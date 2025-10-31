@@ -495,6 +495,3838 @@
     "readFromDocValues": true
   },
   {
+    "name": "azure.activitylogs.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.event_category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.identity.authorization.action",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.identity.authorization.evidence.principal_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.identity.authorization.evidence.principal_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.identity.authorization.evidence.role",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.identity.authorization.evidence.role_assignment_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.identity.authorization.evidence.role_assignment_scope",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.identity.authorization.evidence.role_definition_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.identity.authorization.scope",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.identity.claims",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.identity.claims_initiated_by_user_fullname",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.level",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.operation_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.operation_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.properties.event_category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.properties.event_properties_cause",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.properties.service_request_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.properties.status_code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.result_signature",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.result_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.activitylogs.tenant_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.container_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.event_ip_address",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.event_primary_stamp_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.event_stamp_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.event_stamp_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.host",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.level",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.log",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.operation_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.client_ip",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.client_port",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.computer_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.cookie",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.cs_bytes",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.cs_host",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.cs_method",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.cs_uri_query",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.cs_uri_stem",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.cs_username",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.details",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.protocol",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.referer",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.result",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.s_port",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.sc_bytes",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.sc_status",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.sc_substatus",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.sc_win32status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.service_endpoint",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.source_system",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.time_generated",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.time_taken",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.user",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.user_agent",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.user_display_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.xazurefdid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.xfdhealth_probe",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.xforwarded_for",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.properties.xforwarded_host",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.app_service.result_description",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.application_gateway.hostname",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.application_gateway.instance_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.application_gateway.operation_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.application_gateway.policy.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.application_gateway.policy.scope",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.application_gateway.policy.scope_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.application_gateway.transaction_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.application_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.identity",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.level",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.operation_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.operation_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.activity_datetime",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.activity_display_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.additional_details",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.correlation_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.initiated_by.app.app_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.initiated_by.app.display_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.initiated_by.app.service_principal_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.initiated_by.app.service_principal_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.initiated_by.user.display_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.initiated_by.user.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.initiated_by.user.ipaddress",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.initiated_by.user.roles",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.initiated_by.user.user_principal_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.logged_by_service",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.operation_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.result_description",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.result_reason",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.properties.target_resources",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.auditlogs.result_signature",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.compute_vm.disk_read_bytes.total",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.compute_vm.inbound_flows_maximum_creation_rate.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.compute_vm.network_in.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.compute_vm.network_in_total.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.compute_vm.outbound_flows_maximum_creation_rate.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.compute_vm.percentage_cpu.avg",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.compute_vm_scaleset.cpu_credits_consumed.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.compute_vm_scaleset.cpu_credits_remaining.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.container_instance.network_bytes_received_per_second.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.container_instance.network_bytes_transmitted_per_second.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.container_registry.agent_pool_cpu_time.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.container_registry.run_duration.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.container_registry.storage_used.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.container_registry.successful_pull_count.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.container_registry.successful_push_count.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.container_registry.total_pull_count.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.container_registry.total_push_count.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.container_service.kube_node_status_allocatable_cpu_cores.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.container_service.kube_node_status_allocatable_memory_bytes.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.container_service.kube_node_status_condition.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.container_service.kube_pod_status_phase.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.container_service.kube_pod_status_ready.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.correlation_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.database_account.availability.avg",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.database_account.data_usage_storage.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.database_account.mongo_requests_count.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.api_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.authentication",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.blob_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.closure_reason",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.command_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.condition",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.database_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.feature_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.file_share",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.fingerprint",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.geo_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.geolocation",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.lun",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.model_deployment_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.model_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.namespace",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.node",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.phase",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.pod",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.region",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.resource_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.response_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.status_code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.tier",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.transaction_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.usage_channel",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.virtual_machine",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.dimensions.vmname",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.action",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.dnssec_ok_bit",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.edns0_buffer_size",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.hostname",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.icmp.request.code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.instance_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.is_explicit_proxy_request",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.operation_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.policy",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.policy_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.policy_scope",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.policy_scope_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.request_duration_sec",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.request_size",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.response_size",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.rule_collection_group",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.rule_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.rule_ruleset",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.transaction_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.firewall.web_category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.function.app_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.function.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.function.event_id",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.function.event_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.function.exception_details",
+    "type": "string",
+    "esTypes": ["text"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "azure.function.exception_message",
+    "type": "string",
+    "esTypes": ["text"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "azure.function.exception_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.function.host_instance_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.function.host_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.function.invocation_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.function.level",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.function.level_id",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.function.message",
+    "type": "string",
+    "esTypes": ["text"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "azure.function.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.function.process_id",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.function.role_instance",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivity.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.operation_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.operation_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.properties.api_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.properties.app_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.properties.billed_size",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.properties.client_auth_method",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.properties.client_request_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.properties.identity_provider",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.properties.operation_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.properties.roles",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.properties.scopes",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.properties.service_principal_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.properties.sign_in_activity",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.properties.sign_in_activity_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.properties.time_generated",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.properties.token_issued_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.properties.wids",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.graphactivitylogs.result_signature",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identity.properties.metric_response_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identity.properties.object_key",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identity.requester.app_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identity.requester.audience",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identity.requester.object_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identity.requester.tenant_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identity.requester.token_issuer",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identity.requester.upn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identity.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identity_authorization",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.operation_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.operation_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.activity",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.activity_datetime",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.additional_info",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.correlation_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.is_deleted",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.is_guest",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.is_processing",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.last_updated_datetime",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.request_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.risk_detail",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.risk_event_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.risk_last_updated_datetime",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.risk_level",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.risk_state",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.risk_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.source",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.token_issuer_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.user_display_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.user_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.user_principal_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.properties.user_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.identityprotection.result_signature",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.metrics.Egress.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.metrics.Ingress.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.metrics.SuccessE2ELatency.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.metrics.SuccessServerLatency.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.metrics.Transactions.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.metrics.document_quota.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.namespace",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.active_tokens.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.asset_identity",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.context_tokens_cache_match_rate.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.correlation_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.deployment_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.event",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.fine_tuned_training_hours.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.generated_tokens.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.is_request_success",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.location",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.operation_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.processed_prompt_tokens.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.api_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.api_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.api_revision",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.backend_method",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.backend_protocol",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.backend_request_body",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.backend_response_body",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.backend_response_code",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.backend_time",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.backend_url",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.cache",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.model_deployment_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.model_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.model_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.object_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.operation_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.request_time",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.response_time",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.properties.stream_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.provisioned_managed_utilization_v2.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.requests.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.result_signature",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.sku",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.tenant",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.time_to_response.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.token_transaction.total",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.open_ai.truncated",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.operation_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.activity_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.caller",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.ccpnamespace",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.cloud",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.environment",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.event_category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.event_time_string",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.identity_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.operation_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.auth_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.device_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.direction",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.error_message",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.log",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.masked_ipaddress",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.namespace",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.pod",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.protocol",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.raw",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.request_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.request_size",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.response_size",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.sdk_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.status_code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.stream",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.properties.subscription_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.result_description",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.result_signature",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.result_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.scaleunit",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.platformlogs.status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.identity",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.level",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.operation_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.operation_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.action",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.activity_datetime",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.change_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.cycle_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.duration_ms",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.initiated_by.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.initiated_by.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.initiated_by.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.job_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.modified_properties",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.provisioning_action",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.provisioning_status_info.error_information.additional_details",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.provisioning_status_info.error_information.error_category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.provisioning_status_info.error_information.error_code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.provisioning_status_info.error_information.reason",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.provisioning_status_info.error_information.recommended_action",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.provisioning_status_info.status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.provisioning_steps",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.service_principal.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.service_principal.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.source_identity.details.display_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.source_identity.details.user_principal_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.source_identity.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.source_identity.identity_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.source_identity.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.source_system.details",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.source_system.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.source_system.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.target_identity.details",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.target_identity.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.target_identity.identity_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.target_identity.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.target_system.details",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.target_system.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.target_system.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.properties.tenant_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.result_signature",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.provisioning.result_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.resource.authorization_rule",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.resource.group",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.resource.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.resource.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.resource.namespace",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.resource.provider",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.resource.tags",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.resource.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.rule.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.rule.description",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.rule.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.rule.ruleset",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.rule.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.caller_ip_address",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.identity",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.operation_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.operation_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.app_display_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.app_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.applied_conditional_access_policies",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.authentication_details",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.authentication_processing_details",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.authentication_protocol",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.authentication_requirement",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.authentication_requirement_policies",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.autonomous_system_number",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.client_app_used",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.conditional_access_status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.correlation_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.created_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.cross_tenant_access_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.device_detail.browser",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.device_detail.device_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.device_detail.display_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.device_detail.is_compliant",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.device_detail.is_managed",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.device_detail.operating_system",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.device_detail.trust_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.flagged_for_review",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.home_tenant_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.incoming_token_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.is_interactive",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.is_tenant_restricted",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.original_request_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.processing_time_in_ms",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.resource_display_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.resource_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.resource_tenant_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.risk_detail",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.risk_level_aggregated",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.risk_level_during_signIn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.risk_state",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.service_principal_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.service_principal_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.status.error_code",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.token_issuer_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.unique_token_identifier",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.user_display_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.user_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.user_principal_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.properties.user_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.result_description",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.result_signature",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.signinlogs.result_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.event_category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.level",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.log_format",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.operation_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.properties.app_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.properties.instance_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.properties.logger",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.properties.service_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.properties.service_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.properties.stack",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.properties.status_code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.properties.stream",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.properties.thread",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.properties.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.result_signature",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.result_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.springcloudlogs.status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.account_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.client_request_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.conditions_used",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.container",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.content_length_header",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.duration.ms",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.etag",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.last_modified_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.operation.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.operation.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.operation_count",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.request_header_size",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.request_md5",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.request_url",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.response_header_size",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.schema.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.server_latency.ms",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.server_md5",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.service_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage.status_text",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage_account.availability.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.storage_account.used_capacity.avg",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.subscription_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.tenant_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "azure.timegrain",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
     "name": "check.compliance",
     "type": "string",
     "esTypes": ["keyword"],
@@ -4682,6 +8514,22 @@
     "name": "message",
     "type": "string",
     "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "metricset.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "metricset.period",
+    "type": "number",
+    "esTypes": ["long"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
