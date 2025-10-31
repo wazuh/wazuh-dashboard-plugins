@@ -10,15 +10,16 @@ Through the dashboardId, agentDashboardId, and hasPinnedAgent properties, you ca
 ```typescript
 import { DashboardRenderer } from './dashboard-renderer';
 
-export function DashboardContainer ({
+export function DashboardContainer({
   dashboardId,
   agentDashboardId,
   className,
   hasPinnedAgent,
   config,
 }) {
-
-  const pinnedAgentFilter = Boolean(config?.dataSource?.dataSource?.getPinnedAgentFilter()?.length);
+  const pinnedAgentFilter = Boolean(
+    config?.dataSource?.dataSource?.getPinnedAgentFilter()?.length,
+  );
 
   return (
     <DashboardRenderer
