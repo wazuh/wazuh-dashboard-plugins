@@ -55,7 +55,7 @@ function toVisualizationAttributes(savedVis: DashboardByValueSavedVis) {
   return { attributes, references };
 }
 
-async function createOrUpdateVisualization(
+async function saveVisualizationSavedObject(
   client: SavedObjectsClientContract,
   savedVis: DashboardByValueSavedVis,
   logger: InitializationTaskRunContext['logger'],
@@ -94,7 +94,7 @@ function buildDashboardPanelsJSON(
   }));
 }
 
-async function createOrUpdateDashboard(
+async function saveDashboardSavedObject(
   client: SavedObjectsClientContract,
   dashboard: DashboardByValueInput,
   savedObjectVisualizationsIds: string[],
@@ -134,7 +134,7 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
           new WelcomeDashboardVisualizationConfig();
 
         for (const savedVis of welcomeDashboardVisualizationConfig.getSavedVisualizations()) {
-          await createOrUpdateVisualization(
+          await saveVisualizationSavedObject(
             savedObjectsClient,
             savedVis(INDEX_PATTERN_REPLACE_ME),
             ctx.logger,
@@ -151,12 +151,12 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
           welcomeDashboardPanelsBuilder,
         );
 
-        await createOrUpdateDashboard(
+        await saveDashboardSavedObject(
           savedObjectsClient,
           welcomeDashboardConfig.getConfig(),
           welcomeDashboardVisualizationConfig
             .getSavedVisualizations()
-            .map((vis) => vis(INDEX_PATTERN_REPLACE_ME).id),
+            .map(vis => vis(INDEX_PATTERN_REPLACE_ME).id),
           ctx.logger,
         );
 
