@@ -60,6 +60,9 @@ const config = {
   datasets: [],
   // Mapping from local dataset names to remote template filenames
   datasetToTemplateMapping: {
+    'wazuh-alerts': 'index-template-alerts.json',
+    'agents-monitoring': 'index-template-monitoring.json',
+    'server-statistics': 'index-template-statistics.json',
     'states-fim-files': 'index-template-fim-files.json',
     'states-fim-registry-keys': 'index-template-fim-registry-keys.json',
     'states-fim-registry-values': 'index-template-fim-registry-values.json',
@@ -88,7 +91,12 @@ function getDatasets() {
     const items = fs.readdirSync(config.localDatasetDir);
     config.datasets = items.filter(item => {
       const itemPath = path.join(config.localDatasetDir, item);
-      return fs.statSync(itemPath).isDirectory() && item.startsWith('states-');
+      // Include states-*, wazuh-alerts, agents-monitoring, and server-statistics
+      return fs.statSync(itemPath).isDirectory() && 
+             (item.startsWith('states-') || 
+              item === 'wazuh-alerts' || 
+              item === 'agents-monitoring' || 
+              item === 'server-statistics');
     });
     console.log(`Found ${config.datasets.length} datasets to update.`);
   } catch (error) {
