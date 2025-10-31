@@ -135,9 +135,6 @@ function generateAlert(params) {
     }),
   };
 
-  // Sample data marker
-  alert['@sampledata'] = true;
-
   // Initialize data object for modules that haven't been migrated yet
   alert.data = {};
 
@@ -222,6 +219,14 @@ function generateAlert(params) {
           alert,
         );
 
+        // Generate message and cloud fields (guarddutyPortProbe)
+        alert.message = `AWS GuardDuty: ${alert.data.aws.title}`;
+        alert.cloud = {
+          provider: 'aws',
+          region: alert.data.aws.region,
+          account: { id: alert.data.aws.accountId },
+          service: { name: 'guardduty' },
+        };
         break;
       }
       case 'apiCall': {
@@ -427,6 +432,21 @@ function generateAlert(params) {
       new Date(alert['@timestamp']).getTime() - 3 * 24 * 60 * 60 * 1000,
     );
     const typeAlert = Azure.auditLogs;
+
+    // Update event categorization
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.IAM],
+      type: [EVENT_TYPES.CHANGE],
+      outcome: EVENT_OUTCOMES.SUCCESS,
+      module: 'azure',
+      severity: 3,
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = getDecodersForModule('azure');
+    alert.wazuh.rules = getRulesForModule('azure');
+
     alert.rule = { ...typeAlert.rule };
     alert.rule.description = Random.arrayItem(Azure.ruleDescriptions);
     alert.rule.id = `${Random.number(1, ALERT_ID_MAX)}`;
@@ -473,20 +493,24 @@ function generateAlert(params) {
     );
     alert.data['ms-graph'].userId = Random.createHash(32);
 
-    alert.GeoLocation = Random.arrayItem(GEO_LOCATION);
+    // Cloud fields for Azure
+    alert.cloud = {
+      provider: 'azure',
+      account: { id: alert.data['ms-graph'].tenantId },
+    };
+
+    // Message
+    alert.message = `Azure: ${alert.data['ms-graph'].title} - ${alert.data['ms-graph'].category}`;
+
+    // Log information
+    alert.log = generateLog({
+      level: 'info',
+      filePath: '/var/log/azure.log',
+      originFile: 'azure',
+    });
   }
 
   if (params.office) {
-    alert.agent = {
-      id: '000',
-      ip: alert.agent.ip,
-      name: alert.agent.name,
-    };
-
-    if (params.manager && params.manager.name) {
-      alert.agent.name = params.manager.name;
-    }
-
     const beforeDate = new Date(
       new Date(alert['@timestamp']).getTime() - 3 * 24 * 60 * 60 * 1000,
     );
@@ -504,12 +528,39 @@ function generateAlert(params) {
     const log = Random.arrayItem(Office.arrayLogs);
     const ruleData = Office.officeRules[log.RecordType];
 
-    alert.agent.id = '000';
+    // Update event categorization
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.IAM],
+      type: [EVENT_TYPES.CHANGE],
+      outcome:
+        resultStatus === 'Succeeded'
+          ? EVENT_OUTCOMES.SUCCESS
+          : EVENT_OUTCOMES.FAILURE,
+      module: 'office365',
+      severity: 3,
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = getDecodersForModule('office');
+    alert.wazuh.rules = getRulesForModule('office');
+
+    // User from Office365
+    alert.user = generateUser({
+      name: userID,
+      id: userKey,
+    });
+
+    // Source IP
+    const sourceIp = Random.arrayItem(Office.arrayIp);
+    const sourceGeo = Random.arrayItem(GEO_LOCATION);
+    alert.source = generateNetworkEndpoint({
+      ip: sourceIp,
+      geo: sourceGeo,
+    });
+
     alert.rule = ruleData.rule;
-    alert.decoder = Random.arrayItem(Office.arrayDecoderOffice);
-    alert.GeoLocation = Random.arrayItem(GEO_LOCATION);
     alert.data.integration = 'Office365';
-    alert.location = Office.arrayLocationOffice;
     alert.data.office365 = {
       ...log,
       ...ruleData.data.office365,
@@ -524,11 +575,35 @@ function generateAlert(params) {
       ResultStatus: resultStatus,
       ObjectId: objID,
       UserId: userID,
-      ClientIP: Random.arrayItem(Office.arrayIp),
+      ClientIP: sourceIp,
     };
+
+    // Message
+    alert.message = `Office 365: ${log.Operation} by ${userID} (${resultStatus})`;
+
+    // Log information
+    alert.log = generateLog({
+      level: resultStatus === 'Succeeded' ? 'info' : 'warning',
+      filePath: '/var/log/office365.log',
+      originFile: 'office365',
+    });
   }
 
   if (params.gcp) {
+    // Update event categorization
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.NETWORK],
+      type: [EVENT_TYPES.INFO],
+      outcome: EVENT_OUTCOMES.SUCCESS,
+      module: 'gcp',
+      severity: 3,
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = getDecodersForModule('gcp');
+    alert.wazuh.rules = getRulesForModule('gcp');
+
     alert.rule = Random.arrayItem(GCP.arrayRules);
     alert.data.integration = 'gcp';
     alert.data.gcp = {
@@ -586,11 +661,41 @@ function generateAlert(params) {
       timestamp: '2019-11-11T02:42:04.34921449Z',
     };
 
-    alert.GeoLocation = Random.arrayItem(GEO_LOCATION);
+    // Cloud fields for GCP
+    alert.cloud = {
+      provider: 'gcp',
+      project: { id: alert.data.gcp.resource.labels.project_id },
+      region: alert.data.gcp.resource.labels.location,
+    };
+
+    // Message
+    alert.message = `GCP DNS Query: ${alert.data.gcp.jsonPayload.queryName} (${alert.data.gcp.jsonPayload.queryType})`;
+
+    // Log information
+    alert.log = generateLog({
+      level: alert.data.gcp.severity?.toLowerCase() || 'info',
+      filePath: alert.data.gcp.logName,
+      originFile: 'gcp',
+    });
   }
 
   if (params.audit) {
     const dataAudit = Random.arrayItem(Audit.dataAudit);
+
+    // Update event categorization
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.PROCESS],
+      type: [EVENT_TYPES.CHANGE],
+      outcome: EVENT_OUTCOMES.SUCCESS,
+      module: 'audit',
+      severity: 5,
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = ['audit'];
+    alert.wazuh.rules = getRulesForModule('audit', 'modified');
+
     alert.data = dataAudit.data;
     alert.data.audit.file
       ? alert.data.audit.file.name === ''
@@ -598,26 +703,104 @@ function generateAlert(params) {
         : null
       : null;
     alert.rule = dataAudit.rule;
+
+    // Message
+    alert.message = `Audit: ${dataAudit.rule.description}`;
+
+    // Log
+    alert.log = generateLog({
+      level: 'info',
+      filePath: '/var/log/audit/audit.log',
+      originFile: 'audit',
+    });
   }
 
   if (params.docker) {
     const dataDocker = Random.arrayItem(Docker.dataDocker);
-    alert.data = {};
+
+    // Update event categorization
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.PROCESS],
+      type: [EVENT_TYPES.INFO],
+      outcome: EVENT_OUTCOMES.SUCCESS,
+      module: 'docker',
+      severity: 3,
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = getDecodersForModule('docker');
+    alert.wazuh.rules = getRulesForModule('docker');
+
     alert.data = dataDocker.data;
     alert.rule = dataDocker.rule;
+
+    // Container information
+    alert.container = {
+      id: Random.createHash(12),
+      name: `container-${Random.number(1, 100)}`,
+      image: {
+        name: Random.arrayItem([
+          'nginx:latest',
+          'redis:alpine',
+          'postgres:14',
+          'node:18-alpine',
+        ]),
+      },
+    };
+
+    // Message
+    alert.message = `Docker: ${dataDocker.rule.description}`;
+
+    // Log information
+    alert.log = generateLog({
+      level: 'info',
+      filePath: '/var/log/docker.log',
+      originFile: 'docker',
+    });
   }
 
   if (params.mitre) {
+    // Update event categorization
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.INTRUSION_DETECTION],
+      type: [EVENT_TYPES.INFO],
+      outcome: EVENT_OUTCOMES.UNKNOWN,
+      module: 'mitre',
+      severity: 5,
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = getDecodersForModule('mitre');
+
     alert.rule = Random.arrayItem(Mitre.arrayMitreRules);
-    alert.location = Random.arrayItem(Mitre.arrayLocation);
+
+    // Message
+    alert.message = `MITRE ATT&CK: ${alert.rule.description}`;
+
+    // Log
+    alert.log = generateLog({
+      level: 'info',
+      filePath: Random.arrayItem(Mitre.arrayLocation),
+      originFile: 'mitre',
+    });
   }
 
   if (params.rootcheck) {
-    alert.location = PolicyMonitoring.location;
-    alert.decoder = { ...PolicyMonitoring.decoder };
-    alert.input = {
-      type: 'log',
-    };
+    // Update event categorization
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.MALWARE],
+      type: [EVENT_TYPES.INFO],
+      outcome: EVENT_OUTCOMES.UNKNOWN,
+      module: 'rootcheck',
+      severity: 7,
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = ['rootcheck'];
+    alert.wazuh.rules = getRulesForModule('rootcheck');
 
     const alertCategory = Random.arrayItem(['Rootkit', 'Trojan']);
 
@@ -641,7 +824,7 @@ function generateAlert(params) {
         };
         alert.rule = { ...PolicyMonitoring.rootkitsData.rule };
         alert.rule.firedtimes = Random.number(1, 10);
-        alert.full_log = alert.data.title;
+        alert.message = alert.data.title;
         break;
       }
       case 'Trojan': {
@@ -652,19 +835,20 @@ function generateAlert(params) {
         };
         alert.rule = { ...PolicyMonitoring.trojansData.rule };
         alert.rule.firedtimes = Random.number(1, 10);
-        alert.full_log = interpolateAlertProps(
-          PolicyMonitoring.trojansData.full_log,
-          alert,
-          {
-            _trojan_signature: trojan.signature,
-          },
-        );
+        alert.message = `Trojaned file detected: ${trojan.file}`;
         break;
       }
       default: {
         /* empty */
       }
     }
+
+    // Log
+    alert.log = generateLog({
+      level: 'warning',
+      filePath: PolicyMonitoring.location,
+      originFile: 'rootcheck',
+    });
   }
 
   if (params.syscheck) {
@@ -817,8 +1001,21 @@ function generateAlert(params) {
   }
 
   if (params.virustotal) {
+    // Update event categorization
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.MALWARE],
+      type: [EVENT_TYPES.INFO],
+      outcome: EVENT_OUTCOMES.UNKNOWN,
+      module: 'virustotal',
+      severity: 7,
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = getDecodersForModule('virustotal');
+    alert.wazuh.rules = getRulesForModule('virustotal');
     alert.rule.groups.push('virustotal');
-    alert.location = 'virustotal';
+
     alert.data.virustotal = {};
     alert.data.virustotal.found = Random.arrayItem(['0', '1', '1', '1']);
 
@@ -837,21 +1034,52 @@ function generateAlert(params) {
       alert.data.virustotal.positives = `${Random.number(0, 65)}`;
       alert.data.virustotal.total =
         alert.data.virustotal.malicious + alert.data.virustotal.positives;
-      // eslint-disable-next-line max-len
+
       alert.rule.description = `VirusTotal: Alert - ${alert.data.virustotal.source.file} - ${alert.data.virustotal.positives} engines detected this file`;
       alert.data.virustotal.permalink = Random.arrayItem(Virustotal.permalink);
       alert.data.virustotal.scan_date = new Date(
         Date.parse(alert['@timestamp']) - 4 * 60000,
       );
+
+      // Message for malicious file
+      alert.message = `VirusTotal: Malicious file detected - ${alert.data.virustotal.source.file} (${alert.data.virustotal.positives} engines)`;
     } else {
       alert.data.virustotal.malicious = '0';
       alert.rule.description =
         'VirusTotal: Alert - No records in VirusTotal database';
+      alert.message = `VirusTotal: No records found for ${alert.data.virustotal.source.file}`;
     }
+
+    // Log
+    alert.log = generateLog({
+      level: alert.data.virustotal.found === '1' ? 'warning' : 'info',
+      filePath: '/var/ossec/logs/ossec.log',
+      originFile: 'virustotal',
+    });
   }
 
   if (params.vulnerabilities) {
     const dataVulnerability = Random.arrayItem(Vulnerability.data);
+
+    // Update event categorization
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.VULNERABILITY],
+      type: [EVENT_TYPES.INFO],
+      outcome: EVENT_OUTCOMES.SUCCESS,
+      module: 'vulnerability-detector',
+      severity:
+        dataVulnerability.data.vulnerability.severity === 'Critical'
+          ? 9
+          : dataVulnerability.data.vulnerability.severity === 'High'
+          ? 7
+          : 5,
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = ['json', 'vulnerability-detector'];
+    alert.wazuh.rules = getRulesForModule('vulnerability');
+
     alert.rule = {
       ...dataVulnerability.rule,
       mail: false,
@@ -860,11 +1088,30 @@ function generateAlert(params) {
       pci_dss: ['11.2.1', '11.2.3'],
       tsc: ['CC7.1', 'CC7.2'],
     };
-    alert.location = 'vulnerability-detector';
-    alert.decoder = DECODER.JSON;
     alert.data = {
       ...dataVulnerability.data,
     };
+
+    // Vulnerability field
+    alert.vulnerability = {
+      id: dataVulnerability.data.vulnerability.cve,
+      severity: dataVulnerability.data.vulnerability.severity.toLowerCase(),
+      score: {
+        base: parseFloat(
+          dataVulnerability.data.vulnerability.cvss?.cvss2?.base_score || 5.0,
+        ),
+      },
+    };
+
+    // Message
+    alert.message = `Vulnerability: ${dataVulnerability.data.vulnerability.cve} found in ${dataVulnerability.data.vulnerability.package.name}`;
+
+    // Log
+    alert.log = generateLog({
+      level: 'warning',
+      filePath: '/var/ossec/logs/ossec.log',
+      originFile: 'vulnerability-detector',
+    });
   }
 
   // Regulatory compliance
@@ -896,7 +1143,7 @@ function generateAlert(params) {
     params.hipaa ||
     params.regulatory_compliance ||
     (params.random_probability_regulatory_compliance &&
-      Random.number(params.random_probability_regulatory_compliance))
+      Random.probability(params.random_probability_regulatory_compliance))
   ) {
     alert.rule.hipaa = [Random.arrayItem(HIPAA)];
   }
@@ -904,7 +1151,7 @@ function generateAlert(params) {
     params.nist_800_83 ||
     params.regulatory_compliance ||
     (params.random_probability_regulatory_compliance &&
-      Random.number(params.random_probability_regulatory_compliance))
+      Random.probability(params.random_probability_regulatory_compliance))
   ) {
     alert.rule.nist_800_53 = [Random.arrayItem(NIST_800_53)];
   }
@@ -1211,15 +1458,22 @@ function generateAlert(params) {
   }
 
   if (params.windows) {
+    // Update event categorization
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.CONFIGURATION],
+      type: [EVENT_TYPES.CHANGE],
+      outcome: EVENT_OUTCOMES.SUCCESS,
+      module: 'windows',
+      severity: 3,
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = ['windows_eventchannel'];
+    alert.wazuh.rules = getRulesForModule('windows', 'service');
     alert.rule.groups.push('windows');
+
     if (params.windows.service_control_manager) {
-      alert.predecoder = {
-        program_name: 'WinEvtLog',
-        timestamp: '2020 Apr 17 05:59:05',
-      };
-      alert.input = {
-        type: 'log',
-      };
       alert.data = {
         extra_data: 'Service Control Manager',
         dstuser: 'SYSTEM',
@@ -1238,89 +1492,149 @@ function generateAlert(params) {
       alert.rule.gdpr = ['IV_35.7.d'];
       alert.rule.nist_800_53 = ['AU.6'];
       alert.rule.info = 'This does not appear to be logged on Windows 2000.';
-      alert.location = 'WinEvtLog';
-      alert.decoder = DECODER.WINDOWS;
-      alert.full_log = `2020 Apr 17 05:59:05 WinEvtLog: type: INFORMATION(7040): Service Control Manager: SYSTEM: NT AUTHORITY: ${alert.data.system_name}: Background Intelligent Transfer Service auto start demand start BITS `; // TODO: date
-      alert.id = '18145';
-      alert.fields = {
-        timestamp: alert['@timestamp'],
-      };
+
+      // Message
+      alert.message = 'Windows: Service startup type was changed';
+
+      // Log
+      alert.log = generateLog({
+        level: 'info',
+        filePath: 'WinEvtLog',
+        originFile: 'windows',
+      });
     }
   }
 
   if (params.apache) {
-    // there is only one type alert in data array at the moment. Randomize if
-    // add more type of alerts to data array
+    // Update event categorization
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.WEB],
+      type: [EVENT_TYPES.ERROR],
+      outcome: EVENT_OUTCOMES.FAILURE,
+      module: 'apache',
+      severity: 5,
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = getDecodersForModule('apache');
+    alert.wazuh.rules = getRulesForModule('apache');
+
     const typeAlert = { ...Apache.data[0] };
+    const sourceIp = Random.arrayItem(IPs);
+    const sourcePort = parseInt(Random.arrayItem(PORTS), 10);
+    const sourceGeo = Random.arrayItem(GEO_LOCATION);
+
     alert.data = {
-      srcip: Random.arrayItem(IPs),
-      srcport: Random.arrayItem(PORTS),
+      srcip: sourceIp,
+      srcport: String(sourcePort),
       id: `AH${Random.number(10000, 99999)}`,
     };
-    alert.GeoLocation = { ...Random.arrayItem(GEO_LOCATION) };
+
+    // Source
+    alert.source = generateNetworkEndpoint({
+      ip: sourceIp,
+      port: sourcePort,
+      geo: sourceGeo,
+    });
+
     alert.rule = { ...typeAlert.rule };
     alert.rule.firedtimes = Random.number(2, 10);
-    alert.input = { type: 'log' };
-    alert.location = Apache.location;
-    alert.decoder = { ...Apache.decoder };
 
-    alert.full_log = interpolateAlertProps(typeAlert.full_log, alert, {
-      _timestamp_apache: DateFormatter.format(
-        new Date(alert['@timestamp']),
-        DateFormatter.DATE_FORMAT.READABLE_FORMAT,
-      ),
-      _pi_id: Random.number(10000, 30000),
+    // Message
+    alert.message = `Apache: ${typeAlert.rule.description}`;
+
+    // Log
+    alert.log = generateLog({
+      level: 'error',
+      filePath: Apache.location,
+      originFile: 'apache',
     });
   }
 
   if (params.web) {
-    alert.input = {
-      type: 'log',
-    };
+    // Update event categorization
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.WEB],
+      type: [EVENT_TYPES.ACCESS],
+      outcome: EVENT_OUTCOMES.FAILURE,
+      module: 'web',
+      severity: 5,
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = getDecodersForModule('web');
+    alert.wazuh.rules = getRulesForModule('web');
+
+    const sourceIp = Random.arrayItem(IPs);
+    const sourceGeo = Random.arrayItem(GEO_LOCATION);
+    const urlPath = Random.arrayItem(Web.urls);
+    const statusCode = parseInt(Random.arrayItem(['404', '403', '500', '401']));
+
     alert.data = {
       protocol: 'GET',
-      srcip: Random.arrayItem(IPs),
-      id: '404',
-      url: Random.arrayItem(Web.urls),
+      srcip: sourceIp,
+      id: String(statusCode),
+      url: urlPath,
     };
-    alert.GeoLocation = { ...Random.arrayItem(GEO_LOCATION) };
+
+    // Source
+    alert.source = generateNetworkEndpoint({
+      ip: sourceIp,
+      geo: sourceGeo,
+    });
+
+    // HTTP and URL fields
+    alert.http = {
+      request: {
+        method: 'GET',
+      },
+      response: {
+        status_code: statusCode,
+      },
+    };
+
+    alert.url = {
+      path: urlPath,
+      domain: Random.arrayItem(DOMAINS),
+    };
 
     const typeAlert = Random.arrayItem(Web.data);
     const userAgent = Random.arrayItem(Web.userAgents);
     alert.rule = { ...typeAlert.rule };
     alert.rule.firedtimes = Random.number(1, 10);
-    alert.full_log = interpolateAlertProps(typeAlert.full_log, alert, {
-      _user_agent: userAgent,
-      _date: DateFormatter.format(
-        new Date(alert['@timestamp']),
-        DateFormatter.DATE_FORMAT.ISO_TIMESTAMP,
-      ),
+
+    // User agent
+    alert.user_agent = {
+      original: userAgent,
+    };
+
+    // Message
+    alert.message = `Web: ${typeAlert.rule.description} from ${sourceIp} (${statusCode})`;
+
+    // Log
+    alert.log = generateLog({
+      level: 'warning',
+      filePath: typeAlert.location,
+      originFile: 'web-access',
     });
-    if (typeAlert.previous_output) {
-      /** @type {string[]} */
-      const previousOutput = [];
-      const beforeSeconds = 4;
-      for (let i = beforeSeconds; i > 0; i--) {
-        const beforeDate = new Date(
-          new Date(alert['@timestamp']).getTime() - (2 + i) * 1000,
-        );
-        previousOutput.push(
-          interpolateAlertProps(typeAlert.full_log, alert, {
-            _user_agent: userAgent,
-            _date: DateFormatter.format(
-              new Date(beforeDate),
-              DateFormatter.DATE_FORMAT.ISO_TIMESTAMP,
-            ),
-          }),
-        );
-      }
-      alert.previous_output = previousOutput.join('\n');
-    }
   }
 
   if (params.github) {
-    alert.location = GitHub.LOCATION;
-    alert.decoder = GitHub.decoder;
+    // Update event categorization
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.WEB],
+      type: [EVENT_TYPES.CHANGE],
+      outcome: EVENT_OUTCOMES.SUCCESS,
+      module: 'github',
+      severity: 3,
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = getDecodersForModule('github');
+    alert.wazuh.rules = getRulesForModule('github');
     const alertType = Random.arrayItem(GitHub.ALERT_TYPES);
     const actor = Random.arrayItem(GitHub.ACTORS);
     alert.data = {
@@ -1352,17 +1666,58 @@ function generateAlert(params) {
     alert.rule = {
       ...alertType.rule,
     };
+
+    // Message
+    alert.message = `GitHub: ${alertType.data.github.action} by ${alert.data.github.actor}`;
+
+    // Log
+    alert.log = generateLog({
+      level: 'info',
+      filePath: GitHub.LOCATION,
+      originFile: 'github',
+    });
   }
 
   if (params.yara) {
-    alert = { ...alert, ...Yara.createAlert() };
+    // Update event categorization
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.MALWARE],
+      type: [EVENT_TYPES.INFO],
+      outcome: EVENT_OUTCOMES.SUCCESS,
+      module: 'yara',
+      severity: 8,
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = ['YARA_decoder'];
+    alert.wazuh.rules = getRulesForModule('yara', 'detected');
+
+    const yaraAlert = Yara.createAlert();
+    // Merge YARA alert data, preserving ECS fields
+    alert.data = { ...alert.data, ...(yaraAlert.data || {}) };
+    if (yaraAlert.rule) {
+      alert.rule = { ...alert.rule, ...yaraAlert.rule };
+    }
+    if (yaraAlert.location) {
+      alert.data.location = yaraAlert.location;
+    }
+
+    // Message
+    alert.message = `YARA: Malware signature detected`;
+
+    // Log
+    alert.log = generateLog({
+      level: 'critical',
+      filePath: '/var/ossec/logs/ossec.log',
+      originFile: 'yara',
+    });
   }
 
-  return {
-    ...alert,
-    ['@sampledata']: true,
-    ['@timestamp']: alert['@timestamp'], // Already set in base structure
-  };
+  // Ensure @sampledata marker is set
+  alert['@sampledata'] = true;
+
+  return alert;
 }
 
 /**
