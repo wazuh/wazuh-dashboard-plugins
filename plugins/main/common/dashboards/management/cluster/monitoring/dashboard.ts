@@ -136,7 +136,7 @@ export class ClusterMonitoringDashboardByRendererConfig extends DashboardByRende
   }
 
   protected override getId(): string {
-    return 'ct-dashboard-monitoring-tab';
+    return 'cluster-monitoring-dashboard-tab';
   }
 
   protected override getTitle(): string {
