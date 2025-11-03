@@ -52,6 +52,7 @@ import {
   NistOverviewDashboardByRendererConfig,
   NistPinnedAgentDashboardByRendererConfig,
 } from '../../../common/dashboards/overview/nist/dashboard';
+import { OfficeOverviewDashboardByRendererConfig } from '../../../common/dashboards/overview/office/dashboard';
 import {
   PCIOverviewDashboardByRendererConfig,
   PCIPinnedAgentDashboardByRendererConfig,
@@ -147,6 +148,8 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     new PCIOverviewDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
   const pciPinnedAgentDashboardByRendererConfig =
     new PCIPinnedAgentDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
+  const officeOverviewDashboardByRendererConfig =
+    new OfficeOverviewDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
 
   return [
     agentsEventsDashboardConfig,
@@ -182,5 +185,6 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     nistPinnedAgentDashboardByRendererConfig,
     pciOverviewDashboardByRendererConfig,
     pciPinnedAgentDashboardByRendererConfig,
+    officeOverviewDashboardByRendererConfig,
   ];
 };

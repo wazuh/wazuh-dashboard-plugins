@@ -117,10 +117,7 @@ export abstract class PCIDashboardByRendererConfig extends DashboardByRendererCo
 
 export class PCIOverviewDashboardByRendererConfig extends PCIDashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(
-      indexPatternId,
-      new PCIOverviewDashboardLayoutConfig(indexPatternId),
-    );
+    super(indexPatternId, new PCIOverviewDashboardLayoutConfig(indexPatternId));
   }
 
   protected override getId(): string {
