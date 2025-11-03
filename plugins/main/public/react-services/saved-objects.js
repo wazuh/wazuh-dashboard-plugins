@@ -132,7 +132,7 @@ export class SavedObject {
         };
       }
     } catch (error) {
-      return ((error || {}).data || {}).message || false
+      return error?.data?.message || false
         ? error.data.message
         : error.message || error;
     }
@@ -149,8 +149,8 @@ export class SavedObject {
         `/api/saved_objects/dashboard/${dashboardID}?fields=title`,
       );
 
-      const title = (((dashboardData || {}).data || {}).attributes || {}).title;
-      const id = ((dashboardData || {}).data || {}).id;
+      const title = dashboardData?.data?.attributes?.title;
+      const id = dashboardData?.data?.id;
 
       if (title) {
         return {
@@ -163,26 +163,37 @@ export class SavedObject {
       }
     } catch (error) {
       // Keep consistency with existsIndexPattern by returning the error message
-      return ((error || {}).data || {}).message || false
+      return error?.data?.message || false
         ? error.data.message
         : error.message || error;
     }
   }
 
-  // Fetch a dashboard saved object by id using _find and filter by id client-side
+  // Fetch a dashboard saved object by id using SavedObjects client and filter by id client-side
   static async getDashboardById(dashboardID) {
     try {
-      // Request dashboards via _find; include common fields to avoid a second fetch
-      const url = `/api/saved_objects/_find?type=dashboard&per_page=10000&fields=title&fields=description&fields=panelsJSON&fields=optionsJSON&fields=timeRestore&fields=timeFrom&fields=timeTo`;
-      const result = await GenericRequest.request('GET', url);
-      const list = ((result || {}).data || {}).saved_objects || [];
+      // Request dashboards via SavedObjects client; include common fields to avoid a second fetch
+      const result = await getSavedObjects().client.find({
+        type: 'dashboard',
+        perPage: 10000,
+        fields: [
+          'title',
+          'description',
+          'panelsJSON',
+          'optionsJSON',
+          'timeRestore',
+          'timeFrom',
+          'timeTo',
+        ],
+      });
+      const list = (result && result.savedObjects) || [];
       const match = list.find(so => so && so.id === dashboardID);
       if (!match) {
         throw new Error(`Dashboard '${dashboardID}' not found`);
       }
       return { data: match };
     } catch (error) {
-      throw ((error || {}).data || {}).message || false
+      throw error?.data?.message || false
         ? new Error(error.data.message)
         : error;
     }
@@ -203,20 +214,29 @@ export class SavedObject {
     defaultSearchOperator = 'AND',
   }) {
     try {
-      const hasReference = encodeURIComponent(
-        JSON.stringify({ type: referenceType, id: referenceId }),
-      );
-      const searchFieldsParams = (searchFields || [])
-        .map(f => `search_fields=${encodeURIComponent(f)}`)
-        .join('&');
-      const url = `/api/saved_objects/_find?default_search_operator=${encodeURIComponent(
-        defaultSearchOperator,
-      )}&has_reference=${hasReference}&page=${page}&per_page=${perPage}&${searchFieldsParams}&type=${encodeURIComponent(
+      const result = await getSavedObjects().client.find({
         type,
-      )}`;
-      return await GenericRequest.request('GET', url);
+        page,
+        perPage,
+        searchFields,
+        defaultSearchOperator,
+        hasReference: {
+          type: referenceType,
+          id: referenceId,
+        },
+      });
+
+      // Adapt the result to match the expected format from GenericRequest
+      return {
+        data: {
+          saved_objects: result.savedObjects || [],
+          total: result.total || 0,
+          page: result.page || page,
+          per_page: result.perPage || perPage,
+        },
+      };
     } catch (error) {
-      throw ((error || {}).data || {}).message || false
+      throw error?.data?.message || false
         ? new Error(error.data.message)
         : error;
     }
@@ -241,7 +261,7 @@ export class SavedObject {
     } catch (error) {
       if (error && error.response && error.response.status == 404) return false;
       return Promise.reject(
-        ((error || {}).data || {}).message || false
+        error?.data?.message || false
           ? new Error(error.data.message)
           : new Error(
               error.message || `Error getting the '${patternID}' index pattern`,
@@ -279,7 +299,7 @@ export class SavedObject {
 
       return result;
     } catch (error) {
-      throw ((error || {}).data || {}).message || false
+      throw error?.data?.message || false
         ? new Error(error.data.message)
         : error;
     }
@@ -309,7 +329,7 @@ export class SavedObject {
         },
       );
     } catch (error) {
-      throw ((error || {}).data || {}).message || false
+      throw error?.data?.message || false
         ? new Error(error.data.message)
         : error;
     }
@@ -327,9 +347,8 @@ export class SavedObject {
         the error management that causes that unwanted toasts are displayed when there are no
         indices for the index pattern
       */
-    const fields = await getDataPlugin().indexPatterns.getFieldsForIndexPattern(
-      pattern,
-    );
+    const fields =
+      await getDataPlugin().indexPatterns.getFieldsForIndexPattern(pattern);
     const scripted = pattern.getScriptedFields().map(field => field.spec);
     pattern.fields.replaceAll([...fields, ...scripted]);
     await getDataPlugin().indexPatterns.updateSavedObject(pattern);
@@ -364,7 +383,7 @@ export class SavedObject {
       );
       return;
     } catch (error) {
-      throw ((error || {}).data || {}).message || false
+      throw error?.data?.message || false
         ? error.data.message
         : error.message || error;
     }
