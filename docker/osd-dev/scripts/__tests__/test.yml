@@ -1,0 +1,9 @@
+services:
+  script-tests:
+    build:
+      context: ../../../..
+      dockerfile: docker/osd-dev/scripts/__tests__/Dockerfile
+    working_dir: /workspace/docker/osd-dev/scripts
+    entrypoint: [/usr/local/bin/script-tests-entrypoint]
+    volumes:
+      - ../../../..:/workspace:rw

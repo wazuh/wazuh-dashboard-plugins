@@ -38,6 +38,11 @@ const scanSettings = [
   { field: 'network', label: 'Scan network interfaces' },
   { field: 'ports', label: 'Scan listening network ports' },
   { field: 'ports_all', label: 'Scan all network ports' },
+  { field: 'groups', label: 'Scan groups' },
+  { field: 'users', label: 'Scan users' },
+  { field: 'services', label: 'Scan services' },
+  { field: 'browser_extensions', label: 'Scan browser extensions' },
+  { field: 'sync_max_eps', label: 'Maximum event reporting throughput' },
 ];
 
 const helpLinks = [
@@ -88,8 +93,8 @@ class WzConfigurationInventory extends Component {
           )}
         {currentConfig && this.wodleConfig && this.wodleConfig.syscollector && (
           <WzConfigurationSettingsHeader
-            title="Main settings"
-            description="General settings applied to all the scans"
+            title='Main settings'
+            description='General settings applied to all the scans'
             help={helpLinks}
           >
             <WzConfigurationSettingsGroup
