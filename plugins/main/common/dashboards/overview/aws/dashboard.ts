@@ -1,0 +1,193 @@
+import {
+  DashboardByRendererConfig,
+  DashboardLayoutConfig,
+} from '../../dashboard-builder';
+import {
+  getVisStateAgentEventsByBucket,
+  getVisStateAgentEventsBySource,
+  getVisStateAgentGeolocationMap,
+  getVisStateAgentRegions,
+  getVisStateAgentTopAccounts,
+  getVisStateAgentTopBuckets,
+  getVisStateAgentTopSources,
+  getVisStateEventsByBucket,
+  getVisStateEventsBySource,
+  getVisStateGeolocationMap,
+  getVisStateRegions,
+  getVisStateTopAccounts,
+  getVisStateTopBuckets,
+  getVisStateTopSources,
+} from './vis-states';
+
+export class AWSDashboardLayoutConfig extends DashboardLayoutConfig {
+  constructor() {
+    super();
+  }
+}
+
+export class AWSOverviewDashboardLayoutConfig extends AWSDashboardLayoutConfig {
+  constructor(indexPatternId: string) {
+    super();
+    this.gridVisualizationItems.push(
+      {
+        gridData: {
+          w: 12,
+          h: 9,
+          x: 0,
+          y: 0,
+        },
+        savedVis: getVisStateTopSources(indexPatternId),
+      },
+      {
+        gridData: {
+          w: 12,
+          h: 9,
+          x: 12,
+          y: 0,
+        },
+        savedVis: getVisStateTopAccounts(indexPatternId),
+      },
+      {
+        gridData: {
+          w: 12,
+          h: 9,
+          x: 24,
+          y: 0,
+        },
+        savedVis: getVisStateTopBuckets(indexPatternId),
+      },
+      {
+        gridData: {
+          w: 12,
+          h: 9,
+          x: 36,
+          y: 0,
+        },
+        savedVis: getVisStateRegions(indexPatternId),
+      },
+      {
+        gridData: {
+          w: 24,
+          h: 12,
+          x: 0,
+          y: 9,
+        },
+        savedVis: getVisStateEventsBySource(indexPatternId),
+      },
+      {
+        gridData: {
+          w: 24,
+          h: 12,
+          x: 24,
+          y: 9,
+        },
+        savedVis: getVisStateEventsByBucket(indexPatternId),
+      },
+      {
+        gridData: {
+          w: 48,
+          h: 20,
+          x: 0,
+          y: 21,
+        },
+        savedVis: getVisStateGeolocationMap(indexPatternId),
+      },
+    );
+  }
+}
+
+export class AWSAgentPinnedDashboardLayoutConfig extends AWSDashboardLayoutConfig {
+  constructor(indexPatternId: string) {
+    super();
+    this.gridVisualizationItems.push(
+      {
+        gridData: {
+          w: 12,
+          h: 9,
+          x: 0,
+          y: 0,
+        },
+        savedVis: getVisStateAgentTopSources(indexPatternId),
+      },
+      {
+        gridData: {
+          w: 12,
+          h: 9,
+          x: 12,
+          y: 0,
+        },
+        savedVis: getVisStateAgentTopAccounts(indexPatternId),
+      },
+      {
+        gridData: {
+          w: 12,
+          h: 9,
+          x: 24,
+          y: 0,
+        },
+        savedVis: getVisStateAgentTopBuckets(indexPatternId),
+      },
+      {
+        gridData: {
+          w: 12,
+          h: 9,
+          x: 36,
+          y: 0,
+        },
+        savedVis: getVisStateAgentRegions(indexPatternId),
+      },
+      {
+        gridData: {
+          w: 24,
+          h: 12,
+          x: 0,
+          y: 9,
+        },
+        savedVis: getVisStateAgentEventsBySource(indexPatternId),
+      },
+      {
+        gridData: {
+          w: 24,
+          h: 12,
+          x: 24,
+          y: 9,
+        },
+        savedVis: getVisStateAgentEventsByBucket(indexPatternId),
+      },
+      {
+        gridData: {
+          w: 48,
+          h: 20,
+          x: 0,
+          y: 21,
+        },
+        savedVis: getVisStateAgentGeolocationMap(indexPatternId),
+      },
+    );
+  }
+}
+
+export class AWSDashboardByRendererConfig extends DashboardByRendererConfig {
+  constructor(
+    indexPatternId: string,
+    dashboardLayoutConfig: AWSDashboardLayoutConfig,
+  ) {
+    super(indexPatternId, dashboardLayoutConfig);
+  }
+
+  protected override getId(): string {
+    return 'agent-events-count-evolution';
+  }
+  protected override getTitle(): string {
+    return 'Events count evolution';
+  }
+  protected override getDescription(): string {
+    return 'Dashboard of Events count evolution';
+  }
+  protected override get useMargins(): boolean {
+    return true;
+  }
+  protected override get hidePanelTitles(): boolean {
+    return true;
+  }
+}
