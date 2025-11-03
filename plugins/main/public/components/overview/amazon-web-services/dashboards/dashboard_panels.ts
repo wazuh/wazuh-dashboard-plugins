@@ -1,16 +1,20 @@
-import type { DashboardByValueSavedVis } from "../../../../../common/dashboards";
+import type { DashboardByValuePanels } from '../../../../../common/dashboards';
 import {
   AWSAgentPinnedDashboardLayoutConfig,
+  AWSDashboardByRendererConfig,
   AWSOverviewDashboardLayoutConfig,
 } from '../../../../../common/dashboards/overview/aws/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,
   isPinnedAgent?: boolean,
-): DashboardByValueSavedVis[] => {
+): DashboardByValuePanels => {
   const dashboardLayoutConfig = isPinnedAgent
     ? new AWSAgentPinnedDashboardLayoutConfig(indexPatternId)
     : new AWSOverviewDashboardLayoutConfig(indexPatternId);
 
-  return dashboardLayoutConfig.getSavedVisualizations();
+  return new AWSDashboardByRendererConfig(
+    indexPatternId,
+    dashboardLayoutConfig,
+  ).getDashboardPanels();
 };
