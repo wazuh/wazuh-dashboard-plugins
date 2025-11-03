@@ -43,7 +43,7 @@ export interface DashboardByValuePanelConfig<T extends string = string> {
 
 export type DashboardByValuePanels<T extends string = string> = Record<
   T,
-  DashboardByValuePanelConfig
+  DashboardByValuePanelConfig<T>
 >;
 
 export interface DashboardByValueInput {
