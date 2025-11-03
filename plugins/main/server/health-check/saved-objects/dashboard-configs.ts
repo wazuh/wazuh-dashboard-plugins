@@ -49,13 +49,17 @@ import {
   MitrePinnedAgentDashboardByRendererConfig,
 } from '../../../common/dashboards/overview/mitre/dashboard';
 import {
+  NistOverviewDashboardByRendererConfig,
+  NistPinnedAgentDashboardByRendererConfig,
+} from '../../../common/dashboards/overview/nist/dashboard';
+import {
   TscOverviewDashboardByRendererConfig,
   TscPinnedAgentDashboardByRendererConfig,
 } from '../../../common/dashboards/overview/tsc/dashboard';
 import { INDEX_PATTERN_REPLACE_ME } from './constants';
 
 export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
-  const welcomeDashboardConfig = new AgentsEventsDashboardByRendererConfig(
+  const agentsEventsDashboardConfig = new AgentsEventsDashboardByRendererConfig(
     INDEX_PATTERN_REPLACE_ME,
   );
   const clusterConfigurationDashboardConfig =
@@ -131,9 +135,13 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     new MitreOverviewDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
   const mitrePinnedAgentDashboardByRendererConfig =
     new MitrePinnedAgentDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
+  const nistOverviewDashboardByRendererConfig =
+    new NistOverviewDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
+  const nistPinnedAgentDashboardByRendererConfig =
+    new NistPinnedAgentDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
 
   return [
-    welcomeDashboardConfig,
+    agentsEventsDashboardConfig,
     clusterConfigurationDashboardConfig,
     clusterMonitoringDashboardConfig,
     awsOverviewDashboardConfig,
@@ -162,5 +170,7 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     tscPinnedAgentDashboardByRendererConfig,
     mitreOverviewDashboardByRendererConfig,
     mitrePinnedAgentDashboardByRendererConfig,
+    nistOverviewDashboardByRendererConfig,
+    nistPinnedAgentDashboardByRendererConfig,
   ];
 };
