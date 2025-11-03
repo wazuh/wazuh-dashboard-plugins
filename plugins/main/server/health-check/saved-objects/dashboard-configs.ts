@@ -53,6 +53,10 @@ import {
   NistPinnedAgentDashboardByRendererConfig,
 } from '../../../common/dashboards/overview/nist/dashboard';
 import {
+  PCIOverviewDashboardByRendererConfig,
+  PCIPinnedAgentDashboardByRendererConfig,
+} from '../../../common/dashboards/overview/pci/dashboard';
+import {
   TscOverviewDashboardByRendererConfig,
   TscPinnedAgentDashboardByRendererConfig,
 } from '../../../common/dashboards/overview/tsc/dashboard';
@@ -139,6 +143,10 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     new NistOverviewDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
   const nistPinnedAgentDashboardByRendererConfig =
     new NistPinnedAgentDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
+  const pciOverviewDashboardByRendererConfig =
+    new PCIOverviewDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
+  const pciPinnedAgentDashboardByRendererConfig =
+    new PCIPinnedAgentDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
 
   return [
     agentsEventsDashboardConfig,
@@ -172,5 +180,7 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     mitrePinnedAgentDashboardByRendererConfig,
     nistOverviewDashboardByRendererConfig,
     nistPinnedAgentDashboardByRendererConfig,
+    pciOverviewDashboardByRendererConfig,
+    pciPinnedAgentDashboardByRendererConfig,
   ];
 };
