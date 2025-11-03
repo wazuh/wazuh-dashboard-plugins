@@ -53,27 +53,31 @@ const TEMPLATE_SOURCES = {
   'states-vulnerabilities': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-vulnerabilities.json',
+        'plugins/setup/src/main/resources/templates/states/vulnerabilities.json',
       ),
     ],
     outputFile: 'states-vulnerabilities.json',
   },
   alerts: {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/index-template-alerts.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/alerts.json',
+      ),
     ],
     outputFile: 'alerts.json',
   },
   archives: {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/index-template-archives.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/archives.json',
+      ),
     ],
     outputFile: 'archives.json',
   },
   'events-access-management': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-access-management.json',
+        'plugins/setup/src/main/resources/templates/streams/access-management.json',
       ),
     ],
     outputFile: 'events-access-management.json',
@@ -81,7 +85,7 @@ const TEMPLATE_SOURCES = {
   'events-applications': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-applications.json',
+        'plugins/setup/src/main/resources/templates/streams/applications.json',
       ),
     ],
     outputFile: 'events-applications.json',
@@ -89,7 +93,7 @@ const TEMPLATE_SOURCES = {
   'events-cloud-services': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-cloud-services.json',
+        'plugins/setup/src/main/resources/templates/streams/cloud-services.json',
       ),
     ],
     outputFile: 'events-cloud-services.json',
@@ -97,7 +101,7 @@ const TEMPLATE_SOURCES = {
   'events-cloud-services-aws': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-cloud-services-aws.json',
+        'plugins/setup/src/main/resources/templates/streams/cloud-services-aws.json',
       ),
     ],
     outputFile: 'events-cloud-services-aws.json',
@@ -105,7 +109,7 @@ const TEMPLATE_SOURCES = {
   'events-cloud-services-azure': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-cloud-services-azure.json',
+        'plugins/setup/src/main/resources/templates/streams/cloud-services-azure.json',
       ),
     ],
     outputFile: 'events-cloud-services-azure.json',
@@ -113,7 +117,7 @@ const TEMPLATE_SOURCES = {
   'events-cloud-services-gcp': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-cloud-services-gcp.json',
+        'plugins/setup/src/main/resources/templates/streams/cloud-services-gcp.json',
       ),
     ],
     outputFile: 'events-cloud-services-gcp.json',
@@ -121,44 +125,42 @@ const TEMPLATE_SOURCES = {
   'events-network-activity': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-network-activity.json',
+        'plugins/setup/src/main/resources/templates/streams/network-activity.json',
       ),
     ],
     outputFile: 'events-network-activity.json',
   },
   'events-other': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/index-template-other.json'),
+      wazuhUrl('plugins/setup/src/main/resources/templates/streams/other.json'),
     ],
     outputFile: 'events-other.json',
   },
   'events-security': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/index-template-security.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/security.json',
+      ),
     ],
     outputFile: 'events-security.json',
   },
   'events-system-activity': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-system-activity.json',
+        'plugins/setup/src/main/resources/templates/streams/system-activity.json',
       ),
     ],
     outputFile: 'events-system-activity.json',
   },
   monitoring: {
     urls: [
-      wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-monitoring.json',
-      ),
+      wazuhUrl('plugins/setup/src/main/resources/templates/monitoring.json'),
     ],
     outputFile: 'monitoring.json',
   },
   statistics: {
     urls: [
-      wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-statistics.json',
-      ),
+      wazuhUrl('plugins/setup/src/main/resources/templates/statistics.json'),
     ],
     outputFile: 'statistics.json',
   },
@@ -166,7 +168,7 @@ const TEMPLATE_SOURCES = {
   'states-fim-files': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-fim-files.json',
+        'plugins/setup/src/main/resources/templates/states/fim-files.json',
       ),
     ],
     outputFile: 'states-fim-files.json',
@@ -174,7 +176,7 @@ const TEMPLATE_SOURCES = {
   'states-fim-registries-keys': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-fim-registry-keys.json',
+        'plugins/setup/src/main/resources/templates/states/fim-registry-keys.json',
       ),
     ],
     outputFile: 'states-fim-registries-keys.json',
@@ -182,7 +184,7 @@ const TEMPLATE_SOURCES = {
   'states-fim-registries-values': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-fim-registry-values.json',
+        'plugins/setup/src/main/resources/templates/states/fim-registry-values.json',
       ),
     ],
     outputFile: 'states-fim-registries-values.json',
@@ -190,38 +192,48 @@ const TEMPLATE_SOURCES = {
   // Inventory templates (using the most recent versions without -update suffix)
   'states-inventory-system': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/index-template-system.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/states/inventory-system.json',
+      ),
     ],
     outputFile: 'states-inventory-system.json',
   },
   'states-inventory-hardware': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/index-template-hardware.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/states/inventory-hardware.json',
+      ),
     ],
     outputFile: 'states-inventory-hardware.json',
   },
   'states-inventory-networks': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/index-template-networks.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/states/inventory-networks.json',
+      ),
     ],
     outputFile: 'states-inventory-networks.json',
   },
   'states-inventory-packages': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/index-template-packages.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/states/inventory-packages.json',
+      ),
     ],
     outputFile: 'states-inventory-packages.json',
   },
   'states-inventory-ports': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/index-template-ports.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/states/inventory-ports.json',
+      ),
     ],
     outputFile: 'states-inventory-ports.json',
   },
   'states-inventory-processes': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-processes.json',
+        'plugins/setup/src/main/resources/templates/states/inventory-processes.json',
       ),
     ],
     outputFile: 'states-inventory-processes.json',
@@ -229,56 +241,62 @@ const TEMPLATE_SOURCES = {
   'states-inventory-protocols': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-protocols.json',
+        'plugins/setup/src/main/resources/templates/states/inventory-protocols.json',
       ),
     ],
     outputFile: 'states-inventory-protocols.json',
   },
   'states-inventory-users': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/index-template-users.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/states/inventory-users.json',
+      ),
     ],
     outputFile: 'states-inventory-users.json',
   },
   'states-inventory-groups': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/index-template-groups.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/states/inventory-groups.json',
+      ),
     ],
     outputFile: 'states-inventory-groups.json',
   },
   'states-inventory-services': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/index-template-services.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/states/inventory-services.json',
+      ),
     ],
     outputFile: 'states-inventory-services.json',
   },
   'states-inventory-interfaces': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-interfaces.json',
+        'plugins/setup/src/main/resources/templates/states/inventory-interfaces.json',
       ),
     ],
     outputFile: 'states-inventory-interfaces.json',
   },
   'states-inventory-hotfixes': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/index-template-hotfixes.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/states/inventory-hotfixes.json',
+      ),
     ],
     outputFile: 'states-inventory-hotfixes.json',
   },
   'states-inventory-browser-extensions': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-browser-extensions.json',
+        'plugins/setup/src/main/resources/templates/states/inventory-browser-extensions.json',
       ),
     ],
     outputFile: 'states-inventory-browser-extensions.json',
   },
   'states-sca': {
     urls: [
-      wazuhUrl(
-        'plugins/setup/src/main/resources/index-template-browser-extensions.json',
-      ),
+      wazuhUrl('plugins/setup/src/main/resources/templates/states/sca.json'),
     ],
     outputFile: 'states-sca.json',
   },
