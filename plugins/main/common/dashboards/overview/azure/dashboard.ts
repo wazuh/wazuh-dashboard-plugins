@@ -3,29 +3,23 @@ import {
   DashboardLayoutConfig,
 } from '../../dashboard-builder';
 import {
-  getVisStateAgentEventsByBucket,
-  getVisStateAgentEventsBySource,
+  getVisStateAgentDisplayName,
+  getVisStateAgentEventsByCategory,
   getVisStateAgentGeolocationMap,
+  getVisStateAgentOperationsTypes,
   getVisStateAgentRegions,
-  getVisStateAgentTopAccounts,
-  getVisStateAgentTopBuckets,
-  getVisStateAgentTopSources,
-  getVisStateEventsByBucket,
-  getVisStateEventsBySource,
+  getVisStateAgentResults,
+  getVisStateDisplayName,
+  getVisStateEventsByCategory,
   getVisStateGeolocationMap,
+  getVisStateOperationsTypes,
   getVisStateRegions,
-  getVisStateTopAccounts,
-  getVisStateTopBuckets,
-  getVisStateTopSources,
+  getVisStateResults,
 } from './vis-states';
 
-export class AWSDashboardLayoutConfig extends DashboardLayoutConfig {
-  constructor() {
-    super();
-  }
-}
+export abstract class AzureDashboardLayoutConfig extends DashboardLayoutConfig {}
 
-export class AWSOverviewDashboardLayoutConfig extends AWSDashboardLayoutConfig {
+export class AzureOverviewDashboardLayoutConfig extends AzureDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
     this.gridVisualizationItems.push(
@@ -36,7 +30,7 @@ export class AWSOverviewDashboardLayoutConfig extends AWSDashboardLayoutConfig {
           x: 0,
           y: 0,
         },
-        savedVis: getVisStateTopSources(indexPatternId),
+        savedVis: getVisStateResults(indexPatternId),
       },
       {
         gridData: {
@@ -45,25 +39,16 @@ export class AWSOverviewDashboardLayoutConfig extends AWSDashboardLayoutConfig {
           x: 12,
           y: 0,
         },
-        savedVis: getVisStateTopAccounts(indexPatternId),
+        savedVis: getVisStateRegions(indexPatternId),
       },
       {
         gridData: {
-          w: 12,
+          w: 24,
           h: 9,
           x: 24,
           y: 0,
         },
-        savedVis: getVisStateTopBuckets(indexPatternId),
-      },
-      {
-        gridData: {
-          w: 12,
-          h: 9,
-          x: 36,
-          y: 0,
-        },
-        savedVis: getVisStateRegions(indexPatternId),
+        savedVis: getVisStateDisplayName(indexPatternId),
       },
       {
         gridData: {
@@ -72,7 +57,7 @@ export class AWSOverviewDashboardLayoutConfig extends AWSDashboardLayoutConfig {
           x: 0,
           y: 9,
         },
-        savedVis: getVisStateEventsBySource(indexPatternId),
+        savedVis: getVisStateEventsByCategory(indexPatternId),
       },
       {
         gridData: {
@@ -81,7 +66,7 @@ export class AWSOverviewDashboardLayoutConfig extends AWSDashboardLayoutConfig {
           x: 24,
           y: 9,
         },
-        savedVis: getVisStateEventsByBucket(indexPatternId),
+        savedVis: getVisStateOperationsTypes(indexPatternId),
       },
       {
         gridData: {
@@ -96,7 +81,7 @@ export class AWSOverviewDashboardLayoutConfig extends AWSDashboardLayoutConfig {
   }
 }
 
-export class AWSAgentPinnedDashboardLayoutConfig extends AWSDashboardLayoutConfig {
+export class AzureAgentPinnedDashboardLayoutConfig extends AzureDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
     this.gridVisualizationItems.push(
@@ -107,7 +92,7 @@ export class AWSAgentPinnedDashboardLayoutConfig extends AWSDashboardLayoutConfi
           x: 0,
           y: 0,
         },
-        savedVis: getVisStateAgentTopSources(indexPatternId),
+        savedVis: getVisStateAgentResults(indexPatternId),
       },
       {
         gridData: {
@@ -116,25 +101,16 @@ export class AWSAgentPinnedDashboardLayoutConfig extends AWSDashboardLayoutConfi
           x: 12,
           y: 0,
         },
-        savedVis: getVisStateAgentTopAccounts(indexPatternId),
+        savedVis: getVisStateAgentRegions(indexPatternId),
       },
       {
         gridData: {
-          w: 12,
+          w: 24,
           h: 9,
           x: 24,
           y: 0,
         },
-        savedVis: getVisStateAgentTopBuckets(indexPatternId),
-      },
-      {
-        gridData: {
-          w: 12,
-          h: 9,
-          x: 36,
-          y: 0,
-        },
-        savedVis: getVisStateAgentRegions(indexPatternId),
+        savedVis: getVisStateAgentDisplayName(indexPatternId),
       },
       {
         gridData: {
@@ -143,7 +119,7 @@ export class AWSAgentPinnedDashboardLayoutConfig extends AWSDashboardLayoutConfi
           x: 0,
           y: 9,
         },
-        savedVis: getVisStateAgentEventsBySource(indexPatternId),
+        savedVis: getVisStateAgentEventsByCategory(indexPatternId),
       },
       {
         gridData: {
@@ -152,7 +128,7 @@ export class AWSAgentPinnedDashboardLayoutConfig extends AWSDashboardLayoutConfi
           x: 24,
           y: 9,
         },
-        savedVis: getVisStateAgentEventsByBucket(indexPatternId),
+        savedVis: getVisStateAgentOperationsTypes(indexPatternId),
       },
       {
         gridData: {
@@ -167,10 +143,10 @@ export class AWSAgentPinnedDashboardLayoutConfig extends AWSDashboardLayoutConfi
   }
 }
 
-export abstract class AWSDashboardByRendererConfig extends DashboardByRendererConfig {
+export abstract class AzureDashboardByRendererConfig extends DashboardByRendererConfig {
   constructor(
     indexPatternId: string,
-    dashboardLayoutConfig: AWSDashboardLayoutConfig,
+    dashboardLayoutConfig: AzureDashboardLayoutConfig,
   ) {
     super(indexPatternId, dashboardLayoutConfig);
   }
@@ -181,43 +157,46 @@ export abstract class AWSDashboardByRendererConfig extends DashboardByRendererCo
   protected override get hidePanelTitles(): boolean {
     return false;
   }
-}
 
-export class AWSOverviewDashboardByRendererConfig extends AWSDashboardByRendererConfig {
-  constructor(indexPatternId: string) {
-    super(indexPatternId, new AWSOverviewDashboardLayoutConfig(indexPatternId));
-  }
-
-  protected override getId(): string {
-    return 'aws-overview-dashboard-tab';
-  }
-
-  protected override getTitle(): string {
-    return 'AWS overview dashboard';
-  }
-
-  protected override getDescription(): string {
-    return 'Dashboard of the AWS overview';
+  protected override getClassName(): string {
+    return 'wz-dashboard-hide-tables-pagination-export-csv-controls';
   }
 }
 
-export class AWSAgentPinnedDashboardByRendererConfig extends AWSDashboardByRendererConfig {
+export class AzureOverviewDashboardByRendererConfig extends AzureDashboardByRendererConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new AWSAgentPinnedDashboardLayoutConfig(indexPatternId),
+      new AzureOverviewDashboardLayoutConfig(indexPatternId),
     );
   }
 
   protected override getId(): string {
-    return 'aws-agent-pinned-dashboard-tab';
+    return 'azure-overview-dashboard-tab';
   }
-
   protected override getTitle(): string {
-    return 'AWS Agent Pinned overview dashboard';
+    return 'Azure Overview Dashboard';
+  }
+  protected override getDescription(): string {
+    return 'Overview dashboard for Azure';
+  }
+}
+
+export class AzureAgentPinnedDashboardByRendererConfig extends AzureDashboardByRendererConfig {
+  constructor(indexPatternId: string) {
+    super(
+      indexPatternId,
+      new AzureAgentPinnedDashboardLayoutConfig(indexPatternId),
+    );
   }
 
+  protected override getId(): string {
+    return 'azure-agent-pinned-dashboard-tab';
+  }
+  protected override getTitle(): string {
+    return 'Azure Agent Pinned dashboard';
+  }
   protected override getDescription(): string {
-    return 'Dashboard of the AWS Agent Pinned overview';
+    return 'Dashboard of the Azure Agent Pinned overview';
   }
 }

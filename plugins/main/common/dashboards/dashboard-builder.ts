@@ -108,6 +108,10 @@ export abstract class DashboardByRendererConfig {
 
   protected abstract get hidePanelTitles(): boolean;
 
+  protected getClassName(): string {
+    return '';
+  }
+
   getConfig() {
     return {
       id: this.getId(),
@@ -116,6 +120,7 @@ export abstract class DashboardByRendererConfig {
       panels: this.getDashboardPanels(),
       useMargins: this.useMargins,
       hidePanelTitles: this.hidePanelTitles,
+      className: this.getClassName(),
     };
   }
 }
