@@ -40,6 +40,10 @@ import {
   HipaaPinnedAgentDashboardByRendererConfig,
   HipaaOverviewDashboardByRendererConfig,
 } from '../../../common/dashboards/overview/hipaa/dashboard';
+import {
+  MalwareDetectionOverviewDashboardByRendererConfig,
+  MalwareDetectionPinnedAgentDashboardByRendererConfig,
+} from '../../../common/dashboards/overview/malware-detection/dashboard';
 import { INDEX_PATTERN_REPLACE_ME } from './constants';
 
 export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
@@ -103,6 +107,14 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     new HipaaOverviewDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
   const hipaaPinnedAgentDashboardByRendererConfig =
     new HipaaPinnedAgentDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
+  const malwareDetectionOverviewDashboardByRendererConfig =
+    new MalwareDetectionOverviewDashboardByRendererConfig(
+      INDEX_PATTERN_REPLACE_ME,
+    );
+  const malwareDetectionPinnedAgentDashboardByRendererConfig =
+    new MalwareDetectionPinnedAgentDashboardByRendererConfig(
+      INDEX_PATTERN_REPLACE_ME,
+    );
 
   return [
     welcomeDashboardConfig,
@@ -128,5 +140,7 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     googleCloudPinnedAgentDashboardByRendererConfig,
     hipaaOverviewDashboardByRendererConfig,
     hipaaPinnedAgentDashboardByRendererConfig,
+    malwareDetectionOverviewDashboardByRendererConfig,
+    malwareDetectionPinnedAgentDashboardByRendererConfig,
   ];
 };
