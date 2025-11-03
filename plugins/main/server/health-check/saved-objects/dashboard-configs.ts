@@ -36,6 +36,10 @@ import {
   GoogleCloudOverviewDashboardByRendererConfig,
   GoogleCloudPinnedAgentDashboardByRendererConfig,
 } from '../../../common/dashboards/overview/google-cloud/dashboard';
+import {
+  HipaaAgentPinnedDashboardByRendererConfig,
+  HipaaOverviewDashboardByRendererConfig,
+} from '../../../common/dashboards/overview/hipaa/dashboard';
 import { INDEX_PATTERN_REPLACE_ME } from './constants';
 
 export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
@@ -95,6 +99,10 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     new GoogleCloudPinnedAgentDashboardByRendererConfig(
       INDEX_PATTERN_REPLACE_ME,
     );
+  const hipaaOverviewDashboardByRendererConfig =
+    new HipaaOverviewDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
+  const hipaaAgentPinnedDashboardByRendererConfig =
+    new HipaaAgentPinnedDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
 
   return [
     welcomeDashboardConfig,
@@ -118,5 +126,7 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     githubDrilldownRepositoryDashboardByRendererConfig,
     googleCloudOverviewDashboardByRendererConfig,
     googleCloudPinnedAgentDashboardByRendererConfig,
+    hipaaOverviewDashboardByRendererConfig,
+    hipaaAgentPinnedDashboardByRendererConfig,
   ];
 };
