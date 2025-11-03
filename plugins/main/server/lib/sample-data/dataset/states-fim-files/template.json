@@ -1,7 +1,5 @@
 {
-  "index_patterns": [
-    "wazuh-states-fim-files*"
-  ],
+  "index_patterns": ["wazuh-states-fim-files*"],
   "mappings": {
     "date_detection": false,
     "dynamic": "strict",

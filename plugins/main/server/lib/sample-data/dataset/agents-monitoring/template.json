@@ -1,8 +1,6 @@
 {
   "order": 1,
-  "index_patterns": [
-    "wazuh-monitoring*"
-  ],
+  "index_patterns": ["wazuh-monitoring*"],
   "settings": {
     "index": {
       "number_of_replicas": "0",

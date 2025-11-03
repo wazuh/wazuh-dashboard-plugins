@@ -1,7 +1,5 @@
 {
-  "index_patterns": [
-    "wazuh-states-inventory-system*"
-  ],
+  "index_patterns": ["wazuh-states-inventory-system*"],
   "mappings": {
     "date_detection": false,
     "dynamic": "strict",

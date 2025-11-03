@@ -1,7 +1,5 @@
 {
-  "index_patterns": [
-    "wazuh-states-vulnerabilities*"
-  ],
+  "index_patterns": ["wazuh-states-vulnerabilities*"],
   "mappings": {
     "date_detection": false,
     "dynamic": "strict",
