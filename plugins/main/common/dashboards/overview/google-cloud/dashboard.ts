@@ -152,7 +152,7 @@ export class GoogleCloudOverviewDashboardByRendererConfig extends GoogleCloudDas
   }
 
   protected override getId(): string {
-    return 'google-cloud-overview-dashboard-by-renderer-config';
+    return 'google-cloud-detector-dashboard-tab';
   }
 
   protected override getTitle(): string {
@@ -173,7 +173,7 @@ export class GoogleCloudPinnedAgentDashboardByRendererConfig extends GoogleCloud
   }
 
   protected override getId(): string {
-    return 'google-cloud-agent-pinned-dashboard-by-renderer-config';
+    return 'google-cloud-agent-pinned-dashboard';
   }
 
   protected override getTitle(): string {
