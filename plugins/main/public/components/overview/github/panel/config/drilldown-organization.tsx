@@ -13,99 +13,18 @@
 import React from 'react';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins } from '../../../../../kibana-services';
-import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-import {
-  getVisStateTopActors,
-  getVisStateRuleLevelEvolution,
-  getVisStateTopCountries,
-  getVisStateTopRepositories,
-  getVisStateTopActions,
-} from './visualizations';
 import { ModuleConfigProps } from './module-config';
+import type { DashboardByValuePanels } from '../../../../../../common/dashboards';
+import { GithubDrilldownOrganizationDashboardByRendererConfig } from '../../../../../../common/dashboards/overview/github/panel/config/github-drilldown-organization/dashboard';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 
-const getDashboardPanels = (
-  indexPatternId: string,
-): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
-} => {
-  return {
-    d0: {
-      gridData: {
-        w: 16,
-        h: 11,
-        x: 0,
-        y: 0,
-        i: 'd0',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd0',
-        savedVis: getVisStateTopActions(indexPatternId),
-      },
-    },
-    d1: {
-      gridData: {
-        w: 16,
-        h: 11,
-        x: 16,
-        y: 0,
-        i: 'd1',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd1',
-        savedVis: getVisStateTopRepositories(indexPatternId),
-      },
-    },
-    d2: {
-      gridData: {
-        w: 16,
-        h: 11,
-        x: 32,
-        y: 0,
-        i: 'd2',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd2',
-        savedVis: getVisStateTopActors(indexPatternId),
-      },
-    },
-    d3: {
-      gridData: {
-        w: 24,
-        h: 11,
-        x: 0,
-        y: 11,
-        i: 'd3',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd3',
-        savedVis: getVisStateTopCountries(indexPatternId),
-      },
-    },
-    d4: {
-      gridData: {
-        w: 24,
-        h: 11,
-        x: 24,
-        y: 11,
-        i: 'd4',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd4',
-        savedVis: getVisStateRuleLevelEvolution(indexPatternId),
-      },
-    },
-  };
+const getDashboardPanels = (indexPatternId: string): DashboardByValuePanels => {
+  const githubDrilldownOrganizationDashboardByRendererConfig =
+    new GithubDrilldownOrganizationDashboardByRendererConfig(indexPatternId);
+
+  return githubDrilldownOrganizationDashboardByRendererConfig.getDashboardPanels();
 };
 
 export const DrilldownConfigOrganization = (

@@ -30,6 +30,7 @@ import {
 } from '../../../common/dashboards/overview/github/dashboard';
 import { GithubDrilldownActionDashboardByRendererConfig } from '../../../common/dashboards/overview/github/panel/config/github-drilldown-action/dashboard';
 import { GithubDrilldownActorDashboardByRendererConfig } from '../../../common/dashboards/overview/github/panel/config/github-drilldown-actor/dashboard';
+import { GithubDrilldownOrganizationDashboardByRendererConfig } from '../../../common/dashboards/overview/github/panel/config/github-drilldown-organization/dashboard';
 import { INDEX_PATTERN_REPLACE_ME } from './constants';
 
 export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
@@ -75,6 +76,10 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     );
   const githubDrilldownActorDashboardByRendererConfig =
     new GithubDrilldownActorDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
+  const githubDrilldownOrganizationDashboardByRendererConfig =
+    new GithubDrilldownOrganizationDashboardByRendererConfig(
+      INDEX_PATTERN_REPLACE_ME,
+    );
 
   return [
     welcomeDashboardConfig,
@@ -94,5 +99,6 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     githubAgentPinnedDashboardByRendererConfig,
     githubDrilldownActionDashboardByRendererConfig,
     githubDrilldownActorDashboardByRendererConfig,
+    githubDrilldownOrganizationDashboardByRendererConfig,
   ];
 };
