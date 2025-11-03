@@ -78,7 +78,7 @@ export class ClusterConfigurationDashboardByRendererConfig extends DashboardByRe
   }
 
   protected override getId(): string {
-    return 'ct-dashboard-configuration-tab';
+    return 'cluster-configuration-dashboard-tab';
   }
 
   protected override getTitle(): string {
