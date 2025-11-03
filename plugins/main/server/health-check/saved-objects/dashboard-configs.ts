@@ -24,6 +24,10 @@ import {
   GDPRAgentPinnedDashboardByRendererConfig,
   GDPROverviewDashboardByRendererConfig,
 } from '../../../common/dashboards/overview/gdpr/dashboard';
+import {
+  GithubAgentPinnedDashboardByRendererConfig,
+  GithubOverviewDashboardByRendererConfig,
+} from '../../../common/dashboards/overview/github/dashboard';
 import { INDEX_PATTERN_REPLACE_ME } from './constants';
 
 export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
@@ -59,6 +63,10 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     new GDPROverviewDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
   const gdprAgentPinnedDashboardByRendererConfig =
     new GDPRAgentPinnedDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
+  const githubOverviewDashboardByRendererConfig =
+    new GithubOverviewDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
+  const githubAgentPinnedDashboardByRendererConfig =
+    new GithubAgentPinnedDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
 
   return [
     welcomeDashboardConfig,
@@ -74,5 +82,7 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     fimAgentPinnedDashboardByRendererConfig,
     gdprOverviewDashboardByRendererConfig,
     gdprAgentPinnedDashboardByRendererConfig,
+    githubOverviewDashboardByRendererConfig,
+    githubAgentPinnedDashboardByRendererConfig,
   ];
 };

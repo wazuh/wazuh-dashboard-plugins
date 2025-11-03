@@ -101,12 +101,6 @@ export class DockerAgentPinnedDashboardLayoutConfig extends DockerDashboardLayou
 }
 
 export abstract class DockerDashboardByRendererConfig extends DashboardByRendererConfig {
-  constructor(
-    indexPatternId: string,
-    dashboardLayoutConfig: DockerDashboardLayoutConfig,
-  ) {
-    super(indexPatternId, dashboardLayoutConfig);
-  }
 
   protected override get useMargins(): boolean {
     return true;

@@ -121,10 +121,6 @@ export class GDPRAgentPinnedDashboardLayoutConfig extends GDPRDashboardLayoutCon
 }
 
 export abstract class GDPRDashboardByRendererConfig extends DashboardByRendererConfig {
-  constructor(indexPatternId: string, layoutConfig: DashboardLayoutConfig) {
-    super(indexPatternId, layoutConfig);
-  }
-
   protected override get useMargins(): boolean {
     return true;
   }

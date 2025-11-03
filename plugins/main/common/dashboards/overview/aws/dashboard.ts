@@ -168,12 +168,6 @@ export class AWSAgentPinnedDashboardLayoutConfig extends AWSDashboardLayoutConfi
 }
 
 export abstract class AWSDashboardByRendererConfig extends DashboardByRendererConfig {
-  constructor(
-    indexPatternId: string,
-    dashboardLayoutConfig: AWSDashboardLayoutConfig,
-  ) {
-    super(indexPatternId, dashboardLayoutConfig);
-  }
 
   protected override get useMargins(): boolean {
     return true;

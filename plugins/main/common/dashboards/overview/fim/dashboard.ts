@@ -144,12 +144,6 @@ export class FimAgentPinnedDashboardLayoutConfig extends FimDashboardLayoutConfi
 }
 
 export abstract class FimDashboardByRendererConfig extends DashboardByRendererConfig {
-  constructor(
-    indexPatternId: string,
-    dashboardLayoutConfig: FimDashboardLayoutConfig,
-  ) {
-    super(indexPatternId, dashboardLayoutConfig);
-  }
 
   protected override get useMargins(): boolean {
     return true;

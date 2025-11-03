@@ -144,12 +144,6 @@ export class AzureAgentPinnedDashboardLayoutConfig extends AzureDashboardLayoutC
 }
 
 export abstract class AzureDashboardByRendererConfig extends DashboardByRendererConfig {
-  constructor(
-    indexPatternId: string,
-    dashboardLayoutConfig: AzureDashboardLayoutConfig,
-  ) {
-    super(indexPatternId, dashboardLayoutConfig);
-  }
 
   protected override get useMargins(): boolean {
     return true;
