@@ -1,4 +1,4 @@
-import { ClusterConfigurationDashboardByRendererConfig } from '../../../../../common/dashboards/management/cluster/dashboard';
+import { ClusterConfigurationDashboardByRendererConfig } from '../../../../../common/dashboards';
 
 /* WARNING: The panel id must be unique including general and agents visualizations. Otherwise, the visualizations will not refresh when we pin an agent, because they are cached by id */
 

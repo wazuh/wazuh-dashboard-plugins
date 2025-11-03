@@ -1,8 +1,8 @@
 import {
   DashboardByRendererConfig,
   DashboardLayoutConfig,
-} from '../../dashboard-builder';
-import type { DashboardByValueSavedVis } from '../../types';
+} from '../../../dashboard-builder';
+import type { DashboardByValueSavedVis } from '../../../types';
 
 const getVisStateTop5Nodes = (
   indexPatternId: string,
