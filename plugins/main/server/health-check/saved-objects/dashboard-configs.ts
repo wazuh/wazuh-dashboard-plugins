@@ -44,6 +44,7 @@ import {
   MalwareDetectionOverviewDashboardByRendererConfig,
   MalwareDetectionPinnedAgentDashboardByRendererConfig,
 } from '../../../common/dashboards/overview/malware-detection/dashboard';
+import { TscOverviewDashboardByRendererConfig, TscPinnedAgentDashboardByRendererConfig } from "../../../common/dashboards/overview/tsc/dashboard";
 import { INDEX_PATTERN_REPLACE_ME } from './constants';
 
 export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
@@ -115,6 +116,10 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     new MalwareDetectionPinnedAgentDashboardByRendererConfig(
       INDEX_PATTERN_REPLACE_ME,
     );
+  const tscOverviewDashboardByRendererConfig =
+    new TscOverviewDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
+  const tscPinnedAgentDashboardByRendererConfig =
+    new TscPinnedAgentDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
 
   return [
     welcomeDashboardConfig,
@@ -142,5 +147,7 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     hipaaPinnedAgentDashboardByRendererConfig,
     malwareDetectionOverviewDashboardByRendererConfig,
     malwareDetectionPinnedAgentDashboardByRendererConfig,
+    tscOverviewDashboardByRendererConfig,
+    tscPinnedAgentDashboardByRendererConfig,
   ];
 };
