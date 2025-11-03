@@ -20,6 +20,10 @@ import {
   FimAgentPinnedDashboardByRendererConfig,
   FimOverviewDashboardByRendererConfig,
 } from '../../../common/dashboards/overview/fim/dashboard';
+import {
+  GDPRAgentPinnedDashboardByRendererConfig,
+  GDPROverviewDashboardByRendererConfig,
+} from '../../../common/dashboards/overview/gdpr/dashboard';
 import { INDEX_PATTERN_REPLACE_ME } from './constants';
 
 export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
@@ -51,6 +55,10 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     new FimOverviewDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
   const fimAgentPinnedDashboardByRendererConfig =
     new FimAgentPinnedDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
+  const gdprOverviewDashboardByRendererConfig =
+    new GDPROverviewDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
+  const gdprAgentPinnedDashboardByRendererConfig =
+    new GDPRAgentPinnedDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
 
   return [
     welcomeDashboardConfig,
@@ -64,5 +72,7 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     dockerAgentPinnedDashboardByRendererConfig,
     fimOverviewDashboardByRendererConfig,
     fimAgentPinnedDashboardByRendererConfig,
+    gdprOverviewDashboardByRendererConfig,
+    gdprAgentPinnedDashboardByRendererConfig,
   ];
 };
