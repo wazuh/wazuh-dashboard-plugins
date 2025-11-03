@@ -86,7 +86,7 @@ export class GithubOverviewDashboardLayoutConfig extends GithubDashboardLayoutCo
   }
 }
 
-export class GithubAgentPinnedDashboardLayoutConfig extends GithubDashboardLayoutConfig {
+export class GithubPinnedAgentDashboardLayoutConfig extends GithubDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
     this.gridVisualizationItems.push(
@@ -185,9 +185,9 @@ export class GithubOverviewDashboardByRendererConfig extends GithubDashboardByRe
   }
 }
 
-export class GithubAgentPinnedDashboardByRendererConfig extends GithubDashboardByRendererConfig {
+export class GithubPinnedAgentDashboardByRendererConfig extends GithubDashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new GithubAgentPinnedDashboardLayoutConfig(indexPatternId));
+    super(indexPatternId, new GithubPinnedAgentDashboardLayoutConfig(indexPatternId));
   }
 
   protected override getId(): string {

@@ -81,7 +81,7 @@ export class AzureOverviewDashboardLayoutConfig extends AzureDashboardLayoutConf
   }
 }
 
-export class AzureAgentPinnedDashboardLayoutConfig extends AzureDashboardLayoutConfig {
+export class AzurePinnedAgentDashboardLayoutConfig extends AzureDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
     this.gridVisualizationItems.push(
@@ -176,11 +176,11 @@ export class AzureOverviewDashboardByRendererConfig extends AzureDashboardByRend
   }
 }
 
-export class AzureAgentPinnedDashboardByRendererConfig extends AzureDashboardByRendererConfig {
+export class AzurePinnedAgentDashboardByRendererConfig extends AzureDashboardByRendererConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new AzureAgentPinnedDashboardLayoutConfig(indexPatternId),
+      new AzurePinnedAgentDashboardLayoutConfig(indexPatternId),
     );
   }
 

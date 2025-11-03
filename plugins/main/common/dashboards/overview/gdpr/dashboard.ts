@@ -67,7 +67,7 @@ export class GDPROverviewDashboardLayoutConfig extends GDPRDashboardLayoutConfig
   }
 }
 
-export class GDPRAgentPinnedDashboardLayoutConfig extends GDPRDashboardLayoutConfig {
+export class GDPRPinnedAgentDashboardLayoutConfig extends GDPRDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
     this.gridVisualizationItems.push(
@@ -146,9 +146,9 @@ export class GDPROverviewDashboardByRendererConfig extends GDPRDashboardByRender
   }
 }
 
-export class GDPRAgentPinnedDashboardByRendererConfig extends GDPRDashboardByRendererConfig {
+export class GDPRPinnedAgentDashboardByRendererConfig extends GDPRDashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new GDPRAgentPinnedDashboardLayoutConfig(indexPatternId));
+    super(indexPatternId, new GDPRPinnedAgentDashboardLayoutConfig(indexPatternId));
   }
 
   protected override getId(): string {

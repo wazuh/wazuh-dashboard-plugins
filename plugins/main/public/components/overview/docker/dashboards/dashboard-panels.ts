@@ -1,6 +1,6 @@
 import type { DashboardByValuePanels } from '../../../../../common/dashboards';
 import {
-  DockerAgentPinnedDashboardByRendererConfig,
+  DockerPinnedAgentDashboardByRendererConfig,
   DockerOverviewDashboardByRendererConfig,
 } from '../../../../../common/dashboards/overview/docker/dashboard';
 
@@ -9,7 +9,7 @@ export const getDashboardPanels = (
   isPinnedAgent?: boolean,
 ): DashboardByValuePanels => {
   const DashboardByRendererConfig = isPinnedAgent
-    ? new DockerAgentPinnedDashboardByRendererConfig(indexPatternId)
+    ? new DockerPinnedAgentDashboardByRendererConfig(indexPatternId)
     : new DockerOverviewDashboardByRendererConfig(indexPatternId);
 
   return DashboardByRendererConfig.getDashboardPanels();

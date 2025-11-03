@@ -1,6 +1,6 @@
 import type { DashboardByValuePanels } from '../../../../../common/dashboards';
 import {
-  FimAgentPinnedDashboardByRendererConfig,
+  FimPinnedAgentDashboardByRendererConfig,
   FimOverviewDashboardByRendererConfig,
 } from '../../../../../common/dashboards/overview/fim/dashboard';
 
@@ -9,7 +9,7 @@ export const getDashboardPanels = (
   isPinnedAgent: boolean,
 ): DashboardByValuePanels => {
   const dashboardByRendererConfig = isPinnedAgent
-    ? new FimAgentPinnedDashboardByRendererConfig(indexPatternId)
+    ? new FimPinnedAgentDashboardByRendererConfig(indexPatternId)
     : new FimOverviewDashboardByRendererConfig(indexPatternId);
 
   return dashboardByRendererConfig.getDashboardPanels();

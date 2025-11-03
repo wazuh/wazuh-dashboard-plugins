@@ -1,6 +1,6 @@
 import type { DashboardByValuePanels } from '../../../../../common/dashboards';
 import {
-  GDPRAgentPinnedDashboardByRendererConfig,
+  GDPRPinnedAgentDashboardByRendererConfig,
   GDPROverviewDashboardByRendererConfig,
 } from '../../../../../common/dashboards/overview/gdpr/dashboard';
 
@@ -9,7 +9,7 @@ export const getDashboardPanels = (
   isPinnedAgent: boolean,
 ): DashboardByValuePanels => {
   const gdprDashboardByRendererConfig = isPinnedAgent
-    ? new GDPRAgentPinnedDashboardByRendererConfig(indexPatternId)
+    ? new GDPRPinnedAgentDashboardByRendererConfig(indexPatternId)
     : new GDPROverviewDashboardByRendererConfig(indexPatternId);
 
   return gdprDashboardByRendererConfig.getDashboardPanels();

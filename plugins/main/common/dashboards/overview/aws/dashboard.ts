@@ -96,7 +96,7 @@ export class AWSOverviewDashboardLayoutConfig extends AWSDashboardLayoutConfig {
   }
 }
 
-export class AWSAgentPinnedDashboardLayoutConfig extends AWSDashboardLayoutConfig {
+export class AWSPinnedAgentDashboardLayoutConfig extends AWSDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
     this.gridVisualizationItems.push(
@@ -195,11 +195,11 @@ export class AWSOverviewDashboardByRendererConfig extends AWSDashboardByRenderer
   }
 }
 
-export class AWSAgentPinnedDashboardByRendererConfig extends AWSDashboardByRendererConfig {
+export class AWSPinnedAgentDashboardByRendererConfig extends AWSDashboardByRendererConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new AWSAgentPinnedDashboardLayoutConfig(indexPatternId),
+      new AWSPinnedAgentDashboardLayoutConfig(indexPatternId),
     );
   }
 

@@ -166,7 +166,7 @@ export class HipaaOverviewDashboardByRendererConfig extends HipaaDashboardByRend
   }
 }
 
-export class HipaaAgentPinnedDashboardByRendererConfig extends HipaaDashboardByRendererConfig {
+export class HipaaPinnedAgentDashboardByRendererConfig extends HipaaDashboardByRendererConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

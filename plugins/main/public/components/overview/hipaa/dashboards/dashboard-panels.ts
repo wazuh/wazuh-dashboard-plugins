@@ -1,7 +1,7 @@
 import type { DashboardByValuePanels } from '../../../../../common/dashboards';
 import {
   HipaaOverviewDashboardByRendererConfig,
-  HipaaAgentPinnedDashboardByRendererConfig,
+  HipaaPinnedAgentDashboardByRendererConfig,
 } from '../../../../../common/dashboards/overview/hipaa/dashboard';
 
 export const getDashboardPanels = (
@@ -9,7 +9,7 @@ export const getDashboardPanels = (
   isPinnedAgent?: boolean,
 ): DashboardByValuePanels => {
   const hipaaDashboardByRendererConfig = isPinnedAgent
-    ? new HipaaAgentPinnedDashboardByRendererConfig(indexPatternId)
+    ? new HipaaPinnedAgentDashboardByRendererConfig(indexPatternId)
     : new HipaaOverviewDashboardByRendererConfig(indexPatternId);
 
   return hipaaDashboardByRendererConfig.getDashboardPanels();

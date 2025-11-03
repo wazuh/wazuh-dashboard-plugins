@@ -56,7 +56,7 @@ export class DockerOverviewDashboardLayoutConfig extends DockerDashboardLayoutCo
   }
 }
 
-export class DockerAgentPinnedDashboardLayoutConfig extends DockerDashboardLayoutConfig {
+export class DockerPinnedAgentDashboardLayoutConfig extends DockerDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
     this.gridVisualizationItems.push(
@@ -129,9 +129,9 @@ export class DockerOverviewDashboardByRendererConfig extends DockerDashboardByRe
   }
 }
 
-export class DockerAgentPinnedDashboardByRendererConfig extends DockerDashboardByRendererConfig {
+export class DockerPinnedAgentDashboardByRendererConfig extends DockerDashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new DockerAgentPinnedDashboardLayoutConfig(indexPatternId));
+    super(indexPatternId, new DockerPinnedAgentDashboardLayoutConfig(indexPatternId));
   }
 
   protected override getId(): string {

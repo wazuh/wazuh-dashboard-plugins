@@ -81,7 +81,7 @@ export class FimOverviewDashboardLayoutConfig extends FimDashboardLayoutConfig {
   }
 }
 
-export class FimAgentPinnedDashboardLayoutConfig extends FimDashboardLayoutConfig {
+export class FimPinnedAgentDashboardLayoutConfig extends FimDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
     this.gridVisualizationItems.push(
@@ -172,11 +172,11 @@ export class FimOverviewDashboardByRendererConfig extends FimDashboardByRenderer
   }
 }
 
-export class FimAgentPinnedDashboardByRendererConfig extends FimDashboardByRendererConfig {
+export class FimPinnedAgentDashboardByRendererConfig extends FimDashboardByRendererConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new FimAgentPinnedDashboardLayoutConfig(indexPatternId),
+      new FimPinnedAgentDashboardLayoutConfig(indexPatternId),
     );
   }
 

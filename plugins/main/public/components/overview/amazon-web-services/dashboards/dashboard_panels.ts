@@ -1,6 +1,6 @@
 import type { DashboardByValuePanels } from '../../../../../common/dashboards';
 import {
-  AWSAgentPinnedDashboardByRendererConfig,
+  AWSPinnedAgentDashboardByRendererConfig,
   AWSOverviewDashboardByRendererConfig,
 } from '../../../../../common/dashboards/overview/aws/dashboard';
 
@@ -9,7 +9,7 @@ export const getDashboardPanels = (
   isPinnedAgent?: boolean,
 ): DashboardByValuePanels => {
   const dashboardByRendererConfig = isPinnedAgent
-    ? new AWSAgentPinnedDashboardByRendererConfig(indexPatternId)
+    ? new AWSPinnedAgentDashboardByRendererConfig(indexPatternId)
     : new AWSOverviewDashboardByRendererConfig(indexPatternId);
 
   return dashboardByRendererConfig.getDashboardPanels();
