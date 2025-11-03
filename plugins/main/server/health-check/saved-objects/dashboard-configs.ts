@@ -1,6 +1,7 @@
 import {
   AgentsEventsDashboardByRendererConfig,
   ClusterConfigurationDashboardByRendererConfig,
+  ClusterMonitoringDashboardByRendererConfig,
 } from '../../../common/dashboards';
 import type { DashboardByRendererConfig } from '../../../common/dashboards/dashboard-builder';
 import {
@@ -17,8 +18,13 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
   const welcomeDashboardConfig = new AgentsEventsDashboardByRendererConfig(
     INDEX_PATTERN_REPLACE_ME,
   );
-  const managementClusterDashboardConfig =
+  const clusterConfigurationDashboardConfig =
     new ClusterConfigurationDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
+  const clusterMonitoringDashboardConfig =
+    new ClusterMonitoringDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME, {
+      indexPatternTitle: INDEX_PATTERN_REPLACE_ME,
+      nodeList: [],
+    });
   const awsOverviewDashboardConfig = new AWSOverviewDashboardByRendererConfig(
     INDEX_PATTERN_REPLACE_ME,
   );
@@ -31,7 +37,8 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
 
   return [
     welcomeDashboardConfig,
-    managementClusterDashboardConfig,
+    clusterConfigurationDashboardConfig,
+    clusterMonitoringDashboardConfig,
     awsOverviewDashboardConfig,
     awsAgentPinnedDashboardConfig,
     azureOverviewDashboardConfig,
