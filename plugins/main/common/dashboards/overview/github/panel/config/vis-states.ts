@@ -1,4 +1,8 @@
-export const getVisStateTopActions = (indexPatternId: string) => {
+import type { DashboardByValueSavedVis } from '../../../../types';
+
+export const getVisStateTopActions = (
+  indexPatternId: string,
+): DashboardByValueSavedVis => {
   return {
     id: 'Wazuh-App-Overview-GitHub-Top-Ten-Actions',
     title: 'Top 10 Actions',
@@ -66,7 +70,9 @@ export const getVisStateTopActions = (indexPatternId: string) => {
   };
 };
 
-export const getVisStateTopActors = (indexPatternId: string) => {
+export const getVisStateTopActors = (
+  indexPatternId: string,
+): DashboardByValueSavedVis => {
   return {
     id: '',
     title: 'Top 10 Actors',
@@ -133,7 +139,9 @@ export const getVisStateTopActors = (indexPatternId: string) => {
   };
 };
 
-export const getVisStateTopRepositories = (indexPatternId: string) => {
+export const getVisStateTopRepositories = (
+  indexPatternId: string,
+): DashboardByValueSavedVis => {
   return {
     id: 'Wazuh-App-Overview-GitHub-Top-Ten-Repositories',
     title: 'Top 10 Repositories',
@@ -200,8 +208,11 @@ export const getVisStateTopRepositories = (indexPatternId: string) => {
   };
 };
 
-export const getVisStateTopOrganizations = (indexPatternId: string) => {
+export const getVisStateTopOrganizations = (
+  indexPatternId: string,
+): DashboardByValueSavedVis => {
   return {
+    id: 'Wazuh-App-Overview-GitHub-Top-Ten-Organizations',
     title: 'Top 10 Organizations',
     type: 'pie',
     params: {
@@ -266,7 +277,9 @@ export const getVisStateTopOrganizations = (indexPatternId: string) => {
   };
 };
 
-export const getVisStateTopCountries = (indexPatternId: string) => {
+export const getVisStateTopCountries = (
+  indexPatternId: string,
+): DashboardByValueSavedVis => {
   return {
     id: 'Wazuh-App-Overview-GitHub-Countries',
     title: 'Countries',
@@ -327,7 +340,9 @@ export const getVisStateTopCountries = (indexPatternId: string) => {
   };
 };
 
-export const getVisStateRuleLevelEvolution = (indexPatternId: string) => {
+export const getVisStateRuleLevelEvolution = (
+  indexPatternId: string,
+): DashboardByValueSavedVis => {
   return {
     id: 'Wazuh-App-Overview-GitHub-Alert-Level-Evolution',
     title: 'Alert level evolution',
