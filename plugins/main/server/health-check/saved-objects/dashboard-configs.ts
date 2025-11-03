@@ -28,6 +28,7 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     new ClusterMonitoringDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME, {
       indexPatternTitle: INDEX_PATTERN_REPLACE_ME,
       nodeList: [],
+      clusterName: '',
     });
   const awsOverviewDashboardConfig = new AWSOverviewDashboardByRendererConfig(
     INDEX_PATTERN_REPLACE_ME,
