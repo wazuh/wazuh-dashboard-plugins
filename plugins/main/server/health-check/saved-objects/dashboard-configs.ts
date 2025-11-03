@@ -16,6 +16,10 @@ import {
   DockerAgentPinnedDashboardByRendererConfig,
   DockerOverviewDashboardByRendererConfig,
 } from '../../../common/dashboards/overview/docker/dashboard';
+import {
+  FimAgentPinnedDashboardByRendererConfig,
+  FimOverviewDashboardByRendererConfig,
+} from '../../../common/dashboards/overview/fim/dashboard';
 import { INDEX_PATTERN_REPLACE_ME } from './constants';
 
 export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
@@ -43,6 +47,10 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     new DockerOverviewDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
   const dockerAgentPinnedDashboardByRendererConfig =
     new DockerAgentPinnedDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
+  const fimOverviewDashboardByRendererConfig =
+    new FimOverviewDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
+  const fimAgentPinnedDashboardByRendererConfig =
+    new FimAgentPinnedDashboardByRendererConfig(INDEX_PATTERN_REPLACE_ME);
 
   return [
     welcomeDashboardConfig,
@@ -54,5 +62,7 @@ export const getDashboardConfigs = (): DashboardByRendererConfig[] => {
     azureAgentPinnedDashboardConfig,
     dockerOverviewDashboardByRendererConfig,
     dockerAgentPinnedDashboardByRendererConfig,
+    fimOverviewDashboardByRendererConfig,
+    fimAgentPinnedDashboardByRendererConfig,
   ];
 };
