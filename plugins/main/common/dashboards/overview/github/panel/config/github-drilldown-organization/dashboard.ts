@@ -83,10 +83,6 @@ export class GithubDrilldownOrganizationDashboardByRendererConfig extends Dashbo
     return 'GitHub drilldown organization overview dashboard';
   }
 
-  protected override get useMargins(): boolean {
-    return true;
-  }
-
   protected override get hidePanelTitles(): boolean {
     return true;
   }

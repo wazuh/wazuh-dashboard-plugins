@@ -120,15 +120,7 @@ export class GDPRPinnedAgentDashboardLayoutConfig extends GDPRDashboardLayoutCon
   }
 }
 
-export abstract class GDPRDashboardByRendererConfig extends DashboardByRendererConfig {
-  protected override get useMargins(): boolean {
-    return true;
-  }
-
-  protected override get hidePanelTitles(): boolean {
-    return false;
-  }
-}
+export abstract class GDPRDashboardByRendererConfig extends DashboardByRendererConfig {}
 
 export class GDPROverviewDashboardByRendererConfig extends GDPRDashboardByRendererConfig {
   constructor(indexPatternId: string) {

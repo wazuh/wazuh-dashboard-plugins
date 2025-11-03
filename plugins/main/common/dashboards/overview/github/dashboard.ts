@@ -157,15 +157,7 @@ export class GithubPinnedAgentDashboardLayoutConfig extends GithubDashboardLayou
   }
 }
 
-export abstract class GithubDashboardByRendererConfig extends DashboardByRendererConfig {
-  protected override get useMargins(): boolean {
-    return true;
-  }
-
-  protected override get hidePanelTitles(): boolean {
-    return false;
-  }
-}
+export abstract class GithubDashboardByRendererConfig extends DashboardByRendererConfig {}
 
 export class GithubOverviewDashboardByRendererConfig extends GithubDashboardByRendererConfig {
   constructor(indexPatternId: string) {

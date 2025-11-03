@@ -144,14 +144,6 @@ export class AzurePinnedAgentDashboardLayoutConfig extends AzureDashboardLayoutC
 }
 
 export abstract class AzureDashboardByRendererConfig extends DashboardByRendererConfig {
-
-  protected override get useMargins(): boolean {
-    return true;
-  }
-  protected override get hidePanelTitles(): boolean {
-    return false;
-  }
-
   protected override getClassName(): string {
     return 'wz-dashboard-hide-tables-pagination-export-csv-controls';
   }

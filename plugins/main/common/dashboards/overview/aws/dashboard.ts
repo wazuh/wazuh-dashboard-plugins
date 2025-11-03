@@ -167,15 +167,7 @@ export class AWSPinnedAgentDashboardLayoutConfig extends AWSDashboardLayoutConfi
   }
 }
 
-export abstract class AWSDashboardByRendererConfig extends DashboardByRendererConfig {
-
-  protected override get useMargins(): boolean {
-    return true;
-  }
-  protected override get hidePanelTitles(): boolean {
-    return false;
-  }
-}
+export abstract class AWSDashboardByRendererConfig extends DashboardByRendererConfig {}
 
 export class AWSOverviewDashboardByRendererConfig extends AWSDashboardByRendererConfig {
   constructor(indexPatternId: string) {

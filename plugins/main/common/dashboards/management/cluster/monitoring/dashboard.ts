@@ -78,12 +78,4 @@ export class ClusterMonitoringDashboardByRendererConfig extends DashboardByRende
   protected override getDescription(): string {
     return 'Dashboard of the Cluster Timelions';
   }
-
-  protected override get useMargins(): boolean {
-    return true;
-  }
-
-  protected override get hidePanelTitles(): boolean {
-    return false;
-  }
 }

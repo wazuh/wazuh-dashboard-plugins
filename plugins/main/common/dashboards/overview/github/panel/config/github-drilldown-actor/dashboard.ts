@@ -79,12 +79,4 @@ export class GithubDrilldownActorDashboardByRendererConfig extends DashboardByRe
   protected override getDescription(): string {
     return 'Dashboard of the GitHub drilldown action';
   }
-
-  protected override get useMargins(): boolean {
-    return true;
-  }
-
-  protected override get hidePanelTitles(): boolean {
-    return false;
-  }
 }

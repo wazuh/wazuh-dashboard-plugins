@@ -1,4 +1,7 @@
-import { DashboardByRendererConfig, DashboardLayoutConfig } from '../../dashboard-builder';
+import {
+  DashboardByRendererConfig,
+  DashboardLayoutConfig,
+} from '../../dashboard-builder';
 import {
   getVisStateAgentEvents,
   getVisStateAgentResourcesUsageByOverTime,
@@ -100,20 +103,14 @@ export class DockerPinnedAgentDashboardLayoutConfig extends DockerDashboardLayou
   }
 }
 
-export abstract class DockerDashboardByRendererConfig extends DashboardByRendererConfig {
-
-  protected override get useMargins(): boolean {
-    return true;
-  }
-
-  protected override get hidePanelTitles(): boolean {
-    return false;
-  }
-}
+export abstract class DockerDashboardByRendererConfig extends DashboardByRendererConfig {}
 
 export class DockerOverviewDashboardByRendererConfig extends DockerDashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new DockerOverviewDashboardLayoutConfig(indexPatternId));
+    super(
+      indexPatternId,
+      new DockerOverviewDashboardLayoutConfig(indexPatternId),
+    );
   }
 
   protected override getId(): string {
@@ -131,7 +128,10 @@ export class DockerOverviewDashboardByRendererConfig extends DockerDashboardByRe
 
 export class DockerPinnedAgentDashboardByRendererConfig extends DockerDashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new DockerPinnedAgentDashboardLayoutConfig(indexPatternId));
+    super(
+      indexPatternId,
+      new DockerPinnedAgentDashboardLayoutConfig(indexPatternId),
+    );
   }
 
   protected override getId(): string {

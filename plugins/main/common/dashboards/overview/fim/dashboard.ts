@@ -143,16 +143,7 @@ export class FimPinnedAgentDashboardLayoutConfig extends FimDashboardLayoutConfi
   }
 }
 
-export abstract class FimDashboardByRendererConfig extends DashboardByRendererConfig {
-
-  protected override get useMargins(): boolean {
-    return true;
-  }
-
-  protected override get hidePanelTitles(): boolean {
-    return false;
-  }
-}
+export abstract class FimDashboardByRendererConfig extends DashboardByRendererConfig {}
 
 export class FimOverviewDashboardByRendererConfig extends FimDashboardByRendererConfig {
   constructor(indexPatternId: string) {
