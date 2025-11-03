@@ -104,9 +104,13 @@ export abstract class DashboardByRendererConfig {
 
   protected abstract getDescription(): string;
 
-  protected abstract get useMargins(): boolean;
+  protected get useMargins(): boolean {
+    return true;
+  }
 
-  protected abstract get hidePanelTitles(): boolean;
+  protected get hidePanelTitles(): boolean {
+    return false;
+  }
 
   protected getClassName(): string {
     return '';
