@@ -1,4 +1,7 @@
-import { DashboardByRendererConfig, DashboardLayoutConfig } from '../../../../../dashboard-builder';
+import {
+  DashboardByRendererConfig,
+  DashboardLayoutConfig,
+} from '../../../../../dashboard-builder';
 import {
   getVisStateRuleLevelEvolution,
   getVisStateTopActors,
@@ -62,7 +65,10 @@ export class GithubDrilldownActionDashboardLayoutConfig extends DashboardLayoutC
 
 export class GithubDrilldownActionDashboardByRendererConfig extends DashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new GithubDrilldownActionDashboardLayoutConfig(indexPatternId));
+    super(
+      indexPatternId,
+      new GithubDrilldownActionDashboardLayoutConfig(indexPatternId),
+    );
   }
 
   protected override getId(): string {

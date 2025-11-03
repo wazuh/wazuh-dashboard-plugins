@@ -1,4 +1,7 @@
-import { DashboardByRendererConfig, DashboardLayoutConfig } from '../../dashboard-builder';
+import {
+  DashboardByRendererConfig,
+  DashboardLayoutConfig,
+} from '../../dashboard-builder';
 import {
   getVisStateAgentRuleLevelDistribution,
   getVisStateAgentTopRequirements,
@@ -124,7 +127,10 @@ export abstract class GDPRDashboardByRendererConfig extends DashboardByRendererC
 
 export class GDPROverviewDashboardByRendererConfig extends GDPRDashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new GDPROverviewDashboardLayoutConfig(indexPatternId));
+    super(
+      indexPatternId,
+      new GDPROverviewDashboardLayoutConfig(indexPatternId),
+    );
   }
 
   protected override getId(): string {
@@ -140,7 +146,10 @@ export class GDPROverviewDashboardByRendererConfig extends GDPRDashboardByRender
 
 export class GDPRPinnedAgentDashboardByRendererConfig extends GDPRDashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new GDPRPinnedAgentDashboardLayoutConfig(indexPatternId));
+    super(
+      indexPatternId,
+      new GDPRPinnedAgentDashboardLayoutConfig(indexPatternId),
+    );
   }
 
   protected override getId(): string {

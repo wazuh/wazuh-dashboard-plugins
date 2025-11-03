@@ -1,5 +1,5 @@
-import { ClusterMonitoringDashboardByRendererConfig } from "../../../../../common/dashboards/management/cluster/monitoring/dashboard";
-import type { DashboardByValuePanels } from "../../../../../common/dashboards/types";
+import { ClusterMonitoringDashboardByRendererConfig } from '../../../../../common/dashboards/management/cluster/monitoring/dashboard';
+import type { DashboardByValuePanels } from '../../../../../common/dashboards/types';
 import { tParsedIndexPattern } from '../../../common/data-source';
 
 /* WARNING: The panel id must be unique including general and agents visualizations. Otherwise, the visualizations will not refresh when we pin an agent, because they are cached by id */
@@ -13,12 +13,9 @@ export const getDashboardPanels = (
   nodeList: any[],
   clusterName?: string,
 ): DashboardByValuePanels => {
-  return new ClusterMonitoringDashboardByRendererConfig(
-    indexPattern.id,
-    {
-      indexPatternTitle: indexPattern.title,
-      nodeList,
-      clusterName,
-    },
-  ).getDashboardPanels();
+  return new ClusterMonitoringDashboardByRendererConfig(indexPattern.id, {
+    indexPatternTitle: indexPattern.title,
+    nodeList,
+    clusterName,
+  }).getDashboardPanels();
 };

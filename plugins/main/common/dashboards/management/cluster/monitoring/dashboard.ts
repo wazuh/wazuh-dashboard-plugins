@@ -2,7 +2,10 @@ import {
   DashboardByRendererConfig,
   DashboardLayoutConfig,
 } from '../../../dashboard-builder';
-import { getVisStateAlertsByNodeSummary, getVisStateClusterAlertsSummary } from "./vis-states";
+import {
+  getVisStateAlertsByNodeSummary,
+  getVisStateClusterAlertsSummary,
+} from './vis-states';
 
 export class ClusterMonitoringDashboardLayoutConfig extends DashboardLayoutConfig {
   constructor(

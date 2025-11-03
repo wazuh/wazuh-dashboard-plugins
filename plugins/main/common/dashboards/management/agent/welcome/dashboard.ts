@@ -2,7 +2,7 @@ import {
   DashboardByRendererConfig,
   DashboardLayoutConfig,
 } from '../../../dashboard-builder';
-import { getVisStateEventsCountEvolution } from "./vis-states";
+import { getVisStateEventsCountEvolution } from './vis-states';
 
 export class AgentsEventsDashboardLayoutConfig extends DashboardLayoutConfig {
   constructor(indexPatternId: string) {

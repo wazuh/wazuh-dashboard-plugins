@@ -2,7 +2,7 @@ import {
   DashboardByRendererConfig,
   DashboardLayoutConfig,
 } from '../../../dashboard-builder';
-import { getVisStateTop5Nodes } from "./vis-states";
+import { getVisStateTop5Nodes } from './vis-states';
 
 export class ClusterConfigurationDashboardLayoutConfig extends DashboardLayoutConfig {
   constructor(indexPatternId: string) {

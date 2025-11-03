@@ -1,4 +1,4 @@
-import type { DashboardByValueSavedVis } from "../../../types";
+import type { DashboardByValueSavedVis } from '../../../types';
 
 export const getVisStateEventsCountEvolution = (
   indexPatternId: string,

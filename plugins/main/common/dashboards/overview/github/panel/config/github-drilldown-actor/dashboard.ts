@@ -1,4 +1,7 @@
-import { DashboardByRendererConfig, DashboardLayoutConfig } from '../../../../../dashboard-builder';
+import {
+  DashboardByRendererConfig,
+  DashboardLayoutConfig,
+} from '../../../../../dashboard-builder';
 import {
   getVisStateRuleLevelEvolution,
   getVisStateTopActions,

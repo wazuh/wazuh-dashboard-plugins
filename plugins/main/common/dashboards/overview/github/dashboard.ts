@@ -1,4 +1,7 @@
-import { DashboardByRendererConfig, DashboardLayoutConfig } from '../../dashboard-builder';
+import {
+  DashboardByRendererConfig,
+  DashboardLayoutConfig,
+} from '../../dashboard-builder';
 import {
   getVisStateActionTypeByOrganization,
   getVisStateAgentActionTypeByOrganization,
@@ -161,7 +164,10 @@ export abstract class GithubDashboardByRendererConfig extends DashboardByRendere
 
 export class GithubOverviewDashboardByRendererConfig extends GithubDashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new GithubOverviewDashboardLayoutConfig(indexPatternId));
+    super(
+      indexPatternId,
+      new GithubOverviewDashboardLayoutConfig(indexPatternId),
+    );
   }
 
   protected override getId(): string {
@@ -179,7 +185,10 @@ export class GithubOverviewDashboardByRendererConfig extends GithubDashboardByRe
 
 export class GithubPinnedAgentDashboardByRendererConfig extends GithubDashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new GithubPinnedAgentDashboardLayoutConfig(indexPatternId));
+    super(
+      indexPatternId,
+      new GithubPinnedAgentDashboardLayoutConfig(indexPatternId),
+    );
   }
 
   protected override getId(): string {
