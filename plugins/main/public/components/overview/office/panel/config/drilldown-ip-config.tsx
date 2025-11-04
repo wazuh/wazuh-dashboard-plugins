@@ -12,16 +12,10 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React from 'react';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins } from '../../../../../kibana-services';
-import {
-  getVisStateOfficeMetricStats,
-  getVisStateOfficeTopsEventsPie,
-  getVisStateOfficeUserOperationLevel,
-  getVisStateOfficeAlertsEvolutionByUser,
-} from './visualizations';
-import type { DashboardByRendererPanels } from "../../../../../../common/dashboards";
+import type { DashboardByRendererPanels } from '../../../../../../common/dashboards';
+import { DrilldownIPConfigDashboardByRendererConfig } from '../../../../../../common/dashboards/vis-definitions/overview/office/panel/config/drilldown-ip-config/dashboard';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -29,64 +23,9 @@ const DashboardByRenderer =
 const getDashboardPanels = (
   indexPatternId: string,
 ): DashboardByRendererPanels => {
-  return {
-    d0: {
-      gridData: {
-        w: 15,
-        h: 14,
-        x: 0,
-        y: 0,
-        i: 'd0',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd0',
-        savedVis: getVisStateOfficeMetricStats(indexPatternId),
-      },
-    },
-    d1: {
-      gridData: {
-        w: 15,
-        h: 14,
-        x: 15,
-        y: 0,
-        i: 'd1',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd1',
-        savedVis: getVisStateOfficeTopsEventsPie(indexPatternId),
-      },
-    },
-    d2: {
-      gridData: {
-        w: 18,
-        h: 14,
-        x: 30,
-        y: 0,
-        i: 'd2',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd2',
-        savedVis: getVisStateOfficeUserOperationLevel(indexPatternId),
-      },
-    },
-    d3: {
-      gridData: {
-        w: 48,
-        h: 11,
-        x: 0,
-        y: 14,
-        i: 'd3',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd3',
-        savedVis: getVisStateOfficeAlertsEvolutionByUser(indexPatternId),
-      },
-    },
-  };
+  return new DrilldownIPConfigDashboardByRendererConfig(
+    indexPatternId,
+  ).getDashboardPanels();
 };
 
 export const drilldownIPConfig = props => {
