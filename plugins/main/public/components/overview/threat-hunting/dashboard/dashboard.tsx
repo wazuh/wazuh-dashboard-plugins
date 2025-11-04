@@ -18,18 +18,8 @@ export const DashboardThreatHunting = createDashboard({
   DataSourceRepositoryCreator: AlertsDataSourceRepository,
   getDashboardPanels: [
     {
-      getDashboardPanels: getKPIsPanel,
-      id: 'kpis-th-dashboard-tab',
-      title: 'KPIs Threat Hunting dashboard',
-      description: 'KPIs Dashboard of the Threat Hunting',
-      hidePanelTitles: true,
-    },
-    {
-      getDashboardPanels: getDashboardPanels,
-      id: 'th-dashboard-tab',
-      title: 'Threat Hunting dashboard',
-      description: 'Dashboard of the Threat Hunting',
-      hidePanelTitles: false,
+      dashboardId: 'c19512e7-7598-4b94-a454-f2dc91e4daa0',
+      agentDashboardId: 'e0b59a43-1a41-416f-a0f4-bd126c5c8a07',
     },
   ],
   sampleDataWarningCategories: [
