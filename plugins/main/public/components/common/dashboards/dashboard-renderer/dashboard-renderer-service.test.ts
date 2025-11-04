@@ -299,7 +299,9 @@ describe('Dashboard Renderer Service', () => {
         isFullScreenMode: true,
         refreshConfig: { pause: false, value: 60 },
       };
-      (SavedObject.getDashboardById as jest.Mock).mockResolvedValue(mockDashboard);
+      (SavedObject.getDashboardById as jest.Mock).mockResolvedValue(
+        mockDashboard,
+      );
 
       const result = await buildDashboardByValueInput('dashboard-1', config);
 
