@@ -19,7 +19,7 @@ import type { InitializationTaskRunContext } from '../services';
 import type {
   DashboardByRendererInput,
   SavedVis,
-} from '../../../common/dashboards/types';
+} from '../../../common/dashboards';
 import { DashboardSavedObjectMapper } from './dashboard-saved-object-mapper';
 import { getDashboardConfigs } from './dashboard-configs';
 
