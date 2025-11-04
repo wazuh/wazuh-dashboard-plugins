@@ -12,6 +12,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import React from 'react';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins } from '../../../../../kibana-services';
 import type { DashboardByRendererPanels } from '../../../../../../common/dashboards';
