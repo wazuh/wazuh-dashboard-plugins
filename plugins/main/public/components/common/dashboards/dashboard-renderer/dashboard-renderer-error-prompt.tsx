@@ -53,15 +53,9 @@ export const DashboardRendererErrorPrompt: React.FC<
   const getDashboardSelectionMessage = () => {
     if (!dashboardId) return '';
 
-    const messages = [
-      dashboardId ? `id: ${dashboardId}` : null,
-      hasPinnedAgent && agentDashboardId
-        ? `agent dashboard id: ${agentDashboardId}`
-        : null,
-    ]
-      .filter(Boolean)
-      .join(' or ');
-
+    const messages = `id: ${
+      (hasPinnedAgent && agentDashboardId) || dashboardId
+    }`;
     return `[${messages}]`;
   };
 

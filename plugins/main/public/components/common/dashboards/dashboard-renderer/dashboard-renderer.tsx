@@ -67,7 +67,7 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
 
   if (status === 'validating') {
     return (
-      <div className={className}>
+      <div>
         <EuiEmptyPrompt
           icon={<EuiLoadingSpinner size='xl' />}
           title={<h3>Loading dashboard…</h3>}
@@ -80,7 +80,6 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
   if (status === 'error') {
     return (
       <DashboardRendererErrorPrompt
-        className={className}
         errorType='error'
         errorMessage={error || 'Unknown error'}
         onRetry={buildByValueInputHandler}
@@ -91,7 +90,6 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
   if (status === 'empty') {
     return (
       <DashboardRendererErrorPrompt
-        className={className}
         errorType='empty'
         errorMessage={error || 'Unknown error'}
         dashboardId={dashboardId}
@@ -104,7 +102,6 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
   if (status === 'not_found') {
     return (
       <DashboardRendererErrorPrompt
-        className={className}
         errorType='not_found'
         errorMessage={error || 'Unknown error'}
         dashboardId={dashboardId}
@@ -118,7 +115,6 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
     if (!DashboardContainerByValueRenderer) {
       return (
         <DashboardRendererErrorPrompt
-          className={className}
           errorType='plugin_unavailable'
           errorMessage='Ensure the Dashboard plugin is started and supports by-value rendering.'
         />

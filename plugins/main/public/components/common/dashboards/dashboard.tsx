@@ -12,6 +12,7 @@ import { DiscoverNoResults } from '../no-results/no-results';
 import { SampleDataWarning } from '../../visualize/components';
 import { compose } from 'redux';
 import DashboardRenderer from './dashboard-renderer/dashboard-renderer';
+import classnames from 'classnames';
 
 export const Dashboard = props => {
   // This is not used by the SCA dashboard.
@@ -26,6 +27,8 @@ export const Dashboard = props => {
       to: props.dataSource.searchBarProps.dateRangeTo,
     },
   });
+
+  const shouldHideDashboard = props.dataSourceAction?.data?.hits?.total > 0;
 
   return (
     <>
@@ -42,15 +45,17 @@ export const Dashboard = props => {
       {props.dataSourceAction?.data?.hits?.total === 0 ? (
         <DiscoverNoResults />
       ) : null}
-      <div
-        className={
-          props.dataSourceAction?.data?.hits?.total > 0 ? '' : 'wz-no-display'
-        }
-      >
+      <div>
         {props.sampleDataWarningCategories && (
-          <SampleDataWarning
-            categoriesSampleData={props.sampleDataWarningCategories}
-          />
+          <div
+            className={classnames({
+              'wz-no-display': shouldHideDashboard,
+            })}
+          >
+            <SampleDataWarning
+              categoriesSampleData={props.sampleDataWarningCategories}
+            />
+          </div>
         )}
 
         <div className='wz-dashboard-responsive'>
@@ -60,7 +65,9 @@ export const Dashboard = props => {
                 <DashboardRenderer
                   dashboardId={dashboardId}
                   agentDashboardId={agentDashboardId}
-                  className={className}
+                  className={classnames(className, {
+                    'wz-no-display': shouldHideDashboard,
+                  })}
                   hasPinnedAgent={Boolean(
                     props.dataSource.dataSource?.getPinnedAgentFilter()?.length,
                   )}
@@ -73,11 +80,7 @@ export const Dashboard = props => {
               if (className) {
                 /* Add a wrapper div with the className to apply styles that allow to overwrite
                 some styles using CSS selectors */
-                return (
-                  <div className={className}>
-                    {dashboard}
-                  </div>
-                );
+                return <div className={className}>{dashboard}</div>;
               }
 
               return dashboard;
