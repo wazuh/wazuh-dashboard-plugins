@@ -97,20 +97,18 @@ export async function buildDashboardByValueInput(
   }
 
   try {
-    // Quick validation of existence
-    const result = await SavedObject.existsDashboard(dashboardId);
-    if (!result || typeof result !== 'object' || !(result as any).status) {
+
+    const { data } = (await SavedObject.getDashboardById(dashboardId)) as {
+      data: SavedDashboardSO;
+    };
+
+    if (!data || typeof data !== 'object' || !(data as any).id) {
       return {
         success: false,
         status: 'not_found',
         error: 'Requested dashboard not found.',
       };
     }
-
-    // Fetch full saved object and transform it to by-value input
-    const { data } = (await SavedObject.getDashboardById(dashboardId)) as {
-      data: SavedDashboardSO;
-    };
 
     const byValueInput = toByValueInput(data, config);
 

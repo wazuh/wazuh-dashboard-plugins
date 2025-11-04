@@ -4,7 +4,6 @@ import {
   withErrorBoundary,
   withInjectProps,
 } from '../hocs';
-import { getPlugins } from '../../../kibana-services';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import { useReportingCommunicateSearchContext } from '../hooks/use-reporting-communicate-search-context';
 import { WzSearchBar } from '../search-bar';
@@ -80,7 +79,7 @@ export const Dashboard = props => {
               if (className) {
                 /* Add a wrapper div with the className to apply styles that allow to overwrite
                 some styles using CSS selectors */
-                return <div className={className}>{dashboard}</div>;
+                return <div className={className} key={dashboardId || agentDashboardId}>{dashboard}</div>;
               }
 
               return dashboard;

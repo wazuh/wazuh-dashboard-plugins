@@ -112,15 +112,7 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
   }
 
   if (status === 'ready') {
-    if (!DashboardContainerByValueRenderer) {
-      return (
-        <DashboardRendererErrorPrompt
-          errorType='plugin_unavailable'
-          errorMessage='Ensure the Dashboard plugin is started and supports by-value rendering.'
-        />
-      );
-    }
-
+  
     return (
       <div className={className} style={{ padding: 0 }}>
         <DashboardContainerByValueRenderer

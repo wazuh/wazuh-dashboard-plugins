@@ -175,7 +175,6 @@ export class SavedObject {
       // Request dashboards via SavedObjects client; include common fields to avoid a second fetch
       const result = await getSavedObjects().client.find({
         type: 'dashboard',
-        perPage: 10000,
         fields: [
           'title',
           'description',
