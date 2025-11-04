@@ -16,7 +16,7 @@ import React from 'react';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins } from '../../../../../kibana-services';
 import type { DashboardByRendererPanels } from '../../../../../../common/dashboards';
-import { DrilldownIPConfigDashboardByRendererConfig } from '../../../../../../common/dashboards/vis-definitions/overview/office/panel/config/drilldown-ip-config/dashboard';
+import { OfficeDrilldownIPConfigDashboardByRendererConfig } from '../../../../../../common/dashboards/vis-definitions/overview/office/panel/config/drilldown-ip-config/dashboard';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -24,7 +24,7 @@ const DashboardByRenderer =
 const getDashboardPanels = (
   indexPatternId: string,
 ): DashboardByRendererPanels => {
-  return new DrilldownIPConfigDashboardByRendererConfig(
+  return new OfficeDrilldownIPConfigDashboardByRendererConfig(
     indexPatternId,
   ).getDashboardPanels();
 };

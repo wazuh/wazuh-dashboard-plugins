@@ -9,7 +9,7 @@ import {
   getVisStateOfficeTopsEventsPie,
 } from '../vis-states';
 
-export class DrilldownUserConfigDashboardLayoutDefinition extends DashboardLayoutDefinition {
+export class OfficeDrilldownUserConfigDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -53,11 +53,11 @@ export class DrilldownUserConfigDashboardLayoutDefinition extends DashboardLayou
   }
 }
 
-export class DrilldownUserConfigDashboardByRendererConfig extends DashboardByRendererConfig {
+export class OfficeDrilldownUserConfigDashboardByRendererConfig extends DashboardByRendererConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new DrilldownUserConfigDashboardLayoutDefinition(indexPatternId),
+      new OfficeDrilldownUserConfigDashboardLayoutDefinition(indexPatternId),
     );
   }
 

@@ -9,7 +9,7 @@ import {
   getVisStateOfficeUserOperationLevel,
 } from '../vis-states';
 
-export class DrilldownIPConfigDashboardLayoutDefinition extends DashboardLayoutDefinition {
+export class OfficeDrilldownIPConfigDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -53,11 +53,11 @@ export class DrilldownIPConfigDashboardLayoutDefinition extends DashboardLayoutD
   }
 }
 
-export class DrilldownIPConfigDashboardByRendererConfig extends DashboardByRendererConfig {
+export class OfficeDrilldownIPConfigDashboardByRendererConfig extends DashboardByRendererConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new DrilldownIPConfigDashboardLayoutDefinition(indexPatternId),
+      new OfficeDrilldownIPConfigDashboardLayoutDefinition(indexPatternId),
     );
   }
 

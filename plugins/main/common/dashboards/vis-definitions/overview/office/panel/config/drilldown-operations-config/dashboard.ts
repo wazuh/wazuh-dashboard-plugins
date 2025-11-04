@@ -5,7 +5,7 @@ import {
   getVisStateTopOfficeUsers,
 } from '../vis-states';
 
-export class DrilldownOperationsDashboardLayoutDefinition extends DashboardLayoutDefinition {
+export class OfficeDrilldownOperationsDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -40,11 +40,11 @@ export class DrilldownOperationsDashboardLayoutDefinition extends DashboardLayou
   }
 }
 
-export class DrilldownOperationsDashboardByRendererConfig extends DashboardByRendererConfig {
+export class OfficeDrilldownOperationsDashboardByRendererConfig extends DashboardByRendererConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new DrilldownOperationsDashboardLayoutDefinition(indexPatternId),
+      new OfficeDrilldownOperationsDashboardLayoutDefinition(indexPatternId),
     );
   }
 
