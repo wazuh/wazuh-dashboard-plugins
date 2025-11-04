@@ -87,9 +87,8 @@ OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version package.json) yarn
 > Replace the `GIT_REF` by the branch or tag for the Wazuh reporting plugin, e.g. `v5.0.0`.
 
 ```bash
-cd ../
 GIT_REF=<REPLACE_PLACEHOLDER>
-OPENSEARCH_DASHBOARDS_VERSION=<REPLACE_PLACEHOLDER>
+cd ../
 git clone -b $GIT_REF https://github.com/wazuh/wazuh-dashboard-reporting.git
 cd wazuh-dashboard-reporting/
 yarn
@@ -102,9 +101,8 @@ yarn build
 > Replace the `GIT_REF` by the branch or tag for the Wazuh security analytics plugin, e.g. `v5.0.0`.
 
 ```bash
-cd ../
 GIT_REF=<REPLACE_PLACEHOLDER>
-OPENSEARCH_DASHBOARDS_VERSION=<REPLACE_PLACEHOLDER>
+cd ../
 git clone -b $GIT_REF https://github.com/wazuh/wazuh-dashboard-security-analytics.git
 cd wazuh-dashboard-security-analytics/
 yarn
@@ -129,9 +127,9 @@ ls
 After completing the previous steps, you will have three packages in the packages folder:
 
 - `dashboard-package.zip`
-- `security-package.zip`
 - `reporting-package.zip`
 - `security-analytics-package.zip`
+- `security-package.zip`
 - `wazuh-package.zip`
 
 7. Run the `build-packages.sh` script in the `dev-tools/build-packages/` folder of the `wazuh-dashboard` repository. The script requires the following parameters:
@@ -154,10 +152,10 @@ Replace the placeholders as shown in the example below.
 
 ```bash
 $ cd ../wazuh-dashboard/dev-tools/build-packages/
-./build-packages.sh --commit-sha 0c1f888bb4-46d76ffe0-ec559ea-8f60762-ff51705 -r 1 --deb -b file://$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip -a file://$WZD_ZIPPED_PACKAGES_DIR/wazuh-package.zip -rp file://$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip -s file://$WZD_ZIPPED_PACKAGES_DIR/security-package.zip  -sa file://$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip
+./build-packages.sh --commit-sha f05d58cce5-ec559ea-7aa1b2c86-8f60762-ff51705 -r 1 --deb -b file://$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip -a file://$WZD_ZIPPED_PACKAGES_DIR/wazuh-package.zip -rp file://$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip -s file://$WZD_ZIPPED_PACKAGES_DIR/security-package.zip  -sa file://$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip
 ```
 
-The script generates the package in the `output` folder of the same directory where it is located. To see the generated package, run the command: `ls output/deb`.
+The script generates the package in the `output` folder of the same directory where it is located. To see the generated package, run the command: `ls output`.
 
 ### Generating commit SHA
 
@@ -195,6 +193,7 @@ SECURITY_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-plugins rev-parse --short H
 REPORTING_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-reporting rev-parse --short HEAD)
 SECURITY_ANALYTICS_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-security-analytics rev-parse --short HEAD)
 ALL_COMMIT_SHAS="$DASHBOARD_COMMIT_SHA-$PLUGINS_COMMIT_SHA-$SECURITY_COMMIT_SHA-$REPORTING_COMMIT_SHA-$SECURITY_ANALYTICS_COMMIT_SHA"
+echo $ALL_COMMIT_SHAS
 ```
 
 ## Build with Docker image
@@ -216,7 +215,8 @@ Ensure that these dependencies are installed on the system.
 1. Clone the [wazuh-dashboard](https://github.com/wazuh/wazuh-dashboard) repository, navigate to the `wazuh-dashboard/dev-tools/build-packages/base-packages-to-base` directory, and build the application.
 
 ```bash
-git clone -b v$WAZUH_VERSION https://github.com/wazuh/wazuh-dashboard.git
+WAZUH_DASHBOARDS_BRANCH=<REPLACE_PLACEHOLDER>
+git clone -b $WAZUH_DASHBOARDS_BRANCH https://github.com/wazuh/wazuh-dashboard.git
 cd wazuh-dashboard/dev-tools/build-packages/base-packages-to-base/
 ```
 
@@ -271,11 +271,11 @@ Replace the file path to the generated packages in the previous step.
 
 ```bash
 bash build-packages.sh \
-    --a file://$WZD_ZIPPED_PACKAGES_DIR/wazuh-dashboard-plugins-package.zip \
-    --b file://$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip \
-    --s file://$WZD_ZIPPED_PACKAGES_DIR/security-package.zip \
-    --rp file://$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip \
-    --sa file://$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip \
+    -a file://$WZD_ZIPPED_PACKAGES_DIR/wazuh-dashboard-plugins-package.zip \
+    -b file://$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip \
+    -s file://$WZD_ZIPPED_PACKAGES_DIR/security-package.zip \
+    -rp file://$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip \
+    -sa file://$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip \
     --revision 2 --deb --silent
 ```
 
