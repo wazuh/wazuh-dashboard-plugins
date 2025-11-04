@@ -1328,6 +1328,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Added toast with refresh button when new fields are loaded [#2974](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2974)
 - Migrated manager and cluster files endpoints and their corresponding RBAC [#2984](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2984)
+- Changed dashboards renderer by saved objects [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842)
 
 ### Fixed
 
