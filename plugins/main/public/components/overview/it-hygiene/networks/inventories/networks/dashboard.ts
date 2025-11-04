@@ -1,16 +1,12 @@
-import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import { HEIGHT, STYLE } from '../../../common/saved-vis/constants';
-import {
-  createIndexPatternReferences,
-  createSearchSource,
-} from '../../../common/saved-vis/create-saved-vis-data';
-import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
-import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
 import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
 import {
-  getVisStateDHCPEnabledInterfacesMetric,
-  getVisStateNetworkAveragePriorityMetric,
-} from '../common/dashboard';
+  buildDashboardKPIPanels,
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+  getVisStateHorizontalBarByField,
+  getVisStateHorizontalBarSplitSeries,
+  STYLE,
+} from '../../../../../../../common/dashboards/lib';
 
 const getVisStateUniqueNetworkIPsMetric = (
   indexPatternId: string,
@@ -42,8 +38,8 @@ const getVisStateUniqueNetworkIPsMetric = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -83,7 +79,7 @@ export const getOverviewNetworksNetworksTab = (indexPatternId: string) => {
       'interface.name',
       'Top 5 interface names',
       'it-hygiene-networks',
-      { customLabel: 'Interface name' },
+      { fieldCustomLabel: 'Interface name' },
     ),
   ]);
 };

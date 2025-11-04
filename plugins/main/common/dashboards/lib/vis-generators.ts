@@ -1,95 +1,7 @@
+// @ts-ignore
 import { Filter } from 'src/plugins/data/common';
-import { STYLE } from '../../../components/overview/it-hygiene/common/saved-vis/constants';
-import {
-  createIndexPatternReferences,
-  createSearchSource,
-} from '../lib/create-saved-vis-data';
-
-export const getVisStateDonutByField = (
-  indexPatternId: string,
-  field: string,
-  title: string,
-  visIDPrefix: string,
-  options: {
-    orderAggregation?: 'asc' | 'desc';
-    size?: number;
-    // Define the label, and if this exists, enable the other bucket
-    otherBucket?: boolean | string;
-    // Define the label, and if this exists, enable the missing bucket
-    missingBucket?: boolean | string;
-    // Define the filter
-    searchFilter?: Filter[];
-    // showLegend
-    showLegend?: boolean;
-    // showLabels
-    showLabels?: boolean;
-  } = {},
-) => {
-  const {
-    orderAggregation = 'desc',
-    size = 10,
-    otherBucket,
-    missingBucket,
-    searchFilter = [],
-    showLegend = false,
-    showLabels = true,
-  } = options;
-  return {
-    id: `${visIDPrefix}-${field}`,
-    title: title,
-    type: 'pie',
-    params: {
-      type: 'pie',
-      addTooltip: true,
-      addLegend: showLegend,
-      legendPosition: 'right',
-      isDonut: true,
-      labels: {
-        show: showLabels,
-        values: true,
-        last_level: true,
-        truncate: 100,
-      },
-    },
-    data: {
-      searchSource: createSearchSource(indexPatternId, {
-        filter: searchFilter,
-      }),
-      references: createIndexPatternReferences(indexPatternId),
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          params: {},
-          schema: 'metric',
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'terms',
-          params: {
-            field: field,
-            orderBy: '1',
-            order: orderAggregation,
-            size: size,
-            otherBucket: Boolean(otherBucket),
-            otherBucketLabel:
-              otherBucket && typeof otherBucket === 'boolean'
-                ? 'Other'
-                : otherBucket,
-            missingBucket: Boolean(missingBucket),
-            missingBucketLabel:
-              missingBucket && typeof missingBucket === 'boolean'
-                ? 'Missing'
-                : missingBucket,
-          },
-          schema: 'segment',
-        },
-      ],
-    },
-  };
-};
+import { buildIndexPatternReferenceList, buildSearchSource } from './builders';
+import { STYLE, type Style } from "./constants";
 
 export const getVisStateHorizontalBarByField = (
   indexPatternId: string,
@@ -97,27 +9,31 @@ export const getVisStateHorizontalBarByField = (
   title: string,
   visIDPrefix: string,
   options: {
+    excludeTerm?: string;
+    addLegend?: boolean;
     orderAggregation?: 'asc' | 'desc';
-    size?: number;
     fieldCustomLabel?: string;
+    size?: number;
     metricType?: string;
     metricField?: string;
-    addLegend?: boolean;
     // Define the label, and if this exists, enable the other bucket
     otherBucket?: boolean | string;
     // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
+    filters?: Filter[];
   } = {},
 ) => {
   const {
+    excludeTerm,
+    addLegend = false,
     orderAggregation = 'desc',
     size = 10,
     fieldCustomLabel,
     metricType = 'count',
     metricField = undefined,
-    addLegend = false,
     otherBucket,
     missingBucket,
+    filters: searchFilters = [],
   } = options;
   return {
     id: `${visIDPrefix}-${field}`,
@@ -200,14 +116,16 @@ export const getVisStateHorizontalBarByField = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
+      searchSource: buildSearchSource(indexPatternId, {
+        filter: searchFilters,
+      }),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
           enabled: true,
           type: metricType,
-          params: { field: metricField },
+          params: metricField ? { field: metricField } : {},
           schema: 'metric',
         },
         {
@@ -219,6 +137,7 @@ export const getVisStateHorizontalBarByField = (
             orderBy: '1',
             order: orderAggregation,
             size: 5,
+            otherBucket: Boolean(otherBucket),
             otherBucketLabel:
               otherBucket && typeof otherBucket === 'boolean'
                 ? 'Other'
@@ -229,6 +148,7 @@ export const getVisStateHorizontalBarByField = (
                 ? 'Missing'
                 : missingBucket,
             customLabel: fieldCustomLabel,
+            ...(excludeTerm ? { json: `{"exclude":"${excludeTerm}"}` } : {}),
           },
           schema: 'segment',
         },
@@ -236,6 +156,7 @@ export const getVisStateHorizontalBarByField = (
     },
   };
 };
+
 export const getVisStateHorizontalBarSplitSeries = (
   indexPatternId: string,
   field: string,
@@ -257,7 +178,7 @@ export const getVisStateHorizontalBarSplitSeries = (
     missingBucket?: boolean | string;
     // Define the filter
     searchFilter?: Filter[];
-    uiState: {
+    uiState?: {
       vis: {
         colors: {
           [key: string]: string;
@@ -374,10 +295,10 @@ export const getVisStateHorizontalBarSplitSeries = (
       ],
     },
     data: {
-      searchSource: createSearchSource(indexPatternId, {
+      searchSource: buildSearchSource(indexPatternId, {
         filter: searchFilter,
       }),
-      references: createIndexPatternReferences(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -423,11 +344,10 @@ export const getVisStateTable = (
   title: string,
   visIDPrefix: string,
   options: {
-    orderAggregation?: 'asc' | 'desc';
     excludeTerm?: string;
+    order?: 'asc' | 'desc';
     size?: number;
     perPage?: number;
-    customLabel?: string;
     fieldCustomLabel?: string;
     metricCustomLabel?: string;
     addLegend?: boolean;
@@ -439,13 +359,13 @@ export const getVisStateTable = (
   } = {},
 ) => {
   const {
-    orderAggregation = 'desc',
+    order = 'desc',
     excludeTerm,
-    perPage = 5,
     size = 5,
-    fieldCustomLabel,
-    otherBucket,
-    missingBucket,
+    perPage = 5,
+    fieldCustomLabel: customLabel,
+    otherBucket = false,
+    missingBucket = false,
     metricCustomLabel = 'Count',
     filters = [],
   } = options;
@@ -473,8 +393,8 @@ export const getVisStateTable = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId, { filter: filters }),
-      references: createIndexPatternReferences(indexPatternId),
+      searchSource: buildSearchSource(indexPatternId, { filter: filters }),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -492,8 +412,8 @@ export const getVisStateTable = (
           params: {
             field,
             orderBy: '1',
-            order: orderAggregation,
-            size: size,
+            order,
+            size,
             otherBucket: Boolean(otherBucket),
             otherBucketLabel:
               otherBucket && typeof otherBucket === 'boolean'
@@ -504,7 +424,7 @@ export const getVisStateTable = (
               missingBucket && typeof missingBucket === 'boolean'
                 ? 'Missing'
                 : missingBucket,
-            customLabel: fieldCustomLabel,
+            customLabel,
             ...(excludeTerm ? { json: `{"exclude":"${excludeTerm}"}` } : {}),
           },
           schema: 'bucket',
@@ -512,4 +432,332 @@ export const getVisStateTable = (
       ],
     },
   };
+};
+
+export const getVisStateMetricUniqueCountByField = (
+  indexPatternId: string,
+  field: string,
+  title: string,
+  visIDPrefix: string,
+  aggLabel: string = '',
+) => {
+  return {
+    id: `${visIDPrefix}-${field}`,
+    title: title,
+    type: 'metric',
+    params: {
+      addTooltip: true,
+      addLegend: false,
+      type: 'metric',
+      metric: {
+        percentageMode: false,
+        useRanges: false,
+        colorSchema: 'Green to Red',
+        metricColorMode: 'None',
+        colorsRange: [
+          {
+            from: 0,
+            to: 10000,
+          },
+        ],
+        labels: {
+          show: true,
+        },
+        invertColors: false,
+        style: STYLE,
+      },
+    },
+    data: {
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'cardinality',
+          params: {
+            field: field,
+            customLabel: aggLabel,
+          },
+          schema: 'metric',
+        },
+      ],
+    },
+  };
+};
+
+export const getVisStateHistogramBy = (
+  indexPatternId: string,
+  field: string,
+  title: string,
+  visIDPrefix: string,
+  interval: string = 'd',
+  options: {
+    addLegend?: boolean;
+    customLabel?: string;
+    valueAxesTitleText?: string;
+  },
+) => {
+  const {
+    addLegend = true,
+    customLabel = '',
+    valueAxesTitleText = 'Count',
+  } = options;
+  return {
+    id: `${visIDPrefix}-${field}`,
+    title: title,
+    type: 'area',
+    params: {
+      type: 'area',
+      grid: {
+        categoryLines: false,
+      },
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          type: 'category',
+          position: 'bottom',
+          show: true,
+          style: {},
+          scale: {
+            type: 'linear',
+          },
+          labels: {
+            show: true,
+            filter: true,
+            truncate: 100,
+          },
+          title: {},
+        },
+      ],
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          name: 'LeftAxis-1',
+          type: 'value',
+          position: 'left',
+          show: true,
+          style: {},
+          scale: {
+            type: 'linear',
+            mode: 'normal',
+          },
+          labels: {
+            show: true,
+            rotate: 0,
+            filter: false,
+            truncate: 100,
+          },
+          title: {
+            text: valueAxesTitleText,
+          },
+        },
+      ],
+      seriesParams: [
+        {
+          show: true,
+          type: 'area',
+          mode: 'stacked',
+          data: {
+            label: 'Count',
+            id: '1',
+          },
+          drawLinesBetweenPoints: true,
+          lineWidth: 2,
+          showCircles: true,
+          interpolate: 'linear',
+          valueAxis: 'ValueAxis-1',
+        },
+      ],
+      addTooltip: true,
+      addLegend,
+      legendPosition: 'right',
+      times: [],
+      addTimeMarker: false,
+      thresholdLine: {
+        show: false,
+        value: 10,
+        width: 1,
+        style: 'full',
+        color: '#E7664C',
+      },
+      labels: {},
+    },
+    data: {
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {},
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'date_histogram',
+          params: {
+            customLabel,
+            field: field,
+            timeRange: {
+              from: 'now-24h',
+              to: 'now',
+            },
+            useNormalizedOpenSearchInterval: true,
+            scaleMetricValues: false,
+            interval: interval,
+            drop_partials: false,
+            min_doc_count: 1,
+            extended_bounds: {},
+          },
+          schema: 'segment',
+        },
+      ],
+    },
+  };
+};
+
+export interface MetricVisOptions {
+  id: string;
+  title: string;
+  colorSchema?: string;
+  useRanges?: boolean;
+  style?: Style;
+  aggsQuery?: { input: { query: string; language: string }; label: string }[];
+  metricAgg?: { type: string; params?: any };
+  colors: Record<string, string>;
+}
+
+export const getVisStateMetric = (
+  indexPatternId: string,
+  options: MetricVisOptions,
+) => {
+  const {
+    id,
+    title,
+    colorSchema = 'Green to Red',
+    useRanges = false,
+    style = STYLE,
+    aggsQuery = [],
+    metricAgg = { type: 'count', params: { customLabel: 'checks' } },
+    colors = {},
+  } = options;
+
+  return {
+    id,
+    title,
+    type: 'metric',
+    uiState: {
+      vis: {
+        colors,
+      },
+    },
+    params: {
+      addLegend: false,
+      addTooltip: true,
+      type: 'metric',
+      metric: {
+        colorSchema,
+        colorsRange: [
+          {
+            from: -1,
+            to: 0,
+          },
+          {
+            from: 1,
+            to: 200000000,
+          },
+        ],
+        invertColors: false,
+        labels: { show: true },
+        metricColorMode: 'Labels',
+        percentageMode: false,
+        style,
+        useRanges,
+      },
+    },
+    data: {
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          ...metricAgg,
+          schema: 'metric',
+        },
+        ...(aggsQuery.length
+          ? [
+              {
+                id: '2',
+                enabled: true,
+                type: 'filters',
+                params: { filters: aggsQuery },
+                schema: 'group',
+              },
+            ]
+          : []),
+      ],
+    },
+  };
+};
+
+/**
+ * Table panel configuration for the dashboard table generator.
+ */
+export interface TablePanelConfig {
+  /** Unique panel ID (e.g., 't1') */
+  panelId: string;
+  /** X coordinate in the dashboard grid layout */
+  x: number;
+  /** Field name to aggregate on */
+  field: string;
+  /** Visualization title */
+  title: string;
+  /** Visualization ID prefix */
+  visIDPrefix: string;
+  /** Optional custom field label */
+  fieldCustomLabel?: string;
+}
+
+/**
+ * Creates a visualization state object for a "data table" chart.
+ * It is used on sca dashboard
+ *
+ * @param {string} indexPatternId - The ID of the OpenSearch index pattern.
+ * @param {TablePanelConfig[]} panels - Array of table panel definitions.
+ * @returns {Record<string, any>} A mapping of panel IDs to dashboard panel states.
+ *
+ * @example
+ * const dashboardTables = createDashboardTables('my-index', [
+ *   { panelId: 't1', x: 0, field: 'agent.name', title: 'Top 5 agents', visIDPrefix: 'it-hygiene-stat', fieldCustomLabel: 'Top 5 agents' },
+ *   { panelId: 't2', x: 12, field: 'policy.name', title: 'Top 5 policies', visIDPrefix: 'sca-top-policies', fieldCustomLabel: 'Top 5 policies' },
+ * ]);
+ */
+export const getVisStateDashboardTables = (
+  indexPatternId: string,
+  panels: TablePanelConfig[],
+) => {
+  return panels.reduce(
+    (acc, { panelId, x, field, title, visIDPrefix, fieldCustomLabel }) => {
+      acc[panelId] = {
+        gridData: { w: 12, h: 12, x, y: 0, i: panelId },
+        type: 'visualization',
+        explicitInput: {
+          id: panelId,
+          savedVis: getVisStateTable(
+            indexPatternId,
+            field,
+            title,
+            visIDPrefix,
+            fieldCustomLabel ? { fieldCustomLabel } : {},
+          ),
+        },
+      };
+      return acc;
+    },
+    {} as Record<string, any>,
+  );
 };

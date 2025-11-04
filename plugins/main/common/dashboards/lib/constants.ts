@@ -6,4 +6,7 @@ export const STYLE = {
   fontSize: 40,
 } as const;
 
+export type Style = typeof STYLE;
+
 export const HEIGHT = 6;
+export const DASHBOARD_WIDTH_LIMIT = 48;

@@ -1,8 +1,7 @@
-import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import {
+  buildDashboardKPIPanels,
   getVisStateHorizontalBarByField,
-  getVisStatePieByField,
-} from '../../../common/saved-vis/generators';
+} from '../../../../../../../common/dashboards/lib';
 
 export const getOverviewPackagesHotfixesTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
@@ -11,14 +10,14 @@ export const getOverviewPackagesHotfixesTab = (indexPatternId: string) => {
       'package.hotfix.name',
       'Most common KBs',
       'it-hygiene-hotfixes',
-      { customLabel: 'KBs' },
+      { fieldCustomLabel: 'KBs' },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'package.hotfix.name',
       'Least common KBs',
       'it-hygiene-hotfixes',
-      { customLabel: 'KBs', orderAggregation: 'asc' },
+      { fieldCustomLabel: 'KBs', orderAggregation: 'asc' },
     ),
   ]);
 };

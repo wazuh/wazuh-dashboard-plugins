@@ -1,8 +1,8 @@
 import { DashboardPanelState } from '../../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddable/public';
-import { getVisStateMetric } from '../../../../it-hygiene/common/saved-vis/generators';
 import { checkResultColors, decimalFormat } from './visualization-helpers';
 import { CheckResult } from '../../../utils/constants';
+import { getVisStateMetric } from "../../../../../../../common/dashboards/lib";
 
 // Here we are using vega visualization: https://vega.github.io/vega/
 const checkScore = (indexPatternId: string) => ({

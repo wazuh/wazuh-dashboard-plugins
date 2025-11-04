@@ -1,11 +1,11 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-import { getVisStateTable } from '../common/saved-vis/generators';
-import { getVisStateHorizontalBarSplitSeries } from '../../../../services/visualizations';
 import {
-  createIndexPatternReferences,
-  createSearchSource,
-} from '../common/saved-vis/create-saved-vis-data';
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+  getVisStateHorizontalBarSplitSeries,
+  getVisStateTable,
+} from '../../../../../common/dashboards/lib';
 
 export const getVisStateHostsTotalFreeMemoryTable = (
   indexPatternId: string,
@@ -50,8 +50,8 @@ export const getVisStateHostsTotalFreeMemoryTable = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -93,7 +93,7 @@ export const getVisStateHostsTotalFreeMemoryTable = (
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'Total memory',
+            customLabel: options.customLabel || 'Total memory',
           },
           schema: 'bucket',
         },
@@ -127,7 +127,7 @@ export const getDashboardKPIs = (
           '',
           'it-hygiene-top-operating-system-names',
           {
-            customLabel: 'Operating system families',
+            fieldCustomLabel: 'Operating system families',
           },
         ),
       },

@@ -1,85 +1,8 @@
-import { buildDashboardKPIPanels } from '../common/create-dashboard-panels-kpis';
-import { STYLE } from '../common/saved-vis/constants';
 import {
-  createIndexPatternReferences,
-  createSearchSource,
-} from '../common/saved-vis/create-saved-vis-data';
-import {
-  getVisStateHorizontalBarByField,
+  buildDashboardKPIPanels,
   getVisStateHistogramBy,
-} from '../common/saved-vis/generators';
-import { DashboardByValueSavedVis } from '../../../../../common/dashboards/types';
-
-type ProcessState =
-  | 'Stopped'
-  | 'Zombie'
-  | 'Interruptable Sleep'
-  | 'Uninterruptible Sleep';
-
-const getVisStateProcessesState = (
-  indexPatternId: string,
-  processState: ProcessState,
-): DashboardByValueSavedVis => {
-  return {
-    id: `it-hygiene-processes-state-${processState}`,
-    title: `Processes state ${processState}`,
-    type: 'metric',
-    params: {
-      addLegend: false,
-      addTooltip: true,
-      metric: {
-        colorSchema: 'Green to Red',
-        colorsRange: [
-          {
-            from: 0,
-            to: 10000,
-          },
-        ],
-        invertColors: false,
-        labels: {
-          show: true,
-        },
-        metricColorMode: 'None',
-        percentageMode: false,
-        style: STYLE,
-        useRanges: false,
-      },
-      type: 'metric',
-    },
-    data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          params: {
-            customLabel: processState,
-          },
-          schema: 'metric',
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'filters',
-          params: {
-            filters: [
-              {
-                input: {
-                  query: `process.state: ${processState}`,
-                  language: 'kuery',
-                },
-                label: 'Process State',
-              },
-            ],
-          },
-          schema: 'group',
-        },
-      ],
-    },
-  };
-};
+  getVisStateHorizontalBarByField,
+} from '../../../../../common/dashboards/lib';
 
 export const getOverviewProcessesProcessesTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
@@ -88,7 +11,7 @@ export const getOverviewProcessesProcessesTab = (indexPatternId: string) => {
       'process.name',
       'Top 5 processes',
       'it-hygiene-processes',
-      { customLabel: 'Processes' },
+      { fieldCustomLabel: 'Processes' },
     ),
     getVisStateHistogramBy(
       indexPatternId,

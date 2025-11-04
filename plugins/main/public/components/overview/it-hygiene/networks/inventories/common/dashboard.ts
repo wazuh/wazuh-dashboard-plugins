@@ -1,9 +1,9 @@
-import { STYLE } from '../../../common/saved-vis/constants';
-import {
-  createIndexPatternReferences,
-  createSearchSource,
-} from '../../../common/saved-vis/create-saved-vis-data';
 import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
+import {
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+  STYLE,
+} from '../../../../../../../common/dashboards/lib';
 
 export const getVisStateNetworkAveragePriorityMetric = (
   indexPatternId: string,
@@ -35,8 +35,8 @@ export const getVisStateNetworkAveragePriorityMetric = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -83,8 +83,8 @@ export const getVisStateDHCPEnabledInterfacesMetric = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',

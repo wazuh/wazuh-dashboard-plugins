@@ -1,10 +1,11 @@
-import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
-import {
-  createIndexPatternReferences,
-  createSearchSource,
-} from '../../../common/saved-vis/create-saved-vis-data';
 import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
+import {
+  buildDashboardKPIPanels,
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+  getVisStateHorizontalBarSplitSeries,
+} from '../../../../../../../common/dashboards/lib';
+
 const getVisStateNetworkMetricsMinMax = (
   indexPatternId: string,
 ): DashboardByValueSavedVis => {
@@ -40,8 +41,8 @@ const getVisStateNetworkMetricsMinMax = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',

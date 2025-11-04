@@ -3,7 +3,7 @@ import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddab
 import {
   getVisStateHorizontalBarSplitSeries,
   getVisStateTable,
-} from '../../../../../../services/visualizations';
+} from '../../../../../../../common/dashboards/lib';
 import { SCA_CHECK_RESULT_COLORS } from '../../../utils/constants';
 
 const checkResultColors = SCA_CHECK_RESULT_COLORS;

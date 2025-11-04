@@ -1,4 +1,4 @@
-import { getVisStateDashboardTables } from '../../../../it-hygiene/common/saved-vis/generators';
+import { getVisStateDashboardTables } from "../../../../../../../common/dashboards/lib";
 
 export const getDashboardTables = (indexPatternId: string) =>
   getVisStateDashboardTables(indexPatternId, [

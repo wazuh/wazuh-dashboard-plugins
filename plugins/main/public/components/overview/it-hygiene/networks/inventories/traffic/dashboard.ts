@@ -1,12 +1,12 @@
-import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import { STYLE } from '../../../common/saved-vis/constants';
-import {
-  createIndexPatternReferences,
-  createSearchSource,
-} from '../../../common/saved-vis/create-saved-vis-data';
-import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
-import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
 import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
+import {
+  buildDashboardKPIPanels,
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+  getVisStateHorizontalBarByField,
+  getVisStateHorizontalBarSplitSeries,
+  STYLE,
+} from '../../../../../../../common/dashboards/lib';
 
 type InterfaceState = 'LISTEN' | 'ESTABLISHED';
 
@@ -41,8 +41,8 @@ const getVisStateInterfaceState = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
 
       aggs: [
         {
@@ -106,8 +106,8 @@ const getVisStateUDPOnlyTransportsMetric = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -176,7 +176,7 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
       'process.name',
       'Top 5 processes',
       'it-hygiene-ports',
-      { customLabel: 'Processes' },
+      { fieldCustomLabel: 'Processes' },
     ),
   ]);
 };

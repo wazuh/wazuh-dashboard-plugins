@@ -1,83 +1,6 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-import { getVisStateTable } from '../common/saved-vis/generators';
-
-const getVisStateFilter = (
-  id: string,
-  indexPatternId: string,
-  title: string,
-  label: string,
-  fieldName: string,
-) => {
-  return {
-    id,
-    title,
-    type: 'table',
-    params: {
-      perPage: 5,
-      percentageCol: '',
-      row: true,
-      showMetricsAtAllLevels: false,
-      showPartialRows: false,
-      showTotal: false,
-      totalFunc: 'sum',
-    },
-    uiState: {
-      vis: {
-        columnsWidth: [
-          {
-            colIndex: 1,
-            width: 75,
-          },
-        ],
-      },
-    },
-    data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          params: {
-            customLabel: 'Count',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'terms',
-          params: {
-            field: fieldName,
-            orderBy: '1',
-            order: 'desc',
-            size: 5,
-            otherBucket: false,
-            otherBucketLabel: 'Other',
-            missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: label,
-          },
-          schema: 'bucket',
-        },
-      ],
-    },
-  };
-};
+import { getVisStateTable } from '../../../../../common/dashboards/lib';
 
 export const getDashboardTables = (
   indexPatternId: string,
@@ -104,7 +27,7 @@ export const getDashboardTables = (
           'Top 5 installed packages',
           'it-hygiene-top-packages',
           {
-            customLabel: 'Top 5 installed packages',
+            fieldCustomLabel: 'Top 5 installed packages',
           },
         ),
       },
@@ -126,8 +49,8 @@ export const getDashboardTables = (
           'Top 5 running processes',
           'it-hygiene-top-processes',
           {
-            customLabel: 'Top 5 running processes',
-            filter: [
+            fieldCustomLabel: 'Top 5 running processes',
+            filters: [
               {
                 $state: {
                   store: 'appState',
@@ -167,7 +90,7 @@ export const getDashboardTables = (
           'Top 5 operating systems',
           'it-hygiene-top-operating-system-names',
           {
-            customLabel: 'Top 5 operating systems',
+            fieldCustomLabel: 'Top 5 operating systems',
           },
         ),
       },
@@ -189,7 +112,7 @@ export const getDashboardTables = (
           'Top 5 CPUs',
           'it-hygiene-stat',
           {
-            customLabel: 'Top 5 host CPUs',
+            fieldCustomLabel: 'Top 5 host CPUs',
           },
         ),
       },

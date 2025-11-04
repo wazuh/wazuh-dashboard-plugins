@@ -1,9 +1,8 @@
-import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import { getVisStateMetricUniqueCountByField } from '../../../common/saved-vis/generators';
 import {
-  getVisStateHorizontalBarSplitSeries,
+  buildDashboardKPIPanels,
   getVisStateHorizontalBarByField,
-} from '../../../../../../services/visualizations';
+  getVisStateMetricUniqueCountByField,
+} from '../../../../../../../common/dashboards/lib';
 
 export const getOverviewUsersGroupsTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([

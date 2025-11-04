@@ -1,6 +1,8 @@
-import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
-import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
+import {
+  buildDashboardKPIPanels,
+  getVisStateHorizontalBarByField,
+  getVisStateHorizontalBarSplitSeries,
+} from '../../../../../../../common/dashboards/lib';
 
 export const getOverviewProcessesPortTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
@@ -38,7 +40,7 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
       'process.name',
       'Top 5 processes',
       'it-hygiene-ports',
-      { customLabel: 'Processes' },
+      { fieldCustomLabel: 'Processes' },
     ),
   ]);
 };

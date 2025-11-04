@@ -1,66 +1,8 @@
 import { getVisStateHostsTotalFreeMemoryTable } from '../../../dashboards/dashboard-kpi';
-import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import {
-  getVisStatePieByField,
+  buildDashboardKPIPanels,
   getVisStateHorizontalBarByField,
-} from '../../../common/saved-vis/generators';
-
-import { STYLE } from '../../../common/saved-vis/constants';
-import {
-  createIndexPatternReferences,
-  createSearchSource,
-} from '../../../common/saved-vis/create-saved-vis-data';
-import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
-
-const getVisStateAverageMetric = (
-  indexPatternId: string,
-  field: string,
-  customLabel: string,
-): DashboardByValueSavedVis => {
-  return {
-    id: `it-hygiene-network-${field}`,
-    title: `Average ${field}`,
-    type: 'metric',
-    params: {
-      addTooltip: true,
-      addLegend: false,
-      type: 'metric',
-      metric: {
-        percentageMode: false,
-        useRanges: false,
-        colorSchema: 'Green to Red',
-        metricColorMode: 'None',
-        colorsRange: [
-          {
-            from: 0,
-            to: 10000,
-          },
-        ],
-        labels: {
-          show: true,
-        },
-        invertColors: false,
-        style: STYLE,
-      },
-    },
-    data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'avg',
-          params: {
-            field,
-            customLabel,
-          },
-          schema: 'metric',
-        },
-      ],
-    },
-  };
-};
+} from '../../../../../../../common/dashboards/lib';
 
 export const getOverviewSystemHardwareTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
@@ -69,14 +11,14 @@ export const getOverviewSystemHardwareTab = (indexPatternId: string) => {
       'host.cpu.name',
       'Top 5 CPU names',
       'it-hygiene-hardware',
-      { customLabel: 'CPUs' },
+      { fieldCustomLabel: 'CPUs' },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'host.cpu.cores',
       'Top 5 CPU cores',
       'it-hygiene-hardware',
-      { customLabel: 'Cores count' },
+      { fieldCustomLabel: 'Cores count' },
     ),
     getVisStateHostsTotalFreeMemoryTable(
       indexPatternId,

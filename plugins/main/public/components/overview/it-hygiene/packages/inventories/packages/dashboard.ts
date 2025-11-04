@@ -1,13 +1,12 @@
-import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import { getVisStateMetricUniqueCountByField } from '../../../common/saved-vis/generators';
-
-import { STYLE } from '../../../common/saved-vis/constants';
 import {
-  createIndexPatternReferences,
-  createSearchSource,
-} from '../../../common/saved-vis/create-saved-vis-data';
+  buildDashboardKPIPanels,
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+  getVisStateHorizontalBarSplitSeries,
+  getVisStateMetricUniqueCountByField,
+  STYLE,
+} from '../../../../../../../common/dashboards/lib';
 import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
-import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations/generators';
 
 type PackageArchitecture = 'x86_64' | 'arm64';
 
@@ -119,8 +118,8 @@ const getVisStatePackageArchitectureMetric = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',

@@ -1,11 +1,11 @@
-import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import { HEIGHT, STYLE } from '../../../common/saved-vis/constants';
-import {
-  createIndexPatternReferences,
-  createSearchSource,
-} from '../../../common/saved-vis/create-saved-vis-data';
-import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
 import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
+import {
+  buildDashboardKPIPanels,
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+  getVisStateHorizontalBarSplitSeries,
+  STYLE,
+} from '../../../../../../../common/dashboards/lib';
 
 // You can apply the same logic here using ERRORS instead of DROPS. In both cases, a lower percentage indicates everything is working fine. If the percentage rises too much, it means there's a problem that needs attention.
 const getVisStateGlobalPacketLossMetric = (
@@ -38,8 +38,8 @@ const getVisStateGlobalPacketLossMetric = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -108,8 +108,8 @@ const getVisStateInactiveNetworkInterfacesMetric = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -172,8 +172,8 @@ const getVisStateUnknownStateNetworkInterfacesMetric = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -236,8 +236,8 @@ const getVisStateWirelessNetworkInterfacesMetric = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',

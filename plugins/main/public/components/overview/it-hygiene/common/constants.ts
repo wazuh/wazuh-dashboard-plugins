@@ -1,1 +1,0 @@
-export const DASHBOARD_WIDTH_LIMIT = 48;

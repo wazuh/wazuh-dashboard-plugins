@@ -1,8 +1,8 @@
 import {
+  buildDashboardKPIPanels,
   getVisStateHorizontalBarSplitSeries,
   getVisStateTable,
-} from '../../../../../../services/visualizations';
-import { buildDashboardKPIPanels } from '../../../../it-hygiene/common/create-dashboard-panels-kpis';
+} from '../../../../../../../common/dashboards/lib';
 
 export const getDashboard = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
