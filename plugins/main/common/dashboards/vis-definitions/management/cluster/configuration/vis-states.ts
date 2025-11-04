@@ -1,4 +1,4 @@
-import type { SavedVis } from '../../../types';
+import type { SavedVis } from '../../../../types';
 
 export const getVisStateTop5Nodes = (
   indexPatternId: string,

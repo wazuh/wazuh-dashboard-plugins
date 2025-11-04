@@ -2,7 +2,7 @@ import {
   AgentsEventsDashboardByRendererConfig,
   ClusterConfigurationDashboardByRendererConfig,
   ClusterMonitoringDashboardByRendererConfig,
-} from '../../../common/dashboards';
+} from '../../../common/dashboards/vis-definitions';
 import type { DashboardByRendererConfig } from '../../../common/dashboards/dashboard-builder';
 import {
   AWSPinnedAgentDashboardByRendererConfig,
