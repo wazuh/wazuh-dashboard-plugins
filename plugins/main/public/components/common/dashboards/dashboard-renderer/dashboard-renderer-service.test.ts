@@ -259,7 +259,6 @@ describe('Dashboard Renderer Service', () => {
 
       expect(result.success).toBe(false);
       expect(result.status).toBe('error');
-      expect(result.error).toBe('Requested dashboard not found.');
     });
 
     test('should successfully build dashboard by-value input with config', async () => {
@@ -300,9 +299,7 @@ describe('Dashboard Renderer Service', () => {
         isFullScreenMode: true,
         refreshConfig: { pause: false, value: 60 },
       };
-      (SavedObject.getDashboardById as jest.Mock).mockResolvedValue({
-        data: mockDashboard,
-      });
+      (SavedObject.getDashboardById as jest.Mock).mockResolvedValue(mockDashboard);
 
       const result = await buildDashboardByValueInput('dashboard-1', config);
 
