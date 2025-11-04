@@ -142,11 +142,7 @@ export class SavedObject {
   static async getDashboardById(dashboardID) {
     try {
       // Request dashboards via SavedObjects client; include common fields to avoid a second fetch
-      const result = await getSavedObjects().client.get('dashboard', dashboardID);
-      if (result.error) {
-        throw new Error(`Dashboard '${dashboardID}' not found`);
-      }
-      return { data: result };
+      return await getSavedObjects().client.get('dashboard', dashboardID);
     } catch (error) {
       throw error?.data?.message || false
         ? new Error(error.data.message)

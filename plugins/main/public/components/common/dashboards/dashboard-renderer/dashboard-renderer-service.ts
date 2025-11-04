@@ -97,11 +97,11 @@ export async function buildDashboardByValueInput(
   }
 
   try {
-    const { data } = (await SavedObject.getDashboardById(dashboardId)) as {
+    const data = (await SavedObject.getDashboardById(dashboardId)) as {
       data: SavedDashboardSO;
     };
 
-    if (!data || typeof data !== 'object' || !(data as any).id) {
+    if (data?.error?.statusCode === 404) {
       return {
         success: false,
         status: 'not_found',
