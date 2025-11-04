@@ -2,7 +2,7 @@ import type {
   DashboardByRendererPanels,
   GridDataVisualizationPair,
   SavedVis
-} from './types';
+} from '../types';
 
 export class DashboardPanelBuilderService {
   private panels: DashboardByRendererPanels = {};
