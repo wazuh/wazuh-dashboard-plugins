@@ -9,7 +9,6 @@
 // Mock the SavedObject service before importing
 jest.mock('../../../../react-services/saved-objects', () => ({
   SavedObject: {
-    existsDashboard: jest.fn(),
     getDashboardById: jest.fn(),
   },
 }));
@@ -256,21 +255,7 @@ describe('Dashboard Renderer Service', () => {
     });
 
     test('should return not_found when dashboard does not exist', async () => {
-      (SavedObject.existsDashboard as jest.Mock).mockResolvedValue(null);
-
       const result = await buildDashboardByValueInput('non-existent-dashboard');
-
-      expect(result.success).toBe(false);
-      expect(result.status).toBe('not_found');
-      expect(result.error).toBe('Requested dashboard not found.');
-    });
-
-    test('should return not_found when existsDashboard returns invalid response', async () => {
-      (SavedObject.existsDashboard as jest.Mock).mockResolvedValue({
-        status: false,
-      });
-
-      const result = await buildDashboardByValueInput('invalid-dashboard');
 
       expect(result.success).toBe(false);
       expect(result.status).toBe('not_found');
@@ -315,10 +300,6 @@ describe('Dashboard Renderer Service', () => {
         isFullScreenMode: true,
         refreshConfig: { pause: false, value: 60 },
       };
-
-      (SavedObject.existsDashboard as jest.Mock).mockResolvedValue({
-        status: true,
-      });
       (SavedObject.getDashboardById as jest.Mock).mockResolvedValue({
         data: mockDashboard,
       });
@@ -330,9 +311,6 @@ describe('Dashboard Renderer Service', () => {
     });
 
     test('should handle errors during dashboard fetching', async () => {
-      (SavedObject.existsDashboard as jest.Mock).mockResolvedValue({
-        status: true,
-      });
       (SavedObject.getDashboardById as jest.Mock).mockRejectedValue(
         new Error('Network error'),
       );
@@ -345,9 +323,6 @@ describe('Dashboard Renderer Service', () => {
     });
 
     test('should handle errors without message', async () => {
-      (SavedObject.existsDashboard as jest.Mock).mockResolvedValue({
-        status: true,
-      });
       (SavedObject.getDashboardById as jest.Mock).mockRejectedValue({});
 
       const result = await buildDashboardByValueInput('dashboard-1');
@@ -359,10 +334,6 @@ describe('Dashboard Renderer Service', () => {
 
     test('should call SavedObject methods with correct parameters', async () => {
       const dashboardId = 'test-dashboard-id';
-
-      (SavedObject.existsDashboard as jest.Mock).mockResolvedValue({
-        status: true,
-      });
       (SavedObject.getDashboardById as jest.Mock).mockResolvedValue({
         data: {
           id: dashboardId,
@@ -378,7 +349,6 @@ describe('Dashboard Renderer Service', () => {
 
       await buildDashboardByValueInput(dashboardId);
 
-      expect(SavedObject.existsDashboard).toHaveBeenCalledWith(dashboardId);
       expect(SavedObject.getDashboardById).toHaveBeenCalledWith(dashboardId);
     });
   });

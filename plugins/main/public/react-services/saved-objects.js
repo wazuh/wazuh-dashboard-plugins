@@ -138,102 +138,17 @@ export class SavedObject {
     }
   }
 
-  /**
-   * Given a dashboard saved object ID, checks if it exists
-   * Returns an object with status information when found, otherwise returns the error message.
-   */
-  static async existsDashboard(dashboardID) {
-    try {
-      const dashboardData = await GenericRequest.request(
-        'GET',
-        `/api/saved_objects/dashboard/${dashboardID}?fields=title`,
-      );
-
-      const title = dashboardData?.data?.attributes?.title;
-      const id = dashboardData?.data?.id;
-
-      if (title) {
-        return {
-          data: 'Dashboard found',
-          status: true,
-          statusCode: 200,
-          title,
-          id,
-        };
-      }
-    } catch (error) {
-      // Keep consistency with existsIndexPattern by returning the error message
-      return error?.data?.message || false
-        ? error.data.message
-        : error.message || error;
-    }
-  }
-
   // Fetch a dashboard saved object by id using SavedObjects client and filter by id client-side
   static async getDashboardById(dashboardID) {
     try {
       // Request dashboards via SavedObjects client; include common fields to avoid a second fetch
-      const result = await getSavedObjects().client.find({
-        type: 'dashboard',
-        fields: [
-          'title',
-          'description',
-          'panelsJSON',
-          'optionsJSON',
-          'timeRestore',
-          'timeFrom',
-          'timeTo',
-        ],
-      });
+      const result = await getSavedObjects().client.get('dashboard', dashboardID);
       const list = (result && result.savedObjects) || [];
       const match = list.find(so => so && so.id === dashboardID);
-      if (!match) {
+      if (!result.error) {
         throw new Error(`Dashboard '${dashboardID}' not found`);
       }
       return { data: match };
-    } catch (error) {
-      throw error?.data?.message || false
-        ? new Error(error.data.message)
-        : error;
-    }
-  }
-
-  /**
-   * Find saved objects by reference (generic helper) using _find API and has_reference
-   * Example:
-   * /api/saved_objects/_find?default_search_operator=AND&has_reference={"type":"visualization","id":"<visId>"}&page=1&per_page=100&search_fields=title^3&search_fields=description&type=augment-vis
-   */
-  static async findSavedObjectsByReference({
-    type,
-    referenceType,
-    referenceId,
-    page = 1,
-    perPage = 100,
-    searchFields = ['title^3', 'description'],
-    defaultSearchOperator = 'AND',
-  }) {
-    try {
-      const result = await getSavedObjects().client.find({
-        type,
-        page,
-        perPage,
-        searchFields,
-        defaultSearchOperator,
-        hasReference: {
-          type: referenceType,
-          id: referenceId,
-        },
-      });
-
-      // Adapt the result to match the expected format from GenericRequest
-      return {
-        data: {
-          saved_objects: result.savedObjects || [],
-          total: result.total || 0,
-          page: result.page || page,
-          per_page: result.perPage || perPage,
-        },
-      };
     } catch (error) {
       throw error?.data?.message || false
         ? new Error(error.data.message)
