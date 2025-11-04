@@ -39,7 +39,7 @@ export class DashboardPanelBuilderService {
 
   getDashboardPanels(): DashboardByRendererPanels {
     Array.from({
-      length: this.dashboardLayoutConfig.savedVisualizationsCount,
+      length: this.dashboardLayoutConfig.totalGridVisualizationPairs,
     }).forEach((_, index) => {
       const { gridData, savedVis } =
         this.dashboardLayoutConfig.getGridVisualizationPairs()[index];
@@ -56,7 +56,7 @@ export abstract class DashboardLayoutConfig {
     return this.gridVisualizationPairs.map(gridVisData => gridVisData.savedVis);
   }
 
-  get savedVisualizationsCount() {
+  get totalGridVisualizationPairs() {
     return this.gridVisualizationPairs.length;
   }
 
