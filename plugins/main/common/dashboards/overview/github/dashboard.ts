@@ -21,7 +21,7 @@ export abstract class GithubDashboardLayoutConfig extends DashboardLayoutConfig 
 export class GithubOverviewDashboardLayoutConfig extends GithubDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 16,
@@ -92,7 +92,7 @@ export class GithubOverviewDashboardLayoutConfig extends GithubDashboardLayoutCo
 export class GithubPinnedAgentDashboardLayoutConfig extends GithubDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 16,

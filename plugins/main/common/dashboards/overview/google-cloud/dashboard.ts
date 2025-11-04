@@ -20,7 +20,7 @@ export abstract class GoogleCloudDashboardLayoutConfig extends DashboardLayoutCo
 export class GoogleCloudOverviewDashboardLayoutConfig extends GoogleCloudDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 48,
@@ -73,7 +73,7 @@ export class GoogleCloudOverviewDashboardLayoutConfig extends GoogleCloudDashboa
 export class GoogleCloudPinnedAgentDashboardLayoutConfig extends GoogleCloudDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 24,

@@ -7,7 +7,7 @@ import { getVisStateTop5Nodes } from './vis-states';
 export class ClusterConfigurationDashboardLayoutConfig extends DashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push({
+    this.setGridVisualizationPairs({
       gridData: { w: 48, h: 13, x: 0, y: 0 },
       savedVis: getVisStateTop5Nodes(indexPatternId),
     });

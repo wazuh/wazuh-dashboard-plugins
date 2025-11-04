@@ -28,7 +28,7 @@ export class AWSDashboardLayoutConfig extends DashboardLayoutConfig {
 export class AWSOverviewDashboardLayoutConfig extends AWSDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 12,
@@ -99,7 +99,7 @@ export class AWSOverviewDashboardLayoutConfig extends AWSDashboardLayoutConfig {
 export class AWSPinnedAgentDashboardLayoutConfig extends AWSDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 12,

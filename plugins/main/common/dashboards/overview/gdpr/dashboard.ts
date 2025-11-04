@@ -20,7 +20,7 @@ export abstract class GDPRDashboardLayoutConfig extends DashboardLayoutConfig {}
 export class GDPROverviewDashboardLayoutConfig extends GDPRDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 33,
@@ -73,7 +73,7 @@ export class GDPROverviewDashboardLayoutConfig extends GDPRDashboardLayoutConfig
 export class GDPRPinnedAgentDashboardLayoutConfig extends GDPRDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 16,

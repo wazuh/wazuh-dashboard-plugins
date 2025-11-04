@@ -22,7 +22,7 @@ export abstract class AzureDashboardLayoutConfig extends DashboardLayoutConfig {
 export class AzureOverviewDashboardLayoutConfig extends AzureDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 12,
@@ -84,7 +84,7 @@ export class AzureOverviewDashboardLayoutConfig extends AzureDashboardLayoutConf
 export class AzurePinnedAgentDashboardLayoutConfig extends AzureDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 12,

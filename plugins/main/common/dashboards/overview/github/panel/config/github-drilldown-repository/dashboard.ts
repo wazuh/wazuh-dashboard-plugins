@@ -13,7 +13,7 @@ import {
 export class GithubDrilldownRepositoryDashboardLayoutConfig extends DashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 16,

@@ -19,7 +19,7 @@ export abstract class PCIDashboardLayoutConfig extends DashboardLayoutConfig {}
 export class PCIOverviewDashboardLayoutConfig extends PCIDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 24,
@@ -63,7 +63,7 @@ export class PCIOverviewDashboardLayoutConfig extends PCIDashboardLayoutConfig {
 export class PCIPinnedAgentDashboardLayoutConfig extends PCIDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 16,

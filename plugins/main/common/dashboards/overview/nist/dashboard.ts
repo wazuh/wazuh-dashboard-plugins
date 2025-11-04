@@ -20,7 +20,7 @@ export abstract class NistDashboardLayoutConfig extends DashboardLayoutConfig {}
 export class NistOverviewDashboardLayoutConfig extends NistDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 11,
@@ -82,7 +82,7 @@ export class NistOverviewDashboardLayoutConfig extends NistDashboardLayoutConfig
 export class NistPinnedAgentDashboardLayoutConfig extends NistDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 12,

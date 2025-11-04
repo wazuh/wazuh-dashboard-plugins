@@ -20,7 +20,7 @@ export abstract class TscDashboardLayoutConfig extends DashboardLayoutConfig {}
 export class TscOverviewDashboardLayoutConfig extends TscDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 24,
@@ -73,7 +73,7 @@ export class TscOverviewDashboardLayoutConfig extends TscDashboardLayoutConfig {
 export class TscPinnedAgentDashboardLayoutConfig extends TscDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 16,

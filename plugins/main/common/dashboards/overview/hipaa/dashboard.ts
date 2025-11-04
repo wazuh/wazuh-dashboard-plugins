@@ -22,7 +22,7 @@ export abstract class HipaaDashboardLayoutConfig extends DashboardLayoutConfig {
 export class HipaaOverviewDashboardLayoutConfig extends HipaaDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 24,
@@ -93,7 +93,7 @@ export class HipaaOverviewDashboardLayoutConfig extends HipaaDashboardLayoutConf
 export class HipaaPinnedAgentDashboardLayoutConfig extends HipaaDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 24,

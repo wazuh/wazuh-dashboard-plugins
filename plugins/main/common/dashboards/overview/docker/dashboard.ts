@@ -18,7 +18,7 @@ export abstract class DockerDashboardLayoutConfig extends DashboardLayoutConfig 
 export class DockerOverviewDashboardLayoutConfig extends DockerDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 16,
@@ -62,7 +62,7 @@ export class DockerOverviewDashboardLayoutConfig extends DockerDashboardLayoutCo
 export class DockerPinnedAgentDashboardLayoutConfig extends DockerDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 12,

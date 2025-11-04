@@ -53,20 +53,22 @@ export class DashboardPanelManager {
 }
 
 export abstract class DashboardLayoutConfig {
-  protected gridVisualizationItems = [] as GridDataVisualizationPair[];
-
-  constructor() {}
+  private gridVisualizationPairs = [] as GridDataVisualizationPair[];
 
   getSavedVisualizations(): SavedVis[] {
-    return this.gridVisualizationItems.map(gridVisData => gridVisData.savedVis);
+    return this.gridVisualizationPairs.map(gridVisData => gridVisData.savedVis);
   }
 
   get savedVisualizationsCount() {
-    return this.gridVisualizationItems.length;
+    return this.gridVisualizationPairs.length;
+  }
+
+  setGridVisualizationPairs(...items: GridDataVisualizationPair[]) {
+    this.gridVisualizationPairs = items;
   }
 
   getGridVisualizationPairs(): GridDataVisualizationPair[] {
-    return this.gridVisualizationItems;
+    return this.gridVisualizationPairs;
   }
 }
 

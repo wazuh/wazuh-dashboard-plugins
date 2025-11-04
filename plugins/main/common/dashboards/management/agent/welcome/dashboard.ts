@@ -7,7 +7,7 @@ import { getVisStateEventsCountEvolution } from './vis-states';
 export class AgentsEventsDashboardLayoutConfig extends DashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push({
+    this.setGridVisualizationPairs({
       gridData: { w: 48, h: 7, x: 0, y: 0 },
       savedVis: getVisStateEventsCountEvolution(indexPatternId),
     });

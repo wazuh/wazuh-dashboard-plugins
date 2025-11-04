@@ -18,7 +18,7 @@ export abstract class MitreDashboardLayoutConfig extends DashboardLayoutConfig {
 export class MitreOverviewDashboardLayoutConfig extends MitreDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 36,
@@ -71,7 +71,7 @@ export class MitreOverviewDashboardLayoutConfig extends MitreDashboardLayoutConf
 export class MitrePinnedAgentDashboardLayoutConfig extends MitreDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 36,

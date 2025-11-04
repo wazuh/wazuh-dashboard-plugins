@@ -17,7 +17,7 @@ export abstract class OfficeDashboardLayoutConfig extends DashboardLayoutConfig 
 export class OfficeOverviewDashboardLayoutConfig extends OfficeDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 20,

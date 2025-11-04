@@ -21,7 +21,7 @@ export class ClusterMonitoringDashboardLayoutConfig extends DashboardLayoutConfi
     },
   ) {
     super();
-    this.gridVisualizationItems = [
+    this.setGridVisualizationPairs(
       {
         gridData: { w: 24, h: 13, x: 0, y: 0 },
         savedVis: getVisStateClusterAlertsSummary(
@@ -43,7 +43,7 @@ export class ClusterMonitoringDashboardLayoutConfig extends DashboardLayoutConfi
           clusterName,
         ),
       },
-    ];
+    );
   }
 }
 

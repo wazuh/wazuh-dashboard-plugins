@@ -22,7 +22,7 @@ export abstract class FimDashboardLayoutConfig extends DashboardLayoutConfig {}
 export class FimOverviewDashboardLayoutConfig extends FimDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 48,
@@ -84,7 +84,7 @@ export class FimOverviewDashboardLayoutConfig extends FimDashboardLayoutConfig {
 export class FimPinnedAgentDashboardLayoutConfig extends FimDashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super();
-    this.gridVisualizationItems.push(
+    this.setGridVisualizationPairs(
       {
         gridData: {
           w: 12,
