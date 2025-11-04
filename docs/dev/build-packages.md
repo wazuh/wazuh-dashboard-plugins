@@ -262,7 +262,7 @@ Create a `.zip` files with the generated packages:
 cd ..
 WZD_ZIPPED_PACKAGES_DIR="$(pwd)/zipped_packages"
 mkdir -p "$WZD_ZIPPED_PACKAGES_DIR"
-zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip" base-packages-to-base/packages/wazuh-dashboard/opensearch-dashboards-3.*.*-linux-x64.tar.gz
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip" base-packages-to-base/packages/wazuh-dashboard/opensearch-dashboards-3.*.*-linux-*.tar.gz
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-package.zip" base-packages-to-base/packages/wazuh-security-dashboards-plugin/security-dashboards-3.*.*.0.zip
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip" base-packages-to-base/packages/wazuh-dashboards-reporting/reportsDashboards-3.*.*.zip
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip" base-packages-to-base/packages/wazuh-security-analytics-plugin/security-analytics-dashboards-3.*.*.0.zip
