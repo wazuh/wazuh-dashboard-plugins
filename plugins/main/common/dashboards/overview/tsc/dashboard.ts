@@ -1,6 +1,6 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../dashboard-builder';
 import {
   getVisStateAgentRequirements,
@@ -15,9 +15,9 @@ import {
   getVisStateTopRequirementsOverTime,
 } from './vis-states';
 
-export abstract class TscDashboardLayoutConfig extends DashboardLayoutConfig {}
+export abstract class TscDashboardLayoutDefinition extends DashboardLayoutDefinition {}
 
-export class TscOverviewDashboardLayoutConfig extends TscDashboardLayoutConfig {
+export class TscOverviewDashboardLayoutDefinition extends TscDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -70,7 +70,7 @@ export class TscOverviewDashboardLayoutConfig extends TscDashboardLayoutConfig {
   }
 }
 
-export class TscPinnedAgentDashboardLayoutConfig extends TscDashboardLayoutConfig {
+export class TscPinnedAgentDashboardLayoutDefinition extends TscDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -127,7 +127,7 @@ export abstract class TscDashboardByRendererConfig extends DashboardByRendererCo
 
 export class TscOverviewDashboardByRendererConfig extends TscDashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new TscOverviewDashboardLayoutConfig(indexPatternId));
+    super(indexPatternId, new TscOverviewDashboardLayoutDefinition(indexPatternId));
   }
 
   protected override getId(): string {
@@ -147,7 +147,7 @@ export class TscPinnedAgentDashboardByRendererConfig extends TscDashboardByRende
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new TscPinnedAgentDashboardLayoutConfig(indexPatternId),
+      new TscPinnedAgentDashboardLayoutDefinition(indexPatternId),
     );
   }
 

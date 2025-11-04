@@ -1,6 +1,6 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../dashboard-builder';
 import {
   getVisStateAlertsEvolution,
@@ -13,9 +13,9 @@ import {
   getVisStateTopTacticsByAgent,
 } from './vis-states';
 
-export abstract class MitreDashboardLayoutConfig extends DashboardLayoutConfig {}
+export abstract class MitreDashboardLayoutDefinition extends DashboardLayoutDefinition {}
 
-export class MitreOverviewDashboardLayoutConfig extends MitreDashboardLayoutConfig {
+export class MitreOverviewDashboardLayoutDefinition extends MitreDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -68,7 +68,7 @@ export class MitreOverviewDashboardLayoutConfig extends MitreDashboardLayoutConf
   }
 }
 
-export class MitrePinnedAgentDashboardLayoutConfig extends MitreDashboardLayoutConfig {
+export class MitrePinnedAgentDashboardLayoutDefinition extends MitreDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -127,7 +127,7 @@ export class MitreOverviewDashboardByRendererConfig extends MitreDashboardByRend
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new MitreOverviewDashboardLayoutConfig(indexPatternId),
+      new MitreOverviewDashboardLayoutDefinition(indexPatternId),
     );
   }
 
@@ -148,7 +148,7 @@ export class MitrePinnedAgentDashboardByRendererConfig extends MitreDashboardByR
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new MitrePinnedAgentDashboardLayoutConfig(indexPatternId),
+      new MitrePinnedAgentDashboardLayoutDefinition(indexPatternId),
     );
   }
 

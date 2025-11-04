@@ -1,6 +1,6 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../dashboard-builder';
 import {
   getVisStateEventsBySeverity,
@@ -12,9 +12,9 @@ import {
   getVisStateUsersByOperationResult,
 } from './vis-states';
 
-export abstract class OfficeDashboardLayoutConfig extends DashboardLayoutConfig {}
+export abstract class OfficeDashboardLayoutDefinition extends DashboardLayoutDefinition {}
 
-export class OfficeOverviewDashboardLayoutConfig extends OfficeDashboardLayoutConfig {
+export class OfficeOverviewDashboardLayoutDefinition extends OfficeDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -91,7 +91,7 @@ export class OfficeOverviewDashboardByRendererConfig extends OfficeDashboardByRe
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new OfficeOverviewDashboardLayoutConfig(indexPatternId),
+      new OfficeOverviewDashboardLayoutDefinition(indexPatternId),
     );
   }
 

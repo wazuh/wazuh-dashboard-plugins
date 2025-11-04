@@ -1,10 +1,10 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../../dashboard-builder';
 import { getVisStateTop5Nodes } from './vis-states';
 
-export class ClusterConfigurationDashboardLayoutConfig extends DashboardLayoutConfig {
+export class ClusterConfigurationDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs({
@@ -18,7 +18,7 @@ export class ClusterConfigurationDashboardByRendererConfig extends DashboardByRe
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new ClusterConfigurationDashboardLayoutConfig(indexPatternId),
+      new ClusterConfigurationDashboardLayoutDefinition(indexPatternId),
     );
   }
 

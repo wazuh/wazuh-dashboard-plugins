@@ -1,13 +1,13 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../../dashboard-builder';
 import {
   getVisStateAlertsByNodeSummary,
   getVisStateClusterAlertsSummary,
 } from './vis-states';
 
-export class ClusterMonitoringDashboardLayoutConfig extends DashboardLayoutConfig {
+export class ClusterMonitoringDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor(
     indexPatternId: string,
     {
@@ -62,7 +62,7 @@ export class ClusterMonitoringDashboardByRendererConfig extends DashboardByRende
   ) {
     super(
       indexPatternId,
-      new ClusterMonitoringDashboardLayoutConfig(indexPatternId, {
+      new ClusterMonitoringDashboardLayoutDefinition(indexPatternId, {
         indexPatternTitle,
         nodeList,
         clusterName,

@@ -1,6 +1,6 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../dashboard-builder';
 import {
   getVisStateAgentRuleLevelDistribution,
@@ -14,9 +14,9 @@ import {
   getVisStateTopRequirements,
 } from './vis-states';
 
-export abstract class PCIDashboardLayoutConfig extends DashboardLayoutConfig {}
+export abstract class PCIDashboardLayoutDefinition extends DashboardLayoutDefinition {}
 
-export class PCIOverviewDashboardLayoutConfig extends PCIDashboardLayoutConfig {
+export class PCIOverviewDashboardLayoutDefinition extends PCIDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -60,7 +60,7 @@ export class PCIOverviewDashboardLayoutConfig extends PCIDashboardLayoutConfig {
   }
 }
 
-export class PCIPinnedAgentDashboardLayoutConfig extends PCIDashboardLayoutConfig {
+export class PCIPinnedAgentDashboardLayoutDefinition extends PCIDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -117,7 +117,7 @@ export abstract class PCIDashboardByRendererConfig extends DashboardByRendererCo
 
 export class PCIOverviewDashboardByRendererConfig extends PCIDashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new PCIOverviewDashboardLayoutConfig(indexPatternId));
+    super(indexPatternId, new PCIOverviewDashboardLayoutDefinition(indexPatternId));
   }
 
   protected override getId(): string {
@@ -137,7 +137,7 @@ export class PCIPinnedAgentDashboardByRendererConfig extends PCIDashboardByRende
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new PCIPinnedAgentDashboardLayoutConfig(indexPatternId),
+      new PCIPinnedAgentDashboardLayoutDefinition(indexPatternId),
     );
   }
 

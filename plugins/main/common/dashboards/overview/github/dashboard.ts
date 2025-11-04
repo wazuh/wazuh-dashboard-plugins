@@ -1,6 +1,6 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../dashboard-builder';
 import {
   getVisStateActionTypeByOrganization,
@@ -16,9 +16,9 @@ import {
   getVisStateUsersWithMoreAlerts,
 } from './vis-states';
 
-export abstract class GithubDashboardLayoutConfig extends DashboardLayoutConfig {}
+export abstract class GithubDashboardLayoutDefinition extends DashboardLayoutDefinition {}
 
-export class GithubOverviewDashboardLayoutConfig extends GithubDashboardLayoutConfig {
+export class GithubOverviewDashboardLayoutDefinition extends GithubDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -89,7 +89,7 @@ export class GithubOverviewDashboardLayoutConfig extends GithubDashboardLayoutCo
   }
 }
 
-export class GithubPinnedAgentDashboardLayoutConfig extends GithubDashboardLayoutConfig {
+export class GithubPinnedAgentDashboardLayoutDefinition extends GithubDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -166,7 +166,7 @@ export class GithubOverviewDashboardByRendererConfig extends GithubDashboardByRe
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new GithubOverviewDashboardLayoutConfig(indexPatternId),
+      new GithubOverviewDashboardLayoutDefinition(indexPatternId),
     );
   }
 
@@ -187,7 +187,7 @@ export class GithubPinnedAgentDashboardByRendererConfig extends GithubDashboardB
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new GithubPinnedAgentDashboardLayoutConfig(indexPatternId),
+      new GithubPinnedAgentDashboardLayoutDefinition(indexPatternId),
     );
   }
 

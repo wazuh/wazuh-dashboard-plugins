@@ -1,6 +1,6 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../dashboard-builder';
 import {
   getVisStateAgentDisplayName,
@@ -17,9 +17,9 @@ import {
   getVisStateResults,
 } from './vis-states';
 
-export abstract class AzureDashboardLayoutConfig extends DashboardLayoutConfig {}
+export abstract class AzureDashboardLayoutDefinition extends DashboardLayoutDefinition {}
 
-export class AzureOverviewDashboardLayoutConfig extends AzureDashboardLayoutConfig {
+export class AzureOverviewDashboardLayoutDefinition extends AzureDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -81,7 +81,7 @@ export class AzureOverviewDashboardLayoutConfig extends AzureDashboardLayoutConf
   }
 }
 
-export class AzurePinnedAgentDashboardLayoutConfig extends AzureDashboardLayoutConfig {
+export class AzurePinnedAgentDashboardLayoutDefinition extends AzureDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -153,7 +153,7 @@ export class AzureOverviewDashboardByRendererConfig extends AzureDashboardByRend
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new AzureOverviewDashboardLayoutConfig(indexPatternId),
+      new AzureOverviewDashboardLayoutDefinition(indexPatternId),
     );
   }
 
@@ -172,7 +172,7 @@ export class AzurePinnedAgentDashboardByRendererConfig extends AzureDashboardByR
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new AzurePinnedAgentDashboardLayoutConfig(indexPatternId),
+      new AzurePinnedAgentDashboardLayoutDefinition(indexPatternId),
     );
   }
 

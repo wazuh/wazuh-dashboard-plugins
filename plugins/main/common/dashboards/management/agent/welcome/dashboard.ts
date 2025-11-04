@@ -1,10 +1,10 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../../dashboard-builder';
 import { getVisStateEventsCountEvolution } from './vis-states';
 
-export class AgentsEventsDashboardLayoutConfig extends DashboardLayoutConfig {
+export class AgentsEventsDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs({
@@ -18,7 +18,7 @@ export class AgentsEventsDashboardByRendererConfig extends DashboardByRendererCo
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new AgentsEventsDashboardLayoutConfig(indexPatternId),
+      new AgentsEventsDashboardLayoutDefinition(indexPatternId),
     );
   }
 

@@ -1,14 +1,13 @@
 import type {
   DashboardByRendererPanels,
-  SavedVis,
-  GridData,
   GridDataVisualizationPair,
+  SavedVis
 } from './types';
 
 export class DashboardPanelBuilderService {
   private panels: DashboardByRendererPanels = {};
 
-  constructor(private dashboardLayoutConfig: DashboardLayoutConfig) {}
+  constructor(private dashboardLayoutDefinition: DashboardLayoutDefinition) {}
 
   private buildDashboardPanel = (
     key: string,
@@ -39,17 +38,17 @@ export class DashboardPanelBuilderService {
 
   getDashboardPanels(): DashboardByRendererPanels {
     Array.from({
-      length: this.dashboardLayoutConfig.totalGridVisualizationPairs,
+      length: this.dashboardLayoutDefinition.totalGridVisualizationPairs,
     }).forEach((_, index) => {
       const { gridData, savedVis } =
-        this.dashboardLayoutConfig.getGridVisualizationPairs()[index];
+        this.dashboardLayoutDefinition.getGridVisualizationPairs()[index];
       this.addDashboardPanel({ gridData, savedVis });
     });
     return this.panels;
   }
 }
 
-export abstract class DashboardLayoutConfig {
+export abstract class DashboardLayoutDefinition {
   private gridVisualizationPairs = [] as GridDataVisualizationPair[];
 
   getSavedVisualizations(): SavedVis[] {
@@ -74,10 +73,10 @@ export abstract class DashboardByRendererConfig {
 
   constructor(
     protected indexPatternId: string,
-    protected dashboardLayoutConfig: DashboardLayoutConfig,
+    protected layoutDefinition: DashboardLayoutDefinition,
   ) {
     this.panelBuilderService = new DashboardPanelBuilderService(
-      dashboardLayoutConfig,
+      layoutDefinition,
     );
   }
 
@@ -86,7 +85,7 @@ export abstract class DashboardByRendererConfig {
   }
 
   getSavedVisualizations(): SavedVis[] {
-    return this.dashboardLayoutConfig.getSavedVisualizations();
+    return this.layoutDefinition.getSavedVisualizations();
   }
 
   getSavedVisualizationsIds(): string[] {

@@ -1,6 +1,6 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../dashboard-builder';
 import {
   getVisStateAgentRuleLevelDistribution,
@@ -15,9 +15,9 @@ import {
   getVisStateTopRules,
 } from './vis-states';
 
-export abstract class GDPRDashboardLayoutConfig extends DashboardLayoutConfig {}
+export abstract class GDPRDashboardLayoutDefinition extends DashboardLayoutDefinition {}
 
-export class GDPROverviewDashboardLayoutConfig extends GDPRDashboardLayoutConfig {
+export class GDPROverviewDashboardLayoutDefinition extends GDPRDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -70,7 +70,7 @@ export class GDPROverviewDashboardLayoutConfig extends GDPRDashboardLayoutConfig
   }
 }
 
-export class GDPRPinnedAgentDashboardLayoutConfig extends GDPRDashboardLayoutConfig {
+export class GDPRPinnedAgentDashboardLayoutDefinition extends GDPRDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -129,7 +129,7 @@ export class GDPROverviewDashboardByRendererConfig extends GDPRDashboardByRender
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new GDPROverviewDashboardLayoutConfig(indexPatternId),
+      new GDPROverviewDashboardLayoutDefinition(indexPatternId),
     );
   }
 
@@ -148,7 +148,7 @@ export class GDPRPinnedAgentDashboardByRendererConfig extends GDPRDashboardByRen
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new GDPRPinnedAgentDashboardLayoutConfig(indexPatternId),
+      new GDPRPinnedAgentDashboardLayoutDefinition(indexPatternId),
     );
   }
 

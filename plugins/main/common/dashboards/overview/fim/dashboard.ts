@@ -1,6 +1,6 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../dashboard-builder';
 import {
   getVisStateAgentFIMActions,
@@ -17,9 +17,9 @@ import {
   getVisStateFIMTopRules,
 } from './vis-states';
 
-export abstract class FimDashboardLayoutConfig extends DashboardLayoutConfig {}
+export abstract class FimDashboardLayoutDefinition extends DashboardLayoutDefinition {}
 
-export class FimOverviewDashboardLayoutConfig extends FimDashboardLayoutConfig {
+export class FimOverviewDashboardLayoutDefinition extends FimDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -81,7 +81,7 @@ export class FimOverviewDashboardLayoutConfig extends FimDashboardLayoutConfig {
   }
 }
 
-export class FimPinnedAgentDashboardLayoutConfig extends FimDashboardLayoutConfig {
+export class FimPinnedAgentDashboardLayoutDefinition extends FimDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -147,7 +147,7 @@ export abstract class FimDashboardByRendererConfig extends DashboardByRendererCo
 
 export class FimOverviewDashboardByRendererConfig extends FimDashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new FimOverviewDashboardLayoutConfig(indexPatternId));
+    super(indexPatternId, new FimOverviewDashboardLayoutDefinition(indexPatternId));
   }
 
   protected override getId(): string {
@@ -167,7 +167,7 @@ export class FimPinnedAgentDashboardByRendererConfig extends FimDashboardByRende
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new FimPinnedAgentDashboardLayoutConfig(indexPatternId),
+      new FimPinnedAgentDashboardLayoutDefinition(indexPatternId),
     );
   }
 

@@ -1,6 +1,6 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../dashboard-builder';
 import {
   getVisStateAgentEventsByBucket,
@@ -19,13 +19,13 @@ import {
   getVisStateTopSources,
 } from './vis-states';
 
-export class AWSDashboardLayoutConfig extends DashboardLayoutConfig {
+export class AWSDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor() {
     super();
   }
 }
 
-export class AWSOverviewDashboardLayoutConfig extends AWSDashboardLayoutConfig {
+export class AWSOverviewDashboardLayoutDefinition extends AWSDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -96,7 +96,7 @@ export class AWSOverviewDashboardLayoutConfig extends AWSDashboardLayoutConfig {
   }
 }
 
-export class AWSPinnedAgentDashboardLayoutConfig extends AWSDashboardLayoutConfig {
+export class AWSPinnedAgentDashboardLayoutDefinition extends AWSDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -171,7 +171,7 @@ export abstract class AWSDashboardByRendererConfig extends DashboardByRendererCo
 
 export class AWSOverviewDashboardByRendererConfig extends AWSDashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new AWSOverviewDashboardLayoutConfig(indexPatternId));
+    super(indexPatternId, new AWSOverviewDashboardLayoutDefinition(indexPatternId));
   }
 
   protected override getId(): string {
@@ -191,7 +191,7 @@ export class AWSPinnedAgentDashboardByRendererConfig extends AWSDashboardByRende
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new AWSPinnedAgentDashboardLayoutConfig(indexPatternId),
+      new AWSPinnedAgentDashboardLayoutDefinition(indexPatternId),
     );
   }
 

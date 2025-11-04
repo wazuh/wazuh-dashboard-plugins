@@ -1,6 +1,6 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../../../../dashboard-builder';
 import {
   getVisStateRuleLevelEvolution,
@@ -10,7 +10,7 @@ import {
   getVisStateTopRepositories,
 } from '../vis-states';
 
-export class GithubDrilldownActionDashboardLayoutConfig extends DashboardLayoutConfig {
+export class GithubDrilldownActionDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -67,7 +67,7 @@ export class GithubDrilldownActionDashboardByRendererConfig extends DashboardByR
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new GithubDrilldownActionDashboardLayoutConfig(indexPatternId),
+      new GithubDrilldownActionDashboardLayoutDefinition(indexPatternId),
     );
   }
 

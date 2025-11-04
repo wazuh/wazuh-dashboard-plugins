@@ -1,6 +1,6 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../dashboard-builder';
 import {
   getVisStateAgentEvents,
@@ -13,9 +13,9 @@ import {
   getVisStateTop5Images,
 } from './vis-states';
 
-export abstract class DockerDashboardLayoutConfig extends DashboardLayoutConfig {}
+export abstract class DockerDashboardLayoutDefinition extends DashboardLayoutDefinition {}
 
-export class DockerOverviewDashboardLayoutConfig extends DockerDashboardLayoutConfig {
+export class DockerOverviewDashboardLayoutDefinition extends DockerDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -59,7 +59,7 @@ export class DockerOverviewDashboardLayoutConfig extends DockerDashboardLayoutCo
   }
 }
 
-export class DockerPinnedAgentDashboardLayoutConfig extends DockerDashboardLayoutConfig {
+export class DockerPinnedAgentDashboardLayoutDefinition extends DockerDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -109,7 +109,7 @@ export class DockerOverviewDashboardByRendererConfig extends DockerDashboardByRe
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new DockerOverviewDashboardLayoutConfig(indexPatternId),
+      new DockerOverviewDashboardLayoutDefinition(indexPatternId),
     );
   }
 
@@ -130,7 +130,7 @@ export class DockerPinnedAgentDashboardByRendererConfig extends DockerDashboardB
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new DockerPinnedAgentDashboardLayoutConfig(indexPatternId),
+      new DockerPinnedAgentDashboardLayoutDefinition(indexPatternId),
     );
   }
 

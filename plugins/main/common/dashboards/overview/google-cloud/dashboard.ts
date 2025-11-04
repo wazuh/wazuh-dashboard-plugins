@@ -1,6 +1,6 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../dashboard-builder';
 import {
   getVisStateEventsOverTime,
@@ -15,9 +15,9 @@ import {
   getVisStateTopResponseCode,
 } from './vis-states';
 
-export abstract class GoogleCloudDashboardLayoutConfig extends DashboardLayoutConfig {}
+export abstract class GoogleCloudDashboardLayoutDefinition extends DashboardLayoutDefinition {}
 
-export class GoogleCloudOverviewDashboardLayoutConfig extends GoogleCloudDashboardLayoutConfig {
+export class GoogleCloudOverviewDashboardLayoutDefinition extends GoogleCloudDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -70,7 +70,7 @@ export class GoogleCloudOverviewDashboardLayoutConfig extends GoogleCloudDashboa
   }
 }
 
-export class GoogleCloudPinnedAgentDashboardLayoutConfig extends GoogleCloudDashboardLayoutConfig {
+export class GoogleCloudPinnedAgentDashboardLayoutDefinition extends GoogleCloudDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -147,7 +147,7 @@ export class GoogleCloudOverviewDashboardByRendererConfig extends GoogleCloudDas
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new GoogleCloudOverviewDashboardLayoutConfig(indexPatternId),
+      new GoogleCloudOverviewDashboardLayoutDefinition(indexPatternId),
     );
   }
 
@@ -168,7 +168,7 @@ export class GoogleCloudPinnedAgentDashboardByRendererConfig extends GoogleCloud
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new GoogleCloudPinnedAgentDashboardLayoutConfig(indexPatternId),
+      new GoogleCloudPinnedAgentDashboardLayoutDefinition(indexPatternId),
     );
   }
 

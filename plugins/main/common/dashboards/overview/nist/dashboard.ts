@@ -1,6 +1,6 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../dashboard-builder';
 import {
   getVisStateAgentRequirementsOverTime,
@@ -15,9 +15,9 @@ import {
   getVisStateTopRequirements,
 } from './vis-states';
 
-export abstract class NistDashboardLayoutConfig extends DashboardLayoutConfig {}
+export abstract class NistDashboardLayoutDefinition extends DashboardLayoutDefinition {}
 
-export class NistOverviewDashboardLayoutConfig extends NistDashboardLayoutConfig {
+export class NistOverviewDashboardLayoutDefinition extends NistDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -79,7 +79,7 @@ export class NistOverviewDashboardLayoutConfig extends NistDashboardLayoutConfig
   }
 }
 
-export class NistPinnedAgentDashboardLayoutConfig extends NistDashboardLayoutConfig {
+export class NistPinnedAgentDashboardLayoutDefinition extends NistDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -129,7 +129,7 @@ export class NistOverviewDashboardByRendererConfig extends NistDashboardByRender
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new NistOverviewDashboardLayoutConfig(indexPatternId),
+      new NistOverviewDashboardLayoutDefinition(indexPatternId),
     );
   }
 
@@ -150,7 +150,7 @@ export class NistPinnedAgentDashboardByRendererConfig extends NistDashboardByRen
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new NistPinnedAgentDashboardLayoutConfig(indexPatternId),
+      new NistPinnedAgentDashboardLayoutDefinition(indexPatternId),
     );
   }
 

@@ -1,6 +1,6 @@
 import {
   DashboardByRendererConfig,
-  DashboardLayoutConfig,
+  DashboardLayoutDefinition,
 } from '../../dashboard-builder';
 import {
   getVisStateAgentCommonAlerts,
@@ -17,9 +17,9 @@ import {
   getVisStateTopRequirements,
 } from './vis-states';
 
-export abstract class HipaaDashboardLayoutConfig extends DashboardLayoutConfig {}
+export abstract class HipaaDashboardLayoutDefinition extends DashboardLayoutDefinition {}
 
-export class HipaaOverviewDashboardLayoutConfig extends HipaaDashboardLayoutConfig {
+export class HipaaOverviewDashboardLayoutDefinition extends HipaaDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -90,7 +90,7 @@ export class HipaaOverviewDashboardLayoutConfig extends HipaaDashboardLayoutConf
   }
 }
 
-export class HipaaPinnedAgentDashboardLayoutConfig extends HipaaDashboardLayoutConfig {
+export class HipaaPinnedAgentDashboardLayoutDefinition extends HipaaDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -149,7 +149,7 @@ export class HipaaOverviewDashboardByRendererConfig extends HipaaDashboardByRend
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new HipaaOverviewDashboardLayoutConfig(indexPatternId),
+      new HipaaOverviewDashboardLayoutDefinition(indexPatternId),
     );
   }
 
@@ -170,7 +170,7 @@ export class HipaaPinnedAgentDashboardByRendererConfig extends HipaaDashboardByR
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new HipaaPinnedAgentDashboardLayoutConfig(indexPatternId),
+      new HipaaPinnedAgentDashboardLayoutDefinition(indexPatternId),
     );
   }
 
