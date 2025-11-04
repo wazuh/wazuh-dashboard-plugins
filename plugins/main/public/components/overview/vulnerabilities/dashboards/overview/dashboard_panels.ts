@@ -1,6 +1,5 @@
-import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import { UI_COLOR_STATUS } from '../../../../../../common/constants';
+import type { DashboardByRendererPanels } from "../../../../../../common/dashboards";
 
 const getVisStateTopVulnerabilitiesScore = (indexPatternId: string) => {
   return {
@@ -431,11 +430,7 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
 
 export const getDashboardPanels = (
   indexPatternId: string,
-): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
-} => {
+): DashboardByRendererPanels => {
   return {
     '6': {
       gridData: {

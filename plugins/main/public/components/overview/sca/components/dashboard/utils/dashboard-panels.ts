@@ -1,5 +1,4 @@
-import { DashboardPanelState } from '../../../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddable/public';
+import type { DashboardByRendererPanels } from '../../../../../../../common/dashboards';
 import {
   createBaseVisState,
   createHorizontalBarVis,
@@ -104,11 +103,7 @@ export const getVisStatePolicyByCheckHeatmap = (indexPatternId: string) =>
  */
 export const getDashboardPanels = (
   indexPatternId: string,
-): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
-} => ({
+): DashboardByRendererPanels => ({
   '1': {
     gridData: { w: 24, h: 10, x: 0, y: 0, i: '1' },
     type: 'visualization',

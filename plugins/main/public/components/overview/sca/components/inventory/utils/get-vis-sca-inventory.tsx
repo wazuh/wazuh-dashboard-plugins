@@ -1,5 +1,4 @@
-import { DashboardPanelState } from '../../../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddable/public';
+import type { DashboardByRendererPanels } from '../../../../../../../common/dashboards';
 import {
   getVisStateHorizontalBarSplitSeries,
   getVisStateTable,
@@ -10,11 +9,7 @@ const checkResultColors = SCA_CHECK_RESULT_COLORS;
 
 export const getKPIsPanel = (
   indexPatternId: string,
-): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
-} => {
+): DashboardByRendererPanels => {
   return {
     '1': {
       gridData: { w: 24, h: 9, x: 0, y: 0, i: '1' },

@@ -1,8 +1,7 @@
-import { DashboardPanelState } from '../../../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddable/public';
 import { checkResultColors, decimalFormat } from './visualization-helpers';
 import { CheckResult } from '../../../utils/constants';
-import { getVisStateMetric } from "../../../../../../../common/dashboards/lib";
+import { getVisStateMetric } from '../../../../../../../common/dashboards/lib';
+import type { DashboardByRendererPanels } from '../../../../../../../common/dashboards';
 
 // Here we are using vega visualization: https://vega.github.io/vega/
 const checkScore = (indexPatternId: string) => ({
@@ -86,11 +85,7 @@ const checkScore = (indexPatternId: string) => ({
 
 export const getKPIsPanel = (
   indexPatternId: string,
-): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
-} => {
+): DashboardByRendererPanels => {
   return {
     '1': {
       gridData: { w: 12, h: 6, x: 0, y: 0, i: '1' },

@@ -1,5 +1,4 @@
-import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import type { DashboardByRendererPanels } from "../../../../../../common/dashboards";
 
 const getVisStateFilter = (
   id: string,
@@ -80,11 +79,7 @@ const getVisStateFilter = (
 
 export const getDashboardFilters = (
   indexPatternId: string,
-): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
-} => {
+): DashboardByRendererPanels => {
   return {
     topVulnerabilities: {
       gridData: {

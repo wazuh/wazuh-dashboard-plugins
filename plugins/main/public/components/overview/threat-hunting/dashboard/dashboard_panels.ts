@@ -1,7 +1,6 @@
-import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-
 /* WARNING: The panel id must be unique including general and agents visualizations. Otherwise, the visualizations will not refresh when we pin an agent, because they are cached by id */
+
+import type { DashboardByRendererPanels } from "../../../../../common/dashboards";
 
 /* Overview visualizations */
 
@@ -889,12 +888,8 @@ const getVisStateTop5PCIDSSRequirementsAgents = (indexPatternId: string) => {
 export const getDashboardPanels = (
   indexPatternId: string,
   isPinnedAgent?: boolean,
-): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
-} => {
-  const pinnedAgentPanels = {
+): DashboardByRendererPanels => {
+  const pinnedAgentPanels: DashboardByRendererPanels = {
     '9': {
       gridData: {
         w: 24,
@@ -968,7 +963,7 @@ export const getDashboardPanels = (
     },
   };
 
-  const panels = {
+  const panels: DashboardByRendererPanels = {
     '5': {
       gridData: {
         w: 28,

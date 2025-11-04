@@ -1,14 +1,9 @@
-import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import { getVisStateTable } from '../../../../../common/dashboards/lib';
 
 export const getDashboardTables = (
   indexPatternId: string,
-): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
-} => {
+): DashboardByRendererPanels => {
   return {
     t1: {
       gridData: {

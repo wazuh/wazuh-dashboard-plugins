@@ -1,12 +1,16 @@
-import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-import { getVisStateHistogramBy, getVisStateHorizontalBarSplitSeries } from '../../../../../common/dashboards/lib';
+import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
+import {
+  getVisStateHistogramBy,
+  getVisStateHorizontalBarSplitSeries,
+} from '../../../../../common/dashboards/lib';
 import {
   FILTER_OPERATOR,
   PatternDataSourceFilterManager,
 } from '../../../common/data-source';
 
-const getOverviewDashboardPanels = (indexPatternId: string) => {
+const getOverviewDashboardPanels = (
+  indexPatternId: string,
+): DashboardByRendererPanels => {
   return {
     '1': {
       gridData: {
@@ -102,11 +106,7 @@ const getOverviewDashboardPanels = (indexPatternId: string) => {
 
 const getAgentDashboardPanels = (
   indexPatternId: string,
-): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
-} => {
+): DashboardByRendererPanels => {
   return {
     a1: {
       gridData: {
@@ -203,11 +203,7 @@ const getAgentDashboardPanels = (
 export const getDashboardPanels = (
   indexPatternId: string,
   isPinnedAgent?: boolean,
-): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
-} => {
+): DashboardByRendererPanels => {
   return isPinnedAgent
     ? getAgentDashboardPanels(indexPatternId)
     : getOverviewDashboardPanels(indexPatternId);

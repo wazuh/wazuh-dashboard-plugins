@@ -15,25 +15,20 @@
 import React from 'react';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins } from '../../../../../kibana-services';
-import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import {
   getVisStateOfficeMetricStats,
   getVisStateOfficeTopsEventsPie,
   getVisStateOfficeUserOperationLevel,
   getVisStateOfficeAlertsEvolutionByUser,
 } from './visualizations';
+import type { DashboardByRendererPanels } from "../../../../../../common/dashboards";
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 
 const getDashboardPanels = (
   indexPatternId: string,
-): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
-} => {
+): DashboardByRendererPanels => {
   return {
     d0: {
       gridData: {

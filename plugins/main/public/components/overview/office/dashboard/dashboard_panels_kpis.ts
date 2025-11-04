@@ -1,5 +1,4 @@
-import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 
 const getVisStateMaxRuleLevel = (indexPatternId: string) => {
   return {
@@ -325,11 +324,7 @@ const getVisStatePhishingMalware = (indexPatternId: string) => {
 
 export const getKPIsPanel = (
   indexPatternId: string,
-): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
-} => {
+): DashboardByRendererPanels => {
   return {
     '1': {
       gridData: {

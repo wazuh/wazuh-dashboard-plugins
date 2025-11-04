@@ -1,5 +1,4 @@
-import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
   buildIndexPatternReferenceList,
   buildSearchSource,
@@ -104,11 +103,7 @@ export const getVisStateHostsTotalFreeMemoryTable = (
 
 export const getDashboardKPIs = (
   indexPatternId: string,
-): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
-} => {
+): DashboardByRendererPanels => {
   return {
     s1: {
       gridData: {

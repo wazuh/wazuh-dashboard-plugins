@@ -1,11 +1,10 @@
-import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-
 /* WARNING: The panel id must be unique including general and agents visualizations. Otherwise, the visualizations will not refresh when we pin an agent, because they are cached by id */
+
+import type { DashboardByRendererPanels } from "../../../../../common/dashboards";
 
 /* Overview visualizations */
 
-const getVisStateTotalNumberOfBytesReceived = (indexPatternId?: string) => {
+const getVisStateTotalNumberOfBytesReceived = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Statistics-remoted-Recv-bytes',
     title: 'Total number of bytes received',
@@ -163,7 +162,7 @@ const getVisStateTotalNumberOfBytesReceived = (indexPatternId?: string) => {
   };
 };
 
-const getVisStateEventsSentToAnalysisd = (indexPatternId?: string) => {
+const getVisStateEventsSentToAnalysisd = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Statistics-remoted-event-count',
     title: 'Events sent to Analysisd',
@@ -320,7 +319,7 @@ const getVisStateEventsSentToAnalysisd = (indexPatternId?: string) => {
   };
 };
 
-const getVisStateTCPSessions = (indexPatternId?: string) => {
+const getVisStateTCPSessions = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Statistics-remoted-tcp-sessions',
     title: 'TCP sessions',
@@ -480,12 +479,8 @@ const getVisStateTCPSessions = (indexPatternId?: string) => {
 /* Definitiion of panels */
 
 export const getDashboardPanelsListenerEngine = (
-  indexPatternId?: string,
-): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
-} => {
+  indexPatternId: string,
+): DashboardByRendererPanels => {
   return {
     '1': {
       gridData: {

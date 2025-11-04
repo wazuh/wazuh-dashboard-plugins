@@ -1,5 +1,4 @@
-import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import type { DashboardByRendererPanels } from "../../../../../../common/dashboards";
 
 const getVisStateSeverityCritical = (indexPatternId: string) => {
   return {
@@ -424,11 +423,7 @@ const getVisStateEvaluatedEvaluationPending = (indexPatternId: string) => {
 
 export const getKPIsPanel = (
   indexPatternId: string,
-): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
-} => {
+): DashboardByRendererPanels => {
   return {
     '1': {
       gridData: {
