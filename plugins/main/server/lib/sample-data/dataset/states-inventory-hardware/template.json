@@ -1,7 +1,5 @@
 {
-  "index_patterns": [
-    "wazuh-states-inventory-hardware*"
-  ],
+  "index_patterns": ["wazuh-states-inventory-hardware*"],
   "mappings": {
     "date_detection": false,
     "dynamic": "strict",
