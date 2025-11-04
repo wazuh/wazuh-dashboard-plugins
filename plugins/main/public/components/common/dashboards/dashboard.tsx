@@ -27,7 +27,7 @@ export const Dashboard = props => {
     },
   });
 
-  const shouldHideDashboard = props.dataSourceAction?.data?.hits?.total > 0;
+  const shouldHideDashboard = !Boolean(props.dataSourceAction?.data?.hits?.total > 0);
 
   return (
     <>
