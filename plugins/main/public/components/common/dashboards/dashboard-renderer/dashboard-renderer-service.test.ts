@@ -258,7 +258,7 @@ describe('Dashboard Renderer Service', () => {
       const result = await buildDashboardByValueInput('non-existent-dashboard');
 
       expect(result.success).toBe(false);
-      expect(result.status).toBe('not_found');
+      expect(result.status).toBe('error');
       expect(result.error).toBe('Requested dashboard not found.');
     });
 
