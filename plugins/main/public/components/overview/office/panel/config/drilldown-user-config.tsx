@@ -14,14 +14,9 @@
 
 import React from 'react';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import { getPlugins } from '../../../../../kibana-services';
-import {
-  getVisStateOfficeAlertsEvolutionByUser,
-  getVisStateOfficeClientIPOperationLevelTable,
-  getVisStateOfficeTopsEventsPie,
-  getVisStateOfficeMetricStats,
-} from './visualizations';
 import type { DashboardByRendererPanels } from '../../../../../../common/dashboards';
+import { DrilldownUserConfigDashboardByRendererConfig } from '../../../../../../common/dashboards/vis-definitions/overview/office/panel/config/drilldown-user-config/dashboard';
+import { getPlugins } from '../../../../../kibana-services';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -29,64 +24,9 @@ const DashboardByRenderer =
 const getDashboardPanels = (
   indexPatternId: string,
 ): DashboardByRendererPanels => {
-  return {
-    d0: {
-      gridData: {
-        w: 14,
-        h: 14,
-        x: 0,
-        y: 0,
-        i: 'd0',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd0',
-        savedVis: getVisStateOfficeMetricStats(indexPatternId),
-      },
-    },
-    d1: {
-      gridData: {
-        w: 14,
-        h: 14,
-        x: 14,
-        y: 0,
-        i: 'd1',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd1',
-        savedVis: getVisStateOfficeTopsEventsPie(indexPatternId),
-      },
-    },
-    d2: {
-      gridData: {
-        w: 20,
-        h: 14,
-        x: 28,
-        y: 0,
-        i: 'd2',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd2',
-        savedVis: getVisStateOfficeClientIPOperationLevelTable(indexPatternId),
-      },
-    },
-    d3: {
-      gridData: {
-        w: 48,
-        h: 11,
-        x: 0,
-        y: 14,
-        i: 'd3',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd3',
-        savedVis: getVisStateOfficeAlertsEvolutionByUser(indexPatternId),
-      },
-    },
-  };
+  return new DrilldownUserConfigDashboardByRendererConfig(
+    indexPatternId,
+  ).getDashboardPanels();
 };
 
 export const drilldownUserConfig = props => {
