@@ -45,7 +45,7 @@ export class DashboardPanelManager {
       length: this.dashboardLayoutConfig.savedVisualizationsCount,
     }).forEach((_, index) => {
       const { gridData, savedVis } =
-        this.dashboardLayoutConfig.retrieveGridVisualPairs()[index];
+        this.dashboardLayoutConfig.getGridVisualizationPairs()[index];
       this.addPanel({ gridData, savedVis });
     });
     return this.panels;
@@ -65,7 +65,7 @@ export abstract class DashboardLayoutConfig {
     return this.gridVisualizationItems.length;
   }
 
-  retrieveGridVisualPairs(): GridDataVisualizationPair[] {
+  getGridVisualizationPairs(): GridDataVisualizationPair[] {
     return this.gridVisualizationItems;
   }
 }
