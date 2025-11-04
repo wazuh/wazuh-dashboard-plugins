@@ -50,7 +50,7 @@ function toVisualizationAttributes(savedVis: SavedVis) {
   return { attributes, references };
 }
 
-async function saveVisualizationSavedObject(
+async function saveVisualizationAsSavedObject(
   client: SavedObjectsClientContract,
   savedVis: SavedVis,
   logger: InitializationTaskRunContext['logger'],
@@ -77,7 +77,7 @@ async function saveVisualizationSavedObject(
   return savedVisualizationResult;
 }
 
-async function saveDashboardSavedObject(
+async function saveDashboardAsSavedObject(
   client: SavedObjectsClientContract,
   dashboard: DashboardByRendererInput,
   savedObjectVisualizationsIds: string[],
@@ -120,11 +120,11 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
             dashboardConfig
               .getSavedVisualizations()
               .map(savedVis =>
-                saveVisualizationSavedObject(client, savedVis, ctx.logger),
+                saveVisualizationAsSavedObject(client, savedVis, ctx.logger),
               ),
           );
 
-          await saveDashboardSavedObject(
+          await saveDashboardAsSavedObject(
             client,
             dashboardConfig.getConfig(),
             dashboardConfig.getSavedVisualizationsIds(),

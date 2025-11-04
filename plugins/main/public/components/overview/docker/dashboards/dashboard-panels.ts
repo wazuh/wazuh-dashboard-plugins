@@ -2,7 +2,7 @@ import type { DashboardByRendererPanels } from '../../../../../common/dashboards
 import {
   DockerPinnedAgentDashboardByRendererConfig,
   DockerOverviewDashboardByRendererConfig,
-} from '../../../../../common/dashboards/overview/docker/dashboard';
+} from '../../../../../common/dashboards/vis-definitions/overview/docker/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,

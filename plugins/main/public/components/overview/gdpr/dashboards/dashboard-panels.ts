@@ -2,7 +2,7 @@ import type { DashboardByRendererPanels } from '../../../../../common/dashboards
 import {
   GDPRPinnedAgentDashboardByRendererConfig,
   GDPROverviewDashboardByRendererConfig,
-} from '../../../../../common/dashboards/overview/gdpr/dashboard';
+} from '../../../../../common/dashboards/vis-definitions/overview/gdpr/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,

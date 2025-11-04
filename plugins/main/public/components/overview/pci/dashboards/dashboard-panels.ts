@@ -2,7 +2,7 @@ import type { DashboardByRendererPanels } from '../../../../../common/dashboards
 import {
   PCIOverviewDashboardByRendererConfig,
   PCIPinnedAgentDashboardByRendererConfig,
-} from '../../../../../common/dashboards/overview/pci/dashboard';
+} from '../../../../../common/dashboards/vis-definitions/overview/pci/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,

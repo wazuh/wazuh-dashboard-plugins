@@ -2,7 +2,7 @@ import type { DashboardByRendererPanels } from '../../../../../common/dashboards
 import {
   TscOverviewDashboardByRendererConfig,
   TscPinnedAgentDashboardByRendererConfig,
-} from '../../../../../common/dashboards/overview/tsc/dashboard';
+} from '../../../../../common/dashboards/vis-definitions/overview/tsc/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,

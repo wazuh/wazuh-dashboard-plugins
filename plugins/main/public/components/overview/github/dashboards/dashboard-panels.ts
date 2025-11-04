@@ -2,7 +2,7 @@ import type { DashboardByRendererPanels } from '../../../../../common/dashboards
 import {
   GithubPinnedAgentDashboardByRendererConfig,
   GithubOverviewDashboardByRendererConfig,
-} from '../../../../../common/dashboards/overview/github/dashboard';
+} from '../../../../../common/dashboards/vis-definitions/overview/github/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,

@@ -3,64 +3,64 @@ import {
   ClusterConfigurationDashboardByRendererConfig,
   ClusterMonitoringDashboardByRendererConfig,
 } from '../../../common/dashboards/vis-definitions';
-import type { DashboardByRendererConfig } from '../../../common/dashboards/dashboard-builder';
+import type { DashboardByRendererConfig } from '../../../common/dashboards';
 import {
   AWSPinnedAgentDashboardByRendererConfig,
   AWSOverviewDashboardByRendererConfig,
-} from '../../../common/dashboards/overview/aws/dashboard';
+} from '../../../common/dashboards/vis-definitions/overview/aws/dashboard';
 import {
   AzurePinnedAgentDashboardByRendererConfig,
   AzureOverviewDashboardByRendererConfig,
-} from '../../../common/dashboards/overview/azure/dashboard';
+} from '../../../common/dashboards/vis-definitions/overview/azure/dashboard';
 import {
   DockerPinnedAgentDashboardByRendererConfig,
   DockerOverviewDashboardByRendererConfig,
-} from '../../../common/dashboards/overview/docker/dashboard';
+} from '../../../common/dashboards/vis-definitions/overview/docker/dashboard';
 import {
   FimPinnedAgentDashboardByRendererConfig,
   FimOverviewDashboardByRendererConfig,
-} from '../../../common/dashboards/overview/fim/dashboard';
+} from '../../../common/dashboards/vis-definitions/overview/fim/dashboard';
 import {
   GDPRPinnedAgentDashboardByRendererConfig,
   GDPROverviewDashboardByRendererConfig,
-} from '../../../common/dashboards/overview/gdpr/dashboard';
+} from '../../../common/dashboards/vis-definitions/overview/gdpr/dashboard';
 import {
   GithubPinnedAgentDashboardByRendererConfig,
   GithubOverviewDashboardByRendererConfig,
-} from '../../../common/dashboards/overview/github/dashboard';
-import { GithubDrilldownActionDashboardByRendererConfig } from '../../../common/dashboards/overview/github/panel/config/github-drilldown-action/dashboard';
-import { GithubDrilldownActorDashboardByRendererConfig } from '../../../common/dashboards/overview/github/panel/config/github-drilldown-actor/dashboard';
-import { GithubDrilldownOrganizationDashboardByRendererConfig } from '../../../common/dashboards/overview/github/panel/config/github-drilldown-organization/dashboard';
-import { GithubDrilldownRepositoryDashboardByRendererConfig } from '../../../common/dashboards/overview/github/panel/config/github-drilldown-repository/dashboard';
+} from '../../../common/dashboards/vis-definitions/overview/github/dashboard';
+import { GithubDrilldownActionDashboardByRendererConfig } from '../../../common/dashboards/vis-definitions/overview/github/panel/config/github-drilldown-action/dashboard';
+import { GithubDrilldownActorDashboardByRendererConfig } from '../../../common/dashboards/vis-definitions/overview/github/panel/config/github-drilldown-actor/dashboard';
+import { GithubDrilldownOrganizationDashboardByRendererConfig } from '../../../common/dashboards/vis-definitions/overview/github/panel/config/github-drilldown-organization/dashboard';
+import { GithubDrilldownRepositoryDashboardByRendererConfig } from '../../../common/dashboards/vis-definitions/overview/github/panel/config/github-drilldown-repository/dashboard';
 import {
   GoogleCloudOverviewDashboardByRendererConfig,
   GoogleCloudPinnedAgentDashboardByRendererConfig,
-} from '../../../common/dashboards/overview/google-cloud/dashboard';
+} from '../../../common/dashboards/vis-definitions/overview/google-cloud/dashboard';
 import {
   HipaaPinnedAgentDashboardByRendererConfig,
   HipaaOverviewDashboardByRendererConfig,
-} from '../../../common/dashboards/overview/hipaa/dashboard';
+} from '../../../common/dashboards/vis-definitions/overview/hipaa/dashboard';
 import {
   MalwareDetectionOverviewDashboardByRendererConfig,
   MalwareDetectionPinnedAgentDashboardByRendererConfig,
-} from '../../../common/dashboards/overview/malware-detection/dashboard';
+} from '../../../common/dashboards/vis-definitions/overview/malware-detection/dashboard';
 import {
   MitreOverviewDashboardByRendererConfig,
   MitrePinnedAgentDashboardByRendererConfig,
-} from '../../../common/dashboards/overview/mitre/dashboard';
+} from '../../../common/dashboards/vis-definitions/overview/mitre/dashboard';
 import {
   NistOverviewDashboardByRendererConfig,
   NistPinnedAgentDashboardByRendererConfig,
-} from '../../../common/dashboards/overview/nist/dashboard';
-import { OfficeOverviewDashboardByRendererConfig } from '../../../common/dashboards/overview/office/dashboard';
+} from '../../../common/dashboards/vis-definitions/overview/nist/dashboard';
+import { OfficeOverviewDashboardByRendererConfig } from '../../../common/dashboards/vis-definitions/overview/office/dashboard';
 import {
   PCIOverviewDashboardByRendererConfig,
   PCIPinnedAgentDashboardByRendererConfig,
-} from '../../../common/dashboards/overview/pci/dashboard';
+} from '../../../common/dashboards/vis-definitions/overview/pci/dashboard';
 import {
   TscOverviewDashboardByRendererConfig,
   TscPinnedAgentDashboardByRendererConfig,
-} from '../../../common/dashboards/overview/tsc/dashboard';
+} from '../../../common/dashboards/vis-definitions/overview/tsc/dashboard';
 import { INDEX_PATTERN_REPLACE_ME } from './constants';
 
 export const getDashboardConfigs = (): DashboardByRendererConfig[] => {

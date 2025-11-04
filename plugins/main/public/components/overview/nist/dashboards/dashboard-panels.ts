@@ -2,7 +2,7 @@ import type { DashboardByRendererPanels } from '../../../../../common/dashboards
 import {
   NistOverviewDashboardByRendererConfig,
   NistPinnedAgentDashboardByRendererConfig,
-} from '../../../../../common/dashboards/overview/nist/dashboard';
+} from '../../../../../common/dashboards/vis-definitions/overview/nist/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,

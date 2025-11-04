@@ -2,7 +2,7 @@ import type { DashboardByRendererPanels } from '../../../../../common/dashboards
 import {
   AWSPinnedAgentDashboardByRendererConfig,
   AWSOverviewDashboardByRendererConfig,
-} from '../../../../../common/dashboards/overview/aws/dashboard';
+} from '../../../../../common/dashboards/vis-definitions/overview/aws/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,

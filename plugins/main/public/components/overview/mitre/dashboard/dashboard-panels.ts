@@ -2,7 +2,7 @@ import type { DashboardByRendererPanels } from '../../../../../common/dashboards
 import {
   MitreOverviewDashboardByRendererConfig,
   MitrePinnedAgentDashboardByRendererConfig,
-} from '../../../../../common/dashboards/overview/mitre/dashboard';
+} from '../../../../../common/dashboards/vis-definitions/overview/mitre/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,
