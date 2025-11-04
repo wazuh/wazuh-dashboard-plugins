@@ -12,7 +12,7 @@ export const DashboardFIM = createDashboard({
   DataSourceRepositoryCreator: AlertsDataSourceRepository,
   getDashboardPanels: [
     {
-      getDashboardPanels: getDashboardPanels,
+      getDashboardPanels,
       id: 'fim-dashboard-tab',
       title: 'File Integrity Monitoring dashboard',
       description: 'Dashboard of the File Integrity Monitoring',

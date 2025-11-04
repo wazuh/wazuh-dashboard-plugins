@@ -6,7 +6,7 @@ import {
 
 export const getDashboardPanels = (
   indexPatternId: string,
-  isPinnedAgent: boolean,
+  isPinnedAgent?: boolean,
 ): DashboardByValuePanels => {
   const gdprDashboardByRendererConfig = isPinnedAgent
     ? new GDPRPinnedAgentDashboardByRendererConfig(indexPatternId)
