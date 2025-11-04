@@ -13,13 +13,9 @@
 
 import React from 'react';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import { getPlugins } from '../../../../../kibana-services';
-import {
-  getVisStateTopOfficeUsers,
-  getVisStateOfficeCountryTagCloud,
-  getVisStateOfficeAlertsEvolutionByUserID,
-} from './visualizations';
 import type { DashboardByRendererPanels } from '../../../../../../common/dashboards';
+import { DrilldownOperationsDashboardByRendererConfig } from '../../../../../../common/dashboards/vis-definitions/overview/office/panel/config/drilldown-operations-config/dashboard';
+import { getPlugins } from '../../../../../kibana-services';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -27,50 +23,9 @@ const DashboardByRenderer =
 const getDashboardPanels = (
   indexPatternId: string,
 ): DashboardByRendererPanels => {
-  return {
-    d0: {
-      gridData: {
-        w: 19,
-        h: 14,
-        x: 0,
-        y: 0,
-        i: 'd0',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd0',
-        savedVis: getVisStateTopOfficeUsers(indexPatternId),
-      },
-    },
-    d1: {
-      gridData: {
-        w: 29,
-        h: 14,
-        x: 19,
-        y: 0,
-        i: 'd1',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd1',
-        savedVis: getVisStateOfficeCountryTagCloud(indexPatternId),
-      },
-    },
-    d2: {
-      gridData: {
-        w: 48,
-        h: 11,
-        x: 0,
-        y: 14,
-        i: 'd2',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd2',
-        savedVis: getVisStateOfficeAlertsEvolutionByUserID(indexPatternId),
-      },
-    },
-  };
+  return new DrilldownOperationsDashboardByRendererConfig(
+    indexPatternId,
+  ).getDashboardPanels();
 };
 
 export const drilldownOperationsConfig = props => {
