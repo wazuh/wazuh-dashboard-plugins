@@ -31,10 +31,4 @@ export class WazuhDiscoverDashboardByRendererConfig extends DashboardByRendererC
   protected override getDescription(): string {
     return 'Histogram of Wazuh events by date';
   }
-  protected override get useMargins(): boolean {
-    return false;
-  }
-  protected override get hidePanelTitles(): boolean {
-    return true;
-  }
 }

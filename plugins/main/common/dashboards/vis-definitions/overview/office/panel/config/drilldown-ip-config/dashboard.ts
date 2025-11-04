@@ -70,10 +70,4 @@ export class OfficeDrilldownIPConfigDashboardByRendererConfig extends DashboardB
   protected override getDescription(): string {
     return 'Dashboard of the office drilldown ip config';
   }
-  protected override get useMargins(): boolean {
-    return false;
-  }
-  protected override get hidePanelTitles(): boolean {
-    return true;
-  }
 }

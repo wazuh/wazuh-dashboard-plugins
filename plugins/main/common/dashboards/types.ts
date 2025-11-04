@@ -51,8 +51,6 @@ export interface DashboardByRendererInput {
   title: string;
   description: string;
   panels: DashboardByRendererPanels;
-  useMargins: boolean;
-  hidePanelTitles: boolean;
 }
 
 export type GridDataVisualizationPair = {

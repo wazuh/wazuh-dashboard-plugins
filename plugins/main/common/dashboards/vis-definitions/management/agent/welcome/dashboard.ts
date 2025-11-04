@@ -31,7 +31,4 @@ export class AgentsEventsDashboardByRendererConfig extends DashboardByRendererCo
   protected override getDescription(): string {
     return 'Dashboard of Events count evolution';
   }
-  protected override get hidePanelTitles(): boolean {
-    return true;
-  }
 }

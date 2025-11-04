@@ -102,27 +102,12 @@ export abstract class DashboardByRendererConfig {
 
   protected abstract getDescription(): string;
 
-  protected get useMargins(): boolean {
-    return true;
-  }
-
-  protected get hidePanelTitles(): boolean {
-    return false;
-  }
-
-  protected getClassName(): string {
-    return '';
-  }
-
   getConfig() {
     return {
       id: this.getId(),
       title: this.getTitle(),
       description: this.getDescription(),
       panels: this.getDashboardPanels(),
-      useMargins: this.useMargins,
-      hidePanelTitles: this.hidePanelTitles,
-      className: this.getClassName(),
     };
   }
 }

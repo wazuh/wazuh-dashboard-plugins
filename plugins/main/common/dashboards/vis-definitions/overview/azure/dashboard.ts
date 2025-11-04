@@ -143,11 +143,7 @@ export class AzurePinnedAgentDashboardLayoutDefinition extends AzureDashboardLay
   }
 }
 
-export abstract class AzureDashboardByRendererConfig extends DashboardByRendererConfig {
-  protected override getClassName(): string {
-    return 'wz-dashboard-hide-tables-pagination-export-csv-controls';
-  }
-}
+export abstract class AzureDashboardByRendererConfig extends DashboardByRendererConfig {}
 
 export class AzureOverviewDashboardByRendererConfig extends AzureDashboardByRendererConfig {
   constructor(indexPatternId: string) {

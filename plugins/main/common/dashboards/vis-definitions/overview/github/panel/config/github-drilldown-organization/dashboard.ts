@@ -82,8 +82,4 @@ export class GithubDrilldownOrganizationDashboardByRendererConfig extends Dashbo
   protected override getDescription(): string {
     return 'GitHub drilldown organization overview dashboard';
   }
-
-  protected override get hidePanelTitles(): boolean {
-    return true;
-  }
 }
