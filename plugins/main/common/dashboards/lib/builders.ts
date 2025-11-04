@@ -27,7 +27,7 @@ export function buildIndexPatternReferenceList(indexPatternId: string) {
   ];
 }
 
-export const generateVisualization = ({
+export const buildPanelConfig = ({
   key,
   width,
   height,
@@ -70,7 +70,7 @@ export const buildDashboardKPIPanels = (savedVises: SavedVis[]) => {
   return savedVises.reduce((acc, savedVis, currentIndex) => {
     return {
       ...acc,
-      ...generateVisualization({
+      ...buildPanelConfig({
         key: savedVis.id + currentIndex.toString(),
         width: width,
         height: HEIGHT,
