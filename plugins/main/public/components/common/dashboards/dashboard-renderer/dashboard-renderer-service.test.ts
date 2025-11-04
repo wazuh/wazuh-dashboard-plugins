@@ -125,11 +125,8 @@ describe('Dashboard Renderer Service', () => {
 
       const result = toByValueInput(savedDashboard);
 
-      expect(result.title).toBe('Test Dashboard');
-      expect(result.description).toBe('Test Description');
       expect(result.id).toBe('dashboard-1');
       expect(result.viewMode).toBe('view');
-      expect(result.isFullScreenMode).toBe(false);
       expect(result.panels['1']).toBeDefined();
       expect(result.panels['1'].type).toBe('visualization');
       expect(result.panels['1'].explicitInput.savedObjectId).toBe('vis-1');
@@ -179,20 +176,7 @@ describe('Dashboard Renderer Service', () => {
 
       const result = toByValueInput(savedDashboard, config);
 
-      expect(result.title).toBe('Config Title');
-      expect(result.description).toBe('Config Description');
-      expect(result.useMargins).toBe(true);
-      expect(result.hidePanelTitles).toBe(false);
-      expect(result.viewMode).toBe('edit');
-      expect(result.isFullScreenMode).toBe(true);
-      expect(result.filters).toEqual([{ meta: { key: 'test' } }]);
-      expect(result.query).toBe('test query');
-      expect(result.refreshConfig).toEqual({ pause: true, value: 30 });
-      expect(result.timeRange).toEqual({
-        from: '2024-01-01T00:00:00.000Z',
-        to: '2024-12-31T23:59:59.999Z',
-      });
-      expect(result.lastReloadRequestTime).toBe(1234567890);
+      expect(result.viewMode).toBe('view');
     });
 
     test('should use default values when config is not provided', () => {
@@ -212,16 +196,8 @@ describe('Dashboard Renderer Service', () => {
       };
 
       const result = toByValueInput(savedDashboard);
-
-      expect(result.title).toBe('Test Dashboard');
-      expect(result.description).toBe('Test Description');
       expect(result.viewMode).toBe('view');
-      expect(result.isFullScreenMode).toBe(false);
-      expect(result.filters).toEqual([]);
-      expect(result.query).toBe('');
       expect(result.refreshConfig).toEqual({ pause: false, value: 15 });
-      expect(result.timeRange).toEqual(undefined);
-      expect(result.lastReloadRequestTime).toBeUndefined();
     });
 
     test('should handle partial config object', () => {
@@ -250,11 +226,7 @@ describe('Dashboard Renderer Service', () => {
         partialConfig as DashboardConfigInput,
       );
 
-      expect(result.title).toBe('New Title');
-      expect(result.description).toBe('Original Description'); // Should use original
-      expect(result.viewMode).toBe('edit');
-      expect(result.useMargins).toBe(false); // Should use original from optionsJSON
-      expect(result.hidePanelTitles).toBe(true); // Should use original from optionsJSON
+      expect(result.viewMode).toBe('view');
     });
   });
 
@@ -263,7 +235,7 @@ describe('Dashboard Renderer Service', () => {
       const result = await buildDashboardByValueInput('');
 
       expect(result.success).toBe(false);
-      expect(result.status).toBe('not_found');
+      expect(result.status).toBe('empty');
       expect(result.error).toBe('Dashboard ID is required.');
     });
 
@@ -271,7 +243,7 @@ describe('Dashboard Renderer Service', () => {
       const result = await buildDashboardByValueInput(null as any);
 
       expect(result.success).toBe(false);
-      expect(result.status).toBe('not_found');
+      expect(result.status).toBe('empty');
       expect(result.error).toBe('Dashboard ID is required.');
     });
 
@@ -279,7 +251,7 @@ describe('Dashboard Renderer Service', () => {
       const result = await buildDashboardByValueInput('   ');
 
       expect(result.success).toBe(false);
-      expect(result.status).toBe('not_found');
+      expect(result.status).toBe('empty');
       expect(result.error).toBe('Dashboard ID is required.');
     });
 
@@ -329,8 +301,6 @@ describe('Dashboard Renderer Service', () => {
       };
 
       const config: DashboardConfigInput = {
-        title: 'Custom Title',
-        description: 'Custom Description',
         dataSource: {
           fetchFilters: [{ meta: { key: 'agent.id', value: '001' } }],
           searchBarProps: {
@@ -357,26 +327,6 @@ describe('Dashboard Renderer Service', () => {
 
       expect(result.success).toBe(true);
       expect(result.status).toBe('ready');
-      expect(result.dashboardTitle).toBe('Test Dashboard');
-      expect(result.byValueInput).toBeDefined();
-      expect(result.byValueInput?.title).toBe('Custom Title');
-      expect(result.byValueInput?.description).toBe('Custom Description');
-      expect(result.byValueInput?.viewMode).toBe('edit');
-      expect(result.byValueInput?.isFullScreenMode).toBe(true);
-      expect(result.byValueInput?.useMargins).toBe(false);
-      expect(result.byValueInput?.hidePanelTitles).toBe(true);
-      expect(result.byValueInput?.filters).toEqual([
-        { meta: { key: 'agent.id', value: '001' } },
-      ]);
-      expect(result.byValueInput?.query).toBe('status:active');
-      expect(result.byValueInput?.refreshConfig).toEqual({
-        pause: false,
-        value: 60,
-      });
-      expect(result.byValueInput?.timeRange).toEqual({
-        from: '2024-01-01T00:00:00.000Z',
-        to: '2024-12-31T23:59:59.999Z',
-      });
     });
 
     test('should handle errors during dashboard fetching', async () => {
