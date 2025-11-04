@@ -406,6 +406,7 @@ function generateAlert(params) {
         alert.cloud = {
           provider: 'aws',
           region: alert.data.aws.region,
+          account: { id: Random.arrayItem(AWS.accountId) },
           service: { name: 'macie' },
         };
         break;
@@ -662,6 +663,7 @@ function generateAlert(params) {
       provider: 'gcp',
       project: { id: alert.data.gcp.resource.labels.project_id },
       region: alert.data.gcp.resource.labels.location,
+      service: { name: 'dns' },
     };
 
     // Message
