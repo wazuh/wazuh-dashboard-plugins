@@ -79,7 +79,14 @@ export const Dashboard = props => {
               if (className) {
                 /* Add a wrapper div with the className to apply styles that allow to overwrite
                 some styles using CSS selectors */
-                return <div className={className} key={dashboardId || agentDashboardId}>{dashboard}</div>;
+                return (
+                  <div
+                    className={className}
+                    key={dashboardId || agentDashboardId}
+                  >
+                    {dashboard}
+                  </div>
+                );
               }
 
               return dashboard;

@@ -97,7 +97,6 @@ export async function buildDashboardByValueInput(
   }
 
   try {
-
     const { data } = (await SavedObject.getDashboardById(dashboardId)) as {
       data: SavedDashboardSO;
     };

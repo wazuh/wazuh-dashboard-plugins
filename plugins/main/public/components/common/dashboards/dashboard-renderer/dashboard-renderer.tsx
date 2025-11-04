@@ -112,7 +112,6 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
   }
 
   if (status === 'ready') {
-  
     return (
       <div className={className} style={{ padding: 0 }}>
         <DashboardContainerByValueRenderer
