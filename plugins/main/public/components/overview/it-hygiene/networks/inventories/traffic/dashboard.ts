@@ -1,4 +1,4 @@
-import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
+import { SavedVis } from '../../../../../../../common/dashboards/types';
 import {
   buildDashboardKPIPanels,
   buildIndexPatternReferenceList,
@@ -13,7 +13,7 @@ type InterfaceState = 'LISTEN' | 'ESTABLISHED';
 const getVisStateInterfaceState = (
   indexPatternId: string,
   interfaceState: InterfaceState,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: `it-hygiene-network-interfaces-${interfaceState}`,
     title: `Interfaces in ${interfaceState} state`,
@@ -78,7 +78,7 @@ const getVisStateInterfaceState = (
 
 const getVisStateUDPOnlyTransportsMetric = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'it-hygiene-network-Transports-only-udp',
     title: 'Transports operating only on UDP',

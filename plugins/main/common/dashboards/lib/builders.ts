@@ -1,6 +1,6 @@
 // @ts-ignore
 import { Filter } from 'src/plugins/data/common';
-import type { DashboardByValueSavedVis } from '../types';
+import type { SavedVis } from '../types';
 import { DASHBOARD_WIDTH_LIMIT, HEIGHT } from './constants';
 
 export function buildSearchSource(
@@ -41,7 +41,7 @@ export const generateVisualization = ({
   height: number;
   positionX: number;
   positionY: number;
-  savedVis: DashboardByValueSavedVis;
+  savedVis: SavedVis;
 }) => {
   if (width > 48) {
     throw new Error('Width cannot exceed 48');
@@ -65,7 +65,7 @@ export const generateVisualization = ({
   };
 };
 
-export const buildDashboardKPIPanels = (savedVises: DashboardByValueSavedVis[]) => {
+export const buildDashboardKPIPanels = (savedVises: SavedVis[]) => {
   const width = DASHBOARD_WIDTH_LIMIT / savedVises.length;
   return savedVises.reduce((acc, savedVis, currentIndex) => {
     return {

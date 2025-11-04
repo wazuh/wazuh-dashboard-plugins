@@ -1,9 +1,9 @@
-import type { DashboardByValueSavedVis } from '../../../types';
+import type { SavedVis } from '../../../types';
 
 export const getVisStateClusterAlertsSummary = (
   indexPattern: { id: string; title: string },
   clusterName?: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   let expression = `.es(index=${indexPattern.title},q="cluster.name: ${clusterName}").label("${clusterName} cluster")`;
   expression = expression.replace(/'/g, '"');
   return {
@@ -36,7 +36,7 @@ export const getVisStateAlertsByNodeSummary = (
   indexPattern: { id: string; title: string },
   nodeList: any[],
   clusterName?: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   let expression = '';
   for (const node of nodeList) {
     expression += `.es(index=${indexPattern.title},q="cluster.name: ${clusterName} AND cluster.node: ${node.name}").label("${node.name}"),`;

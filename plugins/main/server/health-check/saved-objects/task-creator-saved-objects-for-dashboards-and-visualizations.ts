@@ -17,15 +17,15 @@
 import type { SavedObjectsClientContract } from 'opensearch_dashboards/server';
 import type { InitializationTaskRunContext } from '../services';
 import type {
-  DashboardByValueInput,
-  DashboardByValueSavedVis,
+  DashboardByRendererInput,
+  SavedVis,
 } from '../../../common/dashboards/types';
 import { DashboardSavedObjectMapper } from './dashboard-saved-object-mapper';
 import { getDashboardConfigs } from './dashboard-configs';
 
 // ---------- Transform helpers ----------
 
-function toVisualizationAttributes(savedVis: DashboardByValueSavedVis) {
+function toVisualizationAttributes(savedVis: SavedVis) {
   // Kibana/OSD visualization SO expects `visState` with `aggs`, and the search source under `kibanaSavedObjectMeta`.
   const visState = {
     title: savedVis.title,
@@ -52,7 +52,7 @@ function toVisualizationAttributes(savedVis: DashboardByValueSavedVis) {
 
 async function saveVisualizationSavedObject(
   client: SavedObjectsClientContract,
-  savedVis: DashboardByValueSavedVis,
+  savedVis: SavedVis,
   logger: InitializationTaskRunContext['logger'],
 ) {
   const id = savedVis.id;
@@ -79,7 +79,7 @@ async function saveVisualizationSavedObject(
 
 async function saveDashboardSavedObject(
   client: SavedObjectsClientContract,
-  dashboard: DashboardByValueInput,
+  dashboard: DashboardByRendererInput,
   savedObjectVisualizationsIds: string[],
   logger: InitializationTaskRunContext['logger'],
 ) {

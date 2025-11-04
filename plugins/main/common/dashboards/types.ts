@@ -1,10 +1,10 @@
-export interface SearchSourceQueryLanguage {
+export interface SearchSourceQuery {
   query: string;
   language: string;
 }
 
 export interface DataSearchSource {
-  query: SearchSourceQueryLanguage;
+  query: SearchSourceQuery;
   filter?: any[];
   index: string;
 }
@@ -21,7 +21,7 @@ export interface SavedVisData {
   aggs: any[];
 }
 
-export interface DashboardByValueSavedVis {
+export interface SavedVis {
   id: string;
   title?: string;
   type: string;
@@ -32,30 +32,30 @@ export interface DashboardByValueSavedVis {
 
 export type GridData = { w: number; h: number; x: number; y: number };
 
-export interface DashboardByValuePanelConfig<T extends string = string> {
+export interface DashboardByRendererPanel<T extends string = string> {
   gridData: GridData & { i: T };
   type: 'visualization';
   explicitInput: {
     id: T;
-    savedVis: DashboardByValueSavedVis;
+    savedVis: SavedVis;
   };
 }
 
-export type DashboardByValuePanels<T extends string = string> = Record<
+export type DashboardByRendererPanels<T extends string = string> = Record<
   T,
-  DashboardByValuePanelConfig<T>
+  DashboardByRendererPanel<T>
 >;
 
-export interface DashboardByValueInput {
+export interface DashboardByRendererInput {
   id: string;
   title: string;
   description: string;
-  panels: DashboardByValuePanels;
+  panels: DashboardByRendererPanels;
   useMargins: boolean;
   hidePanelTitles: boolean;
 }
 
-export type GridVisualPair = {
+export type GridDataVisualizationPair = {
   gridData: GridData;
-  savedVis: DashboardByValueSavedVis;
+  savedVis: SavedVis;
 };

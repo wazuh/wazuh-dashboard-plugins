@@ -1,8 +1,8 @@
-import type { DashboardByValueSavedVis } from '../../types';
+import type { SavedVis } from '../../types';
 
 export const getVisStateTopAgentsByAlertsCount = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GDPR-Agents',
     title: 'Top 10 agents by alerts number',
@@ -58,7 +58,7 @@ export const getVisStateTopAgentsByAlertsCount = (
 
 export const getVisStateRequirements = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GDPR-requirements',
     title: 'GDPR requirements',
@@ -218,7 +218,7 @@ export const getVisStateRequirements = (
 
 export const getVisStateRequirementsOverTime = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GDPR-Requirements-heatmap',
     title: 'Top requirements over time',
@@ -338,7 +338,7 @@ export const getVisStateRequirementsOverTime = (
 
 export const getVisStateRequirementsHeatmap = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GDPR-Requirements-Agents-heatmap',
     title: 'Last alerts',
@@ -452,7 +452,7 @@ export const getVisStateRequirementsHeatmap = (
 
 export const getVisStateRequirementsByAgent = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GDPR-Requirements-by-agent',
     title: 'Requirements by agent',
@@ -560,7 +560,7 @@ export const getVisStateRequirementsByAgent = (
 
 export const getVisStateTopRuleGroups = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-GDPR-Groups',
     title: 'Top 5 rule groups',
@@ -610,7 +610,7 @@ export const getVisStateTopRuleGroups = (
 
 export const getVisStateTopRules = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-GDPR-Rule',
     title: 'Top 5 rules',
@@ -660,7 +660,7 @@ export const getVisStateTopRules = (
 
 export const getVisStateAgentTopRequirements = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-GDPR-Requirement',
     title: 'Top 5 requirements',
@@ -705,7 +705,7 @@ export const getVisStateAgentTopRequirements = (
 
 export const getVisStateAgentTopRequirementsCount = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-GDPR-Requirements',
     title: 'GDPR Requirements',
@@ -807,7 +807,7 @@ export const getVisStateAgentTopRequirementsCount = (
 
 export const getVisStateAgentRuleLevelDistribution = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-GDPR-Rule-level-distribution',
     title: 'Rule level distribution',

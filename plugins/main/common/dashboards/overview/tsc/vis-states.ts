@@ -1,8 +1,8 @@
-import type { DashboardByValueSavedVis } from '../../types';
+import type { SavedVis } from '../../types';
 
 export const getVisStateRequirements = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-gTSC-requirements',
     title: 'TSC requirements',
@@ -162,7 +162,7 @@ export const getVisStateRequirements = (
 
 export const getVisStateTopAgentsByAlertsCount = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-TSC-Agents',
     title: 'Top 10 agents by alerts number',
@@ -218,7 +218,7 @@ export const getVisStateTopAgentsByAlertsCount = (
 
 export const getVisStateTopRequirementsOverTime = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-TSC-Requirements-over-time',
     title: 'Top requirements over time',
@@ -338,7 +338,7 @@ export const getVisStateTopRequirementsOverTime = (
 
 export const getVisStateRequirementsAgentsHeatmap = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-TSC-Requirements-Agents-heatmap',
     title: 'Last alerts',
@@ -452,7 +452,7 @@ export const getVisStateRequirementsAgentsHeatmap = (
 
 export const getVisStateRequirementsByAgent = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-TSC-Requirements-by-agent',
     title: 'Requirements by agent',
@@ -560,7 +560,7 @@ export const getVisStateRequirementsByAgent = (
 
 export const getVisStateAgentTopRuleGroups = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-TSC-Groups',
     title: 'Top 5 rule groups',
@@ -610,7 +610,7 @@ export const getVisStateAgentTopRuleGroups = (
 
 export const getVisStateAgentTopRuleDescription = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-TSC-Rule',
     title: 'Top 5 rules',
@@ -660,7 +660,7 @@ export const getVisStateAgentTopRuleDescription = (
 
 export const getVisStateAgentTopRequirements = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-TSC-Requirement',
     title: 'Top 5 TSC requirements',
@@ -705,7 +705,7 @@ export const getVisStateAgentTopRequirements = (
 
 export const getVisStateAgentRequirements = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-TSC-Requirements',
     title: 'TSC Requirements',
@@ -807,7 +807,7 @@ export const getVisStateAgentRequirements = (
 
 export const getVisStateAgentRuleLevelDistribution = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-TSC-Rule-level-distribution',
     title: 'Rule level distribution',

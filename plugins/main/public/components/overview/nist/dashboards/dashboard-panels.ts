@@ -1,4 +1,4 @@
-import type { DashboardByValuePanels } from '../../../../../common/dashboards';
+import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
   NistOverviewDashboardByRendererConfig,
   NistPinnedAgentDashboardByRendererConfig,
@@ -7,7 +7,7 @@ import {
 export const getDashboardPanels = (
   indexPatternId: string,
   isPinnedAgent?: boolean,
-): DashboardByValuePanels => {
+): DashboardByRendererPanels => {
   const nistDashboardConfig = isPinnedAgent
     ? new NistPinnedAgentDashboardByRendererConfig(indexPatternId)
     : new NistOverviewDashboardByRendererConfig(indexPatternId);

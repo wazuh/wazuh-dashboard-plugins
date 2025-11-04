@@ -1,13 +1,13 @@
 import type {
-  DashboardByValueInput,
-  DashboardByValuePanelConfig,
-  DashboardByValuePanels,
+  DashboardByRendererInput,
+  DashboardByRendererPanel,
+  DashboardByRendererPanels,
 } from '../../../common/dashboards/types';
 
 export class DashboardSavedObjectMapper {
   static mapPanelToSavedObject = (
     key: string,
-    panel: DashboardByValuePanelConfig,
+    panel: DashboardByRendererPanel,
     { panelIndex }: { panelIndex: number },
   ) => {
     return {
@@ -19,7 +19,7 @@ export class DashboardSavedObjectMapper {
     };
   };
 
-  static mapPanelsToSavedObjects = (panels: DashboardByValuePanels) => {
+  static mapPanelsToSavedObjects = (panels: DashboardByRendererPanels) => {
     return Object.entries(panels).map(([key, panel], index) =>
       this.mapPanelToSavedObject(key, panel, {
         panelIndex: index,
@@ -28,7 +28,7 @@ export class DashboardSavedObjectMapper {
   };
 
   static mapDashboardInputToSavedObject = (
-    dashboard: DashboardByValueInput,
+    dashboard: DashboardByRendererInput,
     savedObjectVisualizationsIds: string[],
   ): SavedObjectDashboard => {
     const panelsMapped = this.mapPanelsToSavedObjects(dashboard.panels);

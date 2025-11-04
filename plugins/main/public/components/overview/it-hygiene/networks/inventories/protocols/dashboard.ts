@@ -1,4 +1,4 @@
-import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
+import { SavedVis } from '../../../../../../../common/dashboards/types';
 import {
   buildDashboardKPIPanels,
   buildIndexPatternReferenceList,
@@ -8,7 +8,7 @@ import {
 
 const getVisStateNetworkMetricsMinMax = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'it-hygiene-network-metrics-min-max',
     type: 'metric',

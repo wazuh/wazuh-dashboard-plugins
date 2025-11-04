@@ -1,8 +1,8 @@
-import type { DashboardByValueSavedVis } from '../../types';
+import type { SavedVis } from '../../types';
 
 export const getVisStateAlertsEvolution = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-MITRE-Alerts-Evolution',
     title: 'Alerts evolution over time',
@@ -163,7 +163,7 @@ export const getVisStateAlertsEvolution = (
 
 export const getVisStateTopTactics = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-MITRE-Top-Tactics',
     title: 'Top tactics',
@@ -251,7 +251,7 @@ export const getVisStateTopTactics = (
 
 export const getVisStateAttacksByTechnique = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-MITRE-Attacks-By-Technique',
     title: 'Attacks by technique',
@@ -398,7 +398,7 @@ export const getVisStateAttacksByTechnique = (
 
 export const getVisStateTopTacticsByAgent = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-MITRE-Top-Tactics-By-Agent',
     title: 'Top tactics by agent',
@@ -558,7 +558,7 @@ export const getVisStateTopTacticsByAgent = (
 
 export const getVisStateTechniqueByAgent = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-MITRE-Attacks-By-Agent',
     title: 'Mitre techniques by agent',
@@ -647,7 +647,7 @@ export const getVisStateTechniqueByAgent = (
 
 export const getVisStateAlertsLevelByAttack = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-MITRE-Level-By-Attack',
     title: 'Rule level by attack',
@@ -779,7 +779,7 @@ export const getVisStateAlertsLevelByAttack = (
 
 export const getVisStateMitreAttacksByTactic = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-MITRE-Attacks-By-Tactic',
     title: 'MITRE attacks by tactic',
@@ -926,7 +926,7 @@ export const getVisStateMitreAttacksByTactic = (
 
 export const getVisStateAlertsLevelByTactic = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-MITRE-Level-By-Tactic',
     title: 'Rule level by tactic',

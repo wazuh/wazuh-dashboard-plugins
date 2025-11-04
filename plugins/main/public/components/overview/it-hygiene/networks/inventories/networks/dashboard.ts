@@ -1,4 +1,4 @@
-import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
+import { SavedVis } from '../../../../../../../common/dashboards/types';
 import {
   buildDashboardKPIPanels,
   buildIndexPatternReferenceList,
@@ -10,7 +10,7 @@ import {
 
 const getVisStateUniqueNetworkIPsMetric = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'it-hygiene-network-by-ip',
     title: 'Unique network IPs',

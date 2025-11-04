@@ -1,8 +1,8 @@
-import type { DashboardByValueSavedVis } from '../../../../types';
+import type { SavedVis } from '../../../../types';
 
 export const getVisStateTopActions = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GitHub-Top-Ten-Actions',
     title: 'Top 10 Actions',
@@ -72,7 +72,7 @@ export const getVisStateTopActions = (
 
 export const getVisStateTopActors = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: '',
     title: 'Top 10 Actors',
@@ -141,7 +141,7 @@ export const getVisStateTopActors = (
 
 export const getVisStateTopRepositories = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GitHub-Top-Ten-Repositories',
     title: 'Top 10 Repositories',
@@ -210,7 +210,7 @@ export const getVisStateTopRepositories = (
 
 export const getVisStateTopOrganizations = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GitHub-Top-Ten-Organizations',
     title: 'Top 10 Organizations',
@@ -279,7 +279,7 @@ export const getVisStateTopOrganizations = (
 
 export const getVisStateTopCountries = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GitHub-Countries',
     title: 'Countries',
@@ -342,7 +342,7 @@ export const getVisStateTopCountries = (
 
 export const getVisStateRuleLevelEvolution = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GitHub-Alert-Level-Evolution',
     title: 'Alert level evolution',

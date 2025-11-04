@@ -1,8 +1,8 @@
-import type { DashboardByValueSavedVis } from '../../../types';
+import type { SavedVis } from '../../../types';
 
 export const getVisStateEventsCountEvolution = (
   indexPatternId: string,
-): DashboardByValueSavedVis => ({
+): SavedVis => ({
   id: 'App-Agents-Welcome-Events-Evolution',
   title: 'Events count evolution',
   type: 'line',

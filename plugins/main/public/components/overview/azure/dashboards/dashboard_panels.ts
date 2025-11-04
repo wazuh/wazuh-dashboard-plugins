@@ -1,4 +1,4 @@
-import type { DashboardByValuePanels } from '../../../../../common/dashboards';
+import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
   AzurePinnedAgentDashboardByRendererConfig,
   AzureOverviewDashboardByRendererConfig,
@@ -7,7 +7,7 @@ import {
 export const getDashboardPanels = (
   indexPatternId: string,
   isPinnedAgent?: boolean,
-): DashboardByValuePanels => {
+): DashboardByRendererPanels => {
   const dashboardByRendererConfig = isPinnedAgent
     ? new AzurePinnedAgentDashboardByRendererConfig(indexPatternId)
     : new AzureOverviewDashboardByRendererConfig(indexPatternId);

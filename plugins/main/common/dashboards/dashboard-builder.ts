@@ -1,19 +1,19 @@
 import type {
-  DashboardByValuePanels,
-  DashboardByValueSavedVis,
+  DashboardByRendererPanels,
+  SavedVis,
   GridData,
-  GridVisualPair,
+  GridDataVisualizationPair,
 } from './types';
 
 export class DashboardPanelManager {
-  private panels: DashboardByValuePanels = {};
+  private panels: DashboardByRendererPanels = {};
 
   constructor(private dashboardLayoutConfig: DashboardLayoutConfig) {}
 
   private buildDashboardPanel = (
     key: string,
     gridData: { w: number; h: number; x: number; y: number },
-    savedVis: DashboardByValueSavedVis,
+    savedVis: SavedVis,
   ) => {
     return {
       gridData: {
@@ -33,14 +33,14 @@ export class DashboardPanelManager {
     savedVis,
   }: {
     gridData: GridData;
-    savedVis: DashboardByValueSavedVis;
+    savedVis: SavedVis;
   }): DashboardPanelManager {
     const key = (Object.keys(this.panels).length + 1).toString();
     this.panels[key] = this.buildDashboardPanel(key, gridData, savedVis);
     return this;
   }
 
-  getPanels(): DashboardByValuePanels {
+  getPanels(): DashboardByRendererPanels {
     Array.from({
       length: this.dashboardLayoutConfig.savedVisualizationsCount,
     }).forEach((_, index) => {
@@ -53,11 +53,11 @@ export class DashboardPanelManager {
 }
 
 export abstract class DashboardLayoutConfig {
-  protected gridVisualizationItems = [] as GridVisualPair[];
+  protected gridVisualizationItems = [] as GridDataVisualizationPair[];
 
   constructor() {}
 
-  getSavedVisualizations(): DashboardByValueSavedVis[] {
+  getSavedVisualizations(): SavedVis[] {
     return this.gridVisualizationItems.map(gridVisData => gridVisData.savedVis);
   }
 
@@ -65,7 +65,7 @@ export abstract class DashboardLayoutConfig {
     return this.gridVisualizationItems.length;
   }
 
-  retrieveGridVisualPairs(): GridVisualPair[] {
+  retrieveGridVisualPairs(): GridDataVisualizationPair[] {
     return this.gridVisualizationItems;
   }
 }
@@ -86,7 +86,7 @@ export abstract class DashboardByRendererConfig {
     return this.indexPatternId;
   }
 
-  getSavedVisualizations(): DashboardByValueSavedVis[] {
+  getSavedVisualizations(): SavedVis[] {
     return this.dashboardLayoutConfig.getSavedVisualizations();
   }
 
@@ -94,7 +94,7 @@ export abstract class DashboardByRendererConfig {
     return this.getSavedVisualizations().map(savedVis => savedVis.id);
   }
 
-  getDashboardPanels(): DashboardByValuePanels {
+  getDashboardPanels(): DashboardByRendererPanels {
     return this.dashboardPanelManager.getPanels();
   }
 

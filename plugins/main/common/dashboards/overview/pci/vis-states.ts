@@ -1,8 +1,8 @@
-import type { DashboardByValueSavedVis } from '../../types';
+import type { SavedVis } from '../../types';
 
 export const getVisStateTopRequirements = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-PCI-DSS-requirements',
     title: 'Top 10 PCI DSS requirements',
@@ -162,7 +162,7 @@ export const getVisStateTopRequirements = (
 
 export const getVisStateTopAgentsByCount = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-PCI-DSS-Agents',
     title: 'Top 10 agents by alerts count',
@@ -218,7 +218,7 @@ export const getVisStateTopAgentsByCount = (
 
 export const getVisStateRequirementsHeatmap = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-PCI-DSS-Requirements-Agents-heatmap',
     title: 'Last alerts',
@@ -332,7 +332,7 @@ export const getVisStateRequirementsHeatmap = (
 
 export const getVisStateRequirementsByAgent = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-PCI-DSS-Requirements-by-agent',
     title: 'Requirements by agent',
@@ -483,7 +483,7 @@ export const getVisStateRequirementsByAgent = (
 
 export const getVisStateAgentTopRuleGroups = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-PCI-Groups',
     title: 'Top 5 rule groups',
@@ -533,7 +533,7 @@ export const getVisStateAgentTopRuleGroups = (
 
 export const getVisStateAgentTopRules = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-PCI-Rule',
     title: 'Top 5 rules',
@@ -583,7 +583,7 @@ export const getVisStateAgentTopRules = (
 
 export const getVisStateAgentTopRequirements = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-PCI-Requirement',
     title: 'Top 5 PCI DSS requirements',
@@ -633,7 +633,7 @@ export const getVisStateAgentTopRequirements = (
 
 export const getVisStateAgentTopRequirementsCount = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-PCI-Requirements',
     title: 'PCI DSS requirements',
@@ -735,7 +735,7 @@ export const getVisStateAgentTopRequirementsCount = (
 
 export const getVisStateAgentRuleLevelDistribution = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-PCI-Rule-level-distribution',
     title: 'Rule level distribution',

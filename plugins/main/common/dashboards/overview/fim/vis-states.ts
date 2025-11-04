@@ -1,8 +1,8 @@
-import type { DashboardByValueSavedVis } from '../../types';
+import type { SavedVis } from '../../types';
 
 export const getVisStateFIMAlertsByActionOverTime = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-FIM-Alerts-by-action-over-time',
     title: 'Alerts by action over time',
@@ -122,7 +122,7 @@ export const getVisStateFIMAlertsByActionOverTime = (
 
 export const getVisStateFIMTopAgentsPie = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-FIM-Top-5-agents-pie',
     title: 'Top 5 agents',
@@ -188,7 +188,7 @@ export const getVisStateFIMTopAgentsPie = (
 
 export const getVisStateFIMEventsSummary = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-FIM-Events-summary',
     title: 'Events summary',
@@ -277,7 +277,7 @@ export const getVisStateFIMEventsSummary = (
 
 export const getVisStateFIMTopRules = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-FIM-Top-5-rules',
     title: 'Rule distribution',
@@ -343,7 +343,7 @@ export const getVisStateFIMTopRules = (
 
 export const getVisStateFIMCommonActions = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-FIM-Common-actions',
     title: 'Actions',
@@ -409,7 +409,7 @@ export const getVisStateFIMCommonActions = (
 
 export const getVisStateFIMTopAgentsUser = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-FIM-top-agents-user',
     title: 'Top 5 users',
@@ -525,7 +525,7 @@ export const getVisStateFIMTopAgentsUser = (
 
 export const getVisStateAgentFIMUsers = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-FIM-Users',
     title: 'Most active users',
@@ -586,7 +586,7 @@ export const getVisStateAgentFIMUsers = (
 
 export const getVisStateAgentFIMActions = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-FIM-Actions',
     title: 'Actions',
@@ -647,7 +647,7 @@ export const getVisStateAgentFIMActions = (
 
 export const getVisStateAgentFIMEvents = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-FIM-Events',
     title: 'Events',
@@ -797,7 +797,7 @@ export const getVisStateAgentFIMEvents = (
 
 export const getVisStateAgentFIMFilesAdded = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-FIM-Files-added',
     title: 'Files added',
@@ -886,7 +886,7 @@ export const getVisStateAgentFIMFilesAdded = (
 
 export const getVisStateAgentFIMFilesModified = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-FIM-Files-modified',
     title: 'Files modified',
@@ -969,7 +969,7 @@ export const getVisStateAgentFIMFilesModified = (
 
 export const getVisStateAgentFIMFilesDeleted = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-FIM-Files-deleted',
     title: 'Files deleted',

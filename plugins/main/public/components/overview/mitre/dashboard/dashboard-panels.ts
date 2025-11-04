@@ -1,4 +1,4 @@
-import type { DashboardByValuePanels } from '../../../../../common/dashboards';
+import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
   MitreOverviewDashboardByRendererConfig,
   MitrePinnedAgentDashboardByRendererConfig,
@@ -7,7 +7,7 @@ import {
 export const getDashboardPanels = (
   indexPatternId: string,
   isPinnedAgent?: boolean,
-): DashboardByValuePanels => {
+): DashboardByRendererPanels => {
   const mitreDashboardConfig = isPinnedAgent
     ? new MitrePinnedAgentDashboardByRendererConfig(indexPatternId)
     : new MitreOverviewDashboardByRendererConfig(indexPatternId);

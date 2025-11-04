@@ -1,8 +1,8 @@
-import type { DashboardByValueSavedVis } from '../../types';
+import type { SavedVis } from '../../types';
 
 export const getVisStateMostActiveAgents = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-NIST-Agents',
     title: 'Most active agents',
@@ -92,7 +92,7 @@ export const getVisStateMostActiveAgents = (
 
 export const getVisStateRequirementsOverTime = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-NIST-Requirements-over-time',
     title: 'Top 10 requirements over time',
@@ -247,7 +247,7 @@ export const getVisStateRequirementsOverTime = (
 
 export const getVisStateRequirementsByAgents = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-NIST-requirements-by-agents',
     title: 'Requirements distribution by agent',
@@ -402,7 +402,7 @@ export const getVisStateRequirementsByAgents = (
 
 export const getVisStateRequirementsAgentsHeatmap = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-NIST-Requirements-Agents-heatmap',
     title: 'Alerts volume by agent',
@@ -554,7 +554,7 @@ export const getVisStateRequirementsAgentsHeatmap = (
 
 export const getVisStateMetrics = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-NIST-Metrics',
     title: 'Stats',
@@ -647,7 +647,7 @@ export const getVisStateMetrics = (
 
 export const getVisStateTopRequirements = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-NIST-Top-10-requirements',
     title: 'Top 10 requirements',
@@ -737,7 +737,7 @@ export const getVisStateTopRequirements = (
 
 export const getVisStateAgentStats = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-NIST-Stats',
     title: 'Stats',
@@ -827,7 +827,7 @@ export const getVisStateAgentStats = (
 
 export const getVisStateAgentTopRequirements = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-NIST-top-10-requirements',
     title: 'Top 10 requirements',
@@ -902,7 +902,7 @@ export const getVisStateAgentTopRequirements = (
 
 export const getVisStateAgentRuleLevelDistribution = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-NIST-Requirement-by-level',
     title: 'Requirements distributed by level',
@@ -1057,7 +1057,7 @@ export const getVisStateAgentRuleLevelDistribution = (
 
 export const getVisStateAgentRequirementsOverTime = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-NIST-Requirements-stacked-overtime',
     title: 'Requirements over time',

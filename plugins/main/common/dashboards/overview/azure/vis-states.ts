@@ -1,8 +1,8 @@
-import type { DashboardByValueSavedVis } from '../../types';
+import type { SavedVis } from '../../types';
 
 export const getVisStateResults = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'azure_overview_results',
     title: 'Top 5 activity results',
@@ -67,7 +67,7 @@ export const getVisStateResults = (
 
 export const getVisStateDisplayName = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'azure_overview_display_name',
     title: '',
@@ -139,7 +139,7 @@ export const getVisStateDisplayName = (
 
 export const getVisStateRegions = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'azure_overview_regions',
     title: 'Top 5 regions',
@@ -204,7 +204,7 @@ export const getVisStateRegions = (
 
 export const getVisStateEventsByCategory = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'azure_overview_events_by_category',
     title: 'Events by category over time',
@@ -323,7 +323,7 @@ export const getVisStateEventsByCategory = (
 
 export const getVisStateOperationsTypes = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'azure_overview_activity_operations_types',
     title: 'Top 5 activity operations types',
@@ -413,7 +413,7 @@ export const getVisStateOperationsTypes = (
 
 export const getVisStateGeolocationMap = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'azure_overview_geolocation_map',
     title: 'Geolocation map',
@@ -500,7 +500,7 @@ export const getVisStateGeolocationMap = (
 
 export const getVisStateAgentResults = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'azure_agent_activity_results',
     title: 'Top 5 activity results',
@@ -565,7 +565,7 @@ export const getVisStateAgentResults = (
 
 export const getVisStateAgentDisplayName = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'azure_agent_display_name',
     type: 'table',
@@ -636,7 +636,7 @@ export const getVisStateAgentDisplayName = (
 
 export const getVisStateAgentRegions = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'azure_agent_regions',
     title: 'Top 5 regions',
@@ -701,7 +701,7 @@ export const getVisStateAgentRegions = (
 
 export const getVisStateAgentEventsByCategory = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'azure_agent_events_by_Category',
     title: 'Events by category over time',
@@ -820,7 +820,7 @@ export const getVisStateAgentEventsByCategory = (
 
 export const getVisStateAgentOperationsTypes = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'azure_agent_operations_types',
     title: 'Top 5 activity operations types',
@@ -922,7 +922,7 @@ export const getVisStateAgentOperationsTypes = (
 
 export const getVisStateAgentGeolocationMap = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'azure_agent_geolocation_map',
     title: 'Geolocation map',

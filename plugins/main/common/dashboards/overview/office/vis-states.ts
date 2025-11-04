@@ -1,8 +1,8 @@
-import type { DashboardByValueSavedVis } from '../../types';
+import type { SavedVis } from '../../types';
 
 export const getVisStateEventsBySeverity = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Office-Rule-Level-Histogram',
     title: 'Events by severity over time',
@@ -150,7 +150,7 @@ export const getVisStateEventsBySeverity = (
 
 export const getVisStateIPsByUser = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Office-IPs-By-User-Barchart',
     title: 'IP address by Users',
@@ -300,7 +300,7 @@ export const getVisStateIPsByUser = (
 
 export const getVisStateTopUserBySubcription = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Office-Top-Users-By-Subscription-Barchart',
     title: 'Top Users By Subscription',
@@ -446,7 +446,7 @@ export const getVisStateTopUserBySubcription = (
 
 export const getVisStateUsersByOperationResult = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Office-User-By-Operation-Result',
     title: 'Users by Operation Result',
@@ -545,7 +545,7 @@ export const getVisStateUsersByOperationResult = (
 
 export const getVisStateSeverityByUser = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Office-Severity-By-User-Barchart',
     title: 'Severity by user',
@@ -690,7 +690,7 @@ export const getVisStateSeverityByUser = (
 
 export const getVisStateRuleDescription = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Office-Rule-Description-Level-Table',
     title: 'Rule Description by Level',
@@ -772,7 +772,7 @@ export const getVisStateRuleDescription = (
 
 export const getVisStateOfficeMap = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Office-Location',
     title: 'Geolocation map',

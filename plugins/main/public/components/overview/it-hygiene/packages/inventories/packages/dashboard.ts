@@ -6,7 +6,7 @@ import {
   getVisStateMetricUniqueCountByField,
   STYLE,
 } from '../../../../../../../common/dashboards/lib';
-import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
+import { SavedVis } from '../../../../../../../common/dashboards/types';
 
 type PackageArchitecture = 'x86_64' | 'arm64';
 
@@ -90,7 +90,7 @@ const getVisStateFilter = (
 const getVisStatePackageArchitectureMetric = (
   indexPatternId: string,
   arch: PackageArchitecture,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: `it-hygiene-packages-${arch}`,
     title: `Packages for ${arch} architecture`,

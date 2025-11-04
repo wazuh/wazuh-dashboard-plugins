@@ -1,8 +1,8 @@
-import type { DashboardByValueSavedVis } from '../../types';
+import type { SavedVis } from '../../types';
 
 export const getVisStateTopSources = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'aws_overview_top_sources',
     title: 'Sources',
@@ -67,7 +67,7 @@ export const getVisStateTopSources = (
 
 export const getVisStateTopAccounts = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'aws_overview_top_accounts',
     title: 'Accounts',
@@ -132,7 +132,7 @@ export const getVisStateTopAccounts = (
 
 export const getVisStateTopBuckets = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'aws_overview_top_buckets',
     title: 'Buckets',
@@ -197,7 +197,7 @@ export const getVisStateTopBuckets = (
 
 export const getVisStateRegions = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'aws_overview_regions',
     title: 'Regions',
@@ -262,7 +262,7 @@ export const getVisStateRegions = (
 
 export const getVisStateEventsBySource = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'aws_overview_events_by_source',
     title: 'Events by source over time',
@@ -381,7 +381,7 @@ export const getVisStateEventsBySource = (
 
 export const getVisStateEventsByBucket = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'aws_overview_events_by_bucket',
     title: 'Events by S3 bucket over time',
@@ -500,7 +500,7 @@ export const getVisStateEventsByBucket = (
 
 export const getVisStateGeolocationMap = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'aws_overview_geolocation_map',
     title: 'Geolocation map',
@@ -587,7 +587,7 @@ export const getVisStateGeolocationMap = (
 
 export const getVisStateAgentTopSources = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'aws_agent_top_sources',
     title: 'Sources',
@@ -652,7 +652,7 @@ export const getVisStateAgentTopSources = (
 
 export const getVisStateAgentTopAccounts = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'aws_agent_top_accounts',
     title: 'Accounts',
@@ -717,7 +717,7 @@ export const getVisStateAgentTopAccounts = (
 
 export const getVisStateAgentTopBuckets = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'aws_agent_top_buckets',
     title: 'Buckets',
@@ -782,7 +782,7 @@ export const getVisStateAgentTopBuckets = (
 
 export const getVisStateAgentRegions = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'aws_agent_regions',
     title: 'Regions',
@@ -847,7 +847,7 @@ export const getVisStateAgentRegions = (
 
 export const getVisStateAgentEventsBySource = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'aws_agent_events_by_source',
     title: 'Events by source over time',
@@ -966,7 +966,7 @@ export const getVisStateAgentEventsBySource = (
 
 export const getVisStateAgentEventsByBucket = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'aws_agent_events_by_bucket',
     title: 'Events by S3 bucket over time',
@@ -1085,7 +1085,7 @@ export const getVisStateAgentEventsByBucket = (
 
 export const getVisStateAgentGeolocationMap = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'aws_agent_geolocation_map',
     title: 'Geolocation map',

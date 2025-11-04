@@ -1,4 +1,4 @@
-import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
+import { SavedVis } from '../../../../../../../common/dashboards/types';
 import {
   buildIndexPatternReferenceList,
   buildSearchSource,
@@ -7,7 +7,7 @@ import {
 
 export const getVisStateNetworkAveragePriorityMetric = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'it-hygiene-network-average-priority-of-routes',
     title: 'Monitor the average priority of routes',
@@ -55,7 +55,7 @@ export const getVisStateNetworkAveragePriorityMetric = (
 
 export const getVisStateDHCPEnabledInterfacesMetric = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'it-hygiene-network-interfaces-with-dhcp-enabled',
     title: 'Interfaces with DHCP enabled',

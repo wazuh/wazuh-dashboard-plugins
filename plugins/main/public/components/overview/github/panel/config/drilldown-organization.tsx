@@ -14,13 +14,13 @@ import React from 'react';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins } from '../../../../../kibana-services';
 import { ModuleConfigProps } from './module-config';
-import type { DashboardByValuePanels } from '../../../../../../common/dashboards';
+import type { DashboardByRendererPanels } from '../../../../../../common/dashboards';
 import { GithubDrilldownOrganizationDashboardByRendererConfig } from '../../../../../../common/dashboards/overview/github/panel/config/github-drilldown-organization/dashboard';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 
-const getDashboardPanels = (indexPatternId: string): DashboardByValuePanels => {
+const getDashboardPanels = (indexPatternId: string): DashboardByRendererPanels => {
   const githubDrilldownOrganizationDashboardByRendererConfig =
     new GithubDrilldownOrganizationDashboardByRendererConfig(indexPatternId);
 

@@ -1,8 +1,8 @@
-import type { DashboardByValueSavedVis } from '../../../types';
+import type { SavedVis } from '../../../types';
 
 export const getVisStateTop5Nodes = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Cluster-monitoring-Overview-Node-Pie',
     title: 'Top 5 nodes',

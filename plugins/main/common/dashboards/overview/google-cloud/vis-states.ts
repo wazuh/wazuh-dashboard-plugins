@@ -1,8 +1,8 @@
-import type { DashboardByValueSavedVis } from '../../types';
+import type { SavedVis } from '../../types';
 
 export const getVisStateEventsOverTime = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GCP-Alerts-Evolution-By-AuthAnswer',
     title: 'Events over time by auth answer',
@@ -127,7 +127,7 @@ export const getVisStateEventsOverTime = (
 
 export const getVisStateTopResponseCode = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GCP-Top-vmInstances-By-ResponseCode',
     title: 'Top instances by response code',
@@ -240,7 +240,7 @@ export const getVisStateTopResponseCode = (
 
 export const getVisStateTopResourceTypeProject = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GCP-Top-ResourceType-By-Project-Id',
     title: 'Resource type by project id',
@@ -388,7 +388,7 @@ export const getVisStateTopResourceTypeProject = (
 
 export const getVisStateTopProjectIdBySource = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GCP-Top-ProjectId-By-SourceType',
     title: 'Top project id by sourcetype',
@@ -526,7 +526,7 @@ export const getVisStateTopProjectIdBySource = (
 
 export const getVisStateTop5Map = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GCP-Map-By-SourceIp',
     title: 'Top 5 Map by source ip',
@@ -612,7 +612,7 @@ export const getVisStateTop5Map = (
 
 export const getVisStateTop5Rules = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-GCP-Top-5-rules',
     title: 'Top 5 rules',
@@ -691,7 +691,7 @@ export const getVisStateTop5Rules = (
 
 export const getVisStateTopQueryEvents = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-GCP-Event-Query-Name',
     title: 'Top query events',
@@ -779,7 +779,7 @@ export const getVisStateTopQueryEvents = (
 
 export const getVisStateTop5Instances = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-GCP-Top-5-instances',
     title: 'Top 5 instances',
@@ -867,7 +867,7 @@ export const getVisStateTop5Instances = (
 
 export const getVisStateGCPAlerts = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-GCP-Events-Over-Time',
     title: 'GCP alerts evolution',
@@ -997,7 +997,7 @@ export const getVisStateGCPAlerts = (
 
 export const getVisStateGCPAuthAnswer = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-GCP-authAnswer-Bar',
     title: 'Auth answer count',

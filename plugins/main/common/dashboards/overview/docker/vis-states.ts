@@ -1,8 +1,8 @@
-import type { DashboardByValueSavedVis } from '../../types';
+import type { SavedVis } from '../../types';
 
 export const getVisStateTop5Images = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Docker-top-5-images',
     title: 'Top 5 images',
@@ -68,7 +68,7 @@ export const getVisStateTop5Images = (
 
 export const getVisStateTop5Events = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Docker-top-5-events',
     title: 'Top 5 events',
@@ -134,7 +134,7 @@ export const getVisStateTop5Events = (
 
 export const getVisStateEventsSourceByOverTime = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Docker-Events-By-Source-Over-Time',
     title: 'Events by source over time',
@@ -283,7 +283,7 @@ export const getVisStateEventsSourceByOverTime = (
 
 export const getVisStateEvents = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Docker-Events',
     title: 'Events',
@@ -450,7 +450,7 @@ export const getVisStateEvents = (
 
 export const getVisStateAgentTop5Images = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-Docker-top-5-images',
     title: 'Top 5 images',
@@ -516,7 +516,7 @@ export const getVisStateAgentTop5Images = (
 
 export const getVisStateAgentTop5Events = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-Docker-top-5-actions',
     title: 'Top 5 events',
@@ -582,7 +582,7 @@ export const getVisStateAgentTop5Events = (
 
 export const getVisStateAgentResourcesUsageByOverTime = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-Docker-Types-over-time',
     title: 'Resources usage over time',
@@ -701,7 +701,7 @@ export const getVisStateAgentResourcesUsageByOverTime = (
 
 export const getVisStateAgentEvents = (
   indexPatternId: string,
-): DashboardByValueSavedVis => {
+): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-Docker-Actions-over-time',
     title: 'Events occurred evolution',
