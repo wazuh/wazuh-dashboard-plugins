@@ -44,6 +44,8 @@ yarn osd bootstrap
 yarn build-platform --linux --skip-os-packages --release
 ```
 
+> Note: for `arm` architecture uses `--linux-arm` instead of `--linux`.
+
 2. Clone the [wazuh-security-dashboards-plugin](https://github.com/wazuh/wazuh-security-dashboards-plugin.git) repository in the `wazuh-dashboard/plugins` folder and build the plugin:
 
 > Run the following commands while in the `wazuh-dashboard/` directory.
@@ -245,6 +247,8 @@ bash run-docker-compose.sh \
     --securityAnalytics $WAZUH_SECURITY_ANALYTICS_DASHBOARDS_PLUGIN_BRANCH \
     --node-version 20.18.3
 ```
+
+> Note: for `arm` package adds the `--arm` option.
 
 The packages will be stored in `wazuh-dashboard/dev-tools/build-packages/base-packages-to-base/packages` directory.
 
