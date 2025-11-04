@@ -5,7 +5,7 @@ import type {
   GridDataVisualizationPair,
 } from './types';
 
-export class DashboardPanelManager {
+export class DashboardPanelBuilderService {
   private panels: DashboardByRendererPanels = {};
 
   constructor(private dashboardLayoutConfig: DashboardLayoutConfig) {}
@@ -28,25 +28,22 @@ export class DashboardPanelManager {
     };
   };
 
-  private addPanel({
+  private addDashboardPanel({
     gridData,
     savedVis,
-  }: {
-    gridData: GridData;
-    savedVis: SavedVis;
-  }): DashboardPanelManager {
+  }: GridDataVisualizationPair): DashboardPanelBuilderService {
     const key = (Object.keys(this.panels).length + 1).toString();
     this.panels[key] = this.buildDashboardPanel(key, gridData, savedVis);
     return this;
   }
 
-  getPanels(): DashboardByRendererPanels {
+  getDashboardPanels(): DashboardByRendererPanels {
     Array.from({
       length: this.dashboardLayoutConfig.savedVisualizationsCount,
     }).forEach((_, index) => {
       const { gridData, savedVis } =
         this.dashboardLayoutConfig.getGridVisualizationPairs()[index];
-      this.addPanel({ gridData, savedVis });
+      this.addDashboardPanel({ gridData, savedVis });
     });
     return this.panels;
   }
@@ -73,13 +70,13 @@ export abstract class DashboardLayoutConfig {
 }
 
 export abstract class DashboardByRendererConfig {
-  private dashboardPanelManager: DashboardPanelManager;
+  private panelBuilderService: DashboardPanelBuilderService;
 
   constructor(
     protected indexPatternId: string,
     protected dashboardLayoutConfig: DashboardLayoutConfig,
   ) {
-    this.dashboardPanelManager = new DashboardPanelManager(
+    this.panelBuilderService = new DashboardPanelBuilderService(
       dashboardLayoutConfig,
     );
   }
@@ -97,7 +94,7 @@ export abstract class DashboardByRendererConfig {
   }
 
   getDashboardPanels(): DashboardByRendererPanels {
-    return this.dashboardPanelManager.getPanels();
+    return this.panelBuilderService.getDashboardPanels();
   }
 
   protected abstract getId(): string;
