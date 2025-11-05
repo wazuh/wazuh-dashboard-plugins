@@ -4,7 +4,7 @@
  */
 
 const { generateAlert, generateAlerts } = require('../generate-alerts-script');
-const { version: packageVersion } = require('../../../package.json');
+const { version: packageVersion } = require('../../../../package.json');
 
 describe('Generate Alerts - Wazuh Common Schema', () => {
   describe('Base Alert Structure', () => {
