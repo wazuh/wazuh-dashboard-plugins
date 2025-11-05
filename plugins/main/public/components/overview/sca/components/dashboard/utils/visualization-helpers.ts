@@ -33,7 +33,7 @@ function convertNumeralToD3Format(numeralFormat: string): string {
 
 export const decimalFormat = () => {
   let decimalFormat;
-  const pattern = core.uiSettings.get('format:percent:defaultPattern');
+  const pattern = '0,0.[000]%';
   decimalFormat = convertNumeralToD3Format(pattern);
 
   return decimalFormat ?? '.2f';
@@ -42,9 +42,7 @@ export const decimalFormat = () => {
 export const checkResultColors = () => {
   const colors = {
     ...SCA_CHECK_RESULT_COLOR_MAPPING,
-    checkScoreColor: core.uiSettings.get('theme:darkMode')
-      ? '#dfe5ef'
-      : '#333333',
+    checkScoreColor: '#333333',
   };
 
   return colors;
