@@ -1,7 +1,11 @@
 // @ts-ignore
 import { Filter } from 'src/plugins/data/common';
-import type { SavedVis } from '../types';
+import type { GridDataVisualizationPair, SavedVis } from '../types';
 import { DASHBOARD_WIDTH_LIMIT, HEIGHT, TYPES } from './constants';
+import {
+  DashboardLayoutDefinition,
+  DashboardPanelBuilderService,
+} from './dashboard-config-service';
 
 export function buildSearchSource(
   indexPatternId: string,
@@ -27,57 +31,40 @@ export function buildIndexPatternReferenceList(indexPatternId: string) {
   ];
 }
 
-export const buildPanelConfig = ({
-  key,
-  width,
-  height,
-  positionX,
-  positionY,
-  savedVis,
-}: {
-  key: string;
-  /* MAX: 48 */
-  width: number;
-  height: number;
-  positionX: number;
-  positionY: number;
-  savedVis: SavedVis;
-}) => {
-  if (width > 48) {
-    throw new Error('Width cannot exceed 48');
-  }
+class KPIsDashboardLayoutDefinition extends DashboardLayoutDefinition {
+  constructor(savedVises: SavedVis[]) {
+    super();
 
-  return {
-    [key]: {
-      gridData: {
-        w: width,
-        h: height,
-        x: positionX,
-        y: positionY,
-        i: key,
-      },
-      type: TYPES.VISUALIZATION,
-      explicitInput: {
-        id: key,
-        savedVis,
-      },
-    },
-  };
-};
+    if (!savedVises.length) {
+      return;
+    }
 
-export const buildDashboardKPIPanels = (savedVises: SavedVis[]) => {
-  const width = DASHBOARD_WIDTH_LIMIT / savedVises.length;
-  return savedVises.reduce((acc, savedVis, currentIndex) => {
-    return {
-      ...acc,
-      ...buildPanelConfig({
-        key: savedVis.id + currentIndex.toString(),
-        width: width,
-        height: HEIGHT,
-        positionX: width * currentIndex,
-        positionY: 0,
+    const width = DASHBOARD_WIDTH_LIMIT / savedVises.length;
+    const gridVisualizationPairs: GridDataVisualizationPair[] = savedVises.map(
+      (savedVis, currentIndex) => ({
+        gridData: {
+          w: width,
+          h: HEIGHT,
+          x: width * currentIndex,
+          y: 0,
+        },
         savedVis,
       }),
-    };
-  }, {});
+    );
+
+    this.setGridVisualizationPairs(...gridVisualizationPairs);
+  }
+}
+
+export const buildDashboardKPIPanels = (savedVises: SavedVis[]) => {
+  if (!savedVises.length) {
+    return {};
+  }
+
+  const layoutDefinition = new KPIsDashboardLayoutDefinition(savedVises);
+  const panelBuilderService = new DashboardPanelBuilderService(
+    layoutDefinition,
+  );
+
+  return panelBuilderService.getDashboardPanels();
 };
