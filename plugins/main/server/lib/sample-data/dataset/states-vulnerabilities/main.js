@@ -134,7 +134,6 @@ function generateRandomWazuh() {
   };
 }
 
-
 function generateDocument() {
   return {
     agent: generateRandomAgent(),
