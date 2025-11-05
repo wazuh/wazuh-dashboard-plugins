@@ -2,7 +2,7 @@ import {
   DashboardByRendererConfig,
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
-import { getVisStateFilter } from '../../it-hygiene/packages/inventories/packages/vis-states';
+import { getVisStateFilter } from './vis-states';
 
 export class VulnerabilitiesFiltersDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor(indexPatternId: string) {
