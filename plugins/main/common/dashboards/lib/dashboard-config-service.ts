@@ -1,9 +1,9 @@
 import type {
   DashboardByRendererPanels,
   GridDataVisualizationPair,
-  SavedVis
+  SavedVis,
 } from '../types';
-import { TYPES } from "./constants";
+import { TYPES } from './constants';
 
 export class DashboardPanelBuilderService {
   private panels: DashboardByRendererPanels = {};
@@ -16,14 +16,16 @@ export class DashboardPanelBuilderService {
     savedVis: SavedVis,
   ) => {
     return {
-      gridData: {
-        ...gridData,
-        i: key,
-      },
-      type: TYPES.VISUALIZATION,
-      explicitInput: {
-        id: key,
-        savedVis,
+      [key]: {
+        gridData: {
+          ...gridData,
+          i: key,
+        },
+        type: TYPES.VISUALIZATION,
+        explicitInput: {
+          id: key,
+          savedVis,
+        },
       },
     };
   };
@@ -33,7 +35,10 @@ export class DashboardPanelBuilderService {
     savedVis,
   }: GridDataVisualizationPair): DashboardPanelBuilderService {
     const key = (Object.keys(this.panels).length + 1).toString();
-    this.panels[key] = this.buildDashboardPanel(key, gridData, savedVis);
+    this.panels = {
+      ...this.panels,
+      ...this.buildDashboardPanel(key, gridData, savedVis),
+    };
     return this;
   }
 
