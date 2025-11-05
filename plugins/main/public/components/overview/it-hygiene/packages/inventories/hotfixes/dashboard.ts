@@ -1,23 +1,7 @@
-import {
-  buildDashboardKPIPanels,
-  getVisStateHorizontalBarByField,
-} from '../../../../../../../common/dashboards/lib';
+import { ITHygienePackagesInventoriesHotFixesDashboardByRendererConfig } from "../../../../../../../common/dashboards/vis-definitions/overview/it-hygiene/packages/inventories/hotfixes/dashboard";
 
 export const getOverviewPackagesHotfixesTab = (indexPatternId: string) => {
-  return buildDashboardKPIPanels([
-    getVisStateHorizontalBarByField(
-      indexPatternId,
-      'package.hotfix.name',
-      'Most common KBs',
-      'it-hygiene-hotfixes',
-      { fieldCustomLabel: 'KBs' },
-    ),
-    getVisStateHorizontalBarByField(
-      indexPatternId,
-      'package.hotfix.name',
-      'Least common KBs',
-      'it-hygiene-hotfixes',
-      { fieldCustomLabel: 'KBs', orderAggregation: 'asc' },
-    ),
-  ]);
+  return new ITHygienePackagesInventoriesHotFixesDashboardByRendererConfig(
+    indexPatternId,
+  ).getDashboardPanels();
 };
