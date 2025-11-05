@@ -1,6 +1,6 @@
 # Known Fields Generation Script
 
-This directory contains scripts to automatically generate known fields for Wazuh index patterns from their official template definitions.
+This directory contains scripts to automatically generate known fields from the index pattern templates from the Wazuh indexer plugins repository.
 
 ## Overview
 
@@ -17,29 +17,29 @@ Main script that fetches index templates from Wazuh repositories and converts th
 **Usage:**
 
 ```bash
-node scripts/generate-known-fields.js [branch]
+node scripts/generate-known-fields.js [--branch [branch]] [--destination [path]]
 ```
 
-By default uses the version declared in the package.json.
+By default uses the version declared in the package.json and the `common/known-fields` as destination.
 
 **Features:**
 
-- Fetches templates from multiple sources (Wazuh server repo, dashboard repo)
+- Fetches templates
 - Dynamically reads version from package.json for sustainable URL generation
 - Converts OpenSearch field mappings to dashboard known fields format
 - Supports multiple URL fallbacks for each template type
 - Handles nested field types properly
-- Generates JSON files in `plugins/main/common/known-fields/`
+- Generates JSON files in the destination directory
 
 ## Generated Files
 
-The script generates JSON files in `plugins/main/common/known-fields`: alerts, archives, events, states, monitoring and statistics
+The script generates JSON files in the destination directory: alerts, archives, events, states, monitoring and statistics
 
 The templates can be retrieved from: https://github.com/wazuh/wazuh-indexer-plugins/tree/main/plugins/setup/src/main/resources
 
 ## Integration
 
-The generated files are stored in `plugins/main/public/utils/known-fields/` and consumed by:
+The generated files are stored in the destination directory and consumed by:
 
 - `getKnownFieldsByIndexType(indexType)` - Get fields by index type constant
 
@@ -47,7 +47,6 @@ The generated files are stored in `plugins/main/public/utils/known-fields/` and 
 
 1. **Manual Execution**: Run the script when template changes are detected
 2. **Future Enhancement**: Could be integrated into CI/CD to run automatically on releases
-3. **Fallback**: Manual fields still available as backup in `known-fields.js`
 
 ## Adding New Templates
 
@@ -63,12 +62,5 @@ To add support for a new template:
 - ✅ Dynamic version loading from package.json (no hardcoded versions)
 - ✅ Proper nested field type handling
 - ✅ Moved templates from TypeScript to JSON format for simplicity
-- ✅ Generated files in public/utils/known-fields/ (accessible from both client and server via dynamic path resolution)
+- ✅ Generated files in the destination directory (accessible from both client and server via dynamic path resolution)
 - ✅ Added support for all inventory state templates
-- ✅ Monitoring fields intentionally excluded from auto-generation (template incomplete)
-
-## Future Improvements
-
-- [ ] Integrate with CI/CD for automatic updates on template changes
-- [ ] Add validation to ensure generated fields match expected format
-- [ ] Add diffing tool to show changes between template versions

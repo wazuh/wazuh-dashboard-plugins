@@ -460,6 +460,7 @@ export class WazuhElasticCtrl {
                 let configuration;
 
                 if (sampleDataAndTemplate?.template) {
+                  // Expect flat format (Elasticsearch/Indexer): { index_patterns, mappings, settings }
                   const templateData = sampleDataAndTemplate.template;
 
                   configuration = {
