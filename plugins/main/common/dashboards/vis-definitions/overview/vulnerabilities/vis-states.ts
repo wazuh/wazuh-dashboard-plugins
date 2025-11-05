@@ -352,9 +352,6 @@ export const getVisStateAccumulationMostDetectedVulnerabilities = (
     },
     uiState: {
       vis: {
-        /* These colors should match the specified on the metric visualizations
-        public/components/overview/vulnerabilities/dashboards/overview/vulnerability_detector_filters.scss
-        */
         colors: {
           Critical: UI_COLOR_STATUS.failed,
           High: '#F5A700',
