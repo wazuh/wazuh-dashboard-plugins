@@ -16,7 +16,7 @@ import {
 
 export abstract class ThreatHuntingDashboardLayoutDefinition extends DashboardLayoutDefinition {}
 
-export class ThreatHuntingPinnedAgentDashboardLayoutDefinition extends DashboardLayoutDefinition {
+export class ThreatHuntingPinnedAgentDashboardLayoutDefinition extends ThreatHuntingDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
 
@@ -101,7 +101,7 @@ export class ThreatHuntingPinnedAgentDashboardLayoutDefinition extends Dashboard
   }
 }
 
-export class ThreatHuntingOverviewDashboardLayoutDefinition extends DashboardLayoutDefinition {
+export class ThreatHuntingOverviewDashboardLayoutDefinition extends ThreatHuntingDashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
 
@@ -173,7 +173,7 @@ export class ThreatHuntingOverviewDashboardLayoutDefinition extends DashboardLay
 
 export abstract class ThreatHuntingDashboardByRendererConfig extends DashboardByRendererConfig {}
 
-export class ThreatHuntingPinnedAgentDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ThreatHuntingPinnedAgentDashboardByRendererConfig extends ThreatHuntingDashboardByRendererConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
@@ -192,7 +192,7 @@ export class ThreatHuntingPinnedAgentDashboardByRendererConfig extends Dashboard
   }
 }
 
-export class ThreatHuntingOverviewDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ThreatHuntingOverviewDashboardByRendererConfig extends ThreatHuntingDashboardByRendererConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
