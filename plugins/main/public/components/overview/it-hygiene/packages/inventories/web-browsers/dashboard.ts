@@ -1,23 +1,7 @@
-import {
-  buildDashboardKPIPanels,
-  getVisStateHorizontalBarByField,
-} from '../../../../../../../common/dashboards/lib';
+import { ITHygienePackagesInventoriesBrowserExtensionsDashboardByRendererConfig } from '../../../../../../../common/dashboards/vis-definitions/overview/it-hygiene/packages/inventories/browser-extensions/dashboard';
 
 export const getOverviewBrowserExtensionsTab = (indexPatternId: string) => {
-  return buildDashboardKPIPanels([
-    getVisStateHorizontalBarByField(
-      indexPatternId,
-      'browser.name',
-      'Top 5 browsers',
-      'it-hygiene-browsers-name',
-      { fieldCustomLabel: 'Browsers' },
-    ),
-    getVisStateHorizontalBarByField(
-      indexPatternId,
-      'package.name',
-      'Top 5 packages',
-      'it-hygiene-packages-name',
-      { fieldCustomLabel: 'Packages' },
-    ),
-  ]);
+  return new ITHygienePackagesInventoriesBrowserExtensionsDashboardByRendererConfig(
+    indexPatternId,
+  ).getDashboardPanels();
 };
