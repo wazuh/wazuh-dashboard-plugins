@@ -771,8 +771,6 @@ function generateAlert(params) {
     // Update wazuh fields
     alert.wazuh.decoders = getDecodersForModule('mitre');
 
-    alert.rule = Random.arrayItem(Mitre.arrayMitreRules);
-
     // Message
     alert.message = `MITRE ATT&CK: ${alert.rule.description}`;
 
