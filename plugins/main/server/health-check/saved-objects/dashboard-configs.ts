@@ -73,6 +73,8 @@ import {
 import { VulnerabilitiesOverviewDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/vulnerabilities/dashboard';
 import { VulnerabilitiesKPIsDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/vulnerabilities/kpis/dashboard';
 import { VulnerabilitiesFiltersDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/vulnerabilities/filters/dashboard';
+import { SCAOverviewDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/sca/dashboards/dashboard';
+import { SCAKPIsDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/sca/kpis/dashboard';
 import { SCAInventoryDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/sca/inventory/dashboard';
 import { SCATablesDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/sca/tables/dashboard';
 import { ServerManagementStatisticsDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/server-management/statistics/dashboard';
@@ -211,6 +213,12 @@ export const getDashboardConfigs = (): DashboardConfig[] => {
     new VulnerabilitiesKPIsDashboardConfig(INDEX_PATTERN_REPLACE_ME);
   const vulnerabilitiesFiltersDashboardConfig =
     new VulnerabilitiesFiltersDashboardConfig(INDEX_PATTERN_REPLACE_ME);
+  const scaOverviewDashboardConfig = new SCAOverviewDashboardConfig(
+    INDEX_PATTERN_REPLACE_ME,
+  );
+  const scaKPIsDashboardConfig = new SCAKPIsDashboardConfig(
+    INDEX_PATTERN_REPLACE_ME,
+  );
   const scaInventoryDashboardConfig =
     new SCAInventoryDashboardConfig(INDEX_PATTERN_REPLACE_ME);
   const scaTablesDashboardConfig = new SCATablesDashboardConfig(
@@ -333,6 +341,8 @@ export const getDashboardConfigs = (): DashboardConfig[] => {
     vulnerabilitiesOverviewDashboardConfig,
     vulnerabilitiesKPIsDashboardConfig,
     vulnerabilitiesFiltersDashboardConfig,
+    scaOverviewDashboardConfig,
+    scaKPIsDashboardConfig,
     scaInventoryDashboardConfig,
     scaTablesDashboardConfig,
     serverManagementStatisticsDashboardConfig,
