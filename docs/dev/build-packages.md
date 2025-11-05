@@ -118,7 +118,7 @@ cd ../../../
 mkdir packages
 cd packages
 WZD_ZIPPED_PACKAGES_DIR=$(pwd)
-zip -r -j ./dashboard-package.zip ../wazuh-dashboard/target/opensearch-dashboards-3.*.*-linux-x64.tar.gz
+zip -r -j ./dashboard-package.zip ../wazuh-dashboard/target/opensearch-dashboards-3.*.*-linux-*.tar.gz
 zip -r -j ./security-package.zip ../wazuh-dashboard/plugins/wazuh-security-dashboards-plugin/build/security-dashboards-3.*.*.0.zip
 zip -r -j ./reporting-package.zip ../wazuh-dashboard/plugins/wazuh-dashboard-reporting/build/reportsDashboards-3.*.*.zip
 zip -r -j ./security-analytics-package.zip ../wazuh-dashboard/plugins/wazuh-dashboard-security-analytics/build/security-analytics-dashboards-3.*.*.0.zip
