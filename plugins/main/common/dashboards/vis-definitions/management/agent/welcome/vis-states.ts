@@ -1,3 +1,7 @@
+import {
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+} from '../../../../lib';
 import type { SavedVis } from '../../../../types';
 
 export const getVisStateEventsCountEvolution = (
@@ -77,20 +81,8 @@ export const getVisStateEventsCountEvolution = (
     vis: { params: { sort: { columnIndex: 2, direction: 'desc' } } },
   },
   data: {
-    searchSource: {
-      query: {
-        language: 'kuery',
-        query: '',
-      },
-      index: indexPatternId,
-    },
-    references: [
-      {
-        name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-        type: 'index-pattern',
-        id: indexPatternId,
-      },
-    ],
+    searchSource: buildSearchSource(indexPatternId),
+    references: buildIndexPatternReferenceList(indexPatternId),
     aggs: [
       { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
       {

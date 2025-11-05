@@ -1,7 +1,7 @@
 // @ts-ignore
 import { Filter } from 'src/plugins/data/common';
 import type { SavedVis } from '../types';
-import { DASHBOARD_WIDTH_LIMIT, HEIGHT } from './constants';
+import { DASHBOARD_WIDTH_LIMIT, HEIGHT, TYPES } from './constants';
 
 export function buildSearchSource(
   indexPatternId: string,
@@ -21,7 +21,7 @@ export function buildIndexPatternReferenceList(indexPatternId: string) {
   return [
     {
       name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-      type: 'index-pattern',
+      type: TYPES.INDEX_PATTERN,
       id: indexPatternId,
     },
   ];
@@ -56,7 +56,7 @@ export const buildPanelConfig = ({
         y: positionY,
         i: key,
       },
-      type: 'visualization',
+      type: TYPES.VISUALIZATION,
       explicitInput: {
         id: key,
         savedVis,

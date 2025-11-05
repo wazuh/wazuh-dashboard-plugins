@@ -1,8 +1,10 @@
+import {
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+} from '../../../lib';
 import type { SavedVis } from '../../../types';
 
-export const getVisStateRequirements = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateRequirements = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-gTSC-requirements',
     title: 'TSC requirements',
@@ -94,21 +96,8 @@ export const getVisStateRequirements = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -176,21 +165,8 @@ export const getVisStateTopAgentsByAlertsCount = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -275,21 +251,8 @@ export const getVisStateTopRequirementsOverTime = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -388,21 +351,8 @@ export const getVisStateRequirementsAgentsHeatmap = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -505,21 +455,8 @@ export const getVisStateRequirementsByAgent = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -574,21 +511,8 @@ export const getVisStateAgentTopRuleGroups = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
         {
@@ -624,21 +548,8 @@ export const getVisStateAgentTopRuleDescription = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
         {
@@ -674,21 +585,8 @@ export const getVisStateAgentTopRequirements = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
         {
@@ -757,21 +655,8 @@ export const getVisStateAgentRequirements = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
         {
@@ -822,21 +707,8 @@ export const getVisStateAgentRuleLevelDistribution = (
     },
     uiState: { vis: { legendOpen: false } },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
         {

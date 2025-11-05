@@ -1,3 +1,7 @@
+import {
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+} from '../../../lib';
 import { SavedVis } from '../../../types';
 
 export const getVisStateHitsHistogram = (indexPatternId: string): SavedVis => {
@@ -65,21 +69,8 @@ export const getVisStateHitsHistogram = (indexPatternId: string): SavedVis => {
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
         {

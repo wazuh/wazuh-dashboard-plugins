@@ -1,8 +1,10 @@
+import {
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+} from '../../../../../lib';
 import type { SavedVis } from '../../../../../types';
 
-export const getVisStateTopActions = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateTopActions = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GitHub-Top-Ten-Actions',
     title: 'Top 10 Actions',
@@ -25,21 +27,8 @@ export const getVisStateTopActions = (
       vis: { params: { sort: { columnIndex: 3, direction: 'desc' } } },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -70,9 +59,7 @@ export const getVisStateTopActions = (
   };
 };
 
-export const getVisStateTopActors = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateTopActors = (indexPatternId: string): SavedVis => {
   return {
     id: '',
     title: 'Top 10 Actors',
@@ -94,21 +81,8 @@ export const getVisStateTopActors = (
       vis: { params: { sort: { columnIndex: 3, direction: 'desc' } } },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -163,21 +137,8 @@ export const getVisStateTopRepositories = (
       vis: { params: { sort: { columnIndex: 3, direction: 'desc' } } },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -232,21 +193,8 @@ export const getVisStateTopOrganizations = (
       vis: { params: { sort: { columnIndex: 3, direction: 'desc' } } },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -277,9 +225,7 @@ export const getVisStateTopOrganizations = (
   };
 };
 
-export const getVisStateTopCountries = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateTopCountries = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GitHub-Countries',
     title: 'Countries',
@@ -295,21 +241,8 @@ export const getVisStateTopCountries = (
       vis: { params: { sort: { columnIndex: 3, direction: 'desc' } } },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -427,21 +360,8 @@ export const getVisStateRuleLevelEvolution = (
       vis: { params: { sort: { columnIndex: 3, direction: 'desc' } } },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',

@@ -1,3 +1,7 @@
+import {
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+} from '../../../../lib';
 import type { SavedVis } from '../../../../types';
 
 export const getVisStateClusterAlertsSummary = (
@@ -12,21 +16,8 @@ export const getVisStateClusterAlertsSummary = (
     type: 'timelion',
     params: { expression, interval: 'auto' },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPattern.id,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPattern.id,
-        },
-      ],
+      searchSource: buildSearchSource(indexPattern.id),
+      references: buildIndexPatternReferenceList(indexPattern.id),
       aggs: [],
     },
   };
@@ -49,21 +40,8 @@ export const getVisStateAlertsByNodeSummary = (
     type: 'timelion',
     params: { expression, interval: 'auto' },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPattern.id,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPattern.id,
-        },
-      ],
+      searchSource: buildSearchSource(indexPattern.id),
+      references: buildIndexPatternReferenceList(indexPattern.id),
       aggs: [],
     },
   };

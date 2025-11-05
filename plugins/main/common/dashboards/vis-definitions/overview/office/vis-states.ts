@@ -1,3 +1,7 @@
+import {
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+} from '../../../lib';
 import type { SavedVis } from '../../../types';
 
 export const getVisStateEventsBySeverity = (
@@ -85,21 +89,8 @@ export const getVisStateEventsBySeverity = (
       labels: {},
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -148,9 +139,7 @@ export const getVisStateEventsBySeverity = (
   };
 };
 
-export const getVisStateIPsByUser = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateIPsByUser = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Office-IPs-By-User-Barchart',
     title: 'IP address by Users',
@@ -237,21 +226,8 @@ export const getVisStateIPsByUser = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -384,21 +360,8 @@ export const getVisStateTopUserBySubcription = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -464,21 +427,8 @@ export const getVisStateUsersByOperationResult = (
       percentageCol: '',
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -543,9 +493,7 @@ export const getVisStateUsersByOperationResult = (
   };
 };
 
-export const getVisStateSeverityByUser = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateSeverityByUser = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Office-Severity-By-User-Barchart',
     title: 'Severity by user',
@@ -628,21 +576,8 @@ export const getVisStateSeverityByUser = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -708,21 +643,8 @@ export const getVisStateRuleDescription = (
       percentageCol: '',
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -770,9 +692,7 @@ export const getVisStateRuleDescription = (
   };
 };
 
-export const getVisStateOfficeMap = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateOfficeMap = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Office-Location',
     title: 'Geolocation map',
@@ -812,21 +732,8 @@ export const getVisStateOfficeMap = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
         {

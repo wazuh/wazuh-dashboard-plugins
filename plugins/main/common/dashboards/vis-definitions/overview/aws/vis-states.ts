@@ -1,8 +1,10 @@
+import {
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+} from '../../../lib';
 import type { SavedVis } from '../../../types';
 
-export const getVisStateTopSources = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateTopSources = (indexPatternId: string): SavedVis => {
   return {
     id: 'aws_overview_top_sources',
     title: 'Sources',
@@ -21,21 +23,8 @@ export const getVisStateTopSources = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -65,9 +54,7 @@ export const getVisStateTopSources = (
   };
 };
 
-export const getVisStateTopAccounts = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateTopAccounts = (indexPatternId: string): SavedVis => {
   return {
     id: 'aws_overview_top_accounts',
     title: 'Accounts',
@@ -130,9 +117,7 @@ export const getVisStateTopAccounts = (
   };
 };
 
-export const getVisStateTopBuckets = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateTopBuckets = (indexPatternId: string): SavedVis => {
   return {
     id: 'aws_overview_top_buckets',
     title: 'Buckets',
@@ -195,9 +180,7 @@ export const getVisStateTopBuckets = (
   };
 };
 
-export const getVisStateRegions = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateRegions = (indexPatternId: string): SavedVis => {
   return {
     id: 'aws_overview_regions',
     title: 'Regions',
@@ -260,9 +243,7 @@ export const getVisStateRegions = (
   };
 };
 
-export const getVisStateEventsBySource = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateEventsBySource = (indexPatternId: string): SavedVis => {
   return {
     id: 'aws_overview_events_by_source',
     title: 'Events by source over time',
@@ -379,9 +360,7 @@ export const getVisStateEventsBySource = (
   };
 };
 
-export const getVisStateEventsByBucket = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateEventsByBucket = (indexPatternId: string): SavedVis => {
   return {
     id: 'aws_overview_events_by_bucket',
     title: 'Events by S3 bucket over time',
@@ -498,9 +477,7 @@ export const getVisStateEventsByBucket = (
   };
 };
 
-export const getVisStateGeolocationMap = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateGeolocationMap = (indexPatternId: string): SavedVis => {
   return {
     id: 'aws_overview_geolocation_map',
     title: 'Geolocation map',
@@ -780,9 +757,7 @@ export const getVisStateAgentTopBuckets = (
   };
 };
 
-export const getVisStateAgentRegions = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateAgentRegions = (indexPatternId: string): SavedVis => {
   return {
     id: 'aws_agent_regions',
     title: 'Regions',

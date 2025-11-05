@@ -3,6 +3,7 @@ import type {
   GridDataVisualizationPair,
   SavedVis
 } from '../types';
+import { TYPES } from "./constants";
 
 export class DashboardPanelBuilderService {
   private panels: DashboardByRendererPanels = {};
@@ -19,7 +20,7 @@ export class DashboardPanelBuilderService {
         ...gridData,
         i: key,
       },
-      type: 'visualization' as const,
+      type: TYPES.VISUALIZATION,
       explicitInput: {
         id: key,
         savedVis,

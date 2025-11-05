@@ -1,8 +1,10 @@
+import {
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+} from '../../../lib';
 import type { SavedVis } from '../../../types';
 
-export const getVisStateResults = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateResults = (indexPatternId: string): SavedVis => {
   return {
     id: 'azure_overview_results',
     title: 'Top 5 activity results',
@@ -21,21 +23,8 @@ export const getVisStateResults = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -65,9 +54,7 @@ export const getVisStateResults = (
   };
 };
 
-export const getVisStateDisplayName = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateDisplayName = (indexPatternId: string): SavedVis => {
   return {
     id: 'azure_overview_display_name',
     title: '',
@@ -92,21 +79,8 @@ export const getVisStateDisplayName = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -137,9 +111,7 @@ export const getVisStateDisplayName = (
   };
 };
 
-export const getVisStateRegions = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateRegions = (indexPatternId: string): SavedVis => {
   return {
     id: 'azure_overview_regions',
     title: 'Top 5 regions',
@@ -158,21 +130,8 @@ export const getVisStateRegions = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -260,21 +219,8 @@ export const getVisStateEventsByCategory = (
       addTimeMarker: false,
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -371,18 +317,8 @@ export const getVisStateOperationsTypes = (
       legendPosition: 'right',
     },
     data: {
-      searchSource: {
-        query: { language: 'kuery', query: '' },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -411,9 +347,7 @@ export const getVisStateOperationsTypes = (
   };
 };
 
-export const getVisStateGeolocationMap = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateGeolocationMap = (indexPatternId: string): SavedVis => {
   return {
     id: 'azure_overview_geolocation_map',
     title: 'Geolocation map',
@@ -453,21 +387,8 @@ export const getVisStateGeolocationMap = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -498,9 +419,7 @@ export const getVisStateGeolocationMap = (
 
 // Agent
 
-export const getVisStateAgentResults = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateAgentResults = (indexPatternId: string): SavedVis => {
   return {
     id: 'azure_agent_activity_results',
     title: 'Top 5 activity results',
@@ -519,21 +438,8 @@ export const getVisStateAgentResults = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -589,21 +495,8 @@ export const getVisStateAgentDisplayName = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -634,9 +527,7 @@ export const getVisStateAgentDisplayName = (
   };
 };
 
-export const getVisStateAgentRegions = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateAgentRegions = (indexPatternId: string): SavedVis => {
   return {
     id: 'azure_agent_regions',
     title: 'Top 5 regions',
@@ -655,21 +546,8 @@ export const getVisStateAgentRegions = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -757,21 +635,8 @@ export const getVisStateAgentEventsByCategory = (
       addTimeMarker: false,
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -875,21 +740,8 @@ export const getVisStateAgentOperationsTypes = (
       addTimeMarker: false,
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -962,21 +814,8 @@ export const getVisStateAgentGeolocationMap = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',

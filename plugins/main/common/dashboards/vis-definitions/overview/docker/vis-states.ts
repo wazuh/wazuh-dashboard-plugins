@@ -1,8 +1,7 @@
+import { buildIndexPatternReferenceList, buildSearchSource } from "../../../lib";
 import type { SavedVis } from '../../../types';
 
-export const getVisStateTop5Images = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateTop5Images = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Docker-top-5-images',
     title: 'Top 5 images',
@@ -22,21 +21,8 @@ export const getVisStateTop5Images = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -66,9 +52,7 @@ export const getVisStateTop5Images = (
   };
 };
 
-export const getVisStateTop5Events = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateTop5Events = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Docker-top-5-events',
     title: 'Top 5 events',
@@ -88,21 +72,8 @@ export const getVisStateTop5Events = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -218,21 +189,8 @@ export const getVisStateEventsSourceByOverTime = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -281,9 +239,7 @@ export const getVisStateEventsSourceByOverTime = (
   };
 };
 
-export const getVisStateEvents = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateEvents = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-Docker-Events',
     title: 'Events',
@@ -298,21 +254,8 @@ export const getVisStateEvents = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -470,21 +413,8 @@ export const getVisStateAgentTop5Images = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -536,21 +466,8 @@ export const getVisStateAgentTop5Events = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -638,21 +555,8 @@ export const getVisStateAgentResourcesUsageByOverTime = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -699,9 +603,7 @@ export const getVisStateAgentResourcesUsageByOverTime = (
   };
 };
 
-export const getVisStateAgentEvents = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateAgentEvents = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-Docker-Actions-over-time',
     title: 'Events occurred evolution',
@@ -758,21 +660,8 @@ export const getVisStateAgentEvents = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',

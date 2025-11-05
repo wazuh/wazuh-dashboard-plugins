@@ -1,8 +1,10 @@
+import {
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+} from '../../../../lib';
 import type { SavedVis } from '../../../../types';
 
-export const getVisStateTop5Nodes = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateTop5Nodes = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Cluster-monitoring-Overview-Node-Pie',
     title: 'Top 5 nodes',
@@ -17,21 +19,8 @@ export const getVisStateTop5Nodes = (
     },
     uiState: { spy: { mode: { name: 'table' } } },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
         {

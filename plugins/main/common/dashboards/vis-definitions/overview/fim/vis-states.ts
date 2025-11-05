@@ -1,3 +1,7 @@
+import {
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+} from '../../../lib';
 import type { SavedVis } from '../../../types';
 
 export const getVisStateFIMAlertsByActionOverTime = (
@@ -59,21 +63,8 @@ export const getVisStateFIMAlertsByActionOverTime = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -142,21 +133,8 @@ export const getVisStateFIMTopAgentsPie = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -240,21 +218,8 @@ export const getVisStateFIMEventsSummary = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -275,9 +240,7 @@ export const getVisStateFIMEventsSummary = (
   };
 };
 
-export const getVisStateFIMTopRules = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateFIMTopRules = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-FIM-Top-5-rules',
     title: 'Rule distribution',
@@ -297,21 +260,8 @@ export const getVisStateFIMTopRules = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -363,21 +313,8 @@ export const getVisStateFIMCommonActions = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -427,11 +364,7 @@ export const getVisStateFIMTopAgentsUser = (
       vis: { params: { sort: { columnIndex: 3, direction: 'desc' } } },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
+      searchSource: buildSearchSource(indexPatternId, {
         filter: [
           {
             meta: {
@@ -450,15 +383,8 @@ export const getVisStateFIMTopAgentsUser = (
             $state: { store: 'appState' },
           },
         ],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      }),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -523,9 +449,7 @@ export const getVisStateFIMTopAgentsUser = (
   };
 };
 
-export const getVisStateAgentFIMUsers = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateAgentFIMUsers = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-FIM-Users',
     title: 'Most active users',
@@ -540,21 +464,8 @@ export const getVisStateAgentFIMUsers = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -601,21 +512,8 @@ export const getVisStateAgentFIMActions = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -645,9 +543,7 @@ export const getVisStateAgentFIMActions = (
   };
 };
 
-export const getVisStateAgentFIMEvents = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateAgentFIMEvents = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-FIM-Events',
     title: 'Events',
@@ -737,21 +633,8 @@ export const getVisStateAgentFIMEvents = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -811,11 +694,7 @@ export const getVisStateAgentFIMFilesAdded = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
+      searchSource: buildSearchSource(indexPatternId, {
         filter: [
           {
             meta: {
@@ -850,15 +729,8 @@ export const getVisStateAgentFIMFilesAdded = (
             },
           },
         ],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      }),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -900,11 +772,7 @@ export const getVisStateAgentFIMFilesModified = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
+      searchSource: buildSearchSource(indexPatternId, {
         filter: [
           {
             meta: {
@@ -933,15 +801,8 @@ export const getVisStateAgentFIMFilesModified = (
             },
           },
         ],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      }),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -983,11 +844,7 @@ export const getVisStateAgentFIMFilesDeleted = (
     },
     uiState: {},
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
+      searchSource: buildSearchSource(indexPatternId, {
         filter: [
           {
             meta: {
@@ -1016,15 +873,8 @@ export const getVisStateAgentFIMFilesDeleted = (
             },
           },
         ],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      }),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',

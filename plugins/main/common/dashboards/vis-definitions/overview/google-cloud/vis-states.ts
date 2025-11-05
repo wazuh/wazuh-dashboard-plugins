@@ -1,8 +1,10 @@
+import {
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+} from '../../../lib';
 import type { SavedVis } from '../../../types';
 
-export const getVisStateEventsOverTime = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateEventsOverTime = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GCP-Alerts-Evolution-By-AuthAnswer',
     title: 'Events over time by auth answer',
@@ -73,21 +75,8 @@ export const getVisStateEventsOverTime = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
         {
@@ -182,21 +171,8 @@ export const getVisStateTopResponseCode = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
         {
@@ -330,21 +306,8 @@ export const getVisStateTopResourceTypeProject = (
       ],
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
         {
@@ -451,21 +414,8 @@ export const getVisStateTopProjectIdBySource = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
         {
@@ -524,9 +474,7 @@ export const getVisStateTopProjectIdBySource = (
   };
 };
 
-export const getVisStateTop5Map = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateTop5Map = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Overview-GCP-Map-By-SourceIp',
     title: 'Top 5 Map by source ip',
@@ -566,21 +514,8 @@ export const getVisStateTop5Map = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
         {
@@ -610,9 +545,7 @@ export const getVisStateTop5Map = (
   };
 };
 
-export const getVisStateTop5Rules = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateTop5Rules = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-GCP-Top-5-rules',
     title: 'Top 5 rules',
@@ -627,21 +560,8 @@ export const getVisStateTop5Rules = (
       totalFunc: 'sum',
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -689,9 +609,7 @@ export const getVisStateTop5Rules = (
   };
 };
 
-export const getVisStateTopQueryEvents = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateTopQueryEvents = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-GCP-Event-Query-Name',
     title: 'Top query events',
@@ -733,21 +651,8 @@ export const getVisStateTopQueryEvents = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -777,9 +682,7 @@ export const getVisStateTopQueryEvents = (
   };
 };
 
-export const getVisStateTop5Instances = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateTop5Instances = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-GCP-Top-5-instances',
     title: 'Top 5 instances',
@@ -821,21 +724,8 @@ export const getVisStateTop5Instances = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -865,9 +755,7 @@ export const getVisStateTop5Instances = (
   };
 };
 
-export const getVisStateGCPAlerts = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateGCPAlerts = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-GCP-Events-Over-Time',
     title: 'GCP alerts evolution',
@@ -951,21 +839,8 @@ export const getVisStateGCPAlerts = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',
@@ -995,9 +870,7 @@ export const getVisStateGCPAlerts = (
   };
 };
 
-export const getVisStateGCPAuthAnswer = (
-  indexPatternId: string,
-): SavedVis => {
+export const getVisStateGCPAuthAnswer = (indexPatternId: string): SavedVis => {
   return {
     id: 'Wazuh-App-Agents-GCP-authAnswer-Bar',
     title: 'Auth answer count',
@@ -1079,21 +952,8 @@ export const getVisStateGCPAuthAnswer = (
       },
     },
     data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
       aggs: [
         {
           id: '1',

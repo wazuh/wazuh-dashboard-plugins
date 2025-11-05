@@ -10,3 +10,8 @@ export type Style = typeof STYLE;
 
 export const HEIGHT = 6;
 export const DASHBOARD_WIDTH_LIMIT = 48;
+
+export const TYPES = {
+  INDEX_PATTERN: 'index-pattern',
+  VISUALIZATION: 'visualization',
+} as const;
