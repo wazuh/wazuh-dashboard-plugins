@@ -1,16 +1,16 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
-  DockerPinnedAgentDashboardByRendererConfig,
-  DockerOverviewDashboardByRendererConfig,
+  DockerPinnedAgentDashboardConfig,
+  DockerOverviewDashboardConfig,
 } from '../../../../../common/dashboards/vis-definitions/overview/docker/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,
   isPinnedAgent?: boolean,
 ): DashboardByRendererPanels => {
-  const DashboardByRendererConfig = isPinnedAgent
-    ? new DockerPinnedAgentDashboardByRendererConfig(indexPatternId)
-    : new DockerOverviewDashboardByRendererConfig(indexPatternId);
+  const DashboardConfig = isPinnedAgent
+    ? new DockerPinnedAgentDashboardConfig(indexPatternId)
+    : new DockerOverviewDashboardConfig(indexPatternId);
 
-  return DashboardByRendererConfig.getDashboardPanels();
+  return DashboardConfig.getDashboardPanels();
 };

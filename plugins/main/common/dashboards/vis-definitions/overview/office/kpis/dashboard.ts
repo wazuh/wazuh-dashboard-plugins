@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
 import {
@@ -53,7 +53,7 @@ export class OfficeKPIsDashboardLayoutDefinition extends DashboardLayoutDefiniti
   }
 }
 
-export class OfficeKPIsDashboardByRendererConfig extends DashboardByRendererConfig {
+export class OfficeKPIsDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

@@ -1,16 +1,16 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
-  AWSPinnedAgentDashboardByRendererConfig,
-  AWSOverviewDashboardByRendererConfig,
+  AWSPinnedAgentDashboardConfig,
+  AWSOverviewDashboardConfig,
 } from '../../../../../common/dashboards/vis-definitions/overview/aws/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,
   isPinnedAgent?: boolean,
 ): DashboardByRendererPanels => {
-  const dashboardByRendererConfig = isPinnedAgent
-    ? new AWSPinnedAgentDashboardByRendererConfig(indexPatternId)
-    : new AWSOverviewDashboardByRendererConfig(indexPatternId);
+  const DashboardConfig = isPinnedAgent
+    ? new AWSPinnedAgentDashboardConfig(indexPatternId)
+    : new AWSOverviewDashboardConfig(indexPatternId);
 
-  return dashboardByRendererConfig.getDashboardPanels();
+  return DashboardConfig.getDashboardPanels();
 };

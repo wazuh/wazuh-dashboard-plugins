@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../lib/dashboard-config-service';
 import {
@@ -160,9 +160,9 @@ export class GithubPinnedAgentDashboardLayoutDefinition extends GithubDashboardL
   }
 }
 
-export abstract class GithubDashboardByRendererConfig extends DashboardByRendererConfig {}
+export abstract class GithubDashboardConfig extends DashboardConfig {}
 
-export class GithubOverviewDashboardByRendererConfig extends GithubDashboardByRendererConfig {
+export class GithubOverviewDashboardConfig extends GithubDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
@@ -183,7 +183,7 @@ export class GithubOverviewDashboardByRendererConfig extends GithubDashboardByRe
   }
 }
 
-export class GithubPinnedAgentDashboardByRendererConfig extends GithubDashboardByRendererConfig {
+export class GithubPinnedAgentDashboardConfig extends GithubDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

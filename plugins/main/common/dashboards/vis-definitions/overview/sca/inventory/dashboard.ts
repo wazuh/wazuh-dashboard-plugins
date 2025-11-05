@@ -4,7 +4,7 @@ import {
   SCA_CHECK_RESULT_COLOR_MAPPING
 } from '../../../../lib';
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
 
@@ -64,7 +64,7 @@ export class SCAInventoryDashboardLayoutDefinition extends DashboardLayoutDefini
   }
 }
 
-export class SCAInventoryDashboardByRendererConfig extends DashboardByRendererConfig {
+export class SCAInventoryDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

@@ -1,7 +1,7 @@
-import { FimRegistryKeysDashboardByRendererConfig } from '../../../../../../../common/dashboards/vis-definitions/overview/fim/registry-keys/dashboard';
+import { FimRegistryKeysDashboardConfig } from '../../../../../../../common/dashboards/vis-definitions/overview/fim/registry-keys/dashboard';
 
 export const getDashboard = (indexPatternId: string) => {
-  return new FimRegistryKeysDashboardByRendererConfig(
+  return new FimRegistryKeysDashboardConfig(
     indexPatternId,
   ).getDashboardPanels();
 };

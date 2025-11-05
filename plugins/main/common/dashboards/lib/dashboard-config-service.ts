@@ -74,7 +74,7 @@ export abstract class DashboardLayoutDefinition {
   }
 }
 
-export abstract class DashboardByRendererConfig {
+export abstract class DashboardConfig {
   private panelBuilderService: DashboardPanelBuilderService;
 
   constructor(

@@ -1,4 +1,4 @@
-import { DashboardByRendererConfig, DashboardLayoutDefinition } from '../../../../../../lib/dashboard-config-service';
+import { DashboardConfig, DashboardLayoutDefinition } from '../../../../../../lib/dashboard-config-service';
 import {
   getVisStateOfficeAlertsEvolutionByUserID,
   getVisStateOfficeCountryTagCloud,
@@ -50,7 +50,7 @@ export class OfficeDrilldownRulesConfigDashboardLayoutDefinition extends Dashboa
   }
 }
 
-export class OfficeDrilldownRulesConfigDashboardByRendererConfig extends DashboardByRendererConfig {
+export class OfficeDrilldownRulesConfigDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

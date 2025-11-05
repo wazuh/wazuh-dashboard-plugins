@@ -15,16 +15,16 @@ import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public'
 import { getPlugins } from '../../../../../kibana-services';
 import { ModuleConfigProps } from './module-config';
 import type { DashboardByRendererPanels } from '../../../../../../common/dashboards';
-import { GithubDrilldownOrganizationDashboardByRendererConfig } from '../../../../../../common/dashboards/vis-definitions/overview/github/panel/config/github-drilldown-organization/dashboard';
+import { GithubDrilldownOrganizationDashboardConfig } from '../../../../../../common/dashboards/vis-definitions/overview/github/panel/config/github-drilldown-organization/dashboard';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 
 const getDashboardPanels = (indexPatternId: string): DashboardByRendererPanels => {
-  const githubDrilldownOrganizationDashboardByRendererConfig =
-    new GithubDrilldownOrganizationDashboardByRendererConfig(indexPatternId);
+  const githubDrilldownOrganizationDashboardConfig =
+    new GithubDrilldownOrganizationDashboardConfig(indexPatternId);
 
-  return githubDrilldownOrganizationDashboardByRendererConfig.getDashboardPanels();
+  return githubDrilldownOrganizationDashboardConfig.getDashboardPanels();
 };
 
 export const DrilldownConfigOrganization = (

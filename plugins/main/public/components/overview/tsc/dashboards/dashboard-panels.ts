@@ -1,7 +1,7 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
-  TscOverviewDashboardByRendererConfig,
-  TscPinnedAgentDashboardByRendererConfig,
+  TscOverviewDashboardConfig,
+  TscPinnedAgentDashboardConfig,
 } from '../../../../../common/dashboards/vis-definitions/overview/tsc/dashboard';
 
 export const getDashboardPanels = (
@@ -9,8 +9,8 @@ export const getDashboardPanels = (
   isPinnedAgent?: boolean,
 ): DashboardByRendererPanels => {
   const tscDashboardConfig = isPinnedAgent
-    ? new TscPinnedAgentDashboardByRendererConfig(indexPatternId)
-    : new TscOverviewDashboardByRendererConfig(indexPatternId);
+    ? new TscPinnedAgentDashboardConfig(indexPatternId)
+    : new TscOverviewDashboardConfig(indexPatternId);
 
   return tscDashboardConfig.getDashboardPanels();
 };

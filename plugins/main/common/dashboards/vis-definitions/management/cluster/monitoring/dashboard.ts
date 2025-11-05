@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
 import {
@@ -47,7 +47,7 @@ export class ClusterMonitoringDashboardLayoutDefinition extends DashboardLayoutD
   }
 }
 
-export class ClusterMonitoringDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ClusterMonitoringDashboardConfig extends DashboardConfig {
   constructor(
     indexPatternId: string,
     {

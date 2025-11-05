@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
 import {
@@ -103,7 +103,7 @@ export class ServerManagementStatisticsDashboardLayoutDefinition extends Dashboa
   }
 }
 
-export class ServerManagementStatisticsDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ServerManagementStatisticsDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

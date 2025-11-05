@@ -1,16 +1,16 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
-  AzurePinnedAgentDashboardByRendererConfig,
-  AzureOverviewDashboardByRendererConfig,
+  AzurePinnedAgentDashboardConfig,
+  AzureOverviewDashboardConfig,
 } from '../../../../../common/dashboards/vis-definitions/overview/azure/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,
   isPinnedAgent?: boolean,
 ): DashboardByRendererPanels => {
-  const dashboardByRendererConfig = isPinnedAgent
-    ? new AzurePinnedAgentDashboardByRendererConfig(indexPatternId)
-    : new AzureOverviewDashboardByRendererConfig(indexPatternId);
+  const DashboardConfig = isPinnedAgent
+    ? new AzurePinnedAgentDashboardConfig(indexPatternId)
+    : new AzureOverviewDashboardConfig(indexPatternId);
 
-  return dashboardByRendererConfig.getDashboardPanels();
+  return DashboardConfig.getDashboardPanels();
 };

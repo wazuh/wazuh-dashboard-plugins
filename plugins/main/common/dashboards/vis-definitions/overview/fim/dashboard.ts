@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../lib/dashboard-config-service';
 import {
@@ -143,9 +143,9 @@ export class FimPinnedAgentDashboardLayoutDefinition extends FimDashboardLayoutD
   }
 }
 
-export abstract class FimDashboardByRendererConfig extends DashboardByRendererConfig {}
+export abstract class FimDashboardConfig extends DashboardConfig {}
 
-export class FimOverviewDashboardByRendererConfig extends FimDashboardByRendererConfig {
+export class FimOverviewDashboardConfig extends FimDashboardConfig {
   constructor(indexPatternId: string) {
     super(indexPatternId, new FimOverviewDashboardLayoutDefinition(indexPatternId));
   }
@@ -163,7 +163,7 @@ export class FimOverviewDashboardByRendererConfig extends FimDashboardByRenderer
   }
 }
 
-export class FimPinnedAgentDashboardByRendererConfig extends FimDashboardByRendererConfig {
+export class FimPinnedAgentDashboardConfig extends FimDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

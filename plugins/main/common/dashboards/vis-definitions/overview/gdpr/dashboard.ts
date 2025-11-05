@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../lib/dashboard-config-service';
 import {
@@ -123,9 +123,9 @@ export class GDPRPinnedAgentDashboardLayoutDefinition extends GDPRDashboardLayou
   }
 }
 
-export abstract class GDPRDashboardByRendererConfig extends DashboardByRendererConfig {}
+export abstract class GDPRDashboardConfig extends DashboardConfig {}
 
-export class GDPROverviewDashboardByRendererConfig extends GDPRDashboardByRendererConfig {
+export class GDPROverviewDashboardConfig extends GDPRDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
@@ -144,7 +144,7 @@ export class GDPROverviewDashboardByRendererConfig extends GDPRDashboardByRender
   }
 }
 
-export class GDPRPinnedAgentDashboardByRendererConfig extends GDPRDashboardByRendererConfig {
+export class GDPRPinnedAgentDashboardConfig extends GDPRDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

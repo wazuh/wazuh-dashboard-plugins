@@ -1,7 +1,7 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
-  NistOverviewDashboardByRendererConfig,
-  NistPinnedAgentDashboardByRendererConfig,
+  NistOverviewDashboardConfig,
+  NistPinnedAgentDashboardConfig,
 } from '../../../../../common/dashboards/vis-definitions/overview/nist/dashboard';
 
 export const getDashboardPanels = (
@@ -9,8 +9,8 @@ export const getDashboardPanels = (
   isPinnedAgent?: boolean,
 ): DashboardByRendererPanels => {
   const nistDashboardConfig = isPinnedAgent
-    ? new NistPinnedAgentDashboardByRendererConfig(indexPatternId)
-    : new NistOverviewDashboardByRendererConfig(indexPatternId);
+    ? new NistPinnedAgentDashboardConfig(indexPatternId)
+    : new NistOverviewDashboardConfig(indexPatternId);
 
   return nistDashboardConfig.getDashboardPanels();
 };

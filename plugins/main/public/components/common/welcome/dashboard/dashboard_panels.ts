@@ -1,7 +1,7 @@
-import { AgentsEventsDashboardByRendererConfig } from '../../../../../common/dashboards/vis-definitions';
+import { AgentsEventsDashboardConfig } from '../../../../../common/dashboards/vis-definitions';
 
 export const getDashboardPanels = (indexPatternId: string) => {
-  return new AgentsEventsDashboardByRendererConfig(
+  return new AgentsEventsDashboardConfig(
     indexPatternId,
   ).getDashboardPanels();
 };

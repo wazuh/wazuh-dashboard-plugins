@@ -1,6 +1,6 @@
 import { getVisStateTable } from '../../../../lib';
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
 import type { DashboardByRendererPanels } from '../../../../types';
@@ -126,7 +126,7 @@ export class ITHygieneTablesDashboardLayoutDefinition extends DashboardLayoutDef
   }
 }
 
-export class ITHygieneTablesDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ITHygieneTablesDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
@@ -149,7 +149,7 @@ export class ITHygieneTablesDashboardPanelsService {
   private static getOverviewDashboardPanels = (
     indexPatternId: string,
   ): DashboardByRendererPanels => {
-    return new ITHygieneTablesDashboardByRendererConfig(
+    return new ITHygieneTablesDashboardConfig(
       indexPatternId,
     ).getDashboardPanels();
   };

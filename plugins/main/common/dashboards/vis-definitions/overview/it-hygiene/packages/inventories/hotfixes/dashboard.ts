@@ -3,7 +3,7 @@ import {
   getVisStateHorizontalBarByField,
 } from '../../../../../../lib';
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../../../lib/dashboard-config-service';
 
@@ -37,7 +37,7 @@ export class ITHygienePackagesInventoriesHotFixesDashboardLayoutDefinition exten
   }
 }
 
-export class ITHygienePackagesInventoriesHotFixesDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ITHygienePackagesInventoriesHotFixesDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

@@ -3,7 +3,7 @@ import {
   getVisStateHorizontalBarSplitSeries,
 } from '../../../../lib';
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
 import {
@@ -220,9 +220,9 @@ export class ITHygienePinnedAgentDashboardLayoutDefinition extends ITHygieneDash
   }
 }
 
-export abstract class ITHygieneDashboardByRendererConfig extends DashboardByRendererConfig {}
+export abstract class ITHygieneDashboardConfig extends DashboardConfig {}
 
-export class ITHygieneOverviewDashboardByRendererConfig extends ITHygieneDashboardByRendererConfig {
+export class ITHygieneOverviewDashboardConfig extends ITHygieneDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
@@ -241,7 +241,7 @@ export class ITHygieneOverviewDashboardByRendererConfig extends ITHygieneDashboa
   }
 }
 
-export class ITHygienePinnedAgentDashboardByRendererConfig extends ITHygieneDashboardByRendererConfig {
+export class ITHygienePinnedAgentDashboardConfig extends ITHygieneDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
@@ -264,14 +264,14 @@ export class ITHygieneDashboardPanelsService {
   private static getOverviewDashboardPanels = (
     indexPatternId: string,
   ): DashboardByRendererPanels => {
-    return new ITHygieneOverviewDashboardByRendererConfig(
+    return new ITHygieneOverviewDashboardConfig(
       indexPatternId,
     ).getDashboardPanels();
   };
   private static getAgentDashboardPanels = (
     indexPatternId: string,
   ): DashboardByRendererPanels => {
-    return new ITHygienePinnedAgentDashboardByRendererConfig(
+    return new ITHygienePinnedAgentDashboardConfig(
       indexPatternId,
     ).getDashboardPanels();
   };

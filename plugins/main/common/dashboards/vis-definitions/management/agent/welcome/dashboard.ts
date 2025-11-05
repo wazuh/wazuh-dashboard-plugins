@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
 import { getVisStateEventsCountEvolution } from './vis-states';
@@ -14,7 +14,7 @@ export class AgentsEventsDashboardLayoutDefinition extends DashboardLayoutDefini
   }
 }
 
-export class AgentsEventsDashboardByRendererConfig extends DashboardByRendererConfig {
+export class AgentsEventsDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

@@ -2,8 +2,8 @@
 
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
-  ThreatHuntingOverviewDashboardByRendererConfig,
-  ThreatHuntingPinnedAgentDashboardByRendererConfig,
+  ThreatHuntingOverviewDashboardConfig,
+  ThreatHuntingPinnedAgentDashboardConfig,
 } from '../../../../../common/dashboards/vis-definitions/overview/threat-hunting/dashboard';
 
 /* Definitiion of panels */
@@ -13,10 +13,10 @@ export const getDashboardPanels = (
   isPinnedAgent?: boolean,
 ): DashboardByRendererPanels => {
   const panels = isPinnedAgent
-    ? new ThreatHuntingPinnedAgentDashboardByRendererConfig(
+    ? new ThreatHuntingPinnedAgentDashboardConfig(
         indexPatternId,
       ).getDashboardPanels()
-    : new ThreatHuntingOverviewDashboardByRendererConfig(
+    : new ThreatHuntingOverviewDashboardConfig(
         indexPatternId,
       ).getDashboardPanels();
 

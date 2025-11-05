@@ -4,7 +4,7 @@ import {
   getVisStateTable,
 } from '../../../../lib';
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
 
@@ -48,7 +48,7 @@ export class FimFilesDashboardLayoutDefinition extends DashboardLayoutDefinition
   }
 }
 
-export class FimFilesDashboardByRendererConfig extends DashboardByRendererConfig {
+export class FimFilesDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

@@ -1,6 +1,6 @@
 import { getVisStateDashboardTables } from '../../../../lib';
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
 
@@ -52,7 +52,7 @@ export class SCATablesDashboardLayoutDefinition extends DashboardLayoutDefinitio
   }
 }
 
-export class SCATablesDashboardByRendererConfig extends DashboardByRendererConfig {
+export class SCATablesDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

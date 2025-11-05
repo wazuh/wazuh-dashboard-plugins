@@ -1,7 +1,7 @@
-import { ITHygieneNetworksInventoriesTrafficDashboardByRendererConfig } from '../../../../../../../common/dashboards/vis-definitions/overview/it-hygiene/networks/inventories/traffic/dashboard';
+import { ITHygieneNetworksInventoriesTrafficDashboardConfig } from '../../../../../../../common/dashboards/vis-definitions/overview/it-hygiene/networks/inventories/traffic/dashboard';
 
 export const getOverviewProcessesPortTab = (indexPatternId: string) => {
-  return new ITHygieneNetworksInventoriesTrafficDashboardByRendererConfig(
+  return new ITHygieneNetworksInventoriesTrafficDashboardConfig(
     indexPatternId,
   ).getDashboardPanels();
 };

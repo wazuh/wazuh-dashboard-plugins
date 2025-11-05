@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../../../lib/dashboard-config-service';
 import {
@@ -53,7 +53,7 @@ export class OfficeDrilldownUserConfigDashboardLayoutDefinition extends Dashboar
   }
 }
 
-export class OfficeDrilldownUserConfigDashboardByRendererConfig extends DashboardByRendererConfig {
+export class OfficeDrilldownUserConfigDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

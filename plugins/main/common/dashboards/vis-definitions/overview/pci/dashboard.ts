@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../lib/dashboard-config-service';
 import {
@@ -113,9 +113,9 @@ export class PCIPinnedAgentDashboardLayoutDefinition extends PCIDashboardLayoutD
   }
 }
 
-export abstract class PCIDashboardByRendererConfig extends DashboardByRendererConfig {}
+export abstract class PCIDashboardConfig extends DashboardConfig {}
 
-export class PCIOverviewDashboardByRendererConfig extends PCIDashboardByRendererConfig {
+export class PCIOverviewDashboardConfig extends PCIDashboardConfig {
   constructor(indexPatternId: string) {
     super(indexPatternId, new PCIOverviewDashboardLayoutDefinition(indexPatternId));
   }
@@ -133,7 +133,7 @@ export class PCIOverviewDashboardByRendererConfig extends PCIDashboardByRenderer
   }
 }
 
-export class PCIPinnedAgentDashboardByRendererConfig extends PCIDashboardByRendererConfig {
+export class PCIPinnedAgentDashboardConfig extends PCIDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

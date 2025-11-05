@@ -4,7 +4,7 @@ import {
   getVisStateMetricUniqueCountByField,
 } from '../../../../../../lib';
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../../../lib/dashboard-config-service';
 import type { DashboardByRendererPanels } from '../../../../../../types';
@@ -39,7 +39,7 @@ export class ITHygieneUsersInventoriesGroupsDashboardLayoutDefinition extends Da
   }
 }
 
-export class ITHygieneUsersInventoriesGroupsDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ITHygieneUsersInventoriesGroupsDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
@@ -64,7 +64,7 @@ export class ITHygieneUsersInventoriesGroupsDashboardPanelsService {
   private static getOverviewDashboardPanels = (
     indexPatternId: string,
   ): DashboardByRendererPanels => {
-    return new ITHygieneUsersInventoriesGroupsDashboardByRendererConfig(
+    return new ITHygieneUsersInventoriesGroupsDashboardConfig(
       indexPatternId,
     ).getDashboardPanels();
   };

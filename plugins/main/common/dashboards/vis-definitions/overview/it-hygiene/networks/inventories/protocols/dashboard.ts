@@ -3,7 +3,7 @@ import {
   getVisStateHorizontalBarSplitSeries,
 } from '../../../../../../lib';
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../../../lib/dashboard-config-service';
 import { getVisStateNetworkMetricsMinMax } from './vis-states';
@@ -55,7 +55,7 @@ export class ITHygieneNetworksInventoriesProtocolsDashboardLayoutDefinition exte
   }
 }
 
-export class ITHygieneNetworksInventoriesProtocolsDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ITHygieneNetworksInventoriesProtocolsDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

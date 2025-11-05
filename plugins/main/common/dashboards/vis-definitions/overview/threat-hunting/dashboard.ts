@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../lib/dashboard-config-service';
 import {
@@ -171,9 +171,9 @@ export class ThreatHuntingOverviewDashboardLayoutDefinition extends ThreatHuntin
   }
 }
 
-export abstract class ThreatHuntingDashboardByRendererConfig extends DashboardByRendererConfig {}
+export abstract class ThreatHuntingDashboardConfig extends DashboardConfig {}
 
-export class ThreatHuntingPinnedAgentDashboardByRendererConfig extends ThreatHuntingDashboardByRendererConfig {
+export class ThreatHuntingPinnedAgentDashboardConfig extends ThreatHuntingDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
@@ -192,7 +192,7 @@ export class ThreatHuntingPinnedAgentDashboardByRendererConfig extends ThreatHun
   }
 }
 
-export class ThreatHuntingOverviewDashboardByRendererConfig extends ThreatHuntingDashboardByRendererConfig {
+export class ThreatHuntingOverviewDashboardConfig extends ThreatHuntingDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

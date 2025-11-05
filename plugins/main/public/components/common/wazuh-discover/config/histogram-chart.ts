@@ -1,11 +1,11 @@
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
-import { WazuhDiscoverDashboardByRendererConfig } from '../../../../../common/dashboards/vis-definitions/wazuh-discover/config/dashboard';
+import { WazuhDiscoverDashboardConfig } from '../../../../../common/dashboards/vis-definitions/wazuh-discover/config/dashboard';
 
 export const getDiscoverPanels = (
   indexPatternId: string,
 ): DashboardByRendererPanels => {
-  return new WazuhDiscoverDashboardByRendererConfig(
+  return new WazuhDiscoverDashboardConfig(
     indexPatternId,
   ).getDashboardPanels();
 };

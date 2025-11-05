@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../lib/dashboard-config-service';
 import {
@@ -167,9 +167,9 @@ export class AWSPinnedAgentDashboardLayoutDefinition extends AWSDashboardLayoutD
   }
 }
 
-export abstract class AWSDashboardByRendererConfig extends DashboardByRendererConfig {}
+export abstract class AWSDashboardConfig extends DashboardConfig {}
 
-export class AWSOverviewDashboardByRendererConfig extends AWSDashboardByRendererConfig {
+export class AWSOverviewDashboardConfig extends AWSDashboardConfig {
   constructor(indexPatternId: string) {
     super(indexPatternId, new AWSOverviewDashboardLayoutDefinition(indexPatternId));
   }
@@ -187,7 +187,7 @@ export class AWSOverviewDashboardByRendererConfig extends AWSDashboardByRenderer
   }
 }
 
-export class AWSPinnedAgentDashboardByRendererConfig extends AWSDashboardByRendererConfig {
+export class AWSPinnedAgentDashboardConfig extends AWSDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

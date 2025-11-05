@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../lib/dashboard-config-service';
 import {
@@ -103,9 +103,9 @@ export class DockerPinnedAgentDashboardLayoutDefinition extends DockerDashboardL
   }
 }
 
-export abstract class DockerDashboardByRendererConfig extends DashboardByRendererConfig {}
+export abstract class DockerDashboardConfig extends DashboardConfig {}
 
-export class DockerOverviewDashboardByRendererConfig extends DockerDashboardByRendererConfig {
+export class DockerOverviewDashboardConfig extends DockerDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
@@ -126,7 +126,7 @@ export class DockerOverviewDashboardByRendererConfig extends DockerDashboardByRe
   }
 }
 
-export class DockerPinnedAgentDashboardByRendererConfig extends DockerDashboardByRendererConfig {
+export class DockerPinnedAgentDashboardConfig extends DockerDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

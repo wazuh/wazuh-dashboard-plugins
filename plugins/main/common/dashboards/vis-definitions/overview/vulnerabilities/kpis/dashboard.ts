@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
 import {
@@ -94,7 +94,7 @@ export class VulnerabilitiesKPIsDashboardLayoutDefinition extends DashboardLayou
   }
 }
 
-export class VulnerabilitiesKPIsDashboardByRendererConfig extends DashboardByRendererConfig {
+export class VulnerabilitiesKPIsDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

@@ -4,7 +4,7 @@ import {
   getVisStateHorizontalBarSplitSeries,
 } from '../../../../../../lib';
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../../../lib/dashboard-config-service';
 
@@ -60,7 +60,7 @@ export class ITHygieneNetworksInventoriesTrafficDashboardLayoutDefinition extend
   }
 }
 
-export class ITHygieneNetworksInventoriesTrafficDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ITHygieneNetworksInventoriesTrafficDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

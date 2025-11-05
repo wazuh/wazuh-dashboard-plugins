@@ -1,9 +1,9 @@
 import {
-  SCATablesDashboardByRendererConfig
+  SCATablesDashboardConfig
 } from '../../../../../../../common/dashboards/vis-definitions/overview/sca/tables/dashboard';
 
 export const getDashboardTables = (indexPatternId: string) => {
-  return new SCATablesDashboardByRendererConfig(
+  return new SCATablesDashboardConfig(
     indexPatternId,
   ).getDashboardPanels();
 };

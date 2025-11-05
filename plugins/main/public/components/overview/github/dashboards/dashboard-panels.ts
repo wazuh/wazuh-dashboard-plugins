@@ -1,16 +1,16 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
-  GithubPinnedAgentDashboardByRendererConfig,
-  GithubOverviewDashboardByRendererConfig,
+  GithubPinnedAgentDashboardConfig,
+  GithubOverviewDashboardConfig,
 } from '../../../../../common/dashboards/vis-definitions/overview/github/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,
   isPinnedAgent?: boolean,
 ): DashboardByRendererPanels => {
-  const githubDashboardByRendererConfig = isPinnedAgent
-    ? new GithubPinnedAgentDashboardByRendererConfig(indexPatternId)
-    : new GithubOverviewDashboardByRendererConfig(indexPatternId);
+  const githubDashboardConfig = isPinnedAgent
+    ? new GithubPinnedAgentDashboardConfig(indexPatternId)
+    : new GithubOverviewDashboardConfig(indexPatternId);
 
-  return githubDashboardByRendererConfig.getDashboardPanels();
+  return githubDashboardConfig.getDashboardPanels();
 };

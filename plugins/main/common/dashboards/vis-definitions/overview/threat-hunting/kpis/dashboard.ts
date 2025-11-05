@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
 import {
@@ -79,7 +79,7 @@ export class ThreatHuntingKPIsDashboardLayoutDefinition extends DashboardLayoutD
   }
 }
 
-export class ThreatHuntingKPIsDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ThreatHuntingKPIsDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

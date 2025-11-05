@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../lib/dashboard-config-service';
 import {
@@ -123,9 +123,9 @@ export class NistPinnedAgentDashboardLayoutDefinition extends NistDashboardLayou
   }
 }
 
-export abstract class NistDashboardByRendererConfig extends DashboardByRendererConfig {}
+export abstract class NistDashboardConfig extends DashboardConfig {}
 
-export class NistOverviewDashboardByRendererConfig extends NistDashboardByRendererConfig {
+export class NistOverviewDashboardConfig extends NistDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
@@ -146,7 +146,7 @@ export class NistOverviewDashboardByRendererConfig extends NistDashboardByRender
   }
 }
 
-export class NistPinnedAgentDashboardByRendererConfig extends NistDashboardByRendererConfig {
+export class NistPinnedAgentDashboardConfig extends NistDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

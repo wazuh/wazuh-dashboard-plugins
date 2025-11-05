@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../../../lib/dashboard-config-service';
 import {
@@ -63,7 +63,7 @@ export class GithubDrilldownRepositoryDashboardLayoutDefinition extends Dashboar
   }
 }
 
-export class GithubDrilldownRepositoryDashboardByRendererConfig extends DashboardByRendererConfig {
+export class GithubDrilldownRepositoryDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

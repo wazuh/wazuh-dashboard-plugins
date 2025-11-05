@@ -4,7 +4,7 @@ import {
   getVisStateMetricUniqueCountByField,
 } from '../../../../../../lib';
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../../../lib/dashboard-config-service';
 import { getVisStateFilter } from './vis-states';
@@ -53,7 +53,7 @@ export class ITHygienePackagesInventoriesPackagesDashboardLayoutDefinition exten
   }
 }
 
-export class ITHygienePackagesInventoriesPackagesDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ITHygienePackagesInventoriesPackagesDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

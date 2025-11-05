@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../lib/dashboard-config-service';
 import {
@@ -121,9 +121,9 @@ export class MitrePinnedAgentDashboardLayoutDefinition extends MitreDashboardLay
   }
 }
 
-export abstract class MitreDashboardByRendererConfig extends DashboardByRendererConfig {}
+export abstract class MitreDashboardConfig extends DashboardConfig {}
 
-export class MitreOverviewDashboardByRendererConfig extends MitreDashboardByRendererConfig {
+export class MitreOverviewDashboardConfig extends MitreDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
@@ -144,7 +144,7 @@ export class MitreOverviewDashboardByRendererConfig extends MitreDashboardByRend
   }
 }
 
-export class MitrePinnedAgentDashboardByRendererConfig extends MitreDashboardByRendererConfig {
+export class MitrePinnedAgentDashboardConfig extends MitreDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

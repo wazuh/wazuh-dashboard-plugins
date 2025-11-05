@@ -1,7 +1,7 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
-  GoogleCloudOverviewDashboardByRendererConfig,
-  GoogleCloudPinnedAgentDashboardByRendererConfig,
+  GoogleCloudOverviewDashboardConfig,
+  GoogleCloudPinnedAgentDashboardConfig,
 } from '../../../../../common/dashboards/vis-definitions/overview/google-cloud/dashboard';
 
 export const getDashboardPanels = (
@@ -9,8 +9,8 @@ export const getDashboardPanels = (
   isPinnedAgent?: boolean,
 ): DashboardByRendererPanels => {
   const googleCloudDashboardConfig = isPinnedAgent
-    ? new GoogleCloudPinnedAgentDashboardByRendererConfig(indexPatternId)
-    : new GoogleCloudOverviewDashboardByRendererConfig(indexPatternId);
+    ? new GoogleCloudPinnedAgentDashboardConfig(indexPatternId)
+    : new GoogleCloudOverviewDashboardConfig(indexPatternId);
 
   return googleCloudDashboardConfig.getDashboardPanels();
 };

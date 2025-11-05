@@ -1,16 +1,16 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
-  HipaaOverviewDashboardByRendererConfig,
-  HipaaPinnedAgentDashboardByRendererConfig,
+  HipaaOverviewDashboardConfig,
+  HipaaPinnedAgentDashboardConfig,
 } from '../../../../../common/dashboards/vis-definitions/overview/hipaa/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,
   isPinnedAgent?: boolean,
 ): DashboardByRendererPanels => {
-  const hipaaDashboardByRendererConfig = isPinnedAgent
-    ? new HipaaPinnedAgentDashboardByRendererConfig(indexPatternId)
-    : new HipaaOverviewDashboardByRendererConfig(indexPatternId);
+  const hipaaDashboardConfig = isPinnedAgent
+    ? new HipaaPinnedAgentDashboardConfig(indexPatternId)
+    : new HipaaOverviewDashboardConfig(indexPatternId);
 
-  return hipaaDashboardByRendererConfig.getDashboardPanels();
+  return hipaaDashboardConfig.getDashboardPanels();
 };

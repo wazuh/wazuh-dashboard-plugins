@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../lib/dashboard-config-service';
 import {
@@ -143,9 +143,9 @@ export class HipaaPinnedAgentDashboardLayoutDefinition extends HipaaDashboardLay
   }
 }
 
-export abstract class HipaaDashboardByRendererConfig extends DashboardByRendererConfig {}
+export abstract class HipaaDashboardConfig extends DashboardConfig {}
 
-export class HipaaOverviewDashboardByRendererConfig extends HipaaDashboardByRendererConfig {
+export class HipaaOverviewDashboardConfig extends HipaaDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
@@ -166,7 +166,7 @@ export class HipaaOverviewDashboardByRendererConfig extends HipaaDashboardByRend
   }
 }
 
-export class HipaaPinnedAgentDashboardByRendererConfig extends HipaaDashboardByRendererConfig {
+export class HipaaPinnedAgentDashboardConfig extends HipaaDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

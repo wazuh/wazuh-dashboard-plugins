@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../lib/dashboard-config-service';
 import {
@@ -141,9 +141,9 @@ export class GoogleCloudPinnedAgentDashboardLayoutDefinition extends GoogleCloud
   }
 }
 
-export abstract class GoogleCloudDashboardByRendererConfig extends DashboardByRendererConfig {}
+export abstract class GoogleCloudDashboardConfig extends DashboardConfig {}
 
-export class GoogleCloudOverviewDashboardByRendererConfig extends GoogleCloudDashboardByRendererConfig {
+export class GoogleCloudOverviewDashboardConfig extends GoogleCloudDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
@@ -164,7 +164,7 @@ export class GoogleCloudOverviewDashboardByRendererConfig extends GoogleCloudDas
   }
 }
 
-export class GoogleCloudPinnedAgentDashboardByRendererConfig extends GoogleCloudDashboardByRendererConfig {
+export class GoogleCloudPinnedAgentDashboardConfig extends GoogleCloudDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

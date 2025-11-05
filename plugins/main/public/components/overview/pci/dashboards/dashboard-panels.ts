@@ -1,7 +1,7 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
-  PCIOverviewDashboardByRendererConfig,
-  PCIPinnedAgentDashboardByRendererConfig,
+  PCIOverviewDashboardConfig,
+  PCIPinnedAgentDashboardConfig,
 } from '../../../../../common/dashboards/vis-definitions/overview/pci/dashboard';
 
 export const getDashboardPanels = (
@@ -9,8 +9,8 @@ export const getDashboardPanels = (
   isPinnedAgent?: boolean,
 ): DashboardByRendererPanels => {
   const pciDashboardConfig = isPinnedAgent
-    ? new PCIPinnedAgentDashboardByRendererConfig(indexPatternId)
-    : new PCIOverviewDashboardByRendererConfig(indexPatternId);
+    ? new PCIPinnedAgentDashboardConfig(indexPatternId)
+    : new PCIOverviewDashboardConfig(indexPatternId);
 
   return pciDashboardConfig.getDashboardPanels();
 };

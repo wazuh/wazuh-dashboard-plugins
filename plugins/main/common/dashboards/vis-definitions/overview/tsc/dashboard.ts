@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../lib/dashboard-config-service';
 import {
@@ -123,9 +123,9 @@ export class TscPinnedAgentDashboardLayoutDefinition extends TscDashboardLayoutD
   }
 }
 
-export abstract class TscDashboardByRendererConfig extends DashboardByRendererConfig {}
+export abstract class TscDashboardConfig extends DashboardConfig {}
 
-export class TscOverviewDashboardByRendererConfig extends TscDashboardByRendererConfig {
+export class TscOverviewDashboardConfig extends TscDashboardConfig {
   constructor(indexPatternId: string) {
     super(indexPatternId, new TscOverviewDashboardLayoutDefinition(indexPatternId));
   }
@@ -143,7 +143,7 @@ export class TscOverviewDashboardByRendererConfig extends TscDashboardByRenderer
   }
 }
 
-export class TscPinnedAgentDashboardByRendererConfig extends TscDashboardByRendererConfig {
+export class TscPinnedAgentDashboardConfig extends TscDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

@@ -15,7 +15,7 @@
 import React from 'react';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import type { DashboardByRendererPanels } from '../../../../../../common/dashboards';
-import { OfficeDrilldownUserConfigDashboardByRendererConfig } from '../../../../../../common/dashboards/vis-definitions/overview/office/panel/config/drilldown-user-config/dashboard';
+import { OfficeDrilldownUserConfigDashboardConfig } from '../../../../../../common/dashboards/vis-definitions/overview/office/panel/config/drilldown-user-config/dashboard';
 import { getPlugins } from '../../../../../kibana-services';
 
 const DashboardByRenderer =
@@ -24,7 +24,7 @@ const DashboardByRenderer =
 const getDashboardPanels = (
   indexPatternId: string,
 ): DashboardByRendererPanels => {
-  return new OfficeDrilldownUserConfigDashboardByRendererConfig(
+  return new OfficeDrilldownUserConfigDashboardConfig(
     indexPatternId,
   ).getDashboardPanels();
 };

@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
 import { getVisStateFilter } from './vis-states';
@@ -98,7 +98,7 @@ export class VulnerabilitiesFiltersDashboardLayoutDefinition extends DashboardLa
   }
 }
 
-export class VulnerabilitiesFiltersDashboardByRendererConfig extends DashboardByRendererConfig {
+export class VulnerabilitiesFiltersDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

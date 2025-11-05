@@ -1,5 +1,5 @@
-import { ITHygieneNetworksInventoriesInterfacesDashboardByRendererConfig } from "../../../../../../../common/dashboards/vis-definitions/overview/it-hygiene/networks/inventories/interfaces/dashboard";
+import { ITHygieneNetworksInventoriesInterfacesDashboardConfig } from "../../../../../../../common/dashboards/vis-definitions/overview/it-hygiene/networks/inventories/interfaces/dashboard";
 
 export const getOverviewNetworksInterfacesTab = (indexPatternId: string) => {
-  return new ITHygieneNetworksInventoriesInterfacesDashboardByRendererConfig(indexPatternId).getDashboardPanels();
+  return new ITHygieneNetworksInventoriesInterfacesDashboardConfig(indexPatternId).getDashboardPanels();
 };

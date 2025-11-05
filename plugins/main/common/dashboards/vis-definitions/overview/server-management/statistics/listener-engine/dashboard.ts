@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../../lib/dashboard-config-service';
 import { getVisStateEventsSentToAnalysisd, getVisStateTCPSessions, getVisStateTotalNumberOfBytesReceived } from "./vis-states";
@@ -60,7 +60,7 @@ export class ServerManagementStatisticsListenerEngineDashboardLayoutDefinition e
   }
 }
 
-export class ServerManagementStatisticsListenerEngineDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ServerManagementStatisticsListenerEngineDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

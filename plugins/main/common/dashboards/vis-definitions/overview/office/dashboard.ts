@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../lib/dashboard-config-service';
 import {
@@ -85,9 +85,9 @@ export class OfficeOverviewDashboardLayoutDefinition extends OfficeDashboardLayo
   }
 }
 
-export abstract class OfficeDashboardByRendererConfig extends DashboardByRendererConfig {}
+export abstract class OfficeDashboardConfig extends DashboardConfig {}
 
-export class OfficeOverviewDashboardByRendererConfig extends OfficeDashboardByRendererConfig {
+export class OfficeOverviewDashboardConfig extends OfficeDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

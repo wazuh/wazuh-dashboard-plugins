@@ -3,7 +3,7 @@ import {
   getVisStateTable,
 } from '../../../../lib';
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
 import { getVisStateHostsTotalFreeMemoryTable } from '../vis-states';
@@ -68,7 +68,7 @@ export class ITHygieneKPIsDashboardLayoutDefinition extends DashboardLayoutDefin
   }
 }
 
-export class ITHygieneKPIsDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ITHygieneKPIsDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../lib/dashboard-config-service';
 import {
@@ -143,9 +143,9 @@ export class AzurePinnedAgentDashboardLayoutDefinition extends AzureDashboardLay
   }
 }
 
-export abstract class AzureDashboardByRendererConfig extends DashboardByRendererConfig {}
+export abstract class AzureDashboardConfig extends DashboardConfig {}
 
-export class AzureOverviewDashboardByRendererConfig extends AzureDashboardByRendererConfig {
+export class AzureOverviewDashboardConfig extends AzureDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
@@ -164,7 +164,7 @@ export class AzureOverviewDashboardByRendererConfig extends AzureDashboardByRend
   }
 }
 
-export class AzurePinnedAgentDashboardByRendererConfig extends AzureDashboardByRendererConfig {
+export class AzurePinnedAgentDashboardConfig extends AzureDashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

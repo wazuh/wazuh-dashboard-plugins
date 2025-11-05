@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../lib/dashboard-config-service';
 import { getVisStateHitsHistogram } from './vis-states';
@@ -14,7 +14,7 @@ export class WazuhDiscoverDashboardLayoutDefinition extends DashboardLayoutDefin
   }
 }
 
-export class WazuhDiscoverDashboardByRendererConfig extends DashboardByRendererConfig {
+export class WazuhDiscoverDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

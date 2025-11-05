@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../lib/dashboard-config-service';
 import {
@@ -65,7 +65,7 @@ export class VulnerabilitiesOverviewDashboardLayoutDefinition extends DashboardL
   }
 }
 
-export class VulnerabilitiesOverviewDashboardByRendererConfig extends DashboardByRendererConfig {
+export class VulnerabilitiesOverviewDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

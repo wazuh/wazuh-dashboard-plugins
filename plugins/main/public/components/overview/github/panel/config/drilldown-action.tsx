@@ -15,16 +15,16 @@ import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public'
 import { getPlugins } from '../../../../../kibana-services';
 import { ModuleConfigProps } from './module-config';
 import type { DashboardByRendererPanels } from '../../../../../../common/dashboards';
-import { GithubDrilldownActionDashboardByRendererConfig } from '../../../../../../common/dashboards/vis-definitions/overview/github/panel/config/github-drilldown-action/dashboard';
+import { GithubDrilldownActionDashboardConfig } from '../../../../../../common/dashboards/vis-definitions/overview/github/panel/config/github-drilldown-action/dashboard';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 
 const getDashboardPanels = (indexPatternId: string): DashboardByRendererPanels => {
-  const githubDrilldownActionDashboardByRendererConfig =
-    new GithubDrilldownActionDashboardByRendererConfig(indexPatternId);
+  const githubDrilldownActionDashboardConfig =
+    new GithubDrilldownActionDashboardConfig(indexPatternId);
 
-  return githubDrilldownActionDashboardByRendererConfig.getDashboardPanels();
+  return githubDrilldownActionDashboardConfig.getDashboardPanels();
 };
 
 export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {

@@ -1,7 +1,7 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
-  MitreOverviewDashboardByRendererConfig,
-  MitrePinnedAgentDashboardByRendererConfig,
+  MitreOverviewDashboardConfig,
+  MitrePinnedAgentDashboardConfig,
 } from '../../../../../common/dashboards/vis-definitions/overview/mitre/dashboard';
 
 export const getDashboardPanels = (
@@ -9,8 +9,8 @@ export const getDashboardPanels = (
   isPinnedAgent?: boolean,
 ): DashboardByRendererPanels => {
   const mitreDashboardConfig = isPinnedAgent
-    ? new MitrePinnedAgentDashboardByRendererConfig(indexPatternId)
-    : new MitreOverviewDashboardByRendererConfig(indexPatternId);
+    ? new MitrePinnedAgentDashboardConfig(indexPatternId)
+    : new MitreOverviewDashboardConfig(indexPatternId);
 
   return mitreDashboardConfig.getDashboardPanels();
 };

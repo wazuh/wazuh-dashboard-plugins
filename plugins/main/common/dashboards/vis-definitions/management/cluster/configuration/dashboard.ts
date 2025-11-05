@@ -1,5 +1,5 @@
 import {
-  DashboardByRendererConfig,
+  DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
 import { getVisStateTop5Nodes } from './vis-states';
@@ -14,7 +14,7 @@ export class ClusterConfigurationDashboardLayoutDefinition extends DashboardLayo
   }
 }
 
-export class ClusterConfigurationDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ClusterConfigurationDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,

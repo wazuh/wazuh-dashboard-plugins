@@ -3,7 +3,7 @@ import {
   getVisStateHorizontalBarByField,
   getVisStateHorizontalBarSplitSeries,
 } from '../../../../../../lib';
-import { DashboardByRendererConfig, DashboardLayoutDefinition } from '../../../../../../lib/dashboard-config-service';
+import { DashboardConfig, DashboardLayoutDefinition } from '../../../../../../lib/dashboard-config-service';
 import { getVisStateUniqueNetworkIPsMetric } from './vis-states';
 
 export class ITHygieneNetworksInventoriesNetworksDashboardLayoutDefinition extends DashboardLayoutDefinition {
@@ -45,7 +45,7 @@ export class ITHygieneNetworksInventoriesNetworksDashboardLayoutDefinition exten
   }
 }
 
-export class ITHygieneNetworksInventoriesNetworksDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ITHygieneNetworksInventoriesNetworksDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
