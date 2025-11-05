@@ -1002,6 +1002,6 @@ export const INDEX_PATTERN_ALERTS_REQUIRED_FIELDS = [
   FIELD_TIMESTAMP,
   'rule.id',
   'wazuh.decoders',
+  'wazuh.cluster.node',
   'agent.id',
-  'agent.name',
 ];
