@@ -60,6 +60,8 @@ async function saveVisualizationAsSavedObject(
 
   logger.debug(`Creating/updating visualization [${id}]`);
 
+  // TODO: If the visualization with that ID exists, do not overwrite it
+
   const savedVisualizationResult = await client.create(
     'visualization',
     attributes,
