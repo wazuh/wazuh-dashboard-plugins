@@ -25,7 +25,7 @@ export enum CheckResult {
   NotApplicable = 'Not applicable',
 }
 
-export const SCA_CHECK_RESULT_COLORS = {
+export const CHECK_RESULT_COLOR_MAPPING = {
   [CheckResult.Passed]: UI_COLOR_STATUS.success,
   [CheckResult.Failed]: UI_COLOR_STATUS.failed,
   [CheckResult.NotRun]: UI_COLOR_STATUS.info,

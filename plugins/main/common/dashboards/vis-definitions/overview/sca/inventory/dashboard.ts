@@ -1,7 +1,7 @@
 import {
   getVisStateHorizontalBarSplitSeries,
   getVisStateTable,
-  SCA_CHECK_RESULT_COLORS
+  CHECK_RESULT_COLOR_MAPPING
 } from '../../../../lib';
 import {
   DashboardByRendererConfig,
@@ -48,7 +48,7 @@ export class SCAInventoryDashboardLayoutDefinition extends DashboardLayoutDefini
               fieldCustomLabel: 'Check result',
               uiState: {
                 vis: {
-                  colors: SCA_CHECK_RESULT_COLORS,
+                  colors: CHECK_RESULT_COLOR_MAPPING,
                 },
               },
             },
