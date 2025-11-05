@@ -2,8 +2,8 @@ import {
   buildIndexPatternReferenceList,
   buildSearchSource,
   STYLE,
-} from '../../../../../lib';
-import type { SavedVis } from '../../../../../types';
+} from '../../../../../../lib';
+import type { SavedVis } from '../../../../../../types';
 
 /**
  *  You can apply the same logic here using ERRORS instead of DROPS. In both cases, a lower percentage indicates everything is working fine. If the percentage rises too much, it means there's a problem that needs attention.

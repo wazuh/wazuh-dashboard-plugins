@@ -1,14 +1,14 @@
 import {
   buildDashboardKPIPanels,
   getVisStateHorizontalBarSplitSeries,
-} from '../../../../../lib';
+} from '../../../../../../lib';
 import {
   DashboardByRendererConfig,
   DashboardLayoutDefinition,
-} from '../../../../../lib/dashboard-config-service';
+} from '../../../../../../lib/dashboard-config-service';
 import { getVisStateGlobalPacketLossMetric } from './vis-states';
 
-class ITHygieneNetworksInventoriesDashboardLayoutDefinition extends DashboardLayoutDefinition {
+class ITHygieneNetworksInventoriesInterfacesDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
 
@@ -55,21 +55,21 @@ class ITHygieneNetworksInventoriesDashboardLayoutDefinition extends DashboardLay
   }
 }
 
-export class ITHygieneNetworksInventoriesDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ITHygieneNetworksInventoriesInterfacesDashboardByRendererConfig extends DashboardByRendererConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new ITHygieneNetworksInventoriesDashboardLayoutDefinition(indexPatternId),
+      new ITHygieneNetworksInventoriesInterfacesDashboardLayoutDefinition(indexPatternId),
     );
   }
 
   protected override getId(): string {
-    return 'it-hygiene-networks-inventories-dashboard-tab';
+    return 'it-hygiene-networks-inventories-interfaces-dashboard-tab';
   }
   protected override getTitle(): string {
-    return 'IT Hygiene - Networks Inventories';
+    return 'IT Hygiene - Networks Inventories - Interfaces';
   }
   protected override getDescription(): string {
-    return 'Dashboard providing an overview of network inventories for IT hygiene.';
+    return 'Dashboard providing an overview of network interfaces in IT Hygiene inventories.';
   }
 }
