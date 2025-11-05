@@ -1,44 +1,7 @@
-import {
-  buildDashboardKPIPanels,
-  getVisStateHorizontalBarSplitSeries,
-  getVisStateTable,
-} from '../../../../../../../common/dashboards/lib';
+import { FimRegistryValuesDashboardByRendererConfig } from '../../../../../../../common/dashboards/vis-definitions/overview/fim/registry-values/dashboard';
 
 export const getDashboard = (indexPatternId: string) => {
-  return buildDashboardKPIPanels([
-    getVisStateTable(
-      indexPatternId,
-      'registry.path',
-      '',
-      'registry-values-inventory',
-      {
-        size: 5,
-        fieldCustomLabel: 'Top 5 registry paths',
-      },
-    ),
-    getVisStateTable(
-      indexPatternId,
-      'registry.value',
-      '',
-      'registry-values-inventory',
-      {
-        size: 5,
-        fieldCustomLabel: 'Top 5 registry values',
-      },
-    ),
-    getVisStateHorizontalBarSplitSeries(
-      indexPatternId,
-      'registry.data.type',
-      'Data types',
-      'registry-values-inventory',
-      {
-        fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Registry data type count',
-        valueAxesTitleText: ' ',
-        fieldCustomLabel: 'Registry data type',
-        seriesLabel: 'Registry data type',
-      },
-    ),
-  ]);
+  return new FimRegistryValuesDashboardByRendererConfig(
+    indexPatternId,
+  ).getDashboardPanels();
 };
