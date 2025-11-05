@@ -3,7 +3,7 @@ const {
   generateRandomWazuh,
   generateRandomAgent,
   generateRandomState,
-} = require('../shared-utils');
+} = require('../../shared-utils');
 
 function generateRandomChecksum() {
   return {

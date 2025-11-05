@@ -91,13 +91,7 @@ function getDatasets() {
     const items = fs.readdirSync(config.localDatasetDir);
     config.datasets = items.filter(item => {
       const itemPath = path.join(config.localDatasetDir, item);
-      return (
-        fs.statSync(itemPath).isDirectory() &&
-        (item.startsWith('states-') ||
-          item === 'wazuh-alerts' ||
-          item === 'agents-monitoring' ||
-          item === 'server-statistics')
-      );
+      return fs.statSync(itemPath).isDirectory();
     });
     console.log(`Found ${config.datasets.length} datasets to update.`);
   } catch (error) {

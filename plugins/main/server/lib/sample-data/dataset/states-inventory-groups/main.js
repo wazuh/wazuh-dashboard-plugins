@@ -3,7 +3,7 @@ const {
   generateRandomAgent,
   generateRandomWazuh,
   generateRandomState,
-} = require('../shared-utils');
+} = require('../../shared-utils');
 
 function generateRandomLetters(count) {
   const letters = 'abcdefghijqlmnopqrstuvwyz';

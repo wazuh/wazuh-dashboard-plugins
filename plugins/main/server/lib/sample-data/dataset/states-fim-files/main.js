@@ -3,7 +3,7 @@ const {
   generateRandomAgent,
   generateRandomWazuh,
   generateRandomState,
-} = require('../shared-utils');
+} = require('../../shared-utils');
 const {
   pathsLinux,
 } = require('../../../generate-alerts/sample-data/integrity-monitoring');

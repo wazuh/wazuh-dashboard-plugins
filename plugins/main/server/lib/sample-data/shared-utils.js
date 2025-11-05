@@ -1,4 +1,4 @@
-const random = require('../lib/random');
+const random = require('./lib/random');
 
 // ============================================================================
 // Constants - Realistic values for sample data generation
@@ -136,3 +136,4 @@ module.exports = {
   generateRandomWazuh,
   generateRandomState,
 };
+

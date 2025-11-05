@@ -3,7 +3,7 @@ const {
   generateRandomAgent,
   generateRandomWazuh,
   generateRandomState,
-} = require('../shared-utils');
+} = require('../../shared-utils');
 
 function generateRandomSerialNumber() {
   return `serial${random.int(0, 9999)}`;

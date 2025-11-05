@@ -1,5 +1,5 @@
 const random = require('../../lib/random');
-const { generateRandomState } = require('../shared-utils');
+const { generateRandomState } = require('../../shared-utils');
 
 function generateRandomHost() {
   return {

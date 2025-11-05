@@ -6,7 +6,7 @@ const {
   generateRandomAgent,
   generateRandomWazuh,
   generateRandomState,
-} = require('../shared-utils');
+} = require('../../shared-utils');
 
 const scaResults = [
   CheckResult.Passed,
