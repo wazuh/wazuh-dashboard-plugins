@@ -3,6 +3,7 @@ const {
   generateRandomAgent,
   generateRandomWazuh,
   generateRandomState,
+  generateRandomChecksum,
 } = require('../../shared-utils');
 
 function generateRandomNetwork() {
@@ -23,6 +24,7 @@ function generateRandomInterface() {
 function generateDocument(params) {
   return {
     agent: generateRandomAgent(),
+    checksum: generateRandomChecksum(),
     network: generateRandomNetwork(),
     interface: generateRandomInterface(),
     state: generateRandomState(),

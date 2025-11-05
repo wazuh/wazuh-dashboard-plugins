@@ -3,6 +3,7 @@ const {
   generateRandomWazuh,
   generateRandomAgent,
   generateRandomState,
+  generateRandomChecksum,
 } = require('../../shared-utils');
 const { Random } = require('../../../generate-alerts/helpers/random');
 const {
@@ -37,6 +38,7 @@ function generateDocument(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
     agent: generateRandomAgent(),
+    checksum: generateRandomChecksum(),
     process: generateRandomProcess(),
     state: generateRandomState(),
 
