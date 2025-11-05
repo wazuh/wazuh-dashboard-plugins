@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Wazuh-specific Field Generator for Wazuh 5.0
+ * Wazuh app - Wazuh-specific Field Generator
  * Copyright (C) 2015-2024 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -75,7 +75,7 @@ const WAZUH_RULE_IDS = {
 };
 
 /**
- * Generate wazuh field for Wazuh 5.0
+ * Generate wazuh field
  * @param {Object} options - Wazuh field options
  * @param {string} options.clusterName - Cluster name
  * @param {string} options.clusterNode - Cluster node name
@@ -201,7 +201,7 @@ function getRulesForModule(module, action = null) {
 }
 
 /**
- * Generate agent field for Wazuh 5.0
+ * Generate agent field
  * @param {Object} agentData - Agent basic data
  * @param {Object} options - Additional options
  * @returns {Object} Agent field object
@@ -221,7 +221,7 @@ function generateAgent(agentData = {}, options = {}) {
 }
 
 /**
- * Generate rule field for Wazuh 5.0
+ * Generate rule field
  * @param {Object} options - Rule options
  * @returns {Object} Rule field object
  */

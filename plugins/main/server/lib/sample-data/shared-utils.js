@@ -69,7 +69,7 @@ const ARCHITECTURES = ['x86_64', 'arm64'];
 
 /**
  * Generates a random host object with realistic values
- * @returns {Object} Random host object following Wazuh 5.0 ECS schema
+ * @returns {Object} Random host object following Wazuh ECS schema
  */
 function generateRandomHost() {
   return {
@@ -87,7 +87,7 @@ function generateRandomHost() {
 
 /**
  * Generates a random agent object with realistic values
- * @returns {Object} Random agent object following Wazuh 5.0 ECS schema
+ * @returns {Object} Random agent object following Wazuh ECS schema
  */
 function generateRandomAgent() {
   return {
@@ -118,7 +118,7 @@ function generateRandomWazuh(params) {
 }
 
 /**
- * Generates a random state object for Wazuh 5.0
+ * Generates a random state object for Wazuh
  * @returns {Object} Random state object
  */
 function generateRandomState() {

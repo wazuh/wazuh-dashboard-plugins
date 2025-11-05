@@ -80,7 +80,7 @@ const {
 } = require('./helpers/wazuh-generator');
 
 /**
- * Generate an alert in Wazuh 5.0 ECS format
+ * Generate an alert in Wazuh ECS format
  * @param {import('./types').Params} params
  * @returns {import('./types').SampleAlert}
  **/

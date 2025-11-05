@@ -1,11 +1,11 @@
 /**
  * Unit tests for generate-alerts-script
- * Tests Wazuh 5.0 Common Schema compliance
+ * Tests Wazuh Common Schema compliance
  */
 
 const { generateAlert, generateAlerts } = require('../generate-alerts-script');
 
-describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
+describe('Generate Alerts - Wazuh Common Schema', () => {
   describe('Base Alert Structure', () => {
     test('should generate alert with required top-level fields', () => {
       const alert = generateAlert({ authentication: true });

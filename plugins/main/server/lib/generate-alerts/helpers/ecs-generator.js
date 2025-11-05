@@ -1,5 +1,5 @@
 /*
- * Wazuh app - ECS Field Generator for Wazuh 5.0
+ * Wazuh app - ECS Field Generator
  * Copyright (C) 2015-2024 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
