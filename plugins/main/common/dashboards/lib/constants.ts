@@ -18,16 +18,16 @@ export const TYPES = {
   VISUALIZATION: 'visualization',
 } as const;
 
-export enum CheckResult {
-  Passed = 'Passed',
-  Failed = 'Failed',
-  NotRun = 'Not run',
-  NotApplicable = 'Not applicable',
+export enum SCA_CHECK_RESULT {
+  PASSED = 'Passed',
+  FAILED = 'Failed',
+  NOT_RUN = 'Not run',
+  NOT_APPLICABLE = 'Not applicable',
 }
 
-export const CHECK_RESULT_COLOR_MAPPING = {
-  [CheckResult.Passed]: UI_COLOR_STATUS.success,
-  [CheckResult.Failed]: UI_COLOR_STATUS.failed,
-  [CheckResult.NotRun]: UI_COLOR_STATUS.info,
-  [CheckResult.NotApplicable]: UI_COLOR_STATUS.notApplicable,
+export const SCA_CHECK_RESULT_COLOR_MAPPING = {
+  [SCA_CHECK_RESULT.PASSED]: UI_COLOR_STATUS.success,
+  [SCA_CHECK_RESULT.FAILED]: UI_COLOR_STATUS.failed,
+  [SCA_CHECK_RESULT.NOT_RUN]: UI_COLOR_STATUS.info,
+  [SCA_CHECK_RESULT.NOT_APPLICABLE]: UI_COLOR_STATUS.notApplicable,
 } as const;

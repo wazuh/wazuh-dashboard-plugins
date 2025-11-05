@@ -1,4 +1,4 @@
-import { CHECK_RESULT_COLOR_MAPPING } from "../../../../../../../common/dashboards/lib";
+import { SCA_CHECK_RESULT_COLOR_MAPPING } from "../../../../../../../common/dashboards/lib";
 import { getCore } from '../../../../../../kibana-services';
 
 const core = getCore();
@@ -41,7 +41,7 @@ export const decimalFormat = () => {
 
 export const checkResultColors = () => {
   const colors = {
-    ...CHECK_RESULT_COLOR_MAPPING,
+    ...SCA_CHECK_RESULT_COLOR_MAPPING,
     checkScoreColor: core.uiSettings.get('theme:darkMode')
       ? '#dfe5ef'
       : '#333333',
