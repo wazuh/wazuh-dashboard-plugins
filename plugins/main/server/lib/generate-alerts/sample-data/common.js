@@ -215,16 +215,16 @@ module.exports.GEO_LOCATION = [
 ];
 
 module.exports.AS_DATA = [
-  { number: 15169, organization: 'Google LLC' },
-  { number: 16509, organization: 'Amazon.com, Inc.' },
-  { number: 8075, organization: 'Microsoft Corporation' },
-  { number: 32934, organization: 'Facebook, Inc.' },
-  { number: 13335, organization: 'Cloudflare, Inc.' },
-  { number: 20940, organization: 'Akamai International B.V.' },
-  { number: 714, organization: 'Apple Inc.' },
-  { number: 46489, organization: 'Twitch Interactive Inc.' },
-  { number: 2906, organization: 'Netflix Streaming Services Inc.' },
-  { number: 45102, organization: 'Alibaba (US) Technology Co., Ltd.' },
+  { number: 15169, organization: 'TechCorp Global LLC' },
+  { number: 16509, organization: 'CloudVendor Services Inc.' },
+  { number: 8075, organization: 'DataSystems Corporation' },
+  { number: 32934, organization: 'SocialNet Technologies Inc.' },
+  { number: 13335, organization: 'SecureEdge Networks Inc.' },
+  { number: 20940, organization: 'ContentDelivery International B.V.' },
+  { number: 714, organization: 'Innovation Tech Inc.' },
+  { number: 46489, organization: 'StreamMedia Interactive Inc.' },
+  { number: 2906, organization: 'VideoStreaming Services Inc.' },
+  { number: 45102, organization: 'GlobalTrade Technology Co., Ltd.' },
 ];
 
 // Domains for URL and HTTP events
