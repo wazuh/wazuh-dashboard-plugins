@@ -3,7 +3,7 @@ const {
 } = require('../../../generate-alerts/helpers/date-formatter');
 const { Random } = require('../../../generate-alerts/helpers/random');
 const random = require('../../lib/random');
-const { version: packageVersion } = require('../../../../package.json');
+const { version: packageVersion } = require('../../../../../package.json');
 
 function generateDocument(params) {
   // Based on 4.x data from server API
