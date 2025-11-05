@@ -1,7 +1,7 @@
 import {
   DashboardByRendererConfig,
   DashboardLayoutDefinition,
-} from '../../../../../../lib/dashboard-builder';
+} from '../../../../../../lib/dashboard-config-service';
 import {
   getVisStateOfficeAlertsEvolutionByUser,
   getVisStateOfficeClientIPOperationLevelTable,

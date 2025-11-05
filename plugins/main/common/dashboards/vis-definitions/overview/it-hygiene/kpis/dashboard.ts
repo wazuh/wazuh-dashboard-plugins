@@ -5,7 +5,7 @@ import {
 import {
   DashboardByRendererConfig,
   DashboardLayoutDefinition,
-} from '../../../../lib/dashboard-builder';
+} from '../../../../lib/dashboard-config-service';
 import { getVisStateHostsTotalFreeMemoryTable } from '../vis-states';
 
 export class ITHygieneKPIsDashboardLayoutDefinition extends DashboardLayoutDefinition {

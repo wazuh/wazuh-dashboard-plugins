@@ -1,4 +1,4 @@
-import { DashboardByRendererConfig, DashboardLayoutDefinition } from '../../../../../../lib/dashboard-builder';
+import { DashboardByRendererConfig, DashboardLayoutDefinition } from '../../../../../../lib/dashboard-config-service';
 import {
   getVisStateOfficeAlertsEvolutionByUserID,
   getVisStateOfficeCountryTagCloud,

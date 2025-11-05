@@ -1,2 +1,2 @@
-export * from './lib/dashboard-builder';
+export * from './lib/dashboard-config-service';
 export * from './types';
