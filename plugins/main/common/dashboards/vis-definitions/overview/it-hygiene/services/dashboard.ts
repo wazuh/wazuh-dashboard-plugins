@@ -49,12 +49,12 @@ export class ITHygieneServicesDashboardByRendererConfig extends DashboardByRende
   }
 
   protected override getId(): string {
-    return 'it-hygiene-packages-inventories-services-dashboard-tab';
+    return 'it-hygiene-services-dashboard-tab';
   }
   protected override getTitle(): string {
-    return 'IT Hygiene - Packages Inventories - Services';
+    return 'IT Hygiene - Services';
   }
   protected override getDescription(): string {
-    return 'Dashboard of IT Hygiene Packages Inventories - Services';
+    return 'Dashboard of IT Hygiene Services';
   }
 }
