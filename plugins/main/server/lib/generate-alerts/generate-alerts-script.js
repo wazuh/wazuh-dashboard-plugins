@@ -119,8 +119,8 @@ function generateAlert(params) {
 
     // Wazuh-specific fields
     wazuh: generateWazuhField({
-      clusterName: params.cluster?.name || 'wazuh-cluster',
-      clusterNode: params.cluster?.node || null,
+      clusterName: params.cluster?.name,
+      clusterNode: params.cluster?.node,
     }),
 
     // Rule information

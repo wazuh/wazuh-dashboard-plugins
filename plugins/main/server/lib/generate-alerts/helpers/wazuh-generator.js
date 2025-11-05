@@ -87,7 +87,7 @@ const WAZUH_RULE_IDS = {
 function generateWazuhField(options = {}) {
   const {
     clusterName = 'wazuh-cluster',
-    clusterNode = null,
+    clusterNode = 'wazuh-cluster-node-01',
     decoders = [],
     rules = [],
     schemaVersion = WAZUH_SCHEMA_VERSION,
@@ -96,16 +96,12 @@ function generateWazuhField(options = {}) {
   const wazuh = {
     cluster: {
       name: clusterName,
+      node: clusterNode,
     },
     schema: {
       version: schemaVersion,
     },
   };
-
-  // Add cluster node if provided
-  if (clusterNode) {
-    wazuh.cluster.node = clusterNode;
-  }
 
   // Ensure decoders is an array
   if (decoders && decoders.length > 0) {
