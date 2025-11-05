@@ -72,6 +72,6 @@ export class ITHygieneNetworksInventoriesProtocolsDashboardByRendererConfig exte
     return 'IT Hygiene - Networks Inventories - Protocols';
   }
   protected override getDescription(): string {
-    return 'Dashboard of network protocols in IT hygiene context';
+    return 'Dashboard of IT Hygiene Networks Inventories - Protocols';
   }
 }

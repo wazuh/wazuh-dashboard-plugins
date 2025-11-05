@@ -70,6 +70,6 @@ export class ITHygieneNetworksInventoriesInterfacesDashboardByRendererConfig ext
     return 'IT Hygiene - Networks Inventories - Interfaces';
   }
   protected override getDescription(): string {
-    return 'Dashboard providing an overview of network interfaces in IT Hygiene inventories.';
+    return 'Dashboard of IT Hygiene Networks Inventories - Interfaces.';
   }
 }
