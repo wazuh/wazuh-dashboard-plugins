@@ -4,6 +4,7 @@
  */
 
 const { generateAlert, generateAlerts } = require('../generate-alerts-script');
+const { version: packageVersion } = require('../../../package.json');
 
 describe('Generate Alerts - Wazuh Common Schema', () => {
   describe('Base Alert Structure', () => {
@@ -99,7 +100,7 @@ describe('Generate Alerts - Wazuh Common Schema', () => {
       expect(alert.agent).toHaveProperty('id');
       expect(alert.agent).toHaveProperty('name');
       expect(alert.agent).toHaveProperty('version');
-      expect(alert.agent.version).toBe('v5.0.0');
+      expect(alert.agent.version).toBe(`v${packageVersion}`);
     });
 
     test('should have agent.host with required fields', () => {

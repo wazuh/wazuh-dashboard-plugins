@@ -114,7 +114,6 @@ function generateAlert(params) {
 
     agent: generateAgent(selectedAgent, {
       groups: ['default'],
-      version: 'v5.0.0',
     }),
 
     // Wazuh-specific fields

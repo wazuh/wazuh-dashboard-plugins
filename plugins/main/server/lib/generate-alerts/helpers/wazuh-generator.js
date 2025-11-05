@@ -11,6 +11,7 @@
  */
 
 const { Random } = require('./random');
+const { version: packageVersion } = require('../../../../package.json');
 
 /**
  * Wazuh schema version
@@ -205,7 +206,7 @@ function getRulesForModule(module, action = null) {
 function generateAgent(agentData = {}, options = {}) {
   const { generateHost } = require('./ecs-generator');
 
-  const { groups = ['default'], version = 'v5.0.0' } = options;
+  const { groups = ['default'], version = `v${packageVersion}` } = options;
 
   return {
     id: agentData.id || '000',
