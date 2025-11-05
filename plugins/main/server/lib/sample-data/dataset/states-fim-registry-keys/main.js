@@ -3,20 +3,8 @@ const {
   generateRandomWazuh,
   generateRandomAgent,
   generateRandomState,
+  generateRandomChecksum,
 } = require('../../shared-utils');
-
-function generateRandomChecksum() {
-  return {
-    hash: {
-      sha1: random.choice([
-        '6853b29eef33ff39d8b63911673cf7b078f95485',
-        'c3499c2729730a7f807efb8676a92dcb6f8a3f8f',
-        'a80ed2ef79e22f1d8af817cea1dbbf01bef516cc',
-        '272ae13f02a9c805923917a42d2f27bd02654dec',
-      ]),
-    },
-  };
-}
 
 function generateRandomRegistry() {
   return {

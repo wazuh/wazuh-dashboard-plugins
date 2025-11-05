@@ -3,6 +3,7 @@ const {
   generateRandomAgent,
   generateRandomWazuh,
   generateRandomState,
+  generateRandomChecksum,
 } = require('../../shared-utils');
 
 function generateRandomHostPorts() {
@@ -44,6 +45,7 @@ function generateDocument(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
     agent: generateRandomAgent(),
+    checksum: generateRandomChecksum(),
     destination: generateRandomDestination(),
     file: generateRandomFile(),
     host: generateRandomHostPorts(),

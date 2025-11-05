@@ -130,10 +130,27 @@ function generateRandomState() {
   };
 }
 
+/**
+ * Generates a random checksum object
+ * @returns {Object} Random checksum object with SHA1 hash
+ */
+function generateRandomChecksum() {
+  const hexChars = 'ABCDEF0123456789';
+  let sha1 = '';
+  for (let i = 0; i < 40; i++) {
+    sha1 += hexChars[random.int(0, hexChars.length - 1)];
+  }
+  return {
+    hash: {
+      sha1: sha1,
+    },
+  };
+}
+
 module.exports = {
   generateRandomAgent,
   generateRandomHost,
   generateRandomWazuh,
   generateRandomState,
+  generateRandomChecksum,
 };
-
