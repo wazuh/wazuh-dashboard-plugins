@@ -58,7 +58,7 @@ export class WazuhCorePlugin
 
     // add the initializer context config to the configuration store
     this._internal.configurationStore.registerProvider(
-      EConfigurationProviders.PLUGIN_UI_SETTINGS,
+      EConfigurationProviders.INITIALIZER_CONTEXT,
       new InitializerConfigProvider(this.initializerContext),
     );
 
