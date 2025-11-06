@@ -1,8 +1,8 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
-  DockerPinnedAgentDashboardConfig,
   DockerOverviewDashboardConfig,
-} from '../../../../../common/dashboards/dashboard-definitions/overview/docker/dashboard';
+} from '../../../../../common/dashboards/dashboard-definitions/overview/docker/overview/dashboard';
+import { DockerPinnedAgentDashboardConfig } from "../../../../../common/dashboards/dashboard-definitions/overview/docker/pinned-agent/dashboard";
 
 export const getDashboardPanels = (
   indexPatternId: string,
