@@ -1,8 +1,8 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
   GoogleCloudOverviewDashboardConfig,
-  GoogleCloudPinnedAgentDashboardConfig,
-} from '../../../../../common/dashboards/dashboard-definitions/overview/google-cloud/dashboard';
+} from '../../../../../common/dashboards/dashboard-definitions/overview/google-cloud/overview/dashboard';
+import { GoogleCloudPinnedAgentDashboardConfig } from "../../../../../common/dashboards/dashboard-definitions/overview/google-cloud/pinned-agent/dashboard";
 
 export const getDashboardPanels = (
   indexPatternId: string,

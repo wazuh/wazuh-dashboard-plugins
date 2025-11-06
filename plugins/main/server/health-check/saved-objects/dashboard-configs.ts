@@ -30,8 +30,7 @@ import { GithubDrilldownOrganizationDashboardConfig } from '../../../common/dash
 import { GithubDrilldownRepositoryDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/github/drilldowns/repository/dashboard';
 import {
   GoogleCloudOverviewDashboardConfig,
-  GoogleCloudPinnedAgentDashboardConfig,
-} from '../../../common/dashboards/dashboard-definitions/overview/google-cloud/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/google-cloud/overview/dashboard';
 import {
   HipaaPinnedAgentDashboardConfig,
   HipaaOverviewDashboardConfig,
@@ -95,6 +94,7 @@ import { GithubPinnedAgentDashboardConfig } from "../../../common/dashboards/das
 import { AWSPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/aws/pinned-agent/dashboard";
 import { AzurePinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/azure/pinned-agent/dashboard";
 import { DockerPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/docker/pinned-agent/dashboard";
+import { GoogleCloudPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/google-cloud/pinned-agent/dashboard";
 
 export const getDashboardConfigs = (): DashboardConfig[] => {
   const wazuhDiscoverDashboardConfig = new WazuhDiscoverDashboardConfig(
