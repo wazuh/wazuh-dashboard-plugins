@@ -8,7 +8,7 @@ export const getVisStateNetworkMetricsMinMax = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'it-hygiene-network-metrics-min-max',
+    id: 'wz-vis-it-hygiene-network-metrics-min-max',
     type: 'metric',
     params: {
       addTooltip: true,

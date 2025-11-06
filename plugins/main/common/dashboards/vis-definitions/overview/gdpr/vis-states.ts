@@ -8,7 +8,7 @@ export const getVisStateTopAgentsByAlertsCount = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-gdpr-agents',
+    id: 'wz-vis-overview-gdpr-agents',
     title: 'Top 10 agents by alerts number',
     type: 'pie',
     params: {
@@ -49,7 +49,7 @@ export const getVisStateTopAgentsByAlertsCount = (
 
 export const getVisStateRequirements = (indexPatternId: string): SavedVis => {
   return {
-    id: 'overview-gdpr-requirements',
+    id: 'wz-vis-overview-gdpr-requirements',
     title: 'GDPR requirements',
     type: 'line',
     params: {
@@ -196,7 +196,7 @@ export const getVisStateRequirementsOverTime = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-gdpr-requirements-heatmap',
+    id: 'wz-vis-overview-gdpr-requirements-heatmap',
     title: 'Top requirements over time',
     type: 'area',
     params: {
@@ -303,7 +303,7 @@ export const getVisStateRequirementsHeatmap = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-gdpr-requirements-agents',
+    id: 'wz-vis-overview-gdpr-requirements-agents',
     title: 'Last alerts',
     type: 'heatmap',
     params: {
@@ -404,7 +404,7 @@ export const getVisStateRequirementsByAgent = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-gdpr-requirements-by-agent',
+    id: 'wz-vis-overview-gdpr-requirements-by-agent',
     title: 'Requirements by agent',
     type: 'histogram',
     params: {
@@ -497,7 +497,7 @@ export const getVisStateRequirementsByAgent = (
 
 export const getVisStateTopRuleGroups = (indexPatternId: string): SavedVis => {
   return {
-    id: 'agents-gdpr-groups',
+    id: 'wz-vis-agents-gdpr-groups',
     title: 'Top 5 rule groups',
     type: 'pie',
     params: {
@@ -532,7 +532,7 @@ export const getVisStateTopRuleGroups = (indexPatternId: string): SavedVis => {
 
 export const getVisStateTopRules = (indexPatternId: string): SavedVis => {
   return {
-    id: 'agents-gdpr-rule',
+    id: 'wz-vis-agents-gdpr-rule',
     title: 'Top 5 rules',
     type: 'pie',
     params: {
@@ -569,7 +569,7 @@ export const getVisStateAgentTopRequirements = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-gdpr-requirement',
+    id: 'wz-vis-agents-gdpr-requirement',
     title: 'Top 5 requirements',
     type: 'pie',
     params: {
@@ -601,7 +601,7 @@ export const getVisStateAgentTopRequirementsCount = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-gdpr-requirements',
+    id: 'wz-vis-agents-gdpr-requirements',
     title: 'GDPR Requirements',
     type: 'histogram',
     params: {
@@ -690,7 +690,7 @@ export const getVisStateAgentRuleLevelDistribution = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-gdpr-rule-level-distribution',
+    id: 'wz-vis-agents-gdpr-rule-level-distribution',
     title: 'Rule level distribution',
     type: 'pie',
     params: {

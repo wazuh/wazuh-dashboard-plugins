@@ -8,7 +8,7 @@ export const getVisStateAlertsEvolution = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-mitre-alerts-evolution',
+    id: 'wz-vis-overview-mitre-alerts-evolution',
     title: 'Alerts evolution over time',
     type: 'line',
     params: {
@@ -154,7 +154,7 @@ export const getVisStateAlertsEvolution = (
 
 export const getVisStateTopTactics = (indexPatternId: string): SavedVis => {
   return {
-    id: 'overview-mitre-top-tactics',
+    id: 'wz-vis-overview-mitre-top-tactics',
     title: 'Top tactics',
     type: 'pie',
     params: {
@@ -229,7 +229,7 @@ export const getVisStateAttacksByTechnique = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-mitre-attacks-by-technique',
+    id: 'wz-vis-overview-mitre-attacks-by-technique',
     title: 'Attacks by technique',
     type: 'histogram',
     params: {
@@ -363,7 +363,7 @@ export const getVisStateTopTacticsByAgent = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-mitre-top-tactics-by-agent',
+    id: 'wz-vis-overview-mitre-top-tactics-by-agent',
     title: 'Top tactics by agent',
     type: 'area',
     params: {
@@ -510,7 +510,7 @@ export const getVisStateTechniqueByAgent = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-mitre-attacks-by-agent',
+    id: 'wz-vis-overview-mitre-attacks-by-agent',
     title: 'Mitre techniques by agent',
     type: 'pie',
     params: {
@@ -586,7 +586,7 @@ export const getVisStateAlertsLevelByAttack = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-mitre-level-by-attack',
+    id: 'wz-vis-agents-mitre-level-by-attack',
     title: 'Rule level by attack',
     type: 'pie',
     params: {
@@ -705,7 +705,7 @@ export const getVisStateMitreAttacksByTactic = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-mitre-attacks-by-tactic',
+    id: 'wz-vis-agents-mitre-attacks-by-tactic',
     title: 'MITRE attacks by tactic',
     type: 'histogram',
     params: {
@@ -839,7 +839,7 @@ export const getVisStateAlertsLevelByTactic = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-mitre-level-by-tactic',
+    id: 'wz-vis-agents-mitre-level-by-tactic',
     title: 'Rule level by tactic',
     type: 'pie',
     params: {

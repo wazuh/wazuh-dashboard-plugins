@@ -8,7 +8,7 @@ export const getVisStateOfficeMetricStats = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-office-metric-stats',
+    id: 'wz-vis-overview-office-metric-stats',
     title: 'Stats',
     type: 'metric',
     params: {
@@ -79,7 +79,7 @@ export const getVisStateOfficeTopsEventsPie = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-office-top-events',
+    id: 'wz-vis-overview-office-top-events',
     title: 'Top Events',
     type: 'pie',
     params: {
@@ -152,7 +152,7 @@ export const getVisStateOfficeUserOperationLevel = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-office-user-operation-level-table',
+    id: 'wz-vis-overview-office-user-operation-level-table',
     title: 'User Operations',
     type: 'table',
     params: {
@@ -241,7 +241,7 @@ export const getVisStateOfficeAlertsEvolutionByUser = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-office-alerts-evolution-by-user',
+    id: 'wz-vis-overview-office-alerts-evolution-by-user',
     title: 'Alerts evolution over time',
     type: 'line',
     params: {
@@ -377,7 +377,7 @@ export const getVisStateOfficeAlertsEvolutionByUser = (
 
 export const getVisStateTopOfficeUsers = (indexPatternId: string): SavedVis => {
   return {
-    id: 'overview-office-top-users',
+    id: 'wz-vis-overview-office-top-users',
     title: 'Top Office Users',
     type: 'pie',
     params: {
@@ -432,7 +432,7 @@ export const getVisStateOfficeCountryTagCloud = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-office-country-tag-cloud',
+    id: 'wz-vis-overview-office-country-tag-cloud',
     title: 'Country of origin',
     type: 'tagcloud',
     params: {
@@ -481,7 +481,7 @@ export const getVisStateOfficeAlertsEvolutionByUserID = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-office-alerts-evolution-by-userid',
+    id: 'wz-vis-overview-office-alerts-evolution-by-userid',
     title: 'Alerts by user',
     type: 'line',
     params: {
@@ -622,7 +622,7 @@ export const getVisStateOfficeTopOperations = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-office-top-operations',
+    id: 'wz-vis-overview-office-top-operations',
     title: 'Top Operations',
     type: 'pie',
     params: {
@@ -678,7 +678,7 @@ export const getVisStateOfficeClientIPOperationLevelTable = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-office-client-ip-operation-level-table',
+    id: 'wz-vis-overview-office-client-ip-operation-level-table',
     title: 'Client IP Operations',
     type: 'table',
     params: {

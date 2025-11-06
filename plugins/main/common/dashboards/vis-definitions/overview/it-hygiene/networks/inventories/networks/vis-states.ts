@@ -9,7 +9,7 @@ export const getVisStateUniqueNetworkIPsMetric = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'it-hygiene-network-by-ip',
+    id: 'wz-vis-it-hygiene-network-by-ip',
     title: 'Unique network IPs',
     type: 'metric',
     params: {

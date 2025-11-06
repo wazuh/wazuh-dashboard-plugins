@@ -107,7 +107,7 @@ export const getVisStateEventsSourceByOverTime = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-docker-events-by-source-over-time',
+    id: 'wz-vis-overview-docker-events-by-source-over-time',
     title: 'Events by source over time',
     type: 'histogram',
     params: {
@@ -241,7 +241,7 @@ export const getVisStateEventsSourceByOverTime = (
 
 export const getVisStateEvents = (indexPatternId: string): SavedVis => {
   return {
-    id: 'overview-docker-events',
+    id: 'wz-vis-overview-docker-events',
     title: 'Events',
     type: 'table',
     params: {
@@ -501,7 +501,7 @@ export const getVisStateAgentResourcesUsageByOverTime = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-docker-types-over-time',
+    id: 'wz-vis-agents-docker-types-over-time',
     title: 'Resources usage over time',
     type: 'histogram',
     params: {
@@ -605,7 +605,7 @@ export const getVisStateAgentResourcesUsageByOverTime = (
 
 export const getVisStateAgentEvents = (indexPatternId: string): SavedVis => {
   return {
-    id: 'agents-docker-actions-over-time',
+    id: 'wz-vis-agents-docker-actions-over-time',
     title: 'Events occurred evolution',
     type: 'area',
     params: {

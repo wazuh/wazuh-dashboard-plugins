@@ -12,7 +12,7 @@ export const getVisStateGlobalPacketLossMetric = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'it-hygiene-network-interfaces-global-packet-loss-rate',
+    id: 'wz-vis-it-hygiene-network-interfaces-global-packet-loss-rate',
     title: 'Average packet loss rate',
     type: 'metric',
     params: {

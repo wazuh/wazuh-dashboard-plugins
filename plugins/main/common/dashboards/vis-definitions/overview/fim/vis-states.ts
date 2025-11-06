@@ -8,7 +8,7 @@ export const getVisStateFIMAlertsByActionOverTime = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-fim-alerts-by-action-over-time',
+    id: 'wz-vis-overview-fim-alerts-by-action-over-time',
     title: 'Alerts by action over time',
     type: 'area',
     params: {
@@ -168,7 +168,7 @@ export const getVisStateFIMEventsSummary = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-fim-events-summary',
+    id: 'wz-vis-overview-fim-events-summary',
     title: 'Events summary',
     type: 'line',
     params: {
@@ -295,7 +295,7 @@ export const getVisStateFIMCommonActions = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-fim-common-actions',
+    id: 'wz-vis-overview-fim-common-actions',
     title: 'Actions',
     type: 'pie',
     params: {
@@ -348,7 +348,7 @@ export const getVisStateFIMTopAgentsUser = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-fim-top-agents-user',
+    id: 'wz-vis-overview-fim-top-agents-user',
     title: 'Top 5 users',
     type: 'table',
     params: {
@@ -451,7 +451,7 @@ export const getVisStateFIMTopAgentsUser = (
 
 export const getVisStateAgentFIMUsers = (indexPatternId: string): SavedVis => {
   return {
-    id: 'agents-fim-users',
+    id: 'wz-vis-agents-fim-users',
     title: 'Most active users',
     type: 'pie',
     params: {
@@ -499,7 +499,7 @@ export const getVisStateAgentFIMActions = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-fim-actions',
+    id: 'wz-vis-agents-fim-actions',
     title: 'Actions',
     type: 'pie',
     params: {
@@ -545,7 +545,7 @@ export const getVisStateAgentFIMActions = (
 
 export const getVisStateAgentFIMEvents = (indexPatternId: string): SavedVis => {
   return {
-    id: 'agents-fim-events',
+    id: 'wz-vis-agents-fim-events',
     title: 'Events',
     type: 'line',
     params: {
@@ -682,7 +682,7 @@ export const getVisStateAgentFIMFilesAdded = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-fim-files-added',
+    id: 'wz-vis-agents-fim-files-added',
     title: 'Files added',
     type: 'pie',
     params: {
@@ -760,7 +760,7 @@ export const getVisStateAgentFIMFilesModified = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-fim-files-modified',
+    id: 'wz-vis-agents-fim-files-modified',
     title: 'Files modified',
     type: 'pie',
     params: {
@@ -832,7 +832,7 @@ export const getVisStateAgentFIMFilesDeleted = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-fim-files-deleted',
+    id: 'wz-vis-agents-fim-files-deleted',
     title: 'Files deleted',
     type: 'pie',
     params: {

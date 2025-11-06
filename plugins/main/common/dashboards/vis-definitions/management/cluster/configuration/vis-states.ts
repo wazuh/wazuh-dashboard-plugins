@@ -6,7 +6,7 @@ import type { SavedVis } from '../../../../types';
 
 export const getVisStateTop5Nodes = (indexPatternId: string): SavedVis => {
   return {
-    id: 'cluster-monitoring-overview-node',
+    id: 'wz-vis-cluster-monitoring-overview-node',
     title: 'Top 5 nodes',
     type: 'pie',
     params: {

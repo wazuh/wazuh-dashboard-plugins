@@ -6,7 +6,7 @@ import type { SavedVis } from '../../../../../types';
 
 export const getVisStateTopActions = (indexPatternId: string): SavedVis => {
   return {
-    id: 'overview-github-top-ten-actions',
+    id: 'wz-vis-overview-github-top-ten-actions',
     title: 'Top 10 Actions',
     type: 'pie',
     params: {
@@ -61,7 +61,7 @@ export const getVisStateTopActions = (indexPatternId: string): SavedVis => {
 
 export const getVisStateTopActors = (indexPatternId: string): SavedVis => {
   return {
-    id: 'overview-github-top-ten-actors',
+    id: 'wz-vis-overview-github-top-ten-actors',
     title: 'Top 10 Actors',
     type: 'pie',
     params: {
@@ -117,7 +117,7 @@ export const getVisStateTopRepositories = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-github-top-ten-repositories',
+    id: 'wz-vis-overview-github-top-ten-repositories',
     title: 'Top 10 Repositories',
     type: 'pie',
     params: {
@@ -173,7 +173,7 @@ export const getVisStateTopOrganizations = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-github-top-ten-organizations',
+    id: 'wz-vis-overview-github-top-ten-organizations',
     title: 'Top 10 Organizations',
     type: 'pie',
     params: {
@@ -227,7 +227,7 @@ export const getVisStateTopOrganizations = (
 
 export const getVisStateTopCountries = (indexPatternId: string): SavedVis => {
   return {
-    id: 'overview-github-countries',
+    id: 'wz-vis-overview-github-countries',
     title: 'Countries',
     type: 'tagcloud',
     params: {
@@ -277,7 +277,7 @@ export const getVisStateRuleLevelEvolution = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-github-alert-level-evolution',
+    id: 'wz-vis-overview-github-alert-level-evolution',
     title: 'Alert level evolution',
     type: 'area',
     params: {

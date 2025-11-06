@@ -8,7 +8,7 @@ export const getVisStateEventsBySeverity = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-office-rule-level',
+    id: 'wz-vis-overview-office-rule-level',
     title: 'Events by severity over time',
     type: 'area',
     params: {
@@ -141,7 +141,7 @@ export const getVisStateEventsBySeverity = (
 
 export const getVisStateIPsByUser = (indexPatternId: string): SavedVis => {
   return {
-    id: 'overview-office-ips-by-user',
+    id: 'wz-vis-overview-office-ips-by-user',
     title: 'IP address by Users',
     type: 'horizontal_bar',
     params: {
@@ -278,7 +278,7 @@ export const getVisStateTopUserBySubcription = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-office-top-users-by-subscription',
+    id: 'wz-vis-overview-office-top-users-by-subscription',
     title: 'Top Users By Subscription',
     type: 'histogram',
     params: {
@@ -411,7 +411,7 @@ export const getVisStateUsersByOperationResult = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-office-user-by-operation-result',
+    id: 'wz-vis-overview-office-user-by-operation-result',
     title: 'Users by Operation Result',
     type: 'table',
     params: {
@@ -495,7 +495,7 @@ export const getVisStateUsersByOperationResult = (
 
 export const getVisStateSeverityByUser = (indexPatternId: string): SavedVis => {
   return {
-    id: 'overview-office-severity-by-user',
+    id: 'wz-vis-overview-office-severity-by-user',
     title: 'Severity by user',
     type: 'histogram',
     params: {
@@ -627,7 +627,7 @@ export const getVisStateRuleDescription = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-office-rule-description-level-table',
+    id: 'wz-vis-overview-office-rule-description-level-table',
     title: 'Rule Description by Level',
     type: 'table',
     params: {
@@ -694,7 +694,7 @@ export const getVisStateRuleDescription = (
 
 export const getVisStateOfficeMap = (indexPatternId: string): SavedVis => {
   return {
-    id: 'overview-office-location',
+    id: 'wz-vis-overview-office-location',
     title: 'Geolocation map',
     type: 'tile_map',
     params: {

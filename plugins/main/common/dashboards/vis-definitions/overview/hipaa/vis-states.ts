@@ -8,7 +8,7 @@ export const getVisStateAlertsVolumeByAgent = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-hipaa-heatmap',
+    id: 'wz-vis-overview-hipaa-heatmap',
     title: 'Alerts volume by agent',
     type: 'heatmap',
     params: {
@@ -140,7 +140,7 @@ export const getVisStateAlertsVolumeByAgent = (
 
 export const getVisStateTagsCloud = (indexPatternId: string): SavedVis => {
   return {
-    id: 'overview-hipaa-tag-cloud',
+    id: 'wz-vis-overview-hipaa-tag-cloud',
     title: 'Most common alerts',
     type: 'tagcloud',
     params: {
@@ -316,7 +316,7 @@ export const getVisStateMostActiveAgents = (
 
 export const getVisStateStats = (indexPatternId: string): SavedVis => {
   return {
-    id: 'overview-hipaa-metrics',
+    id: 'wz-vis-overview-hipaa-metrics',
     title: 'Stats',
     type: 'metric',
     params: {
@@ -396,7 +396,7 @@ export const getVisStateRequirementsOverTime2 = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-hipaa-top-requirements-over-time',
+    id: 'wz-vis-overview-hipaa-top-requirements-over-time',
     title: 'Requirements evolution over time',
     type: 'histogram',
     params: {
@@ -665,7 +665,7 @@ export const getVisStateAgentRequirementsOvertime = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-hipaa-requirements-stacked-overtime',
+    id: 'wz-vis-agents-hipaa-requirements-stacked-overtime',
     title: 'Requirements over time',
     type: 'histogram',
     params: {
@@ -869,7 +869,7 @@ export const getVisStateAgentRequirements = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-hipaa-bubbles',
+    id: 'wz-vis-agents-hipaa-bubbles',
     title: 'HIPAA requirements',
     type: 'line',
     params: {
@@ -1026,7 +1026,7 @@ export const getVisStateAgentRuleLevelDistribution = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-hipaa-distributed-by-level',
+    id: 'wz-vis-agents-hipaa-distributed-by-level',
     title: 'Requirements distribution by level',
     type: 'histogram',
     params: {
@@ -1169,7 +1169,7 @@ export const getVisStateAgentCommonAlerts = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-hipaa-most-common',
+    id: 'wz-vis-agents-hipaa-most-common',
     title: 'Most common alerts',
     type: 'tagcloud',
     params: {

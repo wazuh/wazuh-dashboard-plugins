@@ -8,7 +8,7 @@ export const getVisStateAlertsEvolutionByOrganization = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-github-alerts-evolution-by-organization',
+    id: 'wz-vis-overview-github-alerts-evolution-by-organization',
     title: 'Alerts evolution by organization',
     type: 'area',
     params: {
@@ -199,7 +199,7 @@ export const getVisStateActionTypeByOrganization = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-github-alert-action-type-by-organization',
+    id: 'wz-vis-overview-github-alert-action-type-by-organization',
     title: 'Top alerts by action type and organization',
     type: 'pie',
     params: {
@@ -268,7 +268,7 @@ export const getVisStateUsersWithMoreAlerts = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-github-users-with-more-alerts',
+    id: 'wz-vis-overview-github-users-with-more-alerts',
     title: 'Users with more alerts',
     type: 'line',
     params: {
@@ -400,7 +400,7 @@ export const getVisStateAgentAlertsEvolutionByOrganization = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-github-alerts-evolution-by-organization',
+    id: 'wz-vis-agents-github-alerts-evolution-by-organization',
     title: 'Alerts evolution by organization',
     type: 'area',
     params: {
@@ -591,7 +591,7 @@ export const getVisStateAgentActionTypeByOrganization = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-github-alert-action-type-by-organization',
+    id: 'wz-vis-agents-github-alert-action-type-by-organization',
     title: 'Top alerts by action type and organization',
     type: 'pie',
     params: {
@@ -660,7 +660,7 @@ export const getVisStateAgentUsersWithMoreAlerts = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-github-users-with-more-alerts',
+    id: 'wz-vis-agents-github-users-with-more-alerts',
     title: 'Users with more alerts',
     type: 'line',
     params: {
@@ -792,7 +792,7 @@ export const getVisStateMetricOrganizationsCount = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'wazuh-github-metric-organizations-count',
+    id: 'wz-vis-github-metric-organizations-count',
     title: '',
     type: 'metric',
     params: {
@@ -851,7 +851,7 @@ export const getVisStateMetricRepositoriesCount = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'wazuh-github-metric-repositories-count',
+    id: 'wz-vis-github-metric-repositories-count',
     title: '',
     type: 'metric',
     params: {
@@ -911,7 +911,7 @@ export const getVisStateMetricActorsCount = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'wazuh-github-metric-actors-count',
+    id: 'wz-vis-github-metric-actors-count',
     title: '',
     type: 'metric',
     params: {

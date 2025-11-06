@@ -11,7 +11,7 @@ export const getVisStateClusterAlertsSummary = (
   let expression = `.es(index=${indexPattern.title},q="cluster.name: ${clusterName}").label("${clusterName} cluster")`;
   expression = expression.replace(/'/g, '"');
   return {
-    id: 'cluster-monitoring-overview-manager',
+    id: 'wz-vis-cluster-monitoring-overview-manager',
     title: 'Cluster alerts summary',
     type: 'timelion',
     params: { expression, interval: 'auto' },
@@ -35,7 +35,7 @@ export const getVisStateAlertsByNodeSummary = (
   expression = expression.substring(0, expression.length - 1);
   expression = expression.replace(/'/g, '"');
   return {
-    id: 'cluster-monitoring-overview',
+    id: 'wz-vis-cluster-monitoring-overview',
     title: 'Alerts by node summary',
     type: 'timelion',
     params: { expression, interval: 'auto' },

@@ -8,7 +8,7 @@ export const getVisStateMostActiveAgents = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-nist-agents',
+    id: 'wz-vis-overview-nist-agents',
     title: 'Most active agents',
     type: 'pie',
     params: {
@@ -85,7 +85,7 @@ export const getVisStateRequirementsOverTime = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-nist-requirements-over-time',
+    id: 'wz-vis-overview-nist-requirements-over-time',
     title: 'Top 10 requirements over time',
     type: 'histogram',
     params: {
@@ -227,7 +227,7 @@ export const getVisStateRequirementsByAgents = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-nist-requirements-by-agents',
+    id: 'wz-vis-overview-nist-requirements-by-agents',
     title: 'Requirements distribution by agent',
     type: 'area',
     params: {
@@ -369,7 +369,7 @@ export const getVisStateRequirementsAgentsHeatmap = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-nist-requirements-agents-heatmap',
+    id: 'wz-vis-overview-nist-requirements-agents-heatmap',
     title: 'Alerts volume by agent',
     type: 'heatmap',
     params: {
@@ -506,7 +506,7 @@ export const getVisStateRequirementsAgentsHeatmap = (
 
 export const getVisStateMetrics = (indexPatternId: string): SavedVis => {
   return {
-    id: 'overview-nist-metrics',
+    id: 'wz-vis-overview-nist-metrics',
     title: 'Stats',
     type: 'metric',
     params: {
@@ -661,7 +661,7 @@ export const getVisStateTopRequirements = (
 
 export const getVisStateAgentStats = (indexPatternId: string): SavedVis => {
   return {
-    id: 'agents-nist-stats',
+    id: 'wz-vis-agents-nist-stats',
     title: 'Stats',
     type: 'metric',
     params: {
@@ -800,7 +800,7 @@ export const getVisStateAgentRuleLevelDistribution = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-nist-requirement-by-level',
+    id: 'wz-vis-agents-nist-requirement-by-level',
     title: 'Requirements distributed by level',
     type: 'histogram',
     params: {
@@ -942,7 +942,7 @@ export const getVisStateAgentRequirementsOverTime = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-nist-requirements-stacked-overtime',
+    id: 'wz-vis-agents-nist-requirements-stacked-overtime',
     title: 'Requirements over time',
     type: 'histogram',
     params: {

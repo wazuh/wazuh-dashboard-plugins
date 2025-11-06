@@ -6,7 +6,7 @@ export const getVisStateTop10AlertLevelEvolution = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-general-alert-level-evolution',
+    id: 'wz-vis-overview-general-alert-level-evolution',
     title: 'Top 10 Alert level evolution',
     type: 'area',
     params: {
@@ -222,7 +222,7 @@ export const getVisStateTop10MITREATTACKS = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-general-alerts-top-mitre',
+    id: 'wz-vis-overview-general-alerts-top-mitre',
     title: 'Top 10 MITRE ATT&CKS',
     type: 'pie',
     params: {
@@ -395,7 +395,7 @@ export const getVisStatePinnedAgentTop10AlertGroupsEvolution = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-general-alert-groups-evolution',
+    id: 'wz-vis-agents-general-alert-groups-evolution',
     title: 'Top 10 Alert groups evolution',
     type: 'area',
     params: {
@@ -543,7 +543,7 @@ export const getVisStatePinnedAgentTop10AlertGroupsEvolution = (
 
 export const getVisStateAlertsAgents = (indexPatternId: string): SavedVis => {
   return {
-    id: 'agents-general-alerts',
+    id: 'wz-vis-agents-general-alerts',
     title: 'Alerts',
     type: 'area',
     params: {

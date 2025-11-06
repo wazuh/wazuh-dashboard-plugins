@@ -6,7 +6,7 @@ import type { SavedVis } from '../../../types';
 
 export const getVisStateRequirements = (indexPatternId: string): SavedVis => {
   return {
-    id: 'gtsc-requirements',
+    id: 'wz-vis-gtsc-requirements',
     title: 'TSC requirements',
     type: 'line',
     params: {
@@ -153,7 +153,7 @@ export const getVisStateTopAgentsByAlertsCount = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-tsc-agents',
+    id: 'wz-vis-overview-tsc-agents',
     title: 'Top 10 agents by alerts number',
     type: 'pie',
     params: {
@@ -196,7 +196,7 @@ export const getVisStateTopRequirementsOverTime = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-tsc-requirements-over-time',
+    id: 'wz-vis-overview-tsc-requirements-over-time',
     title: 'Top requirements over time',
     type: 'area',
     params: {
@@ -303,7 +303,7 @@ export const getVisStateRequirementsAgentsHeatmap = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-tsc-requirements-agents-heatmap',
+    id: 'wz-vis-overview-tsc-requirements-agents-heatmap',
     title: 'Last alerts',
     type: 'heatmap',
     params: {
@@ -404,7 +404,7 @@ export const getVisStateRequirementsByAgent = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'overview-tsc-requirements-by-agent',
+    id: 'wz-vis-overview-tsc-requirements-by-agent',
     title: 'Requirements by agent',
     type: 'histogram',
     params: {
@@ -499,7 +499,7 @@ export const getVisStateAgentTopRuleGroups = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-tsc-groups',
+    id: 'wz-vis-agents-tsc-groups',
     title: 'Top 5 rule groups',
     type: 'pie',
     params: {
@@ -536,7 +536,7 @@ export const getVisStateAgentTopRuleDescription = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-tsc-rule',
+    id: 'wz-vis-agents-tsc-rule',
     title: 'Top 5 rules',
     type: 'pie',
     params: {
@@ -573,7 +573,7 @@ export const getVisStateAgentTopRequirements = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-tsc-requirement',
+    id: 'wz-vis-agents-tsc-requirement',
     title: 'Top 5 TSC requirements',
     type: 'pie',
     params: {
@@ -605,7 +605,7 @@ export const getVisStateAgentRequirements = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-tsc-requirements',
+    id: 'wz-vis-agents-tsc-requirements',
     title: 'TSC Requirements',
     type: 'histogram',
     params: {
@@ -694,7 +694,7 @@ export const getVisStateAgentRuleLevelDistribution = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'agents-tsc-rule-level-distribution',
+    id: 'wz-vis-agents-tsc-rule-level-distribution',
     title: 'Rule level distribution',
     type: 'pie',
     params: {

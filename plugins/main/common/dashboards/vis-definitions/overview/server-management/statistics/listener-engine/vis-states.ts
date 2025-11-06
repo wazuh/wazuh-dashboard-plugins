@@ -4,7 +4,7 @@ export const getVisStateTotalNumberOfBytesReceived = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'statistics-remoted-recv-bytes',
+    id: 'wz-vis-statistics-remoted-recv-bytes',
     title: 'Total number of bytes received',
     type: 'line',
     params: {
@@ -164,7 +164,7 @@ export const getVisStateEventsSentToAnalysisd = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'statistics-remoted-event-count',
+    id: 'wz-vis-statistics-remoted-event-count',
     title: 'Events sent to Analysisd',
     type: 'line',
     params: {
@@ -321,7 +321,7 @@ export const getVisStateEventsSentToAnalysisd = (
 
 export const getVisStateTCPSessions = (indexPatternId: string): SavedVis => {
   return {
-    id: 'statistics-remoted-tcp-sessions',
+    id: 'wz-vis-statistics-remoted-tcp-sessions',
     title: 'TCP sessions',
     type: 'line',
     params: {
