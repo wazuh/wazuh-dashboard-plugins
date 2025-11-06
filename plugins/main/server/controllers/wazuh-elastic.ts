@@ -65,7 +65,7 @@ export class WazuhElasticCtrl {
                 item.settingIndexPattern,
               )
             : item.indexPatternPrefix
-        }-sample`,
+        }-sample-${category}`,
         dataSet: item?.dataSet,
       })),
     );
