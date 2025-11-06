@@ -15,6 +15,8 @@
 // Whenever possible, custom IDs are used for predictable identification.
 
 import type { SavedObjectsClientContract } from 'opensearch_dashboards/server';
+import fs from 'fs';
+import path from 'path';
 import type { InitializationTaskRunContext } from '../services';
 import type {
   DashboardByRendererInput,
@@ -22,6 +24,7 @@ import type {
 } from '../../../common/dashboards';
 import { DashboardSavedObjectMapper } from './dashboard-saved-object-mapper';
 import { getDashboardConfigs } from './dashboard-configs';
+import { createDirectoryIfNotExists } from '../../lib/filesystem';
 
 function toSentenceCase(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -32,7 +35,7 @@ async function isSavedObjectPresent(
   type: 'visualization' | 'dashboard',
   id: string,
   logger: InitializationTaskRunContext['logger'],
-): Promise<boolean> {
+): Promise<SavedObject | null> {
   try {
     const existing: SavedObject = await client.get(type, id);
     if (existing) {
@@ -41,7 +44,7 @@ async function isSavedObjectPresent(
           existing.attributes?.title
         }] - skipping`,
       );
-      return !!existing.id;
+      return existing;
     }
   } catch (error) {
     const status =
@@ -50,7 +53,7 @@ async function isSavedObjectPresent(
       throw error;
     }
   }
-  return false;
+  return null;
 }
 
 function toVisualizationAttributes(savedVis: SavedVis) {
@@ -82,7 +85,7 @@ async function saveVisualizationAsSavedObject(
   client: SavedObjectsClientContract,
   savedVis: SavedVis,
   logger: InitializationTaskRunContext['logger'],
-) {
+): Promise<SavedObject> {
   const id = savedVis.id;
   const { attributes, references } = toVisualizationAttributes(savedVis);
 
@@ -97,7 +100,7 @@ async function saveVisualizationAsSavedObject(
   );
   if (existingVisId) return existingVisId;
 
-  const savedVisualizationResult = await client.create(
+  const visualizationSavedObject = await client.create(
     'visualization',
     attributes,
     {
@@ -109,9 +112,9 @@ async function saveVisualizationAsSavedObject(
   );
 
   logger.info(
-    `Visualization ensured [${savedVisualizationResult.id}] title [${savedVisualizationResult.attributes.title}]`,
+    `Visualization ensured [${visualizationSavedObject.id}] title [${visualizationSavedObject.attributes.title}]`,
   );
-  return savedVisualizationResult;
+  return visualizationSavedObject;
 }
 
 async function saveDashboardAsSavedObject(
@@ -137,14 +140,49 @@ async function saveDashboardAsSavedObject(
   );
   if (existingDashId) return existingDashId;
 
-  const res = await client.create('dashboard', attributes, {
+  const dashboardSavedObject = await client.create('dashboard', attributes, {
     id,
     overwrite: false,
     refresh: true,
     references,
   });
-  logger.info(`Dashboard ensured [${res.id}] title [${res.attributes.title}]`);
-  return res.id;
+  logger.info(
+    `Dashboard ensured [${dashboardSavedObject.id}] title [${dashboardSavedObject.attributes.title}]`,
+  );
+  return dashboardSavedObject;
+}
+
+function writeDashboardAndVisualizationsToFile(
+  visualizationsSavedObject: SavedObjectVisualization[],
+  dashboardSavedObject: SavedObjectDashboard,
+  dashboardConfig: ReturnType<typeof getDashboardConfigs>[number],
+  logger: InitializationTaskRunContext['logger'],
+) {
+  try {
+    const content =
+      visualizationsSavedObject
+        .map(visualization => JSON.stringify(visualization))
+        .join('\n') +
+      '\n' +
+      JSON.stringify(dashboardSavedObject);
+
+    const outputDir = '/home/node/dashboard-ndjson';
+    createDirectoryIfNotExists(outputDir);
+
+    const fileName = `${dashboardConfig.getConfig().id}.ndjson`;
+    const filePath = path.join(outputDir, fileName);
+
+    fs.writeFileSync(filePath, content, 'utf8');
+    logger.debug(
+      `Saved objects file written [${filePath}] (visualizations: ${visualizationsSavedObject.length}, dashboard: 1)`,
+    );
+  } catch (error) {
+    logger.warn(
+      `Failed to write dashboard saved objects file: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+  }
 }
 
 // ---------- Health check task creators ----------
@@ -163,7 +201,7 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
 
         for (const dashboardConfig of dashboardConfigs) {
           // Create visualizations
-          await Promise.all(
+          const visualizations = await Promise.all(
             dashboardConfig
               .getSavedVisualizations()
               .map(savedVis =>
@@ -171,10 +209,18 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
               ),
           );
 
-          await saveDashboardAsSavedObject(
+          const dashboardSavedObject = await saveDashboardAsSavedObject(
             client,
             dashboardConfig.getConfig(),
-            dashboardConfig.getSavedVisualizationsIds(),
+            visualizations.map(vis => vis.id),
+            ctx.logger,
+          );
+
+          // Persist visualizations and dashboard to file for this config
+          writeDashboardAndVisualizationsToFile(
+            visualizations,
+            dashboardSavedObject,
+            dashboardConfig,
             ctx.logger,
           );
         }
