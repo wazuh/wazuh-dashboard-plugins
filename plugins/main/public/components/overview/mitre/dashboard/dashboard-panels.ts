@@ -1,8 +1,8 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
   MitreOverviewDashboardConfig,
-  MitrePinnedAgentDashboardConfig,
-} from '../../../../../common/dashboards/dashboard-definitions/overview/mitre/dashboard';
+} from '../../../../../common/dashboards/dashboard-definitions/overview/mitre/overview/dashboard';
+import { MitrePinnedAgentDashboardConfig } from "../../../../../common/dashboards/dashboard-definitions/overview/mitre/pinned-agent/dashboard";
 
 export const getDashboardPanels = (
   indexPatternId: string,
