@@ -23,7 +23,35 @@ import type {
 import { DashboardSavedObjectMapper } from './dashboard-saved-object-mapper';
 import { getDashboardConfigs } from './dashboard-configs';
 
-// ---------- Transform helpers ----------
+function toSentenceCase(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+async function isSavedObjectPresent(
+  client: SavedObjectsClientContract,
+  type: 'visualization' | 'dashboard',
+  id: string,
+  logger: InitializationTaskRunContext['logger'],
+): Promise<boolean> {
+  try {
+    const existing: SavedObject = await client.get(type, id);
+    if (existing) {
+      logger.info(
+        `${toSentenceCase(type)} already exists [${existing.id}] title [${
+          existing.attributes?.title
+        }] - skipping`,
+      );
+      return !!existing.id;
+    }
+  } catch (error) {
+    const status =
+      (error as any)?.output?.statusCode ?? (error as any)?.statusCode;
+    if (status !== 404) {
+      throw error;
+    }
+  }
+  return false;
+}
 
 function toVisualizationAttributes(savedVis: SavedVis) {
   // Kibana/OSD visualization SO expects `visState` with `aggs`, and the search source under `kibanaSavedObjectMeta`.
@@ -61,20 +89,13 @@ async function saveVisualizationAsSavedObject(
   logger.debug(`Creating/updating visualization [${id}]`);
 
   // If the visualization with that ID exists, do not overwrite it
-  try {
-    const existing: SavedObject = await client.get('visualization', id);
-    if (existing) {
-      logger.info(
-        `Visualization already exists [${existing.id}] title [${existing.attributes?.title}] - skipping`,
-      );
-      return existing.id;
-    }
-  } catch (error) {
-    const status = (error as any)?.output?.statusCode ?? (error as any)?.statusCode;
-    if (status !== 404) {
-      throw error;
-    }
-  }
+  const existingVisId = await isSavedObjectPresent(
+    client,
+    'visualization',
+    id,
+    logger,
+  );
+  if (existingVisId) return existingVisId;
 
   const savedVisualizationResult = await client.create(
     'visualization',
@@ -108,20 +129,13 @@ async function saveDashboardAsSavedObject(
   logger.debug(`Creating/updating dashboard [${id}]`);
 
   // If the dashboard with that ID exists, do not overwrite it
-  try {
-    const existing: SavedObject = await client.get('dashboard', id);
-    if (existing) {
-      logger.info(
-        `Dashboard already exists [${existing.id}] title [${(existing as any).attributes?.title}] - skipping`,
-      );
-      return existing.id;
-    }
-  } catch (error) {
-    const status = (error as any)?.output?.statusCode ?? (error as any)?.statusCode;
-    if (status !== 404) {
-      throw error;
-    }
-  }
+  const existingDashId = await isSavedObjectPresent(
+    client,
+    'dashboard',
+    id,
+    logger,
+  );
+  if (existingDashId) return existingDashId;
 
   const res = await client.create('dashboard', attributes, {
     id,
