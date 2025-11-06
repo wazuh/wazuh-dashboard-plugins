@@ -1,8 +1,8 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
-  AzurePinnedAgentDashboardConfig,
   AzureOverviewDashboardConfig,
-} from '../../../../../common/dashboards/dashboard-definitions/overview/azure/dashboard';
+} from '../../../../../common/dashboards/dashboard-definitions/overview/azure/overview/dashboard';
+import { AzurePinnedAgentDashboardConfig } from "../../../../../common/dashboards/dashboard-definitions/overview/azure/pinned-agent/dashboard";
 
 export const getDashboardPanels = (
   indexPatternId: string,

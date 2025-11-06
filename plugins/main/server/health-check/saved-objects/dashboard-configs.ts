@@ -7,9 +7,8 @@ import {
   AWSOverviewDashboardConfig,
 } from '../../../common/dashboards/dashboard-definitions/overview/aws/overview/dashboard';
 import {
-  AzurePinnedAgentDashboardConfig,
   AzureOverviewDashboardConfig,
-} from '../../../common/dashboards/dashboard-definitions/overview/azure/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/azure/overview/dashboard';
 import {
   DockerPinnedAgentDashboardConfig,
   DockerOverviewDashboardConfig,
@@ -95,6 +94,7 @@ import { FimPinnedAgentDashboardConfig } from "../../../common/dashboards/dashbo
 import { GDPRPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/gdpr/pinned-agent/dashboard";
 import { GithubPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/github/pinned-agent/dashboard";
 import { AWSPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/aws/pinned-agent/dashboard";
+import { AzurePinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/azure/pinned-agent/dashboard";
 
 export const getDashboardConfigs = (): DashboardConfig[] => {
   const wazuhDiscoverDashboardConfig = new WazuhDiscoverDashboardConfig(
