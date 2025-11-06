@@ -69,7 +69,7 @@ import { SCAInventoryDashboardConfig } from '../../../common/dashboards/dashboar
 import { SCATablesDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/sca/tables/dashboard';
 import { ThreatHuntingOverviewDashboardConfig, ThreatHuntingPinnedAgentDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/threat-hunting/dashboard';
 import { ThreatHuntingKPIsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/threat-hunting/kpis/dashboard';
-import { ITHygieneOverviewDashboardConfig, ITHygienePinnedAgentDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/dashboards/dashboard';
+import { ITHygieneOverviewDashboardConfig} from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/dashboards/overview/dashboard';
 import { ITHygieneTablesDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/tables/dashboard';
 import { ITHygieneKPIsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/kpis/dashboard';
 import { ITHygieneUsersInventoriesUsersDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/users/inventories/users/dashboard';
@@ -95,6 +95,7 @@ import { AzurePinnedAgentDashboardConfig } from "../../../common/dashboards/dash
 import { DockerPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/docker/pinned-agent/dashboard";
 import { GoogleCloudPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/google-cloud/pinned-agent/dashboard";
 import { HipaaPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/hipaa/pinned-agent/dashboard";
+import { ITHygienePinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/it-hygiene/dashboards/pinned-agent/dashboard";
 
 export const getDashboardConfigs = (): DashboardConfig[] => {
   const wazuhDiscoverDashboardConfig = new WazuhDiscoverDashboardConfig(
