@@ -1,5 +1,5 @@
 import type { DashboardByRendererPanels } from '../../../../../../common/dashboards';
-import { VulnerabilitiesOverviewDashboardConfig } from '../../../../../../common/dashboards/dashboard-definitions/overview/vulnerabilities/dashboard';
+import { VulnerabilitiesOverviewDashboardConfig } from '../../../../../../common/dashboards/dashboard-definitions/overview/vulnerabilities/overview/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,

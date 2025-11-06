@@ -55,7 +55,7 @@ import {
 import {
   TscOverviewDashboardConfig,
 } from '../../../common/dashboards/dashboard-definitions/overview/tsc/overview/dashboard';
-import { VulnerabilitiesOverviewDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/vulnerabilities/dashboard';
+import { VulnerabilitiesOverviewDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/vulnerabilities/overview/dashboard';
 import { VulnerabilitiesKPIsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/vulnerabilities/kpis/dashboard';
 import { VulnerabilitiesFiltersDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/vulnerabilities/filters/dashboard';
 import { SCAOverviewDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/sca/overview/dashboard';

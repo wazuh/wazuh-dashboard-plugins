@@ -1,12 +1,12 @@
 import {
   DashboardConfig,
   DashboardLayoutDefinition,
-} from '../../../lib/dashboard-config-service';
+} from '../../../../lib/dashboard-config-service';
 import {
   getVisStateAccumulationMostDetectedVulnerabilities,
   getVisStateTopVulnerabilitiesScore,
   getVisStateTopVulnerableOSFamilies,
-} from './vis-states';
+} from '../vis-states';
 
 export class VulnerabilitiesOverviewDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor(indexPatternId: string) {
