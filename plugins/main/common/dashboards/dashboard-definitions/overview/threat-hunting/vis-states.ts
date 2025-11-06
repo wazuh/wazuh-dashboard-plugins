@@ -154,7 +154,7 @@ export const getVisStateTop10AlertLevelEvolution = (
 
 export const getVisStateTop5Agents = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Overview-General-Top-5-agents',
+    id: 'overview-general-top-5-agents',
     title: 'Top 5 agents',
     type: 'pie',
     params: {
@@ -287,7 +287,7 @@ export const getVisStateAlertEvolutionTop5Agents = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Overview-General-Alerts-evolution-Top-5-agents',
+    id: 'overview-general-alerts-evolution-top-5-agents',
     title: 'Alerts evolution - Top 5 agents',
     type: 'histogram',
     params: {
@@ -693,7 +693,7 @@ export const getVisStateTop5AlertsAgents = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Agents-General-Top-5-alerts',
+    id: 'agents-general-top-5-alerts',
     title: 'Top 5 alerts',
     type: 'pie',
     params: {
@@ -761,7 +761,7 @@ export const getVisStateTop5RuleGroupsAgents = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Agents-General-Top-10-groups',
+    id: 'agents-general-top-10-groups',
     title: 'Top 5 rule groups',
     type: 'pie',
     params: {
@@ -829,7 +829,7 @@ export const getVisStateTop5PCIDSSRequirementsAgents = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Agents-General-Top-5-PCI-DSS-Requirements',
+    id: 'agents-general-top-5-pci-dss-requirements',
     title: 'Top 5 PCI DSS Requirements',
     type: 'pie',
     params: {

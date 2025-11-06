@@ -581,7 +581,7 @@ export const getVisStateAgentEventsByCategory = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'azure_agent_events_by_Category',
+    id: 'azure_agent_events_by_category',
     title: 'Events by category over time',
     type: 'area',
     params: {

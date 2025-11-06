@@ -586,7 +586,7 @@ export const getVisStateTopRequirements = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Overview-NIST-Top-10-requirements',
+    id: 'overview-nist-top-10-requirements',
     title: 'Top 10 requirements',
     type: 'pie',
     params: {
@@ -738,7 +738,7 @@ export const getVisStateAgentTopRequirements = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Agents-NIST-top-10-requirements',
+    id: 'agents-nist-top-10-requirements',
     title: 'Top 10 requirements',
     type: 'pie',
     params: {

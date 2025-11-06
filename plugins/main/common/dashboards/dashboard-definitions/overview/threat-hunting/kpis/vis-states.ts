@@ -68,7 +68,7 @@ export const getVisStateTotal = (indexPatternId: string): SavedVis => {
 
 export const getVisStateLevel12Alerts = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Overview-General-Level-12-alerts',
+    id: 'overview-general-level-12-alerts',
     title: 'Level 12 or above alerts',
     type: 'metric',
     params: {

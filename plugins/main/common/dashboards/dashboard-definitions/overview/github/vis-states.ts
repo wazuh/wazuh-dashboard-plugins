@@ -146,7 +146,7 @@ export const getVisStateTopOrganizationsByAlertCount = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Overview-GitHub-Top-5-Organizations-By-Alerts',
+    id: 'overview-github-top-5-organizations-by-alerts',
     title: 'Top 5 organizations by alerts',
     type: 'pie',
     params: {
@@ -538,7 +538,7 @@ export const getVisStateAgentTopOrganizationsByAlertCount = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Agents-GitHub-Top-5-Organizations-By-Alerts',
+    id: 'agents-github-top-5-organizations-by-alerts',
     title: 'Top 5 organizations by alerts',
     type: 'pie',
     params: {

@@ -187,7 +187,7 @@ export const getVisStateTopRequirements = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Overview-HIPAA-Top-10-requirements',
+    id: 'overview-hipaa-top-10-requirements',
     title: 'Top 10 requirements',
     type: 'pie',
     params: {
@@ -252,7 +252,7 @@ export const getVisStateMostActiveAgents = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Overview-HIPAA-Top-10-agents',
+    id: 'overview-hipaa-top-10-agents',
     title: 'Most active agents',
     type: 'pie',
     params: {
@@ -530,7 +530,7 @@ export const getVisStateRequirementDistributionByAgent = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Overview-HIPAA-Top-10-requirements-over-time-by-agent',
+    id: 'overview-hipaa-top-10-requirements-over-time-by-agent',
     title: 'Requirements distribution by agent',
     type: 'histogram',
     params: {
@@ -792,7 +792,7 @@ export const getVisStateAgentTopRequirements = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Agents-HIPAA-top-10',
+    id: 'agents-hipaa-top-10',
     title: 'Top 10 requirements',
     type: 'pie',
     params: {

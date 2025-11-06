@@ -547,7 +547,7 @@ export const getVisStateTop5Map = (indexPatternId: string): SavedVis => {
 
 export const getVisStateTop5Rules = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Agents-GCP-Top-5-rules',
+    id: 'agents-gcp-top-5-rules',
     title: 'Top 5 rules',
     type: 'table',
     params: {
@@ -684,7 +684,7 @@ export const getVisStateTopQueryEvents = (indexPatternId: string): SavedVis => {
 
 export const getVisStateTop5Instances = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Agents-GCP-Top-5-instances',
+    id: 'agents-gcp-top-5-instances',
     title: 'Top 5 instances',
     type: 'pie',
     params: {
