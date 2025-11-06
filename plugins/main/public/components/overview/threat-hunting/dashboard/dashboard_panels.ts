@@ -3,8 +3,8 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
   ThreatHuntingOverviewDashboardConfig,
-  ThreatHuntingPinnedAgentDashboardConfig,
-} from '../../../../../common/dashboards/dashboard-definitions/overview/threat-hunting/dashboard';
+} from '../../../../../common/dashboards/dashboard-definitions/overview/threat-hunting/overview/dashboard';
+import { ThreatHuntingPinnedAgentDashboardConfig } from "../../../../../common/dashboards/dashboard-definitions/overview/threat-hunting/pinned-agent/dashboard copy";
 
 /* Definitiion of panels */
 

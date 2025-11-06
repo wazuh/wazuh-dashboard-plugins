@@ -1,7 +1,7 @@
 import {
   DashboardConfig,
   DashboardLayoutDefinition,
-} from '../../../lib/dashboard-config-service';
+} from '../../../../lib/dashboard-config-service';
 import {
   getVisStateAlertEvolutionTop5Agents,
   getVisStateAlertsAgents,
@@ -12,7 +12,7 @@ import {
   getVisStateTop5AlertsAgents,
   getVisStateTop5PCIDSSRequirementsAgents,
   getVisStateTop5RuleGroupsAgents,
-} from './vis-states';
+} from '../vis-states';
 
 export abstract class ThreatHuntingDashboardLayoutDefinition extends DashboardLayoutDefinition {}
 

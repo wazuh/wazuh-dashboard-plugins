@@ -63,7 +63,7 @@ import { SCAOverviewDashboardConfig } from '../../../common/dashboards/dashboard
 import { SCAKPIsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/sca/kpis/dashboard';
 import { SCAInventoryDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/sca/inventory/dashboard';
 import { SCATablesDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/sca/tables/dashboard';
-import { ThreatHuntingOverviewDashboardConfig, ThreatHuntingPinnedAgentDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/threat-hunting/dashboard';
+import { ThreatHuntingOverviewDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/threat-hunting/overview/dashboard';
 import { ThreatHuntingKPIsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/threat-hunting/kpis/dashboard';
 import { ITHygieneOverviewDashboardConfig} from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/dashboards/overview/dashboard';
 import { ITHygieneTablesDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/tables/dashboard';
@@ -96,6 +96,7 @@ import { MalwareDetectionPinnedAgentDashboardConfig } from "../../../common/dash
 import { MitrePinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/mitre/pinned-agent/dashboard";
 import { NistPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/nist/pinned-agent/dashboard";
 import { PCIPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/pci/pinned-agent/dashboard";
+import { ThreatHuntingPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/threat-hunting/pinned-agent/dashboard copy";
 
 export const getDashboardConfigs = (): DashboardConfig[] => {
   const wazuhDiscoverDashboardConfig = new WazuhDiscoverDashboardConfig(
