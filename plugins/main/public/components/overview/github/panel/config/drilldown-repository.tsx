@@ -15,7 +15,7 @@ import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public'
 import { getPlugins } from '../../../../../kibana-services';
 import { ModuleConfigProps } from './module-config';
 import type { DashboardByRendererPanels } from '../../../../../../common/dashboards';
-import { GithubDrilldownRepositoryDashboardConfig } from '../../../../../../common/dashboards/vis-definitions/overview/github/panel/config/github-drilldown-repository/dashboard';
+import { GithubDrilldownRepositoryDashboardConfig } from '../../../../../../common/dashboards/vis-definitions/overview/github/drilldowns/repository/dashboard';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;

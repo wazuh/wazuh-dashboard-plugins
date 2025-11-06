@@ -28,10 +28,10 @@ import {
   GithubPinnedAgentDashboardConfig,
   GithubOverviewDashboardConfig,
 } from '../../../common/dashboards/vis-definitions/overview/github/dashboard';
-import { GithubDrilldownActionDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/github/panel/config/github-drilldown-action/dashboard';
-import { GithubDrilldownActorDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/github/panel/config/github-drilldown-actor/dashboard';
-import { GithubDrilldownOrganizationDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/github/panel/config/github-drilldown-organization/dashboard';
-import { GithubDrilldownRepositoryDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/github/panel/config/github-drilldown-repository/dashboard';
+import { GithubDrilldownActionDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/github/drilldowns/action/dashboard';
+import { GithubDrilldownActorDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/github/drilldowns/actor/dashboard';
+import { GithubDrilldownOrganizationDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/github/drilldowns/organization/dashboard';
+import { GithubDrilldownRepositoryDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/github/drilldowns/repository/dashboard';
 import {
   GoogleCloudOverviewDashboardConfig,
   GoogleCloudPinnedAgentDashboardConfig,

@@ -1,7 +1,7 @@
 import {
   DashboardConfig,
   DashboardLayoutDefinition,
-} from '../../../../../../lib/dashboard-config-service';
+} from '../../../../../lib/dashboard-config-service';
 import {
   getVisStateRuleLevelEvolution,
   getVisStateTopActions,

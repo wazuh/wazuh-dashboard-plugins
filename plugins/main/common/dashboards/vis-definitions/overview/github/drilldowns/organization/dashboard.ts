@@ -1,16 +1,16 @@
 import {
   DashboardConfig,
   DashboardLayoutDefinition,
-} from '../../../../../../lib/dashboard-config-service';
+} from '../../../../../lib/dashboard-config-service';
 import {
   getVisStateRuleLevelEvolution,
+  getVisStateTopActions,
   getVisStateTopActors,
   getVisStateTopCountries,
-  getVisStateTopOrganizations,
   getVisStateTopRepositories,
 } from '../vis-states';
 
-export class GithubDrilldownActionDashboardLayoutDefinition extends DashboardLayoutDefinition {
+export class GithubDrilldownOrganizationDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
@@ -21,7 +21,7 @@ export class GithubDrilldownActionDashboardLayoutDefinition extends DashboardLay
           x: 0,
           y: 0,
         },
-        savedVis: getVisStateTopActors(indexPatternId),
+        savedVis: getVisStateTopActions(indexPatternId),
       },
       {
         gridData: {
@@ -39,7 +39,7 @@ export class GithubDrilldownActionDashboardLayoutDefinition extends DashboardLay
           x: 32,
           y: 0,
         },
-        savedVis: getVisStateTopOrganizations(indexPatternId),
+        savedVis: getVisStateTopActors(indexPatternId),
       },
       {
         gridData: {
@@ -63,23 +63,23 @@ export class GithubDrilldownActionDashboardLayoutDefinition extends DashboardLay
   }
 }
 
-export class GithubDrilldownActionDashboardConfig extends DashboardConfig {
+export class GithubDrilldownOrganizationDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new GithubDrilldownActionDashboardLayoutDefinition(indexPatternId),
+      new GithubDrilldownOrganizationDashboardLayoutDefinition(indexPatternId),
     );
   }
 
   protected override getId(): string {
-    return 'github-drilldown-action-dashboard-tab';
+    return 'github-drilldown-organization-dashboard-tab';
   }
 
   protected override getTitle(): string {
-    return 'GitHub Drilldown Action Dashboard';
+    return 'GitHub Drilldown Organization Overview';
   }
 
   protected override getDescription(): string {
-    return 'Dashboard of the GitHub drilldown action';
+    return 'GitHub drilldown organization overview dashboard';
   }
 }
