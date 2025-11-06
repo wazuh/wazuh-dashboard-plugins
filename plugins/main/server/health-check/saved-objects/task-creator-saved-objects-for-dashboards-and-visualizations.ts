@@ -60,14 +60,28 @@ async function saveVisualizationAsSavedObject(
 
   logger.debug(`Creating/updating visualization [${id}]`);
 
-  // TODO: If the visualization with that ID exists, do not overwrite it
+  // If the visualization with that ID exists, do not overwrite it
+  try {
+    const existing: SavedObject = await client.get('visualization', id);
+    if (existing) {
+      logger.info(
+        `Visualization already exists [${existing.id}] title [${existing.attributes?.title}] - skipping`,
+      );
+      return existing.id;
+    }
+  } catch (error) {
+    const status = (error as any)?.output?.statusCode ?? (error as any)?.statusCode;
+    if (status !== 404) {
+      throw error;
+    }
+  }
 
   const savedVisualizationResult = await client.create(
     'visualization',
     attributes,
     {
       id,
-      overwrite: true,
+      overwrite: false,
       refresh: true,
       references,
     },
@@ -92,9 +106,26 @@ async function saveDashboardAsSavedObject(
     );
 
   logger.debug(`Creating/updating dashboard [${id}]`);
+
+  // If the dashboard with that ID exists, do not overwrite it
+  try {
+    const existing: SavedObject = await client.get('dashboard', id);
+    if (existing) {
+      logger.info(
+        `Dashboard already exists [${existing.id}] title [${(existing as any).attributes?.title}] - skipping`,
+      );
+      return existing.id;
+    }
+  } catch (error) {
+    const status = (error as any)?.output?.statusCode ?? (error as any)?.statusCode;
+    if (status !== 404) {
+      throw error;
+    }
+  }
+
   const res = await client.create('dashboard', attributes, {
     id,
-    overwrite: true,
+    overwrite: false,
     refresh: true,
     references,
   });
