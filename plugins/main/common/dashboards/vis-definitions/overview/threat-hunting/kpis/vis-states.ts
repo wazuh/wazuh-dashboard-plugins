@@ -2,7 +2,7 @@ import type { SavedVis } from '../../../../types';
 
 export const getVisStateTotal = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-General-Metric-alerts',
+    id: 'overview-general-metric-alerts',
     title: 'Total',
     type: 'metric',
     params: {
@@ -68,7 +68,7 @@ export const getVisStateTotal = (indexPatternId: string): SavedVis => {
 
 export const getVisStateLevel12Alerts = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-General-Level-12-alerts',
+    id: 'Overview-General-Level-12-alerts',
     title: 'Level 12 or above alerts',
     type: 'metric',
     params: {
@@ -153,7 +153,7 @@ export const getVisStateAuthenticationFailure = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-General-Authentication-failure',
+    id: 'overview-general-authentication-failure',
     title: 'Authentication failure',
     type: 'metric',
     params: {
@@ -239,7 +239,7 @@ export const getVisStateAuthenticationSuccess = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-General-Authentication-success',
+    id: 'overview-general-authentication-success',
     title: 'Authentication success',
     type: 'metric',
     params: {

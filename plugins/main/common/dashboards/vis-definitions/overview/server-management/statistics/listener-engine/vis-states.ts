@@ -4,7 +4,7 @@ export const getVisStateTotalNumberOfBytesReceived = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Statistics-remoted-Recv-bytes',
+    id: 'statistics-remoted-recv-bytes',
     title: 'Total number of bytes received',
     type: 'line',
     params: {
@@ -164,7 +164,7 @@ export const getVisStateEventsSentToAnalysisd = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Statistics-remoted-event-count',
+    id: 'statistics-remoted-event-count',
     title: 'Events sent to Analysisd',
     type: 'line',
     params: {
@@ -321,7 +321,7 @@ export const getVisStateEventsSentToAnalysisd = (
 
 export const getVisStateTCPSessions = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Statistics-remoted-tcp-sessions',
+    id: 'statistics-remoted-tcp-sessions',
     title: 'TCP sessions',
     type: 'line',
     params: {

@@ -6,7 +6,7 @@ import { SavedVis } from '../../../types';
 
 export const getVisStateHitsHistogram = (indexPatternId: string): SavedVis => {
   return {
-    id: 'wz-discover-events-histogram',
+    id: 'wz-discover-events',
     title: 'Events histogram',
     type: 'horizontal_bar',
     params: {

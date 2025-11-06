@@ -8,7 +8,7 @@ export const getVisStateTopRequirements = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-PCI-DSS-requirements',
+    id: 'overview-pci-dss-requirements',
     title: 'Top 10 PCI DSS requirements',
     type: 'line',
     params: {
@@ -155,7 +155,7 @@ export const getVisStateTopAgentsByCount = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-PCI-DSS-Agents',
+    id: 'overview-pci-dss-agents',
     title: 'Top 10 agents by alerts count',
     type: 'pie',
     params: {
@@ -198,7 +198,7 @@ export const getVisStateRequirementsHeatmap = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-PCI-DSS-Requirements-Agents-heatmap',
+    id: 'overview-pci-dss-requirements-agents-heatmap',
     title: 'Last alerts',
     type: 'heatmap',
     params: {
@@ -299,7 +299,7 @@ export const getVisStateRequirementsByAgent = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-PCI-DSS-Requirements-by-agent',
+    id: 'overview-pci-dss-requirements-by-agent',
     title: 'Requirements by agent',
     type: 'histogram',
     params: {
@@ -437,7 +437,7 @@ export const getVisStateAgentTopRuleGroups = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-PCI-Groups',
+    id: 'agents-pci-groups',
     title: 'Top 5 rule groups',
     type: 'pie',
     params: {
@@ -472,7 +472,7 @@ export const getVisStateAgentTopRuleGroups = (
 
 export const getVisStateAgentTopRules = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-PCI-Rule',
+    id: 'agents-pci-rule',
     title: 'Top 5 rules',
     type: 'pie',
     params: {
@@ -509,7 +509,7 @@ export const getVisStateAgentTopRequirements = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-PCI-Requirement',
+    id: 'agents-pci-requirement',
     title: 'Top 5 PCI DSS requirements',
     type: 'pie',
     params: {
@@ -546,7 +546,7 @@ export const getVisStateAgentTopRequirementsCount = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-PCI-Requirements',
+    id: 'agents-pci-requirements',
     title: 'PCI DSS requirements',
     type: 'histogram',
     params: {
@@ -635,7 +635,7 @@ export const getVisStateAgentRuleLevelDistribution = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-PCI-Rule-level-distribution',
+    id: 'agents-pci-rule-level-distribution',
     title: 'Rule level distribution',
     type: 'pie',
     params: {

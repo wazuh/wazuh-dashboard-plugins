@@ -22,7 +22,7 @@ export interface SavedVisData {
 }
 
 export interface SavedVis {
-  id: string;
+  id: Lowercase<string>;
   title?: string;
   type: string;
   params: Record<string, any>;

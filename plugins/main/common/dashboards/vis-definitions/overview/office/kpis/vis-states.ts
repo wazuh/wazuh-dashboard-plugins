@@ -6,7 +6,7 @@ import type { SavedVis } from '../../../../types';
 
 export const getVisStateMaxRuleLevel = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-Office-Metric-Max-Rule-Level',
+    id: 'overview-office-metric-max-rule-level',
     title: 'Max Rule Level',
     type: 'metric',
     params: {
@@ -64,7 +64,7 @@ export const getVisStateSuspiciousDownloads = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-Office-Metric-Suspicious-Downloads',
+    id: 'overview-office-metric-suspicious-downloads',
     title: 'Suspicious Downloads',
     type: 'metric',
     params: {
@@ -134,7 +134,7 @@ export const getVisStateSuspiciousDownloads = (
 
 export const getVisStateFullAccess = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-Office-Metric-FullAccess-Permissions',
+    id: 'overview-office-metric-fullaccess-permissions',
     title: 'Full Access Permissions',
     type: 'metric',
     params: {
@@ -206,7 +206,7 @@ export const getVisStatePhishingMalware = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-Office-Phishing-Malware',
+    id: 'overview-office-phishing-malware',
     title: 'Authentication success',
     type: 'metric',
     params: {

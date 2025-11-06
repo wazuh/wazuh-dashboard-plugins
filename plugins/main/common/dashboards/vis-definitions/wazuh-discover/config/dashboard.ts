@@ -23,7 +23,7 @@ export class WazuhDiscoverDashboardConfig extends DashboardConfig {
   }
 
   protected override getId(): string {
-    return 'wz-discover-events-histogram';
+    return 'wz-discover-events-dashboard';
   }
   protected override getTitle(): string {
     return 'Wazuh Discover Events Histogram';

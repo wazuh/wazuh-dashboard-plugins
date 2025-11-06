@@ -8,7 +8,7 @@ export const getVisStateAlertsEvolutionByOrganization = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-GitHub-Alerts-Evolution-By-Organization',
+    id: 'overview-github-alerts-evolution-by-organization',
     title: 'Alerts evolution by organization',
     type: 'area',
     params: {
@@ -146,7 +146,7 @@ export const getVisStateTopOrganizationsByAlertCount = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-GitHub-Top-5-Organizations-By-Alerts',
+    id: 'Overview-GitHub-Top-5-Organizations-By-Alerts',
     title: 'Top 5 organizations by alerts',
     type: 'pie',
     params: {
@@ -199,7 +199,7 @@ export const getVisStateActionTypeByOrganization = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-GitHub-Alert-Action-Type-By-Organization',
+    id: 'overview-github-alert-action-type-by-organization',
     title: 'Top alerts by action type and organization',
     type: 'pie',
     params: {
@@ -268,7 +268,7 @@ export const getVisStateUsersWithMoreAlerts = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-GitHub-Users-With-More-Alerts',
+    id: 'overview-github-users-with-more-alerts',
     title: 'Users with more alerts',
     type: 'line',
     params: {
@@ -400,7 +400,7 @@ export const getVisStateAgentAlertsEvolutionByOrganization = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-GitHub-Alerts-Evolution-By-Organization',
+    id: 'agents-github-alerts-evolution-by-organization',
     title: 'Alerts evolution by organization',
     type: 'area',
     params: {
@@ -538,7 +538,7 @@ export const getVisStateAgentTopOrganizationsByAlertCount = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-GitHub-Top-5-Organizations-By-Alerts',
+    id: 'Agents-GitHub-Top-5-Organizations-By-Alerts',
     title: 'Top 5 organizations by alerts',
     type: 'pie',
     params: {
@@ -591,7 +591,7 @@ export const getVisStateAgentActionTypeByOrganization = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-GitHub-Alert-Action-Type-By-Organization',
+    id: 'agents-github-alert-action-type-by-organization',
     title: 'Top alerts by action type and organization',
     type: 'pie',
     params: {
@@ -660,7 +660,7 @@ export const getVisStateAgentUsersWithMoreAlerts = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-GitHub-Users-With-More-Alerts',
+    id: 'agents-github-users-with-more-alerts',
     title: 'Users with more alerts',
     type: 'line',
     params: {
@@ -792,7 +792,7 @@ export const getVisStateMetricOrganizationsCount = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-GitHub-Metric-Organizations-Count',
+    id: 'wazuh-github-metric-organizations-count',
     title: '',
     type: 'metric',
     params: {
@@ -851,7 +851,7 @@ export const getVisStateMetricRepositoriesCount = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-GitHub-Metric-Repositories-Count',
+    id: 'wazuh-github-metric-repositories-count',
     title: '',
     type: 'metric',
     params: {
@@ -911,7 +911,7 @@ export const getVisStateMetricActorsCount = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-GitHub-Metric-Actors-Count',
+    id: 'wazuh-github-metric-actors-count',
     title: '',
     type: 'metric',
     params: {

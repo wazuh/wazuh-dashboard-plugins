@@ -6,7 +6,7 @@ export const getVisStateTop10AlertLevelEvolution = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-General-Alert-level-evolution',
+    id: 'overview-general-alert-level-evolution',
     title: 'Top 10 Alert level evolution',
     type: 'area',
     params: {
@@ -154,7 +154,7 @@ export const getVisStateTop10AlertLevelEvolution = (
 
 export const getVisStateTop5Agents = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-General-Top-5-agents',
+    id: 'Overview-General-Top-5-agents',
     title: 'Top 5 agents',
     type: 'pie',
     params: {
@@ -222,7 +222,7 @@ export const getVisStateTop10MITREATTACKS = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-General-Alerts-Top-Mitre',
+    id: 'overview-general-alerts-top-mitre',
     title: 'Top 10 MITRE ATT&CKS',
     type: 'pie',
     params: {
@@ -287,7 +287,7 @@ export const getVisStateAlertEvolutionTop5Agents = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents',
+    id: 'Overview-General-Alerts-evolution-Top-5-agents',
     title: 'Alerts evolution - Top 5 agents',
     type: 'histogram',
     params: {
@@ -395,7 +395,7 @@ export const getVisStatePinnedAgentTop10AlertGroupsEvolution = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-General-Alert-groups-evolution',
+    id: 'agents-general-alert-groups-evolution',
     title: 'Top 10 Alert groups evolution',
     type: 'area',
     params: {
@@ -543,7 +543,7 @@ export const getVisStatePinnedAgentTop10AlertGroupsEvolution = (
 
 export const getVisStateAlertsAgents = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-General-Alerts',
+    id: 'agents-general-alerts',
     title: 'Alerts',
     type: 'area',
     params: {
@@ -693,7 +693,7 @@ export const getVisStateTop5AlertsAgents = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-General-Top-5-alerts',
+    id: 'Agents-General-Top-5-alerts',
     title: 'Top 5 alerts',
     type: 'pie',
     params: {
@@ -761,7 +761,7 @@ export const getVisStateTop5RuleGroupsAgents = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-General-Top-10-groups',
+    id: 'Agents-General-Top-10-groups',
     title: 'Top 5 rule groups',
     type: 'pie',
     params: {
@@ -829,7 +829,7 @@ export const getVisStateTop5PCIDSSRequirementsAgents = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-General-Top-5-PCI-DSS-Requirements',
+    id: 'Agents-General-Top-5-PCI-DSS-Requirements',
     title: 'Top 5 PCI DSS Requirements',
     type: 'pie',
     params: {

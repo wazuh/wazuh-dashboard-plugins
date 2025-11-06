@@ -8,7 +8,7 @@ export const getVisStateAlertsVolumeByAgent = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-HIPAA-Heatmap',
+    id: 'overview-hipaa-heatmap',
     title: 'Alerts volume by agent',
     type: 'heatmap',
     params: {
@@ -140,7 +140,7 @@ export const getVisStateAlertsVolumeByAgent = (
 
 export const getVisStateTagsCloud = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-HIPAA-Tag-cloud',
+    id: 'overview-hipaa-tag-cloud',
     title: 'Most common alerts',
     type: 'tagcloud',
     params: {
@@ -187,7 +187,7 @@ export const getVisStateTopRequirements = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-HIPAA-Top-10-requirements',
+    id: 'Overview-HIPAA-Top-10-requirements',
     title: 'Top 10 requirements',
     type: 'pie',
     params: {
@@ -252,7 +252,7 @@ export const getVisStateMostActiveAgents = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-HIPAA-Top-10-agents',
+    id: 'Overview-HIPAA-Top-10-agents',
     title: 'Most active agents',
     type: 'pie',
     params: {
@@ -316,7 +316,7 @@ export const getVisStateMostActiveAgents = (
 
 export const getVisStateStats = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-HIPAA-Metrics',
+    id: 'overview-hipaa-metrics',
     title: 'Stats',
     type: 'metric',
     params: {
@@ -396,7 +396,7 @@ export const getVisStateRequirementsOverTime2 = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-HIPAA-Top-requirements-over-time',
+    id: 'overview-hipaa-top-requirements-over-time',
     title: 'Requirements evolution over time',
     type: 'histogram',
     params: {
@@ -530,7 +530,7 @@ export const getVisStateRequirementDistributionByAgent = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-HIPAA-Top-10-requirements-over-time-by-agent',
+    id: 'Overview-HIPAA-Top-10-requirements-over-time-by-agent',
     title: 'Requirements distribution by agent',
     type: 'histogram',
     params: {
@@ -665,7 +665,7 @@ export const getVisStateAgentRequirementsOvertime = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-HIPAA-Requirements-Stacked-Overtime',
+    id: 'agents-hipaa-requirements-stacked-overtime',
     title: 'Requirements over time',
     type: 'histogram',
     params: {
@@ -792,7 +792,7 @@ export const getVisStateAgentTopRequirements = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-HIPAA-top-10',
+    id: 'Agents-HIPAA-top-10',
     title: 'Top 10 requirements',
     type: 'pie',
     params: {
@@ -869,7 +869,7 @@ export const getVisStateAgentRequirements = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-HIPAA-Bubbles',
+    id: 'agents-hipaa-bubbles',
     title: 'HIPAA requirements',
     type: 'line',
     params: {
@@ -1026,7 +1026,7 @@ export const getVisStateAgentRuleLevelDistribution = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-HIPAA-Distributed-By-Level',
+    id: 'agents-hipaa-distributed-by-level',
     title: 'Requirements distribution by level',
     type: 'histogram',
     params: {
@@ -1169,7 +1169,7 @@ export const getVisStateAgentCommonAlerts = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-HIPAA-Most-Common',
+    id: 'agents-hipaa-most-common',
     title: 'Most common alerts',
     type: 'tagcloud',
     params: {

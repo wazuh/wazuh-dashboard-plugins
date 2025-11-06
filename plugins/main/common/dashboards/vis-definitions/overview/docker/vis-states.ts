@@ -3,7 +3,7 @@ import type { SavedVis } from '../../../types';
 
 export const getVisStateTop5Images = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-Docker-top-5-images',
+    id: 'overview-docker-top-5-images',
     title: 'Top 5 images',
     type: 'pie',
     params: {
@@ -54,7 +54,7 @@ export const getVisStateTop5Images = (indexPatternId: string): SavedVis => {
 
 export const getVisStateTop5Events = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-Docker-top-5-events',
+    id: 'overview-docker-top-5-events',
     title: 'Top 5 events',
     type: 'pie',
     params: {
@@ -107,7 +107,7 @@ export const getVisStateEventsSourceByOverTime = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-Docker-Events-By-Source-Over-Time',
+    id: 'overview-docker-events-by-source-over-time',
     title: 'Events by source over time',
     type: 'histogram',
     params: {
@@ -241,7 +241,7 @@ export const getVisStateEventsSourceByOverTime = (
 
 export const getVisStateEvents = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Overview-Docker-Events',
+    id: 'overview-docker-events',
     title: 'Events',
     type: 'table',
     params: {
@@ -395,7 +395,7 @@ export const getVisStateAgentTop5Images = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-Docker-top-5-images',
+    id: 'agents-docker-top-5-images',
     title: 'Top 5 images',
     type: 'pie',
     params: {
@@ -448,7 +448,7 @@ export const getVisStateAgentTop5Events = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-Docker-top-5-actions',
+    id: 'agents-docker-top-5-actions',
     title: 'Top 5 events',
     type: 'pie',
     params: {
@@ -501,7 +501,7 @@ export const getVisStateAgentResourcesUsageByOverTime = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-Docker-Types-over-time',
+    id: 'agents-docker-types-over-time',
     title: 'Resources usage over time',
     type: 'histogram',
     params: {
@@ -605,7 +605,7 @@ export const getVisStateAgentResourcesUsageByOverTime = (
 
 export const getVisStateAgentEvents = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Agents-Docker-Actions-over-time',
+    id: 'agents-docker-actions-over-time',
     title: 'Events occurred evolution',
     type: 'area',
     params: {

@@ -6,7 +6,7 @@ import type { SavedVis } from '../../../../types';
 
 export const getVisStateQueueUsage = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Statistics-Analysisd-Queues-Usage',
+    id: 'statistics-analysisd-queues-usage',
     title: 'Queue Usage',
     type: 'line',
     params: {
@@ -283,7 +283,7 @@ export const getVisStateEventsDecodedSummary = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Statistics-Analysisd-Overview-Events-Decoded',
+    id: 'statistics-analysisd-overview-events-decoded',
     title: 'Events decoded summary',
     type: 'line',
     params: {
@@ -558,7 +558,7 @@ export const getVisStateEventsDecodedSummary = (
 
 export const getVisStateSyscheck = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Statistics-Analysisd-Syscheck',
+    id: 'statistics-analysisd-syscheck',
     title: 'Syscheck',
     type: 'line',
     params: {
@@ -783,7 +783,7 @@ export const getVisStateSyscheck = (indexPatternId: string): SavedVis => {
 
 export const getVisStateSyscollector = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Statistics-Analysisd-Syscollector',
+    id: 'statistics-analysisd-syscollector',
     title: 'Syscollector',
     type: 'line',
     params: {
@@ -1008,7 +1008,7 @@ export const getVisStateSyscollector = (indexPatternId: string): SavedVis => {
 
 export const getVisStateRootcheck = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Statistics-Analysisd-Rootcheck',
+    id: 'statistics-analysisd-rootcheck',
     title: 'Rootcheck',
     type: 'line',
     params: {
@@ -1233,7 +1233,7 @@ export const getVisStateRootcheck = (indexPatternId: string): SavedVis => {
 
 export const getVisStateSCA = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Statistics-Analysisd-SCA',
+    id: 'statistics-analysisd-sca',
     title: 'SCA',
     type: 'line',
     params: {
@@ -1458,7 +1458,7 @@ export const getVisStateSCA = (indexPatternId: string): SavedVis => {
 
 export const getVisStateHostInfo = (indexPatternId: string): SavedVis => {
   return {
-    id: 'Wazuh-App-Statistics-Analysisd-HostInfo',
+    id: 'statistics-analysisd-hostinfo',
     title: 'Host Info',
     type: 'line',
     params: {
@@ -1687,7 +1687,7 @@ export const getVisStateEventsProcessedByNode = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Statistics-Analysisd-Events-By-Node',
+    id: 'statistics-analysisd-events-by-node',
     title: 'Events processed',
     type: 'line',
     params: {
@@ -1843,7 +1843,7 @@ export const getVisStateEventsDroppedByNode = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'Wazuh-App-Statistics-Analysisd-Events-Dropped-By-Node',
+    id: 'statistics-analysisd-events-dropped-by-node',
     title: 'Events dropped',
     type: 'line',
     params: {
