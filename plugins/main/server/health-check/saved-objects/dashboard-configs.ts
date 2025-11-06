@@ -36,8 +36,7 @@ import {
 } from '../../../common/dashboards/dashboard-definitions/overview/hipaa/overview/dashboard';
 import {
   MalwareDetectionOverviewDashboardConfig,
-  MalwareDetectionPinnedAgentDashboardConfig,
-} from '../../../common/dashboards/dashboard-definitions/overview/malware-detection/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/malware-detection/overview/dashboard';
 import {
   MitreOverviewDashboardConfig,
   MitrePinnedAgentDashboardConfig,
@@ -96,6 +95,7 @@ import { DockerPinnedAgentDashboardConfig } from "../../../common/dashboards/das
 import { GoogleCloudPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/google-cloud/pinned-agent/dashboard";
 import { HipaaPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/hipaa/pinned-agent/dashboard";
 import { ITHygienePinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/it-hygiene/dashboards/pinned-agent/dashboard";
+import { MalwareDetectionPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/malware-detection/pinned-agent/dashboard";
 
 export const getDashboardConfigs = (): DashboardConfig[] => {
   const wazuhDiscoverDashboardConfig = new WazuhDiscoverDashboardConfig(
