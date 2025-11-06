@@ -22,9 +22,8 @@ import { FimFilesDashboardConfig } from '../../../common/dashboards/vis-definiti
 import { FimRegistryKeysDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/fim/registry-keys/dashboard';
 import { FimRegistryValuesDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/fim/registry-values/dashboard';
 import {
-  GDPRPinnedAgentDashboardConfig,
   GDPROverviewDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/overview/gdpr/dashboard';
+} from '../../../common/dashboards/vis-definitions/overview/gdpr/overview/dashboard';
 import {
   GithubPinnedAgentDashboardConfig,
   GithubOverviewDashboardConfig,
@@ -95,6 +94,7 @@ import { ITHygieneSystemInventoriesHardwareDashboardConfig } from '../../../comm
 import { ITHygieneSystemInventoriesSystemDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/system/inventories/system/dashboard';
 import { INDEX_PATTERN_REPLACE_ME } from './constants';
 import { FimPinnedAgentDashboardConfig } from "../../../common/dashboards/vis-definitions/overview/fim/pinned-agent/dashboard";
+import { GDPRPinnedAgentDashboardConfig } from "../../../common/dashboards/vis-definitions/overview/gdpr/pinned-agent/dashboard";
 
 export const getDashboardConfigs = (): DashboardConfig[] => {
   const wazuhDiscoverDashboardConfig = new WazuhDiscoverDashboardConfig(
