@@ -2,7 +2,7 @@ import {
   AgentsEventsDashboardConfig,
 } from '../../../common/dashboards/vis-definitions';
 import type { DashboardConfig } from '../../../common/dashboards';
-import { WazuhDiscoverDashboardConfig } from '../../../common/dashboards/vis-definitions/wazuh-discover/config/dashboard';
+import { WazuhDiscoverDashboardConfig } from '../../../common/dashboards/vis-definitions/wazuh-discover/events/dashboard';
 import {
   AWSPinnedAgentDashboardConfig,
   AWSOverviewDashboardConfig,
