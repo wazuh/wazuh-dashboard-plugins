@@ -95,7 +95,7 @@ import { MalwareDetectionPinnedAgentDashboardConfig } from "../../../common/dash
 import { MitrePinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/mitre/pinned-agent/dashboard";
 import { NistPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/nist/pinned-agent/dashboard";
 import { PCIPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/pci/pinned-agent/dashboard";
-import { ThreatHuntingPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/threat-hunting/pinned-agent/dashboard copy";
+import { ThreatHuntingPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/threat-hunting/pinned-agent/dashboard";
 import { TscPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/tsc/pinned-agent/dashboard";
 
 export const getDashboardConfigs = (): DashboardConfig[] => {
