@@ -1,5 +1,5 @@
 import type { DashboardByRendererPanels } from '../../../../../../common/dashboards';
-import { VulnerabilitiesKPIsDashboardConfig } from '../../../../../../common/dashboards/vis-definitions/overview/vulnerabilities/kpis/dashboard';
+import { VulnerabilitiesKPIsDashboardConfig } from '../../../../../../common/dashboards/dashboard-definitions/overview/vulnerabilities/kpis/dashboard';
 
 export const getKPIsPanel = (
   indexPatternId: string,

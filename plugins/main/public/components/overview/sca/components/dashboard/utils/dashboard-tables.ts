@@ -1,6 +1,6 @@
 import {
   SCATablesDashboardConfig
-} from '../../../../../../../common/dashboards/vis-definitions/overview/sca/tables/dashboard';
+} from '../../../../../../../common/dashboards/dashboard-definitions/overview/sca/tables/dashboard';
 
 export const getDashboardTables = (indexPatternId: string) => {
   return new SCATablesDashboardConfig(

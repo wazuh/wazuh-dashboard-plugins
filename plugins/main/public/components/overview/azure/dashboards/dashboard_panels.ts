@@ -2,7 +2,7 @@ import type { DashboardByRendererPanels } from '../../../../../common/dashboards
 import {
   AzurePinnedAgentDashboardConfig,
   AzureOverviewDashboardConfig,
-} from '../../../../../common/dashboards/vis-definitions/overview/azure/dashboard';
+} from '../../../../../common/dashboards/dashboard-definitions/overview/azure/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,

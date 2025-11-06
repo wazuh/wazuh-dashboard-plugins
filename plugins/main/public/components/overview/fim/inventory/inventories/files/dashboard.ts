@@ -1,4 +1,4 @@
-import { FimFilesDashboardConfig } from '../../../../../../../common/dashboards/vis-definitions/overview/fim/files/dashboard';
+import { FimFilesDashboardConfig } from '../../../../../../../common/dashboards/dashboard-definitions/overview/fim/files/dashboard';
 
 export const getDashboard = (indexPatternId: string) => {
   return new FimFilesDashboardConfig(

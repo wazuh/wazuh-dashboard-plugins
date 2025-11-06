@@ -1,5 +1,5 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
-import { ThreatHuntingKPIsDashboardConfig } from '../../../../../common/dashboards/vis-definitions/overview/threat-hunting/kpis/dashboard';
+import { ThreatHuntingKPIsDashboardConfig } from '../../../../../common/dashboards/dashboard-definitions/overview/threat-hunting/kpis/dashboard';
 
 export const getKPIsPanel = (
   indexPatternId: string,

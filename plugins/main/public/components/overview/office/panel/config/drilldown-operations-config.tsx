@@ -14,7 +14,7 @@
 import React from 'react';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import type { DashboardByRendererPanels } from '../../../../../../common/dashboards';
-import { OfficeDrilldownOperationsDashboardConfig } from '../../../../../../common/dashboards/vis-definitions/overview/office/panel/config/drilldown-operations-config/dashboard';
+import { OfficeDrilldownOperationsDashboardConfig } from '../../../../../../common/dashboards/dashboard-definitions/overview/office/panel/config/drilldown-operations-config/dashboard';
 import { getPlugins } from '../../../../../kibana-services';
 
 const DashboardByRenderer =

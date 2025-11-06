@@ -1,4 +1,4 @@
-import { ClusterMonitoringDashboardConfig } from '../../../../../common/dashboards/vis-definitions/management/cluster/monitoring/dashboard';
+import { ClusterMonitoringDashboardConfig } from '../../../../../common/dashboards/dashboard-definitions/management/cluster/monitoring/dashboard';
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards/types';
 import { tParsedIndexPattern } from '../../../common/data-source';
 

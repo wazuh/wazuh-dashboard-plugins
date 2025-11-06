@@ -2,7 +2,7 @@ import type { DashboardByRendererPanels } from '../../../../../common/dashboards
 import {
   HipaaOverviewDashboardConfig,
   HipaaPinnedAgentDashboardConfig,
-} from '../../../../../common/dashboards/vis-definitions/overview/hipaa/dashboard';
+} from '../../../../../common/dashboards/dashboard-definitions/overview/hipaa/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,

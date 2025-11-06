@@ -4,7 +4,7 @@ import type { DashboardByRendererPanels } from '../../../../../common/dashboards
 import {
   ThreatHuntingOverviewDashboardConfig,
   ThreatHuntingPinnedAgentDashboardConfig,
-} from '../../../../../common/dashboards/vis-definitions/overview/threat-hunting/dashboard';
+} from '../../../../../common/dashboards/dashboard-definitions/overview/threat-hunting/dashboard';
 
 /* Definitiion of panels */
 

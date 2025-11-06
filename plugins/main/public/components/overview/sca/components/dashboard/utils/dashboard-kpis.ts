@@ -1,5 +1,5 @@
 import type { DashboardByRendererPanels } from '../../../../../../../common/dashboards';
-import { SCAKPIsDashboardPanelsService } from "../../../../../../../common/dashboards/vis-definitions/overview/sca/kpis/dashboard";
+import { SCAKPIsDashboardPanelsService } from "../../../../../../../common/dashboards/dashboard-definitions/overview/sca/kpis/dashboard";
 
 
 export const getKPIsPanel = (

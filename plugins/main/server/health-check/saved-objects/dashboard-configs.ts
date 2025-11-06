@@ -1,100 +1,100 @@
 import {
   AgentsEventsDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/management/agent/overview/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/management/agent/overview/dashboard';
 import type { DashboardConfig } from '../../../common/dashboards';
-import { WazuhDiscoverDashboardConfig } from '../../../common/dashboards/vis-definitions/wazuh-discover/events/dashboard';
+import { WazuhDiscoverDashboardConfig } from '../../../common/dashboards/dashboard-definitions/wazuh-discover/events/dashboard';
 import {
   AWSPinnedAgentDashboardConfig,
   AWSOverviewDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/overview/aws/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/aws/dashboard';
 import {
   AzurePinnedAgentDashboardConfig,
   AzureOverviewDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/overview/azure/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/azure/dashboard';
 import {
   DockerPinnedAgentDashboardConfig,
   DockerOverviewDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/overview/docker/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/docker/dashboard';
 import {
   FimOverviewDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/overview/fim/overview/dashboard';
-import { FimFilesDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/fim/files/dashboard';
-import { FimRegistryKeysDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/fim/registry-keys/dashboard';
-import { FimRegistryValuesDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/fim/registry-values/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/fim/overview/dashboard';
+import { FimFilesDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/fim/files/dashboard';
+import { FimRegistryKeysDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/fim/registry-keys/dashboard';
+import { FimRegistryValuesDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/fim/registry-values/dashboard';
 import {
   GDPROverviewDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/overview/gdpr/overview/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/gdpr/overview/dashboard';
 import {
   GithubOverviewDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/overview/github/overview/dashboard';
-import { GithubDrilldownActionDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/github/drilldowns/action/dashboard';
-import { GithubDrilldownActorDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/github/drilldowns/actor/dashboard';
-import { GithubDrilldownOrganizationDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/github/drilldowns/organization/dashboard';
-import { GithubDrilldownRepositoryDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/github/drilldowns/repository/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/github/overview/dashboard';
+import { GithubDrilldownActionDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/github/drilldowns/action/dashboard';
+import { GithubDrilldownActorDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/github/drilldowns/actor/dashboard';
+import { GithubDrilldownOrganizationDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/github/drilldowns/organization/dashboard';
+import { GithubDrilldownRepositoryDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/github/drilldowns/repository/dashboard';
 import {
   GoogleCloudOverviewDashboardConfig,
   GoogleCloudPinnedAgentDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/overview/google-cloud/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/google-cloud/dashboard';
 import {
   HipaaPinnedAgentDashboardConfig,
   HipaaOverviewDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/overview/hipaa/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/hipaa/dashboard';
 import {
   MalwareDetectionOverviewDashboardConfig,
   MalwareDetectionPinnedAgentDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/overview/malware-detection/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/malware-detection/dashboard';
 import {
   MitreOverviewDashboardConfig,
   MitrePinnedAgentDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/overview/mitre/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/mitre/dashboard';
 import {
   NistOverviewDashboardConfig,
   NistPinnedAgentDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/overview/nist/dashboard';
-import { OfficeOverviewDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/office/dashboard';
-import { OfficeKPIsDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/office/kpis/dashboard';
-import { OfficeDrilldownIPConfigDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/office/panel/config/drilldown-ip-config/dashboard';
-import { OfficeDrilldownOperationsDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/office/panel/config/drilldown-operations-config/dashboard';
-import { OfficeDrilldownRulesConfigDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/office/panel/config/drilldown-rules-config/dashboard';
-import { OfficeDrilldownUserConfigDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/office/panel/config/drilldown-user-config/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/nist/dashboard';
+import { OfficeOverviewDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/dashboard';
+import { OfficeKPIsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/kpis/dashboard';
+import { OfficeDrilldownIPConfigDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/panel/config/drilldown-ip-config/dashboard';
+import { OfficeDrilldownOperationsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/panel/config/drilldown-operations-config/dashboard';
+import { OfficeDrilldownRulesConfigDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/panel/config/drilldown-rules-config/dashboard';
+import { OfficeDrilldownUserConfigDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/panel/config/drilldown-user-config/dashboard';
 import {
   PCIOverviewDashboardConfig,
   PCIPinnedAgentDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/overview/pci/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/pci/dashboard';
 import {
   TscOverviewDashboardConfig,
   TscPinnedAgentDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/overview/tsc/dashboard';
-import { VulnerabilitiesOverviewDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/vulnerabilities/dashboard';
-import { VulnerabilitiesKPIsDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/vulnerabilities/kpis/dashboard';
-import { VulnerabilitiesFiltersDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/vulnerabilities/filters/dashboard';
-import { SCAOverviewDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/sca/dashboards/dashboard';
-import { SCAKPIsDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/sca/kpis/dashboard';
-import { SCAInventoryDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/sca/inventory/dashboard';
-import { SCATablesDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/sca/tables/dashboard';
-import { ThreatHuntingOverviewDashboardConfig, ThreatHuntingPinnedAgentDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/threat-hunting/dashboard';
-import { ThreatHuntingKPIsDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/threat-hunting/kpis/dashboard';
-import { ITHygieneOverviewDashboardConfig, ITHygienePinnedAgentDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/dashboards/dashboard';
-import { ITHygieneTablesDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/tables/dashboard';
-import { ITHygieneKPIsDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/kpis/dashboard';
-import { ITHygieneUsersInventoriesUsersDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/users/inventories/users/dashboard';
-import { ITHygieneUsersInventoriesGroupsDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/users/inventories/groups/dashboard';
-import { ITHygieneNetworksInventoriesInterfacesDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/networks/inventories/interfaces/dashboard';
-import { ITHygieneNetworksInventoriesNetworksDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/networks/inventories/networks/dashboard';
-import { ITHygieneNetworksInventoriesProtocolsDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/networks/inventories/protocols/dashboard';
-import { ITHygieneNetworksInventoriesServicesDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/networks/inventories/services/dashboard';
-import { ITHygieneNetworksInventoriesTrafficDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/networks/inventories/traffic/dashboard';
-import { ITHygienePackagesInventoriesPackagesDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/packages/inventories/packages/dashboard';
-import { ITHygienePackagesInventoriesHotFixesDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/packages/inventories/hotfixes/dashboard';
-import { ITHygienePackagesInventoriesBrowserExtensionsDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/packages/inventories/browser-extensions/dashboard';
-import { ITHygieneProcessesDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/processes/dashboard';
-import { ITHygieneServicesDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/services/dashboard';
-import { ITHygieneSystemInventoriesHardwareDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/system/inventories/hardware/dashboard';
-import { ITHygieneSystemInventoriesSystemDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/system/inventories/system/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/tsc/dashboard';
+import { VulnerabilitiesOverviewDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/vulnerabilities/dashboard';
+import { VulnerabilitiesKPIsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/vulnerabilities/kpis/dashboard';
+import { VulnerabilitiesFiltersDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/vulnerabilities/filters/dashboard';
+import { SCAOverviewDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/sca/dashboards/dashboard';
+import { SCAKPIsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/sca/kpis/dashboard';
+import { SCAInventoryDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/sca/inventory/dashboard';
+import { SCATablesDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/sca/tables/dashboard';
+import { ThreatHuntingOverviewDashboardConfig, ThreatHuntingPinnedAgentDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/threat-hunting/dashboard';
+import { ThreatHuntingKPIsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/threat-hunting/kpis/dashboard';
+import { ITHygieneOverviewDashboardConfig, ITHygienePinnedAgentDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/dashboards/dashboard';
+import { ITHygieneTablesDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/tables/dashboard';
+import { ITHygieneKPIsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/kpis/dashboard';
+import { ITHygieneUsersInventoriesUsersDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/users/inventories/users/dashboard';
+import { ITHygieneUsersInventoriesGroupsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/users/inventories/groups/dashboard';
+import { ITHygieneNetworksInventoriesInterfacesDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/networks/inventories/interfaces/dashboard';
+import { ITHygieneNetworksInventoriesNetworksDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/networks/inventories/networks/dashboard';
+import { ITHygieneNetworksInventoriesProtocolsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/networks/inventories/protocols/dashboard';
+import { ITHygieneNetworksInventoriesServicesDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/networks/inventories/services/dashboard';
+import { ITHygieneNetworksInventoriesTrafficDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/networks/inventories/traffic/dashboard';
+import { ITHygienePackagesInventoriesPackagesDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/packages/inventories/packages/dashboard';
+import { ITHygienePackagesInventoriesHotFixesDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/packages/inventories/hotfixes/dashboard';
+import { ITHygienePackagesInventoriesBrowserExtensionsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/packages/inventories/browser-extensions/dashboard';
+import { ITHygieneProcessesDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/processes/dashboard';
+import { ITHygieneServicesDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/services/dashboard';
+import { ITHygieneSystemInventoriesHardwareDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/system/inventories/hardware/dashboard';
+import { ITHygieneSystemInventoriesSystemDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/it-hygiene/system/inventories/system/dashboard';
 import { INDEX_PATTERN_REPLACE_ME } from './constants';
-import { FimPinnedAgentDashboardConfig } from "../../../common/dashboards/vis-definitions/overview/fim/pinned-agent/dashboard";
-import { GDPRPinnedAgentDashboardConfig } from "../../../common/dashboards/vis-definitions/overview/gdpr/pinned-agent/dashboard";
-import { GithubPinnedAgentDashboardConfig } from "../../../common/dashboards/vis-definitions/overview/github/pinned-agent/dashboard";
+import { FimPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/fim/pinned-agent/dashboard";
+import { GDPRPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/gdpr/pinned-agent/dashboard";
+import { GithubPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/github/pinned-agent/dashboard";
 
 export const getDashboardConfigs = (): DashboardConfig[] => {
   const wazuhDiscoverDashboardConfig = new WazuhDiscoverDashboardConfig(

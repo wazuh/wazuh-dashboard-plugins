@@ -1,5 +1,5 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
-import { ITHygieneKPIsDashboardConfig } from "../../../../../common/dashboards/vis-definitions/overview/it-hygiene/kpis/dashboard";
+import { ITHygieneKPIsDashboardConfig } from "../../../../../common/dashboards/dashboard-definitions/overview/it-hygiene/kpis/dashboard";
 
 export const getDashboardKPIs = (
   indexPatternId: string,

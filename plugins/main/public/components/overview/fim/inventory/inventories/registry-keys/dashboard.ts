@@ -1,4 +1,4 @@
-import { FimRegistryKeysDashboardConfig } from '../../../../../../../common/dashboards/vis-definitions/overview/fim/registry-keys/dashboard';
+import { FimRegistryKeysDashboardConfig } from '../../../../../../../common/dashboards/dashboard-definitions/overview/fim/registry-keys/dashboard';
 
 export const getDashboard = (indexPatternId: string) => {
   return new FimRegistryKeysDashboardConfig(
