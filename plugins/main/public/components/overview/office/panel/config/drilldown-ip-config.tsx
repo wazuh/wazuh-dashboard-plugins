@@ -16,7 +16,7 @@ import React from 'react';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import { getPlugins } from '../../../../../kibana-services';
 import type { DashboardByRendererPanels } from '../../../../../../common/dashboards';
-import { OfficeDrilldownIPConfigDashboardConfig } from '../../../../../../common/dashboards/dashboard-definitions/overview/office/panel/config/drilldown-ip-config/dashboard';
+import { OfficeDrilldownIPConfigDashboardConfig } from '../../../../../../common/dashboards/dashboard-definitions/overview/office/drilldowns/ip-config/dashboard';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;

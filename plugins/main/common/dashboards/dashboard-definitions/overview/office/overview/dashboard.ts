@@ -1,7 +1,7 @@
 import {
   DashboardConfig,
   DashboardLayoutDefinition,
-} from '../../../lib/dashboard-config-service';
+} from '../../../../lib/dashboard-config-service';
 import {
   getVisStateEventsBySeverity,
   getVisStateIPsByUser,
@@ -10,7 +10,7 @@ import {
   getVisStateSeverityByUser,
   getVisStateTopUserBySubcription,
   getVisStateUsersByOperationResult,
-} from './vis-states';
+} from '../vis-states';
 
 export abstract class OfficeDashboardLayoutDefinition extends DashboardLayoutDefinition {}
 

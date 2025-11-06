@@ -1,28 +1,41 @@
-import { DashboardConfig, DashboardLayoutDefinition } from '../../../../../../lib/dashboard-config-service';
+import {
+  DashboardConfig,
+  DashboardLayoutDefinition,
+} from '../../../../../lib/dashboard-config-service';
 import {
   getVisStateOfficeAlertsEvolutionByUserID,
   getVisStateOfficeCountryTagCloud,
+  getVisStateOfficeTopOperations,
   getVisStateTopOfficeUsers,
 } from '../vis-states';
 
-export class OfficeDrilldownOperationsDashboardLayoutDefinition extends DashboardLayoutDefinition {
+export class OfficeDrilldownRulesConfigDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
       {
         gridData: {
-          w: 19,
+          w: 15,
           h: 14,
           x: 0,
+          y: 0,
+        },
+        savedVis: getVisStateOfficeTopOperations(indexPatternId),
+      },
+      {
+        gridData: {
+          w: 15,
+          h: 14,
+          x: 15,
           y: 0,
         },
         savedVis: getVisStateTopOfficeUsers(indexPatternId),
       },
       {
         gridData: {
-          w: 29,
+          w: 18,
           h: 14,
-          x: 19,
+          x: 30,
           y: 0,
         },
         savedVis: getVisStateOfficeCountryTagCloud(indexPatternId),
@@ -40,21 +53,21 @@ export class OfficeDrilldownOperationsDashboardLayoutDefinition extends Dashboar
   }
 }
 
-export class OfficeDrilldownOperationsDashboardConfig extends DashboardConfig {
+export class OfficeDrilldownRulesConfigDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new OfficeDrilldownOperationsDashboardLayoutDefinition(indexPatternId),
+      new OfficeDrilldownRulesConfigDashboardLayoutDefinition(indexPatternId),
     );
   }
 
   protected override getId(): string {
-    return 'office-drilldown-operations-config-panel-tab';
+    return 'office-drilldown-rules-config-panel-tab';
   }
   protected override getTitle(): string {
-    return 'Office drilldown operations config dashboard';
+    return 'Office drilldown rules config dashboard';
   }
   protected override getDescription(): string {
-    return 'Dashboard of the Office drilldown operations config';
+    return 'Dashboard of the Office drilldown rules config';
   }
 }

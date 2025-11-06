@@ -15,7 +15,7 @@ import React from 'react';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 import type { DashboardByRendererPanels } from '../../../../../../common/dashboards';
 import { getPlugins } from '../../../../../kibana-services';
-import { OfficeDrilldownRulesConfigDashboardConfig } from '../../../../../../common/dashboards/dashboard-definitions/overview/office/panel/config/drilldown-rules-config/dashboard';
+import { OfficeDrilldownRulesConfigDashboardConfig } from '../../../../../../common/dashboards/dashboard-definitions/overview/office/drilldowns/rules-config/dashboard';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;

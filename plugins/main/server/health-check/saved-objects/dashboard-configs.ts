@@ -43,12 +43,12 @@ import {
 import {
   NistOverviewDashboardConfig,
 } from '../../../common/dashboards/dashboard-definitions/overview/nist/overview/dashboard';
-import { OfficeOverviewDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/dashboard';
+import { OfficeOverviewDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/overview/dashboard';
 import { OfficeKPIsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/kpis/dashboard';
-import { OfficeDrilldownIPConfigDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/panel/config/drilldown-ip-config/dashboard';
-import { OfficeDrilldownOperationsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/panel/config/drilldown-operations-config/dashboard';
-import { OfficeDrilldownRulesConfigDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/panel/config/drilldown-rules-config/dashboard';
-import { OfficeDrilldownUserConfigDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/panel/config/drilldown-user-config/dashboard';
+import { OfficeDrilldownIPConfigDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/drilldowns/ip-config/dashboard';
+import { OfficeDrilldownOperationsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/drilldowns/operations-config/dashboard';
+import { OfficeDrilldownRulesConfigDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/drilldowns/rules-config/dashboard';
+import { OfficeDrilldownUserConfigDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/drilldowns/user-config/dashboard';
 import {
   PCIOverviewDashboardConfig,
 } from '../../../common/dashboards/dashboard-definitions/overview/pci/overview/dashboard';
