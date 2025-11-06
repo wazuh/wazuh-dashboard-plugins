@@ -51,8 +51,7 @@ import { OfficeDrilldownRulesConfigDashboardConfig } from '../../../common/dashb
 import { OfficeDrilldownUserConfigDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/panel/config/drilldown-user-config/dashboard';
 import {
   PCIOverviewDashboardConfig,
-  PCIPinnedAgentDashboardConfig,
-} from '../../../common/dashboards/dashboard-definitions/overview/pci/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/pci/overview/dashboard';
 import {
   TscOverviewDashboardConfig,
   TscPinnedAgentDashboardConfig,
@@ -96,6 +95,7 @@ import { ITHygienePinnedAgentDashboardConfig } from "../../../common/dashboards/
 import { MalwareDetectionPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/malware-detection/pinned-agent/dashboard";
 import { MitrePinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/mitre/pinned-agent/dashboard";
 import { NistPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/nist/pinned-agent/dashboard";
+import { PCIPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/pci/pinned-agent/dashboard";
 
 export const getDashboardConfigs = (): DashboardConfig[] => {
   const wazuhDiscoverDashboardConfig = new WazuhDiscoverDashboardConfig(
