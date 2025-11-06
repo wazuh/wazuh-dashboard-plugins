@@ -65,7 +65,6 @@ const generateCheckScoreVegaVisualization = (indexPatternId: string) => {
               value:
                 '"Inter UI", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
             },
-            fill: { value: getCheckResultColors().checkScoreColor },
           },
         },
       },
@@ -80,7 +79,6 @@ const generateCheckScoreVegaVisualization = (indexPatternId: string) => {
             baseline: { value: 'top' },
             text: { value: 'Score' },
             fontSize: { value: 16 },
-            fill: { value: getCheckResultColors().checkScoreColor },
           },
         },
       },

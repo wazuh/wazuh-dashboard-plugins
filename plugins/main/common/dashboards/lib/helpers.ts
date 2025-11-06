@@ -37,7 +37,6 @@ export const getDecimalPattern = () => {
 export const getCheckResultColors = () => {
   return {
     ...SCA_CHECK_RESULT_COLOR_MAPPING,
-    checkScoreColor: '#333333',
   };
 };
 
