@@ -1,8 +1,8 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
 import {
-  AWSPinnedAgentDashboardConfig,
   AWSOverviewDashboardConfig,
-} from '../../../../../common/dashboards/dashboard-definitions/overview/aws/dashboard';
+} from '../../../../../common/dashboards/dashboard-definitions/overview/aws/overview/dashboard';
+import { AWSPinnedAgentDashboardConfig } from "../../../../../common/dashboards/dashboard-definitions/overview/aws/pinned-agent/dashboard";
 
 export const getDashboardPanels = (
   indexPatternId: string,
