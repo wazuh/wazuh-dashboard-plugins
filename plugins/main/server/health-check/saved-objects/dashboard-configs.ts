@@ -1,7 +1,5 @@
 import {
   AgentsEventsDashboardConfig,
-  ClusterConfigurationDashboardConfig,
-  ClusterMonitoringDashboardConfig,
 } from '../../../common/dashboards/vis-definitions';
 import type { DashboardConfig } from '../../../common/dashboards';
 import { WazuhDiscoverDashboardConfig } from '../../../common/dashboards/vis-definitions/wazuh-discover/config/dashboard';
@@ -77,8 +75,6 @@ import { SCAOverviewDashboardConfig } from '../../../common/dashboards/vis-defin
 import { SCAKPIsDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/sca/kpis/dashboard';
 import { SCAInventoryDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/sca/inventory/dashboard';
 import { SCATablesDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/sca/tables/dashboard';
-import { ServerManagementStatisticsDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/server-management/statistics/dashboard';
-import { ServerManagementStatisticsListenerEngineDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/server-management/statistics/listener-engine/dashboard';
 import { ThreatHuntingOverviewDashboardConfig, ThreatHuntingPinnedAgentDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/threat-hunting/dashboard';
 import { ThreatHuntingKPIsDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/threat-hunting/kpis/dashboard';
 import { ITHygieneOverviewDashboardConfig, ITHygienePinnedAgentDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/dashboards/dashboard';
@@ -107,14 +103,6 @@ export const getDashboardConfigs = (): DashboardConfig[] => {
   const agentsEventsDashboardConfig = new AgentsEventsDashboardConfig(
     INDEX_PATTERN_REPLACE_ME,
   );
-  const clusterConfigurationDashboardConfig =
-    new ClusterConfigurationDashboardConfig(INDEX_PATTERN_REPLACE_ME);
-  const clusterMonitoringDashboardConfig =
-    new ClusterMonitoringDashboardConfig(INDEX_PATTERN_REPLACE_ME, {
-      indexPatternTitle: INDEX_PATTERN_REPLACE_ME,
-      nodeList: [],
-      clusterName: '',
-    });
   const awsOverviewDashboardConfig = new AWSOverviewDashboardConfig(
     INDEX_PATTERN_REPLACE_ME,
   );
@@ -224,12 +212,6 @@ export const getDashboardConfigs = (): DashboardConfig[] => {
   const scaTablesDashboardConfig = new SCATablesDashboardConfig(
     INDEX_PATTERN_REPLACE_ME,
   );
-  const serverManagementStatisticsDashboardConfig =
-    new ServerManagementStatisticsDashboardConfig(INDEX_PATTERN_REPLACE_ME);
-  const serverManagementStatisticsListenerEngineDashboardConfig =
-    new ServerManagementStatisticsListenerEngineDashboardConfig(
-      INDEX_PATTERN_REPLACE_ME,
-    );
   const threatHuntingOverviewDashboardConfig =
     new ThreatHuntingOverviewDashboardConfig(INDEX_PATTERN_REPLACE_ME);
   const threatHuntingPinnedAgentDashboardConfig =
@@ -300,8 +282,6 @@ export const getDashboardConfigs = (): DashboardConfig[] => {
   return [
     wazuhDiscoverDashboardConfig,
     agentsEventsDashboardConfig,
-    clusterConfigurationDashboardConfig,
-    clusterMonitoringDashboardConfig,
     awsOverviewDashboardConfig,
     awsPinnedAgentDashboardConfig,
     azureOverviewDashboardConfig,
@@ -345,8 +325,6 @@ export const getDashboardConfigs = (): DashboardConfig[] => {
     scaKPIsDashboardConfig,
     scaInventoryDashboardConfig,
     scaTablesDashboardConfig,
-    serverManagementStatisticsDashboardConfig,
-    serverManagementStatisticsListenerEngineDashboardConfig,
     threatHuntingOverviewDashboardConfig,
     threatHuntingPinnedAgentDashboardConfig,
     threatHuntingKPIsDashboardConfig,
