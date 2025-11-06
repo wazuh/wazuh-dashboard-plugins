@@ -25,9 +25,8 @@ import {
   GDPROverviewDashboardConfig,
 } from '../../../common/dashboards/vis-definitions/overview/gdpr/overview/dashboard';
 import {
-  GithubPinnedAgentDashboardConfig,
   GithubOverviewDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/overview/github/dashboard';
+} from '../../../common/dashboards/vis-definitions/overview/github/overview/dashboard';
 import { GithubDrilldownActionDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/github/drilldowns/action/dashboard';
 import { GithubDrilldownActorDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/github/drilldowns/actor/dashboard';
 import { GithubDrilldownOrganizationDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/github/drilldowns/organization/dashboard';
@@ -95,6 +94,7 @@ import { ITHygieneSystemInventoriesSystemDashboardConfig } from '../../../common
 import { INDEX_PATTERN_REPLACE_ME } from './constants';
 import { FimPinnedAgentDashboardConfig } from "../../../common/dashboards/vis-definitions/overview/fim/pinned-agent/dashboard";
 import { GDPRPinnedAgentDashboardConfig } from "../../../common/dashboards/vis-definitions/overview/gdpr/pinned-agent/dashboard";
+import { GithubPinnedAgentDashboardConfig } from "../../../common/dashboards/vis-definitions/overview/github/pinned-agent/dashboard";
 
 export const getDashboardConfigs = (): DashboardConfig[] => {
   const wazuhDiscoverDashboardConfig = new WazuhDiscoverDashboardConfig(
