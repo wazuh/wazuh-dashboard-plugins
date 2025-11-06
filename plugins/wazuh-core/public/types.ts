@@ -3,8 +3,9 @@ import { Configuration } from '../common/services/configuration';
 import { DashboardSecurity } from './utils/dashboard-security';
 
 export interface WazuhCorePluginSetup {
+  _internal: any;
   utils: { formatUIDate: (date: Date) => string };
-  API_USER_STATUS_RUN_AS: API_USER_STATUS_RUN_AS;
+  API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;
   configuration: Configuration;
   dashboardSecurity: DashboardSecurity;
 }
@@ -12,7 +13,7 @@ export interface WazuhCorePluginSetup {
 export interface WazuhCorePluginStart {
   hooks: { useDockedSideNav: () => boolean };
   utils: { formatUIDate: (date: Date) => string };
-  API_USER_STATUS_RUN_AS: API_USER_STATUS_RUN_AS;
+  API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;
   configuration: Configuration;
   dashboardSecurity: DashboardSecurity;
 }

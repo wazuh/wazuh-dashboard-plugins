@@ -51,7 +51,7 @@ export class WazuhUtilsCtrl {
   ) {
     try {
       context.wazuh.logger.debug('Getting configuration');
-      const configuration = await context.wazuh_core.configuration.get();
+      const configuration = await context.wazuh_core.configuration.getAll();
       // Exclude the API host configuration
       const { hosts, ...rest } = configuration;
       context.wazuh.logger.debug(
