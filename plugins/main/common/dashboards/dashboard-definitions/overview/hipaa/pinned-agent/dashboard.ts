@@ -1,96 +1,17 @@
 import {
   DashboardConfig,
   DashboardLayoutDefinition,
-} from '../../../lib/dashboard-config-service';
+} from '../../../../lib/dashboard-config-service';
+import { HipaaOverviewDashboardLayoutDefinition } from "../overview/dashboard";
 import {
   getVisStateAgentCommonAlerts,
   getVisStateAgentRequirements,
   getVisStateAgentRequirementsOvertime,
   getVisStateAgentRuleLevelDistribution,
-  getVisStateAgentTopRequirements,
-  getVisStateAlertsVolumeByAgent,
-  getVisStateMostActiveAgents,
-  getVisStateRequirementDistributionByAgent,
-  getVisStateRequirementsOverTime2,
-  getVisStateStats,
-  getVisStateTagsCloud,
-  getVisStateTopRequirements,
-} from './vis-states';
+  getVisStateAgentTopRequirements
+} from '../vis-states';
 
-export abstract class HipaaDashboardLayoutDefinition extends DashboardLayoutDefinition {}
-
-export class HipaaOverviewDashboardLayoutDefinition extends HipaaDashboardLayoutDefinition {
-  constructor(indexPatternId: string) {
-    super();
-    this.setGridVisualizationPairs(
-      {
-        gridData: {
-          w: 24,
-          h: 20,
-          x: 0,
-          y: 0,
-        },
-        savedVis: getVisStateAlertsVolumeByAgent(indexPatternId),
-      },
-      {
-        gridData: {
-          w: 12,
-          h: 10,
-          x: 24,
-          y: 0,
-        },
-        savedVis: getVisStateTagsCloud(indexPatternId),
-      },
-      {
-        gridData: {
-          w: 12,
-          h: 10,
-          x: 36,
-          y: 0,
-        },
-        savedVis: getVisStateTopRequirements(indexPatternId),
-      },
-      {
-        gridData: {
-          w: 12,
-          h: 10,
-          x: 24,
-          y: 10,
-        },
-        savedVis: getVisStateMostActiveAgents(indexPatternId),
-      },
-      {
-        gridData: {
-          w: 12,
-          h: 10,
-          x: 36,
-          y: 10,
-        },
-        savedVis: getVisStateStats(indexPatternId),
-      },
-      {
-        gridData: {
-          w: 24,
-          h: 14,
-          x: 0,
-          y: 20,
-        },
-        savedVis: getVisStateRequirementsOverTime2(indexPatternId),
-      },
-      {
-        gridData: {
-          w: 24,
-          h: 14,
-          x: 24,
-          y: 20,
-        },
-        savedVis: getVisStateRequirementDistributionByAgent(indexPatternId),
-      },
-    );
-  }
-}
-
-export class HipaaPinnedAgentDashboardLayoutDefinition extends HipaaDashboardLayoutDefinition {
+export class HipaaPinnedAgentDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
     this.setGridVisualizationPairs(
