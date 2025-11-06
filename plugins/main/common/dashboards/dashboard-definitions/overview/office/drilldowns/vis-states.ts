@@ -1,8 +1,8 @@
 import {
   buildIndexPatternReferenceList,
   buildSearchSource,
-} from '../../../../../lib';
-import type { SavedVis } from '../../../../../types';
+} from '../../../../lib';
+import type { SavedVis } from '../../../../types';
 
 export const getVisStateOfficeMetricStats = (
   indexPatternId: string,
