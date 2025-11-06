@@ -54,8 +54,7 @@ import {
 } from '../../../common/dashboards/dashboard-definitions/overview/pci/overview/dashboard';
 import {
   TscOverviewDashboardConfig,
-  TscPinnedAgentDashboardConfig,
-} from '../../../common/dashboards/dashboard-definitions/overview/tsc/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/tsc/overview/dashboard';
 import { VulnerabilitiesOverviewDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/vulnerabilities/dashboard';
 import { VulnerabilitiesKPIsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/vulnerabilities/kpis/dashboard';
 import { VulnerabilitiesFiltersDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/vulnerabilities/filters/dashboard';
@@ -97,6 +96,7 @@ import { MitrePinnedAgentDashboardConfig } from "../../../common/dashboards/dash
 import { NistPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/nist/pinned-agent/dashboard";
 import { PCIPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/pci/pinned-agent/dashboard";
 import { ThreatHuntingPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/threat-hunting/pinned-agent/dashboard copy";
+import { TscPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/tsc/pinned-agent/dashboard";
 
 export const getDashboardConfigs = (): DashboardConfig[] => {
   const wazuhDiscoverDashboardConfig = new WazuhDiscoverDashboardConfig(
