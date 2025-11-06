@@ -1,6 +1,6 @@
 import {
   AgentsEventsDashboardConfig,
-} from '../../../common/dashboards/vis-definitions';
+} from '../../../common/dashboards/vis-definitions/management/agent/overview/dashboard';
 import type { DashboardConfig } from '../../../common/dashboards';
 import { WazuhDiscoverDashboardConfig } from '../../../common/dashboards/vis-definitions/wazuh-discover/events/dashboard';
 import {
