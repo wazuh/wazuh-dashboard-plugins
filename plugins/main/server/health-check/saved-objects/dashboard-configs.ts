@@ -16,9 +16,8 @@ import {
   DockerOverviewDashboardConfig,
 } from '../../../common/dashboards/vis-definitions/overview/docker/dashboard';
 import {
-  FimPinnedAgentDashboardConfig,
   FimOverviewDashboardConfig,
-} from '../../../common/dashboards/vis-definitions/overview/fim/dashboard';
+} from '../../../common/dashboards/vis-definitions/overview/fim/overview/dashboard';
 import { FimFilesDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/fim/files/dashboard';
 import { FimRegistryKeysDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/fim/registry-keys/dashboard';
 import { FimRegistryValuesDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/fim/registry-values/dashboard';
@@ -95,6 +94,7 @@ import { ITHygieneServicesDashboardConfig } from '../../../common/dashboards/vis
 import { ITHygieneSystemInventoriesHardwareDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/system/inventories/hardware/dashboard';
 import { ITHygieneSystemInventoriesSystemDashboardConfig } from '../../../common/dashboards/vis-definitions/overview/it-hygiene/system/inventories/system/dashboard';
 import { INDEX_PATTERN_REPLACE_ME } from './constants';
+import { FimPinnedAgentDashboardConfig } from "../../../common/dashboards/vis-definitions/overview/fim/pinned-agent/dashboard";
 
 export const getDashboardConfigs = (): DashboardConfig[] => {
   const wazuhDiscoverDashboardConfig = new WazuhDiscoverDashboardConfig(
