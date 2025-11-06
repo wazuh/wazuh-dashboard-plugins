@@ -42,8 +42,7 @@ import {
 } from '../../../common/dashboards/dashboard-definitions/overview/mitre/overview/dashboard';
 import {
   NistOverviewDashboardConfig,
-  NistPinnedAgentDashboardConfig,
-} from '../../../common/dashboards/dashboard-definitions/overview/nist/dashboard';
+} from '../../../common/dashboards/dashboard-definitions/overview/nist/overview/dashboard';
 import { OfficeOverviewDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/dashboard';
 import { OfficeKPIsDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/kpis/dashboard';
 import { OfficeDrilldownIPConfigDashboardConfig } from '../../../common/dashboards/dashboard-definitions/overview/office/panel/config/drilldown-ip-config/dashboard';
@@ -96,6 +95,7 @@ import { HipaaPinnedAgentDashboardConfig } from "../../../common/dashboards/dash
 import { ITHygienePinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/it-hygiene/dashboards/pinned-agent/dashboard";
 import { MalwareDetectionPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/malware-detection/pinned-agent/dashboard";
 import { MitrePinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/mitre/pinned-agent/dashboard";
+import { NistPinnedAgentDashboardConfig } from "../../../common/dashboards/dashboard-definitions/overview/nist/pinned-agent/dashboard";
 
 export const getDashboardConfigs = (): DashboardConfig[] => {
   const wazuhDiscoverDashboardConfig = new WazuhDiscoverDashboardConfig(
