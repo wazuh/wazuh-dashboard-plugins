@@ -53,16 +53,12 @@ import { useDataSource } from '../../../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/render-columns';
 import { DocumentViewTableAndJson } from '../../../../common/wazuh-discover/components/document-view-table-and-json';
-import { WzSearchBar } from '../../../../common/search-bar';
-import VulsEvaluationFilter, {
-  createUnderEvaluationFilter,
-  excludeUnderEvaluationFilter,
-  getUnderEvaluationFilterValue,
-} from '../../common/components/vuls-evaluation-filter';
+import { useWithManagedSearchBarFilters, WzSearchBar } from '../../../../common/search-bar';
 import { DataGridVisibleColumnsSelector } from '../../../../common/wazuh-discover/components/visible-columns-selector';
 import { SampleDataWarning } from '../../../../visualize/components';
 import { WAZUH_SAMPLE_VULNERABILITIES } from '../../../../../../common/constants';
 import RestoreStateColumnsButton from '../../../../common/wazuh-discover/components/restore-state-columns';
+import { vulnerabilityManagedFilters } from '../overview/dashboard';
 
 const InventoryVulsComponent = () => {
   const {
@@ -84,6 +80,10 @@ const InventoryVulsComponent = () => {
     setFilters,
   });
   const { query } = searchBarProps;
+
+  const { searchBarFilters, postFixedFilters } = useWithManagedSearchBarFilters({
+      spec: vulnerabilityManagedFilters || {}
+    }, filters, setFilters)
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
@@ -116,11 +116,6 @@ const InventoryVulsComponent = () => {
       </EuiToolTip>
     );
   };
-
-  const getUnderEvaluation = useCallback(getUnderEvaluationFilterValue, [
-    JSON.stringify(filters),
-    isDataSourceLoading,
-  ]);
 
   const dataGridProps = useDataGrid({
     moduleId: 'vulnerabilities-inventory',
@@ -166,7 +161,6 @@ const InventoryVulsComponent = () => {
     if (isDataSourceLoading) {
       return;
     }
-    setUnderEvaluation(getUnderEvaluation(filters || []));
     setIndexPattern(dataSource?.indexPattern);
     fetchData({ query, pagination, sorting })
       .then(results => {
@@ -191,32 +185,6 @@ const InventoryVulsComponent = () => {
     JSON.stringify(sorting),
     fingerprint,
   ]);
-
-  /**
-   * When the user changes the filter value, this function is called to update the filters
-   * If the value is null, the filter is removed
-   * If the filter already exists, it is remove and the new filter is added
-   * @param underEvaluation
-   * @returns
-   */
-  const handleFilterChange = (underEvaluation: boolean | null) => {
-    const newFilters = excludeUnderEvaluationFilter(filters || []);
-    if (underEvaluation === null) {
-      setFilters(newFilters);
-      return;
-    }
-    newFilters.push(
-      createUnderEvaluationFilter(
-        underEvaluation,
-        dataSource?.id || indexPattern?.id,
-      ),
-    );
-    setFilters(newFilters);
-  };
-
-  const [underEvaluation, setUnderEvaluation] = useState<boolean | null>(
-    getUnderEvaluation(filters || []),
-  );
 
   const closeFlyoutHandler = () => setInspectedHit(undefined);
 
@@ -244,16 +212,9 @@ const InventoryVulsComponent = () => {
                   <WzSearchBar
                     appName='inventory-vuls'
                     {...searchBarProps}
-                    filters={excludeUnderEvaluationFilter(filters)}
+                    filters={searchBarFilters}
                     fixedFilters={fixedFilters}
-                    postFixedFilters={[
-                      () => (
-                        <VulsEvaluationFilter
-                          value={underEvaluation}
-                          setValue={handleFilterChange}
-                        />
-                      ),
-                    ]}
+                    postFixedFilters={postFixedFilters}
                     showDatePicker={false}
                     showQueryInput={true}
                     showQueryBar={true}
