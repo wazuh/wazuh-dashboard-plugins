@@ -58,7 +58,7 @@ const config = {
   localDatasetDir: path.join(__dirname, '../../server/lib/sample-data/dataset'),
   // List of datasets to update (obtained from local directory)
   datasets: [],
-  // Mapping from local dataset names to remote template filenames (Wazuh 5.0)
+  // Mapping from local dataset names to remote template filenames
   datasetToTemplateMapping: {
     'wazuh-alerts': 'templates/streams/alerts.json',
     'agents-monitoring': 'templates/monitoring.json',
@@ -91,7 +91,7 @@ function getDatasets() {
     const items = fs.readdirSync(config.localDatasetDir);
     config.datasets = items.filter(item => {
       const itemPath = path.join(config.localDatasetDir, item);
-      return fs.statSync(itemPath).isDirectory() && item.startsWith('states-');
+      return fs.statSync(itemPath).isDirectory();
     });
     console.log(`Found ${config.datasets.length} datasets to update.`);
   } catch (error) {
@@ -144,7 +144,6 @@ function saveFile(dataset, filename, content) {
   return new Promise((resolve, reject) => {
     const filePath = path.join(config.localDatasetDir, dataset, filename);
 
-    // Save the new content
     fs.writeFile(filePath, content, 'utf8', error => {
       if (error) {
         reject(error);

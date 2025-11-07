@@ -47,7 +47,7 @@ export interface Location {
 }
 
 export interface Field {
-  timestamp: string;
+  '@timestamp': string;
 }
 
 export type GeoLocation = {
