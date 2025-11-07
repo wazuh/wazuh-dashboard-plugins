@@ -82,7 +82,7 @@ export class FimPinnedAgentDashboardConfig extends DashboardConfig {
   }
 
   protected override getId(): string {
-    return 'fim-agent-pinned-dashboard';
+    return 'fim-pinned-agent-dashboard';
   }
 
   protected override getTitle(): string {

@@ -72,7 +72,7 @@ export class GDPRPinnedAgentDashboardConfig extends DashboardConfig {
   }
 
   protected override getId(): string {
-    return 'gdpr-agent-pinned-dashboard';
+    return 'gdpr-pinned-agent-dashboard';
   }
   protected override getTitle(): string {
     return 'GDPR Agent Pinned Dashboard';

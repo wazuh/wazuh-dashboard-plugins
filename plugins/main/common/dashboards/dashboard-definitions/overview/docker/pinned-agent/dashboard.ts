@@ -62,7 +62,7 @@ export class DockerPinnedAgentDashboardConfig extends DashboardConfig {
   }
 
   protected override getId(): string {
-    return 'docker-agent-pinned-dashboard-tab';
+    return 'docker-pinned-agent-dashboard-tab';
   }
 
   protected override getTitle(): string {

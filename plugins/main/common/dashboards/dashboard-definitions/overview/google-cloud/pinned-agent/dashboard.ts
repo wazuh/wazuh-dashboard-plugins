@@ -92,7 +92,7 @@ export class GoogleCloudPinnedAgentDashboardConfig extends DashboardConfig {
   }
 
   protected override getId(): string {
-    return 'google-cloud-agent-pinned-dashboard';
+    return 'google-cloud-pinned-agent-dashboard';
   }
 
   protected override getTitle(): string {

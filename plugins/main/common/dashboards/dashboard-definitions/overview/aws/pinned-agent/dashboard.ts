@@ -92,7 +92,7 @@ export class AWSPinnedAgentDashboardConfig extends DashboardConfig {
   }
 
   protected override getId(): string {
-    return 'aws-agent-pinned-dashboard-tab';
+    return 'aws-pinned-agent-dashboard-tab';
   }
 
   protected override getTitle(): string {

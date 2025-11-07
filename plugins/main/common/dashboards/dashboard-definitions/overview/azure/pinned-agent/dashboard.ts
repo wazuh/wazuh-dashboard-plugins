@@ -82,7 +82,7 @@ export class AzurePinnedAgentDashboardConfig extends DashboardConfig {
   }
 
   protected override getId(): string {
-    return 'azure-agent-pinned-dashboard-tab';
+    return 'azure-pinned-agent-dashboard-tab';
   }
   protected override getTitle(): string {
     return 'Azure Agent Pinned dashboard';

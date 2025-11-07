@@ -92,7 +92,7 @@ export class GithubPinnedAgentDashboardConfig extends DashboardConfig {
   }
 
   protected override getId(): string {
-    return 'github-agent-pinned-dashboard-tab';
+    return 'github-pinned-agent-dashboard-tab';
   }
 
   protected override getTitle(): string {
