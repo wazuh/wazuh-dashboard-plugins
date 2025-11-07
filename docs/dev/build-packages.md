@@ -61,7 +61,7 @@ yarn build
 
 3. Clone the [wazuh-dashboard-plugins](https://github.com/wazuh/wazuh-dashboard-plugins.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-plugins/` folder, and build the plugins:
 
-> The yarn build command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
+> The `yarn build` command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
 > Replace the `GIT_REF` by the branch or tag for the Wazuh dashboard plugins, e.g. `v5.0.0`.
 
 ```bash
@@ -72,6 +72,11 @@ cd wazuh-dashboard-plugins/
 nvm install $(cat .nvmrc)
 nvm use $(cat .nvmrc)
 cp -r plugins/* ../
+```
+
+The plugin in the `main` directory needs a git reference to an existent branch or tag in the [`wazuh-indexer-repository`](https://github.com/wazuh/wazuh-indexer-plugins) to download and generate some resources, ensure the provided git reference exists and it is compatible with the plugin.
+
+```bash
 cd ../main
 GIT_REF=$GIT_REF yarn
 OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version package.json) yarn build
@@ -85,7 +90,7 @@ OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version package.json) yarn
 
 4. Clone the [wazuh-dashboard-reporting](https://github.com/wazuh/wazuh-dashboard-reporting.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-reporting/` folder, and build the plugin:
 
-> The yarn build command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
+> The `yarn build` command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
 > Replace the `GIT_REF` by the branch or tag for the Wazuh reporting plugin, e.g. `v5.0.0`.
 
 ```bash
