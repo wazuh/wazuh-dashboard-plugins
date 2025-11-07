@@ -72,7 +72,7 @@ export class GithubDrilldownActorDashboardConfig extends DashboardConfig {
   }
 
   protected override getId(): string {
-    return 'github-drilldown-action-dashboard-tab';
+    return 'github-drilldown-actor-dashboard-tab';
   }
 
   protected override getTitle(): string {
