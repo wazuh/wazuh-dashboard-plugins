@@ -109,6 +109,7 @@ jobs:
 
           # Up the environment and run the command
           docker run -t --rm \
+            -e GIT_REF=${{ inputs.reference }} \
             -e ${docker_env_plugin_platform}=${combined_version} \
             -v `pwd`/${{ matrix.plugins.path }}:/home/node/kbn/plugins/${{ matrix.plugins.container_path }} \
             ${{ inputs.docker_run_extra_args }} \
