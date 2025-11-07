@@ -53,7 +53,10 @@ import { useDataSource } from '../../../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/render-columns';
 import { DocumentViewTableAndJson } from '../../../../common/wazuh-discover/components/document-view-table-and-json';
-import { useWithManagedSearchBarFilters, WzSearchBar } from '../../../../common/search-bar';
+import {
+  useWithManagedSearchBarFilters,
+  WzSearchBar,
+} from '../../../../common/search-bar';
 import { DataGridVisibleColumnsSelector } from '../../../../common/wazuh-discover/components/visible-columns-selector';
 import { SampleDataWarning } from '../../../../visualize/components';
 import { WAZUH_SAMPLE_VULNERABILITIES } from '../../../../../../common/constants';
@@ -81,9 +84,13 @@ const InventoryVulsComponent = () => {
   });
   const { query } = searchBarProps;
 
-  const { searchBarFilters, postFixedFilters } = useWithManagedSearchBarFilters({
-      spec: vulnerabilityManagedFilters || {}
-    }, filters, setFilters)
+  const { searchBarFilters, postFixedFilters } = useWithManagedSearchBarFilters(
+    {
+      spec: vulnerabilityManagedFilters || {},
+    },
+    filters,
+    setFilters,
+  );
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);

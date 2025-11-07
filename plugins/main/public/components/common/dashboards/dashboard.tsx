@@ -31,9 +31,13 @@ export const Dashboard = props => {
     props.dataSourceAction?.data?.hits?.total > 0,
   );
 
-  const { searchBarFilters, postFixedFilters } = useWithManagedSearchBarFilters({
-    spec: props.managedFilters|| {},
-  }, props.dataSource.filters, props.dataSource.setFilters)
+  const { searchBarFilters, postFixedFilters } = useWithManagedSearchBarFilters(
+    {
+      spec: props.managedFilters || {},
+    },
+    props.dataSource.filters,
+    props.dataSource.setFilters,
+  );
 
   return (
     <>
@@ -124,12 +128,12 @@ export const createDashboard = ({
   DataSource: any;
   DataSourceRepositoryCreator: any;
   sampleDataWarningCategories?: string[];
-  managedFilters?: { 
-    [ key:string ]: {
+  managedFilters?: {
+    [key: string]: {
       managedField: string;
       component: (props: any) => any;
       order: number;
-    }
+    };
   };
   getDashboardPanels: Array<{
     dashboardId: string;
@@ -142,7 +146,7 @@ export const createDashboard = ({
     withInjectProps({
       sampleDataWarningCategories,
       getDashboardPanels,
-      managedFilters
+      managedFilters,
     }),
     withDataSourceFetchSearchBar({
       DataSource,

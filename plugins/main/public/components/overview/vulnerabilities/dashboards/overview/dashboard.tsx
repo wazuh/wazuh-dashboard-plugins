@@ -22,35 +22,45 @@ import VulsEvaluationFilter, {
 export const vulnerabilityManagedFilters = {
   underEvaluation: {
     managedField: UNDER_EVALUATION_FIELD,
-    component: (props: { managedFilter?: any; setManagedFilter: (filters: any[]) => void }) => {
+    component: (props: {
+      managedFilter?: any;
+      setManagedFilter: (filters: any[]) => void;
+    }) => {
       const onChange = (underEvaluation: boolean | null) => {
         const newFilters = [];
         if (underEvaluation !== null) {
           const indexId = WAZUH_VULNERABILITIES_PATTERN;
-          newFilters.push(createUnderEvaluationFilter(underEvaluation, indexId));
+          newFilters.push(
+            createUnderEvaluationFilter(underEvaluation, indexId),
+          );
         }
         props?.setManagedFilter(newFilters);
       };
 
-      return (<VulsEvaluationFilter value={getUnderEvaluationFilterValue(props?.managedFilter)} setValue={onChange} />)
+      return (
+        <VulsEvaluationFilter
+          value={getUnderEvaluationFilterValue(props?.managedFilter)}
+          setValue={onChange}
+        />
+      );
     },
     order: 1,
-  }
-}
+  },
+};
 
 export const DashboardVuls = withErrorBoundary(
   withVulnerabilitiesStateDataSource(
-      createDashboard({
-        DataSource: VulnerabilitiesDataSource,
-        DataSourceRepositoryCreator: VulnerabilitiesDataSourceRepository,
-        managedFilters: vulnerabilityManagedFilters,
-        getDashboardPanels: [
-          {
-            dashboardId: VULNERABILITIES_DASHBOARD_ID,
-            agentDashboardId: VULNERABILITIES_AGENT_DASHBOARD_ID,
-          },
-        ],
-        sampleDataWarningCategories: [WAZUH_SAMPLE_VULNERABILITIES],
-      }),
+    createDashboard({
+      DataSource: VulnerabilitiesDataSource,
+      DataSourceRepositoryCreator: VulnerabilitiesDataSourceRepository,
+      managedFilters: vulnerabilityManagedFilters,
+      getDashboardPanels: [
+        {
+          dashboardId: VULNERABILITIES_DASHBOARD_ID,
+          agentDashboardId: VULNERABILITIES_AGENT_DASHBOARD_ID,
+        },
+      ],
+      sampleDataWarningCategories: [WAZUH_SAMPLE_VULNERABILITIES],
+    }),
   ),
 );
