@@ -72,9 +72,11 @@ export const useWithManagedSearchBarFilters = (
     searchBarFilters: filters.filter(
       f =>
         !Object.values(definition.spec)
-          .map(({ controlledBy }) => controlledBy)
+          .map(
+            ({ managedField }) =>
+              managedField && f.meta?.key === managedField,
+          )
           .filter(Boolean)
-          .includes(f.meta?.controlledBy),
     ),
     postFixedFilters: orderBy(
       Object.values(definition.spec),

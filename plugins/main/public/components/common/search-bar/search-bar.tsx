@@ -87,7 +87,7 @@ export const WzSearchBar = ({
                 {postFixedFilters
                   ? postFixedFilters.map((Filter, idx) => (
                       <EuiFlexItem grow={false} key={idx}>
-                        <Filter />
+                        { Filter }
                       </EuiFlexItem>
                     ))
                   : null}
