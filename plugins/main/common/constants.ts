@@ -1006,11 +1006,11 @@ export const INDEX_PATTERN_ALERTS_REQUIRED_FIELDS = [
   //'agent.id',
 ];
 
-
 /** Dashboards ids **/
 
 export const THREAT_HUNTING_DASHBOARD_ID = 'threat-hunting-dashboard';
-export const THREAT_HUNTING_AGENT_DASHBOARD_ID = 'threat-hunting-agent-dashboard';
+export const THREAT_HUNTING_AGENT_DASHBOARD_ID =
+  'threat-hunting-agent-dashboard';
 
 export const AMAZON_WEB_SERVICES_DASHBOARD_ID = 'aws-dashboard';
 export const AMAZON_WEB_SERVICES_AGENT_DASHBOARD_ID = 'aws-agent-dashboard';
@@ -1058,8 +1058,11 @@ export const OFFICE_365_DASHBOARD_ID = 'office-365-dashboard';
 export const IT_HYGIENE_DASHBOARD_ID = 'it-hygiene-dashboard';
 export const IT_HYGIENE_AGENT_DASHBOARD_ID = 'it-hygiene-agent-dashboard';
 
-export const CONFIGURATION_ASSESSMENT_DASHBOARD_ID = 'configuration-assessment-dashboard';
-export const CONFIGURATION_ASSESSMENT_AGENT_DASHBOARD_ID = 'configuration-assessment-agent-dashboard';
+export const CONFIGURATION_ASSESSMENT_DASHBOARD_ID =
+  'configuration-assessment-dashboard';
+export const CONFIGURATION_ASSESSMENT_AGENT_DASHBOARD_ID =
+  'configuration-assessment-agent-dashboard';
 
 export const VULNERABILITIES_DASHBOARD_ID = 'vulnerability-detector-dashboard';
-export const VULNERABILITIES_AGENT_DASHBOARD_ID = 'vulnerability-detector-agent-dashboard';
+export const VULNERABILITIES_AGENT_DASHBOARD_ID =
+  'vulnerability-detector-agent-dashboard';

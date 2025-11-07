@@ -7,7 +7,11 @@ import {
 } from '../../../../common/data-source/pattern/sca';
 import { createDashboard } from '../../../../common/dashboards';
 import { withSCADataSource } from '../../hocs/validate-sca-states-index-pattern';
-import { CONFIGURATION_ASSESSMENT_DASHBOARD_ID, WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT, CONFIGURATION_ASSESSMENT_AGENT_DASHBOARD_ID } from '../../../../../../common/constants';
+import {
+  CONFIGURATION_ASSESSMENT_DASHBOARD_ID,
+  WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
+  CONFIGURATION_ASSESSMENT_AGENT_DASHBOARD_ID,
+} from '../../../../../../common/constants';
 
 export const SCADashboard = compose(
   withErrorBoundary,
