@@ -1,4 +1,7 @@
-import { buildIndexPatternReferenceList, buildSearchSource } from "../../../lib";
+import {
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+} from '../../../lib';
 import type { SavedVis } from '../../../types';
 
 export const getVisStateTop5Images = (indexPatternId: string): SavedVis => {

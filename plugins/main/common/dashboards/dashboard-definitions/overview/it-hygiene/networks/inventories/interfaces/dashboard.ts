@@ -59,7 +59,9 @@ export class ITHygieneNetworksInventoriesInterfacesDashboardConfig extends Dashb
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new ITHygieneNetworksInventoriesInterfacesDashboardLayoutDefinition(indexPatternId),
+      new ITHygieneNetworksInventoriesInterfacesDashboardLayoutDefinition(
+        indexPatternId,
+      ),
     );
   }
 

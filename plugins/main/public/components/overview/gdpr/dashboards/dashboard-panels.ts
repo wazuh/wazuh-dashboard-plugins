@@ -1,8 +1,6 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
-import {
-  GDPROverviewDashboardConfig,
-} from '../../../../../common/dashboards/dashboard-definitions/overview/gdpr/overview/dashboard';
-import { GDPRPinnedAgentDashboardConfig } from "../../../../../common/dashboards/dashboard-definitions/overview/gdpr/pinned-agent/dashboard";
+import { GDPROverviewDashboardConfig } from '../../../../../common/dashboards/dashboard-definitions/overview/gdpr/overview/dashboard';
+import { GDPRPinnedAgentDashboardConfig } from '../../../../../common/dashboards/dashboard-definitions/overview/gdpr/pinned-agent/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,

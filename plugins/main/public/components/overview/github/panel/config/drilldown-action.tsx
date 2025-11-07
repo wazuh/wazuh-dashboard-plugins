@@ -20,7 +20,9 @@ import { GithubDrilldownActionDashboardConfig } from '../../../../../../common/d
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 
-const getDashboardPanels = (indexPatternId: string): DashboardByRendererPanels => {
+const getDashboardPanels = (
+  indexPatternId: string,
+): DashboardByRendererPanels => {
   const githubDrilldownActionDashboardConfig =
     new GithubDrilldownActionDashboardConfig(indexPatternId);
 

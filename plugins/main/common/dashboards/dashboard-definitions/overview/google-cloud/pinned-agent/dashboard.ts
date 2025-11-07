@@ -9,7 +9,7 @@ import {
   getVisStateTop5Rules,
   getVisStateTopProjectIdBySource,
   getVisStateTopQueryEvents,
-  getVisStateTopResourceTypeProject
+  getVisStateTopResourceTypeProject,
 } from '../vis-states';
 
 export class GoogleCloudPinnedAgentDashboardLayoutDefinition extends DashboardLayoutDefinition {

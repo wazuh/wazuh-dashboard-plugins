@@ -7,7 +7,7 @@ import {
   getVisStateRequirementsAgentsHeatmap,
   getVisStateRequirementsByAgent,
   getVisStateTopAgentsByAlertsCount,
-  getVisStateTopRequirementsOverTime
+  getVisStateTopRequirementsOverTime,
 } from '../vis-states';
 
 export class TscOverviewDashboardLayoutDefinition extends DashboardLayoutDefinition {
@@ -65,7 +65,10 @@ export class TscOverviewDashboardLayoutDefinition extends DashboardLayoutDefinit
 
 export class TscOverviewDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new TscOverviewDashboardLayoutDefinition(indexPatternId));
+    super(
+      indexPatternId,
+      new TscOverviewDashboardLayoutDefinition(indexPatternId),
+    );
   }
 
   protected override getId(): string {

@@ -2,13 +2,13 @@ import {
   DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
-import { HipaaOverviewDashboardLayoutDefinition } from "../overview/dashboard";
+import { HipaaOverviewDashboardLayoutDefinition } from '../overview/dashboard';
 import {
   getVisStateAgentCommonAlerts,
   getVisStateAgentRequirements,
   getVisStateAgentRequirementsOvertime,
   getVisStateAgentRuleLevelDistribution,
-  getVisStateAgentTopRequirements
+  getVisStateAgentTopRequirements,
 } from '../vis-states';
 
 export class HipaaPinnedAgentDashboardLayoutDefinition extends DashboardLayoutDefinition {

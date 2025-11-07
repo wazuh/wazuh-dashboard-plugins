@@ -4,7 +4,5 @@ import { SCAInventoryDashboardConfig } from '../../../../../../../common/dashboa
 export const getKPIsPanel = (
   indexPatternId: string,
 ): DashboardByRendererPanels => {
-  return new SCAInventoryDashboardConfig(
-    indexPatternId,
-  ).getDashboardPanels();
+  return new SCAInventoryDashboardConfig(indexPatternId).getDashboardPanels();
 };

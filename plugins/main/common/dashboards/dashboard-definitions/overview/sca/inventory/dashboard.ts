@@ -1,7 +1,7 @@
 import {
   getVisStateHorizontalBarSplitSeries,
   getVisStateTable,
-  SCA_CHECK_RESULT_COLOR_MAPPING
+  SCA_CHECK_RESULT_COLOR_MAPPING,
 } from '../../../../lib';
 import {
   DashboardConfig,

@@ -6,7 +6,7 @@ import {
   getVisStateAlertEvolutionTop5Agents,
   getVisStateTop10AlertLevelEvolution,
   getVisStateTop10MITREATTACKS,
-  getVisStateTop5Agents
+  getVisStateTop5Agents,
 } from '../vis-states';
 
 export class ThreatHuntingOverviewDashboardLayoutDefinition extends DashboardLayoutDefinition {

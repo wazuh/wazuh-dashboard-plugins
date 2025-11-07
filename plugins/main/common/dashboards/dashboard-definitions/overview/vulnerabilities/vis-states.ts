@@ -1,7 +1,9 @@
-import { UI_COLOR_STATUS } from "../../../../constants";
-import type { SavedVis } from "../../../types";
+import { UI_COLOR_STATUS } from '../../../../constants';
+import type { SavedVis } from '../../../types';
 
-export const getVisStateTopVulnerabilitiesScore = (indexPatternId: string): SavedVis => {
+export const getVisStateTopVulnerabilitiesScore = (
+  indexPatternId: string,
+): SavedVis => {
   return {
     id: 'most_detected_vulnerabilities',
     title: 'Most common vulnerability score',
@@ -131,7 +133,9 @@ export const getVisStateTopVulnerabilitiesScore = (indexPatternId: string): Save
   };
 };
 
-export const getVisStateTopVulnerableOSFamilies = (indexPatternId: string): SavedVis => {
+export const getVisStateTopVulnerableOSFamilies = (
+  indexPatternId: string,
+): SavedVis => {
   return {
     id: 'most_vulnerable_endpoints_vulnerabilities',
     title: 'Most vulnerable OS families',

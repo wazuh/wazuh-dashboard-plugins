@@ -9,7 +9,7 @@ import {
   getVisStateRegions,
   getVisStateTopAccounts,
   getVisStateTopBuckets,
-  getVisStateTopSources
+  getVisStateTopSources,
 } from '../vis-states';
 
 export class AWSOverviewDashboardLayoutDefinition extends DashboardLayoutDefinition {

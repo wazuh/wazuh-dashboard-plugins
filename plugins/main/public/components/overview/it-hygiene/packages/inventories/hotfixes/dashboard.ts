@@ -1,4 +1,4 @@
-import { ITHygienePackagesInventoriesHotFixesDashboardConfig } from "../../../../../../../common/dashboards/dashboard-definitions/overview/it-hygiene/packages/inventories/hotfixes/dashboard";
+import { ITHygienePackagesInventoriesHotFixesDashboardConfig } from '../../../../../../../common/dashboards/dashboard-definitions/overview/it-hygiene/packages/inventories/hotfixes/dashboard';
 
 export const getOverviewPackagesHotfixesTab = (indexPatternId: string) => {
   return new ITHygienePackagesInventoriesHotFixesDashboardConfig(

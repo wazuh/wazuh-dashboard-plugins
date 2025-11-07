@@ -9,7 +9,7 @@ import {
   getVisStateMetricOrganizationsCount,
   getVisStateMetricRepositoriesCount,
   getVisStateTopOrganizationsByAlertCount,
-  getVisStateUsersWithMoreAlerts
+  getVisStateUsersWithMoreAlerts,
 } from '../vis-states';
 
 export class GithubOverviewDashboardLayoutDefinition extends DashboardLayoutDefinition {

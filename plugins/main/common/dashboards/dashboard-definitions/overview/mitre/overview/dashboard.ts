@@ -7,7 +7,7 @@ import {
   getVisStateAttacksByTechnique,
   getVisStateTechniqueByAgent,
   getVisStateTopTactics,
-  getVisStateTopTacticsByAgent
+  getVisStateTopTacticsByAgent,
 } from '../vis-states';
 
 export class MitreOverviewDashboardLayoutDefinition extends DashboardLayoutDefinition {

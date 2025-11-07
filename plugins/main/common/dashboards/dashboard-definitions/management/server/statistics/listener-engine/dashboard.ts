@@ -2,7 +2,11 @@ import {
   DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../../lib/dashboard-config-service';
-import { getVisStateEventsSentToAnalysisd, getVisStateTCPSessions, getVisStateTotalNumberOfBytesReceived } from "./vis-states";
+import {
+  getVisStateEventsSentToAnalysisd,
+  getVisStateTCPSessions,
+  getVisStateTotalNumberOfBytesReceived,
+} from './vis-states';
 
 export class ServerManagementStatisticsListenerEngineDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor(indexPatternId: string) {

@@ -9,7 +9,7 @@ import {
   getVisStateRequirementsOverTime2,
   getVisStateStats,
   getVisStateTagsCloud,
-  getVisStateTopRequirements
+  getVisStateTopRequirements,
 } from '../vis-states';
 
 export class HipaaOverviewDashboardLayoutDefinition extends DashboardLayoutDefinition {

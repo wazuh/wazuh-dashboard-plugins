@@ -8,7 +8,7 @@ import {
   getVisStateFIMEventsSummary,
   getVisStateFIMTopAgentsPie,
   getVisStateFIMTopAgentsUser,
-  getVisStateFIMTopRules
+  getVisStateFIMTopRules,
 } from '../vis-states';
 
 export class FimOverviewDashboardLayoutDefinition extends DashboardLayoutDefinition {
@@ -75,7 +75,10 @@ export class FimOverviewDashboardLayoutDefinition extends DashboardLayoutDefinit
 
 export class FimOverviewDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new FimOverviewDashboardLayoutDefinition(indexPatternId));
+    super(
+      indexPatternId,
+      new FimOverviewDashboardLayoutDefinition(indexPatternId),
+    );
   }
 
   protected override getId(): string {

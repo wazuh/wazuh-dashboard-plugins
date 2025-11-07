@@ -5,9 +5,7 @@ import { WazuhDiscoverDashboardConfig } from '../../../../../common/dashboards/d
 export const getDiscoverPanels = (
   indexPatternId: string,
 ): DashboardByRendererPanels => {
-  return new WazuhDiscoverDashboardConfig(
-    indexPatternId,
-  ).getDashboardPanels();
+  return new WazuhDiscoverDashboardConfig(indexPatternId).getDashboardPanels();
 };
 
 export const histogramChartInput = (

@@ -9,7 +9,7 @@ import {
   getVisStateAgentRegions,
   getVisStateAgentTopAccounts,
   getVisStateAgentTopBuckets,
-  getVisStateAgentTopSources
+  getVisStateAgentTopSources,
 } from '../vis-states';
 
 export class AWSPinnedAgentDashboardLayoutDefinition extends DashboardLayoutDefinition {

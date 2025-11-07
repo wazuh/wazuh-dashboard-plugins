@@ -4,7 +4,5 @@ import { OfficeKPIsDashboardConfig } from '../../../../../common/dashboards/dash
 export const getKPIsPanel = (
   indexPatternId: string,
 ): DashboardByRendererPanels => {
-  return new OfficeKPIsDashboardConfig(
-    indexPatternId,
-  ).getDashboardPanels();
+  return new OfficeKPIsDashboardConfig(indexPatternId).getDashboardPanels();
 };

@@ -1,7 +1,7 @@
 // @ts-ignore
 import { Filter } from 'src/plugins/data/common';
 import { buildIndexPatternReferenceList, buildSearchSource } from './builders';
-import { STYLE, type Style } from "./constants";
+import { STYLE, type Style } from './constants';
 
 export const getVisStateHorizontalBarByField = (
   indexPatternId: string,

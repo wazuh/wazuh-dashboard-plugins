@@ -7,7 +7,7 @@ import {
   getVisStateAlertsLevelByAttack,
   getVisStateAlertsLevelByTactic,
   getVisStateMitreAttacksByTactic,
-  getVisStateTopTactics
+  getVisStateTopTactics,
 } from '../vis-states';
 
 export class MitrePinnedAgentDashboardLayoutDefinition extends DashboardLayoutDefinition {

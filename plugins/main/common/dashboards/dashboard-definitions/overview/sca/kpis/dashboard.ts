@@ -4,7 +4,7 @@ import {
   DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
 import { getCheckResultColors } from '../../../../lib/helpers';
-import type { SavedVis } from "../../../../types";
+import type { SavedVis } from '../../../../types';
 import { getVisStateCheckScore } from './vis-states';
 
 export class SCAKPIsDashboardLayoutDefinition extends DashboardLayoutDefinition {

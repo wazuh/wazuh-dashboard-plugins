@@ -1,6 +1,6 @@
 import {
   buildDashboardKPIPanels,
-  getVisStateHorizontalBarByField
+  getVisStateHorizontalBarByField,
 } from '../../../../../../lib';
 import {
   DashboardConfig,

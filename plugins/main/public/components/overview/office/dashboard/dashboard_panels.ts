@@ -4,7 +4,5 @@ import { OfficeOverviewDashboardConfig } from '../../../../../common/dashboards/
 export const getDashboardPanels = (
   indexPatternId: string,
 ): DashboardByRendererPanels => {
-  return new OfficeOverviewDashboardConfig(
-    indexPatternId,
-  ).getDashboardPanels();
+  return new OfficeOverviewDashboardConfig(indexPatternId).getDashboardPanels();
 };

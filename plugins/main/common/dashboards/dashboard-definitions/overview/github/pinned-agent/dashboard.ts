@@ -9,7 +9,7 @@ import {
   getVisStateAgentUsersWithMoreAlerts,
   getVisStateMetricActorsCount,
   getVisStateMetricOrganizationsCount,
-  getVisStateMetricRepositoriesCount
+  getVisStateMetricRepositoriesCount,
 } from '../vis-states';
 
 export class GithubPinnedAgentDashboardLayoutDefinition extends DashboardLayoutDefinition {

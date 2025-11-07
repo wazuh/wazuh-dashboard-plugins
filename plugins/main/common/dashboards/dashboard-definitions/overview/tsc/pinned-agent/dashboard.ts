@@ -7,7 +7,7 @@ import {
   getVisStateAgentRuleLevelDistribution,
   getVisStateAgentTopRequirements,
   getVisStateAgentTopRuleDescription,
-  getVisStateAgentTopRuleGroups
+  getVisStateAgentTopRuleGroups,
 } from '../vis-states';
 
 export class TscPinnedAgentDashboardLayoutDefinition extends DashboardLayoutDefinition {

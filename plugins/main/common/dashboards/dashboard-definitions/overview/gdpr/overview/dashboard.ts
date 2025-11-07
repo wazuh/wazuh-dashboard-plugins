@@ -7,7 +7,7 @@ import {
   getVisStateRequirementsByAgent,
   getVisStateRequirementsHeatmap,
   getVisStateRequirementsOverTime,
-  getVisStateTopAgentsByAlertsCount
+  getVisStateTopAgentsByAlertsCount,
 } from '../vis-states';
 
 export class GDPROverviewDashboardLayoutDefinition extends DashboardLayoutDefinition {

@@ -6,7 +6,7 @@ import {
   getVisStateRequirementsByAgent,
   getVisStateRequirementsHeatmap,
   getVisStateTopAgentsByCount,
-  getVisStateTopRequirements
+  getVisStateTopRequirements,
 } from '../vis-states';
 
 export class PCIOverviewDashboardLayoutDefinition extends DashboardLayoutDefinition {
@@ -55,7 +55,10 @@ export class PCIOverviewDashboardLayoutDefinition extends DashboardLayoutDefinit
 
 export class PCIOverviewDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new PCIOverviewDashboardLayoutDefinition(indexPatternId));
+    super(
+      indexPatternId,
+      new PCIOverviewDashboardLayoutDefinition(indexPatternId),
+    );
   }
 
   protected override getId(): string {

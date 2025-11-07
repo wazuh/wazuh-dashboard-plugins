@@ -4,7 +4,7 @@ import type {
   SavedObjectDashboard,
   SavedObjectVisualization,
 } from './saved-object.types';
-import { DEFAULT_DEFINITIONS_FOLDER, DEFAULT_EXTENSION } from "./constants";
+import { DEFAULT_DEFINITIONS_FOLDER, DEFAULT_EXTENSION } from './constants';
 
 export interface DashboardDefinitionFromFile {
   filePath: string;
@@ -22,9 +22,11 @@ function isDefinitionFile(filePath: string, extension: string) {
   return path.extname(filePath).toLowerCase() === extension.toLowerCase();
 }
 
-function collectDefinitionFiles(folderPath: string,
+function collectDefinitionFiles(
+  folderPath: string,
   extension: string,
-  accumulator: string[] = []) {
+  accumulator: string[] = [],
+) {
   const entries = fs.readdirSync(folderPath, { withFileTypes: true });
 
   for (const entry of entries) {
@@ -46,13 +48,17 @@ type DashboardDefinitionSavedObject =
   | SavedObjectVisualization
   | SavedObjectDashboard;
 
-function isSupportedType(type: DashboardDefinitionSavedObject['type'] | string): type is DashboardDefinitionSavedObject['type'] {
+function isSupportedType(
+  type: DashboardDefinitionSavedObject['type'] | string,
+): type is DashboardDefinitionSavedObject['type'] {
   return type === 'visualization' || type === 'dashboard';
 }
 
-function parseNdjsonLine(line: string,
+function parseNdjsonLine(
+  line: string,
   lineNumber: number,
-  filePath: string): DashboardDefinitionSavedObject | null {
+  filePath: string,
+): DashboardDefinitionSavedObject | null {
   const trimmedLine = line.trim();
   if (!trimmedLine) return null;
 
@@ -70,9 +76,10 @@ function parseNdjsonLine(line: string,
 
     return parsed as DashboardDefinitionSavedObject;
   } catch (error) {
-    const reason = error instanceof Error ? error.message : JSON.stringify(error);
+    const reason =
+      error instanceof Error ? error.message : JSON.stringify(error);
     throw new Error(
-      `Invalid JSON in ${filePath} at line ${lineNumber}: ${reason}`
+      `Invalid JSON in ${filePath} at line ${lineNumber}: ${reason}`,
     );
   }
 }
@@ -85,27 +92,29 @@ function parseDefinitionFile(filePath: string) {
     .filter(Boolean) as DashboardDefinitionSavedObject[];
 }
 
-function toDashboardDefinitionFromFile(filePath: string,
-  rawObjects: DashboardDefinitionSavedObject[]): DashboardDefinitionFromFile {
+function toDashboardDefinitionFromFile(
+  filePath: string,
+  rawObjects: DashboardDefinitionSavedObject[],
+): DashboardDefinitionFromFile {
   const visualizations = rawObjects.filter(
-    (obj): obj is SavedObjectVisualization => obj.type === 'visualization'
+    (obj): obj is SavedObjectVisualization => obj.type === 'visualization',
   );
 
   const dashboards = rawObjects.filter(
-    (obj): obj is SavedObjectDashboard => obj.type === 'dashboard'
+    (obj): obj is SavedObjectDashboard => obj.type === 'dashboard',
   );
 
   if (dashboards.length === 0) {
     throw new Error(
-      `No dashboard object found inside "${path.basename(filePath)}"`
+      `No dashboard object found inside "${path.basename(filePath)}"`,
     );
   }
 
   if (dashboards.length > 1) {
     throw new Error(
       `Expected a single dashboard object in "${path.basename(
-        filePath
-      )}", found ${dashboards.length}`
+        filePath,
+      )}", found ${dashboards.length}`,
     );
   }
 

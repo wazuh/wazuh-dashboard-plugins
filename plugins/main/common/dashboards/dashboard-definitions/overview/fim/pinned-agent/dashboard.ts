@@ -8,7 +8,7 @@ import {
   getVisStateAgentFIMFilesAdded,
   getVisStateAgentFIMFilesDeleted,
   getVisStateAgentFIMFilesModified,
-  getVisStateAgentFIMUsers
+  getVisStateAgentFIMUsers,
 } from '../vis-states';
 
 export class FimPinnedAgentDashboardLayoutDefinition extends DashboardLayoutDefinition {

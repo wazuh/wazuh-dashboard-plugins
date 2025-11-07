@@ -7,7 +7,7 @@ import {
   getVisStateTop5Map,
   getVisStateTopProjectIdBySource,
   getVisStateTopResourceTypeProject,
-  getVisStateTopResponseCode
+  getVisStateTopResponseCode,
 } from '../vis-states';
 
 export class GoogleCloudOverviewDashboardLayoutDefinition extends DashboardLayoutDefinition {

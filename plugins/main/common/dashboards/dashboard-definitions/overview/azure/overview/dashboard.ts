@@ -8,7 +8,7 @@ import {
   getVisStateGeolocationMap,
   getVisStateOperationsTypes,
   getVisStateRegions,
-  getVisStateResults
+  getVisStateResults,
 } from '../vis-states';
 
 export class AzureOverviewDashboardLayoutDefinition extends DashboardLayoutDefinition {

@@ -15,7 +15,6 @@
 // Whenever possible, custom IDs are used for predictable identification.
 
 import type { SavedObjectsClientContract } from 'opensearch_dashboards/server';
-import path from 'path';
 import type { InitializationTaskRunContext } from '../services';
 import { readDashboardDefinitionFiles } from './dashboard-definition-reader';
 import type {
@@ -23,7 +22,7 @@ import type {
   SavedObjectDashboard,
   SavedObjectVisualization,
 } from './saved-object.types';
-import { DEFAULT_DEFINITIONS_FOLDER, DEFAULT_EXTENSION } from "./constants";
+import { DEFAULT_DEFINITIONS_FOLDER, DEFAULT_EXTENSION } from './constants';
 
 function toSentenceCase(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -72,12 +71,16 @@ async function ensureVisualizationSavedObject(
   );
   if (existingVisId) return existingVisId;
 
-  const visualizationSavedObject = await client.create('visualization', attributes, {
-    id,
-    overwrite: false,
-    refresh: true,
-    references,
-  });
+  const visualizationSavedObject = await client.create(
+    'visualization',
+    attributes,
+    {
+      id,
+      overwrite: false,
+      refresh: true,
+      references,
+    },
+  );
 
   logger.info(
     `Visualization ensured [${visualizationSavedObject.id}] title [${visualizationSavedObject.attributes.title}]`,

@@ -1,12 +1,12 @@
 import {
   DashboardConfig,
-  DashboardLayoutDefinition
+  DashboardLayoutDefinition,
 } from '../../../../lib/dashboard-config-service';
 import {
   getVisStateAgentEvents,
   getVisStateAgentResourcesUsageByOverTime,
   getVisStateAgentTop5Events,
-  getVisStateAgentTop5Images
+  getVisStateAgentTop5Images,
 } from '../vis-states';
 
 export class DockerPinnedAgentDashboardLayoutDefinition extends DashboardLayoutDefinition {

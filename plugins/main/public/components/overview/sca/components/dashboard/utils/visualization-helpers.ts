@@ -1,4 +1,4 @@
-import { SCA_CHECK_RESULT_COLOR_MAPPING } from "../../../../../../../common/dashboards/lib";
+import { SCA_CHECK_RESULT_COLOR_MAPPING } from '../../../../../../../common/dashboards/lib';
 import { getCore } from '../../../../../../kibana-services';
 
 const core = getCore();

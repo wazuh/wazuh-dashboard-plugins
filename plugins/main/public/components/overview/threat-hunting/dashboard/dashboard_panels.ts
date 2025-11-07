@@ -1,10 +1,8 @@
 /* WARNING: The panel id must be unique including general and agents visualizations. Otherwise, the visualizations will not refresh when we pin an agent, because they are cached by id */
 
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
-import {
-  ThreatHuntingOverviewDashboardConfig,
-} from '../../../../../common/dashboards/dashboard-definitions/overview/threat-hunting/overview/dashboard';
-import { ThreatHuntingPinnedAgentDashboardConfig } from "../../../../../common/dashboards/dashboard-definitions/overview/threat-hunting/pinned-agent/dashboard";
+import { ThreatHuntingOverviewDashboardConfig } from '../../../../../common/dashboards/dashboard-definitions/overview/threat-hunting/overview/dashboard';
+import { ThreatHuntingPinnedAgentDashboardConfig } from '../../../../../common/dashboards/dashboard-definitions/overview/threat-hunting/pinned-agent/dashboard';
 
 /* Definitiion of panels */
 

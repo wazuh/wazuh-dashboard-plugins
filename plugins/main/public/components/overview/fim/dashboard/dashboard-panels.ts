@@ -1,8 +1,6 @@
 import type { DashboardByRendererPanels } from '../../../../../common/dashboards';
-import {
-  FimOverviewDashboardConfig,
-} from '../../../../../common/dashboards/dashboard-definitions/overview/fim/overview/dashboard';
-import { FimPinnedAgentDashboardConfig } from "../../../../../common/dashboards/dashboard-definitions/overview/fim/pinned-agent/dashboard";
+import { FimOverviewDashboardConfig } from '../../../../../common/dashboards/dashboard-definitions/overview/fim/overview/dashboard';
+import { FimPinnedAgentDashboardConfig } from '../../../../../common/dashboards/dashboard-definitions/overview/fim/pinned-agent/dashboard';
 
 export const getDashboardPanels = (
   indexPatternId: string,

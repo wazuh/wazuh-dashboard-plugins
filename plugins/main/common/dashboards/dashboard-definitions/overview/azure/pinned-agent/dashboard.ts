@@ -8,7 +8,7 @@ import {
   getVisStateAgentGeolocationMap,
   getVisStateAgentOperationsTypes,
   getVisStateAgentRegions,
-  getVisStateAgentResults
+  getVisStateAgentResults,
 } from '../vis-states';
 
 export class AzurePinnedAgentDashboardLayoutDefinition extends DashboardLayoutDefinition {

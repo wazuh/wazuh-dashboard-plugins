@@ -7,7 +7,7 @@ import {
   getVisStateAgentTopRequirements,
   getVisStateAgentTopRequirementsCount,
   getVisStateTopRuleGroups,
-  getVisStateTopRules
+  getVisStateTopRules,
 } from '../vis-states';
 
 export class GDPRPinnedAgentDashboardLayoutDefinition extends DashboardLayoutDefinition {

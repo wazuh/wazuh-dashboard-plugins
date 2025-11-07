@@ -8,7 +8,7 @@ import {
   getVisStateRequirementsAgentsHeatmap,
   getVisStateRequirementsByAgents,
   getVisStateRequirementsOverTime,
-  getVisStateTopRequirements
+  getVisStateTopRequirements,
 } from '../vis-states';
 
 export class NistOverviewDashboardLayoutDefinition extends DashboardLayoutDefinition {

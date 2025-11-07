@@ -7,7 +7,7 @@ import {
   getVisStateAgentTopRequirements,
   getVisStateAgentTopRequirementsCount,
   getVisStateAgentTopRuleGroups,
-  getVisStateAgentTopRules
+  getVisStateAgentTopRules,
 } from '../vis-states';
 
 export class PCIPinnedAgentDashboardLayoutDefinition extends DashboardLayoutDefinition {
