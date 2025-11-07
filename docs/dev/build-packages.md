@@ -73,8 +73,8 @@ nvm install $(cat .nvmrc)
 nvm use $(cat .nvmrc)
 cp -r plugins/* ../
 cd ../main
-yarn
-GIT_REF=$GIT_REF OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version package.json) yarn build
+GIT_REF=$GIT_REF yarn
+OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version package.json) yarn build
 cd ../wazuh-core/
 yarn
 OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version package.json) yarn build
@@ -209,7 +209,6 @@ Ensure that these dependencies are installed on the system.
 - **Docker**: refer to [Docker installation guide](https://docs.docker.com/engine/install/).
 - **Internet connection** to download the Docker images for the first time.
 - **Utilities**: ensure the following are available:
-  - `jq`
   - `curl`
 
 ### Building the Wazuh dashboard package using Docker
