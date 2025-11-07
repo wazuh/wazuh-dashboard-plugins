@@ -41,7 +41,7 @@ export const DashboardITHygiene = compose(
         className: 'wz-dashboard-hide-tables-pagination-export-csv-controls',
       },
       {
-        getDashboardPanels,
+        getDashboardPanels: getDashboardPanels,
         id: 'it-hygiene-dashboard-tab',
         useMargins: true,
         title: 'IT Hygiene dashboard',

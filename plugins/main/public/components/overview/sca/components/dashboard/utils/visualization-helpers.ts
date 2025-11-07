@@ -1,5 +1,5 @@
-import { SCA_CHECK_RESULT_COLOR_MAPPING } from '../../../../../../../common/dashboards/lib';
 import { getCore } from '../../../../../../kibana-services';
+import { CheckResult, SCA_CHECK_RESULT_COLORS } from '../../../utils/constants';
 
 const core = getCore();
 
@@ -33,7 +33,7 @@ function convertNumeralToD3Format(numeralFormat: string): string {
 
 export const decimalFormat = () => {
   let decimalFormat;
-  const pattern = '0,0.[000]%';
+  const pattern = core.uiSettings.get('format:percent:defaultPattern');
   decimalFormat = convertNumeralToD3Format(pattern);
 
   return decimalFormat ?? '.2f';
@@ -41,8 +41,10 @@ export const decimalFormat = () => {
 
 export const checkResultColors = () => {
   const colors = {
-    ...SCA_CHECK_RESULT_COLOR_MAPPING,
-    checkScoreColor: '#333333',
+    ...SCA_CHECK_RESULT_COLORS,
+    checkScoreColor: core.uiSettings.get('theme:darkMode')
+      ? '#dfe5ef'
+      : '#333333',
   };
 
   return colors;

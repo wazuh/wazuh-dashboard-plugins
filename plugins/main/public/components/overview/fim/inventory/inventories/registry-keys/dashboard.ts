@@ -1,7 +1,48 @@
-import { FimRegistryKeysDashboardConfig } from '../../../../../../../common/dashboards/dashboard-definitions/overview/fim/registry-keys/dashboard';
+import {
+  getVisStateHorizontalBarSplitSeries,
+  getVisStateTable,
+} from '../../../../../../services/visualizations';
+import { buildDashboardKPIPanels } from '../../../../it-hygiene/common/create-dashboard-panels-kpis';
 
 export const getDashboard = (indexPatternId: string) => {
-  return new FimRegistryKeysDashboardConfig(
-    indexPatternId,
-  ).getDashboardPanels();
+  return buildDashboardKPIPanels([
+    getVisStateTable(
+      indexPatternId,
+      'registry.path',
+      '',
+      'registry-keys-inventory',
+      {
+        size: 5,
+        fieldCustomLabel: 'Top 5 registry paths',
+      },
+    ),
+    getVisStateHorizontalBarSplitSeries(
+      indexPatternId,
+      'registry.owner',
+      'Registry owners',
+      'registry-keys-inventory',
+      {
+        fieldSize: 4,
+        otherBucket: 'Others',
+        metricCustomLabel: 'Registry owner count',
+        valueAxesTitleText: ' ',
+        fieldCustomLabel: 'Registry owner',
+        seriesLabel: 'Registry owner',
+      },
+    ),
+    getVisStateHorizontalBarSplitSeries(
+      indexPatternId,
+      'registry.group',
+      'Registry groups',
+      'registry-keys-inventory',
+      {
+        fieldSize: 4,
+        otherBucket: 'Others',
+        metricCustomLabel: 'Registry groups count',
+        valueAxesTitleText: ' ',
+        fieldCustomLabel: 'Registry group',
+        seriesLabel: 'Registry group',
+      },
+    ),
+  ]);
 };

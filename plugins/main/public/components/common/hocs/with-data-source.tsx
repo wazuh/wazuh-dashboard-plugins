@@ -384,7 +384,7 @@ export const withDataSourceFetchSearchBar = ({
   LoadingDataSourceComponent?: any;
   FetchingDataComponent?: any;
   ErrorFetchDataComponent?: any;
-  fetchOptions?: WithDataSourceFetchOnStartProps['fetchOptions'];
+  fetchOptions: WithDataSourceFetchOnStartProps['fetchOptions'];
 }) =>
   compose(
     withDataSourceSearchBar({

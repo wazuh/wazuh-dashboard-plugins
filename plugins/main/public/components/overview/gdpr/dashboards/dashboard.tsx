@@ -10,7 +10,7 @@ export const DashboardGDPR = createDashboard({
   DataSourceRepositoryCreator: AlertsDataSourceRepository,
   getDashboardPanels: [
     {
-      getDashboardPanels,
+      getDashboardPanels: getDashboardPanels,
       id: 'gdpr-dashboard-tab',
       title: 'GDPR dashboard',
       description: 'Dashboard of the GDPR',

@@ -13,19 +13,84 @@
 
 import React from 'react';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import type { DashboardByRendererPanels } from '../../../../../../common/dashboards';
 import { getPlugins } from '../../../../../kibana-services';
-import { OfficeDrilldownRulesConfigDashboardConfig } from '../../../../../../common/dashboards/dashboard-definitions/overview/office/drilldowns/rules-config/dashboard';
+import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
+import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import {
+  getVisStateOfficeTopOperations,
+  getVisStateTopOfficeUsers,
+  getVisStateOfficeCountryTagCloud,
+  getVisStateOfficeAlertsEvolutionByUserID,
+} from './visualizations';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 
 const getDashboardPanels = (
   indexPatternId: string,
-): DashboardByRendererPanels => {
-  return new OfficeDrilldownRulesConfigDashboardConfig(
-    indexPatternId,
-  ).getDashboardPanels();
+): {
+  [panelId: string]: DashboardPanelState<
+    EmbeddableInput & { [k: string]: unknown }
+  >;
+} => {
+  return {
+    d0: {
+      gridData: {
+        w: 15,
+        h: 14,
+        x: 0,
+        y: 0,
+        i: 'd0',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: 'd0',
+        savedVis: getVisStateOfficeTopOperations(indexPatternId),
+      },
+    },
+    d1: {
+      gridData: {
+        w: 15,
+        h: 14,
+        x: 15,
+        y: 0,
+        i: 'd1',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: 'd1',
+        savedVis: getVisStateTopOfficeUsers(indexPatternId),
+      },
+    },
+    d2: {
+      gridData: {
+        w: 18,
+        h: 14,
+        x: 30,
+        y: 0,
+        i: 'd2',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: 'd2',
+        savedVis: getVisStateOfficeCountryTagCloud(indexPatternId),
+      },
+    },
+    d3: {
+      gridData: {
+        w: 48,
+        h: 11,
+        x: 0,
+        y: 14,
+        i: 'd3',
+      },
+      type: 'visualization',
+      explicitInput: {
+        id: 'd3',
+        savedVis: getVisStateOfficeAlertsEvolutionByUserID(indexPatternId),
+      },
+    },
+  };
 };
 
 export const drilldownRulesConfig = props => {
