@@ -1,8 +1,11 @@
 import React from 'react';
-import { getDashboardPanels } from './dashboard-panels';
 import { NIST80053DataSource } from '../../../common/data-source/pattern/alerts/nist-800-53/nist-800-53-data-source';
 import { AlertsDataSourceRepository } from '../../../common/data-source';
-import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY } from '../../../../../common/constants';
+import {
+  NIST_800_53_DASHBOARD_ID,
+  NIST_800_53_AGENT_DASHBOARD_ID,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+} from '../../../../../common/constants';
 import { createDashboard } from '../../../common/dashboards';
 
 export const DashboardNIST80053 = createDashboard({
@@ -10,11 +13,8 @@ export const DashboardNIST80053 = createDashboard({
   DataSourceRepositoryCreator: AlertsDataSourceRepository,
   getDashboardPanels: [
     {
-      getDashboardPanels: getDashboardPanels,
-      id: 'nist-dashboard-tab',
-      title: 'NIST 800-53 dashboard',
-      description: 'Dashboard of the NIST 800-53',
-      hidePanelTitles: false,
+      dashboardId: NIST_800_53_DASHBOARD_ID,
+      agentDashboardId: NIST_800_53_AGENT_DASHBOARD_ID,
     },
   ],
   sampleDataWarningCategories: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
