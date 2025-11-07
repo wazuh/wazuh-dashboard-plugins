@@ -23,12 +23,7 @@ import type {
   SavedObjectDashboard,
   SavedObjectVisualization,
 } from './saved-object.types';
-
-const DASHBOARD_DEFINITIONS_FOLDER = path.resolve(
-  __dirname,
-  '../../../common/dashboards/dashboard-definitions',
-);
-const DASHBOARD_DEFINITION_EXTENSION = '.ndjson';
+import { DEFAULT_DEFINITIONS_FOLDER, DEFAULT_EXTENSION } from "./constants";
 
 function toSentenceCase(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -132,8 +127,8 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
           ctx.context.services.core.savedObjects.createInternalRepository();
 
         const dashboardsWithVisualizations = readDashboardDefinitionFiles({
-          folderPath: DASHBOARD_DEFINITIONS_FOLDER,
-          extension: DASHBOARD_DEFINITION_EXTENSION,
+          folderPath: DEFAULT_DEFINITIONS_FOLDER,
+          extension: DEFAULT_EXTENSION,
         });
 
         for (const dashboardDefinition of dashboardsWithVisualizations) {

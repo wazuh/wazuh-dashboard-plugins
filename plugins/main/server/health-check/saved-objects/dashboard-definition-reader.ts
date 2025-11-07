@@ -4,6 +4,7 @@ import type {
   SavedObjectDashboard,
   SavedObjectVisualization,
 } from './saved-object.types';
+import { DEFAULT_DEFINITIONS_FOLDER, DEFAULT_EXTENSION } from "./constants";
 
 export interface DashboardDefinitionFromFile {
   filePath: string;
@@ -16,12 +17,6 @@ interface DashboardDefinitionReaderOptions {
   folderPath?: string;
   extension?: string;
 }
-
-const DEFAULT_DEFINITIONS_FOLDER = path.resolve(
-  __dirname,
-  '../../../common/dashboards/dashboard-definitions',
-);
-const DEFAULT_EXTENSION = '.ndjson';
 
 function isDefinitionFile(filePath: string, extension: string) {
   return path.extname(filePath).toLowerCase() === extension.toLowerCase();
