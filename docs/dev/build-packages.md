@@ -158,7 +158,7 @@ cd ../wazuh-dashboard/dev-tools/build-packages/
 Replace the placeholders as shown in the example below.
 
 ```bash
-$ cd ../wazuh-dashboard/dev-tools/build-packages/
+cd ../wazuh-dashboard/dev-tools/build-packages/
 ./build-packages.sh --commit-sha f05d58cce5-ec559ea-7aa1b2c86-8f60762-ff51705 -r 1 --deb -b file://$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip -a file://$WZD_ZIPPED_PACKAGES_DIR/wazuh-package.zip -rp file://$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip -s file://$WZD_ZIPPED_PACKAGES_DIR/security-package.zip  -sa file://$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip
 ```
 
@@ -263,14 +263,16 @@ The packages will be stored in `wazuh-dashboard/dev-tools/build-packages/base-pa
 Create a `.zip` files with the generated packages:
 
 ```bash
-cd ..
-WZD_ZIPPED_PACKAGES_DIR="$(pwd)/zipped_packages"
-mkdir -p "$WZD_ZIPPED_PACKAGES_DIR"
-zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip" base-packages-to-base/packages/wazuh-dashboard/opensearch-dashboards-3.*.*-linux-*.tar.gz
-zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-package.zip" base-packages-to-base/packages/wazuh-security-dashboards-plugin/security-dashboards-3.*.*.0.zip
-zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip" base-packages-to-base/packages/wazuh-dashboards-reporting/reportsDashboards-3.*.*.zip
-zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip" base-packages-to-base/packages/wazuh-security-analytics-plugin/security-analytics-dashboards-3.*.*.0.zip
-zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/wazuh-dashboard-plugins-package.zip" base-packages-to-base/packages/wazuh-dashboard-plugins/wazuhCheckUpdates-3.*.*.zip base-packages-to-base/packages/wazuh-dashboard-plugins/wazuh-3.*.*.zip base-packages-to-base/packages/wazuh-dashboard-plugins/wazuhCore-3.*.*.zip
+WZD_TARGET_PACKAGES_DIR="$(pwd)/packages"
+cd ../../../../
+mkdir packages
+cd packages
+WZD_ZIPPED_PACKAGES_DIR=$(pwd)
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard/opensearch-dashboards-3.*.*-linux-*.tar.gz
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-security-dashboards-plugin/security-dashboards-3.*.*.0.zip
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboards-reporting/reportsDashboards-3.*.*.zip
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-security-analytics-plugin/security-analytics-dashboards-3.*.*.0.zip
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/wazuh-dashboard-plugins-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuhCheckUpdates-3.*.*.zip $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuh-3.*.*.zip $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuhCore-3.*.*.zip
 ```
 
 3.2 Build the system package
@@ -278,6 +280,7 @@ zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/wazuh-dashboard-plugins-package.zip" base-pa
 Replace the file path to the generated packages in the previous step.
 
 ```bash
+cd ../wazuh-dashboard/dev-tools/build-packages
 bash build-packages.sh \
     -a file://$WZD_ZIPPED_PACKAGES_DIR/wazuh-dashboard-plugins-package.zip \
     -b file://$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip \
