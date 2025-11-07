@@ -15,16 +15,20 @@
 // Whenever possible, custom IDs are used for predictable identification.
 
 import type { SavedObjectsClientContract } from 'opensearch_dashboards/server';
-import fs from 'fs';
 import path from 'path';
 import type { InitializationTaskRunContext } from '../services';
+import { readDashboardDefinitionFiles } from './dashboard-definition-reader';
 import type {
-  DashboardByRendererInput,
-  SavedVis,
-} from '../../../common/dashboards';
-import { DashboardSavedObjectMapper } from './dashboard-saved-object-mapper';
-import { getDashboardConfigs } from './dashboard-configs';
-import { createDirectoryIfNotExists } from '../../lib/filesystem';
+  SavedObject,
+  SavedObjectDashboard,
+  SavedObjectVisualization,
+} from './saved-object.types';
+
+const DASHBOARD_DEFINITIONS_FOLDER = path.resolve(
+  __dirname,
+  '../../../common/dashboards/dashboard-definitions',
+);
+const DASHBOARD_DEFINITION_EXTENSION = '.ndjson';
 
 function toSentenceCase(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -56,42 +60,15 @@ async function isSavedObjectPresent(
   return null;
 }
 
-function toVisualizationAttributes(savedVis: SavedVis) {
-  // Kibana/OSD visualization SO expects `visState` with `aggs`, and the search source under `kibanaSavedObjectMeta`.
-  const visState = {
-    title: savedVis.title,
-    type: savedVis.type,
-    params: savedVis.params ?? {},
-    aggs: savedVis.data?.aggs ?? [],
-  };
-
-  const attributes = {
-    title: savedVis.title,
-    visState: JSON.stringify(visState),
-    uiStateJSON: JSON.stringify(savedVis.uiState ?? {}),
-    description: '',
-    version: 1,
-    kibanaSavedObjectMeta: {
-      searchSourceJSON: JSON.stringify(savedVis.data?.searchSource ?? {}),
-    },
-  };
-
-  const references = savedVis.data?.references ?? [];
-
-  return { attributes, references };
-}
-
-async function saveVisualizationAsSavedObject(
+async function ensureVisualizationSavedObject(
   client: SavedObjectsClientContract,
-  savedVis: SavedVis,
+  visualization: SavedObjectVisualization,
   logger: InitializationTaskRunContext['logger'],
 ): Promise<SavedObject> {
-  const id = savedVis.id;
-  const { attributes, references } = toVisualizationAttributes(savedVis);
+  const { id, attributes, references = [] } = visualization;
 
-  logger.debug(`Creating/updating visualization [${id}]`);
+  logger.debug(`Creating visualization [${id}]`);
 
-  // If the visualization with that ID exists, do not overwrite it
   const existingVisId = await isSavedObjectPresent(
     client,
     'visualization',
@@ -100,16 +77,12 @@ async function saveVisualizationAsSavedObject(
   );
   if (existingVisId) return existingVisId;
 
-  const visualizationSavedObject = await client.create(
-    'visualization',
-    attributes,
-    {
-      id,
-      overwrite: false,
-      refresh: true,
-      references,
-    },
-  );
+  const visualizationSavedObject = await client.create('visualization', attributes, {
+    id,
+    overwrite: false,
+    refresh: true,
+    references,
+  });
 
   logger.info(
     `Visualization ensured [${visualizationSavedObject.id}] title [${visualizationSavedObject.attributes.title}]`,
@@ -117,21 +90,15 @@ async function saveVisualizationAsSavedObject(
   return visualizationSavedObject;
 }
 
-async function saveDashboardAsSavedObject(
+async function ensureDashboardSavedObject(
   client: SavedObjectsClientContract,
-  dashboard: DashboardByRendererInput,
-  savedObjectVisualizationsIds: string[],
+  dashboard: SavedObjectDashboard,
   logger: InitializationTaskRunContext['logger'],
 ) {
-  const { id, attributes, references } =
-    DashboardSavedObjectMapper.mapDashboardInputToSavedObject(
-      dashboard,
-      savedObjectVisualizationsIds,
-    );
+  const { id, attributes, references = [] } = dashboard;
 
-  logger.debug(`Creating/updating dashboard [${id}]`);
+  logger.debug(`Creating dashboard [${id}]`);
 
-  // If the dashboard with that ID exists, do not overwrite it
   const existingDashId = await isSavedObjectPresent(
     client,
     'dashboard',
@@ -152,39 +119,6 @@ async function saveDashboardAsSavedObject(
   return dashboardSavedObject;
 }
 
-function writeDashboardAndVisualizationsToFile(
-  visualizationsSavedObject: SavedObjectVisualization[],
-  dashboardSavedObject: SavedObjectDashboard,
-  dashboardConfig: ReturnType<typeof getDashboardConfigs>[number],
-  logger: InitializationTaskRunContext['logger'],
-) {
-  try {
-    const content =
-      visualizationsSavedObject
-        .map(visualization => JSON.stringify(visualization))
-        .join('\n') +
-      '\n' +
-      JSON.stringify(dashboardSavedObject);
-
-    const outputDir = '/home/node/dashboard-ndjson';
-    createDirectoryIfNotExists(outputDir);
-
-    const fileName = `${dashboardConfig.getConfig().id}.ndjson`;
-    const filePath = path.join(outputDir, fileName);
-
-    fs.writeFileSync(filePath, content, 'utf8');
-    logger.debug(
-      `Saved objects file written [${filePath}] (visualizations: ${visualizationsSavedObject.length}, dashboard: 1)`,
-    );
-  } catch (error) {
-    logger.warn(
-      `Failed to write dashboard saved objects file: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    );
-  }
-}
-
 // ---------- Health check task creators ----------
 
 export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations =
@@ -197,30 +131,25 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
         const client: SavedObjectsClientContract =
           ctx.context.services.core.savedObjects.createInternalRepository();
 
-        const dashboardConfigs = getDashboardConfigs();
+        const dashboardsWithVisualizations = readDashboardDefinitionFiles({
+          folderPath: DASHBOARD_DEFINITIONS_FOLDER,
+          extension: DASHBOARD_DEFINITION_EXTENSION,
+        });
 
-        for (const dashboardConfig of dashboardConfigs) {
-          // Create visualizations
-          const visualizations = await Promise.all(
-            dashboardConfig
-              .getSavedVisualizations()
-              .map(savedVis =>
-                saveVisualizationAsSavedObject(client, savedVis, ctx.logger),
-              ),
+        for (const dashboardDefinition of dashboardsWithVisualizations) {
+          ctx.logger.debug(
+            `Processing dashboard definition file [${dashboardDefinition.relativeFilePath}]`,
           );
 
-          const dashboardSavedObject = await saveDashboardAsSavedObject(
+          await Promise.all(
+            dashboardDefinition.visualizations.map(visualization =>
+              ensureVisualizationSavedObject(client, visualization, ctx.logger),
+            ),
+          );
+
+          await ensureDashboardSavedObject(
             client,
-            dashboardConfig.getConfig(),
-            visualizations.map(vis => vis.id),
-            ctx.logger,
-          );
-
-          // Persist visualizations and dashboard to file for this config
-          writeDashboardAndVisualizationsToFile(
-            visualizations,
-            dashboardSavedObject,
-            dashboardConfig,
+            dashboardDefinition.dashboard,
             ctx.logger,
           );
         }
