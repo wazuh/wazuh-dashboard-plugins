@@ -1,96 +1,156 @@
 {
   "index_patterns": ["wazuh-states-inventory-protocols*"],
-  "priority": 1,
-  "template": {
-    "settings": {
-      "index": {
-        "number_of_replicas": "0",
-        "number_of_shards": "1",
-        "query.default_field": ["agent.id", "agent.host.ip", "interface.name"],
-        "refresh_interval": "5s"
-      }
-    },
-    "mappings": {
-      "date_detection": false,
-      "dynamic": "strict",
-      "properties": {
-        "agent": {
-          "properties": {
-            "host": {
-              "properties": {
-                "architecture": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                },
-                "ip": {
-                  "type": "ip"
+  "mappings": {
+    "date_detection": false,
+    "dynamic": "strict",
+    "properties": {
+      "agent": {
+        "properties": {
+          "groups": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "host": {
+            "properties": {
+              "architecture": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "hostname": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "ip": {
+                "type": "ip"
+              },
+              "os": {
+                "properties": {
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "platform": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
                 }
               }
-            },
-            "id": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "name": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "version": {
-              "ignore_above": 1024,
-              "type": "keyword"
             }
+          },
+          "id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "version": {
+            "ignore_above": 1024,
+            "type": "keyword"
           }
-        },
-        "interface": {
-          "properties": {
-            "name": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            }
-          }
-        },
-        "network": {
-          "properties": {
-            "dhcp": {
-              "type": "boolean"
-            },
-            "gateway": {
-              "type": "ip"
-            },
-            "metric": {
-              "type": "long"
-            },
-            "type": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            }
-          }
-        },
-        "wazuh": {
-          "properties": {
-            "cluster": {
-              "properties": {
-                "name": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                },
-                "node": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                }
+        }
+      },
+      "checksum": {
+        "properties": {
+          "hash": {
+            "properties": {
+              "sha1": {
+                "ignore_above": 1024,
+                "type": "keyword"
               }
-            },
-            "schema": {
-              "properties": {
-                "version": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                }
+            }
+          }
+        }
+      },
+      "interface": {
+        "properties": {
+          "name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          }
+        }
+      },
+      "network": {
+        "properties": {
+          "dhcp": {
+            "type": "boolean"
+          },
+          "gateway": {
+            "type": "ip"
+          },
+          "metric": {
+            "type": "long"
+          },
+          "type": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          }
+        }
+      },
+      "state": {
+        "properties": {
+          "document_version": {
+            "type": "integer"
+          },
+          "modified_at": {
+            "type": "date"
+          }
+        }
+      },
+      "wazuh": {
+        "properties": {
+          "cluster": {
+            "properties": {
+              "name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "node": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
+          "schema": {
+            "properties": {
+              "version": {
+                "ignore_above": 1024,
+                "type": "keyword"
               }
             }
           }
         }
       }
+    }
+  },
+  "order": 1,
+  "settings": {
+    "index": {
+      "number_of_replicas": "0",
+      "number_of_shards": "1",
+      "query.default_field": [
+        "agent.host.architecture",
+        "agent.host.ip",
+        "agent.id",
+        "agent.name",
+        "agent.version",
+        "network.type",
+        "interface.name",
+        "state.modified_at",
+        "wazuh.cluster.name",
+        "wazuh.cluster.node",
+        "wazuh.schema.version"
+      ],
+      "refresh_interval": "2s"
     }
   }
 }
