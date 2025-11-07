@@ -104,6 +104,8 @@ module.exports.AGENTS = [
 module.exports.GEO_LOCATION = [
   {
     country_name: 'Spain',
+    country_iso_code: 'ES',
+    continent_code: 'EU',
     location: {
       lat: 37.1881714,
       lon: -3.6066699,
@@ -113,6 +115,8 @@ module.exports.GEO_LOCATION = [
   },
   {
     country_name: 'France',
+    country_iso_code: 'FR',
+    continent_code: 'EU',
     location: {
       lat: 48.8534088,
       lon: 2.3487999,
@@ -122,6 +126,8 @@ module.exports.GEO_LOCATION = [
   },
   {
     country_name: 'England',
+    country_iso_code: 'GB',
+    continent_code: 'EU',
     location: {
       lat: 51.5085297,
       lon: -0.12574,
@@ -131,6 +137,8 @@ module.exports.GEO_LOCATION = [
   },
   {
     country_name: 'Germany',
+    country_iso_code: 'DE',
+    continent_code: 'EU',
     location: {
       lat: 52.524,
       lon: 13.411,
@@ -140,6 +148,8 @@ module.exports.GEO_LOCATION = [
   },
   {
     country_name: 'United States of America',
+    country_iso_code: 'US',
+    continent_code: 'NA',
     location: {
       lat: 40.7142715,
       lon: -74.0059662,
@@ -149,6 +159,8 @@ module.exports.GEO_LOCATION = [
   },
   {
     country_name: 'Canada',
+    country_iso_code: 'CA',
+    continent_code: 'NA',
     location: {
       lat: 49.2496605,
       lon: -123.119339,
@@ -158,6 +170,8 @@ module.exports.GEO_LOCATION = [
   },
   {
     country_name: 'Brasil',
+    country_iso_code: 'BR',
+    continent_code: 'SA',
     location: {
       lat: -22.9064198,
       lon: -43.1822319,
@@ -167,6 +181,8 @@ module.exports.GEO_LOCATION = [
   },
   {
     country_name: 'India',
+    country_iso_code: 'IN',
+    continent_code: 'AS',
     location: {
       lat: 19.0728302,
       lon: 72.8826065,
@@ -176,6 +192,8 @@ module.exports.GEO_LOCATION = [
   },
   {
     country_name: 'Australia',
+    country_iso_code: 'AU',
+    continent_code: 'OC',
     location: {
       lat: -33.8678513,
       lon: 151.2073212,
@@ -185,6 +203,8 @@ module.exports.GEO_LOCATION = [
   },
   {
     country_name: 'China',
+    country_iso_code: 'CN',
+    continent_code: 'AS',
     location: {
       lat: 31.222,
       lon: 121.458,
@@ -192,6 +212,51 @@ module.exports.GEO_LOCATION = [
     region_name: 'Shanghai',
     city_name: 'Shanghai',
   },
+];
+
+module.exports.AS_DATA = [
+  { number: 15169, organization: 'TechCorp Global LLC' },
+  { number: 16509, organization: 'CloudVendor Services Inc.' },
+  { number: 8075, organization: 'DataSystems Corporation' },
+  { number: 32934, organization: 'SocialNet Technologies Inc.' },
+  { number: 13335, organization: 'SecureEdge Networks Inc.' },
+  { number: 20940, organization: 'ContentDelivery International B.V.' },
+  { number: 714, organization: 'Innovation Tech Inc.' },
+  { number: 46489, organization: 'StreamMedia Interactive Inc.' },
+  { number: 2906, organization: 'VideoStreaming Services Inc.' },
+  { number: 45102, organization: 'GlobalTrade Technology Co., Ltd.' },
+];
+
+// Domains for URL and HTTP events
+module.exports.DOMAINS = [
+  'example.com',
+  'test.com',
+  'internal.local',
+  'company.corp',
+  'api.service.io',
+  'web.application.net',
+  'malicious.site.ru',
+  'suspicious.domain.cn',
+];
+
+module.exports.USER_GROUPS = [
+  { name: 'wheel', id: '10' },
+  { name: 'sudo', id: '27' },
+  { name: 'admin', id: '0' },
+  { name: 'users', id: '100' },
+  { name: 'docker', id: '999' },
+  { name: 'developers', id: '1000' },
+  { name: 'operators', id: '1001' },
+];
+
+module.exports.USER_ROLES = [
+  ['admin'],
+  ['user'],
+  ['developer'],
+  ['operator'],
+  ['auditor'],
+  ['admin', 'developer'],
+  ['user', 'developer'],
 ];
 
 module.exports.DECODER = {

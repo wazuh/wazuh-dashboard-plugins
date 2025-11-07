@@ -65,7 +65,7 @@ export class WazuhElasticCtrl {
                 item.settingIndexPattern,
               )
             : item.indexPatternPrefix
-        }sample-${category}`,
+        }-sample-${category}`,
         dataSet: item?.dataSet,
       })),
     );
@@ -460,7 +460,6 @@ export class WazuhElasticCtrl {
                 let configuration;
 
                 if (sampleDataAndTemplate?.template) {
-                  // Expect flat format (Elasticsearch/Indexer): { index_patterns, mappings, settings }
                   const templateData = sampleDataAndTemplate.template;
 
                   configuration = {
@@ -472,7 +471,6 @@ export class WazuhElasticCtrl {
                   if (!configuration.settings.index) {
                     configuration.settings.index = {};
                   }
-
                   configuration.settings.index.number_of_shards =
                     WAZUH_SAMPLE_ALERTS_INDEX_SHARDS;
                   configuration.settings.index.number_of_replicas =

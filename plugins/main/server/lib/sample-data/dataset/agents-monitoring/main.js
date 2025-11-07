@@ -3,6 +3,7 @@ const {
 } = require('../../../generate-alerts/helpers/date-formatter');
 const { Random } = require('../../../generate-alerts/helpers/random');
 const random = require('../../lib/random');
+const { version: packageVersion } = require('../../../../../package.json');
 
 function generateDocument(params) {
   // Based on 4.x data from server API
@@ -16,7 +17,7 @@ function generateDocument(params) {
       uname: 'Microsoft Windows 11 Pro',
       version: '10.0.26100.3775',
     },
-    version: 'Wazuh v5.0.0',
+    version: `Wazuh v${packageVersion}`,
     group: ['default'],
     group_config_status: 'synced',
     manager: `server${random.int(0, 1000)}`,
