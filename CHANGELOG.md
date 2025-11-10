@@ -24,7 +24,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed date and more format errors [#7754](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7754)
 - Upgraded the `brace-expansion` dependency to `1.1.12` and `2.0.2` [#7812](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7812)
 - Upgraded the `tar-fs` dependency to `2.1.4` [#7812](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7812)
-- Migrate the `wazuh.yml` settings to `opensearch_dashboards.yml` and advanced settings [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
+- Migrated the `wazuh.yml` settings to `opensearch_dashboards.yml` and advanced settings [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 
 ### Removed
 
@@ -38,6 +38,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed `Miscellaneous` from `App Settings`[#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
 - Removed `customization.logo.healthcheck`, `checks.api`, `checks.fields`, `checks.maxBuckets`, `checks.metaFields`, `checks.pattern`, `checks.setup`, `checks.template` and `checks.timeFilter` settings [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
 - Removed `customization.*` settings [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
+- Removed `App Settings` app
 
 ## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 01
 
