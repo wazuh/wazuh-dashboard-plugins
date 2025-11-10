@@ -29,7 +29,7 @@ import { ILegacyClusterClient } from '../../../src/core/server';
 
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { setupRoutes } from './routes';
-import { jobInitializeRun, jobQueueRun, jobMigrationTasksRun } from './start';
+import { jobInitializeRun, jobQueueRun } from './start';
 import { first } from 'rxjs/operators';
 import {
   defineTimeFieldNameIfExist,
