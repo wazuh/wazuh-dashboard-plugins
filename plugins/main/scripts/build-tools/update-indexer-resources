@@ -34,17 +34,13 @@ update_templates_sample_data() {
 # Option 5: plugin package.json
 try_package_json() {
 
-    if ! command -v jq >/dev/null 2>&1; then
-        return 1
-    fi
-
     local file=$(realpath "$SCRIPT_PATH/../../package.json")
     if [ ! -f "$file" ]; then
         return 1
     fi
 
     local version
-    version=$(jq -r '.version' $file)
+    version=$(node -p "require('$file').version")
 
     if [ -n "$version" ]; then
         echo "$version"
@@ -63,11 +59,6 @@ get_candidate_ref(){
 
   if [ -n "$version" ]; then
       CANDIDATE_GIT_REFS+=("$version" "v$version")
-  fi
-
-  if ! command -v jq >/dev/null 2>&1; then
-      echo 'jq is not installed'
-      return 1
   fi
 
   echo "Candidate git references: ${CANDIDATE_GIT_REFS[*]}"

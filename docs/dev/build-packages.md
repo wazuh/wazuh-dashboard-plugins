@@ -61,7 +61,7 @@ yarn build
 
 3. Clone the [wazuh-dashboard-plugins](https://github.com/wazuh/wazuh-dashboard-plugins.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-plugins/` folder, and build the plugins:
 
-> The yarn build command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
+> The `yarn build` command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
 > Replace the `GIT_REF` by the branch or tag for the Wazuh dashboard plugins, e.g. `v5.0.0`.
 
 ```bash
@@ -72,9 +72,14 @@ cd wazuh-dashboard-plugins/
 nvm install $(cat .nvmrc)
 nvm use $(cat .nvmrc)
 cp -r plugins/* ../
+```
+
+The plugin in the `main` directory needs a git reference to an existent branch or tag in the [`wazuh-indexer-repository`](https://github.com/wazuh/wazuh-indexer-plugins) to download and generate some resources, ensure the provided git reference exists and it is compatible with the plugin.
+
+```bash
 cd ../main
-yarn
-GIT_REF=$GIT_REF OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version package.json) yarn build
+GIT_REF=$GIT_REF yarn
+OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version package.json) yarn build
 cd ../wazuh-core/
 yarn
 OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version package.json) yarn build
@@ -85,7 +90,7 @@ OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version package.json) yarn
 
 4. Clone the [wazuh-dashboard-reporting](https://github.com/wazuh/wazuh-dashboard-reporting.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-reporting/` folder, and build the plugin:
 
-> The yarn build command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
+> The `yarn build` command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
 > Replace the `GIT_REF` by the branch or tag for the Wazuh reporting plugin, e.g. `v5.0.0`.
 
 ```bash
@@ -153,7 +158,7 @@ cd ../wazuh-dashboard/dev-tools/build-packages/
 Replace the placeholders as shown in the example below.
 
 ```bash
-$ cd ../wazuh-dashboard/dev-tools/build-packages/
+cd ../wazuh-dashboard/dev-tools/build-packages/
 ./build-packages.sh --commit-sha f05d58cce5-ec559ea-7aa1b2c86-8f60762-ff51705 -r 1 --deb -b file://$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip -a file://$WZD_ZIPPED_PACKAGES_DIR/wazuh-package.zip -rp file://$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip -s file://$WZD_ZIPPED_PACKAGES_DIR/security-package.zip  -sa file://$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip
 ```
 
@@ -209,7 +214,6 @@ Ensure that these dependencies are installed on the system.
 - **Docker**: refer to [Docker installation guide](https://docs.docker.com/engine/install/).
 - **Internet connection** to download the Docker images for the first time.
 - **Utilities**: ensure the following are available:
-  - `jq`
   - `curl`
 
 ### Building the Wazuh dashboard package using Docker
@@ -259,14 +263,16 @@ The packages will be stored in `wazuh-dashboard/dev-tools/build-packages/base-pa
 Create a `.zip` files with the generated packages:
 
 ```bash
-cd ..
-WZD_ZIPPED_PACKAGES_DIR="$(pwd)/zipped_packages"
-mkdir -p "$WZD_ZIPPED_PACKAGES_DIR"
-zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip" base-packages-to-base/packages/wazuh-dashboard/opensearch-dashboards-3.*.*-linux-*.tar.gz
-zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-package.zip" base-packages-to-base/packages/wazuh-security-dashboards-plugin/security-dashboards-3.*.*.0.zip
-zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip" base-packages-to-base/packages/wazuh-dashboards-reporting/reportsDashboards-3.*.*.zip
-zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip" base-packages-to-base/packages/wazuh-security-analytics-plugin/security-analytics-dashboards-3.*.*.0.zip
-zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/wazuh-dashboard-plugins-package.zip" base-packages-to-base/packages/wazuh-dashboard-plugins/wazuhCheckUpdates-3.*.*.zip base-packages-to-base/packages/wazuh-dashboard-plugins/wazuh-3.*.*.zip base-packages-to-base/packages/wazuh-dashboard-plugins/wazuhCore-3.*.*.zip
+WZD_TARGET_PACKAGES_DIR="$(pwd)/packages"
+cd ../../../../
+mkdir packages
+cd packages
+WZD_ZIPPED_PACKAGES_DIR=$(pwd)
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard/opensearch-dashboards-3.*.*-linux-*.tar.gz
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-security-dashboards-plugin/security-dashboards-3.*.*.0.zip
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboards-reporting/reportsDashboards-3.*.*.zip
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-security-analytics-plugin/security-analytics-dashboards-3.*.*.0.zip
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/wazuh-dashboard-plugins-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuhCheckUpdates-3.*.*.zip $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuh-3.*.*.zip $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuhCore-3.*.*.zip
 ```
 
 3.2 Build the system package
@@ -274,6 +280,7 @@ zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/wazuh-dashboard-plugins-package.zip" base-pa
 Replace the file path to the generated packages in the previous step.
 
 ```bash
+cd ../wazuh-dashboard/dev-tools/build-packages
 bash build-packages.sh \
     -a file://$WZD_ZIPPED_PACKAGES_DIR/wazuh-dashboard-plugins-package.zip \
     -b file://$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip \
