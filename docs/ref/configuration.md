@@ -30,7 +30,7 @@ A host has the following properties:
 | port     | Define the port                                                                      | -             | any number           |
 | username | Define the username                                                                  | -             | any string           |
 | password | Define the password                                                                  | -             | any string           |
-| run_as   | Define the the user context is used to retrieve the permissions for the Wazuh server | `false`       | boolean              |
+| run_as   | Define the the user context is used to retrieve the permissions for the Wazuh server | false         | true, false          |
 
 This is an example of a multi-host configuration:
 
