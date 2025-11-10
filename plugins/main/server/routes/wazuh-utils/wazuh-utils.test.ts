@@ -334,8 +334,6 @@ describe.skip('[endpoint] PUT /utils/configuration', () => {
     ${'ip.ignore'}                     | ${['test,']}         | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
     ${'ip.ignore'}                     | ${['test#']}         | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
     ${'ip.ignore'}                     | ${['test', 'test#']} | ${400}             | ${'[request body.ip.ignore.1]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.selector'}                   | ${true}              | ${200}             | ${null}
-    ${'ip.selector'}                   | ${''}                | ${400}             | ${'[request body.ip.selector]: expected value of type [boolean] but got [string]'}
     ${'pattern'}                       | ${'test'}            | ${200}             | ${null}
     ${'pattern'}                       | ${'test*'}           | ${200}             | ${null}
     ${'pattern'}                       | ${''}                | ${400}             | ${'[request body.pattern]: Value can not be empty.'}

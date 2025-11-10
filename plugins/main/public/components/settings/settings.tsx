@@ -31,7 +31,6 @@ import { AppInfo } from './types';
 const mapStateToProps = state => ({
   configurationUIEditable:
     state.appConfig.data['configuration.ui_api_editable'],
-  configurationIPSelector: state.appConfig.data['ip.selector'],
 });
 
 const mapDispatchToProps = dispatch => ({

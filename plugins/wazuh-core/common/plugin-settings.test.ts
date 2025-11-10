@@ -50,8 +50,6 @@ describe.skip('[settings] Input validation', () => {
     ${'ip.ignore'}                     | ${'["test,"]'}                                    | ${String.raw`It can't contain invalid characters: \, /, ?, ", <, >, |, ,, #.`}
     ${'ip.ignore'}                     | ${'["test#"]'}                                    | ${String.raw`It can't contain invalid characters: \, /, ?, ", <, >, |, ,, #.`}
     ${'ip.ignore'}                     | ${'["test", "test#"]'}                            | ${String.raw`It can't contain invalid characters: \, /, ?, ", <, >, |, ,, #.`}
-    ${'ip.selector'}                   | ${true}                                           | ${undefined}
-    ${'ip.selector'}                   | ${''}                                             | ${'It should be a boolean. Allowed values: true or false.'}
     ${'pattern'}                       | ${'test'}                                         | ${undefined}
     ${'pattern'}                       | ${'test*'}                                        | ${undefined}
     ${'pattern'}                       | ${''}                                             | ${'Value can not be empty.'}

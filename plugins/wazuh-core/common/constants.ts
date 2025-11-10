@@ -627,16 +627,6 @@ hosts:
       ),
     ),
   },
-  'ip.selector': {
-    title: 'IP selector',
-    description:
-      'Define if the user is allowed to change the selected index pattern directly from the top menu bar.',
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.switch,
-    defaultValue: true,
-    validate: SettingsValidator.isBoolean,
-  },
   'wazuh.updates.disabled': {
     title: 'Check updates',
     description: 'Define if the check updates service is disabled.',
@@ -808,7 +798,6 @@ export const ENROLLMENT_DNS = 'enrollment.dns';
 export const ENROLLMENT_PASSWORD = 'enrollment.password';
 
 export const IP_IGNORE = 'ip.ignore';
-export const IP_SELECTOR = 'ip.selector';
 
 export const WAZUH_UPDATES_DISABLED = 'wazuh.updates.disabled';
 
