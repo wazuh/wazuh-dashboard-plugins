@@ -469,15 +469,6 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
     defaultValue: true,
     validate: SettingsValidator.isBoolean,
   },
-  'customization.enabled': {
-    title: 'Status',
-    description: 'Enable or disable the customization.',
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    defaultValue: false,
-    category: SettingCategory.CUSTOMIZATION,
-    type: EpluginSettingType.switch,
-    validate: SettingsValidator.isBoolean,
-  },
   'enrollment.dns': {
     title: 'Enrollment DNS',
     description:
@@ -816,8 +807,6 @@ export const HIDE_MANAGER_ALERTS_SETTING = 'hideManagerAlerts';
 export const ALERTS_SAMPLE_PREFIX = 'alerts.sample.prefix';
 
 export const CONFIG_UI_API_EDITABLE = 'configuration.ui_api_editable';
-
-export const CUSTOMIZATION_ENABLED = 'customization.enabled';
 
 export const ENROLLMENT_DNS = 'enrollment.dns';
 export const ENROLLMENT_PASSWORD = 'enrollment.password';

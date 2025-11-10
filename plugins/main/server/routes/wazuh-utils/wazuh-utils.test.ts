@@ -290,88 +290,74 @@ describe.skip('[endpoint] PUT /utils/configuration', () => {
 
   // TODO: this has to be done as a integration test because uses the real setting definition
   it.skip.each`
-    setting                            | value                                                            | responseStatusCode | responseBodyMessage
-    ${'alerts.sample.prefix'}          | ${'test'}                                                        | ${200}             | ${null}
-    ${'alerts.sample.prefix'}          | ${''}                                                            | ${400}             | ${'[request body.alerts.sample.prefix]: Value can not be empty.'}
-    ${'alerts.sample.prefix'}          | ${'test space'}                                                  | ${400}             | ${'[request body.alerts.sample.prefix]: No whitespaces allowed.'}
-    ${'alerts.sample.prefix'}          | ${4}                                                             | ${400}             | ${'[request body.alerts.sample.prefix]: expected value of type [string] but got [number]'}
-    ${'alerts.sample.prefix'}          | ${'-test'}                                                       | ${400}             | ${"[request body.alerts.sample.prefix]: It can't start with: -, _, +, .."}
-    ${'alerts.sample.prefix'}          | ${'_test'}                                                       | ${400}             | ${"[request body.alerts.sample.prefix]: It can't start with: -, _, +, .."}
-    ${'alerts.sample.prefix'}          | ${'+test'}                                                       | ${400}             | ${"[request body.alerts.sample.prefix]: It can't start with: -, _, +, .."}
-    ${'alerts.sample.prefix'}          | ${'.test'}                                                       | ${400}             | ${"[request body.alerts.sample.prefix]: It can't start with: -, _, +, .."}
-    ${'alerts.sample.prefix'}          | ${'test\\'}                                                      | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
-    ${'alerts.sample.prefix'}          | ${'test/'}                                                       | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
-    ${'alerts.sample.prefix'}          | ${'test?'}                                                       | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
-    ${'alerts.sample.prefix'}          | ${'test"'}                                                       | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
-    ${'alerts.sample.prefix'}          | ${'test<'}                                                       | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
-    ${'alerts.sample.prefix'}          | ${'test>'}                                                       | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
-    ${'alerts.sample.prefix'}          | ${'test|'}                                                       | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
-    ${'alerts.sample.prefix'}          | ${'test,'}                                                       | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
-    ${'alerts.sample.prefix'}          | ${'test#'}                                                       | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
-    ${'alerts.sample.prefix'}          | ${'test*'}                                                       | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
-    ${'configuration.ui_api_editable'} | ${true}                                                          | ${200}             | ${null}
-    ${'configuration.ui_api_editable'} | ${true}                                                          | ${400}             | ${'[request body.configuration.ui_api_editable]: expected value of type [boolean] but got [number]'}
-    ${'customization.enabled'}         | ${true}                                                          | ${200}             | ${null}
-    ${'customization.enabled'}         | ${0}                                                             | ${400}             | ${'[request body.customization.enabled]: expected value of type [boolean] but got [number]'}
-    ${'customization.reports.footer'}  | ${'Test'}                                                        | ${200}             | ${null}
-    ${'customization.reports.footer'}  | ${'Test\nTest'}                                                  | ${200}             | ${null}
-    ${'customization.reports.footer'}  | ${'Test\nTest\nTest\nTest\nTest'}                                | ${400}             | ${'[request body.customization.reports.footer]: The string should have less or equal to 2 line/s.'}
-    ${'customization.reports.footer'}  | ${'Line with 30 characters       \nTest'}                        | ${200}             | ${undefined}
-    ${'customization.reports.footer'}  | ${'Testing the maximum length of a line of 50 characters\nTest'} | ${400}             | ${'[request body.customization.reports.footer]: The maximum length of a line is 50 characters.'}
-    ${'customization.reports.footer'}  | ${true}                                                          | ${400}             | ${'[request body.customization.reports.footer]: expected value of type [string] but got [boolean]'}
-    ${'customization.reports.header'}  | ${'Test'}                                                        | ${200}             | ${null}
-    ${'customization.reports.header'}  | ${'Test\nTest'}                                                  | ${200}             | ${null}
-    ${'customization.reports.header'}  | ${'Test\nTest\nTest\nTest\nTest'}                                | ${400}             | ${'[request body.customization.reports.header]: The string should have less or equal to 3 line/s.'}
-    ${'customization.reports.header'}  | ${'Line with 20 charact\nTest'}                                  | ${200}             | ${undefined}
-    ${'customization.reports.header'}  | ${'Testing maximum length of a line of 40 characters\nTest'}     | ${400}             | ${'[request body.customization.reports.header]: The maximum length of a line is 40 characters.'}
-    ${'customization.reports.header'}  | ${true}                                                          | ${400}             | ${'[request body.customization.reports.header]: expected value of type [string] but got [boolean]'}
-    ${'enrollment.dns'}                | ${'test'}                                                        | ${200}             | ${null}
-    ${'enrollment.dns'}                | ${''}                                                            | ${200}             | ${null}
-    ${'enrollment.dns'}                | ${'test space'}                                                  | ${400}             | ${'[request body.enrollment.dns]: No whitespaces allowed.'}
-    ${'enrollment.dns'}                | ${true}                                                          | ${400}             | ${'[request body.enrollment.dns]: expected value of type [string] but got [boolean]'}
-    ${'ip.ignore'}                     | ${['test']}                                                      | ${200}             | ${null}
-    ${'ip.ignore'}                     | ${['test*']}                                                     | ${200}             | ${null}
-    ${'ip.ignore'}                     | ${['']}                                                          | ${400}             | ${'[request body.ip.ignore.0]: Value can not be empty.'}
-    ${'ip.ignore'}                     | ${['test space']}                                                | ${400}             | ${'[request body.ip.ignore.0]: No whitespaces allowed.'}
-    ${'ip.ignore'}                     | ${true}                                                          | ${400}             | ${'[request body.ip.ignore]: expected value of type [array] but got [boolean]'}
-    ${'ip.ignore'}                     | ${['-test']}                                                     | ${400}             | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
-    ${'ip.ignore'}                     | ${['_test']}                                                     | ${400}             | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
-    ${'ip.ignore'}                     | ${['+test']}                                                     | ${400}             | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
-    ${'ip.ignore'}                     | ${['.test']}                                                     | ${400}             | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
-    ${'ip.ignore'}                     | ${['test\\']}                                                    | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                     | ${['test/']}                                                     | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                     | ${['test?']}                                                     | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                     | ${['test"']}                                                     | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                     | ${['test<']}                                                     | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                     | ${['test>']}                                                     | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                     | ${['test|']}                                                     | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                     | ${['test,']}                                                     | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                     | ${['test#']}                                                     | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.ignore'}                     | ${['test', 'test#']}                                             | ${400}             | ${'[request body.ip.ignore.1]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'ip.selector'}                   | ${true}                                                          | ${200}             | ${null}
-    ${'ip.selector'}                   | ${''}                                                            | ${400}             | ${'[request body.ip.selector]: expected value of type [boolean] but got [string]'}
-    ${'pattern'}                       | ${'test'}                                                        | ${200}             | ${null}
-    ${'pattern'}                       | ${'test*'}                                                       | ${200}             | ${null}
-    ${'pattern'}                       | ${''}                                                            | ${400}             | ${'[request body.pattern]: Value can not be empty.'}
-    ${'pattern'}                       | ${'test space'}                                                  | ${400}             | ${'[request body.pattern]: No whitespaces allowed.'}
-    ${'pattern'}                       | ${true}                                                          | ${400}             | ${'[request body.pattern]: expected value of type [string] but got [boolean]'}
-    ${'pattern'}                       | ${'-test'}                                                       | ${400}             | ${"[request body.pattern]: It can't start with: -, _, +, .."}
-    ${'pattern'}                       | ${'_test'}                                                       | ${400}             | ${"[request body.pattern]: It can't start with: -, _, +, .."}
-    ${'pattern'}                       | ${'+test'}                                                       | ${400}             | ${"[request body.pattern]: It can't start with: -, _, +, .."}
-    ${'pattern'}                       | ${'.test'}                                                       | ${400}             | ${"[request body.pattern]: It can't start with: -, _, +, .."}
-    ${'pattern'}                       | ${'test\\'}                                                      | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'pattern'}                       | ${'test/'}                                                       | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'pattern'}                       | ${'test?'}                                                       | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'pattern'}                       | ${'test"'}                                                       | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'pattern'}                       | ${'test<'}                                                       | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'pattern'}                       | ${'test>'}                                                       | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'pattern'}                       | ${'test|'}                                                       | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'pattern'}                       | ${'test,'}                                                       | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'pattern'}                       | ${'test#'}                                                       | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'timeout'}                       | ${15000}                                                         | ${200}             | ${null}
-    ${'timeout'}                       | ${1000}                                                          | ${400}             | ${'[request body.timeout]: Value should be greater or equal than 1500.'}
-    ${'timeout'}                       | ${''}                                                            | ${400}             | ${'[request body.timeout]: expected value of type [number] but got [string]'}
-    ${'timeout'}                       | ${1.2}                                                           | ${400}             | ${'[request body.timeout]: Number should be an integer.'}
+    setting                            | value                | responseStatusCode | responseBodyMessage
+    ${'alerts.sample.prefix'}          | ${'test'}            | ${200}             | ${null}
+    ${'alerts.sample.prefix'}          | ${''}                | ${400}             | ${'[request body.alerts.sample.prefix]: Value can not be empty.'}
+    ${'alerts.sample.prefix'}          | ${'test space'}      | ${400}             | ${'[request body.alerts.sample.prefix]: No whitespaces allowed.'}
+    ${'alerts.sample.prefix'}          | ${4}                 | ${400}             | ${'[request body.alerts.sample.prefix]: expected value of type [string] but got [number]'}
+    ${'alerts.sample.prefix'}          | ${'-test'}           | ${400}             | ${"[request body.alerts.sample.prefix]: It can't start with: -, _, +, .."}
+    ${'alerts.sample.prefix'}          | ${'_test'}           | ${400}             | ${"[request body.alerts.sample.prefix]: It can't start with: -, _, +, .."}
+    ${'alerts.sample.prefix'}          | ${'+test'}           | ${400}             | ${"[request body.alerts.sample.prefix]: It can't start with: -, _, +, .."}
+    ${'alerts.sample.prefix'}          | ${'.test'}           | ${400}             | ${"[request body.alerts.sample.prefix]: It can't start with: -, _, +, .."}
+    ${'alerts.sample.prefix'}          | ${'test\\'}          | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'alerts.sample.prefix'}          | ${'test/'}           | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'alerts.sample.prefix'}          | ${'test?'}           | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'alerts.sample.prefix'}          | ${'test"'}           | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'alerts.sample.prefix'}          | ${'test<'}           | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'alerts.sample.prefix'}          | ${'test>'}           | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'alerts.sample.prefix'}          | ${'test|'}           | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'alerts.sample.prefix'}          | ${'test,'}           | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'alerts.sample.prefix'}          | ${'test#'}           | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'alerts.sample.prefix'}          | ${'test*'}           | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'configuration.ui_api_editable'} | ${true}              | ${200}             | ${null}
+    ${'configuration.ui_api_editable'} | ${true}              | ${400}             | ${'[request body.configuration.ui_api_editable]: expected value of type [boolean] but got [number]'}
+    ${'enrollment.dns'}                | ${'test'}            | ${200}             | ${null}
+    ${'enrollment.dns'}                | ${''}                | ${200}             | ${null}
+    ${'enrollment.dns'}                | ${'test space'}      | ${400}             | ${'[request body.enrollment.dns]: No whitespaces allowed.'}
+    ${'enrollment.dns'}                | ${true}              | ${400}             | ${'[request body.enrollment.dns]: expected value of type [string] but got [boolean]'}
+    ${'ip.ignore'}                     | ${['test']}          | ${200}             | ${null}
+    ${'ip.ignore'}                     | ${['test*']}         | ${200}             | ${null}
+    ${'ip.ignore'}                     | ${['']}              | ${400}             | ${'[request body.ip.ignore.0]: Value can not be empty.'}
+    ${'ip.ignore'}                     | ${['test space']}    | ${400}             | ${'[request body.ip.ignore.0]: No whitespaces allowed.'}
+    ${'ip.ignore'}                     | ${true}              | ${400}             | ${'[request body.ip.ignore]: expected value of type [array] but got [boolean]'}
+    ${'ip.ignore'}                     | ${['-test']}         | ${400}             | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
+    ${'ip.ignore'}                     | ${['_test']}         | ${400}             | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
+    ${'ip.ignore'}                     | ${['+test']}         | ${400}             | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
+    ${'ip.ignore'}                     | ${['.test']}         | ${400}             | ${"[request body.ip.ignore.0]: It can't start with: -, _, +, .."}
+    ${'ip.ignore'}                     | ${['test\\']}        | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                     | ${['test/']}         | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                     | ${['test?']}         | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                     | ${['test"']}         | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                     | ${['test<']}         | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                     | ${['test>']}         | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                     | ${['test|']}         | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                     | ${['test,']}         | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                     | ${['test#']}         | ${400}             | ${'[request body.ip.ignore.0]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.ignore'}                     | ${['test', 'test#']} | ${400}             | ${'[request body.ip.ignore.1]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'ip.selector'}                   | ${true}              | ${200}             | ${null}
+    ${'ip.selector'}                   | ${''}                | ${400}             | ${'[request body.ip.selector]: expected value of type [boolean] but got [string]'}
+    ${'pattern'}                       | ${'test'}            | ${200}             | ${null}
+    ${'pattern'}                       | ${'test*'}           | ${200}             | ${null}
+    ${'pattern'}                       | ${''}                | ${400}             | ${'[request body.pattern]: Value can not be empty.'}
+    ${'pattern'}                       | ${'test space'}      | ${400}             | ${'[request body.pattern]: No whitespaces allowed.'}
+    ${'pattern'}                       | ${true}              | ${400}             | ${'[request body.pattern]: expected value of type [string] but got [boolean]'}
+    ${'pattern'}                       | ${'-test'}           | ${400}             | ${"[request body.pattern]: It can't start with: -, _, +, .."}
+    ${'pattern'}                       | ${'_test'}           | ${400}             | ${"[request body.pattern]: It can't start with: -, _, +, .."}
+    ${'pattern'}                       | ${'+test'}           | ${400}             | ${"[request body.pattern]: It can't start with: -, _, +, .."}
+    ${'pattern'}                       | ${'.test'}           | ${400}             | ${"[request body.pattern]: It can't start with: -, _, +, .."}
+    ${'pattern'}                       | ${'test\\'}          | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'pattern'}                       | ${'test/'}           | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'pattern'}                       | ${'test?'}           | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'pattern'}                       | ${'test"'}           | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'pattern'}                       | ${'test<'}           | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'pattern'}                       | ${'test>'}           | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'pattern'}                       | ${'test|'}           | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'pattern'}                       | ${'test,'}           | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'pattern'}                       | ${'test#'}           | ${400}             | ${'[request body.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'timeout'}                       | ${15000}             | ${200}             | ${null}
+    ${'timeout'}                       | ${1000}              | ${400}             | ${'[request body.timeout]: Value should be greater or equal than 1500.'}
+    ${'timeout'}                       | ${''}                | ${400}             | ${'[request body.timeout]: expected value of type [number] but got [string]'}
+    ${'timeout'}                       | ${1.2}               | ${400}             | ${'[request body.timeout]: Number should be an integer.'}
   `(
     `$setting: $value - PUT /utils/configuration - $responseStatusCode`,
     async ({ responseBodyMessage, responseStatusCode, setting, value }) => {
@@ -398,165 +384,6 @@ describe.skip('[endpoint] PUT /utils/configuration', () => {
         );
       responseBodyMessage &&
         expect(response.body.message).toMatch(responseBodyMessage);
-    },
-  );
-});
-
-describe.skip('[endpoint] PUT /utils/configuration/files/{key} - Upload file', () => {
-  const PUBLIC_CUSTOM_ASSETS_PATH = path.join(
-    __dirname,
-    '../../../',
-    'public/assets/custom',
-  );
-
-  beforeAll(() => {});
-
-  afterAll(() => {});
-
-  it.each`
-    setting                         | filename                     | responseStatusCode | responseBodyMessage
-    ${'customization.logo.unknown'} | ${'fixture_image_small.jpg'} | ${400}             | ${'[request params.key]: types that failed validation:\n- [request params.key.0]: expected value to equal [customization.logo.app]\n- [request params.key.1]: expected value to equal [customization.logo.reports]'}
-    ${'customization.logo.app'}     | ${'fixture_image_small.jpg'} | ${200}             | ${null}
-    ${'customization.logo.app'}     | ${'fixture_image_small.png'} | ${200}             | ${null}
-    ${'customization.logo.app'}     | ${'fixture_image_small.svg'} | ${200}             | ${null}
-    ${'customization.logo.app'}     | ${'fixture_image_big.png'}   | ${413}             | ${'Payload content length greater than maximum allowed: 1048576'}
-    ${'customization.logo.reports'} | ${'fixture_image_small.jpg'} | ${200}             | ${null}
-    ${'customization.logo.reports'} | ${'fixture_image_small.png'} | ${200}             | ${null}
-    ${'customization.logo.reports'} | ${'fixture_image_big.png'}   | ${413}             | ${'Payload content length greater than maximum allowed: 1048576'}
-    ${'customization.logo.reports'} | ${'fixture_image_small.svg'} | ${400}             | ${'File extension is not valid for setting [customization.logo.reports] setting. Allowed file extensions: .jpeg, .jpg, .png'}
-  `(
-    `$setting: $filename - PUT /utils/configuration/files/{key} - $responseStatusCode`,
-    async ({ responseBodyMessage, responseStatusCode, setting, filename }) => {
-      const filePath = path.join(__dirname, 'fixtures', filename);
-      const extension = path.extname(filename);
-
-      const response = await supertest(innerServer.listener)
-        .put(`/utils/configuration/files/${setting}`)
-        .attach('file', filePath)
-        .expect(responseStatusCode);
-
-      responseStatusCode === 200 &&
-        expect(response.body.data.updatedConfiguration[setting]).toBeDefined();
-      responseStatusCode === 200 &&
-        expect(response.body.data.updatedConfiguration[setting]).toMatch(
-          `${setting}${extension}`,
-        );
-      responseStatusCode === 200 &&
-        expect(response.body.data.requiresRunningHealthCheck).toBe(
-          Boolean(PLUGIN_SETTINGS[setting].requiresRunningHealthCheck),
-        );
-      responseStatusCode === 200 &&
-        expect(response.body.data.requiresReloadingBrowserTab).toBe(
-          Boolean(PLUGIN_SETTINGS[setting].requiresReloadingBrowserTab),
-        );
-      responseStatusCode === 200 &&
-        expect(response.body.data.requiresRestartingPluginPlatform).toBe(
-          Boolean(PLUGIN_SETTINGS[setting].requiresRestartingPluginPlatform),
-        );
-      responseBodyMessage &&
-        expect(response.body.message).toMatch(responseBodyMessage);
-
-      // Check the file was created in the expected path of the file system.
-      if (response?.body?.data?.updatedConfiguration?.[setting]) {
-        const targetFilepath = path.join(
-          __dirname,
-          '../../../',
-          PLUGIN_SETTINGS[setting].options.file.store.relativePathFileSystem,
-          `${PLUGIN_SETTINGS[setting].options.file.store.filename}${extension}`,
-        );
-        const files = glob.sync(path.join(targetFilepath));
-        expect(files[0]).toBeDefined();
-      }
-    },
-  );
-});
-
-// TODO: this has to be done as a integration test because uses the real setting definition
-describe.skip('[endpoint] DELETE /utils/configuration/files/{key} - Delete file', () => {
-  const PUBLIC_CUSTOM_ASSETS_PATH = path.join(
-    __dirname,
-    '../../../',
-    'public/assets/custom',
-  );
-
-  beforeAll(() => {});
-
-  afterAll(() => {});
-
-  it.each`
-    setting                         | expectedValue | responseStatusCode | responseBodyMessage
-    ${'customization.logo.unknown'} | ${''}         | ${400}             | ${'[request params.key]: types that failed validation:\n- [request params.key.0]: expected value to equal [customization.logo.app]\n- [request params.key.1]: expected value to equal [customization.logo.reports]'}
-    ${'customization.logo.app'}     | ${''}         | ${200}             | ${'All files were removed and the configuration file was updated.'}
-    ${'customization.logo.reports'} | ${''}         | ${200}             | ${'All files were removed and the configuration file was updated.'}
-  `(
-    `$setting - PUT /utils/configuration - $responseStatusCode`,
-    async ({
-      responseBodyMessage,
-      responseStatusCode,
-      setting,
-      expectedValue,
-    }) => {
-      // If the setting is defined in the plugin
-      if (PLUGIN_SETTINGS[setting]) {
-        // TODO: Create the directory where the asset was stored.
-        //
-        // createDirectoryIfNotExists(
-        //   path.join(
-        //     __dirname,
-        //     '../../../',
-        //     PLUGIN_SETTINGS[setting].options.file.store.relativePathFileSystem,
-        //   ),
-        // );
-
-        // Create a empty file
-        fs.writeFileSync(
-          path.join(
-            __dirname,
-            '../../../',
-            PLUGIN_SETTINGS[setting].options.file.store.relativePathFileSystem,
-            `${PLUGIN_SETTINGS[setting].options.file.store.filename}.jpg`,
-          ),
-          '',
-          'utf8',
-        );
-      }
-
-      const response = await supertest(innerServer.listener)
-        .delete(`/utils/configuration/files/${setting}`)
-        .expect(responseStatusCode);
-
-      responseStatusCode === 200 &&
-        expect(response.body.data.updatedConfiguration[setting]).toBeDefined();
-      responseStatusCode === 200 &&
-        expect(response.body.data.updatedConfiguration[setting]).toMatch(
-          expectedValue,
-        );
-      responseStatusCode === 200 &&
-        expect(response.body.data.requiresRunningHealthCheck).toBe(
-          Boolean(PLUGIN_SETTINGS[setting].requiresRunningHealthCheck),
-        );
-      responseStatusCode === 200 &&
-        expect(response.body.data.requiresReloadingBrowserTab).toBe(
-          Boolean(PLUGIN_SETTINGS[setting].requiresReloadingBrowserTab),
-        );
-      responseStatusCode === 200 &&
-        expect(response.body.data.requiresRestartingPluginPlatform).toBe(
-          Boolean(PLUGIN_SETTINGS[setting].requiresRestartingPluginPlatform),
-        );
-      responseBodyMessage &&
-        expect(response.body.message).toMatch(responseBodyMessage);
-
-      // Check the file was deleted from the expected path of the file system.
-      if (response?.body?.data?.updatedConfiguration?.[setting]) {
-        const targetFilepath = path.join(
-          __dirname,
-          '../../../',
-          PLUGIN_SETTINGS[setting].options.file.store.relativePathFileSystem,
-          `${PLUGIN_SETTINGS[setting].options.file.store.filename}.*`,
-        );
-        const files = glob.sync(path.join(targetFilepath));
-        expect(files).toHaveLength(0);
-      }
     },
   );
 });
