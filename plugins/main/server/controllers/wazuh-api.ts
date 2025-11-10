@@ -748,8 +748,10 @@ export class WazuhApiCtrl {
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
   ) {
-    const appConfig = await context.wazuh_core.configuration.get();
-    const reportMaxRows = appConfig['reports.csv.maxRows'];
+    // TODO: setting is defined in the tenant side and this can not obtained in the backend side
+    const reportMaxRows = await context.wazuh_core.configuration.get(
+      'reports.csv.maxRows',
+    );
     try {
       if (!request.body || !request.body.path)
         throw new Error('Field path is required');
@@ -988,8 +990,6 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const APP_LOGO = 'customization.logo.app';
-
       const logos = {
         [APP_LOGO]:
           await context.wazuh_core.configuration.getCustomizationSetting(

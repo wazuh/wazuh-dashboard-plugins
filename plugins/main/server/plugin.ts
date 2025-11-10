@@ -706,17 +706,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       server: contextServer,
     });
 
-    // Migration tasks
-    jobMigrationTasksRun({
-      core,
-      wazuh: {
-        logger: this.logger.get('migration-task'),
-        api: plugins.wazuhCore.api,
-      },
-      wazuh_core: plugins.wazuhCore,
-      server: contextServer,
-    });
-
     // Queue
     jobQueueRun({
       core,
