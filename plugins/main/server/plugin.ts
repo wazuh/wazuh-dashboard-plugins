@@ -29,12 +29,7 @@ import { ILegacyClusterClient } from '../../../src/core/server';
 
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { setupRoutes } from './routes';
-import {
-  jobInitializeRun,
-  jobQueueRun,
-  jobMigrationTasksRun,
-  jobSanitizeUploadedFilesTasksRun,
-} from './start';
+import { jobInitializeRun, jobQueueRun, jobMigrationTasksRun } from './start';
 import { first } from 'rxjs/operators';
 import {
   defineTimeFieldNameIfExist,
@@ -710,20 +705,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       wazuh_core: plugins.wazuhCore,
       server: contextServer,
     });
-
-    // Sanitize uploaded files tasks
-    // error: [error][plugins][sanitize-uploaded-files-task][wazuh] sanitize:sanitizeUploadedSVG: Error: Configuration undefined not found
-    /*
-    jobSanitizeUploadedFilesTasksRun({
-      core,
-      wazuh: {
-        logger: this.logger.get('sanitize-uploaded-files-task'),
-        api: plugins.wazuhCore.api,
-      },
-      wazuh_core: plugins.wazuhCore,
-      server: contextServer,
-    });
-    */
 
     // Migration tasks
     jobMigrationTasksRun({
