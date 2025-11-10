@@ -3,9 +3,9 @@ name: Dev Scripts Tests
 on:
   pull_request:
     paths:
-      - "docker/osd-dev/dev.sh"
-      - "docker/osd-dev/dev.yml"
-      - "docker/osd-dev/scripts/**"
+      - 'docker/osd-dev/dev.sh'
+      - 'docker/osd-dev/dev.yml'
+      - 'docker/osd-dev/scripts/**'
     branches:
       - 4.*
 
