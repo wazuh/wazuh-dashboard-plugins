@@ -1121,6 +1121,10 @@ export const CONFIGURATION_ASSESSMENT_DASHBOARD_ID =
   'configuration-assessment-dashboard';
 export const CONFIGURATION_ASSESSMENT_AGENT_DASHBOARD_ID =
   'configuration-assessment-agent-dashboard';
+export const CONFIGURATION_ASSESSMENT_INVENTORY_ID =
+  'configuration-assessment-inventory';
+export const CONFIGURATION_ASSESSMENT_AGENT_INVENTORY_ID =
+  'configuration-assessment-inventory-agent';
 
 export const VULNERABILITIES_DASHBOARD_ID = 'vulnerability-detector-dashboard';
 export const VULNERABILITIES_AGENT_DASHBOARD_ID =
