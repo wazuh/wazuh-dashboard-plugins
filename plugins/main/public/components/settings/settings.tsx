@@ -28,11 +28,6 @@ import { Route, Switch } from '../router-search';
 import { useRouterSearch } from '../common/hooks';
 import { AppInfo } from './types';
 
-const mapStateToProps = state => ({
-  configurationUIEditable:
-    state.appConfig.data['configuration.ui_api_editable'],
-});
-
 const mapDispatchToProps = dispatch => ({
   updateGlobalBreadcrumb: breadcrumb =>
     dispatch(updateGlobalBreadcrumb(breadcrumb)),
@@ -41,7 +36,7 @@ const mapDispatchToProps = dispatch => ({
 export const Settings = compose(
   withErrorBoundary,
   withRouteResolvers({ nestedResolve }),
-  connect(mapStateToProps, mapDispatchToProps),
+  connect(null, mapDispatchToProps),
 )(props => {
   const { tab } = useRouterSearch();
   return <SettingsComponent {...props} tab={tab} />;
@@ -49,7 +44,6 @@ export const Settings = compose(
 
 interface SettingsComponentProps {
   tab: string;
-  configurationUIEditable: boolean;
   updateGlobalBreadcrumb: (breadcrumb: { text: string }[]) => void;
 }
 

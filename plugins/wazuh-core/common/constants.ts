@@ -452,16 +452,6 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
       ),
     ),
   },
-  'configuration.ui_api_editable': {
-    title: 'Configuration UI editable',
-    description:
-      'Enable or disable the ability to edit the configuration from UI or API endpoints. When disabled, this can only be edited from the configuration file, the related API endpoints are disabled, and the UI is inaccessible.',
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.switch,
-    defaultValue: true,
-    validate: SettingsValidator.isBoolean,
-  },
   'enrollment.dns': {
     title: 'Enrollment DNS',
     description:
@@ -788,14 +778,8 @@ export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
 
 export const HIDE_MANAGER_ALERTS_SETTING = 'hideManagerAlerts';
 export const ALERTS_SAMPLE_PREFIX = 'alerts.sample.prefix';
-
-export const CONFIG_UI_API_EDITABLE = 'configuration.ui_api_editable';
-
 export const ENROLLMENT_DNS = 'enrollment.dns';
 export const ENROLLMENT_PASSWORD = 'enrollment.password';
-
 export const IP_IGNORE = 'ip.ignore';
-
 export const WAZUH_UPDATES_DISABLED = 'wazuh.updates.disabled';
-
 export const REQUEST_TIMEOUT = 'timeout';
