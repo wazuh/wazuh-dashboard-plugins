@@ -38,7 +38,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed `Miscellaneous` from `App Settings`[#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
 - Removed `customization.logo.healthcheck`, `checks.api`, `checks.fields`, `checks.maxBuckets`, `checks.metaFields`, `checks.pattern`, `checks.setup`, `checks.template` and `checks.timeFilter` settings [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
 - Removed `customization.*` settings [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
-- Removed `App Settings` app
+- Removed `App Settings` app [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
+- Removed `GET /elastic/alerts` and `/utils/configuration*` endpoints [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 
 ## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 01
 
