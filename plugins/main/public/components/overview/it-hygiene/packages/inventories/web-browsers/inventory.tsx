@@ -7,7 +7,11 @@ import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryBrowserExtensionsDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
 import { InventoryDashboardTable } from '../../../../../common/dashboards';
-import { WAZUH_SAMPLE_INVENTORY_AGENT, IT_HYGIENE_BROWSER_EXTENSIONS_INVENTORY_ID, IT_HYGIENE_BROWSER_EXTENSIONS_AGENT_INVENTORY_ID } from '../../../../../../../common/constants';
+import {
+  WAZUH_SAMPLE_INVENTORY_AGENT,
+  IT_HYGIENE_BROWSER_EXTENSIONS_INVENTORY_ID,
+  IT_HYGIENE_BROWSER_EXTENSIONS_AGENT_INVENTORY_ID,
+} from '../../../../../../../common/constants';
 
 export const ITHygienePackagesInventoryWebBrowsers =
   withSystemInventoryBrowserExtensionsDataSource(() => {

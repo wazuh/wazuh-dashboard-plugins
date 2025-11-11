@@ -7,7 +7,11 @@ import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withFIMFilesDataSource } from '../../../common/hocs/validate-fim-states-index-pattern';
 import { InventoryDashboardTable } from '../../../../../common/dashboards';
-import { WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING, FIM_FILES_INVENTORY_ID, FIM_FILES_AGENT_INVENTORY_ID } from '../../../../../../../common/constants';
+import {
+  WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
+  FIM_FILES_INVENTORY_ID,
+  FIM_FILES_AGENT_INVENTORY_ID,
+} from '../../../../../../../common/constants';
 import { withAgent } from '../../../../../common/hocs/with-agent';
 
 const InventoryFIMFilesComponent: React.FC = () => {
@@ -18,7 +22,12 @@ const InventoryFIMFilesComponent: React.FC = () => {
         DataSourceRepositoryCreator={FIMFilesStatesDataSourceRepository}
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
-        getDashboardPanels={[{ dashboardId: FIM_FILES_INVENTORY_ID, agentDashboardId: FIM_FILES_AGENT_INVENTORY_ID }]}
+        getDashboardPanels={[
+          {
+            dashboardId: FIM_FILES_INVENTORY_ID,
+            agentDashboardId: FIM_FILES_AGENT_INVENTORY_ID,
+          },
+        ]}
         tableId='fim-files-inventory'
         categoriesSampleData={[WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]}
       />
@@ -27,5 +36,5 @@ const InventoryFIMFilesComponent: React.FC = () => {
 };
 
 export const InventoryFIMFiles = withAgent(
-  withFIMFilesDataSource(InventoryFIMFilesComponent)
+  withFIMFilesDataSource(InventoryFIMFilesComponent),
 );

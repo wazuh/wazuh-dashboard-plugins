@@ -77,7 +77,7 @@ const InventoryDashboard = compose(
           filterInputsProps={managedFiltersProps}
         />
 
-        {results?.hits?.total === 0 ? (<DiscoverNoResults />) : null}
+        {results?.hits?.total === 0 ? <DiscoverNoResults /> : null}
 
         {categoriesSampleData && (
           <div
@@ -86,17 +86,17 @@ const InventoryDashboard = compose(
               'wz-dashboard-hide-tables-pagination-export-csv-controls',
               classNameDashboardWrapper,
               {
-                'wz-no-display': !shouldHideDashboard
+                'wz-no-display': !shouldHideDashboard,
               },
             )}
           >
-              <SampleDataWarning categoriesSampleData={categoriesSampleData} />
+            <SampleDataWarning categoriesSampleData={categoriesSampleData} />
           </div>
         )}
         <div className='wz-dashboard-responsive'>
           {getDashboardPanels && (
             <>
-              { getDashboardPanels.map(
+              {getDashboardPanels.map(
                 ({ dashboardId, agentDashboardId, className = '' }) => {
                   const dashboard = (
                     <DashboardRenderer
@@ -126,7 +126,7 @@ const InventoryDashboard = compose(
                   }
 
                   return dashboard;
-                }
+                },
               )}
             </>
           )}

@@ -7,7 +7,11 @@ import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryTrafficDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
 import { InventoryDashboardTable } from '../../../../../common/dashboards';
-import { WAZUH_SAMPLE_INVENTORY_AGENT, IT_HYGIENE_TRAFFIC_INVENTORY_ID, IT_HYGIENE_TRAFFIC_AGENT_INVENTORY_ID } from '../../../../../../../common/constants';
+import {
+  WAZUH_SAMPLE_INVENTORY_AGENT,
+  IT_HYGIENE_TRAFFIC_INVENTORY_ID,
+  IT_HYGIENE_TRAFFIC_AGENT_INVENTORY_ID,
+} from '../../../../../../../common/constants';
 
 export const ITHygieneNetworksInventoryTraffic =
   withSystemInventoryTrafficDataSource(() => {

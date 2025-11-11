@@ -7,12 +7,16 @@ import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryUsersDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
 import { InventoryDashboardTable } from '../../../../../common/dashboards';
-import { WAZUH_SAMPLE_INVENTORY_AGENT, IT_HYGIENE_USERS_INVENTORY_ID, IT_HYGIENE_USERS_AGENT_INVENTORY_ID } from '../../../../../../../common/constants';
+import {
+  WAZUH_SAMPLE_INVENTORY_AGENT,
+  IT_HYGIENE_USERS_INVENTORY_ID,
+  IT_HYGIENE_USERS_AGENT_INVENTORY_ID,
+} from '../../../../../../../common/constants';
 import { withAgent } from '../hocs';
 
 export const ITHygieneUsersInventoryUsers = withAgent(
   withSystemInventoryUsersDataSource(() => {
-  return (
+    return (
       <InventoryDashboardTable
         DataSource={SystemInventoryStatesDataSource}
         DataSourceRepositoryCreator={
@@ -29,6 +33,6 @@ export const ITHygieneUsersInventoryUsers = withAgent(
         tableId='it-hygiene-inventory-users'
         categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
       />
-  );
-  })
+    );
+  }),
 );
