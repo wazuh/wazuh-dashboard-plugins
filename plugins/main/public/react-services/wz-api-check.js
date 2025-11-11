@@ -9,19 +9,15 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { WazuhConfig } from './wazuh-config';
-import { AppState } from './app-state';
 import { WzMisc } from '../factories/misc';
-import { getHttp } from '../kibana-services';
+import { getHttp, getWazuhCorePlugin } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 
 export class ApiCheck {
   static async checkStored(data, idChanged = false) {
     try {
-      const wazuhConfig = new WazuhConfig();
-      const configuration = wazuhConfig.getConfig();
-      const timeout = configuration ? configuration.timeout : 20000;
+      const timeout = getWazuhCorePlugin().configuration.get('timeout');
       const payload = { id: data };
       if (idChanged) {
         payload.idChanged = data;
@@ -68,8 +64,7 @@ export class ApiCheck {
    */
   static async checkApi(apiEntry, forceRefresh = false) {
     try {
-      const wazuhConfig = new WazuhConfig();
-      const { timeout } = wazuhConfig.getConfig();
+      const timeout = getWazuhCorePlugin().configuration.get('timeout');
       const url = getHttp().basePath.prepend('/api/check-api');
 
       const options = {
