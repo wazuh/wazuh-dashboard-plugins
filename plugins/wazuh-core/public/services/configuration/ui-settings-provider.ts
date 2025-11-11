@@ -35,11 +35,8 @@ export class UISettingsConfigProvider implements IConfigurationProvider {
     > = {};
 
     for (const key in settings) {
-      if (
-        settings[key].category &&
-        settings[key].category.includes('wazuhCore')
-      ) {
-        wazuhCoreSettings[key] = settings[key];
+      if (settings[key].category) {
+        wazuhCoreSettings[key] = settings[key].value;
       }
     }
 

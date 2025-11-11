@@ -20,9 +20,7 @@ export const configSchema = schema.object(initiliazerConfig);
 export type CorePluginConfigType = TypeOf<typeof configSchema>;
 
 export const config: PluginConfigDescriptor<CorePluginConfigType> = {
-  exposeToBrowser: {
-    hosts: true,
-  },
+  exposeToBrowser: {},
   schema: configSchema,
 };
 
