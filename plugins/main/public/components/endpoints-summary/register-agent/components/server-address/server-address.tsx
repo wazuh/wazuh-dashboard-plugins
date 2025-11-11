@@ -5,7 +5,6 @@ import {
   EuiPopover,
   EuiButtonEmpty,
   EuiLink,
-  EuiSwitch,
 } from '@elastic/eui';
 import React, { Fragment, useEffect, useState } from 'react';
 import { SERVER_ADDRESS_TEXTS } from '../../utils/register-agent-data';
@@ -14,10 +13,10 @@ import { InputForm } from '../../../../common/form';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import '../group-input/group-input.scss';
-import { WzRequest } from '../../../../../react-services';
 import { ErrorHandler } from '../../../../../react-services/error-management/error-handler/error-handler';
 import { WzButtonPermissions } from '../../../../common/permissions/button';
 import { useAppConfig } from '../../../../common/hooks';
+import { getWazuhCorePlugin } from '../../../../../kibana-services';
 
 interface ServerAddressInputProps {
   formField: EnhancedFieldConfiguration;
@@ -63,9 +62,10 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
 
   const saveServerAddress = async () => {
     try {
-      const res = await WzRequest.genericReq('PUT', '/utils/configuration', {
-        'enrollment.dns': formField.value,
-      });
+      await getWazuhCorePlugin().configuration.set(
+        'enrollment.dns',
+        formField.value,
+      );
     } catch (error) {
       ErrorHandler.handleError(error, {
         message: error.message,

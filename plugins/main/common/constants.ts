@@ -828,9 +828,6 @@ export const WAZUH_INDEXER_NAME = 'indexer';
 export const NOT_TIME_FIELD_NAME_INDEX_PATTERN =
   'not_time_field_name_index_pattern';
 
-// Customization
-export const CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES = 1048576;
-
 export enum EpluginSettingType {
   text = 'text',
   textarea = 'textarea',
