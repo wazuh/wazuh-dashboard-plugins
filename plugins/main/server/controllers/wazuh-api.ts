@@ -748,14 +748,14 @@ export class WazuhApiCtrl {
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
   ) {
-    // TODO: setting is defined in the tenant side and this can not obtained in the backend side
-    const reportMaxRows = await context.wazuh_core.configuration.get(
-      'reports.csv.maxRows',
-    );
     try {
       if (!request.body || !request.body.path)
         throw new Error('Field path is required');
       if (!request.body.id) throw new Error('Field id is required');
+
+      const reportMaxRows = await context.core.uiSettings.client.get(
+        'reports.csv.maxRows',
+      );
 
       const filters = Array.isArray(((request || {}).body || {}).filters)
         ? request.body.filters
