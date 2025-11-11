@@ -15,7 +15,7 @@ import React, { useEffect, useState } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiText,
+  EuiTitle,
   EuiFacetButton,
   EuiButtonIcon,
   EuiLoadingChart,
@@ -66,13 +66,13 @@ const MitreTopTacticsTactics = ({
   return (
     <>
       <div className='wz-agents-mitre'>
-        <EuiText size='xs'>
-          <EuiFlexGroup>
-            <EuiFlexItem style={{ margin: 0, padding: '12px 0px 0px 10px' }}>
+        <EuiFlexGroup>
+          <EuiFlexItem style={{ margin: 0, padding: '12px 0px 0px 10px' }}>
+            <EuiTitle size='xs'>
               <h3>Top Tactics</h3>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiText>
+            </EuiTitle>
+          </EuiFlexItem>
+        </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
             {getData?.data?.map(tactic => (
@@ -164,24 +164,24 @@ const MitreTopTacticsTechniques = ({
   }
   return (
     <>
-      <EuiText size='xs'>
-        <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
-            <EuiButtonIcon
-              size={'s'}
-              color={'primary'}
-              onClick={() => {
-                setView('tactics');
-              }}
-              iconType='sortLeft'
-              aria-label='Back Top Tactics'
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
+      <EuiFlexGroup alignItems='center' gutterSize='s'>
+        <EuiFlexItem grow={false}>
+          <EuiButtonIcon
+            size={'s'}
+            color={'primary'}
+            onClick={() => {
+              setView('tactics');
+            }}
+            iconType='sortLeft'
+            aria-label='Back Top Tactics'
+          />
+        </EuiFlexItem>
+        <EuiFlexItem>
+          <EuiTitle size='xxs'>
             <h3>{selectedTactic}</h3>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </EuiText>
+          </EuiTitle>
+        </EuiFlexItem>
+      </EuiFlexGroup>
       <EuiFlexGroup>
         <EuiFlexItem>
           {getData.data.map(tactic => (
@@ -223,7 +223,8 @@ export const MitreTopTactics = ({ agentId }) => {
   const renderEmpty = () => (
     <EuiEmptyPrompt
       iconType='stats'
-      title={<h4>No results</h4>}
+      title={<h2 style={{ fontWeight: 'normal' }}>No results</h2>}
+      titleSize='xs'
       body={
         <p>No MITRE ATT&CK results were found in the selected time range.</p>
       }

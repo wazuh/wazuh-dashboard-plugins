@@ -2,7 +2,6 @@ import {
   EuiPanel,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiText,
   EuiToolTip,
   EuiButtonIcon,
   EuiSpacer,
@@ -164,37 +163,32 @@ const VulsPanel = ({ agent }) => {
   return (
     <Fragment>
       <EuiPanel paddingSize='m'>
-        <EuiText size='xs'>
-          <EuiFlexGroup
-            className='wz-section-sca-euiFlexGroup'
-            responsive={false}
-          >
-            <EuiFlexItem grow={false}>
-              <EuiTitle size='xs'>
-                <h2>Vulnerability Detection</h2>
-              </EuiTitle>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <RedirectAppLinks application={getCore().application}>
-                <EuiToolTip
-                  position='top'
-                  content='Open Vulnerability Detection'
-                >
-                  <EuiButtonIcon
-                    iconType='popout'
-                    color='primary'
-                    className='EuiButtonIcon'
-                    href={NavigationService.getInstance().getUrlForApp(
-                      vulnerabilityDetection.id,
-                    )}
-                    aria-label='Open Vulnerability Detection'
-                  />
-                </EuiToolTip>
-              </RedirectAppLinks>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiText>
-        <EuiSpacer size='s' />
+        <EuiFlexGroup
+          className='wz-section-sca-euiFlexGroup'
+          responsive={false}
+        >
+          <EuiFlexItem grow={false}>
+            <EuiTitle size='s'>
+              <h2>Vulnerability Detection</h2>
+            </EuiTitle>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <RedirectAppLinks application={getCore().application}>
+              <EuiToolTip position='top' content='Open Vulnerability Detection'>
+                <EuiButtonIcon
+                  iconType='popout'
+                  color='primary'
+                  className='EuiButtonIcon'
+                  href={NavigationService.getInstance().getUrlForApp(
+                    vulnerabilityDetection.id,
+                  )}
+                  aria-label='Open Vulnerability Detection'
+                />
+              </EuiToolTip>
+            </RedirectAppLinks>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiSpacer size='m' />
         <PanelWithVulnerabilitiesState agent={agent} />
       </EuiPanel>
     </Fragment>

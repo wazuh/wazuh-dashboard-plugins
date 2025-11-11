@@ -6,7 +6,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiLoadingChart,
-  EuiText,
+  EuiTitle,
   EuiSelect,
   EuiSpacer,
 } from '@elastic/eui';
@@ -67,17 +67,23 @@ export const VisualizationBasic = ({
     visualization = (
       <EuiEmptyPrompt
         iconType='alert'
-        title={<h4>{errorTitle}</h4>}
-        body={errorMessage || error?.message}
+        title={<h2 style={{ fontWeight: 'normal' }}>{errorTitle}</h2>}
+        titleSize='xs'
+        body={<p>{errorMessage || error?.message}</p>}
       />
     );
   } else if (!data || (Array.isArray(data) && !data.length)) {
     visualization = (
       <EuiEmptyPrompt
         iconType='stats'
-        title={<h4>{noDataTitle}</h4>}
+        title={<h2 style={{ fontWeight: 'normal' }}>{noDataTitle}</h2>}
+        titleSize='xs'
         body={
-          typeof noDataMessage === 'function' ? noDataMessage() : noDataMessage
+          <p>
+            {typeof noDataMessage === 'function'
+              ? noDataMessage()
+              : noDataMessage}
+          </p>
         }
       />
     );
@@ -163,15 +169,13 @@ export const VisualizationBasicWidgetSelector = ({
       <EuiFlexGroup
         className='embPanel__header'
         gutterSize='none'
-        alignItems='center'
+        alignItems='flexStart'
       >
         <EuiFlexItem>
           {title && (
-            <h2 className='embPanel__title wz-headline-title'>
-              <EuiText size='xs'>
-                <h2>{title}</h2>
-              </EuiText>
-            </h2>
+            <EuiTitle size='s'>
+              <h2>{title}</h2>
+            </EuiTitle>
           )}
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
@@ -185,7 +189,7 @@ export const VisualizationBasicWidgetSelector = ({
           />
         </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiSpacer size='s' />
+      <EuiSpacer size='m' />
       <VisualizationBasicWidget
         {...rest}
         {...(rest.noDataMessage

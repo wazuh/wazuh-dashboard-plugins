@@ -18,7 +18,7 @@ import {
   EuiFlexItem,
   EuiPanel,
   EuiSpacer,
-  EuiText,
+  EuiTitle,
   EuiFlexGroup,
 } from '@elastic/eui';
 // @ts-ignore
@@ -72,9 +72,9 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
     <EuiPanel paddingSize='m'>
       <EuiFlexGroup>
         <EuiFlexItem>
-          <EuiText size='xs'>
-            <h2>Top 5 Packages</h2>
-          </EuiText>
+          <EuiTitle size='xs'>
+            <h3>Top 5 Packages</h3>
+          </EuiTitle>
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size='s' />

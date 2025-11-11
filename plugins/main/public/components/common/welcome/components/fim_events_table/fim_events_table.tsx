@@ -18,7 +18,7 @@ import {
   EuiFlexItem,
   EuiPanel,
   EuiSpacer,
-  EuiText,
+  EuiTitle,
   EuiButtonIcon,
   EuiFlexGroup,
   EuiToolTip,
@@ -41,9 +41,9 @@ export function FimEventsTable({ agent }) {
         <EuiFlexItem>
           <EuiFlexGroup responsive={false}>
             <EuiFlexItem>
-              <EuiText size='xs'>
+              <EuiTitle size='s'>
                 <h2>FIM: Recent events</h2>
-              </EuiText>
+              </EuiTitle>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiToolTip position='top' content='Open FIM'>
@@ -61,7 +61,7 @@ export function FimEventsTable({ agent }) {
               </EuiToolTip>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <EuiSpacer size='s' />
+          <EuiSpacer size='m' />
           <FimTable agent={agent} />
         </EuiFlexItem>
       </EuiPanel>

@@ -17,7 +17,7 @@ import {
   EuiFlexItem,
   EuiFlexGroup,
   EuiSpacer,
-  EuiText,
+  EuiTitle,
   EuiButtonEmpty,
   EuiPage,
   EuiPopover,
@@ -284,7 +284,7 @@ export const AgentsWelcome = compose(
           responsive={false}
           gutterSize='xs'
         >
-          <EuiFlexItem grow={false} className='wz-module-header-agent-title'>
+          <EuiFlexItem grow={false} className='wz-module-header-agent-title wz-module-header-agent-title-left'>
             <EuiFlexGroup responsive={false} gutterSize='xs'>
               {(this.state.maxModules !== null && this.renderModules()) || (
                 <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
@@ -382,11 +382,9 @@ export const AgentsWelcome = compose(
           <EuiPanel paddingSize='m'>
             <EuiFlexGroup gutterSize='s' responsive={false}>
               <EuiFlexItem>
-                <h2 className='embPanel__title wz-headline-title'>
-                  <EuiText size='xs'>
-                    <h2>MITRE ATT&CK</h2>
-                  </EuiText>
-                </h2>
+                <EuiTitle size='s'>
+                  <h2>MITRE ATT&CK</h2>
+                </EuiTitle>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
                 <EuiToolTip position='top' content='Open MITRE ATT&CK'>

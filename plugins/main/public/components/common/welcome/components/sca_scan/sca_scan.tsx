@@ -17,7 +17,6 @@ import {
   EuiFlexItem,
   EuiPanel,
   EuiTitle,
-  EuiText,
   EuiLink,
   EuiBadge,
   EuiSpacer,
@@ -209,23 +208,23 @@ export const ScaScan = compose(
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <RedirectAppLinks application={getCore().application}>
-                <EuiTitle size='xs'>
-                  <EuiLink
-                    onClick={() => {
-                      this.pinnedAgentManager.pinAgent(this.props.agent);
-                    }}
-                    href={NavigationService.getInstance().getUrlForApp(
-                      configurationAssessment.id,
-                      {
-                        path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
-                      },
-                    )}
-                  >
+                <EuiLink
+                  onClick={() => {
+                    this.pinnedAgentManager.pinAgent(this.props.agent);
+                  }}
+                  href={NavigationService.getInstance().getUrlForApp(
+                    configurationAssessment.id,
+                    {
+                      path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
+                    },
+                  )}
+                >
+                  <EuiTitle size='xs'>
                     <h4>{lastScan.name}</h4>
-                    <EuiSpacer size='m' />
-                  </EuiLink>
-                </EuiTitle>
+                  </EuiTitle>
+                </EuiLink>
               </RedirectAppLinks>
+              <EuiSpacer size='m' />
             </EuiFlexItem>
             <EuiFlexItem grow={false} style={{ marginTop: 12 }}>
               <EuiBadge color='secondary'>{lastScan?.policy_id}</EuiBadge>
@@ -283,48 +282,47 @@ export const ScaScan = compose(
       return (
         <EuiFlexItem>
           <EuiPanel paddingSize='m'>
-            <EuiText size='xs'>
-              <EuiFlexGroup className='wz-section-sca-euiFlexGroup'>
-                <EuiFlexItem grow={false}>
-                  <RedirectAppLinks application={getCore().application}>
-                    <EuiTitle size='xs'>
-                      <EuiLink
-                        className='agents-link-item'
-                        onClick={() => {
-                          this.pinnedAgentManager.pinAgent(this.props.agent);
-                        }}
-                        href={NavigationService.getInstance().getUrlForApp(
-                          configurationAssessment.id,
-                          {
-                            path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
-                          },
-                        )}
-                      >
-                        <h2>SCA: Lastest scans</h2>
-                      </EuiLink>
+            <EuiFlexGroup className='wz-section-sca-euiFlexGroup'>
+              <EuiFlexItem grow={false}>
+                <RedirectAppLinks application={getCore().application}>
+                  <EuiLink
+                    className='agents-link-item'
+                    onClick={() => {
+                      this.pinnedAgentManager.pinAgent(this.props.agent);
+                    }}
+                    href={NavigationService.getInstance().getUrlForApp(
+                      configurationAssessment.id,
+                      {
+                        path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
+                      },
+                    )}
+                  >
+                    <EuiTitle size='s'>
+                      <h2>SCA: Latest scans</h2>
                     </EuiTitle>
-                  </RedirectAppLinks>
-                </EuiFlexItem>
-                <EuiFlexItem grow={false}>
-                  <RedirectAppLinks application={getCore().application}>
-                    <EuiToolTip position='top' content='Open SCA Scans'>
-                      <EuiButtonIcon
-                        iconType='popout'
-                        color='primary'
-                        className='EuiButtonIcon'
-                        onClick={() => {
-                          this.pinnedAgentManager.pinAgent(this.props.agent);
-                        }}
-                        href={NavigationService.getInstance().getUrlForApp(
-                          configurationAssessment.id,
-                        )}
-                        aria-label='Open SCA Scans'
-                      />
-                    </EuiToolTip>
-                  </RedirectAppLinks>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiText>
+                  </EuiLink>
+                </RedirectAppLinks>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <RedirectAppLinks application={getCore().application}>
+                  <EuiToolTip position='top' content='Open SCA Scans'>
+                    <EuiButtonIcon
+                      iconType='popout'
+                      color='primary'
+                      className='EuiButtonIcon'
+                      onClick={() => {
+                        this.pinnedAgentManager.pinAgent(this.props.agent);
+                      }}
+                      href={NavigationService.getInstance().getUrlForApp(
+                        configurationAssessment.id,
+                      )}
+                      aria-label='Open SCA Scans'
+                    />
+                  </EuiToolTip>
+                </RedirectAppLinks>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiSpacer size='m' />
             {scaScan}
           </EuiPanel>
         </EuiFlexItem>

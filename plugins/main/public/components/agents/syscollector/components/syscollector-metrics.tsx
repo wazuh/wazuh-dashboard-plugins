@@ -7,6 +7,7 @@ import {
   EuiTitle,
   EuiToolTip,
   EuiButtonIcon,
+  EuiText,
 } from '@elastic/eui';
 import _ from 'lodash';
 import WzRibbon from '../../../common/ribbon/ribbon';
@@ -101,9 +102,22 @@ export const InventoryMetrics = withSystemInventoryDataSource(
       (_.isEmpty(data?.hardware) || _.isEmpty(data?.software))
     ) {
       return (
-        <EuiPanel paddingSize='s' style={{ margin: 16, textAlign: 'center' }}>
-          <EuiIcon type='iInCircle' /> Not enough hardware or operating system
-          information
+        <EuiPanel>
+          <EuiFlexGroup
+            direction='row'
+            alignItems='center'
+            justifyContent='center'
+            gutterSize='xs'
+          >
+            <EuiFlexItem grow={false}>
+              <EuiIcon type='iInCircle' />
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiText size='s'>
+                Not enough hardware or operating system information
+              </EuiText>
+            </EuiFlexItem>
+          </EuiFlexGroup>
         </EuiPanel>
       );
     }
@@ -159,7 +173,7 @@ export const InventoryMetrics = withSystemInventoryDataSource(
         title={
           <EuiFlexGroup justifyContent='spaceBetween'>
             <EuiFlexItem grow={false}>
-              <EuiTitle>
+              <EuiTitle size='s'>
                 <h2>System inventory</h2>
               </EuiTitle>
             </EuiFlexItem>
