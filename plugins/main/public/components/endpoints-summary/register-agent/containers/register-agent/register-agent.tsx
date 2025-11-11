@@ -42,6 +42,20 @@ import NavigationService from '../../../../../react-services/navigation-service'
 import { SECTIONS } from '../../../../../sections';
 import { getWazuhAPIVersion } from '../../../services';
 
+function serverAddressHostnameFQDNIPv4IPv6(value: string) {
+  const isFQDNOrHostname =
+    /^(?!-)(?!.*--)[a-zA-Z0-9áéíóúüñ-]{0,62}[a-zA-Z0-9áéíóúüñ](?:\.[a-zA-Z0-9áéíóúüñ-]{0,62}[a-zA-Z0-9áéíóúüñ]){0,}$/;
+  const isIPv6 = /^(?:[0-9a-fA-F]{4}:){7}[0-9a-fA-F]{4}$/;
+
+  if (
+    value.length > 255 ||
+    (value.length > 0 && !isFQDNOrHostname.test(value) && !isIPv6.test(value))
+  ) {
+    return 'It should be a valid hostname, FQDN, IPv4 or uncompressed IPv6';
+  }
+  return undefined;
+}
+
 export const RegisterAgent = compose(
   withErrorBoundary,
   withRouteResolvers({ nestedResolve }),
@@ -80,9 +94,7 @@ export const RegisterAgent = compose(
     serverAddress: {
       type: 'text',
       initialValue: configuration['enrollment.dns'] || '',
-      validate:
-        getWazuhCorePlugin().configuration._settings.get('enrollment.dns')
-          .validate,
+      validate: serverAddressHostnameFQDNIPv4IPv6,
     },
     agentName: {
       type: 'text',
