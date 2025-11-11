@@ -3,23 +3,6 @@ import { PLUGIN_SETTINGS } from './constants';
 describe.skip('[settings] Input validation', () => {
   it.each`
     setting                            | value                                             | expectedValidation
-    ${'alerts.sample.prefix'}          | ${'test'}                                         | ${undefined}
-    ${'alerts.sample.prefix'}          | ${''}                                             | ${'Value can not be empty.'}
-    ${'alerts.sample.prefix'}          | ${'test space'}                                   | ${'No whitespaces allowed.'}
-    ${'alerts.sample.prefix'}          | ${'-test'}                                        | ${"It can't start with: -, _, +, .."}
-    ${'alerts.sample.prefix'}          | ${'_test'}                                        | ${"It can't start with: -, _, +, .."}
-    ${'alerts.sample.prefix'}          | ${'+test'}                                        | ${"It can't start with: -, _, +, .."}
-    ${'alerts.sample.prefix'}          | ${'.test'}                                        | ${"It can't start with: -, _, +, .."}
-    ${'alerts.sample.prefix'}          | ${'test\\'}                                       | ${String.raw`It can't contain invalid characters: \, /, ?, ", <, >, |, ,, #, *.`}
-    ${'alerts.sample.prefix'}          | ${'test/'}                                        | ${String.raw`It can't contain invalid characters: \, /, ?, ", <, >, |, ,, #, *.`}
-    ${'alerts.sample.prefix'}          | ${'test?'}                                        | ${String.raw`It can't contain invalid characters: \, /, ?, ", <, >, |, ,, #, *.`}
-    ${'alerts.sample.prefix'}          | ${'test"'}                                        | ${String.raw`It can't contain invalid characters: \, /, ?, ", <, >, |, ,, #, *.`}
-    ${'alerts.sample.prefix'}          | ${'test<'}                                        | ${String.raw`It can't contain invalid characters: \, /, ?, ", <, >, |, ,, #, *.`}
-    ${'alerts.sample.prefix'}          | ${'test>'}                                        | ${String.raw`It can't contain invalid characters: \, /, ?, ", <, >, |, ,, #, *.`}
-    ${'alerts.sample.prefix'}          | ${'test|'}                                        | ${String.raw`It can't contain invalid characters: \, /, ?, ", <, >, |, ,, #, *.`}
-    ${'alerts.sample.prefix'}          | ${'test,'}                                        | ${String.raw`It can't contain invalid characters: \, /, ?, ", <, >, |, ,, #, *.`}
-    ${'alerts.sample.prefix'}          | ${'test#'}                                        | ${String.raw`It can't contain invalid characters: \, /, ?, ", <, >, |, ,, #, *.`}
-    ${'alerts.sample.prefix'}          | ${'test*'}                                        | ${String.raw`It can't contain invalid characters: \, /, ?, ", <, >, |, ,, #, *.`}
     ${'configuration.ui_api_editable'} | ${true}                                           | ${undefined}
     ${'configuration.ui_api_editable'} | ${0}                                              | ${'It should be a boolean. Allowed values: true or false.'}
     ${'enrollment.dns'}                | ${'test'}                                         | ${undefined}

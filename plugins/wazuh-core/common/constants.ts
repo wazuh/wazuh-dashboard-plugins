@@ -424,34 +424,6 @@ interface TPluginSetting {
 }
 
 export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
-  'alerts.sample.prefix': {
-    title: 'Sample alerts prefix',
-    description:
-      'Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.text,
-    defaultValue: WAZUH_SAMPLE_ALERT_PREFIX,
-    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.isNotEmptyString,
-      SettingsValidator.hasNoSpaces,
-      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-      SettingsValidator.hasNotInvalidCharacters(
-        '\\',
-        '/',
-        '?',
-        '"',
-        '<',
-        '>',
-        '|',
-        ',',
-        '#',
-        '*',
-      ),
-    ),
-  },
   'enrollment.dns': {
     title: 'Enrollment DNS',
     description:
@@ -777,7 +749,6 @@ export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
 // uiSettings
 
 export const HIDE_MANAGER_ALERTS_SETTING = 'hideManagerAlerts';
-export const ALERTS_SAMPLE_PREFIX = 'alerts.sample.prefix';
 export const ENROLLMENT_DNS = 'enrollment.dns';
 export const ENROLLMENT_PASSWORD = 'enrollment.password';
 export const IP_IGNORE = 'ip.ignore';

@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import path from 'path';
 import { version } from '../package.json';
 
 // Plugin
@@ -18,7 +17,7 @@ export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
 
 // Index patterns - Wazuh alerts
 export const WAZUH_INDEX_TYPE_ALERTS = 'alerts';
-export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts-*';
+export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts*';
 
 // Job - Wazuh monitoring
 export const WAZUH_INDEX_TYPE_MONITORING = 'monitoring';
@@ -170,7 +169,6 @@ export const FIELD_TIMESTAMP = '@timestamp';
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
 // Sample data
-export const WAZUH_SAMPLE_ALERT_PREFIX = 'wazuh-alerts-4.x-';
 export const WAZUH_SAMPLE_ALERTS_INDEX_SHARDS = 1;
 export const WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS = 0;
 export const WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY = 'security';
@@ -187,7 +185,7 @@ export const WAZUH_SAMPLE_AGENT_MONITORING = 'agent-monitoring';
 export const WAZUH_SAMPLE_SERVER_STATISTICS = 'server-statistics';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 3000;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = {
-  settingIndexPattern: 'alerts.sample.prefix',
+  indexPatternPrefix: WAZUH_ALERTS_PATTERN.replace('*', ''),
   dataSet: 'wazuh-alerts',
 };
 
