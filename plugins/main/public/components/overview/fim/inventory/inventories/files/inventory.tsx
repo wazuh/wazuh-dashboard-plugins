@@ -5,19 +5,12 @@ import {
 } from '../../../../../common/data-source';
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
-withSystemInventoryHardwareDataSource;
-import { getDashboard } from './dashboard';
-import { withSystemInventoryHardwareDataSource } from '../../../../it-hygiene/common/hocs/validate-system-inventory-index-pattern';
 import { withFIMFilesDataSource } from '../../../common/hocs/validate-fim-states-index-pattern';
 import { InventoryDashboardTable } from '../../../../../common/dashboards';
-import { WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING } from '../../../../../../../common/constants';
-import { compose } from 'redux';
+import { WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING, FIM_FILES_INVENTORY_ID, FIM_FILES_AGENT_INVENTORY_ID } from '../../../../../../../common/constants';
 import { withAgent } from '../../../../../common/hocs/with-agent';
 
-export const InventoryFIMFiles = compose(
-  withAgent,
-  withFIMFilesDataSource,
-)(props => {
+const InventoryFIMFilesComponent: React.FC = () => {
   return (
     <div style={{ margin: '0 12px' }}>
       <InventoryDashboardTable
@@ -25,10 +18,14 @@ export const InventoryFIMFiles = compose(
         DataSourceRepositoryCreator={FIMFilesStatesDataSourceRepository}
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
-        getDashboardPanels={getDashboard}
+        getDashboardPanels={[{ dashboardId: FIM_FILES_INVENTORY_ID, agentDashboardId: FIM_FILES_AGENT_INVENTORY_ID }]}
         tableId='fim-files-inventory'
         categoriesSampleData={[WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]}
       />
     </div>
   );
-});
+};
+
+export const InventoryFIMFiles = withAgent(
+  withFIMFilesDataSource(InventoryFIMFilesComponent)
+);

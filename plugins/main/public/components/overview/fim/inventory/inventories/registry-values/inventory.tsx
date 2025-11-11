@@ -5,32 +5,27 @@ import {
 } from '../../../../../common/data-source';
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
-withSystemInventoryHardwareDataSource;
-import { getDashboard } from './dashboard';
-import { withSystemInventoryHardwareDataSource } from '../../../../it-hygiene/common/hocs/validate-system-inventory-index-pattern';
 import { withFIMRegistryValuesDataSource } from '../../../common/hocs/validate-fim-states-index-pattern';
 import { InventoryDashboardTable } from '../../../../../common/dashboards';
-import { WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING } from '../../../../../../../common/constants';
-import { compose } from 'redux';
+import { WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING, FIM_REGISTRY_VALUES_INVENTORY_ID, FIM_REGISTRY_VALUES_AGENT_INVENTORY_ID } from '../../../../../../../common/constants';
 import { withAgent } from '../../../../../common/hocs/with-agent';
 
-export const InventoryFIMRegistryValues = compose(
-  withAgent,
-  withFIMRegistryValuesDataSource,
-)(props => {
+const InventoryFIMRegistryValuesComponent: React.FC = () => {
   return (
     <div style={{ margin: '0 12px' }}>
       <InventoryDashboardTable
         DataSource={FIMRegistryValuesStatesDataSource}
-        DataSourceRepositoryCreator={
-          FIMRegistryValuesStatesDataSourceRepository
-        }
+        DataSourceRepositoryCreator={FIMRegistryValuesStatesDataSourceRepository}
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
-        getDashboardPanels={getDashboard}
+        getDashboardPanels={[{ dashboardId: FIM_REGISTRY_VALUES_INVENTORY_ID, agentDashboardId: FIM_REGISTRY_VALUES_AGENT_INVENTORY_ID }]}
         tableId='fim-registry-values-inventory'
         categoriesSampleData={[WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]}
       />
     </div>
   );
-});
+};
+
+export const InventoryFIMRegistryValues = withAgent(
+  withFIMRegistryValuesDataSource(InventoryFIMRegistryValuesComponent)
+);

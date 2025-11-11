@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import path from 'path';
 import { version } from '../package.json';
 
 // Plugin
@@ -1023,6 +1022,14 @@ export const DOCKER_AGENT_DASHBOARD_ID = 'docker-agent-dashboard';
 export const FIM_DASHBOARD_ID = 'fim-dashboard';
 export const FIM_AGENT_DASHBOARD_ID = 'fim-agent-dashboard';
 
+// FIM inventory dashboard IDs
+export const FIM_FILES_INVENTORY_ID = 'fim-files-inventory';
+export const FIM_REGISTRY_KEYS_INVENTORY_ID = 'fim-registry-keys-inventory';
+export const FIM_REGISTRY_VALUES_INVENTORY_ID = 'fim-registry-values-inventory';
+export const FIM_FILES_AGENT_INVENTORY_ID = 'fim-files-inventory-agent';
+export const FIM_REGISTRY_KEYS_AGENT_INVENTORY_ID = 'fim-registry-keys-inventory-agent';
+export const FIM_REGISTRY_VALUES_AGENT_INVENTORY_ID = 'fim-registry-values-inventory-agent';
+
 export const MALWARE_DETECTION_DASHBOARD_ID = 'malware-detection-dashboard';
 export const MALWARE_DETECTION_AGENT_DASHBOARD_ID =
   'malware-detection-agent-dashboard';
@@ -1056,6 +1063,59 @@ export const OFFICE_365_DASHBOARD_ID = 'office-365-dashboard';
 
 export const IT_HYGIENE_DASHBOARD_ID = 'it-hygiene-dashboard';
 export const IT_HYGIENE_AGENT_DASHBOARD_ID = 'it-hygiene-agent-dashboard';
+
+export const IT_HYGIENE_INTERFACES_INVENTORY_ID = 'it-hygiene-inventory-interfaces';
+export const IT_HYGIENE_INTERFACES_AGENT_INVENTORY_ID = 'it-hygiene-inventory-interfaces-agent';
+
+// IT Hygiene inventory dashboard IDs per category
+export const IT_HYGIENE_NETWORKS_INVENTORY_ID = 'it-hygiene-inventory-networks';
+export const IT_HYGIENE_NETWORKS_AGENT_INVENTORY_ID =
+  'it-hygiene-inventory-networks-agent';
+
+export const IT_HYGIENE_PROTOCOLS_INVENTORY_ID = 'it-hygiene-inventory-protocols';
+export const IT_HYGIENE_PROTOCOLS_AGENT_INVENTORY_ID =
+  'it-hygiene-inventory-protocols-agent';
+
+export const IT_HYGIENE_SERVICES_INVENTORY_ID = 'it-hygiene-inventory-services';
+export const IT_HYGIENE_SERVICES_AGENT_INVENTORY_ID =
+  'it-hygiene-inventory-services-agent';
+
+export const IT_HYGIENE_TRAFFIC_INVENTORY_ID = 'it-hygiene-inventory-traffic';
+export const IT_HYGIENE_TRAFFIC_AGENT_INVENTORY_ID =
+  'it-hygiene-inventory-traffic-agent';
+
+export const IT_HYGIENE_SYSTEM_INVENTORY_ID = 'it-hygiene-inventory-system';
+export const IT_HYGIENE_SYSTEM_AGENT_INVENTORY_ID =
+  'it-hygiene-inventory-system-agent';
+
+export const IT_HYGIENE_HARDWARE_INVENTORY_ID = 'it-hygiene-inventory-hardware';
+export const IT_HYGIENE_HARDWARE_AGENT_INVENTORY_ID =
+  'it-hygiene-inventory-hardware-agent';
+
+export const IT_HYGIENE_PACKAGES_INVENTORY_ID = 'it-hygiene-inventory-packages';
+export const IT_HYGIENE_PACKAGES_AGENT_INVENTORY_ID =
+  'it-hygiene-inventory-packages-agent';
+
+export const IT_HYGIENE_HOTFIXES_INVENTORY_ID = 'it-hygiene-inventory-hotfixes';
+export const IT_HYGIENE_HOTFIXES_AGENT_INVENTORY_ID =
+  'it-hygiene-inventory-hotfixes-agent';
+
+export const IT_HYGIENE_BROWSER_EXTENSIONS_INVENTORY_ID =
+  'it-hygiene-inventory-browser-extensions';
+export const IT_HYGIENE_BROWSER_EXTENSIONS_AGENT_INVENTORY_ID =
+  'it-hygiene-inventory-browser-extensions-agent';
+
+export const IT_HYGIENE_PROCESSES_INVENTORY_ID = 'it-hygiene-inventory-processes';
+export const IT_HYGIENE_PROCESSES_AGENT_INVENTORY_ID =
+  'it-hygiene-inventory-processes-agent';
+
+export const IT_HYGIENE_USERS_INVENTORY_ID = 'it-hygiene-inventory-users';
+export const IT_HYGIENE_USERS_AGENT_INVENTORY_ID =
+  'it-hygiene-inventory-users-agent';
+
+export const IT_HYGIENE_GROUPS_INVENTORY_ID = 'it-hygiene-inventory-groups';
+export const IT_HYGIENE_GROUPS_AGENT_INVENTORY_ID =
+  'it-hygiene-inventory-groups-agent';
 
 export const CONFIGURATION_ASSESSMENT_DASHBOARD_ID =
   'configuration-assessment-dashboard';
