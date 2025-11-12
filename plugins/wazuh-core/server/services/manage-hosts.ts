@@ -11,9 +11,9 @@
  */
 import { Logger } from 'opensearch-dashboards/server';
 import { IConfiguration } from '../../common/services/configuration';
+import { ServerAPIClient } from './server-api-client';
 import { API_USER_STATUS_RUN_AS } from '../../common/api-user-status-run-as';
 import { HTTP_STATUS_CODES } from '../../common/constants';
-import { ServerAPIClient } from './server-api-client';
 
 export interface IAPIHost {
   id: string;
@@ -195,7 +195,7 @@ export class ManageHosts {
   }
 
   /**
-   * Get the cluster info and allowRunAs values for the API host and store into the registry cache
+   * Get the cluster info and allow_run_as values for the API host and store into the registry cache
    * @param host
    * @returns
    */

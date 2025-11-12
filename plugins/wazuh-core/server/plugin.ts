@@ -21,10 +21,7 @@ import {
   ManageHosts,
   createDashboardSecurity,
   ServerAPIClient,
-  // InitializationService,
 } from './services';
-// configuration common
-// configuration server
 import { InitializerConfigProvider } from './services/configuration';
 
 export class WazuhCorePlugin
@@ -62,7 +59,7 @@ export class WazuhCorePlugin
       new InitializerConfigProvider(this.initializerContext),
     );
 
-    // create the configuration service to use like a facede pattern
+    // create the configuration service to use like a facade pattern
     this.services.configuration = new Configuration(
       this.logger.get('configuration'),
       this._internal.configurationStore,

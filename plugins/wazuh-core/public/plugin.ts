@@ -21,9 +21,6 @@ export class WazuhCorePlugin
 {
   _internal: { [key: string]: any } = {};
   services: { [key: string]: any } = {};
-  // runtime: Record<string, any> = { setup: {}, start: {} };
-  // internal: Record<string, any> = {};
-  // services: Record<string, any> = {};
 
   constructor(private readonly initializerContext: PluginInitializerContext) {
     this.services = {};
