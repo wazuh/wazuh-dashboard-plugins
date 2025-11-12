@@ -23,7 +23,6 @@ export const withUserLogged = WrappedComponent => props => {
     <WrappedComponent {...props} />
   ) : (
     <div className='withUserLogged'>
-      <EuiSpacer size='s' />
       <EuiText className='subdued-color'>Loading ...</EuiText>
       <EuiSpacer size='s' />
       <EuiProgress
