@@ -556,7 +556,7 @@ hosts:
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.editor,
-    defaultValue: [],
+    defaultValue: '',
     validate: SettingsValidator.compose(
       SettingsValidator.stringAsList(
         SettingsValidator.compose(
