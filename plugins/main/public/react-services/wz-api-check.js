@@ -32,7 +32,7 @@ export class ApiCheck {
         },
         url: url,
         data: payload,
-        timeout: timeout || 20000,
+        timeout: timeout,
       };
 
       const response = await request(options);
@@ -75,7 +75,7 @@ export class ApiCheck {
         },
         url: url,
         data: { ...apiEntry, forceRefresh },
-        timeout: timeout || 20000,
+        timeout: timeout,
       };
 
       const response = await request(options);
