@@ -548,12 +548,6 @@ hosts:
         },
       },
     },
-    isConfigurableFromSettings: false,
-    // TODO: add validation
-    // validate: SettingsValidator.isBoolean,
-    // validate: function (schema) {
-    //   return schema.boolean();
-    // },
   },
   'ip.ignore': {
     title: 'Index pattern ignore',
