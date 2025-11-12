@@ -6,12 +6,12 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiLoadingChart,
-  EuiTitle,
   EuiSelect,
   EuiSpacer,
 } from '@elastic/eui';
 import { useAsyncActionRunOnStart } from '../../hooks';
 import './visualizations.scss';
+import { Typography } from '../../typography/typography';
 
 export type VisualizationBasicProps = ChartDonutProps & {
   type: 'donut';
@@ -67,7 +67,7 @@ export const VisualizationBasic = ({
     visualization = (
       <EuiEmptyPrompt
         iconType='alert'
-        title={<h2 style={{ fontWeight: 'normal' }}>{errorTitle}</h2>}
+        title={<h4 style={{ fontWeight: 'normal' }}>{errorTitle}</h4>}
         titleSize='xs'
         body={<p>{errorMessage || error?.message}</p>}
       />
@@ -76,7 +76,7 @@ export const VisualizationBasic = ({
     visualization = (
       <EuiEmptyPrompt
         iconType='stats'
-        title={<h2 style={{ fontWeight: 'normal' }}>{noDataTitle}</h2>}
+        title={<h4 style={{ fontWeight: 'normal' }}>{noDataTitle}</h4>}
         titleSize='xs'
         body={
           <p>
@@ -172,11 +172,7 @@ export const VisualizationBasicWidgetSelector = ({
         alignItems='flexStart'
       >
         <EuiFlexItem>
-          {title && (
-            <EuiTitle size='s'>
-              <h2>{title}</h2>
-            </EuiTitle>
-          )}
+          {title && <Typography level='section'>{title}</Typography>}
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiSelect

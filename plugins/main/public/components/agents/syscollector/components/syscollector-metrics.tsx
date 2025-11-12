@@ -28,6 +28,7 @@ import NavigationService from '../../../../react-services/navigation-service';
 import { ITHygiene } from '../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { IndexPatternFormattedField } from '../../../common/index-pattern';
+import { Typography } from '../../../common/typography/typography';
 interface SyscollectorMetricsProps {
   agent: Agent;
 }
@@ -173,9 +174,7 @@ export const InventoryMetrics = withSystemInventoryDataSource(
         title={
           <EuiFlexGroup justifyContent='spaceBetween'>
             <EuiFlexItem grow={false}>
-              <EuiTitle size='s'>
-                <h2>System inventory</h2>
-              </EuiTitle>
+              <Typography level='section'>System inventory</Typography>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <RedirectAppLinks application={getCore().application}>

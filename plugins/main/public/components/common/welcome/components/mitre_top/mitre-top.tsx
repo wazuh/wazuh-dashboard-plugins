@@ -221,7 +221,7 @@ export const MitreTopTactics = ({ agentId }) => {
   const renderEmpty = () => (
     <EuiEmptyPrompt
       iconType='stats'
-      title={<h2 style={{ fontWeight: 'normal' }}>No results</h2>}
+      title={<h4 style={{ fontWeight: 'normal' }}>No results</h4>}
       titleSize='xs'
       body={
         <p>No MITRE ATT&CK results were found in the selected time range.</p>
