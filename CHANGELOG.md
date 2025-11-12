@@ -16,6 +16,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
+- Adapted alerts sample data to Wazuh Common Schema [#7839](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7839)
 - Set cluster mode as default for all Wazuh installations, including single-node deployments. Updated RBAC permissions to `cluster:*` actions [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688)
 - Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7578](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7578)
 - Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data [#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
@@ -44,7 +45,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed task to sanitize the custom logos [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 - Removed task to migrate the reports directory [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 
-## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 01
+## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 02
 
 ### Added
 

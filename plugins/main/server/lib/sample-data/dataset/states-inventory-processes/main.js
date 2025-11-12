@@ -1,5 +1,10 @@
 const random = require('../../lib/random');
-const { generateRandomWazuh, generateRandomAgent } = require('../shared-utils');
+const {
+  generateRandomWazuh,
+  generateRandomAgent,
+  generateRandomState,
+  generateRandomChecksum,
+} = require('../../shared-utils');
 const { Random } = require('../../../generate-alerts/helpers/random');
 const {
   DateFormatter,
@@ -33,7 +38,10 @@ function generateDocument(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
     agent: generateRandomAgent(),
+    checksum: generateRandomChecksum(),
     process: generateRandomProcess(),
+    state: generateRandomState(),
+
     wazuh: generateRandomWazuh(params),
   };
 }

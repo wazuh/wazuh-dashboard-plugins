@@ -168,7 +168,6 @@ export const FIELD_TIMESTAMP = '@timestamp';
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
-// Sample data
 export const WAZUH_SAMPLE_ALERTS_INDEX_SHARDS = 1;
 export const WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS = 0;
 export const WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY = 'security';
@@ -183,7 +182,7 @@ export const WAZUH_SAMPLE_INVENTORY_AGENT = 'wazuh-inventory-agent';
 export const WAZUH_SAMPLE_VULNERABILITIES = 'wazuh-vulnerabilities';
 export const WAZUH_SAMPLE_AGENT_MONITORING = 'agent-monitoring';
 export const WAZUH_SAMPLE_SERVER_STATISTICS = 'server-statistics';
-export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 3000;
+export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 1500;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_ALERTS_PATTERN.replace('*', ''),
   dataSet: 'wazuh-alerts',
@@ -947,6 +946,7 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES =
 
 export const INDEX_PATTERN_ALERTS_REQUIRED_FIELDS = [
   FIELD_TIMESTAMP,
+  'rule.id',
   'wazuh.decoders',
   'wazuh.cluster.node',
   'agent.id',
