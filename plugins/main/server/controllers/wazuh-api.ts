@@ -979,39 +979,6 @@ export class WazuhApiCtrl {
   }
 
   /**
-   * Gets custom logos configuration (path)
-   * @param context
-   * @param request
-   * @param response
-   */
-  async getAppLogos(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      const logos = {
-        [APP_LOGO]:
-          await context.wazuh_core.configuration.getCustomizationSetting(
-            APP_LOGO,
-          ),
-      };
-
-      return response.ok({
-        body: { logos },
-      });
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return ErrorResponse(
-        error.message || error,
-        3035,
-        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-        response,
-      );
-    }
-  }
-
-  /**
    * Check daemons status using cluster endpoints
    * @param context Request context
    * @param api API configuration
