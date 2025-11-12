@@ -10,14 +10,12 @@ It is recommended to export customizations from the Wazuh dashboard. This step h
 **Systemd**
 
 ```bash
-systemctl stop filebeat
 systemctl stop wazuh-dashboard
 ```
 
 **SysV init**
 
 ```bash
-service filebeat stop
 service wazuh-dashboard stop
 ```
 
@@ -34,13 +32,13 @@ cp /etc/wazuh-dashboard/opensearch_dashboards.yml /etc/wazuh-dashboard/opensearc
    **Yum**
 
 ```bash
-yum upgrade wazuh-dashboard|WAZUH_DASHBOARD_RPM_PKG_INSTALL|
+yum upgrade wazuh-dashboard-5.0.0-1
 ```
 
 **APT**
 
 ```bash
-apt-get install wazuh-dashboard|WAZUH_DASHBOARD_DEB_PKG_INSTALL|
+apt-get install wazuh-dashboard=5.0.0-1
 ```
 
 > **Note:** When prompted, choose to replace the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file with the updated version.
