@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.14.2
+- Added persistence for page size and sorting in API tables [#7864](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7864)
 
 ## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 02
 
