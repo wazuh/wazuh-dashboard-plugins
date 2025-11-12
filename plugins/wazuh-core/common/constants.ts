@@ -25,42 +25,6 @@ export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts*';
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
-// Sample data
-export const WAZUH_SAMPLE_ALERT_PREFIX = 'wazuh-alerts-v5-';
-export const WAZUH_SAMPLE_ALERTS_INDEX_SHARDS = 1;
-export const WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS = 0;
-export const WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY = 'security';
-export const WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING =
-  'auditing-policy-monitoring';
-export const WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION = 'threat-detection';
-export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS = 3000;
-export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
-  [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
-    { syscheck: true },
-    { aws: true },
-    { azure: true },
-    { office: true },
-    { gcp: true },
-    { authentication: true },
-    { ssh: true },
-    { apache: true, alerts: 2000 },
-    { web: true },
-    { windows: { service_control_manager: true }, alerts: 1000 },
-    { github: true },
-  ],
-  [WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING]: [
-    { rootcheck: true },
-    { audit: true },
-    { virustotal: true },
-    { yara: true },
-  ],
-  [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION]: [
-    { vulnerabilities: true },
-    { docker: true },
-    { mitre: true },
-  ],
-};
-
 // Security
 export const WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY =
   'OpenSearch Dashboards Security';
