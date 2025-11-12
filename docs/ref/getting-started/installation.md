@@ -109,19 +109,19 @@ echo -e '[wazuh]\ngpgcheck=1\ngpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZU
    **APT:**
 
    ```bash
-   apt-get -y install wazuh-dashboard
+   apt-get -y install wazuh-dashboard=5.0.0-1
    ```
 
    **Yum:**
 
    ```bash
-   yum -y install wazuh-dashboard
+   yum -y install wazuh-dashboard-5.0.0-1
    ```
 
    **DNF:**
 
    ```bash
-   dnf -y install wazuh-dashboard
+   dnf -y install wazuh-dashboard-5.0.0-1
    ```
 
 ### Configuring the Wazuh dashboard
