@@ -111,58 +111,95 @@ export function TableWzAPI({
       ? `${rest?.saveStateStorage?.key}-visible-fields`
       : undefined,
   );
+
+  // Persist page size and sorting together
+  const defaultPageSize = rest.tablePageSizeOptions?.[0] || 15;
+  const defaultSorting = {
+    field: rest.tableInitialSortingField || '',
+    direction: rest.tableInitialSortingDirection || 'asc',
+  };
+
+  const [tableStateRaw, setTableStateRaw] = useStateStorage(
+    {
+      pageSize: defaultPageSize,
+      sorting: defaultSorting,
+    },
+    rest?.saveStateStorage?.system,
+    rest?.saveStateStorage?.key
+      ? `${rest?.saveStateStorage?.key}-table-state`
+      : undefined,
+  );
+
+  // Ensure tableState has the correct structure with defaults
+  const tableState = {
+    pageSize: tableStateRaw?.pageSize ?? defaultPageSize,
+    sorting: tableStateRaw?.sorting?.field
+      ? {
+          field: tableStateRaw.sorting.field,
+          direction:
+            tableStateRaw.sorting.direction ?? defaultSorting.direction,
+        }
+      : defaultSorting,
+  };
+
   const [isOpenFieldSelector, setIsOpenFieldSelector] = useState(false);
   const appConfig = useAppConfig();
   const maxRows = appConfig.data['reports.csv.maxRows'];
-  const onSearch = useCallback(async function (
-    endpoint,
-    filters: Filters,
-    pagination,
-    sorting,
-  ) {
-    try {
-      const { pageIndex, pageSize } = pagination;
-      setSort(sorting.sort);
-      setIsLoading(true);
-      setFilters(filters);
-      onFiltersChange(filters);
-      const params = {
-        ...getFilters(filters),
-        offset: pageIndex * pageSize,
-        limit: pageSize,
-        sort: formatSorting(sorting.sort),
-      };
-      const response = await WzRequest.apiReq('GET', endpoint, { params });
+  const onSearch = useCallback(
+    async function (endpoint, filters: Filters, pagination, sorting) {
+      try {
+        const { pageIndex, pageSize } = pagination;
+        setSort(sorting.sort);
 
-      const { affected_items: items, total_affected_items: totalItems } = (
-        (response || {}).data || {}
-      ).data;
-      setIsLoading(false);
-      setTotalItems(totalItems);
+        // Update persisted table state when page size or sorting changes
+        setTableStateRaw(prevState => ({
+          pageSize,
+          sorting: sorting.sort?.field
+            ? sorting.sort
+            : { field: '', direction: 'asc' },
+        }));
 
-      const result = {
-        items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items,
-        totalItems,
-      };
+        setIsLoading(true);
+        setFilters(filters);
+        onFiltersChange(filters);
+        const params = {
+          ...getFilters(filters),
+          offset: pageIndex * pageSize,
+          limit: pageSize,
+          sort: formatSorting(sorting.sort),
+        };
+        const response = await WzRequest.apiReq('GET', endpoint, { params });
 
-      onDataChange(result);
+        const { affected_items: items, total_affected_items: totalItems } = (
+          (response || {}).data || {}
+        ).data;
+        setIsLoading(false);
+        setTotalItems(totalItems);
 
-      return result;
-    } catch (error) {
-      setIsLoading(false);
-      setTotalItems(0);
-      if (error?.name) {
-        /* This replaces the error name. The intention is that an AxiosError
+        const result = {
+          items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items,
+          totalItems,
+        };
+
+        onDataChange(result);
+
+        return result;
+      } catch (error) {
+        setIsLoading(false);
+        setTotalItems(0);
+        if (error?.name) {
+          /* This replaces the error name. The intention is that an AxiosError
           doesn't appear in the toast message.
           TODO: This should be managed by the service that does the request instead of only changing
           the name in this case.
         */
-        error.name = 'RequestError';
+          error.name = 'RequestError';
+        }
+        throw error;
       }
-      throw error;
-    }
-  },
-  []);
+    },
+    [setTableStateRaw],
+  );
 
   const renderActionButtons = (actionButtons, filters) => {
     if (Array.isArray(actionButtons)) {
@@ -312,11 +349,17 @@ export function TableWzAPI({
       {...{ ...rest, reload: reloadFootprint }}
       tableColumns={tableColumns}
       selectedFields={selectedFields}
+      tableInitialPageSize={tableState.pageSize}
+      tableInitialSortingField={tableState.sorting.field}
+      tableInitialSortingDirection={tableState.sorting.direction}
     />
   ) : (
     <TableDefault
       onSearch={onSearch}
       {...{ ...rest, reload: reloadFootprint }}
+      tableInitialPageSize={tableState.pageSize}
+      tableInitialSortingField={tableState.sorting.field}
+      tableInitialSortingDirection={tableState.sorting.direction}
     />
   );
 
