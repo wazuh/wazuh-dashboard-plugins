@@ -631,9 +631,6 @@ hosts:
         integer: true,
       },
     },
-    validate: function (value) {
-      return SettingsValidator.number(this.options?.number)(value);
-    },
   },
   'reports.csv.maxRows': {
     title: 'Max rows in csv reports',
