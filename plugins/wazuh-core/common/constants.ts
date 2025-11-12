@@ -556,7 +556,7 @@ hosts:
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.editor,
-    defaultValue: '',
+    defaultValue: [],
     validate: SettingsValidator.compose(
       SettingsValidator.stringAsList(
         SettingsValidator.compose(
@@ -633,9 +633,9 @@ hosts:
     },
   },
   'reports.csv.maxRows': {
-    title: 'Max rows in csv reports',
+    title: 'Maximum rows in CSV reports',
     description:
-      'Maximum rows that will be included in csv reports. If the number of rows exceeds this value, the report will be truncated. Setting a high value can cause instability of the report generating process.',
+      'Maximum rows that will be included in CSV reports. If the number of rows exceeds this value, the report will be truncated. Setting a high value can cause instability of the report generating process.',
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.number,
