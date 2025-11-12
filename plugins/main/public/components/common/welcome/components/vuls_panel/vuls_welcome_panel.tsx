@@ -5,7 +5,6 @@ import {
   EuiToolTip,
   EuiButtonIcon,
   EuiSpacer,
-  EuiTitle,
 } from '@elastic/eui';
 import React, { Fragment, useEffect, useState } from 'react';
 import { VulsTopPackageTable } from '../top_packages_table';
@@ -29,6 +28,7 @@ import { withErrorBoundary } from '../../../../common/hocs';
 import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../../../../components/overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
 import { formatUINumber } from '../../../../../react-services/format-number';
+import { Typography } from '../../../typography/typography';
 
 const VulsPanelContent = ({ agent }) => {
   const {
@@ -168,9 +168,9 @@ const VulsPanel = ({ agent }) => {
           responsive={false}
         >
           <EuiFlexItem grow={false}>
-            <EuiTitle size='s'>
-              <h2>Vulnerability Detection</h2>
-            </EuiTitle>
+            <Typography level='section'>
+              Vulnerability Detection
+            </Typography>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <RedirectAppLinks application={getCore().application}>

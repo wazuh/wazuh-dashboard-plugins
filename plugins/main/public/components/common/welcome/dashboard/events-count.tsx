@@ -10,8 +10,8 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiSpacer,
-  EuiTitle,
 } from '@elastic/eui';
+import { Typography } from '../../typography/typography';
 import { useTimeFilter } from '../../hooks';
 import { LoadingSearchbarProgress } from '../../loading-searchbar-progress/loading-searchbar-progress';
 import { EventsCountDataSource } from '../../data-source/pattern/alerts/events-count';
@@ -33,13 +33,13 @@ export const EventsCount = () => {
 
   return (
     <EuiPanel paddingSize='m'>
-      <EuiFlexGroup gutterSize='none'>
-        <EuiFlexItem grow={false}>
-          <EuiTitle size='s'>
-            <h2>Events count evolution</h2>
-          </EuiTitle>
-        </EuiFlexItem>
-      </EuiFlexGroup>
+        <EuiFlexGroup gutterSize='none'>
+          <EuiFlexItem grow={false}>
+            <Typography level='section'>
+              Events count evolution
+            </Typography>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       <EuiSpacer size='m' />
       {!isDataSourceLoading && dataSource ? (
         <DashboardByRenderer

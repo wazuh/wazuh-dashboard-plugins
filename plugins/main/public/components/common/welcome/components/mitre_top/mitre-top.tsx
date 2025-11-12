@@ -15,12 +15,13 @@ import React, { useEffect, useState } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiTitle,
   EuiFacetButton,
   EuiButtonIcon,
   EuiLoadingChart,
   EuiEmptyPrompt,
+  EuiSpacer,
 } from '@elastic/eui';
+import { Typography } from '../../../typography/typography';
 import { FlyoutTechnique } from '../../../../overview/mitre/framework/components/techniques/components/flyout-technique';
 import { getMitreCount } from './lib';
 import { useAsyncActionRunOnStart, useTimeFilter } from '../../../hooks';
@@ -67,10 +68,10 @@ const MitreTopTacticsTactics = ({
     <>
       <div className='wz-agents-mitre'>
         <EuiFlexGroup>
-          <EuiFlexItem style={{ margin: 0, padding: '12px 0px 0px 10px' }}>
-            <EuiTitle size='xs'>
-              <h3>Top Tactics</h3>
-            </EuiTitle>
+          <EuiFlexItem>
+            <Typography level='card'>
+              Top Tactics
+            </Typography>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
@@ -177,11 +178,12 @@ const MitreTopTacticsTechniques = ({
           />
         </EuiFlexItem>
         <EuiFlexItem>
-          <EuiTitle size='xxs'>
-            <h3>{selectedTactic}</h3>
-          </EuiTitle>
+          <Typography level='card'>
+            {selectedTactic}
+          </Typography>
         </EuiFlexItem>
       </EuiFlexGroup>
+      <EuiSpacer size='s' />
       <EuiFlexGroup>
         <EuiFlexItem>
           {getData.data.map(tactic => (
