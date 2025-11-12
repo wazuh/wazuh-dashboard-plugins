@@ -23,7 +23,7 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
 
     // Filter out ignored index patterns from app config
     const ignoreIndexPatterns =
-      store.getState().appConfig?.data['ip.ignore'] || [];
+      store.getState().appConfig?.data?.['ip.ignore'] || [];
     if (ignoreIndexPatterns?.length > 0) {
       try {
         const fieldsToCheck = ['id', 'attributes.title']; // search in these attributes
