@@ -69,9 +69,7 @@ const MitreTopTacticsTactics = ({
       <div className='wz-agents-mitre'>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <Typography level='card'>
-              Top Tactics
-            </Typography>
+            <Typography level='card'>Top Tactics</Typography>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
@@ -178,9 +176,7 @@ const MitreTopTacticsTechniques = ({
           />
         </EuiFlexItem>
         <EuiFlexItem>
-          <Typography level='card'>
-            {selectedTactic}
-          </Typography>
+          <Typography level='card'>{selectedTactic}</Typography>
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size='s' />

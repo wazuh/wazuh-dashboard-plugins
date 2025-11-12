@@ -208,21 +208,19 @@ export const ScaScan = compose(
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <RedirectAppLinks application={getCore().application}>
-              <EuiLink
-                onClick={() => {
-                  this.pinnedAgentManager.pinAgent(this.props.agent);
-                }}
-                href={NavigationService.getInstance().getUrlForApp(
-                  configurationAssessment.id,
-                  {
-                    path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
-                  },
-                )}
-              >
-                <Typography level='card'>
-                  {lastScan.name}
-                </Typography>
-              </EuiLink>
+                <EuiLink
+                  onClick={() => {
+                    this.pinnedAgentManager.pinAgent(this.props.agent);
+                  }}
+                  href={NavigationService.getInstance().getUrlForApp(
+                    configurationAssessment.id,
+                    {
+                      path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
+                    },
+                  )}
+                >
+                  <Typography level='card'>{lastScan.name}</Typography>
+                </EuiLink>
               </RedirectAppLinks>
               <EuiSpacer size='m' />
             </EuiFlexItem>
@@ -285,22 +283,20 @@ export const ScaScan = compose(
             <EuiFlexGroup className='wz-section-sca-euiFlexGroup'>
               <EuiFlexItem grow={false}>
                 <RedirectAppLinks application={getCore().application}>
-              <EuiLink
-                className='agents-link-item'
-                onClick={() => {
-                  this.pinnedAgentManager.pinAgent(this.props.agent);
-                }}
-                href={NavigationService.getInstance().getUrlForApp(
-                  configurationAssessment.id,
-                  {
-                    path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
-                  },
-                )}
-              >
-                <Typography level='section'>
-                  SCA: Latest scans
-                </Typography>
-              </EuiLink>
+                  <EuiLink
+                    className='agents-link-item'
+                    onClick={() => {
+                      this.pinnedAgentManager.pinAgent(this.props.agent);
+                    }}
+                    href={NavigationService.getInstance().getUrlForApp(
+                      configurationAssessment.id,
+                      {
+                        path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
+                      },
+                    )}
+                  >
+                    <Typography level='section'>SCA: Latest scans</Typography>
+                  </EuiLink>
                 </RedirectAppLinks>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>

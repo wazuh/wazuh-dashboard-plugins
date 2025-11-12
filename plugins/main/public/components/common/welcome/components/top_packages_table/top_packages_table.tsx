@@ -72,9 +72,7 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
     <EuiPanel paddingSize='m'>
       <EuiFlexGroup>
         <EuiFlexItem>
-          <Typography level='card'>
-            Top 5 Packages
-          </Typography>
+          <Typography level='card'>Top 5 Packages</Typography>
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size='s' />

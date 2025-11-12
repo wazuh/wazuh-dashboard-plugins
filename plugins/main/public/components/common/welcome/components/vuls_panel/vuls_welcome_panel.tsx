@@ -168,9 +168,7 @@ const VulsPanel = ({ agent }) => {
           responsive={false}
         >
           <EuiFlexItem grow={false}>
-            <Typography level='section'>
-              Vulnerability Detection
-            </Typography>
+            <Typography level='section'>Vulnerability Detection</Typography>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <RedirectAppLinks application={getCore().application}>

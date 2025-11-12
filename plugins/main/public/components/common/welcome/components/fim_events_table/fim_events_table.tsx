@@ -40,11 +40,9 @@ export function FimEventsTable({ agent }) {
       <EuiPanel paddingSize='m'>
         <EuiFlexItem>
           <EuiFlexGroup responsive={false}>
-          <EuiFlexItem>
-            <Typography level='section'>
-              FIM: Recent events
-            </Typography>
-          </EuiFlexItem>
+            <EuiFlexItem>
+              <Typography level='section'>FIM: Recent events</Typography>
+            </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiToolTip position='top' content='Open FIM'>
                 <RedirectAppLinks application={getCore().application}>

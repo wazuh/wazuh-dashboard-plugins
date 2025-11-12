@@ -5,12 +5,7 @@ import { getDashboardPanels } from './dashboard_panels';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import { useDataSource } from '../../data-source/hooks';
 import { PatternDataSource, tParsedIndexPattern } from '../../data-source';
-import {
-  EuiPanel,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiSpacer,
-} from '@elastic/eui';
+import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiSpacer } from '@elastic/eui';
 import { Typography } from '../../typography/typography';
 import { useTimeFilter } from '../../hooks';
 import { LoadingSearchbarProgress } from '../../loading-searchbar-progress/loading-searchbar-progress';
@@ -33,13 +28,11 @@ export const EventsCount = () => {
 
   return (
     <EuiPanel paddingSize='m'>
-        <EuiFlexGroup gutterSize='none'>
-          <EuiFlexItem grow={false}>
-            <Typography level='section'>
-              Events count evolution
-            </Typography>
-          </EuiFlexItem>
-        </EuiFlexGroup>
+      <EuiFlexGroup gutterSize='none'>
+        <EuiFlexItem grow={false}>
+          <Typography level='section'>Events count evolution</Typography>
+        </EuiFlexItem>
+      </EuiFlexGroup>
       <EuiSpacer size='m' />
       {!isDataSourceLoading && dataSource ? (
         <DashboardByRenderer

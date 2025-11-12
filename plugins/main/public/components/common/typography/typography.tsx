@@ -1,11 +1,7 @@
 import React from 'react';
 import { EuiTitle, EuiTitleSize } from '@elastic/eui';
 
-export type TypographyLevel =
-  | 'page'
-  | 'section'
-  | 'card'
-  | 'metric';
+export type TypographyLevel = 'page' | 'section' | 'card' | 'metric';
 
 const TYPOGRAPHY_SCALE: Record<
   TypographyLevel,
@@ -17,8 +13,7 @@ const TYPOGRAPHY_SCALE: Record<
   metric: { size: 'xxs', element: 'h4' },
 };
 
-export interface TypographyProps
-  extends React.HTMLAttributes<HTMLElement> {
+export interface TypographyProps extends React.HTMLAttributes<HTMLElement> {
   level?: TypographyLevel;
   element?: keyof JSX.IntrinsicElements;
   'data-test-subj'?: string;
