@@ -558,7 +558,7 @@ hosts:
     type: EpluginSettingType.editor,
     defaultValue: [],
     validate: SettingsValidator.compose(
-      SettingsValidator.array(
+      SettingsValidator.stringAsList(
         SettingsValidator.compose(
           SettingsValidator.isString,
           SettingsValidator.isNotEmptyString,

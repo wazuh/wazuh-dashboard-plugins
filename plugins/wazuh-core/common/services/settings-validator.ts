@@ -187,6 +187,27 @@ export class SettingsValidator {
   }
 
   /**
+   * Creates a function that checks if the value is a string as list
+   * @param validateParsed Optional parameter to validate the parsed object
+   * @returns
+   */
+  static stringAsList(validateParsed: (object: any) => string | undefined) {
+    return function (value: string) {
+      let items;
+      // Try to parse the string as JSON
+      try {
+        items = value.split(',').map(item => item.trim());
+      } catch (error) {
+        return "Value can't be parsed. There is some error.";
+      }
+
+      for (const item of items) {
+        return validateParsed ? validateParsed(item) : undefined;
+      }
+    };
+  }
+
+  /**
    * Creates a function that checks is the value is an array and optionally validates each element
    * @param validationElement Optional function to validate each element of the array
    * @returns
