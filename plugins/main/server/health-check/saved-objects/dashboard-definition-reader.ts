@@ -18,11 +18,11 @@ interface DashboardDefinitionReaderOptions {
   extension?: string;
 }
 
-function isDefinitionFile(filePath: string, extension: string) {
+export function isDefinitionFile(filePath: string, extension: string) {
   return path.extname(filePath).toLowerCase() === extension.toLowerCase();
 }
 
-function collectDefinitionFiles(
+export function collectDefinitionFiles(
   folderPath: string,
   extension: string,
   accumulator: string[] = [],
@@ -48,13 +48,13 @@ type DashboardDefinitionSavedObject =
   | SavedObjectVisualization
   | SavedObjectDashboard;
 
-function isSupportedType(
+export function isSupportedType(
   type: DashboardDefinitionSavedObject['type'] | string,
 ): type is DashboardDefinitionSavedObject['type'] {
   return type === 'visualization' || type === 'dashboard';
 }
 
-function parseNdjsonLine(
+export function parseNdjsonLine(
   line: string,
   lineNumber: number,
   filePath: string,
@@ -84,7 +84,7 @@ function parseNdjsonLine(
   }
 }
 
-function parseDefinitionFile(filePath: string) {
+export function parseDefinitionFile(filePath: string) {
   const rawContent = fs.readFileSync(filePath, 'utf8');
   return rawContent
     .split(/\r?\n/)
@@ -92,7 +92,7 @@ function parseDefinitionFile(filePath: string) {
     .filter(Boolean) as DashboardDefinitionSavedObject[];
 }
 
-function toDashboardDefinitionFromFile(
+export function toDashboardDefinitionFromFile(
   filePath: string,
   rawObjects: DashboardDefinitionSavedObject[],
 ): DashboardDefinitionFromFile {

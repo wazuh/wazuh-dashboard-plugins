@@ -91,7 +91,8 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
       .mockResolvedValueOnce(mockVisualization)
       .mockResolvedValueOnce(mockDashboard);
 
-    const task = initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations();
+    const task =
+      initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations();
     const result = await task.run(ctx);
 
     expect(result).toEqual({ status: 'ok' });
