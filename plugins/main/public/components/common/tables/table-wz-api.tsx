@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import React, { ReactNode } from 'react';
 import {
   EuiTitle,
   EuiLoadingSpinner,
@@ -24,10 +24,9 @@ import {
 } from '@elastic/eui';
 import { TableWithSearchBar } from './table-with-search-bar';
 import { TableDefault } from './table-default';
-import { WzRequest } from '../../../react-services/wz-request';
 import { ExportTableCsv } from './components/export-table-csv';
-import { useStateStorage, useAppConfig } from '../hooks';
 import { formatUINumber } from '../../../react-services/format-number';
+import { useTableWzAPI, Filters } from './use-table-wz-api';
 
 /**
  * Search input custom filter button
@@ -37,22 +36,6 @@ interface CustomFilterButton {
   field: string;
   value: string;
 }
-
-interface Filters {
-  [key: string]: string;
-}
-
-const getFilters = (filters: Filters) => {
-  const { default: defaultFilters, ...restFilters } = filters;
-  return Object.keys(restFilters).length ? restFilters : defaultFilters;
-};
-
-const formatSorting = sorting => {
-  if (!sorting.field || !sorting.direction) {
-    return '';
-  }
-  return `${sorting.direction === 'asc' ? '+' : '-'}${sorting.field}`;
-};
 
 export function TableWzAPI({
   actionButtons,
@@ -81,127 +64,64 @@ export function TableWzAPI({
   onFiltersChange?: (filters: Filters) => void;
   showReload?: boolean;
   searchBarProps?: any;
-  reload?: boolean;
-  onDataChange?: Function;
+  reload?: boolean | number;
+  onDataChange?: (data: { items: any[]; totalItems: number }) => void;
   setReload?: (newValue: number) => void;
+  tableColumns: Array<{
+    field: string;
+    name: string;
+    show?: boolean;
+    [key: string]: any;
+  }>;
+  tablePageSizeOptions?: number[];
+  tableInitialSortingField?: string;
+  tableInitialSortingDirection?: 'asc' | 'desc';
+  saveStateStorage?: {
+    system?: 'localStorage' | 'sessionStorage';
+    key?: string;
+  };
+  mapResponseItem?: (item: any) => any;
+  showFieldSelector?: boolean;
+  rowProps?: any;
+  [key: string]: any;
 }) {
-  const [totalItems, setTotalItems] = useState(0);
-  const [filters, setFilters] = useState<Filters>({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [sort, setSort] = useState({});
-  const onFiltersChange = (filters: Filters) =>
-    typeof rest.onFiltersChange === 'function'
-      ? rest.onFiltersChange(filters)
-      : null;
+  const {
+    totalItems,
+    filters,
+    isLoading,
+    sort,
+    selectedFields,
+    setSelectedFields,
+    tableState,
+    isOpenFieldSelector,
+    setIsOpenFieldSelector,
+    maxRows,
+    onSearch,
+    triggerReload,
+    reloadFootprint,
+    getFilters,
+    formatSorting,
+  } = useTableWzAPI({
+    endpoint: rest.endpoint,
+    tableColumns: rest.tableColumns,
+    tablePageSizeOptions: rest.tablePageSizeOptions,
+    tableInitialSortingField: rest.tableInitialSortingField,
+    tableInitialSortingDirection: rest.tableInitialSortingDirection,
+    saveStateStorage: rest.saveStateStorage,
+    mapResponseItem: rest.mapResponseItem,
+    onFiltersChange: rest.onFiltersChange,
+    onDataChange: rest.onDataChange,
+    reload: rest.reload,
+    setReload,
+  });
 
-  const onDataChange = data =>
-    typeof rest.onDataChange === 'function' ? rest.onDataChange(data) : null;
-
-  /**
-   * Changing the reloadFootprint timestamp will trigger reloading the table
-   */
-  const [reloadFootprint, setReloadFootprint] = useState(rest.reload || 0);
-
-  const [selectedFields, setSelectedFields] = useStateStorage(
-    rest.tableColumns.some(({ show }) => show)
-      ? rest.tableColumns.filter(({ show }) => show).map(({ field }) => field)
-      : rest.tableColumns.map(({ field }) => field),
-    rest?.saveStateStorage?.system,
-    rest?.saveStateStorage?.key
-      ? `${rest?.saveStateStorage?.key}-visible-fields`
-      : undefined,
-  );
-
-  // Persist page size and sorting together
-  const defaultPageSize = rest.tablePageSizeOptions?.[0] || 15;
-  const defaultSorting = {
-    field: rest.tableInitialSortingField || '',
-    direction: rest.tableInitialSortingDirection || 'asc',
-  };
-
-  const [tableStateRaw, setTableStateRaw] = useStateStorage(
-    {
-      pageSize: defaultPageSize,
-      sorting: defaultSorting,
-    },
-    rest?.saveStateStorage?.system,
-    rest?.saveStateStorage?.key
-      ? `${rest?.saveStateStorage?.key}-table-state`
-      : undefined,
-  );
-
-  // Ensure tableState has the correct structure with defaults
-  const tableState = {
-    pageSize: tableStateRaw?.pageSize ?? defaultPageSize,
-    sorting: tableStateRaw?.sorting?.field
-      ? {
-          field: tableStateRaw.sorting.field,
-          direction:
-            tableStateRaw.sorting.direction ?? defaultSorting.direction,
-        }
-      : defaultSorting,
-  };
-
-  const [isOpenFieldSelector, setIsOpenFieldSelector] = useState(false);
-  const appConfig = useAppConfig();
-  const maxRows = appConfig.data['reports.csv.maxRows'];
-  const onSearch = useCallback(
-    async function (endpoint, filters: Filters, pagination, sorting) {
-      try {
-        const { pageIndex, pageSize } = pagination;
-        setSort(sorting.sort);
-
-        // Update persisted table state when page size or sorting changes
-        setTableStateRaw(prevState => ({
-          pageSize,
-          sorting: sorting.sort?.field
-            ? sorting.sort
-            : { field: '', direction: 'asc' },
-        }));
-
-        setIsLoading(true);
-        setFilters(filters);
-        onFiltersChange(filters);
-        const params = {
-          ...getFilters(filters),
-          offset: pageIndex * pageSize,
-          limit: pageSize,
-          sort: formatSorting(sorting.sort),
-        };
-        const response = await WzRequest.apiReq('GET', endpoint, { params });
-
-        const { affected_items: items, total_affected_items: totalItems } = (
-          (response || {}).data || {}
-        ).data;
-        setIsLoading(false);
-        setTotalItems(totalItems);
-
-        const result = {
-          items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items,
-          totalItems,
-        };
-
-        onDataChange(result);
-
-        return result;
-      } catch (error) {
-        setIsLoading(false);
-        setTotalItems(0);
-        if (error?.name) {
-          /* This replaces the error name. The intention is that an AxiosError
-          doesn't appear in the toast message.
-          TODO: This should be managed by the service that does the request instead of only changing
-          the name in this case.
-        */
-          error.name = 'RequestError';
-        }
-        throw error;
-      }
-    },
-    [setTableStateRaw],
-  );
-
-  const renderActionButtons = (actionButtons, filters) => {
+  const renderActionButtons = (
+    actionButtons:
+      | ReactNode
+      | ReactNode[]
+      | (({ filters }: { filters: Filters }) => ReactNode),
+    filters: Filters,
+  ) => {
     if (Array.isArray(actionButtons)) {
       return actionButtons.map((button, key) => (
         <EuiFlexItem key={key} grow={false}>
@@ -218,22 +138,6 @@ export function TableWzAPI({
       return actionButtons({ filters: getFilters(filters) });
     }
   };
-
-  /**
-   *  Generate a new reload footprint and set reload to propagate refresh
-   */
-  const triggerReload = () => {
-    setReloadFootprint(Date.now());
-    if (setReload) {
-      setReload(Date.now());
-    }
-  };
-
-  useEffect(() => {
-    if (rest.reload) {
-      triggerReload();
-    }
-  }, [rest.reload]);
 
   const ReloadButton = (
     <EuiFlexItem grow={false}>
@@ -314,12 +218,14 @@ export function TableWzAPI({
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiCheckboxGroup
-              options={rest.tableColumns.map(item => ({
-                id: item.field,
-                label: item.name,
-                checked: selectedFields.includes(item.field),
-              }))}
-              onChange={optionID => {
+              options={rest.tableColumns.map(
+                (item: { field: string; name: string }) => ({
+                  id: item.field,
+                  label: item.name,
+                  checked: selectedFields.includes(item.field),
+                }),
+              )}
+              onChange={(optionID: string) => {
                 setSelectedFields(state => {
                   if (state.includes(optionID)) {
                     if (state.length > 1) {
@@ -339,8 +245,8 @@ export function TableWzAPI({
     </>
   );
 
-  const tableColumns = rest.tableColumns.filter(({ field }) =>
-    selectedFields.includes(field),
+  const tableColumns = rest.tableColumns.filter(
+    ({ field }: { field: string }) => selectedFields.includes(field),
   );
 
   const table = rest.searchTable ? (
@@ -357,9 +263,11 @@ export function TableWzAPI({
     <TableDefault
       onSearch={onSearch}
       {...{ ...rest, reload: reloadFootprint }}
+      tableColumns={tableColumns}
       tableInitialPageSize={tableState.pageSize}
       tableInitialSortingField={tableState.sorting.field}
       tableInitialSortingDirection={tableState.sorting.direction}
+      rowProps={rest.rowProps}
     />
   );
 
