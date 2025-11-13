@@ -77,6 +77,7 @@ export const Dashboard = props => {
                   dashboardId={dashboardId}
                   agentDashboardId={agentDashboardId}
                   className={classnames(className, {
+                    'wz-dashboard-hide-tables-pagination-export-csv-controls': true,
                     'wz-no-display': shouldHideDashboard,
                   })}
                   hasPinnedAgent={Boolean(
