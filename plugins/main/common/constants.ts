@@ -1057,8 +1057,8 @@ export const GITHUB_AGENT_DASHBOARD_ID = 'github-pinned-agent-dashboard-tab';
 export const GOOGLE_CLOUD_DASHBOARD_ID = 'google-cloud-detector-dashboard-tab';
 export const GOOGLE_CLOUD_AGENT_DASHBOARD_ID = 'google-cloud-pinned-agent-dashboard';
 
-export const MITRE_ATTACK_DASHBOARD_ID = 'mitre-attack-dashboard';
-export const MITRE_ATTACK_AGENT_DASHBOARD_ID = 'mitre-attack-agent-dashboard';
+export const MITRE_ATTACK_DASHBOARD_ID = 'mitre-overview-dashboard-tab';
+export const MITRE_ATTACK_AGENT_DASHBOARD_ID = 'mitre-pinned-agent-dashboard-tab';
 
 export const OFFICE_365_DASHBOARD_ID = 'office-overview-dashboard-tab';
 
