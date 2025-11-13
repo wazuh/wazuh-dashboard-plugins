@@ -1006,12 +1006,13 @@ export const INDEX_PATTERN_ALERTS_REQUIRED_FIELDS = [
 
 /** Dashboards ids **/
 
-export const THREAT_HUNTING_DASHBOARD_ID = 'threat-hunting-dashboard';
+export const THREAT_HUNTING_DASHBOARD_ID = 'threat-hunting-overview-dashboard';
 export const THREAT_HUNTING_AGENT_DASHBOARD_ID =
   'threat-hunting-agent-dashboard';
 
 export const AMAZON_WEB_SERVICES_DASHBOARD_ID = 'aws-overview-dashboard-tab';
-export const AMAZON_WEB_SERVICES_AGENT_DASHBOARD_ID = 'aws-pinned-agent-dashboard-tab';
+export const AMAZON_WEB_SERVICES_AGENT_DASHBOARD_ID =
+  'aws-pinned-agent-dashboard-tab';
 
 export const AZURE_DASHBOARD_ID = 'azure-overview-dashboard-tab';
 export const AZURE_AGENT_DASHBOARD_ID = 'azure-pinned-agent-dashboard-tab';
@@ -1032,7 +1033,8 @@ export const FIM_REGISTRY_KEYS_AGENT_INVENTORY_ID =
 export const FIM_REGISTRY_VALUES_AGENT_INVENTORY_ID =
   'fim-registry-values-dashboard';
 
-export const MALWARE_DETECTION_DASHBOARD_ID = 'malware-detection-overview-dashboard-tab';
+export const MALWARE_DETECTION_DASHBOARD_ID =
+  'malware-detection-overview-dashboard-tab';
 export const MALWARE_DETECTION_AGENT_DASHBOARD_ID =
   'malware-detection-pinned-agent-dashboard-tab';
 
@@ -1055,15 +1057,18 @@ export const GITHUB_DASHBOARD_ID = 'github-overview-dashboard-tab';
 export const GITHUB_AGENT_DASHBOARD_ID = 'github-pinned-agent-dashboard-tab';
 
 export const GOOGLE_CLOUD_DASHBOARD_ID = 'google-cloud-detector-dashboard-tab';
-export const GOOGLE_CLOUD_AGENT_DASHBOARD_ID = 'google-cloud-pinned-agent-dashboard';
+export const GOOGLE_CLOUD_AGENT_DASHBOARD_ID =
+  'google-cloud-pinned-agent-dashboard';
 
 export const MITRE_ATTACK_DASHBOARD_ID = 'mitre-overview-dashboard-tab';
-export const MITRE_ATTACK_AGENT_DASHBOARD_ID = 'mitre-pinned-agent-dashboard-tab';
+export const MITRE_ATTACK_AGENT_DASHBOARD_ID =
+  'mitre-pinned-agent-dashboard-tab';
 
 export const OFFICE_365_DASHBOARD_ID = 'office-overview-dashboard-tab';
 
 export const IT_HYGIENE_DASHBOARD_ID = 'it-hygiene-overview-dashboard-tab';
-export const IT_HYGIENE_AGENT_DASHBOARD_ID = 'it-hygiene-pinnedit-agent-dashboard-tab';
+export const IT_HYGIENE_AGENT_DASHBOARD_ID =
+  'it-hygiene-pinnedit-agent-dashboard-tab';
 
 export const IT_HYGIENE_INTERFACES_INVENTORY_ID =
   'it-hygiene-networks-inventories-interfaces-dashboard-tab';
@@ -1131,15 +1136,14 @@ export const IT_HYGIENE_GROUPS_INVENTORY_ID =
 export const IT_HYGIENE_GROUPS_AGENT_INVENTORY_ID =
   'it-hygiene-user-inventories-groups-dashboard-tab';
 
-export const CONFIGURATION_ASSESSMENT_DASHBOARD_ID =
-  'sca-overview-dashboard';
+export const CONFIGURATION_ASSESSMENT_DASHBOARD_ID = 'sca-overview-dashboard';
 export const CONFIGURATION_ASSESSMENT_AGENT_DASHBOARD_ID =
   'sca-overview-dashboard';
-export const CONFIGURATION_ASSESSMENT_INVENTORY_ID =
-  'sca-inventory-dashboard';
+export const CONFIGURATION_ASSESSMENT_INVENTORY_ID = 'sca-inventory-dashboard';
 export const CONFIGURATION_ASSESSMENT_AGENT_INVENTORY_ID =
   'sca-inventory-dashboard';
 
-export const VULNERABILITIES_DASHBOARD_ID = 'vulnerability-detector-dashboard';
+export const VULNERABILITIES_DASHBOARD_ID =
+  'vulnerabilities-overview-dashboard-tab';
 export const VULNERABILITIES_AGENT_DASHBOARD_ID =
-  'vulnerability-detector-agent-dashboard';
+  'vulnerabilities-overview-dashboard-tab';
