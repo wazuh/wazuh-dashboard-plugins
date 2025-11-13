@@ -65,9 +65,9 @@ const buildVisualization = (id: string): SavedObjectVisualization => ({
 describe('dashboard definition reader helpers', () => {
   describe('isDefinitionFile', () => {
     it('matches the requested extension regardless of case', () => {
-      expect(
-        isDefinitionFile('/tmp/preset.NDjson', DEFAULT_EXTENSION),
-      ).toBe(true);
+      expect(isDefinitionFile('/tmp/preset.NDjson', DEFAULT_EXTENSION)).toBe(
+        true,
+      );
       expect(isDefinitionFile('/tmp/preset.json', DEFAULT_EXTENSION)).toBe(
         false,
       );
