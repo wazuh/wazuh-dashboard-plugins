@@ -84,13 +84,11 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
                             >
                               Table
                                
-                              <EuiLoadingSpinner
-                                size="s"
-                              >
-                                <span
-                                  className="euiLoadingSpinner euiLoadingSpinner--small"
-                                />
-                              </EuiLoadingSpinner>
+                              <span>
+                                (
+                                0
+                                )
+                              </span>
                             </h1>
                           </EuiTitle>
                         </div>
@@ -128,7 +126,32 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
             downloadCsv={false}
             endpoint="/"
             error={false}
-            onSearch={[Function]}
+            onSearch={
+              [MockFunction] {
+                "calls": Array [
+                  Array [
+                    "/",
+                    Array [],
+                    Object {
+                      "pageIndex": 0,
+                      "pageSize": 15,
+                    },
+                    Object {
+                      "sort": Object {
+                        "direction": "asc",
+                        "field": "",
+                      },
+                    },
+                  ],
+                ],
+                "results": Array [
+                  Object {
+                    "type": "return",
+                    "value": undefined,
+                  },
+                ],
+              }
+            }
             reload={0}
             searchBar={false}
             searchTable={false}

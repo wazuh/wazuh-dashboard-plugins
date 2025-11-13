@@ -15,11 +15,14 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import { TableWzAPI } from './table-wz-api';
-import { useAppConfig, useStateStorage } from '../hooks';
+import { useTableWzAPI } from './use-table-wz-api';
 
-jest.mock('../hooks', () => ({
-  useAppConfig: jest.fn(),
-  useStateStorage: jest.fn(),
+jest.mock('@osd/monaco', () => ({
+  monaco: {},
+}));
+
+jest.mock('./use-table-wz-api', () => ({
+  useTableWzAPI: jest.fn(),
 }));
 
 jest.mock('../../../kibana-services', () => ({
@@ -69,13 +72,31 @@ const columns = [
 ];
 
 describe('Table WZ API component', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('renders correctly to match the snapshot', () => {
-    (useAppConfig as jest.Mock).mockReturnValue({
-      data: {
-        'reports.csv.maxRows': 10000,
+    (useTableWzAPI as jest.Mock).mockReturnValue({
+      totalItems: 0,
+      filters: {},
+      isLoading: false,
+      sort: {},
+      selectedFields: columns.map(({ field }) => field),
+      setSelectedFields: jest.fn(),
+      tableState: {
+        pageSize: 15,
+        sorting: { field: '', direction: 'asc' },
       },
+      isOpenFieldSelector: false,
+      setIsOpenFieldSelector: jest.fn(),
+      maxRows: 10000,
+      onSearch: jest.fn(),
+      triggerReload: jest.fn(),
+      reloadFootprint: 0,
+      getFilters: jest.fn(filters => filters),
+      formatSorting: jest.fn(() => ''),
     });
-    (useStateStorage as jest.Mock).mockReturnValue([[], jest.fn()]);
 
     const wrapper = mount(
       <TableWzAPI
