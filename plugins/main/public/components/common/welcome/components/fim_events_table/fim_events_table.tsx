@@ -18,11 +18,11 @@ import {
   EuiFlexItem,
   EuiPanel,
   EuiSpacer,
-  EuiText,
   EuiButtonIcon,
   EuiFlexGroup,
   EuiToolTip,
 } from '@elastic/eui';
+import { Typography } from '../../../typography/typography';
 // @ts-ignore
 import { getFimAlerts } from './lib';
 import { formatUIDate } from '../../../../../react-services/time-service';
@@ -41,9 +41,7 @@ export function FimEventsTable({ agent }) {
         <EuiFlexItem>
           <EuiFlexGroup responsive={false}>
             <EuiFlexItem>
-              <EuiText size='xs'>
-                <h2>FIM: Recent events</h2>
-              </EuiText>
+              <Typography level='section'>FIM: Recent events</Typography>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiToolTip position='top' content='Open FIM'>
@@ -61,7 +59,7 @@ export function FimEventsTable({ agent }) {
               </EuiToolTip>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <EuiSpacer size='s' />
+          <EuiSpacer size='m' />
           <FimTable agent={agent} />
         </EuiFlexItem>
       </EuiPanel>
