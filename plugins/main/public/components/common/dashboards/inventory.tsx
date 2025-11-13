@@ -81,12 +81,9 @@ const InventoryDashboard = compose(
 
         {categoriesSampleData && (
           <div
-            className={classnames(
-              classNameDashboardWrapper,
-              {
-                'wz-no-display': !shouldHideDashboard,
-              },
-            )}
+            className={classnames(classNameDashboardWrapper, {
+              'wz-no-display': !shouldHideDashboard,
+            })}
           >
             <SampleDataWarning categoriesSampleData={categoriesSampleData} />
           </div>
@@ -102,7 +99,8 @@ const InventoryDashboard = compose(
                       agentDashboardId={agentDashboardId}
                       className={classnames(className, {
                         'wz-no-display': shouldHideDashboard,
-                        'wz-dashboard-hide-tables-pagination-export-csv-controls': true
+                        'wz-dashboard-hide-tables-pagination-export-csv-controls':
+                          true,
                       })}
                       hasPinnedAgent={Boolean(
                         dataSource?.getPinnedAgentFilter?.()?.length,
