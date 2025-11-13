@@ -1010,14 +1010,14 @@ export const THREAT_HUNTING_DASHBOARD_ID = 'threat-hunting-dashboard';
 export const THREAT_HUNTING_AGENT_DASHBOARD_ID =
   'threat-hunting-agent-dashboard';
 
-export const AMAZON_WEB_SERVICES_DASHBOARD_ID = 'aws-dashboard';
-export const AMAZON_WEB_SERVICES_AGENT_DASHBOARD_ID = 'aws-agent-dashboard';
+export const AMAZON_WEB_SERVICES_DASHBOARD_ID = 'aws-overview-dashboard-tab';
+export const AMAZON_WEB_SERVICES_AGENT_DASHBOARD_ID = 'aws-pinned-agent-dashboard-tab';
 
-export const AZURE_DASHBOARD_ID = 'azure-dashboard';
-export const AZURE_AGENT_DASHBOARD_ID = 'azure-agent-dashboard';
+export const AZURE_DASHBOARD_ID = 'azure-overview-dashboard-tab';
+export const AZURE_AGENT_DASHBOARD_ID = 'azure-pinned-agent-dashboard-tab';
 
-export const DOCKER_DASHBOARD_ID = 'docker-dashboard';
-export const DOCKER_AGENT_DASHBOARD_ID = 'docker-agent-dashboard';
+export const DOCKER_DASHBOARD_ID = 'docker-overview-dashboard-tab';
+export const DOCKER_AGENT_DASHBOARD_ID = 'docker-pinned-agent-dashboard-tab';
 
 export const FIM_DASHBOARD_ID = 'fim-dashboard';
 export const FIM_AGENT_DASHBOARD_ID = 'fim-agent-dashboard';
@@ -1051,17 +1051,17 @@ export const NIST_800_53_AGENT_DASHBOARD_ID = 'nist-800-53-agent-dashboard';
 export const TSC_DASHBOARD_ID = 'tsc-dashboard';
 export const TSC_AGENT_DASHBOARD_ID = 'tsc-agent-dashboard';
 
-export const GITHUB_DASHBOARD_ID = 'github-dashboard';
-export const GITHUB_AGENT_DASHBOARD_ID = 'github-agent-dashboard';
+export const GITHUB_DASHBOARD_ID = 'github-overview-dashboard-tab';
+export const GITHUB_AGENT_DASHBOARD_ID = 'github-pinned-agent-dashboard-tab';
 
-export const GOOGLE_CLOUD_DASHBOARD_ID = 'google-cloud-dashboard';
-export const GOOGLE_CLOUD_AGENT_DASHBOARD_ID = 'google-cloud-agent-dashboard';
+export const GOOGLE_CLOUD_DASHBOARD_ID = 'google-cloud-detector-dashboard-tab';
+export const GOOGLE_CLOUD_AGENT_DASHBOARD_ID = 'google-cloud-pinned-agent-dashboard';
 
 export const MITRE_ATTACK_DASHBOARD_ID = 'mitre-attack-dashboard';
 export const MITRE_ATTACK_AGENT_DASHBOARD_ID = 'mitre-attack-agent-dashboard';
 
-export const OFFICE_365_KPIS_DASHBOARD_ID = 'office-365-kpis-dashboard';
-export const OFFICE_365_DASHBOARD_ID = 'office-365-dashboard';
+export const OFFICE_365_DASHBOARD_ID = 'office-overview-dashboard-tab';
+export const OFFICE_365_AGENT_DASHBOARD_ID = 'office-pinned-agent-dashboard';
 
 export const IT_HYGIENE_DASHBOARD_ID = 'it-hygiene-dashboard';
 export const IT_HYGIENE_AGENT_DASHBOARD_ID = 'it-hygiene-agent-dashboard';
