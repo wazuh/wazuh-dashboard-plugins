@@ -247,7 +247,11 @@ export const ScaScan = compose(
         <Fragment>
           <EuiEmptyPrompt
             iconType='visVega'
-            title={<Typography level='prompt'>You don't have SCA scans in this agent.</Typography>}
+            title={
+              <Typography level='prompt'>
+                You don't have SCA scans in this agent.
+              </Typography>
+            }
             titleSize={TypographySize({ level: 'prompt' })}
             body={<p>Check your agent settings to generate scans.</p>}
           />
