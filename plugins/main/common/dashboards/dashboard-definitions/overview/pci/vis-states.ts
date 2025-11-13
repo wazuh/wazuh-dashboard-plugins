@@ -1,0 +1,674 @@
+import {
+  buildIndexPatternReferenceList,
+  buildSearchSource,
+} from '../../../lib';
+import type { SavedVis } from '../../../types';
+
+export const getVisStateTopRequirements = (
+  indexPatternId: string,
+): SavedVis => {
+  return {
+    id: 'wz-vis-overview-pci-dss-requirements',
+    title: 'Top 10 PCI DSS requirements',
+    type: 'line',
+    params: {
+      type: 'line',
+      grid: { categoryLines: true, valueAxis: 'ValueAxis-1' },
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          type: 'category',
+          position: 'bottom',
+          show: true,
+          style: {},
+          scale: { type: 'linear' },
+          labels: { show: true, filter: true, truncate: 100 },
+          title: {},
+        },
+      ],
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          name: 'LeftAxis-1',
+          type: 'value',
+          position: 'left',
+          show: true,
+          style: {},
+          scale: { type: 'linear', mode: 'normal' },
+          labels: { show: true, rotate: 0, filter: false, truncate: 100 },
+          title: { text: 'Count' },
+        },
+      ],
+      seriesParams: [
+        {
+          show: 'true',
+          type: 'line',
+          mode: 'normal',
+          data: { label: 'Count', id: '1' },
+          valueAxis: 'ValueAxis-1',
+          drawLinesBetweenPoints: false,
+          showCircles: true,
+        },
+      ],
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      times: [],
+      addTimeMarker: false,
+      dimensions: {
+        x: {
+          accessor: 0,
+          format: { id: 'date', params: { pattern: 'YYYY-MM-DD' } },
+          params: { date: true, interval: 'P1D', format: 'YYYY-MM-DD' },
+          aggType: 'date_histogram',
+        },
+        y: [
+          {
+            accessor: 2,
+            format: { id: 'number' },
+            params: {},
+            aggType: 'count',
+          },
+        ],
+        z: [
+          {
+            accessor: 3,
+            format: { id: 'number' },
+            params: {},
+            aggType: 'count',
+          },
+        ],
+        series: [
+          {
+            accessor: 1,
+            format: {
+              id: 'terms',
+              params: {
+                id: 'string',
+                otherBucketLabel: 'Other',
+                missingBucketLabel: 'Missing',
+              },
+            },
+            params: {},
+            aggType: 'terms',
+          },
+        ],
+      },
+      radiusRatio: 50,
+    },
+    uiState: {},
+    data: {
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: {},
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'date_histogram',
+          schema: 'segment',
+          params: {
+            field: 'timestamp',
+            timeRange: { from: 'now-1h', to: 'now' },
+            useNormalizedEsInterval: true,
+            interval: 'auto',
+            drop_partials: false,
+            min_doc_count: 1,
+            extended_bounds: {},
+          },
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          schema: 'group',
+          params: {
+            field: 'rule.pci_dss',
+            orderBy: '1',
+            order: 'desc',
+            size: 10,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+        },
+        {
+          id: '4',
+          enabled: true,
+          type: 'count',
+          schema: 'radius',
+          params: {},
+        },
+      ],
+    },
+  };
+};
+
+export const getVisStateTopAgentsByCount = (
+  indexPatternId: string,
+): SavedVis => {
+  return {
+    id: 'wz-vis-overview-pci-dss-agents',
+    title: 'Top 10 agents by alerts count',
+    type: 'pie',
+    params: {
+      type: 'pie',
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      isDonut: true,
+    },
+    uiState: {},
+    data: {
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: {},
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'agent.name',
+            size: 10,
+            order: 'desc',
+            orderBy: '1',
+          },
+        },
+      ],
+    },
+  };
+};
+
+export const getVisStateRequirementsHeatmap = (
+  indexPatternId: string,
+): SavedVis => {
+  return {
+    id: 'wz-vis-overview-pci-dss-requirements-agents-heatmap',
+    title: 'Last alerts',
+    type: 'heatmap',
+    params: {
+      type: 'heatmap',
+      addTooltip: true,
+      addLegend: true,
+      enableHover: false,
+      legendPosition: 'right',
+      times: [],
+      colorsNumber: 10,
+      colorSchema: 'Greens',
+      setColorRange: false,
+      colorsRange: [],
+      invertColors: false,
+      percentageMode: false,
+      valueAxes: [
+        {
+          show: false,
+          id: 'ValueAxis-1',
+          type: 'value',
+          scale: { type: 'linear', defaultYExtents: false },
+          labels: {
+            show: false,
+            rotate: 0,
+            overwriteColor: false,
+            color: '#555',
+          },
+        },
+      ],
+    },
+    uiState: {
+      vis: {
+        defaultColors: {
+          '0 - 13': 'rgb(247,252,245)',
+          '13 - 26': 'rgb(233,247,228)',
+          '26 - 39': 'rgb(211,238,205)',
+          '39 - 52': 'rgb(184,227,177)',
+          '52 - 65': 'rgb(152,213,148)',
+          '65 - 78': 'rgb(116,196,118)',
+          '78 - 91': 'rgb(75,176,98)',
+          '91 - 104': 'rgb(47,152,79)',
+          '104 - 117': 'rgb(21,127,59)',
+          '117 - 130': 'rgb(0,100,40)',
+        },
+      },
+    },
+    data: {
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: {},
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.pci_dss',
+            size: 5,
+            order: 'desc',
+            orderBy: '1',
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Requirements',
+          },
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          schema: 'group',
+          params: {
+            field: 'agent.name',
+            size: 5,
+            order: 'desc',
+            orderBy: '1',
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Agents',
+          },
+        },
+      ],
+    },
+  };
+};
+
+export const getVisStateRequirementsByAgent = (
+  indexPatternId: string,
+): SavedVis => {
+  return {
+    id: 'wz-vis-overview-pci-dss-requirements-by-agent',
+    title: 'Requirements by agent',
+    type: 'histogram',
+    params: {
+      type: 'histogram',
+      grid: {
+        categoryLines: false,
+        style: {
+          color: '#eee',
+        },
+      },
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          type: 'category',
+          position: 'bottom',
+          show: true,
+          style: {},
+          scale: {
+            type: 'linear',
+          },
+          labels: {
+            show: true,
+            filter: true,
+            truncate: 100,
+            rotate: 0,
+          },
+          title: {},
+        },
+      ],
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          name: 'LeftAxis-1',
+          type: 'value',
+          position: 'left',
+          show: true,
+          style: {},
+          scale: {
+            type: 'linear',
+            mode: 'normal',
+          },
+          labels: {
+            show: true,
+            rotate: 0,
+            filter: false,
+            truncate: 100,
+          },
+          title: {
+            text: 'Count',
+          },
+        },
+      ],
+      seriesParams: [
+        {
+          show: 'true',
+          type: 'histogram',
+          mode: 'stacked',
+          data: {
+            label: 'Count',
+            id: '1',
+          },
+          valueAxis: 'ValueAxis-1',
+          drawLinesBetweenPoints: true,
+          showCircles: true,
+        },
+      ],
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      times: [],
+      addTimeMarker: false,
+      radiusRatio: 51,
+      labels: {
+        show: false,
+      },
+      thresholdLine: {
+        show: false,
+        value: 10,
+        width: 1,
+        style: 'full',
+        color: '#E7664C',
+      },
+    },
+    uiState: {},
+    data: {
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {},
+          schema: 'metric',
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field: 'agent.name',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+          schema: 'group',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field: 'rule.pci_dss',
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Requirements',
+          },
+          schema: 'segment',
+        },
+      ],
+    },
+  };
+};
+
+export const getVisStateAgentTopRuleGroups = (
+  indexPatternId: string,
+): SavedVis => {
+  return {
+    id: 'wz-vis-agents-pci-groups',
+    title: 'Top 5 rule groups',
+    type: 'pie',
+    params: {
+      type: 'pie',
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      isDonut: true,
+    },
+    uiState: {},
+    data: {
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
+      aggs: [
+        { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.groups',
+            size: 5,
+            order: 'desc',
+            orderBy: '1',
+          },
+        },
+      ],
+    },
+  };
+};
+
+export const getVisStateAgentTopRules = (indexPatternId: string): SavedVis => {
+  return {
+    id: 'wz-vis-agents-pci-rule',
+    title: 'Top 5 rules',
+    type: 'pie',
+    params: {
+      type: 'pie',
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      isDonut: true,
+    },
+    uiState: {},
+    data: {
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
+      aggs: [
+        { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.description',
+            size: 5,
+            order: 'desc',
+            orderBy: '1',
+          },
+        },
+      ],
+    },
+  };
+};
+
+export const getVisStateAgentTopRequirements = (
+  indexPatternId: string,
+): SavedVis => {
+  return {
+    id: 'wz-vis-agents-pci-requirement',
+    title: 'Top 5 PCI DSS requirements',
+    type: 'pie',
+    params: {
+      type: 'pie',
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      isDonut: true,
+    },
+    uiState: {},
+    data: {
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
+      aggs: [
+        { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.pci_dss',
+            size: 5,
+            order: 'desc',
+            orderBy: '1',
+          },
+        },
+      ],
+    },
+  };
+};
+
+export const getVisStateAgentTopRequirementsCount = (
+  indexPatternId: string,
+): SavedVis => {
+  return {
+    id: 'wz-vis-agents-pci-requirements',
+    title: 'PCI DSS requirements',
+    type: 'histogram',
+    params: {
+      type: 'histogram',
+      grid: { categoryLines: false, style: { color: '#eee' } },
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          type: 'category',
+          position: 'bottom',
+          show: true,
+          style: {},
+          scale: { type: 'linear' },
+          labels: { show: true, filter: true, truncate: 100, rotate: 0 },
+          title: {},
+        },
+      ],
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          name: 'LeftAxis-1',
+          type: 'value',
+          position: 'left',
+          show: true,
+          style: {},
+          scale: { type: 'linear', mode: 'normal' },
+          labels: { show: true, rotate: 0, filter: false, truncate: 100 },
+          title: { text: 'Count' },
+        },
+      ],
+      seriesParams: [
+        {
+          show: 'true',
+          type: 'histogram',
+          mode: 'stacked',
+          data: { label: 'Count', id: '1' },
+          valueAxis: 'ValueAxis-1',
+          drawLinesBetweenPoints: true,
+          showCircles: true,
+        },
+      ],
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      times: [],
+      addTimeMarker: false,
+    },
+    uiState: {},
+    data: {
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
+      aggs: [
+        { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          schema: 'group',
+          params: {
+            field: 'rule.pci_dss',
+            size: 5,
+            order: 'desc',
+            orderBy: '1',
+            customLabel: '',
+          },
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.pci_dss',
+            size: 10,
+            order: 'desc',
+            orderBy: '1',
+            customLabel: 'PCI DSS Requirements',
+          },
+        },
+      ],
+    },
+  };
+};
+
+export const getVisStateAgentRuleLevelDistribution = (
+  indexPatternId: string,
+): SavedVis => {
+  return {
+    id: 'wz-vis-agents-pci-rule-level-distribution',
+    title: 'Rule level distribution',
+    type: 'pie',
+    params: {
+      type: 'pie',
+      addTooltip: true,
+      addLegend: false,
+      legendPosition: 'right',
+      isDonut: true,
+      labels: { show: true, values: true, last_level: true, truncate: 100 },
+    },
+    uiState: { vis: { legendOpen: false } },
+    data: {
+      searchSource: buildSearchSource(indexPatternId),
+      references: buildIndexPatternReferenceList(indexPatternId),
+      aggs: [
+        { id: '1', enabled: true, type: 'count', schema: 'metric', params: {} },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'rule.level',
+            size: 15,
+            order: 'desc',
+            orderBy: '1',
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+        },
+      ],
+    },
+  };
+};
