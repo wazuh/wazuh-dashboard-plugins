@@ -17,6 +17,7 @@ export function transformPanelsJSON(
     panelsArr.map(({ gridData, panelIndex, panelRefName, type }) => [
       panelIndex,
       {
+        ...panelsArr[panelIndex],
         gridData,
         type: type ?? 'visualization',
         explicitInput: {

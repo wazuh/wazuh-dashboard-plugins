@@ -64,7 +64,7 @@ const InventoryDashboard = compose(
         isDataSourceLoading,
       });
 
-    const shouldHideDashboard = !Boolean(results?.data?.hits?.total > 0);
+    const shouldHideDashboard = !Boolean(results?.hits?.total > 0);
 
     return (
       <>
@@ -82,8 +82,6 @@ const InventoryDashboard = compose(
         {categoriesSampleData && (
           <div
             className={classnames(
-              'wz-dashboard-responsive',
-              'wz-dashboard-hide-tables-pagination-export-csv-controls',
               classNameDashboardWrapper,
               {
                 'wz-no-display': !shouldHideDashboard,
@@ -104,6 +102,7 @@ const InventoryDashboard = compose(
                       agentDashboardId={agentDashboardId}
                       className={classnames(className, {
                         'wz-no-display': shouldHideDashboard,
+                        'wz-dashboard-hide-tables-pagination-export-csv-controls': true
                       })}
                       hasPinnedAgent={Boolean(
                         dataSource?.getPinnedAgentFilter?.()?.length,
