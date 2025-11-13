@@ -1019,22 +1019,22 @@ export const AZURE_AGENT_DASHBOARD_ID = 'azure-pinned-agent-dashboard-tab';
 export const DOCKER_DASHBOARD_ID = 'docker-overview-dashboard-tab';
 export const DOCKER_AGENT_DASHBOARD_ID = 'docker-pinned-agent-dashboard-tab';
 
-export const FIM_DASHBOARD_ID = 'fim-dashboard';
-export const FIM_AGENT_DASHBOARD_ID = 'fim-agent-dashboard';
+export const FIM_DASHBOARD_ID = 'fim-overview-dashboard';
+export const FIM_AGENT_DASHBOARD_ID = 'fim-pinned-agent-dashboard';
 
 // FIM inventory dashboard IDs
-export const FIM_FILES_INVENTORY_ID = 'fim-files-inventory';
-export const FIM_REGISTRY_KEYS_INVENTORY_ID = 'fim-registry-keys-inventory';
-export const FIM_REGISTRY_VALUES_INVENTORY_ID = 'fim-registry-values-inventory';
-export const FIM_FILES_AGENT_INVENTORY_ID = 'fim-files-inventory-agent';
+export const FIM_FILES_INVENTORY_ID = 'fim-files-dashboard';
+export const FIM_REGISTRY_KEYS_INVENTORY_ID = 'fim-registry-keys-dashboard';
+export const FIM_REGISTRY_VALUES_INVENTORY_ID = 'fim-registry-values-dashboard';
+export const FIM_FILES_AGENT_INVENTORY_ID = 'fim-files-dashboard';
 export const FIM_REGISTRY_KEYS_AGENT_INVENTORY_ID =
-  'fim-registry-keys-inventory-agent';
+  'fim-registry-keys-dashboard';
 export const FIM_REGISTRY_VALUES_AGENT_INVENTORY_ID =
-  'fim-registry-values-inventory-agent';
+  'fim-registry-values-dashboard';
 
-export const MALWARE_DETECTION_DASHBOARD_ID = 'malware-detection-dashboard';
+export const MALWARE_DETECTION_DASHBOARD_ID = 'malware-detection-overview-dashboard-tab';
 export const MALWARE_DETECTION_AGENT_DASHBOARD_ID =
-  'malware-detection-agent-dashboard';
+  'malware-detection-pinned-agent-dashboard-tab';
 
 export const PCI_DSS_DASHBOARD_ID = 'pci-overview-dashboard-tab';
 export const PCI_DSS_AGENT_DASHBOARD_ID = 'pci-pinned-agent-dashboard-tab';
@@ -1132,13 +1132,13 @@ export const IT_HYGIENE_GROUPS_AGENT_INVENTORY_ID =
   'it-hygiene-user-inventories-groups-dashboard-tab';
 
 export const CONFIGURATION_ASSESSMENT_DASHBOARD_ID =
-  'configuration-assessment-dashboard';
+  'sca-overview-dashboard';
 export const CONFIGURATION_ASSESSMENT_AGENT_DASHBOARD_ID =
-  'configuration-assessment-agent-dashboard';
+  'sca-overview-dashboard';
 export const CONFIGURATION_ASSESSMENT_INVENTORY_ID =
-  'configuration-assessment-inventory';
+  'sca-inventory-dashboard';
 export const CONFIGURATION_ASSESSMENT_AGENT_INVENTORY_ID =
-  'configuration-assessment-inventory-agent';
+  'sca-inventory-dashboard';
 
 export const VULNERABILITIES_DASHBOARD_ID = 'vulnerability-detector-dashboard';
 export const VULNERABILITIES_AGENT_DASHBOARD_ID =
