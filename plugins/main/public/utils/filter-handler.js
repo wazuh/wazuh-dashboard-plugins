@@ -103,7 +103,7 @@ export class FilterHandler {
    * @returns
    */
   clusterQuery(cluster, fixedKey = undefined) {
-    const metaKey = fixedKey ? fixedKey : 'cluster.name';
+    const metaKey = fixedKey ? fixedKey : 'wazuh.cluster.name';
     const result = this.base();
     result.meta.key = metaKey;
     result.meta.value = cluster;
