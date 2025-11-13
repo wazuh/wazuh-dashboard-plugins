@@ -1068,7 +1068,7 @@ export const OFFICE_365_DASHBOARD_ID = 'office-overview-dashboard-tab';
 
 export const IT_HYGIENE_DASHBOARD_ID = 'it-hygiene-overview-dashboard-tab';
 export const IT_HYGIENE_AGENT_DASHBOARD_ID =
-  'it-hygiene-pinnedit-agent-dashboard-tab';
+  'it-hygiene-overview-dashboard-tab';
 
 export const IT_HYGIENE_INTERFACES_INVENTORY_ID =
   'it-hygiene-networks-inventories-interfaces-dashboard-tab';
