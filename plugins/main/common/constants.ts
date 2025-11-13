@@ -1036,20 +1036,20 @@ export const MALWARE_DETECTION_DASHBOARD_ID = 'malware-detection-dashboard';
 export const MALWARE_DETECTION_AGENT_DASHBOARD_ID =
   'malware-detection-agent-dashboard';
 
-export const PCI_DSS_DASHBOARD_ID = 'pci-dss-dashboard';
-export const PCI_DSS_AGENT_DASHBOARD_ID = 'pci-dss-agent-dashboard';
+export const PCI_DSS_DASHBOARD_ID = 'pci-overview-dashboard-tab';
+export const PCI_DSS_AGENT_DASHBOARD_ID = 'pci-pinned-agent-dashboard-tab';
 
-export const GDPR_DASHBOARD_ID = 'gdpr-dashboard';
-export const GDPR_AGENT_DASHBOARD_ID = 'gdpr-agent-dashboard';
+export const GDPR_DASHBOARD_ID = 'gdpr-overview-dashboard';
+export const GDPR_AGENT_DASHBOARD_ID = 'gdpr-pinned-agent-dashboard';
 
-export const HIPAA_DASHBOARD_ID = 'hipaa-dashboard';
-export const HIPAA_AGENT_DASHBOARD_ID = 'hipaa-agent-dashboard';
+export const HIPAA_DASHBOARD_ID = 'hipaa-overview-dashboard-tab';
+export const HIPAA_AGENT_DASHBOARD_ID = 'hipaa-pinned-agent-dashboard-tab';
 
-export const NIST_800_53_DASHBOARD_ID = 'nist-800-53-dashboard';
-export const NIST_800_53_AGENT_DASHBOARD_ID = 'nist-800-53-agent-dashboard';
+export const NIST_800_53_DASHBOARD_ID = 'nist-overview-dashboard-tab';
+export const NIST_800_53_AGENT_DASHBOARD_ID = 'nist-pinned-agent-dashboard-tab';
 
-export const TSC_DASHBOARD_ID = 'tsc-dashboard';
-export const TSC_AGENT_DASHBOARD_ID = 'tsc-agent-dashboard';
+export const TSC_DASHBOARD_ID = 'tsc-overview-dashboard-tab';
+export const TSC_AGENT_DASHBOARD_ID = 'tsc-pinned-agent-dashboard-tab';
 
 export const GITHUB_DASHBOARD_ID = 'github-overview-dashboard-tab';
 export const GITHUB_AGENT_DASHBOARD_ID = 'github-pinned-agent-dashboard-tab';
@@ -1061,67 +1061,75 @@ export const MITRE_ATTACK_DASHBOARD_ID = 'mitre-attack-dashboard';
 export const MITRE_ATTACK_AGENT_DASHBOARD_ID = 'mitre-attack-agent-dashboard';
 
 export const OFFICE_365_DASHBOARD_ID = 'office-overview-dashboard-tab';
-export const OFFICE_365_AGENT_DASHBOARD_ID = 'office-pinned-agent-dashboard';
 
-export const IT_HYGIENE_DASHBOARD_ID = 'it-hygiene-dashboard';
-export const IT_HYGIENE_AGENT_DASHBOARD_ID = 'it-hygiene-agent-dashboard';
+export const IT_HYGIENE_DASHBOARD_ID = 'it-hygiene-overview-dashboard-tab';
+export const IT_HYGIENE_AGENT_DASHBOARD_ID = 'it-hygiene-pinnedit-agent-dashboard-tab';
 
 export const IT_HYGIENE_INTERFACES_INVENTORY_ID =
-  'it-hygiene-inventory-interfaces';
+  'it-hygiene-networks-inventories-interfaces-dashboard-tab';
 export const IT_HYGIENE_INTERFACES_AGENT_INVENTORY_ID =
-  'it-hygiene-inventory-interfaces-agent';
+  'it-hygiene-networks-inventories-interfaces-dashboard-tab';
 
 // IT Hygiene inventory dashboard IDs per category
-export const IT_HYGIENE_NETWORKS_INVENTORY_ID = 'it-hygiene-inventory-networks';
+export const IT_HYGIENE_NETWORKS_INVENTORY_ID =
+  'it-hygiene-networks-inventories-networks-dashboard-tab';
 export const IT_HYGIENE_NETWORKS_AGENT_INVENTORY_ID =
-  'it-hygiene-inventory-networks-agent';
+  'it-hygiene-networks-inventories-networks-dashboard-tab';
 
 export const IT_HYGIENE_PROTOCOLS_INVENTORY_ID =
-  'it-hygiene-inventory-protocols';
+  'it-hygiene-networks-inventories-protocols-dashboard-tab';
 export const IT_HYGIENE_PROTOCOLS_AGENT_INVENTORY_ID =
-  'it-hygiene-inventory-protocols-agent';
+  'it-hygiene-networks-inventories-protocols-dashboard-tab';
 
-export const IT_HYGIENE_SERVICES_INVENTORY_ID = 'it-hygiene-inventory-services';
+export const IT_HYGIENE_SERVICES_INVENTORY_ID =
+  'it-hygiene-services-dashboard-tab';
 export const IT_HYGIENE_SERVICES_AGENT_INVENTORY_ID =
-  'it-hygiene-inventory-services-agent';
+  'it-hygiene-services-dashboard-tab';
 
-export const IT_HYGIENE_TRAFFIC_INVENTORY_ID = 'it-hygiene-inventory-traffic';
+export const IT_HYGIENE_TRAFFIC_INVENTORY_ID =
+  'it-hygiene-networks-inventories-traffic-dashboard-tab';
 export const IT_HYGIENE_TRAFFIC_AGENT_INVENTORY_ID =
-  'it-hygiene-inventory-traffic-agent';
+  'it-hygiene-networks-inventories-traffic-dashboard-tab';
 
-export const IT_HYGIENE_SYSTEM_INVENTORY_ID = 'it-hygiene-inventory-system';
+export const IT_HYGIENE_SYSTEM_INVENTORY_ID =
+  'it-hygiene-system-inventories-system-dashboard-tab';
 export const IT_HYGIENE_SYSTEM_AGENT_INVENTORY_ID =
-  'it-hygiene-inventory-system-agent';
+  'it-hygiene-system-inventories-system-dashboard-tab';
 
-export const IT_HYGIENE_HARDWARE_INVENTORY_ID = 'it-hygiene-inventory-hardware';
+export const IT_HYGIENE_HARDWARE_INVENTORY_ID =
+  'it-hygiene-system-inventories-hardware-dashboard-tab';
 export const IT_HYGIENE_HARDWARE_AGENT_INVENTORY_ID =
-  'it-hygiene-inventory-hardware-agent';
+  'it-hygiene-system-inventories-hardware-dashboard-tab';
 
-export const IT_HYGIENE_PACKAGES_INVENTORY_ID = 'it-hygiene-inventory-packages';
+export const IT_HYGIENE_PACKAGES_INVENTORY_ID =
+  'it-hygiene-packages-inventories-packages-dashboard-tab';
 export const IT_HYGIENE_PACKAGES_AGENT_INVENTORY_ID =
-  'it-hygiene-inventory-packages-agent';
+  'it-hygiene-packages-inventories-packages-dashboard-tab';
 
-export const IT_HYGIENE_HOTFIXES_INVENTORY_ID = 'it-hygiene-inventory-hotfixes';
+export const IT_HYGIENE_HOTFIXES_INVENTORY_ID =
+  'it-hygiene-packages-inventories-hotfixes-dashboard-tab';
 export const IT_HYGIENE_HOTFIXES_AGENT_INVENTORY_ID =
-  'it-hygiene-inventory-hotfixes-agent';
+  'it-hygiene-packages-inventories-hotfixes-dashboard-tab';
 
 export const IT_HYGIENE_BROWSER_EXTENSIONS_INVENTORY_ID =
-  'it-hygiene-inventory-browser-extensions';
+  'it-hygiene-packages-inventories-browser-extensions-dashboard-tab';
 export const IT_HYGIENE_BROWSER_EXTENSIONS_AGENT_INVENTORY_ID =
-  'it-hygiene-inventory-browser-extensions-agent';
+  'it-hygiene-packages-inventories-browser-extensions-dashboard-tab';
 
 export const IT_HYGIENE_PROCESSES_INVENTORY_ID =
-  'it-hygiene-inventory-processes';
+  'it-hygiene-processes-dashboard-tab';
 export const IT_HYGIENE_PROCESSES_AGENT_INVENTORY_ID =
-  'it-hygiene-inventory-processes-agent';
+  'it-hygiene-processes-dashboard-tab';
 
-export const IT_HYGIENE_USERS_INVENTORY_ID = 'it-hygiene-inventory-users';
+export const IT_HYGIENE_USERS_INVENTORY_ID =
+  'it-hygiene-user-inventories-users-dashboard-tab';
 export const IT_HYGIENE_USERS_AGENT_INVENTORY_ID =
-  'it-hygiene-inventory-users-agent';
+  'it-hygiene-user-inventories-users-dashboard-tab';
 
-export const IT_HYGIENE_GROUPS_INVENTORY_ID = 'it-hygiene-inventory-groups';
+export const IT_HYGIENE_GROUPS_INVENTORY_ID =
+  'it-hygiene-user-inventories-groups-dashboard-tab';
 export const IT_HYGIENE_GROUPS_AGENT_INVENTORY_ID =
-  'it-hygiene-inventory-groups-agent';
+  'it-hygiene-user-inventories-groups-dashboard-tab';
 
 export const CONFIGURATION_ASSESSMENT_DASHBOARD_ID =
   'configuration-assessment-dashboard';
