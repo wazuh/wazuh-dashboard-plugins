@@ -11,7 +11,7 @@ import {
 } from '@elastic/eui';
 import { useAsyncActionRunOnStart } from '../../hooks';
 import './visualizations.scss';
-import { Typography } from '../../typography/typography';
+import { Typography, TypographySize } from '../../typography/typography';
 
 export type VisualizationBasicProps = ChartDonutProps & {
   type: 'donut';
@@ -67,8 +67,8 @@ export const VisualizationBasic = ({
     visualization = (
       <EuiEmptyPrompt
         iconType='alert'
-        title={<h4 style={{ fontWeight: 'normal' }}>{errorTitle}</h4>}
-        titleSize='xs'
+        title={<Typography level='prompt'>{errorTitle}</Typography>}
+        titleSize={TypographySize({ level: 'prompt' })}
         body={<p>{errorMessage || error?.message}</p>}
       />
     );
@@ -76,8 +76,8 @@ export const VisualizationBasic = ({
     visualization = (
       <EuiEmptyPrompt
         iconType='stats'
-        title={<h4 style={{ fontWeight: 'normal' }}>{noDataTitle}</h4>}
-        titleSize='xs'
+        title={<Typography level='prompt'>{noDataTitle}</Typography>}
+        titleSize={TypographySize({ level: 'prompt' })}
         body={
           <p>
             {typeof noDataMessage === 'function'

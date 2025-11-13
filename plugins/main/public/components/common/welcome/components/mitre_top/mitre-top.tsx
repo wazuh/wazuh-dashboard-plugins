@@ -21,7 +21,7 @@ import {
   EuiEmptyPrompt,
   EuiSpacer,
 } from '@elastic/eui';
-import { Typography } from '../../../typography/typography';
+import { Typography, TypographySize } from '../../../typography/typography';
 import { FlyoutTechnique } from '../../../../overview/mitre/framework/components/techniques/components/flyout-technique';
 import { getMitreCount } from './lib';
 import { useAsyncActionRunOnStart, useTimeFilter } from '../../../hooks';
@@ -221,8 +221,8 @@ export const MitreTopTactics = ({ agentId }) => {
   const renderEmpty = () => (
     <EuiEmptyPrompt
       iconType='stats'
-      title={<h4 style={{ fontWeight: 'normal' }}>No results</h4>}
-      titleSize='xs'
+      title={<Typography level='prompt'>No results</Typography>}
+      titleSize={TypographySize({ level: 'prompt' })}
       body={
         <p>No MITRE ATT&CK results were found in the selected time range.</p>
       }

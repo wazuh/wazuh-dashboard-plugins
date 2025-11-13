@@ -24,7 +24,7 @@ import {
   EuiToolTip,
   EuiEmptyPrompt,
 } from '@elastic/eui';
-import { Typography } from '../../../typography/typography';
+import { Typography, TypographySize } from '../../../typography/typography';
 import moment from 'moment-timezone';
 import { WzRequest } from '../../../../../react-services';
 import { formatUIDate } from '../../../../../react-services/time-service';
@@ -247,12 +247,9 @@ export const ScaScan = compose(
         <Fragment>
           <EuiEmptyPrompt
             iconType='visVega'
-            title={<h4>You don't have SCA scans in this agent.</h4>}
-            body={
-              <Fragment>
-                <p>Check your agent settings to generate scans.</p>
-              </Fragment>
-            }
+            title={<Typography level='prompt'>You don't have SCA scans in this agent.</Typography>}
+            titleSize={TypographySize({ level: 'prompt' })}
+            body={<p>Check your agent settings to generate scans.</p>}
           />
         </Fragment>
       );
