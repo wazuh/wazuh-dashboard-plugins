@@ -5,13 +5,8 @@ import { getDashboardPanels } from './dashboard_panels';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import { useDataSource } from '../../data-source/hooks';
 import { PatternDataSource, tParsedIndexPattern } from '../../data-source';
-import {
-  EuiPanel,
-  EuiFlexItem,
-  EuiFlexGroup,
-  EuiSpacer,
-  EuiText,
-} from '@elastic/eui';
+import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiSpacer } from '@elastic/eui';
+import { Typography } from '../../typography/typography';
 import { useTimeFilter } from '../../hooks';
 import { LoadingSearchbarProgress } from '../../loading-searchbar-progress/loading-searchbar-progress';
 import { EventsCountDataSource } from '../../data-source/pattern/alerts/events-count';
@@ -32,44 +27,38 @@ export const EventsCount = () => {
   const { timeFilter } = useTimeFilter();
 
   return (
-    <EuiPanel paddingSize='s'>
-      <EuiFlexItem>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <h2 className='embPanel__title wz-headline-title'>
-              <EuiText size='xs'>
-                <h2>Events count evolution</h2>
-              </EuiText>
-            </h2>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiSpacer size='s' />
-        {!isDataSourceLoading && dataSource ? (
-          <DashboardByRenderer
-            input={{
-              viewMode: ViewMode.VIEW,
-              panels: getDashboardPanels(dataSource?.id),
-              isFullScreenMode: false,
-              filters: fetchFilters ?? [],
-              useMargins: true,
-              id: 'agent-events-count-evolution',
-              timeRange: {
-                from: timeFilter.from,
-                to: timeFilter.to,
-              },
-              title: 'Events count evolution',
-              description: 'Dashboard of Events count evolution',
-              refreshConfig: {
-                pause: false,
-                value: 15,
-              },
-              hidePanelTitles: true,
-            }}
-          />
-        ) : (
-          <LoadingSearchbarProgress />
-        )}
-      </EuiFlexItem>
+    <EuiPanel paddingSize='m'>
+      <EuiFlexGroup gutterSize='none'>
+        <EuiFlexItem grow={false}>
+          <Typography level='section'>Events count evolution</Typography>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+      <EuiSpacer size='m' />
+      {!isDataSourceLoading && dataSource ? (
+        <DashboardByRenderer
+          input={{
+            viewMode: ViewMode.VIEW,
+            panels: getDashboardPanels(dataSource?.id),
+            isFullScreenMode: false,
+            filters: fetchFilters ?? [],
+            useMargins: true,
+            id: 'agent-events-count-evolution',
+            timeRange: {
+              from: timeFilter.from,
+              to: timeFilter.to,
+            },
+            title: 'Events count evolution',
+            description: 'Dashboard of Events count evolution',
+            refreshConfig: {
+              pause: false,
+              value: 15,
+            },
+            hidePanelTitles: true,
+          }}
+        />
+      ) : (
+        <LoadingSearchbarProgress />
+      )}
     </EuiPanel>
   );
 };

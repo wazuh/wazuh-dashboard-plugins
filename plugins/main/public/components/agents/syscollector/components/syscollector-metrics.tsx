@@ -7,6 +7,7 @@ import {
   EuiTitle,
   EuiToolTip,
   EuiButtonIcon,
+  EuiText,
 } from '@elastic/eui';
 import _ from 'lodash';
 import WzRibbon from '../../../common/ribbon/ribbon';
@@ -27,6 +28,7 @@ import NavigationService from '../../../../react-services/navigation-service';
 import { ITHygiene } from '../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { IndexPatternFormattedField } from '../../../common/index-pattern';
+import { Typography } from '../../../common/typography/typography';
 interface SyscollectorMetricsProps {
   agent: Agent;
 }
@@ -101,9 +103,22 @@ export const InventoryMetrics = withSystemInventoryDataSource(
       (_.isEmpty(data?.hardware) || _.isEmpty(data?.software))
     ) {
       return (
-        <EuiPanel paddingSize='s' style={{ margin: 16, textAlign: 'center' }}>
-          <EuiIcon type='iInCircle' /> Not enough hardware or operating system
-          information
+        <EuiPanel>
+          <EuiFlexGroup
+            direction='row'
+            alignItems='center'
+            justifyContent='center'
+            gutterSize='xs'
+          >
+            <EuiFlexItem grow={false}>
+              <EuiIcon type='iInCircle' />
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiText size='s'>
+                Not enough hardware or operating system information
+              </EuiText>
+            </EuiFlexItem>
+          </EuiFlexGroup>
         </EuiPanel>
       );
     }
@@ -159,9 +174,7 @@ export const InventoryMetrics = withSystemInventoryDataSource(
         title={
           <EuiFlexGroup justifyContent='spaceBetween'>
             <EuiFlexItem grow={false}>
-              <EuiTitle>
-                <h2>System inventory</h2>
-              </EuiTitle>
+              <Typography level='section'>System inventory</Typography>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <RedirectAppLinks application={getCore().application}>
