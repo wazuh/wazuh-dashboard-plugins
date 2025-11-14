@@ -18,9 +18,9 @@ import {
   EuiFlexItem,
   EuiPanel,
   EuiSpacer,
-  EuiText,
   EuiFlexGroup,
 } from '@elastic/eui';
+import { Typography } from '../../../typography/typography';
 // @ts-ignore
 import { getDataPlugin } from '../../../../../kibana-services';
 import { vulnerabilityDetection } from '../../../../../utils/applications';
@@ -72,9 +72,7 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
     <EuiPanel paddingSize='m'>
       <EuiFlexGroup>
         <EuiFlexItem>
-          <EuiText size='xs'>
-            <h2>Top 5 Packages</h2>
-          </EuiText>
+          <Typography level='card'>Top 5 Packages</Typography>
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size='s' />

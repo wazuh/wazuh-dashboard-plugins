@@ -13,6 +13,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Removed sorting for Program name and Order columns in Related decoders table and Groups column in Related rules table to prevent API errors [#7864](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7864)
 
+### Changed
+
+- Improved text size consistency and visual hierarchy across the Agent Overview page by implementing standardized typography styling [#7878](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7878)
+
 ## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 02
 
 ### Added

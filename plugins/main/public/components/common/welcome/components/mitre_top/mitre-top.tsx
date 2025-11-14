@@ -15,12 +15,13 @@ import React, { useEffect, useState } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiText,
   EuiFacetButton,
   EuiButtonIcon,
   EuiLoadingChart,
   EuiEmptyPrompt,
+  EuiSpacer,
 } from '@elastic/eui';
+import { Typography, TypographySize } from '../../../typography/typography';
 import { FlyoutTechnique } from '../../../../overview/mitre/framework/components/techniques/components/flyout-technique';
 import { getMitreCount } from './lib';
 import { useAsyncActionRunOnStart, useTimeFilter } from '../../../hooks';
@@ -66,13 +67,11 @@ const MitreTopTacticsTactics = ({
   return (
     <>
       <div className='wz-agents-mitre'>
-        <EuiText size='xs'>
-          <EuiFlexGroup>
-            <EuiFlexItem style={{ margin: 0, padding: '12px 0px 0px 10px' }}>
-              <h3>Top Tactics</h3>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiText>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <Typography level='card'>Top Tactics</Typography>
+          </EuiFlexItem>
+        </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
             {getData?.data?.map(tactic => (
@@ -164,24 +163,23 @@ const MitreTopTacticsTechniques = ({
   }
   return (
     <>
-      <EuiText size='xs'>
-        <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
-            <EuiButtonIcon
-              size={'s'}
-              color={'primary'}
-              onClick={() => {
-                setView('tactics');
-              }}
-              iconType='sortLeft'
-              aria-label='Back Top Tactics'
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <h3>{selectedTactic}</h3>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </EuiText>
+      <EuiFlexGroup alignItems='center' gutterSize='s'>
+        <EuiFlexItem grow={false}>
+          <EuiButtonIcon
+            size={'s'}
+            color={'primary'}
+            onClick={() => {
+              setView('tactics');
+            }}
+            iconType='sortLeft'
+            aria-label='Back Top Tactics'
+          />
+        </EuiFlexItem>
+        <EuiFlexItem>
+          <Typography level='card'>{selectedTactic}</Typography>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+      <EuiSpacer size='s' />
       <EuiFlexGroup>
         <EuiFlexItem>
           {getData.data.map(tactic => (
@@ -223,7 +221,8 @@ export const MitreTopTactics = ({ agentId }) => {
   const renderEmpty = () => (
     <EuiEmptyPrompt
       iconType='stats'
-      title={<h4>No results</h4>}
+      title={<Typography level='prompt'>No results</Typography>}
+      titleSize={TypographySize({ level: 'prompt' })}
       body={
         <p>No MITRE ATT&CK results were found in the selected time range.</p>
       }
