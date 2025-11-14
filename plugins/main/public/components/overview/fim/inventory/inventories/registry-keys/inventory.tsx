@@ -15,7 +15,7 @@ import {
 import { withAgent } from '../../../../../common/hocs/with-agent';
 import { compose } from 'redux';
 
-export const InventoryFIMRegistryKeysComponent = compose(
+export const InventoryFIMRegistryKeys = compose(
   withAgent,
   withFIMRegistryKeysDataSource,
 )(props => {
