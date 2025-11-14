@@ -25,14 +25,12 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
     const ignoreIndexPatterns =
       store.getState().appConfig?.data?.['ip.ignore'] || [];
     if (ignoreIndexPatterns?.length > 0) {
-      try {
-        const fieldsToCheck = ['id', 'attributes.title']; // search in these attributes
-        indexPatterns = indexPatterns.filter(indexPattern =>
-          fieldsToCheck.every(
-            field => !ignoreIndexPatterns.includes(get(indexPattern, field)),
-          ),
-        );
-      } catch {}
+      const fieldsToCheck = ['id', 'attributes.title']; // search in these attributes
+      indexPatterns = indexPatterns.filter(indexPattern =>
+        fieldsToCheck.every(
+          field => !ignoreIndexPatterns.includes(get(indexPattern, field)),
+        ),
+      );
     }
     // Filter only alerts index patterns
     return indexPatterns.filter(this.checkIfAlertsIndexPattern);
