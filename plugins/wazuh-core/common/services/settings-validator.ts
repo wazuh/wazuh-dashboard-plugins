@@ -225,7 +225,7 @@ export class SettingsValidator {
    * @param validateParsed Optional parameter to validate the parsed object
    * @returns
    */
-  static stringAsList(validateParsed: (object: any) => string | undefined) {
+  static listAsString(validateParsed: (object: any) => string | undefined) {
     return function (value: string) {
       let items;
       // Try to parse the string as JSON

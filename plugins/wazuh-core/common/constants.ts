@@ -480,7 +480,7 @@ hosts:
           validate: SettingsValidator.compose(
             SettingsValidator.isString,
             SettingsValidator.isNotEmptyString,
-            SettingsValidator.hasMaximumCharacters(4),
+            SettingsValidator.hasMinimumCharacters(4),
             SettingsValidator.hasMaximumCharacters(64),
           ),
         },
@@ -525,7 +525,7 @@ hosts:
     type: EpluginSettingType.editor,
     defaultValue: [],
     validate: SettingsValidator.compose(
-      SettingsValidator.stringAsList(
+      SettingsValidator.listAsString(
         SettingsValidator.compose(
           SettingsValidator.isString,
           SettingsValidator.isNotEmptyString,
