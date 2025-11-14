@@ -17,7 +17,7 @@ import { request } from '../services/request-handler';
 export class ApiCheck {
   static async checkStored(data, idChanged = false) {
     try {
-      const timeout = getWazuhCorePlugin().configuration.get('timeout');
+      const timeout = await getWazuhCorePlugin().configuration.get('timeout');
       const payload = { id: data };
       if (idChanged) {
         payload.idChanged = data;
@@ -64,7 +64,7 @@ export class ApiCheck {
    */
   static async checkApi(apiEntry, forceRefresh = false) {
     try {
-      const timeout = getWazuhCorePlugin().configuration.get('timeout');
+      const timeout = await getWazuhCorePlugin().configuration.get('timeout');
       const url = getHttp().basePath.prepend('/api/check-api');
 
       const options = {
