@@ -88,7 +88,6 @@ export function TableWzAPI({
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState<Filters>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [sort, setSort] = useState({});
   const onFiltersChange = (filters: Filters) =>
     typeof rest.onFiltersChange === 'function'
       ? rest.onFiltersChange(filters)
@@ -149,7 +148,6 @@ export function TableWzAPI({
     async function (endpoint, filters: Filters, pagination, sorting) {
       try {
         const { pageIndex, pageSize } = pagination;
-        setSort(sorting.sort);
 
         // Update persisted table state when page size or sorting changes
         setTableStateRaw(prevState => ({
@@ -283,7 +281,7 @@ export function TableWzAPI({
                   totalItems={totalItems}
                   filters={getFilters({
                     ...filters,
-                    sort: formatSorting(sort),
+                    sort: formatSorting(tableState.sorting),
                   })}
                   title={
                     typeof rest.downloadCsv === 'string'
