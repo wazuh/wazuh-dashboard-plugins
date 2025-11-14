@@ -9,6 +9,7 @@ import {
   EpluginSettingType,
   SettingCategory,
   TPluginSetting,
+  TPluginSettingOptionsObjectOf,
 } from './constants';
 
 /**
@@ -38,7 +39,7 @@ const schemaMapper = (setting: TPluginSetting) => {
       }
 
       const options = setting?.options
-        ?.objectOf as TPlugginSettingOptionsObjectOf;
+        ?.objectOf as TPluginSettingOptionsObjectOf;
       const mappedSchema = {};
 
       for (const key of Object.keys(options)) {

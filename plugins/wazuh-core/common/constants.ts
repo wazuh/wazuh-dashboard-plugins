@@ -352,7 +352,7 @@ export enum EpluginSettingType {
   objectOf = 'objectOf',
 }
 
-interface TPluginSettingOptionsObjectOf {
+export interface TPluginSettingOptionsObjectOf {
   /* eslint-disable no-use-before-define */
   objectOf: Record<string, TPluginSetting>;
 }
@@ -371,7 +371,7 @@ type TPlugingSettingOptions =
   | TPluginSettingOptionsObjectOf
   | TPluginSettingOptionsArrayOf;
 
-interface TPluginSetting {
+export interface TPluginSetting {
   // Define the text displayed in the UI.
   title: string;
   // Description.
