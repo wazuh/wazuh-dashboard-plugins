@@ -45,22 +45,22 @@ describe(`[service] ConfigurationStore`, () => {
     ).toThrowError('Provider is required');
   });
 
-  it('should return a configuration from a provider', () => {
+  it('should return a configuration from a provider', async () => {
     const logger = createMockLogger();
     const configurationStore = new ConfigurationStore(logger);
 
     configurationStore.registerProvider('test', mockedProvider);
     mockedProvider.getAll.mockResolvedValue({ test: 'test' });
-    expect(
+    await expect(
       configurationStore.getProviderConfiguration('test'),
     ).resolves.toEqual({ test: 'test' });
   });
 
-  it('should return error if provider is not defined when getting configuration', () => {
+  it('should return error if provider is not defined when getting configuration', async () => {
     const logger = createMockLogger();
     const configurationStore = new ConfigurationStore(logger);
 
-    expect(
+    await expect(
       configurationStore.getProviderConfiguration('test'),
     ).rejects.toThrowError('Provider test not found');
   });
@@ -107,12 +107,14 @@ describe(`[service] ConfigurationStore`, () => {
     }
   });
 
-  it('should return all the configuration from the registered providers', () => {
+  it('should return all the configuration from the registered providers', async () => {
     const logger = createMockLogger();
     const configurationStore = new ConfigurationStore(logger);
 
     configurationStore.registerProvider('test', mockedProvider);
     mockedProvider.getAll.mockResolvedValue({ test: 'test' });
-    expect(configurationStore.getAll()).resolves.toEqual({ test: 'test' });
+    await expect(configurationStore.getAll()).resolves.toEqual({
+      test: 'test',
+    });
   });
 });
