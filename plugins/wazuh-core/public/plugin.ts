@@ -15,6 +15,7 @@ import { UISettingsConfigProvider } from './services/configuration/ui-settings-p
 import { InitializerConfigProvider } from './services/configuration/initializer-context-provider';
 import { DashboardSecurity } from './utils/dashboard-security';
 import * as hooks from './hooks';
+import { SettingsValidator } from '../common/services/settings-validator';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -68,6 +69,7 @@ export class WazuhCorePlugin
       ...this.services,
       utils,
       API_USER_STATUS_RUN_AS,
+      SettingsValidator,
     };
   }
 
@@ -83,6 +85,7 @@ export class WazuhCorePlugin
       utils,
       API_USER_STATUS_RUN_AS,
       hooks,
+      SettingsValidator,
     };
   }
 
