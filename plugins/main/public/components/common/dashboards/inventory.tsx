@@ -106,7 +106,13 @@ const InventoryDashboard = compose(
                         dataSource?.getPinnedAgentFilter?.()?.length,
                       )}
                       config={{
-                        dataSource,
+                        dataSource: {
+                          ...dataSource,
+                          searchBarProps,
+                          fetchFilters,
+                          fingerprint,
+                          autoRefreshFingerprint,
+                        }
                       }}
                     />
                   );
