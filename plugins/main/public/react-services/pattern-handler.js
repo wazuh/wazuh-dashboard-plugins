@@ -11,9 +11,7 @@
  */
 import { AppState } from './app-state';
 import { SavedObject } from './saved-objects';
-import { getDataPlugin, getToasts, getHttp } from '../kibana-services';
-import { WazuhConfig } from '../react-services/wazuh-config';
-import { HEALTH_CHECK } from '../../common/constants';
+import { getDataPlugin, getWazuhCorePlugin } from '../kibana-services';
 
 export class PatternHandler {
   /**
@@ -21,8 +19,7 @@ export class PatternHandler {
    */
   static async getPatternList(origin) {
     try {
-      const wazuhConfig = new WazuhConfig();
-      const { pattern } = wazuhConfig.getConfig();
+      const pattern = await getWazuhCorePlugin().configuration.get('pattern');
 
       const defaultPatterns = [pattern];
       const selectedPattern = AppState.getCurrentPattern();

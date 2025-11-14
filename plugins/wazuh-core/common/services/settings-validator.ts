@@ -37,6 +37,40 @@ export class SettingsValidator {
   }
 
   /**
+   * Check the string has minimum characters
+   * @param value
+   * @returns
+   */
+  static hasMinimumCharacters(minChars: number) {
+    return (value: string): string | undefined => {
+      if (typeof value === 'string') {
+        if (value.length < minChars) {
+          return `Value must have at least ${minChars} characters.`;
+        } else {
+          return undefined;
+        }
+      }
+    };
+  }
+
+  /**
+   * Check the string has minimum characters
+   * @param value
+   * @returns
+   */
+  static hasMaximumCharacters(maxChars: number) {
+    return (value: string): string | undefined => {
+      if (typeof value === 'string') {
+        if (value.length > maxChars) {
+          return `Value must have at most ${maxChars} characters.`;
+        } else {
+          return undefined;
+        }
+      }
+    };
+  }
+
+  /**
    * Check the string has no empty
    * @param value
    * @returns
@@ -183,6 +217,31 @@ export class SettingsValidator {
       }
 
       return validateParsed ? validateParsed(jsonObject) : undefined;
+    };
+  }
+
+  /**
+   * Creates a function that checks if the value is a string as list
+   * @param validateParsed Optional parameter to validate the parsed object
+   * @returns
+   */
+  static listAsString(validateParsed: (object: any) => string | undefined) {
+    return function (value: string) {
+      let items;
+      // Try to parse the string as JSON
+      try {
+        items = value.split(',').map(item => item.trim());
+      } catch (error) {
+        return "Value can't be parsed. There is some error.";
+      }
+
+      const validationErrors = items
+        .map(item => (validateParsed ? validateParsed(item) : undefined))
+        .filter(error => typeof error === 'string');
+
+      return validationErrors.length > 0
+        ? validationErrors.join(' ')
+        : undefined;
     };
   }
 

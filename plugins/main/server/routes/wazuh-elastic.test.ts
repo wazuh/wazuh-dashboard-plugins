@@ -308,16 +308,4 @@ describe.skip('Wazuh Elastic', () => {
       });
     });
   });
-
-  // TODO: This test need to be defined
-  // describe('Wazuh API - /elastic/alerts', () => {
-  //   test('[200] Check if there an sample data index of Security category', () => {
-  //     const options = buildAxiosOptions('get', '/elastic/alerts');
-  //     return axios(options).then(response => {
-  //       expect(response.status).toBe(200);
-  //       expect(typeof response.data.index).toBe('string');
-  //       expect(typeof response.data.exists).toBe('boolean');
-  //     });
-  //   });
-  // });
 });

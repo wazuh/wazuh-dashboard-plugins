@@ -10,6 +10,8 @@ import {
   tParsedIndexPattern,
 } from '../pattern-data-source-repository';
 import { AlertsDataSource } from './alerts-data-source';
+import { get } from 'lodash';
+import store from '../../../../../redux/store';
 
 export class AlertsDataSourceRepository extends PatternDataSourceRepository {
   constructor() {
@@ -17,8 +19,20 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
   }
 
   async getAll() {
-    const indexPatterns = await super.getAll();
-    // FIXME: this should take into account the ip.ignore setting to filter the index patterns
+    let indexPatterns = await super.getAll();
+
+    // Filter out ignored index patterns from app config
+    const ignoreIndexPatterns =
+      store.getState().appConfig?.data?.['ip.ignore'] || [];
+    if (ignoreIndexPatterns?.length > 0) {
+      const fieldsToCheck = ['id', 'attributes.title']; // search in these attributes
+      indexPatterns = indexPatterns.filter(indexPattern =>
+        fieldsToCheck.every(
+          field => !ignoreIndexPatterns.includes(get(indexPattern, field)),
+        ),
+      );
+    }
+    // Filter only alerts index patterns
     return indexPatterns.filter(this.checkIfAlertsIndexPattern);
   }
 

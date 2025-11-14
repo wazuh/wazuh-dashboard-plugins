@@ -81,8 +81,8 @@ export const RegisterAgent = compose(
       type: 'text',
       initialValue: configuration['enrollment.dns'] || '',
       validate:
-        getWazuhCorePlugin().configuration._settings.get('enrollment.dns')
-          .validate,
+        getWazuhCorePlugin().SettingsValidator
+          .serverAddressHostnameFQDNIPv4IPv6,
     },
     agentName: {
       type: 'text',

@@ -19,7 +19,6 @@ const initialState: AppConfigState = {
   hasError: false,
   data: {
     // TODO: this should use the configuration service
-    'vulnerabilities.pattern': 'wazuh-states-vulnerabilities',
   },
 };
 

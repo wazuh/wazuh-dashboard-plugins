@@ -14,34 +14,6 @@ interface EnsureIndexPatternExistenceContextTask {
   options: any;
 }
 
-interface EnsureIndexPatternExistenceContextTaskWithConfigurationSetting
-  extends EnsureIndexPatternExistenceContextTask {
-  configurationSettingKey: string;
-}
-
-// TODO: unused
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const decoratorCheckIsEnabled =
-  (
-    callback: (
-      ctx: InitializationTaskRunContext,
-      ctxTask: EnsureIndexPatternExistenceContextTask,
-    ) => Promise<void>,
-  ) =>
-  async (
-    ctx: InitializationTaskRunContext,
-    {
-      configurationSettingKey,
-      ...ctxTask
-    }: EnsureIndexPatternExistenceContextTaskWithConfigurationSetting,
-  ) => {
-    if (await ctx.configuration.get(configurationSettingKey)) {
-      await callback(ctx, ctxTask);
-    } else {
-      ctx.logger.info(`Check [${configurationSettingKey}]: disabled. Skipped.`);
-    }
-  };
-
 async function getFieldMappings(
   { logger, indexPatternsClient },
   indexPatternTitle: string,

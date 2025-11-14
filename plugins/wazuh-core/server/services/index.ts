@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export * from './configuration-store';
+export * from './configuration';
 export * from './cookie';
 export * from './manage-hosts';
 export * from './security-factory';

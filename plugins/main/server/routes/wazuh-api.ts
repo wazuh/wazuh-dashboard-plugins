@@ -28,11 +28,11 @@ export function WazuhApiRoutes(router: IRouter) {
       validate: {
         body: schema.any({
           // TODO: not ready
-          //id: schema.string(),
+          // id: schema.string(),
           // url: schema.string(),
           // port: schema.number(),
           // username: schema.string(),
-          //forceRefresh: schema.boolean({defaultValue:false}),
+          // forceRefresh: schema.boolean({defaultValue:false}),
           // cluster_info: schema.object({
           //   status: schema.string(),
           //   manager: schema.string(),
@@ -112,16 +112,5 @@ export function WazuhApiRoutes(router: IRouter) {
     },
     async (context, request, response) =>
       ctrl.getSetupInfo(context, request, response),
-  );
-
-  // Return app logos configuration
-  router.get(
-    {
-      path: '/api/logos',
-      validate: false,
-      options: { authRequired: false },
-    },
-    async (context, request, response) =>
-      ctrl.getAppLogos(context, request, response),
   );
 }
