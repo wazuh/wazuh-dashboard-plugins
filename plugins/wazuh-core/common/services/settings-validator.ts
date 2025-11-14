@@ -37,6 +37,40 @@ export class SettingsValidator {
   }
 
   /**
+   * Check the string has minimum characters
+   * @param value
+   * @returns
+   */
+  static hasMinimumCharacters(minChars: number) {
+    return (value: string): string | undefined => {
+      if (typeof value === 'string') {
+        if (value.length < minChars) {
+          return `Value must have at least ${minChars} characters.`;
+        } else {
+          return undefined;
+        }
+      }
+    };
+  }
+
+  /**
+   * Check the string has minimum characters
+   * @param value
+   * @returns
+   */
+  static hasMaximumCharacters(maxChars: number) {
+    return (value: string): string | undefined => {
+      if (typeof value === 'string') {
+        if (value.length > maxChars) {
+          return `Value must have at most ${maxChars} characters.`;
+        } else {
+          return undefined;
+        }
+      }
+    };
+  }
+
+  /**
    * Check the string has no empty
    * @param value
    * @returns

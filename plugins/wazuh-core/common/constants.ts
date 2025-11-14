@@ -466,13 +466,10 @@ hosts:
           defaultValue: 55000,
           options: {
             number: {
-              min: 0,
+              min: 1,
               max: 65535,
               integer: true,
             },
-          },
-          validate: function (value) {
-            return SettingsValidator.number(this.options?.number)(value);
           },
         },
         username: {
@@ -483,6 +480,8 @@ hosts:
           validate: SettingsValidator.compose(
             SettingsValidator.isString,
             SettingsValidator.isNotEmptyString,
+            SettingsValidator.hasMaximumCharacters(4),
+            SettingsValidator.hasMaximumCharacters(64),
           ),
         },
         password: {
@@ -493,6 +492,10 @@ hosts:
           validate: SettingsValidator.compose(
             SettingsValidator.isString,
             SettingsValidator.isNotEmptyString,
+            // https://github.com/wazuh/wazuh/blob/main/framework/wazuh/security.py#L176
+            // SettingsValidator.hasMaximumCharacters(8), // Disabled because the wazuh user has the as password 'wazuh' that has less than 8 characters
+            // password validation https://github.com/wazuh/wazuh/blob/main/framework/wazuh/security.py#L22
+            SettingsValidator.hasMaximumCharacters(64),
           ),
         },
         run_as: {

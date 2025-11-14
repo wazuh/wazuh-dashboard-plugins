@@ -24,13 +24,13 @@ The Wazuh server hosts are defined in the configuration file through the `wazuh_
 
 A host has the following properties:
 
-| Property | Description                                                                          | Default value | Allowed values       |
-| -------- | ------------------------------------------------------------------------------------ | ------------- | -------------------- |
-| url      | Define the URL address                                                               | -             | any valid URL string |
-| port     | Define the port                                                                      | -             | any number           |
-| username | Define the username                                                                  | -             | any string           |
-| password | Define the password                                                                  | -             | any string           |
-| run_as   | Define the the user context is used to retrieve the permissions for the Wazuh server | false         | true, false          |
+| Property | Description                                                    | Default value | Allowed values                     |
+| -------- | -------------------------------------------------------------- | ------------- | ---------------------------------- |
+| url      | Define the URL address                                         | -             | any valid URL string               |
+| port     | Define the port                                                | -             | any integer beween 1-65535         |
+| username | Define the username                                            | -             | any string between 4-64 characters |
+| password | Define the password                                            | -             | any string up to 64 characters     |
+| run_as   | Define if the user context is used to retrieve the permissions | false         | true, false                        |
 
 This is an example of a multi-host configuration:
 
