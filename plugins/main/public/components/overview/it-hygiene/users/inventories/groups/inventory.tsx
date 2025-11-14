@@ -7,10 +7,13 @@ import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryGroupsDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
 import { InventoryDashboardTable } from '../../../../../common/dashboards';
-import { WAZUH_SAMPLE_INVENTORY_AGENT } from '../../../../../../../common/constants';
-import { compose } from 'redux';
+import {
+  WAZUH_SAMPLE_INVENTORY_AGENT,
+  IT_HYGIENE_GROUPS_INVENTORY_ID,
+  IT_HYGIENE_GROUPS_AGENT_INVENTORY_ID,
+} from '../../../../../../../common/constants';
 import { withAgent } from '../hocs';
-import { getOverviewUsersGroupsTab } from './dashboard';
+import { compose } from 'redux';
 
 export const ITHygieneUsersInventoryGroups = compose(
   withAgent,
@@ -25,7 +28,12 @@ export const ITHygieneUsersInventoryGroups = compose(
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
-        getDashboardPanels={getOverviewUsersGroupsTab}
+        getDashboardPanels={[
+          {
+            dashboardId: IT_HYGIENE_GROUPS_INVENTORY_ID,
+            agentDashboardId: IT_HYGIENE_GROUPS_AGENT_INVENTORY_ID,
+          },
+        ]}
         tableId='it-hygiene-inventory-groups'
         categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
       />

@@ -1,14 +1,15 @@
 import React from 'react';
-import _ from 'lodash';
-import { WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT } from '../../../../../../common/constants';
+import {
+  WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
+  CONFIGURATION_ASSESSMENT_INVENTORY_ID,
+  CONFIGURATION_ASSESSMENT_AGENT_INVENTORY_ID,
+} from '../../../../../../common/constants';
 import {
   SCAStatesDataSource,
   SCAStatesDataSourceRepository,
 } from '../../../../common/data-source/pattern/sca';
-import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { InventoryDashboardTable } from '../../../../common/dashboards';
 import { CheckDetails } from '../sca-check-details';
-import { getKPIsPanel } from './utils/get-vis-sca-inventory';
 import { managedFilters, tableColumns } from './utils/index';
 import { withSCADataSource } from '../../hocs/validate-sca-states-index-pattern';
 import { withErrorBoundary } from '../../../../common/hocs';
@@ -43,7 +44,12 @@ export const SCAInventory: React.FC<{}> = compose(
       DataSourceRepositoryCreator={SCAStatesDataSourceRepository}
       tableDefaultColumns={tableColumns}
       managedFilters={managedFilters}
-      getDashboardPanels={getKPIsPanel}
+      getDashboardPanels={[
+        {
+          dashboardId: CONFIGURATION_ASSESSMENT_INVENTORY_ID,
+          agentDashboardId: CONFIGURATION_ASSESSMENT_AGENT_INVENTORY_ID,
+        },
+      ]}
       tableId='sca-policies-inventory'
       categoriesSampleData={[WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT]}
       additionalDocumentDetailsTabs={[

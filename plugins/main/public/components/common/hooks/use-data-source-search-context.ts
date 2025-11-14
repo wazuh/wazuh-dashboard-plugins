@@ -4,9 +4,7 @@ import {
   Query,
   Filter,
   IndexPattern,
-  FilterManager,
 } from '../../../../../../src/plugins/data/public';
-import { getUiSettings } from '../../../kibana-services';
 import {
   IDataSourceFactoryConstructor,
   PatternDataSource,
@@ -35,7 +33,7 @@ interface UseDataSourceSearchParams {
 }
 
 interface UseSearchBarParams extends UseDataSourceSearchParams {
-  useAbsoluteDateRange: boolean;
+  useAbsoluteDateRange?: boolean;
 }
 
 function useDataSourceNewSearchContext(context: CreateNewSearchContext) {

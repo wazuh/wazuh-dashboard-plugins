@@ -1,8 +1,11 @@
 import React from 'react';
-import { getDashboardPanels } from './dashboard-panels';
 import { AlertsDataSourceRepository } from '../../../common/data-source';
 import { GitHubDataSource } from '../../../common/data-source/pattern/alerts/github/github-data-source';
-import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY } from '../../../../../common/constants';
+import {
+  GITHUB_DASHBOARD_ID,
+  GITHUB_AGENT_DASHBOARD_ID,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+} from '../../../../../common/constants';
 import { createDashboard } from '../../../common/dashboards';
 
 export const DashboardGitHub = createDashboard({
@@ -10,11 +13,8 @@ export const DashboardGitHub = createDashboard({
   DataSourceRepositoryCreator: AlertsDataSourceRepository,
   getDashboardPanels: [
     {
-      getDashboardPanels: getDashboardPanels,
-      id: 'github-dashboard-tab',
-      title: 'GitHub dashboard',
-      description: 'Dashboard of the GitHub',
-      hidePanelTitles: false,
+      dashboardId: GITHUB_DASHBOARD_ID,
+      agentDashboardId: GITHUB_AGENT_DASHBOARD_ID,
     },
   ],
   sampleDataWarningCategories: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],

@@ -1,10 +1,13 @@
 import React from 'react';
-import { getDashboardPanels } from './dashboard-panels';
 import {
   AlertsDataSourceRepository,
   DockerDataSource,
 } from '../../../common/data-source';
-import { WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION } from '../../../../../common/constants';
+import {
+  DOCKER_DASHBOARD_ID,
+  DOCKER_AGENT_DASHBOARD_ID,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+} from '../../../../../common/constants';
 import { createDashboard } from '../../../common/dashboards';
 
 export const DashboardDocker = createDashboard({
@@ -12,11 +15,8 @@ export const DashboardDocker = createDashboard({
   DataSourceRepositoryCreator: AlertsDataSourceRepository,
   getDashboardPanels: [
     {
-      getDashboardPanels: getDashboardPanels,
-      id: 'docker-dashboard-tab',
-      title: 'Docker dashboard',
-      description: 'Dashboard of Docker',
-      hidePanelTitles: false,
+      dashboardId: DOCKER_DASHBOARD_ID,
+      agentDashboardId: DOCKER_AGENT_DASHBOARD_ID,
     },
   ],
   sampleDataWarningCategories: [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION],

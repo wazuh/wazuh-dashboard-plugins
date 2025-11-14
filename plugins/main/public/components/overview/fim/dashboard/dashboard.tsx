@@ -1,10 +1,14 @@
 import React from 'react';
-import { getDashboardPanels } from './dashboard-panels';
+
 import {
   AlertsDataSourceRepository,
   FIMDataSource,
 } from '../../../common/data-source';
-import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY } from '../../../../../common/constants';
+import {
+  FIM_DASHBOARD_ID,
+  FIM_AGENT_DASHBOARD_ID,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+} from '../../../../../common/constants';
 import { createDashboard } from '../../../common/dashboards/dashboard';
 
 export const DashboardFIM = createDashboard({
@@ -12,11 +16,8 @@ export const DashboardFIM = createDashboard({
   DataSourceRepositoryCreator: AlertsDataSourceRepository,
   getDashboardPanels: [
     {
-      getDashboardPanels: getDashboardPanels,
-      id: 'fim-dashboard-tab',
-      title: 'File Integrity Monitoring dashboard',
-      description: 'Dashboard of the File Integrity Monitoring',
-      hidePanelTitles: false,
+      dashboardId: FIM_DASHBOARD_ID,
+      agentDashboardId: FIM_AGENT_DASHBOARD_ID,
     },
   ],
   sampleDataWarningCategories: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],

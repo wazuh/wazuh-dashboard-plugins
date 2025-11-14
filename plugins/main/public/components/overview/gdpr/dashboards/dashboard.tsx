@@ -1,8 +1,11 @@
 import React from 'react';
-import { getDashboardPanels } from './dashboard-panels';
 import { GDPRDataSource } from '../../../common/data-source/pattern/alerts/gdpr/gdpr-data-source';
 import { AlertsDataSourceRepository } from '../../../common/data-source';
-import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY } from '../../../../../common/constants';
+import {
+  GDPR_DASHBOARD_ID,
+  GDPR_AGENT_DASHBOARD_ID,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+} from '../../../../../common/constants';
 import { createDashboard } from '../../../common/dashboards/dashboard';
 
 export const DashboardGDPR = createDashboard({
@@ -10,11 +13,8 @@ export const DashboardGDPR = createDashboard({
   DataSourceRepositoryCreator: AlertsDataSourceRepository,
   getDashboardPanels: [
     {
-      getDashboardPanels: getDashboardPanels,
-      id: 'gdpr-dashboard-tab',
-      title: 'GDPR dashboard',
-      description: 'Dashboard of the GDPR',
-      hidePanelTitles: false,
+      dashboardId: GDPR_DASHBOARD_ID,
+      agentDashboardId: GDPR_AGENT_DASHBOARD_ID,
     },
   ],
   sampleDataWarningCategories: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
