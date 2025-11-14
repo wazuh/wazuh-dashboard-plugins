@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v5.0.0 - OpenSearch Dashboards 3.2.0 - Revision 00
+## Wazuh v5.0.0 - OpenSearch Dashboards 3.3.0 - Revision 00
 
 ### Added
 
@@ -44,6 +44,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed `GET /elastic/alerts` and `/utils/configuration*` endpoints [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 - Removed task to sanitize the custom logos [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 - Removed task to migrate the reports directory [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
+
+## Wazuh v4.14.2 - OpenSearch Dashboards 2.19.3 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.14.2
 
 ## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 02
 
