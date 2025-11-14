@@ -235,9 +235,13 @@ export class SettingsValidator {
         return "Value can't be parsed. There is some error.";
       }
 
-      for (const item of items) {
-        return validateParsed ? validateParsed(item) : undefined;
-      }
+      const validationErrors = items
+        .map(item => (validateParsed ? validateParsed(item) : undefined))
+        .filter(error => typeof error === 'string');
+
+      return validationErrors.length > 0
+        ? validationErrors.join(' ')
+        : undefined;
     };
   }
 
