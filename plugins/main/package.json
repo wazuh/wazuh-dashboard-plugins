@@ -54,6 +54,7 @@
     "prebuild": "node scripts/generate-build-version.js",
     "generate:indexer-resources": "[ -f scripts/build-tools/update-indexer-resources ] && bash scripts/build-tools/update-indexer-resources || echo 'File does not exist. This could be related to the script file is not included in the building time. Skipping...'",
     "postinstall": "yarn run generate:indexer-resources",
+    "generate:known-fields": "node scripts/generate-known-fields/generate-known-fields.js",
     "knip": "knip --files"
   },
   "dependencies": {
