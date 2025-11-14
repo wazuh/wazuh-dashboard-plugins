@@ -3,10 +3,7 @@ import { IConfiguration, IConfigurationStore, ILogger } from './types';
 export class Configuration implements IConfiguration {
   store: IConfigurationStore | null = null;
 
-  constructor(
-    private readonly logger: ILogger,
-    store: IConfigurationStore,
-  ) {
+  constructor(private readonly logger: ILogger, store: IConfigurationStore) {
     this.setStore(store);
   }
 
