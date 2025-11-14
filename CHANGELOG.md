@@ -16,6 +16,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
+- Adapted alerts sample data to Wazuh Common Schema [#7839](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7839)
 - Set cluster mode as default for all Wazuh installations, including single-node deployments. Updated RBAC permissions to `cluster:*` actions [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688)
 - Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7578](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7578)
 - Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data [#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
@@ -37,7 +38,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed `Miscellaneous` from `App Settings`[#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
 - Removed `customization.logo.healthcheck`, `checks.api`, `checks.fields`, `checks.maxBuckets`, `checks.metaFields`, `checks.pattern`, `checks.setup`, `checks.template` and `checks.timeFilter` settings
 
-## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 00
+## Wazuh v4.14.2 - OpenSearch Dashboards 2.19.3 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.14.2
+
+## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 02
 
 ### Added
 
@@ -47,6 +54,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Upgraded the `axios` dependency to `1.12.2` [#7804](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7804)
 - Improved column order in IT Hygiene > Network > Traffic view to follow a logical source-to-destination flow [#7841](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7841)
+- Improved Integrity monitoring settings terminology by clarifying file/registry labels and updating component names for better user understanding [#7639](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7639)
 
 ### Fixed
 
@@ -55,6 +63,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed SCA check result capitalization inconsistency by standardizing 'passed' to 'Passed' and 'failed' to 'Failed' across dashboard components and constants [#7748](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7748)
 - Fixed sorting by agent count in top 5 groups visualization in endpoints summary [#7783](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7783)
 - Fixed System Inventory displaying incorrect agent data after switching agents in Endpoint Details [#7803](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7803)
+- Fixed Microsoft Graph API module icon from Azure logo to Microsoft Graph API logo for better specificity [#7838](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7838)
 
 ## Wazuh v4.14.0 - OpenSearch Dashboards 2.19.3 - Revision 03
 
@@ -73,10 +82,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Updated OS logos [#7712](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7712)
 - Changed "Services" tab label to "Listeners" in IT Hygiene > Networks [#7742](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7742)
-
-### Changed
-
-- Improved Integrity monitoring settings terminology by clarifying file/registry labels and updating component names for better user understanding [#7639](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7639)
 
 ### Fixed
 
@@ -1330,6 +1335,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Added toast with refresh button when new fields are loaded [#2974](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2974)
 - Migrated manager and cluster files endpoints and their corresponding RBAC [#2984](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2984)
+- Changed dashboards renderer by saved objects [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842)
 
 ### Fixed
 

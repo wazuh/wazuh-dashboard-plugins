@@ -132,9 +132,21 @@ export class SavedObject {
         };
       }
     } catch (error) {
-      return ((error || {}).data || {}).message || false
+      return error?.data?.message || false
         ? error.data.message
         : error.message || error;
+    }
+  }
+
+  // Fetch a dashboard saved object by id using SavedObjects client and filter by id client-side
+  static async getDashboardById(dashboardID) {
+    try {
+      // Request dashboards via SavedObjects client; include common fields to avoid a second fetch
+      return await getSavedObjects().client.get('dashboard', dashboardID);
+    } catch (error) {
+      throw error?.data?.message || false
+        ? new Error(error.data.message)
+        : error;
     }
   }
 
@@ -157,7 +169,7 @@ export class SavedObject {
     } catch (error) {
       if (error && error.response && error.response.status == 404) return false;
       return Promise.reject(
-        ((error || {}).data || {}).message || false
+        error?.data?.message || false
           ? new Error(error.data.message)
           : new Error(
               error.message || `Error getting the '${patternID}' index pattern`,
@@ -195,7 +207,7 @@ export class SavedObject {
 
       return result;
     } catch (error) {
-      throw ((error || {}).data || {}).message || false
+      throw error?.data?.message || false
         ? new Error(error.data.message)
         : error;
     }
@@ -225,7 +237,7 @@ export class SavedObject {
         },
       );
     } catch (error) {
-      throw ((error || {}).data || {}).message || false
+      throw error?.data?.message || false
         ? new Error(error.data.message)
         : error;
     }
@@ -280,7 +292,7 @@ export class SavedObject {
       );
       return;
     } catch (error) {
-      throw ((error || {}).data || {}).message || false
+      throw error?.data?.message || false
         ? error.data.message
         : error.message || error;
     }
