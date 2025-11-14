@@ -9,6 +9,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 4.14.2
 - Added persistence for page size and sorting in API tables [#7864](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7864)
 
+### Fixed
+
+- Removed sorting for Program name and Order columns in Related decoders table and Groups column in Related rules table to prevent API errors [#7864](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7864)
+
 ## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 02
 
 ### Added
