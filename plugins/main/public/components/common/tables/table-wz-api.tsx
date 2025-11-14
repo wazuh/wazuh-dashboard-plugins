@@ -139,61 +139,64 @@ export function TableWzAPI({
   const [isOpenFieldSelector, setIsOpenFieldSelector] = useState(false);
   const appConfig = useAppConfig();
   const maxRows = appConfig.data['reports.csv.maxRows'];
-  const onSearch = useCallback(
-    async function (endpoint, filters: Filters, pagination, sorting) {
-      try {
-        const { pageIndex, pageSize } = pagination;
+  const onSearch = useCallback(async function (
+    endpoint,
+    filters: Filters,
+    pagination,
+    sorting,
+  ) {
+    try {
+      const { pageIndex, pageSize } = pagination;
 
-        // Update persisted table state when page size or sorting changes
-        setTableStateRaw(prevState => ({
-          ...prevState,
-          pageSize,
-          sorting: sorting.sort?.field
-            ? sorting.sort
-            : { field: '', direction: 'asc' },
-        }));
+      // Update persisted table state when page size or sorting changes
+      setTableStateRaw(prevState => ({
+        ...prevState,
+        pageSize,
+        sorting: sorting.sort?.field
+          ? sorting.sort
+          : { field: '', direction: 'asc' },
+      }));
 
-        setIsLoading(true);
-        setFilters(filters);
-        onFiltersChange(filters);
-        const params = {
-          ...getFilters(filters),
-          offset: pageIndex * pageSize,
-          limit: pageSize,
-          sort: formatSorting(sorting.sort),
-        };
-        const response = await WzRequest.apiReq('GET', endpoint, { params });
+      setIsLoading(true);
+      setFilters(filters);
+      onFiltersChange(filters);
+      const params = {
+        ...getFilters(filters),
+        offset: pageIndex * pageSize,
+        limit: pageSize,
+        sort: formatSorting(sorting.sort),
+      };
+      const response = await WzRequest.apiReq('GET', endpoint, { params });
 
-        const { affected_items: items, total_affected_items: totalItems } = (
-          (response || {}).data || {}
-        ).data;
-        setIsLoading(false);
-        setTotalItems(totalItems);
+      const { affected_items: items, total_affected_items: totalItems } = (
+        (response || {}).data || {}
+      ).data;
+      setIsLoading(false);
+      setTotalItems(totalItems);
 
-        const result = {
-          items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items,
-          totalItems,
-        };
+      const result = {
+        items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items,
+        totalItems,
+      };
 
-        onDataChange(result);
+      onDataChange(result);
 
-        return result;
-      } catch (error) {
-        setIsLoading(false);
-        setTotalItems(0);
-        if (error?.name) {
-          /* This replaces the error name. The intention is that an AxiosError
+      return result;
+    } catch (error) {
+      setIsLoading(false);
+      setTotalItems(0);
+      if (error?.name) {
+        /* This replaces the error name. The intention is that an AxiosError
           doesn't appear in the toast message.
           TODO: This should be managed by the service that does the request instead of only changing
           the name in this case.
         */
-          error.name = 'RequestError';
-        }
-        throw error;
+        error.name = 'RequestError';
       }
-    },
-    [setTableStateRaw],
-  );
+      throw error;
+    }
+  },
+  []);
 
   const renderActionButtons = (actionButtons, filters) => {
     if (Array.isArray(actionButtons)) {
