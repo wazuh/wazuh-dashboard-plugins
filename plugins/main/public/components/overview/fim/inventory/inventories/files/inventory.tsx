@@ -13,8 +13,12 @@ import {
   FIM_FILES_AGENT_INVENTORY_ID,
 } from '../../../../../../../common/constants';
 import { withAgent } from '../../../../../common/hocs/with-agent';
+import { compose } from 'redux';
 
-const InventoryFIMFilesComponent: React.FC = () => {
+export const InventoryFIMFilesComponent = compose(
+  withAgent,
+  withFIMFilesDataSource,
+)(props => {
   return (
     <div style={{ margin: '0 12px' }}>
       <InventoryDashboardTable
@@ -33,8 +37,4 @@ const InventoryFIMFilesComponent: React.FC = () => {
       />
     </div>
   );
-};
-
-export const InventoryFIMFiles = withAgent(
-  withFIMFilesDataSource(InventoryFIMFilesComponent),
-);
+});

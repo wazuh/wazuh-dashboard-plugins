@@ -13,28 +13,30 @@ import {
   IT_HYGIENE_GROUPS_AGENT_INVENTORY_ID,
 } from '../../../../../../../common/constants';
 import { withAgent } from '../hocs';
+import { compose } from 'redux';
 
-export const ITHygieneUsersInventoryGroups = withAgent(
-  withSystemInventoryGroupsDataSource(() => {
-    return (
-      <div style={{ margin: '0 12px' }}>
-        <InventoryDashboardTable
-          DataSource={SystemInventoryStatesDataSource}
-          DataSourceRepositoryCreator={
-            SystemInventoryGroupsStatesDataSourceRepository
-          }
-          tableDefaultColumns={tableColumns}
-          managedFilters={managedFilters}
-          getDashboardPanels={[
-            {
-              dashboardId: IT_HYGIENE_GROUPS_INVENTORY_ID,
-              agentDashboardId: IT_HYGIENE_GROUPS_AGENT_INVENTORY_ID,
-            },
-          ]}
-          tableId='it-hygiene-inventory-groups'
-          categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
-        />
-      </div>
-    );
-  }),
-);
+export const ITHygieneUsersInventoryGroups = compose(
+  withAgent,
+  withSystemInventoryGroupsDataSource,
+)(() => {
+  return (
+    <div style={{ margin: '0 12px' }}>
+      <InventoryDashboardTable
+        DataSource={SystemInventoryStatesDataSource}
+        DataSourceRepositoryCreator={
+          SystemInventoryGroupsStatesDataSourceRepository
+        }
+        tableDefaultColumns={tableColumns}
+        managedFilters={managedFilters}
+        getDashboardPanels={[
+          {
+            dashboardId: IT_HYGIENE_GROUPS_INVENTORY_ID,
+            agentDashboardId: IT_HYGIENE_GROUPS_AGENT_INVENTORY_ID,
+          },
+        ]}
+        tableId='it-hygiene-inventory-groups'
+        categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
+      />
+    </div>
+  );
+});

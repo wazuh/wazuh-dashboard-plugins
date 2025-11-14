@@ -113,10 +113,7 @@ const InventoryDashboard = compose(
 
                   if (className) {
                     return (
-                      <div
-                        className={className}
-                        key={dashboardId || agentDashboardId}
-                      >
+                      <div key={dashboardId || agentDashboardId}>
                         {dashboard}
                       </div>
                     );

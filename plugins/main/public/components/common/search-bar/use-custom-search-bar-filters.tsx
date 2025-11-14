@@ -73,7 +73,8 @@ export const useWithManagedSearchBarFilters = (
       f =>
         !Object.values(definition.spec)
           .map(
-            ({ managedField }) => managedField && f.meta?.key === managedField,
+            ({ managedField }) =>
+              managedField && (f.meta?.key === managedField || f.meta?.controlledBy === managedField),
           )
           .filter(Boolean),
     ),

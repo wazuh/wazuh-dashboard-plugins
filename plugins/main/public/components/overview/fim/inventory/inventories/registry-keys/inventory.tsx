@@ -13,8 +13,12 @@ import {
   FIM_REGISTRY_KEYS_AGENT_INVENTORY_ID,
 } from '../../../../../../../common/constants';
 import { withAgent } from '../../../../../common/hocs/with-agent';
+import { compose } from 'redux';
 
-const InventoryFIMRegistryKeysComponent: React.FC = () => {
+export const InventoryFIMRegistryKeysComponent = compose(
+  withAgent,
+  withFIMRegistryKeysDataSource,
+)(props => {
   return (
     <div style={{ margin: '0 12px' }}>
       <InventoryDashboardTable
@@ -33,8 +37,4 @@ const InventoryFIMRegistryKeysComponent: React.FC = () => {
       />
     </div>
   );
-};
-
-export const InventoryFIMRegistryKeys = withAgent(
-  withFIMRegistryKeysDataSource(InventoryFIMRegistryKeysComponent),
-);
+});
