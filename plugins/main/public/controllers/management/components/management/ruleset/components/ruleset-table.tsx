@@ -106,6 +106,10 @@ const FilesTable = ({
     showReload={true}
     filters={filters}
     tablePageSizeOptions={[10, 25, 50, 100]}
+    saveStateStorage={{
+      system: 'localStorage',
+      key: 'wz-rules-files-table',
+    }}
   />
 );
 
@@ -139,6 +143,10 @@ const RulesFlyoutTable = withRouterSearch(
         showReload={true}
         filters={filters}
         tablePageSizeOptions={[10, 25, 50, 100]}
+        saveStateStorage={{
+          system: 'localStorage',
+          key: 'wz-rules-table',
+        }}
       />
       <Switch>
         <Route

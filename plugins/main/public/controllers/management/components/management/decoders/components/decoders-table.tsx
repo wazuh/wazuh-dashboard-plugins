@@ -95,6 +95,10 @@ const FilesTable = ({
     showReload={true}
     filters={filters}
     tablePageSizeOptions={[10, 25, 50, 100]}
+    saveStateStorage={{
+      system: 'localStorage',
+      key: 'wz-decoders-files-table',
+    }}
   />
 );
 
@@ -130,6 +134,10 @@ const DecodersFlyoutTable = ({
       showReload={true}
       filters={filters}
       tablePageSizeOptions={[10, 25, 50, 100]}
+      saveStateStorage={{
+        system: 'localStorage',
+        key: 'wz-decoders-table',
+      }}
     />
     {isFlyoutVisible && (
       <FlyoutDetail

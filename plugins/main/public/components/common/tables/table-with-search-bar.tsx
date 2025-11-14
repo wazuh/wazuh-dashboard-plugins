@@ -61,6 +61,10 @@ export interface ITableWithSearcHBarProps<T> {
    */
   tableInitialSortingField?: string;
   /**
+   * Table initial page size
+   */
+  tableInitialPageSize?: number;
+  /**
    * Table properties
    */
   tableProps?: Omit<
@@ -103,6 +107,7 @@ export function TableWithSearchBar<T>({
   tablePageSizeOptions = [15, 25, 50, 100],
   tableInitialSortingDirection = 'asc',
   tableInitialSortingField = '',
+  tableInitialPageSize,
   tableProps = {},
   reload,
   endpoint,
@@ -117,7 +122,7 @@ export function TableWithSearchBar<T>({
   const [filtersTimeMark, setFiltersTimeMark] = useState<number>(Date.now());
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: tablePageSizeOptions[0],
+    pageSize: tableInitialPageSize ?? tablePageSizeOptions[0],
   });
   const [sorting, setSorting] = useState({
     sort: {

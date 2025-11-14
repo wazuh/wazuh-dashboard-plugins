@@ -23,6 +23,7 @@ export function TableDefault({
   hidePerPageOptions = false,
   tableInitialSortingDirection = 'asc',
   tableInitialSortingField = '',
+  tableInitialPageSize,
   tableProps = {},
   reload,
   rowProps,
@@ -33,7 +34,7 @@ export function TableDefault({
   const [totalItems, setTotalItems] = useState(0);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: tablePageSizeOptions[0],
+    pageSize: tableInitialPageSize ?? tablePageSizeOptions[0],
   });
 
   const [sorting, setSorting] = useState({
@@ -75,7 +76,12 @@ export function TableDefault({
     (async function () {
       try {
         setLoading(true);
-        const { items, totalItems } = await onSearch(endpoint, [], pagination, sorting);
+        const { items, totalItems } = await onSearch(
+          endpoint,
+          [],
+          pagination,
+          sorting,
+        );
         setItems(items);
         setTotalItems(totalItems);
       } catch (error) {
@@ -108,11 +114,11 @@ export function TableDefault({
     ...pagination,
     totalItemCount: totalItems,
     pageSizeOptions: tablePageSizeOptions,
-    hidePerPageOptions
+    hidePerPageOptions,
   };
   return (
     <EuiBasicTable
-      columns={tableColumns.map(({show, ...rest}) => ({...rest}))}
+      columns={tableColumns.map(({ show, ...rest }) => ({ ...rest }))}
       items={items}
       loading={loading}
       pagination={tablePagination}
