@@ -69,17 +69,18 @@ export const useWithManagedSearchBarFilters = (
   setFilters: (filters: any) => void,
 ): UseCustomSearchBarFilters => {
   return {
-    searchBarFilters: filters.filter(
-      f =>
-        !Object.values(definition.spec)
-          .map(
-            ({ managedField }) =>
-              managedField &&
-              (f.meta?.key === managedField ||
-                f.meta?.controlledBy === managedField),
-          )
-          .filter(Boolean),
-    ),
+    searchBarFilters: filters.filter(f => {
+      const isManaged = Object.values(definition.spec)
+        .map(
+          ({ managedField }) =>
+            managedField &&
+            (f.meta?.key === managedField ||
+              f.meta?.controlledBy === managedField),
+        )
+        .filter(Boolean);
+      console.log('isManaged', isManaged);
+      return isManaged.length === 0;
+    }),
     postFixedFilters: orderBy(
       Object.values(definition.spec),
       ['order'],

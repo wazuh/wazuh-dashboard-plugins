@@ -1086,6 +1086,11 @@ export const IT_HYGIENE_PROTOCOLS_INVENTORY_ID =
 export const IT_HYGIENE_PROTOCOLS_AGENT_INVENTORY_ID =
   'it-hygiene-networks-inventories-protocols-dashboard-tab';
 
+export const IT_HYGIENE_LISTENERS_INVENTORY_ID =
+  'it-hygiene-networks-inventories-services-dashboard-tab';
+export const IT_HYGIENE_LISTENERS_AGENT_INVENTORY_ID =
+  'it-hygiene-networks-inventories-services-dashboard-tab';
+
 export const IT_HYGIENE_SERVICES_INVENTORY_ID =
   'it-hygiene-services-dashboard-tab';
 export const IT_HYGIENE_SERVICES_AGENT_INVENTORY_ID =

@@ -9,8 +9,8 @@ import { withSystemInventoryTrafficDataSource } from '../../../common/hocs/valid
 import { InventoryDashboardTable } from '../../../../../common/dashboards';
 import {
   WAZUH_SAMPLE_INVENTORY_AGENT,
-  IT_HYGIENE_SERVICES_INVENTORY_ID,
-  IT_HYGIENE_SERVICES_AGENT_INVENTORY_ID,
+  IT_HYGIENE_LISTENERS_INVENTORY_ID,
+  IT_HYGIENE_LISTENERS_AGENT_INVENTORY_ID,
 } from '../../../../../../../common/constants';
 
 export const ITHygieneNetworksInventoryServices =
@@ -25,8 +25,8 @@ export const ITHygieneNetworksInventoryServices =
         managedFilters={managedFilters}
         getDashboardPanels={[
           {
-            dashboardId: IT_HYGIENE_SERVICES_INVENTORY_ID,
-            agentDashboardId: IT_HYGIENE_SERVICES_AGENT_INVENTORY_ID,
+            dashboardId: IT_HYGIENE_LISTENERS_INVENTORY_ID,
+            agentDashboardId: IT_HYGIENE_LISTENERS_AGENT_INVENTORY_ID,
           },
         ]}
         tableId='it-hygiene-inventory-services'
