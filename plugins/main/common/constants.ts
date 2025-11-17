@@ -1008,7 +1008,7 @@ export const INDEX_PATTERN_ALERTS_REQUIRED_FIELDS = [
 
 export const THREAT_HUNTING_DASHBOARD_ID = 'threat-hunting-overview-dashboard';
 export const THREAT_HUNTING_AGENT_DASHBOARD_ID =
-  'threat-hunting-agent-dashboard';
+  'threat-hunting-pinned-agent-dashboard';
 
 export const AMAZON_WEB_SERVICES_DASHBOARD_ID = 'aws-overview-dashboard-tab';
 export const AMAZON_WEB_SERVICES_AGENT_DASHBOARD_ID =
