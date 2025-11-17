@@ -49,16 +49,15 @@ describe('ManageHosts Service', () => {
 
   describe('getEntries - Regression Tests', () => {
     it('should handle missing cluster_info gracefully when host ID is not in registry cache', async () => {
-      const mockHosts = [
-        {
-          id: 'new-host-id',
+      const mockHosts = {
+        'new-host-id': {
           url: 'https://localhost',
           port: 55000,
           username: 'wazuh-wui',
           password: 'wazuh-wui',
           run_as: false,
         },
-      ];
+      };
 
       mockConfiguration.get.mockResolvedValue(mockHosts);
 
@@ -90,16 +89,15 @@ describe('ManageHosts Service', () => {
     });
 
     it('should return existing cluster_info when host ID exists in registry cache', async () => {
-      const mockHosts = [
-        {
-          id: 'existing-host',
+      const mockHosts = {
+        'existing-host': {
           url: 'https://localhost',
           port: 55000,
           username: 'wazuh-wui',
           password: 'wazuh-wui',
           run_as: false,
         },
-      ];
+      };
 
       const mockRegistryData = {
         manager: 'test-manager',
@@ -132,16 +130,17 @@ describe('ManageHosts Service', () => {
 
       (manageHosts as any).cacheRegistry.set('default', mockRegistryData);
 
-      const changedHost = {
-        id: 'default2',
-        url: 'https://localhost',
-        port: 55000,
-        username: 'wazuh-wui',
-        password: 'wazuh-wui',
-        run_as: false,
+      const mockHosts = {
+        default2: {
+          url: 'https://localhost',
+          port: 55000,
+          username: 'wazuh-wui',
+          password: 'wazuh-wui',
+          run_as: false,
+        },
       };
 
-      mockConfiguration.get.mockResolvedValue([changedHost]);
+      mockConfiguration.get.mockResolvedValue(mockHosts);
 
       manageHosts.setServerAPIClient(mockServerAPIClient as any);
       mockServerAPIClient.asInternalUser.request
