@@ -119,7 +119,7 @@ export function TableWzAPI({
     },
     rest?.saveStateStorage?.system,
     rest?.saveStateStorage?.key
-      ? `${rest?.saveStateStorage?.key}-table-state`
+      ? `${rest?.saveStateStorage?.key}-state`
       : undefined,
   );
 
