@@ -5,7 +5,6 @@ import { HttpServer } from '../../../../src/core/server/http/http_server';
 import { loggingSystemMock } from '../../../../src/core/server/logging/logging_system.mock';
 import { ByteSizeValue } from '@osd/config-schema';
 import supertest from 'supertest';
-import { WazuhUtilsRoutes } from './wazuh-utils';
 import { WazuhReportingRoutes } from './wazuh-reporting';
 import md5 from 'md5';
 import path from 'path';
@@ -128,7 +127,6 @@ beforeAll(async () => {
   }));
 
   // Register routes
-  WazuhUtilsRoutes(router, { configuration: context.wazuh_core.configuration });
   WazuhReportingRoutes(router);
 
   // Register router
