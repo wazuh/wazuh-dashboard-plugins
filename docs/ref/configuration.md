@@ -20,7 +20,7 @@ The following settings can be defined in the configuration file `opensearch_dash
 
 The Wazuh server hosts are defined in the configuration file through the `wazuh_core.hosts` setting.
 
-> Note It is required to specify at least one host.
+> NOTE: It is required to specify at least one host.
 
 A host has the following properties:
 
