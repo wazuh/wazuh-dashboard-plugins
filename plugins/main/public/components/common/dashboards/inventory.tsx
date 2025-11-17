@@ -112,7 +112,7 @@ const InventoryDashboard = compose(
                           fetchFilters,
                           fingerprint,
                           autoRefreshFingerprint,
-                        }
+                        },
                       }}
                     />
                   );

@@ -78,7 +78,6 @@ export const useWithManagedSearchBarFilters = (
               f.meta?.controlledBy === managedField),
         )
         .filter(Boolean);
-      console.log('isManaged', isManaged);
       return isManaged.length === 0;
     }),
     postFixedFilters: orderBy(
