@@ -148,13 +148,13 @@ PMID=$(echo $CSR | jq -r '.protocolMappers[] | select(.name=="role list").id')
 curl -sS -L -X PUT "${B}/admin/realms/${REALM}/client-scopes/$CSID/protocol-mappers/models/$PMID" "${H[@]}" -d "$UPDATE"
 
 # Set up auth realm on opensearch
-certs="/usr/share/opensearch/config/certs"
-ca="$certs/ca.pem"
+certs="/usr/share/wazuh-indexer/config/certs"
+ca="$certs/root-ca.pem"
 cert="$certs/admin.pem"
 key="$certs/admin-key.pem"
 
-securityadmin="bash /usr/share/opensearch/plugins/opensearch-security/tools/securityadmin.sh"
-config_path="/usr/share/opensearch/config/opensearch-security"
+securityadmin="bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh"
+config_path="/usr/share/wazuh-indexer/config/opensearch-security"
 
 echo "To update configuration in indexer, you can run:"
-echo docker exec -e JAVA_HOME=/usr/share/opensearch/jdk $indexer $securityadmin -cacert $ca -cert $cert -key $key -cd $config_path
+echo docker exec -e JAVA_HOME=/usr/share/wazuh-indexer/jdk $indexer $securityadmin -cacert $ca -cert $cert -key $key -cd $config_path

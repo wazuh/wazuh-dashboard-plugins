@@ -74,7 +74,7 @@ services:
         cd $$certs
 
         echo "Generating CA"
-        cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
+        cfssl gencert -initca /conf/ca.json | cfssljson -bare root-ca
 
         echo "Generating servers certificates"
         for i in os1 osd imposter; do
@@ -82,8 +82,8 @@ services:
           cat /conf/host.json | \
           sed "s/HOST/$$i/g" | \
           cfssl gencert \
-            -ca $$certs/ca.pem \
-            -ca-key $$certs/ca-key.pem \
+            -ca $$certs/root-ca.pem \
+            -ca-key $$certs/root-ca-key.pem \
             -config /conf/cfssl.json \
             -profile=server - | \
           cfssljson -bare $$i
@@ -96,8 +96,8 @@ services:
           cat /conf/host.json | \
           sed "s/HOST/$$i/g" | \
           cfssl gencert \
-            -ca $$certs/ca.pem \
-            -ca-key $$certs/ca-key.pem \
+            -ca $$certs/root-ca.pem \
+            -ca-key $$certs/root-ca-key.pem \
             -config /conf/cfssl.json \
             -profile=client - | \
           cfssljson -bare $$i
@@ -141,7 +141,7 @@ services:
       idpsetup:
         condition: service_completed_successfully
         required: false
-    image: opensearchproject/opensearch:${OS_VERSION}
+    image: quay.io/wazuh/wazuh-indexer:5.0.0-0 # TODO: Replace hardcoded version
 
     # <<: *logging
     profiles:
@@ -160,7 +160,6 @@ services:
       - cluster.initial_master_nodes=os1
       - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
       - 'OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m' # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
-      - OPENSEARCH_PATH_CONF=/usr/share/opensearch/config/
     ulimits:
       memlock:
         soft: -1
@@ -169,8 +168,8 @@ services:
         soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
         hard: 65536
     volumes:
-      - wi_certs:/usr/share/opensearch/config/certs/
-      - ./config/${OSD_MAJOR}/os/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
+      - wi_certs:/usr/share/wazuh-indexer/config/certs/
+      - ./config/${OSD_MAJOR}/os/opensearch.yml:/usr/share/wazuh-indexer/config/opensearch.yml
       - ./config/${OSD_MAJOR}/os/internal_users.yml:${SEC_CONFIG_PATH}/internal_users.yml
       - ${SEC_CONFIG_FILE}:${SEC_CONFIG_PATH}/config.yml
       - ./config/${OSD_MAJOR}/os/roles_mapping.yml:${SEC_CONFIG_PATH}/roles_mapping.yml
@@ -188,7 +187,7 @@ services:
       test:
         [
           'CMD-SHELL',
-          "curl -v --cacert config/certs/ca.pem https://os1:9200 2>&1 | grep -q '401'",
+          "curl -v --cacert config/certs/root-ca.pem https://os1:9200 2>&1 | grep -q '401'",
         ]
       interval: 1s
       timeout: 5s
@@ -313,7 +312,7 @@ services:
     command: >
       -c '
         # trust store
-        for i in /certs/idp/ca.pem /certs/wd/osd.pem /certs/wi/os1.pem
+        for i in /certs/idp/root-ca.pem /certs/wd/osd.pem /certs/wi/os1.pem
         do
           keytool -import -alias $$(basename $$i .pem) -file $$i -keystore /certs/idp/truststore.jks -storepass SecretPassword -trustcacerts -noprompt
         done
@@ -394,7 +393,7 @@ services:
       - INDEXER_USERNAME=admin
       - INDEXER_PASSWORD=admin
       - FILEBEAT_SSL_VERIFICATION_MODE=full
-      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/wazuh/ca.pem
+      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/wazuh/root-ca.pem
       - SSL_CERTIFICATE=/etc/ssl/wazuh/filebeat.pem
       - SSL_KEY=/etc/ssl/wazuh/filebeat.key
       - API_USERNAME=wazuh-wui
