@@ -131,7 +131,7 @@ export default withRouterSearch(
           field: 'groups',
           name: 'Groups',
           align: 'left',
-          sortable: true,
+          sortable: false,
           width: '10%',
         },
         {

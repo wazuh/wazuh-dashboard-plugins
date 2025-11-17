@@ -76,13 +76,13 @@ export default class WzDecoderInfo extends Component {
         field: 'details.program_name',
         name: 'Program name',
         align: 'left',
-        sortable: true,
+        sortable: false,
       },
       {
         field: 'details.order',
         name: 'Order',
         align: 'left',
-        sortable: true,
+        sortable: false,
       },
       {
         field: 'filename',

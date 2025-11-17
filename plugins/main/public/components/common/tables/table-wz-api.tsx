@@ -88,7 +88,6 @@ export function TableWzAPI({
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState<Filters>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [sort, setSort] = useState({});
   const onFiltersChange = (filters: Filters) =>
     typeof rest.onFiltersChange === 'function'
       ? rest.onFiltersChange(filters)
@@ -102,15 +101,41 @@ export function TableWzAPI({
    */
   const [reloadFootprint, setReloadFootprint] = useState(rest.reload || 0);
 
-  const [selectedFields, setSelectedFields] = useStateStorage(
-    rest.tableColumns.some(({ show }) => show)
-      ? rest.tableColumns.filter(({ show }) => show).map(({ field }) => field)
-      : rest.tableColumns.map(({ field }) => field),
+  // Persist page size, sorting, and selected fields together
+  const defaultPageSize = rest.tablePageSizeOptions?.[0] || 15;
+  const defaultSorting = {
+    field: rest.tableInitialSortingField || '',
+    direction: rest.tableInitialSortingDirection || 'asc',
+  };
+  const defaultSelectedFields = rest.tableColumns.some(({ show }) => show)
+    ? rest.tableColumns.filter(({ show }) => show).map(({ field }) => field)
+    : rest.tableColumns.map(({ field }) => field);
+
+  const [tableStateRaw, setTableStateRaw] = useStateStorage(
+    {
+      pageSize: defaultPageSize,
+      sorting: defaultSorting,
+      selectedFields: defaultSelectedFields,
+    },
     rest?.saveStateStorage?.system,
     rest?.saveStateStorage?.key
-      ? `${rest?.saveStateStorage?.key}-visible-fields`
+      ? `${rest?.saveStateStorage?.key}-state`
       : undefined,
   );
+
+  // Ensure tableState has the correct structure with defaults
+  const tableState = {
+    pageSize: tableStateRaw?.pageSize ?? defaultPageSize,
+    sorting: tableStateRaw?.sorting?.field
+      ? {
+          field: tableStateRaw.sorting.field,
+          direction:
+            tableStateRaw.sorting.direction ?? defaultSorting.direction,
+        }
+      : defaultSorting,
+    selectedFields: tableStateRaw?.selectedFields ?? defaultSelectedFields,
+  };
+
   const [isOpenFieldSelector, setIsOpenFieldSelector] = useState(false);
   const appConfig = useAppConfig();
   const maxRows = appConfig.data['reports.csv.maxRows'];
@@ -122,7 +147,16 @@ export function TableWzAPI({
   ) {
     try {
       const { pageIndex, pageSize } = pagination;
-      setSort(sorting.sort);
+
+      // Update persisted table state when page size or sorting changes
+      setTableStateRaw(prevState => ({
+        ...prevState,
+        pageSize,
+        sorting: sorting.sort?.field
+          ? sorting.sort
+          : { field: '', direction: 'asc' },
+      }));
+
       setIsLoading(true);
       setFilters(filters);
       onFiltersChange(filters);
@@ -246,7 +280,7 @@ export function TableWzAPI({
                   totalItems={totalItems}
                   filters={getFilters({
                     ...filters,
-                    sort: formatSorting(sort),
+                    sort: formatSorting(tableState.sorting),
                   })}
                   title={
                     typeof rest.downloadCsv === 'string'
@@ -280,17 +314,21 @@ export function TableWzAPI({
               options={rest.tableColumns.map(item => ({
                 id: item.field,
                 label: item.name,
-                checked: selectedFields.includes(item.field),
+                checked: tableState.selectedFields.includes(item.field),
               }))}
               onChange={optionID => {
-                setSelectedFields(state => {
-                  if (state.includes(optionID)) {
-                    if (state.length > 1) {
-                      return state.filter(field => field !== optionID);
-                    }
-                    return state;
-                  }
-                  return [...state, optionID];
+                setTableStateRaw(prevState => {
+                  const currentFields =
+                    prevState?.selectedFields ?? tableState.selectedFields;
+                  const newFields = currentFields.includes(optionID)
+                    ? currentFields.length > 1
+                      ? currentFields.filter(field => field !== optionID)
+                      : currentFields
+                    : [...currentFields, optionID];
+                  return {
+                    ...prevState,
+                    selectedFields: newFields,
+                  };
                 });
               }}
               className='columnsSelectedCheckboxs'
@@ -303,7 +341,7 @@ export function TableWzAPI({
   );
 
   const tableColumns = rest.tableColumns.filter(({ field }) =>
-    selectedFields.includes(field),
+    tableState.selectedFields.includes(field),
   );
 
   const table = rest.searchTable ? (
@@ -311,12 +349,18 @@ export function TableWzAPI({
       onSearch={onSearch}
       {...{ ...rest, reload: reloadFootprint }}
       tableColumns={tableColumns}
-      selectedFields={selectedFields}
+      selectedFields={tableState.selectedFields}
+      tableInitialPageSize={tableState.pageSize}
+      tableInitialSortingField={tableState.sorting.field}
+      tableInitialSortingDirection={tableState.sorting.direction}
     />
   ) : (
     <TableDefault
       onSearch={onSearch}
       {...{ ...rest, reload: reloadFootprint }}
+      tableInitialPageSize={tableState.pageSize}
+      tableInitialSortingField={tableState.sorting.field}
+      tableInitialSortingDirection={tableState.sorting.direction}
     />
   );
 
