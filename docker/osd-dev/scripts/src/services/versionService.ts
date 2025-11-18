@@ -7,7 +7,7 @@ export function getPlatformVersionFromPackageJson(
   envPaths: EnvironmentPaths,
 ): string {
   const pkg = readJsonFile<any>(envPaths.packageJsonPath);
-  const version = pkg?.pluginPlatform?.version;
+  const version = pkg?.version;
   if (!version) {
     throw new VersionResolutionError(
       `Could not retrieve the platform version from package.json.`,
