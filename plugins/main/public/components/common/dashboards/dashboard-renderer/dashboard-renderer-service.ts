@@ -25,10 +25,10 @@ export function transformPanelsJSON(
 ): Record<string, PanelInputSpec> {
   const panelsArr = JSON.parse(panelsJSON) as Array<any>;
   return Object.fromEntries(
-    panelsArr.map(({ gridData, panelIndex, panelRefName, type }) => [
+    panelsArr.map(({ gridData, panelIndex, panelRefName, type, ...rest }) => [
       panelIndex,
       {
-        ...panelsArr[panelIndex],
+        ...rest,
         gridData,
         type: type ?? 'visualization',
         explicitInput: {
