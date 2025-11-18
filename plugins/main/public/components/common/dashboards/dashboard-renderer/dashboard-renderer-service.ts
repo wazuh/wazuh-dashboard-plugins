@@ -7,16 +7,28 @@ import {
   DashboardServiceResult,
 } from './types';
 
-// Adapter helpers: transform Saved Object -> DashboardContainerByValueRenderer input
+type DashboardRendererSearchBarProps = {
+  query?: string;
+  dateRangeFrom: string;
+  dateRangeTo: string;
+};
+
+type DashboardRendererDataSource = {
+  fetchFilters?: any[];
+  searchBarProps?: DashboardRendererSearchBarProps;
+  fingerprint?: number;
+};
+
 export function transformPanelsJSON(
   panelsJSON: string,
   refs: SavedDashboardSO['references'],
 ): Record<string, PanelInputSpec> {
   const panelsArr = JSON.parse(panelsJSON) as Array<any>;
   return Object.fromEntries(
-    panelsArr.map(({ gridData, panelIndex, panelRefName, type }) => [
+    panelsArr.map(({ gridData, panelIndex, panelRefName, type, ...rest }) => [
       panelIndex,
       {
+        ...rest,
         gridData,
         type: type ?? 'visualization',
         explicitInput: {
@@ -60,7 +72,7 @@ export function toByValueInput(
 }
 
 export function getFiltersParams(config?: {
-  dataSource?: any;
+  dataSource?: DashboardRendererDataSource;
   refreshConfig?: any;
 }) {
   return {

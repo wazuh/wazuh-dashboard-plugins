@@ -65,18 +65,6 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
     buildByValueInputHandler();
   }, [hasPinnedAgent, dashboardId, agentDashboardId]);
 
-  if (status === 'validating') {
-    return (
-      <div>
-        <EuiEmptyPrompt
-          icon={<EuiLoadingSpinner size='xl' />}
-          title={<h3>Loading dashboard…</h3>}
-          body={<p>Please wait a few seconds.</p>}
-        />
-      </div>
-    );
-  }
-
   if (status === 'error') {
     return (
       <DashboardRendererErrorPrompt

@@ -102,19 +102,22 @@ function generateWazuhField(options = {}) {
     schema: {
       version: schemaVersion,
     },
+    integration: {},
   };
 
   // Ensure decoders is an array
   if (decoders && decoders.length > 0) {
-    wazuh.decoders = Array.isArray(decoders) ? decoders : [decoders];
+    wazuh.integration.decoders = Array.isArray(decoders)
+      ? decoders
+      : [decoders];
   } else {
     // Default to 1-3 random decoders
     const numDecoders = Random.number(1, 3);
-    wazuh.decoders = [];
+    wazuh.integration.decoders = [];
     for (let i = 0; i < numDecoders; i++) {
       const decoder = Random.arrayItem(WAZUH_DECODERS);
-      if (!wazuh.decoders.includes(decoder)) {
-        wazuh.decoders.push(decoder);
+      if (!wazuh.integration.decoders.includes(decoder)) {
+        wazuh.integration.decoders.push(decoder);
       }
     }
   }
