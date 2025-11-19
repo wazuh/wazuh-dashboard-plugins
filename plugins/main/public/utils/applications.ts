@@ -558,25 +558,6 @@ export const endpointGroups = {
   redirectTo: () => '/manager/?tab=groups',
 };
 
-export const decoders = {
-  category: 'wz-category-server-management',
-  id: 'decoders',
-  title: i18n.translate('wz-app-decoders-title', {
-    defaultMessage: 'Decoders',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-decoders-breadcrumbLabel', {
-    defaultMessage: 'Decoders',
-  }),
-  description: i18n.translate('wz-app-decoders-description', {
-    defaultMessage: 'Manage your cluster decoders.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 701,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/manager/?tab=decoders',
-};
-
 export const cdbLists = {
   category: 'wz-category-server-management',
   id: 'cdb-lists',
@@ -867,7 +848,6 @@ export const Applications = [
   office365,
   docker,
   endpointSummary,
-  decoders,
   cdbLists,
   endpointGroups,
   serverStatus,

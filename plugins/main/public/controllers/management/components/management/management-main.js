@@ -11,17 +11,13 @@
  */
 import React from 'react';
 import WzCDBLists from './cdblists/main-cdblists';
-import WzDecoders from './decoders/main-decoders';
 import WzGroups from './groups/groups-main';
 import WzStatus from './status/status-main';
 import WzLogs from './mg-logs/logs';
 import WzReporting from './reporting/reporting-main';
 import WzConfiguration from './configuration/configuration-main';
 import WzStatistics from './statistics/statistics-main';
-import {
-  SECTION_CDBLIST_SECTION,
-  SECTION_DECODERS_SECTION,
-} from './common/constants';
+import { SECTION_CDBLIST_SECTION } from './common/constants';
 import { ClusterOverview } from './cluster/cluster-overview';
 import { Switch, Route } from '../../../../components/router-search';
 
@@ -51,9 +47,6 @@ const WzManagementMain = props => (
           id: '000',
         }}
       />
-    </Route>
-    <Route path={`?tab=${SECTION_DECODERS_SECTION}`}>
-      <WzDecoders />
     </Route>
     <Route path={`?tab=${SECTION_CDBLIST_SECTION}`}>
       <WzCDBLists />
