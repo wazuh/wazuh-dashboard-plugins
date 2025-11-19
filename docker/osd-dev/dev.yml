@@ -141,7 +141,7 @@ services:
       idpsetup:
         condition: service_completed_successfully
         required: false
-    image: quay.io/wazuh/wazuh-indexer:${OS_VERSION}-0
+    image: quay.io/wazuh/wazuh-indexer:${OS_VERSION}
 
     # <<: *logging
     profiles:
