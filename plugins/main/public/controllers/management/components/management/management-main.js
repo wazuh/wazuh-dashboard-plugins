@@ -10,14 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 import React from 'react';
-import WzCDBLists from './cdblists/main-cdblists';
 import WzGroups from './groups/groups-main';
 import WzStatus from './status/status-main';
 import WzLogs from './mg-logs/logs';
 import WzReporting from './reporting/reporting-main';
 import WzConfiguration from './configuration/configuration-main';
 import WzStatistics from './statistics/statistics-main';
-import { SECTION_CDBLIST_SECTION } from './common/constants';
 import { ClusterOverview } from './cluster/cluster-overview';
 import { Switch, Route } from '../../../../components/router-search';
 
@@ -47,9 +45,6 @@ const WzManagementMain = props => (
           id: '000',
         }}
       />
-    </Route>
-    <Route path={`?tab=${SECTION_CDBLIST_SECTION}`}>
-      <WzCDBLists />
     </Route>
   </Switch>
 );

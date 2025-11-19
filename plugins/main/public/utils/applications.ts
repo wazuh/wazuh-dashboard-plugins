@@ -558,25 +558,6 @@ export const endpointGroups = {
   redirectTo: () => '/manager/?tab=groups',
 };
 
-export const cdbLists = {
-  category: 'wz-category-server-management',
-  id: 'cdb-lists',
-  title: i18n.translate('wz-app-lists-title', {
-    defaultMessage: 'CDB Lists',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-cdb-lists-breadcrumbLabel', {
-    defaultMessage: 'CDB Lists',
-  }),
-  description: i18n.translate('wz-app-cdb-lists-description', {
-    defaultMessage: 'Manage your cluster CDB list.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 702,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/manager/?tab=lists',
-};
-
 export const serverStatus = {
   category: 'wz-category-server-management',
   id: 'server-status',
@@ -848,7 +829,6 @@ export const Applications = [
   office365,
   docker,
   endpointSummary,
-  cdbLists,
   endpointGroups,
   serverStatus,
   cluster,
