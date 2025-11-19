@@ -60,7 +60,7 @@ export const MainModuleOverview = connect(mapStateToProps)(
             className={
               this.props.tabs &&
               this.props.tabs.length &&
-              'wz-module-header-nav'
+              'wz-module-header-nav hide-for-sharing'
             }
           >
             {this.props.tabs && this.props.tabs.length && (
