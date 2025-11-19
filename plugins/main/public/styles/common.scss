@@ -1228,39 +1228,6 @@ wz-xml-file-editor {
   color: #000 !important;
 }
 
-.logtest-side {
-  height: calc(100vh - 95px);
-  margin-top: -50px;
-  z-index: 10;
-  position: fixed;
-  right: 0;
-  width: calc(30% - 16px);
-}
-
-.logtest .euiFlyoutFooter,
-.logtest-side .euiFlyoutFooter {
-  margin: 0 -16px;
-  background: transparent;
-}
-
-.logtest-side .euiFlyoutFooter {
-  margin: 0 -16px;
-}
-
-.logtest .euiFlyoutFooter {
-  margin: 0 -16px -16px -16px;
-}
-
-.logtest .euiCodeBlock {
-  border: 1px solid #e1e2e3;
-}
-
-.logtest .euiTextArea,
-.logtest-side .euiTextArea {
-  max-height: 500px;
-  resize: none;
-}
-
 md-chips.md-default-theme .md-chips,
 md-chips .md-chips {
   box-shadow: none;

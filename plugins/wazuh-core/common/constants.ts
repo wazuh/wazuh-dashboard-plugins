@@ -114,7 +114,6 @@ export enum WAZUH_MODULES_ID {
 
 export enum WAZUH_MENU_TOOLS_SECTIONS_ID {
   API_CONSOLE = 'devTools',
-  RULESET_TEST = 'logtest',
 }
 
 export enum WAZUH_MENU_SECURITY_SECTIONS_ID {
