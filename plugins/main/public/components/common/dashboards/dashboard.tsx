@@ -14,15 +14,18 @@ import DashboardRenderer from './dashboard-renderer/dashboard-renderer';
 import classnames from 'classnames';
 
 export const Dashboard = props => {
-
-  const hasPinnedAgent = Boolean(props.dataSource.dataSource?.getPinnedAgentFilter()?.length)
+  const hasPinnedAgent = Boolean(
+    props.dataSource.dataSource?.getPinnedAgentFilter()?.length,
+  );
 
   // This is not used by the SCA dashboard.
   useReportingCommunicateSearchContext({
     isSearching: props.dataSource.dataSource.isLoading,
     totalResults: props.dataSourceAction?.data?.hits?.total ?? 0,
     indexPattern: props.dataSource.dataSource?.indexPattern,
-    dashboardSavedObjectId: hasPinnedAgent ? props.getDashboardPanels[0].agentDashboardId : props.getDashboardPanels[0].dashboardId,
+    dashboardSavedObjectId: hasPinnedAgent
+      ? props.getDashboardPanels[0].agentDashboardId
+      : props.getDashboardPanels[0].dashboardId,
     filters: props.dataSource.fetchFilters,
     query: props.dataSource.query,
     time: {
@@ -73,7 +76,7 @@ export const Dashboard = props => {
           </div>
         )}
 
-        <div className='wz-dashboard-responsive' id="dashboardViewport">
+        <div className='wz-dashboard-responsive' id='dashboardViewport'>
           {props.getDashboardPanels.map(
             ({ dashboardId, agentDashboardId, className = '' }) => {
               const dashboard = (

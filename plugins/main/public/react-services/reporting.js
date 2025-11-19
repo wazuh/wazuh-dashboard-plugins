@@ -30,14 +30,15 @@ export class ReportingService {
 
   /**
    * This methods get the current url from browser and get the query params and use to create a reporting url
-   * 
-   * @param {*} context 
+   *
+   * @param {*} context
    */
-  async generateReportURL(context){
+  async generateReportURL(context) {
     // URL example: "/app/dashboards#/view/it-hygiene-overview-dashboard-tab?_a=(filters:!(),query:(language:kuery,query:''))&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:'2025-08-20T19:38:00.878Z',to:'2025-11-18T19:38:00.878Z'))"
-    const urlParams = window.location.href.split('?')?.[1]??'';
+    const urlParams = window.location.href.split('?')?.[1] ?? '';
     const queryParams = new NavigationURLSearchParams(urlParams);
-    const filtersOnURLFormat = PatternDataSourceFilterManager.filtersToURLFormat(context.filters);
+    const filtersOnURLFormat =
+      PatternDataSourceFilterManager.filtersToURLFormat(context.filters);
     queryParams.set('_a', filtersOnURLFormat);
     // only keep the _a and _g query params (the osd native query params)
     for (const key of Array.from(queryParams.keys())) {
@@ -45,7 +46,9 @@ export class ReportingService {
         queryParams.delete(key);
       }
     }
-    const baseURL = `${window.location.origin}/app/dashboards#/view/${context.dashboardSavedObjectId}${queryParams.toString()}`;
+    const baseURL = `${window.location.origin}/app/dashboards#/view/${
+      context.dashboardSavedObjectId
+    }${queryParams.toString()}`;
     return baseURL;
   }
 
@@ -59,12 +62,14 @@ export class ReportingService {
       if (!reportingPlugin) {
         return null;
       }
-      
-      if(!dataSourceContext.dashboardSavedObjectId) {
+
+      if (!dataSourceContext.dashboardSavedObjectId) {
         return null;
       }
-      await reportingPlugin.generateInContextPDFReport(await this.generateReportURL(dataSourceContext));
-    }catch(error){
+      await reportingPlugin.generateInContextPDFReport(
+        await this.generateReportURL(dataSourceContext),
+      );
+    } catch (error) {
       const options = {
         context: `${ReportingService.name}.generateInContextPDFReport`,
         level: UI_LOGGER_LEVELS.ERROR,
