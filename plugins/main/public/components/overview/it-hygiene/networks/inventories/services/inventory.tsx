@@ -6,9 +6,12 @@ import {
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryTrafficDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
-import { getOverviewProcessesPortTab } from './dashboard';
 import { InventoryDashboardTable } from '../../../../../common/dashboards';
-import { WAZUH_SAMPLE_INVENTORY_AGENT } from '../../../../../../../common/constants';
+import {
+  WAZUH_SAMPLE_INVENTORY_AGENT,
+  IT_HYGIENE_LISTENERS_INVENTORY_ID,
+  IT_HYGIENE_LISTENERS_AGENT_INVENTORY_ID,
+} from '../../../../../../../common/constants';
 
 export const ITHygieneNetworksInventoryServices =
   withSystemInventoryTrafficDataSource(() => {
@@ -20,7 +23,12 @@ export const ITHygieneNetworksInventoryServices =
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
-        getDashboardPanels={getOverviewProcessesPortTab}
+        getDashboardPanels={[
+          {
+            dashboardId: IT_HYGIENE_LISTENERS_INVENTORY_ID,
+            agentDashboardId: IT_HYGIENE_LISTENERS_AGENT_INVENTORY_ID,
+          },
+        ]}
         tableId='it-hygiene-inventory-services'
         categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
       />

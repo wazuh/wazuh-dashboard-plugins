@@ -4,17 +4,14 @@ import {
   withErrorBoundary,
   withInjectProps,
 } from '../hocs';
-import { getPlugins } from '../../../kibana-services';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import { useReportingCommunicateSearchContext } from '../hooks/use-reporting-communicate-search-context';
-import { WzSearchBar } from '../search-bar';
+import { useWithManagedSearchBarFilters, WzSearchBar } from '../search-bar';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { SampleDataWarning } from '../../visualize/components';
 import { compose } from 'redux';
-import { ViewMode } from '../../../../../../src/plugins/embeddable/public';
-
-const DashboardByRenderer =
-  getPlugins().dashboard.DashboardContainerByValueRenderer;
+import DashboardRenderer from './dashboard-renderer/dashboard-renderer';
+import classnames from 'classnames';
 
 export const Dashboard = props => {
   // This is not used by the SCA dashboard.
@@ -30,74 +27,65 @@ export const Dashboard = props => {
     },
   });
 
+  const shouldHideDashboard = !Boolean(
+    props.dataSourceAction?.data?.hits?.total > 0,
+  );
+
+  const { searchBarFilters, postFixedFilters } = useWithManagedSearchBarFilters(
+    {
+      spec: props.managedFilters || {},
+    },
+    props.dataSource.filters,
+    props.dataSource.setFilters,
+  );
+
   return (
     <>
       <WzSearchBar
         appName='dashboard-searchbar'
         {...props.dataSource.searchBarProps}
+        filters={searchBarFilters}
         fixedFilters={props.dataSource.fixedFilters}
         showDatePicker={Boolean(
           props.dataSource.dataSource.indexPattern.timeFieldName,
         )}
         showQueryInput={true}
         showQueryBar={true}
+        postFixedFilters={postFixedFilters}
       />
       {props.dataSourceAction?.data?.hits?.total === 0 ? (
         <DiscoverNoResults />
       ) : null}
-      <div
-        className={
-          props.dataSourceAction?.data?.hits?.total > 0 ? '' : 'wz-no-display'
-        }
-      >
+      <div>
         {props.sampleDataWarningCategories && (
-          <SampleDataWarning
-            categoriesSampleData={props.sampleDataWarningCategories}
-          />
+          <div
+            className={classnames({
+              'wz-no-display': shouldHideDashboard,
+            })}
+          >
+            <SampleDataWarning
+              categoriesSampleData={props.sampleDataWarningCategories}
+            />
+          </div>
         )}
 
         <div className='wz-dashboard-responsive'>
           {props.getDashboardPanels.map(
-            ({
-              getDashboardPanels,
-              id,
-              title,
-              description,
-              hidePanelTitles,
-              useMargins = true,
-              className = '',
-            }) => {
-              const idComponent = id;
+            ({ dashboardId, agentDashboardId, className = '' }) => {
               const dashboard = (
-                <DashboardByRenderer
-                  key={idComponent}
-                  className='wz-search-me'
-                  input={{
-                    viewMode: ViewMode.VIEW,
-                    panels: getDashboardPanels(
-                      props.dataSource.dataSource.id,
-                      Boolean(
-                        props.dataSource.dataSource?.getPinnedAgentFilter()
-                          ?.length,
-                      ),
-                    ),
-                    isFullScreenMode: false,
-                    filters: props.dataSource.fetchFilters ?? [],
-                    useMargins,
-                    id: id,
-                    timeRange: {
-                      from: props.dataSource.searchBarProps.dateRangeFrom,
-                      to: props.dataSource.searchBarProps.dateRangeTo,
-                    },
-                    title: title,
-                    description: description,
-                    query: props.dataSource.searchBarProps.query,
-                    refreshConfig: {
-                      pause: false,
-                      value: 15,
-                    },
-                    hidePanelTitles,
-                    lastReloadRequestTime: props.dataSource.fingerprint,
+                <DashboardRenderer
+                  dashboardId={dashboardId}
+                  agentDashboardId={agentDashboardId}
+                  className={classnames(className, {
+                    'wz-dashboard-hide-tables-pagination-export-csv-controls':
+                      true,
+                    'wz-no-display': shouldHideDashboard,
+                  })}
+                  hasPinnedAgent={Boolean(
+                    props.dataSource.dataSource?.getPinnedAgentFilter()?.length,
+                  )}
+                  config={{
+                    dataSource: props.dataSource,
                   }}
                 />
               );
@@ -106,7 +94,10 @@ export const Dashboard = props => {
                 /* Add a wrapper div with the className to apply styles that allow to overwrite
                 some styles using CSS selectors */
                 return (
-                  <div className={className} key={idComponent}>
+                  <div
+                    className={className}
+                    key={dashboardId || agentDashboardId}
+                  >
                     {dashboard}
                   </div>
                 );
@@ -134,23 +125,21 @@ export const createDashboard = ({
   DataSourceRepositoryCreator,
   sampleDataWarningCategories,
   getDashboardPanels,
+  managedFilters,
 }: {
   DataSource: any;
   DataSourceRepositoryCreator: any;
   sampleDataWarningCategories?: string[];
+  managedFilters?: {
+    [key: string]: {
+      managedField: string;
+      component: (props: any) => any;
+      order: number;
+    };
+  };
   getDashboardPanels: Array<{
-    getDashboardPanels: (
-      indexPatternId: string,
-      isPinnedAgent?: boolean,
-    ) => any;
-    id: string;
-    title: string;
-    description: string;
-    hidePanelTitles: boolean;
-    useMargins?: boolean;
-    /**
-     * Class name to apply to the dashboard container
-     */
+    dashboardId: string;
+    agentDashboardId?: string;
     className?: string;
   }>;
 }) =>
@@ -159,6 +148,7 @@ export const createDashboard = ({
     withInjectProps({
       sampleDataWarningCategories,
       getDashboardPanels,
+      managedFilters,
     }),
     withDataSourceFetchSearchBar({
       DataSource,

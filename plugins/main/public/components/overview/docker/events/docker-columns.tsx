@@ -5,10 +5,6 @@ export const dockerColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   commonColumns['agent.name'],
   {
-    id: 'data.docker.from',
-    initialWidth: 151,
-  },
-  {
     id: 'data.docker.Type',
     initialWidth: 149,
   },

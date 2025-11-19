@@ -24,4 +24,8 @@ export interface WazuhPluginStart {}
 export type PluginSetup = {
   securityDashboards?: {}; // TODO: Add OpenSearch Dashboards Security interface
   wazuhCore: {};
+  // Optional Notifications Dashboards plugin contract presence check
+  notificationsDashboards?: {};
+  // Optional Alerting Dashboards plugin contract presence check
+  alertingDashboards?: {};
 };

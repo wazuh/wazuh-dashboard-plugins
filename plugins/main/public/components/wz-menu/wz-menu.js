@@ -119,7 +119,7 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
         actionError={actionError}
         showSelectorsInPopover={showSelectorsInPopover}
       >
-        API
+        Manager API
       </SelectorLabel>
       <Selector showSelectorsInPopover={showSelectorsInPopover}>
         <div style={style}>

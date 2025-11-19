@@ -6,11 +6,7 @@ import {
 } from '@elastic/eui';
 import React, { useEffect, useMemo, useState } from 'react';
 import { SearchResponse } from '@opensearch-project/opensearch/api/types';
-import {
-  parseData,
-  getFieldFormatted,
-  parseColumns,
-} from './data-grid-service';
+import { parseData, parseColumns } from './data-grid-service';
 import {
   Filter,
   IndexPattern,
@@ -196,37 +192,31 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
 
     // Safer check for array index
     if (rowsParsed.length > relativeRowIndex && relativeRowIndex >= 0) {
-      const fieldFormatted = getFieldFormatted(
-        relativeRowIndex,
-        columnId,
-        indexPattern,
-        rowsParsed,
-      );
-      // check if column have render method initialized
-      const column = defaultColumns.find(column => column.id === columnId);
-
-      if (column && column.render) {
-        return column.render(fieldFormatted, rowsParsed[relativeRowIndex]);
-      }
-
-      // check if column have render method in renderColumns prop
-      const renderColumn = renderColumns?.find(
-        column => column.id === columnId,
-      );
-
-      if (renderColumn) {
-        return renderColumn.render(
-          fieldFormatted,
-          rowsParsed[relativeRowIndex],
-        );
-      }
-
       // Format the value using the field formatter
       // https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.16.0/src/plugins/discover/public/application/components/data_grid/data_grid_table_cell_value.tsx#L80-L89
       const formattedValue = indexPattern.formatField(
         rows[relativeRowIndex],
         columnId,
       );
+      const flattenedRow = indexPattern.flattenHit(rows[relativeRowIndex]);
+      const rawValue = flattenedRow[columnId];
+
+      // check if column have render method initialized
+      const column = defaultColumns.find(column => column.id === columnId);
+
+      if (column && column.render) {
+        return column.render(rawValue, rowsParsed[relativeRowIndex]);
+      }
+
+      // check if the columns exists on the default custom render columns list
+      const renderColumn = renderColumns?.find(
+        column => column.id === columnId,
+      );
+
+      if (renderColumn) {
+        return renderColumn.render(rawValue, rowsParsed[relativeRowIndex]);
+      }
+
       if (typeof formattedValue === 'undefined') {
         return <span>-</span>;
       } else {

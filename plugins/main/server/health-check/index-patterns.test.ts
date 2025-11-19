@@ -19,21 +19,21 @@ const mockContext = () => ({
                     {
                       name: 'wazuh',
                       index_patterns:
-                        '[wazuh-alerts-4.x-*, wazuh-archives-4.x-*]',
+                        '[wazuh-alerts-5.x-*, wazuh-archives-5.x-*]',
                       order: '0',
                       version: '1',
                       composed_of: '',
                     },
                     {
                       name: 'wazuh-agent',
-                      index_patterns: '[wazuh-monitoring-*]',
+                      index_patterns: '[wazuh-monitoring*]',
                       order: '0',
                       version: null,
                       composed_of: '',
                     },
                     {
                       name: 'wazuh-statistics',
-                      index_patterns: '[wazuh-statistics-*]',
+                      index_patterns: '[wazuh-statistics*]',
                       order: '0',
                       version: null,
                       composed_of: '',
@@ -54,11 +54,11 @@ describe('getTemplateForIndexPattern', () => {
     indexPatternTitle          | templateFound | templatesNameFound
     ${'custom-alerts-*'}       | ${false}      | ${'Template was not found for [custom-alerts-*]'}
     ${'custom-wazuh-alerts-*'} | ${false}      | ${'Template was not found for [custom-wazuh-alerts-*]'}
-    ${'wazuh-alerts-4.x-t*'}   | ${true}       | ${['wazuh']}
-    ${'wazuh-alerts-4.x-*'}    | ${true}       | ${['wazuh']}
-    ${'wazuh-alerts-4.x*'}     | ${true}       | ${['wazuh']}
-    ${'wazuh-alerts-4.*'}      | ${true}       | ${['wazuh']}
-    ${'wazuh-alerts-4*'}       | ${true}       | ${['wazuh']}
+    ${'wazuh-alerts-5.x-t*'}   | ${true}       | ${['wazuh']}
+    ${'wazuh-alerts-5.x-*'}    | ${true}       | ${['wazuh']}
+    ${'wazuh-alerts-5.x*'}     | ${true}       | ${['wazuh']}
+    ${'wazuh-alerts-5.*'}      | ${true}       | ${['wazuh']}
+    ${'wazuh-alerts-5*'}       | ${true}       | ${['wazuh']}
     ${'wazuh-alerts-*'}        | ${true}       | ${['wazuh']}
     ${'wazuh-alerts-'}         | ${true}       | ${['wazuh']}
     ${'wazuh-alerts'}          | ${true}       | ${['wazuh']}

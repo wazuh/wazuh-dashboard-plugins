@@ -61,27 +61,23 @@ export const getOverviewUsersUsersTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'user.name',
-      'Top 5 user auth failures count',
+      'Top 5 users',
       'it-hygiene-users',
-      {
-        metricType: 'max',
-        metricField: 'user.auth_failures.count',
-        fieldCustomLabel: 'User name',
-      },
+      { fieldCustomLabel: 'Users' },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'user.groups',
       'Top 5 user groups',
       'it-hygiene-users',
-      { fieldCustomLabel: 'User group' },
+      { fieldCustomLabel: 'User groups' },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'user.shell',
       'Top 5 user shells',
       'it-hygiene-users',
-      { fieldCustomLabel: 'User shell' },
+      { fieldCustomLabel: 'User shells' },
     ),
   ]);
 };

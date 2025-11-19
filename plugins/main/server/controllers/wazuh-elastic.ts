@@ -13,7 +13,6 @@ import { ErrorResponse, WAZUH_STATUS_CODES } from '../lib/error-response';
 import {
   WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
   WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
-  WAZUH_ALERTS_PREFIX,
   WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA,
   WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS,
   WAZUH_INDEXER_NAME,
@@ -66,7 +65,7 @@ export class WazuhElasticCtrl {
                 item.settingIndexPattern,
               )
             : item.indexPatternPrefix
-        }sample-${category}`,
+        }-sample-${category}`,
         dataSet: item?.dataSet,
       })),
     );
@@ -435,6 +434,7 @@ export class WazuhElasticCtrl {
                 mappedData.forEach((item: { sampleData: [] }) =>
                   sampleDataAndTemplate.sampleData.push(...item.sampleData),
                 );
+                sampleDataAndTemplate.template = mappedData[0].template;
               }
 
               if (mappedData.length === 1 && mappedData[0].template) {
@@ -461,11 +461,17 @@ export class WazuhElasticCtrl {
                 let configuration;
 
                 if (sampleDataAndTemplate?.template) {
-                  configuration = sampleDataAndTemplate.template.template;
+                  const templateData = sampleDataAndTemplate.template.template;
 
-                  delete configuration.index_patterns;
-                  delete configuration.priority;
+                  configuration = {
+                    settings: templateData.settings || {},
+                    mappings: templateData.mappings || {},
+                  };
 
+                  // Override shards and replicas for sample data
+                  if (!configuration.settings.index) {
+                    configuration.settings.index = {};
+                  }
                   configuration.settings.index.number_of_shards =
                     WAZUH_SAMPLE_ALERTS_INDEX_SHARDS;
                   configuration.settings.index.number_of_replicas =

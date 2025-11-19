@@ -108,7 +108,10 @@ jobs:
           [ "$platform" = "osd" ] && { docker_env_plugin_platform="OPENSEARCH_DASHBOARDS_VERSION"; };
 
           # Up the environment and run the command
+          # TODO: change the GIT_REF by ${{ inputs.reference }} when the 5.0.0 branch exists.
+          # This should allow the checks in the pull requests...
           docker run -t --rm \
+            -e GIT_REF=main \
             -e ${docker_env_plugin_platform}=${combined_version} \
             -v `pwd`/${{ matrix.plugins.path }}:/home/node/kbn/plugins/${{ matrix.plugins.container_path }} \
             ${{ inputs.docker_run_extra_args }} \

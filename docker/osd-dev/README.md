@@ -11,90 +11,168 @@
 
   To install jq, you can run this command:
 
-  - In Debian/Ubuntu os:
+  - In Debian/Ubuntu:
     `sudo apt-get install jq`
   - In RedHat/CentOS:
     `sudo yum install jq`
   - In Arch:
     `sudo pacman -Sy --noconfirm jq`
-  - In MAC:
+  - In macOS:
     `brew install jq`
 
 ## Usage
 
-Use always the provided script to bring up or down the development
-environment. For example:
+Always use the provided script to bring up or down the development environment. The only allowed positional argument is the action.
 
 ```bash
-./dev.sh [-o <os_version>] [-d <osd_version>] [-a <agents_up>] <wazuh_app_src> <action> [<mode>] [<server_version>]
+./dev.sh <action> \
+  [--plugins-root </absolute/path>]  # aliases: -wdp, --wz-home \
+  [-os <os_version>] [-osd <osd_version>] \
+  [-a <rpm|deb|without>]  # aliases: none, 0 \
+  [-r <repo>=</absolute/path> ...] \
+  [-saml | --server <version> | --server-local <tag> | --indexer-local [tag]] \
+  [--base [</absolute/path>]]
 ```
+
+### About <common-parent-directory>
+
+- Meaning: a host directory where you keep external repositories (e.g., `~/dev`). The script uses it for shorthand `-r <repo>` resolution and for auto‑discovery.
+- How it’s set: the wrapper `docker/osd-dev/dev.sh` sets `SIBLING_REPO_HOST_ROOT` to the parent folder of this repo by default. You can override it explicitly:
+  - `export SIBLING_REPO_HOST_ROOT=/absolute/path/to/your/common-parent-directory`
+  - Then run `./docker/osd-dev/dev.sh …`
+- How to verify: `echo $SIBLING_REPO_HOST_ROOT` (must be an absolute host path).
+- Note: docs refer to this location as `<common-parent-directory>`.
 
 ### Parameters
 
-- -o <os_version> : (Optional) Specifies the OpenSearch version. If not provided, it's obtained from plugins/wazuh-core/package.json .
-- -d <osd_version> : (Optional) Specifies the OpenSearch Dashboards version. If not provided, it's obtained from plugins/wazuh-core/package.json .
+- -os <os_version> : (Optional) Specifies the OpenSearch version. If not provided, it's obtained from plugins/wazuh-core/package.json .
+- -osd <osd_version> : (Optional) Specifies the OpenSearch Dashboards version. If not provided, it's obtained from plugins/wazuh-core/package.json .
 - -a <agents_up> : (Optional) Relevant when using server-local mode. Specifies agent deployment:
   - rpm : Deploys an RPM-based agent.
   - deb : Deploys a DEB-based agent.
   - without : Deploys no agents.
   - If this option is not used with server-local mode (or an empty string is provided), the default agent configuration for the server-local profile is used ( 2 agents, one RPM-based and one DEB-based ).
-- <wazuh_app_src> : (Required) Absolute path to the Wazuh Dashboard plugins source code (e.g., /absolute/path/to/wazuh-dashboard-plugins ). The script checks that the path is absolute.
-- <action> : (Required) The action to perform:
-  - up : Brings up the environment.
-  - down : Stops the environment and removes volumes.
-  - stop : Stops the services.
-  - start : Starts previously stopped services.
-- <mode> : (Optional) Specifies the deployment mode. Can be one of:
-  - saml : Deploys a SAML-enabled environment with KeyCloak IDP.
-    - Note for SAML : You need to add idp to your hosts file ( /etc/hosts on Linux/macOS, C:\Windows\System32\drivers\etc\hosts on Windows) pointing to 127.0.0.1 . Also, based on previous configurations, KeyCloak IDP might need to be started with the --no-base-path option.
-    ```
-    # Example entry in /etc/hosts
-    127.0.0.1 idp
-    ```
-  - server : Deploys an environment with a real Wazuh server. Requires <server_version> .
-  - server-local : Deploys an environment with a local Wazuh server package. Requires <server_version> (which will be used as IMAGE_TAG ).
-    - **Important for `server-local` mode**: You must place the Wazuh manager installation packages (`.deb` file) in a folder named `manager` within the `wazuh-dashboard-plugins/docker/osd-dev/` directory. Similarly, any Wazuh agent installation packages (`.rpm` or/and `.deb` files) should be placed in a folder named `agents` within the same directory. These packages will be used to build the local server and agent images.
-  - If omitted, a standard development environment is deployed (profile standard ).
-- <server_version> : (Optional) Required if <mode> is server or server-local .
-  - For server mode: Specifies the Wazuh release version (e.g., 4.7.2 ) to be used for the WAZUH_STACK variable.
-  - For server-local mode: Specifies the image tag (e.g., my-custom-image ) for the local server build, to be used for the IMAGE_TAG variable.
+- -r <repo>=<path> : (Optional, repeatable) ONLY for external plugin repositories that are not stored inside this repository.
+  - Internal repositories (`main`, `wazuh-core`, `wazuh-check-updates`) are auto-detected under `<root>/plugins/` when running from this repo, or can be set via `--plugins-root` (aliases: `-wdp`, `--wz-home`).
+  - External repositories passed with `-r` are dynamically added as volumes to the `osd` service via an auto-generated `dev.override.generated.yml` (git-ignored).
+  - Paths MUST be absolute and must point to the repository ROOT (do not pass subfolders like `/plugins/...`). Shorthand is also supported: `-r <repo>` (no `=`), which resolves from your <common-parent-directory> using the same `<repo>` name. If not found, an error is raised.
+    Action (positional): One of up | down | stop | start | manager-local-up.
+- -saml: (Optional) Deploys a SAML-enabled environment with KeyCloak IDP.
+  - Note for SAML: You need to add idp to your hosts file ( /etc/hosts on Linux/macOS, C:\\Windows\\System32\\drivers\\etc\\hosts on Windows) pointing to 127.0.0.1 . Also, based on previous configurations, KeyCloak IDP might need to be started with the --no-base-path option.
+  ```
+  # Example entry in /etc/hosts
+  127.0.0.1 idp
+  ```
+- --server <version>: (Optional) Deploys an environment with a real Wazuh server using the given release version (e.g., 4.7.2) for WAZUH_STACK.
+- --server-local <tag>: (Optional) Deploys an environment with a local Wazuh server package using the given image tag (e.g., my-custom-image) for IMAGE_TAG.
+  - Important for `server-local`: Place the Wazuh manager installation packages (`.deb`) in `wazuh-dashboard-plugins/docker/osd-dev/manager/` and any Wazuh agent packages (`.rpm`/`.deb`) in `wazuh-dashboard-plugins/docker/osd-dev/agents/`.
+  - If neither `--server` nor `--server-local` is specified, a standard development environment is deployed (profile standard).
+- --indexer-local [tag]: (Optional) Deploys an environment with a local Wazuh indexer package using the given image tag (e.g., my-custom-image) for IMAGE_INDEXER_PACKAGE_TAG.
+  - Important: Place the Wazuh indexer installation package (`.deb`) in `wazuh-dashboard-plugins/docker/osd-dev/indexer/`.
+
+If you run the script from inside this repository, internal repositories are auto-detected under `<root>/plugins/>`. Otherwise, pass `--plugins-root` (aliases: `-wdp`, `--wz-home`) to specify the root. Use `-r` only for external plugins.
+
+Multi-repository context explanation:
+
+The model is intentionally hybrid: this repository ships several core plugins, while other plugins live (and will continue to live) in their own, permanent external Git repositories. There is no plan to merge everything into a monorepo. For external plugins just point the script to their absolute paths. Example layout for external plugins:
+
+```
+~/dev/wazuh-dashboard-reporting
+~/dev/wazuh-security-dashboards-plugin
+```
+
+Launch using explicit mappings for external plugins:
+
+```bash
+./dev.sh up -r wazuh-dashboard-reporting=~/dev/wazuh-dashboard-reporting -r wazuh-security-dashboards-plugin=~/dev/wazuh-security-dashboards-plugin
+```
+
+Security plugin alias accepted by `-r` (no auto-descend, no search inside dashboardBase, path used as-is):
+
+```
+security
+```
+
+Examples (shorthand alias resolves to the canonical folder 'wazuh-security-dashboards-plugin' under your <common-parent-directory>):
+
+```
+./dev.sh up --base -r security                          # resolves <common-parent-directory>/wazuh-security-dashboards-plugin
+./dev.sh up --base -r security=/abs/path/wazuh-security-dashboards-plugin  # uses absolute path as-is
+```
+
+### Search Order and Precedence (Security Plugin)
+
+- Auto-discovery (no `-r`):
+
+  - Looks only at the canonical folder 'wazuh-security-dashboards-plugin' under your <common-parent-directory>.
+
+- Overrides with `-r` (takes precedence):
+  - `-r <alias>=/absolute/repo/root` → uses the absolute path exactly as provided (no subfolders like `/plugins/...`).
+  - `-r <alias>` → resolves to the canonical folder 'wazuh-security-dashboards-plugin' under your <common-parent-directory>.
+  - Alias: `security`.
+
+Or, with a single root checkout containing `plugins/`:
+
+```bash
+./dev.sh up --plugins-root /absolute/path/to/wazuh-dashboard-plugins/plugins
+```
+
+Note: The model is hybrid: some plugins are here and others will always be external. For external ones, specify them with `-r repo=/absolute/path`.
 
 ### Examples
 
-Standard environment:
+Standard environment (single repository checkout):
 
+```sh
+./dev.sh up --plugins-root /absolute/path/to/wazuh-dashboard-plugins/plugins
 ```
-./dev.sh /absolute/path/to/wazuh-dashboard-plugins up
+
+Standard environment with extra external plugins:
+
+```sh
+./dev.sh up -r wazuh-dashboard-reporting=/workspace/wazuh-dashboard-reporting -r wazuh-security-dashboards-plugin=/workspace/wazuh-security-dashboards-plugin
+```
+
+Standard environment (auto-detect internal plugins when called from inside repo root):
+
+```sh
+./dev.sh up
 ```
 
 With specific OpenSearch/OSD versions:
 
-```
-./dev.sh -o 2.11.0 -d 2.11.0 /absolute/path/to/wazuh-dashboard-plugins up
+```sh
+./dev.sh up -os 2.11.0 -osd 2.11.0 --plugins-root /absolute/path/to/wazuh-dashboard-plugins/plugins
 ```
 
 SAML-enabled environment:
 
-```
-./dev.sh /absolute/path/to/wazuh-dashboard-plugins up saml
+```sh
+./dev.sh up -saml --plugins-root /absolute/path/to/wazuh-dashboard-plugins/plugins
 ```
 
 Environment with a real Wazuh server:
 
-```
-./dev.sh /absolute/path/to/wazuh-dashboard-plugins up server 4.7.2
+```sh
+./dev.sh up --plugins-root /absolute/path/to/wazuh-dashboard-plugins/plugins --server 4.7.2
 ```
 
 Environment with a local Wazuh server build and DEB agent:
 
-```
-./dev.sh -a deb /absolute/path/to/wazuh-dashboard-plugins up server-local my-custom-tag
+```sh
+./dev.sh up --plugins-root /absolute/path/to/wazuh-dashboard-plugins/plugins --server-local my-custom-tag -a deb
 ```
 
 Environment with a local Wazuh server build and no agents:
 
+```sh
+./dev.sh up --plugins-root /absolute/path/to/wazuh-dashboard-plugins/plugins --server-local my-custom-tag -a without
 ```
-./dev.sh -a without /absolute/path/to/wazuh-dashboard-plugins up server-local my-custom-tag
+
+Environment with a local Wazuh indexer build:
+
+```sh
+./dev.sh up --plugins-root /absolute/path/to/wazuh-dashboard-plugins/plugins --indexer-local my-custom-tag
 ```
 
 Important Note about Plugin Version:

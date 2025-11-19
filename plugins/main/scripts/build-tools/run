@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e
+
+SCRIPT_PATH=$(dirname $0)
+
+bash $(realpath "$SCRIPT_PATH/update-indexer-resources")

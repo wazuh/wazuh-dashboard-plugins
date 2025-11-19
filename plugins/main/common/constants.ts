@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import path from 'path';
 import { version } from '../package.json';
 
 // Plugin
@@ -18,21 +17,70 @@ export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
 
 // Index patterns - Wazuh alerts
 export const WAZUH_INDEX_TYPE_ALERTS = 'alerts';
-export const WAZUH_ALERTS_PREFIX = 'wazuh-alerts-';
 export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts-*';
 
 // Job - Wazuh monitoring
 export const WAZUH_INDEX_TYPE_MONITORING = 'monitoring';
-export const WAZUH_MONITORING_PATTERN = 'wazuh-monitoring-*';
+export const WAZUH_MONITORING_PATTERN = 'wazuh-monitoring*';
 
 // Job - Wazuh statistics
 export const WAZUH_INDEX_TYPE_STATISTICS = 'statistics';
-export const WAZUH_STATISTICS_PATTERN = 'wazuh-statistics-*';
+export const WAZUH_STATISTICS_PATTERN = 'wazuh-statistics*';
 
 // Wazuh vulnerabilities
 export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities*';
 export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
 export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
+
+// Wazuh states index types
+export const WAZUH_INDEX_TYPE_ARCHIVES = 'archives';
+export const WAZUH_INDEX_TYPE_STATES_VULNERABILITIES = 'states-vulnerabilities';
+export const WAZUH_INDEX_TYPE_STATES_FIM_FILES = 'states-fim-files';
+export const WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS =
+  'states-fim-registries-keys';
+export const WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_VALUES =
+  'states-fim-registries-values';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY = 'states-inventory';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM =
+  'states-inventory-system';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE =
+  'states-inventory-hardware';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_NETWORKS =
+  'states-inventory-networks';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_PACKAGES =
+  'states-inventory-packages';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_PORTS = 'states-inventory-ports';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_PROCESSES =
+  'states-inventory-processes';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_PROTOCOLS =
+  'states-inventory-protocols';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_USERS = 'states-inventory-users';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_GROUPS =
+  'states-inventory-groups';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_SERVICES =
+  'states-inventory-services';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES =
+  'states-inventory-interfaces';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES =
+  'states-inventory-hotfixes';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS =
+  'states-inventory-browser-extensions';
+export const WAZUH_INDEX_TYPE_STATES_SCA = 'states-sca';
+export const WAZUH_INDEX_TYPE_EVENTS_ACCESS_MANAGEMENT =
+  'events-access-management';
+export const WAZUH_INDEX_TYPE_EVENTS_APPLICATIONS = 'events-applications';
+export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES = 'events-cloud-services';
+export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AWS =
+  'events-cloud-services-aws';
+export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AZURE =
+  'events-cloud-services-azure';
+export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_GCP =
+  'events-cloud-services-gcp';
+export const WAZUH_INDEX_TYPE_EVENTS_NETWORK_ACTIVITY =
+  'events-network-activity';
+export const WAZUH_INDEX_TYPE_EVENTS_OTHER = 'events-other';
+export const WAZUH_INDEX_TYPE_EVENTS_SECURITY = 'events-security';
+export const WAZUH_INDEX_TYPE_EVENTS_SYSTEM_ACTIVITY = 'events-system-activity';
 
 // FIM
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim*';
@@ -70,11 +118,57 @@ export const WAZUH_IT_HYGIENE_SERVICES_PATTERN =
 export const WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN =
   'wazuh-states-inventory-browser-extensions*';
 
+// Index patterns - Archives
+export const WAZUH_ARCHIVES_PATTERN = 'wazuh-archives*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_ARCHIVES =
+  'index-pattern:archives';
+
+// Index patterns - Events
+export const WAZUH_EVENTS_SYSTEM_ACTIVITY_PATTERN =
+  'wazuh-events-v5-system-activity*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SYSTEM_ACTIVITY =
+  'index-pattern:events-system-activity';
+export const WAZUH_EVENTS_SECURITY_PATTERN = 'wazuh-events-v5-security*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SECURITY =
+  'index-pattern:events-security';
+export const WAZUH_EVENTS_OTHER_PATTERN = 'wazuh-events-v5-other*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_OTHER =
+  'index-pattern:events-other';
+export const WAZUH_EVENTS_NETWORK_ACTIVITY_PATTERN =
+  'wazuh-events-v5-network-activity*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_NETWORK_ACTIVITY =
+  'index-pattern:events-network-activity';
+export const WAZUH_EVENTS_CLOUD_SERVICES_PATTERN =
+  'wazuh-events-v5-cloud-services*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES =
+  'index-pattern:events-cloud-services';
+export const WAZUH_EVENTS_CLOUD_SERVICES_AWS_PATTERN =
+  'wazuh-events-v5-cloud-services-aws*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AWS =
+  'index-pattern:events-cloud-services-aws';
+export const WAZUH_EVENTS_CLOUD_SERVICES_AZURE_PATTERN =
+  'wazuh-events-v5-cloud-services-azure*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AZURE =
+  'index-pattern:events-cloud-services-azure';
+export const WAZUH_EVENTS_CLOUD_SERVICES_GCP_PATTERN =
+  'wazuh-events-v5-cloud-services-gcp*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_GCP =
+  'index-pattern:events-cloud-services-gcp';
+export const WAZUH_EVENTS_APLICATIONS_PATTERN = 'wazuh-events-v5-applications*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_APLICATIONS =
+  'index-pattern:events-applications';
+export const WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN =
+  'wazuh-events-v5-access-management*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT =
+  'index-pattern:events-access-management';
+
+// Time field
+export const FIELD_TIMESTAMP = '@timestamp';
+
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
-// Sample data
-export const WAZUH_SAMPLE_ALERT_PREFIX = 'wazuh-alerts-4.x-';
+export const WAZUH_SAMPLE_ALERT_PREFIX = 'wazuh-alerts-v5-';
 export const WAZUH_SAMPLE_ALERTS_INDEX_SHARDS = 1;
 export const WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS = 0;
 export const WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY = 'security';
@@ -89,7 +183,7 @@ export const WAZUH_SAMPLE_INVENTORY_AGENT = 'wazuh-inventory-agent';
 export const WAZUH_SAMPLE_VULNERABILITIES = 'wazuh-vulnerabilities';
 export const WAZUH_SAMPLE_AGENT_MONITORING = 'agent-monitoring';
 export const WAZUH_SAMPLE_SERVER_STATISTICS = 'server-statistics';
-export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 3000;
+export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 1500;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = {
   settingIndexPattern: 'alerts.sample.prefix',
   dataSet: 'wazuh-alerts',
@@ -842,12 +936,12 @@ export const SUPPORTED_LANGUAGES_ARRAY = Object.values(SUPPORTED_LANGUAGES);
 // Health check
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS = 'index-pattern:alerts';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES =
-  'index-pattern:vulnerabilities-states';
+  'index-pattern:states-vulnerabilities';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING =
   'index-pattern:monitoring';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS =
-  'index-pattern:statistitcs';
+  'index-pattern:statistics';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES =
   'index-pattern:states-inventory';
@@ -902,3 +996,159 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES =
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES =
   'index-pattern:states-sca';
+
+export const INDEX_PATTERN_ALERTS_REQUIRED_FIELDS = [
+  FIELD_TIMESTAMP,
+  'wazuh.integration.decoders',
+  'wazuh.cluster.node',
+  'agent.id',
+];
+
+/** Dashboards ids **/
+
+export const THREAT_HUNTING_DASHBOARD_ID = 'threat-hunting-overview-dashboard';
+export const THREAT_HUNTING_AGENT_DASHBOARD_ID =
+  'threat-hunting-pinned-agent-dashboard';
+
+export const AMAZON_WEB_SERVICES_DASHBOARD_ID = 'aws-overview-dashboard-tab';
+export const AMAZON_WEB_SERVICES_AGENT_DASHBOARD_ID =
+  'aws-pinned-agent-dashboard-tab';
+
+export const AZURE_DASHBOARD_ID = 'azure-overview-dashboard-tab';
+export const AZURE_AGENT_DASHBOARD_ID = 'azure-pinned-agent-dashboard-tab';
+
+export const DOCKER_DASHBOARD_ID = 'docker-overview-dashboard-tab';
+export const DOCKER_AGENT_DASHBOARD_ID = 'docker-pinned-agent-dashboard-tab';
+
+export const FIM_DASHBOARD_ID = 'fim-overview-dashboard';
+export const FIM_AGENT_DASHBOARD_ID = 'fim-pinned-agent-dashboard';
+
+// FIM inventory dashboard IDs
+export const FIM_FILES_INVENTORY_ID = 'fim-files-dashboard';
+export const FIM_REGISTRY_KEYS_INVENTORY_ID = 'fim-registry-keys-dashboard';
+export const FIM_REGISTRY_VALUES_INVENTORY_ID = 'fim-registry-values-dashboard';
+export const FIM_FILES_AGENT_INVENTORY_ID = 'fim-files-dashboard';
+export const FIM_REGISTRY_KEYS_AGENT_INVENTORY_ID =
+  'fim-registry-keys-dashboard';
+export const FIM_REGISTRY_VALUES_AGENT_INVENTORY_ID =
+  'fim-registry-values-dashboard';
+
+export const MALWARE_DETECTION_DASHBOARD_ID =
+  'malware-detection-overview-dashboard-tab';
+export const MALWARE_DETECTION_AGENT_DASHBOARD_ID =
+  'malware-detection-pinned-agent-dashboard-tab';
+
+export const PCI_DSS_DASHBOARD_ID = 'pci-overview-dashboard-tab';
+export const PCI_DSS_AGENT_DASHBOARD_ID = 'pci-pinned-agent-dashboard-tab';
+
+export const GDPR_DASHBOARD_ID = 'gdpr-overview-dashboard';
+export const GDPR_AGENT_DASHBOARD_ID = 'gdpr-pinned-agent-dashboard';
+
+export const HIPAA_DASHBOARD_ID = 'hipaa-overview-dashboard-tab';
+export const HIPAA_AGENT_DASHBOARD_ID = 'hipaa-pinned-agent-dashboard-tab';
+
+export const NIST_800_53_DASHBOARD_ID = 'nist-overview-dashboard-tab';
+export const NIST_800_53_AGENT_DASHBOARD_ID = 'nist-pinned-agent-dashboard-tab';
+
+export const TSC_DASHBOARD_ID = 'tsc-overview-dashboard-tab';
+export const TSC_AGENT_DASHBOARD_ID = 'tsc-pinned-agent-dashboard-tab';
+
+export const GITHUB_DASHBOARD_ID = 'github-overview-dashboard-tab';
+export const GITHUB_AGENT_DASHBOARD_ID = 'github-pinned-agent-dashboard-tab';
+
+export const GOOGLE_CLOUD_DASHBOARD_ID = 'google-cloud-detector-dashboard-tab';
+export const GOOGLE_CLOUD_AGENT_DASHBOARD_ID =
+  'google-cloud-pinned-agent-dashboard';
+
+export const MITRE_ATTACK_DASHBOARD_ID = 'mitre-overview-dashboard-tab';
+export const MITRE_ATTACK_AGENT_DASHBOARD_ID =
+  'mitre-pinned-agent-dashboard-tab';
+
+export const OFFICE_365_DASHBOARD_ID = 'office-overview-dashboard-tab';
+
+export const IT_HYGIENE_DASHBOARD_ID = 'it-hygiene-overview-dashboard-tab';
+export const IT_HYGIENE_AGENT_DASHBOARD_ID =
+  'it-hygiene-overview-dashboard-tab';
+
+export const IT_HYGIENE_INTERFACES_INVENTORY_ID =
+  'it-hygiene-networks-inventories-interfaces-dashboard-tab';
+export const IT_HYGIENE_INTERFACES_AGENT_INVENTORY_ID =
+  'it-hygiene-networks-inventories-interfaces-dashboard-tab';
+
+// IT Hygiene inventory dashboard IDs per category
+export const IT_HYGIENE_NETWORKS_INVENTORY_ID =
+  'it-hygiene-networks-inventories-networks-dashboard-tab';
+export const IT_HYGIENE_NETWORKS_AGENT_INVENTORY_ID =
+  'it-hygiene-networks-inventories-networks-dashboard-tab';
+
+export const IT_HYGIENE_PROTOCOLS_INVENTORY_ID =
+  'it-hygiene-networks-inventories-protocols-dashboard-tab';
+export const IT_HYGIENE_PROTOCOLS_AGENT_INVENTORY_ID =
+  'it-hygiene-networks-inventories-protocols-dashboard-tab';
+
+export const IT_HYGIENE_LISTENERS_INVENTORY_ID =
+  'it-hygiene-networks-inventories-services-dashboard-tab';
+export const IT_HYGIENE_LISTENERS_AGENT_INVENTORY_ID =
+  'it-hygiene-networks-inventories-services-dashboard-tab';
+
+export const IT_HYGIENE_SERVICES_INVENTORY_ID =
+  'it-hygiene-services-dashboard-tab';
+export const IT_HYGIENE_SERVICES_AGENT_INVENTORY_ID =
+  'it-hygiene-services-dashboard-tab';
+
+export const IT_HYGIENE_TRAFFIC_INVENTORY_ID =
+  'it-hygiene-networks-inventories-traffic-dashboard-tab';
+export const IT_HYGIENE_TRAFFIC_AGENT_INVENTORY_ID =
+  'it-hygiene-networks-inventories-traffic-dashboard-tab';
+
+export const IT_HYGIENE_SYSTEM_INVENTORY_ID =
+  'it-hygiene-system-inventories-system-dashboard-tab';
+export const IT_HYGIENE_SYSTEM_AGENT_INVENTORY_ID =
+  'it-hygiene-system-inventories-system-dashboard-tab';
+
+export const IT_HYGIENE_HARDWARE_INVENTORY_ID =
+  'it-hygiene-system-inventories-hardware-dashboard-tab';
+export const IT_HYGIENE_HARDWARE_AGENT_INVENTORY_ID =
+  'it-hygiene-system-inventories-hardware-dashboard-tab';
+
+export const IT_HYGIENE_PACKAGES_INVENTORY_ID =
+  'it-hygiene-packages-inventories-packages-dashboard-tab';
+export const IT_HYGIENE_PACKAGES_AGENT_INVENTORY_ID =
+  'it-hygiene-packages-inventories-packages-dashboard-tab';
+
+export const IT_HYGIENE_HOTFIXES_INVENTORY_ID =
+  'it-hygiene-packages-inventories-hotfixes-dashboard-tab';
+export const IT_HYGIENE_HOTFIXES_AGENT_INVENTORY_ID =
+  'it-hygiene-packages-inventories-hotfixes-dashboard-tab';
+
+export const IT_HYGIENE_BROWSER_EXTENSIONS_INVENTORY_ID =
+  'it-hygiene-packages-inventories-browser-extensions-dashboard-tab';
+export const IT_HYGIENE_BROWSER_EXTENSIONS_AGENT_INVENTORY_ID =
+  'it-hygiene-packages-inventories-browser-extensions-dashboard-tab';
+
+export const IT_HYGIENE_PROCESSES_INVENTORY_ID =
+  'it-hygiene-processes-dashboard-tab';
+export const IT_HYGIENE_PROCESSES_AGENT_INVENTORY_ID =
+  'it-hygiene-processes-dashboard-tab';
+
+export const IT_HYGIENE_USERS_INVENTORY_ID =
+  'it-hygiene-user-inventories-users-dashboard-tab';
+export const IT_HYGIENE_USERS_AGENT_INVENTORY_ID =
+  'it-hygiene-user-inventories-users-dashboard-tab';
+
+export const IT_HYGIENE_GROUPS_INVENTORY_ID =
+  'it-hygiene-user-inventories-groups-dashboard-tab';
+export const IT_HYGIENE_GROUPS_AGENT_INVENTORY_ID =
+  'it-hygiene-user-inventories-groups-dashboard-tab';
+
+export const CONFIGURATION_ASSESSMENT_DASHBOARD_ID = 'sca-overview-dashboard';
+export const CONFIGURATION_ASSESSMENT_AGENT_DASHBOARD_ID =
+  'sca-overview-dashboard';
+export const CONFIGURATION_ASSESSMENT_INVENTORY_ID = 'sca-inventory-dashboard';
+export const CONFIGURATION_ASSESSMENT_AGENT_INVENTORY_ID =
+  'sca-inventory-dashboard';
+
+export const VULNERABILITIES_DASHBOARD_ID =
+  'vulnerabilities-overview-dashboard-tab';
+export const VULNERABILITIES_AGENT_DASHBOARD_ID =
+  'vulnerabilities-overview-dashboard-tab';
