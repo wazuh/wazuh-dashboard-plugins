@@ -29,8 +29,12 @@ import { ITHygiene } from '../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { IndexPatternFormattedField } from '../../../common/index-pattern';
 import { Typography } from '../../../common/typography/typography';
+import { compose } from 'redux';
 
-const InventoryMetricsComponent = () => {
+export const InventoryMetrics = compose(
+  withSystemInventorySystemDataSource,
+  withSystemInventoryHardwareDataSource,
+)(() => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [data, setData] = useState<{ hardware: any; software: any } | null>(
     null,
@@ -192,8 +196,4 @@ const InventoryMetricsComponent = () => {
       titleAction
     />
   );
-};
-
-export const InventoryMetrics = withSystemInventorySystemDataSource(
-  withSystemInventoryHardwareDataSource(InventoryMetricsComponent),
-);
+});
