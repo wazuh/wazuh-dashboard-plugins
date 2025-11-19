@@ -10,29 +10,14 @@
  * Find more information about this on the LICENSE file.
  */
 
-import moment from 'moment';
 import { WazuhConfig } from '../react-services/wazuh-config';
-import { AppState } from './app-state';
-import { WzRequest } from './wz-request';
-import { getCore, getHttp, getToasts, getUiSettings, getPlugins } from '../kibana-services';
+import { getPlugins } from '../kibana-services';
+import { NavigationURLSearchParams } from '../react-services/navigation-service';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
 import store from '../redux/store';
-import domtoimage from '../utils/dom-to-image-more';
-import dateMath from '@elastic/datemath';
-import React from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiLink } from '@elastic/eui';
-import { reporting } from '../utils/applications';
-import { RedirectAppLinks } from '../../../../src/plugins/opensearch_dashboards_react/public';
-import {
-  buildOpenSearchQuery,
-  buildRangeFilter,
-  getOpenSearchQueryConfig,
-} from '../../../../src/plugins/data/common';
-import { getForceNow } from '../components/common/search-bar/search-bar-service';
-import NavigationService from './navigation-service';
-import { Agent } from '../components/endpoints-summary/types';
+import { PatternDataSourceFilterManager } from '../components/common/data-source';
 
 export class ReportingService {
   constructor() {
@@ -48,12 +33,19 @@ export class ReportingService {
    * 
    * @param {*} context 
    */
-  generateReportURL(context){
+  async generateReportURL(context){
     // URL example: "/app/dashboards#/view/it-hygiene-overview-dashboard-tab?_a=(filters:!(),query:(language:kuery,query:''))&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:'2025-08-20T19:38:00.878Z',to:'2025-11-18T19:38:00.878Z'))"
-    const currentURL = window.location.href;
-    // get the query params from the current browser url
-    const queryParams = currentURL.split('?')?.[1]??'';
-    const baseURL = `/app/dashboards#/view/${context.dashboardSavedObjectId}?${queryParams}`;
+    const urlParams = window.location.href.split('?')?.[1]??'';
+    const queryParams = new NavigationURLSearchParams(urlParams);
+    const filtersOnURLFormat = PatternDataSourceFilterManager.filtersToURLFormat(context.filters);
+    queryParams.set('_a', filtersOnURLFormat);
+    // only keep the _a and _g query params (the osd native query params)
+    for (const key of Array.from(queryParams.keys())) {
+      if (key !== '_a' && key !== '_g') {
+        queryParams.delete(key);
+      }
+    }
+    const baseURL = `${window.location.origin}/app/dashboards#/view/${context.dashboardSavedObjectId}${queryParams.toString()}`;
     return baseURL;
   }
 
@@ -71,7 +63,7 @@ export class ReportingService {
       if(!dataSourceContext.dashboardSavedObjectId) {
         return null;
       }
-      reportingPlugin.generateInContextPDFReport(this.generateReportURL(dataSourceContext));
+      await reportingPlugin.generateInContextPDFReport(await this.generateReportURL(dataSourceContext));
     }catch(error){
       const options = {
         context: `${ReportingService.name}.generateInContextPDFReport`,

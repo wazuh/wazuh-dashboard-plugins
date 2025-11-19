@@ -12,9 +12,7 @@
 
 import React from 'react';
 import { useAsyncAction } from '../../hooks';
-import { getUiSettings, getPlugins } from '../../../../kibana-services';
 import { ReportingService } from '../../../../react-services';
-import $ from 'jquery';
 import { WzButton } from '../../../common/buttons';
 import { connect } from 'react-redux';
 
@@ -32,7 +30,7 @@ export const ButtonModuleGenerateReport = connect(mapStateToProps)(
     const totalResults = dataSourceSearchContext?.totalResults;
     const action = useAsyncAction(async () => {
       const reportingService = new ReportingService();
-      reportingService.generateInContextPDFReport();
+      await reportingService.generateInContextPDFReport();
     }, [agent]);
 
     return (
