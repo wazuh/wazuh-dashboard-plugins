@@ -558,25 +558,6 @@ export const endpointGroups = {
   redirectTo: () => '/manager/?tab=groups',
 };
 
-export const rules = {
-  category: 'wz-category-server-management',
-  id: 'rules',
-  title: i18n.translate('wz-app-rules-title', {
-    defaultMessage: 'Rules',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-rules-breadcrumbLabel', {
-    defaultMessage: 'Rules',
-  }),
-  description: i18n.translate('wz-app-rules-description', {
-    defaultMessage: 'Manage your cluster rules.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 700,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/manager/?tab=ruleset',
-};
-
 export const decoders = {
   category: 'wz-category-server-management',
   id: 'decoders',
@@ -886,7 +867,6 @@ export const Applications = [
   office365,
   docker,
   endpointSummary,
-  rules,
   decoders,
   cdbLists,
   endpointGroups,
