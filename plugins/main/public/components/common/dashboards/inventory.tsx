@@ -9,8 +9,7 @@ import {
 import { useDataSourceWithSearchBar } from '../hooks/use-data-source-search-context';
 import { IntlProvider } from 'react-intl';
 import { CustomSearchBar } from '../custom-search-bar';
-import { getPlugins } from '../../../kibana-services';
-import { ViewMode } from '../../../../../../src/plugins/embeddable/public';
+import DashboardRenderer from './dashboard-renderer/dashboard-renderer';
 import { CustomSearchBarProps } from '../custom-search-bar/custom-search-bar';
 import { withDataSourceInitiated, withDataSourceLoading } from '../hocs';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
@@ -18,9 +17,6 @@ import { DiscoverNoResults } from '../no-results/no-results';
 import { SampleDataWarning } from '../../visualize/components';
 import classnames from 'classnames';
 import { compose } from 'redux';
-
-const DashboardByRenderer =
-  getPlugins().dashboard.DashboardContainerByValueRenderer;
 
 const InventoryDashboard = compose(
   withDataSourceLoading({
@@ -67,6 +63,9 @@ const InventoryDashboard = compose(
         autoRefreshFingerprint,
         isDataSourceLoading,
       });
+
+    const shouldHideDashboard = !Boolean(results?.hits?.total > 0);
+
     return (
       <>
         <CustomSearchBar
@@ -79,43 +78,57 @@ const InventoryDashboard = compose(
         />
 
         {results?.hits?.total === 0 ? <DiscoverNoResults /> : null}
-        <div
-          className={classnames(
-            'wz-dashboard-responsive',
-            'wz-dashboard-hide-tables-pagination-export-csv-controls',
-            classNameDashboardWrapper,
-            {
-              'wz-no-display': !(results?.hits?.total > 0),
-            },
-          )}
-        >
-          {categoriesSampleData && (
+
+        {categoriesSampleData && (
+          <div
+            className={classnames(classNameDashboardWrapper, {
+              'wz-no-display': !shouldHideDashboard,
+            })}
+          >
             <SampleDataWarning categoriesSampleData={categoriesSampleData} />
-          )}
+          </div>
+        )}
+        <div className='wz-dashboard-responsive'>
           {getDashboardPanels && (
-            <DashboardByRenderer
-              input={{
-                viewMode: ViewMode.VIEW,
-                panels: getDashboardPanels(dataSource?.id),
-                isFullScreenMode: false,
-                filters: fetchFilters ?? [],
-                useMargins: true,
-                id: 'inventory-dashboard',
-                timeRange: {
-                  from: searchBarProps.dateRangeFrom,
-                  to: searchBarProps.dateRangeTo,
+            <>
+              {getDashboardPanels.map(
+                ({ dashboardId, agentDashboardId, className = '' }) => {
+                  const dashboard = (
+                    <DashboardRenderer
+                      dashboardId={dashboardId}
+                      agentDashboardId={agentDashboardId}
+                      className={classnames(className, {
+                        'wz-no-display': shouldHideDashboard,
+                        'wz-dashboard-hide-tables-pagination-export-csv-controls':
+                          true,
+                      })}
+                      hasPinnedAgent={Boolean(
+                        dataSource?.getPinnedAgentFilter?.()?.length,
+                      )}
+                      config={{
+                        dataSource: {
+                          ...dataSource,
+                          searchBarProps,
+                          fetchFilters,
+                          fingerprint,
+                          autoRefreshFingerprint,
+                        },
+                      }}
+                    />
+                  );
+
+                  if (className) {
+                    return (
+                      <div key={dashboardId || agentDashboardId}>
+                        {dashboard}
+                      </div>
+                    );
+                  }
+
+                  return dashboard;
                 },
-                title: 'Inventory dahsboard',
-                description: 'Inventory dahsboard',
-                query: searchBarProps.query,
-                refreshConfig: {
-                  pause: false,
-                  value: 15,
-                },
-                hidePanelTitles: false,
-                lastReloadRequestTime: fingerprint,
-              }}
-            />
+              )}
+            </>
           )}
         </div>
         {results?.hits?.total > 0 && (
@@ -159,7 +172,11 @@ export interface InventoryDashboardTableProps {
   DataSource: any;
   DataSourceRepositoryCreator: any;
   tableDefaultColumns: { id: string }[];
-  getDashboardPanels: (indexPatternID: string) => any;
+  getDashboardPanels: Array<{
+    dashboardId: string;
+    agentDashboardId?: string;
+    className?: string;
+  }>;
   managedFilters: CustomSearchBarProps['filterInputs'];
   managedFiltersProps?: CustomSearchBarProps['filterInputsProps'];
   tableId: TableDataGridWithSearchBarInspectedHitFetchDataTableId;

@@ -1,7 +1,6 @@
 import React from 'react';
-import { getDashboardPanels } from './dashboard-panels';
+// Use saved dashboards by ID instead of panel builders
 import { withErrorBoundary } from '../../../common/hocs';
-import { compose } from 'redux';
 
 import {
   SystemInventoryStatesDataSource,
@@ -9,46 +8,26 @@ import {
 } from '../../../common/data-source';
 
 import { withSystemInventoryDataSource } from '../common/hocs/validate-system-inventory-index-pattern';
-import { getDashboardKPIs } from './dashboard-kpi';
-import { getDashboardTables } from './dashboard-tables';
 import { createDashboard } from '../../../common/dashboards';
-import { WAZUH_SAMPLE_INVENTORY_AGENT } from '../../../../../common/constants';
+import {
+  IT_HYGIENE_DASHBOARD_ID,
+  IT_HYGIENE_AGENT_DASHBOARD_ID,
+  WAZUH_SAMPLE_INVENTORY_AGENT,
+} from '../../../../../common/constants';
 
-export const DashboardITHygiene = compose(
-  withErrorBoundary,
-  withSystemInventoryDataSource,
-)(
-  createDashboard({
-    DataSource: SystemInventoryStatesDataSource,
-    DataSourceRepositoryCreator: SystemInventoryStatesDataSourceRepository,
-    getDashboardPanels: [
-      {
-        getDashboardPanels: getDashboardKPIs,
-        id: 'it-hygiene-dashboard-kpis',
-        useMargins: true,
-        title: 'IT Hygiene dashboard KPIs',
-        description: 'Dashboard of the IT Hygiene KPIs',
-        hidePanelTitles: false,
-        className: 'wz-dashboard-hide-tables-pagination-export-csv-controls',
-      },
-      {
-        getDashboardPanels: getDashboardTables,
-        id: 'it-hygiene-dashboard-tab-filters',
-        useMargins: false,
-        title: 'IT Hygiene dashboard filters',
-        description: 'Dashboard of the IT Hygiene filters',
-        hidePanelTitles: true,
-        className: 'wz-dashboard-hide-tables-pagination-export-csv-controls',
-      },
-      {
-        getDashboardPanels: getDashboardPanels,
-        id: 'it-hygiene-dashboard-tab',
-        useMargins: true,
-        title: 'IT Hygiene dashboard',
-        description: 'Dashboard of the IT Hygiene',
-        hidePanelTitles: false,
-      },
-    ],
-    sampleDataWarningCategories: [WAZUH_SAMPLE_INVENTORY_AGENT],
-  }),
+export const DashboardITHygiene = withErrorBoundary(
+  withSystemInventoryDataSource(
+    createDashboard({
+      DataSource: SystemInventoryStatesDataSource,
+      DataSourceRepositoryCreator: SystemInventoryStatesDataSourceRepository,
+      getDashboardPanels: [
+        {
+          dashboardId: IT_HYGIENE_DASHBOARD_ID,
+          agentDashboardId: IT_HYGIENE_AGENT_DASHBOARD_ID,
+          className: 'wz-dashboard-hide-tables-pagination-export-csv-controls',
+        },
+      ],
+      sampleDataWarningCategories: [WAZUH_SAMPLE_INVENTORY_AGENT],
+    }),
+  ),
 );
