@@ -672,25 +672,6 @@ export const devTools = {
   redirectTo: () => '/wazuh-dev?tab=devTools',
 };
 
-export const rulesetTest = {
-  category: 'wz-category-server-management',
-  id: 'ruleset-test',
-  title: i18n.translate('wz-app-ruleset-test-title', {
-    defaultMessage: 'Ruleset Test',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-ruleset-test-breadcrumbLabel', {
-    defaultMessage: 'Ruleset Test',
-  }),
-  description: i18n.translate('wz-app-ruleset-test-description', {
-    defaultMessage: 'Check your ruleset testing logs.',
-  }),
-  euiIconType: 'visualizeApp',
-  order: 709,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/wazuh-dev?tab=logtest',
-};
-
 export const security = {
   category: 'wz-category-server-management',
   id: 'security',
@@ -820,7 +801,6 @@ export const Applications = [
   nist80053,
   tsc,
   devTools,
-  rulesetTest,
   security,
   microsoftGraphAPI,
   amazonWebServices,
