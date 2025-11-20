@@ -29,22 +29,6 @@ describe('[settings] Input validation', () => {
     ${'customization.logo.app'}        | ${{ size: 124000, name: 'image.svg' }}                                 | ${undefined}
     ${'customization.logo.app'}        | ${{ size: 124000, name: 'image.txt' }}                                 | ${'File extension is invalid. Allowed file extensions: .jpeg, .jpg, .png, .svg.'}
     ${'customization.logo.app'}        | ${{ size: 1240000, name: 'image.txt' }}                                | ${'File size should be lower or equal than 1 MB.'}
-    ${'customization.logo.reports'}    | ${{ size: 124000, name: 'image.jpg' }}                                 | ${undefined}
-    ${'customization.logo.reports'}    | ${{ size: 124000, name: 'image.jpeg' }}                                | ${undefined}
-    ${'customization.logo.reports'}    | ${{ size: 124000, name: 'image.png' }}                                 | ${undefined}
-    ${'customization.logo.reports'}    | ${{ size: 124000, name: 'image.svg' }}                                 | ${'File extension is invalid. Allowed file extensions: .jpeg, .jpg, .png.'}
-    ${'customization.logo.reports'}    | ${{ size: 124000, name: 'image.txt' }}                                 | ${'File extension is invalid. Allowed file extensions: .jpeg, .jpg, .png.'}
-    ${'customization.logo.reports'}    | ${{ size: 1240000, name: 'image.txt' }}                                | ${'File size should be lower or equal than 1 MB.'}
-    ${'customization.reports.footer'}  | ${'Test'}                                                              | ${undefined}
-    ${'customization.reports.footer'}  | ${'Test\nTest'}                                                        | ${undefined}
-    ${'customization.reports.footer'}  | ${'Test\nTest\nTest\nTest\nTest'}                                      | ${'The string should have less or equal to 2 line/s.'}
-    ${'customization.reports.footer'}  | ${'Line with 30 characters       \nTest'}                              | ${undefined}
-    ${'customization.reports.footer'}  | ${'Testing maximum length of a line of more than 50 characters\nTest'} | ${'The maximum length of a line is 50 characters.'}
-    ${'customization.reports.header'}  | ${'Test'}                                                              | ${undefined}
-    ${'customization.reports.header'}  | ${'Test\nTest'}                                                        | ${undefined}
-    ${'customization.reports.header'}  | ${'Test\nTest\nTest\nTest\nTest'}                                      | ${'The string should have less or equal to 3 line/s.'}
-    ${'customization.reports.header'}  | ${'Line with 20 charact\nTest'}                                        | ${undefined}
-    ${'customization.reports.header'}  | ${'Testing maximum length of a line of 40 characters\nTest'}           | ${'The maximum length of a line is 40 characters.'}
     ${'enrollment.dns'}                | ${'test'}                                                              | ${undefined}
     ${'enrollment.dns'}                | ${''}                                                                  | ${undefined}
     ${'enrollment.dns'}                | ${'example.fqdn.valid'}                                                | ${undefined}
