@@ -10,185 +10,72 @@
  * Find more information about this on the LICENSE file.
  */
 
-import moment from 'moment';
 import { WazuhConfig } from '../react-services/wazuh-config';
-import { AppState } from './app-state';
-import { WzRequest } from './wz-request';
-import { getCore, getHttp, getToasts, getUiSettings } from '../kibana-services';
+import { getPlugins } from '../kibana-services';
+import { NavigationURLSearchParams } from '../react-services/navigation-service';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
 import store from '../redux/store';
-import domtoimage from '../utils/dom-to-image-more';
-import dateMath from '@elastic/datemath';
-import React from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiLink } from '@elastic/eui';
-import { reporting } from '../utils/applications';
-import { RedirectAppLinks } from '../../../../src/plugins/opensearch_dashboards_react/public';
-import {
-  buildOpenSearchQuery,
-  buildRangeFilter,
-  getOpenSearchQueryConfig,
-} from '../../../../src/plugins/data/common';
-import { getForceNow } from '../components/common/search-bar/search-bar-service';
-import NavigationService from './navigation-service';
-import { Agent } from '../components/endpoints-summary/types';
+import { PatternDataSourceFilterManager } from '../components/common/data-source/pattern/pattern-data-source-filter-manager';
 
 export class ReportingService {
   constructor() {
     this.wazuhConfig = new WazuhConfig();
   }
 
-  showToast = (color, title, text, time) => {
-    getToasts().add({
-      color: color,
-      title: title,
-      text: text,
-      toastLifeTimeMs: time,
-    });
-  };
-
-  removeTableVis(visList) {
-    const attributes = JSON.parse(visList.attributes.visState);
-    return attributes.type !== 'table';
-  }
-
-  renderSucessReportsToast({ filename }) {
-    this.showToast(
-      'success',
-      'Report created',
-      <>
-        <EuiFlexGroup alignItems='center'>
-          <EuiFlexItem>
-            <EuiFlexGroup justifyContent='flexEnd' gutterSize='s'>
-              <EuiFlexItem style={{ whiteSpace: 'nowrap' }} grow={false}>
-                See the reports on
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <RedirectAppLinks application={getCore().application}>
-                  <EuiLink
-                    aria-label='go to Endpoint summary'
-                    href={NavigationService.getInstance().getUrlForApp(
-                      reporting.id,
-                      {
-                        path: '',
-                      },
-                    )}
-                  >
-                    {reporting.title}
-                  </EuiLink>
-                </RedirectAppLinks>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiLink
-              href={getHttp().basePath.prepend(`/reports/${filename}`)}
-              target='_blank'
-            >
-              Open report
-            </EuiLink>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </>,
-      10000,
-    );
-  }
-
-  async getVisualizationsFromDOM() {
-    const domVisualizations = document.querySelectorAll('.visualization');
-    return await Promise.all(
-      Array.from(domVisualizations).map(async node => {
-        return {
-          /* WORKAROUND: Defining the width and height resolves a bug
-          related to cropped screenshot on Firefox.
-
-          This solution is based on
-          https://github.com/1904labs/dom-to-image-more/issues/160#issuecomment-1922491067
-
-          See https://github.com/wazuh/wazuh-dashboard-plugins/issues/6900#issuecomment-2275495245
-          */
-          element: await domtoimage.toPng(node, {
-            width: node.clientWidth,
-            height: node.clientHeight,
-          }),
-          width: node.clientWidth,
-          height: node.clientHeight,
-          title: node?.parentNode?.parentNode?.parentNode?.querySelector(
-            'figcaption > h2 > .embPanel__titleInner',
-          )?.textContent,
-        };
-      }),
-    );
-  }
-
   async getDataSourceSearchContext() {
     return store.getState().reportingReducers?.dataSourceSearchContext;
   }
 
-  async startVis2Png(
-    tab,
-    /** @type {Agent['id'] | false} */ agents = false,
-    /** @type {any} */ searchContext = null,
-  ) {
+  /**
+   * This methods get the current url from browser and get the query params and use to create a reporting url
+   *
+   * @param {*} context
+   */
+  generateReportURL(context) {
+    // URL example: "/app/dashboards#/view/it-hygiene-overview-dashboard-tab?_a=(filters:!(),query:(language:kuery,query:''))&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:'2025-08-20T19:38:00.878Z',to:'2025-11-18T19:38:00.878Z'))"
+    const urlParams = window.location.href.split('?')?.[1] ?? '';
+    const queryParams = new NavigationURLSearchParams(urlParams);
+    const filtersOnURLFormat =
+      PatternDataSourceFilterManager.filtersToURLFormat(context.filters);
+    queryParams.set('_a', filtersOnURLFormat);
+    // only keep the _a and _g query params (the osd native query params)
+    for (const key of Array.from(queryParams.keys())) {
+      if (key !== '_a' && key !== '_g') {
+        queryParams.delete(key);
+      }
+    }
+    const baseURL = `${window.location.origin}/app/dashboards#/view/${
+      context.dashboardSavedObjectId
+    }${queryParams.toString()}`;
+    return baseURL;
+  }
+
+  reportDashboardPluginExist() {
+    return getPlugins().reportsDashboards !== undefined;
+  }
+
+  async generateInContextPDFReport() {
+    const dataSourceContext = await this.getDataSourceSearchContext();
+    if (!dataSourceContext) {
+      return null;
+    }
     try {
-      const dataSourceContext =
-        searchContext || (await this.getDataSourceSearchContext());
-      const visualizations = await this.getVisualizationsFromDOM();
+      const reportingPlugin = getPlugins().reportsDashboards;
+      if (!reportingPlugin) {
+        return null;
+      }
 
-      const timeFilter =
-        dataSourceContext.time && dataSourceContext.indexPattern.timeFieldName
-          ? buildRangeFilter(
-              {
-                name: dataSourceContext.indexPattern.timeFieldName,
-                type: 'date',
-              },
-              dataSourceContext.time,
-              dataSourceContext.indexPattern,
-            )
-          : null;
-      // Build the filters to use in the server side
-      // Based on https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.13.0/src/plugins/data/public/query/query_service.ts#L103-L113
-      const serverSideQuery = buildOpenSearchQuery(
-        dataSourceContext.indexPattern,
-        dataSourceContext.query,
-        [...dataSourceContext.filters, ...(timeFilter ? [timeFilter] : [])],
-        getOpenSearchQueryConfig(getUiSettings()),
+      if (!dataSourceContext.dashboardSavedObjectId) {
+        return null;
+      }
+      await reportingPlugin.generateInContextPDFReport(
+        this.generateReportURL(dataSourceContext),
       );
-      const browserTimezone = moment.tz.guess(true);
-
-      const time = dataSourceContext.time
-        ? {
-            to: dateMath.parse(dataSourceContext.time.to, {
-              roundUp: true,
-              forceNow: getForceNow(),
-            }),
-            from: dateMath.parse(dataSourceContext.time.from),
-          }
-        : undefined;
-
-      const data = {
-        array: visualizations,
-        serverSideQuery, // Used for applying the same filters on the server side requests
-        filters: dataSourceContext.filters,
-        time,
-        searchBar: dataSourceContext?.query?.query || '',
-        tables: [], // TODO: check is this is used
-        tab,
-        section: agents ? 'agents' : 'overview',
-        agents,
-        browserTimezone,
-        indexPatternTitle: dataSourceContext.indexPattern.title,
-        apiId: JSON.parse(AppState.getCurrentAPI()).id,
-      };
-
-      const apiEndpoint = `/reports/modules/${tab}`;
-      const response = await WzRequest.genericReq('POST', apiEndpoint, data);
-
-      this.renderSucessReportsToast({ filename: response.data.filename });
     } catch (error) {
       const options = {
-        context: `${ReportingService.name}.startVis2Png`,
+        context: `${ReportingService.name}.generateInContextPDFReport`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -196,40 +83,6 @@ export class ReportingService {
           error: error,
           message: error.message || error,
           title: `Error creating the report`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  }
-
-  async startConfigReport(obj, type, components) {
-    try {
-      const browserTimezone = moment.tz.guess(true);
-
-      const data = {
-        filters: [
-          type === 'agentConfig' ? { agent: obj.id } : { group: obj.name },
-        ],
-        browserTimezone,
-        components,
-        apiId: JSON.parse(AppState.getCurrentAPI()).id,
-      };
-      const apiEndpoint =
-        type === 'agentConfig'
-          ? `/reports/agents/${obj.id}`
-          : `/reports/groups/${obj.name}`;
-      const response = await WzRequest.genericReq('POST', apiEndpoint, data);
-      this.renderSucessReportsToast({ filename: response.data.filename });
-    } catch (error) {
-      const options = {
-        context: `${ReportingService.name}.startConfigReport`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: `Error configuring report`,
         },
       };
       getErrorOrchestrator().handleError(options);
