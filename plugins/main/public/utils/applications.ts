@@ -711,25 +711,6 @@ export const sampleData = {
   redirectTo: () => '/settings?tab=sample_data',
 };
 
-export const reporting = {
-  category: 'wz-category-dashboard-management',
-  id: 'reporting',
-  title: i18n.translate('wz-app-reporting-title', {
-    defaultMessage: 'Reporting',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-reporting-breadcrumbLabel', {
-    defaultMessage: 'Reporting',
-  }),
-  description: i18n.translate('wz-app-reporting-description', {
-    defaultMessage: 'Check your stored reports.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 10002,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/manager/?tab=reporting',
-};
-
 export const serverApis = {
   category: 'wz-category-dashboard-management',
   id: 'server-apis',
@@ -815,7 +796,6 @@ export const Applications = [
   statistics,
   logs,
   settings,
-  reporting,
   serverApis,
   sampleData,
   appSettings,
