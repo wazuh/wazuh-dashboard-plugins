@@ -313,18 +313,6 @@ describe.skip('[endpoint] PUT /utils/configuration', () => {
     ${'configuration.ui_api_editable'} | ${true}                                                          | ${400}             | ${'[request body.configuration.ui_api_editable]: expected value of type [boolean] but got [number]'}
     ${'customization.enabled'}         | ${true}                                                          | ${200}             | ${null}
     ${'customization.enabled'}         | ${0}                                                             | ${400}             | ${'[request body.customization.enabled]: expected value of type [boolean] but got [number]'}
-    ${'customization.reports.footer'}  | ${'Test'}                                                        | ${200}             | ${null}
-    ${'customization.reports.footer'}  | ${'Test\nTest'}                                                  | ${200}             | ${null}
-    ${'customization.reports.footer'}  | ${'Test\nTest\nTest\nTest\nTest'}                                | ${400}             | ${'[request body.customization.reports.footer]: The string should have less or equal to 2 line/s.'}
-    ${'customization.reports.footer'}  | ${'Line with 30 characters       \nTest'}                        | ${200}             | ${undefined}
-    ${'customization.reports.footer'}  | ${'Testing the maximum length of a line of 50 characters\nTest'} | ${400}             | ${'[request body.customization.reports.footer]: The maximum length of a line is 50 characters.'}
-    ${'customization.reports.footer'}  | ${true}                                                          | ${400}             | ${'[request body.customization.reports.footer]: expected value of type [string] but got [boolean]'}
-    ${'customization.reports.header'}  | ${'Test'}                                                        | ${200}             | ${null}
-    ${'customization.reports.header'}  | ${'Test\nTest'}                                                  | ${200}             | ${null}
-    ${'customization.reports.header'}  | ${'Test\nTest\nTest\nTest\nTest'}                                | ${400}             | ${'[request body.customization.reports.header]: The string should have less or equal to 3 line/s.'}
-    ${'customization.reports.header'}  | ${'Line with 20 charact\nTest'}                                  | ${200}             | ${undefined}
-    ${'customization.reports.header'}  | ${'Testing maximum length of a line of 40 characters\nTest'}     | ${400}             | ${'[request body.customization.reports.header]: The maximum length of a line is 40 characters.'}
-    ${'customization.reports.header'}  | ${true}                                                          | ${400}             | ${'[request body.customization.reports.header]: expected value of type [string] but got [boolean]'}
     ${'enrollment.dns'}                | ${'test'}                                                        | ${200}             | ${null}
     ${'enrollment.dns'}                | ${''}                                                            | ${200}             | ${null}
     ${'enrollment.dns'}                | ${'test space'}                                                  | ${400}             | ${'[request body.enrollment.dns]: No whitespaces allowed.'}
@@ -415,15 +403,11 @@ describe.skip('[endpoint] PUT /utils/configuration/files/{key} - Upload file', (
 
   it.each`
     setting                         | filename                     | responseStatusCode | responseBodyMessage
-    ${'customization.logo.unknown'} | ${'fixture_image_small.jpg'} | ${400}             | ${'[request params.key]: types that failed validation:\n- [request params.key.0]: expected value to equal [customization.logo.app]\n- [request params.key.1]: expected value to equal [customization.logo.reports]'}
+    ${'customization.logo.unknown'} | ${'fixture_image_small.jpg'} | ${400}             | ${'[request params.key]: expected value to equal [customization.logo.app]'}
     ${'customization.logo.app'}     | ${'fixture_image_small.jpg'} | ${200}             | ${null}
     ${'customization.logo.app'}     | ${'fixture_image_small.png'} | ${200}             | ${null}
     ${'customization.logo.app'}     | ${'fixture_image_small.svg'} | ${200}             | ${null}
     ${'customization.logo.app'}     | ${'fixture_image_big.png'}   | ${413}             | ${'Payload content length greater than maximum allowed: 1048576'}
-    ${'customization.logo.reports'} | ${'fixture_image_small.jpg'} | ${200}             | ${null}
-    ${'customization.logo.reports'} | ${'fixture_image_small.png'} | ${200}             | ${null}
-    ${'customization.logo.reports'} | ${'fixture_image_big.png'}   | ${413}             | ${'Payload content length greater than maximum allowed: 1048576'}
-    ${'customization.logo.reports'} | ${'fixture_image_small.svg'} | ${400}             | ${'File extension is not valid for setting [customization.logo.reports] setting. Allowed file extensions: .jpeg, .jpg, .png'}
   `(
     `$setting: $filename - PUT /utils/configuration/files/{key} - $responseStatusCode`,
     async ({ responseBodyMessage, responseStatusCode, setting, filename }) => {
@@ -485,9 +469,8 @@ describe.skip('[endpoint] DELETE /utils/configuration/files/{key} - Delete file'
 
   it.each`
     setting                         | expectedValue | responseStatusCode | responseBodyMessage
-    ${'customization.logo.unknown'} | ${''}         | ${400}             | ${'[request params.key]: types that failed validation:\n- [request params.key.0]: expected value to equal [customization.logo.app]\n- [request params.key.1]: expected value to equal [customization.logo.reports]'}
+    ${'customization.logo.unknown'} | ${''}         | ${400}             | ${'[request params.key]: expected value to equal [customization.logo.app]'}
     ${'customization.logo.app'}     | ${''}         | ${200}             | ${'All files were removed and the configuration file was updated.'}
-    ${'customization.logo.reports'} | ${''}         | ${200}             | ${'All files were removed and the configuration file was updated.'}
   `(
     `$setting - PUT /utils/configuration - $responseStatusCode`,
     async ({
