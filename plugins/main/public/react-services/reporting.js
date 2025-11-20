@@ -67,7 +67,7 @@ export class ReportingService {
         return null;
       }
       await reportingPlugin.generateInContextPDFReport(
-        await this.generateReportURL(dataSourceContext),
+        this.generateReportURL(dataSourceContext),
       );
     } catch (error) {
       const options = {
