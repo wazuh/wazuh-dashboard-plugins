@@ -33,12 +33,6 @@ exports[`Group main component renders correctly to match the snapshot 1`] = `
         },
       }
     }
-    logtestProps={
-      Object {
-        "onFlyout": true,
-        "showClose": true,
-      }
-    }
     section="groups"
     state={
       Object {

@@ -1,4 +1,7 @@
-export const DEV_TOOLS_INITIAL_BUFFER = `# API Console
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DEV_TOOLS_INITIAL_BUFFER should match the snapshot 1`] = `
+"# API Console
 #
 # This console allows you to interact with the server API directly
 #
@@ -14,5 +17,8 @@ GET /manager/info
 
 # Add agent: Add a new agent
 POST /agents
-${JSON.stringify({ name: 'NewAgent' }, null, 2)}
+{
+  \\"name\\": \\"NewAgent\\"
+}
+"
 `;
