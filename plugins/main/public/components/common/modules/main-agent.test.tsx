@@ -16,13 +16,6 @@ const REPORT_TAB = {
   PROCESSES: 'agent-tab-processes',
 };
 
-jest.mock('../../../react-services/reporting', () => ({
-  ReportingService: {
-    startVis2Png: jest.fn(),
-    startConfigReport: jest.fn(),
-  },
-}));
-
 jest.mock('../data-source', () => ({
   useDataSource: jest.fn().mockImplementation(() => ({
     dataSource: {},
