@@ -2,16 +2,14 @@ network.host: '0.0.0.0'
 node.name: 'os1'
 path.data: /var/lib/os1
 path.logs: /var/log/os1
-cluster.initial_cluster_manager_nodes:
-  - 'os1'
-# comment compatibility.override_main_response_version for 2.0.0 or 3.x.x
-# compatibility.override_main_response_version: true
+discovery.type: single-node
+
 plugins.security.ssl.http.pemcert_filepath: ${OPENSEARCH_PATH_CONF}/certs/os1.pem
 plugins.security.ssl.http.pemkey_filepath: ${OPENSEARCH_PATH_CONF}/certs/os1.key
-plugins.security.ssl.http.pemtrustedcas_filepath: ${OPENSEARCH_PATH_CONF}/certs/ca.pem
+plugins.security.ssl.http.pemtrustedcas_filepath: ${OPENSEARCH_PATH_CONF}/certs/root-ca.pem
 plugins.security.ssl.transport.pemcert_filepath: ${OPENSEARCH_PATH_CONF}/certs/os1.pem
 plugins.security.ssl.transport.pemkey_filepath: ${OPENSEARCH_PATH_CONF}/certs/os1.key
-plugins.security.ssl.transport.pemtrustedcas_filepath: ${OPENSEARCH_PATH_CONF}/certs/ca.pem
+plugins.security.ssl.transport.pemtrustedcas_filepath: ${OPENSEARCH_PATH_CONF}/certs/root-ca.pem
 plugins.security.ssl.http.enabled: true
 plugins.security.ssl.transport.enforce_hostname_verification: false
 plugins.security.ssl.transport.resolve_hostname: false

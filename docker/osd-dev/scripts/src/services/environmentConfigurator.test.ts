@@ -101,7 +101,7 @@ describe('services/environmentConfigurator', () => {
       expect(profile).toBe('standard');
       expect(process.env.WAZUH_DASHBOARD_CONF).toContain('/config/2.x/osd/');
       expect(process.env.SEC_CONFIG_PATH).toContain(
-        '/usr/share/opensearch/config',
+        '/usr/share/wazuh-indexer/config',
       );
     });
 
