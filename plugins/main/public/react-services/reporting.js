@@ -52,6 +52,10 @@ export class ReportingService {
     return baseURL;
   }
 
+  reportDashboardPluginExist() {
+    return getPlugins().reportsDashboards !== undefined;
+  }
+
   async generateInContextPDFReport() {
     const dataSourceContext = await this.getDataSourceSearchContext();
     if (!dataSourceContext) {

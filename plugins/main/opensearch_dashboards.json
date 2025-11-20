@@ -18,8 +18,7 @@
     "opensearchDashboardsUtils",
     "opensearchDashboardsLegacy",
     "wazuhCheckUpdates",
-    "wazuhCore",
-    "reportsDashboards"
+    "wazuhCore"
   ],
   "optionalPlugins": [
     "security",
@@ -27,7 +26,8 @@
     "searchguard",
     "telemetry",
     "notificationsDashboards",
-    "alertingDashboards"
+    "alertingDashboards",
+    "reportsDashboards"
   ],
   "server": true,
   "ui": true
