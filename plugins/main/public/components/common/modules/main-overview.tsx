@@ -74,19 +74,26 @@ export const MainModuleOverview = connect(mapStateToProps)(
                     <EuiFlexGroup>
                       {ModuleTabView &&
                         ModuleTabView.buttons &&
-                        ModuleTabView.buttons.map((ModuleViewButton, index) =>
-                          typeof ModuleViewButton !== 'string' ? (
-                            <EuiFlexItem key={`module_button_${index}`}>
-                              <ModuleViewButton
-                                {...{
-                                  ...this.props,
-                                  ...this.props.agentsSelectionProps,
-                                }}
-                                moduleID={section}
-                              />
-                            </EuiFlexItem>
-                          ) : null,
-                        )}
+                        ModuleTabView.buttons
+                          .filter(button =>
+                            button?.condition
+                              ? button?.condition(this.props)
+                              : true,
+                          )
+                          .map((button, index) => {
+                            const ModuleViewButton = button.component || button;
+                            return typeof ModuleViewButton !== 'string' ? (
+                              <EuiFlexItem key={`module_button_${index}`}>
+                                <ModuleViewButton
+                                  {...{
+                                    ...this.props,
+                                    ...this.props.agentsSelectionProps,
+                                  }}
+                                  moduleID={section}
+                                />
+                              </EuiFlexItem>
+                            ) : null;
+                          })}
                     </EuiFlexGroup>
                   </EuiFlexItem>
                 </EuiFlexGroup>

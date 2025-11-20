@@ -20,8 +20,6 @@ const mapStateToProps = state => ({
   dataSourceSearchContext: state.reportingReducers.dataSourceSearchContext,
 });
 
-const reportingService = new ReportingService();
-
 export const ButtonModuleGenerateReport = connect(mapStateToProps)(
   ({ agent, moduleID, dataSourceSearchContext }) => {
     const disabledReport = ![
@@ -31,12 +29,8 @@ export const ButtonModuleGenerateReport = connect(mapStateToProps)(
     ].every(Boolean);
     const totalResults = dataSourceSearchContext?.totalResults;
     const action = useAsyncAction(async () => {
-      await reportingService?.generateInContextPDFReport();
+      await new ReportingService()?.generateInContextPDFReport();
     }, [agent]);
-
-    if (!reportingService.reportDashboardPluginExist()) {
-      return null;
-    }
 
     return (
       <WzButton
