@@ -112,26 +112,8 @@ export enum WAZUH_MODULES_ID {
   GITHUB = 'github',
 }
 
-export enum WAZUH_MENU_MANAGEMENT_SECTIONS_ID {
-  MANAGEMENT = 'management',
-  ADMINISTRATION = 'administration',
-  RULESET = 'ruleset',
-  RULES = 'rules',
-  DECODERS = 'decoders',
-  CDB_LISTS = 'lists',
-  GROUPS = 'groups',
-  CONFIGURATION = 'configuration',
-  STATUS_AND_REPORTS = 'statusReports',
-  STATUS = 'status',
-  CLUSTER = 'monitoring',
-  LOGS = 'logs',
-  REPORTING = 'reporting',
-  STATISTICS = 'statistics',
-}
-
 export enum WAZUH_MENU_TOOLS_SECTIONS_ID {
   API_CONSOLE = 'devTools',
-  RULESET_TEST = 'logtest',
 }
 
 export enum WAZUH_MENU_SECURITY_SECTIONS_ID {

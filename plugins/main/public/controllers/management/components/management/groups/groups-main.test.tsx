@@ -37,10 +37,6 @@ const mockProps = {
       id: '000',
     },
   },
-  logtestProps: {
-    showClose: true,
-    onFlyout: true,
-  },
   state: {
     section: '',
   },

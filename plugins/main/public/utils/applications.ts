@@ -558,63 +558,6 @@ export const endpointGroups = {
   redirectTo: () => '/manager/?tab=groups',
 };
 
-export const rules = {
-  category: 'wz-category-server-management',
-  id: 'rules',
-  title: i18n.translate('wz-app-rules-title', {
-    defaultMessage: 'Rules',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-rules-breadcrumbLabel', {
-    defaultMessage: 'Rules',
-  }),
-  description: i18n.translate('wz-app-rules-description', {
-    defaultMessage: 'Manage your cluster rules.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 700,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/manager/?tab=ruleset',
-};
-
-export const decoders = {
-  category: 'wz-category-server-management',
-  id: 'decoders',
-  title: i18n.translate('wz-app-decoders-title', {
-    defaultMessage: 'Decoders',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-decoders-breadcrumbLabel', {
-    defaultMessage: 'Decoders',
-  }),
-  description: i18n.translate('wz-app-decoders-description', {
-    defaultMessage: 'Manage your cluster decoders.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 701,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/manager/?tab=decoders',
-};
-
-export const cdbLists = {
-  category: 'wz-category-server-management',
-  id: 'cdb-lists',
-  title: i18n.translate('wz-app-lists-title', {
-    defaultMessage: 'CDB Lists',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-cdb-lists-breadcrumbLabel', {
-    defaultMessage: 'CDB Lists',
-  }),
-  description: i18n.translate('wz-app-cdb-lists-description', {
-    defaultMessage: 'Manage your cluster CDB list.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 702,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/manager/?tab=lists',
-};
-
 export const serverStatus = {
   category: 'wz-category-server-management',
   id: 'server-status',
@@ -727,25 +670,6 @@ export const devTools = {
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/wazuh-dev?tab=devTools',
-};
-
-export const rulesetTest = {
-  category: 'wz-category-server-management',
-  id: 'ruleset-test',
-  title: i18n.translate('wz-app-ruleset-test-title', {
-    defaultMessage: 'Ruleset Test',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-ruleset-test-breadcrumbLabel', {
-    defaultMessage: 'Ruleset Test',
-  }),
-  description: i18n.translate('wz-app-ruleset-test-description', {
-    defaultMessage: 'Check your ruleset testing logs.',
-  }),
-  euiIconType: 'visualizeApp',
-  order: 709,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/wazuh-dev?tab=logtest',
 };
 
 export const security = {
@@ -877,7 +801,6 @@ export const Applications = [
   nist80053,
   tsc,
   devTools,
-  rulesetTest,
   security,
   microsoftGraphAPI,
   amazonWebServices,
@@ -886,9 +809,6 @@ export const Applications = [
   office365,
   docker,
   endpointSummary,
-  rules,
-  decoders,
-  cdbLists,
   endpointGroups,
   serverStatus,
   cluster,
