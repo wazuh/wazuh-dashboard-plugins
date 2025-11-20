@@ -18,8 +18,6 @@ import { connect } from 'react-redux';
 import { updateShowAddAgents } from '../../../../../redux/actions/groupsActions';
 
 import GroupsHandler from './utils/groups-handler';
-import { ExportConfiguration } from '../../../../../components/agents/export-configuration';
-import { ReportingService } from '../../../../../react-services/reporting';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 class WzGroupsActionButtonsAgents extends Component {
@@ -27,8 +25,6 @@ class WzGroupsActionButtonsAgents extends Component {
 
   constructor(props) {
     super(props);
-    this.reportingService = new ReportingService();
-
     this.groupsHandler = GroupsHandler;
   }
 
@@ -55,24 +51,9 @@ class WzGroupsActionButtonsAgents extends Component {
       </WzButtonPermissions>
     );
 
-    // Export PDF button
-    const exportPDFButton = (
-      <ExportConfiguration
-        exportConfiguration={enabledComponents =>
-          this.reportingService.startConfigReport(
-            this.props.state.itemDetail,
-            'groupConfig',
-            enabledComponents,
-          )
-        }
-        type='group'
-      />
-    );
-
     return (
       <Fragment>
         <EuiFlexItem grow={false}>{manageAgentsButton}</EuiFlexItem>
-        <EuiFlexItem grow={false}>{exportPDFButton}</EuiFlexItem>
       </Fragment>
     );
   }
