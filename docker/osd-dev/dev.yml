@@ -193,48 +193,6 @@ services:
       timeout: 5s
       retries: 120
 
-  filebeat:
-    depends_on:
-      os1:
-        condition: service_healthy
-    image: elastic/filebeat:7.10.2
-    profiles:
-      - 'saml'
-      - 'standard'
-      - 'dashboard-src'
-      - 'server-local' # server profile to use the local packages with agents deb and rpm
-      - 'server-local-rpm' # server profile to use the local packages with agent rpm
-      - 'server-local-deb' # server profile to use the local packages with agent deb
-      - 'server-local-without' # server profile to use the local packages without agent
-    hostname: filebeat
-    user: '0:0'
-    networks:
-      - os-dev
-      - mon
-
-    # <<: *logging
-    # restart: always
-    entrypoint:
-      - '/bin/bash'
-    command: >
-      -c '
-        mkdir -p /etc/filebeat
-        echo admin | filebeat keystore add username --stdin --force
-        echo ${PASSWORD}| filebeat keystore add password --stdin --force
-        curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/v4.7.2/extensions/elasticsearch/7.x/wazuh-template.json
-        curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.3.tar.gz | tar -xvz -C /usr/share/filebeat/module
-        # copy filebeat to preserve correct permissions without
-        # affecting host filesystem
-        cp /tmp/filebeat.yml /usr/share/filebeat/filebeat.yml
-        chown root.root /usr/share/filebeat/filebeat.yml
-        chmod go-w /usr/share/filebeat/filebeat.yml
-        filebeat setup -e
-        filebeat
-      '
-    volumes:
-      - wm_certs:/etc/ssl/elastic
-      - ./config/${OSD_MAJOR}/filebeat/filebeat.yml:/tmp/filebeat.yml
-
   osd:
     depends_on:
       os1:
@@ -394,8 +352,8 @@ services:
       - INDEXER_PASSWORD=admin
       - FILEBEAT_SSL_VERIFICATION_MODE=full
       - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/wazuh/root-ca.pem
-      - SSL_CERTIFICATE=/etc/ssl/wazuh/filebeat.pem
-      - SSL_KEY=/etc/ssl/wazuh/filebeat.key
+      - SSL_CERTIFICATE=/etc/ssl/wazuh/server.pem
+      - SSL_KEY=/etc/ssl/wazuh/server-key.pem
       - API_USERNAME=wazuh-wui
       - API_PASSWORD=MyS3cr37P450r.*-
     volumes:
