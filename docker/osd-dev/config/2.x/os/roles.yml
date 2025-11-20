@@ -80,6 +80,38 @@ notebooks_full_access:
     - 'cluster:admin/opendistro/notebooks/get'
     - 'cluster:admin/opendistro/notebooks/list'
 
+# Allows users to read and download Reports
+reports_instances_read_access:
+  reserved: true
+  cluster_permissions:
+    - 'cluster:admin/opendistro/reports/instance/list'
+    - 'cluster:admin/opendistro/reports/instance/get'
+    - 'cluster:admin/opendistro/reports/menu/download'
+
+# Allows users to read and download Reports and Report-definitions
+reports_read_access:
+  reserved: true
+  cluster_permissions:
+    - 'cluster:admin/opendistro/reports/definition/get'
+    - 'cluster:admin/opendistro/reports/definition/list'
+    - 'cluster:admin/opendistro/reports/instance/list'
+    - 'cluster:admin/opendistro/reports/instance/get'
+    - 'cluster:admin/opendistro/reports/menu/download'
+
+# Allows users to all Reports functionality
+reports_full_access:
+  reserved: true
+  cluster_permissions:
+    - 'cluster:admin/opendistro/reports/definition/create'
+    - 'cluster:admin/opendistro/reports/definition/update'
+    - 'cluster:admin/opendistro/reports/definition/on_demand'
+    - 'cluster:admin/opendistro/reports/definition/delete'
+    - 'cluster:admin/opendistro/reports/definition/get'
+    - 'cluster:admin/opendistro/reports/definition/list'
+    - 'cluster:admin/opendistro/reports/instance/list'
+    - 'cluster:admin/opendistro/reports/instance/get'
+    - 'cluster:admin/opendistro/reports/menu/download'
+
 # Allows users to use all asynchronous-search functionality
 asynchronous_search_full_access:
   reserved: true

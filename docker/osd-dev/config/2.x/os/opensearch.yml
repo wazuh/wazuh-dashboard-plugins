@@ -33,6 +33,7 @@ plugins.security.system_indices.indices:
     '.opendistro-anomaly-detector*',
     '.opendistro-anomaly-checkpoints',
     '.opendistro-anomaly-detection-state',
+    '.opendistro-reports-*',
     '.opendistro-notifications-*',
     '.opendistro-notebooks',
     '.opensearch-observability',
