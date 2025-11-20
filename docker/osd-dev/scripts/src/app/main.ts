@@ -36,7 +36,10 @@ import {
 } from '../services/environmentConfigurator';
 import { parseArguments, printUsageAndExit } from '../services/argumentParser';
 import { resolveRequiredRepositories } from '../services/repoResolver';
-import { getPlatformVersionFromPackageJson } from '../services/versionService';
+import {
+  getAppVersionFromPackageJson,
+  getPlatformVersionFromPackageJson,
+} from '../services/versionService';
 import { EnvironmentPaths, ScriptConfig } from '../types/config';
 import { toRepositoryEnvVar } from '../utils/envUtils';
 import {
@@ -177,7 +180,7 @@ export async function mainWithDeps(
     deps.logger.info(
       `OS Version not received via flag, getting the version from ${envPaths.packageJsonPath}`,
     );
-    const resolvedOs = getPlatformVersionFromPackageJson('OS', envPaths);
+    const resolvedOs = getAppVersionFromPackageJson('OS', envPaths);
     // Record that main resolved this value from package.json
     config.setOsVersion(resolvedOs, 'main');
   }

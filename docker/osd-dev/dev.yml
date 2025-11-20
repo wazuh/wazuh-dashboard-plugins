@@ -74,7 +74,7 @@ services:
         cd $$certs
 
         echo "Generating CA"
-        cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
+        cfssl gencert -initca /conf/ca.json | cfssljson -bare root-ca
 
         echo "Generating servers certificates"
         for i in os1 osd imposter; do
@@ -82,8 +82,8 @@ services:
           cat /conf/host.json | \
           sed "s/HOST/$$i/g" | \
           cfssl gencert \
-            -ca $$certs/ca.pem \
-            -ca-key $$certs/ca-key.pem \
+            -ca $$certs/root-ca.pem \
+            -ca-key $$certs/root-ca-key.pem \
             -config /conf/cfssl.json \
             -profile=server - | \
           cfssljson -bare $$i
@@ -91,13 +91,13 @@ services:
         done
 
         echo "Generating clients certificates"
-          for i in admin filebeat saml wazuh.manager.local; do
+          for i in admin server saml wazuh.manager.local; do
             echo "Generating cert for $$i"
           cat /conf/host.json | \
           sed "s/HOST/$$i/g" | \
           cfssl gencert \
-            -ca $$certs/ca.pem \
-            -ca-key $$certs/ca-key.pem \
+            -ca $$certs/root-ca.pem \
+            -ca-key $$certs/root-ca-key.pem \
             -config /conf/cfssl.json \
             -profile=client - | \
           cfssljson -bare $$i
@@ -141,7 +141,7 @@ services:
       idpsetup:
         condition: service_completed_successfully
         required: false
-    image: opensearchproject/opensearch:${OS_VERSION}
+    image: quay.io/wazuh/wazuh-indexer:${OS_VERSION}
 
     # <<: *logging
     profiles:
@@ -160,7 +160,6 @@ services:
       - cluster.initial_master_nodes=os1
       - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
       - 'OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m' # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
-      - OPENSEARCH_PATH_CONF=/usr/share/opensearch/config/
     ulimits:
       memlock:
         soft: -1
@@ -169,8 +168,8 @@ services:
         soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
         hard: 65536
     volumes:
-      - wi_certs:/usr/share/opensearch/config/certs/
-      - ./config/${OSD_MAJOR}/os/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
+      - wi_certs:/usr/share/wazuh-indexer/config/certs/
+      - ./config/${OSD_MAJOR}/os/opensearch.yml:/usr/share/wazuh-indexer/config/opensearch.yml
       - ./config/${OSD_MAJOR}/os/internal_users.yml:${SEC_CONFIG_PATH}/internal_users.yml
       - ${SEC_CONFIG_FILE}:${SEC_CONFIG_PATH}/config.yml
       - ./config/${OSD_MAJOR}/os/roles_mapping.yml:${SEC_CONFIG_PATH}/roles_mapping.yml
@@ -188,53 +187,11 @@ services:
       test:
         [
           'CMD-SHELL',
-          "curl -v --cacert config/certs/ca.pem https://os1:9200 2>&1 | grep -q '401'",
+          "curl -v --cacert config/certs/root-ca.pem https://os1:9200 2>&1 | grep -q '401'",
         ]
       interval: 1s
       timeout: 5s
       retries: 120
-
-  filebeat:
-    depends_on:
-      os1:
-        condition: service_healthy
-    image: elastic/filebeat:7.10.2
-    profiles:
-      - 'saml'
-      - 'standard'
-      - 'dashboard-src'
-      - 'server-local' # server profile to use the local packages with agents deb and rpm
-      - 'server-local-rpm' # server profile to use the local packages with agent rpm
-      - 'server-local-deb' # server profile to use the local packages with agent deb
-      - 'server-local-without' # server profile to use the local packages without agent
-    hostname: filebeat
-    user: '0:0'
-    networks:
-      - os-dev
-      - mon
-
-    # <<: *logging
-    # restart: always
-    entrypoint:
-      - '/bin/bash'
-    command: >
-      -c '
-        mkdir -p /etc/filebeat
-        echo admin | filebeat keystore add username --stdin --force
-        echo ${PASSWORD}| filebeat keystore add password --stdin --force
-        curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/v4.7.2/extensions/elasticsearch/7.x/wazuh-template.json
-        curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.3.tar.gz | tar -xvz -C /usr/share/filebeat/module
-        # copy filebeat to preserve correct permissions without
-        # affecting host filesystem
-        cp /tmp/filebeat.yml /usr/share/filebeat/filebeat.yml
-        chown root.root /usr/share/filebeat/filebeat.yml
-        chmod go-w /usr/share/filebeat/filebeat.yml
-        filebeat setup -e
-        filebeat
-      '
-    volumes:
-      - wm_certs:/etc/ssl/elastic
-      - ./config/${OSD_MAJOR}/filebeat/filebeat.yml:/tmp/filebeat.yml
 
   osd:
     depends_on:
@@ -313,7 +270,7 @@ services:
     command: >
       -c '
         # trust store
-        for i in /certs/idp/ca.pem /certs/wd/osd.pem /certs/wi/os1.pem
+        for i in /certs/idp/root-ca.pem /certs/wd/osd.pem /certs/wi/os1.pem
         do
           keytool -import -alias $$(basename $$i .pem) -file $$i -keystore /certs/idp/truststore.jks -storepass SecretPassword -trustcacerts -noprompt
         done
@@ -394,9 +351,9 @@ services:
       - INDEXER_USERNAME=admin
       - INDEXER_PASSWORD=admin
       - FILEBEAT_SSL_VERIFICATION_MODE=full
-      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/wazuh/ca.pem
-      - SSL_CERTIFICATE=/etc/ssl/wazuh/filebeat.pem
-      - SSL_KEY=/etc/ssl/wazuh/filebeat.key
+      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/wazuh/root-ca.pem
+      - SSL_CERTIFICATE=/etc/ssl/wazuh/server.pem
+      - SSL_KEY=/etc/ssl/wazuh/server-key.pem
       - API_USERNAME=wazuh-wui
       - API_PASSWORD=MyS3cr37P450r.*-
     volumes:
@@ -427,6 +384,13 @@ services:
     networks:
       - os-dev
       - mon
+    environment:
+      - INDEXER_URL=https://os1:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=admin
+      - INDEXER_SSL_CA=/etc/server_certs/root-ca.pem
+      - INDEXER_SSL_CERTIFICATE=/etc/server_certs/server.pem
+      - INDEXER_SSL_CERTIFICATE_KEY=/etc/server_certs/server-key.pem
     volumes:
       - wm_certs:/etc/server_certs
     ports:

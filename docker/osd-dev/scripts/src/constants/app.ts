@@ -88,9 +88,9 @@ export const OSD_MAJOR_1X = '1.x' as const;
 
 /** Security config base path per OSD major. */
 export const SECURITY_CONFIG_PATHS: Record<string, string> = {
-  [OSD_MAJOR_2X]: '/usr/share/opensearch/config/opensearch-security',
+  [OSD_MAJOR_2X]: '/usr/share/wazuh-indexer/config/opensearch-security',
   [OSD_MAJOR_1X]:
-    '/usr/share/opensearch/plugins/opensearch-security/securityconfig',
+    '/usr/share/wazuh-indexer/plugins/opensearch-security/securityconfig',
 };
 
 /** Default values for environment variables used by the script. */
