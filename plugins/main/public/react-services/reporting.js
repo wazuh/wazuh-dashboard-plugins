@@ -33,7 +33,7 @@ export class ReportingService {
    *
    * @param {*} context
    */
-  async generateReportURL(context) {
+  generateReportURL(context) {
     // URL example: "/app/dashboards#/view/it-hygiene-overview-dashboard-tab?_a=(filters:!(),query:(language:kuery,query:''))&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:'2025-08-20T19:38:00.878Z',to:'2025-11-18T19:38:00.878Z'))"
     const urlParams = window.location.href.split('?')?.[1] ?? '';
     const queryParams = new NavigationURLSearchParams(urlParams);
