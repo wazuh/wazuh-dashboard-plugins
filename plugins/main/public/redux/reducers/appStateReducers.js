@@ -22,7 +22,6 @@ const initialState = {
   userPermissions: false,
   toastNotification: false,
   withUserLogged: false,
-  logtestToken: '',
   userAccount: {
     administrator: false,
     administrator_requirements: '',
@@ -101,13 +100,6 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       withUserLogged: action.withUserLogged,
-    };
-  }
-
-  if (action.type === 'UPDATE_LOGTEST_TOKEN') {
-    return {
-      ...state,
-      logtestToken: action.logtestToken,
     };
   }
 
