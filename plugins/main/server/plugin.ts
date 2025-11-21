@@ -74,6 +74,7 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
   INDEX_PATTERN_ALERTS_REQUIRED_FIELDS,
+  WAZUH_ALERTS_PATTERN,
   WAZUH_ARCHIVES_PATTERN,
   WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN,
   WAZUH_EVENTS_APLICATIONS_PATTERN,
@@ -254,13 +255,13 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS,
+        indexPatternID: WAZUH_ALERTS_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasFields: INDEX_PATTERN_ALERTS_REQUIRED_FIELDS,
           hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternAlertsKnownFields,
         },
-        configurationSettingKey: 'pattern',
       }),
     );
 

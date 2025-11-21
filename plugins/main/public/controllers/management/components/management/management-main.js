@@ -13,7 +13,6 @@ import React from 'react';
 import WzGroups from './groups/groups-main';
 import WzStatus from './status/status-main';
 import WzLogs from './mg-logs/logs';
-import WzReporting from './reporting/reporting-main';
 import WzConfiguration from './configuration/configuration-main';
 import WzStatistics from './statistics/statistics-main';
 import { ClusterOverview } from './cluster/cluster-overview';
@@ -29,9 +28,6 @@ const WzManagementMain = props => (
     </Route>
     <Route path='?tab=monitoring'>
       <ClusterOverview />
-    </Route>
-    <Route path='?tab=reporting'>
-      <WzReporting />
     </Route>
     <Route path='?tab=statistics'>
       <WzStatistics />

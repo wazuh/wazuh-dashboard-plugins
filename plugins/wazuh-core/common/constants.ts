@@ -145,7 +145,6 @@ export const ASSETS_BASE_URL_PREFIX = '/plugins/wazuh/assets/';
 export const ASSETS_PUBLIC_URL = '/plugins/wazuh/public/assets/';
 
 // Reports
-export const REPORTS_PRIMARY_COLOR = '#256BD1';
 
 // Plugin platform
 export const PLUGIN_PLATFORM_NAME = 'dashboard';
