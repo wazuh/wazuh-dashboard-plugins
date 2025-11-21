@@ -749,25 +749,6 @@ export const serverApis = {
   redirectTo: () => '/settings?tab=api',
 };
 
-export const appSettings = {
-  category: 'wz-category-dashboard-management',
-  id: 'app-settings',
-  title: i18n.translate('wz-app-settings-title', {
-    defaultMessage: 'App Settings',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-settings-breadcrumbLabel', {
-    defaultMessage: 'App Settings',
-  }),
-  description: i18n.translate('wz-app-settings-description', {
-    defaultMessage: 'Manage your cluster configuration.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 10004,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/settings?tab=configuration',
-};
-
 const about = {
   category: 'wz-category-dashboard-management',
   id: 'about',
@@ -818,7 +799,6 @@ export const Applications = [
   reporting,
   serverApis,
   sampleData,
-  appSettings,
   about,
   ITHygiene,
 ].sort((a, b) => {

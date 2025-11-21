@@ -5,9 +5,7 @@ import { HttpServer } from '../../../../src/core/server/http/http_server';
 import { loggingSystemMock } from '../../../../src/core/server/logging/logging_system.mock';
 import { ByteSizeValue } from '@osd/config-schema';
 import supertest from 'supertest';
-import { WazuhUtilsRoutes } from './wazuh-utils';
 import { WazuhReportingRoutes } from './wazuh-reporting';
-import { WazuhUtilsCtrl } from '../controllers/wazuh-utils/wazuh-utils';
 import md5 from 'md5';
 import path from 'path';
 import fs from 'fs';
@@ -129,7 +127,6 @@ beforeAll(async () => {
   }));
 
   // Register routes
-  WazuhUtilsRoutes(router, { configuration: context.wazuh_core.configuration });
   WazuhReportingRoutes(router);
 
   // Register router
@@ -204,167 +201,6 @@ describe('[endpoint] GET /reports', () => {
         .set('x-test-username', username)
         .expect(200);
       expect(response.body.reports).toHaveLength(files);
-    },
-  );
-});
-
-describe('[endpoint] PUT /utils/configuration', () => {
-  const SettingsDefinitions = {
-    'customization.enabled': {
-      defaultValueIfNotSet: true,
-      isConfigurableFromSettings: true,
-    },
-    'customization.logo.reports': {
-      defaultValueIfNotSet: 'images/logo_reports.png',
-      isConfigurableFromSettings: true,
-    },
-    'customization.reports.header': {
-      defaultValueIfNotSet: 'Original header',
-      isConfigurableFromSettings: true,
-    },
-    'customization.reports.footer': {
-      defaultValueIfNotSet: 'Original footer',
-      isConfigurableFromSettings: true,
-    },
-  };
-  beforeAll(() => {
-    context.wazuh_core.configuration._settings = new Map();
-    Object.entries(SettingsDefinitions).forEach(([key, value]) =>
-      context.wazuh_core.configuration._settings.set(key, value),
-    );
-  });
-
-  afterAll(() => {
-    // Reset the configuration
-    context.wazuh_core.configuration._settings = null;
-  });
-
-  // expectedMD5 variable is a verified md5 of a report generated with this header and footer
-  // If any of the parameters is changed this variable should be updated with the new md5
-  it.each`
-    footer              | header                                 | responseStatusCode | expectedMD5                           | tab
-    ${null}             | ${null}                                | ${200}             | ${'dc7edb68490376cdb70535f420ba82d3'} | ${'pm'}
-    ${'Custom\nFooter'} | ${'info@company.com\nFake Avenue 123'} | ${200}             | ${'9003caabb5a3ef69b4b7e56e8c549011'} | ${'general'}
-    ${''}               | ${''}                                  | ${200}             | ${'66bd70790000b5016f42775653a0f169'} | ${'fim'}
-    ${'Custom Footer'}  | ${null}                                | ${200}             | ${'ed1b880b6141fde5c9109178ea112646'} | ${'aws'}
-    ${null}             | ${'Custom Header'}                     | ${200}             | ${'03dc1e5a92741ea2c7d26deb12154254'} | ${'gcp'}
-  `(
-    `Set custom report header and footer - Verify PDF output`,
-    async ({ footer, header, responseStatusCode, expectedMD5, tab }) => {
-      // Mock PDF report parameters
-      const reportBody = {
-        array: [],
-        serverSideQuery: [],
-        filters: [],
-        time: {
-          from: '2022-10-01T09:59:40.825Z',
-          to: '2022-10-04T09:59:40.825Z',
-        },
-        searchBar: '',
-        tables: [],
-        tab: tab,
-        section: 'overview',
-        agents: false,
-        browserTimezone: 'Europe/Madrid',
-        indexPatternTitle: 'wazuh-alerts-*',
-        apiId: 'default',
-      };
-
-      // Define custom configuration
-      const configurationBody = {};
-
-      if (typeof footer == 'string') {
-        configurationBody['customization.reports.footer'] = footer;
-      }
-      if (typeof header == 'string') {
-        configurationBody['customization.reports.header'] = header;
-      }
-
-      const initialConfig = {
-        pattern: 'test-alerts-*',
-        hosts: [
-          {
-            id: 'default',
-            url: 'https://localhost',
-            port: 55000,
-            username: 'wazuh-wui',
-            password: 'wazuh-wui',
-            run_as: false,
-          },
-        ],
-      };
-
-      const afterUpdateConfiguration = {
-        ...initialConfig,
-        ...configurationBody,
-      };
-      context.wazuh_core.configuration.get.mockReturnValueOnce(initialConfig);
-
-      context.wazuh_core.configuration.getCustomizationSetting.mockImplementation(
-        (...settings) => ({
-          then: fn =>
-            fn(
-              Object.fromEntries(
-                settings.map(setting => [
-                  setting,
-                  afterUpdateConfiguration?.[setting] ??
-                    SettingsDefinitions?.[setting]?.defaultValueIfNotSet,
-                ]),
-              ),
-            ),
-        }),
-      );
-
-      context.wazuh_core.dashboardSecurity.isAdministratorUser.mockImplementation(
-        () => ({ administrator: true }),
-      );
-
-      // Set custom report header and footer
-      if (typeof footer === 'string' || typeof header === 'string') {
-        context.wazuh_core.configuration.set.mockReturnValueOnce({
-          update: configurationBody,
-        });
-        const responseConfig = await supertest(innerServer.listener)
-          .put('/utils/configuration')
-          .send(configurationBody)
-          .expect(responseStatusCode);
-
-        expect(responseConfig.body.data.updatedConfiguration).toEqual(
-          configurationBody,
-        );
-      }
-
-      // Create user directory for PDF generation
-      const userDirPath = md5(USER_NAME);
-      mockDataPathService.createDataDirectoryIfNotExists(
-        path.join(
-          mockDataPathService.getDataDirectoryRelative('downloads/reports'),
-          userDirPath,
-        ),
-      );
-
-      // Generate PDF report
-      const responseReport = await supertest(innerServer.listener)
-        .post(`/reports/modules/${tab}`)
-        .set('x-test-username', USER_NAME)
-        .send(reportBody);
-      // .expect(200);
-
-      const fileName =
-        responseReport.body?.message.match(/([A-Z-0-9]*\.pdf)/gi)[0];
-      const userPath = md5(USER_NAME);
-      const reportPath = `${mockDataPathService.getDataDirectoryRelative(
-        'downloads/reports',
-      )}/${userPath}/${fileName}`;
-      const PDFbuffer = fs.readFileSync(reportPath);
-      const PDFcontent = PDFbuffer.toString('utf8');
-      const content = PDFcontent.replace(
-        /\[<[a-z0-9].+> <[a-z0-9].+>\]/gi,
-        '',
-      ).replace(/(obj\n\(D:[0-9].+Z\)\nendobj)/gi, '');
-      const PDFmd5 = md5(content);
-
-      expect(PDFmd5).toBe(expectedMD5);
     },
   );
 });

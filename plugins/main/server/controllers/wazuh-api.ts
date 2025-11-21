@@ -748,12 +748,14 @@ export class WazuhApiCtrl {
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
   ) {
-    const appConfig = await context.wazuh_core.configuration.get();
-    const reportMaxRows = appConfig['reports.csv.maxRows'];
     try {
       if (!request.body || !request.body.path)
         throw new Error('Field path is required');
       if (!request.body.id) throw new Error('Field id is required');
+
+      const reportMaxRows = await context.core.uiSettings.client.get(
+        'reports.csv.maxRows',
+      );
 
       const filters = Array.isArray(((request || {}).body || {}).filters)
         ? request.body.filters
@@ -970,41 +972,6 @@ export class WazuhApiCtrl {
           error.message || error
         }`,
         4005,
-        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-        response,
-      );
-    }
-  }
-
-  /**
-   * Gets custom logos configuration (path)
-   * @param context
-   * @param request
-   * @param response
-   */
-  async getAppLogos(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      const APP_LOGO = 'customization.logo.app';
-
-      const logos = {
-        [APP_LOGO]:
-          await context.wazuh_core.configuration.getCustomizationSetting(
-            APP_LOGO,
-          ),
-      };
-
-      return response.ok({
-        body: { logos },
-      });
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return ErrorResponse(
-        error.message || error,
-        3035,
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response,
       );

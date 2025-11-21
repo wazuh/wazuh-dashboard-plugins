@@ -27,6 +27,11 @@ jest.mock('../../../../../kibana-services', () => ({
       get: () => 'test',
     };
   },
+  getWazuhCorePlugin: jest.fn(() => ({
+    configuration: {
+      get: jest.fn(),
+    },
+  })),
 }));
 
 jest.mock(

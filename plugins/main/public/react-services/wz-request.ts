@@ -13,9 +13,13 @@ import { AppState } from './app-state';
 import { ApiCheck } from './wz-api-check';
 import { WzAuthentication } from './wz-authentication';
 import { WzMisc } from '../factories/misc';
-import { WazuhConfig } from './wazuh-config';
 import IApiResponse from './interfaces/api-response.interface';
-import { getCore, getHttp, getToasts } from '../kibana-services';
+import {
+  getCore,
+  getHttp,
+  getToasts,
+  getWazuhCorePlugin,
+} from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 import { BehaviorSubject } from 'rxjs';
@@ -168,9 +172,7 @@ export class WzRequest {
       if (!method || !path) {
         throw new Error('Missing parameters');
       }
-      this.wazuhConfig = new WazuhConfig();
-      const configuration = this.wazuhConfig.getConfig();
-      const timeout = configuration ? configuration.timeout : 20000;
+      const timeout = await getWazuhCorePlugin().configuration.get('timeout');
 
       const url = getHttp().basePath.prepend(path);
       const options = {
