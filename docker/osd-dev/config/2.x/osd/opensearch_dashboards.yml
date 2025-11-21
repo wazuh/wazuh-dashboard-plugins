@@ -13,7 +13,7 @@ opensearch_security.readonly_mode.roles: ['kibana_read_only']
 server.ssl.enabled: true
 server.ssl.key: '/home/node/kbn/certs/osd.key'
 server.ssl.certificate: '/home/node/kbn/certs/osd.pem'
-opensearch.ssl.certificateAuthorities: ['/home/node/kbn/certs/ca.pem']
+opensearch.ssl.certificateAuthorities: ['/home/node/kbn/certs/root-ca.pem']
 uiSettings.overrides.defaultRoute: /app/wz-home
 opensearch.username: 'kibanaserver'
 opensearch.password: 'kibanaserver'

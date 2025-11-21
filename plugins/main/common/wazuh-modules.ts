@@ -147,11 +147,6 @@ export const WAZUH_MODULES = {
     appId: 'api-console',
     description: 'Test the API endpoints.',
   },
-  logtest: {
-    title: 'Test your logs',
-    appId: 'ruleset-test',
-    description: 'Check your ruleset testing logs.',
-  },
 
   // TODO - Research the uses of this code.
   testConfiguration: {

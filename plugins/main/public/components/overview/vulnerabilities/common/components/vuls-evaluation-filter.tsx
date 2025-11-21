@@ -11,16 +11,13 @@ type VulsEvaluatedFilterProps = {
   value: boolean | null;
 };
 
-const UNDER_EVALUATION_FIELD = 'vulnerability.under_evaluation';
+export const UNDER_EVALUATION_FIELD = 'vulnerability.under_evaluation';
 
 export const getUnderEvaluationFilterValue = (
-  filters: Filter[],
+  underEvaluationFilter: Filter,
 ): boolean | null => {
-  const underEvaluationFilter = filters.find(
-    f => f.meta?.key === UNDER_EVALUATION_FIELD,
-  );
   if (underEvaluationFilter) {
-    return underEvaluationFilter.meta?.params.query as boolean;
+    return underEvaluationFilter.meta?.params?.query as boolean;
   }
   return null;
 };

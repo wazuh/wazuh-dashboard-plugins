@@ -110,28 +110,6 @@ export const updateToastNotificationsModal = toastNotification => {
 };
 
 /**
- * Updates showFlyoutLogtest in the appState store
- * @param showFlyout
- */
-export const showFlyoutLogtest = showFlyout => {
-  return {
-    type: 'SHOW_FLYOUT_LOGTEST',
-    showFlyoutLogtest: showFlyout,
-  };
-};
-
-/**
- * Updates dockedFlyoutLogtest in the appState store
- * @param dockedFlyout
- */
-export const updateDockedLogtest = dockedFlyout => {
-  return {
-    type: 'UPDATE_DOCKED_LOGTEST',
-    dockedFlyoutLogtest: dockedFlyout,
-  };
-};
-
-/**
  * Updates the status of whether the user is logged in
  * @param withUserLogged
  */
@@ -139,16 +117,5 @@ export const updateWithUserLogged = withUserLogged => {
   return {
     type: 'UPDATE_WITH_USER_LOGGED',
     withUserLogged,
-  };
-};
-
-/**
- * Updates logtestToken in the appState store
- * @param logtestToken
- */
-export const updateLogtestToken = logtestToken => {
-  return {
-    type: 'UPDATE_LOGTEST_TOKEN',
-    logtestToken: logtestToken,
   };
 };

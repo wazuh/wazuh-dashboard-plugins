@@ -1,10 +1,11 @@
 import React from 'react';
-import { getDashboardPanels } from './dashboard-panels';
 import {
   AlertsDataSourceRepository,
   MitreAttackDataSource,
 } from '../../../common/data-source';
 import {
+  MITRE_ATTACK_DASHBOARD_ID,
+  MITRE_ATTACK_AGENT_DASHBOARD_ID,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
 } from '../../../../../common/constants';
@@ -15,11 +16,8 @@ export const DashboardMITRE: React.FC = createDashboard({
   DataSourceRepositoryCreator: AlertsDataSourceRepository,
   getDashboardPanels: [
     {
-      getDashboardPanels: getDashboardPanels,
-      id: 'mitre-dashboard-tab',
-      title: 'MITRE dashboard',
-      description: 'Dashboard of the MITRE',
-      hidePanelTitles: false,
+      dashboardId: MITRE_ATTACK_DASHBOARD_ID,
+      agentDashboardId: MITRE_ATTACK_AGENT_DASHBOARD_ID,
     },
   ],
   sampleDataWarningCategories: [

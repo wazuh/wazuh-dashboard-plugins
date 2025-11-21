@@ -33,7 +33,6 @@ the Wazuh Indexer. The plugin provides the following capabilities:
     - HIPAA: Health Insurance Portability and Accountability Act of 1996 (HIPAA) provides data privacy and security provisions for safeguarding medical information.
     - TSC: Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy.
 - View and edit the Wazuh server configuration.
-- Manage your ruleset (rules, decoders and CDB lists).
 - Manage your groups of agents.
 - Check the status and logs of your Wazuh cluster.
 - Manage your agents, as well as see their configuration and data inventory. You can also deploy new agents.

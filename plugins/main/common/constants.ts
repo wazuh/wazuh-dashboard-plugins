@@ -529,26 +529,8 @@ export enum WAZUH_MODULES_ID {
   GITHUB = 'github',
 }
 
-export enum WAZUH_MENU_MANAGEMENT_SECTIONS_ID {
-  MANAGEMENT = 'management',
-  ADMINISTRATION = 'administration',
-  RULESET = 'ruleset',
-  RULES = 'rules',
-  DECODERS = 'decoders',
-  CDB_LISTS = 'lists',
-  GROUPS = 'groups',
-  CONFIGURATION = 'configuration',
-  STATUS_AND_REPORTS = 'statusReports',
-  STATUS = 'status',
-  CLUSTER = 'monitoring',
-  LOGS = 'logs',
-  REPORTING = 'reporting',
-  STATISTICS = 'statistics',
-}
-
 export enum WAZUH_MENU_TOOLS_SECTIONS_ID {
   API_CONSOLE = 'devTools',
-  RULESET_TEST = 'logtest',
 }
 
 export enum WAZUH_MENU_SECURITY_SECTIONS_ID {
@@ -946,8 +928,156 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES =
 
 export const INDEX_PATTERN_ALERTS_REQUIRED_FIELDS = [
   FIELD_TIMESTAMP,
-  'rule.id',
-  'wazuh.decoders',
+  'wazuh.integration.decoders',
   'wazuh.cluster.node',
   'agent.id',
 ];
+
+/** Dashboards ids **/
+
+export const THREAT_HUNTING_DASHBOARD_ID = 'threat-hunting-overview-dashboard';
+export const THREAT_HUNTING_AGENT_DASHBOARD_ID =
+  'threat-hunting-pinned-agent-dashboard';
+
+export const AMAZON_WEB_SERVICES_DASHBOARD_ID = 'aws-overview-dashboard-tab';
+export const AMAZON_WEB_SERVICES_AGENT_DASHBOARD_ID =
+  'aws-pinned-agent-dashboard-tab';
+
+export const AZURE_DASHBOARD_ID = 'azure-overview-dashboard-tab';
+export const AZURE_AGENT_DASHBOARD_ID = 'azure-pinned-agent-dashboard-tab';
+
+export const DOCKER_DASHBOARD_ID = 'docker-overview-dashboard-tab';
+export const DOCKER_AGENT_DASHBOARD_ID = 'docker-pinned-agent-dashboard-tab';
+
+export const FIM_DASHBOARD_ID = 'fim-overview-dashboard';
+export const FIM_AGENT_DASHBOARD_ID = 'fim-pinned-agent-dashboard';
+
+// FIM inventory dashboard IDs
+export const FIM_FILES_INVENTORY_ID = 'fim-files-dashboard';
+export const FIM_REGISTRY_KEYS_INVENTORY_ID = 'fim-registry-keys-dashboard';
+export const FIM_REGISTRY_VALUES_INVENTORY_ID = 'fim-registry-values-dashboard';
+export const FIM_FILES_AGENT_INVENTORY_ID = 'fim-files-dashboard';
+export const FIM_REGISTRY_KEYS_AGENT_INVENTORY_ID =
+  'fim-registry-keys-dashboard';
+export const FIM_REGISTRY_VALUES_AGENT_INVENTORY_ID =
+  'fim-registry-values-dashboard';
+
+export const MALWARE_DETECTION_DASHBOARD_ID =
+  'malware-detection-overview-dashboard-tab';
+export const MALWARE_DETECTION_AGENT_DASHBOARD_ID =
+  'malware-detection-pinned-agent-dashboard-tab';
+
+export const PCI_DSS_DASHBOARD_ID = 'pci-overview-dashboard-tab';
+export const PCI_DSS_AGENT_DASHBOARD_ID = 'pci-pinned-agent-dashboard-tab';
+
+export const GDPR_DASHBOARD_ID = 'gdpr-overview-dashboard';
+export const GDPR_AGENT_DASHBOARD_ID = 'gdpr-pinned-agent-dashboard';
+
+export const HIPAA_DASHBOARD_ID = 'hipaa-overview-dashboard-tab';
+export const HIPAA_AGENT_DASHBOARD_ID = 'hipaa-pinned-agent-dashboard-tab';
+
+export const NIST_800_53_DASHBOARD_ID = 'nist-overview-dashboard-tab';
+export const NIST_800_53_AGENT_DASHBOARD_ID = 'nist-pinned-agent-dashboard-tab';
+
+export const TSC_DASHBOARD_ID = 'tsc-overview-dashboard-tab';
+export const TSC_AGENT_DASHBOARD_ID = 'tsc-pinned-agent-dashboard-tab';
+
+export const GITHUB_DASHBOARD_ID = 'github-overview-dashboard-tab';
+export const GITHUB_AGENT_DASHBOARD_ID = 'github-pinned-agent-dashboard-tab';
+
+export const GOOGLE_CLOUD_DASHBOARD_ID = 'google-cloud-detector-dashboard-tab';
+export const GOOGLE_CLOUD_AGENT_DASHBOARD_ID =
+  'google-cloud-pinned-agent-dashboard';
+
+export const MITRE_ATTACK_DASHBOARD_ID = 'mitre-overview-dashboard-tab';
+export const MITRE_ATTACK_AGENT_DASHBOARD_ID =
+  'mitre-pinned-agent-dashboard-tab';
+
+export const OFFICE_365_DASHBOARD_ID = 'office-overview-dashboard-tab';
+
+export const IT_HYGIENE_DASHBOARD_ID = 'it-hygiene-overview-dashboard-tab';
+export const IT_HYGIENE_AGENT_DASHBOARD_ID =
+  'it-hygiene-overview-dashboard-tab';
+
+export const IT_HYGIENE_INTERFACES_INVENTORY_ID =
+  'it-hygiene-networks-inventories-interfaces-dashboard-tab';
+export const IT_HYGIENE_INTERFACES_AGENT_INVENTORY_ID =
+  'it-hygiene-networks-inventories-interfaces-dashboard-tab';
+
+// IT Hygiene inventory dashboard IDs per category
+export const IT_HYGIENE_NETWORKS_INVENTORY_ID =
+  'it-hygiene-networks-inventories-networks-dashboard-tab';
+export const IT_HYGIENE_NETWORKS_AGENT_INVENTORY_ID =
+  'it-hygiene-networks-inventories-networks-dashboard-tab';
+
+export const IT_HYGIENE_PROTOCOLS_INVENTORY_ID =
+  'it-hygiene-networks-inventories-protocols-dashboard-tab';
+export const IT_HYGIENE_PROTOCOLS_AGENT_INVENTORY_ID =
+  'it-hygiene-networks-inventories-protocols-dashboard-tab';
+
+export const IT_HYGIENE_LISTENERS_INVENTORY_ID =
+  'it-hygiene-networks-inventories-services-dashboard-tab';
+export const IT_HYGIENE_LISTENERS_AGENT_INVENTORY_ID =
+  'it-hygiene-networks-inventories-services-dashboard-tab';
+
+export const IT_HYGIENE_SERVICES_INVENTORY_ID =
+  'it-hygiene-services-dashboard-tab';
+export const IT_HYGIENE_SERVICES_AGENT_INVENTORY_ID =
+  'it-hygiene-services-dashboard-tab';
+
+export const IT_HYGIENE_TRAFFIC_INVENTORY_ID =
+  'it-hygiene-networks-inventories-traffic-dashboard-tab';
+export const IT_HYGIENE_TRAFFIC_AGENT_INVENTORY_ID =
+  'it-hygiene-networks-inventories-traffic-dashboard-tab';
+
+export const IT_HYGIENE_SYSTEM_INVENTORY_ID =
+  'it-hygiene-system-inventories-system-dashboard-tab';
+export const IT_HYGIENE_SYSTEM_AGENT_INVENTORY_ID =
+  'it-hygiene-system-inventories-system-dashboard-tab';
+
+export const IT_HYGIENE_HARDWARE_INVENTORY_ID =
+  'it-hygiene-system-inventories-hardware-dashboard-tab';
+export const IT_HYGIENE_HARDWARE_AGENT_INVENTORY_ID =
+  'it-hygiene-system-inventories-hardware-dashboard-tab';
+
+export const IT_HYGIENE_PACKAGES_INVENTORY_ID =
+  'it-hygiene-packages-inventories-packages-dashboard-tab';
+export const IT_HYGIENE_PACKAGES_AGENT_INVENTORY_ID =
+  'it-hygiene-packages-inventories-packages-dashboard-tab';
+
+export const IT_HYGIENE_HOTFIXES_INVENTORY_ID =
+  'it-hygiene-packages-inventories-hotfixes-dashboard-tab';
+export const IT_HYGIENE_HOTFIXES_AGENT_INVENTORY_ID =
+  'it-hygiene-packages-inventories-hotfixes-dashboard-tab';
+
+export const IT_HYGIENE_BROWSER_EXTENSIONS_INVENTORY_ID =
+  'it-hygiene-packages-inventories-browser-extensions-dashboard-tab';
+export const IT_HYGIENE_BROWSER_EXTENSIONS_AGENT_INVENTORY_ID =
+  'it-hygiene-packages-inventories-browser-extensions-dashboard-tab';
+
+export const IT_HYGIENE_PROCESSES_INVENTORY_ID =
+  'it-hygiene-processes-dashboard-tab';
+export const IT_HYGIENE_PROCESSES_AGENT_INVENTORY_ID =
+  'it-hygiene-processes-dashboard-tab';
+
+export const IT_HYGIENE_USERS_INVENTORY_ID =
+  'it-hygiene-user-inventories-users-dashboard-tab';
+export const IT_HYGIENE_USERS_AGENT_INVENTORY_ID =
+  'it-hygiene-user-inventories-users-dashboard-tab';
+
+export const IT_HYGIENE_GROUPS_INVENTORY_ID =
+  'it-hygiene-user-inventories-groups-dashboard-tab';
+export const IT_HYGIENE_GROUPS_AGENT_INVENTORY_ID =
+  'it-hygiene-user-inventories-groups-dashboard-tab';
+
+export const CONFIGURATION_ASSESSMENT_DASHBOARD_ID = 'sca-overview-dashboard';
+export const CONFIGURATION_ASSESSMENT_AGENT_DASHBOARD_ID =
+  'sca-overview-dashboard';
+export const CONFIGURATION_ASSESSMENT_INVENTORY_ID = 'sca-inventory-dashboard';
+export const CONFIGURATION_ASSESSMENT_AGENT_INVENTORY_ID =
+  'sca-inventory-dashboard';
+
+export const VULNERABILITIES_DASHBOARD_ID =
+  'vulnerabilities-overview-dashboard-tab';
+export const VULNERABILITIES_AGENT_DASHBOARD_ID =
+  'vulnerabilities-overview-dashboard-tab';

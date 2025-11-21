@@ -1,11 +1,7 @@
 import React from 'react';
 import { EuiLink, EuiToolTip } from '@elastic/eui';
 import { tDataGridRenderColumn } from '../data-grid';
-import {
-  endpointSummary,
-  rules,
-  mitreAttack,
-} from '../../../utils/applications';
+import { endpointSummary, mitreAttack } from '../../../utils/applications';
 import { WzLink } from '../../wz-link/wz-link';
 import { i18n } from '@osd/i18n';
 
@@ -114,22 +110,6 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
     id: 'vulnerability.reference',
     render: renderLinksReference,
-  },
-  {
-    id: 'rule.id',
-    render: value => (
-      <WzLink
-        appId={rules.id}
-        path={`/manager/?tab=rules&redirectRule=${value}`}
-        toolTipProps={{
-          content: i18n.translate('discover.fieldLinkTooltip.rule', {
-            defaultMessage: 'Navigate to the rule details',
-          }),
-        }}
-      >
-        {value}
-      </WzLink>
-    ),
   },
   {
     id: 'rule.mitre.id',

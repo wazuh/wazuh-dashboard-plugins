@@ -6,7 +6,7 @@ import {
 } from '../hocs';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import { useReportingCommunicateSearchContext } from '../hooks/use-reporting-communicate-search-context';
-import { WzSearchBar } from '../search-bar';
+import { useWithManagedSearchBarFilters, WzSearchBar } from '../search-bar';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { SampleDataWarning } from '../../visualize/components';
 import { compose } from 'redux';
@@ -14,11 +14,18 @@ import DashboardRenderer from './dashboard-renderer/dashboard-renderer';
 import classnames from 'classnames';
 
 export const Dashboard = props => {
+  const hasPinnedAgent = Boolean(
+    props.dataSource.dataSource?.getPinnedAgentFilter()?.length,
+  );
+
   // This is not used by the SCA dashboard.
   useReportingCommunicateSearchContext({
     isSearching: props.dataSource.dataSource.isLoading,
     totalResults: props.dataSourceAction?.data?.hits?.total ?? 0,
     indexPattern: props.dataSource.dataSource?.indexPattern,
+    dashboardSavedObjectId: hasPinnedAgent
+      ? props.getDashboardPanels[0].agentDashboardId
+      : props.getDashboardPanels[0].dashboardId,
     filters: props.dataSource.fetchFilters,
     query: props.dataSource.query,
     time: {
@@ -31,17 +38,27 @@ export const Dashboard = props => {
     props.dataSourceAction?.data?.hits?.total > 0,
   );
 
+  const { searchBarFilters, postFixedFilters } = useWithManagedSearchBarFilters(
+    {
+      spec: props.managedFilters || {},
+    },
+    props.dataSource.filters,
+    props.dataSource.setFilters,
+  );
+
   return (
     <>
       <WzSearchBar
         appName='dashboard-searchbar'
         {...props.dataSource.searchBarProps}
+        filters={searchBarFilters}
         fixedFilters={props.dataSource.fixedFilters}
         showDatePicker={Boolean(
           props.dataSource.dataSource.indexPattern.timeFieldName,
         )}
         showQueryInput={true}
         showQueryBar={true}
+        postFixedFilters={postFixedFilters}
       />
       {props.dataSourceAction?.data?.hits?.total === 0 ? (
         <DiscoverNoResults />
@@ -59,7 +76,7 @@ export const Dashboard = props => {
           </div>
         )}
 
-        <div className='wz-dashboard-responsive'>
+        <div className='wz-dashboard-responsive' id='dashboardViewport'>
           {props.getDashboardPanels.map(
             ({ dashboardId, agentDashboardId, className = '' }) => {
               const dashboard = (
@@ -67,6 +84,8 @@ export const Dashboard = props => {
                   dashboardId={dashboardId}
                   agentDashboardId={agentDashboardId}
                   className={classnames(className, {
+                    'wz-dashboard-hide-tables-pagination-export-csv-controls':
+                      true,
                     'wz-no-display': shouldHideDashboard,
                   })}
                   hasPinnedAgent={Boolean(
@@ -113,16 +132,21 @@ export const createDashboard = ({
   DataSourceRepositoryCreator,
   sampleDataWarningCategories,
   getDashboardPanels,
+  managedFilters,
 }: {
   DataSource: any;
   DataSourceRepositoryCreator: any;
   sampleDataWarningCategories?: string[];
+  managedFilters?: {
+    [key: string]: {
+      managedField: string;
+      component: (props: any) => any;
+      order: number;
+    };
+  };
   getDashboardPanels: Array<{
     dashboardId: string;
     agentDashboardId?: string;
-    /**
-     * Class name to apply to the dashboard container
-     */
     className?: string;
   }>;
 }) =>
@@ -131,6 +155,7 @@ export const createDashboard = ({
     withInjectProps({
       sampleDataWarningCategories,
       getDashboardPanels,
+      managedFilters,
     }),
     withDataSourceFetchSearchBar({
       DataSource,

@@ -443,21 +443,3 @@ export const clusterNodes = async () => {
     throw error;
   }
 };
-
-/**
- * Reload ruleset on all nodes using the new API endpoint.
- * @param {array} nodes List of nodes ID
- * @returns {Promise<object>}
- */
-export const reloadRuleset = async (nodes = []) => {
-  try {
-    const nodesString = nodes.join(',');
-    const nodes_param = nodesString ? `?nodes_list=${nodesString}` : '';
-    const reloadEndpoint = `/cluster/analysisd/reload${nodes_param}`;
-
-    const result = await WzRequest.apiReq('PUT', reloadEndpoint, {});
-    return result;
-  } catch (error) {
-    throw error;
-  }
-};

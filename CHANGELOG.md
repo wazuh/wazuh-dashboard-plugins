@@ -27,6 +27,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Upgraded the `tar-fs` dependency to `2.1.4` [#7812](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7812)
 - Migrated the `wazuh.yml` settings to `opensearch_dashboards.yml` and advanced settings [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 - Changed the sample data index names [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
+- Rework generate report button [#7900](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7900)
 
 ### Removed
 
@@ -44,6 +45,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed `GET /elastic/alerts` and `/utils/configuration*` endpoints [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 - Removed task to sanitize the custom logos [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 - Removed task to migrate the reports directory [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
+- Remove `Rules`, `Decoders`, `CDB List` and `Ruleset test` apps [#7901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7901)
 
 ## Wazuh v4.14.2 - OpenSearch Dashboards 2.19.3 - Revision 00
 

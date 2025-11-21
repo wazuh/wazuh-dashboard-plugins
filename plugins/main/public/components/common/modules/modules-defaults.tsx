@@ -13,7 +13,7 @@ import React from 'react';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
 import { ComplianceTable } from '../../overview/compliance-table';
-import { ButtonModuleGenerateReport } from '../modules/buttons';
+import { ButtonModuleGenerateReport as ButtonModuleGenerateReportComponent } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
 import {
@@ -93,6 +93,12 @@ import {
 } from '../../overview/it-hygiene';
 import { InventoryFIM } from '../../overview/fim';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
+import { ReportingService } from '../../../react-services';
+
+const ButtonModuleGenerateReport = {
+  condition: () => new ReportingService().reportDashboardPluginExist(),
+  component: ButtonModuleGenerateReportComponent,
+};
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {

@@ -434,6 +434,7 @@ export class WazuhElasticCtrl {
                 mappedData.forEach((item: { sampleData: [] }) =>
                   sampleDataAndTemplate.sampleData.push(...item.sampleData),
                 );
+                sampleDataAndTemplate.template = mappedData[0].template;
               }
 
               if (mappedData.length === 1 && mappedData[0].template) {
@@ -460,7 +461,7 @@ export class WazuhElasticCtrl {
                 let configuration;
 
                 if (sampleDataAndTemplate?.template) {
-                  const templateData = sampleDataAndTemplate.template;
+                  const templateData = sampleDataAndTemplate.template.template;
 
                   configuration = {
                     settings: templateData.settings || {},
