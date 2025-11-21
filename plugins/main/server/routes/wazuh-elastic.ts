@@ -122,15 +122,4 @@ export function WazuhElasticRoutes(router: IRouter) {
     async (context, request, response) =>
       ctrl.deleteSampleData(context, request, response),
   );
-
-  router.post(
-    {
-      path: '/elastic/alerts',
-      validate: {
-        body: schema.any(),
-      },
-    },
-    async (context, request, response) =>
-      ctrl.alerts(context, request, response),
-  );
 }

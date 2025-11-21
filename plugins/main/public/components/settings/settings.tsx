@@ -26,16 +26,7 @@ import { connect } from 'react-redux';
 import { nestedResolve } from '../../services/resolves';
 import { Route, Switch } from '../router-search';
 import { useRouterSearch } from '../common/hooks';
-import NavigationService from '../../react-services/navigation-service';
 import { AppInfo } from './types';
-
-const configurationTabID = 'configuration';
-
-const mapStateToProps = state => ({
-  configurationUIEditable:
-    state.appConfig.data['configuration.ui_api_editable'],
-  configurationIPSelector: state.appConfig.data['ip.selector'],
-});
 
 const mapDispatchToProps = dispatch => ({
   updateGlobalBreadcrumb: breadcrumb =>
@@ -45,7 +36,7 @@ const mapDispatchToProps = dispatch => ({
 export const Settings = compose(
   withErrorBoundary,
   withRouteResolvers({ nestedResolve }),
-  connect(mapStateToProps, mapDispatchToProps),
+  connect(null, mapDispatchToProps),
 )(props => {
   const { tab } = useRouterSearch();
   return <SettingsComponent {...props} tab={tab} />;
@@ -53,7 +44,6 @@ export const Settings = compose(
 
 interface SettingsComponentProps {
   tab: string;
-  configurationUIEditable: boolean;
   updateGlobalBreadcrumb: (breadcrumb: { text: string }[]) => void;
 }
 
@@ -78,9 +68,6 @@ class SettingsComponent extends React.Component<SettingsComponentProps> {
         const breadcrumb = [{ text: serverApis.breadcrumbLabel }];
         this.props.updateGlobalBreadcrumb(breadcrumb);
       }
-
-      // Set component props
-      this.setComponentProps(urlTab);
     } catch (error) {
       const options = {
         context: `${Settings.name}.onInit`,
@@ -97,29 +84,7 @@ class SettingsComponent extends React.Component<SettingsComponentProps> {
     }
   }
 
-  isConfigurationUIEditable() {
-    return this.props.configurationUIEditable;
-  }
-  /**
-   * Sets the component props
-   */
-  setComponentProps(currentTab: string = 'api') {
-    const isConfigurationUIEditable = this.isConfigurationUIEditable();
-    if (currentTab === configurationTabID && !isConfigurationUIEditable) {
-      // Change the inaccessible configuration to another accessible
-      NavigationService.getInstance().replace('/settings?tab=about');
-      this.props.updateGlobalBreadcrumb([{ text: 'About' }]);
-    }
-  }
-
   render() {
-    // WORKAROUND: This avoids the configuration view is displayed
-    if (
-      this.props.tab === configurationTabID &&
-      !this.isConfigurationUIEditable()
-    ) {
-      return null;
-    }
     return (
       <Switch>
         <Route path='?tab=api'>
@@ -127,11 +92,6 @@ class SettingsComponent extends React.Component<SettingsComponentProps> {
             <div>
               <ApiTable />
             </div>
-          </div>
-        </Route>
-        <Route path='?tab=configuration'>
-          <div>
-            <WzConfigurationSettings />
           </div>
         </Route>
         <Route path='?tab=about'>

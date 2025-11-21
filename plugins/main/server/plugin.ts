@@ -29,12 +29,7 @@ import { ILegacyClusterClient } from '../../../src/core/server';
 
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { setupRoutes } from './routes';
-import {
-  jobInitializeRun,
-  jobQueueRun,
-  jobMigrationTasksRun,
-  jobSanitizeUploadedFilesTasksRun,
-} from './start';
+import { jobInitializeRun, jobQueueRun } from './start';
 import { first } from 'rxjs/operators';
 import {
   defineTimeFieldNameIfExist,
@@ -79,6 +74,7 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
   INDEX_PATTERN_ALERTS_REQUIRED_FIELDS,
+  WAZUH_ALERTS_PATTERN,
   WAZUH_ARCHIVES_PATTERN,
   WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN,
   WAZUH_EVENTS_APLICATIONS_PATTERN,
@@ -201,31 +197,31 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
     const serverInfo = core.http.getServerInfo();
 
-    core.http.registerRouteHandlerContext('wazuh', (context, request) => {
-      return {
-        // Create a custom logger with a tag composed of HTTP method and path endpoint
-        logger: this.logger.get(
-          `${request.route.method.toUpperCase()} ${request.route.path}`,
-        ),
-        server: {
-          info: serverInfo,
-        },
-        plugins,
-        security: plugins.wazuhCore.dashboardSecurity,
-        api: context.wazuh_core.api,
-      };
-    });
+    core.http.registerRouteHandlerContext('wazuh', (context, request) => ({
+      // Create a custom logger with a tag composed of HTTP method and path endpoint
+      logger: this.logger.get(
+        `${request.route.method.toUpperCase()} ${request.route.path}`,
+      ),
+      server: {
+        info: serverInfo,
+      },
+      plugins,
+      security: plugins.wazuhCore.dashboardSecurity,
+      api: context.wazuh_core.api,
+    }));
 
     // Add custom headers to the responses
     core.http.registerOnPreResponse((request, response, toolkit) => {
       const additionalHeaders = {
         'x-frame-options': 'sameorigin',
       };
+
       return toolkit.next({ headers: additionalHeaders });
     });
 
     // Routes
     const router = core.http.createRouter();
+
     setupRoutes(router, plugins.wazuhCore);
 
     // Register health check tasks
@@ -259,13 +255,13 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS,
+        indexPatternID: WAZUH_ALERTS_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasFields: INDEX_PATTERN_ALERTS_REQUIRED_FIELDS,
           hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternAlertsKnownFields,
         },
-        configurationSettingKey: 'pattern',
       }),
     );
 
@@ -701,7 +697,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       await this.initializerContext.config.legacy.globalConfig$
         .pipe(first())
         .toPromise();
-
     const contextServer = {
       config: globalConfiguration,
     };
@@ -711,28 +706,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       core,
       wazuh: {
         logger: this.logger.get('initialize'),
-        api: plugins.wazuhCore.api,
-      },
-      wazuh_core: plugins.wazuhCore,
-      server: contextServer,
-    });
-
-    // Sanitize uploaded files tasks
-    jobSanitizeUploadedFilesTasksRun({
-      core,
-      wazuh: {
-        logger: this.logger.get('sanitize-uploaded-files-task'),
-        api: plugins.wazuhCore.api,
-      },
-      wazuh_core: plugins.wazuhCore,
-      server: contextServer,
-    });
-
-    // Migration tasks
-    jobMigrationTasksRun({
-      core,
-      wazuh: {
-        logger: this.logger.get('migration-task'),
         api: plugins.wazuhCore.api,
       },
       wazuh_core: plugins.wazuhCore,
@@ -749,6 +722,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       wazuh_core: plugins.wazuhCore,
       server: contextServer,
     });
+
     return {};
   }
 
