@@ -59,7 +59,7 @@ const mainSettings = [
     when: 'manager'
   },
   { field: 'scan_on_start', label: 'Scan on start' },
-  { field: 'skip_nfs', label: 'Skip scan on CIFS/NFS mounts' },
+  { field: 'skip_nfs', label: 'Skip scan on CephFS/CIFS/NFS mounts' },
   { field: 'skip_dev', label: 'Skip scan of /dev directory' },
   { field: 'skip_sys', label: 'Skip scan of /sys directory' },
   { field: 'skip_proc', label: 'Skip scan of /proc directory' },

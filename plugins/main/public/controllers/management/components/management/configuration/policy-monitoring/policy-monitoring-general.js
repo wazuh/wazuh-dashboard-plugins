@@ -38,7 +38,7 @@ const allSettings = [
   { field: 'check_winapps', label: 'Check Windows apps' },
   { field: 'check_winaudit', label: 'Check Windows audit' },
   { field: 'check_winmalware', label: 'Check Windows malware' },
-  { field: 'skip_nfs', label: 'Skip scan on CIFS/NFS mounts' },
+  { field: 'skip_nfs', label: 'Skip scan on CephFS/CIFS/NFS mounts' },
   { field: 'rootkit_files', label: 'Rootkit files database path' },
   { field: 'rootkit_trojans', label: 'Rootkit trojans database path' },
   { field: 'windows_audit', label: 'Windows audit definition file path' },
