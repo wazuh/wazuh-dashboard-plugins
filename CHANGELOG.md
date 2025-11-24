@@ -48,11 +48,22 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Remove `Rules`, `Decoders`, `CDB List` and `Ruleset test` apps [#7901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7901)
 - Removed the legacy reporting application, including its server routes, UI, PDF generation logic, and related customization settings [#7899](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7899)
 
-## Wazuh v4.14.2 - OpenSearch Dashboards 2.19.3 - Revision 00
+## Wazuh v4.14.2 - OpenSearch Dashboards 2.19.4 - Revision 00
 
 ### Added
 
 - Support for Wazuh 4.14.2
+- Added persistence for page size and sorting in API tables [#7864](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7864)
+
+### Fixed
+
+- Removed sorting for Program name and Order columns in Related decoders table and Groups column in Related rules table to prevent API errors [#7864](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7864)
+
+### Changed
+
+- Improved text size consistency and visual hierarchy across the Agent Overview page by implementing standardized typography styling [#7878](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7878)
+- Improved Agent Overview resilience by rendering each available system inventory field [#78696](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7896)
+- Upgraded `cookie` dependency to 0.7.0 [#7897](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7897)
 
 ## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 02
 

@@ -92,7 +92,7 @@ export class WazuhPlugin
         }
 
         // If this key isn't mapped, we need to map it
-        if (this.get(key) === null) {
+        if (this.get(key) == null) {
           keysToMap.push(key);
         }
       });

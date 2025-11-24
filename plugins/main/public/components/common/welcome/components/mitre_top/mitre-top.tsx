@@ -15,12 +15,13 @@ import React, { useEffect, useState } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiText,
   EuiFacetButton,
   EuiButtonIcon,
   EuiLoadingChart,
   EuiEmptyPrompt,
+  EuiText,
 } from '@elastic/eui';
+import { Typography, TypographySize } from '../../../typography/typography';
 import { FlyoutTechnique } from '../../../../overview/mitre/framework/components/techniques/components/flyout-technique';
 import { useTimeFilter } from '../../../hooks';
 import NavigationService from '../../../../../react-services/navigation-service';
@@ -39,7 +40,8 @@ import {
 const PromptNoData = () => (
   <EuiEmptyPrompt
     iconType='stats'
-    title={<h4>No results</h4>}
+    title={<Typography level='prompt'>No results</Typography>}
+    titleSize={TypographySize({ level: 'prompt' })}
     body={<p>No MITRE ATT&CK results were found in the selected time range.</p>}
   />
 );
@@ -87,13 +89,11 @@ const MitreTopTacticsTactics = compose(
   return (
     <>
       <div className='wz-agents-mitre'>
-        <EuiText size='xs'>
-          <EuiFlexGroup>
-            <EuiFlexItem style={{ margin: 0, padding: '12px 0px 0px 10px' }}>
-              <h3>Top Tactics</h3>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiText>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <Typography level='card'>Top Tactics</Typography>
+          </EuiFlexItem>
+        </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
             {dataSourceAction?.data?.map(tactic => (
@@ -131,7 +131,7 @@ const MitreTopTacticsTechniquesHeader = ({ selectedTactic, setView }) => (
         />
       </EuiFlexItem>
       <EuiFlexItem>
-        <h3>{selectedTactic}</h3>
+        <Typography level='card'>{selectedTactic}</Typography>
       </EuiFlexItem>
     </EuiFlexGroup>
   </EuiText>

@@ -17,7 +17,6 @@ import {
   EuiFlexItem,
   EuiFlexGroup,
   EuiSpacer,
-  EuiText,
   EuiButtonEmpty,
   EuiPage,
   EuiPopover,
@@ -61,6 +60,7 @@ import NavigationService from '../../../react-services/navigation-service';
 import VulsPanel from './components/vuls_panel/vuls_welcome_panel';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
 import { InventoryMetrics } from '../../agents/syscollector/components';
+import { Typography } from '../typography/typography';
 
 export const AgentsWelcome = compose(
   withErrorBoundary,
@@ -284,7 +284,10 @@ export const AgentsWelcome = compose(
           responsive={false}
           gutterSize='xs'
         >
-          <EuiFlexItem grow={false} className='wz-module-header-agent-title'>
+          <EuiFlexItem
+            grow={false}
+            className='wz-module-header-agent-title wz-module-header-agent-title-left'
+          >
             <EuiFlexGroup responsive={false} gutterSize='xs'>
               {(this.state.maxModules !== null && this.renderModules()) || (
                 <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
@@ -382,11 +385,7 @@ export const AgentsWelcome = compose(
           <EuiPanel paddingSize='m'>
             <EuiFlexGroup gutterSize='s' responsive={false}>
               <EuiFlexItem>
-                <h2 className='embPanel__title wz-headline-title'>
-                  <EuiText size='xs'>
-                    <h2>MITRE ATT&CK</h2>
-                  </EuiText>
-                </h2>
+                <Typography level='section'>MITRE ATT&CK</Typography>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
                 <EuiToolTip position='top' content='Open MITRE ATT&CK'>
