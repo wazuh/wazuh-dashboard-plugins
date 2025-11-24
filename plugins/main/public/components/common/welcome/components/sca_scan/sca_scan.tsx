@@ -16,7 +16,6 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiPanel,
-  EuiTitle,
   EuiText,
   EuiLoadingChart,
   EuiButtonIcon,
@@ -24,6 +23,7 @@ import {
   EuiEmptyPrompt,
   EuiInMemoryTable,
 } from '@elastic/eui';
+import { Typography } from '../../../typography/typography';
 import { getCore } from '../../../../../kibana-services';
 import { withDataSourceFetch, withGuard, withPanel } from '../../../hocs';
 import { compose } from 'redux';
@@ -54,9 +54,7 @@ const ScaScanHeader = ({ agent }) => {
       <EuiFlexGroup className='wz-section-sca-euiFlexGroup'>
         <EuiFlexItem grow={false}>
           <RedirectAppLinks application={getCore().application}>
-            <EuiTitle size='xs'>
-              <h2>SCA: Scans summary</h2>
-            </EuiTitle>
+            <Typography level='card'>SCA: Scans summary</Typography>
           </RedirectAppLinks>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
@@ -142,14 +140,10 @@ const ScaScanTable = ({ dataSourceAction }) => {
     <>
       <EuiFlexGroup alignItems='center' gutterSize='s'>
         <EuiFlexItem grow={false} responsive={false}>
-          <EuiTitle size='xs'>
-            <h4>Checks by policies</h4>
-          </EuiTitle>
+          <Typography level='metric'>Checks by policies</Typography>
         </EuiFlexItem>
         <EuiFlexItem grow={false} responsive={false}>
-          <EuiText size='xs'>
-            <span>(top {TOP_POLICIES_SIZE})</span>
-          </EuiText>
+          <Typography level='metric'>(top {TOP_POLICIES_SIZE})</Typography>
         </EuiFlexItem>
       </EuiFlexGroup>
 

@@ -18,12 +18,11 @@ import {
   EuiFlexItem,
   EuiPanel,
   EuiSpacer,
-  EuiText,
   EuiButtonIcon,
   EuiFlexGroup,
   EuiToolTip,
 } from '@elastic/eui';
-import { EuiLink } from '@elastic/eui';
+import { Typography } from '../../../typography/typography';
 import { getCore, getDataPlugin } from '../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { fileIntegrityMonitoring } from '../../../../../utils/applications';
@@ -42,9 +41,7 @@ export function FimEventsTable({ agent }) {
         <EuiFlexItem>
           <EuiFlexGroup responsive={false}>
             <EuiFlexItem>
-              <EuiText size='xs'>
-                <h2>FIM: Recent events</h2>
-              </EuiText>
+              <Typography level='section'>FIM: Recent events</Typography>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiToolTip position='top' content='Open FIM'>
@@ -62,7 +59,7 @@ export function FimEventsTable({ agent }) {
               </EuiToolTip>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <EuiSpacer size='s' />
+          <EuiSpacer size='m' />
           <FimTable agent={agent} />
         </EuiFlexItem>
       </EuiPanel>
