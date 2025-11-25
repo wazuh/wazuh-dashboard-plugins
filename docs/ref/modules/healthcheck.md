@@ -67,10 +67,15 @@ The checks represents the unit to check and some could do some write actions suc
 | `index-pattern:states-sca`                                          | Validate (create if possible) the existence of a compatible index pattern for Configuration Assessment states                                                                                                              |
 | `server-api:connection-compatibility`                               | Validate the connection and compatibility with the server API hosts                                                                                                                                                        |
 | `integrations:default-notifications-channels-and-alerting-monitors` | Validate the existence of the default Notifications channels and Alerting monitors; creates them if missing (monitors are only created if their corresponding channels exist). See Notifications and Alerting for details. |
+| `saved-objects:dashboards`                                          | Provision saved visualizations and dashboards from the bundled NDJSON definitions so the UI can rely on saved-object references. See Saved Objects for Dashboards and Visualizations for details.                          |
 
 ## Notifications and Alerting
 
 For details about the default notification channels created by Health Check, the sample monitors it can provision, and the steps to finalize configuration, see [Notifications and Alerting](./notifications-alerting.md).
+
+## Saved Objects for Dashboards and Visualizations
+
+For details about the task that provisions dashboard and visualization saved objects from the repository definitions, see [Saved Objects for Dashboards and Visualizations](./saved-objects-dashboards.md).
 
 ## Execution results
 
