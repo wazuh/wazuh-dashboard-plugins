@@ -25,6 +25,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed date and more format errors [#7754](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7754)
 - Upgraded the `brace-expansion` dependency to `1.1.12` and `2.0.2` [#7812](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7812)
 - Upgraded the `tar-fs` dependency to `2.1.4` [#7812](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7812)
+- Migrated the `wazuh.yml` settings to `opensearch_dashboards.yml` and advanced settings [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
+- Changed the sample data index names [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
+- Rework generate report button [#7900](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7900)
 
 ### Removed
 
@@ -36,13 +39,31 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed deprecated modules OpenSCAP, CIS-CAT, Osquery [#7645](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7645)
 - Removed `/health-check` and `/blank-screen` frontend routes [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
 - Removed `Miscellaneous` from `App Settings`[#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
-- Removed `customization.logo.healthcheck`, `checks.api`, `checks.fields`, `checks.maxBuckets`, `checks.metaFields`, `checks.pattern`, `checks.setup`, `checks.template` and `checks.timeFilter` settings
+- Removed `customization.logo.healthcheck`, `checks.api`, `checks.fields`, `checks.maxBuckets`, `checks.metaFields`, `checks.pattern`, `checks.setup`, `checks.template` and `checks.timeFilter` settings [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
+- Removed `customization.*`, `alerts.sample.prefix`, `configuration.ui_api_editable`, `ip.selector` settings [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
+- Removed `App Settings` app [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
+- Removed `GET /elastic/alerts` and `/utils/configuration*` endpoints [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
+- Removed task to sanitize the custom logos [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
+- Removed task to migrate the reports directory [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
+- Remove `Rules`, `Decoders`, `CDB List` and `Ruleset test` apps [#7901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7901)
+- Removed the legacy reporting application, including its server routes, UI, PDF generation logic, and related customization settings [#7899](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7899)
 
-## Wazuh v4.14.2 - OpenSearch Dashboards 2.19.3 - Revision 00
+## Wazuh v4.14.2 - OpenSearch Dashboards 2.19.4 - Revision 00
 
 ### Added
 
 - Support for Wazuh 4.14.2
+- Added persistence for page size and sorting in API tables [#7864](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7864)
+
+### Fixed
+
+- Removed sorting for Program name and Order columns in Related decoders table and Groups column in Related rules table to prevent API errors [#7864](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7864)
+
+### Changed
+
+- Improved text size consistency and visual hierarchy across the Agent Overview page by implementing standardized typography styling [#7878](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7878)
+- Improved Agent Overview resilience by rendering each available system inventory field [#78696](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7896)
+- Upgraded `cookie` dependency to 0.7.0 [#7897](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7897)
 
 ## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 02
 

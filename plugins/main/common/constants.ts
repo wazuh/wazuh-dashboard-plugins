@@ -17,7 +17,7 @@ export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
 
 // Index patterns - Wazuh alerts
 export const WAZUH_INDEX_TYPE_ALERTS = 'alerts';
-export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts-*';
+export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts*';
 
 // Job - Wazuh monitoring
 export const WAZUH_INDEX_TYPE_MONITORING = 'monitoring';
@@ -168,7 +168,6 @@ export const FIELD_TIMESTAMP = '@timestamp';
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
-export const WAZUH_SAMPLE_ALERT_PREFIX = 'wazuh-alerts-v5-';
 export const WAZUH_SAMPLE_ALERTS_INDEX_SHARDS = 1;
 export const WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS = 0;
 export const WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY = 'security';
@@ -185,7 +184,7 @@ export const WAZUH_SAMPLE_AGENT_MONITORING = 'agent-monitoring';
 export const WAZUH_SAMPLE_SERVER_STATISTICS = 'server-statistics';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 1500;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = {
-  settingIndexPattern: 'alerts.sample.prefix',
+  indexPatternPrefix: WAZUH_ALERTS_PATTERN.replace('*', ''),
   dataSet: 'wazuh-alerts',
 };
 
@@ -272,6 +271,7 @@ export const WAZUH_SETTING_SERVER_STATISTICS_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_STATISTICS_PATTERN.replace('*', ''),
   dataSet: 'server-statistics',
 };
+
 export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
   [WAZUH_SAMPLE_AGENT_MONITORING]: [
     {
@@ -283,125 +283,79 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
   [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
     {
       syscheck: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
       aws: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
       azure: true,
       count: 1000,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
       office: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
       gcp: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
       authentication: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
       ssh: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
       apache: true,
       count: 2000,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
       web: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
       windows: { service_control_manager: true },
       count: 1000,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
       github: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
-  ],
+  ].map(item => ({
+    ...item,
+    indexPatternPrefix: `${WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.indexPatternPrefix}-${WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY}`,
+    dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
+  })),
   [WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING]: [
     {
       rootcheck: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
       audit: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
       virustotal: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
       yara: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
-  ],
+  ].map(item => ({
+    ...item,
+    indexPatternPrefix: `${WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.indexPatternPrefix}-${WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING}`,
+    dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
+  })),
   [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION]: [
     {
       vulnerabilities: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
-    {
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
-    },
+    {},
     {
       docker: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
       mitre: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
-  ],
+  ].map(item => ({
+    ...item,
+    indexPatternPrefix: `${WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.indexPatternPrefix}-${WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION}`,
+    dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
+  })),
   [WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]: [
     {
       files: true,
@@ -575,26 +529,8 @@ export enum WAZUH_MODULES_ID {
   GITHUB = 'github',
 }
 
-export enum WAZUH_MENU_MANAGEMENT_SECTIONS_ID {
-  MANAGEMENT = 'management',
-  ADMINISTRATION = 'administration',
-  RULESET = 'ruleset',
-  RULES = 'rules',
-  DECODERS = 'decoders',
-  CDB_LISTS = 'lists',
-  GROUPS = 'groups',
-  CONFIGURATION = 'configuration',
-  STATUS_AND_REPORTS = 'statusReports',
-  STATUS = 'status',
-  CLUSTER = 'monitoring',
-  LOGS = 'logs',
-  REPORTING = 'reporting',
-  STATISTICS = 'statistics',
-}
-
 export enum WAZUH_MENU_TOOLS_SECTIONS_ID {
   API_CONSOLE = 'devTools',
-  RULESET_TEST = 'logtest',
 }
 
 export enum WAZUH_MENU_SECURITY_SECTIONS_ID {
@@ -694,13 +630,6 @@ export const UI_TOAST_COLOR = {
 // Assets
 export const ASSETS_BASE_URL_PREFIX = '/plugins/wazuh/assets/';
 export const ASSETS_PUBLIC_URL = '/plugins/wazuh/public/assets/';
-
-// Reports
-export const REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH =
-  'images/logo_reports.png';
-export const REPORTS_PRIMARY_COLOR = '#256BD1';
-export const REPORTS_PAGE_FOOTER_TEXT = 'Copyright © Wazuh, Inc.';
-export const REPORTS_PAGE_HEADER_TEXT = 'info@wazuh.com\nhttps://wazuh.com';
 
 // Plugin platform
 export const PLUGIN_PLATFORM_NAME = 'dashboard';
@@ -829,9 +758,6 @@ export const WAZUH_INDEXER_NAME = 'indexer';
 // Not timeFieldName on index pattern
 export const NOT_TIME_FIELD_NAME_INDEX_PATTERN =
   'not_time_field_name_index_pattern';
-
-// Customization
-export const CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES = 1048576;
 
 export enum EpluginSettingType {
   text = 'text',

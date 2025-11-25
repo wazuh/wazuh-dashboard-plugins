@@ -5,7 +5,12 @@ import {
   Plugin,
   Logger,
 } from 'opensearch-dashboards/server';
-import { validate as validateNodeCronInterval } from 'node-cron';
+import { EConfigurationProviders, PLUGIN_SETTINGS } from '../common/constants';
+import {
+  Configuration,
+  ConfigurationStore,
+} from '../common/services/configuration';
+import { getUiSettingsDefinitions } from '../common/settings-adapter';
 import {
   PluginSetup,
   WazuhCorePluginSetup,
@@ -16,19 +21,8 @@ import {
   ManageHosts,
   createDashboardSecurity,
   ServerAPIClient,
-  ConfigurationStore,
-  getCookieValueByName,
 } from './services';
-import { Configuration } from '../common/services/configuration';
-import {
-  PLUGIN_SETTINGS,
-  PLUGIN_SETTINGS_CATEGORIES,
-  WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
-} from '../common/constants';
-import { enhanceConfiguration } from './services/enhance-configuration';
-import { DataPathService, IDataPathService } from './services/data-path';
-import path from 'path';
-import { first } from 'rxjs/operators';
+import { InitializerConfigProvider } from './services/configuration';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -49,48 +43,27 @@ export class WazuhCorePlugin
   ): Promise<WazuhCorePluginSetup> {
     this.logger.debug('wazuh_core: Setup');
 
-    // Get global configuration
-    const globalConfig =
-      await this.initializerContext.config.legacy.globalConfig$
-        .pipe(first())
-        .toPromise();
+    // register the uiSetting to use in the public context (advanced settings)
+    const uiSettingsDefs = getUiSettingsDefinitions(PLUGIN_SETTINGS);
 
-    // Initialize DataPathService with logger and global configuration
-    this.services.dataPathService = new DataPathService(
-      this.logger.get('data-path'),
-      globalConfig,
-    );
-    // Setup and start DataPathService
-    await this.services.dataPathService.setup();
-    await this.services.dataPathService.start();
+    core.uiSettings.register(uiSettingsDefs);
 
     this.services.dashboardSecurity = createDashboardSecurity(plugins);
-
     this._internal.configurationStore = new ConfigurationStore(
       this.logger.get('configuration-store'),
-      {
-        cache_seconds: WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
-        file: this.services.dataPathService.getConfigFilePath(),
-      },
-      this.services.dataPathService,
     );
+
+    // add the initializer context config to the configuration store
+    this._internal.configurationStore.registerProvider(
+      EConfigurationProviders.INITIALIZER_CONTEXT,
+      new InitializerConfigProvider(this.initializerContext),
+    );
+
+    // create the configuration service to use like a facade pattern
     this.services.configuration = new Configuration(
       this.logger.get('configuration'),
       this._internal.configurationStore,
     );
-
-    // Enhance configuration service
-    enhanceConfiguration(this.services.configuration);
-
-    // Register the plugin settings
-    Object.entries(PLUGIN_SETTINGS).forEach(([key, value]) =>
-      this.services.configuration.register(key, value),
-    );
-
-    // Add categories to the configuration
-    Object.entries(PLUGIN_SETTINGS_CATEGORIES).forEach(([key, value]) => {
-      this.services.configuration.registerCategory({ ...value, id: key });
-    });
 
     this.services.configuration.setup();
 
@@ -131,11 +104,7 @@ export class WazuhCorePlugin
           asScoped: this.services.serverAPIClient.asScoped,
         },
       },
-      utils: {
-        getAPIHostIDFromCookie: (cookie: any, name: string) =>
-          getCookieValueByName(cookie, name),
-      },
-    };
+    } as WazuhCorePluginSetup;
   }
 
   public async start(core: CoreStart): Promise<WazuhCorePluginStart> {
@@ -154,7 +123,7 @@ export class WazuhCorePlugin
           asScoped: this.services.serverAPIClient.asScoped,
         },
       },
-    };
+    } as WazuhCorePluginSetup;
   }
 
   public stop() {}

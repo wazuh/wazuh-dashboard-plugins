@@ -273,6 +273,10 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
             )}
             tableInitialSortingField='id'
             tablePageSizeOptions={[10, 25, 50, 100]}
+            saveStateStorage={{
+              system: 'localStorage',
+              key: 'agents-table',
+            }}
             reload={reloadTable}
             setReload={props.setExternalReload}
             mapResponseItem={item => {

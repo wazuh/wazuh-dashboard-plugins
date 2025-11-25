@@ -56,7 +56,6 @@ import {
   ErrorHandler,
   GenericRequest,
 } from '../../../react-services';
-import { WazuhConfig } from '../../../react-services/wazuh-config';
 
 export const ApiTable = compose(withErrorBoundary)(
   class ApiTable extends Component {
@@ -113,10 +112,11 @@ export const ApiTable = compose(withErrorBoundary)(
       }
     }
 
-    componentDidMount() {
+    async componentDidMount() {
       this.refresh();
-      this.wazuhConfig = new WazuhConfig().getConfig();
-      this.isUpdatesEnabled = !this.wazuhConfig?.['wazuh.updates.disabled'];
+      this.isUpdatesEnabled = !(await getWazuhCorePlugin().configuration.get(
+        'wazuh.updates.disabled',
+      ));
       if (this.isUpdatesEnabled) {
         this.getApisAvailableUpdates();
       }
