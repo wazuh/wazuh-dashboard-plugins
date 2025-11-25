@@ -2,11 +2,12 @@ import { routes } from '../../common/constants';
 import { getCore } from '../plugin-services';
 import { apiInfo } from './types';
 
-export const getApiInfo = async (): Promise<apiInfo> => {
+export const getStatusSubscription = async (): Promise<apiInfo> => {
   try {
-    const apiInfo = await getCore().http.get(routes.apiInfo, {});
+    const statusSubscription = await getCore().http.get(routes.subscription);
+    console.log('API Info fetched:', statusSubscription);
 
-    return apiInfo;
+    return statusSubscription;
   } catch (error) {
     console.error('Error fetching API info:', error);
     throw error;

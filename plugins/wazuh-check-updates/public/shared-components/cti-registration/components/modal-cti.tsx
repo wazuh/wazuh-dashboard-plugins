@@ -35,13 +35,15 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
           throw new Error('Failed to connect to CTI service');
         }
 
+        // TODO: Replace with the request to the CTI service (endpoint /api/v1/instances/token)
         const ctiResponse = {
           device_code: 'test_device_code',
           user_code: 'mock_user_code',
-          verification_uri: 'https://cti.wazuh.com',
-          verification_uri_complete: 'https://cti.wazuh.com',
-          expires_in: 1800,
+          verification_uri: 'https://console.wazuh.com/instances/new',
+          verification_uri_complete:
+            'https://console.wazuh.com/instances/new?user_code=mock_user_code',
           interval: 5,
+          expires_in: 1800,
         };
 
         setLoading(false);

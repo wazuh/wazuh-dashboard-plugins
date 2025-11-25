@@ -1,1 +1,1 @@
-export { getApiInfo } from './get-api-info';
+export { subscriptionToIndexer } from './subscriptions';

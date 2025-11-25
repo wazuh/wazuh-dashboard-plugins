@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-import { getApiInfo } from './get-api-info';
+import { getStatusSubscriptionIndexer } from './subscriptions';
 import {
   getWazuhCheckUpdatesServices,
   getWazuhCore,
@@ -98,7 +98,7 @@ describe('getApiInfo', () => {
         .mockResolvedValueOnce({ data: mockClusterNodesData })
         .mockResolvedValueOnce({ data: mockApiInfoData });
 
-      const result = await getApiInfo(mockRequest);
+      const result = await getStatusSubscriptionIndexer(mockRequest);
 
       expect(result).toEqual(mockApiInfoData);
       expect(mockUtils.getAPIHostIDFromCookie).toHaveBeenCalledWith(
@@ -151,7 +151,7 @@ describe('getApiInfo', () => {
         .mockResolvedValueOnce({ data: mockClusterNodesData })
         .mockResolvedValueOnce({ data: mockApiInfoData });
 
-      await getApiInfo(mockRequest);
+      await getStatusSubscriptionIndexer(mockRequest);
 
       expect(mockUtils.getAPIHostIDFromCookie).toHaveBeenCalledWith(
         'wz-api=test-cookie',
@@ -162,7 +162,7 @@ describe('getApiInfo', () => {
     it('should throw an error if API host ID is not found', async () => {
       mockUtils.getAPIHostIDFromCookie.mockReturnValueOnce(undefined);
 
-      await expect(getApiInfo(mockRequest)).rejects.toThrow(
+      await expect(getStatusSubscriptionIndexer(mockRequest)).rejects.toThrow(
         'API host ID not found',
       );
     });

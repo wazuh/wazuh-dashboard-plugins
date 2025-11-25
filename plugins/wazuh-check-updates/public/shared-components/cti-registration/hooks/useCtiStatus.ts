@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { CtiDetails, CtiStatus } from '../types';
-import { getApiInfo } from '../../../services/get-api-info';
+import { getStatusSubscription } from '../../../services/subscription';
 import { IWazuhCtiDetails } from '../../../services/types';
 
 export const useCtiStatus = () => {
@@ -26,7 +26,7 @@ export const useCtiStatus = () => {
 
     pollingRef.current = setInterval(async () => {
       try {
-        const response = await getApiInfo();
+        const response = await getStatusSubscription();
         const statusRegistration = response.affected_items?.[0]
           ?.wazuh_cti_auth || {
           status: CtiStatus.PENDING,

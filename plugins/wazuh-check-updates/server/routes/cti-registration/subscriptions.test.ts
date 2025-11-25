@@ -2,16 +2,16 @@ import { Router } from '../../../../../src/core/server/http/router/router';
 import { HttpServer } from '../../../../../src/core/server/http/http_server';
 import { loggingSystemMock } from '../../../../../src/core/server/logging/logging_system.mock';
 import { ByteSizeValue } from '@osd/config-schema';
-import { routes } from '../../../common/constants';
-import { getApiInfoRoute } from './get-api-info';
-import { getApiInfo } from '../../services/cti-registration/get-api-info';
+import { routes, routes } from '../../../common/constants';
+import { subscriptionToIndexerRoute } from './subscriptions';
+import { subscriptionToIndexer } from '../../services/cti-registration/subscriptions';
 import supertest from 'supertest';
 
 const serverAddress = '127.0.0.1';
 const port = 11005; // assign a different port in each unit test
 
-const mockedGetApiInfo = getApiInfo as jest.Mock;
-jest.mock('../../services/cti-subscription/get-api-info');
+const mockedSubscriptionToIndexer = subscriptionToIndexer as jest.Mock;
+jest.mock('../../services/cti-registration/subscriptions');
 
 const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
@@ -51,7 +51,7 @@ beforeAll(async () => {
   innerServer = innerServerTest;
 
   // Register routes
-  getApiInfoRoute(router);
+  subscriptionToIndexerRoute(router);
 
   // Register router
   registerRouter(router);
@@ -68,7 +68,7 @@ afterAll(async () => {
   jest.clearAllMocks();
 });
 
-describe(`[endpoint] GET ${routes.apiInfo}`, () => {
+describe(`[endpoint] GET ${routes.subscription}`, () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -90,27 +90,27 @@ describe(`[endpoint] GET ${routes.apiInfo}`, () => {
       },
     };
 
-    mockedGetApiInfo.mockResolvedValue(mockApiInfo);
+    mockedSubscriptionToIndexer.mockResolvedValue(mockApiInfo);
 
     const response = await supertest(innerServer.listener)
-      .get(routes.apiInfo)
+      .get(routes.subscription)
       .expect(200);
 
     expect(response.body).toEqual(mockApiInfo);
-    expect(mockedGetApiInfo).toHaveBeenCalledTimes(1);
+    expect(mockedSubscriptionToIndexer).toHaveBeenCalledTimes(1);
   });
 
   test('should handle Error instance correctly', async () => {
     const errorMessage = 'API host ID not found';
     const mockError = new Error(errorMessage);
 
-    mockedGetApiInfo.mockRejectedValue(mockError);
+    mockedSubscriptionToIndexer.mockRejectedValue(mockError);
 
     const response = await supertest(innerServer.listener)
-      .get(routes.apiInfo)
+      .get(routes.subscription)
       .expect(503);
 
     expect(response.body.message).toBe(errorMessage);
-    expect(mockedGetApiInfo).toHaveBeenCalledTimes(1);
+    expect(mockedSubscriptionToIndexer).toHaveBeenCalledTimes(1);
   });
 });

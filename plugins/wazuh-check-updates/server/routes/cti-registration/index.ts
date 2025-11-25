@@ -1,6 +1,6 @@
 import { IRouter } from 'opensearch-dashboards/server';
-import { getApiInfoRoute } from './get-api-info';
+import { subscriptionToIndexerRoute } from './subscriptions';
 
 export function apiInfoRoutes(router: IRouter) {
-  getApiInfoRoute(router);
+  subscriptionToIndexerRoute(router);
 }
