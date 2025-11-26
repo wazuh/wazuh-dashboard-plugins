@@ -19,7 +19,7 @@ const mockGetWazuhCore = getWazuhCore as jest.MockedFunction<
   typeof getWazuhCore
 >;
 
-describe('getApiInfo', () => {
+describe('getStatusSubscriptionIndexer', () => {
   let mockLogger: any;
   let mockWazuhApiClient: any;
   let mockUtils: any;

@@ -5,7 +5,6 @@ import { apiInfo } from './types';
 export const getStatusSubscription = async (): Promise<apiInfo> => {
   try {
     const statusSubscription = await getCore().http.get(routes.subscription);
-    console.log('API Info fetched:', statusSubscription);
 
     return statusSubscription;
   } catch (error) {

@@ -53,7 +53,7 @@ export const useCtiStatus = () => {
 
   const checkCtiStatus = useCallback(async () => {
     try {
-      const response = await getApiInfo();
+      const response = await getStatusSubscription();
       const statusRegistration = response.affected_items?.[0]
         ?.wazuh_cti_auth || {
         status: CtiStatus.PENDING,
