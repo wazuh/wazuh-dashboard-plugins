@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiText,
-  EuiPage,
-  EuiPanel,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiText } from '@elastic/eui';
 import { compose } from 'redux';
 import { i18n } from '@osd/i18n';
 import { TableWzAPI } from '../../../common/tables';
