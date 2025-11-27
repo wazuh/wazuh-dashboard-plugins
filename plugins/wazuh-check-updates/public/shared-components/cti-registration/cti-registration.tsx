@@ -5,13 +5,13 @@ import { StartCtiRegistration } from './components/start-cti-registration';
 import { StatusCtiRegistration } from './components/status-cti-registration';
 import { ModalCti } from './components/modal-cti';
 import { StatusCtiModal } from './components/status-cti-modal';
-import { CtiStatus } from './types';
 import { useCtiStatus } from './hooks/useCtiStatus';
+import { statusCodes } from '../../../common/constants';
 
 export const CtiRegistration = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const { statusCTI, checkCtiStatus } = useCtiStatus();
+  const { statusCTI } = useCtiStatus();
 
   const handleModalToggle = () => {
     setIsModalOpen(!isModalOpen);
@@ -24,12 +24,12 @@ export const CtiRegistration = () => {
   return (
     <I18nProvider>
       <>
-        {statusCTI.status === CtiStatus.PENDING ? (
+        {statusCTI.status === statusCodes.NOT_FOUND ? (
           <StartCtiRegistration handleModalToggle={handleModalToggle} />
         ) : (
           <StatusCtiRegistration
             statusCTI={statusCTI}
-            checkCtiStatus={checkCtiStatus}
+            checkCtiStatus={useCtiStatus}
           />
         )}
         {isModalOpen && (

@@ -14,10 +14,10 @@ import {
 } from '@elastic/eui';
 import { StatusCtiModalProps } from '../types';
 
-export const StatusCtiModal: React.FC<StatusCtiModalProps> = ({
+export const StatusCtiModal: React.FC = ({
   handleStatusModalToggle,
   checkCtiStatus,
-}) => {
+}: StatusCtiModalProps) => {
   React.useEffect(() => {
     const fetchStatus = async () => {
       await checkCtiStatus();

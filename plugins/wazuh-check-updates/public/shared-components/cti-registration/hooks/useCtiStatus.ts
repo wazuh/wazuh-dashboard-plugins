@@ -1,15 +1,45 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { CtiDetails, CtiStatus } from '../types';
 import { getStatusSubscription } from '../../../services/subscription';
-import { IWazuhCtiDetails } from '../../../services/types';
+import { ISubscriptionResponse } from '../../../services/types';
+import { statusCodes } from '../../../../common/constants';
 
 export const useCtiStatus = () => {
-  const [statusCTI, setStatusCTI] = useState<IWazuhCtiDetails>({
+  const [statusCTI, setStatusCTI] = useState<ISubscriptionResponse>({
+    status: statusCodes.NOT_FOUND,
+    message: '',
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        setLoading(true);
+        const response = await getStatusSubscription();
+        setStatusCTI({
+          status: response.status,
+          message: response.message,
+        });
+      } catch (error) {
+        setStatusCTI({ status: statusCodes.NOT_FOUND, message: error.message });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStatus();
+  }, []);
+
+  return { statusCTI, loading };
+};
+
+export const useCtiStatusPolling = () => {
+  const [statusCTI, setStatusCTI] = useState<ISubscriptionResponse>({
     status: CtiStatus.PENDING,
     details: CtiDetails.PENDING,
   });
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
-  const previousStatusRef = useRef<IWazuhCtiDetails | null>(null);
+  const previousStatusRef = useRef<ISubscriptionResponse | null>(null);
 
   const stopPolling = useCallback(() => {
     if (pollingRef.current) {

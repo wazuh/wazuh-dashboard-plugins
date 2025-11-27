@@ -13,10 +13,15 @@ export enum routes {
   contentUpdate = `${ctiBasePath}/update`,
 }
 
-export const ctiSubscriptionRoute = '/api/v1/instances/token';
+export const CTI_SUBSCRIPTION_ROUTE = '/api/v1/instances/token';
 
-const wazuhContentManagerBasePath = '_plugins/content-manager';
+const WAZUH_CONTENT_MANAGER_BASE_PATH = '_plugins/content-manager';
 export const enum contentManagerRoutes {
-  subscription = `${wazuhContentManagerBasePath}/subscription`,
-  contentUpdate = `${wazuhContentManagerBasePath}/update`,
+  subscription = `${WAZUH_CONTENT_MANAGER_BASE_PATH}/subscription`,
+  contentUpdate = `${WAZUH_CONTENT_MANAGER_BASE_PATH}/update`,
+}
+
+export const enum statusCodes {
+  SUCCESS = 200,
+  NOT_FOUND = 404,
 }

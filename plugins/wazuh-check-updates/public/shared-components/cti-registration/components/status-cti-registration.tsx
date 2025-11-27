@@ -10,10 +10,10 @@ import {
 import { CtiStatus, StatusCtiRegistrationProps } from '../types';
 import { getCore } from '../../../plugin-services';
 
-export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
+export const StatusCtiRegistration: React.FC = ({
   statusCTI,
   checkCtiStatus,
-}) => {
+}: StatusCtiRegistrationProps) => {
   const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
 
   const isNewHomePageEnable = getCore().uiSettings.get('home:useNewHomePage');
@@ -52,28 +52,6 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
         <FormattedMessage
           id='wazuhCheckUpdates.ctiRegistration.polling'
           defaultMessage='CTI Registration: {status}'
-          values={{ status: statusCTI.status }}
-        />
-      ),
-    },
-    [CtiStatus.DENIED]: {
-      color: 'danger',
-      onClickAriaLabel: 'View denied CTI registration status',
-      message: (
-        <FormattedMessage
-          id='wazuhCheckUpdates.ctiRegistration.denied'
-          defaultMessage='CTI Registration: {status} trying to contact the API.'
-          values={{ status: statusCTI.status }}
-        />
-      ),
-    },
-    [CtiStatus.ERROR]: {
-      color: 'danger',
-      onClickAriaLabel: 'View error CTI registration status',
-      message: (
-        <FormattedMessage
-          id='wazuhCheckUpdates.ctiRegistration.error'
-          defaultMessage='CTI Registration: {status} trying to contact the API.'
           values={{ status: statusCTI.status }}
         />
       ),

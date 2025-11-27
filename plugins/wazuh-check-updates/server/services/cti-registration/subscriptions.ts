@@ -1,30 +1,18 @@
 import { OpenSearchDashboardsRequest } from 'src/core/server';
-import {
-  // getCore,
-  getWazuhCheckUpdatesServices,
-} from '../../plugin-services';
-// import { contentManagerRoutes } from '../../../common/constants';
+import { getCore, getWazuhCheckUpdatesServices } from '../../plugin-services';
+import { contentManagerRoutes } from '../../../common/constants';
 
 export const subscriptionToIndexer = async (
   request: OpenSearchDashboardsRequest,
 ): Promise<any> => {
   const { logger } = getWazuhCheckUpdatesServices();
   try {
-    // const subscription =
-    //   await getCore().opensearch.client.asInternalUser.transport.request({
-    //     method: 'POST',
-    //     path: contentManagerRoutes.subscription,
-    //     body: {
-    //       "device_code": "GmRhmhcxhwAzkoEqiMEg_DnyEysNkuNhszIySk9eS",
-    //       "client_id": "a17c21ed",
-    //       "expires_in": 1800,
-    //       "interval": 5
-    //     }
-    //   });
-    const subscription = {
-      status: 201,
-      data: 'Created - Subscription registered successfully.',
-    };
+    const subscription =
+      await getCore().opensearch.client.asInternalUser.transport.request({
+        method: 'GET',
+        path: contentManagerRoutes.subscription,
+      });
+
     return subscription;
   } catch (error) {
     const message =

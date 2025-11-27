@@ -1,12 +1,6 @@
-import { CtiStatus } from '../shared-components/cti-registration/types';
+import { statusCodes } from '../../common/constants';
 
-export interface IWazuhCtiDetails {
-  status: CtiStatus;
-  details: string;
-}
-
-export interface apiInfo {
-  affected_items: Array<{
-    wazuh_cti_auth: IWazuhCtiDetails;
-  }>;
+export interface ISubscriptionResponse {
+  status: statusCodes;
+  message: string;
 }
