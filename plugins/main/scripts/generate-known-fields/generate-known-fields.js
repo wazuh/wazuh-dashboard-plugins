@@ -319,6 +319,7 @@ function mapIndexFieldType(esType, field) {
     boolean: 'boolean',
     ip: 'ip',
     geo_point: 'geo_point',
+    object: 'object',
     nested: 'nested',
     _id: 'string',
     _index: 'string',
@@ -651,6 +652,51 @@ async function generateCombinedInventoryFields(results, config) {
   return combinedFields;
 }
 
+/**
+ * Combines all events-* fields into a single events.json file
+ * This is useful for the generic wazuh-events-* pattern that matches all events indices
+ */
+async function generateCombinedEventsFields(results, config) {
+  console.log('Processing combined events fields...');
+
+  const eventsKeys = Object.keys(results).filter(
+    key => key.startsWith('events-') && results[key],
+  );
+
+  if (eventsKeys.length === 0) {
+    console.log('  ⚠️  No events fields to combine');
+    return null;
+  }
+
+  // Use a Map to deduplicate fields by name
+  const fieldsMap = new Map();
+
+  for (const key of eventsKeys) {
+    const fields = results[key];
+    for (const field of fields) {
+      // Keep the first occurrence of each field name
+      if (!fieldsMap.has(field.name)) {
+        fieldsMap.set(field.name, field);
+      }
+    }
+  }
+
+  const combinedFields = Array.from(fieldsMap.values());
+
+  // Sort fields alphabetically by name for consistency
+  combinedFields.sort((a, b) => a.name.localeCompare(b.name));
+
+  // Write combined file
+  const outputPath = path.resolve(config.destination, 'events.json');
+  saveOutput(outputPath, combinedFields);
+
+  console.log(
+    `  ✅ Generated ${combinedFields.length} combined fields for events -> ${outputPath}`,
+  );
+
+  return combinedFields;
+}
+
 async function main(config) {
   console.log(`📦 Using Wazuh version: ${config.branch}`);
   console.log('🚀 Starting known fields generation...\n');
@@ -683,6 +729,16 @@ async function main(config) {
     );
     process.exit(1);
     results['states-inventory'] = null;
+  }
+  console.log(''); // Add spacing
+
+  // Generate combined events fields
+  try {
+    results['events'] = await generateCombinedEventsFields(results, config);
+  } catch (error) {
+    console.error('Failed to generate combined events fields:', error.message);
+    process.exit(1);
+    results['events'] = null;
   }
   console.log(''); // Add spacing
 
