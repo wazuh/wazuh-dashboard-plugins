@@ -1,6 +1,9 @@
 import { OpenSearchDashboardsRequest } from 'src/core/server';
-import { getCore, getWazuhCheckUpdatesServices } from '../../plugin-services';
-import { contentManagerRoutes } from '../../../common/constants';
+import {
+  // getCore,
+  getWazuhCheckUpdatesServices,
+} from '../../plugin-services';
+// import { contentManagerRoutes } from '../../../common/constants';
 
 export const subscriptionToIndexer = async (
   request: OpenSearchDashboardsRequest,

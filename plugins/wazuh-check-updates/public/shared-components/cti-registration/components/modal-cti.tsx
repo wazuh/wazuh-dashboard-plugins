@@ -36,6 +36,13 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         }
 
         // TODO: Replace with the request to the CTI service (endpoint /api/v1/instances/token)
+        // const ctiResponse = await getCore().http.get(
+        //   'basepath-to-cti-service/api/v1/instances/token',
+        //   {
+        //     prependBasePath: false,
+        //   },
+        // );
+
         const ctiResponse = {
           device_code: 'test_device_code',
           user_code: 'mock_user_code',
