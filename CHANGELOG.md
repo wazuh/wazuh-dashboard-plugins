@@ -29,6 +29,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the sample data index names [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 - Rework generate report button [#7900](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7900)
 
+### Fixed
+
+- Fixed version hardcoded value in the deploy agent wizard [#7923](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7923)
+
 ### Removed
 
 - Removed logic related to manager in favor to cluster management [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688)
