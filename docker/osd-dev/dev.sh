@@ -10,7 +10,7 @@ if [[ -z "$WDP_ROOT" ]]; then
   WDP_ROOT="$(realpath "${SCRIPT_DIR}/../..")"
 fi
 
-SIBLING_ROOT="$(realpath "${WDP_ROOT}/..")"
+SIBLING_ROOT="$(realpath "${WDP_ROOT}/../../..")"
 
 export WDP_ROOT
 export SIBLING_ROOT
