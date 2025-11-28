@@ -608,25 +608,36 @@ async function processTemplate(templateConfig, config) {
  * Main function
  */
 /**
- * Combines all states-inventory-* fields into a single states-inventory.json file
- * This is useful for the generic states-inventory pattern that matches all inventory indices
+ * Generic function to combine fields from multiple sources into a single file
+ * @param {Object} results - Object containing all processed template results
+ * @param {Object} config - Configuration object with destination path
+ * @param {string} keyPrefix - Prefix to filter keys (e.g., 'states-inventory-', 'events-')
+ * @param {string} outputFileName - Name of the output file (e.g., 'states-inventory.json', 'events.json')
+ * @param {string} displayName - Display name for logging (e.g., 'states-inventory', 'events')
+ * @returns {Promise<Array|null>} Combined fields array or null if no fields to combine
  */
-async function generateCombinedInventoryFields(results, config) {
-  console.log('Processing combined states-inventory fields...');
+async function generateCombinedFields(
+  results,
+  config,
+  keyPrefix,
+  outputFileName,
+  displayName,
+) {
+  console.log(`Processing combined ${displayName} fields...`);
 
-  const inventoryKeys = Object.keys(results).filter(
-    key => key.startsWith('states-inventory-') && results[key],
+  const matchingKeys = Object.keys(results).filter(
+    key => key.startsWith(keyPrefix) && results[key],
   );
 
-  if (inventoryKeys.length === 0) {
-    console.log('  ⚠️  No inventory fields to combine');
+  if (matchingKeys.length === 0) {
+    console.log(`  ⚠️  No ${displayName} fields to combine`);
     return null;
   }
 
   // Use a Map to deduplicate fields by name
   const fieldsMap = new Map();
 
-  for (const key of inventoryKeys) {
+  for (const key of matchingKeys) {
     const fields = results[key];
     for (const field of fields) {
       // Keep the first occurrence of each field name
@@ -642,14 +653,28 @@ async function generateCombinedInventoryFields(results, config) {
   combinedFields.sort((a, b) => a.name.localeCompare(b.name));
 
   // Write combined file
-  const outputPath = path.resolve(config.destination, 'states-inventory.json');
+  const outputPath = path.resolve(config.destination, outputFileName);
   saveOutput(outputPath, combinedFields);
 
   console.log(
-    `  ✅ Generated ${combinedFields.length} combined fields for states-inventory -> ${outputPath}`,
+    `  ✅ Generated ${combinedFields.length} combined fields for ${displayName} -> ${outputPath}`,
   );
 
   return combinedFields;
+}
+
+/**
+ * Combines all states-inventory-* fields into a single states-inventory.json file
+ * This is useful for the generic states-inventory pattern that matches all inventory indices
+ */
+async function generateCombinedInventoryFields(results, config) {
+  return generateCombinedFields(
+    results,
+    config,
+    'states-inventory-',
+    'states-inventory.json',
+    'states-inventory',
+  );
 }
 
 /**
@@ -657,44 +682,13 @@ async function generateCombinedInventoryFields(results, config) {
  * This is useful for the generic wazuh-events-* pattern that matches all events indices
  */
 async function generateCombinedEventsFields(results, config) {
-  console.log('Processing combined events fields...');
-
-  const eventsKeys = Object.keys(results).filter(
-    key => key.startsWith('events-') && results[key],
+  return generateCombinedFields(
+    results,
+    config,
+    'events-',
+    'events.json',
+    'events',
   );
-
-  if (eventsKeys.length === 0) {
-    console.log('  ⚠️  No events fields to combine');
-    return null;
-  }
-
-  // Use a Map to deduplicate fields by name
-  const fieldsMap = new Map();
-
-  for (const key of eventsKeys) {
-    const fields = results[key];
-    for (const field of fields) {
-      // Keep the first occurrence of each field name
-      if (!fieldsMap.has(field.name)) {
-        fieldsMap.set(field.name, field);
-      }
-    }
-  }
-
-  const combinedFields = Array.from(fieldsMap.values());
-
-  // Sort fields alphabetically by name for consistency
-  combinedFields.sort((a, b) => a.name.localeCompare(b.name));
-
-  // Write combined file
-  const outputPath = path.resolve(config.destination, 'events.json');
-  saveOutput(outputPath, combinedFields);
-
-  console.log(
-    `  ✅ Generated ${combinedFields.length} combined fields for events -> ${outputPath}`,
-  );
-
-  return combinedFields;
 }
 
 async function main(config) {
