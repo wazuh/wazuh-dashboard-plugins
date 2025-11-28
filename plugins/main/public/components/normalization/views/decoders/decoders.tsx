@@ -5,7 +5,6 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiText,
-  EuiPage,
   EuiProgress,
   EuiSearchBar,
 } from '@elastic/eui';
@@ -13,7 +12,6 @@ import { compose } from 'redux';
 import { WzButtonPermissionsOpenFlyout } from '../../../common/buttons';
 import { AssetViewer } from './asset-viewer';
 import { useAsyncAction } from '../../../common/hooks';
-import { WzRequest } from '../../../../react-services';
 import {
   withErrorBoundary,
   withGlobalBreadcrumb,
