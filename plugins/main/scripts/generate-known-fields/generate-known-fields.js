@@ -609,20 +609,21 @@ async function processTemplate(templateConfig, config) {
  */
 /**
  * Generic function to combine fields from multiple sources into a single file
- * @param {Object} results - Object containing all processed template results
- * @param {Object} config - Configuration object with destination path
- * @param {string} keyPrefix - Prefix to filter keys (e.g., 'states-inventory-', 'events-')
- * @param {string} outputFileName - Name of the output file (e.g., 'states-inventory.json', 'events.json')
- * @param {string} displayName - Display name for logging (e.g., 'states-inventory', 'events')
+ * @param {Object} options - Configuration options
+ * @param {Object} options.results - Object containing all processed template results
+ * @param {Object} options.config - Configuration object with destination path
+ * @param {string} options.keyPrefix - Prefix to filter keys (e.g., 'states-inventory-', 'events-')
+ * @param {string} options.outputFileName - Name of the output file (e.g., 'states-inventory.json', 'events.json')
+ * @param {string} options.displayName - Display name for logging (e.g., 'states-inventory', 'events')
  * @returns {Promise<Array|null>} Combined fields array or null if no fields to combine
  */
-async function generateCombinedFields(
+async function generateCombinedFields({
   results,
   config,
   keyPrefix,
   outputFileName,
   displayName,
-) {
+}) {
   console.log(`Processing combined ${displayName} fields...`);
 
   const matchingKeys = Object.keys(results).filter(
@@ -663,34 +664,6 @@ async function generateCombinedFields(
   return combinedFields;
 }
 
-/**
- * Combines all states-inventory-* fields into a single states-inventory.json file
- * This is useful for the generic states-inventory pattern that matches all inventory indices
- */
-async function generateCombinedInventoryFields(results, config) {
-  return generateCombinedFields(
-    results,
-    config,
-    'states-inventory-',
-    'states-inventory.json',
-    'states-inventory',
-  );
-}
-
-/**
- * Combines all events-* fields into a single events.json file
- * This is useful for the generic wazuh-events-* pattern that matches all events indices
- */
-async function generateCombinedEventsFields(results, config) {
-  return generateCombinedFields(
-    results,
-    config,
-    'events-',
-    'events.json',
-    'events',
-  );
-}
-
 async function main(config) {
   console.log(`📦 Using Wazuh version: ${config.branch}`);
   console.log('🚀 Starting known fields generation...\n');
@@ -712,10 +685,13 @@ async function main(config) {
 
   // Generate combined inventory fields
   try {
-    results['states-inventory'] = await generateCombinedInventoryFields(
+    results['states-inventory'] = await generateCombinedFields({
       results,
       config,
-    );
+      keyPrefix: 'states-inventory-',
+      outputFileName: 'states-inventory.json',
+      displayName: 'states-inventory',
+    });
   } catch (error) {
     console.error(
       'Failed to generate combined inventory fields:',
@@ -728,7 +704,13 @@ async function main(config) {
 
   // Generate combined events fields
   try {
-    results['events'] = await generateCombinedEventsFields(results, config);
+    results['events'] = await generateCombinedFields({
+      results,
+      config,
+      keyPrefix: 'events-',
+      outputFileName: 'events.json',
+      displayName: 'events',
+    });
   } catch (error) {
     console.error('Failed to generate combined events fields:', error.message);
     process.exit(1);
