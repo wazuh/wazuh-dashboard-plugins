@@ -82,6 +82,7 @@ export const WAZUH_INDEX_TYPE_EVENTS_NETWORK_ACTIVITY =
 export const WAZUH_INDEX_TYPE_EVENTS_OTHER = 'events-other';
 export const WAZUH_INDEX_TYPE_EVENTS_SECURITY = 'events-security';
 export const WAZUH_INDEX_TYPE_EVENTS_SYSTEM_ACTIVITY = 'events-system-activity';
+export const WAZUH_INDEX_TYPE_EVENTS = 'events';
 
 // FIM
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim*';
@@ -162,6 +163,8 @@ export const WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN =
   'wazuh-events-v5-access-management*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT =
   'index-pattern:events-access-management';
+export const WAZUH_EVENTS_PATTERN = 'wazuh-events*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS = 'index-pattern:events';
 
 // Time field
 export const FIELD_TIMESTAMP = '@timestamp';
