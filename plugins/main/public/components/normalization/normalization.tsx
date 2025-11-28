@@ -40,7 +40,6 @@ export const Normalization: React.FC = compose(
             <EuiTitle size='xs'>
               <h3>{normalization.title}</h3>
             </EuiTitle>
-            <EuiSpacer />
           </>
         );
       },
