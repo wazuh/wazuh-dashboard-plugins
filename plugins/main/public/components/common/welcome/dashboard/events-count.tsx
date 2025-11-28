@@ -3,7 +3,9 @@ import { AlertsDataSourceRepository } from '../../data-source/pattern/alerts/ale
 import { getPlugins } from '../../../../kibana-services';
 import { getDashboardPanels } from './dashboard_panels';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
-import { EuiPanel, EuiFlexItem, EuiFlexGroup, EuiSpacer } from '@elastic/eui';
+import { useDataSource } from '../../data-source/hooks';
+import { PatternDataSource, tParsedIndexPattern } from '../../data-source';
+import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiSpacer } from '@elastic/eui';
 import { Typography } from '../../typography/typography';
 import { useTimeFilter } from '../../hooks';
 import { LoadingSearchbarProgress } from '../../loading-searchbar-progress/loading-searchbar-progress';
@@ -64,13 +66,13 @@ export const EventsCount = () => {
   const { timeFilter } = useTimeFilter();
 
   return (
-    <EuiPanel paddingSize='s'>
+    <EuiPanel paddingSize='m'>
       <EuiFlexGroup gutterSize='none'>
         <EuiFlexItem grow={false}>
           <Typography level='section'>Events count evolution</Typography>
         </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiSpacer size='s' />
+      <EuiSpacer size='m' />
       <EventsDashboard timeFilter={timeFilter}></EventsDashboard>
     </EuiPanel>
   );

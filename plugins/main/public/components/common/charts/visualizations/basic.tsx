@@ -188,7 +188,7 @@ export const VisualizationBasicWidgetSelectorHeader = ({
     <EuiFlexGroup
       className='embPanel__header'
       gutterSize='none'
-      alignItems='center'
+      alignItems='flexStart'
     >
       <EuiFlexItem>
         {title && <Typography level='section'>{title}</Typography>}
@@ -204,7 +204,7 @@ export const VisualizationBasicWidgetSelectorHeader = ({
         />
       </EuiFlexItem>
     </EuiFlexGroup>
-    <EuiSpacer size='s' />
+    <EuiSpacer size='m' />
   </>
 );
 
