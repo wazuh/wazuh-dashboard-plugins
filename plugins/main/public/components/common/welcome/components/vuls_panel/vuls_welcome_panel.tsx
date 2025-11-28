@@ -158,7 +158,7 @@ const VulsPanel = ({ agent }) => {
           </RedirectAppLinks>
         </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiSpacer size='s' />
+      <EuiSpacer size='m' />
       <PanelWithVulnerabilitiesState agent={agent} />
     </EuiPanel>
   );

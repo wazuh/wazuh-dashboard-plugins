@@ -5,6 +5,7 @@ import {
   EuiFlexItem,
   EuiToolTip,
   EuiButtonIcon,
+  EuiText,
 } from '@elastic/eui';
 import _ from 'lodash';
 import {
@@ -182,10 +183,21 @@ export const InventoryMetrics = compose(
         }
       ></WzRibbonTitle>
       {notEnoughData ? (
-        <div style={{ textAlign: 'center' }}>
-          <EuiIcon type='iInCircle' /> Not enough hardware or operating system
-          information
-        </div>
+        <EuiFlexGroup
+          direction='row'
+          alignItems='center'
+          justifyContent='center'
+          gutterSize='xs'
+        >
+          <EuiFlexItem grow={false} responsive={false}>
+            <EuiIcon type='iInCircle' />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false} responsive={false}>
+            <EuiText size='s'>
+              Not enough hardware or operating system information
+            </EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       ) : (
         <RibbonBodyProtected
           items={items}
