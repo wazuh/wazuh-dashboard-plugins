@@ -3,8 +3,6 @@ import { AlertsDataSourceRepository } from '../../data-source/pattern/alerts/ale
 import { getPlugins } from '../../../../kibana-services';
 import { getDashboardPanels } from './dashboard_panels';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
-import { useDataSource } from '../../data-source/hooks';
-import { PatternDataSource, tParsedIndexPattern } from '../../data-source';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiSpacer } from '@elastic/eui';
 import { Typography } from '../../typography/typography';
 import { useTimeFilter } from '../../hooks';
