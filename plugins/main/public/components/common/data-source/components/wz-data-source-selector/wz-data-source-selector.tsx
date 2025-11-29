@@ -158,6 +158,7 @@ const WzDataSourceSelector = (
               isInvalid={isInvalid}
               append={
                 <EuiButtonIcon
+                  aria-label='Refresh API list'
                   iconType='refresh'
                   color='primary'
                   isDisabled={action.running}

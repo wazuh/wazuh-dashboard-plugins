@@ -1,0 +1,1 @@
+export { subscriptionToIndexer } from './subscriptions';
