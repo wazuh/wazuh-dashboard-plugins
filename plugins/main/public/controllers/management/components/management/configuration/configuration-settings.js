@@ -71,18 +71,6 @@ export default [
     ],
   },
   {
-    title: 'Alerts and output management',
-    description: '',
-    settings: [
-      {
-        name: 'Alerts',
-        description: 'Settings related to the alerts and their format',
-        goto: 'alerts',
-        when: 'manager',
-      },
-    ],
-  },
-  {
     title: 'Auditing and policy monitoring',
     description: '',
     settings: [
@@ -112,28 +100,9 @@ export default [
         goto: 'inventory',
       },
       {
-        name: 'Active response',
-        description: 'Active threat addressing by immediate response',
-        goto: 'active-response',
-        when: 'manager',
-      },
-      {
-        name: 'Active response',
-        description: 'Active threat addressing by immediate response',
-        goto: 'active-response-agent',
-        when: 'agent',
-      },
-      {
         name: 'Commands',
         description: 'Configuration options of the Command wodle',
         goto: 'commands',
-      },
-      {
-        name: 'Docker listener',
-        description:
-          'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events',
-        goto: 'docker-listener',
-        when: agent => hasAgentSupportModule(agent, dockerApp.id),
       },
     ],
   },
@@ -152,40 +121,6 @@ export default [
         description:
           'Identify changes in content, permissions, ownership, and attributes of files',
         goto: 'integrity-monitoring',
-      },
-    ],
-  },
-  {
-    title: 'Cloud security monitoring',
-    description: '',
-    settings: [
-      {
-        name: 'Amazon S3',
-        description:
-          'Security events related to Amazon AWS services, collected directly via AWS API',
-        goto: 'aws-s3',
-      },
-      {
-        name: 'Azure Logs',
-        description: 'Configuration options of the Azure Logs wodle',
-        goto: 'azure-logs',
-        when: 'manager',
-      },
-      {
-        name: 'Google Cloud Pub/Sub',
-        description: 'Configuration options of the Google Cloud Pub/Sub module',
-        goto: 'gcp-pubsub',
-      },
-      {
-        name: 'GitHub',
-        description: 'Detect threats targeting GitHub organizations',
-        goto: 'github',
-      },
-      {
-        name: 'Office 365',
-        description: 'Configuration options of the Office 365 module',
-        goto: 'office365',
-        when: 'manager',
       },
     ],
   },

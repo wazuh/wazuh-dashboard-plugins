@@ -21,23 +21,16 @@ import WzConfigurationEditConfiguration from './edit-configuration/edit-configur
 import WzConfigurationRegistrationService from './registration-service/registration-service';
 import WzConfigurationLogSettings from './log-settings/log-settings';
 import WzConfigurationCluster from './cluster/cluster';
-import WzConfigurationAlerts from './alerts/alerts';
 import WzConfigurationClient from './client/client';
 import WzConfigurationClientBuffer from './client-buffer/client-buffer';
 import { WzConfigurationAlertsLabelsAgent } from './alerts/alerts-labels';
 import WzConfigurationPolicyMonitoring from './policy-monitoring/policy-monitoring';
 import WzConfigurationVulnerabilities from './vulnerabilities/vulnerabilities';
 import WzConfigurationInventory from './inventory/inventory';
-import WzConfigurationActiveResponse from './active-response/active-response';
 import WzConfigurationActiveResponseAgent from './active-response/active-response-agent';
 import WzConfigurationCommands from './commands/commands';
-import WzConfigurationDockerListener from './docker-listener/docker-listener';
 import WzConfigurationLogCollection from './log-collection/log-collection';
 import WzConfigurationIntegrityMonitoring from './integrity-monitoring/integrity-monitoring';
-import WzConfigurationIntegrityAmazonS3 from './aws-s3/aws-s3';
-import WzConfigurationAzureLogs from './azure-logs/azure-logs';
-import WzConfigurationGoogleCloudPubSub from './google-cloud-pub-sub/google-cloud-pub-sub';
-import { WzConfigurationGitHub } from './github/github';
 import WzViewSelector, {
   WzViewSelectorSwitch,
 } from './util-components/view-selector';
@@ -75,7 +68,6 @@ import {
 } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-import { WzConfigurationOffice365 } from './office365/office365';
 import { getCore } from '../../../../../kibana-services';
 import { PromptNoActiveAgentWithoutSelect } from '../../../../../components/agents/prompts';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -295,13 +287,6 @@ class WzConfigurationSwitch extends Component {
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='alerts'>
-                  <WzConfigurationAlerts
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
                 <WzViewSelectorSwitch view='client'>
                   <WzConfigurationClient
                     clusterNodeSelected={this.props.clusterNodeSelected}
@@ -347,13 +332,6 @@ class WzConfigurationSwitch extends Component {
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='active-response'>
-                  <WzConfigurationActiveResponse
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
                 <WzViewSelectorSwitch view='active-response-agent'>
                   <WzConfigurationActiveResponseAgent
                     clusterNodeSelected={this.props.clusterNodeSelected}
@@ -368,14 +346,6 @@ class WzConfigurationSwitch extends Component {
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='docker-listener'>
-                  <WzConfigurationDockerListener
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateBadge={this.updateBadge}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
                 <WzViewSelectorSwitch view='log-collection'>
                   <WzConfigurationLogCollection
                     clusterNodeSelected={this.props.clusterNodeSelected}
@@ -385,46 +355,6 @@ class WzConfigurationSwitch extends Component {
                 </WzViewSelectorSwitch>
                 <WzViewSelectorSwitch view='integrity-monitoring'>
                   <WzConfigurationIntegrityMonitoring
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateBadge={this.updateBadge}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='aws-s3'>
-                  <WzConfigurationIntegrityAmazonS3
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateBadge={this.updateBadge}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='azure-logs'>
-                  <WzConfigurationAzureLogs
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateBadge={this.updateBadge}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='gcp-pubsub'>
-                  <WzConfigurationGoogleCloudPubSub
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateBadge={this.updateBadge}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='github'>
-                  <WzConfigurationGitHub
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateBadge={this.updateBadge}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='office365'>
-                  <WzConfigurationOffice365
                     clusterNodeSelected={this.props.clusterNodeSelected}
                     agent={agent}
                     updateBadge={this.updateBadge}
