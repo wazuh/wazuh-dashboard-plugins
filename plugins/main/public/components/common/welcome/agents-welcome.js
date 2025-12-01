@@ -488,7 +488,7 @@ export const AgentsWelcome = compose(
                     >
                       {this.renderEventCountVisualization()}
                     </EuiFlexItem>
-                    <EuiFlexItem grow={3}>
+                    {/* <EuiFlexItem grow={3}>
                       <EuiFlexGroup>
                         <EuiFlexItem
                           key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
@@ -500,7 +500,7 @@ export const AgentsWelcome = compose(
                           {this.renderCompliancePanel()}
                         </EuiFlexItem>
                       </EuiFlexGroup>
-                    </EuiFlexItem>
+                    </EuiFlexItem> */}
                   </EuiFlexGroup>
                   <EuiSpacer size='l' />
                   <EuiFlexGroup direction={responsiveGroupDirection}>
