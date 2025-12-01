@@ -49,7 +49,7 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
    * Validate if the data source is an alerts index pattern
    * The alerts index pattern must have the following fields:
    * - timestamp
-   * - wazuh.decoders
+   * - wazuh.integration.decoders
    * - manager.name
    * - agent.id
    *

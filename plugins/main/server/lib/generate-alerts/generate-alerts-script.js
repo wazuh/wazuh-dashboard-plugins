@@ -156,7 +156,7 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = getDecodersForModule('aws');
+    alert.wazuh.integration.decoders = getDecodersForModule('aws');
     alert.wazuh.rules = getRulesForModule('aws');
     switch (randomType) {
       case 'guarddutyPortProbe': {
@@ -440,7 +440,7 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = getDecodersForModule('azure');
+    alert.wazuh.integration.decoders = getDecodersForModule('azure');
     alert.wazuh.rules = getRulesForModule('azure');
 
     alert.rule = { ...typeAlert.rule };
@@ -538,7 +538,7 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = getDecodersForModule('office');
+    alert.wazuh.integration.decoders = getDecodersForModule('office');
     alert.wazuh.rules = getRulesForModule('office');
 
     // User from Office365
@@ -597,7 +597,7 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = getDecodersForModule('gcp');
+    alert.wazuh.integration.decoders = getDecodersForModule('gcp');
     alert.wazuh.rules = getRulesForModule('gcp');
 
     alert.rule = Random.arrayItem(GCP.arrayRules);
@@ -690,7 +690,7 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = ['audit'];
+    alert.wazuh.integration.decoders = ['audit'];
     alert.wazuh.rules = getRulesForModule('audit', 'modified');
 
     alert.data = dataAudit.data;
@@ -726,7 +726,7 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = getDecodersForModule('docker');
+    alert.wazuh.integration.decoders = getDecodersForModule('docker');
     alert.wazuh.rules = getRulesForModule('docker');
 
     alert.data = dataDocker.data;
@@ -769,7 +769,7 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = getDecodersForModule('mitre');
+    alert.wazuh.integration.decoders = getDecodersForModule('mitre');
 
     // Message
     alert.message = `MITRE ATT&CK: ${alert.rule.description}`;
@@ -794,7 +794,7 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = ['rootcheck'];
+    alert.wazuh.integration.decoders = ['rootcheck'];
     alert.wazuh.rules = getRulesForModule('rootcheck');
 
     const alertCategory = Random.arrayItem(['Rootkit', 'Trojan']);
@@ -974,7 +974,7 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = ['syscheck'];
+    alert.wazuh.integration.decoders = ['syscheck'];
     alert.wazuh.rules = getRulesForModule('fim', eventType);
 
     // Update rule based on event type
@@ -989,7 +989,7 @@ function generateAlert(params) {
         alert.rule = { ...IntegrityMonitoring.regulatory[2] };
         break;
     }
-    alert.rule.groups = ['syscheck', 'fim'];
+    alert.wazuh.integration.decoders = ['syscheck', 'fim'];
     alert.rule.firedtimes = Random.number(1, 10);
   }
 
@@ -1005,9 +1005,9 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = getDecodersForModule('virustotal');
+    alert.wazuh.integration.decoders = getDecodersForModule('virustotal');
     alert.wazuh.rules = getRulesForModule('virustotal');
-    alert.rule.groups.push('virustotal');
+    alert.wazuh.integration.decoders.push('virustotal');
 
     alert.data.virustotal = {};
     alert.data.virustotal.found = Random.arrayItem(['0', '1', '1', '1']);
@@ -1070,7 +1070,7 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = ['json', 'vulnerability-detector'];
+    alert.wazuh.integration.decoders = ['json', 'vulnerability-detector'];
     alert.wazuh.rules = getRulesForModule('vulnerability');
 
     alert.rule = {
@@ -1216,7 +1216,7 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = getDecodersForModule('authentication');
+    alert.wazuh.integration.decoders = getDecodersForModule('authentication');
     alert.wazuh.rules = getRulesForModule(
       'authentication',
       isSuccess ? 'success' : 'failure',
@@ -1225,8 +1225,8 @@ function generateAlert(params) {
     switch (typeAlert) {
       case 'invalidLoginPassword': {
         alert.rule = { ...Authentication.invalidLoginPassword.rule };
-        alert.rule.groups = [
-          ...Authentication.invalidLoginPassword.rule.groups,
+        alert.wazuh.integration.decoders = [
+          ...Authentication.invalidLoginPassword.wazuh.integration.decoders,
         ];
         alert.message = generateMessage({
           action: 'Invalid password for SSH login',
@@ -1237,7 +1237,7 @@ function generateAlert(params) {
       }
       case 'invalidLoginUser': {
         alert.rule = { ...Authentication.invalidLoginUser.rule };
-        alert.rule.groups = [...Authentication.invalidLoginUser.rule.groups];
+        alert.wazuh.integration.decoders = [...Authentication.invalidLoginUser.wazuh.integration.decoders];
         alert.message = generateMessage({
           action: 'Invalid user for SSH login',
           user: userName,
@@ -1247,8 +1247,8 @@ function generateAlert(params) {
       }
       case 'multipleAuthenticationFailures': {
         alert.rule = { ...Authentication.multipleAuthenticationFailures.rule };
-        alert.rule.groups = [
-          ...Authentication.multipleAuthenticationFailures.rule.groups,
+        alert.wazuh.integration.decoders = [
+          ...Authentication.multipleAuthenticationFailures.wazuh.integration.decoders,
         ];
         alert.rule.frequency = Random.number(5, 50);
         alert.message = generateMessage({
@@ -1260,8 +1260,8 @@ function generateAlert(params) {
       }
       case 'windowsInvalidLoginPassword': {
         alert.rule = { ...Authentication.windowsInvalidLoginPassword.rule };
-        alert.rule.groups = [
-          ...Authentication.windowsInvalidLoginPassword.rule.groups,
+        alert.wazuh.integration.decoders = [
+          ...Authentication.windowsInvalidLoginPassword.wazuh.integration.decoders,
         ];
         alert.rule.frequency = Random.number(5, 50);
         // Windows event data
@@ -1288,7 +1288,7 @@ function generateAlert(params) {
       }
       case 'userLoginFailed': {
         alert.rule = { ...Authentication.userLoginFailed.rule };
-        alert.rule.groups = [...Authentication.userLoginFailed.rule.groups];
+        alert.wazuh.integration.decoders = [...Authentication.userLoginFailed.wazuh.integration.decoders];
         alert.message = generateMessage({
           action: 'User login failed',
           user: userName,
@@ -1298,7 +1298,7 @@ function generateAlert(params) {
       }
       case 'passwordCheckFailed': {
         alert.rule = { ...Authentication.passwordCheckFailed.rule };
-        alert.rule.groups = [...Authentication.passwordCheckFailed.rule.groups];
+        alert.wazuh.integration.decoders = [...Authentication.passwordCheckFailed.wazuh.integration.decoders];
         alert.message = generateMessage({
           action: 'Password check failed',
           user: userName,
@@ -1307,7 +1307,7 @@ function generateAlert(params) {
       }
       case 'nonExistentUser': {
         alert.rule = { ...Authentication.nonExistentUser.rule };
-        alert.rule.groups = [...Authentication.nonExistentUser.rule.groups];
+        alert.wazuh.integration.decoders = [...Authentication.nonExistentUser.wazuh.integration.decoders];
         alert.message = generateMessage({
           action: 'Attempt to login with non-existent user',
           user: userName,
@@ -1317,8 +1317,8 @@ function generateAlert(params) {
       }
       case 'bruteForceTryingAccessSystem': {
         alert.rule = { ...Authentication.bruteForceTryingAccessSystem.rule };
-        alert.rule.groups = [
-          ...Authentication.bruteForceTryingAccessSystem.rule.groups,
+        alert.wazuh.integration.decoders = [
+          ...Authentication.bruteForceTryingAccessSystem.wazuh.integration.decoders,
         ];
         alert.message = generateMessage({
           action: 'Brute force attack detected',
@@ -1329,7 +1329,7 @@ function generateAlert(params) {
       }
       case 'reverseLoockupError': {
         alert.rule = { ...Authentication.reverseLoockupError.rule };
-        alert.rule.groups = [...Authentication.reverseLoockupError.rule.groups];
+        alert.wazuh.integration.decoders = [...Authentication.reverseLoockupError.wazuh.integration.decoders];
         alert.message = generateMessage({
           action: 'Reverse DNS lookup error',
           sourceIp: sourceIp,
@@ -1338,8 +1338,8 @@ function generateAlert(params) {
       }
       case 'insecureConnectionAttempt': {
         alert.rule = { ...Authentication.insecureConnectionAttempt.rule };
-        alert.rule.groups = [
-          ...Authentication.insecureConnectionAttempt.rule.groups,
+        alert.wazuh.integration.decoders = [
+          ...Authentication.insecureConnectionAttempt.wazuh.integration.decoders,
         ];
         alert.message = generateMessage({
           action: 'Insecure connection attempt',
@@ -1350,8 +1350,8 @@ function generateAlert(params) {
       case 'authenticationSuccess':
         {
           alert.rule = { ...Authentication.authenticationSuccess.rule };
-          alert.rule.groups = [
-            ...Authentication.authenticationSuccess.rule.groups,
+          alert.wazuh.integration.decoders = [
+            ...Authentication.authenticationSuccess.wazuh.integration.decoders,
           ];
           alert.message = generateMessage({
             action: 'SSH authentication successful',
@@ -1365,8 +1365,8 @@ function generateAlert(params) {
           alert.rule = {
             ...Authentication.maximumAuthenticationAttemptsExceeded.rule,
           };
-          alert.rule.groups = [
-            ...Authentication.maximumAuthenticationAttemptsExceeded.rule.groups,
+          alert.wazuh.integration.decoders = [
+            ...Authentication.maximumAuthenticationAttemptsExceeded.wazuh.integration.decoders,
           ];
           alert.message = generateMessage({
             action: 'Maximum authentication attempts exceeded',
@@ -1433,12 +1433,12 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = ['sshd'];
+    alert.wazuh.integration.decoders = ['sshd'];
     alert.wazuh.rules = [typeAlert.rule.id];
 
     // Set rule
     alert.rule = { ...typeAlert.rule };
-    alert.rule.groups = [...typeAlert.rule.groups];
+    alert.wazuh.integration.decoders = [...typeAlert.wazuh.integration.decoders];
     alert.rule.firedtimes = Random.number(1, 15);
 
     // Generate message
@@ -1461,9 +1461,9 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = ['windows_eventchannel'];
+    alert.wazuh.integration.decoders = ['windows_eventchannel'];
     alert.wazuh.rules = getRulesForModule('windows', 'service');
-    alert.rule.groups.push('windows');
+    alert.wazuh.integration.decoders.push('windows');
 
     if (params.windows.service_control_manager) {
       alert.data = {
@@ -1478,7 +1478,7 @@ function generateAlert(params) {
       alert.rule.firedtimes = Random.number(1, 20);
       alert.rule.mail = false;
       alert.rule.level = 3;
-      alert.rule.groups.push('windows', 'policy_changed');
+      alert.wazuh.integration.decoders.push('windows', 'policy_changed');
       alert.rule.pci = ['10.6'];
       alert.rule.hipaa = ['164.312.b'];
       alert.rule.gdpr = ['IV_35.7.d'];
@@ -1509,7 +1509,7 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = getDecodersForModule('apache');
+    alert.wazuh.integration.decoders = getDecodersForModule('apache');
     alert.wazuh.rules = getRulesForModule('apache');
 
     const typeAlert = { ...Apache.data[0] };
@@ -1556,7 +1556,7 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = getDecodersForModule('web');
+    alert.wazuh.integration.decoders = getDecodersForModule('web');
     alert.wazuh.rules = getRulesForModule('web');
 
     const sourceIp = Random.arrayItem(IPs);
@@ -1625,7 +1625,7 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = getDecodersForModule('github');
+    alert.wazuh.integration.decoders = getDecodersForModule('github');
     alert.wazuh.rules = getRulesForModule('github');
     const alertType = Random.arrayItem(GitHub.ALERT_TYPES);
     const actor = Random.arrayItem(GitHub.ACTORS);
@@ -1682,7 +1682,7 @@ function generateAlert(params) {
     });
 
     // Update wazuh fields
-    alert.wazuh.decoders = ['YARA_decoder'];
+    alert.wazuh.integration.decoders = ['YARA_decoder'];
     alert.wazuh.rules = getRulesForModule('yara', 'detected');
 
     const yaraAlert = Yara.createAlert();

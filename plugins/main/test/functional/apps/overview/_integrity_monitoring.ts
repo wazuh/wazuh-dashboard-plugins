@@ -54,7 +54,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -88,7 +88,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -122,7 +122,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -156,7 +156,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -192,7 +192,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -235,7 +235,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -280,7 +280,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -338,7 +338,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -381,7 +381,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -424,7 +424,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -467,7 +467,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -512,7 +512,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -564,7 +564,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -629,7 +629,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -694,7 +694,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -739,7 +739,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -784,7 +784,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -829,7 +829,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -876,7 +876,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -930,7 +930,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {
@@ -997,7 +997,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               must: [
                 {
                   term: {
-                    'wazuh.decoders': 'syscheck',
+                    'wazuh.integration.decoders': 'syscheck',
                   },
                 },
                 {

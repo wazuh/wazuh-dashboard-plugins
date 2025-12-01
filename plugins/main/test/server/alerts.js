@@ -39,7 +39,7 @@ const syscheck = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'rule.groups': 'syscheck' } }
+            { match: { 'wazuh.integration.decoders': 'syscheck' } }
           ]
         }
       }
@@ -56,7 +56,7 @@ const syscheck = async agentID => {
   checkRes(res);
   commonFields(sample);
   sample.syscheck.should.be.a('object');
-  sample.rule.groups.should.be.a('array').that.includes('syscheck');
+  sample.wazuh.integration.decoders.should.be.a('array').that.includes('syscheck');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
   sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
@@ -75,7 +75,7 @@ const rootcheck = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'rule.groups': 'rootcheck' } }
+            { match: { 'wazuh.integration.decoders': 'rootcheck' } }
           ]
         }
       }
@@ -91,7 +91,7 @@ const rootcheck = async agentID => {
 
   checkRes(res);
   commonFields(sample);
-  sample.rule.groups.should.be.a('array').that.includes('rootcheck');
+  sample.wazuh.integration.decoders.should.be.a('array').that.includes('rootcheck');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
   sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
@@ -110,7 +110,7 @@ const vulnerability = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'rule.groups': 'vulnerability-detector' } }
+            { match: { 'wazuh.integration.decoders': 'vulnerability-detector' } }
           ]
         }
       }
@@ -135,7 +135,7 @@ const vulnerability = async agentID => {
   sample.data.vulnerability.severity.should.be.a('string');
   sample.data.vulnerability.state.should.be.a('string');
   sample.data.vulnerability.cve.should.be.a('string');
-  sample.rule.groups.should.be
+  sample.wazuh.integration.decoders.should.be
     .a('array')
     .that.includes('vulnerability-detector');
   sample.manager.should.be.a('object');
@@ -224,7 +224,7 @@ const audit = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'rule.groups': 'audit' } }
+            { match: { 'wazuh.integration.decoders': 'audit' } }
           ]
         }
       }
@@ -241,7 +241,7 @@ const audit = async agentID => {
   checkRes(res);
   commonFields(sample);
   sample.data.should.be.a('object');
-  sample.rule.groups.should.be.a('array').that.includes('audit');
+  sample.wazuh.integration.decoders.should.be.a('array').that.includes('audit');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
   sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');

@@ -2,7 +2,7 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_AWS_RULE_GROUP } from '../../../../../../../common/constants';
 import { AlertsDataSource } from '../alerts-data-source';
 
-const AWS_GROUP_KEY = 'wazuh.decoders';
+const AWS_GROUP_KEY = 'wazuh.integration.decoders';
 const AWS_GROUP_VALUE = 'amazon';
 
 export class AWSDataSource extends AlertsDataSource {

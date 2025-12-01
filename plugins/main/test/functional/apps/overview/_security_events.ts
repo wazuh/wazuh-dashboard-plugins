@@ -71,7 +71,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
           );
         }),
         authSuccess: ((todayAlerts || {}).hits || {}).hits.filter(hit => {
-          return hit._source.rule.groups.includes('authentication_success');
+          return hit._source.wazuh.integration.decoders.includes('authentication_success');
         }),
       };
 
@@ -182,7 +182,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
           },
         },
       };
-      const esValues = await esPieChart.getData(query, 'rule.groups');
+      const esValues = await esPieChart.getData(query, 'wazuh.integration.decoders');
 
       expect(JSON.stringify(esValues.slice(0, 5))).to.be.equal(
         JSON.stringify(values),
@@ -305,7 +305,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
           );
         }),
         authSuccess: ((todayAlerts || {}).hits || {}).hits.filter(hit => {
-          return hit._source.rule.groups.includes('authentication_success');
+          return hit._source.wazuh.integration.decoders.includes('authentication_success');
         }),
       };
 
@@ -476,7 +476,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
           },
         },
       };
-      const esValues = await esPieChart.getData(query, 'rule.groups');
+      const esValues = await esPieChart.getData(query, 'wazuh.integration.decoders');
 
       expect(arrayHelper.compareObjects(values, esValues)).to.be.ok();
       await filterBar.removeAllFilters();
@@ -618,7 +618,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
           );
         }),
         authSuccess: ((todayAlerts || {}).hits || {}).hits.filter(hit => {
-          return hit._source.rule.groups.includes('authentication_success');
+          return hit._source.wazuh.integration.decoders.includes('authentication_success');
         }),
       };
 
@@ -797,7 +797,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
           },
         },
       };
-      const esValues = await esPieChart.getData(query, 'rule.groups');
+      const esValues = await esPieChart.getData(query, 'wazuh.integration.decoders');
       expect(arrayHelper.compareObjects(values, esValues)).to.be.ok();
       await queryBar.setQuery('');
       await queryBar.submitQuery();

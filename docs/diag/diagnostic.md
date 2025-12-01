@@ -37,7 +37,7 @@ Try to re-select the index pattern using the alerts index pattern selector.
 The alerts index pattern is stored in the `currentPattern` cookie that stores the ID in the browser. If this cookie is not present or this has a falsy value, the error is thrown.
 
 1. Select the alerts index pattern in the dashboard header.
-2. Ensure compatible index patterns exist with required fields (timestamp, wazuh.decoders, manager.name and agent.id).
+2. Ensure compatible index patterns exist with required fields (timestamp, wazuh.integration.decoders, manager.name and agent.id).
 3. If no compatible index patterns exist, create one if matching indices are available.
 4. Verify the `currentPattern` cookie is set with the index pattern ID.
 

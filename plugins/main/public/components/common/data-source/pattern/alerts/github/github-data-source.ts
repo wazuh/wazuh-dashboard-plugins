@@ -2,7 +2,7 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_GITHUB_RULE_GROUP } from '../../../../../../../common/constants';
 import { AlertsDataSource } from '../alerts-data-source';
 
-const GITHUB_GROUP_KEY = 'wazuh.decoders';
+const GITHUB_GROUP_KEY = 'wazuh.integration.decoders';
 const GITHUB_GROUP_VALUE = 'github';
 
 export class GitHubDataSource extends AlertsDataSource {

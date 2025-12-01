@@ -222,7 +222,7 @@ const RuleDetails = (props: Props) => {
         typeof group === 'object' ? JSON.stringify(group) : group;
       listGroups.push(
         <span key={groupValue}>
-          <EuiLink onClick={() => addFilter({ 'rule.groups': groupValue })}>
+          <EuiLink onClick={() => addFilter({ 'wazuh.integration.decoders': groupValue })}>
             <EuiToolTip
               position='top'
               content={`Filter by this group: ${groupValue}`}

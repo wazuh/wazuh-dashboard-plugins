@@ -82,8 +82,8 @@ describe('Generate Alerts - Wazuh Common Schema', () => {
 
     test('should have decoders as array', () => {
       const alert = generateAlert({ authentication: true });
-      expect(Array.isArray(alert.wazuh.decoders)).toBe(true);
-      expect(alert.wazuh.decoders.length).toBeGreaterThan(0);
+      expect(Array.isArray(alert.wazuh.integration.decoders)).toBe(true);
+      expect(alert.wazuh.integration.decoders.length).toBeGreaterThan(0);
     });
 
     test('should have rules as array', () => {
@@ -141,9 +141,9 @@ describe('Generate Alerts - Wazuh Common Schema', () => {
       expect(alert.rule).toHaveProperty('groups');
     });
 
-    test('should have rule.groups as array', () => {
+    test('should have wazuh.integration.decoders as array', () => {
       const alert = generateAlert({ authentication: true });
-      expect(Array.isArray(alert.rule.groups)).toBe(true);
+      expect(Array.isArray(alert.wazuh.integration.decoders)).toBe(true);
     });
 
     test('should have valid rule level', () => {
