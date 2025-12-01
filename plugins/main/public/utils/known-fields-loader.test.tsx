@@ -2,7 +2,6 @@ import { KnownFields, getKnownFieldsByIndexType } from './known-fields-loader';
 import FieldsMonitoring from '../../common/known-fields/monitoring.json';
 import statisticsFields from '../../common/known-fields/statistics.json';
 import {
-  WAZUH_INDEX_TYPE_ALERTS,
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATES_FIM_FILES,
   WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS,

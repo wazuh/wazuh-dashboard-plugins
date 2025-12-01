@@ -23,11 +23,6 @@ export const PLUGIN_MAJOR_VERSION = version.split('.')[0];
 export const WAZUH_INDEX_TYPE_EVENTS = 'events';
 export const WAZUH_EVENTS_PATTERN = 'wazuh-events*';
 
-// Deprecated: Use WAZUH_INDEX_TYPE_EVENTS and WAZUH_EVENTS_PATTERN instead
-// These are kept for backward compatibility
-export const WAZUH_INDEX_TYPE_ALERTS = WAZUH_INDEX_TYPE_EVENTS;
-export const WAZUH_ALERTS_PATTERN = WAZUH_EVENTS_PATTERN;
-
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
