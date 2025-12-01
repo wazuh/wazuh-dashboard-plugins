@@ -71,18 +71,6 @@ export default [
     ],
   },
   {
-    title: 'Alerts and output management',
-    description: '',
-    settings: [
-      {
-        name: 'Alerts',
-        description: 'Settings related to the alerts and their format',
-        goto: 'alerts',
-        when: 'manager',
-      },
-    ],
-  },
-  {
     title: 'Auditing and policy monitoring',
     description: '',
     settings: [

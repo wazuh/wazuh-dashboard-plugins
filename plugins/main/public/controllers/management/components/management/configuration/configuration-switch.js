@@ -21,7 +21,6 @@ import WzConfigurationEditConfiguration from './edit-configuration/edit-configur
 import WzConfigurationRegistrationService from './registration-service/registration-service';
 import WzConfigurationLogSettings from './log-settings/log-settings';
 import WzConfigurationCluster from './cluster/cluster';
-import WzConfigurationAlerts from './alerts/alerts';
 import WzConfigurationClient from './client/client';
 import WzConfigurationClientBuffer from './client-buffer/client-buffer';
 import { WzConfigurationAlertsLabelsAgent } from './alerts/alerts-labels';
@@ -292,13 +291,6 @@ class WzConfigurationSwitch extends Component {
                     clusterNodeSelected={this.props.clusterNodeSelected}
                     agent={agent}
                     updateBadge={this.updateBadge}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='alerts'>
-                  <WzConfigurationAlerts
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
