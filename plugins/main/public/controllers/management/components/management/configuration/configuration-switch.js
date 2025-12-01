@@ -27,7 +27,6 @@ import { WzConfigurationAlertsLabelsAgent } from './alerts/alerts-labels';
 import WzConfigurationPolicyMonitoring from './policy-monitoring/policy-monitoring';
 import WzConfigurationVulnerabilities from './vulnerabilities/vulnerabilities';
 import WzConfigurationInventory from './inventory/inventory';
-import WzConfigurationActiveResponse from './active-response/active-response';
 import WzConfigurationActiveResponseAgent from './active-response/active-response-agent';
 import WzConfigurationCommands from './commands/commands';
 import WzConfigurationDockerListener from './docker-listener/docker-listener';
@@ -336,13 +335,6 @@ class WzConfigurationSwitch extends Component {
                     clusterNodeSelected={this.props.clusterNodeSelected}
                     agent={agent}
                     updateBadge={this.updateBadge}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='active-response'>
-                  <WzConfigurationActiveResponse
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
