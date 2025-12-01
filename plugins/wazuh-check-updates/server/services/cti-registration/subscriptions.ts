@@ -28,26 +28,35 @@ export const subscriptionToIndexer = async (
 };
 
 export const getStatusSubscriptionIndexer = async (
-      context,
-      request,
-      response
+  context,
+  request,
+  response,
 ): Promise<any> => {
   const { logger } = getWazuhCheckUpdatesServices();
   try {
+    // const contentManagerClient =
+    //   context.wazuh_check_updates.contentManager.asScoped(request);
+    // const subscriptionStatus =
+    //   await contentManagerClient.callAsCurrentUser('contentManager.subscription', {});
 
-    const contentManagerClient = context.wazuh_check_updates.contentManager.asScoped(request);
+    const subscriptionStatusSuccess = {
+      statusCode: 200,
+      data: {
+        access_token: 'AYjcyMdY3ZDhiNmJkNTY',
+        token_type: 'Bearer',
+      },
+    };
 
-    const subscriptionStatus =
-      await contentManagerClient.callAsCurrentUser('contentManager.subscription', {});
+    const subscriptionStatusNotFound = {
+      statusCode: 404,
+      message: 'Not found',
+    };
 
-    // const subscriptionStatus = {
-    //   status: 200,
-    //   data: {
-    //     access_token: 'AYjcyMdY3ZDhiNmJkNTY',
-    //     token_type: 'Bearer',
-    //   },
-    // };
-    return subscriptionStatus;
+    return Math.random() < 0.5
+      ? subscriptionStatusSuccess
+      : subscriptionStatusNotFound;
+
+    // return subscriptionStatus;
   } catch (error) {
     const message =
       error instanceof Error

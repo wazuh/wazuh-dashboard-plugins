@@ -11,26 +11,26 @@ export const useCtiStatus = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchStatus = async () => {
-      try {
-        setLoading(true);
-        const response = await getStatusSubscription();
-        setStatusCTI({
-          status: response.status,
-          message: response.message,
-        });
-      } catch (error) {
-        setStatusCTI({ status: statusCodes.NOT_FOUND, message: error.message });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStatus();
+  const fetchStatus = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await getStatusSubscription();
+      setStatusCTI({
+        status: response.statusCode,
+        message: response.message,
+      });
+    } catch (error) {
+      setStatusCTI({ status: error.statusCode, message: error.message });
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  return { statusCTI, loading };
+  useEffect(() => {
+    fetchStatus();
+  }, [fetchStatus]);
+
+  return { statusCTI, loading, refetchStatus: fetchStatus };
 };
 
 export const useCtiStatusPolling = () => {

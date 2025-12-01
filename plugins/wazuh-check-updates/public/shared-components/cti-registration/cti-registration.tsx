@@ -11,7 +11,7 @@ import { statusCodes } from '../../../common/constants';
 export const CtiRegistration = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const { statusCTI } = useCtiStatus();
+  const { statusCTI, refetchStatus } = useCtiStatus();
 
   const handleModalToggle = () => {
     setIsModalOpen(!isModalOpen);
@@ -29,7 +29,7 @@ export const CtiRegistration = () => {
         ) : (
           <StatusCtiRegistration
             statusCTI={statusCTI}
-            checkCtiStatus={useCtiStatus}
+            refetchStatus={refetchStatus}
           />
         )}
         {isModalOpen && (
@@ -40,8 +40,9 @@ export const CtiRegistration = () => {
         )}
         {isStatusModalOpen && (
           <StatusCtiModal
-            checkCtiStatus={checkCtiStatus}
+            refetchStatus={refetchStatus}
             handleStatusModalToggle={handleStatusModalToggle}
+            statusCTI={statusCTI}
           />
         )}
       </>

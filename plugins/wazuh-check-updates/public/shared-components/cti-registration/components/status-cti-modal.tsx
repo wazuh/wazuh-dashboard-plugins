@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 import {
   EuiButton,
@@ -11,20 +11,23 @@ import {
   EuiSpacer,
   EuiText,
   EuiTitle,
+  EuiHealth,
 } from '@elastic/eui';
 import { StatusCtiModalProps } from '../types';
+import { statusData } from '../../../../common/cti-status-config';
 
 export const StatusCtiModal: React.FC = ({
   handleStatusModalToggle,
-  checkCtiStatus,
+  refetchStatus,
+  statusCTI,
 }: StatusCtiModalProps) => {
-  React.useEffect(() => {
-    const fetchStatus = async () => {
-      await checkCtiStatus();
-    };
+  const checkCtiStatus = () => {
+    refetchStatus();
+  };
 
-    fetchStatus();
-  }, [checkCtiStatus]);
+  useEffect(() => {
+    refetchStatus();
+  }, [refetchStatus]);
 
   return (
     <EuiModal onClose={handleStatusModalToggle}>
@@ -60,9 +63,26 @@ export const StatusCtiModal: React.FC = ({
             }}
           />
         </EuiText>
+
+        <EuiSpacer size='m' />
+
+        <EuiText>
+          <EuiHealth
+            aria-label={statusData[statusCTI.status].onClickAriaLabel}
+            color={statusData[statusCTI.status].color}
+          >
+            {statusData[statusCTI.status].message()}
+          </EuiHealth>
+        </EuiText>
       </EuiModalBody>
 
       <EuiModalFooter>
+        <EuiButton onClick={checkCtiStatus} fill>
+          <FormattedMessage
+            id='wazuhCheckUpdates.ctiRegistration.statusModalCheckStatus'
+            defaultMessage='Check Status'
+          />
+        </EuiButton>
         <EuiButton onClick={handleStatusModalToggle} fill>
           <FormattedMessage
             id='wazuhCheckUpdates.ctiRegistration.statusModalDone'

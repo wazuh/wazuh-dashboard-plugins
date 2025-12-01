@@ -21,10 +21,11 @@ export enum CtiDetails {
 
 export interface StatusCtiRegistrationProps {
   statusCTI: ISubscriptionResponse;
-  checkCtiStatus: () => Promise<void>;
+  refetchStatus: () => Promise<void>;
 }
 
 export interface StatusCtiModalProps {
   handleStatusModalToggle: () => void;
-  checkCtiStatus: () => Promise<void>;
+  refetchStatus: () => Promise<void>;
+  statusCTI: ISubscriptionResponse;
 }

@@ -9,7 +9,7 @@ export const getStatusSubscription =
 
       return statusSubscription;
     } catch (error) {
-      console.error('Error fetching API info:', error);
-      throw error;
+      console.error('Error fetching API info:', error.body.message);
+      throw error.body;
     }
   };

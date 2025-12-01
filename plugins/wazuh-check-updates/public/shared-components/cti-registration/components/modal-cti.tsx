@@ -15,10 +15,10 @@ import {
 } from '@elastic/eui';
 import { LinkCtiProps } from '../types';
 
-export const ModalCti: React.FC<LinkCtiProps> = ({
+export const ModalCti: React.FC = ({
   handleModalToggle,
   handleStatusModalToggle,
-}) => {
+}: LinkCtiProps) => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
 
