@@ -1,6 +1,9 @@
 import { IRouter } from 'opensearch-dashboards/server';
 import { routes } from '../../../common/constants';
-import { subscriptionToIndexer } from '../../services/cti-registration/subscriptions';
+import {
+  getStatusSubscriptionIndexer,
+  subscriptionToIndexer,
+} from '../../services/cti-registration/subscriptions';
 
 export const subscriptionToIndexerRoute = (router: IRouter) => {
   router.post(
@@ -23,7 +26,7 @@ export const subscriptionToIndexerRoute = (router: IRouter) => {
             : new Error(`Error trying to get available updates`);
 
         return response.customError({
-          statusCode: 503,
+          statusCode: error.statusCode || 503,
           body: finalError,
         });
       }
@@ -39,7 +42,11 @@ export const getStatusSubscriptionIndexerRoute = (router: IRouter) => {
     },
     async (context, request, response) => {
       try {
-        const subscriptionStatus = await subscriptionToIndexer(request);
+        const subscriptionStatus = await getStatusSubscriptionIndexer(
+          context,
+          request,
+          response,
+        );
         return response.ok({
           body: subscriptionStatus,
         });
@@ -52,7 +59,7 @@ export const getStatusSubscriptionIndexerRoute = (router: IRouter) => {
             : new Error(`Error trying to get subscription status`);
 
         return response.customError({
-          statusCode: 503,
+          statusCode: error.statusCode || 503,
           body: finalError,
         });
       }

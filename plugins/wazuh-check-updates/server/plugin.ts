@@ -24,6 +24,7 @@ import {
   setWazuhCheckUpdatesServices,
 } from './plugin-services';
 import { ISecurityFactory } from '../../wazuh-core/server/services/security-factory';
+import { initializeClientContentManager } from './services/plugins/content-manager';
 
 declare module 'opensearch-dashboards/server' {
   interface RequestHandlerContext {
@@ -49,10 +50,18 @@ export class WazuhCheckUpdatesPlugin
     setWazuhCore(plugins.wazuhCore);
     setWazuhCheckUpdatesServices({ logger: this.logger });
 
+    const contentManagerClient = core.opensearch.legacy.createClient(
+      'content-manager',
+      {
+        plugins: [initializeClientContentManager],
+      },
+    );
+
     core.http.registerRouteHandlerContext('wazuh_check_updates', () => {
       return {
         logger: this.logger,
         security: plugins.wazuhCore.dashboardSecurity,
+        contentManager: contentManagerClient,
       };
     });
 

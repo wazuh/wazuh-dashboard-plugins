@@ -15,7 +15,7 @@ export enum routes {
 
 export const CTI_SUBSCRIPTION_ROUTE = '/api/v1/instances/token';
 
-const WAZUH_CONTENT_MANAGER_BASE_PATH = '_plugins/content-manager';
+const WAZUH_CONTENT_MANAGER_BASE_PATH = '/_plugins/content-manager';
 export const enum contentManagerRoutes {
   subscription = `${WAZUH_CONTENT_MANAGER_BASE_PATH}/subscription`,
   contentUpdate = `${WAZUH_CONTENT_MANAGER_BASE_PATH}/update`,

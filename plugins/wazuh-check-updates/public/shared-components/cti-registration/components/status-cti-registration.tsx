@@ -9,6 +9,7 @@ import {
 } from '@elastic/eui';
 import { CtiStatus, StatusCtiRegistrationProps } from '../types';
 import { getCore } from '../../../plugin-services';
+import { statusCodes } from '../../../../common/constants';
 
 export const StatusCtiRegistration: React.FC = ({
   statusCTI,
@@ -23,7 +24,7 @@ export const StatusCtiRegistration: React.FC = ({
   };
 
   const statusData = {
-    [CtiStatus.PENDING]: {
+    [statusCodes.NOT_FOUND]: {
       color: 'none',
       onClickAriaLabel: 'View pending to start CTI registration',
       message: (
@@ -34,23 +35,12 @@ export const StatusCtiRegistration: React.FC = ({
         />
       ),
     },
-    [CtiStatus.AVAILABLE]: {
+    [statusCodes.SUCCESS]: {
       color: 'success',
       onClickAriaLabel: 'View available CTI registration status',
       message: (
         <FormattedMessage
           id='wazuhCheckUpdates.ctiRegistration.available'
-          defaultMessage='CTI Registration: {status}'
-          values={{ status: statusCTI.status }}
-        />
-      ),
-    },
-    [CtiStatus.POLLING]: {
-      color: 'warning',
-      onClickAriaLabel: 'View polling CTI registration status',
-      message: (
-        <FormattedMessage
-          id='wazuhCheckUpdates.ctiRegistration.polling'
           defaultMessage='CTI Registration: {status}'
           values={{ status: statusCTI.status }}
         />
@@ -87,13 +77,7 @@ export const StatusCtiRegistration: React.FC = ({
       onClick={() => setIsPopoverOpen(prevState => !prevState)}
     >
       <EuiText style={{ width: 300 }}>
-        <FormattedMessage
-          id='wazuhCheckUpdates.ctiRegistration.statusPopover'
-          defaultMessage={statusData[statusCTI.status].message}
-          values={{
-            status: statusCTI.status,
-          }}
-        />
+        {statusData[statusCTI.status].message}
       </EuiText>
       <EuiButton onClick={checkStatus}>Try again</EuiButton>
     </EuiPopover>

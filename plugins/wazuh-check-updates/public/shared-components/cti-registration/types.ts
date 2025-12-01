@@ -1,4 +1,5 @@
-import { IWazuhCtiDetails } from '../../services/types';
+import { statusCodes } from '../../../common/constants';
+import { ISubscriptionResponse } from '../../services/types';
 
 export interface LinkCtiProps {
   handleModalToggle: () => void;
@@ -19,7 +20,7 @@ export enum CtiDetails {
 }
 
 export interface StatusCtiRegistrationProps {
-  statusCTI: { status: CtiStatus; details: string };
+  statusCTI: ISubscriptionResponse;
   checkCtiStatus: () => Promise<void>;
 }
 

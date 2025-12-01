@@ -28,23 +28,25 @@ export const subscriptionToIndexer = async (
 };
 
 export const getStatusSubscriptionIndexer = async (
-  request: OpenSearchDashboardsRequest,
+      context,
+      request,
+      response
 ): Promise<any> => {
   const { logger } = getWazuhCheckUpdatesServices();
   try {
-    // const subscriptionStatus =
-    //   await getCore().opensearch.client.asInternalUser.transport.request({
-    //     method: 'GET',
-    //     path: contentManagerRoutes.subscription,
-    //   });
 
-    const subscriptionStatus = {
-      status: 200,
-      data: {
-        access_token: 'AYjcyMdY3ZDhiNmJkNTY',
-        token_type: 'Bearer',
-      },
-    };
+    const contentManagerClient = context.wazuh_check_updates.contentManager.asScoped(request);
+
+    const subscriptionStatus =
+      await contentManagerClient.callAsCurrentUser('contentManager.subscription', {});
+
+    // const subscriptionStatus = {
+    //   status: 200,
+    //   data: {
+    //     access_token: 'AYjcyMdY3ZDhiNmJkNTY',
+    //     token_type: 'Bearer',
+    //   },
+    // };
     return subscriptionStatus;
   } catch (error) {
     const message =
