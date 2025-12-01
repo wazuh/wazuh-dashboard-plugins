@@ -187,7 +187,7 @@ export const WAZUH_SAMPLE_SERVER_STATISTICS = 'server-statistics';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 1500;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_EVENTS_PATTERN.replace('*', ''),
-  dataSet: 'wazuh-alerts',
+  dataSet: 'wazuh-events',
 };
 
 export const WAZUH_SETTING_SCA_SAMPLE_PREFIX = {
