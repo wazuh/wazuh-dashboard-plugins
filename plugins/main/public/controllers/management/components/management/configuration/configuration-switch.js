@@ -29,7 +29,6 @@ import WzConfigurationVulnerabilities from './vulnerabilities/vulnerabilities';
 import WzConfigurationInventory from './inventory/inventory';
 import WzConfigurationActiveResponseAgent from './active-response/active-response-agent';
 import WzConfigurationCommands from './commands/commands';
-import WzConfigurationDockerListener from './docker-listener/docker-listener';
 import WzConfigurationLogCollection from './log-collection/log-collection';
 import WzConfigurationIntegrityMonitoring from './integrity-monitoring/integrity-monitoring';
 import WzConfigurationIntegrityAmazonS3 from './aws-s3/aws-s3';
@@ -349,14 +348,6 @@ class WzConfigurationSwitch extends Component {
                   <WzConfigurationCommands
                     clusterNodeSelected={this.props.clusterNodeSelected}
                     agent={agent}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='docker-listener'>
-                  <WzConfigurationDockerListener
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateBadge={this.updateBadge}
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>

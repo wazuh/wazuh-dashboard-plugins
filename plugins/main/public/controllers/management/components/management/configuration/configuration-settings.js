@@ -110,13 +110,6 @@ export default [
         description: 'Configuration options of the Command wodle',
         goto: 'commands',
       },
-      {
-        name: 'Docker listener',
-        description:
-          'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events',
-        goto: 'docker-listener',
-        when: agent => hasAgentSupportModule(agent, dockerApp.id),
-      },
     ],
   },
   {
