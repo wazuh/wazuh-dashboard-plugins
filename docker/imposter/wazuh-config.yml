@@ -190,8 +190,6 @@ resources:
   # Get node info
   - method: GET
     path: /cluster/{node_id}/info
-    response:
-      scriptFile: cluster/node-info/node-info.js
 
   # Get node config
   - method: GET
