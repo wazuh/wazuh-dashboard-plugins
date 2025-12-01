@@ -346,14 +346,14 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   mitre: {
-    init: 'dashboard',
+    init: 'intelligence',
     tabs: [
-      {
-        id: 'dashboard',
-        name: 'Dashboard',
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardMITRE,
-      },
+      // {
+      //   id: 'dashboard',
+      //   name: 'Dashboard',
+      //   buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+      //   component: DashboardMITRE,
+      // },
       {
         id: 'intelligence',
         name: 'Intelligence',
@@ -365,15 +365,15 @@ export const ModulesDefaults = {
         buttons: [ButtonExploreAgent],
         component: MainMitre,
       },
-      renderDiscoverTab({
-        moduleId: 'mitre',
-        DataSource: MitreAttackDataSource,
-        tableColumns: mitreAttackColumns,
-        categoriesSampleData: [
-          WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
-          WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
-        ],
-      }),
+      // renderDiscoverTab({
+      //   moduleId: 'mitre',
+      //   DataSource: MitreAttackDataSource,
+      //   tableColumns: mitreAttackColumns,
+      //   categoriesSampleData: [
+      //     WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+      //     WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+      //   ],
+      // }),
     ],
     availableFor: ['manager', 'agent'],
   },
