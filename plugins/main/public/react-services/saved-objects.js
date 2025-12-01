@@ -46,7 +46,7 @@ export class SavedObject {
   /**
    *
    * Returns the full list of index patterns that are valid
-   * An index is valid if its fields contain at least these 4 fields: 'timestamp', 'rule.groups', 'agent.id' and 'manager.name'
+   * An index is valid if its fields contain at least these 4 fields: 'timestamp', 'wazuh.decoders', 'agent.id' and 'manager.name'
    */
   static async getListOfWazuhValidIndexPatterns(defaultIndexPatterns, where) {
     let result = [];
@@ -72,7 +72,7 @@ export class SavedObject {
   static validateIndexPatterns(list) {
     const requiredFields = [
       'timestamp',
-      'rule.groups',
+      'wazuh.decoders',
       'manager.name',
       'agent.id',
     ];

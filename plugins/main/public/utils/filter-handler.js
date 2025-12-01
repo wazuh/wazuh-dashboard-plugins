@@ -70,11 +70,11 @@ export class FilterHandler {
 
   ruleGroupQuery(group) {
     const result = this.base();
-    result.meta.key = 'rule.groups';
+    result.meta.key = 'wazuh.decoders';
     result.meta.value = group;
     result.meta.params.query = group;
     result.query.match = {
-      'rule.groups': {
+      'wazuh.decoders': {
         query: group,
         type: 'phrase',
       },

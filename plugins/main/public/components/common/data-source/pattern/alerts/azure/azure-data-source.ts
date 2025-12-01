@@ -2,7 +2,7 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_AZURE_RULE_GROUP } from '../../../../../../../common/constants';
 import { AlertsDataSource } from '../alerts-data-source';
 
-const AZURE_GROUP_KEY = 'rule.groups';
+const AZURE_GROUP_KEY = 'wazuh.decoders';
 const AZURE_GROUP_VALUE = 'ms-graph';
 
 export class AzureDataSource extends AlertsDataSource {

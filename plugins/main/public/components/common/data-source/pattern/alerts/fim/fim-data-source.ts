@@ -2,7 +2,7 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_FIM_RULE_GROUP } from '../../../../../../../common/constants';
 import { AlertsDataSource } from '../alerts-data-source';
 
-const FIM_GROUP_KEY = 'rule.groups';
+const FIM_GROUP_KEY = 'wazuh.decoders';
 const FIM_GROUP_VALUE = 'syscheck';
 
 export class FIMDataSource extends AlertsDataSource {
