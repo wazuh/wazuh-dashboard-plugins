@@ -16,9 +16,14 @@ export const PLUGIN_VERSION = version;
 export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
 export const PLUGIN_MAJOR_VERSION = version.split('.')[0];
 
-// Index patterns - Wazuh alerts
-export const WAZUH_INDEX_TYPE_ALERTS = 'alerts';
-export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts*';
+// Index patterns - Wazuh events (previously alerts)
+export const WAZUH_INDEX_TYPE_EVENTS = 'events';
+export const WAZUH_EVENTS_PATTERN = 'wazuh-events*';
+
+// Deprecated: Use WAZUH_INDEX_TYPE_EVENTS and WAZUH_EVENTS_PATTERN instead
+// These are kept for backward compatibility
+export const WAZUH_INDEX_TYPE_ALERTS = WAZUH_INDEX_TYPE_EVENTS;
+export const WAZUH_ALERTS_PATTERN = WAZUH_EVENTS_PATTERN;
 
 // Job - Wazuh monitoring
 export const WAZUH_INDEX_TYPE_MONITORING = 'monitoring';
@@ -82,7 +87,6 @@ export const WAZUH_INDEX_TYPE_EVENTS_NETWORK_ACTIVITY =
 export const WAZUH_INDEX_TYPE_EVENTS_OTHER = 'events-other';
 export const WAZUH_INDEX_TYPE_EVENTS_SECURITY = 'events-security';
 export const WAZUH_INDEX_TYPE_EVENTS_SYSTEM_ACTIVITY = 'events-system-activity';
-export const WAZUH_INDEX_TYPE_EVENTS = 'events';
 
 // FIM
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim*';
@@ -163,7 +167,6 @@ export const WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN =
   'wazuh-events-v5-access-management*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT =
   'index-pattern:events-access-management';
-export const WAZUH_EVENTS_PATTERN = 'wazuh-events*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS = 'index-pattern:events';
 
 // Time field
@@ -188,7 +191,7 @@ export const WAZUH_SAMPLE_AGENT_MONITORING = 'agent-monitoring';
 export const WAZUH_SAMPLE_SERVER_STATISTICS = 'server-statistics';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 1500;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = {
-  indexPatternPrefix: WAZUH_ALERTS_PATTERN.replace('*', ''),
+  indexPatternPrefix: WAZUH_EVENTS_PATTERN.replace('*', ''),
   dataSet: 'wazuh-alerts',
 };
 

@@ -133,14 +133,14 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   fim: {
-    init: 'dashboard',
+    init: 'inventory',
     tabs: [
-      {
-        id: 'dashboard',
-        name: 'Dashboard',
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardFIM,
-      },
+      // {
+      //   id: 'dashboard',
+      //   name: 'Dashboard',
+      //   buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+      //   component: DashboardFIM,
+      // },
       {
         id: 'inventory',
         name: 'Inventory',
@@ -311,7 +311,7 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         component: DashboardVuls,
-        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-events* */
         buttons: [
           ({ ...props }) => (
             <ButtonExploreAgent
@@ -325,7 +325,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Inventory',
         component: InventoryVuls,
-        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-events* */
         buttons: [
           ({ ...props }) => (
             <ButtonExploreAgent
@@ -346,14 +346,14 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   mitre: {
-    init: 'dashboard',
+    init: 'intelligence',
     tabs: [
-      {
-        id: 'dashboard',
-        name: 'Dashboard',
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardMITRE,
-      },
+      // {
+      //   id: 'dashboard',
+      //   name: 'Dashboard',
+      //   buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+      //   component: DashboardMITRE,
+      // },
       {
         id: 'intelligence',
         name: 'Intelligence',
@@ -365,15 +365,15 @@ export const ModulesDefaults = {
         buttons: [ButtonExploreAgent],
         component: MainMitre,
       },
-      renderDiscoverTab({
-        moduleId: 'mitre',
-        DataSource: MitreAttackDataSource,
-        tableColumns: mitreAttackColumns,
-        categoriesSampleData: [
-          WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
-          WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
-        ],
-      }),
+      // renderDiscoverTab({
+      //   moduleId: 'mitre',
+      //   DataSource: MitreAttackDataSource,
+      //   tableColumns: mitreAttackColumns,
+      //   categoriesSampleData: [
+      //     WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+      //     WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+      //   ],
+      // }),
     ],
     availableFor: ['manager', 'agent'],
   },

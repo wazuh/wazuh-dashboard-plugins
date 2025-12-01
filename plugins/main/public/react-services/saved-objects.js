@@ -16,7 +16,7 @@ import {
   HEALTH_CHECK,
   NOT_TIME_FIELD_NAME_INDEX_PATTERN,
   PLUGIN_PLATFORM_NAME,
-  WAZUH_INDEX_TYPE_ALERTS,
+  WAZUH_INDEX_TYPE_EVENTS,
 } from '../../common/constants';
 import { getDataPlugin, getSavedObjects } from '../kibana-services';
 import { webDocumentationLink } from '../../common/services/web_documentation';
@@ -91,7 +91,7 @@ export class SavedObject {
     if (!result.data) {
       const fields = await SavedObject.getIndicesFields(
         patternID,
-        WAZUH_INDEX_TYPE_ALERTS,
+        WAZUH_INDEX_TYPE_EVENTS,
       );
       await this.createSavedObject(
         'index-pattern',
@@ -264,13 +264,13 @@ export class SavedObject {
   }
 
   /**
-   * Creates the 'wazuh-alerts-*'  index pattern
+   * Creates the 'wazuh-events*'  index pattern
    */
   static async createWazuhIndexPattern(pattern) {
     try {
       const fields = await SavedObject.getIndicesFields(
         pattern,
-        WAZUH_INDEX_TYPE_ALERTS,
+        WAZUH_INDEX_TYPE_EVENTS,
       );
       await this.createSavedObject(
         'index-pattern',
