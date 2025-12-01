@@ -133,14 +133,14 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   fim: {
-    init: 'dashboard',
+    init: 'inventory',
     tabs: [
-      {
-        id: 'dashboard',
-        name: 'Dashboard',
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardFIM,
-      },
+      // {
+      //   id: 'dashboard',
+      //   name: 'Dashboard',
+      //   buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+      //   component: DashboardFIM,
+      // },
       {
         id: 'inventory',
         name: 'Inventory',
