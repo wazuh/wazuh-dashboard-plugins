@@ -17,6 +17,7 @@ import { SettingsValidator } from '../common/services/settings-validator';
 // Plugin
 export const PLUGIN_VERSION = version;
 export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
+export const PLUGIN_MAJOR_VERSION = version.split('.')[0];
 
 // Index patterns - Wazuh alerts
 export const WAZUH_INDEX_TYPE_ALERTS = 'alerts';

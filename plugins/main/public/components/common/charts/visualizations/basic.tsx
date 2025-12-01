@@ -6,12 +6,12 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiLoadingChart,
-  EuiText,
   EuiSelect,
   EuiSpacer,
 } from '@elastic/eui';
 import { useAsyncActionRunOnStart } from '../../hooks';
 import './visualizations.scss';
+import { Typography, TypographySize } from '../../typography/typography';
 
 export type VisualizationBasicProps = ChartDonutProps & {
   type: 'donut';
@@ -67,17 +67,23 @@ export const VisualizationBasic = ({
     visualization = (
       <EuiEmptyPrompt
         iconType='alert'
-        title={<h4>{errorTitle}</h4>}
-        body={errorMessage || error?.message}
+        title={<Typography level='prompt'>{errorTitle}</Typography>}
+        titleSize={TypographySize({ level: 'prompt' })}
+        body={<p>{errorMessage || error?.message}</p>}
       />
     );
   } else if (!data || (Array.isArray(data) && !data.length)) {
     visualization = (
       <EuiEmptyPrompt
         iconType='stats'
-        title={<h4>{noDataTitle}</h4>}
+        title={<Typography level='prompt'>{noDataTitle}</Typography>}
+        titleSize={TypographySize({ level: 'prompt' })}
         body={
-          typeof noDataMessage === 'function' ? noDataMessage() : noDataMessage
+          <p>
+            {typeof noDataMessage === 'function'
+              ? noDataMessage()
+              : noDataMessage}
+          </p>
         }
       />
     );
@@ -182,16 +188,10 @@ export const VisualizationBasicWidgetSelectorHeader = ({
     <EuiFlexGroup
       className='embPanel__header'
       gutterSize='none'
-      alignItems='center'
+      alignItems='flexStart'
     >
       <EuiFlexItem>
-        {title && (
-          <h2 className='embPanel__title wz-headline-title'>
-            <EuiText size='xs'>
-              <h2>{title}</h2>
-            </EuiText>
-          </h2>
-        )}
+        {title && <Typography level='section'>{title}</Typography>}
       </EuiFlexItem>
       <EuiFlexItem grow={false}>
         <EuiSelect
@@ -204,7 +204,7 @@ export const VisualizationBasicWidgetSelectorHeader = ({
         />
       </EuiFlexItem>
     </EuiFlexGroup>
-    <EuiSpacer size='s' />
+    <EuiSpacer size='m' />
   </>
 );
 

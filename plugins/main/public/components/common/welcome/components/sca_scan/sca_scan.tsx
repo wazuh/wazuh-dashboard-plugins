@@ -16,18 +16,16 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiPanel,
-  EuiTitle,
-  EuiText,
   EuiLoadingChart,
   EuiButtonIcon,
   EuiToolTip,
   EuiEmptyPrompt,
   EuiInMemoryTable,
 } from '@elastic/eui';
+import { Typography, TypographySize } from '../../../typography/typography';
 import { getCore } from '../../../../../kibana-services';
 import { withDataSourceFetch, withGuard, withPanel } from '../../../hocs';
 import { compose } from 'redux';
-
 import { configurationAssessment } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
@@ -50,35 +48,31 @@ const TOP_POLICIES_SIZE = 20;
 
 const ScaScanHeader = ({ agent }) => {
   return (
-    <EuiText size='xs'>
-      <EuiFlexGroup className='wz-section-sca-euiFlexGroup'>
-        <EuiFlexItem grow={false}>
-          <RedirectAppLinks application={getCore().application}>
-            <EuiTitle size='xs'>
-              <h2>SCA: Scans summary</h2>
-            </EuiTitle>
-          </RedirectAppLinks>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <RedirectAppLinks application={getCore().application}>
-            <EuiToolTip position='top' content='Open SCA Scans'>
-              <EuiButtonIcon
-                iconType='popout'
-                color='primary'
-                className='EuiButtonIcon'
-                onClick={() => {
-                  new PinnedAgentManager().pinAgent(agent);
-                }}
-                href={NavigationService.getInstance().getUrlForApp(
-                  configurationAssessment.id,
-                )}
-                aria-label='Open SCA Scans'
-              />
-            </EuiToolTip>
-          </RedirectAppLinks>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    </EuiText>
+    <EuiFlexGroup className='wz-section-sca-euiFlexGroup'>
+      <EuiFlexItem grow={false}>
+        <RedirectAppLinks application={getCore().application}>
+          <Typography level='card'>SCA: Scans summary</Typography>
+        </RedirectAppLinks>
+      </EuiFlexItem>
+      <EuiFlexItem grow={false}>
+        <RedirectAppLinks application={getCore().application}>
+          <EuiToolTip position='top' content='Open SCA Scans'>
+            <EuiButtonIcon
+              iconType='popout'
+              color='primary'
+              className='EuiButtonIcon'
+              onClick={() => {
+                new PinnedAgentManager().pinAgent(agent);
+              }}
+              href={NavigationService.getInstance().getUrlForApp(
+                configurationAssessment.id,
+              )}
+              aria-label='Open SCA Scans'
+            />
+          </EuiToolTip>
+        </RedirectAppLinks>
+      </EuiFlexItem>
+    </EuiFlexGroup>
   );
 };
 
@@ -142,14 +136,10 @@ const ScaScanTable = ({ dataSourceAction }) => {
     <>
       <EuiFlexGroup alignItems='center' gutterSize='s'>
         <EuiFlexItem grow={false} responsive={false}>
-          <EuiTitle size='xs'>
-            <h4>Checks by policies</h4>
-          </EuiTitle>
+          <Typography level='metric'>Checks by policies</Typography>
         </EuiFlexItem>
         <EuiFlexItem grow={false} responsive={false}>
-          <EuiText size='xs'>
-            <span>(top {TOP_POLICIES_SIZE})</span>
-          </EuiText>
+          <Typography level='metric'>(top {TOP_POLICIES_SIZE})</Typography>
         </EuiFlexItem>
       </EuiFlexGroup>
 
@@ -183,6 +173,7 @@ const ScaScanNoData = () => {
       <EuiEmptyPrompt
         iconType='visVega'
         title={<h4>You don't have SCA scans in this agent.</h4>}
+        titleSize={TypographySize({ level: 'prompt' })}
         body={
           <>
             <p>Check your agent settings to generate scans.</p>

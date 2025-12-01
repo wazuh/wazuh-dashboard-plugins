@@ -319,6 +319,7 @@ function mapIndexFieldType(esType, field) {
     boolean: 'boolean',
     ip: 'ip',
     geo_point: 'geo_point',
+    object: 'object',
     nested: 'nested',
     _id: 'string',
     _index: 'string',
@@ -607,25 +608,37 @@ async function processTemplate(templateConfig, config) {
  * Main function
  */
 /**
- * Combines all states-inventory-* fields into a single states-inventory.json file
- * This is useful for the generic states-inventory pattern that matches all inventory indices
+ * Generic function to combine fields from multiple sources into a single file
+ * @param {Object} options - Configuration options
+ * @param {Object} options.results - Object containing all processed template results
+ * @param {Object} options.config - Configuration object with destination path
+ * @param {string} options.keyPrefix - Prefix to filter keys (e.g., 'states-inventory-', 'events-')
+ * @param {string} options.outputFileName - Name of the output file (e.g., 'states-inventory.json', 'events.json')
+ * @param {string} options.displayName - Display name for logging (e.g., 'states-inventory', 'events')
+ * @returns {Promise<Array|null>} Combined fields array or null if no fields to combine
  */
-async function generateCombinedInventoryFields(results, config) {
-  console.log('Processing combined states-inventory fields...');
+async function generateCombinedFields({
+  results,
+  config,
+  keyPrefix,
+  outputFileName,
+  displayName,
+}) {
+  console.log(`Processing combined ${displayName} fields...`);
 
-  const inventoryKeys = Object.keys(results).filter(
-    key => key.startsWith('states-inventory-') && results[key],
+  const matchingKeys = Object.keys(results).filter(
+    key => key.startsWith(keyPrefix) && results[key],
   );
 
-  if (inventoryKeys.length === 0) {
-    console.log('  ⚠️  No inventory fields to combine');
+  if (matchingKeys.length === 0) {
+    console.log(`  ⚠️  No ${displayName} fields to combine`);
     return null;
   }
 
   // Use a Map to deduplicate fields by name
   const fieldsMap = new Map();
 
-  for (const key of inventoryKeys) {
+  for (const key of matchingKeys) {
     const fields = results[key];
     for (const field of fields) {
       // Keep the first occurrence of each field name
@@ -641,11 +654,11 @@ async function generateCombinedInventoryFields(results, config) {
   combinedFields.sort((a, b) => a.name.localeCompare(b.name));
 
   // Write combined file
-  const outputPath = path.resolve(config.destination, 'states-inventory.json');
+  const outputPath = path.resolve(config.destination, outputFileName);
   saveOutput(outputPath, combinedFields);
 
   console.log(
-    `  ✅ Generated ${combinedFields.length} combined fields for states-inventory -> ${outputPath}`,
+    `  ✅ Generated ${combinedFields.length} combined fields for ${displayName} -> ${outputPath}`,
   );
 
   return combinedFields;
@@ -672,10 +685,13 @@ async function main(config) {
 
   // Generate combined inventory fields
   try {
-    results['states-inventory'] = await generateCombinedInventoryFields(
+    results['states-inventory'] = await generateCombinedFields({
       results,
       config,
-    );
+      keyPrefix: 'states-inventory-',
+      outputFileName: 'states-inventory.json',
+      displayName: 'states-inventory',
+    });
   } catch (error) {
     console.error(
       'Failed to generate combined inventory fields:',
@@ -683,6 +699,22 @@ async function main(config) {
     );
     process.exit(1);
     results['states-inventory'] = null;
+  }
+  console.log(''); // Add spacing
+
+  // Generate combined events fields
+  try {
+    results['events'] = await generateCombinedFields({
+      results,
+      config,
+      keyPrefix: 'events-',
+      outputFileName: 'events.json',
+      displayName: 'events',
+    });
+  } catch (error) {
+    console.error('Failed to generate combined events fields:', error.message);
+    process.exit(1);
+    results['events'] = null;
   }
   console.log(''); // Add spacing
 

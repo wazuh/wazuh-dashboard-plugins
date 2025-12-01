@@ -17,10 +17,10 @@ import {
   EuiFlexItem,
   EuiPanel,
   EuiSpacer,
-  EuiText,
   EuiFlexGroup,
   EuiInMemoryTable,
 } from '@elastic/eui';
+import { Typography } from '../../../typography/typography';
 // @ts-ignore
 import { vulnerabilityDetection } from '../../../../../utils/applications';
 import {
@@ -66,9 +66,7 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
     <EuiPanel paddingSize='m'>
       <EuiFlexGroup>
         <EuiFlexItem>
-          <EuiText size='xs'>
-            <h2>Top 5 Packages</h2>
-          </EuiText>
+          <Typography level='card'>Top 5 Packages</Typography>
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size='s' />

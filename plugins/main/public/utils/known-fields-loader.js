@@ -10,6 +10,7 @@
 import {
   WAZUH_INDEX_TYPE_ALERTS,
   WAZUH_INDEX_TYPE_ARCHIVES,
+  WAZUH_INDEX_TYPE_EVENTS,
   WAZUH_INDEX_TYPE_EVENTS_ACCESS_MANAGEMENT,
   WAZUH_INDEX_TYPE_EVENTS_APPLICATIONS,
   WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES,
@@ -46,6 +47,7 @@ import {
 // Import generated known fields JSON files
 import alertsFields from '../../common/known-fields/alerts.json';
 import archivesFields from '../../common/known-fields/archives.json';
+import eventsFields from '../../common/known-fields/events.json';
 import eventsAccessManagementFields from '../../common/known-fields/events-access-management.json';
 import eventsApplicationsFields from '../../common/known-fields/events-applications.json';
 import eventsCloudServicesFields from '../../common/known-fields/events-cloud-services.json';
@@ -93,6 +95,7 @@ export const KnownFieldsByIndexType = {
   [WAZUH_INDEX_TYPE_ARCHIVES]: archivesFields,
 
   // Events
+  [WAZUH_INDEX_TYPE_EVENTS]: eventsFields,
   [WAZUH_INDEX_TYPE_EVENTS_ACCESS_MANAGEMENT]: eventsAccessManagementFields,
   [WAZUH_INDEX_TYPE_EVENTS_APPLICATIONS]: eventsApplicationsFields,
   [WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES]: eventsCloudServicesFields,
