@@ -130,38 +130,4 @@ export default [
       },
     ],
   },
-  {
-    title: 'Cloud security monitoring',
-    description: '',
-    settings: [
-      {
-        name: 'Amazon S3',
-        description:
-          'Security events related to Amazon AWS services, collected directly via AWS API',
-        goto: 'aws-s3',
-      },
-      {
-        name: 'Azure Logs',
-        description: 'Configuration options of the Azure Logs wodle',
-        goto: 'azure-logs',
-        when: 'manager',
-      },
-      {
-        name: 'Google Cloud Pub/Sub',
-        description: 'Configuration options of the Google Cloud Pub/Sub module',
-        goto: 'gcp-pubsub',
-      },
-      {
-        name: 'GitHub',
-        description: 'Detect threats targeting GitHub organizations',
-        goto: 'github',
-      },
-      {
-        name: 'Office 365',
-        description: 'Configuration options of the Office 365 module',
-        goto: 'office365',
-        when: 'manager',
-      },
-    ],
-  },
 ];
