@@ -37,7 +37,7 @@ async function isSavedObjectPresent(
   try {
     const existing: SavedObject = await client.get(type, id);
     if (existing) {
-      logger.info(
+      logger.debug(
         `${toSentenceCase(type)} already exists [${existing.id}] title [${
           existing.attributes?.title
         }] - skipping`,
@@ -82,7 +82,7 @@ async function ensureVisualizationSavedObject(
     },
   );
 
-  logger.info(
+  logger.debug(
     `Visualization ensured [${visualizationSavedObject.id}] title [${visualizationSavedObject.attributes.title}]`,
   );
   return visualizationSavedObject;
@@ -111,7 +111,7 @@ async function ensureDashboardSavedObject(
     refresh: true,
     references,
   });
-  logger.info(
+  logger.debug(
     `Dashboard ensured [${dashboardSavedObject.id}] title [${dashboardSavedObject.attributes.title}]`,
   );
   return dashboardSavedObject;

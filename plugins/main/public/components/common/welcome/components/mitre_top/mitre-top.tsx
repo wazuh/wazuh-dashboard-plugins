@@ -19,7 +19,7 @@ import {
   EuiButtonIcon,
   EuiLoadingChart,
   EuiEmptyPrompt,
-  EuiText,
+  EuiSpacer,
 } from '@elastic/eui';
 import { Typography, TypographySize } from '../../../typography/typography';
 import { FlyoutTechnique } from '../../../../overview/mitre/framework/components/techniques/components/flyout-technique';
@@ -116,7 +116,7 @@ const MitreTopTacticsTactics = compose(
 });
 
 const MitreTopTacticsTechniquesHeader = ({ selectedTactic, setView }) => (
-  <EuiText size='xs'>
+  <>
     <EuiFlexGroup>
       {/* TODO: this should be splitted separating the header, to allow go back */}
       <EuiFlexItem grow={false}>
@@ -134,7 +134,8 @@ const MitreTopTacticsTechniquesHeader = ({ selectedTactic, setView }) => (
         <Typography level='card'>{selectedTactic}</Typography>
       </EuiFlexItem>
     </EuiFlexGroup>
-  </EuiText>
+    <EuiSpacer size='s' />
+  </>
 );
 
 const MitreTopTacticsTechniquesBody = compose(

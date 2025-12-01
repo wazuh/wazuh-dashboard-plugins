@@ -15,6 +15,7 @@ import {
   scapeSpecialCharsForWindows,
 } from '../../services/wazuh-password-service';
 import { IOSDefinition, tOptionalParams } from '../register-commands/types';
+import { PLUGIN_MAJOR_VERSION } from '../../../../../../common/constants';
 
 // Defined OS combinations
 
@@ -83,28 +84,28 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
     {
       architecture: 'DEB amd64',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${props.wazuhVersion}-1_amd64.deb`,
+        `https://packages.wazuh.com/${PLUGIN_MAJOR_VERSION}.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${props.wazuhVersion}-1_amd64.deb`,
       installCommand: props => getDEBAMD64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
       architecture: 'RPM amd64',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64.rpm`,
+        `https://packages.wazuh.com/${PLUGIN_MAJOR_VERSION}.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64.rpm`,
       installCommand: props => getRPMAMD64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
       architecture: 'DEB aarch64',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${props.wazuhVersion}-1_arm64.deb`,
+        `https://packages.wazuh.com/${PLUGIN_MAJOR_VERSION}.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${props.wazuhVersion}-1_arm64.deb`,
       installCommand: props => getDEBARM64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
       architecture: 'RPM aarch64',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.aarch64.rpm`,
+        `https://packages.wazuh.com/${PLUGIN_MAJOR_VERSION}.x/yum/wazuh-agent-${props.wazuhVersion}-1.aarch64.rpm`,
       installCommand: props => getRPMARM64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
@@ -117,7 +118,7 @@ const windowsDefinition: IOSDefinition<IWindowsOSTypes, tOptionalParameters> = {
     {
       architecture: 'MSI 32/64 bits',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/windows/wazuh-agent-${props.wazuhVersion}-1.msi`,
+        `https://packages.wazuh.com/${PLUGIN_MAJOR_VERSION}.x/windows/wazuh-agent-${props.wazuhVersion}-1.msi`,
       installCommand: props => getWindowsInstallCommand(props),
       startCommand: props => getWindowsStartCommand(props),
     },
@@ -130,14 +131,14 @@ const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
     {
       architecture: 'Intel',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/macos/wazuh-agent-${props.wazuhVersion}-1.intel64.pkg`,
+        `https://packages.wazuh.com/${PLUGIN_MAJOR_VERSION}.x/macos/wazuh-agent-${props.wazuhVersion}-1.intel64.pkg`,
       installCommand: props => getMacOsInstallCommand(props),
       startCommand: props => getMacosStartCommand(props),
     },
     {
       architecture: 'Apple silicon',
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/macos/wazuh-agent-${props.wazuhVersion}-1.arm64.pkg`,
+        `https://packages.wazuh.com/${PLUGIN_MAJOR_VERSION}.x/macos/wazuh-agent-${props.wazuhVersion}-1.arm64.pkg`,
       installCommand: props => getMacOsInstallCommand(props),
       startCommand: props => getMacosStartCommand(props),
     },
