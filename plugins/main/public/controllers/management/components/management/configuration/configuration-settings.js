@@ -100,12 +100,6 @@ export default [
         goto: 'inventory',
       },
       {
-        name: 'Active response',
-        description: 'Active threat addressing by immediate response',
-        goto: 'active-response-agent',
-        when: 'agent',
-      },
-      {
         name: 'Commands',
         description: 'Configuration options of the Command wodle',
         goto: 'commands',
