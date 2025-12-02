@@ -25,11 +25,16 @@ import { normalization } from '../../../../utils/applications';
 import { i18n } from '@osd/i18n';
 import { WzLink } from '../../../wz-link/wz-link';
 import { Name, indexName } from './info';
-import { Name as OverviewName, Id as OverviewId } from '../overview/info';
+import {
+  Name as OverviewName,
+  Id as OverviewId,
+  indexName as OverviewIndexName,
+} from '../overview/info';
 import { TableDataFetch } from '../../components/table-data/table-fetch';
 import {
-  fetchInternalOpenSearchIndexItemsInTable,
   fetchInternalOpenSearchIndex,
+  fetchInternalOpenSearchIndexItemsInTableRelation,
+  fetchInternalOpenSearchIndexItemsRelation,
 } from '../../services/http';
 import {
   SearchBar,
@@ -38,10 +43,13 @@ import {
 import { Metadata } from '../../components/metadata/metadata';
 import { get } from 'lodash';
 
+const relationIntegrationIDField = '__integration';
+
 const detailsMapLabels: { [key: string]: string } = {
   'document.id': 'ID',
   'document.name': 'Name',
   integration_id: 'Integration ID',
+  [`${relationIntegrationIDField}.document.title`]: 'Integration',
   'document.metadata.title': 'Title',
   'document.metadata.module': 'Module',
   'document.metadata.compatibility': 'Compatibility',
@@ -56,6 +64,7 @@ const Details: React.FC<{ item: { document: { id: string } } }> = ({
   item,
 }) => {
   const action = useAsyncAction(async () => {
+    // TODO: take item form props or fetch the data
     const response = await fetchInternalOpenSearchIndex(indexName, {
       size: 1,
       query: {
@@ -69,7 +78,17 @@ const Details: React.FC<{ item: { document: { id: string } } }> = ({
       throw new Error('Decoder not found');
     }
 
-    return hit._source;
+    const [hitWithRelation] = await fetchInternalOpenSearchIndexItemsRelation(
+      [hit._source],
+      {
+        integration_id: {
+          index: OverviewIndexName,
+          target_field: relationIntegrationIDField,
+        },
+      },
+    );
+
+    return hitWithRelation;
   });
 
   useEffect(() => {
@@ -103,7 +122,7 @@ const Details: React.FC<{ item: { document: { id: string } } }> = ({
                 <EuiFlexGrid columns={2}>
                   {[
                     'document.id',
-                    'integration_id',
+                    `${relationIntegrationIDField}.document.title`,
                     'document.metadata.title',
                     'document.metadata.module',
                     'document.metadata.compatibility',
@@ -209,7 +228,7 @@ const tableColums = [
     sortable: true,
   },
   {
-    field: 'integration_id',
+    field: `${relationIntegrationIDField}.document.title`,
     name: 'Integration',
     sortable: true,
     render: (value: string) => (
@@ -217,7 +236,7 @@ const tableColums = [
         appId={normalization.id}
         path={`/${
           normalization.id
-        }/${OverviewId}?query=document.id:${encodeURIComponent(value)}`}
+        }/${OverviewId}?query=document.title:${encodeURIComponent(value)}`}
         toolTipProps={{
           content: i18n.translate(
             'normalization.overview.navigate_to_with_filter',
@@ -359,7 +378,18 @@ const Body: React.FC = compose(
         </EuiFlexGroup>
         <TableDataFetch
           onFetch={async params =>
-            fetchInternalOpenSearchIndexItemsInTable(indexName, params)
+            fetchInternalOpenSearchIndexItemsInTableRelation(
+              indexName,
+              params,
+              {
+                relations: {
+                  integration_id: {
+                    index: OverviewIndexName,
+                    target_field: relationIntegrationIDField,
+                  },
+                },
+              },
+            )
           }
           tableColumns={tableColums}
           tableInitialSortingField='document.name'

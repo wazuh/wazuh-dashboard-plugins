@@ -1,4 +1,5 @@
 import { getCore } from '../../../kibana-services';
+import { get, set } from 'lodash';
 
 /**
  * Fetches data from an OpenSearch index via internal API.
@@ -90,4 +91,112 @@ export async function fetchInternalOpenSearchIndexItemsInTable<
       },
     },
   );
+}
+
+interface RelationDefintion {
+  field?: string;
+  index: string;
+  target_field?: string;
+}
+
+export async function fetchInternalOpenSearchIndexItemsRelation<
+  T = any,
+  R = any,
+>(
+  items: T[],
+  relations: {
+    [key: string]: RelationDefintion;
+  },
+): Promise<R[]> {
+  for (const [field, relation] of Object.entries(relations)) {
+    const {
+      field: relationField,
+      index,
+      target_field,
+    } = relation as RelationDefintion;
+
+    const relatedIds = items
+      .map((item: any) => get(item, field))
+      .filter((v: any, i: number, a: any[]) => v != null && a.indexOf(v) === i);
+
+    const query = !relationField ? { ids: { values: relatedIds } } : {}; // TODO: implement other relation types;
+
+    const response = await fetchInternalOpenSearchIndexItems(index, {
+      size: relatedIds.length,
+      query,
+    });
+
+    const relatedItemsMap: { [key: string]: any } = Object.fromEntries(
+      response.items.map(({ _id, _source }) => [_id, _source]), // TODO: implement other relation types;
+    );
+
+    items = items.map((item: any) => {
+      const relationData = relatedItemsMap[get(item, field)];
+      set(item, target_field || field, relationData);
+      return item;
+    });
+  }
+
+  return items as unknown as R[];
+}
+
+export async function fetchInternalOpenSearchIndexItemsInTableRelation<
+  T = any,
+  R = any,
+>(
+  index: string,
+  tableContext: {
+    pagination: { pageIndex: number; pageSize: number };
+    sorting: { sort: { field: string; direction: string } };
+    searchParams: any;
+  },
+  options: {
+    mapResponseItem?: (item: any) => R;
+    relations?: {
+      [key: string]: RelationDefintion;
+    };
+  } = {},
+): Promise<{ items: T; totalItems: number }> {
+  const { relations, ...restOptions } = options;
+  let { items, totalItems } = await fetchInternalOpenSearchIndexItemsInTable(
+    index,
+    tableContext,
+    restOptions,
+  );
+
+  if (relations) {
+    items = await fetchInternalOpenSearchIndexItemsRelation(items, relations);
+    // for (const [field, relation] of Object.entries(relations)) {
+    // const {
+    //   field: relationField,
+    //   index,
+    //   target_field,
+    // } = relation as RelationDefintion;
+
+    // const relatedIds = items
+    //   .map((item: any) => get(item, field))
+    //   .filter(
+    //     (v: any, i: number, a: any[]) => v != null && a.indexOf(v) === i,
+    //   );
+
+    // const query = !relationField ? { ids: { values: relatedIds } } : {}; // TODO: implement other relation types;
+
+    // const response = await fetchInternalOpenSearchIndexItems(index, {
+    //   size: relatedIds.length,
+    //   query,
+    // });
+
+    // const relatedItemsMap: { [key: string]: any } = Object.fromEntries(
+    //   response.items.map(({ _id, _source }) => [_id, _source]), // TODO: implement other relation types;
+    // );
+
+    // items = items.map((item: any) => {
+    //   const relationData = relatedItemsMap[get(item, field)];
+    //   set(item, target_field || field, relationData);
+    //   return item;
+    // });
+    // }
+  }
+
+  return { items, totalItems };
 }

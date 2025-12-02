@@ -23,9 +23,12 @@ import {
 import { normalization } from '../../../../utils/applications';
 import { WzLink } from '../../../wz-link/wz-link';
 import { Name, indexName } from './info';
+import { indexName as OverviewIndexName } from '../overview/info';
 import {
   fetchInternalOpenSearchIndex,
   fetchInternalOpenSearchIndexItemsInTable,
+  fetchInternalOpenSearchIndexItemsInTableRelation,
+  fetchInternalOpenSearchIndexItemsRelation,
 } from '../../services/http';
 import {
   SearchBar,
@@ -37,10 +40,13 @@ import { Metadata } from '../../components/metadata/metadata';
 import { get } from 'lodash';
 import { AssetViewer } from './asset-viewer';
 
+const relationIntegrationIDField = '__integration';
+
 const detailsMapLabels: { [key: string]: string } = {
   'document.id': 'ID',
   'document.name': 'Name',
   integration_id: 'Integration ID',
+  [`${relationIntegrationIDField}.document.title`]: 'Integration',
   'document.title': 'Title',
   'document.author': 'Author',
   'document.enabled': 'Enabled',
@@ -66,7 +72,17 @@ const Details: React.FC<{ item: { id: string; space: string } }> = ({
       throw new Error('KVDB not found');
     }
 
-    return hit._source;
+    const [hitWithRelation] = await fetchInternalOpenSearchIndexItemsRelation(
+      [hit._source],
+      {
+        integration_id: {
+          index: OverviewIndexName,
+          target_field: relationIntegrationIDField,
+        },
+      },
+    );
+
+    return hitWithRelation;
   });
 
   useEffect(() => {
@@ -101,7 +117,7 @@ const Details: React.FC<{ item: { id: string; space: string } }> = ({
                   <EuiFlexGrid columns={2}>
                     {[
                       'document.id',
-                      'integration_id',
+                      `${relationIntegrationIDField}.document.title`,
                       'document.title',
                       ['document.date', 'date'],
                       'document.author',
@@ -165,7 +181,7 @@ const tableColums = [
     sortable: true,
   },
   {
-    field: 'integration_id',
+    field: `${relationIntegrationIDField}.document.title`,
     name: 'Integration',
     sortable: true,
     render: (value: string) => (
@@ -173,7 +189,7 @@ const tableColums = [
         appId={normalization.id}
         path={`/${
           normalization.id
-        }/${OverviewId}?query=document.id:${encodeURIComponent(value)}`}
+        }/${OverviewId}?query=document.title:${encodeURIComponent(value)}`}
         toolTipProps={{
           content: i18n.translate(
             'normalization.overview.navigate_to_with_filter',
@@ -300,7 +316,18 @@ const Body: React.FC = compose(
         </EuiFlexGroup>
         <TableDataFetch
           onFetch={async params =>
-            fetchInternalOpenSearchIndexItemsInTable(indexName, params)
+            fetchInternalOpenSearchIndexItemsInTableRelation(
+              indexName,
+              params,
+              {
+                relations: {
+                  integration_id: {
+                    index: OverviewIndexName,
+                    target_field: relationIntegrationIDField,
+                  },
+                },
+              },
+            )
           }
           tableColumns={tableColums}
           tableInitialSortingField='document.title'
