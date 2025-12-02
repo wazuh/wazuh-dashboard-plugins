@@ -306,9 +306,7 @@ const Body: React.FC = compose(
           tableInitialSortingField='document.title'
           tableInitialSortingDirection='asc'
           searchParams={
-            search
-              ? { query: EuiSearchBar.Query.toESQuery(search, schema) }
-              : null
+            search ? { query: EuiSearchBar.Query.toESQuery(search) } : null
           }
           reload={refresh}
         />
