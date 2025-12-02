@@ -41,7 +41,7 @@ import { initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations } f
 import {
   FIELD_TIMESTAMP,
   HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_ARCHIVES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_APLICATIONS,
@@ -53,7 +53,6 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_OTHER,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SECURITY,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SYSTEM_ACTIVITY,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES,
@@ -74,7 +73,6 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
-  INDEX_PATTERN_ALERTS_REQUIRED_FIELDS,
   WAZUH_EVENTS_PATTERN,
   WAZUH_ARCHIVES_PATTERN,
   WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN,
@@ -247,22 +245,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       initializationTaskCreatorServerAPIConnectionCompatibility({
         taskName: 'server-api:connection-compatibility',
         services: plugins.wazuhCore,
-      }),
-    );
-
-    // index patterns
-    core.healthCheck.register(
-      // TODO: this could check if there is compatible index pattern regarding the fields instead of a hardcoded title/ID
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS,
-        indexPatternID: WAZUH_EVENTS_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasFields: INDEX_PATTERN_ALERTS_REQUIRED_FIELDS,
-          hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsKnownFields,
-        },
       }),
     );
 

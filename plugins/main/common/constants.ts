@@ -861,8 +861,6 @@ export const SUPPORTED_LANGUAGES = {
 
 export const SUPPORTED_LANGUAGES_ARRAY = Object.values(SUPPORTED_LANGUAGES);
 
-// Health check
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS = 'index-pattern:alerts';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES =
   'index-pattern:states-vulnerabilities';
 
@@ -925,7 +923,7 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES =
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES =
   'index-pattern:states-sca';
 
-export const INDEX_PATTERN_ALERTS_REQUIRED_FIELDS = [
+export const INDEX_PATTERN_EVENTS_REQUIRED_FIELDS = [
   FIELD_TIMESTAMP,
   'wazuh.integration.decoders',
   'wazuh.cluster.node',

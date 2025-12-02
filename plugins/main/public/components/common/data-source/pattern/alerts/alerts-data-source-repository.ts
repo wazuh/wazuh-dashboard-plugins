@@ -1,4 +1,4 @@
-import { INDEX_PATTERN_ALERTS_REQUIRED_FIELDS } from '../../../../../../common/constants';
+import { INDEX_PATTERN_EVENTS_REQUIRED_FIELDS } from '../../../../../../common/constants';
 import { AppState } from '../../../../../react-services';
 import {
   ErrorDataSourceNotFound,
@@ -57,7 +57,7 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
    * @returns boolean
    */
   checkIfAlertsIndexPattern(dataSource): boolean {
-    return INDEX_PATTERN_ALERTS_REQUIRED_FIELDS.every(reqField =>
+    return INDEX_PATTERN_EVENTS_REQUIRED_FIELDS.every(reqField =>
       dataSource._fields.some(field => field.name === reqField),
     );
   }
