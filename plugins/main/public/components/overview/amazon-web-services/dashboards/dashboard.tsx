@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './styles.scss';
 import {
-  AlertsDataSourceRepository,
+  EventsDataSourceRepository,
   AWSDataSource,
 } from '../../../common/data-source';
 import {
@@ -13,7 +13,7 @@ import { createDashboard } from '../../../common/dashboards';
 
 export const DashboardAWS = createDashboard({
   DataSource: AWSDataSource,
-  DataSourceRepositoryCreator: AlertsDataSourceRepository,
+  DataSourceRepositoryCreator: EventsDataSourceRepository,
   getDashboardPanels: [
     {
       dashboardId: AMAZON_WEB_SERVICES_DASHBOARD_ID,

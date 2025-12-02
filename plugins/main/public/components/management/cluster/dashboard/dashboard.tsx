@@ -19,7 +19,7 @@ import { ConfigurationCards } from '../components/configuration_cards';
 import { NodeList } from '../node-list';
 import {
   ClusterDataSource,
-  AlertsDataSourceRepository,
+  EventsDataSourceRepository,
   PatternDataSource,
   tParsedIndexPattern,
   useDataSource,
@@ -95,7 +95,7 @@ const DashboardCT: React.FC<DashboardCTProps> = () => {
     error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: ClusterDataSource,
-    repository: new AlertsDataSourceRepository(),
+    repository: new EventsDataSourceRepository(),
   });
 
   const [state, setState] = useState<ClusterDashboardState>({

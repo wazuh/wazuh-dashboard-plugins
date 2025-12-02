@@ -22,7 +22,7 @@ import NavigationService from './react-services/navigation-service';
 import { SECTIONS } from './sections';
 import { withGuardAsync } from './components/common/hocs';
 import { WzRequest } from './react-services/wz-request';
-import { AlertsDataSourceSetup } from './components/common/data-source';
+import { EventsDataSourceSetup } from './components/common/data-source';
 
 export const Application = withGuardAsync(
   async (_props: any) => {
@@ -36,8 +36,8 @@ export const Application = withGuardAsync(
       ]);
 
       await Promise.allSettled([
-        // Setup the alerts index pattern
-        AlertsDataSourceSetup(),
+        // Setup the events index pattern
+        EventsDataSourceSetup(),
       ]);
     } catch {}
 

@@ -34,15 +34,10 @@ import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/typ
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { MountPointPortal } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 import { setBreadcrumbs } from '../common/globalBreadcrumb/platformBreadcrumb';
-import WzDataSourceSelector from '../common/data-source/components/wz-data-source-selector/wz-data-source-selector';
 import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
 import NavigationService from '../../react-services/navigation-service';
 import { useAsyncActionRunOnStart } from '../common/hooks';
 import { useSelectedServerApi } from '../common/hooks/use-selected-server-api';
-import {
-  AlertsDataSource,
-  AlertsDataSourceRepository,
-} from '../common/data-source';
 import { Selector, SelectorContainer, SelectorLabel } from './selectors';
 
 async function getServerAPIList() {
@@ -153,18 +148,6 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
   );
 };
 
-const AlertsIndexPatternSelector = ({ showSelectorsInPopover, appConfig }) => {
-  return (
-    <WzDataSourceSelector
-      name='index pattern'
-      DataSource={AlertsDataSource}
-      DataSourceRepositoryCreator={AlertsDataSourceRepository}
-      refetchDependencies={[appConfig?.data?.['ip.ignore']]}
-      showSelectorsInPopover={showSelectorsInPopover}
-    />
-  );
-};
-
 export const WzMenu = withWindowSize(
   class WzMenu extends Component {
     constructor(props) {
@@ -272,14 +255,6 @@ export const WzMenu = withWindowSize(
                       <EuiFlexGroup
                         alignItems='center'
                         style={{ paddingTop: 5 }}
-                      >
-                        <AlertsIndexPatternSelector
-                          showSelectorsInPopover={showSelectorsInPopover}
-                        />
-                      </EuiFlexGroup>
-                      <EuiFlexGroup
-                        alignItems='center'
-                        style={{ paddingTop: 5 }}
                         direction='row'
                       >
                         <ServerAPISelector
@@ -291,11 +266,6 @@ export const WzMenu = withWindowSize(
                 </>
               )) || (
                 <>
-                  <EuiFlexItem grow={showSelectorsInPopover}>
-                    <AlertsIndexPatternSelector
-                      showSelectorsInPopover={showSelectorsInPopover}
-                    />
-                  </EuiFlexItem>
                   <EuiFlexItem grow={showSelectorsInPopover}>
                     <ServerAPISelector
                       showSelectorsInPopover={showSelectorsInPopover}
