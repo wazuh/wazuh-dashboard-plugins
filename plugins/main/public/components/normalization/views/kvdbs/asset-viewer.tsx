@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { EuiInMemoryTable, EuiSpacer } from '@elastic/eui';
 import { sortBy } from 'lodash';
 
-function flatten(
+export function flatten(
   obj: any,
   parentKey: string = '',
   result: { key: string; value: any }[] = [],
