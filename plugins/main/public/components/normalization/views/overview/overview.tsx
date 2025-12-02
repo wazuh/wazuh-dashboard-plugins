@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   EuiButton,
   EuiFlexGroup,
@@ -17,15 +17,13 @@ import { normalization } from '../../../../utils/applications';
 import { Name as DecodersName, Id as DecodersId } from '../decoders/info';
 import { Name as KVDBsName, Id as KVDBsId } from '../kvdbs/info';
 import { WzLink } from '../../../wz-link/wz-link';
-import { Name } from './info';
+import { Name, indexName } from './info';
 import { TableDataFetch } from '../../components/table-data/table-fetch';
 import { fetchInternalOpenSearchIndexItemsInTable } from '../../services/http';
 import {
   SearchBar,
   withInitialQueryFromURL,
 } from '../../components/search-bar/search-bar';
-
-const indexName = 'integrations';
 
 const decodersCountKey = '___decoders_count';
 const kvdbsCountKey = '___kvdbs_count';

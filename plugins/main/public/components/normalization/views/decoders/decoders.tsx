@@ -24,7 +24,7 @@ import {
 import { normalization } from '../../../../utils/applications';
 import { i18n } from '@osd/i18n';
 import { WzLink } from '../../../wz-link/wz-link';
-import { Name } from './info';
+import { Name, indexName } from './info';
 import { Name as OverviewName, Id as OverviewId } from '../overview/info';
 import { TableDataFetch } from '../../components/table-data/table-fetch';
 import {
@@ -52,7 +52,6 @@ const detailsMapLabels: { [key: string]: string } = {
   'document.metadata.author.date': 'Date',
 };
 
-const indexName = 'decoders';
 const Details: React.FC<{ item: { document: { id: string } } }> = ({
   item,
 }) => {
@@ -242,7 +241,7 @@ const tableColums = [
         flyoutTitle={`Decoder details - ${item.document.name}`}
         flyoutBody={() => <Details item={item} />}
         buttonProps={{
-          administrator: true,
+          tooltip: { content: 'View details' },
           buttonType: 'icon',
           iconType: 'inspect',
           'aria-label': 'View Decoder details',
