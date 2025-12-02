@@ -23,7 +23,10 @@ import {
 import { normalization } from '../../../../utils/applications';
 import { WzLink } from '../../../wz-link/wz-link';
 import { Name, indexName } from './info';
-import { indexName as OverviewIndexName } from '../overview/info';
+import {
+  Name as OverviewName,
+  indexName as OverviewIndexName,
+} from '../overview/info';
 import {
   fetchInternalOpenSearchIndex,
   fetchInternalOpenSearchIndexItemsInTable,
@@ -196,7 +199,7 @@ const tableColums = [
             {
               defaultMessage:
                 'Navigate to {appName} filtering by {integrationName} integration',
-              values: { appName: normalization.title, integrationName: value },
+              values: { appName: OverviewName, integrationName: value },
             },
           ),
         }}
