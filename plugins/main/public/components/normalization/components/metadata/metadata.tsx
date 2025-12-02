@@ -54,7 +54,17 @@ export const Metadata: React.FC<{
       <div>
         <strong>{label}</strong>
       </div>
-      <div>{value ? mapFieldRenderers[type]({ value }) : '-'}</div>
+      <div style={label ? { marginTop: '4px' } : {}}>
+        {typeof value === 'undefined'
+          ? '-'
+          : Array.isArray(value)
+          ? value.map((v, i) => (
+              <div key={`${label}-${i}`}>
+                {mapFieldRenderers[type]({ value: v })}
+              </div>
+            ))
+          : mapFieldRenderers[type]({ value })}
+      </div>
     </div>
   );
 };
