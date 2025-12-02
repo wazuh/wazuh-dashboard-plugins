@@ -56,7 +56,7 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
    * @param dataSource
    * @returns boolean
    */
-  checkIfAlertsIndexPattern(dataSource): boolean {
+  checkIfEventsIndexPattern(dataSource): boolean {
     return INDEX_PATTERN_EVENTS_REQUIRED_FIELDS.every(reqField =>
       dataSource._fields.some(field => field.name === reqField),
     );
