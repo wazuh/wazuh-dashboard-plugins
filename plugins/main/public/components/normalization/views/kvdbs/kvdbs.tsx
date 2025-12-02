@@ -22,7 +22,7 @@ import {
 } from '../../../common/hocs';
 import { normalization } from '../../../../utils/applications';
 import { WzLink } from '../../../wz-link/wz-link';
-import { Name } from './info';
+import { Name, indexName } from './info';
 import {
   fetchInternalOpenSearchIndex,
   fetchInternalOpenSearchIndexItemsInTable,
@@ -49,7 +49,6 @@ const detailsMapLabels: { [key: string]: string } = {
   'document.date': 'Date',
 };
 
-const indexName = 'kvdb';
 const Details: React.FC<{ item: { id: string; space: string } }> = ({
   item,
 }) => {
@@ -104,10 +103,10 @@ const Details: React.FC<{ item: { id: string; space: string } }> = ({
                       'document.id',
                       'integration_id',
                       'document.title',
-                      'document.date',
+                      ['document.date', 'date'],
                       'document.author',
                       ['document.enabled', 'boolean_yesno'],
-                      'document.references',
+                      ['document.references', 'url'],
                     ].map(item => {
                       const [field, type] =
                         typeof item === 'string' ? [item, 'text'] : item;
@@ -198,7 +197,7 @@ const tableColums = [
         flyoutTitle={`KVDB details - ${item.document.title}`}
         flyoutBody={() => <Details item={item} />}
         buttonProps={{
-          administrator: true,
+          tooltip: { content: 'View details' },
           buttonType: 'icon',
           iconType: 'inspect',
           'aria-label': 'View KVDB details',
