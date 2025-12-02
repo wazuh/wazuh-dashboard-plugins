@@ -48,13 +48,17 @@ export async function fetchInternalOpenSearchIndexItems<T = any>(
  * @param tableContext
  * @returns
  */
-export async function fetchInternalOpenSearchIndexItemsInTable<T = any>(
+export async function fetchInternalOpenSearchIndexItemsInTable<
+  T = any,
+  R = any,
+>(
   index: string,
   tableContext: {
     pagination: { pageIndex: number; pageSize: number };
     sorting: { sort: { field: string; direction: string } };
     searchParams: any;
   },
+  options: { mapResponseItem?: (item: any) => R } = {},
 ): Promise<{ items: T; totalItems: number }> {
   // Map table context to OpenSearch query parameters
   const {
@@ -81,7 +85,8 @@ export async function fetchInternalOpenSearchIndexItemsInTable<T = any>(
     },
     {
       mapResponseItem(item) {
-        return item._source;
+        const data = item._source;
+        return options?.mapResponseItem ? options?.mapResponseItem(data) : data;
       },
     },
   );

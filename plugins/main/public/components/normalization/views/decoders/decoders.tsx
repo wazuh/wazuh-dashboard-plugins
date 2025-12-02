@@ -3,10 +3,14 @@ import {
   EuiButton,
   EuiCallOut,
   EuiFlexGroup,
+  EuiFlexGrid,
   EuiFlexItem,
-  EuiText,
   EuiProgress,
+  EuiTabbedContent,
+  EuiText,
+  EuiTitle,
   EuiSearchBar,
+  EuiSpacer,
 } from '@elastic/eui';
 import { compose } from 'redux';
 import { WzButtonPermissionsOpenFlyout } from '../../../common/buttons';
@@ -31,13 +35,32 @@ import {
   SearchBar,
   withInitialQueryFromURL,
 } from '../../components/search-bar/search-bar';
+import { Metadata } from '../../components/metadata/metadata';
+import { get } from 'lodash';
 
-const Details: React.FC<{ item: { name: string } }> = ({ item }) => {
+const detailsMapLabels: { [key: string]: string } = {
+  'document.id': 'ID',
+  'document.name': 'Name',
+  integration_id: 'Integration ID',
+  'document.metadata.title': 'Title',
+  'document.metadata.module': 'Module',
+  'document.metadata.compatibility': 'Compatibility',
+  'document.metadata.versions': 'Versions',
+  'document.metadata.author.name': 'Name',
+  'document.metadata.author.email': 'Email',
+  'document.metadata.author.url': 'URL',
+  'document.metadata.author.date': 'Date',
+};
+
+const indexName = 'decoders';
+const Details: React.FC<{ item: { document: { id: string } } }> = ({
+  item,
+}) => {
   const action = useAsyncAction(async () => {
-    const response = await fetchInternalOpenSearchIndex('decoders', {
+    const response = await fetchInternalOpenSearchIndex(indexName, {
       size: 1,
       query: {
-        match: { name: item.name },
+        ids: { values: [item.document.id] },
       },
     });
 
@@ -47,7 +70,7 @@ const Details: React.FC<{ item: { name: string } }> = ({ item }) => {
       throw new Error('Decoder not found');
     }
 
-    return hit._source.text;
+    return hit._source;
   });
 
   useEffect(() => {
@@ -69,7 +92,92 @@ const Details: React.FC<{ item: { name: string } }> = ({ item }) => {
   }
 
   if (action.data) {
-    return <AssetViewer content={action.data} />;
+    return (
+      <EuiTabbedContent
+        tabs={[
+          {
+            id: 'info',
+            name: 'Info',
+            content: (
+              <>
+                <EuiSpacer />
+                <EuiFlexGrid columns={2}>
+                  {[
+                    'document.id',
+                    'integration_id',
+                    'document.metadata.title',
+                    'document.metadata.module',
+                    'document.metadata.compatibility',
+                    'document.metadata.versions',
+                  ].map(item => {
+                    const [field, type] =
+                      typeof item === 'string' ? [item, 'text'] : item;
+                    return (
+                      <EuiFlexItem key={field}>
+                        <Metadata
+                          label={detailsMapLabels[field]}
+                          value={get(action.data, field)}
+                          type={type as 'text' | 'url'}
+                        />
+                      </EuiFlexItem>
+                    );
+                  })}
+                </EuiFlexGrid>
+                <EuiSpacer />
+
+                {action.data?.document?.metadata?.author && (
+                  <>
+                    <EuiTitle size='s'>
+                      <h5>Author</h5>
+                    </EuiTitle>
+                    <EuiSpacer size='s' />
+                    <EuiFlexGrid columns={2}>
+                      {[
+                        'document.metadata.author.name',
+                        'document.metadata.author.email',
+                        ['document.metadata.author.url', 'url'],
+                        'document.metadata.author.date',
+                      ].map(item => {
+                        const [field, type] =
+                          typeof item === 'string' ? [item, 'text'] : item;
+                        return (
+                          <EuiFlexItem key={field}>
+                            <Metadata
+                              label={detailsMapLabels[field]}
+                              value={get(action.data, field)}
+                              type={type as 'text' | 'url'}
+                            />
+                          </EuiFlexItem>
+                        );
+                      })}
+                    </EuiFlexGrid>
+                  </>
+                )}
+                <EuiSpacer />
+                {action.data?.document?.metadata?.description && (
+                  <>
+                    <EuiTitle size='s'>
+                      <h5>Description</h5>
+                    </EuiTitle>
+                    <EuiSpacer size='s' />
+                    <Metadata
+                      label=''
+                      value={action.data.document.metadata.description}
+                      type={'text'}
+                    />
+                  </>
+                )}
+              </>
+            ),
+          },
+          {
+            id: 'content',
+            name: 'File',
+            content: <AssetViewer content={action.data.decoder || ''} />,
+          },
+        ]}
+      />
+    );
   }
 
   return null;
@@ -97,12 +205,12 @@ const Header: React.FC = () => {
 
 const tableColums = [
   {
-    field: 'name',
+    field: 'document.name',
     name: 'Name',
     sortable: true,
   },
   {
-    field: 'integration',
+    field: 'integration_id',
     name: 'Integration',
     sortable: true,
     render: (value: string) => (
@@ -110,7 +218,7 @@ const tableColums = [
         appId={normalization.id}
         path={`/${
           normalization.id
-        }/${OverviewId}?query=name:${encodeURIComponent(value)}`}
+        }/${OverviewId}?query=document.id:${encodeURIComponent(value)}`}
         toolTipProps={{
           content: i18n.translate(
             'normalization.overview.navigate_to_with_filter',
@@ -131,7 +239,7 @@ const tableColums = [
     name: 'Actions',
     render: item => (
       <WzButtonPermissionsOpenFlyout
-        flyoutTitle={`Decoder details - ${item.name}`}
+        flyoutTitle={`Decoder details - ${item.document.name}`}
         flyoutBody={() => <Details item={item} />}
         buttonProps={{
           administrator: true,
@@ -147,10 +255,40 @@ const tableColums = [
 const schema = {
   strict: true,
   fields: {
-    name: {
+    'document.check': {
       type: 'string',
     },
-    integration: {
+    'document.enabled': {
+      type: 'boolean',
+    },
+    'document.id': {
+      type: 'string',
+    },
+    'document.metadata.author.date': {
+      type: 'date',
+    },
+    'document.metadata.author.name': {
+      type: 'string',
+    },
+    'document.metadata.compatibility': {
+      type: 'string',
+    },
+    'document.metadata.description': {
+      type: 'string',
+    },
+    'document.metadata.module': {
+      type: 'string',
+    },
+    'document.metadata.references': {
+      type: 'string',
+    },
+    'document.metadata.title': {
+      type: 'string',
+    },
+    'document.metadata.versions': {
+      type: 'string',
+    },
+    integration_id: {
       type: 'string',
     },
   },
@@ -159,15 +297,15 @@ const schema = {
 const filters = [
   {
     type: 'field_value_selection',
-    field: 'integration',
+    field: 'integration_id',
     name: 'Integration',
     multiSelect: false,
     options: async () => {
-      const response = await fetchInternalOpenSearchIndex('decoders', {
+      const response = await fetchInternalOpenSearchIndex(indexName, {
         size: 0,
         aggs: {
           integrations: {
-            terms: { field: 'integration', size: 100 },
+            terms: { field: 'integration_id', size: 100 },
           },
         },
       });
@@ -182,49 +320,62 @@ const filters = [
 const Body: React.FC = compose(
   withPanel(),
   withInitialQueryFromURL,
-)(({ initialQuery }: { initialQuery?: string }) => {
-  const [search, setSearch] = useState(initialQuery || null);
-  const [refresh, setRefresh] = useState(0);
+)(
+  ({
+    initialQuery,
+    syncQueryURL,
+  }: {
+    initialQuery?: string;
+    syncQueryURL: (query: string) => void;
+  }) => {
+    const [search, setSearch] = useState(initialQuery || null);
+    const [refresh, setRefresh] = useState(0);
 
-  return (
-    <>
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <SearchBar
-            defaultQuery={initialQuery}
-            schema={schema}
-            onChange={setSearch}
-            filters={filters}
-          />
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiButton
-            color='primary'
-            onClick={() => setRefresh(state => state + 1)}
-            size='s'
-            iconType='refresh'
-          >
-            Refresh
-          </EuiButton>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-      <TableDataFetch
-        onFetch={async params =>
-          fetchInternalOpenSearchIndexItemsInTable('decoders', params)
-        }
-        tableColumns={tableColums}
-        tableInitialSortingField='name'
-        tableInitialSortingDirection='asc'
-        searchParams={
-          search
-            ? { query: EuiSearchBar.Query.toESQuery(search, schema) }
-            : null
-        }
-        reload={refresh}
-      />
-    </>
-  );
-});
+    const onChangeSearch = ({ query, queryText }) => {
+      syncQueryURL(queryText);
+      setSearch(query);
+    };
+
+    return (
+      <>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <SearchBar
+              defaultQuery={initialQuery}
+              schema={schema}
+              onChange={onChangeSearch}
+              filters={filters}
+            />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton
+              color='primary'
+              onClick={() => setRefresh(state => state + 1)}
+              size='s'
+              iconType='refresh'
+            >
+              Refresh
+            </EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <TableDataFetch
+          onFetch={async params =>
+            fetchInternalOpenSearchIndexItemsInTable(indexName, params)
+          }
+          tableColumns={tableColums}
+          tableInitialSortingField='document.name'
+          tableInitialSortingDirection='asc'
+          searchParams={
+            search
+              ? { query: EuiSearchBar.Query.toESQuery(search, schema) }
+              : null
+          }
+          reload={refresh}
+        />
+      </>
+    );
+  },
+);
 
 export const Decoders: React.FC = compose(
   withErrorBoundary,

@@ -3,17 +3,18 @@ import {
   EuiButton,
   EuiCallOut,
   EuiFlexGroup,
+  EuiFlexGrid,
   EuiFlexItem,
+  EuiTabbedContent,
   EuiText,
-  EuiPage,
   EuiProgress,
   EuiSearchBar,
+  EuiSpacer,
 } from '@elastic/eui';
 import { compose } from 'redux';
 import { i18n } from '@osd/i18n';
 import { WzButtonPermissionsOpenFlyout } from '../../../common/buttons';
 import { useAsyncAction } from '../../../common/hooks';
-import { WzRequest } from '../../../../react-services';
 import {
   withErrorBoundary,
   withGlobalBreadcrumb,
@@ -32,18 +33,40 @@ import {
 } from '../../components/search-bar/search-bar';
 import { TableDataFetch } from '../../components/table-data/table-fetch';
 import { Id as OverviewId } from '../overview/info';
+import { Metadata } from '../../components/metadata/metadata';
+import { get } from 'lodash';
 
+const detailsMapLabels: { [key: string]: string } = {
+  'document.id': 'ID',
+  'document.name': 'Name',
+  integration_id: 'Integration ID',
+  'document.title': 'Title',
+  'document.author': 'Author',
+  'document.enabled': 'Enabled',
+  'document.metadata.author.url': 'URL',
+  'document.references': 'References',
+  'document.date': 'Date',
+};
+
+const indexName = 'kvdb';
 const Details: React.FC<{ item: { id: string; space: string } }> = ({
   item,
 }) => {
   const action = useAsyncAction(async () => {
-    return 'PLACEHOLDER';
-    const response = await WzRequest.apiReq(
-      'GET',
-      `/content/asset/${item.space}/${item.id}`,
-      {},
-    );
-    return response.data.data;
+    const response = await fetchInternalOpenSearchIndex(indexName, {
+      size: 1,
+      query: {
+        ids: { values: [item.document.id] },
+      },
+    });
+
+    const hit = response?.hits?.hits?.[0];
+
+    if (!hit) {
+      throw new Error('KVDB not found');
+    }
+
+    return hit._source;
   });
 
   useEffect(() => {
@@ -65,7 +88,51 @@ const Details: React.FC<{ item: { id: string; space: string } }> = ({
   }
 
   if (action.data) {
-    return <div>KVDB INFO TO BE DEFINED</div>;
+    return (
+      <>
+        <EuiTabbedContent
+          tabs={[
+            {
+              id: 'info',
+              name: 'Info',
+              content: (
+                <>
+                  <EuiSpacer />
+                  <EuiFlexGrid columns={2}>
+                    {[
+                      'document.id',
+                      'document.title',
+                      'integration_id',
+                      'document.date',
+                      'document.author',
+                      ['document.enabled', 'boolean_yesno'],
+                      'document.references',
+                    ].map(item => {
+                      const [field, type] =
+                        typeof item === 'string' ? [item, 'text'] : item;
+                      return (
+                        <EuiFlexItem key={field}>
+                          <Metadata
+                            label={detailsMapLabels[field]}
+                            value={get(action.data, field)}
+                            type={type as 'text' | 'url'}
+                          />
+                        </EuiFlexItem>
+                      );
+                    })}
+                  </EuiFlexGrid>
+                </>
+              ),
+            },
+            // {
+            //   id: 'content',
+            //   name: 'Key-Value pairs',
+            //   content: <AssetViewer content={action.data.decoder || ''} />,
+            // },
+          ]}
+        />
+      </>
+    );
   }
 
   return null;
@@ -93,12 +160,12 @@ const Header: React.FC = () => {
 
 const tableColums = [
   {
-    field: 'name',
-    name: 'Name',
+    field: 'document.title',
+    name: 'Title',
     sortable: true,
   },
   {
-    field: 'integration',
+    field: 'integration_id',
     name: 'Integration',
     sortable: true,
     render: (value: string) => (
@@ -106,7 +173,7 @@ const tableColums = [
         appId={normalization.id}
         path={`/${
           normalization.id
-        }/${OverviewId}?query=name:${encodeURIComponent(value)}`}
+        }/${OverviewId}?query=document.id:${encodeURIComponent(value)}`}
         toolTipProps={{
           content: i18n.translate(
             'normalization.overview.navigate_to_with_filter',
@@ -127,7 +194,7 @@ const tableColums = [
     name: 'Actions',
     render: item => (
       <WzButtonPermissionsOpenFlyout
-        flyoutTitle={`KVDB details - ${item.name}`}
+        flyoutTitle={`KVDB details - ${item.document.title}`}
         flyoutBody={() => <Details item={item} />}
         buttonProps={{
           administrator: true,
@@ -143,10 +210,25 @@ const tableColums = [
 const schema = {
   strict: true,
   fields: {
-    name: {
+    'document.author': {
       type: 'string',
     },
-    integration: {
+    'document.date': {
+      type: 'date',
+    },
+    'document.enabled': {
+      type: 'boolean',
+    },
+    'document.id': {
+      type: 'string',
+    },
+    'document.references': {
+      type: 'string',
+    },
+    'document.title': {
+      type: 'string',
+    },
+    integration_id: {
       type: 'string',
     },
   },
@@ -155,15 +237,15 @@ const schema = {
 const filters = [
   {
     type: 'field_value_selection',
-    field: 'integration',
+    field: 'integration_id',
     name: 'Integration',
     multiSelect: false,
     options: async () => {
-      const response = await fetchInternalOpenSearchIndex('kvdbs', {
+      const response = await fetchInternalOpenSearchIndex(indexName, {
         size: 0,
         aggs: {
           integrations: {
-            terms: { field: 'integration', size: 100 },
+            terms: { field: 'integration_id', size: 100 },
           },
         },
       });
@@ -178,49 +260,62 @@ const filters = [
 const Body: React.FC = compose(
   withPanel(),
   withInitialQueryFromURL,
-)(({ initialQuery }: { initialQuery: string }) => {
-  const [search, setSearch] = useState(initialQuery || null);
-  const [refresh, setRefresh] = useState(0);
+)(
+  ({
+    initialQuery,
+    syncQueryURL,
+  }: {
+    initialQuery?: string;
+    syncQueryURL: (query: string) => void;
+  }) => {
+    const [search, setSearch] = useState(initialQuery || null);
+    const [refresh, setRefresh] = useState(0);
 
-  return (
-    <>
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <SearchBar
-            defaultQuery={initialQuery}
-            schema={schema}
-            onChange={setSearch}
-            filters={filters}
-          />
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiButton
-            color='primary'
-            onClick={() => setRefresh(state => state + 1)}
-            size='s'
-            iconType='refresh'
-          >
-            Refresh
-          </EuiButton>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-      <TableDataFetch
-        onFetch={async params =>
-          fetchInternalOpenSearchIndexItemsInTable('kvdbs', params)
-        }
-        tableColumns={tableColums}
-        tableInitialSortingField='name'
-        tableInitialSortingDirection='asc'
-        searchParams={
-          search
-            ? { query: EuiSearchBar.Query.toESQuery(search, schema) }
-            : null
-        }
-        reload={refresh}
-      />
-    </>
-  );
-});
+    const onChangeSearch = ({ query, queryText }) => {
+      syncQueryURL(queryText);
+      setSearch(query);
+    };
+
+    return (
+      <>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <SearchBar
+              defaultQuery={initialQuery}
+              schema={schema}
+              onChange={onChangeSearch}
+              filters={filters}
+            />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton
+              color='primary'
+              onClick={() => setRefresh(state => state + 1)}
+              size='s'
+              iconType='refresh'
+            >
+              Refresh
+            </EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <TableDataFetch
+          onFetch={async params =>
+            fetchInternalOpenSearchIndexItemsInTable(indexName, params)
+          }
+          tableColumns={tableColums}
+          tableInitialSortingField='document.title'
+          tableInitialSortingDirection='asc'
+          searchParams={
+            search
+              ? { query: EuiSearchBar.Query.toESQuery(search, schema) }
+              : null
+          }
+          reload={refresh}
+        />
+      </>
+    );
+  },
+);
 
 export const KVDBs: React.FC = compose(
   withErrorBoundary,

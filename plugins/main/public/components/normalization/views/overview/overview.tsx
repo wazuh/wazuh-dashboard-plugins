@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   EuiButton,
   EuiFlexGroup,
@@ -25,6 +25,10 @@ import {
   withInitialQueryFromURL,
 } from '../../components/search-bar/search-bar';
 
+const indexName = 'integrations';
+
+const decodersCountKey = '___decoders_count';
+const kvdbsCountKey = '___kvdbs_count';
 const PageHeader: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return children;
 };
@@ -47,26 +51,34 @@ const Header: React.FC = () => {
 
 const tableColums = [
   {
-    field: 'name',
+    field: 'document.title',
     name: 'Name',
     sortable: true,
   },
   {
-    field: 'decoders_count',
+    field: decodersCountKey,
     name: 'Decoders',
-    sortable: true,
-    render: (value: string, item: { name: string }) => (
+    sortable: false,
+    render: (
+      value: string,
+      item: { document: { title: string; id: string } },
+    ) => (
       <WzLink
         appId={normalization.id}
         path={`/${
           normalization.id
-        }/${DecodersId}?query=integration:${encodeURIComponent(item.name)}`}
+        }/${DecodersId}?query=integration_id:${encodeURIComponent(
+          item.document.id,
+        )}`}
         toolTipProps={{
           content: i18n.translate(
             'normalization.decoders.navigate_to_with_filter',
             {
               defaultMessage: `Navigate to {appName} filtering by {integrationName} integration`,
-              values: { appName: DecodersName, integrationName: item.name },
+              values: {
+                appName: DecodersName,
+                integrationName: item.document.title,
+              },
             },
           ),
         }}
@@ -76,21 +88,29 @@ const tableColums = [
     ),
   },
   {
-    field: 'kvdbs_count',
+    field: kvdbsCountKey,
     name: 'KVDBs',
-    sortable: true,
-    render: (value: string, item: { name: string }) => (
+    sortable: false,
+    render: (
+      value: string,
+      item: { document: { title: string; id: string } },
+    ) => (
       <WzLink
         appId={normalization.id}
         path={`/${
           normalization.id
-        }/${KVDBsId}?query=integration:${encodeURIComponent(item.name)}`}
+        }/${KVDBsId}?query=integration_id:${encodeURIComponent(
+          item.document.id,
+        )}`}
         toolTipProps={{
           content: i18n.translate(
             'normalization.kvdbs.navigate_to_with_filter',
             {
               defaultMessage: `Navigate to {appName} filtering by {integrationName} integration`,
-              values: { appName: KVDBsName, integrationName: item.name },
+              values: {
+                appName: KVDBsName,
+                integrationName: item.document.title,
+              },
             },
           ),
         }}
@@ -104,14 +124,38 @@ const tableColums = [
 const schema = {
   strict: true,
   fields: {
-    name: {
+    'document.author': {
       type: 'string',
     },
-    decoders_count: {
-      type: 'number',
+    'document.category': {
+      type: 'string',
     },
-    kvdbs_count: {
-      type: 'number',
+    'document.date': {
+      type: 'date',
+    },
+    'document.decoders': {
+      type: 'string',
+    },
+    'document.description': {
+      type: 'string',
+    },
+    'document.documentation': {
+      type: 'string',
+    },
+    'document.enable_decoders': {
+      type: 'boolean',
+    },
+    'document.id': {
+      type: 'string',
+    },
+    'document.kvdbs': {
+      type: 'string',
+    },
+    'document.references': {
+      type: 'string',
+    },
+    'document.title': {
+      type: 'string',
     },
   },
 };
@@ -119,48 +163,71 @@ const schema = {
 const Body: React.FC = compose(
   withPanel(),
   withInitialQueryFromURL,
-)(({ initialQuery }: { initialQuery?: string }) => {
-  const [search, setSearch] = useState(initialQuery || null);
-  const [refresh, setRefresh] = useState(0);
+)(
+  ({
+    initialQuery,
+    syncQueryURL,
+  }: {
+    initialQuery?: string;
+    syncQueryURL: (query: string) => void;
+  }) => {
+    const [search, setSearch] = useState(initialQuery || null);
+    const [refresh, setRefresh] = useState(0);
 
-  return (
-    <>
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <SearchBar
-            defaultQuery={initialQuery}
-            schema={schema}
-            onChange={setSearch}
-          />
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiButton
-            color='primary'
-            onClick={() => setRefresh(state => state + 1)}
-            size='s'
-            iconType='refresh'
-          >
-            Refresh
-          </EuiButton>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-      <TableDataFetch
-        onFetch={async params =>
-          fetchInternalOpenSearchIndexItemsInTable('integrations', params)
-        }
-        tableColumns={tableColums}
-        tableInitialSortingField='name'
-        tableInitialSortingDirection='asc'
-        searchParams={
-          search
-            ? { query: EuiSearchBar.Query.toESQuery(search, schema) }
-            : null
-        }
-        reload={refresh}
-      />
-    </>
-  );
-});
+    const onChangeSearch = ({ query, queryText }) => {
+      syncQueryURL(queryText);
+      setSearch(query);
+    };
+
+    /* FIXME: with a query in the URL for previous serach, use the back button does not update the search.
+    This happens on Decoders and KVDBs views as well.
+    */
+
+    return (
+      <>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <SearchBar
+              defaultQuery={initialQuery}
+              schema={schema}
+              onChange={onChangeSearch}
+            />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton
+              color='primary'
+              onClick={() => setRefresh(state => state + 1)}
+              size='s'
+              iconType='refresh'
+            >
+              Refresh
+            </EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <TableDataFetch
+          onFetch={async params =>
+            fetchInternalOpenSearchIndexItemsInTable(indexName, params, {
+              mapResponseItem: item => ({
+                ...item,
+                ___decoders_count: item.document.decoders.length,
+                ___kvdbs_count: item.document.kvdbs.length,
+              }),
+            })
+          }
+          tableColumns={tableColums}
+          tableInitialSortingField='document.title'
+          tableInitialSortingDirection='asc'
+          searchParams={
+            search
+              ? { query: EuiSearchBar.Query.toESQuery(search, schema) }
+              : null
+          }
+          reload={refresh}
+        />
+      </>
+    );
+  },
+);
 
 export const Overview: React.FC = compose(
   withErrorBoundary,

@@ -23,8 +23,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         incremental: false,
         schema,
       }}
-      onChange={({ query }) => {
-        onChange(query);
+      onChange={({ query, queryText }) => {
+        onChange({ query, queryText });
       }}
       filters={filters}
       compressed={true}
@@ -45,7 +45,6 @@ export const withInitialQueryFromURL = (Component: React.FC) => {
       const q = params.get('query');
       if (q) {
         setQuery(q);
-        params.delete('query');
         history.replace({
           pathname: location.pathname,
           search: params.toString(),
@@ -53,9 +52,22 @@ export const withInitialQueryFromURL = (Component: React.FC) => {
       } else {
         setQuery(null);
       }
-    }, []);
+    }, [location.search]);
+
+    const syncQueryURL = (query: string) => {
+      const params = new URLSearchParams(location.search);
+      if (query) {
+        params.set('query', query);
+      } else {
+        params.delete('query');
+      }
+      history.push({
+        pathname: location.pathname,
+        search: params.toString(),
+      });
+    };
     return query !== undefined ? (
-      <Component {...props} initialQuery={query} />
+      <Component {...props} initialQuery={query} syncQueryURL={syncQueryURL} />
     ) : null;
   };
 };
