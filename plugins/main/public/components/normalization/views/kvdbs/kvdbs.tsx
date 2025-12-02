@@ -35,6 +35,7 @@ import { TableDataFetch } from '../../components/table-data/table-fetch';
 import { Id as OverviewId } from '../overview/info';
 import { Metadata } from '../../components/metadata/metadata';
 import { get } from 'lodash';
+import { AssetViewer } from './asset-viewer';
 
 const detailsMapLabels: { [key: string]: string } = {
   'document.id': 'ID',
@@ -124,11 +125,11 @@ const Details: React.FC<{ item: { id: string; space: string } }> = ({
                 </>
               ),
             },
-            // {
-            //   id: 'content',
-            //   name: 'Key-Value pairs',
-            //   content: <AssetViewer content={action.data.decoder || ''} />,
-            // },
+            {
+              id: 'content',
+              name: 'Key-Value pairs',
+              content: <AssetViewer content={action.data.document.content} />,
+            },
           ]}
         />
       </>
