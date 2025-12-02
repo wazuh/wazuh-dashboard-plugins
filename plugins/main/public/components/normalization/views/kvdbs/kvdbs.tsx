@@ -102,8 +102,8 @@ const Details: React.FC<{ item: { id: string; space: string } }> = ({
                   <EuiFlexGrid columns={2}>
                     {[
                       'document.id',
-                      'document.title',
                       'integration_id',
+                      'document.title',
                       'document.date',
                       'document.author',
                       ['document.enabled', 'boolean_yesno'],
