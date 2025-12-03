@@ -15,7 +15,7 @@ Follow these steps to install the Wazuh dashboard.
 #### APT
 
 ```bash
-apt-get install debhelper tar curl libcap2-bin #debhelper version 9 or later
+apt-get install debhelper tar curl libcap2-bin # debhelper version 9 or later
 ```
 
 #### Yum
@@ -126,10 +126,12 @@ echo -e '[wazuh]\ngpgcheck=1\ngpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZU
 
 ### Configuring the Wazuh dashboard
 
-1. Edit the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file and replace the following values:
+The Wazuh dashboard configuration now lives entirely in `/etc/wazuh-dashboard/opensearch_dashboards.yml`. The `wazuh.yml` file under `/usr/share/wazuh-dashboard/` is no longer created or used.
+
+1. Edit `/etc/wazuh-dashboard/opensearch_dashboards.yml` and set the basic network and indexer values:
 
    - **`server.host`**: This setting specifies the host of the Wazuh dashboard server. To allow remote users to connect, set the value to the IP address or DNS name of the Wazuh dashboard server. The value `0.0.0.0` will accept all the available IP addresses of the host.
-
+   - **`server.port`**: Port that the dashboard exposes. Use `443` if you serve it over HTTPS.
    - **`opensearch.hosts`**: The URLs of the Wazuh indexer instances to use for all your queries. The Wazuh dashboard can be configured to connect to multiple Wazuh indexer nodes in the same cluster. The addresses of the nodes can be separated by commas. For example, `["https://10.0.0.2:9200", "https://10.0.0.3:9200","https://10.0.0.4:9200"]`
 
    ```yaml
@@ -138,6 +140,21 @@ echo -e '[wazuh]\ngpgcheck=1\ngpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZU
    opensearch.hosts: https://localhost:9200
    opensearch.ssl.verificationMode: certificate
    ```
+
+2. In the same file, define the Wazuh server hosts that the dashboard will use to query the Wazuh API. At least one host is required. Each host entry must include the URL, port, and credentials:
+
+    ```yaml
+    wazuh_core.hosts:
+      default:
+        url: https://<WAZUH_SERVER_IP_OR_DNS>
+        port: 55000
+        username: wazuh-wui
+        password: wazuh-wui
+        run_as: false
+    ```
+
+   - `run_as: true` will make the dashboard request data using the current user's context; leave it as `false` for the default service account.
+   - If you manage multiple Wazuh servers, add more entries under `wazuh_core.hosts` (for example, `regional_eu`, `regional_us`), each with its own connection details.
 
 ### Deploying certificates
 
@@ -158,6 +175,8 @@ echo -e '[wazuh]\ngpgcheck=1\ngpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZU
    chmod 400 /etc/wazuh-dashboard/certs/*
    chown -R wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/certs
    ```
+
+  Ensure the SSL fields in `/etc/wazuh-dashboard/opensearch_dashboards.yml` (`server.ssl.enabled`, `server.ssl.certificate`, and `server.ssl.key`) point to the files you just deployed.
 
 ### Starting the Wazuh dashboard service
 
@@ -182,24 +201,13 @@ echo -e '[wazuh]\ngpgcheck=1\ngpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZU
      ```
 
    - Debian-based operating system:
+
      ```bash
      update-rc.d wazuh-dashboard defaults 95 10
      service wazuh-dashboard start
      ```
 
-2. Edit the `/usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml` file and replace `<WAZUH_SERVER_IP_ADDRESS>` with the IP address or hostname of the Wazuh server master node.
-
-   ```yaml
-   hosts:
-     - default:
-         url: https://<WAZUH_SERVER_IP_ADDRESS>
-         port: 55000
-         username: wazuh-wui
-         password: wazuh-wui
-         run_as: false
-   ```
-
-3. Access the Wazuh web interface with your `admin` user credentials. This is the default administrator account for the Wazuh indexer and it allows you to access the Wazuh dashboard.
+2. Access the Wazuh web interface with your `admin` user credentials. This is the default administrator account for the Wazuh indexer and it allows you to access the Wazuh dashboard.
 
    - **URL**: `https://<WAZUH_DASHBOARD_IP_ADDRESS>`
    - **Username**: `admin`
