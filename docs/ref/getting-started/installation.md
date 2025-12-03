@@ -143,15 +143,15 @@ The Wazuh dashboard configuration now lives entirely in `/etc/wazuh-dashboard/op
 
 2. In the same file, define the Wazuh server hosts that the dashboard will use to query the Wazuh API. At least one host is required. Each host entry must include the URL, port, and credentials:
 
-    ```yaml
-    wazuh_core.hosts:
-      default:
-        url: https://<WAZUH_SERVER_IP_OR_DNS>
-        port: 55000
-        username: wazuh-wui
-        password: wazuh-wui
-        run_as: false
-    ```
+   ```yaml
+   wazuh_core.hosts:
+     default:
+       url: https://<WAZUH_SERVER_IP_OR_DNS>
+       port: 55000
+       username: wazuh-wui
+       password: wazuh-wui
+       run_as: false
+   ```
 
    - `run_as: true` will make the dashboard request data using the current user's context; leave it as `false` for the default service account.
    - If you manage multiple Wazuh servers, add more entries under `wazuh_core.hosts` (for example, `regional_eu`, `regional_us`), each with its own connection details.
@@ -176,7 +176,7 @@ The Wazuh dashboard configuration now lives entirely in `/etc/wazuh-dashboard/op
    chown -R wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/certs
    ```
 
-  Ensure the SSL fields in `/etc/wazuh-dashboard/opensearch_dashboards.yml` (`server.ssl.enabled`, `server.ssl.certificate`, and `server.ssl.key`) point to the files you just deployed.
+Ensure the SSL fields in `/etc/wazuh-dashboard/opensearch_dashboards.yml` (`server.ssl.enabled`, `server.ssl.certificate`, and `server.ssl.key`) point to the files you just deployed.
 
 ### Starting the Wazuh dashboard service
 
