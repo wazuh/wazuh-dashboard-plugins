@@ -1,5 +1,5 @@
 import { tSavedObjectResponse } from '../pattern-data-source-repository';
-import { AlertsDataSourceRepository } from '../../index';
+import { EventsDataSourceRepository } from './events-data-source-repository';
 jest.mock('../../../../../react-services/generic-request');
 import { AppState } from '../../../../../react-services';
 jest.mock('../../../../../react-services/app-state');
@@ -53,11 +53,11 @@ const mockedSavedObject = {
   },
 } as tSavedObjectResponse;
 
-describe('AlertsDataSourceRepository', () => {
-  let repository: AlertsDataSourceRepository;
+describe('EventsDataSourceRepository', () => {
+  let repository: EventsDataSourceRepository;
 
   beforeEach(() => {
-    repository = new AlertsDataSourceRepository();
+    repository = new EventsDataSourceRepository();
   });
 
   afterEach(() => {
@@ -65,7 +65,7 @@ describe('AlertsDataSourceRepository', () => {
   });
 
   it('should create a new instance', () => {
-    expect(repository).toBeInstanceOf(AlertsDataSourceRepository);
+    expect(repository).toBeInstanceOf(EventsDataSourceRepository);
   });
 
   it('should set default pattern in storage', async () => {
@@ -88,10 +88,10 @@ describe('AlertsDataSourceRepository', () => {
   it('should return an ERROR when default index pattern is not saved in storage', async () => {
     AppState.getCurrentPattern = jest.fn().mockReturnValue(null);
     try {
-      await repository.getDefault();
+      await repository.getDefault([]);
     } catch (error) {
       expect(error.message).toBe(
-        'No index pattern selected for alerts. Make sure a compatible index pattern exists and select it. This wasn’t applied correctly or needs to be re‑selected.',
+        "No index pattern selected for events. Make sure a compatible index pattern exists and select it. This wasn't applied correctly or needs to be re-selected.",
       );
     }
   });
