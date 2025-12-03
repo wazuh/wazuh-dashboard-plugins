@@ -232,22 +232,16 @@ function getIndexPatternsClient(
   ctx: HealthCheckTaskContext,
   scope: InitializationTaskContext,
 ) {
-  switch (true) {
-    case scope.includes('internal'): {
-      return new IndexPatternsFetcher(
-        ctx.services.core.opensearch.legacy.client.callAsInternalUser,
-      );
-    }
+  if (scope.includes('internal')) {
+    return new IndexPatternsFetcher(
+      ctx.services.core.opensearch.legacy.client.callAsInternalUser,
+    );
+  }
 
-    case scope.includes('user'): {
-      return new IndexPatternsFetcher(
-        ctx.services.core.opensearch.legacy.client.callAsCurrentUser,
-      );
-    }
-
-    default: {
-      break;
-    }
+  if (scope.includes('user')) {
+    return new IndexPatternsFetcher(
+      ctx.services.core.opensearch.legacy.client.callAsCurrentUser,
+    );
   }
 }
 
@@ -260,21 +254,16 @@ async function getIndexPatternID(
   if (indexPatternID) {
     return indexPatternID;
   }
-  switch (true) {
-    case ctx?.scope?.includes('internal'): {
-      return configurationSettingKey
-        ? await services.configuration.get(configurationSettingKey)
-        : undefined;
-    }
 
-    case ctx?.scope?.includes('user'): {
-      // TODO
-      return ctx?.getIndexPatternID?.(ctx);
-    }
+  if (ctx?.scope?.includes('internal')) {
+    return configurationSettingKey
+      ? await services.configuration.get(configurationSettingKey)
+      : undefined;
+  }
 
-    default: {
-      break;
-    }
+  if (ctx?.scope?.includes('user')) {
+    // TODO
+    return ctx?.getIndexPatternID?.(ctx);
   }
 }
 
