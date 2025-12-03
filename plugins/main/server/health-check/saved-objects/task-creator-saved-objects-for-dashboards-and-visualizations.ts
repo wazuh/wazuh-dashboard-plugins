@@ -131,7 +131,12 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
     async run(ctx: InitializationTaskRunContext) {
       try {
         ctx.logger.debug('Starting saved objects provisioning');
+        
         const shouldOverwrite = ctx.context.scope === 'internal-initial';
+       
+        shouldOverwrite
+          ? ctx.logger.info('Initializing/overwriting saved objects')
+          : ctx.logger.info('Initializing missing saved objects');
 
         const client: SavedObjectsClientContract =
           ctx.context.services.core.savedObjects.createInternalRepository();
