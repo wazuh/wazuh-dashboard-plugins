@@ -217,12 +217,12 @@ function getSavedObjectsClient(
   ctx: HealthCheckTaskContext,
   scope: InitializationTaskContext,
 ) {
-  switch (scope) {
-    case 'internal': {
+  switch (true) {
+    case scope.includes('internal'): {
       return ctx.services.core.savedObjects.createInternalRepository();
     }
 
-    case 'user': {
+    case scope.includes('user'): {
       return ctx.services.core.savedObjects.savedObjectsStart.getScopedClient(
         ctx.request,
       );
@@ -238,14 +238,14 @@ function getIndexPatternsClient(
   ctx: HealthCheckTaskContext,
   scope: InitializationTaskContext,
 ) {
-  switch (scope) {
-    case 'internal': {
+  switch (true) {
+    case scope.includes('internal'): {
       return new IndexPatternsFetcher(
         ctx.services.core.opensearch.legacy.client.callAsInternalUser,
       );
     }
 
-    case 'user': {
+    case scope.includes('user'): {
       return new IndexPatternsFetcher(
         ctx.services.core.opensearch.legacy.client.callAsCurrentUser,
       );
@@ -266,16 +266,16 @@ async function getIndexPatternID(
   if (indexPatternID) {
     return indexPatternID;
   }
-  switch (ctx.scope) {
-    case 'internal': {
+  switch (true) {
+    case ctx?.scope?.includes('internal'): {
       return configurationSettingKey
         ? await services.configuration.get(configurationSettingKey)
         : undefined;
     }
 
-    case 'user': {
+    case ctx?.scope?.includes('user'): {
       // TODO
-      return ctx.getIndexPatternID(ctx);
+      return ctx?.getIndexPatternID?.(ctx);
     }
 
     default: {
