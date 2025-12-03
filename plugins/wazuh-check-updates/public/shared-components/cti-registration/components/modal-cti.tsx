@@ -14,6 +14,9 @@ import {
   EuiCallOut,
 } from '@elastic/eui';
 import { LinkCtiProps } from '../types';
+import { getCore } from '../../../plugin-services';
+import { routes } from '../../../../common/constants';
+import { Cookies } from 'react-cookie';
 
 export const ModalCti: React.FC = ({
   handleModalToggle,
@@ -22,48 +25,28 @@ export const ModalCti: React.FC = ({
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  const handleButtonClick = () => {
+  const handleButtonClick = async () => {
     setLoading(true);
+    try {
+      const cookie = new Cookies();
+      const currentApiId = JSON.parse(decodeURI(cookie.get('currentApi')))?.id;
 
-    // TODO: Replace with actual API call to start CTI registration
-    setTimeout(() => {
-      try {
-        // Simulate possible error - replace with actual API call
-        const shouldFail = Math.random() < 0.4; // 40% chance of error
+      const ctiResponse = await getCore().http.post(routes.token, {
+        body: JSON.stringify({
+          currentApiId: currentApiId,
+        }),
+      });
 
-        if (shouldFail) {
-          throw new Error('Failed to connect to CTI service');
-        }
-
-        // TODO: Replace with the request to the CTI service (endpoint /api/v1/instances/token)
-        // const ctiResponse = await getCore().http.get(
-        //   'basepath-to-cti-service/api/v1/instances/token',
-        //   {
-        //     prependBasePath: false,
-        //   },
-        // );
-
-        const ctiResponse = {
-          device_code: 'test_device_code',
-          user_code: 'mock_user_code',
-          verification_uri: 'https://console.wazuh.com/instances/new',
-          verification_uri_complete:
-            'https://console.wazuh.com/instances/new?user_code=mock_user_code',
-          interval: 5,
-          expires_in: 1800,
-        };
-
-        setLoading(false);
-        window.open(ctiResponse.verification_uri_complete, 'wazuh_cti');
-        handleStatusModalToggle?.();
-        handleModalToggle();
-      } catch (err) {
-        setLoading(false);
-        setError(
-          'There was an error connecting to the CTI service. Please try again later.',
-        );
-      }
-    }, 2000);
+      setLoading(false);
+      window.open(ctiResponse.verification_uri_complete, 'wazuh_cti');
+      handleStatusModalToggle?.();
+      handleModalToggle();
+    } catch (err) {
+      setLoading(false);
+      setError(
+        'There was an error connecting to the CTI service. Please try again later.',
+      );
+    }
   };
 
   return (

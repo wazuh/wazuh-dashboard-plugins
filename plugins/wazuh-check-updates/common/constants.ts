@@ -9,11 +9,15 @@ const ctiBasePath = '/api/wazuh-check-updates/cti-registration';
 export enum routes {
   checkUpdates = '/api/wazuh-check-updates/updates',
   userPreferences = '/api/wazuh-check-updates/user-preferences/me',
+  token = `${ctiBasePath}/token`,
   subscription = `${ctiBasePath}/subscription`,
   contentUpdate = `${ctiBasePath}/update`,
 }
 
-export const CTI_SUBSCRIPTION_ROUTE = '/api/v1/instances/token';
+const ctiPath = 'https://console.precti.wazuh.com';
+export enum ctiUrls {
+  token = `${ctiPath}/api/v1/instances/token`,
+}
 
 const WAZUH_CONTENT_MANAGER_BASE_PATH = '/_plugins/content-manager';
 export const enum contentManagerRoutes {
