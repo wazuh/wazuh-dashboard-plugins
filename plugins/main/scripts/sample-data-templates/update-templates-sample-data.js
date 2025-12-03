@@ -60,7 +60,7 @@ const config = {
   datasets: [],
   // Mapping from local dataset names to remote template filenames
   datasetToTemplateMapping: {
-    'wazuh-events': 'templates/streams/alerts.json',
+    'wazuh-alerts': 'templates/streams/alerts.json',
     'agents-monitoring': 'templates/monitoring.json',
     'server-statistics': 'templates/statistics.json',
     'states-fim-files': 'templates/states/fim-files.json',
