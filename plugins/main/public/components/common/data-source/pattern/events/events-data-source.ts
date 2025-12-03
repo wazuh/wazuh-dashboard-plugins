@@ -1,5 +1,6 @@
 import { PatternDataSource } from '../pattern-data-source';
-import { tFilter, PatternDataSourceFilterManager } from '../../index';
+import { PatternDataSourceFilterManager } from '../pattern-data-source-filter-manager';
+import { tFilter } from '../../types';
 import { DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER } from '../../../../../../common/constants';
 
 export class EventsDataSource extends PatternDataSource {
