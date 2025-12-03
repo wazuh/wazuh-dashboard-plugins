@@ -217,20 +217,14 @@ function getSavedObjectsClient(
   ctx: HealthCheckTaskContext,
   scope: InitializationTaskContext,
 ) {
-  switch (true) {
-    case scope.includes('internal'): {
-      return ctx.services.core.savedObjects.createInternalRepository();
-    }
+  if (scope.includes('internal')){
+    return ctx.services.core.savedObjects.createInternalRepository();
+  }
 
-    case scope.includes('user'): {
-      return ctx.services.core.savedObjects.savedObjectsStart.getScopedClient(
-        ctx.request,
-      );
-    }
-
-    default: {
-      break;
-    }
+  if (scope.includes('user')){
+    return ctx.services.core.savedObjects.savedObjectsStart.getScopedClient(
+      ctx.request,
+    );
   }
 }
 
