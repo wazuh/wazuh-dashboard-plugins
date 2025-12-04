@@ -126,7 +126,7 @@ echo -e '[wazuh]\ngpgcheck=1\ngpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZU
 
 ### Configuring the Wazuh dashboard
 
-The Wazuh dashboard configuration now lives entirely in `/etc/wazuh-dashboard/opensearch_dashboards.yml`. The `wazuh.yml` file under `/usr/share/wazuh-dashboard/` is no longer created or used.
+1. Edit the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file and replace the following values:
 
 1. Edit `/etc/wazuh-dashboard/opensearch_dashboards.yml` and set the basic network and indexer values:
 
