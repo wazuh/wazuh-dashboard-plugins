@@ -126,9 +126,7 @@ echo -e '[wazuh]\ngpgcheck=1\ngpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZU
 
 ### Configuring the Wazuh dashboard
 
-1. Edit the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file and replace the following values:
-
-1. Edit `/etc/wazuh-dashboard/opensearch_dashboards.yml` and set the basic network and indexer values:
+Edit the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file and replace the following values:
 
    - **`server.host`**: This setting specifies the host of the Wazuh dashboard server. To allow remote users to connect, set the value to the IP address or DNS name of the Wazuh dashboard server. The value `0.0.0.0` will accept all the available IP addresses of the host.
    - **`server.port`**: Port that the dashboard exposes. Use `443` if you serve it over HTTPS.
@@ -141,16 +139,16 @@ echo -e '[wazuh]\ngpgcheck=1\ngpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZU
    opensearch.ssl.verificationMode: certificate
    ```
 
-2. In the same file, define the Wazuh server hosts that the dashboard will use to query the Wazuh API. At least one host is required. Each host entry must include the URL, port, and credentials:
+Define the Wazuh server hosts that the dashboard will use to query the Wazuh API. At least one host is required. Each host entry must include the URL, port, and credentials:
 
    ```yaml
    wazuh_core.hosts:
-     default:
-       url: https://<WAZUH_SERVER_IP_OR_DNS>
-       port: 55000
-       username: wazuh-wui
-       password: wazuh-wui
-       run_as: false
+      default:
+         url: https://<WAZUH_SERVER_IP_OR_DNS>
+         port: 55000
+         username: wazuh-wui
+         password: wazuh-wui
+         run_as: false
    ```
 
    - `run_as: true` will make the dashboard request data using the current user's context; leave it as `false` for the default service account.
