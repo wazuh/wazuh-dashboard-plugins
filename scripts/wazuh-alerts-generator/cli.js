@@ -105,7 +105,12 @@
       'web',
       'windows',
     ],
-    'auditing-policy-monitoring': ['audit', 'rootcheck', 'virustotal', 'yara'],
+    'auditing-policy-monitoring': [
+      'audit',
+      'wazuh-rootcheck',
+      'virustotal',
+      'yara',
+    ],
     'thread-detection': ['docker', 'mitre', 'vulnerabilities'],
   };
 

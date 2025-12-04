@@ -789,13 +789,13 @@ function generateAlert(params) {
       category: [EVENT_CATEGORIES.MALWARE],
       type: [EVENT_TYPES.INFO],
       outcome: EVENT_OUTCOMES.UNKNOWN,
-      module: 'rootcheck',
+      module: 'wazuh-rootcheck',
       severity: 7,
     });
 
     // Update wazuh fields
-    alert.wazuh.integration.decoders = ['rootcheck'];
-    alert.wazuh.rules = getRulesForModule('rootcheck');
+    alert.wazuh.integration.decoders = ['wazuh-rootcheck'];
+    alert.wazuh.rules = getRulesForModule('wazuh-rootcheck');
 
     const alertCategory = Random.arrayItem(['Rootkit', 'Trojan']);
 

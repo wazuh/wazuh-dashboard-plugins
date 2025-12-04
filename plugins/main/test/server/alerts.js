@@ -75,12 +75,12 @@ const rootcheck = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'wazuh.integration.decoders': 'rootcheck' } }
-          ]
-        }
-      }
+            { match: { 'wazuh.integration.decoders': 'wazuh-rootcheck' } },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -91,11 +91,13 @@ const rootcheck = async agentID => {
 
   checkRes(res);
   commonFields(sample);
-  sample.wazuh.integration.decoders.should.be.a('array').that.includes('rootcheck');
+  sample.wazuh.integration.decoders.should.be
+    .a('array')
+    .that.includes('wazuh-rootcheck');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
   sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
-  sample.location.should.be.eql('rootcheck');
+  sample.location.should.be.eql('wazuh-rootcheck');
   sample.cluster.should.be.a('object');
   sample.cluster.name.should.be.eql('wazuh');
   sample.cluster.node.should.be.eql('node01');
