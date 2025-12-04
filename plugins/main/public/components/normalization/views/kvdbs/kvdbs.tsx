@@ -145,7 +145,7 @@ const Details: React.FC<{ item: { id: string; space: string } }> = ({
             },
             {
               id: 'content',
-              name: 'Key-Value pairs',
+              name: 'Database',
               content: <AssetViewer content={action.data.document.content} />,
             },
           ]}
