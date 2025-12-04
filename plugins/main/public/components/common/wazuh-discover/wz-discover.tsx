@@ -106,7 +106,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     setFilters,
     error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    repository: AlertsRepository, // this makes only works with events index pattern
+    repository: EventsRepository, // this makes only works with events index pattern
     DataSource,
   });
 
