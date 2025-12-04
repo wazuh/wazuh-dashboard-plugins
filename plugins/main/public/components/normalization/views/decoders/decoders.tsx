@@ -155,7 +155,7 @@ const Details: React.FC<{ item: { document: { id: string } } }> = ({
                         'document.metadata.author.name',
                         'document.metadata.author.email',
                         ['document.metadata.author.url', 'url'],
-                        'document.metadata.author.date',
+                        ['document.metadata.author.date', 'date'],
                       ].map(item => {
                         const [field, type] =
                           typeof item === 'string' ? [item, 'text'] : item;

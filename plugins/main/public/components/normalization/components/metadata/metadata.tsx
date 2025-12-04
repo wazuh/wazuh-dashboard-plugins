@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiLink } from '@elastic/eui';
+import { formatUIDate } from '../../../../react-services';
 
 type MetadataFieldType =
   | 'text'
@@ -33,6 +34,10 @@ export const MetadataFieldBooleanAsYesNo: React.FC<{ value: string }> = ({
   return value ? 'Yes' : 'No';
 };
 
+export const MetadataFieldDate: React.FC<{ value: string }> = ({ value }) => {
+  return formatUIDate(value);
+};
+
 const mapFieldRenderers: {
   [key in MetadataFieldType]: React.FC<{ value: any }>;
 } = {
@@ -40,7 +45,7 @@ const mapFieldRenderers: {
   boolean: MetadataFieldBoolean,
   boolean_yesno: MetadataFieldBooleanAsYesNo,
   number: MetadataFieldText,
-  date: MetadataFieldText,
+  date: MetadataFieldDate,
   url: MetadataFieldURL,
 };
 
