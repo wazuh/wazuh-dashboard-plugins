@@ -59,10 +59,11 @@ export class ComplianceSubrequirements extends Component {
    * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
    * @param filter
    */
-  addFilter(filter) {
+  async addFilter(filter) {
     const { filterManager } = getDataPlugin().query;
     const matchPhrase = {};
     matchPhrase[filter.key] = filter.value;
+    const pattern = await getWazuhCorePlugin().configuration.get('pattern');
     const newFilter = {
       meta: {
         disabled: false,
@@ -70,9 +71,7 @@ export class ComplianceSubrequirements extends Component {
         params: { query: filter.value },
         type: 'phrase',
         negate: filter.negate || false,
-        index:
-          AppState.getCurrentPattern() ||
-          getWazuhCorePlugin().configuration.getSettingValue('pattern'),
+        index: pattern,
       },
       query: { match_phrase: matchPhrase },
       $state: { store: 'appState' },

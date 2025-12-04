@@ -84,9 +84,17 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     undefined,
   );
   const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [patternId, setPatternId] = useState<string>('');
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
 
-  const AlertsRepository = new EventsDataSourceRepository();
+  const EventsRepository = new EventsDataSourceRepository();
+
+  useEffect(() => {
+    (async () => {
+      const id = await EventsRepository.getStoreIndexPatternId();
+      setPatternId(id);
+    })();
+  }, []);
 
   const {
     dataSource,
@@ -284,16 +292,18 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                       paddingSize='none'
                     >
                       <EuiPanel>
-                        <DashboardByRenderer
-                          input={histogramChartInput(
-                            AlertsRepository.getStoreIndexPatternId(),
-                            fetchFilters,
-                            query,
-                            dateRangeFrom,
-                            dateRangeTo,
-                            fingerprint,
-                          )}
-                        />
+                        {patternId && (
+                          <DashboardByRenderer
+                            input={histogramChartInput(
+                              patternId,
+                              fetchFilters,
+                              query,
+                              dateRangeFrom,
+                              dateRangeTo,
+                              fingerprint,
+                            )}
+                          />
+                        )}
                       </EuiPanel>
                     </EuiPanel>
                   </EuiFlexItem>

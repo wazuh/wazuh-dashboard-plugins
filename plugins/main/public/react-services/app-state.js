@@ -240,49 +240,6 @@ export class AppState {
   }
 
   /**
-   * Set a new value to the 'currentPattern' cookie
-   * @param {*} newPattern
-   */
-  static setCurrentPattern(newPattern) {
-    const encodedPattern = encodeURI(newPattern);
-    const exp = new Date();
-    exp.setDate(exp.getDate() + 365);
-    if (newPattern) {
-      getCookies().set('currentPattern', encodedPattern, {
-        expires: exp,
-      });
-    }
-  }
-
-  /**
-   * Get 'currentPattern' value
-   */
-  static getCurrentPattern() {
-    const currentPattern = getCookies().get('currentPattern')
-      ? decodeURI(getCookies().get('currentPattern'))
-      : '';
-    // check if the current Cookie has the format of 3.11 and previous versions, in that case we remove the extra " " characters
-    if (
-      currentPattern &&
-      currentPattern[0] === '"' &&
-      currentPattern[currentPattern.length - 1] === '"'
-    ) {
-      const newPattern = currentPattern.substring(1, currentPattern.length - 1);
-      this.setCurrentPattern(newPattern);
-    }
-    return getCookies().get('currentPattern')
-      ? decodeURI(getCookies().get('currentPattern'))
-      : '';
-  }
-
-  /**
-   * Remove 'currentPattern' value
-   */
-  static removeCurrentPattern() {
-    return getCookies().remove('currentPattern');
-  }
-
-  /**
    * Set a new value to the 'currentDevTools' cookie
    * @param {*} current
    **/

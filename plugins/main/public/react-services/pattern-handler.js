@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { AppState } from './app-state';
 import { SavedObject } from './saved-objects';
 import { getDataPlugin, getWazuhCorePlugin } from '../kibana-services';
 
@@ -22,9 +21,6 @@ export class PatternHandler {
       const pattern = await getWazuhCorePlugin().configuration.get('pattern');
 
       const defaultPatterns = [pattern];
-      const selectedPattern = AppState.getCurrentPattern();
-      if (selectedPattern && selectedPattern !== pattern)
-        defaultPatterns.push(selectedPattern);
       let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(
         defaultPatterns,
         origin,
@@ -38,26 +34,14 @@ export class PatternHandler {
   }
 
   /**
-   * Change current pattern for the given pattern
-   * @param {String} selectedPattern
-   */
-  static async changePattern(selectedPattern) {
-    try {
-      AppState.setCurrentPattern(selectedPattern);
-      await this.refreshIndexPattern();
-      return AppState.getCurrentPattern();
-    } catch (error) {
-      throw new Error('Error Pattern Handler (changePattern)');
-    }
-  }
-
-  /**
    * Refresh current pattern for the given pattern
    * @param newFields
    */
   static async refreshIndexPattern() {
     try {
-      const currentPattern = AppState.getCurrentPattern();
+      const currentPattern = await getWazuhCorePlugin().configuration.get(
+        'pattern',
+      );
       const pattern = await getDataPlugin().indexPatterns.get(currentPattern);
       await SavedObject.refreshIndexPattern(pattern);
     } catch (error) {

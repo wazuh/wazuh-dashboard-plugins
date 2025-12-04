@@ -60,9 +60,7 @@ jest.mock('../../../common/hooks/use-server-api-available', () => ({
 jest.mock('../../../../kibana-services');
 
 jest.mock('../../../../react-services/app-state', () => ({
-  AppState: {
-    getCurrentPattern: () => 'test',
-  },
+  AppState: {},
 }));
 
 getCookies.mockImplementation(() => {

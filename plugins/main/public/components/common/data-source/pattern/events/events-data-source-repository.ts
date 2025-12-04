@@ -1,5 +1,4 @@
 import { INDEX_PATTERN_EVENTS_REQUIRED_FIELDS } from '../../../../../../common/constants';
-import { AppState } from '../../../../../react-services';
 import {
   ErrorDataSourceNotFound,
   ErrorDataSourceAlertsSelect,
@@ -12,6 +11,7 @@ import {
 import { EventsDataSource } from './events-data-source';
 import { get } from 'lodash';
 import store from '../../../../../redux/store';
+import { getWazuhCorePlugin } from '../../../../../kibana-services';
 
 export class EventsDataSourceRepository extends PatternDataSourceRepository {
   constructor() {
@@ -63,7 +63,7 @@ export class EventsDataSourceRepository extends PatternDataSourceRepository {
   }
 
   async getDefault(dataSources): Promise<tParsedIndexPattern | null> {
-    const storedIndexPatternId = this.getStoreIndexPatternId();
+    const storedIndexPatternId = await this.getStoreIndexPatternId();
 
     if (!storedIndexPatternId) {
       throw new ErrorDataSourceAlertsSelect(
@@ -85,53 +85,22 @@ export class EventsDataSourceRepository extends PatternDataSourceRepository {
   }
 
   setDefault(dataSource: tParsedIndexPattern): void {
-    if (!dataSource) {
-      throw new Error('Index pattern is required');
-    }
-    AppState.setCurrentPattern(dataSource.id);
+    // No-op: Index pattern is now obtained from configuration, not stored in cookies
+    return;
   }
 
-  getStoreIndexPatternId(): string {
-    return AppState.getCurrentPattern();
-  }
-
-  async setupDefault(dataSources): Promise<void> {
-    if (!this.getStoreIndexPatternId()) {
-      const [dataSource] = dataSources;
-
-      if (!dataSource) {
-        throw new Error('No compatible index patterns found.');
-      }
-
-      AppState.setCurrentPattern(dataSource.id);
-    }
+  async getStoreIndexPatternId(): Promise<string> {
+    return await getWazuhCorePlugin().configuration.get('pattern');
   }
 }
 
 /* WORKAROUND: This is a workaround to ensure the default events index pattern is set when the app starts.
-  Multiple UI views depend on the events index pattern is created. This method try to set the cookie
-  where the events index pattern ID is stored.
-
+  Multiple UI views depend on the events index pattern is created.
   This logic could be moved to another service.
 */
 export async function EventsDataSourceSetup() {
-  const selectedIndexPatternId = AppState.getCurrentPattern();
-
   const factory = new PatternDataSourceFactory();
   const repository = new EventsDataSourceRepository();
 
-  const dataSources = await factory.createAll(
-    EventsDataSource,
-    await repository.getAll(),
-  );
-
-  // Check if the selected index pattern Id in cookie exists and skip
-  if (
-    selectedIndexPatternId &&
-    dataSources.find(({ id }) => id === selectedIndexPatternId)
-  ) {
-    return;
-  }
-
-  await repository.setupDefault(dataSources);
+  await factory.createAll(EventsDataSource, await repository.getAll());
 }

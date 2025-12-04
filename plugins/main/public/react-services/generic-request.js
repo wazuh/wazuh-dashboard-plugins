@@ -41,8 +41,9 @@ export class GenericRequest {
       const tmpUrl = getHttp().basePath.prepend(path);
 
       try {
+        const pattern = await getWazuhCorePlugin().configuration.get('pattern');
         requestHeaders.pattern = (
-          await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())
+          await getDataPlugin().indexPatterns.get(pattern)
         ).title;
       } catch (error) {}
 

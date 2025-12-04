@@ -10,10 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { AppState } from './app-state';
-
 import { Query, TimeRange, Filter } from '../../../../src/plugins/data/common';
-import { getDataPlugin } from '../kibana-services';
+import { getDataPlugin, getWazuhCorePlugin } from '../kibana-services';
 
 export interface IFilterParams {
   filters: Filter[];
@@ -22,7 +20,9 @@ export interface IFilterParams {
 }
 
 export async function getIndexPattern() {
-  const idIndexPattern = AppState.getCurrentPattern();
+  const idIndexPattern = await getWazuhCorePlugin().configuration.get(
+    'pattern',
+  );
   const indexPattern = await getDataPlugin().indexPatterns.get(idIndexPattern);
   return indexPattern;
 }

@@ -20,7 +20,7 @@ import {
   VisualizationBasicWidgetSelectorHeader,
 } from '../../../charts/visualizations/basic';
 import { useTimeFilter } from '../../../hooks';
-import { AppState } from '../../../../../react-services';
+import { getWazuhCorePlugin } from '../../../../../kibana-services';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import {
@@ -102,7 +102,9 @@ const RequirementVisBody = compose(
 
   const goToDashboardWithFilter = async (requirement, key, agent) => {
     pinnedAgentManager.pinAgent(agent);
-    const indexPatternId = AppState.getCurrentPattern();
+    const indexPatternId = await getWazuhCorePlugin().configuration.get(
+      'pattern',
+    );
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,

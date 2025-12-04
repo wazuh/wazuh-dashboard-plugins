@@ -79,14 +79,19 @@ describe('EventsDataSourceRepository', () => {
     };
     const parsedIndexPatternData =
       repository.parseIndexPattern(mockedIndexPattern);
+    // setDefault is now a no-op since pattern comes from configuration
     await repository.setDefault(parsedIndexPatternData);
-    expect(AppState.setCurrentPattern).toHaveBeenCalledWith(
-      mockedIndexPattern.id,
-    );
+    // No assertion needed as setDefault no longer stores in cookies
   });
 
   it('should return an ERROR when default index pattern is not saved in storage', async () => {
-    AppState.getCurrentPattern = jest.fn().mockReturnValue(null);
+    // Mock getWazuhCorePlugin configuration to return empty pattern
+    const { getWazuhCorePlugin } = require('../../../../../kibana-services');
+    jest.spyOn(require('../../../../../kibana-services'), 'getWazuhCorePlugin').mockReturnValue({
+      configuration: {
+        get: jest.fn().mockResolvedValue(''),
+      },
+    });
     try {
       await repository.getDefault([]);
     } catch (error) {
