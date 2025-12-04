@@ -3,7 +3,7 @@ import { DATA_SOURCE_FILTER_CONTROLLED_CONFIGURATION_ASSASSMENT_RULE_GROUP } fro
 import { AlertsDataSource } from '../alerts-data-source';
 
 const CONFIGURATION_ASSESSMENT_GROUP_KEY = 'wazuh.integration.decoders';
-const CONFIGURATION_ASSESSMENT_VALUE = 'sca';
+const CONFIGURATION_ASSESSMENT_VALUE = 'wazuh-sca';
 
 export class ConfigurationAssessmentDataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
