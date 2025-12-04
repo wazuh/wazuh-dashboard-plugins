@@ -10,6 +10,7 @@ export interface WazuhCheckUpdatesPluginStart {
     forceQuery: boolean,
   ) => Promise<AvailableUpdates>;
   DismissNotificationCheck: () => JSX.Element | null;
+  CtiRegistration: () => JSX.Element | null;
 }
 
 export interface AppPluginStartDependencies {
