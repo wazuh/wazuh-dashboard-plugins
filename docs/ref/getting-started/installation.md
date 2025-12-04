@@ -174,8 +174,6 @@ Define the Wazuh server hosts that the dashboard will use to query the Wazuh API
    chown -R wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/certs
    ```
 
-Ensure the SSL fields in `/etc/wazuh-dashboard/opensearch_dashboards.yml` (`server.ssl.enabled`, `server.ssl.certificate`, and `server.ssl.key`) point to the files you just deployed.
-
 ### Starting the Wazuh dashboard service
 
 1. Enable and start the Wazuh dashboard service.
