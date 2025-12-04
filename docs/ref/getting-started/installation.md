@@ -128,31 +128,31 @@ echo -e '[wazuh]\ngpgcheck=1\ngpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZU
 
 Edit the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file and replace the following values:
 
-   - **`server.host`**: This setting specifies the host of the Wazuh dashboard server. To allow remote users to connect, set the value to the IP address or DNS name of the Wazuh dashboard server. The value `0.0.0.0` will accept all the available IP addresses of the host.
-   - **`server.port`**: Port that the dashboard exposes. Use `443` if you serve it over HTTPS.
-   - **`opensearch.hosts`**: The URLs of the Wazuh indexer instances to use for all your queries. The Wazuh dashboard can be configured to connect to multiple Wazuh indexer nodes in the same cluster. The addresses of the nodes can be separated by commas. For example, `["https://10.0.0.2:9200", "https://10.0.0.3:9200","https://10.0.0.4:9200"]`
+- **`server.host`**: This setting specifies the host of the Wazuh dashboard server. To allow remote users to connect, set the value to the IP address or DNS name of the Wazuh dashboard server. The value `0.0.0.0` will accept all the available IP addresses of the host.
+- **`server.port`**: Port that the dashboard exposes. Use `443` if you serve it over HTTPS.
+- **`opensearch.hosts`**: The URLs of the Wazuh indexer instances to use for all your queries. The Wazuh dashboard can be configured to connect to multiple Wazuh indexer nodes in the same cluster. The addresses of the nodes can be separated by commas. For example, `["https://10.0.0.2:9200", "https://10.0.0.3:9200","https://10.0.0.4:9200"]`
 
-   ```yaml
-   server.host: 0.0.0.0
-   server.port: 443
-   opensearch.hosts: https://localhost:9200
-   opensearch.ssl.verificationMode: certificate
-   ```
+```yaml
+server.host: 0.0.0.0
+server.port: 443
+opensearch.hosts: https://localhost:9200
+opensearch.ssl.verificationMode: certificate
+```
 
 Define the Wazuh server hosts that the dashboard will use to query the Wazuh API. At least one host is required. Each host entry must include the URL, port, and credentials:
 
-   ```yaml
-   wazuh_core.hosts:
-      default:
-         url: https://<WAZUH_SERVER_IP_OR_DNS>
-         port: 55000
-         username: wazuh-wui
-         password: wazuh-wui
-         run_as: false
-   ```
+```yaml
+wazuh_core.hosts:
+  default:
+    url: https://<WAZUH_SERVER_IP_OR_DNS>
+    port: 55000
+    username: wazuh-wui
+    password: wazuh-wui
+    run_as: false
+```
 
-   - `run_as: true` will make the dashboard request data using the current user's context; leave it as `false` for the default service account.
-   - If you manage multiple Wazuh servers, add more entries under `wazuh_core.hosts` (for example, `regional_eu`, `regional_us`), each with its own connection details.
+- `run_as: true` will make the dashboard request data using the current user's context; leave it as `false` for the default service account.
+- If you manage multiple Wazuh servers, add more entries under `wazuh_core.hosts` (for example, `regional_eu`, `regional_us`), each with its own connection details.
 
 ### Deploying certificates
 
