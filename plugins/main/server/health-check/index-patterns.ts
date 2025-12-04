@@ -217,11 +217,11 @@ function getSavedObjectsClient(
   ctx: HealthCheckTaskContext,
   scope: InitializationTaskContext,
 ) {
-  if (scope.includes('internal')){
+  if (scope.includes('internal')) {
     return ctx.services.core.savedObjects.createInternalRepository();
   }
 
-  if (scope.includes('user')){
+  if (scope.includes('user')) {
     return ctx.services.core.savedObjects.savedObjectsStart.getScopedClient(
       ctx.request,
     );
