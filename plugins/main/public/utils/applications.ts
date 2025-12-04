@@ -749,6 +749,25 @@ const about = {
   redirectTo: () => '/settings?tab=about',
 };
 
+export const normalization = {
+  category: 'security_analytics',
+  id: 'normalization',
+  title: i18n.translate('wz-app-normalization-title', {
+    defaultMessage: 'Normalization',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-normalization-breadcrumbLabel', {
+    defaultMessage: 'Normalization',
+  }),
+  description: i18n.translate('wz-app-normalization-description', {
+    defaultMessage: 'PLACEHOLDER.',
+  }),
+  euiIconType: 'indexRollupApp',
+  order: 10007,
+  showInOverviewApp: false,
+  showInAgentMenu: false,
+  redirectTo: () => '/normalization',
+};
+
 export const Applications = [
   fileIntegrityMonitoring,
   overview,
@@ -781,6 +800,7 @@ export const Applications = [
   sampleData,
   about,
   ITHygiene,
+  normalization,
 ].sort((a, b) => {
   // Sort applications by order
   if (a.order < b.order) {
@@ -871,5 +891,11 @@ export const Categories = [
     }),
     order: 6e3,
     euiIconType: 'dashboardApp',
+  },
+  {
+    id: 'security_analytics',
+    label: 'Security analytics',
+    order: 550,
+    euiIconType: 'securityAnalyticsApp',
   },
 ];
