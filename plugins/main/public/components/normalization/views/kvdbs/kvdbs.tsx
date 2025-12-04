@@ -47,7 +47,6 @@ const relationIntegrationIDField = '__integration';
 const detailsMapLabels: { [key: string]: string } = {
   'document.id': 'ID',
   'document.name': 'Name',
-  integration_id: 'Integration ID',
   [`${relationIntegrationIDField}.document.title`]: 'Integration',
   'document.title': 'Title',
   'document.author': 'Author',
@@ -187,7 +186,7 @@ const tableColums = [
   {
     field: `${relationIntegrationIDField}.document.title`,
     name: 'Integration',
-    sortable: true,
+    sortable: false,
     render: (value: string) => (
       <WzLink
         appId={normalization.id}
@@ -248,34 +247,8 @@ const schema = {
     'document.title': {
       type: 'string',
     },
-    integration_id: {
-      type: 'string',
-    },
   },
 };
-
-const filters = [
-  {
-    type: 'field_value_selection',
-    field: 'integration_id',
-    name: 'Integration',
-    multiSelect: false,
-    options: async () => {
-      const response = await fetchInternalOpenSearchIndex(indexName, {
-        size: 0,
-        aggs: {
-          integrations: {
-            terms: { field: 'integration_id', size: 100 },
-          },
-        },
-      });
-      return response.aggregations.integrations.buckets.map((bucket: any) => ({
-        value: bucket.key,
-        name: bucket.key,
-      }));
-    },
-  },
-];
 
 const Body: React.FC = compose(
   withPanel(),
@@ -304,7 +277,6 @@ const Body: React.FC = compose(
               defaultQuery={initialQuery}
               schema={schema}
               onChange={onChangeSearch}
-              filters={filters}
             />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
