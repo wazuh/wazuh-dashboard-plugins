@@ -64,7 +64,7 @@ export enum WAZUH_MODULES_ID {
   GOOGLE_CLOUD_PLATFORM = 'gcp',
   POLICY_MONITORING = 'pm',
   SECURITY_CONFIGURATION_ASSESSMENT = 'sca',
-  AUDITING = 'audit',
+  AUDITING = 'azure-audit',
   VULNERABILITIES = 'vuls',
   DOCKER = 'docker',
   MITRE_ATTACK = 'mitre',
