@@ -58,25 +58,28 @@ async function ensureVisualizationSavedObject(
   client: SavedObjectsClientContract,
   visualization: SavedObjectVisualization,
   logger: InitializationTaskRunContext['logger'],
+  shouldOverwrite: boolean,
 ): Promise<SavedObject> {
   const { id, attributes, references = [] } = visualization;
 
-  logger.debug(`Creating visualization [${id}]`);
+  logger.debug(`Ensuring visualization [${id}]`);
 
-  const existingVisId = await isSavedObjectPresent(
-    client,
-    'visualization',
-    id,
-    logger,
-  );
-  if (existingVisId) return existingVisId;
+  if (!shouldOverwrite) {
+    const existingVisId = await isSavedObjectPresent(
+      client,
+      'visualization',
+      id,
+      logger,
+    );
+    if (existingVisId) return existingVisId;
+  }
 
   const visualizationSavedObject = await client.create(
     'visualization',
     attributes,
     {
       id,
-      overwrite: false,
+      overwrite: shouldOverwrite,
       refresh: true,
       references,
     },
@@ -92,22 +95,25 @@ async function ensureDashboardSavedObject(
   client: SavedObjectsClientContract,
   dashboard: SavedObjectDashboard,
   logger: InitializationTaskRunContext['logger'],
+  shouldOverwrite: boolean,
 ) {
   const { id, attributes, references = [] } = dashboard;
 
-  logger.debug(`Creating dashboard [${id}]`);
+  logger.debug(`Ensuring dashboard [${id}]`);
 
-  const existingDashId = await isSavedObjectPresent(
-    client,
-    'dashboard',
-    id,
-    logger,
-  );
-  if (existingDashId) return existingDashId;
+  if (!shouldOverwrite) {
+    const existingDashId = await isSavedObjectPresent(
+      client,
+      'dashboard',
+      id,
+      logger,
+    );
+    if (existingDashId) return existingDashId;
+  }
 
   const dashboardSavedObject = await client.create('dashboard', attributes, {
     id,
-    overwrite: false,
+    overwrite: shouldOverwrite,
     refresh: true,
     references,
   });
@@ -126,6 +132,12 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
       try {
         ctx.logger.debug('Starting saved objects provisioning');
 
+        const shouldOverwrite = ctx.context.scope === 'internal-initial';
+
+        shouldOverwrite
+          ? ctx.logger.info('Initializing/overwriting saved objects')
+          : ctx.logger.info('Initializing missing saved objects');
+
         const client: SavedObjectsClientContract =
           ctx.context.services.core.savedObjects.createInternalRepository();
 
@@ -141,7 +153,12 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
 
           await Promise.all(
             dashboardDefinition.visualizations.map(visualization =>
-              ensureVisualizationSavedObject(client, visualization, ctx.logger),
+              ensureVisualizationSavedObject(
+                client,
+                visualization,
+                ctx.logger,
+                shouldOverwrite,
+              ),
             ),
           );
 
@@ -149,6 +166,7 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
             client,
             dashboardDefinition.dashboard,
             ctx.logger,
+            shouldOverwrite,
           );
         }
 
