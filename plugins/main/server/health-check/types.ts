@@ -1,6 +1,10 @@
 import type { Logger } from 'opensearch_dashboards/server';
 
-export type TaskExecutionContext = 'internal' | 'user';
+export type TaskExecutionContext =
+  | 'internal'
+  | 'internal-initial'
+  | 'internal-scheduled'
+  | 'user';
 
 export type InitializationTaskContext = TaskExecutionContext;
 

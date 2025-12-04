@@ -85,7 +85,8 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
     mockReadDashboardDefinitionFiles.mockReturnValue([mockDefinition]);
   });
 
-  it('creates the required visualizations and dashboard when they are missing', async () => {
+  it('creates the required visualizations and dashboard when they are missing (internal-scheduled)', async () => {
+    ctx.scope = 'internal-scheduled';
     mockClient.get.mockRejectedValue({ output: { statusCode: 404 } });
     mockClient.create
       .mockResolvedValueOnce(mockVisualization)
@@ -98,13 +99,11 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
     expect(result).toEqual({ status: 'ok' });
     expect(mockCreateInternalRepository).toHaveBeenCalledTimes(1);
     expect(mockReadDashboardDefinitionFiles).toHaveBeenCalledTimes(1);
-
     expect(mockClient.get).toHaveBeenCalledWith(
       'visualization',
       mockVisualization.id,
     );
     expect(mockClient.get).toHaveBeenCalledWith('dashboard', mockDashboard.id);
-
     expect(mockClient.create).toHaveBeenCalledWith(
       'visualization',
       mockVisualization.attributes,
@@ -128,6 +127,41 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
 
     expect(ctx.logger.debug).toHaveBeenCalledWith(
       'Saved objects provisioning finished',
+    );
+  });
+
+  it('overwrites the visualizations and dashboard without checking existence (internal-initial)', async () => {
+    ctx.scope = 'internal-initial';
+    mockClient.create
+      .mockResolvedValueOnce(mockVisualization)
+      .mockResolvedValueOnce(mockDashboard);
+
+    const task =
+      initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations();
+    const result = await task.run(ctx);
+
+    expect(result).toEqual({ status: 'ok' });
+    expect(mockCreateInternalRepository).toHaveBeenCalledTimes(1);
+    expect(mockClient.get).not.toHaveBeenCalled();
+    expect(mockClient.create).toHaveBeenCalledWith(
+      'visualization',
+      mockVisualization.attributes,
+      {
+        id: mockVisualization.id,
+        overwrite: true,
+        refresh: true,
+        references: mockVisualization.references,
+      },
+    );
+    expect(mockClient.create).toHaveBeenCalledWith(
+      'dashboard',
+      mockDashboard.attributes,
+      {
+        id: mockDashboard.id,
+        overwrite: true,
+        refresh: true,
+        references: mockDashboard.references,
+      },
     );
   });
 });
