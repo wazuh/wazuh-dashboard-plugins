@@ -87,11 +87,13 @@ describe('EventsDataSourceRepository', () => {
   it('should return an ERROR when default index pattern is not saved in storage', async () => {
     // Mock getWazuhCorePlugin configuration to return empty pattern
     const { getWazuhCorePlugin } = require('../../../../../kibana-services');
-    jest.spyOn(require('../../../../../kibana-services'), 'getWazuhCorePlugin').mockReturnValue({
-      configuration: {
-        get: jest.fn().mockResolvedValue(''),
-      },
-    });
+    jest
+      .spyOn(require('../../../../../kibana-services'), 'getWazuhCorePlugin')
+      .mockReturnValue({
+        configuration: {
+          get: jest.fn().mockResolvedValue(''),
+        },
+      });
     try {
       await repository.getDefault([]);
     } catch (error) {

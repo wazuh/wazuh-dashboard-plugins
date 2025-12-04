@@ -21,7 +21,9 @@ export const getLast24HoursAlerts = async (
 ): Promise<Last24HoursAlerts> => {
   try {
     const pattern = await getWazuhCorePlugin().configuration.get('pattern');
-    const currentIndexPattern = await getDataPlugin().indexPatterns.get(pattern);
+    const currentIndexPattern = await getDataPlugin().indexPatterns.get(
+      pattern,
+    );
     const clusterValue = AppState.getClusterInfo().cluster;
 
     const lastAlertsQuery = getLastAlertsQuery(
