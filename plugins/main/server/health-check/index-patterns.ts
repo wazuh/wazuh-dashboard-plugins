@@ -217,20 +217,14 @@ function getSavedObjectsClient(
   ctx: HealthCheckTaskContext,
   scope: InitializationTaskContext,
 ) {
-  switch (scope) {
-    case 'internal': {
-      return ctx.services.core.savedObjects.createInternalRepository();
-    }
+  if (scope.includes('internal')) {
+    return ctx.services.core.savedObjects.createInternalRepository();
+  }
 
-    case 'user': {
-      return ctx.services.core.savedObjects.savedObjectsStart.getScopedClient(
-        ctx.request,
-      );
-    }
-
-    default: {
-      break;
-    }
+  if (scope.includes('user')) {
+    return ctx.services.core.savedObjects.savedObjectsStart.getScopedClient(
+      ctx.request,
+    );
   }
 }
 
@@ -238,22 +232,16 @@ function getIndexPatternsClient(
   ctx: HealthCheckTaskContext,
   scope: InitializationTaskContext,
 ) {
-  switch (scope) {
-    case 'internal': {
-      return new IndexPatternsFetcher(
-        ctx.services.core.opensearch.legacy.client.callAsInternalUser,
-      );
-    }
+  if (scope.includes('internal')) {
+    return new IndexPatternsFetcher(
+      ctx.services.core.opensearch.legacy.client.callAsInternalUser,
+    );
+  }
 
-    case 'user': {
-      return new IndexPatternsFetcher(
-        ctx.services.core.opensearch.legacy.client.callAsCurrentUser,
-      );
-    }
-
-    default: {
-      break;
-    }
+  if (scope.includes('user')) {
+    return new IndexPatternsFetcher(
+      ctx.services.core.opensearch.legacy.client.callAsCurrentUser,
+    );
   }
 }
 
@@ -266,21 +254,16 @@ async function getIndexPatternID(
   if (indexPatternID) {
     return indexPatternID;
   }
-  switch (ctx.scope) {
-    case 'internal': {
-      return configurationSettingKey
-        ? await services.configuration.get(configurationSettingKey)
-        : undefined;
-    }
 
-    case 'user': {
-      // TODO
-      return ctx.getIndexPatternID(ctx);
-    }
+  if (ctx?.scope?.includes('internal')) {
+    return configurationSettingKey
+      ? await services.configuration.get(configurationSettingKey)
+      : undefined;
+  }
 
-    default: {
-      break;
-    }
+  if (ctx?.scope?.includes('user')) {
+    // TODO
+    return ctx?.getIndexPatternID?.(ctx);
   }
 }
 
