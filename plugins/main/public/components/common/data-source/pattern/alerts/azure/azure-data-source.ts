@@ -3,7 +3,7 @@ import { DATA_SOURCE_FILTER_CONTROLLED_AZURE_RULE_GROUP } from '../../../../../.
 import { AlertsDataSource } from '../alerts-data-source';
 
 const AZURE_GROUP_KEY = 'wazuh.integration.decoders';
-const AZURE_GROUP_VALUE = 'ms-graph';
+const AZURE_GROUP_VALUE = 'azure-graphactivity';
 
 export class AzureDataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
