@@ -191,7 +191,7 @@ const Details: React.FC<{ item: { document: { id: string } } }> = ({
           },
           {
             id: 'content',
-            name: 'File',
+            name: 'Content',
             content: <AssetViewer content={action.data.decoder || ''} />,
           },
         ]}
