@@ -57,65 +57,11 @@ const tableColums = [
     field: decodersCountKey,
     name: 'Decoders',
     sortable: false,
-    render: (
-      value: string,
-      item: { document: { title: string; id: string } },
-    ) => (
-      <WzLink
-        appId={normalization.id}
-        path={`/${
-          normalization.id
-        }/${DecodersId}?query=integration_id:${encodeURIComponent(
-          item.document.id,
-        )}`}
-        toolTipProps={{
-          content: i18n.translate(
-            'normalization.decoders.navigate_to_with_filter',
-            {
-              defaultMessage: `Navigate to {appName} filtering by {integrationName} integration`,
-              values: {
-                appName: DecodersName,
-                integrationName: item.document.title,
-              },
-            },
-          ),
-        }}
-      >
-        {value}
-      </WzLink>
-    ),
   },
   {
     field: kvdbsCountKey,
     name: 'KVDBs',
     sortable: false,
-    render: (
-      value: string,
-      item: { document: { title: string; id: string } },
-    ) => (
-      <WzLink
-        appId={normalization.id}
-        path={`/${
-          normalization.id
-        }/${KVDBsId}?query=integration_id:${encodeURIComponent(
-          item.document.id,
-        )}`}
-        toolTipProps={{
-          content: i18n.translate(
-            'normalization.kvdbs.navigate_to_with_filter',
-            {
-              defaultMessage: `Navigate to {appName} filtering by {integrationName} integration`,
-              values: {
-                appName: KVDBsName,
-                integrationName: item.document.title,
-              },
-            },
-          ),
-        }}
-      >
-        {value}
-      </WzLink>
-    ),
   },
 ];
 
