@@ -3,7 +3,7 @@ import { DATA_SOURCE_FILTER_CONTROLLED_AWS_RULE_GROUP } from '../../../../../../
 import { AlertsDataSource } from '../alerts-data-source';
 
 const AWS_GROUP_KEY = 'wazuh.integration.decoders';
-const AWS_GROUP_VALUE = 'amazon';
+const AWS_GROUP_VALUE = 'aws-audit';
 
 export class AWSDataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
