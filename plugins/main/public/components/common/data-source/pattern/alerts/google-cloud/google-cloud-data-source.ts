@@ -3,7 +3,7 @@ import { DATA_SOURCE_FILTER_CONTROLLED_GOOGLE_CLOUD_RULE_GROUP } from '../../../
 import { AlertsDataSource } from '../alerts-data-source';
 
 const GOOGLE_CLOUD_GROUP_KEY = 'wazuh.integration.decoders';
-const GOOGLE_CLOUD_GROUP_VALUE = 'gcp';
+const GOOGLE_CLOUD_GROUP_VALUE = 'gcp-audit';
 
 export class GoogleCloudDataSource extends AlertsDataSource {
   constructor(id: string, title: string) {

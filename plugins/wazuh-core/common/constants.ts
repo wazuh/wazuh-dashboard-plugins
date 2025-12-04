@@ -61,7 +61,7 @@ export enum WAZUH_MODULES_ID {
   INTEGRITY_MONITORING = 'fim',
   AMAZON_WEB_SERVICES = 'aws',
   OFFICE_365 = 'office',
-  GOOGLE_CLOUD_PLATFORM = 'gcp',
+  GOOGLE_CLOUD_PLATFORM = 'gcp-audit',
   POLICY_MONITORING = 'pm',
   SECURITY_CONFIGURATION_ASSESSMENT = 'sca',
   AUDITING = 'azure-audit',
