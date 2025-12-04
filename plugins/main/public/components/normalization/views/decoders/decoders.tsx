@@ -81,7 +81,9 @@ const Details: React.FC<{ item: { document: { id: string } } }> = ({
     const [hitWithRelation] = await fetchInternalOpenSearchIndexItemsRelation(
       [hit._source],
       {
-        integration_id: {
+        'document.id': {
+          field: 'document.id',
+          indexField: 'document.decoders',
           index: OverviewIndexName,
           target_field: relationIntegrationIDField,
         },
@@ -383,7 +385,9 @@ const Body: React.FC = compose(
               params,
               {
                 relations: {
-                  integration_id: {
+                  'document.id': {
+                    field: 'document.id',
+                    indexField: 'document.decoders',
                     index: OverviewIndexName,
                     target_field: relationIntegrationIDField,
                   },

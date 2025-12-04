@@ -96,7 +96,9 @@ export async function fetchInternalOpenSearchIndexItemsInTable<
 interface RelationDefintion {
   field?: string;
   index: string;
+  indexField?: string;
   target_field?: string;
+  type?: 'one-to-one' | 'one-to-many';
 }
 
 export async function fetchInternalOpenSearchIndexItemsRelation<
@@ -108,30 +110,70 @@ export async function fetchInternalOpenSearchIndexItemsRelation<
     [key: string]: RelationDefintion;
   },
 ): Promise<R[]> {
-  for (const [field, relation] of Object.entries(relations)) {
+  for (const relation of Object.values(relations)) {
     const {
-      field: relationField,
+      field,
+      indexField: relationField,
       index,
       target_field,
+      type = 'one-to-one',
     } = relation as RelationDefintion;
+
+    const useDocIds = !relationField;
 
     const relatedIds = items
       .map((item: any) => get(item, field))
       .filter((v: any, i: number, a: any[]) => v != null && a.indexOf(v) === i);
 
-    const query = !relationField ? { ids: { values: relatedIds } } : {}; // TODO: implement other relation types;
+    const query = useDocIds
+      ? { ids: { values: relatedIds } }
+      : {
+          terms: { [relationField]: relatedIds },
+        };
 
     const response = await fetchInternalOpenSearchIndexItems(index, {
       size: relatedIds.length,
       query,
     });
 
-    const relatedItemsMap: { [key: string]: any } = Object.fromEntries(
-      response.items.map(({ _id, _source }) => [_id, _source]), // TODO: implement other relation types;
-    );
+    const relatedIdsSet = new Set(relatedIds);
+
+    const relatedItemsMap = new Map();
+
+    for (const { _id, _source } of Object.values(response.items) as {
+      _id: string;
+      _source: any;
+    }[]) {
+      let key;
+      if (useDocIds) {
+        key = _id;
+        relatedItemsMap.set(key, _source);
+      } else {
+        const relationFieldValue = get(_source, relationField!);
+        if (Array.isArray(relationFieldValue)) {
+          for (const relationFieldVal of relationFieldValue) {
+            if (relatedIdsSet.has(relationFieldVal)) {
+              if (type === 'one-to-one') {
+                if (!relatedItemsMap.has(relationFieldVal)) {
+                  relatedItemsMap.set(relationFieldVal, _source);
+                }
+              } else if (type === 'one-to-many') {
+                if (!relatedItemsMap.has(relationFieldVal)) {
+                  relatedItemsMap.set(relationFieldVal, []);
+                }
+                relatedItemsMap.get(relationFieldVal).push(_source);
+              }
+            }
+          }
+        } else {
+          key = relationFieldValue;
+          relatedItemsMap.set(key, _source);
+        }
+      }
+    }
 
     items = items.map((item: any) => {
-      const relationData = relatedItemsMap[get(item, field)];
+      const relationData = relatedItemsMap.get(get(item, field));
       set(item, target_field || field, relationData);
       return item;
     });
@@ -166,36 +208,6 @@ export async function fetchInternalOpenSearchIndexItemsInTableRelation<
 
   if (relations) {
     items = await fetchInternalOpenSearchIndexItemsRelation(items, relations);
-    // for (const [field, relation] of Object.entries(relations)) {
-    // const {
-    //   field: relationField,
-    //   index,
-    //   target_field,
-    // } = relation as RelationDefintion;
-
-    // const relatedIds = items
-    //   .map((item: any) => get(item, field))
-    //   .filter(
-    //     (v: any, i: number, a: any[]) => v != null && a.indexOf(v) === i,
-    //   );
-
-    // const query = !relationField ? { ids: { values: relatedIds } } : {}; // TODO: implement other relation types;
-
-    // const response = await fetchInternalOpenSearchIndexItems(index, {
-    //   size: relatedIds.length,
-    //   query,
-    // });
-
-    // const relatedItemsMap: { [key: string]: any } = Object.fromEntries(
-    //   response.items.map(({ _id, _source }) => [_id, _source]), // TODO: implement other relation types;
-    // );
-
-    // items = items.map((item: any) => {
-    //   const relationData = relatedItemsMap[get(item, field)];
-    //   set(item, target_field || field, relationData);
-    //   return item;
-    // });
-    // }
   }
 
   return { items, totalItems };

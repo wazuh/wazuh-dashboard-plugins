@@ -29,7 +29,6 @@ import {
 } from '../overview/info';
 import {
   fetchInternalOpenSearchIndex,
-  fetchInternalOpenSearchIndexItemsInTable,
   fetchInternalOpenSearchIndexItemsInTableRelation,
   fetchInternalOpenSearchIndexItemsRelation,
 } from '../../services/http';
@@ -78,7 +77,9 @@ const Details: React.FC<{ item: { id: string; space: string } }> = ({
     const [hitWithRelation] = await fetchInternalOpenSearchIndexItemsRelation(
       [hit._source],
       {
-        integration_id: {
+        'document.id': {
+          field: 'document.id',
+          indexField: 'document.kvdbs',
           index: OverviewIndexName,
           target_field: relationIntegrationIDField,
         },
@@ -324,7 +325,9 @@ const Body: React.FC = compose(
               params,
               {
                 relations: {
-                  integration_id: {
+                  'document.id': {
+                    field: 'document.id',
+                    indexField: 'document.kvdbs',
                     index: OverviewIndexName,
                     target_field: relationIntegrationIDField,
                   },
