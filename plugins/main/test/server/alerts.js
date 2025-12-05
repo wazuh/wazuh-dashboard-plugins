@@ -5,7 +5,10 @@ const elasticServer = process.env.WAZUH_ELASTIC_IP || 'localhost';
 chai.should();
 
 const headers = {
-  headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' }
+  headers: {
+    ...PLUGIN_PLATFORM_REQUEST_HEADERS,
+    'content-type': 'application/json',
+  },
 };
 
 const date = new Date();
@@ -39,12 +42,12 @@ const syscheck = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'wazuh.integration.decoders': 'syscheck' } }
-          ]
-        }
-      }
+            { match: { 'wazuh.integration.decoders': 'syscheck' } },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -56,7 +59,9 @@ const syscheck = async agentID => {
   checkRes(res);
   commonFields(sample);
   sample.syscheck.should.be.a('object');
-  sample.wazuh.integration.decoders.should.be.a('array').that.includes('syscheck');
+  sample.wazuh.integration.decoders.should.be
+    .a('array')
+    .that.includes('syscheck');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
   sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
@@ -112,12 +117,14 @@ const vulnerability = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'wazuh.integration.decoders': 'vulnerability-detector' } }
-          ]
-        }
-      }
+            {
+              match: { 'wazuh.integration.decoders': 'vulnerability-detector' },
+            },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -158,12 +165,12 @@ const pciDss = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { exists: { field: 'rule.pci_dss' } }
-          ]
-        }
-      }
+            { exists: { field: 'rule.pci_dss' } },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -192,12 +199,12 @@ const gdpr = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { exists: { field: 'rule.gdpr' } }
-          ]
-        }
-      }
+            { exists: { field: 'rule.gdpr' } },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -226,12 +233,12 @@ const audit = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'wazuh.integration.decoders': 'audit' } }
-          ]
-        }
-      }
+            { match: { 'wazuh.integration.decoders': 'audit' } },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -259,7 +266,7 @@ describe('Elasticsearch', () => {
       'get',
       `${elasticServer}:9200/_cat/indices`,
       {},
-      headers
+      headers,
     );
     res.statusCode.should.be.eql(200);
     res.body.should.be.a('string');
@@ -270,7 +277,7 @@ describe('Elasticsearch', () => {
       'get',
       `${elasticServer}:9200/_cat/indices/${index}`,
       {},
-      headers
+      headers,
     );
     res.statusCode.should.be.eql(200);
     res.body.should.be.a('string');

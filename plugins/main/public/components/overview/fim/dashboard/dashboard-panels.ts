@@ -434,7 +434,12 @@ const getVisStateFIMTopAgentsUser = (indexPatternId: string) => {
               params: { query: 'syscheck', type: 'phrase' },
             },
             query: {
-              match: { 'wazuh.integration.decoders': { query: 'syscheck', type: 'phrase' } },
+              match: {
+                'wazuh.integration.decoders': {
+                  query: 'syscheck',
+                  type: 'phrase',
+                },
+              },
             },
             $state: { store: 'appState' },
           },

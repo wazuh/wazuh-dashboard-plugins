@@ -266,7 +266,12 @@ export class WazuhElasticCtrl {
    * @param {Array<Object>} indexPatternList List of index patterns
    */
   validateIndexPattern(indexPatternList) {
-    const minimum = ['timestamp', 'wazuh.integration.decoders', 'manager.name', 'agent.id'];
+    const minimum = [
+      'timestamp',
+      'wazuh.integration.decoders',
+      'manager.name',
+      'agent.id',
+    ];
     let list = [];
     for (const index of indexPatternList) {
       let valid, parsed;

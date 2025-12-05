@@ -379,7 +379,10 @@ export const getVisStateFIMTopAgentsUser = (
             },
             query: {
               match: {
-                'wazuh.integration.decoders': { query: 'syscheck', type: 'phrase' },
+                'wazuh.integration.decoders': {
+                  query: 'syscheck',
+                  type: 'phrase',
+                },
               },
             },
             $state: { store: 'appState' },

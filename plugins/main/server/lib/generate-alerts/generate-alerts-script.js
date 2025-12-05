@@ -1237,7 +1237,9 @@ function generateAlert(params) {
       }
       case 'invalidLoginUser': {
         alert.rule = { ...Authentication.invalidLoginUser.rule };
-        alert.wazuh.integration.decoders = [...Authentication.invalidLoginUser.wazuh.integration.decoders];
+        alert.wazuh.integration.decoders = [
+          ...Authentication.invalidLoginUser.wazuh.integration.decoders,
+        ];
         alert.message = generateMessage({
           action: 'Invalid user for SSH login',
           user: userName,
@@ -1248,7 +1250,8 @@ function generateAlert(params) {
       case 'multipleAuthenticationFailures': {
         alert.rule = { ...Authentication.multipleAuthenticationFailures.rule };
         alert.wazuh.integration.decoders = [
-          ...Authentication.multipleAuthenticationFailures.wazuh.integration.decoders,
+          ...Authentication.multipleAuthenticationFailures.wazuh.integration
+            .decoders,
         ];
         alert.rule.frequency = Random.number(5, 50);
         alert.message = generateMessage({
@@ -1261,7 +1264,8 @@ function generateAlert(params) {
       case 'windowsInvalidLoginPassword': {
         alert.rule = { ...Authentication.windowsInvalidLoginPassword.rule };
         alert.wazuh.integration.decoders = [
-          ...Authentication.windowsInvalidLoginPassword.wazuh.integration.decoders,
+          ...Authentication.windowsInvalidLoginPassword.wazuh.integration
+            .decoders,
         ];
         alert.rule.frequency = Random.number(5, 50);
         // Windows event data
@@ -1288,7 +1292,9 @@ function generateAlert(params) {
       }
       case 'userLoginFailed': {
         alert.rule = { ...Authentication.userLoginFailed.rule };
-        alert.wazuh.integration.decoders = [...Authentication.userLoginFailed.wazuh.integration.decoders];
+        alert.wazuh.integration.decoders = [
+          ...Authentication.userLoginFailed.wazuh.integration.decoders,
+        ];
         alert.message = generateMessage({
           action: 'User login failed',
           user: userName,
@@ -1298,7 +1304,9 @@ function generateAlert(params) {
       }
       case 'passwordCheckFailed': {
         alert.rule = { ...Authentication.passwordCheckFailed.rule };
-        alert.wazuh.integration.decoders = [...Authentication.passwordCheckFailed.wazuh.integration.decoders];
+        alert.wazuh.integration.decoders = [
+          ...Authentication.passwordCheckFailed.wazuh.integration.decoders,
+        ];
         alert.message = generateMessage({
           action: 'Password check failed',
           user: userName,
@@ -1307,7 +1315,9 @@ function generateAlert(params) {
       }
       case 'nonExistentUser': {
         alert.rule = { ...Authentication.nonExistentUser.rule };
-        alert.wazuh.integration.decoders = [...Authentication.nonExistentUser.wazuh.integration.decoders];
+        alert.wazuh.integration.decoders = [
+          ...Authentication.nonExistentUser.wazuh.integration.decoders,
+        ];
         alert.message = generateMessage({
           action: 'Attempt to login with non-existent user',
           user: userName,
@@ -1318,7 +1328,8 @@ function generateAlert(params) {
       case 'bruteForceTryingAccessSystem': {
         alert.rule = { ...Authentication.bruteForceTryingAccessSystem.rule };
         alert.wazuh.integration.decoders = [
-          ...Authentication.bruteForceTryingAccessSystem.wazuh.integration.decoders,
+          ...Authentication.bruteForceTryingAccessSystem.wazuh.integration
+            .decoders,
         ];
         alert.message = generateMessage({
           action: 'Brute force attack detected',
@@ -1329,7 +1340,9 @@ function generateAlert(params) {
       }
       case 'reverseLoockupError': {
         alert.rule = { ...Authentication.reverseLoockupError.rule };
-        alert.wazuh.integration.decoders = [...Authentication.reverseLoockupError.wazuh.integration.decoders];
+        alert.wazuh.integration.decoders = [
+          ...Authentication.reverseLoockupError.wazuh.integration.decoders,
+        ];
         alert.message = generateMessage({
           action: 'Reverse DNS lookup error',
           sourceIp: sourceIp,
@@ -1339,7 +1352,8 @@ function generateAlert(params) {
       case 'insecureConnectionAttempt': {
         alert.rule = { ...Authentication.insecureConnectionAttempt.rule };
         alert.wazuh.integration.decoders = [
-          ...Authentication.insecureConnectionAttempt.wazuh.integration.decoders,
+          ...Authentication.insecureConnectionAttempt.wazuh.integration
+            .decoders,
         ];
         alert.message = generateMessage({
           action: 'Insecure connection attempt',
@@ -1366,7 +1380,8 @@ function generateAlert(params) {
             ...Authentication.maximumAuthenticationAttemptsExceeded.rule,
           };
           alert.wazuh.integration.decoders = [
-            ...Authentication.maximumAuthenticationAttemptsExceeded.wazuh.integration.decoders,
+            ...Authentication.maximumAuthenticationAttemptsExceeded.wazuh
+              .integration.decoders,
           ];
           alert.message = generateMessage({
             action: 'Maximum authentication attempts exceeded',
@@ -1438,7 +1453,9 @@ function generateAlert(params) {
 
     // Set rule
     alert.rule = { ...typeAlert.rule };
-    alert.wazuh.integration.decoders = [...typeAlert.wazuh.integration.decoders];
+    alert.wazuh.integration.decoders = [
+      ...typeAlert.wazuh.integration.decoders,
+    ];
     alert.rule.firedtimes = Random.number(1, 15);
 
     // Generate message
