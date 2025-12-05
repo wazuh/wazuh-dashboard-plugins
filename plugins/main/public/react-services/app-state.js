@@ -249,22 +249,7 @@ export class AppState {
    * @returns {Promise<string>} The current index pattern ID
    */
   static async getCurrentPattern() {
-    try {
-      return await getWazuhCorePlugin().configuration.get('pattern');
-    } catch (error) {
-      const options = {
-        context: `${AppState.name}.getCurrentPattern`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.UI,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: `${error.name}: Error get current pattern`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-      throw error;
-    }
+    return await getWazuhCorePlugin().configuration.get('pattern');
   }
 
   /**
