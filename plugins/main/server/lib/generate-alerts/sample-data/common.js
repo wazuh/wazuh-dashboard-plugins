@@ -281,7 +281,7 @@ module.exports.DECODER = {
     name: 'web-accesslog',
   },
   ROOTCHECK: {
-    name: 'rootcheck',
+    name: 'wazuh-rootcheck',
   },
   APACHE_ERRORLOG: {
     parent: 'apache-errorlog',
