@@ -11,7 +11,8 @@
  */
 
 import { Query, TimeRange, Filter } from '../../../../src/plugins/data/common';
-import { getDataPlugin, getWazuhCorePlugin } from '../kibana-services';
+import { getDataPlugin } from '../kibana-services';
+import { AppState } from './app-state';
 
 export interface IFilterParams {
   filters: Filter[];
@@ -20,9 +21,7 @@ export interface IFilterParams {
 }
 
 export async function getIndexPattern() {
-  const idIndexPattern = await getWazuhCorePlugin().configuration.get(
-    'pattern',
-  );
+  const idIndexPattern = await AppState.getCurrentPattern();
   const indexPattern = await getDataPlugin().indexPatterns.get(idIndexPattern);
   return indexPattern;
 }

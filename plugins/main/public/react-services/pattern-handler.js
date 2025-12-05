@@ -10,7 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import { SavedObject } from './saved-objects';
-import { getDataPlugin, getWazuhCorePlugin } from '../kibana-services';
+import { getDataPlugin } from '../kibana-services';
+import { AppState } from './app-state';
 
 export class PatternHandler {
   /**
@@ -18,7 +19,7 @@ export class PatternHandler {
    */
   static async getPatternList(origin) {
     try {
-      const pattern = await getWazuhCorePlugin().configuration.get('pattern');
+      const pattern = await AppState.getCurrentPattern();
 
       const defaultPatterns = [pattern];
       let patternList = await SavedObject.getListOfWazuhValidIndexPatterns(
@@ -39,9 +40,7 @@ export class PatternHandler {
    */
   static async refreshIndexPattern() {
     try {
-      const currentPattern = await getWazuhCorePlugin().configuration.get(
-        'pattern',
-      );
+      const currentPattern = await AppState.getCurrentPattern();
       const pattern = await getDataPlugin().indexPatterns.get(currentPattern);
       await SavedObject.refreshIndexPattern(pattern);
     } catch (error) {

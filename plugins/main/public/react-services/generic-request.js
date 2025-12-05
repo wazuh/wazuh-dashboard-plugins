@@ -17,6 +17,7 @@ import { getHttp, getDataPlugin, getWazuhCorePlugin } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 import NavigationService from './navigation-service';
+import { AppState } from './app-state';
 
 export class GenericRequest {
   /**
@@ -41,7 +42,7 @@ export class GenericRequest {
       const tmpUrl = getHttp().basePath.prepend(path);
 
       try {
-        const pattern = await getWazuhCorePlugin().configuration.get('pattern');
+        const pattern = await AppState.getCurrentPattern();
         requestHeaders.pattern = (
           await getDataPlugin().indexPatterns.get(pattern)
         ).title;

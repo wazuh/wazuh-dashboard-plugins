@@ -1,9 +1,10 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { getCore, getWazuhCorePlugin } from '../../../../kibana-services';
+import { getCore } from '../../../../kibana-services';
 import { PatternDataSourceFilterManager } from '../../data-source';
 import { withWrapComponent } from '../../hocs';
 import { WazuhFlyoutDiscoverNewFilterManager } from '../../wazuh-discover/wz-flyout-discover';
 import { EuiFlexGroup, EuiFlexItem, EuiLink } from '@elastic/eui';
+import { AppState } from '../../../../react-services/app-state';
 
 const generatePathNavigate = ({
   document,
@@ -50,9 +51,7 @@ export const WazuhFlyoutDiscoverNewFilterManagerRecentEvents =
 
       useEffect(() => {
         (async () => {
-          const pattern = await getWazuhCorePlugin().configuration.get(
-            'pattern',
-          );
+          const pattern = await AppState.getCurrentPattern();
           setPatternId(pattern);
         })();
       }, []);

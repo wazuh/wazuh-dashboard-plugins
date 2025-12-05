@@ -11,15 +11,14 @@
  */
 import { useState, useEffect } from 'react';
 import { IIndexPattern } from '../../../../../../src/plugins/data/public';
-import { getDataPlugin, getWazuhCorePlugin } from '../../../kibana-services';
+import { getDataPlugin } from '../../../kibana-services';
+import { AppState } from '../../../react-services/app-state';
 
 export const useIndexPattern = (): IIndexPattern | undefined => {
   const [indexPattern, setIndexPattern] = useState();
   useEffect(() => {
     (async () => {
-      const idIndexPattern = await getWazuhCorePlugin().configuration.get(
-        'pattern',
-      );
+      const idIndexPattern = await AppState.getCurrentPattern();
       getDataPlugin().indexPatterns.get(idIndexPattern).then(setIndexPattern);
     })();
   }, []);

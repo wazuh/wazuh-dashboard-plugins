@@ -20,7 +20,7 @@ import {
   VisualizationBasicWidgetSelectorHeader,
 } from '../../../charts/visualizations/basic';
 import { useTimeFilter } from '../../../hooks';
-import { getWazuhCorePlugin } from '../../../../../kibana-services';
+import { AppState } from '../../../../../react-services/app-state';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import {

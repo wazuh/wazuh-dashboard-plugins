@@ -13,7 +13,12 @@
 import store from '../redux/store';
 import { updateCurrentApi } from '../redux/actions/appStateActions';
 import { CSVRequest } from '../services/csv-request';
-import { getToasts, getCookies, setCookies } from '../kibana-services';
+import {
+  getToasts,
+  getCookies,
+  setCookies,
+  getWazuhCorePlugin,
+} from '../kibana-services';
 import * as FileSaver from '../services/file-saver';
 import { WzAuthentication } from './wz-authentication';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
@@ -237,6 +242,29 @@ export class AppState {
   static setPatternSelector(value) {
     const encodedPattern = encodeURI(value);
     getCookies().set('patternSelector', encodedPattern, {});
+  }
+
+  /**
+   * Get current index pattern from plugin configuration
+   * @returns {Promise<string>} The current index pattern ID
+   */
+  static async getCurrentPattern() {
+    try {
+      return await getWazuhCorePlugin().configuration.get('pattern');
+    } catch (error) {
+      const options = {
+        context: `${AppState.name}.getCurrentPattern`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `${error.name}: Error get current pattern`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+      throw error;
+    }
   }
 
   /**

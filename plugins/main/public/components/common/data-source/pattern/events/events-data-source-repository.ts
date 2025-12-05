@@ -11,7 +11,7 @@ import {
 import { EventsDataSource } from './events-data-source';
 import { get } from 'lodash';
 import store from '../../../../../redux/store';
-import { getWazuhCorePlugin } from '../../../../../kibana-services';
+import { AppState } from '../../../../../react-services/app-state';
 
 export class EventsDataSourceRepository extends PatternDataSourceRepository {
   constructor() {
@@ -90,7 +90,7 @@ export class EventsDataSourceRepository extends PatternDataSourceRepository {
   }
 
   async getStoreIndexPatternId(): Promise<string> {
-    return await getWazuhCorePlugin().configuration.get('pattern');
+    return await AppState.getCurrentPattern();
   }
 }
 
