@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { AppState } from './app-state';
 import { ApiCheck } from './wz-api-check';
 import { WzMisc } from '../factories/misc';
 import { getHttp, getDataPlugin, getWazuhCorePlugin } from '../kibana-services';
