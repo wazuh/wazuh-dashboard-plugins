@@ -13,7 +13,12 @@
 import store from '../redux/store';
 import { updateCurrentApi } from '../redux/actions/appStateActions';
 import { CSVRequest } from '../services/csv-request';
-import { getToasts, getCookies, setCookies } from '../kibana-services';
+import {
+  getToasts,
+  getCookies,
+  setCookies,
+  getWazuhCorePlugin,
+} from '../kibana-services';
 import * as FileSaver from '../services/file-saver';
 import { WzAuthentication } from './wz-authentication';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
@@ -240,46 +245,11 @@ export class AppState {
   }
 
   /**
-   * Set a new value to the 'currentPattern' cookie
-   * @param {*} newPattern
+   * Get current index pattern from plugin configuration
+   * @returns {Promise<string>} The current index pattern ID
    */
-  static setCurrentPattern(newPattern) {
-    const encodedPattern = encodeURI(newPattern);
-    const exp = new Date();
-    exp.setDate(exp.getDate() + 365);
-    if (newPattern) {
-      getCookies().set('currentPattern', encodedPattern, {
-        expires: exp,
-      });
-    }
-  }
-
-  /**
-   * Get 'currentPattern' value
-   */
-  static getCurrentPattern() {
-    const currentPattern = getCookies().get('currentPattern')
-      ? decodeURI(getCookies().get('currentPattern'))
-      : '';
-    // check if the current Cookie has the format of 3.11 and previous versions, in that case we remove the extra " " characters
-    if (
-      currentPattern &&
-      currentPattern[0] === '"' &&
-      currentPattern[currentPattern.length - 1] === '"'
-    ) {
-      const newPattern = currentPattern.substring(1, currentPattern.length - 1);
-      this.setCurrentPattern(newPattern);
-    }
-    return getCookies().get('currentPattern')
-      ? decodeURI(getCookies().get('currentPattern'))
-      : '';
-  }
-
-  /**
-   * Remove 'currentPattern' value
-   */
-  static removeCurrentPattern() {
-    return getCookies().remove('currentPattern');
+  static async getCurrentPattern() {
+    return await getWazuhCorePlugin().configuration.get('pattern');
   }
 
   /**

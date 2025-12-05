@@ -20,7 +20,7 @@ import {
   VisualizationBasicWidgetSelectorHeader,
 } from '../../../charts/visualizations/basic';
 import { useTimeFilter } from '../../../hooks';
-import { AppState } from '../../../../../react-services';
+import { AppState } from '../../../../../react-services/app-state';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import {
@@ -35,7 +35,7 @@ import {
   withPanel,
 } from '../../../hocs';
 import {
-  AlertsDataSourceRepository,
+  EventsDataSourceRepository,
   ThreatHuntingDataSource,
 } from '../../../data-source';
 import { LoadingSearchbarProgress } from '../../../loading-searchbar-progress/loading-searchbar-progress';
@@ -84,7 +84,7 @@ export const RequirementVis = withPanel({ paddingSize: 'm' })(props => {
 const RequirementVisBody = compose(
   withDataSource({
     DataSource: ThreatHuntingDataSource,
-    DataSourceRepositoryCreator: AlertsDataSourceRepository,
+    DataSourceRepositoryCreator: EventsDataSourceRepository,
   }),
   withDataSourceLoading({
     isLoadingNameProp: 'dataSource.isLoading',
@@ -102,7 +102,9 @@ const RequirementVisBody = compose(
 
   const goToDashboardWithFilter = async (requirement, key, agent) => {
     pinnedAgentManager.pinAgent(agent);
-    const indexPatternId = AppState.getCurrentPattern();
+    const indexPatternId = await getWazuhCorePlugin().configuration.get(
+      'pattern',
+    );
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,

@@ -5,7 +5,7 @@ import {
   tFilter,
   PatternDataSource,
   tParsedIndexPattern,
-} from '../index';
+} from '../pattern/index';
 import {
   IndexPatternsService,
   IndexPattern,

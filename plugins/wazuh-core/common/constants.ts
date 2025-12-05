@@ -19,9 +19,9 @@ export const PLUGIN_VERSION = version;
 export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
 export const PLUGIN_MAJOR_VERSION = version.split('.')[0];
 
-// Index patterns - Wazuh alerts
-export const WAZUH_INDEX_TYPE_ALERTS = 'alerts';
-export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts*';
+// Index patterns - Wazuh events (previously alerts)
+export const WAZUH_INDEX_TYPE_EVENTS = 'events';
+export const WAZUH_EVENTS_PATTERN = 'wazuh-events*';
 
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
@@ -545,7 +545,7 @@ hosts:
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
-    defaultValue: WAZUH_ALERTS_PATTERN,
+    defaultValue: WAZUH_EVENTS_PATTERN,
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
     validate: SettingsValidator.compose(
       SettingsValidator.isString,

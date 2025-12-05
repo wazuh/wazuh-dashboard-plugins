@@ -429,12 +429,17 @@ const getVisStateFIMTopAgentsUser = (indexPatternId: string) => {
               disabled: false,
               alias: null,
               type: 'phrase',
-              key: 'rule.groups',
+              key: 'wazuh.integration.decoders',
               value: 'syscheck',
               params: { query: 'syscheck', type: 'phrase' },
             },
             query: {
-              match: { 'rule.groups': { query: 'syscheck', type: 'phrase' } },
+              match: {
+                'wazuh.integration.decoders': {
+                  query: 'syscheck',
+                  type: 'phrase',
+                },
+              },
             },
             $state: { store: 'appState' },
           },
@@ -968,7 +973,7 @@ const getVisStateAgentFIMFilesDeleted = (indexPatternId: string) => {
         filter: [
           {
             meta: {
-              index: 'wazuh-alerts',
+              index: 'wazuh-events',
               negate: false,
               disabled: false,
               alias: null,

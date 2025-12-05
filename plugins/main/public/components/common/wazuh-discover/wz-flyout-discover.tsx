@@ -35,7 +35,7 @@ import {
   useDataSource,
   tParsedIndexPattern,
   PatternDataSource,
-  AlertsDataSourceRepository,
+  EventsDataSourceRepository,
   tFilterManager,
   tFilter,
 } from '../data-source';
@@ -255,7 +255,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     setFilters,
     error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    repository: new AlertsDataSourceRepository(), // this makes only works with alerts index pattern
+    repository: new EventsDataSourceRepository(), // this makes only works with events index pattern
     DataSource,
     filterManager,
     filters: initialFilters,

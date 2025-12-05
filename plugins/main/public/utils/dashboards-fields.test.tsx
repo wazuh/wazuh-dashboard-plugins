@@ -1,4 +1,3 @@
-import React from 'react';
 import { getDashboardPanels as clusterPanels } from '../components/management/cluster/dashboard/dashboard_panels';
 import {
   idExtractor,
@@ -6,8 +5,8 @@ import {
   clusterQExtractor,
 } from './functions-to-test';
 import { KnownFields } from './known-fields-loader';
-
-const INDEX_PATTERN_ALERTS = 'wazuh-alerts-*';
+import { WAZUH_EVENTS_PATTERN } from '../../common/constants';
+import { tParsedIndexPattern } from '../components/common/data-source';
 
 const dashboardPanels = {
   welcome: '../components/common/welcome/dashboard/dashboard_panels',
@@ -40,7 +39,7 @@ test.each(panelEntries)(
     expect(
       compareColumnsValue(
         KnownFields,
-        idExtractor(panelFunction(INDEX_PATTERN_ALERTS, true)),
+        idExtractor(panelFunction(WAZUH_EVENTS_PATTERN, true)),
       ),
     ).toBe(true);
   },
@@ -54,7 +53,7 @@ test.each(panelEntries)(
     expect(
       compareColumnsValue(
         KnownFields,
-        idExtractor(panelFunction(INDEX_PATTERN_ALERTS, false)),
+        idExtractor(panelFunction(WAZUH_EVENTS_PATTERN, false)),
       ),
     ).toBe(true);
   },
@@ -62,11 +61,29 @@ test.each(panelEntries)(
 
 test(`Test cluster panels`, () => {
   const nodeListMock = [{ name: 'node1' }, { name: 'node2' }];
+  const mockIndexPattern: tParsedIndexPattern = {
+    id: WAZUH_EVENTS_PATTERN,
+    title: WAZUH_EVENTS_PATTERN,
+    attributes: {
+      title: WAZUH_EVENTS_PATTERN,
+      fields: '[]',
+    },
+    migrationVersion: {
+      'index-pattern': '7.10.0',
+    },
+    namespace: ['default'],
+    references: [],
+    score: 0,
+    type: 'index-pattern',
+    updated_at: '2021-08-23T14:05:54.000Z',
+    version: 'WzIwMjEsM',
+    _fields: [],
+  };
   expect(
     compareColumnsValue(
       KnownFields,
       clusterQExtractor(
-        clusterPanels(INDEX_PATTERN_ALERTS, nodeListMock, 'manager'),
+        clusterPanels(mockIndexPattern, nodeListMock, 'manager'),
       ),
     ),
   ).toBe(true);

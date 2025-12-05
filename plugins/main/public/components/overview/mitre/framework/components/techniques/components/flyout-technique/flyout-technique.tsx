@@ -51,7 +51,7 @@ import { buildPhraseFilter } from '../../../../../../../../../../../src/plugins/
 import store from '../../../../../../../../redux/store';
 import NavigationService from '../../../../../../../../react-services/navigation-service';
 import { wzDiscoverRenderColumns } from '../../../../../../../common/wazuh-discover/render-columns';
-import { AppState } from '../../../../../../../../react-services';
+import { AppState } from '../../../../../../../../react-services/app-state';
 import { mitreAttack } from '../../../../../../../../utils/applications';
 import { setFilters } from '../../../../../../../common/search-bar/set-filters';
 
@@ -265,7 +265,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
   };
 
   const goToTechniqueInIntelligence = async (e, currentTechnique) => {
-    const indexPatternId = AppState.getCurrentPattern();
+    const indexPatternId = await AppState.getCurrentPattern();
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
@@ -283,7 +283,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
   };
 
   const goToTacticInIntelligence = async (e, tactic) => {
-    const indexPatternId = AppState.getCurrentPattern();
+    const indexPatternId = await AppState.getCurrentPattern();
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,

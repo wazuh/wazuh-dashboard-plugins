@@ -33,7 +33,7 @@ import {
 import { compose } from 'redux';
 import { withDataSourceFetch, withGuard } from '../../../hocs';
 import {
-  AlertsDataSourceRepository,
+  EventsDataSourceRepository,
   MitreAttackDataSource,
 } from '../../../data-source';
 
@@ -49,7 +49,7 @@ const PromptNoData = () => (
 const MitreTopTacticsTactics = compose(
   withDataSourceFetch({
     DataSource: MitreAttackDataSource,
-    DataSourceRepositoryCreator: AlertsDataSourceRepository,
+    DataSourceRepositoryCreator: EventsDataSourceRepository,
     mapRequestParams(props) {
       const [, , dateRange] = props.dependencies;
       return {
@@ -141,7 +141,7 @@ const MitreTopTacticsTechniquesHeader = ({ selectedTactic, setView }) => (
 const MitreTopTacticsTechniquesBody = compose(
   withDataSourceFetch({
     DataSource: MitreAttackDataSource,
-    DataSourceRepositoryCreator: AlertsDataSourceRepository,
+    DataSourceRepositoryCreator: EventsDataSourceRepository,
     mapRequestParams(props) {
       const [, , dateRange, selectedTactic] = props.dependencies;
       return {

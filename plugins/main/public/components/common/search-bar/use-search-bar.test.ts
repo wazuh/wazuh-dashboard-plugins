@@ -15,7 +15,6 @@ import useSearchBar from './use-search-bar';
 import { getDataPlugin } from '../../../kibana-services';
 import * as timeFilterHook from '../hooks/use-time-filter';
 import * as queryManagerHook from '../hooks/use-query';
-import { AppState } from '../../../react-services/app-state';
 import NavigationService from '../../../react-services/navigation-service';
 import { createHashHistory, History } from 'history';
 
@@ -112,9 +111,6 @@ describe('[hook] useSearchBarConfiguration', () => {
 
   it('should return default app index pattern when not receiving a default index pattern', async () => {
     jest
-      .spyOn(AppState, 'getCurrentPattern')
-      .mockImplementation(() => 'default-index-pattern');
-    jest
       .spyOn(mockDataPlugin.indexPatterns, 'getDefault')
       .mockResolvedValue(mockedDefaultIndexPatternData);
     jest
@@ -141,10 +137,6 @@ describe('[hook] useSearchBarConfiguration', () => {
       title: '',
     };
     jest
-      .spyOn(AppState, 'getCurrentPattern')
-      .mockImplementation(() => 'wazuh-alerts-*');
-    jest.spyOn(AppState, 'setCurrentPattern').mockImplementation(jest.fn());
-    jest
       .spyOn(mockDataPlugin.indexPatterns, 'get')
       .mockResolvedValue(mockedIndexPatternData);
     const { result, waitForNextUpdate } = renderHook(() =>
@@ -165,10 +157,6 @@ describe('[hook] useSearchBarConfiguration', () => {
       id: exampleIndexPatternId,
       title: '',
     };
-    jest
-      .spyOn(AppState, 'getCurrentPattern')
-      .mockImplementation(() => exampleIndexPatternId);
-    jest.spyOn(AppState, 'setCurrentPattern').mockImplementation(jest.fn());
     jest
       .spyOn(mockDataPlugin.indexPatterns, 'get')
       .mockResolvedValue(mockedExampleIndexPatternData);
@@ -197,10 +185,6 @@ describe('[hook] useSearchBarConfiguration', () => {
       id: exampleIndexPatternId,
       title: '',
     };
-    jest
-      .spyOn(AppState, 'getCurrentPattern')
-      .mockImplementation(() => exampleIndexPatternId);
-    jest.spyOn(AppState, 'setCurrentPattern').mockImplementation(jest.fn());
     jest
       .spyOn(mockDataPlugin.indexPatterns, 'get')
       .mockResolvedValue(mockedExampleIndexPatternData);
