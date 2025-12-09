@@ -50,6 +50,7 @@ export function WazuhElasticRoutes(router: IRouter) {
       ctrl.getCurrentPlatform(context, request, response),
   );
 
+  // TODO: this seems that is unused and could be removed
   router.get(
     {
       path: '/elastic/template/{pattern}',
