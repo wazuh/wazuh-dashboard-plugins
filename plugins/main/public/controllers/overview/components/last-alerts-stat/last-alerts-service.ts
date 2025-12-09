@@ -20,9 +20,9 @@ export const getLast24HoursAlerts = async (
   ruleLevelRange,
 ): Promise<Last24HoursAlerts> => {
   try {
-    const pattern = await AppState.getCurrentPattern();
+    const patternId = AppState.getCurrentPattern();
     const currentIndexPattern = await getDataPlugin().indexPatterns.get(
-      pattern,
+      patternId,
     );
     const clusterValue = AppState.getClusterInfo().cluster;
 

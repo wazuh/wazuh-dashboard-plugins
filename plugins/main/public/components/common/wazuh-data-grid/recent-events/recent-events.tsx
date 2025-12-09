@@ -47,17 +47,8 @@ export const WazuhFlyoutDiscoverNewFilterManagerRecentEvents =
       applicationTab,
       recentEventsSpecificFilters,
     }) => {
-      const [patternId, setPatternId] = useState<string>('');
-
-      useEffect(() => {
-        (async () => {
-          const pattern = await AppState.getCurrentPattern();
-          setPatternId(pattern);
-        })();
-      }, []);
-
       const href = useMemo(() => {
-        if (!patternId) return '';
+        const patternId = AppState.getCurrentPattern();
         return generatePathNavigate({
           document,
           agent,
@@ -66,7 +57,7 @@ export const WazuhFlyoutDiscoverNewFilterManagerRecentEvents =
           applicationTab,
           getSpecificFilters: recentEventsSpecificFilters,
         });
-      }, [document, agent, patternId]); // Maybe it should be done when the index pattern is changed
+      }, [document, agent]);
 
       return (
         <>

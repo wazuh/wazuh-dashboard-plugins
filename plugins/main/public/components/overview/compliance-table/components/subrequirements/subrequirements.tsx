@@ -56,11 +56,11 @@ export class ComplianceSubrequirements extends Component {
    * Adds a new filter with format { "filter_key" : "filter_value" }, e.g. {"agent.id": "001"}
    * @param filter
    */
-  async addFilter(filter) {
+  addFilter(filter) {
     const { filterManager } = getDataPlugin().query;
     const matchPhrase = {};
     matchPhrase[filter.key] = filter.value;
-    const pattern = await AppState.getCurrentPattern();
+    const pattern = AppState.getCurrentPattern();
     const newFilter = {
       meta: {
         disabled: false,

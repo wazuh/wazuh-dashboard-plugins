@@ -22,7 +22,7 @@ import {
 import * as FileSaver from '../services/file-saver';
 import { WzAuthentication } from './wz-authentication';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../common/constants';
+import { UI_LOGGER_LEVELS, WAZUH_EVENTS_PATTERN } from '../../common/constants';
 import { getErrorOrchestrator } from './common-services';
 import { BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
@@ -248,8 +248,10 @@ export class AppState {
    * Get current index pattern from plugin configuration
    * @returns {Promise<string>} The current index pattern ID
    */
-  static async getCurrentPattern() {
-    return await getWazuhCorePlugin().configuration.get('pattern');
+
+  //TODO: This function should be remeved in order to use the data source service
+  static getCurrentPattern() {
+    return WAZUH_EVENTS_PATTERN;
   }
 
   /**

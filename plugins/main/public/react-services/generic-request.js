@@ -41,9 +41,9 @@ export class GenericRequest {
       const tmpUrl = getHttp().basePath.prepend(path);
 
       try {
-        const pattern = await AppState.getCurrentPattern();
+        const patternId = AppState.getCurrentPattern();
         requestHeaders.pattern = (
-          await getDataPlugin().indexPatterns.get(pattern)
+          await getDataPlugin().indexPatterns.get(patternId)
         ).title;
       } catch (error) {}
 
