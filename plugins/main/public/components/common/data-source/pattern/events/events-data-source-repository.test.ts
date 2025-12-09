@@ -79,9 +79,7 @@ describe('EventsDataSourceRepository', () => {
     };
     const parsedIndexPatternData =
       repository.parseIndexPattern(mockedIndexPattern);
-    // setDefault is now a no-op since pattern comes from configuration
     await repository.setDefault(parsedIndexPatternData);
-    // No assertion needed as setDefault no longer stores in cookies
   });
 
   it('should return an ERROR when default index pattern is not saved in storage', async () => {
