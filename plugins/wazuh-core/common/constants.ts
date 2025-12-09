@@ -498,37 +498,6 @@ hosts:
       },
     },
   },
-  'ip.ignore': {
-    title: 'Index pattern ignore',
-    description:
-      'Disable certain index pattern names from being available in index pattern selector.',
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.editor,
-    defaultValue: [],
-    validate: SettingsValidator.compose(
-      SettingsValidator.listAsString(
-        SettingsValidator.compose(
-          SettingsValidator.isString,
-          SettingsValidator.isNotEmptyString,
-          SettingsValidator.hasNoSpaces,
-          SettingsValidator.noLiteralString('.', '..'),
-          SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-          SettingsValidator.hasNotInvalidCharacters(
-            '\\',
-            '/',
-            '?',
-            '"',
-            '<',
-            '>',
-            '|',
-            ',',
-            '#',
-          ),
-        ),
-      ),
-    ),
-  },
   'wazuh.updates.disabled': {
     title: 'Check updates',
     description: 'Define if the check updates service is disabled.',
@@ -691,6 +660,5 @@ export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
 export const HIDE_MANAGER_ALERTS_SETTING = 'hideManagerAlerts';
 export const ENROLLMENT_DNS = 'enrollment.dns';
 export const ENROLLMENT_PASSWORD = 'enrollment.password';
-export const IP_IGNORE = 'ip.ignore';
 export const WAZUH_UPDATES_DISABLED = 'wazuh.updates.disabled';
 export const REQUEST_TIMEOUT = 'timeout';

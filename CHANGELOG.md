@@ -56,6 +56,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the legacy reporting application, including its server routes, UI, PDF generation logic, and related customization settings [#7899](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7899)
 - Removed some sections in Server Management > Settings and agent configuration [#7932](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7932)
 - Removed `wazuh-alerts*` index pattern and replaced with `wazuh-events*` as the default index pattern. Removed index pattern selector from top navigation bar as index pattern selection is now handled through module-specific configurations [#7933](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7933)
+- Removed `ip.ignore` setting [#7933](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7933)
 
 ## Wazuh v4.14.2 - OpenSearch Dashboards 2.19.4 - Revision 00
 
