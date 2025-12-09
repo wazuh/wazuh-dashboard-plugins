@@ -45,7 +45,7 @@ Security recommendations: treat these URLs and credentials as secrets. Review pe
 
 ## Sample Monitors Created
 
-If the Alerts functionality is available, the Health Check attempts to create the following sample monitors on the Wazuh alerts index pattern (`wazuh-alerts-*`):
+If the Alerts functionality is available, the Health Check attempts to create the following sample monitors on the Wazuh events index pattern (`wazuh-events-*`):
 
 | Monitor name        | Target channel    | Behavior                                                                                     |
 | ------------------- | ----------------- | -------------------------------------------------------------------------------------------- |
