@@ -16,7 +16,7 @@ import {
   HEALTH_CHECK,
   NOT_TIME_FIELD_NAME_INDEX_PATTERN,
   PLUGIN_PLATFORM_NAME,
-  WAZUH_INDEX_TYPE_ALERTS,
+  WAZUH_INDEX_TYPE_EVENTS,
 } from '../../common/constants';
 import { getDataPlugin, getSavedObjects } from '../kibana-services';
 import { webDocumentationLink } from '../../common/services/web_documentation';
@@ -91,7 +91,7 @@ export class SavedObject {
     if (!result.data) {
       const fields = await SavedObject.getIndicesFields(
         patternID,
-        WAZUH_INDEX_TYPE_ALERTS,
+        WAZUH_INDEX_TYPE_EVENTS,
       );
       await this.createSavedObject(
         'index-pattern',
@@ -244,33 +244,13 @@ export class SavedObject {
   }
 
   /**
-   * Refresh an index pattern
-   * Optionally force a new field
-   */
-  static async refreshIndexPattern(pattern) {
-    /* Refresh fields using the same way that the Dashboards Management/Index patterns
-        https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.11.0/src/plugins/index_pattern_management/public/components/edit_index_pattern/edit_index_pattern.tsx#L136-L137
-
-        This approach takes the definition of indexPatterns.refreshFields instead of using it due to
-        the error management that causes that unwanted toasts are displayed when there are no
-        indices for the index pattern
-      */
-    const fields = await getDataPlugin().indexPatterns.getFieldsForIndexPattern(
-      pattern,
-    );
-    const scripted = pattern.getScriptedFields().map(field => field.spec);
-    pattern.fields.replaceAll([...fields, ...scripted]);
-    await getDataPlugin().indexPatterns.updateSavedObject(pattern);
-  }
-
-  /**
-   * Creates the 'wazuh-alerts-*'  index pattern
+   * Creates the 'wazuh-events*'  index pattern
    */
   static async createWazuhIndexPattern(pattern) {
     try {
       const fields = await SavedObject.getIndicesFields(
         pattern,
-        WAZUH_INDEX_TYPE_ALERTS,
+        WAZUH_INDEX_TYPE_EVENTS,
       );
       await this.createSavedObject(
         'index-pattern',

@@ -10,7 +10,7 @@ import {
   tParsedIndexPattern,
   PatternDataSourceFilterManager,
   tFilterManager,
-} from '../index';
+} from '../pattern/index';
 import { createOsdUrlStateStorage } from '../../../../../../../src/plugins/opensearch_dashboards_utils/public';
 import NavigationService from '../../../../react-services/navigation-service';
 import { OSD_URL_STATE_STORAGE_ID } from '../../../../../common/constants';

@@ -90,7 +90,7 @@ const hitsHistogram = (indexPatternId: string) => {
           type: 'date_histogram',
           schema: 'segment',
           params: {
-            field: 'timestamp',
+            field: '@timestamp',
             useNormalizedEsInterval: true,
             scaleMetricValues: false,
             interval: 'auto',

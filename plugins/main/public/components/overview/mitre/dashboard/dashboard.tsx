@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  AlertsDataSourceRepository,
+  EventsDataSourceRepository,
   MitreAttackDataSource,
 } from '../../../common/data-source';
 import {
@@ -13,7 +13,7 @@ import { createDashboard } from '../../../common/dashboards/dashboard';
 
 export const DashboardMITRE: React.FC = createDashboard({
   DataSource: MitreAttackDataSource,
-  DataSourceRepositoryCreator: AlertsDataSourceRepository,
+  DataSourceRepositoryCreator: EventsDataSourceRepository,
   getDashboardPanels: [
     {
       dashboardId: MITRE_ATTACK_DASHBOARD_ID,

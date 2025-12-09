@@ -245,28 +245,6 @@ function getIndexPatternsClient(
   }
 }
 
-async function getIndexPatternID(
-  services: any,
-  ctx: HealthCheckTaskContext,
-  indexPatternID: string,
-  configurationSettingKey: string,
-) {
-  if (indexPatternID) {
-    return indexPatternID;
-  }
-
-  if (ctx?.scope?.includes('internal')) {
-    return configurationSettingKey
-      ? await services.configuration.get(configurationSettingKey)
-      : undefined;
-  }
-
-  if (ctx?.scope?.includes('user')) {
-    // TODO
-    return ctx?.getIndexPatternID?.(ctx);
-  }
-}
-
 async function validateIndexPattern(indexPattern, options, ctx, logger) {
   logger.debug(
     `Validating index pattern [title ${indexPattern.attributes.title}] [id ${indexPattern.id}]`,
@@ -313,7 +291,6 @@ async function validateIndexPattern(indexPattern, options, ctx, logger) {
 export const initializationTaskCreatorIndexPattern = ({
   taskName,
   options = {},
-  configurationSettingKey,
   indexPatternID,
   services,
   taskProps = {},
@@ -324,14 +301,11 @@ export const initializationTaskCreatorIndexPattern = ({
     hasTemplate?: boolean;
     hasTimeFieldName?: true | string;
   };
-  configurationSettingKey: string;
   indexPatternID?: string;
 }) => ({
   ...taskProps,
   name: taskName,
   async run({ context: ctx, logger }: InitializationTaskRunContext) {
-    let indexPatternIDResolved;
-
     try {
       logger.debug('Starting index pattern saved object');
       // Get clients depending on the scope
@@ -340,20 +314,12 @@ export const initializationTaskCreatorIndexPattern = ({
 
       let compatibleIndexPatterns = [];
 
-      indexPatternIDResolved = await getIndexPatternID(
-        services,
-        ctx,
-        indexPatternID,
-        configurationSettingKey,
-      );
-
-      if (indexPatternIDResolved) {
+      if (indexPatternID) {
         const savedObject = await ensureIndexPatternExistence(
           { ...ctx, indexPatternsClient, savedObjectsClient, logger },
           {
-            indexPatternID: indexPatternIDResolved,
+            indexPatternID: indexPatternID,
             options,
-            configurationSettingKey,
           },
         );
         await validateIndexPattern(savedObject, options, ctx, logger);
@@ -382,7 +348,7 @@ export const initializationTaskCreatorIndexPattern = ({
         id,
       }));
     } catch (error) {
-      const message = `Error initilizating index pattern with ID [${indexPatternIDResolved}]: ${error.message}`;
+      const message = `Error initilizating index pattern with ID [${indexPatternID}]: ${error.message}`;
 
       logger.error(message);
       throw new Error(message);

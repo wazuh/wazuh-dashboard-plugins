@@ -19,9 +19,9 @@ export const PLUGIN_VERSION = version;
 export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
 export const PLUGIN_MAJOR_VERSION = version.split('.')[0];
 
-// Index patterns - Wazuh alerts
-export const WAZUH_INDEX_TYPE_ALERTS = 'alerts';
-export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts*';
+// Index patterns - Wazuh events
+export const WAZUH_INDEX_TYPE_EVENTS = 'events';
+export const WAZUH_EVENTS_PATTERN = 'wazuh-events*';
 
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
@@ -498,37 +498,6 @@ hosts:
       },
     },
   },
-  'ip.ignore': {
-    title: 'Index pattern ignore',
-    description:
-      'Disable certain index pattern names from being available in index pattern selector.',
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.editor,
-    defaultValue: [],
-    validate: SettingsValidator.compose(
-      SettingsValidator.listAsString(
-        SettingsValidator.compose(
-          SettingsValidator.isString,
-          SettingsValidator.isNotEmptyString,
-          SettingsValidator.hasNoSpaces,
-          SettingsValidator.noLiteralString('.', '..'),
-          SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-          SettingsValidator.hasNotInvalidCharacters(
-            '\\',
-            '/',
-            '?',
-            '"',
-            '<',
-            '>',
-            '|',
-            ',',
-            '#',
-          ),
-        ),
-      ),
-    ),
-  },
   'wazuh.updates.disabled': {
     title: 'Check updates',
     description: 'Define if the check updates service is disabled.',
@@ -537,34 +506,6 @@ hosts:
     type: EpluginSettingType.switch,
     defaultValue: false,
     validate: SettingsValidator.isBoolean,
-  },
-  pattern: {
-    title: 'Index pattern',
-    description:
-      "Default index pattern to use on the app. If there's no valid index pattern, the app will automatically create one with the name indicated in this option.",
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.text,
-    defaultValue: WAZUH_ALERTS_PATTERN,
-    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.isNotEmptyString,
-      SettingsValidator.hasNoSpaces,
-      SettingsValidator.noLiteralString('.', '..'),
-      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-      SettingsValidator.hasNotInvalidCharacters(
-        '\\',
-        '/',
-        '?',
-        '"',
-        '<',
-        '>',
-        '|',
-        ',',
-        '#',
-      ),
-    ),
   },
   timeout: {
     title: 'Request timeout',
@@ -691,6 +632,5 @@ export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
 export const HIDE_MANAGER_ALERTS_SETTING = 'hideManagerAlerts';
 export const ENROLLMENT_DNS = 'enrollment.dns';
 export const ENROLLMENT_PASSWORD = 'enrollment.password';
-export const IP_IGNORE = 'ip.ignore';
 export const WAZUH_UPDATES_DISABLED = 'wazuh.updates.disabled';
 export const REQUEST_TIMEOUT = 'timeout';

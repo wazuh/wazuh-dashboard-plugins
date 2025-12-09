@@ -165,8 +165,8 @@ ${Object.keys(outputs)
 - Generate alerts for all the modules in ndjson format and save to a output.ndjson file
 node ${cliFilePath} --all-modules > output.ndjson
 
-- Generate alerts for all the modules in OpenSearch/Elasticsearch Bulk API format to a wazuh-alerts index and save to a output.ndjson file
-node ${cliFilePath} --all-modules --format bulk-api --index wazuh-alerts > output.ndjson
+- Generate alerts for all the modules in OpenSearch/Elasticsearch Bulk API format to a wazuh-events index and save to a output.ndjson file
+node ${cliFilePath} --all-modules --format bulk-api --index wazuh-events > output.ndjson
 
 - Generate alerts for AWS module and save to output.ndjson file
 node ${cliFilePath} --module-aws > output.ndjson

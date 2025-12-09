@@ -49,6 +49,7 @@ const mockContext = () => ({
   },
 });
 
+// TODO: the templates are deprecated and the test makes no sense, this could be removed.
 describe('getTemplateForIndexPattern', () => {
   it.each`
     indexPatternTitle          | templateFound | templatesNameFound

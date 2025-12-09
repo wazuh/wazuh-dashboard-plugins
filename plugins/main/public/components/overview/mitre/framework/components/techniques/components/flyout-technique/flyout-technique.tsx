@@ -39,11 +39,7 @@ import {
   techniquesColumns,
   agentTechniquesColumns,
 } from './flyout-technique-columns';
-import {
-  FILTER_OPERATOR,
-  PatternDataSourceFilterManager,
-  PatternDataSource,
-} from '../../../../../../../../components/common/data-source';
+import { PatternDataSource } from '../../../../../../../../components/common/data-source';
 import { WazuhFlyoutDiscover } from '../../../../../../../common/wazuh-discover/wz-flyout-discover';
 import { tFilterParams } from '../../../../mitre';
 import TechniqueRowDetails from './technique-row-details';
@@ -51,8 +47,6 @@ import { buildPhraseFilter } from '../../../../../../../../../../../src/plugins/
 import store from '../../../../../../../../redux/store';
 import NavigationService from '../../../../../../../../react-services/navigation-service';
 import { wzDiscoverRenderColumns } from '../../../../../../../common/wazuh-discover/render-columns';
-import { AppState } from '../../../../../../../../react-services';
-import { mitreAttack } from '../../../../../../../../utils/applications';
 import { setFilters } from '../../../../../../../common/search-bar/set-filters';
 
 type tFlyoutTechniqueProps = {
@@ -264,16 +258,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       : addRenderColumn(techniquesColumns);
   };
 
-  const goToTechniqueInIntelligence = async (e, currentTechnique) => {
-    const indexPatternId = AppState.getCurrentPattern();
-    const filters = [
-      PatternDataSourceFilterManager.createFilter(
-        FILTER_OPERATOR.IS,
-        `rule.mitre.id`,
-        currentTechnique,
-        indexPatternId,
-      ),
-    ];
+  const goToTechniqueInIntelligence = (e, currentTechnique) => {
     NavigationService.getInstance().updateAndNavigateSearchParams({
       tab: 'mitre',
       tabView: 'intelligence',
@@ -283,15 +268,6 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
   };
 
   const goToTacticInIntelligence = async (e, tactic) => {
-    const indexPatternId = AppState.getCurrentPattern();
-    const filters = [
-      PatternDataSourceFilterManager.createFilter(
-        FILTER_OPERATOR.IS,
-        `rule.mitre.id`,
-        tactic,
-        indexPatternId,
-      ),
-    ];
     NavigationService.getInstance().updateAndNavigateSearchParams({
       tab: 'mitre',
       tabView: 'intelligence',

@@ -44,7 +44,7 @@ import {
   useDataSource,
   tParsedIndexPattern,
   PatternDataSource,
-  AlertsDataSourceRepository,
+  EventsDataSourceRepository,
 } from '../data-source';
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
 import { wzDiscoverRenderColumns } from './render-columns';
@@ -86,7 +86,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
 
-  const AlertsRepository = new AlertsDataSourceRepository();
+  const EventsRepository = new EventsDataSourceRepository();
 
   const {
     dataSource,
@@ -98,7 +98,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     setFilters,
     error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    repository: AlertsRepository, // this makes only works with alerts index pattern
+    repository: EventsRepository, // this makes only works with events index pattern
     DataSource,
   });
 
@@ -284,16 +284,18 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                       paddingSize='none'
                     >
                       <EuiPanel>
-                        <DashboardByRenderer
-                          input={histogramChartInput(
-                            AlertsRepository.getStoreIndexPatternId(),
-                            fetchFilters,
-                            query,
-                            dateRangeFrom,
-                            dateRangeTo,
-                            fingerprint,
-                          )}
-                        />
+                        {dataSource?.id && (
+                          <DashboardByRenderer
+                            input={histogramChartInput(
+                              dataSource?.id,
+                              fetchFilters,
+                              query,
+                              dateRangeFrom,
+                              dateRangeTo,
+                              fingerprint,
+                            )}
+                          />
+                        )}
                       </EuiPanel>
                     </EuiPanel>
                   </EuiFlexItem>
