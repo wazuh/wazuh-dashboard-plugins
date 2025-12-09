@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { getCore } from '../../../../kibana-services';
 import { PatternDataSourceFilterManager } from '../../data-source';
 import { withWrapComponent } from '../../hocs';
