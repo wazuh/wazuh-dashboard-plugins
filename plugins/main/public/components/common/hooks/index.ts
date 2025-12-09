@@ -11,7 +11,6 @@
  */
 
 export * from './use-filter-manager';
-export * from './use-index-pattern';
 export * from './use-kbn-loading-indicator';
 export * from './use-query';
 export * from './use-time-filter';
