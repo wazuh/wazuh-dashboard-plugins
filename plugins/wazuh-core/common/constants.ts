@@ -19,7 +19,7 @@ export const PLUGIN_VERSION = version;
 export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
 export const PLUGIN_MAJOR_VERSION = version.split('.')[0];
 
-// Index patterns - Wazuh events (previously alerts)
+// Index patterns - Wazuh events
 export const WAZUH_INDEX_TYPE_EVENTS = 'events';
 export const WAZUH_EVENTS_PATTERN = 'wazuh-events*';
 
