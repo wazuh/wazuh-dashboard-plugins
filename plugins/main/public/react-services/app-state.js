@@ -240,11 +240,10 @@ export class AppState {
   }
 
   /**
-   * Get current index pattern from plugin configuration
+   * Get current index pattern
    * @returns {Promise<string>} The current index pattern ID
+   * TODO: This function should be removed in order to use the data source service
    */
-
-  //TODO: This function should be remeved in order to use the data source service
   static getCurrentPattern() {
     return WAZUH_EVENTS_PATTERN;
   }
