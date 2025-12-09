@@ -22,7 +22,6 @@ import NavigationService from './react-services/navigation-service';
 import { SECTIONS } from './sections';
 import { withGuardAsync } from './components/common/hocs';
 import { WzRequest } from './react-services/wz-request';
-import { EventsDataSourceSetup } from './components/common/data-source';
 import { Normalization } from './components/normalization/normalization';
 
 export const Application = withGuardAsync(
@@ -34,11 +33,6 @@ export const Application = withGuardAsync(
         WzRequest.setupAPI(),
         // Load the app state
         loadAppConfig(),
-      ]);
-
-      await Promise.allSettled([
-        // Setup the events index pattern
-        EventsDataSourceSetup(),
       ]);
     } catch {}
 

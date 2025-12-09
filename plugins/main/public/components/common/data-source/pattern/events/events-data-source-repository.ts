@@ -93,14 +93,3 @@ export class EventsDataSourceRepository extends PatternDataSourceRepository {
     return await AppState.getCurrentPattern();
   }
 }
-
-/* WORKAROUND: This is a workaround to ensure the default events index pattern is set when the app starts.
-  Multiple UI views depend on the events index pattern is created.
-  This logic could be moved to another service.
-*/
-export async function EventsDataSourceSetup() {
-  const factory = new PatternDataSourceFactory();
-  const repository = new EventsDataSourceRepository();
-
-  await factory.createAll(EventsDataSource, await repository.getAll());
-}
