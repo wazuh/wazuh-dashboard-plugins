@@ -13,12 +13,7 @@
 import store from '../redux/store';
 import { updateCurrentApi } from '../redux/actions/appStateActions';
 import { CSVRequest } from '../services/csv-request';
-import {
-  getToasts,
-  getCookies,
-  setCookies,
-  getWazuhCorePlugin,
-} from '../kibana-services';
+import { getToasts, getCookies, setCookies } from '../kibana-services';
 import * as FileSaver from '../services/file-saver';
 import { WzAuthentication } from './wz-authentication';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';

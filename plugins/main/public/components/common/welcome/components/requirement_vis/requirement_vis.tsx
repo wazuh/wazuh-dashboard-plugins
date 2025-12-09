@@ -102,9 +102,7 @@ const RequirementVisBody = compose(
 
   const goToDashboardWithFilter = async (requirement, key, agent) => {
     pinnedAgentManager.pinAgent(agent);
-    const indexPatternId = await getWazuhCorePlugin().configuration.get(
-      'pattern',
-    );
+    const indexPatternId = AppState.getCurrentPattern();
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
