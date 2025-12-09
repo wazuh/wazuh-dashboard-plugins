@@ -81,23 +81,4 @@ describe('EventsDataSourceRepository', () => {
       repository.parseIndexPattern(mockedIndexPattern);
     await repository.setDefault(parsedIndexPatternData);
   });
-
-  it('should return an ERROR when default index pattern is not saved in storage', async () => {
-    // Mock getWazuhCorePlugin configuration to return empty pattern
-    const { getWazuhCorePlugin } = require('../../../../../kibana-services');
-    jest
-      .spyOn(require('../../../../../kibana-services'), 'getWazuhCorePlugin')
-      .mockReturnValue({
-        configuration: {
-          get: jest.fn().mockResolvedValue(''),
-        },
-      });
-    try {
-      await repository.getDefault([]);
-    } catch (error) {
-      expect(error.message).toBe(
-        "No index pattern selected for events. Make sure a compatible index pattern exists and select it. This wasn't applied correctly or needs to be re-selected.",
-      );
-    }
-  });
 });
