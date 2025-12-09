@@ -28,19 +28,6 @@ In some cases, it searches by index pattern ID, and in others, this could be the
 - Verify data collection is enabled.
 - Check server and indexer logs for data collection/ingestion issues.
 
-### No index pattern selected for alerts. Make sure a compatible index pattern exists and select it. This wasn’t applied correctly or needs to be re‑selected.
-
-This error indicates the index pattern related to alerts is not selected. It is usually caused because there is no a compatible index pattern or there is a problem in the selection.
-
-Try to re-select the index pattern using the alerts index pattern selector.
-
-The alerts index pattern is stored in the `currentPattern` cookie that stores the ID in the browser. If this cookie is not present or this has a falsy value, the error is thrown.
-
-1. Select the alerts index pattern in the dashboard header.
-2. Ensure compatible index patterns exist with required fields (timestamp, wazuh.integration.decoders, manager.name and agent.id).
-3. If no compatible index patterns exist, create one if matching indices are available.
-4. Verify the `currentPattern` cookie is set with the index pattern ID.
-
 ### The server API is not available. Check the connection, ensure the service is running, and verify the API host configuration.
 
 This means the dashboard can not connect with the server API host.

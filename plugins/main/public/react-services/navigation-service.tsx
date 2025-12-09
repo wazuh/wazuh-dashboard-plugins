@@ -1,9 +1,9 @@
 import { Location, Action, History } from 'history';
-import { getCore } from '../kibana-services';
+import { getCore, getDataPlugin } from '../kibana-services';
 import { NavigateToAppOptions } from '../../../../src/core/public';
-import { getIndexPattern } from './elastic_helpers';
 import { buildPhraseFilter } from '../../../../src/plugins/data/common';
 import rison from 'rison-node';
+import { WAZUH_EVENTS_PATTERN } from '../../common/constants';
 
 /**
  * Custom implementation URLSearchParams-like to parse and serialize the URL query string.
@@ -283,36 +283,39 @@ class NavigationService {
         return;
       }
     }
-    getIndexPattern().then(indexPattern => {
-      const urlParams = {};
 
-      if (Object.keys(params).length) {
-        Object.keys(params).forEach(key => {
-          if (key === 'filters') {
-            urlParams['_w'] = this.buildFilter_w(params[key], indexPattern);
-          } else {
-            urlParams[key] = params[key];
-          }
-        });
-      }
-      const url = Object.entries(urlParams)
-        .map(e => e.join('='))
-        .join('&');
-      const currentUrl = window.location.href.split('#/')[0];
-      const newUrl = currentUrl + `#/${section}?` + url;
+    getDataPlugin()
+      .indexPatterns.get(WAZUH_EVENTS_PATTERN)
+      .then(indexPattern => {
+        const urlParams = {};
 
-      if (e && (e.which == 2 || e.button == 1)) {
-        // middlebutton clicked
-        window.open(newUrl, '_blank', 'noreferrer');
-      } else if (e.button == 0) {
-        // left button clicked
-        if (navigateMethod) {
-          navigateMethod();
-        } else {
-          this.replace(`${this.getPathname()}?${url}`);
+        if (Object.keys(params).length) {
+          Object.keys(params).forEach(key => {
+            if (key === 'filters') {
+              urlParams['_w'] = this.buildFilter_w(params[key], indexPattern);
+            } else {
+              urlParams[key] = params[key];
+            }
+          });
         }
-      }
-    });
+        const url = Object.entries(urlParams)
+          .map(e => e.join('='))
+          .join('&');
+        const currentUrl = window.location.href.split('#/')[0];
+        const newUrl = currentUrl + `#/${section}?` + url;
+
+        if (e && (e.which == 2 || e.button == 1)) {
+          // middlebutton clicked
+          window.open(newUrl, '_blank', 'noreferrer');
+        } else if (e.button == 0) {
+          // left button clicked
+          if (navigateMethod) {
+            navigateMethod();
+          } else {
+            this.replace(`${this.getPathname()}?${url}`);
+          }
+        }
+      });
   }
 }
 

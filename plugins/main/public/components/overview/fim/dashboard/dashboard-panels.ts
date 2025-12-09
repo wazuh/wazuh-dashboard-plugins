@@ -973,7 +973,7 @@ const getVisStateAgentFIMFilesDeleted = (indexPatternId: string) => {
         filter: [
           {
             meta: {
-              index: 'wazuh-alerts',
+              index: 'wazuh-events',
               negate: false,
               disabled: false,
               alias: null,

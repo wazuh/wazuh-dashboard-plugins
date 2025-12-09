@@ -21,11 +21,6 @@
           "label": "ip.selector"
         },
         {
-          "title": "IP ignore",
-          "subTitle": "Disable certain index pattern names from being available in index pattern selector from the Wazuh app.",
-          "label": "ip.ignore"
-        },
-        {
           "title": "Cron prefix",
           "subTitle": "Define the index prefix of predefined jobs.",
           "label": "cron.prefix"

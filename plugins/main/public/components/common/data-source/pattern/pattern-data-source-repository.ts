@@ -1,6 +1,5 @@
 import { tDataSourceRepository } from '../index';
 import { GenericRequest } from '../../../../react-services/generic-request';
-import { AppState } from '../../../../react-services';
 
 export type tSavedObjectResponse = {
   data: {

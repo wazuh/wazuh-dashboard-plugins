@@ -2,7 +2,6 @@ import { KnownFields, getKnownFieldsByIndexType } from './known-fields-loader';
 import FieldsMonitoring from '../../common/known-fields/monitoring.json';
 import statisticsFields from '../../common/known-fields/statistics.json';
 import {
-  WAZUH_INDEX_TYPE_ALERTS,
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATES_FIM_FILES,
   WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS,
@@ -40,7 +39,7 @@ const monitoringFields = FieldsMonitoring;
 
 describe('Known Fields Loader', () => {
   describe('KnownFields export', () => {
-    test('should export KnownFields as alerts fields', () => {
+    test('should export KnownFields as events fields', () => {
       expect(KnownFields).toBeDefined();
       expect(Array.isArray(KnownFields)).toBe(true);
       expect(KnownFields.length).toBeGreaterThan(0);
@@ -57,7 +56,7 @@ describe('Known Fields Loader', () => {
   describe('getKnownFieldsByIndexType', () => {
     test('should return known fields for all index types', () => {
       const indexTypes = [
-        WAZUH_INDEX_TYPE_ALERTS,
+        WAZUH_INDEX_TYPE_EVENTS,
         WAZUH_INDEX_TYPE_MONITORING,
         WAZUH_INDEX_TYPE_STATISTICS,
         WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
@@ -100,7 +99,7 @@ describe('Known Fields Loader', () => {
     });
 
     test('should have consistent field structure', () => {
-      const fields = getKnownFieldsByIndexType(WAZUH_INDEX_TYPE_ALERTS);
+      const fields = getKnownFieldsByIndexType(WAZUH_INDEX_TYPE_EVENTS);
       expect(fields).toBeTruthy();
       expect(Array.isArray(fields)).toBe(true);
       if (fields) {

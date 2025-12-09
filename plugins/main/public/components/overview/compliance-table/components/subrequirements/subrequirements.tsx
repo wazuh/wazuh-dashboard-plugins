@@ -28,10 +28,7 @@ import {
 } from '@elastic/eui';
 import { AppState } from '../../../../../react-services/app-state';
 import { RequirementFlyout } from '../requirement-flyout';
-import {
-  getDataPlugin,
-  getWazuhCorePlugin,
-} from '../../../../../kibana-services';
+import { getDataPlugin } from '../../../../../kibana-services';
 
 export class ComplianceSubrequirements extends Component {
   _isMount = false;
@@ -63,6 +60,7 @@ export class ComplianceSubrequirements extends Component {
     const { filterManager } = getDataPlugin().query;
     const matchPhrase = {};
     matchPhrase[filter.key] = filter.value;
+    const pattern = AppState.getCurrentPattern();
     const newFilter = {
       meta: {
         disabled: false,
@@ -70,9 +68,7 @@ export class ComplianceSubrequirements extends Component {
         params: { query: filter.value },
         type: 'phrase',
         negate: filter.negate || false,
-        index:
-          AppState.getCurrentPattern() ||
-          getWazuhCorePlugin().configuration.getSettingValue('pattern'),
+        index: pattern,
       },
       query: { match_phrase: matchPhrase },
       $state: { store: 'appState' },
