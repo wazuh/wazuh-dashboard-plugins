@@ -7,16 +7,12 @@ import {
   EuiText,
 } from '@elastic/eui';
 import { compose } from 'redux';
-import { i18n } from '@osd/i18n';
 import {
   withErrorBoundary,
   withGlobalBreadcrumb,
   withPanel,
 } from '../../../common/hocs';
 import { normalization } from '../../../../utils/applications';
-import { Name as DecodersName, Id as DecodersId } from '../decoders/info';
-import { Name as KVDBsName, Id as KVDBsId } from '../kvdbs/info';
-import { WzLink } from '../../../wz-link/wz-link';
 import { Name, indexName } from './info';
 import { TableDataFetch } from '../../components/table-data/table-fetch';
 import { fetchInternalOpenSearchIndexItemsInTable } from '../../services/http';
@@ -24,6 +20,8 @@ import {
   SearchBar,
   withInitialQueryFromURL,
 } from '../../components/search-bar/search-bar';
+import { WzButtonPermissionsOpenFlyout } from '../../../common/buttons';
+import { Details } from './details';
 
 const decodersCountKey = '___decoders_count';
 const kvdbsCountKey = '___kvdbs_count';
@@ -62,6 +60,22 @@ const tableColums = [
     field: kvdbsCountKey,
     name: 'KVDBs',
     sortable: false,
+  },
+  {
+    align: 'right',
+    name: 'Actions',
+    render: item => (
+      <WzButtonPermissionsOpenFlyout
+        flyoutTitle={`Integration details - ${item.document.title}`}
+        flyoutBody={() => <Details item={item} />}
+        buttonProps={{
+          tooltip: { content: 'View details' },
+          buttonType: 'icon',
+          iconType: 'inspect',
+          'aria-label': 'View integration details',
+        }}
+      ></WzButtonPermissionsOpenFlyout>
+    ),
   },
 ];
 
@@ -123,7 +137,7 @@ const Body: React.FC = compose(
       setSearch(query);
     };
 
-    /* FIXME: with a query in the URL for previous serach, use the back button does not update the search.
+    /* FIXME: with a query in the URL for previous search, use the back button does not update the search.
     This happens on Decoders and KVDBs views as well.
     */
 

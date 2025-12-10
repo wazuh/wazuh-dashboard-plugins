@@ -99,6 +99,10 @@ interface RelationDefintion {
   indexField?: string;
   target_field?: string;
   type?: 'one-to-one' | 'one-to-many';
+  // Function to handle missing related items, this should return a compatible item to be used in place of the missing one
+  onMissing?: (value: any, item: any) => any;
+  // Source fields to query from the relation index
+  includeFields?: string[];
 }
 
 export async function fetchInternalOpenSearchIndexItemsRelation<
@@ -117,12 +121,22 @@ export async function fetchInternalOpenSearchIndexItemsRelation<
       index,
       target_field,
       type = 'one-to-one',
+      onMissing,
+      includeFields,
     } = relation as RelationDefintion;
 
     const useDocIds = !relationField;
 
     const relatedIds = items
-      .map((item: any) => get(item, field))
+      .map((item: any) => {
+        const data = get(item, field);
+        if (Array.isArray(data)) {
+          return data;
+        } else {
+          return [data];
+        }
+      })
+      .flat()
       .filter((v: any, i: number, a: any[]) => v != null && a.indexOf(v) === i);
 
     const query = useDocIds
@@ -134,6 +148,7 @@ export async function fetchInternalOpenSearchIndexItemsRelation<
     const response = await fetchInternalOpenSearchIndexItems(index, {
       size: relatedIds.length,
       query,
+      _source: includeFields ? { includes: includeFields } : true,
     });
 
     const relatedIdsSet = new Set(relatedIds);
@@ -172,8 +187,18 @@ export async function fetchInternalOpenSearchIndexItemsRelation<
       }
     }
 
+
     items = items.map((item: any) => {
-      const relationData = relatedItemsMap.get(get(item, field));
+      const refData = get(item, field);
+
+      const relationData = Array.isArray(refData)
+        ? refData.map(
+            (refDataItem: any) =>
+              relatedItemsMap.get(refDataItem) ??
+              (onMissing ? onMissing(refDataItem, item) : refDataItem),
+          )
+        : relatedItemsMap.get(refData);
+
       set(item, target_field || field, relationData);
       return item;
     });

@@ -775,7 +775,7 @@ export const Applications = [
   configurationAssessment,
   // threatHunting,
   vulnerabilityDetection,
-  mitreAttack,
+  // mitreAttack,
   // pciDss,
   // hipaa,
   // gdpr,
