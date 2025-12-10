@@ -326,7 +326,7 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
   })),
   [WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING]: [
     {
-      'wazuh-rootcheck': true,
+      rootcheck: true,
     },
     {
       audit: true,
