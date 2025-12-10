@@ -15,6 +15,9 @@ const WzRibbon = (props: RibbonProps) => {
   const condensedItems = items.filter(item => item.condensed);
   const nonCondensedItems = items.filter(item => !item.condensed);
 
+  console.log('condensedItems', condensedItems);
+  console.log('nonCondensedItems', nonCondensedItems);
+
   return (
     <EuiPanel paddingSize='m'>
       {title ? (
@@ -36,13 +39,19 @@ const WzRibbon = (props: RibbonProps) => {
         justifyContent='spaceBetween'
         style={{ responsive: true }}
       >
-        <EuiFlexGroup gutterSize='l' className='wz-ribbon-condensed'>
-          {condensedItems.map(item => (
-            <WzRibbonItem key={item.key} item={item} />
-          ))}
-        </EuiFlexGroup>
+        {condensedItems.length > 0 && (
+          <EuiFlexGroup gutterSize='l' className='wz-ribbon-condensed'>
+            {condensedItems.map(item => (
+              <WzRibbonItem key={item.key} item={item} />
+            ))}
+          </EuiFlexGroup>
+        )}
         {nonCondensedItems.map(item => (
-          <WzRibbonItem key={item.key} item={item} />
+          <WzRibbonItem
+            key={item.key}
+            item={item}
+            grow={condensedItems.length === 0}
+          />
         ))}
       </EuiFlexGroup>
     </EuiPanel>
