@@ -782,7 +782,7 @@ function generateAlert(params) {
     });
   }
 
-  if (params.rootcheck) {
+  if (params['wazuh-rootcheck']) {
     // Update event categorization
     alert.event = generateEvent({
       kind: EVENT_KINDS.ALERT,
