@@ -31,7 +31,7 @@ const detailsMapLabels: { [key: string]: string } = {
   'document.date': 'Date',
   'document.description': 'Description',
   'document.documentation': 'Documentation',
-  'document.enable_decoders': 'Enable Decoders',
+  'document.enable_decoders': 'Enable decoders',
   'document.id': 'ID',
   'document.name': 'Name',
   'document.title': 'Title',
