@@ -15,9 +15,6 @@ const WzRibbon = (props: RibbonProps) => {
   const condensedItems = items.filter(item => item.condensed);
   const nonCondensedItems = items.filter(item => !item.condensed);
 
-  console.log('condensedItems', condensedItems);
-  console.log('nonCondensedItems', nonCondensedItems);
-
   return (
     <EuiPanel paddingSize='m'>
       {title ? (
