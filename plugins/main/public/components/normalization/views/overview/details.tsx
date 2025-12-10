@@ -46,7 +46,7 @@ const MissingAssetInTable: React.FC<{ value: string }> = ({ value }) => (
       aria-label='Warning'
       type='alert'
       color='warning'
-      content='Data could not be found'
+      content='Data not found'
     />
   </div>
 );
