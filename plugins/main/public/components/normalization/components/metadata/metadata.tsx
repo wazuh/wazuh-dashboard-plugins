@@ -60,7 +60,7 @@ export const Metadata: React.FC<{
         <strong>{label}</strong>
       </div>
       <div style={label ? { marginTop: '4px' } : {}}>
-        {typeof value === 'undefined'
+        {typeof value === 'undefined' || value === ''
           ? '-'
           : Array.isArray(value)
           ? value.map((v, i) => (
