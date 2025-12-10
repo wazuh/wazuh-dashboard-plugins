@@ -15,13 +15,13 @@ import React from 'react';
 import { MainPanel } from '../../../common/modules/panel';
 import { ModuleConfiguration } from './views';
 import { ModuleConfig, filtersValues } from './config';
-import { AlertsDataSourceRepository } from '../../../common/data-source';
-import { Office365DataSource } from '../../../common/data-source/pattern/alerts/office-365/office-365-data-source';
+import { EventsDataSourceRepository } from '../../../common/data-source';
+import { Office365DataSource } from '../../../common/data-source/pattern/events/office-365/office-365-data-source';
 import { createPanel } from '../../../common/dashboards';
 
 export const OfficePanel = createPanel({
   DataSource: Office365DataSource,
-  DataSourceRepositoryCreator: AlertsDataSourceRepository,
+  DataSourceRepositoryCreator: EventsDataSourceRepository,
   MainPanel,
   ModuleConfiguration,
   ModuleConfig,

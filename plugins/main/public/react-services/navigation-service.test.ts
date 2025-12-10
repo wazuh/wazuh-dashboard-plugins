@@ -4,11 +4,7 @@ import { getCore, getCookies } from '../kibana-services';
 
 jest.mock('../kibana-services');
 jest.mock('../react-services/app-state', () => ({
-  AppState: {
-    getCurrentPattern() {
-      return 'test';
-    },
-  },
+  AppState: {},
 }));
 
 const navigateToApp = jest.fn();

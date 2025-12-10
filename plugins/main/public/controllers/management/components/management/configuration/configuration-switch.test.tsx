@@ -30,8 +30,6 @@ jest.mock('./log-settings/log-settings', () => () => <></>);
 
 jest.mock('./cluster/cluster', () => () => <></>);
 
-jest.mock('./alerts/alerts', () => () => <></>);
-
 jest.mock('./client/client', () => () => <></>);
 
 jest.mock('./client-buffer/client-buffer', () => () => <></>);
@@ -47,28 +45,13 @@ jest.mock('./vulnerabilities/vulnerabilities', () => () => <></>);
 
 jest.mock('./inventory/inventory', () => () => <></>);
 
-jest.mock('./active-response/active-response', () => () => <></>);
-
 jest.mock('./active-response/active-response-agent', () => () => <></>);
 
 jest.mock('./commands/commands', () => () => <></>);
 
-jest.mock('./docker-listener/docker-listener', () => () => <></>);
-
 jest.mock('./log-collection/log-collection', () => () => <></>);
 
 jest.mock('./integrity-monitoring/integrity-monitoring', () => () => <></>);
-
-jest.mock('./aws-s3/aws-s3', () => () => <></>);
-
-jest.mock('./azure-logs/azure-logs', () => () => <></>);
-
-jest.mock('./google-cloud-pub-sub/google-cloud-pub-sub', () => () => <></>);
-
-jest.mock('./github/github', () => ({
-  WzConfigurationGitHub: () => <></>,
-  __esModule: true,
-}));
 
 jest.mock('./util-components/view-selector', () => ({
   default: () => <></>,
@@ -86,11 +69,6 @@ jest.mock('./util-hocs/render-if', () => ({
 jest.mock('./util-components/configuration-path', () => () => <></>);
 
 jest.mock('./util-components/refresh-cluster-info-button', () => () => <></>);
-
-jest.mock('./office365/office365', () => ({
-  WzConfigurationOffice365: () => <></>,
-  __esModule: true,
-}));
 
 jest.mock('../../../../../components/agents/prompts', () => ({
   PromptNoActiveAgentWithoutSelect: () => <></>,

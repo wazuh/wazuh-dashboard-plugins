@@ -311,7 +311,7 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         component: DashboardVuls,
-        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-events* */
         buttons: [
           ({ ...props }) => (
             <ButtonExploreAgent
@@ -325,7 +325,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Inventory',
         component: InventoryVuls,
-        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
+        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-events* */
         buttons: [
           ({ ...props }) => (
             <ButtonExploreAgent
