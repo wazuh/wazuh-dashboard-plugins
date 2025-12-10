@@ -262,37 +262,6 @@ export class WazuhElasticCtrl {
   }
 
   /**
-   * Checks for minimum index pattern fields in a list of index patterns.
-   * @param {Array<Object>} indexPatternList List of index patterns
-   */
-  validateIndexPattern(indexPatternList) {
-    const minimum = [
-      'timestamp',
-      'wazuh.integration.decoders',
-      'manager.name',
-      'agent.id',
-    ];
-    let list = [];
-    for (const index of indexPatternList) {
-      let valid, parsed;
-      try {
-        parsed = JSON.parse(index.attributes.fields);
-      } catch (error) {
-        continue;
-      }
-
-      valid = parsed.filter(item => minimum.includes(item.name));
-      if (valid.length === 4) {
-        list.push({
-          id: index.id,
-          title: index.attributes.title,
-        });
-      }
-    }
-    return list;
-  }
-
-  /**
    * Returns current security platform
    * @param {Object} req
    * @param {Object} reply
