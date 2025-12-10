@@ -187,7 +187,6 @@ export async function fetchInternalOpenSearchIndexItemsRelation<
       }
     }
 
-    console.log({ target_field, relatedItemsMap });
 
     items = items.map((item: any) => {
       const refData = get(item, field);
