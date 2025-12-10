@@ -2,7 +2,6 @@ import rison from 'rison-node';
 import store from '../../../../redux/store';
 import { AppState } from '../../../../react-services/app-state';
 import { getDataPlugin } from '../../../../kibana-services';
-import { FilterHandler } from '../../../../utils/filter-handler';
 import {
   tDataSourceFilterManager,
   tFilter,
@@ -264,7 +263,6 @@ export class PatternDataSourceFilterManager
     controlledByValue: string,
     key?: string,
   ): tFilter[] {
-    const filterHandler = new FilterHandler();
     const { cluster } = AppState.getClusterInfo();
     const filterValue = cluster;
 
@@ -274,16 +272,13 @@ export class PatternDataSourceFilterManager
       );
     }
 
-    const clusterFilter = filterHandler.clusterQuery(filterValue, key);
-    clusterFilter.meta = {
-      ...clusterFilter.meta,
-      controlledBy: controlledByValue,
-      index: indexPatternId,
-    };
-    //@ts-ignore
-    clusterFilter.$state = {
-      store: FilterStateStore.APP_STATE,
-    };
+    const clusterFilter = PatternDataSourceFilterManager.createFilter(
+      FILTER_OPERATOR.IS,
+      key || 'wazuh.cluster.name',
+      filterValue,
+      indexPatternId,
+      controlledByValue,
+    );
     //@ts-ignore
     return [clusterFilter] as tFilter[];
   }
