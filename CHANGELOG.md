@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.3
 
+### Changed
+
+- Upgraded `js-yaml` dependency to 4.1.1 [#7958](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7958)
+
 ## Wazuh v4.14.2 - OpenSearch Dashboards 2.19.4 - Revision 00
 
 ### Added
