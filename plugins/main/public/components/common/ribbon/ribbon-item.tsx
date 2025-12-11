@@ -52,7 +52,7 @@ const WzRibbonItem = (props: RibbonItemProps) => {
   const contentStyle = {
     ...restStyle,
     fontSize: FONT_SIZE,
-    ...(grow ? { maxWidth: 'none' } : {}),
+    ...(grow ? { maxWidth: 'none' } : maxWidth ? { maxWidth } : {}),
   };
 
   const renderOptionalField = function <T>(field?: T): T | string {
