@@ -273,7 +273,9 @@ export const ScaScan = compose(
                       },
                     )}
                   >
-                    <Typography level='section'>Security Configuration Assessment</Typography>
+                    <Typography level='section'>
+                      Security Configuration Assessment
+                    </Typography>
                   </EuiLink>
                 </RedirectAppLinks>
               </EuiFlexItem>
