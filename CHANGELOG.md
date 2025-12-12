@@ -12,16 +12,16 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Upgraded `js-yaml` dependency to 4.1.1 [#7958](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7958)
 
-## Wazuh v4.14.2 - OpenSearch Dashboards 2.19.4 - Revision 00
+## Wazuh v4.14.2 - OpenSearch Dashboards 2.19.4 - Revision 01
 
 ### Added
 
 - Support for Wazuh 4.14.2
-- Added persistence for page size and sorting in API tables [#7864](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7864)
+- Added persistence for page size and sorting in API tables [#7883](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7883)
 
 ### Fixed
 
-- Removed sorting for Program name and Order columns in Related decoders table and Groups column in Related rules table to prevent API errors [#7864](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7864)
+- Removed sorting for Program name and Order columns in Related decoders table and Groups column in Related rules table to prevent API errors [#7883](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7883)
 
 ### Changed
 
