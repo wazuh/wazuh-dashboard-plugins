@@ -44,11 +44,7 @@ const WzRibbon = (props: RibbonProps) => {
           </EuiFlexGroup>
         )}
         {nonCondensedItems.map(item => (
-          <WzRibbonItem
-            key={item.key}
-            item={item}
-            grow={condensedItems.length === 0}
-          />
+          <WzRibbonItem key={item.key} item={item} />
         ))}
       </EuiFlexGroup>
     </EuiPanel>

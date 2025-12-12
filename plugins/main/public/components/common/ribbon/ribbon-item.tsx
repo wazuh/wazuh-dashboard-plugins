@@ -42,18 +42,12 @@ const isStatus = (
 
 interface RibbonItemProps {
   item: IRibbonItem;
-  grow?: boolean;
 }
 
 const WzRibbonItem = (props: RibbonItemProps) => {
-  const { item, grow = false } = props;
+  const { item } = props;
 
-  const { maxWidth, ...restStyle } = item.style || {};
-  const contentStyle = {
-    ...restStyle,
-    fontSize: FONT_SIZE,
-    ...(grow ? { maxWidth: 'none' } : maxWidth ? { maxWidth } : {}),
-  };
+  const contentStyle = { ...item.style, fontSize: FONT_SIZE };
 
   const renderOptionalField = function <T>(field?: T): T | string {
     return field !== undefined || field ? field : '-';
@@ -94,7 +88,7 @@ const WzRibbonItem = (props: RibbonItemProps) => {
   return (
     <EuiFlexItem
       className='wz-ribbon-item'
-      grow={grow}
+      grow={false}
       data-test-subj={`ribbon-item-${item.key}`}
       key={item.key}
       style={contentStyle}
