@@ -205,29 +205,6 @@ export const ScaScan = compose(
 
       return (
         <Fragment>
-          <EuiFlexGroup>
-            <EuiFlexItem grow={false}>
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink
-                  onClick={() => {
-                    this.pinnedAgentManager.pinAgent(this.props.agent);
-                  }}
-                  href={NavigationService.getInstance().getUrlForApp(
-                    configurationAssessment.id,
-                    {
-                      path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
-                    },
-                  )}
-                >
-                  <Typography level='card'>{lastScan.name}</Typography>
-                </EuiLink>
-              </RedirectAppLinks>
-              <EuiSpacer size='m' />
-            </EuiFlexItem>
-            <EuiFlexItem grow={false} style={{ marginTop: 12 }}>
-              <EuiBadge color='secondary'>{lastScan?.policy_id}</EuiBadge>
-            </EuiFlexItem>
-          </EuiFlexGroup>
           <EuiPanel>
             <SCAPoliciesTable
               agent={this.props.agent}
@@ -296,7 +273,7 @@ export const ScaScan = compose(
                       },
                     )}
                   >
-                    <Typography level='section'>SCA: Latest scans</Typography>
+                    <Typography level='section'>Security Configuration Assessment</Typography>
                   </EuiLink>
                 </RedirectAppLinks>
               </EuiFlexItem>
