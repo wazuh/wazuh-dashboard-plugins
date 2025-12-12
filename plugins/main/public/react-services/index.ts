@@ -18,5 +18,4 @@ export * from './wz-request';
 export * from './wz-security-opensearch-dashboards-security';
 export * from './wz-user-permissions';
 export * from './query-config';
-export * from './check-index';
 export * from './state-storage';

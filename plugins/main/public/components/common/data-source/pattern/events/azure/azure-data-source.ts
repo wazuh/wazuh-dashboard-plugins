@@ -2,8 +2,8 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_AZURE_RULE_GROUP } from '../../../../../../../common/constants';
 import { EventsDataSource } from '../events-data-source';
 
-const AZURE_GROUP_KEY = 'rule.groups';
-const AZURE_GROUP_VALUE = 'ms-graph';
+const AZURE_GROUP_KEY = 'wazuh.integration.decoders';
+const AZURE_GROUP_VALUE = 'azure-graphactivity';
 
 export class AzureDataSource extends EventsDataSource {
   constructor(id: string, title: string) {

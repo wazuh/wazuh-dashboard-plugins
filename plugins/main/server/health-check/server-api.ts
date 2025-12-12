@@ -83,7 +83,7 @@ async function serversAPIConnectionCompatibility(
   ctx: InitializationTaskRunContext,
   services: any,
 ) {
-  if (ctx.scope === 'user' && ctx.request?.query?.apiHostID) {
+  if (ctx.context.scope === 'user' && ctx.request?.query?.apiHostID) {
     const host = await services.manageHosts.get(ctx.request.query.apiHostID, {
       excludePassword: true,
     });

@@ -82,7 +82,7 @@
     windows: { windows: { service_control_manager: true } },
     github: { github: true },
     office: { office: true },
-    rootcheck: { rootcheck: true },
+    'wazuh-rootcheck': { 'wazuh-rootcheck': true },
     audit: { audit: true },
     vulnerabilities: { vulnerabilities: true },
     virustotal: { virustotal: true },
@@ -105,7 +105,12 @@
       'web',
       'windows',
     ],
-    'auditing-policy-monitoring': ['audit', 'rootcheck', 'virustotal', 'yara'],
+    'auditing-policy-monitoring': [
+      'audit',
+      'wazuh-rootcheck',
+      'virustotal',
+      'yara',
+    ],
     'thread-detection': ['docker', 'mitre', 'vulnerabilities'],
   };
 

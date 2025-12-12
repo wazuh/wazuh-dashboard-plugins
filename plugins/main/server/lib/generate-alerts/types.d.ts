@@ -176,7 +176,7 @@ export type Params = {
   /* if true, set Mitre att&ck fields */
   mitre: boolean;
   /* if true, set Policy monitoring fields */
-  rootcheck: boolean;
+  'wazuh-rootcheck': boolean;
   /* if true, set integrity monitoring fields (IMF) */
   syscheck: boolean;
   /* if true, set VirusTotal fields */

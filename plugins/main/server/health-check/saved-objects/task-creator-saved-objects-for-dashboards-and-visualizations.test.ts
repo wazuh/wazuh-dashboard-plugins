@@ -86,7 +86,7 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
   });
 
   it('creates the required visualizations and dashboard when they are missing (internal-scheduled)', async () => {
-    ctx.scope = 'internal-scheduled';
+    ctx.context.scope = 'internal-scheduled';
     mockClient.get.mockRejectedValue({ output: { statusCode: 404 } });
     mockClient.create
       .mockResolvedValueOnce(mockVisualization)
@@ -131,7 +131,7 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
   });
 
   it('overwrites the visualizations and dashboard without checking existence (internal-initial)', async () => {
-    ctx.scope = 'internal-initial';
+    ctx.context.scope = 'internal-initial';
     mockClient.create
       .mockResolvedValueOnce(mockVisualization)
       .mockResolvedValueOnce(mockDashboard);
