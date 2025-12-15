@@ -15,11 +15,11 @@ const { DECODER } = require('./common');
 // Policy monitoring
 module.exports.title = ['Trojaned version of file detected.'];
 module.exports.ruleDescription = [
-  'Host-based anomaly detection event (rootcheck).',
+  'Host-based anomaly detection event (wazuh-rootcheck).',
   'System Audit event.',
 ];
 
-module.exports.location = 'rootcheck';
+module.exports.location = 'wazuh-rootcheck';
 
 module.exports.decoder = DECODER.ROOTCHECK;
 
@@ -67,8 +67,8 @@ module.exports.rootkitsData = {
     firedtimes: 1,
     mail: false,
     level: 7,
-    description: 'Host-based anomaly detection event (rootcheck).',
-    groups: ['wazuh', 'rootcheck'],
+    description: 'Host-based anomaly detection event (wazuh-rootcheck).',
+    groups: ['wazuh', 'wazuh-rootcheck'],
     id: '510',
     gdpr: ['IV_35.7.d'],
   },
@@ -120,8 +120,8 @@ module.exports.trojansData = {
     firedtimes: 2,
     mail: false,
     level: 7,
-    description: 'Host-based anomaly detection event (rootcheck).',
-    groups: ['wazuh', 'rootcheck'],
+    description: 'Host-based anomaly detection event (wazuh-rootcheck).',
+    groups: ['wazuh', 'wazuh-rootcheck'],
     id: '510',
     gdpr: ['IV_35.7.d'],
   },

@@ -5,7 +5,10 @@ const elasticServer = process.env.WAZUH_ELASTIC_IP || 'localhost';
 chai.should();
 
 const headers = {
-  headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' }
+  headers: {
+    ...PLUGIN_PLATFORM_REQUEST_HEADERS,
+    'content-type': 'application/json',
+  },
 };
 
 const date = new Date();
@@ -39,12 +42,12 @@ const syscheck = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'rule.groups': 'syscheck' } }
-          ]
-        }
-      }
+            { match: { 'wazuh.integration.decoders': 'syscheck' } },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -56,7 +59,9 @@ const syscheck = async agentID => {
   checkRes(res);
   commonFields(sample);
   sample.syscheck.should.be.a('object');
-  sample.rule.groups.should.be.a('array').that.includes('syscheck');
+  sample.wazuh.integration.decoders.should.be
+    .a('array')
+    .that.includes('syscheck');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
   sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
@@ -75,12 +80,12 @@ const rootcheck = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'rule.groups': 'rootcheck' } }
-          ]
-        }
-      }
+            { match: { 'wazuh.integration.decoders': 'wazuh-rootcheck' } },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -91,11 +96,13 @@ const rootcheck = async agentID => {
 
   checkRes(res);
   commonFields(sample);
-  sample.rule.groups.should.be.a('array').that.includes('rootcheck');
+  sample.wazuh.integration.decoders.should.be
+    .a('array')
+    .that.includes('wazuh-rootcheck');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
   sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
-  sample.location.should.be.eql('rootcheck');
+  sample.location.should.be.eql('wazuh-rootcheck');
   sample.cluster.should.be.a('object');
   sample.cluster.name.should.be.eql('wazuh');
   sample.cluster.node.should.be.eql('node01');
@@ -110,12 +117,14 @@ const vulnerability = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'rule.groups': 'vulnerability-detector' } }
-          ]
-        }
-      }
+            {
+              match: { 'wazuh.integration.decoders': 'vulnerability-detector' },
+            },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -135,7 +144,7 @@ const vulnerability = async agentID => {
   sample.data.vulnerability.severity.should.be.a('string');
   sample.data.vulnerability.state.should.be.a('string');
   sample.data.vulnerability.cve.should.be.a('string');
-  sample.rule.groups.should.be
+  sample.wazuh.integration.decoders.should.be
     .a('array')
     .that.includes('vulnerability-detector');
   sample.manager.should.be.a('object');
@@ -156,12 +165,12 @@ const pciDss = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { exists: { field: 'rule.pci_dss' } }
-          ]
-        }
-      }
+            { exists: { field: 'rule.pci_dss' } },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -190,12 +199,12 @@ const gdpr = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { exists: { field: 'rule.gdpr' } }
-          ]
-        }
-      }
+            { exists: { field: 'rule.gdpr' } },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -224,12 +233,12 @@ const audit = async agentID => {
         bool: {
           must: [
             { match: { 'agent.id': `${agentID}` } },
-            { match: { 'rule.groups': 'audit' } }
-          ]
-        }
-      }
+            { match: { 'wazuh.integration.decoders': 'audit' } },
+          ],
+        },
+      },
     },
-    headers
+    headers,
   );
 
   if (!res.body.hits.hits.length) {
@@ -241,7 +250,7 @@ const audit = async agentID => {
   checkRes(res);
   commonFields(sample);
   sample.data.should.be.a('object');
-  sample.rule.groups.should.be.a('array').that.includes('audit');
+  sample.wazuh.integration.decoders.should.be.a('array').that.includes('audit');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
   sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
@@ -257,7 +266,7 @@ describe('Elasticsearch', () => {
       'get',
       `${elasticServer}:9200/_cat/indices`,
       {},
-      headers
+      headers,
     );
     res.statusCode.should.be.eql(200);
     res.body.should.be.a('string');
@@ -268,7 +277,7 @@ describe('Elasticsearch', () => {
       'get',
       `${elasticServer}:9200/_cat/indices/${index}`,
       {},
-      headers
+      headers,
     );
     res.statusCode.should.be.eql(200);
     res.body.should.be.a('string');
