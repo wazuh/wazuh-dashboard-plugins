@@ -3,7 +3,7 @@
 # Configure Wazuh server-Wazuh indexer connection
 [ -n "$INDEXER_USERNAME" ] && echo "$INDEXER_USERNAME" | /var/ossec/bin/wazuh-keystore -f indexer -k username
 [ -n "$INDEXER_PASSWORD" ] && echo "$INDEXER_PASSWORD" | /var/ossec/bin/wazuh-keystore -f indexer -k password
-[ -n "$INDEXER_URL" ] && sed -i "s|<host>https://0.0.0.0:9200</host>|<host>$INDEXER_URL</host>|g" /var/ossec/etc/ossec.conf
+[ -n "$INDEXER_URL" ] && sed -i "s|<host>https://127.0.0.1:9200</host>|<host>$INDEXER_URL</host>|g" /var/ossec/etc/ossec.conf
 if [ -n "$INDEXER_SSL_CA" ]; then
   sed -i "s|<ca>/var/ossec/etc/certs/root-ca.pem</ca>|<ca>$INDEXER_SSL_CA</ca>|g" /var/ossec/etc/ossec.conf
   chmod 400 $INDEXER_SSL_CA

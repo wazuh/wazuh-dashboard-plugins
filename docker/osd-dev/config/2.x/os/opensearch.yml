@@ -41,3 +41,4 @@ plugins.security.system_indices.indices:
 plugins.security.allow_default_init_securityindex: true
 cluster.routing.allocation.disk.threshold_enabled: false
 bootstrap.memory_lock: true
+content_manager.catalog.sync_interval: 1
