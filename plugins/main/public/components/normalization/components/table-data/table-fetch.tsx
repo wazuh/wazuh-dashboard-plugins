@@ -27,6 +27,10 @@ export interface ITableBasicProps<T> {
    */
   tablePageSizeOptions?: number[];
   /**
+   * Table initial page size
+   */
+  tableInitialPageSize?: number;
+  /**
    * Table initial sorting direction
    */
   tableInitialSortingDirection?: 'asc' | 'desc';
@@ -62,6 +66,7 @@ export function TableDataFetch<T>({
   tableColumns,
   rowProps,
   tablePageSizeOptions = [15, 25, 50, 100],
+  tableInitialPageSize = 15,
   tableInitialSortingDirection = 'asc',
   tableInitialSortingField = '',
   tableProps = {},
@@ -74,7 +79,7 @@ export function TableDataFetch<T>({
   const [searchParams, setParams] = useState(rest.searchParams || {});
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: tablePageSizeOptions[0],
+    pageSize: tableInitialPageSize || tablePageSizeOptions[0],
   });
   const [sorting, setSorting] = useState({
     sort: {

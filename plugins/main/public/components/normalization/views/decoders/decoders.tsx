@@ -377,6 +377,7 @@ const Body: React.FC = compose(
               },
             )
           }
+          tableInitialPageSize={25}
           tableColumns={tableColums}
           tableInitialSortingField='document.name'
           tableInitialSortingDirection='asc'
