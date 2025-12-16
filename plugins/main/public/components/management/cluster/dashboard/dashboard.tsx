@@ -201,7 +201,7 @@ const DashboardCT: React.FC<DashboardCTProps> = () => {
 
   return (
     <I18nProvider>
-      <EuiFlexItem style={{ padding: '0 16px' }}>
+      <EuiFlexItem className='wz-dashboard-page'>
         {dataSource && !state.showNodes && (
           <WzSearchBar
             appName='ct-searchbar'

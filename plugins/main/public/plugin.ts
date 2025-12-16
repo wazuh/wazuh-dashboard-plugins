@@ -171,6 +171,10 @@ export class WazuhPlugin
             }
 
             params.element.classList.add('dscAppWrapper', 'wz-app');
+            params.element.classList.toggle(
+              'wz-use-new-home-page',
+              Boolean(core.uiSettings.get('home:useNewHomePage')),
+            );
 
             const unmount = await renderApp(params);
 

@@ -34,6 +34,7 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { statistics } from '../../../../../utils/applications';
 import { DashboardTabsPanels } from '../../../../../components/overview/server-management-statistics/dashboards/dashboardTabsPanels';
+
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
   constructor(props) {
@@ -136,39 +137,46 @@ export class WzStatisticsOverview extends Component {
   render() {
     return (
       <EuiPage style={{ background: 'transparent' }}>
-        <EuiPanel>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiTitle>
-                    <h2>Statistics</h2>
-                  </EuiTitle>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiText color='subdued'>
-                From here you can see daemon statistics.
-              </EuiText>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiTabs>{this.renderTabs()}</EuiTabs>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiSpacer size={'m'} />
-          <DashboardTabsPanels
-            selectedTab={this.state.selectedTabId}
-            loadingNode={this.state.loadingNode}
-            clusterNodes={this.state.clusterNodes}
-            clusterNodeSelected={this.state.clusterNodeSelected}
-            onSelectNode={this.onSelectNode}
-          />
-        </EuiPanel>
+        <div className='wz-dashboard-page'>
+          <EuiPanel
+            paddingSize='none'
+            hasShadow={false}
+            hasBorder={false}
+            color='transparent'
+          >
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiTitle>
+                      <h2>Statistics</h2>
+                    </EuiTitle>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiText color='subdued'>
+                  From here you can see daemon statistics.
+                </EuiText>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiTabs>{this.renderTabs()}</EuiTabs>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiSpacer size={'m'} />
+            <DashboardTabsPanels
+              selectedTab={this.state.selectedTabId}
+              loadingNode={this.state.loadingNode}
+              clusterNodes={this.state.clusterNodes}
+              clusterNodeSelected={this.state.clusterNodeSelected}
+              onSelectNode={this.onSelectNode}
+            />
+          </EuiPanel>
+        </div>
       </EuiPage>
     );
   }

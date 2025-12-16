@@ -1769,6 +1769,30 @@ iframe.width-changed {
 }
 
 .wz-app {
+  --wz-page-padding: 8px;
+  --wz-page-padding-wide: 14px;
+
+  &.wz-use-new-home-page {
+    --wz-page-padding: 24px;
+    --wz-page-padding-wide: 24px;
+
+    .wz-welcome-page-agent-tabs {
+      padding: 12px 0 1px;
+
+      > .euiFlexGroup {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding-inline: var(--wz-page-padding);
+      }
+    }
+
+    .wz-custom-searchbar-wrapper {
+      max-width: 1400px;
+      margin: 4px auto 0;
+      padding-inline: var(--wz-page-padding);
+    }
+  }
+
   .euiPage {
     background-color: transparent;
   }

@@ -47,7 +47,7 @@ export const Dashboard = props => {
   );
 
   return (
-    <>
+    <div className='wz-dashboard-page'>
       <WzSearchBar
         appName='dashboard-searchbar'
         {...props.dataSource.searchBarProps}
@@ -115,7 +115,7 @@ export const Dashboard = props => {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
