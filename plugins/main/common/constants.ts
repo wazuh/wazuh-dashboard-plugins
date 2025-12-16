@@ -119,11 +119,6 @@ export const WAZUH_IT_HYGIENE_SERVICES_PATTERN =
 export const WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN =
   'wazuh-states-inventory-browser-extensions*';
 
-// Index patterns - Archives
-export const WAZUH_ARCHIVES_PATTERN = 'wazuh-archives*';
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_ARCHIVES =
-  'index-pattern:archives';
-
 // Index patterns - Events
 export const WAZUH_EVENTS_SYSTEM_ACTIVITY_PATTERN =
   'wazuh-events-v5-system-activity*';

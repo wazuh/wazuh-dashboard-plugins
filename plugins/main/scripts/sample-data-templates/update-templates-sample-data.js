@@ -60,7 +60,6 @@ const config = {
   datasets: [],
   // Mapping from local dataset names to remote template filenames
   datasetToTemplateMapping: {
-    'wazuh-alerts': 'templates/streams/alerts.json',
     'agents-monitoring': 'templates/monitoring.json',
     'server-statistics': 'templates/statistics.json',
     'states-fim-files': 'templates/states/fim-files.json',
@@ -209,6 +208,7 @@ async function updateTemplates() {
     results.failed.forEach(item => {
       console.log(`- ${item.dataset}: ${item.error}`);
     });
+    throw new Error('Some datasets failed to update.');
   }
 }
 
