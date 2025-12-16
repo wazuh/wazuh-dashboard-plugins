@@ -18,6 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
+- Replaced "Not run" KPI with "Not applicable" in SCA Configuration Assessment Dashboard and fixed Score KPI vertical alignment [#7979](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7979)
 - Adapted alerts sample data to Wazuh Common Schema [#7839](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7839)
 - Set cluster mode as default for all Wazuh installations, including single-node deployments. Updated RBAC permissions to `cluster:*` actions [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688)
 - Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7578](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7578) [#7929](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7929)
@@ -39,6 +40,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Removed
 
+- Removed "Not run" check result status from SCA module: removed from enums, sample data, visualizations, and documentation [#7979](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7979)
 - Removed logic related to manager in favor to cluster management [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688)
 - Removed the monitoring and statistics jobs in the backend side [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Removed the settings related to monitoring and statistics job from the configuration [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597) [#7698](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7698)
