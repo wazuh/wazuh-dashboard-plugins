@@ -116,11 +116,12 @@ jobs:
               attempt=1;
 
               while [ "${attempt}" -le "${max_attempts}" ]; do
+                echo "Performing yarn install (attempt ${attempt}/${max_attempts})...";
                 if yarn install --non-interactive; then
                   break;
+                else
+                  exit_code=$?;
                 fi;
-
-                exit_code=$?;
                 if [ "${attempt}" -ge "${max_attempts}" ]; then
                   echo "yarn install failed after ${max_attempts} attempts (exit code ${exit_code})." >&2;
                   exit "${exit_code}";
