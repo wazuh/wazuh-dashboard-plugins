@@ -35,13 +35,10 @@ export const AssetViewer: React.FC<{
     },
   };
   return (
-    <>
-      <EuiSpacer />
-      <EuiInMemoryTable
-        search={search}
-        items={flattenContent}
-        columns={columns}
-      ></EuiInMemoryTable>
-    </>
+    <EuiInMemoryTable
+      search={search}
+      items={flattenContent}
+      columns={columns}
+    ></EuiInMemoryTable>
   );
 };
