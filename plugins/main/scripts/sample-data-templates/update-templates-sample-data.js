@@ -82,6 +82,8 @@ const config = {
     'states-inventory-browser-extensions':
       'templates/states/inventory-browser-extensions.json',
   },
+  // WORKAROUND: This dataset is ignored due to issues with its template file (no existing in source repository). The wazuh-events dataset should be composed with the other wazuh-events related datasets in the future.
+  ignore_datasets: ['wazuh-events'],
 };
 
 // Function to get the list of datasets
@@ -89,6 +91,10 @@ function getDatasets() {
   try {
     const items = fs.readdirSync(config.localDatasetDir);
     config.datasets = items.filter(item => {
+      // Ignore specific datasets
+      if (config.ignore_datasets.includes(item)) {
+        return false;
+      }
       const itemPath = path.join(config.localDatasetDir, item);
       return fs.statSync(itemPath).isDirectory();
     });
