@@ -83,7 +83,8 @@ describe('XML Utils', () => {
     });
 
     it('should escape backslashes in Windows paths with drive letters', () => {
-      const windowsPath = '<var name="test_folder">C:\\Users\\Public\\Documents\\\\</var>';
+      const windowsPath =
+        '<var name="test_folder">C:\\Users\\Public\\Documents\\\\</var>';
       const result = replaceIllegalXML(windowsPath);
       expect(result).toContain('&amp;#92;');
       expect(result).not.toContain('C:\\Users');
@@ -92,19 +93,22 @@ describe('XML Utils', () => {
     });
 
     it('should escape backslashes in Windows paths in var tags', () => {
-      const varTagWithPath = '<var name="path">D:\\Program Files\\Wazuh\\</var>';
+      const varTagWithPath =
+        '<var name="path">D:\\Program Files\\Wazuh\\</var>';
       const result = replaceIllegalXML(varTagWithPath);
       expect(result).toContain('&amp;#92;');
     });
 
     it('should escape backslashes in Windows paths ending with backslashes', () => {
-      const pathEndingWithBackslash = '<directory>C:\\Users\\Test\\</directory>';
+      const pathEndingWithBackslash =
+        '<directory>C:\\Users\\Test\\</directory>';
       const result = replaceIllegalXML(pathEndingWithBackslash);
       expect(result).toContain('&amp;#92;');
     });
 
     it('should NOT escape backslashes in command tags', () => {
-      const commandWithRegex = '<command>netstat -tulpn | sed \'s/\\([[:alnum:]]\\+\\)\\ +[[:digit:]]\\+\\ +[[:digit:]]\\+\\ +\\(.*\\):\\([[:digit:]]*\\)\\ +\\([0-9\\.\\:\\*]\\+\\).\\+\\ \\([[:digit:]]*\\/[[:alnum:]\\-]*\\).*/\\1 \\2 == \\3 == \\4 \\5/\' | sort -k 4 -g</command>';
+      const commandWithRegex =
+        "<command>netstat -tulpn | sed 's/\\([[:alnum:]]\\+\\)\\ +[[:digit:]]\\+\\ +[[:digit:]]\\+\\ +\\(.*\\):\\([[:digit:]]*\\)\\ +\\([0-9\\.\\:\\*]\\+\\).\\+\\ \\([[:digit:]]*\\/[[:alnum:]\\-]*\\).*/\\1 \\2 == \\3 == \\4 \\5/' | sort -k 4 -g</command>";
       const result = replaceIllegalXML(commandWithRegex);
       expect(result).toContain('\\+');
       expect(result).toContain('\\(');
@@ -112,7 +116,8 @@ describe('XML Utils', () => {
     });
 
     it('should NOT escape backslashes in multiline commands', () => {
-      const multilineCommand = '<localfile>\n    <log_format>full_command</log_format>\n    <command>netstat -tulpn | sed \'s/\\([[:alnum:]]\\+\\)\\ +[[:digit:]]\\+/\' | sort -k 4 -g</command>\n    <alias>netstat listening ports</alias>\n</localfile>';
+      const multilineCommand =
+        "<localfile>\n    <log_format>full_command</log_format>\n    <command>netstat -tulpn | sed 's/\\([[:alnum:]]\\+\\)\\ +[[:digit:]]\\+/' | sort -k 4 -g</command>\n    <alias>netstat listening ports</alias>\n</localfile>";
       const result = replaceIllegalXML(multilineCommand);
       // Backslashes in command content should NOT be escaped
       expect(result).toContain('\\+');
@@ -120,7 +125,8 @@ describe('XML Utils', () => {
     });
 
     it('should NOT escape backslashes in command syntax (pipes with sed/awk/grep)', () => {
-      const commandSyntax = 'netstat -tulpn | sed \'s/\\(.*\\)/\\1/\' | awk \'{print $1}\' | grep test';
+      const commandSyntax =
+        "netstat -tulpn | sed 's/\\(.*\\)/\\1/' | awk '{print $1}' | grep test";
       const result = replaceIllegalXML(commandSyntax);
       // Backslashes in command syntax should NOT be escaped
       expect(result).toContain('\\(');
@@ -129,7 +135,8 @@ describe('XML Utils', () => {
     });
 
     it('should escape Windows paths but not commands in the same XML', () => {
-      const mixedContent = '<var name="path">C:\\Users\\Test\\</var>\n<command>sed \'s/\\(.*\\)/\\1/\'</command>';
+      const mixedContent =
+        '<var name="path">C:\\Users\\Test\\</var>\n<command>sed \'s/\\(.*\\)/\\1/\'</command>';
       const result = replaceIllegalXML(mixedContent);
       // Windows path should be escaped
       expect(result).toContain('C:&amp;#92;Users');
