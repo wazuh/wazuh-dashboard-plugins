@@ -141,28 +141,6 @@ export const getKPIsPanel = (
       gridData: { w: 12, h: 6, x: 24, y: 0, i: '3' },
       type: 'visualization',
       explicitInput: {
-        id: '3',
-        savedVis: getVisStateMetric(indexPatternId, {
-          id: 'check_result_not_run',
-          title: 'Checks not run',
-          colors: checkResultColors(),
-          colorSchema: 'Blues',
-          aggsQuery: [
-            {
-              input: {
-                query: `check.result: "${CheckResult.NotRun}"`,
-                language: 'kuery',
-              },
-              label: CheckResult.NotRun,
-            },
-          ],
-        }),
-      },
-    },
-    '4': {
-      gridData: { w: 12, h: 6, x: 36, y: 0, i: '4' },
-      type: 'visualization',
-      explicitInput: {
         id: '4',
         savedVis: {
           id: '4',

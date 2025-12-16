@@ -115,12 +115,6 @@ const ScaScanTable = ({ dataSourceAction }) => {
       sortable: true,
     },
     {
-      field: 'not_run',
-      name: CheckResult.NotRun,
-      width: '10%',
-      sortable: true,
-    },
-    {
       field: 'score',
       name: 'Score',
       width: '10%',
@@ -226,9 +220,6 @@ const ScaScanBody = compose(
             const {
               [CheckResult.Passed]: [{ doc_count: pass }] = [{ doc_count: 0 }],
               [CheckResult.Failed]: [{ doc_count: fail }] = [{ doc_count: 0 }],
-              [CheckResult.NotRun]: [{ doc_count: not_run }] = [
-                { doc_count: 0 },
-              ],
             } = groupBy(check_result.buckets, 'key');
 
             const score = pass / Math.max(pass + fail, 1);
@@ -237,7 +228,6 @@ const ScaScanBody = compose(
               name: policy_name,
               pass,
               fail,
-              not_run,
               score,
             };
           },
