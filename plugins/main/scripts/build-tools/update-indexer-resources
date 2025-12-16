@@ -29,8 +29,6 @@ update_templates_sample_data() {
   echo "Updating sample data of index pattern templates with indexer reference [$ref]..."
 
   node $(realpath "$SCRIPT_PATH/../sample-data-templates/update-templates-sample-data.js") --branch=$ref
-
-  echo "Result $?"
 }
 
 # Option 5: plugin package.json
