@@ -11,6 +11,7 @@
  */
 
 import { i18n } from '@osd/i18n';
+import { DEFAULT_NAV_GROUPS } from '../../../../src/core/public';
 import { Applications } from './applications';
 
 /**
@@ -37,21 +38,6 @@ export interface WazuhNavLinkConfig {
     order?: number;
   };
 }
-
-/**
- * DEFAULT_NAV_GROUPS mirrors the OpenSearch core navigation groups.
- * These are the predefined navigation groups like 'security-analytics', 'observability', etc.
- * @see https://github.com/opensearch-project/OpenSearch-Dashboards/blob/main/src/core/utils/default_nav_groups.ts
- */
-const DEFAULT_NAV_GROUPS: Record<string, ChromeNavGroup> = {
-  all: {
-    id: 'all',
-    title: 'Analytics',
-    description:
-      "If you aren't sure where to start with OpenSearch, or if you have needs that cut across multiple use cases.",
-    order: 3000,
-  },
-};
 
 /**
  * Wazuh custom nav groups for the new home page navigation.
@@ -109,7 +95,8 @@ export const WZ_APP_CATEGORIES = {
  * Mapping from old Wazuh categories to new nav category configurations.
  * Maps the category ID from applications.ts to the new nav category format.
  */
-export const CATEGORY_TO_NAV_CATEGORY: Record<string, typeof WZ_APP_CATEGORIES.endpointSecurity> = {
+type NavCategory = { id: string; label: string; order?: number };
+export const CATEGORY_TO_NAV_CATEGORY: Record<string, NavCategory> = {
   'wz-category-endpoint-security': WZ_APP_CATEGORIES.endpointSecurity,
   'wz-category-threat-intelligence': WZ_APP_CATEGORIES.threatIntelligence,
   'wz-category-security-operations': WZ_APP_CATEGORIES.securityOperations,
