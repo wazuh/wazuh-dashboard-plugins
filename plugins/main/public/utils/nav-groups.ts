@@ -104,6 +104,7 @@ export const CATEGORY_TO_NAV_CATEGORY: Record<string, NavCategory> = {
   'wz-category-agents-management': WZ_APP_CATEGORIES.agentsManagement,
   'wz-category-server-management': WZ_APP_CATEGORIES.serverManagement,
   'wz-category-dashboard-management': DEFAULT_APP_CATEGORIES.dashboardManagement,
+  'management': DEFAULT_APP_CATEGORIES.management,
 };
 
 /**
