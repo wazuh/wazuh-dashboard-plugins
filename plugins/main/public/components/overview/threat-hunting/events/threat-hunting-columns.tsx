@@ -4,6 +4,8 @@ import { commonColumns } from '../../common/data-grid-columns';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
+
+
 const threatHuntingTableCommonColumns = {
   icon: {
     id: 'icon',
@@ -20,9 +22,7 @@ const threatHuntingTableCommonColumns = {
 
 export const threatHuntingTableDefaultColumns: tDataGridColumn[] = [
   threatHuntingTableCommonColumns.icon,
-  commonColumns.timestamp,
   commonColumns['agent.id'],
-  commonColumns['agent.name'],
   threatHuntingTableCommonColumns['rule.mitre.id'],
   threatHuntingTableCommonColumns['rule.mitre.tactic'],
   commonColumns['rule.description'],
