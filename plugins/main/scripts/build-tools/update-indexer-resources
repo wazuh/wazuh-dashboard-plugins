@@ -100,6 +100,11 @@ check_dependencies() {
   fi
 }
 
+if [ "$SKIP_DOWNLOAD_INDEXER_RESOURCES" == "true"]; then
+  echo 'Skipping the download of indexer resources'
+  exit 0;
+fi
+
 # Input parameter: indexer branch reference
 # e.g., main, develop, feature/some-feature
 INPUT_CANDIDATE_REF="${1:-$GIT_REF}"
