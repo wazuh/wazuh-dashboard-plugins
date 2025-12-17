@@ -144,6 +144,30 @@ describe('XML Utils', () => {
       expect(result).toContain('\\(');
       expect(result).toContain('\\)');
     });
+
+    it('should NOT escape backslashes in command content on the same line as closing command tag', () => {
+      // This test covers the fix for lines containing </command> with command content
+      // The closing tag should not cause the line to be misclassified as non-command
+      const commandWithClosingTagOnSameLine =
+        "<command>sed 's/\\([[:alnum:]]\\+\\)\\ +[[:digit:]]\\+/\' | sort</command>";
+      const result = replaceIllegalXML(commandWithClosingTagOnSameLine);
+      // Backslashes in command content should NOT be escaped even though </command> is on the same line
+      expect(result).toContain('\\+');
+      expect(result).toContain('\\(');
+      expect(result).not.toContain('&amp;#92;');
+    });
+
+    it('should NOT escape backslashes in multiline command where last line contains closing tag', () => {
+      // This test covers the specific case mentioned in the code review
+      // where the closing </command> tag is on a line with command content
+      const multilineCommandWithClosingTag =
+        "<localfile>\n    <command>netstat -tulpn | sed 's/\\(.*\\)/\\1/' | sort -k 4 -g</command>\n    <alias>netstat</alias>\n</localfile>";
+      const result = replaceIllegalXML(multilineCommandWithClosingTag);
+      // Backslashes in command should NOT be escaped
+      expect(result).toContain('\\(');
+      expect(result).toContain('\\)');
+      expect(result).not.toContain('&amp;#92;');
+    });
   });
 
   describe('replaceXML', () => {
