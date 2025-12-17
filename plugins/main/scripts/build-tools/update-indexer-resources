@@ -100,7 +100,7 @@ check_dependencies() {
   fi
 }
 
-if [ "$SKIP_DOWNLOAD_INDEXER_RESOURCES" == "true"]; then
+if [ "$SKIP_DOWNLOAD_INDEXER_RESOURCES" = "true" ]; then
   echo 'Skipping the download of indexer resources'
   exit 0;
 fi
