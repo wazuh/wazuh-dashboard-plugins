@@ -19,7 +19,6 @@ import {
 } from './global-configuration/global-configuration';
 import WzConfigurationEditConfiguration from './edit-configuration/edit-configuration';
 import WzConfigurationRegistrationService from './registration-service/registration-service';
-import WzConfigurationLogSettings from './log-settings/log-settings';
 import WzConfigurationCluster from './cluster/cluster';
 import WzConfigurationClient from './client/client';
 import WzConfigurationClientBuffer from './client-buffer/client-buffer';
@@ -273,14 +272,6 @@ class WzConfigurationSwitch extends Component {
                 </WzViewSelectorSwitch>
                 <WzViewSelectorSwitch view='registration-service'>
                   <WzConfigurationRegistrationService
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateBadge={this.updateBadge}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='log-settings'>
-                  <WzConfigurationLogSettings
                     clusterNodeSelected={this.props.clusterNodeSelected}
                     agent={agent}
                     updateBadge={this.updateBadge}
