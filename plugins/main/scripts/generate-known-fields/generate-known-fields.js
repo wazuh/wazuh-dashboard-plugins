@@ -58,22 +58,6 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'states-vulnerabilities.json',
   },
-  alerts: {
-    urls: [
-      wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/alerts.json',
-      ),
-    ],
-    outputFile: 'alerts.json',
-  },
-  archives: {
-    urls: [
-      wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/archives.json',
-      ),
-    ],
-    outputFile: 'archives.json',
-  },
   'events-access-management': {
     urls: [
       wazuhUrl(

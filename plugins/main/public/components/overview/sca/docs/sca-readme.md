@@ -11,7 +11,7 @@ It allows users to quickly see, for each policy associated with an agent, how ma
 
 - ✅ Passed
 - ❌ Failed
-- 🚫 Not Run
+- 🚫 Not Applicable
 
 ---
 

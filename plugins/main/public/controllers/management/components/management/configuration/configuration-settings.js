@@ -62,12 +62,6 @@ export default [
         goto: 'alerts-agent',
         when: 'agent',
       },
-      // ,
-      // { //TODO: Uncomment this to activate Log Settings
-      //   name: 'Log settings',
-      //   description: 'Alerts, archives and internal settings',
-      //   goto: 'log-settings'
-      // }
     ],
   },
   {
