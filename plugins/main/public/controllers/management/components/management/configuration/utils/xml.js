@@ -111,13 +111,14 @@ export const replaceIllegalXML = text => {
   for (const line of lines) {
     const trimmedLine = line.trim();
 
-    // Track if we're inside a command tag
-    if (/<command[^>]*>/i.test(trimmedLine)) {
-      insideCommandTag = true;
-    }
-    if (/<\/command>/i.test(trimmedLine)) {
-      insideCommandTag = false;
-    }
+    // Check if this line opens or closes a command tag
+    const opensCommandTag = /<command[^>]*>/i.test(trimmedLine);
+    const closesCommandTag = /<\/command>/i.test(trimmedLine);
+
+    // Determine if this is a command line BEFORE updating the flag
+    // If we're inside a command tag OR this line contains </command>,
+    // treat it as command content (the closing tag is still part of the command)
+    const isCommand = isCommandLine(line, insideCommandTag || closesCommandTag);
 
     let sanitized = replaceXML(trimmedLine, '&', '&amp;');
 
@@ -128,10 +129,6 @@ export const replaceIllegalXML = text => {
       not in command syntax (like regex patterns in sed commands).
     */
     if (sanitized.includes('\\') && !sanitized.includes('&amp;#92;')) {
-      // Only escape backslashes if:
-      // 1. This is NOT a command line (commands may contain regex patterns)
-      // 2. This appears to be a Windows path
-      const isCommand = isCommandLine(line, insideCommandTag);
       if (!isCommand && isWindowsPath(line)) {
         sanitized = replaceXML(sanitized, '\\', '&amp;#92;');
       }
@@ -143,6 +140,13 @@ export const replaceIllegalXML = text => {
      */
     if (!line.includes(sanitized)) {
       text = replaceXML(text, trimmedLine, sanitized);
+    }
+
+    if (opensCommandTag) {
+      insideCommandTag = true;
+    }
+    if (closesCommandTag) {
+      insideCommandTag = false;
     }
   }
   return text;
