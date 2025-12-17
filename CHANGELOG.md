@@ -40,7 +40,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Removed
 
-- Removed "Not run" check result status from SCA module: removed from enums, sample data, visualizations, and documentation [#7979](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7979)
+- Removed "Not run" check result status from SCA module [#7979](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7979)
 - Removed logic related to manager in favor to cluster management [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688)
 - Removed the monitoring and statistics jobs in the backend side [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Removed the settings related to monitoring and statistics job from the configuration [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597) [#7698](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7698)
