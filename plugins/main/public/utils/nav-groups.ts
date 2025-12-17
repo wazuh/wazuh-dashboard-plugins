@@ -44,13 +44,6 @@ export interface WazuhNavLinkConfig {
  * @see https://github.com/opensearch-project/OpenSearch-Dashboards/blob/main/src/core/utils/default_nav_groups.ts
  */
 const DEFAULT_NAV_GROUPS: Record<string, ChromeNavGroup> = {
-  'security-analytics': {
-    id: 'security-analytics',
-    title: 'Security Analytics',
-    description:
-      'Detect and investigate potential security threats and vulnerabilities across your systems and data.',
-    order: 5000,
-  },
   all: {
     id: 'all',
     title: 'Analytics',
@@ -110,13 +103,6 @@ export const WZ_APP_CATEGORIES = {
     }),
     order: 600,
   },
-  dashboardManagement: {
-    id: 'wazuh-dashboard-management',
-    label: i18n.translate('wazuh.navCategory.dashboardManagement', {
-      defaultMessage: 'Dashboard management',
-    }),
-    order: 700,
-  },
 };
 
 /**
@@ -130,7 +116,6 @@ export const CATEGORY_TO_NAV_CATEGORY: Record<string, typeof WZ_APP_CATEGORIES.e
   'wz-category-cloud-security': WZ_APP_CATEGORIES.cloudSecurity,
   'wz-category-agents-management': WZ_APP_CATEGORIES.agentsManagement,
   'wz-category-server-management': WZ_APP_CATEGORIES.serverManagement,
-  'wz-category-dashboard-management': WZ_APP_CATEGORIES.dashboardManagement,
 };
 
 /**
@@ -180,9 +165,6 @@ export function registerWazuhNavLinks(
 
   // Get all nav link configurations from applications
   const navLinks = createNavLinksFromApplications(Applications);
-
-  // Register in Security Analytics use case (primary use case for Wazuh)
-  addNavLinksToGroup(DEFAULT_NAV_GROUPS['security-analytics'], navLinks);
 
   // Also register in "All" (Analytics) use case for visibility
   addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, navLinks.map(link => ({
