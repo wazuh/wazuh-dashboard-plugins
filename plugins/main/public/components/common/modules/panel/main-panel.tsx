@@ -95,7 +95,7 @@ export const MainPanel = (props: MainPanelProps) => {
   );
 
   return (
-    <EuiFlexGroup className='wz-dashboard-panel'>
+    <EuiFlexGroup style={{ margin: '0 8px' }}>
       <EuiFlexItem>
         {sidePanelChildren && (
           <ModuleSidePanel>{sidePanelChildren}</ModuleSidePanel>

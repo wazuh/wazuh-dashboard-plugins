@@ -203,7 +203,7 @@ const InventoryVulsComponent = () => {
         of data source error prompt. We should unify the different views. In the Dashboard tab, the
         same prompt is rendered at top of view */}
         <EuiPageTemplate
-          className='vulsInventoryContainer wz-dashboard-page'
+          className='vulsInventoryContainer'
           restrictWidth='100%'
           fullHeight={true}
           grow

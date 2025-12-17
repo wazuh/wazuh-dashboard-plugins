@@ -70,9 +70,7 @@ export const SampleDataWarning = ({
         title='This dashboard contains sample data'
         color='warning'
         iconType='alert'
-        style={{
-          margin: '0 var(--wz-page-padding) 16px var(--wz-page-padding)',
-        }}
+        style={{ margin: '0 8px 16px 8px' }}
         data-test-subject='sample-data-callout'
         {...props}
       >

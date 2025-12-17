@@ -50,7 +50,7 @@ export const TabsManagedBySearchParam = ({
 
   return (
     <>
-      <EuiTabs {...tabsProps} style={{ padding: '0 var(--wz-page-padding-wide)' }}>
+      <EuiTabs {...tabsProps} style={{ padding: '0px 14px' }}>
         {tabs.map(tab => (
           <EuiTab
             key={tab.id}

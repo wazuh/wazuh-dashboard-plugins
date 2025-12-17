@@ -1,26 +1,5 @@
 /* Dashboards */
 
-.wz-dashboard-page {
-  padding-inline: var(--wz-page-padding);
-}
-
-.wz-dashboard-panel {
-  margin: 0 8px;
-}
-
-.wz-app.wz-use-new-home-page {
-  .wz-dashboard-page {
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-
-  .wz-dashboard-panel {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding-inline: var(--wz-page-padding);
-  }
-}
-
 /* Responsive */
 .wz-dashboard-responsive {
   @media (max-width: 767px) {

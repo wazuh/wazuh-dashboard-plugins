@@ -171,9 +171,7 @@ export const DashboardTabsPanels = ({
       <EuiSpacer size={'m'} />
       <div
         // WORKAROUND: This style mitigates the include styles in the DiscoverNoResults component to align with the SampleDataWarning component and the EuiCallOut with information about the tab. The components should not include wrappers with margin/padding and this should be set by the layout instead
-        style={{
-          margin: '0 var(--wz-page-padding) 16px var(--wz-page-padding)',
-        }}
+        style={{ margin: '0 8px 16px 8px' }}
       >
         <EuiCallOut title={infoMessage[selectedTab]} iconType='iInCircle' />
       </div>
@@ -181,7 +179,7 @@ export const DashboardTabsPanels = ({
       {dataSource && results?.hits?.total === 0 ? (
         <div
           // WORKAROUND: This style mitigates the include styles in the DiscoverNoResults component to align with the SampleDataWarning component and the EuiCallOut with information about the tab. The components should not include wrappers with margin/padding and this should be set by the layout instead
-          style={{ margin: 'calc(-1 * var(--wz-page-padding))' }}
+          style={{ margin: '-8px' }}
         >
           <DiscoverNoResults />
         </div>

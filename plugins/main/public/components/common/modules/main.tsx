@@ -51,7 +51,7 @@ export const MainModule = compose(withErrorBoundary)(
       if (!agent) {
       }
       return (
-        <EuiFlexItem className='wz-module-tabs'>
+        <EuiFlexItem style={{ margin: '0 8px 0 8px' }}>
           <EuiTabs>
             {this.tabs.map((tab, index) => {
               if (!tab.onlyAgent || (tab.onlyAgent && this.props.agent)) {

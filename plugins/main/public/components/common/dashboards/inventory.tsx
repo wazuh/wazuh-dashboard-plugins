@@ -67,7 +67,7 @@ const InventoryDashboard = compose(
     const shouldHideDashboard = !Boolean(results?.hits?.total > 0);
 
     return (
-      <div className='wz-dashboard-page'>
+      <>
         <CustomSearchBar
           searchBarProps={searchBarProps}
           indexPattern={dataSource?.indexPattern}
@@ -159,11 +159,11 @@ const InventoryDashboard = compose(
                   tableDefaultColumns={tableDefaultColumns}
                   additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
                 />
-          </EuiPageTemplate>
+              </EuiPageTemplate>
             </>
           </IntlProvider>
         )}
-      </div>
+      </>
     );
   },
 );
