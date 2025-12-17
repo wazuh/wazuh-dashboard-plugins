@@ -52,9 +52,9 @@ const checkScore = (indexPatternId: string) => ({
       encode: {
         enter: {
           x: { signal: 'width / 2' },
-          y: { signal: 'height / 1.5' },
+          y: { signal: 'height / 2' },
           align: { value: 'center' },
-          baseline: { value: 'bottom' },
+          baseline: { value: 'middle' },
           text: { signal: `format(datum.score, '${decimalFormat()}') + '%'` },
           fontSize: { value: 53.333 },
           fontWeight: { value: 700 },
@@ -143,17 +143,17 @@ export const getKPIsPanel = (
       explicitInput: {
         id: '3',
         savedVis: getVisStateMetric(indexPatternId, {
-          id: 'check_result_not_run',
-          title: 'Checks not run',
+          id: 'check_result_not_applicable',
+          title: 'Checks not applicable',
           colors: checkResultColors(),
           colorSchema: 'Blues',
           aggsQuery: [
             {
               input: {
-                query: `check.result: "${CheckResult.NotRun}"`,
+                query: `check.result: "${CheckResult.NotApplicable}"`,
                 language: 'kuery',
               },
-              label: CheckResult.NotRun,
+              label: CheckResult.NotApplicable,
             },
           ],
         }),
