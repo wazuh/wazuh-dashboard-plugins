@@ -41,7 +41,8 @@ import {
   withInitialQueryFromURL,
 } from '../../components/search-bar/search-bar';
 import { Metadata } from '../../components/metadata/metadata';
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
+import { JSONViewer } from '../../components/json-viewer/json-viewer';
 
 const relationIntegrationIDField = '__integration';
 
@@ -115,8 +116,8 @@ const Details: React.FC<{ item: { document: { id: string } } }> = ({
       <EuiTabbedContent
         tabs={[
           {
-            id: 'info',
-            name: 'Info',
+            id: 'visual',
+            name: 'Visual',
             content: (
               <>
                 <EuiSpacer />
@@ -190,9 +191,18 @@ const Details: React.FC<{ item: { document: { id: string } } }> = ({
             ),
           },
           {
-            id: 'content',
-            name: 'Content',
+            id: 'yaml',
+            name: 'YAML',
             content: <AssetViewer content={action.data.decoder || ''} />,
+          },
+          {
+            id: 'json',
+            name: 'JSON',
+            content: (
+              <JSONViewer
+                data={omit(action.data, [relationIntegrationIDField])}
+              />
+            ),
           },
         ]}
       />
@@ -367,6 +377,7 @@ const Body: React.FC = compose(
               },
             )
           }
+          tableInitialPageSize={25}
           tableColumns={tableColums}
           tableInitialSortingField='document.name'
           tableInitialSortingDirection='asc'
