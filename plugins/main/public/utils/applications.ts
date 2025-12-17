@@ -773,7 +773,7 @@ export const Applications = [
   overview,
   // malwareDetection,
   configurationAssessment,
-  // threatHunting,
+  threatHunting,
   vulnerabilityDetection,
   // mitreAttack,
   // pciDss,
