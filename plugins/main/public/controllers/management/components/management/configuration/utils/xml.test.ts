@@ -149,7 +149,7 @@ describe('XML Utils', () => {
       // This test covers the fix for lines containing </command> with command content
       // The closing tag should not cause the line to be misclassified as non-command
       const commandWithClosingTagOnSameLine =
-        "<command>sed 's/\\([[:alnum:]]\\+\\)\\ +[[:digit:]]\\+/\' | sort</command>";
+        "<command>sed 's/\\([[:alnum:]]\\+\\)\\ +[[:digit:]]\\+/' | sort</command>";
       const result = replaceIllegalXML(commandWithClosingTagOnSameLine);
       // Backslashes in command content should NOT be escaped even though </command> is on the same line
       expect(result).toContain('\\+');
