@@ -109,7 +109,6 @@ import {
 import { notificationSetup } from './health-check/notification-default-channels';
 import { initializeDefaultNotificationChannel } from './health-check/notification-default-channels/tasks';
 import IndexPatternEventsKnownFields from '../common/known-fields/events.json';
-import IndexPatternArchivesKnownFields from '../common/known-fields/archives.json';
 import IndexPatternEventsAccessManagementKnownFields from '../common/known-fields/events-access-management.json';
 import IndexPatternEventsApplicationsKnownFields from '../common/known-fields/events-applications.json';
 import IndexPatternEventsCloudServicesKnownFields from '../common/known-fields/events-cloud-services.json';
