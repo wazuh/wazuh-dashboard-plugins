@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  EuiAccordion,
   EuiButton,
   EuiCallOut,
   EuiFlexGroup,
@@ -39,8 +40,9 @@ import {
 import { TableDataFetch } from '../../components/table-data/table-fetch';
 import { Id as OverviewId } from '../overview/info';
 import { Metadata } from '../../components/metadata/metadata';
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 import { AssetViewer } from './asset-viewer';
+import { JSONViewer } from '../../components/json-viewer/json-viewer';
 
 const relationIntegrationIDField = '__integration';
 
@@ -112,8 +114,8 @@ const Details: React.FC<{ item: { id: string; space: string } }> = ({
         <EuiTabbedContent
           tabs={[
             {
-              id: 'info',
-              name: 'Info',
+              id: 'visual',
+              name: 'Visual',
               content: (
                 <>
                   <EuiSpacer />
@@ -140,13 +142,30 @@ const Details: React.FC<{ item: { id: string; space: string } }> = ({
                       );
                     })}
                   </EuiFlexGrid>
+                  {action.data?.document?.content && (
+                    <>
+                      <EuiSpacer />
+                      <EuiAccordion
+                        id='content'
+                        buttonContent='Content'
+                        paddingSize='s'
+                        initialIsOpen={true}
+                      >
+                        <AssetViewer content={action.data.document.content} />
+                      </EuiAccordion>
+                    </>
+                  )}
                 </>
               ),
             },
             {
-              id: 'content',
-              name: 'Database',
-              content: <AssetViewer content={action.data.document.content} />,
+              id: 'json',
+              name: 'JSON',
+              content: (
+                <JSONViewer
+                  data={omit(action.data, [relationIntegrationIDField])}
+                />
+              ),
             },
           ]}
         />
@@ -308,6 +327,7 @@ const Body: React.FC = compose(
             )
           }
           tableColumns={tableColums}
+          tableInitialPageSize={25}
           tableInitialSortingField='document.title'
           tableInitialSortingDirection='asc'
           searchParams={

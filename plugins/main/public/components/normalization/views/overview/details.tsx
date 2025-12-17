@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import {
+  EuiAccordion,
   EuiCallOut,
   EuiFlexGrid,
   EuiFlexItem,
@@ -10,7 +11,7 @@ import {
   EuiTabbedContent,
   EuiTitle,
 } from '@elastic/eui';
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 import { useAsyncAction } from '../../../common/hooks';
 import {
   fetchInternalOpenSearchIndex,
@@ -20,6 +21,7 @@ import { indexName } from './info';
 import { indexName as DecodersIndexName } from '../decoders/info';
 import { indexName as KVDBsIndexName } from '../kvdbs/info';
 import { Metadata } from '../../components/metadata/metadata';
+import { JSONViewer } from '../../components/json-viewer/json-viewer';
 
 const relationDecodersIDField = '___decoders';
 const relationKVDBsIDField = '___kvdbs';
@@ -75,22 +77,21 @@ const AssetViewer: React.FC<{ items: string }> = ({
   items,
   columns,
   schema = true,
+  executeQueryOptions = undefined,
 }) => {
   const search = {
     box: {
       incremental: true,
-      schema,
+      schema: schema,
     },
   };
   return (
-    <>
-      <EuiSpacer />
-      <EuiInMemoryTable
-        search={search}
-        items={items}
-        columns={columns}
-      ></EuiInMemoryTable>
-    </>
+    <EuiInMemoryTable
+      search={search}
+      items={items}
+      columns={columns}
+      executeQueryOptions={executeQueryOptions}
+    ></EuiInMemoryTable>
   );
 };
 
@@ -164,8 +165,8 @@ export const Details: React.FC<{ item: { document: { id: string } } }> = ({
       <EuiTabbedContent
         tabs={[
           {
-            id: 'info',
-            name: 'Info',
+            id: 'visual',
+            name: 'Visual',
             content: (
               <>
                 <EuiSpacer />
@@ -207,54 +208,84 @@ export const Details: React.FC<{ item: { document: { id: string } } }> = ({
                     />
                   </>
                 )}
+                {action.data?.[relationDecodersIDField] && (
+                  <>
+                    <EuiSpacer />
+                    <EuiAccordion
+                      id='decoders'
+                      buttonContent='Decoders'
+                      initialIsOpen={true}
+                      paddingSize='s'
+                    >
+                      <AssetViewer
+                        items={action.data[relationDecodersIDField] || []}
+                        columns={columnsRelationDecoders}
+                        schema={{
+                          strict: true,
+                          fields: {
+                            'document.name': {
+                              type: 'string',
+                            },
+                            'document.id': {
+                              type: 'string',
+                            },
+                            [missingFieldMarker]: {
+                              type: 'boolean',
+                            },
+                          },
+                        }}
+                        executeQueryOptions={{
+                          defaultFields: ['document.name'],
+                        }}
+                      />
+                    </EuiAccordion>
+                  </>
+                )}
+                {action.data?.[relationDecodersIDField] && (
+                  <>
+                    <EuiSpacer />
+                    <EuiAccordion
+                      id='kvdbs'
+                      buttonContent='KVDBs'
+                      initialIsOpen={true}
+                      paddingSize='s'
+                    >
+                      <AssetViewer
+                        items={action.data[relationKVDBsIDField] || []}
+                        columns={columnsRelationKVDBs}
+                        schema={{
+                          strict: true,
+                          fields: {
+                            'document.title': {
+                              type: 'string',
+                            },
+                            'document.id': {
+                              type: 'string',
+                            },
+                            [missingFieldMarker]: {
+                              type: 'boolean',
+                            },
+                          },
+                        }}
+                        executeQueryOptions={{
+                          defaultFields: ['document.title'],
+                        }}
+                      />
+                    </EuiAccordion>
+                  </>
+                )}
               </>
             ),
           },
           {
-            id: 'decoders',
-            name: 'Decoders',
+            id: 'json',
+            name: 'JSON',
             content: (
-              <AssetViewer
-                items={action.data[relationDecodersIDField] || []}
-                columns={columnsRelationDecoders}
-                schema={{
-                  strict: true,
-                  fields: {
-                    'document.name': {
-                      type: 'string',
-                    },
-                    'document.id': {
-                      type: 'string',
-                    },
-                    [missingFieldMarker]: {
-                      type: 'boolean',
-                    },
-                  },
-                }}
-              />
-            ),
-          },
-          {
-            id: 'kvdbs',
-            name: 'KVDBs',
-            content: (
-              <AssetViewer
-                items={action.data[relationKVDBsIDField] || []}
-                columns={columnsRelationKVDBs}
-                schema={{
-                  strict: true,
-                  fields: {
-                    'document.title': {
-                      type: 'string',
-                    },
-                    'document.id': {
-                      type: 'string',
-                    },
-                    [missingFieldMarker]: {
-                      type: 'boolean',
-                    },
-                  },
-                }}
+              <JSONViewer
+                data={omit(action.data, [
+                  relationDecodersIDField,
+                  relationKVDBsIDField,
+                ])}
               />
             ),
           },
