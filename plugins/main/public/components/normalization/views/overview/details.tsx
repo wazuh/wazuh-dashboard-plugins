@@ -77,11 +77,12 @@ const AssetViewer: React.FC<{ items: string }> = ({
   items,
   columns,
   schema = true,
+  executeQueryOptions = undefined,
 }) => {
   const search = {
     box: {
       incremental: true,
-      schema,
+      schema: schema,
     },
   };
   return (
@@ -89,6 +90,7 @@ const AssetViewer: React.FC<{ items: string }> = ({
       search={search}
       items={items}
       columns={columns}
+      executeQueryOptions={executeQueryOptions}
     ></EuiInMemoryTable>
   );
 };
@@ -232,6 +234,9 @@ export const Details: React.FC<{ item: { document: { id: string } } }> = ({
                             },
                           },
                         }}
+                        executeQueryOptions={{
+                          defaultFields: ['document.name'],
+                        }}
                       />
                     </EuiAccordion>
                   </>
@@ -261,6 +266,9 @@ export const Details: React.FC<{ item: { document: { id: string } } }> = ({
                               type: 'boolean',
                             },
                           },
+                        }}
+                        executeQueryOptions={{
+                          defaultFields: ['document.title'],
                         }}
                       />
                     </EuiAccordion>
