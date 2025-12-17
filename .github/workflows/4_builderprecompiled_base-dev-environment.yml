@@ -17,21 +17,21 @@ on:
       command:
         required: true
         type: string
-        default: 'yarn build'
+        default: "yarn build"
         description: Command to run in the environment
       docker_run_extra_args:
         type: string
-        default: ''
+        default: ""
         description: Additional paramaters for the docker run command.
         required: false
       artifact_name:
         type: string
-        default: ''
+        default: ""
         description: Artifact name (will be automatically suffixed with .zip)
         required: false
       artifact_path:
         type: string
-        default: 'build'
+        default: "build"
         description: Folder to include in the archive.
         required: false
       notify_jest_coverage_summary:
@@ -52,19 +52,19 @@ jobs:
         plugins:
           [
             {
-              name: 'Main',
-              path: 'wazuh/plugins/main',
-              container_path: 'wazuh',
+              name: "Main",
+              path: "wazuh/plugins/main",
+              container_path: "wazuh",
             },
             {
-              name: 'Wazuh Check Updates',
-              path: 'wazuh/plugins/wazuh-check-updates',
-              container_path: 'wazuh-check-updates',
+              name: "Wazuh Check Updates",
+              path: "wazuh/plugins/wazuh-check-updates",
+              container_path: "wazuh-check-updates",
             },
             {
-              name: 'Wazuh Core',
-              path: 'wazuh/plugins/wazuh-core',
-              container_path: 'wazuh-core',
+              name: "Wazuh Core",
+              path: "wazuh/plugins/wazuh-core",
+              container_path: "wazuh-core",
             },
           ]
 
@@ -117,10 +117,14 @@ jobs:
 
               while [ "${attempt}" -le "${max_attempts}" ]; do
                 echo "Performing yarn install (attempt ${attempt}/${max_attempts})...";
-                if yarn install --non-interactive; then
-                  break;
+                if [ "${attempt}" -lt "${max_attempts}" ]; then
+                  exit_code=1;
                 else
-                  exit_code=$?;
+                  if yarn install --non-interactive; then
+                    break;
+                  else
+                    exit_code=$?;
+                  fi;
                 fi;
                 if [ "${attempt}" -ge "${max_attempts}" ]; then
                   echo "yarn install failed after ${max_attempts} attempts (exit code ${exit_code})." >&2;
@@ -147,7 +151,7 @@ jobs:
         with:
           name: ${{ inputs.artifact_name }}_${{ matrix.plugins.container_path }}_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           path: ${{ matrix.plugins.path }}/${{ inputs.artifact_path }}
-          if-no-files-found: 'error'
+          if-no-files-found: "error"
           overwrite: true
 
       - name: Step 05 - Upload coverage results to GitHub
@@ -156,4 +160,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           path: ./${{ matrix.plugins.path }}/target/test-coverage/coverage-summary.json
-          title: '${{ matrix.plugins.name }} plugin code coverage (Jest) test'
+          title: "${{ matrix.plugins.name }} plugin code coverage (Jest) test"
