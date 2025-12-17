@@ -4,8 +4,6 @@ import { commonColumns } from '../../common/data-grid-columns';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
-
-
 const threatHuntingTableCommonColumns = {
   icon: {
     id: 'icon',
