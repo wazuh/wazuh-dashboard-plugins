@@ -26,8 +26,6 @@ jest.mock('./edit-configuration/edit-configuration', () => () => <></>);
 
 jest.mock('./registration-service/registration-service', () => () => <></>);
 
-jest.mock('./log-settings/log-settings', () => () => <></>);
-
 jest.mock('./cluster/cluster', () => () => <></>);
 
 jest.mock('./client/client', () => () => <></>);

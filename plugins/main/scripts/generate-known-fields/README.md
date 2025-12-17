@@ -33,7 +33,7 @@ By default uses the version declared in the package.json and the `common/known-f
 
 ## Generated Files
 
-The script generates JSON files in the destination directory: alerts, archives, events, states, monitoring and statistics
+The script generates JSON files in the destination directory: events, states, monitoring and statistics
 
 The templates can be retrieved from: https://github.com/wazuh/wazuh-indexer-plugins/tree/main/plugins/setup/src/main/resources
 
