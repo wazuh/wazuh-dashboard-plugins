@@ -52,9 +52,9 @@ const checkScore = (indexPatternId: string) => ({
       encode: {
         enter: {
           x: { signal: 'width / 2' },
-          y: { signal: 'height / 1.5' },
+          y: { signal: 'height / 2' },
           align: { value: 'center' },
-          baseline: { value: 'bottom' },
+          baseline: { value: 'middle' },
           text: { signal: `format(datum.score, '${decimalFormat()}') + '%'` },
           fontSize: { value: 53.333 },
           fontWeight: { value: 700 },
@@ -139,6 +139,28 @@ export const getKPIsPanel = (
     },
     '3': {
       gridData: { w: 12, h: 6, x: 24, y: 0, i: '3' },
+      type: 'visualization',
+      explicitInput: {
+        id: '3',
+        savedVis: getVisStateMetric(indexPatternId, {
+          id: 'check_result_not_applicable',
+          title: 'Checks not applicable',
+          colors: checkResultColors(),
+          colorSchema: 'Blues',
+          aggsQuery: [
+            {
+              input: {
+                query: `check.result: "${CheckResult.NotApplicable}"`,
+                language: 'kuery',
+              },
+              label: CheckResult.NotApplicable,
+            },
+          ],
+        }),
+      },
+    },
+    '4': {
+      gridData: { w: 12, h: 6, x: 36, y: 0, i: '4' },
       type: 'visualization',
       explicitInput: {
         id: '4',
