@@ -11,7 +11,7 @@
  */
 
 import { i18n } from '@osd/i18n';
-import { DEFAULT_NAV_GROUPS } from '../../../../src/core/public';
+import { DEFAULT_NAV_GROUPS, DEFAULT_APP_CATEGORIES } from '../../../../src/core/public';
 import { Applications } from './applications';
 
 /**
@@ -103,6 +103,7 @@ export const CATEGORY_TO_NAV_CATEGORY: Record<string, NavCategory> = {
   'wz-category-cloud-security': WZ_APP_CATEGORIES.cloudSecurity,
   'wz-category-agents-management': WZ_APP_CATEGORIES.agentsManagement,
   'wz-category-server-management': WZ_APP_CATEGORIES.serverManagement,
+  'wz-category-dashboard-management': DEFAULT_APP_CATEGORIES.dashboardManagement,
 };
 
 /**
