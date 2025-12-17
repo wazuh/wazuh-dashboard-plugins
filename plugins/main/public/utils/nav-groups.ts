@@ -52,42 +52,42 @@ export const WZ_APP_CATEGORIES = {
     label: i18n.translate('wazuh.navCategory.endpointSecurity', {
       defaultMessage: 'Endpoint security',
     }),
-    order: 100,
+    order: 300,
   },
   threatIntelligence: {
     id: 'wazuh-threat-intelligence',
     label: i18n.translate('wazuh.navCategory.threatIntelligence', {
       defaultMessage: 'Threat intelligence',
     }),
-    order: 200,
+    order: 400,
   },
   securityOperations: {
     id: 'wazuh-security-operations',
     label: i18n.translate('wazuh.navCategory.securityOperations', {
       defaultMessage: 'Security operations',
     }),
-    order: 300,
+    order: 500,
   },
   cloudSecurity: {
     id: 'wazuh-cloud-security',
     label: i18n.translate('wazuh.navCategory.cloudSecurity', {
       defaultMessage: 'Cloud security',
     }),
-    order: 400,
+    order: 600,
   },
   agentsManagement: {
     id: 'wazuh-agents-management',
     label: i18n.translate('wazuh.navCategory.agentsManagement', {
       defaultMessage: 'Agents management',
     }),
-    order: 500,
+    order: 700,
   },
   serverManagement: {
     id: 'wazuh-server-management',
     label: i18n.translate('wazuh.navCategory.serverManagement', {
       defaultMessage: 'Server management',
     }),
-    order: 600,
+    order: 800,
   },
 };
 
