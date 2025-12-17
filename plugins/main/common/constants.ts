@@ -34,7 +34,6 @@ export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
 export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
 
 // Wazuh states index types
-export const WAZUH_INDEX_TYPE_ARCHIVES = 'archives';
 export const WAZUH_INDEX_TYPE_STATES_VULNERABILITIES = 'states-vulnerabilities';
 export const WAZUH_INDEX_TYPE_STATES_FIM_FILES = 'states-fim-files';
 export const WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS =
