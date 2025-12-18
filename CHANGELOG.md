@@ -20,7 +20,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Adapted alerts sample data to Wazuh Common Schema [#7839](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7839)
 - Set cluster mode as default for all Wazuh installations, including single-node deployments. Updated RBAC permissions to `cluster:*` actions [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688)
-- Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7578](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7578) [#7929](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7929) [#7974](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7974)
+- Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7578](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7578) [#7929](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7929) [#7974](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7974) [#7979](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7979)
 - Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data [#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
 - Reworked health check [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622) [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694) [#7756](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7756) [#7829](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7829)
 - Reworked some view components to use data source [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
@@ -59,6 +59,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed `wazuh-alerts*` index pattern and replaced with `wazuh-events*` as the default index pattern. Removed index pattern selector from top navigation bar as index pattern selection is now handled through module-specific configurations [#7933](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7933)
 - Removed `ip.ignore` , `pattern` settings [#7933](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7933)
 - Remove references to templates for alerts and archives [#7977](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7977)
+- Remove files related to indexer resources from the source code and obtained when installing the dependencies of the `wazuh` plugin [#7857](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7857) [#7868](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7868) [#7891](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7891) [#7982](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7982)
 
 ## Wazuh v4.14.3 - OpenSearch Dashboards 2.19.4 - Revision 00
 

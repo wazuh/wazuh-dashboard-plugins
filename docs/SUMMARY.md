@@ -10,6 +10,7 @@
 - [Build Image](dev/build-image.md)
 - [Build from Sources](dev/build-sources.md)
 - [Run from Sources](dev/run-sources.md)
+- [Get external resouces](dev/get-external-resources.md)
 - [Run Tests](dev/run-tests.md)
 
 # Reference Manual
