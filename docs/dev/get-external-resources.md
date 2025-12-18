@@ -6,9 +6,9 @@ The `wazuh` plugin requires some files that are based in some external resources
 
 - Indexer resources: .
 
-## Indexer resources
+### Indexer resources
 
-### Objective
+#### Objective
 
 Download templates for sample data indices and generate index pattern known fields for the different data schemas.
 
@@ -16,7 +16,7 @@ This process is done through the `update-indexer-resources` script located at `p
 
 ---
 
-### Process Overview
+#### Process Overview
 
 The script performs the following steps:
 
@@ -48,16 +48,16 @@ The script performs the following steps:
 
 ---
 
-### Usage
+#### Usage
 
-#### Prerequisites
+##### Prerequisites
 
 Ensure the following dependencies are installed:
 
 - **Git**: Used to interact with the repository.
 - **Node.js**: Required for executing JavaScript-based tasks.
 
-#### Running the Script
+##### Running the Script
 
 You can run the script with the following command:
 
