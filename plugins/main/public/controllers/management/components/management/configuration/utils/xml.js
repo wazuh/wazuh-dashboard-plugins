@@ -230,8 +230,9 @@ export const replaceIllegalXML = text => {
   // - \w+ (word characters for tag names)
   // - .+> (any characters followed by > for tags)
   // - !-- (for comments)
-  // Use a more explicit pattern to avoid issues with lookahead
-  text = text.replace(/<(?!\/?\w+.*>|!--)/g, '&lt;');
+  // We need to be more careful: match tags like </tag>, <tag>, <tag attr="value">, or <!--
+  // The pattern should match: < followed by optional /, then word chars, then any chars until >
+  text = text.replace(/<(?!\/?\w+[^<]*>|!--)/g, '&lt;');
 
   // Step 7: Replace temporary markers for \< and \>
   // Replace _temp_backslash_lt_ by &backslash;&lt;
