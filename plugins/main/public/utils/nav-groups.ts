@@ -28,17 +28,6 @@ interface ChromeNavGroup {
 /**
  * Interface for navigation link configuration.
  */
-export interface WazuhNavLinkConfig {
-  id: string;
-  title?: string;
-  order?: number;
-  category?: {
-    id: string;
-    label: string;
-    order?: number;
-  };
-}
-
 /**
  * Wazuh custom nav groups for the new home page navigation.
  * These nav groups organize Wazuh applications in the left sidebar menu
