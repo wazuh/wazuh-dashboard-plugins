@@ -64,6 +64,38 @@ const isWindowsPath = line => {
 };
 
 /**
+ * Check if a line contains JSON content
+ * JSON content should not have backslashes escaped as they are part of the JSON syntax
+ * (e.g., \n for newline, \t for tab, or Windows paths in JSON strings)
+ * This is a general detection based on JSON structure, not specific tag names
+ * @param {string} line
+ * @param {boolean} insideJsonContent
+ * @returns {boolean}
+ */
+const isJsonContentLine = (line, insideJsonContent) => {
+  const trimmedLine = line.trim();
+
+  // If we're already inside JSON content, this line is part of it
+  if (insideJsonContent) {
+    return true;
+  }
+
+  // General JSON detection: check for JSON structure patterns
+  // JSON typically starts with { or [ and contains key-value pairs
+  const startsWithJson =
+    trimmedLine.startsWith('{') || trimmedLine.startsWith('[');
+
+  // Check for JSON-like patterns: quotes, colons, and structure
+  const hasJsonStructure =
+    (trimmedLine.includes('"') && trimmedLine.includes(':')) ||
+    (trimmedLine.includes('{') && trimmedLine.includes('}')) ||
+    (trimmedLine.includes('[') && trimmedLine.includes(']'));
+
+  // If it looks like JSON and contains backslashes, it's likely JSON content
+  return (startsWithJson || hasJsonStructure) && trimmedLine.includes('\\');
+};
+
+/**
  * Check if a line is inside a command tag or contains command syntax
  * Commands should not have their backslashes escaped as they may contain
  * regex patterns or other shell syntax.
@@ -104,32 +136,34 @@ const isCommandLine = (line, insideCommandTag) => {
  * @returns {string}
  */
 export const replaceIllegalXML = text => {
-  const oDOM = parser.parseFromString(text, 'text/html');
-  const lines = oDOM.documentElement.textContent.split('\n');
+  const lines = text.split('\n');
   let insideCommandTag = false;
+  let insideJsonContent = false;
 
   for (const line of lines) {
     const trimmedLine = line.trim();
 
-    // Check if this line opens or closes a command tag
-    const opensCommandTag = /<command[^>]*>/i.test(trimmedLine);
-    const closesCommandTag = /<\/command>/i.test(trimmedLine);
+    // Determine if this is a command line or JSON content BEFORE updating the flags
+    const isCommand = isCommandLine(line, insideCommandTag);
 
-    // Determine if this is a command line BEFORE updating the flag
-    // If we're inside a command tag OR this line contains </command>,
-    // treat it as command content (the closing tag is still part of the command)
-    const isCommand = isCommandLine(line, insideCommandTag || closesCommandTag);
+    // Check if this line contains or continues JSON content (general detection)
+    const isJsonContent = isJsonContentLine(line, insideJsonContent);
 
-    let sanitized = replaceXML(trimmedLine, '&', '&amp;');
+    // Extract content for sanitization (get text content, but keep original for tag detection)
+    const oDOM = parser.parseFromString(trimmedLine, 'text/html');
+    const textContent = oDOM.documentElement.textContent || trimmedLine;
+    let sanitized = replaceXML(textContent, '&', '&amp;');
 
     /*
       This lines escapes the backslashes to avoid code editor
       error validation. The case is when a windows path is used inside a XML tag
       or as an attribute value. We only escape backslashes in Windows paths,
-      not in command syntax (like regex patterns in sed commands).
+      not in command syntax (like regex patterns in sed commands) or JSON content.
     */
     if (sanitized.includes('\\') && !sanitized.includes('&amp;#92;')) {
-      if (!isCommand && isWindowsPath(line)) {
+      // Don't escape backslashes in commands or JSON content
+      // Only escape in Windows paths that are NOT commands or JSON
+      if (!isCommand && !isJsonContent && isWindowsPath(line)) {
         sanitized = replaceXML(sanitized, '\\', '&amp;#92;');
       }
     }
@@ -138,15 +172,29 @@ export const replaceIllegalXML = text => {
      * Do not remove this condition. We don't want to replace
      * non-sanitized lines.
      */
-    if (!line.includes(sanitized)) {
-      text = replaceXML(text, trimmedLine, sanitized);
+    if (textContent !== sanitized && line.includes(textContent)) {
+      text = replaceXML(text, textContent, sanitized);
     }
 
-    if (opensCommandTag) {
+    // Update flags AFTER processing the line
+    if (/<command[^>]*>/i.test(line)) {
       insideCommandTag = true;
     }
-    if (closesCommandTag) {
+    if (/<\/command>/i.test(line)) {
       insideCommandTag = false;
+    }
+
+    // Track JSON content state: if we detect JSON structure, mark as inside JSON
+    // Reset when we see a closing XML tag (indicating end of content)
+    if (isJsonContent) {
+      insideJsonContent = true;
+    } else if (
+      trimmedLine.includes('</') &&
+      !trimmedLine.includes('{') &&
+      !trimmedLine.includes('[')
+    ) {
+      // Reset JSON state when we see a closing XML tag and no JSON structure continues
+      insideJsonContent = false;
     }
   }
   return text;

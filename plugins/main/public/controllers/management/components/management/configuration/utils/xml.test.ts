@@ -86,6 +86,9 @@ describe('XML Utils', () => {
       const windowsPath =
         '<var name="test_folder">C:\\Users\\Public\\Documents\\\\</var>';
       const result = replaceIllegalXML(windowsPath);
+      // Verify the complete XML structure is preserved
+      expect(result).toContain('<var name="test_folder">');
+      expect(result).toContain('</var>');
       expect(result).toContain('&amp;#92;');
       expect(result).not.toContain('C:\\Users');
       expect(result).toContain('C:&amp;#92;');
@@ -163,10 +166,100 @@ describe('XML Utils', () => {
       const multilineCommandWithClosingTag =
         "<localfile>\n    <command>netstat -tulpn | sed 's/\\(.*\\)/\\1/' | sort -k 4 -g</command>\n    <alias>netstat</alias>\n</localfile>";
       const result = replaceIllegalXML(multilineCommandWithClosingTag);
+      // Verify the complete XML structure is preserved
+      expect(result).toContain('<localfile>');
+      expect(result).toContain('<command>');
+      expect(result).toContain('</command>');
+      expect(result).toContain('</localfile>');
       // Backslashes in command should NOT be escaped
       expect(result).toContain('\\(');
       expect(result).toContain('\\)');
       expect(result).not.toContain('&amp;#92;');
+    });
+
+    it('should NOT escape backslashes in JSON content within options tag', () => {
+      // This test covers the case where JSON content in <options> tag contains backslashes
+      // (e.g., \n for newline, Windows paths in JSON strings)
+      const integrationWithJsonOptions =
+        '<integration>\n    <name>slack</name>\n    <hook_url>https://slack</hook_url>\n    <alert_format>json</alert_format>\n    <level>12</level>\n    <options>{"pretext":"hello_world\\n\\nanother line\\nC:\\text\\"}</options>\n</integration>';
+      const result = replaceIllegalXML(integrationWithJsonOptions);
+      // Verify the complete XML structure is preserved
+      expect(result).toContain('<integration>');
+      expect(result).toContain('<options>');
+      expect(result).toContain('</options>');
+      expect(result).toContain('</integration>');
+      // Backslashes in JSON content should NOT be escaped
+      expect(result).toContain('\\n');
+      expect(result).toContain('C:\\text\\');
+      expect(result).not.toContain('&amp;#92;');
+    });
+
+    it('should NOT escape backslashes in JSON content even if it contains Windows path pattern', () => {
+      // JSON content should preserve backslashes even if they look like Windows paths
+      const jsonWithWindowsPath =
+        '<options>{"path":"C:\\Users\\Test\\","message":"Line 1\\nLine 2"}</options>';
+      const result = replaceIllegalXML(jsonWithWindowsPath);
+      // Verify the complete XML structure is preserved
+      expect(result).toContain('<options>');
+      expect(result).toContain('</options>');
+      // Backslashes in JSON should NOT be escaped
+      expect(result).toContain('C:\\Users\\Test\\');
+      expect(result).toContain('\\n');
+      expect(result).not.toContain('&amp;#92;');
+    });
+
+    it('should handle complete ossec.conf XML with commands, JSON, and Windows paths', () => {
+      // Complete XML configuration file with various content types
+      const completeXML = `<!--
+  Wazuh - Manager - Default configuration
+-->
+
+<ossec_config>
+  <localfile>
+    <log_format>full_command</log_format>
+    <command>netstat -tulpn | sed 's/\\([[:alnum:]]\\+\\)\\ +[[:digit:]]\\+\\ +[[:digit:]]\\+\\ +\\(.*\\):\\([[:digit:]]*\\)\\ +\\([0-9\\.\\:\\*]\\+\\).\\+\\ \\([[:digit:]]*\\/[[:alnum:]\\-]*\\).*/\\1 \\2 == \\3 == \\4 \\5/' | sort -k 4 -g | sed 's/ == \\(.*\\) ==/:\\1/' | sed 1,2d</command>
+    <alias>netstat listening ports</alias>
+    <frequency>360</frequency>
+  </localfile>
+
+  <integration>
+    <name>slack</name>
+    <hook_url>https://slack</hook_url>
+    <alert_format>json</alert_format>
+    <level>12</level>
+    <options>{"pretext":"hello_world\\n\\nanother line\\nC:\\text\\"}</options>
+  </integration>
+
+  <var name="test_folder">C:\\Users\\Public\\Documents\\\\</var>
+</ossec_config>`;
+
+      const result = replaceIllegalXML(completeXML);
+
+      // Commands should NOT have backslashes escaped
+      expect(result).toContain("sed 's/\\([[:alnum:]]\\+\\)");
+      expect(result).toContain('\\ +');
+      expect(result).toContain('\\1 \\2 == \\3');
+
+      // JSON content should NOT have backslashes escaped
+      expect(result).toContain(
+        '{"pretext":"hello_world\\n\\nanother line\\nC:\\text\\"}',
+      );
+      expect(result).toContain('\\n');
+      expect(result).toContain('C:\\text\\');
+
+      // Windows paths in var tags SHOULD be escaped
+      expect(result).toContain(
+        'C:&amp;#92;Users&amp;#92;Public&amp;#92;Documents&amp;#92;&amp;#92;',
+      );
+      expect(result).not.toContain('C:\\Users\\Public\\Documents\\\\');
+
+      // Verify XML structure is preserved
+      expect(result).toContain('<ossec_config>');
+      expect(result).toContain('</ossec_config>');
+      expect(result).toContain('<command>');
+      expect(result).toContain('</command>');
+      expect(result).toContain('<options>');
+      expect(result).toContain('</options>');
     });
   });
 
