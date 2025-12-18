@@ -59,6 +59,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed `wazuh-alerts*` index pattern and replaced with `wazuh-events*` as the default index pattern. Removed index pattern selector from top navigation bar as index pattern selection is now handled through module-specific configurations [#7933](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7933)
 - Removed `ip.ignore` , `pattern` settings [#7933](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7933)
 - Remove references to templates for alerts and archives [#7977](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7977)
+- Remove files related to indexer resources from the source code and obtained when installing the dependencies of the `wazuh` plugin [#7857](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7857) [#7868](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7868) [#7891](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7891) [#7982](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7982)
 
 ## Wazuh v4.14.3 - OpenSearch Dashboards 2.19.4 - Revision 00
 
