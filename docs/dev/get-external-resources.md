@@ -4,8 +4,6 @@
 
 The `wazuh` plugin requires some files that are based in some external resources. This is usually done when installing its dependencies or it can be executed on demand in the development phase.
 
-- Indexer resources: .
-
 ### Indexer resources
 
 #### Objective
