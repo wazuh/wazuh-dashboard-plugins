@@ -11,7 +11,10 @@
  */
 
 import { i18n } from '@osd/i18n';
-import { DEFAULT_NAV_GROUPS, DEFAULT_APP_CATEGORIES } from '../../../../src/core/public';
+import {
+  DEFAULT_NAV_GROUPS,
+  DEFAULT_APP_CATEGORIES,
+} from '../../../../src/core/public';
 import { Applications } from './applications';
 
 /**
@@ -92,8 +95,9 @@ export const CATEGORY_TO_NAV_CATEGORY: Record<string, NavCategory> = {
   'wz-category-cloud-security': WZ_APP_CATEGORIES.cloudSecurity,
   'wz-category-agents-management': WZ_APP_CATEGORIES.agentsManagement,
   'wz-category-server-management': WZ_APP_CATEGORIES.serverManagement,
-  'wz-category-dashboard-management': DEFAULT_APP_CATEGORIES.dashboardManagement,
-  'management': DEFAULT_APP_CATEGORIES.management,
+  'wz-category-dashboard-management':
+    DEFAULT_APP_CATEGORIES.dashboardManagement,
+  management: DEFAULT_APP_CATEGORIES.management,
 };
 
 /**
@@ -134,7 +138,10 @@ function createNavLinksFromApplications(
  * This integrates Wazuh apps into the Security Analytics use case.
  */
 export function registerWazuhNavLinks(
-  addNavLinksToGroup: (navGroup: ChromeNavGroup, navLinks: WazuhNavLinkConfig[]) => void,
+  addNavLinksToGroup: (
+    navGroup: ChromeNavGroup,
+    navLinks: WazuhNavLinkConfig[],
+  ) => void,
   navGroupEnabled: boolean,
 ): void {
   if (!navGroupEnabled) {
@@ -145,9 +152,12 @@ export function registerWazuhNavLinks(
   const navLinks = createNavLinksFromApplications(Applications);
 
   // Also register in "All" (Analytics) use case for visibility
-  addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, navLinks.map(link => ({
-    ...link,
-    // In "All" use case, we group by the Wazuh category
-    category: link.category,
-  })));
+  addNavLinksToGroup(
+    DEFAULT_NAV_GROUPS.all,
+    navLinks.map(link => ({
+      ...link,
+      // In "All" use case, we group by the Wazuh category
+      category: link.category,
+    })),
+  );
 }
