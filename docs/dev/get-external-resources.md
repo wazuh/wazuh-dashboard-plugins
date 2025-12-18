@@ -43,8 +43,8 @@ The script performs the following steps:
 5. **Update Resources**:
 
 - Executes the following functions to update the indexer resources:
-- `update_known_fields_from_templates`: Updates known fields based based on the templates for the data schemas.
-- `update_templates_sample_data`: Updates the templates used for the sample data indices in its creation.
+- `update_known_fields_from_templates`: Add files with the known fields for the data schemas based on the templates to the `plugins/main/common/known-fields` directory that are used as default fields for the index pattern creation of health check.
+- `update_templates_sample_data`: Add the template files to `server/lib/sample-data/dataset` subdirectories that are used for the creation of the sample data indices.
 
 ---
 
