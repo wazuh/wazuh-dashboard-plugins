@@ -131,50 +131,76 @@ const isCommandLine = (line, insideCommandTag) => {
 };
 
 /**
+ * Replace -- characters in XML comments (not allowed in XML)
+ * @param {string} content
+ * @param {string} toBeReplaced
+ * @param {string} replacement
+ * @returns {string}
+ */
+const replaceInComments = (content, toBeReplaced, replacement) => {
+  const xmlCommentRegex = /<!--(.*?)-->/gs;
+  let result = content;
+  let match;
+
+  while ((match = xmlCommentRegex.exec(content)) !== null) {
+    const commentContent = match[1];
+    const goodComment = commentContent.replace(
+      new RegExp(toBeReplaced.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+      replacement,
+    );
+    result = result.replace(commentContent, goodComment);
+  }
+
+  return result;
+};
+
+/**
  * Replace illegal XML
  * @param {string} text
  * @returns {string}
  */
 export const replaceIllegalXML = text => {
+  // Step 1: -- characters are not allowed in XML comments
+  text = replaceInComments(text, '--', '..');
+
+  // Step 2: Replace &lt; and &gt; currently present in the config with temporary markers
+  text = text
+    .replace(/&lt;/g, '_custom_amp_lt_')
+    .replace(/&gt;/g, '_custom_amp_gt_');
+
+  // Step 3: Define custom entities (backslash)
+  const customEntities = {
+    backslash: '\\',
+  };
+
+  // Step 4: Handle \< and \> before replacing backslashes
+  // Replace \< by a temporary marker (will be converted to &backslash;&lt; later)
+  text = text.replace(/\\</g, '_temp_backslash_lt_');
+  // Replace \> by a temporary marker (will be converted to &backslash;&gt; later)
+  text = text.replace(/\\>/g, '_temp_backslash_gt_');
+
+  // Step 5: Replace backslashes with custom entity &backslash;
+  // But preserve backslashes in commands and JSON content
   const lines = text.split('\n');
   let insideCommandTag = false;
   let insideJsonContent = false;
+  let resultLines = [];
 
   for (const line of lines) {
     const trimmedLine = line.trim();
+    let processedLine = line;
 
     // Determine if this is a command line or JSON content BEFORE updating the flags
     const isCommand = isCommandLine(line, insideCommandTag);
-
-    // Check if this line contains or continues JSON content (general detection)
     const isJsonContent = isJsonContentLine(line, insideJsonContent);
 
-    // Extract content for sanitization (get text content, but keep original for tag detection)
-    const oDOM = parser.parseFromString(trimmedLine, 'text/html');
-    const textContent = oDOM.documentElement.textContent || trimmedLine;
-    let sanitized = replaceXML(textContent, '&', '&amp;');
-
-    /*
-      This lines escapes the backslashes to avoid code editor
-      error validation. The case is when a windows path is used inside a XML tag
-      or as an attribute value. We only escape backslashes in Windows paths,
-      not in command syntax (like regex patterns in sed commands) or JSON content.
-    */
-    if (sanitized.includes('\\') && !sanitized.includes('&amp;#92;')) {
-      // Don't escape backslashes in commands or JSON content
-      // Only escape in Windows paths that are NOT commands or JSON
-      if (!isCommand && !isJsonContent && isWindowsPath(line)) {
-        sanitized = replaceXML(sanitized, '\\', '&amp;#92;');
-      }
+    // Only replace backslashes if NOT in commands or JSON content
+    if (!isCommand && !isJsonContent) {
+      // Replace backslashes with &backslash; entity
+      processedLine = processedLine.replace(/\\/g, '&backslash;');
     }
 
-    /**
-     * Do not remove this condition. We don't want to replace
-     * non-sanitized lines.
-     */
-    if (textContent !== sanitized && line.includes(textContent)) {
-      text = replaceXML(text, textContent, sanitized);
-    }
+    resultLines.push(processedLine);
 
     // Update flags AFTER processing the line
     if (/<command[^>]*>/i.test(line)) {
@@ -184,8 +210,7 @@ export const replaceIllegalXML = text => {
       insideCommandTag = false;
     }
 
-    // Track JSON content state: if we detect JSON structure, mark as inside JSON
-    // Reset when we see a closing XML tag (indicating end of content)
+    // Track JSON content state
     if (isJsonContent) {
       insideJsonContent = true;
     } else if (
@@ -193,32 +218,180 @@ export const replaceIllegalXML = text => {
       !trimmedLine.includes('{') &&
       !trimmedLine.includes('[')
     ) {
-      // Reset JSON state when we see a closing XML tag and no JSON structure continues
       insideJsonContent = false;
     }
   }
+
+  text = resultLines.join('\n');
+
+  // Step 6: < characters should be escaped as &lt; unless < is starting a <tag> or a comment
+  // This regex matches < that is NOT followed by:
+  // - /? (optional slash for closing tags)
+  // - \w+ (word characters for tag names)
+  // - .+> (any characters followed by > for tags)
+  // - !-- (for comments)
+  // Use a more explicit pattern to avoid issues with lookahead
+  text = text.replace(/<(?!\/?\w+.*>|!--)/g, '&lt;');
+
+  // Step 7: Replace temporary markers for \< and \>
+  // Replace _temp_backslash_lt_ by &backslash;&lt;
+  text = text.replace(/_temp_backslash_lt_/g, '&backslash;&lt;');
+  // Replace _temp_backslash_gt_ by &backslash;&gt;
+  text = text.replace(/_temp_backslash_gt_/g, '&backslash;&gt;');
+
+  // Step 8: Restore temporary markers for &lt; and &gt;
+  text = text
+    .replace(/_custom_amp_lt_/g, '&lt;')
+    .replace(/_custom_amp_gt_/g, '&gt;');
+
+  // Step 9: & characters should be escaped if they don't represent an &entity;
+  // Default entities: amp, lt, gt, apos, quot
+  // Custom entities: backslash
+  const defaultEntities = ['amp', 'lt', 'gt', 'apos', 'quot'];
+  const allEntities = [...defaultEntities, ...Object.keys(customEntities)];
+  const entityPattern = allEntities.join('|');
+  const entityRegex = new RegExp(`&(?!(${entityPattern});)`, 'g');
+  text = text.replace(entityRegex, '&amp;');
+
   return text;
 };
 
 /**
  * Validate XML
+ * This function follows the validation flow:
+ * 1. Replace -- in comments with %wildcard%
+ * 2. Wrap content in <root>...</root> and temporarily escape &
+ * 3. Parse and normalize XML (beautify)
+ * 4. Revert xml.dom automatic replacements
+ * 5. Remove added indentation
+ * 6. Restore comments (%wildcard% -> --)
+ * 7. Finally validate with load_wazuh_xml equivalent logic
  * @param {string} xml
  * @returns {string|boolean}
  */
 export const validateXML = xml => {
-  const xmlReplaced = replaceIllegalXML(xml)
-    .replace(/..xml.+\?>/, '')
-    .replace(/\\</gm, '');
-  const xmlDoc = parser.parseFromString(
-    `<file>${xmlReplaced}</file>`,
-    'text/xml',
-  );
-  const parsererror = xmlDoc.getElementsByTagName('parsererror');
-  if (parsererror.length) {
-    const xmlFullError = parsererror[0].textContent;
-    return (
-      (xmlFullError.match('error\\s.+\n') || [])[0] || 'Error validating XML'
+  try {
+    // Step 1: -- characters are not allowed in XML comments
+    // Use %wildcard% as temporary replacement
+    let content = replaceInComments(xml, '--', '%wildcard%');
+
+    // Step 2: Beautify xml file and escape '&' character as it could come in some tag values unescaped
+    // Wrap content in <root>...</root> and temporarily escape & to &amp;
+    const wrappedContent = `<root>${content.replace(/&/g, '&amp;')}</root>`;
+    const xmlDoc = parser.parseFromString(wrappedContent, 'text/xml');
+
+    // Check for parsing errors
+    const parsererror = xmlDoc.getElementsByTagName('parsererror');
+    if (parsererror.length) {
+      const xmlFullError = parsererror[0].textContent;
+      return (
+        (xmlFullError.match('error\\s.+\n') || [])[0] || 'Error validating XML'
+      );
+    }
+
+    // Step 3: Extract and normalize content between <root> and </root>
+    // Extract only the child content of the root element, skipping XML declaration and root tags
+    const rootElement = xmlDoc.documentElement;
+    if (!rootElement || rootElement.tagName !== 'root') {
+      return 'Error validating XML: root element not found';
+    }
+
+    // Extract child nodes and serialize them individually
+    // This extracts content between <root> and </root> tags
+    let prettyXml = '';
+    const childNodes = Array.from(rootElement.childNodes);
+
+    for (const node of childNodes) {
+      if (node.nodeType === 1) {
+        // ELEMENT_NODE
+        // Serialize element node
+        if (typeof XMLSerializer !== 'undefined') {
+          const serializer = new XMLSerializer();
+          prettyXml += serializer.serializeToString(node) + '\n';
+        } else {
+          // Fallback: use outerHTML if available, otherwise construct manually
+          prettyXml +=
+            (node.outerHTML ||
+              `<${node.tagName}>${node.textContent}</${node.tagName}>`) + '\n';
+        }
+      } else if (node.nodeType === 3) {
+        // TEXT_NODE
+        // Preserve significant text content
+        const text = node.textContent.trim();
+        if (text) {
+          prettyXml += text + '\n';
+        }
+      } else if (node.nodeType === 8) {
+        // COMMENT_NODE
+        // Preserve comments
+        prettyXml += `<!--${node.textContent}-->` + '\n';
+      }
+    }
+
+    // If no children were found, get text content as fallback
+    if (!prettyXml.trim() && rootElement.textContent) {
+      prettyXml = rootElement.textContent;
+    }
+
+    // Step 4: Revert xml.dom replacings
+    // xml.dom/minidom automatically escapes: &amp;, &lt;, &quot;, &gt;, &apos;
+    // We need to revert these back to their original characters
+    prettyXml = prettyXml
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&quot;/g, '"')
+      .replace(/&gt;/g, '>')
+      .replace(/&apos;/g, "'");
+
+    // Step 5: Remove indentation added by pretty printing (2 spaces at start of each line)
+    const indent = '  '; // 2 spaces indent
+    const indentRegex = new RegExp(`^${indent.replace(/ /g, ' ')}`, 'gm');
+    let finalXml = prettyXml.replace(indentRegex, '');
+
+    // Remove empty lines and ensure final newline
+    finalXml =
+      finalXml
+        .split('\n')
+        .filter(line => line.trim())
+        .join('\n') + '\n';
+
+    // Step 6: Restore comments (%wildcard% -> --)
+    finalXml = replaceInComments(finalXml, '%wildcard%', '--');
+
+    // Step 7: Final validation using load_wazuh_xml equivalent logic
+    // Apply replaceIllegalXML transformations (which includes load_wazuh_xml logic)
+    finalXml = replaceIllegalXML(finalXml);
+
+    // Remove XML declaration if present
+    finalXml = finalXml.replace(/<\?xml[^>]*\?>/g, '');
+
+    // Create DOCTYPE with custom entities
+    const customEntities = {
+      backslash: '\\',
+    };
+    const entities =
+      '<!DOCTYPE xmlfile [\n' +
+      Object.entries(customEntities)
+        .map(([name, value]) => `<!ENTITY ${name} "${value}">`)
+        .join('\n') +
+      '\n]>\n';
+
+    // Final parse with DOCTYPE and custom entities
+    const finalXmlDoc = parser.parseFromString(
+      `${entities}<root_tag>${finalXml}</root_tag>`,
+      'text/xml',
     );
+
+    const finalParsererror = finalXmlDoc.getElementsByTagName('parsererror');
+    if (finalParsererror.length) {
+      const xmlFullError = finalParsererror[0].textContent;
+      return (
+        (xmlFullError.match('error\\s.+\n') || [])[0] || 'Error validating XML'
+      );
+    }
+
+    return false;
+  } catch (error) {
+    return `Error validating XML: ${error.message}`;
   }
-  return false;
 };
