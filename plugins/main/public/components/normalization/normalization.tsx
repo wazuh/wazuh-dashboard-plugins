@@ -20,6 +20,7 @@ import { normalization } from '../../utils/applications';
 import { DecodersView } from './views/decoders';
 import { KVDBsView } from './views/kvdbs';
 import { OverviewView } from './views/overview';
+import { getUiSettings } from '../../kibana-services';
 
 export const Normalization: React.FC = compose(withErrorBoundary)(
   ({ history }: { history: RouteComponentProps['history'] }) => {
@@ -68,9 +69,11 @@ export const Normalization: React.FC = compose(withErrorBoundary)(
 
     return (
       <EuiPage>
-        <EuiPageSideBar style={{ minWidth: 200 }}>
-          <EuiSideNav style={{ width: 200 }} items={sideNav} />
-        </EuiPageSideBar>
+        {!getUiSettings().get('home:useNewHomePage') && (
+          <EuiPageSideBar style={{ minWidth: 200 }}>
+            <EuiSideNav style={{ width: 200 }} items={sideNav} />
+          </EuiPageSideBar>
+        )}
         <EuiPageBody>
           <Switch>
             <Route

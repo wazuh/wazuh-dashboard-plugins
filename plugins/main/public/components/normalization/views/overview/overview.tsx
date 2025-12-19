@@ -22,6 +22,7 @@ import {
 } from '../../components/search-bar/search-bar';
 import { WzButtonPermissionsOpenFlyout } from '../../../common/buttons';
 import { Details } from './details';
+import { getUiSettings } from '../../../../kibana-services';
 
 const decodersCountKey = '___decoders_count';
 const kvdbsCountKey = '___kvdbs_count';
@@ -199,7 +200,7 @@ export const Overview: React.FC = compose(
 )(() => {
   return (
     <EuiFlexGroup direction='column' gutterSize={'m'}>
-      <Header />
+      {!getUiSettings().get('home:useNewHomePage') && <Header />}
       <Body />
     </EuiFlexGroup>
   );

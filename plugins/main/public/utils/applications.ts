@@ -7,6 +7,7 @@ import {
   LogoMicrosoftGraphAPI,
   LogoOffice365,
 } from '../components/common/logos';
+import { DEFAULT_NAV_GROUPS } from '../../../../src/core/public';
 
 /* Applications
 Convention: the order of each application must according to the order of the category
@@ -762,11 +763,81 @@ export const normalization = {
     defaultMessage: 'PLACEHOLDER.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 10007,
+  order: 7003,
   showInOverviewApp: false,
   showInAgentMenu: false,
-  redirectTo: () => '/normalization',
 };
+
+export const overviewNormalization = {
+  category: DEFAULT_NAV_GROUPS['security-analytics'],
+  id: 'overview-normalization',
+  parentNavLinkId: 'normalization',
+  title: i18n.translate('wz-app-overview-normalization-title', {
+    defaultMessage: 'Overview',
+  }),
+  breadcrumbLabel: i18n.translate(
+    'wz-app-overview-normalization-breadcrumbLabel',
+    {
+      defaultMessage: 'Overview',
+    },
+  ),
+  description: i18n.translate('wz-app-overview-normalization-description', {
+    defaultMessage: 'PLACEHOLDER.',
+  }),
+  euiIconType: 'indexRollupApp',
+  order: 10008,
+  showInOverviewApp: false,
+  showInAgentMenu: false,
+  redirectTo: () => '/normalization/overview',
+};
+
+export const decoders = {
+  category: 'security_analytics',
+  id: 'decoders',
+  parentNavLinkId: 'normalization',
+  showInAllNavGroup: true,
+  title: i18n.translate('wz-app-decoders-title', {
+    defaultMessage: 'Decoders',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-decoders-breadcrumbLabel', {
+    defaultMessage: 'Decoders',
+  }),
+  description: i18n.translate('wz-app-decoders-description', {
+    defaultMessage: 'PLACEHOLDER.',
+  }),
+  euiIconType: 'indexRollupApp',
+  order: 10009,
+  showInOverviewApp: false,
+  showInAgentMenu: false,
+  redirectTo: () => '/normalization/decoders',
+};
+
+export const KVDBs = {
+  category: 'security_analytics',
+  id: 'kvdbs',
+  parentNavLinkId: 'normalization',
+  title: i18n.translate('wz-app-kvdbs-title', {
+    defaultMessage: 'KVDBs',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-kvdbs-breadcrumbLabel', {
+    defaultMessage: 'KVDBs',
+  }),
+  description: i18n.translate('wz-app-kvdbs-description', {
+    defaultMessage: 'PLACEHOLDER.',
+  }),
+  euiIconType: 'indexRollupApp',
+  order: 10010,
+  showInOverviewApp: false,
+  showInAgentMenu: false,
+  redirectTo: () => '/normalization/kvdbs',
+};
+
+export const NormalizationApps = [
+  normalization,
+  overviewNormalization,
+  decoders,
+  KVDBs,
+];
 
 export const Applications = [
   fileIntegrityMonitoring,
@@ -801,6 +872,9 @@ export const Applications = [
   about,
   ITHygiene,
   normalization,
+  overviewNormalization,
+  decoders,
+  KVDBs,
 ].sort((a, b) => {
   // Sort applications by order
   if (a.order < b.order) {
