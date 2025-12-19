@@ -43,6 +43,7 @@ import { Metadata } from '../../components/metadata/metadata';
 import { get, omit } from 'lodash';
 import { AssetViewer } from './asset-viewer';
 import { JSONViewer } from '../../components/json-viewer/json-viewer';
+import { getUiSettings } from '../../../../kibana-services';
 
 const relationIntegrationIDField = '__integration';
 
@@ -353,7 +354,7 @@ export const KVDBs: React.FC = compose(
 )(() => {
   return (
     <EuiFlexGroup direction='column' gutterSize={'m'}>
-      <Header />
+      {!getUiSettings().get('home:useNewHomePage') && <Header />}
       <Body />
     </EuiFlexGroup>
   );
