@@ -17,7 +17,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Improved text size consistency and visual hierarchy across the Agent Overview page by implementing standardized typography styling [#7878](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7878)
-- Improved Agent Overview resilience by rendering each available system inventory field [#78696](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7896)
+- Improved Agent Overview resilience by rendering each available system inventory field [#7896](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7896)
 - Upgraded `cookie` dependency to 0.7.0 [#7897](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7897)
 - Remove SCA Agent card subtitle [#7963](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7963)
 
