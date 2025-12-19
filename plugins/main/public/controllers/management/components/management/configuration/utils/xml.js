@@ -12,10 +12,22 @@
  */
 const parser = new DOMParser();
 
+/**
+ * Replace string in a XML
+ * @param {string} str
+ * @param {string} split
+ * @param {string} newstr
+ * @returns {string}
+ */
 export const replaceXML = function (str, split, newstr) {
   return str.split(split).join(newstr);
 };
 
+/**
+ * Check if a line contains a Windows path pattern
+ * @param {string} line
+ * @returns {boolean}
+ */
 const isWindowsPath = line => {
   const trimmedLine = line.trim();
   const windowsDrivePattern = /[A-Za-z]:\\/;
@@ -37,6 +49,12 @@ const isWindowsPath = line => {
   return false;
 };
 
+/**
+ * Check if a line contains JSON content
+ * @param {string} line
+ * @param {boolean} insideJsonContent
+ * @returns {boolean}
+ */
 const isJsonContentLine = (line, insideJsonContent) => {
   const trimmedLine = line.trim();
   if (insideJsonContent) {
@@ -57,6 +75,12 @@ const isJsonContentLine = (line, insideJsonContent) => {
   );
 };
 
+/**
+ * Check if a line is inside a command tag or contains command syntax
+ * @param {string} line
+ * @param {boolean} insideCommandTag
+ * @returns {boolean}
+ */
 const isCommandLine = (line, insideCommandTag) => {
   const trimmedLine = line.trim();
   if (insideCommandTag) {
@@ -76,6 +100,13 @@ const isCommandLine = (line, insideCommandTag) => {
   return hasCommandSyntax;
 };
 
+/**
+ * Replace -- characters in XML comments (not allowed in XML)
+ * @param {string} content
+ * @param {string} toBeReplaced
+ * @param {string} replacement
+ * @returns {string}
+ */
 const replaceInComments = (content, toBeReplaced, replacement) => {
   const xmlCommentRegex = /<!--(.*?)-->/gs;
   let result = content;
@@ -91,6 +122,11 @@ const replaceInComments = (content, toBeReplaced, replacement) => {
   return result;
 };
 
+/**
+ * Replace illegal XML
+ * @param {string} text
+ * @returns {string}
+ */
 export const replaceIllegalXML = text => {
   text = replaceInComments(text, '--', '..');
   text = text
@@ -161,6 +197,11 @@ export const replaceIllegalXML = text => {
   return text;
 };
 
+/**
+ * Validate XML
+ * @param {string} xml
+ * @returns {string|boolean}
+ */
 export const validateXML = xml => {
   try {
     let content = xml.replace(/<\?xml[^>]*\?>/g, '');
