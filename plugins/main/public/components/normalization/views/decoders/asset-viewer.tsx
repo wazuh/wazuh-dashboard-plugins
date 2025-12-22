@@ -1,5 +1,5 @@
 import React from 'react';
-import { EuiCodeEditor } from '@elastic/eui';
+import { EuiCodeBlock } from '@elastic/eui';
 
 export const AssetViewer: React.FC<{
   content: string;
@@ -7,14 +7,15 @@ export const AssetViewer: React.FC<{
   minusHeight?: number;
 }> = ({ content, height, minusHeight = 200 }) => {
   return (
-    <EuiCodeEditor
-      readOnly={true}
-      width='100%'
-      value={content}
-      mode='yml'
-      wrapEnabled
+    <EuiCodeBlock
       aria-label='Asset viewer'
-      height={height || `calc(100vh - ${minusHeight}px)`}
-    />
+      language='yml'
+      isCopyable
+      paddingSize='s'
+      overflowHeight={height || `calc(100vh - ${minusHeight}px)`}
+      width='100%'
+    >
+      {content}
+    </EuiCodeBlock>
   );
 };
