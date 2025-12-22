@@ -20,7 +20,7 @@ import {
   SearchBar,
   withInitialQueryFromURL,
 } from '../../components/search-bar/search-bar';
-import { WzButtonPermissionsOpenFlyout } from '../../../common/buttons';
+import { ButtonOpenFlyout } from '../../components/buttons';
 import { Details } from './details';
 
 const decodersCountKey = '___decoders_count';
@@ -65,7 +65,7 @@ const tableColums = [
     align: 'right',
     name: 'Actions',
     render: item => (
-      <WzButtonPermissionsOpenFlyout
+      <ButtonOpenFlyout
         flyoutTitle={`Integration details - ${item.document.title}`}
         flyoutBody={() => <Details item={item} />}
         buttonProps={{
@@ -74,7 +74,7 @@ const tableColums = [
           iconType: 'inspect',
           'aria-label': 'View integration details',
         }}
-      ></WzButtonPermissionsOpenFlyout>
+      ></ButtonOpenFlyout>
     ),
   },
 ];
