@@ -13,7 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added prompts to some views related to problems with server API and alerts index pattern [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694)
 - Added "Not applicable" status to SCA CheckResult enum with corresponding color mapping (#B9A888) and sample data support
 - Added Alerting sample monitors health check [#7833](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7833)
-- Add the Normalization app [#7917](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7917) [#7975](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7975)
+- Add the Normalization app [#7917](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7917) [#7975](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7975) [#7990](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7990)
 - Added default `wazuh-events*` index pattern [#7924](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7924)
 
 ### Changed
