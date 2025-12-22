@@ -51,53 +51,32 @@ const isWindowsPath = line => {
 
 /**
  * Check if a line contains JSON content
+ * Relies solely on XML tags (<options>), not on JSON structure detection
  * @param {string} line
  * @param {boolean} insideJsonContent
  * @returns {boolean}
  */
 const isJsonContentLine = (line, insideJsonContent) => {
-  const trimmedLine = line.trim();
   if (insideJsonContent) {
     return true;
   }
-  const isOptionsTag =
-    /<options[^>]*>/i.test(trimmedLine) || trimmedLine.includes('</options>');
-  const startsWithJson =
-    trimmedLine.startsWith('{') || trimmedLine.startsWith('[');
-  const hasJsonStructure =
-    ((trimmedLine.includes('"') && trimmedLine.includes(':')) ||
-      (trimmedLine.includes('{') && trimmedLine.includes('}')) ||
-      (trimmedLine.includes('[') && trimmedLine.includes(']'))) &&
-    !trimmedLine.match(/<[^>]+\s+\w+="[^"]*"/);
-  return (
-    ((startsWithJson || hasJsonStructure) && trimmedLine.includes('\\')) ||
-    (isOptionsTag && trimmedLine.includes('\\'))
-  );
+  // Only detect JSON content within <options> tags
+  return /<options[^>]*>/i.test(line.trim());
 };
 
 /**
- * Check if a line is inside a command tag or contains command syntax
+ * Check if a line is inside a command tag
+ * Relies solely on XML tags, not on command syntax patterns
  * @param {string} line
  * @param {boolean} insideCommandTag
  * @returns {boolean}
  */
 const isCommandLine = (line, insideCommandTag) => {
-  const trimmedLine = line.trim();
   if (insideCommandTag) {
     return true;
   }
-  if (/<command[^>]*>/i.test(trimmedLine)) {
-    return true;
-  }
-  const hasCommandSyntax =
-    trimmedLine.includes('|') &&
-    (trimmedLine.includes('sed') ||
-      trimmedLine.includes('awk') ||
-      trimmedLine.includes('grep') ||
-      trimmedLine.includes('sort') ||
-      trimmedLine.includes('netstat') ||
-      trimmedLine.includes('command'));
-  return hasCommandSyntax;
+  // Check if line contains <command> tag
+  return /<command[^>]*>/i.test(line.trim());
 };
 
 /**
@@ -157,6 +136,7 @@ export const replaceIllegalXML = text => {
 
     resultLines.push(processedLine);
 
+    // Update command tag state
     if (/<command[^>]*>/i.test(line)) {
       insideCommandTag = true;
     }
@@ -164,18 +144,11 @@ export const replaceIllegalXML = text => {
       insideCommandTag = false;
     }
 
-    if (isJsonContent) {
+    // Update JSON content state (only for <options> tags)
+    if (/<options[^>]*>/i.test(line)) {
       insideJsonContent = true;
     }
-    if (trimmedLine.includes('</options>')) {
-      insideJsonContent = false;
-    } else if (
-      insideJsonContent &&
-      trimmedLine.includes('</') &&
-      !trimmedLine.includes('{') &&
-      !trimmedLine.includes('[') &&
-      !trimmedLine.includes('<options')
-    ) {
+    if (/<\/options>/i.test(line)) {
       insideJsonContent = false;
     }
   }
