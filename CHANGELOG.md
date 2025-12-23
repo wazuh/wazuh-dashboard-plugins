@@ -12,6 +12,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Upgraded `js-yaml` dependency to 4.1.1 [#7958](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7958)
 
+### Fixed
+
+- Fixed special characters not being properly escaped in XML configuration files when saving through the dashboard [#7967](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7967)
+
 ## Wazuh v4.14.2 - OpenSearch Dashboards 2.19.4 - Revision 01
 
 ### Added
