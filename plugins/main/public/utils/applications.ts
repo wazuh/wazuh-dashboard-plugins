@@ -772,6 +772,13 @@ export const normalization = {
   redirectTo: () => '/normalization/overview',
 };
 
+export const breadcrumbLabelSecurityAnalytics = i18n.translate(
+  'wz-app-security-analytics-breadcrumbLabel',
+  {
+    defaultMessage: 'Security Analytics',
+  },
+);
+
 export const overviewNormalization = {
   category: DEFAULT_NAV_GROUPS['security-analytics'],
   id: 'overview-normalization',

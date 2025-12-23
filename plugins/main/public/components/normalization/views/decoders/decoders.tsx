@@ -21,7 +21,10 @@ import {
   withGlobalBreadcrumb,
   withPanel,
 } from '../../../common/hocs';
-import { normalization } from '../../../../utils/applications';
+import {
+  breadcrumbLabelSecurityAnalytics,
+  normalization,
+} from '../../../../utils/applications';
 import { i18n } from '@osd/i18n';
 import { WzLink } from '../../../wz-link/wz-link';
 import { Name, indexName } from './info';
@@ -395,6 +398,9 @@ const Body: React.FC = compose(
 export const Decoders: React.FC = compose(
   withErrorBoundary,
   withGlobalBreadcrumb(() => [
+    {
+      text: breadcrumbLabelSecurityAnalytics,
+    },
     {
       text: normalization.breadcrumbLabel,
     },
