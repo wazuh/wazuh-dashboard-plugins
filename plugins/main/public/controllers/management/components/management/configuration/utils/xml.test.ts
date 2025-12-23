@@ -257,12 +257,15 @@ describe('XML Utils', () => {
 
     it('should NOT escape backslashes in command syntax (pipes with sed/awk/grep)', () => {
       const commandSyntax =
-        "netstat -tulpn | sed 's/\\(.*\\)/\\1/' | awk '{print $1}' | grep test";
+        "<command>netstat -tulpn | sed 's/\\(.*\\)/\\1/' | awk '{print $1}' | grep test</command>";
       const result = replaceIllegalXML(commandSyntax);
-      // Backslashes in command syntax should NOT be escaped
+      // Backslashes in command content should NOT be escaped
       expect(result).toContain('\\(');
       expect(result).toContain('\\)');
       expect(result).not.toContain('&backslash;');
+      // Verify XML structure is preserved
+      expect(result).toContain('<command>');
+      expect(result).toContain('</command>');
     });
 
     it('should escape Windows paths but not commands in the same XML', () => {
