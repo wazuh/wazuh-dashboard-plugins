@@ -12,7 +12,10 @@ import {
   withGlobalBreadcrumb,
   withPanel,
 } from '../../../common/hocs';
-import { normalization } from '../../../../utils/applications';
+import {
+  breadcrumbLabelSecurityAnalytics,
+  normalization,
+} from '../../../../utils/applications';
 import { Name, indexName } from './info';
 import { TableDataFetch } from '../../components/table-data/table-fetch';
 import { fetchInternalOpenSearchIndexItemsInTable } from '../../services/http';
@@ -190,6 +193,9 @@ const Body: React.FC = compose(
 export const Overview: React.FC = compose(
   withErrorBoundary,
   withGlobalBreadcrumb(() => [
+    {
+      text: breadcrumbLabelSecurityAnalytics,
+    },
     {
       text: normalization.breadcrumbLabel,
     },

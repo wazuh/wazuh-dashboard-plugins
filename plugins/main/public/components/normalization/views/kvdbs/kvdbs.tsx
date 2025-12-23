@@ -21,7 +21,10 @@ import {
   withGlobalBreadcrumb,
   withPanel,
 } from '../../../common/hocs';
-import { normalization } from '../../../../utils/applications';
+import {
+  breadcrumbLabelSecurityAnalytics,
+  normalization,
+} from '../../../../utils/applications';
 import { WzLink } from '../../../wz-link/wz-link';
 import { Name, indexName } from './info';
 import {
@@ -344,6 +347,9 @@ const Body: React.FC = compose(
 export const KVDBs: React.FC = compose(
   withErrorBoundary,
   withGlobalBreadcrumb(() => [
+    {
+      text: breadcrumbLabelSecurityAnalytics,
+    },
     {
       text: normalization.breadcrumbLabel,
     },
