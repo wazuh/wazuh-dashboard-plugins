@@ -50,6 +50,9 @@ const applicationsId = {
   logTypes: 'log_types',
   correlations: 'correlations',
   correlationRules: 'correlation_rules',
+  decoders: 'decoders',
+  normalization: 'normalization',
+  kvdbs: 'kvdbs',
 };
 
 const ROUTES = Object.freeze({
@@ -186,7 +189,12 @@ export const Normalization: React.FC = compose(withErrorBoundary)(
                 name: Navigation.Overview,
                 id: Navigation.OverviewNormalization,
                 onClick: () => {
-                  history.push(`/${normalization.id}/${OverviewView.id}`);
+                  NavigationService.getInstance(history).navigateToApp(
+                    applicationsId.normalization,
+                    {
+                      path: `#/${normalization.id}/${OverviewView.id}`,
+                    },
+                  );
                 },
                 isSelected: view === OverviewView.id,
               },
@@ -195,6 +203,12 @@ export const Normalization: React.FC = compose(withErrorBoundary)(
                 id: DecodersView.id,
                 onClick: () => {
                   history.push(`/${normalization.id}/${DecodersView.id}`);
+                  NavigationService.getInstance(history).navigateToApp(
+                    applicationsId.decoders,
+                    {
+                      path: `#/${normalization.id}/${DecodersView.id}`,
+                    },
+                  );
                 },
                 isSelected: view === DecodersView.id,
               },
@@ -203,6 +217,12 @@ export const Normalization: React.FC = compose(withErrorBoundary)(
                 id: KVDBsView.id,
                 onClick: () => {
                   history.push(`/${normalization.id}/${KVDBsView.id}`);
+                  NavigationService.getInstance(history).navigateToApp(
+                    applicationsId.kvdbs,
+                    {
+                      path: `#/${normalization.id}/${KVDBsView.id}`,
+                    },
+                  );
                 },
                 isSelected: view === KVDBsView.id,
               },
