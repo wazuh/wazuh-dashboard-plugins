@@ -12,7 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Upgraded `js-yaml` dependency to 4.1.1 [#7958](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7958)
 
-## Wazuh v4.14.2 - OpenSearch Dashboards 2.19.4 - Revision 01
+## Wazuh v4.14.2 - OpenSearch Dashboards 2.19.4 - Revision 02
 
 ### Added
 
@@ -21,13 +21,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Fixed text alignment and column distribution in System inventory card within Agent view [#7962](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7962)
 - Removed sorting for Program name and Order columns in Related decoders table and Groups column in Related rules table to prevent API errors [#7883](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7883)
 
 ### Changed
 
 - Improved text size consistency and visual hierarchy across the Agent Overview page by implementing standardized typography styling [#7878](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7878)
-- Improved Agent Overview resilience by rendering each available system inventory field [#78696](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7896)
+- Improved Agent Overview resilience by rendering each available system inventory field [#7896](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7896)
 - Upgraded `cookie` dependency to 0.7.0 [#7897](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7897)
+- Remove SCA Agent card subtitle [#7963](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7963)
 
 ## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 02
 
