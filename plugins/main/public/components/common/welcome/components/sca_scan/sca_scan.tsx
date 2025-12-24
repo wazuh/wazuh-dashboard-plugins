@@ -51,7 +51,9 @@ const ScaScanHeader = ({ agent }) => {
     <EuiFlexGroup className='wz-section-sca-euiFlexGroup'>
       <EuiFlexItem grow={false}>
         <RedirectAppLinks application={getCore().application}>
-          <Typography level='card'>SCA: Scans summary</Typography>
+          <Typography level='card'>
+            Security Configuration Assessment
+          </Typography>
         </RedirectAppLinks>
       </EuiFlexItem>
       <EuiFlexItem grow={false}>

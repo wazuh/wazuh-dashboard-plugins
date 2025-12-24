@@ -58,11 +58,13 @@ export const WzRibbonBody = ({
       justifyContent='spaceBetween'
       style={{ responsive: true }}
     >
-      <EuiFlexGroup gutterSize='l' className='wz-ribbon-condensed'>
-        {condensedItems.map(item => (
-          <WzRibbonItem key={item.key} item={item} />
-        ))}
-      </EuiFlexGroup>
+      {condensedItems.length > 0 && (
+        <EuiFlexGroup gutterSize='l' className='wz-ribbon-condensed'>
+          {condensedItems.map(item => (
+            <WzRibbonItem key={item.key} item={item} />
+          ))}
+        </EuiFlexGroup>
+      )}
       {nonCondensedItems.map(item => (
         <WzRibbonItem key={item.key} item={item} />
       ))}
