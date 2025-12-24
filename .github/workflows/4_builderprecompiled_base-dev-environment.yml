@@ -106,8 +106,33 @@ jobs:
             ${{ inputs.docker_run_extra_args }} \
             quay.io/wazuh/${platform}-dev:${platform_version} \
             bash -c '
+              set -e;
               yarn config set registry https://registry.yarnpkg.com;
-              cd /home/node/kbn/plugins/${{ matrix.plugins.container_path }} && yarn && ${{ inputs.command }};
+
+              cd /home/node/kbn/plugins/${{ matrix.plugins.container_path }};
+
+              max_attempts="${RETRY_MAX_ATTEMPTS:-3}";
+              delay_seconds="${RETRY_DELAY_SECONDS:-15}";
+              attempt=1;
+
+              while [ "${attempt}" -le "${max_attempts}" ]; do
+                echo "Performing yarn install (attempt ${attempt}/${max_attempts})...";
+                if yarn install --non-interactive; then
+                  break;
+                else
+                  exit_code=$?;
+                fi;
+                if [ "${attempt}" -ge "${max_attempts}" ]; then
+                  echo "yarn install failed after ${max_attempts} attempts (exit code ${exit_code})." >&2;
+                  exit "${exit_code}";
+                fi;
+
+                echo "yarn install failed (attempt ${attempt}/${max_attempts}, exit ${exit_code}). Retrying in ${delay_seconds}s..." >&2;
+                sleep "${delay_seconds}";
+                attempt=$((attempt + 1));
+              done;
+
+              ${{ inputs.command }};
             '
 
       - name: Get the plugin version and format reference name
