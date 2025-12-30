@@ -18,7 +18,6 @@ import {
   fetchInternalOpenSearchIndexItemsRelation,
 } from '../../services/http';
 import { indexName } from './info';
-import { indexName as DecodersIndexName } from '../decoders/info';
 import { indexName as KVDBsIndexName } from '../kvdbs/info';
 import { Metadata } from '../../components/metadata/metadata';
 import { JSONViewer } from '../../components/json-viewer/json-viewer';
@@ -26,6 +25,7 @@ import { JSONViewer } from '../../components/json-viewer/json-viewer';
 const relationDecodersIDField = '___decoders';
 const relationKVDBsIDField = '___kvdbs';
 const missingFieldMarker = 'missing';
+const DECODERS_INDEX_NAME = '.cti-decoders';
 
 const detailsMapLabels: { [key: string]: string } = {
   'document.author': 'Author',
@@ -119,7 +119,7 @@ export const Details: React.FC<{ item: { document: { id: string } } }> = ({
         decoders: {
           field: 'document.decoders',
           indexField: 'document.id',
-          index: DecodersIndexName,
+          index: DECODERS_INDEX_NAME,
           target_field: relationDecodersIDField,
           onMissing: item => {
             return { document: { title: item }, [missingFieldMarker]: true };

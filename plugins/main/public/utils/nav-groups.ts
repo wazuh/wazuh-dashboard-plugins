@@ -153,7 +153,6 @@ export function registerWazuhNavLinks(
   const appsNormalization = [
     'normalization',
     'overview-normalization',
-    'decoders',
     'kvdbs',
   ];
 
