@@ -35,6 +35,7 @@ enum Navigation {
   Insights = 'Insights',
   Detection = 'Detection',
   KVDBs = 'KVDBs',
+  Decoders = 'Decoders',
   OverviewNormalization = 'OverviewNormalization',
   Normalization = 'Normalization',
 }
@@ -51,6 +52,7 @@ const applicationsId = {
   // correlationRules: 'correlation_rules',
   normalization: 'normalization',
   kvdbs: 'kvdbs',
+  decoders: 'decoders',
 };
 
 const ROUTES = Object.freeze({
@@ -195,6 +197,19 @@ export const Normalization: React.FC = compose(withErrorBoundary)(
                   );
                 },
                 isSelected: view === OverviewView.id,
+              },
+              {
+                name: Navigation.Decoders,
+                id: Navigation.Decoders,
+                onClick: () => {
+                  NavigationService.getInstance(history).navigateToApp(
+                    applicationsId.decoders,
+                    {
+                      path: '#/decoders',
+                    },
+                  );
+                },
+                isSelected: false,
               },
               {
                 name: KVDBsView.title,
