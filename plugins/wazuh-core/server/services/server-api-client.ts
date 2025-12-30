@@ -11,7 +11,9 @@
  */
 
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import { promises as fs } from 'fs';
 import https from 'https';
+import path from 'path';
 import { Logger } from 'opensearch-dashboards/server';
 import { getCookieValueByName } from './cookie';
 import { ManageHosts } from './manage-hosts';
@@ -71,6 +73,18 @@ export interface ServerAPIAuthenticateOptions {
   authContext?: any;
 }
 
+interface WazuhApiHttpsConfig {
+  enabled?: boolean | string;
+  key?: string;
+  cert?: string;
+  use_ca?: boolean | string;
+  ca?: string;
+  ssl_protocol?: string;
+  ssl_ciphers?: string;
+}
+
+const WAZUH_API_SSL_DIR = '/var/ossec/api/configuration/ssl';
+
 /**
  * This service communicates with the Wazuh server APIs
  */
@@ -79,17 +93,22 @@ export class ServerAPIClient {
   private _axios: typeof axios;
   private asInternalUser: ServerAPIInternalUserClient;
   private _axios: AxiosInstance;
+  private _httpsAgentsByHost: Map<string, https.Agent | null>;
+  private _httpsAgentsLoading: Map<string, Promise<void>>;
+  private _bootstrapHttpsAgent: https.Agent;
   constructor(
     private logger: Logger, // TODO: add logger as needed
     private manageHosts: ManageHosts,
     private dashboardSecurity: ISecurityFactory,
   ) {
-    const httpsAgent = new https.Agent({
+    this._bootstrapHttpsAgent = new https.Agent({
       rejectUnauthorized: false,
     });
-    this._axios = axios.create({ httpsAgent });
+    this._axios = axios.create({ httpsAgent: this._bootstrapHttpsAgent });
     // Cache to save the token for the internal user by API host ID
     this._CacheInternalUserAPIHostToken = new Map<string, string>();
+    this._httpsAgentsByHost = new Map<string, https.Agent | null>();
+    this._httpsAgentsLoading = new Map<string, Promise<void>>();
 
     // Create internal user client
     this.asInternalUser = {
@@ -145,6 +164,10 @@ export class ServerAPIClient {
   ) {
     const api = await this.manageHosts.get(apiHostID);
     const { body, params, headers, ...rest } = data;
+    const httpsAgent =
+      token && `${api.url}`.startsWith('https://')
+        ? await this._ensureHttpsAgent(apiHostID)
+        : undefined;
     return {
       method: method,
       headers: {
@@ -155,6 +178,7 @@ export class ServerAPIClient {
       data: body || rest || {},
       params: params || {},
       url: `${api.url}:${api.port}${path}`,
+      ...(httpsAgent ? { httpsAgent } : {}),
     };
   }
 
@@ -169,6 +193,7 @@ export class ServerAPIClient {
     options: ServerAPIAuthenticateOptions,
   ): Promise<string> {
     const api = (await this.manageHosts.get(apiHostID)) as APIHost;
+    const httpsAgent = this._getCachedHttpsAgent(apiHostID);
     const optionsRequest = {
       method: 'POST',
       headers: {
@@ -182,6 +207,7 @@ export class ServerAPIClient {
         options.useRunAs ? '/run_as' : ''
       }`,
       ...(!!options?.authContext ? { data: options?.authContext } : {}),
+      ...(httpsAgent ? { httpsAgent } : {}),
     };
 
     const response: AxiosResponse = await this._axios(optionsRequest);
@@ -198,6 +224,154 @@ export class ServerAPIClient {
     const token = await this._authenticate(apiHostID, { useRunAs: false });
     this._CacheInternalUserAPIHostToken.set(apiHostID, token);
     return token;
+  }
+
+  private _getCachedHttpsAgent(apiHostID: string) {
+    const agent = this._httpsAgentsByHost.get(apiHostID);
+    return agent || undefined;
+  }
+
+  private _parseBoolean(value: unknown, defaultValue: boolean) {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      if (['yes', 'true', '1', 'on'].includes(normalized)) {
+        return true;
+      }
+      if (['no', 'false', '0', 'off'].includes(normalized)) {
+        return false;
+      }
+    }
+    return defaultValue;
+  }
+
+  private _resolveApiSslPath(fileName?: string) {
+    if (!fileName) {
+      return undefined;
+    }
+
+    if (path.isAbsolute(fileName)) {
+      return path.normalize(fileName);
+    }
+
+    return path.join(WAZUH_API_SSL_DIR, fileName);
+  }
+
+  private async _fetchApiConfig(apiHostID: string, token: string) {
+    const api = (await this.manageHosts.get(apiHostID)) as APIHost;
+    const response = await this._axios({
+      method: 'GET',
+      url: `${api.url}:${api.port}/manager/api/config`,
+      headers: {
+        'content-type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      },
+      httpsAgent: this._bootstrapHttpsAgent,
+    });
+
+    const responseData = (response || {}).data;
+    const data = (responseData || {}).data;
+
+    if (data?.affected_items && Array.isArray(data.affected_items)) {
+      return data.affected_items[0];
+    }
+
+    return data || responseData;
+  }
+
+  private async _buildHttpsAgentFromConfig(config: WazuhApiHttpsConfig) {
+    const httpsEnabled = this._parseBoolean(config.enabled, true);
+    if (!httpsEnabled) {
+      return null;
+    }
+
+    const useCa = this._parseBoolean(config.use_ca, false);
+    const primaryPath = this._resolveApiSslPath(
+      useCa ? config.ca : config.cert,
+    );
+    const fallbackPath = useCa
+      ? this._resolveApiSslPath(config.cert)
+      : undefined;
+    const caPath = primaryPath || fallbackPath;
+
+    if (!caPath) {
+      return null;
+    }
+
+    const caContent = await fs.readFile(caPath);
+
+    return new https.Agent({
+      ca: caContent,
+      rejectUnauthorized: true,
+    });
+  }
+
+  private async _ensureHttpsAgent(apiHostID: string) {
+    if (this._httpsAgentsByHost.has(apiHostID)) {
+      return this._getCachedHttpsAgent(apiHostID);
+    }
+
+    const existingPromise = this._httpsAgentsLoading.get(apiHostID);
+    if (existingPromise) {
+      await existingPromise;
+      return this._getCachedHttpsAgent(apiHostID);
+    }
+
+    const loadPromise = (async () => {
+      try {
+        this.logger.debug(
+          `Loading Wazuh API certificate configuration for host [${apiHostID}]`,
+        );
+        let token = this._CacheInternalUserAPIHostToken.get(apiHostID);
+        if (!token) {
+          token = await this._authenticateInternalUser(apiHostID);
+        }
+
+        let apiConfig;
+        try {
+          apiConfig = await this._fetchApiConfig(apiHostID, token);
+        } catch (error) {
+          if (error?.response?.status === 401) {
+            token = await this._authenticateInternalUser(apiHostID);
+            apiConfig = await this._fetchApiConfig(apiHostID, token);
+          } else {
+            throw error;
+          }
+        }
+        const httpsConfig = (apiConfig || {}).https as WazuhApiHttpsConfig;
+
+        if (!httpsConfig) {
+          this._httpsAgentsByHost.set(apiHostID, null);
+          return;
+        }
+
+        const httpsAgent = await this._buildHttpsAgentFromConfig(httpsConfig);
+        if (httpsAgent) {
+          this._httpsAgentsByHost.set(apiHostID, httpsAgent);
+          this.logger.debug(
+            `Wazuh API certificates loaded for host [${apiHostID}]`,
+          );
+          return;
+        }
+
+        this._httpsAgentsByHost.set(apiHostID, null);
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        this.logger.warn(
+          `Failed to load Wazuh API certificates for host [${apiHostID}]: ${errorMessage}`,
+        );
+        this._httpsAgentsByHost.set(apiHostID, null);
+      } finally {
+        this._httpsAgentsLoading.delete(apiHostID);
+      }
+    })();
+
+    this._httpsAgentsLoading.set(apiHostID, loadPromise);
+    await loadPromise;
+    return this._getCachedHttpsAgent(apiHostID);
   }
 
   /**
