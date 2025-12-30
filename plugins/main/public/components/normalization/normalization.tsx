@@ -29,11 +29,13 @@ enum Navigation {
   Detectors = 'Detectors',
   Rules = 'Detection rules',
   Overview = 'Overview',
-  Alerts = 'Alerts',
-  Correlations = 'Correlations',
-  CorrelationRules = 'Correlation rules',
+  // Wazuh: hide Alerts/Correlations navigation entries.
+  // Alerts = 'Alerts',
+  // Correlations = 'Correlations',
+  // CorrelationRules = 'Correlation rules',
   LogTypes = 'Integrations',
-  Insights = 'Insights',
+  // Wazuh: remove Insights group from navigation.
+  // Insights = 'Insights',
   Detection = 'Detection',
   Decoders = 'Decoders',
   KVDBs = 'KVDBs',
@@ -44,12 +46,14 @@ enum Navigation {
 const applicationsId = {
   saOverview: 'sa_overview',
   findings: 'findings',
-  threatAlerts: 'threat_alerts',
+  // Wazuh: hide Alerts app id from navigation.
+  // threatAlerts: 'threat_alerts',
   detectors: 'detectors',
   detectionRules: 'detection_rules',
   logTypes: 'log_types',
-  correlations: 'correlations',
-  correlationRules: 'correlation_rules',
+  // Wazuh: hide Correlations app ids from navigation.
+  // correlations: 'correlations',
+  // correlationRules: 'correlation_rules',
   decoders: 'decoders',
   normalization: 'normalization',
   kvdbs: 'kvdbs',
@@ -57,7 +61,8 @@ const applicationsId = {
 
 const ROUTES = Object.freeze({
   ROOT: '/',
-  ALERTS: '/alerts',
+  // Wazuh: hide Alerts route entry.
+  // ALERTS: '/alerts',
   DETECTORS: '/detectors',
   FINDINGS: '/findings',
   OVERVIEW: '/overview',
@@ -72,11 +77,13 @@ const ROUTES = Object.freeze({
   EDIT_DETECTOR_DETAILS: '/edit-detector-details',
   EDIT_DETECTOR_RULES: '/edit-detector-rules',
   EDIT_FIELD_MAPPINGS: '/edit-field-mappings',
-  EDIT_DETECTOR_ALERT_TRIGGERS: '/edit-alert-triggers',
-  CORRELATIONS: '/correlations',
-  CORRELATION_RULES: '/correlations/rules',
-  CORRELATION_RULE_CREATE: '/correlations/create-rule',
-  CORRELATION_RULE_EDIT: '/correlations/rule',
+  // Wazuh: hide alert triggers route entry.
+  // EDIT_DETECTOR_ALERT_TRIGGERS: '/edit-alert-triggers',
+  // Wazuh: hide Correlations route entries.
+  // CORRELATIONS: '/correlations',
+  // CORRELATION_RULES: '/correlations/rules',
+  // CORRELATION_RULE_CREATE: '/correlations/create-rule',
+  // CORRELATION_RULE_EDIT: '/correlations/rule',
   LOG_TYPES: '/log-types',
   LOG_TYPES_CREATE: '/create-log-type',
   THREAT_INTEL_OVERVIEW: '/threat-intel',
@@ -122,51 +129,65 @@ export const Normalization: React.FC = compose(withErrorBoundary)(
             isSelected: view === Navigation.Overview,
           },
           {
-            name: Navigation.Insights,
-            id: Navigation.Insights,
-            forceOpen: true,
-            items: [
-              {
-                name: Navigation.Findings,
-                id: Navigation.Findings,
-                onClick: () => {
-                  NavigationService.getInstance(history).navigateToApp(
-                    applicationsId.findings,
-                    {
-                      path: `#${ROUTES.FINDINGS}`,
-                    },
-                  );
+            name: Navigation.Findings,
+            id: Navigation.Findings,
+            onClick: () => {
+              NavigationService.getInstance(history).navigateToApp(
+                applicationsId.findings,
+                {
+                  path: `#${ROUTES.FINDINGS}`,
                 },
-                isSelected: view === Navigation.Findings,
-              },
-              {
-                name: Navigation.Alerts,
-                id: Navigation.Alerts,
-                onClick: () => {
-                  NavigationService.getInstance(history).navigateToApp(
-                    applicationsId.threatAlerts,
-                    {
-                      path: `#${ROUTES.ALERTS}`,
-                    },
-                  );
-                },
-                isSelected: view === Navigation.Alerts,
-              },
-              {
-                name: Navigation.Correlations,
-                id: Navigation.Correlations,
-                onClick: () => {
-                  NavigationService.getInstance(history).navigateToApp(
-                    applicationsId.correlations,
-                    {
-                      path: `#${ROUTES.CORRELATIONS}`,
-                    },
-                  );
-                },
-                isSelected: view === Navigation.Correlations,
-              },
-            ],
+              );
+            },
+            isSelected: view === Navigation.Findings,
           },
+          // Wazuh: remove Insights group (Alerts/Correlations) from navigation.
+          // {
+          //   name: Navigation.Insights,
+          //   id: Navigation.Insights,
+          //   forceOpen: true,
+          //   items: [
+          //     {
+          //       name: Navigation.Findings,
+          //       id: Navigation.Findings,
+          //       onClick: () => {
+          //         NavigationService.getInstance(history).navigateToApp(
+          //           applicationsId.findings,
+          //           {
+          //             path: `#${ROUTES.FINDINGS}`,
+          //           },
+          //         );
+          //       },
+          //       isSelected: view === Navigation.Findings,
+          //     },
+          //     {
+          //       name: Navigation.Alerts,
+          //       id: Navigation.Alerts,
+          //       onClick: () => {
+          //         NavigationService.getInstance(history).navigateToApp(
+          //           applicationsId.threatAlerts,
+          //           {
+          //             path: `#${ROUTES.ALERTS}`,
+          //           },
+          //         );
+          //       },
+          //       isSelected: view === Navigation.Alerts,
+          //     },
+          //     {
+          //       name: Navigation.Correlations,
+          //       id: Navigation.Correlations,
+          //       onClick: () => {
+          //         NavigationService.getInstance(history).navigateToApp(
+          //           applicationsId.correlations,
+          //           {
+          //             path: `#${ROUTES.CORRELATIONS}`,
+          //           },
+          //         );
+          //       },
+          //       isSelected: view === Navigation.Correlations,
+          //     },
+          //   ],
+          // },
           {
             name: Navigation.LogTypes,
             id: Navigation.LogTypes,
@@ -259,19 +280,20 @@ export const Normalization: React.FC = compose(withErrorBoundary)(
                 },
                 isSelected: view === Navigation.Rules,
               },
-              {
-                name: Navigation.CorrelationRules,
-                id: Navigation.CorrelationRules,
-                onClick: () => {
-                  NavigationService.getInstance(history).navigateToApp(
-                    applicationsId.correlationRules,
-                    {
-                      path: `#${ROUTES.CORRELATION_RULES}`,
-                    },
-                  );
-                },
-                isSelected: view === Navigation.CorrelationRules,
-              },
+              // Wazuh: hide Correlation rules navigation entry.
+              // {
+              //   name: Navigation.CorrelationRules,
+              //   id: Navigation.CorrelationRules,
+              //   onClick: () => {
+              //     NavigationService.getInstance(history).navigateToApp(
+              //       applicationsId.correlationRules,
+              //       {
+              //         path: `#${ROUTES.CORRELATION_RULES}`,
+              //       },
+              //     );
+              //   },
+              //   isSelected: view === Navigation.CorrelationRules,
+              // },
             ],
           },
         ],
