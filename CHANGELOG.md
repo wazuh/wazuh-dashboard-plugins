@@ -33,6 +33,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed dashboards renderer by saved objects [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842) [#7847](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7847) [#7916](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7916) [#7938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7938)
 - Changed `rule.groups` filter to `wazuh.integration.decoders` [#7934](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7934)
 - Applied the new home page navigation style to all dashboards [#7981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7981)
+- Hide Alerts/Correlations and Correlation rules from the Security Analytics navigation, leaving Findings at the root level [#8004](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8004)
 
 ### Fixed
 
