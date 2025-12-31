@@ -803,27 +803,6 @@ export const overviewNormalization = {
   redirectTo: () => '/normalization/overview',
 };
 
-export const decoders = {
-  category: 'security_analytics',
-  id: 'decoders',
-  parentNavLinkId: 'normalization',
-  showInAllNavGroup: true,
-  title: i18n.translate('wz-app-decoders-title', {
-    defaultMessage: 'Decoders',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-decoders-breadcrumbLabel', {
-    defaultMessage: 'Decoders',
-  }),
-  description: i18n.translate('wz-app-decoders-description', {
-    defaultMessage: 'PLACEHOLDER.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 7006,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/normalization/decoders',
-};
-
 export const KVDBs = {
   category: 'security_analytics',
   id: 'kvdbs',
@@ -847,7 +826,6 @@ export const KVDBs = {
 export const NormalizationApps = [
   normalization,
   overviewNormalization,
-  decoders,
   KVDBs,
 ];
 
@@ -885,7 +863,6 @@ export const Applications = [
   ITHygiene,
   normalization,
   overviewNormalization,
-  decoders,
   KVDBs,
 ].sort((a, b) => {
   // Sort applications by order

@@ -17,7 +17,6 @@ import {
 import { compose } from 'redux';
 import { withErrorBoundary, withGlobalBreadcrumb } from '../common/hocs';
 import { normalization } from '../../utils/applications';
-import { DecodersView } from './views/decoders';
 import { KVDBsView } from './views/kvdbs';
 import { OverviewView } from './views/overview';
 import { getUiSettings } from '../../kibana-services';
@@ -35,8 +34,8 @@ enum Navigation {
   LogTypes = 'Integrations',
   Insights = 'Insights',
   Detection = 'Detection',
-  Decoders = 'Decoders',
   KVDBs = 'KVDBs',
+  Decoders = 'Decoders',
   OverviewNormalization = 'OverviewNormalization',
   Normalization = 'Normalization',
 }
@@ -48,11 +47,12 @@ const applicationsId = {
   detectors: 'detectors',
   detectionRules: 'detection_rules',
   logTypes: 'log_types',
-  correlations: 'correlations',
-  correlationRules: 'correlation_rules',
-  decoders: 'decoders',
+  // Wazuh: hide Correlations app ids from navigation.
+  // correlations: 'correlations',
+  // correlationRules: 'correlation_rules',
   normalization: 'normalization',
   kvdbs: 'kvdbs',
+  decoders: 'decoders',
 };
 
 const ROUTES = Object.freeze({
@@ -199,18 +199,17 @@ export const Normalization: React.FC = compose(withErrorBoundary)(
                 isSelected: view === OverviewView.id,
               },
               {
-                name: DecodersView.title,
-                id: DecodersView.id,
+                name: Navigation.Decoders,
+                id: Navigation.Decoders,
                 onClick: () => {
-                  history.push(`/${normalization.id}/${DecodersView.id}`);
                   NavigationService.getInstance(history).navigateToApp(
                     applicationsId.decoders,
                     {
-                      path: `#/${normalization.id}/${DecodersView.id}`,
+                      path: '#/decoders',
                     },
                   );
                 },
-                isSelected: view === DecodersView.id,
+                isSelected: false,
               },
               {
                 name: KVDBsView.title,
@@ -292,13 +291,13 @@ export const Normalization: React.FC = compose(withErrorBoundary)(
               render={OverviewView.component}
             ></Route>
             <Route
-              path={`/${normalization.id}/${DecodersView.id}`}
-              render={DecodersView.component}
-            ></Route>
-            <Route
               path={`/${normalization.id}/${KVDBsView.id}`}
               render={KVDBsView.component}
             ></Route>
+            <Redirect
+              from={`/${normalization.id}/decoders`}
+              to={`/${normalization.id}/${OverviewView.id}`}
+            />
             <Redirect
               from={`/${normalization.id}`}
               to={`/${normalization.id}/${OverviewView.id}`}
