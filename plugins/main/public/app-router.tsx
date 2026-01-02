@@ -22,7 +22,6 @@ import NavigationService from './react-services/navigation-service';
 import { SECTIONS } from './sections';
 import { withGuardAsync } from './components/common/hocs';
 import { WzRequest } from './react-services/wz-request';
-import { Normalization } from './components/normalization/normalization';
 
 export const Application = withGuardAsync(
   async (_props: any) => {
@@ -111,10 +110,6 @@ export const Application = withGuardAsync(
           path={`/${SECTIONS.WAZUH_DEV}`}
           exact
           render={props => <ToolsRouter {...props} />}
-        ></Route>
-        <Route
-          path={`/${SECTIONS.NORMALIZATION}/:view?`}
-          render={props => <Normalization {...props} />}
         ></Route>
         <Redirect from='/' to={getWzMainParams()} />
       </Switch>

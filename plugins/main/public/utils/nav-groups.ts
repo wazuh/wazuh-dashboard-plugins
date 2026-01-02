@@ -15,7 +15,7 @@ import {
   DEFAULT_NAV_GROUPS,
   DEFAULT_APP_CATEGORIES,
 } from '../../../../src/core/public';
-import { Applications, NormalizationApps } from './applications';
+import { Applications } from './applications';
 
 /**
  * Interface for ChromeNavGroup compatible with OpenSearch Dashboards.
@@ -148,32 +148,8 @@ export function registerWazuhNavLinks(
     return;
   }
 
-  // TODO: Remove this when Normalization is migrated to security analytics
-
-  const appsNormalization = [
-    'normalization',
-    'overview-normalization',
-    'decoders',
-    'kvdbs',
-  ];
-
-  const apps = Applications.filter(app => !appsNormalization.includes(app.id));
-
-  const navLinksNormalization =
-    createNavLinksFromApplications(NormalizationApps);
-  addNavLinksToGroup(
-    DEFAULT_NAV_GROUPS.all,
-    navLinksNormalization.map(link => ({
-      id: link.id,
-      ...(link.id !== 'normalization' && { parentNavLinkId: 'normalization' }),
-      title: link.title,
-      order: link.order,
-      category: DEFAULT_NAV_GROUPS['security-analytics'],
-    })),
-  );
-
   // Get all nav link configurations from applications
-  const navLinks = createNavLinksFromApplications(apps);
+  const navLinks = createNavLinksFromApplications(Applications);
 
   // Also register in "All" (Analytics) use case for visibility
   addNavLinksToGroup(

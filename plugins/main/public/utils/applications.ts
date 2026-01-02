@@ -7,10 +7,6 @@ import {
   LogoMicrosoftGraphAPI,
   LogoOffice365,
 } from '../components/common/logos';
-import {
-  DEFAULT_NAV_GROUPS,
-  AppNavLinkStatus,
-} from '../../../../src/core/public';
 
 /* Applications
 Convention: the order of each application must according to the order of the category
@@ -53,10 +49,9 @@ export const overview = {
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () =>
-    `/overview/${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `?agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `?agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -81,10 +76,9 @@ export const configurationAssessment = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=sca&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=sca&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -106,10 +100,9 @@ export const malwareDetection = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=pm&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=pm&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -134,10 +127,9 @@ export const fileIntegrityMonitoring = {
   showInAgentMenu: true,
   order: 202,
   redirectTo: () =>
-    `/overview/?tab=fim&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=fim&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -159,10 +151,9 @@ export const threatHunting = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=general&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=general&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -187,10 +178,9 @@ export const vulnerabilityDetection = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=vuls&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=vuls&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -212,10 +202,9 @@ export const mitreAttack = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=mitre&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=mitre&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -237,10 +226,9 @@ export const ITHygiene = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=it-hygiene&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=it-hygiene&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -262,10 +250,9 @@ const pciDss = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=pci&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=pci&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -287,10 +274,9 @@ const gdpr = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=gdpr&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=gdpr&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -312,10 +298,9 @@ const hipaa = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=hipaa&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=hipaa&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -337,10 +322,9 @@ const nist80053 = {
   showInAgentMenu: true,
   order: 404,
   redirectTo: () =>
-    `/overview/?tab=nist&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=nist&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -362,10 +346,9 @@ const tsc = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=tsc&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=tsc&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -387,10 +370,9 @@ export const docker = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=docker&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=docker&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -415,10 +397,9 @@ export const amazonWebServices = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=aws&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=aws&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -440,10 +421,9 @@ export const googleCloud = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=gcp&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=gcp&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -465,10 +445,9 @@ export const github = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=github&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=github&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -489,10 +468,9 @@ export const office365 = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=office&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=office&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -517,10 +495,9 @@ export const microsoftGraphAPI = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=microsoftGraphAPI&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=microsoftGraphAPI&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -753,104 +730,6 @@ const about = {
   redirectTo: () => '/settings?tab=about',
 };
 
-export const normalization = {
-  category: 'security_analytics',
-  id: 'normalization',
-  title: i18n.translate('wz-app-normalization-title', {
-    defaultMessage: 'Normalization',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-normalization-breadcrumbLabel', {
-    defaultMessage: 'Normalization',
-  }),
-  description: i18n.translate('wz-app-normalization-description', {
-    defaultMessage: 'PLACEHOLDER.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 7005,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/normalization/overview',
-};
-
-export const breadcrumbLabelSecurityAnalytics = i18n.translate(
-  'wz-app-security-analytics-breadcrumbLabel',
-  {
-    defaultMessage: 'Security Analytics',
-  },
-);
-
-export const overviewNormalization = {
-  category: DEFAULT_NAV_GROUPS['security-analytics'],
-  id: 'overview-normalization',
-  parentNavLinkId: 'normalization',
-  title: i18n.translate('wz-app-overview-normalization-title', {
-    defaultMessage: 'Overview',
-  }),
-  breadcrumbLabel: i18n.translate(
-    'wz-app-overview-normalization-breadcrumbLabel',
-    {
-      defaultMessage: 'Overview',
-    },
-  ),
-  description: i18n.translate('wz-app-overview-normalization-description', {
-    defaultMessage: 'PLACEHOLDER.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 7005,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  navLinkStatusOnOldMenu: AppNavLinkStatus.hidden,
-  redirectTo: () => '/normalization/overview',
-};
-
-export const decoders = {
-  category: 'security_analytics',
-  id: 'decoders',
-  parentNavLinkId: 'normalization',
-  showInAllNavGroup: true,
-  title: i18n.translate('wz-app-decoders-title', {
-    defaultMessage: 'Decoders',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-decoders-breadcrumbLabel', {
-    defaultMessage: 'Decoders',
-  }),
-  description: i18n.translate('wz-app-decoders-description', {
-    defaultMessage: 'PLACEHOLDER.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 7006,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/normalization/decoders',
-};
-
-export const KVDBs = {
-  category: 'security_analytics',
-  id: 'kvdbs',
-  parentNavLinkId: 'normalization',
-  title: i18n.translate('wz-app-kvdbs-title', {
-    defaultMessage: 'KVDBs',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-kvdbs-breadcrumbLabel', {
-    defaultMessage: 'KVDBs',
-  }),
-  description: i18n.translate('wz-app-kvdbs-description', {
-    defaultMessage: 'PLACEHOLDER.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 7007,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/normalization/kvdbs',
-};
-
-export const NormalizationApps = [
-  normalization,
-  overviewNormalization,
-  decoders,
-  KVDBs,
-];
-
 export const Applications = [
   fileIntegrityMonitoring,
   overview,
@@ -883,10 +762,6 @@ export const Applications = [
   sampleData,
   about,
   ITHygiene,
-  normalization,
-  overviewNormalization,
-  decoders,
-  KVDBs,
 ].sort((a, b) => {
   // Sort applications by order
   if (a.order < b.order) {
@@ -977,11 +852,5 @@ export const Categories = [
     }),
     order: 6e3,
     euiIconType: 'dashboardApp',
-  },
-  {
-    id: 'security_analytics',
-    label: 'Security analytics',
-    order: 550,
-    euiIconType: 'securityAnalyticsApp',
   },
 ];

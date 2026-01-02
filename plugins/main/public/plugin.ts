@@ -47,7 +47,6 @@ import NavigationService from './react-services/navigation-service';
 import { createHashHistory } from 'history';
 import { SUPPORTED_LANGUAGES_ARRAY } from '../common/constants';
 import { registerWazuhNavLinks } from './utils/nav-groups';
-import { AppNavLinkStatus } from '../../../src/core/public';
 
 export class WazuhPlugin
   implements
@@ -132,18 +131,12 @@ export class WazuhPlugin
 
     // Register the applications
     for (const app of Applications) {
-      const { category, id, title, redirectTo, order, navLinkStatusOnOldMenu } =
-        app;
-
-      const navLinkStatus = core.chrome.navGroup.getNavGroupEnabled()
-        ? AppNavLinkStatus.default
-        : navLinkStatusOnOldMenu || AppNavLinkStatus.default;
+      const { category, id, title, redirectTo, order } = app;
 
       core.application.register({
         id,
         title,
         order,
-        navLinkStatus: navLinkStatus,
         mount: async (params: AppMountParameters) => {
           try {
             setWzCurrentAppID(id);
