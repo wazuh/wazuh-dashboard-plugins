@@ -1,3 +1,3 @@
 export const Name = 'Overview';
-export const Id = 'overview';
+export const Id = 'overwiew';
 export const indexName = '.cti-integration-decoders';

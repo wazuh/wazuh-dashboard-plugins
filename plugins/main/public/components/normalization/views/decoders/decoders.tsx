@@ -117,8 +117,8 @@ const Details: React.FC<{ item: { document: { id: string } } }> = ({
       <EuiTabbedContent
         tabs={[
           {
-            id: 'visual',
-            name: 'Visual',
+            id: 'info',
+            name: 'Info',
             content: (
               <>
                 <EuiSpacer />
@@ -192,18 +192,9 @@ const Details: React.FC<{ item: { document: { id: string } } }> = ({
             ),
           },
           {
-            id: 'yaml',
-            name: 'YAML',
+            id: 'content',
+            name: 'Content',
             content: <AssetViewer content={action.data.decoder || ''} />,
-          },
-          {
-            id: 'json',
-            name: 'JSON',
-            content: (
-              <JSONViewer
-                data={omit(action.data, [relationIntegrationIDField])}
-              />
-            ),
           },
         ]}
       />
@@ -378,7 +369,6 @@ const Body: React.FC = compose(
               },
             )
           }
-          tableInitialPageSize={25}
           tableColumns={tableColums}
           tableInitialSortingField='document.name'
           tableInitialSortingDirection='asc'
