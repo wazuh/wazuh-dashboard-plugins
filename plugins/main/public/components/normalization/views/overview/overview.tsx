@@ -20,7 +20,7 @@ import {
   SearchBar,
   withInitialQueryFromURL,
 } from '../../components/search-bar/search-bar';
-import { ButtonOpenFlyout } from '../../components/buttons';
+import { WzButtonPermissionsOpenFlyout } from '../../../common/buttons';
 import { Details } from './details';
 import { getUiSettings } from '../../../../kibana-services';
 
@@ -66,7 +66,7 @@ const tableColums = [
     align: 'right',
     name: 'Actions',
     render: item => (
-      <ButtonOpenFlyout
+      <WzButtonPermissionsOpenFlyout
         flyoutTitle={`Integration details - ${item.document.title}`}
         flyoutBody={() => <Details item={item} />}
         buttonProps={{
@@ -75,7 +75,7 @@ const tableColums = [
           iconType: 'inspect',
           'aria-label': 'View integration details',
         }}
-      ></ButtonOpenFlyout>
+      ></WzButtonPermissionsOpenFlyout>
     ),
   },
 ];

@@ -13,7 +13,6 @@ const columns = [
   {
     field: 'key',
     name: 'Key',
-    width: '30%',
   },
   {
     field: 'value',

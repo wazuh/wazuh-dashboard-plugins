@@ -766,7 +766,6 @@ export const normalization = {
   order: 7003,
   showInOverviewApp: false,
   showInAgentMenu: false,
-  redirectTo: () => '/normalization/overview',
 };
 
 export const overviewNormalization = {

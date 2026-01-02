@@ -14,7 +14,7 @@ import {
 } from '@elastic/eui';
 import { compose } from 'redux';
 import { i18n } from '@osd/i18n';
-import { ButtonOpenFlyout } from '../../components/buttons';
+import { WzButtonPermissionsOpenFlyout } from '../../../common/buttons';
 import { useAsyncAction } from '../../../common/hooks';
 import {
   withErrorBoundary,
@@ -232,7 +232,7 @@ const tableColums = [
     align: 'right',
     name: 'Actions',
     render: item => (
-      <ButtonOpenFlyout
+      <WzButtonPermissionsOpenFlyout
         flyoutTitle={`KVDB details - ${item.document.title}`}
         flyoutBody={() => <Details item={item} />}
         buttonProps={{
@@ -241,7 +241,7 @@ const tableColums = [
           iconType: 'inspect',
           'aria-label': 'View KVDB details',
         }}
-      ></ButtonOpenFlyout>
+      ></WzButtonPermissionsOpenFlyout>
     ),
   },
 ];

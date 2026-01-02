@@ -13,7 +13,7 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 import { compose } from 'redux';
-import { ButtonOpenFlyout } from '../../components/buttons';
+import { WzButtonPermissionsOpenFlyout } from '../../../common/buttons';
 import { AssetViewer } from './asset-viewer';
 import { useAsyncAction } from '../../../common/hooks';
 import {
@@ -268,7 +268,7 @@ const tableColums = [
     align: 'right',
     name: 'Actions',
     render: item => (
-      <ButtonOpenFlyout
+      <WzButtonPermissionsOpenFlyout
         flyoutTitle={`Decoder details - ${item.document.name}`}
         flyoutBody={() => <Details item={item} />}
         buttonProps={{
@@ -277,7 +277,7 @@ const tableColums = [
           iconType: 'inspect',
           'aria-label': 'View Decoder details',
         }}
-      ></ButtonOpenFlyout>
+      ></WzButtonPermissionsOpenFlyout>
     ),
   },
 ];
