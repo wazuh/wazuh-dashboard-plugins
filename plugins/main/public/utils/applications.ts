@@ -7,7 +7,6 @@ import {
   LogoMicrosoftGraphAPI,
   LogoOffice365,
 } from '../components/common/logos';
-import { DEFAULT_NAV_GROUPS } from '../../../../src/core/public';
 
 /* Applications
 Convention: the order of each application must according to the order of the category
