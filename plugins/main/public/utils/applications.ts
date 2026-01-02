@@ -7,10 +7,7 @@ import {
   LogoMicrosoftGraphAPI,
   LogoOffice365,
 } from '../components/common/logos';
-import {
-  DEFAULT_NAV_GROUPS,
-  AppNavLinkStatus,
-} from '../../../../src/core/public';
+import { DEFAULT_NAV_GROUPS } from '../../../../src/core/public';
 
 /* Applications
 Convention: the order of each application must according to the order of the category
@@ -766,18 +763,11 @@ export const normalization = {
     defaultMessage: 'PLACEHOLDER.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 7005,
+  order: 7003,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/normalization/overview',
 };
-
-export const breadcrumbLabelSecurityAnalytics = i18n.translate(
-  'wz-app-security-analytics-breadcrumbLabel',
-  {
-    defaultMessage: 'Security Analytics',
-  },
-);
 
 export const overviewNormalization = {
   category: DEFAULT_NAV_GROUPS['security-analytics'],
@@ -796,10 +786,9 @@ export const overviewNormalization = {
     defaultMessage: 'PLACEHOLDER.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 7005,
+  order: 10008,
   showInOverviewApp: false,
   showInAgentMenu: false,
-  navLinkStatusOnOldMenu: AppNavLinkStatus.hidden,
   redirectTo: () => '/normalization/overview',
 };
 
@@ -818,7 +807,7 @@ export const decoders = {
     defaultMessage: 'PLACEHOLDER.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 7006,
+  order: 10009,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/normalization/decoders',
@@ -838,7 +827,7 @@ export const KVDBs = {
     defaultMessage: 'PLACEHOLDER.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 7007,
+  order: 10010,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/normalization/kvdbs',
