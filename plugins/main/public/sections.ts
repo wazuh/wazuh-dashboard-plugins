@@ -7,5 +7,4 @@ export enum SECTIONS {
   SECURITY = 'security',
   SETTINGS = 'settings',
   WAZUH_DEV = 'wazuh-dev',
-  NORMALIZATION = 'normalization',
 }
