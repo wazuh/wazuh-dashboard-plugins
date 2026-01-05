@@ -7,10 +7,6 @@ import {
   LogoMicrosoftGraphAPI,
   LogoOffice365,
 } from '../components/common/logos';
-import {
-  DEFAULT_NAV_GROUPS,
-  AppNavLinkStatus,
-} from '../../../../src/core/public';
 
 /* Applications
 Convention: the order of each application must according to the order of the category
@@ -753,104 +749,6 @@ const about = {
   redirectTo: () => '/settings?tab=about',
 };
 
-export const normalization = {
-  category: 'security_analytics',
-  id: 'normalization',
-  title: i18n.translate('wz-app-normalization-title', {
-    defaultMessage: 'Normalization',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-normalization-breadcrumbLabel', {
-    defaultMessage: 'Normalization',
-  }),
-  description: i18n.translate('wz-app-normalization-description', {
-    defaultMessage: 'PLACEHOLDER.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 7005,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/normalization/overview',
-};
-
-export const breadcrumbLabelSecurityAnalytics = i18n.translate(
-  'wz-app-security-analytics-breadcrumbLabel',
-  {
-    defaultMessage: 'Security Analytics',
-  },
-);
-
-export const overviewNormalization = {
-  category: DEFAULT_NAV_GROUPS['security-analytics'],
-  id: 'overview-normalization',
-  parentNavLinkId: 'normalization',
-  title: i18n.translate('wz-app-overview-normalization-title', {
-    defaultMessage: 'Overview',
-  }),
-  breadcrumbLabel: i18n.translate(
-    'wz-app-overview-normalization-breadcrumbLabel',
-    {
-      defaultMessage: 'Overview',
-    },
-  ),
-  description: i18n.translate('wz-app-overview-normalization-description', {
-    defaultMessage: 'PLACEHOLDER.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 7005,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  navLinkStatusOnOldMenu: AppNavLinkStatus.hidden,
-  redirectTo: () => '/normalization/overview',
-};
-
-export const decoders = {
-  category: 'security_analytics',
-  id: 'decoders',
-  parentNavLinkId: 'normalization',
-  showInAllNavGroup: true,
-  title: i18n.translate('wz-app-decoders-title', {
-    defaultMessage: 'Decoders',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-decoders-breadcrumbLabel', {
-    defaultMessage: 'Decoders',
-  }),
-  description: i18n.translate('wz-app-decoders-description', {
-    defaultMessage: 'PLACEHOLDER.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 7006,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/normalization/decoders',
-};
-
-export const KVDBs = {
-  category: 'security_analytics',
-  id: 'kvdbs',
-  parentNavLinkId: 'normalization',
-  title: i18n.translate('wz-app-kvdbs-title', {
-    defaultMessage: 'KVDBs',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-kvdbs-breadcrumbLabel', {
-    defaultMessage: 'KVDBs',
-  }),
-  description: i18n.translate('wz-app-kvdbs-description', {
-    defaultMessage: 'PLACEHOLDER.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 7007,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/normalization/kvdbs',
-};
-
-export const NormalizationApps = [
-  normalization,
-  overviewNormalization,
-  decoders,
-  KVDBs,
-];
-
 export const Applications = [
   fileIntegrityMonitoring,
   overview,
@@ -883,10 +781,6 @@ export const Applications = [
   sampleData,
   about,
   ITHygiene,
-  normalization,
-  overviewNormalization,
-  decoders,
-  KVDBs,
 ].sort((a, b) => {
   // Sort applications by order
   if (a.order < b.order) {
@@ -977,11 +871,5 @@ export const Categories = [
     }),
     order: 6e3,
     euiIconType: 'dashboardApp',
-  },
-  {
-    id: 'security_analytics',
-    label: 'Security analytics',
-    order: 550,
-    euiIconType: 'securityAnalyticsApp',
   },
 ];
