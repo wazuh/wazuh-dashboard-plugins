@@ -399,8 +399,9 @@ node ${cliFilePath} --spec https://raw.githubusercontent.com/wazuh/wazuh/main/ap
               {
                 name,
                 documentation,
-                description: description.replace(/Wazuh/g, 'Server'),
-                summary: summary.replace(/Wazuh/g, 'Server'),
+                description:
+                  description && description.replace(/Wazuh/g, 'Server'),
+                summary: summary && summary.replace(/Wazuh/g, 'Server'),
                 tags,
                 ...(args.length ? { args } : {}),
                 ...(query.length
@@ -409,10 +410,9 @@ node ${cliFilePath} --spec https://raw.githubusercontent.com/wazuh/wazuh/main/ap
                         ...params,
                         ...(params.description
                           ? {
-                              description: params.description.replace(
-                                /Wazuh/g,
-                                'Server',
-                              ),
+                              description:
+                                params?.description &&
+                                params.description.replace(/Wazuh/g, 'Server'),
                             }
                           : {}),
                       })),
