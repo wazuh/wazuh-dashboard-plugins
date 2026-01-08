@@ -591,6 +591,44 @@ export const ApiTable = compose(withErrorBoundary)(
           },
         },
         {
+          name: 'Use ca',
+          field: 'cluster_info.use_ca',
+          align: 'center',
+          sortable: true,
+          width: '80px',
+          render: (value, row) => {
+            const use_ca = row.cluster_info?.use_ca;
+            if (use_ca === true) {
+              return (
+                <EuiToolTip
+                  position='top'
+                  content='The Wazuh API is configured to use CA certificate.'
+                >
+                  <EuiIcon type='check' />
+                </EuiToolTip>
+              );
+            } else if (use_ca === false) {
+              return (
+                <EuiToolTip
+                  position='top'
+                  content='The Wazuh API is not configured to use CA certificate.'
+                >
+                  <p>-</p>
+                </EuiToolTip>
+              );
+            } else {
+              return (
+                <EuiToolTip
+                  position='top'
+                  content='Unable to check CA certificate configuration.'
+                >
+                  <p>-</p>
+                </EuiToolTip>
+              );
+            }
+          },
+        },
+        {
           name: 'Actions',
           render: item => (
             <EuiFlexGroup>

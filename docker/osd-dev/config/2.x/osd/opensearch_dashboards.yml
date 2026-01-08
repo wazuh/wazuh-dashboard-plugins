@@ -26,6 +26,12 @@ wazuh_core.hosts:
     username: wazuh-wui
     password: MyS3cr37P450r.*-
     run_as: false
+    key: 'server.key'
+    cert: 'server.crt'
+    use_ca: false
+    ca: 'ca.crt'
+    ssl_protocol: 'auto'
+    ssl_ciphers: ''
   imposter:
     url: 'http://imposter'
     port: 8080
@@ -44,3 +50,9 @@ wazuh_core.hosts:
     username: wazuh-wui
     password: wazuh-wui
     run_as: false
+    key: 'server.key'
+    cert: 'server.crt'
+    use_ca: true
+    ca: 'ca.crt'
+    ssl_protocol: 'auto'
+    ssl_ciphers: ''
