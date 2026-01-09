@@ -11,20 +11,13 @@
  */
 
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import https from 'https';
+import * as https from 'https';
+import * as fs from 'fs';
+import * as path from 'path';
 import { Logger } from 'opensearch-dashboards/server';
 import { getCookieValueByName } from './cookie';
-import { ManageHosts } from './manage-hosts';
+import { ManageHosts, IAPIHost } from './manage-hosts';
 import { ISecurityFactory } from './security-factory';
-
-interface APIHost {
-  id: string;
-  url: string;
-  username: string;
-  password: string;
-  port: number;
-  run_as: boolean;
-}
 
 type RequestHTTPMethod = 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
 type RequestPath = string;
@@ -76,18 +69,22 @@ export interface ServerAPIAuthenticateOptions {
  */
 export class ServerAPIClient {
   private _CacheInternalUserAPIHostToken: Map<string, string>;
-  private _axios: typeof axios;
   private asInternalUser: ServerAPIInternalUserClient;
   private _axios: AxiosInstance;
+  private defaultHttpsAgent: https.Agent;
+  private configDir: string;
   constructor(
     private logger: Logger, // TODO: add logger as needed
     private manageHosts: ManageHosts,
     private dashboardSecurity: ISecurityFactory,
+    configDir?: string,
   ) {
-    const httpsAgent = new https.Agent({
+    this.configDir = configDir || '';
+    // Default HTTPS agent without certificate verification
+    this.defaultHttpsAgent = new https.Agent({
       rejectUnauthorized: false,
     });
-    this._axios = axios.create({ httpsAgent });
+    this._axios = axios.create({ httpsAgent: this.defaultHttpsAgent });
     // Cache to save the token for the internal user by API host ID
     this._CacheInternalUserAPIHostToken = new Map<string, string>();
 
@@ -102,6 +99,76 @@ export class ServerAPIClient {
         options,
       ) => await this._requestAsInternalUser(method, path, data, options),
     };
+  }
+
+  /**
+   * Create an HTTPS agent based on the host configuration
+   * Follows the pattern from: https://stackoverflow.com/questions/51363855/how-to-configure-axios-to-use-ssl-certificate
+   * @param apiHost Host configuration with certificate paths
+   * @returns HTTPS agent configured with certificates if available
+   */
+  private _createHttpsAgent(apiHost: any): https.Agent {
+    const agentOptions: https.AgentOptions = {
+      rejectUnauthorized: false, // Default to false for backward compatibility
+    };
+
+    // Read certificate files if configured
+    try {
+      if (apiHost.key && apiHost.cert) {
+        // Resolve paths: if absolute, use directly; if relative, resolve from config directory
+        // This matches how OpenSearch Dashboards handles server.ssl.key and server.ssl.certificate
+        const keyPath = path.isAbsolute(apiHost.key)
+          ? apiHost.key
+          : this.configDir
+          ? path.resolve(this.configDir, apiHost.key)
+          : apiHost.key;
+        const certPath = path.isAbsolute(apiHost.cert)
+          ? apiHost.cert
+          : this.configDir
+          ? path.resolve(this.configDir, apiHost.cert)
+          : apiHost.cert;
+
+        // Check if files exist before reading
+        if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
+          agentOptions.key = fs.readFileSync(keyPath);
+          agentOptions.cert = fs.readFileSync(certPath);
+        } else {
+          this.logger.warn(
+            `Certificate files not found for host ${apiHost.id}. Key: ${keyPath}, Cert: ${certPath}`,
+          );
+        }
+      }
+
+      // Read CA certificate if use_ca is enabled
+      if (apiHost.use_ca === true && apiHost.ca) {
+        // Resolve path: if absolute, use directly; if relative, resolve from config directory
+        // This matches how OpenSearch Dashboards handles opensearch.ssl.certificateAuthorities
+        const caPath = path.isAbsolute(apiHost.ca)
+          ? apiHost.ca
+          : this.configDir
+          ? path.resolve(this.configDir, apiHost.ca)
+          : apiHost.ca;
+
+        if (fs.existsSync(caPath)) {
+          agentOptions.ca = fs.readFileSync(caPath);
+          agentOptions.rejectUnauthorized = true; // Enable certificate verification when CA is provided
+        } else {
+          this.logger.warn(
+            `CA certificate file not found for host ${apiHost.id}. CA: ${caPath}`,
+          );
+        }
+      }
+    } catch (error: any) {
+      this.logger.error(
+        `Error reading certificate files for host ${apiHost.id}: ${
+          error?.message || String(error)
+        }`,
+      );
+      // Fall back to default agent on error
+      return this.defaultHttpsAgent;
+    }
+
+    return new https.Agent(agentOptions);
   }
 
   /**
@@ -141,20 +208,30 @@ export class ServerAPIClient {
     method: RequestHTTPMethod,
     path: RequestPath,
     data: any,
-    { apiHostID, token }: APIInterceptorRequestOptions,
+    options:
+      | APIInterceptorRequestOptions
+      | APIInterceptorRequestOptionsInternalUser
+      | APIInterceptorRequestOptionsScopedUser,
   ) {
-    const api = await this.manageHosts.get(apiHostID);
+    const apiHostID = options.apiHostID;
+    const token = 'token' in options ? options.token : undefined;
+    const api = (await this.manageHosts.get(apiHostID)) as IAPIHost;
     const { body, params, headers, ...rest } = data;
+
+    // Create HTTPS agent with certificates if configured
+    const httpsAgent = this._createHttpsAgent(api);
+
     return {
       method: method,
       headers: {
         'content-type': 'application/json',
-        Authorization: 'Bearer ' + token,
+        ...(token ? { Authorization: 'Bearer ' + token } : {}),
         ...(headers ? headers : {}),
       },
       data: body || rest || {},
       params: params || {},
       url: `${api.url}:${api.port}${path}`,
+      httpsAgent: httpsAgent,
     };
   }
 
@@ -168,7 +245,11 @@ export class ServerAPIClient {
     apiHostID: string,
     options: ServerAPIAuthenticateOptions,
   ): Promise<string> {
-    const api = (await this.manageHosts.get(apiHostID)) as APIHost;
+    const api = (await this.manageHosts.get(apiHostID)) as IAPIHost;
+
+    // Create HTTPS agent with certificates if configured
+    const httpsAgent = this._createHttpsAgent(api);
+
     const optionsRequest = {
       method: 'POST',
       headers: {
@@ -182,6 +263,7 @@ export class ServerAPIClient {
         options.useRunAs ? '/run_as' : ''
       }`,
       ...(!!options?.authContext ? { data: options?.authContext } : {}),
+      httpsAgent: httpsAgent,
     };
 
     const response: AxiosResponse = await this._axios(optionsRequest);
@@ -258,8 +340,8 @@ export class ServerAPIClient {
           ? this._CacheInternalUserAPIHostToken.get(options.apiHostID)
           : await this._authenticateInternalUser(options.apiHostID);
       return await this._request(method, path, data, { ...options, token });
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
+    } catch (error: any) {
+      if (error?.response && error.response.status === 401) {
         const token: string = await this._authenticateInternalUser(
           options.apiHostID,
         );
