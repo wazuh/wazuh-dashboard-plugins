@@ -22,6 +22,12 @@ export interface IAPIHost {
   password: string;
   port: number;
   run_as: boolean;
+  key?: string;
+  cert?: string;
+  use_ca?: boolean;
+  ca?: string;
+  ssl_protocol?: string;
+  ssl_ciphers?: string;
 }
 
 interface IAPIHostRegistry {
@@ -29,6 +35,12 @@ interface IAPIHostRegistry {
   node: string | null;
   cluster: string;
   allow_run_as: API_USER_STATUS_RUN_AS;
+  use_ca: boolean | null;
+  ca: string | null;
+  cert: string | null;
+  key: string | null;
+  ssl_protocol: string | null;
+  ssl_ciphers: string | null;
 }
 
 interface GetRegistryDataByHostOptions {
@@ -267,11 +279,25 @@ export class ManageHosts {
       }
     }
 
+    // Get certificate settings from host configuration (similar to run_as)
+    const use_ca = host.use_ca !== undefined ? host.use_ca : null;
+    const ca = host.ca || null;
+    const cert = host.cert || null;
+    const key = host.key || null;
+    const ssl_protocol = host.ssl_protocol || null;
+    const ssl_ciphers = host.ssl_ciphers || null;
+
     const data = {
       manager,
       node,
       cluster,
       allow_run_as,
+      use_ca,
+      ca,
+      cert,
+      key,
+      ssl_protocol,
+      ssl_ciphers,
     };
 
     this.updateRegistryByHost(apiHostID, data);
@@ -298,9 +324,23 @@ export class ManageHosts {
         return;
       }
 
-      await Promise.all(
+      await Promise.allSettled(
         hosts.map(host =>
-          (async () => [host.id, await this.getRegistryDataByHost(host)])(),
+          (async () => {
+            try {
+              return [
+                host.id,
+                await this.getRegistryDataByHost(host, { throwError: false }),
+              ];
+            } catch (error) {
+              this.logger.warn(
+                `Failed to get registry data for host [${
+                  host.id
+                }] during startup: ${error.message || error}`,
+              );
+              return [host.id, null];
+            }
+          })(),
         ),
       );
       this.logger.debug('API hosts data stored in the registry');
