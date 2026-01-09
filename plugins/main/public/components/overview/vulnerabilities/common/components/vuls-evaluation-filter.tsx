@@ -16,13 +16,8 @@ const UNDER_EVALUATION_FIELD = 'vulnerability.under_evaluation';
 export const getUnderEvaluationFilterValue = (
   filters: Filter[],
 ): boolean | null => {
-  const underEvaluationFilter = filters.find(
-    f => f.meta?.key === UNDER_EVALUATION_FIELD,
-  );
-  if (underEvaluationFilter) {
-    return underEvaluationFilter.meta?.params.query as boolean;
-  }
-  return null;
+  const filter = filters.find(f => f.meta?.key === UNDER_EVALUATION_FIELD);
+  return (filter?.meta?.params?.query as boolean) ?? null;
 };
 
 export const excludeUnderEvaluationFilter = (filters: Filter[]): Filter[] => {
