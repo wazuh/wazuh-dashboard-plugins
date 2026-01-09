@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.3
 
+### Fixed
+
+- Fixed TypeError when using "exists" or "does not exist" operators on vulnerability.under_evaluation filter [#8018](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8018)
+
 ### Changed
 
 - Upgraded `js-yaml` dependency to 4.1.1 [#7958](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7958)
