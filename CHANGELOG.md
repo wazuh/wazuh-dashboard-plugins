@@ -7,7 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.14.2
-- Added persistence for page size and sorting in API tables [#7883](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7883)
+- Added persistence for page size and sorting in API tables [#7883](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7883) [#8024](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8024)
 
 ### Fixed
 
