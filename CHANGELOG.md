@@ -14,6 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added "Not applicable" status to SCA CheckResult enum with corresponding color mapping (#B9A888) and sample data support
 - Added Alerting sample monitors health check [#7833](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7833)
 - Added default `wazuh-events*` index pattern [#7924](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7924)
+- Added SSL certificate support for Wazuh API connections, allowing the dashboard to use client certificates and CA certificate validation when connecting to Wazuh Manager APIs configured with custom SSL certificates [#8015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8015)
 
 ### Changed
 
