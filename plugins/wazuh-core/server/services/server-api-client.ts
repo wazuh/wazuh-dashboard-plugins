@@ -116,7 +116,16 @@ export class ServerAPIClient {
 
     // Read certificate files if configured
     try {
-      if (apiHost.key && apiHost.cert) {
+      // Check if key and cert are configured (not empty strings or undefined)
+      const hasKey =
+        apiHost.key &&
+        typeof apiHost.key === 'string' &&
+        apiHost.key.trim() !== '';
+      const hasCert =
+        apiHost.cert &&
+        typeof apiHost.cert === 'string' &&
+        apiHost.cert.trim() !== '';
+      if (hasKey && hasCert) {
         // Resolve paths: if absolute, use directly; if relative, resolve from config directory
         const keyPath = path.isAbsolute(apiHost.key)
           ? apiHost.key
@@ -142,7 +151,12 @@ export class ServerAPIClient {
       }
 
       // Read CA certificate if use_ca is enabled
-      if (apiHost.use_ca === true && apiHost.ca) {
+      // Check if ca is configured (not empty string or undefined)
+      const hasCa =
+        apiHost.ca &&
+        typeof apiHost.ca === 'string' &&
+        apiHost.ca.trim() !== '';
+      if (apiHost.use_ca === true && hasCa) {
         // Resolve path: if absolute, use directly; if relative, resolve from config directory
         const caPath = path.isAbsolute(apiHost.ca)
           ? apiHost.ca
