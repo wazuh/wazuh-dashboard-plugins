@@ -12,16 +12,24 @@ type VulsEvaluatedFilterProps = {
 };
 
 const UNDER_EVALUATION_FIELD = 'vulnerability.under_evaluation';
+const PHRASE_TYPE = 'phrase';
+const EXISTS_TYPE = 'exists';
 
 export const getUnderEvaluationFilterValue = (
   filters: Filter[],
 ): boolean | null => {
-  const filter = filters.find(f => f.meta?.key === UNDER_EVALUATION_FIELD);
+  const filter = filters.find(
+    f => f.meta?.key === UNDER_EVALUATION_FIELD && f.meta?.type === 'phrase',
+  );
   return (filter?.meta?.params?.query as boolean) ?? null;
 };
 
 export const excludeUnderEvaluationFilter = (filters: Filter[]): Filter[] => {
-  return filters.filter(f => f.meta?.key !== UNDER_EVALUATION_FIELD);
+  return filters.filter(f => {
+    const condition =
+      f.meta?.key === UNDER_EVALUATION_FIELD && f.meta?.type === PHRASE_TYPE;
+    return !condition;
+  });
 };
 
 export const createUnderEvaluationFilter = (
