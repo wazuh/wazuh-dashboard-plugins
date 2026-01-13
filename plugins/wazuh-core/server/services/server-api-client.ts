@@ -171,7 +171,6 @@ export class ServerAPIClient {
         }
       }
 
-      // Use CA only if verify_ca is true (calculated based on opensearch.ssl.verificationMode)
       const hasCa = caValue !== '';
       const verifyCa = apiHost.verify_ca === true;
       if (certificatesConfigured && hasCa && verifyCa) {
