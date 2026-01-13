@@ -102,8 +102,8 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
           </EuiFlexGroup>
           <EuiSpacer />
           <EuiCallOut color='warning'>
-            If any of the selected agents are still active and auto-enrollment
-            is enabled, they will automatically register again after deletion.
+            If the selected agent is still active and auto-enrollment is
+            enabled, they will automatically register again after deletion.
           </EuiCallOut>
         </EuiModalBody>
 
