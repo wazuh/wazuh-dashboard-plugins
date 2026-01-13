@@ -42,6 +42,7 @@ import { setBreadcrumbs } from '../common/globalBreadcrumb/platformBreadcrumb';
 import WzDataSourceSelector from '../common/data-source/components/wz-data-source-selector/wz-data-source-selector';
 import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
 import NavigationService from '../../react-services/navigation-service';
+import { RunAsWarning } from './run-as-warning';
 
 export const WzMenu = withWindowSize(
   class WzMenu extends Component {
@@ -335,7 +336,9 @@ export const WzMenu = withWindowSize(
       if (this.showSelectorsInPopover) {
         style = { width: '100%', minWidth: 200 };
       }
-
+      const currentAPIConfig = this.state.APIlist.find(
+        api => api.id === this.state.currentAPI,
+      );
       return (
         <>
           <EuiFlexItem grow={this.showSelectorsInPopover}>
@@ -354,6 +357,7 @@ export const WzMenu = withWindowSize(
                 aria-label='API selector'
               />
             </div>
+            <RunAsWarning run_as={currentAPIConfig?.run_as} />
           </EuiFlexItem>
         </>
       );
