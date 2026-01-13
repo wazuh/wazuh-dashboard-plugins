@@ -315,9 +315,6 @@ export class WazuhApiCtrl {
       }
       let responseClusterInfo;
       try {
-        context.wazuh.logger.debug(
-          `Attempting to connect to API host ${request.body.id} at ${data.url}:${data.port}/cluster/local/info`,
-        );
         responseClusterInfo =
           await context.wazuh.api.client.asInternalUser.request(
             'GET',
@@ -325,17 +322,7 @@ export class WazuhApiCtrl {
             {},
             options,
           );
-        context.wazuh.logger.debug(
-          `Successfully connected to API host ${request.body.id}. Response status: ${responseClusterInfo.status}`,
-        );
       } catch (error) {
-        context.wazuh.logger.error(
-          `Failed to connect to API host ${request.body.id}: ${
-            error?.message || String(error)
-          } - Code: ${error?.code || 'N/A'} - Status: ${
-            error?.response?.status || 'N/A'
-          } - Response data: ${JSON.stringify(error?.response?.data || {})}`,
-        );
         return ErrorResponse(
           `ERROR3099 - ${
             error.response?.data?.detail || 'Server not ready yet'

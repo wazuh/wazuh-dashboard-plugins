@@ -111,6 +111,9 @@ export class ServerAPIClient {
       rejectUnauthorized: false, // Default to false for backward compatibility
     };
 
+    let certificatesConfigured = false;
+    let caConfigured = false;
+
     // Read certificate files if configured
     try {
       if (apiHost.key && apiHost.cert) {
@@ -130,6 +133,7 @@ export class ServerAPIClient {
         if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
           agentOptions.key = fs.readFileSync(keyPath);
           agentOptions.cert = fs.readFileSync(certPath);
+          certificatesConfigured = true;
         } else {
           this.logger.warn(
             `Certificate files not found for host ${apiHost.id}. Key: ${keyPath}, Cert: ${certPath}`,
@@ -149,11 +153,23 @@ export class ServerAPIClient {
         if (fs.existsSync(caPath)) {
           agentOptions.ca = fs.readFileSync(caPath);
           agentOptions.rejectUnauthorized = true; // Enable certificate verification when CA is provided
+          caConfigured = true;
         } else {
           this.logger.warn(
             `CA certificate file not found for host ${apiHost.id}. CA: ${caPath}`,
           );
         }
+      }
+
+      // Log SSL configuration status (only when certificates are configured)
+      if (certificatesConfigured || caConfigured) {
+        this.logger.info(
+          `SSL certificates configured for host ${apiHost.id}: ` +
+            `client certificates=${
+              certificatesConfigured ? 'enabled' : 'not configured'
+            }, ` +
+            `CA verification=${caConfigured ? 'enabled' : 'disabled'}`,
+        );
       }
     } catch (error: any) {
       this.logger.error(
