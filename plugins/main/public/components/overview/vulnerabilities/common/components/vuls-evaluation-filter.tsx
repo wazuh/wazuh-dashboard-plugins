@@ -13,7 +13,6 @@ type VulsEvaluatedFilterProps = {
 
 const UNDER_EVALUATION_FIELD = 'vulnerability.under_evaluation';
 const PHRASE_TYPE = 'phrase';
-const EXISTS_TYPE = 'exists';
 
 export const getUnderEvaluationFilterValue = (
   filters: Filter[],
@@ -25,11 +24,10 @@ export const getUnderEvaluationFilterValue = (
 };
 
 export const excludeUnderEvaluationFilter = (filters: Filter[]): Filter[] => {
-  return filters.filter(f => {
-    const condition =
-      f.meta?.key === UNDER_EVALUATION_FIELD && f.meta?.type === PHRASE_TYPE;
-    return !condition;
-  });
+  return filters.filter(
+    f =>
+      !(f.meta?.key === UNDER_EVALUATION_FIELD && f.meta?.type === PHRASE_TYPE),
+  );
 };
 
 export const createUnderEvaluationFilter = (

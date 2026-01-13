@@ -200,6 +200,7 @@ const InventoryVulsComponent = () => {
    * @returns
    */
   const handleFilterChange = (underEvaluation: boolean | null) => {
+    skipFilterRestoration.current = true;
     const newFilters = excludeUnderEvaluationFilter(filters || []);
     if (underEvaluation === null) {
       setFilters(newFilters);
@@ -217,6 +218,38 @@ const InventoryVulsComponent = () => {
   const [underEvaluation, setUnderEvaluation] = useState<boolean | null>(
     getUnderEvaluation(filters || []),
   );
+
+  // Skip auto-restoration when user clicks evaluation buttons
+  const skipFilterRestoration = React.useRef(false);
+
+  useEffect(() => {
+    if (skipFilterRestoration.current) {
+      skipFilterRestoration.current = false;
+      const currentValue = getUnderEvaluationFilterValue(filters || []);
+      if (currentValue !== underEvaluation) {
+        setUnderEvaluation(currentValue);
+      }
+      return;
+    }
+
+    const currentValue = getUnderEvaluationFilterValue(filters || []);
+
+    if (underEvaluation !== null && currentValue === null) {
+      const newFilters = [
+        ...filters,
+        createUnderEvaluationFilter(
+          underEvaluation,
+          dataSource?.id || indexPattern?.id,
+        ),
+      ];
+      setFilters(newFilters);
+      return;
+    }
+
+    if (currentValue !== underEvaluation) {
+      setUnderEvaluation(currentValue);
+    }
+  }, [JSON.stringify(filters)]);
 
   const closeFlyoutHandler = () => setInspectedHit(undefined);
 
