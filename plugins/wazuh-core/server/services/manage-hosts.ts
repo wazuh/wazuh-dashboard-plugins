@@ -278,8 +278,7 @@ export class ManageHosts {
         throw error;
       }
     }
-
-    // Get certificate settings from host configuration (similar to run_as)
+    
     const use_ca = host.use_ca !== undefined ? host.use_ca : null;
     const ca = host.ca || null;
     const cert = host.cert || null;
