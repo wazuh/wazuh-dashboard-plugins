@@ -103,7 +103,6 @@ export class ServerAPIClient {
 
   /**
    * Create an HTTPS agent based on the host configuration
-   * Follows the pattern from: https://stackoverflow.com/questions/51363855/how-to-configure-axios-to-use-ssl-certificate
    * @param apiHost Host configuration with certificate paths
    * @returns HTTPS agent configured with certificates if available
    */
@@ -116,7 +115,6 @@ export class ServerAPIClient {
     try {
       if (apiHost.key && apiHost.cert) {
         // Resolve paths: if absolute, use directly; if relative, resolve from config directory
-        // This matches how OpenSearch Dashboards handles server.ssl.key and server.ssl.certificate
         const keyPath = path.isAbsolute(apiHost.key)
           ? apiHost.key
           : this.configDir
@@ -142,7 +140,6 @@ export class ServerAPIClient {
       // Read CA certificate if use_ca is enabled
       if (apiHost.use_ca === true && apiHost.ca) {
         // Resolve path: if absolute, use directly; if relative, resolve from config directory
-        // This matches how OpenSearch Dashboards handles opensearch.ssl.certificateAuthorities
         const caPath = path.isAbsolute(apiHost.ca)
           ? apiHost.ca
           : this.configDir

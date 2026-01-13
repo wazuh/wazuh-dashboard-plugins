@@ -72,14 +72,13 @@ export class WazuhCorePlugin
       this.services.configuration,
     );
 
-    // Get OpenSearch Dashboards configuration directory for resolving relative certificate paths
     const configDir = this.initializerContext.env?.configDir;
 
     this.services.serverAPIClient = new ServerAPIClient(
       this.logger.get('server-api-client'),
       this.services.manageHosts,
       this.services.dashboardSecurity,
-      configDir, // Pass configDir to ServerAPIClient for resolving relative paths
+      configDir,
     );
 
     this.services.manageHosts.setServerAPIClient(this.services.serverAPIClient);
