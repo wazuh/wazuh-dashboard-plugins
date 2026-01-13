@@ -449,12 +449,12 @@ export const WzMenu = withWindowSize(
                 this.getIndexPatternSelectorComponent()}
 
               {!this.showSelectorsInPopover &&
-                this.state.APIlist.length > 1 &&
+                this.state.APIlist.length &&
                 this.getApiSelectorComponent()}
 
               {this.showSelectorsInPopover &&
                 (this.state.patternList.length > 1 ||
-                  this.state.APIlist.length > 1) && (
+                  this.state.APIlist.length) && (
                   <>
                     <EuiFlexItem grow={false}>
                       <EuiPopover
@@ -472,7 +472,7 @@ export const WzMenu = withWindowSize(
                             {this.getIndexPatternSelectorComponent()}
                           </EuiFlexGroup>
                         )}
-                        {this.state.APIlist.length > 1 && (
+                        {this.state.APIlist.length && (
                           <EuiFlexGroup
                             alignItems='center'
                             style={{ paddingTop: 5 }}

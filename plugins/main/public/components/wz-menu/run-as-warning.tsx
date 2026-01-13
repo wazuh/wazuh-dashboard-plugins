@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { EuiHealth, EuiPopover, EuiText } from '@elastic/eui';
+import { EuiHealth, EuiPopover, EuiText, EuiLink } from '@elastic/eui';
+import { webDocumentationLink } from '../../../common/services/web_documentation';
 
 export const RunAsWarning = ({ run_as }: { run_as: boolean }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -14,6 +15,7 @@ export const RunAsWarning = ({ run_as }: { run_as: boolean }) => {
         button={
           <EuiHealth
             color='warning'
+            style={{ cursor: 'pointer' }}
             onClick={() => setIsPopoverOpen(!isPopoverOpen)}
           ></EuiHealth>
         }
@@ -27,13 +29,16 @@ export const RunAsWarning = ({ run_as }: { run_as: boolean }) => {
             user role-mapping is not applied.
           </p>
           <p>
-            <a
-              href='https://documentation.wazuh.com/current/user-manual/user-administration/rbac.html'
+            <EuiLink
+              href={webDocumentationLink(
+                'user-manual/user-administration/rbac.html',
+              )}
               target='_blank'
+              external
               rel='noopener noreferrer'
             >
               RBAC Documentation
-            </a>
+            </EuiLink>
           </p>
         </EuiText>
       </EuiPopover>
