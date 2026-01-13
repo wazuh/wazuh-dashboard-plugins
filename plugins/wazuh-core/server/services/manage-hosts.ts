@@ -59,7 +59,6 @@ interface GetRegistryDataByHostOptions {
 export class ManageHosts {
   public serverAPIClient: ServerAPIClient | null = null;
   private readonly cacheRegistry = new Map<string, IAPIHostRegistry>();
-  private opensearchVerificationMode: string | null = null;
 
   constructor(
     private readonly logger: Logger,
@@ -67,24 +66,10 @@ export class ManageHosts {
     private readonly initializerContext?: PluginInitializerContext,
   ) {}
 
-  private async initializeOpenSearchConfig(): Promise<void> {
-    if (!this.initializerContext) {
-      return;
-    }
-    try {
-      const config$ = this.initializerContext.config.create<any>();
-      const config = await config$.pipe(first()).toPromise();
-      this.opensearchVerificationMode =
-        config?.opensearch?.ssl?.verificationMode || null;
-    } catch (error) {
-      this.logger.warn(
-        `Could not read opensearch.ssl.verificationMode: ${error}`,
-      );
-    }
-  }
-
   /**
-   * Calculate verify_ca based on opensearch.ssl.verificationMode and certificate paths
+   * Calculate verify_ca based on certificate paths.
+   * If key, cert, and ca are all configured, verify_ca is true.
+   * Otherwise, verify_ca is null (not configured) or false (partially configured).
    */
   private calculateVerifyCa(host: IAPIHost): boolean | null {
     // Check if certificate paths are defined
@@ -95,20 +80,17 @@ export class ManageHosts {
     const hasCa =
       host.ca && typeof host.ca === 'string' && host.ca.trim() !== '';
 
-    // If no certificate paths are defined, return null
-    if (!hasKey || !hasCert || !hasCa) {
-      return null;
-    }
-
-    // Check opensearch.ssl.verificationMode
-    // If verificationMode is 'certificate' or 'full', use CA verification
-    if (
-      this.opensearchVerificationMode === 'certificate' ||
-      this.opensearchVerificationMode === 'full'
-    ) {
+    // If all certificate paths are configured, enable CA verification
+    if (hasKey && hasCert && hasCa) {
       return true;
     }
 
+    // If no certificate paths are defined, return null (not configured)
+    if (!hasKey && !hasCert && !hasCa) {
+      return null;
+    }
+
+    // If only some paths are configured, return false (partially configured)
     return false;
   }
 
@@ -230,14 +212,27 @@ export class ManageHosts {
         ]);
         return hosts.map(host => {
           const { id } = host;
-          return { ...host, cluster_info: updatedRegistry[id] || {} };
+          const registryData = updatedRegistry[id] || {};
+          const { allow_run_as, verify_ca, ...cluster_info } = registryData;
+          return {
+            ...host,
+            allow_run_as,
+            verify_ca,
+            cluster_info,
+          };
         });
       }
 
       return hosts.map(host => {
         const { id } = host;
-
-        return { ...host, cluster_info: registry[id] || {} };
+        const registryData = registry[id] || {};
+        const { allow_run_as, verify_ca, ...cluster_info } = registryData;
+        return {
+          ...host,
+          allow_run_as,
+          verify_ca,
+          cluster_info,
+        };
       });
     } catch (error) {
       this.logger.error(error.message);
@@ -322,7 +317,7 @@ export class ManageHosts {
       }
     }
 
-    // Calculate verify_ca based on opensearch.ssl.verificationMode and certificate paths
+    // Calculate verify_ca based on certificate paths
     const verify_ca = this.calculateVerifyCa(host);
     const ca = host.ca || null;
     const cert = host.cert || null;
@@ -352,9 +347,6 @@ export class ManageHosts {
   async start() {
     try {
       this.logger.debug('Start');
-
-      // Initialize OpenSearch SSL verification mode configuration
-      await this.initializeOpenSearchConfig();
 
       const hosts = (await this.get(undefined, {
         excludePassword: true,

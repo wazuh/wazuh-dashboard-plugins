@@ -169,9 +169,11 @@ export const ApiTable = compose(withErrorBoundary)(
           },
           true,
         );
-        APIConnection.cluster_info = response.data;
+        const { allow_run_as, verify_ca, ...cluster_info } = response.data;
+        APIConnection.cluster_info = cluster_info;
         APIConnection.status = 'online';
-        APIConnection.allow_run_as = response.data.allow_run_as;
+        APIConnection.allow_run_as = allow_run_as;
+        APIConnection.verify_ca = verify_ca;
         !silent && ErrorHandler.info('Connection success', 'Settings');
         // WORKAROUND: Update the apiEntries with the modifications of the APIConnection object
         this.setState({
@@ -234,9 +236,11 @@ export const ApiTable = compose(withErrorBoundary)(
       try {
         const data = await ApiCheck.checkApi(APIconnection, true);
         const clusterInfo = data.data || {};
+        const { allow_run_as, verify_ca, ...cluster_info } = clusterInfo;
         APIconnection.status = 'online';
-        APIconnection.cluster_info = clusterInfo;
-        APIconnection.allow_run_as = clusterInfo.allow_run_as;
+        APIconnection.cluster_info = cluster_info;
+        APIconnection.allow_run_as = allow_run_as;
+        APIconnection.verify_ca = verify_ca;
         if (options?.selectAPIHostOnAvailable) {
           this.setDefault(entry);
         }
@@ -591,27 +595,28 @@ export const ApiTable = compose(withErrorBoundary)(
           },
         },
         {
-          name: 'Use ca',
-          field: 'cluster_info.use_ca',
+          name: 'Verify CA',
+          field: 'verify_ca',
           align: 'center',
           sortable: true,
           width: '80px',
           render: (value, row) => {
-            const use_ca = row.cluster_info?.use_ca;
-            if (use_ca === true) {
+            const verify_ca = row.verify_ca;
+
+            if (verify_ca === true) {
               return (
                 <EuiToolTip
                   position='top'
-                  content='The Wazuh API is configured to use CA certificate.'
+                  content='CA certificate verification is enabled.'
                 >
                   <EuiIcon type='check' />
                 </EuiToolTip>
               );
-            } else if (use_ca === false) {
+            } else if (verify_ca === false) {
               return (
                 <EuiToolTip
                   position='top'
-                  content='The Wazuh API is not configured to use CA certificate.'
+                  content='CA certificate verification is disabled. Either certificate paths are not configured.'
                 >
                   <p>-</p>
                 </EuiToolTip>
@@ -620,7 +625,7 @@ export const ApiTable = compose(withErrorBoundary)(
               return (
                 <EuiToolTip
                   position='top'
-                  content='Unable to check CA certificate configuration.'
+                  content='CA certificate verification status is unknown.'
                 >
                   <p>-</p>
                 </EuiToolTip>
