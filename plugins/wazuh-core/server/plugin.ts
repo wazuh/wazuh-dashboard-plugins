@@ -70,6 +70,7 @@ export class WazuhCorePlugin
     this.services.manageHosts = new ManageHosts(
       this.logger.get('manage-hosts'),
       this.services.configuration,
+      this.initializerContext,
     );
 
     const configDir = this.initializerContext.env?.configDir;

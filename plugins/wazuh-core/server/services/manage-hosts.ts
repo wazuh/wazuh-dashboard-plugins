@@ -9,7 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { Logger } from 'opensearch-dashboards/server';
+import { Logger, PluginInitializerContext } from 'opensearch-dashboards/server';
+import { first } from 'rxjs/operators';
 import { IConfiguration } from '../../common/services/configuration';
 import { ServerAPIClient } from './server-api-client';
 import { API_USER_STATUS_RUN_AS } from '../../common/api-user-status-run-as';
@@ -24,10 +25,7 @@ export interface IAPIHost {
   run_as: boolean;
   key?: string;
   cert?: string;
-  use_ca?: boolean;
   ca?: string;
-  ssl_protocol?: string;
-  ssl_ciphers?: string;
 }
 
 interface IAPIHostRegistry {
@@ -35,12 +33,9 @@ interface IAPIHostRegistry {
   node: string | null;
   cluster: string;
   allow_run_as: API_USER_STATUS_RUN_AS;
-  use_ca: boolean | null;
   ca: string | null;
   cert: string | null;
   key: string | null;
-  ssl_protocol: string | null;
-  ssl_ciphers: string | null;
 }
 
 interface GetRegistryDataByHostOptions {
@@ -63,11 +58,58 @@ interface GetRegistryDataByHostOptions {
 export class ManageHosts {
   public serverAPIClient: ServerAPIClient | null = null;
   private readonly cacheRegistry = new Map<string, IAPIHostRegistry>();
+  private opensearchVerificationMode: string | null = null;
 
   constructor(
     private readonly logger: Logger,
     private readonly configuration: IConfiguration,
+    private readonly initializerContext?: PluginInitializerContext,
   ) {}
+
+  private async initializeOpenSearchConfig(): Promise<void> {
+    if (!this.initializerContext) {
+      return;
+    }
+    try {
+      const config$ = this.initializerContext.config.create<any>();
+      const config = await config$.pipe(first()).toPromise();
+      this.opensearchVerificationMode =
+        config?.opensearch?.ssl?.verificationMode || null;
+    } catch (error) {
+      this.logger.warn(
+        `Could not read opensearch.ssl.verificationMode: ${error}`,
+      );
+    }
+  }
+
+  /**
+   * Calculate use_ca based on opensearch.ssl.verificationMode and certificate paths
+   */
+  private calculateUseCa(host: IAPIHost): boolean | null {
+    // Check if certificate paths are defined
+    const hasKey =
+      host.key && typeof host.key === 'string' && host.key.trim() !== '';
+    const hasCert =
+      host.cert && typeof host.cert === 'string' && host.cert.trim() !== '';
+    const hasCa =
+      host.ca && typeof host.ca === 'string' && host.ca.trim() !== '';
+
+    // If no certificate paths are defined, return null
+    if (!hasKey || !hasCert || !hasCa) {
+      return null;
+    }
+
+    // Check opensearch.ssl.verificationMode
+    // If verificationMode is 'certificate' or 'full', use CA verification
+    if (
+      this.opensearchVerificationMode === 'certificate' ||
+      this.opensearchVerificationMode === 'full'
+    ) {
+      return true;
+    }
+
+    return false;
+  }
 
   setServerAPIClient(client: ServerAPIClient) {
     this.serverAPIClient = client;
@@ -279,12 +321,11 @@ export class ManageHosts {
       }
     }
 
-    const use_ca = host.use_ca !== undefined ? host.use_ca : null;
+    // Calculate use_ca based on opensearch.ssl.verificationMode and certificate paths
+    const use_ca = this.calculateUseCa(host);
     const ca = host.ca || null;
     const cert = host.cert || null;
     const key = host.key || null;
-    const ssl_protocol = host.ssl_protocol || null;
-    const ssl_ciphers = host.ssl_ciphers || null;
 
     const data = {
       manager,
@@ -295,8 +336,6 @@ export class ManageHosts {
       ca,
       cert,
       key,
-      ssl_protocol,
-      ssl_ciphers,
     };
 
     this.updateRegistryByHost(apiHostID, data);
@@ -312,6 +351,9 @@ export class ManageHosts {
   async start() {
     try {
       this.logger.debug('Start');
+
+      // Initialize OpenSearch SSL verification mode configuration
+      await this.initializeOpenSearchConfig();
 
       const hosts = (await this.get(undefined, {
         excludePassword: true,

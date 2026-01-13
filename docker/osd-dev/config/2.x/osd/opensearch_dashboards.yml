@@ -1,7 +1,7 @@
 server.host: 0.0.0.0
 server.port: 5601
 opensearch.hosts: https://os1:9200
-opensearch.ssl.verificationMode: certificate
+opensearch.ssl.verificationMode: none
 #osd 1.2.4
 # opensearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
 #
@@ -26,12 +26,6 @@ wazuh_core.hosts:
     username: wazuh-wui
     password: MyS3cr37P450r.*-
     run_as: false
-    key: 'server.key'
-    cert: 'server.crt'
-    use_ca: false
-    ca: 'ca.crt'
-    ssl_protocol: 'auto'
-    ssl_ciphers: ''
   imposter:
     url: 'http://imposter'
     port: 8080
@@ -50,9 +44,6 @@ wazuh_core.hosts:
     username: wazuh-wui
     password: wazuh-wui
     run_as: false
-    key: 'server.key'
-    cert: 'server.crt'
-    use_ca: true
-    ca: 'ca.crt'
-    ssl_protocol: 'auto'
-    ssl_ciphers: ''
+    key: '/home/node/kbn/certs/dashboard-client.key'
+    cert: '/home/node/kbn/certs/dashboard-client.crt'
+    ca: '/home/node/kbn/certs/manager-rootCA.pem'

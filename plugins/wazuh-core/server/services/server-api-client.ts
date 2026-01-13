@@ -116,55 +116,81 @@ export class ServerAPIClient {
 
     // Read certificate files if configured
     try {
-      const hasKey =
-        apiHost.key &&
-        typeof apiHost.key === 'string' &&
-        apiHost.key.trim() !== '';
-      const hasCert =
-        apiHost.cert &&
-        typeof apiHost.cert === 'string' &&
-        apiHost.cert.trim() !== '';
+      // Clean and validate certificate paths
+      const keyValue =
+        apiHost.key && typeof apiHost.key === 'string'
+          ? apiHost.key.trim()
+          : '';
+      const certValue =
+        apiHost.cert && typeof apiHost.cert === 'string'
+          ? apiHost.cert.trim()
+          : '';
+      const caValue =
+        apiHost.ca && typeof apiHost.ca === 'string' ? apiHost.ca.trim() : '';
+
+      this.logger.debug(
+        `Certificate configuration for host ${apiHost.id}: key="${keyValue}", cert="${certValue}", ca="${caValue}"`,
+      );
+
+      const hasKey = keyValue !== '';
+      const hasCert = certValue !== '';
+
       if (hasKey && hasCert) {
         // Resolve paths: if absolute, use directly; if relative, resolve from config directory
-        const keyPath = path.isAbsolute(apiHost.key)
-          ? apiHost.key
+        const keyPath = path.isAbsolute(keyValue)
+          ? keyValue
           : this.configDir
-          ? path.resolve(this.configDir, apiHost.key)
-          : apiHost.key;
-        const certPath = path.isAbsolute(apiHost.cert)
-          ? apiHost.cert
+          ? path.resolve(this.configDir, keyValue)
+          : keyValue;
+        const certPath = path.isAbsolute(certValue)
+          ? certValue
           : this.configDir
-          ? path.resolve(this.configDir, apiHost.cert)
-          : apiHost.cert;
+          ? path.resolve(this.configDir, certValue)
+          : certValue;
+
+        this.logger.debug(
+          `Checking certificate files for host ${apiHost.id}. Key: ${keyPath}, Cert: ${certPath}`,
+        );
 
         // Check if files exist before reading
-        if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
+        const keyExists = fs.existsSync(keyPath);
+        const certExists = fs.existsSync(certPath);
+
+        if (keyExists && certExists) {
           agentOptions.key = fs.readFileSync(keyPath);
           agentOptions.cert = fs.readFileSync(certPath);
           certificatesConfigured = true;
+          this.logger.debug(
+            `Certificate files loaded successfully for host ${apiHost.id}`,
+          );
         } else {
           this.logger.warn(
-            `Certificate files not found for host ${apiHost.id}. Key: ${keyPath}, Cert: ${certPath}`,
+            `Certificate files not found for host ${apiHost.id}. Key exists: ${keyExists} (${keyPath}), Cert exists: ${certExists} (${certPath})`,
           );
         }
       }
 
-      const hasCa =
-        apiHost.ca &&
-        typeof apiHost.ca === 'string' &&
-        apiHost.ca.trim() !== '';
-      if (apiHost.use_ca === true && hasCa) {
+      // Use CA if certificate paths are defined (key, cert, ca)
+      const hasCa = caValue !== '';
+      if (certificatesConfigured && hasCa) {
         // Resolve path: if absolute, use directly; if relative, resolve from config directory
-        const caPath = path.isAbsolute(apiHost.ca)
-          ? apiHost.ca
+        const caPath = path.isAbsolute(caValue)
+          ? caValue
           : this.configDir
-          ? path.resolve(this.configDir, apiHost.ca)
-          : apiHost.ca;
+          ? path.resolve(this.configDir, caValue)
+          : caValue;
+
+        this.logger.debug(
+          `Checking CA certificate file for host ${apiHost.id}. CA: ${caPath}`,
+        );
 
         if (fs.existsSync(caPath)) {
           agentOptions.ca = fs.readFileSync(caPath);
           agentOptions.rejectUnauthorized = true; // Enable certificate verification when CA is provided
           caConfigured = true;
+          this.logger.debug(
+            `CA certificate loaded successfully for host ${apiHost.id}`,
+          );
         } else {
           this.logger.warn(
             `CA certificate file not found for host ${apiHost.id}. CA: ${caPath}`,

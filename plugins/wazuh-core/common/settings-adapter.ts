@@ -42,14 +42,7 @@ const schemaMapper = (setting: TPluginSetting) => {
         ?.objectOf as TPluginSettingOptionsObjectOf;
       const mappedSchema = {};
 
-      const optionalFields = [
-        'ssl_protocol',
-        'ssl_ciphers',
-        'key',
-        'cert',
-        'use_ca',
-        'ca',
-      ];
+      const optionalFields = ['key', 'cert', 'ca'];
 
       for (const key of Object.keys(options)) {
         const fieldSetting = options[key] as TPluginSetting;

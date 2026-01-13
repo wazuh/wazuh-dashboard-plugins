@@ -511,42 +511,10 @@ hosts:
           defaultValue: '',
           validate: SettingsValidator.isString,
         },
-        use_ca: {
-          title: 'Use CA',
-          description:
-            'Whether to use CA certificate for SSL/TLS verification.',
-          type: EpluginSettingType.switch,
-          defaultValue: false,
-          options: {
-            switch: {
-              values: {
-                disabled: { label: 'false', value: false },
-                enabled: { label: 'true', value: true },
-              },
-            },
-          },
-          validate: SettingsValidator.isBoolean,
-        },
         ca: {
           title: 'CA Certificate',
           description:
             'Path to the CA certificate file for SSL/TLS verification.',
-          type: EpluginSettingType.text,
-          defaultValue: '',
-          validate: SettingsValidator.isString,
-        },
-        ssl_protocol: {
-          title: 'SSL Protocol',
-          description:
-            'SSL/TLS protocol version to use. If not specified, defaults to the API manager settings.',
-          type: EpluginSettingType.text,
-          defaultValue: '',
-          validate: SettingsValidator.isString,
-        },
-        ssl_ciphers: {
-          title: 'SSL Ciphers',
-          description:
-            'SSL/TLS cipher suites to use. If not specified, defaults to the API manager settings.',
           type: EpluginSettingType.text,
           defaultValue: '',
           validate: SettingsValidator.isString,
