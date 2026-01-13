@@ -1520,7 +1520,7 @@ hosts:
       port: 55000
       username: wazuh-wui
       password: wazuh-wui
-      run_as: false`,
+      run_as: true`,
         transformFrom: value => {
           return value.map(hostData => {
             const key = Object.keys(hostData)?.[0];
@@ -1623,7 +1623,7 @@ hosts:
           title: 'Run as',
           description: 'Use the authentication context.',
           type: EpluginSettingType.switch,
-          defaultValue: false,
+          defaultValue: true,
           isConfigurableFromSettings: true,
           options: {
             switch: {
