@@ -339,7 +339,7 @@ export const WzMenu = withWindowSize(
       const currentAPIConfig = this.state.APIlist.find(
         api => api.id === this.state.currentAPI,
       );
-      return (
+      return this.state.APIlist.length ? (
         <>
           <EuiFlexItem grow={this.showSelectorsInPopover}>
             <p>API</p>
@@ -357,9 +357,25 @@ export const WzMenu = withWindowSize(
                 aria-label='API selector'
               />
             </div>
-            <RunAsWarning run_as={currentAPIConfig?.run_as} />
+            {!this.showSelectorsInPopover ? (
+              <RunAsWarning
+                style={{ position: 'absolute', top: 17, right: 0 }}
+                run_as={currentAPIConfig?.run_as}
+              />
+            ) : (
+              <></>
+            )}
           </EuiFlexItem>
+          {this.showSelectorsInPopover ? (
+            <EuiFlexItem>
+              <RunAsWarning run_as={currentAPIConfig?.run_as} />
+            </EuiFlexItem>
+          ) : (
+            <></>
+          )}
         </>
+      ) : (
+        <></>
       );
     }
 
@@ -448,9 +464,7 @@ export const WzMenu = withWindowSize(
                 this.state.patternList.length > 1 &&
                 this.getIndexPatternSelectorComponent()}
 
-              {!this.showSelectorsInPopover &&
-                this.state.APIlist.length &&
-                this.getApiSelectorComponent()}
+              {!this.showSelectorsInPopover && this.getApiSelectorComponent()}
 
               {this.showSelectorsInPopover &&
                 (this.state.patternList.length > 1 ||
@@ -472,7 +486,7 @@ export const WzMenu = withWindowSize(
                             {this.getIndexPatternSelectorComponent()}
                           </EuiFlexGroup>
                         )}
-                        {this.state.APIlist.length && (
+                        {this.state.APIlist.length ? (
                           <EuiFlexGroup
                             alignItems='center'
                             style={{ paddingTop: 5 }}
@@ -480,6 +494,8 @@ export const WzMenu = withWindowSize(
                           >
                             {this.getApiSelectorComponent()}
                           </EuiFlexGroup>
+                        ) : (
+                          <></>
                         )}
                       </EuiPopover>
                     </EuiFlexItem>

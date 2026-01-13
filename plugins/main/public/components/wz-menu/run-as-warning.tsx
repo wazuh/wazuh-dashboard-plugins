@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import { EuiHealth, EuiPopover, EuiText, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../common/services/web_documentation';
 
-export const RunAsWarning = ({ run_as }: { run_as: boolean }) => {
+export const RunAsWarning = ({
+  run_as,
+  style,
+}: {
+  run_as: boolean;
+  style?: React.CSSProperties;
+}) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const closePopover = () => {
@@ -10,7 +16,7 @@ export const RunAsWarning = ({ run_as }: { run_as: boolean }) => {
   };
 
   return run_as === false ? (
-    <div style={{ position: 'absolute', top: 17, right: 0 }}>
+    <div style={style}>
       <EuiPopover
         button={
           <EuiHealth
