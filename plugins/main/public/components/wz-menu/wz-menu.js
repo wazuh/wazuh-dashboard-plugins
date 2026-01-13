@@ -42,6 +42,7 @@ import { setBreadcrumbs } from '../common/globalBreadcrumb/platformBreadcrumb';
 import WzDataSourceSelector from '../common/data-source/components/wz-data-source-selector/wz-data-source-selector';
 import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
 import NavigationService from '../../react-services/navigation-service';
+import { RunAsWarning } from './run-as-warning';
 
 export const WzMenu = withWindowSize(
   class WzMenu extends Component {
@@ -335,8 +336,10 @@ export const WzMenu = withWindowSize(
       if (this.showSelectorsInPopover) {
         style = { width: '100%', minWidth: 200 };
       }
-
-      return (
+      const currentAPIConfig = this.state.APIlist.find(
+        api => api.id === this.state.currentAPI,
+      );
+      return this.state.APIlist.length ? (
         <>
           <EuiFlexItem grow={this.showSelectorsInPopover}>
             <p>API</p>
@@ -354,8 +357,25 @@ export const WzMenu = withWindowSize(
                 aria-label='API selector'
               />
             </div>
+            {!this.showSelectorsInPopover ? (
+              <RunAsWarning
+                style={{ position: 'absolute', top: 17, right: 0 }}
+                run_as={currentAPIConfig?.run_as}
+              />
+            ) : (
+              <></>
+            )}
           </EuiFlexItem>
+          {this.showSelectorsInPopover ? (
+            <EuiFlexItem>
+              <RunAsWarning run_as={currentAPIConfig?.run_as} />
+            </EuiFlexItem>
+          ) : (
+            <></>
+          )}
         </>
+      ) : (
+        <></>
       );
     }
 
@@ -444,13 +464,11 @@ export const WzMenu = withWindowSize(
                 this.state.patternList.length > 1 &&
                 this.getIndexPatternSelectorComponent()}
 
-              {!this.showSelectorsInPopover &&
-                this.state.APIlist.length > 1 &&
-                this.getApiSelectorComponent()}
+              {!this.showSelectorsInPopover && this.getApiSelectorComponent()}
 
               {this.showSelectorsInPopover &&
                 (this.state.patternList.length > 1 ||
-                  this.state.APIlist.length > 1) && (
+                  this.state.APIlist.length) && (
                   <>
                     <EuiFlexItem grow={false}>
                       <EuiPopover
@@ -468,7 +486,7 @@ export const WzMenu = withWindowSize(
                             {this.getIndexPatternSelectorComponent()}
                           </EuiFlexGroup>
                         )}
-                        {this.state.APIlist.length > 1 && (
+                        {this.state.APIlist.length ? (
                           <EuiFlexGroup
                             alignItems='center'
                             style={{ paddingTop: 5 }}
@@ -476,6 +494,8 @@ export const WzMenu = withWindowSize(
                           >
                             {this.getApiSelectorComponent()}
                           </EuiFlexGroup>
+                        ) : (
+                          <></>
                         )}
                       </EuiPopover>
                     </EuiFlexItem>
