@@ -15,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added Alerting sample monitors health check [#7833](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7833)
 - Added default `wazuh-events*` index pattern [#7924](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7924)
 - Added SSL certificate support for Wazuh API connections, allowing the dashboard to use client certificates and CA certificate validation when connecting to Wazuh Manager APIs configured with custom SSL certificates [#8015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8015)
+- Added "Use ca" column in the API Connections table to display whether CA certificate verification is enabled for each API host [#8015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8015)
 
 ### Changed
 
