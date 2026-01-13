@@ -116,7 +116,6 @@ export class ServerAPIClient {
 
     // Read certificate files if configured
     try {
-      // Check if key and cert are configured (not empty strings or undefined)
       const hasKey =
         apiHost.key &&
         typeof apiHost.key === 'string' &&
@@ -150,8 +149,6 @@ export class ServerAPIClient {
         }
       }
 
-      // Read CA certificate if use_ca is enabled
-      // Check if ca is configured (not empty string or undefined)
       const hasCa =
         apiHost.ca &&
         typeof apiHost.ca === 'string' &&
