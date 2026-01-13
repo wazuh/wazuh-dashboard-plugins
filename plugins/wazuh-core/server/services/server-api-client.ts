@@ -73,6 +73,7 @@ export class ServerAPIClient {
   private _axios: AxiosInstance;
   private defaultHttpsAgent: https.Agent;
   private configDir: string;
+  private _sslConfigLogged: Set<string> = new Set();
   constructor(
     private logger: Logger, // TODO: add logger as needed
     private manageHosts: ManageHosts,
@@ -170,9 +171,10 @@ export class ServerAPIClient {
         }
       }
 
-      // Use CA if certificate paths are defined (key, cert, ca)
+      // Use CA only if verify_ca is true (calculated based on opensearch.ssl.verificationMode)
       const hasCa = caValue !== '';
-      if (certificatesConfigured && hasCa) {
+      const verifyCa = apiHost.verify_ca === true;
+      if (certificatesConfigured && hasCa && verifyCa) {
         // Resolve path: if absolute, use directly; if relative, resolve from config directory
         const caPath = path.isAbsolute(caValue)
           ? caValue
@@ -186,7 +188,7 @@ export class ServerAPIClient {
 
         if (fs.existsSync(caPath)) {
           agentOptions.ca = fs.readFileSync(caPath);
-          agentOptions.rejectUnauthorized = true; // Enable certificate verification when CA is provided
+          agentOptions.rejectUnauthorized = true; // Enable certificate verification when CA is provided and verify_ca is true
           caConfigured = true;
           this.logger.debug(
             `CA certificate loaded successfully for host ${apiHost.id}`,
@@ -198,15 +200,27 @@ export class ServerAPIClient {
         }
       }
 
-      // Log SSL configuration status (only when certificates are configured)
+      // Log SSL configuration status once per host (info level for first time, debug for subsequent)
       if (certificatesConfigured || caConfigured) {
-        this.logger.info(
-          `SSL certificates configured for host ${apiHost.id}: ` +
-            `client certificates=${
-              certificatesConfigured ? 'enabled' : 'not configured'
-            }, ` +
-            `CA verification=${caConfigured ? 'enabled' : 'disabled'}`,
-        );
+        const logKey = `${apiHost.id}-ssl-config`;
+        if (!this._sslConfigLogged.has(logKey)) {
+          this.logger.info(
+            `SSL certificates configured for host ${apiHost.id}: ` +
+              `client certificates=${
+                certificatesConfigured ? 'enabled' : 'not configured'
+              }, ` +
+              `CA verification=${caConfigured ? 'enabled' : 'disabled'}`,
+          );
+          this._sslConfigLogged.add(logKey);
+        } else {
+          this.logger.debug(
+            `SSL certificates configured for host ${apiHost.id}: ` +
+              `client certificates=${
+                certificatesConfigured ? 'enabled' : 'not configured'
+              }, ` +
+              `CA verification=${caConfigured ? 'enabled' : 'disabled'}`,
+          );
+        }
       }
     } catch (error: any) {
       this.logger.error(
@@ -266,10 +280,13 @@ export class ServerAPIClient {
     const apiHostID = options.apiHostID;
     const token = 'token' in options ? options.token : undefined;
     const api = (await this.manageHosts.get(apiHostID)) as IAPIHost;
+    // Get registry data from cache which includes verify_ca
+    const registryData = (this.manageHosts as any).getRegistryByHost(apiHostID);
+    const apiWithRegistry = { ...api, verify_ca: registryData?.verify_ca };
     const { body, params, headers, ...rest } = data;
 
     // Create HTTPS agent with certificates if configured
-    const httpsAgent = this._createHttpsAgent(api);
+    const httpsAgent = this._createHttpsAgent(apiWithRegistry);
 
     const requestUrl = `${api.url}:${api.port}${path}`;
 
@@ -298,9 +315,12 @@ export class ServerAPIClient {
     options: ServerAPIAuthenticateOptions,
   ): Promise<string> {
     const api = (await this.manageHosts.get(apiHostID)) as IAPIHost;
+    // Get registry data from cache which includes verify_ca
+    const registryData = (this.manageHosts as any).getRegistryByHost(apiHostID);
+    const apiWithRegistry = { ...api, verify_ca: registryData?.verify_ca };
 
     // Create HTTPS agent with certificates if configured
-    const httpsAgent = this._createHttpsAgent(api);
+    const httpsAgent = this._createHttpsAgent(apiWithRegistry);
 
     const authUrl = `${api.url}:${api.port}/security/user/authenticate${
       options.useRunAs ? '/run_as' : ''

@@ -33,6 +33,7 @@ interface IAPIHostRegistry {
   node: string | null;
   cluster: string;
   allow_run_as: API_USER_STATUS_RUN_AS;
+  verify_ca: boolean | null;
   ca: string | null;
   cert: string | null;
   key: string | null;
@@ -83,9 +84,9 @@ export class ManageHosts {
   }
 
   /**
-   * Calculate use_ca based on opensearch.ssl.verificationMode and certificate paths
+   * Calculate verify_ca based on opensearch.ssl.verificationMode and certificate paths
    */
-  private calculateUseCa(host: IAPIHost): boolean | null {
+  private calculateVerifyCa(host: IAPIHost): boolean | null {
     // Check if certificate paths are defined
     const hasKey =
       host.key && typeof host.key === 'string' && host.key.trim() !== '';
@@ -321,8 +322,8 @@ export class ManageHosts {
       }
     }
 
-    // Calculate use_ca based on opensearch.ssl.verificationMode and certificate paths
-    const use_ca = this.calculateUseCa(host);
+    // Calculate verify_ca based on opensearch.ssl.verificationMode and certificate paths
+    const verify_ca = this.calculateVerifyCa(host);
     const ca = host.ca || null;
     const cert = host.cert || null;
     const key = host.key || null;
@@ -332,7 +333,7 @@ export class ManageHosts {
       node,
       cluster,
       allow_run_as,
-      use_ca,
+      verify_ca,
       ca,
       cert,
       key,
