@@ -159,7 +159,7 @@ export class ServerAPIClient {
       this.logger.error(
         `Error reading certificate files for host ${apiHost.id}: ${
           error?.message || String(error)
-        }`,
+        }. Stack: ${error?.stack || 'N/A'}`,
       );
       // Fall back to default agent on error
       return this.defaultHttpsAgent;
@@ -218,6 +218,8 @@ export class ServerAPIClient {
     // Create HTTPS agent with certificates if configured
     const httpsAgent = this._createHttpsAgent(api);
 
+    const requestUrl = `${api.url}:${api.port}${path}`;
+
     return {
       method: method,
       headers: {
@@ -227,7 +229,7 @@ export class ServerAPIClient {
       },
       data: body || rest || {},
       params: params || {},
-      url: `${api.url}:${api.port}${path}`,
+      url: requestUrl,
       httpsAgent: httpsAgent,
     };
   }
@@ -247,6 +249,10 @@ export class ServerAPIClient {
     // Create HTTPS agent with certificates if configured
     const httpsAgent = this._createHttpsAgent(api);
 
+    const authUrl = `${api.url}:${api.port}/security/user/authenticate${
+      options.useRunAs ? '/run_as' : ''
+    }`;
+
     const optionsRequest = {
       method: 'POST',
       headers: {
@@ -256,9 +262,7 @@ export class ServerAPIClient {
         username: api.username,
         password: api.password,
       },
-      url: `${api.url}:${api.port}/security/user/authenticate${
-        options.useRunAs ? '/run_as' : ''
-      }`,
+      url: authUrl,
       ...(!!options?.authContext ? { data: options?.authContext } : {}),
       httpsAgent: httpsAgent,
     };
