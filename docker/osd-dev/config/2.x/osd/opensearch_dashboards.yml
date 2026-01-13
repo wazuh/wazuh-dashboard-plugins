@@ -1,7 +1,7 @@
 server.host: 0.0.0.0
 server.port: 5601
 opensearch.hosts: https://os1:9200
-opensearch.ssl.verificationMode: none
+opensearch.ssl.verificationMode: certificate
 #osd 1.2.4
 # opensearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
 #
