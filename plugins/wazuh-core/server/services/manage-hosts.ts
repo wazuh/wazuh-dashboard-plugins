@@ -278,7 +278,7 @@ export class ManageHosts {
         throw error;
       }
     }
-    
+
     const use_ca = host.use_ca !== undefined ? host.use_ca : null;
     const ca = host.ca || null;
     const cert = host.cert || null;
