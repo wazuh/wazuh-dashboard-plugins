@@ -10,6 +10,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added ability to remove agents from Agents management > Summary [#8025](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8025)
 - Added API selector warning in case run_as is false in the wazuh.yml file [#8026](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8026)
 
+### Fixed
+
+- Fixed edition of XML content in Server management > Settings on edit configuration [#8032](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8032)
+
 ### Changed
 
 - Upgraded `js-yaml` dependency to 4.1.1 [#7958](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7958)
