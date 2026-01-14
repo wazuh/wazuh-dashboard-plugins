@@ -102,9 +102,10 @@ export default class DecodersColumns {
           sortable: true,
         },
         {
+          field: 'actions',
           name: 'Actions',
           align: 'left',
-          render: item => {
+          render: (_actionField, item) => {
             if (item.relative_dirname.startsWith('ruleset/')) {
               return (
                 <WzButtonPermissions

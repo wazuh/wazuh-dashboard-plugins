@@ -151,9 +151,10 @@ export default class RulesetColumns {
           width: '10%',
         },
         {
+          field: 'actions',
           name: 'Actions',
           align: 'left',
-          render: item => {
+          render: (_actionField, item) => {
             if (item.relative_dirname.startsWith('ruleset/')) {
               return (
                 <WzButtonPermissions
