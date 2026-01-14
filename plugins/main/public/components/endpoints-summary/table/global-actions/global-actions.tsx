@@ -11,6 +11,7 @@ import { WzElementPermissions } from '../../../common/permissions/element';
 import { Agent } from '../../types';
 import { EditAgentsGroupsModal } from './edit-groups/edit-groups-modal';
 import { UpgradeAgentsModal } from './upgrade/upgrade-modal';
+import { RemoveAgentsModal } from './remove/remove-modal';
 
 export interface AgentsTableGlobalActionsProps {
   selectedAgents: Agent[];
@@ -18,6 +19,7 @@ export interface AgentsTableGlobalActionsProps {
   allAgentsCount: number;
   filters: any;
   allowEditGroups: boolean;
+  allowRemove: boolean;
   allowUpgrade: boolean;
   allowGetTasks: boolean;
   reloadAgents: () => void;
@@ -31,6 +33,7 @@ export const AgentsTableGlobalActions = ({
   allAgentsCount,
   filters,
   allowEditGroups,
+  allowRemove,
   allowUpgrade,
   allowGetTasks,
   reloadAgents,
@@ -43,6 +46,8 @@ export const AgentsTableGlobalActions = ({
     'add' | 'remove'
   >();
   const [isUpgradeAgentsVisible, setIsUpgradeAgentsVisible] = useState(false);
+  const [isRemoveAgentsModalVisible, setIsRemoveAgentsModalVisible] =
+    useState(false);
 
   const onButtonClick = () => {
     setPopover(!isPopoverOpen);
@@ -76,6 +81,7 @@ export const AgentsTableGlobalActions = ({
     addGroups: 'Add groups to agents',
     removeGroups: 'Remove groups from agents',
     upgrade: 'Upgrade agents',
+    remove: 'Remove agents',
   };
 
   return (
@@ -190,6 +196,39 @@ export const AgentsTableGlobalActions = ({
               <span>Upgrade task details</span>
             </WzElementPermissions>
           </EuiContextMenuItem>
+          <EuiHorizontalRule margin='xs' />
+          <EuiContextMenuItem
+            icon='trash'
+            disabled={!totalAgents || !allowRemove}
+            onClick={() => {
+              closePopover();
+              setIsRemoveAgentsModalVisible(true);
+            }}
+          >
+            {allowRemove && !totalAgents ? (
+              selectAgentsTooltip(actions.remove)
+            ) : (
+              <WzElementPermissions
+                permissions={[
+                  [
+                    {
+                      action: 'agent:delete',
+                      resource: 'agent:id:*',
+                    },
+                    {
+                      action: 'agent:delete',
+                      resource: 'agent:group:*',
+                    },
+                  ],
+                ]}
+              >
+                <span>
+                  {actions.remove}
+                  {totalAgents ? ` (${totalAgents})` : ''}
+                </span>
+              </WzElementPermissions>
+            )}
+          </EuiContextMenuItem>
         </EuiContextMenuPanel>
       </EuiPopover>
       {isEditGroupsVisible ? (
@@ -216,6 +255,17 @@ export const AgentsTableGlobalActions = ({
           setIsUpgradePanelClosed={setIsUpgradePanelClosed}
         />
       ) : null}
+      {isRemoveAgentsModalVisible && (
+        <RemoveAgentsModal
+          selectedAgents={selectedAgents}
+          allAgentsSelected={allAgentsSelected}
+          filters={filters}
+          reloadAgents={() => reloadAgents()}
+          onClose={() => {
+            setIsRemoveAgentsModalVisible(false);
+          }}
+        />
+      )}
     </>
   );
 };
