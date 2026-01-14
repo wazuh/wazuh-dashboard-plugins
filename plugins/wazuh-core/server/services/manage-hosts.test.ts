@@ -105,9 +105,6 @@ describe('ManageHosts Service', () => {
         cluster: 'test-cluster',
         allow_run_as: 1,
         verify_ca: null,
-        ca: null,
-        cert: null,
-        key: null,
       };
 
       mockConfiguration.get.mockResolvedValue(mockHosts);

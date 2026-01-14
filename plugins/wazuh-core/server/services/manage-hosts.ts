@@ -210,7 +210,8 @@ export class ManageHosts {
         return hosts.map(host => {
           const { id } = host;
           const registryData = updatedRegistry[id] || {};
-          const { allow_run_as, verify_ca, ...cluster_info } = registryData;
+          const { allow_run_as, verify_ca, ca, cert, key, ...cluster_info } =
+            registryData;
           return {
             ...host,
             allow_run_as,
@@ -223,7 +224,8 @@ export class ManageHosts {
       return hosts.map(host => {
         const { id } = host;
         const registryData = registry[id] || {};
-        const { allow_run_as, verify_ca, ...cluster_info } = registryData;
+        const { allow_run_as, verify_ca, ca, cert, key, ...cluster_info } =
+          registryData;
         return {
           ...host,
           allow_run_as,
