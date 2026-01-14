@@ -13,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed TypeError when using "exists" or "does not exist" operators on vulnerability.under_evaluation filter [#8018](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8018)
+- Fixed edition of XML content in Server management > Settings on edit configuration [#8032](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8032)
 
 ### Changed
 
