@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.14.3
+- Added API selector warning in case run_as is false in the wazuh.yml file [#8026](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8026)
 
 ### Fixed
 
@@ -16,6 +17,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Upgraded `js-yaml` dependency to 4.1.1 [#7958](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7958)
 - Upgraded `swagger-client` dependency to 3.36.0 [#8008](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8008)
+- Set run_as as true by default in the wazuh.yml file [#8026](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8026)
 
 ## Wazuh v4.14.2 - OpenSearch Dashboards 2.19.4 - Revision 02
 
