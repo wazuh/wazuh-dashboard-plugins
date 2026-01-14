@@ -34,9 +34,6 @@ interface IAPIHostRegistry {
   cluster: string;
   allow_run_as: API_USER_STATUS_RUN_AS;
   verify_ca: boolean | null;
-  ca: string | null;
-  cert: string | null;
-  key: string | null;
 }
 
 interface GetRegistryDataByHostOptions {
@@ -319,9 +316,6 @@ export class ManageHosts {
 
     // Calculate verify_ca based on certificate paths
     const verify_ca = this.calculateVerifyCa(host);
-    const ca = host.ca || null;
-    const cert = host.cert || null;
-    const key = host.key || null;
 
     const data = {
       manager,
@@ -329,9 +323,6 @@ export class ManageHosts {
       cluster,
       allow_run_as,
       verify_ca,
-      ca,
-      cert,
-      key,
     };
 
     this.updateRegistryByHost(apiHostID, data);

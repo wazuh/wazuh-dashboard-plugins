@@ -122,9 +122,6 @@ describe('ManageHosts Service', () => {
         manager: 'test-manager',
         node: 'test-node',
         cluster: 'test-cluster',
-        ca: null,
-        cert: null,
-        key: null,
       });
 
       expect(result[0].allow_run_as).toBe(1);
@@ -139,9 +136,6 @@ describe('ManageHosts Service', () => {
         cluster: 'test-cluster',
         allow_run_as: 1,
         verify_ca: null,
-        ca: null,
-        cert: null,
-        key: null,
       };
 
       (manageHosts as any).cacheRegistry.set('default', mockRegistryData);
