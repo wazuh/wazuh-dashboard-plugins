@@ -16,16 +16,23 @@ import WzIconSVG from '../../common/icons/wz-icon-svg';
 import { getAgentOSType } from '../../../react-services';
 import { isVersionLower } from './utils';
 
+type SetModalIsVisible = (visible: boolean) => void;
+
 // Columns with the property truncateText: true won't wrap the text
 // This is added to prevent the wrap because of the table-layout: auto
 export const agentsTableColumns = (
   allowEditGroups: boolean,
   allowUpgrade: boolean,
   setAgent: (agents: Agent) => void,
-  setIsEditGroupsVisible: (visible: boolean) => void,
-  setIsUpgradeModalVisible: (visible: boolean) => void,
+  setIsEditGroupsVisible: SetModalIsVisible,
+  setIsUpgradeModalVisible: SetModalIsVisible,
   setFilters: (filters) => void,
   apiVersion: string,
+  {
+    // TODO: consider moving the positional arguments to this to avoid bug related to position and allow to extend easily.
+    setIsRemoveModalVisible,
+    allowRemove,
+  }: { setIsRemoveModalVisible: SetModalIsVisible; allowRemove: boolean },
 ) => [
   {
     field: 'id',
@@ -163,6 +170,7 @@ export const agentsTableColumns = (
       setIsEditGroupsVisible,
       setIsUpgradeModalVisible,
       apiVersion,
+      { setIsRemoveModalVisible, allowRemove },
     ),
   },
 ];
