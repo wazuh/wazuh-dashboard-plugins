@@ -109,7 +109,8 @@ export class ServerAPIClient {
    */
   private _createHttpsAgent(apiHost: any): https.Agent {
     const agentOptions: https.AgentOptions = {
-      rejectUnauthorized: false, // Default to false for backward compatibility
+      // Default to false unless verify_ca is enabled with a valid CA.
+      rejectUnauthorized: false,
     };
 
     let certificatesConfigured = false;
@@ -173,6 +174,10 @@ export class ServerAPIClient {
 
       const hasCa = caValue !== '';
       const verifyCa = apiHost.verify_ca === true;
+      const isHttps =
+        typeof apiHost.url === 'string' &&
+        apiHost.url.trim().toLowerCase().startsWith('https://');
+
       if (certificatesConfigured && hasCa && verifyCa) {
         // Resolve path: if absolute, use directly; if relative, resolve from config directory
         const caPath = path.isAbsolute(caValue)
@@ -187,7 +192,7 @@ export class ServerAPIClient {
 
         if (fs.existsSync(caPath)) {
           agentOptions.ca = fs.readFileSync(caPath);
-          agentOptions.rejectUnauthorized = true; // Enable certificate verification when CA is provided and verify_ca is true
+          agentOptions.rejectUnauthorized = true;
           caConfigured = true;
           this.logger.debug(
             `CA certificate loaded successfully for host ${apiHost.id}`,
@@ -198,8 +203,14 @@ export class ServerAPIClient {
           );
         }
       }
+      if (isHttps && !verifyCa) {
+        agentOptions.rejectUnauthorized = true;
+        this.logger.warn(
+          `HTTPS without verify_ca enabled for host ${apiHost.id}. ` +
+            'Rejecting unauthorized certificates unless trusted by system CA.',
+        );
+      }
 
-      // Log SSL configuration status once per host (info level for first time, debug for subsequent)
       if (certificatesConfigured || caConfigured) {
         const logKey = `${apiHost.id}-ssl-config`;
         if (!this._sslConfigLogged.has(logKey)) {
@@ -279,9 +290,10 @@ export class ServerAPIClient {
     const apiHostID = options.apiHostID;
     const token = 'token' in options ? options.token : undefined;
     const api = (await this.manageHosts.get(apiHostID)) as IAPIHost;
-    // Get registry data from cache which includes verify_ca
-    const registryData = (this.manageHosts as any).getRegistryByHost(apiHostID);
-    const apiWithRegistry = { ...api, verify_ca: registryData?.verify_ca };
+    const apiWithRegistry = {
+      ...api,
+      verify_ca: this.manageHosts.resolveVerifyCa(api),
+    };
     const { body, params, headers, ...rest } = data;
 
     // Create HTTPS agent with certificates if configured
@@ -314,9 +326,10 @@ export class ServerAPIClient {
     options: ServerAPIAuthenticateOptions,
   ): Promise<string> {
     const api = (await this.manageHosts.get(apiHostID)) as IAPIHost;
-    // Get registry data from cache which includes verify_ca
-    const registryData = (this.manageHosts as any).getRegistryByHost(apiHostID);
-    const apiWithRegistry = { ...api, verify_ca: registryData?.verify_ca };
+    const apiWithRegistry = {
+      ...api,
+      verify_ca: this.manageHosts.resolveVerifyCa(api),
+    };
 
     // Create HTTPS agent with certificates if configured
     const httpsAgent = this._createHttpsAgent(apiWithRegistry);

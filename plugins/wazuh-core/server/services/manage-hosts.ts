@@ -91,6 +91,19 @@ export class ManageHosts {
     return false;
   }
 
+  /**
+   * Resolve verify_ca for a host.
+   * Uses cached registry value when present, otherwise derives from host config.
+   */
+  public resolveVerifyCa(host: IAPIHost): boolean | null {
+    const registryHost = this.cacheRegistry.get(host.id);
+    if (registryHost && typeof registryHost.verify_ca !== 'undefined') {
+      return registryHost.verify_ca;
+    }
+
+    return this.calculateVerifyCa(host);
+  }
+
   setServerAPIClient(client: ServerAPIClient) {
     this.serverAPIClient = client;
   }
