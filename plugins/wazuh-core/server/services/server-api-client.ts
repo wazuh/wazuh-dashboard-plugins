@@ -74,6 +74,10 @@ export class ServerAPIClient {
   private defaultHttpsAgent: https.Agent;
   private configDir: string;
   private _sslConfigLogged: Set<string> = new Set();
+  private _httpsAgentCache: Map<
+    string,
+    { signature: string; agent: https.Agent }
+  > = new Map();
   constructor(
     private logger: Logger, // TODO: add logger as needed
     private manageHosts: ManageHosts,
@@ -115,6 +119,12 @@ export class ServerAPIClient {
 
     let certificatesConfigured = false;
     let caConfigured = false;
+    const cacheKey = apiHost.id || `${apiHost.url}:${apiHost.port}`;
+    let signature = '';
+    let keyPath = '';
+    let certPath = '';
+    let caPath = '';
+    let verifyCa = false;
 
     // Read certificate files if configured
     try {
@@ -136,20 +146,28 @@ export class ServerAPIClient {
 
       const hasKey = keyValue !== '';
       const hasCert = certValue !== '';
+      const hasCa = caValue !== '';
+      verifyCa = apiHost.verify_ca === true;
+      const isHttps =
+        typeof apiHost.url === 'string' &&
+        apiHost.url.trim().toLowerCase().startsWith('https://');
+
+      keyPath = hasKey ? this._resolveConfigPath(keyValue) : '';
+      certPath = hasCert ? this._resolveConfigPath(certValue) : '';
+      caPath = hasCa ? this._resolveConfigPath(caValue) : '';
+
+      signature = this._buildHttpsAgentSignature({
+        keyPath,
+        certPath,
+        caPath,
+        verifyCa,
+      });
+      const cached = this._httpsAgentCache.get(cacheKey);
+      if (cached?.signature === signature) {
+        return cached.agent;
+      }
 
       if (hasKey && hasCert) {
-        // Resolve paths: if absolute, use directly; if relative, resolve from config directory
-        const keyPath = path.isAbsolute(keyValue)
-          ? keyValue
-          : this.configDir
-          ? path.resolve(this.configDir, keyValue)
-          : keyValue;
-        const certPath = path.isAbsolute(certValue)
-          ? certValue
-          : this.configDir
-          ? path.resolve(this.configDir, certValue)
-          : certValue;
-
         this.logger.debug(
           `Checking certificate files for host ${apiHost.id}. Key: ${keyPath}, Cert: ${certPath}`,
         );
@@ -172,20 +190,7 @@ export class ServerAPIClient {
         }
       }
 
-      const hasCa = caValue !== '';
-      const verifyCa = apiHost.verify_ca === true;
-      const isHttps =
-        typeof apiHost.url === 'string' &&
-        apiHost.url.trim().toLowerCase().startsWith('https://');
-
       if (certificatesConfigured && hasCa && verifyCa) {
-        // Resolve path: if absolute, use directly; if relative, resolve from config directory
-        const caPath = path.isAbsolute(caValue)
-          ? caValue
-          : this.configDir
-          ? path.resolve(this.configDir, caValue)
-          : caValue;
-
         this.logger.debug(
           `Checking CA certificate file for host ${apiHost.id}. CA: ${caPath}`,
         );
@@ -242,7 +247,48 @@ export class ServerAPIClient {
       return this.defaultHttpsAgent;
     }
 
-    return new https.Agent(agentOptions);
+    const agent = new https.Agent(agentOptions);
+    if (signature) {
+      this._httpsAgentCache.set(cacheKey, { signature, agent });
+    }
+    return agent;
+  }
+
+  private _resolveConfigPath(value: string): string {
+    if (!value) {
+      return '';
+    }
+    return path.isAbsolute(value)
+      ? value
+      : this.configDir
+      ? path.resolve(this.configDir, value)
+      : value;
+  }
+
+  private _buildHttpsAgentSignature(params: {
+    keyPath: string;
+    certPath: string;
+    caPath: string;
+    verifyCa: boolean;
+  }): string {
+    const fileSig = (filePath: string) => {
+      if (!filePath) {
+        return 'none';
+      }
+      try {
+        const stat = fs.statSync(filePath);
+        return `${filePath}:${stat.size}:${stat.mtimeMs}`;
+      } catch (error) {
+        return `${filePath}:missing`;
+      }
+    };
+
+    return JSON.stringify({
+      verifyCa: params.verifyCa,
+      key: fileSig(params.keyPath),
+      cert: fileSig(params.certPath),
+      ca: fileSig(params.caPath),
+    });
   }
 
   /**
