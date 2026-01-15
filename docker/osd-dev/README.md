@@ -187,6 +187,12 @@ The default user and password to access the UI at https://0.0.0.0:5601/ are:
 admin:admin
 ```
 
+For SAML-enabled environments, use:
+
+```
+wazuh:wazuh
+```
+
 ## Notes
 
 `Wazuh Indexer` and `Wazuh Dashboard` are both a redistribution of a
