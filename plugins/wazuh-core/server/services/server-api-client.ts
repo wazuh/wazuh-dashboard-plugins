@@ -351,7 +351,7 @@ export class ServerAPIClient {
       method: method,
       headers: {
         'content-type': 'application/json',
-        ...(token ? { Authorization: 'Bearer ' + token } : {}),
+        Authorization: `Bearer ${token}`,
         ...(headers ? headers : {}),
       },
       data: body || rest || {},
