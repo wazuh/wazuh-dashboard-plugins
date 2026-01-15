@@ -358,25 +358,12 @@ export class ManageHosts {
         return;
       }
 
-      await Promise.allSettled(
+      await Promise.all(
         hosts.map(host =>
-          (async () => {
-            try {
-              return [
-                host.id,
-                await this.getRegistryDataByHost(host, { throwError: false }),
-              ];
-            } catch (error) {
-              this.logger.warn(
-                `Failed to get registry data for host [${
-                  host.id
-                }] during startup: ${error.message || error}`,
-              );
-              return [host.id, null];
-            }
-          })(),
+          this.getRegistryDataByHost(host, { throwError: false }),
         ),
       );
+
       this.logger.debug('API hosts data stored in the registry');
     } catch (error) {
       this.logger.error(error.message);
