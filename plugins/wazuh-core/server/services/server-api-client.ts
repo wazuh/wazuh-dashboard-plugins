@@ -11,20 +11,13 @@
  */
 
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import https from 'https';
+import * as https from 'https';
+import * as fs from 'fs';
+import * as path from 'path';
 import { Logger } from 'opensearch-dashboards/server';
 import { getCookieValueByName } from './cookie';
-import { ManageHosts } from './manage-hosts';
+import { ManageHosts, IAPIHost } from './manage-hosts';
 import { ISecurityFactory } from './security-factory';
-
-interface APIHost {
-  id: string;
-  url: string;
-  username: string;
-  password: string;
-  port: number;
-  run_as: boolean;
-}
 
 type RequestHTTPMethod = 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
 type RequestPath = string;
@@ -76,18 +69,27 @@ export interface ServerAPIAuthenticateOptions {
  */
 export class ServerAPIClient {
   private _CacheInternalUserAPIHostToken: Map<string, string>;
-  private _axios: typeof axios;
   private asInternalUser: ServerAPIInternalUserClient;
   private _axios: AxiosInstance;
+  private defaultHttpsAgent: https.Agent;
+  private configDir: string;
+  private _sslConfigLogged: Set<string> = new Set();
+  private _httpsAgentCache: Map<
+    string,
+    { signature: string; agent: https.Agent }
+  > = new Map();
   constructor(
     private logger: Logger, // TODO: add logger as needed
     private manageHosts: ManageHosts,
     private dashboardSecurity: ISecurityFactory,
+    configDir?: string,
   ) {
-    const httpsAgent = new https.Agent({
+    this.configDir = configDir || '';
+    // Default HTTPS agent without certificate verification
+    this.defaultHttpsAgent = new https.Agent({
       rejectUnauthorized: false,
     });
-    this._axios = axios.create({ httpsAgent });
+    this._axios = axios.create({ httpsAgent: this.defaultHttpsAgent });
     // Cache to save the token for the internal user by API host ID
     this._CacheInternalUserAPIHostToken = new Map<string, string>();
 
@@ -102,6 +104,191 @@ export class ServerAPIClient {
         options,
       ) => await this._requestAsInternalUser(method, path, data, options),
     };
+  }
+
+  /**
+   * Create an HTTPS agent based on the host configuration
+   * @param apiHost Host configuration with certificate paths
+   * @returns HTTPS agent configured with certificates if available
+   */
+  private _createHttpsAgent(apiHost: any): https.Agent {
+    const agentOptions: https.AgentOptions = {
+      // Default to false unless verify_ca is enabled with a valid CA.
+      rejectUnauthorized: false,
+    };
+
+    let certificatesConfigured = false;
+    let caConfigured = false;
+    const cacheKey = apiHost.id || `${apiHost.url}:${apiHost.port}`;
+    let signature = '';
+    let keyPath = '';
+    let certPath = '';
+    let caPath = '';
+    let verifyCa = false;
+
+    // Read certificate files if configured
+    try {
+      // Clean and validate certificate paths
+      const keyValue =
+        apiHost.key && typeof apiHost.key === 'string'
+          ? apiHost.key.trim()
+          : '';
+      const certValue =
+        apiHost.cert && typeof apiHost.cert === 'string'
+          ? apiHost.cert.trim()
+          : '';
+      const caValue =
+        apiHost.ca && typeof apiHost.ca === 'string' ? apiHost.ca.trim() : '';
+
+      this.logger.debug(
+        `Certificate configuration for host ${apiHost.id}: key="${keyValue}", cert="${certValue}", ca="${caValue}"`,
+      );
+
+      const hasKey = keyValue !== '';
+      const hasCert = certValue !== '';
+      const hasCa = caValue !== '';
+      verifyCa = apiHost.verify_ca === true;
+      const isHttps =
+        typeof apiHost.url === 'string' &&
+        apiHost.url.trim().toLowerCase().startsWith('https://');
+
+      keyPath = hasKey ? this._resolveConfigPath(keyValue) : '';
+      certPath = hasCert ? this._resolveConfigPath(certValue) : '';
+      caPath = hasCa ? this._resolveConfigPath(caValue) : '';
+
+      signature = this._buildHttpsAgentSignature({
+        keyPath,
+        certPath,
+        caPath,
+        verifyCa,
+      });
+      const cached = this._httpsAgentCache.get(cacheKey);
+      if (cached?.signature === signature) {
+        return cached.agent;
+      }
+
+      if (hasKey && hasCert) {
+        this.logger.debug(
+          `Checking certificate files for host ${apiHost.id}. Key: ${keyPath}, Cert: ${certPath}`,
+        );
+
+        // Check if files exist before reading
+        const keyExists = fs.existsSync(keyPath);
+        const certExists = fs.existsSync(certPath);
+
+        if (keyExists && certExists) {
+          agentOptions.key = fs.readFileSync(keyPath);
+          agentOptions.cert = fs.readFileSync(certPath);
+          certificatesConfigured = true;
+          this.logger.debug(
+            `Certificate files loaded successfully for host ${apiHost.id}`,
+          );
+        } else {
+          this.logger.warn(
+            `Certificate files not found for host ${apiHost.id}. Key exists: ${keyExists} (${keyPath}), Cert exists: ${certExists} (${certPath})`,
+          );
+        }
+      }
+
+      if (certificatesConfigured && hasCa && verifyCa) {
+        this.logger.debug(
+          `Checking CA certificate file for host ${apiHost.id}. CA: ${caPath}`,
+        );
+
+        if (fs.existsSync(caPath)) {
+          agentOptions.ca = fs.readFileSync(caPath);
+          agentOptions.rejectUnauthorized = true;
+          caConfigured = true;
+          this.logger.debug(
+            `CA certificate loaded successfully for host ${apiHost.id}`,
+          );
+        } else {
+          this.logger.warn(
+            `CA certificate file not found for host ${apiHost.id}. CA: ${caPath}`,
+          );
+        }
+      }
+      if (isHttps && !verifyCa) {
+        agentOptions.rejectUnauthorized = true;
+        this.logger.warn(
+          `HTTPS without verify_ca enabled for host ${apiHost.id}. ` +
+            'Rejecting unauthorized certificates unless trusted by system CA.',
+        );
+      }
+
+      if (certificatesConfigured || caConfigured) {
+        const logKey = `${apiHost.id}-ssl-config`;
+        if (!this._sslConfigLogged.has(logKey)) {
+          this.logger.info(
+            `SSL certificates configured for host ${apiHost.id}: ` +
+              `client certificates=${
+                certificatesConfigured ? 'enabled' : 'not configured'
+              }, ` +
+              `CA verification=${caConfigured ? 'enabled' : 'disabled'}`,
+          );
+          this._sslConfigLogged.add(logKey);
+        } else {
+          this.logger.debug(
+            `SSL certificates configured for host ${apiHost.id}: ` +
+              `client certificates=${
+                certificatesConfigured ? 'enabled' : 'not configured'
+              }, ` +
+              `CA verification=${caConfigured ? 'enabled' : 'disabled'}`,
+          );
+        }
+      }
+    } catch (error: any) {
+      this.logger.error(
+        `Error reading certificate files for host ${apiHost.id}: ${
+          error?.message || String(error)
+        }. Stack: ${error?.stack || 'N/A'}`,
+      );
+      // Fall back to default agent on error
+      return this.defaultHttpsAgent;
+    }
+
+    const agent = new https.Agent(agentOptions);
+    if (signature) {
+      this._httpsAgentCache.set(cacheKey, { signature, agent });
+    }
+    return agent;
+  }
+
+  private _resolveConfigPath(value: string): string {
+    if (!value) {
+      return '';
+    }
+    return path.isAbsolute(value)
+      ? value
+      : this.configDir
+      ? path.resolve(this.configDir, value)
+      : value;
+  }
+
+  private _buildHttpsAgentSignature(params: {
+    keyPath: string;
+    certPath: string;
+    caPath: string;
+    verifyCa: boolean;
+  }): string {
+    const fileSig = (filePath: string) => {
+      if (!filePath) {
+        return 'none';
+      }
+      try {
+        const stat = fs.statSync(filePath);
+        return `${filePath}:${stat.size}:${stat.mtimeMs}`;
+      } catch (error) {
+        return `${filePath}:missing`;
+      }
+    };
+
+    return JSON.stringify({
+      verifyCa: params.verifyCa,
+      key: fileSig(params.keyPath),
+      cert: fileSig(params.certPath),
+      ca: fileSig(params.caPath),
+    });
   }
 
   /**
@@ -141,20 +328,36 @@ export class ServerAPIClient {
     method: RequestHTTPMethod,
     path: RequestPath,
     data: any,
-    { apiHostID, token }: APIInterceptorRequestOptions,
+    options:
+      | APIInterceptorRequestOptions
+      | APIInterceptorRequestOptionsInternalUser
+      | APIInterceptorRequestOptionsScopedUser,
   ) {
-    const api = await this.manageHosts.get(apiHostID);
+    const apiHostID = options.apiHostID;
+    const token = 'token' in options ? options.token : undefined;
+    const api = (await this.manageHosts.get(apiHostID)) as IAPIHost;
+    const apiWithRegistry = {
+      ...api,
+      verify_ca: this.manageHosts.resolveVerifyCa(api),
+    };
     const { body, params, headers, ...rest } = data;
+
+    // Create HTTPS agent with certificates if configured
+    const httpsAgent = this._createHttpsAgent(apiWithRegistry);
+
+    const requestUrl = `${api.url}:${api.port}${path}`;
+
     return {
       method: method,
       headers: {
         'content-type': 'application/json',
-        Authorization: 'Bearer ' + token,
+        Authorization: `Bearer ${token}`,
         ...(headers ? headers : {}),
       },
       data: body || rest || {},
       params: params || {},
-      url: `${api.url}:${api.port}${path}`,
+      url: requestUrl,
+      httpsAgent: httpsAgent,
     };
   }
 
@@ -168,7 +371,19 @@ export class ServerAPIClient {
     apiHostID: string,
     options: ServerAPIAuthenticateOptions,
   ): Promise<string> {
-    const api = (await this.manageHosts.get(apiHostID)) as APIHost;
+    const api = (await this.manageHosts.get(apiHostID)) as IAPIHost;
+    const apiWithRegistry = {
+      ...api,
+      verify_ca: this.manageHosts.resolveVerifyCa(api),
+    };
+
+    // Create HTTPS agent with certificates if configured
+    const httpsAgent = this._createHttpsAgent(apiWithRegistry);
+
+    const authUrl = `${api.url}:${api.port}/security/user/authenticate${
+      options.useRunAs ? '/run_as' : ''
+    }`;
+
     const optionsRequest = {
       method: 'POST',
       headers: {
@@ -178,10 +393,9 @@ export class ServerAPIClient {
         username: api.username,
         password: api.password,
       },
-      url: `${api.url}:${api.port}/security/user/authenticate${
-        options.useRunAs ? '/run_as' : ''
-      }`,
+      url: authUrl,
       ...(!!options?.authContext ? { data: options?.authContext } : {}),
+      httpsAgent: httpsAgent,
     };
 
     const response: AxiosResponse = await this._axios(optionsRequest);
@@ -258,8 +472,8 @@ export class ServerAPIClient {
           ? this._CacheInternalUserAPIHostToken.get(options.apiHostID)
           : await this._authenticateInternalUser(options.apiHostID);
       return await this._request(method, path, data, { ...options, token });
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
+    } catch (error: any) {
+      if (error?.response && error.response.status === 401) {
         const token: string = await this._authenticateInternalUser(
           options.apiHostID,
         );
