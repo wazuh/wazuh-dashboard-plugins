@@ -197,6 +197,16 @@ export class ManageHosts {
       const registry = Object.fromEntries([...this.cacheRegistry.entries()]);
 
       const hostsNeedingRegistry = hosts.filter(host => !registry[host.id]);
+      const enhanceHostWithRegistry = (host: IAPIHost, registryData: any) => {
+        const { allow_run_as, verify_ca, ca, cert, key, ...cluster_info } =
+          registryData || {};
+        return {
+          ...host,
+          allow_run_as,
+          verify_ca,
+          cluster_info,
+        };
+      };
       if (hostsNeedingRegistry.length > 0) {
         this.logger.debug(
           `Found ${hostsNeedingRegistry.length} hosts without registry data, updating cache`,
@@ -222,29 +232,13 @@ export class ManageHosts {
         ]);
         return hosts.map(host => {
           const { id } = host;
-          const registryData = updatedRegistry[id] || {};
-          const { allow_run_as, verify_ca, ca, cert, key, ...cluster_info } =
-            registryData;
-          return {
-            ...host,
-            allow_run_as,
-            verify_ca,
-            cluster_info,
-          };
+          return enhanceHostWithRegistry(host, updatedRegistry[id]);
         });
       }
 
       return hosts.map(host => {
         const { id } = host;
-        const registryData = registry[id] || {};
-        const { allow_run_as, verify_ca, ca, cert, key, ...cluster_info } =
-          registryData;
-        return {
-          ...host,
-          allow_run_as,
-          verify_ca,
-          cluster_info,
-        };
+        return enhanceHostWithRegistry(host, registry[id]);
       });
     } catch (error) {
       this.logger.error(error.message);
