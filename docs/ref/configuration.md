@@ -31,6 +31,9 @@ A host has the following properties:
 | username | Define the username                                            | -             | any string between 4-64 characters |
 | password | Define the password                                            | -             | any string up to 64 characters     |
 | run_as   | Define if the user context is used to retrieve the permissions | false         | true, false                        |
+| key      | Define the client key path                                     | -             | any valid file path                |
+| cert     | Define the client certificate path                             | -             | any valid file path                |
+| ca       | Define the certificate authority path                          | -             | any valid file path                |
 
 This is an example of a multi-host configuration:
 
