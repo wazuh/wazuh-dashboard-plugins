@@ -14,6 +14,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added "Not applicable" status to SCA CheckResult enum with corresponding color mapping (#B9A888) and sample data support
 - Added Alerting sample monitors health check [#7833](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7833)
 - Added default `wazuh-events*` index pattern [#7924](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7924)
+- Added Wazuh API connection configuration to `docker/osd-dev/config/2.x/osd/opensearch_dashboards_saml.yml` for development environment [#8040](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8040)
+- Added SAML credentials documentation to `docker/osd-dev/README.md` [#8040](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8040)
 
 ### Changed
 
@@ -28,6 +30,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Upgraded the `tar-fs` dependency to `2.1.4` [#7812](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7812)
 - Migrated the `wazuh.yml` settings to `opensearch_dashboards.yml` and advanced settings [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 - Changed the sample data index names [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
+- Updated `plugins.content_manager.catalog.sync_interval` to 10 in `docker/osd-dev/config/2.x/os/opensearch.yml`
 - Rework generate report button [#7900](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7900)
 - Changed dashboards renderer by saved objects [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842) [#7847](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7847) [#7916](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7916) [#7938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7938)
 - Changed `rule.groups` filter to `wazuh.integration.decoders` [#7934](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7934)
@@ -48,6 +51,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed `/health-check` and `/blank-screen` frontend routes [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
 - Removed `Miscellaneous` from `App Settings`[#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
 - Removed `customization.logo.healthcheck`, `checks.api`, `checks.fields`, `checks.maxBuckets`, `checks.metaFields`, `checks.pattern`, `checks.setup`, `checks.template` and `checks.timeFilter` settings [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
+- Removed `docker/osd-dev/config/2.x/osd/wazuh.yml` file as configurations were moved to `opensearch_dashboards.yml` [#8040](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8040)
 - Removed `customization.*`, `alerts.sample.prefix`, `configuration.ui_api_editable`, `ip.selector` settings [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 - Removed `App Settings` app [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 - Removed `GET /elastic/alerts` and `/utils/configuration*` endpoints [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
