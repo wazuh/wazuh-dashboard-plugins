@@ -6,6 +6,8 @@ import { Agent } from '../../types';
 import NavigationService from '../../../../react-services/navigation-service';
 import { isVersionLower } from '../utils';
 
+type SetModalIsVisible = (visible: boolean) => void;
+
 export const agentsTableActions = (
   allowEditGroups: boolean,
   allowUpgrade: boolean,
@@ -13,6 +15,11 @@ export const agentsTableActions = (
   setIsEditGroupsVisible: (visible: boolean) => void,
   setIsUpgradeModalVisible: (visible: boolean) => void,
   apiVersion: string,
+  {
+    // TODO: consider moving the positional arguments to this to avoid bug related to position and allow to extend easily.
+    setIsRemoveModalVisible,
+    allowRemove,
+  }: { setIsRemoveModalVisible: SetModalIsVisible; allowRemove: boolean },
 ) => [
   {
     name: agent => {
@@ -124,6 +131,32 @@ export const agentsTableActions = (
         agent.status === API_NAME_AGENT_STATUS.ACTIVE &&
         isOutdated
       );
+    },
+  },
+  {
+    name: (agent: Agent) => {
+      return (
+        <WzElementPermissions
+          permissions={[
+            // FIXME: this should use the group permissions too adn the agent ID should be specific
+            { action: 'agent:delete', resource: `agent:id:*` },
+          ]}
+        >
+          <span>Remove</span>
+        </WzElementPermissions>
+      );
+    },
+    description: 'Remove',
+    icon: 'trash',
+    type: 'icon',
+    onClick: agent => {
+      setAgent(agent);
+      setIsRemoveModalVisible(true);
+    },
+    'data-test-subj': 'action-remove',
+    enabled: (agent: Agent) => {
+      // FIXME: this should use the user permissions with agent:id and agent:group resources instead the generic allowRemove flag
+      return allowRemove;
     },
   },
 ];

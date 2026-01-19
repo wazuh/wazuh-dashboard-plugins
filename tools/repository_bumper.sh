@@ -135,7 +135,30 @@ update_json() {
 update_endpoints_json() {
   local old_doc_version="$1"
   local new_doc_version="$2"
-  local endpoints_file="${REPO_PATH}/plugins/main/common/api-info/endpoints.json"
+  local main_plugin_dir="${REPO_PATH}/plugins/main"
+  local endpoints_file="${main_plugin_dir}/common/api-info/endpoints.json"
+
+  # Paths to the files to be updated with the yarn command
+  local path_file_change="common/api-info"
+  local api_info_files="${path_file_change}/endpoints.json ${path_file_change}/security-actions.json"
+
+  # First, try to run yarn generate:api-data
+  log "Attempting to run 'yarn generate:api-data' in $main_plugin_dir..."
+
+  # Temporarily disable 'set -e' to handle the yarn command failure gracefully
+  set +e
+  (cd "$main_plugin_dir" && yarn generate:api-data && yarn prettier --write $api_info_files) >> "$LOG_FILE" 2>&1
+  local yarn_exit_code=$?
+  set -e
+
+  if [ $yarn_exit_code -eq 0 ]; then
+    log "Successfully generated API data using yarn command"
+    return
+  else
+    log "WARNING: 'yarn generate:api-data' failed with exit code $yarn_exit_code. Falling back to sed-based update."
+  fi
+
+  # Fallback: Use sed to replace the version string within the documentation URLs
 
   # If the versions are the same, no update is needed.
   if [ "$old_doc_version" = "$new_doc_version" ]; then
@@ -143,21 +166,20 @@ update_endpoints_json() {
     return
   fi
 
+  # Check if endpoints.json exists
   if [ ! -f "$endpoints_file" ]; then
     log "WARNING: $endpoints_file not found. Skipping documentation URL update."
     return
   fi
 
-  log "Updating documentation URLs in $endpoints_file from $old_doc_version to $new_doc_version"
-
-  # Use sed to replace the version string within the documentation URLs
   # Escape dots in the version strings for sed
   local escaped_old_version=$(echo "$old_doc_version" | sed 's/\./\\./g')
   local escaped_new_version=$(echo "$new_doc_version" | sed 's/\./\\./g')
 
+  log "Updating documentation URLs in $endpoints_file from $old_doc_version to $new_doc_version"
+
   sed_inplace "s|documentation.wazuh.com/${escaped_old_version}|documentation.wazuh.com/${escaped_new_version}|g" "$endpoints_file" && log "Successfully updated documentation URLs in $endpoints_file" || {
     log "ERROR: Failed to update documentation URLs in $endpoints_file using sed."
-    # Consider adding error handling or attempting to restore a backup if needed
     exit 1
   }
 }
@@ -540,21 +562,13 @@ main() {
   update_package_json_files
   update_osd_json_files
   update_changelog
-
-  # Conditionally update endpoints.json
-  if [[ -n "$VERSION" && "$CURRENT_MAJOR_MINOR" != "$NEW_MAJOR_MINOR" ]]; then
-    log "Major.minor version changed ($CURRENT_MAJOR_MINOR -> $NEW_MAJOR_MINOR). Updating endpoints.json..."
-    update_endpoints_json "$CURRENT_MAJOR_MINOR" "$NEW_MAJOR_MINOR"
-  else
-    log "Major.minor version ($CURRENT_MAJOR_MINOR) remains the same. Skipping endpoints.json update."
-  fi
+  update_endpoints_json "$CURRENT_MAJOR_MINOR" "$NEW_MAJOR_MINOR"
 
   # Update docker/imposter/wazuh-config.yml
   log "Updating docker/imposter/wazuh-config.yml..."
   update_imposter_config "$VERSION"
 
   log "File modifications completed."
-  log "WARNING: API spec data generation (if applicable) needs to be done manually or with other tools."
   log "Repository bump completed successfully. Log file: $LOG_FILE"
   exit 0
 }

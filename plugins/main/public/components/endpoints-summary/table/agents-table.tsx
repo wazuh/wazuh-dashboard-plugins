@@ -40,6 +40,7 @@ import { AgentUpgradesInProgress } from './upgrades-in-progress/upgrades-in-prog
 import { AgentUpgradesTaskDetailsModal } from './upgrade-task-details-modal';
 import NavigationService from '../../../react-services/navigation-service';
 import { getWazuhAPIVersion } from '../services';
+import { RemoveAgentModal } from './actions/remove-agent-modal';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -75,6 +76,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   });
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = useState(false);
+  const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Agent[]>([]);
   const [allAgentsSelected, setAllAgentsSelected] = useState(false);
   const [denyEditGroups] = useUserPermissionsRequirements([
@@ -82,6 +84,10 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   ]);
   const [denyUpgrade] = useUserPermissionsRequirements([
     { action: 'agent:upgrade', resource: 'agent:id:*' },
+  ]);
+  // FIXME: This defines if the user has the capability to not remove agent, negating it we got the capability to this action. This is used to enable the action despite this should use the specific agent ID and group. Same happens with the upgrade and probably with the edition of groups too.
+  const [denyRemove] = useUserPermissionsRequirements([
+    { action: 'agent:delete', resource: 'agent:id:*' },
   ]);
   const [denyGetTasks] = useUserPermissionsRequirements([
     { action: 'task:status', resource: '*:*:*' },
@@ -253,6 +259,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                   allAgentsCount={agentList.totalItems}
                   filters={filters?.q}
                   allowEditGroups={!denyEditGroups}
+                  allowRemove={!denyRemove}
                   allowUpgrade={!denyUpgrade}
                   allowGetTasks={!denyGetTasks}
                   reloadAgents={() => reloadAgents()}
@@ -270,6 +277,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
               setIsUpgradeModalVisible,
               setFilters,
               apiVersion,
+              { setIsRemoveModalVisible, allowRemove: !denyRemove },
             )}
             tableInitialSortingField='id'
             tablePageSizeOptions={[10, 25, 50, 100]}
@@ -469,6 +477,16 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
             setAgent(undefined);
           }}
           setIsUpgradePanelClosed={setIsUpgradePanelClosed}
+        />
+      ) : null}
+      {isRemoveModalVisible && agent ? (
+        <RemoveAgentModal
+          agent={agent}
+          reloadAgents={() => reloadAgents()}
+          onClose={() => {
+            setIsRemoveModalVisible(false);
+            setAgent(undefined);
+          }}
         />
       ) : null}
       {isUpgradeTasksModalVisible ? (
