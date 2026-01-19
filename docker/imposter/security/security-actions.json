@@ -321,10 +321,7 @@
         "resources": ["agent:id:011"],
         "effect": "allow"
       },
-      "related_endpoints": [
-        "GET /rootcheck/{agent_id}",
-        "GET /rootcheck/{agent_id}/last_scan"
-      ]
+      "related_endpoints": ["GET /rootcheck"]
     },
     "rules:read": {
       "description": "Read rules files",
