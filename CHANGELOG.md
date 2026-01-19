@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.4
 
+### Fixed
+
+- Fixed `indexDate` function to correctly handle ISO week-year calculation for weekly index patterns [#8047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8047)
+
 ## Wazuh v4.14.3 - OpenSearch Dashboards 2.19.4 - Revision 01
 
 ### Added
