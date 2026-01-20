@@ -321,23 +321,7 @@
         "resources": ["agent:id:011"],
         "effect": "allow"
       },
-      "related_endpoints": [
-        "GET /rootcheck/{agent_id}",
-        "GET /rootcheck/{agent_id}/last_scan"
-      ]
-    },
-    "rootcheck:clear": {
-      "description": "Clear the agents rootcheck database",
-      "resources": ["agent:id", "agent:group"],
-      "example": {
-        "actions": ["rootcheck:clear"],
-        "resources": ["agent:id:*"],
-        "effect": "deny"
-      },
-      "related_endpoints": [
-        "DELETE /rootcheck/{agent_id}",
-        "DELETE /experimental/rootcheck"
-      ]
+      "related_endpoints": ["GET /rootcheck"]
     },
     "rules:read": {
       "description": "Read rules files",
