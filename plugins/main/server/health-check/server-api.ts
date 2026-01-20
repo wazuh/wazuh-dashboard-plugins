@@ -182,16 +182,16 @@ export const initializationTaskCreatorServerAPIRunAs = ({
       const allowRunAsLabel = (value: number) => {
         switch (value) {
           case API_USER_STATUS_RUN_AS.ENABLED:
-            return 'ENABLED';
+            return 'Run as allowed for user and host';
           case API_USER_STATUS_RUN_AS.HOST_DISABLED:
-            return 'HOST_DISABLED';
+            return 'Run as disabled in host';
           case API_USER_STATUS_RUN_AS.ALL_DISABLED:
-            return 'ALL_DISABLED';
+            return 'Run as disabled in host and user';
           case API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED:
-            return 'USER_NOT_ALLOWED';
+            return 'Run as not allowed for user';
           case API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK:
           default:
-            return 'UNABLE_TO_CHECK';
+            return 'Unable to check user run as permission';
         }
       };
 
@@ -225,11 +225,11 @@ export const initializationTaskCreatorServerAPIRunAs = ({
           .join(', ');
 
         ctx.logger.warn(
-          `Server API hosts with allow_run_as disabled: ${disabledSummary}`,
+          `Server API hosts with run_as permission disabled: ${disabledSummary}`,
         );
 
         throw new Error(
-          `Some server API hosts have allow_run_as disabled: ${disabledSummary}`,
+          `Some server API hosts have run_as permission disabled: ${disabledSummary}`,
         );
       }
 
