@@ -169,15 +169,14 @@ export const initializationTaskCreatorServerAPIRunAs = ({
         excludePassword: true,
       });
 
-      const results = hosts.map((host: {
-        id: string;
-        cluster_info?: { allow_run_as?: number };
-      }) => ({
-        id: host.id,
-        allow_run_as: host.cluster_info?.allow_run_as ?? -1,
-        enabled: false,
-        error: null as string | null,
-      }));
+      const results = hosts.map(
+        (host: { id: string; cluster_info?: { allow_run_as?: number } }) => ({
+          id: host.id,
+          allow_run_as: host.cluster_info?.allow_run_as ?? -1,
+          enabled: false,
+          error: null as string | null,
+        }),
+      );
 
       const allowRunAsLabel = (value: number) => {
         switch (value) {
@@ -195,22 +194,24 @@ export const initializationTaskCreatorServerAPIRunAs = ({
         }
       };
 
-      results.forEach((result: {
-        id: string;
-        allow_run_as: number;
-        enabled: boolean;
-        error: string | null;
-      }) => {
-        result.enabled = result.allow_run_as === API_USER_STATUS_RUN_AS.ENABLED;
-      });
+      results.forEach(
+        (result: {
+          id: string;
+          allow_run_as: number;
+          enabled: boolean;
+          error: string | null;
+        }) => {
+          result.enabled =
+            result.allow_run_as === API_USER_STATUS_RUN_AS.ENABLED;
+        },
+      );
 
-      const disabledHosts = results.filter(
-        (result: { allow_run_as: number }) =>
-          [
-            API_USER_STATUS_RUN_AS.HOST_DISABLED,
-            API_USER_STATUS_RUN_AS.ALL_DISABLED,
-            API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED,
-          ].includes(result.allow_run_as),
+      const disabledHosts = results.filter((result: { allow_run_as: number }) =>
+        [
+          API_USER_STATUS_RUN_AS.HOST_DISABLED,
+          API_USER_STATUS_RUN_AS.ALL_DISABLED,
+          API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED,
+        ].includes(result.allow_run_as),
       );
       const unableToCheckHosts = results.filter(
         (result: { allow_run_as: number }) =>
@@ -219,8 +220,9 @@ export const initializationTaskCreatorServerAPIRunAs = ({
 
       if (disabledHosts.length > 0) {
         const disabledSummary = disabledHosts
-          .map((result: { id: string; allow_run_as: number }) =>
-            `${result.id} (${allowRunAsLabel(result.allow_run_as)})`,
+          .map(
+            (result: { id: string; allow_run_as: number }) =>
+              `${result.id} (${allowRunAsLabel(result.allow_run_as)})`,
           )
           .join(', ');
 
@@ -263,8 +265,9 @@ export const initializationTaskCreatorServerAPIRunAs = ({
             API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED,
           ].includes(result.allow_run_as),
         )
-        .map((result: { id: string; allow_run_as: number }) =>
-          `${result.id} (${allowRunAsLabel(result.allow_run_as)})`,
+        .map(
+          (result: { id: string; allow_run_as: number }) =>
+            `${result.id} (${allowRunAsLabel(result.allow_run_as)})`,
         )
         .join(', ');
 
@@ -276,7 +279,8 @@ export const initializationTaskCreatorServerAPIRunAs = ({
         `Not all server API hosts have run_as permission enabled: ${notEnabledHosts}. Ensure every configured API host allows run_as for the API user.`,
       );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       const message = `Error checking server API allow_run_as: ${errorMessage}`;
 
       ctx.logger.error(message);
