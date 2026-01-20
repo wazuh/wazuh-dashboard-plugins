@@ -233,30 +233,47 @@ export const initializationTaskCreatorServerAPIRunAs = ({
         );
       }
 
-      const enabledHosts = results.filter(
-        (result: { enabled: boolean }) => result.enabled,
-      );
-
-      if (enabledHosts.length > 0) {
-        ctx.logger.debug(
-          `Server API hosts with allow_run_as enabled: ${enabledHosts
-            .map((result: { id: string }) => result.id)
-            .join(', ')}`,
-        );
-        return results;
-      }
-
       if (unableToCheckHosts.length > 0) {
         ctx.logger.warn(
           `Server API hosts where allow_run_as could not be checked: ${unableToCheckHosts
             .map((result: { id: string }) => result.id)
             .join(', ')}`,
         );
+      }
+
+      const enabledHosts = results.filter(
+        (result: { enabled: boolean }) => result.enabled,
+      );
+
+      ctx.logger.debug(
+        `Server API hosts with run_as permission enabled: ${enabledHosts
+          .map((result: { id: string }) => result.id)
+          .join(', ')}`,
+      );
+
+      if (enabledHosts.length === results.length) {
+        return results;
+      }
+
+      const notEnabledHosts = results
+        .filter((result: { allow_run_as: number }) =>
+          [
+            API_USER_STATUS_RUN_AS.HOST_DISABLED,
+            API_USER_STATUS_RUN_AS.ALL_DISABLED,
+            API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED,
+          ].includes(result.allow_run_as),
+        )
+        .map((result: { id: string; allow_run_as: number }) =>
+          `${result.id} (${allowRunAsLabel(result.allow_run_as)})`,
+        )
+        .join(', ');
+
+      if (notEnabledHosts.length === 0) {
         return results;
       }
 
       throw new Error(
-        'No server API hosts have allow_run_as enabled. Ensure at least one API user is allowed to use run_as.',
+        `Not all server API hosts have run_as permission enabled: ${notEnabledHosts}. Ensure every configured API host allows run_as for the API user.`,
       );
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
