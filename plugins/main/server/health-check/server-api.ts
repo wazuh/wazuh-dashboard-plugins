@@ -55,7 +55,7 @@ export async function serverAPIConnectionCompatibility(
 
     if (checkAppServerCompatibility(appVersion, apiVersion)) {
       compatibility = true;
-      ctx.logger.warn(
+      ctx.logger.info(
         `Server API [${apiHostID}] version [${apiVersion}] is compatible with the ${PLUGIN_APP_NAME} version`,
       );
     } else {
