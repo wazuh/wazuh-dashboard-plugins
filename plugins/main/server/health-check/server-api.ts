@@ -173,7 +173,8 @@ export const initializationTaskCreatorServerAPIRunAs = ({
         (host: { id: string; cluster_info?: { allow_run_as?: number } }) => ({
           id: host.id,
           allow_run_as: host.cluster_info?.allow_run_as ?? -1,
-          enabled: host?.cluster_info?.allow_run_as === API_USER_STATUS_RUN_AS.ENABLED,
+          enabled:
+            host?.cluster_info?.allow_run_as === API_USER_STATUS_RUN_AS.ENABLED,
         }),
       );
 
@@ -193,13 +194,14 @@ export const initializationTaskCreatorServerAPIRunAs = ({
         }
       };
 
-      const notEnabledHosts = results.filter((result: { allow_run_as: number }) =>
-        [
-          API_USER_STATUS_RUN_AS.HOST_DISABLED,
-          API_USER_STATUS_RUN_AS.ALL_DISABLED,
-          API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED,
-          API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK,
-        ].includes(result.allow_run_as),
+      const notEnabledHosts = results.filter(
+        (result: { allow_run_as: number }) =>
+          [
+            API_USER_STATUS_RUN_AS.HOST_DISABLED,
+            API_USER_STATUS_RUN_AS.ALL_DISABLED,
+            API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED,
+            API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK,
+          ].includes(result.allow_run_as),
       );
       const unableToCheckHosts = results.filter(
         (result: { allow_run_as: number }) =>
@@ -215,13 +217,9 @@ export const initializationTaskCreatorServerAPIRunAs = ({
           .join(', ');
 
         const message = `Some server API hosts have not enabled the run_as or the user has no the ability to use it or both are not enabled: ${notEnabledSummary}. Ensure every configured API host allows run_as for the API user.`;
-          ctx.logger.warn(
-            message,
-          );
+        ctx.logger.warn(message);
 
-        throw new Error(
-          message,
-        );
+        throw new Error(message);
       }
 
       if (unableToCheckHosts.length > 0) {
@@ -242,8 +240,6 @@ export const initializationTaskCreatorServerAPIRunAs = ({
           .join(', ')}`,
       );
       return enabledHosts;
-
-     
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
