@@ -23,10 +23,4 @@ import './media-queries.scss';
 import './typography.scss';
 import './inventory.scss';
 import './dashboard.scss';
-
-const IS_DARK_THEME = getUiSettings().get('theme:darkMode');
-/* tslint-disable no-undef */
-if (IS_DARK_THEME) {
-  import('./theme/dark/index.dark.scss').then();
-}
-/* tslint-enable no-undef */
+import './theme/dark/index.dark.scss';

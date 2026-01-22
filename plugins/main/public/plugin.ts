@@ -50,11 +50,22 @@ import { registerWazuhNavLinks } from './utils/nav-groups';
 
 export class WazuhPlugin
   implements
-    Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins>
-{
-  constructor(private readonly initializerContext: PluginInitializerContext) {}
+  Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins> {
+  constructor(private readonly initializerContext: PluginInitializerContext) { }
 
   private hideTelemetryBanner?: () => void;
+
+  /* Apply theme classes to the document element based on theme settings
+  to use for custom styling */
+  private setupThemeClasses(core: CoreStart): void {
+    const isDarkMode = core.uiSettings.get('theme:darkMode');
+    const themeVersion = core.uiSettings.get('theme:version');
+    const themeClass = typeof themeVersion === 'string' ? themeVersion.split(' ')[0] : 'v7';
+
+    document.documentElement.classList.toggle('theme-dark', isDarkMode);
+    document.documentElement.classList.toggle('theme-light', !isDarkMode);
+    document.documentElement.classList.add(themeClass);
+  }
 
   public async setup(
     core: CoreSetup,
@@ -213,6 +224,8 @@ export class WazuhPlugin
       this.hideTelemetryBanner = () =>
         plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen();
     }
+
+    this.setupThemeClasses(core);
 
     setCore(core);
     setPlugins(plugins);
