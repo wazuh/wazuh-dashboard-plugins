@@ -19,8 +19,6 @@ export interface AgentsTableGlobalActionsProps {
   allAgentsCount: number;
   filters: any;
   allowEditGroups: boolean;
-  allowRemove: boolean;
-  allowUpgrade: boolean;
   allowGetTasks: boolean;
   reloadAgents: () => void;
   setIsUpgradeTasksModalVisible: (isModalVisible: boolean) => void;
@@ -33,8 +31,6 @@ export const AgentsTableGlobalActions = ({
   allAgentsCount,
   filters,
   allowEditGroups,
-  allowRemove,
-  allowUpgrade,
   allowGetTasks,
   reloadAgents,
   setIsUpgradeTasksModalVisible,
@@ -153,28 +149,19 @@ export const AgentsTableGlobalActions = ({
           <EuiHorizontalRule margin='xs' />
           <EuiContextMenuItem
             icon='package'
-            disabled={!totalAgents || !allowUpgrade}
+            disabled={!totalAgents}
             onClick={() => {
               closePopover();
               setIsUpgradeAgentsVisible(true);
             }}
           >
-            {allowUpgrade && !totalAgents ? (
+            {!totalAgents ? (
               selectAgentsTooltip(actions.upgrade)
             ) : (
-              <WzElementPermissions
-                permissions={[
-                  {
-                    action: 'agent:upgrade',
-                    resource: 'agent:id:*',
-                  },
-                ]}
-              >
-                <span>
-                  {actions.upgrade}
-                  {totalAgents ? ` (${totalAgents})` : ''}
-                </span>
-              </WzElementPermissions>
+              <span>
+                {actions.upgrade}
+                {totalAgents ? ` (${totalAgents})` : ''}
+              </span>
             )}
           </EuiContextMenuItem>
           <EuiContextMenuItem
@@ -199,34 +186,19 @@ export const AgentsTableGlobalActions = ({
           <EuiHorizontalRule margin='xs' />
           <EuiContextMenuItem
             icon='trash'
-            disabled={!totalAgents || !allowRemove}
+            disabled={!totalAgents}
             onClick={() => {
               closePopover();
               setIsRemoveAgentsModalVisible(true);
             }}
           >
-            {allowRemove && !totalAgents ? (
+            {!totalAgents ? (
               selectAgentsTooltip(actions.remove)
             ) : (
-              <WzElementPermissions
-                permissions={[
-                  [
-                    {
-                      action: 'agent:delete',
-                      resource: 'agent:id:*',
-                    },
-                    {
-                      action: 'agent:delete',
-                      resource: 'agent:group:*',
-                    },
-                  ],
-                ]}
-              >
-                <span>
-                  {actions.remove}
-                  {totalAgents ? ` (${totalAgents})` : ''}
-                </span>
-              </WzElementPermissions>
+              <span>
+                {actions.remove}
+                {totalAgents ? ` (${totalAgents})` : ''}
+              </span>
             )}
           </EuiContextMenuItem>
         </EuiContextMenuPanel>
