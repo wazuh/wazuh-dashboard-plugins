@@ -74,10 +74,7 @@ export class ServerAPIClient {
   private defaultHttpsAgent: https.Agent;
   private configDir: string;
   private _sslConfigLogged: Set<string> = new Set();
-  private _httpsAgentCache: Map<
-    string,
-    { signature: string; agent: https.Agent }
-  > = new Map();
+  private _httpsAgentCache: Map<string, https.Agent> = new Map();
   constructor(
     private logger: Logger, // TODO: add logger as needed
     private manageHosts: ManageHosts,
@@ -120,7 +117,6 @@ export class ServerAPIClient {
     let certificatesConfigured = false;
     let caConfigured = false;
     const cacheKey = apiHost.id || `${apiHost.url}:${apiHost.port}`;
-    let signature = '';
     let keyPath = '';
     let certPath = '';
     let caPath = '';
@@ -156,15 +152,9 @@ export class ServerAPIClient {
       certPath = hasCert ? this._resolveConfigPath(certValue) : '';
       caPath = hasCa ? this._resolveConfigPath(caValue) : '';
 
-      signature = this._buildHttpsAgentSignature({
-        keyPath,
-        certPath,
-        caPath,
-        verifyCa,
-      });
       const cached = this._httpsAgentCache.get(cacheKey);
-      if (cached?.signature === signature) {
-        return cached.agent;
+      if (cached) {
+        return cached;
       }
 
       if (hasKey && hasCert) {
@@ -241,9 +231,7 @@ export class ServerAPIClient {
     }
 
     const agent = new https.Agent(agentOptions);
-    if (signature) {
-      this._httpsAgentCache.set(cacheKey, { signature, agent });
-    }
+    this._httpsAgentCache.set(cacheKey, agent);
     return agent;
   }
 
@@ -258,31 +246,6 @@ export class ServerAPIClient {
       : value;
   }
 
-  private _buildHttpsAgentSignature(params: {
-    keyPath: string;
-    certPath: string;
-    caPath: string;
-    verifyCa: boolean;
-  }): string {
-    const fileSig = (filePath: string) => {
-      if (!filePath) {
-        return 'none';
-      }
-      try {
-        const stat = fs.statSync(filePath);
-        return `${filePath}:${stat.size}:${stat.mtimeMs}`;
-      } catch (error) {
-        return `${filePath}:missing`;
-      }
-    };
-
-    return JSON.stringify({
-      verifyCa: params.verifyCa,
-      key: fileSig(params.keyPath),
-      cert: fileSig(params.certPath),
-      ca: fileSig(params.caPath),
-    });
-  }
 
   /**
    * Internal method to execute the request
