@@ -385,10 +385,9 @@ export const saveNodeConfiguration = async (node, content) => {
  * @param {node}
  */
 export const saveFileCluster = async (text, node) => {
-  const xml = replaceIllegalXML(text);
   try {
     await WzRequest.apiReq('PUT', `/cluster/${node}/configuration`, {
-      body: xml.toString(),
+      body: text.toString(),
       origin: 'raw',
     });
     await validateAfterSent();

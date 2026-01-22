@@ -16,12 +16,14 @@ export const paginatedAgentsRequestService = async ({
   agentIds,
   groupId,
   pageSize = 1000,
+  requestParams = {},
 }: {
   method: 'PUT' | 'DELETE';
   url: string;
   agentIds: string[];
   groupId?: string;
   pageSize?: number;
+  requestParams?: any;
 }): Promise<IApiResponse<any>> => {
   let offset = 0;
   let requestAgentIds: string[] = [];
@@ -51,6 +53,7 @@ export const paginatedAgentsRequestService = async ({
       url,
       {
         params: {
+          ...(requestParams || {}),
           ...(groupId ? { group_id: groupId } : {}),
           agents_list: requestAgentIds.join(','),
           wait_for_complete: true,

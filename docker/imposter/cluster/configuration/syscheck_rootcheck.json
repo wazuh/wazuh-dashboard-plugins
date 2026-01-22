@@ -5,19 +5,14 @@
         "rootcheck": {
           "disabled": "no",
           "base_directory": "",
-          "rootkit_files": "/var/ossec/etc/rootcheck/rootkit_files.txt",
-          "rootkit_trojans": "/var/ossec/etc/rootcheck/rootkit_trojans.txt",
           "scanall": "no",
           "skip_nfs": "yes",
           "frequency": 43200,
           "check_dev": "yes",
-          "check_files": "yes",
           "check_if": "yes",
           "check_pids": "yes",
           "check_ports": "yes",
-          "check_sys": "yes",
-          "check_trojans": "yes",
-          "check_unixaudit": "no"
+          "check_sys": "yes"
         }
       }
     ],

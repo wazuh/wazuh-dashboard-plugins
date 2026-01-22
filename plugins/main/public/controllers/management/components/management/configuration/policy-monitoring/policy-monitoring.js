@@ -14,11 +14,10 @@ import React, { Component, Fragment } from 'react';
 
 import withWzConfig from '../util-hocs/wz-config';
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
 
 import WzConfigurationPolicyMonitoringGeneral from './policy-monitoring-general';
-import WzConfigurationPolicyMonitoringSystemAudit from './policy-monitoring-system-audit';
 import WzConfigurationPolicyMonitoringIgnored from './policy-monitoring-ignored';
 import WzConfigurationPolicyMonitoringSCA from './policy-monitoring-sca';
 
@@ -39,46 +38,24 @@ class WzPolicyMonitoring extends Component {
   }
   render() {
     return (
-      <Fragment>
-        {(this.props.onlyShowTab === 'Policy Monitoring' && (
-          <WzTabSelector>
-            <WzTabSelectorTab label="General">
-              <WzConfigurationPolicyMonitoringGeneral {...this.props} />
-            </WzTabSelectorTab>
-            <WzTabSelectorTab label="Ignored">
-              <WzConfigurationPolicyMonitoringIgnored {...this.props} />
-            </WzTabSelectorTab>
-          </WzTabSelector>
-        )) ||
-          (this.props.onlyShowTab === 'System audit' && (
-            <WzConfigurationPolicyMonitoringSystemAudit {...this.props} />
-          )) ||
-          (this.props.onlyShowTab === 'SCA' && (
-            <WzConfigurationPolicyMonitoringSCA {...this.props} />
-          )) || (
-            <WzTabSelector>
-              <WzTabSelectorTab label="General">
-                <WzConfigurationPolicyMonitoringGeneral {...this.props} />
-              </WzTabSelectorTab>
-              <WzTabSelectorTab label="System audit">
-                <WzConfigurationPolicyMonitoringSystemAudit {...this.props} />
-              </WzTabSelectorTab>
-              <WzTabSelectorTab label="Ignored">
-                <WzConfigurationPolicyMonitoringIgnored {...this.props} />
-              </WzTabSelectorTab>
-              <WzTabSelectorTab label="SCA">
-                <WzConfigurationPolicyMonitoringSCA {...this.props} />
-              </WzTabSelectorTab>
-            </WzTabSelector>
-          )}
-      </Fragment>
+      <WzTabSelector>
+        <WzTabSelectorTab label='General'>
+          <WzConfigurationPolicyMonitoringGeneral {...this.props} />
+        </WzTabSelectorTab>
+        <WzTabSelectorTab label='Ignored'>
+          <WzConfigurationPolicyMonitoringIgnored {...this.props} />
+        </WzTabSelectorTab>
+        <WzTabSelectorTab label='SCA'>
+          <WzConfigurationPolicyMonitoringSCA {...this.props} />
+        </WzTabSelectorTab>
+      </WzTabSelector>
     );
   }
 }
 
 const sections = [
   { component: 'syscheck', configuration: 'rootcheck' },
-  { component: 'wmodules', configuration: 'wmodules' }
+  { component: 'wmodules', configuration: 'wmodules' },
 ];
 
 export default withWzConfig(sections)(WzPolicyMonitoring);
