@@ -11,6 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed `indexDate` function to correctly handle ISO week-year calculation for weekly indices [#8047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8047)
+- Fixed the status code and body displayed in failed requests in Server management > Dev tools as internal server error [#8052](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8052)
 
 ## Wazuh v4.14.3 - OpenSearch Dashboards 2.19.4 - Revision 01
 

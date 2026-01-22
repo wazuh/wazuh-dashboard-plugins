@@ -653,7 +653,27 @@ export class WazuhApiCtrl {
           const body = error.response.data || {
             message: error.message || 'Unexpected error',
           };
-          return response.custom({ statusCode, body });
+
+          let responseBody = body;
+
+          if (statusCode >= 400 && statusCode < 600) {
+            responseBody = {
+              /*
+                Ensure the body has a message property to avoid the internal server error when this is missing. See https://github.com/wazuh/wazuh-dashboard/blob/v4.14.2/src/core/server/http/router/response_adapter.ts#L168.
+
+                This should allow to display the error related to missing endpoints on server API in the Server management > Dev Tools instead of an internal server error.
+
+                More information: https://github.com/wazuh/wazuh-dashboard-plugins/issues/8051
+              */
+              ...responseBody,
+              message:
+                responseBody.message ??
+                responseBody.detail ??
+                'Server API response has no message property. This is added to avoid an internal server error due to the missing property.',
+            };
+          }
+
+          return response.custom({ statusCode, body: responseBody });
         } catch (_) {
           // fall through to the default error handling below if something goes wrong
         }
