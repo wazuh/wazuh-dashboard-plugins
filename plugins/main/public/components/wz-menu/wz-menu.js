@@ -39,7 +39,6 @@ import NavigationService from '../../react-services/navigation-service';
 import { useAsyncActionRunOnStart } from '../common/hooks';
 import { useSelectedServerApi } from '../common/hooks/use-selected-server-api';
 import { Selector, SelectorContainer, SelectorLabel } from './selectors';
-import { RunAsWarning } from './run-as-warning';
 
 async function getServerAPIList() {
   const response = await GenericRequest.request('GET', '/hosts/apis', {});
@@ -54,11 +53,6 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
   let style = { minWidth: 100, textOverflow: 'ellipsis' };
   if (showSelectorsInPopover) {
     style = { width: '100%', minWidth: 220 };
-  }
-
-  let currentAPIConfig;
-  if (action?.data) {
-    currentAPIConfig = action.data.find(({ id }) => id === currentAPI?.id);
   }
 
   const notSelected = !Boolean(currentAPI);
@@ -149,22 +143,7 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
             }
           />
         </div>
-        {!showSelectorsInPopover ? (
-          <RunAsWarning
-            style={{ position: 'absolute', top: 17, right: 0 }}
-            run_as={currentAPIConfig?.run_as}
-          />
-        ) : (
-          <></>
-        )}
       </Selector>
-      {showSelectorsInPopover ? (
-        <EuiFlexItem>
-          <RunAsWarning run_as={currentAPIConfig?.run_as} />
-        </EuiFlexItem>
-      ) : (
-        <></>
-      )}
     </SelectorContainer>
   );
 };

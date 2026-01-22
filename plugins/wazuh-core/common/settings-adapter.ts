@@ -29,6 +29,9 @@ const schemaMapper = (setting: TPluginSetting) => {
   let schemaConfig;
   const schemaDef = {
     validate: validate,
+    ...(setting.defaultValue !== undefined
+      ? { defaultValue: setting.defaultValue }
+      : {}),
   } as TypeOptions<any>;
 
   switch (type) {
