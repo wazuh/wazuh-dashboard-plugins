@@ -9,7 +9,6 @@
 }
 
 .theme-dark {
-
   body.md-default-theme,
   body,
   html.md-default-theme,
@@ -341,7 +340,8 @@
   .refresh-agents-btn:hover {
     background-color: #0a9dec !important;
     border-color: #0a9dec !important;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.15), 0 2px 2px -1px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.15),
+      0 2px 2px -1px rgba(0, 0, 0, 0.3) !important;
     color: #000 !important;
   }
 
@@ -384,7 +384,9 @@
     border-bottom: 1px solid #343741 !important;
   }
 
-  .module-discover-table .euiTableRow.euiTableRow-isExpandedRow .euiTableRowCell {
+  .module-discover-table
+    .euiTableRow.euiTableRow-isExpandedRow
+    .euiTableRowCell {
     background: #1d1e24 !important;
   }
 
@@ -395,7 +397,8 @@
   .wz-search-bar > div > div > div.euiComboBox__inputWrap {
     background: #16171c !important;
     box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.2),
-      0 3px 2px -2px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+      0 3px 2px -2px rgba(0, 0, 0, 0.2),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
   }
 
   .euiComboBoxPlaceholder {
@@ -469,5 +472,4 @@
       ) !important;
     }
   }
-
 }
