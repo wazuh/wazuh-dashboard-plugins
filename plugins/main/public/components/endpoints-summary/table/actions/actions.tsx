@@ -10,7 +10,6 @@ type SetModalIsVisible = (visible: boolean) => void;
 
 export const agentsTableActions = (
   allowEditGroups: boolean,
-  allowUpgrade: boolean,
   setAgent: (agent: Agent) => void,
   setIsEditGroupsVisible: (visible: boolean) => void,
   setIsUpgradeModalVisible: (visible: boolean) => void,
@@ -18,8 +17,7 @@ export const agentsTableActions = (
   {
     // TODO: consider moving the positional arguments to this to avoid bug related to position and allow to extend easily.
     setIsRemoveModalVisible,
-    allowRemove,
-  }: { setIsRemoveModalVisible: SetModalIsVisible; allowRemove: boolean },
+  }: { setIsRemoveModalVisible: SetModalIsVisible },
 ) => [
   {
     name: agent => {
@@ -95,13 +93,7 @@ export const agentsTableActions = (
       const isOutdated = isVersionLower(agent.version, apiVersion);
 
       if (agent.status === API_NAME_AGENT_STATUS.ACTIVE && isOutdated) {
-        return (
-          <WzElementPermissions
-            permissions={[{ action: 'agent:upgrade', resource: 'agent:id:*' }]}
-          >
-            <span>Upgrade</span>
-          </WzElementPermissions>
-        );
+        return 'Upgrade';
       }
 
       return (
@@ -126,25 +118,12 @@ export const agentsTableActions = (
     'data-test-subj': 'action-upgrade',
     enabled: (agent: Agent) => {
       const isOutdated = isVersionLower(agent.version, apiVersion);
-      return (
-        allowUpgrade &&
-        agent.status === API_NAME_AGENT_STATUS.ACTIVE &&
-        isOutdated
-      );
+      return agent.status === API_NAME_AGENT_STATUS.ACTIVE && isOutdated;
     },
   },
   {
     name: (agent: Agent) => {
-      return (
-        <WzElementPermissions
-          permissions={[
-            // FIXME: this should use the group permissions too adn the agent ID should be specific
-            { action: 'agent:delete', resource: `agent:id:*` },
-          ]}
-        >
-          <span>Remove</span>
-        </WzElementPermissions>
-      );
+      return 'Remove';
     },
     description: 'Remove',
     icon: 'trash',
@@ -155,8 +134,7 @@ export const agentsTableActions = (
     },
     'data-test-subj': 'action-remove',
     enabled: (agent: Agent) => {
-      // FIXME: this should use the user permissions with agent:id and agent:group resources instead the generic allowRemove flag
-      return allowRemove;
+      return true;
     },
   },
 ];
