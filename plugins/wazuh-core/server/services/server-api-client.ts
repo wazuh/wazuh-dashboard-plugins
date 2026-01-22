@@ -208,13 +208,6 @@ export class ServerAPIClient {
           );
         }
       }
-      if (isHttps && !verifyCa) {
-        agentOptions.rejectUnauthorized = true;
-        this.logger.warn(
-          `HTTPS without verify_ca enabled for host ${apiHost.id}. ` +
-            'Rejecting unauthorized certificates unless trusted by system CA.',
-        );
-      }
 
       if (certificatesConfigured || caConfigured) {
         const logKey = `${apiHost.id}-ssl-config`;
