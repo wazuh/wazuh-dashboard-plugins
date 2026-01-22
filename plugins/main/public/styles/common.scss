@@ -14,6 +14,16 @@
 /* ------------------------ Wazuh commons stylesheet ------------------------ */
 /* -------------------------------------------------------------------------- */
 
+/* Variables */
+:root {
+  --wz-bg-color: #fafbfd;
+}
+
+/* v9 theme specific overrides */
+.v9 {
+  --wz-bg-color: #f0f2f4;
+}
+
 /* Customize the App icon style */
 
 /* .euiCollapsibleNav .euiCollapsibleNavGroup .euiListGroupItem__button .euiIcon {
@@ -383,7 +393,7 @@ md-content {
 }
 
 .table-hover > tbody > tr:hover {
-  background-color: #fafbfd !important;
+  background-color: var(--wz-bg-color) !important;
 }
 
 /* .table > tbody {
@@ -473,7 +483,7 @@ md-sidenav {
   align-items: center;
   justify-content: center;
   position: relative;
-  background: linear-gradient(#fafbfd);
+  background: linear-gradient(var(--wz-bg-color));
   border-left: 1px solid rgba(0, 0, 0, 0.04);
   border-right: 1px solid rgba(0, 0, 0, 0.04);
   z-index: 1000;
@@ -840,7 +850,7 @@ wz-xml-file-editor {
 }
 
 .table-striped > tbody > tr:nth-of-type(odd):hover {
-  background-color: #fafbfd !important;
+  background-color: var(--wz-bg-color) !important;
 }
 
 .table-striped-duo > tbody tr:not(.euiTableRow):nth-child(2n + 1):not(:hover),
@@ -976,11 +986,11 @@ wz-xml-file-editor {
 
 .registerAgent {
   min-height: calc(100vh - 100px);
-  background: #fafbfd;
+  background: var(--wz-bg-color);
 }
 
 .application {
-  background: #fafbfd;
+  background: var(--wz-bg-color);
 }
 
 .application.tab-health-check wz-menu {
@@ -1411,7 +1421,7 @@ md-chips .md-chips {
 }
 
 .wz-menu-agent-info {
-  background-color: #fafbfd;
+  background-color: var(--wz-bg-color);
   margin-bottom: 0px;
   margin-left: 0px;
   margin-right: 0px;
