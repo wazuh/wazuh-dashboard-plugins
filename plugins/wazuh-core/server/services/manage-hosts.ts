@@ -9,7 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { Logger } from 'opensearch-dashboards/server';
+import { Logger, PluginInitializerContext } from 'opensearch-dashboards/server';
+import { first } from 'rxjs/operators';
 import { IConfiguration } from '../../common/services/configuration';
 import { ServerAPIClient } from './server-api-client';
 import { API_USER_STATUS_RUN_AS } from '../../common/api-user-status-run-as';
@@ -22,6 +23,9 @@ export interface IAPIHost {
   password: string;
   port: number;
   run_as: boolean;
+  key?: string;
+  cert?: string;
+  ca?: string;
 }
 
 interface IAPIHostRegistry {
@@ -29,6 +33,7 @@ interface IAPIHostRegistry {
   node: string | null;
   cluster: string;
   allow_run_as: API_USER_STATUS_RUN_AS;
+  verify_ca: boolean | null;
 }
 
 interface GetRegistryDataByHostOptions {
@@ -55,7 +60,33 @@ export class ManageHosts {
   constructor(
     private readonly logger: Logger,
     private readonly configuration: IConfiguration,
+    private readonly initializerContext?: PluginInitializerContext,
   ) {}
+
+  /**
+   * Calculate verify_ca based on certificate paths.
+   * If key, cert, and ca are all configured, verify_ca is true.
+   * Otherwise, verify_ca is null (not configured) or false (partially configured).
+   */
+  private calculateVerifyCa(host: IAPIHost): boolean | null {
+    // Check if certificate paths are defined
+    return Boolean(
+      host.ca && typeof host.ca === 'string' && host.ca.trim() !== '',
+    );
+  }
+
+  /**
+   * Resolve verify_ca for a host.
+   * Uses cached registry value when present, otherwise derives from host config.
+   */
+  public resolveVerifyCa(host: IAPIHost): boolean | null {
+    const registryHost = this.cacheRegistry.get(host.id);
+    if (registryHost && typeof registryHost.verify_ca !== 'undefined') {
+      return registryHost.verify_ca;
+    }
+
+    return this.calculateVerifyCa(host);
+  }
 
   setServerAPIClient(client: ServerAPIClient) {
     this.serverAPIClient = client;
@@ -150,6 +181,16 @@ export class ManageHosts {
       const registry = Object.fromEntries([...this.cacheRegistry.entries()]);
 
       const hostsNeedingRegistry = hosts.filter(host => !registry[host.id]);
+      const enhanceHostWithRegistry = (host: IAPIHost, registryData: any) => {
+        const { allow_run_as, verify_ca, ca, cert, key, ...cluster_info } =
+          registryData || {};
+        return {
+          ...host,
+          allow_run_as,
+          verify_ca,
+          cluster_info,
+        };
+      };
       if (hostsNeedingRegistry.length > 0) {
         this.logger.debug(
           `Found ${hostsNeedingRegistry.length} hosts without registry data, updating cache`,
@@ -175,14 +216,13 @@ export class ManageHosts {
         ]);
         return hosts.map(host => {
           const { id } = host;
-          return { ...host, cluster_info: updatedRegistry[id] || {} };
+          return enhanceHostWithRegistry(host, updatedRegistry[id]);
         });
       }
 
       return hosts.map(host => {
         const { id } = host;
-
-        return { ...host, cluster_info: registry[id] || {} };
+        return enhanceHostWithRegistry(host, registry[id]);
       });
     } catch (error) {
       this.logger.error(error.message);
@@ -267,11 +307,15 @@ export class ManageHosts {
       }
     }
 
+    // Calculate verify_ca based on certificate paths
+    const verify_ca = this.calculateVerifyCa(host);
+
     const data = {
       manager,
       node,
       cluster,
       allow_run_as,
+      verify_ca,
     };
 
     this.updateRegistryByHost(apiHostID, data);
@@ -300,9 +344,10 @@ export class ManageHosts {
 
       await Promise.all(
         hosts.map(host =>
-          (async () => [host.id, await this.getRegistryDataByHost(host)])(),
+          this.getRegistryDataByHost(host, { throwError: false }),
         ),
       );
+
       this.logger.debug('API hosts data stored in the registry');
     } catch (error) {
       this.logger.error(error.message);
