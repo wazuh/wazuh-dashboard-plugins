@@ -62,7 +62,7 @@ export class WazuhPlugin
     const isDarkMode = core.uiSettings.get('theme:darkMode');
     const themeVersion = core.uiSettings.get('theme:version');
     const themeClass =
-      typeof themeVersion === 'string' ? themeVersion.split(' ')[0] : 'v7';
+      typeof themeVersion === 'string' ? themeVersion.split(' ')[0] : 'v9';
 
     document.documentElement.classList.toggle('theme-dark', isDarkMode);
     document.documentElement.classList.toggle('theme-light', !isDarkMode);
