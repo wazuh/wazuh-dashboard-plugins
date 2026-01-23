@@ -332,19 +332,17 @@ export const initializationTaskCreatorIndexPattern = ({
           // Set defaultIndex only when null (first launch), otherwise respect user configuration when it's '' or any other value.
           if (defaultIndex === null) {
             logger.debug(
-              `Default index pattern is null, setting to [${indexPatternID}]`,
+              `Default index pattern is null, setting to [${savedObject.id}]`,
             );
             if (savedObject.id) {
               logger.info(
-                `Setting default index pattern to [${indexPatternID}] from health check initialization task`,
+                `Setting default index pattern to [${savedObject.id}] from health check initialization task`,
               );
               await uiSettingsClient.set('defaultIndex', savedObject.id);
-              logger.info(`Default index pattern set to [${indexPatternID}]`);
+              logger.info(`Default index pattern set to [${savedObject.id}]`);
             }
           } else {
-            logger.debug(
-              `Default index pattern already configured [${defaultIndex}], skipping`,
-            );
+            logger.debug(`Default index pattern already configured, skipping`);
           }
         }
 
