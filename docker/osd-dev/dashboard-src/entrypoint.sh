@@ -13,7 +13,6 @@ for plugin in $plugins; do
 done
 
 cd $ROOT_APP_DIR
-yarn start --no-base-path
 
 # Block to avoid the container exit
 tail -f /dev/null
