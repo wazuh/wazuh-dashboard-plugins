@@ -35,6 +35,7 @@ import {
   defineTimeFieldNameIfExist,
   initializationTaskCreatorIndexPattern,
   initializationTaskCreatorServerAPIConnectionCompatibility,
+  initializationTaskCreatorServerAPIRunAs,
   mapFieldsFormat,
 } from './health-check';
 import { initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations } from './health-check';
@@ -241,6 +242,14 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     core.healthCheck.register(
       initializationTaskCreatorServerAPIConnectionCompatibility({
         taskName: 'server-api:connection-compatibility',
+        services: plugins.wazuhCore,
+      }),
+    );
+
+    // server API run_as (allow_run_as)
+    core.healthCheck.register(
+      initializationTaskCreatorServerAPIRunAs({
+        taskName: 'server-api:run-as',
         services: plugins.wazuhCore,
       }),
     );
@@ -665,6 +674,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternEventsKnownFields,
+          checkDefaultIndexPattern: true,
         },
       }),
     );

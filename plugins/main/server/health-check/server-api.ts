@@ -151,3 +151,103 @@ export const initializationTaskCreatorServerAPIConnectionCompatibility = ({
     }
   },
 });
+
+export const initializationTaskCreatorServerAPIRunAs = ({
+  taskName,
+  services,
+}: {
+  taskName: string;
+  services: any;
+}) => ({
+  name: taskName,
+  async run(ctx: InitializationTaskRunContext) {
+    try {
+      ctx.logger.debug('Starting check server API allow_run_as');
+
+      const hosts = await services.manageHosts.getEntries({
+        excludePassword: true,
+      });
+
+      const API_USER_STATUS_RUN_AS = services.API_USER_STATUS_RUN_AS;
+
+      const results = hosts.map(
+        (host: { id: string; cluster_info?: { allow_run_as?: number } }) => ({
+          id: host.id,
+          allow_run_as: host.cluster_info?.allow_run_as ?? -1,
+          enabled:
+            host?.cluster_info?.allow_run_as === API_USER_STATUS_RUN_AS.ENABLED,
+        }),
+      );
+
+      const allowRunAsLabel = (value: number) => {
+        switch (value) {
+          case API_USER_STATUS_RUN_AS.ENABLED:
+            return 'Run as allowed for user and host';
+          case API_USER_STATUS_RUN_AS.HOST_DISABLED:
+            return 'Run as disabled in host';
+          case API_USER_STATUS_RUN_AS.ALL_DISABLED:
+            return 'Run as disabled in host and user';
+          case API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED:
+            return 'Run as not allowed for user';
+          case API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK:
+          default:
+            return 'Unable to check user run as permission';
+        }
+      };
+
+      const notEnabledHosts = results.filter(
+        (result: { allow_run_as: number }) =>
+          [
+            API_USER_STATUS_RUN_AS.HOST_DISABLED,
+            API_USER_STATUS_RUN_AS.ALL_DISABLED,
+            API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED,
+            API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK,
+          ].includes(result.allow_run_as),
+      );
+      const unableToCheckHosts = results.filter(
+        (result: { allow_run_as: number }) =>
+          result.allow_run_as === API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK,
+      );
+
+      if (notEnabledHosts.length > 0) {
+        const notEnabledSummary = notEnabledHosts
+          .map(
+            (result: { id: string; allow_run_as: number }) =>
+              `${result.id} (${allowRunAsLabel(result.allow_run_as)})`,
+          )
+          .join(', ');
+
+        const message = `Some server API hosts have not enabled the run_as or the user has no the ability to use it or both are not enabled: ${notEnabledSummary}. Ensure every configured API host allows run_as for the API user.`;
+        ctx.logger.warn(message);
+
+        throw new Error(message);
+      }
+
+      if (unableToCheckHosts.length > 0) {
+        ctx.logger.warn(
+          `Server API hosts where allow_run_as could not be checked: ${unableToCheckHosts
+            .map((result: { id: string }) => result.id)
+            .join(', ')}`,
+        );
+      }
+
+      const enabledHosts = results.filter(
+        (result: { enabled: boolean }) => result.enabled,
+      );
+
+      ctx.logger.debug(
+        `Server API hosts with run_as permission enabled: ${enabledHosts
+          .map((result: { id: string }) => result.id)
+          .join(', ')}`,
+      );
+      return enabledHosts;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      const message = `Error checking server API allow_run_as: ${errorMessage}`;
+
+      ctx.logger.error(message);
+      throw new Error(message);
+    }
+  },
+});

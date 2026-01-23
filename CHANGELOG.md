@@ -14,9 +14,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added Alerting sample monitors health check [#7833](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7833)
 - Added default `wazuh-events*` index pattern [#7924](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7924)
 - Reintroduce Threat Hunting dashboard [#8063](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8063)
+- Added `server-api:run_as` health check to warn when `allow_run_as` is disabled for configured API hosts [#8050](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8050)
 
 ### Changed
 
+- Changed default index pattern settings key from `defaultIndex` to `wazuh-events*` [#1090](https://github.com/wazuh/wazuh-dashboard/issues/1090)
 - Adapted alerts sample data to Wazuh Common Schema [#7839](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7839)
 - Set cluster mode as default for all Wazuh installations, including single-node deployments. Updated RBAC permissions to `cluster:*` actions [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688)
 - Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7578](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7578) [#7929](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7929) [#7974](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7974) [#7979](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7979)
@@ -63,7 +65,18 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed deprecated settings of Policy monitoring [#8049](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8049)
 - Removed the UI permission validation for the upgrade and remove agent actions on Agent management > Summary [#8060](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8060)
 
-## Wazuh v4.14.3 - OpenSearch Dashboards 2.19.4 - Revision 00
+## Wazuh v4.14.4 - OpenSearch Dashboards 2.19.4 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.14.4
+
+### Fixed
+
+- Fixed `indexDate` function to correctly handle ISO week-year calculation for weekly indices [#8047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8047)
+- Fixed the status code and body displayed in failed requests in Server management > Dev tools as internal server error [#8052](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8052)
+
+## Wazuh v4.14.3 - OpenSearch Dashboards 2.19.4 - Revision 01
 
 ### Added
 
@@ -73,6 +86,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Fixed TypeError when using "exists" or "does not exist" operators on vulnerability.under_evaluation filter [#8018](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8018)
 - Fixed edition of XML content in Server management > Settings on edit configuration [#8032](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8032)
 
 ### Changed
