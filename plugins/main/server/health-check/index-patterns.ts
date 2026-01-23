@@ -300,6 +300,7 @@ export const initializationTaskCreatorIndexPattern = ({
     hasFields?: string[];
     hasTemplate?: boolean;
     hasTimeFieldName?: true | string;
+    checkDefaultIndexPattern?: boolean;
   };
   indexPatternID?: string;
 }) => ({
@@ -322,6 +323,29 @@ export const initializationTaskCreatorIndexPattern = ({
             options,
           },
         );
+
+        if (options.checkDefaultIndexPattern) {
+          const uiSettingsClient =
+            ctx.services.core.uiSettings.asScopedToClient(savedObjectsClient);
+          const defaultIndex = await uiSettingsClient.get('defaultIndex');
+
+          // Set defaultIndex only when null (first launch), otherwise respect user configuration when it's '' or any other value.
+          if (defaultIndex === null) {
+            logger.debug(
+              `Default index pattern is null, setting to [${savedObject.id}]`,
+            );
+            if (savedObject.id) {
+              logger.info(
+                `Setting default index pattern to [${savedObject.id}] from health check initialization task`,
+              );
+              await uiSettingsClient.set('defaultIndex', savedObject.id);
+              logger.info(`Default index pattern set to [${savedObject.id}]`);
+            }
+          } else {
+            logger.debug(`Default index pattern already configured, skipping`);
+          }
+        }
+
         await validateIndexPattern(savedObject, options, ctx, logger);
         compatibleIndexPatterns.push(savedObject);
       } else {
