@@ -64,7 +64,18 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed deprecated settings of Policy monitoring [#8049](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8049)
 - Removed the UI permission validation for the upgrade and remove agent actions on Agent management > Summary [#8060](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8060)
 
-## Wazuh v4.14.3 - OpenSearch Dashboards 2.19.4 - Revision 00
+## Wazuh v4.14.4 - OpenSearch Dashboards 2.19.4 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.14.4
+
+### Fixed
+
+- Fixed `indexDate` function to correctly handle ISO week-year calculation for weekly indices [#8047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8047)
+- Fixed the status code and body displayed in failed requests in Server management > Dev tools as internal server error [#8052](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8052)
+
+## Wazuh v4.14.3 - OpenSearch Dashboards 2.19.4 - Revision 01
 
 ### Added
 
@@ -74,6 +85,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Fixed TypeError when using "exists" or "does not exist" operators on vulnerability.under_evaluation filter [#8018](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8018)
 - Fixed edition of XML content in Server management > Settings on edit configuration [#8032](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8032)
 
 ### Changed

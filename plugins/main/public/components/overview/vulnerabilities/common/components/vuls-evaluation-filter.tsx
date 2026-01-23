@@ -12,18 +12,22 @@ type VulsEvaluatedFilterProps = {
 };
 
 export const UNDER_EVALUATION_FIELD = 'vulnerability.under_evaluation';
+const PHRASE_TYPE = 'phrase';
 
 export const getUnderEvaluationFilterValue = (
   underEvaluationFilter: Filter,
 ): boolean | null => {
-  if (underEvaluationFilter) {
-    return underEvaluationFilter.meta?.params?.query as boolean;
-  }
-  return null;
+  const filter = filters.find(
+    f => f.meta?.key === UNDER_EVALUATION_FIELD && f.meta?.type === 'phrase',
+  );
+  return (filter?.meta?.params?.query as boolean) ?? null;
 };
 
 export const excludeUnderEvaluationFilter = (filters: Filter[]): Filter[] => {
-  return filters.filter(f => f.meta?.key !== UNDER_EVALUATION_FIELD);
+  return filters.filter(
+    f =>
+      !(f.meta?.key === UNDER_EVALUATION_FIELD && f.meta?.type === PHRASE_TYPE),
+  );
 };
 
 export const createUnderEvaluationFilter = (
@@ -63,9 +67,8 @@ const VulsEvaluationFilter = ({
     }
   };
 
-  const [toggleIdToSelectedMap, setToggleIdToSelectedMap] = useState(
-    getDefaultValue(),
-  );
+  const [toggleIdToSelectedMap, setToggleIdToSelectedMap] =
+    useState(getDefaultValue());
 
   useEffect(() => {
     setToggleIdToSelectedMap(getDefaultValue());
