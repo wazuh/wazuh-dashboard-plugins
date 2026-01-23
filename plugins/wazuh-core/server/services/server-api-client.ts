@@ -109,22 +109,22 @@ export class ServerAPIClient {
    * @returns HTTPS agent configured with certificates if available
    */
   private _createHttpsAgent(apiHost: any): https.Agent {
+    const cacheKey = apiHost.id || `${apiHost.url}:${apiHost.port}`;
+    const cached = this._httpsAgentCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const agentOptions: https.AgentOptions = {
       // Default to false unless verify_ca is enabled with a valid CA.
       rejectUnauthorized: false,
     };
 
-    let certificatesConfigured = false;
-    let caConfigured = false;
-    const cacheKey = apiHost.id || `${apiHost.url}:${apiHost.port}`;
     let keyPath = '';
     let certPath = '';
     let caPath = '';
-    let verifyCa = false;
 
-    // Read certificate files if configured
     try {
-      // Clean and validate certificate paths
       const keyValue =
         apiHost.key && typeof apiHost.key === 'string'
           ? apiHost.key.trim()
@@ -137,29 +137,20 @@ export class ServerAPIClient {
         apiHost.ca && typeof apiHost.ca === 'string' ? apiHost.ca.trim() : '';
 
       this.logger.debug(
-        `Certificate configuration for host ${apiHost.id}: key="${keyValue}", cert="${certValue}", ca="${caValue}"`,
+        `Certificate configuration for host [${apiHost.id}]: key="${keyValue}", cert="${certValue}", ca="${caValue}"`,
       );
 
       const hasKey = keyValue !== '';
       const hasCert = certValue !== '';
       const hasCa = caValue !== '';
-      verifyCa = apiHost.verify_ca === true;
-      const isHttps =
-        typeof apiHost.url === 'string' &&
-        apiHost.url.trim().toLowerCase().startsWith('https://');
 
-      keyPath = hasKey ? this._resolveConfigPath(keyValue) : '';
-      certPath = hasCert ? this._resolveConfigPath(certValue) : '';
       caPath = hasCa ? this._resolveConfigPath(caValue) : '';
 
-      const cached = this._httpsAgentCache.get(cacheKey);
-      if (cached) {
-        return cached;
-      }
-
       if (hasKey && hasCert) {
+        keyPath = this._resolveConfigPath(keyValue);
+        certPath = this._resolveConfigPath(certValue);
         this.logger.debug(
-          `Checking certificate files for host ${apiHost.id}. Key: ${keyPath}, Cert: ${certPath}`,
+          `Checking certificate files for host [${apiHost.id}]. key: ${keyPath}, cert: ${certPath}`,
         );
 
         // Check if files exist before reading
@@ -169,65 +160,49 @@ export class ServerAPIClient {
         if (keyExists && certExists) {
           agentOptions.key = fs.readFileSync(keyPath);
           agentOptions.cert = fs.readFileSync(certPath);
-          certificatesConfigured = true;
           this.logger.debug(
-            `Certificate files loaded successfully for host ${apiHost.id}`,
+            `Certificate files loaded successfully for host [${apiHost.id}]`,
           );
         } else {
-          this.logger.warn(
-            `Certificate files not found for host ${apiHost.id}. Key exists: ${keyExists} (${keyPath}), Cert exists: ${certExists} (${certPath})`,
+          const message = [
+            { exist: keyExists, path: keyPath, label: 'Key' },
+            { exist: certExists, path: certPath, label: 'Cert' },
+          ]
+            .map(
+              ({ exist, path, label }) =>
+                `${label} [${path}]${exist ? '' : ' not'} found`,
+            )
+            .join(', ');
+          throw new Error(
+            `Certificate files not found for host [${apiHost.id}]. ${message}`,
           );
         }
       }
 
-      if (certificatesConfigured && hasCa && verifyCa) {
+      if (hasCa) {
         this.logger.debug(
-          `Checking CA certificate file for host ${apiHost.id}. CA: ${caPath}`,
+          `Checking CA certificate file for host [${apiHost.id}]. ca: ${caPath}`,
         );
 
         if (fs.existsSync(caPath)) {
           agentOptions.ca = fs.readFileSync(caPath);
           agentOptions.rejectUnauthorized = true;
-          caConfigured = true;
           this.logger.debug(
-            `CA certificate loaded successfully for host ${apiHost.id}`,
+            `CA certificate loaded successfully for host [${apiHost.id}]`,
           );
         } else {
-          this.logger.warn(
-            `CA certificate file not found for host ${apiHost.id}. CA: ${caPath}`,
-          );
-        }
-      }
-
-      if (certificatesConfigured || caConfigured) {
-        const logKey = `${apiHost.id}-ssl-config`;
-        if (!this._sslConfigLogged.has(logKey)) {
-          this.logger.info(
-            `SSL certificates configured for host ${apiHost.id}: ` +
-              `client certificates=${
-                certificatesConfigured ? 'enabled' : 'not configured'
-              }, ` +
-              `CA verification=${caConfigured ? 'enabled' : 'disabled'}`,
-          );
-          this._sslConfigLogged.add(logKey);
-        } else {
-          this.logger.debug(
-            `SSL certificates configured for host ${apiHost.id}: ` +
-              `client certificates=${
-                certificatesConfigured ? 'enabled' : 'not configured'
-              }, ` +
-              `CA verification=${caConfigured ? 'enabled' : 'disabled'}`,
+          throw new Error(
+            `CA certificate file not found for host [${apiHost.id}]. ca: ${caPath}`,
           );
         }
       }
     } catch (error: any) {
-      this.logger.error(
-        `Error reading certificate files for host ${apiHost.id}: ${
-          error?.message || String(error)
-        }. Stack: ${error?.stack || 'N/A'}`,
-      );
+      const message = `Error reading certificate files for host [${
+        apiHost.id
+      }]: ${error?.message || String(error)}`;
+      this.logger.error(message);
       // Fall back to default agent on error
-      return this.defaultHttpsAgent;
+      throw new Error(message);
     }
 
     const agent = new https.Agent(agentOptions);
@@ -245,7 +220,6 @@ export class ServerAPIClient {
       ? path.resolve(this.configDir, value)
       : value;
   }
-
 
   /**
    * Internal method to execute the request

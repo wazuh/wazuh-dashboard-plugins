@@ -70,25 +70,9 @@ export class ManageHosts {
    */
   private calculateVerifyCa(host: IAPIHost): boolean | null {
     // Check if certificate paths are defined
-    const hasKey =
-      host.key && typeof host.key === 'string' && host.key.trim() !== '';
-    const hasCert =
-      host.cert && typeof host.cert === 'string' && host.cert.trim() !== '';
-    const hasCa =
-      host.ca && typeof host.ca === 'string' && host.ca.trim() !== '';
-
-    // If all certificate paths are configured, enable CA verification
-    if (hasKey && hasCert && hasCa) {
-      return true;
-    }
-
-    // If no certificate paths are defined, return null (not configured)
-    if (!hasKey && !hasCert && !hasCa) {
-      return null;
-    }
-
-    // If only some paths are configured, return false (partially configured)
-    return false;
+    return Boolean(
+      host.ca && typeof host.ca === 'string' && host.ca.trim() !== '',
+    );
   }
 
   /**
