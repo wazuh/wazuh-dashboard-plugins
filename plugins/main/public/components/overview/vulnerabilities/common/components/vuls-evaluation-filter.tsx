@@ -17,13 +17,10 @@ export const getUnderEvaluationFilterValue = (
   underEvaluationFilter: Filter,
 ): boolean | null => {
   if (underEvaluationFilter) {
-    return underEvaluationFilter.meta?.params?.query as boolean;
+    const value = underEvaluationFilter.meta?.params?.query as boolean;
+    return underEvaluationFilter.meta?.negate ? !value : (value as boolean);
   }
   return null;
-};
-
-export const excludeUnderEvaluationFilter = (filters: Filter[]): Filter[] => {
-  return filters.filter(f => f.meta?.key !== UNDER_EVALUATION_FIELD);
 };
 
 export const createUnderEvaluationFilter = (
