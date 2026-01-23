@@ -4,7 +4,6 @@ import {
 } from '../../common/constants';
 import { webDocumentationLink } from '../../common/services/web_documentation';
 import { version as appVersion } from '../../package.json';
-import { API_USER_STATUS_RUN_AS } from '../../../wazuh-core/common/api-user-status-run-as';
 import type { InitializationTaskRunContext } from './types';
 
 export function checkAppServerCompatibility(
@@ -168,6 +167,8 @@ export const initializationTaskCreatorServerAPIRunAs = ({
       const hosts = await services.manageHosts.getEntries({
         excludePassword: true,
       });
+
+      const API_USER_STATUS_RUN_AS = services.API_USER_STATUS_RUN_AS;
 
       const results = hosts.map(
         (host: { id: string; cluster_info?: { allow_run_as?: number } }) => ({
