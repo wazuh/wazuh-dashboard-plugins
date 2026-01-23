@@ -1,12 +1,19 @@
 import React from 'react';
 import { orderBy } from 'lodash';
+import { Filter } from 'src/plugins/data/common';
 
-interface ManagedFilter {
+export interface ManagedFilter {
   managedField?: string;
   controlledBy?: string;
+  selector?: (filter: Filter) => boolean;
   component: any;
   order: number;
 }
+
+type ManagedFilterSelectors = Pick<
+  ManagedFilter,
+  'managedField' | 'controlledBy' | 'selector'
+>;
 
 /**
  * Decide if the filter is managed or not.
@@ -14,7 +21,13 @@ interface ManagedFilter {
  * @param param1
  * @returns
  */
-function isManagedFilter(filter, { managedField, controlledBy }) {
+function isManagedFilter(
+  filter: Filter,
+  { managedField, controlledBy, selector }: ManagedFilterSelectors,
+) {
+  if (selector) {
+    return selector(filter);
+  }
   return (
     (managedField && filter.meta?.key === managedField) ||
     (controlledBy && filter.meta?.controlledBy === controlledBy)
@@ -27,9 +40,12 @@ function isManagedFilter(filter, { managedField, controlledBy }) {
  * @param param1
  * @returns
  */
-function getManagedFilter(filters, { managedField, controlledBy }) {
+function getManagedFilter(
+  filters: Filter[],
+  { managedField, controlledBy, selector }: ManagedFilterSelectors,
+) {
   return filters.find(filter =>
-    isManagedFilter(filter, { managedField, controlledBy }),
+    isManagedFilter(filter, { managedField, controlledBy, selector }),
   );
 }
 
@@ -39,9 +55,13 @@ function getManagedFilter(filters, { managedField, controlledBy }) {
  * @param param1
  * @returns
  */
-function excludeManagedFilter(filters, { managedField, controlledBy }) {
+function excludeManagedFilter(
+  filters: Filter[],
+  { managedField, controlledBy, selector }: ManagedFilterSelectors,
+) {
   return filters.filter(
-    filter => !isManagedFilter(filter, { managedField, controlledBy }),
+    filter =>
+      !isManagedFilter(filter, { managedField, controlledBy, selector }),
   );
 }
 
@@ -65,18 +85,22 @@ export const useWithManagedSearchBarFilters = (
       [key: string]: ManagedFilter;
     };
   },
-  filters: any[],
-  setFilters: (filters: any) => void,
+  filters: Filter[],
+  setFilters: (filters: Filter[]) => void,
 ): UseCustomSearchBarFilters => {
   return {
     searchBarFilters: filters.filter(f => {
       const isManaged = Object.values(definition.spec)
-        .map(
-          ({ managedField }) =>
-            managedField &&
-            (f.meta?.key === managedField ||
-              f.meta?.controlledBy === managedField),
-        )
+        .map(({ managedField, selector }) => {
+          if (selector) {
+            return selector(f);
+          } else if (managedField) {
+            return (
+              f.meta?.key === managedField ||
+              f.meta?.controlledBy === managedField
+            );
+          }
+        })
         .filter(Boolean);
       return isManaged.length === 0;
     }),
@@ -85,7 +109,7 @@ export const useWithManagedSearchBarFilters = (
       ['order'],
       ['asc'],
       // eslint-disable-next-line react/display-name
-    ).map(customFilterSpec => (
+    ).map((customFilterSpec: ManagedFilter) => (
       // eslint-disable-next-line react/jsx-key
       <ManagedFilterComponent
         {...customFilterSpec}
