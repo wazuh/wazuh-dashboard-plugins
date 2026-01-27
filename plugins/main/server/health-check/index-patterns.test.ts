@@ -1,4 +1,7 @@
-import { ensureIndexPatternHasTemplate } from './index-patterns';
+import {
+  ensureIndexPatternHasTemplate,
+  initializationTaskCreatorIndexPattern,
+} from './index-patterns';
 
 const mockContext = () => ({
   logger: {
@@ -84,4 +87,116 @@ describe('getTemplateForIndexPattern', () => {
       }
     },
   );
+});
+
+describe('initializationTaskCreatorIndexPattern - checkDefaultIndexPattern', () => {
+  const mockLogger = {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    log: jest.fn(),
+    get: jest.fn().mockReturnThis(),
+  };
+
+  const createMockContext = (defaultIndex = undefined) => {
+    const savedObjectsClient = {
+      get: jest.fn(),
+      create: jest.fn(),
+      find: jest.fn(),
+    };
+    const uiSettingsClient = {
+      get: jest.fn().mockResolvedValue(defaultIndex),
+      set: jest.fn().mockResolvedValue(undefined),
+    };
+
+    return {
+      context: {
+        logger: mockLogger,
+        scope: ['internal'],
+        services: {
+          core: {
+            savedObjects: {
+              createInternalRepository: jest
+                .fn()
+                .mockReturnValue(savedObjectsClient),
+            },
+            opensearch: {
+              legacy: { client: { callAsInternalUser: jest.fn() } },
+            },
+            uiSettings: {
+              asScopedToClient: jest.fn().mockReturnValue(uiSettingsClient),
+            },
+          },
+        },
+      },
+      savedObjectsClient,
+      uiSettingsClient,
+    };
+  };
+
+  beforeEach(() => jest.clearAllMocks());
+
+  it('should set defaultIndex when it does not exist', async () => {
+    const { context, savedObjectsClient, uiSettingsClient } =
+      createMockContext(null);
+    savedObjectsClient.get.mockResolvedValue({
+      id: 'wazuh-events-*',
+      attributes: { title: 'wazuh-events-*', fields: '[]' },
+    });
+
+    const task = initializationTaskCreatorIndexPattern({
+      taskName: 'test-task',
+      indexPatternID: 'wazuh-events-*',
+      options: { checkDefaultIndexPattern: true },
+    });
+
+    await task.run({ context, logger: mockLogger });
+
+    expect(uiSettingsClient.get).toHaveBeenCalledWith('defaultIndex');
+    expect(uiSettingsClient.set).toHaveBeenCalledWith(
+      'defaultIndex',
+      'wazuh-events-*',
+    );
+  });
+
+  it('should NOT set defaultIndex when it already exists', async () => {
+    const { context, savedObjectsClient, uiSettingsClient } =
+      createMockContext('existing-id');
+    savedObjectsClient.get.mockResolvedValue({
+      id: 'wazuh-events-*',
+      attributes: { title: 'wazuh-events-*', fields: '[]' },
+    });
+
+    const task = initializationTaskCreatorIndexPattern({
+      taskName: 'test-task',
+      indexPatternID: 'wazuh-events-*',
+      options: { checkDefaultIndexPattern: true },
+    });
+
+    await task.run({ context, logger: mockLogger });
+
+    expect(uiSettingsClient.get).toHaveBeenCalledWith('defaultIndex');
+    expect(uiSettingsClient.set).not.toHaveBeenCalled();
+  });
+
+  it('should NOT check defaultIndex when option is not enabled', async () => {
+    const { context, savedObjectsClient, uiSettingsClient } =
+      createMockContext(undefined);
+    savedObjectsClient.get.mockResolvedValue({
+      id: 'wazuh-monitoring-*',
+      attributes: { title: 'wazuh-monitoring-*', fields: '[]' },
+    });
+
+    const task = initializationTaskCreatorIndexPattern({
+      taskName: 'test-task',
+      indexPatternID: 'wazuh-monitoring-*',
+      options: {},
+    });
+
+    await task.run({ context, logger: mockLogger });
+
+    expect(uiSettingsClient.get).not.toHaveBeenCalled();
+    expect(uiSettingsClient.set).not.toHaveBeenCalled();
+  });
 });

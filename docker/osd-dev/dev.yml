@@ -365,7 +365,6 @@ services:
       - '55000:55000'
 
   wazuh.manager.local:
-    platform: linux/amd64 # if you want to try packages for other architectures change this value to linux/arm64 or linux/arm/v7
     depends_on:
       os1:
         condition: service_healthy
@@ -400,7 +399,6 @@ services:
       - '55000:55000'
 
   wazuh.agent.deb.local:
-    platform: linux/amd64 # if you want to try packages for other architectures change this value to linux/arm64 or linux/arm/v7
     image: ubuntu:24.04
     profiles:
       - 'server-local' # server profile to use the local packages with agents deb and rpm
@@ -427,7 +425,6 @@ services:
         tail -f /var/ossec/logs/ossec.log
 
   wazuh.agent.rpm.local:
-    platform: linux/amd64 # if you want to try packages for other architectures change this value to linux/arm64 or linux/arm/v7
     image: centos:8
     profiles:
       - 'server-local' # server profile to use the local packages with agents deb and rpm
