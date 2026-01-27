@@ -114,7 +114,7 @@ const getVisStateAlertsEvolutionByOrganization = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -198,7 +198,7 @@ const getVisStateTopOrganizationsByAlertCount = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -262,7 +262,7 @@ const getVisStateActionTypeByOrganization = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -278,7 +278,7 @@ const getVisStateActionTypeByOrganization = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.action',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 3,
@@ -405,7 +405,7 @@ const getVisStateUsersWithMoreAlerts = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -421,7 +421,7 @@ const getVisStateUsersWithMoreAlerts = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.actor',
+            field: 'github.actor',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -552,7 +552,7 @@ const getVisStateAgentAlertsEvolutionByOrganization = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -638,7 +638,7 @@ const getVisStateAgentTopOrganizationsByAlertCount = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -702,7 +702,7 @@ const getVisStateAgentActionTypeByOrganization = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -718,7 +718,7 @@ const getVisStateAgentActionTypeByOrganization = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.action',
+            field: 'github.action',
             orderBy: '1',
             order: 'desc',
             size: 3,
@@ -845,7 +845,7 @@ const getVisStateAgentUsersWithMoreAlerts = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -861,7 +861,7 @@ const getVisStateAgentUsersWithMoreAlerts = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.actor',
+            field: 'github.actor',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -937,7 +937,7 @@ const getVisStateMetricOrganizationsCount = (indexPatternId: string) => {
           enabled: true,
           type: 'cardinality',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             customLabel: 'Organizations',
           },
           schema: 'metric',
@@ -1008,7 +1008,7 @@ const getVisStateMetricRepositoriesCount = (indexPatternId: string) => {
           enabled: true,
           type: 'cardinality',
           params: {
-            field: 'data.github.repo',
+            field: 'github.audit.repo',
             customLabel: 'Repositories',
           },
           schema: 'metric',
@@ -1079,7 +1079,7 @@ const getVisStateMetricActorsCount = (indexPatternId: string) => {
           enabled: true,
           type: 'cardinality',
           params: {
-            field: 'data.github.actor',
+            field: 'github.actor',
             customLabel: 'Actors',
           },
           schema: 'metric',

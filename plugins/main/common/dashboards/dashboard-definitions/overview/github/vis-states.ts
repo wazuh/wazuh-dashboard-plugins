@@ -106,7 +106,7 @@ export const getVisStateAlertsEvolutionByOrganization = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -179,7 +179,7 @@ export const getVisStateTopOrganizationsByAlertCount = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -232,7 +232,7 @@ export const getVisStateActionTypeByOrganization = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -248,7 +248,7 @@ export const getVisStateActionTypeByOrganization = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.action',
+            field: 'event.name',
             orderBy: '1',
             order: 'desc',
             size: 3,
@@ -364,7 +364,7 @@ export const getVisStateUsersWithMoreAlerts = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -380,7 +380,7 @@ export const getVisStateUsersWithMoreAlerts = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.actor',
+            field: 'user.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -498,7 +498,7 @@ export const getVisStateAgentAlertsEvolutionByOrganization = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -571,7 +571,7 @@ export const getVisStateAgentTopOrganizationsByAlertCount = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -624,7 +624,7 @@ export const getVisStateAgentActionTypeByOrganization = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -640,7 +640,7 @@ export const getVisStateAgentActionTypeByOrganization = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.action',
+            field: 'event.name',
             orderBy: '1',
             order: 'desc',
             size: 3,
@@ -756,7 +756,7 @@ export const getVisStateAgentUsersWithMoreAlerts = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -772,7 +772,7 @@ export const getVisStateAgentUsersWithMoreAlerts = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.actor',
+            field: 'user.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -837,7 +837,7 @@ export const getVisStateMetricOrganizationsCount = (
           enabled: true,
           type: 'cardinality',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             customLabel: 'Organizations',
           },
           schema: 'metric',
@@ -897,7 +897,7 @@ export const getVisStateMetricRepositoriesCount = (
           enabled: true,
           type: 'cardinality',
           params: {
-            field: 'data.github.repo',
+            field: 'github.audit.repo',
             customLabel: 'Repositories',
           },
           schema: 'metric',
@@ -957,7 +957,7 @@ export const getVisStateMetricActorsCount = (
           enabled: true,
           type: 'cardinality',
           params: {
-            field: 'data.github.actor',
+            field: 'user.name',
             customLabel: 'Actors',
           },
           schema: 'metric',

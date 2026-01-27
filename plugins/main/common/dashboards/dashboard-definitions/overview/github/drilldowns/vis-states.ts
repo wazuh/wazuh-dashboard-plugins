@@ -42,7 +42,7 @@ export const getVisStateTopActions = (indexPatternId: string): SavedVis => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.action',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -96,7 +96,7 @@ export const getVisStateTopActors = (indexPatternId: string): SavedVis => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.actor',
+            field: 'user.name',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -152,7 +152,7 @@ export const getVisStateTopRepositories = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.repo',
+            field: 'github.audit.repo',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -208,7 +208,7 @@ export const getVisStateTopOrganizations = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -256,7 +256,7 @@ export const getVisStateTopCountries = (indexPatternId: string): SavedVis => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.actor_location.country_code',
+            field: 'source.geo.country_iso_code',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -278,7 +278,7 @@ export const getVisStateRuleLevelEvolution = (
 ): SavedVis => {
   return {
     id: 'wz-vis-overview-github-alert-level-evolution',
-    title: 'Alert level evolution',
+    title: 'Audit level evolution',
     type: 'area',
     params: {
       type: 'area',

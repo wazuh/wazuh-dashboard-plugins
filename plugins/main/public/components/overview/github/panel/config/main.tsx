@@ -16,7 +16,6 @@ import { EuiFlexItem } from '@elastic/eui';
 import { ModuleConfigProps } from './module-config';
 
 export const MainViewConfig = (props: ModuleConfigProps) => {
-
   const { fetchFilters, searchBarProps, indexPattern } = props;
 
   const searchParams = {
@@ -26,7 +25,7 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
     dateRange: {
       from: searchBarProps.dateRangeFrom || '',
       to: searchBarProps.dateRangeTo || '',
-    }
+    },
   };
 
   return {
@@ -39,7 +38,7 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
               <EuiFlexItem grow={props.width}>
                 <AggTable
                   tableTitle='Actors'
-                  aggTerm='data.github.actor'
+                  aggTerm='user.name'
                   aggLabel='Actor'
                   maxRows={5}
                   onRowClick={props.onRowClick}
@@ -54,7 +53,7 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
               <EuiFlexItem grow={props.width}>
                 <AggTable
                   tableTitle='Organizations'
-                  aggTerm='data.github.org'
+                  aggTerm='organization.name'
                   aggLabel='Organization'
                   maxRows={5}
                   onRowClick={props.onRowClick}
@@ -73,7 +72,7 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
               <EuiFlexItem grow={props.width}>
                 <AggTable
                   tableTitle='Repositories'
-                  aggTerm='data.github.repo'
+                  aggTerm='github.audit.repo'
                   aggLabel='Repository'
                   maxRows={5}
                   onRowClick={props.onRowClick}
@@ -88,7 +87,7 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
               <EuiFlexItem grow={props.width}>
                 <AggTable
                   tableTitle='Actions'
-                  aggTerm='data.github.action'
+                  aggTerm='event.action'
                   aggLabel='Action'
                   maxRows={5}
                   onRowClick={props.onRowClick}
@@ -101,4 +100,4 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
       },
     ],
   };
-}
+};
