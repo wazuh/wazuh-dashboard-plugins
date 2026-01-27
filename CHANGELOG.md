@@ -38,6 +38,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed version hardcoded value in the deploy agent wizard [#7923](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7923)
+- Fixed XML validation when configuring `agent.conf` to allow to save successfully XPath Queries [#8071](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8071)
 
 ### Removed
 
