@@ -51,8 +51,8 @@ export const overview = {
   redirectTo: () =>
     `/overview/${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `?agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `?agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -79,8 +79,8 @@ export const configurationAssessment = {
   redirectTo: () =>
     `/overview/?tab=sca&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -104,8 +104,8 @@ export const malwareDetection = {
   redirectTo: () =>
     `/overview/?tab=pm&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -132,8 +132,8 @@ export const fileIntegrityMonitoring = {
   redirectTo: () =>
     `/overview/?tab=fim&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -157,8 +157,8 @@ export const threatHunting = {
   redirectTo: () =>
     `/overview/?tab=general&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -185,8 +185,8 @@ export const vulnerabilityDetection = {
   redirectTo: () =>
     `/overview/?tab=vuls&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -210,8 +210,8 @@ export const mitreAttack = {
   redirectTo: () =>
     `/overview/?tab=mitre&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -235,8 +235,8 @@ export const ITHygiene = {
   redirectTo: () =>
     `/overview/?tab=it-hygiene&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -260,8 +260,8 @@ const pciDss = {
   redirectTo: () =>
     `/overview/?tab=pci&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -285,8 +285,8 @@ const gdpr = {
   redirectTo: () =>
     `/overview/?tab=gdpr&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -310,8 +310,8 @@ const hipaa = {
   redirectTo: () =>
     `/overview/?tab=hipaa&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -335,8 +335,8 @@ const nist80053 = {
   redirectTo: () =>
     `/overview/?tab=nist&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -360,8 +360,8 @@ const tsc = {
   redirectTo: () =>
     `/overview/?tab=tsc&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -385,8 +385,8 @@ export const docker = {
   redirectTo: () =>
     `/overview/?tab=docker&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -413,8 +413,8 @@ export const amazonWebServices = {
   redirectTo: () =>
     `/overview/?tab=aws&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -438,8 +438,8 @@ export const googleCloud = {
   redirectTo: () =>
     `/overview/?tab=gcp&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -463,8 +463,8 @@ export const github = {
   redirectTo: () =>
     `/overview/?tab=github&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -487,8 +487,8 @@ export const office365 = {
   redirectTo: () =>
     `/overview/?tab=office&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -515,8 +515,8 @@ export const microsoftGraphAPI = {
   redirectTo: () =>
     `/overview/?tab=microsoftGraphAPI&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -766,7 +766,7 @@ export const Applications = [
   security,
   // microsoftGraphAPI,
   // amazonWebServices,
-  // googleCloud,
+  googleCloud,
   // github,
   // office365,
   // docker,
