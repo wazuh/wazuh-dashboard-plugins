@@ -1,5 +1,11 @@
 /* eslint-disable */
-import { validateXML, replaceIllegalXML, replaceXML } from './xml';
+import {
+  validateXML,
+  replaceIllegalXML,
+  replaceXML,
+  isLineInsideQueryTag,
+  hasEscapedXmlInQueryTags,
+} from './xml';
 global.DOMParser = class DOMParser {
   parseFromString(string, contentType) {
     if (contentType !== 'text/xml' && contentType !== 'text/html') {
@@ -60,6 +66,32 @@ describe('XML Utils', () => {
       const result = validateXML(xmlWithEscapedBrackets);
       expect(result).toBe(false);
     });
+
+    it('should handle XML with escaped angle brackets in query tags (Windows EventChannel)', () => {
+      const xmlWithEscapedQuery = `<localfile>
+  <location>System</location>
+  <log_format>eventchannel</log_format>
+   <query>
+     \\<QueryList\\>
+       \\<Query Id="0" Path="System"\\>
+         \\<Select Path="System"\\>*[System[(Level&lt;=3)]]\\</Select\\>
+          \\</Query\\>
+        \\</QueryList\\>
+  </query>
+</localfile>`;
+      const result = validateXML(xmlWithEscapedQuery);
+      expect(result).toBe(false);
+    });
+
+    it('should handle simple query format without escaping', () => {
+      const xmlWithSimpleQuery = `<localfile>
+        <location>System</location>
+        <log_format>eventchannel</log_format>
+        <query>Event/System[EventID=7040]</query>
+      </localfile>`;
+      const result = validateXML(xmlWithSimpleQuery);
+      expect(result).toBe(false);
+    });
   });
 
   describe('replaceIllegalXML', () => {
@@ -106,6 +138,50 @@ describe('XML Utils', () => {
       const original = 'original string';
       const result = replaceXML(original, 'not found', 'replaced');
       expect(result).toBe(original);
+    });
+  });
+
+  describe('isLineInsideQueryTag', () => {
+    const xmlContent = `<localfile>
+  <location>System</location>
+  <query>
+    \\<QueryList\\>
+  </query>
+</localfile>`;
+
+    it('should return false for lines outside query tag', () => {
+      expect(isLineInsideQueryTag(xmlContent, 0)).toBe(false); // <localfile>
+      expect(isLineInsideQueryTag(xmlContent, 1)).toBe(false); // <location>
+      expect(isLineInsideQueryTag(xmlContent, 5)).toBe(false); // </localfile>
+    });
+
+    it('should return true for lines inside query tag', () => {
+      expect(isLineInsideQueryTag(xmlContent, 3)).toBe(true); // \<QueryList\>
+    });
+
+    it('should return true for the closing query tag line', () => {
+      expect(isLineInsideQueryTag(xmlContent, 4)).toBe(true); // </query>
+    });
+  });
+
+  describe('hasEscapedXmlInQueryTags', () => {
+    it('should return true when query tag contains escaped XML', () => {
+      const xml = `<localfile>
+  <query>\\<QueryList\\></query>
+</localfile>`;
+      expect(hasEscapedXmlInQueryTags(xml)).toBe(true);
+    });
+
+    it('should return false when query tag has no escaped XML', () => {
+      const xml = `<localfile>
+  <query>Event/System[EventID=7040]</query>
+</localfile>`;
+      expect(hasEscapedXmlInQueryTags(xml)).toBe(false);
+    });
+
+    it('should return false when there is no query tag', () => {
+      const xml = '<localfile><location>System</location></localfile>';
+      expect(hasEscapedXmlInQueryTags(xml)).toBe(false);
     });
   });
 });
