@@ -34,5 +34,5 @@ export const googleCloudColumns: tDataGridColumn[] = [
   {
     id: 'dns.response_code',
     initialWidth: 220,
-  }
+  },
 ];
