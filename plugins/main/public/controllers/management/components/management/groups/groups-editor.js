@@ -34,7 +34,10 @@ import {
 import GroupsHandler from './utils/groups-handler';
 
 import { getToasts } from '../../../../../kibana-services';
-import { validateXML, setupBackslashXmlAnnotationFilter } from '../configuration/utils/xml';
+import {
+  validateXML,
+  setupBackslashXmlAnnotationFilter,
+} from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { WzOverlayMask } from '../../../../../components/common/util';
 import 'brace/theme/textmate';
