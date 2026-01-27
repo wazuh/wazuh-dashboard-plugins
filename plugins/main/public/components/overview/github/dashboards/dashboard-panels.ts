@@ -421,7 +421,7 @@ const getVisStateUsersWithMoreAlerts = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'github.actor',
+            field: 'user.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -718,7 +718,7 @@ const getVisStateAgentActionTypeByOrganization = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'github.action',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 3,
@@ -861,7 +861,7 @@ const getVisStateAgentUsersWithMoreAlerts = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'github.actor',
+            field: 'user.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -1079,7 +1079,7 @@ const getVisStateMetricActorsCount = (indexPatternId: string) => {
           enabled: true,
           type: 'cardinality',
           params: {
-            field: 'github.actor',
+            field: 'user.name',
             customLabel: 'Actors',
           },
           schema: 'metric',
