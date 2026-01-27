@@ -61,10 +61,15 @@ export const replaceIllegalXML = text => {
  * @returns {string|boolean}
  */
 export const validateXML = xml => {
+  // Remove escaped angle brackets only inside <query> tags
   // This handles Windows EventChannel query syntax like: \<QueryList\>\<Query Id="0"\>
-  const xmlWithoutEscapedBrackets = xml
-    .replace(/\\</gm, '')
-    .replace(/\\>/gm, '');
+  const xmlWithoutEscapedBrackets = xml.replace(
+    /(<query[^>]*>)([\s\S]*?)(<\/query>)/gi,
+    (match, openTag, content, closeTag) => {
+      const cleanedContent = content.replace(/\\[<>]/g, '');
+      return openTag + cleanedContent + closeTag;
+    },
+  );
 
   const xmlReplaced = replaceIllegalXML(xmlWithoutEscapedBrackets).replace(
     /..xml.+\?>/,
