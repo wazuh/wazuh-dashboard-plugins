@@ -34,7 +34,7 @@ import {
 import GroupsHandler from './utils/groups-handler';
 
 import { getToasts } from '../../../../../kibana-services';
-import { validateXML } from '../configuration/utils/xml';
+import { validateXML, setupBackslashXmlAnnotationFilter } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { WzOverlayMask } from '../../../../../components/common/util';
 import 'brace/theme/textmate';
@@ -244,6 +244,7 @@ class WzGroupsEditor extends Component {
                             mode='xml'
                             wrapEnabled
                             setOptions={this.codeEditorOptions}
+                            onLoad={setupBackslashXmlAnnotationFilter}
                             aria-label='Code Editor'
                           />
                         )) || (

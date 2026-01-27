@@ -61,9 +61,16 @@ export const replaceIllegalXML = text => {
  * @returns {string|boolean}
  */
 export const validateXML = xml => {
-  const xmlReplaced = replaceIllegalXML(xml)
-    .replace(/..xml.+\?>/, '')
-    .replace(/\\</gm, '');
+  // This handles Windows EventChannel query syntax like: \<QueryList\>\<Query Id="0"\>
+  const xmlWithoutEscapedBrackets = xml
+    .replace(/\\</gm, '')
+    .replace(/\\>/gm, '');
+
+  const xmlReplaced = replaceIllegalXML(xmlWithoutEscapedBrackets).replace(
+    /..xml.+\?>/,
+    '',
+  );
+
   const xmlDoc = parser.parseFromString(
     `<file>${xmlReplaced}</file>`,
     'text/xml',
@@ -76,4 +83,74 @@ export const validateXML = xml => {
     );
   }
   return false;
+};
+
+/**
+ * Check if a line number is inside a <query> tag block
+ * @returns {boolean} True if the line is inside or is the closing </query> tag
+ */
+export const isLineInsideQueryTag = (content, lineNumber) => {
+  const lines = content.split('\n');
+  let insideQuery = false;
+
+  for (let i = 0; i <= lineNumber && i < lines.length; i++) {
+    const line = lines[i];
+    const hasOpenTag = /<query[\s>]/i.test(line);
+    const hasCloseTag = /<\/query>/i.test(line);
+
+    if (hasOpenTag) {
+      insideQuery = true;
+    }
+
+    if (hasCloseTag) {
+      if (i === lineNumber) {
+        return true;
+      }
+      insideQuery = false;
+    }
+  }
+
+  return insideQuery;
+};
+
+/**
+ * Check if content has escaped XML (\< or \>) inside query tags
+ */
+export const hasEscapedXmlInQueryTags = content => {
+  const queryTagRegex = /<query[^>]*>([\s\S]*?)<\/query>/gi;
+  let match;
+
+  while ((match = queryTagRegex.exec(content)) !== null) {
+    const queryContent = match[1];
+    if (/\\[<>]/.test(queryContent)) {
+      return true;
+    }
+  }
+  return false;
+};
+
+/**
+ * Setup editor annotation filtering for XML mode.
+ * Filters out false positive errors caused by escaped XML in query tags.
+ */
+export const setupBackslashXmlAnnotationFilter = editor => {
+  const session = editor.getSession();
+  const originalSetAnnotations = session.setAnnotations.bind(session);
+
+  session.setAnnotations = annotations => {
+    const content = session.getValue();
+
+    // If there's escaped XML in query tags, the code editor parser gets confused and reports
+    // false errors. Use our own validateXML to determine if there are actual errors in this case.
+    if (hasEscapedXmlInQueryTags(content) && !validateXML(content)) {
+      originalSetAnnotations([]);
+      return;
+    }
+
+    // Filter out annotations for lines inside query tags
+    const filteredAnnotations = annotations.filter(
+      annotation => !isLineInsideQueryTag(content, annotation.row),
+    );
+    originalSetAnnotations(filteredAnnotations);
+  };
 };

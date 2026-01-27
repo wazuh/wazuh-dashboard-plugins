@@ -14,6 +14,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import { EuiCodeEditor, EuiSpacer } from '@elastic/eui';
+import { setupBackslashXmlAnnotationFilter } from '../utils/xml';
 
 import 'brace/theme/textmate';
 import 'brace/mode/xml';
@@ -29,6 +30,17 @@ class WzCodeEditor extends Component {
   constructor(props) {
     super(props);
   }
+
+  /**
+   * Handle editor load to filter annotations for query tags (XML only)
+   */
+  onEditorLoad = editor => {
+    const { mode } = this.props;
+    if (mode === 'xml') {
+      setupBackslashXmlAnnotationFilter(editor);
+    }
+  };
+
   render() {
     const {
       title,
@@ -66,6 +78,7 @@ class WzCodeEditor extends Component {
               fontSize: '14px',
               enableSnippets: true
             }}
+            onLoad={this.onEditorLoad}
             aria-label="Code Editor"
           />
         </div>
