@@ -135,12 +135,12 @@ export const ModulesDefaults = {
   fim: {
     init: 'inventory',
     tabs: [
-      // {
-      //   id: 'dashboard',
-      //   name: 'Dashboard',
-      //   buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-      //   component: DashboardFIM,
-      // },
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardFIM,
+      },
       {
         id: 'inventory',
         name: 'Inventory',
