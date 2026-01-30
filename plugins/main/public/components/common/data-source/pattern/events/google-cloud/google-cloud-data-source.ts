@@ -2,8 +2,8 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_GOOGLE_CLOUD_RULE_GROUP } from '../../../../../../../common/constants';
 import { EventsDataSource } from '../events-data-source';
 
-const GOOGLE_CLOUD_GROUP_KEY = 'wazuh.integration.decoders';
-const GOOGLE_CLOUD_GROUP_VALUE = 'gcp-audit';
+const GOOGLE_CLOUD_GROUP_KEY = 'wazuh.integration.name';
+const GOOGLE_CLOUD_GROUP_VALUE = 'gcp';
 
 export class GoogleCloudDataSource extends EventsDataSource {
   constructor(id: string, title: string) {
