@@ -768,7 +768,7 @@ export const Applications = [
   // amazonWebServices,
   // googleCloud,
   // github,
-  // office365,
+  office365,
   // docker,
   endpointSummary,
   endpointGroups,

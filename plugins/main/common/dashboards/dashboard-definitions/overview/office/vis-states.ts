@@ -123,7 +123,7 @@ export const getVisStateEventsBySeverity = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'rule.level',
+            field: 'event.type',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -241,7 +241,7 @@ export const getVisStateIPsByUser = (indexPatternId: string): SavedVis => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.ClientIP',
+            field: 'client.ip',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -258,7 +258,7 @@ export const getVisStateIPsByUser = (indexPatternId: string): SavedVis => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.UserId',
+            field: 'user.id',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -375,7 +375,7 @@ export const getVisStateTopUserBySubcription = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.UserId',
+            field: 'user.id',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -391,7 +391,7 @@ export const getVisStateTopUserBySubcription = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.Subscription',
+            field: 'event.provider',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -442,7 +442,7 @@ export const getVisStateUsersByOperationResult = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.Operation',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -459,7 +459,7 @@ export const getVisStateUsersByOperationResult = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.UserId',
+            field: 'user.id',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -476,7 +476,7 @@ export const getVisStateUsersByOperationResult = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.ResultStatus',
+            field: 'event.outcome',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -591,7 +591,7 @@ export const getVisStateSeverityByUser = (indexPatternId: string): SavedVis => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'rule.level',
+            field: 'event.type',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -607,7 +607,7 @@ export const getVisStateSeverityByUser = (indexPatternId: string): SavedVis => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.UserId',
+            field: 'user.id',
             orderBy: '1',
             order: 'desc',
             size: 20,
@@ -658,7 +658,7 @@ export const getVisStateRuleDescription = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'rule.description',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 500,
@@ -675,7 +675,7 @@ export const getVisStateRuleDescription = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'rule.level',
+            field: 'event.type',
             orderBy: '1',
             order: 'desc',
             size: 20,
@@ -742,7 +742,7 @@ export const getVisStateOfficeMap = (indexPatternId: string): SavedVis => {
           type: 'geohash_grid',
           schema: 'segment',
           params: {
-            field: 'GeoLocation.location',
+            field: 'client.ip',
             autoPrecision: true,
             precision: 2,
             useGeocentroid: true,

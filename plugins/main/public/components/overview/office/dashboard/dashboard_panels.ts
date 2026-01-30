@@ -131,7 +131,7 @@ const getVisStateEventsBySeverity = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'rule.level',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -262,7 +262,7 @@ const getVisStateIPsByUser = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.ClientIP',
+            field: 'client.ip',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -279,7 +279,7 @@ const getVisStateIPsByUser = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.UserId',
+            field: 'user.id',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -407,7 +407,7 @@ const getVisStateTopUserBySubcription = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.UserId',
+            field: 'user.id',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -423,7 +423,7 @@ const getVisStateTopUserBySubcription = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.Subscription',
+            field: 'event.provider',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -485,7 +485,7 @@ const getVisStateUsersByOperationResult = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.Operation',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -502,7 +502,7 @@ const getVisStateUsersByOperationResult = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.UserId',
+            field: 'user.id',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -519,7 +519,7 @@ const getVisStateUsersByOperationResult = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.ResultStatus',
+            field: 'event.outcome',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -647,7 +647,7 @@ const getVisStateSeverityByUser = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'rule.level',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -725,7 +725,7 @@ const getVisStateRuleDescription = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'rule.description',
+            field: 'event.type',
             orderBy: '1',
             order: 'desc',
             size: 500,
@@ -742,7 +742,7 @@ const getVisStateRuleDescription = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'rule.level',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 20,
@@ -822,7 +822,7 @@ const getVisStateOfficeMap = (indexPatternId: string) => {
           type: 'geohash_grid',
           schema: 'segment',
           params: {
-            field: 'GeoLocation.location',
+            field: 'client.ip',
             autoPrecision: true,
             precision: 2,
             useGeocentroid: true,

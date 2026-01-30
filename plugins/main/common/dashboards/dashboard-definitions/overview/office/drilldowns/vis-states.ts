@@ -61,10 +61,10 @@ export const getVisStateOfficeMetricStats = (
           enabled: true,
           type: 'top_hits',
           params: {
-            field: 'rule.level',
+            field: 'event.type',
             aggregate: 'concat',
             size: 1,
-            sortField: 'rule.level',
+            sortField: 'event.type',
             sortOrder: 'desc',
             customLabel: 'Max rule level detected',
           },
@@ -116,7 +116,7 @@ export const getVisStateOfficeTopsEventsPie = (
           enabled: false,
           type: 'terms',
           params: {
-            field: 'rule.level',
+            field: 'event.type',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -132,7 +132,7 @@ export const getVisStateOfficeTopsEventsPie = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'rule.description',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -186,7 +186,7 @@ export const getVisStateOfficeUserOperationLevel = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.UserId',
+            field: 'user.id',
             orderBy: '1',
             order: 'desc',
             size: 500,
@@ -203,7 +203,7 @@ export const getVisStateOfficeUserOperationLevel = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.Operation',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 100,
@@ -220,7 +220,7 @@ export const getVisStateOfficeUserOperationLevel = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'rule.level',
+            field: 'event.type',
             orderBy: '1',
             order: 'desc',
             size: 20,
@@ -359,7 +359,7 @@ export const getVisStateOfficeAlertsEvolutionByUser = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.Actor.ID',
+            field: 'user.id',
             orderBy: '1',
             order: 'asc',
             size: 5,
@@ -412,7 +412,7 @@ export const getVisStateTopOfficeUsers = (indexPatternId: string): SavedVis => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.UserId',
+            field: 'user.id',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -433,7 +433,7 @@ export const getVisStateOfficeCountryTagCloud = (
 ): SavedVis => {
   return {
     id: 'wz-vis-overview-office-country-tag-cloud',
-    title: 'Country of origin',
+    title: 'Event Provider',
     type: 'tagcloud',
     params: {
       scale: 'linear',
@@ -461,7 +461,7 @@ export const getVisStateOfficeCountryTagCloud = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'GeoLocation.country_name',
+            field: 'event.provider',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -601,7 +601,7 @@ export const getVisStateOfficeAlertsEvolutionByUserID = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.UserId',
+            field: 'user.id',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -712,7 +712,7 @@ export const getVisStateOfficeClientIPOperationLevelTable = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.ClientIP',
+            field: 'client.ip',
             orderBy: '1',
             order: 'desc',
             size: 500,
@@ -729,7 +729,7 @@ export const getVisStateOfficeClientIPOperationLevelTable = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.Operation',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 100,
@@ -746,7 +746,7 @@ export const getVisStateOfficeClientIPOperationLevelTable = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'rule.level',
+            field: 'event.type',
             orderBy: '1',
             order: 'desc',
             size: 20,
