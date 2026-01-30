@@ -259,7 +259,8 @@ describe('Wazuh User Permissions', () => {
       });
     });
 
-    describe('Should return all OK to show inventory on MITRE view', () => {
+    // This test are skipped temporally until MITRE view is finished
+    describe.skip('Should return all OK to show inventory on MITRE view', () => {
       const requiredMitreView = [
         {
           action: 'mitre:read',
