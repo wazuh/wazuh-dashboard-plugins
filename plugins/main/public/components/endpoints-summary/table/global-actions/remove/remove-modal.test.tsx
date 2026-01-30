@@ -11,7 +11,7 @@ jest.mock('../../../services', () => ({
 
 jest.mock('../../../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: () => { },
+    handleError: () => {},
   }),
 }));
 
@@ -27,8 +27,8 @@ describe('RemoveAgentsModal component', () => {
         ]}
         allAgentsSelected={false}
         filters={{}}
-        onClose={() => { }}
-        reloadAgents={() => { }}
+        onClose={() => {}}
+        reloadAgents={() => {}}
       />,
     );
 
@@ -55,8 +55,8 @@ describe('RemoveAgentsModal component', () => {
         ]}
         allAgentsSelected={false}
         filters={{}}
-        onClose={() => { }}
-        reloadAgents={() => { }}
+        onClose={() => {}}
+        reloadAgents={() => {}}
       />,
     );
 
