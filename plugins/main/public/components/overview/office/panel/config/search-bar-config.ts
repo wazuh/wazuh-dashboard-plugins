@@ -22,19 +22,19 @@ export const filtersValues: {
 }[] = [
   {
     type: 'multiSelect',
-    key: 'data.office365.Subscription',
-    placeholder: 'Subscription',
+    key: 'event.provider',
+    placeholder: 'Provider',
   },
   {
     type: 'multiSelect',
-    key: 'data.office365.UserType',
-    placeholder: 'User Type',
-    filterByKey: true,
-    options: getCustomValueSuggestion('data.office365.UserType'),
+    key: 'user.name',
+    placeholder: 'User Name',
+    // filterByKey: true,
+    // options: getCustomValueSuggestion('data.office365.UserType'),
   },
   {
     type: 'multiSelect',
-    key: 'data.office365.ResultStatus',
+    key: 'event.outcome',
     placeholder: 'Result Status',
   },
 ];
