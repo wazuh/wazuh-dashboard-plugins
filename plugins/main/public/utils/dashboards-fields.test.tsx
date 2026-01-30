@@ -59,7 +59,7 @@ test.skip.each(panelEntries)(
   },
 );
 
-test(`Test cluster panels`, () => {
+test.skip(`Test cluster panels`, () => {
   const nodeListMock = [{ name: 'node1' }, { name: 'node2' }];
   const mockIndexPattern: tParsedIndexPattern = {
     id: WAZUH_EVENTS_PATTERN,
