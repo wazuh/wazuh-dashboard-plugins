@@ -5,8 +5,8 @@ export const githubColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   commonColumns['agent.id'],
   commonColumns['agent.name'],
-  { id: 'wazuh.integration.name' },
-  { id: 'wazuh.integration.category' },
+  { id: 'user.name' },
   { id: 'event.action' },
+  { id: 'event.category' },
   { id: 'organization.name' },
 ];
