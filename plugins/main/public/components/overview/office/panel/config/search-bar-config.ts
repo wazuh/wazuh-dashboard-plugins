@@ -34,6 +34,11 @@ export const filtersValues: {
   },
   {
     type: 'multiSelect',
+    key: 'event.action',
+    placeholder: 'Action',
+  },
+  {
+    type: 'multiSelect',
     key: 'event.outcome',
     placeholder: 'Result Status',
   },
