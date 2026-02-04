@@ -75,7 +75,8 @@ export const normalizeQueryEscapes = xml =>
  * @returns {string|boolean}
  */
 export const validateXML = xml => {
-  const xmlReplaced = replaceIllegalXML(xml)
+  const xmlNormalized = normalizeQueryEscapes(xml);
+  const xmlReplaced = replaceIllegalXML(xmlNormalized)
     .replace(/..xml.+\?>/, '')
     .replace(/\\</gm, '');
   const xmlDoc = parser.parseFromString(
