@@ -56,6 +56,20 @@ export const replaceIllegalXML = text => {
 };
 
 /**
+ * Normalize escaped closing angle brackets inside <query> tags.
+ * Only targets \> that closes an escaped tag opened with \<
+ * (e.g. \<QueryList\> → \<QueryList>), leaving everything else untouched.
+ * @param {string} xml
+ * @returns {string}
+ */
+export const normalizeQueryEscapes = xml =>
+  xml.replace(
+    /(<query>)([\s\S]*?)(<\/query>)/gm,
+    (_, open, content, close) =>
+      open + content.replace(/\\<([^<]*?)\\>/g, '\\<$1>') + close,
+  );
+
+/**
  * Validate XML
  * @param {string} xml
  * @returns {string|boolean}
