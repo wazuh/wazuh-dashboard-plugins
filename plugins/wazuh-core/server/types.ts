@@ -1,3 +1,4 @@
+import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import {
   ISecurityFactory,
   ManageHosts,
@@ -12,6 +13,7 @@ export interface WazuhCorePluginSetup {
   dashboardSecurity: ISecurityFactory;
   configuration: IConfigurationEnhanced;
   manageHosts: ManageHosts;
+  API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;
   serverAPIClient: ServerAPIClient;
   api: {
     client: {
@@ -25,6 +27,7 @@ export interface WazuhCorePluginStart {
   dashboardSecurity: ISecurityFactory;
   configuration: IConfigurationEnhanced;
   manageHosts: ManageHosts;
+  API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;
   serverAPIClient: ServerAPIClient;
   api: {
     client: {
