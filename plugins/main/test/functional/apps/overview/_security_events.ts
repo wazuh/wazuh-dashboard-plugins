@@ -159,7 +159,10 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
           },
         },
       };
-      const esValues: object[] = await esPieChart.getData(query, 'agent.name');
+      const esValues: object[] = await esPieChart.getData(
+        query,
+        'wazuh.agent.name',
+      );
 
       expect(JSON.stringify(esValues.slice(0, 5))).to.be.equal(
         JSON.stringify(values),
@@ -213,7 +216,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
           },
         },
       };
-      const esValues = await esAreaChart.getData(query, 'agent.name');
+      const esValues = await esAreaChart.getData(query, 'wazuh.agent.name');
 
       expect(JSON.stringify(esValues)).to.be.equal(JSON.stringify(values));
     });
@@ -442,7 +445,10 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
           },
         },
       };
-      const esValues: object[] = await esPieChart.getData(query, 'agent.name');
+      const esValues: object[] = await esPieChart.getData(
+        query,
+        'wazuh.agent.name',
+      );
 
       expect(JSON.stringify(esValues.slice(0, 5))).to.be.equal(
         JSON.stringify(values),
@@ -525,7 +531,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
           },
         },
       };
-      const esValues = await esAreaChart.getData(query, 'agent.name');
+      const esValues = await esAreaChart.getData(query, 'wazuh.agent.name');
 
       expect(JSON.stringify(esValues)).to.be.equal(JSON.stringify(values));
       await filterBar.removeAllFilters();
@@ -766,7 +772,10 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
           },
         },
       };
-      const esValues: object[] = await esPieChart.getData(query, 'agent.name');
+      const esValues: object[] = await esPieChart.getData(
+        query,
+        'wazuh.agent.name',
+      );
 
       expect(JSON.stringify(esValues.slice(0, 5))).to.be.equal(
         JSON.stringify(values),
@@ -852,7 +861,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
           },
         },
       };
-      const esValues = await esAreaChart.getData(query, 'agent.name');
+      const esValues = await esAreaChart.getData(query, 'wazuh.agent.name');
 
       expect(JSON.stringify(esValues)).to.be.equal(JSON.stringify(values));
       await queryBar.setQuery('');
