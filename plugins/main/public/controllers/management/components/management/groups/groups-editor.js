@@ -28,7 +28,7 @@ import {
   EuiConfirmModal,
   EuiPanel,
   EuiCodeBlock,
-  EuiOverlayMask
+  EuiOverlayMask,
 } from '@elastic/eui';
 
 import GroupsHandler from './utils/groups-handler';
@@ -46,7 +46,6 @@ import 'brace/ext/searchbox';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-
 
 class WzGroupsEditor extends Component {
   _isMounted = false;
@@ -83,7 +82,9 @@ class WzGroupsEditor extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.content !== this.state.content) {
-      this.setState({ hasChanges: this.state.content !== this.state.initContent });
+      this.setState({
+        hasChanges: this.state.content !== this.state.initContent,
+      });
     }
   }
 
@@ -125,7 +126,7 @@ class WzGroupsEditor extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: "Error found saving the file.",
+          title: 'Error found saving the file.',
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -170,14 +171,14 @@ class WzGroupsEditor extends Component {
       modal = (
         <EuiOverlayMask>
           <EuiConfirmModal
-            title="Unsubmitted changes"
+            title='Unsubmitted changes'
             onConfirm={() => {
               closeModal;
               this.props.cleanFileContent();
             }}
             onCancel={closeModal}
             cancelButtonText="No, don't do it"
-            confirmButtonText="Yes, do it"
+            confirmButtonText='Yes, do it'
           >
             <p style={{ textAlign: 'center' }}>
               There are unsaved changes. Are you sure you want to proceed?
@@ -197,12 +198,12 @@ class WzGroupsEditor extends Component {
                   <EuiFlexItem>
                     <EuiTitle>
                       <span style={{ fontSize: '22px' }}>
-                        <EuiToolTip position="right" content={`Back to groups`}>
+                        <EuiToolTip position='right' content={`Back to groups`}>
                           <EuiButtonIcon
-                            aria-label="Back"
-                            color="primary"
-                            iconSize="l"
-                            iconType="arrowLeft"
+                            aria-label='Back'
+                            color='primary'
+                            iconSize='l'
+                            iconType='arrowLeft'
                             onClick={() => {
                               if (this.state.hasChanges) {
                                 showModal();
@@ -212,45 +213,49 @@ class WzGroupsEditor extends Component {
                             }}
                           />
                         </EuiToolTip>
-                        {name} <span style={{ color: 'grey' }}>of</span> {groupName}{' '}
-                        <span style={{ color: 'grey' }}>group</span>
+                        {name} <span style={{ color: 'grey' }}>of</span>{' '}
+                        {groupName} <span style={{ color: 'grey' }}>group</span>
                       </span>
                     </EuiTitle>
                   </EuiFlexItem>
                   <EuiFlexItem />
-                  {isEditable && <EuiFlexItem grow={false}>{saveButton}</EuiFlexItem>}
+                  {isEditable && (
+                    <EuiFlexItem grow={false}>{saveButton}</EuiFlexItem>
+                  )}
                 </EuiFlexGroup>
-                <EuiSpacer size="m" />
+                <EuiSpacer size='m' />
                 {xmlError && (
                   <Fragment>
                     <span style={{ color: 'red' }}> {xmlError}</span>
-                    <EuiSpacer size="s" />
+                    <EuiSpacer size='s' />
                   </Fragment>
                 )}
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiFlexGroup>
-                      <EuiFlexItem className="codeEditorWrapper">
+                      <EuiFlexItem className='codeEditorWrapper'>
                         {(isEditable && (
                           <EuiCodeEditor
-                            theme="textmate"
-                            width="100%"
+                            theme='textmate'
+                            width='100%'
                             height={`calc(100vh - ${xmlError ? 250 : 230}px)`}
                             value={content}
-                            onChange={(newContent) => this.setState({ content: newContent })}
-                            mode="xml"
+                            onChange={newContent =>
+                              this.setState({ content: newContent })
+                            }
+                            mode='xml'
                             wrapEnabled
                             setOptions={this.codeEditorOptions}
-                            aria-label="Code Editor"
-                            onLoad={(editor) => {
+                            aria-label='Code Editor'
+                            onLoad={editor => {
                               editor.getSession().setMode(new WazuhXmlMode());
                             }}
                           />
                         )) || (
                           <EuiCodeBlock
-                            language="json"
-                            fontSize="m"
-                            paddingSize="m"
+                            language='json'
+                            fontSize='m'
+                            paddingSize='m'
                             overflowHeight={this.height}
                           >
                             {content}
@@ -270,13 +275,13 @@ class WzGroupsEditor extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     state: state.groupsReducers,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
     cleanFileContent: () => dispatch(cleanFileContent()),
   };

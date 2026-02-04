@@ -1,5 +1,10 @@
 /* eslint-disable */
-import { validateXML, replaceIllegalXML, replaceXML, normalizeQueryEscapes } from './xml';
+import {
+  validateXML,
+  replaceIllegalXML,
+  replaceXML,
+  normalizeQueryEscapes,
+} from './xml';
 global.DOMParser = class DOMParser {
   parseFromString(string, contentType) {
     if (contentType !== 'text/xml' && contentType !== 'text/html') {
@@ -112,16 +117,15 @@ describe('XML Utils', () => {
     it('should handle escaped tags with attributes', () => {
       const input = '<query>\\<Select Path="Security"\\>*\\</Select\\></query>';
       const result = normalizeQueryEscapes(input);
-      expect(result).toBe('<query>\\<Select Path="Security">*\\</Select></query>');
+      expect(result).toBe(
+        '<query>\\<Select Path="Security">*\\</Select></query>',
+      );
     });
 
     it('should handle multiple <query> blocks', () => {
-      const input =
-        '<query>\\<A\\></query><other/><query>\\<B\\></query>';
+      const input = '<query>\\<A\\></query><other/><query>\\<B\\></query>';
       const result = normalizeQueryEscapes(input);
-      expect(result).toBe(
-        '<query>\\<A></query><other/><query>\\<B></query>',
-      );
+      expect(result).toBe('<query>\\<A></query><other/><query>\\<B></query>');
     });
   });
 

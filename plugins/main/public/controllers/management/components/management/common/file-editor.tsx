@@ -441,7 +441,7 @@ class WzFileEditor extends Component {
                           wrapEnabled
                           setOptions={this.codeEditorOptions}
                           aria-label='Code Editor'
-                          onLoad={(editor) => {
+                          onLoad={editor => {
                             editor.getSession().setMode(new WazuhXmlMode());
                           }}
                         />
