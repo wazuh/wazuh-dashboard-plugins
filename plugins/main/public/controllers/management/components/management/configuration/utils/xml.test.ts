@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { validateXML, replaceIllegalXML, replaceXML } from './xml';
+import { validateXML, replaceIllegalXML, replaceXML, normalizeQueryEscapes } from './xml';
 global.DOMParser = class DOMParser {
   parseFromString(string, contentType) {
     if (contentType !== 'text/xml' && contentType !== 'text/html') {
@@ -60,6 +60,13 @@ describe('XML Utils', () => {
       const result = validateXML(xmlWithEscapedBrackets);
       expect(result).toBe(false);
     });
+
+    it('should handle XML with both escaped opening and closing angle brackets', () => {
+      const xmlWithEscapedBrackets =
+        '<localfile><query>\\<QueryList\\>\\<Query Id="0"\\>\\</Query\\>\\</QueryList\\></query></localfile>';
+      const result = validateXML(xmlWithEscapedBrackets);
+      expect(result).toBe(false);
+    });
   });
 
   describe('replaceIllegalXML', () => {
@@ -80,6 +87,41 @@ describe('XML Utils', () => {
       const result = replaceIllegalXML(multilineText);
       expect(result).toContain('Line 1 with &amp;');
       expect(result).toContain('Line 2 with &amp;');
+    });
+  });
+
+  describe('normalizeQueryEscapes', () => {
+    it('should normalize \\<...\\> to \\<...> inside <query> tags', () => {
+      const input = '<query>\\<QueryList\\>\\</QueryList\\></query>';
+      const result = normalizeQueryEscapes(input);
+      expect(result).toBe('<query>\\<QueryList>\\</QueryList></query>');
+    });
+
+    it('should not touch \\> outside <query> tags', () => {
+      const input = '<root>\\<Test\\></root><query>\\<Q\\></query>';
+      const result = normalizeQueryEscapes(input);
+      expect(result).toBe('<root>\\<Test\\></root><query>\\<Q></query>');
+    });
+
+    it('should not touch standalone \\> without a preceding \\<', () => {
+      const input = '<query>some text \\> here</query>';
+      const result = normalizeQueryEscapes(input);
+      expect(result).toBe('<query>some text \\> here</query>');
+    });
+
+    it('should handle escaped tags with attributes', () => {
+      const input = '<query>\\<Select Path="Security"\\>*\\</Select\\></query>';
+      const result = normalizeQueryEscapes(input);
+      expect(result).toBe('<query>\\<Select Path="Security">*\\</Select></query>');
+    });
+
+    it('should handle multiple <query> blocks', () => {
+      const input =
+        '<query>\\<A\\></query><other/><query>\\<B\\></query>';
+      const result = normalizeQueryEscapes(input);
+      expect(result).toBe(
+        '<query>\\<A></query><other/><query>\\<B></query>',
+      );
     });
   });
 
