@@ -73,7 +73,7 @@ const getVisStateMostActiveAgents = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -362,7 +362,7 @@ const getVisStateRequirementsByAgents = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'agent.id',
+            field: 'wazuh.agent.id',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -528,7 +528,7 @@ const getVisStateRequirementsAgentsHeatmap = (indexPatternId: string) => {
           id: '2',
           params: {
             customLabel: 'Agent',
-            field: 'agent.id',
+            field: 'wazuh.agent.id',
             missingBucket: false,
             missingBucketLabel: 'Missing',
             order: 'desc',

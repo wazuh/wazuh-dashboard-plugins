@@ -3,7 +3,7 @@ import { commonColumns } from '../../common/data-grid-columns';
 
 export const nistColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
-  commonColumns['agent.name'],
+  commonColumns['wazuh.agent.name'],
   {
     id: 'rule.nist_800_53',
     initialWidth: 171,
