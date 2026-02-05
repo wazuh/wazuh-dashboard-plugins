@@ -5,7 +5,7 @@
 
 /* v9 theme specific overrides */
 .v9 {
-  --wz-bg-dark-color: rgb(2, 2, 14);
+  --wz-bg-dark-color: $ouiPageBackgroundColor;
 }
 
 .theme-dark {
@@ -18,7 +18,7 @@
   }
 
   .application {
-    background: var(--wz-bg-dark-color);
+     background: linear-gradient(180deg, $ouiPageBackgroundColor 0%, $ouiPageBackgroundColor 100%);
   }
 
   #kibana-body {
