@@ -3,7 +3,7 @@ import { commonColumns } from '../../common/data-grid-columns';
 
 export const hipaaColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
-  commonColumns['agent.name'],
+  commonColumns['wazuh.agent.name'],
   {
     id: 'rule.hipaa',
     initialWidth: 183,

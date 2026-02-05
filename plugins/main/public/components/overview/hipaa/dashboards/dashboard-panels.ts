@@ -113,7 +113,7 @@ const getVisStateAlertsVolumeByAgent = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'agent.id',
+            field: 'wazuh.agent.id',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -341,7 +341,7 @@ const getVisStateMostActiveAgents = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             customLabel: 'Agent',
             orderBy: '1',
             order: 'desc',
@@ -708,7 +708,7 @@ const getVisStateRequirementDistributionByAgent = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             orderBy: '1',
             order: 'desc',
             size: 5,

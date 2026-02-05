@@ -204,7 +204,7 @@ const getVisStateTop5Agents = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -362,7 +362,7 @@ const getVisStateAlertEvolutionTop5Agents = (indexPatternId: string) => {
           type: 'terms',
           schema: 'group',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             size: 5,
             order: 'desc',
             orderBy: '1',

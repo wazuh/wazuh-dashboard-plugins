@@ -252,7 +252,7 @@ const MitreTopTacticsTechniquesBody = compose(
           <FlyoutTechnique
             openDashboard={(e, itemId) => goToDashboardWithFilter(e, itemId)}
             openDiscover={(e, itemId) => goToEventsWithFilter(e, itemId)}
-            implicitFilters={[{ 'agent.id': agentId }]}
+            implicitFilters={[{ 'wazuh.agent.id': agentId }]}
             agentId={agentId}
             onChangeFlyout={onChangeFlyout}
             currentTechnique={showTechniqueDetails}
