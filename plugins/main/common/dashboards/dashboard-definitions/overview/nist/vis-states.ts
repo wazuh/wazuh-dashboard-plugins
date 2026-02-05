@@ -65,7 +65,7 @@ export const getVisStateMostActiveAgents = (
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -332,7 +332,7 @@ export const getVisStateRequirementsByAgents = (
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'agent.id',
+            field: 'wazuh.agent.id',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -487,7 +487,7 @@ export const getVisStateRequirementsAgentsHeatmap = (
           id: '2',
           params: {
             customLabel: 'Agent',
-            field: 'agent.id',
+            field: 'wazuh.agent.id',
             missingBucket: false,
             missingBucketLabel: 'Missing',
             order: 'desc',

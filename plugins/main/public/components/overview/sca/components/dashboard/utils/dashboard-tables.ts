@@ -5,7 +5,7 @@ export const getDashboardTables = (indexPatternId: string) =>
     {
       panelId: 't1',
       x: 0,
-      field: 'agent.name',
+      field: 'wazuh.agent.name',
       title: 'Top 5 agents',
       visIDPrefix: 'it-hygiene-stat',
       fieldCustomLabel: 'Top 5 agents',

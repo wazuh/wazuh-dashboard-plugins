@@ -921,7 +921,7 @@ export const INDEX_PATTERN_EVENTS_REQUIRED_FIELDS = [
   FIELD_TIMESTAMP,
   'wazuh.integration.decoders',
   'wazuh.cluster.node',
-  'agent.id',
+  'wazuh.agent.id',
 ];
 
 /** Dashboards ids **/
