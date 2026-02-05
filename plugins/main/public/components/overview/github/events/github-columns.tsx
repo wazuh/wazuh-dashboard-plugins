@@ -3,8 +3,8 @@ import { commonColumns } from '../../common/data-grid-columns';
 
 export const githubColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
-  commonColumns['agent.id'],
-  commonColumns['agent.name'],
+  commonColumns['wazuh.agent.id'],
+  commonColumns['wazuh.agent.name'],
   { id: 'user.name' },
   { id: 'event.action' },
   { id: 'event.category' },
