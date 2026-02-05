@@ -11,10 +11,10 @@ export const techniquesColumns: tDataGridColumn[] = [
     render: value => formatUIDate(value),
   },
   {
-    id: 'agent.id',
+    id: 'wazuh.agent.id',
     displayAsText: 'Agent',
   },
-  { id: 'agent.name', displayAsText: 'Agent Name' },
+  { id: 'wazuh.agent.name', displayAsText: 'Agent Name' },
   {
     id: 'rule.mitre.id',
     displayAsText: 'Technique(s)',

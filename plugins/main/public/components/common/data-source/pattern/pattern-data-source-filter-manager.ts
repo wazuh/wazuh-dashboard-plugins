@@ -15,7 +15,7 @@ import { FilterStateStore } from '../../../../../common/constants';
 import { ErrorDataSourceServerAPIContextFilter } from '../../../../utils/errors';
 
 const MANAGER_AGENT_ID = '000';
-const AGENT_ID_KEY = 'agent.id';
+const AGENT_ID_KEY = 'wazuh.agent.id';
 
 /**
  * Get the filter that excludes the data related to Wazuh servers

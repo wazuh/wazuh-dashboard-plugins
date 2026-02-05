@@ -1,5 +1,5 @@
 export const tableColumns = [
-  { id: 'agent.name' },
+  { id: 'wazuh.agent.name' },
   { id: 'policy.name' },
   { id: 'policy.description' },
   { id: 'policy.file' },
