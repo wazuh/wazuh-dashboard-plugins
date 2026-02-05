@@ -20,7 +20,7 @@ const threatHuntingTableCommonColumns = {
 
 export const threatHuntingTableDefaultColumns: tDataGridColumn[] = [
   threatHuntingTableCommonColumns.icon,
-  commonColumns['agent.id'],
+  commonColumns['wazuh.agent.id'],
   threatHuntingTableCommonColumns['rule.mitre.id'],
   threatHuntingTableCommonColumns['rule.mitre.tactic'],
   commonColumns['rule.description'],

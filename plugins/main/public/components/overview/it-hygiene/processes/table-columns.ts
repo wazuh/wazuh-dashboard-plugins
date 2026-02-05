@@ -1,5 +1,5 @@
 export default [
-  { id: 'agent.name' },
+  { id: 'wazuh.agent.name' },
   { id: 'process.name' },
   { id: 'process.start' },
   { id: 'process.pid' },
