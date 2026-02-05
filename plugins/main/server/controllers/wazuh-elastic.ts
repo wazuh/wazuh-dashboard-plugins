@@ -196,7 +196,7 @@ export class WazuhElasticCtrl {
             must: [],
             must_not: {
               term: {
-                'agent.id': '000',
+                'wazuh.agent.id': '000',
               },
             },
             filter: [
@@ -233,7 +233,7 @@ export class WazuhElasticCtrl {
       if (request.query.agentsList)
         payload.query.bool.filter.push({
           terms: {
-            'agent.id': request.query.agentsList.split(','),
+            'wazuh.agent.id': request.query.agentsList.split(','),
           },
         });
       payload.aggs['2'].terms.field = request.params.field;

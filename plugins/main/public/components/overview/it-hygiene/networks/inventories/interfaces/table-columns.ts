@@ -1,5 +1,5 @@
 export default [
-  { id: 'agent.name' },
+  { id: 'wazuh.agent.name' },
   { id: 'interface.name' },
   { id: 'interface.type' },
   { id: 'interface.state' },

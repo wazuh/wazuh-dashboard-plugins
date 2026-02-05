@@ -65,7 +65,7 @@ export const getVisStateHostsTotalFreeMemoryTable = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             orderBy: '1',
             order: 'desc',
             size: 5,

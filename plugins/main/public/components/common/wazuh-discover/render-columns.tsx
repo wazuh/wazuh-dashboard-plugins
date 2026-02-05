@@ -60,7 +60,7 @@ const renderMitreTechnique = technique => (
 
 export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
-    id: 'agent.id',
+    id: 'wazuh.agent.id',
     render: value => {
       if (value === '000') {
         return value;
@@ -82,16 +82,16 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
     },
   },
   {
-    id: 'agent.name',
+    id: 'wazuh.agent.name',
     render: (value, row) => {
-      if (row.agent.id === '000') {
+      if (row.wazuh.agent.id === '000') {
         return value;
       }
 
       return (
         <WzLink
           appId={endpointSummary.id}
-          path={`/agents?tab=welcome&agent=${row.agent.id}`}
+          path={`/agents?tab=welcome&agent=${row.wazuh.agent.id}`}
           toolTipProps={{
             content: i18n.translate('discover.fieldLinkTooltip.agent', {
               defaultMessage: 'Navigate to the agent details',
