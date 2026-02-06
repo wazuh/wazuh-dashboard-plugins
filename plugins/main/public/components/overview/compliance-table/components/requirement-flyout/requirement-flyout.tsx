@@ -108,11 +108,11 @@ export const RequirementFlyout = connect(mapStateToProps)(
           render: value => formatUIDate(value),
         },
         {
-          id: 'agent.id',
+          id: 'wazuh.agent.id',
           displayAsText: 'Agent',
         },
         {
-          id: 'agent.name',
+          id: 'wazuh.agent.name',
           displayAsText: 'Agent name',
         },
         {

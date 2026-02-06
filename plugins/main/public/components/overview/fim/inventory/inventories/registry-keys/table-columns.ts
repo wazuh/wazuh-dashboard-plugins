@@ -1,6 +1,6 @@
 export default [
   {
-    id: 'agent.name',
+    id: 'wazuh.agent.name',
   },
   {
     id: 'registry.path',
