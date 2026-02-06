@@ -2,8 +2,8 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_AWS_RULE_GROUP } from '../../../../../../../common/constants';
 import { EventsDataSource } from '../events-data-source';
 
-const AWS_GROUP_KEY = 'wazuh.integration.decoders';
-const AWS_GROUP_VALUE = 'aws-audit';
+const AWS_GROUP_KEY = 'wazuh.integration.name';
+const AWS_GROUP_VALUE = 'aws';
 
 export class AWSDataSource extends EventsDataSource {
   constructor(id: string, title: string) {
