@@ -55,7 +55,7 @@ Always use the provided script to bring up or down the development environment. 
   - `down` remove the containers, but docker images are not removed.
   - `stop` containers are not removed, they go into "exited" state, useful to evade optimizing again.
   - `start` restarting the containers that were in "exited" state.
-  - `manager-local-up`
+  - `manager-local-up` launch only the manager.
 - -os <os_version> : (Optional) Specifies the OpenSearch version. If not provided, it's obtained from plugins/wazuh-core/package.json .
 - -osd <osd_version> : (Optional) Specifies the OpenSearch Dashboards version. If not provided, it's obtained from plugins/wazuh-core/package.json .
 - -a <agents_up> : (Optional) Relevant when using server-local mode. Specifies agent deployment:
