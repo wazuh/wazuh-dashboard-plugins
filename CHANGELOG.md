@@ -35,6 +35,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed `rule.groups` filter to `wazuh.integration.decoders` [#7934](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7934)
 - Applied the new home page navigation style to all dashboards [#7981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7981)
 - Updated File Integrity Monitoring dashboards to use new index pattern [#8044](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8044)
+- Reintroduce Google Cloud dashboard [#8069](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8069)
 
 ### Fixed
 
