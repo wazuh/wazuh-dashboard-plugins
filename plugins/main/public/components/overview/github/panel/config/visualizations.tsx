@@ -49,7 +49,7 @@ export const getVisStateTopActions = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.action',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -116,7 +116,7 @@ export const getVisStateTopActors = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.actor',
+            field: 'user.name',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -183,7 +183,7 @@ export const getVisStateTopRepositories = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.repo',
+            field: 'github.audit.repo',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -249,7 +249,7 @@ export const getVisStateTopOrganizations = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.org',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -310,7 +310,7 @@ export const getVisStateTopCountries = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.github.actor_location.country_code',
+            field: 'source.geo.country_iso_code',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -330,7 +330,7 @@ export const getVisStateTopCountries = (indexPatternId: string) => {
 export const getVisStateRuleLevelEvolution = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-GitHub-Alert-Level-Evolution',
-    title: 'Alert level evolution',
+    title: 'Audit level evolution',
     type: 'area',
     params: {
       type: 'area',
@@ -440,7 +440,7 @@ export const getVisStateRuleLevelEvolution = (indexPatternId: string) => {
           enabled: true,
           type: 'date_histogram',
           params: {
-            field: 'timestamp',
+            field: '@timestamp',
             timeRange: {
               from: 'now-30d',
               to: 'now',
@@ -459,7 +459,7 @@ export const getVisStateRuleLevelEvolution = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'rule.level',
+            field: 'organization.name',
             orderBy: '1',
             order: 'desc',
             size: 10,

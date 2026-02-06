@@ -4,19 +4,9 @@ import { commonColumns } from '../../common/data-grid-columns';
 export const githubColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   commonColumns['wazuh.agent.id'],
-  {
-    id: 'data.github.repo',
-    initialWidth: 200,
-  },
-  {
-    id: 'data.github.actor',
-    initialWidth: 200,
-  },
-  {
-    id: 'data.github.org',
-    initialWidth: 200,
-  },
-  commonColumns['rule.description'],
-  commonColumns['rule.level'],
-  commonColumns['rule.id'],
+  commonColumns['wazuh.agent.name'],
+  { id: 'user.name' },
+  { id: 'event.action' },
+  { id: 'event.category' },
+  { id: 'organization.name' },
 ];
