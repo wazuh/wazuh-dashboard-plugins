@@ -5,5 +5,5 @@ export const threatHuntingColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   commonColumns['wazuh.agent.name'],
   { id: 'wazuh.integration.name' },
-  { id: 'wazuh.integration.category' }
+  { id: 'wazuh.integration.category' },
 ];
