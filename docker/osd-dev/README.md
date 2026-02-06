@@ -2,15 +2,20 @@
 
 ## Requirements
 
-- vm.max_map_count=262144
+- vm.max_map_count=262144, needed by elastic search to prevent out-of-memory exceptions.
 
-  To modify the vm.max_map_count, you can run this command:
+  To modify the vm.max_map_count temporarily, you can run this command:
   `sudo sysctl -w vm.max_map_count=262144`
+
+  To make the change permanent in host machine:
+  - In host machine:
+    `sudo nano /etc/sysctl.conf`
+  - Add at the end of the file: vm.max_map_count=262144
 
 - jq
 
+  The jq tool is used by the scripts to process JSON files.
   To install jq, you can run this command:
-
   - In Debian/Ubuntu:
     `sudo apt-get install jq`
   - In RedHat/CentOS:
@@ -45,6 +50,12 @@ Always use the provided script to bring up or down the development environment. 
 
 ### Parameters
 
+- Action (positional): One of up | down | stop | start | manager-local-up.
+  - `up` launch the containers.
+  - `down` remove the containers, but docker images are not removed.
+  - `stop` containers are not removed, they go into "exited" state, useful to evade optimizing again.
+  - `start` restarting the containers that were in "exited" state.
+  - `manager-local-up`
 - -os <os_version> : (Optional) Specifies the OpenSearch version. If not provided, it's obtained from plugins/wazuh-core/package.json .
 - -osd <osd_version> : (Optional) Specifies the OpenSearch Dashboards version. If not provided, it's obtained from plugins/wazuh-core/package.json .
 - -a <agents_up> : (Optional) Relevant when using server-local mode. Specifies agent deployment:
@@ -56,7 +67,6 @@ Always use the provided script to bring up or down the development environment. 
   - Internal repositories (`main`, `wazuh-core`, `wazuh-check-updates`) are auto-detected under `<root>/plugins/` when running from this repo, or can be set via `--plugins-root` (aliases: `-wdp`, `--wz-home`).
   - External repositories passed with `-r` are dynamically added as volumes to the `osd` service via an auto-generated `dev.override.generated.yml` (git-ignored).
   - Paths MUST be absolute and must point to the repository ROOT (do not pass subfolders like `/plugins/...`). Shorthand is also supported: `-r <repo>` (no `=`), which resolves from your <common-parent-directory> using the same `<repo>` name. If not found, an error is raised.
-    Action (positional): One of up | down | stop | start | manager-local-up.
 - -saml: (Optional) Deploys a SAML-enabled environment with KeyCloak IDP.
   - Note for SAML: You need to add idp to your hosts file ( /etc/hosts on Linux/macOS, C:\\Windows\\System32\\drivers\\etc\\hosts on Windows) pointing to 127.0.0.1 . Also, based on previous configurations, KeyCloak IDP might need to be started with the --no-base-path option.
   ```
@@ -103,7 +113,6 @@ Examples (shorthand alias resolves to the canonical folder 'wazuh-security-dashb
 ### Search Order and Precedence (Security Plugin)
 
 - Auto-discovery (no `-r`):
-
   - Looks only at the canonical folder 'wazuh-security-dashboards-plugin' under your <common-parent-directory>.
 
 - Overrides with `-r` (takes precedence):
@@ -178,6 +187,34 @@ Environment with a local Wazuh indexer build:
 Important Note about Plugin Version:
 
 The script will not select the appropriate version of the wazuh-dashboard-plugins to use, so be sure to check out the appropriate version before bringing up the environment!
+
+### Launch UI
+
+- Once the docker containers are online use yarn start command to launch the UI:
+  - Find the osd-dev container_id:
+    `docker ps`
+  - Enter the shell.
+    `docker exec -it <CONTAINER_ID> bash`
+  - Launch the UI.
+    `yarn start --no-base-path`
+  - Wait for `[success][@osd/optimizer]` to show in console (could take a lot of time).
+
+#### Warning
+
+- After using the yarn start command, an error about missing dependencies could appear, to fix the dependencies:
+  - In osd-dev container shell inside `/plugins` folder:
+    `for d in */; do (cd "$d" && yarn install); done`
+
+  - If the following line stops the installation of dependencies:
+
+    ```bash
+    Enter the git reference (branch/tag) of the current source code. This reference will be used to get
+    the referece in the indexer git repository to update the resource files (e.g., main, develop):
+    ```
+
+    Write: `main`
+
+Repeat yarn start command.
 
 ### UI Credentials
 
