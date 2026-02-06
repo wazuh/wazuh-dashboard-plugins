@@ -766,7 +766,7 @@ export const Applications = [
   security,
   // microsoftGraphAPI,
   // amazonWebServices,
-  // googleCloud,
+  googleCloud,
   // github,
   office365,
   // docker,

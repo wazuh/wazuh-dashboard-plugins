@@ -3,5 +3,5 @@ import { commonColumns } from '../../common/data-grid-columns';
 
 export const configurationAssessmentColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
-  commonColumns['agent.name'],
+  commonColumns['wazuh.agent.name'],
 ];

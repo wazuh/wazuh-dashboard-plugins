@@ -7,7 +7,7 @@ export const getVisStateResultsByAgent = (indexPatternId: string) =>
   createHorizontalBarVis(
     'results_by_agent',
     'Agents by check result',
-    'agent.name',
+    'wazuh.agent.name',
     'Agents',
     indexPatternId,
   );
@@ -64,7 +64,7 @@ export const getVisStatePolicyByCheckHeatmap = (indexPatternId: string) =>
         enabled: true,
         type: 'terms',
         params: {
-          field: 'agent.id',
+          field: 'wazuh.agent.id',
           orderBy: '1',
           order: 'desc',
           size: 20,

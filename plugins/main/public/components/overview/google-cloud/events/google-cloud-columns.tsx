@@ -3,24 +3,36 @@ import { commonColumns } from '../../common/data-grid-columns';
 
 export const googleCloudColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
-  commonColumns['agent.name'],
+  commonColumns['wazuh.agent.name'],
   {
-    id: 'data.gcp.jsonPayload.vmInstanceName',
+    id: 'cloud.instance.id',
   },
   {
-    id: 'data.gcp.resource.labels.location',
-    initialWidth: 261,
+    id: 'cloud.region',
+    initialWidth: 180,
   },
   {
-    id: 'data.gcp.resource.labels.project_id',
-    initialWidth: 281,
+    id: 'cloud.project.id',
+    initialWidth: 220,
   },
   {
-    id: 'data.gcp.resource.type',
-    initialWidth: 192,
+    id: 'event.action',
+    initialWidth: 250,
   },
   {
-    id: 'data.gcp.severity',
-    initialWidth: 152,
+    id: 'event.outcome',
+    initialWidth: 120,
+  },
+  {
+    id: 'event.category',
+    initialWidth: 240,
+  },
+  {
+    id: 'gcp_audit.servicename',
+    initialWidth: 220,
+  },
+  {
+    id: 'dns.response_code',
+    initialWidth: 220,
   },
 ];
