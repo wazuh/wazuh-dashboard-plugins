@@ -359,12 +359,12 @@ export const ModulesDefaults = {
         name: 'Intelligence',
         component: ModuleMitreAttackIntelligence,
       },
-      {
-        id: 'inventory',
-        name: 'Framework',
-        buttons: [ButtonExploreAgent],
-        component: MainMitre,
-      },
+      // {
+      //   id: 'inventory',
+      //   name: 'Framework',
+      //   buttons: [ButtonExploreAgent],
+      //   component: MainMitre,
+      // },
       // renderDiscoverTab({
       //   moduleId: 'mitre',
       //   DataSource: MitreAttackDataSource,
