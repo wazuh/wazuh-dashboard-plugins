@@ -3,8 +3,8 @@ import { commonColumns } from '../../common/data-grid-columns';
 
 export const amazonWebServicesColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
-  commonColumns['agent.id'],
-  commonColumns['agent.name'],
+  commonColumns['wazuh.agent.id'],
+  commonColumns['wazuh.agent.name'],
   {
     id: 'aws.cloudtrail_event_source',
     initialWidth: 280,
