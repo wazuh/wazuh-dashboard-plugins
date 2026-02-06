@@ -38,6 +38,7 @@ import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateAct
 import WzReloadClusterManagerCallout from '../../../../../components/common/reload-cluster-manager-callout';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
+import WazuhXmlMode from '../configuration/utils/wz-xml-mode';
 import 'brace/theme/textmate';
 import 'brace/mode/xml';
 import 'brace/snippets/xml';
@@ -440,6 +441,9 @@ class WzFileEditor extends Component {
                           wrapEnabled
                           setOptions={this.codeEditorOptions}
                           aria-label='Code Editor'
+                          onLoad={editor => {
+                            editor.getSession().setMode(new WazuhXmlMode());
+                          }}
                         />
                       </EuiFlexItem>
                     </EuiFlexGroup>
