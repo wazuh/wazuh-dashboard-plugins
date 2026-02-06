@@ -22,9 +22,4 @@ export const DashboardThreatHunting = createDashboard({
       agentDashboardId: THREAT_HUNTING_AGENT_DASHBOARD_ID,
     },
   ],
-  sampleDataWarningCategories: [
-    WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
-    WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
-    WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
-  ],
 });

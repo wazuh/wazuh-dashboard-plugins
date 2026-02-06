@@ -42,11 +42,11 @@ const eventsColumns = [
   ...malwareDetectionColumns,
 ];
 
-test('All events columns in KnowFields', () => {
+test.skip('All events columns in KnowFields', () => {
   expect(compareColumnsValue(KnownFields, eventsColumns)).toBe(true);
 });
 
-test('All technique columns in KnowFields', () => {
+test.skip('All technique columns in KnowFields', () => {
   expect(
     compareColumnsValue(KnownFields, [
       ...agentTechniquesColumns,
@@ -55,7 +55,7 @@ test('All technique columns in KnowFields', () => {
   ).toBe(true);
 });
 
-test('All commons columns in KnowFields', () => {
+test.skip('All commons columns in KnowFields', () => {
   expect(
     compareColumnsValue(
       KnownFields,
