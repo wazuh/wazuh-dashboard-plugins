@@ -195,7 +195,7 @@ The script will not select the appropriate version of the wazuh-dashboard-plugin
     `docker ps`
   - Enter the shell.
     `docker exec -it <CONTAINER_ID> bash`
-  - Launch the UI.
+  - Launch the UI from the kbn folder.
     `yarn start --no-base-path`
   - Wait for `[success][@osd/optimizer]` to show in console (could take a lot of time).
 
