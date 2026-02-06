@@ -34,7 +34,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed dashboards renderer by saved objects [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842) [#7847](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7847) [#7916](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7916) [#7938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7938)
 - Changed `rule.groups` filter to `wazuh.integration.decoders` [#7934](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7934)
 - Applied the new home page navigation style to all dashboards [#7981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7981)
-- Reintroduce Github dashboard [#8072](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8072)
+- Updated GitHub dashboards to use new index pattern [#8072](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8072)
 - Reintroduce Google Cloud dashboard [#8069](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8069)
 
 ### Fixed
