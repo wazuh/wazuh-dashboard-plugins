@@ -39,9 +39,7 @@ function convertNumeralToD3Format(
 export const decimalFormat = (maxPrecision?: number) => {
   let decimalFormat;
   const pattern = core.uiSettings.get('format:percent:defaultPattern');
-  console.log('pattern', pattern);
   decimalFormat = convertNumeralToD3Format(pattern, maxPrecision);
-  console.log('decimalFormat', decimalFormat);
   return decimalFormat ?? '.2%';
 };
 
