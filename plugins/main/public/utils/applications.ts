@@ -764,7 +764,7 @@ export const Applications = [
   // tsc,
   devTools,
   security,
-  // microsoftGraphAPI,
+  microsoftGraphAPI,
   // amazonWebServices,
   googleCloud,
   // github,
