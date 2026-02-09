@@ -3,7 +3,10 @@ import { CheckResult, SCA_CHECK_RESULT_COLORS } from '../../../utils/constants';
 
 const core = getCore();
 
-function convertNumeralToD3Format(numeralFormat: string): string {
+function convertNumeralToD3Format(
+  numeralFormat: string,
+  maxPrecision?: number,
+): string {
   const useThousands: boolean = numeralFormat.includes(',');
   const decimalMatch: RegExpMatchArray | null =
     numeralFormat.match(/\.(0+)?(\[0+\])?/);
@@ -20,23 +23,26 @@ function convertNumeralToD3Format(numeralFormat: string): string {
     useTrim = optional.length > 0;
   }
 
-  const precision: number = maxDecimals || minDecimals;
+  const precision: number = maxPrecision
+    ? maxPrecision
+    : maxDecimals || minDecimals;
 
   let format: string = '';
   if (useThousands) format += ',';
   format += '.' + precision;
 
-  format += '~f';
+  format += '%';
 
   return format;
 }
 
-export const decimalFormat = () => {
+export const decimalFormat = (maxPrecision?: number) => {
   let decimalFormat;
   const pattern = core.uiSettings.get('format:percent:defaultPattern');
-  decimalFormat = convertNumeralToD3Format(pattern);
-
-  return decimalFormat ?? '.2f';
+  console.log('pattern', pattern);
+  decimalFormat = convertNumeralToD3Format(pattern, maxPrecision);
+  console.log('decimalFormat', decimalFormat);
+  return decimalFormat ?? '.2%';
 };
 
 export const checkResultColors = () => {
