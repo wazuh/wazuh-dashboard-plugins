@@ -81,7 +81,7 @@ class WzConfigurationSwitch extends Component {
       viewProps: {},
       agentSynchronized: undefined,
       masterNodeInfo: undefined,
-      loadingOverview: this.props.agent.id === '000',
+      loadingOverview: false,
     };
   }
 
@@ -169,12 +169,9 @@ class WzConfigurationSwitch extends Component {
   };
 
   handleAgentOrClusterUpdate = (/** @type {string} */ context) => {
-    if (this.props.agent.id !== '000') {
-      this.updateAgentSynchronization(context);
-    } else {
-      this.updateClusterInformation(context);
-      this.fetchMasterNodeInfo();
-    }
+    this.updateAgentSynchronization(context);
+    this.updateClusterInformation(context);
+    this.fetchMasterNodeInfo();
   };
 
   async componentDidMount() {
@@ -199,7 +196,7 @@ class WzConfigurationSwitch extends Component {
       <EuiPage>
         <EuiPageBody>
           <EuiPanel>
-            {agent.id !== '000' && agent.group?.length ? (
+            {agent.group?.length ? (
               <Fragment>
                 <span>Groups:</span>
                 <RedirectAppLinks application={getCore().application}>
@@ -225,11 +222,9 @@ class WzConfigurationSwitch extends Component {
                 updateConfigurationSection={this.updateConfigurationSection}
                 badge={badge}
               >
-                {agent.id === '000' && (
-                  <EuiFlexItem grow={false}>
-                    <WzRefreshClusterInfoButton />
-                  </EuiFlexItem>
-                )}
+                <EuiFlexItem grow={false}>
+                  <WzRefreshClusterInfoButton />
+                </EuiFlexItem>
               </WzConfigurationPath>
             )}
             {view === '' &&
@@ -376,20 +371,14 @@ const mapDispatchToProps = dispatch => ({
 
 export default compose(
   withUserAuthorizationPrompt(props => [
-    props.agent.id === '000'
-      ? { action: 'cluster:read', resource: 'node:id:*' }
-      : [
-          { action: 'agent:read', resource: `agent:id:${props.agent.id}` },
-          ...(props.agent.group || []).map(group => ({
-            action: 'agent:read',
-            resource: `agent:group:${group}`,
-          })),
-        ],
+    { action: 'agent:read', resource: `agent:id:${props.agent.id}` },
+    ...(props.agent.group || []).map(group => ({
+      action: 'agent:read',
+      resource: `agent:group:${group}`,
+    })),
   ]),
   withRenderIfOrWrapped(
-    props =>
-      props.agent.id !== '000' &&
-      props.agent.status !== API_NAME_AGENT_STATUS.ACTIVE,
+    props => props.agent.status !== API_NAME_AGENT_STATUS.ACTIVE,
     PromptNoActiveAgentWithoutSelect,
   ),
   connect(mapStateToProps, mapDispatchToProps),

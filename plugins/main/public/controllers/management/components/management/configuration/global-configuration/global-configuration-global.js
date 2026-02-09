@@ -89,8 +89,7 @@ const preludeZeroMQOutputSettings = [
   { field: 'zeromq_uri', label: 'ZeroMQ URI to bind publisher socket' },
 ];
 
-const buildHelpLinks = agent =>
-  agent.id === '000' ? helpLinks : [helpLinks[1]];
+const buildHelpLinks = agent => [helpLinks[1]];
 
 class WzConfigurationGlobalConfigurationGlobal extends Component {
   constructor(props) {
@@ -100,30 +99,13 @@ class WzConfigurationGlobalConfigurationGlobal extends Component {
   render() {
     const { currentConfig, agent, wazuhNotReadyYet } = this.props;
     const mainSettingsConfig =
-      agent.id === '000' &&
-      currentConfig['analysis-global'] &&
-      currentConfig['analysis-global'].global &&
-      currentConfig['com-logging'] &&
-      currentConfig['com-logging'].logging
-        ? {
-            ...currentConfig['analysis-global'].global,
-            plain: currentConfig['com-logging'].logging.plain,
-            json: currentConfig['com-logging'].logging.json,
-          }
-        : currentConfig['com-logging'] && currentConfig['com-logging'].logging
+      currentConfig['com-logging'] && currentConfig['com-logging'].logging
         ? {
             plain: currentConfig['com-logging'].logging.plain,
             json: currentConfig['com-logging'].logging.json,
           }
         : {};
-    const globalSettingsConfig =
-      agent.id === '000' &&
-      currentConfig['analysis-global'] &&
-      currentConfig['analysis-global'].global
-        ? {
-            ...currentConfig['analysis-global'].global,
-          }
-        : {};
+    const globalSettingsConfig = {};
     return (
       <Fragment>
         {currentConfig['analysis-global'] &&
@@ -133,9 +115,7 @@ class WzConfigurationGlobalConfigurationGlobal extends Component {
               help={this.helpLinks}
             />
           )}
-        {agent &&
-          agent.id !== '000' &&
-          currentConfig['com-logging'] &&
+        {currentConfig['com-logging'] &&
           isString(currentConfig['com-logging']) && (
             <WzNoConfig
               error={currentConfig['com-global']}

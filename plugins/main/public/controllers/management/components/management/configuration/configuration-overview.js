@@ -64,13 +64,8 @@ class WzConfigurationOverview extends Component {
   filterSettingsIfAgentOrManager(settings) {
     return settings.filter(
       setting =>
-        (this.props.agent.id !== '000' &&
-          setting.when &&
+        (setting.when &&
           ((isString(setting.when) && setting.when === 'agent') ||
-            (isFunction(setting.when) && setting.when(this.props.agent)))) ||
-        (this.props.agent.id === '000' &&
-          setting.when &&
-          ((isString(setting.when) && setting.when === 'manager') ||
             (isFunction(setting.when) && setting.when(this.props.agent)))) ||
         (isFunction(setting.when) && setting.when(this.props.agent)) ||
         (!setting.when && true),
@@ -95,45 +90,39 @@ class WzConfigurationOverview extends Component {
             <EuiTitle>
               <span>
                 Configuration{' '}
-                {this.props.agent.id !== '000' && (
-                  <WzBadge synchronized={this.props.agentSynchronized} />
-                )}
+                <WzBadge synchronized={this.props.agentSynchronized} />
               </span>
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiFlexGroup gutterSize='s'>
-              {this.props.agent.id === '000' && (
-                <EuiFlexItem grow={false}>
-                  <WzRefreshClusterInfoButton />
-                </EuiFlexItem>
-              )}
-              {this.props.agent.id === '000' && (
-                <EuiFlexItem>
-                  <WzButtonPermissions
-                    buttonType='empty'
-                    permissions={[
-                      this.props.clusterNodeSelected && {
-                        action: 'cluster:update_config',
-                        resource: `node:id:${this.props.clusterNodeSelected}`,
-                      },
-                    ].filter(Boolean)} // Filter falsy values. clusterNodeSelected is initially false on mount
-                    // before cluster data loads, causing [false] in permissions array and TypeError
-                    iconSide='left'
-                    iconType='pencil'
-                    onClick={() =>
-                      this.updateConfigurationSection(
-                        'edit-configuration',
-                        `Cluster configuration`,
-                        '',
-                        'Edit configuration',
-                      )
-                    }
-                  >
-                    Edit configuration
-                  </WzButtonPermissions>
-                </EuiFlexItem>
-              )}
+              <EuiFlexItem grow={false}>
+                <WzRefreshClusterInfoButton />
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <WzButtonPermissions
+                  buttonType='empty'
+                  permissions={[
+                    this.props.clusterNodeSelected && {
+                      action: 'cluster:update_config',
+                      resource: `node:id:${this.props.clusterNodeSelected}`,
+                    },
+                  ].filter(Boolean)} // Filter falsy values. clusterNodeSelected is initially false on mount
+                  // before cluster data loads, causing [false] in permissions array and TypeError
+                  iconSide='left'
+                  iconType='pencil'
+                  onClick={() =>
+                    this.updateConfigurationSection(
+                      'edit-configuration',
+                      `Cluster configuration`,
+                      '',
+                      'Edit configuration',
+                    )
+                  }
+                >
+                  Edit configuration
+                </WzButtonPermissions>
+              </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <WzHelpButtonPopover links={helpLinks} />
               </EuiFlexItem>

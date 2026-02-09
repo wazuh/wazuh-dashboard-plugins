@@ -370,8 +370,7 @@ const WzEditorConfiguration = compose(
       }
     },
     (props, prevProps) =>
-      (props.agent.id === '000' &&
-        props.clusterNodeSelected &&
+      (props.clusterNodeSelected &&
         prevProps.clusterNodeSelected &&
         props.clusterNodeSelected !== prevProps.clusterNodeSelected) ||
       props.refreshTime !== prevProps.refreshTime,
