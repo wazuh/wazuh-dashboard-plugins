@@ -65,6 +65,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Remove files related to indexer resources from the source code and obtained when installing the dependencies of the `wazuh` plugin [#7857](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7857) [#7868](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7868) [#7891](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7891) [#7982](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7982)
 - Removed deprecated settings of Policy monitoring [#8049](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8049)
 - Removed the UI permission validation for the upgrade and remove agent actions on Agent management > Summary [#8060](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8060)
+- Removed customs filters related to agent 000 [#8104](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8104)
 
 ## Wazuh v4.14.4 - OpenSearch Dashboards 2.19.4 - Revision 00
 
