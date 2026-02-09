@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- vm.max_map_count=262144, needed by elastic search to prevent out-of-memory exceptions.
+- vm.max_map_count=262144, needed by Elasticsearch to prevent out-of-memory exceptions.
 
   To modify the vm.max_map_count temporarily, you can run this command:
   `sudo sysctl -w vm.max_map_count=262144`
@@ -51,11 +51,11 @@ Always use the provided script to bring up or down the development environment. 
 ### Parameters
 
 - Action (positional): One of up | down | stop | start | manager-local-up.
-  - `up` launch the containers.
-  - `down` remove the containers, but docker images are not removed.
-  - `stop` containers are not removed, they go into "exited" state, useful to evade optimizing again.
-  - `start` restarting the containers that were in "exited" state.
-  - `manager-local-up` launch only the manager.
+  - `up` Launches the containers.
+  - `down` Removes the containers.
+  - `stop` Stops the containers, they go into "exited" state, useful to avoid re-optimization.
+  - `start` Restarts the containers that were in "exited" state.
+  - `manager-local-up` Launches only the manager.
 - -os <os_version> : (Optional) Specifies the OpenSearch version. If not provided, it's obtained from plugins/wazuh-core/package.json .
 - -osd <osd_version> : (Optional) Specifies the OpenSearch Dashboards version. If not provided, it's obtained from plugins/wazuh-core/package.json .
 - -a <agents_up> : (Optional) Relevant when using server-local mode. Specifies agent deployment:
@@ -190,7 +190,7 @@ The script will not select the appropriate version of the wazuh-dashboard-plugin
 
 ### Launch UI
 
-- Once the docker containers are online use yarn start command to launch the UI:
+- Once the docker containers are online, use yarn start command to launch the UI:
   - Find the osd-dev container_id:
     `docker ps`
   - Enter the shell.
@@ -209,7 +209,7 @@ The script will not select the appropriate version of the wazuh-dashboard-plugin
 
     ```bash
     Enter the git reference (branch/tag) of the current source code. This reference will be used to get
-    the referece in the indexer git repository to update the resource files (e.g., main, develop):
+    the reference in the indexer git repository to update the resource files (e.g., main, develop):
     ```
 
     Write: `main`
