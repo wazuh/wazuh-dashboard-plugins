@@ -80,7 +80,6 @@ class WzConfigurationSwitch extends Component {
       view: '',
       viewProps: {},
       agentSynchronized: undefined,
-      masterNodeInfo: undefined,
       loadingOverview: false,
     };
   }
@@ -150,28 +149,9 @@ class WzConfigurationSwitch extends Component {
     }
   };
 
-  fetchMasterNodeInfo = async (/** @type {string} */ context) => {
-    this.setState({ loadingOverview: true });
-
-    try {
-      const masterNodeInfo = await WzRequest.apiReq(
-        'GET',
-        '/agents?agents_list=000',
-        {},
-      );
-      const masterNode = masterNodeInfo.data.data.affected_items[0];
-      this.setState({ masterNodeInfo: masterNode });
-    } catch (error) {
-      this.catchError(error, context);
-    } finally {
-      this.setState({ loadingOverview: false });
-    }
-  };
-
   handleAgentOrClusterUpdate = (/** @type {string} */ context) => {
     this.updateAgentSynchronization(context);
     this.updateClusterInformation(context);
-    this.fetchMasterNodeInfo();
   };
 
   async componentDidMount() {
@@ -189,7 +169,6 @@ class WzConfigurationSwitch extends Component {
       view,
       viewProps: { title, description, badge },
       agentSynchronized,
-      masterNodeInfo,
     } = this.state;
     const { agent } = this.props; // TODO: goGroups and exportConfiguration is used for Manager and depends of AngularJS
     return (
@@ -227,14 +206,13 @@ class WzConfigurationSwitch extends Component {
                 </EuiFlexItem>
               </WzConfigurationPath>
             )}
-            {view === '' &&
-              ((!this.state.loadingOverview && (
-                <WzConfigurationOverview
-                  agent={masterNodeInfo || agent}
-                  agentSynchronized={agentSynchronized}
-                  updateConfigurationSection={this.updateConfigurationSection}
-                />
-              )) || <WzLoading />)}
+            {view === '' && (
+              <WzConfigurationOverview
+                agent={agent}
+                agentSynchronized={agentSynchronized}
+                updateConfigurationSection={this.updateConfigurationSection}
+              />
+            )}
             {view === 'edit-configuration' && (
               <WzConfigurationEditConfiguration
                 clusterNodeSelected={this.props.clusterNodeSelected}

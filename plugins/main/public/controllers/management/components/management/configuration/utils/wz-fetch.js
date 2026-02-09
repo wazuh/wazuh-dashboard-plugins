@@ -17,12 +17,12 @@ import { AGENT_SYNCED_STATUS } from '../../../../../../../common/constants';
 
 /**
  * Get configuration for an agent of request sections
- * @param {string} [agentId=000] Agent ID
+ * @param {string} agentId Agent ID
  * @param {array} sections Sections
  * @param {false} [node=false] Node
  */
 export const getCurrentConfig = async (
-  agentId = '000',
+  agentId,
   sections,
   node = false,
   updateWazuhNotReadyYet,

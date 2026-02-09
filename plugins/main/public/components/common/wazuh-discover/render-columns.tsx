@@ -61,47 +61,35 @@ const renderMitreTechnique = technique => (
 export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
     id: 'wazuh.agent.id',
-    render: value => {
-      if (value === '000') {
-        return value;
-      }
-
-      return (
-        <WzLink
-          appId={endpointSummary.id}
-          path={`/agents?tab=welcome&agent=${value}`}
-          toolTipProps={{
-            content: i18n.translate('discover.fieldLinkTooltip.agent', {
-              defaultMessage: 'Navigate to the agent details',
-            }),
-          }}
-        >
-          {value}
-        </WzLink>
-      );
-    },
+    render: value => (
+      <WzLink
+        appId={endpointSummary.id}
+        path={`/agents?tab=welcome&agent=${value}`}
+        toolTipProps={{
+          content: i18n.translate('discover.fieldLinkTooltip.agent', {
+            defaultMessage: 'Navigate to the agent details',
+          }),
+        }}
+      >
+        {value}
+      </WzLink>
+    ),
   },
   {
     id: 'wazuh.agent.name',
-    render: (value, row) => {
-      if (row.wazuh.agent.id === '000') {
-        return value;
-      }
-
-      return (
-        <WzLink
-          appId={endpointSummary.id}
-          path={`/agents?tab=welcome&agent=${row.wazuh.agent.id}`}
-          toolTipProps={{
-            content: i18n.translate('discover.fieldLinkTooltip.agent', {
-              defaultMessage: 'Navigate to the agent details',
-            }),
-          }}
-        >
-          {value}
-        </WzLink>
-      );
-    },
+    render: (value, row) => (
+      <WzLink
+        appId={endpointSummary.id}
+        path={`/agents?tab=welcome&agent=${row.wazuh.agent.id}`}
+        toolTipProps={{
+          content: i18n.translate('discover.fieldLinkTooltip.agent', {
+            defaultMessage: 'Navigate to the agent details',
+          }),
+        }}
+      >
+        {value}
+      </WzLink>
+    ),
   },
   {
     id: 'data.vulnerability.reference',
