@@ -28,7 +28,8 @@ export enum FILTER_OPERATOR {
 }
 
 export class PatternDataSourceFilterManager
-  implements tDataSourceFilterManager {
+  implements tDataSourceFilterManager
+{
   private filterManager: tFilterManager;
   private defaultFetchFilters: tFilter[] = [];
   constructor(
