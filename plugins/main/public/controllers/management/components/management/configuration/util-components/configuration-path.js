@@ -114,11 +114,14 @@ class WzConfigurationPath extends Component {
             </EuiFlexGroup>
           </EuiFlexItem>
           {children ? <Fragment>{children}</Fragment> : null}
-          {this.props.clusterNodes && this.props.clusterNodes.length && (
-            <EuiFlexItem grow={false}>
-              <WzClusterSelect />
-            </EuiFlexItem>
-          )}
+          {/* Only show cluster selector when no agent is pinned */}
+          {!this.props.agent &&
+            this.props.clusterNodes &&
+            this.props.clusterNodes.length && (
+              <EuiFlexItem grow={false}>
+                <WzClusterSelect />
+              </EuiFlexItem>
+            )}
         </EuiFlexGroup>
         <EuiSpacer size="l" />
         {modal}
@@ -137,7 +140,8 @@ WzConfigurationPath.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  clusterNodes: state.configurationReducers.clusterNodes
+  clusterNodes: state.configurationReducers.clusterNodes,
+  agent: state.appStateReducers.currentAgentData,
 });
 
 export default connect(mapStateToProps)(WzConfigurationPath);

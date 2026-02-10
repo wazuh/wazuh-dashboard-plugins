@@ -22,6 +22,17 @@ import { SECTIONS } from '../../../../../sections';
 export default compose(
   withErrorBoundary,
   withGlobalBreadcrumb(({ agent }) => {
+    if (!agent) {
+      return [
+        {
+          text: settings.breadcrumbLabel,
+          href: NavigationService.getInstance().getUrlForApp(settings.id, {
+            path: `#/${SECTIONS.SETTINGS}`,
+          }),
+        },
+      ];
+    }
+
     const breadcrumb = [
       {
         text: endpointSummary.breadcrumbLabel,

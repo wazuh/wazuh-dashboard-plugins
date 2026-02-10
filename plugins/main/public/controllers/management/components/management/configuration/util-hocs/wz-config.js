@@ -41,10 +41,23 @@ const withWzConfig = sections => WrappedComponent =>
     withLoading(
       async props => {
         try {
+          // If no agent, use clusterNodeSelected as fallback
+          const agentId = props.agent?.id || props.clusterNodeSelected;
+          if (!agentId) {
+            // If there's no agent or clusterNodeSelected, we can't get configuration
+            return {
+              ...props,
+              currentConfig: {},
+              error: 'No agent or cluster node available',
+            };
+          }
+
+          // Use clusterNodeSelected only if there's no agent (manager context)
+          const node = props.agent?.id ? false : props.clusterNodeSelected;
           const currentConfig = await getCurrentConfig(
-            props.agent.id,
+            agentId,
             sections,
-            props.clusterNodeSelected,
+            node,
             props.updateWazuhNotReadyYet,
           );
           return { ...props, currentConfig };

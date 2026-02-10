@@ -35,6 +35,9 @@ const WzManagementMain = props => (
     <Route path='?tab=logs'>
       <WzLogs />
     </Route>
+    <Route path='?tab=configuration'>
+      <WzConfiguration />
+    </Route>
   </Switch>
 );
 

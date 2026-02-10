@@ -32,7 +32,18 @@ class WzConfigurationGlobalConfiguration extends Component {
     const { agent } = this.props;
     return (
       <Fragment>
-        <WzConfigurationGlobalConfigurationGlobal {...this.props} />
+        {!agent ? (
+          <WzTabSelector>
+            <WzTabSelectorTab label='Global'>
+              <WzConfigurationGlobalConfigurationGlobal {...this.props} />
+            </WzTabSelectorTab>
+            <WzTabSelectorTab label='Remote'>
+              <WzConfigurationGlobalConfigurationRemote {...this.props} />
+            </WzTabSelectorTab>
+          </WzTabSelector>
+        ) : (
+          <WzConfigurationGlobalConfigurationGlobal {...this.props} />
+        )}
       </Fragment>
     );
   }

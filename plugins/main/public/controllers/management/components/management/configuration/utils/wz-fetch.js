@@ -57,20 +57,28 @@ export const getCurrentConfig = async (
 
         const partialResult = await WzRequest.apiReq('GET', url, {});
 
-        /*
-         * I need to check the amount of properties and use the first one in case there's only one
-         * because the /agents/{agent_id}/config/logcollector/socket response has property named "target" instead of "socket" in versions before Wazuh 4.9.0
-         * this allows to interprete any property name in the response
-         */
-        const configKeys = Object.keys(partialResult.data.data);
-        const configPropertyName =
-          configKeys.length === 1 ? configKeys[0] : configuration;
+        // For cluster, the response comes in affected_items
+        if (node) {
+          result[`${component}-${configuration}`] =
+            partialResult.data.data.total_affected_items !== 0
+              ? partialResult.data.data.affected_items[0]
+              : {};
+        } else {
+          /*
+           * I need to check the amount of properties and use the first one in case there's only one
+           * because the /agents/{agent_id}/config/logcollector/socket response has property named "target" instead of "socket" in versions before Wazuh 4.9.0
+           * this allows to interprete any property name in the response
+           */
+          const configKeys = Object.keys(partialResult.data.data);
+          const configPropertyName =
+            configKeys.length === 1 ? configKeys[0] : configuration;
 
-        result[`${component}-${configuration}`] = partialResult.data.data[
-          configPropertyName
-        ]
-          ? partialResult.data.data
-          : {};
+          result[`${component}-${configuration}`] = partialResult.data.data[
+            configPropertyName
+          ]
+            ? partialResult.data.data
+            : {};
+        }
       } catch (error) {
         result[`${component}-${configuration}`] = await handleError(
           error,

@@ -85,7 +85,9 @@ const mainSettings = [
 ];
 
 const mainSettingsOfAgentOrManager = agent =>
-  mainSettings.filter(setting => setting.when !== 'manager');
+  agent
+    ? mainSettings.filter(setting => setting.when !== 'manager')
+    : mainSettings;
 
 class WzConfigurationIntegrityMonitoringGeneral extends Component {
   constructor(props) {
