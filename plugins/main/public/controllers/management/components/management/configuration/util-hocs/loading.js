@@ -53,7 +53,6 @@ const withLoading = (
       }
     }
     async componentDidUpdate(prevProps){
-      // if(this.props.agent.id === '000' && this.props.clusterNodeSelected && prevProps.clusterNodeSelected && this.props.clusterNodeSelected !== prevProps.clusterNodeSelected){
       if(didUpdateConditionRecharge && didUpdateConditionRecharge(this.props, prevProps)){
         try {
           this.setState({isLoading: true, error: false, wrappedProps: undefined })

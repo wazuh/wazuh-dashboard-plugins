@@ -44,7 +44,7 @@ import { RemoveAgentModal } from './actions/remove-agent-modal';
 
 const searchBarWQLOptions = {
   implicitQuery: {
-    query: 'id!=000',
+    query: '',
     conjunction: ';',
   },
 };
@@ -62,7 +62,7 @@ interface AgentsTableProps {
 
 export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   const defaultFilters = {
-    default: { q: 'id!=000' },
+    default: { q: '' },
     ...(sessionStorage.getItem('wz-agents-overview-table-filter')
       ? JSON.parse(sessionStorage.getItem('wz-agents-overview-table-filter'))
       : {}),

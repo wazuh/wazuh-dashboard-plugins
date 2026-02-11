@@ -94,7 +94,7 @@ export default class StatusHandler {
         params: {
           limit: 1,
           sort: '-dateAdd',
-          q: 'id!=000',
+          q: '',
         },
       });
       return result;

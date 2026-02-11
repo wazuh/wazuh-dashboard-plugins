@@ -17,7 +17,7 @@ describe('SearchBar component', () => {
         id: WQL.id,
         options: {
           implicitQuery: {
-            query: 'id!=000',
+            query: '',
             conjunction: ';',
           },
         },

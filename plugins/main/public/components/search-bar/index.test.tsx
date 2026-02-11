@@ -9,7 +9,7 @@ describe('SearchBar component', () => {
     modes: [
       {
         id: 'aql',
-        implicitQuery: 'id!=000;',
+        implicitQuery: '',
         suggestions: {
           field(currentValue) {
             return [];
@@ -22,7 +22,7 @@ describe('SearchBar component', () => {
       {
         id: 'wql',
         implicitQuery: {
-          query: 'id!=000',
+          query: '',
           conjunction: ';'
         },
         suggestions: {

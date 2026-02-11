@@ -24,7 +24,7 @@ import { getAgentOSType } from '../../../../react-services';
 
 const searchBarWQLOptions = {
   implicitQuery: {
-    query: 'id!=000',
+    query: '',
     conjunction: ';',
   },
 };
@@ -33,7 +33,7 @@ export class AgentSelectionTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filters: { default: { q: 'id!=000' } },
+      filters: { default: { q: '' } },
     };
     this.pinnedAgentManager = new PinnedAgentManager();
     this.columns = [
@@ -134,7 +134,7 @@ export class AgentSelectionTable extends Component {
   filterGroupBadge = group => {
     this.setState({
       filters: {
-        default: { q: 'id!=000' },
+        default: { q: '' },
         q: `group=${group}`,
       },
     });
