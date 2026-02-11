@@ -78,9 +78,7 @@ export const EndpointsSummary = compose(
 
     filterAgentByOS(item: any) {
       const query =
-        item.label === 'N/A'
-          ? 'os.platform=null'
-          : `os.platform~${item.label}`;
+        item.label === 'N/A' ? 'os.platform=null' : `os.platform~${item.label}`;
       this._isMount &&
         this.setState({
           agentTableFilters: { q: query },
@@ -88,10 +86,7 @@ export const EndpointsSummary = compose(
     }
 
     filterAgentByGroup(item: any) {
-      const query =
-        item.label === 'N/A'
-          ? 'group=null'
-          : `group=${item.label}`;
+      const query = item.label === 'N/A' ? 'group=null' : `group=${item.label}`;
       this._isMount &&
         this.setState({
           agentTableFilters: { q: query },

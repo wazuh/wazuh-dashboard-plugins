@@ -17,84 +17,92 @@ import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 
-const withLoading = (
-  load,
-  didUpdateConditionRecharge,
-  LoadingComponent,
-  ErrorComponent
-) => WrappedComponent => {
-  LoadingComponent = LoadingComponent || WzLoading;
-  class WithLoading extends Component {
-    constructor(props) {
-      super(props);
-      this.state = {
-        isLoading: true,
-        error: false,
-        wrappedProps: undefined
-      };
-    }
-    async componentDidMount() {
-      try {
-        const wrappedProps = await load(this.props);
-        this.setState({ isLoading: false, error: false, wrappedProps });
-      } catch (error) {
-        this.setState({ isLoading: false, error, wrappedProps: undefined });
-        const options = {
-          context: `${WithLoading.name}.componentDidMount`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: error.name || error
-          },
+const withLoading =
+  (load, didUpdateConditionRecharge, LoadingComponent, ErrorComponent) =>
+  WrappedComponent => {
+    LoadingComponent = LoadingComponent || WzLoading;
+    class WithLoading extends Component {
+      constructor(props) {
+        super(props);
+        this.state = {
+          isLoading: true,
+          error: false,
+          wrappedProps: undefined,
         };
-        getErrorOrchestrator().handleError(options);
       }
-    }
-    async componentDidUpdate(prevProps){
-      if(didUpdateConditionRecharge && didUpdateConditionRecharge(this.props, prevProps)){
+      async componentDidMount() {
         try {
-          this.setState({isLoading: true, error: false, wrappedProps: undefined })
           const wrappedProps = await load(this.props);
-          this.setState({ isLoading: false, wrappedProps });
+          this.setState({ isLoading: false, error: false, wrappedProps });
         } catch (error) {
           this.setState({ isLoading: false, error, wrappedProps: undefined });
           const options = {
-            context: `${WithLoading.name}.componentDidUpdate`,
+            context: `${WithLoading.name}.componentDidMount`,
             level: UI_LOGGER_LEVELS.ERROR,
             severity: UI_ERROR_SEVERITIES.BUSINESS,
             error: {
               error: error,
-              message: error.message || error,
-              title: error.name || error
+              message: error.message || error,
+              title: error.name || error,
             },
           };
           getErrorOrchestrator().handleError(options);
         }
       }
+      async componentDidUpdate(prevProps) {
+        if (
+          didUpdateConditionRecharge &&
+          didUpdateConditionRecharge(this.props, prevProps)
+        ) {
+          try {
+            this.setState({
+              isLoading: true,
+              error: false,
+              wrappedProps: undefined,
+            });
+            const wrappedProps = await load(this.props);
+            this.setState({ isLoading: false, wrappedProps });
+          } catch (error) {
+            this.setState({ isLoading: false, error, wrappedProps: undefined });
+            const options = {
+              context: `${WithLoading.name}.componentDidUpdate`,
+              level: UI_LOGGER_LEVELS.ERROR,
+              severity: UI_ERROR_SEVERITIES.BUSINESS,
+              error: {
+                error: error,
+                message: error.message || error,
+                title: error.name || error,
+              },
+            };
+            getErrorOrchestrator().handleError(options);
+          }
+        }
+      }
+      render() {
+        const { error, isLoading, wrappedProps } = this.state;
+        return (
+          <Fragment>
+            {(!error &&
+              (isLoading ? (
+                <LoadingComponent />
+              ) : (
+                <WrappedComponent {...wrappedProps} {...this.props} />
+              ))) ||
+              (error && ErrorComponent && (
+                <ErrorComponent
+                  error={error}
+                  {...wrappedProps}
+                  {...this.props}
+                />
+              ))}
+          </Fragment>
+        );
+      }
     }
-    render() {
-      const { error, isLoading, wrappedProps } = this.state;
-      return (
-        <Fragment>
-          {(!error &&
-            (isLoading ? (
-              <LoadingComponent />
-            ) : (
-              <WrappedComponent {...wrappedProps} {...this.props} />
-            ))) ||
-            (error && ErrorComponent && (
-              <ErrorComponent error={error} {...wrappedProps} {...this.props} />
-            ))}
-        </Fragment>
-      );
-    }
-  }
-  WithLoading.displayName = `WithLoading(${WrappedComponent.displayName ||
-    WrappedComponent.name ||
-    'Component'})`;
-  return WithLoading;
-};
+    WithLoading.displayName = `WithLoading(${
+      WrappedComponent.displayName || WrappedComponent.name || 'Component'
+    })`;
+    return WithLoading;
+  };
 
 export default withLoading;
