@@ -35,7 +35,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed `rule.groups` filter to `wazuh.integration.decoders` [#7934](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7934)
 - Applied the new home page navigation style to all dashboards [#7981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7981)
 - Updated GitHub dashboards to use new index pattern [#8072](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8072)
-- Reintroduce Google Cloud dashboard [#8069](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8069)
+- Updated File Integrity Monitoring dashboards to use new index pattern [#8044](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8044)
+- Updated Google Cloud dashboard to use new index pattern [#8069](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8069)
+- Updated Microsoft Graph API dashboard to use new index pattern [#8073](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8073)
 
 ### Fixed
 
@@ -77,8 +79,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed `indexDate` function to correctly handle ISO week-year calculation for weekly indices [#8047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8047)
 - Fixed the status code and body displayed in failed requests in Server management > Dev tools as internal server error [#8052](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8052)
+- Fixed saving of valid Windows EventChannel QueryList queries in agent.conf editor [#8087](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8087)
 
-## Wazuh v4.14.3 - OpenSearch Dashboards 2.19.4 - Revision 02
+## Wazuh v4.14.3 - OpenSearch Dashboards 2.19.4 - Revision 03
 
 ### Added
 
