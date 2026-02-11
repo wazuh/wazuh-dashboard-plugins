@@ -94,42 +94,37 @@ const buildHelpLinks = agent => [helpLinks[1]];
 class WzConfigurationGlobalConfigurationGlobal extends Component {
   constructor(props) {
     super(props);
-    this.helpLinks = buildHelpLinks(this.props.agent);
   }
   render() {
     const { currentConfig, agent, wazuhNotReadyYet } = this.props;
-    const mainSettingsConfig =
-      currentConfig['com-logging'] && currentConfig['com-logging'].logging
-        ? {
-            plain: currentConfig['com-logging'].logging.plain,
-            json: currentConfig['com-logging'].logging.json,
-          }
-        : {};
-    const globalSettingsConfig = {};
+    const helpLinks = buildHelpLinks(agent);
+    const mainSettingsConfig = currentConfig['com-logging']?.logging
+      ? {
+          plain: currentConfig['com-logging'].logging.plain,
+          json: currentConfig['com-logging'].logging.json,
+        }
+      : {};
     return (
       <Fragment>
         {currentConfig['analysis-global'] &&
           isString(currentConfig['analysis-global']) && (
             <WzNoConfig
               error={currentConfig['analysis-global']}
-              help={this.helpLinks}
+              help={helpLinks}
             />
           )}
         {currentConfig['com-logging'] &&
           isString(currentConfig['com-logging']) && (
-            <WzNoConfig
-              error={currentConfig['com-global']}
-              help={this.helpLinks}
-            />
+            <WzNoConfig error={currentConfig['com-global']} help={helpLinks} />
           )}
         {currentConfig['analysis-global'] &&
           !isString(currentConfig['analysis-global']) &&
           !currentConfig['analysis-global'].global && (
-            <WzNoConfig error='not-present' help={this.helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {wazuhNotReadyYet &&
           (!currentConfig || !currentConfig['analysis-global']) && (
-            <WzNoConfig error='Server not ready yet' help={this.helpLinks} />
+            <WzNoConfig error='Server not ready yet' help={helpLinks} />
           )}
         {((currentConfig['analysis-global'] &&
           currentConfig['analysis-global'].global) ||
@@ -138,7 +133,7 @@ class WzConfigurationGlobalConfigurationGlobal extends Component {
           <WzConfigurationSettingsHeader
             title='Main settings'
             description='Basic alerts and logging settings'
-            help={this.helpLinks}
+            help={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={mainSettingsConfig}

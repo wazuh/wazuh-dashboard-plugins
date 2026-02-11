@@ -64,23 +64,16 @@ class WzConfigurationOverview extends Component {
   filterSettingsIfAgentOrManager(settings) {
     const isManager = !this.props.agent;
     return settings.filter(setting => {
-      // If no 'when' property, show for both
-      if (!setting.when) {
-        return true;
-      }
+      if (!setting.when) return true;
 
-      // If 'when' is a function, evaluate it
       if (isFunction(setting.when)) {
         return setting.when(this.props.agent);
       }
 
-      // If 'when' is a string
       if (isString(setting.when)) {
-        if (isManager) {
-          return setting.when === 'manager';
-        } else {
-          return setting.when === 'agent';
-        }
+        return isManager
+          ? setting.when === 'manager'
+          : setting.when === 'agent';
       }
 
       return false;
@@ -88,12 +81,10 @@ class WzConfigurationOverview extends Component {
   }
   filterSettings(groups) {
     return groups
-      .map(group => {
-        return {
-          title: group.title,
-          settings: this.filterSettingsIfAgentOrManager(group.settings),
-        };
-      })
+      .map(group => ({
+        title: group.title,
+        settings: this.filterSettingsIfAgentOrManager(group.settings),
+      }))
       .filter(group => group.settings.length);
   }
   render() {
