@@ -20,5 +20,5 @@ export const DashboardFIM = createDashboard({
       agentDashboardId: FIM_AGENT_DASHBOARD_ID,
     },
   ],
-  sampleDataWarningCategories: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+  // sampleDataWarningCategories: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
 });
