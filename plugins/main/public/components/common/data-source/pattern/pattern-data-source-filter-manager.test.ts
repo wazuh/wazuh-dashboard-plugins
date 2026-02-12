@@ -78,7 +78,6 @@ class DataSourceMocked implements PatternDataSource {
   }
   getClusterFilters = mockedGetFilters;
   getPinnedAgentFilter = mockedGetFilters;
-  getExcludeManagerFilter = mockedGetFilters;
 }
 
 const createFilter = (id: string, value: string, index: string): tFilter => {
@@ -345,17 +344,6 @@ describe('PatternDataSourceFilterManager', () => {
   });
 
   describe('wazuh filters', () => {
-    it('should return the filters to fetch the data merging the filters stored without the excluded manager filter when is not defined', () => {
-      (store.getState as jest.Mock).mockReturnValue({
-        appConfig: {
-          data: {},
-        },
-      });
-      const filter =
-        PatternDataSourceFilterManager.getExcludeManagerFilter('index-title');
-      expect(filter.length).toBe(0);
-    });
-
     // FIXME:
     it.skip('should return the fixed filters merged with the pinned agent filter when correspond', () => {
       // mock store.getState
