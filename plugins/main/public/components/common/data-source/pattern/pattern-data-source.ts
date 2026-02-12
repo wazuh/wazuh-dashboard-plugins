@@ -41,7 +41,7 @@ export class PatternDataSource implements tDataSource {
   }
 
   getFetchFilters(): tFilter[] {
-    return [...this.getExcludeManagerFilter()];
+    return [];
   }
 
   async select() {
@@ -124,9 +124,5 @@ export class PatternDataSource implements tDataSource {
    */
   getPinnedAgentFilter(): tFilter[] {
     return PatternDataSourceFilterManager.getPinnedAgentFilter(this.id);
-  }
-
-  getExcludeManagerFilter(): tFilter[] {
-    return PatternDataSourceFilterManager.getExcludeManagerFilter(this.id);
   }
 }
