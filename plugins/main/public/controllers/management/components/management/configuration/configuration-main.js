@@ -22,24 +22,27 @@ import { SECTIONS } from '../../../../../sections';
 export default compose(
   withErrorBoundary,
   withGlobalBreadcrumb(({ agent }) => {
-    let breadcrumb = false;
-    if (agent?.id === '000') {
-      breadcrumb = [{ text: settings.breadcrumbLabel }];
-    } else {
-      breadcrumb = [
+    if (!agent) {
+      return [
         {
-          text: endpointSummary.breadcrumbLabel,
-          href: NavigationService.getInstance().getUrlForApp(
-            endpointSummary.id,
-            {
-              path: `#/${SECTIONS.AGENTS_PREVIEW}`,
-            },
-          ),
+          text: settings.breadcrumbLabel,
+          href: NavigationService.getInstance().getUrlForApp(settings.id, {
+            path: `#/${SECTIONS.SETTINGS}`,
+          }),
         },
-        { agent },
-        { text: 'Configuration' },
       ];
     }
+
+    const breadcrumb = [
+      {
+        text: endpointSummary.breadcrumbLabel,
+        href: NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
+          path: `#/${SECTIONS.AGENTS_PREVIEW}`,
+        }),
+      },
+      { agent },
+      { text: 'Configuration' },
+    ];
     document.querySelector('#breadcrumbNoTitle')?.setAttribute('title', '');
     return breadcrumb;
   }),
