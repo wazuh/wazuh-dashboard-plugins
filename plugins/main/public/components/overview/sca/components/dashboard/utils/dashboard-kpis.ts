@@ -55,7 +55,7 @@ const checkScore = (indexPatternId: string) => ({
           y: { signal: 'height / 2' },
           align: { value: 'center' },
           baseline: { value: 'middle' },
-          text: { signal: `format(datum.score, '${decimalFormat()}') + '%'` },
+          text: { signal: `format(datum.score, '${decimalFormat().param('pattern')}')` },
           fontSize: { value: 53.333 },
           fontWeight: { value: 700 },
           font: {
