@@ -34,7 +34,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed dashboards renderer by saved objects [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842) [#7847](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7847) [#7916](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7916) [#7938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7938)
 - Changed `rule.groups` filter to `wazuh.integration.decoders` [#7934](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7934)
 - Applied the new home page navigation style to all dashboards [#7981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7981)
-- Reintroduce Google Cloud dashboard [#8069](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8069)
+- Updated Office 365 dashboards to use new index pattern [#8081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8081)
+- Updated GitHub dashboards to use new index pattern [#8072](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8072)
+- Updated File Integrity Monitoring dashboards to use new index pattern [#8044](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8044)
+- Updated Google Cloud dashboard to use new index pattern [#8069](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8069)
+- Updated Microsoft Graph API dashboard to use new index pattern [#8073](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8073)
+- Updated Threat Hunting dashboard with new index pattern definition [#8063](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8063)
 
 ### Fixed
 
@@ -66,6 +71,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed deprecated settings of Policy monitoring [#8049](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8049)
 - Removed the UI permission validation for the upgrade and remove agent actions on Agent management > Summary [#8060](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8060)
 - Removed settings related to agent 000 [#8102](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8102)
+- Removed customs filters related to agent 000 [#8104](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8104)
 
 ## Wazuh v4.14.4 - OpenSearch Dashboards 2.19.4 - Revision 00
 
