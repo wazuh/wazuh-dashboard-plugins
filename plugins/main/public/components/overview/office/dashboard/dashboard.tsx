@@ -16,5 +16,5 @@ export const DashboardOffice365 = createDashboard({
       agentDashboardId: OFFICE_365_DASHBOARD_ID,
     },
   ],
-  sampleDataWarningCategories: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+  // sampleDataWarningCategories: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
 });

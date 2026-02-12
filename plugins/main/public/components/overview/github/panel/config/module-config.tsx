@@ -23,12 +23,11 @@ import { IndexPattern } from '../../../../../../src/plugins/data/public';
 
 export const ModuleConfig = {
   main: {
-    component:
-      props => {
-        return <Main {...{ ...MainViewConfig(props), ...props }} />
-      }
+    component: props => {
+      return <Main {...{ ...MainViewConfig(props), ...props }} />;
+    },
   },
-  'data.github.actor': {
+  'user.name': {
     component: props => (
       <Drilldown
         title={'Actor Activity'}
@@ -36,7 +35,7 @@ export const ModuleConfig = {
       />
     ),
   },
-  'data.github.org': {
+  'organization.name': {
     component: props => (
       <Drilldown
         title={'Organization Activity'}
@@ -44,7 +43,7 @@ export const ModuleConfig = {
       />
     ),
   },
-  'data.github.repo': {
+  'github.audit.repo': {
     component: props => (
       <Drilldown
         title={'Repository Activity'}
@@ -52,7 +51,7 @@ export const ModuleConfig = {
       />
     ),
   },
-  'data.github.action': {
+  'event.action': {
     component: props => (
       <Drilldown
         title={'Action Activity'}
