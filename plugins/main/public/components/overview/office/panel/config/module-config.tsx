@@ -26,26 +26,40 @@ import {
  */
 export const ModuleConfig = {
   main: {
-    component: (props) => <OfficeBody {...{ ...MainViewConfig(props), ...props }} />,
-  },
-  'data.office365.UserId': {
-    component: (props) => (
-      <OfficeDrilldown title={'User Activity'} {...{ ...drilldownUserConfig(props), ...props }} />
+    component: props => (
+      <OfficeBody {...{ ...MainViewConfig(props), ...props }} />
     ),
   },
-  'data.office365.ClientIP': {
-    component: (props) => (
-      <OfficeDrilldown title={'Client IP address'} {...{ ...drilldownIPConfig(props), ...props }} />
+  'user.name': {
+    component: props => (
+      <OfficeDrilldown
+        title={'User Activity'}
+        {...{ ...drilldownUserConfig(props), ...props }}
+      />
     ),
   },
-  'data.office365.Operation': {
-    component: (props) => (
-      <OfficeDrilldown title={'Operation'} {...{ ...drilldownOperationsConfig(props), ...props }} />
+  'client.ip': {
+    component: props => (
+      <OfficeDrilldown
+        title={'Client IP address'}
+        {...{ ...drilldownIPConfig(props), ...props }}
+      />
     ),
   },
-  'rule.description': {
-    component: (props) => (
-      <OfficeDrilldown title={'Rule'} {...{ ...drilldownRulesConfig(props), ...props }} />
+  'event.action': {
+    component: props => (
+      <OfficeDrilldown
+        title={'Operation'}
+        {...{ ...drilldownOperationsConfig(props), ...props }}
+      />
+    ),
+  },
+  'event.type': {
+    component: props => (
+      <OfficeDrilldown
+        title={'Event Type'}
+        {...{ ...drilldownRulesConfig(props), ...props }}
+      />
     ),
   },
 };
