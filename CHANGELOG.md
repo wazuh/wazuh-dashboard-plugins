@@ -72,6 +72,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the UI permission validation for the upgrade and remove agent actions on Agent management > Summary [#8060](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8060)
 - Removed settings related to agent 000 [#8102](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8102)
 - Removed customs filters related to agent 000 [#8104](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8104)
+- Removed agent.id 000 conditionals from the Management settings components [#8105](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8105)
 
 ## Wazuh v4.14.4 - OpenSearch Dashboards 2.19.4 - Revision 00
 
