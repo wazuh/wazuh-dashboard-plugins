@@ -383,15 +383,6 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
       SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
     ),
   },
-  hideManagerAlerts: {
-    title: 'Hide manager alerts',
-    description: 'Hide the alerts of the manager in every dashboard.',
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.switch,
-    defaultValue: false,
-    validate: SettingsValidator.isBoolean,
-  },
   /* `# The following configuration is the default structure to define a host.
 #
 # hosts:
@@ -653,7 +644,6 @@ export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
 // TODO: review if required
 // uiSettings
 
-export const HIDE_MANAGER_ALERTS_SETTING = 'hideManagerAlerts';
 export const ENROLLMENT_DNS = 'enrollment.dns';
 export const ENROLLMENT_PASSWORD = 'enrollment.password';
 export const WAZUH_UPDATES_DISABLED = 'wazuh.updates.disabled';

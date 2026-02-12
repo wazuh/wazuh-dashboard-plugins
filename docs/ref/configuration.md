@@ -63,7 +63,6 @@ Wazuh dashboard adds the following settings that can be configured in tenant lev
 | Setting                | Description                                                | Default value | Allowed values                |
 | ---------------------- | ---------------------------------------------------------- | ------------- | ----------------------------- |
 | enrollment.dns         | Define the Wazuh server DNS for the guide to deploy agents | ''            | any valid DNS or IP           |
-| hideManagerAlerts      | Define if the alerts of Wazuh server should be hidden      | false         | true, false                   |
 | reports.csv.maxRows    | Define the maximum rows to exports in some tables          | 10000         | any number starting from 0    |
 | timeout                | Define the timeout for some requests done from UI          | 20000         | any number starting from 1500 |
 | wazuh.updates.disabled | Define if the updates check is disabled                    | false         | true, false                   |

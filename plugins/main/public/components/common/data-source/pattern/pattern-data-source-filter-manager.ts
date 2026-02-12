@@ -14,31 +14,6 @@ import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector
 import { FilterStateStore } from '../../../../../common/constants';
 import { ErrorDataSourceServerAPIContextFilter } from '../../../../utils/errors';
 
-const MANAGER_AGENT_ID = '000';
-const AGENT_ID_KEY = 'agent.id';
-
-/**
- * Get the filter that excludes the data related to Wazuh servers
- * @param indexPatternId Index pattern id
- * @returns
- */
-export function getFilterExcludeManager(indexPatternId: string) {
-  return {
-    meta: {
-      alias: null,
-      disabled: false,
-      key: AGENT_ID_KEY,
-      negate: true,
-      params: { query: MANAGER_AGENT_ID },
-      type: 'phrase',
-      index: indexPatternId,
-      controlledBy: DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
-    },
-    query: { match_phrase: { [AGENT_ID_KEY]: MANAGER_AGENT_ID } },
-    $state: { store: FilterStateStore.APP_STATE },
-  };
-}
-
 export enum FILTER_OPERATOR {
   IS = 'is',
   IS_NOT = 'is not',
@@ -302,19 +277,6 @@ export class PatternDataSourceFilterManager
         PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
       ),
     ];
-  }
-
-  /**
-   * Return the filter to exclude the data related to servers (managers) due to the setting hideManagerAlerts is enabled
-   */
-  static getExcludeManagerFilter(indexPatternId: string): tFilter[] {
-    if (store.getState().appConfig?.data?.hideManagerAlerts) {
-      let excludeManagerFilter = getFilterExcludeManager(
-        indexPatternId,
-      ) as tFilter;
-      return [excludeManagerFilter];
-    }
-    return [];
   }
 
   /******************************************************************/

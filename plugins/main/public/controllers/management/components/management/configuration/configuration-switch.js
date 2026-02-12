@@ -80,8 +80,7 @@ class WzConfigurationSwitch extends Component {
       view: '',
       viewProps: {},
       agentSynchronized: undefined,
-      masterNodeInfo: undefined,
-      loadingOverview: this.props.agent.id === '000',
+      loadingOverview: false,
     };
   }
 
@@ -116,6 +115,10 @@ class WzConfigurationSwitch extends Component {
 
   updateAgentSynchronization = async (/** @type {string} */ context) => {
     // If agent, check if is synchronized or not
+    if (!this.props.agent) {
+      // No agent (manager), no need to verify synchronization
+      return;
+    }
     try {
       const agentSynchronized = await agentIsSynchronized(this.props.agent);
       this.setState({ agentSynchronized });
@@ -150,31 +153,9 @@ class WzConfigurationSwitch extends Component {
     }
   };
 
-  fetchMasterNodeInfo = async (/** @type {string} */ context) => {
-    this.setState({ loadingOverview: true });
-
-    try {
-      const masterNodeInfo = await WzRequest.apiReq(
-        'GET',
-        '/agents?agents_list=000',
-        {},
-      );
-      const masterNode = masterNodeInfo.data.data.affected_items[0];
-      this.setState({ masterNodeInfo: masterNode });
-    } catch (error) {
-      this.catchError(error, context);
-    } finally {
-      this.setState({ loadingOverview: false });
-    }
-  };
-
   handleAgentOrClusterUpdate = (/** @type {string} */ context) => {
-    if (this.props.agent.id !== '000') {
-      this.updateAgentSynchronization(context);
-    } else {
-      this.updateClusterInformation(context);
-      this.fetchMasterNodeInfo();
-    }
+    this.updateAgentSynchronization(context);
+    this.updateClusterInformation(context);
   };
 
   async componentDidMount() {
@@ -182,8 +163,15 @@ class WzConfigurationSwitch extends Component {
   }
 
   async componentDidUpdate(prevProps) {
-    if (this.props.agent.id !== prevProps.agent.id) {
+    if (this.props.agent?.id !== prevProps.agent?.id) {
       this.handleAgentOrClusterUpdate('componentDidUpdate');
+
+      // Reset view if switching between manager/agent contexts
+      const wasManager = !prevProps.agent;
+      const isManager = !this.props.agent;
+      if (wasManager !== isManager && this.state.view !== '') {
+        this.setState({ view: '' });
+      }
     }
   }
 
@@ -192,14 +180,15 @@ class WzConfigurationSwitch extends Component {
       view,
       viewProps: { title, description, badge },
       agentSynchronized,
-      masterNodeInfo,
     } = this.state;
-    const { agent } = this.props; // TODO: goGroups and exportConfiguration is used for Manager and depends of AngularJS
+    const { agent } = this.props;
+    const isManager = !agent; // If no agent, it's manager configuration
+
     return (
       <EuiPage>
         <EuiPageBody>
           <EuiPanel>
-            {agent.id !== '000' && agent.group?.length ? (
+            {agent?.group?.length ? (
               <Fragment>
                 <span>Groups:</span>
                 <RedirectAppLinks application={getCore().application}>
@@ -225,7 +214,8 @@ class WzConfigurationSwitch extends Component {
                 updateConfigurationSection={this.updateConfigurationSection}
                 badge={badge}
               >
-                {agent.id === '000' && (
+                {/* Only show refresh button when no agent is pinned */}
+                {isManager && (
                   <EuiFlexItem grow={false}>
                     <WzRefreshClusterInfoButton />
                   </EuiFlexItem>
@@ -235,7 +225,7 @@ class WzConfigurationSwitch extends Component {
             {view === '' &&
               ((!this.state.loadingOverview && (
                 <WzConfigurationOverview
-                  agent={masterNodeInfo || agent}
+                  agent={agent}
                   agentSynchronized={agentSynchronized}
                   updateConfigurationSection={this.updateConfigurationSection}
                 />
@@ -256,13 +246,6 @@ class WzConfigurationSwitch extends Component {
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='global-configuration-agent'>
-                  <WzConfigurationGlobalConfigurationAgent
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
                 <WzViewSelectorSwitch view='cluster'>
                   <WzConfigurationCluster
                     clusterNodeSelected={this.props.clusterNodeSelected}
@@ -278,32 +261,10 @@ class WzConfigurationSwitch extends Component {
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='client'>
-                  <WzConfigurationClient
+                <WzViewSelectorSwitch view='commands'>
+                  <WzConfigurationCommands
                     clusterNodeSelected={this.props.clusterNodeSelected}
                     agent={agent}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='client-buffer'>
-                  <WzConfigurationClientBuffer
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='alerts-agent'>
-                  <WzConfigurationAlertsLabelsAgent
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='policy-monitoring'>
-                  <WzConfigurationPolicyMonitoring
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateBadge={this.updateBadge}
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
@@ -315,25 +276,19 @@ class WzConfigurationSwitch extends Component {
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='inventory'>
-                  <WzConfigurationInventory
+                <WzViewSelectorSwitch view='policy-monitoring'>
+                  <WzConfigurationPolicyMonitoring
                     clusterNodeSelected={this.props.clusterNodeSelected}
                     agent={agent}
                     updateBadge={this.updateBadge}
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='active-response-agent'>
-                  <WzConfigurationActiveResponseAgent
+                <WzViewSelectorSwitch view='inventory'>
+                  <WzConfigurationInventory
                     clusterNodeSelected={this.props.clusterNodeSelected}
                     agent={agent}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='commands'>
-                  <WzConfigurationCommands
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
+                    updateBadge={this.updateBadge}
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
@@ -352,6 +307,56 @@ class WzConfigurationSwitch extends Component {
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
+
+                {!isManager && (
+                  <>
+                    <WzViewSelectorSwitch view='global-configuration-agent'>
+                      <WzConfigurationGlobalConfigurationAgent
+                        clusterNodeSelected={this.props.clusterNodeSelected}
+                        agent={agent}
+                        updateConfigurationSection={
+                          this.updateConfigurationSection
+                        }
+                      />
+                    </WzViewSelectorSwitch>
+                    <WzViewSelectorSwitch view='client'>
+                      <WzConfigurationClient
+                        clusterNodeSelected={this.props.clusterNodeSelected}
+                        agent={agent}
+                        updateConfigurationSection={
+                          this.updateConfigurationSection
+                        }
+                      />
+                    </WzViewSelectorSwitch>
+                    <WzViewSelectorSwitch view='client-buffer'>
+                      <WzConfigurationClientBuffer
+                        clusterNodeSelected={this.props.clusterNodeSelected}
+                        agent={agent}
+                        updateConfigurationSection={
+                          this.updateConfigurationSection
+                        }
+                      />
+                    </WzViewSelectorSwitch>
+                    <WzViewSelectorSwitch view='alerts-agent'>
+                      <WzConfigurationAlertsLabelsAgent
+                        clusterNodeSelected={this.props.clusterNodeSelected}
+                        agent={agent}
+                        updateConfigurationSection={
+                          this.updateConfigurationSection
+                        }
+                      />
+                    </WzViewSelectorSwitch>
+                    <WzViewSelectorSwitch view='active-response-agent'>
+                      <WzConfigurationActiveResponseAgent
+                        clusterNodeSelected={this.props.clusterNodeSelected}
+                        agent={agent}
+                        updateConfigurationSection={
+                          this.updateConfigurationSection
+                        }
+                      />
+                    </WzViewSelectorSwitch>
+                  </>
+                )}
               </WzViewSelector>
             )}
           </EuiPanel>
@@ -376,20 +381,16 @@ const mapDispatchToProps = dispatch => ({
 
 export default compose(
   withUserAuthorizationPrompt(props => [
-    props.agent.id === '000'
-      ? { action: 'cluster:read', resource: 'node:id:*' }
-      : [
-          { action: 'agent:read', resource: `agent:id:${props.agent.id}` },
-          ...(props.agent.group || []).map(group => ({
-            action: 'agent:read',
-            resource: `agent:group:${group}`,
-          })),
-        ],
+    ...(props.agent?.id
+      ? [{ action: 'agent:read', resource: `agent:id:${props.agent.id}` }]
+      : []),
+    ...(props.agent?.group || []).map(group => ({
+      action: 'agent:read',
+      resource: `agent:group:${group}`,
+    })),
   ]),
   withRenderIfOrWrapped(
-    props =>
-      props.agent.id !== '000' &&
-      props.agent.status !== API_NAME_AGENT_STATUS.ACTIVE,
+    props => props.agent && props.agent.status !== API_NAME_AGENT_STATUS.ACTIVE,
     PromptNoActiveAgentWithoutSelect,
   ),
   connect(mapStateToProps, mapDispatchToProps),

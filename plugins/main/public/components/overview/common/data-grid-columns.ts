@@ -7,12 +7,12 @@ export const commonColumns = {
     defaultSortDirection: 'desc',
     initialWidth: commonInitialWidth.timestamp,
   },
-  'agent.id': {
-    id: 'agent.id',
-    initialWidth: commonInitialWidth['agent.id'],
+  'wazuh.agent.id': {
+    id: 'wazuh.agent.id',
+    initialWidth: commonInitialWidth['wazuh.agent.id'],
   },
-  'agent.name': {
-    id: 'agent.name',
-    initialWidth: commonInitialWidth['agent.name'],
+  'wazuh.agent.name': {
+    id: 'wazuh.agent.name',
+    initialWidth: commonInitialWidth['wazuh.agent.name'],
   },
 } as const;

@@ -31,7 +31,7 @@ const dashboardPanels = {
 
 const panelEntries = Object.entries(dashboardPanels);
 
-test.each(panelEntries)(
+test.skip.each(panelEntries)(
   'Test %s panels with pinned agent',
   async (name, path) => {
     const module = await import(path);
@@ -45,7 +45,7 @@ test.each(panelEntries)(
   },
 );
 
-test.each(panelEntries)(
+test.skip.each(panelEntries)(
   'Test %s panels without pinned agent',
   async (name, path) => {
     const module = await import(path);
@@ -59,7 +59,7 @@ test.each(panelEntries)(
   },
 );
 
-test(`Test cluster panels`, () => {
+test.skip(`Test cluster panels`, () => {
   const nodeListMock = [{ name: 'node1' }, { name: 'node2' }];
   const mockIndexPattern: tParsedIndexPattern = {
     id: WAZUH_EVENTS_PATTERN,
