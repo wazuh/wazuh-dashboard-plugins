@@ -8,6 +8,7 @@
   `sudo sysctl -w vm.max_map_count=262144`
 
   To make the change permanent in host machine:
+
   - In host machine:
     `sudo nano /etc/sysctl.conf`
   - Add at the end of the file: vm.max_map_count=262144
@@ -16,6 +17,7 @@
 
   The jq tool is used by the scripts to process JSON files.
   To install jq, you can run this command:
+
   - In Debian/Ubuntu:
     `sudo apt-get install jq`
   - In RedHat/CentOS:
@@ -113,6 +115,7 @@ Examples (shorthand alias resolves to the canonical folder 'wazuh-security-dashb
 ### Search Order and Precedence (Security Plugin)
 
 - Auto-discovery (no `-r`):
+
   - Looks only at the canonical folder 'wazuh-security-dashboards-plugin' under your <common-parent-directory>.
 
 - Overrides with `-r` (takes precedence):
@@ -190,7 +193,7 @@ The script will not select the appropriate version of the wazuh-dashboard-plugin
 
 ### Launch UI
 
-- Once the docker containers are online, use yarn start command to launch the UI:
+- Once the docker containers are online, use `yarn start` command to launch the UI:
   - Find the osd-dev container_id:
     `docker ps`
   - Enter the shell.
@@ -202,8 +205,9 @@ The script will not select the appropriate version of the wazuh-dashboard-plugin
 #### Warning
 
 - After using the yarn start command, an error about missing dependencies could appear, to fix the dependencies:
+
   - In osd-dev container shell inside `/plugins` folder:
-    `for d in */; do (cd "$d" && yarn install); done`
+    `for d in */; do (cd "$d" && yarn); done`
 
   - If the following line stops the installation of dependencies:
 
@@ -212,9 +216,14 @@ The script will not select the appropriate version of the wazuh-dashboard-plugin
     the reference in the indexer git repository to update the resource files (e.g., main, develop):
     ```
 
-    Write: `main`
+    Provide the branch name of indexre repository to retrieve the resource files and generate in the
+    plugin directory.
 
-Repeat yarn start command.
+    e.g. if working in `main` (or derivated) branch of the plugins, type `main`.
+
+    Note the dashboard plugins repository branch name could be different to the indexer.
+
+Repeat `yarn start --no-base-path` command.
 
 ### UI Credentials
 
