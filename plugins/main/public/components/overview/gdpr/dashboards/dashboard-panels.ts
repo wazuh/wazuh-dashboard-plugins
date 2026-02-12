@@ -44,7 +44,7 @@ const getVisStateTopAgentsByAlertsCount = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             size: 10,
             order: 'desc',
             orderBy: '1',
@@ -427,7 +427,7 @@ const getVisStateRequirementsHeatmap = (indexPatternId: string) => {
           type: 'terms',
           schema: 'group',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -538,7 +538,7 @@ const getVisStateRequirementsByAgent = (indexPatternId: string) => {
           type: 'terms',
           schema: 'group',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             size: 5,
             order: 'desc',
             orderBy: '1',

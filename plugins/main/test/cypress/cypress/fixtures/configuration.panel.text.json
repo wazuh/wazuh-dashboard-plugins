@@ -31,11 +31,6 @@
           "label": "alerts.sample.prefix"
         },
         {
-          "title": "Hide manager alerts",
-          "subTitle": "Hide the alerts of the manager in every dashboard.",
-          "label": "hideManagerAlerts"
-        },
-        {
           "title": "Log level",
           "subTitle": "Logging level of the App.",
           "label": "logs.level"

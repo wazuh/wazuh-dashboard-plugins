@@ -292,7 +292,7 @@ export const getVisStateEvents = (indexPatternId: string): SavedVis => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -300,7 +300,7 @@ export const getVisStateEvents = (indexPatternId: string): SavedVis => {
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'agent.name',
+            customLabel: 'wazuh.agent.name',
           },
           schema: 'bucket',
         },
