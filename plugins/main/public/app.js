@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
 // Require CSS
 import './styles';
 // Font Awesome, plugin platform UI framework and others
