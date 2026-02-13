@@ -122,8 +122,8 @@ const ScaScanTable = ({ dataSourceAction }) => {
       width: '10%',
       sortable: true,
       render: score => {
-        const scoreFormat = decimalFormat();
-        return `${d3.format(scoreFormat)(score * 100)}%`;
+        const scoreFormatter = decimalFormat();
+        return `${scoreFormatter.convert(score)}`;
       },
     },
   ];
