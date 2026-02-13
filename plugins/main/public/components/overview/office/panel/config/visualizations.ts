@@ -57,7 +57,7 @@ export const getVisStateOfficeMetricStats = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Total Alerts',
+            customLabel: 'Total Events',
           },
           schema: 'metric',
         },
@@ -66,12 +66,12 @@ export const getVisStateOfficeMetricStats = (indexPatternId: string) => {
           enabled: true,
           type: 'top_hits',
           params: {
-            field: 'rule.level',
+            field: 'event.type',
             aggregate: 'concat',
             size: 1,
-            sortField: 'rule.level',
+            sortField: 'event.type',
             sortOrder: 'desc',
-            customLabel: 'Max rule level detected',
+            customLabel: 'Max event type detected',
           },
           schema: 'metric',
         },
@@ -83,7 +83,7 @@ export const getVisStateOfficeMetricStats = (indexPatternId: string) => {
 export const getVisStateOfficeTopsEventsPie = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-Office-Top-Events-Pie',
-    title: 'Top Events',
+    title: 'Top Event Actions',
     type: 'pie',
     params: {
       type: 'pie',
@@ -132,7 +132,7 @@ export const getVisStateOfficeTopsEventsPie = (indexPatternId: string) => {
           enabled: false,
           type: 'terms',
           params: {
-            field: 'rule.level',
+            field: 'event.type',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -148,7 +148,7 @@ export const getVisStateOfficeTopsEventsPie = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'rule.description',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -213,7 +213,7 @@ export const getVisStateOfficeUserOperationLevel = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.UserId',
+            field: 'user.id',
             orderBy: '1',
             order: 'desc',
             size: 500,
@@ -230,7 +230,7 @@ export const getVisStateOfficeUserOperationLevel = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.Operation',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 100,
@@ -247,7 +247,7 @@ export const getVisStateOfficeUserOperationLevel = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'rule.level',
+            field: 'event.type',
             orderBy: '1',
             order: 'desc',
             size: 20,
@@ -255,7 +255,7 @@ export const getVisStateOfficeUserOperationLevel = (indexPatternId: string) => {
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'Rule level',
+            customLabel: 'Event Type',
           },
           schema: 'bucket',
         },
@@ -269,7 +269,7 @@ export const getVisStateOfficeAlertsEvolutionByUser = (
 ) => {
   return {
     id: 'Wazuh-App-Overview-Office-Alerts-Evolution-By-User',
-    title: 'Alerts evolution over time',
+    title: 'Office 365 events over time',
     type: 'line',
     params: {
       type: 'line',
@@ -380,7 +380,7 @@ export const getVisStateOfficeAlertsEvolutionByUser = (
           enabled: true,
           type: 'date_histogram',
           params: {
-            field: 'timestamp',
+            field: '@timestamp',
             timeRange: {
               from: 'now-1y',
               to: 'now',
@@ -399,7 +399,7 @@ export const getVisStateOfficeAlertsEvolutionByUser = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.Actor.ID',
+            field: 'event.type',
             orderBy: '1',
             order: 'asc',
             size: 5,
@@ -434,7 +434,10 @@ export const getVisStateTopOfficeUsers = (indexPatternId: string) => {
       },
     },
     uiState: {
-      vis: { params: { sort: { columnIndex: 3, direction: 'desc' } } },
+      vis: {
+        height: 400,
+        params: { sort: { columnIndex: 3, direction: 'desc' } },
+      },
     },
     data: {
       searchSource: {
@@ -465,7 +468,7 @@ export const getVisStateTopOfficeUsers = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.UserId',
+            field: 'user.id',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -484,7 +487,7 @@ export const getVisStateTopOfficeUsers = (indexPatternId: string) => {
 export const getVisStateOfficeCountryTagCloud = (indexPatternId: string) => {
   return {
     id: 'Wazuh-App-Overview-Office-Country-Tag-Cloud',
-    title: 'Country of origin',
+    title: 'Providers',
     type: 'tagcloud',
     params: {
       scale: 'linear',
@@ -525,7 +528,7 @@ export const getVisStateOfficeCountryTagCloud = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'GeoLocation.country_name',
+            field: 'event.provider',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -659,7 +662,7 @@ export const getVisStateOfficeAlertsEvolutionByUserID = (
           enabled: true,
           type: 'date_histogram',
           params: {
-            field: 'timestamp',
+            field: '@timestamp',
             timeRange: {
               from: 'now-1w',
               to: 'now',
@@ -678,7 +681,7 @@ export const getVisStateOfficeAlertsEvolutionByUserID = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.UserId',
+            field: 'user.id',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -745,7 +748,7 @@ export const getVisStateOfficeTopOperations = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.Operation',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -813,7 +816,7 @@ export const getVisStateOfficeClientIPOperationLevelTable = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.ClientIP',
+            field: 'client.ip',
             orderBy: '1',
             order: 'desc',
             size: 500,
@@ -830,7 +833,7 @@ export const getVisStateOfficeClientIPOperationLevelTable = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'data.office365.Operation',
+            field: 'event.action',
             orderBy: '1',
             order: 'desc',
             size: 100,
@@ -838,7 +841,7 @@ export const getVisStateOfficeClientIPOperationLevelTable = (
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'Operation',
+            customLabel: 'Action',
           },
           schema: 'bucket',
         },
@@ -847,7 +850,7 @@ export const getVisStateOfficeClientIPOperationLevelTable = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'rule.level',
+            field: 'event.type',
             orderBy: '1',
             order: 'desc',
             size: 20,
@@ -855,7 +858,7 @@ export const getVisStateOfficeClientIPOperationLevelTable = (
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'Rule level',
+            customLabel: 'Operation',
           },
           schema: 'bucket',
         },

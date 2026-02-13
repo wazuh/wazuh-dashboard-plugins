@@ -1,5 +1,5 @@
 export default [
-  { id: 'agent.name' },
+  { id: 'wazuh.agent.name' },
   { id: 'browser.name' },
   { id: 'package.name' },
   { id: 'package.version' },

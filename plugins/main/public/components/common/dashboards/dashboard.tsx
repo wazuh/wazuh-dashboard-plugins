@@ -6,7 +6,11 @@ import {
 } from '../hocs';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import { useReportingCommunicateSearchContext } from '../hooks/use-reporting-communicate-search-context';
-import { useWithManagedSearchBarFilters, WzSearchBar } from '../search-bar';
+import {
+  useWithManagedSearchBarFilters,
+  WzSearchBar,
+  ManagedFilter,
+} from '../search-bar';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { SampleDataWarning } from '../../visualize/components';
 import { compose } from 'redux';
@@ -138,11 +142,7 @@ export const createDashboard = ({
   DataSourceRepositoryCreator: any;
   sampleDataWarningCategories?: string[];
   managedFilters?: {
-    [key: string]: {
-      managedField: string;
-      component: (props: any) => any;
-      order: number;
-    };
+    [key: string]: ManagedFilter;
   };
   getDashboardPanels: Array<{
     dashboardId: string;

@@ -104,7 +104,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
           },
         },
       };
-      const esValues = await esPieChart.getData(query, 'agent.name');
+      const esValues = await esPieChart.getData(query, 'wazuh.agent.name');
 
       expect(arrayHelper.compareObjects(values, esValues)).to.be.ok();
     });
@@ -220,10 +220,10 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
       const values: object[] = await tableViz.getValues(chartSelector);
 
       const fields = [
-        { field: 'agent.id', label: 'Agent ID' },
-        { field: 'agent.name', label: 'Agent name' },
+        { field: 'wazuh.agent.id', label: 'Agent ID' },
+        { field: 'wazuh.agent.name', label: 'Agent name' },
         { field: 'syscheck.uname_after', label: 'Top user' },
-        { method: 'count', field: 'agent.id', label: 'Count' },
+        { method: 'count', field: 'wazuh.agent.id', label: 'Count' },
       ];
 
       const query: SearchParams = {
@@ -265,7 +265,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
       const values: object[] = await tableViz.getValues(chartSelector);
 
       const fields = [
-        { field: 'agent.name', label: 'Agent' },
+        { field: 'wazuh.agent.name', label: 'Agent' },
         { field: 'syscheck.path', label: 'Path' },
         { field: 'syscheck.event', label: 'Action' },
         { method: 'count', field: 'syscheck.path', label: 'Count' },
@@ -402,7 +402,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
           },
         },
       };
-      const esValues = await esPieChart.getData(query, 'agent.name');
+      const esValues = await esPieChart.getData(query, 'wazuh.agent.name');
 
       expect(arrayHelper.compareObjects(values, esValues)).to.be.ok();
       await filterBar.removeAllFilters();
@@ -549,10 +549,10 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
       const values: object[] = await tableViz.getValues(chartSelector);
 
       const fields = [
-        { field: 'agent.id', label: 'Agent ID' },
-        { field: 'agent.name', label: 'Agent name' },
+        { field: 'wazuh.agent.id', label: 'Agent ID' },
+        { field: 'wazuh.agent.name', label: 'Agent name' },
         { field: 'syscheck.uname_after', label: 'Top user' },
-        { method: 'count', field: 'agent.id', label: 'Count' },
+        { method: 'count', field: 'wazuh.agent.id', label: 'Count' },
       ];
 
       const query: SearchParams = {
@@ -614,7 +614,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
       const values: object[] = await tableViz.getValues(chartSelector);
 
       const fields = [
-        { field: 'agent.name', label: 'Agent' },
+        { field: 'wazuh.agent.name', label: 'Agent' },
         { field: 'syscheck.path', label: 'Path' },
         { field: 'syscheck.event', label: 'Action' },
         { method: 'count', field: 'syscheck.path', label: 'Count' },
@@ -760,7 +760,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
           },
         },
       };
-      const esValues = await esPieChart.getData(query, 'agent.name');
+      const esValues = await esPieChart.getData(query, 'wazuh.agent.name');
 
       expect(arrayHelper.compareObjects(values, esValues)).to.be.ok();
       await queryBar.setQuery('');
@@ -915,10 +915,10 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
       const values: object[] = await tableViz.getValues(chartSelector);
 
       const fields = [
-        { field: 'agent.id', label: 'Agent ID' },
-        { field: 'agent.name', label: 'Agent name' },
+        { field: 'wazuh.agent.id', label: 'Agent ID' },
+        { field: 'wazuh.agent.name', label: 'Agent name' },
         { field: 'syscheck.uname_after', label: 'Top user' },
-        { method: 'count', field: 'agent.id', label: 'Count' },
+        { method: 'count', field: 'wazuh.agent.id', label: 'Count' },
       ];
 
       const query: SearchParams = {
@@ -982,7 +982,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
       const values: object[] = await tableViz.getValues(chartSelector);
 
       const fields = [
-        { field: 'agent.name', label: 'Agent' },
+        { field: 'wazuh.agent.name', label: 'Agent' },
         { field: 'syscheck.path', label: 'Path' },
         { field: 'syscheck.event', label: 'Action' },
         { method: 'count', field: 'syscheck.path', label: 'Count' },

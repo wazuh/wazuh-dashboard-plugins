@@ -22,6 +22,8 @@ import VulsEvaluationFilter, {
 export const vulnerabilityManagedFilters = {
   underEvaluation: {
     managedField: UNDER_EVALUATION_FIELD,
+    selector: f =>
+      f.meta?.key === UNDER_EVALUATION_FIELD && f.meta?.type === 'phrase',
     component: (props: {
       managedFilter?: any;
       setManagedFilter: (filters: any[]) => void;

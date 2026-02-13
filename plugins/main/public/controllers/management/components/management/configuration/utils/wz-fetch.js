@@ -17,12 +17,12 @@ import { AGENT_SYNCED_STATUS } from '../../../../../../../common/constants';
 
 /**
  * Get configuration for an agent of request sections
- * @param {string} [agentId=000] Agent ID
+ * @param {string} agentId Agent ID
  * @param {array} sections Sections
  * @param {false} [node=false] Node
  */
 export const getCurrentConfig = async (
-  agentId = '000',
+  agentId,
   sections,
   node = false,
   updateWazuhNotReadyYet,
@@ -51,14 +51,14 @@ export const getCurrentConfig = async (
         throw new Error('Invalid section');
       }
       try {
-        const url =
-          agentId === '000' || node
-            ? `/cluster/${node}/configuration/${component}/${configuration}`
-            : `/agents/${agentId}/config/${component}/${configuration}`;
+        const url = node
+          ? `/cluster/${node}/configuration/${component}/${configuration}`
+          : `/agents/${agentId}/config/${component}/${configuration}`;
 
         const partialResult = await WzRequest.apiReq('GET', url, {});
 
-        if (agentId === '000') {
+        // For cluster, the response comes in affected_items
+        if (node) {
           result[`${component}-${configuration}`] =
             partialResult.data.data.total_affected_items !== 0
               ? partialResult.data.data.affected_items[0]

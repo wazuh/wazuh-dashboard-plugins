@@ -16,22 +16,22 @@
 export const filtersValues = [
   {
     type: 'multiSelect',
-    key: 'data.github.actor',
+    key: 'user.name',
     placeholder: 'Actor',
   },
   {
     type: 'multiSelect',
-    key: 'data.github.org',
+    key: 'organization.name',
     placeholder: 'Organization',
   },
   {
     type: 'multiSelect',
-    key: 'data.github.repo',
+    key: 'github.audit.repo',
     placeholder: 'Repository',
   },
   {
     type: 'multiSelect',
-    key: 'data.github.action',
+    key: 'event.action',
     placeholder: 'Action',
   },
 ];
