@@ -28,8 +28,8 @@ This can't be changed by the user. If this is defined, will be displayed as a pr
 
 ```ts
 // language options
-// ID is not equal to 000 and <user input>. This is defined in UQL that is transformed internally to the specific query language.
-implicitQuery: 'id!=000;'
+// ID is not equal to 001 and <user input>. This is defined in UQL that is transformed internally to the specific query language.
+implicitQuery: 'id!=001;'
 ```
 
 - `suggestions`: define the suggestion handlers. This is required.

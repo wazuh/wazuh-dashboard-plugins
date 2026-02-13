@@ -2,7 +2,7 @@ var agentId = context.request.queryParams.agents_list;
 
 var queryParamsQ = context.request.queryParams.q;
 var queryAgentIdExist =
-  queryParamsQ !== undefined && queryParamsQ !== 'id!=000';
+  queryParamsQ !== undefined;
 if (queryAgentIdExist) {
   agentIdarray = queryParamsQ.split('=');
   agentId = agentIdarray[1];

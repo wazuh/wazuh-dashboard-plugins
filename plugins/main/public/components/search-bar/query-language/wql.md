@@ -159,10 +159,10 @@ Use UQL (Unified Query Language).
 ```ts
 // language options
 options: {
-  // ID is not equal to 000 and <user input>. This is defined in UQL that is transformed internally to
+  // ID is not equal to 001 and <user input>. This is defined in UQL that is transformed internally to
   // the specific query language.
   implicitQuery: {
-    query: 'id!=000',
+    query: 'id!=001',
     conjunction: ';'
   }
   searchTermFields: ['id', 'ip']

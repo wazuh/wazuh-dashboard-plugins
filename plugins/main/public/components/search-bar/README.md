@@ -33,7 +33,7 @@ Basic usage:
         // Set a implicit query that can't be changed by the user.
         // Use the UQL (Unified Query Language) syntax.
         implicitQuery: {
-          query: 'id!=000',
+          query: 'id!=001',
           conjunction: ';'
         },
         searchTermFields: ['id', 'ip']

@@ -212,7 +212,7 @@ function generateAgent(agentData = {}, options = {}) {
   const { groups = ['default'], version = `v${packageVersion}` } = options;
 
   return {
-    id: agentData.id || '000',
+    id: agentData.id || '001',
     name: agentData.name || 'master',
     version: version,
     groups: Array.isArray(groups) ? groups : [groups],
