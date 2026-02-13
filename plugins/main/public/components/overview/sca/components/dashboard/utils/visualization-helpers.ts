@@ -1,42 +1,18 @@
 import { getCore } from '../../../../../../kibana-services';
 import { CheckResult, SCA_CHECK_RESULT_COLORS } from '../../../utils/constants';
+import { PercentFormat } from '../../../../../../../../../src/plugins/data/common';
 
 const core = getCore();
 
-function convertNumeralToD3Format(numeralFormat: string): string {
-  const useThousands: boolean = numeralFormat.includes(',');
-  const decimalMatch: RegExpMatchArray | null =
-    numeralFormat.match(/\.(0+)?(\[0+\])?/);
-
-  let minDecimals: number = 0;
-  let maxDecimals: number = 0;
-  let useTrim: boolean = false;
-
-  if (decimalMatch) {
-    const fixed: string = decimalMatch[1] || '';
-    const optional: string = decimalMatch[2] || '';
-    minDecimals = fixed.length;
-    maxDecimals = fixed.length + (optional.match(/0/g) || []).length;
-    useTrim = optional.length > 0;
-  }
-
-  const precision: number = maxDecimals || minDecimals;
-
-  let format: string = '';
-  if (useThousands) format += ',';
-  format += '.' + precision;
-
-  format += '~f';
-
-  return format;
-}
-
 export const decimalFormat = () => {
-  let decimalFormat;
-  const pattern = core.uiSettings.get('format:percent:defaultPattern');
-  decimalFormat = convertNumeralToD3Format(pattern);
+  const pattern =
+    core.uiSettings.get('format:percent:defaultPattern') ?? '0,0.[00]%';
 
-  return decimalFormat ?? '.2f';
+  const decimalFormat = new PercentFormat({
+    pattern: pattern,
+    fractional: true,
+  });
+  return decimalFormat;
 };
 
 export const checkResultColors = () => {
