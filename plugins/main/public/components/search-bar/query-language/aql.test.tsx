@@ -10,7 +10,7 @@ describe('SearchBar component', () => {
     modes: [
       {
         id: AQL.id,
-        implicitQuery: ' ',
+        implicitQuery: 'id=001;',
         suggestions: {
           field(currentValue) {
             return [];
@@ -22,8 +22,8 @@ describe('SearchBar component', () => {
       },
     ],
     /* eslint-disable @typescript-eslint/no-empty-function */
-    onChange: () => {},
-    onSearch: () => {},
+    onChange: () => { },
+    onSearch: () => { },
     /* eslint-enable @typescript-eslint/no-empty-function */
   };
 
@@ -32,7 +32,7 @@ describe('SearchBar component', () => {
 
     await waitFor(() => {
       const elementImplicitQuery = wrapper.container.querySelector('code');
-      expect(elementImplicitQuery?.innerHTML).toEqual(' ');
+      expect(elementImplicitQuery?.innerHTML).toEqual('id=001;');
       expect(wrapper.container).toMatchSnapshot();
     });
   });
