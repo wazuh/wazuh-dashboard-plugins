@@ -22,18 +22,11 @@ import { PinnedAgentManager } from '../../../../components/wz-agent-selector/wz-
 import WzIconSVG from '../../../../components/common/icons/wz-icon-svg';
 import { getAgentOSType } from '../../../../react-services';
 
-const searchBarWQLOptions = {
-  implicitQuery: {
-    query: '',
-    conjunction: ';',
-  },
-};
-
 export class AgentSelectionTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filters: { default: { q: '' } },
+      filters: { },
     };
     this.pinnedAgentManager = new PinnedAgentManager();
     this.columns = [
@@ -134,7 +127,7 @@ export class AgentSelectionTable extends Component {
   filterGroupBadge = group => {
     this.setState({
       filters: {
-        default: { q: '' },
+        default: { },
         q: `group=${group}`,
       },
     });
@@ -221,7 +214,6 @@ export class AgentSelectionTable extends Component {
           filters={this.state.filters}
           searchTable
           searchBarWQL={{
-            options: searchBarWQLOptions,
             suggestions: {
               field(currentValue) {
                 return [
@@ -259,10 +251,10 @@ export class AgentSelectionTable extends Component {
                             sort: `+${field}`,
                             ...(currentValue
                               ? {
-                                  q: `${searchBarWQLOptions.implicitQuery.query}${searchBarWQLOptions.implicitQuery.conjunction}${field}~${currentValue}`,
+                                  q: `;${field}~${currentValue}`,
                                 }
                               : {
-                                  q: `${searchBarWQLOptions.implicitQuery.query}`,
+                                  q: ``,
                                 }),
                           },
                         },

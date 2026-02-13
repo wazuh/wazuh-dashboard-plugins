@@ -188,7 +188,6 @@ const addIconPlatformRender = (agent: Agent) => {
 
 const filterGroupBadge = (group: string, setFilters: any) => {
   setFilters({
-    default: { q: '' },
     q: `group=${group}`,
   });
 };

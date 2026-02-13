@@ -9,7 +9,6 @@ describe('SearchBar component', () => {
     modes: [
       {
         id: 'aql',
-        implicitQuery: '',
         suggestions: {
           field(currentValue) {
             return [];
