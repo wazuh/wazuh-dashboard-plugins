@@ -1,475 +1,413 @@
-/* Dark theme variables */
-:root {
-  --wz-bg-dark-color: #141519;
+.application {
+  background: linear-gradient(
+    180deg,
+    $ouiPageBackgroundColor 0%,
+    $ouiPageBackgroundColor 100%
+  );
 }
 
-/* v9 theme specific overrides */
-.v9 {
-  --wz-bg-dark-color: $ouiPageBackgroundColor;
+.euiHeaderSectionItem__button,
+.euiListGroupItem__icon {
+  color: $euiTextColor;
 }
 
-.theme-dark {
-  body.md-default-theme,
-  body,
-  html.md-default-theme,
-  html {
-    color: #dfe5ef !important;
-    background-color: var(--wz-bg-dark-color) !important;
+.wz-md-card:not(.wz-metric-color) {
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.3),
+    0 1px 5px -2px rgba(0, 0, 0, 0.3);
+  background-color: #1d1e24;
+  border: 1px solid #343741;
+}
+
+.wz-card-actions-vis {
+  color: white;
+  border-bottom: 1px solid #343741;
+}
+
+.wz-card-actions.wz-card-actions-top,
+.columns-bar-active {
+  border-bottom: 1px solid #343741 !important;
+  background: #16171c;
+  color: #dfe5ef;
+  border-top: none !important;
+}
+
+.kuiButton--secondary:enabled:hover {
+  background: rgba(27, 169, 245, 0.1) !important;
+  color: #45b9f6 !important;
+  border-color: #1ba9f5 !important;
+}
+
+.kuiButton--secondary {
+  color: #45b9f6 !important;
+  border-color: #1ba9f5;
+  background: transparent;
+}
+
+.btn-info:hover {
+  background: #ebebeb17 !important;
+  color: #fff !important;
+}
+
+#wz-search-filter-bar-input {
+  background: transparent;
+  color: white;
+}
+
+.json-beautifier {
+  background: black;
+  color: gray;
+}
+
+.wz-configuration-value {
+  background: transparent;
+  border-color: #343741;
+}
+
+.kuiSelect {
+  filter: invert(1);
+}
+
+.ui-select-choices-row-inner {
+  color: #dfe5ef;
+}
+
+.wz-metric-color {
+  background-color: #343741 !important;
+  border: 1px solid #131417;
+  color: white;
+}
+
+.visLegend__toggle {
+  color: white !important;
+}
+
+.euiBreadcrumbs--truncate
+  .euiBreadcrumb:not(.euiBreadcrumb--collapsed).euiBreadcrumb--last,
+.euiNavDrawerGroup__item .euiListGroupItem__label,
+.euiNavDrawer .euiNavDrawer__expandButton .euiListGroupItem__button {
+  color: $euiTextColor;
+}
+
+.percentage {
+  color: #fff;
+}
+
+.sidebar-container .index-pattern {
+  background-color: #1ba9f5 !important;
+  color: white !important;
+}
+
+.wz-menu {
+  background-color: $ouiPageBackgroundColor;
+  border-bottom: 1px solid #343741;
+  color: white;
+}
+
+.wz-menu-button.wz-menu-active {
+  background-color: #16171c !important;
+}
+
+.wz-menu-button:not([disabled]):hover {
+  background: #16171c;
+}
+
+.wzXmlEditor {
+  background: #1d1e24;
+  border: 1px solid #343741;
+  color: #c8dad9;
+}
+
+.CodeMirror {
+  border-top: 1px solid #5c606f;
+}
+
+.wz-select-input {
+  border: none !important;
+}
+
+.euiCard {
+  color: #dfe5ef;
+}
+
+.euiCard__top.wz-card-actions-top {
+  background: #272931;
+}
+
+table thead > tr {
+  background-color: $ouiPageBackgroundColor !important;
+}
+
+.table-hover > tbody > tr:hover {
+  background-color: rgba(27, 169, 245, 0.05) !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd):hover {
+  background-color: rgba(27, 169, 245, 0.05) !important;
+}
+
+#wz-search-filter-bar {
+  background: #16171c;
+  color: #dfe5ef;
+}
+
+#wz-search-filter-bar-input {
+  box-shadow: none;
+}
+
+.kuiLocalSearchInput,
+.kuiLocalSearchInput:focus {
+  border: 1px solid #343741 !important;
+  background: #16171c;
+  color: #dfe5ef;
+}
+
+.wzMultipleSelector .panel-primary {
+  border: 1px solid #343741 !important;
+  -webkit-box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 2px;
+}
+
+.wzMultipleSelector .panel-primary > .panel-heading {
+  color: #fff;
+  border-color: #343741;
+}
+
+.wzMultipleSelector select {
+  border-color: #343741;
+}
+
+.wzMultipleSelectorSelect {
+  color: #dfe5ef;
+}
+
+.btn-info {
+  border: 1px solid #343741 !important;
+}
+
+.table-resizable > thead th:not(:first-child) {
+  border-left: 1px dashed #343741;
+}
+
+.wz-item-detail {
+  border: 1px solid #343741;
+}
+
+.wz-item-list {
+  background-color: #16171c;
+  border: 1px solid #343741;
+}
+
+.wz-dev-tools .CodeMirror {
+  border: 1px solid $ouiBorderColor !important;
+}
+
+#wz-dev-tools-editor--separator {
+  background: $euiColorLightestShade;
+
+  &:hover {
+    background-color: #0b4462;
   }
+}
 
-  .application {
-     background: linear-gradient(180deg, $ouiPageBackgroundColor 0%, $ouiPageBackgroundColor 100%);
-  }
+.CodeMirror-styled-background {
+  background-color: #343741;
+}
 
-  #kibana-body {
-    background-color: var(--wz-bg-dark-color) !important;
-  }
+.CodeMirror-hints {
+  background-color: #16171c !important;
+  border-color: #000;
+  color: #dfe5ef !important;
+}
 
-  .euiHeaderSectionItem__button,
-  .euiListGroupItem__icon {
-    color: #dfe5ef;
-  }
+.CodeMirror-hint {
+  color: #dfe5ef !important;
+}
 
-  /* If this style is enabled, the stats with colors are wihte and not show the color in dark mode */
-  /* .euiToolTipAnchor {
-    color: white;
-  } */
+.CodeMirror-hint:hover {
+  background-color: #25262e;
+}
 
-  .app-wrapper-panel {
-    background-color: var(--wz-bg-dark-color);
-  }
+.wz-input-text {
+  background-color: #16171c;
+  border: 1px solid #343741;
+  color: #dfe5ef;
+}
 
-  .wz-md-card:not(.wz-metric-color) {
-    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.3),
-      0 1px 5px -2px rgba(0, 0, 0, 0.3);
-    background-color: #1d1e24;
-    border: 1px solid #343741;
-  }
+.wz-menu {
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.3) !important;
+}
 
-  .wz-card-actions-vis {
-    color: white;
-    border-bottom: 1px solid #343741;
-  }
+.wz-menu-select {
+  background-color: #16171c !important;
+  border: 1px solid #343741 !important;
+  color: #dfe5ef !important;
+}
 
-  .wz-card-actions.wz-card-actions-top,
-  .columns-bar-active {
-    border-bottom: 1px solid #343741 !important;
-    background: #16171c;
-    color: #dfe5ef;
-    border-top: none !important;
-  }
+.wz-menu-select-option {
+  background-color: #16171c !important;
+  border: 1px solid #343741 !important;
+  color: #dfe5ef !important;
+}
 
-  .kuiButton--secondary:enabled:hover {
-    background: rgba(27, 169, 245, 0.1) !important;
-    color: #45b9f6 !important;
-    border-color: #1ba9f5 !important;
-  }
+.extraHeader {
+  border-bottom: 1px solid #2e2f34 !important;
+}
 
-  .kuiButton--secondary {
-    color: #45b9f6 !important;
-    border-color: #1ba9f5;
-    background: transparent;
-  }
+.wzMultipleSelectorAdding {
+  background-color: #037200 !important;
+}
 
-  .btn-info:hover {
-    background: #ebebeb17 !important;
-    color: #fff !important;
-  }
+.wzMultipleSelectorRemoving {
+  background-color: #990000 !important;
+}
 
-  #wz-search-filter-bar-input {
-    background: transparent;
-    color: white;
-  }
+.wzMultipleSelectorSelect {
+  background-color: #16171c;
+  border: 1px solid rgb(52, 55, 65);
+}
 
-  .registerAgent {
-    background: var(--wz-bg-dark-color) !important;
-  }
+.wz-button,
+.wz-button-groups,
+.refresh-agents-btn {
+  background-color: #1ba9f5 !important;
+  border-color: #1ba9f5 !important;
+  color: #000 !important;
+}
 
-  .json-beautifier {
-    background: black;
-    color: gray;
-  }
+.wz-button-groups.active,
+.wz-button-groups:not([disabled]):hover,
+.wz-button.active,
+.wz-button:not([disabled]):hover,
+.wz-button-flat:not([disabled]):hover,
+.refresh-agents-btn:hover {
+  background-color: #0a9dec !important;
+  border-color: #0a9dec !important;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.15), 0 2px 2px -1px rgba(0, 0, 0, 0.3) !important;
+  color: #000 !important;
+}
 
-  .wz-configuration-value {
-    background: transparent;
-    border-color: #343741;
-  }
+.kuiButton--hollow:hover {
+  color: #006e8a !important;
+  text-decoration: underline !important;
+}
 
-  .kuiSelect {
-    filter: invert(1);
-  }
+.wz-menu-select {
+  filter: invert(0) !important;
+}
 
-  md-card md-card-content {
-    color: #fff;
-  }
+.wz-menu-left-side {
+  border-right: 1px solid #343741 !important;
+  background: #1d1e24 !important;
+}
 
-  .ui-select-choices-row-inner {
-    color: #dfe5ef;
-  }
+.wz-menu-sections {
+  background: $ouiPageBackgroundColor;
+}
 
-  md-content.md-default-theme,
-  md-content {
-    background-color: var(--wz-bg-dark-color);
-    color: #c8dad9;
-  }
+.wz-module-header-agent,
+.wz-module-header-nav {
+  border-bottom: 1px solid #343741 !important;
+  background: #1d1e24 !important;
+}
 
-  .wz-metric-color {
-    background-color: #343741 !important;
-    border: 1px solid #131417;
-    color: white;
-  }
+.details-row {
+  background: #16171c !important;
+  border-top: 1px solid #343741 !important;
+}
 
-  .visLegend__toggle {
-    color: white !important;
-  }
-
-  .euiBreadcrumbs--truncate
-    .euiBreadcrumb:not(.euiBreadcrumb--collapsed).euiBreadcrumb--last,
-  .euiNavDrawerGroup__item .euiListGroupItem__label,
-  .euiNavDrawer .euiNavDrawer__expandButton .euiListGroupItem__button {
-    color: #dfe5ef;
-  }
-
-  .percentage {
-    color: #fff;
-  }
-
-  md-nav-bar.md-default-theme .md-nav-bar,
-  md-nav-bar .md-nav-bar {
-    border-color: rgb(52, 55, 65);
-  }
-
-  .sidebar-container .index-pattern {
-    background-color: #1ba9f5 !important;
-    color: white !important;
-  }
-
-  .wz-menu {
-    background-color: var(--wz-bg-dark-color);
-    border-bottom: 1px solid #343741;
-    color: white;
-  }
-
-  .wz-menu-button.wz-menu-active {
-    background-color: #16171c !important;
-  }
-
-  .wz-menu-button:not([disabled]):hover {
-    background: #16171c;
-  }
-
-  .wzXmlEditor {
-    background: #1d1e24;
-    border: 1px solid #343741;
-    color: #c8dad9;
-  }
-
-  .CodeMirror {
-    border-top: 1px solid #5c606f;
-  }
-
-  .wz-select-input {
-    border: none !important;
-  }
-
-  .euiCard {
-    color: #dfe5ef;
-  }
-
-  .md-subheader.md-default-theme,
-  .md-subheader {
-    color: #dfe5ef;
-  }
-
-  .euiCard__top.wz-card-actions-top {
-    background: #272931;
-  }
-
-  table thead > tr {
-    background-color: var(--wz-bg-dark-color) !important;
-  }
-
-  .table-hover > tbody > tr:hover {
-    background-color: rgba(27, 169, 245, 0.05) !important;
-  }
-
-  .table-striped > tbody > tr:nth-of-type(odd):hover {
-    background-color: rgba(27, 169, 245, 0.05) !important;
-  }
-
-  #wz-search-filter-bar {
-    background: #16171c;
-    color: #dfe5ef;
-  }
-
-  #wz-search-filter-bar-input {
-    box-shadow: none;
-  }
-
-  .kuiLocalSearchInput,
-  .kuiLocalSearchInput:focus {
-    border: 1px solid #343741 !important;
-    background: #16171c;
-    color: #dfe5ef;
-  }
-
-  .wzMultipleSelector .panel-primary {
-    border: 1px solid #343741 !important;
-    -webkit-box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
-    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
-    border-radius: 2px;
-  }
-
-  .wzMultipleSelector .panel-primary > .panel-heading {
-    color: #fff;
-    border-color: #343741;
-  }
-
-  .wzMultipleSelector select {
-    border-color: #343741;
-  }
-
-  .wzMultipleSelectorSelect {
-    color: #dfe5ef;
-  }
-
-  .btn-info {
-    border: 1px solid #343741 !important;
-  }
-
-  .table-resizable > thead th:not(:first-child) {
-    border-left: 1px dashed #343741;
-  }
-
-  md-divider.md-default-theme,
-  md-divider {
-    border-top-color: rgb(52, 55, 65);
-  }
-
-  .wz-item-detail {
-    border: 1px solid #343741;
-  }
-
-  .wz-item-list {
+.wz-inventory {
+  .detail-tooltip {
     background-color: #16171c;
-    border: 1px solid #343741;
   }
+}
 
-  .wz-dev-tools .CodeMirror {
-    border: 1px solid #343741 !important;
+.flyout-body .euiAccordion {
+  border-bottom: 1px solid #343741 !important;
+}
+
+.module-discover-table .euiTableRow.euiTableRow-isExpandedRow .euiTableRowCell {
+  background: #1d1e24 !important;
+}
+
+.module-discover-table .euiTableRow-isExpandedRow .euiTableCellContent {
+  background: #1d1e24 !important;
+}
+
+.wz-search-bar > div > div > div.euiComboBox__inputWrap {
+  background: #16171c !important;
+  box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.2),
+    0 3px 2px -2px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+}
+
+.euiComboBoxPlaceholder {
+  color: #dfe5ef !important;
+}
+
+svg .legend text {
+  fill: white;
+}
+
+/* welcome-agent */
+
+.wz-welcome-page-agent-tabs {
+  border-bottom: 1px solid #343741;
+  background-color: #1d1e24;
+}
+
+.wz-module-welcome .euiPanel--paddingSmall {
+  padding: 8px;
+  overflow: hidden;
+}
+
+.wz-agents-mitre .euiFlexGroup--directionRow {
+  overflow: hidden;
+}
+
+.wz-menu-agent-info {
+  background-color: $ouiPageBackgroundColor;
+  border-bottom: 1px solid #343741 !important;
+}
+
+.flyout-row {
+  border: none;
+}
+
+.application .euiAccordion,
+.flyout-body .euiAccordion {
+  border-bottom: 1px solid $ouiBorderColor !important;
+}
+
+.sidepanel-infoBtnStyle {
+  background: unset;
+}
+
+.copy-codeblock-wrapper .euiToolTipAnchor {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.wz-app {
+  .wz-welcome-page .euiIcon--app .euiIcon__fillSecondary {
+    fill: $euiTextColor;
   }
+}
 
-  #wz-dev-tools-editor--separator {
-    background: #1d1e24;
-
-    &:hover {
-      background-color: #0b4462;
-    }
-  }
-
-  .CodeMirror-styled-background {
-    background-color: #343741;
-  }
-
-  .CodeMirror-hints {
-    background-color: #16171c !important;
-    border-color: #000;
-    color: #dfe5ef !important;
-  }
-
-  .CodeMirror-hint {
-    color: #dfe5ef !important;
-  }
-
-  .CodeMirror-hint:hover {
-    background-color: #25262e;
-  }
-
-  .wz-input-text {
-    background-color: #16171c;
-    border: 1px solid #343741;
-    color: #dfe5ef;
-  }
-
-  .wz-menu {
-    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.3) !important;
-  }
-
-  .wz-menu-select {
-    background-color: #16171c !important;
-    border: 1px solid #343741 !important;
-    color: #dfe5ef !important;
-  }
-
-  .wz-menu-select-option {
-    background-color: #16171c !important;
-    border: 1px solid #343741 !important;
-    color: #dfe5ef !important;
-  }
-
-  .extraHeader {
-    border-bottom: 1px solid #2e2f34 !important;
-  }
-
-  .wzMultipleSelectorAdding {
-    background-color: #037200 !important;
-  }
-
-  .wzMultipleSelectorRemoving {
-    background-color: #990000 !important;
-  }
-
-  .wzMultipleSelectorSelect {
-    background-color: #16171c;
-    border: 1px solid rgb(52, 55, 65);
-  }
-
-  .wz-button,
-  .wz-button-groups,
-  .refresh-agents-btn {
-    background-color: #1ba9f5 !important;
-    border-color: #1ba9f5 !important;
-    color: #000 !important;
-  }
-
-  .wz-button-groups.active,
-  .wz-button-groups:not([disabled]):hover,
-  .wz-button.active,
-  .wz-button:not([disabled]):hover,
-  .wz-button-flat:not([disabled]):hover,
-  .refresh-agents-btn:hover {
-    background-color: #0a9dec !important;
-    border-color: #0a9dec !important;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.15),
-      0 2px 2px -1px rgba(0, 0, 0, 0.3) !important;
-    color: #000 !important;
-  }
-
-  .kuiButton--hollow:hover {
-    color: #006e8a !important;
-    text-decoration: underline !important;
-  }
-
-  .wz-menu-select {
-    filter: invert(0) !important;
-  }
-
-  .wz-menu-left-side {
-    border-right: 1px solid #343741 !important;
-    background: #1d1e24 !important;
-  }
-
-  .wz-menu-sections {
-    background: var(--wz-bg-dark-color);
-  }
-
-  .wz-module-header-agent,
-  .wz-module-header-nav {
-    border-bottom: 1px solid #343741 !important;
-    background: #1d1e24 !important;
-  }
-
-  .details-row {
-    background: #16171c !important;
-    border-top: 1px solid #343741 !important;
-  }
-
-  .wz-inventory {
-    .detail-tooltip {
-      background-color: #16171c;
-    }
-  }
-
-  .flyout-body .euiAccordion {
-    border-bottom: 1px solid #343741 !important;
-  }
-
-  .module-discover-table
-    .euiTableRow.euiTableRow-isExpandedRow
-    .euiTableRowCell {
-    background: #1d1e24 !important;
-  }
-
-  .module-discover-table .euiTableRow-isExpandedRow .euiTableCellContent {
-    background: #1d1e24 !important;
-  }
-
-  .wz-search-bar > div > div > div.euiComboBox__inputWrap {
-    background: #16171c !important;
+/* Vulnerabilities under evaluation filter */
+.button-group-filter {
+  .euiButtonGroup__buttons {
     box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.2),
-      0 3px 2px -2px rgba(0, 0, 0, 0.2),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+      0 3px 2px -2px rgba(0, 0, 0, 0.2), inset 0 0 0 1px #424752 !important;
   }
+}
 
-  .euiComboBoxPlaceholder {
-    color: #dfe5ef !important;
-  }
+/* wzDocViewer buttons */
 
-  svg .legend text {
-    fill: white;
-  }
-
-  /* welcome-agent */
-
-  .wz-welcome-page-agent-tabs {
-    border-bottom: 1px solid #343741;
-    background-color: #1d1e24;
-  }
-
-  .wz-module-welcome .euiPanel--paddingSmall {
-    padding: 8px;
-    overflow: hidden;
-  }
-
-  .wz-agents-mitre .euiFlexGroup--directionRow {
-    overflow: hidden;
-  }
-
-  .wz-menu-agent-info {
-    background-color: var(--wz-bg-dark-color);
-    border-bottom: 1px solid #343741 !important;
-  }
-
-  .flyout-row {
-    border: none;
-  }
-
-  .application .euiAccordion,
-  .flyout-body .euiAccordion {
-    border-bottom: 1px solid #343741 !important;
-  }
-
-  .sidepanel-infoBtnStyle {
-    background: unset;
-  }
-
-  .copy-codeblock-wrapper .euiToolTipAnchor {
-    background-color: rgba(0, 0, 0, 0.7);
-  }
-
-  .wz-app {
-    .wz-welcome-page .euiIcon--app .euiIcon__fillSecondary {
-      fill: #dfe5ef;
-    }
-  }
-
-  /* Vulnerabilities under evaluation filter */
-  .button-group-filter {
-    .euiButtonGroup__buttons {
-      box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.2),
-        0 3px 2px -2px rgba(0, 0, 0, 0.2), inset 0 0 0 1px #424752 !important;
-    }
-  }
-
-  /* wzDocViewer buttons */
-
-  tr:hover {
-    .wzDocViewer__buttons::before {
-      background-image: linear-gradient(
-        to right,
-        transparent 0,
-        #1d1e24 4px
-      ) !important;
-    }
+tr:hover {
+  .wzDocViewer__buttons::before {
+    background-image: linear-gradient(
+      to right,
+      transparent 0,
+      #1d1e24 4px
+    ) !important;
   }
 }

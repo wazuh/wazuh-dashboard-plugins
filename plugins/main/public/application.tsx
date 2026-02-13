@@ -4,7 +4,6 @@ import { I18nProvider } from '@osd/i18n/react';
 import { Application } from './app-router';
 import { Provider } from 'react-redux';
 import store from './redux/store';
-import './styles';
 
 export async function renderApp(params) {
   /*
