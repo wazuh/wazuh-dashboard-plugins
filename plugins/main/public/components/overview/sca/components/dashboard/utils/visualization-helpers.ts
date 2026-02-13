@@ -4,16 +4,10 @@ import { PercentFormat } from '../../../../../../../../../src/plugins/data/commo
 
 const core = getCore();
 
-export const decimalFormat = (precision?: number) => {
-  let pattern;
-  if (precision !== undefined) {
-    pattern = '0,0.' + '['+'0'.repeat(precision)+']%';
-  }
-  else {
-    pattern = core.uiSettings.get('format:percent:defaultPattern');
-  }
+export const decimalFormat = () => {
+  const pattern =
+    core.uiSettings.get('format:percent:defaultPattern') ?? '0,0.[00]%';
 
-  
   const decimalFormat = new PercentFormat({
     pattern: pattern,
     fractional: true,
