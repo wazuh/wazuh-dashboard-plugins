@@ -31,6 +31,9 @@ A host has the following properties:
 | username | Define the username                                            | -             | any string between 4-64 characters |
 | password | Define the password                                            | -             | any string up to 64 characters     |
 | run_as   | Define if the user context is used to retrieve the permissions | false         | true, false                        |
+| key      | Define the client key file path. Optional.                     | -             | any valid file path                |
+| cert     | Define the client certificate file path. Optional.             | -             | any valid file path                |
+| ca       | Define the certificate authority file path. Optional.          | -             | any valid file path                |
 
 This is an example of a multi-host configuration:
 
@@ -48,6 +51,9 @@ wazuh_core.hosts:
     username: wazuh-wui
     password: wazuh-wui
     run_as: true
+    key: '/ect/dashboards/certs/dashboard-another-host-dns.key' # Path to client private key
+    cert: '/home/node/kbn/certs/dashboard-another-host-dns.crt' # Path to client certificate
+    ca: '/home/node/kbn/certs/dashboard-another-host-dns-root-ca.pem' # Path to shared root CA
 ```
 
 # Tenant configuration

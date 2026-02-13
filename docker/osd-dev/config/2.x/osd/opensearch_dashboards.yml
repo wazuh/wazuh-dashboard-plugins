@@ -44,3 +44,6 @@ wazuh_core.hosts:
     username: wazuh-wui
     password: wazuh-wui
     run_as: false
+    key: '/home/node/kbn/certs/dashboard-client.key'
+    cert: '/home/node/kbn/certs/dashboard-client.crt'
+    ca: '/home/node/kbn/certs/manager-rootCA.pem'

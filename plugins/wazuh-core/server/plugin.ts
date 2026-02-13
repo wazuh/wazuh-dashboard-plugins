@@ -71,12 +71,16 @@ export class WazuhCorePlugin
     this.services.manageHosts = new ManageHosts(
       this.logger.get('manage-hosts'),
       this.services.configuration,
+      this.initializerContext,
     );
+
+    const configDir = this.initializerContext.env?.configDir;
 
     this.services.serverAPIClient = new ServerAPIClient(
       this.logger.get('server-api-client'),
       this.services.manageHosts,
       this.services.dashboardSecurity,
+      configDir,
     );
 
     this.services.manageHosts.setServerAPIClient(this.services.serverAPIClient);

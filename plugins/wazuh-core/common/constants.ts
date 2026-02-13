@@ -486,6 +486,30 @@ hosts:
           },
           validate: SettingsValidator.isBoolean,
         },
+        key: {
+          title: 'Key',
+          description:
+            'Path to the SSL/TLS private key file for the API connection.',
+          type: EpluginSettingType.text,
+          defaultValue: '',
+          validate: SettingsValidator.isString,
+        },
+        cert: {
+          title: 'Certificate',
+          description:
+            'Path to the SSL/TLS certificate file for the API connection.',
+          type: EpluginSettingType.text,
+          defaultValue: '',
+          validate: SettingsValidator.isString,
+        },
+        ca: {
+          title: 'CA Certificate',
+          description:
+            'Path to the CA certificate file for SSL/TLS verification.',
+          type: EpluginSettingType.text,
+          defaultValue: '',
+          validate: SettingsValidator.isString,
+        },
       },
     },
   },
