@@ -129,6 +129,12 @@ jest.mock('./utils/wz-fetch', () => ({
   }),
 }));
 
+jest.mock('../../../../../react-services/common-services', () => ({
+  getErrorOrchestrator: () => ({
+    handleError: jest.fn(),
+  }),
+}));
+
 describe('WzConfigurationSwitch', () => {
   let updateClusterNodes: jest.Mock;
   let updateClusterNodeSelected: jest.Mock;

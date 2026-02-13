@@ -148,7 +148,7 @@ export const MultipleAgentSelector = withErrorBoundary(
             return (
               this.state.selectedAgents.data.filter(selected => {
                 return selected.key == item.id;
-              }).length == 0 && item.id !== '000'
+              }).length == 0
             );
           })
           .map(item => {
