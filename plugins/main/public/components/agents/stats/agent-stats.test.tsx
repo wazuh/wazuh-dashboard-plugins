@@ -116,8 +116,7 @@ describe('AgentStats', () => {
 
     let rerender: RenderResult['rerender'];
 
-    await act(async () => {
-    });
+    await act(async () => {});
     ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
 
     expect(apiReqMock).toHaveBeenCalledTimes(2);
@@ -174,8 +173,7 @@ describe('AgentStats', () => {
 
     let rerender: RenderResult['rerender'];
 
-    await act(async () => {
-    });
+    await act(async () => {});
     ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
 
     expect(AgentStatTableMock.mock.calls[0][0].columns).toEqual(mockColumns);
@@ -199,8 +197,7 @@ describe('AgentStats', () => {
 
     let rerender: RenderResult['rerender'];
 
-    await act(async () => {
-    });
+    await act(async () => {});
     ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
 
     expect(AgentStatTableMock.mock.calls[0][0].title).toEqual(
@@ -230,22 +227,17 @@ describe('AgentStats', () => {
     const mockExportCSVFilename = (
       suffix: 'global' | 'interval',
       agent002: string,
-
     ) => `agent-stats-${agent002}-logcollector-${suffix}`;
     let rerender: RenderResult['rerender'];
 
-    await act(async () => {
-    });
+    await act(async () => {});
     ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
 
-    expect(AgentStatTableMock.mock.calls[0][0].exportCSVFilename).toEqual(
-    );
-    mockExportCSVFilename(agent002, 'global'),
-      expect(AgentStatTableMock.mock.calls[1][0].exportCSVFilename).toEqual(
-      );
-    mockExportCSVFilename(agent002, 'interval'),
-
-      AgentStatTableMock.mockClear();
+    expect(AgentStatTableMock.mock.calls[0][0].exportCSVFilename).toEqual();
+    (mockExportCSVFilename(agent002, 'global'),
+      expect(AgentStatTableMock.mock.calls[1][0].exportCSVFilename).toEqual());
+    (mockExportCSVFilename(agent002, 'interval'),
+      AgentStatTableMock.mockClear());
 
     await act(async () => {
       rerender(<AgentStats agent={{ id: agent001 }} />);

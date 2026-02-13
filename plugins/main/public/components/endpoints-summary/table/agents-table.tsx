@@ -128,7 +128,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
     return {
       'data-test-subj': `row-${id}`,
       className: 'customRowClass',
-      onClick: () => { },
+      onClick: () => {},
     };
   };
 
@@ -359,10 +359,10 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                               sort: `+${field}`,
                               ...(currentValue
                                 ? {
-                                  q: `;${field}~${currentValue}`,
+                                    q: `;${field}~${currentValue}`,
                                   }
                                 : {
-                                  q: ``,
+                                    q: ``,
                                   }),
                             },
                           },

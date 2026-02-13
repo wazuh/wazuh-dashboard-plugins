@@ -26,7 +26,7 @@ export class AgentSelectionTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filters: { },
+      filters: {},
     };
     this.pinnedAgentManager = new PinnedAgentManager();
     this.columns = [
@@ -127,7 +127,7 @@ export class AgentSelectionTable extends Component {
   filterGroupBadge = group => {
     this.setState({
       filters: {
-        default: { },
+        default: {},
         q: `group=${group}`,
       },
     });
