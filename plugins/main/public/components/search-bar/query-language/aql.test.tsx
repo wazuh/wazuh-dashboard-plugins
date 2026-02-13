@@ -22,8 +22,8 @@ describe('SearchBar component', () => {
       },
     ],
     /* eslint-disable @typescript-eslint/no-empty-function */
-    onChange: () => { },
-    onSearch: () => { },
+    onChange: () => {},
+    onSearch: () => {},
     /* eslint-enable @typescript-eslint/no-empty-function */
   };
 

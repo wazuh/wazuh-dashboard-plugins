@@ -34,6 +34,7 @@ implicitQuery: 'id!=001;';
 ```
 
 - `suggestions`: define the suggestion handlers. This is required.
+
   - `field`: method that returns the suggestions for the fields
 
   ```ts

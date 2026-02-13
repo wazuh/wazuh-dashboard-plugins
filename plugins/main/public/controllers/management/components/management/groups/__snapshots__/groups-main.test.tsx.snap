@@ -29,7 +29,7 @@ exports[`Group main component renders correctly to match the snapshot 1`] = `
     configurationProps={
       Object {
         "agent": Object {
-          "id": "000",
+          "id": "001",
         },
       }
     }

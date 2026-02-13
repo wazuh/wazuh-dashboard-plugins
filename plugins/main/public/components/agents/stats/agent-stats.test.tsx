@@ -6,8 +6,8 @@ import { CSS } from '../../../../test/utils/CSS';
 import { WzRequest } from '../../../react-services';
 import { AgentStatTable } from './table';
 
-const agent001 = '001';
 const agent002 = '002';
+const agent001 = '001';
 
 const apiReqMock = WzRequest.apiReq as jest.Mock;
 const AgentStatTableMock = AgentStatTable as jest.Mock;
@@ -58,7 +58,13 @@ jest.mock('./table', () => ({
 describe('AgentStats', () => {
   it('should not render agent info ribbon', async () => {
     await act(async () => {
-      const { container } = render(<AgentStats agent={{ id: '001' }} />);
+      const { container } = render(
+        <AgentStats
+          agent={{
+            id: '002',
+          }}
+        />,
+      );
 
       const agentInfoRibbon = container.querySelector(
         queryDataTestAttr('agent-info'),
@@ -69,7 +75,7 @@ describe('AgentStats', () => {
 
   it('should render stats info ribbon', async () => {
     await act(async () => {
-      const { container } = render(<AgentStats agent={{ id: '001' }} />);
+      const { container } = render(<AgentStats agent={{ id: '002' }} />);
 
       expect(
         container.querySelector(queryDataTestAttr('ribbon-item-status')),
@@ -116,19 +122,20 @@ describe('AgentStats', () => {
 
     let rerender: RenderResult['rerender'];
 
-    await act(async () => {});
-    ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
+    await act(async () => {
+      ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
+    });
 
     expect(apiReqMock).toHaveBeenCalledTimes(2);
     expect(apiReqMock.mock.calls[0]).toEqual([
       'GET',
-      {},
       `/agents/${agent002}/stats/logcollector`,
+      {},
     ]);
     expect(apiReqMock.mock.calls[1]).toEqual([
       'GET',
-      {},
       `/agents/${agent002}/stats/agent`,
+      {},
     ]);
 
     apiReqMock.mockClear();
@@ -173,8 +180,9 @@ describe('AgentStats', () => {
 
     let rerender: RenderResult['rerender'];
 
-    await act(async () => {});
-    ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
+    await act(async () => {
+      ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
+    });
 
     expect(AgentStatTableMock.mock.calls[0][0].columns).toEqual(mockColumns);
     expect(AgentStatTableMock.mock.calls[1][0].columns).toEqual(mockColumns);
@@ -197,8 +205,9 @@ describe('AgentStats', () => {
 
     let rerender: RenderResult['rerender'];
 
-    await act(async () => {});
-    ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
+    await act(async () => {
+      ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
+    });
 
     expect(AgentStatTableMock.mock.calls[0][0].title).toEqual(
       mockDataStatLogcollectorTitle,
@@ -225,19 +234,24 @@ describe('AgentStats', () => {
     AgentStatTableMock.mockClear();
 
     const mockExportCSVFilename = (
-      suffix: 'global' | 'interval',
       agent002: string,
+      suffix: 'global' | 'interval',
     ) => `agent-stats-${agent002}-logcollector-${suffix}`;
+
     let rerender: RenderResult['rerender'];
 
-    await act(async () => {});
-    ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
+    await act(async () => {
+      ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
+    });
 
-    expect(AgentStatTableMock.mock.calls[0][0].exportCSVFilename).toEqual();
-    (mockExportCSVFilename(agent002, 'global'),
-      expect(AgentStatTableMock.mock.calls[1][0].exportCSVFilename).toEqual());
-    (mockExportCSVFilename(agent002, 'interval'),
-      AgentStatTableMock.mockClear());
+    expect(AgentStatTableMock.mock.calls[0][0].exportCSVFilename).toEqual(
+      mockExportCSVFilename(agent002, 'global'),
+    );
+    expect(AgentStatTableMock.mock.calls[1][0].exportCSVFilename).toEqual(
+      mockExportCSVFilename(agent002, 'interval'),
+    );
+
+    AgentStatTableMock.mockClear();
 
     await act(async () => {
       rerender(<AgentStats agent={{ id: agent001 }} />);

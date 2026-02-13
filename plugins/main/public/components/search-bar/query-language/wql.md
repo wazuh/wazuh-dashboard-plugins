@@ -174,6 +174,7 @@ options: {
 ```
 
 - `suggestions`: define the suggestion handlers. This is required.
+
   - `field`: method that returns the suggestions for the fields
 
   ```ts
@@ -200,6 +201,7 @@ options: {
   ```
 
 - `validate`: define validation methods for the field types. Optional
+
   - `value`: method to validate the value token
 
   ```ts
