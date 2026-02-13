@@ -113,12 +113,12 @@ export const ModulesDefaults = {
   general: {
     init: 'events',
     tabs: [
-      /*{
+      {
         id: 'dashboard',
         name: 'Dashboard',
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardThreatHunting,
-      },*/
+      },
       renderDiscoverTab({
         moduleId: 'threat-hunting',
         tableColumns: threatHuntingColumns,
@@ -135,12 +135,12 @@ export const ModulesDefaults = {
   fim: {
     init: 'inventory',
     tabs: [
-      // {
-      //   id: 'dashboard',
-      //   name: 'Dashboard',
-      //   buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-      //   component: DashboardFIM,
-      // },
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardFIM,
+      },
       {
         id: 'inventory',
         name: 'Inventory',

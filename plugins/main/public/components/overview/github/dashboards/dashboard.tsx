@@ -17,5 +17,5 @@ export const DashboardGitHub = createDashboard({
       agentDashboardId: GITHUB_AGENT_DASHBOARD_ID,
     },
   ],
-  sampleDataWarningCategories: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+  // sampleDataWarningCategories: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
 });

@@ -24,7 +24,7 @@ import {
   EuiText,
   EuiConfirmModal,
   EuiIcon,
-  EuiOverlayMask
+  EuiOverlayMask,
 } from '@elastic/eui';
 
 import WzBadge from '../util-components/badge';
@@ -46,7 +46,7 @@ class WzConfigurationPath extends Component {
       updateConfigurationSection,
       badge,
       hasChanges,
-      children
+      children,
     } = this.props;
 
     const closeModal = () => this.setState({ isModalVisible: false });
@@ -57,14 +57,14 @@ class WzConfigurationPath extends Component {
       modal = (
         <EuiOverlayMask>
           <EuiConfirmModal
-            title="Unsubmitted changes"
+            title='Unsubmitted changes'
             onConfirm={() => {
               closeModal;
               updateConfigurationSection('');
             }}
             onCancel={closeModal}
             cancelButtonText="No, don't do it"
-            confirmButtonText="Yes, do it"
+            confirmButtonText='Yes, do it'
           >
             <p style={{ textAlign: 'center' }}>
               There are unsaved changes. Are you sure you want to proceed?
@@ -75,16 +75,16 @@ class WzConfigurationPath extends Component {
     }
     return (
       <Fragment>
-        <EuiSpacer size="s" />
-        <EuiFlexGroup alignItems="center">
+        <EuiSpacer size='s' />
+        <EuiFlexGroup alignItems='center'>
           <EuiFlexItem>
-            <EuiFlexGroup alignItems="center">
+            <EuiFlexGroup alignItems='center'>
               <span style={{ margin: '0 6px' }}>
-                <EuiToolTip content="Back to configuration" position="right">
+                <EuiToolTip content='Back to configuration' position='right'>
                   <EuiButtonIcon
                     style={{ padding: 0 }}
-                    iconType="arrowLeft"
-                    iconSize="l"
+                    iconType='arrowLeft'
+                    iconSize='l'
                     onClick={() => {
                       if (hasChanges) {
                         showModal();
@@ -92,12 +92,12 @@ class WzConfigurationPath extends Component {
                         updateConfigurationSection('');
                       }
                     }}
-                    aria-label="back to configuration"
+                    aria-label='back to configuration'
                   />
                 </EuiToolTip>
               </span>
               <span style={{ marginLeft: '6px', marginRight: '6px' }}>
-                {icon && <EuiIcon size="l" type={icon} />}
+                {icon && <EuiIcon size='l' type={icon} />}
                 <EuiTitle style={{ display: 'inline-block', margin: 0 }}>
                   <span>
                     {title}{' '}
@@ -107,20 +107,23 @@ class WzConfigurationPath extends Component {
                   </span>
                 </EuiTitle>
                 {description && (
-                  <EuiText color="subdued">{description}</EuiText>
+                  <EuiText color='subdued'>{description}</EuiText>
                 )}
-                <EuiSpacer size="xs" />
+                <EuiSpacer size='xs' />
               </span>
             </EuiFlexGroup>
           </EuiFlexItem>
           {children ? <Fragment>{children}</Fragment> : null}
-          {this.props.clusterNodes && this.props.clusterNodes.length && (
-            <EuiFlexItem grow={false}>
-              <WzClusterSelect />
-            </EuiFlexItem>
-          )}
+          {/* Only show cluster selector when no agent is pinned */}
+          {!this.props.agent &&
+            this.props.clusterNodes &&
+            this.props.clusterNodes.length && (
+              <EuiFlexItem grow={false}>
+                <WzClusterSelect />
+              </EuiFlexItem>
+            )}
         </EuiFlexGroup>
-        <EuiSpacer size="l" />
+        <EuiSpacer size='l' />
         {modal}
       </Fragment>
     );
@@ -133,11 +136,12 @@ WzConfigurationPath.propTypes = {
   icon: PropTypes.string,
   updateConfigurationSection: PropTypes.func,
   hasChanges: PropTypes.bool,
-  badge: PropTypes.bool
+  badge: PropTypes.bool,
 };
 
 const mapStateToProps = state => ({
-  clusterNodes: state.configurationReducers.clusterNodes
+  clusterNodes: state.configurationReducers.clusterNodes,
+  agent: state.appStateReducers.currentAgentData,
 });
 
 export default connect(mapStateToProps)(WzConfigurationPath);

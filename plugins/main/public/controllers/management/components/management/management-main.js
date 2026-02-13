@@ -36,11 +36,7 @@ const WzManagementMain = props => (
       <WzLogs />
     </Route>
     <Route path='?tab=configuration'>
-      <WzConfiguration
-        agent={{
-          id: '000',
-        }}
-      />
+      <WzConfiguration />
     </Route>
   </Switch>
 );
