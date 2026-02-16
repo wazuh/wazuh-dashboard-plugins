@@ -359,7 +359,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                               sort: `+${field}`,
                               ...(currentValue
                                 ? {
-                                    q: `;${field}~${currentValue}`,
+                                    q: `${field}~${currentValue}`,
                                   }
                                 : {
                                     q: ``,
