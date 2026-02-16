@@ -366,10 +366,6 @@ input[type='search'].euiFieldSearch {
   margin: 0 !important;
 }
 
-.table-hover > tbody > tr:hover {
-  background-color: $ouiPageBackgroundColor !important;
-}
-
 /* .table > tbody {
     border-right: 1px solid #D9D9D9;
     border-left: 1px solid #D9D9D9;
@@ -921,10 +917,6 @@ wz-xml-file-editor {
   white-space: nowrap;
 }
 
-.application {
-  background: $ouiPageBackgroundColor;
-}
-
 .application.tab-health-check wz-menu {
   display: none;
 }
@@ -1148,18 +1140,9 @@ wz-xml-file-editor {
   margin-bottom: 10px;
 }
 
-.list-of-files .euiListGroupItem {
-  background: white !important;
-  color: #377dbb !important;
-}
-
 .list-of-files-fail {
   margin-top: 10px;
   margin-bottom: 10px;
-}
-
-.list-of-files-fail .euiListGroupItem {
-  background: white !important;
 }
 
 .list-element-ok {
@@ -1698,10 +1681,6 @@ iframe.width-changed {
 .wz-app {
   .euiPage {
     background-color: transparent;
-  }
-
-  .wz-welcome-page .euiIcon--app .euiIcon__fillSecondary {
-    fill: #000000bb;
   }
 }
 

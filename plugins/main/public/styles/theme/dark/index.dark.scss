@@ -1,14 +1,10 @@
 .application {
+  // Solves background color banding in dark mode
   background: linear-gradient(
     180deg,
     $ouiPageBackgroundColor 0%,
     $ouiPageBackgroundColor 100%
   );
-}
-
-.euiHeaderSectionItem__button,
-.euiListGroupItem__icon {
-  color: $euiTextColor;
 }
 
 .wz-md-card:not(.wz-metric-color) {
@@ -81,13 +77,6 @@
   color: white !important;
 }
 
-.euiBreadcrumbs--truncate
-  .euiBreadcrumb:not(.euiBreadcrumb--collapsed).euiBreadcrumb--last,
-.euiNavDrawerGroup__item .euiListGroupItem__label,
-.euiNavDrawer .euiNavDrawer__expandButton .euiListGroupItem__button {
-  color: $euiTextColor;
-}
-
 .percentage {
   color: #fff;
 }
@@ -135,10 +124,6 @@
 
 table thead > tr {
   background-color: $ouiPageBackgroundColor !important;
-}
-
-.table-hover > tbody > tr:hover {
-  background-color: rgba(27, 169, 245, 0.05) !important;
 }
 
 .table-striped > tbody > tr:nth-of-type(odd):hover {
@@ -350,11 +335,6 @@ svg .legend text {
 
 /* welcome-agent */
 
-.wz-welcome-page-agent-tabs {
-  border-bottom: 1px solid #343741;
-  background-color: #1d1e24;
-}
-
 .wz-module-welcome .euiPanel--paddingSmall {
   padding: 8px;
   overflow: hidden;
@@ -368,23 +348,12 @@ svg .legend text {
   border: none;
 }
 
-.application .euiAccordion,
-.flyout-body .euiAccordion {
-  border-bottom: 1px solid $ouiBorderColor !important;
-}
-
 .sidepanel-infoBtnStyle {
   background: unset;
 }
 
 .copy-codeblock-wrapper .euiToolTipAnchor {
   background-color: rgba(0, 0, 0, 0.7);
-}
-
-.wz-app {
-  .wz-welcome-page .euiIcon--app .euiIcon__fillSecondary {
-    fill: $euiTextColor;
-  }
 }
 
 /* Vulnerabilities under evaluation filter */
