@@ -877,16 +877,6 @@ wz-xml-file-editor {
   overflow: hidden !important;
 }
 
-.agents-headline .euiStat .euiStat__title {
-  color: #6e6e6e;
-  font-size: 14px;
-}
-
-.agents-headline .euiText.euiText--small p {
-  color: #006bb4;
-  font-weight: 600;
-}
-
 .discoverSectionSwitchBtn {
   height: 15px;
   margin: 2px 10px 0 0 !important;
@@ -941,21 +931,6 @@ wz-xml-file-editor {
   width: 26px;
 }
 
-.health-check .euiCodeBlock {
-  max-height: 0;
-  margin-top: 0;
-  transition: all 0.25s ease-out;
-  overflow: hidden;
-  border: 0px solid #0001;
-}
-
-.health-check .euiCodeBlock.visible {
-  border: 1px solid #0001;
-  max-height: 700px;
-  margin-top: 16px;
-  visibility: visible;
-}
-
 .wz-hover-transform-y1:hover {
   -webkit-transform: translateY(-1px) !important;
   transform: translateY(-1px) !important;
@@ -968,29 +943,6 @@ wz-xml-file-editor {
 
   to {
     transform: rotate(359deg);
-  }
-}
-
-.health-check-loader {
-  height: 120px;
-  width: 120px;
-  margin: 0 auto;
-}
-
-.health-check-logo {
-  width: 140px;
-  z-index: 1;
-  margin: 0 auto;
-}
-
-.health-check {
-  .euiDescriptionList__title {
-    width: 60% !important;
-  }
-
-  .euiDescriptionList__description {
-    text-align: left !important;
-    width: 40% !important;
   }
 }
 
@@ -1304,7 +1256,6 @@ wz-xml-file-editor {
 }
 
 .euiCodeBlock.euiCodeBlock-isFullScreen {
-  border: 1px solid $euiBorderColor;
   border-radius: 4px;
   margin: 22px;
 }
