@@ -9,27 +9,22 @@ describe('SearchBar component', () => {
     modes: [
       {
         id: 'aql',
-        implicitQuery: 'id!=000;',
         suggestions: {
           field(currentValue) {
             return [];
           },
-          value(currentValue, { field }){
+          value(currentValue, { field }) {
             return [];
           },
         },
       },
       {
         id: 'wql',
-        implicitQuery: {
-          query: 'id!=000',
-          conjunction: ';'
-        },
         suggestions: {
           field(currentValue) {
             return [];
           },
-          value(currentValue, { field }){
+          value(currentValue, { field }) {
             return [];
           },
         },
@@ -37,17 +32,12 @@ describe('SearchBar component', () => {
     ],
     /* eslint-disable @typescript-eslint/no-empty-function */
     onChange: () => {},
-    onSearch: () => {}
+    onSearch: () => {},
     /* eslint-enable @typescript-eslint/no-empty-function */
   };
 
   it('Renders correctly the initial render', async () => {
-    const wrapper = render(
-      <SearchBar
-        {...componentProps}
-        defaultMode='wql'
-      />
-    );
+    const wrapper = render(<SearchBar {...componentProps} defaultMode='wql' />);
 
     /* This test causes a warning about act. This is intentional, because the test pretends to get
     the first rendering of the component that doesn't have the component properties coming of the

@@ -78,7 +78,10 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
 
       AppState.setClusterInfo(apiData[0].cluster_info);
       AppState.setCurrentAPI(
-        JSON.stringify({ name: apiData[0].manager, id: apiId.value }),
+        JSON.stringify({
+          name: apiData[0].cluster_info?.cluster,
+          id: apiId.value,
+        }),
       );
       const pinnedAgentManager = new PinnedAgentManager();
       const isPinnedAgent = pinnedAgentManager.isPinnedAgent();
