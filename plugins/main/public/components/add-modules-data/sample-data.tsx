@@ -171,9 +171,8 @@ export default class WzSampleData extends Component {
 
       // Get information about cluster
       const clusterName = AppState.getClusterInfo().cluster;
-      const managerName = AppState.getClusterInfo().manager;
 
-      if (!clusterName && !managerName) {
+      if (!clusterName) {
         throw new Error(
           'The data related to the server API context could not be obtained. This is required when adding sample data to match the server API context.',
         );
@@ -188,7 +187,7 @@ export default class WzSampleData extends Component {
         node: clusterName,
       };
       this.generateAlertsParams.manager = {
-        name: managerName,
+        name: clusterName,
       };
 
       if (!this.generateAlertsParams.api_id) {

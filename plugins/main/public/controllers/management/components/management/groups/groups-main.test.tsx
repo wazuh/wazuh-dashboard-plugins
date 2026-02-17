@@ -34,7 +34,7 @@ const mockProps = {
   section: 'groups',
   configurationProps: {
     agent: {
-      id: '000',
+      id: '001',
     },
   },
   state: {

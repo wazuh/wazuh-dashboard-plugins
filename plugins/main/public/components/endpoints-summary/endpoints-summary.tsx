@@ -72,15 +72,13 @@ export const EndpointsSummary = compose(
     filterAgentByStatus(item: any) {
       this._isMount &&
         this.setState({
-          agentTableFilters: { q: `id!=000;status=${item.status}` },
+          agentTableFilters: { q: `status=${item.status}` },
         });
     }
 
     filterAgentByOS(item: any) {
       const query =
-        item.label === 'N/A'
-          ? 'id!=000;os.platform=null'
-          : `id!=000;os.platform~${item.label}`;
+        item.label === 'N/A' ? 'os.platform=null' : `os.platform~${item.label}`;
       this._isMount &&
         this.setState({
           agentTableFilters: { q: query },
@@ -88,10 +86,7 @@ export const EndpointsSummary = compose(
     }
 
     filterAgentByGroup(item: any) {
-      const query =
-        item.label === 'N/A'
-          ? 'id!=000;group=null'
-          : `id!=000;group=${item.label}`;
+      const query = item.label === 'N/A' ? 'group=null' : `group=${item.label}`;
       this._isMount &&
         this.setState({
           agentTableFilters: { q: query },

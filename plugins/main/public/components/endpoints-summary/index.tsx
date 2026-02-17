@@ -23,7 +23,6 @@ import { getAgentsService } from './services';
 
 async function fetchTotalAgents() {
   const { total_affected_items } = await getAgentsService({
-    filters: 'id!=000',
     limit: 1,
   });
 

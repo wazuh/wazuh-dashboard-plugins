@@ -285,12 +285,12 @@ describe('Elasticsearch', () => {
 
   describe('Manager (agent.id: 000)', () => {
     it(`GET /${index}/_search - vulnerability-detector`, async () =>
-      vulnerability('000'));
-    it(`GET /${index}/_search - syscheck`, async () => syscheck('000'));
-    it(`GET /${index}/_search - rootcheck`, async () => rootcheck('000'));
-    it(`GET /${index}/_search - pci_dss`, async () => pciDss('000'));
-    it(`GET /${index}/_search - gdpr`, async () => gdpr('000'));
-    it(`GET /${index}/_search - audit`, async () => audit('000'));
+      vulnerability('001'));
+    it(`GET /${index}/_search - syscheck`, async () => syscheck('001'));
+    it(`GET /${index}/_search - rootcheck`, async () => rootcheck('001'));
+    it(`GET /${index}/_search - pci_dss`, async () => pciDss('001'));
+    it(`GET /${index}/_search - gdpr`, async () => gdpr('001'));
+    it(`GET /${index}/_search - audit`, async () => audit('001'));
   });
 
   describe('Agent (agent.id: 001)', () => {

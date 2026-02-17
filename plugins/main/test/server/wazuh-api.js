@@ -78,14 +78,14 @@ describe('wazuh-api', () => {
     const res = await needle(
       'post',
       `localhost:5601/api/request`,
-      { method: 'GET', path: '/agents/000', body: {}, id: API_ID },
+      { method: 'GET', path: '/agents/001', body: {}, id: API_ID },
       headers,
     );
     res.body.should.be.a('object');
     res.body.error.should.be.eql(0);
     res.body.data.should.be.a('object');
     res.body.data.status.should.be.eql('Active');
-    res.body.data.id.should.be.eql('000');
+    res.body.data.id.should.be.eql('001');
   });
 
   it('GET /api/pci/{requirement}', async () => {
