@@ -31,10 +31,9 @@ import {
   withDataSourceLoading,
 } from '../../../common/hocs';
 import { compose } from 'redux';
+import { useRouterSearch } from '../../../common/hooks';
 
 interface ClusterDashboardState {
-  showConfig: boolean;
-  showNodes: boolean;
   nodeList: any;
   configuration: any;
   version: any;
@@ -84,6 +83,7 @@ const DashboardCTMainView = compose(
 );
 
 const DashboardCT: React.FC<DashboardCTProps> = () => {
+  const navigationService = NavigationService.getInstance();
   const {
     filters,
     dataSource,
@@ -97,10 +97,11 @@ const DashboardCT: React.FC<DashboardCTProps> = () => {
     DataSource: ClusterDataSource,
     repository: new EventsDataSourceRepository(),
   });
+  const { tabView } = useRouterSearch();
+  const showNodes = tabView === 'nodes';
+  const showConfig = tabView === 'config';
 
   const [state, setState] = useState<ClusterDashboardState>({
-    showConfig: false,
-    showNodes: false,
     nodeList: [],
     configuration: undefined,
     version: undefined,
@@ -147,30 +148,27 @@ const DashboardCT: React.FC<DashboardCTProps> = () => {
     autoRefreshFingerprint,
   ]);
 
-  const setBooleans = (component: string | null) => {
-    setState({
-      ...state,
-      showConfig: component === 'showConfig',
-      showNodes: component === 'showNodes',
+  const switchClusterSubTab = (subTab: 'nodes' | 'config' | null) =>
+    navigationService.updateAndNavigateSearchParams({
+      tabView: subTab,
     });
-  };
 
   const goAgents = () => {
-    NavigationService.getInstance().navigateToApp(endpointSummary.id, {
+    navigationService.navigateToApp(endpointSummary.id, {
       path: '#/agents-preview',
     });
   };
 
   const goBack = () => {
-    setBooleans(null);
+    switchClusterSubTab(null);
   };
 
   const goNodes = () => {
-    setBooleans('showNodes');
+    switchClusterSubTab('nodes');
   };
 
   const goConfiguration = () => {
-    setBooleans('showConfig');
+    switchClusterSubTab('config');
   };
 
   useEffect(() => {
@@ -179,21 +177,23 @@ const DashboardCT: React.FC<DashboardCTProps> = () => {
         WzRequest.apiReq('GET', '/cluster/nodes', {}),
         WzRequest.apiReq('GET', '/cluster/local/config', {}),
         WzRequest.apiReq('GET', '/', {}),
-        WzRequest.apiReq('GET', '/agents', { limit: 1 }),
+        WzRequest.apiReq('GET', '/agents', {
+          params: { limit: 1, q: 'id!=000' },
+        }),
         WzRequest.apiReq('GET', '/cluster/healthcheck', {}),
       ]);
 
       const nodeList = data[0]?.data?.data || {} || false;
       const clusterConfig = data[1]?.data?.data || {} || false;
       const agents = data[3]?.data?.data || {} || false;
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         configuration: clusterConfig.affected_items[0],
         version: data[2]?.data?.data?.api_version || false,
         nodesCount: nodeList.total_affected_items,
-        agentsCount: agents.total_affected_items - 1,
+        agentsCount: Number(agents.total_affected_items ?? 0),
         nodeList: nodeList?.affected_items ?? [],
-      });
+      }));
     };
 
     getData();
@@ -202,7 +202,7 @@ const DashboardCT: React.FC<DashboardCTProps> = () => {
   return (
     <I18nProvider>
       <EuiFlexItem style={{ padding: '0 16px' }}>
-        {dataSource && !state.showNodes && (
+        {dataSource && !showNodes && (
           <WzSearchBar
             appName='ct-searchbar'
             {...searchBarProps}
@@ -210,7 +210,7 @@ const DashboardCT: React.FC<DashboardCTProps> = () => {
           />
         )}
         <EuiSpacer size='m' />
-        {!state.showConfig && !state.showNodes ? (
+        {!showConfig && !showNodes ? (
           <DashboardCTMainView
             goNodes={goNodes}
             goAgents={goAgents}
@@ -225,7 +225,7 @@ const DashboardCT: React.FC<DashboardCTProps> = () => {
             error={error}
           />
         ) : null}
-        {state.showConfig ? (
+        {showConfig ? (
           <ConfigurationCards
             goBack={goBack}
             configuration={state?.configuration}
@@ -236,7 +236,7 @@ const DashboardCT: React.FC<DashboardCTProps> = () => {
             lastReloadRequestTime={fingerprint}
           />
         ) : null}
-        {state.showNodes ? <NodeList goBack={goBack} /> : null}
+        {showNodes ? <NodeList goBack={goBack} /> : null}
       </EuiFlexItem>
     </I18nProvider>
   );
