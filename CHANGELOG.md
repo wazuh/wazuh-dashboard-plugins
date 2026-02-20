@@ -75,6 +75,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed `hideManagerAlerts` setting [#8102](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8102)
 - Removed usage of agent `000` [#8104](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8104) [#8105](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8105) [#8117](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8117)
 
+## Wazuh v4.14.5 - OpenSearch Dashboards 2.19.4 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.14.5
+
 ## Wazuh v4.14.4 - OpenSearch Dashboards 2.19.4 - Revision 00
 
 ### Added
