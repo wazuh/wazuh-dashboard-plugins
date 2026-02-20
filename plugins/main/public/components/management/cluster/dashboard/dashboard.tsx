@@ -178,7 +178,7 @@ const DashboardCT: React.FC<DashboardCTProps> = () => {
         WzRequest.apiReq('GET', '/cluster/local/config', {}),
         WzRequest.apiReq('GET', '/', {}),
         WzRequest.apiReq('GET', '/agents', {
-          params: { limit: 1, q: 'id!=000' },
+          params: { limit: 1 },
         }),
         WzRequest.apiReq('GET', '/cluster/healthcheck', {}),
       ]);
