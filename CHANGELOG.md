@@ -76,6 +76,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed customs filters related to agent 000 [#8104](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8104)
 - Removed agent.id 000 conditionals from the Management settings components [#8105](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8105)
 
+## Wazuh v4.14.5 - OpenSearch Dashboards 2.19.4 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.14.5
+
 ## Wazuh v4.14.4 - OpenSearch Dashboards 2.19.4 - Revision 00
 
 ### Added
