@@ -69,8 +69,7 @@
     "md5": "^2.3.0",
     "needle": "^3.2.0",
     "node-cron": "^1.1.2",
-    "react-cookie": "^4.0.3",
-    "read-last-lines": "^1.7.2"
+    "react-cookie": "^4.0.3"
   },
   "devDependencies": {
     "@types/node-cron": "^2.0.3",
