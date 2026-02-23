@@ -67,7 +67,6 @@
     "loglevel": "1.9.2",
     "markdown-it-link-attributes": "^4.0.1",
     "md5": "^2.3.0",
-    "needle": "^3.2.0",
     "node-cron": "^1.1.2",
     "react-cookie": "^4.0.3"
   },
