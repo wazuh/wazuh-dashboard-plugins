@@ -280,6 +280,7 @@ Maltiverse provides threat intelligence and Indicator of Compromise (IoC) enrich
    ```
 
 4. Configuration parameters:
+
    - **api_key**: Your Maltiverse API key
    - **level**: Minimum alert level to trigger enrichment (default: 3)
    - **options**: IoC types to enrich (file hashes, IPs, domains, URLs)
@@ -388,16 +389,19 @@ To avoid rate limit issues:
 Monitor the health and performance of external integrations:
 
 1. **Check notification channels**:
+
    - Navigate to **☰ Menu > Explore > Notifications > Channels**
    - Verify all channels show **Enabled** and **Unmuted**
    - Use **Send test message** periodically
 
 2. **Review monitor status**:
+
    - Navigate to **☰ Menu > Explore > Alerting > Monitors**
    - Check for failed monitors or error states
    - Review trigger history
 
 3. **Audit integration logs**:
+
    - Wazuh manager: `/var/ossec/logs/integrations.log`
    - OpenSearch Dashboards: `/var/log/wazuh-dashboard/opensearch_dashboards.log`
 
