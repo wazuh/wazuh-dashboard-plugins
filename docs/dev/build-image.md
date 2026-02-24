@@ -24,13 +24,6 @@ docker build \
 
 Adjust `OPENSEARCH_VERSION` and the output tag as needed for your target.
 
-## Optional: Use the NPM cache container
-
-To speed up repeated builds, bring up the cache container first:
-
-```bash
-cd ../cache
-docker compose up -d
-```
+## Examples:
 
 For additional image recipes and examples, see [docker/README.md](../../docker/README.md).
