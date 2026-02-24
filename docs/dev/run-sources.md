@@ -76,4 +76,3 @@ The Docker environment includes:
 - Use `--server <version>` for a real Wazuh server release (e.g., `--server 4.7.2`).
 - Use `--server-local <tag>` to test local Wazuh manager builds (place `.deb` packages in `docker/osd-dev/manager/`).
 - Use `--indexer-local <tag>` to test local Wazuh indexer builds (place `.deb` package in `docker/osd-dev/indexer/`).
-

@@ -63,6 +63,7 @@ uiSettings.overrides.defaultRoute: /app/wz-home
 
    **SysV init:**
    Choose one option according to your operating system:
+
    - RPM-based operating system:
 
    ```bash
