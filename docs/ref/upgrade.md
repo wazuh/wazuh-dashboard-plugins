@@ -85,6 +85,11 @@ You can now access the Wazuh dashboard via: `https://<DASHBOARD_IP_ADDRESS>/app/
 - Navigate to **Dashboard management** > **Dashboard Management** > **Saved objects** on the Wazuh dashboard.
 - Click **Import**, add the ndjson file and click **Import**.
 
+## Migrating from 4.x to 5.x
+
+If you are moving from 4.x to 5.x, review the migration checklist in
+[Migration guide (4.x to 5.x)](migration-4x-5x.md) before applying the upgrade.
+
 > **Note:**
 > Note that the upgrade process doesn't update plugins installed manually. Outdated plugins might cause the upgrade to fail.
 >
