@@ -1,5 +1,12 @@
 # How to generate a package
 
+This guide explains how to build complete system packages (DEB/RPM) for the
+Wazuh dashboard, including all required plugins and dependencies.
+
+> **Note**: This builds **complete installation packages**. If you only need to
+> build the plugins from this repository for development, see
+> [Build from Sources](build-sources.md).
+
 ## Step by step
 
 This section shows how to build the DEB or RPM Wazuh dashboard package locally using NVM and Yarn.
@@ -227,7 +234,6 @@ cd wazuh-dashboard/dev-tools/build-packages/base-packages-to-base/
 ```
 
 2. Build the Docker image with the following parameters:
-
    - `NODE_VERSION`: Node version to use in the `.nvmrc` file.
    - `WAZUH_DASHBOARDS_BRANCH`: Branch of the Wazuh dashboards repository.
    - `WAZUH_DASHBOARDS_PLUGINS`: Branch of the Wazuh dashboards Plugins repository.
