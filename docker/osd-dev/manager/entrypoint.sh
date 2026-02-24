@@ -17,7 +17,7 @@ if [ -n "$INDEXER_SSL_CERTIFICATE" ]; then
 fi
 
 if [ -n "$INDEXER_SSL_CERTIFICATE_KEY" ]; then
-  sed -i "s|<key>/var/wazuh-manaer/etc/certs/server-key.pem</key>|<key>$INDEXER_SSL_CERTIFICATE_KEY</key>|g" /var/wazuh-manager/etc/wazuh-manager.conf
+  sed -i "s|<key>/var/wazuh-manager/etc/certs/server-key.pem</key>|<key>$INDEXER_SSL_CERTIFICATE_KEY</key>|g" /var/wazuh-manager/etc/wazuh-manager.conf
   chmod 400 $INDEXER_SSL_CERTIFICATE_KEY
   chown root:root $INDEXER_SSL_CERTIFICATE_KEY
 fi
