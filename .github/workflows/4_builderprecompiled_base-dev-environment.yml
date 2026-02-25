@@ -46,7 +46,7 @@ jobs:
     permissions:
       pull-requests: write
     name: Deploy and run command
-    runs-on: ubuntu-24.04
+    runs-on: wz-linux-amd64
     strategy:
       matrix:
         plugins:
