@@ -86,7 +86,7 @@ function generateRandomUser() {
     '/home/john.doe',
     '/home/sysadmin',
     '/home/developer',
-    '/var/ossec',
+    '/var/wazuh-manager',
     'C:\\Users\\Administrator',
     'C:\\Users\\admin.local',
     'C:\\Users\\marie.martin',

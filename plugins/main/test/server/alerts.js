@@ -64,7 +64,7 @@ const syscheck = async agentID => {
     .that.includes('syscheck');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
-  sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
+  sample.source.should.be.eql('/var/wazuh-manager/logs/alerts/alerts.json');
   sample.location.should.be.eql('syscheck');
   sample.cluster.should.be.a('object');
   sample.cluster.name.should.be.eql('wazuh');
@@ -101,7 +101,7 @@ const rootcheck = async agentID => {
     .that.includes('wazuh-rootcheck');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
-  sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
+  sample.source.should.be.eql('/var/wazuh-manager/logs/alerts/alerts.json');
   sample.location.should.be.eql('wazuh-rootcheck');
   sample.cluster.should.be.a('object');
   sample.cluster.name.should.be.eql('wazuh');
@@ -149,7 +149,7 @@ const vulnerability = async agentID => {
     .that.includes('vulnerability-detector');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
-  sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
+  sample.source.should.be.eql('/var/wazuh-manager/logs/alerts/alerts.json');
   sample.location.should.be.eql('vulnerability-detector');
   sample.cluster.should.be.a('object');
   sample.cluster.name.should.be.eql('wazuh');
@@ -184,7 +184,7 @@ const pciDss = async agentID => {
   sample.rule.pci_dss.should.be.a('array');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
-  sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
+  sample.source.should.be.eql('/var/wazuh-manager/logs/alerts/alerts.json');
   sample.cluster.should.be.a('object');
   sample.cluster.name.should.be.eql('wazuh');
   sample.cluster.node.should.be.eql('node01');
@@ -218,7 +218,7 @@ const gdpr = async agentID => {
   sample.rule.gdpr.should.be.a('array');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
-  sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
+  sample.source.should.be.eql('/var/wazuh-manager/logs/alerts/alerts.json');
   sample.cluster.should.be.a('object');
   sample.cluster.name.should.be.eql('wazuh');
   sample.cluster.node.should.be.eql('node01');
@@ -253,7 +253,7 @@ const audit = async agentID => {
   sample.wazuh.integration.decoders.should.be.a('array').that.includes('audit');
   sample.manager.should.be.a('object');
   sample.manager.name.should.be.a('string');
-  sample.source.should.be.eql('/var/ossec/logs/alerts/alerts.json');
+  sample.source.should.be.eql('/var/wazuh-manager/logs/alerts/alerts.json');
   sample.location.should.be.eql('/var/log/audit/audit.log');
   sample.cluster.should.be.a('object');
   sample.cluster.name.should.be.eql('wazuh');

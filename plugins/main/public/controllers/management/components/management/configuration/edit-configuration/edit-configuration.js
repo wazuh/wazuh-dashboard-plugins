@@ -404,7 +404,9 @@ const WzEditorConfiguration = compose(
           {!this.props.errorXMLFetched ? (
             <Fragment>
               <EuiText>
-                Edit <span style={{ fontWeight: 'bold' }}>ossec.conf</span> of{' '}
+                Edit{' '}
+                <span style={{ fontWeight: 'bold' }}>wazuh-manager.conf</span>{' '}
+                of{' '}
                 <span style={{ fontWeight: 'bold' }}>
                   {clusterNodeSelected}
                   {existsClusterCurrentNodeSelected && clusterNodes
