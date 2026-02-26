@@ -65,7 +65,7 @@ export const Users = withUserAuthorizationPrompt([
 
   useEffect(() => {
     getData();
-  }, [getData]);
+  }, []);
 
   useEffect(() => {
     if (!rolesLoading && (roles || []).length) {

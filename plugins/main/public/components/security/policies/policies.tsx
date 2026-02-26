@@ -28,12 +28,14 @@ export const Policies = withUserAuthorizationPrompt([
     pageIndex,
     pageSize,
     totalItems,
+    getData,
     refreshCurrentPage,
     onTableChange: handleTableChange,
   } = usePagination(GetPoliciesService);
 
   useEffect(() => {
-    // Component initialization can be done here if needed
+    getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const editPolicy = item => {
