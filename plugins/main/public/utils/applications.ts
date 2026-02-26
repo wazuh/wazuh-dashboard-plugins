@@ -769,7 +769,7 @@ export const Applications = [
   googleCloud,
   office365,
   github,
-  // docker,
+  docker,
   endpointSummary,
   endpointGroups,
   serverStatus,
