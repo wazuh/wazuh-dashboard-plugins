@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   EuiPageContent,
   EuiPageContentHeader,
@@ -20,7 +20,6 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { withUserAuthorizationPrompt } from '../../common/hocs';
 import { WzButtonPermissions } from '../../common/permissions/button';
-import { closeFlyout } from '../../common/flyouts/close-flyout-security';
 
 export const Users = withUserAuthorizationPrompt([
   { action: 'security:read', resource: 'user:id:*' },
@@ -36,16 +35,28 @@ export const Users = withUserAuthorizationPrompt([
   );
   const [securityError, setSecurityError] = useState(false);
   const [rolesObject, setRolesObject] = useState({});
+  const [loadingTable, setLoadingTable] = useState(false);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
 
-  const getUsers = async () => {
+  const getData = async (pageIndex = 0, pageSize = 10) => {
+    setLoadingTable(true);
     try {
-      const _users = await UsersServices.GetUsers();
+      const offset = pageIndex * pageSize;
+      const { users: _users, total } = await UsersServices.GetUsers(
+        offset,
+        pageSize,
+      );
       setUsers(_users as User[]);
+      setTotalItems(total);
+      setPageIndex(pageIndex);
+      setPageSize(pageSize);
     } catch (error) {
       setUsers([]);
       setSecurityError(true);
       const options = {
-        context: `${Users.name}.getUsers`,
+        context: `${Users.name}.getData`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -56,8 +67,14 @@ export const Users = withUserAuthorizationPrompt([
         },
       };
       getErrorOrchestrator().handleError(options);
+    } finally {
+      setLoadingTable(false);
     }
   };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   useEffect(() => {
     if (!rolesLoading && (roles || []).length) {
@@ -72,17 +89,31 @@ export const Users = withUserAuthorizationPrompt([
     }
   }, [rolesLoading]);
 
-  useEffect(() => {
-    getUsers();
-  }, []);
+  const refreshCurrentPage = useCallback(() => {
+    return getData(pageIndex, pageSize);
+  }, [pageIndex, pageSize]);
 
   let editFlyout, createFlyout;
   const closeEditFlyout = refresh => {
-    closeFlyout(refresh, setIsEditFlyoutVisible, getUsers);
+    if (refresh) {
+      refreshCurrentPage();
+    }
+    setIsEditFlyoutVisible(false);
   };
 
   const closeCreateFlyout = refresh => {
-    closeFlyout(refresh, setIsCreateFlyoutVisible, getUsers);
+    if (refresh) {
+      refreshCurrentPage();
+    }
+    setIsCreateFlyoutVisible(false);
+  };
+
+  const handleTableChange = ({ page }) => {
+    if (page) {
+      // If pageSize changed, reset to first page
+      const newPageIndex = page.size !== pageSize ? 0 : page.index;
+      getData(newPageIndex, page.size);
+    }
   };
 
   if (securityError) {
@@ -144,7 +175,12 @@ export const Users = withUserAuthorizationPrompt([
           editUserFlyover={showEditFlyover}
           rolesLoading={rolesLoading}
           roles={rolesObject}
-          onSave={async () => await getUsers()}
+          loading={loadingTable}
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          onTableChange={handleTableChange}
+          onSave={refreshCurrentPage}
         ></UsersTable>
       </EuiPageContentBody>
       {editFlyout}
