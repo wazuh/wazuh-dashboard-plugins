@@ -48,7 +48,7 @@ jobs:
   test-packages:
     needs: build
     name: Test packages
-    runs-on: ubuntu-24.04
+    runs-on: wz-linux-amd64
 
     steps:
       - name: Step 01 - Download the plugin's source code
