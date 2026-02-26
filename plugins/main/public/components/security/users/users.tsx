@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   EuiPageContent,
   EuiPageContentHeader,
@@ -14,6 +14,7 @@ import UsersServices from './services';
 import RolesServices from '../roles/services';
 import { User } from './types/user.type';
 import { useApiService } from '../../common/hooks/useApiService';
+import { usePagination } from '../../common/hooks/usePagination';
 import { Role } from '../roles/types/role.type';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
@@ -28,53 +29,43 @@ export const Users = withUserAuthorizationPrompt([
   const [isEditFlyoutVisible, setIsEditFlyoutVisible] = useState(false);
   const [isCreateFlyoutVisible, setIsCreateFlyoutVisible] = useState(false);
   const [editingUser, setEditingUser] = useState({});
-  const [users, setUsers] = useState([] as User[]);
   const [rolesLoading, roles, rolesError] = useApiService<Role[]>(
     RolesServices.GetRoles,
     {},
   );
   const [securityError, setSecurityError] = useState(false);
   const [rolesObject, setRolesObject] = useState({});
-  const [loadingTable, setLoadingTable] = useState(false);
-  const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [totalItems, setTotalItems] = useState(0);
 
-  const getData = async (pageIndex = 0, pageSize = 10) => {
-    setLoadingTable(true);
-    try {
-      const offset = pageIndex * pageSize;
-      const { users: _users, total } = await UsersServices.GetUsers(
-        offset,
-        pageSize,
-      );
-      setUsers(_users as User[]);
-      setTotalItems(total);
-      setPageIndex(pageIndex);
-      setPageSize(pageSize);
-    } catch (error) {
-      setUsers([]);
-      setSecurityError(true);
-      const options = {
-        context: `${Users.name}.getData`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    } finally {
-      setLoadingTable(false);
-    }
+  const handlePaginationError = (error: any) => {
+    setSecurityError(true);
+    const options = {
+      context: `${Users.name}.getData`,
+      level: UI_LOGGER_LEVELS.ERROR,
+      severity: UI_ERROR_SEVERITIES.BUSINESS,
+      store: true,
+      error: {
+        error: error,
+        message: error.message || error,
+        title: error.name || error,
+      },
+    };
+    getErrorOrchestrator().handleError(options);
   };
+
+  const {
+    items: users,
+    loading: loadingTable,
+    pageIndex,
+    pageSize,
+    totalItems,
+    getData,
+    refreshCurrentPage,
+    onTableChange: handleTableChange,
+  } = usePagination(UsersServices.GetUsers, handlePaginationError);
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [getData]);
 
   useEffect(() => {
     if (!rolesLoading && (roles || []).length) {
@@ -89,9 +80,15 @@ export const Users = withUserAuthorizationPrompt([
     }
   }, [rolesLoading]);
 
-  const refreshCurrentPage = useCallback(() => {
-    return getData(pageIndex, pageSize);
-  }, [pageIndex, pageSize]);
+  if (securityError) {
+    return (
+      <EuiEmptyPrompt
+        iconType='securityApp'
+        title={<h2>You need permission to manage users</h2>}
+        body={<p>Contact your system administrator.</p>}
+      />
+    );
+  }
 
   let editFlyout, createFlyout;
   const closeEditFlyout = refresh => {
@@ -108,23 +105,6 @@ export const Users = withUserAuthorizationPrompt([
     setIsCreateFlyoutVisible(false);
   };
 
-  const handleTableChange = ({ page }) => {
-    if (page) {
-      // If pageSize changed, reset to first page
-      const newPageIndex = page.size !== pageSize ? 0 : page.index;
-      getData(newPageIndex, page.size);
-    }
-  };
-
-  if (securityError) {
-    return (
-      <EuiEmptyPrompt
-        iconType='securityApp'
-        title={<h2>You need permission to manage users</h2>}
-        body={<p>Contact your system administrator.</p>}
-      />
-    );
-  }
   if (isEditFlyoutVisible) {
     editFlyout = (
       <EditUser

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   EuiPageContent,
   EuiPageContentHeader,
@@ -12,7 +12,7 @@ import { RolesMappingCreate } from './components/roles-mapping-create';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WazuhSecurity } from '../../../factories/wazuh-security';
 import { useApiService } from '../../common/hooks/useApiService';
-import { Rule } from '../rules/types/rule.type';
+import { usePagination } from '../../common/hooks/usePagination';
 import { Role } from '../roles/types/role.type';
 import RolesServices from '../roles/services';
 import RulesServices from '../rules/services';
@@ -29,8 +29,6 @@ export const RolesMapping = withUserAuthorizationPrompt([
 ])(() => {
   const [isEditingRule, setIsEditingRule] = useState(false);
   const [isCreatingRule, setIsCreatingRule] = useState(false);
-  const [rules, setRules] = useState<Rule[]>([]);
-  const [loadingTable, setLoadingTable] = useState(true);
   const [selectedRule, setSelectedRule] = useState({});
   const [rolesEquivalences, setRolesEquivalences] = useState({});
   const [rolesLoading, roles, rolesError] = useApiService<Role[]>(
@@ -38,12 +36,35 @@ export const RolesMapping = withUserAuthorizationPrompt([
     {},
   );
   const [internalUsers, setInternalUsers] = useState([]);
-  const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [totalItems, setTotalItems] = useState(0);
   const currentPlatform = useSelector(
     (state: any) => state.appStateReducers.currentPlatform,
   );
+
+  const handlePaginationError = (error: any) => {
+    const options = {
+      context: `${RolesMapping.name}.getData`,
+      level: UI_LOGGER_LEVELS.ERROR,
+      severity: UI_ERROR_SEVERITIES.BUSINESS,
+      store: true,
+      error: {
+        error: error,
+        message: error.message || error,
+        title: error.name || error,
+      },
+    };
+    getErrorOrchestrator().handleError(options);
+  };
+
+  const {
+    items: rules,
+    loading: loadingTable,
+    pageIndex,
+    pageSize,
+    totalItems,
+    getData,
+    refreshCurrentPage,
+    onTableChange: handleTableChange,
+  } = usePagination(RulesServices.GetRules, handlePaginationError);
 
   useEffect(() => {
     initData();
@@ -94,51 +115,10 @@ export const RolesMapping = withUserAuthorizationPrompt([
     }
   };
 
-  const getData = async (pageIndex = 0, pageSize = 10) => {
-    try {
-      const offset = pageIndex * pageSize;
-      const { rules: _rules, total } = await RulesServices.GetRules(
-        offset,
-        pageSize,
-      );
-      setRules(_rules);
-      setTotalItems(total);
-      setPageIndex(pageIndex);
-      setPageSize(pageSize);
-    } catch (error) {
-      const options = {
-        context: `${RolesMapping.name}.getData`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  };
-
   const initData = async () => {
-    setLoadingTable(true);
     await getData();
     if (currentPlatform) {
       await getInternalUsers();
-    }
-    setLoadingTable(false);
-  };
-
-  const refreshCurrentPage = useCallback(() => {
-    return getData(pageIndex, pageSize);
-  }, [pageIndex, pageSize]);
-
-  const handleTableChange = ({ page }) => {
-    if (page) {
-      // If pageSize changed, reset to first page
-      const newPageIndex = page.size !== pageSize ? 0 : page.index;
-      getData(newPageIndex, page.size);
     }
   };
 
