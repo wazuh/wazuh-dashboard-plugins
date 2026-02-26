@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   EuiPageContent,
   EuiPageContentHeader,
@@ -22,7 +22,6 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { withUserAuthorizationPrompt } from '../../common/hocs';
 import { WzButtonPermissions } from '../../common/permissions/button';
-import { closeFlyout } from '../../common/flyouts/close-flyout-security';
 
 export const RolesMapping = withUserAuthorizationPrompt([
   { action: 'security:read', resource: 'role:id:*' },
@@ -39,6 +38,9 @@ export const RolesMapping = withUserAuthorizationPrompt([
     {},
   );
   const [internalUsers, setInternalUsers] = useState([]);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
   const currentPlatform = useSelector(
     (state: any) => state.appStateReducers.currentPlatform,
   );
@@ -92,13 +94,20 @@ export const RolesMapping = withUserAuthorizationPrompt([
     }
   };
 
-  const getRules = async () => {
+  const getData = async (pageIndex = 0, pageSize = 10) => {
     try {
-      const _rules = await RulesServices.GetRules();
+      const offset = pageIndex * pageSize;
+      const { rules: _rules, total } = await RulesServices.GetRules(
+        offset,
+        pageSize,
+      );
       setRules(_rules);
+      setTotalItems(total);
+      setPageIndex(pageIndex);
+      setPageSize(pageSize);
     } catch (error) {
       const options = {
-        context: `${RolesMapping.name}.getRules`,
+        context: `${RolesMapping.name}.getData`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
@@ -114,23 +123,37 @@ export const RolesMapping = withUserAuthorizationPrompt([
 
   const initData = async () => {
     setLoadingTable(true);
-    await getRules();
+    await getData();
     if (currentPlatform) {
       await getInternalUsers();
     }
     setLoadingTable(false);
   };
 
-  const updateRoles = async () => {
-    await getRules();
+  const refreshCurrentPage = useCallback(() => {
+    return getData(pageIndex, pageSize);
+  }, [pageIndex, pageSize]);
+
+  const handleTableChange = ({ page }) => {
+    if (page) {
+      // If pageSize changed, reset to first page
+      const newPageIndex = page.size !== pageSize ? 0 : page.index;
+      getData(newPageIndex, page.size);
+    }
   };
 
   const closeEditingFlyout = needRefresh => {
-    closeFlyout(needRefresh, setIsEditingRule, initData);
+    if (needRefresh) {
+      refreshCurrentPage();
+    }
+    setIsEditingRule(false);
   };
 
   const closeCreatingFlyout = needRefresh => {
-    closeFlyout(needRefresh, setIsCreatingRule, initData);
+    if (needRefresh) {
+      refreshCurrentPage();
+    }
+    setIsCreatingRule(false);
   };
 
   let editFlyout;
@@ -142,7 +165,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
         rolesEquivalences={rolesEquivalences}
         roles={roles}
         internalUsers={internalUsers}
-        onSave={async () => await updateRoles()}
+        onSave={async () => await refreshCurrentPage()}
         currentPlatform={currentPlatform}
       />
     );
@@ -155,7 +178,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
         rolesEquivalences={rolesEquivalences}
         roles={roles}
         internalUsers={internalUsers}
-        onSave={async () => await updateRoles()}
+        onSave={async () => await refreshCurrentPage()}
         currentPlatform={currentPlatform}
       />
     );
@@ -195,7 +218,11 @@ export const RolesMapping = withUserAuthorizationPrompt([
             setSelectedRule(item);
             setIsEditingRule(true);
           }}
-          updateRules={async () => await updateRoles()}
+          updateRules={refreshCurrentPage}
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          onTableChange={handleTableChange}
         ></RolesMappingTable>
       </EuiPageContentBody>
     </EuiPageContent>
