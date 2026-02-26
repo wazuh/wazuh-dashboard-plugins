@@ -14,12 +14,15 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import { Rule } from '../types/rule.type';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
-const GetRulesService = async (offset = 0, limit = 10): Promise<{ rules: Rule[], total: number }> => {
+const GetRulesService = async (
+  offset = 0,
+  limit = 10,
+): Promise<{ rules: Rule[]; total: number }> => {
   const response = (await WzRequest.apiReq('GET', '/security/rules?sort=name', {
     params: {
       offset,
       limit,
-    }
+    },
   })) as IApiResponse<Rule>;
   const rules = ((response.data || {}).data || {}).affected_items || [];
   const total = ((response.data || {}).data || {}).total_affected_items || 0;

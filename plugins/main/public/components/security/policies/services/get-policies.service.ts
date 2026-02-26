@@ -28,7 +28,10 @@ interface GetPoliciesResult {
   total: number;
 }
 
-const GetPoliciesService = async (offset = 0, limit = 10): Promise<GetPoliciesResult> => {
+const GetPoliciesService = async (
+  offset = 0,
+  limit = 10,
+): Promise<GetPoliciesResult> => {
   const response = (await WzRequest.apiReq('GET', '/security/policies', {
     params: {
       offset,

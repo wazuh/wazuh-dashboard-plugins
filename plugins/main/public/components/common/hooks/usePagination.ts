@@ -79,7 +79,10 @@ interface UsePaginationReturn<T> {
  * />
  */
 export function usePagination<T>(
-  fetchFunction: (offset: number, limit: number) => Promise<PaginationResult<T>>,
+  fetchFunction: (
+    offset: number,
+    limit: number,
+  ) => Promise<PaginationResult<T>>,
   onError?: (error: any) => void,
 ): UsePaginationReturn<T> {
   const [items, setItems] = useState<T[]>([]);
