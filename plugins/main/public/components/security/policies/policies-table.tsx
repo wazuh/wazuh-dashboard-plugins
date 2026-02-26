@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { EuiInMemoryTable, EuiBadge } from '@elastic/eui';
+import { EuiBasicTable, EuiBadge } from '@elastic/eui';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzAPIUtils } from '../../../react-services/wz-api-utils';
@@ -13,6 +13,10 @@ export const PoliciesTable = ({
   loading,
   editPolicy,
   updatePolicies,
+  pageIndex,
+  pageSize,
+  totalItems,
+  onTableChange,
 }) => {
   const [policiesState, setPoliciesState] = useState([]);
 
@@ -153,20 +157,21 @@ export const PoliciesTable = ({
     },
   };
 
-  const search = {
-    box: {
-      incremental: false,
-      schema: true,
-    },
+  const pagination = {
+    pageIndex,
+    pageSize,
+    totalItemCount: totalItems,
+    pageSizeOptions: [5, 10, 25, 50],
+    showPerPageOptions: true,
   };
 
   return (
-    <EuiInMemoryTable
+    <EuiBasicTable
       items={policiesState}
       columns={columns}
-      search={search}
+      pagination={pagination}
+      onChange={onTableChange}
       rowProps={getRowProps}
-      pagination={true}
       loading={loading}
       sorting={sorting}
     />
