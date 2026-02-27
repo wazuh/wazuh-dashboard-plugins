@@ -10,7 +10,7 @@ export const DEV_TOOLS_INITIAL_BUFFER = `# API Console
 GET /agents?status=active
 
 # Get information: Return basic information such as version, compilation date, installation path
-GET /manager/info
+GET /cluster/node01/info
 
 # Add agent: Add a new agent
 POST /agents
