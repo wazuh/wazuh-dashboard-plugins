@@ -7,6 +7,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.10.4
+- Added API selector warning in case run_as is false in the wazuh.yml file [#8026](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8135)
+
+### Changed
+
+- Set run_as as true by default in the wazuh.yml file [#8026](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8135)
 
 ## Wazuh v4.10.3 - OpenSearch Dashboards 2.16.0 - Revision 01
 
