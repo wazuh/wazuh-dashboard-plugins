@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v5.0.0 - OpenSearch Dashboards 3.3.0 - Revision 00
+## Wazuh v5.0.0 - OpenSearch Dashboards 3.5.0 - Revision 00
 
 ### Added
 
@@ -42,6 +42,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated Amazon web services dashboard to use new index pattern [#8065](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8065)
 - Updated Microsoft Graph API dashboard to use new index pattern [#8073](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8073)
 - Updated Threat Hunting dashboard with new index pattern definition [#8063](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8063)
+- Upgraded axios to 1.13.3 [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
+- Upgraded loglovel to 1.9.2 [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
 - Updated Docker module under Cloud Security, with new index pattern definition [#8128](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8128)
 - Changed Ossec references to wazuh-manager [#8136](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8136)
 
@@ -77,6 +79,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the UI permission validation for the upgrade and remove agent actions on Agent management > Summary [#8060](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8060)
 - Removed `hideManagerAlerts` setting [#8102](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8102)
 - Removed usage of agent `000` [#8104](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8104) [#8105](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8105) [#8117](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8117)
+- Removed `needle` dependency [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
+- Removed `read-last-lines` dependency [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
 
 ## Wazuh v4.14.5 - OpenSearch Dashboards 2.19.4 - Revision 00
 
