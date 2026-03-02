@@ -44,7 +44,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated Threat Hunting dashboard with new index pattern definition [#8063](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8063)
 - Updated Docker module under Cloud Security, with new index pattern definition [#8128](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8128)
 - Changed Ossec references to wazuh-manager [#8136](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8136)
-- Changed default Dev Tools request from deprecated `GET /manager/info` to `GET /cluster/node01/info` [#8137](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8137)
+- Changed default Dev Tools request from deprecated `GET /manager/info` to `GET /cluster/<NODE_NAME>/info` [#8137](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8137)
 
 ### Fixed
 
