@@ -359,9 +359,9 @@ export const saveConfiguration = async (selectedNode, xml) => {
 };
 
 /**
- * Send ossec.conf content for a cluster node
+ * Send wazuh-manager.conf content for a cluster node
  * @param {*} node Node name
- * @param {*} content XML raw content for ossec.conf file
+ * @param {*} content XML raw content for wazuh-manager.conf file
  */
 export const saveNodeConfiguration = async (node, content) => {
   try {
@@ -380,7 +380,7 @@ export const saveNodeConfiguration = async (node, content) => {
 };
 
 /**
- * Save text to ossec.conf cluster file
+ * Save text to wazuh-manager.conf cluster file
  * @param {string} text Text to save
  * @param {node}
  */

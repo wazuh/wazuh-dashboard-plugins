@@ -5,13 +5,19 @@ export const dockerColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   commonColumns['wazuh.agent.name'],
   {
-    id: 'data.docker.Type',
+    id: 'container.image.name',
     initialWidth: 149,
   },
   {
-    id: 'data.docker.Action',
+    id: 'event.action',
     initialWidth: 161,
   },
-  commonColumns['rule.description'],
-  commonColumns['rule.level'],
+  {
+    id: 'event.category',
+    initialWidth: 130,
+  },
+  {
+    id: 'container.name',
+    initialWidth: 160,
+  },
 ];
