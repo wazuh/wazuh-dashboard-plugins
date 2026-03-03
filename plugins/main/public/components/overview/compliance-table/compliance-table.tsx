@@ -210,11 +210,11 @@ export const ComplianceTable = compose(
   }) => {
     try {
       const mapFieldAgg = {
-        pci: 'rule.pci_dss',
-        gdpr: 'rule.gdpr',
-        hipaa: 'rule.hipaa',
-        nist: 'rule.nist_800_53',
-        tsc: 'rule.tsc',
+        pci: 'compliance.pci_dss.requirements',
+        gdpr: 'compliance.gdpr.requirements',
+        hipaa: 'compliance.hipaa.requirements',
+        nist: 'compliance.nist_800_53.requirements',
+        tsc: 'compliance.tsc.requirements',
       };
       const aggs = {
         tactics: {

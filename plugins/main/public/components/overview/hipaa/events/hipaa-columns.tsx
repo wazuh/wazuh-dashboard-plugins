@@ -5,10 +5,10 @@ export const hipaaColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   commonColumns['wazuh.agent.name'],
   {
-    id: 'rule.hipaa',
+    id: 'compliance.hipaa.requirements',
     initialWidth: 183,
   },
-  commonColumns['rule.description'],
-  commonColumns['rule.level'],
-  commonColumns['rule.id'],
+  { id: 'wazuh.integration.name' },
+  { id: 'wazuh.integration.category' },
+  { id: 'wazuh.integration.decoders' },
 ];

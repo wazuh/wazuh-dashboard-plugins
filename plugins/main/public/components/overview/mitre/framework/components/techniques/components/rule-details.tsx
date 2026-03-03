@@ -108,19 +108,19 @@ const getFormattedDetails = value => {
 
 const getComplianceKey = key => {
   if (key === 'pci') {
-    return 'rule.pci_dss';
+    return 'compliance.pci_dss.requirements';
   }
   if (key === 'gdpr') {
-    return 'rule.gdpr';
+    return 'compliance.gdpr.requirements';
   }
   if (key === 'gpg13') {
     return 'rule.gpg13';
   }
   if (key === 'hipaa') {
-    return 'rule.hipaa';
+    return 'compliance.hipaa.requirements';
   }
   if (key === 'nist-800-53') {
-    return 'rule.nist_800_53';
+    return 'compliance.nist_800_53.requirements';
   }
   if (key === 'mitre') {
     return 'rule.mitre.id';
