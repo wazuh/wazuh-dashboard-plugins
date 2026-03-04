@@ -92,11 +92,11 @@ export class WzStatusOverview extends Component {
     try {
       this.props.updateLoadingStatus(true);
 
-      const agentsCountByManagerNodes = (
+      const agentsOverview = (
         await this.statusHandler.clusterAgentsCount()
       )?.data?.data;
       const { connection: agentsCount, configuration } =
-        agentsCountByManagerNodes?.agent_status;
+        agentsOverview?.agent_status;
 
       const agentsActiveCoverage = (
         (agentsCount.active / agentsCount.total) *
@@ -108,7 +108,7 @@ export class WzStatusOverview extends Component {
       ).toFixed(2);
 
       this.props.updateStats({
-        agentsCountByManagerNodes: agentsCountByManagerNodes.nodes,
+        agentsCountByNode: agentsOverview?.nodes,
         agentsCount,
         agentsSynced: isNaN(agentsSyncedCoverage) ? 0 : agentsSyncedCoverage,
         agentsCoverage: isNaN(agentsActiveCoverage) ? 0 : agentsActiveCoverage,
@@ -131,7 +131,7 @@ export class WzStatusOverview extends Component {
         );
         this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
       }
-      const [lastAgent] = agentsCountByManagerNodes?.last_registered_agent;
+      const [lastAgent] = agentsOverview?.last_registered_agent;
 
       this.props.updateAgentInfo(lastAgent);
     } catch (error) {
