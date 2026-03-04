@@ -92,9 +92,8 @@ export class WzStatusOverview extends Component {
     try {
       this.props.updateLoadingStatus(true);
 
-      const agentsOverview = (
-        await this.statusHandler.clusterAgentsCount()
-      )?.data?.data;
+      const agentsOverview = (await this.statusHandler.clusterAgentsCount())
+        ?.data?.data;
       const { connection: agentsCount, configuration } =
         agentsOverview?.agent_status;
 

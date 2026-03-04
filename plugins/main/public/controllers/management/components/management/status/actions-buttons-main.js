@@ -129,8 +129,7 @@ class WzStatusActionButtons extends Component {
       const nodeInfo = await this.statusHandler.clusterNodeInfo(node);
       this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
 
-      const [lastAgent] =
-        agentsOverview?.data?.data?.last_registered_agent;
+      const [lastAgent] = agentsOverview?.data?.data?.last_registered_agent;
 
       this.props.updateAgentInfo(lastAgent);
 
