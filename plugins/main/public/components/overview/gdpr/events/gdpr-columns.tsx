@@ -5,10 +5,10 @@ export const gdprColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   commonColumns['wazuh.agent.name'],
   {
-    id: 'rule.gdpr',
+    id: 'compliance.gdpr',
     initialWidth: 138,
   },
-  commonColumns['rule.description'],
-  commonColumns['rule.level'],
-  commonColumns['rule.id'],
+  { id: 'wazuh.integration.name' },
+  { id: 'wazuh.integration.category' },
+  { id: 'wazuh.integration.decoders' },
 ];

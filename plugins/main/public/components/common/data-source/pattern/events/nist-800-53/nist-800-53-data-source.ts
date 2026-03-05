@@ -2,7 +2,7 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_NIST_800_53_EXIST } from '../../../../../../../common/constants';
 import { EventsDataSource } from '../events-data-source';
 
-const KEY_EXIST = 'rule.nist_800_53';
+const KEY_EXIST = 'compliance.nist_800_53';
 
 export class NIST80053DataSource extends EventsDataSource {
   constructor(id: string, title: string) {
