@@ -39,6 +39,7 @@ import NavigationService from '../../react-services/navigation-service';
 import { useAsyncActionRunOnStart } from '../common/hooks';
 import { useSelectedServerApi } from '../common/hooks/use-selected-server-api';
 import { Selector, SelectorContainer, SelectorLabel } from './selectors';
+import { isEqual } from 'lodash';
 
 async function getServerAPIList() {
   const response = await GenericRequest.request('GET', '/hosts/apis', {});
@@ -166,7 +167,7 @@ export const WzMenu = withWindowSize(
 
     async componentDidUpdate(prevProps) {
       if (
-        !_.isEqual(
+        !isEqual(
           this.props.globalBreadcrumbReducers.breadcrumb,
           prevProps.globalBreadcrumbReducers.breadcrumb,
         )

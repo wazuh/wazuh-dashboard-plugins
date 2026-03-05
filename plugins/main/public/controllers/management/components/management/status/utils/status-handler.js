@@ -74,7 +74,7 @@ export default class StatusHandler {
   }
 
   /**
-   * Get agents node count
+   * Get agents overview for the selected cluster
    */
   static async clusterAgentsCount() {
     try {
