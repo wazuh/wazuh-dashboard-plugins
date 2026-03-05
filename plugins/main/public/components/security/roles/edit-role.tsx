@@ -33,7 +33,7 @@ const reservedRoles = [
   'cluster_admin',
 ];
 
-export const EditRole = ({ role, closeFlyout }) => {
+export const EditRole = ({ role, closeFlyout, onRoleUpdated }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentRole, setCurrentRole] = useState({});
   const [isReserved, setIsReserved] = useState(
@@ -146,6 +146,9 @@ export const EditRole = ({ role, closeFlyout }) => {
 
   const update = async () => {
     await getData();
+    if (onRoleUpdated) {
+      await onRoleUpdated();
+    }
   };
 
   const onChangePolicies = selectedPolicies => {

@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Get Rules Service
+ * Wazuh app - Get Policies Service
  * Copyright (C) 2015-2022 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,22 +11,36 @@
  */
 
 import { WzRequest } from '../../../../react-services/wz-request';
-import { Rule } from '../types/rule.type';
 import IApiResponse from '../../../../react-services/interfaces/api-response.interface';
 
-const GetRulesService = async (
+interface Policy {
+  id: string;
+  name: string;
+  policy: {
+    effect: string;
+    actions: string[];
+    resources: string[];
+  };
+}
+
+interface GetPoliciesResult {
+  data: Policy[];
+  total: number;
+}
+
+const GetPoliciesService = async (
   offset = 0,
   limit = 10,
-): Promise<{ rules: Rule[]; total: number }> => {
-  const response = (await WzRequest.apiReq('GET', '/security/rules?sort=name', {
+): Promise<GetPoliciesResult> => {
+  const response = (await WzRequest.apiReq('GET', '/security/policies', {
     params: {
       offset,
       limit,
     },
-  })) as IApiResponse<Rule>;
-  const rules = ((response.data || {}).data || {}).affected_items || [];
+  })) as IApiResponse<Policy>;
+  const data = ((response.data || {}).data || {}).affected_items || [];
   const total = ((response.data || {}).data || {}).total_affected_items || 0;
-  return { rules, total };
+  return { data, total };
 };
 
-export default GetRulesService;
+export default GetPoliciesService;
