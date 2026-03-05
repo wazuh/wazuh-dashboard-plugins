@@ -2,7 +2,7 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_GDPR_EXIST } from '../../../../../../../common/constants';
 import { EventsDataSource } from '../events-data-source';
 
-const KEY_EXIST = 'compliance.gdpr.requirements';
+const KEY_EXIST = 'compliance.gdpr';
 
 export class GDPRDataSource extends EventsDataSource {
   constructor(id: string, title: string) {

@@ -116,23 +116,23 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   },
 
   {
-    id: 'compliance.pci_dss.requirements',
+    id: 'compliance.pci_dss',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'compliance.gdpr.requirements',
+    id: 'compliance.gdpr',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'compliance.nist_800_53.requirements',
+    id: 'compliance.nist_800_53',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'compliance.hipaa.requirements',
+    id: 'compliance.hipaa',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'compliance.tsc.requirements',
+    id: 'compliance.tsc',
     render: renderRequirementsSecurityOperations,
   },
   {
