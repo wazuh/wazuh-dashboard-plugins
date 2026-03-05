@@ -78,7 +78,7 @@
     "@eslint/compat": "^1.1.1",
     "eslint": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-import-resolver-typescript": "3.5.5",
     "eslint-plugin-async-await": "^0.0.0",
     "eslint-plugin-cypress": "^6.1.0",
     "eslint-plugin-filenames-simple": "^0.9.0",
