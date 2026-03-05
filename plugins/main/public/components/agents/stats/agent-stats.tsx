@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useState, useEffect } from 'react';
+import semver from 'semver';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -132,11 +133,7 @@ export const MainAgentStats = compose(
   ),
   withGuard(
     ({ agent }) => {
-      const [major, minor, patch] = agent.version
-        .replace('Wazuh v', '')
-        .split('.')
-        .map(value => parseInt(value));
-      return !(major >= 4 && minor >= 2 && patch >= 0);
+      return semver.lt(agent.version.replace('Wazuh v', ''), '4.2.0');
     },
     () => (
       <PromptAgentFeatureVersion version='equal or higher version than 4.2.0' />
