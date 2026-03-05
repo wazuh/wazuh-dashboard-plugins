@@ -1,31 +1,10 @@
-body.md-default-theme,
-body,
-html.md-default-theme,
-html {
-  color: #dfe5ef !important;
-  background-color: #1a1b20 !important;
-}
-
 .application {
-  background: #1a1b20;
-}
-
-#kibana-body {
-  background-color: #1a1b20 !important;
-}
-
-.euiHeaderSectionItem__button,
-.euiListGroupItem__icon {
-  color: #dfe5ef;
-}
-
-/* If this style is enabled, the stats with colors are wihte and not show the color in dark mode */
-/* .euiToolTipAnchor {
-  color: white;
-} */
-
-.app-wrapper-panel {
-  background-color: #1a1b20;
+  // Solves background color banding in dark mode
+  background: linear-gradient(
+    180deg,
+    $ouiPageBackgroundColor 0%,
+    $ouiPageBackgroundColor 100%
+  );
 }
 
 .wz-md-card:not(.wz-metric-color) {
@@ -70,10 +49,6 @@ html {
   color: white;
 }
 
-.registerAgent {
-  background: #1a1b20 !important;
-}
-
 .json-beautifier {
   background: black;
   color: gray;
@@ -88,18 +63,8 @@ html {
   filter: invert(1);
 }
 
-md-card md-card-content {
-  color: #fff;
-}
-
 .ui-select-choices-row-inner {
   color: #dfe5ef;
-}
-
-md-content.md-default-theme,
-md-content {
-  background-color: #1a1b20;
-  color: #c8dad9;
 }
 
 .wz-metric-color {
@@ -112,20 +77,8 @@ md-content {
   color: white !important;
 }
 
-.euiBreadcrumbs--truncate
-  .euiBreadcrumb:not(.euiBreadcrumb--collapsed).euiBreadcrumb--last,
-.euiNavDrawerGroup__item .euiListGroupItem__label,
-.euiNavDrawer .euiNavDrawer__expandButton .euiListGroupItem__button {
-  color: #dfe5ef;
-}
-
 .percentage {
   color: #fff;
-}
-
-md-nav-bar.md-default-theme .md-nav-bar,
-md-nav-bar .md-nav-bar {
-  border-color: rgb(52, 55, 65);
 }
 
 .sidebar-container .index-pattern {
@@ -134,7 +87,7 @@ md-nav-bar .md-nav-bar {
 }
 
 .wz-menu {
-  background-color: #1a1b20;
+  background-color: $ouiPageBackgroundColor;
   border-bottom: 1px solid #343741;
   color: white;
 }
@@ -165,21 +118,12 @@ md-nav-bar .md-nav-bar {
   color: #dfe5ef;
 }
 
-.md-subheader.md-default-theme,
-.md-subheader {
-  color: #dfe5ef;
-}
-
 .euiCard__top.wz-card-actions-top {
   background: #272931;
 }
 
 table thead > tr {
-  background-color: #1a1b20 !important;
-}
-
-.table-hover > tbody > tr:hover {
-  background-color: rgba(27, 169, 245, 0.05) !important;
+  background-color: $ouiPageBackgroundColor !important;
 }
 
 .table-striped > tbody > tr:nth-of-type(odd):hover {
@@ -230,11 +174,6 @@ table thead > tr {
   border-left: 1px dashed #343741;
 }
 
-md-divider.md-default-theme,
-md-divider {
-  border-top-color: rgb(52, 55, 65);
-}
-
 .wz-item-detail {
   border: 1px solid #343741;
 }
@@ -245,11 +184,11 @@ md-divider {
 }
 
 .wz-dev-tools .CodeMirror {
-  border: 1px solid #343741 !important;
+  border: 1px solid $ouiBorderColor !important;
 }
 
 #wz-dev-tools-editor--separator {
-  background: #1d1e24;
+  background: $euiColorLightestShade;
 
   &:hover {
     background-color: #0b4462;
@@ -348,7 +287,7 @@ md-divider {
 }
 
 .wz-menu-sections {
-  background: #1a1b20;
+  background: $ouiPageBackgroundColor;
 }
 
 .wz-module-header-agent,
@@ -368,18 +307,6 @@ md-divider {
   }
 }
 
-.flyout-body .euiAccordion {
-  border-bottom: 1px solid #343741 !important;
-}
-
-.module-discover-table .euiTableRow.euiTableRow-isExpandedRow .euiTableRowCell {
-  background: #1d1e24 !important;
-}
-
-.module-discover-table .euiTableRow-isExpandedRow .euiTableCellContent {
-  background: #1d1e24 !important;
-}
-
 .wz-search-bar > div > div > div.euiComboBox__inputWrap {
   background: #16171c !important;
   box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.2),
@@ -396,11 +323,6 @@ svg .legend text {
 
 /* welcome-agent */
 
-.wz-welcome-page-agent-tabs {
-  border-bottom: 1px solid #343741;
-  background-color: #1d1e24;
-}
-
 .wz-module-welcome .euiPanel--paddingSmall {
   padding: 8px;
   overflow: hidden;
@@ -410,18 +332,8 @@ svg .legend text {
   overflow: hidden;
 }
 
-.wz-menu-agent-info {
-  background-color: #1a1b20;
-  border-bottom: 1px solid #343741 !important;
-}
-
 .flyout-row {
   border: none;
-}
-
-.application .euiAccordion,
-.flyout-body .euiAccordion {
-  border-bottom: 1px solid #343741 !important;
 }
 
 .sidepanel-infoBtnStyle {
@@ -430,12 +342,6 @@ svg .legend text {
 
 .copy-codeblock-wrapper .euiToolTipAnchor {
   background-color: rgba(0, 0, 0, 0.7);
-}
-
-.wz-app {
-  .wz-welcome-page .euiIcon--app .euiIcon__fillSecondary {
-    fill: #dfe5ef;
-  }
 }
 
 /* Vulnerabilities under evaluation filter */

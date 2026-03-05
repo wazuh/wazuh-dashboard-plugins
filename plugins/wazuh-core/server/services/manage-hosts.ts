@@ -29,7 +29,6 @@ export interface IAPIHost {
 }
 
 interface IAPIHostRegistry {
-  manager: string | null;
   node: string | null;
   cluster: string;
   allow_run_as: API_USER_STATUS_RUN_AS;
@@ -248,23 +247,11 @@ export class ManageHosts {
     this.logger.debug(`Getting registry data from host [${apiHostID}]`);
     // Get cluster info data
 
-    let manager = null,
-      node = null,
+    let node = null,
       cluster = null,
       allow_run_as = API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK;
 
     try {
-      const responseAgents = await this.serverAPIClient.asInternalUser.request(
-        'GET',
-        `/agents`,
-        { params: { agents_list: '000' } },
-        { apiHostID },
-      );
-
-      if (this.isServerAPIClientResponseOk(responseAgents)) {
-        manager = responseAgents.data.data.affected_items[0].manager;
-      }
-
       // Get allow_run_as
       const responseAllowRunAs =
         await this.serverAPIClient.asInternalUser.request(
@@ -311,7 +298,6 @@ export class ManageHosts {
     const verify_ca = this.calculateVerifyCa(host);
 
     const data = {
-      manager,
       node,
       cluster,
       allow_run_as,

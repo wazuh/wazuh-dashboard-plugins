@@ -81,7 +81,7 @@ jest.mock('@osd/i18n', () => ({
 }));
 
 jest.mock('../../../../../utils/applications', () => ({
-  id: '000',
+  id: '001',
   __esModule: true,
 }));
 
@@ -147,7 +147,7 @@ describe('WzConfigurationSwitch', () => {
   it("shouldn't render the agent info ribbon", () => {
     const { container } = render(
       <WzConfigurationSwitch
-        agent={{ id: '000' }}
+        agent={{ id: '001' }}
         updateClusterNodes={updateClusterNodes}
         updateClusterNodeSelected={updateClusterNodeSelected}
       />,
@@ -163,7 +163,7 @@ describe('WzConfigurationSwitch', () => {
   it("shouldn't render any ribbon items", () => {
     const { container } = render(
       <WzConfigurationSwitch
-        agent={{ id: '000' }}
+        agent={{ id: '001' }}
         updateClusterNodes={updateClusterNodes}
         updateClusterNodeSelected={updateClusterNodeSelected}
       />,

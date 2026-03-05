@@ -969,7 +969,7 @@ function generateAlert(params) {
     // Log information
     alert.log = generateLog({
       level: eventType === 'deleted' ? 'warning' : 'info',
-      filePath: '/var/ossec/logs/ossec.log',
+      filePath: '/var/wazuh-manager/logs/wazuh-manager.log',
       originFile: 'syscheck',
     });
 
@@ -1046,7 +1046,7 @@ function generateAlert(params) {
     // Log
     alert.log = generateLog({
       level: alert.data.virustotal.found === '1' ? 'warning' : 'info',
-      filePath: '/var/ossec/logs/ossec.log',
+      filePath: '/var/wazuh-manager/logs/wazuh-manager.log',
       originFile: 'virustotal',
     });
   }
@@ -1102,7 +1102,7 @@ function generateAlert(params) {
     // Log
     alert.log = generateLog({
       level: 'warning',
-      filePath: '/var/ossec/logs/ossec.log',
+      filePath: '/var/wazuh-manager/logs/wazuh-manager.log',
       originFile: 'vulnerability-detector',
     });
   }
@@ -1717,7 +1717,7 @@ function generateAlert(params) {
     // Log
     alert.log = generateLog({
       level: 'critical',
-      filePath: '/var/ossec/logs/ossec.log',
+      filePath: '/var/wazuh-manager/logs/wazuh-manager.log',
       originFile: 'yara',
     });
   }

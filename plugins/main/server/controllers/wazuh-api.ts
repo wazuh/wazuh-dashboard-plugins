@@ -158,7 +158,7 @@ export class WazuhApiCtrl {
 
       // If we have a valid response from the Wazuh API
       try {
-        const { manager, node, cluster } =
+        const { node, cluster } =
           await context.wazuh_core.manageHosts.getRegistryDataByHost(
             apiHostData,
             {
@@ -166,7 +166,7 @@ export class WazuhApiCtrl {
             },
           );
 
-        api.cluster_info = { manager, node, cluster };
+        api.cluster_info = { node, cluster };
 
         return response.ok({
           body: {

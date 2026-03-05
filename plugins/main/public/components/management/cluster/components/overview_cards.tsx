@@ -124,21 +124,7 @@ export const OverviewCards = ({
               compressed
               listItems={[
                 {
-                  title: (
-                    <EuiToolTip
-                      content='Click to open the list of nodes'
-                      position='left'
-                    >
-                      <EuiButtonEmpty
-                        color='primary'
-                        flush='left'
-                        onClick={goNodes}
-                        style={{ height: 'auto' }}
-                      >
-                        Nodes
-                      </EuiButtonEmpty>
-                    </EuiToolTip>
-                  ),
+                  title: 'Nodes',
                   description: (
                     <EuiToolTip
                       content='Click to open the list of nodes'
@@ -156,21 +142,7 @@ export const OverviewCards = ({
                   ),
                 },
                 {
-                  title: (
-                    <EuiToolTip
-                      content='Click to open the list of agents'
-                      position='left'
-                    >
-                      <EuiButtonEmpty
-                        color='primary'
-                        flush='left'
-                        onClick={goAgents}
-                        style={{ height: 'auto' }}
-                      >
-                        Agents
-                      </EuiButtonEmpty>
-                    </EuiToolTip>
-                  ),
+                  title: 'Agents',
                   description: (
                     <EuiToolTip
                       content='Click to open the list of agents'

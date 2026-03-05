@@ -353,17 +353,6 @@ input[type='search'].euiFieldSearch {
   background-color: transparent;
 }
 
-.md-subheader {
-  background: transparent !important;
-}
-
-/* Custom plugin plaform styles */
-
-md-content.md-default-theme,
-md-content {
-  background: transparent !important;
-}
-
 .wz-border-none,
 .wz-border-none md-select-value {
   border: none !important;
@@ -375,15 +364,6 @@ md-content {
 
 .table {
   margin: 0 !important;
-}
-
-.wz-md-tab .md-tab,
-.wz-md-tab .md-active {
-  color: black !important;
-}
-
-.table-hover > tbody > tr:hover {
-  background-color: #fafbfd !important;
 }
 
 /* .table > tbody {
@@ -428,12 +408,6 @@ kbn-vis .visChart__container {
   overflow: hidden !important;
 }
 
-md-sidenav {
-  width: 250px !important;
-  font-size: 12px;
-  background: transparent !important;
-}
-
 /* Dev tools styles */
 
 .wz-dev-tools {
@@ -473,7 +447,7 @@ md-sidenav {
   align-items: center;
   justify-content: center;
   position: relative;
-  background: linear-gradient(#fafbfd);
+  background: linear-gradient($ouiPageBackgroundColor);
   border-left: 1px solid rgba(0, 0, 0, 0.04);
   border-right: 1px solid rgba(0, 0, 0, 0.04);
   z-index: 1000;
@@ -482,7 +456,7 @@ md-sidenav {
   svg {
     position: relative;
     z-index: 1;
-    color: #1f2933;
+    color: $euiColorDarkestShade;
   }
 
   svg path {
@@ -491,7 +465,7 @@ md-sidenav {
 
   /* hover: light blue background, grey rail stays */
   &:hover {
-    background: linear-gradient(#cce1f0);
+    background: linear-gradient($euiColorLightShade);
   }
 
   focusRingAnimate animation {
@@ -553,22 +527,6 @@ md-sidenav {
   margin: 0px 15px;
   border-bottom: 1px solid #d3dae6;
   padding: 16px 0px;
-}
-
-md-switch.md-default-theme .md-thumb,
-md-switch .md-thumb {
-  border: 1px solid #d3dae6;
-}
-
-md-switch.md-default-theme .md-bar,
-md-switch .md-bar {
-  border: 1px solid #d3dae6;
-}
-
-md-switch.md-default-theme.md-checked .md-thumb,
-md-switch.md-checked .md-thumb {
-  background-color: rgb(0, 107, 180);
-  border: none;
 }
 
 .wz-select-input {
@@ -838,21 +796,6 @@ wz-xml-file-editor {
 .table-striped > tbody > tr:nth-of-type(odd) {
   background-color: transparent !important;
 }
-
-.table-striped > tbody > tr:nth-of-type(odd):hover {
-  background-color: #fafbfd !important;
-}
-
-.table-striped-duo > tbody tr:not(.euiTableRow):nth-child(2n + 1):not(:hover),
-.table-striped-duo > tbody tr:not(.euiTableRow):nth-child(2n + 2):not(:hover) {
-  background: #f9f9f9;
-}
-
-.table-striped-duo > tbody tr:not(.euiTableRow):nth-child(4n + 1):not(:hover),
-.table-striped-duo > tbody tr:not(.euiTableRow):nth-child(4n + 2):not(:hover) {
-  background: #fff;
-}
-
 .table-resizable > thead th:not(:first-child) {
   border-left: 1px dashed #dfeff8;
   overflow: hidden;
@@ -934,16 +877,6 @@ wz-xml-file-editor {
   overflow: hidden !important;
 }
 
-.agents-headline .euiStat .euiStat__title {
-  color: #6e6e6e;
-  font-size: 14px;
-}
-
-.agents-headline .euiText.euiText--small p {
-  color: #006bb4;
-  font-weight: 600;
-}
-
 .discoverSectionSwitchBtn {
   height: 15px;
   margin: 2px 10px 0 0 !important;
@@ -974,15 +907,6 @@ wz-xml-file-editor {
   white-space: nowrap;
 }
 
-.registerAgent {
-  min-height: calc(100vh - 100px);
-  background: #fafbfd;
-}
-
-.application {
-  background: #fafbfd;
-}
-
 .application.tab-health-check wz-menu {
   display: none;
 }
@@ -1007,21 +931,6 @@ wz-xml-file-editor {
   width: 26px;
 }
 
-.health-check .euiCodeBlock {
-  max-height: 0;
-  margin-top: 0;
-  transition: all 0.25s ease-out;
-  overflow: hidden;
-  border: 0px solid #0001;
-}
-
-.health-check .euiCodeBlock.visible {
-  border: 1px solid #0001;
-  max-height: 700px;
-  margin-top: 16px;
-  visibility: visible;
-}
-
 .wz-hover-transform-y1:hover {
   -webkit-transform: translateY(-1px) !important;
   transform: translateY(-1px) !important;
@@ -1034,29 +943,6 @@ wz-xml-file-editor {
 
   to {
     transform: rotate(359deg);
-  }
-}
-
-.health-check-loader {
-  height: 120px;
-  width: 120px;
-  margin: 0 auto;
-}
-
-.health-check-logo {
-  width: 140px;
-  z-index: 1;
-  margin: 0 auto;
-}
-
-.health-check {
-  .euiDescriptionList__title {
-    width: 60% !important;
-  }
-
-  .euiDescriptionList__description {
-    text-align: left !important;
-    width: 40% !important;
   }
 }
 
@@ -1206,18 +1092,9 @@ wz-xml-file-editor {
   margin-bottom: 10px;
 }
 
-.list-of-files .euiListGroupItem {
-  background: white !important;
-  color: #377dbb !important;
-}
-
 .list-of-files-fail {
   margin-top: 10px;
   margin-bottom: 10px;
-}
-
-.list-of-files-fail .euiListGroupItem {
-  background: white !important;
 }
 
 .list-element-ok {
@@ -1226,11 +1103,6 @@ wz-xml-file-editor {
 
 .list-element-bad {
   color: #000 !important;
-}
-
-md-chips.md-default-theme .md-chips,
-md-chips .md-chips {
-  box-shadow: none;
 }
 
 .min-guide-width {
@@ -1288,7 +1160,7 @@ md-chips .md-chips {
 }
 
 .subdued-color {
-  color: #808184;
+  color: $euiTextSubduedColor;
 }
 
 .react-code-mirror {
@@ -1364,7 +1236,7 @@ md-chips .md-chips {
 }
 
 .codeEditorWrapper {
-  border: 1px solid #e9edf3;
+  border: 1px solid $euiColorLightShade;
 }
 
 .codeEditorWrapper .ace-tm .ace_gutter {
@@ -1384,7 +1256,6 @@ md-chips .md-chips {
 }
 
 .euiCodeBlock.euiCodeBlock-isFullScreen {
-  border: 1px solid #d3dae6;
   border-radius: 4px;
   margin: 22px;
 }
@@ -1410,23 +1281,13 @@ md-chips .md-chips {
   animation-iteration-count: infinite;
 }
 
-.wz-menu-agent-info {
-  background-color: #fafbfd;
-  margin-bottom: 0px;
-  margin-left: 0px;
-  margin-right: 0px;
-  border-bottom: 1px solid #d3dae6;
-  height: 56px;
-  margin-top: 0px;
-}
-
 .wz-select-agent-modal {
   max-width: 60vw;
 }
 
 .wz-markdown-wrapper code {
-  color: #1c2226;
-  background-color: #e6e6e6;
+  color: $euiColorDarkestShade;
+  background-color: $euiColorLightestShade;
   border-radius: 3px;
   font-family: courier, monospace;
   padding: 0 3px;
@@ -1771,10 +1632,6 @@ iframe.width-changed {
 .wz-app {
   .euiPage {
     background-color: transparent;
-  }
-
-  .wz-welcome-page .euiIcon--app .euiIcon__fillSecondary {
-    fill: #000000bb;
   }
 }
 

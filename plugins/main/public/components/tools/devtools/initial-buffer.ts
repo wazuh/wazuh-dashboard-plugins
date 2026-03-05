@@ -10,7 +10,9 @@ export const DEV_TOOLS_INITIAL_BUFFER = `# API Console
 GET /agents?status=active
 
 # Get information: Return basic information such as version, compilation date, installation path
-GET /manager/info
+# Replace <NODE_NAME> with the name of an existing node in your cluster
+# TIP: Use GET /cluster/local/info to get the local node name
+GET /cluster/<NODE_NAME>/info
 
 # Add agent: Add a new agent
 POST /agents

@@ -39,6 +39,7 @@ import NavigationService from '../../react-services/navigation-service';
 import { useAsyncActionRunOnStart } from '../common/hooks';
 import { useSelectedServerApi } from '../common/hooks/use-selected-server-api';
 import { Selector, SelectorContainer, SelectorLabel } from './selectors';
+import { isEqual } from 'lodash';
 
 async function getServerAPIList() {
   const response = await GenericRequest.request('GET', '/hosts/apis', {});
@@ -78,7 +79,10 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
 
       AppState.setClusterInfo(apiData[0].cluster_info);
       AppState.setCurrentAPI(
-        JSON.stringify({ name: apiData[0].manager, id: apiId.value }),
+        JSON.stringify({
+          name: apiData[0].cluster_info?.cluster,
+          id: apiId.value,
+        }),
       );
       const pinnedAgentManager = new PinnedAgentManager();
       const isPinnedAgent = pinnedAgentManager.isPinnedAgent();
@@ -163,7 +167,7 @@ export const WzMenu = withWindowSize(
 
     async componentDidUpdate(prevProps) {
       if (
-        !_.isEqual(
+        !isEqual(
           this.props.globalBreadcrumbReducers.breadcrumb,
           prevProps.globalBreadcrumbReducers.breadcrumb,
         )

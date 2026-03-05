@@ -61,7 +61,7 @@ export const Stats = withErrorBoundary(
       if (status) {
         sessionStorage.setItem(
           'wz-agents-overview-table-filter',
-          JSON.stringify({ q: `id!=000;status=${status}` }),
+          JSON.stringify({ q: `status=${status}` }),
         );
       } else if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
         sessionStorage.removeItem('wz-agents-overview-table-filter');

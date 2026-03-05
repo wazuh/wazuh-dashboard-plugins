@@ -471,12 +471,6 @@ export const ApiTable = compose(withErrorBoundary)(
           sortable: true,
         },
         {
-          field: 'cluster_info.manager',
-          name: 'Manager',
-          align: 'left',
-          sortable: true,
-        },
-        {
           field: 'url',
           name: 'Host',
           align: 'left',
