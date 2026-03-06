@@ -284,6 +284,14 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'states-sca.json',
   },
+  'active-responses': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/active-responses.json',
+      ),
+    ],
+    outputFile: 'active-responses.json',
+  },
 };
 
 /**
