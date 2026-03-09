@@ -21,7 +21,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Changed default index pattern settings key from `defaultIndex` to `wazuh-events*` [#1090](https://github.com/wazuh/wazuh-dashboard/issues/1090)
 - Adapted alerts sample data to Wazuh Common Schema [#7839](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7839)
-- Set cluster mode as default for all Wazuh installations, including single-node deployments. Updated RBAC permissions to `cluster:*` actions [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688)
+- Set cluster mode as default for all Wazuh installations, including single-node deployments. Updated RBAC permissions to `cluster:*` actions [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688) [#8147](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8147)
 - Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7578](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7578) [#7929](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7929) [#7974](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7974) [#7979](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7979)
 - Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data [#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
 - Reworked health check [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622) [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694) [#7756](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7756) [#7829](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7829)
@@ -47,6 +47,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated Docker module under Cloud Security, with new index pattern definition [#8128](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8128)
 - Changed Ossec references to wazuh-manager [#8136](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8136)
 - Changed default Dev Tools request from deprecated `GET /manager/info` to `GET /cluster/<NODE_NAME>/info` [#8137](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8137)
+- Updated Malware Detection dashboard with new index pattern definition [#8139](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8157)
 
 ### Fixed
 

@@ -106,11 +106,10 @@ class WzStatusActionButtons extends Component {
       this.props.updateLoadingStatus(true);
       this.props.updateSelectedNode(node);
 
-      const agentDistributionByCluster =
-        await this.statusHandler.clusterAgentsCount();
+      const agentsOverview = await this.statusHandler.clusterAgentsCount();
 
       const { connection: agentsCount } =
-        agentDistributionByCluster?.data?.data?.agent_status;
+        agentsOverview?.data?.data?.agent_status;
 
       const agentsActiveCoverage = (
         (agentsCount.active / agentsCount.total) *
@@ -118,8 +117,7 @@ class WzStatusActionButtons extends Component {
       ).toFixed(2);
 
       this.props.updateStats({
-        agentDistributionByCluster:
-          agentDistributionByCluster?.data?.data?.nodes,
+        agentsCountByNode: agentsOverview?.data?.data?.nodes,
         agentsCount,
         agentsCoverage: isNaN(agentsActiveCoverage) ? 0 : agentsActiveCoverage,
       });
@@ -131,8 +129,7 @@ class WzStatusActionButtons extends Component {
       const nodeInfo = await this.statusHandler.clusterNodeInfo(node);
       this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
 
-      const [lastAgent] =
-        agentDistributionByCluster?.data?.data?.last_registered_agent;
+      const [lastAgent] = agentsOverview?.data?.data?.last_registered_agent;
 
       this.props.updateAgentInfo(lastAgent);
 
