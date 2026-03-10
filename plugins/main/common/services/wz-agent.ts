@@ -11,7 +11,7 @@ export const getAgentVersion = (
   // const raw = version.replace(//, '');
   const [, rawVersion, majorText, minorText, patchText] = version.match(
     /((\d+)\.(\d+)\.(\d+))/,
-  ); // Remove leading 'v' if it exists
+  ); // This regex captures the version numbers in groups, allowing for optional leading 'v' and any additional text.
 
   const raw = rawVersion || version; // Fallback to original version if regex doesn't match
   const major = Number(majorText) || 0;
