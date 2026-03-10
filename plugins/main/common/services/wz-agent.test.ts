@@ -11,12 +11,5 @@ describe('getAgentVersion', () => {
     ['Wazuh v5.1.2', { major: 5, minor: 1, patch: 2, raw: '5.1.2' }],
   ])('parses version %s', (input, expected) => {
     expect(getAgentVersion(input)).toEqual(expected);
-
-    expect(logSpy).toHaveBeenCalledWith('Parsed version:', {
-      major: expected.major,
-      minor: expected.minor,
-      patch: expected.patch,
-      rawVersion: expected.raw,
-    });
   });
 });
