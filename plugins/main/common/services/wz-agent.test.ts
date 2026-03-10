@@ -10,8 +10,6 @@ describe('getAgentVersion', () => {
     ['5.0.0', { major: 5, minor: 0, patch: 0, raw: '5.0.0' }],
     ['Wazuh v5.1.2', { major: 5, minor: 1, patch: 2, raw: '5.1.2' }],
   ])('parses version %s', (input, expected) => {
-    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-
     expect(getAgentVersion(input)).toEqual(expected);
 
     expect(logSpy).toHaveBeenCalledWith('Parsed version:', {
