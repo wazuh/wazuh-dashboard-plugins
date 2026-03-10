@@ -47,6 +47,7 @@ import NavigationService from '../../../react-services/navigation-service';
 import WzRibbon from '../../common/ribbon/ribbon';
 import { Agent } from '../../endpoints-summary/types';
 import { SECTIONS } from '../../../sections';
+import { getAgentVersion } from '../../../../common/services/wz-agent';
 
 const tableColumns = [
   {
@@ -133,7 +134,8 @@ export const MainAgentStats = compose(
   ),
   withGuard(
     ({ agent }) => {
-      return semver.lt(agent.version.replace('Wazuh v', ''), '4.2.0');
+      const { raw } = getAgentVersion(agent.version);
+      return semver.lt(raw, '4.2.0');
     },
     () => (
       <PromptAgentFeatureVersion version='equal or higher version than 4.2.0' />
