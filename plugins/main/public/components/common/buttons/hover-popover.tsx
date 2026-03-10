@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { EuiPopover, EuiIcon, EuiText } from '@elastic/eui';
+import { EuiPopover, EuiIcon, EuiText, EuiTextAlign } from '@elastic/eui';
 
 type hoverPopoverProps = {
   iconType?: string;
@@ -10,9 +10,9 @@ type hoverPopoverProps = {
 
 export const HoverPopover = ({
   isDisabled = false,
-  message,
   color = 'primary',
   iconType = 'questionInCircle',
+  message,
 }: hoverPopoverProps) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
@@ -31,6 +31,7 @@ export const HoverPopover = ({
         height: 40,
         lineHeight: 0,
         paddingRight: 10,
+        paddingLeft: 10,
       }}
     >
       <EuiIcon
@@ -51,11 +52,13 @@ export const HoverPopover = ({
       isOpen={isPopoverOpen}
       closePopover={() => setIsPopoverOpen(false)}
       anchorPosition='downCenter'
-      panelPaddingSize='m'
+      panelPaddingSize='s'
     >
-      <EuiText size='s' style={{ width: 200 }}>
-        {message}
-      </EuiText>
+      <EuiTextAlign textAlign='center'>
+        <EuiText size='s' style={{ maxWidth: 250 }}>
+          {message}
+        </EuiText>
+      </EuiTextAlign>
     </EuiPopover>
   );
 };

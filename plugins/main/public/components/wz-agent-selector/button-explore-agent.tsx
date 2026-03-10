@@ -1,4 +1,5 @@
 import React from 'react';
+import { isVersionLower } from '../endpoints-summary/table/utils';
 import { WzButton, HoverPopover } from '../common/buttons';
 import { PinnedAgentManager } from './wz-agent-selector-service';
 import { WzButtonType } from '../common/buttons/button';
@@ -28,6 +29,9 @@ const ButtonPinnedAgent = ({
   const avaliableForAgent = module
     ? module?.availableFor && module?.availableFor.includes('agent')
     : true;
+  const outdatedAgentPinned = agent?.version
+    ? isVersionLower(agent.version, '5.0.0')
+    : false;
 
   const unPinAgentHandler = () => {
     pinnedAgentManager.unPinAgent();
@@ -41,8 +45,8 @@ const ButtonPinnedAgent = ({
     >
       <HoverPopover
         iconType='alert'
-        isDisabled={false}
-        color='danger'
+        isDisabled={!outdatedAgentPinned}
+        color='warning'
         message='This agent version is below 5.x, capabilities might be limited'
       />
       <WzButton
