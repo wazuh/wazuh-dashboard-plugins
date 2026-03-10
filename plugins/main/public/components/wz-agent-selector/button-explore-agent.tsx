@@ -40,8 +40,8 @@ const ButtonPinnedAgent = ({
       style={{ display: 'inline-flex' }}
     >
       <HoverPopover
-        icon='alert'
-        disabled={false}
+        iconType='alert'
+        isDisabled={false}
         color='danger'
         message='This agent version is below 5.x, capabilities might be limited'
       />

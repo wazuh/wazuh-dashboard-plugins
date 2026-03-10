@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import { EuiPopover, EuiIcon, EuiText } from '@elastic/eui';
 
 type hoverPopoverProps = {
-  icon?: string;
-  disabled?: boolean;
+  iconType?: string;
+  isDisabled?: boolean;
   color?: string;
   message: string;
 };
 
 export const HoverPopover = ({
-  disabled = false,
+  isDisabled = false,
   message,
   color = 'primary',
-  icon = 'questionInCircle',
+  iconType = 'questionInCircle',
 }: hoverPopoverProps) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
@@ -21,19 +21,28 @@ export const HoverPopover = ({
   const onMouseLeave = () => setIsPopoverOpen(false);
   const onFocus = () => setIsPopoverOpen(true);
 
-  if (disabled) return null;
+  if (isDisabled) return null;
 
   const button = (
-    <EuiIcon
-      type={icon}
-      color={color}
-      size='l'
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      onFocus={onFocus}
-      tabIndex={0}
-      aria-label='Warning Info'
-    />
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        height: 40,
+        lineHeight: 0,
+        paddingRight: 10,
+      }}
+    >
+      <EuiIcon
+        type={iconType}
+        color={color}
+        size='l'
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onFocus={onFocus}
+        tabIndex={0}
+      />
+    </span>
   );
 
   return (
@@ -41,7 +50,7 @@ export const HoverPopover = ({
       button={button}
       isOpen={isPopoverOpen}
       closePopover={() => setIsPopoverOpen(false)}
-      anchorPosition='upCenter'
+      anchorPosition='downCenter'
       panelPaddingSize='m'
     >
       <EuiText size='s' style={{ width: 200 }}>
