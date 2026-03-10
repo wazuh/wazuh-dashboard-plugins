@@ -752,7 +752,7 @@ const about = {
 export const Applications = [
   fileIntegrityMonitoring,
   overview,
-  // malwareDetection,
+  malwareDetection,
   configurationAssessment,
   threatHunting,
   vulnerabilityDetection,

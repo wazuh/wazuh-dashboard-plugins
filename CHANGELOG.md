@@ -47,6 +47,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated Docker module under Cloud Security, with new index pattern definition [#8128](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8128)
 - Changed Ossec references to wazuh-manager [#8136](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8136)
 - Changed default Dev Tools request from deprecated `GET /manager/info` to `GET /cluster/<NODE_NAME>/info` [#8137](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8137)
+- Upgraded ESLint from version 8 to version 10 and migrated configuration from legacy `.eslintrc.json` to the new flat config format (`eslint.config.mjs`) [#8145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8145)
+- Updated Malware Detection dashboard with new index pattern definition [#8157](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8157)
 
 ### Fixed
 
