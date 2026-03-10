@@ -1,10 +1,11 @@
 import React from 'react';
-import { WzButton } from '../common/buttons';
+import { WzButton, HoverPopover } from '../common/buttons';
 import { PinnedAgentManager } from './wz-agent-selector-service';
 import { WzButtonType } from '../common/buttons/button';
 import { connect } from 'react-redux';
 import { showExploreAgentModalGlobal } from '../../redux/actions/appStateActions';
 import './button-explore-agent.scss';
+
 import clsx from 'clsx';
 
 interface ButtonPinnedAgentProps {
@@ -38,6 +39,12 @@ const ButtonPinnedAgent = ({
       data-test-subj='explore-agent-button'
       style={{ display: 'inline-flex' }}
     >
+      <HoverPopover
+        icon='alert'
+        disabled={false}
+        color='danger'
+        message='This agent version is below 5.x, capabilities might be limited'
+      />
       <WzButton
         buttonType={WzButtonType.empty}
         color='primary'
