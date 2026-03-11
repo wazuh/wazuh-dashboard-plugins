@@ -26,6 +26,23 @@ exports[`SettingsAboutAppInfo component should render version, revision, install
               </b>
             </div>
           </div>
+          <div
+            class="euiFlexItem"
+          >
+            <div
+              class="euiText euiText--medium"
+            >
+              Cluster UUID:
+               
+              <b>
+                <span
+                  class="euiTextColor euiTextColor--subdued"
+                >
+                  -
+                </span>
+              </b>
+            </div>
+          </div>
         </div>
       </div>
     </div>
