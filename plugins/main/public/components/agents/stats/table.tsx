@@ -33,29 +33,55 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 
-export function AgentStatTable({ columns, title, start, end, loading, items, exportCSVFilename }) {
+export function AgentStatTable({
+  columns,
+  title,
+  start,
+  end,
+  loading,
+  items,
+  exportCSVFilename,
+}) {
   return (
     <EuiPanel>
-      <EuiFlexGroup justifyContent="spaceBetween">
+      <EuiFlexGroup justifyContent='spaceBetween'>
         <EuiFlexItem grow={false}>
           <EuiText>{title}</EuiText>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiText>
-            <EuiIcon type="calendar" /> Start:{' '}
-            {loading ? <EuiLoadingSpinner size="s" /> : start ? formatUIDate(start) : '-'} - End:{' '}
-            {loading ? <EuiLoadingSpinner size="s" /> : end ? formatUIDate(end) : '-'}
+            <EuiIcon type='calendar' /> Start:{' '}
+            {loading ? (
+              <EuiLoadingSpinner size='s' />
+            ) : start ? (
+              formatUIDate(start)
+            ) : (
+              '-'
+            )}{' '}
+            - End:{' '}
+            {loading ? (
+              <EuiLoadingSpinner size='s' />
+            ) : end ? (
+              formatUIDate(end)
+            ) : (
+              '-'
+            )}
           </EuiText>
         </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiHorizontalRule margin="xs" />
-      <EuiInMemoryTable columns={columns} items={items || []} loading={loading} pagination={true} />
-      <EuiSpacer size="xs" />
-      <EuiFlexGroup justifyContent="flexEnd">
+      <EuiHorizontalRule margin='xs' />
+      <EuiInMemoryTable
+        columns={columns}
+        items={items || []}
+        loading={loading}
+        pagination={true}
+      />
+      <EuiSpacer size='xs' />
+      <EuiFlexGroup justifyContent='flexEnd'>
         <EuiFlexItem grow={false}>
           <EuiButtonEmpty
             onClick={() => downloadCsv(columns, items, exportCSVFilename)}
-            iconType="importAction"
+            iconType='importAction'
             isDisabled={loading}
           >
             Download CSV
@@ -68,8 +94,10 @@ export function AgentStatTable({ columns, title, start, end, loading, items, exp
 
 function downloadCsv(columns: any[], data: any[], filename: string) {
   try {
-    const header = columns.map((column) => column.name).join(',');
-    const body = data.map((row) => columns.map((column) => row[column.field]).join(',')).join('\n');
+    const header = columns.map(column => column.name).join(',');
+    const body = data
+      .map(row => columns.map(column => row[column.field]).join(','))
+      .join('\n');
     const result = [header, body].join('\n');
     const blob = new Blob([result], { type: 'text/csv' }); // eslint-disable-line
     FileSaver.saveAs(blob, `${filename}.csv`);

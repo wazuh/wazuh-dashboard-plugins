@@ -336,9 +336,7 @@ export class ServerAPIClient {
     try {
       return await this._axios(optionsRequest);
     } catch (error: any) {
-      const api = (await this.manageHosts.get(
-        options.apiHostID,
-      )) as IAPIHost;
+      const api = (await this.manageHosts.get(options.apiHostID)) as IAPIHost;
       throw this._enhanceConnectionError(error, options.apiHostID, api);
     }
   }

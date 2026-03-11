@@ -1,7 +1,5 @@
 {
-  "plugins": [
-    "cypress"
-  ],
+  "plugins": ["cypress"],
   "rules": {
     "cypress/no-assigning-return-values": "error",
     "cypress/no-unnecessary-waiting": "error",
@@ -12,7 +10,5 @@
   "env": {
     "cypress/globals": true
   },
-  "extends": [
-    "plugin:cypress/recommended"
-  ]
+  "extends": ["plugin:cypress/recommended"]
 }
