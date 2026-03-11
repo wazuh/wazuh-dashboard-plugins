@@ -6,26 +6,13 @@ exports[`SettingsAboutAppInfo component should render version, revision, install
     class="euiCallOut euiCallOut--primary"
   >
     <div
-      class="euiCallOutHeader"
-    >
-      <span
-        class="euiCallOutHeader__title"
-      >
-        <h3
-          class="euiTitle euiTitle--xsmall"
-        >
-          Setup information
-        </h3>
-      </span>
-    </div>
-    <div
       class="euiText euiText--small"
     >
       <div
         class="euiTextColor euiTextColor--default"
       >
         <div
-          class="euiFlexGroup euiFlexGroup--gutterMedium euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+          class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
         >
           <div
             class="euiFlexItem"

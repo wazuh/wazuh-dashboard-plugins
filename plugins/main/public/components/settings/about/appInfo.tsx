@@ -21,7 +21,7 @@ export const SettingsAboutAppInfo = ({
         direction='row'
         alignItems='center'
         justifyContent='flexStart'
-        gutterSize='m'
+        gutterSize='none'
       >
         <EuiFlexItem>
           <EuiText>
