@@ -6,6 +6,10 @@ import semver from 'semver';
  * Handles edge cases like invalid versions or '-' values.
  */
 export function isVersionLower(versionA: string, versionB: string): boolean {
+  // Handle edge cases
+  if (!semver.valid(versionA) || !semver.valid(versionB)) {
+    return false;
+  }
   try {
     // Clean versions by removing any 'v' prefix and ensuring valid semver format
     const cleanVersionA = semver.coerce(versionA);
