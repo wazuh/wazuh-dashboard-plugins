@@ -54,6 +54,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed version hardcoded value in the deploy agent wizard [#7923](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7923)
 - Fixed a visual bug in SCA score decimal precision on the Agent Overview [#8099](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8099)
+- Fixed the agent stats view was innaccesible for some version combinations [#8150](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8150)
 
 ### Removed
 
