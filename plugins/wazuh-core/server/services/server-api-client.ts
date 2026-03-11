@@ -144,6 +144,16 @@ export class ServerAPIClient {
       const hasCert = certValue !== '';
       const hasCa = caValue !== '';
 
+      if (hasKey !== hasCert) {
+        const missing = hasKey ? 'cert' : 'key';
+        const present = hasKey ? 'key' : 'cert';
+        throw new Error(
+          `Incomplete SSL client certificate configuration for host [${apiHost.id}]. ` +
+            `The "${present}" is configured but "${missing}" is missing. ` +
+            `Both "key" and "cert" must be provided together.`,
+        );
+      }
+
       caPath = hasCa ? this._resolveConfigPath(caValue) : '';
 
       if (hasKey && hasCert) {
@@ -221,6 +231,55 @@ export class ServerAPIClient {
       : value;
   }
 
+  private _enhanceConnectionError(
+    error: any,
+    apiHostID: string,
+    api: IAPIHost,
+  ): Error {
+    if (error.response) {
+      return error;
+    }
+
+    const host = `${api.url}:${api.port}`;
+    const code = error.code || '';
+    const originalMessage = error.message || String(error);
+
+    const hasCerts = api.key || api.cert || api.ca;
+
+    const SSL_ERROR_HINTS: Record<string, string> = {
+      ECONNRESET: `The server at [${host}] closed the connection unexpectedly.`,
+      ECONNREFUSED: `Could not connect to [${host}]. Verify the server is running and the URL/port are correct.`,
+      ENOTFOUND: `Could not resolve hostname for [${host}]. Verify the URL is correct.`,
+      UNABLE_TO_VERIFY_LEAF_SIGNATURE: `SSL certificate verification failed for [${host}]. The server certificate may not be signed by the configured CA.`,
+      CERT_HAS_EXPIRED: `The SSL certificate for [${host}] has expired.`,
+      ERR_TLS_CERT_ALTNAME_INVALID: `The hostname does not match the certificate's Subject Alternative Names for [${host}].`,
+      DEPTH_ZERO_SELF_SIGNED_CERT: `The server at [${host}] uses a self-signed certificate. Configure the CA certificate to verify the connection.`,
+    };
+
+    let enhancedMessage = SSL_ERROR_HINTS[code] || '';
+
+    if (
+      originalMessage === 'socket hang up' ||
+      code === 'ECONNRESET' ||
+      code === 'ERR_SOCKET_CLOSED'
+    ) {
+      enhancedMessage = hasCerts
+        ? `Connection to [${host}] was closed by the server. The SSL client certificates may be invalid, ` +
+          `incomplete, or not signed by the CA trusted by the server.`
+        : `Connection to [${host}] was closed by the server. If the server requires SSL client certificates, ` +
+          `configure "key", "cert", and "ca" for this host in opensearch_dashboards.yml.`;
+    }
+
+    const finalMessage = enhancedMessage
+      ? `${enhancedMessage} (${originalMessage})`
+      : `Error connecting to [${host}]: ${originalMessage}`;
+
+    const enhanced = new Error(finalMessage);
+    (enhanced as any).code = code;
+    (enhanced as any).response = error.response;
+    return enhanced;
+  }
+
   /**
    * Internal method to execute the request
    * @param method HTTP verb
@@ -243,7 +302,14 @@ export class ServerAPIClient {
       data,
       options,
     );
-    return await this._axios(optionsRequest);
+    try {
+      return await this._axios(optionsRequest);
+    } catch (error: any) {
+      const api = (await this.manageHosts.get(
+        options.apiHostID,
+      )) as IAPIHost;
+      throw this._enhanceConnectionError(error, options.apiHostID, api);
+    }
   }
 
   /**
@@ -328,9 +394,13 @@ export class ServerAPIClient {
       httpsAgent: httpsAgent,
     };
 
-    const response: AxiosResponse = await this._axios(optionsRequest);
-    const token: string = (((response || {}).data || {}).data || {}).token;
-    return token;
+    try {
+      const response: AxiosResponse = await this._axios(optionsRequest);
+      const token: string = (((response || {}).data || {}).data || {}).token;
+      return token;
+    } catch (error: any) {
+      throw this._enhanceConnectionError(error, apiHostID, api);
+    }
   }
 
   /**

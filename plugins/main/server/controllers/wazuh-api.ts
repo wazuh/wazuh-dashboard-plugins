@@ -325,7 +325,9 @@ export class WazuhApiCtrl {
       } catch (error) {
         return ErrorResponse(
           `ERROR3099 - ${
-            error.response?.data?.detail || 'Server not ready yet'
+            error.response?.data?.detail ||
+            error.message ||
+            'Server not ready yet'
           }`,
           3099,
           error?.response?.status || HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
@@ -355,7 +357,9 @@ export class WazuhApiCtrl {
           } catch (error) {
             return ErrorResponse(
               `ERROR3099 - ${
-                error.response?.data?.detail || 'Server not ready yet'
+                error.response?.data?.detail ||
+                error.message ||
+                'Server not ready yet'
               }`,
               3099,
               error?.response?.status || HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
