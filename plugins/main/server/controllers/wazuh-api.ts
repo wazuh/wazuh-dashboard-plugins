@@ -975,14 +975,24 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
+      const osResp =
+        await context.core.opensearch.client.asInternalUser.transport.request({
+          method: 'GET',
+          path: '/',
+        });
+      const clusterUuid = osResp?.body?.cluster_uuid ?? null;
+
+      const data = {
+        'app-version': pluginVersion,
+        revision: pluginRevision,
+        configuration_file: context.wazuh_core.configuration.store.file,
+        cluster_uuid: clusterUuid,
+      };
+
       return response.ok({
         body: {
           statusCode: HTTP_STATUS_CODES.OK,
-          data: {
-            'app-version': pluginVersion,
-            revision: pluginRevision,
-            configuration_file: context.wazuh_core.configuration.store.file,
-          },
+          data,
         },
       });
     } catch (error) {

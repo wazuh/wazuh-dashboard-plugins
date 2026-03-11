@@ -1,17 +1,49 @@
 import React from 'react';
-import { EuiCallOut, EuiFlexGroup, EuiFlexItem, EuiText } from '@elastic/eui';
+import {
+  EuiCallOut,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiText,
+  EuiTextColor,
+  EuiTitle,
+} from '@elastic/eui';
 
-export const SettingsAboutAppInfo = ({ appInfo }: { appInfo: string }) => {
+export const SettingsAboutAppInfo = ({
+  appInfo,
+  clusterUuid,
+}: {
+  appInfo: string;
+  clusterUuid?: string | null;
+}) => {
   return (
-    <EuiCallOut>
+    <EuiCallOut
+      title={
+        <EuiTitle size='xs'>
+          <h3>Setup information</h3>
+        </EuiTitle>
+      }
+    >
       <EuiFlexGroup
+        direction='row'
         alignItems='center'
         justifyContent='flexStart'
-        gutterSize='none'
+        gutterSize='m'
       >
         <EuiFlexItem>
           <EuiText>
             App version: <b>{appInfo}</b>
+          </EuiText>
+        </EuiFlexItem>
+        <EuiFlexItem>
+          <EuiText>
+            Cluster UUID:{' '}
+            <b>
+              {clusterUuid ? (
+                clusterUuid
+              ) : (
+                <EuiTextColor color='subdued'>-</EuiTextColor>
+              )}
+            </b>
           </EuiText>
         </EuiFlexItem>
       </EuiFlexGroup>
