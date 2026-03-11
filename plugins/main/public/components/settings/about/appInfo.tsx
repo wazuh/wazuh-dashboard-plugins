@@ -16,13 +16,7 @@ export const SettingsAboutAppInfo = ({
   clusterUuid?: string | null;
 }) => {
   return (
-    <EuiCallOut
-      title={
-        <EuiTitle size='xs'>
-          <h3>Setup information</h3>
-        </EuiTitle>
-      }
-    >
+    <EuiCallOut>
       <EuiFlexGroup
         direction='row'
         alignItems='center'
