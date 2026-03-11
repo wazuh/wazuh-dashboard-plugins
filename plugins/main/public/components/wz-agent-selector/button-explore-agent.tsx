@@ -52,7 +52,7 @@ const ButtonPinnedAgent = ({
           color='warning'
           size='l'
           isDisabled={!outdatedAgentPinned}
-          message='This agent version is below 5.x, capabilities might be limited'
+          message='Agent version is below 5.0.0. Some features may not be available.'
         />
       </EuiFlexItem>
       <EuiFlexItem grow={false}>
