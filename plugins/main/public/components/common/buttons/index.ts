@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export { HoverPopover } from './hover-popover';
+export { IconTip } from './icon-tip';
 export { WzButton } from './button';
 export {
   WzButtonModalConfirm,

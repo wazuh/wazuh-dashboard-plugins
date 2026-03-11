@@ -1,10 +1,11 @@
 import React from 'react';
 import { isVersionLower } from '../endpoints-summary/table/utils';
-import { WzButton, HoverPopover } from '../common/buttons';
+import { WzButton, IconTip } from '../common/buttons';
 import { PinnedAgentManager } from './wz-agent-selector-service';
 import { WzButtonType } from '../common/buttons/button';
 import { connect } from 'react-redux';
 import { showExploreAgentModalGlobal } from '../../redux/actions/appStateActions';
+import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import './button-explore-agent.scss';
 
 import clsx from 'clsx';
@@ -39,45 +40,54 @@ const ButtonPinnedAgent = ({
   };
 
   return (
-    <div
+    <EuiFlexGroup
       data-test-subj='explore-agent-button'
-      style={{ display: 'inline-flex' }}
+      gutterSize='none'
+      alignItems='center'
+      responsive={false}
     >
-      <HoverPopover
-        iconType='alert'
-        isDisabled={!outdatedAgentPinned}
-        color='warning'
-        message='This agent version is below 5.x, capabilities might be limited'
-      />
-      <WzButton
-        buttonType={WzButtonType.empty}
-        color='primary'
-        isDisabled={!avaliableForAgent}
-        tooltip={{
-          position: 'bottom',
-          content: !avaliableForAgent
-            ? 'This module is not supported for agents.'
-            : agent
-            ? 'Change agent selected'
-            : 'Select an agent to explore its modules',
-        }}
-        className={clsx({ 'wz-unpin-agent-bg': agent })}
-        iconType='watchesApp'
-        onClick={() => showExploreAgentModalGlobal(true)}
-      >
-        {agent ? `${agent.name} (${agent.id})` : 'Explore agent'}
-      </WzButton>
-      {agent ? (
-        <WzButton
-          buttonType={WzButtonType.icon}
-          className='wz-unpin-agent wz-unpin-agent-bg'
-          iconType='pinFilled'
-          onClick={unPinAgentHandler}
-          tooltip={{ position: 'bottom', content: 'Unpin agent' }}
-          aria-label='Unpin agent'
+      <EuiFlexItem grow={false} style={{ paddingLeft: 5, paddingRight: 5 }}>
+        <IconTip
+          iconType='alert'
+          color='warning'
+          size='l'
+          isDisabled={!outdatedAgentPinned}
+          message='This agent version is below 5.x, capabilities might be limited'
         />
+      </EuiFlexItem>
+      <EuiFlexItem grow={false}>
+        <WzButton
+          buttonType={WzButtonType.empty}
+          color='primary'
+          isDisabled={!avaliableForAgent}
+          tooltip={{
+            position: 'bottom',
+            content: !avaliableForAgent
+              ? 'This module is not supported for agents.'
+              : agent
+              ? 'Change agent selected'
+              : 'Select an agent to explore its modules',
+          }}
+          className={clsx({ 'wz-unpin-agent-bg': agent })}
+          iconType='watchesApp'
+          onClick={() => showExploreAgentModalGlobal(true)}
+        >
+          {agent ? `${agent.name} (${agent.id})` : 'Explore agent'}
+        </WzButton>
+      </EuiFlexItem>
+      {agent ? (
+        <EuiFlexItem grow={false}>
+          <WzButton
+            buttonType={WzButtonType.icon}
+            className='wz-unpin-agent wz-unpin-agent-bg'
+            iconType='pinFilled'
+            onClick={unPinAgentHandler}
+            tooltip={{ position: 'bottom', content: 'Unpin agent' }}
+            aria-label='Unpin agent'
+          />
+        </EuiFlexItem>
       ) : null}
-    </div>
+    </EuiFlexGroup>
   );
 };
 
