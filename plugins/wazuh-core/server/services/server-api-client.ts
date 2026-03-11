@@ -241,43 +241,74 @@ export class ServerAPIClient {
     }
 
     const host = `${api.url}:${api.port}`;
-    const code = error.code || '';
     const originalMessage = error.message || String(error);
+    const code = error.code || this._inferErrorCode(originalMessage);
+    const hasCerts = !!(api.key || api.cert || api.ca);
 
-    const hasCerts = api.key || api.cert || api.ca;
+    this.logger.debug(
+      `Connection error for host [${apiHostID}]: code=${code}, message=${originalMessage}`,
+    );
 
-    const SSL_ERROR_HINTS: Record<string, string> = {
-      ECONNRESET: `The server at [${host}] closed the connection unexpectedly.`,
-      ECONNREFUSED: `Could not connect to [${host}]. Verify the server is running and the URL/port are correct.`,
-      ENOTFOUND: `Could not resolve hostname for [${host}]. Verify the URL is correct.`,
-      UNABLE_TO_VERIFY_LEAF_SIGNATURE: `SSL certificate verification failed for [${host}]. The server certificate may not be signed by the configured CA.`,
-      CERT_HAS_EXPIRED: `The SSL certificate for [${host}] has expired.`,
-      ERR_TLS_CERT_ALTNAME_INVALID: `The hostname does not match the certificate's Subject Alternative Names for [${host}].`,
-      DEPTH_ZERO_SELF_SIGNED_CERT: `The server at [${host}] uses a self-signed certificate. Configure the CA certificate to verify the connection.`,
-    };
+    const enhancedMessage = this._getConnectionErrorMessage(
+      code,
+      originalMessage,
+      host,
+      hasCerts,
+    );
 
-    let enhancedMessage = SSL_ERROR_HINTS[code] || '';
-
-    if (
-      originalMessage === 'socket hang up' ||
-      code === 'ECONNRESET' ||
-      code === 'ERR_SOCKET_CLOSED'
-    ) {
-      enhancedMessage = hasCerts
-        ? `Connection to [${host}] was closed by the server. The SSL client certificates may be invalid, ` +
-          `incomplete, or not signed by the CA trusted by the server.`
-        : `Connection to [${host}] was closed by the server. If the server requires SSL client certificates, ` +
-          `configure "key", "cert", and "ca" for this host in opensearch_dashboards.yml.`;
-    }
-
-    const finalMessage = enhancedMessage
-      ? `${enhancedMessage} (${originalMessage})`
-      : `Error connecting to [${host}]: ${originalMessage}`;
-
-    const enhanced = new Error(finalMessage);
+    const enhanced = new Error(enhancedMessage);
     (enhanced as any).code = code;
     (enhanced as any).response = error.response;
     return enhanced;
+  }
+
+  private _inferErrorCode(message: string): string {
+    const patterns: [RegExp, string][] = [
+      [/socket hang up/i, 'ECONNRESET'],
+      [/ECONNREFUSED/i, 'ECONNREFUSED'],
+      [/ENOTFOUND/i, 'ENOTFOUND'],
+      [/certificate.*(expire|not yet valid)/i, 'CERT_HAS_EXPIRED'],
+      [/self.signed/i, 'DEPTH_ZERO_SELF_SIGNED_CERT'],
+      [/altname/i, 'ERR_TLS_CERT_ALTNAME_INVALID'],
+    ];
+    for (const [pattern, code] of patterns) {
+      if (pattern.test(message)) {
+        return code;
+      }
+    }
+    return '';
+  }
+
+  private _getConnectionErrorMessage(
+    code: string,
+    originalMessage: string,
+    host: string,
+    hasCerts: boolean,
+  ): string {
+    switch (code) {
+      case 'ECONNRESET':
+      case 'ERR_SOCKET_CLOSED':
+      case 'EPIPE':
+        return hasCerts
+          ? `Connection to [${host}] was rejected by the server. ` +
+              `Verify the SSL client certificates are valid and signed by the CA trusted by the server.`
+          : `Connection to [${host}] was rejected by the server. ` +
+              `If the server requires SSL client certificates, configure "key", "cert", and "ca" for this host.`;
+      case 'ECONNREFUSED':
+        return `Could not connect to [${host}]. Verify the server is running and the URL/port are correct.`;
+      case 'ENOTFOUND':
+        return `Could not resolve hostname [${host}]. Verify the URL is correct.`;
+      case 'UNABLE_TO_VERIFY_LEAF_SIGNATURE':
+        return `SSL certificate verification failed for [${host}]. The server certificate may not be signed by the configured CA.`;
+      case 'CERT_HAS_EXPIRED':
+        return `The SSL certificate for [${host}] has expired.`;
+      case 'ERR_TLS_CERT_ALTNAME_INVALID':
+        return `The hostname does not match the certificate's Subject Alternative Names for [${host}].`;
+      case 'DEPTH_ZERO_SELF_SIGNED_CERT':
+        return `The server at [${host}] uses a self-signed certificate. Configure the CA certificate to verify the connection.`;
+      default:
+        return `Error connecting to [${host}]: ${originalMessage}`;
+    }
   }
 
   /**
