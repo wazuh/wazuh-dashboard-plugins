@@ -61,7 +61,7 @@ const TEMPLATE_SOURCES = {
   'events-access-management': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/access-management.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-access-management.json',
@@ -69,7 +69,7 @@ const TEMPLATE_SOURCES = {
   'events-applications': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/applications.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-applications.json',
@@ -77,7 +77,7 @@ const TEMPLATE_SOURCES = {
   'events-cloud-services': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/cloud-services.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-cloud-services.json',
@@ -85,7 +85,7 @@ const TEMPLATE_SOURCES = {
   'events-cloud-services-aws': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/cloud-services-aws.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-cloud-services-aws.json',
@@ -93,7 +93,7 @@ const TEMPLATE_SOURCES = {
   'events-cloud-services-azure': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/cloud-services-azure.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-cloud-services-azure.json',
@@ -101,7 +101,7 @@ const TEMPLATE_SOURCES = {
   'events-cloud-services-gcp': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/cloud-services-gcp.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-cloud-services-gcp.json',
@@ -109,21 +109,23 @@ const TEMPLATE_SOURCES = {
   'events-network-activity': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/network-activity.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-network-activity.json',
   },
   'events-other': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/templates/streams/other.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/events.json',
+      ),
     ],
     outputFile: 'events-other.json',
   },
   'events-security': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/security.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-security.json',
@@ -131,7 +133,7 @@ const TEMPLATE_SOURCES = {
   'events-system-activity': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/system-activity.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-system-activity.json',
