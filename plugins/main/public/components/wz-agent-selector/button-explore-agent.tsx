@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { showExploreAgentModalGlobal } from '../../redux/actions/appStateActions';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import './button-explore-agent.scss';
+import { getAgentVersion } from '../../../common/services/wz-agent';
 
 import clsx from 'clsx';
 
@@ -31,7 +32,7 @@ const ButtonPinnedAgent = ({
     ? module?.availableFor && module?.availableFor.includes('agent')
     : true;
   const outdatedAgentPinned = agent?.version
-    ? isVersionLower(agent.version, '5.0.0')
+    ? isVersionLower(getAgentVersion(agent.version).raw, '5.0.0')
     : false;
 
   const unPinAgentHandler = () => {
