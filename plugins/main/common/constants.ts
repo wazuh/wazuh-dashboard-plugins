@@ -117,6 +117,7 @@ export const WAZUH_IT_HYGIENE_SERVICES_PATTERN =
   'wazuh-states-inventory-services*';
 export const WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN =
   'wazuh-states-inventory-browser-extensions*';
+export const WAZUH_ACTIVE_RESPONSES_PATTERN = 'wazuh-active-responses*';
 
 // Index patterns - Events
 export const WAZUH_EVENTS_SYSTEM_ACTIVITY_PATTERN =
@@ -157,6 +158,8 @@ export const WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN =
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT =
   'index-pattern:events-access-management';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS = 'index-pattern:events';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_ACTIVE_RESPONSES =
+  'index-pattern:active-responses';
 
 // Time field
 export const FIELD_TIMESTAMP = '@timestamp';

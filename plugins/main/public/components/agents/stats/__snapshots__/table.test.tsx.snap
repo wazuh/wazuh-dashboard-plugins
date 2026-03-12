@@ -73,7 +73,8 @@ exports[`AgentStatTable component Renders correctly to match the snapshot 1`] = 
                    Start:
                    
                   -
-                   - End:
+                   
+                  - End:
                    
                   -
                 </div>
@@ -414,12 +415,12 @@ exports[`AgentStatTable component Renders correctly to match the snapshot 1`] = 
             >
               <EuiButtonEmpty
                 iconType="importAction"
-                isDisabled={false}
+                isDisabled={true}
                 onClick={[Function]}
               >
                 <button
-                  className="euiButtonEmpty euiButtonEmpty--primary"
-                  disabled={false}
+                  className="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty-isDisabled"
+                  disabled={true}
                   onClick={[Function]}
                   type="button"
                 >

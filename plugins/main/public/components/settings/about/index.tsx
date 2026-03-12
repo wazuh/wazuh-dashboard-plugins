@@ -15,7 +15,11 @@ async function fetchAboutData() {
   try {
     const data = await GenericRequest.request('GET', '/api/setup');
     const response = data.data.data;
-    return response['app-version'] as string;
+    return response as {
+      'app-version': string;
+      revision?: string;
+      cluster_uuid?: string;
+    };
   } catch (error) {
     const options = {
       context: `${SettingsAbout.name}.getAppInfo`,
@@ -48,7 +52,12 @@ export const SettingsAbout: React.FC = () => {
   } else {
     headerAbout = (
       <>
-        {data && <SettingsAboutAppInfo appInfo={data} />}
+        {data && (
+          <SettingsAboutAppInfo
+            appInfo={data['app-version']}
+            clusterUuid={data.cluster_uuid}
+          />
+        )}
         <EuiSpacer size='l' />
       </>
     );

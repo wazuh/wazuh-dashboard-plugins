@@ -48,6 +48,7 @@ import NavigationService from './react-services/navigation-service';
 import { createHashHistory } from 'history';
 import { SUPPORTED_LANGUAGES_ARRAY } from '../common/constants';
 import { registerWazuhNavLinks } from './utils/nav-groups';
+import _ from 'lodash';
 
 export class WazuhPlugin
   implements

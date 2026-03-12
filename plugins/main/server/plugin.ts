@@ -105,6 +105,8 @@ import {
   WAZUH_SCA_PATTERN,
   WAZUH_STATISTICS_PATTERN,
   WAZUH_VULNERABILITIES_PATTERN,
+  WAZUH_ACTIVE_RESPONSES_PATTERN,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_ACTIVE_RESPONSES,
 } from '../common/constants';
 
 import { notificationSetup } from './health-check/notification-default-channels';
@@ -141,6 +143,7 @@ import IndexPatternMonitoringKnownFields from '../common/known-fields/monitoring
 import IndexPatternSCAKnownFields from '../common/known-fields/states-sca.json';
 import IndexPatternStatisticsKnownFields from '../common/known-fields/statistics.json';
 import IndexPatternVulnerabilitiesKnownFields from '../common/known-fields/states-vulnerabilities.json';
+import IndexPatternActiveResponsesKnownFields from '../common/known-fields/active-responses.json';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -675,6 +678,19 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternEventsKnownFields,
           checkDefaultIndexPattern: true,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_ACTIVE_RESPONSES,
+        indexPatternID: WAZUH_ACTIVE_RESPONSES_PATTERN,
+        options: {
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+          hasTimeFieldName: true,
+          fieldsNoIndices: IndexPatternActiveResponsesKnownFields,
         },
       }),
     );
