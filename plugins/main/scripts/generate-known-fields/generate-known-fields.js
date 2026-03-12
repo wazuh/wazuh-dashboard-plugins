@@ -61,7 +61,7 @@ const TEMPLATE_SOURCES = {
   'events-access-management': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/access-management.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-access-management.json',
@@ -69,7 +69,7 @@ const TEMPLATE_SOURCES = {
   'events-applications': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/applications.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-applications.json',
@@ -77,7 +77,7 @@ const TEMPLATE_SOURCES = {
   'events-cloud-services': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/cloud-services.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-cloud-services.json',
@@ -85,7 +85,7 @@ const TEMPLATE_SOURCES = {
   'events-cloud-services-aws': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/cloud-services-aws.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-cloud-services-aws.json',
@@ -93,7 +93,7 @@ const TEMPLATE_SOURCES = {
   'events-cloud-services-azure': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/cloud-services-azure.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-cloud-services-azure.json',
@@ -101,7 +101,7 @@ const TEMPLATE_SOURCES = {
   'events-cloud-services-gcp': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/cloud-services-gcp.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-cloud-services-gcp.json',
@@ -109,21 +109,23 @@ const TEMPLATE_SOURCES = {
   'events-network-activity': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/network-activity.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-network-activity.json',
   },
   'events-other': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/templates/streams/other.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/events.json',
+      ),
     ],
     outputFile: 'events-other.json',
   },
   'events-security': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/security.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-security.json',
@@ -131,7 +133,7 @@ const TEMPLATE_SOURCES = {
   'events-system-activity': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/system-activity.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-system-activity.json',
@@ -284,6 +286,14 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'states-sca.json',
   },
+  'active-responses': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/active-responses.json',
+      ),
+    ],
+    outputFile: 'active-responses.json',
+  },
 };
 
 /**
@@ -368,10 +378,25 @@ function shouldReadFromDocValues(fieldProps, esType) {
   return true;
 }
 
+function createExtractionIssuesContext() {
+  return {
+    warnings: [],
+    errors: [],
+    addWarning(message) {
+      this.warnings.push(message);
+      console.log(`   ⚠️  ${message}`);
+    },
+    addError(message) {
+      this.errors.push(message);
+      console.error(`   ❌ ${message}`);
+    },
+  };
+}
+
 /**
  * Recursively extracts field definitions from template mappings
  */
-function extractFields(properties, prefix = '') {
+function extractFieldsFromProperties(properties, prefix = '', issues) {
   const fields = [];
 
   // Add basic index meta fields if we're at root level
@@ -458,15 +483,128 @@ function extractFields(properties, prefix = '') {
 
       // Handle nested type with properties
       if (esType === 'nested' && fieldDef.properties) {
-        fields.push(...extractFields(fieldDef.properties, fullFieldName));
+        fields.push(
+          ...extractFieldsFromProperties(
+            fieldDef.properties,
+            fullFieldName,
+            issues,
+          ),
+        );
       }
     } else if (fieldDef.properties) {
       // Object type without explicit type - recurse into properties
-      fields.push(...extractFields(fieldDef.properties, fullFieldName));
+      fields.push(
+        ...extractFieldsFromProperties(
+          fieldDef.properties,
+          fullFieldName,
+          issues,
+        ),
+      );
     }
   }
 
   return fields;
+}
+
+/**
+ * Extracts fields from dynamic templates (if applicable)
+ * Note: This is a simplified approach and may need to be enhanced to handle complex dynamic template structures
+ * "dynamic_templates": [
+ *   {
+ *     "wcs_agent_build_original": {
+ *       "path_match": "agent.build.original",
+ *       "mapping": {
+ *         "ignore_above": 1024,
+ *         "type": "keyword"
+ *       }
+ *    }
+ *   },
+ * @param {*} dynamicTemplates
+ * @returns
+ */
+function extractFieldsFromDynamicTemplates(dynamicTemplates, issues) {
+  return dynamicTemplates
+    .map(dynamicTemplate => {
+      const templateName = Object.keys(dynamicTemplate)[0];
+      if (dynamicTemplate[templateName].path_match) {
+        const fieldName = dynamicTemplate[templateName].path_match;
+        const mapping = dynamicTemplate[templateName].mapping;
+        const esType = mapping.type;
+
+        return {
+          name: fieldName,
+          type: mapIndexFieldType(esType, mapping),
+          esTypes: [esType],
+          searchable: isSearchable(mapping, esType),
+          aggregatable: isAggregatable(mapping, esType),
+          readFromDocValues: shouldReadFromDocValues(mapping, esType),
+        };
+      }
+      issues.addWarning(
+        `Unsupported dynamic template structure in ${templateName}, skipping field extraction`,
+      );
+    })
+    .flat()
+    .filter(Boolean); // Remove undefined entries
+}
+
+function extractFields(mappings, properties) {
+  const issues = createExtractionIssuesContext();
+  const fields = [];
+
+  // Handle different possible mappings structures
+  if (properties) {
+    fields.push(...extractFieldsFromProperties(properties, '', issues));
+  }
+
+  if (mappings.dynamic_templates) {
+    fields.push(
+      ...extractFieldsFromDynamicTemplates(mappings.dynamic_templates, issues),
+    );
+  }
+
+  // Ensure fields are unique by name (in case of duplicates from properties and dynamic templates)
+  const uniqueFieldsMap = new Map();
+  for (const field of fields) {
+    if (!field?.name) {
+      issues.addWarning(
+        `Field with undefined name detected, skipping field extraction. ${JSON.stringify(
+          field,
+        )}`,
+      );
+      continue;
+    }
+    if (field?.name.includes('*')) {
+      issues.addWarning(
+        `Field name contains wildcard: ${field.name}, skipping field extraction.`,
+      );
+    }
+    if (!uniqueFieldsMap.has(field.name)) {
+      uniqueFieldsMap.set(field.name, field);
+    } else {
+      issues.addWarning(
+        `Duplicate field name detected: ${field.name}, keeping the first occurrence and skipping this one.`,
+      );
+    }
+  }
+
+  // Sort fields: fields starting with _ first, then alphabetically
+  const uniqueFields = Array.from(uniqueFieldsMap.values()).sort((a, b) => {
+    const aStartsWithUnderscore = a.name.startsWith('_');
+    const bStartsWithUnderscore = b.name.startsWith('_');
+
+    if (aStartsWithUnderscore !== bStartsWithUnderscore) {
+      return aStartsWithUnderscore ? -1 : 1;
+    }
+
+    return a.name.localeCompare(b.name);
+  });
+
+  return {
+    fields: uniqueFields,
+    warnings: issues.warnings,
+    errors: issues.errors,
+  };
 }
 
 /**
@@ -532,7 +670,7 @@ function saveOutput(location, dataASObject) {
  * Processes a template and generates known fields
  */
 async function processTemplate(templateConfig, config) {
-  console.log(`Processing ${templateConfig.name} template...`);
+  console.log(`⚙️  Processing ${templateConfig.name} template...`);
 
   try {
     const { template, url } = await fetchTemplateFromUrls(
@@ -563,7 +701,8 @@ async function processTemplate(templateConfig, config) {
     }
 
     // Generate known fields
-    const knownFields = extractFields(properties);
+    const extractionResult = extractFields(mappings, properties);
+    const knownFields = extractionResult.fields;
 
     // Ensure output directory exists - resolve relative to script location
     const absoluteOutputFile = path.resolve(
@@ -579,7 +718,11 @@ async function processTemplate(templateConfig, config) {
       `  ✅ Generated ${knownFields.length} known fields for ${templateConfig.name} -> ${absoluteOutputFile}`,
     );
 
-    return knownFields;
+    return {
+      fields: knownFields,
+      warnings: extractionResult.warnings,
+      errors: extractionResult.errors,
+    };
   } catch (error) {
     console.error(
       `  ❌ Error processing ${templateConfig.name}: ${error.message}`,
@@ -608,7 +751,7 @@ async function generateCombinedFields({
   outputFileName,
   displayName,
 }) {
-  console.log(`Processing combined ${displayName} fields...`);
+  console.log(`⚙️  Processing combined ${displayName} fields...`);
 
   const matchingKeys = Object.keys(results).filter(
     key => key.startsWith(keyPrefix) && results[key],
@@ -623,7 +766,7 @@ async function generateCombinedFields({
   const fieldsMap = new Map();
 
   for (const key of matchingKeys) {
-    const fields = results[key];
+    const fields = results[key].fields;
     for (const field of fields) {
       // Keep the first occurrence of each field name
       if (!fieldsMap.has(field.name)) {
@@ -669,13 +812,16 @@ async function main(config) {
 
   // Generate combined inventory fields
   try {
-    results['states-inventory'] = await generateCombinedFields({
+    const combinedFields = await generateCombinedFields({
       results,
       config,
       keyPrefix: 'states-inventory-',
       outputFileName: 'states-inventory.json',
       displayName: 'states-inventory',
     });
+    results['states-inventory'] = combinedFields
+      ? { fields: combinedFields, warnings: [], errors: [] }
+      : null;
   } catch (error) {
     console.error(
       'Failed to generate combined inventory fields:',
@@ -688,13 +834,16 @@ async function main(config) {
 
   // Generate combined events fields
   try {
-    results['events'] = await generateCombinedFields({
+    const combinedFields = await generateCombinedFields({
       results,
       config,
       keyPrefix: 'events-',
       outputFileName: 'events.json',
       displayName: 'events',
     });
+    results['events'] = combinedFields
+      ? { fields: combinedFields, warnings: [], errors: [] }
+      : null;
   } catch (error) {
     console.error('Failed to generate combined events fields:', error.message);
     process.exit(1);
@@ -706,13 +855,38 @@ async function main(config) {
   let shouldFail = false;
 
   console.log('📊 Summary:');
-  for (const [key, fields] of Object.entries(results)) {
-    if (fields) {
-      console.log(`  ${key}: ✅ ${fields.length} fields generated`);
+  for (const [key, result] of Object.entries(results)) {
+    if (result) {
+      const warningsCount = result.warnings?.length || 0;
+      const errorsCount = result.errors?.length || 0;
+      const warningsText = warningsCount
+        ? ` (⚠️ ${warningsCount} warnings)`
+        : '';
+      const errorsText = errorsCount ? ` (❌ ${errorsCount} errors)` : '';
+      const resultIcon = errorsCount ? '❌' : warningsCount ? '⚠️' : '✅';
+
+      console.log(
+        `  ${resultIcon}  ${key}: ${result.fields.length} fields generated${warningsText}${errorsText}`,
+      );
+
+      if (warningsCount > 0) {
+        console.log(`    ⚠️  Warnings (${warningsCount}):`);
+        result.warnings.forEach(warning => {
+          console.log(`      - ${warning}`);
+        });
+      }
+
+      if (errorsCount > 0) {
+        shouldFail = true;
+        console.log(`    ❌ Errors (${errorsCount}):`);
+        result.errors.forEach(error => {
+          console.log(`      - ${error}`);
+        });
+      }
     } else {
       // Mark overall failure if any template failed
       shouldFail = true;
-      console.log(`  ${key}: ❌ Failed`);
+      console.log(`  ❌ ${key}: Failed`);
     }
   }
 
@@ -746,6 +920,6 @@ if (require.main === module) {
 
 module.exports = {
   processTemplate,
-  extractFields,
+  extractFields: extractFieldsFromProperties,
   mapIndexFieldType,
 };

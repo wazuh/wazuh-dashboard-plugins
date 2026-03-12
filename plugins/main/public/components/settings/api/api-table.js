@@ -78,7 +78,6 @@ export const ApiTable = compose(withErrorBoundary)(
         refreshingEntries: false,
         availableUpdates: {},
         refreshingAvailableUpdates: false,
-        popoverOpened: null,
       };
     }
 
@@ -346,16 +345,6 @@ export const ApiTable = compose(withErrorBoundary)(
       }
     }
 
-    /**
-     * Show/close info UUID
-     * @param {String | Null} id
-     */
-    togglePopoverUUID = id => {
-      this.setState({
-        popoverOpened: this.state.popoverOpened === id ? null : id,
-      });
-    };
-
     render() {
       const { DismissNotificationCheck } = getWazuhCheckUpdatesPlugin();
 
@@ -402,65 +391,7 @@ export const ApiTable = compose(withErrorBoundary)(
           name: 'ID',
           align: 'left',
           sortable: true,
-          render: (item, row) => {
-            if (row.cluster_info.uuid) {
-              return (
-                <EuiPopover
-                  button={
-                    <EuiLink
-                      onClick={() => this.togglePopoverUUID(row.id)}
-                      style={{
-                        fontWeight: 'normal',
-                      }}
-                      color='text'
-                    >
-                      <EuiFlexGroup
-                        alignItems='center'
-                        gutterSize='xs'
-                        responsive={false}
-                      >
-                        <EuiFlexItem grow={false}>{item}</EuiFlexItem>
-                        <EuiFlexItem grow={false}>
-                          <EuiToolTip
-                            position='top'
-                            content='Show UUID information'
-                          >
-                            <EuiIcon type='iInCircle' color='primary' />
-                          </EuiToolTip>
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                    </EuiLink>
-                  }
-                  isOpen={this.state.popoverOpened === row.id}
-                  closePopover={() => this.togglePopoverUUID(null)}
-                  anchorPosition='upCenter'
-                  hasArrow={true}
-                  panelPaddingSize='s'
-                >
-                  <EuiFlexGroup alignItems='center' gutterSize='s'>
-                    <EuiFlexItem>
-                      <EuiText size='s'>
-                        <p>
-                          <strong>UUID:</strong> {row.cluster_info.uuid}
-                        </p>
-                      </EuiText>
-                    </EuiFlexItem>
-                    <EuiFlexItem grow={false}>
-                      <EuiToolTip position='top' content='Copy to clipboard'>
-                        <EuiButtonIcon
-                          iconType='copy'
-                          size='s'
-                          aria-label='copy UUID'
-                          onClick={() =>
-                            this.copyToClipBoard(row.cluster_info.uuid)
-                          }
-                        />
-                      </EuiToolTip>
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiPopover>
-              );
-            }
+          render: item => {
             return <EuiText size='s'>{item}</EuiText>;
           },
         },

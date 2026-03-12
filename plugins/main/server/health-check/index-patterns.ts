@@ -39,8 +39,8 @@ async function getFieldMappings(
 interface CreateIndexPatternOptions {
   fieldsNoIndices?: any;
   savedObjectOverwrite?:
-    | Record<string, any>
-    | ((params: any) => Record<string, any>);
+  | Record<string, any>
+  | ((params: any) => Record<string, any>);
 }
 
 async function createIndexPattern(
@@ -51,21 +51,8 @@ async function createIndexPattern(
   try {
     let fieldsObj;
 
-    try {
-      fieldsObj = await getFieldMappings(
-        { logger, indexPatternsClient },
-        indexPatternID,
-      );
-    } catch (error) {
-      if (error?.output?.statusCode === 404 && options.fieldsNoIndices) {
-        const message = `Fields for index pattern with ID [${indexPatternID}] could not be obtained. This could indicate there are not matching indices because they were not generated or there is some error in the process that generates and indexes that data. The index pattern will be created with a set of pre-defined fields.`;
-
-        logger.warn(message);
-        fieldsObj = options.fieldsNoIndices;
-      } else {
-        throw error;
-      }
-    }
+    // The creation of the index pattern will always rely on the defined known fields.
+    fieldsObj = options.fieldsNoIndices;
 
     const title = indexPatternID;
     const fields = JSON.stringify(fieldsObj);
@@ -254,10 +241,9 @@ async function validateIndexPattern(indexPattern, options, ctx, logger) {
     !indexPatternHasTimeField(indexPattern, options.hasTimeFieldName)
   ) {
     throw new Error(
-      `Index pattern has missing the time field name: [${
-        options.hasTimeFieldName !== true
-          ? options.hasTimeFieldName
-          : 'any compatible field'
+      `Index pattern has missing the time field name: [${options.hasTimeFieldName !== true
+        ? options.hasTimeFieldName
+        : 'any compatible field'
       }]`,
     );
   }
@@ -359,7 +345,7 @@ export const initializationTaskCreatorIndexPattern = ({
           try {
             await validateIndexPattern(savedObject, options, ctx, logger);
             compatibleIndexPatterns.push(savedObject);
-          } catch {}
+          } catch { }
         }
       }
 

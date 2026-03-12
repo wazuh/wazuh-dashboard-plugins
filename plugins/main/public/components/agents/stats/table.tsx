@@ -42,6 +42,7 @@ export function AgentStatTable({
   items,
   exportCSVFilename,
 }) {
+  const tableItems = items || [];
   return (
     <EuiPanel>
       <EuiFlexGroup justifyContent='spaceBetween'>
@@ -72,7 +73,7 @@ export function AgentStatTable({
       <EuiHorizontalRule margin='xs' />
       <EuiInMemoryTable
         columns={columns}
-        items={items || []}
+        items={tableItems}
         loading={loading}
         pagination={true}
       />
@@ -80,9 +81,9 @@ export function AgentStatTable({
       <EuiFlexGroup justifyContent='flexEnd'>
         <EuiFlexItem grow={false}>
           <EuiButtonEmpty
-            onClick={() => downloadCsv(columns, items, exportCSVFilename)}
+            onClick={() => downloadCsv(columns, tableItems, exportCSVFilename)}
             iconType='importAction'
-            isDisabled={loading}
+            isDisabled={loading || !tableItems.length}
           >
             Download CSV
           </EuiButtonEmpty>
