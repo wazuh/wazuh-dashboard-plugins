@@ -86,8 +86,8 @@ import {
   WAZUH_EVENTS_OTHER_PATTERN,
   WAZUH_EVENTS_SECURITY_PATTERN,
   WAZUH_EVENTS_SYSTEM_ACTIVITY_PATTERN,
-  WAZUH_EVENTS_UNCLASSIFIED,
-  WAZUH_EVENTS_RAW,
+  WAZUH_EVENTS_UNCLASSIFIED_PATTERN,
+  WAZUH_EVENTS_RAW_PATTERN,
   WAZUH_FIM_FILES_PATTERN,
   WAZUH_FIM_REGISTRY_KEYS_PATTERN,
   WAZUH_FIM_REGISTRY_VALUES_PATTERN,
@@ -126,6 +126,8 @@ import IndexPatternEventsNetworkActivityKnownFields from '../common/known-fields
 import IndexPatternEventsOtherKnownFields from '../common/known-fields/events-other.json';
 import IndexPatternEventsSecurityKnownFields from '../common/known-fields/events-security.json';
 import IndexPatternEventsSystemActivityKnownFields from '../common/known-fields/events-system-activity.json';
+import IndexPatternEventsUnclassifiedKnownFields from '../common/known-fields/events-unclassified.json';
+import IndexPatternEventsRawKnownFields from '../common/known-fields/events-raw.json';
 import IndexPatternFIMFilesKnownFields from '../common/known-fields/states-fim-files.json';
 import IndexPatternFIMRegistriesKeysKnownFields from '../common/known-fields/states-fim-registries-keys.json';
 import IndexPatternFIMRegistriesValuesKnownFields from '../common/known-fields/states-fim-registries-values.json';
@@ -703,11 +705,11 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_UNCLASSIFIED,
-        indexPatternID: WAZUH_EVENTS_UNCLASSIFIED,
+        indexPatternID: WAZUH_EVENTS_UNCLASSIFIED_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: ,
+          fieldsNoIndices: IndexPatternEventsUnclassifiedKnownFields,
         },
       }),
     );
@@ -716,11 +718,11 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_RAW,
-        indexPatternID: WAZUH_EVENTS_RAW,
+        indexPatternID: WAZUH_EVENTS_RAW_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: ,
+          fieldsNoIndices: IndexPatternEventsRawKnownFields,
         },
       }),
     );
