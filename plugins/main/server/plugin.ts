@@ -53,6 +53,8 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_OTHER,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SECURITY,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SYSTEM_ACTIVITY,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_UNCLASSIFIED,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_RAW,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES,
@@ -84,6 +86,8 @@ import {
   WAZUH_EVENTS_OTHER_PATTERN,
   WAZUH_EVENTS_SECURITY_PATTERN,
   WAZUH_EVENTS_SYSTEM_ACTIVITY_PATTERN,
+  WAZUH_EVENTS_UNCLASSIFIED,
+  WAZUH_EVENTS_RAW,
   WAZUH_FIM_FILES_PATTERN,
   WAZUH_FIM_REGISTRY_KEYS_PATTERN,
   WAZUH_FIM_REGISTRY_VALUES_PATTERN,
@@ -691,6 +695,32 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternActiveResponsesKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_UNCLASSIFIED,
+        indexPatternID: WAZUH_EVENTS_UNCLASSIFIED,
+        options: {
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+          hasTimeFieldName: true,
+          fieldsNoIndices: ,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_RAW,
+        indexPatternID: WAZUH_EVENTS_RAW,
+        options: {
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+          hasTimeFieldName: true,
+          fieldsNoIndices: ,
         },
       }),
     );
