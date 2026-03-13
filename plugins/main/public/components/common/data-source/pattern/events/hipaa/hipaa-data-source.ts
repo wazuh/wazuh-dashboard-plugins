@@ -2,7 +2,7 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_HIPAA_EXIST } from '../../../../../../../common/constants';
 import { EventsDataSource } from '../events-data-source';
 
-const KEY_EXIST = 'rule.hipaa';
+const KEY_EXIST = 'compliance.hipaa';
 
 export class HIPAADataSource extends EventsDataSource {
   constructor(id: string, title: string) {

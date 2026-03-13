@@ -78,11 +78,11 @@ export class ComplianceSubrequirements extends Component {
 
   getRequirementKey() {
     const mapKeys = {
-      pci: 'rule.pci_dss',
-      gdpr: 'rule.gdpr',
-      nist: 'rule.nist_800_53',
-      hipaa: 'rule.hipaa',
-      tsc: 'rule.tsc',
+      pci: 'compliance.pci_dss',
+      gdpr: 'compliance.gdpr',
+      nist: 'compliance.nist_800_53',
+      hipaa: 'compliance.hipaa',
+      tsc: 'compliance.tsc',
     };
     return mapKeys[this.props.section];
   }

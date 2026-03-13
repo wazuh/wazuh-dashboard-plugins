@@ -5,10 +5,10 @@ export const pciColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   commonColumns['wazuh.agent.name'],
   {
-    id: 'rule.pci_dss',
+    id: 'compliance.pci_dss',
     initialWidth: 160,
   },
-  commonColumns['rule.description'],
-  commonColumns['rule.level'],
-  commonColumns['rule.id'],
+  { id: 'wazuh.integration.name' },
+  { id: 'wazuh.integration.category' },
+  { id: 'wazuh.integration.decoders' },
 ];
