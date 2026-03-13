@@ -160,6 +160,13 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT =
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS = 'index-pattern:events';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_ACTIVE_RESPONSES =
   'index-pattern:active-responses';
+export const WAZUH_EVENTS_UNCLASSIFIED_PATTERN =
+  'wazuh-events-v5-unclassified*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_UNCLASSIFIED =
+  'index-pattern:events-unclassified';
+export const WAZUH_EVENTS_RAW_PATTERN = 'wazuh-events-raw-v5*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_RAW =
+  'index-pattern:events-raw';
 
 // Time field
 export const FIELD_TIMESTAMP = '@timestamp';
