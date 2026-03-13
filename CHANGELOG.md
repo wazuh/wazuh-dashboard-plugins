@@ -341,6 +341,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added filter by value to document details fields [#7081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7081)
 - Added pinned agent mechanic to inventory data, stats, and configuration for consistent functionality [#7135](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7135)
 - Added ability to edit the `wazuh.updates.disabled` configuration setting from UI [#7156](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7156)
+- Added legacy agent warning for Wazuh 5.0 compatibility [#8171](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8171)
 
 ### Changed
 
