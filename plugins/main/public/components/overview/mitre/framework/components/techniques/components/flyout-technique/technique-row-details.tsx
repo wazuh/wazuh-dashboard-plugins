@@ -83,11 +83,11 @@ const TechniqueRowDetails = ({
               </EuiCodeBlock>
             ),
           },
-          {
-            id: 'rule',
-            name: 'Rule',
-            content: <RuleDetails data={ruleData} onClick={onAddFilter} />,
-          },
+          // {
+          //   id: 'rule',
+          //   name: 'Rule',
+          //   content: <RuleDetails data={ruleData} onClick={onAddFilter} />,
+          // },
         ]}
       />
     </EuiFlexGroup>
