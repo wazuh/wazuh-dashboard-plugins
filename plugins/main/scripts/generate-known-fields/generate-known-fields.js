@@ -138,6 +138,20 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'events-system-activity.json',
   },
+  'events-unclassified': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/unclassified.json',
+      ),
+    ],
+    outputFile: 'events-unclassified.json',
+  },
+  'events-raw': {
+    urls: [
+      wazuhUrl('plugins/setup/src/main/resources/templates/streams/raw.json'),
+    ],
+    outputFile: 'events-raw.json',
+  },
   monitoring: {
     urls: [
       wazuhUrl('plugins/setup/src/main/resources/templates/monitoring.json'),

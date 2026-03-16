@@ -8,32 +8,34 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import { PoliciesTable } from './policies-table';
-import { WzRequest } from '../../../react-services/wz-request';
+import { usePagination } from '../../common/hooks/usePagination';
+import GetPoliciesService from './services/get-policies.service';
 import { EditPolicyFlyout } from './edit-policy';
 import { CreatePolicyFlyout } from './create-policy';
 import { withUserAuthorizationPrompt } from '../../common/hocs';
 import { WzButtonPermissions } from '../../common/permissions/button';
-import { closeFlyout } from '../../common/flyouts/close-flyout-security';
 
 export const Policies = withUserAuthorizationPrompt([
   { action: 'security:read', resource: 'policy:id:*' },
 ])(() => {
-  const [policies, setPolicies] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [isCreatingPolicy, setIsCreatingPolicy] = useState(false);
   const [isEditingPolicy, setIsEditingPolicy] = useState(false);
   const [editingPolicy, setEditingPolicy] = useState('');
 
-  const getPolicies = async () => {
-    setLoading(true);
-    const request = await WzRequest.apiReq('GET', '/security/policies', {});
-    const policies = request?.data?.data?.affected_items || [];
-    setPolicies(policies);
-    setLoading(false);
-  };
+  const {
+    items: policies,
+    loading,
+    pageIndex,
+    pageSize,
+    totalItems,
+    getData,
+    refreshCurrentPage,
+    onTableChange: handleTableChange,
+  } = usePagination(GetPoliciesService);
 
   useEffect(() => {
-    getPolicies();
+    getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const editPolicy = item => {
@@ -42,11 +44,17 @@ export const Policies = withUserAuthorizationPrompt([
   };
 
   const closeEditingFlyout = needRefresh => {
-    closeFlyout(needRefresh, setIsEditingPolicy, getPolicies);
+    if (needRefresh) {
+      refreshCurrentPage();
+    }
+    setIsEditingPolicy(false);
   };
 
   const closeCreatingFlyout = needRefresh => {
-    closeFlyout(needRefresh, setIsCreatingPolicy, getPolicies);
+    if (needRefresh) {
+      refreshCurrentPage();
+    }
+    setIsCreatingPolicy(false);
   };
 
   let editFlyout;
@@ -92,7 +100,11 @@ export const Policies = withUserAuthorizationPrompt([
           loading={loading}
           policies={policies}
           editPolicy={editPolicy}
-          updatePolicies={getPolicies}
+          updatePolicies={refreshCurrentPage}
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          onTableChange={handleTableChange}
         ></PoliciesTable>
       </EuiPageContentBody>
     </EuiPageContent>

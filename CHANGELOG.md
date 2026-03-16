@@ -93,7 +93,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.5
 
-## Wazuh v4.14.4 - OpenSearch Dashboards 2.19.4 - Revision 00
+### Fixed
+
+- Fixed `wazuh-core` plugin startup timeout when configured API hosts are unreachable by making `manageHosts.start()` non-blocking [#8130](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8130)
+- Fixed security tables pagination to load all items beyond 500 limit (Users, Roles, Policies, Roles Mapping) [#8133](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8133)
+
+## Wazuh v4.14.4 - OpenSearch Dashboards 2.19.4 - Revision 02
 
 ### Added
 
@@ -341,6 +346,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added filter by value to document details fields [#7081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7081)
 - Added pinned agent mechanic to inventory data, stats, and configuration for consistent functionality [#7135](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7135)
 - Added ability to edit the `wazuh.updates.disabled` configuration setting from UI [#7156](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7156)
+- Added legacy agent warning for Wazuh 5.0 compatibility [#8171](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8171)
 
 ### Changed
 
