@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   EuiPageContent,
   EuiPageContentHeader,
@@ -24,33 +24,78 @@ export const Roles = withUserAuthorizationPrompt([
   const [roles, setRoles] = useState([]);
   const [policiesData, setPoliciesData] = useState([]);
   const [loadingTable, setLoadingTable] = useState(false);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
 
-  async function getData() {
+  async function getData(pageIndex = 0, pageSize = 10) {
     setLoadingTable(true);
-    const rolesRequest = await WzRequest.apiReq('GET', '/security/roles', {});
-    const roles = rolesRequest?.data?.data?.affected_items || [];
-    setRoles(roles);
-    const policiesRequest = await WzRequest.apiReq(
-      'GET',
-      '/security/policies',
-      {},
-    );
-    const policiesData = policiesRequest?.data?.data?.affected_items || [];
-    setPoliciesData(policiesData);
-    setLoadingTable(false);
+    try {
+      const offset = pageIndex * pageSize;
+      const rolesRequest = await WzRequest.apiReq('GET', '/security/roles', {
+        params: {
+          offset,
+          limit: pageSize,
+        },
+      });
+      const roles = rolesRequest?.data?.data?.affected_items || [];
+      const total = rolesRequest?.data?.data?.total_affected_items || 0;
+      setRoles(roles);
+      setTotalItems(total);
+      setPageIndex(pageIndex);
+      setPageSize(pageSize);
+
+      // Only fetch policies that are actually used by the roles in this page
+      const policyIds = [
+        ...new Set(roles.flatMap(role => role.policies || [])),
+      ];
+      if (policyIds.length > 0) {
+        const policiesRequest = await WzRequest.apiReq(
+          'GET',
+          '/security/policies',
+          {
+            params: {
+              policy_ids: policyIds.join(','),
+            },
+          },
+        );
+        const policiesData = policiesRequest?.data?.data?.affected_items || [];
+        setPoliciesData(policiesData);
+      } else {
+        setPoliciesData([]);
+      }
+    } finally {
+      setLoadingTable(false);
+    }
   }
 
   useEffect(() => {
     getData();
   }, []);
 
-  const closeEditingFlyout = needRefresh => {
-    closeFlyout(needRefresh, setIsEditFlyoutVisible, getData);
-  };
+  const refreshCurrentPage = useCallback(() => {
+    return getData(pageIndex, pageSize);
+  }, [pageIndex, pageSize]);
 
-  const closeCreatingFlyout = needRefresh => {
-    closeFlyout(needRefresh, setIsFlyoutVisible, getData);
-  };
+  const closeEditingFlyout = useCallback(
+    needRefresh => {
+      if (needRefresh) {
+        refreshCurrentPage();
+      }
+      setIsEditFlyoutVisible(false);
+    },
+    [refreshCurrentPage],
+  );
+
+  const closeCreatingFlyout = useCallback(
+    needRefresh => {
+      if (needRefresh) {
+        refreshCurrentPage();
+      }
+      setIsFlyoutVisible(false);
+    },
+    [refreshCurrentPage],
+  );
 
   let flyout;
   if (isFlyoutVisible) {
@@ -62,10 +107,22 @@ export const Roles = withUserAuthorizationPrompt([
     setIsEditFlyoutVisible(true);
   };
 
+  const handleTableChange = ({ page }) => {
+    if (page) {
+      // If pageSize changed, reset to first page
+      const newPageIndex = page.size !== pageSize ? 0 : page.index;
+      getData(newPageIndex, page.size);
+    }
+  };
+
   let editFlyout;
   if (isEditFlyoutVisible) {
     editFlyout = (
-      <EditRole role={editingRole} closeFlyout={closeEditingFlyout} />
+      <EditRole
+        role={editingRole}
+        closeFlyout={closeEditingFlyout}
+        onRoleUpdated={refreshCurrentPage}
+      />
     );
   }
 
@@ -100,6 +157,10 @@ export const Roles = withUserAuthorizationPrompt([
           policiesData={policiesData}
           editRole={editRole}
           updateRoles={getData}
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          onTableChange={handleTableChange}
         ></RolesTable>
       </EuiPageContentBody>
     </EuiPageContent>

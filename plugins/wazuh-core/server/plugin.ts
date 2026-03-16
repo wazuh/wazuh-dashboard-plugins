@@ -119,7 +119,15 @@ export class WazuhCorePlugin
     setCore(core);
 
     await this.services.configuration.start();
-    await this.services.manageHosts.start();
+
+    // Do not await manageHosts.start() to prevent blocking the plugin
+    // lifecycle when configured API hosts are unreachable (issue #8085).
+    // The host cache will be populated in the background.
+    this.services.manageHosts.start().catch(error => {
+      this.logger.error(
+        `manageHosts.start() failed in background: ${error.message}`,
+      );
+    });
 
     return {
       ...this.services,
