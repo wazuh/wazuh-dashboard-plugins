@@ -83,13 +83,13 @@ Certificate paths are resolved as follows:
 
 The dashboard surfaces certificate errors at connection time rather than at startup. If a certificate file is missing or unreadable, the API health check for that host will fail with a descriptive error. The following conditions produce errors:
 
-| Condition | Behavior |
-| --------- | -------- |
+| Condition                                         | Behavior                                           |
+| ------------------------------------------------- | -------------------------------------------------- |
 | `key` provided but `cert` missing (or vice versa) | Error: incomplete client certificate configuration |
-| `key` or `cert` file not found on disk | Error: certificate file not found |
-| `ca` file not found on disk | Error: CA certificate file not found |
-| File exists but process lacks read permission | Error: `EACCES: permission denied` |
-| Server hostname not in certificate SAN | Error: `ERR_TLS_CERT_ALTNAME_INVALID` |
+| `key` or `cert` file not found on disk            | Error: certificate file not found                  |
+| `ca` file not found on disk                       | Error: CA certificate file not found               |
+| File exists but process lacks read permission     | Error: `EACCES: permission denied`                 |
+| Server hostname not in certificate SAN            | Error: `ERR_TLS_CERT_ALTNAME_INVALID`              |
 
 ### Configuration example
 
