@@ -81,7 +81,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
     getDiscoverColumns() {
       const columnsAgent = [
         {
-          id: 'timestamp',
+          id: '@timestamp',
           isSortable: true,
           defaultSortDirection: 'desc',
           displayAsText: 'Time',
@@ -91,17 +91,13 @@ export const RequirementFlyout = connect(mapStateToProps)(
           id: this.props.getRequirementKey(),
           displayAsText: 'Requirement(s)',
         },
-        { id: 'rule.description', displayAsText: 'Description' },
-        { id: 'rule.level', displayAsText: 'Level' },
-        {
-          id: 'rule.id',
-          displayAsText: 'Rule ID',
-        },
+        { id: 'wazuh.integration.name', displayAsText: 'Integration' },
+        { id: 'wazuh.integration.decoders', displayAsText: 'Decoders' },
       ];
 
       const columnsWithoutAgent = [
         {
-          id: 'timestamp',
+          id: '@timestamp',
           isSortable: true,
           defaultSortDirection: 'desc',
           displayAsText: 'Time',
@@ -119,12 +115,8 @@ export const RequirementFlyout = connect(mapStateToProps)(
           id: this.props.getRequirementKey(),
           displayAsText: 'Requirement',
         },
-        { id: 'rule.description', displayAsText: 'Description' },
-        { id: 'rule.level', displayAsText: 'Level' },
-        {
-          id: 'rule.id',
-          displayAsText: 'Rule ID',
-        },
+        { id: 'wazuh.integration.name', displayAsText: 'Integration' },
+        { id: 'wazuh.integration.decoders', displayAsText: 'Decoders' },
       ];
       const agentId = this.props.currentAgentData?.id;
       return agentId
