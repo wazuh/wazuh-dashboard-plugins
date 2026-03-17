@@ -43,7 +43,6 @@ import {
 } from './services/request-handler';
 import { Applications, Categories } from './utils/applications';
 import { euiPaletteColorBlind } from '@elastic/eui';
-import _ from 'lodash';
 import NavigationService from './react-services/navigation-service';
 import { createHashHistory } from 'history';
 import { SUPPORTED_LANGUAGES_ARRAY } from '../common/constants';
