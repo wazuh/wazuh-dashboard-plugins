@@ -112,8 +112,8 @@ class WzRegistrationService extends Component {
           currentConfig['auth-auth'].auth &&
           !isString(currentConfig['auth-auth'].auth) && (
             <WzConfigurationSettingsHeader
-              title="Main settings"
-              description="General settings applied to the registration service"
+              title='Main settings'
+              description='General settings applied to the registration service'
               help={helpLinks}
             >
               <WzConfigurationSettingsGroup
@@ -121,8 +121,8 @@ class WzRegistrationService extends Component {
                 items={mainSettings}
               />
               <WzConfigurationSettingsGroup
-                title="SSL settings"
-                description="Applied when the registration service uses SSL certificates"
+                title='SSL settings'
+                description='Applied when the registration service uses SSL certificates'
                 config={currentConfig['auth-auth'].auth}
                 items={sslSettings}
               />
@@ -133,4 +133,6 @@ class WzRegistrationService extends Component {
   }
 }
 
-export default withWzConfig([{ component: 'auth', configuration: 'auth' }])(WzRegistrationService);
+export default withWzConfig([{ component: 'auth', configuration: 'auth' }])(
+  WzRegistrationService,
+);
