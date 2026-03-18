@@ -14,6 +14,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added "Not applicable" status to SCA CheckResult enum with corresponding color mapping (#B9A888) and sample data support
 - Added Alerting sample monitors health check [#7833](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7833)
 - Added default `wazuh-events*` index pattern [#7924](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7924)
+- Added SSL certificate support for Wazuh API connections, allowing the dashboard to use client certificates and CA certificate validation when connecting to Wazuh Manager APIs configured with custom SSL certificates. The `verify_ca` value is automatically calculated based on whether certificate paths (`key`, `cert`, `ca`) are configured [#8015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8015)
+- Added "Verify CA" column in the API Connections table to display whether CA certificate verification is enabled for each API host. The value is automatically determined based on certificate configuration [#8015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8015)
 - Added `server-api:run_as` health check to warn when `allow_run_as` is disabled for configured API hosts [#8050](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8050)
 - Fixed styling issues for v9 theme [#8064](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8064)
 
@@ -94,7 +96,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.5
 
-## Wazuh v4.14.4 - OpenSearch Dashboards 2.19.4 - Revision 00
+### Fixed
+
+- Fixed `wazuh-core` plugin startup timeout when configured API hosts are unreachable by making `manageHosts.start()` non-blocking [#8130](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8130)
+- Fixed security tables pagination to load all items beyond 500 limit (Users, Roles, Policies, Roles Mapping) [#8133](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8133)
+
+## Wazuh v4.14.4 - OpenSearch Dashboards 2.19.4 - Revision 02
 
 ### Added
 
@@ -342,6 +349,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added filter by value to document details fields [#7081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7081)
 - Added pinned agent mechanic to inventory data, stats, and configuration for consistent functionality [#7135](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7135)
 - Added ability to edit the `wazuh.updates.disabled` configuration setting from UI [#7156](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7156)
+- Added legacy agent warning for Wazuh 5.0 compatibility [#8171](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8171)
 
 ### Changed
 

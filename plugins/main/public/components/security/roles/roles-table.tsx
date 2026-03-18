@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  EuiInMemoryTable,
+  EuiBasicTable,
   EuiBadge,
   EuiFlexGroup,
   EuiFlexItem,
@@ -22,6 +22,10 @@ export const RolesTable = ({
   loading,
   editRole,
   updateRoles,
+  pageIndex,
+  pageSize,
+  totalItems,
+  onTableChange,
 }) => {
   const [rolesState, setRolesState] = useState([]);
 
@@ -187,19 +191,20 @@ export const RolesTable = ({
     },
   };
 
-  const search = {
-    box: {
-      incremental: false,
-      schema: true,
-    },
+  const pagination = {
+    pageIndex,
+    pageSize,
+    totalItemCount: totalItems,
+    pageSizeOptions: [5, 10, 25, 50],
+    showPerPageOptions: true,
   };
 
   return (
-    <EuiInMemoryTable
+    <EuiBasicTable
       items={rolesState}
       columns={columns}
-      search={search}
-      pagination={true}
+      pagination={pagination}
+      onChange={onTableChange}
       rowProps={getRowProps}
       loading={loading}
       sorting={sorting}
