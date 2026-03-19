@@ -91,6 +91,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed usage of agent `000` [#8104](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8104) [#8105](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8105) [#8117](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8117)
 - Removed `needle` dependency [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
 - Removed `read-last-lines` dependency [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
+- Removed Key Request configuration options from the Registration Service view [#8195](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8195)
 
 ## Wazuh v4.14.5 - OpenSearch Dashboards 2.19.4 - Revision 00
 
