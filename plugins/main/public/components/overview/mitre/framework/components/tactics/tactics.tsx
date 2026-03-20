@@ -134,12 +134,12 @@ export const Tactics = (props: tTacticsProps) => {
   };
 
   const getTacticsList = () => {
-    const tacticsIds = Object.keys(tacticsObject);
+    const tacticsIds = Object.values(tacticsObject);
     const tacticsList: Array<any> = tacticsIds.map((item) => {
-      const quantity = (tacticsCount.find((tactic) => tactic.key === item) || {}).doc_count || 0;
+      const quantity = (tacticsCount.find((tactic) => tactic.key === item.external_id) || {}).doc_count || 0;
       return {
-        id: item,
-        label: item,
+        id: item.name,
+        label: item.name,
         quantity,
         onClick: (id) => facetClicked(id),
       };

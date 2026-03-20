@@ -100,7 +100,7 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
     render: renderLinksReference,
   },
   {
-    id: 'rule.mitre.id',
+    id: 'rule.mitre.technique',
     render: value =>
       Array.isArray(value) ? (
         <div style={{ display: 'flex', gap: 10 }}>
@@ -116,23 +116,23 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   },
 
   {
-    id: 'compliance.pci_dss',
+    id: 'rule.compliance.pci_dss',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'compliance.gdpr',
+    id: 'rule.compliance.gdpr',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'compliance.nist_800_53',
+    id: 'rule.compliance.nist_800_53',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'compliance.hipaa',
+    id: 'rule.compliance.hipaa',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'compliance.tsc',
+    id: 'rule.compliance.tsc',
     render: renderRequirementsSecurityOperations,
   },
   {
