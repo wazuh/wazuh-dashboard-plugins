@@ -31,7 +31,10 @@ import {
   withDataSourceLoading,
   withDataSourceSearchBar,
 } from '../../common/hocs';
-import { FindingsDataSourceRepository, tFilter } from '../../common/data-source';
+import {
+  FindingsDataSourceRepository,
+  tFilter,
+} from '../../common/data-source';
 import { LoadingSearchbarProgress } from '../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { I18nProvider } from '@osd/i18n/react';
 import { useAsyncAction } from '../../common/hooks';

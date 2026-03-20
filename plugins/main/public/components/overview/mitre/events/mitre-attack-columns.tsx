@@ -15,5 +15,5 @@ export const mitreAttackColumns: tDataGridColumn[] = [
   {
     id: 'rule.level',
     initialWidth: 280,
-  }
+  },
 ];
