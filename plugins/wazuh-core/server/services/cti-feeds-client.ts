@@ -1,21 +1,21 @@
 import { Logger } from 'opensearch-dashboards/server';
 
-const CTI_BASE_URL ='/_plugins/content-manager'
+const CONTENT_MANAGER_BASE_PATH = '/_plugins/_content_manager';
 
 export class CTIFeedsClient {
-  constructor(private logger: Logger, private opensearchClient: any) {
+  constructor(private logger: Logger) {
     this.logger.debug('CTI Feeds client initialized');
   }
 
   // Re-use this class to implement the get credentials, post subscriptions, etc.
 
-  async updateCTIFeeds() {
+  async updateCTIFeeds(context) {
     try {
       this.logger.debug('Triggering CTI feeds update in indexer');
       const response =
-        await this.opensearchClient.asInternalUser.transport.request({
+        await context.core.opensearch.client.asInternalUser.transport.request({
           method: 'POST',
-          path: `${CTI_BASE_URL}/update`,
+          path: `${CONTENT_MANAGER_BASE_PATH}/update`,
         });
       return response.body;
     } catch (error) {

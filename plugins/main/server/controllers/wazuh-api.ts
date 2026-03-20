@@ -1084,7 +1084,7 @@ export class WazuhApiCtrl {
     try {
       const ctiFeedsClient = context.wazuh_core.ctiFeedsClient;
 
-      const result = await ctiFeedsClient.updateCTIFeeds();
+      const result = await ctiFeedsClient.updateCTIFeeds(context);
 
       return response.ok({
         body: {

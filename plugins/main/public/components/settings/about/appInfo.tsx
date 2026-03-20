@@ -9,6 +9,11 @@ import {
   EuiIcon,
 } from '@elastic/eui';
 
+import { GenericRequest } from '../../../react-services';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+
 export const SettingsAboutAppInfo = ({
   appInfo,
   clusterUuid,
@@ -19,20 +24,32 @@ export const SettingsAboutAppInfo = ({
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+
   const handleUpdateClick = async () => {
     setIsLoading(true);
     setShowSuccess(false);
 
-    // Adam
-
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await GenericRequest.request('POST', '/api/cti-feeds/update');
       setShowSuccess(true);
-
-      // Look for how much time is given on other sections
       setTimeout(() => setShowSuccess(false), 5000);
-    }, 2000);
+    } catch (error) {
+      const options = {
+        context: `${SettingsAboutAppInfo.name}.handleUpdateClick`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: 'Error updating CTI feeds',
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
   return (
     <EuiCallOut>
       <EuiFlexGroup direction='column' gutterSize='s'>

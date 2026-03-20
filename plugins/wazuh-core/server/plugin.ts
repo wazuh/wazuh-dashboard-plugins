@@ -88,7 +88,6 @@ export class WazuhCorePlugin
 
     this.services.ctiFeedsClient = new CTIFeedsClient(
       this.logger.get('cti-feeds-client'),
-      core.opensearch.client,
     );
 
     // Register a property to the context parameter of the endpoint handlers
