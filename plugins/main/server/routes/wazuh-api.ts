@@ -113,4 +113,13 @@ export function WazuhApiRoutes(router: IRouter) {
     async (context, request, response) =>
       ctrl.getSetupInfo(context, request, response),
   );
+
+  router.post(
+    {
+      path: '/api/cti-feeds/update',
+      validate: false,
+    },
+    async (context, request, response) =>
+      ctrl.updateCTIFeeds(context, request, response),
+  );
 }
