@@ -12,7 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 
-import { EuiBasicTable } from '@elastic/eui';
+import { EuiBasicTable, EuiCallOut } from '@elastic/eui';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
@@ -103,17 +103,27 @@ class WzConfigurationClient extends Component {
                 config={currentConfig['agent-client'].client}
                 items={mainSettings}
               />
-              {currentConfig['agent-client'].client.server.length && (
+              {currentConfig['agent-client'].client && (
                 <Fragment>
                   <WzConfigurationSettingsHeader
                     title='Server settings'
                     description='List of managers to connect'
                   />
-                  <EuiBasicTable
-                    items={currentConfig['agent-client'].client.server}
-                    columns={columns}
-                    tableLayout='auto'
-                  />
+                  {currentConfig['agent-client'].client.manager?.length ? (
+                    <EuiBasicTable
+                      items={currentConfig['agent-client'].client.manager}
+                      columns={columns}
+                      tableLayout='auto'
+                    />
+                  ) : (
+                    <EuiCallOut
+                      title='Client manager configuration error'
+                      color='warning'
+                      iconType='alert'
+                    >
+                      <p>The manager configuration is undefined or empty.</p>
+                    </EuiCallOut>
+                  )}
                 </Fragment>
               )}
             </WzConfigurationSettingsHeader>
