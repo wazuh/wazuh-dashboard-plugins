@@ -18,7 +18,7 @@ import { getWzCurrentAppID } from '../../kibana-services';
 import { ApiTable } from '../settings/api/api-table';
 import { WzConfigurationSettings } from '../settings/configuration';
 import { WzSampleDataWrapper } from '../add-modules-data/WzSampleDataWrapper';
-import { WzIndexerSettings } from './indexer-settings/index';
+import { WzIndexerSettings } from '../indexer-settings';
 import { SettingsAbout } from '../settings/about/index';
 import { Applications, serverApis } from '../../utils/applications';
 import { compose } from 'redux';

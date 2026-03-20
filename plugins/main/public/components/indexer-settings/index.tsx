@@ -22,8 +22,8 @@ import {
   EuiFlexItem,
   EuiTitle,
 } from '@elastic/eui';
-import { getToasts } from '../../../kibana-services';
-import { GenericRequest } from '../../../react-services';
+import { getToasts } from '../../kibana-services';
+import { GenericRequest } from '../../react-services';
 import { EngineSwitch } from './engine-switch';
 import type { Engine, IndexerSettings } from './types';
 
