@@ -5,7 +5,7 @@ export const nistColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   commonColumns['wazuh.agent.name'],
   {
-    id: 'compliance.nist_800_53',
+    id: 'rule.compliance.nist_800_53',
     initialWidth: 171,
   },
   { id: 'wazuh.integration.name' },

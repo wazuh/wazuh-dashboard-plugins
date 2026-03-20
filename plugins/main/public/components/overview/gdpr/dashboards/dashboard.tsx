@@ -1,6 +1,6 @@
 import React from 'react';
 import { GDPRDataSource } from '../../../common/data-source/pattern/events/gdpr/gdpr-data-source';
-import { EventsDataSourceRepository } from '../../../common/data-source';
+import { FindingsDataSourceRepository } from '../../../common/data-source';
 import {
   GDPR_DASHBOARD_ID,
   GDPR_AGENT_DASHBOARD_ID,
@@ -10,7 +10,7 @@ import { createDashboard } from '../../../common/dashboards/dashboard';
 
 export const DashboardGDPR = createDashboard({
   DataSource: GDPRDataSource,
-  DataSourceRepositoryCreator: EventsDataSourceRepository,
+  DataSourceRepositoryCreator: FindingsDataSourceRepository,
   getDashboardPanels: [
     {
       dashboardId: GDPR_DASHBOARD_ID,

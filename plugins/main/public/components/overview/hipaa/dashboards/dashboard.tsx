@@ -1,6 +1,6 @@
 import React from 'react';
 import { HIPAADataSource } from '../../../common/data-source/pattern/events/hipaa/hipaa-data-source';
-import { EventsDataSourceRepository } from '../../../common/data-source';
+import { FindingsDataSourceRepository } from '../../../common/data-source';
 import {
   HIPAA_DASHBOARD_ID,
   HIPAA_AGENT_DASHBOARD_ID,
@@ -10,7 +10,7 @@ import { createDashboard } from '../../../common/dashboards';
 
 export const DashboardHIPAA = createDashboard({
   DataSource: HIPAADataSource,
-  DataSourceRepositoryCreator: EventsDataSourceRepository,
+  DataSourceRepositoryCreator: FindingsDataSourceRepository,
   getDashboardPanels: [
     {
       dashboardId: HIPAA_DASHBOARD_ID,
