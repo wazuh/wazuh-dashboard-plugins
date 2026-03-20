@@ -3,26 +3,11 @@ import { Logger } from 'opensearch-dashboards/server';
 const CTI_BASE_URL ='/_plugins/content-manager'
 
 export class CTIFeedsClient {
-  constructor(
-    private logger: Logger,
-    private opensearchClient: any,
-  ) {
+  constructor(private logger: Logger, private opensearchClient: any) {
     this.logger.debug('CTI Feeds client initialized');
   }
 
-  async getCredentials() {
-    try {
-      this.logger.debug('Fetching CTI subscription credentials from indexer');
-      const response = await this.opensearchClient.asInternalUser.transport.request({
-        method: 'GET',
-        path: `${CTI_BASE_URL}/subscription`,
-      });
-      return response.body;
-    } catch (error) {
-      this.logger.error(`Error retrieving CTI credentials: ${error.message}`);
-      throw error;
-    }
-  }
+  // Re-use this class to implement the get credentials, post subscriptions, etc.
 
   async updateCTIFeeds() {
     try {
