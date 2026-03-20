@@ -1,5 +1,5 @@
 import React from 'react';
-import { EventsDataSourceRepository } from '../../../common/data-source';
+import { FindingsDataSourceRepository } from '../../../common/data-source';
 import { GitHubDataSource } from '../../../common/data-source/pattern/events/github/github-data-source';
 import {
   GITHUB_DASHBOARD_ID,
@@ -10,7 +10,7 @@ import { createDashboard } from '../../../common/dashboards';
 
 export const DashboardGitHub = createDashboard({
   DataSource: GitHubDataSource,
-  DataSourceRepositoryCreator: EventsDataSourceRepository,
+  DataSourceRepositoryCreator: FindingsDataSourceRepository,
   getDashboardPanels: [
     {
       dashboardId: GITHUB_DASHBOARD_ID,
