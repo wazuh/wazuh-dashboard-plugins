@@ -52,15 +52,15 @@ export const SettingsAboutAppInfo = ({
 
   return (
     <EuiCallOut>
-      <EuiFlexGroup direction='column' gutterSize='s'>
+      <EuiFlexGroup alignItems='center' justifyContent='spaceBetween'>
         <EuiFlexItem grow={false}>
-          <EuiText>
-            App version: <b>{appInfo}</b>
-          </EuiText>
-        </EuiFlexItem>
+          <EuiFlexGroup direction='column' gutterSize='xs'>
+            <EuiFlexItem grow={false}>
+              <EuiText>
+                App version: <b>{appInfo}</b>
+              </EuiText>
+            </EuiFlexItem>
 
-        <EuiFlexItem grow={false}>
-          <EuiFlexGroup direction='row' alignItems='center' gutterSize='m'>
             <EuiFlexItem grow={false}>
               <EuiText>
                 Cluster UUID:{' '}
@@ -73,30 +73,32 @@ export const SettingsAboutAppInfo = ({
                 </b>
               </EuiText>
             </EuiFlexItem>
-
-            <EuiFlexItem grow={false}>
-              <EuiButton
-                size='s'
-                isLoading={isLoading}
-                onClick={handleUpdateClick}
-                iconType='refresh'
-              >
-                Request CTI update
-              </EuiButton>
-            </EuiFlexItem>
-
-            {showSuccess && (
-              <EuiFlexItem grow={false}>
-                <EuiText size='s'>
-                  <EuiTextColor color='success'>
-                    <EuiIcon type='check' /> Update requested successfully
-                  </EuiTextColor>
-                </EuiText>
-              </EuiFlexItem>
-            )}
           </EuiFlexGroup>
         </EuiFlexItem>
+
+        <EuiFlexItem grow={false}>
+          <EuiButton
+            size='s'
+            isLoading={isLoading}
+            onClick={handleUpdateClick}
+            iconType='refresh'
+          >
+            Request CTI update
+          </EuiButton>
+        </EuiFlexItem>
       </EuiFlexGroup>
+
+      {showSuccess && (
+        <EuiFlexGroup justifyContent='center' style={{ marginTop: 8 }}>
+          <EuiFlexItem grow={false}>
+            <EuiText size='s'>
+              <EuiTextColor color='success'>
+                <EuiIcon type='check' /> Update requested successfully
+              </EuiTextColor>
+            </EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      )}
     </EuiCallOut>
   );
 };
