@@ -40,6 +40,10 @@ function wazuhUrl(path) {
   return `https://raw.githubusercontent.com/wazuh/wazuh-indexer-plugins/{branch}/${path}`;
 }
 
+function wazuhSecurityAnalyticsUrl(path) {
+  return `https://raw.githubusercontent.com/wazuh/wazuh-indexer-security-analytics/{branch}/${path}`;
+}
+
 // Simple template interpolation
 function interpolate(template, variables) {
   return template.replace(/{(\w+)}/g, (_, key) => {
@@ -151,6 +155,14 @@ const TEMPLATE_SOURCES = {
       wazuhUrl('plugins/setup/src/main/resources/templates/streams/raw.json'),
     ],
     outputFile: 'events-raw.json',
+  },
+  findings: {
+    urls: [
+      wazuhSecurityAnalyticsUrl(
+        'src/main/resources/mappings/wazuh-finding-enrichment-mapping.json',
+      ),
+    ],
+    outputFile: 'findings.json',
   },
   monitoring: {
     urls: [
@@ -495,8 +507,8 @@ function extractFieldsFromProperties(properties, prefix = '', issues) {
         }
       }
 
-      // Handle nested type with properties
-      if (esType === 'nested' && fieldDef.properties) {
+      // Handle nested or object type with properties
+      if ((esType === 'nested' || esType === 'object') && fieldDef.properties) {
         fields.push(
           ...extractFieldsFromProperties(
             fieldDef.properties,
@@ -694,12 +706,17 @@ async function processTemplate(templateConfig, config) {
     );
     console.log(`  ✅ Successfully fetched from: ${url}`);
 
-    // Extract mappings - handle different template structures
+    // Extract mappings - handle different template structures:
+    // 1. Index template:           { "mappings": { "properties": {...} } }
+    // 2. Composable template:      { "template": { "mappings": { ... } } }
+    // 3. Raw mapping (e.g. SA):    { "properties": {...} }
     let mappings;
     if (template.mappings) {
       mappings = template.mappings;
     } else if (template.template && template.template.mappings) {
       mappings = template.template.mappings;
+    } else if (template.properties) {
+      mappings = template;
     } else {
       throw new Error('Could not find mappings in template structure');
     }

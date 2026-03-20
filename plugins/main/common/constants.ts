@@ -20,6 +20,12 @@ export const PLUGIN_MAJOR_VERSION = version.split('.')[0];
 export const WAZUH_INDEX_TYPE_EVENTS = 'events';
 export const WAZUH_EVENTS_PATTERN = 'wazuh-events*';
 
+// Index patterns - Wazuh findings
+export const WAZUH_INDEX_TYPE_FINDINGS = 'findings';
+export const WAZUH_FINDINGS_PATTERN = 'wazuh-findings*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS =
+  'index-pattern:findings';
+
 // Job - Wazuh monitoring
 export const WAZUH_INDEX_TYPE_MONITORING = 'monitoring';
 export const WAZUH_MONITORING_PATTERN = 'wazuh-monitoring*';
