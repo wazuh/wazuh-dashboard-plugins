@@ -1068,4 +1068,40 @@ export class WazuhApiCtrl {
       return Promise.reject(error);
     }
   }
+
+  /**
+   * This updates the threat intelligence content from subscribed CTI feeds
+   * @param {Object} context
+   * @param {Object} request
+   * @param {Object} response
+   * @returns {Object} TODO -> Indexer returns a task identifier because it takes a lot of time
+   */
+  async updateCTIFeeds(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const ctiFeedsClient = context.wazuh_core.ctiFeedsClient;
+
+      const result = await ctiFeedsClient.updateCTIFeeds();
+
+      return response.ok({
+        body: {
+          message: 'CTI feeds update initiated',
+          ...result,
+        },
+      });
+    } catch (error) {
+      context.wazuh.logger.error(error.message || error);
+      return ErrorResponse(
+        `Could not update the content from subscribed CTI feeds due to ${
+          error.message || error
+        }`,
+        4005,
+        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+        response,
+      );
+    }
+  }
 }

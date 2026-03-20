@@ -5,6 +5,7 @@ import {
   ServerAPIClient,
   ServerAPIInternalUserClient,
   ServerAPIScopedUserClient,
+  CTIFeedsClient,
 } from './services';
 import { IConfigurationEnhanced } from './services/enhance-configuration';
 
@@ -15,6 +16,7 @@ export interface WazuhCorePluginSetup {
   manageHosts: ManageHosts;
   API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;
   serverAPIClient: ServerAPIClient;
+  ctiFeedsClient: CTIFeedsClient;
   api: {
     client: {
       asInternalUser: ServerAPIInternalUserClient;
@@ -29,6 +31,7 @@ export interface WazuhCorePluginStart {
   manageHosts: ManageHosts;
   API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;
   serverAPIClient: ServerAPIClient;
+  ctiFeedsClient: CTIFeedsClient;
   api: {
     client: {
       asInternalUser: ServerAPIInternalUserClient;

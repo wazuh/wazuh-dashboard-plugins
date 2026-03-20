@@ -21,6 +21,7 @@ import {
   ManageHosts,
   createDashboardSecurity,
   ServerAPIClient,
+  CTIFeedsClient,
 } from './services';
 import { InitializerConfigProvider } from './services/configuration';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
@@ -84,6 +85,11 @@ export class WazuhCorePlugin
     );
 
     this.services.manageHosts.setServerAPIClient(this.services.serverAPIClient);
+
+    this.services.ctiFeedsClient = new CTIFeedsClient(
+      this.logger.get('cti-feeds-client'),
+      core.opensearch.client,
+    );
 
     // Register a property to the context parameter of the endpoint handlers
     core.http.registerRouteHandlerContext('wazuh_core', (context, request) => {
