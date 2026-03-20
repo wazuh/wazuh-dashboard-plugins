@@ -711,6 +711,25 @@ export const sampleData = {
   redirectTo: () => '/settings?tab=sample_data',
 };
 
+export const indexerSettings = {
+  category: 'management',
+  id: 'indexer-settings',
+  title: i18n.translate('wz-app-indexer-settings-title', {
+    defaultMessage: 'Settings',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-indexer-settings-breadcrumbLabel', {
+    defaultMessage: 'Settings',
+  }),
+  description: i18n.translate('wz-app-indexer-settings-description', {
+    defaultMessage: 'Configure Indexer settings.',
+  }),
+  euiIconType: 'indexRollupApp',
+  order: 9070,
+  showInOverviewApp: false,
+  showInAgentMenu: false,
+  redirectTo: () => '/settings?tab=indexer_settings',
+};
+
 export const serverApis = {
   category: 'wz-category-dashboard-management',
   id: 'server-apis',
@@ -778,6 +797,7 @@ export const Applications = [
   logs,
   settings,
   serverApis,
+  indexerSettings,
   sampleData,
   about,
   ITHygiene,

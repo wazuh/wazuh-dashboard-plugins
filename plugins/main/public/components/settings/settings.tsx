@@ -18,6 +18,7 @@ import { getWzCurrentAppID } from '../../kibana-services';
 import { ApiTable } from '../settings/api/api-table';
 import { WzConfigurationSettings } from '../settings/configuration';
 import { WzSampleDataWrapper } from '../add-modules-data/WzSampleDataWrapper';
+import { WzIndexerSettings } from './indexer-settings/index';
 import { SettingsAbout } from '../settings/about/index';
 import { Applications, serverApis } from '../../utils/applications';
 import { compose } from 'redux';
@@ -97,6 +98,11 @@ class SettingsComponent extends React.Component<SettingsComponentProps> {
         <Route path='?tab=about'>
           <div>
             <SettingsAbout />
+          </div>
+        </Route>
+        <Route path='?tab=indexer_settings'>
+          <div>
+            <WzIndexerSettings />
           </div>
         </Route>
         <Route path='?tab=sample_data'>

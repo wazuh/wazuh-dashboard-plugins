@@ -655,6 +655,102 @@ export class WazuhElasticCtrl {
     }
   }
 
+  async getIndexerSettings(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const fallbackSearch =
+        await context.core.opensearch.client.asCurrentUser.search({
+          index: '.wazuh-settings',
+          size: 1,
+          body: {
+            query: { match_all: {} },
+          },
+        });
+      const hit = fallbackSearch?.body?.hits?.hits?.[0];
+      const source = hit?._source ?? {};
+
+      if (!source.engine) {
+        throw ErrorResponse(
+          'Engine settings not found in .wazuh-settings index',
+          404,
+          500,
+          response,
+        );
+      }
+
+      return response.ok({
+        body: {
+          ...source,
+          engine: source.engine,
+        },
+      });
+    } catch (error: any) {
+      context.wazuh.logger.error(error.message || error);
+      return ErrorResponse(error.message || error, 4010, 500, response);
+    }
+  }
+
+  updateIndexerSettings = routeDecoratorProtectedAdministrator(
+    WAZUH_STATUS_CODES.UNKNOWN,
+  )(
+    async (
+      context: RequestHandlerContext,
+      request: OpenSearchDashboardsRequest<{ engine: Record<string, unknown> }>,
+      response: OpenSearchDashboardsResponseFactory,
+    ) => {
+      try {
+        const osResp =
+          await context.core.opensearch.client.asCurrentUser.transport.request({
+            method: 'PUT',
+            path: '/_plugins/_setup/settings',
+            body: request.body,
+          });
+
+        const osBody = osResp?.body ?? {};
+        const message = osBody?.message ?? 'Settings updated successfully.';
+        const status = typeof osBody?.status === 'number' ? osBody.status : 200;
+
+        return response.custom({
+          statusCode: status,
+          body: { message, status },
+        });
+      } catch (error: any) {
+        const pluginBody = error?.meta?.body ?? {};
+        const hasPluginResponse =
+          typeof pluginBody?.message === 'string' &&
+          typeof pluginBody?.status === 'number';
+
+        if (hasPluginResponse) {
+          context.wazuh.logger.error(
+            `Error updating Indexer Setup settings: ${pluginBody.message}`,
+          );
+          return response.custom({
+            statusCode: pluginBody.status,
+            body: { message: pluginBody.message, status: pluginBody.status },
+          });
+        }
+
+        const message =
+          pluginBody?.detail ?? error?.message ?? 'Internal Server Error.';
+        const status = error?.meta?.statusCode ?? 500;
+
+        context.wazuh.logger.error(
+          `Error updating Indexer Setup settings: ${message}`,
+        );
+
+        return ErrorResponse(
+          message,
+          WAZUH_STATUS_CODES.UNKNOWN,
+          status,
+          response,
+        );
+      }
+    },
+  );
+
   getErrorDetails(error) {
     const statusCode = error?.meta?.statusCode || 500;
     let errorMessage = error.message;
