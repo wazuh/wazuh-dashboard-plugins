@@ -30,7 +30,7 @@ import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selec
 import NavigationService from '../../../../../react-services/navigation-service';
 import { withDataSourceFetch } from '../../../hocs';
 import {
-  EventsDataSourceRepository,
+  FindingsDataSourceRepository,
   FIMDataSource,
 } from '../../../data-source';
 
@@ -83,7 +83,7 @@ export function useTimeFilter() {
 
 const FimTableDataSource = withDataSourceFetch({
   DataSource: FIMDataSource,
-  DataSourceRepositoryCreator: EventsDataSourceRepository,
+  DataSourceRepositoryCreator: FindingsDataSourceRepository,
   mapRequestParams: ({ dataSource, dependencies }) => {
     const [_, timeFilter, sort] = dependencies;
 

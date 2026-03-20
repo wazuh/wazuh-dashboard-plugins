@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  EventsDataSourceRepository,
+  FindingsDataSourceRepository,
   ThreatHuntingDataSource,
 } from '../../../common/data-source';
 
@@ -15,7 +15,7 @@ import { createDashboard } from '../../../common/dashboards/dashboard';
 
 export const DashboardThreatHunting = createDashboard({
   DataSource: ThreatHuntingDataSource,
-  DataSourceRepositoryCreator: EventsDataSourceRepository,
+  DataSourceRepositoryCreator: FindingsDataSourceRepository,
   getDashboardPanels: [
     {
       dashboardId: THREAT_HUNTING_DASHBOARD_ID,
