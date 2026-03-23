@@ -16,6 +16,9 @@ export const PLUGIN_VERSION = version;
 export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
 export const PLUGIN_MAJOR_VERSION = version.split('.')[0];
 
+// Index - Wazuh engine/indexer settings located in Indexer management > Settings
+export const WAZUH_ENGINE_SETTINGS_INDEX = '.wazuh-settings';
+
 // Index patterns - Wazuh events (previously alerts)
 export const WAZUH_INDEX_TYPE_EVENTS = 'events';
 export const WAZUH_EVENTS_PATTERN = 'wazuh-events*';
