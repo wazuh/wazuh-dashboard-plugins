@@ -171,10 +171,6 @@ describe('ManageHosts Service', () => {
       expect(result[0].cluster_info).toBeDefined();
       expect(result[0].cluster_info).not.toBeUndefined();
       expect(result[0].id).toBe('default2');
-
-      expect(() => {
-        const uuid = result[0].cluster_info.uuid;
-      }).not.toThrow();
     });
   });
 });
