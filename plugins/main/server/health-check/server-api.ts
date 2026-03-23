@@ -171,11 +171,11 @@ export const initializationTaskCreatorServerAPIRunAs = ({
       const API_USER_STATUS_RUN_AS = services.API_USER_STATUS_RUN_AS;
 
       const results = hosts.map(
-        (host: { id: string; cluster_info?: { allow_run_as?: number } }) => ({
+        (host: { id: string; allow_run_as?: number }) => ({
           id: host.id,
-          allow_run_as: host.cluster_info?.allow_run_as ?? -1,
-          enabled:
-            host?.cluster_info?.allow_run_as === API_USER_STATUS_RUN_AS.ENABLED,
+          allow_run_as:
+            host?.allow_run_as ?? API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK,
+          enabled: host?.allow_run_as === API_USER_STATUS_RUN_AS.ENABLED,
         }),
       );
 
