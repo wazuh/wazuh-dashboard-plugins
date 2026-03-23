@@ -44,7 +44,7 @@ import {
   useDataSource,
   tParsedIndexPattern,
   PatternDataSource,
-  EventsDataSourceRepository,
+  FindingsDataSourceRepository,
 } from '../data-source';
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
 import { wzDiscoverRenderColumns } from './render-columns';
@@ -86,7 +86,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
 
-  const EventsRepository = new EventsDataSourceRepository();
+  const FindingsRepository = new FindingsDataSourceRepository();
 
   const {
     dataSource,
@@ -98,7 +98,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     setFilters,
     error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    repository: EventsRepository, // this makes only works with events index pattern
+    repository: FindingsRepository, // this makes only works with findings index pattern
     DataSource,
   });
 

@@ -16,7 +16,7 @@ export const azureColumns: tDataGridColumn[] = [
     initialWidth: 120,
   },
   {
-    id: 'azure.auditlogs.properties.activity_display_name',
+    id: 'user.name',
     initialWidth: 250,
   },
   {
@@ -28,11 +28,11 @@ export const azureColumns: tDataGridColumn[] = [
     initialWidth: 120,
   },
   {
-    id: 'azure.resource.name',
+    id: 'cloud.service.name',
     initialWidth: 180,
   },
   {
-    id: 'azure.tenant_id',
+    id: 'cloud.account.id',
     initialWidth: 150,
   },
 ];

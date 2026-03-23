@@ -1,6 +1,6 @@
 import React from 'react';
 import { NIST80053DataSource } from '../../../common/data-source/pattern/events/nist-800-53/nist-800-53-data-source';
-import { EventsDataSourceRepository } from '../../../common/data-source';
+import { FindingsDataSourceRepository } from '../../../common/data-source';
 import {
   NIST_800_53_DASHBOARD_ID,
   NIST_800_53_AGENT_DASHBOARD_ID,
@@ -10,7 +10,7 @@ import { createDashboard } from '../../../common/dashboards';
 
 export const DashboardNIST80053 = createDashboard({
   DataSource: NIST80053DataSource,
-  DataSourceRepositoryCreator: EventsDataSourceRepository,
+  DataSourceRepositoryCreator: FindingsDataSourceRepository,
   getDashboardPanels: [
     {
       dashboardId: NIST_800_53_DASHBOARD_ID,

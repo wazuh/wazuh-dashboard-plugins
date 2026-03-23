@@ -124,7 +124,7 @@ export const Tactics = (props: tTacticsProps) => {
     }
   };
 
-  const facetClicked = (id) => {
+  const facetClicked = id => {
     const { selectedTactics: oldSelected, onChangeSelectedTactics } = props;
     const selectedTactics = {
       ...oldSelected,
@@ -134,14 +134,16 @@ export const Tactics = (props: tTacticsProps) => {
   };
 
   const getTacticsList = () => {
-    const tacticsIds = Object.keys(tacticsObject);
-    const tacticsList: Array<any> = tacticsIds.map((item) => {
-      const quantity = (tacticsCount.find((tactic) => tactic.key === item) || {}).doc_count || 0;
+    const tacticsIds = Object.values(tacticsObject);
+    const tacticsList: Array<any> = tacticsIds.map(item => {
+      const quantity =
+        (tacticsCount.find(tactic => tactic.key === item.external_id) || {})
+          .doc_count || 0;
       return {
-        id: item,
-        label: item,
+        id: item.name,
+        label: item.name,
         quantity,
-        onClick: (id) => facetClicked(id),
+        onClick: id => facetClicked(id),
       };
     });
 
@@ -149,7 +151,7 @@ export const Tactics = (props: tTacticsProps) => {
       <>
         {tacticsList
           .sort((a, b) => b.quantity - a.quantity)
-          .map((facet) => {
+          .map(facet => {
             let iconNode;
             return (
               <EuiFacetButton
@@ -159,7 +161,9 @@ export const Tactics = (props: tTacticsProps) => {
                 isSelected={selectedTactics[facet.id]}
                 isLoading={isLoadingAlerts}
                 icon={iconNode}
-                onClick={facet.onClick ? () => facet.onClick(facet.id) : undefined}
+                onClick={
+                  facet.onClick ? () => facet.onClick(facet.id) : undefined
+                }
               >
                 {facet.label}
               </EuiFacetButton>
@@ -177,8 +181,8 @@ export const Tactics = (props: tTacticsProps) => {
     setState({ ...state, isPopoverOpen: false });
   };
 
-  const selectAll = (status) => {
-    Object.keys(selectedTactics).map((item) => {
+  const selectAll = status => {
+    Object.keys(selectedTactics).map(item => {
       selectedTactics[item] = status;
     });
     onChangeSelectedTactics(selectedTactics);
@@ -191,7 +195,7 @@ export const Tactics = (props: tTacticsProps) => {
       items: [
         {
           name: 'Select all',
-          icon: <EuiIcon type="check" size="m" />,
+          icon: <EuiIcon type='check' size='m' />,
           onClick: () => {
             closePopover();
             selectAll(true);
@@ -199,7 +203,7 @@ export const Tactics = (props: tTacticsProps) => {
         },
         {
           name: 'Unselect all',
-          icon: <EuiIcon type="cross" size="m" />,
+          icon: <EuiIcon type='cross' size='m' />,
           onClick: () => {
             closePopover();
             selectAll(false);
@@ -218,7 +222,7 @@ export const Tactics = (props: tTacticsProps) => {
     >
       <EuiFlexGroup>
         <EuiFlexItem>
-          <EuiTitle size="m">
+          <EuiTitle size='m'>
             <h1>Tactics</h1>
           </EuiTitle>
         </EuiFlexItem>
@@ -227,13 +231,13 @@ export const Tactics = (props: tTacticsProps) => {
           <EuiPopover
             button={
               <EuiButtonIcon
-                iconType="gear"
+                iconType='gear'
                 onClick={() => onGearButtonClick()}
                 aria-label={'tactics options'}
               ></EuiButtonIcon>
             }
             isOpen={isPopoverOpen}
-            panelPaddingSize="none"
+            panelPaddingSize='none'
             closePopover={() => closePopover()}
           >
             <EuiContextMenu initialPanelId={0} panels={panels} />
@@ -242,7 +246,7 @@ export const Tactics = (props: tTacticsProps) => {
       </EuiFlexGroup>
       {isLoading ? (
         <EuiFlexItem style={{ alignItems: 'center', marginTop: 50 }}>
-          <EuiLoadingSpinner size="xl" />
+          <EuiLoadingSpinner size='xl' />
         </EuiFlexItem>
       ) : (
         <EuiFacetGroup style={{}}>{getTacticsList()}</EuiFacetGroup>

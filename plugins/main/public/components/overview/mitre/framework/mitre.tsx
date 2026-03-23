@@ -27,7 +27,7 @@ import { getErrorOrchestrator } from '../../../../react-services/common-services
 import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import {
   MitreAttackDataSource,
-  EventsDataSourceRepository,
+  FindingsDataSourceRepository,
   tFilter,
 } from '../../../common/data-source';
 import { WzSearchBar } from '../../../common/search-bar';
@@ -54,7 +54,7 @@ type tMitreState = {
 const MitreComponent = compose(
   withDataSourceFetchSearchBar({
     DataSource: MitreAttackDataSource,
-    DataSourceRepositoryCreator: EventsDataSourceRepository,
+    DataSourceRepositoryCreator: FindingsDataSourceRepository,
   }),
   withDataSourceLoading({
     isLoadingNameProp: 'dataSourrce.isLoading',

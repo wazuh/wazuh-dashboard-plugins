@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {
-  EventsDataSourceRepository,
+  FindingsDataSourceRepository,
   FIMDataSource,
 } from '../../../common/data-source';
 import {
@@ -13,7 +13,7 @@ import { createDashboard } from '../../../common/dashboards/dashboard';
 
 export const DashboardFIM = createDashboard({
   DataSource: FIMDataSource,
-  DataSourceRepositoryCreator: EventsDataSourceRepository,
+  DataSourceRepositoryCreator: FindingsDataSourceRepository,
   getDashboardPanels: [
     {
       dashboardId: FIM_DASHBOARD_ID,

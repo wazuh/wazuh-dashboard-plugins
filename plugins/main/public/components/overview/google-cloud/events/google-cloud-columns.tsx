@@ -28,10 +28,6 @@ export const googleCloudColumns: tDataGridColumn[] = [
     initialWidth: 240,
   },
   {
-    id: 'gcp_audit.servicename',
-    initialWidth: 220,
-  },
-  {
     id: 'dns.response_code',
     initialWidth: 220,
   },

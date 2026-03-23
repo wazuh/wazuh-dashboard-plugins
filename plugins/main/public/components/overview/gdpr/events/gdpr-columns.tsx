@@ -5,7 +5,7 @@ export const gdprColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   commonColumns['wazuh.agent.name'],
   {
-    id: 'compliance.gdpr',
+    id: 'rule.compliance.gdpr',
     initialWidth: 138,
   },
   { id: 'wazuh.integration.name' },

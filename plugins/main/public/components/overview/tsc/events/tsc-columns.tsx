@@ -5,7 +5,7 @@ export const tscColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   commonColumns['wazuh.agent.name'],
   {
-    id: 'compliance.tsc',
+    id: 'rule.compliance.tsc',
     initialWidth: 283,
   },
   { id: 'wazuh.integration.name' },

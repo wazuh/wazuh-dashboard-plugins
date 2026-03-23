@@ -2,7 +2,7 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_PCI_DSS_EXIST } from '../../../../../../../common/constants';
 import { EventsDataSource } from '../events-data-source';
 
-const KEY_EXIST = 'compliance.pci_dss';
+const KEY_EXIST = 'rule.compliance.pci_dss';
 
 export class PCIDSSDataSource extends EventsDataSource {
   constructor(id: string, title: string) {

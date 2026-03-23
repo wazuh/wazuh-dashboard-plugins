@@ -1,5 +1,5 @@
 import React from 'react';
-import { EventsDataSourceRepository } from '../../../common/data-source';
+import { FindingsDataSourceRepository } from '../../../common/data-source';
 import { GoogleCloudDataSource } from '../../../common/data-source/pattern/events/google-cloud/google-cloud-data-source';
 import {
   GOOGLE_CLOUD_DASHBOARD_ID,
@@ -10,7 +10,7 @@ import { createDashboard } from '../../../common/dashboards';
 
 export const DashboardGoogleCloud = createDashboard({
   DataSource: GoogleCloudDataSource,
-  DataSourceRepositoryCreator: EventsDataSourceRepository,
+  DataSourceRepositoryCreator: FindingsDataSourceRepository,
   getDashboardPanels: [
     {
       dashboardId: GOOGLE_CLOUD_DASHBOARD_ID,

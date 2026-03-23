@@ -152,6 +152,14 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'events-raw.json',
   },
+  findings: {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/findings-mappings.json',
+      ),
+    ],
+    outputFile: 'findings.json',
+  },
   monitoring: {
     urls: [
       wazuhUrl('plugins/setup/src/main/resources/templates/monitoring.json'),
@@ -495,8 +503,8 @@ function extractFieldsFromProperties(properties, prefix = '', issues) {
         }
       }
 
-      // Handle nested type with properties
-      if (esType === 'nested' && fieldDef.properties) {
+      // Handle nested or object type with properties
+      if ((esType === 'nested' || esType === 'object') && fieldDef.properties) {
         fields.push(
           ...extractFieldsFromProperties(
             fieldDef.properties,
@@ -694,12 +702,17 @@ async function processTemplate(templateConfig, config) {
     );
     console.log(`  ✅ Successfully fetched from: ${url}`);
 
-    // Extract mappings - handle different template structures
+    // Extract mappings - handle different template structures:
+    // 1. Index template:           { "mappings": { "properties": {...} } }
+    // 2. Composable template:      { "template": { "mappings": { ... } } }
+    // 3. Raw mapping (e.g. SA):    { "properties": {...} }
     let mappings;
     if (template.mappings) {
       mappings = template.mappings;
     } else if (template.template && template.template.mappings) {
       mappings = template.template.mappings;
+    } else if (template.properties) {
+      mappings = template;
     } else {
       throw new Error('Could not find mappings in template structure');
     }
