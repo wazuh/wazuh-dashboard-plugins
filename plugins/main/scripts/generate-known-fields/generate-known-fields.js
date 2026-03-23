@@ -40,10 +40,6 @@ function wazuhUrl(path) {
   return `https://raw.githubusercontent.com/wazuh/wazuh-indexer-plugins/{branch}/${path}`;
 }
 
-function wazuhSecurityAnalyticsUrl(path) {
-  return `https://raw.githubusercontent.com/wazuh/wazuh-indexer-security-analytics/{branch}/${path}`;
-}
-
 // Simple template interpolation
 function interpolate(template, variables) {
   return template.replace(/{(\w+)}/g, (_, key) => {
@@ -158,8 +154,8 @@ const TEMPLATE_SOURCES = {
   },
   findings: {
     urls: [
-      wazuhSecurityAnalyticsUrl(
-        'src/main/resources/mappings/wazuh-finding-enrichment-mapping.json',
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/findings-mappings.json',
       ),
     ],
     outputFile: 'findings.json',
