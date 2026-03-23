@@ -123,4 +123,26 @@ export function WazuhElasticRoutes(router: IRouter) {
     async (context, request, response) =>
       ctrl.deleteSampleData(context, request, response),
   );
+
+  router.get(
+    {
+      path: '/indexer/settings',
+      validate: false,
+    },
+    async (context, request, response) =>
+      ctrl.getIndexerSettings(context, request, response),
+  );
+
+  router.put(
+    {
+      path: '/indexer/settings',
+      validate: {
+        body: schema.object({
+          engine: schema.recordOf(schema.string(), schema.any()),
+        }),
+      },
+    },
+    async (context, request, response) =>
+      ctrl.updateIndexerSettings(context, request, response),
+  );
 }
