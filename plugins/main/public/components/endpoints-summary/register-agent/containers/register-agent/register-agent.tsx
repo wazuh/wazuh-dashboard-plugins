@@ -134,19 +134,19 @@ export const RegisterAgent = compose(
         }
         setNeedsPassword(needsPassword);
         setWazuhPassword(wazuhPassword);
-      } 
+      }
 
       // Handle wazuh version
       if (wazuhVersionResult.status === 'fulfilled') {
         const wazuhVersion = wazuhVersionResult.value;
         setWazuhVersion(wazuhVersion || '');
-      } 
+      }
 
       // Handle groups
       if (groupsResult.status === 'fulfilled') {
         const groups = groupsResult.value;
         setGroups(groups);
-      } 
+      }
 
       // Handle individual errors
       const errors = [wazuhVersionResult, masterConfigResult, groupsResult]
