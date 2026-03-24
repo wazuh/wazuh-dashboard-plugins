@@ -114,12 +114,17 @@ export const RegisterAgent = compose(
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const [wazuhVersion, masterConfig, groups] = await Promise.all([
+      // Resolve all the
+      const [wazuhVersionResult, masterConfigResult, groupsResult] =
+        await Promise.allSettled([
           getWazuhAPIVersion('RegisterAgent.getWazuhVersion'),
           getMasterConfig(),
           getGroups(),
         ]);
+
+      // Handle master config
+      if (masterConfigResult.status === 'fulfilled') {
+        const masterConfig = masterConfigResult.value;
         const { auth: authConfig } = masterConfig;
         // get wazuh password configuration
         let wazuhPassword = '';
@@ -129,26 +134,55 @@ export const RegisterAgent = compose(
         }
         setNeedsPassword(needsPassword);
         setWazuhPassword(wazuhPassword);
-        setWazuhVersion(wazuhVersion || '');
-        setGroups(groups);
-        setLoading(false);
-      } catch (error) {
-        setWazuhVersion(wazuhVersion || '');
-        setLoading(false);
-        const options = {
-          context: 'RegisterAgent',
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          display: true,
-          store: false,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: error.name || error,
-          },
-        };
-        ErrorHandler.handleError(error, options);
+      } else {
+        console.error(
+          'Error fetching master config:',
+          masterConfigResult.reason,
+        );
       }
+
+      // Handle wazuh version
+      if (wazuhVersionResult.status === 'fulfilled') {
+        const wazuhVersion = wazuhVersionResult.value;
+        setWazuhVersion(wazuhVersion || '');
+      } else {
+        console.error(
+          'Error fetching wazuh version:',
+          wazuhVersionResult.reason,
+        );
+      }
+
+      // Handle groups
+      if (groupsResult.status === 'fulfilled') {
+        const groups = groupsResult.value;
+        setGroups(groups);
+      } else {
+        console.error('Error fetching groups:', groupsResult.reason);
+      }
+
+      // Handle individual errors
+      const errors = [wazuhVersionResult, masterConfigResult, groupsResult]
+        .filter(result => result.status === 'rejected')
+        .map(result => result.reason);
+
+      if (errors.length > 0) {
+        errors.forEach(error => {
+          const options = {
+            context: 'RegisterAgent',
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
+            display: true,
+            store: false,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: error.name || error,
+            },
+          };
+          ErrorHandler.handleError(error, options);
+        });
+      }
+      setLoading(false);
     };
 
     fetchData();
