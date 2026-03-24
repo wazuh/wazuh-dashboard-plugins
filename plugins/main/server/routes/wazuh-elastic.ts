@@ -84,18 +84,18 @@ export function WazuhElasticRoutes(router: IRouter) {
       ctrl.getFieldTop(context, request, response),
   );
 
-  router.get(
-    {
-      path: '/indexer/sampledata/{category}',
-      validate: {
-        params: schema.object({
-          category: schemaSampleAlertsCategories,
-        }),
-      },
-    },
-    async (context, request, response) =>
-      ctrl.haveSampleDataOfCategory(context, request, response),
-  );
+  // router.get(
+  //   {
+  //     path: '/indexer/sampledata/{category}',
+  //     validate: {
+  //       params: schema.object({
+  //         category: schemaSampleAlertsCategories,
+  //       }),
+  //     },
+  //   },
+  //   async (context, request, response) =>
+  //     ctrl.haveSampleDataOfCategory(context, request, response),
+  // );
 
   // router.post(
   //   {
