@@ -134,31 +134,19 @@ export const RegisterAgent = compose(
         }
         setNeedsPassword(needsPassword);
         setWazuhPassword(wazuhPassword);
-      } else {
-        console.error(
-          'Error fetching master config:',
-          masterConfigResult.reason,
-        );
-      }
+      } 
 
       // Handle wazuh version
       if (wazuhVersionResult.status === 'fulfilled') {
         const wazuhVersion = wazuhVersionResult.value;
         setWazuhVersion(wazuhVersion || '');
-      } else {
-        console.error(
-          'Error fetching wazuh version:',
-          wazuhVersionResult.reason,
-        );
-      }
+      } 
 
       // Handle groups
       if (groupsResult.status === 'fulfilled') {
         const groups = groupsResult.value;
         setGroups(groups);
-      } else {
-        console.error('Error fetching groups:', groupsResult.reason);
-      }
+      } 
 
       // Handle individual errors
       const errors = [wazuhVersionResult, masterConfigResult, groupsResult]
