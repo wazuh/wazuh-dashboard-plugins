@@ -798,7 +798,7 @@ export const Applications = [
   settings,
   serverApis,
   indexerSettings,
-  sampleData,
+  // sampleData,
   about,
   ITHygiene,
 ].sort((a, b) => {
