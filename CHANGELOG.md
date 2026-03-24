@@ -55,7 +55,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated Malware Detection dashboard with new index pattern definition [#8157](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8157)
 - Removed Manager UUID from Server APIs table and added Cluster UUID on About page [#8175](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8175) [#8209](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8209)
 - Updated Security Operations dashboards with new index pattern definition [#8146](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8146)
-- Hided the docker module from the UI [#8215](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8215)
 
 ### Fixed
 
@@ -94,6 +93,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed `needle` dependency [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
 - Removed `read-last-lines` dependency [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
 - Removed Key Request configuration options from the Registration Service view [#8195](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8195)
+- Removed the Docker app [#8215](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8215)
 
 ## Wazuh v4.14.5 - OpenSearch Dashboards 2.19.4 - Revision 00
 
