@@ -94,6 +94,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed `read-last-lines` dependency [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
 - Removed Key Request configuration options from the Registration Service view [#8195](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8195)
 - Removed Sample Data app and related endpoints to manage [#8214](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8214)
+- Removed the Docker app [#8215](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8215)
 
 ## Wazuh v4.14.5 - OpenSearch Dashboards 2.19.4 - Revision 00
 
