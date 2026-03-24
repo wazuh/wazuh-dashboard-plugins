@@ -180,7 +180,7 @@ const DashboardCT: React.FC<DashboardCTProps> = () => {
         WzRequest.apiReq('GET', '/agents', {
           params: { limit: 1 },
         }),
-        WzRequest.apiReq('GET', '/cluster/healthcheck', {}),
+        // WzRequest.apiReq('GET', '/cluster/healthcheck', {}),
       ]);
 
       const nodeList = data[0]?.data?.data || {} || false;
