@@ -201,15 +201,15 @@ const DashboardCT: React.FC<DashboardCTProps> = () => {
 
   return (
     <I18nProvider>
-      <EuiFlexItem style={{ padding: '0 16px' }}>
-        {dataSource && !showNodes && (
+      <EuiFlexItem>
+        {/*{dataSource && !showNodes && (
           <WzSearchBar
             appName='ct-searchbar'
             {...searchBarProps}
             fixedFilters={fixedFilters}
           />
-        )}
-        <EuiSpacer size='m' />
+        )} 
+        <EuiSpacer size='m' /> */}
         {!showConfig && !showNodes ? (
           <DashboardCTMainView
             goNodes={goNodes}

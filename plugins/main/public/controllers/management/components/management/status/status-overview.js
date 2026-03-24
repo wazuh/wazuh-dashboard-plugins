@@ -55,6 +55,8 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { serverStatus } from '../../../../../utils/applications';
 
+import { ClusterOverview } from '../../management/cluster/cluster-overview';
+
 export class WzStatusOverview extends Component {
   _isMounted = false;
   constructor(props) {
@@ -163,43 +165,48 @@ export class WzStatusOverview extends Component {
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
-        <EuiPanel>
-          <EuiFlexGroup>
-            <EuiFlexItem>
+        <EuiFlexGroup direction='column'>
+          <ClusterOverview />
+          <EuiFlexItem>
+            <EuiPanel>
               <EuiFlexGroup>
                 <EuiFlexItem>
-                  <EuiTitle>
-                    <h2>Status</h2>
-                  </EuiTitle>
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      <EuiTitle>
+                        <h2>Status</h2>
+                      </EuiTitle>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiFlexItem>
+                <WzStatusActionButtons />
+              </EuiFlexGroup>
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  {isLoading && <EuiProgress size='xs' color='primary' />}
+                  {!isLoading && listDaemons && <WzStatusDaemons />}
+                  <EuiSpacer size='l' />
+                  {!isLoading && stats && <WzStatusStats />}
+                  <EuiSpacer size='l' />
+                  {!isLoading && (
+                    <EuiFlexGrid columns={2}>
+                      {nodeInfo && (
+                        <EuiFlexItem>
+                          <WzStatusNodeInfo />
+                        </EuiFlexItem>
+                      )}
+                      {agentInfo && (
+                        <EuiFlexItem>
+                          <WzStatusAgentInfo />
+                        </EuiFlexItem>
+                      )}
+                    </EuiFlexGrid>
+                  )}
                 </EuiFlexItem>
               </EuiFlexGroup>
-            </EuiFlexItem>
-            <WzStatusActionButtons />
-          </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              {isLoading && <EuiProgress size='xs' color='primary' />}
-              {!isLoading && listDaemons && <WzStatusDaemons />}
-              <EuiSpacer size='l' />
-              {!isLoading && stats && <WzStatusStats />}
-              <EuiSpacer size='l' />
-              {!isLoading && (
-                <EuiFlexGrid columns={2}>
-                  {nodeInfo && (
-                    <EuiFlexItem>
-                      <WzStatusNodeInfo />
-                    </EuiFlexItem>
-                  )}
-                  {agentInfo && (
-                    <EuiFlexItem>
-                      <WzStatusAgentInfo />
-                    </EuiFlexItem>
-                  )}
-                </EuiFlexGrid>
-              )}
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPanel>
+            </EuiPanel>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       </EuiPage>
     );
   }

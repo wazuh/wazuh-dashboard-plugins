@@ -170,7 +170,7 @@ export const OverviewCards = ({
           </EuiCard>
         </EuiFlexItem>
       </EuiFlexGroup>
-      {results?.hits?.total > 0 ? (
+      {/* {results?.hits?.total > 0 ? (
         <div className='ct-dashboard-responsive'>
           <DashboardByRenderer
             input={{
@@ -201,7 +201,7 @@ export const OverviewCards = ({
           message='There are no results for selected time range. Try another
             one.'
         />
-      )}
+      )} */}
     </>
   );
 };
