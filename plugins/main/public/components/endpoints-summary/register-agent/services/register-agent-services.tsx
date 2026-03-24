@@ -203,15 +203,11 @@ export const getMasterConfiguration = async () => {
 export { getConnectionConfig, getRemoteConfiguration };
 
 export const getGroups = async () => {
-  try {
-    const result = await WzRequest.apiReq('GET', '/groups', {});
-    return result.data.data.affected_items.map(item => ({
-      label: item.name,
-      id: item.name,
-    }));
-  } catch (error) {
-    throw new Error(error);
-  }
+  const result = await WzRequest.apiReq('GET', '/groups', {});
+  return result.data.data.affected_items.map(item => ({
+    label: item.name,
+    id: item.name,
+  }));
 };
 
 export const getRegisterAgentFormValues = (form: UseFormReturn) => {
