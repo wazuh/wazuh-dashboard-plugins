@@ -84,45 +84,45 @@ export function WazuhElasticRoutes(router: IRouter) {
       ctrl.getFieldTop(context, request, response),
   );
 
-  router.get(
-    {
-      path: '/indexer/sampledata/{category}',
-      validate: {
-        params: schema.object({
-          category: schemaSampleAlertsCategories,
-        }),
-      },
-    },
-    async (context, request, response) =>
-      ctrl.haveSampleDataOfCategory(context, request, response),
-  );
+  // router.get(
+  //   {
+  //     path: '/indexer/sampledata/{category}',
+  //     validate: {
+  //       params: schema.object({
+  //         category: schemaSampleAlertsCategories,
+  //       }),
+  //     },
+  //   },
+  //   async (context, request, response) =>
+  //     ctrl.haveSampleDataOfCategory(context, request, response),
+  // );
 
-  router.post(
-    {
-      path: '/indexer/sampledata/{category}',
-      validate: {
-        params: schema.object({
-          category: schemaSampleAlertsCategories,
-        }),
-        body: schema.any(),
-      },
-    },
-    async (context, request, response) =>
-      ctrl.createSampleData(context, request, response),
-  );
+  // router.post(
+  //   {
+  //     path: '/indexer/sampledata/{category}',
+  //     validate: {
+  //       params: schema.object({
+  //         category: schemaSampleAlertsCategories,
+  //       }),
+  //       body: schema.any(),
+  //     },
+  //   },
+  //   async (context, request, response) =>
+  //     ctrl.createSampleData(context, request, response),
+  // );
 
-  router.delete(
-    {
-      path: '/indexer/sampledata/{category}',
-      validate: {
-        params: schema.object({
-          category: schemaSampleAlertsCategories,
-        }),
-      },
-    },
-    async (context, request, response) =>
-      ctrl.deleteSampleData(context, request, response),
-  );
+  // router.delete(
+  //   {
+  //     path: '/indexer/sampledata/{category}',
+  //     validate: {
+  //       params: schema.object({
+  //         category: schemaSampleAlertsCategories,
+  //       }),
+  //     },
+  //   },
+  //   async (context, request, response) =>
+  //     ctrl.deleteSampleData(context, request, response),
+  // );
 
   router.get(
     {

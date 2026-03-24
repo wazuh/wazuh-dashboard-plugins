@@ -61,7 +61,7 @@ export const SampleDataWarning = ({
   };
 
   useEffect(() => {
-    request();
+    // request(); // Removed temporally
   }, []);
 
   if (isSampleData) {
