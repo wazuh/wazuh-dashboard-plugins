@@ -55,6 +55,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated Malware Detection dashboard with new index pattern definition [#8157](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8157)
 - Removed Manager UUID from Server APIs table and added Cluster UUID on About page [#8175](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8175) [#8209](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8209)
 - Updated Security Operations dashboards with new index pattern definition [#8146](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8146)
+- Renamed `Events` tab to `Findings` [#8231](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8231)
 
 ### Fixed
 
