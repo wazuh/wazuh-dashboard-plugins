@@ -486,6 +486,7 @@ function extractFieldsFromProperties(properties, prefix = '', issues) {
         readFromDocValues: shouldReadFromDocValues(fieldDef, esType),
       };
 
+      if (!(esType === 'object' || esType === 'nested') || !fieldDef.properties)
       fields.push(field);
 
       // Handle multi-fields (like .keyword subfields)
