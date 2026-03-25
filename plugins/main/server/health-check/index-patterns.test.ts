@@ -21,22 +21,21 @@ const mockContext = () => ({
                   body: [
                     {
                       name: 'wazuh',
-                      index_patterns:
-                        '[wazuh-alerts-5.x-*, wazuh-archives-5.x-*]',
+                      index_patterns: '[wazuh-events-v5*, wazuh-findings-v5*]',
                       order: '0',
                       version: '1',
                       composed_of: '',
                     },
                     {
-                      name: 'wazuh-agent',
-                      index_patterns: '[wazuh-monitoring*]',
+                      name: 'metrics-agents',
+                      index_patterns: '[wazuh-metrics-agents*]',
                       order: '0',
                       version: null,
                       composed_of: '',
                     },
                     {
-                      name: 'wazuh-statistics',
-                      index_patterns: '[wazuh-statistics*]',
+                      name: 'metrics-comms',
+                      index_patterns: '[wazuh-metrics-comms*]',
                       order: '0',
                       version: null,
                       composed_of: '',
@@ -57,17 +56,16 @@ describe('getTemplateForIndexPattern', () => {
   it.each`
     indexPatternTitle          | templateFound | templatesNameFound
     ${'custom-alerts-*'}       | ${false}      | ${'Template was not found for [custom-alerts-*]'}
-    ${'custom-wazuh-alerts-*'} | ${false}      | ${'Template was not found for [custom-wazuh-alerts-*]'}
-    ${'wazuh-alerts-5.x-t*'}   | ${true}       | ${['wazuh']}
-    ${'wazuh-alerts-5.x-*'}    | ${true}       | ${['wazuh']}
-    ${'wazuh-alerts-5.x*'}     | ${true}       | ${['wazuh']}
-    ${'wazuh-alerts-5.*'}      | ${true}       | ${['wazuh']}
-    ${'wazuh-alerts-5*'}       | ${true}       | ${['wazuh']}
-    ${'wazuh-alerts-*'}        | ${true}       | ${['wazuh']}
-    ${'wazuh-alerts-'}         | ${true}       | ${['wazuh']}
-    ${'wazuh-alerts'}          | ${true}       | ${['wazuh']}
-    ${'wazuh-al'}              | ${true}       | ${['wazuh']}
-    ${'wazuh-a'}               | ${true}       | ${['wazuh']}
+    ${'custom-wazuh-events-*'} | ${false}      | ${'Template was not found for [custom-wazuh-events-*]'}
+    ${'wazuh-events-v5-t*'}    | ${true}       | ${['wazuh']}
+    ${'wazuh-events-v5-*'}     | ${true}       | ${['wazuh']}
+    ${'wazuh-events-v5*'}      | ${true}       | ${['wazuh']}
+    ${'wazuh-events-v*'}       | ${true}       | ${['wazuh']}
+    ${'wazuh-events-*'}        | ${true}       | ${['wazuh']}
+    ${'wazuh-events-'}         | ${true}       | ${['wazuh']}
+    ${'wazuh-events'}          | ${true}       | ${['wazuh']}
+    ${'wazuh-ev'}              | ${true}       | ${['wazuh']}
+    ${'wazuh-e'}               | ${true}       | ${['wazuh']}
   `(
     `indexPatternTitle: $indexPatternTitle`,
     async ({ indexPatternTitle, templateFound, templatesNameFound }) => {
@@ -184,13 +182,13 @@ describe('initializationTaskCreatorIndexPattern - checkDefaultIndexPattern', () 
     const { context, savedObjectsClient, uiSettingsClient } =
       createMockContext(undefined);
     savedObjectsClient.get.mockResolvedValue({
-      id: 'wazuh-monitoring-*',
-      attributes: { title: 'wazuh-monitoring-*', fields: '[]' },
+      id: 'wazuh-metrics-agents*',
+      attributes: { title: 'wazuh-metrics-agents*', fields: '[]' },
     });
 
     const task = initializationTaskCreatorIndexPattern({
       taskName: 'test-task',
-      indexPatternID: 'wazuh-monitoring-*',
+      indexPatternID: 'wazuh-metrics-agents*',
       options: {},
     });
 
