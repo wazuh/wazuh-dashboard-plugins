@@ -19,8 +19,8 @@ import {
   WAZUH_INDEX_TYPE_EVENTS_OTHER,
   WAZUH_INDEX_TYPE_EVENTS_SECURITY,
   WAZUH_INDEX_TYPE_EVENTS_SYSTEM_ACTIVITY,
-  WAZUH_INDEX_TYPE_MONITORING,
-  WAZUH_INDEX_TYPE_STATISTICS,
+  WAZUH_INDEX_TYPE_METRICS_AGENTS,
+  WAZUH_INDEX_TYPE_METRICS_COMMS,
   WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
   WAZUH_INDEX_TYPE_STATES_FIM_FILES,
   WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS,
@@ -73,8 +73,8 @@ import inventoryInterfacesFields from '../../common/known-fields/states-inventor
 import inventoryHotfixesFields from '../../common/known-fields/states-inventory-hotfixes.json';
 import inventoryBrowserExtensionsFields from '../../common/known-fields/states-inventory-browser-extensions.json';
 import inventorySCAFields from '../../common/known-fields/states-sca.json';
-import statisticsFields from '../../common/known-fields/statistics.json';
-import monitoringFields from '../../common/known-fields/monitoring.json';
+import metricsCommsFields from '../../common/known-fields/metrics-comms.json';
+import metricsAgentsFields from '../../common/known-fields/metrics-agents.json';
 
 // Use generated fields as the primary source
 export const KnownFields = eventsFields;
@@ -86,8 +86,8 @@ export const KnownFields = eventsFields;
 export const KnownFieldsByIndexType = {
   // Main index types
   [WAZUH_INDEX_TYPE_EVENTS]: eventsFields,
-  [WAZUH_INDEX_TYPE_MONITORING]: monitoringFields,
-  [WAZUH_INDEX_TYPE_STATISTICS]: statisticsFields,
+  [WAZUH_INDEX_TYPE_METRICS_AGENTS]: metricsAgentsFields,
+  [WAZUH_INDEX_TYPE_METRICS_COMMS]: metricsCommsFields,
 
   // Events
   [WAZUH_INDEX_TYPE_EVENTS_ACCESS_MANAGEMENT]: eventsAccessManagementFields,
