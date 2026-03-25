@@ -115,14 +115,16 @@ describe('Known Fields Loader', () => {
   describe('States-specific field validation', () => {
     test('metrics agents should have timestamp and status fields', () => {
       const timestampField = metricsAgentsFields.find(
-        f => f.name === 'timestamp',
+        f => f.name === '@timestamp',
       );
       expect(timestampField).toBeDefined();
       if (timestampField) {
         expect(timestampField.type).toBe('date');
       }
 
-      const statusField = metricsAgentsFields.find(f => f.name === 'status');
+      const statusField = metricsAgentsFields.find(
+        f => f.name === 'wazuh.agent.status',
+      );
       expect(statusField).toBeDefined();
       if (statusField) {
         expect(statusField.type).toBe('string');
@@ -130,15 +132,19 @@ describe('Known Fields Loader', () => {
     });
 
     test('metrics comms should have analysisd fields', () => {
-      const analysisdFields = metricsCommsFields.filter(f =>
-        f.name.startsWith('analysisd.'),
-      );
-      expect(analysisdFields.length).toBeGreaterThan(0);
-
-      const remoteFields = metricsCommsFields.filter(f =>
-        f.name.startsWith('remoted.'),
-      );
-      expect(remoteFields.length).toBeGreaterThan(0);
+      [
+        'discarded.',
+        'network.',
+        'event.',
+        'messages.',
+        'tcp.',
+        'queue.',
+        'wazuh.',
+      ].forEach(str => {
+        expect(
+          metricsCommsFields.filter(f => f.name.startsWith(str)).length,
+        ).toBeGreaterThan(0);
+      });
     });
   });
 
