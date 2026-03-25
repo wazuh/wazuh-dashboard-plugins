@@ -19,6 +19,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added `server-api:run_as` health check to warn when `allow_run_as` is disabled for configured API hosts [#8050](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8050)
 - Fixed styling issues for v9 theme [#8064](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8064)
 - Added Indexer management **Settings** [#8206](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8206)
+- Added `wazuh-findings` index patterns [#8233](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8233)
 
 ### Changed
 
