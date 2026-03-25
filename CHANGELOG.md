@@ -19,6 +19,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added `server-api:run_as` health check to warn when `allow_run_as` is disabled for configured API hosts [#8050](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8050)
 - Fixed styling issues for v9 theme [#8064](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8064)
 - Added Indexer management **Settings** [#8206](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8206)
+- Added `wazuh-findings` index patterns [#8233](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8233)
 
 ### Changed
 
@@ -57,6 +58,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated Security Operations dashboards with new index pattern definition [#8146](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8146)
 - Changed the monitoring and statistics index patterns to `wazuh-metrics-agents*` and `wazuh-metrics-comms*` [#8224](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8224)
 - Renamed `Events` tab to `Findings` [#8231](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8231)
+- Replaced the broken visualization in Configuration Assessment [#8232](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8232)
 - Swapped menu positions of Vulnerability detection and MITRE ATT&CK [#8230](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8230)
 
 ### Fixed
