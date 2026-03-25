@@ -56,6 +56,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed Manager UUID from Server APIs table and added Cluster UUID on About page [#8175](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8175) [#8209](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8209)
 - Updated Security Operations dashboards with new index pattern definition [#8146](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8146)
 - Changed the monitoring and statistics index patterns to `wazuh-metrics-agents*` and `wazuh-metrics-comms*` [#8224](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8224)
+- Swapped menu positions of Vulnerability detection and MITRE ATT&CK [#8230](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8230)
 
 ### Fixed
 
