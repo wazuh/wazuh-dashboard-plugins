@@ -202,28 +202,35 @@ const DashboardCT: React.FC<DashboardCTProps> = () => {
   return (
     <I18nProvider>
       <EuiFlexItem>
-        {/*{dataSource && !showNodes && (
+        {dataSource && !showNodes && (
           <WzSearchBar
             appName='ct-searchbar'
             {...searchBarProps}
-            fixedFilters={fixedFilters}
+            showQueryInput={false}
+            showQueryBar={true}
+            showSaveQuery={false}
+            showSaveQueryButton={false}
+            hideFixedFilters={true}
+            showFilterBar={false}
           />
-        )} 
-        <EuiSpacer size='m' /> */}
+        )}
         {!showConfig && !showNodes ? (
-          <DashboardCTMainView
-            goNodes={goNodes}
-            goAgents={goAgents}
-            goConfiguration={goConfiguration}
-            state={state}
-            searchBarProps={searchBarProps}
-            results={results}
-            dataSource={dataSource}
-            fetchFilters={fetchFilters ?? []}
-            lastReloadRequestTime={fingerprint}
-            isDataSourceLoading={isDataSourceLoading}
-            error={error}
-          />
+          <>
+            <EuiSpacer size='s' />
+            <DashboardCTMainView
+              goNodes={goNodes}
+              goAgents={goAgents}
+              goConfiguration={goConfiguration}
+              state={state}
+              searchBarProps={searchBarProps}
+              results={results}
+              dataSource={dataSource}
+              fetchFilters={fetchFilters ?? []}
+              lastReloadRequestTime={fingerprint}
+              isDataSourceLoading={isDataSourceLoading}
+              error={error}
+            />
+          </>
         ) : null}
         {showConfig ? (
           <ConfigurationCards

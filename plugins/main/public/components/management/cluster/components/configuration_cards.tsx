@@ -71,7 +71,7 @@ export const ConfigurationCards = ({
   ];
 
   return (
-    <EuiFlexGroup direction='column' gutterSize='s'>
+    <EuiFlexGroup direction='column' gutterSize='xs'>
       <EuiFlexItem>
         <EuiFlexGroup responsive={false} alignItems='center' gutterSize='s'>
           <EuiFlexItem grow={false}>
@@ -94,7 +94,7 @@ export const ConfigurationCards = ({
         </EuiFlexGroup>
       </EuiFlexItem>
       <EuiFlexItem>
-        <EuiFlexGroup responsive alignItems='flexStart' gutterSize='s'>
+        <EuiFlexGroup responsive alignItems='flexStart' gutterSize='l'>
           <EuiFlexItem
             grow={false}
             style={{
@@ -104,29 +104,31 @@ export const ConfigurationCards = ({
             }}
           >
             {results?.hits?.total > 0 ? (
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardConfigurationPanels(indexPatternId),
-                  isFullScreenMode: false,
-                  filters: filters,
-                  useMargins: true,
-                  id: 'ct-dashboard-configuration-tab',
-                  timeRange: {
-                    from: searchBarProps.dateRangeFrom,
-                    to: searchBarProps.dateRangeTo,
-                  },
-                  title: 'Cluster configuration dashboard',
-                  description: 'Dashboard of the Cluster configuration',
-                  query: searchBarProps.query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                  lastReloadRequestTime,
-                }}
-              />
+              <div className='ct-dashboard-responsive'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardConfigurationPanels(indexPatternId),
+                    isFullScreenMode: false,
+                    filters: filters,
+                    useMargins: true,
+                    id: 'ct-dashboard-configuration-tab',
+                    timeRange: {
+                      from: searchBarProps.dateRangeFrom,
+                      to: searchBarProps.dateRangeTo,
+                    },
+                    title: 'Cluster configuration dashboard',
+                    description: 'Dashboard of the Cluster configuration',
+                    query: searchBarProps.query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                    lastReloadRequestTime,
+                  }}
+                />
+              </div>
             ) : (
               <DiscoverNoResults
                 message='There are no results for selected time range. Try another
