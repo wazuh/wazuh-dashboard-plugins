@@ -41,7 +41,7 @@ import {
 import { initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations } from './health-check';
 import {
   FIELD_TIMESTAMP,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_AGENTS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_APLICATIONS,
@@ -74,7 +74,7 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_COMMS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
   WAZUH_EVENTS_PATTERN,
   WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN,
@@ -107,9 +107,9 @@ import {
   WAZUH_IT_HYGIENE_SERVICES_PATTERN,
   WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
   WAZUH_IT_HYGIENE_USERS_PATTERN,
-  WAZUH_MONITORING_PATTERN,
+  WAZUH_METRICS_AGENTS_PATTERN,
   WAZUH_SCA_PATTERN,
-  WAZUH_STATISTICS_PATTERN,
+  WAZUH_METRICS_COMMS_PATTERN,
   WAZUH_VULNERABILITIES_PATTERN,
   WAZUH_ACTIVE_RESPONSES_PATTERN,
   HEALTH_CHECK_TASK_INDEX_PATTERN_ACTIVE_RESPONSES,
@@ -148,9 +148,9 @@ import IndexPatternITHygieneProtocolsKnownFields from '../common/known-fields/st
 import IndexPatternITHygieneServicesKnownFields from '../common/known-fields/states-inventory-services.json';
 import IndexPatternITHygieneSystemKnownFields from '../common/known-fields/states-inventory-system.json';
 import IndexPatternITHygieneUsersKnownFields from '../common/known-fields/states-inventory-users.json';
-import IndexPatternMonitoringKnownFields from '../common/known-fields/monitoring.json';
+import IndexPatternMetricsAgentsKnownFields from '../common/known-fields/metrics-agents.json';
 import IndexPatternSCAKnownFields from '../common/known-fields/states-sca.json';
-import IndexPatternStatisticsKnownFields from '../common/known-fields/statistics.json';
+import IndexPatternMetricsCommsKnownFields from '../common/known-fields/metrics-comms.json';
 import IndexPatternVulnerabilitiesKnownFields from '../common/known-fields/states-vulnerabilities.json';
 import IndexPatternActiveResponsesKnownFields from '../common/known-fields/active-responses.json';
 
@@ -273,12 +273,12 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     core.healthCheck.register(
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING,
-        indexPatternID: WAZUH_MONITORING_PATTERN,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_AGENTS,
+        indexPatternID: WAZUH_METRICS_AGENTS_PATTERN,
         options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist('timestamp'),
+          savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternMonitoringKnownFields,
+          fieldsNoIndices: IndexPatternMetricsAgentsKnownFields,
         },
       }),
     );
@@ -286,12 +286,12 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     core.healthCheck.register(
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
-        indexPatternID: WAZUH_STATISTICS_PATTERN,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_COMMS,
+        indexPatternID: WAZUH_METRICS_COMMS_PATTERN,
         options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist('timestamp'),
+          savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternStatisticsKnownFields,
+          fieldsNoIndices: IndexPatternMetricsCommsKnownFields,
         },
       }),
     );

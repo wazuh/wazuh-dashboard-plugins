@@ -32,7 +32,7 @@ import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { DashboardAnalysisEngineStatistics } from './dashboard_analysis_engine';
 import { DashboardListenerEngineStatistics } from './dashboard_listener_engine';
 import { SampleDataWarning } from '../../../visualize/components';
-import { WAZUH_SAMPLE_SERVER_STATISTICS } from '../../../../../common/constants';
+import { WAZUH_SAMPLE_METRICS_COMMS } from '../../../../../common/constants';
 import { PromptErrorInitializatingDataSource } from '../../../common/hocs';
 
 const SearchBar = getPlugins().data.ui.SearchBar;
@@ -187,7 +187,7 @@ export const DashboardTabsPanels = ({
       {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
         <>
           <SampleDataWarning
-            categoriesSampleData={[WAZUH_SAMPLE_SERVER_STATISTICS]}
+            categoriesSampleData={[WAZUH_SAMPLE_METRICS_COMMS]}
           />
           {selectedTab === 'remoted' && !loadingNode && (
             <div>

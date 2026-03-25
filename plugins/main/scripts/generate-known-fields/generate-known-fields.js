@@ -155,22 +155,26 @@ const TEMPLATE_SOURCES = {
   findings: {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/findings-mappings.json',
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
       ),
     ],
     outputFile: 'findings.json',
   },
-  monitoring: {
+  'metrics-agents': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/templates/monitoring.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/metrics-agents.json',
+      ),
     ],
-    outputFile: 'monitoring.json',
+    outputFile: 'metrics-agents.json',
   },
-  statistics: {
+  'metrics-comms': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/templates/statistics.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/metrics-comms.json',
+      ),
     ],
-    outputFile: 'statistics.json',
+    outputFile: 'metrics-comms.json',
   },
   // FIM templates
   'states-fim-files': {
