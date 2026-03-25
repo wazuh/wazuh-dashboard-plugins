@@ -28,11 +28,11 @@ import { amazonWebServicesColumns } from '../../overview/amazon-web-services/eve
 import { office365Columns } from '../../overview/office/events/office-365-columns';
 import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
 import { configurationAssessmentColumns } from '../../overview/sca/events/configuration-assessment-columns';
-import { pciColumns } from '../../overview/pci/events/pci-columns';
-import { hipaaColumns } from '../../overview/hipaa/events/hipaa-columns';
-import { nistColumns } from '../../overview/nist/events/nist-columns';
-import { gdprColumns } from '../../overview/gdpr/events/gdpr-columns';
-import { tscColumns } from '../../overview/tsc/events/tsc-columns';
+import { pciColumns } from '../../overview/regulatory-compliance/pci/events/pci-columns';
+import { hipaaColumns } from '../../overview/regulatory-compliance/hipaa/events/hipaa-columns';
+import { nistColumns } from '../../overview/regulatory-compliance/nist/events/nist-columns';
+import { gdprColumns } from '../../overview/regulatory-compliance/gdpr/events/gdpr-columns';
+import { tscColumns } from '../../overview/regulatory-compliance/tsc/events/tsc-columns';
 import { githubColumns } from '../../overview/github/events/github-columns';
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
@@ -91,6 +91,13 @@ import {
   ITHygieneUsersInventory,
   ITHygieneServicesInventory,
 } from '../../overview/it-hygiene';
+import {
+  RegulatoryCompliancePCIDSS,
+  RegulatoryComplianceGDPR,
+  RegulatoryComplianceHIPAA,
+  RegulatoryComplianceNIST80053,
+  RegulatoryComplianceTSC,
+} from '../../overview/regulatory-compliance';
 import { InventoryFIM } from '../../overview/fim';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
 import { ReportingService } from '../../../react-services';
@@ -573,9 +580,46 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
+  'regulatory-compliance': {
+    init: 'pci-dss',
+    tabs: [
+      {
+        id: 'pci-dss',
+        name: 'PCI DSS',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryCompliancePCIDSS,
+      },
+      {
+        id: 'gdpr',
+        name: 'GDPR',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceGDPR,
+      },
+      {
+        id: 'hipaa',
+        name: 'HIPAA',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceHIPAA,
+      },
+      {
+        id: 'nist-800-53',
+        name: 'NIST 800-53',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceNIST80053,
+      },
+      {
+        id: 'tsc',
+        name: 'TSC',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceTSC,
+      },
+    ],
+    availableFor: ['manager', 'agent'],
+  },
   software: {
     notModule: true,
   },
+
   network: {
     notModule: true,
   },

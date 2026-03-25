@@ -240,6 +240,34 @@ export const ITHygiene = {
     }`,
 };
 
+export const regulatoryCompliance = {
+  category: 'wz-category-security-operations',
+  id: 'regulatory-compliance',
+  title: i18n.translate('wz-app-regulatory-compliance-title', {
+    defaultMessage: 'Regulatory Compliance',
+  }),
+  breadcrumbLabel: i18n.translate(
+    'wz-app-regulatory-compliance-breadcrumbLabel',
+    {
+      defaultMessage: 'Regulatory Compliance',
+    },
+  ),
+  description: i18n.translate('wz-app-regulatory-compliance-description', {
+    defaultMessage:
+      'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, and TSC.',
+  }),
+  euiIconType: 'usersRolesApp',
+  order: 401,
+  showInOverviewApp: true,
+  showInAgentMenu: true,
+  redirectTo: () =>
+    `/overview/?tab=regulatory-compliance&tabView=dashboard${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
 const pciDss = {
   category: 'wz-category-security-operations',
   id: 'pci-dss',
@@ -776,11 +804,7 @@ export const Applications = [
   threatHunting,
   vulnerabilityDetection,
   mitreAttack,
-  pciDss,
-  hipaa,
-  gdpr,
-  nist80053,
-  tsc,
+  regulatoryCompliance,
   devTools,
   security,
   amazonWebServices,
