@@ -278,11 +278,11 @@ export const WAZUH_SETTING_INVENTORY_BROWSER_EXTENSIONS_SAMPLE_PREFIX = {
   ),
   dataSet: 'states-inventory-browser-extensions',
 };
-export const WAZUH_SETTING_AGENTS_MONITORING_SAMPLE_PREFIX = {
+export const WAZUH_SETTING_METRICS_AGENTS_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_METRICS_AGENTS_PATTERN.replace('*', ''),
   dataSet: 'metrics-agents',
 };
-export const WAZUH_SETTING_SERVER_STATISTICS_SAMPLE_PREFIX = {
+export const WAZUH_SETTING_METRICS_COMMS_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_METRICS_COMMS_PATTERN.replace('*', ''),
   dataSet: 'metrics-comms',
 };
@@ -291,8 +291,8 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
   [WAZUH_SAMPLE_METRICS_AGENTS]: [
     {
       indexPatternPrefix:
-        WAZUH_SETTING_AGENTS_MONITORING_SAMPLE_PREFIX.indexPatternPrefix,
-      dataSet: WAZUH_SETTING_AGENTS_MONITORING_SAMPLE_PREFIX.dataSet,
+        WAZUH_SETTING_METRICS_AGENTS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_METRICS_AGENTS_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
@@ -479,8 +479,8 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
   [WAZUH_SAMPLE_METRICS_COMMS]: [
     {
       indexPatternPrefix:
-        WAZUH_SETTING_SERVER_STATISTICS_SAMPLE_PREFIX.indexPatternPrefix,
-      dataSet: WAZUH_SETTING_SERVER_STATISTICS_SAMPLE_PREFIX.dataSet,
+        WAZUH_SETTING_METRICS_COMMS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_METRICS_COMMS_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_VULNERABILITIES]: [
