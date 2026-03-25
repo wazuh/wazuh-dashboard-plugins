@@ -152,25 +152,85 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'events-raw.json',
   },
-  findings: {
+  'findings-access-management': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/findings-mappings.json',
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
       ),
     ],
-    outputFile: 'findings.json',
+    outputFile: 'findings-access-management.json',
   },
-  monitoring: {
+  'findings-applications': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/templates/monitoring.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
     ],
-    outputFile: 'monitoring.json',
+    outputFile: 'findings-applications.json',
   },
-  statistics: {
+  'findings-cloud-services': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/templates/statistics.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
     ],
-    outputFile: 'statistics.json',
+    outputFile: 'findings-cloud-services.json',
+  },
+  'findings-network-activity': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-network-activity.json',
+  },
+  'findings-other': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-other.json',
+  },
+  'findings-security': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-security.json',
+  },
+  'findings-system-activity': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-system-activity.json',
+  },
+  'findings-unclassified': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-unclassified.json',
+  },
+  'metrics-agents': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/metrics-agents.json',
+      ),
+    ],
+    outputFile: 'metrics-agents.json',
+  },
+  'metrics-comms': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/metrics-comms.json',
+      ),
+    ],
+    outputFile: 'metrics-comms.json',
   },
   // FIM templates
   'states-fim-files': {
@@ -482,7 +542,8 @@ function extractFieldsFromProperties(properties, prefix = '', issues) {
         readFromDocValues: shouldReadFromDocValues(fieldDef, esType),
       };
 
-      fields.push(field);
+      if (!(esType === 'object' || esType === 'nested') || !fieldDef.properties)
+        fields.push(field);
 
       // Handle multi-fields (like .keyword subfields)
       if (fieldDef.fields) {
@@ -875,6 +936,28 @@ async function main(config) {
     console.error('Failed to generate combined events fields:', error.message);
     process.exit(1);
     results['events'] = null;
+  }
+  console.log(''); // Add spacing
+
+  // Generate combined findings fields
+  try {
+    const combinedFields = await generateCombinedFields({
+      results,
+      config,
+      keyPrefix: 'findings-',
+      outputFileName: 'findings.json',
+      displayName: 'findings',
+    });
+    results['findings'] = combinedFields
+      ? { fields: combinedFields, warnings: [], errors: [] }
+      : null;
+  } catch (error) {
+    console.error(
+      'Failed to generate combined findings fields:',
+      error.message,
+    );
+    process.exit(1);
+    results['findings'] = null;
   }
   console.log(''); // Add spacing
 

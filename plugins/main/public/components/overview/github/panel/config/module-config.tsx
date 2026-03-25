@@ -43,7 +43,7 @@ export const ModuleConfig = {
       />
     ),
   },
-  'github.audit.repo': {
+  'url.original': {
     component: props => (
       <Drilldown
         title={'Repository Activity'}

@@ -89,7 +89,7 @@ const GroupInput = ({ value, options, onChange }) => {
           <EuiCallOut
             style={{ marginTop: '1.5rem' }}
             color='warning'
-            title='This section could not be configured because you do not have permission to read groups.'
+            title='No groups available. Groups may not exist yet or there was an issue loading them.'
             iconType='iInCircle'
             data-testid='group-input-callout'
           />

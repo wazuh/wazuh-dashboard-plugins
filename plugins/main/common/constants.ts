@@ -29,13 +29,13 @@ export const WAZUH_FINDINGS_PATTERN = 'wazuh-findings*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS =
   'index-pattern:findings';
 
-// Job - Wazuh monitoring
-export const WAZUH_INDEX_TYPE_MONITORING = 'monitoring';
-export const WAZUH_MONITORING_PATTERN = 'wazuh-monitoring*';
+// Job - Wazuh metrics agents
+export const WAZUH_INDEX_TYPE_METRICS_AGENTS = 'metrics-agents';
+export const WAZUH_METRICS_AGENTS_PATTERN = 'wazuh-metrics-agents*';
 
-// Job - Wazuh statistics
-export const WAZUH_INDEX_TYPE_STATISTICS = 'statistics';
-export const WAZUH_STATISTICS_PATTERN = 'wazuh-statistics*';
+// Job - Wazuh metrics comms
+export const WAZUH_INDEX_TYPE_METRICS_COMMS = 'metrics-commns';
+export const WAZUH_METRICS_COMMS_PATTERN = 'wazuh-metrics-comms*';
 
 // Wazuh vulnerabilities
 export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities*';
@@ -90,6 +90,17 @@ export const WAZUH_INDEX_TYPE_EVENTS_NETWORK_ACTIVITY =
 export const WAZUH_INDEX_TYPE_EVENTS_OTHER = 'events-other';
 export const WAZUH_INDEX_TYPE_EVENTS_SECURITY = 'events-security';
 export const WAZUH_INDEX_TYPE_EVENTS_SYSTEM_ACTIVITY = 'events-system-activity';
+export const WAZUH_INDEX_TYPE_FINDINGS_ACCESS_MANAGEMENT =
+  'findings-access-management';
+export const WAZUH_INDEX_TYPE_FINDINGS_APPLICATIONS = 'findings-applications';
+export const WAZUH_INDEX_TYPE_FINDINGS_CLOUD_SERVICES =
+  'findings-cloud-services';
+export const WAZUH_INDEX_TYPE_FINDINGS_NETWORK_ACTIVITY =
+  'findings-network-activity';
+export const WAZUH_INDEX_TYPE_FINDINGS_OTHER = 'findings-other';
+export const WAZUH_INDEX_TYPE_FINDINGS_SECURITY = 'findings-security';
+export const WAZUH_INDEX_TYPE_FINDINGS_SYSTEM_ACTIVITY =
+  'findings-system-activity';
 
 // FIM
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim*';
@@ -177,6 +188,38 @@ export const WAZUH_EVENTS_RAW_PATTERN = 'wazuh-events-raw-v5*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_RAW =
   'index-pattern:events-raw';
 
+// Index patterns - Findings sub-patterns
+export const WAZUH_FINDINGS_SYSTEM_ACTIVITY_PATTERN =
+  'wazuh-findings-v5-system-activity*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SYSTEM_ACTIVITY =
+  'index-pattern:findings-system-activity';
+export const WAZUH_FINDINGS_SECURITY_PATTERN = 'wazuh-findings-v5-security*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SECURITY =
+  'index-pattern:findings-security';
+export const WAZUH_FINDINGS_OTHER_PATTERN = 'wazuh-findings-v5-other*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_OTHER =
+  'index-pattern:findings-other';
+export const WAZUH_FINDINGS_NETWORK_ACTIVITY_PATTERN =
+  'wazuh-findings-v5-network-activity*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_NETWORK_ACTIVITY =
+  'index-pattern:findings-network-activity';
+export const WAZUH_FINDINGS_CLOUD_SERVICES_PATTERN =
+  'wazuh-findings-v5-cloud-services*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_CLOUD_SERVICES =
+  'index-pattern:findings-cloud-services';
+export const WAZUH_FINDINGS_APPLICATIONS_PATTERN =
+  'wazuh-findings-v5-applications*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_APPLICATIONS =
+  'index-pattern:findings-applications';
+export const WAZUH_FINDINGS_ACCESS_MANAGEMENT_PATTERN =
+  'wazuh-findings-v5-access-management*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_ACCESS_MANAGEMENT =
+  'index-pattern:findings-access-management';
+export const WAZUH_FINDINGS_UNCLASSIFIED_PATTERN =
+  'wazuh-findings-v5-unclassified*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_UNCLASSIFIED =
+  'index-pattern:findings-unclassified';
+
 // Time field
 export const FIELD_TIMESTAMP = '@timestamp';
 
@@ -195,8 +238,8 @@ export const WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT =
   'security-configuration-assessment';
 export const WAZUH_SAMPLE_INVENTORY_AGENT = 'wazuh-inventory-agent';
 export const WAZUH_SAMPLE_VULNERABILITIES = 'wazuh-vulnerabilities';
-export const WAZUH_SAMPLE_AGENT_MONITORING = 'agent-monitoring';
-export const WAZUH_SAMPLE_SERVER_STATISTICS = 'server-statistics';
+export const WAZUH_SAMPLE_METRICS_AGENTS = 'metrics-agents';
+export const WAZUH_SAMPLE_METRICS_COMMS = 'metrics-comms';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 1500;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_EVENTS_PATTERN.replace('*', ''),
@@ -278,21 +321,21 @@ export const WAZUH_SETTING_INVENTORY_BROWSER_EXTENSIONS_SAMPLE_PREFIX = {
   ),
   dataSet: 'states-inventory-browser-extensions',
 };
-export const WAZUH_SETTING_AGENTS_MONITORING_SAMPLE_PREFIX = {
-  indexPatternPrefix: WAZUH_MONITORING_PATTERN.replace('*', ''),
-  dataSet: 'agents-monitoring',
+export const WAZUH_SETTING_METRICS_AGENTS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_METRICS_AGENTS_PATTERN.replace('*', ''),
+  dataSet: 'metrics-agents',
 };
-export const WAZUH_SETTING_SERVER_STATISTICS_SAMPLE_PREFIX = {
-  indexPatternPrefix: WAZUH_STATISTICS_PATTERN.replace('*', ''),
-  dataSet: 'server-statistics',
+export const WAZUH_SETTING_METRICS_COMMS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_METRICS_COMMS_PATTERN.replace('*', ''),
+  dataSet: 'metrics-comms',
 };
 
 export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
-  [WAZUH_SAMPLE_AGENT_MONITORING]: [
+  [WAZUH_SAMPLE_METRICS_AGENTS]: [
     {
       indexPatternPrefix:
-        WAZUH_SETTING_AGENTS_MONITORING_SAMPLE_PREFIX.indexPatternPrefix,
-      dataSet: WAZUH_SETTING_AGENTS_MONITORING_SAMPLE_PREFIX.dataSet,
+        WAZUH_SETTING_METRICS_AGENTS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_METRICS_AGENTS_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
@@ -476,11 +519,11 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
       dataSet: WAZUH_SETTING_INVENTORY_BROWSER_EXTENSIONS_SAMPLE_PREFIX.dataSet,
     },
   ],
-  [WAZUH_SAMPLE_SERVER_STATISTICS]: [
+  [WAZUH_SAMPLE_METRICS_COMMS]: [
     {
       indexPatternPrefix:
-        WAZUH_SETTING_SERVER_STATISTICS_SAMPLE_PREFIX.indexPatternPrefix,
-      dataSet: WAZUH_SETTING_SERVER_STATISTICS_SAMPLE_PREFIX.dataSet,
+        WAZUH_SETTING_METRICS_COMMS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_METRICS_COMMS_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_VULNERABILITIES]: [
@@ -877,10 +920,10 @@ export const SUPPORTED_LANGUAGES_ARRAY = Object.values(SUPPORTED_LANGUAGES);
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES =
   'index-pattern:states-vulnerabilities';
 
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING =
-  'index-pattern:monitoring';
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS =
-  'index-pattern:statistics';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_AGENTS =
+  'index-pattern:metrics-agents';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_COMMS =
+  'index-pattern:metrics-comms';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES =
   'index-pattern:states-inventory';

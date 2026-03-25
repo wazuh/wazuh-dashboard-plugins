@@ -1,8 +1,8 @@
 import { KnownFields, getKnownFieldsByIndexType } from './known-fields-loader';
-import FieldsMonitoring from '../../common/known-fields/monitoring.json';
-import statisticsFields from '../../common/known-fields/statistics.json';
+import metricsAgentsFields from '../../common/known-fields/metrics-agents.json';
+import metricsCommsFields from '../../common/known-fields/metrics-comms.json';
 import {
-  WAZUH_INDEX_TYPE_MONITORING,
+  WAZUH_INDEX_TYPE_METRICS_AGENTS,
   WAZUH_INDEX_TYPE_STATES_FIM_FILES,
   WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS,
   WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_VALUES,
@@ -20,7 +20,7 @@ import {
   WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM,
   WAZUH_INDEX_TYPE_STATES_INVENTORY_USERS,
   WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
-  WAZUH_INDEX_TYPE_STATISTICS,
+  WAZUH_INDEX_TYPE_METRICS_COMMS,
   WAZUH_INDEX_TYPE_STATES_SCA,
   WAZUH_INDEX_TYPE_EVENTS,
   WAZUH_INDEX_TYPE_EVENTS_ACCESS_MANAGEMENT,
@@ -34,8 +34,6 @@ import {
   WAZUH_INDEX_TYPE_EVENTS_SECURITY,
   WAZUH_INDEX_TYPE_EVENTS_SYSTEM_ACTIVITY,
 } from '../../common/constants';
-
-const monitoringFields = FieldsMonitoring;
 
 describe('Known Fields Loader', () => {
   describe('KnownFields export', () => {
@@ -57,8 +55,8 @@ describe('Known Fields Loader', () => {
     test('should return known fields for all index types', () => {
       const indexTypes = [
         WAZUH_INDEX_TYPE_EVENTS,
-        WAZUH_INDEX_TYPE_MONITORING,
-        WAZUH_INDEX_TYPE_STATISTICS,
+        WAZUH_INDEX_TYPE_METRICS_AGENTS,
+        WAZUH_INDEX_TYPE_METRICS_COMMS,
         WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
         WAZUH_INDEX_TYPE_STATES_FIM_FILES,
         WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS,
@@ -115,30 +113,38 @@ describe('Known Fields Loader', () => {
   });
 
   describe('States-specific field validation', () => {
-    test('monitoring should have timestamp and status fields', () => {
-      const timestampField = monitoringFields.find(f => f.name === 'timestamp');
+    test('metrics agents should have timestamp and status fields', () => {
+      const timestampField = metricsAgentsFields.find(
+        f => f.name === '@timestamp',
+      );
       expect(timestampField).toBeDefined();
       if (timestampField) {
         expect(timestampField.type).toBe('date');
       }
 
-      const statusField = monitoringFields.find(f => f.name === 'status');
+      const statusField = metricsAgentsFields.find(
+        f => f.name === 'wazuh.agent.status',
+      );
       expect(statusField).toBeDefined();
       if (statusField) {
         expect(statusField.type).toBe('string');
       }
     });
 
-    test('statistics should have analysisd fields', () => {
-      const analysisdFields = statisticsFields.filter(f =>
-        f.name.startsWith('analysisd.'),
-      );
-      expect(analysisdFields.length).toBeGreaterThan(0);
-
-      const remoteFields = statisticsFields.filter(f =>
-        f.name.startsWith('remoted.'),
-      );
-      expect(remoteFields.length).toBeGreaterThan(0);
+    test('metrics comms should have analysisd fields', () => {
+      [
+        'discarded.',
+        'network.',
+        'event.',
+        'messages.',
+        'tcp.',
+        'queue.',
+        'wazuh.',
+      ].forEach(str => {
+        expect(
+          metricsCommsFields.filter(f => f.name.startsWith(str)).length,
+        ).toBeGreaterThan(0);
+      });
     });
   });
 

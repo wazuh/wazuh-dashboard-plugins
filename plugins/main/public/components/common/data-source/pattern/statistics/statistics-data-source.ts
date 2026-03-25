@@ -1,7 +1,7 @@
 import { AppState } from '../../../../../react-services';
 import { tFilter } from '../../index';
 import { PatternDataSource } from '../pattern-data-source';
-import { WAZUH_STATISTICS_PATTERN } from '../../../../../../common/constants';
+import { WAZUH_METRICS_COMMS_PATTERN } from '../../../../../../common/constants';
 
 export class StatisticsDataSource extends PatternDataSource {
   constructor(id: string, title: string) {
@@ -10,7 +10,7 @@ export class StatisticsDataSource extends PatternDataSource {
 
   static getIdentifierDataSourcePattern(): string {
     // Return Statistics Identifier Index Pattern
-    return WAZUH_STATISTICS_PATTERN;
+    return WAZUH_METRICS_COMMS_PATTERN;
   }
 
   getFetchFilters(): tFilter[] {
