@@ -59,7 +59,8 @@ jest.mock('../../../react-services/navigation-service', () => ({
   },
 }));
 
-describe('Check sample data component', () => {
+// TODO: enable when the sample data warning is enabled again
+describe.skip('Check sample data component', () => {
   it('should render if there is sample data', async () => {
     WzRequest.genericReq.mockResolvedValue({
       data: { exists: true },

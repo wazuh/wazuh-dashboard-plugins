@@ -26,7 +26,7 @@ export const filtersValues = [
   },
   {
     type: 'multiSelect',
-    key: 'github.audit.repo',
+    key: 'url.original',
     placeholder: 'Repository',
   },
   {

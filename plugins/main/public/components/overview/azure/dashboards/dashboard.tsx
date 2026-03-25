@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  FindingsDataSourceRepository,
+  FindingsCloudServicesDataSourceRepository,
   AzureDataSource,
 } from '../../../common/data-source';
 
@@ -13,7 +13,7 @@ import { createDashboard } from '../../../common/dashboards';
 
 export const DashboardAzure = createDashboard({
   DataSource: AzureDataSource,
-  DataSourceRepositoryCreator: FindingsDataSourceRepository,
+  DataSourceRepositoryCreator: FindingsCloudServicesDataSourceRepository,
   getDashboardPanels: [
     {
       dashboardId: AZURE_DASHBOARD_ID,
