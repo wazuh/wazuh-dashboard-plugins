@@ -90,6 +90,17 @@ export const WAZUH_INDEX_TYPE_EVENTS_NETWORK_ACTIVITY =
 export const WAZUH_INDEX_TYPE_EVENTS_OTHER = 'events-other';
 export const WAZUH_INDEX_TYPE_EVENTS_SECURITY = 'events-security';
 export const WAZUH_INDEX_TYPE_EVENTS_SYSTEM_ACTIVITY = 'events-system-activity';
+export const WAZUH_INDEX_TYPE_FINDINGS_ACCESS_MANAGEMENT =
+  'findings-access-management';
+export const WAZUH_INDEX_TYPE_FINDINGS_APPLICATIONS = 'findings-applications';
+export const WAZUH_INDEX_TYPE_FINDINGS_CLOUD_SERVICES =
+  'findings-cloud-services';
+export const WAZUH_INDEX_TYPE_FINDINGS_NETWORK_ACTIVITY =
+  'findings-network-activity';
+export const WAZUH_INDEX_TYPE_FINDINGS_OTHER = 'findings-other';
+export const WAZUH_INDEX_TYPE_FINDINGS_SECURITY = 'findings-security';
+export const WAZUH_INDEX_TYPE_FINDINGS_SYSTEM_ACTIVITY =
+  'findings-system-activity';
 
 // FIM
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim*';
@@ -176,6 +187,38 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_UNCLASSIFIED =
 export const WAZUH_EVENTS_RAW_PATTERN = 'wazuh-events-raw-v5*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_RAW =
   'index-pattern:events-raw';
+
+// Index patterns - Findings sub-patterns
+export const WAZUH_FINDINGS_SYSTEM_ACTIVITY_PATTERN =
+  'wazuh-findings-v5-system-activity*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SYSTEM_ACTIVITY =
+  'index-pattern:findings-system-activity';
+export const WAZUH_FINDINGS_SECURITY_PATTERN = 'wazuh-findings-v5-security*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SECURITY =
+  'index-pattern:findings-security';
+export const WAZUH_FINDINGS_OTHER_PATTERN = 'wazuh-findings-v5-other*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_OTHER =
+  'index-pattern:findings-other';
+export const WAZUH_FINDINGS_NETWORK_ACTIVITY_PATTERN =
+  'wazuh-findings-v5-network-activity*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_NETWORK_ACTIVITY =
+  'index-pattern:findings-network-activity';
+export const WAZUH_FINDINGS_CLOUD_SERVICES_PATTERN =
+  'wazuh-findings-v5-cloud-services*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_CLOUD_SERVICES =
+  'index-pattern:findings-cloud-services';
+export const WAZUH_FINDINGS_APPLICATIONS_PATTERN =
+  'wazuh-findings-v5-applications*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_APPLICATIONS =
+  'index-pattern:findings-applications';
+export const WAZUH_FINDINGS_ACCESS_MANAGEMENT_PATTERN =
+  'wazuh-findings-v5-access-management*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_ACCESS_MANAGEMENT =
+  'index-pattern:findings-access-management';
+export const WAZUH_FINDINGS_UNCLASSIFIED_PATTERN =
+  'wazuh-findings-v5-unclassified*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_UNCLASSIFIED =
+  'index-pattern:findings-unclassified';
 
 // Time field
 export const FIELD_TIMESTAMP = '@timestamp';
@@ -1091,3 +1134,9 @@ export const VULNERABILITIES_DASHBOARD_ID =
   'vulnerabilities-overview-dashboard-tab';
 export const VULNERABILITIES_AGENT_DASHBOARD_ID =
   'vulnerabilities-overview-dashboard-tab';
+
+// Main module tabs
+export const TAB_VIEW_ID_EVENTS = 'findings';
+export const TAB_VIEW_NAME_EVENTS = 'Findings';
+export const TAB_VIEW_ID_DASHBOARD = 'dashboard';
+export const TAB_VIEW_NAME_DASHBOARD = 'Dashboard';

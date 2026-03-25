@@ -522,7 +522,7 @@ hosts:
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.switch,
-    defaultValue: false,
+    defaultValue: true,
     validate: SettingsValidator.isBoolean,
   },
   timeout: {

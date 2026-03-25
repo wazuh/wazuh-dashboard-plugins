@@ -38,6 +38,10 @@ import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-col
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
 import { azureColumns } from '../../overview/azure/events/azure-columns';
 import {
+  TAB_VIEW_ID_DASHBOARD,
+  TAB_VIEW_ID_EVENTS,
+  TAB_VIEW_NAME_DASHBOARD,
+  TAB_VIEW_NAME_EVENTS,
   WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
@@ -109,8 +113,8 @@ const ButtonModuleGenerateReport = {
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
-    id: 'events',
-    name: 'Events',
+    id: TAB_VIEW_ID_EVENTS,
+    name: TAB_VIEW_NAME_EVENTS,
     buttons: [ButtonExploreAgent],
     component: () => <WazuhDiscover {...props} />,
   };
@@ -118,11 +122,11 @@ const renderDiscoverTab = (props: WazuhDiscoverProps) => {
 
 export const ModulesDefaults = {
   general: {
-    init: 'events',
+    init: TAB_VIEW_ID_DASHBOARD, // The apps define a redirection URL when accessing so this value could be ignored. There is a recovery mechanism to select an available tab if the tabView URL query parameter has a value that is not one of the availabels in the tabs IDs
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardThreatHunting,
       },
@@ -140,11 +144,11 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   fim: {
-    init: 'inventory',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardFIM,
       },
@@ -164,11 +168,11 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   microsoftGraphAPI: {
-    init: 'dashboard',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardAzure,
       },
@@ -182,11 +186,11 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   aws: {
-    init: 'dashboard',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardAWS,
       },
@@ -200,11 +204,11 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   gcp: {
-    init: 'dashboard',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         component: DashboardGoogleCloud,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
       },
@@ -219,11 +223,11 @@ export const ModulesDefaults = {
   },
   // This module is Malware Detection. Ref: https://github.com/wazuh/wazuh-dashboard-plugins/issues/5893
   pm: {
-    init: 'dashboard',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardMalwareDetection,
       },
@@ -239,11 +243,11 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   sca: {
-    init: 'dashboard',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [ButtonExploreAgent],
         component: SCADashboard,
       },
@@ -264,11 +268,11 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   office: {
-    init: 'dashboard',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         component: DashboardOffice365,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
       },
@@ -288,11 +292,11 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   github: {
-    init: 'dashboard',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardGitHub,
       },
@@ -312,11 +316,11 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   vuls: {
-    init: 'dashboard',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         component: DashboardVuls,
         /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-events* */
         buttons: [
@@ -353,11 +357,11 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   mitre: {
-    init: 'intelligence',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardMITRE,
       },
@@ -385,11 +389,11 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   docker: {
-    init: 'dashboard',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardDocker,
       },
@@ -403,11 +407,11 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   pci: {
-    init: 'dashboard',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardPCIDSS,
       },
@@ -429,11 +433,11 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   hipaa: {
-    init: 'dashboard',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardHIPAA,
       },
@@ -455,11 +459,11 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   nist: {
-    init: 'dashboard',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardNIST80053,
       },
@@ -481,11 +485,11 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   gdpr: {
-    init: 'dashboard',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardGDPR,
       },
@@ -507,11 +511,11 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   tsc: {
-    init: 'dashboard',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardTSC,
       },
@@ -533,11 +537,11 @@ export const ModulesDefaults = {
     availableFor: ['manager', 'agent'],
   },
   'it-hygiene': {
-    init: 'dashboard',
+    init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {
-        id: 'dashboard',
-        name: 'Dashboard',
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardITHygiene,
       },
