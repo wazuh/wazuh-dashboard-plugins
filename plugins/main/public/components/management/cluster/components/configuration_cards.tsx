@@ -15,6 +15,7 @@ import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { getDashboardConfigurationPanels } from '../dashboard/dashboard_configuration_panels';
 import '../dashboard/cluster_dashboard.scss';
 import { tFilter } from '../../../common/data-source';
+import { WzSearchBar } from '../../../common/search-bar';
 
 interface ConfigurationCardsProps {
   goBack: () => void;
@@ -90,6 +91,18 @@ export const ConfigurationCards = ({
             <EuiTitle>
               <h2>Overview</h2>
             </EuiTitle>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <WzSearchBar
+              appName='ct-searchbar'
+              {...searchBarProps}
+              showQueryInput={false}
+              showQueryBar={true}
+              showSaveQuery={false}
+              showSaveQueryButton={false}
+              hideFixedFilters={true}
+              showFilterBar={false}
+            />
           </EuiFlexItem>
         </EuiFlexGroup>
       </EuiFlexItem>
