@@ -43,7 +43,7 @@ const getVisStateTop5Nodes = (indexPatternId?: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'cluster.node',
+            field: 'wazuh.cluster.node',
             otherBucket: false,
             otherBucketLabel: 'Other',
             missingBucket: false,
