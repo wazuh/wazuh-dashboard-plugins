@@ -29,6 +29,12 @@ import {
 import { AppState } from '../../../../../react-services/app-state';
 import { RequirementFlyout } from '../requirement-flyout';
 import { getDataPlugin } from '../../../../../kibana-services';
+import {
+  TAB_VIEW_ID_DASHBOARD,
+  TAB_VIEW_ID_EVENTS,
+  TAB_VIEW_NAME_DASHBOARD,
+  TAB_VIEW_NAME_EVENTS,
+} from '../../../../../../common/constants';
 
 export class ComplianceSubrequirements extends Component {
   _isMount = false;
@@ -93,7 +99,7 @@ export class ComplianceSubrequirements extends Component {
       value: requirementId,
       negate: false,
     });
-    this.props.onSelectedTabChanged('events');
+    this.props.onSelectedTabChanged(TAB_VIEW_ID_EVENTS);
   }
 
   openDashboard(e, requirementId) {
@@ -102,7 +108,7 @@ export class ComplianceSubrequirements extends Component {
       value: requirementId,
       negate: false,
     });
-    this.props.onSelectedTabChanged('dashboard');
+    this.props.onSelectedTabChanged(TAB_VIEW_ID_DASHBOARD);
   }
 
   renderFacet() {
@@ -199,7 +205,7 @@ export class ComplianceSubrequirements extends Component {
                     <span style={{ float: 'right', position: 'fixed' }}>
                       <EuiToolTip
                         position='top'
-                        content={'Show' + item.id + ' in Dashboard'}
+                        content={`Show ${item.id} in ${TAB_VIEW_NAME_DASHBOARD}`}
                       >
                         <EuiIcon
                           onMouseDown={e => {
@@ -213,7 +219,7 @@ export class ComplianceSubrequirements extends Component {
                       &nbsp;
                       <EuiToolTip
                         position='top'
-                        content={'Inspect ' + item.id + ' in Events'}
+                        content={`Inspect ${item.id} in ${TAB_VIEW_NAME_EVENTS}`}
                       >
                         <EuiIcon
                           onMouseDown={e => {
