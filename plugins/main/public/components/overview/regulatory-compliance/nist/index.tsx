@@ -1,60 +1,20 @@
 import React from 'react';
-import { ModuleSubTabs } from '../../../common/tabs';
 import { DashboardNIST80053 } from './dashboards/dashboard';
-import { ComplianceTable } from '../../compliance-table';
-import { WazuhDiscover } from '../../../common/wazuh-discover/wz-discover';
 import { NIST80053DataSource } from '../../../common/data-source';
 import { nistColumns } from './events/nist-columns';
-import { ButtonExploreAgent } from '../../../wz-agent-selector/button-explore-agent';
-import { ButtonModuleGenerateReport as ButtonModuleGenerateReportComponent } from '../../../common/modules/buttons';
-import { ReportingService } from '../../../../react-services';
-import {
-  TAB_VIEW_ID_DASHBOARD,
-  TAB_VIEW_ID_EVENTS,
-  TAB_VIEW_NAME_DASHBOARD,
-  TAB_VIEW_NAME_EVENTS,
-  WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
-} from '../../../../../common/constants';
+import { ComplianceModule } from '../shared/compliance-module';
 
-const ButtonModuleGenerateReport = {
-  condition: () => new ReportingService().reportDashboardPluginExist(),
-  component: ButtonModuleGenerateReportComponent,
+import { buildStandardComplianceTabs } from '../shared/compliance-tab-factory';
+
+export const RegulatoryComplianceNIST80053 = () => {
+  const tabs = buildStandardComplianceTabs({
+    dashboardComponent: DashboardNIST80053,
+    section: 'nist',
+    moduleId: 'nist',
+    dataSource: NIST80053DataSource,
+    tableColumns: nistColumns,
+  });
+
+  return <ComplianceModule moduleId='nist' tabs={tabs} />;
 };
 
-const tabs = [
-  {
-    id: TAB_VIEW_ID_DASHBOARD,
-    name: TAB_VIEW_NAME_DASHBOARD,
-    buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-    component: DashboardNIST80053,
-  },
-  {
-    id: 'controls',
-    name: 'Controls',
-    buttons: [ButtonExploreAgent],
-    component: (props: any) => (
-      <ComplianceTable
-        {...props}
-        section='nist'
-        DataSource={NIST80053DataSource}
-      />
-    ),
-  },
-  {
-    id: TAB_VIEW_ID_EVENTS,
-    name: TAB_VIEW_NAME_EVENTS,
-    buttons: [ButtonExploreAgent],
-    component: () => (
-      <WazuhDiscover
-        moduleId='nist'
-        tableColumns={nistColumns}
-        DataSource={NIST80053DataSource}
-        categoriesSampleData={[WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]}
-      />
-    ),
-  },
-];
-
-export const RegulatoryComplianceNIST80053 = () => (
-  <ModuleSubTabs tabs={tabs} />
-);
