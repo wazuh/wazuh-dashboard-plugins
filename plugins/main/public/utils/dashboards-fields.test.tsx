@@ -18,7 +18,8 @@ const dashboardPanels = {
   github: '../components/overview/github/dashboards/dashboard-panels',
   googleCloud:
     '../components/overview/google-cloud/dashboards/dashboard_panels',
-  hipaa: '../components/overview/regulatory-compliance/hipaa/dashboards/dashboard-panels',
+  hipaa:
+    '../components/overview/regulatory-compliance/hipaa/dashboards/dashboard-panels',
   malwareDetection:
     '../components/overview/malware-detection/dashboard/dashboard-panels',
   nist: '../components/overview/regulatory-compliance/nist/dashboards/dashboard-panels',
