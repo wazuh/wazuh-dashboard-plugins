@@ -69,7 +69,7 @@ export const OverviewCards = ({
                 wrap
               >
                 <EuiFlexItem grow={false}>
-                  <EuiTitle size='s'>
+                  <EuiTitle>
                     <h2>Details</h2>
                   </EuiTitle>
                 </EuiFlexItem>
@@ -86,7 +86,6 @@ export const OverviewCards = ({
               </EuiFlexGroup>
             }
           >
-            <EuiSpacer size='m' />
             <EuiDescriptionList
               type='responsiveColumn'
               compressed
@@ -113,12 +112,11 @@ export const OverviewCards = ({
           <EuiCard
             textAlign='left'
             title={
-              <span className='euiTitle euiTitle--small euiCard__title'>
-                Information
-              </span>
+              <EuiTitle>
+                <h2>Information</h2>
+              </EuiTitle>
             }
           >
-            <EuiSpacer size='m' />
             <EuiDescriptionList
               type='column'
               compressed
