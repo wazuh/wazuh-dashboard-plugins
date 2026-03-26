@@ -40,6 +40,12 @@ export const WAZUH_MODULES = {
     description:
       'Audit users behavior, monitoring command execution and alerting on access to critical files.',
   },
+  'regulatory-compliance': {
+    title: 'Regulatory Compliance',
+    appId: 'regulatory-compliance',
+    description:
+      'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, and TSC.',
+  },
   pci: {
     title: 'PCI DSS',
     appId: 'pci-dss',

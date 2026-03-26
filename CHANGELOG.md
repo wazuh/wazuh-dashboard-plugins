@@ -61,6 +61,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Replaced the broken visualization in Configuration Assessment [#8232](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8232)
 - Swapped menu positions of Vulnerability detection and MITRE ATT&CK [#8230](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8230)
 - Changed the default value of `wazuh.updates.disabled` from `false` to `true` [#8236](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8236)
+- Centralized regulatory compliance modules (PCI DSS, GDPR, HIPAA, NIST 800-53, and TSC) into a single "Regulatory Compliance" application [#8239](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8239)
 
 ### Fixed
 
