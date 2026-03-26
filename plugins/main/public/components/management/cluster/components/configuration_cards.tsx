@@ -3,8 +3,7 @@ import {
   EuiFlexItem,
   EuiButtonIcon,
   EuiCard,
-  EuiDescriptionList,
-  EuiSpacer,
+  EuiText,
   EuiToolTip,
   EuiFlexGroup,
   EuiTitle,
@@ -72,116 +71,71 @@ export const ConfigurationCards = ({
   ];
 
   return (
-    <EuiFlexGroup direction='column' gutterSize='xs'>
-      <EuiFlexItem>
-        <EuiFlexGroup responsive={false} alignItems='center' gutterSize='s'>
-          <EuiFlexItem grow={false}>
-            <EuiToolTip content='Go back' position='bottom'>
-              <EuiButtonIcon
-                color='primary'
-                size='m'
-                display='empty'
-                iconType='arrowLeft'
-                aria-label='Back'
-                onClick={goBack}
-              />
-            </EuiToolTip>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiTitle>
-              <h2>Overview</h2>
-            </EuiTitle>
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <WzSearchBar
-              appName='ct-searchbar'
-              {...searchBarProps}
-              showQueryInput={false}
-              showQueryBar={true}
-              showSaveQuery={false}
-              showSaveQueryButton={false}
-              hideFixedFilters={true}
-              showFilterBar={false}
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </EuiFlexItem>
-      <EuiFlexItem>
-        <EuiFlexGroup responsive alignItems='flexStart' gutterSize='l'>
-          <EuiFlexItem
-            grow={false}
-            style={{
-              minWidth: '500px',
-              overflow: 'hidden',
-              height: '100%',
-            }}
-          >
-            {results?.hits?.total > 0 ? (
-              <div className='ct-dashboard-responsive'>
-                <DashboardByRenderer
-                  input={{
-                    viewMode: ViewMode.VIEW,
-                    panels: getDashboardConfigurationPanels(indexPatternId),
-                    isFullScreenMode: false,
-                    filters: filters,
-                    useMargins: true,
-                    id: 'ct-dashboard-configuration-tab',
-                    timeRange: {
-                      from: searchBarProps.dateRangeFrom,
-                      to: searchBarProps.dateRangeTo,
-                    },
-                    title: 'Cluster configuration dashboard',
-                    description: 'Dashboard of the Cluster configuration',
-                    query: searchBarProps.query,
-                    refreshConfig: {
-                      pause: false,
-                      value: 15,
-                    },
-                    hidePanelTitles: false,
-                    lastReloadRequestTime,
-                  }}
+    <EuiCard textAlign='left' style={{ paddingTop: '5px' }}>
+      <EuiFlexGroup direction='column' gutterSize='l'>
+        <EuiFlexItem>
+          <EuiFlexGroup alignItems='center' gutterSize='s'>
+            <EuiFlexItem grow={false}>
+              <EuiToolTip content='Go back' position='bottom'>
+                <EuiButtonIcon
+                  color='primary'
+                  size='m'
+                  display='empty'
+                  iconType='arrowLeft'
+                  aria-label='Back'
+                  onClick={goBack}
                 />
-              </div>
-            ) : (
-              <DiscoverNoResults
-                message='There are no results for selected time range. Try another
-            one.'
-              />
-            )}
-          </EuiFlexItem>
-          <EuiFlexItem style={{ padding: '8px 0 0 0', height: '364px' }}>
-            <EuiCard
-              textAlign='left'
-              title={
-                <EuiTitle size='s'>
-                  <h2>Configuration</h2>
-                </EuiTitle>
-              }
-            >
-              <EuiSpacer size='m' />
-              <EuiDescriptionList
-                type='column'
-                compressed={true}
-                align='left'
-                listItems={configurationItemsList.map(item => ({
-                  title: (
-                    <span style={{ fontWeight: 400, fontSize: '1rem' }}>
-                      {item.title}
-                    </span>
-                  ),
-                  description: item.description,
-                }))}
-                titleProps={{
-                  className: 'cluster-descriptionList-title',
-                }}
-                descriptionProps={{
-                  className: 'color-grey cluster-descriptionList-description',
-                }}
-              />
-            </EuiCard>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </EuiFlexItem>
-    </EuiFlexGroup>
+              </EuiToolTip>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiTitle>
+                <h2>Overview</h2>
+              </EuiTitle>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiFlexItem>
+        <EuiFlexItem>
+          <EuiFlexGroup direction='column' gutterSize='m'>
+            <EuiFlexItem>
+              <EuiTitle size='xs'>
+                <h3>Configuration</h3>
+              </EuiTitle>
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiFlexGroup
+                gutterSize='l'
+                responsive={false}
+                justifyContent='spaceBetween'
+                style={{ marginRight: '20px' }}
+              >
+                {configurationItemsList.map((item, index) => (
+                  <EuiFlexItem key={index} grow={false}>
+                    <EuiFlexGroup
+                      direction='row'
+                      gutterSize='xs'
+                      responsive={false}
+                      alignItems='baseline'
+                    >
+                      <EuiFlexItem grow={false}>
+                        <EuiText size='s'>
+                          <span style={{ color: '#69707D' }}>
+                            {item.title}:
+                          </span>
+                        </EuiText>
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>
+                        <EuiText size='m'>
+                          <strong>{item.description}</strong>
+                        </EuiText>
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiFlexItem>
+                ))}
+              </EuiFlexGroup>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    </EuiCard>
   );
 };
