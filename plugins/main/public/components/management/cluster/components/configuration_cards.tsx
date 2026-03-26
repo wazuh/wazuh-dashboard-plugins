@@ -117,15 +117,15 @@ export const ConfigurationCards = ({
                       alignItems='baseline'
                     >
                       <EuiFlexItem grow={false}>
-                        <EuiText size='s'>
-                          <span style={{ color: '#69707D' }}>
-                            {item.title}:
-                          </span>
+                        <EuiText size='m'>
+                          <strong>{item.title}:</strong>
                         </EuiText>
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
-                        <EuiText size='m'>
-                          <strong>{item.description}</strong>
+                        <EuiText size='s'>
+                          <span style={{ color: '#69707D' }}>
+                            {item.description}
+                          </span>
                         </EuiText>
                       </EuiFlexItem>
                     </EuiFlexGroup>
