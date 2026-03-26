@@ -261,7 +261,7 @@ export const regulatoryCompliance = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=regulatory-compliance&tabView=pci-dss${
+    `/overview/?tab=regulatory-compliance&tabView=pci-dss&tabSubView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
