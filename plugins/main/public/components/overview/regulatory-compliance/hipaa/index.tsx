@@ -17,4 +17,3 @@ export const RegulatoryComplianceHIPAA = () => {
 
   return <ComplianceModule moduleId='hipaa' tabs={tabs} />;
 };
-

@@ -17,4 +17,3 @@ export const RegulatoryCompliancePCIDSS = () => {
 
   return <ComplianceModule moduleId='pci' tabs={tabs} />;
 };
-

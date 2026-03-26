@@ -17,4 +17,3 @@ export const RegulatoryComplianceNIST80053 = () => {
 
   return <ComplianceModule moduleId='nist' tabs={tabs} />;
 };
-
