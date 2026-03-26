@@ -8,7 +8,13 @@ import { tscColumns } from './events/tsc-columns';
 import { ButtonExploreAgent } from '../../../wz-agent-selector/button-explore-agent';
 import { ButtonModuleGenerateReport as ButtonModuleGenerateReportComponent } from '../../../common/modules/buttons';
 import { ReportingService } from '../../../../react-services';
-import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY } from '../../../../../common/constants';
+import {
+  TAB_VIEW_ID_DASHBOARD,
+  TAB_VIEW_ID_EVENTS,
+  TAB_VIEW_NAME_DASHBOARD,
+  TAB_VIEW_NAME_EVENTS,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+} from '../../../../../common/constants';
 
 const ButtonModuleGenerateReport = {
   condition: () => new ReportingService().reportDashboardPluginExist(),
@@ -17,8 +23,8 @@ const ButtonModuleGenerateReport = {
 
 const tabs = [
   {
-    id: 'dashboard',
-    name: 'Dashboard',
+    id: TAB_VIEW_ID_DASHBOARD,
+    name: TAB_VIEW_NAME_DASHBOARD,
     buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
     component: DashboardTSC,
   },
@@ -31,8 +37,8 @@ const tabs = [
     ),
   },
   {
-    id: 'events',
-    name: 'Events',
+    id: TAB_VIEW_ID_EVENTS,
+    name: TAB_VIEW_NAME_EVENTS,
     buttons: [ButtonExploreAgent],
     component: () => (
       <WazuhDiscover
