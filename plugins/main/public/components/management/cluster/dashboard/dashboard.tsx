@@ -33,6 +33,8 @@ import {
 import { compose } from 'redux';
 import { useRouterSearch } from '../../../common/hooks';
 
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 interface ClusterDashboardState {
   nodeList: any;
   configuration: any;
@@ -173,27 +175,67 @@ const DashboardCT: React.FC<DashboardCTProps> = () => {
 
   useEffect(() => {
     const getData = async () => {
-      const data = await Promise.all([
+      const data = await Promise.allSettled([
         WzRequest.apiReq('GET', '/cluster/nodes', {}),
         WzRequest.apiReq('GET', '/cluster/local/config', {}),
         WzRequest.apiReq('GET', '/', {}),
         WzRequest.apiReq('GET', '/agents', {
           params: { limit: 1 },
         }),
-        // WzRequest.apiReq('GET', '/cluster/healthcheck', {}),
+        // WzRequest.apiReq('GET', '/cluster/healthcheck', {}), // Endpoint returns Internal Server Error
       ]);
 
-      const nodeList = data[0]?.data?.data || {} || false;
-      const clusterConfig = data[1]?.data?.data || {} || false;
-      const agents = data[3]?.data?.data || {} || false;
-      setState(prevState => ({
-        ...prevState,
-        configuration: clusterConfig.affected_items[0],
-        version: data[2]?.data?.data?.api_version || false,
-        nodesCount: nodeList.total_affected_items,
-        agentsCount: Number(agents.total_affected_items ?? 0),
-        nodeList: nodeList?.affected_items ?? [],
-      }));
+      if (data[0].status === 'fulfilled') {
+        const nodeList = data[0].value.data.data;
+        setState(prevState => ({
+          ...prevState,
+          nodeList: nodeList.affected_items ?? [],
+          nodesCount: nodeList.total_affected_items ?? 0,
+        }));
+      }
+      if (data[1].status === 'fulfilled') {
+        const clusterConfig = data[1].value.data.data;
+        setState(prevState => ({
+          ...prevState,
+          configuration: clusterConfig.affected_items[0],
+        }));
+      }
+      if (data[2].status === 'fulfilled') {
+        const version = data[2].value.data.data;
+        setState(prevState => ({
+          ...prevState,
+          version: version.api_version,
+        }));
+      }
+      if (data[3].status === 'fulfilled') {
+        const agents = data[3].value.data.data;
+        setState(prevState => ({
+          ...prevState,
+          agentsCount: Number(agents.total_affected_items ?? 0),
+        }));
+      }
+
+      const errors = data
+        .filter(result => result.status === 'rejected')
+        .map(result => result.reason);
+
+      if (errors.length > 0) {
+        errors.forEach(error => {
+          const options = {
+            context: 'StatusDashboard',
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
+            display: true,
+            store: false,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: error.name || error,
+            },
+          };
+          ErrorHandler.handleError(error, options);
+        });
+      }
     };
 
     getData();
