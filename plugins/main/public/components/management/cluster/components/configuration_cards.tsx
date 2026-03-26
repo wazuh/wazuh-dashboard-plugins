@@ -2,15 +2,11 @@ import React from 'react';
 import {
   EuiFlexItem,
   EuiButtonIcon,
-  EuiCard,
-  EuiText,
   EuiToolTip,
   EuiFlexGroup,
   EuiTitle,
 } from '@elastic/eui';
-import { getPlugins } from '../../../../kibana-services';
 import '../dashboard/cluster_dashboard.scss';
-import { tFilter } from '../../../common/data-source';
 import {
   WzRibbonBody,
   WzRibbonPanel,
@@ -20,16 +16,7 @@ import {
 interface ConfigurationCardsProps {
   goBack: () => void;
   configuration: any;
-  searchBarProps: any;
-  results: any;
-  indexPatternId?: string;
-  filters: tFilter[];
-  lastReloadRequestTime: number;
 }
-
-const plugins = getPlugins();
-
-const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
 export const ConfigurationCards = ({
   goBack,
@@ -58,7 +45,7 @@ export const ConfigurationCards = ({
     },
     {
       label: 'IP',
-      value: configuration?.nodes[0],
+      value: configuration?.nodes?.[0],
     },
     {
       label: 'Port',

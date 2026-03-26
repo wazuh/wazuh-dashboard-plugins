@@ -4,17 +4,11 @@ import {
   EuiButtonEmpty,
   EuiCard,
   EuiDescriptionList,
-  EuiSpacer,
   EuiToolTip,
   EuiFlexGroup,
   EuiTitle,
 } from '@elastic/eui';
-import { getDashboardPanels } from '../dashboard/dashboard_panels';
-import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import '../dashboard/cluster_dashboard.scss';
-import { getPlugins } from '../../../../kibana-services';
-import { DiscoverNoResults } from '../../../common/no-results/no-results';
-import { tFilter, tParsedIndexPattern } from '../../../common/data-source';
 import { formatUINumber } from '../../../../react-services/format-number';
 
 interface OverviewCardsProps {
@@ -26,17 +20,7 @@ interface OverviewCardsProps {
   nodesCount: number;
   nodeList: any[];
   agentsCount: number;
-  searchBarProps: any;
-  results: any;
-  indexPattern: tParsedIndexPattern;
-  clusterName?: string;
-  filters: tFilter[];
-  lastReloadRequestTime: number;
 }
-
-const plugins = getPlugins();
-
-const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
 export const OverviewCards = ({
   goAgents,
@@ -45,14 +29,7 @@ export const OverviewCards = ({
   configuration,
   version,
   nodesCount,
-  nodeList,
   agentsCount,
-  searchBarProps,
-  results,
-  indexPattern,
-  clusterName,
-  filters,
-  lastReloadRequestTime,
 }: OverviewCardsProps) => {
   return (
     <>
@@ -168,38 +145,6 @@ export const OverviewCards = ({
           </EuiCard>
         </EuiFlexItem>
       </EuiFlexGroup>
-      {/* {results?.hits?.total > 0 ? (
-        <div className='ct-dashboard-responsive'>
-          <DashboardByRenderer
-            input={{
-              viewMode: ViewMode.VIEW,
-              panels: getDashboardPanels(indexPattern, nodeList, clusterName),
-              isFullScreenMode: false,
-              filters: filters,
-              useMargins: true,
-              id: 'ct-dashboard-tab',
-              timeRange: {
-                from: searchBarProps?.dateRangeFrom,
-                to: searchBarProps?.dateRangeTo,
-              },
-              title: 'Cluster Timelions dashboard',
-              description: 'Dashboard of the Cluster Timelions',
-              query: searchBarProps.query,
-              refreshConfig: {
-                pause: false,
-                value: 15,
-              },
-              hidePanelTitles: false,
-              lastReloadRequestTime,
-            }}
-          />
-        </div>
-      ) : (
-        <DiscoverNoResults
-          message='There are no results for selected time range. Try another
-            one.'
-        />
-      )} */}
     </>
   );
 };
