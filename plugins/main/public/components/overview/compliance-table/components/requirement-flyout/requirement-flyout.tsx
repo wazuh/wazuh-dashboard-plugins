@@ -42,6 +42,11 @@ import {
 import { connect } from 'react-redux';
 import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/render-columns';
 import { setFilters } from '../../../../common/search-bar/set-filters';
+import {
+  TAB_VIEW_ID_EVENTS,
+  TAB_VIEW_NAME_DASHBOARD,
+  TAB_VIEW_NAME_EVENTS,
+} from '../../../../../../common/constants';
 
 const mapStateToProps = state => ({
   currentAgentData: state.appStateReducers.currentAgentData,
@@ -258,14 +263,12 @@ export const RequirementFlyout = connect(mapStateToProps)(
               <EuiTitle size='s'>
                 <h3>
                   Recent events
-                  {this.props.view !== 'events' && (
+                  {this.props.view !== TAB_VIEW_ID_EVENTS && (
                     <span style={{ marginLeft: 16 }}>
                       <span>
                         <EuiToolTip
                           position='top'
-                          content={
-                            'Show ' + currentRequirement + ' in Dashboard'
-                          }
+                          content={`Show ${currentRequirement} in ${TAB_VIEW_NAME_DASHBOARD}`}
                         >
                           <EuiIcon
                             onMouseDown={e => {
@@ -279,9 +282,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
                         </EuiToolTip>
                         <EuiToolTip
                           position='top'
-                          content={
-                            'Inspect ' + currentRequirement + ' in Events'
-                          }
+                          content={`Inspect ${currentRequirement} in ${TAB_VIEW_NAME_EVENTS}`}
                         >
                           <EuiIcon
                             onMouseDown={e => {
