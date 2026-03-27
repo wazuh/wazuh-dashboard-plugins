@@ -41,7 +41,7 @@ const agentsSettings = [
   },
 ];
 
-const buildHelpLinks = agent => [helpLinks[1]];
+const buildHelpLinks = agent => [helpLinks[0]];
 
 class WzConfigurationAgentsConfigurationGlobal extends Component {
   constructor(props) {
