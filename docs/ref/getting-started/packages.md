@@ -139,3 +139,76 @@ rpm --checksig wazuh-dashboard-5.0.0-1.x86_64.rpm
 dpkg -c wazuh-dashboard_5.0.0-1_amd64.deb  # DEB
 rpm -qlp wazuh-dashboard-5.0.0-1.x86_64.rpm  # RPM
 ```
+
+## Download packages
+
+Packages can be downloaded from the official Wazuh repositories:
+
+- Producción: `https://packages.wazuh.com/production/<MAJOR_VERSION>.x/<PACKAGE>`
+- Pre-release: `https://packages-staging.xdrsiem.wazuh.info/pre-release/<MAJOR_VERSION>.x/<PACKAGE>`
+- Nightly backup: `https://packages-staging.xdrsiem.wazuh.info/nightly-backup/<DATE>/<PACKAGE>`
+- Nightly: `https://packages-staging.xdrsiem.wazuh.info/nightly/<VERSION>/<PACKAGE>`
+- Development: `s3://xdrsiem-packages-dev-internal/development/wazuh/<MAJOR_VERSION>.x/<PACKAGE>`
+
+where:
+
+- `<DATE>`: date representation in `YYYY-MM-DD` format, e.g. `2026-03-27`
+- `<MAJOR_VERSION>`: major version number, e.g. `5`
+- `<VERSION>`: version number, e.g. `5.0.0`
+- `<PACKAGE>`: package name:
+
+| System            | Architecture     | Package name                                       |
+| ----------------- | ---------------- | -------------------------------------------------- |
+| Debian-based      | 64-bit Intel/AMD | `wazuh-dashboard_<VERSION>-<REVISION>_amd64.deb`   |
+| Debian-based      | 64-bit ARM       | `wazuh-dashboard_<VERSION>-<REVISION>_arm64.deb`   |
+| RHEL/CentOS-based | 64-bit Intel/AMD | `wazuh-dashboard-<VERSION>-<REVISION>.x86_64.rpm`  |
+| RHEL/CentOS-based | 64-bit ARM       | `wazuh-dashboard-<VERSION>-<REVISION>.aarch64.rpm` |
+
+where:
+
+- `VERSION`: app version. e.g. `5.0.0`
+- `REVISION`: app revision.
+  - For production packages, the revision is usually `1`.
+  - For pre-release packages, the revision can be `alpha1`, `alpha2`, `beta1`, `rc1`, etc. e.g. `rc1`
+  - For development packages, the revision is `latest`.
+
+Package examples:
+
+- Debian-based amd64 production: `wazuh-dashboard_5.0.0-1_amd64.deb`
+- Debian-based amd64 pre-release: `wazuh-dashboard_5.0.0-alpha1_amd64.deb`
+- Debian-based arm64 pre-release: `wazuh-dashboard.-5.0.0-rc1_arm64.deb`
+- RHEL/CentOS-based x86_64 production: `wazuh-dashboard-5.0.0-1.x86_64.rpm`
+- RHEL/CentOS-based x86_64 pre-release: `wazuh-dashboard-5.0.0-alpha1.x86_64.rpm`
+- RHEL/CentOS-based arm64 pre-release: `wazuh-dashboard-5.0.0-rc1.aarch64.rpm`
+
+URL examples:
+
+- Production package for Debian-based amd64: `https://packages.wazuh.com/production/5.x/wazuh-dashboard_5.0.0-1_amd64.deb`
+- Production package for RHEL/CentOS-based amd64: `https://packages.wazuh.com/production/5.x/wazuh-dashboard-5.0.0-1.x86_64.rpm`
+- Pre-release package for Debian-based arm64: `https://packages-staging.xdrsiem.wazuh.info/pre-release/5.x/wazuh-dashboard_5.0.0-alpha1_arm64.deb`
+- Pre-release package for RHEL/CentOS-based arm64: `https://packages-staging.xdrsiem.wazuh.info/pre-release/5.x/wazuh-dashboard-5.0.0-rc1.aarch64.rpm`
+- Nightly backup package for Debian-based amd64: `https://packages-staging.xdrsiem.wazuh.info/nightly-backup/2026-03-27/wazuh-dashboard_5.0.0-latest_amd64.deb`
+- Nightly backup package for RHEL/CentOS-based arm64: `https://packages-staging.xdrsiem.wazuh.info/nightly-backup/2026-03-27/wazuh-dashboard-5.0.0-latest.aarch64.rpm`
+- Development package for Debian-based amd64: `s3://xdrsiem-packages-dev-internal/development/wazuh/5.x/wazuh-dashboard_5.0.0-latest_amd64.deb`
+
+Download the package:
+
+- https
+
+```bash
+wget <URL>
+```
+
+where:
+
+- `<URL>`: is the package URL obtained in the previous step.
+
+- AWS S3:
+
+```bash
+aws s3 cp s3://xdrsiem-packages-dev-internal/development/wazuh/5.x/<PACKAGE> .
+```
+
+where:
+
+- `<PACKAGE>`: is the package name obtained in the previous step.
