@@ -898,6 +898,28 @@ async function main(config) {
     console.log(''); // Add spacing between processing
   }
 
+  // Generate combined FIM fields
+  try {
+    const combinedFields = await generateCombinedFields({
+      results,
+      config,
+      keyPrefix: 'states-fim-',
+      outputFileName: 'states-fim.json',
+      displayName: 'states-fim',
+    });
+    results['states-fim'] = combinedFields
+      ? { fields: combinedFields, warnings: [], errors: [] }
+      : null;
+  } catch (error) {
+    console.error(
+      'Failed to generate combined FIM fields:',
+      error.message,
+    );
+    process.exit(1);
+    results['states-fim'] = null;
+  }
+  console.log(''); // Add spacing
+
   // Generate combined inventory fields
   try {
     const combinedFields = await generateCombinedFields({

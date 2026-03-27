@@ -22,6 +22,7 @@ import {
   WAZUH_INDEX_TYPE_METRICS_AGENTS,
   WAZUH_INDEX_TYPE_METRICS_COMMS,
   WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
+  WAZUH_INDEX_TYPE_STATES_FIM,
   WAZUH_INDEX_TYPE_STATES_FIM_FILES,
   WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS,
   WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_VALUES,
@@ -55,6 +56,7 @@ import eventsOtherFields from '../../common/known-fields/events-other.json';
 import eventsSecurityFields from '../../common/known-fields/events-security.json';
 import eventsSystemActivityFields from '../../common/known-fields/events-system-activity.json';
 import vulnerabilitiesFields from '../../common/known-fields/states-vulnerabilities.json';
+import fimFields from '../../common/known-fields/states-fim.json';
 import fimFilesFields from '../../common/known-fields/states-fim-files.json';
 import fimRegistriesKeysFields from '../../common/known-fields/states-fim-registries-keys.json';
 import fimRegistriesValuesFields from '../../common/known-fields/states-fim-registries-keys.json';
@@ -104,6 +106,7 @@ export const KnownFieldsByIndexType = {
 
   // States index types
   [WAZUH_INDEX_TYPE_STATES_VULNERABILITIES]: vulnerabilitiesFields,
+  [WAZUH_INDEX_TYPE_STATES_FIM]: fimFields,
   [WAZUH_INDEX_TYPE_STATES_FIM_FILES]: fimFilesFields,
   [WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS]: fimRegistriesKeysFields,
   [WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_VALUES]: fimRegistriesValuesFields,
