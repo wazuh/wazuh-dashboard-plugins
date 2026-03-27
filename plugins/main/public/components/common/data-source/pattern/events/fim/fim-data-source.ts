@@ -21,7 +21,6 @@ export class FIMDataSource extends EventsDataSource {
   getFixedFilters(): tFilter[] {
     return [
       ...super.getFixedFiltersClusterManager(),
-      // ...this.getRuleGroupsFilter(), // Deactivate rule group filter since we're using wazuh-states-fim-files* indice
       ...super.getFixedFilters(),
     ];
   }
