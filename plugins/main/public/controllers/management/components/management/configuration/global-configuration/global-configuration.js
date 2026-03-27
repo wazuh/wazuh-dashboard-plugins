@@ -18,24 +18,14 @@ import WzTabSelector, {
 } from '../util-components/tab-selector';
 import WzConfigurationGlobalConfigurationGlobal from './global-configuration-global';
 import WzConfigurationGlobalConfigurationRemote from './global-configuration-remote';
+import WzConfigurationAgentsConfigurationGlobal from './global-configuration-agents';
 
 import withWzConfig from '../util-hocs/wz-config';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+import { configurationAssessment } from '../../../../../../utils/applications';
 
-/*
-  FIXME:  Reintroduce Global tab with the main settings if com/logging or a similar
-          endpoint is reintroduced.
-  <WzTabSelector>
-    <WzTabSelectorTab label='Global'>
-      <WzConfigurationGlobalConfigurationGlobal {...this.props} />
-    </WzTabSelectorTab>
-    <WzTabSelectorTab label='Remote'>
-      <WzConfigurationGlobalConfigurationRemote {...this.props} />
-    </WzTabSelectorTab>
-  </WzTabSelector>
-*/
 class WzConfigurationGlobalConfiguration extends Component {
   constructor(props) {
     super(props);
@@ -45,7 +35,14 @@ class WzConfigurationGlobalConfiguration extends Component {
     return (
       <Fragment>
         {!agent ? (
-          <WzConfigurationGlobalConfigurationRemote {...this.props} />
+          <WzTabSelector>
+            <WzTabSelectorTab label='Agents'>
+              <WzConfigurationAgentsConfigurationGlobal {...this.props} />
+            </WzTabSelectorTab>
+            <WzTabSelectorTab label='Remote'>
+              <WzConfigurationGlobalConfigurationRemote {...this.props} />
+            </WzTabSelectorTab>
+          </WzTabSelector>
         ) : (
           <WzConfigurationGlobalConfigurationGlobal {...this.props} />
         )}
@@ -55,6 +52,7 @@ class WzConfigurationGlobalConfiguration extends Component {
 }
 const sectionsManager = [
   { component: 'request', configuration: 'remote' },
+  { component: 'monitor', configuration: 'global' },
   //{ component: 'com', configuration: 'logging' },
 ];
 
