@@ -18,11 +18,13 @@ import WzTabSelector, {
 } from '../util-components/tab-selector';
 import WzConfigurationGlobalConfigurationGlobal from './global-configuration-global';
 import WzConfigurationGlobalConfigurationRemote from './global-configuration-remote';
+import WzConfigurationAgentsConfigurationGlobal from './global-configuration-agents';
 
 import withWzConfig from '../util-hocs/wz-config';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+import { configurationAssessment } from '../../../../../../utils/applications';
 
 class WzConfigurationGlobalConfiguration extends Component {
   constructor(props) {
@@ -34,8 +36,8 @@ class WzConfigurationGlobalConfiguration extends Component {
       <Fragment>
         {!agent ? (
           <WzTabSelector>
-            <WzTabSelectorTab label='Global'>
-              <WzConfigurationGlobalConfigurationGlobal {...this.props} />
+            <WzTabSelectorTab label='Agents'>
+              <WzConfigurationAgentsConfigurationGlobal {...this.props} />
             </WzTabSelectorTab>
             <WzTabSelectorTab label='Remote'>
               <WzConfigurationGlobalConfigurationRemote {...this.props} />
@@ -48,12 +50,10 @@ class WzConfigurationGlobalConfiguration extends Component {
     );
   }
 }
-
 const sectionsManager = [
-  { component: 'analysis', configuration: 'global' },
-  { component: 'mail', configuration: 'global' },
   { component: 'request', configuration: 'remote' },
-  { component: 'com', configuration: 'logging' },
+  { component: 'monitor', configuration: 'global' },
+  //{ component: 'com', configuration: 'logging' },
 ];
 
 const sectionsAgent = [{ component: 'com', configuration: 'logging' }];
