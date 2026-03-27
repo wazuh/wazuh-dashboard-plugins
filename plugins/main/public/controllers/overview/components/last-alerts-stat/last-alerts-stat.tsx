@@ -209,11 +209,6 @@ export const LastAlertsCountBySeverity = withDataSourceFetchOnStart({
           titleColor={severity.color}
           textAlign={textAlign}
         />
-        {hideBottomText ? null : (
-          <EuiText size='s' css='margin-top: 0.7vh'>
-            {`Severity: ${severity.label}`}
-          </EuiText>
-        )}
       </RedirectAppLinks>
     );
   },
@@ -316,11 +311,6 @@ export function LastAlertsStat({
           titleColor={severity.color}
           textAlign={textAlign}
         />
-        {hideBottomText ? null : (
-          <EuiText size='s' css='margin-top: 0.7vh'>
-            {`Severity: ${severity.label}`}
-          </EuiText>
-        )}
       </RedirectAppLinks>
     </EuiFlexItem>
   );
