@@ -36,18 +36,26 @@ Backup the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file to save your se
 cp /etc/wazuh-dashboard/opensearch_dashboards.yml /etc/wazuh-dashboard/opensearch_dashboards.yml.old
 ```
 
-3. Upgrade the Wazuh dashboard.
+3. Download the new package and install it.
 
-**Yum**
+See the [Package Download](getting-started/packages.md#package-download) section for available repositories and download instructions.
+
+**Debian-based:**
 
 ```bash
-yum upgrade wazuh-dashboard-5.0.0-1
+dpkg -i wazuh-dashboard_<VERSION>-<REVISION>_<ARCHITECTURE>.deb
 ```
 
-**APT**
+**RHEL/CentOS-based:**
 
 ```bash
-apt-get install wazuh-dashboard=5.0.0-1
+yum localinstall wazuh-dashboard-<VERSION>-<REVISION>.<ARCHITECTURE>.rpm
+```
+
+**RHEL/CentOS-based (DNF):**
+
+```bash
+dnf localinstall wazuh-dashboard-<VERSION>-<REVISION>.<ARCHITECTURE>.rpm
 ```
 
 > **Note:** When prompted, choose to replace the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file with the updated version.
