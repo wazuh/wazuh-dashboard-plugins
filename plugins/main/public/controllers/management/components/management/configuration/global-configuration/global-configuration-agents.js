@@ -51,6 +51,14 @@ class WzConfigurationAgentsConfigurationGlobal extends Component {
     const { currentConfig, agent, wazuhNotReadyYet } = this.props;
     const helpLinks = buildHelpLinks(agent);
     const agentsSettingsConfig = currentConfig['monitor-global'].monitord;
+    const agentsSettingsConfigMinutes =
+      agentsSettingsConfig.agents_disconnection_time
+        ? {
+            ...agentsSettingsConfig,
+            agents_disconnection_time:
+              agentsSettingsConfig.agents_disconnection_time / 60,
+          }
+        : agentsSettingsConfig;
     return (
       <Fragment>
         {currentConfig['monitor-global'] &&
@@ -73,7 +81,7 @@ class WzConfigurationAgentsConfigurationGlobal extends Component {
               help={helpLinks}
             >
               <WzConfigurationSettingsGroup
-                config={agentsSettingsConfig}
+                config={agentsSettingsConfigMinutes}
                 items={agentsSettings}
               />
             </WzConfigurationSettingsHeader>
