@@ -2,7 +2,7 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_CONFIGURATION_ASSASSMENT_RULE_GROUP } from '../../../../../../../common/constants';
 import { EventsDataSource } from '../events-data-source';
 
-const CONFIGURATION_ASSESSMENT_GROUP_KEY = 'wazuh.integration.decoders';
+const CONFIGURATION_ASSESSMENT_GROUP_KEY = 'wazuh.integration.name';
 const CONFIGURATION_ASSESSMENT_VALUE = 'wazuh-sca';
 
 export class ConfigurationAssessmentDataSource extends EventsDataSource {
