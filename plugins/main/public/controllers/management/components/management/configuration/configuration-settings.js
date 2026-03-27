@@ -25,12 +25,13 @@ export default [
         goto: 'global-configuration',
         when: 'manager',
       },
-      {
+      /*{ FIXME: Either remove cluster section or edit the endpoint it  
+                uses (if there is a valid endpoint with the info)
         name: 'Cluster',
         description: 'Master node configuration',
         goto: 'cluster',
         when: 'manager',
-      },
+      },*/
       {
         name: 'Registration Service',
         description: 'Automatic agent registration service',
@@ -65,6 +66,7 @@ export default [
     ],
   },
   {
+    // Wazuh: Removed this section for the manager.
     title: 'Auditing and policy monitoring',
     description: '',
     settings: [
@@ -73,6 +75,7 @@ export default [
         description:
           'Configuration to ensure compliance with security policies, standards and hardening guides',
         goto: 'policy-monitoring',
+        when: 'agent',
       },
     ],
   },
@@ -88,10 +91,12 @@ export default [
         when: 'manager',
       },
       {
+        // Wazuh: Removed this section for the manager.
         name: 'Inventory data',
         description:
           'Gather relevant information about system operating system, hardware, networking and packages',
         goto: 'inventory',
+        when: 'agent',
       },
       {
         name: 'Commands',
@@ -101,6 +106,7 @@ export default [
     ],
   },
   {
+    // Wazuh: Removed this section for the manager.
     title: 'Log data analysis',
     description: '',
     settings: [
@@ -109,12 +115,14 @@ export default [
         description:
           'Log analysis from text files, Windows events or syslog outputs',
         goto: 'log-collection',
+        when: 'agent',
       },
       {
         name: 'Integrity monitoring',
         description:
           'Identify changes in content, permissions, ownership, and attributes of files',
         goto: 'integrity-monitoring',
+        when: 'agent',
       },
     ],
   },
