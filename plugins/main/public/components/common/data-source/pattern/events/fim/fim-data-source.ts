@@ -21,7 +21,6 @@ export class FIMDataSource extends EventsDataSource {
   getFixedFilters(): tFilter[] {
     return [
       ...super.getFixedFiltersClusterManager(),
-      ...this.getRuleGroupsFilter(),
       ...super.getFixedFilters(),
     ];
   }
