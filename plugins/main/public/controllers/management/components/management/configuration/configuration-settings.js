@@ -56,13 +56,14 @@ export default [
         goto: 'client-buffer',
         when: 'agent',
       },
-      {
-        name: 'Labels',
-        description:
-          'User-defined information about the agent included in alerts',
-        goto: 'alerts-agent',
-        when: 'agent',
-      },
+      // Wazuh: Removed this section for the agent.
+      // {
+      //   name: 'Labels',
+      //   description:
+      //     'User-defined information about the agent included in alerts',
+      //   goto: 'alerts-agent',
+      //   when: 'agent',
+      // },
     ],
   },
   {
