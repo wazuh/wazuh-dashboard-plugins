@@ -911,10 +911,7 @@ async function main(config) {
       ? { fields: combinedFields, warnings: [], errors: [] }
       : null;
   } catch (error) {
-    console.error(
-      'Failed to generate combined FIM fields:',
-      error.message,
-    );
+    console.error('Failed to generate combined FIM fields:', error.message);
     process.exit(1);
     results['states-fim'] = null;
   }

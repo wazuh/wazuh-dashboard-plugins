@@ -6,7 +6,7 @@ import {
 } from '../../../../../../common/constants';
 import { createPatternDataSourceRepositoryUseValue } from '../pattern-data-source-repository-use-setting-value';
 
-export const FIMDataSourceRepository = 
+export const FIMDataSourceRepository =
   createPatternDataSourceRepositoryUseValue(WAZUH_FIM_PATTERN);
 
 export const FIMFilesStatesDataSourceRepository =
