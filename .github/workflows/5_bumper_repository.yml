@@ -19,6 +19,11 @@ on:
         default: false
         required: false
         type: boolean
+      set-as-main:
+        description: 'Enable main branch mode: bump version values only, keep branch references pointing to main'
+        required: false
+        type: boolean
+        default: false
       issue-link:
         description: 'Issue link in format https://github.com/wazuh/<REPO>/issues/<ISSUE-NUMBER>'
         required: true
@@ -82,11 +87,13 @@ jobs:
           VERSION: ${{ inputs.version }}
           STAGE: ${{ inputs.stage }}
           TAG: ${{ inputs.tag }}
+          SET_AS_MAIN: ${{ inputs.set-as-main }}
         run: |
           script_params=""
           version=${{ env.VERSION }}
           stage=${{ env.STAGE }}
           tag=${{ env.TAG }}
+          set_as_main=${{ env.SET_AS_MAIN }}
 
           # Both version and stage provided
           if [[ -n "$version" && -n "$stage" && "$tag" != "true" ]]; then
@@ -95,6 +102,10 @@ jobs:
             script_params="--stage ${stage} --tag"
           elif [[ -z "$version" && -z "$stage" && "$tag" == "true" ]]; then
             script_params="--tag"
+          fi
+
+          if [[ "$set_as_main" == "true" ]]; then
+            script_params="${script_params} --set-as-main"
           fi
 
           issue_number=$(echo "${{ inputs.issue-link }}" | awk -F'/' '{print $NF}')

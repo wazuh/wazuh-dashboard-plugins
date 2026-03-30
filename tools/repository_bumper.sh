@@ -14,6 +14,8 @@ DATE_TIME=$(date "+%Y-%m-%d_%H-%M-%S" 2>/dev/null || date "+%Y-%m-%d_%H-%M-%S")
 LOG_FILE="${SCRIPT_PATH}/repository_bumper_${DATE_TIME}.log"
 VERSION_FILE="${REPO_PATH}/VERSION.json"
 VERSION=""
+SET_AS_MAIN=""
+SKIP_URLS=""
 STAGE=""
 REVISION="00"
 TAG=false
@@ -58,7 +60,7 @@ log() {
 
 # Function to show usage
 usage() {
-  echo "Usage: $0 [--version VERSION --stage STAGE | --tag] [--help]"
+  echo "Usage: $0 [--version VERSION --stage STAGE | --tag] [--set-as-main] [--help]"
   echo ""
   echo "Parameters:"
   echo "  --version VERSION   Specify the version (e.g., 4.6.0)"
@@ -69,12 +71,14 @@ usage() {
   echo "                      If --stage is not set, it will be stageless(e.g., v4.6.0)"
   echo "                      Otherwise it will be with the provided stage (e.g., v4.6.0-alpha1)"
   echo "                      If this is set, --version and --stage are not required."
+  echo "  --set-as-main       Skip updating branch/URL references (used when updating 'main' itself)"
   echo "  --help              Display this help message"
   echo ""
   echo "Examples:"
   echo "  $0 --version 4.6.0 --stage alpha0"
   echo "  $0 --tag --stage alpha1"
   echo "  $0 --tag"
+  echo "  $0 --set-as-main --version 5.0.0"
 }
 
 # Function to update JSON file using sed
@@ -184,6 +188,51 @@ update_endpoints_json() {
   }
 }
 
+# Function to handle main -> version freeze for branch-related fields
+update_branch_references() {
+  if [[ "$SKIP_URLS" == "yes" ]]; then
+    log "skip_urls is set. Skipping 'main' branch reference freeze."
+    return
+  fi
+
+  local replacement
+  if [ "$TAG" = true ]; then
+    replacement="v${VERSION}"
+    if [ -n "$STAGE" ]; then
+      replacement+="-${STAGE}"
+    fi
+  else
+    replacement="${VERSION}"
+  fi
+
+  log "Freezing 'main' branch references to '$replacement' in repo files..."
+
+  # Pattern: default: main (with or without quotes)
+  # Matches:
+  #   default: main
+  #   default: 'main'
+  #   default: "main"
+  # Only found matches in ./github/workflows
+  local workflow_dir="${REPO_PATH}/.github/workflows"
+  
+  if [ -d "$workflow_dir" ]; then
+    log "Updating branch references to $replacement"
+    # Loop .yml files in the directory.
+    find "$workflow_dir" -name "*.yml" -type f | while IFS= read -r workflow_file; do
+      # For each file find the matches.
+      if grep -q "default:[[:space:]]*['\"]\\?main['\"]\\?" "$workflow_file"; then
+        # For each match, replace with 
+        sed -i -E "s/(default:[[:space:]]*['\"]?)main(['\"]?)/\1${replacement}\2/g" "$workflow_file"
+        log "Updated branch references in $workflow_file"
+      fi
+    done
+  else
+    log "WARNING: GitHub workflows directory not found at $workflow_dir"
+  fi
+
+  log "Successfully updated branch references."
+}
+
 # Function to update specFile URL in docker/imposter/wazuh-config.yml
 update_imposter_config() {
   local new_version="$1"
@@ -191,6 +240,11 @@ update_imposter_config() {
 
   if [ ! -f "$imposter_config_file" ]; then
     log "WARNING: $imposter_config_file not found. Skipping specFile URL update."
+    return
+  fi
+
+  if [[ "$SKIP_URLS" == "yes" ]]; then
+    log "SKIP_URLS is set. Skipping imposter config main branch reference update."
     return
   fi
 
@@ -245,6 +299,10 @@ parse_arguments() {
       TAG=true
       shift
       ;;
+    --set-as-main)
+      SET_AS_MAIN="yes"
+      shift 1
+      ;;
     *)
       log "ERROR: Unknown option: $1" # Log error instead of just echo
       usage
@@ -256,6 +314,12 @@ parse_arguments() {
 
 # Function to validate input parameters
 validate_input() {
+  if [[ -n "$SET_AS_MAIN" ]]; then
+    SKIP_URLS="yes"
+  else
+    SKIP_URLS="no"
+  fi
+
   if [ -z "$VERSION" ] && [ "$TAG" != true ]; then
     log "ERROR: --version is required unless --tag is set"
     usage
@@ -296,7 +360,7 @@ pre_update_checks() {
     exit 1 # Exit if sed fails
   fi
   log "Successfully extracted version using sed: $CURRENT_VERSION"
-
+  
   if [ "$CURRENT_VERSION" == "null" ]; then # Check specifically for "null" string if sed might output that
     log "ERROR: Could not read current version from $VERSION_FILE (value was 'null')"
     exit 1
@@ -564,6 +628,9 @@ main() {
   update_changelog
   update_endpoints_json "$CURRENT_MAJOR_MINOR" "$NEW_MAJOR_MINOR"
 
+  # Freeze main branch references if we are NOT on a main-update flow
+  update_branch_references
+  
   # Update docker/imposter/wazuh-config.yml
   log "Updating docker/imposter/wazuh-config.yml..."
   update_imposter_config "$VERSION"
