@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { isEqual } from 'lodash';
 import {
   SearchBarProps,
@@ -11,6 +11,11 @@ import {
 import { getDataPlugin } from '../../../kibana-services';
 import { useQueryManager, useTimeFilter } from '../hooks';
 import { useSavedQuery } from '../hooks/saved_query/use_saved_query';
+import {
+  createManagedFilters,
+  isManagedFilter,
+  ManagedFiltersSpec,
+} from './use-custom-search-bar-filters';
 
 // Input - types
 type tUseSearchBarCustomInputs = {
@@ -23,6 +28,7 @@ type tUseSearchBarCustomInputs = {
     payload: { dateRange: TimeRange; query?: Query },
     isUpdate?: boolean,
   ) => void;
+  managedFiltersSpec?: ManagedFiltersSpec;
 };
 export type tUseSearchBarProps = Partial<SearchBarProps> &
   tUseSearchBarCustomInputs;
@@ -32,6 +38,7 @@ type tUserSearchBarResponse = {
   searchBarProps: Partial<
     SearchBarProps & {
       useDefaultBehaviors: boolean;
+      postFixedFilters: Filter[] | null;
     }
   >;
   fingerprint: number;
@@ -130,6 +137,51 @@ const useSearchBarConfiguration = (
     return await indexPatternService.getDefault();
   };
 
+  // Define and separate managed and non-managed filters
+  const { userManagedFilters, nonManagedFilters } = useMemo(() => {
+    if (!props.managedFiltersSpec) {
+      return {
+        userManagedFilters: [] as Filter[],
+        nonManagedFilters: filters,
+      };
+    }
+
+    const managedFiltersSpecValues = Object.values(
+      props.managedFiltersSpec,
+    ) as ManagedFiltersSpec[keyof ManagedFiltersSpec][];
+
+    return filters.reduce<{
+      userManagedFilters: Filter[];
+      nonManagedFilters: Filter[];
+    }>(
+      (
+        acc: { userManagedFilters: Filter[]; nonManagedFilters: Filter[] },
+        filter: Filter,
+      ) => {
+        const isFilterManaged = managedFiltersSpecValues.some(
+          ({ managedField, selector, controlledBy }) =>
+            isManagedFilter(filter, {
+              managedField,
+              selector,
+              controlledBy,
+            }),
+        );
+
+        if (isFilterManaged) {
+          acc.userManagedFilters.push(filter);
+        } else {
+          acc.nonManagedFilters.push(filter);
+        }
+
+        return acc;
+      },
+      {
+        userManagedFilters: [] as Filter[],
+        nonManagedFilters: [] as Filter[],
+      },
+    );
+  }, [filters, props.managedFiltersSpec]);
+
   /**
    * Search bar properties necessary to render and initialize the osd search bar component
    */
@@ -141,16 +193,18 @@ const useSearchBarConfiguration = (
   > = {
     isLoading,
     ...(indexPatternSelected && { indexPatterns: [indexPatternSelected] }), // indexPattern cannot be empty or empty []
-    filters,
+    filters: nonManagedFilters,
     query,
     timeHistory,
     dateRangeFrom: timeFilter.from,
     dateRangeTo: timeFilter.to,
-    onFiltersUpdated: (userFilters: Filter[]) => {
+    onFiltersUpdated: (searchBarFilters: Filter[]) => {
+      // Combine the filters managed by the search bar and the user controlled filters (not passed to the search bar). This ensures when using the Add filter button, the user controlled filters are not lost.
+      const newFilters = [...userManagedFilters, ...searchBarFilters];
       setFilters
-        ? setFilters(userFilters)
+        ? setFilters(newFilters)
         : console.warn('setFilters function is not defined');
-      props?.onFiltersUpdated && props?.onFiltersUpdated(userFilters);
+      props?.onFiltersUpdated && props?.onFiltersUpdated(newFilters);
     },
     refreshInterval:
       queryService.timefilter.timefilter.getRefreshInterval().value,
@@ -191,6 +245,12 @@ const useSearchBarConfiguration = (
     onSaved: setSavedQuery,
     onSavedQueryUpdated: setSavedQuery,
     savedQuery,
+    postFixedFilters: props.managedFiltersSpec
+      ? createManagedFilters(props.managedFiltersSpec, {
+          filters: filters,
+          setFilters,
+        })
+      : null,
   };
 
   return {
