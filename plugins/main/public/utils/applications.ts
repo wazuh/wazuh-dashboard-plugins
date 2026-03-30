@@ -692,7 +692,7 @@ export const Applications = [
   endpointGroups,
   serverStatus,
   // cluster,
-  // statistics,
+  statistics,
   logs,
   settings,
   serverApis,

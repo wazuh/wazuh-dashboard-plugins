@@ -29,7 +29,8 @@ import {
   HttpError,
 } from '../../../../react-services/error-management';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
-import { DashboardAnalysisEngineStatistics } from './dashboard_analysis_engine';
+// TODO: DashboardAnalysisEngineStatistics is commented out until analysisd metrics have a new data stream
+// import { DashboardAnalysisEngineStatistics } from './dashboard_analysis_engine';
 import { DashboardListenerEngineStatistics } from './dashboard_listener_engine';
 import { SampleDataWarning } from '../../../visualize/components';
 import { WAZUH_SAMPLE_METRICS_COMMS } from '../../../../../common/constants';
@@ -70,8 +71,9 @@ export const DashboardTabsPanels = ({
   const infoMessage = {
     remoted:
       'Remoted statistics are cumulative, this means that the information shown is since the data exists.',
-    analysisd:
-      "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'.",
+    // TODO: analysisd tab is commented out until analysisd metrics have a new data stream
+    // analysisd:
+    //   "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'.",
   };
 
   const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
@@ -129,7 +131,7 @@ export const DashboardTabsPanels = ({
     },
     query: {
       match: {
-        nodeName: clusterNodeSelected,
+        'wazuh.cluster.node': clusterNodeSelected,
       },
     },
     $state: {
@@ -203,6 +205,7 @@ export const DashboardTabsPanels = ({
               />
             </div>
           )}
+          {/* TODO: analysisd tab is commented out until analysisd metrics have a new data stream
           {selectedTab === 'analysisd' && !loadingNode && (
             <DashboardAnalysisEngineStatistics
               indexPatternId={dataSource?.id}
@@ -215,6 +218,7 @@ export const DashboardTabsPanels = ({
               }
             />
           )}
+          */}
         </>
       ) : null}
       {error && <PromptErrorInitializatingDataSource error={error} />}

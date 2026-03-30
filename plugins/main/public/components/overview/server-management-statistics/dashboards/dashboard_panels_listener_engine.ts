@@ -90,7 +90,7 @@ const getVisStateTotalNumberOfBytesReceived = (indexPatternId?: string) => {
     uiState: {
       vis: {
         colors: {
-          'recv_bytes': '#70DBED', // prettier-ignore
+          'network.ingress.bytes': '#70DBED', // prettier-ignore
         },
       },
     },
@@ -116,7 +116,7 @@ const getVisStateTotalNumberOfBytesReceived = (indexPatternId?: string) => {
           enabled: true,
           type: 'avg',
           params: {
-            field: 'remoted.recv_bytes',
+            field: 'network.ingress.bytes',
             customLabel: 'Count',
           },
           schema: 'metric',
@@ -126,7 +126,7 @@ const getVisStateTotalNumberOfBytesReceived = (indexPatternId?: string) => {
           enabled: true,
           type: 'date_histogram',
           params: {
-            field: 'timestamp',
+            field: '@timestamp',
             timeRange: {
               from: 'now-24h',
               to: 'now',
@@ -137,7 +137,7 @@ const getVisStateTotalNumberOfBytesReceived = (indexPatternId?: string) => {
             drop_partials: false,
             min_doc_count: 1,
             extended_bounds: {},
-            customLabel: 'timestamp',
+            customLabel: '@timestamp',
           },
           schema: 'segment',
         },
@@ -149,10 +149,10 @@ const getVisStateTotalNumberOfBytesReceived = (indexPatternId?: string) => {
             filters: [
               {
                 input: {
-                  query: 'remoted.recv_bytes:*',
+                  query: 'network.ingress.bytes:*',
                   language: 'kuery',
                 },
-                label: 'recv_bytes',
+                label: 'network.ingress.bytes',
               },
             ],
           },
@@ -247,7 +247,7 @@ const getVisStateEventsSentToAnalysisd = (indexPatternId?: string) => {
     uiState: {
       vis: {
         colors: {
-          'evt_count': '#70DBED', // prettier-ignore
+          'events.total': '#70DBED', // prettier-ignore
         },
       },
     },
@@ -273,7 +273,7 @@ const getVisStateEventsSentToAnalysisd = (indexPatternId?: string) => {
           enabled: true,
           type: 'avg',
           params: {
-            field: 'remoted.evt_count',
+            field: 'events.total',
             customLabel: 'Count',
           },
           schema: 'metric',
@@ -283,7 +283,7 @@ const getVisStateEventsSentToAnalysisd = (indexPatternId?: string) => {
           enabled: true,
           type: 'date_histogram',
           params: {
-            field: 'timestamp',
+            field: '@timestamp',
             timeRange: {
               from: 'now-30m',
               to: 'now',
@@ -294,7 +294,7 @@ const getVisStateEventsSentToAnalysisd = (indexPatternId?: string) => {
             drop_partials: false,
             min_doc_count: 1,
             extended_bounds: {},
-            customLabel: 'timestamp',
+            customLabel: '@timestamp',
           },
           schema: 'segment',
         },
@@ -306,10 +306,10 @@ const getVisStateEventsSentToAnalysisd = (indexPatternId?: string) => {
             filters: [
               {
                 input: {
-                  query: 'remoted.evt_count:*',
+                  query: 'events.total:*',
                   language: 'kuery',
                 },
-                label: 'evt_count',
+                label: 'events.total',
               },
             ],
           },
@@ -404,7 +404,7 @@ const getVisStateTCPSessions = (indexPatternId?: string) => {
     uiState: {
       vis: {
         colors: {
-          "tcp_sessions": "#70DBED", // prettier-ignore
+          'tcp.sessions': '#70DBED', // prettier-ignore
         },
       },
     },
@@ -430,7 +430,7 @@ const getVisStateTCPSessions = (indexPatternId?: string) => {
           enabled: true,
           type: 'sum',
           params: {
-            field: 'remoted.tcp_sessions',
+            field: 'tcp.sessions',
             customLabel: 'Count',
           },
           schema: 'metric',
@@ -440,7 +440,7 @@ const getVisStateTCPSessions = (indexPatternId?: string) => {
           enabled: true,
           type: 'date_histogram',
           params: {
-            field: 'timestamp',
+            field: '@timestamp',
             timeRange: {
               from: 'now-24h',
               to: 'now',
@@ -451,7 +451,7 @@ const getVisStateTCPSessions = (indexPatternId?: string) => {
             drop_partials: false,
             min_doc_count: 1,
             extended_bounds: {},
-            customLabel: 'timestamp',
+            customLabel: '@timestamp',
           },
           schema: 'segment',
         },
@@ -463,10 +463,10 @@ const getVisStateTCPSessions = (indexPatternId?: string) => {
             filters: [
               {
                 input: {
-                  query: 'remoted.tcp_sessions:*',
+                  query: 'tcp.sessions:*',
                   language: 'kuery',
                 },
-                label: 'tcp_sessions',
+                label: 'tcp.sessions',
               },
             ],
           },
