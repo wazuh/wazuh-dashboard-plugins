@@ -20,7 +20,7 @@ on:
       reference:
         required: true
         type: string
-        default: main
+        default: 5.1.0
         description: Git reference (branch, tag, or commit SHA) to build from.
       command:
         required: true
