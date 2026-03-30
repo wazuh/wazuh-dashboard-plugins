@@ -71,6 +71,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the agent stats view was innaccesible for some version combinations [#8150](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8150)
 - Fixed the button tooltip showing administrator role requirement where it wasn't needed [#8196](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8196)
 - Fixed a message in the group selector of the deploy new agent guide related to missing permissions when there was no groups available or they could not be obtained [#8216](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8216)
+- Fixed the under evaluation filter was removed on filter addition in Vulnerability Detection [#8252](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8252)
 
 ### Removed
 
