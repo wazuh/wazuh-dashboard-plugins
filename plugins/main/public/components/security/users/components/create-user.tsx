@@ -15,6 +15,7 @@ import {
   EuiPanel,
   EuiConfirmModal,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 
 import { useApiService } from '../../../common/hooks/useApiService';
 import { Role } from '../../roles/types/role.type';
@@ -225,7 +226,7 @@ export const CreateUser = ({ closeFlyout }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title='Unsubmitted changes'
+          title={i18n.translate('wazuh.security.users.unsubmittedchanges', { defaultMessage: {i18n.translate('wazuh.security.users.unsubmittedchanges', { defaultMessage: 'Unsubmitted changes' })} })}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
@@ -266,24 +267,24 @@ export const CreateUser = ({ closeFlyout }) => {
       <WzFlyout onClose={onClose} flyoutProps={{ className: 'wzApp' }}>
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size='m'>
-            <h2>Create new user</h2>
+            <h2>{i18n.translate('wazuh.security.users.createnewuser', { defaultMessage: 'Create new user' })}</h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
           <EuiForm component='form' style={{ padding: 24 }}>
             <EuiPanel>
               <EuiTitle size='s'>
-                <h2>User data</h2>
+                <h2>{i18n.translate('wazuh.security.users.userdata', { defaultMessage: 'User data' })}</h2>
               </EuiTitle>
               <EuiSpacer />
               <EuiFormRow
-                label='User name'
+                label={i18n.translate('wazuh.security.users.username', { defaultMessage: {i18n.translate('wazuh.security.users.username', { defaultMessage: {i18n.translate('wazuh.security.users.username', { defaultMessage: 'User name' })} })} })}
                 isInvalid={!!formErrors.userName}
                 error={formErrors.userName}
                 helpText='Introduce the user name for the user.'
               >
                 <EuiFieldText
-                  placeholder='User name'
+                  placeholder={i18n.translate('wazuh.security.users.username', { defaultMessage: {i18n.translate('wazuh.security.users.username', { defaultMessage: 'User name' })} })}
                   value={userName}
                   onChange={e => onChangeUserName(e)}
                   aria-label=''
@@ -291,13 +292,13 @@ export const CreateUser = ({ closeFlyout }) => {
                 />
               </EuiFormRow>
               <EuiFormRow
-                label='Password'
+                label={i18n.translate('wazuh.security.users.password', { defaultMessage: {i18n.translate('wazuh.security.users.password', { defaultMessage: {i18n.translate('wazuh.security.users.password', { defaultMessage: 'Password' })} })} })}
                 isInvalid={!!formErrors.password}
                 error={formErrors.password}
                 helpText='Introduce a new password for the user.'
               >
                 <EuiFieldPassword
-                  placeholder='Password'
+                  placeholder={i18n.translate('wazuh.security.users.password', { defaultMessage: {i18n.translate('wazuh.security.users.password', { defaultMessage: 'Password' })} })}
                   value={password}
                   onChange={e => onChangePassword(e)}
                   aria-label=''
@@ -305,13 +306,13 @@ export const CreateUser = ({ closeFlyout }) => {
                 />
               </EuiFormRow>
               <EuiFormRow
-                label='Confirm Password'
+                label={i18n.translate('wazuh.security.users.confirmpassword', { defaultMessage: {i18n.translate('wazuh.security.users.confirmpassword', { defaultMessage: {i18n.translate('wazuh.security.users.confirmpassword', { defaultMessage: 'Confirm Password' })} })} })}
                 isInvalid={!!formErrors.confirmPassword}
                 error={formErrors.confirmPassword}
                 helpText='Confirm the new password.'
               >
                 <EuiFieldPassword
-                  placeholder='Confirm Password'
+                  placeholder={i18n.translate('wazuh.security.users.confirmpassword', { defaultMessage: {i18n.translate('wazuh.security.users.confirmpassword', { defaultMessage: 'Confirm Password' })} })}
                   value={confirmPassword}
                   onChange={e => onChangeConfirmPassword(e)}
                   aria-label=''
@@ -319,12 +320,12 @@ export const CreateUser = ({ closeFlyout }) => {
                 />
               </EuiFormRow>
               <EuiFormRow
-                label='Allow run as'
+                label={i18n.translate('wazuh.security.users.allowrunas', { defaultMessage: {i18n.translate('wazuh.security.users.allowrunas', { defaultMessage: {i18n.translate('wazuh.security.users.allowrunas', { defaultMessage: 'Allow run as' })} })} })}
                 helpText='Set if the user is able to use run as'
               >
                 <WzButtonPermissions
                   buttonType='switch'
-                  label='Allow run as'
+                  label={i18n.translate('wazuh.security.users.allowrunas', { defaultMessage: {i18n.translate('wazuh.security.users.allowrunas', { defaultMessage: {i18n.translate('wazuh.security.users.allowrunas', { defaultMessage: 'Allow run as' })} })} })}
                   showLabel={false}
                   checked={allowRunAs}
                   permissions={[
@@ -338,11 +339,11 @@ export const CreateUser = ({ closeFlyout }) => {
             <EuiSpacer />
             <EuiPanel>
               <EuiTitle size='s'>
-                <h2>User roles</h2>
+                <h2>{i18n.translate('wazuh.security.users.userroles', { defaultMessage: 'User roles' })}</h2>
               </EuiTitle>
               <EuiFormRow label='' helpText='Assign roles to the selected user'>
                 <EuiComboBox
-                  placeholder='Select roles'
+                  placeholder={i18n.translate('wazuh.security.users.selectroles', { defaultMessage: 'Select roles' })}
                   options={rolesOptions}
                   selectedOptions={selectedRoles}
                   isLoading={rolesLoading || isLoading}

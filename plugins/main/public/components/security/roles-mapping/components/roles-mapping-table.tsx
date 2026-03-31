@@ -8,6 +8,7 @@ import {
   EuiBasicTableColumn,
   SortDirection,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 import { WzButtonPermissionsModalConfirm } from '../../../common/buttons';
 import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
@@ -80,13 +81,13 @@ export const RolesMappingTable = ({
     },
     {
       field: 'name',
-      name: 'Name',
+      name={i18n.translate('wazuh.security.roles.name', { defaultMessage: {i18n.translate('wazuh.security.roles.name', { defaultMessage: 'Name' })} })},
       sortable: true,
       truncateText: true,
     },
     {
       field: 'roles',
-      name: 'Roles',
+      name={i18n.translate('wazuh.security.roles.roles', { defaultMessage: {i18n.translate('wazuh.security.roles.roles', { defaultMessage: 'Roles' })} })},
       sortable: true,
       render: item => {
         const tmpRoles = item.map((role, idx) => {
@@ -106,13 +107,13 @@ export const RolesMappingTable = ({
     },
     {
       field: 'id',
-      name: 'Status',
+      name={i18n.translate('wazuh.security.roles.status', { defaultMessage: {i18n.translate('wazuh.security.roles.status', { defaultMessage: 'Status' })} })},
       render(item, obj) {
         if (WzAPIUtils.isReservedID(item)) {
           if (WAZUH_API_RESERVED_WUI_SECURITY_RULES.includes(obj.id)) {
             return (
               <EuiFlexGroup>
-                <EuiBadge color='primary'>Reserved</EuiBadge>
+                <EuiBadge color='primary'>{i18n.translate('wazuh.security.roles.reserved', { defaultMessage: 'Reserved' })}</EuiBadge>
                 <EuiToolTip
                   position='top'
                   content='wui_ rules belong to wazuh-wui API user'
@@ -123,7 +124,7 @@ export const RolesMappingTable = ({
                 </EuiToolTip>
               </EuiFlexGroup>
             );
-          } else return <EuiBadge color='primary'>Reserved</EuiBadge>;
+          } else return <EuiBadge color='primary'>{i18n.translate('wazuh.security.roles.reserved', { defaultMessage: 'Reserved' })}</EuiBadge>;
         }
       },
       width: '300',
@@ -132,7 +133,7 @@ export const RolesMappingTable = ({
     {
       align: 'right',
       width: '5%',
-      name: 'Actions',
+      name={i18n.translate('wazuh.security.roles.actions', { defaultMessage: {i18n.translate('wazuh.security.roles.actions', { defaultMessage: 'Actions' })} })},
       render: item => (
         <div onClick={ev => ev.stopPropagation()}>
           <WzButtonPermissionsModalConfirm
@@ -143,7 +144,7 @@ export const RolesMappingTable = ({
             tooltip={{
               content: WzAPIUtils.isReservedID(item.id)
                 ? "Reserved role mapping can't be deleted"
-                : 'Delete role mapping',
+                : {i18n.translate('wazuh.security.roles.deleterolemapping', { defaultMessage: {i18n.translate('wazuh.security.roles.deleterolemapping', { defaultMessage: 'Delete role mapping' })} })},
               position: 'left',
             }}
             isDisabled={WzAPIUtils.isReservedID(item.id)}
@@ -152,9 +153,9 @@ export const RolesMappingTable = ({
             modalProps={{ buttonColor: 'danger' }}
             iconType='trash'
             color='danger'
-            aria-label='Delete role mapping'
-            modalCancelText='Cancel'
-            modalConfirmText='Confirm'
+            aria-label={i18n.translate('wazuh.security.roles.deleterolemapping', { defaultMessage: {i18n.translate('wazuh.security.roles.deleterolemapping', { defaultMessage: {i18n.translate('wazuh.security.roles.deleterolemapping', { defaultMessage: 'Delete role mapping' })} })} })}
+            modalCancelText={i18n.translate('wazuh.security.roles.cancel', { defaultMessage: 'Cancel' })}
+            modalConfirmText={i18n.translate('wazuh.security.roles.confirm', { defaultMessage: 'Confirm' })}
           />
         </div>
       ),

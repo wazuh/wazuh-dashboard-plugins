@@ -7,6 +7,7 @@ import {
   EuiButtonIcon,
   EuiText,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import _ from 'lodash';
 import {
   IWzRibbonBody,
@@ -114,14 +115,14 @@ export const InventoryMetrics = compose(
   const items: IRibbonItem[] = [
     {
       key: 'cores',
-      label: 'Cores',
+      label: {i18n.translate('wazuh.cores', { defaultMessage: 'Cores' })},
       value: data?.hardware?.host?.cpu?.cores,
       isLoading: isLoading,
       style: { maxWidth: 100 },
     },
     {
       key: 'memory',
-      label: 'Memory',
+      label: {i18n.translate('wazuh.memory', { defaultMessage: 'Memory' })},
       render: () =>
         itHygieneHardwareDataSource?.dataSource?.indexPattern && (
           <IndexPatternFormattedField // This could be used to render the rest of fields to take into account the field formatter
@@ -135,21 +136,21 @@ export const InventoryMetrics = compose(
     },
     {
       key: 'cpu',
-      label: 'CPU',
+      label: {i18n.translate('wazuh.cpu', { defaultMessage: 'CPU' })},
       value: data?.hardware?.host?.cpu?.name,
       isLoading: isLoading,
       style: { maxWidth: 250 },
     },
     {
       key: 'hostname',
-      label: 'Host name',
+      label: {i18n.translate('wazuh.hostname', { defaultMessage: 'Host name' })},
       value: data?.software?.host?.hostname,
       isLoading: isLoading,
       style: { maxWidth: 100 },
     },
     {
       key: 'serial_number',
-      label: 'Serial number',
+      label: {i18n.translate('wazuh.serialnumber', { defaultMessage: 'Serial number' })},
       value: data?.hardware?.host?.serial_number,
       isLoading: isLoading,
       style: { maxWidth: 100 },
@@ -162,7 +163,7 @@ export const InventoryMetrics = compose(
         title={
           <EuiFlexGroup justifyContent='spaceBetween'>
             <EuiFlexItem grow={false}>
-              <Typography level='section'>System inventory</Typography>
+              <Typography level='section'>{i18n.translate('wazuh.systeminventory', { defaultMessage: 'System inventory' })}</Typography>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <RedirectAppLinks application={getCore().application}>
@@ -170,7 +171,7 @@ export const InventoryMetrics = compose(
                   <EuiButtonIcon
                     iconType='popout'
                     color='primary'
-                    className='EuiButtonIcon'
+                    className={i18n.translate('wazuh.euibuttonicon', { defaultMessage: 'EuiButtonIcon' })}
                     href={NavigationService.getInstance().getUrlForApp(
                       ITHygiene.id,
                     )}

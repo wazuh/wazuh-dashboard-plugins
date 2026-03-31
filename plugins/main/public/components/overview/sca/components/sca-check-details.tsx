@@ -7,6 +7,7 @@ import {
   EuiSpacer,
   EuiPanel,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 
 interface CheckDetailsProps {
   check: {
@@ -26,7 +27,7 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ document }) => {
     <EuiFlexGroup direction='column' gutterSize='m' style={{ padding: 16 }}>
       <EuiFlexItem>
         <EuiTitle size='s'>
-          <h3>Description</h3>
+          <h3>{i18n.translate('wazuh.description', { defaultMessage: 'Description' })}</h3>
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>
@@ -36,7 +37,7 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ document }) => {
 
       <EuiFlexItem>
         <EuiTitle size='s'>
-          <h3>Rationale</h3>
+          <h3>{i18n.translate('wazuh.rationale', { defaultMessage: 'Rationale' })}</h3>
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>
@@ -46,7 +47,7 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ document }) => {
 
       <EuiFlexItem>
         <EuiTitle size='s'>
-          <h3>Remediation</h3>
+          <h3>{i18n.translate('wazuh.remediation', { defaultMessage: 'Remediation' })}</h3>
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>
@@ -70,7 +71,7 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ document }) => {
 
       <EuiFlexItem>
         <EuiTitle size='s'>
-          <h3>Compliance</h3>
+          <h3>{i18n.translate('wazuh.compliance', { defaultMessage: 'Compliance' })}</h3>
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>

@@ -16,6 +16,7 @@ import {
   EuiDescriptionListTitle,
   EuiDescriptionListDescription,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
@@ -132,7 +133,7 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
             <EuiFlexGroup gutterSize='m'>
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
-                  <EuiDescriptionListTitle>Agent ID</EuiDescriptionListTitle>
+                  <EuiDescriptionListTitle>{i18n.translate('wazuh.endpointsSummary.table.actions.agentid', { defaultMessage: 'Agent ID' })}<EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.id}
                   </EuiDescriptionListDescription>
@@ -140,7 +141,7 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
-                  <EuiDescriptionListTitle>Agent name</EuiDescriptionListTitle>
+                  <EuiDescriptionListTitle>{i18n.translate('wazuh.endpointsSummary.table.actions.agentname', { defaultMessage: 'Agent name' })}<EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.name}
                   </EuiDescriptionListDescription>
@@ -150,7 +151,7 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiFormRow
-              label='Groups'
+              label={i18n.translate('wazuh.endpointsSummary.table.actions.groups', { defaultMessage: 'Groups' })}
               isInvalid={!selectedGroups?.length}
               error={['You must add at least one group']}
             >
@@ -176,13 +177,13 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
         }}
       >
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Edit agent groups</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>{i18n.translate('wazuh.endpointsSummary.table.actions.editagentgroups', { defaultMessage: 'Edit agent groups' })}<EuiModalHeaderTitle>
         </EuiModalHeader>
 
         <EuiModalBody>{form}</EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+          <EuiButtonEmpty onClick={onClose}>{i18n.translate('wazuh.endpointsSummary.table.actions.cancel', { defaultMessage: 'Cancel' })}<EuiButtonEmpty>
           <EuiButton
             onClick={handleOnSave}
             fill

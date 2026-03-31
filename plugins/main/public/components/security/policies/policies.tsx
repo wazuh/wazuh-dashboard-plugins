@@ -7,6 +7,7 @@ import {
   EuiButton,
   EuiTitle,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { PoliciesTable } from './policies-table';
 import { usePagination } from '../../common/hooks/usePagination';
 import GetPoliciesService from './services/get-policies.service';
@@ -76,7 +77,7 @@ export const Policies = withUserAuthorizationPrompt([
       <EuiPageContentHeader>
         <EuiPageContentHeaderSection>
           <EuiTitle>
-            <h2>Policies</h2>
+            <h2>{i18n.translate('wazuh.security.policies.policies', { defaultMessage: 'Policies' })}</h2>
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>

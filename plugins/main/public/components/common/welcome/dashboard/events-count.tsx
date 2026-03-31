@@ -4,6 +4,7 @@ import { getPlugins } from '../../../../kibana-services';
 import { getDashboardPanels } from './dashboard_panels';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiSpacer } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { Typography } from '../../typography/typography';
 import { useTimeFilter } from '../../hooks';
 import { LoadingSearchbarProgress } from '../../loading-searchbar-progress/loading-searchbar-progress';
@@ -48,7 +49,7 @@ const EventsDashboard = compose(
           from: timeFilter.from,
           to: timeFilter.to,
         },
-        title: 'Events count evolution',
+        title: {i18n.translate('wazuh.common.eventscountevolution', { defaultMessage: 'Events count evolution' })},
         description: 'Dashboard of Events count evolution',
         refreshConfig: {
           pause: false,
@@ -67,7 +68,7 @@ export const EventsCount = () => {
     <EuiPanel paddingSize='m'>
       <EuiFlexGroup gutterSize='none'>
         <EuiFlexItem grow={false}>
-          <Typography level='section'>Events count evolution</Typography>
+          <Typography level='section'>{i18n.translate('wazuh.common.eventscountevolution', { defaultMessage: {i18n.translate('wazuh.common.eventscountevolution', { defaultMessage: 'Events count evolution' })} })}</Typography>
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size='m' />

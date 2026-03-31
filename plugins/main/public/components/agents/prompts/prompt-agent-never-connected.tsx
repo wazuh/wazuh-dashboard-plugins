@@ -12,6 +12,7 @@
 
 import React, { Fragment } from 'react';
 import { EuiEmptyPrompt, EuiButton, EuiLink } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { useDispatch } from 'react-redux';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { showExploreAgentModalGlobal } from '../../../redux/actions/appStateActions';

@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { EuiEmptyPrompt, EuiLink } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { withGuard } from './withGuard';
 import { compose } from 'redux';
 import { get } from 'lodash';
@@ -119,7 +120,7 @@ export const PromptErrorInitializatingDataSource = ({
   return (
     <EuiEmptyPrompt
       iconType='alert'
-      title={<h2>Something was wrong</h2>}
+      title={<h2>{i18n.translate('wazuh.common.somethingwaswrong', { defaultMessage: 'Something was wrong' })}</h2>}
       body={<>{typeof body === 'string' && <p>{body}</p>}</>}
     />
   );
@@ -310,7 +311,7 @@ export const withDataSourceFetchOnStart =
     }
 
     return (
-      <WrappedComponent {...props} {...{ [nameProp + 'Action']: action }} />
+      <WrappedComponent {...props} {...{ [nameProp + {i18n.translate('wazuh.common.action', { defaultMessage: 'Action' })}]: action }} />
     );
   };
 

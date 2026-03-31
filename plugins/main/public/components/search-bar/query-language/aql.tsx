@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiButtonEmpty, EuiPopover, EuiText, EuiCode } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
 type ITokenType =
@@ -307,7 +308,7 @@ export async function getSuggestions(
           ? [
               {
                 type: 'function_search',
-                label: 'Search',
+                label: {i18n.translate('wazuh.search', { defaultMessage: 'Search' })},
                 description: 'run the search query',
               },
             ]
@@ -436,7 +437,7 @@ function getOutput(input: string, options: { implicitQuery?: string } = {}) {
 
 export const AQL = {
   id: 'aql',
-  label: 'AQL',
+  label: {i18n.translate('wazuh.aql', { defaultMessage: 'AQL' })},
   description: 'API Query Language (AQL) allows to do queries.',
   documentationLink: webDocumentationLink('user-manual/api/queries.html'),
   getConfiguration() {

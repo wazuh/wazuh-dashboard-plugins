@@ -11,6 +11,7 @@
  */
 
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { withGuard } from './withGuard';
@@ -27,7 +28,7 @@ export const withModuleNotForAgent = (WrappedComponent) =>
       ({ agent }) => agent?.id,
       (props) => (
         <PromptModuleNotForAgent
-          title="Module not available for agents"
+          title={i18n.translate('wazuh.module.notAvailableForAgents', { defaultMessage: 'Module not available for agents' })}
           body="Remove the pinned agent."
           {...props}
         />

@@ -24,6 +24,7 @@ import {
   EuiFlexItem,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { Markdown } from '../../../common/util';
 import { WzFlyout } from '../../../common/flyouts';
 
@@ -47,7 +48,7 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
     >
       <EuiFlyoutHeader hasBorder>
         <EuiTitle size='m'>
-          <h2 id='flyoutTitle'>Details</h2>
+          <h2 id='flyoutTitle'>{i18n.translate('wazuh.details', { defaultMessage: 'Details' })}</h2>
         </EuiTitle>
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
@@ -74,7 +75,7 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
         <EuiFlexGroup>
           <EuiFlexItem>
             <div>
-              <strong>Description</strong>
+              <strong>{i18n.translate('wazuh.description', { defaultMessage: 'Description' })}</strong>
             </div>
             <EuiText>
               {details.description ? (

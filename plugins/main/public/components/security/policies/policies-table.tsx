@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { EuiBasicTable, EuiBadge } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzAPIUtils } from '../../../react-services/wz-api-utils';
@@ -38,7 +39,7 @@ export const PoliciesTable = ({
     return async () => {
       try {
         const response = await WzRequest.apiReq(
-          'DELETE',
+          {i18n.translate('wazuh.security.policies.delete', { defaultMessage: 'DELETE' })},
           `/security/policies/`,
           {
             params: {
@@ -82,13 +83,13 @@ export const PoliciesTable = ({
     },
     {
       field: 'name',
-      name: 'Name',
+      name={i18n.translate('wazuh.security.policies.name', { defaultMessage: {i18n.translate('wazuh.security.policies.name', { defaultMessage: 'Name' })} })},
       sortable: true,
       truncateText: true,
     },
     {
       field: 'policy.actions',
-      name: 'Actions',
+      name={i18n.translate('wazuh.security.policies.actions', { defaultMessage: {i18n.translate('wazuh.security.policies.actions', { defaultMessage: {i18n.translate('wazuh.security.policies.actions', { defaultMessage: 'Actions' })} })} })},
       sortable: true,
       render: actions => {
         return (actions || []).sort((a, b) => a.localeCompare(b)).join(', ');
@@ -97,23 +98,23 @@ export const PoliciesTable = ({
     },
     {
       field: 'policy.resources',
-      name: 'Resources',
+      name={i18n.translate('wazuh.security.policies.resources', { defaultMessage: {i18n.translate('wazuh.security.policies.resources', { defaultMessage: 'Resources' })} })},
       sortable: true,
       truncateText: true,
     },
     {
       field: 'policy.effect',
-      name: 'Effect',
+      name={i18n.translate('wazuh.security.policies.effect', { defaultMessage: {i18n.translate('wazuh.security.policies.effect', { defaultMessage: 'Effect' })} })},
       sortable: true,
       truncateText: true,
     },
     {
       field: 'id',
-      name: 'Status',
+      name={i18n.translate('wazuh.security.policies.status', { defaultMessage: {i18n.translate('wazuh.security.policies.status', { defaultMessage: 'Status' })} })},
       render: item => {
         return (
           WzAPIUtils.isReservedID(item) && (
-            <EuiBadge color='primary'>Reserved</EuiBadge>
+            <EuiBadge color='primary'>{i18n.translate('wazuh.security.policies.reserved', { defaultMessage: 'Reserved' })}</EuiBadge>
           )
         );
       },
@@ -123,7 +124,7 @@ export const PoliciesTable = ({
     {
       align: 'right',
       width: '5%',
-      name: 'Actions',
+      name={i18n.translate('wazuh.security.policies.actions', { defaultMessage: {i18n.translate('wazuh.security.policies.actions', { defaultMessage: {i18n.translate('wazuh.security.policies.actions', { defaultMessage: 'Actions' })} })} })},
       render: item => (
         <div onClick={ev => ev.stopPropagation()}>
           <WzButtonPermissionsModalConfirm
@@ -134,7 +135,7 @@ export const PoliciesTable = ({
             tooltip={{
               content: WzAPIUtils.isReservedID(item.id)
                 ? "Reserved policies can't be deleted"
-                : 'Delete policy',
+                : {i18n.translate('wazuh.security.policies.deletepolicy', { defaultMessage: {i18n.translate('wazuh.security.policies.deletepolicy', { defaultMessage: 'Delete policy' })} })},
               position: 'left',
             }}
             isDisabled={WzAPIUtils.isReservedID(item.id)}
@@ -143,7 +144,7 @@ export const PoliciesTable = ({
             modalProps={{ buttonColor: 'danger' }}
             iconType='trash'
             color='danger'
-            aria-label='Delete policy'
+            aria-label={i18n.translate('wazuh.security.policies.deletepolicy', { defaultMessage: {i18n.translate('wazuh.security.policies.deletepolicy', { defaultMessage: {i18n.translate('wazuh.security.policies.deletepolicy', { defaultMessage: 'Delete policy' })} })} })}
           />
         </div>
       ),

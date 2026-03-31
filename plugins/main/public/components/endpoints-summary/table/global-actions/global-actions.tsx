@@ -7,6 +7,7 @@ import {
   EuiHorizontalRule,
   EuiToolTip,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { WzElementPermissions } from '../../../common/permissions/element';
 import { Agent } from '../../types';
 import { EditAgentsGroupsModal } from './edit-groups/edit-groups-modal';
@@ -180,7 +181,9 @@ export const AgentsTableGlobalActions = ({
                 },
               ]}
             >
-              <span>Upgrade task details</span>
+              <span>{i18n.translate('wazuh.endpointsSummary.upgradeTaskDetails', {
+                defaultMessage: 'Upgrade task details'
+              })}</span>
             </WzElementPermissions>
           </EuiContextMenuItem>
           <EuiHorizontalRule margin='xs' />

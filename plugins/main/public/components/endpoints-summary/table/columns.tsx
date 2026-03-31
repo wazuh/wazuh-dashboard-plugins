@@ -11,6 +11,7 @@ import {
   EuiHealth,
   EuiToolTip,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { Agent } from '../types';
 import WzIconSVG from '../../common/icons/wz-icon-svg';
 import { getAgentOSType } from '../../../react-services';
@@ -34,28 +35,28 @@ export const agentsTableColumns = (
 ) => [
   {
     field: 'id',
-    name: 'ID',
+    name={i18n.translate('wazuh.endpointsSummary.table.id', { defaultMessage: 'ID' })},
     sortable: true,
     show: true,
     searchable: true,
   },
   {
     field: 'name',
-    name: 'Name',
+    name={i18n.translate('wazuh.endpointsSummary.table.name', { defaultMessage: 'Name' })},
     sortable: true,
     show: true,
     searchable: true,
   },
   {
     field: 'ip',
-    name: 'IP address',
+    name={i18n.translate('wazuh.endpointsSummary.table.ipaddress', { defaultMessage: 'IP address' })},
     sortable: true,
     show: true,
     searchable: true,
   },
   {
     field: 'group',
-    name: 'Group(s)',
+    name={i18n.translate('wazuh.endpointsSummary.table.groups', { defaultMessage: 'Group(s)' })},
     sortable: true,
     show: true,
     render: groups => renderGroups(groups, setFilters),
@@ -64,7 +65,7 @@ export const agentsTableColumns = (
   {
     field: 'os.name,os.version',
     composeField: ['os.name', 'os.version'],
-    name: 'Operating system',
+    name={i18n.translate('wazuh.endpointsSummary.table.operatingsystem', { defaultMessage: 'Operating system' })},
     sortable: true,
     show: true,
     render: (field: any, agentData: Agent) => addIconPlatformRender(agentData),
@@ -72,14 +73,14 @@ export const agentsTableColumns = (
   },
   {
     field: 'node_name',
-    name: 'Cluster node',
+    name={i18n.translate('wazuh.endpointsSummary.table.clusternode', { defaultMessage: 'Cluster node' })},
     sortable: true,
     show: true,
     searchable: true,
   },
   {
     field: 'version',
-    name: 'Version',
+    name={i18n.translate('wazuh.endpointsSummary.table.version', { defaultMessage: 'Version' })},
     sortable: true,
     show: true,
     searchable: true,
@@ -96,7 +97,7 @@ export const agentsTableColumns = (
           <EuiFlexItem grow={false}>{version}</EuiFlexItem>
           {isOutdated ? (
             <EuiFlexItem grow={false}>
-              <EuiToolTip content={<p>Outdated</p>}>
+              <EuiToolTip content={<p>{i18n.translate('wazuh.endpointsSummary.table.outdated', { defaultMessage: 'Outdated' })}<p>}>
                 <EuiHealth className='wz-flex' color='danger'></EuiHealth>
               </EuiToolTip>
             </EuiFlexItem>
@@ -143,7 +144,7 @@ export const agentsTableColumns = (
   },
   {
     field: 'status',
-    name: 'Status',
+    name={i18n.translate('wazuh.endpointsSummary.table.status', { defaultMessage: 'Status' })},
     truncateText: true,
     sortable: true,
     show: true,
@@ -151,7 +152,7 @@ export const agentsTableColumns = (
   },
   {
     field: 'group_config_status',
-    name: 'Synced',
+    name={i18n.translate('wazuh.endpointsSummary.table.synced', { defaultMessage: 'Synced' })},
     sortable: true,
     show: false,
     render: synced => <AgentSynced synced={synced} />,
@@ -159,7 +160,7 @@ export const agentsTableColumns = (
   },
   {
     field: 'actions',
-    name: 'Actions',
+    name={i18n.translate('wazuh.endpointsSummary.table.actions', { defaultMessage: 'Actions' })},
     show: true,
     actions: agentsTableActions(
       allowEditGroups,

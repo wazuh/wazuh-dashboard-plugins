@@ -6,6 +6,7 @@ import {
   EuiFlexGroup,
   EuiTitle,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import '../dashboard/cluster_dashboard.scss';
 import {
   WzRibbonBody,
@@ -24,31 +25,31 @@ export const ConfigurationCards = ({
 }: ConfigurationCardsProps) => {
   const configurationItemsList = [
     {
-      label: 'Hidden',
+      label: {i18n.translate('wazuh.hidden', { defaultMessage: 'Hidden' })},
       value: String(configuration?.hidden),
     },
     {
-      label: 'Name',
+      label: {i18n.translate('wazuh.name', { defaultMessage: 'Name' })},
       value: configuration?.name,
     },
     {
-      label: 'Node name',
+      label: {i18n.translate('wazuh.nodename', { defaultMessage: 'Node name' })},
       value: configuration?.node_name,
     },
     {
-      label: 'Node type',
+      label: {i18n.translate('wazuh.nodetype', { defaultMessage: 'Node type' })},
       value: configuration?.node_type,
     },
     {
-      label: 'Bind address',
+      label: {i18n.translate('wazuh.bindaddress', { defaultMessage: 'Bind address' })},
       value: configuration?.bind_addr,
     },
     {
-      label: 'IP',
+      label: {i18n.translate('wazuh.ip', { defaultMessage: 'IP' })},
       value: configuration?.nodes?.[0],
     },
     {
-      label: 'Port',
+      label: {i18n.translate('wazuh.port', { defaultMessage: 'Port' })},
       value: configuration?.port,
     },
   ];
@@ -59,20 +60,20 @@ export const ConfigurationCards = ({
         title={
           <EuiFlexGroup alignItems='center' gutterSize='s'>
             <EuiFlexItem grow={false}>
-              <EuiToolTip content='Go back' position='bottom'>
+              <EuiToolTip content={i18n.translate('wazuh.goback', { defaultMessage: 'Go back' })} position='bottom'>
                 <EuiButtonIcon
                   color='primary'
                   size='s'
                   display='empty'
                   iconType='arrowLeft'
-                  aria-label='Back'
+                  aria-label={i18n.translate('wazuh.back', { defaultMessage: {i18n.translate('wazuh.back', { defaultMessage: 'Back' })} })}
                   onClick={goBack}
                 />
               </EuiToolTip>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiTitle>
-                <h2>Overview</h2>
+                <h2>{i18n.translate('wazuh.overview', { defaultMessage: 'Overview' })}</h2>
               </EuiTitle>
             </EuiFlexItem>
           </EuiFlexGroup>

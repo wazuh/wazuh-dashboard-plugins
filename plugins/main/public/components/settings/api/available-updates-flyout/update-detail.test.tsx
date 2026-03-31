@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { UpdateDetail } from './update-detail';
@@ -21,15 +22,15 @@ jest.mock('../../../../kibana-services', () => ({
 jest.mock(
   '../../../../../../../src/plugins/opensearch_dashboards_react/public',
   () => ({
-    Markdown: jest.fn().mockReturnValue(<div>Description</div>),
+    Markdown: jest.fn().mockReturnValue(<div>{i18n.translate('wazuh.description', { defaultMessage: {i18n.translate('wazuh.description', { defaultMessage: 'Description' })} })}</div>),
   }),
 );
 
-describe('UpdateDetail component', () => {
+describe({i18n.translate('wazuh.updatedetailcomponent', { defaultMessage: 'UpdateDetail component' })}, () => {
   test('should return the UpdateDetail component', async () => {
     const { container, getByText, getByRole } = render(
       <UpdateDetail
-        type='Last available minor'
+        type={i18n.translate('wazuh.lastavailableminor', { defaultMessage: 'Last available minor' })}
         update={{
           description:
             '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
@@ -49,6 +50,6 @@ describe('UpdateDetail component', () => {
 
     expect(getByText('Wazuh v4.8.0')).toBeInTheDocument();
     expect(getByText('Sep 25, 2023 @ 14:03:40.816')).toBeInTheDocument();
-    expect(getByText('Description')).toBeInTheDocument();
+    expect(getByText({i18n.translate('wazuh.description', { defaultMessage: 'Description' })})).toBeInTheDocument();
   });
 });

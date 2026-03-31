@@ -22,6 +22,7 @@ import {
   EuiFlexItem,
   EuiTitle,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { getToasts } from '../../kibana-services';
 import { GenericRequest } from '../../react-services';
 import { EngineSwitch } from './engine-switch';
@@ -48,7 +49,7 @@ export const WzIndexerSettings: React.FC = () => {
     setLoadError(null);
     try {
       const response = await GenericRequest.request<{ data: IndexerSettings }>(
-        'GET',
+        {i18n.translate('wazuh.get', { defaultMessage: 'GET' })},
         '/indexer/settings',
       );
 
@@ -112,7 +113,7 @@ export const WzIndexerSettings: React.FC = () => {
     if (draftSettings === null) return;
     setSaving(true);
     try {
-      await GenericRequest.request('PUT', '/indexer/settings', draftSettings);
+      await GenericRequest.request({i18n.translate('wazuh.put', { defaultMessage: 'PUT' })}, '/indexer/settings', draftSettings);
 
       setSavedSettings(draftSettings);
       getToasts().addSuccess('Settings updated successfully.');
@@ -167,7 +168,7 @@ export const WzIndexerSettings: React.FC = () => {
       <EuiPageBody>
         <EuiPanel paddingSize='l'>
           <EuiTitle size='l'>
-            <h2>Settings</h2>
+            <h2>{i18n.translate('wazuh.settings', { defaultMessage: 'Settings' })}</h2>
           </EuiTitle>
 
           <EuiSpacer size='m' />
@@ -206,7 +207,7 @@ export const WzIndexerSettings: React.FC = () => {
               <EuiDescribedFormGroup
                 fullWidth
                 id='indexer-settings-enable-raw-events-group'
-                title={<span>Enable raw events</span>}
+                title={<span>{i18n.translate('wazuh.enablerawevents', { defaultMessage: {i18n.translate('wazuh.enablerawevents', { defaultMessage: 'Enable raw events' })} })}</span>}
                 description={
                   <div>
                     Enables indexing of raw events into the{' '}
@@ -218,7 +219,7 @@ export const WzIndexerSettings: React.FC = () => {
               >
                 <EngineSwitch
                   field='index_raw_events'
-                  ariaLabel='Enable raw events'
+                  ariaLabel={i18n.translate('wazuh.enablerawevents', { defaultMessage: 'Enable raw events' })}
                   engine={draftSettings.engine}
                   updateEngine={updateEngine}
                   saving={saving}

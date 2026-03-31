@@ -20,6 +20,7 @@ import {
   EuiComboBoxOptionOption,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import {
   getJsonFromRule,
   decodeJsonRule,
@@ -44,7 +45,7 @@ export const RuleEditor = ({
   onFormChange,
   saveButtonPermissions = [],
 }) => {
-  const [logicalOperator, setLogicalOperator] = useState('OR');
+  const [logicalOperator, setLogicalOperator] = useState({i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: 'OR' })} })} })} })} })});
   const [isLogicalPopoverOpen, setIsLogicalPopoverOpen] = useState(false);
   const [isJsonEditor, setIsJsonEditor] = useState(false);
   const [ruleJson, setRuleJson] = useState('{\n\t\n}');
@@ -64,12 +65,12 @@ export const RuleEditor = ({
   const [initialSelectedUsers, setInitialSelectedUsers] = useState<
     EuiComboBoxOptionOption<any>[]
   >([]);
-  const [initialLogicalOperator, setInitialLogicalOperator] = useState('OR');
+  const [initialLogicalOperator, setInitialLogicalOperator] = useState({i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: 'OR' })} })} })} })} })});
 
   const searchOperationOptions = [
-    { value: 'FIND', text: 'FIND' },
+    { value: {i18n.translate('wazuh.security.roles.find', { defaultMessage: {i18n.translate('wazuh.security.roles.find', { defaultMessage: {i18n.translate('wazuh.security.roles.find', { defaultMessage: {i18n.translate('wazuh.security.roles.find', { defaultMessage: 'FIND' })} })} })} })}, text: {i18n.translate('wazuh.security.roles.find', { defaultMessage: {i18n.translate('wazuh.security.roles.find', { defaultMessage: {i18n.translate('wazuh.security.roles.find', { defaultMessage: {i18n.translate('wazuh.security.roles.find', { defaultMessage: 'FIND' })} })} })} })} },
     { value: 'FIND$', text: 'FIND$' },
-    { value: 'MATCH', text: 'MATCH' },
+    { value: {i18n.translate('wazuh.security.roles.match', { defaultMessage: {i18n.translate('wazuh.security.roles.match', { defaultMessage: 'MATCH' })} })}, text: {i18n.translate('wazuh.security.roles.match', { defaultMessage: {i18n.translate('wazuh.security.roles.match', { defaultMessage: 'MATCH' })} })} },
     { value: 'MATCH$', text: 'MATCH$' },
   ];
   const default_user_field =
@@ -78,7 +79,7 @@ export const RuleEditor = ({
       : 'username';
   const default_rule = {
     user_field: default_user_field,
-    searchOperation: 'FIND',
+    searchOperation: {i18n.translate('wazuh.security.roles.find', { defaultMessage: {i18n.translate('wazuh.security.roles.find', { defaultMessage: {i18n.translate('wazuh.security.roles.find', { defaultMessage: {i18n.translate('wazuh.security.roles.find', { defaultMessage: 'FIND' })} })} })} })},
     value: 'wazuh',
   };
 
@@ -173,7 +174,7 @@ export const RuleEditor = ({
         customRules: [],
         internalUsersRules: [],
         wrongFormat: false,
-        logicalOperator: 'OR',
+        logicalOperator: {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: 'OR' })} })} })} })} })},
       };
     }
   };
@@ -183,7 +184,7 @@ export const RuleEditor = ({
         <Fragment key={`rule_${idx}`}>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiFormRow label='User field'>
+              <EuiFormRow label={i18n.translate('wazuh.security.roles.userfield', { defaultMessage: {i18n.translate('wazuh.security.roles.userfield', { defaultMessage: 'User field' })} })}>
                 <EuiFieldText
                   disabled={isLoading || isReserved}
                   placeholder=''
@@ -194,7 +195,7 @@ export const RuleEditor = ({
               </EuiFormRow>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiFormRow label='Search operation'>
+              <EuiFormRow label={i18n.translate('wazuh.security.roles.searchoperation', { defaultMessage: {i18n.translate('wazuh.security.roles.searchoperation', { defaultMessage: 'Search operation' })} })}>
                 <EuiSelect
                   disabled={isLoading || isReserved}
                   id='selectDocExample'
@@ -206,7 +207,7 @@ export const RuleEditor = ({
               </EuiFormRow>
             </EuiFlexItem>
             <EuiFlexItem>
-              <EuiFormRow label='Value'>
+              <EuiFormRow label={i18n.translate('wazuh.security.roles.value', { defaultMessage: {i18n.translate('wazuh.security.roles.value', { defaultMessage: 'Value' })} })}>
                 <EuiFieldText
                   disabled={isLoading || isReserved}
                   placeholder=''
@@ -222,7 +223,7 @@ export const RuleEditor = ({
                 onClick={() => removeRule(idx)}
                 iconType='trash'
                 color='danger'
-                aria-label='Remove rule'
+                aria-label={i18n.translate('wazuh.security.roles.removerule', { defaultMessage: {i18n.translate('wazuh.security.roles.removerule', { defaultMessage: 'Remove rule' })} })}
               />
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -306,7 +307,7 @@ export const RuleEditor = ({
     const tmpInternalUsersRules = selectedUsers.map(user => {
       return {
         user_field: default_user_field,
-        searchOperation: 'FIND',
+        searchOperation: {i18n.translate('wazuh.security.roles.find', { defaultMessage: {i18n.translate('wazuh.security.roles.find', { defaultMessage: {i18n.translate('wazuh.security.roles.find', { defaultMessage: {i18n.translate('wazuh.security.roles.find', { defaultMessage: 'FIND' })} })} })} })},
         value: user.id,
       };
     });
@@ -330,7 +331,7 @@ export const RuleEditor = ({
     <>
       <EuiPanel>
         <EuiTitle>
-          <h1>Mapping rules</h1>
+          <h1>{i18n.translate('wazuh.security.roles.mappingrules', { defaultMessage: 'Mapping rules' })}</h1>
         </EuiTitle>
         <EuiFlexGroup>
           <EuiFlexItem>
@@ -362,19 +363,19 @@ export const RuleEditor = ({
                   mode='json'
                   onChange={onChangeRuleJson}
                   wrapEnabled
-                  aria-label='Code Editor'
+                  aria-label={i18n.translate('wazuh.security.roles.codeeditor', { defaultMessage: {i18n.translate('wazuh.security.roles.codeeditor', { defaultMessage: 'Code Editor' })} })}
                 />
               )) || (
                 <Fragment>
                   <EuiTitle size='s'>
-                    <h2>Map internal users</h2>
+                    <h2>{i18n.translate('wazuh.security.roles.mapinternalusers', { defaultMessage: 'Map internal users' })}</h2>
                   </EuiTitle>
                   <EuiFormRow
-                    label='Internal users'
+                    label={i18n.translate('wazuh.security.roles.internalusers', { defaultMessage: {i18n.translate('wazuh.security.roles.internalusers', { defaultMessage: 'Internal users' })} })}
                     helpText='Assign internal users to the selected role mapping'
                   >
                     <EuiComboBox
-                      placeholder='Select internal users'
+                      placeholder={i18n.translate('wazuh.security.roles.selectinternalusers', { defaultMessage: 'Select internal users' })}
                       options={internalUsersOptions}
                       selectedOptions={selectedUsers}
                       isLoading={isLoading}
@@ -385,7 +386,7 @@ export const RuleEditor = ({
                   </EuiFormRow>
                   <EuiSpacer />
                   <EuiTitle size='s'>
-                    <h2>Custom rules</h2>
+                    <h2>{i18n.translate('wazuh.security.roles.customrules', { defaultMessage: 'Custom rules' })}</h2>
                   </EuiTitle>
                   <EuiPopover
                     ownFocus
@@ -396,9 +397,9 @@ export const RuleEditor = ({
                         iconType='arrowDown'
                         iconSide='right'
                       >
-                        {logicalOperator === 'AND'
-                          ? 'All are true'
-                          : 'Any are true'}
+                        {logicalOperator === {i18n.translate('wazuh.security.roles.and', { defaultMessage: {i18n.translate('wazuh.security.roles.and', { defaultMessage: {i18n.translate('wazuh.security.roles.and', { defaultMessage: 'AND' })} })} })}
+                          ? {i18n.translate('wazuh.security.roles.allaretrue', { defaultMessage: 'All are true' })}
+                          : {i18n.translate('wazuh.security.roles.anyaretrue', { defaultMessage: 'Any are true' })}}
                       </EuiButtonEmpty>
                     }
                     isOpen={isLogicalPopoverOpen}
@@ -411,9 +412,9 @@ export const RuleEditor = ({
                           <EuiButtonEmpty
                             disabled={isLoading || isReserved}
                             color='text'
-                            onClick={() => selectOperator('AND')}
+                            onClick={() => selectOperator({i18n.translate('wazuh.security.roles.and', { defaultMessage: {i18n.translate('wazuh.security.roles.and', { defaultMessage: {i18n.translate('wazuh.security.roles.and', { defaultMessage: 'AND' })} })} })})}
                           >
-                            {logicalOperator === 'AND' && (
+                            {logicalOperator === {i18n.translate('wazuh.security.roles.and', { defaultMessage: {i18n.translate('wazuh.security.roles.and', { defaultMessage: {i18n.translate('wazuh.security.roles.and', { defaultMessage: 'AND' })} })} })} && (
                               <EuiIcon type='check' />
                             )}
                             All are true
@@ -425,9 +426,9 @@ export const RuleEditor = ({
                           <EuiButtonEmpty
                             disabled={isLoading || isReserved}
                             color='text'
-                            onClick={() => selectOperator('OR')}
+                            onClick={() => selectOperator({i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: 'OR' })} })} })} })} })})}
                           >
-                            {logicalOperator === 'OR' && (
+                            {logicalOperator === {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: {i18n.translate('wazuh.security.roles.or', { defaultMessage: 'OR' })} })} })} })} })} && (
                               <EuiIcon type='check' />
                             )}
                             Any are true

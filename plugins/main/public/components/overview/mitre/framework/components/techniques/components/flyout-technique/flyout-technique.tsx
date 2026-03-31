@@ -25,6 +25,7 @@ import {
   EuiToolTip,
   EuiIcon,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { WzRequest } from '../../../../../../../../react-services/wz-request';
 import { getUiSettings } from '../../../../../../../../kibana-services';
 import {
@@ -139,7 +140,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       setState({ techniqueData: {} });
       const { currentTechnique } = props;
       const techniqueResponse = await WzRequest.apiReq(
-        'GET',
+        {i18n.translate('wazuh.get', { defaultMessage: {i18n.translate('wazuh.get', { defaultMessage: 'GET' })} })},
         '/mitre/techniques',
         {
           params: {
@@ -151,7 +152,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
         ((techniqueResponse || {}).data || {}).data || {}
       ).affected_items;
       const tacticsResponse = await WzRequest.apiReq(
-        'GET',
+        {i18n.translate('wazuh.get', { defaultMessage: {i18n.translate('wazuh.get', { defaultMessage: 'GET' })} })},
         '/mitre/tactics',
         {},
       );
@@ -303,7 +304,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
         ),
       },
       {
-        title: 'Tactics',
+        title: {i18n.translate('wazuh.tactics', { defaultMessage: 'Tactics' })},
         description: techniqueData.tactics
           ? techniqueData.tactics.map(tactic => {
               return (
@@ -328,7 +329,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           : '',
       },
       {
-        title: 'Version',
+        title: {i18n.translate('wazuh.version', { defaultMessage: 'Version' })},
         description: techniqueData.mitre_version,
       },
     ];
@@ -339,7 +340,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           initialIsOpen={true}
           buttonContent={
             <EuiTitle size='s'>
-              <h3>Technique details</h3>
+              <h3>{i18n.translate('wazuh.techniquedetails', { defaultMessage: 'Technique details' })}</h3>
             </EuiTitle>
           }
         >

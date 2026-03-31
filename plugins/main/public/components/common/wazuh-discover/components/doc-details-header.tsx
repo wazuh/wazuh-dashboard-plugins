@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiTitle, EuiLink } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { getCore } from '../../../../kibana-services';
 import NavigationService from '../../../../react-services/navigation-service';
@@ -9,7 +10,7 @@ const DocDetailsHeader = ({ doc, indexPattern }) => {
     <EuiFlexGroup>
       <EuiFlexItem>
         <EuiTitle>
-          <h2>Document Details</h2>
+          <h2>{i18n.translate('wazuh.common.documentdetails', { defaultMessage: 'Document Details' })}</h2>
         </EuiTitle>
       </EuiFlexItem>
       <EuiFlexItem>

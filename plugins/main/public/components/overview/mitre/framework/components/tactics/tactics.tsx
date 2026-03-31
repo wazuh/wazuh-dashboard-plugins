@@ -22,6 +22,7 @@ import {
   EuiContextMenu,
   EuiIcon,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
@@ -191,10 +192,10 @@ export const Tactics = (props: tTacticsProps) => {
   const panels = [
     {
       id: 0,
-      title: 'Options',
+      title: {i18n.translate('wazuh.options', { defaultMessage: 'Options' })},
       items: [
         {
-          name: 'Select all',
+          name={i18n.translate('wazuh.selectall', { defaultMessage: {i18n.translate('wazuh.selectall', { defaultMessage: 'Select all' })} })},
           icon: <EuiIcon type='check' size='m' />,
           onClick: () => {
             closePopover();
@@ -202,7 +203,7 @@ export const Tactics = (props: tTacticsProps) => {
           },
         },
         {
-          name: 'Unselect all',
+          name={i18n.translate('wazuh.unselectall', { defaultMessage: {i18n.translate('wazuh.unselectall', { defaultMessage: 'Unselect all' })} })},
           icon: <EuiIcon type='cross' size='m' />,
           onClick: () => {
             closePopover();
@@ -223,7 +224,7 @@ export const Tactics = (props: tTacticsProps) => {
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiTitle size='m'>
-            <h1>Tactics</h1>
+            <h1>{i18n.translate('wazuh.tactics', { defaultMessage: 'Tactics' })}</h1>
           </EuiTitle>
         </EuiFlexItem>
 

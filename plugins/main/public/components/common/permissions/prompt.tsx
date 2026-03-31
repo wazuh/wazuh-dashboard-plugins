@@ -12,6 +12,7 @@
 
 import React, { Fragment } from 'react';
 import { EuiEmptyPrompt, EuiSpacer } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { TUserPermissions, TUserIsAdministrator } from '../permissions/element';
 import { WzPermissionsFormatted } from './format';
 import { withErrorBoundary } from '../hocs/error-boundary/with-error-boundary';
@@ -26,7 +27,7 @@ export const WzEmptyPromptNoPermissions = withErrorBoundary(
     return (
       <EuiEmptyPrompt
         iconType='securityApp'
-        title={<h2>You have no permissions</h2>}
+        title={<h2>{i18n.translate('wazuh.security.noPermissions', { defaultMessage: 'You have no permissions' })}</h2>}
         body={
           <Fragment>
             {permissions && (

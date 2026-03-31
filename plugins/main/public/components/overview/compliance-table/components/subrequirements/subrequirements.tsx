@@ -26,6 +26,7 @@ import {
   EuiIcon,
   EuiLoadingSpinner,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { AppState } from '../../../../../react-services/app-state';
 import { RequirementFlyout } from '../requirement-flyout';
 import { getDataPlugin } from '../../../../../kibana-services';
@@ -293,7 +294,7 @@ export class ComplianceSubrequirements extends Component {
         <EuiFlexGroup>
           <EuiFlexItem grow={true}>
             <EuiTitle size='m'>
-              <h1>Requirements</h1>
+              <h1>{i18n.translate('wazuh.requirements', { defaultMessage: 'Requirements' })}</h1>
             </EuiTitle>
           </EuiFlexItem>
 
@@ -316,7 +317,7 @@ export class ComplianceSubrequirements extends Component {
 
         <EuiFieldSearch
           fullWidth={true}
-          placeholder='Filter requirements'
+          placeholder={i18n.translate('wazuh.filterrequirements', { defaultMessage: 'Filter requirements' })}
           value={this.state.searchValue}
           onChange={e => this.onSearchValueChange(e)}
           isClearable={true}

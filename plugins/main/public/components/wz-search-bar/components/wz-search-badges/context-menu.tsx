@@ -27,6 +27,7 @@ import {
   EuiFlexItem,
   EuiSpacer
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 
 const operators = {
   '=': ' is ',
@@ -79,17 +80,17 @@ const panelTree = (props) => {
     id: 0,
     items: [
       {
-        name: 'Edit filter',
+        name={i18n.translate('wazuh.editfilter', { defaultMessage: {i18n.translate('wazuh.editfilter', { defaultMessage: {i18n.translate('wazuh.editfilter', { defaultMessage: 'Edit filter' })} })} })},
         icon: 'pencil',
         panel: {
           id: 1,
-          title: 'Edit filter',
+          title: {i18n.translate('wazuh.editfilter', { defaultMessage: {i18n.translate('wazuh.editfilter', { defaultMessage: 'Edit filter' })} })},
           width: 400,
           content: <EditFilter {...props} />
         }
       },
       {
-        name: 'Delete filter',
+        name={i18n.translate('wazuh.deletefilter', { defaultMessage: {i18n.translate('wazuh.deletefilter', { defaultMessage: 'Delete filter' })} })},
         icon: 'trash',
         onClick: props.deleteFilter
       },
@@ -103,7 +104,7 @@ const panelTree = (props) => {
 const operatorItem = (props) => {
   const { invertOperator, setIsOpen } = props;
   return {
-    name: 'Invert operator',
+    name={i18n.translate('wazuh.invertoperator', { defaultMessage: {i18n.translate('wazuh.invertoperator', { defaultMessage: 'Invert operator' })} })},
     icon: 'kqlOperand',
     onClick: (...args) => {invertOperator(...args); setIsOpen(false)}
   }
@@ -112,7 +113,7 @@ const operatorItem = (props) => {
 const conjuntionItem = (props) => {
   const { changeConjuntion, setIsOpen } = props;
   return {
-    name: 'Change conjuntion',
+    name={i18n.translate('wazuh.changeconjuntion', { defaultMessage: {i18n.translate('wazuh.changeconjuntion', { defaultMessage: 'Change conjuntion' })} })},
     icon: 'kqlSelector',
     onClick: (...args) => {changeConjuntion(...args); setIsOpen(false)}
   }
@@ -167,7 +168,7 @@ function EditFilterValue(value, setValue, suggest): React.ReactNode {
   useEffect(() => {
     updateSuggestsValues(suggest, value, setSuggetsValues);
   }, [value])
-  return <EuiFormRow label="Value">
+  return <EuiFormRow label={i18n.translate('wazuh.value', { defaultMessage: {i18n.translate('wazuh.value', { defaultMessage: "Value" })} })}>
     <EuiInputPopover
       input={<EuiFieldText
         value={value}
@@ -200,18 +201,18 @@ function EditFilterOperator(operator, setOperator) {
     { value: '~', inputDisplay: 'like' },
   ];
 
-  return <EuiFormRow label="Operator">
+  return <EuiFormRow label={i18n.translate('wazuh.operator', { defaultMessage: {i18n.translate('wazuh.operator', { defaultMessage: "Operator" })} })}>
     <EuiSuperSelect options={operatorSelectOptions} valueOfSelected={operator} onChange={setOperator} />
   </EuiFormRow>;
 }
 
 function EditFilterConjuntion(conjuntion: string, setConjuntion): React.ReactNode {
   const conjuntionOptions = [
-    { id: `conjuntion-AND`, label: "AND" },
-    { id: `conjuntion-OR`, label: "OR" },
+    { id: `conjuntion-AND`, label: {i18n.translate('wazuh.and', { defaultMessage: "AND" })} },
+    { id: `conjuntion-OR`, label: {i18n.translate('wazuh.or', { defaultMessage: "OR" })} },
   ];
 
-  return <EuiFormRow label="Conjuntion">
-    <EuiButtonGroup legend="Conjunction" options={conjuntionOptions} idSelected={`conjuntion-${conjuntion.trim()}`} onChange={() => setConjuntion(/and/gi.test(conjuntion) ? ' OR ' : ' AND ')} />
+  return <EuiFormRow label={i18n.translate('wazuh.conjuntion', { defaultMessage: {i18n.translate('wazuh.conjuntion', { defaultMessage: "Conjuntion" })} })}>
+    <EuiButtonGroup legend={i18n.translate('wazuh.conjunction', { defaultMessage: "Conjunction" })} options={conjuntionOptions} idSelected={`conjuntion-${conjuntion.trim()}`} onChange={() => setConjuntion(/and/gi.test(conjuntion) ? ' OR ' : ' AND ')} />
   </EuiFormRow>;
 }

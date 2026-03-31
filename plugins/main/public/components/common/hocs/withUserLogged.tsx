@@ -13,6 +13,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { EuiProgress, EuiText, EuiSpacer } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 
 export const withUserLogged = WrappedComponent => props => {
   const withUserLogged = useSelector(
