@@ -12,16 +12,7 @@
     "cross-spawn": "^7.0.5",
     "micromatch": "4.0.8",
     "form-data": "^4.0.4",
-    "@tootallnate/once": "^3.0.1",
-    "smol-toml": "^1.6.1",
-    "lodash": "^4.17.23",
-    "flatted": "^3.4.2",
-    "brace-expansion": "^5.0.5",
-    "**/brace-expansion": "^1.1.13",
-    "minimatch": "^10.2.2",
-    "**/minimatch": "^3.1.4",
-    "picomatch": "^4.0.4",
-    "**/picomatch": "^2.3.2"
+    "@tootallnate/once": "^3.0.1"
   },
   "scripts": {
     "build": "yarn plugin-helpers build --opensearch-dashboards-version=$OPENSEARCH_DASHBOARDS_VERSION",
@@ -37,6 +28,8 @@
   },
   "dependencies": {
     "axios": "1.13.5",
+    "dompurify": "3.3.2",
+    "lodash": "4.17.23",
     "md5": "^2.3.0",
     "node-cron": "^3.0.2"
   },
