@@ -23,6 +23,7 @@ import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-
 import { FILTER_OPERATOR } from '../data-source';
 import { compose } from 'redux';
 import { PatternDataSourceFilterManager as dataSourceFilterManager } from '../../common/data-source/pattern/pattern-data-source-filter-manager';
+import { ManagedFiltersSpec } from '../search-bar';
 
 /**
  * Create a panel dashboard component using minimal dependencies: datasource, sample data warning
@@ -40,6 +41,7 @@ export const createPanel = ({
   ModuleConfig,
   filtersValues,
   sampleDataWarningCategories,
+  searchBarManagedFiltersSpec,
 }: {
   DataSource: any;
   DataSourceRepositoryCreator: any;
@@ -56,6 +58,7 @@ export const createPanel = ({
     key: string;
     placeholder: string;
   }>;
+  searchBarManagedFiltersSpec?: ManagedFiltersSpec;
 }) =>
   compose(
     withErrorBoundary,
@@ -63,6 +66,7 @@ export const createPanel = ({
       DataSource,
       DataSourceRepositoryCreator,
       nameProp: 'dataSource',
+      searchBarManagedFiltersSpec,
     }),
     withDataSourceLoading({
       isLoadingNameProp: 'dataSource.isLoading',

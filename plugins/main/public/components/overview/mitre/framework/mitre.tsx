@@ -57,7 +57,7 @@ const MitreComponent = compose(
     DataSourceRepositoryCreator: FindingsDataSourceRepository,
   }),
   withDataSourceLoading({
-    isLoadingNameProp: 'dataSourrce.isLoading',
+    isLoadingNameProp: 'dataSource.isLoading',
     LoadingComponent: LoadingSearchbarProgress,
   }),
   withDataSourceInitiated({
