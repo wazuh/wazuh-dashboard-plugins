@@ -244,7 +244,7 @@ update_imposter_config() {
   fi
 
   if [[ "$SKIP_URLS" == "yes" ]]; then
-    log "SKIP_URLS is set. Skipping imposter config main branch reference update."
+    log "skip_urls is set. Skipping imposter config main branch reference update."
     return
   fi
 
