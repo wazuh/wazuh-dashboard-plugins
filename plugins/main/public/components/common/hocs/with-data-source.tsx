@@ -18,6 +18,7 @@ import {
 } from '../../../utils/errors';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { getCore } from '../../../kibana-services';
+import { tUseSearchBarProps } from '../search-bar';
 
 export const PromptErrorDataSourceServerAPIContextFilter = ({
   error,
@@ -208,6 +209,8 @@ export const withDataSourceSearchBar =
     nameProp = 'dataSource',
     DataSourceFromNameProp,
     DataSourceRepositoryCreatorFromNameProp,
+    searchBarManagedFiltersSpec,
+    searchBarManagedFiltersSpecFromProps,
   }) =>
   WrappedCompoment =>
   props => {
@@ -219,9 +222,15 @@ export const withDataSourceSearchBar =
         ? get(props, DataSourceRepositoryCreatorFromNameProp)
         : DataSourceRepositoryCreator;
 
+    const searchBarManagedFiltersSpecBuilder =
+      searchBarManagedFiltersSpecFromProps
+        ? get(props, searchBarManagedFiltersSpecFromProps)
+        : searchBarManagedFiltersSpec;
+
     const dataSource = useDataSourceWithSearchBar({
       DataSource: DataSourceBuilder,
       DataSourceRepositoryCreator: DataSourceRepositoryCreatorBuilder,
+      searchBarManagedFiltersSpec: searchBarManagedFiltersSpecBuilder,
     });
     return <WrappedCompoment {...props} {...{ [nameProp]: dataSource }} />;
   };
@@ -363,6 +372,8 @@ export const withDataSourceFetchSearchBar = ({
   DataSourceRepositoryCreator,
   DataSourceRepositoryCreatorFromNameProp,
   nameProp = 'dataSource',
+  searchBarManagedFiltersSpec,
+  searchBarManagedFiltersSpecFromProps,
   mapRequestParams,
   mapResponse,
   mapFetchActionDependencies,
@@ -378,6 +389,8 @@ export const withDataSourceFetchSearchBar = ({
   DataSourceRepositoryCreator: any;
   DataSourceRepositoryCreatorFromNameProp?: string;
   nameProp?: string;
+  searchBarManagedFiltersSpec?: tUseSearchBarProps['managedFiltersSpec'];
+  searchBarManagedFiltersSpecFromProps?: string;
   mapRequestParams?: WithDataSourceFetchOnStartProps['mapRequestParams'];
   mapResponse?: WithDataSourceFetchOnStartProps['mapResponse'];
   mapFetchActionDependencies?: WithDataSourceFetchOnStartProps['mapFetchActionDependencies'];
@@ -393,6 +406,8 @@ export const withDataSourceFetchSearchBar = ({
       DataSourceRepositoryCreator,
       DataSourceRepositoryCreatorFromNameProp,
       nameProp,
+      searchBarManagedFiltersSpec,
+      searchBarManagedFiltersSpecFromProps,
     }),
     withDataSourceLoading({
       isLoadingNameProp: `${nameProp}.isLoading`,
