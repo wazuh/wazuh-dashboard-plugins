@@ -19,6 +19,6 @@ export class FIMFindingsDataSource extends FIMDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [...this.getRuleGroupsFilter(), ...super.getFixedFilters()];
+    return [...super.getFixedFilters(), ...this.getRuleGroupsFilter()];
   }
 }
