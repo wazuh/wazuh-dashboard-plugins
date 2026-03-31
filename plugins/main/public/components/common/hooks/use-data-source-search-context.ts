@@ -16,7 +16,7 @@ import useSearchBar, {
   tUseSearchBarProps,
 } from '../../common/search-bar/use-search-bar';
 import { useTimeFilter } from './use-time-filter';
-import { transformDateRange } from '../search-bar';
+import { ManagedFiltersSpec, transformDateRange } from '../search-bar';
 import { useNewFilterManager } from './use-filter-manager';
 
 export type CreateNewSearchContext =
@@ -34,6 +34,7 @@ interface UseDataSourceSearchParams {
 
 interface UseSearchBarParams extends UseDataSourceSearchParams {
   useAbsoluteDateRange?: boolean;
+  searchBarManagedFiltersSpec?: ManagedFiltersSpec;
 }
 
 function useDataSourceNewSearchContext(context: CreateNewSearchContext) {
@@ -110,6 +111,7 @@ export function useDataSourceWithSearchBar({
   DataSource,
   DataSourceRepositoryCreator,
   useAbsoluteDateRange = false,
+  searchBarManagedFiltersSpec,
 }: UseSearchBarParams) {
   // Data source
   const {
@@ -147,6 +149,7 @@ export function useDataSourceWithSearchBar({
     setQuery: setNewQuery,
     query: newQuery,
     setTimeFilter: setDateRange,
+    managedFiltersSpec: searchBarManagedFiltersSpec,
   } as tUseSearchBarProps);
 
   const fetchDataWrapQueryDateRange = params =>

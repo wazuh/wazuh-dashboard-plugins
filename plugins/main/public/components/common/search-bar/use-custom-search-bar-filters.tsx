@@ -10,6 +10,10 @@ export interface ManagedFilter {
   order: number;
 }
 
+export interface ManagedFiltersSpec {
+  [key: string]: ManagedFilter;
+}
+
 type ManagedFilterSelectors = Pick<
   ManagedFilter,
   'managedField' | 'controlledBy' | 'selector'
@@ -21,7 +25,7 @@ type ManagedFilterSelectors = Pick<
  * @param param1
  * @returns
  */
-function isManagedFilter(
+export function isManagedFilter(
   filter: Filter,
   { managedField, controlledBy, selector }: ManagedFilterSelectors,
 ) {
@@ -50,7 +54,7 @@ function getManagedFilter(
 }
 
 /**
- * Exclude the manged filter
+ * Exclude the managed filter
  * @param filters
  * @param param1
  * @returns
@@ -70,56 +74,27 @@ interface UseCustomSearchBarFilters {
   postFixedFilters: React.ReactNode[];
 }
 
-/**
- * Hook to use with the WzSearchBar that excludes the managed filter from the filter in the
- * filter manager and returns the expected postFixedFilters to be rendered in the WzSearchBar with
- * the managed filters.
- * @param definition
- * @param filters
- * @param setFilters
- * @returns
- */
-export const useWithManagedSearchBarFilters = (
-  definition: {
-    spec: {
-      [key: string]: ManagedFilter;
-    };
-  },
-  filters: Filter[],
-  setFilters: (filters: Filter[]) => void,
-): UseCustomSearchBarFilters => {
-  return {
-    searchBarFilters: filters.filter(f => {
-      const isManaged = Object.values(definition.spec)
-        .map(({ managedField, selector }) => {
-          if (selector) {
-            return selector(f);
-          } else if (managedField) {
-            return (
-              f.meta?.key === managedField ||
-              f.meta?.controlledBy === managedField
-            );
-          }
-        })
-        .filter(Boolean);
-      return isManaged.length === 0;
-    }),
-    postFixedFilters: orderBy(
-      Object.values(definition.spec),
-      ['order'],
-      ['asc'],
-      // eslint-disable-next-line react/display-name
-    ).map((customFilterSpec: ManagedFilter) => (
-      // eslint-disable-next-line react/jsx-key
-      <ManagedFilterComponent
-        {...customFilterSpec}
-        filters={filters}
-        setFilters={setFilters}
-        managedFilter={getManagedFilter(filters, customFilterSpec)}
-      />
-    )),
-  };
-};
+export const createManagedFilters = (
+  spec: ManagedFiltersSpec,
+  {
+    filters,
+    setFilters,
+  }: { filters: Filter[]; setFilters: (filters: Filter[]) => void },
+) =>
+  orderBy(
+    Object.values(spec),
+    ['order'],
+    ['asc'],
+    // eslint-disable-next-line react/display-name
+  ).map((customFilterSpec: ManagedFilter) => (
+    // eslint-disable-next-line react/jsx-key
+    <ManagedFilterComponent
+      {...customFilterSpec}
+      filters={filters}
+      setFilters={setFilters}
+      managedFilter={getManagedFilter(filters, customFilterSpec)}
+    />
+  ));
 
 const ManagedFilterComponent = ({
   filters,
