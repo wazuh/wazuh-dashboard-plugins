@@ -222,8 +222,7 @@ update_branch_references() {
       # For each file find the matches.
       if grep -q "default:[[:space:]]*['\"]\\?main['\"]\\?" "$workflow_file"; then
         # For each match, replace with
-        tmp_file="${workflow_file}.tmp"
-        sed -E "s/(default:[[:space:]]*['\"]?)main(['\"]?)/\\1${replacement}\\2/g" "$workflow_file" > "$tmp_file" && mv "$tmp_file" "$workflow_file"
+        sed_inplace -E "s/(default:[[:space:]]*['\"]?)main(['\"]?)/\\1${replacement}\\2/g" "$workflow_file"
         log "Updated branch references in $workflow_file"
       fi
     done
