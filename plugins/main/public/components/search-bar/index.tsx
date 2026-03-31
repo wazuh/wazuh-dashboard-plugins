@@ -11,6 +11,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { EuiSuggest } from '../eui-suggest';
 import { searchBarQueryLanguages } from './query-language';
 import _ from 'lodash';
@@ -171,7 +172,9 @@ export const SearchBar = ({
         }
         onClosePopover={() => setIsOpenSuggestionPopover(false)}
         onPopoverFocus={() => setIsOpenSuggestionPopover(true)}
-        placeholder={'Search'}
+        placeholder={i18n.translate('wazuh.searchBar.placeholder', {
+          defaultMessage: 'Search',
+        })}
         append={
           <EuiPopover
             button={
@@ -182,7 +185,11 @@ export const SearchBar = ({
             isOpen={isOpenPopoverQueryLanguage}
             closePopover={onQueryLanguagePopoverSwitch}
           >
-            <EuiPopoverTitle>SYNTAX OPTIONS</EuiPopoverTitle>
+            <EuiPopoverTitle>
+              {i18n.translate('wazuh.searchBar.syntaxOptions', {
+                defaultMessage: 'SYNTAX OPTIONS',
+              })}
+            </EuiPopoverTitle>
             <div style={{ width: '350px' }}>
               <EuiText>
                 {searchBarQueryLanguages[queryLanguage.id].description}
@@ -199,7 +206,9 @@ export const SearchBar = ({
                       target='__blank'
                       rel='noopener noreferrer'
                     >
-                      Documentation
+{i18n.translate('wazuh.searchBar.documentation', {
+                        defaultMessage: 'Documentation',
+                      })}
                     </EuiLink>
                   </div>
                 </>
@@ -207,7 +216,12 @@ export const SearchBar = ({
               {modes?.length > 1 && (
                 <>
                   <EuiSpacer />
-                  <EuiFormRow label='Select a query language' fullWidth>
+                  <EuiFormRow 
+                    label={i18n.translate('wazuh.searchBar.selectQueryLanguage', {
+                      defaultMessage: 'Select a query language',
+                    })} 
+                    fullWidth
+                  >
                     <EuiSelect
                       id='query-language-selector'
                       options={modes.map(({ id }) => ({

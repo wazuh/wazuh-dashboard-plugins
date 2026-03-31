@@ -13,6 +13,7 @@ import {
   EuiCallOut,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
@@ -179,7 +180,11 @@ export const RemoveAgentsModal = compose(withErrorBoundary)(
     return (
       <EuiModal onClose={onClose}>
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Remove agents</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>
+            {i18n.translate('wazuh.endpoints.removeModal.title', {
+              defaultMessage: 'Remove agents',
+            })}
+          </EuiModalHeaderTitle>
         </EuiModalHeader>
         <EuiModalBody>
           {!isResultVisible ? (
@@ -197,9 +202,15 @@ export const RemoveAgentsModal = compose(withErrorBoundary)(
         <EuiModalFooter>
           {!isResultVisible ? (
             <>
-              <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+              <EuiButtonEmpty onClick={onClose}>
+                {i18n.translate('wazuh.endpoints.removeModal.cancel', {
+                  defaultMessage: 'Cancel',
+                })}
+              </EuiButtonEmpty>
               <EuiButton onClick={handleOnSave} fill color='danger'>
-                Remove
+                {i18n.translate('wazuh.endpoints.removeModal.remove', {
+                  defaultMessage: 'Remove',
+                })}
               </EuiButton>
             </>
           ) : (
@@ -210,7 +221,9 @@ export const RemoveAgentsModal = compose(withErrorBoundary)(
                 getAgentsStatus === 'loading' || saveChangesStatus === 'loading'
               }
             >
-              Close
+{i18n.translate('wazuh.endpoints.removeModal.close', {
+                defaultMessage: 'Close',
+              })}
             </EuiButton>
           )}
         </EuiModalFooter>

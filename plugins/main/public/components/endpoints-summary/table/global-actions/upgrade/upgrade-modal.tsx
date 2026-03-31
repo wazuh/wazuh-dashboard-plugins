@@ -12,6 +12,7 @@ import {
   EuiText,
   EuiCallOut,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
@@ -176,7 +177,11 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
     return (
       <EuiModal onClose={onClose}>
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Upgrade agents</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>
+            {i18n.translate('wazuh.endpoints.upgradeModal.title', {
+              defaultMessage: 'Upgrade agents',
+            })}
+          </EuiModalHeaderTitle>
         </EuiModalHeader>
         <EuiModalBody>
           {!isResultVisible ? (
@@ -194,9 +199,15 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
         <EuiModalFooter>
           {!isResultVisible ? (
             <>
-              <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+              <EuiButtonEmpty onClick={onClose}>
+                {i18n.translate('wazuh.endpoints.upgradeModal.cancel', {
+                  defaultMessage: 'Cancel',
+                })}
+              </EuiButtonEmpty>
               <EuiButton onClick={handleOnSave} fill>
-                Upgrade
+                {i18n.translate('wazuh.endpoints.upgradeModal.upgrade', {
+                  defaultMessage: 'Upgrade',
+                })}
               </EuiButton>
             </>
           ) : (
@@ -207,7 +218,9 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
                 getAgentsStatus === 'loading' || saveChangesStatus === 'loading'
               }
             >
-              Close
+{i18n.translate('wazuh.endpoints.upgradeModal.close', {
+                defaultMessage: 'Close',
+              })}
             </EuiButton>
           )}
         </EuiModalFooter>
