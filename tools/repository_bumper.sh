@@ -214,15 +214,16 @@ update_branch_references() {
   #   default: "main"
   # Only found matches in ./github/workflows
   local workflow_dir="${REPO_PATH}/.github/workflows"
-  
+
   if [ -d "$workflow_dir" ]; then
     log "Updating branch references to $replacement"
     # Loop .yml files in the directory.
     find "$workflow_dir" -name "*.yml" -type f | while IFS= read -r workflow_file; do
       # For each file find the matches.
       if grep -q "default:[[:space:]]*['\"]\\?main['\"]\\?" "$workflow_file"; then
-        # For each match, replace with 
-        sed -i -E "s/(default:[[:space:]]*['\"]?)main(['\"]?)/\1${replacement}\2/g" "$workflow_file"
+        # For each match, replace with
+        tmp_file="${workflow_file}.tmp"
+        sed -E "s/(default:[[:space:]]*['\"]?)main(['\"]?)/\\1${replacement}\\2/g" "$workflow_file" > "$tmp_file" && mv "$tmp_file" "$workflow_file"
         log "Updated branch references in $workflow_file"
       fi
     done
@@ -360,7 +361,7 @@ pre_update_checks() {
     exit 1 # Exit if sed fails
   fi
   log "Successfully extracted version using sed: $CURRENT_VERSION"
-  
+
   if [ "$CURRENT_VERSION" == "null" ]; then # Check specifically for "null" string if sed might output that
     log "ERROR: Could not read current version from $VERSION_FILE (value was 'null')"
     exit 1
@@ -630,7 +631,7 @@ main() {
 
   # Freeze main branch references if we are NOT on a main-update flow
   update_branch_references
-  
+
   # Update docker/imposter/wazuh-config.yml
   log "Updating docker/imposter/wazuh-config.yml..."
   update_imposter_config "$VERSION"
