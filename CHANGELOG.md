@@ -64,6 +64,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the Cluster app and relocated some panels to the Status app [#8220](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8220)
 - Changed the default value of `wazuh.updates.disabled` from `false` to `true` [#8236](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8236)
 - Centralized regulatory compliance modules (PCI DSS, GDPR, HIPAA, NIST 800-53, and TSC) into a single "Regulatory Compliance" application [#8239](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8239)
+- Updated Vulnerability Detection Discover tab filters, and inventory columns [#8262](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8262)
 
 ### Fixed
 
