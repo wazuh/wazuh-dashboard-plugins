@@ -44,6 +44,7 @@ export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
 
 // Wazuh states index types
 export const WAZUH_INDEX_TYPE_STATES_VULNERABILITIES = 'states-vulnerabilities';
+export const WAZUH_INDEX_TYPE_STATES_FIM = 'states-fim';
 export const WAZUH_INDEX_TYPE_STATES_FIM_FILES = 'states-fim-files';
 export const WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS =
   'states-fim-registries-keys';
@@ -966,6 +967,9 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SERVICES_STATES =
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_BROWSER_EXTENSIONS_STATES =
   'index-pattern:states-inventory-browser-extensions';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_STATES =
+  'index-pattern:states-fim';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES =
   'index-pattern:states-fim-files';
