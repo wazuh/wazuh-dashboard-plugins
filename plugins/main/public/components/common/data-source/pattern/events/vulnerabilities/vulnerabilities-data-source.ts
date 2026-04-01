@@ -2,8 +2,8 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP } from '../../../../../../../common/constants';
 import { EventsDataSource } from '../events-data-source';
 
-const VULNERABILITIES_GROUP_KEY = 'wazuh.integration.decoders';
-const VULNERABILITIES_GROUP_VALUE = 'vulnerability-detector';
+const VULNERABILITIES_GROUP_KEY = 'wazuh.integration.name';
+const VULNERABILITIES_GROUP_VALUE = 'wazuh-vd';
 
 export class AlertsVulnerabilitiesDataSource extends EventsDataSource {
   constructor(id: string, title: string) {

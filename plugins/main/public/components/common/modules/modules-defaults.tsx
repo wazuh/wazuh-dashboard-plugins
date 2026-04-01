@@ -70,7 +70,7 @@ import {
   DockerDataSource,
   AlertsVulnerabilitiesDataSource,
   AWSDataSource,
-  FIMDataSource,
+  FIMFindingsDataSource,
   GitHubDataSource,
   MalwareDetectionDataSource,
   TSCDataSource,
@@ -161,7 +161,7 @@ export const ModulesDefaults = {
       renderDiscoverTab({
         moduleId: 'fim',
         tableColumns: fileIntegrityMonitoringColumns,
-        DataSource: FIMDataSource,
+        DataSource: FIMFindingsDataSource,
         categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
