@@ -22,6 +22,8 @@ CURRENT_MAJOR_MINOR=""
 NEW_MAJOR_MINOR=""
 COMBINED_VERSION_REVISION=""
 OPENSEARCH_VERSION=""
+SET_AS_MAIN=""
+SKIP_URLS="no"
 
 # Create log file
 touch "$LOG_FILE"
@@ -58,7 +60,7 @@ log() {
 
 # Function to show usage
 usage() {
-  echo "Usage: $0 [--version VERSION --stage STAGE | --tag] [--help]"
+  echo "Usage: $0 [--version VERSION --stage STAGE | --tag] [--set-as-main] [--help]"
   echo ""
   echo "Parameters:"
   echo "  --version VERSION   Specify the version (e.g., 4.6.0)"
@@ -69,12 +71,14 @@ usage() {
   echo "                      If --stage is not set, it will be stageless(e.g., v4.6.0)"
   echo "                      Otherwise it will be with the provided stage (e.g., v4.6.0-alpha1)"
   echo "                      If this is set, --version and --stage are not required."
+  echo "  --set-as-main       Skip updating branch/URL references (used when updating 'main' itself)"
   echo "  --help              Display this help message"
   echo ""
   echo "Examples:"
   echo "  $0 --version 4.6.0 --stage alpha0"
   echo "  $0 --tag --stage alpha1"
   echo "  $0 --tag"
+  echo "  $0 --set-as-main --version 5.0.0"
 }
 
 # Function to update JSON file using sed
@@ -184,6 +188,51 @@ update_endpoints_json() {
   }
 }
 
+
+
+update_branch_reference_defaults() {
+  if [[ "$SKIP_URLS" == "yes" ]]; then
+    log "skip_urls is yes (--set-as-main): leaving workflow branch defaults unchanged"
+    return 0
+  fi
+
+  local bump_string="$VERSION"
+  local files=(
+    "${REPO_PATH}/.github/workflows/5_testunit_jest.yml"
+    "${REPO_PATH}/.github/workflows/5_testunit_dev_sh.yml"
+    "${REPO_PATH}/.github/workflows/5_builderpackage_plugins.yml"
+    "${REPO_PATH}/.github/workflows/5_builderprecompiled_base-dev-environment.yml"
+
+    "${REPO_PATH}/.github/workflows/6_builderpackage_plugins.yml"
+    "${REPO_PATH}/.github/workflows/6_builderprecompiled_base-dev-environment.yml"
+    "${REPO_PATH}/.github/workflows/6_builderprecompiled_playground.yml"
+    "${REPO_PATH}/.github/workflows/6_documentation_deploy-to-gh-pages.yml"
+    "${REPO_PATH}/.github/workflows/6_testunit_jest.yml"
+
+    "${REPO_PATH}/.github/workflows/deploy-docs.yml"
+    "${REPO_PATH}/.github/workflows/dev-environment.yml"
+    "${REPO_PATH}/.github/workflows/manual-build.yml"
+    "${REPO_PATH}/.github/workflows/playground.yml"
+    "${REPO_PATH}/.github/workflows/wazuh-build-push-docker-action.yml"
+
+  )
+  local f
+  for f in "${files[@]}"; do
+    if [ ! -f "$f" ]; then
+      log "WARNING: $f not found. Skipping main→${bump_string} default update."
+      continue
+    fi
+
+    log "Replacing branch refs main with ${bump_string} in $f (where applicable)"
+
+    sed_inplace "s/^\\([[:space:]]*default:[[:space:]]*\\)main\\([[:space:]]*\\)$/\\1${bump_string}\\2/" "$f"
+    sed_inplace "s/^\\([[:space:]]*default:[[:space:]]*'\\)main'\\([[:space:]]*\\)$/\\1${bump_string}'\\2/" "$f"
+    sed_inplace "s/^\\([[:space:]]*default:[[:space:]]*\"\\)main\"\\([[:space:]]*\\)$/\\1${bump_string}\"\\2/" "$f"
+
+    sed_inplace "s/^\\([[:space:]]*- \\)main$/\\1${bump_string}/" "$f"
+  done
+}
+
 # Function to update specFile URL in docker/imposter/wazuh-config.yml
 update_imposter_config() {
   local new_version="$1"
@@ -191,6 +240,11 @@ update_imposter_config() {
 
   if [ ! -f "$imposter_config_file" ]; then
     log "WARNING: $imposter_config_file not found. Skipping specFile URL update."
+    return
+  fi
+
+  if [[ "$SKIP_URLS" == "yes" ]]; then
+    log "skip_urls is set. Skipping imposter config main branch reference update."
     return
   fi
 
@@ -245,6 +299,10 @@ parse_arguments() {
       TAG=true
       shift
       ;;
+    --set-as-main)
+      SET_AS_MAIN="yes"
+      shift 1
+      ;;
     *)
       log "ERROR: Unknown option: $1" # Log error instead of just echo
       usage
@@ -252,6 +310,12 @@ parse_arguments() {
       ;;
     esac
   done
+  
+  if [[ -n "$SET_AS_MAIN" ]]; then
+    SKIP_URLS="yes"
+  else
+    SKIP_URLS="no"
+  fi
 }
 
 # Function to validate input parameters
@@ -563,6 +627,7 @@ main() {
   update_osd_json_files
   update_changelog
   update_endpoints_json "$CURRENT_MAJOR_MINOR" "$NEW_MAJOR_MINOR"
+  update_branch_reference_defaults
 
   # Update docker/imposter/wazuh-config.yml
   log "Updating docker/imposter/wazuh-config.yml..."
