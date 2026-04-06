@@ -207,7 +207,7 @@ If you have custom scripts or integrations:
 | -------------------------- | ---------------------------------------- |
 | `/app/wazuh#/overview`     | `/app/wz-home`                           |
 | `/app/wazuh#/settings`     | Dashboard Management > Advanced Settings |
-| `/app/wazuh#/health-check` | **☰ Menu > Management > Health Check**   |
+| `/app/wazuh#/health-check` | **☰ Menu > Management > Health Check**  |
 
 ---
 
@@ -309,7 +309,6 @@ sudo nano /etc/wazuh-dashboard/opensearch_dashboards.yml
 5. **Remove deprecated settings** (if present):
 
    Remove any lines containing:
-
    - `customization.*`
    - `wazuh.monitoring.*`
    - `admin`
@@ -559,7 +558,6 @@ Wazuh API is not reachable
 **Solutions**:
 
 1. **Re-import saved objects**:
-
    - Go to **Dashboard Management > Saved objects > Import**
    - Select backed-up `.ndjson` file
    - Choose **Automatically overwrite conflicts**
@@ -713,7 +711,6 @@ sudo systemctl start wazuh-dashboard
 
 - **Upgrade documentation**: [Upgrade](upgrade.md)
 - **CHANGELOG**: [CHANGELOG.md](../../CHANGELOG.md)
-- **Official migration guide**: https://documentation.wazuh.com/current/upgrade-guide/index.html
 - **Requirements**: [Requirements](getting-started/requirements.md)
 - **Configuration reference**: [Configuration](configuration.md)
 - **Security hardening**: [Security](security.md)
@@ -725,4 +722,3 @@ For migration assistance:
 
 - Community forum: https://groups.google.com/g/wazuh
 - GitHub issues: https://github.com/wazuh/wazuh-dashboard-plugins/issues
-- Official documentation: https://documentation.wazuh.com/

@@ -105,13 +105,11 @@ Each Wazuh dashboard version is built for a specific OpenSearch Dashboards versi
 Packages can be installed via:
 
 1. **Official repositories** (recommended):
-
    - Automatic dependency resolution
    - Easy updates with package manager
    - GPG signature verification
 
 2. **Direct package download**:
-
    - From https://packages.wazuh.com/
    - Manual dependency management required
 
@@ -119,10 +117,6 @@ Packages can be installed via:
    - Download package and dependencies offline
    - Transfer to target system
    - Install using local package manager
-
-The installation steps and repository configuration are documented in the
-installation guide:
-https://documentation.wazuh.com/current/installation-guide/wazuh-dashboard/index.html
 
 ## Package verification
 

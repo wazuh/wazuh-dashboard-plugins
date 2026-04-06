@@ -9,9 +9,8 @@ The Wazuh dashboard supports integration with:
 - **Slack** - Team communication and notifications
 - **PagerDuty** - Incident management and on-call alerting
 - **Shuffle** - Security orchestration and workflow automation
-- **Maltiverse** - Threat intelligence and IoC enrichment
 
-Notification integrations (Slack, PagerDuty, Shuffle) use OpenSearch Dashboards Notifications and Alerting plugins, while Maltiverse is configured at the Wazuh manager level.
+Notification integrations (Slack, PagerDuty, Shuffle) use OpenSearch Dashboards Notifications and Alerting plugins.
 
 ---
 
@@ -231,184 +230,27 @@ Common security automation workflows:
 
 ---
 
-## Maltiverse integration
-
-Maltiverse provides threat intelligence and Indicator of Compromise (IoC) enrichment for security events.
-
-### Prerequisites
-
-- Maltiverse account with API access
-- Wazuh manager with ossec.conf configuration access
-- Root or sudo privileges on Wazuh manager host
-
-### Step 1: Create Maltiverse API key
-
-1. Register or log in to https://maltiverse.com/
-2. Navigate to **Settings > API Keys** or **Account > API Access**
-3. Click **Create API Key** or **Generate Key**
-4. Enter a name (e.g., "Wazuh Integration")
-5. Copy the API key (format: `mt-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`)
-6. Set appropriate rate limits and permissions
-
-### Step 2: Configure Maltiverse in Wazuh manager
-
-1. SSH to the Wazuh manager server
-
-2. Edit the Wazuh manager configuration:
-
-   ```bash
-   sudo nano /var/ossec/etc/ossec.conf
-   ```
-
-3. Add the Maltiverse integration block inside `<ossec_config>`:
-
-   ```xml
-   <integration>
-     <name>maltiverse</name>
-     <api_key>mt-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</api_key>
-     <hook_url>https://api.maltiverse.com/v2</hook_url>
-     <level>3</level>
-     <alert_format>json</alert_format>
-     <options>
-       <file_sha1>yes</file_sha1>
-       <file_md5>yes</file_md5>
-       <ip_address>yes</ip_address>
-       <hostname>yes</hostname>
-       <url>yes</url>
-     </options>
-   </integration>
-   ```
-
-4. Configuration parameters:
-
-   - **api_key**: Your Maltiverse API key
-   - **level**: Minimum alert level to trigger enrichment (default: 3)
-   - **options**: IoC types to enrich (file hashes, IPs, domains, URLs)
-
-5. Save the file and exit
-
-### Step 3: Restart Wazuh manager
-
-1. Restart the Wazuh manager service:
-
-   **Systemd:**
-
-   ```bash
-   sudo systemctl restart wazuh-manager
-   ```
-
-   **SysV init:**
-
-   ```bash
-   sudo service wazuh-manager restart
-   ```
-
-2. Verify the service started successfully:
-
-   ```bash
-   sudo systemctl status wazuh-manager
-   ```
-
-3. Check logs for integration initialization:
-
-   ```bash
-   sudo tail -f /var/ossec/logs/ossec.log | grep -i maltiverse
-   ```
-
-   Look for:
-
-   ```
-   INFO: Integration 'maltiverse' enabled
-   ```
-
-### Step 4: Validate enriched alerts in dashboard
-
-1. Open the Wazuh dashboard
-2. Navigate to **Threat Hunting > Events** or **Security Events**
-3. Look for alerts with IoCs (file hashes, IP addresses, domains)
-4. Click on an enriched alert to view details
-5. Verify Maltiverse enrichment data appears:
-   - **Threat classification**: malware, phishing, C2
-   - **Blacklist status**: Listed in threat feeds
-   - **Historical data**: First seen, last seen dates
-   - **Related campaigns**: Associated threat actors or campaigns
-
-### Step 5: Create custom dashboards for threat intel
-
-1. Navigate to **☰ Menu > Dashboard Management > Dashboards**
-2. Create visualizations for:
-   - Top malicious IPs by country
-   - File hash reputation distribution
-   - Threat intel alerts over time
-   - Malware families detected
-3. Add filters for `integration: maltiverse` to show enriched data
-
-### Maltiverse enrichment examples
-
-Example alert with Maltiverse enrichment:
-
-```json
-{
-  "rule": {
-    "level": 12,
-    "description": "Malicious file hash detected"
-  },
-  "data": {
-    "file_sha1": "a1b2c3d4e5f6...",
-    "maltiverse": {
-      "classification": "malware",
-      "type": "trojan",
-      "blacklist": ["blocklist.de", "abuse.ch"],
-      "score": 95,
-      "first_seen": "2025-01-15T10:30:00Z"
-    }
-  }
-}
-```
-
-### Troubleshooting
-
-- **No enrichment data**: Verify API key is valid and has not expired
-- **Rate limit errors**: Check Maltiverse account limits and adjust alert levels
-- **Integration not loading**: Check ossec.log for configuration errors
-- **Invalid IoCs**: Ensure alert data contains properly formatted file hashes or IPs
-
-### Rate limiting and optimization
-
-To avoid rate limit issues:
-
-- Set `<level>` to 7+ to enrich only medium/high severity alerts
-- Limit enrichment to specific IoC types relevant to your environment
-- Monitor API usage in Maltiverse dashboard
-- Consider caching enriched IoCs locally (future enhancement)
-
----
-
 ## Integration health monitoring
 
 Monitor the health and performance of external integrations:
 
 1. **Check notification channels**:
-
    - Navigate to **☰ Menu > Explore > Notifications > Channels**
    - Verify all channels show **Enabled** and **Unmuted**
    - Use **Send test message** periodically
 
 2. **Review monitor status**:
-
    - Navigate to **☰ Menu > Explore > Alerting > Monitors**
    - Check for failed monitors or error states
    - Review trigger history
 
 3. **Audit integration logs**:
-
    - Wazuh manager: `/var/ossec/logs/integrations.log`
    - OpenSearch Dashboards: `/var/log/wazuh-dashboard/opensearch_dashboards.log`
 
 4. **Performance metrics**:
    - Alert delivery latency
    - Failed notification attempts
-   - API rate limit usage (Maltiverse)
 
 ---
 
@@ -442,4 +284,3 @@ Monitor the health and performance of external integrations:
   - Slack API: https://api.slack.com/messaging/webhooks
   - PagerDuty: https://developer.pagerduty.com/docs/ZG9jOjExMDI5NTgw-events-api-v2-overview
   - Shuffle: https://shuffler.io/docs/workflows
-  - Maltiverse: https://maltiverse.com/documentation

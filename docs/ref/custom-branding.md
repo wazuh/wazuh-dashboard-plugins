@@ -48,7 +48,3 @@ In **Dashboard management** > **App Settings**, configure:
 - `customization.logo.reports`
 - `customization.reports.footer`
 - `customization.reports.header`
-
-## References
-
-- Custom branding documentation: https://documentation.wazuh.com/current/user-manual/wazuh-dashboard/custom-branding.html

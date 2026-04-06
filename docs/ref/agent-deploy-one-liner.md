@@ -24,8 +24,3 @@ yum install wazuh-agent
 Use the manager FQDN for both `WAZUH_MANAGER` and `WAZUH_REGISTRATION_SERVER`
 when enrollment is performed through DNS. Add additional variables as needed,
 for example `WAZUH_AGENT_NAME` or `WAZUH_REGISTRATION_PASSWORD`.
-
-## References
-
-- Deploying agents on Linux: https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-linux.html
-- Deployment variables: https://documentation.wazuh.com/current/user-manual/agent/agent-enrollment/deployment-variables/deployment-variables-linux.html

@@ -34,9 +34,3 @@ The following parameters are required in the Wazuh SSO configuration:
 5. Apply the security configuration changes (for example, using the
    `securityadmin` script) and restart the services if required.
 6. Validate both roles by signing in through the IdP and verifying access.
-
-## References
-
-- SSO overview: https://documentation.wazuh.com/current/user-manual/user-administration/single-sign-on/index.html
-- Administrator role setup: https://documentation.wazuh.com/current/user-manual/user-administration/single-sign-on/administrator/index.html
-- Read-only role setup: https://documentation.wazuh.com/current/user-manual/user-administration/single-sign-on/read-only/index.html
