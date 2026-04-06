@@ -3,6 +3,7 @@ import metricsAgentsFields from '../../common/known-fields/metrics-agents.json';
 import metricsCommsFields from '../../common/known-fields/metrics-comms.json';
 import {
   WAZUH_INDEX_TYPE_METRICS_AGENTS,
+  WAZUH_INDEX_TYPE_STATES_FIM,
   WAZUH_INDEX_TYPE_STATES_FIM_FILES,
   WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS,
   WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_VALUES,
@@ -58,6 +59,7 @@ describe('Known Fields Loader', () => {
         WAZUH_INDEX_TYPE_METRICS_AGENTS,
         WAZUH_INDEX_TYPE_METRICS_COMMS,
         WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
+        WAZUH_INDEX_TYPE_STATES_FIM,
         WAZUH_INDEX_TYPE_STATES_FIM_FILES,
         WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS,
         WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_VALUES,

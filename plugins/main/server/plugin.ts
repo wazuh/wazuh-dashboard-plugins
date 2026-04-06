@@ -64,6 +64,7 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SECURITY,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SYSTEM_ACTIVITY,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_UNCLASSIFIED,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES,
@@ -106,6 +107,7 @@ import {
   WAZUH_FINDINGS_SECURITY_PATTERN,
   WAZUH_FINDINGS_SYSTEM_ACTIVITY_PATTERN,
   WAZUH_FINDINGS_UNCLASSIFIED_PATTERN,
+  WAZUH_FIM_PATTERN,
   WAZUH_FIM_FILES_PATTERN,
   WAZUH_FIM_REGISTRY_KEYS_PATTERN,
   WAZUH_FIM_REGISTRY_VALUES_PATTERN,
@@ -155,6 +157,7 @@ import IndexPatternFindingsOtherKnownFields from '../common/known-fields/finding
 import IndexPatternFindingsSecurityKnownFields from '../common/known-fields/findings-security.json';
 import IndexPatternFindingsSystemActivityKnownFields from '../common/known-fields/findings-system-activity.json';
 import IndexPatternFindingsUnclassifiedKnownFields from '../common/known-fields/findings-unclassified.json';
+import IndexPatternFIMKnownFields from '../common/known-fields/states-fim.json';
 import IndexPatternFIMFilesKnownFields from '../common/known-fields/states-fim-files.json';
 import IndexPatternFIMRegistriesKeysKnownFields from '../common/known-fields/states-fim-registries-keys.json';
 import IndexPatternFIMRegistriesValuesKnownFields from '../common/known-fields/states-fim-registries-values.json';
@@ -517,6 +520,21 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN,
         options: {
           fieldsNoIndices: IndexPatternITHygieneBrowserExtensionsKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_STATES,
+        indexPatternID: WAZUH_FIM_PATTERN,
+        options: {
+          savedObjectOverwrite: mapFieldsFormat({
+            'file.size': 'bytes',
+            'registry.size': 'bytes',
+          }),
+          fieldsNoIndices: IndexPatternFIMKnownFields,
         },
       }),
     );
