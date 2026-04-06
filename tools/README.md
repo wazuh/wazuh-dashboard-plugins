@@ -68,17 +68,9 @@ Run the script with the following syntax:
 
 - `--version VERSION`: Specify the version (e.g., `4.6.0`).
 - `--stage STAGE`: Specify the stage (e.g., `alpha0`, `beta1`, `rc2`).
-- `--tag`
-
-  Generate a tag version format.
-
-- `--set-as-main`
-
-  Enable main branch mode: bump version values but keep branch references pointing to `main`.
-
-- `--help`
-
-  Shows help and exits.
+- `--tag`: Generate a tag version format.
+- `--set-as-main`: Enable main branch mode: bump version values but keep branch references pointing to `main`.
+- `--help`: Shows help and exits.
 
 #### Examples
 
