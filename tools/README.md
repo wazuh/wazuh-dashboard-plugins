@@ -50,32 +50,56 @@ The `main` function orchestrates the script's execution by:
 1. Parsing and validating arguments.
 2. Performing pre-update checks.
 3. Updating various files (e.g., `VERSION.json`, `package.json`).
-4. Logging all operations.
+4. Updating API data and documentation URLs.
+5. **Handles branch reference replacements**:
+   - If `--set-as-main` is used, branch references to `main` are preserved.
+   - Otherwise, `main` references in supported workflow fields are replaced with the target version.
+6. **Logs all actions** to a log file in the `tools` directory.
 
 ### Usage
 
 Run the script with the following syntax:
 
 ```bash
-./repository_bumper.sh --version VERSION --stage STAGE
+./repository_bumper.sh --version VERSION --stage STAGE [--tag] [--set-as-main] [--help]
 ```
 
 #### Parameters
 
 - `--version VERSION`: Specify the version (e.g., `4.6.0`).
 - `--stage STAGE`: Specify the stage (e.g., `alpha0`, `beta1`, `rc2`).
-- `--help`: Display help information.
+- `--tag`
+
+  Generate a tag version format.
+
+- `--set-as-main`
+
+  Enable main branch mode: bump version values but keep branch references pointing to `main`.
+
+- `--help`
+
+  Shows help and exits.
 
 #### Examples
 
 ```bash
-./repository_bumper.sh --version 4.6.0 --stage alpha0
-./repository_bumper.sh --version 4.6.0 --stage beta1
+./repository_bumper.sh --version 5.0.0 --stage alpha0
+./repository_bumper.sh --version 5.0.0 --stage beta1
+./repository_bumper.sh --version 5.1.0 --stage alpha0 --set-as-main
+./repository_bumper.sh --tag --stage alpha1
+./repository_bumper.sh --tag
 ```
 
 ### Log File
 
 All operations are logged in a file named `repository_bumper_<timestamp>.log` located in the same directory as the script.
+
+### Files Affected
+
+- `CHANGELOG.md`
+- `VERSION.json`
+- `package.json`
+- `.github/workflows/*.yml` (only when not using `--set-as-main`)
 
 ### Notes
 

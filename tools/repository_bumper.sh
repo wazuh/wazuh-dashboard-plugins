@@ -14,8 +14,6 @@ DATE_TIME=$(date "+%Y-%m-%d_%H-%M-%S" 2>/dev/null || date "+%Y-%m-%d_%H-%M-%S")
 LOG_FILE="${SCRIPT_PATH}/repository_bumper_${DATE_TIME}.log"
 VERSION_FILE="${REPO_PATH}/VERSION.json"
 VERSION=""
-SET_AS_MAIN=""
-SKIP_URLS=""
 STAGE=""
 REVISION="00"
 TAG=false
@@ -24,6 +22,8 @@ CURRENT_MAJOR_MINOR=""
 NEW_MAJOR_MINOR=""
 COMBINED_VERSION_REVISION=""
 OPENSEARCH_VERSION=""
+SET_AS_MAIN=""
+SKIP_URLS="no"
 
 # Create log file
 touch "$LOG_FILE"
@@ -188,49 +188,49 @@ update_endpoints_json() {
   }
 }
 
-# Function to handle main -> version freeze for branch-related fields
-update_branch_references() {
+
+
+update_branch_reference_defaults() {
   if [[ "$SKIP_URLS" == "yes" ]]; then
-    log "skip_urls is set. Skipping 'main' branch reference freeze."
-    return
+    log "skip_urls is yes (--set-as-main): leaving workflow branch defaults unchanged"
+    return 0
   fi
 
-  local replacement
-  if [ "$TAG" = true ]; then
-    replacement="v${VERSION}"
-    if [ -n "$STAGE" ]; then
-      replacement+="-${STAGE}"
+  local bump_string="$VERSION"
+  local files=(
+    "${REPO_PATH}/.github/workflows/5_testunit_jest.yml"
+    "${REPO_PATH}/.github/workflows/5_testunit_dev_sh.yml"
+    "${REPO_PATH}/.github/workflows/5_builderpackage_plugins.yml"
+    "${REPO_PATH}/.github/workflows/5_builderprecompiled_base-dev-environment.yml"
+
+    "${REPO_PATH}/.github/workflows/6_builderpackage_plugins.yml"
+    "${REPO_PATH}/.github/workflows/6_builderprecompiled_base-dev-environment.yml"
+    "${REPO_PATH}/.github/workflows/6_builderprecompiled_playground.yml"
+    "${REPO_PATH}/.github/workflows/6_documentation_deploy-to-gh-pages.yml"
+    "${REPO_PATH}/.github/workflows/6_testunit_jest.yml"
+
+    "${REPO_PATH}/.github/workflows/deploy-docs.yml"
+    "${REPO_PATH}/.github/workflows/dev-environment.yml"
+    "${REPO_PATH}/.github/workflows/manual-build.yml"
+    "${REPO_PATH}/.github/workflows/playground.yml"
+    "${REPO_PATH}/.github/workflows/wazuh-build-push-docker-action.yml"
+
+  )
+  local f
+  for f in "${files[@]}"; do
+    if [ ! -f "$f" ]; then
+      log "WARNING: $f not found. Skipping main→${bump_string} default update."
+      continue
     fi
-  else
-    replacement="${VERSION}"
-  fi
 
-  log "Freezing 'main' branch references to '$replacement' in repo files..."
+    log "Replacing branch refs main with ${bump_string} in $f (where applicable)"
 
-  # Pattern: default: main (with or without quotes)
-  # Matches:
-  #   default: main
-  #   default: 'main'
-  #   default: "main"
-  # Only found matches in ./github/workflows
-  local workflow_dir="${REPO_PATH}/.github/workflows"
+    sed_inplace "s/^\\([[:space:]]*default:[[:space:]]*\\)main\\([[:space:]]*\\)$/\\1${bump_string}\\2/" "$f"
+    sed_inplace "s/^\\([[:space:]]*default:[[:space:]]*'\\)main'\\([[:space:]]*\\)$/\\1${bump_string}'\\2/" "$f"
+    sed_inplace "s/^\\([[:space:]]*default:[[:space:]]*\"\\)main\"\\([[:space:]]*\\)$/\\1${bump_string}\"\\2/" "$f"
 
-  if [ -d "$workflow_dir" ]; then
-    log "Updating branch references to $replacement"
-    # Loop .yml files in the directory.
-    find "$workflow_dir" -name "*.yml" -type f | while IFS= read -r workflow_file; do
-      # For each file find the matches.
-      if grep -q "default:[[:space:]]*['\"]\\?main['\"]\\?" "$workflow_file"; then
-        # For each match, replace with
-        sed_inplace -E "s/(default:[[:space:]]*['\"]?)main(['\"]?)/\\1${replacement}\\2/g" "$workflow_file"
-        log "Updated branch references in $workflow_file"
-      fi
-    done
-  else
-    log "WARNING: GitHub workflows directory not found at $workflow_dir"
-  fi
-
-  log "Successfully updated branch references."
+    sed_inplace "s/^\\([[:space:]]*- \\)main$/\\1${bump_string}/" "$f"
+  done
 }
 
 # Function to update specFile URL in docker/imposter/wazuh-config.yml
@@ -310,16 +310,16 @@ parse_arguments() {
       ;;
     esac
   done
-}
-
-# Function to validate input parameters
-validate_input() {
+  
   if [[ -n "$SET_AS_MAIN" ]]; then
     SKIP_URLS="yes"
   else
     SKIP_URLS="no"
   fi
+}
 
+# Function to validate input parameters
+validate_input() {
   if [ -z "$VERSION" ] && [ "$TAG" != true ]; then
     log "ERROR: --version is required unless --tag is set"
     usage
@@ -627,9 +627,7 @@ main() {
   update_osd_json_files
   update_changelog
   update_endpoints_json "$CURRENT_MAJOR_MINOR" "$NEW_MAJOR_MINOR"
-
-  # Freeze main branch references if we are NOT on a main-update flow
-  update_branch_references
+  update_branch_reference_defaults
 
   # Update docker/imposter/wazuh-config.yml
   log "Updating docker/imposter/wazuh-config.yml..."
