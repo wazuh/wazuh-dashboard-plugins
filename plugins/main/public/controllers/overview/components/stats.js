@@ -158,10 +158,12 @@ export const Stats = withErrorBoundary(
             </EuiCard>
           </EuiFlexItem>
           <EuiFlexItem>
-            <EuiCard betaBadgeLabel='Last 24 hours alerts' title=''>
-              <div className='vulnerabilites-summary-card'>
-                <LastAlertsSummaryBySeverity />
-              </div>
+            <EuiCard
+              betaBadgeLabel='Last 24 hours alerts'
+              title=''
+              className='home-alerts-card'
+            >
+              <LastAlertsSummaryBySeverity />
             </EuiCard>
           </EuiFlexItem>
         </EuiFlexGroup>

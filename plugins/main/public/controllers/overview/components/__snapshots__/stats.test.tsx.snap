@@ -116,7 +116,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
       class="euiFlexItem"
     >
       <div
-        class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow euiCard euiCard--centerAligned euiCard--hasBetaBadge"
+        class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow euiCard euiCard--centerAligned euiCard--hasBetaBadge home-alerts-card"
       >
         <div
           class="euiCard__content"
@@ -129,12 +129,8 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
             class="euiCard__children"
           >
             <div
-              class="vulnerabilites-summary-card"
-            >
-              <div
-                class="euiProgress euiProgress--indeterminate euiProgress--xs euiProgress--primary"
-              />
-            </div>
+              class="euiProgress euiProgress--indeterminate euiProgress--xs euiProgress--primary"
+            />
           </div>
         </div>
         <span
