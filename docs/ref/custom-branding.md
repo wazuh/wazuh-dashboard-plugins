@@ -45,6 +45,8 @@ Assets are stored in:
 
 In **Dashboard management** > **App Settings**, configure:
 
-- `customization.logo.reports`
-- `customization.reports.footer`
-- `customization.reports.header`
+| Property                       | Description                                                                                                                                                                 |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `customization.logo.reports`   | Sets the PDF reports logo image. It has a size limit of 1 MB. It's printed in the top left corner of the PDF reports. Recommended size: 190 pixels width, 40 pixels height. |
+| `customization.reports.footer` | Sets the Reports footer text block. It has a size limit of 2 lines of 50 characters each. It's printed in the bottom left corner of the PDF reports.                        |
+| `customization.reports.header` | Sets the Reports header text block. It has a size limit of 3 lines of 40 characters each. It's printed in the top right corner of the PDF reports.                          |
