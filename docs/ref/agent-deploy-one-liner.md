@@ -65,19 +65,19 @@ On some systems, you need to start the agent manually:
 
 ### Deployment variables:
 
-| Option | Description |
-|--------|-------------|
-| WAZUH_MANAGER | This is the primary Wazuh manager that the Wazuh agent will connect to for ongoing communication and security data exchange. Specifies the Wazuh manager IP address or FQDN (Fully Qualified Domain Name). If you want to specify multiple managers, you can add them separated by commas. |
-| WAZUH_MANAGER_PORT | Specifies the Wazuh manager connection port. |
-| WAZUH_PROTOCOL | Sets the communication protocol between the Wazuh manager and the Wazuh agent. Accepts UDP and TCP. The default is TCP. |
-| WAZUH_REGISTRATION_SERVER | Specifies the Wazuh enrollment server, used for the Wazuh agent enrollment. If empty, the value set in WAZUH_MANAGER will be used. |
-| WAZUH_REGISTRATION_PORT | Specifies the port used by the Wazuh enrollment server. |
-| WAZUH_REGISTRATION_PASSWORD | Sets password used to authenticate during enrollment, stored in etc/authd.pass. |
-| WAZUH_KEEP_ALIVE_INTERVAL | Sets the time between Wazuh agent checks for Wazuh manager connection. |
-| WAZUH_TIME_RECONNECT | Sets the time interval for the Wazuh agent to reconnect with the Wazuh manager when connectivity is lost. |
-| WAZUH_REGISTRATION_CA | Host SSL validation need of Certificate of Authority. This option specifies the CA path. |
-| WAZUH_REGISTRATION_CERTIFICATE | The SSL agent verification needs a CA signed certificate and the respective key. This option specifies the certificate path. |
-| WAZUH_REGISTRATION_KEY | Specifies the key path completing the required variables with WAZUH_REGISTRATION_CERTIFICATE for the SSL agent verification process. |
-| WAZUH_AGENT_NAME | Designates the Wazuh agent's name. By default, it will be the computer name. |
-| WAZUH_AGENT_GROUP | Assigns the Wazuh agent to one or more existing groups (separated by commas). |
-| ENROLLMENT_DELAY | Assigns the time that agentd should wait after a successful enrollment. |
+| Option                         | Description                                                                                                                                                                                                                                                                                |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| WAZUH_MANAGER                  | This is the primary Wazuh manager that the Wazuh agent will connect to for ongoing communication and security data exchange. Specifies the Wazuh manager IP address or FQDN (Fully Qualified Domain Name). If you want to specify multiple managers, you can add them separated by commas. |
+| WAZUH_MANAGER_PORT             | Specifies the Wazuh manager connection port.                                                                                                                                                                                                                                               |
+| WAZUH_PROTOCOL                 | Sets the communication protocol between the Wazuh manager and the Wazuh agent. Accepts UDP and TCP. The default is TCP.                                                                                                                                                                    |
+| WAZUH_REGISTRATION_SERVER      | Specifies the Wazuh enrollment server, used for the Wazuh agent enrollment. If empty, the value set in WAZUH_MANAGER will be used.                                                                                                                                                         |
+| WAZUH_REGISTRATION_PORT        | Specifies the port used by the Wazuh enrollment server.                                                                                                                                                                                                                                    |
+| WAZUH_REGISTRATION_PASSWORD    | Sets password used to authenticate during enrollment, stored in etc/authd.pass.                                                                                                                                                                                                            |
+| WAZUH_KEEP_ALIVE_INTERVAL      | Sets the time between Wazuh agent checks for Wazuh manager connection.                                                                                                                                                                                                                     |
+| WAZUH_TIME_RECONNECT           | Sets the time interval for the Wazuh agent to reconnect with the Wazuh manager when connectivity is lost.                                                                                                                                                                                  |
+| WAZUH_REGISTRATION_CA          | Host SSL validation need of Certificate of Authority. This option specifies the CA path.                                                                                                                                                                                                   |
+| WAZUH_REGISTRATION_CERTIFICATE | The SSL agent verification needs a CA signed certificate and the respective key. This option specifies the certificate path.                                                                                                                                                               |
+| WAZUH_REGISTRATION_KEY         | Specifies the key path completing the required variables with WAZUH_REGISTRATION_CERTIFICATE for the SSL agent verification process.                                                                                                                                                       |
+| WAZUH_AGENT_NAME               | Designates the Wazuh agent's name. By default, it will be the computer name.                                                                                                                                                                                                               |
+| WAZUH_AGENT_GROUP              | Assigns the Wazuh agent to one or more existing groups (separated by commas).                                                                                                                                                                                                              |
+| ENROLLMENT_DELAY               | Assigns the time that agentd should wait after a successful enrollment.                                                                                                                                                                                                                    |

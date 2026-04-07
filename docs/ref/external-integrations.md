@@ -235,16 +235,19 @@ Common security automation workflows:
 Monitor the health and performance of external integrations:
 
 1. **Check notification channels**:
+
    - Navigate to **☰ Menu > Explore > Notifications > Channels**
    - Verify all channels show **Enabled** and **Unmuted**
    - Use **Send test message** periodically
 
 2. **Review monitor status**:
+
    - Navigate to **☰ Menu > Explore > Alerting > Monitors**
    - Check for failed monitors or error states
    - Review trigger history
 
 3. **Audit integration logs**:
+
    - Wazuh manager: `/var/ossec/logs/integrations.log`
    - OpenSearch Dashboards: `/var/log/wazuh-dashboard/opensearch_dashboards.log`
 
