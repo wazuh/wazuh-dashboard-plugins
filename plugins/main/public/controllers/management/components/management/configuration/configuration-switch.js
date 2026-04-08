@@ -246,7 +246,7 @@ class WzConfigurationSwitch extends Component {
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
-                {/* FIXME: Either remove cluster section or edit the endpoint it  
+                {/* FIXME: Either remove cluster section or edit the endpoint it
                           uses (if there is a valid endpoint with the info)
                 <WzViewSelectorSwitch view='cluster'>
                   <WzConfigurationCluster
@@ -265,7 +265,6 @@ class WzConfigurationSwitch extends Component {
                 </WzViewSelectorSwitch>
                 <WzViewSelectorSwitch view='commands'>
                   <WzConfigurationCommands
-                    clusterNodeSelected={this.props.clusterNodeSelected}
                     agent={agent}
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
@@ -308,7 +307,7 @@ class WzConfigurationSwitch extends Component {
                       />
                     </WzViewSelectorSwitch>
                     {/* Removed this section for the agent
-                    
+
                     <WzViewSelectorSwitch view='alerts-agent'>
                       <WzConfigurationAlertsLabelsAgent
                         clusterNodeSelected={this.props.clusterNodeSelected}
