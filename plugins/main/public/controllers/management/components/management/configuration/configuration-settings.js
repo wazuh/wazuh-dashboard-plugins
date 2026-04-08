@@ -25,7 +25,7 @@ export default [
         goto: 'global-configuration',
         when: 'manager',
       },
-      /*{ FIXME: Either remove cluster section or edit the endpoint it  
+      /*{ FIXME: Either remove cluster section or edit the endpoint it
                 uses (if there is a valid endpoint with the info)
         name: 'Cluster',
         description: 'Master node configuration',
@@ -103,6 +103,7 @@ export default [
         name: 'Commands',
         description: 'Configuration options of the Command wodle',
         goto: 'commands',
+        when: 'agent',
       },
     ],
   },
