@@ -120,10 +120,6 @@ Packages can be installed via:
    - Transfer to target system
    - Install using local package manager
 
-The installation steps and repository configuration are documented in the
-installation guide:
-https://documentation.wazuh.com/current/installation-guide/wazuh-dashboard/index.html
-
 ## Package verification
 
 Verify package integrity:
