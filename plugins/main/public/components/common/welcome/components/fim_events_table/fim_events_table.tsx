@@ -33,6 +33,7 @@ import {
   FIMDataSourceRepository,
   FIMDataSource,
 } from '../../../data-source';
+import { formatUIDate } from '../../../../../react-services';
 
 export function FimEventsTable({ agent }) {
   return (
@@ -41,7 +42,7 @@ export function FimEventsTable({ agent }) {
         <EuiFlexItem>
           <EuiFlexGroup responsive={false}>
             <EuiFlexItem>
-              <Typography level='section'>FIM: Recent events</Typography>
+              <Typography level='section'>FIM: Recent files</Typography>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiToolTip position='top' content='Open FIM'>
@@ -153,6 +154,7 @@ const columns = [
     name: 'Modified time',
     sortable: true,
     width: '150px',
+    render: formatUIDate,
   },
   {
     field: '_source.file.path',
@@ -164,12 +166,12 @@ const columns = [
     field: '_source.file.owner',
     name: 'File owner',
     sortable: true,
-    width: '100px',
   },
   {
-    field: '_source.file.size',
-    name: 'File size',
+    field: '_source.file.uid',
+    name: 'File user ID',
     sortable: true,
     truncateText: true,
   }
+  // TODO: Add file.size column using the index pattern byte formatter
 ];
