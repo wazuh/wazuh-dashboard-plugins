@@ -29,10 +29,7 @@ import { fileIntegrityMonitoring } from '../../../../../utils/applications';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import NavigationService from '../../../../../react-services/navigation-service';
 import { withDataSourceFetch } from '../../../hocs';
-import {
-  FIMDataSourceRepository,
-  FIMDataSource,
-} from '../../../data-source';
+import { FIMDataSourceRepository, FIMDataSource } from '../../../data-source';
 import { formatUIDate } from '../../../../../react-services';
 
 export function FimEventsTable({ agent }) {
@@ -172,6 +169,6 @@ const columns = [
     name: 'File user ID',
     sortable: true,
     truncateText: true,
-  }
+  },
   // TODO: Add file.size column using the index pattern byte formatter
 ];
