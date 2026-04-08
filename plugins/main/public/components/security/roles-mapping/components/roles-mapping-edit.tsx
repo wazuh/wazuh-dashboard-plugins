@@ -14,6 +14,7 @@ import {
   EuiConfirmModal,
   EuiFieldText,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 import { RuleEditor } from './rule-editor';
 import RulesServices from '../../rules/services';
@@ -110,7 +111,7 @@ export const RolesMappingEdit = ({
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title='Unsubmitted changes'
+          title={i18n.translate('wazuh.security.roles.unsubmittedchanges', { defaultMessage: {i18n.translate('wazuh.security.roles.unsubmittedchanges', { defaultMessage: 'Unsubmitted changes' })} })}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
@@ -154,7 +155,7 @@ export const RolesMappingEdit = ({
             <h2>
               Edit <strong>{rule.name}&nbsp;&nbsp;</strong>
               {WzAPIUtils.isReservedID(rule.id) && (
-                <EuiBadge color='primary'>Reserved</EuiBadge>
+                <EuiBadge color='primary'>{i18n.translate('wazuh.security.roles.reserved', { defaultMessage: 'Reserved' })}</EuiBadge>
               )}
             </h2>
           </EuiTitle>
@@ -162,7 +163,7 @@ export const RolesMappingEdit = ({
         <EuiFlyoutBody>
           <EuiForm component='form' style={{ padding: 24 }}>
             <EuiFormRow
-              label='Role name'
+              label={i18n.translate('wazuh.security.roles.rolename', { defaultMessage: {i18n.translate('wazuh.security.roles.rolename', { defaultMessage: 'Role name' })} })}
               isInvalid={false}
               error={'Please provide a role name'}
               helpText='Introduce a name for this role mapping.'
@@ -176,13 +177,13 @@ export const RolesMappingEdit = ({
               />
             </EuiFormRow>
             <EuiFormRow
-              label='Roles'
+              label={i18n.translate('wazuh.security.roles.roles', { defaultMessage: {i18n.translate('wazuh.security.roles.roles', { defaultMessage: 'Roles' })} })}
               isInvalid={false}
               error={'At least one role must be selected.'}
               helpText='Assign roles to your users.'
             >
               <EuiComboBox
-                placeholder='Select roles'
+                placeholder={i18n.translate('wazuh.security.roles.selectroles', { defaultMessage: 'Select roles' })}
                 options={getRolesList(roles)}
                 isDisabled={WzAPIUtils.isReservedID(rule.id)}
                 selectedOptions={selectedRoles}

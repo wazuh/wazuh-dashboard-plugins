@@ -10,6 +10,7 @@ import {
   EuiToolTip,
   EuiBadge,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import WzTextWithTooltipTruncated from '../../../../../../common/wz-text-with-tooltip-if-truncated';
 import { RedirectAppLinks } from '../../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { getCore } from '../../../../../../../kibana-services';
@@ -21,11 +22,11 @@ type Props = {
 };
 
 const complianceEquivalences = {
-  pci: 'PCI DSS',
-  gdpr: 'GDPR',
+  pci: {i18n.translate('wazuh.pcidss', { defaultMessage: 'PCI DSS' })},
+  gdpr: {i18n.translate('wazuh.gdpr', { defaultMessage: 'GDPR' })},
   gpg13: 'GPG 13',
-  hipaa: 'HIPAA',
-  mitre: 'MITRE',
+  hipaa: {i18n.translate('wazuh.hipaa', { defaultMessage: 'HIPAA' })},
+  mitre: {i18n.translate('wazuh.mitre', { defaultMessage: 'MITRE' })},
   'nist-800-53': 'NIST-800-53',
 };
 
@@ -255,7 +256,7 @@ const RuleDetails = (props: Props) => {
           </EuiToolTip>
         </EuiFlexItem>
         <EuiFlexItem key='level' grow={1}>
-          <b style={{ paddingBottom: 6 }}>Level</b>
+          <b style={{ paddingBottom: 6 }}>{i18n.translate('wazuh.level', { defaultMessage: 'Level' })}</b>
           <EuiToolTip position='top' content={`Filter by this level: ${level}`}>
             <EuiLink onClick={async () => addFilter({ 'rule.level': level })}>
               {level}
@@ -263,15 +264,15 @@ const RuleDetails = (props: Props) => {
           </EuiToolTip>
         </EuiFlexItem>
         <EuiFlexItem key='file' grow={1}>
-          <b style={{ paddingBottom: 6 }}>File</b>
+          <b style={{ paddingBottom: 6 }}>{i18n.translate('wazuh.file', { defaultMessage: 'File' })}</b>
           {file}
         </EuiFlexItem>
         <EuiFlexItem key='path' grow={1}>
-          <b style={{ paddingBottom: 6 }}>Path</b>
+          <b style={{ paddingBottom: 6 }}>{i18n.translate('wazuh.path', { defaultMessage: 'Path' })}</b>
           {path}
         </EuiFlexItem>
-        <EuiFlexItem key='Groups' grow={1}>
-          <b style={{ paddingBottom: 6 }}>Groups</b>
+        <EuiFlexItem key={i18n.translate('wazuh.groups', { defaultMessage: 'Groups' })} grow={1}>
+          <b style={{ paddingBottom: 6 }}>{i18n.translate('wazuh.groups', { defaultMessage: {i18n.translate('wazuh.groups', { defaultMessage: 'Groups' })} })}</b>
           {renderGroups(groups)}
         </EuiFlexItem>
       </EuiFlexGrid>
@@ -282,10 +283,10 @@ const RuleDetails = (props: Props) => {
     <EuiFlexGroup direction='column' gutterSize='none'>
       <EuiFlexItem style={{ marginTop: 8 }}>
         <EuiAccordion
-          id='Info'
+          id={i18n.translate('wazuh.info', { defaultMessage: 'Info' })}
           buttonContent={
             <EuiTitle size='s'>
-              <h3>Information</h3>
+              <h3>{i18n.translate('wazuh.information', { defaultMessage: 'Information' })}</h3>
             </EuiTitle>
           }
           extraAction={
@@ -310,10 +311,10 @@ const RuleDetails = (props: Props) => {
       </EuiFlexItem>
       <EuiFlexItem style={{ marginTop: 8 }}>
         <EuiAccordion
-          id='Details'
+          id={i18n.translate('wazuh.details', { defaultMessage: 'Details' })}
           buttonContent={
             <EuiTitle size='s'>
-              <h3>Details</h3>
+              <h3>{i18n.translate('wazuh.details', { defaultMessage: {i18n.translate('wazuh.details', { defaultMessage: 'Details' })} })}</h3>
             </EuiTitle>
           }
           initialIsOpen={true}
@@ -323,10 +324,10 @@ const RuleDetails = (props: Props) => {
       </EuiFlexItem>
       <EuiFlexItem style={{ marginTop: 8 }}>
         <EuiAccordion
-          id='Compliance'
+          id={i18n.translate('wazuh.compliance', { defaultMessage: 'Compliance' })}
           buttonContent={
             <EuiTitle size='s'>
-              <h3>Compliance</h3>
+              <h3>{i18n.translate('wazuh.compliance', { defaultMessage: {i18n.translate('wazuh.compliance', { defaultMessage: 'Compliance' })} })}</h3>
             </EuiTitle>
           }
           initialIsOpen={true}

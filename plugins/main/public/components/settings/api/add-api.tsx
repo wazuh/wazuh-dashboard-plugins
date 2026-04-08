@@ -7,6 +7,7 @@ import {
   EuiCode,
   EuiCallOut,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { withErrorBoundary } from '../../common/hocs';
 import { getWazuhCorePlugin } from '../../../kibana-services';
 
@@ -35,9 +36,10 @@ export const AddApi = withErrorBoundary(() => {
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiText>
-            Modify{' '}
-            <EuiCode>{getWazuhCorePlugin().configuration.store.file}</EuiCode>{' '}
-            to set the connection information.
+            {i18n.translate('wazuh.settings.api.modifyFileInstruction', {
+              defaultMessage: 'Modify {configFile} to set the connection information.',
+              values: { configFile: getWazuhCorePlugin().configuration.store.file },
+            })}
           </EuiText>
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -48,7 +50,11 @@ export const AddApi = withErrorBoundary(() => {
       </EuiFlexGroup>
       <EuiFlexGroup>
         <EuiFlexItem>
-          <EuiText>Where:</EuiText>
+          <EuiText>
+            {i18n.translate('wazuh.settings.api.whereLabel', {
+              defaultMessage: 'Where:',
+            })}
+          </EuiText>
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiFlexGroup>
@@ -64,10 +70,17 @@ export const AddApi = withErrorBoundary(() => {
       </EuiFlexGroup>
       <EuiFlexGroup>
         <EuiFlexItem>
-          <EuiCallOut title='Warning' color='warning' iconType='alert'>
+          <EuiCallOut 
+            title={i18n.translate('wazuh.settings.api.warningTitle', {
+              defaultMessage: 'Warning',
+            })} 
+            color='warning' 
+            iconType='alert'
+          >
             <p>
-              The changes of the API connections in the configuration file could
-              need some time to take effect due to the cache of configuration.
+              {i18n.translate('wazuh.settings.api.warningMessage', {
+                defaultMessage: 'The changes of the API connections in the configuration file could need some time to take effect due to the cache of configuration.',
+              })}
             </p>
           </EuiCallOut>
         </EuiFlexItem>

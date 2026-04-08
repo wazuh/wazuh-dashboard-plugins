@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES } from '../../../../../common/constants';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 import { withHealthCheckChecks } from '../../../common/hocs';

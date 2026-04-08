@@ -1,13 +1,14 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { AvailableUpdatesFlyout } from './';
 
 jest.mock('./update-detail', () => ({
-  UpdateDetail: jest.fn().mockReturnValue(<div>Update detail</div>),
+  UpdateDetail: jest.fn().mockReturnValue(<div>{i18n.translate('wazuh.updatedetail', { defaultMessage: 'Update detail' })}</div>),
 }));
 
-describe('AvailableUpdatesFlyout component', () => {
+describe({i18n.translate('wazuh.availableupdatesflyoutcomponen', { defaultMessage: 'AvailableUpdatesFlyout component' })}, () => {
   test('should return the AvailableUpdatesFlyout component', async () => {
     const { container, getByText, getByRole } = render(
       <AvailableUpdatesFlyout

@@ -14,6 +14,7 @@
 
 import React from 'react';
 import { EuiEmptyPrompt } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import './error-boundary-prompt.scss';
 
 export const ErrorComponentPrompt = (props: {

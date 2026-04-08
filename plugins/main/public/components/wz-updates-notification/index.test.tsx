@@ -1,15 +1,16 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import '@testing-library/jest-dom';
 import { WzUpdatesNotification } from '.';
 import { renderWithProviders } from '../../redux/render-with-redux-provider';
 
 jest.mock('../../kibana-services', () => ({
   getWazuhCheckUpdatesPlugin: jest.fn().mockReturnValue({
-    UpdatesNotification: () => <div>Updates notification</div>,
+    UpdatesNotification: () => <div>{i18n.translate('wazuh.updatesnotification', { defaultMessage: 'Updates notification' })}</div>,
   }),
 }));
 
-describe('WzUpdatesNotification tests', () => {
+describe({i18n.translate('wazuh.wzupdatesnotificationtests', { defaultMessage: 'WzUpdatesNotification tests' })}, () => {
   test('should render a WzUpdatesNotification is enabled', () => {
     const { container } = renderWithProviders(<WzUpdatesNotification />, {
       preloadedState: {

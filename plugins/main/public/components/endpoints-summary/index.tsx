@@ -5,6 +5,7 @@ import {
   EuiEmptyPrompt,
   EuiProgress,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { EndpointsSummary } from './endpoints-summary';
 import { endpointSummary } from '../../utils/applications';
 import {
@@ -69,8 +70,20 @@ export const MainEndpointsSummary = compose(
     () => (
       <EuiEmptyPrompt
         iconType='watchesApp'
-        title={<h2>No agents were added to the manager</h2>}
-        body={<p>Add agents to fleet to start monitoring</p>}
+        title={
+          <h2>
+            {i18n.translate('wazuh.endpointsSummary.noAgents.title', {
+              defaultMessage: 'No agents were added to the manager',
+            })}
+          </h2>
+        }
+        body={
+          <p>
+            {i18n.translate('wazuh.endpointsSummary.noAgents.body', {
+              defaultMessage: 'Add agents to fleet to start monitoring',
+            })}
+          </p>
+        }
         actions={
           <WzButtonPermissions
             color='primary'
@@ -84,7 +97,9 @@ export const MainEndpointsSummary = compose(
               },
             )}
           >
-            Deploy new agent
+{i18n.translate('wazuh.endpointsSummary.noAgents.deployNewAgent', {
+              defaultMessage: 'Deploy new agent',
+            })}
           </WzButtonPermissions>
         }
       />

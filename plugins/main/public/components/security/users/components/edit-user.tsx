@@ -15,6 +15,7 @@ import {
   EuiConfirmModal,
   EuiPanel,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 
 import { useApiService } from '../../../common/hooks/useApiService';
 import { Role } from '../../roles/types/role.type';
@@ -219,7 +220,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title='Unsubmitted changes'
+          title={i18n.translate('wazuh.security.users.unsubmittedchanges', { defaultMessage: {i18n.translate('wazuh.security.users.unsubmittedchanges', { defaultMessage: 'Unsubmitted changes' })} })}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
@@ -262,7 +263,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
             <h2>
               Edit {currentUser.username} user &nbsp; &nbsp;
               {WzAPIUtils.isReservedID(currentUser.id) && (
-                <EuiBadge color='primary'>Reserved</EuiBadge>
+                <EuiBadge color='primary'>{i18n.translate('wazuh.security.users.reserved', { defaultMessage: 'Reserved' })}</EuiBadge>
               )}
             </h2>
           </EuiTitle>
@@ -271,7 +272,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
           <EuiForm component='form' style={{ padding: 24 }}>
             <EuiPanel>
               <EuiTitle size='s'>
-                <h2>Run as</h2>
+                <h2>{i18n.translate('wazuh.security.users.runas', { defaultMessage: 'Run as' })}</h2>
               </EuiTitle>
               <EuiFormRow
                 label=''
@@ -279,7 +280,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
               >
                 <WzButtonPermissions
                   buttonType='switch'
-                  label='Allow run as'
+                  label={i18n.translate('wazuh.security.users.allowrunas', { defaultMessage: {i18n.translate('wazuh.security.users.allowrunas', { defaultMessage: 'Allow run as' })} })}
                   showLabel={true}
                   checked={allowRunAs}
                   permissions={[
@@ -294,7 +295,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
             <EuiSpacer />
             <EuiPanel>
               <EuiTitle size='s'>
-                <h2>Password</h2>
+                <h2>{i18n.translate('wazuh.security.users.password', { defaultMessage: {i18n.translate('wazuh.security.users.password', { defaultMessage: 'Password' })} })}</h2>
               </EuiTitle>
               <EuiFormRow
                 label=''
@@ -303,7 +304,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
                 helpText='Introduce a new password for the user.'
               >
                 <EuiFieldPassword
-                  placeholder='Password'
+                  placeholder={i18n.translate('wazuh.security.users.password', { defaultMessage: 'Password' })}
                   value={password}
                   onChange={e => onChangePassword(e)}
                   aria-label=''
@@ -318,7 +319,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
                 helpText='Confirm the new password.'
               >
                 <EuiFieldPassword
-                  placeholder='Confirm Password'
+                  placeholder={i18n.translate('wazuh.security.users.confirmpassword', { defaultMessage: 'Confirm Password' })}
                   value={confirmPassword}
                   onChange={e => onChangeConfirmPassword(e)}
                   aria-label=''
@@ -330,11 +331,11 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
             <EuiSpacer />
             <EuiPanel>
               <EuiTitle size='s'>
-                <h2>Roles</h2>
+                <h2>{i18n.translate('wazuh.security.users.roles', { defaultMessage: 'Roles' })}</h2>
               </EuiTitle>
               <EuiFormRow label='' helpText='Assign roles to the selected user'>
                 <EuiComboBox
-                  placeholder='Select roles'
+                  placeholder={i18n.translate('wazuh.security.users.selectroles', { defaultMessage: 'Select roles' })}
                   options={rolesOptions}
                   selectedOptions={selectedRoles}
                   isLoading={rolesLoading || isLoading}

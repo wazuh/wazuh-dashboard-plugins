@@ -17,6 +17,7 @@ import {
   EuiDescriptionListDescription,
   EuiIconTip,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
@@ -110,7 +111,7 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
             <EuiFlexGroup gutterSize='m'>
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
-                  <EuiDescriptionListTitle>Agent ID</EuiDescriptionListTitle>
+                  <EuiDescriptionListTitle>{i18n.translate('wazuh.endpointsSummary.table.actions.agentid', { defaultMessage: 'Agent ID' })}<EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.id}
                   </EuiDescriptionListDescription>
@@ -118,7 +119,7 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
-                  <EuiDescriptionListTitle>Agent name</EuiDescriptionListTitle>
+                  <EuiDescriptionListTitle>{i18n.translate('wazuh.endpointsSummary.table.actions.agentname', { defaultMessage: 'Agent name' })}<EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.name}
                   </EuiDescriptionListDescription>
@@ -140,7 +141,7 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
-                  <EuiDescriptionListTitle>OS</EuiDescriptionListTitle>
+                  <EuiDescriptionListTitle>{i18n.translate('wazuh.endpointsSummary.table.actions.os', { defaultMessage: 'OS' })}<EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.os.name}
                   </EuiDescriptionListDescription>
@@ -184,13 +185,13 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
         }}
       >
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Upgrade agent</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>{i18n.translate('wazuh.endpointsSummary.table.actions.upgradeagent', { defaultMessage: 'Upgrade agent' })}<EuiModalHeaderTitle>
         </EuiModalHeader>
 
         <EuiModalBody>{form}</EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+          <EuiButtonEmpty onClick={onClose}>{i18n.translate('wazuh.endpointsSummary.table.actions.cancel', { defaultMessage: 'Cancel' })}<EuiButtonEmpty>
           <EuiButton
             onClick={handleOnSave}
             fill

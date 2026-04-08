@@ -10,6 +10,7 @@ import {
   EuiButtonEmpty,
   EuiButtonIcon,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { useGetUpgradeTasks } from '../../hooks';
 import {
   API_NAME_TASK_STATUS,
@@ -103,7 +104,7 @@ export const AgentUpgradesInProgress = ({
             responsive={false}
           >
             <EuiFlexItem grow={false}>
-              <EuiText>Upgrade tasks</EuiText>
+              <EuiText>{i18n.translate('wazuh.endpointsSummary.table.upgradetasks', { defaultMessage: 'Upgrade tasks' })}<EuiText>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty
@@ -120,7 +121,7 @@ export const AgentUpgradesInProgress = ({
               onClick={() => setIsPanelClosed(true)}
               color='text'
               iconType='cross'
-              aria-label='Close'
+              aria-label={i18n.translate('wazuh.endpointsSummary.table.close', { defaultMessage: 'Close' })}
             />
           </EuiFlexItem>
         </EuiFlexGroup>

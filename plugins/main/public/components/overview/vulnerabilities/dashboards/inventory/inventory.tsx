@@ -14,6 +14,7 @@ import {
   EuiButtonEmpty,
   EuiPanel,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { SearchResponse } from '../../../../../../../../src/core/server';
 import { HitsCounter } from '../../../../../kibana-integrations/discover/application/components/hits_counter/hits_counter';
 import { formatNumWithCommas } from '../../../../../kibana-integrations/discover/application/helpers';
@@ -101,7 +102,7 @@ const InventoryVulsComponent = () => {
   const DocViewInspectButton = ({
     rowIndex,
   }: EuiDataGridCellValueElementProps) => {
-    const inspectHintMsg = 'Inspect vulnerability details';
+    const inspectHintMsg = {i18n.translate('wazuh.inspectvulnerabilitydetails', { defaultMessage: 'Inspect vulnerability details' })};
     return (
       <EuiToolTip content={inspectHintMsg}>
         <EuiButtonIcon
@@ -115,7 +116,7 @@ const InventoryVulsComponent = () => {
 
   const dataGridProps = useDataGrid({
     moduleId: 'vulnerabilities-inventory',
-    ariaLabelledBy: 'Vulnerabilities Inventory Table',
+    ariaLabelledBy: {i18n.translate('wazuh.vulnerabilitiesinventorytable', { defaultMessage: 'Vulnerabilities Inventory Table' })},
     defaultColumns: inventoryTableDefaultColumns,
     renderColumns: wzDiscoverRenderColumns,
     results,
@@ -165,7 +166,7 @@ const InventoryVulsComponent = () => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching data',
+          message: {i18n.translate('wazuh.errorfetchingdata', { defaultMessage: 'Error fetching data' })},
         });
         ErrorHandler.handleError(searchError);
       });
@@ -245,7 +246,7 @@ const InventoryVulsComponent = () => {
                               results?.hits?.total &&
                               results?.hits?.total > MAX_ENTRIES_PER_QUERY
                                 ? {
-                                    ariaLabel: 'Info',
+                                    ariaLabel: {i18n.translate('wazuh.info', { defaultMessage: 'Info' })},
                                     content: `The query results has exceeded the limit of ${formatNumWithCommas(
                                       MAX_ENTRIES_PER_QUERY,
                                     )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
@@ -293,7 +294,7 @@ const InventoryVulsComponent = () => {
               <EuiFlyout onClose={closeFlyoutHandler} size='m'>
                 <EuiFlyoutHeader>
                   <EuiTitle>
-                    <h2>Vulnerability details</h2>
+                    <h2>{i18n.translate('wazuh.vulnerabilitydetails', { defaultMessage: 'Vulnerability details' })}</h2>
                   </EuiTitle>
                 </EuiFlyoutHeader>
                 <EuiFlyoutBody>

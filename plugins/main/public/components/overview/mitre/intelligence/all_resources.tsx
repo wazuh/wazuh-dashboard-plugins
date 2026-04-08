@@ -16,6 +16,7 @@ import {
   EuiTitle,
   EuiSpacer
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { ModuleMitreAttackIntelligenceAllResourcesSearchResults } from './all_resources_search_results';
 import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
 
@@ -32,7 +33,7 @@ export const ModuleMitreAttackIntelligenceAllResources = ({ results, loading }) 
 
   return (
     <>
-      <EuiTitle><h1>Search results</h1></EuiTitle>
+      <EuiTitle><h1>{i18n.translate('wazuh.searchresults', { defaultMessage: 'Search results' })}</h1></EuiTitle>
       <EuiSpacer />
       <ModuleMitreAttackIntelligenceAllResourcesSearchResults results={results} loading={loading} onSelectResource={selectResource}/> 
 

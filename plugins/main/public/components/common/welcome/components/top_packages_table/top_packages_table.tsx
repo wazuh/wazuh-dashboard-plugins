@@ -20,6 +20,7 @@ import {
   EuiFlexGroup,
   EuiInMemoryTable,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { Typography } from '../../../typography/typography';
 // @ts-ignore
 import { vulnerabilityDetection } from '../../../../../utils/applications';
@@ -33,7 +34,7 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
   const columns = [
     {
       field: 'key',
-      name: 'Package',
+      name={i18n.translate('wazuh.common.package', { defaultMessage: {i18n.translate('wazuh.common.package', { defaultMessage: 'Package' })} })},
       sortable: true,
       render: field => (
         <WzLink
@@ -55,7 +56,7 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
     },
     {
       field: 'doc_count',
-      name: 'Count',
+      name={i18n.translate('wazuh.common.count', { defaultMessage: {i18n.translate('wazuh.common.count', { defaultMessage: 'Count' })} })},
       sortable: true,
       truncateText: true,
       width: '100px',
@@ -74,7 +75,7 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
         items={items}
         columns={columns}
         sorting={true}
-        noItemsMessage='No packages found'
+        noItemsMessage={i18n.translate('wazuh.common.nopackagesfound', { defaultMessage: 'No packages found' })}
       ></EuiInMemoryTable>
     </EuiPanel>
   );

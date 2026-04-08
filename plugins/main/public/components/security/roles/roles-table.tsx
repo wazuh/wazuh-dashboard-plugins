@@ -8,6 +8,7 @@ import {
   EuiSpacer,
   EuiLoadingSpinner,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzButtonPermissionsModalConfirm } from '../../common/buttons';
@@ -44,7 +45,7 @@ export const RolesTable = ({
   const onConfirmDeleteRole = item => {
     return async () => {
       try {
-        const response = await WzRequest.apiReq('DELETE', '/security/roles/', {
+        const response = await WzRequest.apiReq({i18n.translate('wazuh.security.roles.delete', { defaultMessage: 'DELETE' })}, '/security/roles/', {
           params: {
             role_ids: item.id,
           },
@@ -85,14 +86,14 @@ export const RolesTable = ({
     },
     {
       field: 'name',
-      name: 'Name',
+      name={i18n.translate('wazuh.security.roles.name', { defaultMessage: {i18n.translate('wazuh.security.roles.name', { defaultMessage: 'Name' })} })},
       width: '200',
       sortable: true,
       truncateText: true,
     },
     {
       field: 'policies',
-      name: 'Policies',
+      name={i18n.translate('wazuh.security.roles.policies', { defaultMessage: {i18n.translate('wazuh.security.roles.policies', { defaultMessage: 'Policies' })} })},
       render: policies => {
         return (
           (policiesData && (
@@ -107,17 +108,17 @@ export const RolesTable = ({
                         position='top'
                         content={
                           <div>
-                            <b>Actions</b>
+                            <b>{i18n.translate('wazuh.security.roles.actions', { defaultMessage: {i18n.translate('wazuh.security.roles.actions', { defaultMessage: 'Actions' })} })}</b>
                             <p>
                               {((data.policy || {}).actions || []).join(', ')}
                             </p>
                             <EuiSpacer size='s' />
-                            <b>Resources</b>
+                            <b>{i18n.translate('wazuh.security.roles.resources', { defaultMessage: 'Resources' })}</b>
                             <p>
                               {((data.policy || {}).resources || []).join(', ')}
                             </p>
                             <EuiSpacer size='s' />
-                            <b>Effect</b>
+                            <b>{i18n.translate('wazuh.security.roles.effect', { defaultMessage: 'Effect' })}</b>
                             <p>{(data.policy || {}).effect}</p>
                           </div>
                         }
@@ -143,11 +144,11 @@ export const RolesTable = ({
     },
     {
       field: 'id',
-      name: 'Status',
+      name={i18n.translate('wazuh.security.roles.status', { defaultMessage: {i18n.translate('wazuh.security.roles.status', { defaultMessage: 'Status' })} })},
       render: item => {
         return (
           WzAPIUtils.isReservedID(item) && (
-            <EuiBadge color='primary'>Reserved</EuiBadge>
+            <EuiBadge color='primary'>{i18n.translate('wazuh.security.roles.reserved', { defaultMessage: 'Reserved' })}</EuiBadge>
           )
         );
       },
@@ -157,7 +158,7 @@ export const RolesTable = ({
     {
       align: 'right',
       width: '5%',
-      name: 'Actions',
+      name={i18n.translate('wazuh.security.roles.actions', { defaultMessage: {i18n.translate('wazuh.security.roles.actions', { defaultMessage: 'Actions' })} })},
       render: item => (
         <div onClick={ev => ev.stopPropagation()}>
           <WzButtonPermissionsModalConfirm
@@ -168,7 +169,7 @@ export const RolesTable = ({
             tooltip={{
               content: WzAPIUtils.isReservedID(item.id)
                 ? "Reserved roles can't be deleted"
-                : 'Delete role',
+                : {i18n.translate('wazuh.security.roles.deleterole', { defaultMessage: {i18n.translate('wazuh.security.roles.deleterole', { defaultMessage: 'Delete role' })} })},
               position: 'left',
             }}
             isDisabled={WzAPIUtils.isReservedID(item.id)}
@@ -177,7 +178,7 @@ export const RolesTable = ({
             modalProps={{ buttonColor: 'danger' }}
             iconType='trash'
             color='danger'
-            aria-label='Delete role'
+            aria-label={i18n.translate('wazuh.security.roles.deleterole', { defaultMessage: {i18n.translate('wazuh.security.roles.deleterole', { defaultMessage: {i18n.translate('wazuh.security.roles.deleterole', { defaultMessage: 'Delete role' })} })} })}
           />
         </div>
       ),

@@ -7,6 +7,7 @@ import {
   EuiButtonIcon,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { VulsTopPackageTable } from '../top_packages_table';
 import VulsSeverityStat from '../vuls_severity_stat/vuls_severity_stat';
 import {
@@ -140,19 +141,19 @@ const VulsPanel = ({ agent }) => {
     <EuiPanel paddingSize='m'>
       <EuiFlexGroup className='wz-section-sca-euiFlexGroup' responsive={false}>
         <EuiFlexItem grow={false}>
-          <Typography level='section'>Vulnerability Detection</Typography>
+          <Typography level='section'>{i18n.translate('wazuh.common.vulnerabilitydetection', { defaultMessage: 'Vulnerability Detection' })}</Typography>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <RedirectAppLinks application={getCore().application}>
-            <EuiToolTip position='top' content='Open Vulnerability Detection'>
+            <EuiToolTip position='top' content={i18n.translate('wazuh.common.openvulnerabilitydetection', { defaultMessage: {i18n.translate('wazuh.common.openvulnerabilitydetection', { defaultMessage: 'Open Vulnerability Detection' })} })}>
               <EuiButtonIcon
                 iconType='popout'
                 color='primary'
-                className='EuiButtonIcon'
+                className={i18n.translate('wazuh.common.euibuttonicon', { defaultMessage: 'EuiButtonIcon' })}
                 href={NavigationService.getInstance().getUrlForApp(
                   vulnerabilityDetection.id,
                 )}
-                aria-label='Open Vulnerability Detection'
+                aria-label={i18n.translate('wazuh.common.openvulnerabilitydetection', { defaultMessage: {i18n.translate('wazuh.common.openvulnerabilitydetection', { defaultMessage: {i18n.translate('wazuh.common.openvulnerabilitydetection', { defaultMessage: 'Open Vulnerability Detection' })} })} })}
               />
             </EuiToolTip>
           </RedirectAppLinks>

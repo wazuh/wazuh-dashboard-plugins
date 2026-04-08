@@ -6,6 +6,7 @@ import {
   EuiPageContentBody,
   EuiTitle,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { RolesMappingTable } from './components/roles-mapping-table';
 import { RolesMappingEdit } from './components/roles-mapping-edit';
 import { RolesMappingCreate } from './components/roles-mapping-create';
@@ -168,7 +169,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
       <EuiPageContentHeader>
         <EuiPageContentHeaderSection>
           <EuiTitle>
-            <h2>Roles mapping</h2>
+            <h2>{i18n.translate('wazuh.security.roles.rolesmapping', { defaultMessage: 'Roles mapping' })}</h2>
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>

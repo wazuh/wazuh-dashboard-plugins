@@ -11,6 +11,7 @@ import {
   EuiComboBox,
   EuiConfirmModal,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
@@ -30,7 +31,7 @@ export const CreateRole = ({ closeFlyout }) => {
 
   async function getData() {
     const policies_request = await WzRequest.apiReq(
-      'GET',
+      {i18n.translate('wazuh.security.roles.get', { defaultMessage: 'GET' })},
       '/security/policies',
       {},
     );
@@ -61,7 +62,7 @@ export const CreateRole = ({ closeFlyout }) => {
     }
 
     try {
-      const result = await WzRequest.apiReq('POST', '/security/roles', {
+      const result = await WzRequest.apiReq({i18n.translate('wazuh.security.roles.post', { defaultMessage: {i18n.translate('wazuh.security.roles.post', { defaultMessage: 'POST' })} })}, '/security/roles', {
         name: roleName,
       });
       const data = result?.data?.data;
@@ -76,7 +77,7 @@ export const CreateRole = ({ closeFlyout }) => {
         return policy.id;
       });
       const policyResult = await WzRequest.apiReq(
-        'POST',
+        {i18n.translate('wazuh.security.roles.post', { defaultMessage: {i18n.translate('wazuh.security.roles.post', { defaultMessage: 'POST' })} })},
         `/security/roles/${roleId}/policies`,
         {
           params: {
@@ -111,7 +112,7 @@ export const CreateRole = ({ closeFlyout }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title='Unsubmitted changes'
+          title={i18n.translate('wazuh.security.roles.unsubmittedchanges', { defaultMessage: {i18n.translate('wazuh.security.roles.unsubmittedchanges', { defaultMessage: 'Unsubmitted changes' })} })}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
@@ -149,13 +150,13 @@ export const CreateRole = ({ closeFlyout }) => {
       <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size='m'>
-            <h2>New role</h2>
+            <h2>{i18n.translate('wazuh.security.roles.newrole', { defaultMessage: 'New role' })}</h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
           <EuiForm component='form' style={{ padding: 24 }}>
             <EuiFormRow
-              label='Role name'
+              label={i18n.translate('wazuh.security.roles.rolename', { defaultMessage: {i18n.translate('wazuh.security.roles.rolename', { defaultMessage: 'Role name' })} })}
               isInvalid={roleNameError}
               error={'Please provide a role name'}
               helpText='Introduce a name for this new role.'
@@ -168,13 +169,13 @@ export const CreateRole = ({ closeFlyout }) => {
               />
             </EuiFormRow>
             <EuiFormRow
-              label='Policies'
+              label={i18n.translate('wazuh.security.roles.policies', { defaultMessage: {i18n.translate('wazuh.security.roles.policies', { defaultMessage: 'Policies' })} })}
               isInvalid={selectedPoliciesError}
               error={'At least one policy must be selected.'}
               helpText='Assign policies to the role.'
             >
               <EuiComboBox
-                placeholder='Select policies'
+                placeholder={i18n.translate('wazuh.security.roles.selectpolicies', { defaultMessage: 'Select policies' })}
                 options={policies}
                 selectedOptions={selectedPolicies}
                 onChange={onChangePolicies}

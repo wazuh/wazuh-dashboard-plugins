@@ -23,6 +23,7 @@ import {
   EuiSpacer,
   FilterChecked,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { IndexPattern } from 'src/plugins/data/public';
 import { IValueSuggestion, useValueSuggestion } from '../../hooks';
 import _ from 'lodash';
@@ -227,7 +228,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
               <div className='euiFilterSelect__noteContent'>
                 <EuiLoadingChart size='m' />
                 <EuiSpacer size='xs' />
-                <p>Loading filters</p>
+                <p>{i18n.translate('wazuh.common.loadingfilters', { defaultMessage: 'Loading filters' })}</p>
               </div>
             </div>
           )}
@@ -236,7 +237,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
               <div className='euiFilterSelect__noteContent'>
                 <EuiIcon type='minusInCircle' />
                 <EuiSpacer size='xs' />
-                <p>No filters found</p>
+                <p>{i18n.translate('wazuh.common.nofiltersfound', { defaultMessage: 'No filters found' })}</p>
               </div>
             </div>
           )}

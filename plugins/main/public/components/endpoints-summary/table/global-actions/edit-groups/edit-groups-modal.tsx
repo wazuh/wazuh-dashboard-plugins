@@ -13,6 +13,7 @@ import {
   EuiText,
   EuiCallOut,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
@@ -221,8 +222,12 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
 
     const groupsText =
       addOrRemove === 'add'
-        ? 'Select groups to add'
-        : 'Select groups to remove';
+        ? i18n.translate('wazuh.endpointsSummary.editGroups.selectGroupsToAdd', {
+            defaultMessage: 'Select groups to add'
+          })
+        : i18n.translate('wazuh.endpointsSummary.editGroups.selectGroupsToRemove', {
+            defaultMessage: 'Select groups to remove'
+          });
 
     const handleOnChangeGroupsSelect = (selectedGroups: Option[]) => {
       setSelectedGroups(selectedGroups);
@@ -235,11 +240,15 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
             <EuiCallOut
               color='warning'
               iconType='alert'
-              title='The changes will be applied to all agents that match the filters set in the list'
+              title={i18n.translate('wazuh.endpointsSummary.editGroups.changesAppliedToFiltered', {
+                defaultMessage: 'The changes will be applied to all agents that match the filters set in the list'
+              })}
             />
           </EuiFormRow>
         ) : (
-          <EuiFormRow label='Selected agents'>
+          <EuiFormRow label={i18n.translate('wazuh.endpointsSummary.editGroups.selectedAgents', {
+            defaultMessage: 'Selected agents'
+          })}>
             <EuiText>{selectedAgents.length}</EuiText>
           </EuiFormRow>
         )}
@@ -284,7 +293,9 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
         <EuiModalFooter>
           {!isResultVisible ? (
             <>
-              <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+              <EuiButtonEmpty onClick={onClose}>{i18n.translate('wazuh.common.cancel', {
+                defaultMessage: 'Cancel'
+              })}</EuiButtonEmpty>
               <EuiButton
                 onClick={handleOnSave}
                 fill

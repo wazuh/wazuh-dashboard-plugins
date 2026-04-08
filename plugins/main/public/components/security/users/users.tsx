@@ -7,6 +7,7 @@ import {
   EuiTitle,
   EuiEmptyPrompt,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { UsersTable } from './components/users-table';
 import { CreateUser } from './components/create-user';
 import { EditUser } from './components/edit-user';
@@ -84,7 +85,7 @@ export const Users = withUserAuthorizationPrompt([
     return (
       <EuiEmptyPrompt
         iconType='securityApp'
-        title={<h2>You need permission to manage users</h2>}
+        title={<h2>{i18n.translate('wazuh.security.needPermissionManageUsers', { defaultMessage: 'You need permission to manage users' })}</h2>}
         body={<p>Contact your system administrator.</p>}
       />
     );
@@ -129,7 +130,7 @@ export const Users = withUserAuthorizationPrompt([
       <EuiPageContentHeader>
         <EuiPageContentHeaderSection>
           <EuiTitle>
-            <h2>Users</h2>
+            <h2>{i18n.translate('wazuh.security.users.users', { defaultMessage: 'Users' })}</h2>
           </EuiTitle>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>

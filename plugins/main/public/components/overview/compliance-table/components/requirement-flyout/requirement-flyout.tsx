@@ -23,6 +23,7 @@ import {
   EuiFlexItem,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { AppState } from '../../../../../react-services/app-state';
 import { requirementGoal } from '../../requirement-goal';
 import { getUiSettings } from '../../../../../kibana-services';
@@ -89,15 +90,15 @@ export const RequirementFlyout = connect(mapStateToProps)(
           id: '@timestamp',
           isSortable: true,
           defaultSortDirection: 'desc',
-          displayAsText: 'Time',
+          displayAsText: {i18n.translate('wazuh.time', { defaultMessage: {i18n.translate('wazuh.time', { defaultMessage: 'Time' })} })},
           render: value => formatUIDate(value),
         },
         {
           id: this.props.getRequirementKey(),
           displayAsText: 'Requirement(s)',
         },
-        { id: 'wazuh.integration.name', displayAsText: 'Integration' },
-        { id: 'wazuh.integration.decoders', displayAsText: 'Decoders' },
+        { id: 'wazuh.integration.name', displayAsText: {i18n.translate('wazuh.integration', { defaultMessage: {i18n.translate('wazuh.integration', { defaultMessage: 'Integration' })} })} },
+        { id: 'wazuh.integration.decoders', displayAsText: {i18n.translate('wazuh.decoders', { defaultMessage: {i18n.translate('wazuh.decoders', { defaultMessage: 'Decoders' })} })} },
       ];
 
       const columnsWithoutAgent = [
@@ -105,23 +106,23 @@ export const RequirementFlyout = connect(mapStateToProps)(
           id: '@timestamp',
           isSortable: true,
           defaultSortDirection: 'desc',
-          displayAsText: 'Time',
+          displayAsText: {i18n.translate('wazuh.time', { defaultMessage: {i18n.translate('wazuh.time', { defaultMessage: 'Time' })} })},
           render: value => formatUIDate(value),
         },
         {
           id: 'wazuh.agent.id',
-          displayAsText: 'Agent',
+          displayAsText: {i18n.translate('wazuh.agent', { defaultMessage: 'Agent' })},
         },
         {
           id: 'wazuh.agent.name',
-          displayAsText: 'Agent name',
+          displayAsText: {i18n.translate('wazuh.agentname', { defaultMessage: 'Agent name' })},
         },
         {
           id: this.props.getRequirementKey(),
-          displayAsText: 'Requirement',
+          displayAsText: {i18n.translate('wazuh.requirement', { defaultMessage: 'Requirement' })},
         },
-        { id: 'wazuh.integration.name', displayAsText: 'Integration' },
-        { id: 'wazuh.integration.decoders', displayAsText: 'Decoders' },
+        { id: 'wazuh.integration.name', displayAsText: {i18n.translate('wazuh.integration', { defaultMessage: {i18n.translate('wazuh.integration', { defaultMessage: 'Integration' })} })} },
+        { id: 'wazuh.integration.decoders', displayAsText: {i18n.translate('wazuh.decoders', { defaultMessage: {i18n.translate('wazuh.decoders', { defaultMessage: 'Decoders' })} })} },
       ];
       const agentId = this.props.currentAgentData?.id;
       return agentId
@@ -203,7 +204,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
             id={'details'}
             buttonContent={
               <EuiTitle size='s'>
-                <h3>Details</h3>
+                <h3>{i18n.translate('wazuh.details', { defaultMessage: 'Details' })}</h3>
               </EuiTitle>
             }
             paddingSize='xs'
@@ -223,7 +224,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
                   </EuiFlexItem>
                   <EuiFlexItem style={{ marginLeft: 2 }} grow={true}>
                     <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
-                      <p style={{ fontWeight: 500, marginBottom: 2 }}>Goals</p>
+                      <p style={{ fontWeight: 500, marginBottom: 2 }}>{i18n.translate('wazuh.goals', { defaultMessage: 'Goals' })}</p>
 
                       <p>{requirementGoal[currentReq]}</p>
                     </EuiText>

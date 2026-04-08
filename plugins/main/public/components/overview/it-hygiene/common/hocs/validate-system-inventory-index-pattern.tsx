@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { withHealthCheckChecks } from '../../../../common/hocs';
 import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_GROUPS_STATES,

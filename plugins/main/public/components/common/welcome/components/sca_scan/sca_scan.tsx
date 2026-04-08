@@ -22,6 +22,7 @@ import {
   EuiEmptyPrompt,
   EuiInMemoryTable,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { Typography, TypographySize } from '../../../typography/typography';
 import { getCore } from '../../../../../kibana-services';
 import { withDataSourceFetch, withGuard, withPanel } from '../../../hocs';
@@ -58,18 +59,18 @@ const ScaScanHeader = ({ agent }) => {
       </EuiFlexItem>
       <EuiFlexItem grow={false}>
         <RedirectAppLinks application={getCore().application}>
-          <EuiToolTip position='top' content='Open SCA Scans'>
+          <EuiToolTip position='top' content={i18n.translate('wazuh.common.openscascans', { defaultMessage: {i18n.translate('wazuh.common.openscascans', { defaultMessage: 'Open SCA Scans' })} })}>
             <EuiButtonIcon
               iconType='popout'
               color='primary'
-              className='EuiButtonIcon'
+              className={i18n.translate('wazuh.common.euibuttonicon', { defaultMessage: 'EuiButtonIcon' })}
               onClick={() => {
                 new PinnedAgentManager().pinAgent(agent);
               }}
               href={NavigationService.getInstance().getUrlForApp(
                 configurationAssessment.id,
               )}
-              aria-label='Open SCA Scans'
+              aria-label={i18n.translate('wazuh.common.openscascans', { defaultMessage: {i18n.translate('wazuh.common.openscascans', { defaultMessage: {i18n.translate('wazuh.common.openscascans', { defaultMessage: 'Open SCA Scans' })} })} })}
             />
           </EuiToolTip>
         </RedirectAppLinks>
@@ -100,7 +101,7 @@ const ScaScanTable = ({ dataSourceAction }) => {
   const columnsPolicies = [
     {
       field: 'name',
-      name: 'Policy',
+      name={i18n.translate('wazuh.common.policy', { defaultMessage: {i18n.translate('wazuh.common.policy', { defaultMessage: 'Policy' })} })},
       width: '40%',
       sortable: true,
     },
@@ -118,7 +119,7 @@ const ScaScanTable = ({ dataSourceAction }) => {
     },
     {
       field: 'score',
-      name: 'Score',
+      name={i18n.translate('wazuh.common.score', { defaultMessage: {i18n.translate('wazuh.common.score', { defaultMessage: 'Score' })} })},
       width: '10%',
       sortable: true,
       render: score => {
@@ -132,7 +133,7 @@ const ScaScanTable = ({ dataSourceAction }) => {
     <>
       <EuiFlexGroup alignItems='center' gutterSize='s'>
         <EuiFlexItem grow={false} responsive={false}>
-          <Typography level='metric'>Checks by policies</Typography>
+          <Typography level='metric'>{i18n.translate('wazuh.common.checksbypolicies', { defaultMessage: 'Checks by policies' })}</Typography>
         </EuiFlexItem>
         <EuiFlexItem grow={false} responsive={false}>
           <Typography level='metric'>(top {TOP_POLICIES_SIZE})</Typography>

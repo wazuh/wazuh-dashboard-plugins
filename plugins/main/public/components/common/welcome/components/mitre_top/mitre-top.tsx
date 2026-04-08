@@ -21,6 +21,7 @@ import {
   EuiEmptyPrompt,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { Typography, TypographySize } from '../../../typography/typography';
 import { FlyoutTechnique } from '../../../../overview/mitre/framework/components/techniques/components/flyout-technique';
 import { useTimeFilter } from '../../../hooks';
@@ -40,7 +41,7 @@ import {
 const PromptNoData = () => (
   <EuiEmptyPrompt
     iconType='stats'
-    title={<Typography level='prompt'>No results</Typography>}
+    title={<Typography level='prompt'>{i18n.translate('wazuh.common.noresults', { defaultMessage: 'No results' })}</Typography>}
     titleSize={TypographySize({ level: 'prompt' })}
     body={<p>No MITRE ATT&CK results were found in the selected time range.</p>}
   />
@@ -91,7 +92,7 @@ const MitreTopTacticsTactics = compose(
       <div className='wz-agents-mitre'>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <Typography level='card'>Top Tactics</Typography>
+            <Typography level='card'>{i18n.translate('wazuh.common.toptactics', { defaultMessage: 'Top Tactics' })}</Typography>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
@@ -127,7 +128,7 @@ const MitreTopTacticsTechniquesHeader = ({ selectedTactic, setView }) => (
             setView('tactics');
           }}
           iconType='sortLeft'
-          aria-label='Back Top Tactics'
+          aria-label={i18n.translate('wazuh.common.backtoptactics', { defaultMessage: {i18n.translate('wazuh.common.backtoptactics', { defaultMessage: 'Back Top Tactics' })} })}
         />
       </EuiFlexItem>
       <EuiFlexItem>

@@ -8,6 +8,7 @@ import {
   EuiFlexGroup,
   EuiTitle,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import '../dashboard/cluster_dashboard.scss';
 import { formatUINumber } from '../../../../react-services/format-number';
 
@@ -47,7 +48,7 @@ export const OverviewCards = ({
               >
                 <EuiFlexItem grow={false}>
                   <EuiTitle>
-                    <h2>Details</h2>
+                    <h2>{i18n.translate('wazuh.details', { defaultMessage: 'Details' })}</h2>
                   </EuiTitle>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
@@ -68,11 +69,11 @@ export const OverviewCards = ({
               compressed
               listItems={[
                 {
-                  title: 'IP address',
+                  title: {i18n.translate('wazuh.ipaddress', { defaultMessage: 'IP address' })},
                   description: configuration?.nodes[0] || '-',
                 },
                 {
-                  title: 'Version',
+                  title: {i18n.translate('wazuh.version', { defaultMessage: 'Version' })},
                   description: version ?? '-',
                 },
               ]}
@@ -90,7 +91,7 @@ export const OverviewCards = ({
             textAlign='left'
             title={
               <EuiTitle>
-                <h2>Information</h2>
+                <h2>{i18n.translate('wazuh.information', { defaultMessage: 'Information' })}</h2>
               </EuiTitle>
             }
           >
@@ -99,7 +100,7 @@ export const OverviewCards = ({
               compressed
               listItems={[
                 {
-                  title: 'Nodes',
+                  title: {i18n.translate('wazuh.nodes', { defaultMessage: 'Nodes' })},
                   description: (
                     <EuiToolTip
                       content='Click to open the list of nodes'
@@ -117,7 +118,7 @@ export const OverviewCards = ({
                   ),
                 },
                 {
-                  title: 'Agents',
+                  title: {i18n.translate('wazuh.agents', { defaultMessage: 'Agents' })},
                   description: (
                     <EuiToolTip
                       content='Click to open the list of agents'

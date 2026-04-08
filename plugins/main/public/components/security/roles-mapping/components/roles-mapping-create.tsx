@@ -15,6 +15,7 @@ import {
   EuiOutsideClickDetector,
   EuiConfirmModal,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 import { RuleEditor } from './rule-editor';
 import RulesServices from '../../rules/services';
@@ -86,7 +87,7 @@ export const RolesMappingCreate = ({
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title='Unsubmitted changes'
+          title={i18n.translate('wazuh.security.roles.unsubmittedchanges', { defaultMessage: {i18n.translate('wazuh.security.roles.unsubmittedchanges', { defaultMessage: 'Unsubmitted changes' })} })}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
@@ -131,25 +132,25 @@ export const RolesMappingCreate = ({
         <EuiFlyoutBody>
           <EuiForm component='form' style={{ padding: 24 }}>
             <EuiFormRow
-              label='Role mapping name'
+              label={i18n.translate('wazuh.security.roles.rolemappingname', { defaultMessage: {i18n.translate('wazuh.security.roles.rolemappingname', { defaultMessage: 'Role mapping name' })} })}
               isInvalid={false}
               error={'Please provide a role mapping name'}
               helpText='Introduce a name for this role mapping.'
             >
               <EuiFieldText
-                placeholder='Role name'
+                placeholder={i18n.translate('wazuh.security.roles.rolename', { defaultMessage: 'Role name' })}
                 value={ruleName}
                 onChange={e => setRuleName(e.target.value)}
               />
             </EuiFormRow>
             <EuiFormRow
-              label='Roles'
+              label={i18n.translate('wazuh.security.roles.roles', { defaultMessage: {i18n.translate('wazuh.security.roles.roles', { defaultMessage: 'Roles' })} })}
               isInvalid={false}
               error={'At least one role must be selected.'}
               helpText='Assign roles to your users.'
             >
               <EuiComboBox
-                placeholder='Select roles'
+                placeholder={i18n.translate('wazuh.security.roles.selectroles', { defaultMessage: 'Select roles' })}
                 options={getRolesList()}
                 isDisabled={false}
                 selectedOptions={selectedRoles}

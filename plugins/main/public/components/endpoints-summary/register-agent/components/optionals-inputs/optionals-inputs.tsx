@@ -9,6 +9,7 @@ import {
   EuiCallOut,
   EuiLink,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { InputForm } from '../../../../common/form';
 import { OPTIONAL_PARAMETERS_TEXT } from '../../utils/register-agent-data';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
@@ -30,19 +31,24 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
   );
   const popoverAgentName = (
     <span>
-      Learn about{' '}
+      {i18n.translate('wazuh.registerAgent.optionalInputs.learnAbout', {
+        defaultMessage: 'Learn about',
+      })}{' '}
       <EuiLink
         href={agentNameDocLink}
         target='_blank'
         rel='noopener noreferrer'
       >
-        Assigning an agent name.
+        {i18n.translate('wazuh.registerAgent.optionalInputs.assigningAgentName', {
+          defaultMessage: 'Assigning an agent name.',
+        })}
       </EuiLink>
     </span>
   );
 
-  const warningForAgentName =
-    'The agent name must be unique. It can’t be changed once the agent has been enrolled.';
+  const warningForAgentName = i18n.translate('wazuh.registerAgent.optionalInputs.agentNameWarning', {
+    defaultMessage: 'The agent name must be unique. It can\'t be changed once the agent has been enrolled.',
+  });
   return (
     <Fragment>
       <EuiFlexGroup gutterSize='s' wrap>
@@ -64,7 +70,11 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
               gutterSize='s'
             >
               <EuiFlexItem grow={false}>
-                <p className='registerAgentLabels'>Assign an agent name:</p>
+                <p className='registerAgentLabels'>
+                  {i18n.translate('wazuh.registerAgent.optionalInputs.assignAgentNameLabel', {
+                    defaultMessage: 'Assign an agent name:',
+                  })}
+                </p>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiPopover
@@ -90,7 +100,9 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
             </EuiFlexGroup>
           </>
         }
-        placeholder='Agent name'
+        placeholder={i18n.translate('wazuh.registerAgent.optionalInputs.agentNamePlaceholder', {
+          defaultMessage: 'Agent name',
+        })}
       />
       <EuiCallOut
         color='warning'

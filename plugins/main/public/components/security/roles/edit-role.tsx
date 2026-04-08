@@ -13,6 +13,7 @@ import {
   EuiOverlayMask,
   EuiConfirmModal,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
@@ -50,7 +51,7 @@ export const EditRole = ({ role, closeFlyout, onRoleUpdated }) => {
     try {
       setIsLoading(true);
       const roleDataResponse = await WzRequest.apiReq(
-        'GET',
+        {i18n.translate('wazuh.security.roles.get', { defaultMessage: {i18n.translate('wazuh.security.roles.get', { defaultMessage: 'GET' })} })},
         '/security/roles',
         {
           params: {
@@ -61,7 +62,7 @@ export const EditRole = ({ role, closeFlyout, onRoleUpdated }) => {
       const roleData = roleDataResponse?.data?.data?.affected_items?.[0];
       setCurrentRole(roleData);
       const policies_request = await WzRequest.apiReq(
-        'GET',
+        {i18n.translate('wazuh.security.roles.get', { defaultMessage: {i18n.translate('wazuh.security.roles.get', { defaultMessage: 'GET' })} })},
         '/security/policies',
         {},
       );
@@ -110,7 +111,7 @@ export const EditRole = ({ role, closeFlyout, onRoleUpdated }) => {
         return policy.id;
       });
       const policyResult = await WzRequest.apiReq(
-        'POST',
+        {i18n.translate('wazuh.security.roles.post', { defaultMessage: 'POST' })},
         `/security/roles/${roleId}/policies`,
         {
           params: {
@@ -160,7 +161,7 @@ export const EditRole = ({ role, closeFlyout, onRoleUpdated }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title='Unsubmitted changes'
+          title={i18n.translate('wazuh.security.roles.unsubmittedchanges', { defaultMessage: {i18n.translate('wazuh.security.roles.unsubmittedchanges', { defaultMessage: 'Unsubmitted changes' })} })}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
@@ -190,7 +191,7 @@ export const EditRole = ({ role, closeFlyout, onRoleUpdated }) => {
           <EuiTitle size='m'>
             <h2>
               Edit {role.name} role &nbsp;
-              {isReserved && <EuiBadge color='primary'>Reserved</EuiBadge>}
+              {isReserved && <EuiBadge color='primary'>{i18n.translate('wazuh.security.roles.reserved', { defaultMessage: 'Reserved' })}</EuiBadge>}
             </h2>
           </EuiTitle>
         </EuiFlyoutHeader>
@@ -199,13 +200,13 @@ export const EditRole = ({ role, closeFlyout, onRoleUpdated }) => {
             <EuiFlexGroup>
               <EuiFlexItem grow={true}>
                 <EuiFormRow
-                  label='Policies'
+                  label={i18n.translate('wazuh.security.roles.policies', { defaultMessage: {i18n.translate('wazuh.security.roles.policies', { defaultMessage: 'Policies' })} })}
                   isInvalid={selectedPoliciesError}
                   error={'At least one policy must be selected.'}
                   helpText='Assign policies to the role.'
                 >
                   <EuiComboBox
-                    placeholder='Select policies'
+                    placeholder={i18n.translate('wazuh.security.roles.selectpolicies', { defaultMessage: 'Select policies' })}
                     options={policies}
                     isDisabled={isReserved}
                     selectedOptions={selectedPolicies}

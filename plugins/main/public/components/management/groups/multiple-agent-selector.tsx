@@ -27,6 +27,7 @@ import {
   EuiKeyPadMenuItem,
   EuiIcon,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzRequest } from '../../../react-services/wz-request';
 import './multiple-agent-selector.scss';
@@ -118,7 +119,7 @@ export const MultipleAgentSelector = withErrorBoundary(
           error: {
             error: error,
             message: error.message || error,
-            title: 'Error loading agents',
+            title: {i18n.translate('wazuh.errorloadingagents', { defaultMessage: 'Error loading agents' })},
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -137,7 +138,7 @@ export const MultipleAgentSelector = withErrorBoundary(
           params.search = searchTerm;
         }
 
-        const req = await WzRequest.apiReq('GET', '/agents', {
+        const req = await WzRequest.apiReq({i18n.translate('wazuh.get', { defaultMessage: {i18n.translate('wazuh.get', { defaultMessage: 'GET' })} })}, '/agents', {
           params: params,
         });
 
@@ -204,7 +205,7 @@ export const MultipleAgentSelector = withErrorBoundary(
           params.search = searchTerm;
         }
         const result = await WzRequest.apiReq(
-          'GET',
+          {i18n.translate('wazuh.get', { defaultMessage: {i18n.translate('wazuh.get', { defaultMessage: 'GET' })} })},
           `/groups/${this.props.currentGroup.name}/agents`,
           {
             params,
@@ -303,7 +304,7 @@ export const MultipleAgentSelector = withErrorBoundary(
       try {
         this.setState({ savingChanges: true, initState: false });
         if (itemsToSave.addedIds.length) {
-          await WzRequest.apiReq('PUT', `/agents/group`, {
+          await WzRequest.apiReq({i18n.translate('wazuh.put', { defaultMessage: 'PUT' })}, `/agents/group`, {
             params: {
               group_id: this.props.currentGroup.name,
               agents_list: itemsToSave.addedIds.toString(),
@@ -312,7 +313,7 @@ export const MultipleAgentSelector = withErrorBoundary(
         }
 
         if (itemsToSave.deletedIds.length) {
-          await WzRequest.apiReq('DELETE', `/agents/group`, {
+          await WzRequest.apiReq({i18n.translate('wazuh.delete', { defaultMessage: 'DELETE' })}, `/agents/group`, {
             params: {
               group_id: this.props.currentGroup.name,
               agents_list: itemsToSave.deletedIds.toString(),
@@ -512,7 +513,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                               style={{ marginRight: 0 }}
                             >
                               <EuiButtonIcon
-                                aria-label='Back'
+                                aria-label={i18n.translate('wazuh.back', { defaultMessage: {i18n.translate('wazuh.back', { defaultMessage: {i18n.translate('wazuh.back', { defaultMessage: 'Back' })} })} })}
                                 style={{ paddingTop: 8 }}
                                 color='primary'
                                 iconSize='l'
@@ -563,12 +564,12 @@ export const MultipleAgentSelector = withErrorBoundary(
                                 <EuiFlexGroup>
                                   <EuiFlexItem>
                                     <EuiTitle size='s'>
-                                      <h4>Available agents</h4>
+                                      <h4>{i18n.translate('wazuh.availableagents', { defaultMessage: 'Available agents' })}</h4>
                                     </EuiTitle>
                                   </EuiFlexItem>
                                   <EuiFlexItem grow={false}>
                                     <EuiButtonIcon
-                                      aria-label='Back'
+                                      aria-label={i18n.translate('wazuh.back', { defaultMessage: {i18n.translate('wazuh.back', { defaultMessage: {i18n.translate('wazuh.back', { defaultMessage: 'Back' })} })} })}
                                       color='primary'
                                       iconType='refresh'
                                       onClick={() =>
@@ -600,7 +601,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                   }}
                                   isClearable={true}
                                   fullWidth={true}
-                                  aria-label='Filter'
+                                  aria-label={i18n.translate('wazuh.filter', { defaultMessage: {i18n.translate('wazuh.filter', { defaultMessage: {i18n.translate('wazuh.filter', { defaultMessage: 'Filter' })} })} })}
                                 />
                                 <EuiSpacer size={'m'}></EuiSpacer>
                                 <select
@@ -690,7 +691,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                             </div>
                             <EuiKeyPadMenu className='wzMultipleSelectorButtons'>
                               <EuiKeyPadMenuItem
-                                label='Add all items'
+                                label={i18n.translate('wazuh.addallitems', { defaultMessage: {i18n.translate('wazuh.addallitems', { defaultMessage: 'Add all items' })} })}
                                 onClick={() => {
                                   this.moveAll(
                                     this.state.availableAgents.data,
@@ -725,7 +726,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                 />
                               </EuiKeyPadMenuItem>
                               <EuiKeyPadMenuItem
-                                label='Add selected items'
+                                label={i18n.translate('wazuh.addselecteditems', { defaultMessage: {i18n.translate('wazuh.addselecteditems', { defaultMessage: 'Add selected items' })} })}
                                 onClick={() => {
                                   this.moveItem(
                                     this.state.availableItem,
@@ -751,7 +752,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                 />
                               </EuiKeyPadMenuItem>
                               <EuiKeyPadMenuItem
-                                label='Remove selected items'
+                                label={i18n.translate('wazuh.removeselecteditems', { defaultMessage: {i18n.translate('wazuh.removeselecteditems', { defaultMessage: 'Remove selected items' })} })}
                                 onClick={() => {
                                   this.moveItem(
                                     this.state.selectedElement,
@@ -777,7 +778,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                 />
                               </EuiKeyPadMenuItem>
                               <EuiKeyPadMenuItem
-                                label='Remove all items'
+                                label={i18n.translate('wazuh.removeallitems', { defaultMessage: {i18n.translate('wazuh.removeallitems', { defaultMessage: 'Remove all items' })} })}
                                 onClick={() => {
                                   this.moveAll(
                                     this.state.selectedAgents.data,
@@ -846,7 +847,7 @@ export const MultipleAgentSelector = withErrorBoundary(
                                   }}
                                   isClearable={true}
                                   fullWidth={true}
-                                  aria-label='Filter'
+                                  aria-label={i18n.translate('wazuh.filter', { defaultMessage: {i18n.translate('wazuh.filter', { defaultMessage: {i18n.translate('wazuh.filter', { defaultMessage: 'Filter' })} })} })}
                                 />
                                 <EuiSpacer size={'m'}></EuiSpacer>
                                 <select

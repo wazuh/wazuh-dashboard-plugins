@@ -11,6 +11,7 @@ import {
   EuiLoadingSpinner,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { Agent, AgentInfoMinimal } from '../../../types';
 import { Result } from './remove-modal';
 import { ErrorAgent } from '../../../services/paginated-agents-request';
@@ -50,7 +51,7 @@ export const RemoveAgentsModalResult = ({
         },
         {
           field: 'name',
-          name: 'Name',
+          name={i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.name', { defaultMessage: {i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.name', { defaultMessage: {i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.name', { defaultMessage: 'Name' })} })} })},
           align: 'left',
           sortable: true,
         },
@@ -78,7 +79,7 @@ export const RemoveAgentsModalResult = ({
         },
         {
           field: 'name',
-          name: 'Name',
+          name={i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.name', { defaultMessage: {i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.name', { defaultMessage: {i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.name', { defaultMessage: 'Name' })} })} })},
           align: 'left',
           sortable: true,
         },
@@ -100,26 +101,26 @@ export const RemoveAgentsModalResult = ({
       columns={[
         {
           field: 'error.code',
-          name: 'Code',
+          name={i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.code', { defaultMessage: {i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.code', { defaultMessage: 'Code' })} })},
           align: 'left',
           sortable: true,
           width: '100px',
         },
         {
           field: 'error.message',
-          name: 'Error',
+          name={i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.error', { defaultMessage: {i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.error', { defaultMessage: 'Error' })} })},
           align: 'left',
           sortable: true,
         },
         {
           field: 'error.remediation',
-          name: 'Remediation',
+          name={i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.remediation', { defaultMessage: {i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.remediation', { defaultMessage: 'Remediation' })} })},
           align: 'left',
           sortable: true,
         },
         {
           field: 'id',
-          name: 'Agent IDs',
+          name={i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.agentids', { defaultMessage: {i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.agentids', { defaultMessage: 'Agent IDs' })} })},
           align: 'left',
           render: ids => ids.join(', '),
         },
@@ -158,7 +159,7 @@ export const RemoveAgentsModalResult = ({
       steps={[
         {
           step: 1,
-          title: 'Retrieve agents data',
+          title: {i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.retrieveagentsdata', { defaultMessage: 'Retrieve agents data' })},
           status: getAgentsStatus,
           children:
             getAgentsStatus === 'loading' ? null : getAgentsStatus ===
@@ -183,7 +184,7 @@ export const RemoveAgentsModalResult = ({
         },
         {
           step: 2,
-          title: 'Apply agents removal',
+          title: {i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.applyagentsremoval', { defaultMessage: 'Apply agents removal' })},
           status: saveChangesStatus,
           children:
             getAgentsStatus === 'complete' ? (
@@ -200,7 +201,7 @@ export const RemoveAgentsModalResult = ({
                         <EuiLoadingSpinner size='m' />
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
-                        <EuiText>Removing agents</EuiText>
+                        <EuiText>{i18n.translate('wazuh.endpointsSummary.table.globalActions.remove.removingagents', { defaultMessage: 'Removing agents' })}</EuiText>
                       </EuiFlexItem>
                     </EuiFlexGroup>
                   </EuiFlexItem>

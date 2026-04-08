@@ -26,6 +26,7 @@ import {
   EuiCallOut,
   EuiLoadingSpinner,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { FlyoutTechnique } from './components/flyout-technique/';
 import { ITactic } from '../../';
 import { withWindowSize } from '../../../../../common/hocs/withWindowSize';
@@ -191,24 +192,24 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
     return [
       {
         id: 0,
-        title: 'Actions',
+        title: {i18n.translate('wazuh.actions', { defaultMessage: 'Actions' })},
         items: [
           {
-            name: 'Filter for value',
+            name={i18n.translate('wazuh.filterforvalue', { defaultMessage: {i18n.translate('wazuh.filterforvalue', { defaultMessage: 'Filter for value' })} })},
             icon: <EuiIcon type='magnifyWithPlus' size='m' />,
             onClick: () => {
               closeActionsMenu();
             },
           },
           {
-            name: 'Filter out value',
+            name={i18n.translate('wazuh.filteroutvalue', { defaultMessage: {i18n.translate('wazuh.filteroutvalue', { defaultMessage: 'Filter out value' })} })},
             icon: <EuiIcon type='magnifyWithMinus' size='m' />,
             onClick: () => {
               closeActionsMenu();
             },
           },
           {
-            name: 'View technique details',
+            name={i18n.translate('wazuh.viewtechniquedetails', { defaultMessage: {i18n.translate('wazuh.viewtechniquedetails', { defaultMessage: 'View technique details' })} })},
             icon: <EuiIcon type='filebeatApp' size='m' />,
             onClick: () => {
               closeActionsMenu();
@@ -234,7 +235,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
 
   const getMitreTechniques = async params => {
     try {
-      return await WzRequest.apiReq('GET', '/mitre/techniques', { params });
+      return await WzRequest.apiReq({i18n.translate('wazuh.get', { defaultMessage: {i18n.translate('wazuh.get', { defaultMessage: 'GET' })} })}, '/mitre/techniques', { params });
     } catch (error) {
       const options = {
         context: `${Techniques.name}.getMitreTechniques`,
@@ -518,7 +519,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
     try {
       if (searchValue) {
         setIsSearching(true);
-        const response = await WzRequest.apiReq('GET', '/mitre/techniques', {
+        const response = await WzRequest.apiReq({i18n.translate('wazuh.get', { defaultMessage: {i18n.translate('wazuh.get', { defaultMessage: 'GET' })} })}, '/mitre/techniques', {
           params: {
             search: searchValue,
           },
@@ -583,7 +584,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
       <EuiFlexGroup>
         <EuiFlexItem grow={true}>
           <EuiTitle size='m'>
-            <h1>Techniques</h1>
+            <h1>{i18n.translate('wazuh.techniques', { defaultMessage: 'Techniques' })}</h1>
           </EuiTitle>
         </EuiFlexItem>
 
