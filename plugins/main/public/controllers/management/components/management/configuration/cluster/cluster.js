@@ -16,13 +16,13 @@ import PropTypes from 'prop-types';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
-import withWzConfig from '../util-hocs/wz-config';
+import WzLoading from '../util-components/loading';
 import { isString, renderValueOrNoValue } from '../utils/utils';
 
 import { connect } from 'react-redux';
-import { compose } from 'redux';
 
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { WzRequest } from '../../../../../../react-services/wz-request';
 
 const mainSettings = [
   { field: 'name', label: 'Cluster name' },
@@ -84,73 +84,129 @@ const helpLinks = [
 export class WzCluster extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      clusterConfig: null,
+      isLoading: true,
+      errorFetching: null,
+    };
   }
+
+  async componentDidMount() {
+    await this.fetchClusterConfig();
+  }
+
+  async componentDidUpdate(prevProps) {
+    if (
+      prevProps.clusterNodeSelected !== this.props.clusterNodeSelected ||
+      prevProps.refreshTime !== this.props.refreshTime
+    ) {
+      await this.fetchClusterConfig();
+    }
+  }
+
+  fetchClusterConfig = async () => {
+    try {
+      this.setState({ isLoading: true, errorFetching: null });
+      const node = this.props.clusterNodeSelected;
+      if (!node) {
+        this.setState({
+          isLoading: false,
+          errorFetching: 'No cluster node selected',
+        });
+        return;
+      }
+      const result = await WzRequest.apiReq(
+        'GET',
+        `/cluster/${node}/configuration`,
+        {},
+      );
+      const clusterConfig =
+        result?.data?.data?.affected_items?.[0]?.cluster || null;
+      if (clusterConfig) {
+        this.setState({ clusterConfig, isLoading: false });
+      } else {
+        this.setState({ isLoading: false, errorFetching: 'not-present' });
+      }
+    } catch (error) {
+      this.setState({
+        isLoading: false,
+        errorFetching: error.message || 'Error fetching cluster configuration',
+      });
+    }
+  };
+
   render() {
-    const { currentConfig, wazuhNotReadyYet } = this.props;
+    const { clusterConfig, isLoading, errorFetching } = this.state;
+    const { wazuhNotReadyYet } = this.props;
+
+    if (isLoading) {
+      return <WzLoading />;
+    }
+
+    if (errorFetching && isString(errorFetching)) {
+      return <WzNoConfig error={errorFetching} help={helpLinks} />;
+    }
+
+    if (wazuhNotReadyYet && !clusterConfig) {
+      return <WzNoConfig error='Server not ready yet' help={helpLinks} />;
+    }
+
+    if (!clusterConfig) {
+      return <WzNoConfig error='not-present' help={helpLinks} />;
+    }
+
     let mainSettingsConfig = {
-      ...currentConfig['com-cluster'],
+      ...clusterConfig,
       disabled:
-        currentConfig['com-cluster'].disabled === true ? 'disabled' : 'enabled',
+        clusterConfig.disabled === true ? 'disabled' : 'enabled',
     };
 
-    if (currentConfig['com-cluster'].haproxy_helper) {
+    if (clusterConfig.haproxy_helper) {
       mainSettingsConfig = {
         ...mainSettingsConfig,
         haproxy_helper: {
-          ...currentConfig['com-cluster'].haproxy_helper,
+          ...clusterConfig.haproxy_helper,
           haproxy_disabled:
-            currentConfig['com-cluster'].haproxy_helper.haproxy_disabled ===
-            true
+            clusterConfig.haproxy_helper.haproxy_disabled === true
               ? 'disabled'
               : 'enabled',
         },
       };
     }
+
     return (
       <Fragment>
-        {currentConfig['com-cluster'] &&
-          isString(currentConfig['com-cluster']) && (
-            <WzNoConfig error={currentConfig['com-cluster']} help={helpLinks} />
+        <WzConfigurationSettingsHeader
+          title='Main settings'
+          help={helpLinks}
+        >
+          <WzConfigurationSettingsGroup
+            config={mainSettingsConfig}
+            items={mainSettings}
+          />
+          {mainSettingsConfig.haproxy_helper && (
+            <WzConfigurationSettingsGroup
+              title='HAProxy settings'
+              config={mainSettingsConfig}
+              items={haproxySettings}
+            />
           )}
-        {wazuhNotReadyYet &&
-          (!currentConfig || !currentConfig['com-cluster']) && (
-            <WzNoConfig error='Server not ready yet' help={helpLinks} />
-          )}
-        {currentConfig['com-cluster'] &&
-          !isString(currentConfig['com-cluster']) && (
-            <WzConfigurationSettingsHeader
-              title='Main settings'
-              help={helpLinks}
-            >
-              <WzConfigurationSettingsGroup
-                config={mainSettingsConfig}
-                items={mainSettings}
-              />
-              {mainSettingsConfig.haproxy_helper && (
-                <WzConfigurationSettingsGroup
-                  title='HAProxy settings'
-                  config={mainSettingsConfig}
-                  items={haproxySettings}
-                />
-              )}
-            </WzConfigurationSettingsHeader>
-          )}
+        </WzConfigurationSettingsHeader>
       </Fragment>
     );
   }
 }
 
-const sections = [{ component: 'com', configuration: 'cluster' }];
-
 const mapStateToProps = state => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
+  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
+  refreshTime: state.configurationReducers.refreshTime,
 });
 
 WzCluster.propTypes = {
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+  clusterNodeSelected: PropTypes.string,
+  refreshTime: PropTypes.number,
 };
 
-export default compose(
-  withWzConfig(sections),
-  connect(mapStateToProps),
-)(WzCluster);
+export default connect(mapStateToProps)(WzCluster);

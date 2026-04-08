@@ -25,13 +25,12 @@ export default [
         goto: 'global-configuration',
         when: 'manager',
       },
-      /*{ FIXME: Either remove cluster section or edit the endpoint it  
-                uses (if there is a valid endpoint with the info)
+      {
         name: 'Cluster',
         description: 'Master node configuration',
         goto: 'cluster',
         when: 'manager',
-      },*/
+      },
       {
         name: 'Registration Service',
         description: 'Automatic agent registration service',

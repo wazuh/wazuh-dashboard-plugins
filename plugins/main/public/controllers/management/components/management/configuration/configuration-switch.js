@@ -246,15 +246,13 @@ class WzConfigurationSwitch extends Component {
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
-                {/* FIXME: Either remove cluster section or edit the endpoint it  
-                          uses (if there is a valid endpoint with the info)
                 <WzViewSelectorSwitch view='cluster'>
                   <WzConfigurationCluster
                     clusterNodeSelected={this.props.clusterNodeSelected}
                     agent={agent}
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
-                </WzViewSelectorSwitch>*/}
+                </WzViewSelectorSwitch>
                 <WzViewSelectorSwitch view='registration-service'>
                   <WzConfigurationRegistrationService
                     clusterNodeSelected={this.props.clusterNodeSelected}
