@@ -153,7 +153,7 @@ const columns = [
     field: '_source.file.mtime',
     name: 'Modified time',
     sortable: true,
-    width: '150px',
+    width: '300px',
     render: formatUIDate,
   },
   {
