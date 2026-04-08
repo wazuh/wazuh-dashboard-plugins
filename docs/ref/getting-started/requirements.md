@@ -114,6 +114,3 @@ Supported web browsers:
 - Low-latency network connection to Wazuh indexer (<50ms recommended)
 - Dedicated server or VM (not containerized for production)
 - Sufficient disk I/O for logging and caching operations
-
-For detailed compatibility matrices and sizing guidance, see the official installation guide:
-https://documentation.wazuh.com/current/installation-guide/index.html
