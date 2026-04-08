@@ -30,7 +30,7 @@ import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selec
 import NavigationService from '../../../../../react-services/navigation-service';
 import { withDataSourceFetch } from '../../../hocs';
 import {
-  FindingsDataSourceRepository,
+  FIMDataSourceRepository,
   FIMDataSource,
 } from '../../../data-source';
 
@@ -83,9 +83,9 @@ export function useTimeFilter() {
 
 const FimTableDataSource = withDataSourceFetch({
   DataSource: FIMDataSource,
-  DataSourceRepositoryCreator: FindingsDataSourceRepository,
+  DataSourceRepositoryCreator: FIMDataSourceRepository,
   mapRequestParams: ({ dataSource, dependencies }) => {
-    const [_, timeFilter, sort] = dependencies;
+    const [_, sort] = dependencies;
 
     const sortSearch = [
       { id: sort.field.substring(8), direction: sort.direction },
@@ -93,7 +93,6 @@ const FimTableDataSource = withDataSourceFetch({
     return {
       query: { query: '', language: 'kuery' },
       filters: [...dataSource.fetchFilters],
-      dateRange: timeFilter,
       pagination: {
         pageIndex: 0,
         pageSize: 5,
@@ -103,8 +102,7 @@ const FimTableDataSource = withDataSourceFetch({
       },
     };
   },
-  mapFetchActionDependencies: ({ timeFilter, sort }) => [
-    timeFilter,
+  mapFetchActionDependencies: ({ sort }) => [
     sort,
     /* Changing the agent causes the fetchFilters change, and the HOC manage this case so it is not
     requried adding the agent to the dependencies */
@@ -122,14 +120,14 @@ const FimTableDataSource = withDataSourceFetch({
       sorting={{ sort }}
       onChange={e => setSort(e.sort)}
       itemId='fim-alerts'
-      noItemsMessage='No recent events'
+      noItemsMessage='No recent documents'
     />
   );
 });
 
 function FimTable({ agent }) {
   const [sort, setSort] = useState({
-    field: '_source.timestamp',
+    field: '_source.file.mtime',
     direction: 'desc',
   });
 
@@ -151,34 +149,27 @@ function navigateToFim(agent) {
 
 const columns = [
   {
-    field: '_source.timestamp',
-    name: 'Time',
+    field: '_source.file.mtime',
+    name: 'Modified time',
     sortable: true,
     width: '150px',
   },
   {
-    field: '_source.syscheck.path',
-    name: 'Path',
+    field: '_source.file.path',
+    name: 'File path',
     sortable: true,
     truncateText: true,
   },
   {
-    field: '_source.syscheck.event',
-    name: 'Action',
+    field: '_source.file.owner',
+    name: 'File owner',
     sortable: true,
     width: '100px',
   },
   {
-    field: '_source.rule.description',
-    name: 'Rule description',
+    field: '_source.file.size',
+    name: 'File size',
     sortable: true,
     truncateText: true,
-  },
-  {
-    field: '_source.rule.level',
-    name: 'Rule Level',
-    sortable: true,
-    width: '75px',
-  },
-  { field: '_source.rule.id', name: 'Rule Id', sortable: true, width: '75px' },
+  }
 ];
