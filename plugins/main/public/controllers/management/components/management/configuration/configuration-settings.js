@@ -102,6 +102,7 @@ export default [
         name: 'Commands',
         description: 'Configuration options of the Command wodle',
         goto: 'commands',
+        when: 'agent',
       },
     ],
   },

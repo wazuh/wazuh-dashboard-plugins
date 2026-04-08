@@ -263,7 +263,6 @@ class WzConfigurationSwitch extends Component {
                 </WzViewSelectorSwitch>
                 <WzViewSelectorSwitch view='commands'>
                   <WzConfigurationCommands
-                    clusterNodeSelected={this.props.clusterNodeSelected}
                     agent={agent}
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
@@ -306,7 +305,7 @@ class WzConfigurationSwitch extends Component {
                       />
                     </WzViewSelectorSwitch>
                     {/* Removed this section for the agent
-                    
+
                     <WzViewSelectorSwitch view='alerts-agent'>
                       <WzConfigurationAlertsLabelsAgent
                         clusterNodeSelected={this.props.clusterNodeSelected}
