@@ -40,7 +40,8 @@ export class ComplianceRequirements extends Component {
   }
 
   facetClicked(id) {
-    const { selectedRequirements: oldSelected, onChangeSelectedRequirements } = this.props;
+    const { selectedRequirements: oldSelected, onChangeSelectedRequirements } =
+      this.props;
     const selectedRequirements = {
       ...oldSelected,
       [id]: !oldSelected[id],
@@ -53,18 +54,21 @@ export class ComplianceRequirements extends Component {
 
     const { selectedRequirements } = this.props;
     const requirementIds = Object.keys(this.props.complianceObject);
-    const requirementList: Array<any> = requirementIds.map((item) => {
+    const requirementList: Array<any> = requirementIds.map(item => {
       let quantity = 0;
-      this.props.complianceObject[item].forEach((subitem) => {
+      this.props.complianceObject[item].forEach(subitem => {
         quantity +=
-          (requirementsCount.find((requirement) => requirement.key === subitem) || {}).doc_count ||
-          0;
+          (
+            requirementsCount.find(
+              requirement => requirement.key === subitem,
+            ) || {}
+          ).doc_count || 0;
       });
       return {
         id: item,
         label: item,
         quantity,
-        onClick: (id) => this.facetClicked(id),
+        onClick: id => this.facetClicked(id),
       };
     });
 
@@ -72,9 +76,10 @@ export class ComplianceRequirements extends Component {
       <>
         {requirementList
           .sort((a, b) => b.quantity - a.quantity)
-          .map((facet) => {
+          .map(facet => {
             let iconNode;
-            const name = requirementsName[facet.label] || `Requirement ${facet.label}`;
+            const name =
+              requirementsName[facet.label] || `Requirement ${facet.label}`;
             return (
               <EuiFacetButton
                 key={'Requirement ' + facet.id}
@@ -83,9 +88,15 @@ export class ComplianceRequirements extends Component {
                 isSelected={this.props.selectedRequirements[facet.id]}
                 isLoading={this.props.loadingAlerts}
                 icon={iconNode}
-                onClick={facet.onClick ? () => facet.onClick(facet.id) : undefined}
+                onClick={
+                  facet.onClick ? () => facet.onClick(facet.id) : undefined
+                }
               >
-                <EuiToolTip position="top" content={name} anchorClassName="wz-display-inline-grid">
+                <EuiToolTip
+                  position='top'
+                  content={name}
+                  anchorClassName='wz-display-inline-grid'
+                >
                   <span
                     style={{
                       display: 'block',
@@ -114,7 +125,7 @@ export class ComplianceRequirements extends Component {
 
   selectAll(status) {
     const { selectedRequirements, onChangeSelectedRequirements } = this.props;
-    Object.keys(selectedRequirements).map((item) => {
+    Object.keys(selectedRequirements).map(item => {
       selectedRequirements[item] = status;
     });
     onChangeSelectedRequirements(selectedRequirements);
@@ -128,7 +139,7 @@ export class ComplianceRequirements extends Component {
         items: [
           {
             name: 'Select all',
-            icon: <EuiIcon type="check" size="m" />,
+            icon: <EuiIcon type='check' size='m' />,
             onClick: () => {
               this.closePopover();
               this.selectAll(true);
@@ -136,7 +147,7 @@ export class ComplianceRequirements extends Component {
           },
           {
             name: 'Unselect all',
-            icon: <EuiIcon type="cross" size="m" />,
+            icon: <EuiIcon type='cross' size='m' />,
             onClick: () => {
               this.closePopover();
               this.selectAll(false);
@@ -178,21 +189,24 @@ export class ComplianceRequirements extends Component {
       >
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiTitle size="m">
+            <EuiTitle size='m'>
               <h1>{title}</h1>
             </EuiTitle>
           </EuiFlexItem>
 
-          <EuiFlexItem grow={false} style={{ marginTop: '15px', marginRight: 8 }}>
+          <EuiFlexItem
+            grow={false}
+            style={{ marginTop: '15px', marginRight: 8 }}
+          >
             <EuiPopover
               button={
                 <EuiButtonIcon
-                  iconType="gear"
+                  iconType='gear'
                   onClick={() => this.onGearButtonClick()}
                 ></EuiButtonIcon>
               }
               isOpen={this.state.isPopoverOpen}
-              panelPaddingSize="none"
+              panelPaddingSize='none'
               closePopover={() => this.closePopover()}
             >
               <EuiContextMenu initialPanelId={0} panels={panels} />
