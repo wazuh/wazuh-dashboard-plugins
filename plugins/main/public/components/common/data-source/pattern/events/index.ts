@@ -9,6 +9,7 @@ export * from './docker';
 export * from './malware-detection';
 export * from './hipaa';
 export * from './nist-800-53';
+export * from './nist-800-171';
 export * from './mitre-attack';
 export * from './pci-dss';
 export * from './gdpr';

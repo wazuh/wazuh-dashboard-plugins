@@ -18,6 +18,7 @@ import { pciRequirementsFile } from '../../../../common/compliance-requirements/
 import { gdprRequirementsFile } from '../../../../common/compliance-requirements/gdpr-requirements';
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
 import { nistRequirementsFile } from '../../../../common/compliance-requirements/nist-requirements';
+import { nist171RequirementsFile } from '../../../../common/compliance-requirements/nist-171-requirements';
 import { tscRequirementsFile } from '../../../../common/compliance-requirements/tsc-requirements';
 import {
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
@@ -95,6 +96,19 @@ function buildComplianceObject({ section }) {
     if (section === 'nist') {
       descriptions = nistRequirementsFile;
       Object.keys(nistRequirementsFile).forEach(item => {
+        const currentRequirement = item.split('.')[0];
+        if (complianceRequirements[currentRequirement]) {
+          complianceRequirements[currentRequirement].push(item);
+        } else {
+          selectedRequirements[currentRequirement] = true;
+          complianceRequirements[currentRequirement] = [];
+          complianceRequirements[currentRequirement].push(item);
+        }
+      }); //forEach
+    }
+    if (section === 'nist-800-171') {
+      descriptions = nist171RequirementsFile;
+      Object.keys(nist171RequirementsFile).forEach(item => {
         const currentRequirement = item.split('.')[0];
         if (complianceRequirements[currentRequirement]) {
           complianceRequirements[currentRequirement].push(item);
@@ -217,6 +231,7 @@ export const ComplianceTable = compose(
         gdpr: 'rule.compliance.gdpr',
         hipaa: 'rule.compliance.hipaa',
         nist: 'rule.compliance.nist_800_53',
+        'nist-800-171': 'rule.compliance.nist_800_171',
         tsc: 'rule.compliance.tsc',
       };
       const aggs = {
