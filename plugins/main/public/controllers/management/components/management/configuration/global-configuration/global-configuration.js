@@ -38,7 +38,7 @@ class WzConfigurationGlobalConfiguration extends Component {
         {!agent ? (
           <WzTabSelector>
             <WzTabSelectorTab label='Global'>
-              <WzConfigurationGlobalConfigurationLogging {...this.props} />
+              <WzConfigurationGlobalConfigurationLogging />
               <WzConfigurationAgentsConfigurationGlobal {...this.props} />
             </WzTabSelectorTab>
             <WzTabSelectorTab label='Remote'>

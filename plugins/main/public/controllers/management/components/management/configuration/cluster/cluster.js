@@ -16,13 +16,13 @@ import PropTypes from 'prop-types';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
-import WzLoading from '../util-components/loading';
+import withWzConfig from '../util-hocs/wz-config';
 import { isString, renderValueOrNoValue } from '../utils/utils';
 
 import { connect } from 'react-redux';
+import { compose } from 'redux';
 
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-import { WzRequest } from '../../../../../../react-services/wz-request';
 
 const mainSettings = [
   { field: 'name', label: 'Cluster name' },
@@ -84,74 +84,20 @@ const helpLinks = [
 export class WzCluster extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      clusterConfig: null,
-      isLoading: true,
-      errorFetching: null,
-    };
   }
-
-  async componentDidMount() {
-    await this.fetchClusterConfig();
-  }
-
-  async componentDidUpdate(prevProps) {
-    if (
-      prevProps.clusterNodeSelected !== this.props.clusterNodeSelected ||
-      prevProps.refreshTime !== this.props.refreshTime
-    ) {
-      await this.fetchClusterConfig();
-    }
-  }
-
-  fetchClusterConfig = async () => {
-    try {
-      this.setState({ isLoading: true, errorFetching: null });
-      const node = this.props.clusterNodeSelected;
-      if (!node) {
-        this.setState({
-          isLoading: false,
-          errorFetching: 'No cluster node selected',
-        });
-        return;
-      }
-      const result = await WzRequest.apiReq(
-        'GET',
-        `/cluster/${node}/configuration`,
-        {},
-      );
-      const clusterConfig =
-        result?.data?.data?.affected_items?.[0]?.cluster || null;
-      if (clusterConfig) {
-        this.setState({ clusterConfig, isLoading: false });
-      } else {
-        this.setState({ isLoading: false, errorFetching: 'not-present' });
-      }
-    } catch (error) {
-      this.setState({
-        isLoading: false,
-        errorFetching: error.message || 'Error fetching cluster configuration',
-      });
-    }
-  };
-
   render() {
-    const { clusterConfig, isLoading, errorFetching } = this.state;
-    const { wazuhNotReadyYet } = this.props;
+    const { currentConfig, wazuhNotReadyYet } = this.props;
+    const clusterConfig = currentConfig?.['cluster'];
 
-    if (isLoading) {
-      return <WzLoading />;
+    if (clusterConfig && isString(clusterConfig)) {
+      return <WzNoConfig error={clusterConfig} help={helpLinks} />;
     }
 
-    if (errorFetching && isString(errorFetching)) {
-      return <WzNoConfig error={errorFetching} help={helpLinks} />;
-    }
-
-    if (wazuhNotReadyYet && !clusterConfig) {
+    if (wazuhNotReadyYet && (!currentConfig || !clusterConfig)) {
       return <WzNoConfig error='Server not ready yet' help={helpLinks} />;
     }
 
-    if (!clusterConfig) {
+    if (!clusterConfig || !Object.keys(clusterConfig).length) {
       return <WzNoConfig error='not-present' help={helpLinks} />;
     }
 
@@ -197,16 +143,17 @@ export class WzCluster extends Component {
   }
 }
 
+const sections = [{ useFullEndpoint: true, key: 'cluster' }];
+
 const mapStateToProps = state => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
-  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
-  refreshTime: state.configurationReducers.refreshTime,
 });
 
 WzCluster.propTypes = {
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
-  clusterNodeSelected: PropTypes.string,
-  refreshTime: PropTypes.number,
 };
 
-export default connect(mapStateToProps)(WzCluster);
+export default compose(
+  withWzConfig(sections),
+  connect(mapStateToProps),
+)(WzCluster);

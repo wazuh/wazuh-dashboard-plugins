@@ -16,7 +16,55 @@ import { delayAsPromise } from '../../../../../../../common/utils';
 import { AGENT_SYNCED_STATUS } from '../../../../../../../common/constants';
 
 /**
- * Get configuration for an agent of request sections
+ * Fetch full node configuration and extract requested keys.
+ * Uses GET /cluster/{node}/configuration which returns the entire
+ * wazuh-manager.conf as a single response. Each section's key is
+ * extracted from affected_items[0].
+ *
+ * @param {string} node Cluster node name
+ * @param {array} sections Sections with { useFullEndpoint: true, key: string }
+ * @param {function} updateWazuhNotReadyYet
+ * @returns {object} Map of key → config object (or error string)
+ */
+const getFullEndpointConfig = async (node, sections, updateWazuhNotReadyYet) => {
+  const result = {};
+  try {
+    const url = `/cluster/${node}/configuration`;
+    const fullResult = await WzRequest.apiReq('GET', url, {});
+    const fullConfig =
+      fullResult?.data?.data?.total_affected_items !== 0
+        ? fullResult?.data?.data?.affected_items?.[0] || {}
+        : {};
+    for (const section of sections) {
+      result[section.key] = fullConfig[section.key] ?? {};
+    }
+  } catch (error) {
+    const errorMsg = await handleError(
+      error,
+      'Fetch configuration',
+      updateWazuhNotReadyYet,
+      node,
+    );
+    for (const section of sections) {
+      result[section.key] = errorMsg;
+    }
+  }
+  return result;
+};
+
+/**
+ * Get configuration for an agent of request sections.
+ *
+ * Supports two section formats:
+ *  - Standard:      { component: string, configuration: string }
+ *    Calls /cluster/{node}/configuration/{component}/{configuration}
+ *    or    /agents/{agentId}/config/{component}/{configuration}
+ *
+ *  - Full endpoint: { useFullEndpoint: true, key: string }
+ *    Delegates to getFullEndpointConfig which calls
+ *    /cluster/{node}/configuration once and extracts the requested
+ *    keys. Only valid in manager context (node must be set).
+ *
  * @param {string} agentId Agent ID
  * @param {array} sections Sections
  * @param {false} [node=false] Node
@@ -40,7 +88,18 @@ export const getCurrentConfig = async (
     }
 
     const result = {};
-    for (const section of sections) {
+
+    const fullEndpointSections = sections.filter(s => s.useFullEndpoint);
+    const regularSections = sections.filter(s => !s.useFullEndpoint);
+
+    if (fullEndpointSections.length > 0 && node) {
+      Object.assign(
+        result,
+        await getFullEndpointConfig(node, fullEndpointSections, updateWazuhNotReadyYet),
+      );
+    }
+
+    for (const section of regularSections) {
       const { component, configuration } = section;
       if (
         !component ||
@@ -57,7 +116,6 @@ export const getCurrentConfig = async (
 
         const partialResult = await WzRequest.apiReq('GET', url, {});
 
-        // For cluster, the response comes in affected_items
         if (node) {
           result[`${component}-${configuration}`] =
             partialResult.data.data.total_affected_items !== 0

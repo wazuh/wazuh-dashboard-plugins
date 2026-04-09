@@ -16,13 +16,13 @@ import PropTypes from 'prop-types';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
-import WzLoading from '../util-components/loading';
+import withWzConfig from '../util-hocs/wz-config';
 import { isString } from '../utils/utils';
 
 import { connect } from 'react-redux';
+import { compose } from 'redux';
 
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
-import { WzRequest } from '../../../../../../react-services/wz-request';
 
 const renderCertificateAuthorities = value => {
   if (!value || !Array.isArray(value)) return '-';
@@ -69,75 +69,20 @@ const helpLinks = [
 export class WzIndexer extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      indexerConfig: null,
-      isLoading: true,
-      errorFetching: null,
-    };
   }
-
-  async componentDidMount() {
-    await this.fetchIndexerConfig();
-  }
-
-  async componentDidUpdate(prevProps) {
-    if (
-      prevProps.clusterNodeSelected !== this.props.clusterNodeSelected ||
-      prevProps.refreshTime !== this.props.refreshTime
-    ) {
-      await this.fetchIndexerConfig();
-    }
-  }
-
-  fetchIndexerConfig = async () => {
-    try {
-      this.setState({ isLoading: true, errorFetching: null });
-      const node = this.props.clusterNodeSelected;
-      if (!node) {
-        this.setState({
-          isLoading: false,
-          errorFetching: 'No cluster node selected',
-        });
-        return;
-      }
-      const result = await WzRequest.apiReq(
-        'GET',
-        `/cluster/${node}/configuration`,
-        {},
-      );
-      const indexerConfig =
-        result?.data?.data?.affected_items?.[0]?.indexer || null;
-      if (indexerConfig) {
-        this.setState({ indexerConfig, isLoading: false });
-      } else {
-        this.setState({ isLoading: false, errorFetching: 'not-present' });
-      }
-    } catch (error) {
-      this.setState({
-        isLoading: false,
-        errorFetching:
-          error.message || 'Error fetching indexer configuration',
-      });
-    }
-  };
-
   render() {
-    const { indexerConfig, isLoading, errorFetching } = this.state;
-    const { wazuhNotReadyYet } = this.props;
+    const { currentConfig, wazuhNotReadyYet } = this.props;
+    const indexerConfig = currentConfig?.['indexer'];
 
-    if (isLoading) {
-      return <WzLoading />;
+    if (indexerConfig && isString(indexerConfig)) {
+      return <WzNoConfig error={indexerConfig} help={helpLinks} />;
     }
 
-    if (errorFetching && isString(errorFetching)) {
-      return <WzNoConfig error={errorFetching} help={helpLinks} />;
-    }
-
-    if (wazuhNotReadyYet && !indexerConfig) {
+    if (wazuhNotReadyYet && (!currentConfig || !indexerConfig)) {
       return <WzNoConfig error='Server not ready yet' help={helpLinks} />;
     }
 
-    if (!indexerConfig) {
+    if (!indexerConfig || !Object.keys(indexerConfig).length) {
       return <WzNoConfig error='not-present' help={helpLinks} />;
     }
 
@@ -162,16 +107,17 @@ export class WzIndexer extends Component {
   }
 }
 
+const sections = [{ useFullEndpoint: true, key: 'indexer' }];
+
 const mapStateToProps = state => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
-  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
-  refreshTime: state.configurationReducers.refreshTime,
 });
 
 WzIndexer.propTypes = {
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
-  clusterNodeSelected: PropTypes.string,
-  refreshTime: PropTypes.number,
 };
 
-export default connect(mapStateToProps)(WzIndexer);
+export default compose(
+  withWzConfig(sections),
+  connect(mapStateToProps),
+)(WzIndexer);
