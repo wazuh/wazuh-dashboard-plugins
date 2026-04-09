@@ -109,7 +109,7 @@ function buildComplianceObject({ section }) {
     if (section === 'nist-800-171') {
       descriptions = nist171RequirementsFile;
       Object.keys(nist171RequirementsFile).forEach(item => {
-        const currentRequirement = item.split('.')[0];
+        const currentRequirement = item.split('.').slice(0, 2).join('.');
         if (complianceRequirements[currentRequirement]) {
           complianceRequirements[currentRequirement].push(item);
         } else {
@@ -335,6 +335,8 @@ export const ComplianceTable = compose(
                         minWidth: 145,
                         maxHeight: 'calc(100vh - 320px)',
                         overflowX: 'hidden',
+                        overflowY: 'auto',
+                        backgroundColor: '#80808014',
                       }}
                     >
                       <ComplianceRequirements

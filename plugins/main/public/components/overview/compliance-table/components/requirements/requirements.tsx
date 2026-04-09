@@ -40,7 +40,7 @@ export class ComplianceRequirements extends Component {
     }
   }
 
- 
+
 
   facetClicked(id){
     const { selectedRequirements: oldSelected, onChangeSelectedRequirements } = this.props;
@@ -69,10 +69,18 @@ export class ComplianceRequirements extends Component {
         onClick: (id) => this.facetClicked(id),
       }}
     );
-    
+
+    const isNist171 = this.props.section === 'nist-800-171';
     return (
       <>
-      {requirementList.sort((a, b) => b.quantity - a.quantity).map(facet => {
+      {requirementList.sort((a, b) => {
+        const quantityDiff = b.quantity - a.quantity;
+        if (quantityDiff !== 0) return quantityDiff;
+        if (isNist171) {
+          return parseInt(a.id.split('.')[1], 10) - parseInt(b.id.split('.')[1], 10);
+        }
+        return 0;
+      }).map(facet => {
         let iconNode;
         const name = requirementsName[facet.label] || `Requirement ${facet.label}`;
         return (
@@ -97,19 +105,19 @@ export class ComplianceRequirements extends Component {
                     Requirement {facet.label}
                   </span>
                 </EuiToolTip>
-            
+
           </EuiFacetButton>
         );
       })}
       </>
     );
-    
+
   }
 
   onGearButtonClick(){
     this.setState({isPopoverOpen: !this.state.isPopoverOpen});
   }
-  
+
 
   closePopover(){
     this.setState({isPopoverOpen: false});
@@ -164,12 +172,15 @@ export class ComplianceRequirements extends Component {
     if(this.props.section === "nist"){
       title = "NIST 800-53"
     }
+    if(this.props.section === "nist-800-171"){
+      title = "NIST 800-171"
+    }
     if(this.props.section === "tsc"){
       title = "TSC";
       sectionStyle["height"] = 350;
     }
     return (
-      <div style={{ backgroundColor: "#80808014", padding: "10px 10px 0 10px", minHeight: 300,  height: "100%"}}>
+      <div style={{ padding: "10px 10px 0 10px", minHeight: 300,  height: "100%"}}>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiTitle size="m">
@@ -177,7 +188,7 @@ export class ComplianceRequirements extends Component {
             </EuiTitle>
           </EuiFlexItem>
 
-          <EuiFlexItem grow={false} style={{marginTop:'15px', marginRight:8}}> 
+          <EuiFlexItem grow={false} style={{marginTop:'15px', marginRight:8}}>
              <EuiPopover
               button={(<EuiButtonIcon iconType="gear" onClick={() => this.onGearButtonClick()}></EuiButtonIcon>)}
               isOpen={this.state.isPopoverOpen}
