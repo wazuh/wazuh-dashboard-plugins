@@ -44,7 +44,7 @@ export const WAZUH_MODULES = {
     title: 'Regulatory Compliance',
     appId: 'regulatory-compliance',
     description:
-      'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, and TSC.',
+      'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, TSC and NIS2.',
   },
   pci: {
     title: 'PCI DSS',
@@ -75,6 +75,12 @@ export const WAZUH_MODULES = {
     appId: 'tsc',
     description:
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy',
+  },
+  nis2: {
+    title: 'NIS2',
+    appId: 'nis2',
+    description:
+      'EU directive on measures for high common level of cybersecurity across the Union.',
   },
   microsoftGraphAPI: {
     title: 'Microsoft Graph API',

@@ -33,6 +33,7 @@ import { hipaaColumns } from '../../overview/regulatory-compliance/hipaa/events/
 import { nistColumns } from '../../overview/regulatory-compliance/nist/events/nist-columns';
 import { gdprColumns } from '../../overview/regulatory-compliance/gdpr/events/gdpr-columns';
 import { tscColumns } from '../../overview/regulatory-compliance/tsc/events/tsc-columns';
+import { nis2Columns } from '../../overview/regulatory-compliance/nis2/events/nis2-columns';
 import { githubColumns } from '../../overview/github/events/github-columns';
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
@@ -57,6 +58,7 @@ import {
   DashboardNIST80053,
   DashboardHIPAA,
   DashboardTSC,
+  DashboardNIS2,
   DashboardMITRE,
   DashboardAWS,
   DashboardOffice365,
@@ -81,6 +83,7 @@ import {
   ConfigurationAssessmentDataSource,
   HIPAADataSource,
   PCIDSSDataSource,
+  Nis2DataSource,
   Office365DataSource,
   ThreatHuntingDataSource,
   AzureDataSource,
@@ -101,6 +104,7 @@ import {
   RegulatoryComplianceHIPAA,
   RegulatoryComplianceNIST80053,
   RegulatoryComplianceTSC,
+  RegulatoryComplianceNIS2,
 } from '../../overview/regulatory-compliance';
 import { InventoryFIM } from '../../overview/fim';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
@@ -536,6 +540,33 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
+  nis2: {
+    init: TAB_VIEW_ID_DASHBOARD,
+    tabs: [
+      {
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardNIS2,
+      },
+      {
+        id: 'inventory',
+        name: 'Controls',
+        buttons: [ButtonExploreAgent],
+        component: (props: any) => (
+          <ComplianceTable {...props} DataSource={Nis2DataSource} />
+        ),
+      },
+      renderDiscoverTab({
+        moduleId: 'nis2',
+        tableColumns: nis2Columns,
+        DataSource: Nis2DataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+      }),
+    ],
+    availableFor: ['manager', 'agent'],
+  },
+
   'it-hygiene': {
     init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
@@ -616,6 +647,12 @@ export const ModulesDefaults = {
         name: 'TSC',
         buttons: [ButtonExploreAgent],
         component: RegulatoryComplianceTSC,
+      },
+      {
+        id: 'nis2',
+        name: 'NIS2',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceNIS2,
       },
     ],
     availableFor: ['manager', 'agent'],
