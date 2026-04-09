@@ -1145,4 +1145,5 @@ export const TAB_VIEW_NAME_EVENTS = 'Findings';
 export const TAB_VIEW_ID_DASHBOARD = 'dashboard';
 export const TAB_VIEW_NAME_DASHBOARD = 'Dashboard';
 
-export const CTI_CVE_LINK_BASE_PATH = 'https://cti.wazuh.com/vulnerabilities/cves/';
+export const CTI_CVE_LINK_BASE_PATH =
+  'https://cti.wazuh.com/vulnerabilities/cves/';

@@ -139,7 +139,9 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
     id: 'vulnerability.id',
     render: (value, row) => {
-      if (!(row.vulnerability?.reference || row.vulnerability?.scanner?.reference)) {
+      if (
+        !(row.vulnerability?.reference || row.vulnerability?.scanner?.reference)
+      ) {
         return value;
       }
       return (
@@ -167,7 +169,12 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
     id: 'data.vulnerability.cve',
     render: (value, row) => {
-      if (!(row.data?.vulnerability?.reference || row.data?.vulnerability?.scanner?.reference)) {
+      if (
+        !(
+          row.data?.vulnerability?.reference ||
+          row.data?.vulnerability?.scanner?.reference
+        )
+      ) {
         return value;
       }
       return (
