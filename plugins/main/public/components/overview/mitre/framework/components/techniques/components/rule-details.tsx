@@ -27,6 +27,7 @@ const complianceEquivalences = {
   hipaa: 'HIPAA',
   mitre: 'MITRE',
   'nist-800-53': 'NIST-800-53',
+  // TODO: add the remaining regulatory compliances when the component is readded
 };
 
 const getValueAsString = value => {
@@ -66,6 +67,7 @@ const buildCompliance = ruleInfo => {
     'nist-800-53',
     'pci',
     'mitre',
+    // TODO: add the remaining regulatory compliances when the component is readded
   ];
   Object.keys(ruleInfo).forEach(key => {
     if (complianceKeys.includes(key) && ruleInfo[key].length)
@@ -122,6 +124,7 @@ const getComplianceKey = key => {
   if (key === 'nist-800-53') {
     return 'rule.compliance.nist_800_53';
   }
+  // TODO: add the remaining regulatory compliances when the component is readded
   if (key === 'mitre') {
     return 'rule.mitre.technique';
   }
