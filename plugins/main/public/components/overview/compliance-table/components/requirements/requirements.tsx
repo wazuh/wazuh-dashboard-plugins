@@ -40,10 +40,8 @@ export class ComplianceRequirements extends Component {
   }
 
   facetClicked(id) {
-    const {
-      selectedRequirements: oldSelected,
-      onChangeSelectedRequirements,
-    } = this.props;
+    const { selectedRequirements: oldSelected, onChangeSelectedRequirements } =
+      this.props;
     const selectedRequirements = {
       ...oldSelected,
       [id]: !oldSelected[id],
