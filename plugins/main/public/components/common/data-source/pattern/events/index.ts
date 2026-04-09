@@ -19,3 +19,4 @@ export * from './office-365';
 export * from './cluster';
 export * from './threat-hunting';
 export * from './azure';
+export * from './fedramp';

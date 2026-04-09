@@ -136,6 +136,10 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
     render: renderRequirementsSecurityOperations,
   },
   {
+    id: 'rule.compliance.fedramp',
+    render: renderRequirementsSecurityOperations,
+  },
+  {
     id: 'vulnerability.id',
     render: (value, row) => {
       if (!row.vulnerability?.scanner?.reference) {

@@ -48,6 +48,7 @@ const selectionOptionsCompliance = [
   { value: 'hipaa', text: 'HIPAA' },
   { value: 'gpg13', text: 'GPG13' },
   { value: 'tsc', text: 'TSC' },
+  { value: 'fedramp', text: 'FEDRAMP' },
 ];
 
 const requirementNameModuleID = {
@@ -57,6 +58,7 @@ const requirementNameModuleID = {
   hipaa: 'hipaa',
   gpg13: '',
   tsc: 'tsc',
+  fedramp: 'fedramp',
 };
 
 export const RequirementVis = withPanel({ paddingSize: 'm' })(props => {
