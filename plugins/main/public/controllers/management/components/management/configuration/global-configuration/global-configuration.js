@@ -18,6 +18,7 @@ import WzTabSelector, {
 } from '../util-components/tab-selector';
 import WzConfigurationGlobalConfigurationGlobal from './global-configuration-global';
 import WzConfigurationGlobalConfigurationRemote from './global-configuration-remote';
+import WzConfigurationGlobalConfigurationLogging from './global-configuration-logging';
 import WzConfigurationAgentsConfigurationGlobal from './global-configuration-agents';
 
 import withWzConfig from '../util-hocs/wz-config';
@@ -36,7 +37,8 @@ class WzConfigurationGlobalConfiguration extends Component {
       <Fragment>
         {!agent ? (
           <WzTabSelector>
-            <WzTabSelectorTab label='Agents'>
+            <WzTabSelectorTab label='Global'>
+              <WzConfigurationGlobalConfigurationLogging {...this.props} />
               <WzConfigurationAgentsConfigurationGlobal {...this.props} />
             </WzTabSelectorTab>
             <WzTabSelectorTab label='Remote'>
