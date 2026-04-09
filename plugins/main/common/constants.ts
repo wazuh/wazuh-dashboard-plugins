@@ -1040,7 +1040,8 @@ export const NIST_800_53_DASHBOARD_ID = 'nist-overview-dashboard-tab';
 export const NIST_800_53_AGENT_DASHBOARD_ID = 'nist-pinned-agent-dashboard-tab';
 
 export const NIST_800_171_DASHBOARD_ID = 'nist-800-171-overview-dashboard-tab';
-export const NIST_800_171_AGENT_DASHBOARD_ID = 'nist-800-171-pinned-agent-dashboard-tab';
+export const NIST_800_171_AGENT_DASHBOARD_ID =
+  'nist-800-171-pinned-agent-dashboard-tab';
 
 export const TSC_DASHBOARD_ID = 'tsc-overview-dashboard-tab';
 export const TSC_AGENT_DASHBOARD_ID = 'tsc-pinned-agent-dashboard-tab';
