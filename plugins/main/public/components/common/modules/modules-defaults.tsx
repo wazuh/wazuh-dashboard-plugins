@@ -101,6 +101,7 @@ import {
   RegulatoryComplianceHIPAA,
   RegulatoryComplianceNIST80053,
   RegulatoryComplianceTSC,
+  RegulatoryComplianceISO27001,
 } from '../../overview/regulatory-compliance';
 import { InventoryFIM } from '../../overview/fim';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
@@ -616,6 +617,12 @@ export const ModulesDefaults = {
         name: 'TSC',
         buttons: [ButtonExploreAgent],
         component: RegulatoryComplianceTSC,
+      },
+      {
+        id: 'iso-27001',
+        name: 'ISO 27001',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceISO27001,
       },
     ],
     availableFor: ['manager', 'agent'],

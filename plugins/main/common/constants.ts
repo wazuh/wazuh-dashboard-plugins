@@ -644,6 +644,8 @@ export const DATA_SOURCE_FILTER_CONTROLLED_AZURE_RULE_GROUP =
 export const DATA_SOURCE_FILTER_CONTROLLED_FIM_RULE_GROUP = 'fim-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_CONFIGURATION_ASSASSMENT_RULE_GROUP =
   'configuration-assessment-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_ISO27001_EXIST =
+  'iso27001-rule-exist';
 
 // Wazuh links
 export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';
@@ -1038,6 +1040,10 @@ export const NIST_800_53_AGENT_DASHBOARD_ID = 'nist-pinned-agent-dashboard-tab';
 
 export const TSC_DASHBOARD_ID = 'tsc-overview-dashboard-tab';
 export const TSC_AGENT_DASHBOARD_ID = 'tsc-pinned-agent-dashboard-tab';
+
+export const ISO27001_DASHBOARD_ID = 'iso27001-overview-dashboard-tab';
+export const ISO27001_AGENT_DASHBOARD_ID =
+  'iso27001-pinned-agent-dashboard-tab';
 
 export const GITHUB_DASHBOARD_ID = 'github-overview-dashboard-tab';
 export const GITHUB_AGENT_DASHBOARD_ID = 'github-pinned-agent-dashboard-tab';
