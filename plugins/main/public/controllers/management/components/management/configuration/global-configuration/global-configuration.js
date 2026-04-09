@@ -55,7 +55,6 @@ class WzConfigurationGlobalConfiguration extends Component {
 const sectionsManager = [
   { component: 'request', configuration: 'remote' },
   { component: 'monitor', configuration: 'global' },
-  //{ component: 'com', configuration: 'logging' },
 ];
 
 const sectionsAgent = [{ component: 'com', configuration: 'logging' }];
