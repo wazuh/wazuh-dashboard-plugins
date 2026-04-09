@@ -20,6 +20,7 @@ import {
 import WzConfigurationEditConfiguration from './edit-configuration/edit-configuration';
 import WzConfigurationRegistrationService from './registration-service/registration-service';
 import WzConfigurationCluster from './cluster/cluster';
+import WzConfigurationIndexer from './indexer/indexer-configuration';
 import WzConfigurationClient from './client/client';
 import WzConfigurationClientBuffer from './client-buffer/client-buffer';
 import { WzConfigurationAlertsLabelsAgent } from './alerts/alerts-labels';
@@ -248,6 +249,13 @@ class WzConfigurationSwitch extends Component {
                 </WzViewSelectorSwitch>
                 <WzViewSelectorSwitch view='cluster'>
                   <WzConfigurationCluster
+                    clusterNodeSelected={this.props.clusterNodeSelected}
+                    agent={agent}
+                    updateConfigurationSection={this.updateConfigurationSection}
+                  />
+                </WzViewSelectorSwitch>
+                <WzViewSelectorSwitch view='indexer'>
+                  <WzConfigurationIndexer
                     clusterNodeSelected={this.props.clusterNodeSelected}
                     agent={agent}
                     updateConfigurationSection={this.updateConfigurationSection}

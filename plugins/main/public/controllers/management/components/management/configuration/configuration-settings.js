@@ -32,6 +32,12 @@ export default [
         when: 'manager',
       },
       {
+        name: 'Indexer',
+        description: 'Indexer connection and SSL settings',
+        goto: 'indexer',
+        when: 'manager',
+      },
+      {
         name: 'Registration Service',
         description: 'Automatic agent registration service',
         goto: 'registration-service',
