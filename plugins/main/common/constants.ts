@@ -624,6 +624,7 @@ export const DATA_SOURCE_FILTER_CONTROLLED_OFFICE_365_RULE_GROUP =
 export const DATA_SOURCE_FILTER_CONTROLLED_GITHUB_RULE_GROUP =
   'github-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_TSC_EXIST = 'tsc-rule-exist';
+export const DATA_SOURCE_FILTER_CONTROLLED_CMMC_EXIST = 'cmmc-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_NIST_800_53_EXIST =
   'nist-800-53-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_GDPR_EXIST = 'gdpr-rule-exist';
@@ -1038,6 +1039,9 @@ export const NIST_800_53_AGENT_DASHBOARD_ID = 'nist-pinned-agent-dashboard-tab';
 
 export const TSC_DASHBOARD_ID = 'tsc-overview-dashboard-tab';
 export const TSC_AGENT_DASHBOARD_ID = 'tsc-pinned-agent-dashboard-tab';
+
+export const CMMC_DASHBOARD_ID = 'cmmc-overview-dashboard-tab';
+export const CMMC_AGENT_DASHBOARD_ID = 'cmmc-pinned-agent-dashboard-tab';
 
 export const GITHUB_DASHBOARD_ID = 'github-overview-dashboard-tab';
 export const GITHUB_AGENT_DASHBOARD_ID = 'github-pinned-agent-dashboard-tab';

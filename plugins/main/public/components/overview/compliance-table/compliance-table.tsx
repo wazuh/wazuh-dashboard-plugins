@@ -19,6 +19,7 @@ import { gdprRequirementsFile } from '../../../../common/compliance-requirements
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
 import { nistRequirementsFile } from '../../../../common/compliance-requirements/nist-requirements';
 import { tscRequirementsFile } from '../../../../common/compliance-requirements/tsc-requirements';
+import { cmmcRequirementsFile } from '../../../../common/compliance-requirements/cmmc-requirements';
 import {
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
   UI_LOGGER_LEVELS,
@@ -108,6 +109,19 @@ function buildComplianceObject({ section }) {
     if (section === 'tsc') {
       descriptions = tscRequirementsFile;
       Object.keys(tscRequirementsFile).forEach(item => {
+        const currentRequirement = item.split('.')[0];
+        if (complianceRequirements[currentRequirement]) {
+          complianceRequirements[currentRequirement].push(item);
+        } else {
+          selectedRequirements[currentRequirement] = true;
+          complianceRequirements[currentRequirement] = [];
+          complianceRequirements[currentRequirement].push(item);
+        }
+      }); //forEach
+    }
+    if (section === 'cmmc') {
+      descriptions = cmmcRequirementsFile;
+      Object.keys(cmmcRequirementsFile).forEach(item => {
         const currentRequirement = item.split('.')[0];
         if (complianceRequirements[currentRequirement]) {
           complianceRequirements[currentRequirement].push(item);
@@ -218,6 +232,7 @@ export const ComplianceTable = compose(
         hipaa: 'rule.compliance.hipaa',
         nist: 'rule.compliance.nist_800_53',
         tsc: 'rule.compliance.tsc',
+        cmmc: 'rule.compliance.cmmc',
       };
       const aggs = {
         tactics: {

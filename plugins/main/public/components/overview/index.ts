@@ -12,5 +12,6 @@ export { DashboardPCIDSS } from './regulatory-compliance/pci/dashboards';
 export { DashboardOffice365 } from './office/dashboard';
 export { DashboardThreatHunting } from './threat-hunting/dashboard';
 export { DashboardTSC } from './regulatory-compliance/tsc/dashboards';
+export { DashboardCMMC } from './regulatory-compliance/cmmc/dashboards';
 export { DashboardVuls, InventoryVuls } from './vulnerabilities';
 export { DashboardAzure } from './azure/dashboards';
