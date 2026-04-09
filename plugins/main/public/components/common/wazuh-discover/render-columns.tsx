@@ -138,7 +138,7 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
     id: 'vulnerability.id',
     render: (value, row) => {
-      if (!row.vulnerability?.scanner?.reference) {
+      if (!row.vulnerability?.reference) {
         return value;
       }
       return (
@@ -152,7 +152,7 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
           )}
         >
           <EuiLink
-            href={row.vulnerability.scanner.reference}
+            href={row.vulnerability.reference}
             target='_blank'
             rel='noopener noreferrer'
             external
