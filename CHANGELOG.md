@@ -65,7 +65,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the Cluster app and relocated some panels to the Status app [#8220](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8220)
 - Changed the default value of `wazuh.updates.disabled` from `false` to `true` [#8236](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8236)
 - Centralized regulatory compliance modules (PCI DSS, GDPR, HIPAA, NIST 800-53, and TSC) into a single "Regulatory Compliance" application [#8239](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8239)
-- Updated Vulnerability Detection Discover tab filters, and inventory columns [#8262](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8262)
+- Updated Vulnerability Detection Discover tab filters, and inventory columns [#8262](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8262) [#8283](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8283) [#8292](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8292)
 - Changed FIM table columns and index source in the agent view [#8269](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8269)
 - Updated Threat Hunting dashboards visualizations to use new `wazuh-findings*` index properties [#8281](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8281)
 
@@ -77,7 +77,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the button tooltip showing administrator role requirement where it wasn't needed [#8196](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8196)
 - Fixed a message in the group selector of the deploy new agent guide related to missing permissions when there was no groups available or they could not be obtained [#8216](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8216)
 - Fixed the under evaluation filter was removed on filter addition in Vulnerability Detection [#8252](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8252)
-- Fixed home KPIs not being vertically centered [#8267](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8267)
+- Fixed home KPIs not being vertically centered [#8267](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8267) [#8285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8285)
 
 ### Removed
 
