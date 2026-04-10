@@ -16,8 +16,6 @@ export const fedrampRequirementsFile = {
     'Access Enforcement: Enforce approved authorizations for logical access to information and system resources.',
   'AC-4':
     'Information Flow Enforcement: Control the flow of information within the system and between connected systems based on security policies.',
-  'AC-11(1)':
-    'Pattern-hiding Displays: Mask information on screens to prevent unauthorized viewing of sensitive data.',
   'AC-12':
     'Session Termination: Automatically terminate user sessions after a defined period of inactivity.',
   'AC-17':
