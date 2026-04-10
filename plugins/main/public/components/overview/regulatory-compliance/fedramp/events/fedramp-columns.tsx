@@ -6,7 +6,7 @@ export const fedrampColumns: tDataGridColumn[] = [
   commonColumns['wazuh.agent.name'],
   {
     id: 'rule.compliance.fedramp',
-    initialWidth: 160,
+    initialWidth: 240,
   },
   { id: 'wazuh.integration.name' },
   { id: 'wazuh.integration.category' },
