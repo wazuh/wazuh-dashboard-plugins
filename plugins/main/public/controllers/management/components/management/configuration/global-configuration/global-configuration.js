@@ -18,7 +18,7 @@ import WzTabSelector, {
 } from '../util-components/tab-selector';
 import WzConfigurationGlobalConfigurationGlobal from './global-configuration-global';
 import WzConfigurationGlobalConfigurationRemote from './global-configuration-remote';
-import WzConfigurationGlobalConfigurationLogging from './global-configuration-logging';
+import { WzConfigurationGlobalConfigurationLogging } from './global-configuration-logging';
 import WzConfigurationAgentsConfigurationGlobal from './global-configuration-agents';
 
 import withWzConfig from '../util-hocs/wz-config';
@@ -38,7 +38,7 @@ class WzConfigurationGlobalConfiguration extends Component {
         {!agent ? (
           <WzTabSelector>
             <WzTabSelectorTab label='Global'>
-              <WzConfigurationGlobalConfigurationLogging />
+              <WzConfigurationGlobalConfigurationLogging {...this.props} />
               <WzConfigurationAgentsConfigurationGlobal {...this.props} />
             </WzTabSelectorTab>
             <WzTabSelectorTab label='Remote'>
@@ -55,6 +55,7 @@ class WzConfigurationGlobalConfiguration extends Component {
 const sectionsManager = [
   { component: 'request', configuration: 'remote' },
   { component: 'monitor', configuration: 'global' },
+  { useFullEndpoint: true, key: 'logging' },
 ];
 
 const sectionsAgent = [{ component: 'com', configuration: 'logging' }];

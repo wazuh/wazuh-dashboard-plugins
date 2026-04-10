@@ -16,11 +16,7 @@ import PropTypes from 'prop-types';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
-import withWzConfig from '../util-hocs/wz-config';
 import { isString } from '../utils/utils';
-
-import { connect } from 'react-redux';
-import { compose } from 'redux';
 
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
@@ -70,17 +66,6 @@ export class WzConfigurationGlobalConfigurationLogging extends Component {
   }
 }
 
-const sections = [{ useFullEndpoint: true, key: 'logging' }];
-
-const mapStateToProps = state => ({
-  wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
-});
-
 WzConfigurationGlobalConfigurationLogging.propTypes = {
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
-
-export default compose(
-  withWzConfig(sections),
-  connect(mapStateToProps),
-)(WzConfigurationGlobalConfigurationLogging);
