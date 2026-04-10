@@ -1,5 +1,5 @@
 import React from 'react';
-import { FEDRAMPDataSource } from '../../../../common/data-source/pattern';
+import { FedRAMPDataSource } from '../../../../common/data-source/pattern';
 import { FindingsDataSourceRepository } from '../../../../common/data-source';
 import {
   FEDRAMP_DASHBOARD_ID,
@@ -8,8 +8,8 @@ import {
 } from '../../../../../../common/constants';
 import { createDashboard } from '../../../../common/dashboards/dashboard';
 
-export const DashboardFEDRAMP = createDashboard({
-  DataSource: FEDRAMPDataSource,
+export const DashboardFedRAMP = createDashboard({
+  DataSource: FedRAMPDataSource,
   DataSourceRepositoryCreator: FindingsDataSourceRepository,
   getDashboardPanels: [
     {

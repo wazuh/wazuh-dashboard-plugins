@@ -40,7 +40,6 @@ export const KeyEquivalence: { [key: string]: string } = {
   file: 'File',
   gdpr: 'GDPR',
   pci: 'PCI',
-  fedramp: 'FEDRAMP',
   hipaa: 'HIPAA',
   'nist-800-53': 'NIST 800-53',
   cis: 'CIS',

@@ -4,7 +4,7 @@ import { EventsDataSource } from '../events-data-source';
 
 const KEY_EXIST = 'rule.compliance.fedramp';
 
-export class FEDRAMPDataSource extends EventsDataSource {
+export class FedRAMPDataSource extends EventsDataSource {
   constructor(id: string, title: string) {
     super(id, title);
   }

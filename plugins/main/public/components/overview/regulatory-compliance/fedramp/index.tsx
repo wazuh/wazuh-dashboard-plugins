@@ -1,17 +1,17 @@
 import React from 'react';
-import { DashboardFEDRAMP } from './dashboards';
-import { FEDRAMPDataSource } from '../../../common/data-source';
+import { DashboardFedRAMP } from './dashboards';
+import { FedRAMPDataSource } from '../../../common/data-source';
 import { fedrampColumns } from './events/fedramp-columns';
 import { ComplianceModule } from '../shared/compliance-module';
 
 import { buildStandardComplianceTabs } from '../shared/compliance-tab-factory';
 
-export const RegulatoryComplianceFEDRAMP = () => {
+export const RegulatoryComplianceFedRAMP = () => {
   const tabs = buildStandardComplianceTabs({
-    dashboardComponent: DashboardFEDRAMP,
+    dashboardComponent: DashboardFedRAMP,
     section: 'fedramp',
     moduleId: 'fedramp',
-    dataSource: FEDRAMPDataSource,
+    dataSource: FedRAMPDataSource,
     tableColumns: fedrampColumns,
   });
 

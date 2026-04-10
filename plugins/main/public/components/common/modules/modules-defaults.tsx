@@ -58,7 +58,7 @@ import {
   DashboardNIST80053,
   DashboardHIPAA,
   DashboardTSC,
-  DashboardFEDRAMP,
+  DashboardFedRAMP,
   DashboardMITRE,
   DashboardAWS,
   DashboardOffice365,
@@ -86,7 +86,7 @@ import {
   Office365DataSource,
   ThreatHuntingDataSource,
   AzureDataSource,
-  FEDRAMPDataSource,
+  FedRAMPDataSource,
 } from '../data-source';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 import {
@@ -104,7 +104,7 @@ import {
   RegulatoryComplianceHIPAA,
   RegulatoryComplianceNIST80053,
   RegulatoryComplianceTSC,
-  RegulatoryComplianceFEDRAMP,
+  RegulatoryComplianceFedRAMP,
 } from '../../overview/regulatory-compliance';
 import { InventoryFIM } from '../../overview/fim';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
@@ -547,20 +547,20 @@ export const ModulesDefaults = {
         id: TAB_VIEW_ID_DASHBOARD,
         name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardFEDRAMP,
+        component: DashboardFedRAMP,
       },
       {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
         component: (props: any) => (
-          <ComplianceTable {...props} DataSource={FEDRAMPDataSource} />
+          <ComplianceTable {...props} DataSource={FedRAMPDataSource} />
         ),
       },
       renderDiscoverTab({
         moduleId: 'fedramp',
         tableColumns: fedrampColumns,
-        DataSource: FEDRAMPDataSource,
+        DataSource: FedRAMPDataSource,
         categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
@@ -649,9 +649,9 @@ export const ModulesDefaults = {
       },
       {
         id: 'fedramp',
-        name: 'FEDRAMP',
+        name: 'FedRAMP',
         buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceFEDRAMP,
+        component: RegulatoryComplianceFedRAMP,
       },
     ],
     availableFor: ['manager', 'agent'],

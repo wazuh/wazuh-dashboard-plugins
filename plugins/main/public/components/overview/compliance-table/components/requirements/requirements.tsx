@@ -169,7 +169,7 @@ export class ComplianceRequirements extends Component {
       sectionStyle["height"] = 350;
     }
     if (this.props.section === 'fedramp') {
-      title = 'FEDRAMP';
+      title = 'FedRAMP';
     }
     return (
       <div style={{ backgroundColor: "#80808014", padding: "10px 10px 0 10px", minHeight: 300,  height: "100%"}}>

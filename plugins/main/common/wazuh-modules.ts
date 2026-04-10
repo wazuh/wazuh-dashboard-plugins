@@ -52,12 +52,6 @@ export const WAZUH_MODULES = {
     description:
       'Global security standard for entities that process, store or transmit payment cardholder data.',
   },
-  fedramp: {
-    title: 'FEDRAMP',
-    appId: 'fedramp',
-    description:
-      'Federal Risk and Authorization Management Program (FedRAMP) standardizes security assessment and authorization for cloud services.',
-  },
   gdpr: {
     title: 'GDPR',
     appId: 'gdpr',
