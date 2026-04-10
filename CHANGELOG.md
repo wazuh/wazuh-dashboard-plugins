@@ -67,7 +67,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Centralized regulatory compliance modules (PCI DSS, GDPR, HIPAA, NIST 800-53, and TSC) into a single "Regulatory Compliance" application [#8239](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8239)
 - Updated Vulnerability Detection Discover tab filters, and inventory columns [#8262](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8262) [#8283](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8283) [#8292](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8292)
 - Changed FIM table columns and index source in the agent view [#8269](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8269)
-- Updated Threat Hunting dashboards visualizations to use new `wazuh-findings*` index properties [#8281](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8281)
+- Updated Threat Hunting dashboard with new index pattern definition [#8281](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8281)
 
 ### Fixed
 
