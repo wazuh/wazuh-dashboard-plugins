@@ -22,7 +22,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added `wazuh-findings` index patterns [#8233](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8233)
 - Added `policy.name`, `policy.description`, `policy.file` and `event.outcome` columns to the Configuration Assessment Findings table [#8264](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8264)
 - Added `wazuh-state-fim*` index pattern [#8248](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8248)
-- Added NIST 800-171 support in the Regulatory Compliance dashboard [#8294](hhttps://github.com/wazuh/wazuh-dashboard-plugins/pull/8294)
+- Added NIST 800-171 support in the Regulatory Compliance dashboard [#8294](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8294)
 
 ### Changed
 
