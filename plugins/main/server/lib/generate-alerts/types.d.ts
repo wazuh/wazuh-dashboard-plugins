@@ -11,6 +11,7 @@ export interface Rule {
   hipaa?: string[];
   nist_800_53?: string[];
   nist_800_83?: string[];
+  nis2?: string[];
   gpg13?: string[];
   pci?: string[];
   frequency?: number;
