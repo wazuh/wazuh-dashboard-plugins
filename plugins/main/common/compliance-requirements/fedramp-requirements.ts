@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 export const fedrampRequirementsFile = {
-  // --- MONITORING & VULNERABILITY (Where your findings are) ---
   'RA-5':
     'Vulnerability Monitoring and Scanning: Perform authenticated scans of all operating systems, web apps, and databases. 2026 CR26 Update: High-risk vulnerabilities must be remediated within 30 days (or sooner if on the CISA KEV list).',
   'SI-2':
