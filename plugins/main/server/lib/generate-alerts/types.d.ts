@@ -13,6 +13,7 @@ export interface Rule {
   nist_800_83?: string[];
   gpg13?: string[];
   pci?: string[];
+  cmmc?: string[];
   frequency?: number;
   info?: string;
 }
