@@ -137,6 +137,10 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
     render: renderRequirementsSecurityOperations,
   },
   {
+    id: 'rule.compliance.cmmc',
+    render: renderRequirementsSecurityOperations,
+  },
+  {
     id: 'vulnerability.id',
     render: (value, row) => {
       if (
