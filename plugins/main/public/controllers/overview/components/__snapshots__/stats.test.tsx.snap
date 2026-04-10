@@ -139,9 +139,9 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
           <span
             class="euiBetaBadge euiBetaBadge--hollow euiCard__betaBadge"
             id="htmlIdBetaBadge"
-            title="Last 24 hours alerts"
+            title="Last 24 hours findings"
           >
-            Last 24 hours alerts
+            Last 24 hours findings
           </span>
         </span>
       </div>
