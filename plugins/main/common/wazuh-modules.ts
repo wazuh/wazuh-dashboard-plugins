@@ -44,7 +44,7 @@ export const WAZUH_MODULES = {
     title: 'Regulatory Compliance',
     appId: 'regulatory-compliance',
     description:
-      'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, and TSC.',
+      'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, TSC, and NIST 800-171.',
   },
   pci: {
     title: 'PCI DSS',
@@ -69,6 +69,12 @@ export const WAZUH_MODULES = {
     appId: 'nist-800-53',
     description:
       'National Institute of Standards and Technology Special Publication 800-53 (NIST 800-53) sets guidelines for federal information systems.',
+  },
+  'nist-800-171': {
+    title: 'NIST 800-171',
+    appId: 'nist-800-171',
+    description:
+      'National Institute of Standards and Technology Special Publication 800-171 (NIST 800-171) protects Controlled Unclassified Information in non-federal systems.',
   },
   tsc: {
     title: 'TSC',
