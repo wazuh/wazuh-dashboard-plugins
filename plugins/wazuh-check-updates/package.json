@@ -3,7 +3,7 @@
   "version": "4.10.4",
   "revision": "00",
   "pluginPlatform": {
-    "version": "2.16.0"
+    "version": "2.19.5"
   },
   "description": "Wazuh Check Updates",
   "private": true,
