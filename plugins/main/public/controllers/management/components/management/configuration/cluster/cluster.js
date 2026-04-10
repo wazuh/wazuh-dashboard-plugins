@@ -103,8 +103,7 @@ export class WzCluster extends Component {
 
     let mainSettingsConfig = {
       ...clusterConfig,
-      disabled:
-        clusterConfig.disabled === true ? 'disabled' : 'enabled',
+      disabled: clusterConfig.disabled === true ? 'disabled' : 'enabled',
     };
 
     if (clusterConfig.haproxy_helper) {
@@ -122,10 +121,7 @@ export class WzCluster extends Component {
 
     return (
       <Fragment>
-        <WzConfigurationSettingsHeader
-          title='Main settings'
-          help={helpLinks}
-        >
+        <WzConfigurationSettingsHeader title='Main settings' help={helpLinks}>
           <WzConfigurationSettingsGroup
             config={mainSettingsConfig}
             items={mainSettings}

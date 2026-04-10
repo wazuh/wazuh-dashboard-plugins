@@ -7,9 +7,7 @@ const basicIndexerConfig = {
   indexer: {
     hosts: ['https://os1:9200'],
     ssl: {
-      certificate_authorities: [
-        { ca: ['/etc/server_certs/root-ca.pem'] },
-      ],
+      certificate_authorities: [{ ca: ['/etc/server_certs/root-ca.pem'] }],
       certificate: ['/etc/server_certs/server.pem'],
       key: ['/etc/server_certs/server-key.pem'],
     },
@@ -21,7 +19,9 @@ const multiHostIndexerConfig = {
     hosts: ['https://os1:9200', 'https://os2:9200'],
     ssl: {
       certificate_authorities: [
-        { ca: ['/etc/server_certs/root-ca.pem', '/etc/server_certs/alt-ca.pem'] },
+        {
+          ca: ['/etc/server_certs/root-ca.pem', '/etc/server_certs/alt-ca.pem'],
+        },
       ],
       certificate: ['/etc/server_certs/server.pem'],
       key: ['/etc/server_certs/server-key.pem'],

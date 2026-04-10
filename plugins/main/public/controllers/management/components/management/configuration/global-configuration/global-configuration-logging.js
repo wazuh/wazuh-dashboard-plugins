@@ -24,16 +24,12 @@ import { compose } from 'redux';
 
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
-const loggingSettings = [
-  { field: 'log_format', label: 'Log format' },
-];
+const loggingSettings = [{ field: 'log_format', label: 'Log format' }];
 
 const helpLinks = [
   {
     text: 'Logging reference',
-    href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/logging.html',
-    ),
+    href: webDocumentationLink('user-manual/reference/ossec-conf/logging.html'),
   },
 ];
 

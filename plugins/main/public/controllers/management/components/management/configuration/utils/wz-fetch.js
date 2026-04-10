@@ -26,7 +26,11 @@ import { AGENT_SYNCED_STATUS } from '../../../../../../../common/constants';
  * @param {function} updateWazuhNotReadyYet
  * @returns {object} Map of key → config object (or error string)
  */
-const getFullEndpointConfig = async (node, sections, updateWazuhNotReadyYet) => {
+const getFullEndpointConfig = async (
+  node,
+  sections,
+  updateWazuhNotReadyYet,
+) => {
   const result = {};
   try {
     const url = `/cluster/${node}/configuration`;
@@ -95,7 +99,11 @@ export const getCurrentConfig = async (
     if (fullEndpointSections.length > 0 && node) {
       Object.assign(
         result,
-        await getFullEndpointConfig(node, fullEndpointSections, updateWazuhNotReadyYet),
+        await getFullEndpointConfig(
+          node,
+          fullEndpointSections,
+          updateWazuhNotReadyYet,
+        ),
       );
     }
 

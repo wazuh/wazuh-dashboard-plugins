@@ -35,9 +35,7 @@ const renderArrayValue = value => {
   return value.join(', ');
 };
 
-const connectionSettings = [
-  { field: 'hosts', label: 'Hosts' },
-];
+const connectionSettings = [{ field: 'hosts', label: 'Hosts' }];
 
 const sslSettings = [
   {
@@ -60,9 +58,7 @@ const sslSettings = [
 const helpLinks = [
   {
     text: 'Indexer configuration',
-    href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/indexer.html',
-    ),
+    href: webDocumentationLink('user-manual/reference/ossec-conf/indexer.html'),
   },
 ];
 
@@ -88,10 +84,7 @@ export class WzIndexer extends Component {
 
     return (
       <Fragment>
-        <WzConfigurationSettingsHeader
-          title='Main settings'
-          help={helpLinks}
-        >
+        <WzConfigurationSettingsHeader title='Main settings' help={helpLinks}>
           <WzConfigurationSettingsGroup
             config={indexerConfig}
             items={connectionSettings}
