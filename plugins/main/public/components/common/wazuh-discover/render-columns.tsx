@@ -138,7 +138,7 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
     id: 'rule.compliance.nis2',
     render: renderRequirementsSecurityOperations,
-  }
+  },
   {
     id: 'vulnerability.id',
     render: (value, row) => {
