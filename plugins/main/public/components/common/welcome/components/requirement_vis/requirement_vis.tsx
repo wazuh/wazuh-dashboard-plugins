@@ -46,7 +46,6 @@ const selectionOptionsCompliance = [
   { value: 'cmmc', text: 'CMMC' },
   { value: 'fedramp', text: 'FedRAMP' },
   { value: 'gdpr', text: 'GDPR' },
-  { value: 'gpg13', text: 'GPG13' },
   { value: 'hipaa', text: 'HIPAA' },
   { value: 'iso_27001', text: 'ISO 27001' },
   { value: 'nis2', text: 'NIS2' },
@@ -61,7 +60,6 @@ const requirementNameModuleID = {
   gdpr: 'gdpr',
   nist_800_53: 'nist',
   hipaa: 'hipaa',
-  gpg13: '',
   tsc: 'tsc',
   nis2: 'nis2',
   cmmc: 'cmmc',
@@ -170,11 +168,8 @@ const RequirementVisBody = compose(
             label: key,
             value: doc_count,
             color: colors[index],
-            onClick:
-              selectedOptionValue === 'gpg13'
-                ? undefined
-                : () =>
-                    goToDashboardWithFilter(selectedOptionValue, key, agent),
+            onClick: () =>
+              goToDashboardWithFilter(selectedOptionValue, key, agent),
           }))
         : null;
     },
