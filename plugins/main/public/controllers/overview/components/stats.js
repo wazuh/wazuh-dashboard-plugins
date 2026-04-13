@@ -159,7 +159,7 @@ export const Stats = withErrorBoundary(
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiCard
-              betaBadgeLabel='Last 24 hours alerts'
+              betaBadgeLabel='Last 24 hours findings'
               title=''
               className='home-alerts-card'
             >
