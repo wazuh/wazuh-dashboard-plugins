@@ -122,7 +122,7 @@ function buildComplianceObject({ section }) {
     if (section === 'fedramp') {
       descriptions = fedrampRequirementsFile;
       Object.keys(fedrampRequirementsFile).forEach(item => {
-        const currentRequirement = item.split('.')[0];
+        const currentRequirement = item.split('-')[0];
         if (complianceRequirements[currentRequirement]) {
           complianceRequirements[currentRequirement].push(item);
         } else {
