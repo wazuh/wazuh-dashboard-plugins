@@ -31,7 +31,6 @@ import { configurationAssessmentColumns } from '../../overview/sca/events/config
 import { pciColumns } from '../../overview/regulatory-compliance/pci/events/pci-columns';
 import { hipaaColumns } from '../../overview/regulatory-compliance/hipaa/events/hipaa-columns';
 import { nistColumns } from '../../overview/regulatory-compliance/nist/events/nist-columns';
-import { nist171Columns } from '../../overview/regulatory-compliance/nist-800-171/events/nist-171-columns';
 import { gdprColumns } from '../../overview/regulatory-compliance/gdpr/events/gdpr-columns';
 import { tscColumns } from '../../overview/regulatory-compliance/tsc/events/tsc-columns';
 import { githubColumns } from '../../overview/github/events/github-columns';
@@ -56,7 +55,6 @@ import {
   DashboardMalwareDetection,
   DashboardFIM,
   DashboardNIST80053,
-  DashboardNIST800171,
   DashboardHIPAA,
   DashboardTSC,
   DashboardMITRE,
@@ -78,7 +76,6 @@ import {
   TSCDataSource,
   GoogleCloudDataSource,
   NIST80053DataSource,
-  NIST800171DataSource,
   MitreAttackDataSource,
   GDPRDataSource,
   ConfigurationAssessmentDataSource,
@@ -483,32 +480,6 @@ export const ModulesDefaults = {
         moduleId: 'nist',
         tableColumns: nistColumns,
         DataSource: NIST80053DataSource,
-        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
-      }),
-    ],
-    availableFor: ['manager', 'agent'],
-  },
-  'nist-800-171': {
-    init: TAB_VIEW_ID_DASHBOARD,
-    tabs: [
-      {
-        id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardNIST800171,
-      },
-      {
-        id: 'inventory',
-        name: 'Controls',
-        buttons: [ButtonExploreAgent],
-        component: (props: any) => (
-          <ComplianceTable {...props} DataSource={NIST800171DataSource} />
-        ),
-      },
-      renderDiscoverTab({
-        moduleId: 'nist-800-171',
-        tableColumns: nist171Columns,
-        DataSource: NIST800171DataSource,
         categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
