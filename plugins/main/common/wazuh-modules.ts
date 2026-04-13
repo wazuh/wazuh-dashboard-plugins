@@ -76,6 +76,12 @@ export const WAZUH_MODULES = {
     description:
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy',
   },
+  nis2: {
+    title: 'NIS2',
+    appId: 'nis2',
+    description:
+      'EU directive on measures for high common level of cybersecurity across the Union.',
+  },
   microsoftGraphAPI: {
     title: 'Microsoft Graph API',
     appId: 'microsoft-graph-api',
