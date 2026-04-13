@@ -62,7 +62,10 @@ describe('dev.ts - --all-forks auto-discovers sibling repositories', () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
 
-    await mainWithDeps(['--all-forks', 'up'], { logger, processRunner: runner });
+    await mainWithDeps(['--all-forks', 'up'], {
+      logger,
+      processRunner: runner,
+    });
     await new Promise(tick => setImmediate(tick));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
@@ -113,7 +116,10 @@ describe('dev.ts - --all-forks auto-discovers sibling repositories', () => {
     const runner = new StubRunner();
     const logSpy = jest.spyOn(logger, 'info');
 
-    await mainWithDeps(['--all-forks', 'up'], { logger, processRunner: runner });
+    await mainWithDeps(['--all-forks', 'up'], {
+      logger,
+      processRunner: runner,
+    });
     await new Promise(tick => setImmediate(tick));
 
     const logs = logSpy.mock.calls.map(call => String(call[0]));

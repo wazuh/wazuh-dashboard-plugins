@@ -217,9 +217,7 @@ export async function mainWithDeps(
       ...(ALL_FORKS_EXCLUDED_REPOS as readonly string[]),
       ...(REQUIRED_REPOSITORIES as readonly string[]),
     ]);
-    const alreadyAdded = new Set(
-      config.userRepositories.map(r => r.name),
-    );
+    const alreadyAdded = new Set(config.userRepositories.map(r => r.name));
 
     const entries = readdirSync(siblingContainerPath, { withFileTypes: true });
     const discovered: string[] = [];
