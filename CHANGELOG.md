@@ -22,6 +22,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added `wazuh-findings` index patterns [#8233](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8233)
 - Added `policy.name`, `policy.description`, `policy.file` and `event.outcome` columns to the Configuration Assessment Findings table [#8264](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8264)
 - Added `wazuh-state-fim*` index pattern [#8248](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8248)
+- Added compliance options in Compliance panel in agent overview [#8307](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8307)
 
 ### Changed
 
@@ -67,6 +68,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Centralized regulatory compliance modules (PCI DSS, GDPR, HIPAA, NIST 800-53, and TSC) into a single "Regulatory Compliance" application [#8239](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8239) [#8303](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8303)
 - Updated Vulnerability Detection Discover tab filters, and inventory columns [#8262](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8262) [#8283](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8283) [#8292](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8292)
 - Changed FIM table columns and index source in the agent view [#8269](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8269)
+- Changed index pattern usage in MITRE ATT&CK and Compliance panels in agent overview [#8307](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8307)
 
 ### Fixed
 
