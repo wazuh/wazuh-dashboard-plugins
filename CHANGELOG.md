@@ -38,7 +38,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Migrated the `wazuh.yml` settings to `opensearch_dashboards.yml` and advanced settings [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 - Changed the sample data index names [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 - Rework generate report button [#7900](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7900)
-- Changed dashboards renderer by saved objects [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842) [#7847](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7847) [#7916](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7916) [#7938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7938)
+- Changed dashboards renderer by saved objects [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842) [#7847](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7847) [#7916](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7916) [#7938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7938) [#8310](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8310)
 - Changed `rule.groups` filter to `wazuh.integration.decoders` [#7934](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7934)
 - Applied the new home page navigation style to all dashboards [#7981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7981)
 - Updated Office 365 dashboards to use new index pattern [#8081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8081)
