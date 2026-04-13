@@ -43,17 +43,17 @@ import { compose } from 'redux';
 
 const selectionOptionsCompliance = [
   // TODO: apply the same order that the modules in Regulatory compliance overview
-  { value: 'pci_dss', text: 'PCI DSS' },
+  { value: 'cmmc', text: 'CMMC' },
+  { value: 'fedramp', text: 'FedRAMP' },
   { value: 'gdpr', text: 'GDPR' },
+  { value: 'gpg13', text: 'GPG13' },
+  { value: 'hipaa', text: 'HIPAA' },
+  { value: 'iso_27001', text: 'ISO 27001' },
+  { value: 'nis2', text: 'NIS2' },
   { value: 'nist_800_53', text: 'NIST 800-53' },
   { value: 'nist_800_171', text: 'NIST 800-171' },
-  { value: 'hipaa', text: 'HIPAA' },
-  { value: 'gpg13', text: 'GPG13' },
+  { value: 'pci_dss', text: 'PCI DSS' },
   { value: 'tsc', text: 'TSC' },
-  { value: 'nis2', text: 'NIS2' },
-  { value: 'fedramp', text: 'FedRAMP' },
-  { value: 'cmmc', text: 'CMMC' },
-  { value: 'iso_27001', text: 'ISO 27001' },
 ];
 
 const requirementNameModuleID = {
@@ -73,6 +73,7 @@ const requirementNameModuleID = {
 export const RequirementVis = withPanel({ paddingSize: 'm' })(props => {
   const { selectedOption, onChange } = useVisualizationBasicWidgetSelector(
     selectionOptionsCompliance,
+    'pci_dss', // default option
   );
 
   return (
