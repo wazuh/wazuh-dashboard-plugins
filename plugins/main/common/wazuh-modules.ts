@@ -70,6 +70,12 @@ export const WAZUH_MODULES = {
     description:
       'National Institute of Standards and Technology Special Publication 800-53 (NIST 800-53) sets guidelines for federal information systems.',
   },
+  cmmc: {
+    title: 'CMMC',
+    appId: 'cmmc',
+    description:
+      'Cybersecurity Maturity Model Certification (CMMC) is a framework to assess the cybersecurity maturity of organizations.',
+  },
   tsc: {
     title: 'TSC',
     appId: 'tsc',
