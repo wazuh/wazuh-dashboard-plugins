@@ -33,7 +33,6 @@ import { hipaaColumns } from '../../overview/regulatory-compliance/hipaa/events/
 import { nistColumns } from '../../overview/regulatory-compliance/nist/events/nist-columns';
 import { gdprColumns } from '../../overview/regulatory-compliance/gdpr/events/gdpr-columns';
 import { tscColumns } from '../../overview/regulatory-compliance/tsc/events/tsc-columns';
-import { nis2Columns } from '../../overview/regulatory-compliance/nis2/events/nis2-columns';
 import { githubColumns } from '../../overview/github/events/github-columns';
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
@@ -58,7 +57,6 @@ import {
   DashboardNIST80053,
   DashboardHIPAA,
   DashboardTSC,
-  DashboardNIS2,
   DashboardMITRE,
   DashboardAWS,
   DashboardOffice365,
@@ -83,7 +81,6 @@ import {
   ConfigurationAssessmentDataSource,
   HIPAADataSource,
   PCIDSSDataSource,
-  Nis2DataSource,
   Office365DataSource,
   ThreatHuntingDataSource,
   AzureDataSource,
