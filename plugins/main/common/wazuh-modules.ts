@@ -76,6 +76,12 @@ export const WAZUH_MODULES = {
     description:
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy',
   },
+  iso27001: {
+    title: 'ISO 27001',
+    appId: 'iso27001',
+    description:
+      'International standard for information security management systems (ISMS), providing a systematic approach to managing sensitive company information.',
+  },
   microsoftGraphAPI: {
     title: 'Microsoft Graph API',
     appId: 'microsoft-graph-api',
