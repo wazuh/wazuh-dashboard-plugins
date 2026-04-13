@@ -42,7 +42,6 @@ import { LoadingSearchbarProgress } from '../../../loading-searchbar-progress/lo
 import { compose } from 'redux';
 
 const selectionOptionsCompliance = [
-  // TODO: apply the same order that the modules in Regulatory compliance overview
   { value: 'cmmc', text: 'CMMC' },
   { value: 'fedramp', text: 'FedRAMP' },
   { value: 'gdpr', text: 'GDPR' },
