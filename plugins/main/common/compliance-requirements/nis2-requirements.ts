@@ -7,6 +7,8 @@
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
+ * Source: https://eur-lex.europa.eu/eli/dir/2022/2555/oj
+ *
  * Find more information about this on the LICENSE file.
  */
 export const nis2RequirementsFile = {
