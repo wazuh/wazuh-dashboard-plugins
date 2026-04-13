@@ -7,6 +7,9 @@
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
+ * Source: https://www.fedramp.gov/resources/documents/rev4/REV_4_FedRAMP_Security_Controls_Baseline.xlsx
+ * Source: https://www.fedramp.gov/resources/templates/SSP-Appendix-A-Moderate-FedRAMP-Security-Controls.docx
+ *
  * Find more information about this on the LICENSE file.
  */
 export const fedrampRequirementsFile = {

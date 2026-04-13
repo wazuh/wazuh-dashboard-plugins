@@ -7,10 +7,6 @@
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Source: https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.fedramp.gov/resources/documents/rev4/REV_4_FedRAMP_Security_Controls_Baseline.xlsx ved=2ahUKEwiDhcPVoeOTAxXrUqQEHcvSAIEQFnoECBsQAQ&usg=AOvVaw1ttr3bzRF1KA00qpDBdnpP
- *
- * Source: https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.fedramp.gov/resources/templates/SSP-Appendix-A-Moderate-FedRAMP-Security-Controls.docx&ved=2ahUKEwjCk7n7oeOTAxXiZqQEHZ7WBPsQFnoECBYQAQ&usg=AOvVaw1eD3TWDLA0rB5V5xBrteGk
- *
  * Find more information about this on the LICENSE file.
  */
 export const WAZUH_MODULES = {
