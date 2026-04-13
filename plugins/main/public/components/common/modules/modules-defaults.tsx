@@ -33,7 +33,6 @@ import { hipaaColumns } from '../../overview/regulatory-compliance/hipaa/events/
 import { nistColumns } from '../../overview/regulatory-compliance/nist/events/nist-columns';
 import { gdprColumns } from '../../overview/regulatory-compliance/gdpr/events/gdpr-columns';
 import { tscColumns } from '../../overview/regulatory-compliance/tsc/events/tsc-columns';
-import { fedrampColumns } from '../../overview/regulatory-compliance/fedramp/events/fedramp-columns';
 import { githubColumns } from '../../overview/github/events/github-columns';
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
@@ -58,7 +57,6 @@ import {
   DashboardNIST80053,
   DashboardHIPAA,
   DashboardTSC,
-  DashboardFedRAMP,
   DashboardMITRE,
   DashboardAWS,
   DashboardOffice365,
@@ -86,7 +84,6 @@ import {
   Office365DataSource,
   ThreatHuntingDataSource,
   AzureDataSource,
-  FedRAMPDataSource,
 } from '../data-source';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 import {
@@ -535,32 +532,6 @@ export const ModulesDefaults = {
         moduleId: 'tsc',
         tableColumns: tscColumns,
         DataSource: TSCDataSource,
-        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
-      }),
-    ],
-    availableFor: ['manager', 'agent'],
-  },
-  fedramp: {
-    init: TAB_VIEW_ID_DASHBOARD,
-    tabs: [
-      {
-        id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardFedRAMP,
-      },
-      {
-        id: 'inventory',
-        name: 'Controls',
-        buttons: [ButtonExploreAgent],
-        component: (props: any) => (
-          <ComplianceTable {...props} DataSource={FedRAMPDataSource} />
-        ),
-      },
-      renderDiscoverTab({
-        moduleId: 'fedramp',
-        tableColumns: fedrampColumns,
-        DataSource: FedRAMPDataSource,
         categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
