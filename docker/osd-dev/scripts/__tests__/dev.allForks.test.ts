@@ -68,17 +68,21 @@ describe('dev.ts - --all-forks auto-discovers sibling repositories', () => {
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
     expect(fs.existsSync(overridePath)).toBe(true);
 
-    const content = fs.readFileSync(overridePath, 'utf-8');
+    const rawContent = fs.readFileSync(overridePath, 'utf-8');
 
-    // Should contain plugin-alpha and plugin-beta
-    expect(content).toContain('plugin-alpha');
-    expect(content).toContain('plugin-beta');
-    expect(content).toContain(pluginAlphaPath);
-    expect(content).toContain(pluginBetaPath);
+    // Compare against fixture — normalise dynamic paths to placeholder names
+    const normalised = rawContent
+      .replaceAll(pluginAlphaPath, '${pluginAlphaPath}')
+      .replaceAll(pluginBetaPath, '${pluginBetaPath}');
+    const expected = fs.readFileSync(
+      path.join(__dirname, 'fixtures', 'override_all_forks.yml'),
+      'utf-8',
+    );
+    expect(normalised.trim()).toBe(expected.trim());
 
     // Should NOT contain wazuh-dashboard or not-a-plugin
-    expect(content).not.toContain('wazuh-dashboard');
-    expect(content).not.toContain('not-a-plugin');
+    expect(rawContent).not.toContain('wazuh-dashboard');
+    expect(rawContent).not.toContain('not-a-plugin');
 
     // Compose was called with the override file
     const args: string[] = runner.spawnCalls[0].args;
