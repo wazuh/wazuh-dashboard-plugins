@@ -95,7 +95,7 @@ function buildComplianceObject({ section }) {
     if (section === 'nist') {
       descriptions = nistRequirementsFile;
       Object.keys(nistRequirementsFile).forEach(item => {
-        const currentRequirement = item.split('.')[0];
+        const currentRequirement = item.split('-')[0];
         if (complianceRequirements[currentRequirement]) {
           complianceRequirements[currentRequirement].push(item);
         } else {
