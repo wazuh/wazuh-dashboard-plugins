@@ -10,7 +10,6 @@ import {
   PROFILES,
   DEV_COMPOSE_FILE,
   ACTIONS,
-  FLAGS,
   ALL_FORKS_EXCLUDED_REPOS,
 } from '../constants/app';
 import {
