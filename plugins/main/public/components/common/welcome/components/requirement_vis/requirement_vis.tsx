@@ -42,12 +42,18 @@ import { LoadingSearchbarProgress } from '../../../loading-searchbar-progress/lo
 import { compose } from 'redux';
 
 const selectionOptionsCompliance = [
+  // TODO: apply the same order that the modules in Regulatory compliance overview
   { value: 'pci_dss', text: 'PCI DSS' },
   { value: 'gdpr', text: 'GDPR' },
   { value: 'nist_800_53', text: 'NIST 800-53' },
+  { value: 'nist_800_171', text: 'NIST 800-171' },
   { value: 'hipaa', text: 'HIPAA' },
   { value: 'gpg13', text: 'GPG13' },
   { value: 'tsc', text: 'TSC' },
+  { value: 'nis2', text: 'NIS2' },
+  { value: 'fedramp', text: 'FedRAMP' },
+  { value: 'cmmc', text: 'CMMC' },
+  { value: 'iso_27001', text: 'ISO 27001' },
 ];
 
 const requirementNameModuleID = {
@@ -57,6 +63,11 @@ const requirementNameModuleID = {
   hipaa: 'hipaa',
   gpg13: '',
   tsc: 'tsc',
+  nis2: 'nis2',
+  cmmc: 'cmmc',
+  iso_27001: 'iso_27001',
+  nist_800_171: 'nist_800_171',
+  fedramp: 'fedramp',
 };
 
 export const RequirementVis = withPanel({ paddingSize: 'm' })(props => {
@@ -131,7 +142,7 @@ const RequirementVisBody = compose(
           ...props.dataSource.fetchFilters,
           PatternDataSourceFilterManager.createFilter(
             FILTER_OPERATOR.EXISTS,
-            `rule.${selectedOptionValue}`,
+            `rule.compliance.${selectedOptionValue}`,
             null,
             props.dataSource.dataSource.indexPattern.id,
           ),
@@ -144,7 +155,7 @@ const RequirementVisBody = compose(
         aggs: {
           top_alerts_compliance: {
             terms: {
-              field: `rule.${selectedOptionValue}`,
+              field: `rule.compliance.${selectedOptionValue}`,
               size: 5,
             },
           },
