@@ -245,7 +245,9 @@ export async function mainWithDeps(
 
     if (discovered.length > 0) {
       deps.logger.info(
-        `--all-forks: discovered ${discovered.length} sibling repo(s): ${discovered.join(', ')}`,
+        `--all-forks: discovered ${
+          discovered.length
+        } sibling repo(s): ${discovered.join(', ')}`,
       );
     } else {
       deps.logger.info(
