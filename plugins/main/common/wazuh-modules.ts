@@ -76,6 +76,12 @@ export const WAZUH_MODULES = {
     description:
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy',
   },
+  fedramp: {
+    title: 'FedRAMP',
+    appId: 'fedramp',
+    description:
+      'Federal Risk and Authorization Management Program (FedRAMP) provides a standardized approach to security assessment, authorization, and continuous monitoring for cloud products and services.',
+  },
   microsoftGraphAPI: {
     title: 'Microsoft Graph API',
     appId: 'microsoft-graph-api',
