@@ -203,7 +203,7 @@ export class ComplianceRequirements extends Component {
                 <EuiButtonIcon
                   iconType='gear'
                   onClick={() => this.onGearButtonClick()}
-                ></EuiButtonIcon>
+                />
               }
               isOpen={this.state.isPopoverOpen}
               panelPaddingSize='none'

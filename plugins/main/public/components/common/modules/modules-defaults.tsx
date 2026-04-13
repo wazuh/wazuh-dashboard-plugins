@@ -540,32 +540,6 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
-  nis2: {
-    init: TAB_VIEW_ID_DASHBOARD,
-    tabs: [
-      {
-        id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardNIS2,
-      },
-      {
-        id: 'inventory',
-        name: 'Controls',
-        buttons: [ButtonExploreAgent],
-        component: (props: any) => (
-          <ComplianceTable {...props} DataSource={Nis2DataSource} />
-        ),
-      },
-      renderDiscoverTab({
-        moduleId: 'nis2',
-        tableColumns: nis2Columns,
-        DataSource: Nis2DataSource,
-        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
-      }),
-    ],
-    availableFor: ['manager', 'agent'],
-  },
 
   'it-hygiene': {
     init: TAB_VIEW_ID_DASHBOARD,

@@ -122,7 +122,18 @@ function buildComplianceObject({ section }) {
     if (section === 'nis2') {
       descriptions = nis2RequirementsFile;
       Object.keys(nis2RequirementsFile).forEach(item => {
-        const currentRequirement = item.split('.')[0];
+        const parts = item.split('.');
+        let currentRequirement: string;
+
+        // All Art. 23 reporting obligations in one group
+        if (parts[0] === '23') {
+          currentRequirement = '23';
+        } else if (parts.length >= 3 && isNaN(Number(parts[2]))) {
+          currentRequirement = parts.slice(0, 3).join('.');
+        } else {
+          currentRequirement = parts.slice(0, 2).join('.');
+        }
+
         if (complianceRequirements[currentRequirement]) {
           complianceRequirements[currentRequirement].push(item);
         } else {
@@ -130,7 +141,7 @@ function buildComplianceObject({ section }) {
           complianceRequirements[currentRequirement] = [];
           complianceRequirements[currentRequirement].push(item);
         }
-      }); //forEach
+      }); // forEach
     }
 
     return {
