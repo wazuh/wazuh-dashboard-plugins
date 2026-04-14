@@ -16,13 +16,14 @@ This module exposes the following sections:
 
 A **detection rule** defines the conditions under which the Wazuh Engine generates a security alert. Rules operate on fields that have been previously normalized by decoders, and they support references to compliance frameworks and the MITRE ATT&CK matrix.
 
-Rules are written in YAML and follow the same promotion lifecycle as integrations and decoders:
+Rules are written in YAML and follow the same promotion lifecycle as integrations and decoders. Draft, Test, and Custom are user-managed; Standard is read-only:
 
-| Space | Description |
-|-------|-------------|
-| **Draft** | Working area where rules are created and edited. Not active in the engine. |
-| **Test** | Validation area where rules are loaded into the engine alongside decoders for testing. |
-| **Custom** | Production area. Rules are active and applied to all incoming normalized events. |
+| Space | Managed by | Description |
+|-------|-----------|-------------|
+| **Draft** | User | Working area where rules are created and edited. Not active in the engine. |
+| **Test** | User | Validation area where rules are loaded into the engine alongside decoders for testing. |
+| **Custom** | User | Production area. Rules are active and applied to all incoming normalized events. |
+| **Standard** | Wazuh | Read-only. Contains the built-in rules shipped with Wazuh. |
 
 **Lifecycle flow:**
 
