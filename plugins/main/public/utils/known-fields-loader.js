@@ -12,7 +12,6 @@ import {
   WAZUH_INDEX_TYPE_EVENTS_ACCESS_MANAGEMENT,
   WAZUH_INDEX_TYPE_EVENTS_APPLICATIONS,
   WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES,
-  WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AWS,
   WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AZURE,
   WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_GCP,
   WAZUH_INDEX_TYPE_EVENTS_NETWORK_ACTIVITY,
@@ -48,7 +47,6 @@ import eventsFields from '../../common/known-fields/events.json';
 import eventsAccessManagementFields from '../../common/known-fields/events-access-management.json';
 import eventsApplicationsFields from '../../common/known-fields/events-applications.json';
 import eventsCloudServicesFields from '../../common/known-fields/events-cloud-services.json';
-import eventsCloudServicesAWSFields from '../../common/known-fields/events-cloud-services-aws.json';
 import eventsCloudServicesAzureFields from '../../common/known-fields/events-cloud-services-azure.json';
 import eventsCloudServicesGCPFields from '../../common/known-fields/events-cloud-services-gcp.json';
 import eventsNetworkActivityFields from '../../common/known-fields/events-network-activity.json';
@@ -95,7 +93,6 @@ export const KnownFieldsByIndexType = {
   [WAZUH_INDEX_TYPE_EVENTS_ACCESS_MANAGEMENT]: eventsAccessManagementFields,
   [WAZUH_INDEX_TYPE_EVENTS_APPLICATIONS]: eventsApplicationsFields,
   [WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES]: eventsCloudServicesFields,
-  [WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AWS]: eventsCloudServicesAWSFields,
   [WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AZURE]:
     eventsCloudServicesAzureFields,
   [WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_GCP]: eventsCloudServicesGCPFields,
