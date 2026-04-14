@@ -18,12 +18,12 @@ A **detection rule** defines the conditions under which the Wazuh Engine generat
 
 Rules are written in YAML and follow the same promotion lifecycle as integrations and decoders. Draft, Test, and Custom are user-managed; Standard is read-only:
 
-| Space | Managed by | Description |
-|-------|-----------|-------------|
-| **Draft** | User | Working area where rules are created and edited. Not active in the engine. |
-| **Test** | User | Validation area where rules are loaded into the engine alongside decoders for testing. |
-| **Custom** | User | Production area. Rules are active and applied to all incoming normalized events. |
-| **Standard** | Wazuh | Read-only. Contains the built-in rules shipped with Wazuh. |
+| Space        | Managed by | Description                                                                            |
+| ------------ | ---------- | -------------------------------------------------------------------------------------- |
+| **Draft**    | User       | Working area where rules are created and edited. Not active in the engine.             |
+| **Test**     | User       | Validation area where rules are loaded into the engine alongside decoders for testing. |
+| **Custom**   | User       | Production area. Rules are active and applied to all incoming normalized events.       |
+| **Standard** | Wazuh      | Read-only. Contains the built-in rules shipped with Wazuh.                             |
 
 **Lifecycle flow:**
 
@@ -37,17 +37,17 @@ Rules are promoted as part of their parent integration. When an integration is p
 
 A detection rule is composed of the following main blocks:
 
-| Block | Description |
-|-------|-------------|
-| `id` | Unique identifier for the rule. |
-| `logsource` | Binds the rule to a specific integration. The `product` field must match the integration title exactly. |
-| `detection` | Defines the field conditions (`selection`) and the logical `condition` that triggers the alert. |
-| `level` | Severity level of the alert (`informational`, `low`, `medium`, `high`, `critical`). |
-| `tags` | Free-form tags, commonly used for MITRE ATT&CK technique references. |
-| `mitre` | Explicit mapping to MITRE ATT&CK tactics and techniques. |
-| `compliance` | Mapping to compliance framework controls (e.g., PCI DSS, NIST 800-53). |
-| `metadata` | Descriptive information: title, author, description, and references. |
-| `falsepositives` | Documents known conditions that may trigger the rule without indicating a real threat. |
+| Block            | Description                                                                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------------- |
+| `id`             | Unique identifier for the rule.                                                                         |
+| `logsource`      | Binds the rule to a specific integration. The `product` field must match the integration title exactly. |
+| `detection`      | Defines the field conditions (`selection`) and the logical `condition` that triggers the alert.         |
+| `level`          | Severity level of the alert (`informational`, `low`, `medium`, `high`, `critical`).                     |
+| `tags`           | Free-form tags, commonly used for MITRE ATT&CK technique references.                                    |
+| `mitre`          | Explicit mapping to MITRE ATT&CK tactics and techniques.                                                |
+| `compliance`     | Mapping to compliance framework controls (e.g., PCI DSS, NIST 800-53).                                  |
+| `metadata`       | Descriptive information: title, author, description, and references.                                    |
+| `falsepositives` | Documents known conditions that may trigger the rule without indicating a real threat.                  |
 
 ---
 
@@ -67,7 +67,7 @@ Navigate to **Security Analytics → Detection → Rules** and ensure the **Draf
 
 ### Step 2: Create a Custom Rule
 
-Select **Create rule**. In the creation form, choose between **Form editor** or  the **YAML Editor** mode and select the target integration — in this case, **Custom Ssh Auth**.
+Select **Create rule**. In the creation form, choose between **Form editor** or the **YAML Editor** mode and select the target integration — in this case, **Custom Ssh Auth**.
 
 <!-- IMAGE: Create rule form with YAML Editor selected and integration chosen -->
 <!-- Suggested filename: images/detection/01-create-rule-form.png -->
@@ -185,7 +185,7 @@ Click on **Create detector** to add a new detecor:
 **Detector details**
 
 - **Name** — Enter a descriptive name that identifies the detector (e.g., `SSH Brute Force Monitor`).
-- **Description** *(optional)* — A brief explanation of the detector's purpose.
+- **Description** _(optional)_ — A brief explanation of the detector's purpose.
 
 **Data source**
 

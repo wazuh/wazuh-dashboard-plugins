@@ -19,12 +19,12 @@ An **integration** is the top-level organizational unit in Security Analytics. I
 
 The following spaces are available. Draft, Test, and Custom are user-managed; Standard is read-only and contains the built-in content shipped with Wazuh:
 
-| Space | Managed by | Description |
-|-------|-----------|-------------|
-| **Draft** | User | Working area where content is created and edited. Not active in the engine. |
-| **Test** | User | Validation area where content is loaded into the engine for testing. |
-| **Custom** | User | Production area. Content is active and applied to all incoming events. |
-| **Standard** | Wazuh | Read-only. Contains the built-in integrations, decoders, and rules shipped with Wazuh. |
+| Space        | Managed by | Description                                                                            |
+| ------------ | ---------- | -------------------------------------------------------------------------------------- |
+| **Draft**    | User       | Working area where content is created and edited. Not active in the engine.            |
+| **Test**     | User       | Validation area where content is loaded into the engine for testing.                   |
+| **Custom**   | User       | Production area. Content is active and applied to all incoming events.                 |
+| **Standard** | Wazuh      | Read-only. Contains the built-in integrations, decoders, and rules shipped with Wazuh. |
 
 ### Decoders
 
