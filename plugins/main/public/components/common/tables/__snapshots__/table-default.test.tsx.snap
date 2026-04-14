@@ -208,6 +208,7 @@ exports[`Table Default component renders correctly to match the snapshot 1`] = `
                                 >
                                   <EuiButtonContent
                                     className="euiButtonEmpty__content"
+                                    iconGap="m"
                                     iconSide="right"
                                     iconSize="s"
                                     iconType="arrowDown"
