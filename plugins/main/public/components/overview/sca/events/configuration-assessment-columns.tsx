@@ -5,7 +5,7 @@ export const configurationAssessmentColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   commonColumns['wazuh.agent.name'],
   { id: 'policy.name' },
-  { id: 'policy.description' },
-  { id: 'policy.file' },
+  { id: 'check.id' },
+  { id: 'check.name' },
   { id: 'event.outcome' },
 ];
