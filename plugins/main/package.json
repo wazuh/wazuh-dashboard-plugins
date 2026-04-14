@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "axios": "^1.12.2",
-    "dompurify": "^3.2.4",
+    "dompurify": "3.2.4",
     "install": "^0.13.0",
     "js2xmlparser": "^5.0.0",
     "jsdom": "16.7.0",
