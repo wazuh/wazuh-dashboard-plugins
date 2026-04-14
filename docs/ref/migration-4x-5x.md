@@ -713,7 +713,6 @@ sudo systemctl start wazuh-dashboard
 
 - **Upgrade documentation**: [Upgrade](upgrade.md)
 - **CHANGELOG**: [CHANGELOG.md](../../CHANGELOG.md)
-- **Official migration guide**: https://documentation.wazuh.com/current/upgrade-guide/index.html
 - **Requirements**: [Requirements](getting-started/requirements.md)
 - **Configuration reference**: [Configuration](configuration.md)
 - **Security hardening**: [Security](security.md)
@@ -725,4 +724,3 @@ For migration assistance:
 
 - Community forum: https://groups.google.com/g/wazuh
 - GitHub issues: https://github.com/wazuh/wazuh-dashboard-plugins/issues
-- Official documentation: https://documentation.wazuh.com/

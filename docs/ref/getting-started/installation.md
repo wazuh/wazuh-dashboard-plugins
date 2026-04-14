@@ -30,98 +30,30 @@ yum install libcap
 dnf install libcap
 ```
 
-### Adding the Wazuh repository
+### Downloading the package
 
-> **Note:** If you are installing the Wazuh dashboard on the same host as the Wazuh indexer or the Wazuh server, you may skip these steps as you may have added the Wazuh repository already.
-
-#### APT (Debian/Ubuntu)
-
-Add the Wazuh repository to your APT sources.
-
-1. Install the following packages if missing.
-
-```bash
-apt-get install gnupg apt-transport-https
-```
-
-2. Install the GPG key.
-
-```bash
-curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && chmod 644 /usr/share/keyrings/wazuh.gpg
-```
-
-3. Add the repository.
-
-```bash
-echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/5.x/apt/ stable main" | tee -a /etc/apt/sources.list.d/wazuh.list
-```
-
-4. Update the packages information.
-
-```bash
-apt-get update
-```
-
-#### Yum (RHEL/CentOS)
-
-Add the Wazuh repository to your Yum configuration.
-
-1. Import the GPG key.
-
-```bash
-rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH
-```
-
-2. Add the repository.
-
-- For RHEL-compatible systems version 8 and earlier, use the following command:
-
-```bash
-echo -e '[wazuh]\ngpgcheck=1\ngpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH\nenabled=1\nname=EL-$releasever - Wazuh\nbaseurl=https://packages.wazuh.com/5.x/yum/\nprotect=1' | tee /etc/yum.repos.d/wazuh.repo
-```
-
-- For RHEL-compatible systems version 9 and later, use the following command:
-
-```bash
-echo -e '[wazuh]\ngpgcheck=1\ngpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH\nenabled=1\nname=EL-$releasever - Wazuh\nbaseurl=https://packages.wazuh.com/5.x/yum/\npriority=1' | tee /etc/yum.repos.d/wazuh.repo
-```
-
-#### DNF (Fedora)
-
-Add the Wazuh repository to your DNF configuration.
-
-1. Import the GPG key.
-
-```bash
-rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH
-```
-
-2. Add the repository.
-
-```bash
-echo -e '[wazuh]\ngpgcheck=1\ngpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH\nenabled=1\nname=EL-$releasever - Wazuh\nbaseurl=https://packages.wazuh.com/5.x/yum/\npriority=1' | tee /etc/yum.repos.d/wazuh.repo
-```
+See the [Package Download](packages.md#package-download) section for available repositories and download instructions.
 
 ### Installing the Wazuh dashboard
 
 1. Install the Wazuh dashboard package.
 
-   **APT:**
+   **Debian-based:**
 
    ```bash
-   apt-get -y install wazuh-dashboard=5.0.0-1
+   dpkg -i wazuh-dashboard_<VERSION>-<REVISION>_<ARCHITECTURE>.deb
    ```
 
-   **Yum:**
+   **RHEL/CentOS-based:**
 
    ```bash
-   yum -y install wazuh-dashboard-5.0.0-1
+   yum localinstall wazuh-dashboard-<VERSION>-<REVISION>.<ARCHITECTURE>.rpm
    ```
 
-   **DNF:**
+   **RHEL/CentOS-based (DNF):**
 
    ```bash
-   dnf -y install wazuh-dashboard-5.0.0-1
+   dnf localinstall wazuh-dashboard-<VERSION>-<REVISION>.<ARCHITECTURE>.rpm
    ```
 
 ### Configuring the Wazuh dashboard

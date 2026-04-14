@@ -33,6 +33,10 @@ import { WzRequest } from '../../../../../../react-services/wz-request';
 import { WzFieldSearchDelay } from '../../../../../common/search';
 import {
   DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE_ID,
+  TAB_VIEW_ID_DASHBOARD,
+  TAB_VIEW_ID_EVENTS,
+  TAB_VIEW_NAME_DASHBOARD,
+  TAB_VIEW_NAME_EVENTS,
   UI_LOGGER_LEVELS,
 } from '../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
@@ -92,7 +96,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
   const { isFlyoutVisible, techniquesCount, currentTechnique } = state;
 
   const getMitreRuleIdFilter = (value: string) => {
-    const GROUP_KEY = 'rule.mitre.id';
+    const GROUP_KEY = 'rule.mitre.technique';
     if (!value) return [];
     return [
       {
@@ -145,7 +149,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
       const aggs = {
         techniques: {
           terms: {
-            field: 'rule.mitre.id',
+            field: 'rule.mitre.technique',
             size: 1000,
           },
         },
@@ -324,20 +328,20 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
 
   const openDiscover = (e, techniqueID) => {
     addFilter({
-      key: 'rule.mitre.id',
+      key: 'rule.mitre.technique',
       value: techniqueID,
       negate: false,
     });
-    onSelectedTabChanged('events');
+    onSelectedTabChanged(TAB_VIEW_ID_EVENTS);
   };
 
   const openDashboard = (e, techniqueID) => {
     addFilter({
-      key: 'rule.mitre.id',
+      key: 'rule.mitre.technique',
       value: techniqueID,
       negate: false,
     });
-    onSelectedTabChanged('dashboard');
+    onSelectedTabChanged(TAB_VIEW_ID_DASHBOARD);
   };
 
   const renderFacet = () => {
@@ -428,7 +432,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
                     <span style={{ float: 'right', position: 'fixed' }}>
                       <EuiToolTip
                         position='top'
-                        content={'Show ' + item.id + ' in Dashboard'}
+                        content={`Show ${item.id} in ${TAB_VIEW_NAME_DASHBOARD}`}
                       >
                         <EuiIcon
                           onClick={e => {
@@ -442,7 +446,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
                       &nbsp;
                       <EuiToolTip
                         position='top'
-                        content={'Inspect ' + item.id + ' in Events'}
+                        content={`Inspect ${item.id} in ${TAB_VIEW_NAME_EVENTS}`}
                       >
                         <EuiIcon
                           onClick={e => {

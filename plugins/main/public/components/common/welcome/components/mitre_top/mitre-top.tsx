@@ -33,7 +33,7 @@ import {
 import { compose } from 'redux';
 import { withDataSourceFetch, withGuard } from '../../../hocs';
 import {
-  EventsDataSourceRepository,
+  FindingsDataSourceRepository,
   MitreAttackDataSource,
 } from '../../../data-source';
 
@@ -49,7 +49,7 @@ const PromptNoData = () => (
 const MitreTopTacticsTactics = compose(
   withDataSourceFetch({
     DataSource: MitreAttackDataSource,
-    DataSourceRepositoryCreator: EventsDataSourceRepository,
+    DataSourceRepositoryCreator: FindingsDataSourceRepository,
     mapRequestParams(props) {
       const [, , dateRange] = props.dependencies;
       return {
@@ -141,7 +141,7 @@ const MitreTopTacticsTechniquesHeader = ({ selectedTactic, setView }) => (
 const MitreTopTacticsTechniquesBody = compose(
   withDataSourceFetch({
     DataSource: MitreAttackDataSource,
-    DataSourceRepositoryCreator: EventsDataSourceRepository,
+    DataSourceRepositoryCreator: FindingsDataSourceRepository,
     mapRequestParams(props) {
       const [, , dateRange, selectedTactic] = props.dependencies;
       return {
@@ -157,7 +157,7 @@ const MitreTopTacticsTechniquesBody = compose(
         aggs: {
           tactics: {
             terms: {
-              field: 'rule.mitre.id',
+              field: 'rule.mitre.technique',
               size: 5,
             },
           },
@@ -199,7 +199,7 @@ const MitreTopTacticsTechniquesBody = compose(
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
-        `rule.mitre.id`,
+        `rule.mitre.technique`,
         techniqueID,
         indexPatternId,
       ),
@@ -218,7 +218,7 @@ const MitreTopTacticsTechniquesBody = compose(
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
-        `rule.mitre.id`,
+        `rule.mitre.technique`,
         techniqueID,
         indexPatternId,
       ),

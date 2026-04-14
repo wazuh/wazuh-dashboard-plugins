@@ -5,14 +5,12 @@ export const mitreAttackColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   commonColumns['wazuh.agent.name'],
   {
-    id: 'rule.mitre.id',
-    initialWidth: 118,
+    id: 'rule.mitre.tactic',
   },
   {
-    id: 'rule.mitre.tactic',
-    initialWidth: 280,
+    id: 'rule.title',
   },
-  commonColumns['rule.description'],
-  commonColumns['rule.level'],
-  commonColumns['rule.id'],
+  {
+    id: 'rule.level',
+  },
 ];

@@ -246,13 +246,15 @@ class WzConfigurationSwitch extends Component {
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
+                {/* FIXME: Either remove cluster section or edit the endpoint it
+                          uses (if there is a valid endpoint with the info)
                 <WzViewSelectorSwitch view='cluster'>
                   <WzConfigurationCluster
                     clusterNodeSelected={this.props.clusterNodeSelected}
                     agent={agent}
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
-                </WzViewSelectorSwitch>
+                </WzViewSelectorSwitch>*/}
                 <WzViewSelectorSwitch view='registration-service'>
                   <WzConfigurationRegistrationService
                     clusterNodeSelected={this.props.clusterNodeSelected}
@@ -263,7 +265,6 @@ class WzConfigurationSwitch extends Component {
                 </WzViewSelectorSwitch>
                 <WzViewSelectorSwitch view='commands'>
                   <WzConfigurationCommands
-                    clusterNodeSelected={this.props.clusterNodeSelected}
                     agent={agent}
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
@@ -276,38 +277,6 @@ class WzConfigurationSwitch extends Component {
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='policy-monitoring'>
-                  <WzConfigurationPolicyMonitoring
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateBadge={this.updateBadge}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='inventory'>
-                  <WzConfigurationInventory
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateBadge={this.updateBadge}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='log-collection'>
-                  <WzConfigurationLogCollection
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='integrity-monitoring'>
-                  <WzConfigurationIntegrityMonitoring
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateBadge={this.updateBadge}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-
                 {!isManager && (
                   <>
                     <WzViewSelectorSwitch view='global-configuration-agent'>
@@ -337,6 +306,8 @@ class WzConfigurationSwitch extends Component {
                         }
                       />
                     </WzViewSelectorSwitch>
+                    {/* Removed this section for the agent
+
                     <WzViewSelectorSwitch view='alerts-agent'>
                       <WzConfigurationAlertsLabelsAgent
                         clusterNodeSelected={this.props.clusterNodeSelected}
@@ -345,11 +316,50 @@ class WzConfigurationSwitch extends Component {
                           this.updateConfigurationSection
                         }
                       />
-                    </WzViewSelectorSwitch>
+                    </WzViewSelectorSwitch> */}
                     <WzViewSelectorSwitch view='active-response-agent'>
                       <WzConfigurationActiveResponseAgent
                         clusterNodeSelected={this.props.clusterNodeSelected}
                         agent={agent}
+                        updateConfigurationSection={
+                          this.updateConfigurationSection
+                        }
+                      />
+                    </WzViewSelectorSwitch>
+                    <WzViewSelectorSwitch view='policy-monitoring'>
+                      <WzConfigurationPolicyMonitoring
+                        clusterNodeSelected={this.props.clusterNodeSelected}
+                        agent={agent}
+                        updateBadge={this.updateBadge}
+                        updateConfigurationSection={
+                          this.updateConfigurationSection
+                        }
+                      />
+                    </WzViewSelectorSwitch>
+                    <WzViewSelectorSwitch view='inventory'>
+                      <WzConfigurationInventory
+                        clusterNodeSelected={this.props.clusterNodeSelected}
+                        agent={agent}
+                        updateBadge={this.updateBadge}
+                        updateConfigurationSection={
+                          this.updateConfigurationSection
+                        }
+                      />
+                    </WzViewSelectorSwitch>
+                    <WzViewSelectorSwitch view='log-collection'>
+                      <WzConfigurationLogCollection
+                        clusterNodeSelected={this.props.clusterNodeSelected}
+                        agent={agent}
+                        updateConfigurationSection={
+                          this.updateConfigurationSection
+                        }
+                      />
+                    </WzViewSelectorSwitch>
+                    <WzViewSelectorSwitch view='integrity-monitoring'>
+                      <WzConfigurationIntegrityMonitoring
+                        clusterNodeSelected={this.props.clusterNodeSelected}
+                        agent={agent}
+                        updateBadge={this.updateBadge}
                         updateConfigurationSection={
                           this.updateConfigurationSection
                         }

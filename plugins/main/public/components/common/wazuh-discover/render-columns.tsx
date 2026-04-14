@@ -4,6 +4,7 @@ import { tDataGridRenderColumn } from '../data-grid';
 import { endpointSummary, mitreAttack } from '../../../utils/applications';
 import { WzLink } from '../../wz-link/wz-link';
 import { i18n } from '@osd/i18n';
+import { CTI_CVE_LINK_BASE_PATH } from '../../../../common/constants';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -100,7 +101,7 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
     render: renderLinksReference,
   },
   {
-    id: 'rule.mitre.id',
+    id: 'rule.mitre.technique',
     render: value =>
       Array.isArray(value) ? (
         <div style={{ display: 'flex', gap: 10 }}>
@@ -116,29 +117,31 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   },
 
   {
-    id: 'compliance.pci_dss',
+    id: 'rule.compliance.pci_dss',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'compliance.gdpr',
+    id: 'rule.compliance.gdpr',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'compliance.nist_800_53',
+    id: 'rule.compliance.nist_800_53',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'compliance.hipaa',
+    id: 'rule.compliance.hipaa',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'compliance.tsc',
+    id: 'rule.compliance.tsc',
     render: renderRequirementsSecurityOperations,
   },
   {
     id: 'vulnerability.id',
     render: (value, row) => {
-      if (!row.vulnerability?.scanner?.reference) {
+      if (
+        !(row.vulnerability?.reference || row.vulnerability?.scanner?.reference)
+      ) {
         return value;
       }
       return (
@@ -152,7 +155,7 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
           )}
         >
           <EuiLink
-            href={row.vulnerability.scanner.reference}
+            href={`${CTI_CVE_LINK_BASE_PATH}${row.vulnerability.id}`}
             target='_blank'
             rel='noopener noreferrer'
             external
@@ -166,7 +169,12 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
     id: 'data.vulnerability.cve',
     render: (value, row) => {
-      if (!row.data?.vulnerability?.scanner?.reference) {
+      if (
+        !(
+          row.data?.vulnerability?.reference ||
+          row.data?.vulnerability?.scanner?.reference
+        )
+      ) {
         return value;
       }
       return (
@@ -180,7 +188,7 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
           )}
         >
           <EuiLink
-            href={row.data.vulnerability.scanner.reference}
+            href={`${CTI_CVE_LINK_BASE_PATH}${row.data.vulnerability.cve}`}
             target='_blank'
             rel='noopener noreferrer'
             external

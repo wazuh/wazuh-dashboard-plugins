@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  EventsDataSourceRepository,
+  FindingsDataSourceRepository,
   DockerDataSource,
 } from '../../../common/data-source';
 import {
@@ -12,7 +12,7 @@ import { createDashboard } from '../../../common/dashboards';
 
 export const DashboardDocker = createDashboard({
   DataSource: DockerDataSource,
-  DataSourceRepositoryCreator: EventsDataSourceRepository,
+  DataSourceRepositoryCreator: FindingsDataSourceRepository,
   getDashboardPanels: [
     {
       dashboardId: DOCKER_DASHBOARD_ID,

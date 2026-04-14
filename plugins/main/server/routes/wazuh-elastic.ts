@@ -13,13 +13,13 @@ import { WazuhElasticCtrl } from '../controllers';
 import { IRouter } from 'opensearch_dashboards/server';
 import { schema } from '@osd/config-schema';
 import {
-  WAZUH_SAMPLE_AGENT_MONITORING,
+  WAZUH_SAMPLE_METRICS_AGENTS,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
   WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
   WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
   WAZUH_SAMPLE_INVENTORY_AGENT,
-  WAZUH_SAMPLE_SERVER_STATISTICS,
+  WAZUH_SAMPLE_METRICS_COMMS,
   WAZUH_SAMPLE_VULNERABILITIES,
   WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
 } from '../../common/constants';
@@ -28,13 +28,13 @@ export function WazuhElasticRoutes(router: IRouter) {
   const ctrl = new WazuhElasticCtrl();
   const schemaSampleAlertsCategories = schema.oneOf(
     [
-      WAZUH_SAMPLE_AGENT_MONITORING,
+      WAZUH_SAMPLE_METRICS_AGENTS,
       WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
       WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
       WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
       WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
       WAZUH_SAMPLE_INVENTORY_AGENT,
-      WAZUH_SAMPLE_SERVER_STATISTICS,
+      WAZUH_SAMPLE_METRICS_COMMS,
       WAZUH_SAMPLE_VULNERABILITIES,
       WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
     ].map(category => schema.literal(category)),
@@ -84,43 +84,65 @@ export function WazuhElasticRoutes(router: IRouter) {
       ctrl.getFieldTop(context, request, response),
   );
 
+  // router.get(
+  //   {
+  //     path: '/indexer/sampledata/{category}',
+  //     validate: {
+  //       params: schema.object({
+  //         category: schemaSampleAlertsCategories,
+  //       }),
+  //     },
+  //   },
+  //   async (context, request, response) =>
+  //     ctrl.haveSampleDataOfCategory(context, request, response),
+  // );
+
+  // router.post(
+  //   {
+  //     path: '/indexer/sampledata/{category}',
+  //     validate: {
+  //       params: schema.object({
+  //         category: schemaSampleAlertsCategories,
+  //       }),
+  //       body: schema.any(),
+  //     },
+  //   },
+  //   async (context, request, response) =>
+  //     ctrl.createSampleData(context, request, response),
+  // );
+
+  // router.delete(
+  //   {
+  //     path: '/indexer/sampledata/{category}',
+  //     validate: {
+  //       params: schema.object({
+  //         category: schemaSampleAlertsCategories,
+  //       }),
+  //     },
+  //   },
+  //   async (context, request, response) =>
+  //     ctrl.deleteSampleData(context, request, response),
+  // );
+
   router.get(
     {
-      path: '/indexer/sampledata/{category}',
-      validate: {
-        params: schema.object({
-          category: schemaSampleAlertsCategories,
-        }),
-      },
+      path: '/indexer/settings',
+      validate: false,
     },
     async (context, request, response) =>
-      ctrl.haveSampleDataOfCategory(context, request, response),
+      ctrl.getIndexerSettings(context, request, response),
   );
 
-  router.post(
+  router.put(
     {
-      path: '/indexer/sampledata/{category}',
+      path: '/indexer/settings',
       validate: {
-        params: schema.object({
-          category: schemaSampleAlertsCategories,
-        }),
-        body: schema.any(),
-      },
-    },
-    async (context, request, response) =>
-      ctrl.createSampleData(context, request, response),
-  );
-
-  router.delete(
-    {
-      path: '/indexer/sampledata/{category}',
-      validate: {
-        params: schema.object({
-          category: schemaSampleAlertsCategories,
+        body: schema.object({
+          engine: schema.recordOf(schema.string(), schema.any()),
         }),
       },
     },
     async (context, request, response) =>
-      ctrl.deleteSampleData(context, request, response),
+      ctrl.updateIndexerSettings(context, request, response),
   );
 }

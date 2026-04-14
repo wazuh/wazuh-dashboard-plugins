@@ -120,10 +120,6 @@ Packages can be installed via:
    - Transfer to target system
    - Install using local package manager
 
-The installation steps and repository configuration are documented in the
-installation guide:
-https://documentation.wazuh.com/current/installation-guide/wazuh-dashboard/index.html
-
 ## Package verification
 
 Verify package integrity:
@@ -139,3 +135,89 @@ rpm --checksig wazuh-dashboard-5.0.0-1.x86_64.rpm
 dpkg -c wazuh-dashboard_5.0.0-1_amd64.deb  # DEB
 rpm -qlp wazuh-dashboard-5.0.0-1.x86_64.rpm  # RPM
 ```
+
+## Download packages
+
+### Package name
+
+| System            | Architecture     | Package name                                       |
+| ----------------- | ---------------- | -------------------------------------------------- |
+| Debian-based      | 64-bit Intel/AMD | `wazuh-dashboard_<VERSION>-<REVISION>_amd64.deb`   |
+| Debian-based      | 64-bit ARM       | `wazuh-dashboard_<VERSION>-<REVISION>_arm64.deb`   |
+| RHEL/CentOS-based | 64-bit Intel/AMD | `wazuh-dashboard-<VERSION>-<REVISION>.x86_64.rpm`  |
+| RHEL/CentOS-based | 64-bit ARM       | `wazuh-dashboard-<VERSION>-<REVISION>.aarch64.rpm` |
+
+where:
+
+- `VERSION`: app version. e.g. `5.0.0`
+- `REVISION`: app revision.
+  - For production packages, the revision is usually `1`.
+  - For pre-release packages, the revision can be `alpha1`, `alpha2`, `beta1`, `rc1`, etc. e.g. `rc1`
+  - For nightly packages, the revision is `latest`.
+
+### Repositories
+
+#### Production
+
+URL: `https://packages.wazuh.com/production/<MAJOR_VERSION>.x/<PACKAGE_MANAGER>/pool/main/w/<PACKAGE_NAME>`
+
+where:
+
+- `<MAJOR_VERSION>`: major version number, e.g. `5`
+- `<PACKAGE_MANAGER>`: `apt` (Debian-based) `yum` (RHEL/CentOS-based)
+- `<PACKAGE_NAME>`: package name
+
+The `<REVISION>` in the package name for production packages is usually `1`.
+
+Example: `https://packages.wazuh.com/production/5.x/apt/pool/main/w/wazuh-dashboard_5.0.0-1_amd64.deb`
+
+#### Pre-release
+
+URL: `https://packages-staging.xdrsiem.wazuh.info/pre-release/<MAJOR_VERSION>.x/<PACKAGE_MANAGER>/pool/main/w/<PACKAGE_NAME>`
+
+where:
+
+- `<MAJOR_VERSION>`: major version number, e.g. `5`
+- `<PACKAGE_MANAGER>`: `apt` (Debian-based) `yum` (RHEL/CentOS-based)
+- `<PACKAGE_NAME>`: package name
+
+The `<REVISION>` in the package name for pre-release packages can be `alpha1`, `alpha2`, `beta1`, `rc1`, etc. e.g. `rc1`
+
+Example: `https://packages-staging.xdrsiem.wazuh.info/pre-release/5.x/apt/pool/main/w/wazuh-dashboard_5.0.0-alpha1_amd64.deb`
+
+#### Nightly
+
+URL: `https://packages-staging.xdrsiem.wazuh.info/nightly/<VERSION>/<PACKAGE_MANAGER>/pool/main/w/<PACKAGE_NAME>`
+
+where:
+
+- `<VERSION>`: version number, e.g. `5.0.0`
+- `<PACKAGE_MANAGER>`: `apt` (Debian-based) `yum` (RHEL/CentOS-based)
+- `<PACKAGE_NAME>`: package name
+
+The `<REVISION>` in the package name for nightly packages is `latest`.
+
+Example: `https://packages-staging.xdrsiem.wazuh.info/nightly/5.0.0/apt/pool/main/w/wazuh-dashboard/wazuh-dashboard_5.0.0-latest_arm64.deb`
+
+#### Nightly backup
+
+URL: `https://packages-staging.xdrsiem.wazuh.info/nightly-backup/<DATE>/<PACKAGE_NAME>`
+
+where:
+
+- `<DATE>`: date representation in `YYYY-MM-DD` format, e.g. `2026-03-27`
+- `<PACKAGE_NAME>`: package name
+
+The `<REVISION>` in the package name for nightly backup packages is `latest`.
+
+Example: `https://packages-staging.xdrsiem.wazuh.info/nightly-backup/2026-03-27/wazuh-dashboard_5.0.0-latest_amd64.deb`
+
+### Download the package
+
+```bash
+wget <URL>
+```
+
+where:
+
+- `<URL>`: is the package URL obtained in the previous step.

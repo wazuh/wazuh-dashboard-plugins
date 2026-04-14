@@ -152,17 +152,85 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'events-raw.json',
   },
-  monitoring: {
+  'findings-access-management': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/templates/monitoring.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
     ],
-    outputFile: 'monitoring.json',
+    outputFile: 'findings-access-management.json',
   },
-  statistics: {
+  'findings-applications': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/templates/statistics.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
     ],
-    outputFile: 'statistics.json',
+    outputFile: 'findings-applications.json',
+  },
+  'findings-cloud-services': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-cloud-services.json',
+  },
+  'findings-network-activity': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-network-activity.json',
+  },
+  'findings-other': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-other.json',
+  },
+  'findings-security': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-security.json',
+  },
+  'findings-system-activity': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-system-activity.json',
+  },
+  'findings-unclassified': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-unclassified.json',
+  },
+  'metrics-agents': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/metrics-agents.json',
+      ),
+    ],
+    outputFile: 'metrics-agents.json',
+  },
+  'metrics-comms': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/metrics-comms.json',
+      ),
+    ],
+    outputFile: 'metrics-comms.json',
   },
   // FIM templates
   'states-fim-files': {
@@ -474,7 +542,8 @@ function extractFieldsFromProperties(properties, prefix = '', issues) {
         readFromDocValues: shouldReadFromDocValues(fieldDef, esType),
       };
 
-      fields.push(field);
+      if (!(esType === 'object' || esType === 'nested') || !fieldDef.properties)
+        fields.push(field);
 
       // Handle multi-fields (like .keyword subfields)
       if (fieldDef.fields) {
@@ -495,8 +564,8 @@ function extractFieldsFromProperties(properties, prefix = '', issues) {
         }
       }
 
-      // Handle nested type with properties
-      if (esType === 'nested' && fieldDef.properties) {
+      // Handle nested or object type with properties
+      if ((esType === 'nested' || esType === 'object') && fieldDef.properties) {
         fields.push(
           ...extractFieldsFromProperties(
             fieldDef.properties,
@@ -694,12 +763,17 @@ async function processTemplate(templateConfig, config) {
     );
     console.log(`  ✅ Successfully fetched from: ${url}`);
 
-    // Extract mappings - handle different template structures
+    // Extract mappings - handle different template structures:
+    // 1. Index template:           { "mappings": { "properties": {...} } }
+    // 2. Composable template:      { "template": { "mappings": { ... } } }
+    // 3. Raw mapping (e.g. SA):    { "properties": {...} }
     let mappings;
     if (template.mappings) {
       mappings = template.mappings;
     } else if (template.template && template.template.mappings) {
       mappings = template.template.mappings;
+    } else if (template.properties) {
+      mappings = template;
     } else {
       throw new Error('Could not find mappings in template structure');
     }
@@ -824,6 +898,25 @@ async function main(config) {
     console.log(''); // Add spacing between processing
   }
 
+  // Generate combined FIM fields
+  try {
+    const combinedFields = await generateCombinedFields({
+      results,
+      config,
+      keyPrefix: 'states-fim-',
+      outputFileName: 'states-fim.json',
+      displayName: 'states-fim',
+    });
+    results['states-fim'] = combinedFields
+      ? { fields: combinedFields, warnings: [], errors: [] }
+      : null;
+  } catch (error) {
+    console.error('Failed to generate combined FIM fields:', error.message);
+    process.exit(1);
+    results['states-fim'] = null;
+  }
+  console.log(''); // Add spacing
+
   // Generate combined inventory fields
   try {
     const combinedFields = await generateCombinedFields({
@@ -862,6 +955,28 @@ async function main(config) {
     console.error('Failed to generate combined events fields:', error.message);
     process.exit(1);
     results['events'] = null;
+  }
+  console.log(''); // Add spacing
+
+  // Generate combined findings fields
+  try {
+    const combinedFields = await generateCombinedFields({
+      results,
+      config,
+      keyPrefix: 'findings-',
+      outputFileName: 'findings.json',
+      displayName: 'findings',
+    });
+    results['findings'] = combinedFields
+      ? { fields: combinedFields, warnings: [], errors: [] }
+      : null;
+  } catch (error) {
+    console.error(
+      'Failed to generate combined findings fields:',
+      error.message,
+    );
+    process.exit(1);
+    results['findings'] = null;
   }
   console.log(''); // Add spacing
 

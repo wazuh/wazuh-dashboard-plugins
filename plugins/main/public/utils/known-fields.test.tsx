@@ -7,11 +7,11 @@ import { amazonWebServicesColumns } from '../components/overview/amazon-web-serv
 import { office365Columns } from '../components/overview/office/events/office-365-columns';
 import { fileIntegrityMonitoringColumns } from '../components/overview/fim/events/file-integrity-monitoring-columns';
 import { configurationAssessmentColumns } from '../components/overview/sca/events/configuration-assessment-columns';
-import { pciColumns } from '../components/overview/pci/events/pci-columns';
-import { hipaaColumns } from '../components/overview/hipaa/events/hipaa-columns';
-import { nistColumns } from '../components/overview/nist/events/nist-columns';
-import { gdprColumns } from '../components/overview/gdpr/events/gdpr-columns';
-import { tscColumns } from '../components/overview/tsc/events/tsc-columns';
+import { pciColumns } from '../components/overview/regulatory-compliance/pci/events/pci-columns';
+import { hipaaColumns } from '../components/overview/regulatory-compliance/hipaa/events/hipaa-columns';
+import { nistColumns } from '../components/overview/regulatory-compliance/nist/events/nist-columns';
+import { gdprColumns } from '../components/overview/regulatory-compliance/gdpr/events/gdpr-columns';
+import { tscColumns } from '../components/overview/regulatory-compliance/tsc/events/tsc-columns';
 import { githubColumns } from '../components/overview/github/events/github-columns';
 import { mitreAttackColumns } from '../components/overview/mitre/events/mitre-attack-columns';
 import { malwareDetectionColumns } from '../components/overview/malware-detection/events/malware-detection-columns';

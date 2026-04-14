@@ -4,7 +4,7 @@ import { commonColumns } from '../../common/data-grid-columns';
 export const amazonWebServicesColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   {
-    id: 'aws.cloudtrail_event_source',
+    id: 'event.provider',
   },
   {
     id: 'event.action',

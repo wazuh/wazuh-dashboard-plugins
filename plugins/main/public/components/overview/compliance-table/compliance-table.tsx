@@ -31,7 +31,10 @@ import {
   withDataSourceLoading,
   withDataSourceSearchBar,
 } from '../../common/hocs';
-import { EventsDataSourceRepository, tFilter } from '../../common/data-source';
+import {
+  FindingsDataSourceRepository,
+  tFilter,
+} from '../../common/data-source';
 import { LoadingSearchbarProgress } from '../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { I18nProvider } from '@osd/i18n/react';
 import { useAsyncAction } from '../../common/hooks';
@@ -92,7 +95,7 @@ function buildComplianceObject({ section }) {
     if (section === 'nist') {
       descriptions = nistRequirementsFile;
       Object.keys(nistRequirementsFile).forEach(item => {
-        const currentRequirement = item.split('.')[0];
+        const currentRequirement = item.split('-')[0];
         if (complianceRequirements[currentRequirement]) {
           complianceRequirements[currentRequirement].push(item);
         } else {
@@ -142,7 +145,7 @@ export const ComplianceTable = compose(
   withAgentSupportModule,
   withDataSourceSearchBar({
     DataSourceFromNameProp: 'DataSource',
-    DataSourceRepositoryCreator: EventsDataSourceRepository,
+    DataSourceRepositoryCreator: FindingsDataSourceRepository,
   }),
   withDataSourceLoading({
     isLoadingNameProp: 'dataSource.isLoading',
@@ -210,11 +213,11 @@ export const ComplianceTable = compose(
   }) => {
     try {
       const mapFieldAgg = {
-        pci: 'compliance.pci_dss',
-        gdpr: 'compliance.gdpr',
-        hipaa: 'compliance.hipaa',
-        nist: 'compliance.nist_800_53',
-        tsc: 'compliance.tsc',
+        pci: 'rule.compliance.pci_dss',
+        gdpr: 'rule.compliance.gdpr',
+        hipaa: 'rule.compliance.hipaa',
+        nist: 'rule.compliance.nist_800_53',
+        tsc: 'rule.compliance.tsc',
       };
       const aggs = {
         tactics: {

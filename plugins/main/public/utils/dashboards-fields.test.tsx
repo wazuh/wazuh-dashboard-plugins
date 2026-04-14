@@ -14,19 +14,20 @@ const dashboardPanels = {
   aws: '../components/overview/amazon-web-services/dashboards/dashboard_panels',
   docker: '../components/overview/docker/dashboards/dashboard-panels',
   fim: '../components/overview/fim/dashboard/dashboard-panels',
-  gdpr: '../components/overview/gdpr/dashboards/dashboard-panels',
+  gdpr: '../components/overview/regulatory-compliance/gdpr/dashboards/dashboard-panels',
   github: '../components/overview/github/dashboards/dashboard-panels',
   googleCloud:
     '../components/overview/google-cloud/dashboards/dashboard_panels',
-  hipaa: '../components/overview/hipaa/dashboards/dashboard-panels',
+  hipaa:
+    '../components/overview/regulatory-compliance/hipaa/dashboards/dashboard-panels',
   malwareDetection:
     '../components/overview/malware-detection/dashboard/dashboard-panels',
-  nist: '../components/overview/nist/dashboards/dashboard-panels',
-  pci: '../components/overview/pci/dashboards/dashboard-panels',
+  nist: '../components/overview/regulatory-compliance/nist/dashboards/dashboard-panels',
+  pci: '../components/overview/regulatory-compliance/pci/dashboards/dashboard-panels',
   office: '../components/overview/office/dashboard/dashboard_panels',
   threatHunting:
     '../components/overview/threat-hunting/dashboard/dashboard_panels',
-  tsc: '../components/overview/tsc/dashboards/dashboard-panels',
+  tsc: '../components/overview/regulatory-compliance/tsc/dashboards/dashboard-panels',
 };
 
 const panelEntries = Object.entries(dashboardPanels);

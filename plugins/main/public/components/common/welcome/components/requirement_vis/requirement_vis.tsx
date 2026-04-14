@@ -35,7 +35,7 @@ import {
   withPanel,
 } from '../../../hocs';
 import {
-  EventsDataSourceRepository,
+  FindingsDataSourceRepository,
   ThreatHuntingDataSource,
 } from '../../../data-source';
 import { LoadingSearchbarProgress } from '../../../loading-searchbar-progress/loading-searchbar-progress';
@@ -84,7 +84,7 @@ export const RequirementVis = withPanel({ paddingSize: 'm' })(props => {
 const RequirementVisBody = compose(
   withDataSource({
     DataSource: ThreatHuntingDataSource,
-    DataSourceRepositoryCreator: EventsDataSourceRepository,
+    DataSourceRepositoryCreator: FindingsDataSourceRepository,
   }),
   withDataSourceLoading({
     isLoadingNameProp: 'dataSource.isLoading',

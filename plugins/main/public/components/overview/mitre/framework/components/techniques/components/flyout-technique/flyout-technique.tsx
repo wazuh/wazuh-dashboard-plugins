@@ -31,7 +31,11 @@ import {
   FilterManager,
   IndexPattern,
 } from '../../../../../../../../../../../src/plugins/data/public/';
-import { UI_LOGGER_LEVELS } from '../../../../../../../../../common/constants';
+import {
+  TAB_VIEW_NAME_DASHBOARD,
+  TAB_VIEW_NAME_EVENTS,
+  UI_LOGGER_LEVELS,
+} from '../../../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../../../react-services/common-services';
 import { WzFlyout } from '../../../../../../../../components/common/flyouts';
@@ -368,7 +372,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
                   <span>
                     <EuiToolTip
                       position='top'
-                      content={'Show ' + currentTechnique + ' in Dashboard'}
+                      content={`Show ${currentTechnique} in ${TAB_VIEW_NAME_DASHBOARD}`}
                     >
                       <EuiIcon
                         onMouseDown={e => {
@@ -382,7 +386,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
                     </EuiToolTip>
                     <EuiToolTip
                       position='top'
-                      content={'Inspect ' + currentTechnique + ' in Events'}
+                      content={`Inspect ${currentTechnique} in ${TAB_VIEW_NAME_EVENTS}`}
                     >
                       <EuiIcon
                         onMouseDown={e => {

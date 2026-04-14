@@ -55,7 +55,7 @@ For administrators deploying the plugins:
 
 ### Integration and Operations
 
-- [External Integrations](external-integrations.md) - Slack, PagerDuty, Shuffle, Maltiverse
+- [External Integrations](external-integrations.md) - Slack, PagerDuty, Shuffle
 - [Upgrade](upgrade.md) - Version upgrade procedures
 - [Migration 4.x to 5.x](migration-4x-5x.md) - Migration guide for major version changes
 - [Uninstall](uninstall.md) - Plugin removal procedures
