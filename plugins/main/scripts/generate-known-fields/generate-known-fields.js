@@ -82,14 +82,6 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'events-cloud-services.json',
   },
-  'events-cloud-services-azure': {
-    urls: [
-      wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/events.json',
-      ),
-    ],
-    outputFile: 'events-cloud-services-azure.json',
-  },
   'events-cloud-services-gcp': {
     urls: [
       wazuhUrl(

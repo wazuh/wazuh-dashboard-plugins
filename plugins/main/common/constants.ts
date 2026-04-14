@@ -80,8 +80,6 @@ export const WAZUH_INDEX_TYPE_EVENTS_ACCESS_MANAGEMENT =
   'events-access-management';
 export const WAZUH_INDEX_TYPE_EVENTS_APPLICATIONS = 'events-applications';
 export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES = 'events-cloud-services';
-export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AZURE =
-  'events-cloud-services-azure';
 export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_GCP =
   'events-cloud-services-gcp';
 export const WAZUH_INDEX_TYPE_EVENTS_NETWORK_ACTIVITY =
@@ -157,10 +155,6 @@ export const WAZUH_EVENTS_CLOUD_SERVICES_PATTERN =
   'wazuh-events-v5-cloud-services*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES =
   'index-pattern:events-cloud-services';
-export const WAZUH_EVENTS_CLOUD_SERVICES_AZURE_PATTERN =
-  'wazuh-events-v5-cloud-services-azure*';
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AZURE =
-  'index-pattern:events-cloud-services-azure';
 export const WAZUH_EVENTS_CLOUD_SERVICES_GCP_PATTERN =
   'wazuh-events-v5-cloud-services-gcp*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_GCP =
