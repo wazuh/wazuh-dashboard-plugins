@@ -7,8 +7,6 @@ export class CTIFeedsClient {
     this.logger.debug('CTI Feeds client initialized');
   }
 
-  // Re-use this class to implement the get credentials, post subscriptions, etc.
-
   async updateCTIFeeds(context) {
     try {
       this.logger.debug('Triggering CTI feeds update in indexer');
