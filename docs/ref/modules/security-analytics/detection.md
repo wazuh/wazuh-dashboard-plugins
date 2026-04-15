@@ -1,6 +1,6 @@
 # Detection
 
-The **Detection** module is part of the **Security Analytics** section in the Wazuh Dashboard. It provides visibility and management over the rules that govern alert generation based on normalized events processed by the Wazuh Engine.
+The **Detection** module is part of the **Security Analytics** section in the Wazuh Dashboard. It provides visibility and management over the rules that govern finding generation based on normalized events processed by the Wazuh Engine.
 
 This module exposes the following sections:
 
@@ -14,7 +14,7 @@ This module exposes the following sections:
 
 ### Rules
 
-A **detection rule** defines the conditions under which the Wazuh Engine generates a security alert. Rules operate on fields that have been previously normalized by decoders, and they support references to compliance frameworks and the MITRE ATT&CK matrix.
+A **detection rule** defines the conditions under which the Wazuh Engine generates a security finding. Rules operate on fields that have been previously normalized by decoders, and they support references to compliance frameworks and the MITRE ATT&CK matrix.
 
 Rules are written in YAML and follow the same promotion lifecycle as integrations and decoders. Draft, Test, and Custom are user-managed; Standard is read-only:
 
@@ -41,8 +41,8 @@ A detection rule is composed of the following main blocks:
 | ---------------- | ------------------------------------------------------------------------------------------------------- |
 | `id`             | Unique identifier for the rule.                                                                         |
 | `logsource`      | Binds the rule to a specific integration. The `product` field must match the integration title exactly. |
-| `detection`      | Defines the field conditions (`selection`) and the logical `condition` that triggers the alert.         |
-| `level`          | Severity level of the alert (`informational`, `low`, `medium`, `high`, `critical`).                     |
+| `detection`      | Defines the field conditions (`selection`) and the logical `condition` that triggers the finding.       |
+| `level`          | Severity level of the finding (`informational`, `low`, `medium`, `high`, `critical`).                   |
 | `tags`           | Free-form tags, commonly used for MITRE ATT&CK technique references.                                    |
 | `mitre`          | Explicit mapping to MITRE ATT&CK tactics and techniques.                                                |
 | `compliance`     | Mapping to compliance framework controls (e.g., PCI DSS, NIST 800-53).                                  |
@@ -155,7 +155,7 @@ The promotion dialog lists all entities that will be synchronized. Because the i
 
 Click **Promote** to confirm. The integration and its rule are now available in the **Test** space. Follow the same steps to promote from **Test → Custom** once validation is complete.
 
-After promotion to **Custom**, the rule is active in the engine. Any incoming event normalized by the **custom-ssh-auth** decoder that satisfies the `event.action: authentication_failed` condition will trigger an alert classified as **High** severity, mapped to MITRE ATT&CK technique **T1110** (Brute Force) and tactic **TA0006** (Credential Access).
+After promotion to **Custom**, the rule is active in the engine. Any incoming event normalized by the **custom-ssh-auth** decoder that satisfies the `event.action: authentication_failed` condition will generate a finding classified as **High** severity, mapped to MITRE ATT&CK technique **T1110** (Brute Force) and tactic **TA0006** (Credential Access).
 
 ---
 

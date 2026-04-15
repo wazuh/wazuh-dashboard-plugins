@@ -17,6 +17,8 @@ This module exposes the following sections:
 
 An **integration** is the top-level organizational unit in Security Analytics. It groups a set of related decoders and rules that together implement support for a specific log source or use case.
 
+In each space, the integration is configured through a **space policy**. That policy must be **enabled** before the integration can move forward in the promotion workflow for that space, and it defines the **root decoder**—the decoder the normalization engine uses as the entry point when processing events for this integration (in **Test** and **Custom**, where content is loaded into the engine).
+
 The following spaces are available. Draft, Test, and Custom are user-managed; Standard is read-only and contains the built-in content shipped with Wazuh:
 
 | Space        | Managed by | Description                                                                            |
@@ -43,7 +45,7 @@ The following walkthrough demonstrates how to create a custom decoder for SSH au
 **Lifecycle flow:**
 
 ```
-Create Integration → Add Decoder → Enable → Promote to Test → Test → Promote to Custom
+Create Integration → Add Decoder → Enable policy → Promote to Test → Test → Promote to Custom
 ```
 
 ---
@@ -68,12 +70,12 @@ Once created, the new integration appears in the integrations list within the **
 
 ### Step 2: Create a Custom Decoder
 
-Navigate to **Security Analytics → Normalization → Decoders**, then select **Create**. In the creation form, select the **YAML Editor** mode, choose the integration created in the previous step (e.g., **Custom Ssh Auth**), and provide the decoder definition.
+Navigate to **Security Analytics → Normalization → Decoders**, then select **Create**. In the creation form, choose the integration created in the previous step (e.g., **Custom Ssh Auth**), and provide the decoder definition.
 
-<!-- IMAGE: Decoder creation form with YAML Editor selected and integration chosen -->
+<!-- IMAGE: Decoder creation form with integration chosen -->
 <!-- Suggested filename: images/normalization/03-create-decoder-yaml-editor.png -->
 
-![Create decoder - YAML Editor](images/normalization/03-create-decoder-yaml-editor.png)
+![Create decoder form](images/normalization/03-create-decoder-yaml-editor.png)
 
 The following is an example decoder definition for SSH authentication logs:
 
@@ -110,30 +112,30 @@ Click **Create decoder**. The engine automatically validates the YAML definition
 
 ---
 
-### Step 3: Enable the Integration and Assign a Root Decoder
+### Step 3: Enable the space policy and assign the root decoder
 
-Before an integration can be promoted, it must be **enabled** and have a **root decoder** assigned. The root decoder is the entry point that the engine uses to begin processing events for this integration.
+Before an integration can be promoted, its **space policy** must be configured. The space policy is the component that controls whether the integration is active in a given space and which decoder acts as the entry point for event processing (the **root decoder**). Both conditions must be met before promotion is allowed.
 
 1. Navigate to **Security Analytics → Normalization → Overview** and ensure the **Draft** space is selected (top-right space selector).
-2. Locate the integration, click **Actions → Edit**.
+2. Locate the integration and click **Actions → Edit**.
 
 <!-- IMAGE: Integration actions menu in the Draft space, Edit option highlighted -->
 <!-- Suggested filename: images/normalization/05-enable-integration-edit.png -->
 
 ![Integration actions - Edit](images/normalization/05-enable-integration-edit.png)
 
-3. Set **Status** to **Enabled** and confirm the root decoder is assigned.
+3. In the space policy settings, set **Status** to **Enabled** and assign the **root decoder**.
 
-<!-- IMAGE: Integration edit form showing Status set to Enabled -->
+<!-- IMAGE: Space policy form showing Status set to Enabled and root decoder assigned -->
 <!-- Suggested filename: images/normalization/06-enable-integration-status.png -->
 
-![Enable integration](images/normalization/06-enable-integration-status.png)
+![Space policy - Enabled with root decoder](images/normalization/06-enable-integration-status.png)
 
 ---
 
 ### Step 4: Promote Draft → Test
 
-Once the integration is enabled, it can be promoted to the **Test** space so its decoders are loaded into the engine for validation.
+Once the **Draft** policy is **enabled** and the **root decoder** is set, the integration can be promoted to the **Test** space so its decoders are loaded into the engine for validation.
 
 1. In the **Draft** space click **Actions → Promote**.
 
