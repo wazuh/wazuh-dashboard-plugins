@@ -11,7 +11,7 @@ export class CTIFeedsClient {
     try {
       this.logger.debug('Triggering CTI feeds update in indexer');
       const response =
-        await context.core.opensearch.client.asInternalUser.transport.request({
+        await context.core.opensearch.client.asCurrentUser.transport.request({
           method: 'POST',
           path: `${CONTENT_MANAGER_BASE_PATH}/update`,
         });
