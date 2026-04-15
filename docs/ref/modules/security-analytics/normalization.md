@@ -4,7 +4,7 @@ The **Normalization** module is part of the **Security Analytics** section in th
 
 This module exposes the following sections:
 
-- **Overview** — Displays all integrations available across the active spaces (Draft, Test, and Custom), along with their status and associated metadata.
+- **Overview** — Displays all integrations available across the active spaces (Draft, Test, Custom, and Standard), along with their status and associated metadata.
 - **Decoders** — Lists all decoders defined within the normalization engine, with filtering and inspection capabilities.
 - **KVDBs** — Lists all key-value databases (KVDBs) available for use in decoder and rule logic.
 - **Log test** — Provides an interactive interface to validate that a specific log event is correctly parsed by the active decoders in a given space.
