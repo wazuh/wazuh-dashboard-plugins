@@ -112,8 +112,10 @@ In the active response action for the trigger af an alerting monitor, the user c
   },
   "wazuh": {
     "active_response": {
+      "name": string; // the name of the active response channel that triggered the active response
+      "type": 'active-reponse' // the type of the notification channel, used to differentiate the active responses from the usual notifications channels
       "executable": string; // the executable to run for the active response
-      "extra_args": string | null; // the extra arguments to run for the active response
+      "extra_arguments": string | null; // the extra arguments to run for the active response
       "type": 'stateful' | 'stateless'; // the type of the active response
       "stateful_timeout": number; // only for stateful active response, the timeout for the active response
       "location": 'all' | 'defined-agent' | 'local'; // the location where the active response should be executed
