@@ -4,25 +4,26 @@ Active responses are a powerful feature of Wazuh that allow you to automate acti
 
 ## Repositories
 
-- wazuh-dashboard-notifications: This plugin adds the **Active Responses** app into the **Explore** section of the Wazuh dashboard that allows users to manage the active responses.
-- wazuh-dashboard-alerting: This plugin adds the ability to configure active response channels in alerting triggers when the monitor is a **Per document monitor**.
-- wazuh-dashboard-plugins: This plugin adds the healtcheck task to create the index pattern related to active responses: `wazuh-active-responses*`.
+- [wazuh-dashboard-notifications](https://github.com/wazuh/wazuh-dashboard-notifications): This plugin adds the **Active Responses** app into the **Explore** section of the Wazuh dashboard that allows users to manage the active responses.
+- [wazuh-dashboard-alerting](https://github.com/wazuh/wazuh-dashboard-alerting): This plugin adds the ability to configure active response channels in alerting triggers when the monitor is a **Per document monitor**.
+- [wazuh-dashboard-plugins](https://github.com/wazuh/wazuh-dashboard-plugins): This plugin adds the healtcheck task to create the index pattern related to active responses: `wazuh-active-responses*`.
 
 ### wazuh-dashboard-notifications
 
 #### Add Active Responses app
 
-Add the **Active Responses** (id: `active-responses` => `app/active-responses`) app into the **Explore** section of the Wazuh dashboard.
+Add the **Active Responses** app into the **Explore** section of the Wazuh dashboard.
 
-This allows users to manage the active responses, including creating, editing, and deleting active response configurations in a similar way to the existing notification channels.
+- id: `active-responses`
+- route: `/app/active-responses`
+
+This allows users to manage the active responses, including creating, editing, and deleting active response configurations in a similar way to the existing notification channels. Muting and unmuting active responses is also allowed.
 
 The application definition is located in `public/active-responses/application.tsx`.
 
 #### Exclude managed categories from Notifications
 
-As the active responses and the usual notifications are notifications in the backend side, we used the notification channel categories to exclude the usual notifications from the managed categories, such as the active responses, in the notifications management UI.
-
-The **Notification** app is adapted to exclude the managed categories, such as the **active-responses** category, this avoids they are listed in this app, so they can be managed in the related **Active Responses** app avoiding confusion for users.
+As the active responses and the usual notifications are notifications in the backend side, they are categorized as `notifications` for the usual notification channels and others such as `active-responses`. The categories different from `notifications` are considered managed categories, which means they are not listed in the **Notification** app and they have a dedicated app to be managed, such as the **Active Responses** app for the `active-responses` category.
 
 See [Channel categories](#channel-categories) for more information about the concept of managed categories and how they are used to separate "other" notification channels from the usual notification channels.
 
@@ -37,6 +38,7 @@ The active response channel configuration is similar to the existing notificatio
   type: 'active_response';
   name: string;
   description: string;
+  enabled: boolean;
   active_response?: {
     executable: string;
     extra_args: string;
@@ -52,12 +54,12 @@ The configuration of active response channels are stored in the same index as th
 
 #### Notification channel categories
 
-The notifications channels are split into categories:
+The notification channels are split into categories:
 
 - **notifications**: channels that send notifications to external services, such as email or Slack. They are the existing channels coming from OpenSearch Dashboards. They can be managed through the existing **Notification** app in the Wazuh dashboard.
 - **active-responses**: channels that trigger active responses in Wazuh. They are a new channel type added by Wazuh and they are managed through the new **Active Responses** app in the Wazuh dashboard.
 
-The concept of managed categories was added to separate the usual notifications channels from other that require a special behavior, such as the active responses. This allows us to manage the active responses in a separate app and avoid confusion for users when managing the notification channels.
+This categorization allows to separate the usual notifications channels from other that require a special behavior, such as the active responses. This allows to manage the active responses in a separate app and avoid confusion for users when managing the notification channels.
 
 Additional categories can be added in the future for other types of channels that require a dedicated app to be managed.
 
