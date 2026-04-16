@@ -12,6 +12,8 @@
 - [Run from Sources](dev/run-sources.md)
 - [Get external resouces](dev/get-external-resources.md)
 - [Run Tests](dev/run-tests.md)
+- [Modules](dev/modules/index.md)
+  - [Active responses](dev/modules/active-responses.md)
 
 # Reference Manual
 
