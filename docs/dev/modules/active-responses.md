@@ -50,7 +50,7 @@ The active response channel configuration is similar to the existing notificatio
 }
 ```
 
-The configuration of active response channels are stored in the same index as the notification channels (`.opensearch-notifications-config`) with a different `type` field (`active_response`) and the specific fields for active responses.
+The configuration of active response channels is stored in the same index as the notification channels (`.opensearch-notifications-config`) with a different `type` field (`active_response`) and the specific fields for active responses.
 
 #### Notification channel categories
 
