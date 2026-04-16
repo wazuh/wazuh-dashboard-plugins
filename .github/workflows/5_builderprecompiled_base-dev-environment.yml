@@ -12,7 +12,7 @@ on:
       reference:
         required: true
         type: string
-        default: v5.0.0-beta1
+        default: main
         description: Source code reference (branch, tag or commit SHA).
       command:
         required: true

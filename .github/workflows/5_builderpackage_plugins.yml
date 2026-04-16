@@ -22,14 +22,14 @@ on:
       reference:
         required: true
         type: string
-        default: v5.0.0-beta1
+        default: main
         description: Source code reference (branch, tag or commit SHA)
   workflow_dispatch:
     inputs:
       reference:
         required: true
         type: string
-        default: v5.0.0-beta1
+        default: main
         description: Source code reference (branch, tag or commit SHA)
 
 jobs:
@@ -41,8 +41,8 @@ jobs:
       pull-requests: write
     with:
       reference: ${{ inputs.reference }}
-      command: "yarn build"
-      artifact_name: "wazuh-dashboard-plugins"
+      command: 'yarn build'
+      artifact_name: 'wazuh-dashboard-plugins'
     secrets: inherit
 
   test-packages:
