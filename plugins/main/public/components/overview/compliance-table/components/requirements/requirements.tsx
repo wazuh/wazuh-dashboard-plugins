@@ -185,6 +185,9 @@ export class ComplianceRequirements extends Component {
       title = 'TSC';
       sectionStyle['height'] = 350;
     }
+    if (this.props.section === 'fedramp') {
+      title = 'FedRAMP';
+    }
     if (this.props.section === 'nis2') {
       title = 'NIS2';
     }
@@ -213,7 +216,7 @@ export class ComplianceRequirements extends Component {
                 <EuiButtonIcon
                   iconType='gear'
                   onClick={() => this.onGearButtonClick()}
-                />
+                ></EuiButtonIcon>
               }
               isOpen={this.state.isPopoverOpen}
               panelPaddingSize='none'

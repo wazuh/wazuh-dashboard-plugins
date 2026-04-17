@@ -53,7 +53,7 @@ import {
   vulnerabilityDetection,
 } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
-import { EventsCount } from './dashboard/events-count';
+import { FindingsCount } from './dashboard/findings-count';
 import { IntlProvider } from 'react-intl';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 import NavigationService from '../../../react-services/navigation-service';
@@ -425,8 +425,8 @@ export const AgentsWelcome = compose(
       );
     }
 
-    renderEventCountVisualization() {
-      return <EventsCount />;
+    renderFindingCountVisualization() {
+      return <FindingsCount />;
     }
 
     renderSCALastScan() {
@@ -483,10 +483,10 @@ export const AgentsWelcome = compose(
                   </EuiFlexGroup>
                   <EuiFlexGroup direction={responsiveGroupDirection}>
                     <EuiFlexItem
-                      key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
+                      key={'Wazuh-App-Agents-Welcome-Findings-Evolution'}
                       grow={3}
                     >
-                      {this.renderEventCountVisualization()}
+                      {this.renderFindingCountVisualization()}
                     </EuiFlexItem>
                     {/* <EuiFlexItem grow={3}>
                       <EuiFlexGroup>

@@ -12,6 +12,8 @@
 - [Run from Sources](dev/run-sources.md)
 - [Get external resouces](dev/get-external-resources.md)
 - [Run Tests](dev/run-tests.md)
+- [Modules](dev/modules/index.md)
+  - [Active responses](dev/modules/active-responses.md)
 
 # Reference Manual
 
@@ -29,8 +31,10 @@
 - [Custom Branding](ref/custom-branding.md)
 - [Modules](ref/modules/README.md)
   - [Health check](ref/modules/healthcheck.md)
-  - [Normalization](ref/modules/normalization.md)
   - [Notifications and Alerting](ref/modules/notifications-alerting.md)
+  - [Security Analytics](ref/modules/security-analytics/README.md)
+    - [Normalization](ref/modules/security-analytics/normalization.md)
+    - [Detection](ref/modules/security-analytics/detection.md)
 - [External Integrations](ref/external-integrations.md)
 - [Upgrade](ref/upgrade.md)
 - [Migration 4.x to 5.x](ref/migration-4x-5x.md)

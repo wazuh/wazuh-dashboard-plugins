@@ -80,12 +80,6 @@ export const WAZUH_INDEX_TYPE_EVENTS_ACCESS_MANAGEMENT =
   'events-access-management';
 export const WAZUH_INDEX_TYPE_EVENTS_APPLICATIONS = 'events-applications';
 export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES = 'events-cloud-services';
-export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AWS =
-  'events-cloud-services-aws';
-export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AZURE =
-  'events-cloud-services-azure';
-export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_GCP =
-  'events-cloud-services-gcp';
 export const WAZUH_INDEX_TYPE_EVENTS_NETWORK_ACTIVITY =
   'events-network-activity';
 export const WAZUH_INDEX_TYPE_EVENTS_OTHER = 'events-other';
@@ -159,18 +153,6 @@ export const WAZUH_EVENTS_CLOUD_SERVICES_PATTERN =
   'wazuh-events-v5-cloud-services*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES =
   'index-pattern:events-cloud-services';
-export const WAZUH_EVENTS_CLOUD_SERVICES_AWS_PATTERN =
-  'wazuh-events-v5-cloud-services-aws*';
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AWS =
-  'index-pattern:events-cloud-services-aws';
-export const WAZUH_EVENTS_CLOUD_SERVICES_AZURE_PATTERN =
-  'wazuh-events-v5-cloud-services-azure*';
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AZURE =
-  'index-pattern:events-cloud-services-azure';
-export const WAZUH_EVENTS_CLOUD_SERVICES_GCP_PATTERN =
-  'wazuh-events-v5-cloud-services-gcp*';
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_GCP =
-  'index-pattern:events-cloud-services-gcp';
 export const WAZUH_EVENTS_APLICATIONS_PATTERN = 'wazuh-events-v5-applications*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_APLICATIONS =
   'index-pattern:events-applications';
@@ -618,6 +600,7 @@ export const DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER = 'cluster-manager';
 export const DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT =
   'hidden-regulatory-compliance-requirement';
 export const DATA_SOURCE_FILTER_CONTROLLED_PCI_DSS_EXIST = 'pci-dss-exist';
+export const DATA_SOURCE_FILTER_CONTROLLED_FEDRAMP_EXIST = 'fedramp-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP =
   'vulnerabilities-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_OFFICE_365_RULE_GROUP =
@@ -1043,6 +1026,9 @@ export const TSC_AGENT_DASHBOARD_ID = 'tsc-pinned-agent-dashboard-tab';
 
 export const NIS2_DASHBOARD_ID = 'nis2-overview-dashboard-tab';
 export const NIS2_AGENT_DASHBOARD_ID = 'nis2-pinned-agent-dashboard-tab';
+
+export const FEDRAMP_DASHBOARD_ID = 'fedramp-overview-dashboard-tab';
+export const FEDRAMP_AGENT_DASHBOARD_ID = 'fedramp-pinned-agent-dashboard-tab';
 
 export const GITHUB_DASHBOARD_ID = 'github-overview-dashboard-tab';
 export const GITHUB_AGENT_DASHBOARD_ID = 'github-pinned-agent-dashboard-tab';

@@ -19,7 +19,9 @@ import { gdprRequirementsFile } from '../../../../common/compliance-requirements
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
 import { nistRequirementsFile } from '../../../../common/compliance-requirements/nist-requirements';
 import { tscRequirementsFile } from '../../../../common/compliance-requirements/tsc-requirements';
+import { fedrampRequirementsFile } from '../../../../common/compliance-requirements/fedramp-requirements';
 import { nis2RequirementsFile } from '../../../../common/compliance-requirements/nis2-requirements';
+
 import {
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
   UI_LOGGER_LEVELS,
@@ -96,7 +98,7 @@ function buildComplianceObject({ section }) {
     if (section === 'nist') {
       descriptions = nistRequirementsFile;
       Object.keys(nistRequirementsFile).forEach(item => {
-        const currentRequirement = item.split('.')[0];
+        const currentRequirement = item.split('-')[0];
         if (complianceRequirements[currentRequirement]) {
           complianceRequirements[currentRequirement].push(item);
         } else {
@@ -121,6 +123,7 @@ function buildComplianceObject({ section }) {
     }
     if (section === 'nis2') {
       descriptions = nis2RequirementsFile;
+      console.log({ nis2RequirementsFile });
       Object.keys(nis2RequirementsFile).forEach(item => {
         const parts = item.split('.');
         let currentRequirement: string;
@@ -133,7 +136,20 @@ function buildComplianceObject({ section }) {
         } else {
           currentRequirement = parts.slice(0, 2).join('.');
         }
+        if (complianceRequirements[currentRequirement]) {
+          complianceRequirements[currentRequirement].push(item);
+        } else {
+          selectedRequirements[currentRequirement] = true;
+          complianceRequirements[currentRequirement] = [];
+          complianceRequirements[currentRequirement].push(item);
+        }
+      }); // forEach
+    }
 
+    if (section === 'fedramp') {
+      descriptions = fedrampRequirementsFile;
+      Object.keys(fedrampRequirementsFile).forEach(item => {
+        const currentRequirement = item.split('-')[0];
         if (complianceRequirements[currentRequirement]) {
           complianceRequirements[currentRequirement].push(item);
         } else {
@@ -243,6 +259,7 @@ export const ComplianceTable = compose(
         hipaa: 'rule.compliance.hipaa',
         nist: 'rule.compliance.nist_800_53',
         tsc: 'rule.compliance.tsc',
+        fedramp: 'rule.compliance.fedramp',
         nis2: 'rule.compliance.nis2',
       };
       const aggs = {

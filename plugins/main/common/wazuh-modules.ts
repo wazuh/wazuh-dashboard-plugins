@@ -44,7 +44,7 @@ export const WAZUH_MODULES = {
     title: 'Regulatory Compliance',
     appId: 'regulatory-compliance',
     description:
-      'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, TSC and NIS2.',
+      'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, TSC, FedRAMP and NIS2.',
   },
   pci: {
     title: 'PCI DSS',
@@ -75,6 +75,12 @@ export const WAZUH_MODULES = {
     appId: 'tsc',
     description:
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy',
+  },
+  fedramp: {
+    title: 'FedRAMP',
+    appId: 'fedramp',
+    description:
+      'Federal Risk and Authorization Management Program (FedRAMP) provides a standardized approach to security assessment, authorization, and continuous monitoring for cloud products and services.',
   },
   nis2: {
     title: 'NIS2',
