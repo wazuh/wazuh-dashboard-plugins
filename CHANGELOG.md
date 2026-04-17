@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v5.0.0 - OpenSearch Dashboards 3.5.0 - Revision 00
+## Wazuh v5.0.0 - OpenSearch Dashboards 3.5.0 - Revision 01
 
 ### Added
 
@@ -69,6 +69,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed FIM table columns and index source in the agent view [#8269](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8269)
 - Changed IT Hygiene memory visualization [#8313](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8313)
 - Reduce the request done to get the index pattern to use in some views [#8318](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8318)
+- Changed default columns in Configuration assessment [#8320](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8320)
 
 ### Fixed
 
