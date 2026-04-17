@@ -34,6 +34,7 @@ const TechniqueRowDetails = ({
   const [ruleData, setRuleData] = useState({});
 
   const getRuleData = async () => {
+    // TODO: adapt to the detector rule
     const params = { q: `id=${item.rule.id}` };
     const rulesDataResponse = await WzRequest.apiReq('GET', `/rules`, {
       params,
@@ -47,9 +48,9 @@ const TechniqueRowDetails = ({
     onRuleItemClick?.(filter, indexPattern);
   };
 
-  useEffect(() => {
-    getRuleData();
-  }, []);
+  // useEffect(() => {
+  //   getRuleData();
+  // }, []);
 
   return (
     <EuiFlexGroup style={{ margin: '-8px' }}>
@@ -83,7 +84,7 @@ const TechniqueRowDetails = ({
               </EuiCodeBlock>
             ),
           },
-          // {
+          // { // TODO: add the tab adapted to the detector rule
           //   id: 'rule',
           //   name: 'Rule',
           //   content: <RuleDetails data={ruleData} onClick={onAddFilter} />,
