@@ -1175,7 +1175,7 @@ exports[`Cluster settings should render the cluster settings with HAProxy helper
 </div>
 `;
 
-exports[`Cluster settings should render the error message when the cluster setting is a string 1`] = `
+exports[`Cluster settings should render the error message when cluster config is empty 1`] = `
 <div>
   <div
     class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
@@ -1225,9 +1225,9 @@ exports[`Cluster settings should render the error message when the cluster setti
           <hr
             class="euiHorizontalRule euiHorizontalRule--full euiHorizontalRule--marginSmall"
           />
-          <span>
-            There was a problem while fetching the configuration for this section. It may be a server problem or the configuration doesn't exist.
-          </span>
+          <p>
+            This section is not present on the configuration file.
+          </p>
           <div
             class="euiSpacer euiSpacer--s"
           />
