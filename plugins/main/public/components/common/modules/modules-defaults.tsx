@@ -594,10 +594,16 @@ export const ModulesDefaults = {
     init: 'pci-dss',
     tabs: [
       {
-        id: 'pci-dss',
-        name: 'PCI DSS',
+        id: 'cmmc',
+        name: 'CMMC',
         buttons: [ButtonExploreAgent],
-        component: RegulatoryCompliancePCIDSS,
+        component: RegulatoryComplianceCMMC,
+      },
+      {
+        id: 'fedramp',
+        name: 'FedRAMP',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceFedRAMP,
       },
       {
         id: 'gdpr',
@@ -612,6 +618,18 @@ export const ModulesDefaults = {
         component: RegulatoryComplianceHIPAA,
       },
       {
+        id: 'iso-27001',
+        name: 'ISO 27001',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceISO27001,
+      },
+      {
+        id: 'nis2',
+        name: 'NIS2',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceNIS2,
+      },
+      {
         id: 'nist-800-53',
         name: 'NIST 800-53',
         buttons: [ButtonExploreAgent],
@@ -624,34 +642,16 @@ export const ModulesDefaults = {
         component: RegulatoryComplianceNIST800171,
       },
       {
+        id: 'pci-dss',
+        name: 'PCI DSS',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryCompliancePCIDSS,
+      },
+      {
         id: 'tsc',
         name: 'TSC',
         buttons: [ButtonExploreAgent],
         component: RegulatoryComplianceTSC,
-      },
-      {
-        id: 'cmmc',
-        name: 'CMMC',
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceCMMC,
-      },
-      {
-        id: 'fedramp',
-        name: 'FedRAMP',
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceFedRAMP,
-      },
-      {
-        id: 'iso-27001',
-        name: 'ISO 27001',
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceISO27001,
-      },
-      {
-        id: 'nis2',
-        name: 'NIS2',
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceNIS2,
       },
     ],
     availableFor: ['manager', 'agent'],
