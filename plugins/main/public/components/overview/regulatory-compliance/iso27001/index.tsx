@@ -9,7 +9,7 @@ import { buildStandardComplianceTabs } from '../shared/compliance-tab-factory';
 export const RegulatoryComplianceISO27001 = () => {
   const tabs = buildStandardComplianceTabs({
     dashboardComponent: DashboardISO27001,
-    section: 'iso27001',
+    section: 'iso-27001',
     moduleId: 'iso-27001',
     dataSource: ISO27001DataSource,
     tableColumns: tableColumns,
