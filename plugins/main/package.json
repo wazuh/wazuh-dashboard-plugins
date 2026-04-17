@@ -23,7 +23,7 @@
     "tar-fs": "2.1.4",
     "cookie": "0.7.0",
     "@tootallnate/once": "^3.0.1",
-    "lodash": "4.17.23"
+    "lodash": "4.18.1"
   },
   "repository": {
     "type": "git",
