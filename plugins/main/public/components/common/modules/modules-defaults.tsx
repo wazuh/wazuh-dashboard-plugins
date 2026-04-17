@@ -96,12 +96,16 @@ import {
   ITHygieneServicesInventory,
 } from '../../overview/it-hygiene';
 import {
-  RegulatoryCompliancePCIDSS,
+  RegulatoryComplianceCMMC,
+  RegulatoryComplianceFedRAMP,
   RegulatoryComplianceGDPR,
   RegulatoryComplianceHIPAA,
-  RegulatoryComplianceNIST80053,
-  RegulatoryComplianceTSC,
   RegulatoryComplianceISO27001,
+  RegulatoryComplianceNIS2,
+  RegulatoryComplianceNIST800171,
+  RegulatoryComplianceNIST80053,
+  RegulatoryCompliancePCIDSS,
+  RegulatoryComplianceTSC,
 } from '../../overview/regulatory-compliance';
 import { InventoryFIM } from '../../overview/fim';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
@@ -537,6 +541,7 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
+
   'it-hygiene': {
     init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
@@ -613,16 +618,40 @@ export const ModulesDefaults = {
         component: RegulatoryComplianceNIST80053,
       },
       {
+        id: 'nist-800-171',
+        name: 'NIST 800-171',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceNIST800171,
+      },
+      {
         id: 'tsc',
         name: 'TSC',
         buttons: [ButtonExploreAgent],
         component: RegulatoryComplianceTSC,
       },
       {
+        id: 'cmmc',
+        name: 'CMMC',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceCMMC,
+      },
+      {
+        id: 'fedramp',
+        name: 'FedRAMP',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceFedRAMP,
+      },
+      {
         id: 'iso-27001',
         name: 'ISO 27001',
         buttons: [ButtonExploreAgent],
         component: RegulatoryComplianceISO27001,
+      },
+      {
+        id: 'nis2',
+        name: 'NIS2',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceNIS2,
       },
     ],
     availableFor: ['manager', 'agent'],

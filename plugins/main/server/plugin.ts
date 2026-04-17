@@ -46,9 +46,6 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_APLICATIONS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AWS,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AZURE,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_GCP,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_NETWORK_ACTIVITY,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_OTHER,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SECURITY,
@@ -88,9 +85,6 @@ import {
   WAZUH_EVENTS_PATTERN,
   WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN,
   WAZUH_EVENTS_APLICATIONS_PATTERN,
-  WAZUH_EVENTS_CLOUD_SERVICES_AWS_PATTERN,
-  WAZUH_EVENTS_CLOUD_SERVICES_AZURE_PATTERN,
-  WAZUH_EVENTS_CLOUD_SERVICES_GCP_PATTERN,
   WAZUH_EVENTS_CLOUD_SERVICES_PATTERN,
   WAZUH_EVENTS_NETWORK_ACTIVITY_PATTERN,
   WAZUH_EVENTS_OTHER_PATTERN,
@@ -139,9 +133,6 @@ import IndexPatternEventsKnownFields from '../common/known-fields/events.json';
 import IndexPatternEventsAccessManagementKnownFields from '../common/known-fields/events-access-management.json';
 import IndexPatternEventsApplicationsKnownFields from '../common/known-fields/events-applications.json';
 import IndexPatternEventsCloudServicesKnownFields from '../common/known-fields/events-cloud-services.json';
-import IndexPatternEventsCloudServicesAWSKnownFields from '../common/known-fields/events-cloud-services-aws.json';
-import IndexPatternEventsCloudServicesAzureKnownFields from '../common/known-fields/events-cloud-services-azure.json';
-import IndexPatternEventsCloudServicesGCPKnownFields from '../common/known-fields/events-cloud-services-gcp.json';
 import IndexPatternEventsNetworkActivityKnownFields from '../common/known-fields/events-network-activity.json';
 import IndexPatternEventsOtherKnownFields from '../common/known-fields/events-other.json';
 import IndexPatternEventsSecurityKnownFields from '../common/known-fields/events-security.json';
@@ -676,45 +667,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternEventsCloudServicesKnownFields,
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AWS,
-        indexPatternID: WAZUH_EVENTS_CLOUD_SERVICES_AWS_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsCloudServicesAWSKnownFields,
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AZURE,
-        indexPatternID: WAZUH_EVENTS_CLOUD_SERVICES_AZURE_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsCloudServicesAzureKnownFields,
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_GCP,
-        indexPatternID: WAZUH_EVENTS_CLOUD_SERVICES_GCP_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsCloudServicesGCPKnownFields,
         },
       }),
     );

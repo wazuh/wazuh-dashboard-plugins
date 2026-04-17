@@ -75,7 +75,17 @@ export class ComplianceRequirements extends Component {
     return (
       <>
         {requirementList
-          .sort((a, b) => b.quantity - a.quantity)
+          .sort((a, b) => {
+            const quantityDiff = b.quantity - a.quantity;
+
+            if (quantityDiff !== 0) {
+              return quantityDiff;
+            }
+
+            return String(a.label).localeCompare(String(b.label), undefined, {
+              numeric: true,
+            });
+          })
           .map(facet => {
             let iconNode;
             const name =
@@ -171,12 +181,24 @@ export class ComplianceRequirements extends Component {
     if (this.props.section === 'nist') {
       title = 'NIST 800-53';
     }
+    if (this.props.section === 'nist-800-171') {
+      title = 'NIST 800-171';
+    }
     if (this.props.section === 'tsc') {
       title = 'TSC';
       sectionStyle['height'] = 350;
     }
-    if (this.props.section === 'iso27001') {
+    if (this.props.section === 'cmmc') {
+      title = 'CMMC';
+    }
+    if (this.props.section === 'fedramp') {
+      title = 'FedRAMP';
+    }
+    if (this.props.section === 'iso-27001') {
       title = 'ISO 27001';
+    }
+    if (this.props.section === 'nis2') {
+      title = 'NIS2';
     }
     return (
       <div

@@ -87,60 +87,59 @@ export class WzCluster extends Component {
   }
   render() {
     const { currentConfig, wazuhNotReadyYet } = this.props;
+    const clusterConfig = currentConfig?.['cluster'];
+
+    if (clusterConfig && isString(clusterConfig)) {
+      return <WzNoConfig error={clusterConfig} help={helpLinks} />;
+    }
+
+    if (wazuhNotReadyYet && (!currentConfig || !clusterConfig)) {
+      return <WzNoConfig error='Server not ready yet' help={helpLinks} />;
+    }
+
+    if (!clusterConfig || !Object.keys(clusterConfig).length) {
+      return <WzNoConfig error='not-present' help={helpLinks} />;
+    }
+
     let mainSettingsConfig = {
-      ...currentConfig['com-cluster'],
-      disabled:
-        currentConfig['com-cluster'].disabled === true ? 'disabled' : 'enabled',
+      ...clusterConfig,
+      disabled: clusterConfig.disabled === true ? 'disabled' : 'enabled',
     };
 
-    if (currentConfig['com-cluster'].haproxy_helper) {
+    if (clusterConfig.haproxy_helper) {
       mainSettingsConfig = {
         ...mainSettingsConfig,
         haproxy_helper: {
-          ...currentConfig['com-cluster'].haproxy_helper,
+          ...clusterConfig.haproxy_helper,
           haproxy_disabled:
-            currentConfig['com-cluster'].haproxy_helper.haproxy_disabled ===
-            true
+            clusterConfig.haproxy_helper.haproxy_disabled === true
               ? 'disabled'
               : 'enabled',
         },
       };
     }
+
     return (
       <Fragment>
-        {currentConfig['com-cluster'] &&
-          isString(currentConfig['com-cluster']) && (
-            <WzNoConfig error={currentConfig['com-cluster']} help={helpLinks} />
+        <WzConfigurationSettingsHeader title='Main settings' help={helpLinks}>
+          <WzConfigurationSettingsGroup
+            config={mainSettingsConfig}
+            items={mainSettings}
+          />
+          {mainSettingsConfig.haproxy_helper && (
+            <WzConfigurationSettingsGroup
+              title='HAProxy settings'
+              config={mainSettingsConfig}
+              items={haproxySettings}
+            />
           )}
-        {wazuhNotReadyYet &&
-          (!currentConfig || !currentConfig['com-cluster']) && (
-            <WzNoConfig error='Server not ready yet' help={helpLinks} />
-          )}
-        {currentConfig['com-cluster'] &&
-          !isString(currentConfig['com-cluster']) && (
-            <WzConfigurationSettingsHeader
-              title='Main settings'
-              help={helpLinks}
-            >
-              <WzConfigurationSettingsGroup
-                config={mainSettingsConfig}
-                items={mainSettings}
-              />
-              {mainSettingsConfig.haproxy_helper && (
-                <WzConfigurationSettingsGroup
-                  title='HAProxy settings'
-                  config={mainSettingsConfig}
-                  items={haproxySettings}
-                />
-              )}
-            </WzConfigurationSettingsHeader>
-          )}
+        </WzConfigurationSettingsHeader>
       </Fragment>
     );
   }
 }
 
-const sections = [{ component: 'com', configuration: 'cluster' }];
+const sections = [{ useFullEndpoint: true, key: 'cluster' }];
 
 const mapStateToProps = state => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
