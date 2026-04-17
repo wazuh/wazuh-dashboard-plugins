@@ -5,7 +5,7 @@ name: deploy-gh-pages
 on:
   push:
     branches:
-      - v5.0.0-beta1
+      - main
   workflow_dispatch:
 
 jobs:
@@ -35,7 +35,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "docs/book"
+          path: 'docs/book'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
