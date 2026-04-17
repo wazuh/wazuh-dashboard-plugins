@@ -565,6 +565,7 @@ export enum WAZUH_MODULES_ID {
   HIPAA = 'hipaa',
   NIST_800_53 = 'nist',
   TSC = 'tsc',
+  NIS2 = 'nis2',
   VIRUSTOTAL = 'virustotal',
   GDPR = 'gdpr',
   GITHUB = 'github',
@@ -611,6 +612,7 @@ export const DATA_SOURCE_FILTER_CONTROLLED_NIST_800_53_EXIST =
   'nist-800-53-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_GDPR_EXIST = 'gdpr-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_HIPAA_EXIST = 'hipaa-rule-exist';
+export const DATA_SOURCE_FILTER_CONTROLLED_NIS2_EXIST = 'nis2-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_DOCKER_RULE_GROUP =
   'docker-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE =
@@ -1021,6 +1023,9 @@ export const NIST_800_53_AGENT_DASHBOARD_ID = 'nist-pinned-agent-dashboard-tab';
 
 export const TSC_DASHBOARD_ID = 'tsc-overview-dashboard-tab';
 export const TSC_AGENT_DASHBOARD_ID = 'tsc-pinned-agent-dashboard-tab';
+
+export const NIS2_DASHBOARD_ID = 'nis2-overview-dashboard-tab';
+export const NIS2_AGENT_DASHBOARD_ID = 'nis2-pinned-agent-dashboard-tab';
 
 export const FEDRAMP_DASHBOARD_ID = 'fedramp-overview-dashboard-tab';
 export const FEDRAMP_AGENT_DASHBOARD_ID = 'fedramp-pinned-agent-dashboard-tab';

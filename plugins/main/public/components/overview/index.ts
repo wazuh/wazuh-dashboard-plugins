@@ -9,6 +9,7 @@ export { DashboardHIPAA } from './regulatory-compliance/hipaa/dashboards';
 export { DashboardMalwareDetection } from './malware-detection/dashboard';
 export { DashboardNIST80053 } from './regulatory-compliance/nist/dashboards';
 export { DashboardPCIDSS } from './regulatory-compliance/pci/dashboards';
+export { DashboardNIS2 } from './regulatory-compliance/nis2/dashboards';
 export { DashboardOffice365 } from './office/dashboard';
 export { DashboardThreatHunting } from './threat-hunting/dashboard';
 export { DashboardTSC } from './regulatory-compliance/tsc/dashboards';
