@@ -29,8 +29,7 @@ Choose your installation method:
 
 ### Production deployment
 
-For production environments, follow the official installation guide:
-https://documentation.wazuh.com/current/installation-guide/index.html
+For production environments, use the official installation scripts and procedures.
 
 This includes:
 
@@ -97,6 +96,5 @@ If you encounter issues during installation or setup:
 
 For additional help:
 
-- Official documentation: https://documentation.wazuh.com/
 - Community forum: https://groups.google.com/g/wazuh
 - GitHub issues: https://github.com/wazuh/wazuh-dashboard-plugins/issues

@@ -40,15 +40,3 @@ Assets are stored in:
 > Note: In-file `customization.logo.*` settings are deprecated. Use the UI to
 > update these values. If the App Settings UI is not present in your version,
 > rely on the `opensearchDashboards.branding` settings only.
-
-## PDF reports branding
-
-In **Dashboard management** > **App Settings**, configure:
-
-- `customization.logo.reports`
-- `customization.reports.footer`
-- `customization.reports.header`
-
-## References
-
-- Custom branding documentation: https://documentation.wazuh.com/current/user-manual/wazuh-dashboard/custom-branding.html

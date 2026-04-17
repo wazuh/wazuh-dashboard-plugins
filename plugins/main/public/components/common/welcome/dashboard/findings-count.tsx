@@ -1,5 +1,5 @@
 import React from 'react';
-import { EventsDataSourceRepository } from '../../data-source/pattern/events/events-data-source-repository';
+import { FindingsDataSourceRepository } from '../../data-source/pattern/events/findings-data-source-repository';
 import { getPlugins } from '../../../../kibana-services';
 import { getDashboardPanels } from './dashboard_panels';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
@@ -18,11 +18,11 @@ import { EventsCountDataSource } from '../../data-source/pattern/events/events-c
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-const EventsDashboard = compose(
+const FindingsDashboard = compose(
   withDataSource({
     // FIXME: This data source has no the filter related to the server API context
     DataSource: EventsCountDataSource,
-    DataSourceRepositoryCreator: EventsDataSourceRepository,
+    DataSourceRepositoryCreator: FindingsDataSourceRepository,
   }),
   withDataSourceLoading({
     isLoadingNameProp: 'dataSource.isLoading',
@@ -43,13 +43,13 @@ const EventsDashboard = compose(
         isFullScreenMode: false,
         filters: fetchFilters ?? [],
         useMargins: true,
-        id: 'agent-events-count-evolution',
+        id: 'agent-findings-count-evolution',
         timeRange: {
           from: timeFilter.from,
           to: timeFilter.to,
         },
-        title: 'Events count evolution',
-        description: 'Dashboard of Events count evolution',
+        title: 'Findings count evolution',
+        description: 'Dashboard of Findings count evolution',
         refreshConfig: {
           pause: false,
           value: 15,
@@ -60,18 +60,18 @@ const EventsDashboard = compose(
   );
 });
 
-export const EventsCount = () => {
+export const FindingsCount = () => {
   const { timeFilter } = useTimeFilter();
 
   return (
     <EuiPanel paddingSize='m'>
       <EuiFlexGroup gutterSize='none'>
         <EuiFlexItem grow={false}>
-          <Typography level='section'>Events count evolution</Typography>
+          <Typography level='section'>Findings count evolution</Typography>
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size='m' />
-      <EventsDashboard timeFilter={timeFilter}></EventsDashboard>
+      <FindingsDashboard timeFilter={timeFilter}></FindingsDashboard>
     </EuiPanel>
   );
 };

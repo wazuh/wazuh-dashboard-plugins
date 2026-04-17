@@ -6,14 +6,11 @@ export const mitreAttackColumns: tDataGridColumn[] = [
   commonColumns['wazuh.agent.name'],
   {
     id: 'rule.mitre.tactic',
-    initialWidth: 280,
   },
   {
     id: 'rule.title',
-    initialWidth: 280,
   },
   {
     id: 'rule.level',
-    initialWidth: 280,
   },
 ];

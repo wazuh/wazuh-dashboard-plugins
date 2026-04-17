@@ -4,6 +4,7 @@ import { tDataGridRenderColumn } from '../data-grid';
 import { endpointSummary, mitreAttack } from '../../../utils/applications';
 import { WzLink } from '../../wz-link/wz-link';
 import { i18n } from '@osd/i18n';
+import { CTI_CVE_LINK_BASE_PATH } from '../../../../common/constants';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -136,9 +137,23 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
     render: renderRequirementsSecurityOperations,
   },
   {
+    id: 'rule.compliance.cmmc',
+    render: renderRequirementsSecurityOperations,
+  },
+  {
+    id: 'rule.compliance.fedramp',
+    render: renderRequirementsSecurityOperations,
+  },
+  {
+    id: 'rule.compliance.nis2',
+    render: renderRequirementsSecurityOperations,
+  },
+  {
     id: 'vulnerability.id',
     render: (value, row) => {
-      if (!row.vulnerability?.scanner?.reference) {
+      if (
+        !(row.vulnerability?.reference || row.vulnerability?.scanner?.reference)
+      ) {
         return value;
       }
       return (
@@ -152,7 +167,7 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
           )}
         >
           <EuiLink
-            href={row.vulnerability.scanner.reference}
+            href={`${CTI_CVE_LINK_BASE_PATH}${row.vulnerability.id}`}
             target='_blank'
             rel='noopener noreferrer'
             external
@@ -166,7 +181,12 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
     id: 'data.vulnerability.cve',
     render: (value, row) => {
-      if (!row.data?.vulnerability?.scanner?.reference) {
+      if (
+        !(
+          row.data?.vulnerability?.reference ||
+          row.data?.vulnerability?.scanner?.reference
+        )
+      ) {
         return value;
       }
       return (
@@ -180,7 +200,7 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
           )}
         >
           <EuiLink
-            href={row.data.vulnerability.scanner.reference}
+            href={`${CTI_CVE_LINK_BASE_PATH}${row.data.vulnerability.cve}`}
             target='_blank'
             rel='noopener noreferrer'
             external
