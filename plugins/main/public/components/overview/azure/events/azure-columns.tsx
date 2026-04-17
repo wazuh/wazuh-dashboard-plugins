@@ -5,7 +5,6 @@ export const azureColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   {
     id: 'event.action',
-    initialWidth: 200,
   },
   {
     id: 'event.category',

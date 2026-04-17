@@ -47,7 +47,14 @@ export const FLAGS = {
   REPO: '-r',
   BASE: '--base',
   INDEXER_LOCAL: '--indexer-local',
+  ALL_FORKS: '--all-forks',
 } as const;
+
+/**
+ * Repositories that --all-forks should never mount automatically.
+ * - 'wazuh-dashboard' is handled exclusively by --base.
+ */
+export const ALL_FORKS_EXCLUDED_REPOS = ['wazuh-dashboard'] as const;
 
 /** Relative path (from dev script dir) for the dashboard entrypoint wrapper. */
 export const DASHBOARD_ENTRYPOINT_PATH = './dashboard-src/entrypoint.sh';
