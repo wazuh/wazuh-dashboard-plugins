@@ -87,6 +87,7 @@ export class ComplianceSubrequirements extends Component {
       pci: 'rule.compliance.pci_dss',
       gdpr: 'rule.compliance.gdpr',
       nist: 'rule.compliance.nist_800_53',
+      'nist-800-171': 'rule.compliance.nist_800_171',
       hipaa: 'rule.compliance.hipaa',
       tsc: 'rule.compliance.tsc',
       cmmc: 'rule.compliance.cmmc',

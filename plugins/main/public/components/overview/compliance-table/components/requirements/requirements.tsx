@@ -181,6 +181,9 @@ export class ComplianceRequirements extends Component {
     if (this.props.section === 'nist') {
       title = 'NIST 800-53';
     }
+    if (this.props.section === 'nist-800-171') {
+      title = 'NIST 800-171';
+    }
     if (this.props.section === 'tsc') {
       title = 'TSC';
       sectionStyle['height'] = 350;

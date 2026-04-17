@@ -100,6 +100,7 @@ import {
   RegulatoryComplianceGDPR,
   RegulatoryComplianceHIPAA,
   RegulatoryComplianceNIST80053,
+  RegulatoryComplianceNIST800171,
   RegulatoryComplianceTSC,
   RegulatoryComplianceCMMC,
   RegulatoryComplianceFedRAMP,
@@ -614,6 +615,12 @@ export const ModulesDefaults = {
         name: 'NIST 800-53',
         buttons: [ButtonExploreAgent],
         component: RegulatoryComplianceNIST80053,
+      },
+      {
+        id: 'nist-800-171',
+        name: 'NIST 800-171',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceNIST800171,
       },
       {
         id: 'tsc',

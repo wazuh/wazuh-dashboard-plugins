@@ -26,6 +26,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added CMMC regulatory compliance module [#8290](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8290)
 - Added FedRAMP regulatory compliance module [#8296](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8296)
 - Added NIS2 regulatory compliance module [#8298](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8298)
+- Added NIST 800-171 regulatory compliance module [#8294](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8294)
 
 ### Changed
 

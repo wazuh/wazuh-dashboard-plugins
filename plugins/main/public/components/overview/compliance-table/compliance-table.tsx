@@ -18,6 +18,7 @@ import { pciRequirementsFile } from '../../../../common/compliance-requirements/
 import { gdprRequirementsFile } from '../../../../common/compliance-requirements/gdpr-requirements';
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
 import { nistRequirementsFile } from '../../../../common/compliance-requirements/nist-requirements';
+import { nist171RequirementsFile } from '../../../../common/compliance-requirements/nist-171-requirements';
 import { tscRequirementsFile } from '../../../../common/compliance-requirements/tsc-requirements';
 import { cmmcRequirementsFile } from '../../../../common/compliance-requirements/cmmc-requirements';
 import { fedrampRequirementsFile } from '../../../../common/compliance-requirements/fedramp-requirements';
@@ -100,6 +101,19 @@ function buildComplianceObject({ section }) {
       descriptions = nistRequirementsFile;
       Object.keys(nistRequirementsFile).forEach(item => {
         const currentRequirement = item.split('-')[0];
+        if (complianceRequirements[currentRequirement]) {
+          complianceRequirements[currentRequirement].push(item);
+        } else {
+          selectedRequirements[currentRequirement] = true;
+          complianceRequirements[currentRequirement] = [];
+          complianceRequirements[currentRequirement].push(item);
+        }
+      }); //forEach
+    }
+    if (section === 'nist-800-171') {
+      descriptions = nist171RequirementsFile;
+      Object.keys(nist171RequirementsFile).forEach(item => {
+        const currentRequirement = item.split('.').slice(0, 2).join('.');
         if (complianceRequirements[currentRequirement]) {
           complianceRequirements[currentRequirement].push(item);
         } else {
@@ -273,6 +287,7 @@ export const ComplianceTable = compose(
         gdpr: 'rule.compliance.gdpr',
         hipaa: 'rule.compliance.hipaa',
         nist: 'rule.compliance.nist_800_53',
+        'nist-800-171': 'rule.compliance.nist_800_171',
         tsc: 'rule.compliance.tsc',
         cmmc: 'rule.compliance.cmmc',
         fedramp: 'rule.compliance.fedramp',
@@ -379,6 +394,8 @@ export const ComplianceTable = compose(
                         minWidth: 145,
                         maxHeight: 'calc(100vh - 320px)',
                         overflowX: 'hidden',
+                        overflowY: 'auto',
+                        backgroundColor: '#80808014',
                       }}
                     >
                       <ComplianceRequirements
