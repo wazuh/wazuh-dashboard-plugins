@@ -8,6 +8,7 @@ export interface Rule {
   gdpr?: string[];
   pci_dss?: string[];
   tsc?: string[];
+  fedramp?: string[];
   hipaa?: string[];
   nist_800_53?: string[];
   nist_800_83?: string[];

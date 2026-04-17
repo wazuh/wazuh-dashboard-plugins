@@ -101,6 +101,7 @@ import {
   RegulatoryComplianceHIPAA,
   RegulatoryComplianceNIST80053,
   RegulatoryComplianceTSC,
+  RegulatoryComplianceFedRAMP,
 } from '../../overview/regulatory-compliance';
 import { InventoryFIM } from '../../overview/fim';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
@@ -616,6 +617,12 @@ export const ModulesDefaults = {
         name: 'TSC',
         buttons: [ButtonExploreAgent],
         component: RegulatoryComplianceTSC,
+      },
+      {
+        id: 'fedramp',
+        name: 'FedRAMP',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceFedRAMP,
       },
     ],
     availableFor: ['manager', 'agent'],

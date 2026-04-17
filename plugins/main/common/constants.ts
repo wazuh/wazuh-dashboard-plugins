@@ -599,6 +599,7 @@ export const DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER = 'cluster-manager';
 export const DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT =
   'hidden-regulatory-compliance-requirement';
 export const DATA_SOURCE_FILTER_CONTROLLED_PCI_DSS_EXIST = 'pci-dss-exist';
+export const DATA_SOURCE_FILTER_CONTROLLED_FEDRAMP_EXIST = 'fedramp-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP =
   'vulnerabilities-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_OFFICE_365_RULE_GROUP =
@@ -1020,6 +1021,9 @@ export const NIST_800_53_AGENT_DASHBOARD_ID = 'nist-pinned-agent-dashboard-tab';
 
 export const TSC_DASHBOARD_ID = 'tsc-overview-dashboard-tab';
 export const TSC_AGENT_DASHBOARD_ID = 'tsc-pinned-agent-dashboard-tab';
+
+export const FEDRAMP_DASHBOARD_ID = 'fedramp-overview-dashboard-tab';
+export const FEDRAMP_AGENT_DASHBOARD_ID = 'fedramp-pinned-agent-dashboard-tab';
 
 export const GITHUB_DASHBOARD_ID = 'github-overview-dashboard-tab';
 export const GITHUB_AGENT_DASHBOARD_ID = 'github-pinned-agent-dashboard-tab';

@@ -19,6 +19,7 @@ import { gdprRequirementsFile } from '../../../../common/compliance-requirements
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
 import { nistRequirementsFile } from '../../../../common/compliance-requirements/nist-requirements';
 import { tscRequirementsFile } from '../../../../common/compliance-requirements/tsc-requirements';
+import { fedrampRequirementsFile } from '../../../../common/compliance-requirements/fedramp-requirements';
 import {
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
   UI_LOGGER_LEVELS,
@@ -109,6 +110,19 @@ function buildComplianceObject({ section }) {
       descriptions = tscRequirementsFile;
       Object.keys(tscRequirementsFile).forEach(item => {
         const currentRequirement = item.split('.')[0];
+        if (complianceRequirements[currentRequirement]) {
+          complianceRequirements[currentRequirement].push(item);
+        } else {
+          selectedRequirements[currentRequirement] = true;
+          complianceRequirements[currentRequirement] = [];
+          complianceRequirements[currentRequirement].push(item);
+        }
+      }); //forEach
+    }
+    if (section === 'fedramp') {
+      descriptions = fedrampRequirementsFile;
+      Object.keys(fedrampRequirementsFile).forEach(item => {
+        const currentRequirement = item.split('-')[0];
         if (complianceRequirements[currentRequirement]) {
           complianceRequirements[currentRequirement].push(item);
         } else {
@@ -218,6 +232,7 @@ export const ComplianceTable = compose(
         hipaa: 'rule.compliance.hipaa',
         nist: 'rule.compliance.nist_800_53',
         tsc: 'rule.compliance.tsc',
+        fedramp: 'rule.compliance.fedramp',
       };
       const aggs = {
         tactics: {
