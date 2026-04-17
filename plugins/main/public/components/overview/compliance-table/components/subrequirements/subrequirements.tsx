@@ -90,6 +90,9 @@ export class ComplianceSubrequirements extends Component {
       'nist-800-171': 'rule.compliance.nist_800_171',
       hipaa: 'rule.compliance.hipaa',
       tsc: 'rule.compliance.tsc',
+      cmmc: 'rule.compliance.cmmc',
+      fedramp: 'rule.compliance.fedramp',
+      nis2: 'rule.compliance.nis2',
     };
     return mapKeys[this.props.section];
   }

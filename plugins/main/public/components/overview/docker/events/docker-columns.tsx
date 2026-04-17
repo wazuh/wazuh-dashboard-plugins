@@ -6,7 +6,6 @@ export const dockerColumns: tDataGridColumn[] = [
   commonColumns['wazuh.agent.name'],
   {
     id: 'container.image.name',
-    initialWidth: 149,
   },
   {
     id: 'event.action',

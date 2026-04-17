@@ -3,8 +3,8 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { WzCluster } from './cluster';
 
-const basicClusterSettings = {
-  'com-cluster': {
+const basicClusterConfig = {
+  cluster: {
     disabled: false,
     name: 'wazuh1',
     node_name: 'master',
@@ -17,17 +17,9 @@ const basicClusterSettings = {
   },
 };
 
-const clusterSettingsWithHaproxyHelper = {
-  'com-cluster': {
-    disabled: false,
-    name: 'wazuh1',
-    node_name: 'master',
-    node_type: 'master',
-    key: 'test1234',
-    port: 1516,
-    bind_addr: '0.0.0.0',
-    nodes: ['0.0.0.0'],
-    hidden: 'no',
+const clusterConfigWithHaproxyHelper = {
+  cluster: {
+    ...basicClusterConfig.cluster,
     haproxy_helper: {
       haproxy_disabled: false,
       haproxy_address: 'wazuh-proxy',
@@ -51,11 +43,10 @@ const clusterSettingsWithHaproxyHelper = {
 describe('Cluster settings', () => {
   it('should render the cluster settings', () => {
     const { container, getByText, queryByText, getByTestId } = render(
-      <WzCluster currentConfig={basicClusterSettings} />,
+      <WzCluster currentConfig={basicClusterConfig} />,
     );
 
     expect(container).toMatchSnapshot();
-
     expect(getByText('Cluster name')).toBeInTheDocument();
     expect(getByTestId('cluster-name').value).toBe('wazuh1');
     expect(queryByText('HAProxy settings')).toBeFalsy();
@@ -63,30 +54,36 @@ describe('Cluster settings', () => {
 
   it('should render the cluster settings with HAProxy helper', () => {
     const { container, getByText, getByTestId } = render(
-      <WzCluster currentConfig={clusterSettingsWithHaproxyHelper} />,
+      <WzCluster currentConfig={clusterConfigWithHaproxyHelper} />,
     );
 
     expect(container).toMatchSnapshot();
-
     expect(getByText('Cluster name')).toBeInTheDocument();
     expect(getByTestId('cluster-name').value).toBe('wazuh1');
     expect(getByText('HAProxy settings')).toBeInTheDocument();
     expect(getByTestId('haproxy-status').value).toBe('enabled');
     expect(getByTestId('user').value).toBe(
-      clusterSettingsWithHaproxyHelper['com-cluster'].haproxy_helper
-        .haproxy_user,
+      clusterConfigWithHaproxyHelper.cluster.haproxy_helper.haproxy_user,
     );
   });
 
-  it('should render the error message when the cluster setting is a string', () => {
+  it('should render the error message when cluster config is empty', () => {
     const { container, getByText, queryByText } = render(
-      <WzCluster currentConfig={{ 'com-cluster': 'error message' }} />,
+      <WzCluster currentConfig={{ cluster: {} }} />,
     );
 
     expect(container).toMatchSnapshot();
-
     expect(getByText('Configuration not available')).toBeInTheDocument();
     expect(queryByText('Cluster name')).toBeFalsy();
     expect(queryByText('HAProxy settings')).toBeFalsy();
+  });
+
+  it('should render the error message when cluster config is a string (error)', () => {
+    const { getByText, queryByText } = render(
+      <WzCluster currentConfig={{ cluster: 'Fetch error message' }} />,
+    );
+
+    expect(getByText('Configuration not available')).toBeInTheDocument();
+    expect(queryByText('Cluster name')).toBeFalsy();
   });
 });

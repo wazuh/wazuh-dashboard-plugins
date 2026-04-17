@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v5.0.0 - OpenSearch Dashboards 3.5.0 - Revision 00
+## Wazuh v5.0.0 - OpenSearch Dashboards 3.5.0 - Revision 01
 
 ### Added
 
@@ -22,7 +22,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added `wazuh-findings` index patterns [#8233](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8233)
 - Added `policy.name`, `policy.description`, `policy.file` and `event.outcome` columns to the Configuration Assessment Findings table [#8264](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8264)
 - Added `wazuh-state-fim*` index pattern [#8248](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8248)
-- Added NIST 800-171 support in the Regulatory Compliance dashboard [#8294](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8294)
+- Added Indexer configuration UI section in Server Management Settings [#8289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8289)
+- Added CMMC regulatory compliance module [#8290](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8290)
+- Added FedRAMP regulatory compliance module [#8296](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8296)
+- Added NIS2 regulatory compliance module [#8298](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8298)
+- Added NIST 800-171 regulatory compliance module [#8294](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8294)
 
 ### Changed
 
@@ -31,7 +35,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Set cluster mode as default for all Wazuh installations, including single-node deployments. Updated RBAC permissions to `cluster:*` actions [#7701](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7701) [#8147](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8147)
 - Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7602](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7602) [#7929](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7929) [#7974](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7974) [#7979](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7979) [#8242](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8242) [#8306](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8306)
 - Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data [#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
-- Reworked health check [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622) [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694) [#7756](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7756) [#7829](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7829)
+- Reworked health check [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622) [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694) [#7756](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7756) [#7829](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7829) [#8317](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8317)
 - Reworked some view components to use data source [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
 - Fixed date and more format errors [#7754](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7754)
 - Upgraded the `brace-expansion` dependency to `1.1.12` and `2.0.2` [#7812](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7812)
@@ -39,7 +43,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Migrated the `wazuh.yml` settings to `opensearch_dashboards.yml` and advanced settings [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 - Changed the sample data index names [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 - Rework generate report button [#7900](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7900)
-- Changed dashboards renderer by saved objects [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842) [#7847](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7847) [#7916](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7916) [#7938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7938)
+- Changed dashboards renderer by saved objects [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842) [#7847](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7847) [#7916](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7916) [#7938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7938) [#8310](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8310)
 - Changed `rule.groups` filter to `wazuh.integration.decoders` [#7934](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7934)
 - Applied the new home page navigation style to all dashboards [#7981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7981)
 - Updated Office 365 dashboards to use new index pattern [#8081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8081)
@@ -47,7 +51,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated File Integrity Monitoring dashboards to use new index pattern [#8074](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8074) [#8247](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8247)
 - Updated Google Cloud dashboard to use new index pattern [#8069](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8069)
 - Updated Amazon web services dashboard to use new index pattern [#8065](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8065)
-- Updated Microsoft Graph API dashboard to use new index pattern [#8073](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8073)
+- Updated Microsoft Graph API dashboard to use new index pattern [#8073](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8073) [#8335](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8335)
 - Updated Threat Hunting dashboard with new index pattern definition [#8063](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8063)
 - Upgraded axios to 1.13.3 [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
 - Upgraded axios to 1.13.5 [8179](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8179)
@@ -56,7 +60,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed Ossec references to wazuh-manager [#8136](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8136)
 - Changed default Dev Tools request from deprecated `GET /manager/info` to `GET /cluster/<NODE_NAME>/info` [#8137](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8137)
 - Upgraded ESLint from version 8 to version 10 and migrated configuration from legacy `.eslintrc.json` to the new flat config format (`eslint.config.mjs`) [#8145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8145)
-- Updated Malware Detection dashboard with new index pattern definition [#8157](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8157)
+- Updated Malware Detection dashboard with new index pattern definition [#8157](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8157) [#8335](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8335)
 - Removed Manager UUID from Server APIs table and added Cluster UUID on About page [#8175](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8175) [#8209](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8209)
 - Updated Security Operations dashboards with new index pattern definition [#8146](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8146)
 - Changed the monitoring and statistics index patterns to `wazuh-metrics-agents*` and `wazuh-metrics-comms*` [#8224](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8224)
@@ -68,6 +72,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Centralized regulatory compliance modules (PCI DSS, GDPR, HIPAA, NIST 800-53, and TSC) into a single "Regulatory Compliance" application [#8239](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8239) [#8303](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8303)
 - Updated Vulnerability Detection Discover tab filters, and inventory columns [#8262](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8262) [#8283](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8283) [#8292](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8292)
 - Changed FIM table columns and index source in the agent view [#8269](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8269)
+- Changed Cluster and Logging configuration sections in Server Management Settings to use the full node configuration endpoint [#8289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8289)
+- Changed last alerts home KPIs title to findings [#8285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8285)
+- Changed IT Hygiene memory visualization [#8313](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8313)
+- Reduce the request done to get the index pattern to use in some views [#8318](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8318)
+- Changed default columns in Configuration assessment [#8320](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8320)
 
 ### Fixed
 
@@ -77,7 +86,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the button tooltip showing administrator role requirement where it wasn't needed [#8196](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8196)
 - Fixed a message in the group selector of the deploy new agent guide related to missing permissions when there was no groups available or they could not be obtained [#8216](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8216)
 - Fixed the under evaluation filter was removed on filter addition in Vulnerability Detection [#8252](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8252)
-- Fixed home KPIs not being vertically centered [#8267](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8267) [#8285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8285)
+- Fixed home KPIs not being vertically centered [#8267](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8267)
+- Fixed MITRE ATT&CK Findings data grid not spanning the full available width [#8311](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8311)
 
 ### Removed
 

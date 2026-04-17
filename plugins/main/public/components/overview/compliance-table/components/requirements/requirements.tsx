@@ -72,20 +72,19 @@ export class ComplianceRequirements extends Component {
       };
     });
 
-    const isNist171 = this.props.section === 'nist-800-171';
     return (
       <>
         {requirementList
           .sort((a, b) => {
             const quantityDiff = b.quantity - a.quantity;
-            if (quantityDiff !== 0) return quantityDiff;
-            if (isNist171) {
-              return (
-                parseInt(a.id.split('.')[1], 10) -
-                parseInt(b.id.split('.')[1], 10)
-              );
+
+            if (quantityDiff !== 0) {
+              return quantityDiff;
             }
-            return 0;
+
+            return String(a.label).localeCompare(String(b.label), undefined, {
+              numeric: true,
+            });
           })
           .map(facet => {
             let iconNode;
@@ -189,9 +188,23 @@ export class ComplianceRequirements extends Component {
       title = 'TSC';
       sectionStyle['height'] = 350;
     }
+    if (this.props.section === 'cmmc') {
+      title = 'CMMC';
+    }
+    if (this.props.section === 'fedramp') {
+      title = 'FedRAMP';
+    }
+    if (this.props.section === 'nis2') {
+      title = 'NIS2';
+    }
     return (
       <div
-        style={{ padding: '10px 10px 0 10px', minHeight: 300, height: '100%' }}
+        style={{
+          backgroundColor: '#80808014',
+          padding: '10px 10px 0 10px',
+          minHeight: 300,
+          height: '100%',
+        }}
       >
         <EuiFlexGroup>
           <EuiFlexItem>
