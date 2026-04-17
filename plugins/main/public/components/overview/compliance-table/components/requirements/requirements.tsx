@@ -185,6 +185,9 @@ export class ComplianceRequirements extends Component {
       title = 'TSC';
       sectionStyle['height'] = 350;
     }
+    if (this.props.section === 'cmmc') {
+      title = 'CMMC';
+    }
     if (this.props.section === 'fedramp') {
       title = 'FedRAMP';
     }

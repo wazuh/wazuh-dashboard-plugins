@@ -15,6 +15,7 @@ export interface Rule {
   nis2?: string[];
   gpg13?: string[];
   pci?: string[];
+  cmmc?: string[];
   frequency?: number;
   info?: string;
 }

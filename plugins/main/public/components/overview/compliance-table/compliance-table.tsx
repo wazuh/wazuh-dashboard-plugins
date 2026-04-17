@@ -19,6 +19,7 @@ import { gdprRequirementsFile } from '../../../../common/compliance-requirements
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
 import { nistRequirementsFile } from '../../../../common/compliance-requirements/nist-requirements';
 import { tscRequirementsFile } from '../../../../common/compliance-requirements/tsc-requirements';
+import { cmmcRequirementsFile } from '../../../../common/compliance-requirements/cmmc-requirements';
 import { fedrampRequirementsFile } from '../../../../common/compliance-requirements/fedramp-requirements';
 import { nis2RequirementsFile } from '../../../../common/compliance-requirements/nis2-requirements';
 
@@ -121,9 +122,23 @@ function buildComplianceObject({ section }) {
         }
       }); //forEach
     }
+
+    if (section === 'cmmc') {
+      descriptions = cmmcRequirementsFile;
+      Object.keys(cmmcRequirementsFile).forEach(item => {
+        const currentRequirement = item.split('.')[0];
+        if (complianceRequirements[currentRequirement]) {
+          complianceRequirements[currentRequirement].push(item);
+        } else {
+          selectedRequirements[currentRequirement] = true;
+          complianceRequirements[currentRequirement] = [];
+          complianceRequirements[currentRequirement].push(item);
+        }
+      }); //forEach
+    }
+
     if (section === 'nis2') {
       descriptions = nis2RequirementsFile;
-      console.log({ nis2RequirementsFile });
       Object.keys(nis2RequirementsFile).forEach(item => {
         const parts = item.split('.');
         let currentRequirement: string;
@@ -259,6 +274,7 @@ export const ComplianceTable = compose(
         hipaa: 'rule.compliance.hipaa',
         nist: 'rule.compliance.nist_800_53',
         tsc: 'rule.compliance.tsc',
+        cmmc: 'rule.compliance.cmmc',
         fedramp: 'rule.compliance.fedramp',
         nis2: 'rule.compliance.nis2',
       };

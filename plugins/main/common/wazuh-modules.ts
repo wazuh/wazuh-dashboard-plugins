@@ -44,7 +44,7 @@ export const WAZUH_MODULES = {
     title: 'Regulatory Compliance',
     appId: 'regulatory-compliance',
     description:
-      'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, TSC, FedRAMP and NIS2.',
+      'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, TSC, CMMC, FedRAMP and NIS2.',
   },
   pci: {
     title: 'PCI DSS',
@@ -69,6 +69,12 @@ export const WAZUH_MODULES = {
     appId: 'nist-800-53',
     description:
       'National Institute of Standards and Technology Special Publication 800-53 (NIST 800-53) sets guidelines for federal information systems.',
+  },
+  cmmc: {
+    title: 'CMMC',
+    appId: 'cmmc',
+    description:
+      'Cybersecurity Maturity Model Certification (CMMC) is a framework to assess the cybersecurity maturity of organizations.',
   },
   tsc: {
     title: 'TSC',

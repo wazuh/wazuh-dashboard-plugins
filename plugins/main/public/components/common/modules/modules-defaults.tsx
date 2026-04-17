@@ -101,6 +101,7 @@ import {
   RegulatoryComplianceHIPAA,
   RegulatoryComplianceNIST80053,
   RegulatoryComplianceTSC,
+  RegulatoryComplianceCMMC,
   RegulatoryComplianceFedRAMP,
   RegulatoryComplianceNIS2,
 } from '../../overview/regulatory-compliance';
@@ -619,6 +620,12 @@ export const ModulesDefaults = {
         name: 'TSC',
         buttons: [ButtonExploreAgent],
         component: RegulatoryComplianceTSC,
+      },
+      {
+        id: 'cmmc',
+        name: 'CMMC',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceCMMC,
       },
       {
         id: 'fedramp',
