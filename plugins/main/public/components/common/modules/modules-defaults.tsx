@@ -102,6 +102,8 @@ import {
   RegulatoryComplianceNIST80053,
   RegulatoryComplianceTSC,
   RegulatoryComplianceCMMC,
+  RegulatoryComplianceFedRAMP,
+  RegulatoryComplianceNIS2,
 } from '../../overview/regulatory-compliance';
 import { InventoryFIM } from '../../overview/fim';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
@@ -537,6 +539,7 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
+
   'it-hygiene': {
     init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
@@ -623,6 +626,18 @@ export const ModulesDefaults = {
         name: 'CMMC',
         buttons: [ButtonExploreAgent],
         component: RegulatoryComplianceCMMC,
+      },
+      {
+        id: 'fedramp',
+        name: 'FedRAMP',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceFedRAMP,
+      },
+      {
+        id: 'nis2',
+        name: 'NIS2',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceNIS2,
       },
     ],
     availableFor: ['manager', 'agent'],

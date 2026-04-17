@@ -90,6 +90,8 @@ export class ComplianceSubrequirements extends Component {
       hipaa: 'rule.compliance.hipaa',
       tsc: 'rule.compliance.tsc',
       cmmc: 'rule.compliance.cmmc',
+      fedramp: 'rule.compliance.fedramp',
+      nis2: 'rule.compliance.nis2',
     };
     return mapKeys[this.props.section];
   }

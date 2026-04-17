@@ -75,7 +75,17 @@ export class ComplianceRequirements extends Component {
     return (
       <>
         {requirementList
-          .sort((a, b) => b.quantity - a.quantity)
+          .sort((a, b) => {
+            const quantityDiff = b.quantity - a.quantity;
+
+            if (quantityDiff !== 0) {
+              return quantityDiff;
+            }
+
+            return String(a.label).localeCompare(String(b.label), undefined, {
+              numeric: true,
+            });
+          })
           .map(facet => {
             let iconNode;
             const name =
@@ -177,6 +187,12 @@ export class ComplianceRequirements extends Component {
     }
     if (this.props.section === 'cmmc') {
       title = 'CMMC';
+    }
+    if (this.props.section === 'fedramp') {
+      title = 'FedRAMP';
+    }
+    if (this.props.section === 'nis2') {
+      title = 'NIS2';
     }
     return (
       <div

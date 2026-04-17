@@ -254,7 +254,7 @@ export const regulatoryCompliance = {
   ),
   description: i18n.translate('wz-app-regulatory-compliance-description', {
     defaultMessage:
-      'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, TSC and CMMC.',
+      'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, TSC, CMMC, FedRAMP and NIS2',
   }),
   euiIconType: 'usersRolesApp',
   order: 401,
