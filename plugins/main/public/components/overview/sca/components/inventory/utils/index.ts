@@ -1,10 +1,8 @@
 export const tableColumns = [
   { id: 'wazuh.agent.name' },
   { id: 'policy.name' },
-  { id: 'policy.description' },
-  { id: 'policy.file' },
+  { id: 'check.id' },
   { id: 'check.name' },
-  { id: 'check.result' },
 ];
 
 export const managedFilters = [
@@ -15,7 +13,7 @@ export const managedFilters = [
   },
   {
     type: 'multiSelect',
-    key: 'check.result',
+    key: 'check.name',
     placeholder: 'Check',
   },
 ];

@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 
-import { existsSync, readFileSync } from 'fs';
-import { resolve } from 'path';
+import { existsSync, readFileSync, readdirSync } from 'fs';
+import { basename, resolve } from 'path';
 import {
   OVERRIDE_COMPOSE_FILE,
   REQUIRED_REPOSITORIES,
@@ -10,7 +10,7 @@ import {
   PROFILES,
   DEV_COMPOSE_FILE,
   ACTIONS,
-  FLAGS,
+  ALL_FORKS_EXCLUDED_REPOS,
 } from '../constants/app';
 import {
   msgInvalidRepoSubfolder,
@@ -190,6 +190,70 @@ export async function mainWithDeps(
     );
     const resolvedOsd = getPlatformVersionFromPackageJson('OSD', envPaths);
     config.setOsdVersion(resolvedOsd, 'main');
+  }
+
+  // --all-forks: auto-discover sibling repositories and add them as external repos
+  if (config.allForks) {
+    if (!envPaths.siblingRepoHostRoot) {
+      throw new ConfigurationError(
+        'SIBLING_REPO_HOST_ROOT is not set, cannot use --all-forks.',
+      );
+    }
+
+    const siblingContainerPath = toContainerPath(
+      envPaths.siblingRepoHostRoot,
+      envPaths,
+    );
+    if (!siblingContainerPath || !existsSync(siblingContainerPath)) {
+      throw new ConfigurationError(
+        `Sibling root '${envPaths.siblingRepoHostRoot}' is not accessible inside the container.`,
+      );
+    }
+
+    const currentRepoName = basename(envPaths.currentRepoHostRoot);
+    const excludedNames = new Set<string>([
+      currentRepoName,
+      ...(ALL_FORKS_EXCLUDED_REPOS as readonly string[]),
+      ...(REQUIRED_REPOSITORIES as readonly string[]),
+    ]);
+    const alreadyAdded = new Set(config.userRepositories.map(r => r.name));
+
+    const entries = readdirSync(siblingContainerPath, { withFileTypes: true });
+    const discovered: string[] = [];
+
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      if (excludedNames.has(entry.name)) continue;
+      if (alreadyAdded.has(entry.name)) continue;
+
+      const packageJsonContainerPath = resolve(
+        siblingContainerPath,
+        entry.name,
+        'package.json',
+      );
+      if (!existsSync(packageJsonContainerPath)) continue;
+
+      const hostPath = stripTrailingSlash(
+        resolve(envPaths.siblingRepoHostRoot, entry.name),
+      );
+      config.addUserRepositoryOverride(
+        { name: entry.name, path: hostPath },
+        'allForks',
+      );
+      discovered.push(entry.name);
+    }
+
+    if (discovered.length > 0) {
+      deps.logger.info(
+        `--all-forks: discovered ${
+          discovered.length
+        } sibling repo(s): ${discovered.join(', ')}`,
+      );
+    } else {
+      deps.logger.info(
+        '--all-forks: no additional sibling repositories found.',
+      );
+    }
   }
 
   // Resolve required repositories and apply env vars
