@@ -30,13 +30,13 @@ const validOsDefinition: IOSCommandsDefinition<tOperatingSystem, tOptionalParame
   architecture: 'x64',
   installCommand: props => 'install command mocked',
   startCommand: props => 'start command mocked',
-  urlPackage: props => 'https://package-url.com',
+  packageName: props => 'package-name.deb',
+  urlPackage: props => `https://mock-base-url.com/${props.packageName}`,
 };
 describe('getInstallCommandByOS', () => {
   it('should return the correct install command for each OS', () => {
     const installCommand = getInstallCommandByOS(
       validOsDefinition,
-      'https://package-url.com',
       '4.4',
       'linux',
     );
@@ -47,7 +47,6 @@ describe('getInstallCommandByOS', () => {
     try {
       getInstallCommandByOS(
         validOsDefinition,
-        'https://package-url.com',
         '',
         'linux',
       );
@@ -60,12 +59,12 @@ describe('getInstallCommandByOS', () => {
     const osDefinition: IOSCommandsDefinition<tOperatingSystem, tOptionalParameters> = {
       architecture: 'x64',
       startCommand: props => 'start command mocked',
-      urlPackage: props => 'https://package-url.com',
+      packageName: props => 'package-name.deb',
+      urlPackage: props => `https://mock-base-url.com/${props.packageName}`,
     };
     try {
       getInstallCommandByOS(
         osDefinition,
-        'https://package-url.com',
         '4.4',
         'linux',
       );
@@ -73,9 +72,14 @@ describe('getInstallCommandByOS', () => {
       expect(error).toBeInstanceOf(NoInstallCommandDefinitionException);
     }
   });
+
   it('should return ERROR when the OS has no package url', () => {
+    const osDefinitionWithEmptyUrl: IOSCommandsDefinition<tOperatingSystem, tOptionalParameters> = {
+      ...validOsDefinition,
+      urlPackage: props => '',
+    };
     try {
-      getInstallCommandByOS(validOsDefinition, '', '4.4', 'linux');
+      getInstallCommandByOS(osDefinitionWithEmptyUrl, '4.4', 'linux');
     } catch (error) {
       expect(error).toBeInstanceOf(NoPackageURLDefinitionException);
     }
@@ -87,7 +91,8 @@ describe('getInstallCommandByOS', () => {
       architecture: 'x64',
       installCommand: mockedInstall,
       startCommand: props => 'start command mocked',
-      urlPackage: props => 'https://package-url.com',
+      packageName: props => 'package-name.deb',
+      urlPackage: props => `https://mock-base-url.com/${props.packageName}`,
     };
 
     const optionalParams: IOptionalParameters<tOptionalParameters> = {
@@ -101,7 +106,6 @@ describe('getInstallCommandByOS', () => {
 
     getInstallCommandByOS(
       validOsDefinition,
-      'https://package-url.com',
       '4.4',
       'linux',
       optionalParams

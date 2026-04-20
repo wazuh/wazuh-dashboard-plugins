@@ -10,7 +10,7 @@ import {
 
 const mockedInstallCommand = (props: any) => 'install command mocked';
 const mockedStartCommand = (props: any) => 'start command mocked';
-const mockedUrlPackage = (props: any) => 'https://package-url.com';
+const mockedPackageName = (props: any) => 'package-name.deb';
 
 type tOptionalParamsNames = 'optional1' | 'optional2';
 
@@ -38,7 +38,8 @@ const validOSDefinitions: IOSDefinition<tOperatingSystem,tOptionalParamsNames>[]
         architecture: 'x64',
         installCommand: mockedInstallCommand,
         startCommand: mockedStartCommand,
-        urlPackage: mockedUrlPackage,
+        packageName: mockedPackageName,
+        urlPackage: props => `https://mock-base-url.com/${props.packageName}`,
       },
     ],
   },
@@ -49,7 +50,8 @@ const validOSDefinitions: IOSDefinition<tOperatingSystem,tOptionalParamsNames>[]
         architecture: 'x64',
         installCommand: mockedInstallCommand,
         startCommand: mockedStartCommand,
-        urlPackage: mockedUrlPackage,
+        packageName: mockedPackageName,
+        urlPackage: props => `https://mock-base-url.com/${props.packageName}`,
       },
     ],
   },
@@ -74,7 +76,7 @@ describe('search OS definitions services', () => {
         }),
       ).toThrow(NoOSOptionFoundException);
     });
-    
+
   });
 
   describe('validateOSDefinitionsDuplicated', () => {
@@ -87,7 +89,8 @@ describe('search OS definitions services', () => {
               architecture: 'x64',
               installCommand: mockedInstallCommand,
               startCommand: mockedStartCommand,
-              urlPackage: mockedUrlPackage,
+              packageName: mockedPackageName,
+              urlPackage: props => `https://mock-base-url.com/${props.packageName}`,
             },
           ],
         },
@@ -98,7 +101,8 @@ describe('search OS definitions services', () => {
               architecture: 'x64',
               installCommand: mockedInstallCommand,
               startCommand: mockedStartCommand,
-              urlPackage: mockedUrlPackage,
+              packageName: mockedPackageName,
+              urlPackage: props => `https://mock-base-url.com/${props.packageName}`,
             },
           ],
         },
@@ -119,7 +123,8 @@ describe('search OS definitions services', () => {
             packageManager: 'aix',
             installCommand: mockedInstallCommand,
             startCommand: mockedStartCommand,
-            urlPackage: mockedUrlPackage,
+            packageName: mockedPackageName,
+            urlPackage: props => `https://mock-base-url.com/${props.packageName}`,
           },
         ],
       };
@@ -145,7 +150,8 @@ describe('search OS definitions services', () => {
               architecture: 'x64',
               installCommand: mockedInstallCommand,
               startCommand: mockedStartCommand,
-              urlPackage: mockedUrlPackage,
+              packageName: mockedPackageName,
+              urlPackage: props => `https://mock-base-url.com/${props.packageName}`,
             },
           ],
         },
@@ -156,13 +162,15 @@ describe('search OS definitions services', () => {
               architecture: 'x64',
               installCommand: mockedInstallCommand,
               startCommand: mockedStartCommand,
-              urlPackage: mockedUrlPackage,
+              packageName: mockedPackageName,
+              urlPackage: props => `https://mock-base-url.com/${props.packageName}`,
             },
             {
               architecture: 'x64',
               installCommand: mockedInstallCommand,
               startCommand: mockedStartCommand,
-              urlPackage: mockedUrlPackage,
+              packageName: mockedPackageName,
+              urlPackage: props => `https://mock-base-url.com/${props.packageName}`,
             },
           ],
         },
