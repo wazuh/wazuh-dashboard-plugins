@@ -20,7 +20,6 @@ import {
   VisualizationBasicWidgetSelectorHeader,
 } from '../../../charts/visualizations/basic';
 import { useTimeFilter } from '../../../hooks';
-import { AppState } from '../../../../../react-services/app-state';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import {
@@ -40,6 +39,7 @@ import {
 } from '../../../data-source';
 import { LoadingSearchbarProgress } from '../../../loading-searchbar-progress/loading-searchbar-progress';
 import { compose } from 'redux';
+import { regulatoryCompliance } from '../../../../../utils/applications';
 
 const selectionOptionsCompliance = [
   { value: 'cmmc', text: 'CMMC' },
@@ -55,16 +55,16 @@ const selectionOptionsCompliance = [
 ];
 
 const requirementNameModuleID = {
-  pci_dss: 'pci',
-  gdpr: 'gdpr',
-  nist_800_53: 'nist',
-  hipaa: 'hipaa',
-  tsc: 'tsc',
-  nis2: 'nis2',
   cmmc: 'cmmc',
-  iso_27001: 'iso_27001',
-  nist_800_171: 'nist_800_171',
   fedramp: 'fedramp',
+  gdpr: 'gdpr',
+  hipaa: 'hipaa',
+  iso_27001: 'iso-27001',
+  nis2: 'nis2',
+  nist_800_53: 'nist',
+  nist_800_171: 'nist-800-171',
+  pci_dss: 'pci',
+  tsc: 'tsc',
 };
 
 export const RequirementVis = withPanel({ paddingSize: 'm' })(props => {
@@ -111,25 +111,24 @@ const RequirementVisBody = compose(
 
   const goToDashboardWithFilter = async (requirement, key, agent) => {
     pinnedAgentManager.pinAgent(agent);
-    const indexPatternId = AppState.getCurrentPattern();
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
-        `rule.${requirement}`,
+        `rule.compliance.${requirement}`,
         key,
-        indexPatternId,
+        props.dataSource.dataSource.indexPattern.id,
       ),
     ];
     const tabName = requirementNameModuleID[requirement];
-    const params = `tab=${tabName}&agentId=${
+    const params = `tab=${regulatoryCompliance.id}&tabView=${
+      WAZUH_MODULES[tabName].appId
+    }&tabSubView=dashboard&agentId=${
       agent.id
     }&_g=${PatternDataSourceFilterManager.filtersToURLFormat(filters)}`;
-    NavigationService.getInstance().navigateToApp(
-      WAZUH_MODULES[tabName].appId,
-      {
-        path: `#/overview?${params}`,
-      },
-    );
+    console.log(params);
+    NavigationService.getInstance().navigateToApp(regulatoryCompliance.id, {
+      path: `#/overview?${params}`,
+    });
   };
 
   const fetchData = useCallback(
