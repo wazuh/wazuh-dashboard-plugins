@@ -20,7 +20,6 @@ import {
   VisualizationBasicWidgetSelectorHeader,
 } from '../../../charts/visualizations/basic';
 import { useTimeFilter } from '../../../hooks';
-import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import {
   FILTER_OPERATOR,
@@ -40,6 +39,7 @@ import {
 import { LoadingSearchbarProgress } from '../../../loading-searchbar-progress/loading-searchbar-progress';
 import { compose } from 'redux';
 import { regulatoryCompliance } from '../../../../../utils/applications';
+import { WAZUH_MODULES_ID } from '../../../../../../common/constants';
 
 const selectionOptionsCompliance = [
   { value: 'cmmc', text: 'CMMC' },
@@ -55,16 +55,16 @@ const selectionOptionsCompliance = [
 ];
 
 const requirementNameModuleID = {
-  cmmc: 'cmmc',
-  fedramp: 'fedramp',
-  gdpr: 'gdpr',
-  hipaa: 'hipaa',
-  iso_27001: 'iso-27001',
-  nis2: 'nis2',
-  nist_800_53: 'nist',
-  nist_800_171: 'nist-800-171',
-  pci_dss: 'pci',
-  tsc: 'tsc',
+  cmmc: WAZUH_MODULES_ID.CMMC,
+  fedramp: WAZUH_MODULES_ID.FEDRAMP,
+  gdpr: WAZUH_MODULES_ID.GDPR,
+  hipaa: WAZUH_MODULES_ID.HIPAA,
+  iso_27001: WAZUH_MODULES_ID.ISO_27001,
+  nis2: WAZUH_MODULES_ID.NIS2,
+  nist_800_53: WAZUH_MODULES_ID.NIST_800_53,
+  nist_800_171: WAZUH_MODULES_ID.NIST_800_171,
+  pci_dss: WAZUH_MODULES_ID.PCI_DSS,
+  tsc: WAZUH_MODULES_ID.TSC,
 };
 
 export const RequirementVis = withPanel({ paddingSize: 'm' })(props => {
@@ -120,9 +120,9 @@ const RequirementVisBody = compose(
       ),
     ];
     const tabName = requirementNameModuleID[requirement];
-    const params = `tab=${regulatoryCompliance.id}&tabView=${
-      WAZUH_MODULES[tabName].appId
-    }&tabSubView=dashboard&agentId=${
+    const params = `tab=${
+      regulatoryCompliance.id
+    }&tabView=${tabName}&tabSubView=dashboard&agentId=${
       agent.id
     }&_g=${PatternDataSourceFilterManager.filtersToURLFormat(filters)}`;
     console.log(params);
