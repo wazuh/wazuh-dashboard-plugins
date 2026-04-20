@@ -18,7 +18,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main
+      - 5.9.9
   workflow_dispatch:
 
 jobs:
