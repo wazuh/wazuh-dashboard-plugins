@@ -91,7 +91,8 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
     },
     {
       architecture: 'RPM amd64',
-      packageName: props => `wazuh-agent-${props.wazuhVersion}-beta1.x86_64.rpm`,
+      packageName: props =>
+        `wazuh-agent-${props.wazuhVersion}-beta1.x86_64.rpm`,
       urlPackage: props =>
         `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/yum/${props.packageName}`,
       installCommand: props => getRPMAMD64InstallCommand(props),
@@ -107,7 +108,8 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
     },
     {
       architecture: 'RPM aarch64',
-      packageName: props => `wazuh-agent-${props.wazuhVersion}-beta1.aarch64.rpm`,
+      packageName: props =>
+        `wazuh-agent-${props.wazuhVersion}-beta1.aarch64.rpm`,
       urlPackage: props =>
         `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/yum/${props.packageName}`,
       installCommand: props => getRPMARM64InstallCommand(props),
@@ -135,7 +137,8 @@ const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
   options: [
     {
       architecture: 'Intel',
-      packageName: props => `wazuh-agent-${props.wazuhVersion}-beta1.intel64.pkg`,
+      packageName: props =>
+        `wazuh-agent-${props.wazuhVersion}-beta1.intel64.pkg`,
       urlPackage: props =>
         `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/macos/${props.packageName}`,
       installCommand: props => getMacOsInstallCommand(props),

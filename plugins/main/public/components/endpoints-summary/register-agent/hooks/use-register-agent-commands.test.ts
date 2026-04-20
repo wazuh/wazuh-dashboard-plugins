@@ -37,7 +37,8 @@ const linuxDefinition: IOSDefinition<tOperatingSystem, tOptionalParamsNames> = {
     },
     {
       architecture: 'x64',
-      packageName: props => `wazuh-agent_${props.wazuhVersion}-1_${props.architecture}`,
+      packageName: props =>
+        `wazuh-agent_${props.wazuhVersion}-1_${props.architecture}`,
       urlPackage: props =>
         `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/${props.packageName}`,
       installCommand: props =>
@@ -119,9 +120,7 @@ describe('useRegisterAgentCommands hook', () => {
 
     const optionSelected = osCommandsDefinitions
       .find(os => os.name === 'linux')
-      ?.options.find(
-        item => item.architecture === 'x64',
-      );
+      ?.options.find(item => item.architecture === 'x64');
     const spyInstall = jest.spyOn(optionSelected!, 'installCommand');
     const spyStart = jest.spyOn(optionSelected!, 'startCommand');
 
@@ -205,9 +204,7 @@ describe('useRegisterAgentCommands hook', () => {
     const { selectOS, setOptionalParams } = hook.result.current;
     const optionSelected = osCommandsDefinitions
       .find(os => os.name === 'linux')
-      ?.options.find(
-        item => item.architecture === 'x64',
-      );
+      ?.options.find(item => item.architecture === 'x64');
     const spyInstall = jest.spyOn(optionSelected!, 'installCommand');
     const spyStart = jest.spyOn(optionSelected!, 'startCommand');
 

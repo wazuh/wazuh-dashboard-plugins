@@ -1,5 +1,13 @@
-import { NoInstallCommandDefinitionException, NoPackageURLDefinitionException, WazuhVersionUndefinedException } from "../exceptions";
-import { IOSCommandsDefinition, IOperationSystem, IOptionalParameters } from "../types";
+import {
+  NoInstallCommandDefinitionException,
+  NoPackageURLDefinitionException,
+  WazuhVersionUndefinedException,
+} from '../exceptions';
+import {
+  IOSCommandsDefinition,
+  IOperationSystem,
+  IOptionalParameters,
+} from '../types';
 
 /**
  * Returns the installation command for a given operating system.
@@ -12,33 +20,46 @@ import { IOSCommandsDefinition, IOperationSystem, IOptionalParameters } from "..
  * @throws {NoPackageURLDefinitionException} If the package URL is not defined.
  * @throws {WazuhVersionUndefinedException} If the Wazuh version is not defined.
  */
-export function getInstallCommandByOS<OS extends IOperationSystem, Params extends string>(osDefinition: IOSCommandsDefinition<OS, Params>, version: string, osName: string, optionals?: IOptionalParameters<Params>) {
+export function getInstallCommandByOS<
+  OS extends IOperationSystem,
+  Params extends string,
+>(
+  osDefinition: IOSCommandsDefinition<OS, Params>,
+  version: string,
+  osName: string,
+  optionals?: IOptionalParameters<Params>,
+) {
+  if (!osDefinition.installCommand) {
+    throw new NoInstallCommandDefinitionException(
+      osName,
+      osDefinition.architecture,
+    );
+  }
 
-    if (!osDefinition.installCommand) {
-        throw new NoInstallCommandDefinitionException(osName, osDefinition.architecture);
-    }
+  if (!version || version === '') {
+    throw new WazuhVersionUndefinedException();
+  }
 
-    if (!version || version === '') {
-        throw new WazuhVersionUndefinedException();
-    }
+  const baseProps = {
+    wazuhVersion: version,
+    name: osName as OS['name'],
+    architecture: osDefinition.architecture,
+  };
 
-    const baseProps = {
-        wazuhVersion: version,
-        name: osName as OS['name'],
-        architecture: osDefinition.architecture,
-    };
+  const packageName = osDefinition.packageName(baseProps);
+  const packageUrl = osDefinition.urlPackage({ ...baseProps, packageName });
 
-    const packageName = osDefinition.packageName(baseProps);
-    const packageUrl = osDefinition.urlPackage({ ...baseProps, packageName });
+  if (!packageUrl || packageUrl === '') {
+    throw new NoPackageURLDefinitionException(
+      osName,
+      osDefinition.architecture,
+    );
+  }
 
-    if (!packageUrl || packageUrl === '') {
-        throw new NoPackageURLDefinitionException(osName, osDefinition.architecture);
-    }
-
-    return osDefinition.installCommand({
-        ...baseProps,
-        urlPackage: packageUrl,
-        packageName,
-        optionals,
-    });
+  return osDefinition.installCommand({
+    ...baseProps,
+    urlPackage: packageUrl,
+    packageName,
+    optionals,
+  });
 }

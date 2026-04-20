@@ -108,7 +108,8 @@ export class CommandGenerator<
     }
     return this.osDefinitionSelected.urlPackage({
       wazuhVersion: this.wazuhVersion,
-      architecture: this.osDefinitionSelected.architecture as OS['architecture'],
+      architecture: this.osDefinitionSelected
+        .architecture as OS['architecture'],
       name: this.os as OS['name'],
       packageName: this.getPackageName(),
     });
