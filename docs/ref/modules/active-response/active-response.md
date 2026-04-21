@@ -324,9 +324,6 @@ From any execution record, `event.doc_id` and `event.index` point back to the al
 
 ## FAQ
 
-**Can I keep using the classic `<active-response>` block in `ossec.conf`?**
-Yes. The traditional agent-level configuration still works. The indexer-driven flow described here is the recommended path from 5.0 onwards.
-
 **How do I change the 3-day retention?**
 Ask your administrator to adjust the retention policy on the indexer side.
 
