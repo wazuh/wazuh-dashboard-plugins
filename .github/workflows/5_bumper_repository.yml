@@ -87,12 +87,13 @@ jobs:
           VERSION: ${{ inputs.version }}
           STAGE: ${{ inputs.stage }}
           TAG: ${{ inputs.tag }}
-          set_as_main: ${{ inputs.set_as_main }}
+          SET_AS_MAIN: ${{ inputs.set-as-main }}
         run: |
           script_params=""
           version=${{ env.VERSION }}
           stage=${{ env.STAGE }}
           tag=${{ env.TAG }}
+          set_as_main=${{ env.SET_AS_MAIN }}
 
           # Both version and stage provided
           if [[ -n "$version" && -n "$stage" && "$tag" != "true" ]]; then
