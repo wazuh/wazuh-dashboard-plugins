@@ -70,6 +70,7 @@ import {
   DockerDataSource,
   AlertsVulnerabilitiesDataSource,
   AWSDataSource,
+  EventsCloudServicesDataSourceRepository,
   FIMFindingsDataSource,
   GitHubDataSource,
   MalwareDetectionDataSource,
@@ -115,6 +116,8 @@ const ButtonModuleGenerateReport = {
   condition: () => new ReportingService().reportDashboardPluginExist(),
   component: ButtonModuleGenerateReportComponent,
 };
+
+const office365DiscoverRepository = new EventsCloudServicesDataSourceRepository();
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
@@ -292,6 +295,7 @@ export const ModulesDefaults = {
         tableColumns: office365Columns,
         DataSource: Office365DataSource,
         categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+        repository: office365DiscoverRepository,
       }),
     ],
     availableFor: ['manager', 'agent'],
