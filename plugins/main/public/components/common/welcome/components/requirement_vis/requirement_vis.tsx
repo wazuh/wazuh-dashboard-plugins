@@ -125,7 +125,6 @@ const RequirementVisBody = compose(
     }&tabView=${tabName}&tabSubView=dashboard&agentId=${
       agent.id
     }&_g=${PatternDataSourceFilterManager.filtersToURLFormat(filters)}`;
-    console.log(params);
     NavigationService.getInstance().navigateToApp(regulatoryCompliance.id, {
       path: `#/overview?${params}`,
     });
