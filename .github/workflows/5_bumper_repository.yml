@@ -19,8 +19,8 @@ on:
         default: false
         required: false
         type: boolean
-      set-as-main:
-        description: 'Enable main branch mode: bump version values only, keep branch references pointing to main'
+      set_as_main:
+        description: "Enable main branch mode: bump version values only, keep branch references pointing to main"
         required: false
         type: boolean
         default: false
@@ -87,13 +87,12 @@ jobs:
           VERSION: ${{ inputs.version }}
           STAGE: ${{ inputs.stage }}
           TAG: ${{ inputs.tag }}
-          SET_AS_MAIN: ${{ inputs.set-as-main }}
+          set_as_main: ${{ inputs.set_as_main }}
         run: |
           script_params=""
           version=${{ env.VERSION }}
           stage=${{ env.STAGE }}
           tag=${{ env.TAG }}
-          set_as_main=${{ env.SET_AS_MAIN }}
 
           # Both version and stage provided
           if [[ -n "$version" && -n "$stage" && "$tag" != "true" ]]; then
