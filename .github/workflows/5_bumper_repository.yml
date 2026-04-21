@@ -20,7 +20,7 @@ on:
         required: false
         type: boolean
       set_as_main:
-        description: "Enable main branch mode: bump version values only, keep branch references pointing to main"
+        description: 'Enable main branch mode: bump version values only, keep branch references pointing to main'
         required: false
         type: boolean
         default: false
