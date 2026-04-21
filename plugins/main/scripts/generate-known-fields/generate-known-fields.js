@@ -360,6 +360,15 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'threatintel-enrichments.json',
   },
+  // TODO: replace placeholder URL with the actual template path once available
+  'threatintel-vulnerabilities': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/content/placeholder_vulnerabilities.json',
+      ),
+    ],
+    outputFile: 'threatintel-vulnerabilities.json',
+  },
 };
 
 /**
