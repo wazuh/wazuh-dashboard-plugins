@@ -360,11 +360,10 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'threatintel-enrichments.json',
   },
-  // TODO: replace placeholder URL with the actual template path once available
   'threatintel-vulnerabilities': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/content/placeholder_vulnerabilities.json',
+        'plugins/content-manager/src/main/resources/mappings/cti-cve-mappings.json',
       ),
     ],
     outputFile: 'threatintel-vulnerabilities.json',
@@ -652,7 +651,7 @@ function extractFields(mappings, properties) {
     }
     if (field?.name.includes('*')) {
       issues.addWarning(
-        `Field name contains wildcard: ${field.name}, skipping field extraction.`,
+        `Field name contains wildcard: ${field.name}.`,
       );
     }
     if (!uniqueFieldsMap.has(field.name)) {
