@@ -51,6 +51,7 @@ import {
   mitreAttack,
   threatHunting,
   vulnerabilityDetection,
+  getAppUrl,
 } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { FindingsCount } from './dashboard/findings-count';
@@ -219,9 +220,7 @@ export const AgentsWelcome = compose(
                 >
                   <RedirectAppLinks application={getCore().application}>
                     <EuiButtonEmpty
-                      href={NavigationService.getInstance().getUrlForApp(
-                        applicationId,
-                      )}
+                      href={getAppUrl(applicationId)}
                       style={{ cursor: 'pointer' }}
                     >
                       <span>
@@ -393,9 +392,7 @@ export const AgentsWelcome = compose(
                     <EuiButtonIcon
                       iconType='popout'
                       color='primary'
-                      href={`${NavigationService.getInstance().getUrlForApp(
-                        mitreAttack.id,
-                      )}`}
+                      href={getAppUrl(mitreAttack.id)}
                       aria-label='Open MITRE ATT&CK'
                     />
                   </RedirectAppLinks>

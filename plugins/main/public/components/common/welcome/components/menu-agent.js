@@ -21,10 +21,13 @@ import {
 import { connect } from 'react-redux';
 import { hasAgentSupportModule } from '../../../../react-services/wz-agents';
 import { getCore, getToasts } from '../../../../kibana-services';
-import { Applications, Categories } from '../../../../utils/applications';
+import {
+  Applications,
+  Categories,
+  getAppUrl,
+} from '../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
-import NavigationService from '../../../../react-services/navigation-service';
 
 class WzMenuAgent extends Component {
   constructor(props) {
@@ -102,7 +105,7 @@ class WzMenuAgent extends Component {
           >
             <RedirectAppLinks application={getCore().application}>
               <EuiLink
-                href={NavigationService.getInstance().getUrlForApp(item.id)}
+                href={getAppUrl(item.id)}
                 style={{ cursor: 'pointer' }}
               >
                 {item.title}
