@@ -28,15 +28,19 @@ interface IOptionalParamsWithValues<Params extends string> {
 
 export type tOSEntryProps<Param extends string> = IOSProps &
   IOptionalParamsWithValues<Param>;
+export type tUrlPackageProps<Param extends string> = tOSEntryProps<Param> & {
+  packageName: string;
+};
 export type tOSEntryInstallCommand<Param extends string> =
-  tOSEntryProps<Param> & { urlPackage: string };
+  tOSEntryProps<Param> & { urlPackage: string; packageName: string };
 
 export interface IOSCommandsDefinition<
   OS extends IOperationSystem,
   Param extends string,
 > {
   architecture: OS['architecture'];
-  urlPackage: (props: tOSEntryProps<Param>) => string;
+  urlPackage: (props: tUrlPackageProps<Param>) => string;
+  packageName: (props: tOSEntryProps<Param>) => string;
   installCommand: (props: tOSEntryInstallCommand<Param>) => string;
   startCommand: (props: tOSEntryProps<Param>) => string;
 }
