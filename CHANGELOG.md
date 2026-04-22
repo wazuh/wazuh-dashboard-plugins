@@ -52,7 +52,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated File Integrity Monitoring dashboards to use new index pattern [#8074](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8074) [#8247](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8247)
 - Updated Google Cloud dashboard to use new index pattern [#8069](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8069)
 - Updated Amazon web services dashboard to use new index pattern [#8065](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8065)
-- Updated Microsoft Graph API dashboard to use new index pattern [#8073](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8073) [#8335](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8335)
+- Updated Microsoft Graph API dashboard to use new index pattern [#8073](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8073) [#8335](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8335) [#8343](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8343)
 - Updated Threat Hunting dashboard with new index pattern definition [#8063](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8063)
 - Upgraded axios to 1.13.3 [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
 - Upgraded axios to 1.13.5 [8179](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8179)
@@ -73,15 +73,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Centralized regulatory compliance modules (PCI DSS, GDPR, HIPAA, NIST 800-53, and TSC) into a single "Regulatory Compliance" application [#8239](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8239) [#8303](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8303)
 - Updated Vulnerability Detection Discover tab filters, and inventory columns [#8262](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8262) [#8283](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8283) [#8292](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8292)
 - Changed FIM table columns and index source in the agent view [#8269](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8269)
-  <<<<<<< HEAD
-- # Changed index pattern usage in MITRE ATT&CK and Compliance panels in agent overview [#8307](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8307)
+- Changed index pattern usage in MITRE ATT&CK and Compliance panels in agent overview [#8307](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8307)
 - Updated Threat Hunting dashboard with new index pattern definition [#8281](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8281)
 - Changed Cluster and Logging configuration sections in Server Management Settings to use the full node configuration endpoint [#8289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8289)
 - Changed last alerts home KPIs title to findings [#8285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8285)
 - Changed IT Hygiene memory visualization [#8313](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8313)
 - Reduce the request done to get the index pattern to use in some views [#8318](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8318)
 - Changed default columns in Configuration assessment [#8320](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8320)
-  > > > > > > > af48615b5e9df579fafa79ce1e34e1fde9b8df7c
+- Set the downloaded local agent package name same to the remote one [#8350](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8350)
 
 ### Fixed
 
@@ -93,6 +92,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the under evaluation filter was removed on filter addition in Vulnerability Detection [#8252](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8252)
 - Fixed home KPIs not being vertically centered [#8267](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8267)
 - Fixed MITRE ATT&CK Findings data grid not spanning the full available width [#8311](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8311)
+- Fixed long labels in IT Hygiene horizontal bar visualizations causing display issues [#8330](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8330)
 
 ### Removed
 
