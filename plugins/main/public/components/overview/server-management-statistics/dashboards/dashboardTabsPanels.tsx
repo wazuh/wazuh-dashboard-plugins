@@ -106,6 +106,7 @@ export const DashboardTabsPanels = ({
         ErrorHandler.handleError(searchError);
       });
   }, [
+    isDataSourceLoading,
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
     dateRangeFrom,
