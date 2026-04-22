@@ -66,11 +66,12 @@ import {
   InventoryVuls,
   DashboardAzure,
 } from '../../overview';
+import type { tDataSourceRepository, tParsedIndexPattern } from '../data-source';
 import {
   DockerDataSource,
   AlertsVulnerabilitiesDataSource,
   AWSDataSource,
-  EventsCloudServicesDataSourceRepository,
+  FindingsCloudServicesDataSourceRepository,
   FIMFindingsDataSource,
   GitHubDataSource,
   MalwareDetectionDataSource,
@@ -117,7 +118,8 @@ const ButtonModuleGenerateReport = {
   component: ButtonModuleGenerateReportComponent,
 };
 
-const office365DiscoverRepository = new EventsCloudServicesDataSourceRepository();
+const office365DiscoverRepository =
+  new FindingsCloudServicesDataSourceRepository() as unknown as tDataSourceRepository<tParsedIndexPattern>;
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
