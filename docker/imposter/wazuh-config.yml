@@ -191,7 +191,7 @@ resources:
   - method: GET
     path: /cluster/{node_id}/info
 
-  # Get node config
+  # Get node config (raw)
   - method: GET
     path: /cluster/{node_id}/configuration
     queryParams:
@@ -199,6 +199,13 @@ resources:
     response:
       statusCode: 200
       staticFile: cluster/configuration_node.txt
+
+  # Get node config (JSON)
+  - method: GET
+    path: /cluster/{node_id}/configuration
+    response:
+      statusCode: 200
+      staticFile: cluster/configuration_full.json
 
   # Update node configuration
   - method: PUT
