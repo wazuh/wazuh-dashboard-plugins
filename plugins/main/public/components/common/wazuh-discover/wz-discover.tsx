@@ -43,7 +43,6 @@ import {
   IDataSourceFactoryConstructor,
   useDataSource,
   tParsedIndexPattern,
-  tDataSourceRepository,
   PatternDataSource,
   FindingsDataSourceRepository,
 } from '../data-source';
@@ -65,8 +64,6 @@ export type WazuhDiscoverProps = {
   tableColumns: tDataGridColumn[];
   DataSource: IDataSourceFactoryConstructor<PatternDataSource>;
   categoriesSampleData: string[];
-  /** When omitted, the default Wazuh findings index pattern is used. */
-  repository?: tDataSourceRepository<tParsedIndexPattern>;
 };
 
 const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
@@ -75,7 +72,6 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     DataSource,
     tableColumns: defaultTableColumns,
     categoriesSampleData,
-    repository: repositoryProp,
   } = props;
 
   if (!DataSource) {
@@ -90,10 +86,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
 
-  const indexPatternRepository = useMemo(
-    () => repositoryProp ?? new FindingsDataSourceRepository(),
-    [repositoryProp],
-  );
+  const FindingsRepository = new FindingsDataSourceRepository();
 
   const {
     dataSource,
@@ -105,7 +98,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     setFilters,
     error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    repository: indexPatternRepository,
+    repository: FindingsRepository,
     DataSource,
   });
 
