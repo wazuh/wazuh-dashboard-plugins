@@ -18,11 +18,12 @@ import { pciRequirementsFile } from '../../../../common/compliance-requirements/
 import { gdprRequirementsFile } from '../../../../common/compliance-requirements/gdpr-requirements';
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
 import { nistRequirementsFile } from '../../../../common/compliance-requirements/nist-requirements';
+import { nist171RequirementsFile } from '../../../../common/compliance-requirements/nist-171-requirements';
 import { tscRequirementsFile } from '../../../../common/compliance-requirements/tsc-requirements';
+import { iso27001RequirementsFile } from '../../../../common/compliance-requirements/iso27001-requirements';
 import { cmmcRequirementsFile } from '../../../../common/compliance-requirements/cmmc-requirements';
 import { fedrampRequirementsFile } from '../../../../common/compliance-requirements/fedramp-requirements';
 import { nis2RequirementsFile } from '../../../../common/compliance-requirements/nis2-requirements';
-
 import {
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
   UI_LOGGER_LEVELS,
@@ -45,96 +46,91 @@ import { useAsyncAction } from '../../common/hooks';
 import { WzSearchBar } from '../../common/search-bar';
 import { compose } from 'redux';
 
+function buildComplianceRequirements(
+  requirements: { [key: string]: string },
+  entriesBySeparator: number = 1,
+  separator: string = '.',
+) {
+  const complianceRequirements = {};
+  const selectedRequirements = {};
+
+  Object.keys(requirements).forEach(item => {
+    const _splitItem = item.split(separator);
+    const currentRequirement = _splitItem
+      .slice(0, entriesBySeparator)
+      .join(separator);
+    if (complianceRequirements[currentRequirement]) {
+      complianceRequirements[currentRequirement].push(item);
+    } else {
+      selectedRequirements[currentRequirement] = true;
+      complianceRequirements[currentRequirement] = [];
+      complianceRequirements[currentRequirement].push(item);
+    }
+  });
+
+  return {
+    descriptions: requirements,
+    selectedRequirements,
+    complianceRequirements,
+  };
+}
+
 function buildComplianceObject({ section }) {
   try {
     let complianceRequirements = {};
     let descriptions = {};
     let selectedRequirements = {}; // all enabled by default
     if (section === 'pci') {
-      descriptions = pciRequirementsFile;
-      Object.keys(pciRequirementsFile).forEach(item => {
-        const currentRequirement = item.split('.')[0];
-        if (complianceRequirements[currentRequirement]) {
-          complianceRequirements[currentRequirement].push(item);
-        } else {
-          selectedRequirements[currentRequirement] = true;
-          complianceRequirements[currentRequirement] = [];
-          complianceRequirements[currentRequirement].push(item);
-        }
-      }); //forEach
+      const r = buildComplianceRequirements(pciRequirementsFile, 1, '.');
+      complianceRequirements = r.complianceRequirements;
+      descriptions = r.descriptions;
+      selectedRequirements = r.selectedRequirements;
     }
     if (section === 'gdpr') {
-      descriptions = gdprRequirementsFile;
-      Object.keys(gdprRequirementsFile).forEach(item => {
-        const currentRequirement = item.split('_')[0];
-        if (complianceRequirements[currentRequirement]) {
-          complianceRequirements[currentRequirement].push(item);
-        } else {
-          selectedRequirements[currentRequirement] = true;
-          complianceRequirements[currentRequirement] = [];
-          complianceRequirements[currentRequirement].push(item);
-        }
-      }); //forEach
+      const r = buildComplianceRequirements(gdprRequirementsFile, 1, '_');
+      complianceRequirements = r.complianceRequirements;
+      descriptions = r.descriptions;
+      selectedRequirements = r.selectedRequirements;
     }
 
     if (section === 'hipaa') {
-      descriptions = hipaaRequirementsFile;
-      Object.keys(hipaaRequirementsFile).forEach(item => {
-        const currentRequirement =
-          item.split('.')[0] +
-          '.' +
-          item.split('.')[1] +
-          '.' +
-          item.split('.')[2];
-        if (complianceRequirements[currentRequirement]) {
-          complianceRequirements[currentRequirement].push(item);
-        } else {
-          selectedRequirements[currentRequirement] = true;
-          complianceRequirements[currentRequirement] = [];
-          complianceRequirements[currentRequirement].push(item);
-        }
-      }); //forEach
+      const r = buildComplianceRequirements(hipaaRequirementsFile, 3, '.');
+      complianceRequirements = r.complianceRequirements;
+      descriptions = r.descriptions;
+      selectedRequirements = r.selectedRequirements;
     }
 
     if (section === 'nist') {
-      descriptions = nistRequirementsFile;
-      Object.keys(nistRequirementsFile).forEach(item => {
-        const currentRequirement = item.split('-')[0];
-        if (complianceRequirements[currentRequirement]) {
-          complianceRequirements[currentRequirement].push(item);
-        } else {
-          selectedRequirements[currentRequirement] = true;
-          complianceRequirements[currentRequirement] = [];
-          complianceRequirements[currentRequirement].push(item);
-        }
-      }); //forEach
+      const r = buildComplianceRequirements(nistRequirementsFile, 1, '-');
+      complianceRequirements = r.complianceRequirements;
+      descriptions = r.descriptions;
+      selectedRequirements = r.selectedRequirements;
+    }
+    if (section === 'nist-800-171') {
+      const r = buildComplianceRequirements(nist171RequirementsFile, 2, '.');
+      complianceRequirements = r.complianceRequirements;
+      descriptions = r.descriptions;
+      selectedRequirements = r.selectedRequirements;
     }
     if (section === 'tsc') {
-      descriptions = tscRequirementsFile;
-      Object.keys(tscRequirementsFile).forEach(item => {
-        const currentRequirement = item.split('.')[0];
-        if (complianceRequirements[currentRequirement]) {
-          complianceRequirements[currentRequirement].push(item);
-        } else {
-          selectedRequirements[currentRequirement] = true;
-          complianceRequirements[currentRequirement] = [];
-          complianceRequirements[currentRequirement].push(item);
-        }
-      }); //forEach
+      const r = buildComplianceRequirements(tscRequirementsFile, 1, '.');
+      complianceRequirements = r.complianceRequirements;
+      descriptions = r.descriptions;
+      selectedRequirements = r.selectedRequirements;
+    }
+
+    if (section === 'iso-27001') {
+      const r = buildComplianceRequirements(iso27001RequirementsFile, 2, '.');
+      complianceRequirements = r.complianceRequirements;
+      descriptions = r.descriptions;
+      selectedRequirements = r.selectedRequirements;
     }
 
     if (section === 'cmmc') {
-      descriptions = cmmcRequirementsFile;
-      Object.keys(cmmcRequirementsFile).forEach(item => {
-        const currentRequirement = item.split('.')[0];
-        if (complianceRequirements[currentRequirement]) {
-          complianceRequirements[currentRequirement].push(item);
-        } else {
-          selectedRequirements[currentRequirement] = true;
-          complianceRequirements[currentRequirement] = [];
-          complianceRequirements[currentRequirement].push(item);
-        }
-      }); //forEach
+      const r = buildComplianceRequirements(cmmcRequirementsFile, 1, '.');
+      complianceRequirements = r.complianceRequirements;
+      descriptions = r.descriptions;
+      selectedRequirements = r.selectedRequirements;
     }
 
     if (section === 'nis2') {
@@ -162,17 +158,10 @@ function buildComplianceObject({ section }) {
     }
 
     if (section === 'fedramp') {
-      descriptions = fedrampRequirementsFile;
-      Object.keys(fedrampRequirementsFile).forEach(item => {
-        const currentRequirement = item.split('-')[0];
-        if (complianceRequirements[currentRequirement]) {
-          complianceRequirements[currentRequirement].push(item);
-        } else {
-          selectedRequirements[currentRequirement] = true;
-          complianceRequirements[currentRequirement] = [];
-          complianceRequirements[currentRequirement].push(item);
-        }
-      }); // forEach
+      const r = buildComplianceRequirements(fedrampRequirementsFile, 2, '.');
+      complianceRequirements = r.complianceRequirements;
+      descriptions = r.descriptions;
+      selectedRequirements = r.selectedRequirements;
     }
 
     return {
@@ -273,9 +262,11 @@ export const ComplianceTable = compose(
         gdpr: 'rule.compliance.gdpr',
         hipaa: 'rule.compliance.hipaa',
         nist: 'rule.compliance.nist_800_53',
+        'nist-800-171': 'rule.compliance.nist_800_171',
         tsc: 'rule.compliance.tsc',
         cmmc: 'rule.compliance.cmmc',
         fedramp: 'rule.compliance.fedramp',
+        'iso-27001': 'rule.compliance.iso_27001',
         nis2: 'rule.compliance.nis2',
       };
       const aggs = {
@@ -379,6 +370,8 @@ export const ComplianceTable = compose(
                         minWidth: 145,
                         maxHeight: 'calc(100vh - 320px)',
                         overflowX: 'hidden',
+                        overflowY: 'auto',
+                        backgroundColor: '#80808014',
                       }}
                     >
                       <ComplianceRequirements

@@ -1,10 +1,11 @@
 import { CommandGenerator } from './command-generator';
+import { IOSDefinition, IOptionalParameters, tOptionalParams } from '../types';
 import {
-  IOSDefinition,
-  IOptionalParameters,
-  tOptionalParams,
-} from '../types';
-import { DuplicatedOSException, DuplicatedOSOptionException, NoOSSelectedException, WazuhVersionUndefinedException } from '../exceptions';
+  DuplicatedOSException,
+  DuplicatedOSOptionException,
+  NoOSSelectedException,
+  WazuhVersionUndefinedException,
+} from '../exceptions';
 
 const mockedCommandValue = 'mocked command';
 const mockedCommandsResponse = jest.fn().mockReturnValue(mockedCommandValue);
@@ -28,8 +29,12 @@ export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
 
 // Defined Optional Parameters
 
-
-export type tOptionalParameters = 'server_address' | 'agent_name' | 'agent_group' | 'protocol' | 'wazuh_password';
+export type tOptionalParameters =
+  | 'server_address'
+  | 'agent_name'
+  | 'agent_group'
+  | 'protocol'
+  | 'wazuh_password';
 
 const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [
   {
@@ -39,12 +44,14 @@ const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [
         architecture: 'x64',
         installCommand: mockedCommandsResponse,
         startCommand: mockedCommandsResponse,
+        packageName: mockedCommandsResponse,
         urlPackage: mockedCommandsResponse,
       },
       {
         architecture: 'x86',
         installCommand: mockedCommandsResponse,
         startCommand: mockedCommandsResponse,
+        packageName: mockedCommandsResponse,
         urlPackage: mockedCommandsResponse,
       },
     ],
@@ -201,7 +208,10 @@ describe('Command Generator', () => {
   });
 
   it('should return an ERROR when the os definitions received has a os with options duplicated', () => {
-    const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [
+    const osDefinitions: IOSDefinition<
+      tOperatingSystem,
+      tOptionalParameters
+    >[] = [
       {
         name: 'linux',
         options: [
@@ -209,12 +219,14 @@ describe('Command Generator', () => {
             architecture: 'x64',
             installCommand: mockedCommandsResponse,
             startCommand: mockedCommandsResponse,
+            packageName: mockedCommandsResponse,
             urlPackage: mockedCommandsResponse,
           },
           {
             architecture: 'x64',
             installCommand: mockedCommandsResponse,
             startCommand: mockedCommandsResponse,
+            packageName: mockedCommandsResponse,
             urlPackage: mockedCommandsResponse,
           },
         ],
@@ -230,7 +242,10 @@ describe('Command Generator', () => {
   });
 
   it('should return an ERROR when the os definitions received has a os with options duplicated', () => {
-    const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [
+    const osDefinitions: IOSDefinition<
+      tOperatingSystem,
+      tOptionalParameters
+    >[] = [
       {
         name: 'linux',
         options: [
@@ -238,6 +253,7 @@ describe('Command Generator', () => {
             architecture: 'x64',
             installCommand: mockedCommandsResponse,
             startCommand: mockedCommandsResponse,
+            packageName: mockedCommandsResponse,
             urlPackage: mockedCommandsResponse,
           },
         ],
@@ -249,6 +265,7 @@ describe('Command Generator', () => {
             architecture: 'x64',
             installCommand: mockedCommandsResponse,
             startCommand: mockedCommandsResponse,
+            packageName: mockedCommandsResponse,
             urlPackage: mockedCommandsResponse,
           },
         ],
@@ -331,7 +348,9 @@ describe('Command Generator', () => {
       server_address: 'wazuh-ip',
     };
 
-    commandGenerator.addOptionalParams(optionalValues as IOptionalParameters<tOptionalParameters>);
+    commandGenerator.addOptionalParams(
+      optionalValues as IOptionalParameters<tOptionalParameters>,
+    );
     commandGenerator.getInstallCommand();
     expect(mockedCommandsResponse).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -363,7 +382,9 @@ describe('Command Generator', () => {
       server_address: 'wazuh-ip',
     };
 
-    commandGenerator.addOptionalParams(optionalValues as IOptionalParameters<tOptionalParameters>);
+    commandGenerator.addOptionalParams(
+      optionalValues as IOptionalParameters<tOptionalParameters>,
+    );
     commandGenerator.getStartCommand();
     expect(mockedCommandsResponse).toHaveBeenCalledWith(
       expect.objectContaining({

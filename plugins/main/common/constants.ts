@@ -564,6 +564,7 @@ export enum WAZUH_MODULES_ID {
   PCI_DSS = 'pci',
   HIPAA = 'hipaa',
   NIST_800_53 = 'nist',
+  NIST_800_171 = 'nist-800-171',
   TSC = 'tsc',
   NIS2 = 'nis2',
   VIRUSTOTAL = 'virustotal',
@@ -611,6 +612,8 @@ export const DATA_SOURCE_FILTER_CONTROLLED_TSC_EXIST = 'tsc-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_CMMC_EXIST = 'cmmc-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_NIST_800_53_EXIST =
   'nist-800-53-rule-exist';
+export const DATA_SOURCE_FILTER_CONTROLLED_NIST_800_171_EXIST =
+  'nist-800-171-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_GDPR_EXIST = 'gdpr-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_HIPAA_EXIST = 'hipaa-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_NIS2_EXIST = 'nis2-rule-exist';
@@ -630,6 +633,8 @@ export const DATA_SOURCE_FILTER_CONTROLLED_AZURE_RULE_GROUP =
 export const DATA_SOURCE_FILTER_CONTROLLED_FIM_RULE_GROUP = 'fim-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_CONFIGURATION_ASSASSMENT_RULE_GROUP =
   'configuration-assessment-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_ISO27001_EXIST =
+  'iso27001-rule-exist';
 
 // Wazuh links
 export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';
@@ -1022,17 +1027,25 @@ export const HIPAA_AGENT_DASHBOARD_ID = 'hipaa-pinned-agent-dashboard-tab';
 export const NIST_800_53_DASHBOARD_ID = 'nist-overview-dashboard-tab';
 export const NIST_800_53_AGENT_DASHBOARD_ID = 'nist-pinned-agent-dashboard-tab';
 
+export const NIST_800_171_DASHBOARD_ID = 'nist-800-171-overview-dashboard-tab';
+export const NIST_800_171_AGENT_DASHBOARD_ID =
+  'nist-800-171-pinned-agent-dashboard-tab';
+
 export const TSC_DASHBOARD_ID = 'tsc-overview-dashboard-tab';
 export const TSC_AGENT_DASHBOARD_ID = 'tsc-pinned-agent-dashboard-tab';
 
 export const CMMC_DASHBOARD_ID = 'cmmc-overview-dashboard-tab';
 export const CMMC_AGENT_DASHBOARD_ID = 'cmmc-pinned-agent-dashboard-tab';
 
-export const NIS2_DASHBOARD_ID = 'nis2-overview-dashboard-tab';
-export const NIS2_AGENT_DASHBOARD_ID = 'nis2-pinned-agent-dashboard-tab';
+export const ISO27001_DASHBOARD_ID = 'iso27001-overview-dashboard-tab';
+export const ISO27001_AGENT_DASHBOARD_ID =
+  'iso27001-pinned-agent-dashboard-tab';
 
 export const FEDRAMP_DASHBOARD_ID = 'fedramp-overview-dashboard-tab';
 export const FEDRAMP_AGENT_DASHBOARD_ID = 'fedramp-pinned-agent-dashboard-tab';
+
+export const NIS2_DASHBOARD_ID = 'nis2-overview-dashboard-tab';
+export const NIS2_AGENT_DASHBOARD_ID = 'nis2-pinned-agent-dashboard-tab';
 
 export const GITHUB_DASHBOARD_ID = 'github-overview-dashboard-tab';
 export const GITHUB_AGENT_DASHBOARD_ID = 'github-pinned-agent-dashboard-tab';

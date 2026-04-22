@@ -8,6 +8,7 @@ export { DashboardGoogleCloud } from './google-cloud/dashboards';
 export { DashboardHIPAA } from './regulatory-compliance/hipaa/dashboards';
 export { DashboardMalwareDetection } from './malware-detection/dashboard';
 export { DashboardNIST80053 } from './regulatory-compliance/nist/dashboards';
+export { DashboardNIST800171 } from './regulatory-compliance/nist-800-171/dashboards';
 export { DashboardPCIDSS } from './regulatory-compliance/pci/dashboards';
 export { DashboardNIS2 } from './regulatory-compliance/nis2/dashboards';
 export { DashboardOffice365 } from './office/dashboard';

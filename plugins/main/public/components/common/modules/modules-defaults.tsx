@@ -96,14 +96,16 @@ import {
   ITHygieneServicesInventory,
 } from '../../overview/it-hygiene';
 import {
-  RegulatoryCompliancePCIDSS,
-  RegulatoryComplianceGDPR,
-  RegulatoryComplianceHIPAA,
-  RegulatoryComplianceNIST80053,
-  RegulatoryComplianceTSC,
   RegulatoryComplianceCMMC,
   RegulatoryComplianceFedRAMP,
+  RegulatoryComplianceGDPR,
+  RegulatoryComplianceHIPAA,
+  RegulatoryComplianceISO27001,
   RegulatoryComplianceNIS2,
+  RegulatoryComplianceNIST800171,
+  RegulatoryComplianceNIST80053,
+  RegulatoryCompliancePCIDSS,
+  RegulatoryComplianceTSC,
 } from '../../overview/regulatory-compliance';
 import { InventoryFIM } from '../../overview/fim';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
@@ -592,10 +594,16 @@ export const ModulesDefaults = {
     init: 'pci-dss',
     tabs: [
       {
-        id: 'pci-dss',
-        name: 'PCI DSS',
+        id: 'cmmc',
+        name: 'CMMC',
         buttons: [ButtonExploreAgent],
-        component: RegulatoryCompliancePCIDSS,
+        component: RegulatoryComplianceCMMC,
+      },
+      {
+        id: 'fedramp',
+        name: 'FedRAMP',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceFedRAMP,
       },
       {
         id: 'gdpr',
@@ -610,34 +618,40 @@ export const ModulesDefaults = {
         component: RegulatoryComplianceHIPAA,
       },
       {
-        id: 'nist-800-53',
-        name: 'NIST 800-53',
+        id: 'iso-27001',
+        name: 'ISO 27001',
         buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceNIST80053,
-      },
-      {
-        id: 'tsc',
-        name: 'TSC',
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceTSC,
-      },
-      {
-        id: 'cmmc',
-        name: 'CMMC',
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceCMMC,
-      },
-      {
-        id: 'fedramp',
-        name: 'FedRAMP',
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceFedRAMP,
+        component: RegulatoryComplianceISO27001,
       },
       {
         id: 'nis2',
         name: 'NIS2',
         buttons: [ButtonExploreAgent],
         component: RegulatoryComplianceNIS2,
+      },
+      {
+        id: 'nist-800-53',
+        name: 'NIST 800-53',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceNIST80053,
+      },
+      {
+        id: 'nist-800-171',
+        name: 'NIST 800-171',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceNIST800171,
+      },
+      {
+        id: 'pci-dss',
+        name: 'PCI DSS',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryCompliancePCIDSS,
+      },
+      {
+        id: 'tsc',
+        name: 'TSC',
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceTSC,
       },
     ],
     availableFor: ['manager', 'agent'],

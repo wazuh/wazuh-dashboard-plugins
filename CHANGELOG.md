@@ -25,7 +25,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added Indexer configuration UI section in Server Management Settings [#8289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8289)
 - Added CMMC regulatory compliance module [#8290](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8290)
 - Added FedRAMP regulatory compliance module [#8296](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8296)
+- Added ISO 27001 regulatory compliance module [#8286](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8286)
 - Added NIS2 regulatory compliance module [#8298](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8298)
+- Added NIST 800-171 regulatory compliance module [#8294](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8294)
 
 ### Changed
 
@@ -71,11 +73,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Centralized regulatory compliance modules (PCI DSS, GDPR, HIPAA, NIST 800-53, and TSC) into a single "Regulatory Compliance" application [#8239](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8239) [#8303](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8303)
 - Updated Vulnerability Detection Discover tab filters, and inventory columns [#8262](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8262) [#8283](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8283) [#8292](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8292)
 - Changed FIM table columns and index source in the agent view [#8269](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8269)
+- Updated Threat Hunting dashboard with new index pattern definition [#8281](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8281)
 - Changed Cluster and Logging configuration sections in Server Management Settings to use the full node configuration endpoint [#8289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8289)
 - Changed last alerts home KPIs title to findings [#8285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8285)
 - Changed IT Hygiene memory visualization [#8313](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8313)
 - Reduce the request done to get the index pattern to use in some views [#8318](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8318)
 - Changed default columns in Configuration assessment [#8320](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8320)
+- Set the downloaded local agent package name same to the remote one [#8350](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8350)
 
 ### Fixed
 
@@ -87,6 +91,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the under evaluation filter was removed on filter addition in Vulnerability Detection [#8252](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8252)
 - Fixed home KPIs not being vertically centered [#8267](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8267)
 - Fixed MITRE ATT&CK Findings data grid not spanning the full available width [#8311](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8311)
+- Fixed long labels in IT Hygiene horizontal bar visualizations causing display issues [#8330](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8330)
 
 ### Removed
 

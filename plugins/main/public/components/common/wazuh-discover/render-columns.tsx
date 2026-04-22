@@ -125,6 +125,10 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
     render: renderRequirementsSecurityOperations,
   },
   {
+    id: 'rule.compliance.iso_27001',
+    render: renderRequirementsSecurityOperations,
+  },
+  {
     id: 'rule.compliance.nist_800_53',
     render: renderRequirementsSecurityOperations,
   },
@@ -134,6 +138,10 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   },
   {
     id: 'rule.compliance.tsc',
+    render: renderRequirementsSecurityOperations,
+  },
+  {
+    id: 'rule.compliance.nist_800_171',
     render: renderRequirementsSecurityOperations,
   },
   {
