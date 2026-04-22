@@ -354,9 +354,7 @@ const TEMPLATE_SOURCES = {
   },
   'threatintel-enrichments': {
     urls: [
-      wazuhUrl(
-        'plugins/setup/src/main/resources/templates/content/ioc.json',
-      ),
+      wazuhUrl('plugins/setup/src/main/resources/templates/content/ioc.json'),
     ],
     outputFile: 'threatintel-enrichments.json',
   },

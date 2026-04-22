@@ -121,7 +121,8 @@ export const KnownFieldsByIndexType = {
     inventoryBrowserExtensionsFields,
   [WAZUH_INDEX_TYPE_STATES_SCA]: inventorySCAFields,
   [WAZUH_INDEX_TYPE_THREATINTEL_ENRICHMENTS]: threatintelEnrichmentsFields,
-  [WAZUH_INDEX_TYPE_THREATINTEL_VULNERABILITIES]: threatintelVulnerabilitiesFields,
+  [WAZUH_INDEX_TYPE_THREATINTEL_VULNERABILITIES]:
+    threatintelVulnerabilitiesFields,
 };
 
 /**
