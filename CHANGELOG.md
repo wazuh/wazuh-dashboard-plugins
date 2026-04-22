@@ -90,6 +90,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the under evaluation filter was removed on filter addition in Vulnerability Detection [#8252](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8252)
 - Fixed home KPIs not being vertically centered [#8267](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8267)
 - Fixed MITRE ATT&CK Findings data grid not spanning the full available width [#8311](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8311)
+- Fixed long labels in IT Hygiene horizontal bar visualizations causing display issues [#8330](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8330)
 
 ### Removed
 
