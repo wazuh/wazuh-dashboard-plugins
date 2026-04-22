@@ -79,7 +79,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed IT Hygiene memory visualization [#8313](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8313)
 - Reduce the request done to get the index pattern to use in some views [#8318](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8318)
 - Changed default columns in Configuration assessment [#8320](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8320)
-- Set the downloaded local agent package same to the remote one [#8350](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8350)
+- Set the downloaded local agent package name same to the remote one [#8350](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8350)
 
 ### Fixed
 
