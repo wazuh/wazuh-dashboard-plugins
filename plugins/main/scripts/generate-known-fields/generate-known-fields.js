@@ -651,8 +651,9 @@ function extractFields(mappings, properties) {
     }
     if (field?.name.includes('*')) {
       issues.addWarning(
-        `Field name contains wildcard: ${field.name}.`,
+        `Field name contains wildcard: ${field.name}, skipping field extraction.`,
       );
+      continue;
     }
     if (!uniqueFieldsMap.has(field.name)) {
       uniqueFieldsMap.set(field.name, field);
