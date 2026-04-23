@@ -57,8 +57,7 @@ export const getAllOptionalsMacos = (
 export const getDEBAMD64InstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
-  const { optionals, urlPackage, wazuhVersion } = props;
-  const packageName = `wazuh-agent_${wazuhVersion}-1_amd64.deb`;
+  const { optionals, urlPackage, packageName } = props;
   return `wget ${urlPackage} && sudo ${
     optionals && getAllOptionals(optionals)
   }dpkg -i ./${packageName}`;
@@ -67,8 +66,7 @@ export const getDEBAMD64InstallCommand = (
 export const getDEBARM64InstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
-  const { optionals, urlPackage, wazuhVersion } = props;
-  const packageName = `wazuh-agent_${wazuhVersion}-1_arm64.deb`;
+  const { optionals, urlPackage, packageName } = props;
   return `wget ${urlPackage} && sudo ${
     optionals && getAllOptionals(optionals)
   }dpkg -i ./${packageName}`;
@@ -79,8 +77,7 @@ export const getDEBARM64InstallCommand = (
 export const getRPMAMD64InstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
-  const { optionals, urlPackage, wazuhVersion, architecture } = props;
-  const packageName = `wazuh-agent-${wazuhVersion}-1.x86_64.rpm`;
+  const { optionals, urlPackage, packageName } = props;
   return `curl -o ${packageName} ${urlPackage} && sudo ${
     optionals && getAllOptionals(optionals)
   }rpm -ihv ${packageName}`;
@@ -89,8 +86,7 @@ export const getRPMAMD64InstallCommand = (
 export const getRPMARM64InstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
-  const { optionals, urlPackage, wazuhVersion, architecture } = props;
-  const packageName = `wazuh-agent-${wazuhVersion}-1.aarch64.rpm`;
+  const { optionals, urlPackage, packageName } = props;
   return `curl -o ${packageName} ${urlPackage} && sudo ${
     optionals && getAllOptionals(optionals)
   }rpm -ihv ${packageName}`;
@@ -110,8 +106,8 @@ export const getLinuxStartCommand = (
 export const getWindowsInstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
-  const { optionals, urlPackage, name } = props;
-  return `Invoke-WebRequest -Uri ${urlPackage} -OutFile \$env:tmp\\wazuh-agent; msiexec.exe /i \$env:tmp\\wazuh-agent /q ${
+  const { optionals, urlPackage, packageName, name } = props;
+  return `Invoke-WebRequest -Uri ${urlPackage} -OutFile \$env:tmp\\${packageName}; msiexec.exe /i \$env:tmp\\${packageName} /q ${
     optionals && getAllOptionals(optionals, name)
   }`;
 };
@@ -134,7 +130,7 @@ export const transformOptionalsParamatersMacOSCommand = (command: string) => {
 export const getMacOsInstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
-  const { optionals, urlPackage } = props;
+  const { optionals, urlPackage, packageName } = props;
 
   let optionalsForCommand = { ...optionals };
   if (optionalsForCommand?.wazuhPassword) {
@@ -165,7 +161,7 @@ export const getMacOsInstallCommand = (
     : ``;
 
   // Merge environment variables with installation script
-  const macOSInstallationScript = `curl -so wazuh-agent.pkg ${urlPackage} && ${macOSInstallationSetEnvVariablesScript}sudo installer -pkg ./wazuh-agent.pkg -target /`;
+  const macOSInstallationScript = `curl -so ${packageName} ${urlPackage} && ${macOSInstallationSetEnvVariablesScript}sudo installer -pkg ./${packageName} -target /`;
   return macOSInstallationScript;
 };
 
