@@ -352,6 +352,20 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'active-responses.json',
   },
+  'threatintel-enrichments': {
+    urls: [
+      wazuhUrl('plugins/setup/src/main/resources/templates/content/ioc.json'),
+    ],
+    outputFile: 'threatintel-enrichments.json',
+  },
+  'threatintel-vulnerabilities': {
+    urls: [
+      wazuhUrl(
+        'plugins/content-manager/src/main/resources/mappings/cti-cve-mappings.json',
+      ),
+    ],
+    outputFile: 'threatintel-vulnerabilities.json',
+  },
 };
 
 /**
@@ -637,6 +651,7 @@ function extractFields(mappings, properties) {
       issues.addWarning(
         `Field name contains wildcard: ${field.name}, skipping field extraction.`,
       );
+      continue;
     }
     if (!uniqueFieldsMap.has(field.name)) {
       uniqueFieldsMap.set(field.name, field);
