@@ -75,6 +75,7 @@ export enum WAZUH_MODULES_ID {
   HIPAA = 'hipaa',
   NIST_800_53 = 'nist',
   TSC = 'tsc',
+  ISO_27001 = 'iso-27001',
   NIS2 = 'nis2',
   VIRUSTOTAL = 'virustotal',
   GDPR = 'gdpr',

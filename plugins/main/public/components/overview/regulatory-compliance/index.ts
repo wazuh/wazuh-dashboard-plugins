@@ -6,4 +6,5 @@ export { RegulatoryComplianceNIST800171 } from './nist-800-171';
 export { RegulatoryComplianceTSC } from './tsc';
 export { RegulatoryComplianceCMMC } from './cmmc';
 export { RegulatoryComplianceFedRAMP } from './fedramp';
+export { RegulatoryComplianceISO27001 } from './iso27001';
 export { RegulatoryComplianceNIS2 } from './nis2';

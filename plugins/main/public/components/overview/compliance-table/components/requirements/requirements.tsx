@@ -194,6 +194,9 @@ export class ComplianceRequirements extends Component {
     if (this.props.section === 'fedramp') {
       title = 'FedRAMP';
     }
+    if (this.props.section === 'iso-27001') {
+      title = 'ISO 27001';
+    }
     if (this.props.section === 'nis2') {
       title = 'NIS2';
     }
