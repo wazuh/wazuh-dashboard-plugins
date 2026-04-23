@@ -58,20 +58,18 @@ export const getDEBAMD64InstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
   const { optionals, urlPackage, wazuhVersion } = props;
-  const packageName = `wazuh-agent_${wazuhVersion}-1_amd64.deb`;
-  return `wget ${urlPackage} && sudo ${
-    optionals && getAllOptionals(optionals)
-  }dpkg -i ./${packageName}`;
+  const packageName = `wazuh-agent_${wazuhVersion}-beta1_amd64.deb`;
+  return `wget ${urlPackage} && sudo ${optionals && getAllOptionals(optionals)
+    }dpkg -i ./${packageName}`;
 };
 
 export const getDEBARM64InstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
   const { optionals, urlPackage, wazuhVersion } = props;
-  const packageName = `wazuh-agent_${wazuhVersion}-1_arm64.deb`;
-  return `wget ${urlPackage} && sudo ${
-    optionals && getAllOptionals(optionals)
-  }dpkg -i ./${packageName}`;
+  const packageName = `wazuh-agent_${wazuhVersion}-beta1_arm64.deb`;
+  return `wget ${urlPackage} && sudo ${optionals && getAllOptionals(optionals)
+    }dpkg -i ./${packageName}`;
 };
 
 /******* RPM *******/
@@ -80,20 +78,18 @@ export const getRPMAMD64InstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
   const { optionals, urlPackage, wazuhVersion, architecture } = props;
-  const packageName = `wazuh-agent-${wazuhVersion}-1.x86_64.rpm`;
-  return `curl -o ${packageName} ${urlPackage} && sudo ${
-    optionals && getAllOptionals(optionals)
-  }rpm -ihv ${packageName}`;
+  const packageName = `wazuh-agent-${wazuhVersion}-beta1.x86_64.rpm`;
+  return `curl -o ${packageName} ${urlPackage} && sudo ${optionals && getAllOptionals(optionals)
+    }rpm -ihv ${packageName}`;
 };
 
 export const getRPMARM64InstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
   const { optionals, urlPackage, wazuhVersion, architecture } = props;
-  const packageName = `wazuh-agent-${wazuhVersion}-1.aarch64.rpm`;
-  return `curl -o ${packageName} ${urlPackage} && sudo ${
-    optionals && getAllOptionals(optionals)
-  }rpm -ihv ${packageName}`;
+  const packageName = `wazuh-agent-${wazuhVersion}-beta1.aarch64.rpm`;
+  return `curl -o ${packageName} ${urlPackage} && sudo ${optionals && getAllOptionals(optionals)
+    }rpm -ihv ${packageName}`;
 };
 
 /******* Linux *******/
@@ -111,9 +107,8 @@ export const getWindowsInstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
   const { optionals, urlPackage, name } = props;
-  return `Invoke-WebRequest -Uri ${urlPackage} -OutFile \$env:tmp\\wazuh-agent; msiexec.exe /i \$env:tmp\\wazuh-agent /q ${
-    optionals && getAllOptionals(optionals, name)
-  }`;
+  return `Invoke-WebRequest -Uri ${urlPackage} -OutFile \$env:tmp\\wazuh-agent; msiexec.exe /i \$env:tmp\\wazuh-agent /q ${optionals && getAllOptionals(optionals, name)
+    }`;
 };
 
 export const getWindowsStartCommand = (
