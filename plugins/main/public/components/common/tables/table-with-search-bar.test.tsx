@@ -19,7 +19,7 @@ import { TableWithSearchBar } from './table-with-search-bar';
 jest.mock('../../../kibana-services', () => ({
   getHttp: () => ({
     basePath: {
-      prepend: str => str,
+      prepend: (str) => str,
     },
   }),
   getCookies: () => {
@@ -31,7 +31,7 @@ jest.mock('../../../kibana-services', () => ({
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: options => {},
+    handleError: (options) => {},
   }),
 }));
 
@@ -39,7 +39,7 @@ jest.mock(
   '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
-  }),
+  })
 );
 
 const columns = [
@@ -95,9 +95,7 @@ const tableProps = {
 };
 
 beforeAll(() => {
-  global.Date.now = jest.fn(() =>
-    new Date('2024-12-02T14:35:10.123').getTime(),
-  );
+  global.Date.now = jest.fn(() => new Date('2024-12-02T14:35:10.123').getTime());
 });
 
 describe('Table With Search Bar component', () => {

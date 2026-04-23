@@ -54,7 +54,7 @@ jest.mock(
   '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
-  }),
+  })
 );
 
 jest.mock('react-use/lib/useObservable', () => () => {});
@@ -93,7 +93,7 @@ jest.mock('../../../kibana-services', () => ({
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: options => {},
+    handleError: (options) => {},
   }),
 }));
 
@@ -109,7 +109,7 @@ describe('Stats component', () => {
           total={11}
           error={null}
           isAgentsLoading={false}
-        />,
+        />
       );
       expect(container).toMatchSnapshot();
     });
