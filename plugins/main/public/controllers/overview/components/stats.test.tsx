@@ -57,7 +57,7 @@ jest.mock(
   }),
 );
 
-jest.mock('react-use/lib/useObservable', () => () => {});
+jest.mock('react-use/lib/useObservable', () => () => { });
 jest.mock('./last-alerts-stat/last-alerts-service', () => ({
   getLast24HoursAlerts: jest.fn().mockReturnValue({
     count: 100,
@@ -93,14 +93,15 @@ jest.mock('../../../kibana-services', () => ({
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: options => {},
+    handleError: options => { },
   }),
 }));
 
 describe('Stats component', () => {
   test('renders correctly to match the snapshot', async () => {
+    let container: HTMLElement;
     await act(async () => {
-      const { container } = render(
+      const { container: renderedContainer } = render(
         <Stats
           active={8}
           disconnected={0}
@@ -111,7 +112,8 @@ describe('Stats component', () => {
           isAgentsLoading={false}
         />,
       );
-      expect(container).toMatchSnapshot();
+      container = renderedContainer;
     });
+    expect(container).toMatchSnapshot();
   });
 });
