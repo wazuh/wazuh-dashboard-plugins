@@ -40,7 +40,7 @@ jest.mock('../../../kibana-services', () => ({
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: (options) => {},
+    handleError: (options) => { },
   }),
 }));
 
@@ -90,7 +90,7 @@ describe('Table WZ API component', () => {
       },
     });
     (useStateStorage as jest.Mock).mockReturnValue([[], jest.fn()]);
-    (WzRequest.apiReq as jest.Mock).mockReturnValue(new Promise(() => {}));
+    (WzRequest.apiReq as jest.Mock).mockReturnValue(new Promise(() => { }));
 
     let wrapper = null;
 

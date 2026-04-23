@@ -147,7 +147,7 @@ describe('WzSearchBar', () => {
       'should take query inputs "%j" and create search badges when queries are VALID/COMPLETE',
       async (inputs) => {
         const spyReactConsoleError = jest.spyOn(console, 'error');
-        spyReactConsoleError.mockImplementation(() => {});
+        spyReactConsoleError.mockImplementation(() => { });
         const spyOnChange = jest.spyOn(ComponentWithWzSearchBar.prototype, 'onFilterChanges');
         const { getByRole, getByText, getByTestId } = render(<ComponentWithWzSearchBar />);
         const searchInput = getByRole('textbox') as HTMLInputElement;
@@ -192,7 +192,7 @@ describe('WzSearchBar', () => {
       ' OR name=test1 OR ',
     ])('should NOT apply filter "%s" when the query is INVALID/INCOMPLETE', (inputQuery) => {
       const spyReactConsoleError = jest.spyOn(console, 'error');
-      spyReactConsoleError.mockImplementation(() => {});
+      spyReactConsoleError.mockImplementation(() => { });
       const spyOnChange = jest.spyOn(ComponentWithWzSearchBar.prototype, 'onFilterChanges');
       const { getByRole } = render(<ComponentWithWzSearchBar />);
       const searchInput = getByRole('textbox') as HTMLInputElement;
@@ -209,7 +209,7 @@ describe('WzSearchBar', () => {
 
     it('should not apply filters when input is empty', () => {
       const spyReactConsoleError = jest.spyOn(console, 'error');
-      spyReactConsoleError.mockImplementation(() => {});
+      spyReactConsoleError.mockImplementation(() => { });
       const spyOnChange = jest.spyOn(ComponentWithWzSearchBar.prototype, 'onFilterChanges');
       const { getByRole } = render(<ComponentWithWzSearchBar />);
       const searchInput = getByRole('textbox') as HTMLInputElement;

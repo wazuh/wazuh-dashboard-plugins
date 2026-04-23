@@ -5,9 +5,9 @@ import '@testing-library/jest-dom/extend-expect';
 
 /* It is necessary to mock the ResizeObserver class because it is used in the useChartDimensions hook in one of the DonutChart subcomponents */
 class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() { }
+  unobserve() { }
+  disconnect() { }
 }
 global.ResizeObserver = ResizeObserver;
 
