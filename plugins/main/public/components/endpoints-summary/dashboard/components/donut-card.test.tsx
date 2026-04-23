@@ -5,9 +5,9 @@ import '@testing-library/jest-dom/extend-expect';
 
 /* It is necessary to mock the ResizeObserver class because it is used in the useChartDimensions hook in one of the DonutChart subcomponents */
 class ResizeObserver {
-  observe() { }
-  unobserve() { }
-  disconnect() { }
+  observe() {}
+  unobserve() {}
+  disconnect() {}
 }
 global.ResizeObserver = ResizeObserver;
 
@@ -50,18 +50,18 @@ describe('DonutCard', () => {
   it('renders with data', () => {
     const { getByText } = render(
       <DonutCard
-        title='Component title example'
-        description='Component description example'
-        betaBadgeLabel='Component betaBadgeLabel example'
+        title="Component title example"
+        description="Component description example"
+        betaBadgeLabel="Component betaBadgeLabel example"
         data={mockData}
         isLoading={mockIsLoading}
-      />,
+      />
     );
 
     expect(getByText('Component title example')).toBeInTheDocument();
     expect(getByText('Component description example')).toBeInTheDocument();
     expect(getByText('Component betaBadgeLabel example')).toBeInTheDocument();
-    mockData.forEach(element => {
+    mockData.forEach((element) => {
       expect(getByText(`${element.label} (${element.value})`)).toBeInTheDocument();
     });
   });
@@ -72,11 +72,11 @@ describe('DonutCard', () => {
 
     const { getByText } = render(
       <DonutCard
-        title='Component title example'
+        title="Component title example"
         data={mockData}
         isLoading={mockIsLoading}
         onClickLabel={handleClick}
-      />,
+      />
     );
 
     fireEvent.click(getByText(`${firstMockData.label} (${firstMockData.value})`));
@@ -90,14 +90,12 @@ describe('DonutCard', () => {
       <DonutCard
         data={mockNoData}
         isLoading={mockIsLoading}
-        noDataTitle='Component no data title example message'
-        noDataMessage='Component no data example message'
-      />,
+        noDataTitle="Component no data title example message"
+        noDataMessage="Component no data example message"
+      />
     );
 
-    expect(
-      getByText('Component no data title example message'),
-    ).toBeInTheDocument();
+    expect(getByText('Component no data title example message')).toBeInTheDocument();
     expect(getByText('Component no data example message')).toBeInTheDocument();
   });
 });

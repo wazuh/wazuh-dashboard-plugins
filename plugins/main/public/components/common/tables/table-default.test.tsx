@@ -20,14 +20,14 @@ import { TableDefault } from './table-default';
 jest.mock('../../../kibana-services', () => ({
   getHttp: () => ({
     basePath: {
-      prepend: str => str,
+      prepend: (str) => str,
     },
   }),
 }));
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: options => { },
+    handleError: (options) => {},
   }),
 }));
 
@@ -35,7 +35,7 @@ jest.mock(
   '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
-  }),
+  })
 );
 
 const columns = [
@@ -64,7 +64,7 @@ const columns = [
 ];
 
 const tableProps = {
-  onSearch: jest.fn().mockReturnValue(new Promise(() => { })),
+  onSearch: jest.fn().mockReturnValue(new Promise(() => {})),
   tableColumns: columns,
   tablePageSizeOptions: [15, 25, 50, 100],
   tableInitialSortingDirection: 'asc' as const,

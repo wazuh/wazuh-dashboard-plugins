@@ -63,12 +63,10 @@ describe('AgentStats', () => {
           agent={{
             id: '002',
           }}
-        />,
+        />
       );
 
-      const agentInfoRibbon = container.querySelector(
-        queryDataTestAttr('agent-info'),
-      );
+      const agentInfoRibbon = container.querySelector(queryDataTestAttr('agent-info'));
       expect(agentInfoRibbon).toBeFalsy();
     });
   });
@@ -80,42 +78,22 @@ describe('AgentStats', () => {
       ({ container } = render(<AgentStats agent={{ id: '002' }} />));
     });
 
-    expect(
-      container!.querySelector(queryDataTestAttr('ribbon-item-status')),
-    ).toBeTruthy();
+    expect(container!.querySelector(queryDataTestAttr('ribbon-item-status'))).toBeTruthy();
+
+    expect(container!.querySelector(queryDataTestAttr('ribbon-item-buffer_enabled'))).toBeTruthy();
+
+    expect(container!.querySelector(queryDataTestAttr('ribbon-item-msg_buffer'))).toBeTruthy();
+
+    expect(container!.querySelector(queryDataTestAttr('ribbon-item-msg_count'))).toBeTruthy();
+
+    expect(container!.querySelector(queryDataTestAttr('ribbon-item-msg_sent'))).toBeTruthy();
+
+    expect(container!.querySelector(queryDataTestAttr('ribbon-item-last_ack'))).toBeTruthy();
+
+    expect(container!.querySelector(queryDataTestAttr('ribbon-item-last_keepalive'))).toBeTruthy();
 
     expect(
-      container!.querySelector(
-        queryDataTestAttr('ribbon-item-buffer_enabled'),
-      ),
-    ).toBeTruthy();
-
-    expect(
-      container!.querySelector(queryDataTestAttr('ribbon-item-msg_buffer')),
-    ).toBeTruthy();
-
-    expect(
-      container!.querySelector(queryDataTestAttr('ribbon-item-msg_count')),
-    ).toBeTruthy();
-
-    expect(
-      container!.querySelector(queryDataTestAttr('ribbon-item-msg_sent')),
-    ).toBeTruthy();
-
-    expect(
-      container!.querySelector(queryDataTestAttr('ribbon-item-last_ack')),
-    ).toBeTruthy();
-
-    expect(
-      container!.querySelector(
-        queryDataTestAttr('ribbon-item-last_keepalive'),
-      ),
-    ).toBeTruthy();
-
-    expect(
-      container!.querySelectorAll(
-        queryDataTestAttr('ribbon-item-', CSS.Attribute.Substring),
-      ),
+      container!.querySelectorAll(queryDataTestAttr('ribbon-item-', CSS.Attribute.Substring))
     ).toHaveLength(7);
   });
 
@@ -129,16 +107,8 @@ describe('AgentStats', () => {
     });
 
     expect(apiReqMock).toHaveBeenCalledTimes(2);
-    expect(apiReqMock.mock.calls[0]).toEqual([
-      'GET',
-      `/agents/${agent002}/stats/logcollector`,
-      {},
-    ]);
-    expect(apiReqMock.mock.calls[1]).toEqual([
-      'GET',
-      `/agents/${agent002}/stats/agent`,
-      {},
-    ]);
+    expect(apiReqMock.mock.calls[0]).toEqual(['GET', `/agents/${agent002}/stats/logcollector`, {}]);
+    expect(apiReqMock.mock.calls[1]).toEqual(['GET', `/agents/${agent002}/stats/agent`, {}]);
 
     apiReqMock.mockClear();
 
@@ -147,16 +117,8 @@ describe('AgentStats', () => {
     });
 
     expect(apiReqMock).toHaveBeenCalledTimes(2);
-    expect(apiReqMock.mock.calls[0]).toEqual([
-      'GET',
-      `/agents/${agent001}/stats/logcollector`,
-      {},
-    ]);
-    expect(apiReqMock.mock.calls[1]).toEqual([
-      'GET',
-      `/agents/${agent001}/stats/agent`,
-      {},
-    ]);
+    expect(apiReqMock.mock.calls[0]).toEqual(['GET', `/agents/${agent001}/stats/logcollector`, {}]);
+    expect(apiReqMock.mock.calls[1]).toEqual(['GET', `/agents/${agent001}/stats/agent`, {}]);
   });
 
   it('should maintain column structure across multiple renders, either when changing agent or not', async () => {
@@ -211,12 +173,8 @@ describe('AgentStats', () => {
       ({ rerender } = render(<AgentStats agent={{ id: agent002 }} />));
     });
 
-    expect(AgentStatTableMock.mock.calls[0][0].title).toEqual(
-      mockDataStatLogcollectorTitle,
-    );
-    expect(AgentStatTableMock.mock.calls[1][0].title).toEqual(
-      mockDataStatAgentTitle,
-    );
+    expect(AgentStatTableMock.mock.calls[0][0].title).toEqual(mockDataStatLogcollectorTitle);
+    expect(AgentStatTableMock.mock.calls[1][0].title).toEqual(mockDataStatAgentTitle);
 
     AgentStatTableMock.mockClear();
 
@@ -224,21 +182,15 @@ describe('AgentStats', () => {
       rerender(<AgentStats agent={{ id: agent001 }} />);
     });
 
-    expect(AgentStatTableMock.mock.calls[0][0].title).toEqual(
-      mockDataStatLogcollectorTitle,
-    );
-    expect(AgentStatTableMock.mock.calls[1][0].title).toEqual(
-      mockDataStatAgentTitle,
-    );
+    expect(AgentStatTableMock.mock.calls[0][0].title).toEqual(mockDataStatLogcollectorTitle);
+    expect(AgentStatTableMock.mock.calls[1][0].title).toEqual(mockDataStatAgentTitle);
   });
 
   it('should update export csv filename correctly when changing agent', async () => {
     AgentStatTableMock.mockClear();
 
-    const mockExportCSVFilename = (
-      agent002: string,
-      suffix: 'global' | 'interval',
-    ) => `agent-stats-${agent002}-logcollector-${suffix}`;
+    const mockExportCSVFilename = (agent002: string, suffix: 'global' | 'interval') =>
+      `agent-stats-${agent002}-logcollector-${suffix}`;
 
     let rerender: RenderResult['rerender'];
 
@@ -247,10 +199,10 @@ describe('AgentStats', () => {
     });
 
     expect(AgentStatTableMock.mock.calls[0][0].exportCSVFilename).toEqual(
-      mockExportCSVFilename(agent002, 'global'),
+      mockExportCSVFilename(agent002, 'global')
     );
     expect(AgentStatTableMock.mock.calls[1][0].exportCSVFilename).toEqual(
-      mockExportCSVFilename(agent002, 'interval'),
+      mockExportCSVFilename(agent002, 'interval')
     );
 
     AgentStatTableMock.mockClear();
@@ -260,10 +212,10 @@ describe('AgentStats', () => {
     });
 
     expect(AgentStatTableMock.mock.calls[0][0].exportCSVFilename).toEqual(
-      mockExportCSVFilename(agent001, 'global'),
+      mockExportCSVFilename(agent001, 'global')
     );
     expect(AgentStatTableMock.mock.calls[1][0].exportCSVFilename).toEqual(
-      mockExportCSVFilename(agent001, 'interval'),
+      mockExportCSVFilename(agent001, 'interval')
     );
   });
 });
