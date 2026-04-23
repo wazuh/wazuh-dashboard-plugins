@@ -7,21 +7,15 @@ jest.mock('../plugin-services', () => ({
   getCore: jest.fn().mockReturnValue({
     http: {
       get: jest.fn().mockResolvedValue({
-        last_dismissed_updates: [
-          {
-            api_id: 'api id',
-            last_patch: '4.3.1',
-          },
-        ],
+        last_dismissed_updates: {
+          last_patch: '4.3.1',
+        },
         hide_update_notifications: false,
       }),
       patch: jest.fn().mockResolvedValue({
-        last_dismissed_updates: [
-          {
-            api_id: 'api id',
-            last_patch: '4.3.1',
-          },
-        ],
+        last_dismissed_updates: {
+          last_patch: '4.3.1',
+        },
         hide_update_notifications: false,
       }),
     },
@@ -31,12 +25,9 @@ jest.mock('../plugin-services', () => ({
 describe('useUserPreferences hook', () => {
   it('should fetch initial data without any error', async () => {
     const mockUserPreferences: UserPreferences = {
-      last_dismissed_updates: [
-        {
-          api_id: 'api id',
-          last_patch: '4.3.1',
-        },
-      ],
+      last_dismissed_updates: {
+        last_patch: '4.3.1',
+      },
       hide_update_notifications: false,
     };
     const { result, waitForNextUpdate } = renderHook(() => useUserPreferences());
@@ -49,12 +40,9 @@ describe('useUserPreferences hook', () => {
 
   it('should update user preferences', async () => {
     const mockUserPreferences: UserPreferences = {
-      last_dismissed_updates: [
-        {
-          api_id: 'api id',
-          last_patch: '4.3.1',
-        },
-      ],
+      last_dismissed_updates: {
+        last_patch: '4.3.1',
+      },
       hide_update_notifications: false,
     };
     const { result, waitForNextUpdate } = renderHook(() => useUserPreferences());
@@ -88,12 +76,9 @@ describe('useUserPreferences hook', () => {
 
   it('should handle error while updating user preferences', async () => {
     const mockUserPreferences: UserPreferences = {
-      last_dismissed_updates: [
-        {
-          api_id: 'api id',
-          last_patch: '4.3.1',
-        },
-      ],
+      last_dismissed_updates: {
+        last_patch: '4.3.1',
+      },
       hide_update_notifications: false,
     };
     const mockErrorMessage = 'Some error occurred';
