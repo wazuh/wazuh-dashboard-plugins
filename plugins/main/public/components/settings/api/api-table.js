@@ -117,7 +117,8 @@ export const ApiTable = compose(withErrorBoundary)(
         'wazuh.updates.disabled',
       ));
 
-      console.log('API updates enabled:', this.isUpdatesEnabled);
+
+
       if (this.isUpdatesEnabled) {
         this.getApisAvailableUpdates();
       }
