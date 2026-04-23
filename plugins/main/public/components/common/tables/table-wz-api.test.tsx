@@ -28,7 +28,7 @@ jest.mock('../hooks', () => ({
 jest.mock('../../../kibana-services', () => ({
   getHttp: () => ({
     basePath: {
-      prepend: (str) => str,
+      prepend: str => str,
     },
   }),
   getCookies: () => {
@@ -40,7 +40,7 @@ jest.mock('../../../kibana-services', () => ({
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: (options) => { },
+    handleError: options => {},
   }),
 }));
 
@@ -54,7 +54,7 @@ jest.mock(
   '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
-  })
+  }),
 );
 
 const columns = [
@@ -90,20 +90,20 @@ describe('Table WZ API component', () => {
       },
     });
     (useStateStorage as jest.Mock).mockReturnValue([[], jest.fn()]);
-    (WzRequest.apiReq as jest.Mock).mockReturnValue(new Promise(() => { }));
+    (WzRequest.apiReq as jest.Mock).mockReturnValue(new Promise(() => {}));
 
     let wrapper = null;
 
     await act(async () => {
       wrapper = mount(
         <TableWzAPI
-          title="Table"
+          title='Table'
           downloadCsv={false}
           tableColumns={columns}
           endpoint={'/'}
           searchTable={false}
           error={false}
-        />
+        />,
       );
       await Promise.resolve();
     });
