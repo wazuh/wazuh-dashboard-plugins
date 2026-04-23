@@ -54,7 +54,7 @@ jest.mock(
   '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
-  })
+  }),
 );
 
 jest.mock('react-use/lib/useObservable', () => () => {});
@@ -93,14 +93,15 @@ jest.mock('../../../kibana-services', () => ({
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: (options) => {},
+    handleError: options => {},
   }),
 }));
 
 describe('Stats component', () => {
   test('renders correctly to match the snapshot', async () => {
+    let container: HTMLElement;
     await act(async () => {
-      const { container } = render(
+      const { container: renderedContainer } = render(
         <Stats
           active={8}
           disconnected={0}
@@ -109,9 +110,10 @@ describe('Stats component', () => {
           total={11}
           error={null}
           isAgentsLoading={false}
-        />
+        />,
       );
-      expect(container).toMatchSnapshot();
+      container = renderedContainer;
     });
+    expect(container).toMatchSnapshot();
   });
 });

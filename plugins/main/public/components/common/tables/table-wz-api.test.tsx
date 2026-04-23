@@ -13,9 +13,11 @@
  */
 
 import React from 'react';
+import { act } from '@testing-library/react';
 import { mount } from 'enzyme';
 import { TableWzAPI } from './table-wz-api';
 import { useAppConfig, useStateStorage } from '../hooks';
+import { WzRequest } from '../../../react-services/wz-request';
 
 jest.mock('../hooks', () => ({
   useAppConfig: jest.fn(),
@@ -26,7 +28,7 @@ jest.mock('../hooks', () => ({
 jest.mock('../../../kibana-services', () => ({
   getHttp: () => ({
     basePath: {
-      prepend: (str) => str,
+      prepend: str => str,
     },
   }),
   getCookies: () => {
@@ -38,15 +40,21 @@ jest.mock('../../../kibana-services', () => ({
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: (options) => {},
+    handleError: options => {},
   }),
+}));
+
+jest.mock('../../../react-services/wz-request', () => ({
+  WzRequest: {
+    apiReq: jest.fn(),
+  },
 }));
 
 jest.mock(
   '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
-  })
+  }),
 );
 
 const columns = [
@@ -75,23 +83,33 @@ const columns = [
 ];
 
 describe('Table WZ API component', () => {
-  it('renders correctly to match the snapshot', () => {
+  it('renders correctly to match the snapshot', async () => {
     (useAppConfig as jest.Mock).mockReturnValue({
       data: {
         'reports.csv.maxRows': 10000,
       },
     });
     (useStateStorage as jest.Mock).mockReturnValue([[], jest.fn()]);
+    (WzRequest.apiReq as jest.Mock).mockReturnValue(new Promise(() => {}));
 
-    const wrapper = mount(
-      <TableWzAPI
-        title="Table"
-        tableColumns={columns}
-        endpoint={'/'}
-        searchTable={false}
-        error={false}
-      />
-    );
-    expect(wrapper).toMatchSnapshot();
+    let wrapper = null;
+
+    await act(async () => {
+      wrapper = mount(
+        <TableWzAPI
+          title='Table'
+          downloadCsv={false}
+          tableColumns={columns}
+          endpoint={'/'}
+          searchTable={false}
+          error={false}
+        />,
+      );
+      await Promise.resolve();
+    });
+
+    wrapper!.update();
+    expect(wrapper!).toMatchSnapshot();
+    wrapper!.unmount();
   });
 });

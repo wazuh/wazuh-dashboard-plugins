@@ -1,9 +1,15 @@
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { IWzSuggestItem, WzSearchBar } from './wz-search-bar';
 import { WZ_SEARCH_BADGE_NAME } from './components/wz-search-badges/wz-search-badges';
 import React from 'react';
 import { CASES_SEARCHBAR } from './wz-search-bar.test-cases';
+
+jest.mock('../../react-services/common-services', () => ({
+  getErrorOrchestrator: () => ({
+    handleError: jest.fn(),
+  }),
+}));
 
 const getSuggestionsFilters = async (field, value, filters = {}) => {
   // here is returned filter to call api and get suggestions
@@ -16,84 +22,86 @@ const suggestions: IWzSuggestItem[] = [
     label: 'os.platform',
     description: 'Filter by operating system platform',
     operators: ['=', '!='],
-    values: async (value) => getSuggestionsFilters('os.platform', value, { q: '' }),
+    values: async value =>
+      getSuggestionsFilters('os.platform', value, { q: '' }),
   },
   {
     type: 'q',
     label: 'ip',
     description: 'Filter by agent IP address',
     operators: ['=', '!='],
-    values: async (value) => getSuggestionsFilters('ip', value, { q: '' }),
+    values: async value => getSuggestionsFilters('ip', value, { q: '' }),
   },
   {
     type: 'q',
     label: 'name',
     description: 'Filter by agent name',
     operators: ['=', '!='],
-    values: async (value) => getSuggestionsFilters('name', value, { q: '' }),
+    values: async value => getSuggestionsFilters('name', value, { q: '' }),
   },
   {
     type: 'q',
     label: 'id',
     description: 'Filter by agent id',
     operators: ['=', '!='],
-    values: async (value) => getSuggestionsFilters('id', value, { q: '' }),
+    values: async value => getSuggestionsFilters('id', value, { q: '' }),
   },
   {
     type: 'q',
     label: 'group',
     description: 'Filter by agent group',
     operators: ['=', '!='],
-    values: async (value) => getSuggestionsFilters('group', value, { q: '' }),
+    values: async value => getSuggestionsFilters('group', value, { q: '' }),
   },
   {
     type: 'q',
     label: 'node_name',
     description: 'Filter by node name',
     operators: ['=', '!='],
-    values: async (value) => getSuggestionsFilters('node_name', value, { q: '' }),
+    values: async value => getSuggestionsFilters('node_name', value, { q: '' }),
   },
   {
     type: 'q',
     label: 'manager',
     description: 'Filter by manager',
     operators: ['=', '!='],
-    values: async (value) => getSuggestionsFilters('manager', value, { q: '' }),
+    values: async value => getSuggestionsFilters('manager', value, { q: '' }),
   },
   {
     type: 'q',
     label: 'version',
     description: 'Filter by agent version',
     operators: ['=', '!='],
-    values: async (value) => getSuggestionsFilters('version', value, { q: '' }),
+    values: async value => getSuggestionsFilters('version', value, { q: '' }),
   },
   {
     type: 'q',
     label: 'configSum',
     description: 'Filter by agent config sum',
     operators: ['=', '!='],
-    values: async (value) => getSuggestionsFilters('configSum', value, { q: '' }),
+    values: async value => getSuggestionsFilters('configSum', value, { q: '' }),
   },
   {
     type: 'q',
     label: 'mergedSum',
     description: 'Filter by agent merged sum',
     operators: ['=', '!='],
-    values: async (value) => getSuggestionsFilters('mergedSum', value, { q: '' }),
+    values: async value => getSuggestionsFilters('mergedSum', value, { q: '' }),
   },
   {
     type: 'q',
     label: 'dateAdd',
     description: 'Filter by add date',
     operators: ['=', '!='],
-    values: async (value) => getSuggestionsFilters('dateAdd', value, { q: '' }),
+    values: async value => getSuggestionsFilters('dateAdd', value, { q: '' }),
   },
   {
     type: 'q',
     label: 'lastKeepAlive',
     description: 'Filter by last keep alive',
     operators: ['=', '!='],
-    values: async (value) => getSuggestionsFilters('lastKeepAlive', value, { q: '' }),
+    values: async value =>
+      getSuggestionsFilters('lastKeepAlive', value, { q: '' }),
   },
 ];
 
@@ -117,7 +125,7 @@ class ComponentWithWzSearchBar extends React.Component<{}, { filters: any[] }> {
     return (
       <WzSearchBar
         filters={this.state.filters}
-        onFiltersChange={(filters) => this.onFilterChanges(filters)}
+        onFiltersChange={filters => this.onFilterChanges(filters)}
         suggestions={suggestions}
       />
     );
@@ -139,33 +147,41 @@ describe('WzSearchBar', () => {
   describe('Valid cases', () => {
     it.each(CASES_SEARCHBAR)(
       'should take query inputs "%j" and create search badges when queries are VALID/COMPLETE',
-      (inputs) => {
+      async inputs => {
         const spyReactConsoleError = jest.spyOn(console, 'error');
         spyReactConsoleError.mockImplementation(() => {});
-        const spyOnChange = jest.spyOn(ComponentWithWzSearchBar.prototype, 'onFilterChanges');
-        const { getByRole, getByText, getByTestId } = render(<ComponentWithWzSearchBar />);
+        const spyOnChange = jest.spyOn(
+          ComponentWithWzSearchBar.prototype,
+          'onFilterChanges',
+        );
+        const { getByRole, getByText, getByTestId } = render(
+          <ComponentWithWzSearchBar />,
+        );
         const searchInput = getByRole('textbox') as HTMLInputElement;
         // change input and trigger Enter key for each value
-        inputs.forEach((value) => {
+        inputs.forEach(value => {
           fireEvent.change(searchInput, { target: { value } });
           fireEvent.keyPress(searchInput, {
             key: 'Enter',
-            code: 13,
+            code: 'Enter',
             charCode: 13,
           });
         });
 
-        inputs.forEach((filterText, index) => {
-          // check all badges created
-          expect(getByTestId(`${WZ_SEARCH_BADGE_NAME}-${index}`)).toHaveTextContent(filterText);
-          expect(getByText(filterText)).toBeInTheDocument();
+        await waitFor(() => {
+          inputs.forEach((filterText, index) => {
+            expect(
+              getByTestId(`${WZ_SEARCH_BADGE_NAME}-${index}`),
+            ).toHaveTextContent(filterText);
+            expect(getByText(filterText)).toBeInTheDocument();
+          });
         });
 
         // check the input value if filter was applied
-        expect(searchInput.value).toBe('');
+        await waitFor(() => expect(searchInput.value).toBe(''));
         spyOnChange.mockRestore();
         spyReactConsoleError.mockRestore();
-      }
+      },
     );
   });
 
@@ -183,30 +199,43 @@ describe('WzSearchBar', () => {
       ' or name=test1 or ',
       'OR name=test1 OR ',
       ' OR name=test1 OR ',
-    ])('should NOT apply filter "%s" when the query is INVALID/INCOMPLETE', (inputQuery) => {
-      const spyReactConsoleError = jest.spyOn(console, 'error');
-      spyReactConsoleError.mockImplementation(() => {});
-      const spyOnChange = jest.spyOn(ComponentWithWzSearchBar.prototype, 'onFilterChanges');
-      const { getByRole } = render(<ComponentWithWzSearchBar />);
-      const searchInput = getByRole('textbox') as HTMLInputElement;
-      fireEvent.change(searchInput, { target: { value: inputQuery } });
-      fireEvent.keyPress(searchInput, {
-        key: 'Enter',
-        code: 13,
-        charCode: 13,
-      });
-      expect(searchInput.value).toBe(inputQuery);
-      spyOnChange.mockRestore();
-      spyReactConsoleError.mockRestore();
-    });
+    ])(
+      'should NOT apply filter "%s" when the query is INVALID/INCOMPLETE',
+      inputQuery => {
+        const spyReactConsoleError = jest.spyOn(console, 'error');
+        spyReactConsoleError.mockImplementation(() => {});
+        const spyOnChange = jest.spyOn(
+          ComponentWithWzSearchBar.prototype,
+          'onFilterChanges',
+        );
+        const { getByRole } = render(<ComponentWithWzSearchBar />);
+        const searchInput = getByRole('textbox') as HTMLInputElement;
+        fireEvent.change(searchInput, { target: { value: inputQuery } });
+        fireEvent.keyPress(searchInput, {
+          key: 'Enter',
+          code: 'Enter',
+          charCode: 13,
+        });
+        expect(searchInput.value).toBe(inputQuery);
+        spyOnChange.mockRestore();
+        spyReactConsoleError.mockRestore();
+      },
+    );
 
     it('should not apply filters when input is empty', () => {
       const spyReactConsoleError = jest.spyOn(console, 'error');
       spyReactConsoleError.mockImplementation(() => {});
-      const spyOnChange = jest.spyOn(ComponentWithWzSearchBar.prototype, 'onFilterChanges');
+      const spyOnChange = jest.spyOn(
+        ComponentWithWzSearchBar.prototype,
+        'onFilterChanges',
+      );
       const { getByRole } = render(<ComponentWithWzSearchBar />);
       const searchInput = getByRole('textbox') as HTMLInputElement;
-      fireEvent.keyPress(searchInput, { key: 'Enter', code: 13, charCode: 13 });
+      fireEvent.keyPress(searchInput, {
+        key: 'Enter',
+        code: 'Enter',
+        charCode: 13,
+      });
       expect(searchInput.value).toBe('');
       expect(spyOnChange).toHaveBeenCalledTimes(1);
       expect(spyOnChange).toBeCalledWith([]);

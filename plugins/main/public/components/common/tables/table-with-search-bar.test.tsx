@@ -13,13 +13,14 @@
  */
 
 import React from 'react';
+import { act, waitFor } from '@testing-library/react';
 import { mount } from 'enzyme';
 import { TableWithSearchBar } from './table-with-search-bar';
 
 jest.mock('../../../kibana-services', () => ({
   getHttp: () => ({
     basePath: {
-      prepend: (str) => str,
+      prepend: str => str,
     },
   }),
   getCookies: () => {
@@ -31,7 +32,7 @@ jest.mock('../../../kibana-services', () => ({
 
 jest.mock('../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: (options) => {},
+    handleError: options => {},
   }),
 }));
 
@@ -39,7 +40,7 @@ jest.mock(
   '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
-  })
+  }),
 );
 
 const columns = [
@@ -72,13 +73,15 @@ const searchBarWQLOptions = {
 };
 
 const tableProps = {
-  onSearch: () => {},
+  onSearch: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
   tableColumns: columns,
   tablePageSizeOptions: [15, 25, 50, 100],
-  tableInitialSortingDirection: 'asc',
+  tableInitialSortingDirection: 'asc' as const,
   tableInitialSortingField: '',
   tableProps: {},
-  reload: () => {},
+  reload: 0,
+  endpoint: '/test-endpoint',
+  selectedFields: columns.map(({ field }) => field),
   searchBarSuggestions: [],
   rowProps: () => {},
   searchBarWQL: {
@@ -95,12 +98,23 @@ const tableProps = {
 };
 
 beforeAll(() => {
-  global.Date.now = jest.fn(() => new Date('2024-12-02T14:35:10.123').getTime());
+  global.Date.now = jest.fn(() =>
+    new Date('2024-12-02T14:35:10.123').getTime(),
+  );
 });
 
 describe('Table With Search Bar component', () => {
-  it('renders correctly to match the snapshot', () => {
-    const wrapper = mount(<TableWithSearchBar {...tableProps} />);
-    expect(wrapper).toMatchSnapshot();
+  it('renders correctly to match the snapshot', async () => {
+    let wrapper = null;
+
+    await act(async () => {
+      wrapper = mount(<TableWithSearchBar {...tableProps} />);
+    });
+
+    await waitFor(() => expect(tableProps.onSearch).toHaveBeenCalled());
+
+    wrapper!.update();
+    expect(wrapper!).toMatchSnapshot();
+    wrapper!.unmount();
   });
 });
