@@ -117,8 +117,6 @@ export const ApiTable = compose(withErrorBoundary)(
         'wazuh.updates.disabled',
       ));
 
-
-
       if (this.isUpdatesEnabled) {
         this.getApisAvailableUpdates();
       }
@@ -753,7 +751,8 @@ export const ApiTable = compose(withErrorBoundary)(
                         <EuiToolTip
                           title='Last dashboard check'
                           content={
-                            this.state.availableUpdates?.last_check_date_dashboard
+                            this.state.availableUpdates
+                              ?.last_check_date_dashboard
                               ? getWazuhCorePlugin().utils.formatUIDate(
                                   this.state.availableUpdates.last_check_date,
                                 )

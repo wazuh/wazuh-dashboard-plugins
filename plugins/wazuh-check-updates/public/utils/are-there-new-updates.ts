@@ -1,4 +1,7 @@
-import { AvailableUpdates, UserPreferencesDimissedUpdate } from '../../common/types';
+import {
+  AvailableUpdates,
+  UserPreferencesDimissedUpdate,
+} from '../../common/types';
 
 export const areThereNewUpdates = (
   availableUpdates?: AvailableUpdates,
@@ -9,7 +12,9 @@ export const areThereNewUpdates = (
 
   if (
     !lastDismissedUpdate &&
-    (last_available_major?.tag || last_available_minor?.tag || last_available_patch?.tag)
+    (last_available_major?.tag ||
+      last_available_minor?.tag ||
+      last_available_patch?.tag)
   ) {
     return true;
   }

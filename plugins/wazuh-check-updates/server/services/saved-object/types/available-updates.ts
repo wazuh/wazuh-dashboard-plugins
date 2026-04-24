@@ -1,4 +1,7 @@
-import { SavedObjectsFieldMapping, SavedObjectsType } from 'opensearch-dashboards/server';
+import {
+  SavedObjectsFieldMapping,
+  SavedObjectsType,
+} from 'opensearch-dashboards/server';
 import { SAVED_OBJECT_UPDATES } from '../../../../common/constants';
 
 const updateObjectType: SavedObjectsFieldMapping = {

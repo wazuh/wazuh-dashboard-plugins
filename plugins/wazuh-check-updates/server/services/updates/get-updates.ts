@@ -17,14 +17,18 @@ const getStatus = ({
   last_available_minor,
   last_available_patch,
 }: ResponseIndexerAvailableUpdates): API_UPDATES_STATUS =>
-  last_available_major?.tag || last_available_minor?.tag || last_available_patch?.tag
+  last_available_major?.tag ||
+  last_available_minor?.tag ||
+  last_available_patch?.tag
     ? API_UPDATES_STATUS.AVAILABLE_UPDATES
     : API_UPDATES_STATUS.UP_TO_DATE;
 
 const presentUpdate = (update?: Update): Update | undefined =>
   update?.tag ? update : undefined;
 
-const saveAndReturn = async (result: AvailableUpdates): Promise<AvailableUpdates> => {
+const saveAndReturn = async (
+  result: AvailableUpdates,
+): Promise<AvailableUpdates> => {
   await setSavedObject(SAVED_OBJECT_UPDATES, result);
   return result;
 };
@@ -78,7 +82,11 @@ export const getUpdates = async (
     });
   } catch (error: any) {
     logger.error(
-      `[ERROR]: Cannot get available updates from indexer. Message: ${error.message}. Status: ${error.meta?.statusCode}. Body: ${JSON.stringify(error.meta?.body)}`,
+      `[ERROR]: Cannot get available updates from indexer. Message: ${
+        error.message
+      }. Status: ${error.meta?.statusCode}. Body: ${JSON.stringify(
+        error.meta?.body,
+      )}`,
     );
     return saveAndReturn({
       last_check_date_dashboard: new Date(),

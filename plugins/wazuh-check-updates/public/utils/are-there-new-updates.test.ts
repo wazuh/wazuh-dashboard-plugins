@@ -31,7 +31,10 @@ describe('areThereNewUpdates function', () => {
     const lastDismissedUpdate: UserPreferencesDimissedUpdate = {
       last_patch: 'v4.3.8',
     };
-    const result = areThereNewUpdates(mockAvailableUpdates, lastDismissedUpdate);
+    const result = areThereNewUpdates(
+      mockAvailableUpdates,
+      lastDismissedUpdate,
+    );
     expect(result).toBe(false);
   });
 
@@ -39,7 +42,10 @@ describe('areThereNewUpdates function', () => {
     const lastDismissedUpdate: UserPreferencesDimissedUpdate = {
       last_patch: 'v4.3.7',
     };
-    const result = areThereNewUpdates(mockAvailableUpdates, lastDismissedUpdate);
+    const result = areThereNewUpdates(
+      mockAvailableUpdates,
+      lastDismissedUpdate,
+    );
     expect(result).toBe(true);
   });
 

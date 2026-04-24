@@ -8,7 +8,7 @@ jest.mock(
   '../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
-  })
+  }),
 );
 
 const mockedUseUserPreferences = useUserPreferences as jest.Mock;
