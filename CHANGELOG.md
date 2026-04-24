@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v5.0.0 - OpenSearch Dashboards 3.5.0 - Revision 01
+## Wazuh v5.0.0 - OpenSearch Dashboards 3.6.0 - Revision 01
 
 ### Added
 
@@ -28,6 +28,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added ISO 27001 regulatory compliance module [#8286](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8286)
 - Added NIS2 regulatory compliance module [#8298](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8298)
 - Added NIST 800-171 regulatory compliance module [#8294](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8294)
+- Added `wazuh-threatintel-enrichments*` and `wazuh-threatintel-vulnerabilities*` index patterns [#8357](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8357)
 
 ### Changed
 
@@ -57,7 +58,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Upgraded axios to 1.13.3 [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
 - Upgraded axios to 1.13.5 [8179](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8179)
 - Upgraded loglovel to 1.9.2 [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
-- Updated Docker module under Cloud Security, with new index pattern definition [#8128](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8128)
+- Updated Docker module under Cloud Security, with new index pattern definition [#8128](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8128) [#8364](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8364)
 - Changed Ossec references to wazuh-manager [#8136](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8136)
 - Changed default Dev Tools request from deprecated `GET /manager/info` to `GET /cluster/<NODE_NAME>/info` [#8137](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8137)
 - Upgraded ESLint from version 8 to version 10 and migrated configuration from legacy `.eslintrc.json` to the new flat config format (`eslint.config.mjs`) [#8145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8145)
@@ -128,7 +129,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the Statistics app [#8218](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8218)
 - Removed some options of the manager and agent configuration [#8243](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8243)
 
-## Wazuh v4.14.5 - OpenSearch Dashboards 2.19.4 - Revision 00
+## Wazuh v4.14.6 - OpenSearch Dashboards 2.19.5 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.14.6
+
+## Wazuh v4.14.5 - OpenSearch Dashboards 2.19.5 - Revision 01
 
 ### Added
 

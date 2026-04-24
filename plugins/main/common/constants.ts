@@ -203,6 +203,22 @@ export const WAZUH_FINDINGS_UNCLASSIFIED_PATTERN =
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_UNCLASSIFIED =
   'index-pattern:findings-unclassified';
 
+// Index patterns - Threat Intel enrichments
+export const WAZUH_INDEX_TYPE_THREATINTEL_ENRICHMENTS =
+  'threatintel-enrichments';
+export const WAZUH_THREATINTEL_ENRICHMENTS_PATTERN =
+  'wazuh-threatintel-enrichments*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS =
+  'index-pattern:threatintel-enrichments';
+
+// Index patterns - Threat Intel vulnerabilities
+export const WAZUH_INDEX_TYPE_THREATINTEL_VULNERABILITIES =
+  'threatintel-vulnerabilities';
+export const WAZUH_THREATINTEL_VULNERABILITIES_PATTERN =
+  'wazuh-threatintel-vulnerabilities*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_VULNERABILITIES =
+  'index-pattern:threatintel-vulnerabilities';
+
 // Time field
 export const FIELD_TIMESTAMP = '@timestamp';
 
