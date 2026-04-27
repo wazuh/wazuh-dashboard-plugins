@@ -10,10 +10,10 @@
 
 Active Response combines three areas of the Wazuh Dashboard:
 
-| Area                     | Role in Active Response                                                                                                      |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| Area                      | Role in Active Response                                                                                                                                                          |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Active Responses view** | Manage active responses from the Wazuh Dashboard (under **Explore → Active Responses**). Each entry defines the executable, type, timeout, and target location of a remediation. |
-| **Alerting**             | Per document monitors expose an **Add active response** action that invokes one when the trigger condition is met.           |
-| **Discover**             | The `wazuh-active-responses-*` index pattern keeps an auditable record of every execution, retained for 3 days by default.  |
+| **Alerting**              | Per document monitors expose an **Add active response** action that invokes one when the trigger condition is met.                                                               |
+| **Discover**              | The `wazuh-active-responses*` index pattern keeps an auditable record of every execution, retained for 3 days by default.                                                        |
 
 An active response never runs on its own: it must be attached to a Per document monitor trigger. When the trigger fires, an execution record is stored in **Discover**, the manager picks it up within about one minute, and the target agent carries out the action.

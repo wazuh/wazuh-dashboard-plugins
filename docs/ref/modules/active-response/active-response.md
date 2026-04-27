@@ -21,25 +21,25 @@ An **active response** is an entry in the Active Responses view that describes a
 
 Each active response has the following fields:
 
-| Field                | Description                                                                                     |
-| -------------------- | ----------------------------------------------------------------------------------------------- |
-| **Name**             | Visible identifier. Required, must not be empty.                                                |
-| **Description**      | Free-form description. Optional.                                                                |
-| **Executable**       | Name of the executable to run on the target agent. Required.                                    |
-| **Extra arguments**  | Free-form string passed to the executable. Optional.                                            |
-| **Type**             | `Stateless` (run once) or `Stateful` (run and revert after a timeout).                          |
-| **Stateful timeout** | Integer in seconds. Only applies when `Type = Stateful`. Must be `> 0`. Default `180`.          |
-| **Location**         | `All`, `Defined agent`, or `Local`. Default `Local`.                                            |
-| **Agent ID**         | Numeric agent identifier. Only applies when `Location = Defined agent`.                         |
+| Field                | Description                                                                            |
+| -------------------- | -------------------------------------------------------------------------------------- |
+| **Name**             | Visible identifier. Required, must not be empty.                                       |
+| **Description**      | Free-form description. Optional.                                                       |
+| **Executable**       | Name or path of the executable to run on the target agent. Required.                   |
+| **Extra arguments**  | Free-form string passed to the executable. Optional.                                   |
+| **Type**             | `Stateless` (run once) or `Stateful` (run and revert after a timeout).                 |
+| **Stateful timeout** | Integer in seconds. Only applies when `Type = Stateful`. Must be `> 0`. Default `180`. |
+| **Location**         | `All`, `Defined agent`, or `Local`. Default `Local`.                                   |
+| **Agent ID**         | Numeric agent identifier. Only applies when `Location = Defined agent`.                |
 
 ### Stateful vs stateless
 
 A **stateless** active response runs the action once and does not revert anything. A **stateful** active response runs the action, waits `Stateful timeout` seconds, and then asks the agent to **revert** it (for example, unblocking an IP that had been blocked).
 
-| Mode          | When to use it                                                              | Main risk                                                                   |
-| ------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| **Stateless** | Definitive or idempotent actions (kill process, notify, restart).           | If fired on a false positive, there is no automatic reversal.               |
-| **Stateful**  | Temporary enforcement with automatic reversal (block an IP for 10 minutes). | Works only if the action itself supports reversal; ask your administrator.  |
+| Mode          | When to use it                                                              | Main risk                                                                  |
+| ------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| **Stateless** | Definitive or idempotent actions (kill process, notify, restart).           | If fired on a false positive, there is no automatic reversal.              |
+| **Stateful**  | Temporary enforcement with automatic reversal (block an IP for 10 minutes). | Works only if the action itself supports reversal; ask your administrator. |
 
 > **Important:** `Stateful timeout` is expressed in **seconds**. Ask your administrator to verify, in a non-production environment, that the chosen executable can be both applied and reverted before enabling it in production.
 
@@ -51,7 +51,6 @@ The **Location** field controls where the command is executed:
 - **Defined agent** — The command is always executed on the agent whose numeric ID is set in the **Agent ID** field.
 - **Local** — The command is executed on the agent that generated the event.
 
-
 ### About the executable
 
 The Active Responses view only references the executable by name; the executable itself is managed on the agent side, outside the dashboard. If you are not sure whether a given executable is available on the target agent, check with your administrator before using it in production.
@@ -62,7 +61,7 @@ An active response does not run on its own. It is invoked from a **trigger** ins
 
 When the trigger fires, the active response action does the following:
 
-1. A record of the execution is written to the `wazuh-active-responses-*` index, which you can inspect from **Discover**.
+1. A record of the execution is written to the `wazuh-active-responses*` index, which you can inspect from **Discover**.
 2. The manager picks it up within about one minute and forwards the command to the target agent.
 3. The target agent carries out the action.
 
@@ -77,7 +76,7 @@ The following walkthrough shows how to create an active response that blocks the
 **Prerequisites:**
 
 - Wazuh indexer, manager, and dashboard running version **5.0.0** or later.
-- The `wazuh-active-responses-*` index pattern available in **Stack Management → Index Patterns**. The dashboard creates it automatically at startup; contact your administrator if it is missing.
+- The `wazuh-active-responses*` index pattern available in **Stack Management → Index Patterns**. The dashboard creates it automatically at startup; contact your administrator if it is missing.
 
 > **Note:** creating the active response only stores the executable name. For the remediation to actually run when the monitor fires, the executable must be available on the target agent — see [Concepts → About the executable](#about-the-executable).
 
@@ -85,7 +84,7 @@ The following walkthrough shows how to create an active response that blocks the
 
 ### Step 1: Open the Active Responses view
 
-Inside the Wazuh Dashboard, open the side menu (top-left hamburger icon), expand **Explore**, and select **Active Responses**. The entry sits alongside the other Explore modules (Discover, Dashboards, Visualize, Reporting, Alerting, Maps, Notifications).
+Inside the Wazuh Dashboard, open the side menu (top-left hamburger icon), expand **Explore**, and select **Active Responses**.
 
 ![Side menu - Explore → Active Responses](images/00-explore-menu-entry.png)
 
@@ -253,13 +252,13 @@ The action automatically wires the triggering alert to the active response, so t
 
 ## Use Case: Monitoring active response executions
 
-Every time an active response fires, two traces are produced: an execution record in **Discover** (under the `wazuh-active-responses-*` index pattern) and an entry in `/var/ossec/logs/active-responses.log` on the target agent.
+Every time an active response fires, two traces are produced: an execution record in **Discover** (under the `wazuh-active-responses*` index pattern) and an entry in `/var/ossec/logs/active-responses.log` on the target agent.
 
 ---
 
 ### Step 1: Inspect the execution record in Discover
 
-Open **Discover** and select the `wazuh-active-responses-*` index pattern from the index selector. Before any trigger has fired, the view is empty — that is expected.
+Open **Discover** and select the `wazuh-active-responses*` index pattern from the index selector. Before any trigger has fired, the view is empty — that is expected.
 
 ![Discover - Active response index pattern selected](images/16-discover-ar-documents.png)
 
@@ -269,18 +268,18 @@ When a monitor trigger fires an active response, a new document appears here wit
 
 The most useful fields for investigation are:
 
-| Field                                    | Content                                                          |
-| ---------------------------------------- | ---------------------------------------------------------------- |
-| `@timestamp`                             | Time the execution was recorded.                                 |
-| `wazuh.active_response.name`             | Active response name.                                            |
-| `wazuh.active_response.type`             | `stateful` or `stateless`.                                       |
-| `wazuh.active_response.executable`       | Executable that was run.                                         |
-| `wazuh.active_response.extra_arguments`  | Extra arguments passed to the executable.                        |
-| `wazuh.active_response.stateful_timeout` | Timeout in seconds (stateful active responses only).             |
-| `wazuh.active_response.location`         | `all`, `defined-agent`, or `local`.                              |
-| `wazuh.active_response.agent_id`         | Target agent ID (only when `location = defined-agent`).          |
-| `wazuh.agent.id`, `.name`                | Agent that reported the original alert.                          |
-| `event.doc_id`, `event.index`            | Original alert that triggered the action (useful for pivoting).  |
+| Field                                    | Content                                                         |
+| ---------------------------------------- | --------------------------------------------------------------- |
+| `@timestamp`                             | Time the execution was recorded.                                |
+| `wazuh.active_response.name`             | Active response name.                                           |
+| `wazuh.active_response.type`             | `stateful` or `stateless`.                                      |
+| `wazuh.active_response.executable`       | Executable that was run.                                        |
+| `wazuh.active_response.extra_arguments`  | Extra arguments passed to the executable.                       |
+| `wazuh.active_response.stateful_timeout` | Timeout in seconds (stateful active responses only).            |
+| `wazuh.active_response.location`         | `all`, `defined-agent`, or `local`.                             |
+| `wazuh.active_response.agent_id`         | Target agent ID (only when `location = defined-agent`).         |
+| `wazuh.agent.id`, `.name`                | Agent that reported the original alert.                         |
+| `event.doc_id`, `event.index`            | Original alert that triggered the action (useful for pivoting). |
 
 > **Tip:** to narrow the list to a specific active response, filter by `wazuh.active_response.name: "<your-name>"` and sort by `@timestamp` descending.
 
@@ -308,16 +307,16 @@ From any execution record, `event.doc_id` and `event.index` point back to the al
 
 ## Troubleshooting
 
-| Symptom                                                                | Likely cause                                                                     | Action                                                                                |
-| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| The active response is not listed in the trigger selector             | The monitor is not _Per document_, or the active response is muted               | Recreate the monitor as _Per document_; unmute the active response from its details page |
-| No execution record shows up in **Discover**                           | The indexer notifications or alerting plugins are missing                        | Ask your administrator to verify the plugin installation                              |
-| The execution record is present but the action does not take effect on the agent | The manager did not deliver the command, or the agent is disconnected  | Check the manager service and the agent connection                                    |
-| The target agent reports that the executable is missing                 | The executable is not available on that agent                                   | Ask your administrator to make it available on the target agent                       |
-| A stateful active response does not revert after the timeout            | Timeout too large, or the executable does not support reversal                   | Confirm the timeout value; ask your administrator to verify reversal support          |
-| The `wazuh-active-responses-*` index pattern is missing from Discover  | The dashboard did not create it on startup                                       | Ask your administrator to inspect the dashboard logs and restart                      |
-| Execution records disappear after 3 days                               | Expected — default retention                                                     | Ask your administrator to extend retention or export records to another index         |
-| The active response runs on an unexpected agent                        | `Location = All` with an overly broad monitor query, or an incorrect `Agent ID`  | Narrow the monitor query; review the `Agent ID`                                       |
+| Symptom                                                                          | Likely cause                                                                    | Action                                                                                   |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| The active response is not listed in the trigger selector                        | The monitor is not _Per document_, or the active response is muted              | Recreate the monitor as _Per document_; unmute the active response from its details page |
+| No execution record shows up in **Discover**                                     | The indexer notifications or alerting plugins are missing                       | Ask your administrator to verify the plugin installation                                 |
+| The execution record is present but the action does not take effect on the agent | The manager did not deliver the command, or the agent is disconnected           | Check the manager service and the agent connection                                       |
+| The target agent reports that the executable is missing                          | The executable is not available on that agent                                   | Ask your administrator to make it available on the target agent                          |
+| A stateful active response does not revert after the timeout                     | Timeout too large, or the executable does not support reversal                  | Confirm the timeout value; ask your administrator to verify reversal support             |
+| The `wazuh-active-responses*` index pattern is missing from Discover             | The dashboard did not create it on startup                                      | Ask your administrator to inspect the dashboard logs and restart                         |
+| Execution records disappear after 3 days                                         | Expected — default retention                                                    | Ask your administrator to extend retention or export records to another index            |
+| The active response runs on an unexpected agent                                  | `Location = All` with an overly broad monitor query, or an incorrect `Agent ID` | Narrow the monitor query; review the `Agent ID`                                          |
 
 ---
 

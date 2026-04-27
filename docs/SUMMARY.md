@@ -32,6 +32,8 @@
 - [Modules](ref/modules/README.md)
   - [Health check](ref/modules/healthcheck.md)
   - [Notifications and Alerting](ref/modules/notifications-alerting.md)
+  - [Active responses](ref/modules/active-response/README.md)
+    - [Active responses](ref/modules/active-response/active-response.md)
   - [Security Analytics](ref/modules/security-analytics/README.md)
     - [Normalization](ref/modules/security-analytics/normalization.md)
     - [Detection](ref/modules/security-analytics/detection.md)
