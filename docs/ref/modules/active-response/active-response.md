@@ -41,17 +41,16 @@ A **stateless** active response runs the action once and does not revert anythin
 | **Stateless** | Definitive or idempotent actions (kill process, notify, restart).           | If fired on a false positive, there is no automatic reversal.               |
 | **Stateful**  | Temporary enforcement with automatic reversal (block an IP for 10 minutes). | Works only if the action itself supports reversal; ask your administrator.  |
 
-> **Important:** `Stateful timeout` is expressed in **seconds**, not milliseconds. Ask your administrator to verify, in a non-production environment, that the chosen executable can be both applied and reverted before enabling it in production.
+> **Important:** `Stateful timeout` is expressed in **seconds**. Ask your administrator to verify, in a non-production environment, that the chosen executable can be both applied and reverted before enabling it in production.
 
 ### Location and targeting
 
 The **Location** field controls where the command is executed:
 
-- **All** — The manager forwards the command to the agent that reported the alert, resolved from the triggering document.
+- **All** — Every agent in the environment must run the script. Use this option with caution. Incorrect configuration can cause problems in your environment.
 - **Defined agent** — The command is always executed on the agent whose numeric ID is set in the **Agent ID** field.
-- **Local** — The command is executed on the manager instead of an agent.
+- **Local** — The command is executed on the agent that generated the event.
 
-> **Important:** `Location = All` does **not** mean "every agent". It means "the agent associated with the document that fired the alert". To act on multiple agents, either shape the monitor query so it generates one matching document per agent, or create one active response per agent using `Defined agent`.
 
 ### About the executable
 
