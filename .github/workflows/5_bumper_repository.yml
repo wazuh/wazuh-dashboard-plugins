@@ -32,6 +32,11 @@ on:
         description: 'Optional identifier for the run'
         required: false
         type: string
+      revert:
+        description: 'Set to true to revert the bump changes applied for this issue'
+        default: false
+        required: false
+        type: boolean
 
 jobs:
   bump:
@@ -77,9 +82,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # Using workflow-specific GITHUB_TOKEN because currently CI_WAZUHCI_BUMPER_TOKEN
-          # doesn't have all the necessary permissions
           token: ${{ env.GH_TOKEN }}
+          fetch-depth: 0
 
       - name: Determine branch name
         id: vars
@@ -87,7 +91,7 @@ jobs:
           VERSION: ${{ inputs.version }}
           STAGE: ${{ inputs.stage }}
           TAG: ${{ inputs.tag }}
-          SET_AS_MAIN: ${{ inputs.set-as-main }}
+          SET_AS_MAIN: ${{ inputs.set_as_main }}
         run: |
           script_params=""
           version=${{ env.VERSION }}
@@ -109,7 +113,13 @@ jobs:
           fi
 
           issue_number=$(echo "${{ inputs.issue-link }}" | awk -F'/' '{print $NF}')
-          BRANCH_NAME="enhancement/wqa${issue_number}-bump-${{ github.ref_name }}"
+          if [[ "${{ inputs.revert }}" == "true" ]]; then
+            BRANCH_NAME="enhancement/wqa${issue_number}-revert-bump-${{ github.ref_name }}"
+            echo "pr_title=Revert bump ${{ github.ref_name }} branch" >> $GITHUB_OUTPUT
+          else
+            BRANCH_NAME="enhancement/wqa${issue_number}-bump-${{ github.ref_name }}"
+            echo "pr_title=Bump ${{ github.ref_name }} branch" >> $GITHUB_OUTPUT
+          fi
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
           echo "script_params=${script_params}" >> $GITHUB_OUTPUT
 
@@ -118,6 +128,7 @@ jobs:
           git checkout -b ${{ steps.vars.outputs.branch_name }}
 
       - name: Make version bump changes
+        if: inputs.revert != true
         run: |
           echo "Running bump script"
           bash ${{ env.BUMP_SCRIPT_PATH }} ${{ steps.vars.outputs.script_params }}
@@ -125,7 +136,9 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          if [[ -z "$(git status --porcelain)" ]]; then
+          if [[ "${{ inputs.revert }}" == "true" ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          elif [[ -z "$(git status --porcelain)" ]]; then
             echo "has_changes=false" >> $GITHUB_OUTPUT
             echo "No changes detected - no-op"
           else
@@ -134,20 +147,58 @@ jobs:
             git status --porcelain
           fi
 
-      - name: Commit and push changes
-        if: steps.check_changes.outputs.has_changes == 'true'
+      - name: Commit changes (Bump)
+        if: inputs.revert != true && steps.check_changes.outputs.has_changes == 'true'
         run: |
           git add .
           git commit -m "feat: bump ${{ github.ref_name }}"
+
+      - name: Revert references (Revert)
+        id: revert_step
+        if: inputs.revert == true
+        run: |
+          ISSUE_NUMBER=$(echo "${{ inputs.issue-link }}" | awk -F'/' '{print $NF}')
+
+          BUMP_BRANCH="enhancement/wqa${ISSUE_NUMBER}-bump-${{ github.ref_name }}"
+
+          PR_NUMBER=$(gh pr list --head "$BUMP_BRANCH" --base "${{ github.ref_name }}" --state merged --json number --jq '.[0].number')
+
+          if [ -z "$PR_NUMBER" ] || [ "$PR_NUMBER" == "null" ]; then
+            echo "Error: The original PR for the bump was not found"
+            echo "Searching merged PR from: $BUMP_BRANCH to ${{ github.ref_name }}"
+            exit 1
+          fi
+
+          echo "Original PR found: #$PR_NUMBER"
+
+          MERGE_COMMIT=$(gh pr view $PR_NUMBER --json mergeCommit --jq '.mergeCommit.oid')
+
+          git revert -m 1 $MERGE_COMMIT --no-commit
+
+          git checkout HEAD -- VERSION.json 2>/dev/null || true
+          git checkout HEAD -- CHANGELOG.md 2>/dev/null || true
+          git checkout HEAD -- package.json 2>/dev/null || true
+
+          if git diff --staged --quiet; then
+            echo "No references to revert. Skipping commit."
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            git commit -m "feat: revert ${{ github.ref_name }} references"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Push changes
+        if: (inputs.revert != true && steps.check_changes.outputs.has_changes == 'true') || (inputs.revert == true && steps.revert_step.outputs.has_changes == 'true')
+        run: |
           git push origin ${{ steps.vars.outputs.branch_name }}
 
       - name: Create pull request
-        if: steps.check_changes.outputs.has_changes == 'true'
+        if: (inputs.revert != true && steps.check_changes.outputs.has_changes == 'true') || (inputs.revert == true && steps.revert_step.outputs.has_changes == 'true')
         id: create_pr
         run: |
           gh auth setup-git
           PR_URL=$(gh pr create \
-            --title "Bump ${{ github.ref_name }} branch" \
+            --title "${{ steps.vars.outputs.pr_title }}" \
             --body "Issue: ${{ inputs.issue-link }}" \
             --base ${{ github.ref_name }} \
             --head ${{ steps.vars.outputs.branch_name }})
@@ -156,12 +207,12 @@ jobs:
           echo "pull_request_url=${PR_URL}" >> $GITHUB_OUTPUT
 
       - name: Merge pull request
-        if: steps.check_changes.outputs.has_changes == 'true'
+        if: (inputs.revert != true && steps.check_changes.outputs.has_changes == 'true') || (inputs.revert == true && steps.revert_step.outputs.has_changes == 'true')
         run: |
-          # Any checks for the PR are bypassed since the branch is expected to be functional (i.e. the bump process does not introduce any bugs)
           gh pr merge "${{ steps.create_pr.outputs.pull_request_url }}" --merge --admin
 
       - name: Show logs
+        if: inputs.revert != true
         run: |
           echo "Bump complete."
           echo "Branch: ${{ steps.vars.outputs.branch_name }}"
@@ -172,3 +223,16 @@ jobs:
           fi
           echo "Bumper scripts logs:"
           cat ${BUMP_LOG_PATH}/repository_bumper*log
+
+      - name: Show revert logs
+        if: inputs.revert == true
+        run: |
+          echo "Revert bump complete."
+          echo "Branch: ${{ steps.vars.outputs.branch_name }}"
+          if [[ "${{ steps.revert_step.outputs.has_changes }}" == "true" ]]; then
+            echo "PR: ${{ steps.create_pr.outputs.pull_request_url }}"
+          else
+            echo "No references to revert (no PR created)."
+          fi
+          echo "Revert bumper scripts logs:"
+          cat ${BUMP_LOG_PATH}/repository_bumper*log || true
