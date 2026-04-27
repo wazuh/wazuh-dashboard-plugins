@@ -26,10 +26,8 @@ import { Typography, TypographySize } from '../../../typography/typography';
 import { getCore } from '../../../../../kibana-services';
 import { withDataSourceFetch, withGuard, withPanel } from '../../../hocs';
 import { compose } from 'redux';
-import {
-  configurationAssessment,
-  getAppUrl,
-} from '../../../../../utils/applications';
+import { configurationAssessment } from '../../../../../utils/applications';
+import { getAppUrl } from '../../../../../react-services/navigation-service';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import {

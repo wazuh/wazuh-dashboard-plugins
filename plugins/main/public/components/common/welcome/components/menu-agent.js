@@ -21,11 +21,8 @@ import {
 import { connect } from 'react-redux';
 import { hasAgentSupportModule } from '../../../../react-services/wz-agents';
 import { getCore, getToasts } from '../../../../kibana-services';
-import {
-  Applications,
-  Categories,
-  getAppUrl,
-} from '../../../../utils/applications';
+import { Applications, Categories } from '../../../../utils/applications';
+import { getAppUrl } from '../../../../react-services/navigation-service';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
 

@@ -51,13 +51,14 @@ import {
   mitreAttack,
   threatHunting,
   vulnerabilityDetection,
-  getAppUrl,
 } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { FindingsCount } from './dashboard/findings-count';
 import { IntlProvider } from 'react-intl';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
-import NavigationService from '../../../react-services/navigation-service';
+import NavigationService, {
+  getAppUrl,
+} from '../../../react-services/navigation-service';
 import VulsPanel from './components/vuls_panel/vuls_welcome_panel';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
 import { InventoryMetrics } from '../../agents/syscollector/components';

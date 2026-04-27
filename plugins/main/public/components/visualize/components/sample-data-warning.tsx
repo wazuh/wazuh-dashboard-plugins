@@ -18,7 +18,7 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { getCore } from '../../../kibana-services';
 import { sampleData } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
-import NavigationService from '../../../react-services/navigation-service';
+import { getAppUrl } from '../../../react-services/navigation-service';
 
 export const SampleDataWarning = ({
   categoriesSampleData,
@@ -78,7 +78,7 @@ export const SampleDataWarning = ({
           <p>
             {'The data displayed may contain sample data. Go '}
             <EuiLink
-              href={NavigationService.getInstance().getUrlForApp(sampleData.id)}
+              href={getAppUrl(sampleData.id)}
               aria-label='go to configure sample data'
             >
               {'here'}

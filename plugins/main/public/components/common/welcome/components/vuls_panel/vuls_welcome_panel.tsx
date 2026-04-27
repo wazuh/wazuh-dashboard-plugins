@@ -18,10 +18,8 @@ import {
 import { severities } from '../../../../../controllers/overview/components/last-alerts-stat/last-alerts-stat';
 import { getCore } from '../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
-import {
-  vulnerabilityDetection,
-  getAppUrl,
-} from '../../../../../utils/applications';
+import { vulnerabilityDetection } from '../../../../../utils/applications';
+import { getAppUrl } from '../../../../../react-services/navigation-service';
 import { WzLink } from '../../../../../components/wz-link/wz-link';
 import {
   withDataSourceFetch,

@@ -7,7 +7,6 @@ import {
   LogoMicrosoftGraphAPI,
   LogoOffice365,
 } from '../components/common/logos';
-import NavigationService from '../react-services/navigation-service';
 
 /* Applications
 Convention: the order of each application must according to the order of the category
@@ -711,12 +710,6 @@ export const Applications = [
     return 0;
   }
 });
-
-export function getAppUrl(appId: string): string {
-  const app = Applications.find(a => a.id === appId);
-  const path = app?.redirectTo ? `#${app.redirectTo()}` : undefined;
-  return NavigationService.getInstance().getUrlForApp(appId, { path });
-}
 
 // Categories
 export const Categories = [

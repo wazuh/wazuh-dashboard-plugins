@@ -25,10 +25,8 @@ import {
 import { Typography } from '../../../typography/typography';
 import { getCore, getDataPlugin } from '../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
-import {
-  fileIntegrityMonitoring,
-  getAppUrl,
-} from '../../../../../utils/applications';
+import { fileIntegrityMonitoring } from '../../../../../utils/applications';
+import { getAppUrl } from '../../../../../react-services/navigation-service';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import { withDataSourceFetch } from '../../../hocs';
 import { FIMDataSourceRepository, FIMDataSource } from '../../../data-source';
