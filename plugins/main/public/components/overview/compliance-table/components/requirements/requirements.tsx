@@ -23,6 +23,7 @@ import {
   EuiToolTip,
 } from '@elastic/eui';
 import { requirementsName } from '../../requirement-name';
+import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
 
 export class ComplianceRequirements extends Component {
   _isMount = false;
@@ -168,37 +169,13 @@ export class ComplianceRequirements extends Component {
     ];
     let sectionStyle = {};
     let title = '';
+
+    title = WAZUH_MODULES?.[this.props.section]?.title || '';
     if (this.props.section === 'gdpr') {
       sectionStyle['height'] = 300;
-      title = 'GDPR';
-    }
-    if (this.props.section === 'pci') {
-      title = 'PCI DSS';
-    }
-    if (this.props.section === 'hipaa') {
-      title = 'HIPAA';
-    }
-    if (this.props.section === 'nist') {
-      title = 'NIST 800-53';
-    }
-    if (this.props.section === 'nist-800-171') {
-      title = 'NIST 800-171';
     }
     if (this.props.section === 'tsc') {
-      title = 'TSC';
       sectionStyle['height'] = 350;
-    }
-    if (this.props.section === 'cmmc') {
-      title = 'CMMC';
-    }
-    if (this.props.section === 'fedramp') {
-      title = 'FedRAMP';
-    }
-    if (this.props.section === 'iso-27001') {
-      title = 'ISO 27001';
-    }
-    if (this.props.section === 'nis2') {
-      title = 'NIS2';
     }
     return (
       <div

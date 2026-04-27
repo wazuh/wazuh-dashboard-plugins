@@ -74,6 +74,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Centralized regulatory compliance modules (PCI DSS, GDPR, HIPAA, NIST 800-53, and TSC) into a single "Regulatory Compliance" application [#8239](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8239) [#8303](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8303)
 - Updated Vulnerability Detection Discover tab filters, and inventory columns [#8262](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8262) [#8283](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8283) [#8292](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8292)
 - Changed FIM table columns and index source in the agent view [#8269](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8269)
+- Changed index pattern usage in MITRE ATT&CK and Compliance panels in agent overview [#8307](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8307)
 - Updated Threat Hunting dashboard with new index pattern definition [#8281](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8281)
 - Changed Cluster and Logging configuration sections in Server Management Settings to use the full node configuration endpoint [#8289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8289)
 - Changed last alerts home KPIs title to findings [#8285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8285)
@@ -128,6 +129,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the Docker app [#8215](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8215)
 - Removed the Statistics app [#8218](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8218)
 - Removed some options of the manager and agent configuration [#8243](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8243)
+- Removed GPG13 option in Compliance panel in agent overview [#8307](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8307)
 
 ## Wazuh v4.14.6 - OpenSearch Dashboards 2.19.5 - Revision 00
 
