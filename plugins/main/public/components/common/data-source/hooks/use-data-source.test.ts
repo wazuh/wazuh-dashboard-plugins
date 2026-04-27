@@ -1,5 +1,5 @@
 import { useDataSource } from './use-data-source';
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react';
 import {
   tDataSourceRepository,
   tFilter,
@@ -11,8 +11,27 @@ import {
   IndexPattern,
 } from '../../../../../../../src/plugins/data/common';
 
+jest.mock('../../../../react-services/navigation-service', () => ({
+  getInstance() {
+    return {
+      getHistory: () => ({ listen: jest.fn(), location: {} }),
+    };
+  },
+}));
+
+jest.mock(
+  '../../../../../../../src/plugins/opensearch_dashboards_utils/public',
+  () => ({
+    createOsdUrlStateStorage: jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue(null),
+      set: jest.fn(),
+    }),
+  }),
+);
+
 jest.mock('../../../../kibana-services', () => ({
   ...(jest.requireActual('../../../../kibana-services') as object),
+  getUiSettings: () => ({ get: jest.fn().mockReturnValue(false) }),
   getDataPlugin: () => ({
     // mock indexPatterns getter
     indexPatterns: {

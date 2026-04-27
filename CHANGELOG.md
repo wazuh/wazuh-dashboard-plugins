@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v5.0.0 - OpenSearch Dashboards 3.5.0 - Revision 01
+## Wazuh v5.0.0 - OpenSearch Dashboards 3.6.0 - Revision 01
 
 ### Added
 
@@ -130,7 +130,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the Statistics app [#8218](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8218)
 - Removed some options of the manager and agent configuration [#8243](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8243)
 
-## Wazuh v4.14.5 - OpenSearch Dashboards 2.19.4 - Revision 00
+## Wazuh v4.14.6 - OpenSearch Dashboards 2.19.5 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.14.6
+
+## Wazuh v4.14.5 - OpenSearch Dashboards 2.19.5 - Revision 01
 
 ### Added
 
