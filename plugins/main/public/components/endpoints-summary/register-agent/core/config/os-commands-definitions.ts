@@ -83,29 +83,35 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
   options: [
     {
       architecture: 'DEB amd64',
+      packageName: props => `wazuh-agent_${props.wazuhVersion}-beta1_amd64.deb`,
       urlPackage: props =>
-        `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${props.wazuhVersion}-beta1_amd64.deb`,
+        `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/apt/pool/main/w/wazuh-agent/${props.packageName}`,
       installCommand: props => getDEBAMD64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
       architecture: 'RPM amd64',
+      packageName: props =>
+        `wazuh-agent-${props.wazuhVersion}-beta1.x86_64.rpm`,
       urlPackage: props =>
-        `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/yum/wazuh-agent-${props.wazuhVersion}-beta1.x86_64.rpm`,
+        `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/yum/${props.packageName}`,
       installCommand: props => getRPMAMD64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
       architecture: 'DEB aarch64',
+      packageName: props => `wazuh-agent_${props.wazuhVersion}-beta1_arm64.deb`,
       urlPackage: props =>
-        `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${props.wazuhVersion}-beta1_arm64.deb`,
+        `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/apt/pool/main/w/wazuh-agent/${props.packageName}`,
       installCommand: props => getDEBARM64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
       architecture: 'RPM aarch64',
+      packageName: props =>
+        `wazuh-agent-${props.wazuhVersion}-beta1.aarch64.rpm`,
       urlPackage: props =>
-        `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/yum/wazuh-agent-${props.wazuhVersion}-beta1.aarch64.rpm`,
+        `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/yum/${props.packageName}`,
       installCommand: props => getRPMARM64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
@@ -117,8 +123,9 @@ const windowsDefinition: IOSDefinition<IWindowsOSTypes, tOptionalParameters> = {
   options: [
     {
       architecture: 'MSI 32/64 bits',
+      packageName: props => `wazuh-agent-${props.wazuhVersion}-beta1.msi`,
       urlPackage: props =>
-        `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/windows/wazuh-agent-${props.wazuhVersion}-beta1.msi`,
+        `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/windows/${props.packageName}`,
       installCommand: props => getWindowsInstallCommand(props),
       startCommand: props => getWindowsStartCommand(props),
     },
@@ -130,15 +137,18 @@ const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
   options: [
     {
       architecture: 'Intel',
+      packageName: props =>
+        `wazuh-agent-${props.wazuhVersion}-beta1.intel64.pkg`,
       urlPackage: props =>
-        `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/macos/wazuh-agent-${props.wazuhVersion}-beta1.intel64.pkg`,
+        `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/macos/${props.packageName}`,
       installCommand: props => getMacOsInstallCommand(props),
       startCommand: props => getMacosStartCommand(props),
     },
     {
       architecture: 'Apple silicon',
+      packageName: props => `wazuh-agent-${props.wazuhVersion}-beta1.arm64.pkg`,
       urlPackage: props =>
-        `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/macos/wazuh-agent-${props.wazuhVersion}-beta1.arm64.pkg`,
+        `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/macos/${props.packageName}`,
       installCommand: props => getMacOsInstallCommand(props),
       startCommand: props => getMacosStartCommand(props),
     },

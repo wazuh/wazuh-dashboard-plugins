@@ -1,3 +1,4 @@
+/** @jest-environment node */
 import { Router } from '../../../../../src/core/server/http/router/router';
 import { HttpServer } from '../../../../../src/core/server/http/http_server';
 import { loggingSystemMock } from '../../../../../src/core/server/logging/logging_system.mock';

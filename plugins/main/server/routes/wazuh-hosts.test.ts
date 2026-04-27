@@ -1,3 +1,4 @@
+/** @jest-environment node */
 // To launch this file
 // yarn test:jest --testEnvironment node --verbose server/routes/wazuh-hosts
 import supertest from 'supertest';

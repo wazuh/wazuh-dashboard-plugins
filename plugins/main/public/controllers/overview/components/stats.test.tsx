@@ -99,8 +99,9 @@ jest.mock('../../../react-services/common-services', () => ({
 
 describe('Stats component', () => {
   test('renders correctly to match the snapshot', async () => {
+    let container: HTMLElement;
     await act(async () => {
-      const { container } = render(
+      const { container: renderedContainer } = render(
         <Stats
           active={8}
           disconnected={0}
@@ -111,7 +112,8 @@ describe('Stats component', () => {
           isAgentsLoading={false}
         />,
       );
-      expect(container).toMatchSnapshot();
+      container = renderedContainer;
     });
+    expect(container).toMatchSnapshot();
   });
 });

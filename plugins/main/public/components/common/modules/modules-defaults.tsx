@@ -42,6 +42,7 @@ import {
   TAB_VIEW_ID_EVENTS,
   TAB_VIEW_NAME_DASHBOARD,
   TAB_VIEW_NAME_EVENTS,
+  WAZUH_MODULES_ID,
   WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
@@ -96,15 +97,21 @@ import {
   ITHygieneServicesInventory,
 } from '../../overview/it-hygiene';
 import {
-  RegulatoryCompliancePCIDSS,
+  RegulatoryComplianceCMMC,
+  RegulatoryComplianceFedRAMP,
   RegulatoryComplianceGDPR,
   RegulatoryComplianceHIPAA,
+  RegulatoryComplianceISO27001,
+  RegulatoryComplianceNIS2,
+  RegulatoryComplianceNIST800171,
   RegulatoryComplianceNIST80053,
+  RegulatoryCompliancePCIDSS,
   RegulatoryComplianceTSC,
 } from '../../overview/regulatory-compliance';
 import { InventoryFIM } from '../../overview/fim';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
 import { ReportingService } from '../../../react-services';
+import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 
 const ButtonModuleGenerateReport = {
   condition: () => new ReportingService().reportDashboardPluginExist(),
@@ -536,6 +543,7 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
+
   'it-hygiene': {
     init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
@@ -588,32 +596,62 @@ export const ModulesDefaults = {
     init: 'pci-dss',
     tabs: [
       {
-        id: 'pci-dss',
-        name: 'PCI DSS',
+        id: WAZUH_MODULES_ID.CMMC,
+        name: WAZUH_MODULES[WAZUH_MODULES_ID.CMMC].title,
         buttons: [ButtonExploreAgent],
-        component: RegulatoryCompliancePCIDSS,
+        component: RegulatoryComplianceCMMC,
       },
       {
-        id: 'gdpr',
-        name: 'GDPR',
+        id: WAZUH_MODULES_ID.FEDRAMP,
+        name: WAZUH_MODULES[WAZUH_MODULES_ID.FEDRAMP].title,
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceFedRAMP,
+      },
+      {
+        id: WAZUH_MODULES_ID.GDPR,
+        name: WAZUH_MODULES[WAZUH_MODULES_ID.GDPR].title,
         buttons: [ButtonExploreAgent],
         component: RegulatoryComplianceGDPR,
       },
       {
-        id: 'hipaa',
-        name: 'HIPAA',
+        id: WAZUH_MODULES_ID.HIPAA,
+        name: WAZUH_MODULES[WAZUH_MODULES_ID.HIPAA].title,
         buttons: [ButtonExploreAgent],
         component: RegulatoryComplianceHIPAA,
       },
       {
-        id: 'nist-800-53',
-        name: 'NIST 800-53',
+        id: WAZUH_MODULES_ID.ISO_27001,
+        name: WAZUH_MODULES[WAZUH_MODULES_ID.ISO_27001].title,
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceISO27001,
+      },
+      {
+        id: WAZUH_MODULES_ID.NIS2,
+        name: WAZUH_MODULES[WAZUH_MODULES_ID.NIS2].title,
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceNIS2,
+      },
+      {
+        id: WAZUH_MODULES_ID.NIST_800_53,
+        name: WAZUH_MODULES[WAZUH_MODULES_ID.NIST_800_53].title,
         buttons: [ButtonExploreAgent],
         component: RegulatoryComplianceNIST80053,
       },
       {
-        id: 'tsc',
-        name: 'TSC',
+        id: WAZUH_MODULES_ID.NIST_800_171,
+        name: WAZUH_MODULES[WAZUH_MODULES_ID.NIST_800_171].title,
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryComplianceNIST800171,
+      },
+      {
+        id: WAZUH_MODULES_ID.PCI_DSS,
+        name: WAZUH_MODULES[WAZUH_MODULES_ID.PCI_DSS].title,
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryCompliancePCIDSS,
+      },
+      {
+        id: WAZUH_MODULES_ID.TSC,
+        name: WAZUH_MODULES[WAZUH_MODULES_ID.TSC].title,
         buttons: [ButtonExploreAgent],
         component: RegulatoryComplianceTSC,
       },
