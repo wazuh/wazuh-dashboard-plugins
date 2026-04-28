@@ -29,6 +29,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added NIS2 regulatory compliance module [#8298](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8298)
 - Added NIST 800-171 regulatory compliance module [#8294](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8294)
 - Added `wazuh-threatintel-enrichments*` and `wazuh-threatintel-vulnerabilities*` index patterns [#8357](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8357)
+- Allow report generation in Vulnerabilities dashboard [#8403](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8403)
 
 ### Changed
 
