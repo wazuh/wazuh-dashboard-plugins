@@ -4,6 +4,7 @@ import { NavigateToAppOptions } from '../../../../src/core/public';
 import { buildPhraseFilter } from '../../../../src/plugins/data/common';
 import rison from 'rison-node';
 import { WAZUH_EVENTS_PATTERN } from '../../common/constants';
+import { Applications } from '../utils/applications';
 
 /**
  * Custom implementation URLSearchParams-like to parse and serialize the URL query string.
@@ -224,6 +225,12 @@ class NavigationService {
     options?: { path?: string; absolute?: boolean },
   ): string {
     return getCore().application.getUrlForApp(appId, options);
+  }
+
+  public getAppURL(appId: string): string {
+    const app = Applications.find(a => a.id === appId);
+    const path = app?.redirectTo ? `#${app.redirectTo()}` : undefined;
+    return NavigationService.getInstance().getUrlForApp(appId, { path });
   }
 
   public buildSearch(search: NavigationURLSearchParams) {

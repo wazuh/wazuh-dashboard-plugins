@@ -27,9 +27,9 @@ import { getCore } from '../../../../../kibana-services';
 import { withDataSourceFetch, withGuard, withPanel } from '../../../hocs';
 import { compose } from 'redux';
 import { configurationAssessment } from '../../../../../utils/applications';
+import NavigationService from '../../../../../react-services/navigation-service';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
-import NavigationService from '../../../../../react-services/navigation-service';
 import {
   SCAStatesDataSource,
   SCAStatesDataSourceRepository,
@@ -66,7 +66,7 @@ const ScaScanHeader = ({ agent }) => {
               onClick={() => {
                 new PinnedAgentManager().pinAgent(agent);
               }}
-              href={NavigationService.getInstance().getUrlForApp(
+              href={NavigationService.getInstance().getAppURL(
                 configurationAssessment.id,
               )}
               aria-label='Open SCA Scans'
