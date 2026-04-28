@@ -5,6 +5,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v5.0.0 - OpenSearch Dashboards 3.6.0 - Revision 01
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 5.0.0
 - Added default notification channels through health check [#7827](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7827)
@@ -135,12 +136,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.14.6 - OpenSearch Dashboards 2.19.5 - Revision 00
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.14.6
 
 ## Wazuh v4.14.5 - OpenSearch Dashboards 2.19.5 - Revision 01
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.14.5
 
@@ -152,6 +155,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.14.4 - OpenSearch Dashboards 2.19.4 - Revision 02
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.14.4
 
@@ -164,6 +168,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.14.3 - OpenSearch Dashboards 2.19.4 - Revision 03
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.14.3
 - Added ability to remove agents from Agents management > Summary [#8025](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8025)
@@ -183,6 +188,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.14.2 - OpenSearch Dashboards 2.19.4 - Revision 04
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.14.2
 - Added persistence for page size and sorting in API tables [#7883](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7883) [#8024](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8024)
@@ -202,6 +208,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 02
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.14.1
 
@@ -223,6 +230,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.14.0 - OpenSearch Dashboards 2.19.3 - Revision 03
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.14.0
 - Added visualizations field validations when creating wazuh-states index patterns [#7777](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7777)
@@ -250,6 +258,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.13.1 - OpenSearch Dashboards 2.19.2 - Revision 01
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.13.1
 
@@ -264,6 +273,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 08
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.13.0
 - Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7461](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7461) [#7476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7476) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513) [#7582](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7582) [#7588](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7588) [#7692](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7692) [#7717](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7717)
@@ -304,6 +314,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.12.0 - OpenSearch Dashboards 2.19.1 - Revision 03
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.12.0
 - Add setting to limit the number of rows in csv reports [#7182](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7182)
@@ -333,6 +344,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.11.2 - OpenSearch Dashboards 2.16.0 - Revision 02
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.11.2
 
@@ -343,6 +355,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.11.1 - OpenSearch Dashboards 2.16.0 - Revision 02
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.11.1
 - Added missing fields to the default fields list of the alerts index pattern [#7318](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7318)
@@ -354,6 +367,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.11.0 - OpenSearch Dashboards 2.16.0 - Revision 03
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.11.0
 
@@ -374,6 +388,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.10.1 - OpenSearch Dashboards 2.16.0 - Revision 01
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.10.1
 - Added comma separators to numbers [#7233](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7233)
@@ -386,6 +401,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 08
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.10.0
 - Added sample data for YARA [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
@@ -447,6 +463,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.9.2 - OpenSearch Dashboards 2.13.0 - Revision 01
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.9.2
 
@@ -457,6 +474,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.9.1 - OpenSearch Dashboards 2.13.0 - Revision 04
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.9.1
 - Add feature to filter by field in the events table rows [#6977](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6991)
@@ -498,6 +516,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 07
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.9.0
 - Added AngularJS dependencies [#6145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6145)
@@ -579,12 +598,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.8.2 - OpenSearch Dashboards 2.10.0 - Revision 01
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.8.2
 
 ## Wazuh v4.8.1 - OpenSearch Dashboards 2.10.0 - Revision 04
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.8.1
 
@@ -598,6 +619,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.8.0 - OpenSearch Dashboards 2.10.0 - Revision 12
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.8.0
 - Added the ability to check if there are available updates from the UI. [#6093](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6093) [#6256](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6256) [#6328](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6328)
@@ -652,6 +674,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.7.5 - OpenSearch Dashboards 2.8.0 - Revision 02
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.7.5
 - Added sanitization to custom branding SVG files [#6687](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6687)
@@ -663,12 +686,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.7.4 - OpenSearch Dashboards 2.8.0 - Revision 02
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.7.4
 
 ## Wazuh v4.7.3 - OpenSearch Dashboards 2.8.0 - Revision 02
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.7.3
 
@@ -679,6 +704,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.7.2 - OpenSearch Dashboards 2.8.0 - Revision 02
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.7.2
 - Added contextual information in the register agent commands [#6208](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6208)
@@ -693,6 +719,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.7.1 - OpenSearch Dashboards 2.8.0 - Revision 03
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.7.1
 
@@ -706,6 +733,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.7.0 - OpenSearch Dashboards 2.8.0 - Revision 04
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.7.0
 - Added `status detail` column in the agents table. [#5680](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5680)
@@ -731,6 +759,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.6.0 - OpenSearch Dashboards 2.8.0 - Revision 03
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Added rel="noopener noreferrer" in documentation links. [#5197](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5197) [#5274](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5274) [#5298](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5298) [#5409](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5409)
 - Added `ignore` and `restrict` options to Syslog configuration. [#5203](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5203)
@@ -783,12 +812,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.5.4 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.5.4
 
 ## Wazuh v4.5.3 - OpenSearch Dashboards 2.6.0 - Revision 02
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.5.3
 
@@ -799,6 +830,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.5.2 - OpenSearch Dashboards 2.6.0 - Revision 02
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.5.2
 
@@ -810,6 +842,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.5.1 - OpenSearch Dashboards 2.6.0 - Revision 03
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Add Apple Silicon architecture button to the register Agent wizard [#5478](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5478)
 
@@ -834,18 +867,21 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.5.0 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.5.0
 
 ## Wazuh v4.4.5 - OpenSearch Dashboards 2.6.0 - Revision 02
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.4.5
 
 ## Wazuh v4.4.4 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.4.4
 
@@ -856,6 +892,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.4.3 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.4.3
 
@@ -867,6 +904,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.4.2 - OpenSearch Dashboards 2.6.0 - Revision 01
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.4.2
 
@@ -887,6 +925,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.4.0 - OpenSearch Dashboards 2.4.0 - Revision 06
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Added the option to sort by the agent's count in the group table. [#4323](https://github.com/wazuh/wazuh-dashboard-plugins/pull/4323)
 - Added agent synchronization status in the agent module. [#3874](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3874) [#5143](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5143) [#5177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/5177)
@@ -970,6 +1009,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.3.11 - OpenSearch Dashboards 1.2.0 - Revision 4312
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.3.11
 
@@ -982,12 +1022,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.3.9 - OpenSearch Dashboards 1.2.0 - Revision 4310
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.3.9
 
 ## Wazuh v4.3.8 - OpenSearch Dashboards 1.2.0 - Revision 4309
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.3.8
 
@@ -1025,6 +1067,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.3.5 - OpenSearch Dashboards 1.2.0 - Revision 4306
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Added to the interface API messages in the Ruleset test module [#4244](https://github.com/wazuh/wazuh-dashboard-plugins/pull/4244)
 - Added authorization prompt in Mitre > Intelligence [#4261](https://github.com/wazuh/wazuh-dashboard-plugins/pull/4261)
@@ -1049,6 +1092,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.3.4 - OpenSearch Dashboards 1.2.0 - Revision 4305
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Added the `pending` agent status to some sections that was missing
   [#4166](https://github.com/wazuh/wazuh-dashboard-plugins/pull/4166)
@@ -1077,12 +1121,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.3.2 - OpenSearch Dashboards 1.2.0 - Revision 4303
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.3.2
 
 ## Wazuh v4.3.1 - OpenSearch Dashboards 1.2.0 - Revision 4302
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Added PowerShell version warning to Windows agent installation wizard [#4142](https://github.com/wazuh/wazuh-dashboard-plugins/pull/4142)
 - A new workflow is added to perform backports to specific branches [#4149](https://github.com/wazuh/wazuh-dashboard-plugins/pull/4149)
@@ -1094,6 +1140,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.3.0 - OpenSearch Dashboards 1.2.0 - Revision 4301
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for OpenSearch Dashboards 1.2.0
 - Added GitHub and Office365 modules [#3557](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3557)
@@ -1269,6 +1316,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.2.6 - Kibana 7.10.2, 7.11.2, 7.12.1, 7.13.0, 7.13.1, 7.13.2, 7.13.3, 7.13.4, 7.14.0, 7.14.1, 7.14.2 - Revision 4207
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana 7.13.4
 - Support for Kibana 7.14.2
@@ -1291,6 +1339,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.2.4 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4205
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.2.4
 
@@ -1301,12 +1350,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.2.3 - Kibana 7.10.2, 7.11.2, 7.12.1 - Revision 4204
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.2.3
 
 ## Wazuh v4.2.2 - Kibana 7.10.2 , 7.12.1 - Revision 4203
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Wazuh help links in the Kibana help menu [#3170](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3170)
 - Redirect to group details using the `group` query param in the URL [#3184](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3184)
@@ -1364,12 +1415,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.2.1 - Kibana 7.10.2 , 7.11.2 - Revision 4202
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 4.2.1
 
 ## Wazuh v4.2.0 - Kibana 7.10.2 , 7.11.2 - Revision 4201
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Added `Ruleset Test` section under Tools menu, and on Edit Rules/Decoders as a tool. [#1434](https://github.com/wazuh/wazuh-dashboard-plugins/pull/1434)
 - Added page size options in Security events, explore agents table [#2925](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2925)
@@ -1421,6 +1474,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.1.5 - Kibana 7.10.0 , 7.10.2, 7.11.2 - Revision 4107
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana 7.11.2
 - Added a warning message for the `Install and enroll the agent` step of `Deploy new agent` guide [#3238](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3238)
@@ -1441,6 +1495,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.1.3 - Kibana 7.10.0 , 7.10.2 - Revision 4104
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Creation of index pattern after the default one is changes in Settings [#2985](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2985)
 - Added node name of agent list and detail [#3039](https://github.com/wazuh/wazuh-dashboard-plugins/pull/3039)
@@ -1483,6 +1538,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.1.1 - Kibana 7.10.0 , 7.10.2 - Revision 4102
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Prompt to show the unsupported module for the selected agent [#2959](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2959)
 - Added a X-Frame-Options header to the backend responses [#2977](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2977)
@@ -1518,6 +1574,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.1.0 - Kibana 7.10.0 , 7.10.2 - Revision 4101
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Check the max buckets by default in healthcheck and increase them [#2901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2901)
 - Added a prompt wraning in role mapping if run_as is false or he is not allowed to use it by API [#2876](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2876)
@@ -1554,6 +1611,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4017
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Adapt the app to the new Kibana platform [#2475](https://github.com/wazuh/wazuh-dashboard-plugins/issues/2475)
 - Wazuh data directory moved from `optimize` to `data` Kibana directory [#2591](https://github.com/wazuh/wazuh-dashboard-plugins/issues/2591)
@@ -1601,6 +1659,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.0.4 - Kibana 7.10.0 , 7.10.2 - Revision 4016
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Modified agent registration adding groups and architecture [#2666](https://github.com/wazuh/wazuh-dashboard-plugins/issues/2666) [#2652](https://github.com/wazuh/wazuh-dashboard-plugins/issues/2652)
 - Each user can only view their own reports [#2686](https://github.com/wazuh/wazuh-dashboard-plugins/issues/2686)
@@ -1623,12 +1682,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.0.4 - Kibana v7.9.1, v7.9.3 - Revision 4015
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v4.0.4
 
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4014
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Improved management of index-pattern fields [#2630](https://github.com/wazuh/wazuh-dashboard-plugins/issues/2630)
 
@@ -1643,12 +1704,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.0.3 - Kibana v7.9.1, v7.9.2, v7.9.3 - Revision 4013
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v4.0.3.
 
 ## Wazuh v4.0.2 - Kibana v7.9.1, v7.9.3 - Revision 4012
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Sample data indices name should take index pattern in use [#2593](https://github.com/wazuh/wazuh-dashboard-plugins/issues/2593)
 - Added start option to macos Agents [#2653](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2653)
@@ -1660,6 +1723,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.0.2 - Kibana v7.9.1, v7.9.3 - Revision 4011
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v4.0.2.
 
@@ -1727,12 +1791,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v4.0.0 - Kibana v7.9.3 - Revision 4005
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.9.3
 
 ## Wazuh v4.0.0 - Kibana v7.9.1, v7.9.2 - Revision 4002
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v4.0.0.
 - Support for Kibana v7.9.1 and 7.9.2.
@@ -1764,6 +1830,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 # Wazuh v3.13.6 - Kibana v7.9.2 - Revision 890
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.13.6
 
@@ -1774,48 +1841,56 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.13.2 - Kibana v7.9.1 - Revision 887
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.13.2
 
 ## Wazuh v3.13.2 - Kibana v7.8.0 - Revision 887
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.13.2
 
 ## Wazuh v3.13.1 - Kibana v7.9.1 - Revision 886
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.9.1
 
 ## Wazuh v3.13.1 - Kibana v7.9.0 - Revision 885
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.9.0
 
 ## Wazuh v3.13.1 - Kibana v7.8.1 - Revision 884
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.8.1
 
 ## Wazuh v3.13.1 - Kibana v7.8.0 - Revision 883
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.13.1
 
 ## Wazuh v3.13.0 - Kibana v7.8.0 - Revision 881
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.8.0
 
 ## Wazuh v3.13.0 - Kibana v7.7.0, v7.7.1 - Revision 880
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.13.0
 - Support for Kibana v7.7.1
@@ -1848,30 +1923,35 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.12.3 - Kibana v7.7.1 - Revision 876
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.7.1
 
 ## Wazuh v3.12.3 - Kibana v7.7.0 - Revision 875
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.7.0
 
 ## Wazuh v3.12.3 - Kibana v6.8.8, v7.6.1, v7.6.2 - Revision 874
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.12.3
 
 ## Wazuh v3.12.2 - Kibana v6.8.8, v7.6.1, v7.6.2 - Revision 873
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.12.2
 
 ## Wazuh v3.12.1 - Kibana v6.8.8, v7.6.1, v7.6.2 - Revision 872
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support Wazuh 3.12.1
 - Added new FIM settings on configuration on demand. [#2147](https://github.com/wazuh/wazuh-dashboard-plugins/issues/2147)
@@ -1887,12 +1967,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.12.0 - Kibana v6.8.8, v7.6.2 - Revision 871
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v6.8.8 and v7.6.2
 
 ## Wazuh v3.12.0 - Kibana v6.8.7, v7.4.2, v7.6.1 - Revision 870
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.12.0
 - Added a new setting to hide manager alerts from dashboards. [#2102](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2102)
@@ -1914,30 +1996,35 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.11.4 - Kibana v7.6.1 - Revision 858
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.6.1
 
 ## Wazuh v3.11.4 - Kibana v6.8.6, v7.4.2, v7.6.0 - Revision 857
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.11.4
 
 ## Wazuh v3.11.3 - Kibana v7.6.0 - Revision 856
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.6.0
 
 ## Wazuh v3.11.3 - Kibana v7.4.2 - Revision 855
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.4.2
 
 ## Wazuh v3.11.3 - Kibana v7.5.2 - Revision 854
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.11.3
 
@@ -1948,12 +2035,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.11.2 - Kibana v7.5.2 - Revision 853
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.5.2
 
 ## Wazuh v3.11.2 - Kibana v6.8.6, v7.3.2, v7.5.1 - Revision 852
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.11.2
 
@@ -1969,12 +2058,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.11.1 - Kibana v6.8.6, v7.3.2, v7.5.1 - Revision 581
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.11.1.
 
 ## Wazuh v3.11.0 - Kibana v6.8.6, v7.3.2, v7.5.1 - Revision 580
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.11.0.
 - Support for Kibana v7.5.1.
@@ -2013,30 +2104,35 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.10.2 - Kibana v7.5.1 - Revision 556
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.5.1
 
 ## Wazuh v3.10.2 - Kibana v7.5.0 - Revision 555
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.5.0
 
 ## Wazuh v3.10.2 - Kibana v7.4.2 - Revision 549
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.4.2
 
 ## Wazuh v3.10.2 - Kibana v7.4.1 - Revision 548
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.4.1
 
 ## Wazuh v3.10.2 - Kibana v7.4.0 - Revision 547
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.4.0
 - Support for Wazuh v3.10.2.
@@ -2044,18 +2140,21 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.10.2 - Kibana v7.3.2 - Revision 546
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.10.2.
 
 ## Wazuh v3.10.1 - Kibana v7.3.2 - Revision 545
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.10.1.
 
 ## Wazuh v3.10.0 - Kibana v7.3.2 - Revision 543
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.10.0.
 - Added an interactive guide for registering agents, things are now easier for the user, guiding it through the steps needed ending in a _copy & paste_ snippet for deploying his agent [#1468](https://github.com/wazuh/wazuh-dashboard-plugins/issues/1468).
@@ -2097,12 +2196,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.9.5 - Kibana v6.8.2 / Kibana v7.2.1 / Kibana v7.3.0 - Revision 531
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.9.5
 
 ## Wazuh v3.9.4 - Kibana v6.8.1 / Kibana v6.8.2 / Kibana v7.2.0 / Kibana v7.2.1 / Kibana v7.3.0 - Revision 528
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.9.4
 - Allow filtering by clicking a column in rules/decoders tables [0e2ddd7](https://github.com/wazuh/wazuh-dashboard-plugins/pull/1615/commits/0e2ddd7b73f7f7975d02e97ed86ae8a0966472b4)
@@ -2144,6 +2245,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.9.3 - Kibana v6.8.1 / v7.1.1 / v7.2.0 - Revision 523
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.9.3
 - Support for Kibana v7.2.0 [#1556](https://github.com/wazuh/wazuh-dashboard-plugins/pull/1556).
@@ -2175,6 +2277,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.9.2 - Kibana v7.1.1 - Revision 510
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.9.2
 
@@ -2191,6 +2294,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.9.1 - Kibana v7.1.1 - Revision 509
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.1.1
 - Added overall metrics for Agents > Overview [#1479](https://github.com/wazuh/wazuh-dashboard-plugins/pull/1479).
@@ -2204,12 +2308,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.9.1 - Kibana v7.1.0 - Revision 508
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v7.1.0
 
 ## Wazuh v3.9.1 - Kibana v6.8.0 - Revision 444
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.9.1
 - Support for Kibana v6.8.0
@@ -2234,6 +2340,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.9.0 - Kibana v6.7.0 / v6.7.1 / v6.7.2 - Revision 441
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.9.0
 - Support for Kibana v6.7.0 / v6.7.1 / v6.7.2
@@ -2307,6 +2414,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.8.2 - Kibana v6.6.0 / v6.6.1 / v6.6.2 / v6.7.0 - Revision 419
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Kibana v6.6.0 / v6.6.1 / v6.6.2 / v6.7.0
 
@@ -2318,6 +2426,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.8.2 - Kibana v6.5.4 - Revision 418
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.8.2
 
@@ -2329,6 +2438,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.8.1 - Kibana v6.5.4 - Revision 417
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.8.1
 
@@ -2347,6 +2457,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.8.0 - Kibana v6.5.4 - Revision 416
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Added group management features such as:
   - Edit the group configuration ([#1096](https://github.com/wazuh/wazuh-dashboard-plugins/pull/1096)).
@@ -2401,6 +2512,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.7.1 / v3.7.2 - Kibana v6.5.1 / v6.5.2 / v6.5.3 / v6.5.4 - Revision 415
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Elastic stack v6.5.2 / v6.5.3 / v6.5.4.
 - Support for Wazuh v3.7.1 / v3.7.2.
@@ -2421,6 +2533,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.7.0 - Kibana v6.5.0 / v6.5.1 - Revision 414
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Elastic Stack v6.5.0 / v6.5.1.
 - Agent groups bar is now visible on the agent configuration section ([#1023](https://github.com/wazuh/wazuh-dashboard-plugins/pull/1023)).
@@ -2434,6 +2547,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.7.0 - Kibana v6.4.2 / v6.4.3 - Revision 413
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.7.0.
 - Support for Elastic Stack v6.4.2 / v6.4.3.
@@ -2494,12 +2608,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.6.1 - Kibana v6.4.1 / v6.4.2 / v6.4.3 - Revision 412
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Elastic Stack v6.4.1 / v6.4.2 / v6.4.3.
 
 ## Wazuh v3.6.1 - Kibana v6.4.0 - Revision 411
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Redesigned the _Overview > Integrity monitoring_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#893](https://github.com/wazuh/wazuh-dashboard-plugins/pull/893)).
 - Added a new table for the _Inventory_ tab: _Processes_ ([#895](https://github.com/wazuh/wazuh-dashboard-plugins/pull/895)).
@@ -2517,6 +2633,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.6.1 - Kibana v6.4.0 - Revision 410
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - The _Inventory_ tab has been redesigned ([#873](https://github.com/wazuh/wazuh-dashboard-plugins/pull/873)):
   - Added new network interfaces and port tables.
@@ -2550,6 +2667,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.6.1 - Kibana v6.4.0 - Revision 409
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.6.1.
 
@@ -2560,6 +2678,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.6.1 - Kibana v6.3.2 - Revision 408
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.6.1.
 
@@ -2570,24 +2689,28 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.6.0 - Kibana v6.4.0 - Revision 407
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.6.0.
 
 ## Wazuh v3.6.0 - Kibana v6.3.2 - Revision 406
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.6.0.
 
 ## Wazuh v3.5.0 - Kibana v6.4.0 - Revision 405
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Elastic Stack v6.4.0 ([#813](https://github.com/wazuh/wazuh-dashboard-plugins/pull/813)).
 
 ## Wazuh v3.5.0 - Kibana v6.3.2 - Revision 404
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Added new options to `config.yml` to change shards and replicas settings for `wazuh-monitoring` indices ([#809](https://github.com/wazuh/wazuh-dashboard-plugins/pull/809)).
 - Added more error messages for `wazuhapp.log` in case of failure when performing some crucial functions ([#812](https://github.com/wazuh/wazuh-dashboard-plugins/pull/812)).
@@ -2606,6 +2729,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.5.0 - Kibana v6.3.2 - Revision 403
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - The welcome tabs on _Overview_ and _Agents_ have been updated with a new name and description for the existing sections ([#788](https://github.com/wazuh/wazuh-dashboard-plugins/pull/788)).
 - Now the app tables will auto-resize depending on the screen height ([#792](https://github.com/wazuh/wazuh-dashboard-plugins/pull/792)).
@@ -2629,6 +2753,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.5.0 - Kibana v6.3.1/v6.3.2 - Revision 402
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.5.0.
 - Added new fields for _Vulnerability detector_ alerts ([#752](https://github.com/wazuh/wazuh-dashboard-plugins/pull/752)).
@@ -2637,6 +2762,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.4.0 - Kibana v6.3.1/v6.3.2 - Revision 401
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Added a few new fields for Kibana due to the new Wazuh _who-data_ feature ([#763](https://github.com/wazuh/wazuh-dashboard-plugins/pull/763)).
 - Added XML/JSON viewer for each card under _Management > Configuration_ ([#764](https://github.com/wazuh/wazuh-dashboard-plugins/pull/764)).
@@ -2660,6 +2786,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.4.0 - Kibana v6.3.1/v6.3.2 - Revision 400
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.4.0.
 - Support for Elastic Stack v6.3.2.
@@ -2686,6 +2813,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.3.0/v3.3.1 - Kibana v6.3.1 - Revision 399
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Added a new Angular.js factory to store the Wazuh app configuration values. Also, this factory is being used by the pre-routes functions (resolves); this way we are sure about having the real configuration at any time. These pre-routes functions have been improved too ([#670](https://github.com/wazuh/wazuh-dashboard-plugins/pull/670)).
 - Added extended information for reports from _Reporting_ feature ([#701](https://github.com/wazuh/wazuh-dashboard-plugins/pull/701)).
@@ -2715,6 +2843,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.3.0/v3.3.1 - Kibana v6.3.0 - Revision 398
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Improvements for latest app redesign ([#652](https://github.com/wazuh/wazuh-dashboard-plugins/pull/652)):
   - The _Welcome_ tabs have been simplified, following a more Elastic design.
@@ -2765,6 +2894,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.3.0/v3.3.1 - Kibana v6.3.0 - Revision 397
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Elastic Stack v6.3.0 ([#579](https://github.com/wazuh/wazuh-dashboard-plugins/pull/579) & [#612](https://github.com/wazuh/wazuh-dashboard-plugins/pull/612) & [#615](https://github.com/wazuh/wazuh-dashboard-plugins/pull/615)).
 - Brand-new Wazuh app redesign for the _Monitoring_ tab ([#581](https://github.com/wazuh/wazuh-dashboard-plugins/pull/581)):
@@ -2803,6 +2933,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.3.0/v3.3.1 - Kibana v6.2.4 - Revision 396
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.3.1.
 - Brand-new Wazuh app redesign for the _Settings_ tab ([#570](https://github.com/wazuh/wazuh-dashboard-plugins/pull/570)):
@@ -2834,6 +2965,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.3.0 - Kibana v6.2.4 - Revision 394
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.3.0.
 - Updated some backend API calls to include the app version in the request header ([#560](https://github.com/wazuh/wazuh-dashboard-plugins/pull/560)).
@@ -2841,6 +2973,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.2.4 - Kibana v6.2.4 - Revision 393
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Brand-new Wazuh app redesign for _Overview_ and _Agents_ tabs ([#543](https://github.com/wazuh/wazuh-dashboard-plugins/pull/543)):
   - Updated UI for these tabs using breadcrumbs.
@@ -2872,6 +3005,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.2.3/v3.2.4 - Kibana v6.2.4 - Revision 392
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.2.4.
 - New functionality - _Reporting_ ([#510](https://github.com/wazuh/wazuh-dashboard-plugins/pull/510)):
@@ -2896,6 +3030,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.2.3 - Kibana v6.2.4 - Revision 391
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.2.3.
 - Brand-new extension - _GDPR Alerts_ ([#453](https://github.com/wazuh/wazuh-dashboard-plugins/pull/453)):
@@ -2970,6 +3105,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.2.1/v3.2.2 - Kibana v6.2.4 - Revision 390
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.2.2.
 - Refactoring on visualizations use and management ([#397](https://github.com/wazuh/wazuh-dashboard-plugins/pull/397)):
@@ -3020,6 +3156,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.2.1 - Kibana v6.2.4 - Revision 388
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Elastic Stack v6.2.4.
 - App server fully refactored ([#360](https://github.com/wazuh/wazuh-dashboard-plugins/pull/360)):
@@ -3070,6 +3207,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.2.1 - Kibana v6.2.2/v6.2.3 - Revision 387
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - New logging system ([#307](https://github.com/wazuh/wazuh-dashboard-plugins/pull/307)):
   - New module implemented to write app logs.
@@ -3140,6 +3278,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 386
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - New design for the _Manager/Groups_ tab ([#295](https://github.com/wazuh/wazuh-dashboard-plugins/pull/295)).
 - New design for the _Manager/Configuration_ tab ([#297](https://github.com/wazuh/wazuh-dashboard-plugins/pull/297)).
@@ -3178,6 +3317,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 385
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh v3.2.1.
 - Brand-new first redesign for the app user interface ([#278](https://github.com/wazuh/wazuh-dashboard-plugins/pull/278)):
@@ -3214,6 +3354,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.2.0 - Kibana v6.2.2 - Revision 384
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - New directives for the Wazuh app: `wz-table`, `wz-table-header` and `wz-search-bar` ([#263](https://github.com/wazuh/wazuh-dashboard-plugins/pull/263)):
   - Maintainable and reusable components for a better-structured app.
@@ -3247,6 +3388,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.2.0 - Kibana v6.2.1 - Revision 383
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 3.2.0.
 - Compatibility with Kibana 6.1.0 to Kibana 6.2.1.
@@ -3279,6 +3421,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.1.0 - Kibana v6.1.3 - Revision 380
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Support for Wazuh 3.1.0.
 - Compatibility with Kibana 6.1.3.
@@ -3330,6 +3473,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.0.0 - Kibana v6.1.0 - Revision 371
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - You can configure the initial index-pattern used by the plugin in the initialPattern variable of the app's package.json.
 - Auto `.wazuh` reindex from Wazuh 2.x - Kibana 5.x to Wazuh 3.x - Kibana 6.x.
@@ -3355,6 +3499,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v2.1.0 - Kibana v5.6.1 - Revision 345
 
 ### Added
+- Test entry for automated merge test [5538]
 
 - Loading icon while Wazuh loads the visualizations.
 - Add/Delete/Restart agents.
