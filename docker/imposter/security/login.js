@@ -2,7 +2,7 @@ exports = {};
 
 load(
   'https://raw.githubusercontent.com/kjur/jsrsasign/10.8.6/npm/lib/jsrsasign.js',
-  exports,
+  exports
 );
 header = {
   alg: 'HS256',
@@ -30,7 +30,7 @@ jwt = KJUR.jws.JWS.sign(
   'HS256',
   JSON.stringify(header),
   JSON.stringify(claims),
-  '616161',
+  '616161'
 );
 
 resp = {
