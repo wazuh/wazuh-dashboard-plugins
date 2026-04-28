@@ -56,9 +56,7 @@ import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashb
 import { FindingsCount } from './dashboard/findings-count';
 import { IntlProvider } from 'react-intl';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
-import NavigationService, {
-  getAppUrl,
-} from '../../../react-services/navigation-service';
+import NavigationService from '../../../react-services/navigation-service';
 import VulsPanel from './components/vuls_panel/vuls_welcome_panel';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
 import { InventoryMetrics } from '../../agents/syscollector/components';
@@ -221,7 +219,9 @@ export const AgentsWelcome = compose(
                 >
                   <RedirectAppLinks application={getCore().application}>
                     <EuiButtonEmpty
-                      href={getAppUrl(applicationId)}
+                      href={NavigationService.getInstance().getAppURL(
+                        applicationId,
+                      )}
                       style={{ cursor: 'pointer' }}
                     >
                       <span>
@@ -393,7 +393,9 @@ export const AgentsWelcome = compose(
                     <EuiButtonIcon
                       iconType='popout'
                       color='primary'
-                      href={getAppUrl(mitreAttack.id)}
+                      href={NavigationService.getInstance().getAppURL(
+                        mitreAttack.id,
+                      )}
                       aria-label='Open MITRE ATT&CK'
                     />
                   </RedirectAppLinks>

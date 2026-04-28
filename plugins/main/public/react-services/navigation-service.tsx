@@ -227,6 +227,12 @@ class NavigationService {
     return getCore().application.getUrlForApp(appId, options);
   }
 
+  public getAppURL(appId: string): string {
+    const app = Applications.find(a => a.id === appId);
+    const path = app?.redirectTo ? `#${app.redirectTo()}` : undefined;
+    return NavigationService.getInstance().getUrlForApp(appId, { path });
+  }
+
   public buildSearch(search: NavigationURLSearchParams) {
     return search.toString();
   }
@@ -318,12 +324,6 @@ class NavigationService {
         }
       });
   }
-}
-
-export function getAppUrl(appId: string): string {
-  const app = Applications.find(a => a.id === appId);
-  const path = app?.redirectTo ? `#${app.redirectTo()}` : undefined;
-  return NavigationService.getInstance().getUrlForApp(appId, { path });
 }
 
 export default NavigationService;

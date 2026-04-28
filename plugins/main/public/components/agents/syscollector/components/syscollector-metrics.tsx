@@ -28,7 +28,7 @@ import {
   withSystemInventorySystemDataSource,
 } from '../../../overview/it-hygiene/common/hocs/validate-system-inventory-index-pattern';
 import { getCore } from '../../../../kibana-services';
-import { getAppUrl } from '../../../../react-services/navigation-service';
+import NavigationService from '../../../../react-services/navigation-service';
 import { ITHygiene } from '../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { IndexPatternFormattedField } from '../../../common/index-pattern';
@@ -171,7 +171,9 @@ export const InventoryMetrics = compose(
                     iconType='popout'
                     color='primary'
                     className='EuiButtonIcon'
-                    href={getAppUrl(ITHygiene.id)}
+                    href={NavigationService.getInstance().getAppURL(
+                      ITHygiene.id,
+                    )}
                     aria-label={`Open ${ITHygiene.title}`}
                   />
                 </EuiToolTip>

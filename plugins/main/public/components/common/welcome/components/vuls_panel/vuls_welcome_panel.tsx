@@ -19,7 +19,7 @@ import { severities } from '../../../../../controllers/overview/components/last-
 import { getCore } from '../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { vulnerabilityDetection } from '../../../../../utils/applications';
-import { getAppUrl } from '../../../../../react-services/navigation-service';
+import NavigationService from '../../../../../react-services/navigation-service';
 import { WzLink } from '../../../../../components/wz-link/wz-link';
 import {
   withDataSourceFetch,
@@ -149,7 +149,9 @@ const VulsPanel = ({ agent }) => {
                 iconType='popout'
                 color='primary'
                 className='EuiButtonIcon'
-                href={getAppUrl(vulnerabilityDetection.id)}
+                href={NavigationService.getInstance().getAppURL(
+                  vulnerabilityDetection.id,
+                )}
                 aria-label='Open Vulnerability Detection'
               />
             </EuiToolTip>
