@@ -39,6 +39,7 @@ services:
     environment:
       - JAVA_OPTS="-Xmx512m -Xss512k -Dfile.encoding=UTF-8 -XX:MaxRAM=800m -XX:MaxRAMPercentage=95 -XX:MinRAMPercentage=60A"
       - MALLOC_ARENA_MAX=1
+      - IMPOSTER_CONFIG_SCAN_RECURSIVE=true
     volumes:
       - ../imposter:/opt/imposter/config
 
