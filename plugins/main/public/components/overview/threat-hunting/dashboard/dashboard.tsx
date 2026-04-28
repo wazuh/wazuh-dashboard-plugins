@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  AlertsDataSourceRepository,
+  FindingsDataSourceRepository,
   ThreatHuntingDataSource,
 } from '../../../common/data-source';
 
@@ -15,16 +15,11 @@ import { createDashboard } from '../../../common/dashboards/dashboard';
 
 export const DashboardThreatHunting = createDashboard({
   DataSource: ThreatHuntingDataSource,
-  DataSourceRepositoryCreator: AlertsDataSourceRepository,
+  DataSourceRepositoryCreator: FindingsDataSourceRepository,
   getDashboardPanels: [
     {
       dashboardId: THREAT_HUNTING_DASHBOARD_ID,
       agentDashboardId: THREAT_HUNTING_AGENT_DASHBOARD_ID,
     },
-  ],
-  sampleDataWarningCategories: [
-    WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
-    WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
-    WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
   ],
 });

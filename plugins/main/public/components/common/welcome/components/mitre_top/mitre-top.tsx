@@ -33,7 +33,7 @@ import {
 import { compose } from 'redux';
 import { withDataSourceFetch, withGuard } from '../../../hocs';
 import {
-  AlertsDataSourceRepository,
+  FindingsDataSourceRepository,
   MitreAttackDataSource,
 } from '../../../data-source';
 
@@ -49,7 +49,7 @@ const PromptNoData = () => (
 const MitreTopTacticsTactics = compose(
   withDataSourceFetch({
     DataSource: MitreAttackDataSource,
-    DataSourceRepositoryCreator: AlertsDataSourceRepository,
+    DataSourceRepositoryCreator: FindingsDataSourceRepository,
     mapRequestParams(props) {
       const [, , dateRange] = props.dependencies;
       return {
@@ -141,9 +141,9 @@ const MitreTopTacticsTechniquesHeader = ({ selectedTactic, setView }) => (
 const MitreTopTacticsTechniquesBody = compose(
   withDataSourceFetch({
     DataSource: MitreAttackDataSource,
-    DataSourceRepositoryCreator: AlertsDataSourceRepository,
+    DataSourceRepositoryCreator: FindingsDataSourceRepository,
     mapRequestParams(props) {
-      const [, , dateRange, selectedTactic] = props.dependencies;
+      const [, dateRange, selectedTactic] = props.dependencies;
       return {
         filters: [
           ...props.dataSource.fetchFilters,
@@ -157,7 +157,7 @@ const MitreTopTacticsTechniquesBody = compose(
         aggs: {
           tactics: {
             terms: {
-              field: 'rule.mitre.id',
+              field: 'rule.mitre.technique',
               size: 5,
             },
           },
@@ -174,7 +174,6 @@ const MitreTopTacticsTechniquesBody = compose(
       ];
     },
     mapResponse(response, props) {
-      return [];
       return response?.aggregations?.tactics?.buckets;
     },
     FetchingDataComponent: () => (
@@ -195,11 +194,11 @@ const MitreTopTacticsTechniquesBody = compose(
   };
 
   const goToDashboardWithFilter = async (e, techniqueID) => {
-    const indexPatternId = dataSource.dataSourece.indexPattern.id;
+    const indexPatternId = dataSource.dataSource.indexPattern.id;
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
-        `rule.mitre.id`,
+        `rule.mitre.technique`,
         techniqueID,
         indexPatternId,
       ),
@@ -214,11 +213,11 @@ const MitreTopTacticsTechniquesBody = compose(
   };
 
   const goToEventsWithFilter = async (e, techniqueID) => {
-    const indexPatternId = dataSource.dataSourece.indexPattern.id;
+    const indexPatternId = dataSource.dataSource.indexPattern.id;
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
-        `rule.mitre.id`,
+        `rule.mitre.technique`,
         techniqueID,
         indexPatternId,
       ),
@@ -252,7 +251,7 @@ const MitreTopTacticsTechniquesBody = compose(
           <FlyoutTechnique
             openDashboard={(e, itemId) => goToDashboardWithFilter(e, itemId)}
             openDiscover={(e, itemId) => goToEventsWithFilter(e, itemId)}
-            implicitFilters={[{ 'agent.id': agentId }]}
+            implicitFilters={[{ 'wazuh.agent.id': agentId }]}
             agentId={agentId}
             onChangeFlyout={onChangeFlyout}
             currentTechnique={showTechniqueDetails}

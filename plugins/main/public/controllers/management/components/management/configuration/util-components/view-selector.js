@@ -17,19 +17,37 @@ class WzViewSelector extends Component {
   constructor(props) {
     super(props);
   }
+
+  // Recursively flatten children to handle Fragments
+  flattenChildren(children) {
+    const result = [];
+    React.Children.forEach(children, child => {
+      if (!child) return;
+
+      // If it's a Fragment, flatten its children recursively
+      if (child.type === React.Fragment) {
+        result.push(...this.flattenChildren(child.props.children));
+      } else {
+        result.push(child);
+      }
+    });
+    return result;
+  }
+
   render() {
     const { view, children } = this.props;
-    return (
-      <Fragment>
-        {children.find(child => child.props.view === view) ||
-          children.find(child => child.props.default)}
-      </Fragment>
+    // Flatten children recursively to handle Fragments
+    const childrenArray = this.flattenChildren(children);
+    const selectedChild = childrenArray.find(
+      child => child.props?.view === view,
     );
+    const defaultChild = childrenArray.find(child => child.props?.default);
+    return <Fragment>{selectedChild || defaultChild}</Fragment>;
   }
 }
 
 WzViewSelector.propTypes = {
-  children: PropTypes.array
+  children: PropTypes.array,
 };
 
 export default WzViewSelector;
@@ -44,5 +62,5 @@ export class WzViewSelectorSwitch extends Component {
 }
 
 WzViewSelectorSwitch.propTypes = {
-  view: PropTypes.oneOfType([PropTypes.string, PropTypes.any])
+  view: PropTypes.oneOfType([PropTypes.string, PropTypes.any]),
 };

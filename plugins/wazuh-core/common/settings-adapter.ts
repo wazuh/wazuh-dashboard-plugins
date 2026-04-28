@@ -29,6 +29,9 @@ const schemaMapper = (setting: TPluginSetting) => {
   let schemaConfig;
   const schemaDef = {
     validate: validate,
+    ...(setting.defaultValue !== undefined
+      ? { defaultValue: setting.defaultValue }
+      : {}),
   } as TypeOptions<any>;
 
   switch (type) {
@@ -42,8 +45,20 @@ const schemaMapper = (setting: TPluginSetting) => {
         ?.objectOf as TPluginSettingOptionsObjectOf;
       const mappedSchema = {};
 
+      const optionalFields = ['key', 'cert', 'ca'];
+
       for (const key of Object.keys(options)) {
-        mappedSchema[key] = schemaMapper(options[key] as TPluginSetting);
+        const fieldSetting = options[key] as TPluginSetting;
+        const fieldSchema = schemaMapper(fieldSetting);
+        if (
+          optionalFields.includes(key) ||
+          fieldSetting.defaultValue === '' ||
+          fieldSetting.defaultValue === undefined
+        ) {
+          mappedSchema[key] = schema.maybe(fieldSchema);
+        } else {
+          mappedSchema[key] = fieldSchema;
+        }
       }
 
       const innerSchema = schema.object(mappedSchema);

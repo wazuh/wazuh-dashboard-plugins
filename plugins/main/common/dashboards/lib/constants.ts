@@ -21,13 +21,11 @@ export const TYPES = {
 export enum SCA_CHECK_RESULT {
   PASSED = 'Passed',
   FAILED = 'Failed',
-  NOT_RUN = 'Not run',
   NOT_APPLICABLE = 'Not applicable',
 }
 
 export const SCA_CHECK_RESULT_COLOR_MAPPING = {
   [SCA_CHECK_RESULT.PASSED]: UI_COLOR_STATUS.success,
   [SCA_CHECK_RESULT.FAILED]: UI_COLOR_STATUS.failed,
-  [SCA_CHECK_RESULT.NOT_RUN]: UI_COLOR_STATUS.info,
-  [SCA_CHECK_RESULT.NOT_APPLICABLE]: UI_COLOR_STATUS.notApplicable,
+  [SCA_CHECK_RESULT.NOT_APPLICABLE]: UI_COLOR_STATUS.info,
 } as const;

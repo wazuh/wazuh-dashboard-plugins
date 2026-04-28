@@ -2,8 +2,34 @@
 
 exports[`Table Default component renders correctly to match the snapshot 1`] = `
 <TableDefault
-  onSearch={[Function]}
-  reload={[Function]}
+  endpoint="/test-endpoint"
+  onSearch={
+    [MockFunction] {
+      "calls": Array [
+        Array [
+          "/test-endpoint",
+          Array [],
+          Object {
+            "pageIndex": 0,
+            "pageSize": 15,
+          },
+          Object {
+            "sort": Object {
+              "direction": "asc",
+              "field": "",
+            },
+          },
+        ],
+      ],
+      "results": Array [
+        Object {
+          "type": "return",
+          "value": Promise {},
+        },
+      ],
+    }
+  }
+  reload={0}
   tableColumns={
     Array [
       Object {
@@ -30,6 +56,7 @@ exports[`Table Default component renders correctly to match the snapshot 1`] = `
       },
     ]
   }
+  tableInitialPageSize={15}
   tableInitialSortingDirection="asc"
   tableInitialSortingField=""
   tablePageSizeOptions={

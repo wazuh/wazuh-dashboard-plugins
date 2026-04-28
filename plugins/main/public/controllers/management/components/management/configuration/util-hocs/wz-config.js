@@ -28,34 +28,49 @@ import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appState
 
 const mapStateToProps = state => ({
   clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
-  refreshTime: state.configurationReducers.refreshTime
+  refreshTime: state.configurationReducers.refreshTime,
 });
 
 const mapDispatchToProps = dispatch => ({
-  updateWazuhNotReadyYet: value => dispatch(updateWazuhNotReadyYet(value))
+  updateWazuhNotReadyYet: value => dispatch(updateWazuhNotReadyYet(value)),
 });
 
 const withWzConfig = sections => WrappedComponent =>
   compose(
-    connect(
-      mapStateToProps,
-      mapDispatchToProps
+    connect(mapStateToProps, mapDispatchToProps),
+    withLoading(
+      async props => {
+        try {
+          // If no agent, use clusterNodeSelected as fallback
+          const agentId = props.agent?.id || props.clusterNodeSelected;
+          if (!agentId) {
+            // If there's no agent or clusterNodeSelected, we can't get configuration
+            return {
+              ...props,
+              currentConfig: {},
+              error: 'No agent or cluster node available',
+            };
+          }
+
+          // Use clusterNodeSelected only if there's no agent (manager context)
+          const node = props.agent?.id ? false : props.clusterNodeSelected;
+          const currentConfig = await getCurrentConfig(
+            agentId,
+            sections,
+            node,
+            props.updateWazuhNotReadyYet,
+          );
+          return { ...props, currentConfig };
+        } catch (error) {
+          return { ...props, currentConfig: {}, error };
+        }
+      },
+      (props, prevProps) =>
+        (props.clusterNodeSelected &&
+          prevProps.clusterNodeSelected &&
+          props.clusterNodeSelected !== prevProps.clusterNodeSelected) ||
+        props.refreshTime !== prevProps.refreshTime,
     ),
-    withLoading(async props => {
-      try {
-        const currentConfig = await getCurrentConfig(
-          props.agent.id,
-          sections,
-          props.clusterNodeSelected,
-          props.updateWazuhNotReadyYet
-        );
-        return { ...props, currentConfig };
-      } catch (error) {
-        return { ...props, currentConfig: {}, error };
-      }
-    },
-    (props, prevProps) => (props.agent.id === '000' && props.clusterNodeSelected && prevProps.clusterNodeSelected && props.clusterNodeSelected !== prevProps.clusterNodeSelected) || (props.refreshTime !== prevProps.refreshTime)
-    )
   )(WrappedComponent);
 
 export default withWzConfig;

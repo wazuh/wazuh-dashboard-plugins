@@ -218,7 +218,7 @@
         "id": 21,
         "name": "rootcheck_all_rootcheck",
         "policy": {
-          "actions": ["rootcheck:clear", "rootcheck:read", "rootcheck:run"],
+          "actions": ["rootcheck:read", "rootcheck:run"],
           "resources": ["agent:id:*"],
           "effect": "allow"
         },

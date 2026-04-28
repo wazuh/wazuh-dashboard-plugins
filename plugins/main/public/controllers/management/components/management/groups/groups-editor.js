@@ -37,6 +37,7 @@ import { getToasts } from '../../../../../kibana-services';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { WzOverlayMask } from '../../../../../components/common/util';
+import WazuhXmlMode from '../configuration/utils/wz-xml-mode';
 import 'brace/theme/textmate';
 import 'brace/mode/xml';
 import 'brace/snippets/xml';
@@ -245,6 +246,9 @@ class WzGroupsEditor extends Component {
                             wrapEnabled
                             setOptions={this.codeEditorOptions}
                             aria-label='Code Editor'
+                            onLoad={editor => {
+                              editor.getSession().setMode(new WazuhXmlMode());
+                            }}
                           />
                         )) || (
                           <EuiCodeBlock

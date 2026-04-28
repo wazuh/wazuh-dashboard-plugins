@@ -17,7 +17,7 @@ export class PinnedAgentManager {
   public static NO_AGENT_DATA = {};
   public static AGENT_ID_VIEW_KEY = 'agent';
   public static AGENT_ID_URL_VIEW_KEY = 'agentId';
-  public static AGENT_ID_KEY = 'agent.id';
+  public static AGENT_ID_KEY = 'wazuh.agent.id';
   public static FILTER_CONTROLLED_PINNED_AGENT_KEY =
     DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT;
   private AGENT_VIEW_URL = '/agents';

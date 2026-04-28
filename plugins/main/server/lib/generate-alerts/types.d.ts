@@ -8,11 +8,14 @@ export interface Rule {
   gdpr?: string[];
   pci_dss?: string[];
   tsc?: string[];
+  fedramp?: string[];
   hipaa?: string[];
   nist_800_53?: string[];
   nist_800_83?: string[];
+  nis2?: string[];
   gpg13?: string[];
   pci?: string[];
+  cmmc?: string[];
   frequency?: number;
   info?: string;
 }
@@ -176,7 +179,7 @@ export type Params = {
   /* if true, set Mitre att&ck fields */
   mitre: boolean;
   /* if true, set Policy monitoring fields */
-  rootcheck: boolean;
+  'wazuh-rootcheck': boolean;
   /* if true, set integrity monitoring fields (IMF) */
   syscheck: boolean;
   /* if true, set VirusTotal fields */

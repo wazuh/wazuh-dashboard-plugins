@@ -33,7 +33,16 @@ By default uses the version declared in the package.json and the `common/known-f
 
 ## Generated Files
 
-The script generates JSON files in the destination directory: alerts, archives, events, states, monitoring and statistics
+The script generates JSON files in the destination directory: events, states, monitoring and statistics
+
+**Combined index pattern files** are generated automatically from their sub-patterns:
+
+| Combined file           | Source sub-patterns                                                              | Index pattern             |
+| ----------------------- | -------------------------------------------------------------------------------- | ------------------------- |
+| `states-fim.json`       | `states-fim-files`, `states-fim-registries-keys`, `states-fim-registries-values` | `wazuh-states-fim*`       |
+| `states-inventory.json` | all `states-inventory-*`                                                         | `wazuh-states-inventory*` |
+| `events.json`           | all `events-*`                                                                   | `wazuh-events*`           |
+| `findings.json`         | all `findings-*`                                                                 | `wazuh-findings*`         |
 
 The templates can be retrieved from: https://github.com/wazuh/wazuh-indexer-plugins/tree/main/plugins/setup/src/main/resources
 

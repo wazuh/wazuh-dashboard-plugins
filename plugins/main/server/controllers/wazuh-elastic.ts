@@ -17,6 +17,7 @@ import {
   WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS,
   WAZUH_INDEXER_NAME,
   HTTP_STATUS_CODES,
+  WAZUH_ENGINE_SETTINGS_INDEX,
 } from '../../common/constants';
 import {
   OpenSearchDashboardsRequest,
@@ -194,11 +195,6 @@ export class WazuhElasticCtrl {
         query: {
           bool: {
             must: [],
-            must_not: {
-              term: {
-                'agent.id': '000',
-              },
-            },
             filter: [
               {
                 range: { timestamp: {} },
@@ -233,7 +229,7 @@ export class WazuhElasticCtrl {
       if (request.query.agentsList)
         payload.query.bool.filter.push({
           terms: {
-            'agent.id': request.query.agentsList.split(','),
+            'wazuh.agent.id': request.query.agentsList.split(','),
           },
         });
       payload.aggs['2'].terms.field = request.params.field;
@@ -259,32 +255,6 @@ export class WazuhElasticCtrl {
       context.wazuh.logger.error(error.message || error);
       return ErrorResponse(error.message || error, 4004, 500, response);
     }
-  }
-
-  /**
-   * Checks for minimum index pattern fields in a list of index patterns.
-   * @param {Array<Object>} indexPatternList List of index patterns
-   */
-  validateIndexPattern(indexPatternList) {
-    const minimum = ['timestamp', 'rule.groups', 'manager.name', 'agent.id'];
-    let list = [];
-    for (const index of indexPatternList) {
-      let valid, parsed;
-      try {
-        parsed = JSON.parse(index.attributes.fields);
-      } catch (error) {
-        continue;
-      }
-
-      valid = parsed.filter(item => minimum.includes(item.name));
-      if (valid.length === 4) {
-        list.push({
-          id: index.id,
-          title: index.attributes.title,
-        });
-      }
-    }
-    return list;
   }
 
   /**
@@ -683,6 +653,93 @@ export class WazuhElasticCtrl {
     } catch (error) {
       context.wazuh.logger.error(error.message || error);
       return ErrorResponse(error.message || error, 4010, 500, response);
+    }
+  }
+
+  async getIndexerSettings(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const fallbackSearch =
+        await context.core.opensearch.client.asCurrentUser.search({
+          index: WAZUH_ENGINE_SETTINGS_INDEX,
+          size: 1,
+          body: {
+            query: { match_all: {} },
+          },
+        });
+      const hit = fallbackSearch?.body?.hits?.hits?.[0];
+      const source = hit?._source ?? {};
+
+      if (!source.engine) {
+        throw ErrorResponse(`Engine settings not found`, 404, 500, response);
+      }
+
+      return response.ok({
+        body: {
+          ...source,
+          engine: source.engine,
+        },
+      });
+    } catch (error: any) {
+      context.wazuh.logger.error(error.message || error);
+      return ErrorResponse(error.message || error, 4010, 500, response);
+    }
+  }
+
+  async updateIndexerSettings(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest<{ engine: Record<string, unknown> }>,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const osResp =
+        await context.core.opensearch.client.asCurrentUser.transport.request({
+          method: 'PUT',
+          path: '/_plugins/_setup/settings',
+          body: request.body,
+        });
+
+      const osBody = osResp?.body ?? {};
+      const message = osBody?.message ?? 'Settings updated successfully.';
+      const status = typeof osBody?.status === 'number' ? osBody.status : 200;
+
+      return response.custom({
+        statusCode: status,
+        body: { message, status },
+      });
+    } catch (error: any) {
+      const pluginBody = error?.meta?.body ?? {};
+      const hasPluginResponse =
+        typeof pluginBody?.message === 'string' &&
+        typeof pluginBody?.status === 'number';
+
+      if (hasPluginResponse) {
+        context.wazuh.logger.error(
+          `Error updating Indexer Setup settings: ${pluginBody.message}`,
+        );
+        return response.custom({
+          statusCode: pluginBody.status,
+          body: { message: pluginBody.message, status: pluginBody.status },
+        });
+      }
+
+      const message =
+        pluginBody?.detail ?? error?.message ?? 'Internal Server Error.';
+      const status = error?.meta?.statusCode ?? 500;
+
+      context.wazuh.logger.error(
+        `Error updating Indexer Setup settings: ${message}`,
+      );
+
+      return ErrorResponse(
+        message,
+        WAZUH_STATUS_CODES.UNKNOWN,
+        status,
+        response,
+      );
     }
   }
 

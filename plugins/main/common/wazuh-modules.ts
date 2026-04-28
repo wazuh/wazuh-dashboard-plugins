@@ -9,6 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { WAZUH_MODULES_ID } from './constants';
+
 export const WAZUH_MODULES = {
   general: {
     title: 'Threat hunting',
@@ -40,35 +42,71 @@ export const WAZUH_MODULES = {
     description:
       'Audit users behavior, monitoring command execution and alerting on access to critical files.',
   },
-  pci: {
+  'regulatory-compliance': {
+    title: 'Regulatory Compliance',
+    appId: 'regulatory-compliance',
+    description:
+      'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, TSC, CMMC, FedRAMP, ISO 27001, NIS2, and NIST 800-171.',
+  },
+  [WAZUH_MODULES_ID.PCI_DSS]: {
     title: 'PCI DSS',
     appId: 'pci-dss',
     description:
       'Global security standard for entities that process, store or transmit payment cardholder data.',
   },
-  gdpr: {
+  [WAZUH_MODULES_ID.GDPR]: {
     title: 'GDPR',
     appId: 'gdpr',
     description:
       'General Data Protection Regulation (GDPR) sets guidelines for processing of personal data.',
   },
-  hipaa: {
+  [WAZUH_MODULES_ID.HIPAA]: {
     title: 'HIPAA',
     appId: 'hipaa',
     description:
       'Health Insurance Portability and Accountability Act of 1996 (HIPAA) provides data privacy and security provisions for safeguarding medical information.',
   },
-  nist: {
+  [WAZUH_MODULES_ID.NIST_800_53]: {
     title: 'NIST 800-53',
     appId: 'nist-800-53',
     description:
       'National Institute of Standards and Technology Special Publication 800-53 (NIST 800-53) sets guidelines for federal information systems.',
   },
-  tsc: {
+  [WAZUH_MODULES_ID.NIST_800_171]: {
+    title: 'NIST 800-171',
+    appId: 'nist-800-171',
+    description:
+      'National Institute of Standards and Technology Special Publication 800-171 (NIST 800-171) protects Controlled Unclassified Information in non-federal systems.',
+  },
+  [WAZUH_MODULES_ID.CMMC]: {
+    title: 'CMMC',
+    appId: 'cmmc',
+    description:
+      'Cybersecurity Maturity Model Certification (CMMC) is a framework to assess the cybersecurity maturity of organizations.',
+  },
+  [WAZUH_MODULES_ID.TSC]: {
     title: 'TSC',
     appId: 'tsc',
     description:
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy',
+  },
+  [WAZUH_MODULES_ID.FEDRAMP]: {
+    title: 'FedRAMP',
+    appId: 'fedramp',
+    description:
+      'Federal Risk and Authorization Management Program (FedRAMP) provides a standardized approach to security assessment, authorization, and continuous monitoring for cloud products and services.',
+  },
+  [WAZUH_MODULES_ID.ISO_27001]: {
+    title: 'ISO 27001',
+    appId: 'iso-27001',
+    description:
+      'International standard for information security management systems (ISMS), providing a systematic approach to managing sensitive company information.',
+  },
+  [WAZUH_MODULES_ID.NIS2]: {
+    title: 'NIS2',
+    appId: 'nis2',
+    description:
+      'EU directive on measures for high common level of cybersecurity across the Union.',
   },
   microsoftGraphAPI: {
     title: 'Microsoft Graph API',

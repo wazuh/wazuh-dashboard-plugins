@@ -24,7 +24,8 @@ const WzManagementMain = props => (
       <WzGroups {...props} />
     </Route>
     <Route path='?tab=status'>
-      <WzStatus />
+      {/* WORKAROUND: this allows the useRouterSearch hook to work. See the comment in the hook implementation for more details */}
+      <WzStatus {...props} />
     </Route>
     <Route path='?tab=monitoring'>
       <ClusterOverview />
@@ -36,11 +37,7 @@ const WzManagementMain = props => (
       <WzLogs />
     </Route>
     <Route path='?tab=configuration'>
-      <WzConfiguration
-        agent={{
-          id: '000',
-        }}
-      />
+      <WzConfiguration />
     </Route>
   </Switch>
 );

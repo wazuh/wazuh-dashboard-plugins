@@ -22,6 +22,8 @@ CURRENT_MAJOR_MINOR=""
 NEW_MAJOR_MINOR=""
 COMBINED_VERSION_REVISION=""
 OPENSEARCH_VERSION=""
+SET_AS_MAIN=""
+SKIP_URLS="no"
 
 # Create log file
 touch "$LOG_FILE"
@@ -58,7 +60,7 @@ log() {
 
 # Function to show usage
 usage() {
-  echo "Usage: $0 [--version VERSION --stage STAGE | --tag] [--help]"
+  echo "Usage: $0 [--version VERSION --stage STAGE | --tag] [--set-as-main] [--help]"
   echo ""
   echo "Parameters:"
   echo "  --version VERSION   Specify the version (e.g., 4.6.0)"
@@ -69,12 +71,14 @@ usage() {
   echo "                      If --stage is not set, it will be stageless(e.g., v4.6.0)"
   echo "                      Otherwise it will be with the provided stage (e.g., v4.6.0-alpha1)"
   echo "                      If this is set, --version and --stage are not required."
+  echo "  --set-as-main       Skip updating branch/URL references (used when updating 'main' itself)"
   echo "  --help              Display this help message"
   echo ""
   echo "Examples:"
   echo "  $0 --version 4.6.0 --stage alpha0"
   echo "  $0 --tag --stage alpha1"
   echo "  $0 --tag"
+  echo "  $0 --set-as-main --version 5.0.0"
 }
 
 # Function to update JSON file using sed
@@ -135,7 +139,30 @@ update_json() {
 update_endpoints_json() {
   local old_doc_version="$1"
   local new_doc_version="$2"
-  local endpoints_file="${REPO_PATH}/plugins/main/common/api-info/endpoints.json"
+  local main_plugin_dir="${REPO_PATH}/plugins/main"
+  local endpoints_file="${main_plugin_dir}/common/api-info/endpoints.json"
+
+  # Paths to the files to be updated with the yarn command
+  local path_file_change="common/api-info"
+  local api_info_files="${path_file_change}/endpoints.json ${path_file_change}/security-actions.json"
+
+  # First, try to run yarn generate:api-data
+  log "Attempting to run 'yarn generate:api-data' in $main_plugin_dir..."
+
+  # Temporarily disable 'set -e' to handle the yarn command failure gracefully
+  set +e
+  (cd "$main_plugin_dir" && yarn generate:api-data && yarn prettier --write $api_info_files) >> "$LOG_FILE" 2>&1
+  local yarn_exit_code=$?
+  set -e
+
+  if [ $yarn_exit_code -eq 0 ]; then
+    log "Successfully generated API data using yarn command"
+    return
+  else
+    log "WARNING: 'yarn generate:api-data' failed with exit code $yarn_exit_code. Falling back to sed-based update."
+  fi
+
+  # Fallback: Use sed to replace the version string within the documentation URLs
 
   # If the versions are the same, no update is needed.
   if [ "$old_doc_version" = "$new_doc_version" ]; then
@@ -143,23 +170,67 @@ update_endpoints_json() {
     return
   fi
 
+  # Check if endpoints.json exists
   if [ ! -f "$endpoints_file" ]; then
     log "WARNING: $endpoints_file not found. Skipping documentation URL update."
     return
   fi
 
-  log "Updating documentation URLs in $endpoints_file from $old_doc_version to $new_doc_version"
-
-  # Use sed to replace the version string within the documentation URLs
   # Escape dots in the version strings for sed
   local escaped_old_version=$(echo "$old_doc_version" | sed 's/\./\\./g')
   local escaped_new_version=$(echo "$new_doc_version" | sed 's/\./\\./g')
 
+  log "Updating documentation URLs in $endpoints_file from $old_doc_version to $new_doc_version"
+
   sed_inplace "s|documentation.wazuh.com/${escaped_old_version}|documentation.wazuh.com/${escaped_new_version}|g" "$endpoints_file" && log "Successfully updated documentation URLs in $endpoints_file" || {
     log "ERROR: Failed to update documentation URLs in $endpoints_file using sed."
-    # Consider adding error handling or attempting to restore a backup if needed
     exit 1
   }
+}
+
+
+
+update_branch_reference_defaults() {
+  if [[ "$SKIP_URLS" == "yes" ]]; then
+    log "skip_urls is yes (--set-as-main): leaving workflow branch defaults unchanged"
+    return 0
+  fi
+
+  local bump_string="$VERSION"
+  local files=(
+    "${REPO_PATH}/.github/workflows/5_testunit_jest.yml"
+    "${REPO_PATH}/.github/workflows/5_testunit_dev_sh.yml"
+    "${REPO_PATH}/.github/workflows/5_builderpackage_plugins.yml"
+    "${REPO_PATH}/.github/workflows/5_builderprecompiled_base-dev-environment.yml"
+
+    "${REPO_PATH}/.github/workflows/6_builderpackage_plugins.yml"
+    "${REPO_PATH}/.github/workflows/6_builderprecompiled_base-dev-environment.yml"
+    "${REPO_PATH}/.github/workflows/6_builderprecompiled_playground.yml"
+    "${REPO_PATH}/.github/workflows/6_documentation_deploy-to-gh-pages.yml"
+    "${REPO_PATH}/.github/workflows/6_testunit_jest.yml"
+
+    "${REPO_PATH}/.github/workflows/deploy-docs.yml"
+    "${REPO_PATH}/.github/workflows/dev-environment.yml"
+    "${REPO_PATH}/.github/workflows/manual-build.yml"
+    "${REPO_PATH}/.github/workflows/playground.yml"
+    "${REPO_PATH}/.github/workflows/wazuh-build-push-docker-action.yml"
+
+  )
+  local f
+  for f in "${files[@]}"; do
+    if [ ! -f "$f" ]; then
+      log "WARNING: $f not found. Skipping main→${bump_string} default update."
+      continue
+    fi
+
+    log "Replacing branch refs main with ${bump_string} in $f (where applicable)"
+
+    sed_inplace "s/^\\([[:space:]]*default:[[:space:]]*\\)main\\([[:space:]]*\\)$/\\1${bump_string}\\2/" "$f"
+    sed_inplace "s/^\\([[:space:]]*default:[[:space:]]*'\\)main'\\([[:space:]]*\\)$/\\1${bump_string}'\\2/" "$f"
+    sed_inplace "s/^\\([[:space:]]*default:[[:space:]]*\"\\)main\"\\([[:space:]]*\\)$/\\1${bump_string}\"\\2/" "$f"
+
+    sed_inplace "s/^\\([[:space:]]*- \\)main$/\\1${bump_string}/" "$f"
+  done
 }
 
 # Function to update specFile URL in docker/imposter/wazuh-config.yml
@@ -169,6 +240,11 @@ update_imposter_config() {
 
   if [ ! -f "$imposter_config_file" ]; then
     log "WARNING: $imposter_config_file not found. Skipping specFile URL update."
+    return
+  fi
+
+  if [[ "$SKIP_URLS" == "yes" ]]; then
+    log "skip_urls is set. Skipping imposter config main branch reference update."
     return
   fi
 
@@ -223,6 +299,10 @@ parse_arguments() {
       TAG=true
       shift
       ;;
+    --set-as-main)
+      SET_AS_MAIN="yes"
+      shift 1
+      ;;
     *)
       log "ERROR: Unknown option: $1" # Log error instead of just echo
       usage
@@ -230,6 +310,12 @@ parse_arguments() {
       ;;
     esac
   done
+  
+  if [[ -n "$SET_AS_MAIN" ]]; then
+    SKIP_URLS="yes"
+  else
+    SKIP_URLS="no"
+  fi
 }
 
 # Function to validate input parameters
@@ -540,21 +626,14 @@ main() {
   update_package_json_files
   update_osd_json_files
   update_changelog
-
-  # Conditionally update endpoints.json
-  if [[ -n "$VERSION" && "$CURRENT_MAJOR_MINOR" != "$NEW_MAJOR_MINOR" ]]; then
-    log "Major.minor version changed ($CURRENT_MAJOR_MINOR -> $NEW_MAJOR_MINOR). Updating endpoints.json..."
-    update_endpoints_json "$CURRENT_MAJOR_MINOR" "$NEW_MAJOR_MINOR"
-  else
-    log "Major.minor version ($CURRENT_MAJOR_MINOR) remains the same. Skipping endpoints.json update."
-  fi
+  update_endpoints_json "$CURRENT_MAJOR_MINOR" "$NEW_MAJOR_MINOR"
+  update_branch_reference_defaults
 
   # Update docker/imposter/wazuh-config.yml
   log "Updating docker/imposter/wazuh-config.yml..."
   update_imposter_config "$VERSION"
 
   log "File modifications completed."
-  log "WARNING: API spec data generation (if applicable) needs to be done manually or with other tools."
   log "Repository bump completed successfully. Log file: $LOG_FILE"
   exit 0
 }

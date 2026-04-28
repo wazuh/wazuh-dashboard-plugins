@@ -1,10 +1,7 @@
 export const getLastAlertsQuery = (
   currentIndexPattern: string,
   clusterValue: string,
-  ruleLevelRange: {
-    minRuleLevel: number;
-    maxRuleLevel?: number;
-  },
+  ruleLevel: string,
 ) => {
   const clusterField = 'cluster.name';
   return {
@@ -31,11 +28,8 @@ export const getLastAlertsQuery = (
         },
       },
       {
-        range: {
-          'rule.level': {
-            gte: ruleLevelRange.minRuleLevel,
-            lte: ruleLevelRange.maxRuleLevel,
-          },
+        term: {
+          'rule.level': ruleLevel,
         },
       },
       {

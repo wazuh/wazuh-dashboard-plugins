@@ -1,12 +1,23 @@
 import React from 'react';
 import { orderBy } from 'lodash';
+import { Filter } from 'src/plugins/data/common';
 
-interface ManagedFilter {
+export interface ManagedFilter {
   managedField?: string;
   controlledBy?: string;
+  selector?: (filter: Filter) => boolean;
   component: any;
   order: number;
 }
+
+export interface ManagedFiltersSpec {
+  [key: string]: ManagedFilter;
+}
+
+type ManagedFilterSelectors = Pick<
+  ManagedFilter,
+  'managedField' | 'controlledBy' | 'selector'
+>;
 
 /**
  * Decide if the filter is managed or not.
@@ -14,7 +25,13 @@ interface ManagedFilter {
  * @param param1
  * @returns
  */
-function isManagedFilter(filter, { managedField, controlledBy }) {
+export function isManagedFilter(
+  filter: Filter,
+  { managedField, controlledBy, selector }: ManagedFilterSelectors,
+) {
+  if (selector) {
+    return selector(filter);
+  }
   return (
     (managedField && filter.meta?.key === managedField) ||
     (controlledBy && filter.meta?.controlledBy === controlledBy)
@@ -27,21 +44,28 @@ function isManagedFilter(filter, { managedField, controlledBy }) {
  * @param param1
  * @returns
  */
-function getManagedFilter(filters, { managedField, controlledBy }) {
+function getManagedFilter(
+  filters: Filter[],
+  { managedField, controlledBy, selector }: ManagedFilterSelectors,
+) {
   return filters.find(filter =>
-    isManagedFilter(filter, { managedField, controlledBy }),
+    isManagedFilter(filter, { managedField, controlledBy, selector }),
   );
 }
 
 /**
- * Exclude the manged filter
+ * Exclude the managed filter
  * @param filters
  * @param param1
  * @returns
  */
-function excludeManagedFilter(filters, { managedField, controlledBy }) {
+function excludeManagedFilter(
+  filters: Filter[],
+  { managedField, controlledBy, selector }: ManagedFilterSelectors,
+) {
   return filters.filter(
-    filter => !isManagedFilter(filter, { managedField, controlledBy }),
+    filter =>
+      !isManagedFilter(filter, { managedField, controlledBy, selector }),
   );
 }
 
@@ -50,52 +74,27 @@ interface UseCustomSearchBarFilters {
   postFixedFilters: React.ReactNode[];
 }
 
-/**
- * Hook to use with the WzSearchBar that excludes the managed filter from the filter in the
- * filter manager and returns the expected postFixedFilters to be rendered in the WzSearchBar with
- * the managed filters.
- * @param definition
- * @param filters
- * @param setFilters
- * @returns
- */
-export const useWithManagedSearchBarFilters = (
-  definition: {
-    spec: {
-      [key: string]: ManagedFilter;
-    };
-  },
-  filters: any[],
-  setFilters: (filters: any) => void,
-): UseCustomSearchBarFilters => {
-  return {
-    searchBarFilters: filters.filter(f => {
-      const isManaged = Object.values(definition.spec)
-        .map(
-          ({ managedField }) =>
-            managedField &&
-            (f.meta?.key === managedField ||
-              f.meta?.controlledBy === managedField),
-        )
-        .filter(Boolean);
-      return isManaged.length === 0;
-    }),
-    postFixedFilters: orderBy(
-      Object.values(definition.spec),
-      ['order'],
-      ['asc'],
-      // eslint-disable-next-line react/display-name
-    ).map(customFilterSpec => (
-      // eslint-disable-next-line react/jsx-key
-      <ManagedFilterComponent
-        {...customFilterSpec}
-        filters={filters}
-        setFilters={setFilters}
-        managedFilter={getManagedFilter(filters, customFilterSpec)}
-      />
-    )),
-  };
-};
+export const createManagedFilters = (
+  spec: ManagedFiltersSpec,
+  {
+    filters,
+    setFilters,
+  }: { filters: Filter[]; setFilters: (filters: Filter[]) => void },
+) =>
+  orderBy(
+    Object.values(spec),
+    ['order'],
+    ['asc'],
+    // eslint-disable-next-line react/display-name
+  ).map((customFilterSpec: ManagedFilter) => (
+    // eslint-disable-next-line react/jsx-key
+    <ManagedFilterComponent
+      {...customFilterSpec}
+      filters={filters}
+      setFilters={setFilters}
+      managedFilter={getManagedFilter(filters, customFilterSpec)}
+    />
+  ));
 
 const ManagedFilterComponent = ({
   filters,

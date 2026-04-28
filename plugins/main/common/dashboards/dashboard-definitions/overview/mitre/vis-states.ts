@@ -491,7 +491,7 @@ export const getVisStateTopTacticsByAgent = (
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -551,7 +551,7 @@ export const getVisStateTechniqueByAgent = (
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             orderBy: '1',
             order: 'desc',
             size: 5,

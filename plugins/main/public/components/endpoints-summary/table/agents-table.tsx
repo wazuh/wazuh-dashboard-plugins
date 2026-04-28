@@ -40,13 +40,8 @@ import { AgentUpgradesInProgress } from './upgrades-in-progress/upgrades-in-prog
 import { AgentUpgradesTaskDetailsModal } from './upgrade-task-details-modal';
 import NavigationService from '../../../react-services/navigation-service';
 import { getWazuhAPIVersion } from '../services';
-
-const searchBarWQLOptions = {
-  implicitQuery: {
-    query: 'id!=000',
-    conjunction: ';',
-  },
-};
+import { RemoveAgentModal } from './actions/remove-agent-modal';
+import { getAgentVersion } from '../../../../common/services/wz-agent';
 
 type AgentList = {
   items: Agent[];
@@ -61,7 +56,6 @@ interface AgentsTableProps {
 
 export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   const defaultFilters = {
-    default: { q: 'id!=000' },
     ...(sessionStorage.getItem('wz-agents-overview-table-filter')
       ? JSON.parse(sessionStorage.getItem('wz-agents-overview-table-filter'))
       : {}),
@@ -75,13 +69,11 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   });
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = useState(false);
+  const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Agent[]>([]);
   const [allAgentsSelected, setAllAgentsSelected] = useState(false);
   const [denyEditGroups] = useUserPermissionsRequirements([
     { action: 'group:modify_assignments', resource: 'group:id:*' },
-  ]);
-  const [denyUpgrade] = useUserPermissionsRequirements([
-    { action: 'agent:upgrade', resource: 'agent:id:*' },
   ]);
   const [denyGetTasks] = useUserPermissionsRequirements([
     { action: 'task:status', resource: '*:*:*' },
@@ -253,7 +245,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                   allAgentsCount={agentList.totalItems}
                   filters={filters?.q}
                   allowEditGroups={!denyEditGroups}
-                  allowUpgrade={!denyUpgrade}
                   allowGetTasks={!denyGetTasks}
                   reloadAgents={() => reloadAgents()}
                   setIsUpgradeTasksModalVisible={setIsUpgradeTasksModalVisible}
@@ -264,12 +255,12 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
             endpoint={'/agents'}
             tableColumns={agentsTableColumns(
               !denyEditGroups,
-              !denyUpgrade,
               setAgent,
               setIsEditGroupsVisible,
               setIsUpgradeModalVisible,
               setFilters,
               apiVersion,
+              { setIsRemoveModalVisible },
             )}
             tableInitialSortingField='id'
             tablePageSizeOptions={[10, 25, 50, 100]}
@@ -291,7 +282,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                   v<NUMBER><ANYTHING>
                   */
                 ...(typeof item.version === 'string'
-                  ? { version: item.version.match(/(v\d.+)/)?.[1] }
+                  ? { version: getAgentVersion(item.version).raw }
                   : { version: '-' }),
               };
             }}
@@ -303,7 +294,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
             showFieldSelector
             searchTable
             searchBarWQL={{
-              options: searchBarWQLOptions,
               suggestions: {
                 field(currentValue) {
                   return [
@@ -370,10 +360,10 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                               sort: `+${field}`,
                               ...(currentValue
                                 ? {
-                                    q: `${searchBarWQLOptions.implicitQuery.query}${searchBarWQLOptions.implicitQuery.conjunction}${field}~${currentValue}`,
+                                    q: `${field}~${currentValue}`,
                                   }
                                 : {
-                                    q: `${searchBarWQLOptions.implicitQuery.query}`,
+                                    q: ``,
                                   }),
                             },
                           },
@@ -469,6 +459,16 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
             setAgent(undefined);
           }}
           setIsUpgradePanelClosed={setIsUpgradePanelClosed}
+        />
+      ) : null}
+      {isRemoveModalVisible && agent ? (
+        <RemoveAgentModal
+          agent={agent}
+          reloadAgents={() => reloadAgents()}
+          onClose={() => {
+            setIsRemoveModalVisible(false);
+            setAgent(undefined);
+          }}
         />
       ) : null}
       {isUpgradeTasksModalVisible ? (

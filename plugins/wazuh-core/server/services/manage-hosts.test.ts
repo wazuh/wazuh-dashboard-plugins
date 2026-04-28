@@ -102,9 +102,9 @@ describe('ManageHosts Service', () => {
       const mockRegistryData = {
         manager: 'test-manager',
         node: 'test-node',
-        status: 'enabled',
         cluster: 'test-cluster',
         allow_run_as: 1,
+        verify_ca: null,
       };
 
       mockConfiguration.get.mockResolvedValue(mockHosts);
@@ -115,7 +115,14 @@ describe('ManageHosts Service', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('cluster_info');
-      expect(result[0].cluster_info).toEqual(mockRegistryData);
+      expect(result[0].cluster_info).toEqual({
+        manager: 'test-manager',
+        node: 'test-node',
+        cluster: 'test-cluster',
+      });
+
+      expect(result[0].allow_run_as).toBe(1);
+      expect(result[0].verify_ca).toBe(null);
       expect(result[0].id).toBe('existing-host');
     });
 
@@ -123,9 +130,9 @@ describe('ManageHosts Service', () => {
       const mockRegistryData = {
         manager: 'test-manager',
         node: 'test-node',
-        status: 'enabled',
         cluster: 'test-cluster',
         allow_run_as: 1,
+        verify_ca: null,
       };
 
       (manageHosts as any).cacheRegistry.set('default', mockRegistryData);
@@ -164,10 +171,6 @@ describe('ManageHosts Service', () => {
       expect(result[0].cluster_info).toBeDefined();
       expect(result[0].cluster_info).not.toBeUndefined();
       expect(result[0].id).toBe('default2');
-
-      expect(() => {
-        const uuid = result[0].cluster_info.uuid;
-      }).not.toThrow();
     });
   });
 });

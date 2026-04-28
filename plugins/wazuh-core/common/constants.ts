@@ -19,9 +19,12 @@ export const PLUGIN_VERSION = version;
 export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
 export const PLUGIN_MAJOR_VERSION = version.split('.')[0];
 
-// Index patterns - Wazuh alerts
-export const WAZUH_INDEX_TYPE_ALERTS = 'alerts';
-export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts*';
+// Index - Wazuh engine/indexer settings located in Indexer management > Settings
+export const WAZUH_ENGINE_SETTINGS_INDEX = '.wazuh-settings';
+
+// Index patterns - Wazuh events
+export const WAZUH_INDEX_TYPE_EVENTS = 'events';
+export const WAZUH_EVENTS_PATTERN = 'wazuh-events*';
 
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
@@ -61,10 +64,10 @@ export enum WAZUH_MODULES_ID {
   INTEGRITY_MONITORING = 'fim',
   AMAZON_WEB_SERVICES = 'aws',
   OFFICE_365 = 'office',
-  GOOGLE_CLOUD_PLATFORM = 'gcp',
+  GOOGLE_CLOUD_PLATFORM = 'gcp-audit',
   POLICY_MONITORING = 'pm',
   SECURITY_CONFIGURATION_ASSESSMENT = 'sca',
-  AUDITING = 'audit',
+  AUDITING = 'azure-audit',
   VULNERABILITIES = 'vuls',
   DOCKER = 'docker',
   MITRE_ATTACK = 'mitre',
@@ -72,6 +75,8 @@ export enum WAZUH_MODULES_ID {
   HIPAA = 'hipaa',
   NIST_800_53 = 'nist',
   TSC = 'tsc',
+  ISO_27001 = 'iso-27001',
+  NIS2 = 'nis2',
   VIRUSTOTAL = 'virustotal',
   GDPR = 'gdpr',
   GITHUB = 'github',
@@ -383,15 +388,6 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
       SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
     ),
   },
-  hideManagerAlerts: {
-    title: 'Hide manager alerts',
-    description: 'Hide the alerts of the manager in every dashboard.',
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.switch,
-    defaultValue: false,
-    validate: SettingsValidator.isBoolean,
-  },
   /* `# The following configuration is the default structure to define a host.
 #
 # hosts:
@@ -420,7 +416,7 @@ hosts:
       port: 55000
       username: wazuh-wui
       password: wazuh-wui
-      run_as: false`,
+      run_as: true`,
   */
   hosts: {
     title: 'Server hosts',
@@ -484,7 +480,7 @@ hosts:
           title: 'Run as',
           description: 'Use the authentication context.',
           type: EpluginSettingType.switch,
-          defaultValue: false,
+          defaultValue: true,
           options: {
             switch: {
               values: {
@@ -495,39 +491,32 @@ hosts:
           },
           validate: SettingsValidator.isBoolean,
         },
+        key: {
+          title: 'Key',
+          description:
+            'Path to the SSL/TLS private key file for the API connection.',
+          type: EpluginSettingType.text,
+          defaultValue: '',
+          validate: SettingsValidator.isString,
+        },
+        cert: {
+          title: 'Certificate',
+          description:
+            'Path to the SSL/TLS certificate file for the API connection.',
+          type: EpluginSettingType.text,
+          defaultValue: '',
+          validate: SettingsValidator.isString,
+        },
+        ca: {
+          title: 'CA Certificate',
+          description:
+            'Path to the CA certificate file for SSL/TLS verification.',
+          type: EpluginSettingType.text,
+          defaultValue: '',
+          validate: SettingsValidator.isString,
+        },
       },
     },
-  },
-  'ip.ignore': {
-    title: 'Index pattern ignore',
-    description:
-      'Disable certain index pattern names from being available in index pattern selector.',
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.editor,
-    defaultValue: [],
-    validate: SettingsValidator.compose(
-      SettingsValidator.listAsString(
-        SettingsValidator.compose(
-          SettingsValidator.isString,
-          SettingsValidator.isNotEmptyString,
-          SettingsValidator.hasNoSpaces,
-          SettingsValidator.noLiteralString('.', '..'),
-          SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-          SettingsValidator.hasNotInvalidCharacters(
-            '\\',
-            '/',
-            '?',
-            '"',
-            '<',
-            '>',
-            '|',
-            ',',
-            '#',
-          ),
-        ),
-      ),
-    ),
   },
   'wazuh.updates.disabled': {
     title: 'Check updates',
@@ -535,36 +524,8 @@ hosts:
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.switch,
-    defaultValue: false,
+    defaultValue: true,
     validate: SettingsValidator.isBoolean,
-  },
-  pattern: {
-    title: 'Index pattern',
-    description:
-      "Default index pattern to use on the app. If there's no valid index pattern, the app will automatically create one with the name indicated in this option.",
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.text,
-    defaultValue: WAZUH_ALERTS_PATTERN,
-    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.isNotEmptyString,
-      SettingsValidator.hasNoSpaces,
-      SettingsValidator.noLiteralString('.', '..'),
-      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-      SettingsValidator.hasNotInvalidCharacters(
-        '\\',
-        '/',
-        '?',
-        '"',
-        '<',
-        '>',
-        '|',
-        ',',
-        '#',
-      ),
-    ),
   },
   timeout: {
     title: 'Request timeout',
@@ -688,9 +649,7 @@ export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
 // TODO: review if required
 // uiSettings
 
-export const HIDE_MANAGER_ALERTS_SETTING = 'hideManagerAlerts';
 export const ENROLLMENT_DNS = 'enrollment.dns';
 export const ENROLLMENT_PASSWORD = 'enrollment.password';
-export const IP_IGNORE = 'ip.ignore';
 export const WAZUH_UPDATES_DISABLED = 'wazuh.updates.disabled';
 export const REQUEST_TIMEOUT = 'timeout';

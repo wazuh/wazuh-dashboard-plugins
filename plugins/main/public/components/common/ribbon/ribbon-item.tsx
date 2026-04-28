@@ -91,7 +91,7 @@ const WzRibbonItem = (props: RibbonItemProps) => {
       grow={false}
       data-test-subj={`ribbon-item-${item.key}`}
       key={item.key}
-      style={contentStyle || null}
+      style={contentStyle}
     >
       <WzStat title={renderValue()} description={item.label} titleSize='xs' />
     </EuiFlexItem>

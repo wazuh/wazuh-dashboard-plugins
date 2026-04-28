@@ -26,11 +26,7 @@ jest.mock('./edit-configuration/edit-configuration', () => () => <></>);
 
 jest.mock('./registration-service/registration-service', () => () => <></>);
 
-jest.mock('./log-settings/log-settings', () => () => <></>);
-
 jest.mock('./cluster/cluster', () => () => <></>);
-
-jest.mock('./alerts/alerts', () => () => <></>);
 
 jest.mock('./client/client', () => () => <></>);
 
@@ -47,28 +43,13 @@ jest.mock('./vulnerabilities/vulnerabilities', () => () => <></>);
 
 jest.mock('./inventory/inventory', () => () => <></>);
 
-jest.mock('./active-response/active-response', () => () => <></>);
-
 jest.mock('./active-response/active-response-agent', () => () => <></>);
 
 jest.mock('./commands/commands', () => () => <></>);
 
-jest.mock('./docker-listener/docker-listener', () => () => <></>);
-
 jest.mock('./log-collection/log-collection', () => () => <></>);
 
 jest.mock('./integrity-monitoring/integrity-monitoring', () => () => <></>);
-
-jest.mock('./aws-s3/aws-s3', () => () => <></>);
-
-jest.mock('./azure-logs/azure-logs', () => () => <></>);
-
-jest.mock('./google-cloud-pub-sub/google-cloud-pub-sub', () => () => <></>);
-
-jest.mock('./github/github', () => ({
-  WzConfigurationGitHub: () => <></>,
-  __esModule: true,
-}));
 
 jest.mock('./util-components/view-selector', () => ({
   default: () => <></>,
@@ -87,11 +68,6 @@ jest.mock('./util-components/configuration-path', () => () => <></>);
 
 jest.mock('./util-components/refresh-cluster-info-button', () => () => <></>);
 
-jest.mock('./office365/office365', () => ({
-  WzConfigurationOffice365: () => <></>,
-  __esModule: true,
-}));
-
 jest.mock('../../../../../components/agents/prompts', () => ({
   PromptNoActiveAgentWithoutSelect: () => <></>,
   __esModule: true,
@@ -105,7 +81,7 @@ jest.mock('@osd/i18n', () => ({
 }));
 
 jest.mock('../../../../../utils/applications', () => ({
-  id: '000',
+  id: '001',
   __esModule: true,
 }));
 
@@ -153,6 +129,12 @@ jest.mock('./utils/wz-fetch', () => ({
   }),
 }));
 
+jest.mock('../../../../../react-services/common-services', () => ({
+  getErrorOrchestrator: () => ({
+    handleError: jest.fn(),
+  }),
+}));
+
 describe('WzConfigurationSwitch', () => {
   let updateClusterNodes: jest.Mock;
   let updateClusterNodeSelected: jest.Mock;
@@ -165,7 +147,7 @@ describe('WzConfigurationSwitch', () => {
   it("shouldn't render the agent info ribbon", () => {
     const { container } = render(
       <WzConfigurationSwitch
-        agent={{ id: '000' }}
+        agent={{ id: '001' }}
         updateClusterNodes={updateClusterNodes}
         updateClusterNodeSelected={updateClusterNodeSelected}
       />,
@@ -181,7 +163,7 @@ describe('WzConfigurationSwitch', () => {
   it("shouldn't render any ribbon items", () => {
     const { container } = render(
       <WzConfigurationSwitch
-        agent={{ id: '000' }}
+        agent={{ id: '001' }}
         updateClusterNodes={updateClusterNodes}
         updateClusterNodeSelected={updateClusterNodeSelected}
       />,

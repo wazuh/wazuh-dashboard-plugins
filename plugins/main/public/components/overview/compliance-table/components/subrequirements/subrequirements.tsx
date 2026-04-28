@@ -28,10 +28,14 @@ import {
 } from '@elastic/eui';
 import { AppState } from '../../../../../react-services/app-state';
 import { RequirementFlyout } from '../requirement-flyout';
+import { getDataPlugin } from '../../../../../kibana-services';
 import {
-  getDataPlugin,
-  getWazuhCorePlugin,
-} from '../../../../../kibana-services';
+  TAB_VIEW_ID_DASHBOARD,
+  TAB_VIEW_ID_EVENTS,
+  TAB_VIEW_NAME_DASHBOARD,
+  TAB_VIEW_NAME_EVENTS,
+  WAZUH_MODULES_ID,
+} from '../../../../../../common/constants';
 
 export class ComplianceSubrequirements extends Component {
   _isMount = false;
@@ -63,6 +67,7 @@ export class ComplianceSubrequirements extends Component {
     const { filterManager } = getDataPlugin().query;
     const matchPhrase = {};
     matchPhrase[filter.key] = filter.value;
+    const pattern = AppState.getCurrentPattern();
     const newFilter = {
       meta: {
         disabled: false,
@@ -70,9 +75,7 @@ export class ComplianceSubrequirements extends Component {
         params: { query: filter.value },
         type: 'phrase',
         negate: filter.negate || false,
-        index:
-          AppState.getCurrentPattern() ||
-          getWazuhCorePlugin().configuration.getSettingValue('pattern'),
+        index: pattern,
       },
       query: { match_phrase: matchPhrase },
       $state: { store: 'appState' },
@@ -82,11 +85,16 @@ export class ComplianceSubrequirements extends Component {
 
   getRequirementKey() {
     const mapKeys = {
-      pci: 'rule.pci_dss',
-      gdpr: 'rule.gdpr',
-      nist: 'rule.nist_800_53',
-      hipaa: 'rule.hipaa',
-      tsc: 'rule.tsc',
+      [WAZUH_MODULES_ID.CMMC]: 'rule.compliance.cmmc',
+      [WAZUH_MODULES_ID.FEDRAMP]: 'rule.compliance.fedramp',
+      [WAZUH_MODULES_ID.GDPR]: 'rule.compliance.gdpr',
+      [WAZUH_MODULES_ID.HIPAA]: 'rule.compliance.hipaa',
+      [WAZUH_MODULES_ID.ISO_27001]: 'rule.compliance.iso_27001',
+      [WAZUH_MODULES_ID.NIS2]: 'rule.compliance.nis2',
+      [WAZUH_MODULES_ID.NIST_800_53]: 'rule.compliance.nist_800_53',
+      [WAZUH_MODULES_ID.NIST_800_171]: 'rule.compliance.nist_800_171',
+      [WAZUH_MODULES_ID.PCI_DSS]: 'rule.compliance.pci_dss',
+      [WAZUH_MODULES_ID.TSC]: 'rule.compliance.tsc',
     };
     return mapKeys[this.props.section];
   }
@@ -97,7 +105,7 @@ export class ComplianceSubrequirements extends Component {
       value: requirementId,
       negate: false,
     });
-    this.props.onSelectedTabChanged('events');
+    this.props.onSelectedTabChanged(TAB_VIEW_ID_EVENTS);
   }
 
   openDashboard(e, requirementId) {
@@ -106,7 +114,7 @@ export class ComplianceSubrequirements extends Component {
       value: requirementId,
       negate: false,
     });
-    this.props.onSelectedTabChanged('dashboard');
+    this.props.onSelectedTabChanged(TAB_VIEW_ID_DASHBOARD);
   }
 
   renderFacet() {
@@ -203,7 +211,7 @@ export class ComplianceSubrequirements extends Component {
                     <span style={{ float: 'right', position: 'fixed' }}>
                       <EuiToolTip
                         position='top'
-                        content={'Show' + item.id + ' in Dashboard'}
+                        content={`Show ${item.id} in ${TAB_VIEW_NAME_DASHBOARD}`}
                       >
                         <EuiIcon
                           onMouseDown={e => {
@@ -217,7 +225,7 @@ export class ComplianceSubrequirements extends Component {
                       &nbsp;
                       <EuiToolTip
                         position='top'
-                        content={'Inspect ' + item.id + ' in Events'}
+                        content={`Inspect ${item.id} in ${TAB_VIEW_NAME_EVENTS}`}
                       >
                         <EuiIcon
                           onMouseDown={e => {

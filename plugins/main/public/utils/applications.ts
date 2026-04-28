@@ -179,7 +179,7 @@ export const vulnerabilityDetection = {
       'Discover what applications in your environment are affected by well-known vulnerabilities.',
   }),
   euiIconType: 'heartbeatApp',
-  order: 301,
+  order: 302,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -204,7 +204,7 @@ export const mitreAttack = {
       'Explore security alerts mapped to adversary tactics and techniques for better threat understanding.',
   }),
   euiIconType: 'grokApp',
-  order: 302,
+  order: 301,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -240,125 +240,28 @@ export const ITHygiene = {
     }`,
 };
 
-const pciDss = {
+export const regulatoryCompliance = {
   category: 'wz-category-security-operations',
-  id: 'pci-dss',
-  title: i18n.translate('wz-app-pci-dss-title', {
-    defaultMessage: 'PCI DSS',
+  id: 'regulatory-compliance',
+  title: i18n.translate('wz-app-regulatory-compliance-title', {
+    defaultMessage: 'Regulatory Compliance',
   }),
-  breadcrumbLabel: i18n.translate('wz-app-pci-dss-breadcrumbLabel', {
-    defaultMessage: 'PCI DSS',
-  }),
-  description: i18n.translate('wz-app-pci-dss-description', {
+  breadcrumbLabel: i18n.translate(
+    'wz-app-regulatory-compliance-breadcrumbLabel',
+    {
+      defaultMessage: 'Regulatory Compliance',
+    },
+  ),
+  description: i18n.translate('wz-app-regulatory-compliance-description', {
     defaultMessage:
-      'Global security standard for entities that process, store, or transmit payment cardholder data.',
+      'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, TSC, CMMC, FedRAMP, ISO 27001, NIST2 and NIST 800-171.',
   }),
-  euiIconType: 'visTagCloud',
+  euiIconType: 'usersRolesApp',
   order: 401,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=pci&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
-    }`,
-};
-
-const gdpr = {
-  category: 'wz-category-security-operations',
-  id: 'gdpr',
-  title: i18n.translate('wz-app-gdpr-title', {
-    defaultMessage: 'GDPR',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-gdpr-breadcrumbLabel', {
-    defaultMessage: 'GDPR',
-  }),
-  description: i18n.translate('wz-app-gdpr-description', {
-    defaultMessage:
-      'General Data Protection Regulation (GDPR) sets guidelines for processing of personal data.',
-  }),
-  euiIconType: 'visBarVertical',
-  order: 402,
-  showInOverviewApp: true,
-  showInAgentMenu: true,
-  redirectTo: () =>
-    `/overview/?tab=gdpr&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
-    }`,
-};
-
-const hipaa = {
-  category: 'wz-category-security-operations',
-  id: 'hipaa',
-  title: i18n.translate('wz-app-hipaa-title', {
-    defaultMessage: 'HIPAA',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-hipaa-breadcrumbLabel', {
-    defaultMessage: 'HIPAA',
-  }),
-  description: i18n.translate('wz-app-hipaa-description', {
-    defaultMessage:
-      'Health Insurance Portability and Accountability Act of 1996 (HIPAA) provides data privacy and security provisions for safeguarding medical information.',
-  }),
-  euiIconType: 'monitoringApp',
-  order: 403,
-  showInOverviewApp: true,
-  showInAgentMenu: true,
-  redirectTo: () =>
-    `/overview/?tab=hipaa&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
-    }`,
-};
-
-const nist80053 = {
-  category: 'wz-category-security-operations',
-  id: 'nist-800-53',
-  title: i18n.translate('wz-app-nist-800-53-title', {
-    defaultMessage: 'NIST 800-53',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-nist-800-53-breadcrumbLabel', {
-    defaultMessage: 'NIST 800-53',
-  }),
-  description: i18n.translate('wz-app-nist-800-53-description', {
-    defaultMessage:
-      'National Institute of Standards and Technology Special Publication 800-53 (NIST 800-53) sets guidelines for federal information systems.',
-  }),
-  euiIconType: 'notebookApp',
-  showInOverviewApp: true,
-  showInAgentMenu: true,
-  order: 404,
-  redirectTo: () =>
-    `/overview/?tab=nist&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
-    }`,
-};
-
-const tsc = {
-  category: 'wz-category-security-operations',
-  id: 'tsc',
-  title: i18n.translate('wz-app-tsc-title', {
-    defaultMessage: 'TSC',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-tsc-breadcrumbLabel', {
-    defaultMessage: 'TSC',
-  }),
-  description: i18n.translate('wz-app-tsc-description', {
-    defaultMessage:
-      'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy.',
-  }),
-  euiIconType: 'packetbeatApp',
-  order: 405,
-  showInOverviewApp: true,
-  showInAgentMenu: true,
-  redirectTo: () =>
-    `/overview/?tab=tsc&tabView=dashboard${
+    `/overview/?tab=regulatory-compliance&tabView=pci-dss&tabSubView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -711,6 +614,25 @@ export const sampleData = {
   redirectTo: () => '/settings?tab=sample_data',
 };
 
+export const indexerSettings = {
+  category: 'management',
+  id: 'indexer-settings',
+  title: i18n.translate('wz-app-indexer-settings-title', {
+    defaultMessage: 'Settings',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-indexer-settings-breadcrumbLabel', {
+    defaultMessage: 'Settings',
+  }),
+  description: i18n.translate('wz-app-indexer-settings-description', {
+    defaultMessage: 'Configure Indexer settings.',
+  }),
+  euiIconType: 'indexRollupApp',
+  order: 9070,
+  showInOverviewApp: false,
+  showInAgentMenu: false,
+  redirectTo: () => '/settings?tab=indexer_settings',
+};
+
 export const serverApis = {
   category: 'wz-category-dashboard-management',
   id: 'server-apis',
@@ -752,33 +674,30 @@ const about = {
 export const Applications = [
   fileIntegrityMonitoring,
   overview,
-  // malwareDetection,
+  malwareDetection,
   configurationAssessment,
-  // threatHunting,
+  threatHunting,
   vulnerabilityDetection,
   mitreAttack,
-  // pciDss,
-  // hipaa,
-  // gdpr,
-  // nist80053,
-  // tsc,
+  regulatoryCompliance,
   devTools,
   security,
-  // microsoftGraphAPI,
-  // amazonWebServices,
-  // googleCloud,
-  // github,
-  // office365,
-  // docker,
+  amazonWebServices,
+  microsoftGraphAPI,
+  googleCloud,
+  office365,
+  github,
+  docker,
   endpointSummary,
   endpointGroups,
   serverStatus,
-  cluster,
-  statistics,
+  // cluster,
+  // statistics,
   logs,
   settings,
   serverApis,
-  sampleData,
+  indexerSettings,
+  // sampleData,
   about,
   ITHygiene,
 ].sort((a, b) => {

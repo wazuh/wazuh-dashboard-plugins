@@ -42,6 +42,11 @@ import {
 import { connect } from 'react-redux';
 import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/render-columns';
 import { setFilters } from '../../../../common/search-bar/set-filters';
+import {
+  TAB_VIEW_ID_EVENTS,
+  TAB_VIEW_NAME_DASHBOARD,
+  TAB_VIEW_NAME_EVENTS,
+} from '../../../../../../common/constants';
 
 const mapStateToProps = state => ({
   currentAgentData: state.appStateReducers.currentAgentData,
@@ -81,7 +86,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
     getDiscoverColumns() {
       const columnsAgent = [
         {
-          id: 'timestamp',
+          id: '@timestamp',
           isSortable: true,
           defaultSortDirection: 'desc',
           displayAsText: 'Time',
@@ -91,40 +96,32 @@ export const RequirementFlyout = connect(mapStateToProps)(
           id: this.props.getRequirementKey(),
           displayAsText: 'Requirement(s)',
         },
-        { id: 'rule.description', displayAsText: 'Description' },
-        { id: 'rule.level', displayAsText: 'Level' },
-        {
-          id: 'rule.id',
-          displayAsText: 'Rule ID',
-        },
+        { id: 'wazuh.integration.name', displayAsText: 'Integration' },
+        { id: 'wazuh.integration.decoders', displayAsText: 'Decoders' },
       ];
 
       const columnsWithoutAgent = [
         {
-          id: 'timestamp',
+          id: '@timestamp',
           isSortable: true,
           defaultSortDirection: 'desc',
           displayAsText: 'Time',
           render: value => formatUIDate(value),
         },
         {
-          id: 'agent.id',
+          id: 'wazuh.agent.id',
           displayAsText: 'Agent',
         },
         {
-          id: 'agent.name',
+          id: 'wazuh.agent.name',
           displayAsText: 'Agent name',
         },
         {
           id: this.props.getRequirementKey(),
           displayAsText: 'Requirement',
         },
-        { id: 'rule.description', displayAsText: 'Description' },
-        { id: 'rule.level', displayAsText: 'Level' },
-        {
-          id: 'rule.id',
-          displayAsText: 'Rule ID',
-        },
+        { id: 'wazuh.integration.name', displayAsText: 'Integration' },
+        { id: 'wazuh.integration.decoders', displayAsText: 'Decoders' },
       ];
       const agentId = this.props.currentAgentData?.id;
       return agentId
@@ -266,14 +263,12 @@ export const RequirementFlyout = connect(mapStateToProps)(
               <EuiTitle size='s'>
                 <h3>
                   Recent events
-                  {this.props.view !== 'events' && (
+                  {this.props.view !== TAB_VIEW_ID_EVENTS && (
                     <span style={{ marginLeft: 16 }}>
                       <span>
                         <EuiToolTip
                           position='top'
-                          content={
-                            'Show ' + currentRequirement + ' in Dashboard'
-                          }
+                          content={`Show ${currentRequirement} in ${TAB_VIEW_NAME_DASHBOARD}`}
                         >
                           <EuiIcon
                             onMouseDown={e => {
@@ -287,9 +282,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
                         </EuiToolTip>
                         <EuiToolTip
                           position='top'
-                          content={
-                            'Inspect ' + currentRequirement + ' in Events'
-                          }
+                          content={`Inspect ${currentRequirement} in ${TAB_VIEW_NAME_EVENTS}`}
                         >
                           <EuiIcon
                             onMouseDown={e => {

@@ -6,7 +6,7 @@ import {
 } from '../hocs';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import { useReportingCommunicateSearchContext } from '../hooks/use-reporting-communicate-search-context';
-import { useWithManagedSearchBarFilters, WzSearchBar } from '../search-bar';
+import { WzSearchBar, ManagedFilter } from '../search-bar';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { SampleDataWarning } from '../../visualize/components';
 import { compose } from 'redux';
@@ -38,27 +38,17 @@ export const Dashboard = props => {
     props.dataSourceAction?.data?.hits?.total > 0,
   );
 
-  const { searchBarFilters, postFixedFilters } = useWithManagedSearchBarFilters(
-    {
-      spec: props.managedFilters || {},
-    },
-    props.dataSource.filters,
-    props.dataSource.setFilters,
-  );
-
   return (
     <>
       <WzSearchBar
         appName='dashboard-searchbar'
         {...props.dataSource.searchBarProps}
-        filters={searchBarFilters}
         fixedFilters={props.dataSource.fixedFilters}
         showDatePicker={Boolean(
           props.dataSource.dataSource.indexPattern.timeFieldName,
         )}
         showQueryInput={true}
         showQueryBar={true}
-        postFixedFilters={postFixedFilters}
       />
       {props.dataSourceAction?.data?.hits?.total === 0 ? (
         <DiscoverNoResults />
@@ -138,11 +128,7 @@ export const createDashboard = ({
   DataSourceRepositoryCreator: any;
   sampleDataWarningCategories?: string[];
   managedFilters?: {
-    [key: string]: {
-      managedField: string;
-      component: (props: any) => any;
-      order: number;
-    };
+    [key: string]: ManagedFilter;
   };
   getDashboardPanels: Array<{
     dashboardId: string;
@@ -161,6 +147,7 @@ export const createDashboard = ({
       DataSource,
       DataSourceRepositoryCreator,
       nameProp: 'dataSource',
+      searchBarManagedFiltersSpec: managedFilters,
       mapRequestParams: ({ dataSource, dependencies }) => {
         const [, , query, dateRangeFrom, dateRangeTo] = dependencies;
         return {

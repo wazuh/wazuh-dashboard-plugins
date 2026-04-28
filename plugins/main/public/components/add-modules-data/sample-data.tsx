@@ -28,14 +28,14 @@ import { AppState } from '../../react-services/app-state';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import {
   UI_LOGGER_LEVELS,
-  WAZUH_SAMPLE_AGENT_MONITORING,
+  WAZUH_SAMPLE_METRICS_AGENTS,
   WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
   WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
   WAZUH_SAMPLE_INVENTORY_AGENT,
   WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
-  WAZUH_SAMPLE_SERVER_STATISTICS,
+  WAZUH_SAMPLE_METRICS_COMMS,
   WAZUH_SAMPLE_VULNERABILITIES,
 } from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
@@ -123,13 +123,13 @@ export default class WzSampleData extends Component {
         title: 'Sample agents monitoring',
         description: 'Sample data for agents monitoring.',
         image: '',
-        categorySampleDataIndex: WAZUH_SAMPLE_AGENT_MONITORING,
+        categorySampleDataIndex: WAZUH_SAMPLE_METRICS_AGENTS,
       },
       {
         title: 'Sample server statistics',
         description: 'Sample data for server statistics.',
         image: '',
-        categorySampleDataIndex: WAZUH_SAMPLE_SERVER_STATISTICS,
+        categorySampleDataIndex: WAZUH_SAMPLE_METRICS_COMMS,
       },
     ];
     this.state = {};
@@ -171,9 +171,8 @@ export default class WzSampleData extends Component {
 
       // Get information about cluster
       const clusterName = AppState.getClusterInfo().cluster;
-      const managerName = AppState.getClusterInfo().manager;
 
-      if (!clusterName && !managerName) {
+      if (!clusterName) {
         throw new Error(
           'The data related to the server API context could not be obtained. This is required when adding sample data to match the server API context.',
         );
@@ -188,7 +187,7 @@ export default class WzSampleData extends Component {
         node: clusterName,
       };
       this.generateAlertsParams.manager = {
-        name: managerName,
+        name: clusterName,
       };
 
       if (!this.generateAlertsParams.api_id) {

@@ -55,6 +55,8 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { serverStatus } from '../../../../../utils/applications';
 
+import { ClusterOverview } from '../../management/cluster/cluster-overview';
+
 export class WzStatusOverview extends Component {
   _isMounted = false;
   constructor(props) {
@@ -92,11 +94,10 @@ export class WzStatusOverview extends Component {
     try {
       this.props.updateLoadingStatus(true);
 
-      const agentsCountByManagerNodes = (
-        await this.statusHandler.clusterAgentsCount()
-      )?.data?.data;
+      const agentsOverview = (await this.statusHandler.clusterAgentsCount())
+        ?.data?.data;
       const { connection: agentsCount, configuration } =
-        agentsCountByManagerNodes?.agent_status;
+        agentsOverview?.agent_status;
 
       const agentsActiveCoverage = (
         (agentsCount.active / agentsCount.total) *
@@ -108,7 +109,7 @@ export class WzStatusOverview extends Component {
       ).toFixed(2);
 
       this.props.updateStats({
-        agentsCountByManagerNodes: agentsCountByManagerNodes.nodes,
+        agentsCountByNode: agentsOverview?.nodes,
         agentsCount,
         agentsSynced: isNaN(agentsSyncedCoverage) ? 0 : agentsSyncedCoverage,
         agentsCoverage: isNaN(agentsActiveCoverage) ? 0 : agentsActiveCoverage,
@@ -131,7 +132,7 @@ export class WzStatusOverview extends Component {
         );
         this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
       }
-      const [lastAgent] = agentsCountByManagerNodes?.last_registered_agent;
+      const [lastAgent] = agentsOverview?.last_registered_agent;
 
       this.props.updateAgentInfo(lastAgent);
     } catch (error) {
@@ -164,43 +165,48 @@ export class WzStatusOverview extends Component {
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
-        <EuiPanel>
-          <EuiFlexGroup>
-            <EuiFlexItem>
+        <EuiFlexGroup direction='column'>
+          <ClusterOverview />
+          <EuiFlexItem>
+            <EuiPanel>
               <EuiFlexGroup>
                 <EuiFlexItem>
-                  <EuiTitle>
-                    <h2>Status</h2>
-                  </EuiTitle>
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      <EuiTitle>
+                        <h2>Status</h2>
+                      </EuiTitle>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiFlexItem>
+                <WzStatusActionButtons />
+              </EuiFlexGroup>
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  {isLoading && <EuiProgress size='xs' color='primary' />}
+                  {!isLoading && listDaemons && <WzStatusDaemons />}
+                  <EuiSpacer size='l' />
+                  {!isLoading && stats && <WzStatusStats />}
+                  <EuiSpacer size='l' />
+                  {!isLoading && (
+                    <EuiFlexGrid columns={2}>
+                      {nodeInfo && (
+                        <EuiFlexItem>
+                          <WzStatusNodeInfo />
+                        </EuiFlexItem>
+                      )}
+                      {agentInfo && (
+                        <EuiFlexItem>
+                          <WzStatusAgentInfo />
+                        </EuiFlexItem>
+                      )}
+                    </EuiFlexGrid>
+                  )}
                 </EuiFlexItem>
               </EuiFlexGroup>
-            </EuiFlexItem>
-            <WzStatusActionButtons />
-          </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              {isLoading && <EuiProgress size='xs' color='primary' />}
-              {!isLoading && listDaemons && <WzStatusDaemons />}
-              <EuiSpacer size='l' />
-              {!isLoading && stats && <WzStatusStats />}
-              <EuiSpacer size='l' />
-              {!isLoading && (
-                <EuiFlexGrid columns={2}>
-                  {nodeInfo && (
-                    <EuiFlexItem>
-                      <WzStatusNodeInfo />
-                    </EuiFlexItem>
-                  )}
-                  {agentInfo && (
-                    <EuiFlexItem>
-                      <WzStatusAgentInfo />
-                    </EuiFlexItem>
-                  )}
-                </EuiFlexGrid>
-              )}
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPanel>
+            </EuiPanel>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       </EuiPage>
     );
   }
@@ -222,6 +228,7 @@ const mapDispatchToProps = dispatch => {
     updateStats: stats => dispatch(updateStats(stats)),
     updateNodeInfo: nodeInfo => dispatch(updateNodeInfo(nodeInfo)),
     updateAgentInfo: agentInfo => dispatch(updateAgentInfo(agentInfo)),
+    cleanInfo: () => dispatch(cleanInfo()),
   };
 };
 

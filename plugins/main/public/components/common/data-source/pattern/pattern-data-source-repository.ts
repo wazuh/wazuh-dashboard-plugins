@@ -1,6 +1,5 @@
 import { tDataSourceRepository } from '../index';
 import { GenericRequest } from '../../../../react-services/generic-request';
-import { AppState } from '../../../../react-services';
 
 export type tSavedObjectResponse = {
   data: {
@@ -40,6 +39,9 @@ export type tParsedIndexPattern = {
   _fields: any[];
 } & object;
 
+/* WARN: Avoid the usage of get and getAll methods and create a new class that implement thse methods with lower impact. The current methods retrieve the fields of the index pattern and causes the request is slow. See https://github.com/wazuh/wazuh-dashboard-plugins/issues/8316
+Consider refactor this using the indexPattern service provided by the core.
+*/
 export abstract class PatternDataSourceRepository
   implements tDataSourceRepository<tParsedIndexPattern>
 {

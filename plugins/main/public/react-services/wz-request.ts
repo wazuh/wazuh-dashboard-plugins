@@ -77,7 +77,7 @@ export class WzRequest {
           AppState.setClusterInfo(response?.data?.data?.cluster_info);
           AppState.setCurrentAPI(
             JSON.stringify({
-              name: response?.data?.data?.cluster_info?.manager,
+              name: response?.data?.data?.cluster_info?.cluster,
               id: apiID,
             }),
           );
@@ -101,7 +101,7 @@ export class WzRequest {
             AppState.setClusterInfo(response?.data?.data?.cluster_info);
             AppState.setCurrentAPI(
               JSON.stringify({
-                name: response?.data?.data?.cluster_info?.manager,
+                name: response?.data?.data?.cluster_info?.cluster,
                 id: apiID,
               }),
             );

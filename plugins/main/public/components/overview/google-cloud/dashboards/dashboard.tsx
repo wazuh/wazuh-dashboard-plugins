@@ -1,6 +1,6 @@
 import React from 'react';
-import { AlertsDataSourceRepository } from '../../../common/data-source';
-import { GoogleCloudDataSource } from '../../../common/data-source/pattern/alerts/google-cloud/google-cloud-data-source';
+import { FindingsCloudServicesDataSourceRepository } from '../../../common/data-source';
+import { GoogleCloudDataSource } from '../../../common/data-source/pattern/events/google-cloud/google-cloud-data-source';
 import {
   GOOGLE_CLOUD_DASHBOARD_ID,
   GOOGLE_CLOUD_AGENT_DASHBOARD_ID,
@@ -10,7 +10,7 @@ import { createDashboard } from '../../../common/dashboards';
 
 export const DashboardGoogleCloud = createDashboard({
   DataSource: GoogleCloudDataSource,
-  DataSourceRepositoryCreator: AlertsDataSourceRepository,
+  DataSourceRepositoryCreator: FindingsCloudServicesDataSourceRepository,
   getDashboardPanels: [
     {
       dashboardId: GOOGLE_CLOUD_DASHBOARD_ID,

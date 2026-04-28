@@ -35,25 +35,37 @@ import {
   defineTimeFieldNameIfExist,
   initializationTaskCreatorIndexPattern,
   initializationTaskCreatorServerAPIConnectionCompatibility,
+  initializationTaskCreatorServerAPIRunAs,
   mapFieldsFormat,
 } from './health-check';
 import { initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations } from './health-check';
 import {
   FIELD_TIMESTAMP,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_ARCHIVES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_AGENTS,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_APLICATIONS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AWS,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AZURE,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_GCP,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_NETWORK_ACTIVITY,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_OTHER,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SECURITY,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SYSTEM_ACTIVITY,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_UNCLASSIFIED,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_RAW,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_ACCESS_MANAGEMENT,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_APPLICATIONS,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_CLOUD_SERVICES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_NETWORK_ACTIVITY,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_OTHER,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SECURITY,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SYSTEM_ACTIVITY,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_UNCLASSIFIED,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS,
+  WAZUH_THREATINTEL_ENRICHMENTS_PATTERN,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_VULNERABILITIES,
+  WAZUH_THREATINTEL_VULNERABILITIES_PATTERN,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES,
@@ -72,22 +84,28 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_COMMS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
-  INDEX_PATTERN_ALERTS_REQUIRED_FIELDS,
-  WAZUH_ALERTS_PATTERN,
-  WAZUH_ARCHIVES_PATTERN,
+  WAZUH_EVENTS_PATTERN,
   WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN,
   WAZUH_EVENTS_APLICATIONS_PATTERN,
-  WAZUH_EVENTS_CLOUD_SERVICES_AWS_PATTERN,
-  WAZUH_EVENTS_CLOUD_SERVICES_AZURE_PATTERN,
-  WAZUH_EVENTS_CLOUD_SERVICES_GCP_PATTERN,
   WAZUH_EVENTS_CLOUD_SERVICES_PATTERN,
   WAZUH_EVENTS_NETWORK_ACTIVITY_PATTERN,
   WAZUH_EVENTS_OTHER_PATTERN,
-  WAZUH_EVENTS_PATTERN,
   WAZUH_EVENTS_SECURITY_PATTERN,
   WAZUH_EVENTS_SYSTEM_ACTIVITY_PATTERN,
+  WAZUH_EVENTS_UNCLASSIFIED_PATTERN,
+  WAZUH_EVENTS_RAW_PATTERN,
+  WAZUH_FINDINGS_PATTERN,
+  WAZUH_FINDINGS_ACCESS_MANAGEMENT_PATTERN,
+  WAZUH_FINDINGS_APPLICATIONS_PATTERN,
+  WAZUH_FINDINGS_CLOUD_SERVICES_PATTERN,
+  WAZUH_FINDINGS_NETWORK_ACTIVITY_PATTERN,
+  WAZUH_FINDINGS_OTHER_PATTERN,
+  WAZUH_FINDINGS_SECURITY_PATTERN,
+  WAZUH_FINDINGS_SYSTEM_ACTIVITY_PATTERN,
+  WAZUH_FINDINGS_UNCLASSIFIED_PATTERN,
+  WAZUH_FIM_PATTERN,
   WAZUH_FIM_FILES_PATTERN,
   WAZUH_FIM_REGISTRY_KEYS_PATTERN,
   WAZUH_FIM_REGISTRY_VALUES_PATTERN,
@@ -105,27 +123,36 @@ import {
   WAZUH_IT_HYGIENE_SERVICES_PATTERN,
   WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
   WAZUH_IT_HYGIENE_USERS_PATTERN,
-  WAZUH_MONITORING_PATTERN,
+  WAZUH_METRICS_AGENTS_PATTERN,
   WAZUH_SCA_PATTERN,
-  WAZUH_STATISTICS_PATTERN,
+  WAZUH_METRICS_COMMS_PATTERN,
   WAZUH_VULNERABILITIES_PATTERN,
+  WAZUH_ACTIVE_RESPONSES_PATTERN,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_ACTIVE_RESPONSES,
 } from '../common/constants';
 
 import { notificationSetup } from './health-check/notification-default-channels';
 import { initializeDefaultNotificationChannel } from './health-check/notification-default-channels/tasks';
-import IndexPatternAlertsKnownFields from '../common/known-fields/alerts.json';
-import IndexPatternArchivesKnownFields from '../common/known-fields/archives.json';
+import IndexPatternEventsKnownFields from '../common/known-fields/events.json';
 import IndexPatternEventsAccessManagementKnownFields from '../common/known-fields/events-access-management.json';
 import IndexPatternEventsApplicationsKnownFields from '../common/known-fields/events-applications.json';
 import IndexPatternEventsCloudServicesKnownFields from '../common/known-fields/events-cloud-services.json';
-import IndexPatternEventsCloudServicesAWSKnownFields from '../common/known-fields/events-cloud-services-aws.json';
-import IndexPatternEventsCloudServicesAzureKnownFields from '../common/known-fields/events-cloud-services-azure.json';
-import IndexPatternEventsCloudServicesGCPKnownFields from '../common/known-fields/events-cloud-services-gcp.json';
 import IndexPatternEventsNetworkActivityKnownFields from '../common/known-fields/events-network-activity.json';
 import IndexPatternEventsOtherKnownFields from '../common/known-fields/events-other.json';
 import IndexPatternEventsSecurityKnownFields from '../common/known-fields/events-security.json';
 import IndexPatternEventsSystemActivityKnownFields from '../common/known-fields/events-system-activity.json';
-import IndexPatternEventsKnownFields from '../common/known-fields/events.json';
+import IndexPatternEventsUnclassifiedKnownFields from '../common/known-fields/events-unclassified.json';
+import IndexPatternEventsRawKnownFields from '../common/known-fields/events-raw.json';
+import IndexPatternFindingsKnownFields from '../common/known-fields/findings.json';
+import IndexPatternFindingsAccessManagementKnownFields from '../common/known-fields/findings-access-management.json';
+import IndexPatternFindingsApplicationsKnownFields from '../common/known-fields/findings-applications.json';
+import IndexPatternFindingsCloudServicesKnownFields from '../common/known-fields/findings-cloud-services.json';
+import IndexPatternFindingsNetworkActivityKnownFields from '../common/known-fields/findings-network-activity.json';
+import IndexPatternFindingsOtherKnownFields from '../common/known-fields/findings-other.json';
+import IndexPatternFindingsSecurityKnownFields from '../common/known-fields/findings-security.json';
+import IndexPatternFindingsSystemActivityKnownFields from '../common/known-fields/findings-system-activity.json';
+import IndexPatternFindingsUnclassifiedKnownFields from '../common/known-fields/findings-unclassified.json';
+import IndexPatternFIMKnownFields from '../common/known-fields/states-fim.json';
 import IndexPatternFIMFilesKnownFields from '../common/known-fields/states-fim-files.json';
 import IndexPatternFIMRegistriesKeysKnownFields from '../common/known-fields/states-fim-registries-keys.json';
 import IndexPatternFIMRegistriesValuesKnownFields from '../common/known-fields/states-fim-registries-values.json';
@@ -143,10 +170,13 @@ import IndexPatternITHygieneProtocolsKnownFields from '../common/known-fields/st
 import IndexPatternITHygieneServicesKnownFields from '../common/known-fields/states-inventory-services.json';
 import IndexPatternITHygieneSystemKnownFields from '../common/known-fields/states-inventory-system.json';
 import IndexPatternITHygieneUsersKnownFields from '../common/known-fields/states-inventory-users.json';
-import IndexPatternMonitoringKnownFields from '../common/known-fields/monitoring.json';
+import IndexPatternMetricsAgentsKnownFields from '../common/known-fields/metrics-agents.json';
 import IndexPatternSCAKnownFields from '../common/known-fields/states-sca.json';
-import IndexPatternStatisticsKnownFields from '../common/known-fields/statistics.json';
+import IndexPatternMetricsCommsKnownFields from '../common/known-fields/metrics-comms.json';
 import IndexPatternVulnerabilitiesKnownFields from '../common/known-fields/states-vulnerabilities.json';
+import IndexPatternActiveResponsesKnownFields from '../common/known-fields/active-responses.json';
+import IndexPatternThreatintelEnrichmentsKnownFields from '../common/known-fields/threatintel-enrichments.json';
+import IndexPatternThreatintelVulnerabilitiesKnownFields from '../common/known-fields/threatintel-vulnerabilities.json';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -252,19 +282,11 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       }),
     );
 
-    // index patterns
+    // server API run_as (allow_run_as)
     core.healthCheck.register(
-      // TODO: this could check if there is compatible index pattern regarding the fields instead of a hardcoded title/ID
-      initializationTaskCreatorIndexPattern({
+      initializationTaskCreatorServerAPIRunAs({
+        taskName: 'server-api:run-as',
         services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS,
-        indexPatternID: WAZUH_ALERTS_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasFields: INDEX_PATTERN_ALERTS_REQUIRED_FIELDS,
-          hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternAlertsKnownFields,
-        },
       }),
     );
 
@@ -275,12 +297,12 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     core.healthCheck.register(
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING,
-        indexPatternID: WAZUH_MONITORING_PATTERN,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_AGENTS,
+        indexPatternID: WAZUH_METRICS_AGENTS_PATTERN,
         options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist('timestamp'),
+          savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternMonitoringKnownFields,
+          fieldsNoIndices: IndexPatternMetricsAgentsKnownFields,
         },
       }),
     );
@@ -288,12 +310,12 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     core.healthCheck.register(
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
-        indexPatternID: WAZUH_STATISTICS_PATTERN,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_COMMS,
+        indexPatternID: WAZUH_METRICS_COMMS_PATTERN,
         options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist('timestamp'),
+          savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternStatisticsKnownFields,
+          fieldsNoIndices: IndexPatternMetricsCommsKnownFields,
         },
       }),
     );
@@ -502,6 +524,21 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     core.healthCheck.register(
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_STATES,
+        indexPatternID: WAZUH_FIM_PATTERN,
+        options: {
+          savedObjectOverwrite: mapFieldsFormat({
+            'file.size': 'bytes',
+            'registry.size': 'bytes',
+          }),
+          fieldsNoIndices: IndexPatternFIMKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES,
         options: {
           savedObjectOverwrite: mapFieldsFormat({
@@ -643,51 +680,13 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     core.healthCheck.register(
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AWS,
-        indexPatternID: WAZUH_EVENTS_CLOUD_SERVICES_AWS_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsCloudServicesAWSKnownFields,
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AZURE,
-        indexPatternID: WAZUH_EVENTS_CLOUD_SERVICES_AZURE_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsCloudServicesAzureKnownFields,
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_GCP,
-        indexPatternID: WAZUH_EVENTS_CLOUD_SERVICES_GCP_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsCloudServicesGCPKnownFields,
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS,
         indexPatternID: WAZUH_EVENTS_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternEventsKnownFields,
+          checkDefaultIndexPattern: true,
         },
       }),
     );
@@ -695,12 +694,177 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     core.healthCheck.register(
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_ARCHIVES,
-        indexPatternID: WAZUH_ARCHIVES_PATTERN,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_ACTIVE_RESPONSES,
+        indexPatternID: WAZUH_ACTIVE_RESPONSES_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternArchivesKnownFields,
+          fieldsNoIndices: IndexPatternActiveResponsesKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_UNCLASSIFIED,
+        indexPatternID: WAZUH_EVENTS_UNCLASSIFIED_PATTERN,
+        options: {
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+          hasTimeFieldName: true,
+          fieldsNoIndices: IndexPatternEventsUnclassifiedKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_RAW,
+        indexPatternID: WAZUH_EVENTS_RAW_PATTERN,
+        options: {
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+          hasTimeFieldName: true,
+          fieldsNoIndices: IndexPatternEventsRawKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SYSTEM_ACTIVITY,
+        indexPatternID: WAZUH_FINDINGS_SYSTEM_ACTIVITY_PATTERN,
+        options: {
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+          hasTimeFieldName: true,
+          fieldsNoIndices: IndexPatternFindingsSystemActivityKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SECURITY,
+        indexPatternID: WAZUH_FINDINGS_SECURITY_PATTERN,
+        options: {
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+          hasTimeFieldName: true,
+          fieldsNoIndices: IndexPatternFindingsSecurityKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_ACCESS_MANAGEMENT,
+        indexPatternID: WAZUH_FINDINGS_ACCESS_MANAGEMENT_PATTERN,
+        options: {
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+          hasTimeFieldName: true,
+          fieldsNoIndices: IndexPatternFindingsAccessManagementKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_APPLICATIONS,
+        indexPatternID: WAZUH_FINDINGS_APPLICATIONS_PATTERN,
+        options: {
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+          hasTimeFieldName: true,
+          fieldsNoIndices: IndexPatternFindingsApplicationsKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_OTHER,
+        indexPatternID: WAZUH_FINDINGS_OTHER_PATTERN,
+        options: {
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+          hasTimeFieldName: true,
+          fieldsNoIndices: IndexPatternFindingsOtherKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_NETWORK_ACTIVITY,
+        indexPatternID: WAZUH_FINDINGS_NETWORK_ACTIVITY_PATTERN,
+        options: {
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+          hasTimeFieldName: true,
+          fieldsNoIndices: IndexPatternFindingsNetworkActivityKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_CLOUD_SERVICES,
+        indexPatternID: WAZUH_FINDINGS_CLOUD_SERVICES_PATTERN,
+        options: {
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+          hasTimeFieldName: true,
+          fieldsNoIndices: IndexPatternFindingsCloudServicesKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_UNCLASSIFIED,
+        indexPatternID: WAZUH_FINDINGS_UNCLASSIFIED_PATTERN,
+        options: {
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+          hasTimeFieldName: true,
+          fieldsNoIndices: IndexPatternFindingsUnclassifiedKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS,
+        indexPatternID: WAZUH_FINDINGS_PATTERN,
+        options: {
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+          hasTimeFieldName: true,
+          fieldsNoIndices: IndexPatternFindingsKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS,
+        indexPatternID: WAZUH_THREATINTEL_ENRICHMENTS_PATTERN,
+        options: {
+          fieldsNoIndices: IndexPatternThreatintelEnrichmentsKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_VULNERABILITIES,
+        indexPatternID: WAZUH_THREATINTEL_VULNERABILITIES_PATTERN,
+        options: {
+          fieldsNoIndices: IndexPatternThreatintelVulnerabilitiesKnownFields,
         },
       }),
     );

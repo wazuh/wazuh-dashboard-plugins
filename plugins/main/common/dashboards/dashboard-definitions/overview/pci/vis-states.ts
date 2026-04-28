@@ -183,7 +183,7 @@ export const getVisStateTopAgentsByCount = (
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             size: 10,
             order: 'desc',
             orderBy: '1',
@@ -279,7 +279,7 @@ export const getVisStateRequirementsHeatmap = (
           type: 'terms',
           schema: 'group',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -400,7 +400,7 @@ export const getVisStateRequirementsByAgent = (
           enabled: true,
           type: 'terms',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             orderBy: '1',
             order: 'desc',
             size: 5,

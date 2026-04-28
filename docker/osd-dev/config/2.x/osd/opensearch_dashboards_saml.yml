@@ -14,7 +14,7 @@ server.ssl.enabled: true
 server.ssl.key: '/home/node/kbn/certs/osd.key'
 server.ssl.certificate: '/home/node/kbn/certs/osd.pem'
 opensearch.ssl.certificateAuthorities: ['/home/node/kbn/certs/root-ca.pem']
-uiSettings.overrides.defaultRoute: /app/wazuh
+uiSettings.overrides.defaultRoute: /app/wz-home
 opensearch.username: 'kibanaserver'
 opensearch.password: 'kibanaserver'
 
@@ -28,3 +28,31 @@ server.xsrf.allowlist:
     /_plugins/_security/saml/logout,
     /_opendistro/_security/saml/logout,
   ]
+
+opensearchDashboards.branding:
+  useExpandedHeader: false
+wazuh_core.hosts:
+  manager:
+    url: 'https://wazuh.manager'
+    port: 55000
+    username: wazuh-wui
+    password: MyS3cr37P450r.*-
+    run_as: true
+  imposter:
+    url: 'http://imposter'
+    port: 8080
+    username: wazuh-wui
+    password: MyS3cr37P450r.*-
+    run_as: false
+  imposter-cli:
+    url: 'http://<ip-local>'
+    port: 8080
+    username: wazuh-wui
+    password: MyS3cr37P450r.*-
+    run_as: false
+  manager-local:
+    url: 'https://wazuh.manager.local'
+    port: 55000
+    username: wazuh-wui
+    password: wazuh-wui
+    run_as: true

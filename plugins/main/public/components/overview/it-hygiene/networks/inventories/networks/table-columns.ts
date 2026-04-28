@@ -1,5 +1,5 @@
 export default [
-  { id: 'agent.name' },
+  { id: 'wazuh.agent.name' },
   { id: 'network.ip' },
   { id: 'network.netmask' },
   { id: 'network.broadcast' },

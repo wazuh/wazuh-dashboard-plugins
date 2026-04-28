@@ -4,6 +4,7 @@ import { tDataGridRenderColumn } from '../data-grid';
 import { endpointSummary, mitreAttack } from '../../../utils/applications';
 import { WzLink } from '../../wz-link/wz-link';
 import { i18n } from '@osd/i18n';
+import { CTI_CVE_LINK_BASE_PATH } from '../../../../common/constants';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -60,48 +61,36 @@ const renderMitreTechnique = technique => (
 
 export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
-    id: 'agent.id',
-    render: value => {
-      if (value === '000') {
-        return value;
-      }
-
-      return (
-        <WzLink
-          appId={endpointSummary.id}
-          path={`/agents?tab=welcome&agent=${value}`}
-          toolTipProps={{
-            content: i18n.translate('discover.fieldLinkTooltip.agent', {
-              defaultMessage: 'Navigate to the agent details',
-            }),
-          }}
-        >
-          {value}
-        </WzLink>
-      );
-    },
+    id: 'wazuh.agent.id',
+    render: value => (
+      <WzLink
+        appId={endpointSummary.id}
+        path={`/agents?tab=welcome&agent=${value}`}
+        toolTipProps={{
+          content: i18n.translate('discover.fieldLinkTooltip.agent', {
+            defaultMessage: 'Navigate to the agent details',
+          }),
+        }}
+      >
+        {value}
+      </WzLink>
+    ),
   },
   {
-    id: 'agent.name',
-    render: (value, row) => {
-      if (row.agent.id === '000') {
-        return value;
-      }
-
-      return (
-        <WzLink
-          appId={endpointSummary.id}
-          path={`/agents?tab=welcome&agent=${row.agent.id}`}
-          toolTipProps={{
-            content: i18n.translate('discover.fieldLinkTooltip.agent', {
-              defaultMessage: 'Navigate to the agent details',
-            }),
-          }}
-        >
-          {value}
-        </WzLink>
-      );
-    },
+    id: 'wazuh.agent.name',
+    render: (value, row) => (
+      <WzLink
+        appId={endpointSummary.id}
+        path={`/agents?tab=welcome&agent=${row.wazuh.agent.id}`}
+        toolTipProps={{
+          content: i18n.translate('discover.fieldLinkTooltip.agent', {
+            defaultMessage: 'Navigate to the agent details',
+          }),
+        }}
+      >
+        {value}
+      </WzLink>
+    ),
   },
   {
     id: 'data.vulnerability.reference',
@@ -112,7 +101,7 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
     render: renderLinksReference,
   },
   {
-    id: 'rule.mitre.id',
+    id: 'rule.mitre.technique',
     render: value =>
       Array.isArray(value) ? (
         <div style={{ display: 'flex', gap: 10 }}>
@@ -128,29 +117,51 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   },
 
   {
-    id: 'rule.pci_dss',
+    id: 'rule.compliance.pci_dss',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'rule.gdpr',
+    id: 'rule.compliance.gdpr',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'rule.nist_800_53',
+    id: 'rule.compliance.iso_27001',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'rule.hipaa',
+    id: 'rule.compliance.nist_800_53',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'rule.tsc',
+    id: 'rule.compliance.hipaa',
+    render: renderRequirementsSecurityOperations,
+  },
+  {
+    id: 'rule.compliance.tsc',
+    render: renderRequirementsSecurityOperations,
+  },
+  {
+    id: 'rule.compliance.nist_800_171',
+    render: renderRequirementsSecurityOperations,
+  },
+  {
+    id: 'rule.compliance.cmmc',
+    render: renderRequirementsSecurityOperations,
+  },
+  {
+    id: 'rule.compliance.fedramp',
+    render: renderRequirementsSecurityOperations,
+  },
+  {
+    id: 'rule.compliance.nis2',
     render: renderRequirementsSecurityOperations,
   },
   {
     id: 'vulnerability.id',
     render: (value, row) => {
-      if (!row.vulnerability?.scanner?.reference) {
+      if (
+        !(row.vulnerability?.reference || row.vulnerability?.scanner?.reference)
+      ) {
         return value;
       }
       return (
@@ -164,7 +175,7 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
           )}
         >
           <EuiLink
-            href={row.vulnerability.scanner.reference}
+            href={`${CTI_CVE_LINK_BASE_PATH}${row.vulnerability.id}`}
             target='_blank'
             rel='noopener noreferrer'
             external
@@ -178,7 +189,12 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
     id: 'data.vulnerability.cve',
     render: (value, row) => {
-      if (!row.data?.vulnerability?.scanner?.reference) {
+      if (
+        !(
+          row.data?.vulnerability?.reference ||
+          row.data?.vulnerability?.scanner?.reference
+        )
+      ) {
         return value;
       }
       return (
@@ -192,7 +208,7 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
           )}
         >
           <EuiLink
-            href={row.data.vulnerability.scanner.reference}
+            href={`${CTI_CVE_LINK_BASE_PATH}${row.data.vulnerability.cve}`}
             target='_blank'
             rel='noopener noreferrer'
             external

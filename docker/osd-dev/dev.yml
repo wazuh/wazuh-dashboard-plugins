@@ -159,7 +159,7 @@ services:
       - discovery.seed_hosts=os1
       - cluster.initial_master_nodes=os1
       - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
-      - 'OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m' # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - 'OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g' # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
     ulimits:
       memlock:
         soft: -1
@@ -365,7 +365,6 @@ services:
       - '55000:55000'
 
   wazuh.manager.local:
-    platform: linux/amd64 # if you want to try packages for other architectures change this value to linux/arm64 or linux/arm/v7
     depends_on:
       os1:
         condition: service_healthy
@@ -373,7 +372,6 @@ services:
     build:
       context: ./manager
     profiles:
-      - 'dashboard-src'
       - 'server-local' # server profile to use the local packages with agents deb and rpm
       - 'server-local-rpm' # server profile to use the local packages with agent rpm
       - 'server-local-deb' # server profile to use the local packages with agent deb
@@ -400,7 +398,6 @@ services:
       - '55000:55000'
 
   wazuh.agent.deb.local:
-    platform: linux/amd64 # if you want to try packages for other architectures change this value to linux/arm64 or linux/arm/v7
     image: ubuntu:24.04
     profiles:
       - 'server-local' # server profile to use the local packages with agents deb and rpm
@@ -427,7 +424,6 @@ services:
         tail -f /var/ossec/logs/ossec.log
 
   wazuh.agent.rpm.local:
-    platform: linux/amd64 # if you want to try packages for other architectures change this value to linux/arm64 or linux/arm/v7
     image: centos:8
     profiles:
       - 'server-local' # server profile to use the local packages with agents deb and rpm

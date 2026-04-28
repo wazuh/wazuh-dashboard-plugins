@@ -661,7 +661,7 @@ export interface TablePanelConfig {
  *
  * @example
  * const dashboardTables = createDashboardTables('my-index', [
- *   { panelId: 't1', x: 0, field: 'agent.name', title: 'Top 5 agents', visIDPrefix: 'it-hygiene-stat', fieldCustomLabel: 'Top 5 agents' },
+ *   { panelId: 't1', x: 0, field: 'wazuh.agent.name', title: 'Top 5 agents', visIDPrefix: 'it-hygiene-stat', fieldCustomLabel: 'Top 5 agents' },
  *   { panelId: 't2', x: 12, field: 'policy.name', title: 'Top 5 policies', visIDPrefix: 'sca-top-policies', fieldCustomLabel: 'Top 5 policies' },
  * ]);
  */

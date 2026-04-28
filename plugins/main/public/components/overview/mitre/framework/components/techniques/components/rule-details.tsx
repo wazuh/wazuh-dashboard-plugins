@@ -27,6 +27,7 @@ const complianceEquivalences = {
   hipaa: 'HIPAA',
   mitre: 'MITRE',
   'nist-800-53': 'NIST-800-53',
+  // TODO: add the remaining regulatory compliances when the component is readded
 };
 
 const getValueAsString = value => {
@@ -66,6 +67,7 @@ const buildCompliance = ruleInfo => {
     'nist-800-53',
     'pci',
     'mitre',
+    // TODO: add the remaining regulatory compliances when the component is readded
   ];
   Object.keys(ruleInfo).forEach(key => {
     if (complianceKeys.includes(key) && ruleInfo[key].length)
@@ -108,22 +110,23 @@ const getFormattedDetails = value => {
 
 const getComplianceKey = key => {
   if (key === 'pci') {
-    return 'rule.pci_dss';
+    return 'rule.compliance.pci_dss';
   }
   if (key === 'gdpr') {
-    return 'rule.gdpr';
+    return 'rule.compliance.gdpr';
   }
   if (key === 'gpg13') {
-    return 'rule.gpg13';
+    return 'rule.compliance.gpg13';
   }
   if (key === 'hipaa') {
-    return 'rule.hipaa';
+    return 'rule.compliance.hipaa';
   }
   if (key === 'nist-800-53') {
-    return 'rule.nist_800_53';
+    return 'rule.compliance.nist_800_53';
   }
+  // TODO: add the remaining regulatory compliances when the component is readded
   if (key === 'mitre') {
-    return 'rule.mitre.id';
+    return 'rule.mitre.technique';
   }
 
   return '';
@@ -222,7 +225,11 @@ const RuleDetails = (props: Props) => {
         typeof group === 'object' ? JSON.stringify(group) : group;
       listGroups.push(
         <span key={groupValue}>
-          <EuiLink onClick={() => addFilter({ 'rule.groups': groupValue })}>
+          <EuiLink
+            onClick={() =>
+              addFilter({ 'wazuh.integration.decoders': groupValue })
+            }
+          >
             <EuiToolTip
               position='top'
               content={`Filter by this group: ${groupValue}`}

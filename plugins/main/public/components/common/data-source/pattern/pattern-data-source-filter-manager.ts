@@ -2,7 +2,6 @@ import rison from 'rison-node';
 import store from '../../../../redux/store';
 import { AppState } from '../../../../react-services/app-state';
 import { getDataPlugin } from '../../../../kibana-services';
-import { FilterHandler } from '../../../../utils/filter-handler';
 import {
   tDataSourceFilterManager,
   tFilter,
@@ -14,31 +13,6 @@ import { DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER } from '../../../../../com
 import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
 import { FilterStateStore } from '../../../../../common/constants';
 import { ErrorDataSourceServerAPIContextFilter } from '../../../../utils/errors';
-
-const MANAGER_AGENT_ID = '000';
-const AGENT_ID_KEY = 'agent.id';
-
-/**
- * Get the filter that excludes the data related to Wazuh servers
- * @param indexPatternId Index pattern id
- * @returns
- */
-export function getFilterExcludeManager(indexPatternId: string) {
-  return {
-    meta: {
-      alias: null,
-      disabled: false,
-      key: AGENT_ID_KEY,
-      negate: true,
-      params: { query: MANAGER_AGENT_ID },
-      type: 'phrase',
-      index: indexPatternId,
-      controlledBy: DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
-    },
-    query: { match_phrase: { [AGENT_ID_KEY]: MANAGER_AGENT_ID } },
-    $state: { store: FilterStateStore.APP_STATE },
-  };
-}
 
 export enum FILTER_OPERATOR {
   IS = 'is',
@@ -264,7 +238,6 @@ export class PatternDataSourceFilterManager
     controlledByValue: string,
     key?: string,
   ): tFilter[] {
-    const filterHandler = new FilterHandler();
     const { cluster } = AppState.getClusterInfo();
     const filterValue = cluster;
 
@@ -274,16 +247,13 @@ export class PatternDataSourceFilterManager
       );
     }
 
-    const clusterFilter = filterHandler.clusterQuery(filterValue, key);
-    clusterFilter.meta = {
-      ...clusterFilter.meta,
-      controlledBy: controlledByValue,
-      index: indexPatternId,
-    };
-    //@ts-ignore
-    clusterFilter.$state = {
-      store: FilterStateStore.APP_STATE,
-    };
+    const clusterFilter = PatternDataSourceFilterManager.createFilter(
+      FILTER_OPERATOR.IS,
+      key || 'wazuh.cluster.name',
+      filterValue,
+      indexPatternId,
+      controlledByValue,
+    );
     //@ts-ignore
     return [clusterFilter] as tFilter[];
   }
@@ -307,19 +277,6 @@ export class PatternDataSourceFilterManager
         PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
       ),
     ];
-  }
-
-  /**
-   * Return the filter to exclude the data related to servers (managers) due to the setting hideManagerAlerts is enabled
-   */
-  static getExcludeManagerFilter(indexPatternId: string): tFilter[] {
-    if (store.getState().appConfig?.data?.hideManagerAlerts) {
-      let excludeManagerFilter = getFilterExcludeManager(
-        indexPatternId,
-      ) as tFilter;
-      return [excludeManagerFilter];
-    }
-    return [];
   }
 
   /******************************************************************/

@@ -35,3 +35,10 @@ export type ResponseUpgradeAgents = {
   agent: string;
   task_id: number;
 };
+
+export type ResponseRemoveAgent = string;
+
+export type AgentInfoMinimal = {
+  id: string;
+  name: string;
+};

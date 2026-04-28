@@ -3,15 +3,20 @@ import { commonColumns } from '../../common/data-grid-columns';
 
 export const dockerColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
-  commonColumns['agent.name'],
+  commonColumns['wazuh.agent.name'],
   {
-    id: 'data.docker.Type',
-    initialWidth: 149,
+    id: 'container.image.name',
   },
   {
-    id: 'data.docker.Action',
+    id: 'event.action',
     initialWidth: 161,
   },
-  commonColumns['rule.description'],
-  commonColumns['rule.level'],
+  {
+    id: 'event.category',
+    initialWidth: 130,
+  },
+  {
+    id: 'container.name',
+    initialWidth: 160,
+  },
 ];

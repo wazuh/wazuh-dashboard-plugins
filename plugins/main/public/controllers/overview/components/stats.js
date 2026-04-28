@@ -61,7 +61,7 @@ export const Stats = withErrorBoundary(
       if (status) {
         sessionStorage.setItem(
           'wz-agents-overview-table-filter',
-          JSON.stringify({ q: `id!=000;status=${status}` }),
+          JSON.stringify({ q: `status=${status}` }),
         );
       } else if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
         sessionStorage.removeItem('wz-agents-overview-table-filter');
@@ -158,10 +158,12 @@ export const Stats = withErrorBoundary(
             </EuiCard>
           </EuiFlexItem>
           <EuiFlexItem>
-            <EuiCard betaBadgeLabel='Last 24 hours alerts' title=''>
-              <div className='vulnerabilites-summary-card'>
-                <LastAlertsSummaryBySeverity />
-              </div>
+            <EuiCard
+              betaBadgeLabel='Last 24 hours findings'
+              title=''
+              className='home-alerts-card'
+            >
+              <LastAlertsSummaryBySeverity />
             </EuiCard>
           </EuiFlexItem>
         </EuiFlexGroup>

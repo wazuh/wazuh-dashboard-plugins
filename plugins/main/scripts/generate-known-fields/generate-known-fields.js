@@ -58,26 +58,10 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'states-vulnerabilities.json',
   },
-  alerts: {
-    urls: [
-      wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/alerts.json',
-      ),
-    ],
-    outputFile: 'alerts.json',
-  },
-  archives: {
-    urls: [
-      wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/archives.json',
-      ),
-    ],
-    outputFile: 'archives.json',
-  },
   'events-access-management': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/access-management.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-access-management.json',
@@ -85,7 +69,7 @@ const TEMPLATE_SOURCES = {
   'events-applications': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/applications.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-applications.json',
@@ -93,53 +77,31 @@ const TEMPLATE_SOURCES = {
   'events-cloud-services': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/cloud-services.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-cloud-services.json',
   },
-  'events-cloud-services-aws': {
-    urls: [
-      wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/cloud-services-aws.json',
-      ),
-    ],
-    outputFile: 'events-cloud-services-aws.json',
-  },
-  'events-cloud-services-azure': {
-    urls: [
-      wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/cloud-services-azure.json',
-      ),
-    ],
-    outputFile: 'events-cloud-services-azure.json',
-  },
-  'events-cloud-services-gcp': {
-    urls: [
-      wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/cloud-services-gcp.json',
-      ),
-    ],
-    outputFile: 'events-cloud-services-gcp.json',
-  },
   'events-network-activity': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/network-activity.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-network-activity.json',
   },
   'events-other': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/templates/streams/other.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/events.json',
+      ),
     ],
     outputFile: 'events-other.json',
   },
   'events-security': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/security.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-security.json',
@@ -147,22 +109,104 @@ const TEMPLATE_SOURCES = {
   'events-system-activity': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/system-activity.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-system-activity.json',
   },
-  monitoring: {
+  'events-unclassified': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/templates/monitoring.json'),
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/unclassified.json',
+      ),
     ],
-    outputFile: 'monitoring.json',
+    outputFile: 'events-unclassified.json',
   },
-  statistics: {
+  'events-raw': {
     urls: [
-      wazuhUrl('plugins/setup/src/main/resources/templates/statistics.json'),
+      wazuhUrl('plugins/setup/src/main/resources/templates/streams/raw.json'),
     ],
-    outputFile: 'statistics.json',
+    outputFile: 'events-raw.json',
+  },
+  'findings-access-management': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-access-management.json',
+  },
+  'findings-applications': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-applications.json',
+  },
+  'findings-cloud-services': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-cloud-services.json',
+  },
+  'findings-network-activity': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-network-activity.json',
+  },
+  'findings-other': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-other.json',
+  },
+  'findings-security': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-security.json',
+  },
+  'findings-system-activity': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-system-activity.json',
+  },
+  'findings-unclassified': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/findings.json',
+      ),
+    ],
+    outputFile: 'findings-unclassified.json',
+  },
+  'metrics-agents': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/metrics-agents.json',
+      ),
+    ],
+    outputFile: 'metrics-agents.json',
+  },
+  'metrics-comms': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/metrics-comms.json',
+      ),
+    ],
+    outputFile: 'metrics-comms.json',
   },
   // FIM templates
   'states-fim-files': {
@@ -300,6 +344,28 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'states-sca.json',
   },
+  'active-responses': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/active-responses.json',
+      ),
+    ],
+    outputFile: 'active-responses.json',
+  },
+  'threatintel-enrichments': {
+    urls: [
+      wazuhUrl('plugins/setup/src/main/resources/templates/content/ioc.json'),
+    ],
+    outputFile: 'threatintel-enrichments.json',
+  },
+  'threatintel-vulnerabilities': {
+    urls: [
+      wazuhUrl(
+        'plugins/content-manager/src/main/resources/mappings/cti-cve-mappings.json',
+      ),
+    ],
+    outputFile: 'threatintel-vulnerabilities.json',
+  },
 };
 
 /**
@@ -384,10 +450,25 @@ function shouldReadFromDocValues(fieldProps, esType) {
   return true;
 }
 
+function createExtractionIssuesContext() {
+  return {
+    warnings: [],
+    errors: [],
+    addWarning(message) {
+      this.warnings.push(message);
+      console.log(`   ⚠️  ${message}`);
+    },
+    addError(message) {
+      this.errors.push(message);
+      console.error(`   ❌ ${message}`);
+    },
+  };
+}
+
 /**
  * Recursively extracts field definitions from template mappings
  */
-function extractFields(properties, prefix = '') {
+function extractFieldsFromProperties(properties, prefix = '', issues) {
   const fields = [];
 
   // Add basic index meta fields if we're at root level
@@ -451,7 +532,8 @@ function extractFields(properties, prefix = '') {
         readFromDocValues: shouldReadFromDocValues(fieldDef, esType),
       };
 
-      fields.push(field);
+      if (!(esType === 'object' || esType === 'nested') || !fieldDef.properties)
+        fields.push(field);
 
       // Handle multi-fields (like .keyword subfields)
       if (fieldDef.fields) {
@@ -472,17 +554,131 @@ function extractFields(properties, prefix = '') {
         }
       }
 
-      // Handle nested type with properties
-      if (esType === 'nested' && fieldDef.properties) {
-        fields.push(...extractFields(fieldDef.properties, fullFieldName));
+      // Handle nested or object type with properties
+      if ((esType === 'nested' || esType === 'object') && fieldDef.properties) {
+        fields.push(
+          ...extractFieldsFromProperties(
+            fieldDef.properties,
+            fullFieldName,
+            issues,
+          ),
+        );
       }
     } else if (fieldDef.properties) {
       // Object type without explicit type - recurse into properties
-      fields.push(...extractFields(fieldDef.properties, fullFieldName));
+      fields.push(
+        ...extractFieldsFromProperties(
+          fieldDef.properties,
+          fullFieldName,
+          issues,
+        ),
+      );
     }
   }
 
   return fields;
+}
+
+/**
+ * Extracts fields from dynamic templates (if applicable)
+ * Note: This is a simplified approach and may need to be enhanced to handle complex dynamic template structures
+ * "dynamic_templates": [
+ *   {
+ *     "wcs_agent_build_original": {
+ *       "path_match": "agent.build.original",
+ *       "mapping": {
+ *         "ignore_above": 1024,
+ *         "type": "keyword"
+ *       }
+ *    }
+ *   },
+ * @param {*} dynamicTemplates
+ * @returns
+ */
+function extractFieldsFromDynamicTemplates(dynamicTemplates, issues) {
+  return dynamicTemplates
+    .map(dynamicTemplate => {
+      const templateName = Object.keys(dynamicTemplate)[0];
+      if (dynamicTemplate[templateName].path_match) {
+        const fieldName = dynamicTemplate[templateName].path_match;
+        const mapping = dynamicTemplate[templateName].mapping;
+        const esType = mapping.type;
+
+        return {
+          name: fieldName,
+          type: mapIndexFieldType(esType, mapping),
+          esTypes: [esType],
+          searchable: isSearchable(mapping, esType),
+          aggregatable: isAggregatable(mapping, esType),
+          readFromDocValues: shouldReadFromDocValues(mapping, esType),
+        };
+      }
+      issues.addWarning(
+        `Unsupported dynamic template structure in ${templateName}, skipping field extraction`,
+      );
+    })
+    .flat()
+    .filter(Boolean); // Remove undefined entries
+}
+
+function extractFields(mappings, properties) {
+  const issues = createExtractionIssuesContext();
+  const fields = [];
+
+  // Handle different possible mappings structures
+  if (properties) {
+    fields.push(...extractFieldsFromProperties(properties, '', issues));
+  }
+
+  if (mappings.dynamic_templates) {
+    fields.push(
+      ...extractFieldsFromDynamicTemplates(mappings.dynamic_templates, issues),
+    );
+  }
+
+  // Ensure fields are unique by name (in case of duplicates from properties and dynamic templates)
+  const uniqueFieldsMap = new Map();
+  for (const field of fields) {
+    if (!field?.name) {
+      issues.addWarning(
+        `Field with undefined name detected, skipping field extraction. ${JSON.stringify(
+          field,
+        )}`,
+      );
+      continue;
+    }
+    if (field?.name.includes('*')) {
+      issues.addWarning(
+        `Field name contains wildcard: ${field.name}, skipping field extraction.`,
+      );
+      continue;
+    }
+    if (!uniqueFieldsMap.has(field.name)) {
+      uniqueFieldsMap.set(field.name, field);
+    } else {
+      issues.addWarning(
+        `Duplicate field name detected: ${field.name}, keeping the first occurrence and skipping this one.`,
+      );
+    }
+  }
+
+  // Sort fields: fields starting with _ first, then alphabetically
+  const uniqueFields = Array.from(uniqueFieldsMap.values()).sort((a, b) => {
+    const aStartsWithUnderscore = a.name.startsWith('_');
+    const bStartsWithUnderscore = b.name.startsWith('_');
+
+    if (aStartsWithUnderscore !== bStartsWithUnderscore) {
+      return aStartsWithUnderscore ? -1 : 1;
+    }
+
+    return a.name.localeCompare(b.name);
+  });
+
+  return {
+    fields: uniqueFields,
+    warnings: issues.warnings,
+    errors: issues.errors,
+  };
 }
 
 /**
@@ -548,7 +744,7 @@ function saveOutput(location, dataASObject) {
  * Processes a template and generates known fields
  */
 async function processTemplate(templateConfig, config) {
-  console.log(`Processing ${templateConfig.name} template...`);
+  console.log(`⚙️  Processing ${templateConfig.name} template...`);
 
   try {
     const { template, url } = await fetchTemplateFromUrls(
@@ -558,12 +754,17 @@ async function processTemplate(templateConfig, config) {
     );
     console.log(`  ✅ Successfully fetched from: ${url}`);
 
-    // Extract mappings - handle different template structures
+    // Extract mappings - handle different template structures:
+    // 1. Index template:           { "mappings": { "properties": {...} } }
+    // 2. Composable template:      { "template": { "mappings": { ... } } }
+    // 3. Raw mapping (e.g. SA):    { "properties": {...} }
     let mappings;
     if (template.mappings) {
       mappings = template.mappings;
     } else if (template.template && template.template.mappings) {
       mappings = template.template.mappings;
+    } else if (template.properties) {
+      mappings = template;
     } else {
       throw new Error('Could not find mappings in template structure');
     }
@@ -579,7 +780,8 @@ async function processTemplate(templateConfig, config) {
     }
 
     // Generate known fields
-    const knownFields = extractFields(properties);
+    const extractionResult = extractFields(mappings, properties);
+    const knownFields = extractionResult.fields;
 
     // Ensure output directory exists - resolve relative to script location
     const absoluteOutputFile = path.resolve(
@@ -595,7 +797,11 @@ async function processTemplate(templateConfig, config) {
       `  ✅ Generated ${knownFields.length} known fields for ${templateConfig.name} -> ${absoluteOutputFile}`,
     );
 
-    return knownFields;
+    return {
+      fields: knownFields,
+      warnings: extractionResult.warnings,
+      errors: extractionResult.errors,
+    };
   } catch (error) {
     console.error(
       `  ❌ Error processing ${templateConfig.name}: ${error.message}`,
@@ -624,7 +830,7 @@ async function generateCombinedFields({
   outputFileName,
   displayName,
 }) {
-  console.log(`Processing combined ${displayName} fields...`);
+  console.log(`⚙️  Processing combined ${displayName} fields...`);
 
   const matchingKeys = Object.keys(results).filter(
     key => key.startsWith(keyPrefix) && results[key],
@@ -639,7 +845,7 @@ async function generateCombinedFields({
   const fieldsMap = new Map();
 
   for (const key of matchingKeys) {
-    const fields = results[key];
+    const fields = results[key].fields;
     for (const field of fields) {
       // Keep the first occurrence of each field name
       if (!fieldsMap.has(field.name)) {
@@ -683,15 +889,37 @@ async function main(config) {
     console.log(''); // Add spacing between processing
   }
 
+  // Generate combined FIM fields
+  try {
+    const combinedFields = await generateCombinedFields({
+      results,
+      config,
+      keyPrefix: 'states-fim-',
+      outputFileName: 'states-fim.json',
+      displayName: 'states-fim',
+    });
+    results['states-fim'] = combinedFields
+      ? { fields: combinedFields, warnings: [], errors: [] }
+      : null;
+  } catch (error) {
+    console.error('Failed to generate combined FIM fields:', error.message);
+    process.exit(1);
+    results['states-fim'] = null;
+  }
+  console.log(''); // Add spacing
+
   // Generate combined inventory fields
   try {
-    results['states-inventory'] = await generateCombinedFields({
+    const combinedFields = await generateCombinedFields({
       results,
       config,
       keyPrefix: 'states-inventory-',
       outputFileName: 'states-inventory.json',
       displayName: 'states-inventory',
     });
+    results['states-inventory'] = combinedFields
+      ? { fields: combinedFields, warnings: [], errors: [] }
+      : null;
   } catch (error) {
     console.error(
       'Failed to generate combined inventory fields:',
@@ -704,13 +932,16 @@ async function main(config) {
 
   // Generate combined events fields
   try {
-    results['events'] = await generateCombinedFields({
+    const combinedFields = await generateCombinedFields({
       results,
       config,
       keyPrefix: 'events-',
       outputFileName: 'events.json',
       displayName: 'events',
     });
+    results['events'] = combinedFields
+      ? { fields: combinedFields, warnings: [], errors: [] }
+      : null;
   } catch (error) {
     console.error('Failed to generate combined events fields:', error.message);
     process.exit(1);
@@ -718,17 +949,64 @@ async function main(config) {
   }
   console.log(''); // Add spacing
 
+  // Generate combined findings fields
+  try {
+    const combinedFields = await generateCombinedFields({
+      results,
+      config,
+      keyPrefix: 'findings-',
+      outputFileName: 'findings.json',
+      displayName: 'findings',
+    });
+    results['findings'] = combinedFields
+      ? { fields: combinedFields, warnings: [], errors: [] }
+      : null;
+  } catch (error) {
+    console.error(
+      'Failed to generate combined findings fields:',
+      error.message,
+    );
+    process.exit(1);
+    results['findings'] = null;
+  }
+  console.log(''); // Add spacing
+
   // Summary
   let shouldFail = false;
 
   console.log('📊 Summary:');
-  for (const [key, fields] of Object.entries(results)) {
-    if (fields) {
-      console.log(`  ${key}: ✅ ${fields.length} fields generated`);
+  for (const [key, result] of Object.entries(results)) {
+    if (result) {
+      const warningsCount = result.warnings?.length || 0;
+      const errorsCount = result.errors?.length || 0;
+      const warningsText = warningsCount
+        ? ` (⚠️ ${warningsCount} warnings)`
+        : '';
+      const errorsText = errorsCount ? ` (❌ ${errorsCount} errors)` : '';
+      const resultIcon = errorsCount ? '❌' : warningsCount ? '⚠️' : '✅';
+
+      console.log(
+        `  ${resultIcon}  ${key}: ${result.fields.length} fields generated${warningsText}${errorsText}`,
+      );
+
+      if (warningsCount > 0) {
+        console.log(`    ⚠️  Warnings (${warningsCount}):`);
+        result.warnings.forEach(warning => {
+          console.log(`      - ${warning}`);
+        });
+      }
+
+      if (errorsCount > 0) {
+        shouldFail = true;
+        console.log(`    ❌ Errors (${errorsCount}):`);
+        result.errors.forEach(error => {
+          console.log(`      - ${error}`);
+        });
+      }
     } else {
       // Mark overall failure if any template failed
       shouldFail = true;
-      console.log(`  ${key}: ❌ Failed`);
+      console.log(`  ❌ ${key}: Failed`);
     }
   }
 
@@ -762,6 +1040,6 @@ if (require.main === module) {
 
 module.exports = {
   processTemplate,
-  extractFields,
+  extractFields: extractFieldsFromProperties,
   mapIndexFieldType,
 };

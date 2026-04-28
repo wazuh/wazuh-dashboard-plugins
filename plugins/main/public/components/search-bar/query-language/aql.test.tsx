@@ -10,7 +10,7 @@ describe('SearchBar component', () => {
     modes: [
       {
         id: AQL.id,
-        implicitQuery: 'id!=000;',
+        implicitQuery: 'id=001;',
         suggestions: {
           field(currentValue) {
             return [];
@@ -32,7 +32,7 @@ describe('SearchBar component', () => {
 
     await waitFor(() => {
       const elementImplicitQuery = wrapper.container.querySelector('code');
-      expect(elementImplicitQuery?.innerHTML).toEqual('id!=000;');
+      expect(elementImplicitQuery?.innerHTML).toEqual('id=001;');
       expect(wrapper.container).toMatchSnapshot();
     });
   });

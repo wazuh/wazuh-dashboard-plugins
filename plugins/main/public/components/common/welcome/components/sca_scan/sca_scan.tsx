@@ -27,9 +27,9 @@ import { getCore } from '../../../../../kibana-services';
 import { withDataSourceFetch, withGuard, withPanel } from '../../../hocs';
 import { compose } from 'redux';
 import { configurationAssessment } from '../../../../../utils/applications';
+import NavigationService from '../../../../../react-services/navigation-service';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
-import NavigationService from '../../../../../react-services/navigation-service';
 import {
   SCAStatesDataSource,
   SCAStatesDataSourceRepository,
@@ -51,7 +51,9 @@ const ScaScanHeader = ({ agent }) => {
     <EuiFlexGroup className='wz-section-sca-euiFlexGroup'>
       <EuiFlexItem grow={false}>
         <RedirectAppLinks application={getCore().application}>
-          <Typography level='card'>SCA: Scans summary</Typography>
+          <Typography level='card'>
+            Security Configuration Assessment
+          </Typography>
         </RedirectAppLinks>
       </EuiFlexItem>
       <EuiFlexItem grow={false}>
@@ -64,7 +66,7 @@ const ScaScanHeader = ({ agent }) => {
               onClick={() => {
                 new PinnedAgentManager().pinAgent(agent);
               }}
-              href={NavigationService.getInstance().getUrlForApp(
+              href={NavigationService.getInstance().getAppURL(
                 configurationAssessment.id,
               )}
               aria-label='Open SCA Scans'
@@ -115,19 +117,13 @@ const ScaScanTable = ({ dataSourceAction }) => {
       sortable: true,
     },
     {
-      field: 'not_run',
-      name: CheckResult.NotRun,
-      width: '10%',
-      sortable: true,
-    },
-    {
       field: 'score',
       name: 'Score',
       width: '10%',
       sortable: true,
       render: score => {
-        const scoreFormat = decimalFormat();
-        return `${d3.format(scoreFormat)(score * 100)}%`;
+        const scoreFormatter = decimalFormat();
+        return `${scoreFormatter.convert(score)}`;
       },
     },
   ];
@@ -226,9 +222,6 @@ const ScaScanBody = compose(
             const {
               [CheckResult.Passed]: [{ doc_count: pass }] = [{ doc_count: 0 }],
               [CheckResult.Failed]: [{ doc_count: fail }] = [{ doc_count: 0 }],
-              [CheckResult.NotRun]: [{ doc_count: not_run }] = [
-                { doc_count: 0 },
-              ],
             } = groupBy(check_result.buckets, 'key');
 
             const score = pass / Math.max(pass + fail, 1);
@@ -237,7 +230,6 @@ const ScaScanBody = compose(
               name: policy_name,
               pass,
               fail,
-              not_run,
               score,
             };
           },

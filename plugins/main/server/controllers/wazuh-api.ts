@@ -158,7 +158,7 @@ export class WazuhApiCtrl {
 
       // If we have a valid response from the Wazuh API
       try {
-        const { manager, node, cluster } =
+        const { node, cluster } =
           await context.wazuh_core.manageHosts.getRegistryDataByHost(
             apiHostData,
             {
@@ -166,7 +166,7 @@ export class WazuhApiCtrl {
             },
           );
 
-        api.cluster_info = { manager, node, cluster };
+        api.cluster_info = { node, cluster };
 
         return response.ok({
           body: {
@@ -325,7 +325,9 @@ export class WazuhApiCtrl {
       } catch (error) {
         return ErrorResponse(
           `ERROR3099 - ${
-            error.response?.data?.detail || 'Server not ready yet'
+            error.response?.data?.detail ||
+            error.message ||
+            'Server not ready yet'
           }`,
           3099,
           error?.response?.status || HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
@@ -339,50 +341,11 @@ export class WazuhApiCtrl {
       ) {
         // Check if cluster node info exists in the response
         if (responseClusterInfo.data?.data?.affected_items?.[0]?.node) {
-          const nodeInfo = responseClusterInfo.data?.data?.affected_items[0];
-          const nodeId = nodeInfo.node;
-
-          // Get UUID from cluster node info endpoint
-          let responseNodeInfo;
-          try {
-            responseNodeInfo =
-              await context.wazuh.api.client.asInternalUser.request(
-                'GET',
-                `/cluster/${nodeId}/info`,
-                {},
-                options,
-              );
-          } catch (error) {
-            return ErrorResponse(
-              `ERROR3099 - ${
-                error.response?.data?.detail || 'Server not ready yet'
-              }`,
-              3099,
-              error?.response?.status || HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
-              response,
-            );
-          }
-
-          // Check if UUID exists in the node info response
-          if (responseNodeInfo.data?.data?.affected_items?.[0]?.uuid) {
-            const uuid = responseNodeInfo.data.data.affected_items[0].uuid;
-            const result =
-              await context.wazuh_core.manageHosts.getRegistryDataByHost(data);
-            return response.ok({
-              body: {
-                ...result,
-                uuid,
-              },
-            });
-          } else {
-            context.wazuh.logger.warn('Could not obtain UUID');
-            return ErrorResponse(
-              'Could not obtain UUID',
-              null,
-              HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-              response,
-            );
-          }
+          const result =
+            await context.wazuh_core.manageHosts.getRegistryDataByHost(data);
+          return response.ok({
+            body: result,
+          });
         } else {
           context.wazuh.logger.warn(
             'Could not obtain cluster node information',
@@ -641,7 +604,27 @@ export class WazuhApiCtrl {
           const body = error.response.data || {
             message: error.message || 'Unexpected error',
           };
-          return response.custom({ statusCode, body });
+
+          let responseBody = body;
+
+          if (statusCode >= 400 && statusCode < 600) {
+            responseBody = {
+              /*
+                Ensure the body has a message property to avoid the internal server error when this is missing. See https://github.com/wazuh/wazuh-dashboard/blob/v4.14.2/src/core/server/http/router/response_adapter.ts#L168.
+
+                This should allow to display the error related to missing endpoints on server API in the Server management > Dev Tools instead of an internal server error.
+
+                More information: https://github.com/wazuh/wazuh-dashboard-plugins/issues/8051
+              */
+              ...responseBody,
+              message:
+                responseBody.message ??
+                responseBody.detail ??
+                'Server API response has no message property. This is added to avoid an internal server error due to the missing property.',
+            };
+          }
+
+          return response.custom({ statusCode, body: responseBody });
         } catch (_) {
           // fall through to the default error handling below if something goes wrong
         }
@@ -955,14 +938,24 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
+      const osResp =
+        await context.core.opensearch.client.asInternalUser.transport.request({
+          method: 'GET',
+          path: '/',
+        });
+      const clusterUuid = osResp?.body?.cluster_uuid ?? null;
+
+      const data = {
+        'app-version': pluginVersion,
+        revision: pluginRevision,
+        configuration_file: context.wazuh_core.configuration.store.file,
+        cluster_uuid: clusterUuid,
+      };
+
       return response.ok({
         body: {
           statusCode: HTTP_STATUS_CODES.OK,
-          data: {
-            'app-version': pluginVersion,
-            revision: pluginRevision,
-            configuration_file: context.wazuh_core.configuration.store.file,
-          },
+          data,
         },
       });
     } catch (error) {

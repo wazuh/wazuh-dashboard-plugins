@@ -1,5 +1,5 @@
 export default [
-  { id: 'agent.name' },
+  { id: 'wazuh.agent.name' },
   { id: 'user.name' },
   { id: 'user.groups' },
   { id: 'user.shell' },

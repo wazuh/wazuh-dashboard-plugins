@@ -1,5 +1,5 @@
 export default [
-  { id: 'agent.name' },
+  { id: 'wazuh.agent.name' },
   { id: 'host.memory.total' },
   { id: 'host.memory.used' },
   { id: 'host.memory.free' },

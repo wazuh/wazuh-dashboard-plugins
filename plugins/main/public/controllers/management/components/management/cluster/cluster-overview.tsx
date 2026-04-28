@@ -5,12 +5,12 @@ import {
   withGlobalBreadcrumb,
   withUserAuthorizationPrompt,
 } from '../../../../../components/common/hocs';
-import { cluster } from '../../../../../utils/applications';
+import { serverStatus } from '../../../../../utils/applications';
 import { ClusterDashboard } from '../../../../../components/management/cluster/dashboard/dashboard';
 
 export const ClusterOverview = compose(
   withErrorBoundary,
-  withGlobalBreadcrumb([{ text: cluster.breadcrumbLabel }]),
+  withGlobalBreadcrumb([{ text: serverStatus.breadcrumbLabel }]),
   withUserAuthorizationPrompt([
     { action: 'cluster:read', resource: 'node:id:*' },
   ]),

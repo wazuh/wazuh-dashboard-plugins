@@ -26,13 +26,11 @@ import { Typography } from '../../../typography/typography';
 import { getCore, getDataPlugin } from '../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { fileIntegrityMonitoring } from '../../../../../utils/applications';
-import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import NavigationService from '../../../../../react-services/navigation-service';
+import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import { withDataSourceFetch } from '../../../hocs';
-import {
-  AlertsDataSourceRepository,
-  FIMDataSource,
-} from '../../../data-source';
+import { FIMDataSourceRepository, FIMDataSource } from '../../../data-source';
+import { formatUIDate } from '../../../../../react-services';
 
 export function FimEventsTable({ agent }) {
   return (
@@ -41,7 +39,7 @@ export function FimEventsTable({ agent }) {
         <EuiFlexItem>
           <EuiFlexGroup responsive={false}>
             <EuiFlexItem>
-              <Typography level='section'>FIM: Recent events</Typography>
+              <Typography level='section'>FIM: Recent files</Typography>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiToolTip position='top' content='Open FIM'>
@@ -50,9 +48,9 @@ export function FimEventsTable({ agent }) {
                     iconType='popout'
                     color='primary'
                     onClick={() => navigateToFim(agent)}
-                    href={`${NavigationService.getInstance().getUrlForApp(
+                    href={NavigationService.getInstance().getAppURL(
                       fileIntegrityMonitoring.id,
-                    )}`}
+                    )}
                     aria-label='Open FIM'
                   />
                 </RedirectAppLinks>
@@ -83,9 +81,9 @@ export function useTimeFilter() {
 
 const FimTableDataSource = withDataSourceFetch({
   DataSource: FIMDataSource,
-  DataSourceRepositoryCreator: AlertsDataSourceRepository,
+  DataSourceRepositoryCreator: FIMDataSourceRepository,
   mapRequestParams: ({ dataSource, dependencies }) => {
-    const [_, timeFilter, sort] = dependencies;
+    const [_, sort] = dependencies;
 
     const sortSearch = [
       { id: sort.field.substring(8), direction: sort.direction },
@@ -93,7 +91,6 @@ const FimTableDataSource = withDataSourceFetch({
     return {
       query: { query: '', language: 'kuery' },
       filters: [...dataSource.fetchFilters],
-      dateRange: timeFilter,
       pagination: {
         pageIndex: 0,
         pageSize: 5,
@@ -103,8 +100,7 @@ const FimTableDataSource = withDataSourceFetch({
       },
     };
   },
-  mapFetchActionDependencies: ({ timeFilter, sort }) => [
-    timeFilter,
+  mapFetchActionDependencies: ({ sort }) => [
     sort,
     /* Changing the agent causes the fetchFilters change, and the HOC manage this case so it is not
     requried adding the agent to the dependencies */
@@ -122,14 +118,14 @@ const FimTableDataSource = withDataSourceFetch({
       sorting={{ sort }}
       onChange={e => setSort(e.sort)}
       itemId='fim-alerts'
-      noItemsMessage='No recent events'
+      noItemsMessage='No recent documents'
     />
   );
 });
 
 function FimTable({ agent }) {
   const [sort, setSort] = useState({
-    field: '_source.timestamp',
+    field: '_source.file.mtime',
     direction: 'desc',
   });
 
@@ -151,34 +147,28 @@ function navigateToFim(agent) {
 
 const columns = [
   {
-    field: '_source.timestamp',
-    name: 'Time',
+    field: '_source.file.mtime',
+    name: 'Modified time',
     sortable: true,
-    width: '150px',
+    width: '300px',
+    render: formatUIDate,
   },
   {
-    field: '_source.syscheck.path',
-    name: 'Path',
+    field: '_source.file.path',
+    name: 'File path',
     sortable: true,
     truncateText: true,
   },
   {
-    field: '_source.syscheck.event',
-    name: 'Action',
+    field: '_source.file.owner',
+    name: 'File owner',
     sortable: true,
-    width: '100px',
   },
   {
-    field: '_source.rule.description',
-    name: 'Rule description',
+    field: '_source.file.uid',
+    name: 'File user ID',
     sortable: true,
     truncateText: true,
   },
-  {
-    field: '_source.rule.level',
-    name: 'Rule Level',
-    sortable: true,
-    width: '75px',
-  },
-  { field: '_source.rule.id', name: 'Rule Id', sortable: true, width: '75px' },
+  // TODO: Add file.size column using the index pattern byte formatter
 ];

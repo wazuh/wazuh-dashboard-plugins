@@ -62,32 +62,34 @@ class WzConfigurationOverview extends Component {
     this.props.updateConfigurationSection(section, title, description, path);
   }
   filterSettingsIfAgentOrManager(settings) {
-    return settings.filter(
-      setting =>
-        (this.props.agent.id !== '000' &&
-          setting.when &&
-          ((isString(setting.when) && setting.when === 'agent') ||
-            (isFunction(setting.when) && setting.when(this.props.agent)))) ||
-        (this.props.agent.id === '000' &&
-          setting.when &&
-          ((isString(setting.when) && setting.when === 'manager') ||
-            (isFunction(setting.when) && setting.when(this.props.agent)))) ||
-        (isFunction(setting.when) && setting.when(this.props.agent)) ||
-        (!setting.when && true),
-    );
+    const isManager = !this.props.agent;
+    return settings.filter(setting => {
+      if (!setting.when) return true;
+
+      if (isFunction(setting.when)) {
+        return setting.when(this.props.agent);
+      }
+
+      if (isString(setting.when)) {
+        return isManager
+          ? setting.when === 'manager'
+          : setting.when === 'agent';
+      }
+
+      return false;
+    });
   }
   filterSettings(groups) {
     return groups
-      .map(group => {
-        return {
-          title: group.title,
-          settings: this.filterSettingsIfAgentOrManager(group.settings),
-        };
-      })
+      .map(group => ({
+        title: group.title,
+        settings: this.filterSettingsIfAgentOrManager(group.settings),
+      }))
       .filter(group => group.settings.length);
   }
   render() {
     const settings = this.filterSettings(configurationSettingsGroup);
+    const isManager = !this.props.agent;
     return (
       <Fragment>
         <EuiFlexGroup>
@@ -95,55 +97,54 @@ class WzConfigurationOverview extends Component {
             <EuiTitle>
               <span>
                 Configuration{' '}
-                {this.props.agent.id !== '000' && (
-                  <WzBadge synchronized={this.props.agentSynchronized} />
-                )}
+                <WzBadge synchronized={this.props.agentSynchronized} />
               </span>
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiFlexGroup gutterSize='s'>
-              {this.props.agent.id === '000' && (
-                <EuiFlexItem grow={false}>
-                  <WzRefreshClusterInfoButton />
-                </EuiFlexItem>
-              )}
-              {this.props.agent.id === '000' && (
-                <EuiFlexItem>
-                  <WzButtonPermissions
-                    buttonType='empty'
-                    permissions={[
-                      this.props.clusterNodeSelected && {
-                        action: 'cluster:update_config',
-                        resource: `node:id:${this.props.clusterNodeSelected}`,
-                      },
-                    ].filter(Boolean)} // Filter falsy values. clusterNodeSelected is initially false on mount
-                    // before cluster data loads, causing [false] in permissions array and TypeError
-                    iconSide='left'
-                    iconType='pencil'
-                    onClick={() =>
-                      this.updateConfigurationSection(
-                        'edit-configuration',
-                        `Cluster configuration`,
-                        '',
-                        'Edit configuration',
-                      )
-                    }
-                  >
-                    Edit configuration
-                  </WzButtonPermissions>
-                </EuiFlexItem>
-              )}
               <EuiFlexItem grow={false}>
                 <WzHelpButtonPopover links={helpLinks} />
               </EuiFlexItem>
-              {this.props.clusterNodes &&
-              this.props.clusterNodes.length &&
-              this.props.clusterNodeSelected ? (
-                <EuiFlexItem>
-                  <WzClusterSelect />
-                </EuiFlexItem>
-              ) : null}
+              {/* Only show manager-specific controls when no agent is pinned */}
+              {isManager && (
+                <>
+                  <EuiFlexItem grow={false}>
+                    <WzRefreshClusterInfoButton />
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    <WzButtonPermissions
+                      buttonType='empty'
+                      permissions={[
+                        this.props.clusterNodeSelected && {
+                          action: 'cluster:update_config',
+                          resource: `node:id:${this.props.clusterNodeSelected}`,
+                        },
+                      ].filter(Boolean)} // Filter falsy values. clusterNodeSelected is initially false on mount
+                      // before cluster data loads, causing [false] in permissions array and TypeError
+                      iconSide='left'
+                      iconType='pencil'
+                      onClick={() =>
+                        this.updateConfigurationSection(
+                          'edit-configuration',
+                          `Cluster configuration`,
+                          '',
+                          'Edit configuration',
+                        )
+                      }
+                    >
+                      Edit configuration
+                    </WzButtonPermissions>
+                  </EuiFlexItem>
+                  {this.props.clusterNodes &&
+                  this.props.clusterNodes.length &&
+                  this.props.clusterNodeSelected ? (
+                    <EuiFlexItem>
+                      <WzClusterSelect />
+                    </EuiFlexItem>
+                  ) : null}
+                </>
+              )}
             </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>

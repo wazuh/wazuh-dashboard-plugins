@@ -10,13 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { AppState } from './app-state';
 import { ApiCheck } from './wz-api-check';
 import { WzMisc } from '../factories/misc';
 import { getHttp, getDataPlugin, getWazuhCorePlugin } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 import NavigationService from './navigation-service';
+import { AppState } from './app-state';
 
 export class GenericRequest {
   /**
@@ -41,8 +41,9 @@ export class GenericRequest {
       const tmpUrl = getHttp().basePath.prepend(path);
 
       try {
+        const patternId = AppState.getCurrentPattern();
         requestHeaders.pattern = (
-          await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())
+          await getDataPlugin().indexPatterns.get(patternId)
         ).title;
       } catch (error) {}
 

@@ -25,6 +25,8 @@ export interface ScriptConfig {
   enableSaml: boolean;
   serverFlagVersion: string; // from --server <version>
   serverLocalFlagVersion: string; // from --server-local <tag>
+  /** Whether to auto-discover and mount all sibling repos via --all-forks. */
+  allForks: boolean;
 }
 
 export interface GenerateOverrideOptions {
@@ -71,6 +73,7 @@ export class Config implements ScriptConfig {
   private _enableSaml = false;
   private _serverFlagVersion = '';
   private _serverLocalFlagVersion = '';
+  private _allForks = false;
 
   private _changeLog: Array<{
     key: string;
@@ -297,5 +300,18 @@ export class Config implements ScriptConfig {
     const prev = this._serverLocalFlagVersion;
     this._serverLocalFlagVersion = value;
     this.logChange('serverLocalFlagVersion', prev, value, source);
+  }
+
+  // allForks
+  get allForks(): boolean {
+    return this._allForks;
+  }
+  set allForks(value: boolean) {
+    this.setAllForks(value);
+  }
+  setAllForks(value: boolean, source?: string): void {
+    const prev = this._allForks;
+    this._allForks = value;
+    this.logChange('allForks', prev, value, source);
   }
 }

@@ -18,7 +18,7 @@ import {
   TelemetryPluginSetup,
 } from '../../../src/plugins/telemetry/public';
 import { WazuhCheckUpdatesPluginStart } from '../../wazuh-check-updates/public';
-import { WazuhCorePluginStart } from '../../wazuh-core/public';
+import type { WazuhCorePluginStart } from '../../wazuh-core/public';
 import { DashboardStart } from '../../../src/plugins/dashboard/public';
 
 export interface AppPluginStartDependencies {

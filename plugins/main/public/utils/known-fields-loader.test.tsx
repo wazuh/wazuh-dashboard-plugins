@@ -1,9 +1,9 @@
 import { KnownFields, getKnownFieldsByIndexType } from './known-fields-loader';
-import FieldsMonitoring from '../../common/known-fields/monitoring.json';
-import statisticsFields from '../../common/known-fields/statistics.json';
+import metricsAgentsFields from '../../common/known-fields/metrics-agents.json';
+import metricsCommsFields from '../../common/known-fields/metrics-comms.json';
 import {
-  WAZUH_INDEX_TYPE_ALERTS,
-  WAZUH_INDEX_TYPE_MONITORING,
+  WAZUH_INDEX_TYPE_METRICS_AGENTS,
+  WAZUH_INDEX_TYPE_STATES_FIM,
   WAZUH_INDEX_TYPE_STATES_FIM_FILES,
   WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS,
   WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_VALUES,
@@ -21,26 +21,21 @@ import {
   WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM,
   WAZUH_INDEX_TYPE_STATES_INVENTORY_USERS,
   WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
-  WAZUH_INDEX_TYPE_STATISTICS,
+  WAZUH_INDEX_TYPE_METRICS_COMMS,
   WAZUH_INDEX_TYPE_STATES_SCA,
   WAZUH_INDEX_TYPE_EVENTS,
   WAZUH_INDEX_TYPE_EVENTS_ACCESS_MANAGEMENT,
   WAZUH_INDEX_TYPE_EVENTS_APPLICATIONS,
   WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES,
-  WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AWS,
-  WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AZURE,
-  WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_GCP,
   WAZUH_INDEX_TYPE_EVENTS_NETWORK_ACTIVITY,
   WAZUH_INDEX_TYPE_EVENTS_OTHER,
   WAZUH_INDEX_TYPE_EVENTS_SECURITY,
   WAZUH_INDEX_TYPE_EVENTS_SYSTEM_ACTIVITY,
 } from '../../common/constants';
 
-const monitoringFields = FieldsMonitoring;
-
 describe('Known Fields Loader', () => {
   describe('KnownFields export', () => {
-    test('should export KnownFields as alerts fields', () => {
+    test('should export KnownFields as events fields', () => {
       expect(KnownFields).toBeDefined();
       expect(Array.isArray(KnownFields)).toBe(true);
       expect(KnownFields.length).toBeGreaterThan(0);
@@ -57,10 +52,11 @@ describe('Known Fields Loader', () => {
   describe('getKnownFieldsByIndexType', () => {
     test('should return known fields for all index types', () => {
       const indexTypes = [
-        WAZUH_INDEX_TYPE_ALERTS,
-        WAZUH_INDEX_TYPE_MONITORING,
-        WAZUH_INDEX_TYPE_STATISTICS,
+        WAZUH_INDEX_TYPE_EVENTS,
+        WAZUH_INDEX_TYPE_METRICS_AGENTS,
+        WAZUH_INDEX_TYPE_METRICS_COMMS,
         WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
+        WAZUH_INDEX_TYPE_STATES_FIM,
         WAZUH_INDEX_TYPE_STATES_FIM_FILES,
         WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS,
         WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_VALUES,
@@ -82,9 +78,6 @@ describe('Known Fields Loader', () => {
         WAZUH_INDEX_TYPE_EVENTS_ACCESS_MANAGEMENT,
         WAZUH_INDEX_TYPE_EVENTS_APPLICATIONS,
         WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES,
-        WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AWS,
-        WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AZURE,
-        WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_GCP,
         WAZUH_INDEX_TYPE_EVENTS_NETWORK_ACTIVITY,
         WAZUH_INDEX_TYPE_EVENTS_OTHER,
         WAZUH_INDEX_TYPE_EVENTS_SECURITY,
@@ -100,7 +93,7 @@ describe('Known Fields Loader', () => {
     });
 
     test('should have consistent field structure', () => {
-      const fields = getKnownFieldsByIndexType(WAZUH_INDEX_TYPE_ALERTS);
+      const fields = getKnownFieldsByIndexType(WAZUH_INDEX_TYPE_EVENTS);
       expect(fields).toBeTruthy();
       expect(Array.isArray(fields)).toBe(true);
       if (fields) {
@@ -116,30 +109,38 @@ describe('Known Fields Loader', () => {
   });
 
   describe('States-specific field validation', () => {
-    test('monitoring should have timestamp and status fields', () => {
-      const timestampField = monitoringFields.find(f => f.name === 'timestamp');
+    test('metrics agents should have timestamp and status fields', () => {
+      const timestampField = metricsAgentsFields.find(
+        f => f.name === '@timestamp',
+      );
       expect(timestampField).toBeDefined();
       if (timestampField) {
         expect(timestampField.type).toBe('date');
       }
 
-      const statusField = monitoringFields.find(f => f.name === 'status');
+      const statusField = metricsAgentsFields.find(
+        f => f.name === 'wazuh.agent.status',
+      );
       expect(statusField).toBeDefined();
       if (statusField) {
         expect(statusField.type).toBe('string');
       }
     });
 
-    test('statistics should have analysisd fields', () => {
-      const analysisdFields = statisticsFields.filter(f =>
-        f.name.startsWith('analysisd.'),
-      );
-      expect(analysisdFields.length).toBeGreaterThan(0);
-
-      const remoteFields = statisticsFields.filter(f =>
-        f.name.startsWith('remoted.'),
-      );
-      expect(remoteFields.length).toBeGreaterThan(0);
+    test('metrics comms should have analysisd fields', () => {
+      [
+        'discarded.',
+        'network.',
+        'event.',
+        'messages.',
+        'tcp.',
+        'queue.',
+        'wazuh.',
+      ].forEach(str => {
+        expect(
+          metricsCommsFields.filter(f => f.name.startsWith(str)).length,
+        ).toBeGreaterThan(0);
+      });
     });
   });
 
@@ -172,9 +173,6 @@ describe('Known Fields Loader', () => {
         WAZUH_INDEX_TYPE_EVENTS_ACCESS_MANAGEMENT,
         WAZUH_INDEX_TYPE_EVENTS_APPLICATIONS,
         WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES,
-        WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AWS,
-        WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AZURE,
-        WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_GCP,
         WAZUH_INDEX_TYPE_EVENTS_NETWORK_ACTIVITY,
         WAZUH_INDEX_TYPE_EVENTS_OTHER,
         WAZUH_INDEX_TYPE_EVENTS_SECURITY,

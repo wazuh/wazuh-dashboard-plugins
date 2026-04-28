@@ -63,7 +63,6 @@ module.exports.WIN_HOSTNAMES = [
 module.exports.PATHS = ['/home/user/sample', '/tmp/sample', '/etc/sample'];
 
 module.exports.AGENTS = [
-  // { id: '000', name: 'master', ip: '120.17.47.10' },
   {
     id: '001',
     name: 'RHEL7',
@@ -281,7 +280,7 @@ module.exports.DECODER = {
     name: 'web-accesslog',
   },
   ROOTCHECK: {
-    name: 'rootcheck',
+    name: 'wazuh-rootcheck',
   },
   APACHE_ERRORLOG: {
     parent: 'apache-errorlog',

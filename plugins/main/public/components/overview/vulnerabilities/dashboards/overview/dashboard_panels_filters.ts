@@ -142,7 +142,7 @@ export const getDashboardFilters = (
           indexPatternId,
           'Agent filter',
           'Top 5 agents',
-          'agent.name',
+          'wazuh.agent.name',
         ),
       },
     },

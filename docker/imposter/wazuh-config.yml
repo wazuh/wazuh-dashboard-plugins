@@ -191,7 +191,7 @@ resources:
   - method: GET
     path: /cluster/{node_id}/info
 
-  # Get node config
+  # Get node config (raw)
   - method: GET
     path: /cluster/{node_id}/configuration
     queryParams:
@@ -199,6 +199,13 @@ resources:
     response:
       statusCode: 200
       staticFile: cluster/configuration_node.txt
+
+  # Get node config (JSON)
+  - method: GET
+    path: /cluster/{node_id}/configuration
+    response:
+      statusCode: 200
+      staticFile: cluster/configuration_full.json
 
   # Update node configuration
   - method: PUT
@@ -288,54 +295,6 @@ resources:
   # Get parent decoders
   - method: GET
     path: /decoders/parents
-
-  # ===================================================== #
-  #   EXPERIMENTAL
-  # ===================================================== #
-
-  # Clearrootcheck results
-  - method: DELETE
-    path: /experimental/rootcheck
-
-  # Clearagents FIM results
-  - method: DELETE
-    path: /experimental/syscheck
-
-  # Get agents hardware
-  - method: GET
-    path: /experimental/syscollector/hardware
-
-  # Get agents netaddr
-  - method: GET
-    path: /experimental/syscollector/netaddr
-
-  # Get agents netiface
-  - method: GET
-    path: /experimental/syscollector/netiface
-
-  # Get agents netproto
-  - method: GET
-    path: /experimental/syscollector/netproto
-
-  # Get agents OS
-  - method: GET
-    path: /experimental/syscollector/os
-
-  # Get agents packages
-  - method: GET
-    path: /experimental/syscollector/packages
-
-  # Get agents ports
-  - method: GET
-    path: /experimental/syscollector/ports
-
-  # Get agents processes
-  - method: GET
-    path: /experimental/syscollector/processes
-
-  # Get agents hotfixes
-  - method: GET
-    path: /experimental/syscollector/hotfixes
 
   # ===================================================== #
   #   GROUPS
@@ -470,18 +429,6 @@ resources:
   # Run scan
   - method: PUT
     path: /rootcheck
-
-  # Get results
-  - method: GET
-    path: /rootcheck/{agent_id}
-
-  # Clearresults
-  - method: DELETE
-    path: /rootcheck/{agent_id}
-
-  # Get last scan datetime
-  - method: GET
-    path: /rootcheck/{agent_id}/last_scan
 
   # ===================================================== #
   #   RULES

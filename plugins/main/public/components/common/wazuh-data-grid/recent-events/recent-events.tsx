@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
 import { getCore } from '../../../../kibana-services';
-import { AppState } from '../../../../react-services';
 import { PatternDataSourceFilterManager } from '../../data-source';
 import { withWrapComponent } from '../../hocs';
 import { WazuhFlyoutDiscoverNewFilterManager } from '../../wazuh-discover/wz-flyout-discover';
 import { EuiFlexGroup, EuiFlexItem, EuiLink } from '@elastic/eui';
+import { AppState } from '../../../../react-services/app-state';
 
 const generatePathNavigate = ({
   document,
@@ -48,15 +48,16 @@ export const WazuhFlyoutDiscoverNewFilterManagerRecentEvents =
       recentEventsSpecificFilters,
     }) => {
       const href = useMemo(() => {
+        const patternId = AppState.getCurrentPattern();
         return generatePathNavigate({
           document,
           agent,
-          indexPattern: { id: AppState.getCurrentPattern() },
+          indexPattern: { id: patternId },
           applicationId,
           applicationTab,
           getSpecificFilters: recentEventsSpecificFilters,
         });
-      }, [document, agent]); // Maybe it should be done when the index pattern is changed
+      }, [document, agent]);
 
       return (
         <>

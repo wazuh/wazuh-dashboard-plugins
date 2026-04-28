@@ -55,6 +55,8 @@ describe('services/environmentConfigurator', () => {
       enableSaml: false,
       serverFlagVersion: '',
       serverLocalFlagVersion: '',
+      useIndexerFromPackage: false,
+      allForks: false,
     };
     initializeBaseEnvironment(cfg);
     expect(process.env.PASSWORD).toBeDefined();
@@ -93,6 +95,8 @@ describe('services/environmentConfigurator', () => {
       enableSaml: false,
       serverFlagVersion: '',
       serverLocalFlagVersion: '',
+      useIndexerFromPackage: false,
+      allForks: false,
     };
 
     it('returns standard profile by default and sets security paths', () => {

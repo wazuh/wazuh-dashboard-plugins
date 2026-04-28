@@ -143,7 +143,6 @@
       "GET /cluster/local/config",
       "GET /cluster/nodes",
       "GET /cluster/healthcheck",
-      "GET /cluster/ruleset/synchronization",
       "GET /cluster/{node_id}/status",
       "GET /cluster/{node_id}/info",
       "GET /cluster/{node_id}/configuration",
@@ -217,18 +216,15 @@
     },
     "related_endpoints": ["PUT /groups/{group_id}/configuration"]
   },
-  "ciscat:read": {
-    "description": "Access CIS-CAT results for agents",
-    "resources": ["agent:id", "agent:group"],
+  "cluster:status": {
+    "description": "Check Wazuh's cluster general status",
+    "resources": ["*:*"],
     "example": {
-      "actions": ["ciscat:read"],
-      "resources": ["agent:id:001", "agent:id:003", "agent:group:default"],
-      "effect": "deny"
+      "actions": ["cluster:status"],
+      "resources": ["*:*:*"],
+      "effect": "allow"
     },
-    "related_endpoints": [
-      "GET /ciscat/{agent_id}/results",
-      "GET /experimental/ciscat/results"
-    ]
+    "related_endpoints": ["GET /cluster/status"]
   },
   "cluster:read_api_config": {
     "description": "Check Wazuh's cluster nodes API configuration",
@@ -260,71 +256,6 @@
     },
     "related_endpoints": ["PUT /cluster/restart"]
   },
-  "lists:read": {
-    "description": "Read CDB lists files",
-    "resources": ["list:file"],
-    "example": {
-      "actions": ["lists:read"],
-      "resources": ["list:file:audit-keys"],
-      "effect": "deny"
-    },
-    "related_endpoints": [
-      "GET /lists",
-      "GET /lists/files/{filename}",
-      "GET /lists/files"
-    ]
-  },
-  "lists:update": {
-    "description": "Update or upload CDB lists files",
-    "resources": ["*:*"],
-    "example": {
-      "actions": ["lists:update"],
-      "resources": ["*:*:*"],
-      "effect": "allow"
-    },
-    "related_endpoints": ["PUT /lists/files/{filename}"]
-  },
-  "lists:delete": {
-    "description": "Delete CDB lists files",
-    "resources": ["list:file"],
-    "example": {
-      "actions": ["lists:delete"],
-      "resources": ["list:file:audit-keys"],
-      "effect": "deny"
-    },
-    "related_endpoints": [
-      "PUT /lists/files/{filename}",
-      "DELETE /lists/files/{filename}"
-    ]
-  },
-  "logtest:run": {
-    "description": "Run logtest tool or end a logtest session",
-    "resources": ["*:*"],
-    "example": {
-      "actions": ["logtest:run"],
-      "resources": ["*:*:*"],
-      "effect": "allow"
-    },
-    "related_endpoints": ["PUT /logtest", "DELETE /logtest/sessions/{token}"]
-  },
-  "mitre:read": {
-    "description": "Access information from MITRE database",
-    "resources": ["*:*"],
-    "example": {
-      "actions": ["mitre:read"],
-      "resources": ["*:*:*"],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "GET /mitre/groups",
-      "GET /mitre/metadata",
-      "GET /mitre/mitigations",
-      "GET /mitre/references",
-      "GET /mitre/software",
-      "GET /mitre/tactics",
-      "GET /mitre/techniques"
-    ]
-  },
   "rootcheck:run": {
     "description": "Run agents rootcheck scan",
     "resources": ["agent:id", "agent:group"],
@@ -334,84 +265,6 @@
       "effect": "allow"
     },
     "related_endpoints": ["PUT /rootcheck"]
-  },
-  "rootcheck:read": {
-    "description": "Access information from agents rootcheck database",
-    "resources": ["agent:id", "agent:group"],
-    "example": {
-      "actions": ["rootcheck:read"],
-      "resources": ["agent:id:011"],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "GET /rootcheck/{agent_id}",
-      "GET /rootcheck/{agent_id}/last_scan"
-    ]
-  },
-  "rootcheck:clear": {
-    "description": "Clear the agents rootcheck database",
-    "resources": ["agent:id", "agent:group"],
-    "example": {
-      "actions": ["rootcheck:clear"],
-      "resources": ["agent:id:*"],
-      "effect": "deny"
-    },
-    "related_endpoints": [
-      "DELETE /rootcheck/{agent_id}",
-      "DELETE /experimental/rootcheck"
-    ]
-  },
-  "rules:read": {
-    "description": "Read rules files",
-    "resources": ["rule:file"],
-    "example": {
-      "actions": ["rules:read"],
-      "resources": ["rule:file:0610-win-ms_logs_rules.xml"],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "GET /rules",
-      "GET /rules/groups",
-      "GET /rules/requirement/{requirement}",
-      "GET /rules/files",
-      "GET /rules/files/{filename}"
-    ]
-  },
-  "rules:update": {
-    "description": "Update or upload custom rule files",
-    "resources": ["*:*"],
-    "example": {
-      "actions": ["rules:update"],
-      "resources": ["*:*:*"],
-      "effect": "allow"
-    },
-    "related_endpoints": ["PUT /rules/files/{filename}"]
-  },
-  "rules:delete": {
-    "description": "Delete custom rule files",
-    "resources": ["rule:file"],
-    "example": {
-      "actions": ["rules:delete"],
-      "resources": ["rule:file:0610-win-ms_logs_rules.xml"],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "PUT /rules/files/{filename}",
-      "DELETE /rules/files/{filename}"
-    ]
-  },
-  "sca:read": {
-    "description": "Access agents security configuration assessment",
-    "resources": ["agent:id", "agent:group"],
-    "example": {
-      "actions": ["sca:read"],
-      "resources": ["agent:id:*"],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "GET /sca/{agent_id}",
-      "GET /sca/{agent_id}/checks/{policy_id}"
-    ]
   },
   "syscheck:run": {
     "description": "Run agents syscheck scan",
@@ -423,70 +276,6 @@
     },
     "related_endpoints": ["PUT /syscheck"]
   },
-  "syscheck:read": {
-    "description": "Access information from agents syscheck database",
-    "resources": ["agent:id", "agent:group"],
-    "example": {
-      "actions": ["syscheck:read"],
-      "resources": ["agent:id:011", "agent:group:us-west"],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "GET /syscheck/{agent_id}",
-      "GET /syscheck/{agent_id}/last_scan"
-    ]
-  },
-  "syscheck:clear": {
-    "description": "Clear the agents syscheck database",
-    "resources": ["agent:id", "agent:group"],
-    "example": {
-      "actions": ["syscheck:clear"],
-      "resources": ["agent:id:*"],
-      "effect": "deny"
-    },
-    "related_endpoints": [
-      "DELETE /syscheck/{agent_id}",
-      "DELETE /experimental/syscheck"
-    ]
-  },
-  "decoders:read": {
-    "description": "Read decoders files",
-    "resources": ["decoder:file"],
-    "example": {
-      "actions": ["decoders:read"],
-      "resources": ["decoder:file:*"],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "GET /decoders",
-      "GET /decoders/files",
-      "GET /decoders/files/{filename}",
-      "GET /decoders/parents"
-    ]
-  },
-  "decoders:update": {
-    "description": "Update or upload custom decoder files",
-    "resources": ["*:*"],
-    "example": {
-      "actions": ["decoders:update"],
-      "resources": ["*:*:*"],
-      "effect": "allow"
-    },
-    "related_endpoints": ["PUT /decoders/files/{filename}"]
-  },
-  "decoders:delete": {
-    "description": "Delete custom decoder files",
-    "resources": ["decoder:file"],
-    "example": {
-      "actions": ["decoders:delete"],
-      "resources": ["decoder:file:local_decoder.xml"],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "PUT /decoders/files/{filename}",
-      "DELETE /decoders/files/{filename}"
-    ]
-  },
   "event:ingest": {
     "description": "Ingest events",
     "resources": ["*:*"],
@@ -496,37 +285,6 @@
       "effect": "allow"
     },
     "related_endpoints": ["POST /events"]
-  },
-  "syscollector:read": {
-    "description": "Access agents syscollector information",
-    "resources": ["agent:id", "agent:group"],
-    "example": {
-      "actions": ["syscollector:read"],
-      "resources": ["agent:id:*"],
-      "effect": "allow"
-    },
-    "related_endpoints": [
-      "GET /experimental/syscollector/hardware",
-      "GET /experimental/syscollector/netaddr",
-      "GET /experimental/syscollector/netiface",
-      "GET /experimental/syscollector/netproto",
-      "GET /experimental/syscollector/os",
-      "GET /experimental/syscollector/packages",
-      "GET /experimental/syscollector/ports",
-      "GET /experimental/syscollector/processes",
-      "GET /experimental/syscollector/hotfixes",
-      "GET /syscollector/{agent_id}/hardware",
-      "GET /syscollector/{agent_id}/hotfixes",
-      "GET /syscollector/{agent_id}/netaddr",
-      "GET /syscollector/{agent_id}/netiface",
-      "GET /syscollector/{agent_id}/netproto",
-      "GET /syscollector/{agent_id}/os",
-      "GET /syscollector/{agent_id}/packages",
-      "GET /syscollector/{agent_id}/ports",
-      "GET /syscollector/{agent_id}/processes",
-      "GET /syscollector/{agent_id}/users",
-      "GET /syscollector/{agent_id}/groups"
-    ]
   },
   "security:revoke": {
     "description": "Revoke all active JWT tokens",

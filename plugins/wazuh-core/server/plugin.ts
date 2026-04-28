@@ -23,6 +23,7 @@ import {
   ServerAPIClient,
 } from './services';
 import { InitializerConfigProvider } from './services/configuration';
+import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -70,12 +71,16 @@ export class WazuhCorePlugin
     this.services.manageHosts = new ManageHosts(
       this.logger.get('manage-hosts'),
       this.services.configuration,
+      this.initializerContext,
     );
+
+    const configDir = this.initializerContext.env?.configDir;
 
     this.services.serverAPIClient = new ServerAPIClient(
       this.logger.get('server-api-client'),
       this.services.manageHosts,
       this.services.dashboardSecurity,
+      configDir,
     );
 
     this.services.manageHosts.setServerAPIClient(this.services.serverAPIClient);
@@ -98,6 +103,7 @@ export class WazuhCorePlugin
 
     return {
       ...this.services,
+      API_USER_STATUS_RUN_AS,
       api: {
         client: {
           asInternalUser: this.services.serverAPIClient.asInternalUser,
@@ -113,17 +119,26 @@ export class WazuhCorePlugin
     setCore(core);
 
     await this.services.configuration.start();
-    await this.services.manageHosts.start();
+
+    // Do not await manageHosts.start() to prevent blocking the plugin
+    // lifecycle when configured API hosts are unreachable (issue #8085).
+    // The host cache will be populated in the background.
+    this.services.manageHosts.start().catch(error => {
+      this.logger.error(
+        `manageHosts.start() failed in background: ${error.message}`,
+      );
+    });
 
     return {
       ...this.services,
+      API_USER_STATUS_RUN_AS,
       api: {
         client: {
           asInternalUser: this.services.serverAPIClient.asInternalUser,
           asScoped: this.services.serverAPIClient.asScoped,
         },
       },
-    } as WazuhCorePluginSetup;
+    } as WazuhCorePluginStart;
   }
 
   public stop() {}

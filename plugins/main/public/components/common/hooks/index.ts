@@ -11,7 +11,6 @@
  */
 
 export * from './use-filter-manager';
-export * from './use-index-pattern';
 export * from './use-kbn-loading-indicator';
 export * from './use-query';
 export * from './use-time-filter';
@@ -22,7 +21,6 @@ export * from './useApiRequest';
 export * from './use-app-config';
 export * from './use_async_action';
 export * from './use_async_action_run_on_start';
-export { useEsSearch } from './use-es-search';
 export { useValueSuggestion, IValueSuggestion } from './use-value-suggestion';
 export * from './use-state-storage';
 export * from './use-router-search';

@@ -11,7 +11,10 @@
  */
 import { WzRequest } from './wz-request';
 import { getToasts } from '../kibana-services';
-import { API_NAME_AGENT_STATUS, UI_LOGGER_LEVELS } from '../../common/constants';
+import {
+  API_NAME_AGENT_STATUS,
+  UI_LOGGER_LEVELS,
+} from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
 
@@ -57,7 +60,8 @@ export class ActionAgents {
    */
   static async upgradeAgents(selectedItems) {
     for (let item of selectedItems.filter(
-      (item) => item.outdated && item.status !== API_NAME_AGENT_STATUS.DISCONNECTED
+      item =>
+        item.outdated && item.status !== API_NAME_AGENT_STATUS.DISCONNECTED,
     )) {
       try {
         await WzRequest.apiReq('PUT', `/agents/${item.id}/upgrade`, '1');
@@ -85,9 +89,8 @@ export class ActionAgents {
    * @param {String} managerVersion
    */
   static async upgradeAllAgents(selectedItems, managerVersion) {
-    selectedItems.forEach(async (agent) => {
+    selectedItems.forEach(async agent => {
       if (
-        agent.id !== '000' &&
         this.compareVersions(agent.version, managerVersion) === true &&
         agent.status === API_NAME_AGENT_STATUS.ACTIVE
       ) {
@@ -141,7 +144,7 @@ export class ActionAgents {
    * @param {Array} selectedItems
    */
   static async restartAgents(selectedItems) {
-    const agentsId = selectedItems.map((item) => item.id);
+    const agentsId = selectedItems.map(item => item.id);
     try {
       await WzRequest.apiReq('PUT', `/agents/restart`, { ids: [...agentsId] });
       this.showToast('success', 'Restarting selected agents...', '', 5000);
@@ -167,13 +170,15 @@ export class ActionAgents {
    */
   static async restartAllAgents(selectedItems) {
     let idAvaibleAgents = [];
-    selectedItems.forEach((agent) => {
-      if (agent.id !== '000' && agent.status === API_NAME_AGENT_STATUS.ACTIVE) {
+    selectedItems.forEach(agent => {
+      if (agent.status === API_NAME_AGENT_STATUS.ACTIVE) {
         idAvaibleAgents.push(agent.id);
       }
     });
     try {
-      await WzRequest.apiReq('PUT', `/agents/restart`, { ids: [...idAvaibleAgents] });
+      await WzRequest.apiReq('PUT', `/agents/restart`, {
+        ids: [...idAvaibleAgents],
+      });
       this.showToast('success', 'Restarting all agents...', '', 5000);
     } catch (error) {
       const options = {
@@ -196,18 +201,19 @@ export class ActionAgents {
    * @param {Number} selectedItems
    */
   static async deleteAgents(selectedItems) {
-    const auxAgents = selectedItems
-      .map((agent) => {
-        return agent.id !== '000' ? agent.id : null;
-      })
-      .filter((agent) => agent !== null);
+    const auxAgents = selectedItems.map(agent => agent.id);
     try {
       await WzRequest.apiReq('DELETE', `/agents`, {
         purge: true,
         ids: auxAgents,
         older_than: '1s',
       });
-      this.showToast('success', `Selected agents were successfully deleted`, '', 5000);
+      this.showToast(
+        'success',
+        `Selected agents were successfully deleted`,
+        '',
+        5000,
+      );
     } catch (error) {
       const options = {
         context: `${ActionAgents.name}.deleteAgents`,
@@ -232,12 +238,12 @@ export class ActionAgents {
    * @returns {Boolean}
    */
   static compareVersions(managerVersion, agentVersion) {
-    let agentMatch = new RegExp(/[.+]?v(?<version>\d+)\.(?<minor>\d+)\.(?<path>\d+)/).exec(
-      agentVersion
-    );
-    let managerMatch = new RegExp(/[.+]?v(?<version>\d+)\.(?<minor>\d+)\.(?<path>\d+)/).exec(
-      managerVersion
-    );
+    let agentMatch = new RegExp(
+      /[.+]?v(?<version>\d+)\.(?<minor>\d+)\.(?<path>\d+)/,
+    ).exec(agentVersion);
+    let managerMatch = new RegExp(
+      /[.+]?v(?<version>\d+)\.(?<minor>\d+)\.(?<path>\d+)/,
+    ).exec(managerVersion);
     if (agentMatch === null || managerMatch === null) return;
     return managerMatch[1] <= agentMatch[1]
       ? managerMatch[2] <= agentMatch[2]

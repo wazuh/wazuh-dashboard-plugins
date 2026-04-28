@@ -19,6 +19,11 @@ on:
         default: false
         required: false
         type: boolean
+      set_as_main:
+        description: 'Enable main branch mode: bump version values only, keep branch references pointing to main'
+        required: false
+        type: boolean
+        default: false
       issue-link:
         description: 'Issue link in format https://github.com/wazuh/<REPO>/issues/<ISSUE-NUMBER>'
         required: true
@@ -82,11 +87,13 @@ jobs:
           VERSION: ${{ inputs.version }}
           STAGE: ${{ inputs.stage }}
           TAG: ${{ inputs.tag }}
+          SET_AS_MAIN: ${{ inputs.set-as-main }}
         run: |
           script_params=""
           version=${{ env.VERSION }}
           stage=${{ env.STAGE }}
           tag=${{ env.TAG }}
+          set_as_main=${{ env.SET_AS_MAIN }}
 
           # Both version and stage provided
           if [[ -n "$version" && -n "$stage" && "$tag" != "true" ]]; then
@@ -95,6 +102,10 @@ jobs:
             script_params="--stage ${stage} --tag"
           elif [[ -z "$version" && -z "$stage" && "$tag" == "true" ]]; then
             script_params="--tag"
+          fi
+
+          if [[ "$set_as_main" == "true" ]]; then
+            script_params="${script_params} --set-as-main"
           fi
 
           issue_number=$(echo "${{ inputs.issue-link }}" | awk -F'/' '{print $NF}')
@@ -111,13 +122,27 @@ jobs:
           echo "Running bump script"
           bash ${{ env.BUMP_SCRIPT_PATH }} ${{ steps.vars.outputs.script_params }}
 
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if [[ -z "$(git status --porcelain)" ]]; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No changes detected - no-op"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Changes detected"
+            git status --porcelain
+          fi
+
       - name: Commit and push changes
+        if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           git add .
           git commit -m "feat: bump ${{ github.ref_name }}"
           git push origin ${{ steps.vars.outputs.branch_name }}
 
       - name: Create pull request
+        if: steps.check_changes.outputs.has_changes == 'true'
         id: create_pr
         run: |
           gh auth setup-git
@@ -131,6 +156,7 @@ jobs:
           echo "pull_request_url=${PR_URL}" >> $GITHUB_OUTPUT
 
       - name: Merge pull request
+        if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           # Any checks for the PR are bypassed since the branch is expected to be functional (i.e. the bump process does not introduce any bugs)
           gh pr merge "${{ steps.create_pr.outputs.pull_request_url }}" --merge --admin
@@ -139,6 +165,10 @@ jobs:
         run: |
           echo "Bump complete."
           echo "Branch: ${{ steps.vars.outputs.branch_name }}"
-          echo "PR: ${{ steps.create_pr.outputs.pull_request_url }}"
+          if [[ "${{ steps.check_changes.outputs.has_changes }}" == "true" ]]; then
+            echo "PR: ${{ steps.create_pr.outputs.pull_request_url }}"
+          else
+            echo "No changes detected - bump was a no-op (HTTP 204)"
+          fi
           echo "Bumper scripts logs:"
           cat ${BUMP_LOG_PATH}/repository_bumper*log

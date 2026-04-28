@@ -16,13 +16,65 @@ import { delayAsPromise } from '../../../../../../../common/utils';
 import { AGENT_SYNCED_STATUS } from '../../../../../../../common/constants';
 
 /**
- * Get configuration for an agent of request sections
- * @param {string} [agentId=000] Agent ID
+ * Fetch full node configuration and extract requested keys.
+ * Uses GET /cluster/{node}/configuration which returns the entire
+ * wazuh-manager.conf as a single response. Each section's key is
+ * extracted from affected_items[0].
+ *
+ * @param {string} node Cluster node name
+ * @param {array} sections Sections with { useFullEndpoint: true, key: string }
+ * @param {function} updateWazuhNotReadyYet
+ * @returns {object} Map of key → config object (or error string)
+ */
+const getFullEndpointConfig = async (
+  node,
+  sections,
+  updateWazuhNotReadyYet,
+) => {
+  const result = {};
+  try {
+    const url = `/cluster/${node}/configuration`;
+    const fullResult = await WzRequest.apiReq('GET', url, {});
+    const fullConfig =
+      fullResult?.data?.data?.total_affected_items !== 0
+        ? fullResult?.data?.data?.affected_items?.[0] || {}
+        : {};
+    for (const section of sections) {
+      result[section.key] = fullConfig[section.key] ?? {};
+    }
+  } catch (error) {
+    const errorMsg = await handleError(
+      error,
+      'Fetch configuration',
+      updateWazuhNotReadyYet,
+      node,
+    );
+    for (const section of sections) {
+      result[section.key] = errorMsg;
+    }
+  }
+  return result;
+};
+
+/**
+ * Get configuration for an agent of request sections.
+ *
+ * Supports two section formats:
+ *  - Standard:      { component: string, configuration: string }
+ *    Calls /cluster/{node}/configuration/{component}/{configuration}
+ *    or    /agents/{agentId}/config/{component}/{configuration}
+ *
+ *  - Full endpoint: { useFullEndpoint: true, key: string }
+ *    Delegates to getFullEndpointConfig which calls
+ *    /cluster/{node}/configuration once and extracts the requested
+ *    keys. Only valid in manager context (node must be set).
+ *
+ * @param {string} agentId Agent ID
  * @param {array} sections Sections
  * @param {false} [node=false] Node
  */
 export const getCurrentConfig = async (
-  agentId = '000',
+  agentId,
   sections,
   node = false,
   updateWazuhNotReadyYet,
@@ -40,7 +92,22 @@ export const getCurrentConfig = async (
     }
 
     const result = {};
-    for (const section of sections) {
+
+    const fullEndpointSections = sections.filter(s => s.useFullEndpoint);
+    const regularSections = sections.filter(s => !s.useFullEndpoint);
+
+    if (fullEndpointSections.length > 0 && node) {
+      Object.assign(
+        result,
+        await getFullEndpointConfig(
+          node,
+          fullEndpointSections,
+          updateWazuhNotReadyYet,
+        ),
+      );
+    }
+
+    for (const section of regularSections) {
       const { component, configuration } = section;
       if (
         !component ||
@@ -51,14 +118,13 @@ export const getCurrentConfig = async (
         throw new Error('Invalid section');
       }
       try {
-        const url =
-          agentId === '000' || node
-            ? `/cluster/${node}/configuration/${component}/${configuration}`
-            : `/agents/${agentId}/config/${component}/${configuration}`;
+        const url = node
+          ? `/cluster/${node}/configuration/${component}/${configuration}`
+          : `/agents/${agentId}/config/${component}/${configuration}`;
 
         const partialResult = await WzRequest.apiReq('GET', url, {});
 
-        if (agentId === '000') {
+        if (node) {
           result[`${component}-${configuration}`] =
             partialResult.data.data.total_affected_items !== 0
               ? partialResult.data.data.affected_items[0]
@@ -359,9 +425,9 @@ export const saveConfiguration = async (selectedNode, xml) => {
 };
 
 /**
- * Send ossec.conf content for a cluster node
+ * Send wazuh-manager.conf content for a cluster node
  * @param {*} node Node name
- * @param {*} content XML raw content for ossec.conf file
+ * @param {*} content XML raw content for wazuh-manager.conf file
  */
 export const saveNodeConfiguration = async (node, content) => {
   try {
@@ -380,15 +446,14 @@ export const saveNodeConfiguration = async (node, content) => {
 };
 
 /**
- * Save text to ossec.conf cluster file
+ * Save text to wazuh-manager.conf cluster file
  * @param {string} text Text to save
  * @param {node}
  */
 export const saveFileCluster = async (text, node) => {
-  const xml = replaceIllegalXML(text);
   try {
     await WzRequest.apiReq('PUT', `/cluster/${node}/configuration`, {
-      body: xml.toString(),
+      body: text.toString(),
       origin: 'raw',
     });
     await validateAfterSent();

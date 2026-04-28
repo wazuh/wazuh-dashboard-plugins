@@ -11,7 +11,6 @@ const {
 const scaResults = [
   CheckResult.Passed,
   CheckResult.Failed,
-  CheckResult.NotRun,
   CheckResult.NotApplicable,
 ];
 

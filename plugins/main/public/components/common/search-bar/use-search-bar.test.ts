@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 // osd dependencies
 import {
@@ -15,7 +15,6 @@ import useSearchBar from './use-search-bar';
 import { getDataPlugin } from '../../../kibana-services';
 import * as timeFilterHook from '../hooks/use-time-filter';
 import * as queryManagerHook from '../hooks/use-query';
-import { AppState } from '../../../react-services/app-state';
 import NavigationService from '../../../react-services/navigation-service';
 import { createHashHistory, History } from 'history';
 
@@ -112,25 +111,23 @@ describe('[hook] useSearchBarConfiguration', () => {
 
   it('should return default app index pattern when not receiving a default index pattern', async () => {
     jest
-      .spyOn(AppState, 'getCurrentPattern')
-      .mockImplementation(() => 'default-index-pattern');
-    jest
       .spyOn(mockDataPlugin.indexPatterns, 'getDefault')
       .mockResolvedValue(mockedDefaultIndexPatternData);
     jest
       .spyOn(mockDataPlugin.query.filterManager, 'getFilters')
       .mockReturnValue([]);
     // @ts-ignore
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result } = renderHook(() =>
       useSearchBar({
         setFilters: jest.fn(),
       }),
     );
-    await waitForNextUpdate();
+    await waitFor(() =>
+      expect(result.current.searchBarProps.indexPatterns).toMatchObject([
+        mockedDefaultIndexPatternData,
+      ]),
+    );
     expect(mockDataPlugin.indexPatterns.getDefault).toBeCalled();
-    expect(result.current.searchBarProps.indexPatterns).toMatchObject([
-      mockedDefaultIndexPatternData,
-    ]);
   });
 
   it('should return the same index pattern when receiving a default index pattern', async () => {
@@ -141,13 +138,9 @@ describe('[hook] useSearchBarConfiguration', () => {
       title: '',
     };
     jest
-      .spyOn(AppState, 'getCurrentPattern')
-      .mockImplementation(() => 'wazuh-alerts-*');
-    jest.spyOn(AppState, 'setCurrentPattern').mockImplementation(jest.fn());
-    jest
       .spyOn(mockDataPlugin.indexPatterns, 'get')
       .mockResolvedValue(mockedIndexPatternData);
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result } = renderHook(() =>
       useSearchBar({
         indexPattern: mockedIndexPatternData as IndexPattern,
         setFilters: jest.fn(),
@@ -166,10 +159,6 @@ describe('[hook] useSearchBarConfiguration', () => {
       title: '',
     };
     jest
-      .spyOn(AppState, 'getCurrentPattern')
-      .mockImplementation(() => exampleIndexPatternId);
-    jest.spyOn(AppState, 'setCurrentPattern').mockImplementation(jest.fn());
-    jest
       .spyOn(mockDataPlugin.indexPatterns, 'get')
       .mockResolvedValue(mockedExampleIndexPatternData);
     jest
@@ -178,7 +167,7 @@ describe('[hook] useSearchBarConfiguration', () => {
     jest
       .spyOn(mockDataPlugin.query.filterManager, 'getFilters')
       .mockReturnValue([]);
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result } = renderHook(() =>
       useSearchBar({
         indexPattern: mockedExampleIndexPatternData as IndexPattern,
         setFilters: jest.fn(),
@@ -198,10 +187,6 @@ describe('[hook] useSearchBarConfiguration', () => {
       title: '',
     };
     jest
-      .spyOn(AppState, 'getCurrentPattern')
-      .mockImplementation(() => exampleIndexPatternId);
-    jest.spyOn(AppState, 'setCurrentPattern').mockImplementation(jest.fn());
-    jest
       .spyOn(mockDataPlugin.indexPatterns, 'get')
       .mockResolvedValue(mockedExampleIndexPatternData);
     jest
@@ -210,7 +195,7 @@ describe('[hook] useSearchBarConfiguration', () => {
     jest
       .spyOn(mockDataPlugin.query.filterManager, 'getFilters')
       .mockReturnValue([]);
-    const { result, waitForNextUpdate, rerender } = renderHook(
+    const { result, rerender } = renderHook(
       // @ts-ignore
       props => useSearchBar(props),
       {
@@ -235,8 +220,10 @@ describe('[hook] useSearchBarConfiguration', () => {
       indexPattern: newExampleIndexPatternData as IndexPattern,
       setFilters: jest.fn(),
     });
-    expect(result.current.searchBarProps.indexPatterns).toMatchObject([
-      newExampleIndexPatternData,
-    ]);
+    await waitFor(() =>
+      expect(result.current.searchBarProps.indexPatterns).toMatchObject([
+        newExampleIndexPatternData,
+      ]),
+    );
   });
 });

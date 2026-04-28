@@ -42,10 +42,9 @@ export const queryConfig = async (agentId, sections, node = false) => {
           throw new Error('Invalid section');
         }
         try {
-          const url =
-            agentId === '000' || node
-              ? `/cluster/${node}/configuration/${component}/${configuration}`
-              : `/agents/${agentId}/configuration/${component}/${configuration}`;
+          const url = node
+            ? `/cluster/${node}/configuration/${component}/${configuration}`
+            : `/agents/${agentId}/configuration/${component}/${configuration}`;
 
           const partialResult = await WzRequest.apiReq('GET', url, {});
           result[`${component}-${configuration}`] = partialResult.data.data;

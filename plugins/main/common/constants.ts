@@ -16,17 +16,26 @@ export const PLUGIN_VERSION = version;
 export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
 export const PLUGIN_MAJOR_VERSION = version.split('.')[0];
 
-// Index patterns - Wazuh alerts
-export const WAZUH_INDEX_TYPE_ALERTS = 'alerts';
-export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts*';
+// Index - Wazuh engine/indexer settings located in Indexer management > Settings
+export const WAZUH_ENGINE_SETTINGS_INDEX = '.wazuh-settings';
 
-// Job - Wazuh monitoring
-export const WAZUH_INDEX_TYPE_MONITORING = 'monitoring';
-export const WAZUH_MONITORING_PATTERN = 'wazuh-monitoring*';
+// Index patterns - Wazuh events (previously alerts)
+export const WAZUH_INDEX_TYPE_EVENTS = 'events';
+export const WAZUH_EVENTS_PATTERN = 'wazuh-events*';
 
-// Job - Wazuh statistics
-export const WAZUH_INDEX_TYPE_STATISTICS = 'statistics';
-export const WAZUH_STATISTICS_PATTERN = 'wazuh-statistics*';
+// Index patterns - Wazuh findings
+export const WAZUH_INDEX_TYPE_FINDINGS = 'findings';
+export const WAZUH_FINDINGS_PATTERN = 'wazuh-findings*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS =
+  'index-pattern:findings';
+
+// Job - Wazuh metrics agents
+export const WAZUH_INDEX_TYPE_METRICS_AGENTS = 'metrics-agents';
+export const WAZUH_METRICS_AGENTS_PATTERN = 'wazuh-metrics-agents*';
+
+// Job - Wazuh metrics comms
+export const WAZUH_INDEX_TYPE_METRICS_COMMS = 'metrics-commns';
+export const WAZUH_METRICS_COMMS_PATTERN = 'wazuh-metrics-comms*';
 
 // Wazuh vulnerabilities
 export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities*';
@@ -34,8 +43,8 @@ export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
 export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
 
 // Wazuh states index types
-export const WAZUH_INDEX_TYPE_ARCHIVES = 'archives';
 export const WAZUH_INDEX_TYPE_STATES_VULNERABILITIES = 'states-vulnerabilities';
+export const WAZUH_INDEX_TYPE_STATES_FIM = 'states-fim';
 export const WAZUH_INDEX_TYPE_STATES_FIM_FILES = 'states-fim-files';
 export const WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS =
   'states-fim-registries-keys';
@@ -71,18 +80,22 @@ export const WAZUH_INDEX_TYPE_EVENTS_ACCESS_MANAGEMENT =
   'events-access-management';
 export const WAZUH_INDEX_TYPE_EVENTS_APPLICATIONS = 'events-applications';
 export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES = 'events-cloud-services';
-export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AWS =
-  'events-cloud-services-aws';
-export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AZURE =
-  'events-cloud-services-azure';
-export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_GCP =
-  'events-cloud-services-gcp';
 export const WAZUH_INDEX_TYPE_EVENTS_NETWORK_ACTIVITY =
   'events-network-activity';
 export const WAZUH_INDEX_TYPE_EVENTS_OTHER = 'events-other';
 export const WAZUH_INDEX_TYPE_EVENTS_SECURITY = 'events-security';
 export const WAZUH_INDEX_TYPE_EVENTS_SYSTEM_ACTIVITY = 'events-system-activity';
-export const WAZUH_INDEX_TYPE_EVENTS = 'events';
+export const WAZUH_INDEX_TYPE_FINDINGS_ACCESS_MANAGEMENT =
+  'findings-access-management';
+export const WAZUH_INDEX_TYPE_FINDINGS_APPLICATIONS = 'findings-applications';
+export const WAZUH_INDEX_TYPE_FINDINGS_CLOUD_SERVICES =
+  'findings-cloud-services';
+export const WAZUH_INDEX_TYPE_FINDINGS_NETWORK_ACTIVITY =
+  'findings-network-activity';
+export const WAZUH_INDEX_TYPE_FINDINGS_OTHER = 'findings-other';
+export const WAZUH_INDEX_TYPE_FINDINGS_SECURITY = 'findings-security';
+export const WAZUH_INDEX_TYPE_FINDINGS_SYSTEM_ACTIVITY =
+  'findings-system-activity';
 
 // FIM
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim*';
@@ -119,11 +132,7 @@ export const WAZUH_IT_HYGIENE_SERVICES_PATTERN =
   'wazuh-states-inventory-services*';
 export const WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN =
   'wazuh-states-inventory-browser-extensions*';
-
-// Index patterns - Archives
-export const WAZUH_ARCHIVES_PATTERN = 'wazuh-archives*';
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_ARCHIVES =
-  'index-pattern:archives';
+export const WAZUH_ACTIVE_RESPONSES_PATTERN = 'wazuh-active-responses*';
 
 // Index patterns - Events
 export const WAZUH_EVENTS_SYSTEM_ACTIVITY_PATTERN =
@@ -144,18 +153,6 @@ export const WAZUH_EVENTS_CLOUD_SERVICES_PATTERN =
   'wazuh-events-v5-cloud-services*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES =
   'index-pattern:events-cloud-services';
-export const WAZUH_EVENTS_CLOUD_SERVICES_AWS_PATTERN =
-  'wazuh-events-v5-cloud-services-aws*';
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AWS =
-  'index-pattern:events-cloud-services-aws';
-export const WAZUH_EVENTS_CLOUD_SERVICES_AZURE_PATTERN =
-  'wazuh-events-v5-cloud-services-azure*';
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AZURE =
-  'index-pattern:events-cloud-services-azure';
-export const WAZUH_EVENTS_CLOUD_SERVICES_GCP_PATTERN =
-  'wazuh-events-v5-cloud-services-gcp*';
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_GCP =
-  'index-pattern:events-cloud-services-gcp';
 export const WAZUH_EVENTS_APLICATIONS_PATTERN = 'wazuh-events-v5-applications*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_APLICATIONS =
   'index-pattern:events-applications';
@@ -163,8 +160,64 @@ export const WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN =
   'wazuh-events-v5-access-management*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT =
   'index-pattern:events-access-management';
-export const WAZUH_EVENTS_PATTERN = 'wazuh-events*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS = 'index-pattern:events';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_ACTIVE_RESPONSES =
+  'index-pattern:active-responses';
+export const WAZUH_EVENTS_UNCLASSIFIED_PATTERN =
+  'wazuh-events-v5-unclassified*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_UNCLASSIFIED =
+  'index-pattern:events-unclassified';
+export const WAZUH_EVENTS_RAW_PATTERN = 'wazuh-events-raw-v5*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_RAW =
+  'index-pattern:events-raw';
+
+// Index patterns - Findings sub-patterns
+export const WAZUH_FINDINGS_SYSTEM_ACTIVITY_PATTERN =
+  'wazuh-findings-v5-system-activity*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SYSTEM_ACTIVITY =
+  'index-pattern:findings-system-activity';
+export const WAZUH_FINDINGS_SECURITY_PATTERN = 'wazuh-findings-v5-security*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SECURITY =
+  'index-pattern:findings-security';
+export const WAZUH_FINDINGS_OTHER_PATTERN = 'wazuh-findings-v5-other*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_OTHER =
+  'index-pattern:findings-other';
+export const WAZUH_FINDINGS_NETWORK_ACTIVITY_PATTERN =
+  'wazuh-findings-v5-network-activity*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_NETWORK_ACTIVITY =
+  'index-pattern:findings-network-activity';
+export const WAZUH_FINDINGS_CLOUD_SERVICES_PATTERN =
+  'wazuh-findings-v5-cloud-services*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_CLOUD_SERVICES =
+  'index-pattern:findings-cloud-services';
+export const WAZUH_FINDINGS_APPLICATIONS_PATTERN =
+  'wazuh-findings-v5-applications*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_APPLICATIONS =
+  'index-pattern:findings-applications';
+export const WAZUH_FINDINGS_ACCESS_MANAGEMENT_PATTERN =
+  'wazuh-findings-v5-access-management*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_ACCESS_MANAGEMENT =
+  'index-pattern:findings-access-management';
+export const WAZUH_FINDINGS_UNCLASSIFIED_PATTERN =
+  'wazuh-findings-v5-unclassified*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_UNCLASSIFIED =
+  'index-pattern:findings-unclassified';
+
+// Index patterns - Threat Intel enrichments
+export const WAZUH_INDEX_TYPE_THREATINTEL_ENRICHMENTS =
+  'threatintel-enrichments';
+export const WAZUH_THREATINTEL_ENRICHMENTS_PATTERN =
+  'wazuh-threatintel-enrichments*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS =
+  'index-pattern:threatintel-enrichments';
+
+// Index patterns - Threat Intel vulnerabilities
+export const WAZUH_INDEX_TYPE_THREATINTEL_VULNERABILITIES =
+  'threatintel-vulnerabilities';
+export const WAZUH_THREATINTEL_VULNERABILITIES_PATTERN =
+  'wazuh-threatintel-vulnerabilities*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_VULNERABILITIES =
+  'index-pattern:threatintel-vulnerabilities';
 
 // Time field
 export const FIELD_TIMESTAMP = '@timestamp';
@@ -184,12 +237,12 @@ export const WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT =
   'security-configuration-assessment';
 export const WAZUH_SAMPLE_INVENTORY_AGENT = 'wazuh-inventory-agent';
 export const WAZUH_SAMPLE_VULNERABILITIES = 'wazuh-vulnerabilities';
-export const WAZUH_SAMPLE_AGENT_MONITORING = 'agent-monitoring';
-export const WAZUH_SAMPLE_SERVER_STATISTICS = 'server-statistics';
+export const WAZUH_SAMPLE_METRICS_AGENTS = 'metrics-agents';
+export const WAZUH_SAMPLE_METRICS_COMMS = 'metrics-comms';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 1500;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = {
-  indexPatternPrefix: WAZUH_ALERTS_PATTERN.replace('*', ''),
-  dataSet: 'wazuh-alerts',
+  indexPatternPrefix: WAZUH_EVENTS_PATTERN.replace('*', ''),
+  dataSet: 'wazuh-events',
 };
 
 export const WAZUH_SETTING_SCA_SAMPLE_PREFIX = {
@@ -267,21 +320,21 @@ export const WAZUH_SETTING_INVENTORY_BROWSER_EXTENSIONS_SAMPLE_PREFIX = {
   ),
   dataSet: 'states-inventory-browser-extensions',
 };
-export const WAZUH_SETTING_AGENTS_MONITORING_SAMPLE_PREFIX = {
-  indexPatternPrefix: WAZUH_MONITORING_PATTERN.replace('*', ''),
-  dataSet: 'agents-monitoring',
+export const WAZUH_SETTING_METRICS_AGENTS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_METRICS_AGENTS_PATTERN.replace('*', ''),
+  dataSet: 'metrics-agents',
 };
-export const WAZUH_SETTING_SERVER_STATISTICS_SAMPLE_PREFIX = {
-  indexPatternPrefix: WAZUH_STATISTICS_PATTERN.replace('*', ''),
-  dataSet: 'server-statistics',
+export const WAZUH_SETTING_METRICS_COMMS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_METRICS_COMMS_PATTERN.replace('*', ''),
+  dataSet: 'metrics-comms',
 };
 
 export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
-  [WAZUH_SAMPLE_AGENT_MONITORING]: [
+  [WAZUH_SAMPLE_METRICS_AGENTS]: [
     {
       indexPatternPrefix:
-        WAZUH_SETTING_AGENTS_MONITORING_SAMPLE_PREFIX.indexPatternPrefix,
-      dataSet: WAZUH_SETTING_AGENTS_MONITORING_SAMPLE_PREFIX.dataSet,
+        WAZUH_SETTING_METRICS_AGENTS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_METRICS_AGENTS_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
@@ -328,7 +381,7 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
   })),
   [WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING]: [
     {
-      rootcheck: true,
+      'wazuh-rootcheck': true,
     },
     {
       audit: true,
@@ -465,11 +518,11 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
       dataSet: WAZUH_SETTING_INVENTORY_BROWSER_EXTENSIONS_SAMPLE_PREFIX.dataSet,
     },
   ],
-  [WAZUH_SAMPLE_SERVER_STATISTICS]: [
+  [WAZUH_SAMPLE_METRICS_COMMS]: [
     {
       indexPatternPrefix:
-        WAZUH_SETTING_SERVER_STATISTICS_SAMPLE_PREFIX.indexPatternPrefix,
-      dataSet: WAZUH_SETTING_SERVER_STATISTICS_SAMPLE_PREFIX.dataSet,
+        WAZUH_SETTING_METRICS_COMMS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_METRICS_COMMS_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_VULNERABILITIES]: [
@@ -520,13 +573,18 @@ export enum WAZUH_MODULES_ID {
   GOOGLE_CLOUD_PLATFORM = 'gcp',
   POLICY_MONITORING = 'pm',
   SECURITY_CONFIGURATION_ASSESSMENT = 'sca',
-  AUDITING = 'audit',
+  AUDITING = 'azure-audit',
   VULNERABILITIES = 'vuls',
   DOCKER = 'docker',
   MITRE_ATTACK = 'mitre',
-  PCI_DSS = 'pci',
+  CMMC = 'cmmc',
+  FEDRAMP = 'fedramp',
   HIPAA = 'hipaa',
-  NIST_800_53 = 'nist',
+  ISO_27001 = 'iso-27001',
+  NIS2 = 'nis2',
+  NIST_800_53 = 'nist-800-53',
+  NIST_800_171 = 'nist-800-171',
+  PCI_DSS = 'pci-dss',
   TSC = 'tsc',
   VIRUSTOTAL = 'virustotal',
   GDPR = 'gdpr',
@@ -562,6 +620,7 @@ export const DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER = 'cluster-manager';
 export const DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT =
   'hidden-regulatory-compliance-requirement';
 export const DATA_SOURCE_FILTER_CONTROLLED_PCI_DSS_EXIST = 'pci-dss-exist';
+export const DATA_SOURCE_FILTER_CONTROLLED_FEDRAMP_EXIST = 'fedramp-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP =
   'vulnerabilities-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_OFFICE_365_RULE_GROUP =
@@ -569,10 +628,14 @@ export const DATA_SOURCE_FILTER_CONTROLLED_OFFICE_365_RULE_GROUP =
 export const DATA_SOURCE_FILTER_CONTROLLED_GITHUB_RULE_GROUP =
   'github-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_TSC_EXIST = 'tsc-rule-exist';
+export const DATA_SOURCE_FILTER_CONTROLLED_CMMC_EXIST = 'cmmc-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_NIST_800_53_EXIST =
   'nist-800-53-rule-exist';
+export const DATA_SOURCE_FILTER_CONTROLLED_NIST_800_171_EXIST =
+  'nist-800-171-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_GDPR_EXIST = 'gdpr-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_HIPAA_EXIST = 'hipaa-rule-exist';
+export const DATA_SOURCE_FILTER_CONTROLLED_NIS2_EXIST = 'nis2-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_DOCKER_RULE_GROUP =
   'docker-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE =
@@ -589,6 +652,8 @@ export const DATA_SOURCE_FILTER_CONTROLLED_AZURE_RULE_GROUP =
 export const DATA_SOURCE_FILTER_CONTROLLED_FIM_RULE_GROUP = 'fim-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_CONFIGURATION_ASSASSMENT_RULE_GROUP =
   'configuration-assessment-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_ISO27001_EXIST =
+  'iso27001-rule-exist';
 
 // Wazuh links
 export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';
@@ -863,15 +928,13 @@ export const SUPPORTED_LANGUAGES = {
 
 export const SUPPORTED_LANGUAGES_ARRAY = Object.values(SUPPORTED_LANGUAGES);
 
-// Health check
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS = 'index-pattern:alerts';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES =
   'index-pattern:states-vulnerabilities';
 
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING =
-  'index-pattern:monitoring';
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS =
-  'index-pattern:statistics';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_AGENTS =
+  'index-pattern:metrics-agents';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_COMMS =
+  'index-pattern:metrics-comms';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES =
   'index-pattern:states-inventory';
@@ -915,6 +978,9 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SERVICES_STATES =
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_BROWSER_EXTENSIONS_STATES =
   'index-pattern:states-inventory-browser-extensions';
 
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_STATES =
+  'index-pattern:states-fim';
+
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES =
   'index-pattern:states-fim-files';
 
@@ -927,11 +993,11 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES =
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES =
   'index-pattern:states-sca';
 
-export const INDEX_PATTERN_ALERTS_REQUIRED_FIELDS = [
+export const INDEX_PATTERN_EVENTS_REQUIRED_FIELDS = [
   FIELD_TIMESTAMP,
   'wazuh.integration.decoders',
   'wazuh.cluster.node',
-  'agent.id',
+  'wazuh.agent.id',
 ];
 
 /** Dashboards ids **/
@@ -980,8 +1046,25 @@ export const HIPAA_AGENT_DASHBOARD_ID = 'hipaa-pinned-agent-dashboard-tab';
 export const NIST_800_53_DASHBOARD_ID = 'nist-overview-dashboard-tab';
 export const NIST_800_53_AGENT_DASHBOARD_ID = 'nist-pinned-agent-dashboard-tab';
 
+export const NIST_800_171_DASHBOARD_ID = 'nist-800-171-overview-dashboard-tab';
+export const NIST_800_171_AGENT_DASHBOARD_ID =
+  'nist-800-171-pinned-agent-dashboard-tab';
+
 export const TSC_DASHBOARD_ID = 'tsc-overview-dashboard-tab';
 export const TSC_AGENT_DASHBOARD_ID = 'tsc-pinned-agent-dashboard-tab';
+
+export const CMMC_DASHBOARD_ID = 'cmmc-overview-dashboard-tab';
+export const CMMC_AGENT_DASHBOARD_ID = 'cmmc-pinned-agent-dashboard-tab';
+
+export const ISO27001_DASHBOARD_ID = 'iso27001-overview-dashboard-tab';
+export const ISO27001_AGENT_DASHBOARD_ID =
+  'iso27001-pinned-agent-dashboard-tab';
+
+export const FEDRAMP_DASHBOARD_ID = 'fedramp-overview-dashboard-tab';
+export const FEDRAMP_AGENT_DASHBOARD_ID = 'fedramp-pinned-agent-dashboard-tab';
+
+export const NIS2_DASHBOARD_ID = 'nis2-overview-dashboard-tab';
+export const NIS2_AGENT_DASHBOARD_ID = 'nis2-pinned-agent-dashboard-tab';
 
 export const GITHUB_DASHBOARD_ID = 'github-overview-dashboard-tab';
 export const GITHUB_AGENT_DASHBOARD_ID = 'github-pinned-agent-dashboard-tab';
@@ -1082,3 +1165,12 @@ export const VULNERABILITIES_DASHBOARD_ID =
   'vulnerabilities-overview-dashboard-tab';
 export const VULNERABILITIES_AGENT_DASHBOARD_ID =
   'vulnerabilities-overview-dashboard-tab';
+
+// Main module tabs
+export const TAB_VIEW_ID_EVENTS = 'findings';
+export const TAB_VIEW_NAME_EVENTS = 'Findings';
+export const TAB_VIEW_ID_DASHBOARD = 'dashboard';
+export const TAB_VIEW_NAME_DASHBOARD = 'Dashboard';
+
+export const CTI_CVE_LINK_BASE_PATH =
+  'https://cti.wazuh.com/vulnerabilities/cves/';

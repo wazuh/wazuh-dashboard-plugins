@@ -78,7 +78,6 @@ export const ApiTable = compose(withErrorBoundary)(
         refreshingEntries: false,
         availableUpdates: {},
         refreshingAvailableUpdates: false,
-        popoverOpened: null,
       };
     }
 
@@ -169,9 +168,11 @@ export const ApiTable = compose(withErrorBoundary)(
           },
           true,
         );
-        APIConnection.cluster_info = response.data;
+        const { allow_run_as, verify_ca, ...cluster_info } = response.data;
+        APIConnection.cluster_info = cluster_info;
         APIConnection.status = 'online';
-        APIConnection.allow_run_as = response.data.allow_run_as;
+        APIConnection.allow_run_as = allow_run_as;
+        APIConnection.verify_ca = verify_ca;
         !silent && ErrorHandler.info('Connection success', 'Settings');
         // WORKAROUND: Update the apiEntries with the modifications of the APIConnection object
         this.setState({
@@ -234,9 +235,11 @@ export const ApiTable = compose(withErrorBoundary)(
       try {
         const data = await ApiCheck.checkApi(APIconnection, true);
         const clusterInfo = data.data || {};
+        const { allow_run_as, verify_ca, ...cluster_info } = clusterInfo;
         APIconnection.status = 'online';
-        APIconnection.cluster_info = clusterInfo;
-        APIconnection.allow_run_as = clusterInfo.allow_run_as;
+        APIconnection.cluster_info = cluster_info;
+        APIconnection.allow_run_as = allow_run_as;
+        APIconnection.verify_ca = verify_ca;
         if (options?.selectAPIHostOnAvailable) {
           this.setDefault(entry);
         }
@@ -342,16 +345,6 @@ export const ApiTable = compose(withErrorBoundary)(
       }
     }
 
-    /**
-     * Show/close info UUID
-     * @param {String | Null} id
-     */
-    togglePopoverUUID = id => {
-      this.setState({
-        popoverOpened: this.state.popoverOpened === id ? null : id,
-      });
-    };
-
     render() {
       const { DismissNotificationCheck } = getWazuhCheckUpdatesPlugin();
 
@@ -398,77 +391,13 @@ export const ApiTable = compose(withErrorBoundary)(
           name: 'ID',
           align: 'left',
           sortable: true,
-          render: (item, row) => {
-            if (row.cluster_info.uuid) {
-              return (
-                <EuiPopover
-                  button={
-                    <EuiLink
-                      onClick={() => this.togglePopoverUUID(row.id)}
-                      style={{
-                        fontWeight: 'normal',
-                      }}
-                      color='text'
-                    >
-                      <EuiFlexGroup
-                        alignItems='center'
-                        gutterSize='xs'
-                        responsive={false}
-                      >
-                        <EuiFlexItem grow={false}>{item}</EuiFlexItem>
-                        <EuiFlexItem grow={false}>
-                          <EuiToolTip
-                            position='top'
-                            content='Show UUID information'
-                          >
-                            <EuiIcon type='iInCircle' color='primary' />
-                          </EuiToolTip>
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                    </EuiLink>
-                  }
-                  isOpen={this.state.popoverOpened === row.id}
-                  closePopover={() => this.togglePopoverUUID(null)}
-                  anchorPosition='upCenter'
-                  hasArrow={true}
-                  panelPaddingSize='s'
-                >
-                  <EuiFlexGroup alignItems='center' gutterSize='s'>
-                    <EuiFlexItem>
-                      <EuiText size='s'>
-                        <p>
-                          <strong>UUID:</strong> {row.cluster_info.uuid}
-                        </p>
-                      </EuiText>
-                    </EuiFlexItem>
-                    <EuiFlexItem grow={false}>
-                      <EuiToolTip position='top' content='Copy to clipboard'>
-                        <EuiButtonIcon
-                          iconType='copy'
-                          size='s'
-                          aria-label='copy UUID'
-                          onClick={() =>
-                            this.copyToClipBoard(row.cluster_info.uuid)
-                          }
-                        />
-                      </EuiToolTip>
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiPopover>
-              );
-            }
+          render: item => {
             return <EuiText size='s'>{item}</EuiText>;
           },
         },
         {
           field: 'cluster_info.cluster',
           name: 'Cluster',
-          align: 'left',
-          sortable: true,
-        },
-        {
-          field: 'cluster_info.manager',
-          name: 'Manager',
           align: 'left',
           sortable: true,
         },
@@ -588,6 +517,45 @@ export const ApiTable = compose(withErrorBoundary)(
                 <p>-</p>
               </EuiToolTip>
             );
+          },
+        },
+        {
+          name: 'Verify CA',
+          field: 'verify_ca',
+          align: 'center',
+          sortable: true,
+          width: '80px',
+          render: (value, row) => {
+            const verify_ca = row.verify_ca;
+
+            if (verify_ca === true) {
+              return (
+                <EuiToolTip
+                  position='top'
+                  content='CA certificate verification is enabled.'
+                >
+                  <EuiIcon type='check' />
+                </EuiToolTip>
+              );
+            } else if (verify_ca === false) {
+              return (
+                <EuiToolTip
+                  position='top'
+                  content='CA certificate verification is disabled. Either certificate paths are not configured.'
+                >
+                  <p>-</p>
+                </EuiToolTip>
+              );
+            } else {
+              return (
+                <EuiToolTip
+                  position='top'
+                  content='CA certificate verification status is unknown.'
+                >
+                  <p>-</p>
+                </EuiToolTip>
+              );
+            }
           },
         },
         {

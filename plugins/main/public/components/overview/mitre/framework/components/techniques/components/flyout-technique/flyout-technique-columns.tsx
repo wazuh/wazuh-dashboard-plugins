@@ -4,19 +4,19 @@ import { tDataGridColumn } from '../../../../../../../common/data-grid';
 
 export const techniquesColumns: tDataGridColumn[] = [
   {
-    id: 'timestamp',
+    id: '@timestamp',
     isSortable: true,
     defaultSortDirection: 'desc',
     displayAsText: 'Time',
     render: value => formatUIDate(value),
   },
   {
-    id: 'agent.id',
+    id: 'wazuh.agent.id',
     displayAsText: 'Agent',
   },
-  { id: 'agent.name', displayAsText: 'Agent Name' },
+  { id: 'wazuh.agent.name', displayAsText: 'Agent Name' },
   {
-    id: 'rule.mitre.id',
+    id: 'rule.mitre.technique',
     displayAsText: 'Technique(s)',
   },
   { id: 'rule.mitre.tactic', displayAsText: 'Tactic(s)' },
@@ -25,19 +25,19 @@ export const techniquesColumns: tDataGridColumn[] = [
     id: 'rule.id',
     displayAsText: 'Rule ID',
   },
-  { id: 'rule.description', displayAsText: 'Description' },
+  { id: 'rule.title', displayAsText: 'Title' },
 ];
 
 export const agentTechniquesColumns: tDataGridColumn[] = [
   {
-    id: 'timestamp',
+    id: '@timestamp',
     isSortable: true,
     defaultSortDirection: 'desc',
     displayAsText: 'Time',
     render: value => formatUIDate(value),
   },
   {
-    id: 'rule.mitre.id',
+    id: 'rule.mitre.technique',
     displayAsText: 'Technique(s)',
   },
   { id: 'rule.mitre.tactic', displayAsText: 'Tactic(s)' },
@@ -46,5 +46,5 @@ export const agentTechniquesColumns: tDataGridColumn[] = [
     id: 'rule.id',
     displayAsText: 'Rule ID',
   },
-  { id: 'rule.description', displayAsText: 'Description' },
+  { id: 'rule.title', displayAsText: 'Title' },
 ];

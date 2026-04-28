@@ -47,6 +47,8 @@ import NavigationService from './react-services/navigation-service';
 import { createHashHistory } from 'history';
 import { SUPPORTED_LANGUAGES_ARRAY } from '../common/constants';
 import { registerHeaderNavControl } from './components/wz-header-nav-control/header-nav-control';
+import { registerWazuhNavLinks } from './utils/nav-groups';
+import _ from 'lodash';
 
 export class WazuhPlugin
   implements
@@ -188,6 +190,13 @@ export class WazuhPlugin
         ),
       });
     }
+
+    // Register nav links for the new home page menu (OpenSearch 3.x)
+    // This is only active when the 'home:useNewHomePage' setting is enabled
+    registerWazuhNavLinks(
+      core.chrome.navGroup.addNavLinksToGroup.bind(core.chrome.navGroup),
+      core.chrome.navGroup.getNavGroupEnabled(),
+    );
 
     return {};
   }

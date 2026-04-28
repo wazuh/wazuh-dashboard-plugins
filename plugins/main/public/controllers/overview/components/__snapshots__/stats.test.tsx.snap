@@ -38,7 +38,24 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                   >
                     <g
                       transform="translate(0,0)"
-                    />
+                    >
+                      <g
+                        class="arc"
+                      >
+                        <path
+                          class="arc"
+                          fill="#007871"
+                        />
+                      </g>
+                      <g
+                        class="arc"
+                      >
+                        <path
+                          class="arc"
+                          fill="#BD271E"
+                        />
+                      </g>
+                    </g>
                   </svg>
                 </div>
                 <div
@@ -61,6 +78,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                         />
                         <span
                           class="euiListGroupItem__label"
+                          title="Active (8)"
                         >
                           <div
                             style="font-size: 0.875rem; text-overflow: ellipsis; overflow: hidden;"
@@ -84,6 +102,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                         />
                         <span
                           class="euiListGroupItem__label"
+                          title="Disconnected (0)"
                         >
                           <div
                             style="font-size: 0.875rem; text-overflow: ellipsis; overflow: hidden;"
@@ -116,7 +135,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
       class="euiFlexItem"
     >
       <div
-        class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow euiCard euiCard--centerAligned euiCard--hasBetaBadge"
+        class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow euiCard euiCard--centerAligned euiCard--hasBetaBadge home-alerts-card"
       >
         <div
           class="euiCard__content"
@@ -129,11 +148,53 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
             class="euiCard__children"
           >
             <div
-              class="vulnerabilites-summary-card"
+              class="euiEmptyPrompt"
             >
-              <div
-                class="euiProgress euiProgress--indeterminate euiProgress--xs euiProgress--primary"
+              <span
+                color="subdued"
+                data-euiicon-type="alert"
               />
+              <div
+                class="euiSpacer euiSpacer--m"
+              />
+              <span
+                class="euiTextColor euiTextColor--subdued"
+              >
+                <div
+                  class="euiText euiText--medium"
+                >
+                  <p>
+                    Index pattern [
+                    id: wazuh-findings*
+                    ] not found
+                  </p>
+                </div>
+              </span>
+              <div
+                class="euiSpacer euiSpacer--l"
+              />
+              <div
+                class="osdRedirectCrossAppLinks"
+              >
+                <a
+                  class="euiLink euiLink--primary"
+                  href="http://url"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  Manage index patterns
+                  <span
+                    aria-label="External link"
+                    class="euiLink__externalIcon"
+                    data-euiicon-type="popout"
+                  />
+                  <span
+                    class="euiScreenReaderOnly"
+                  >
+                    (opens in a new tab or window)
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -143,9 +204,9 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
           <span
             class="euiBetaBadge euiBetaBadge--hollow euiCard__betaBadge"
             id="htmlIdBetaBadge"
-            title="Last 24 hours alerts"
+            title="Last 24 hours findings"
           >
-            Last 24 hours alerts
+            Last 24 hours findings
           </span>
         </span>
       </div>

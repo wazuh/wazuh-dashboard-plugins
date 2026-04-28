@@ -12,7 +12,7 @@ import { RolesMappingCreate } from './components/roles-mapping-create';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WazuhSecurity } from '../../../factories/wazuh-security';
 import { useApiService } from '../../common/hooks/useApiService';
-import { Rule } from '../rules/types/rule.type';
+import { usePagination } from '../../common/hooks/usePagination';
 import { Role } from '../roles/types/role.type';
 import RolesServices from '../roles/services';
 import RulesServices from '../rules/services';
@@ -22,7 +22,6 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { withUserAuthorizationPrompt } from '../../common/hocs';
 import { WzButtonPermissions } from '../../common/permissions/button';
-import { closeFlyout } from '../../common/flyouts/close-flyout-security';
 
 export const RolesMapping = withUserAuthorizationPrompt([
   { action: 'security:read', resource: 'role:id:*' },
@@ -30,8 +29,6 @@ export const RolesMapping = withUserAuthorizationPrompt([
 ])(() => {
   const [isEditingRule, setIsEditingRule] = useState(false);
   const [isCreatingRule, setIsCreatingRule] = useState(false);
-  const [rules, setRules] = useState<Rule[]>([]);
-  const [loadingTable, setLoadingTable] = useState(true);
   const [selectedRule, setSelectedRule] = useState({});
   const [rolesEquivalences, setRolesEquivalences] = useState({});
   const [rolesLoading, roles, rolesError] = useApiService<Role[]>(
@@ -42,6 +39,32 @@ export const RolesMapping = withUserAuthorizationPrompt([
   const currentPlatform = useSelector(
     (state: any) => state.appStateReducers.currentPlatform,
   );
+
+  const handlePaginationError = (error: any) => {
+    const options = {
+      context: `${RolesMapping.name}.getData`,
+      level: UI_LOGGER_LEVELS.ERROR,
+      severity: UI_ERROR_SEVERITIES.BUSINESS,
+      store: true,
+      error: {
+        error: error,
+        message: error.message || error,
+        title: error.name || error,
+      },
+    };
+    getErrorOrchestrator().handleError(options);
+  };
+
+  const {
+    items: rules,
+    loading: loadingTable,
+    pageIndex,
+    pageSize,
+    totalItems,
+    getData,
+    refreshCurrentPage,
+    onTableChange: handleTableChange,
+  } = usePagination(RulesServices.GetRules, handlePaginationError);
 
   useEffect(() => {
     initData();
@@ -92,45 +115,25 @@ export const RolesMapping = withUserAuthorizationPrompt([
     }
   };
 
-  const getRules = async () => {
-    try {
-      const _rules = await RulesServices.GetRules();
-      setRules(_rules);
-    } catch (error) {
-      const options = {
-        context: `${RolesMapping.name}.getRules`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  };
-
   const initData = async () => {
-    setLoadingTable(true);
-    await getRules();
+    await getData();
     if (currentPlatform) {
       await getInternalUsers();
     }
-    setLoadingTable(false);
-  };
-
-  const updateRoles = async () => {
-    await getRules();
   };
 
   const closeEditingFlyout = needRefresh => {
-    closeFlyout(needRefresh, setIsEditingRule, initData);
+    if (needRefresh) {
+      refreshCurrentPage();
+    }
+    setIsEditingRule(false);
   };
 
   const closeCreatingFlyout = needRefresh => {
-    closeFlyout(needRefresh, setIsCreatingRule, initData);
+    if (needRefresh) {
+      refreshCurrentPage();
+    }
+    setIsCreatingRule(false);
   };
 
   let editFlyout;
@@ -142,7 +145,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
         rolesEquivalences={rolesEquivalences}
         roles={roles}
         internalUsers={internalUsers}
-        onSave={async () => await updateRoles()}
+        onSave={async () => await refreshCurrentPage()}
         currentPlatform={currentPlatform}
       />
     );
@@ -155,7 +158,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
         rolesEquivalences={rolesEquivalences}
         roles={roles}
         internalUsers={internalUsers}
-        onSave={async () => await updateRoles()}
+        onSave={async () => await refreshCurrentPage()}
         currentPlatform={currentPlatform}
       />
     );
@@ -195,7 +198,11 @@ export const RolesMapping = withUserAuthorizationPrompt([
             setSelectedRule(item);
             setIsEditingRule(true);
           }}
-          updateRules={async () => await updateRoles()}
+          updateRules={refreshCurrentPage}
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          onTableChange={handleTableChange}
         ></RolesMappingTable>
       </EuiPageContentBody>
     </EuiPageContent>
