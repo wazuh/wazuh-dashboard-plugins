@@ -5,6 +5,8 @@ dashboard.
 
 ## UI
 
+<!-- Reference: https://docs.opensearch.org/3.6/dashboards/branding/ -->
+
 ### Loading and header logos
 
 Edit `opensearch_dashboards.yml` and set the branding URLs:
@@ -22,9 +24,9 @@ opensearchDashboards.branding:
     darkModeUrl: 'https://domain.org/dark-mode-logo.png'
 ```
 
-- **logo**: home and expaneded header logo.
-- **loadingLogo**: logo used while loading.
-- **mark**: used in other views.
+- **logo**: home and expanded header logo. Allowed formats: PNG, GIF, SVG.
+- **loadingLogo**: logo used while loading. Allowed formats: PNG, GIF, SVG.
+- **mark**: used in other views. Allowed formats: PNG, GIF, SVG.
 
 Restart the service after changes:
 
@@ -69,6 +71,8 @@ opensearchDashboards.branding:
   faviconUrl: 'https://domain.org/favicon.png'
 ```
 
+Allowed formats: PNG, GIF, SVG.
+
 Restart the service after changes:
 
 ```bash
@@ -88,7 +92,7 @@ opensearch_security.ui.basicauth:
     subtitle: 'My custom subtitle' # Define a subtitle
     showbrandimage: true # Enable or disable if the logo should be displayed
     brandimage: 'https://domain.org/login_logo.png' # Customize the logo
-    buttonstyle: '' # class name to apply to the button, the class should be defined by some style file
+    buttonstyle: '' # CSS class name to apply to the button, the class should be defined by some style file
 ```
 
 Restart the service after changes:
@@ -108,20 +112,46 @@ TODO: define settings for SSO, refer to: https://github.com/wazuh/wazuh-security
 
 # Reporting
 
-## Wazuh app custom logos
+The PDF reports can be customized through a report definition that allows to define a custom header and footer.
 
-If the App Settings UI is available in your build:
+1. Go to **Explore** > **Reporting**
+2. Click on **Create** button.
+3. Define the report name and description, source and other settings.
+4. In the **Report definition** section, click on the **Add header** or **Add footer** option to customize them.
 
-1. Open **Dashboard management** > **App Settings**.
-2. Set the following properties in the Custom branding section:
+For example, for the header, you can add the following HTML code to set a custom title:
 
-- `customization.logo.app`
-- `customization.logo.healthcheck`
-- `customization.logo.reports`
+```html
+<p><strong>My custom report title</strong></p>
+```
 
-Assets are stored in:
-`/usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom/images/`
+5. Click on the **Save** button to save the report definition and click on the **Generate** button to create a report with the custom header and footer.
 
-> Note: In-file `customization.logo.*` settings are deprecated. Use the UI to
-> update these values. If the App Settings UI is not present in your version,
-> rely on the `opensearchDashboards.branding` settings only.
+![Custom report header](./images/report_custom_header.png)
+
+# Host the images in the dashboard server
+
+To host the images in the dashboard server, place them in the `src/core/server/core_app/assets` folder of the Wazuh dashboard installation. For example, if you place an image named `custom-logo.png` in the `src/core/server/core_app/assets` folder, you can reference it in the configuration as follows:
+
+```yml
+opensearchDashboards.branding:
+  logo:
+    defaultUrl: '/ui/custom-logo.png'
+    darkModeUrl: '/ui/custom-logo.png'
+```
+
+> The files should have the permissions of the Wazuh dashboard server user.
+
+From the root of the Wazuh dashboard installation, run the following command to set the correct ownership for the images:
+
+```bash
+chown wazuh-dashboard:wazuh-dashboard src/core/server/core_app/assets/custom-logo.png
+```
+
+After placing the images and updating the configuration, restart the Wazuh dashboard service to apply the changes.
+
+```bash
+systemctl restart wazuh-dashboard
+```
+
+> ⚠️ The images hosted in the dashboard server could be lost in the upgrades. Ensure to take a backup of the images and reapply them after the upgrade if necessary.
