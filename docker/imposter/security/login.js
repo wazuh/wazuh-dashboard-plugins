@@ -36,13 +36,15 @@ var signingInput = b64urlSegment(header) + '.' + b64urlSegment(claims);
 var mac = Mac.getInstance('HmacSHA256');
 var keySpec = new SecretKeySpec(
   new java.lang.String(secret).getBytes(StandardCharsets.UTF_8),
-  'HmacSHA256'
+  'HmacSHA256',
 );
 mac.init(keySpec);
 var sigBytes = mac.doFinal(
-  new java.lang.String(signingInput).getBytes(StandardCharsets.UTF_8)
+  new java.lang.String(signingInput).getBytes(StandardCharsets.UTF_8),
 );
-var signature = Base64.getUrlEncoder().withoutPadding().encodeToString(sigBytes);
+var signature = Base64.getUrlEncoder()
+  .withoutPadding()
+  .encodeToString(sigBytes);
 var jwt = signingInput + '.' + signature;
 
 var resp = {
@@ -52,6 +54,4 @@ var resp = {
   },
 };
 
-respond()
-  .withStatusCode(200)
-  .withData(JSON.stringify(resp));
+respond().withStatusCode(200).withData(JSON.stringify(resp));

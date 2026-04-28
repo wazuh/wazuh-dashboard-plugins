@@ -54,7 +54,7 @@ function parseBody(rawBody) {
     var value = idx === -1 ? '' : pairs[i].substring(idx + 1);
     try {
       result[decodeURIComponent(key)] = decodeURIComponent(
-        value.replace(/\+/g, ' ')
+        value.replace(/\+/g, ' '),
       );
     } catch (e) {
       result[key] = value;
