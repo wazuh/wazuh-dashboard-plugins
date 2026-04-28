@@ -1,38 +1,55 @@
-exports = {};
+/**
+ * Mock JWT for POST /security/user/authenticate (Wazuh API 4.4+).
+ * Uses Java HMAC-SHA256 (Nashorn-compatible) — do not load jsrsasign from
+ * GitHub master; upstream added ES6+ (`const`) which Nashorn cannot parse.
+ */
+var StandardCharsets = Java.type('java.nio.charset.StandardCharsets');
+var Mac = Java.type('javax.crypto.Mac');
+var SecretKeySpec = Java.type('javax.crypto.spec.SecretKeySpec');
+var Base64 = Java.type('java.util.Base64');
 
-load('https://raw.githubusercontent.com/kjur/jsrsasign/master/npm/lib/jsrsasign.js', exports);
-header = {
-  "alg": "HS256",
-  "typ": "JWT",
-  "kid": "vpaas-magic-cookie-1fc542a3e4414a44b2611668195e2bfe/4f4910"
+var header = {
+  alg: 'HS256',
+  typ: 'JWT',
+  kid: 'vpaas-magic-cookie-1fc542a3e4414a44b2611668195e2bfe/4f4910',
 };
 
-// The second part of the token is the payload, which contains the claims.
-// Claims are statements about an entity (typically, the user) and
-// additional data. There are three types of claims:
-// registered, public, and private claims.
-nbf = Date.now() - 1000;
-
-claims = {
-  "iss": "wazuh",
-  "aud": "Wazuh API REST",
-  "nbf": nbf,
-  "exp": nbf + 3600000,
-  "sub": "wazuh",
-  "rbac_roles": [
-    1
-  ],
-  "rbac_mode": "white"
+var nbf = new Date().getTime() - 1000;
+var claims = {
+  iss: 'wazuh',
+  aud: 'Wazuh API REST',
+  nbf: nbf,
+  exp: nbf + 3600000,
+  sub: 'wazuh',
+  rbac_roles: [1],
+  rbac_mode: 'white',
 };
 
+function b64urlSegment(obj) {
+  var json = JSON.stringify(obj);
+  var data = new java.lang.String(json).getBytes(StandardCharsets.UTF_8);
+  return Base64.getUrlEncoder().withoutPadding().encodeToString(data);
+}
 
-jwt = KJUR.jws.JWS.sign("HS256", JSON.stringify(header), JSON.stringify(claims), "616161");
+var secret = '616161';
+var signingInput = b64urlSegment(header) + '.' + b64urlSegment(claims);
+var mac = Mac.getInstance('HmacSHA256');
+var keySpec = new SecretKeySpec(
+  new java.lang.String(secret).getBytes(StandardCharsets.UTF_8),
+  'HmacSHA256'
+);
+mac.init(keySpec);
+var sigBytes = mac.doFinal(
+  new java.lang.String(signingInput).getBytes(StandardCharsets.UTF_8)
+);
+var signature = Base64.getUrlEncoder().withoutPadding().encodeToString(sigBytes);
+var jwt = signingInput + '.' + signature;
 
-resp = {
-  "data": {
-    "token": jwt,
-    "error": 0
-  }
+var resp = {
+  data: {
+    token: jwt,
+    error: 0,
+  },
 };
 
 respond()
