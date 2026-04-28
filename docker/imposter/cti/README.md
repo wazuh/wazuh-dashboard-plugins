@@ -1,4 +1,3 @@
-
 Mocks the CTI Console registration and authorization endpoints used during
 local development of the Wazuh Dashboard CTI integration.
 
