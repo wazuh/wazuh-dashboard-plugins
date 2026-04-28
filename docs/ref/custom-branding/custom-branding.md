@@ -33,13 +33,13 @@ systemctl restart wazuh-dashboard
 ```
 
 Home logo:
-![Home logo](./custom-branding/images/home_logo.png)
+![Home logo](./images/home_logo.png)
 
 Expanded header logo:
 
 > visible when `opensearchDashboards.branding.useExpandedHeader: true`
 
-![Expanded header logo](./custom-branding/images/expanded_header_logo.png)
+![Expanded header logo](./images/expanded_header_logo.png)
 
 ## Application title
 
@@ -58,7 +58,7 @@ Restart the service after changes:
 systemctl restart wazuh-dashboard
 ```
 
-![Application title](./custom-branding/images/application_title.png)
+![Application title](./images/application_title.png)
 
 ## Favicon
 
@@ -75,7 +75,7 @@ Restart the service after changes:
 systemctl restart wazuh-dashboard
 ```
 
-![Favicon](./custom-branding/images/favicon_logo.png)
+![Favicon](./images/favicon_logo.png)
 
 ### Login page
 
@@ -97,7 +97,7 @@ Restart the service after changes:
 systemctl restart wazuh-dashboard
 ```
 
-![Login page](./custom-branding/images/login_page_basicauth.png)
+![Login page](./images/login_page_basicauth.png)
 
 <!--
 #### Provider authentication

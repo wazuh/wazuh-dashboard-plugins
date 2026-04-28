@@ -28,7 +28,7 @@
 - [Agent Deploy One-Liner](ref/agent-deploy-one-liner.md)
 - [Configuration](ref/configuration.md)
 - [Single Sign-On](ref/sso.md)
-- [Custom Branding](ref/custom-branding.md)
+- [Custom Branding](ref/custom-branding/custom-branding.md)
 - [Modules](ref/modules/README.md)
   - [Health check](ref/modules/healthcheck.md)
   - [Notifications and Alerting](ref/modules/notifications-alerting.md)
