@@ -1,29 +1,23 @@
 # Uninstalling the Wazuh dashboard
 
-Follow the step below to uninstall the Wazuh dashboard using your package manager.
+Follow the steps below to uninstall the Wazuh dashboard package.
 
-## Remove the Wazuh dashboard installation.
+## Remove the Wazuh dashboard installation
 
-**APT**
+**Debian-based platforms:**
 
 ```bash
-apt-get remove --purge wazuh-dashboard -y
+sudo dpkg --purge wazuh-dashboard
+sudo rm -rf /var/lib/wazuh-dashboard/
+sudo rm -rf /usr/share/wazuh-dashboard/
+sudo rm -rf /etc/wazuh-dashboard/
 ```
 
-**Yum**
+**Red Hat-based platforms:**
 
 ```bash
-yum remove wazuh-dashboard -y
-rm -rf /var/lib/wazuh-dashboard/
-rm -rf /usr/share/wazuh-dashboard/
-rm -rf /etc/wazuh-dashboard/
-```
-
-**DNF**
-
-```bash
-dnf remove wazuh-dashboard -y
-rm -rf /var/lib/wazuh-dashboard/
-rm -rf /usr/share/wazuh-dashboard/
-rm -rf /etc/wazuh-dashboard/
+sudo rpm -e wazuh-dashboard
+sudo rm -rf /var/lib/wazuh-dashboard/
+sudo rm -rf /usr/share/wazuh-dashboard/
+sudo rm -rf /etc/wazuh-dashboard/
 ```

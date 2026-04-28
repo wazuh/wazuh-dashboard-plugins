@@ -12,22 +12,16 @@ Follow these steps to install the Wazuh dashboard.
 
 1. Install the following packages if missing.
 
-#### APT
+#### Debian-based platforms
 
 ```bash
-apt-get install debhelper tar curl libcap2-bin # debhelper version 9 or later
+dpkg -i debhelper_*.deb tar_*.deb curl_*.deb libcap2-bin_*.deb # debhelper version 9 or later
 ```
 
-#### Yum
+#### Red Hat-based platforms
 
 ```bash
-yum install libcap
-```
-
-#### DNF
-
-```bash
-dnf install libcap
+rpm -ivh libcap-*.rpm
 ```
 
 ### Downloading the package
@@ -38,23 +32,17 @@ See the [Package Download](packages.md#package-download) section for available r
 
 1. Install the Wazuh dashboard package.
 
-   **Debian-based:**
+**Debian-based platforms:**
 
-   ```bash
-   dpkg -i wazuh-dashboard_<VERSION>-<REVISION>_<ARCHITECTURE>.deb
-   ```
+```bash
+dpkg -i wazuh-dashboard_*.deb
+```
 
-   **RHEL/CentOS-based:**
+**Red Hat-based platforms:**
 
-   ```bash
-   yum localinstall wazuh-dashboard-<VERSION>-<REVISION>.<ARCHITECTURE>.rpm
-   ```
-
-   **RHEL/CentOS-based (DNF):**
-
-   ```bash
-   dnf localinstall wazuh-dashboard-<VERSION>-<REVISION>.<ARCHITECTURE>.rpm
-   ```
+```bash
+rpm -ivh wazuh-dashboard-*.rpm
+```
 
 ### Configuring the Wazuh dashboard
 

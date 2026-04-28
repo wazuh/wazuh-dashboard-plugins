@@ -3,22 +3,22 @@
 The Wazuh dashboard provides a **Deploy new agent** wizard, but you can also
 use one-line commands on Linux endpoints by passing deployment variables.
 
-## Example (APT)
+## Example (Debian-based platforms)
 
 ```bash
 WAZUH_MANAGER="manager.example.org" \
 WAZUH_REGISTRATION_SERVER="manager.example.org" \
 WAZUH_AGENT_GROUP="linux-servers" \
-apt-get install wazuh-agent
+dpkg -i wazuh-agent_*.deb
 ```
 
-## Example (Yum/DNF)
+## Example (Red Hat-based platforms)
 
 ```bash
 WAZUH_MANAGER="manager.example.org" \
 WAZUH_REGISTRATION_SERVER="manager.example.org" \
 WAZUH_AGENT_GROUP="linux-servers" \
-yum install wazuh-agent
+rpm -ivh wazuh-agent-*.rpm
 ```
 
 Use the manager FQDN for both `WAZUH_MANAGER` and `WAZUH_REGISTRATION_SERVER`

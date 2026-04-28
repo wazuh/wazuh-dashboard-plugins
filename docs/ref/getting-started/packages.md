@@ -12,14 +12,14 @@ Two package formats are available:
 - **File pattern**: `wazuh-dashboard_<version>-<revision>_amd64.deb`
 - **Example**: `wazuh-dashboard_5.0.0-1_amd64.deb`
 - **Supported distributions**: Debian, Ubuntu
-- **Package manager**: `apt`, `apt-get`, `dpkg`
+- **Package manager**: `dpkg`
 
 ### RPM (Red Hat-based distributions)
 
 - **File pattern**: `wazuh-dashboard-<version>-<revision>.x86_64.rpm`
 - **Example**: `wazuh-dashboard-5.0.0-1.x86_64.rpm`
 - **Supported distributions**: RHEL, CentOS, Fedora, Amazon Linux
-- **Package manager**: `yum`, `dnf`, `rpm`
+- **Package manager**: `rpm`
 
 ## Package name
 

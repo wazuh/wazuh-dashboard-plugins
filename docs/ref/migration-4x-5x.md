@@ -224,9 +224,9 @@ Follow this sequence to avoid compatibility issues:
 sudo systemctl stop wazuh-dashboard
 
 # Upgrade indexer
-sudo apt-get update && sudo apt-get install wazuh-indexer=5.0.0-1  # Debian/Ubuntu
+sudo dpkg -i wazuh-indexer_*.deb  # Debian-based platforms
 # OR
-sudo yum install wazuh-indexer-5.0.0-1  # RHEL/CentOS
+sudo rpm -Uvh wazuh-indexer-*.rpm  # Red Hat-based platforms
 
 # Restart indexer
 sudo systemctl restart wazuh-indexer
@@ -239,9 +239,9 @@ curl -k -u admin:admin https://localhost:9200/_cluster/health?pretty
 
 ```bash
 # Upgrade manager
-sudo apt-get install wazuh-manager=5.0.0-1  # Debian/Ubuntu
+sudo dpkg -i wazuh-manager_*.deb  # Debian-based platforms
 # OR
-sudo yum install wazuh-manager-5.0.0-1  # RHEL/CentOS
+sudo rpm -Uvh wazuh-manager-*.rpm  # Red Hat-based platforms
 
 # Restart manager
 sudo systemctl restart wazuh-manager
@@ -254,9 +254,9 @@ sudo systemctl status wazuh-manager
 
 ```bash
 # Upgrade dashboard package
-sudo apt-get install wazuh-dashboard=5.0.0-1  # Debian/Ubuntu
+sudo dpkg -i wazuh-dashboard_*.deb  # Debian-based platforms
 # OR
-sudo yum install wazuh-dashboard-5.0.0-1  # RHEL/CentOS
+sudo rpm -Uvh wazuh-dashboard-*.rpm  # Red Hat-based platforms
 
 # Do NOT start yet - configure first
 ```
@@ -682,10 +682,10 @@ sudo systemctl stop wazuh-dashboard
 
 ```bash
 # Debian/Ubuntu
-sudo apt-get install wazuh-dashboard=4.9.0-1 --allow-downgrades
+sudo dpkg -i wazuh-dashboard_*.deb
 
 # RHEL/CentOS
-sudo yum downgrade wazuh-dashboard-4.9.0-1
+sudo rpm -Uvh --oldpackage wazuh-dashboard-*.rpm
 ```
 
 ### 3. Restore configuration

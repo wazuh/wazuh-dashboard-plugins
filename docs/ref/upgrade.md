@@ -40,22 +40,16 @@ cp /etc/wazuh-dashboard/opensearch_dashboards.yml /etc/wazuh-dashboard/opensearc
 
 See the [Package Download](getting-started/packages.md#package-download) section for available repositories and download instructions.
 
-**Debian-based:**
+**Debian-based platforms:**
 
 ```bash
-dpkg -i wazuh-dashboard_<VERSION>-<REVISION>_<ARCHITECTURE>.deb
+dpkg -i wazuh-dashboard_*.deb
 ```
 
-**RHEL/CentOS-based:**
+**Red Hat-based platforms:**
 
 ```bash
-yum localinstall wazuh-dashboard-<VERSION>-<REVISION>.<ARCHITECTURE>.rpm
-```
-
-**RHEL/CentOS-based (DNF):**
-
-```bash
-dnf localinstall wazuh-dashboard-<VERSION>-<REVISION>.<ARCHITECTURE>.rpm
+rpm -ivh wazuh-dashboard-*.rpm
 ```
 
 > **Note:** When prompted, choose to replace the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file with the updated version.
