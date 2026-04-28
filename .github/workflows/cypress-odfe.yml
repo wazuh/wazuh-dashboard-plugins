@@ -34,17 +34,23 @@ jobs:
   setup-wazuh-kibana-app:
     name: Run setup environment wazuh kibana app
     runs-on: ubuntu-latest
+    env:
+      WAZUH_VERSION: ${{ github.event.inputs.wazuh-version }}
+      ELASTIC_VERSION: ${{ github.event.inputs.elastic-version }}
+      ODFE_VERSION: ${{ github.event.inputs.odfe-version }}
+      UBUNTU_CYPRESS_VERSION: ${{ github.event.inputs.ubuntu-cypress-version }}
+      URL_PACKAGE: ${{ github.event.inputs.url-package }}
     steps:
       - name: Step 01 - Set up environment variables
         run: |
           echo "PATH_TEMPLATE=$GITHUB_WORKSPACE/wazuh-app-environments/templates_elastic_prod/es_odfe-wz_cluster-agent/" >> $GITHUB_ENV
 
           echo "Information about the workflow (odfe):
-          wazuh-version: ${{ github.event.inputs.wazuh-version }}
-          elastic-version: ${{ github.event.inputs.elastic-version }}
-          odfe-version: ${{ github.event.inputs.odfe-version }}
-          ubuntu-cypress-version: ${{ github.event.inputs.ubuntu-cypress-version }}
-          url-package: ${{ github.event.inputs.url-package }}"
+          wazuh-version: $WAZUH_VERSION
+          elastic-version: $ELASTIC_VERSION
+          odfe-version: $ODFE_VERSION
+          ubuntu-cypress-version: $UBUNTU_CYPRESS_VERSION
+          url-package: $URL_PACKAGE"
 
       - name: Step 02 - Download Project wazuh-app-environments
         uses: actions/checkout@v4
@@ -58,10 +64,10 @@ jobs:
           cd $GITHUB_WORKSPACE/wazuh-app-environments/
           mkdir packages
           cd ${{ env.PATH_TEMPLATE }}
-          sed -i -e 's|WAZUH_VERSION=.*|WAZUH_VERSION=${{ github.event.inputs.wazuh-version }}|g' ./.env
-          sed -i -e 's|ELASTIC_VERSION=.*|ELASTIC_VERSION=${{ github.event.inputs.elastic-version }}|g' ./.env
-          sed -i -e 's|ODFE_VERSION=.*|ODFE_VERSION=${{ github.event.inputs.odfe-version }}|g' ./.env
-          sed -i -e 's|UBUNTU_CYPRESS_VERSION=.*|UBUNTU_CYPRESS_VERSION=${{ github.event.inputs.ubuntu-cypress-version }}|g' ./.env
+          sed -i -e "s|WAZUH_VERSION=.*|WAZUH_VERSION=$WAZUH_VERSION|g" ./.env
+          sed -i -e "s|ELASTIC_VERSION=.*|ELASTIC_VERSION=$ELASTIC_VERSION|g" ./.env
+          sed -i -e "s|ODFE_VERSION=.*|ODFE_VERSION=$ODFE_VERSION|g" ./.env
+          sed -i -e "s|UBUNTU_CYPRESS_VERSION=.*|UBUNTU_CYPRESS_VERSION=$UBUNTU_CYPRESS_VERSION|g" ./.env
           cat .env
       - name: Step 04 - Starting containers
         run: |
@@ -72,7 +78,7 @@ jobs:
       - name: Step 05 - Installing package from url
         run: |
           cd ${{ env.PATH_TEMPLATE }}
-          docker exec $(docker-compose ps -q kibana) bin/kibana-plugin install ${{ github.event.inputs.url-package }}
+          docker exec $(docker-compose ps -q kibana) bin/kibana-plugin install $URL_PACKAGE
           docker-compose restart kibana
           echo CONTINUES AFTER 60 SECONDS ...
           sleep 60s
@@ -95,7 +101,7 @@ jobs:
       - name: Step 09 - Archive reports
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-reports_ODFE_${{ github.event.inputs.wazuh-version }}-${{ github.event.inputs.odfe-version }}-${{ github.event.inputs.elastic-version }}
+          name: cypress-reports_ODFE_${{ env.WAZUH_VERSION }}-${{ env.ODFE_VERSION }}-${{ env.ELASTIC_VERSION }}
           path: ${{ env.PATH_TEMPLATE }}/report/*
           overwrite: true
       - name: Step 10 - Log parsing
@@ -116,6 +122,6 @@ jobs:
           channel-id:
             ${{ secrets.SLACK_CHANNEL_ID }}
             # For posting a simple plain text message
-          slack-message: "The following workflow was executed: ${{ github.workflow }}\nWazuh version: ${{ github.event.inputs.wazuh-version }}\nElastic version: ${{ github.event.inputs.elastic-version }}\nODFE version: ${{ github.event.inputs.odfe-version }}\nUbuntu Cypress version: ${{ github.event.inputs.ubuntu-cypress-version }}\nPackage used: ${{ github.event.inputs.url-package }}\n\nTest summary:\n\tTotal Test: ${{ env.TEST_TOTAL }}\n\tPassing: ${{ env.TEST_PASSING }}\n\tFailing: ${{ env.TEST_FAILING }}\n\tPending: ${{ env.TEST_PENDING }}\n\tSkipped: ${{ env.TEST_SKIPPED }}\n\tTotal Time: ${{ env.TEST_TIME }}\n\nFor more information visit: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          slack-message: "The following workflow was executed: ${{ github.workflow }}\nWazuh version: ${{ env.WAZUH_VERSION }}\nElastic version: ${{ env.ELASTIC_VERSION }}\nODFE version: ${{ env.ODFE_VERSION }}\nUbuntu Cypress version: ${{ env.UBUNTU_CYPRESS_VERSION }}\nPackage used: ${{ env.URL_PACKAGE }}\n\nTest summary:\n\tTotal Test: ${{ env.TEST_TOTAL }}\n\tPassing: ${{ env.TEST_PASSING }}\n\tFailing: ${{ env.TEST_FAILING }}\n\tPending: ${{ env.TEST_PENDING }}\n\tSkipped: ${{ env.TEST_SKIPPED }}\n\tTotal Time: ${{ env.TEST_TIME }}\n\nFor more information visit: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.ACTIONS_SLACK_TOKEN }}

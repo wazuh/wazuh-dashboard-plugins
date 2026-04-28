@@ -26,15 +26,19 @@ jobs:
   setup-wazuh-dashboard-app:
     name: Run setup environment wazuh dashboard app
     runs-on: ubuntu-latest
+    env:
+      WAZUH_STACK_VERSION: ${{ github.event.inputs.wazuh-stack-version }}
+      UBUNTU_CYPRESS_VERSION: ${{ github.event.inputs.ubuntu-cypress-version }}
+      URL_PACKAGE: ${{ github.event.inputs.url-package }}
     steps:
       - name: Step 01 - Set up environment variables
         run: |
           echo "PATH_TEMPLATE=$GITHUB_WORKSPACE/wazuh-app-environments/templates_wazuh_prod/" >> $GITHUB_ENV
 
           echo "Information about the workflow (wzd):
-          wazuh-stack-version: ${{ github.event.inputs.wazuh-stack-version }}
-          ubuntu-cypress-version: ${{ github.event.inputs.ubuntu-cypress-version }}
-          url-package: ${{ github.event.inputs.url-package }}"
+          wazuh-stack-version: $WAZUH_STACK_VERSION
+          ubuntu-cypress-version: $UBUNTU_CYPRESS_VERSION
+          url-package: $URL_PACKAGE"
 
       - name: Step 02 - Download Project wazuh-app-environments
         uses: actions/checkout@v4
@@ -48,8 +52,8 @@ jobs:
           cd $GITHUB_WORKSPACE/wazuh-app-environments/
           mkdir packages
           cd ${{ env.PATH_TEMPLATE }}
-          sed -i -e 's|WAZUH_STACK_VERSION=.*|WAZUH_STACK_VERSION=${{ github.event.inputs.wazuh-stack-version }}|g' ./.env
-          sed -i -e 's|UBUNTU_CYPRESS_VERSION=.*|UBUNTU_CYPRESS_VERSION=${{ github.event.inputs.ubuntu-cypress-version }}|g' ./.env
+          sed -i -e "s|WAZUH_STACK_VERSION=.*|WAZUH_STACK_VERSION=$WAZUH_STACK_VERSION|g" ./.env
+          sed -i -e "s|UBUNTU_CYPRESS_VERSION=.*|UBUNTU_CYPRESS_VERSION=$UBUNTU_CYPRESS_VERSION|g" ./.env
           cat .env
       - name: Step 04 - Starting containers
         run: |
@@ -68,7 +72,7 @@ jobs:
       - name: Step 06 - Installing package from url
         run: |
           cd ${{ env.PATH_TEMPLATE }}
-          docker exec $(docker-compose ps -q wazuh.dashboard) bin/opensearch-dashboards-plugin install ${{ github.event.inputs.url-package }}
+          docker exec $(docker-compose ps -q wazuh.dashboard) bin/opensearch-dashboards-plugin install $URL_PACKAGE
           docker-compose restart wazuh.dashboard
           echo CONTINUES AFTER 60 SECONDS ...
           sleep 60s
@@ -86,7 +90,7 @@ jobs:
       - name: Step 09 - Archive reports
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-reports_WZD_${{ github.event.inputs.wazuh-stack-version }}
+          name: cypress-reports_WZD_${{ env.WAZUH_STACK_VERSION }}
           path: ${{ env.PATH_TEMPLATE }}/report/*
           overwrite: true
       - name: Step 10 - Log parsing
@@ -107,6 +111,6 @@ jobs:
           channel-id:
             ${{ secrets.SLACK_CHANNEL_ID }}
             # For posting a simple plain text message
-          slack-message: "The following workflow was executed: ${{ github.workflow }}\nWazuh stack version: ${{ github.event.inputs.wazuh-stack-version }}\nUbuntu Cypress version: ${{ github.event.inputs.ubuntu-cypress-version }}\nPackage used: ${{ github.event.inputs.url-package }}\n\nTest summary:\n\tTotal Test: ${{ env.TEST_TOTAL }}\n\tPassing: ${{ env.TEST_PASSING }}\n\tFailing: ${{ env.TEST_FAILING }}\n\tPending: ${{ env.TEST_PENDING }}\n\tSkipped: ${{ env.TEST_SKIPPED }}\n\tTotal Time: ${{ env.TEST_TIME }}\n\nFor more information visit: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          slack-message: "The following workflow was executed: ${{ github.workflow }}\nWazuh stack version: ${{ env.WAZUH_STACK_VERSION }}\nUbuntu Cypress version: ${{ env.UBUNTU_CYPRESS_VERSION }}\nPackage used: ${{ env.URL_PACKAGE }}\n\nTest summary:\n\tTotal Test: ${{ env.TEST_TOTAL }}\n\tPassing: ${{ env.TEST_PASSING }}\n\tFailing: ${{ env.TEST_FAILING }}\n\tPending: ${{ env.TEST_PENDING }}\n\tSkipped: ${{ env.TEST_SKIPPED }}\n\tTotal Time: ${{ env.TEST_TIME }}\n\nFor more information visit: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.ACTIONS_SLACK_TOKEN }}
