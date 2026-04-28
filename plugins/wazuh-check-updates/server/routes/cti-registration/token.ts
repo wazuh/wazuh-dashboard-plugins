@@ -1,6 +1,9 @@
 import { IRouter } from 'opensearch-dashboards/server';
 import { schema } from '@osd/config-schema';
-import { getCtiToken } from '../../services/cti-registration';
+import {
+  getCtiToken,
+  resolveCtiOAuthClientId,
+} from '../../services/cti-registration';
 import { routes } from '../../../common/constants';
 
 export const getCtiTokenRoute = (router: IRouter) => {
@@ -9,26 +12,15 @@ export const getCtiTokenRoute = (router: IRouter) => {
       path: routes.token,
       validate: {
         body: schema.object({
-          currentApiId: schema.string(),
+          client_id: schema.maybe(schema.string()),
         }),
       },
     },
-    async (context, request, response) => {
+    async (_context, request, response) => {
       try {
-        const { currentApiId } = request.body;
+        const clientId = resolveCtiOAuthClientId(request.body.client_id);
 
-        const wazuhCore = context.wazuh_core;
-
-        const nodeInfo = await wazuhCore.serverAPIClient.asInternalUser.request(
-          'GET',
-          `/cluster/imposter/info`,
-          {},
-          { apiHostID: currentApiId },
-        );
-
-        const uuid = nodeInfo?.data?.data?.affected_items?.[0]?.uuid
-
-        const tokenResponse = await getCtiToken(uuid);
+        const tokenResponse = await getCtiToken(clientId);
 
         return response.ok({
           body: tokenResponse,

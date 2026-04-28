@@ -14,11 +14,6 @@ export enum routes {
   contentUpdate = `${ctiBasePath}/update`,
 }
 
-const ctiPath = 'https://console.precti.wazuh.com';
-export enum ctiUrls {
-  token = `${ctiPath}/api/v1/instances/token`,
-}
-
 const WAZUH_CONTENT_MANAGER_BASE_PATH = '/_plugins/content-manager';
 export const enum contentManagerRoutes {
   subscription = `${WAZUH_CONTENT_MANAGER_BASE_PATH}/subscription`,

@@ -1,2 +1,2 @@
 export { subscriptionToIndexer } from './subscriptions';
-export { getCtiToken } from './token';
+export { getCtiToken, resolveCtiOAuthClientId } from './token';
