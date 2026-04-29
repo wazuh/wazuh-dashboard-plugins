@@ -27,8 +27,9 @@ export const drilldownIPConfig = props => {
                 <DashboardRenderer
                   dashboardId='office-drilldown-ip-config-panel-tab'
                   hasPinnedAgent={false}
-                  config={{ dataSource: { fetchFilters, searchBarProps } }} />
-                </div>
+                  config={{ dataSource: { fetchFilters, searchBarProps } }}
+                />
+              </div>
             ),
           },
         ],

@@ -27,8 +27,9 @@ export const drilldownRulesConfig = props => {
                 <DashboardRenderer
                   dashboardId='office-drilldown-rules-config-panel-tab'
                   hasPinnedAgent={false}
-                  config={{ dataSource: { fetchFilters, searchBarProps } }} />
-                </div>
+                  config={{ dataSource: { fetchFilters, searchBarProps } }}
+                />
+              </div>
             ),
           },
         ],
