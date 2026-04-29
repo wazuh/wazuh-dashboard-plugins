@@ -131,6 +131,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the Statistics app [#8218](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8218)
 - Removed some options of the manager and agent configuration [#8243](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8243)
 - Removed GPG13 option in Compliance panel in agent overview [#8307](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8307)
+- Removed default notification channels creation health check [#8405](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8405)
 
 ## Wazuh v4.14.6 - OpenSearch Dashboards 2.19.5 - Revision 00
 
