@@ -10,13 +10,16 @@ export const useCtiStatus = (deviceFlowNonce = 0) => {
     message: '',
   });
   const [loading, setLoading] = useState(true);
+  const [pollingSeed, setPollingSeed] = useState(0);
 
   const fetchStatus = useCallback(async (options?: { silent?: boolean }) => {
     try {
       if (!options?.silent) {
         setLoading(true);
       }
-      const response = await fetchCtiRegistrationStatus();
+      const response = await fetchCtiRegistrationStatus({
+        skipHydrate: Boolean(options?.silent),
+      });
       setStatusCTI({
         status: response.statusCode,
         message: response.message,
@@ -30,6 +33,12 @@ export const useCtiStatus = (deviceFlowNonce = 0) => {
     } finally {
       if (!options?.silent) {
         setLoading(false);
+        if (
+          ctiFlowState.getDeviceCode() &&
+          !ctiFlowState.isRegistrationComplete()
+        ) {
+          setPollingSeed(s => s + 1);
+        }
       }
     }
   }, []);
@@ -82,7 +91,7 @@ export const useCtiStatus = (deviceFlowNonce = 0) => {
         clearTimeout(timeoutId);
       }
     };
-  }, [deviceFlowNonce, fetchStatus]);
+  }, [deviceFlowNonce, pollingSeed, fetchStatus]);
 
   return { statusCTI, loading, refetchStatus: fetchStatus };
 };

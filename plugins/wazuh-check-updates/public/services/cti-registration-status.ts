@@ -4,6 +4,7 @@ import {
   routes,
   statusCodes,
 } from '../../common/constants';
+import type { CtiRegistrationStatusApiBody } from '../../common/cti-registration-status-api';
 import { ctiFlowState } from './cti-flow-state';
 import { getCore } from '../plugin-services';
 
@@ -17,10 +18,46 @@ function formatOAuthErrorMessage(
   return error;
 }
 
-export async function fetchCtiRegistrationStatus(): Promise<{
+export async function hydrateCtiFlowFromServer(): Promise<void> {
+  const body = await getCore().http.get<CtiRegistrationStatusApiBody>(
+    routes.ctiRegistrationStatus,
+  );
+
+  if (body.registrationComplete) {
+    ctiFlowState.setRegistrationComplete(true);
+    return;
+  }
+
+  if (body.inProgress && body.device_code) {
+    ctiFlowState.setRegistrationComplete(false);
+    ctiFlowState.setDeviceCode(body.device_code);
+    if (typeof body.poll_interval_sec === 'number') {
+      ctiFlowState.setPollIntervalSec(body.poll_interval_sec);
+    }
+    if (
+      typeof body.expires_in_remaining_sec === 'number' &&
+      body.expires_in_remaining_sec > 0
+    ) {
+      ctiFlowState.setDeviceAuthExpiry(body.expires_in_remaining_sec);
+    }
+    return;
+  }
+
+  if (ctiFlowState.getDeviceCode() || ctiFlowState.isRegistrationComplete()) {
+    ctiFlowState.reset();
+  }
+}
+
+export async function fetchCtiRegistrationStatus(options?: {
+  skipHydrate?: boolean;
+}): Promise<{
   statusCode: number;
   message: string;
 }> {
+  if (!options?.skipHydrate) {
+    await hydrateCtiFlowFromServer();
+  }
+
   try {
     if (ctiFlowState.isRegistrationComplete()) {
       return { statusCode: statusCodes.SUCCESS, message: '' };

@@ -1,11 +1,16 @@
 import { IRouter } from 'opensearch-dashboards/server';
 import { schema } from '@osd/config-schema';
+import { getWazuhCheckUpdatesServices } from '../../plugin-services';
 import {
   CtiConfigurationError,
   getCtiToken,
   pollCtiToken,
   resolveCtiOAuthClientId,
 } from '../../services/cti-registration';
+import {
+  CtiRegistrationStore,
+  parseDeviceAuthorizationForStore,
+} from '../../services/cti-registration/cti-registration-store';
 import {
   routes,
   CTI_OAUTH_DEVICE_GRANT_TYPE,
@@ -51,20 +56,44 @@ export const getCtiTokenRoute = (router: IRouter) => {
           });
         }
 
+        const clientId = await resolveCtiOAuthClientId(client_id);
+
         if (hasPoll) {
-          const clientId = await resolveCtiOAuthClientId(client_id);
+          const store = CtiRegistrationStore.getInstance();
           const pollBody = (await pollCtiToken(
             clientId,
             device_code,
           )) as Record<string, unknown>;
+
           if (isSuccessfulUpstreamDevicePoll(pollBody)) {
+            store.setRegistrationComplete(clientId);
             return response.ok({ body: CTI_REGISTRATION_COMPLETED_BODY });
           }
+
+          const err =
+            typeof pollBody.error === 'string' ? pollBody.error : undefined;
+          if (err === 'slow_down') {
+            store.applySlowDown(clientId);
+          } else if (err === 'authorization_pending') {
+            /* keep in-memory registration state */
+          } else if (err) {
+            store.clear(clientId);
+          }
+
           return response.ok({ body: pollBody });
         }
 
-        const clientId = await resolveCtiOAuthClientId(client_id);
         const tokenResponse = await getCtiToken(clientId);
+
+        try {
+          const parsed = parseDeviceAuthorizationForStore(tokenResponse);
+          CtiRegistrationStore.getInstance().setInProgress(clientId, parsed);
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : String(e);
+          getWazuhCheckUpdatesServices().logger.warn(
+            `CTI registration store not updated: ${msg}`,
+          );
+        }
 
         return response.ok({
           body: tokenResponse,

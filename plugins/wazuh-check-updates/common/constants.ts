@@ -10,6 +10,7 @@ export enum routes {
   checkUpdates = '/api/wazuh-check-updates/updates',
   userPreferences = '/api/wazuh-check-updates/user-preferences/me',
   token = `${ctiBasePath}/token`,
+  ctiRegistrationStatus = `${ctiBasePath}/status`,
   contentUpdate = `${ctiBasePath}/update`,
 }
 
