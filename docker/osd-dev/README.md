@@ -8,7 +8,6 @@
   `sudo sysctl -w vm.max_map_count=262144`
 
   To make the change permanent in host machine:
-
   - In host machine:
     `sudo nano /etc/sysctl.conf`
   - Add at the end of the file: vm.max_map_count=262144
@@ -17,7 +16,6 @@
 
   The jq tool is used by the scripts to process JSON files.
   To install jq, you can run this command:
-
   - In Debian/Ubuntu:
     `sudo apt-get install jq`
   - In RedHat/CentOS:
@@ -38,7 +36,8 @@ Always use the provided script to bring up or down the development environment. 
   [-a <rpm|deb|without>]  # aliases: none, 0 \
   [-r <repo>=</absolute/path> ...] \
   [-saml | --server <version> | --server-local <tag> | --indexer-local [tag]] \
-  [--base [</absolute/path>]]
+  [--base [</absolute/path>]] \
+  [--mailpit]
 ```
 
 ### About <common-parent-directory>
@@ -75,6 +74,14 @@ Always use the provided script to bring up or down the development environment. 
   # Example entry in /etc/hosts
   127.0.0.1 idp
   ```
+- --mailpit: (Optional) Enables Mailpit email testing service for development.
+  - Web UI: Access at http://localhost:8025 to view captured emails
+  - SMTP server: Available at localhost:1025
+  - Use this to test and debug email functionality during development
+  - Example SMTP configuration for applications:
+    - Host: `mailpit` (from within Docker network) or `localhost` (from host)
+    - Port: `1025`
+    - No authentication required (development mode)
 - --server <version>: (Optional) Deploys an environment with a real Wazuh server using the given release version (e.g., 4.7.2) for WAZUH_STACK.
 - --server-local <tag>: (Optional) Deploys an environment with a local Wazuh server package using the given image tag (e.g., my-custom-image) for IMAGE_TAG.
   - Important for `server-local`: Place the Wazuh manager installation packages (`.deb`) in `wazuh-dashboard-plugins/docker/osd-dev/manager/` and any Wazuh agent packages (`.rpm`/`.deb`) in `wazuh-dashboard-plugins/docker/osd-dev/agents/`.
@@ -115,7 +122,6 @@ Examples (shorthand alias resolves to the canonical folder 'wazuh-security-dashb
 ### Search Order and Precedence (Security Plugin)
 
 - Auto-discovery (no `-r`):
-
   - Looks only at the canonical folder 'wazuh-security-dashboards-plugin' under your <common-parent-directory>.
 
 - Overrides with `-r` (takes precedence):
@@ -187,6 +193,18 @@ Environment with a local Wazuh indexer build:
 ./dev.sh up --plugins-root /absolute/path/to/wazuh-dashboard-plugins/plugins --indexer-local my-custom-tag
 ```
 
+Environment with Mailpit email testing:
+
+```sh
+./dev.sh up --mailpit
+```
+
+Environment with server and Mailpit:
+
+```sh
+./dev.sh up --server 4.7.2 --mailpit
+```
+
 Important Note about Plugin Version:
 
 The script will not select the appropriate version of the wazuh-dashboard-plugins to use, so be sure to check out the appropriate version before bringing up the environment!
@@ -205,7 +223,6 @@ The script will not select the appropriate version of the wazuh-dashboard-plugin
 #### Warning
 
 - After using the yarn start command, an error about missing dependencies could appear, to fix the dependencies:
-
   - In osd-dev container shell inside `/plugins` folder:
     `for d in */; do (cd "$d" && yarn); done`
 
@@ -238,6 +255,44 @@ For SAML-enabled environments, use:
 ```
 wazuh:wazuh
 ```
+
+## Email Notifications Configuration
+
+### Mailpit Setup
+
+The development environment includes **Mailpit**, a development SMTP server that captures and displays emails sent from the application without actually sending them.
+
+#### Configuring the Notifications Sender
+
+To configure the notifications sender to use Mailpit:
+
+1. **Access notification settings** in Wazuh Dashboard:
+   - Go to the `Notifications` section
+
+2. **Configure the sender with these settings**:
+
+   ```
+   SMTP Host: mailpit
+   SMTP Port: 1025
+   Security: None (No SSL/TLS)
+   From Email: noreply@wazuh.local
+   ```
+
+   **Note**: The recipient email address doesn't matter when using Mailpit. All emails will be captured and displayed in the Mailpit interface regardless of the recipient address, and no actual emails will be delivered to real email accounts.
+
+3. **Access Mailpit web interface**:
+   - URL: http://localhost:8025
+   - Here you can view all captured emails during development
+
+#### Testing the Configuration
+
+To verify that notifications are working correctly:
+
+1. Set up a notification rule in Wazuh Dashboard
+2. Generate an event that triggers the notification
+3. Check that the email appears in the Mailpit interface (http://localhost:8025)
+
+**Note**: Mailpit is only available in the development environment and should not be used in production.
 
 ## Notes
 
