@@ -2,7 +2,7 @@
 
 ## Supported operating systems
 
-Even though we aim to support as many operating systems as [OpenSearch Dashboards](https://docs.opensearch.org/latest/install-and-configure/install-dashboards/index/) does and Wazuh dashboard should work on many Linux distributions, we only test a handful of Linux distributions. The following table lists the operating system versions that we currently support.
+Even though we aim to support as many operating systems as [OpenSearch Dashboards](https://docs.opensearch.org/3.6/install-and-configure/install-dashboards/index/) does and Wazuh dashboard should work on many Linux distributions, we only test a handful of Linux distributions. The following table lists the operating system versions that we currently support.
 
 For 5.0.0 and above, we support the operating system versions and architectures included in the table below.
 | Name | Version | Architecture |
@@ -16,3 +16,7 @@ For 5.0.0 and above, we support the operating system versions and architectures 
 | Minimum RAM (GB) | Minimum CPU (cores) | Recommended RAM (GB) | Recommended CPU (cores) |
 | ---------------- | ------------------- | -------------------- | ----------------------- |
 | 4                | 2                   | 8                    | 4                       |
+
+## OpenSearch
+
+Currently, Wazuh indexer is using version `3.6.0` of OpenSearch.
