@@ -53,6 +53,8 @@ under `/opt/imposter/config` is loaded, including `cti/cti-config.yml` alongside
 
 ## Quick test
 
+`client_id` must match the **environment UID**: the same value as OpenSearch **`cluster_uuid`** from `GET /` on the cluster root (the dashboard uses that automatically). For ad-hoc curls against Imposter you can use any placeholder string the mock accepts.
+
 ```bash
 # 1. Device authorization request
 curl -i -X POST http://imposter:8080/api/v1/platform/environments/token \

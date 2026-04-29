@@ -220,6 +220,9 @@ services:
     tty: true
     environment:
       - 'LOGS=/proc/1/fd/1'
+      # CTI Console — WAZUH_CTI_CONSOLE_BASE_URL (see docker/imposter/cti/README.md).
+      # OAuth client_id defaults to OpenSearch cluster_uuid (GET /); set WAZUH_CTI_CLIENT_ID only to override.
+      - WAZUH_CTI_CONSOLE_BASE_URL=http://imposter:8080
     entrypoint: ['tail', '-f', '/dev/null']
     volumes:
       - osd_cache:/home/node/.cache
