@@ -19,4 +19,4 @@ We support the operating system versions and architectures included in the table
 
 ## OpenSearch
 
-Currently, Wazuh dashboard is using version `3.6.0` of OpenSearch.
+Currently, Wazuh dashboard is using version `3.6.0` of OpenSearch Dashboards.
