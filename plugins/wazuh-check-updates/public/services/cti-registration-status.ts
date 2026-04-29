@@ -6,10 +6,6 @@ import {
 import { ctiFlowState } from './cti-flow-state';
 import { getCore } from '../plugin-services';
 
-/**
- * Derives CTI registration UI state from the same token endpoint as device
- * authorization (poll with `device_code`) — no separate subscription API.
- */
 export async function fetchCtiRegistrationStatus(): Promise<{
   statusCode: number;
   message: string;

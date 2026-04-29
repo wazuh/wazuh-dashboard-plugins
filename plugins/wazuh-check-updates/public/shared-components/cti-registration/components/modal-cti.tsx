@@ -51,8 +51,6 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     setError(null);
     setLoading(true);
     try {
-      /* Device authorization: server proxies to CTI Console (Imposter in dev).
-       * See docker/imposter/cti/README.md — POST /api/v1/platform/environments/token */
       /* eslint-disable camelcase -- POST body/response match OAuth device authorization field names */
       const ctiResponse = await getCore().http.post<{
         device_code?: string;
@@ -60,7 +58,6 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         verification_uri?: string;
         verification_uri_complete?: string;
       }>(routes.token, {
-        /* client_id omitted: server uses OpenSearch cluster_uuid (GET /) per Wazuh env registration spec */
         body: JSON.stringify({}),
       });
 
