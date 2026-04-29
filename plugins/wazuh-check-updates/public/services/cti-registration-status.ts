@@ -1,6 +1,7 @@
 import {
   CTI_OAUTH_DEVICE_GRANT_TYPE,
   CTI_REGISTRATION_COMPLETED_BODY,
+  CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE,
   routes,
   statusCodes,
 } from '../../common/constants';
@@ -60,7 +61,10 @@ export async function fetchCtiRegistrationStatus(options?: {
 
   try {
     if (ctiFlowState.isRegistrationComplete()) {
-      return { statusCode: statusCodes.SUCCESS, message: '' };
+      return {
+        statusCode: statusCodes.SUCCESS,
+        message: CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE,
+      };
     }
 
     const deviceCode = ctiFlowState.getDeviceCode();
@@ -94,7 +98,10 @@ export async function fetchCtiRegistrationStatus(options?: {
         CTI_REGISTRATION_COMPLETED_BODY.success
     ) {
       ctiFlowState.setRegistrationComplete(true);
-      return { statusCode: statusCodes.SUCCESS, message: '' };
+      return {
+        statusCode: statusCodes.SUCCESS,
+        message: CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE,
+      };
     }
 
     if (typeof res.error === 'string') {

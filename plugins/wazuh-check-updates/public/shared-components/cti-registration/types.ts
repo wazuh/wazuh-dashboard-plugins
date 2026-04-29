@@ -31,4 +31,5 @@ export enum CtiDetails {
 export interface StatusCtiRegistrationProps {
   statusCTI: ISubscriptionResponse;
   refetchStatus: (options?: { silent?: boolean }) => Promise<void>;
+  onOpenModal: () => void;
 }

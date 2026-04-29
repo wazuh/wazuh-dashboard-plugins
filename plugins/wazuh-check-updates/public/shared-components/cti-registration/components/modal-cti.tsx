@@ -11,6 +11,7 @@ import {
   EuiModalFooter,
   EuiModalHeader,
   EuiModalHeaderTitle,
+  EuiProgress,
   EuiSpacer,
   EuiText,
   EuiTitle,
@@ -137,42 +138,59 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
   const showRegistrationFailed =
     statusCTI.status === statusCodes.REGISTRATION_FAILED;
 
+  const showRegistrationIntro =
+    !showSuccess && !showRegistrationFailed;
+
   return (
     <EuiModal onClose={handleModalToggle}>
       <EuiModalHeader>
         <EuiModalHeaderTitle>
           <EuiTitle>
-            <FormattedMessage
-              id='wazuhCheckUpdates.ctiRegistration.modalTitle'
-              defaultMessage='Do you want to register to CTI updates?'
-            />
+            {showSuccess ? (
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.modalTitleSuccess'
+                defaultMessage='CTI updates registration'
+              />
+            ) : showRegistrationFailed ? (
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.modalTitleFailed'
+                defaultMessage='CTI registration'
+              />
+            ) : (
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.modalTitle'
+                defaultMessage='Do you want to register to CTI updates?'
+              />
+            )}
           </EuiTitle>
         </EuiModalHeaderTitle>
       </EuiModalHeader>
 
       <EuiModalBody>
-        <EuiText>
-          <FormattedMessage
-            id='wazuhCheckUpdates.ctiRegistration.modalBodyAdditional'
-            defaultMessage='If you register, you will receive updates about CTI changes and improvements. For more information, visit our {documentationCTIWazuh}.'
-            values={{
-              documentationCTIWazuh: (
-                <EuiLink
-                  href='https://cti.wazuh.com/vulnerabilities/cves'
-                  target='_blank'
-                >
-                  <FormattedMessage
-                    id='wazuhCheckUpdates.ctiRegistration.modalBodyAdditionalLink'
-                    defaultMessage='documentation'
-                  />
-                </EuiLink>
-              ),
-            }}
-          />
-        </EuiText>
+        {showRegistrationIntro ? (
+          <EuiText>
+            <FormattedMessage
+              id='wazuhCheckUpdates.ctiRegistration.modalBodyAdditional'
+              defaultMessage='If you register, you will receive updates about CTI changes and improvements. For more information, visit our {documentationCTIWazuh}.'
+              values={{
+                documentationCTIWazuh: (
+                  <EuiLink
+                    href='https://cti.wazuh.com/vulnerabilities/cves'
+                    target='_blank'
+                  >
+                    <FormattedMessage
+                      id='wazuhCheckUpdates.ctiRegistration.modalBodyAdditionalLink'
+                      defaultMessage='documentation'
+                    />
+                  </EuiLink>
+                ),
+              }}
+            />
+          </EuiText>
+        ) : null}
         {deviceAuth && !showSuccess && !showRegistrationFailed && (
           <>
-            <EuiSpacer size='m' />
+            {showRegistrationIntro ? <EuiSpacer size='m' /> : null}
             <CtiDeviceAuthLinks deviceAuth={deviceAuth} />
           </>
         )}
@@ -182,9 +200,13 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
             <EuiText size='s' color='subdued' data-test-subj='ctiRegistrationInProgress'>
               <FormattedMessage
                 id='wazuhCheckUpdates.ctiRegistration.inProgress'
-                defaultMessage='Registration in progress…'
+                defaultMessage='Registration in progress'
               />
             </EuiText>
+            <EuiSpacer size='xs' />
+            <div className='ctiRegistrationModalProgress'>
+              <EuiProgress size='xs' color='primary' />
+            </div>
           </>
         )}
         {showSuccess && (
@@ -201,6 +223,18 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
                 defaultMessage='Registration successful'
               />
             </EuiText>
+            {statusCTI.message ? (
+              <>
+                <EuiSpacer size='s' />
+                <EuiText
+                  size='s'
+                  color='subdued'
+                  data-test-subj='ctiRegistrationSuccessDetail'
+                >
+                  {statusCTI.message}
+                </EuiText>
+              </>
+            ) : null}
           </>
         )}
         {showRegistrationFailed && (

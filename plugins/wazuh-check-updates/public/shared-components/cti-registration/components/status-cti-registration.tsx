@@ -2,70 +2,77 @@ import React from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 import {
   EuiHealth,
-  EuiButton,
-  EuiPopover,
-  EuiText,
   EuiButtonEmpty,
-  EuiSpacer,
+  EuiLoadingSpinner,
 } from '@elastic/eui';
 import { StatusCtiRegistrationProps } from '../types';
 import { getCore } from '../../../plugin-services';
+import { ctiFlowState } from '../../../services/cti-flow-state';
 import { statusData } from '../../../../common/cti-status-config';
 import { statusCodes } from '../../../../common/constants';
+
+const inlineRow: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 8,
+};
+
+function isBackgroundRegistrationActive(): boolean {
+  return (
+    Boolean(ctiFlowState.getDeviceCode()) &&
+    !ctiFlowState.isRegistrationComplete()
+  );
+}
 
 export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
   statusCTI,
   refetchStatus,
-}: StatusCtiRegistrationProps) => {
-  const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
-
+  onOpenModal,
+}) => {
   const isNewHomePageEnable = getCore().uiSettings.get('home:useNewHomePage');
 
-  const checkStatus = () => {
+  const backgroundActive =
+    statusCTI.status === statusCodes.NOT_FOUND &&
+    isBackgroundRegistrationActive();
+
+  const openRegistrationModal = () => {
     void refetchStatus();
+    onOpenModal();
   };
 
+  const backgroundSpinner = backgroundActive ? (
+    <EuiLoadingSpinner size='s' data-test-subj='ctiStatusBackgroundSpinner' />
+  ) : null;
+
   const statusNavTop = (
-    <EuiButtonEmpty>
+    <EuiButtonEmpty onClick={openRegistrationModal}>
       <EuiHealth
         aria-label={statusData[statusCTI.status].onClickAriaLabel}
         color={statusData[statusCTI.status].color}
       >
-        <FormattedMessage
-          id='wazuhCheckUpdates.ctiRegistration.statusNavTop'
-          defaultMessage='CTI Status'
-        />
+        <span style={inlineRow}>
+          <FormattedMessage
+            id='wazuhCheckUpdates.ctiRegistration.statusNavTop'
+            defaultMessage='CTI Status'
+          />
+          {backgroundSpinner}
+        </span>
       </EuiHealth>
     </EuiButtonEmpty>
   );
 
   const statusBadge = (
-    <EuiHealth
-      onClickAriaLabel={statusData[statusCTI.status].onClickAriaLabel}
-      color={statusData[statusCTI.status].color}
-    />
+    <EuiButtonEmpty
+      aria-label={statusData[statusCTI.status].onClickAriaLabel}
+      onClick={openRegistrationModal}
+      flush='both'
+    >
+      <span style={inlineRow}>
+        <EuiHealth color={statusData[statusCTI.status].color} />
+        {backgroundSpinner}
+      </span>
+    </EuiButtonEmpty>
   );
 
-  return (
-    <EuiPopover
-      button={isNewHomePageEnable ? statusBadge : statusNavTop}
-      isOpen={isPopoverOpen}
-      closePopover={() => setIsPopoverOpen(false)}
-      onClick={() => setIsPopoverOpen(prevState => !prevState)}
-    >
-      <EuiText style={{ width: 300 }}>
-        {statusData[statusCTI.status].message()}
-        {statusCTI.status === statusCodes.REGISTRATION_FAILED &&
-        statusCTI.message ? (
-          <>
-            <EuiSpacer size='s' />
-            <EuiText size='xs' color='danger'>
-              {statusCTI.message}
-            </EuiText>
-          </>
-        ) : null}
-      </EuiText>
-      <EuiButton onClick={checkStatus}>Try again</EuiButton>
-    </EuiPopover>
-  );
+  return isNewHomePageEnable ? statusBadge : statusNavTop;
 };

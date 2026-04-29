@@ -41,6 +41,10 @@ export const CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC = 30 * SECONDS_PER_MINUTE;
  */
 export const CTI_REGISTRATION_COMPLETED_BODY = { success: true } as const;
 
+/** Shown as `message` and in the success modal (i18n `successDetail` default). */
+export const CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE =
+  'This environment is registered for CTI updates. You will be notified about relevant changes when they are available.';
+
 /**
  * Paths on `WAZUH_CTI_CONSOLE_BASE_URL` (Imposter in dev, real CTI Console in prod).
  * See `docker/imposter/cti/README.md`.
