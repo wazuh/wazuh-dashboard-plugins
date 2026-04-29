@@ -6,7 +6,7 @@ import React from 'react';
 import { render, fireEvent, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { getCore } from '../../../plugin-services';
-import { WAZUH_CTI_DEVICE_CODE_SESSION_KEY } from '../../../../common/constants';
+import { ctiFlowState } from '../../../services/cti-flow-state';
 import { ModalCti } from './modal-cti';
 jest.mock('@osd/i18n', () => ({
   i18n: {
@@ -35,7 +35,7 @@ const defaultStatusCti = { status: 404, message: '' };
 describe('ModalCti component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    sessionStorage.clear();
+    ctiFlowState.reset();
     (getCore as jest.Mock).mockReturnValue({
       http: { post: mockHttpPost },
     });
@@ -89,9 +89,7 @@ describe('ModalCti component', () => {
           body: JSON.stringify({}),
         }),
       );
-      expect(
-        sessionStorage.getItem(WAZUH_CTI_DEVICE_CODE_SESSION_KEY),
-      ).toBe('mock_device_code_123');
+      expect(ctiFlowState.getDeviceCode()).toBe('mock_device_code_123');
       expect(
         getByText(
           /https:\/\/console\.wazuh\.com\/platform\/environments\/register\?user_code=WZH-999/,

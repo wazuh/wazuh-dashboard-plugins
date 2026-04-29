@@ -17,12 +17,6 @@ export enum routes {
 export const CTI_OAUTH_DEVICE_GRANT_TYPE =
   'urn:ietf:params:oauth:grant-type:device_code';
 
-/** Session key: `device_code` from the device authorization response until registration succeeds. */
-export const WAZUH_CTI_DEVICE_CODE_SESSION_KEY = 'wazuh_cti_device_code';
-
-/** Local persistence: user completed device flow (received `access_token` via poll). */
-export const WAZUH_CTI_REGISTERED_LOCAL_KEY = 'wazuh_cti_registered';
-
 /**
  * Paths on `WAZUH_CTI_CONSOLE_BASE_URL` (Imposter in dev, real CTI Console in prod).
  * See `docker/imposter/cti/README.md`.

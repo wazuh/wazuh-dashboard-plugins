@@ -2,9 +2,8 @@ import {
   CTI_OAUTH_DEVICE_GRANT_TYPE,
   routes,
   statusCodes,
-  WAZUH_CTI_DEVICE_CODE_SESSION_KEY,
-  WAZUH_CTI_REGISTERED_LOCAL_KEY,
 } from '../../common/constants';
+import { ctiFlowState } from './cti-flow-state';
 import { getCore } from '../plugin-services';
 
 /**
@@ -16,17 +15,11 @@ export async function fetchCtiRegistrationStatus(): Promise<{
   message: string;
 }> {
   try {
-    if (
-      typeof window !== 'undefined' &&
-      window.localStorage.getItem(WAZUH_CTI_REGISTERED_LOCAL_KEY) === '1'
-    ) {
+    if (ctiFlowState.isRegistrationComplete()) {
       return { statusCode: statusCodes.SUCCESS, message: '' };
     }
 
-    const deviceCode =
-      typeof window !== 'undefined'
-        ? window.sessionStorage.getItem(WAZUH_CTI_DEVICE_CODE_SESSION_KEY)
-        : null;
+    const deviceCode = ctiFlowState.getDeviceCode();
     if (!deviceCode) {
       return { statusCode: statusCodes.NOT_FOUND, message: '' };
     }
@@ -42,8 +35,7 @@ export async function fetchCtiRegistrationStatus(): Promise<{
     )) as Record<string, unknown>;
 
     if (typeof res.access_token === 'string' && res.access_token.length > 0) {
-      window.sessionStorage.removeItem(WAZUH_CTI_DEVICE_CODE_SESSION_KEY);
-      window.localStorage.setItem(WAZUH_CTI_REGISTERED_LOCAL_KEY, '1');
+      ctiFlowState.setRegistrationComplete(true);
       return { statusCode: statusCodes.SUCCESS, message: '' };
     }
 

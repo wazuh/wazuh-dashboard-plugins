@@ -17,7 +17,8 @@ import {
 } from '@elastic/eui';
 import { LinkCtiProps, CtiDeviceAuthorization } from '../types';
 import { getCore } from '../../../plugin-services';
-import { routes, statusCodes, WAZUH_CTI_DEVICE_CODE_SESSION_KEY } from '../../../../common/constants';
+import { ctiFlowState } from '../../../services/cti-flow-state';
+import { routes, statusCodes } from '../../../../common/constants';
 import { statusData } from '../../../../common/cti-status-config';
 import { CtiDeviceAuthLinks } from './cti-device-auth-links';
 
@@ -67,10 +68,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         typeof ctiResponse.device_code === 'string' &&
         ctiResponse.device_code.length > 0
       ) {
-        sessionStorage.setItem(
-          WAZUH_CTI_DEVICE_CODE_SESSION_KEY,
-          ctiResponse.device_code,
-        );
+        ctiFlowState.setDeviceCode(ctiResponse.device_code);
       }
 
       const verificationUri =
