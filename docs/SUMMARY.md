@@ -32,7 +32,7 @@
 - [Modules](ref/modules/README.md)
   - [Health check](ref/modules/healthcheck.md)
   - [Notifications and Alerting](ref/modules/notifications-alerting.md)
-  - [Active Response](ref/modules/active-response/README.md)
+  - [Active Response](ref/modules/active-response/index.md)
     - [Create an active response](ref/modules/active-response/create.md)
     - [Attach to an Alerting trigger](ref/modules/active-response/alerting-integration.md)
     - [Monitor executions](ref/modules/active-response/monitor-executions.md)

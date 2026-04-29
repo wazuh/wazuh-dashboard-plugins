@@ -7,7 +7,7 @@ The following walkthrough shows how to create an active response that blocks the
 - Wazuh indexer, manager, and dashboard running version **5.0.0** or later.
 - The `wazuh-active-responses*` index pattern available in **Stack Management → Index Patterns**. The dashboard creates it automatically at startup; contact your administrator if it is missing.
 
-> **Note:** creating the active response only stores the executable name. For the remediation to actually run when the monitor fires, the executable must be available on the target agent — see [Concepts → About the executable](README.md#about-the-executable).
+> **Note:** creating the active response only stores the executable name. For the remediation to actually run when the monitor fires, the executable must be available on the target agent — see [Concepts → About the executable](index.md#about-the-executable).
 
 ---
 
@@ -42,7 +42,7 @@ Click **Create active response**. The form is organized in two panels: **Name an
 
 Complete the fields in order:
 
-- **Executable** — `firewalld-drop`. Required. This script is one of the default executables shipped with the Wazuh agent (see [Concepts → About the executable](README.md#about-the-executable)); enter only its name, without a path. An empty value shows the error `Executable name cannot be empty.`
+- **Executable** — `firewalld-drop`. Required. This script is one of the default executables shipped with the Wazuh agent (see [Concepts → About the executable](index.md#about-the-executable)); enter only its name, without a path. An empty value shows the error `Executable name cannot be empty.`
 - **Extra arguments** — leave empty for this example. Optional.
 - **Type** — select `Stateful`. This makes the **Stateful timeout (seconds)** field appear.
 - **Stateful timeout (seconds)** — `600` (ten minutes). Default: `180`. Validations: non-numeric values show `Stateful timeout must be a number.`; values `≤ 0` show `Stateful timeout must be greater than 0.`
@@ -66,7 +66,7 @@ Selecting `Defined agent` reveals the **Agent ID** field, which must be a numeri
 
 Selecting `Stateless` hides the **Stateful timeout** field, since it no longer applies:
 
-![Stateless with Location = All](images/07-create-form-stateless-all.png)
+![Stateless with Location = Local](images/07-create-form-stateless-local.png)
 
 > **Note:** the **Extra arguments** field is also labeled **Extra args** on the details page, and appears as `extra_arguments` when you inspect an execution record in **Discover**. They all refer to the same value.
 
