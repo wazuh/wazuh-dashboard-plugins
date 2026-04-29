@@ -11,7 +11,7 @@ import { StatusCtiRegistrationProps } from '../types';
 import { getCore } from '../../../plugin-services';
 import { statusData } from '../../../../common/cti-status-config';
 
-export const StatusCtiRegistration: React.FC = ({
+export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
   statusCTI,
   refetchStatus,
 }: StatusCtiRegistrationProps) => {

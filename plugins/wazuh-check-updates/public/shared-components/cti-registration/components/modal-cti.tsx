@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 import {
   EuiButton,
   EuiButtonEmpty,
   EuiCallOut,
-  EuiCode,
-  EuiCopy,
+  EuiHealth,
   EuiLink,
   EuiModal,
   EuiModalBody,
@@ -16,24 +15,36 @@ import {
   EuiText,
   EuiTitle,
 } from '@elastic/eui';
-import { LinkCtiProps } from '../types';
+import { LinkCtiProps, CtiDeviceAuthorization } from '../types';
 import { getCore } from '../../../plugin-services';
-import { routes } from '../../../../common/constants';
+import { routes, statusCodes, WAZUH_CTI_DEVICE_CODE_SESSION_KEY } from '../../../../common/constants';
+import { statusData } from '../../../../common/cti-status-config';
+import { CtiDeviceAuthLinks } from './cti-device-auth-links';
 
-type DeviceAuthorizationDisplay = {
-  user_code: string;
-  verification_uri: string;
-  verification_uri_complete: string;
-};
+function statusRowForCode(status: number) {
+  const entry =
+    status in statusData
+      ? statusData[status as keyof typeof statusData]
+      : statusData[statusCodes.NOT_FOUND];
+  return entry;
+}
 
 export const ModalCti: React.FC<LinkCtiProps> = ({
   handleModalToggle,
-  handleStatusModalToggle,
+  statusCTI,
+  refetchStatus,
+  statusCheckLoading = false,
 }) => {
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [isCheckingStatus, setIsCheckingStatus] =
+    React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
   const [deviceAuth, setDeviceAuth] =
-    React.useState<DeviceAuthorizationDisplay | null>(null);
+    React.useState<CtiDeviceAuthorization | null>(null);
+
+  useEffect(() => {
+    refetchStatus();
+  }, [refetchStatus]);
 
   const handleStartRegistration = async () => {
     setError(null);
@@ -43,12 +54,24 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
        * See docker/imposter/cti/README.md — POST /api/v1/platform/environments/token */
       /* eslint-disable camelcase -- POST body/response match OAuth device authorization field names */
       const ctiResponse = await getCore().http.post<{
+        device_code?: string;
         user_code?: string;
         verification_uri?: string;
         verification_uri_complete?: string;
       }>(routes.token, {
+        /* client_id omitted: server uses OpenSearch cluster_uuid (GET /) per Wazuh env registration spec */
         body: JSON.stringify({}),
       });
+
+      if (
+        typeof ctiResponse.device_code === 'string' &&
+        ctiResponse.device_code.length > 0
+      ) {
+        sessionStorage.setItem(
+          WAZUH_CTI_DEVICE_CODE_SESSION_KEY,
+          ctiResponse.device_code,
+        );
+      }
 
       const verificationUri =
         ctiResponse.verification_uri ?? ctiResponse.verification_uri_complete ?? '';
@@ -72,6 +95,8 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
       if (verificationUriComplete) {
         window.open(verificationUriComplete, 'wazuh_cti');
       }
+
+      await refetchStatus();
     } catch {
       setLoading(false);
       setError(
@@ -80,9 +105,13 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     }
   };
 
-  const handleContinueToStatus = () => {
-    handleStatusModalToggle?.();
-    handleModalToggle();
+  const handleCheckStatus = async () => {
+    setIsCheckingStatus(true);
+    try {
+      await refetchStatus();
+    } finally {
+      setIsCheckingStatus(false);
+    }
   };
 
   const handleOpenActivationPage = () => {
@@ -90,6 +119,8 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
       window.open(deviceAuth.verification_uri_complete, 'wazuh_cti');
     }
   };
+
+  const statusRow = statusRowForCode(statusCTI.status);
 
   return (
     <EuiModal onClose={handleModalToggle}>
@@ -127,62 +158,16 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         {deviceAuth && (
           <>
             <EuiSpacer size='m' />
-            <EuiCallOut
-              title={
-                <FormattedMessage
-                  id='wazuhCheckUpdates.ctiRegistration.deviceAuthTitle'
-                  defaultMessage='Complete registration in your browser'
-                />
-              }
-              color='primary'
-              iconType='globe'
-            >
-              <EuiText size='s'>
-                <FormattedMessage
-                  id='wazuhCheckUpdates.ctiRegistration.userCodeLabel'
-                  defaultMessage='Your verification code:'
-                />
-              </EuiText>
-              <EuiSpacer size='xs' />
-              <EuiCode data-test-subj='ctiDeviceUserCode'>
-                {deviceAuth.user_code}
-              </EuiCode>
-              <EuiSpacer size='m' />
-              <EuiText size='s'>
-                <FormattedMessage
-                  id='wazuhCheckUpdates.ctiRegistration.verificationLinkLabel'
-                  defaultMessage='Activation page:'
-                />{' '}
-                <EuiLink
-                  href={deviceAuth.verification_uri_complete}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  data-test-subj='ctiDeviceVerificationLink'
-                >
-                  {deviceAuth.verification_uri}
-                </EuiLink>
-              </EuiText>
-              <EuiSpacer size='s' />
-              <EuiText size='xs' color='subdued' style={{ wordBreak: 'break-all' }}>
-                {deviceAuth.verification_uri_complete}
-              </EuiText>
-              <EuiSpacer size='s' />
-              <EuiCopy textToCopy={deviceAuth.verification_uri_complete}>
-                {(copy: () => void) => (
-                  <EuiButtonEmpty
-                    size='xs'
-                    iconType='copyClipboard'
-                    onClick={copy}
-                    data-test-subj='ctiCopyVerificationUrl'
-                  >
-                    <FormattedMessage
-                      id='wazuhCheckUpdates.ctiRegistration.copyActivationUrl'
-                      defaultMessage='Copy activation URL'
-                    />
-                  </EuiButtonEmpty>
-                )}
-              </EuiCopy>
-            </EuiCallOut>
+            <CtiDeviceAuthLinks deviceAuth={deviceAuth} />
+            <EuiSpacer size='m' />
+            <EuiText>
+              <EuiHealth
+                aria-label={statusRow.onClickAriaLabel}
+                color={statusRow.color}
+              >
+                {statusRow.message()}
+              </EuiHealth>
+            </EuiText>
           </>
         )}
         {error && (
@@ -220,10 +205,16 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
                 defaultMessage='Open activation page'
               />
             </EuiButtonEmpty>
-            <EuiButton onClick={handleContinueToStatus} fill>
+            <EuiButton
+              onClick={() => {
+                void handleCheckStatus();
+              }}
+              fill
+              isLoading={isCheckingStatus || statusCheckLoading}
+            >
               <FormattedMessage
-                id='wazuhCheckUpdates.ctiRegistration.continueToStatus'
-                defaultMessage='Continue to status'
+                id='wazuhCheckUpdates.ctiRegistration.statusModalCheckStatus'
+                defaultMessage='Check status'
               />
             </EuiButton>
           </>

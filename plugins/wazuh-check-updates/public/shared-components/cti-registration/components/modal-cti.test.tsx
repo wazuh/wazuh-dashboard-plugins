@@ -6,9 +6,8 @@ import React from 'react';
 import { render, fireEvent, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { getCore } from '../../../plugin-services';
+import { WAZUH_CTI_DEVICE_CODE_SESSION_KEY } from '../../../../common/constants';
 import { ModalCti } from './modal-cti';
-
-// Mock @osd/i18n to handle FormattedMessage components
 jest.mock('@osd/i18n', () => ({
   i18n: {
     translate: (_id: string, opts: { defaultMessage?: string }) =>
@@ -27,18 +26,22 @@ jest.mock('@osd/i18n/react', () => ({
 }));
 
 const handleModalToggleMock = jest.fn();
-const handleStatusModalToggleMock = jest.fn();
 
 const mockHttpPost = jest.fn();
+const mockRefetchStatus = jest.fn().mockResolvedValue(undefined);
+
+const defaultStatusCti = { status: 404, message: '' };
 
 describe('ModalCti component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    sessionStorage.clear();
     (getCore as jest.Mock).mockReturnValue({
       http: { post: mockHttpPost },
     });
     /* eslint-disable camelcase -- OAuth device authorization JSON uses snake_case */
     mockHttpPost.mockResolvedValue({
+      device_code: 'mock_device_code_123',
       user_code: 'WZH-999',
       verification_uri:
         'https://console.wazuh.com/platform/environments/register',
@@ -56,7 +59,8 @@ describe('ModalCti component', () => {
     const { getByText } = render(
       <ModalCti
         handleModalToggle={handleModalToggleMock}
-        handleStatusModalToggle={handleStatusModalToggleMock}
+        statusCTI={defaultStatusCti}
+        refetchStatus={mockRefetchStatus}
       />,
     );
     expect(
@@ -69,7 +73,8 @@ describe('ModalCti component', () => {
     const { getByText } = render(
       <ModalCti
         handleModalToggle={handleModalToggleMock}
-        handleStatusModalToggle={handleStatusModalToggleMock}
+        statusCTI={defaultStatusCti}
+        refetchStatus={mockRefetchStatus}
       />,
     );
     const button = getByText('Yes, I want to register');
@@ -78,6 +83,15 @@ describe('ModalCti component', () => {
     });
 
     await waitFor(() => {
+      expect(mockHttpPost).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          body: JSON.stringify({}),
+        }),
+      );
+      expect(
+        sessionStorage.getItem(WAZUH_CTI_DEVICE_CODE_SESSION_KEY),
+      ).toBe('mock_device_code_123');
       expect(
         getByText(
           /https:\/\/console\.wazuh\.com\/platform\/environments\/register\?user_code=WZH-999/,

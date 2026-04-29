@@ -4,9 +4,9 @@ import { EuiButtonEmpty, EuiButtonIcon, EuiToolTip } from '@elastic/eui';
 import { LinkCtiProps } from '../types';
 import { getCore } from '../../../plugin-services';
 
-export const StartCtiRegistration: React.FC = ({
-  handleModalToggle,
-}: LinkCtiProps) => {
+export const StartCtiRegistration: React.FC<
+  Pick<LinkCtiProps, 'handleModalToggle'>
+> = ({ handleModalToggle }) => {
   const isNewHomePageEnable = getCore().uiSettings.get('home:useNewHomePage');
 
   const navButtonTopRight = (
