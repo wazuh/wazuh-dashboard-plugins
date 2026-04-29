@@ -10,9 +10,26 @@ export enum routes {
   checkUpdates = '/api/wazuh-check-updates/updates',
   userPreferences = '/api/wazuh-check-updates/user-preferences/me',
   token = `${ctiBasePath}/token`,
-  subscription = `${ctiBasePath}/subscription`,
   contentUpdate = `${ctiBasePath}/update`,
 }
+
+/** OAuth 2.0 device authorization grant type (RFC 8628) for CTI Console token polling. */
+export const CTI_OAUTH_DEVICE_GRANT_TYPE =
+  'urn:ietf:params:oauth:grant-type:device_code';
+
+/** Session key: `device_code` from the device authorization response until registration succeeds. */
+export const WAZUH_CTI_DEVICE_CODE_SESSION_KEY = 'wazuh_cti_device_code';
+
+/** Local persistence: user completed device flow (received `access_token` via poll). */
+export const WAZUH_CTI_REGISTERED_LOCAL_KEY = 'wazuh_cti_registered';
+
+/**
+ * Paths on `WAZUH_CTI_CONSOLE_BASE_URL` (Imposter in dev, real CTI Console in prod).
+ * See `docker/imposter/cti/README.md`.
+ */
+export const ctiConsoleApiPaths = {
+  environmentsToken: '/api/v1/platform/environments/token',
+} as const;
 
 const WAZUH_CONTENT_MANAGER_BASE_PATH = '/_plugins/content-manager';
 export const enum contentManagerRoutes {
