@@ -31,4 +31,14 @@ export const statusData = {
       />
     ),
   },
+  [statusCodes.REGISTRATION_FAILED]: {
+    color: 'danger',
+    onClickAriaLabel: 'CTI registration failed',
+    message: () => (
+      <FormattedMessage
+        id='wazuhCheckUpdates.ctiRegistration.failedNav'
+        defaultMessage='CTI Registration: Failed'
+      />
+    ),
+  },
 } as const;

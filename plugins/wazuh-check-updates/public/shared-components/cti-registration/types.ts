@@ -10,8 +10,9 @@ export type CtiDeviceAuthorization = {
 export interface LinkCtiProps {
   handleModalToggle: () => void;
   statusCTI: ISubscriptionResponse;
-  refetchStatus: () => Promise<void>;
-  statusCheckLoading?: boolean;
+  refetchStatus: (options?: { silent?: boolean }) => Promise<void>;
+  /** Called after device authorization succeeds so polling can start at `interval`. */
+  onDeviceFlowStarted?: () => void;
 }
 
 export enum CtiStatus {
@@ -29,5 +30,5 @@ export enum CtiDetails {
 
 export interface StatusCtiRegistrationProps {
   statusCTI: ISubscriptionResponse;
-  refetchStatus: () => Promise<void>;
+  refetchStatus: (options?: { silent?: boolean }) => Promise<void>;
 }

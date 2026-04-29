@@ -5,6 +5,7 @@ import { ByteSizeValue } from '@osd/config-schema';
 import {
   routes,
   CTI_OAUTH_DEVICE_GRANT_TYPE,
+  CTI_REGISTRATION_COMPLETED_BODY,
 } from '../../../common/constants';
 import { getCtiTokenRoute } from './token';
 import {
@@ -104,7 +105,7 @@ describe('CTI token route', () => {
     expect(mockedPollCtiToken).not.toHaveBeenCalled();
   });
 
-  test(`POST ${routes.token} polling forwards pollCtiToken`, async () => {
+  test(`POST ${routes.token} polling returns success marker without token fields`, async () => {
     mockedPollCtiToken.mockResolvedValue({ access_token: 'tok' });
 
     const response = await supertest(innerServer.listener)
@@ -115,7 +116,7 @@ describe('CTI token route', () => {
       })
       .expect(200);
 
-    expect(response.body).toEqual({ access_token: 'tok' });
+    expect(response.body).toEqual(CTI_REGISTRATION_COMPLETED_BODY);
     expect(mockedPollCtiToken).toHaveBeenCalledWith('resolved-client-id', 'dc1');
     expect(mockedGetCtiToken).not.toHaveBeenCalled();
   });

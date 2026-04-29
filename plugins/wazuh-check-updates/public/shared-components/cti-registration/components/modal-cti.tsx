@@ -4,7 +4,7 @@ import {
   EuiButton,
   EuiButtonEmpty,
   EuiCallOut,
-  EuiHealth,
+  EuiIcon,
   EuiLink,
   EuiModal,
   EuiModalBody,
@@ -18,34 +18,37 @@ import {
 import { LinkCtiProps, CtiDeviceAuthorization } from '../types';
 import { getCore } from '../../../plugin-services';
 import { ctiFlowState } from '../../../services/cti-flow-state';
-import { routes, statusCodes } from '../../../../common/constants';
-import { statusData } from '../../../../common/cti-status-config';
+import {
+  CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC,
+  CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
+  routes,
+  statusCodes,
+} from '../../../../common/constants';
 import { CtiDeviceAuthLinks } from './cti-device-auth-links';
-
-function statusRowForCode(status: number) {
-  const entry =
-    status in statusData
-      ? statusData[status as keyof typeof statusData]
-      : statusData[statusCodes.NOT_FOUND];
-  return entry;
-}
 
 export const ModalCti: React.FC<LinkCtiProps> = ({
   handleModalToggle,
   statusCTI,
   refetchStatus,
-  statusCheckLoading = false,
+  onDeviceFlowStarted,
 }) => {
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [isCheckingStatus, setIsCheckingStatus] =
-    React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
   const [deviceAuth, setDeviceAuth] =
     React.useState<CtiDeviceAuthorization | null>(null);
 
   useEffect(() => {
-    refetchStatus();
+    void refetchStatus();
   }, [refetchStatus]);
+
+  useEffect(() => {
+    if (statusCTI.status === statusCodes.SUCCESS) {
+      setDeviceAuth(null);
+    }
+    if (statusCTI.status === statusCodes.REGISTRATION_FAILED) {
+      setDeviceAuth(null);
+    }
+  }, [statusCTI.status]);
 
   const handleStartRegistration = async () => {
     setError(null);
@@ -57,6 +60,8 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         user_code?: string;
         verification_uri?: string;
         verification_uri_complete?: string;
+        interval?: number;
+        expires_in?: number;
       }>(routes.token, {
         body: JSON.stringify({}),
       });
@@ -68,8 +73,24 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         ctiFlowState.setDeviceCode(ctiResponse.device_code);
       }
 
+      const rawInterval = ctiResponse.interval;
+      const intervalSec =
+        typeof rawInterval === 'number' && rawInterval > 0
+          ? rawInterval
+          : CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC;
+      ctiFlowState.setPollIntervalSec(intervalSec);
+
+      const rawExpires = ctiResponse.expires_in;
+      const expiresInSec =
+        typeof rawExpires === 'number' && rawExpires > 0
+          ? rawExpires
+          : CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC;
+      ctiFlowState.setDeviceAuthExpiry(expiresInSec);
+
       const verificationUri =
-        ctiResponse.verification_uri ?? ctiResponse.verification_uri_complete ?? '';
+        ctiResponse.verification_uri ??
+        ctiResponse.verification_uri_complete ??
+        '';
       const userCode = ctiResponse.user_code ?? '';
       const verificationUriComplete =
         ctiResponse.verification_uri_complete ??
@@ -91,21 +112,12 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         window.open(verificationUriComplete, 'wazuh_cti');
       }
 
-      await refetchStatus();
+      onDeviceFlowStarted?.();
     } catch {
       setLoading(false);
       setError(
         'There was an error connecting to the CTI service. Please try again later.',
       );
-    }
-  };
-
-  const handleCheckStatus = async () => {
-    setIsCheckingStatus(true);
-    try {
-      await refetchStatus();
-    } finally {
-      setIsCheckingStatus(false);
     }
   };
 
@@ -115,7 +127,15 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     }
   };
 
-  const statusRow = statusRowForCode(statusCTI.status);
+  const showInProgress =
+    Boolean(deviceAuth) &&
+    statusCTI.status === statusCodes.NOT_FOUND &&
+    !ctiFlowState.isRegistrationComplete();
+
+  const showSuccess = statusCTI.status === statusCodes.SUCCESS;
+
+  const showRegistrationFailed =
+    statusCTI.status === statusCodes.REGISTRATION_FAILED;
 
   return (
     <EuiModal onClose={handleModalToggle}>
@@ -150,19 +170,56 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
             }}
           />
         </EuiText>
-        {deviceAuth && (
+        {deviceAuth && !showSuccess && !showRegistrationFailed && (
           <>
             <EuiSpacer size='m' />
             <CtiDeviceAuthLinks deviceAuth={deviceAuth} />
+          </>
+        )}
+        {showInProgress && (
+          <>
             <EuiSpacer size='m' />
-            <EuiText>
-              <EuiHealth
-                aria-label={statusRow.onClickAriaLabel}
-                color={statusRow.color}
-              >
-                {statusRow.message()}
-              </EuiHealth>
+            <EuiText size='s' color='subdued' data-test-subj='ctiRegistrationInProgress'>
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.inProgress'
+                defaultMessage='Registration in progress…'
+              />
             </EuiText>
+          </>
+        )}
+        {showSuccess && (
+          <>
+            <EuiSpacer size='m' />
+            <EuiText color='success' data-test-subj='ctiRegistrationSuccess'>
+              <EuiIcon
+                type='checkInCircleFilled'
+                color='success'
+                style={{ marginRight: 8 }}
+              />
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.success'
+                defaultMessage='Registration successful'
+              />
+            </EuiText>
+          </>
+        )}
+        {showRegistrationFailed && (
+          <>
+            <EuiSpacer size='m' />
+            <EuiCallOut
+              title={
+                <FormattedMessage
+                  id='wazuhCheckUpdates.ctiRegistration.failedTitle'
+                  defaultMessage='Registration could not be completed'
+                />
+              }
+              color='danger'
+              iconType='alert'
+            >
+              {statusCTI.message ? (
+                <EuiText size='s'>{statusCTI.message}</EuiText>
+              ) : null}
+            </EuiCallOut>
           </>
         )}
         {error && (
@@ -186,7 +243,14 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
       </EuiModalBody>
 
       <EuiModalFooter>
-        {deviceAuth ? (
+        {showSuccess || showRegistrationFailed ? (
+          <EuiButtonEmpty onClick={handleModalToggle}>
+            <FormattedMessage
+              id='wazuhCheckUpdates.ctiRegistration.modalButtonClose'
+              defaultMessage='Close'
+            />
+          </EuiButtonEmpty>
+        ) : deviceAuth ? (
           <>
             <EuiButtonEmpty onClick={handleModalToggle}>
               <FormattedMessage
@@ -200,18 +264,6 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
                 defaultMessage='Open activation page'
               />
             </EuiButtonEmpty>
-            <EuiButton
-              onClick={() => {
-                void handleCheckStatus();
-              }}
-              fill
-              isLoading={isCheckingStatus || statusCheckLoading}
-            >
-              <FormattedMessage
-                id='wazuhCheckUpdates.ctiRegistration.statusModalCheckStatus'
-                defaultMessage='Check status'
-              />
-            </EuiButton>
           </>
         ) : (
           <>

@@ -6,10 +6,12 @@ import {
   EuiPopover,
   EuiText,
   EuiButtonEmpty,
+  EuiSpacer,
 } from '@elastic/eui';
 import { StatusCtiRegistrationProps } from '../types';
 import { getCore } from '../../../plugin-services';
 import { statusData } from '../../../../common/cti-status-config';
+import { statusCodes } from '../../../../common/constants';
 
 export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
   statusCTI,
@@ -20,7 +22,7 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
   const isNewHomePageEnable = getCore().uiSettings.get('home:useNewHomePage');
 
   const checkStatus = () => {
-    refetchStatus();
+    void refetchStatus();
   };
 
   const statusNavTop = (
@@ -53,6 +55,15 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
     >
       <EuiText style={{ width: 300 }}>
         {statusData[statusCTI.status].message()}
+        {statusCTI.status === statusCodes.REGISTRATION_FAILED &&
+        statusCTI.message ? (
+          <>
+            <EuiSpacer size='s' />
+            <EuiText size='xs' color='danger'>
+              {statusCTI.message}
+            </EuiText>
+          </>
+        ) : null}
       </EuiText>
       <EuiButton onClick={checkStatus}>Try again</EuiButton>
     </EuiPopover>

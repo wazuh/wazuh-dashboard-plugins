@@ -6,7 +6,19 @@ import {
   pollCtiToken,
   resolveCtiOAuthClientId,
 } from '../../services/cti-registration';
-import { routes, CTI_OAUTH_DEVICE_GRANT_TYPE } from '../../../common/constants';
+import {
+  routes,
+  CTI_OAUTH_DEVICE_GRANT_TYPE,
+  CTI_REGISTRATION_COMPLETED_BODY,
+} from '../../../common/constants';
+
+function isSuccessfulUpstreamDevicePoll(
+  body: Record<string, unknown>,
+): boolean {
+  return (
+    typeof body.access_token === 'string' && body.access_token.length > 0
+  );
+}
 
 export const getCtiTokenRoute = (router: IRouter) => {
   router.post(
@@ -41,7 +53,13 @@ export const getCtiTokenRoute = (router: IRouter) => {
 
         if (hasPoll) {
           const clientId = await resolveCtiOAuthClientId(client_id);
-          const pollBody = await pollCtiToken(clientId, device_code);
+          const pollBody = (await pollCtiToken(
+            clientId,
+            device_code,
+          )) as Record<string, unknown>;
+          if (isSuccessfulUpstreamDevicePoll(pollBody)) {
+            return response.ok({ body: CTI_REGISTRATION_COMPLETED_BODY });
+          }
           return response.ok({ body: pollBody });
         }
 

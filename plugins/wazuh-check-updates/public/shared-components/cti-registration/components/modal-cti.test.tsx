@@ -7,6 +7,10 @@ import { render, fireEvent, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { getCore } from '../../../plugin-services';
 import { ctiFlowState } from '../../../services/cti-flow-state';
+import {
+  CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC,
+  CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
+} from '../../../../common/constants';
 import { ModalCti } from './modal-cti';
 jest.mock('@osd/i18n', () => ({
   i18n: {
@@ -47,6 +51,8 @@ describe('ModalCti component', () => {
         'https://console.wazuh.com/platform/environments/register',
       verification_uri_complete:
         'https://console.wazuh.com/platform/environments/register?user_code=WZH-999',
+      interval: CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
+      expires_in: CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC,
     });
     /* eslint-enable camelcase */
     Object.defineProperty(window, 'open', {
@@ -101,5 +107,27 @@ describe('ModalCti component', () => {
       'https://console.wazuh.com/platform/environments/register?user_code=WZH-999',
       'wazuh_cti',
     );
+  });
+
+  it('starts device flow polling schedule and shows in-progress copy', async () => {
+    const onDeviceFlowStarted = jest.fn();
+    const { getByText, getByTestId } = render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={defaultStatusCti}
+        refetchStatus={mockRefetchStatus}
+        onDeviceFlowStarted={onDeviceFlowStarted}
+      />,
+    );
+    act(() => {
+      fireEvent.click(getByText('Yes, I want to register'));
+    });
+    await waitFor(() => {
+      expect(onDeviceFlowStarted).toHaveBeenCalled();
+      expect(ctiFlowState.getPollIntervalSec()).toBe(
+        CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
+      );
+      expect(getByTestId('ctiRegistrationInProgress')).toBeInTheDocument();
+    });
   });
 });

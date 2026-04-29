@@ -9,17 +9,21 @@ import { statusCodes } from '../../../common/constants';
 
 export const CtiRegistration = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { statusCTI, refetchStatus, loading: statusCheckLoading } =
-    useCtiStatus();
+  const [deviceFlowNonce, setDeviceFlowNonce] = useState(0);
+  const { statusCTI, refetchStatus } = useCtiStatus(deviceFlowNonce);
 
   const handleModalToggle = () => {
     setIsModalOpen(!isModalOpen);
   };
 
+  const showStartCti =
+    statusCTI.status === statusCodes.NOT_FOUND ||
+    statusCTI.status === statusCodes.REGISTRATION_FAILED;
+
   return (
     <I18nProvider>
       <>
-        {statusCTI.status === statusCodes.NOT_FOUND ? (
+        {showStartCti ? (
           <StartCtiRegistration handleModalToggle={handleModalToggle} />
         ) : (
           <StatusCtiRegistration
@@ -32,7 +36,9 @@ export const CtiRegistration = () => {
             handleModalToggle={handleModalToggle}
             statusCTI={statusCTI}
             refetchStatus={refetchStatus}
-            statusCheckLoading={statusCheckLoading}
+            onDeviceFlowStarted={() =>
+              setDeviceFlowNonce(n => n + 1)
+            }
           />
         )}
       </>

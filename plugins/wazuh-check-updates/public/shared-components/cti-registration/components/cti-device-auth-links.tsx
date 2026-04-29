@@ -29,7 +29,7 @@ export const CtiDeviceAuthLinks: React.FC<Props> = ({ deviceAuth }) => (
     <EuiText size='s'>
       <FormattedMessage
         id='wazuhCheckUpdates.ctiRegistration.userCodeLabel'
-        defaultMessage='Your verification code:'
+        defaultMessage='User code:'
       />
     </EuiText>
     <EuiSpacer size='xs' />

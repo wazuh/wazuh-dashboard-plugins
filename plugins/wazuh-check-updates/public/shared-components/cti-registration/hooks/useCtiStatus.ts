@@ -1,18 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchCtiRegistrationStatus } from '../../../services/cti-registration-status';
+import { ctiFlowState } from '../../../services/cti-flow-state';
 import { ISubscriptionResponse } from '../../../services/types';
 import { statusCodes } from '../../../../common/constants';
 
-export const useCtiStatus = () => {
+export const useCtiStatus = (deviceFlowNonce = 0) => {
   const [statusCTI, setStatusCTI] = useState<ISubscriptionResponse>({
     status: statusCodes.NOT_FOUND,
     message: '',
   });
   const [loading, setLoading] = useState(true);
 
-  const fetchStatus = useCallback(async () => {
+  const fetchStatus = useCallback(async (options?: { silent?: boolean }) => {
     try {
-      setLoading(true);
+      if (!options?.silent) {
+        setLoading(true);
+      }
       const response = await fetchCtiRegistrationStatus();
       setStatusCTI({
         status: response.statusCode,
@@ -25,13 +28,61 @@ export const useCtiStatus = () => {
         message: e.message ?? '',
       });
     } finally {
-      setLoading(false);
+      if (!options?.silent) {
+        setLoading(false);
+      }
     }
   }, []);
 
   useEffect(() => {
-    fetchStatus();
+    void fetchStatus();
   }, [fetchStatus]);
+
+  useEffect(() => {
+    if (ctiFlowState.isRegistrationComplete()) {
+      return undefined;
+    }
+    if (!ctiFlowState.getDeviceCode()) {
+      return undefined;
+    }
+
+    let cancelled = false;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    const schedule = () => {
+      const sec = ctiFlowState.getPollIntervalSec();
+      timeoutId = setTimeout(async () => {
+        if (cancelled) {
+          return;
+        }
+        if (
+          !ctiFlowState.getDeviceCode() ||
+          ctiFlowState.isRegistrationComplete()
+        ) {
+          return;
+        }
+        await fetchStatus({ silent: true });
+        if (cancelled) {
+          return;
+        }
+        if (
+          !ctiFlowState.getDeviceCode() ||
+          ctiFlowState.isRegistrationComplete()
+        ) {
+          return;
+        }
+        schedule();
+      }, sec * 1000);
+    };
+
+    schedule();
+    return () => {
+      cancelled = true;
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [deviceFlowNonce, fetchStatus]);
 
   return { statusCTI, loading, refetchStatus: fetchStatus };
 };
