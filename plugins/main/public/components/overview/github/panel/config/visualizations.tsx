@@ -183,7 +183,7 @@ export const getVisStateTopRepositories = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'github.audit.repo',
+            field: 'url.original',
             orderBy: '1',
             order: 'desc',
             size: 10,

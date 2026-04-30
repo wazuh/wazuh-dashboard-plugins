@@ -80,12 +80,6 @@ export const WAZUH_INDEX_TYPE_EVENTS_ACCESS_MANAGEMENT =
   'events-access-management';
 export const WAZUH_INDEX_TYPE_EVENTS_APPLICATIONS = 'events-applications';
 export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES = 'events-cloud-services';
-export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AWS =
-  'events-cloud-services-aws';
-export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AZURE =
-  'events-cloud-services-azure';
-export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_GCP =
-  'events-cloud-services-gcp';
 export const WAZUH_INDEX_TYPE_EVENTS_NETWORK_ACTIVITY =
   'events-network-activity';
 export const WAZUH_INDEX_TYPE_EVENTS_OTHER = 'events-other';
@@ -159,18 +153,6 @@ export const WAZUH_EVENTS_CLOUD_SERVICES_PATTERN =
   'wazuh-events-v5-cloud-services*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES =
   'index-pattern:events-cloud-services';
-export const WAZUH_EVENTS_CLOUD_SERVICES_AWS_PATTERN =
-  'wazuh-events-v5-cloud-services-aws*';
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AWS =
-  'index-pattern:events-cloud-services-aws';
-export const WAZUH_EVENTS_CLOUD_SERVICES_AZURE_PATTERN =
-  'wazuh-events-v5-cloud-services-azure*';
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AZURE =
-  'index-pattern:events-cloud-services-azure';
-export const WAZUH_EVENTS_CLOUD_SERVICES_GCP_PATTERN =
-  'wazuh-events-v5-cloud-services-gcp*';
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_GCP =
-  'index-pattern:events-cloud-services-gcp';
 export const WAZUH_EVENTS_APLICATIONS_PATTERN = 'wazuh-events-v5-applications*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_APLICATIONS =
   'index-pattern:events-applications';
@@ -220,6 +202,22 @@ export const WAZUH_FINDINGS_UNCLASSIFIED_PATTERN =
   'wazuh-findings-v5-unclassified*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_UNCLASSIFIED =
   'index-pattern:findings-unclassified';
+
+// Index patterns - Threat Intel enrichments
+export const WAZUH_INDEX_TYPE_THREATINTEL_ENRICHMENTS =
+  'threatintel-enrichments';
+export const WAZUH_THREATINTEL_ENRICHMENTS_PATTERN =
+  'wazuh-threatintel-enrichments*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS =
+  'index-pattern:threatintel-enrichments';
+
+// Index patterns - Threat Intel vulnerabilities
+export const WAZUH_INDEX_TYPE_THREATINTEL_VULNERABILITIES =
+  'threatintel-vulnerabilities';
+export const WAZUH_THREATINTEL_VULNERABILITIES_PATTERN =
+  'wazuh-threatintel-vulnerabilities*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_VULNERABILITIES =
+  'index-pattern:threatintel-vulnerabilities';
 
 // Time field
 export const FIELD_TIMESTAMP = '@timestamp';
@@ -579,9 +577,14 @@ export enum WAZUH_MODULES_ID {
   VULNERABILITIES = 'vuls',
   DOCKER = 'docker',
   MITRE_ATTACK = 'mitre',
-  PCI_DSS = 'pci',
+  CMMC = 'cmmc',
+  FEDRAMP = 'fedramp',
   HIPAA = 'hipaa',
-  NIST_800_53 = 'nist',
+  ISO_27001 = 'iso-27001',
+  NIS2 = 'nis2',
+  NIST_800_53 = 'nist-800-53',
+  NIST_800_171 = 'nist-800-171',
+  PCI_DSS = 'pci-dss',
   TSC = 'tsc',
   VIRUSTOTAL = 'virustotal',
   GDPR = 'gdpr',
@@ -617,6 +620,7 @@ export const DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER = 'cluster-manager';
 export const DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT =
   'hidden-regulatory-compliance-requirement';
 export const DATA_SOURCE_FILTER_CONTROLLED_PCI_DSS_EXIST = 'pci-dss-exist';
+export const DATA_SOURCE_FILTER_CONTROLLED_FEDRAMP_EXIST = 'fedramp-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_VULNERABILITIES_RULE_GROUP =
   'vulnerabilities-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_OFFICE_365_RULE_GROUP =
@@ -624,10 +628,14 @@ export const DATA_SOURCE_FILTER_CONTROLLED_OFFICE_365_RULE_GROUP =
 export const DATA_SOURCE_FILTER_CONTROLLED_GITHUB_RULE_GROUP =
   'github-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_TSC_EXIST = 'tsc-rule-exist';
+export const DATA_SOURCE_FILTER_CONTROLLED_CMMC_EXIST = 'cmmc-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_NIST_800_53_EXIST =
   'nist-800-53-rule-exist';
+export const DATA_SOURCE_FILTER_CONTROLLED_NIST_800_171_EXIST =
+  'nist-800-171-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_GDPR_EXIST = 'gdpr-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_HIPAA_EXIST = 'hipaa-rule-exist';
+export const DATA_SOURCE_FILTER_CONTROLLED_NIS2_EXIST = 'nis2-rule-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_DOCKER_RULE_GROUP =
   'docker-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE =
@@ -644,6 +652,8 @@ export const DATA_SOURCE_FILTER_CONTROLLED_AZURE_RULE_GROUP =
 export const DATA_SOURCE_FILTER_CONTROLLED_FIM_RULE_GROUP = 'fim-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_CONFIGURATION_ASSASSMENT_RULE_GROUP =
   'configuration-assessment-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_ISO27001_EXIST =
+  'iso27001-rule-exist';
 
 // Wazuh links
 export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';
@@ -1036,8 +1046,25 @@ export const HIPAA_AGENT_DASHBOARD_ID = 'hipaa-pinned-agent-dashboard-tab';
 export const NIST_800_53_DASHBOARD_ID = 'nist-overview-dashboard-tab';
 export const NIST_800_53_AGENT_DASHBOARD_ID = 'nist-pinned-agent-dashboard-tab';
 
+export const NIST_800_171_DASHBOARD_ID = 'nist-800-171-overview-dashboard-tab';
+export const NIST_800_171_AGENT_DASHBOARD_ID =
+  'nist-800-171-pinned-agent-dashboard-tab';
+
 export const TSC_DASHBOARD_ID = 'tsc-overview-dashboard-tab';
 export const TSC_AGENT_DASHBOARD_ID = 'tsc-pinned-agent-dashboard-tab';
+
+export const CMMC_DASHBOARD_ID = 'cmmc-overview-dashboard-tab';
+export const CMMC_AGENT_DASHBOARD_ID = 'cmmc-pinned-agent-dashboard-tab';
+
+export const ISO27001_DASHBOARD_ID = 'iso27001-overview-dashboard-tab';
+export const ISO27001_AGENT_DASHBOARD_ID =
+  'iso27001-pinned-agent-dashboard-tab';
+
+export const FEDRAMP_DASHBOARD_ID = 'fedramp-overview-dashboard-tab';
+export const FEDRAMP_AGENT_DASHBOARD_ID = 'fedramp-pinned-agent-dashboard-tab';
+
+export const NIS2_DASHBOARD_ID = 'nis2-overview-dashboard-tab';
+export const NIS2_AGENT_DASHBOARD_ID = 'nis2-pinned-agent-dashboard-tab';
 
 export const GITHUB_DASHBOARD_ID = 'github-overview-dashboard-tab';
 export const GITHUB_AGENT_DASHBOARD_ID = 'github-pinned-agent-dashboard-tab';

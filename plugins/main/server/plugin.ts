@@ -46,9 +46,6 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_APLICATIONS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AWS,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AZURE,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_GCP,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_NETWORK_ACTIVITY,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_OTHER,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SECURITY,
@@ -64,6 +61,10 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SECURITY,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SYSTEM_ACTIVITY,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_UNCLASSIFIED,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS,
+  WAZUH_THREATINTEL_ENRICHMENTS_PATTERN,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_VULNERABILITIES,
+  WAZUH_THREATINTEL_VULNERABILITIES_PATTERN,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
@@ -88,9 +89,6 @@ import {
   WAZUH_EVENTS_PATTERN,
   WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN,
   WAZUH_EVENTS_APLICATIONS_PATTERN,
-  WAZUH_EVENTS_CLOUD_SERVICES_AWS_PATTERN,
-  WAZUH_EVENTS_CLOUD_SERVICES_AZURE_PATTERN,
-  WAZUH_EVENTS_CLOUD_SERVICES_GCP_PATTERN,
   WAZUH_EVENTS_CLOUD_SERVICES_PATTERN,
   WAZUH_EVENTS_NETWORK_ACTIVITY_PATTERN,
   WAZUH_EVENTS_OTHER_PATTERN,
@@ -139,9 +137,6 @@ import IndexPatternEventsKnownFields from '../common/known-fields/events.json';
 import IndexPatternEventsAccessManagementKnownFields from '../common/known-fields/events-access-management.json';
 import IndexPatternEventsApplicationsKnownFields from '../common/known-fields/events-applications.json';
 import IndexPatternEventsCloudServicesKnownFields from '../common/known-fields/events-cloud-services.json';
-import IndexPatternEventsCloudServicesAWSKnownFields from '../common/known-fields/events-cloud-services-aws.json';
-import IndexPatternEventsCloudServicesAzureKnownFields from '../common/known-fields/events-cloud-services-azure.json';
-import IndexPatternEventsCloudServicesGCPKnownFields from '../common/known-fields/events-cloud-services-gcp.json';
 import IndexPatternEventsNetworkActivityKnownFields from '../common/known-fields/events-network-activity.json';
 import IndexPatternEventsOtherKnownFields from '../common/known-fields/events-other.json';
 import IndexPatternEventsSecurityKnownFields from '../common/known-fields/events-security.json';
@@ -180,6 +175,8 @@ import IndexPatternSCAKnownFields from '../common/known-fields/states-sca.json';
 import IndexPatternMetricsCommsKnownFields from '../common/known-fields/metrics-comms.json';
 import IndexPatternVulnerabilitiesKnownFields from '../common/known-fields/states-vulnerabilities.json';
 import IndexPatternActiveResponsesKnownFields from '../common/known-fields/active-responses.json';
+import IndexPatternThreatintelEnrichmentsKnownFields from '../common/known-fields/threatintel-enrichments.json';
+import IndexPatternThreatintelVulnerabilitiesKnownFields from '../common/known-fields/threatintel-vulnerabilities.json';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -683,45 +680,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     core.healthCheck.register(
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AWS,
-        indexPatternID: WAZUH_EVENTS_CLOUD_SERVICES_AWS_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsCloudServicesAWSKnownFields,
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AZURE,
-        indexPatternID: WAZUH_EVENTS_CLOUD_SERVICES_AZURE_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsCloudServicesAzureKnownFields,
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_GCP,
-        indexPatternID: WAZUH_EVENTS_CLOUD_SERVICES_GCP_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsCloudServicesGCPKnownFields,
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS,
         indexPatternID: WAZUH_EVENTS_PATTERN,
         options: {
@@ -885,6 +843,28 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternFindingsKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS,
+        indexPatternID: WAZUH_THREATINTEL_ENRICHMENTS_PATTERN,
+        options: {
+          fieldsNoIndices: IndexPatternThreatintelEnrichmentsKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_VULNERABILITIES,
+        indexPatternID: WAZUH_THREATINTEL_VULNERABILITIES_PATTERN,
+        options: {
+          fieldsNoIndices: IndexPatternThreatintelVulnerabilitiesKnownFields,
         },
       }),
     );

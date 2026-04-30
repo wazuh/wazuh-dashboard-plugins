@@ -35,33 +35,12 @@ describe('services/versionService', () => {
     );
   });
 
-  it('reads version from package.json version and revision', () => {
+  it('reads version from package.json version', () => {
     (readJsonFile as jest.Mock).mockReturnValue({
       version: '5.0.0',
-      revision: '00',
     });
     const wazuhIndexerVersion = getAppVersionFromPackageJson('OS', envPaths);
-    expect(wazuhIndexerVersion).toBe('5.0.0-0');
-    expect(readJsonFile).toHaveBeenCalledWith(envPaths.packageJsonPath);
-  });
-
-  it('reads version from package.json version and revision', () => {
-    (readJsonFile as jest.Mock).mockReturnValue({
-      version: '5.0.0',
-      revision: '0',
-    });
-    const wazuhIndexerVersion = getAppVersionFromPackageJson('OS', envPaths);
-    expect(wazuhIndexerVersion).toBe('5.0.0-0');
-    expect(readJsonFile).toHaveBeenCalledWith(envPaths.packageJsonPath);
-  });
-
-  it('reads version from package.json version and revision', () => {
-    (readJsonFile as jest.Mock).mockReturnValue({
-      version: '5.0.0',
-      revision: '13',
-    });
-    const wazuhIndexerVersion = getAppVersionFromPackageJson('OS', envPaths);
-    expect(wazuhIndexerVersion).toBe('5.0.0-13');
+    expect(wazuhIndexerVersion).toBe('5.0.0-latest');
     expect(readJsonFile).toHaveBeenCalledWith(envPaths.packageJsonPath);
   });
 

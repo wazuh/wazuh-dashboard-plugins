@@ -146,6 +146,7 @@ export const VisualizationBasicWidget = ({
 type VisualizationBasicWidgetSelectorOptions = { value: any; text: string }[];
 type VisualizationBasicWidgetSelectorProps = VisualizationBasicWidgetProps & {
   selectorOptions: VisualizationBasicWidgetSelectorOptions;
+  defaultOption?: string;
   title?: string;
   onFetchExtraDependencies?: any[];
 };
@@ -165,9 +166,10 @@ type VisualizationBasicWidgetSelectorBodyProps =
 
 export const useVisualizationBasicWidgetSelector = (
   selectorOptions: VisualizationBasicWidgetSelectorOptions,
+  defaultOption?: string,
 ) => {
   const [selectedOption, setSelectedOption] = useState(
-    selectorOptions[0].value,
+    defaultOption || selectorOptions[0].value,
   );
 
   const onChange = useCallback(
@@ -238,12 +240,15 @@ export const VisualizationBasicWidgetSelectorBody = ({
  */
 export const VisualizationBasicWidgetSelector = ({
   selectorOptions,
+  defaultOption,
   title,
   onFetchExtraDependencies,
   ...rest
 }: VisualizationBasicWidgetSelectorProps) => {
-  const { selectedOption, onChange } =
-    useVisualizationBasicWidgetSelector(selectorOptions);
+  const { selectedOption, onChange } = useVisualizationBasicWidgetSelector(
+    selectorOptions,
+    defaultOption,
+  );
 
   return (
     <>

@@ -39,6 +39,7 @@ services:
     environment:
       - JAVA_OPTS="-Xmx512m -Xss512k -Dfile.encoding=UTF-8 -XX:MaxRAM=800m -XX:MaxRAMPercentage=95 -XX:MinRAMPercentage=60A"
       - MALLOC_ARENA_MAX=1
+      - IMPOSTER_CONFIG_SCAN_RECURSIVE=true
     volumes:
       - ../imposter:/opt/imposter/config
 
@@ -372,7 +373,6 @@ services:
     build:
       context: ./manager
     profiles:
-      - 'dashboard-src'
       - 'server-local' # server profile to use the local packages with agents deb and rpm
       - 'server-local-rpm' # server profile to use the local packages with agent rpm
       - 'server-local-deb' # server profile to use the local packages with agent deb

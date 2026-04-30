@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, waitFor } from '@testing-library/react';
 import { useService } from './use-service';
 
 const successfulService = async (_params?: any) => {
@@ -7,21 +7,23 @@ const successfulService = async (_params?: any) => {
 const failingService = async (_params?: any) => {
   return Promise.reject('Error occurred');
 };
+
+let callCount = 0;
 const successfulRefreshService = async (_params?: any) => {
-  // Add a small delay to ensure different timestamps
-  await new Promise(resolve => setTimeout(resolve, 1));
-  return Promise.resolve(Date.now());
+  return Promise.resolve(++callCount);
 };
 
 const successfulServiceWithParams = jest.fn().mockResolvedValue('test data');
 
 describe('useService hook', () => {
-  it('should return data and success state when service call is successful', async () => {
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useService(successfulService),
-    );
+  beforeEach(() => {
+    callCount = 0;
+  });
 
-    await waitForNextUpdate();
+  it('should return data and success state when service call is successful', async () => {
+    const { result } = renderHook(() => useService(successfulService));
+
+    await waitFor(() => expect(result.current.isLoading).toEqual(false));
 
     expect(result.current.data).toEqual('test data');
     expect(result.current.isLoading).toEqual(false);
@@ -31,11 +33,9 @@ describe('useService hook', () => {
   });
 
   it('should return error state when service call fails', async () => {
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useService(failingService),
-    );
+    const { result } = renderHook(() => useService(failingService));
 
-    await waitForNextUpdate();
+    await waitFor(() => expect(result.current.isLoading).toEqual(false));
 
     expect(result.current.data).toBeUndefined();
     expect(result.current.isLoading).toEqual(false);
@@ -45,17 +45,17 @@ describe('useService hook', () => {
   });
 
   it('should fetch data again with new data when refresh value changes', async () => {
-    const { result, rerender, waitForNextUpdate } = renderHook(
+    const { result, rerender } = renderHook(
       ({ refresh }) => useService(successfulRefreshService, undefined, refresh),
       { initialProps: { refresh: 0 } },
     );
 
-    await waitForNextUpdate();
+    await waitFor(() => expect(result.current.isLoading).toEqual(false));
 
     const data = result.current.data;
 
     rerender({ refresh: 1 });
-    await waitForNextUpdate();
+    await waitFor(() => expect(result.current.data).not.toEqual(data));
 
     expect(result.current.data).not.toEqual(data);
   });
@@ -63,8 +63,12 @@ describe('useService hook', () => {
   it('should call the service with provided parameters', async () => {
     const params = { id: 123456 };
 
-    renderHook(() => useService(successfulServiceWithParams, params));
+    const { result } = renderHook(() =>
+      useService(successfulServiceWithParams, params),
+    );
 
     expect(successfulServiceWithParams).toHaveBeenCalledWith(params);
+
+    await waitFor(() => expect(result.current.isLoading).toEqual(false));
   });
 });

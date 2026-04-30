@@ -13,6 +13,7 @@
  */
 
 import React from 'react';
+import { act } from '@testing-library/react';
 import { mount } from 'enzyme';
 import { TableDefault } from './table-default';
 
@@ -63,18 +64,29 @@ const columns = [
 ];
 
 const tableProps = {
-  onSearch: () => {},
+  onSearch: jest.fn().mockReturnValue(new Promise(() => {})),
   tableColumns: columns,
   tablePageSizeOptions: [15, 25, 50, 100],
-  tableInitialSortingDirection: 'asc',
+  tableInitialSortingDirection: 'asc' as const,
   tableInitialSortingField: '',
+  tableInitialPageSize: 15,
   tableProps: {},
-  reload: () => {},
+  reload: 0,
+  rowProps: undefined,
+  endpoint: '/test-endpoint',
 };
 
 describe('Table Default component', () => {
-  it('renders correctly to match the snapshot', () => {
-    const wrapper = mount(<TableDefault {...tableProps} />);
-    expect(wrapper).toMatchSnapshot();
+  it('renders correctly to match the snapshot', async () => {
+    let wrapper = null;
+
+    await act(async () => {
+      wrapper = mount(<TableDefault {...tableProps} />);
+      await Promise.resolve();
+    });
+
+    wrapper!.update();
+    expect(wrapper!).toMatchSnapshot();
+    wrapper!.unmount();
   });
 });

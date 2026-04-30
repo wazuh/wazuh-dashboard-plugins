@@ -34,7 +34,7 @@ import type { Logger } from '../utils/logger';
 export function printUsageAndExit(log: Logger): never {
   log.infoPlain('');
   log.infoPlain(
-    `./dev.sh <action> [${FLAGS.PLUGINS_ROOT} /abs/path] [${FLAGS.OS_VERSION} os_version] [${FLAGS.OSD_VERSION} osd_version] [${FLAGS.AGENTS_UP} agents_up] [${FLAGS.REPO} repo=absolute_path ...] [${FLAGS.SAML} | ${FLAGS.SERVER} <version> | ${FLAGS.SERVER_LOCAL} <tag>] [${FLAGS.BASE} [absolute_path]]`,
+    `./dev.sh <action> [${FLAGS.PLUGINS_ROOT} /abs/path] [${FLAGS.OS_VERSION} os_version] [${FLAGS.OSD_VERSION} osd_version] [${FLAGS.AGENTS_UP} agents_up] [${FLAGS.REPO} repo=absolute_path ...] [${FLAGS.SAML} | ${FLAGS.SERVER} <version> | ${FLAGS.SERVER_LOCAL} <tag>] [${FLAGS.BASE} [absolute_path]] [${FLAGS.ALL_FORKS}]`,
   );
   log.infoPlain('');
   log.infoPlain('Flags');
@@ -63,6 +63,9 @@ export function printUsageAndExit(log: Logger): never {
   );
   log.infoPlain(
     `  ${FLAGS.INDEXER_LOCAL} [image_tag] Use an indexer from package.`,
+  );
+  log.infoPlain(
+    `  ${FLAGS.ALL_FORKS}           Auto-discover and mount all sibling repositories (excludes wazuh-dashboard, use --base for that).`,
   );
   log.infoPlain('');
   log.infoPlain(
@@ -272,6 +275,12 @@ export function parseArguments(
         } else {
           index++;
         }
+        break;
+      }
+
+      case FLAGS.ALL_FORKS: {
+        config.setAllForks(true, 'argumentParser');
+        index++;
         break;
       }
 

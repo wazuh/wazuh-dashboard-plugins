@@ -20,6 +20,7 @@ import {
 import WzConfigurationEditConfiguration from './edit-configuration/edit-configuration';
 import WzConfigurationRegistrationService from './registration-service/registration-service';
 import WzConfigurationCluster from './cluster/cluster';
+import WzConfigurationIndexer from './indexer/indexer-configuration';
 import WzConfigurationClient from './client/client';
 import WzConfigurationClientBuffer from './client-buffer/client-buffer';
 import { WzConfigurationAlertsLabelsAgent } from './alerts/alerts-labels';
@@ -246,15 +247,20 @@ class WzConfigurationSwitch extends Component {
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
-                {/* FIXME: Either remove cluster section or edit the endpoint it
-                          uses (if there is a valid endpoint with the info)
                 <WzViewSelectorSwitch view='cluster'>
                   <WzConfigurationCluster
                     clusterNodeSelected={this.props.clusterNodeSelected}
                     agent={agent}
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
-                </WzViewSelectorSwitch>*/}
+                </WzViewSelectorSwitch>
+                <WzViewSelectorSwitch view='indexer'>
+                  <WzConfigurationIndexer
+                    clusterNodeSelected={this.props.clusterNodeSelected}
+                    agent={agent}
+                    updateConfigurationSection={this.updateConfigurationSection}
+                  />
+                </WzViewSelectorSwitch>
                 <WzViewSelectorSwitch view='registration-service'>
                   <WzConfigurationRegistrationService
                     clusterNodeSelected={this.props.clusterNodeSelected}

@@ -38,7 +38,7 @@ export default {
     '^.+\\.html?$': `${kbnDir}/src/dev/jest/babel_transform.js`,
   },
   transformIgnorePatterns: [
-    '[/\\\\]node_modules(?![\\/\\\\](monaco-editor|react-monaco-editor|weak-lru-cache|ordered-binary|d3-color|axios|@smithy|@aws-crypto|@aws-sdk|uuid))[/\\\\].+\\.js$',
+    '[/\\\\]node_modules(?![\\/\\\\](monaco-editor|react-monaco-editor|weak-lru-cache|ordered-binary|d3-color|axios|@smithy|@aws-crypto|@aws-sdk|uuid|@tootallnate/once))[/\\\\].+\\.js$',
   ],
   snapshotSerializers: [`${kbnDir}/node_modules/enzyme-to-json/serializer`],
   testEnvironment: 'jest-environment-jsdom',
