@@ -39,6 +39,8 @@ const defaultStatusCti = { status: 404, message: '' };
 describe('ModalCti component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockRefetchStatus.mockReset();
+    mockRefetchStatus.mockResolvedValue(undefined);
     ctiFlowState.reset();
     (getCore as jest.Mock).mockReturnValue({
       http: { post: mockHttpPost },
@@ -75,6 +77,35 @@ describe('ModalCti component', () => {
     expect(getByText('Yes, I want to register')).toBeInTheDocument();
   });
 
+  it('reopens to in-progress links when refetch restores server snapshot', async () => {
+    mockRefetchStatus.mockImplementation(async () => {
+      ctiFlowState.setRegistrationComplete(false);
+      ctiFlowState.setDeviceCode('dc-restored');
+      ctiFlowState.setDeviceAuthLinks({
+        user_code: 'WZH-REST',
+        verification_uri: 'https://console.wazuh.com/act',
+        verification_uri_complete:
+          'https://console.wazuh.com/act?user_code=WZH-REST',
+      });
+    });
+
+    const { getByText, queryByText, getByTestId } = render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={defaultStatusCti}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(getByText('Registration in progress')).toBeInTheDocument();
+      expect(getByTestId('ctiDeviceUserCode')).toHaveTextContent('WZH-REST');
+    });
+    expect(
+      queryByText('Do you want to register to CTI updates?'),
+    ).not.toBeInTheDocument();
+  });
+
   it('should handle button click, show activation URL, and open verification URI', async () => {
     const { getByText } = render(
       <ModalCti
@@ -107,6 +138,9 @@ describe('ModalCti component', () => {
       'https://console.wazuh.com/platform/environments/register?user_code=WZH-999',
       'wazuh_cti',
     );
+    expect(ctiFlowState.getDeviceAuthLinks()?.verification_uri_complete).toBe(
+      'https://console.wazuh.com/platform/environments/register?user_code=WZH-999',
+    );
   });
 
   it('starts device flow polling schedule and shows in-progress copy', async () => {
@@ -127,6 +161,7 @@ describe('ModalCti component', () => {
       expect(ctiFlowState.getPollIntervalSec()).toBe(
         CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
       );
+      expect(ctiFlowState.getDeviceAuthLinks()?.user_code).toBe('WZH-999');
       expect(getByTestId('ctiRegistrationInProgress')).toBeInTheDocument();
     });
   });

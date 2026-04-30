@@ -6,6 +6,7 @@ import {
   statusCodes,
 } from '../../common/constants';
 import type { CtiRegistrationStatusApiBody } from '../../common/cti-registration-status-api';
+import type { CtiDeviceAuthorization } from '../shared-components/cti-registration/types';
 import { ctiFlowState } from './cti-flow-state';
 import { getCore } from '../plugin-services';
 
@@ -17,6 +18,31 @@ function formatOAuthErrorMessage(
     return `${error}: ${errorDescription}`;
   }
   return error;
+}
+
+function buildDeviceAuthLinksFromStatusBody(
+  body: CtiRegistrationStatusApiBody,
+): CtiDeviceAuthorization | null {
+  const userCode = body.user_code ?? '';
+  const verificationUri =
+    body.verification_uri ?? body.verification_uri_complete ?? '';
+  const verificationUriComplete =
+    body.verification_uri_complete ??
+    (verificationUri && userCode
+      ? `${verificationUri}${
+          verificationUri.includes('?') ? '&' : '?'
+        }user_code=${encodeURIComponent(userCode)}`
+      : '');
+
+  if (!userCode && !verificationUri && !verificationUriComplete) {
+    return null;
+  }
+
+  return {
+    user_code: userCode,
+    verification_uri: verificationUri || verificationUriComplete,
+    verification_uri_complete: verificationUriComplete,
+  };
 }
 
 export async function hydrateCtiFlowFromServer(): Promise<void> {
@@ -41,6 +67,8 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
     ) {
       ctiFlowState.setDeviceAuthExpiry(body.expires_in_remaining_sec);
     }
+    const links = buildDeviceAuthLinksFromStatusBody(body);
+    ctiFlowState.setDeviceAuthLinks(links);
     return;
   }
 

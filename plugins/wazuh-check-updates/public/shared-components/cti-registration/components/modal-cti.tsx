@@ -39,7 +39,17 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     React.useState<CtiDeviceAuthorization | null>(null);
 
   useEffect(() => {
-    void refetchStatus();
+    let cancelled = false;
+    (async () => {
+      await refetchStatus();
+      if (cancelled) {
+        return;
+      }
+      setDeviceAuth(ctiFlowState.getDeviceAuthLinks());
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [refetchStatus]);
 
   useEffect(() => {
@@ -101,11 +111,13 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
             }user_code=${encodeURIComponent(userCode)}`
           : '');
 
-      setDeviceAuth({
+      const links: CtiDeviceAuthorization = {
         user_code: userCode,
         verification_uri: verificationUri || verificationUriComplete,
         verification_uri_complete: verificationUriComplete,
-      });
+      };
+      setDeviceAuth(links);
+      ctiFlowState.setDeviceAuthLinks(links);
       /* eslint-enable camelcase */
       setLoading(false);
 
@@ -139,7 +151,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     statusCTI.status === statusCodes.REGISTRATION_FAILED;
 
   const showRegistrationIntro =
-    !showSuccess && !showRegistrationFailed;
+    !showSuccess && !showRegistrationFailed && !deviceAuth;
 
   return (
     <EuiModal onClose={handleModalToggle}>
@@ -155,6 +167,11 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               <FormattedMessage
                 id='wazuhCheckUpdates.ctiRegistration.modalTitleFailed'
                 defaultMessage='CTI registration'
+              />
+            ) : deviceAuth ? (
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.modalTitleInProgress'
+                defaultMessage='Registration in progress'
               />
             ) : (
               <FormattedMessage
@@ -190,7 +207,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         ) : null}
         {deviceAuth && !showSuccess && !showRegistrationFailed && (
           <>
-            {showRegistrationIntro ? <EuiSpacer size='m' /> : null}
+            <EuiSpacer size='m' />
             <CtiDeviceAuthLinks deviceAuth={deviceAuth} />
           </>
         )}

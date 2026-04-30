@@ -4,11 +4,13 @@ import {
   CTI_MIN_DEVICE_POLL_INTERVAL_SEC,
   CTI_SLOW_DOWN_EXTRA_INTERVAL_SEC,
 } from '../../common/constants';
+import type { CtiDeviceAuthorization } from '../shared-components/cti-registration/types';
 
 let deviceCode: string | null = null;
 let registrationComplete = false;
 let pollIntervalSeconds = CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC;
 let deviceAuthExpiresAt: number | null = null;
+let deviceAuthLinks: CtiDeviceAuthorization | null = null;
 
 export const ctiFlowState = {
   getDeviceCode(): string | null {
@@ -17,6 +19,17 @@ export const ctiFlowState = {
 
   setDeviceCode(code: string | null): void {
     deviceCode = code && code.length > 0 ? code : null;
+    if (!deviceCode) {
+      deviceAuthLinks = null;
+    }
+  },
+
+  getDeviceAuthLinks(): CtiDeviceAuthorization | null {
+    return deviceAuthLinks;
+  },
+
+  setDeviceAuthLinks(links: CtiDeviceAuthorization | null): void {
+    deviceAuthLinks = links;
   },
 
   isRegistrationComplete(): boolean {
@@ -28,6 +41,7 @@ export const ctiFlowState = {
     if (complete) {
       deviceCode = null;
       deviceAuthExpiresAt = null;
+      deviceAuthLinks = null;
     }
   },
 
@@ -71,5 +85,6 @@ export const ctiFlowState = {
     registrationComplete = false;
     pollIntervalSeconds = CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC;
     deviceAuthExpiresAt = null;
+    deviceAuthLinks = null;
   },
 };
