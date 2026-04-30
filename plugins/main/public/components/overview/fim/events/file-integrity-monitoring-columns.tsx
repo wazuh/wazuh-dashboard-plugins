@@ -5,8 +5,8 @@ export const fileIntegrityMonitoringColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   commonColumns['wazuh.agent.id'],
   commonColumns['wazuh.agent.name'],
-  { id: 'file.path' },
-  { id: 'event.type' },
+  { id: 'rule.title' },
+  { id: 'rule.level' },
   { id: 'event.action' },
-  { id: 'file.inode' },
+  { id: 'file.path' },
 ];
