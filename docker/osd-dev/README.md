@@ -8,6 +8,7 @@
   `sudo sysctl -w vm.max_map_count=262144`
 
   To make the change permanent in host machine:
+
   - In host machine:
     `sudo nano /etc/sysctl.conf`
   - Add at the end of the file: vm.max_map_count=262144
@@ -16,6 +17,7 @@
 
   The jq tool is used by the scripts to process JSON files.
   To install jq, you can run this command:
+
   - In Debian/Ubuntu:
     `sudo apt-get install jq`
   - In RedHat/CentOS:
@@ -122,6 +124,7 @@ Examples (shorthand alias resolves to the canonical folder 'wazuh-security-dashb
 ### Search Order and Precedence (Security Plugin)
 
 - Auto-discovery (no `-r`):
+
   - Looks only at the canonical folder 'wazuh-security-dashboards-plugin' under your <common-parent-directory>.
 
 - Overrides with `-r` (takes precedence):
@@ -223,6 +226,7 @@ The script will not select the appropriate version of the wazuh-dashboard-plugin
 #### Warning
 
 - After using the yarn start command, an error about missing dependencies could appear, to fix the dependencies:
+
   - In osd-dev container shell inside `/plugins` folder:
     `for d in */; do (cd "$d" && yarn); done`
 
@@ -267,6 +271,7 @@ The development environment includes **Mailpit**, a development SMTP server that
 To configure the notifications sender to use Mailpit:
 
 1. **Access notification settings** in Wazuh Dashboard:
+
    - Go to the `Notifications` section
 
 2. **Configure the sender with these settings**:
