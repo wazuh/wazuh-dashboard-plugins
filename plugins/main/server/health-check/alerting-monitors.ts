@@ -13,7 +13,7 @@
  */
 
 import type { Monitor, PluginTaskRunContext, TriggerAction } from './types';
-import { WAZUH_EVENTS_PATTERN } from '../../common/constants';
+import { WAZUH_FINDINGS_PATTERN } from '../../common/constants';
 import { DEFAULT_CHANNELS_ID } from './notification-default-channels/common/constants';
 
 const JSON_INDENT_SPACES = 4;
@@ -141,7 +141,7 @@ function buildMonitorBody(
     inputs: [
       {
         search: {
-          indices: [WAZUH_EVENTS_PATTERN],
+          indices: [WAZUH_FINDINGS_PATTERN],
           query: {
             size: 0,
             query: {
