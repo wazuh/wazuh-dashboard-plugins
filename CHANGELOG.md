@@ -7,7 +7,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 5.0.0
-- Added default notification channels through health check [#7827](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7827)
 - Added sample data generators for agents monitoring and server statistics [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Added "form-data": "^4.0.4" to the resolutions section to ensure this specific version is installed [#7662](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7662)
 - Added prompts to some views related to problems with server API and alerts index pattern [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694)
@@ -131,7 +130,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the Statistics app [#8218](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8218)
 - Removed some options of the manager and agent configuration [#8243](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8243)
 - Removed GPG13 option in Compliance panel in agent overview [#8307](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8307)
-- Removed default notification channels creation health check [#8405](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8405)
 
 ## Wazuh v4.14.6 - OpenSearch Dashboards 2.19.5 - Revision 00
 

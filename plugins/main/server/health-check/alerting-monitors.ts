@@ -5,8 +5,8 @@
 
 // Health-check task that ensures sample Alerting monitors exist for quick
 // integrations: Slack, PagerDuty, Jira, Shuffle. Actions will target
-// Notifications channels created by the notifications health-check task. If a
-// required channel is not available, monitors are NOT created.
+// Notifications channels created by the wazuh-indexer-notifications repository.
+// If a required channel is not available, monitors are NOT created.
 
 /**
  * @see https://docs.opensearch.org/3.2/observing-your-data/alerting/api/
