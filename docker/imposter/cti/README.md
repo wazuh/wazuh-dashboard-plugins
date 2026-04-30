@@ -3,6 +3,8 @@ local development of the Wazuh Dashboard CTI integration.
 
 ## What it mocks
 
+### CTI Console (device flow)
+
 A single endpoint implementing the OAuth 2.0 Device Authorization Grant
 (RFC 8628):
 
@@ -19,6 +21,29 @@ The response depends on the request body:
 
 Both `application/x-www-form-urlencoded` and `application/json` request
 bodies are accepted.
+
+### Content Manager subscription (indexer stand-in)
+
+Until the real OpenSearch Content Manager plugin exists, the same Imposter
+instance exposes:
+
+```
+POST /_plugins/_content_manager/subscription
+```
+
+| JSON body | HTTP | Response body |
+| --------- | ---- | --------------- |
+| `{ "access_token": "<non-empty>" }` | **201** | `{ "message": "Credentials received", "status": 201 }` |
+| Missing, empty, or invalid JSON / no `access_token` | **400** | `{ "message": "Missing [access_token] field.", "status": 400 }` |
+
+**Security:** the `access_token` is a secret. Only the dashboard **server**
+should POST it to this URL (or to the real indexer later). Do not surface it
+in public bundles or browser-facing API responses.
+
+In `docker/osd-dev/dev.yml`, the OSD service sets
+`WAZUH_CONTENT_MANAGER_BASE_URL=http://imposter:8080` so a successful CTI
+device poll triggers this mock automatically. Omit the variable (or point it
+at the real indexer) in other environments.
 
 ## Forcing a polling result
 
@@ -37,11 +62,12 @@ the header `X-Mock-Scenario` with one of:
 - `openapi.yml` — OpenAPI 3.0 specification consumed by Imposter.
 - `cti-config.yml` — Imposter resource configuration.
 - `token.js` — Dispatch logic (body parsing, scenario selection, poll counter).
+- `subscription.js` — Content Manager subscription mock (JSON `access_token` validation).
 - `responses/*.json` — Static payloads for each response.
 
 > **Note:** Imposter scripts run on **Nashorn (ES5 only)**. Avoid trailing
 > commas in function calls, `const`/`let`, arrow functions, template literals,
-> destructuring and any other ES2015+ syntax in `token.js`.
+> destructuring and any other ES2015+ syntax in `token.js` and `subscription.js`.
 
 ## Topology
 
@@ -49,7 +75,9 @@ This mock runs **inside the existing Imposter container** (no extra service
 required). With `IMPOSTER_CONFIG_SCAN_RECURSIVE=true` on the Imposter service
 (see `docker/osd-dev/dev.yml` and `docker/kbn-dev/dev.yml`), every `*-config.yml`
 under `/opt/imposter/config` is loaded, including `cti/cti-config.yml` alongside
-`wazuh-config.yml`. Paths do not collide with the Wazuh API mocks.
+`wazuh-config.yml`. Paths do not collide with the Wazuh API mocks. The
+`/_plugins/_content_manager/subscription` path does not overlap the Wazuh mocks
+either.
 
 ## Quick test
 
@@ -68,4 +96,14 @@ curl -i -X POST http://imposter:8080/api/v1/platform/environments/token \
 curl -i -X POST http://imposter:8080/api/v1/platform/environments/token \
   -H 'X-Mock-Scenario: expired_token' \
   -d 'grant_type=urn:ietf:params:oauth:grant-type:device_code&client_id=a17c21ed&device_code=mock_device_code_123'
+
+# 4. Content Manager subscription (use a placeholder token in local dev only)
+curl -i -X POST http://imposter:8080/_plugins/_content_manager/subscription \
+  -H 'Content-Type: application/json' \
+  -d '{"access_token":"dev-placeholder-token"}'
+
+# 5. Subscription validation error (missing token)
+curl -i -X POST http://imposter:8080/_plugins/_content_manager/subscription \
+  -H 'Content-Type: application/json' \
+  -d '{}'
 ```

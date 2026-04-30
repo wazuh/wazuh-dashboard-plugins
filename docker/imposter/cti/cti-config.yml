@@ -16,3 +16,10 @@ resources:
     path: /api/v1/platform/environments/token
     response:
       scriptFile: token.js
+
+  # Stand-in for the indexer Content Manager subscription API (replace with
+  # real cluster URL in production). JSON body: { "access_token": "..." }.
+  - method: POST
+    path: /_plugins/_content_manager/subscription
+    response:
+      scriptFile: subscription.js

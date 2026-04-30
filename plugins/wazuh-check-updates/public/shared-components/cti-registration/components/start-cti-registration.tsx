@@ -21,9 +21,9 @@ export const StartCtiRegistration: React.FC<
   );
 
   const navButtonBottomLeft = (
-    <EuiToolTip position='top' content='register to CTI updates'>
+    <EuiToolTip position='top' content='Register to CTI updates'>
       <EuiButtonIcon
-        aria-label='register to CTI updates'
+        aria-label='Register to CTI updates'
         color='text'
         iconType='globe'
         onClick={() => handleModalToggle()}

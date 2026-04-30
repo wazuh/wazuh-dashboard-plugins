@@ -53,7 +53,10 @@ export const ctiConsoleApiPaths = {
   environmentsToken: '/api/v1/platform/environments/token',
 } as const;
 
-const WAZUH_CONTENT_MANAGER_BASE_PATH = '/_plugins/content-manager';
+/** OpenSearch Content Manager plugin HTTP prefix (matches indexer / Imposter mock). */
+const WAZUH_CONTENT_MANAGER_BASE_PATH = '/_plugins/_content_manager';
+
+/** Relative paths appended to `WAZUH_CONTENT_MANAGER_BASE_URL` (server-side only). */
 export const enum contentManagerRoutes {
   subscription = `${WAZUH_CONTENT_MANAGER_BASE_PATH}/subscription`,
   contentUpdate = `${WAZUH_CONTENT_MANAGER_BASE_PATH}/update`,

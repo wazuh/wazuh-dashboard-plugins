@@ -11,6 +11,7 @@ import { getCtiTokenRoute } from './token';
 import {
   getCtiToken,
   pollCtiToken,
+  postContentManagerSubscription,
   resolveCtiOAuthClientId,
 } from '../../services/cti-registration';
 import {
@@ -31,6 +32,8 @@ const port = 11006;
 const mockedGetCtiToken = getCtiToken as jest.Mock;
 const mockedPollCtiToken = pollCtiToken as jest.Mock;
 const mockedResolve = resolveCtiOAuthClientId as jest.Mock;
+const mockedPostContentManagerSubscription =
+  postContentManagerSubscription as jest.Mock;
 
 jest.mock('../../services/cti-registration', () => ({
   CtiConfigurationError: class CtiConfigurationError extends Error {},
@@ -39,6 +42,7 @@ jest.mock('../../services/cti-registration', () => ({
   resolveCtiOAuthClientId: jest.fn(),
   getCtiConsoleBaseUrl: jest.fn(),
   fetchOpenSearchClusterUuid: jest.fn(),
+  postContentManagerSubscription: jest.fn(() => Promise.resolve()),
 }));
 
 const loggingService = loggingSystemMock.create();
@@ -180,10 +184,30 @@ describe('CTI token route', () => {
     expect(response.body).toEqual(CTI_REGISTRATION_COMPLETED_BODY);
     expect(mockedPollCtiToken).toHaveBeenCalledWith('resolved-client-id', 'dc1');
     expect(mockedGetCtiToken).not.toHaveBeenCalled();
+    expect(mockedPostContentManagerSubscription).toHaveBeenCalledWith('tok');
     expect(
       CtiRegistrationStore.getInstance().getStatus('resolved-client-id')
         ?.registrationComplete,
     ).toBe(true);
+  });
+
+  test('POST polling returns 503 when Content Manager subscription fails', async () => {
+    mockedPollCtiToken.mockResolvedValue({ access_token: 'tok' });
+    mockedPostContentManagerSubscription.mockRejectedValueOnce(
+      new Error('upstream failed'),
+    );
+
+    await supertest(innerServer.listener)
+      .post(routes.token)
+      .send({
+        grant_type: CTI_OAUTH_DEVICE_GRANT_TYPE,
+        device_code: 'dc1',
+      })
+      .expect(503);
+
+    expect(
+      CtiRegistrationStore.getInstance().getStatus('resolved-client-id'),
+    ).toBeUndefined();
   });
 
   test('POST rejects partial polling body', async () => {

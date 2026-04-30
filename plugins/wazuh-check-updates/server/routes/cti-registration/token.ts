@@ -5,6 +5,7 @@ import {
   CtiConfigurationError,
   getCtiToken,
   pollCtiToken,
+  postContentManagerSubscription,
   resolveCtiOAuthClientId,
 } from '../../services/cti-registration';
 import {
@@ -66,6 +67,18 @@ export const getCtiTokenRoute = (router: IRouter) => {
           )) as Record<string, unknown>;
 
           if (isSuccessfulUpstreamDevicePoll(pollBody)) {
+            const accessToken = pollBody.access_token as string;
+            try {
+              await postContentManagerSubscription(accessToken);
+            } catch {
+              store.clear(clientId);
+              return response.customError({
+                statusCode: 503,
+                body: new Error(
+                  'Registration could not be completed on this server.',
+                ),
+              });
+            }
             store.setRegistrationComplete(clientId);
             return response.ok({ body: CTI_REGISTRATION_COMPLETED_BODY });
           }
