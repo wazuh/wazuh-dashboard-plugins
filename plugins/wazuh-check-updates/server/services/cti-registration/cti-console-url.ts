@@ -1,7 +1,7 @@
 /**
  * Base URL for the Wazuh Console CTI / environment token API.
- * Must be set explicitly (no runtime default). For Imposter in Docker dev, use
- * `http://imposter:8080` — see docker/imposter/cti/README.md.
+ * Resolved from the dashboard server process environment (no hardcoded default).
+ * Deployment / local dev: see project documentation for required settings.
  */
 export class CtiConfigurationError extends Error {
   constructor(message: string) {
@@ -15,7 +15,7 @@ export const getCtiConsoleBaseUrl = (): string => {
   const raw = process.env.WAZUH_CTI_CONSOLE_BASE_URL?.trim();
   if (!raw) {
     throw new CtiConfigurationError(
-      'WAZUH_CTI_CONSOLE_BASE_URL is not set. For Imposter in Docker dev, set it to http://imposter:8080 (see docker/imposter/cti/README.md).',
+      'The CTI Console service is not configured on this server.',
     );
   }
   return raw.replace(/\/$/, '');

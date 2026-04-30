@@ -29,7 +29,7 @@ export async function resolveCtiOAuthClientId(
   const clusterUuid = await fetchOpenSearchClusterUuid();
   if (!clusterUuid) {
     throw new CtiConfigurationError(
-      'CTI OAuth client_id: OpenSearch GET / did not return cluster_uuid. Set WAZUH_CTI_CLIENT_ID or pass client_id in the request body.',
+      'CTI registration cannot determine an environment identifier on this server.',
     );
   }
   return clusterUuid;
