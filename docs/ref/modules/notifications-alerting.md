@@ -5,7 +5,7 @@
 When executed, the Health Check validates that the Notifications and Alerting plugins are available and ensures that a minimal, working configuration exists.
 If both plugins are detected, it automatically:
 
-- Verifies the existence of the **default notification channels** for the supported integrations. The channels themselves are provisioned by the [`wazuh-indexer-notifications`](https://github.com/wazuh/wazuh-indexer-notifications) repository, not by the Dashboard.
+- Verifies the existence of the **default notification channels** for the supported integrations. The channels themselves are provisioned by the [Wazuh indexer notifications plugin](https://github.com/wazuh/wazuh-indexer-notifications).
 - Creates **sample alerting monitors** associated with the channels that are present.
 - Logs the verification and creation progress in the Dashboard server logs.
 
@@ -23,14 +23,14 @@ These functions are part of the Dashboard and may be available depending on the 
 The Health Check includes a specific task that streamlines the setup of these capabilities:
 
 - **Task name**: `integrations:default-notifications-channels-and-alerting-monitors`.
-- **Function**: verifies the existence of the default notification channels (provisioned by the `wazuh-indexer-notifications` repository) and logs a warning if any are missing. If the Alerts component is available, the task also attempts to create sample monitors pointing to the channels that exist.
+- **Function**: verifies the existence of the default notification channels (provisioned by the Wazuh indexer notifications plugin) and logs a warning if any are missing. If the Alerts component is available, the task also attempts to create sample monitors pointing to the channels that exist.
 - **Creation state**: monitors created by this task are left disabled to facilitate review and configuration before activation.
 
 For general Health Check details, see [Health Check](./healthcheck.md).
 
 ## Default Notification Channels
 
-When the Notifications functionality is available in the Dashboard, the Health Check expects the following channels to exist (provisioned by `wazuh-indexer-notifications`, all created disabled):
+When the Notifications functionality is available in the Dashboard, the Health Check expects the following channels to exist (provisioned by Wazuh indexer notifications plugin, all created disabled):
 
 | Channel               | Description                                                                         | Configuration                                                                                                                                                                                            |
 | --------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
