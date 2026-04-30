@@ -1,7 +1,7 @@
 {
   "name": "wazuh-core",
-  "version": "5.0.0",
-  "revision": "01",
+  "version": "5.9.9",
+  "revision": "00",
   "pluginPlatform": {
     "version": "3.6.0"
   },
