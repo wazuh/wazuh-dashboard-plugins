@@ -1,4 +1,7 @@
-import { SavedObjectsFieldMapping, SavedObjectsType } from 'opensearch-dashboards/server';
+import {
+  SavedObjectsFieldMapping,
+  SavedObjectsType,
+} from 'opensearch-dashboards/server';
 import { SAVED_OBJECT_UPDATES } from '../../../../common/constants';
 
 const updateObjectType: SavedObjectsFieldMapping = {
@@ -38,40 +41,32 @@ export const availableUpdatesObject: SavedObjectsType = {
   namespaceType: 'agnostic',
   mappings: {
     properties: {
+      uuid: {
+        type: 'keyword',
+      },
+      current_version: {
+        type: 'text',
+      },
+      status: {
+        type: 'text',
+      },
       last_check_date: {
         type: 'date',
       },
-      apis_available_updates: {
+      last_check_date_dashboard: {
+        type: 'date',
+      },
+      last_available_major: updateObjectType,
+      last_available_minor: updateObjectType,
+      last_available_patch: updateObjectType,
+      error: {
         type: 'nested',
         properties: {
-          api_id: {
+          title: {
             type: 'text',
           },
-          current_version: {
+          detail: {
             type: 'text',
-          },
-          update_check: {
-            type: 'boolean',
-          },
-          status: {
-            type: 'text',
-          },
-          last_check_date: {
-            type: 'date',
-          },
-          last_available_major: updateObjectType,
-          last_available_minor: updateObjectType,
-          last_available_patch: updateObjectType,
-          error: {
-            type: 'nested',
-            properties: {
-              title: {
-                type: 'text',
-              },
-              detail: {
-                type: 'text',
-              },
-            },
           },
         },
       },

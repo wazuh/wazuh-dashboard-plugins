@@ -48,36 +48,22 @@ jest.mock('../utils/are-there-new-updates');
 describe('UpdatesNotification component', () => {
   test('should return the nofication component', async () => {
     mockedGetAvailableUpdates.mockImplementation(() => ({
-      isLoading: false,
-      apisAvailableUpdates: [
-        {
-          api_id: 'api id',
-          current_version: '4.3.1',
-          status: 'availableUpdates' as API_UPDATES_STATUS,
-          last_available_patch: {
-            description:
-              '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
-            published_date: '2022-05-18T10:12:43Z',
-            semver: {
-              major: 4,
-              minor: 3,
-              patch: 8,
-            },
-            tag: 'v4.3.8',
-            title: 'Wazuh v4.3.8',
-          },
-        },
-      ],
+      current_version: 'v4.3.1',
+      status: 'availableUpdates' as API_UPDATES_STATUS,
+      last_check_date_dashboard: new Date('2023-09-30T14:00:00.000Z'),
+      last_available_patch: {
+        description:
+          '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
+        published_date: '2022-05-18T10:12:43Z',
+        semver: { major: 4, minor: 3, patch: 8 },
+        tag: 'v4.3.8',
+        title: 'Wazuh v4.3.8',
+      },
     }));
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: false,
       userPreferences: {
-        last_dismissed_updates: [
-          {
-            api_id: 'api id',
-            last_patch: 'v4.3.1',
-          },
-        ],
+        last_dismissed_updates: { last_patch: 'v4.3.1' },
         hide_update_notifications: false,
       },
     }));
@@ -104,36 +90,22 @@ describe('UpdatesNotification component', () => {
 
   test('should return null when user close notification', async () => {
     mockedGetAvailableUpdates.mockImplementation(() => ({
-      apisAvailableUpdates: [
-        {
-          api_id: 'api id',
-          current_version: '4.3.1',
-          status: 'availableUpdates' as API_UPDATES_STATUS,
-          last_available_patch: {
-            description:
-              '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
-            published_date: '2022-05-18T10:12:43Z',
-            semver: {
-              major: 4,
-              minor: 3,
-              patch: 8,
-            },
-            tag: 'v4.3.8',
-            title: 'Wazuh v4.3.8',
-          },
-        },
-      ],
-      last_check_date: '20231027 14:39',
+      current_version: 'v4.3.1',
+      status: 'availableUpdates' as API_UPDATES_STATUS,
+      last_check_date_dashboard: new Date('2023-09-30T14:00:00.000Z'),
+      last_available_patch: {
+        description:
+          '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
+        published_date: '2022-05-18T10:12:43Z',
+        semver: { major: 4, minor: 3, patch: 8 },
+        tag: 'v4.3.8',
+        title: 'Wazuh v4.3.8',
+      },
     }));
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: false,
       userPreferences: {
-        last_dismissed_updates: [
-          {
-            api_id: 'api id',
-            last_patch: 'v4.3.1',
-          },
-        ],
+        last_dismissed_updates: { last_patch: 'v4.3.1' },
         hide_update_notifications: false,
       },
       updateUserPreferences: () => {},
@@ -169,8 +141,9 @@ describe('UpdatesNotification component', () => {
 
   test('should return null when there are no available updates', async () => {
     mockedGetAvailableUpdates.mockImplementation(() => ({
-      apisAvailableUpdates: [],
-      last_check_date: '20231027 14:39',
+      current_version: 'v4.3.8',
+      status: 'upToDate' as API_UPDATES_STATUS,
+      last_check_date_dashboard: new Date('2023-09-30T14:00:00.000Z'),
     }));
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: false,
@@ -190,12 +163,7 @@ describe('UpdatesNotification component', () => {
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: false,
       userPreferences: {
-        last_dismissed_updates: [
-          {
-            api_id: 'api id',
-            last_patch: 'v4.3.1',
-          },
-        ],
+        last_dismissed_updates: { last_patch: 'v4.3.1' },
         hide_update_notifications: true,
       },
     }));
@@ -210,36 +178,22 @@ describe('UpdatesNotification component', () => {
 
   test('should return null when user already dismissed the notifications for available updates', async () => {
     mockedGetAvailableUpdates.mockImplementation(() => ({
-      apisAvailableUpdates: [
-        {
-          api_id: 'api id',
-          current_version: '4.3.1',
-          status: 'availableUpdates' as API_UPDATES_STATUS,
-          last_available_patch: {
-            description:
-              '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
-            published_date: '2022-05-18T10:12:43Z',
-            semver: {
-              major: 4,
-              minor: 3,
-              patch: 8,
-            },
-            tag: 'v4.3.8',
-            title: 'Wazuh v4.3.8',
-          },
-        },
-      ],
-      last_check_date: '20231027 14:39',
+      current_version: 'v4.3.1',
+      status: 'availableUpdates' as API_UPDATES_STATUS,
+      last_check_date_dashboard: new Date('2023-09-30T14:00:00.000Z'),
+      last_available_patch: {
+        description:
+          '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
+        published_date: '2022-05-18T10:12:43Z',
+        semver: { major: 4, minor: 3, patch: 8 },
+        tag: 'v4.3.8',
+        title: 'Wazuh v4.3.8',
+      },
     }));
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: false,
       userPreferences: {
-        last_dismissed_updates: [
-          {
-            api_id: 'api id',
-            last_patch: 'v4.3.8',
-          },
-        ],
+        last_dismissed_updates: { last_patch: 'v4.3.8' },
         hide_update_notifications: false,
       },
     }));

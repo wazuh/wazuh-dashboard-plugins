@@ -10,14 +10,11 @@ export const updateUserPreferencesRoutes = (router: IRouter) => {
       validate: {
         body: schema.object({
           last_dismissed_updates: schema.maybe(
-            schema.arrayOf(
-              schema.object({
-                api_id: schema.string(),
-                last_major: schema.maybe(schema.string()),
-                last_minor: schema.maybe(schema.string()),
-                last_patch: schema.maybe(schema.string()),
-              })
-            )
+            schema.object({
+              last_major: schema.maybe(schema.string()),
+              last_minor: schema.maybe(schema.string()),
+              last_patch: schema.maybe(schema.string()),
+            }),
           ),
           hide_update_notifications: schema.maybe(schema.boolean()),
         }),
@@ -30,7 +27,9 @@ export const updateUserPreferencesRoutes = (router: IRouter) => {
     },
     async (context, request, response) => {
       try {
-        const user = await context['wazuh_check_updates'].security.getCurrentUser(request, context);
+        const user = await context[
+          'wazuh_check_updates'
+        ].security.getCurrentUser(request, context);
 
         if (!user?.username) {
           return response.customError({
@@ -39,7 +38,10 @@ export const updateUserPreferencesRoutes = (router: IRouter) => {
           });
         }
 
-        const userPreferences = await updateUserPreferences(user.username, request.body);
+        const userPreferences = await updateUserPreferences(
+          user.username,
+          request.body,
+        );
 
         return response.ok({
           body: userPreferences,
@@ -57,6 +59,6 @@ export const updateUserPreferencesRoutes = (router: IRouter) => {
           body: finalError,
         });
       }
-    }
+    },
   );
 };
