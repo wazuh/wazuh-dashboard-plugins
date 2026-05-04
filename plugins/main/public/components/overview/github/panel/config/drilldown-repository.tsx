@@ -19,7 +19,7 @@ import {
   getVisStateRuleLevelEvolution,
   getVisStateTopActions,
   getVisStateTopActors,
-  getVisStateTopCountries,
+  getVisStateTopSourceIPs,
   getVisStateTopOrganizations,
 } from './visualizations';
 import { ModuleConfigProps } from './module-config';
@@ -88,7 +88,7 @@ const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'd3',
-        savedVis: getVisStateTopCountries(indexPatternId),
+        savedVis: getVisStateTopSourceIPs(indexPatternId),
       },
     },
     d4: {

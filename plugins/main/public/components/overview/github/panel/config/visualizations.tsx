@@ -266,17 +266,23 @@ export const getVisStateTopOrganizations = (indexPatternId: string) => {
   };
 };
 
-export const getVisStateTopCountries = (indexPatternId: string) => {
+export const getVisStateTopSourceIPs = (indexPatternId: string) => {
   return {
-    id: 'Wazuh-App-Overview-GitHub-Countries',
-    title: 'Countries',
-    type: 'tagcloud',
+    id: 'Wazuh-App-Overview-GitHub-Top-Source-IPs',
+    title: 'Top 10 source IPs',
+    type: 'pie',
     params: {
-      scale: 'linear',
-      orientation: 'single',
-      minFontSize: 18,
-      maxFontSize: 72,
-      showLabel: true,
+      type: 'pie',
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      isDonut: true,
+      labels: {
+        show: false,
+        values: true,
+        last_level: true,
+        truncate: 100,
+      },
     },
     uiState: {
       vis: { params: { sort: { columnIndex: 3, direction: 'desc' } } },
@@ -310,7 +316,7 @@ export const getVisStateTopCountries = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'source.geo.country_iso_code',
+            field: 'source.ip',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -318,7 +324,7 @@ export const getVisStateTopCountries = (indexPatternId: string) => {
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'Top countries ',
+            customLabel: 'Source IPs',
           },
           schema: 'segment',
         },
