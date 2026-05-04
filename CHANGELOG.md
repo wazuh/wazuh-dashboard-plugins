@@ -84,6 +84,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Reduce the request done to get the index pattern to use in some views [#8318](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8318)
 - Changed default columns in Configuration assessment [#8320](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8320)
 - Set the downloaded local agent package name same to the remote one [#8350](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8350)
+- Changed FIM findings default columns [#8417](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8417)
 
 ### Fixed
 
