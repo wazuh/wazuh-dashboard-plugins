@@ -52,4 +52,3 @@ export interface Config {
 export interface Chime {
   url: string;
 }
-
