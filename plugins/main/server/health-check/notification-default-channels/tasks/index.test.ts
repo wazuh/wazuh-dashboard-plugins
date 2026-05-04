@@ -27,7 +27,7 @@ describe('initializeDefaultNotificationChannel', () => {
 
       expect(task).toHaveProperty('name');
       expect(task.name).toBe(
-        'integrations:default-notifications-channels-and-alerting-monitors',
+        'integrations:default-notifications-channels',
       );
       expect(task).toHaveProperty('run');
       expect(typeof task.run).toBe('function');
