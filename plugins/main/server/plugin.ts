@@ -64,7 +64,6 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS,
   WAZUH_THREATINTEL_ENRICHMENTS_PATTERN,
   HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_VULNERABILITIES,
-  WAZUH_THREATINTEL_VULNERABILITIES_PATTERN,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
@@ -854,17 +853,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_THREATINTEL_ENRICHMENTS_PATTERN,
         options: {
           fieldsNoIndices: IndexPatternThreatintelEnrichmentsKnownFields,
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_VULNERABILITIES,
-        indexPatternID: WAZUH_THREATINTEL_VULNERABILITIES_PATTERN,
-        options: {
-          fieldsNoIndices: IndexPatternThreatintelVulnerabilitiesKnownFields,
         },
       }),
     );

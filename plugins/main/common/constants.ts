@@ -214,8 +214,6 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS =
 // Index patterns - Threat Intel vulnerabilities
 export const WAZUH_INDEX_TYPE_THREATINTEL_VULNERABILITIES =
   'threatintel-vulnerabilities';
-export const WAZUH_THREATINTEL_VULNERABILITIES_PATTERN =
-  'wazuh-threatintel-vulnerabilities*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_VULNERABILITIES =
   'index-pattern:threatintel-vulnerabilities';
 
