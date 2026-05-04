@@ -39,7 +39,6 @@ import {
   WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS,
   WAZUH_INDEX_TYPE_STATES_SCA,
   WAZUH_INDEX_TYPE_THREATINTEL_ENRICHMENTS,
-  WAZUH_INDEX_TYPE_THREATINTEL_VULNERABILITIES,
 } from '../../common/constants';
 
 // Import generated known fields JSON files
@@ -73,8 +72,6 @@ import inventoryBrowserExtensionsFields from '../../common/known-fields/states-i
 import inventorySCAFields from '../../common/known-fields/states-sca.json';
 import metricsCommsFields from '../../common/known-fields/metrics-comms.json';
 import metricsAgentsFields from '../../common/known-fields/metrics-agents.json';
-import threatintelEnrichmentsFields from '../../common/known-fields/threatintel-enrichments.json';
-import threatintelVulnerabilitiesFields from '../../common/known-fields/threatintel-vulnerabilities.json';
 
 // Use generated fields as the primary source
 export const KnownFields = eventsFields;
@@ -121,8 +118,6 @@ export const KnownFieldsByIndexType = {
     inventoryBrowserExtensionsFields,
   [WAZUH_INDEX_TYPE_STATES_SCA]: inventorySCAFields,
   [WAZUH_INDEX_TYPE_THREATINTEL_ENRICHMENTS]: threatintelEnrichmentsFields,
-  [WAZUH_INDEX_TYPE_THREATINTEL_VULNERABILITIES]:
-    threatintelVulnerabilitiesFields,
 };
 
 /**

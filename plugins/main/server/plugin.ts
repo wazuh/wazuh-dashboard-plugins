@@ -63,7 +63,6 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_UNCLASSIFIED,
   HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS,
   WAZUH_THREATINTEL_ENRICHMENTS_PATTERN,
-  HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_VULNERABILITIES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
@@ -175,7 +174,6 @@ import IndexPatternMetricsCommsKnownFields from '../common/known-fields/metrics-
 import IndexPatternVulnerabilitiesKnownFields from '../common/known-fields/states-vulnerabilities.json';
 import IndexPatternActiveResponsesKnownFields from '../common/known-fields/active-responses.json';
 import IndexPatternThreatintelEnrichmentsKnownFields from '../common/known-fields/threatintel-enrichments.json';
-import IndexPatternThreatintelVulnerabilitiesKnownFields from '../common/known-fields/threatintel-vulnerabilities.json';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {

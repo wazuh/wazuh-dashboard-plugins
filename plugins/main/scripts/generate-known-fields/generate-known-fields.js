@@ -358,14 +358,6 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'threatintel-enrichments.json',
   },
-  'threatintel-vulnerabilities': {
-    urls: [
-      wazuhUrl(
-        'plugins/content-manager/src/main/resources/mappings/cti-cve-mappings.json',
-      ),
-    ],
-    outputFile: 'threatintel-vulnerabilities.json',
-  },
 };
 
 /**
