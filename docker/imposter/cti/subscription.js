@@ -1,5 +1,5 @@
-// Mock for the OpenSearch Content Manager subscription endpoint (stand-in until
-// the real indexer plugin exists). POST JSON body must include a non-empty
+// Mock for the Content Manager subscription endpoint (stand-in until
+// the real cluster plugin exists). POST JSON body must include a non-empty
 // `access_token`. The real dashboard must send this only from the server.
 //
 //   POST /_plugins/_content_manager/subscription

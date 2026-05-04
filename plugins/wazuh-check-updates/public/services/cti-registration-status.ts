@@ -50,8 +50,18 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
     routes.ctiRegistrationStatus,
   );
 
+  ctiFlowState.setPersistedCtiCredentials(
+    Boolean(body.hasPersistedCtiCredentials),
+  );
+
   if (body.registrationComplete) {
     ctiFlowState.setRegistrationComplete(true);
+    return;
+  }
+
+  if (body.hasPersistedCtiCredentials) {
+    ctiFlowState.setRegistrationComplete(false);
+    ctiFlowState.setDeviceCode(null);
     return;
   }
 
@@ -88,6 +98,13 @@ export async function fetchCtiRegistrationStatus(options?: {
   }
 
   try {
+    if (ctiFlowState.hasPersistedCtiCredentials()) {
+      return {
+        statusCode: statusCodes.SUCCESS,
+        message: CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE,
+      };
+    }
+
     if (ctiFlowState.isRegistrationComplete()) {
       return {
         statusCode: statusCodes.SUCCESS,

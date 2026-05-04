@@ -22,9 +22,9 @@ The response depends on the request body:
 Both `application/x-www-form-urlencoded` and `application/json` request
 bodies are accepted.
 
-### Content Manager subscription (indexer stand-in)
+### Content Manager subscription (cluster stand-in)
 
-Until the real OpenSearch Content Manager plugin exists, the same Imposter
+Until the real Content Manager plugin exists, the same Imposter
 instance exposes:
 
 ```
@@ -81,7 +81,7 @@ either.
 
 ## Quick test
 
-`client_id` must match the **environment UID**: the same value as OpenSearch **`cluster_uuid`** from `GET /` on the cluster root (the dashboard uses that automatically). For ad-hoc curls against Imposter you can use any placeholder string the mock accepts.
+`client_id` must match the **environment UID**: the same value as **`cluster_uuid`** from `GET /` on the cluster root (the dashboard uses that automatically). For ad-hoc curls against Imposter you can use any placeholder string the mock accepts.
 
 ```bash
 # 1. Device authorization request

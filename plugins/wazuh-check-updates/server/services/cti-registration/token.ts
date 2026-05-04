@@ -8,11 +8,11 @@ import {
   CtiConfigurationError,
   getCtiConsoleBaseUrl,
 } from './cti-console-url';
-import { fetchOpenSearchClusterUuid } from './opensearch-cluster-uuid';
+import { fetchClusterUuid } from './cluster-uuid';
 
 /**
  * OAuth `client_id` (environment UID): optional body override, then
- * `WAZUH_CTI_CLIENT_ID`, otherwise OpenSearch `cluster_uuid` from `GET /`.
+ * `WAZUH_CTI_CLIENT_ID`, otherwise cluster `cluster_uuid` from `GET /`.
  */
 export async function resolveCtiOAuthClientId(
   fromBody?: string,
@@ -26,7 +26,7 @@ export async function resolveCtiOAuthClientId(
     return fromEnv;
   }
 
-  const clusterUuid = await fetchOpenSearchClusterUuid();
+  const clusterUuid = await fetchClusterUuid();
   if (!clusterUuid) {
     throw new CtiConfigurationError(
       'CTI registration cannot determine an environment identifier on this server.',

@@ -48,7 +48,7 @@ paths:
       summary: Register subscription credentials (mock)
       description: |
         Accepts a JSON body with `access_token` only. Intended to mirror the
-        future OpenSearch `/_plugins/_content_manager/subscription` contract.
+        future cluster `/_plugins/_content_manager/subscription` contract.
         The dashboard must call this from the **server** only; never expose the
         token to the browser.
       operationId: contentManagerSubscription

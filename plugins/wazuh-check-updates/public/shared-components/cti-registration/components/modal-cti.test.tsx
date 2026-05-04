@@ -42,6 +42,7 @@ describe('ModalCti component', () => {
     mockRefetchStatus.mockReset();
     mockRefetchStatus.mockResolvedValue(undefined);
     ctiFlowState.reset();
+    ctiFlowState.setPersistedCtiCredentials(false);
     (getCore as jest.Mock).mockReturnValue({
       http: { post: mockHttpPost },
     });

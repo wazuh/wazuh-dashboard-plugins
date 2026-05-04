@@ -41,7 +41,7 @@ jest.mock('../../services/cti-registration', () => ({
   pollCtiToken: jest.fn(),
   resolveCtiOAuthClientId: jest.fn(),
   getCtiConsoleBaseUrl: jest.fn(),
-  fetchOpenSearchClusterUuid: jest.fn(),
+  fetchClusterUuid: jest.fn(),
   postContentManagerSubscription: jest.fn(() => Promise.resolve()),
 }));
 

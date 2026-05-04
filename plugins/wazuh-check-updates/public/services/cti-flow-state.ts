@@ -11,8 +11,17 @@ let registrationComplete = false;
 let pollIntervalSeconds = CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC;
 let deviceAuthExpiresAt: number | null = null;
 let deviceAuthLinks: CtiDeviceAuthorization | null = null;
+let persistedCtiCredentials = false;
 
 export const ctiFlowState = {
+  setPersistedCtiCredentials(value: boolean): void {
+    persistedCtiCredentials = value;
+  },
+
+  hasPersistedCtiCredentials(): boolean {
+    return persistedCtiCredentials;
+  },
+
   getDeviceCode(): string | null {
     return deviceCode;
   },
