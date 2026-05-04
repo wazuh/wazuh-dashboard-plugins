@@ -16,12 +16,4 @@ export function initializeClientNotificationConfigs(
     },
     method: 'GET',
   });
-
-  notifications.createConfig = clientAction({
-    url: {
-      fmt: OPENSEARCH_API.CONFIGS,
-    },
-    method: 'POST',
-    needBody: true,
-  });
 }
