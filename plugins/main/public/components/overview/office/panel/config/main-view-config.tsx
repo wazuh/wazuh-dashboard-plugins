@@ -74,7 +74,7 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
                 <AggTable
                   tableTitle='Top actions'
                   aggTerm='event.action'
-                  aggLabel='Rule'
+                  aggLabel='Action'
                   maxRows={5}
                   onRowClick={(field, value) => props.onRowClick(field, value)}
                   searchParams={searchParams}
@@ -87,9 +87,9 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
             component: props => (
               <EuiFlexItem grow={props.grow}>
                 <AggTable
-                  tableTitle='Top operations'
+                  tableTitle='Top event types'
                   aggTerm='event.type'
-                  aggLabel='Operation'
+                  aggLabel='Event Type'
                   maxRows={5}
                   onRowClick={(field, value) => props.onRowClick(field, value)}
                   searchParams={searchParams}
