@@ -46,8 +46,8 @@ export const CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE =
   'This environment is registered for CTI updates. You will be notified about relevant changes when they are available.';
 
 /**
- * Paths on `WAZUH_CTI_CONSOLE_BASE_URL` (Imposter in dev, real CTI Console in prod).
- * See `docker/imposter/cti/README.md`.
+ * Paths appended to `WAZUH_CTI_CONSOLE_BASE_URL` (e.g. Wazuh Cloud API or local Imposter).
+ * See `docker/imposter/cti/README.md` for the offline mock contract.
  */
 export const ctiConsoleApiPaths = {
   environmentsToken: '/api/v1/platform/environments/token',

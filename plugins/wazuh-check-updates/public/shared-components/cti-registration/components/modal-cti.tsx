@@ -6,6 +6,7 @@ import {
   EuiCallOut,
   EuiIcon,
   EuiLink,
+  EuiLoadingSpinner,
   EuiModal,
   EuiModalBody,
   EuiModalFooter,
@@ -36,7 +37,18 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
   const [deviceAuth, setDeviceAuth] =
-    React.useState<CtiDeviceAuthorization | null>(null);
+    React.useState<CtiDeviceAuthorization | null>(() =>
+      ctiFlowState.getDeviceAuthLinks(),
+    );
+  const [serverSnapshotReady, setServerSnapshotReady] = React.useState(() => {
+    if (
+      statusCTI.status === statusCodes.SUCCESS ||
+      statusCTI.status === statusCodes.REGISTRATION_FAILED
+    ) {
+      return true;
+    }
+    return Boolean(ctiFlowState.getDeviceAuthLinks());
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -46,6 +58,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         return;
       }
       setDeviceAuth(ctiFlowState.getDeviceAuthLinks());
+      setServerSnapshotReady(true);
     })();
     return () => {
       cancelled = true;
@@ -140,6 +153,11 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     }
   };
 
+  const awaitingServerSnapshot =
+    !serverSnapshotReady &&
+    statusCTI.status === statusCodes.NOT_FOUND &&
+    !deviceAuth;
+
   const showInProgress =
     Boolean(deviceAuth) &&
     statusCTI.status === statusCodes.NOT_FOUND &&
@@ -151,7 +169,10 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     statusCTI.status === statusCodes.REGISTRATION_FAILED;
 
   const showRegistrationIntro =
-    !showSuccess && !showRegistrationFailed && !deviceAuth;
+    serverSnapshotReady &&
+    !showSuccess &&
+    !showRegistrationFailed &&
+    !deviceAuth;
 
   return (
     <EuiModal onClose={handleModalToggle}>
@@ -166,6 +187,11 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
             ) : showRegistrationFailed ? (
               <FormattedMessage
                 id='wazuhCheckUpdates.ctiRegistration.modalTitleFailed'
+                defaultMessage='CTI registration'
+              />
+            ) : awaitingServerSnapshot ? (
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.modalTitleLoading'
                 defaultMessage='CTI registration'
               />
             ) : deviceAuth ? (
@@ -184,6 +210,17 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
       </EuiModalHeader>
 
       <EuiModalBody>
+        {awaitingServerSnapshot ? (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              padding: '24px 0',
+            }}
+          >
+            <EuiLoadingSpinner size='xl' data-test-subj='ctiModalSyncSpinner' />
+          </div>
+        ) : null}
         {showRegistrationIntro ? (
           <EuiText>
             <FormattedMessage
@@ -295,6 +332,13 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
 
       <EuiModalFooter>
         {showSuccess || showRegistrationFailed ? (
+          <EuiButtonEmpty onClick={handleModalToggle}>
+            <FormattedMessage
+              id='wazuhCheckUpdates.ctiRegistration.modalButtonClose'
+              defaultMessage='Close'
+            />
+          </EuiButtonEmpty>
+        ) : awaitingServerSnapshot ? (
           <EuiButtonEmpty onClick={handleModalToggle}>
             <FormattedMessage
               id='wazuhCheckUpdates.ctiRegistration.modalButtonClose'

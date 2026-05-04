@@ -3,7 +3,7 @@ jest.mock('../../../plugin-services', () => ({
 }));
 
 import React from 'react';
-import { render, fireEvent, act, waitFor } from '@testing-library/react';
+import { render, fireEvent, act, waitFor, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { getCore } from '../../../plugin-services';
 import { ctiFlowState } from '../../../services/cti-flow-state';
@@ -64,8 +64,8 @@ describe('ModalCti component', () => {
     });
   });
 
-  it('should render correctly', () => {
-    const { getByText } = render(
+  it('should render correctly', async () => {
+    render(
       <ModalCti
         handleModalToggle={handleModalToggleMock}
         statusCTI={defaultStatusCti}
@@ -73,9 +73,9 @@ describe('ModalCti component', () => {
       />,
     );
     expect(
-      getByText('Do you want to register to CTI updates?'),
+      await screen.findByText('Do you want to register to CTI updates?'),
     ).toBeInTheDocument();
-    expect(getByText('Yes, I want to register')).toBeInTheDocument();
+    expect(screen.getByText('Yes, I want to register')).toBeInTheDocument();
   });
 
   it('reopens to in-progress links when refetch restores server snapshot', async () => {
@@ -90,7 +90,7 @@ describe('ModalCti component', () => {
       });
     });
 
-    const { getByText, queryByText, getByTestId } = render(
+    const { queryByText, getByTestId } = render(
       <ModalCti
         handleModalToggle={handleModalToggleMock}
         statusCTI={defaultStatusCti}
@@ -99,7 +99,7 @@ describe('ModalCti component', () => {
     );
 
     await waitFor(() => {
-      expect(getByText('Registration in progress')).toBeInTheDocument();
+      expect(screen.getByText('Registration in progress')).toBeInTheDocument();
       expect(getByTestId('ctiDeviceUserCode')).toHaveTextContent('WZH-REST');
     });
     expect(
@@ -108,14 +108,14 @@ describe('ModalCti component', () => {
   });
 
   it('should handle button click, show activation URL, and open verification URI', async () => {
-    const { getByText } = render(
+    render(
       <ModalCti
         handleModalToggle={handleModalToggleMock}
         statusCTI={defaultStatusCti}
         refetchStatus={mockRefetchStatus}
       />,
     );
-    const button = getByText('Yes, I want to register');
+    const button = await screen.findByText('Yes, I want to register');
     act(() => {
       fireEvent.click(button);
     });
@@ -129,12 +129,12 @@ describe('ModalCti component', () => {
       );
       expect(ctiFlowState.getDeviceCode()).toBe('mock_device_code_123');
       expect(
-        getByText(
+        screen.getByText(
           /https:\/\/console\.wazuh\.com\/platform\/environments\/register\?user_code=WZH-999/,
         ),
       ).toBeInTheDocument();
     });
-    expect(getByText('WZH-999')).toBeInTheDocument();
+    expect(screen.getByText('WZH-999')).toBeInTheDocument();
     expect(window.open).toHaveBeenCalledWith(
       'https://console.wazuh.com/platform/environments/register?user_code=WZH-999',
       'wazuh_cti',
@@ -146,7 +146,7 @@ describe('ModalCti component', () => {
 
   it('starts device flow polling schedule and shows in-progress copy', async () => {
     const onDeviceFlowStarted = jest.fn();
-    const { getByText, getByTestId } = render(
+    const { getByTestId } = render(
       <ModalCti
         handleModalToggle={handleModalToggleMock}
         statusCTI={defaultStatusCti}
@@ -154,8 +154,9 @@ describe('ModalCti component', () => {
         onDeviceFlowStarted={onDeviceFlowStarted}
       />,
     );
+    const registerBtn = await screen.findByText('Yes, I want to register');
     act(() => {
-      fireEvent.click(getByText('Yes, I want to register'));
+      fireEvent.click(registerBtn);
     });
     await waitFor(() => {
       expect(onDeviceFlowStarted).toHaveBeenCalled();

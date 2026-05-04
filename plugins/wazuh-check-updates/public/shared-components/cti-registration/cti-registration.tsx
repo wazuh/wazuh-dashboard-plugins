@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { I18nProvider } from '@osd/i18n/react';
-import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiLoadingSpinner } from '@elastic/eui';
 import './registration.scss';
 import { StartCtiRegistration } from './components/start-cti-registration';
 import { StatusCtiRegistration } from './components/status-cti-registration';
@@ -12,7 +12,7 @@ import { ctiFlowState } from '../../services/cti-flow-state';
 export const CtiRegistration = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deviceFlowNonce, setDeviceFlowNonce] = useState(0);
-  const { statusCTI, refetchStatus } = useCtiStatus(deviceFlowNonce);
+  const { statusCTI, loading, refetchStatus } = useCtiStatus(deviceFlowNonce);
 
   const handleModalToggle = () => {
     setIsModalOpen(!isModalOpen);
@@ -26,19 +26,26 @@ export const CtiRegistration = () => {
   const isFailed = statusCTI.status === statusCodes.REGISTRATION_FAILED;
 
   const showStartCtiBar =
+    !loading &&
     !isSuccess &&
     !deviceFlowActive &&
     (isFailed || statusCTI.status === statusCodes.NOT_FOUND);
 
   const showStatusBar =
-    isSuccess ||
-    isFailed ||
-    (statusCTI.status === statusCodes.NOT_FOUND && deviceFlowActive);
+    !loading &&
+    (isSuccess ||
+      isFailed ||
+      (statusCTI.status === statusCodes.NOT_FOUND && deviceFlowActive));
 
   return (
     <I18nProvider>
       <>
         <EuiFlexGroup gutterSize='s' alignItems='center' responsive={false}>
+          {loading ? (
+            <EuiFlexItem grow={false}>
+              <EuiLoadingSpinner size='m' data-test-subj='ctiRegistrationNavLoading' />
+            </EuiFlexItem>
+          ) : null}
           {showStartCtiBar ? (
             <EuiFlexItem grow={false}>
               <StartCtiRegistration handleModalToggle={handleModalToggle} />
