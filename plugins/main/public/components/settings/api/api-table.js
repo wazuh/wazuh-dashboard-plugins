@@ -14,7 +14,6 @@ import React, { Component } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiInMemoryTable,
   EuiButtonIcon,
   EuiToolTip,
   EuiHealth,
@@ -31,10 +30,8 @@ import {
   EuiCopy,
   EuiCodeBlock,
   EuiButton,
-  EuiLink,
-  EuiPopover,
+  EuiDescriptionList,
 } from '@elastic/eui';
-import { WzButtonPermissions } from '../../common/permissions/button';
 import { AppState } from '../../../react-services/app-state';
 import { withErrorBoundary } from '../../common/hocs';
 import { compose } from 'redux';
@@ -46,11 +43,7 @@ import {
   getWazuhCorePlugin,
 } from '../../../kibana-services';
 import { AvailableUpdatesFlyout } from './available-updates-flyout';
-import { AddApi } from './add-api';
-import {
-  WzButtonOpenFlyout,
-  WzButtonPermissionsOpenFlyout,
-} from '../../common/buttons';
+import { WzButtonOpenFlyout } from '../../common/buttons';
 import {
   ApiCheck,
   ErrorHandler,
@@ -196,6 +189,21 @@ export const ApiTable = compose(withErrorBoundary)(
       }
     }
 
+    notifyManagerCheckFailure(error, context) {
+      const message = error.message || error;
+      getErrorOrchestrator().handleError({
+        context: `${ApiTable.name}.${context}`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error: error,
+          message,
+          title: error.name || 'Error',
+        },
+      });
+    }
+
     async setDefault(APIconnection) {
       try {
         await this.checkManager(APIconnection, true);
@@ -241,7 +249,7 @@ export const ApiTable = compose(withErrorBoundary)(
         APIconnection.allow_run_as = allow_run_as;
         APIconnection.verify_ca = verify_ca;
         if (options?.selectAPIHostOnAvailable) {
-          this.setDefault(entry);
+          await this.setDefault(APIconnection);
         }
       } catch (error) {
         const code = ((error || {}).data || {}).code;
@@ -257,13 +265,16 @@ export const ApiTable = compose(withErrorBoundary)(
           // if the selected API is down, we remove it so a new one will selected
           AppState.removeCurrentAPI();
         }
-        throw new Error(error);
+        throw error;
       }
     }
     /**
      * Refresh the API entries
      */
-    async refresh(options = { selectAPIHostOnAvailable: false }) {
+    async refresh(options = {}) {
+      const { selectAPIHostOnAvailable = false, notifyCheckFailure = false } =
+        options;
+      const refreshApiOptions = { selectAPIHostOnAvailable };
       try {
         let status = 'complete';
         this.setState({ error: false, refreshingEntries: true });
@@ -278,13 +289,20 @@ export const ApiTable = compose(withErrorBoundary)(
         });
         const entries = [...hosts];
         let numErr = 0;
+        let refreshCheckError = null;
         for (let idx in entries) {
           const entry = entries[idx];
           try {
-            await this.refreshAPI(entry, options);
+            await this.refreshAPI(entry, refreshApiOptions);
           } catch (error) {
             numErr = numErr + 1;
+            if (!refreshCheckError) {
+              refreshCheckError = error;
+            }
           }
+        }
+        if (notifyCheckFailure && refreshCheckError) {
+          this.notifyManagerCheckFailure(refreshCheckError, 'refresh');
         }
         this.setState({
           apiEntries: entries,
@@ -299,50 +317,136 @@ export const ApiTable = compose(withErrorBoundary)(
       }
     }
 
-    /**
-     * Checks the API connectivity
-     * @param {Object} api
-     */
-    async checkApi(api) {
-      try {
-        const entries = this.state.apiEntries;
-        const idx = entries.map(e => e.id).indexOf(api.id);
-        try {
-          await this.checkManager(api);
-          entries[idx].status = 'online';
-        } catch (error) {
-          const code = ((error || {}).data || {}).code;
-          const downReason =
-            typeof error === 'string'
-              ? error
-              : (error || {}).message ||
-                ((error || {}).data || {}).message ||
-                'API is not reachable';
-          const status = code === 3099 ? 'down' : 'unknown';
-          entries[idx].status = { status, downReason };
-          throw error;
-        } finally {
-          this.setState({
-            apiEntries: entries,
-          });
-        }
-      } catch (error) {
-        const options = {
-          context: `${ApiTable.name}.checkApi`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          store: true,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `Error checking manager connection: ${
-              error.message || error
-            }`,
-          },
-        };
+    async refreshFromUi() {
+      await this.refresh({
+        notifyCheckFailure: true,
+        selectAPIHostOnAvailable: true,
+      });
+    }
 
-        getErrorOrchestrator().handleError(options);
+    renderStatusCell(item) {
+      if (item === 'checking') {
+        return (
+          <span>
+            <EuiLoadingSpinner size='s' />
+            <span>&nbsp;&nbsp;Checking</span>
+          </span>
+        );
       }
+      if (!item) {
+        return null;
+      }
+      if (item === 'online') {
+        return (
+          <EuiHealth color='success' style={{ wordBreak: 'normal' }}>
+            Online
+          </EuiHealth>
+        );
+      }
+      if (item.status === 'down') {
+        return (
+          <EuiFlexGroup alignItems='center' gutterSize='xs' responsive={false}>
+            <EuiFlexItem grow={false}>
+              <EuiHealth color='warning' style={{ wordBreak: 'normal' }}>
+                Warning
+              </EuiHealth>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiToolTip position='top' content={item.downReason}>
+                <EuiButtonIcon
+                  color='primary'
+                  iconType='questionInCircle'
+                  aria-label='Info about the error'
+                  onClick={() => this.copyToClipBoard(item.downReason)}
+                />
+              </EuiToolTip>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        );
+      }
+      return (
+        <EuiFlexGroup alignItems='center' gutterSize='xs' responsive={false}>
+          <EuiFlexItem grow={false}>
+            <EuiHealth color='danger' style={{ wordBreak: 'normal' }}>
+              Offline
+            </EuiHealth>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiToolTip position='top' content={item.downReason}>
+              <EuiButtonIcon
+                color='primary'
+                iconType='questionInCircle'
+                aria-label='Info about the error'
+                onClick={() => this.copyToClipBoard(item.downReason)}
+              />
+            </EuiToolTip>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      );
+    }
+
+    renderRunAsCell(value) {
+      if (value === getWazuhCorePlugin().API_USER_STATUS_RUN_AS.ENABLED) {
+        return (
+          <EuiToolTip
+            position='top'
+            content='The configured API user uses the authentication context.'
+          >
+            <EuiIcon type='check' />
+          </EuiToolTip>
+        );
+      }
+      if (
+        value === getWazuhCorePlugin().API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED
+      ) {
+        return (
+          <EuiToolTip
+            position='top'
+            content='The configured API user is not allowed to use run_as. Give it permissions or set run_as with false value in the host configuration.'
+          >
+            <EuiIcon color='danger' type='alert' />
+          </EuiToolTip>
+        );
+      }
+      return (
+        <EuiToolTip
+          position='top'
+          content='The configured API user does not use authentication context.'
+        >
+          <p>-</p>
+        </EuiToolTip>
+      );
+    }
+
+    renderVerifyCaCell(verify_ca) {
+      if (verify_ca === true) {
+        return (
+          <EuiToolTip
+            position='top'
+            content='CA certificate verification is enabled.'
+          >
+            <EuiIcon type='check' />
+          </EuiToolTip>
+        );
+      }
+      if (verify_ca === false) {
+        return (
+          <EuiToolTip
+            position='top'
+            content='CA certificate verification is disabled. Either certificate paths are not configured.'
+          >
+            <p>-</p>
+          </EuiToolTip>
+        );
+      }
+      return (
+        <EuiToolTip
+          position='top'
+          content='CA certificate verification status is unknown.'
+        >
+          <p>-</p>
+        </EuiToolTip>
+      );
     }
 
     render() {
@@ -385,360 +489,173 @@ export const ApiTable = compose(withErrorBoundary)(
         }),
       ];
 
-      const columns = [
-        {
-          field: 'id',
-          name: 'ID',
-          align: 'left',
-          sortable: true,
-          render: item => {
-            return <EuiText size='s'>{item}</EuiText>;
+      const api = items[0];
+      const listItems = [];
+
+      if (api) {
+        listItems.push(
+          { title: 'ID', description: <EuiText size='s'>{api.id}</EuiText> },
+          {
+            title: 'Cluster',
+            description: (
+              <EuiText size='s'>{api.cluster_info?.cluster ?? '—'}</EuiText>
+            ),
           },
-        },
-        {
-          field: 'cluster_info.cluster',
-          name: 'Cluster',
-          align: 'left',
-          sortable: true,
-        },
-        {
-          field: 'url',
-          name: 'Host',
-          align: 'left',
-          sortable: true,
-        },
-        {
-          field: 'port',
-          name: 'Port',
-          align: 'left',
-          sortable: true,
-        },
-        {
-          field: 'username',
-          name: 'Username',
-          align: 'left',
-          sortable: true,
-        },
-        {
-          field: 'status',
-          name: 'Status',
-          align: 'left',
-          sortable: true,
-          render: item => {
-            if (item === 'checking') {
-              return (
+          { title: 'Host', description: <EuiText size='s'>{api.url}</EuiText> },
+          {
+            title: 'Port',
+            description: <EuiText size='s'>{api.port}</EuiText>,
+          },
+          {
+            title: 'Username',
+            description: <EuiText size='s'>{api.username}</EuiText>,
+          },
+          {
+            title: 'Status',
+            description: this.renderStatusCell(api.status),
+          },
+          {
+            title: 'Run as',
+            description: this.renderRunAsCell(api.allow_run_as),
+          },
+          {
+            title: 'Verify CA',
+            description: this.renderVerifyCaCell(api.verify_ca),
+          },
+        );
+
+        if (this.isUpdatesEnabled) {
+          const vs = api.version_status;
+          const color = API_UPDATES_STATUS_COLUMN[vs]?.color ?? 'subdued';
+          const content =
+            API_UPDATES_STATUS_COLUMN[vs]?.text ?? 'Never checked';
+          listItems.push(
+            {
+              title: 'Version',
+              description: (
+                <EuiText size='s'>{api.current_version ?? '—'}</EuiText>
+              ),
+            },
+            {
+              title: 'Updates status',
+              description: !this.state.refreshingAvailableUpdates ? (
+                <EuiFlexGroup
+                  alignItems='center'
+                  gutterSize='xs'
+                  responsive={false}
+                >
+                  <EuiFlexItem grow={false}>
+                    <EuiHealth color={color} style={{ wordBreak: 'normal' }}>
+                      {content}
+                    </EuiHealth>
+                  </EuiFlexItem>
+                  {!vs ? (
+                    <EuiFlexItem grow={false}>
+                      <EuiToolTip
+                        position='top'
+                        content={
+                          <p>
+                            Click <b>Check updates</b> to get information
+                          </p>
+                        }
+                      >
+                        <EuiButtonIcon
+                          aria-label={content}
+                          iconType='questionInCircle'
+                        />
+                      </EuiToolTip>
+                    </EuiFlexItem>
+                  ) : null}
+                  {vs === 'availableUpdates' ? (
+                    <EuiFlexItem grow={false}>
+                      <WzButtonOpenFlyout
+                        tooltip={{ content: 'View available updates' }}
+                        flyoutTitle={'Available updates'}
+                        flyoutBody={() => <AvailableUpdatesFlyout api={api} />}
+                        buttonProps={{
+                          buttonType: 'icon',
+                          iconType: 'eye',
+                        }}
+                      />
+                    </EuiFlexItem>
+                  ) : null}
+                  {vs === 'error' && api.error?.detail ? (
+                    <EuiFlexItem grow={false}>
+                      <EuiToolTip
+                        position='top'
+                        title={api.error.title}
+                        content={api.error.detail}
+                      >
+                        <EuiButtonIcon
+                          color='primary'
+                          iconType='questionInCircle'
+                          aria-label='Info about the error'
+                          onClick={() => this.copyToClipBoard(api.error.detail)}
+                        />
+                      </EuiToolTip>
+                    </EuiFlexItem>
+                  ) : null}
+                </EuiFlexGroup>
+              ) : (
                 <span>
                   <EuiLoadingSpinner size='s' />
                   <span>&nbsp;&nbsp;Checking</span>
                 </span>
-              );
-            }
-            if (item) {
-              return item === 'online' ? (
-                <EuiHealth color='success' style={{ wordBreak: 'normal' }}>
-                  Online
-                </EuiHealth>
-              ) : item.status === 'down' ? (
-                <EuiFlexGroup
-                  alignItems='center'
-                  gutterSize='xs'
-                  responsive={false}
-                >
-                  <EuiFlexItem grow={false}>
-                    <EuiHealth color='warning' style={{ wordBreak: 'normal' }}>
-                      Warning
-                    </EuiHealth>
-                  </EuiFlexItem>
-                  <EuiFlexItem grow={false}>
-                    <EuiToolTip position='top' content={item.downReason}>
-                      <EuiButtonIcon
-                        color='primary'
-                        iconType='questionInCircle'
-                        aria-label='Info about the error'
-                        onClick={() => this.copyToClipBoard(item.downReason)}
-                      />
-                    </EuiToolTip>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              ) : (
-                <EuiFlexGroup
-                  alignItems='center'
-                  gutterSize='xs'
-                  responsive={false}
-                >
-                  <EuiFlexItem grow={false}>
-                    <EuiHealth color='danger' style={{ wordBreak: 'normal' }}>
-                      Offline
-                    </EuiHealth>
-                  </EuiFlexItem>
-                  <EuiFlexItem grow={false}>
-                    <EuiToolTip position='top' content={item.downReason}>
-                      <EuiButtonIcon
-                        color='primary'
-                        iconType='questionInCircle'
-                        aria-label='Info about the error'
-                        onClick={() => this.copyToClipBoard(item.downReason)}
-                      />
-                    </EuiToolTip>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              );
-            }
-          },
-        },
-        {
-          name: 'Run as',
-          field: 'allow_run_as',
-          align: 'center',
-          sortable: true,
-          width: '80px',
-          render: value => {
-            return value ===
-              getWazuhCorePlugin().API_USER_STATUS_RUN_AS.ENABLED ? (
-              <EuiToolTip
-                position='top'
-                content='The configured API user uses the authentication context.'
-              >
-                <EuiIcon type='check' />
-              </EuiToolTip>
-            ) : value ===
-              getWazuhCorePlugin().API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED ? (
-              <EuiToolTip
-                position='top'
-                content='The configured API user is not allowed to use run_as. Give it permissions or set run_as with false value in the host configuration.'
-              >
-                <EuiIcon color='danger' type='alert' />
-              </EuiToolTip>
-            ) : (
-              <EuiToolTip
-                position='top'
-                content='The configured API user does not use authentication context.'
-              >
-                <p>-</p>
-              </EuiToolTip>
-            );
-          },
-        },
-        {
-          name: 'Verify CA',
-          field: 'verify_ca',
-          align: 'center',
-          sortable: true,
-          width: '80px',
-          render: (value, row) => {
-            const verify_ca = row.verify_ca;
-
-            if (verify_ca === true) {
-              return (
-                <EuiToolTip
-                  position='top'
-                  content='CA certificate verification is enabled.'
-                >
-                  <EuiIcon type='check' />
-                </EuiToolTip>
-              );
-            } else if (verify_ca === false) {
-              return (
-                <EuiToolTip
-                  position='top'
-                  content='CA certificate verification is disabled. Either certificate paths are not configured.'
-                >
-                  <p>-</p>
-                </EuiToolTip>
-              );
-            } else {
-              return (
-                <EuiToolTip
-                  position='top'
-                  content='CA certificate verification status is unknown.'
-                >
-                  <p>-</p>
-                </EuiToolTip>
-              );
-            }
-          },
-        },
-        {
-          name: 'Actions',
-          render: item => (
-            <EuiFlexGroup>
-              <WzButtonPermissions
-                buttonType='icon'
-                tooltip={{ position: 'top', content: <p>Set as default</p> }}
-                iconType={
-                  item.id === this.state.selectedAPIConnection
-                    ? 'starFilled'
-                    : 'starEmpty'
-                }
-                aria-label='Set as default'
-                onClick={async () => {
-                  const currentDefault = await this.setDefault(item);
-                  this.setState({
-                    currentDefault,
-                  });
-                }}
-              />
-              <EuiToolTip position='top' content={<p>Check connection</p>}>
-                <EuiButtonIcon
-                  aria-label='Check connection'
-                  iconType='refresh'
-                  onClick={async () => await this.checkApi(item)}
-                  color='success'
-                />
-              </EuiToolTip>
-            </EuiFlexGroup>
-          ),
-        },
-      ];
-
-      // optional column if Check Updates is enabled
-      const currentVersionColumn = {
-        field: 'current_version',
-        name: 'Version',
-        align: 'left',
-        sortable: true,
-      };
-
-      // optional column if Check Updates is enabled
-      const versionStatusColumn = {
-        field: 'version_status',
-        name: 'Updates status',
-        sortable: true,
-        render: (item, api) => {
-          const color = API_UPDATES_STATUS_COLUMN[item]?.color ?? 'subdued';
-
-          const content =
-            API_UPDATES_STATUS_COLUMN[item]?.text ?? 'Never checked';
-
-          if (!this.state.refreshingAvailableUpdates) {
-            return (
-              <EuiFlexGroup
-                alignItems='center'
-                gutterSize='xs'
-                responsive={false}
-              >
-                <EuiFlexItem grow={false}>
-                  <EuiHealth color={color} style={{ wordBreak: 'normal' }}>
-                    {content}
-                  </EuiHealth>
-                </EuiFlexItem>
-                {!item ? (
-                  <EuiFlexItem grow={false}>
-                    <EuiToolTip
-                      position='top'
-                      content={
-                        <p>
-                          Click <b>Check updates</b> button to get information
-                        </p>
-                      }
-                    >
-                      <EuiButtonIcon
-                        aria-label={content}
-                        iconType='questionInCircle'
-                      />
-                    </EuiToolTip>
-                  </EuiFlexItem>
-                ) : null}
-                {item === 'availableUpdates' ? (
-                  <EuiFlexItem grow={false}>
-                    <WzButtonOpenFlyout
-                      tooltip={{ content: 'View available updates' }}
-                      flyoutTitle={'Available updates'}
-                      flyoutBody={() => {
-                        return <AvailableUpdatesFlyout api={api} />;
-                      }}
-                      buttonProps={{
-                        buttonType: 'icon',
-                        iconType: 'eye',
-                      }}
-                    />
-                  </EuiFlexItem>
-                ) : null}
-                {item === 'error' && api.error?.detail ? (
-                  <EuiFlexItem grow={false}>
-                    <EuiToolTip
-                      position='top'
-                      title={api.error.title}
-                      content={api.error.detail}
-                    >
-                      <EuiButtonIcon
-                        color='primary'
-                        iconType='questionInCircle'
-                        aria-label='Info about the error'
-                        onClick={() => this.copyToClipBoard(api.error.detail)}
-                      />
-                    </EuiToolTip>
-                  </EuiFlexItem>
-                ) : null}
-              </EuiFlexGroup>
-            );
-          } else {
-            return (
-              <span>
-                <EuiLoadingSpinner size='s' />
-                <span>&nbsp;&nbsp;Checking</span>
-              </span>
-            );
-          }
-        },
-      };
-      if (this.isUpdatesEnabled) {
-        columns.splice(7, 0, currentVersionColumn, versionStatusColumn);
+              ),
+            },
+          );
+        }
       }
-
-      const search = {
-        box: {
-          incremental: this.state.incremental,
-          schema: true,
-        },
-      };
-
-      const checkAPIHostsConnectionButton = (
-        <EuiButton
-          onClick={async () =>
-            await this.refresh({
-              selectAPIHostOnAvailable: true,
-            })
-          }
-          isDisabled={this.state.refreshingEntries}
-        >
-          Check connection
-        </EuiButton>
-      );
 
       return (
         <EuiPage>
-          <EuiPanel paddingSize='l'>
+          <EuiPanel paddingSize='m'>
             <EuiFlexGroup alignItems='center'>
               <EuiFlexItem>
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiTitle>
-                      <h2>API Connections</h2>
+                      <h2>API connection</h2>
                     </EuiTitle>
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
-                <WzButtonPermissionsOpenFlyout
-                  flyoutTitle='Add API connection'
-                  flyoutBody={() => <AddApi />}
-                  buttonProps={{
-                    administrator: true,
-                    buttonType: 'empty',
-                    iconType: 'plusInCircle',
-                  }}
+                <EuiFlexGroup
+                  gutterSize='xs'
+                  alignItems='center'
+                  responsive={false}
                 >
-                  Add API connection
-                </WzButtonPermissionsOpenFlyout>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiButtonEmpty
-                  iconType='refresh'
-                  onClick={async () => await this.refresh()}
-                >
-                  Refresh
-                </EuiButtonEmpty>
+                  <EuiFlexItem grow={false}>
+                    <EuiButtonEmpty
+                      iconType='refresh'
+                      onClick={async () => await this.refreshFromUi()}
+                      isLoading={this.state.refreshingEntries}
+                    >
+                      Refresh
+                    </EuiButtonEmpty>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <EuiToolTip
+                      position='top'
+                      content={
+                        <p>
+                          Reloads the API entry from the dashboard configuration
+                          and runs a connectivity check against the Wazuh
+                          manager. If the manager is available, the API entry is
+                          updated.
+                        </p>
+                      }
+                    >
+                      <EuiButtonIcon
+                        display='empty'
+                        color='primary'
+                        iconType='questionInCircle'
+                        aria-label='What Refresh does'
+                      />
+                    </EuiToolTip>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
               </EuiFlexItem>
               {this.isUpdatesEnabled && (
                 <>
@@ -775,24 +692,29 @@ export const ApiTable = compose(withErrorBoundary)(
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
-                  From here you can manage and configure the API entries. You
-                  can also check their connection and status.
+                  The manager API entry configured for this dashboard and its
+                  current status.
                 </EuiText>
               </EuiFlexItem>
             </EuiFlexGroup>
             {this.state.apiIsDown && (
-              <EuiFlexGroup>
+              <EuiFlexGroup style={{ marginBottom: api ? '15px' : '0px' }}>
                 <EuiFlexItem>
                   <EuiCallOut
-                    title='The API connections could be down or inaccessible'
+                    title='Connection issue detected on the active API'
                     iconType='alert'
-                    color='warning'
+                    color='danger'
                   >
+                    <EuiText size='s'>
+                      The current API host is unreachable or not responding.
+                      Review the configuration and validate connectivity.
+                    </EuiText>
+                    <EuiSpacer size='s' />
                     <EuiFlexGroup>
                       <EuiFlexItem grow={false}>
                         <WzButtonOpenFlyout
                           flyoutTitle={
-                            'The API connections could be down or inaccessible'
+                            'The API connection could be down or inaccessible'
                           }
                           flyoutBody={() => {
                             const steps = [
@@ -845,11 +767,29 @@ export const ApiTable = compose(withErrorBoundary)(
                                 ),
                               },
                               {
-                                title: 'Review the API hosts configuration',
+                                title: 'Review the API host configuration',
                               },
                               {
-                                title: 'Check the API hosts connection',
-                                children: checkAPIHostsConnectionButton,
+                                title: 'Check the API connection',
+                                children: (
+                                  <>
+                                    <EuiText size='s'>
+                                      Reload the API configuration from the
+                                      dashboard host and verify manager
+                                      connectivity.
+                                    </EuiText>
+                                    <EuiSpacer size='s' />
+                                    <EuiButton
+                                      iconType='refresh'
+                                      onClick={async () =>
+                                        await this.refreshFromUi()
+                                      }
+                                      isLoading={this.state.refreshingEntries}
+                                    >
+                                      Refresh
+                                    </EuiButton>
+                                  </>
+                                ),
                               },
                             ];
 
@@ -864,27 +804,26 @@ export const ApiTable = compose(withErrorBoundary)(
                           Troubleshooting
                         </WzButtonOpenFlyout>
                       </EuiFlexItem>
-                      <EuiFlexItem grow={false}>
-                        {checkAPIHostsConnectionButton}
-                      </EuiFlexItem>
                     </EuiFlexGroup>
                   </EuiCallOut>
                 </EuiFlexItem>
               </EuiFlexGroup>
             )}
-            <EuiInMemoryTable
-              itemId='id'
-              items={items}
-              search={search}
-              columns={columns}
-              pagination={true}
-              sorting={true}
-              loading={isLoading}
-              tableLayout='auto'
-              message={
-                !items.length ? 'No API connections. Add a new one.' : undefined
-              }
-            />
+            {isLoading && !api ? (
+              <EuiText>
+                <EuiLoadingSpinner size='m' /> Loading…
+              </EuiText>
+            ) : !api ? (
+              <EuiText color='subdued'>No API connection configured.</EuiText>
+            ) : (
+              <>
+                <EuiDescriptionList
+                  compressed
+                  type='responsiveColumn'
+                  listItems={listItems}
+                />
+              </>
+            )}
           </EuiPanel>
         </EuiPage>
       );
