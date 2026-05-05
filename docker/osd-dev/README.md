@@ -33,13 +33,12 @@ The Wazuh dashboard uses **only the first** Manager API host defined in
 `wazuh_core.hosts`. Health checks, startup registry refresh, and the Server API
 settings screen all target that entry only; extra hosts are ignored.
 
+If you want to change which Manager API host is used, move that host to the
+first position under `wazuh_core.hosts` and restart the environment.
+
 For the **2.x** dev stack, hosts are inlined in
 `docker/osd-dev/config/2.x/osd/opensearch_dashboards.yml` (and
-`opensearch_dashboards_saml.yml` when using SAML). **imposter** is listed first so
-local mocks are used without changing application code.
-
-The **1.x** stack continues to use `docker/osd-dev/config/1.x/osd/wazuh.yml` for
-`hosts` (first entry wins there as well).
+`opensearch_dashboards_saml.yml` when using SAML).
 
 ## Usage
 
