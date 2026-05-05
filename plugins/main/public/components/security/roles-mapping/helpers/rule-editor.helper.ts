@@ -71,7 +71,7 @@ const formatRules = rulesArray => {
 
 const hasInternalUsers = (rules, internalUsers) => {
   return rules.every(rule => {
-    return internalUsers.some(user => user.user === wazuh.rule.value);
+    return internalUsers.some(user => user.user === rule.value);
   });
 };
 
@@ -163,7 +163,7 @@ export const decodeJsonRule = (jsonRule, internalUsers) => {
     };
   } catch (error) {
     const options = {
-      context: decodeJsonwazuh.rule.name,
+      context: decodeJsonRule.name,
       level: UI_LOGGER_LEVELS.ERROR,
       severity: UI_ERROR_SEVERITIES.BUSINESS,
       store: true,
@@ -179,5 +179,5 @@ export const decodeJsonRule = (jsonRule, internalUsers) => {
 };
 
 export const getSelectedUsersFromRules = rules => {
-  return rules.map(rule => ({ label: wazuh.rule.value, id: wazuh.rule.value }));
+  return rules.map(rule => ({ label: rule.value, id: rule.value }));
 };
