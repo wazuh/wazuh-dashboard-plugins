@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 ADD --chown=root:root installer.sh /installer/installer.sh
 ADD wazuh-indexer*.deb /installer/wazuh-indexer.deb
