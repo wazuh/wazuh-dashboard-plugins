@@ -197,46 +197,6 @@ export class WazuhApiCtrl {
           },
         });
       } else {
-        try {
-          const apis = await context.wazuh_core.manageHosts.get();
-          for (const api of apis) {
-            try {
-              const { id } = api;
-
-              const responseClusterInfo =
-                await context.wazuh.api.client.asInternalUser.request(
-                  'GET',
-                  `/cluster/local/info`,
-                  {},
-                  { apiHostID: id },
-                );
-
-              if (this.checkResponseIsDown(context, responseClusterInfo)) {
-                return ErrorResponse(
-                  `ERROR3099 - ${
-                    responseClusterInfo.detail || 'Server not ready yet'
-                  }`,
-                  3099,
-                  HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
-                  response,
-                );
-              }
-              if (responseClusterInfo.status === HTTP_STATUS_CODES.OK) {
-                request.body.id = id;
-                request.body.idChanged = id;
-                return await this.checkStoredAPI(context, request, response);
-              }
-            } catch (error) {} // eslint-disable-line
-          }
-        } catch (error) {
-          context.wazuh.logger.error(error.message || error);
-          return ErrorResponse(
-            error.message || error,
-            3020,
-            error?.response?.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-            response,
-          );
-        }
         context.wazuh.logger.error(error.message || error);
         return ErrorResponse(
           error.message || error,

@@ -98,7 +98,9 @@ describe('[endpoint] GET /hosts/apis', () => {
       .get(`/hosts/apis`)
       .expect(200);
 
-    currentAPIs.forEach((currentAPI, index) => {
+    const expected = currentAPIs.slice(0, 1);
+    expect(response.body).toHaveLength(expected.length);
+    expected.forEach((currentAPI, index) => {
       Object.keys(currentAPI).forEach(key => {
         expect(response.body[index][key]).toBe(currentAPI[key]);
       });

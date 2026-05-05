@@ -105,11 +105,19 @@ async function serversAPIConnectionCompatibility(
 
     ctx.logger.debug(`APP version [${appVersion}]`);
 
-    return await Promise.all(
-      hosts.map(async ({ id: apiHostID }: { id: string }) =>
-        serverAPIConnectionCompatibility(ctx, services, apiHostID, appVersion),
+    const firstHost = (hosts as { id: string }[])[0];
+    if (!firstHost) {
+      return [];
+    }
+
+    return [
+      await serverAPIConnectionCompatibility(
+        ctx,
+        services,
+        firstHost.id,
+        appVersion,
       ),
-    );
+    ];
   }
 }
 
@@ -134,9 +142,9 @@ export const initializationTaskCreatorServerAPIConnectionCompatibility = ({
       );
 
       if (
-        results?.some(
-          ({ compatibility, connection }) => compatibility && connection,
-        )
+        results?.length > 0 &&
+        results[0].connection &&
+        results[0].compatibility
       ) {
         return results;
       }
@@ -170,7 +178,9 @@ export const initializationTaskCreatorServerAPIRunAs = ({
 
       const API_USER_STATUS_RUN_AS = services.API_USER_STATUS_RUN_AS;
 
-      const results = hosts.map(
+      const hostsToValidate = hosts.slice(0, 1);
+
+      const results = hostsToValidate.map(
         (host: { id: string; allow_run_as?: number }) => ({
           id: host.id,
           allow_run_as:
