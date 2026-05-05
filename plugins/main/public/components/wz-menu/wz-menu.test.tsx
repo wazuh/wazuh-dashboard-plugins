@@ -14,11 +14,22 @@
 
 import React from 'react';
 import { shallow } from 'enzyme';
+import { setHeaderActionMenuMounter } from '../../kibana-services';
 import { WzMenu } from './wz-menu';
 
 describe('WzMenu tests', () => {
+  beforeEach(() => {
+    setHeaderActionMenuMounter(() => {});
+  });
+
   test('should render a WzMenu', () => {
-    const component = shallow(<WzMenu />);
+    const component = shallow(
+      <WzMenu
+        state={{ wazuhNotReadyYet: '' }}
+        globalBreadcrumbReducers={{ breadcrumb: [] }}
+      />,
+      { disableLifecycleMethods: true },
+    );
 
     expect(component).toMatchSnapshot();
   });
