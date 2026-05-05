@@ -216,8 +216,9 @@ export class WazuhPlugin
         plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen();
     }
 
-    // Register the header navigation control
-    registerHeaderNavControl(core, plugins.wazuhCheckUpdates.CtiRegistration);
+    if (plugins.wazuhCheckUpdates.ctiRegistrationUiEnabled) {
+      registerHeaderNavControl(core, plugins.wazuhCheckUpdates.CtiRegistration);
+    }
 
     setCore(core);
     setPlugins(plugins);

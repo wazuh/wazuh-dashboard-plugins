@@ -1,4 +1,10 @@
-import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
+import {
+  CoreSetup,
+  CoreStart,
+  Plugin,
+  PluginInitializerContext,
+} from 'opensearch-dashboards/public';
+import type { WazuhCheckUpdatesPluginConfigType } from '../server/index';
 import {
   AppPluginStartDependencies,
   WazuhCheckUpdatesPluginSetup,
@@ -13,7 +19,12 @@ import { CtiRegistration } from './shared-components/cti-registration/cti-regist
 export class WazuhCheckUpdatesPlugin
   implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart>
 {
+  constructor(
+    private readonly initializerContext: PluginInitializerContext<WazuhCheckUpdatesPluginConfigType>,
+  ) {}
+
   public setup(core: CoreSetup): WazuhCheckUpdatesPluginSetup {
+    void core;
     return {};
   }
 
@@ -24,10 +35,13 @@ export class WazuhCheckUpdatesPlugin
     setCore(core);
     setWazuhCore(plugins.wazuhCore);
 
+    const { ctiRegistrationUiEnabled } = this.initializerContext.config.get();
+
     return {
       UpdatesNotification,
       getAvailableUpdates,
       DismissNotificationCheck,
+      ctiRegistrationUiEnabled,
       CtiRegistration,
     };
   }

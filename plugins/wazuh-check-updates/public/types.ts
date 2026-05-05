@@ -1,8 +1,9 @@
 import { WazuhCorePluginStart } from '../../wazuh-core/public';
 import { AvailableUpdates } from '../common/types';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface WazuhCheckUpdatesPluginSetup {}
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+
 export interface WazuhCheckUpdatesPluginStart {
   UpdatesNotification: () => JSX.Element | null;
   getAvailableUpdates: (
@@ -10,6 +11,7 @@ export interface WazuhCheckUpdatesPluginStart {
     forceQuery: boolean,
   ) => Promise<AvailableUpdates>;
   DismissNotificationCheck: () => JSX.Element | null;
+  ctiRegistrationUiEnabled: boolean;
   CtiRegistration: () => JSX.Element | null;
 }
 
