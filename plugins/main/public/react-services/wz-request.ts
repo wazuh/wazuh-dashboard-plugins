@@ -63,13 +63,12 @@ export class WzRequest {
       ({ name, status }) =>
         name === 'server-api:connection-compatibility' && status === 'finished',
     );
-    if (check) {
-      const availableApiID = check?.data?.find(
-        ({ connection, compatibility }) => connection && compatibility,
-      )?.id;
+    if (check?.data?.[0]) {
+      const first = check.data[0];
+      const availableApiID =
+        first.connection && first.compatibility ? first.id : null;
 
       if (availableApiID) {
-        // WARNING: the checkStored API can return information about another API host that is available
         const response = await ApiCheck.checkStored(availableApiID);
         if (response?.data?.data?.cluster_info) {
           // WORKAROUND: this sets the API according to the return taking into account the warning
@@ -90,25 +89,24 @@ export class WzRequest {
   static async setupAPITryHosts() {
     try {
       const hosts = await getCore().http.get('/hosts/apis');
-
-      for (var i = 0; i < hosts.length; i++) {
-        try {
-          // WARNING: the checkStored API can return information about another API host that is available
-          const response = await ApiCheck.checkStored(hosts[i].id);
-          if (response?.data?.data?.cluster_info) {
-            // WORKAROUND: this sets the API according to the return taking into account the warning
-            const apiID = response?.data?.idChanged || hosts[i].id;
-            AppState.setClusterInfo(response?.data?.data?.cluster_info);
-            AppState.setCurrentAPI(
-              JSON.stringify({
-                name: response?.data?.data?.cluster_info?.cluster,
-                id: apiID,
-              }),
-            );
-            return true;
-          }
-        } catch {}
+      if (!hosts?.length) {
+        return;
       }
+      const host = hosts[0];
+      try {
+        const response = await ApiCheck.checkStored(host.id);
+        if (response?.data?.data?.cluster_info) {
+          const apiID = response?.data?.idChanged || host.id;
+          AppState.setClusterInfo(response?.data?.data?.cluster_info);
+          AppState.setCurrentAPI(
+            JSON.stringify({
+              name: response?.data?.data?.cluster_info?.cluster,
+              id: apiID,
+            }),
+          );
+          return true;
+        }
+      } catch {}
     } catch {}
   }
 
@@ -207,7 +205,7 @@ export class WzRequest {
             wzMisc.setApiIsDown(true);
             this.serverAPIAvailable$.next(false);
             const title = `API with ID [${currentApi.id}] is not available.`;
-            const text = `This could indicate a problem in the network of the server API, review or change the API host in the API host selector if configurated other hosts. Cause: ${error.message}`;
+            const text = `This could indicate a problem reaching the configured Manager API. Cause: ${error.message}`;
 
             displayAPINotAvailableToast({ title, text });
 

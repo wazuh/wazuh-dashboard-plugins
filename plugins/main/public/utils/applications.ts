@@ -637,13 +637,13 @@ export const serverApis = {
   category: 'wz-category-dashboard-management',
   id: 'server-apis',
   title: i18n.translate('wz-app-server-apis-title', {
-    defaultMessage: 'Server APIs',
+    defaultMessage: 'Server API',
   }),
   breadcrumbLabel: i18n.translate('wz-app-server-apis-breadcrumbLabel', {
-    defaultMessage: 'Server APIs',
+    defaultMessage: 'Server API',
   }),
   description: i18n.translate('wz-app-server-apis-description', {
-    defaultMessage: 'Manage and configure the API entries.',
+    defaultMessage: 'View the primary Manager API connection.',
   }),
   euiIconType: 'indexRollupApp',
   order: 10003,
