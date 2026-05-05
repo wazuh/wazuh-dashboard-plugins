@@ -1043,8 +1043,9 @@ export const GDPR_AGENT_DASHBOARD_ID = 'gdpr-pinned-agent-dashboard';
 export const HIPAA_DASHBOARD_ID = 'hipaa-overview-dashboard-tab';
 export const HIPAA_AGENT_DASHBOARD_ID = 'hipaa-pinned-agent-dashboard-tab';
 
-export const NIST_800_53_DASHBOARD_ID = 'nist-overview-dashboard-tab';
-export const NIST_800_53_AGENT_DASHBOARD_ID = 'nist-pinned-agent-dashboard-tab';
+export const NIST_800_53_DASHBOARD_ID = 'nist-800-53-overview-dashboard-tab';
+export const NIST_800_53_AGENT_DASHBOARD_ID =
+  'nist-800-53-pinned-agent-dashboard-tab';
 
 export const NIST_800_171_DASHBOARD_ID = 'nist-800-171-overview-dashboard-tab';
 export const NIST_800_171_AGENT_DASHBOARD_ID =
