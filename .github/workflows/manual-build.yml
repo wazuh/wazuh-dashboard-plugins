@@ -37,7 +37,7 @@ jobs:
   test-packages:
     needs: build
     name: Test packages
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Step 01 - Download the plugin's source code

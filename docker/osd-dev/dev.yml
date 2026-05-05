@@ -437,7 +437,7 @@ services:
 
   wazuh.agent.deb.local:
     platform: linux/amd64 # if you want to try packages for other architectures change this value to linux/arm64 or linux/arm/v7
-    image: ubuntu:24.04
+    image: ubuntu:26.04
     profiles:
       - 'server-local' # server profile to use the local packages with agents deb and rpm
       - 'server-local-deb' # server profile to use the local packages with agent deb

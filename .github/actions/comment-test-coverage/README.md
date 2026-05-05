@@ -13,7 +13,7 @@ name: test-pull-request
 on: [pull_request]
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
