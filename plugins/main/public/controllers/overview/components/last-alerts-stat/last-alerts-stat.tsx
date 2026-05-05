@@ -118,7 +118,7 @@ export const LastAlertsCountBySeverity = withDataSourceFetchOnStart({
         ...dataSource.fetchFilters,
         PatternDataSourceFilterManager.createFilter(
           FILTER_OPERATOR.IS,
-          'rule.level',
+          'wazuh.rule.level',
           severityKey,
           dataSource.dataSource.indexPattern.id,
         ),
@@ -164,7 +164,7 @@ export const LastAlertsCountBySeverity = withDataSourceFetchOnStart({
           ...dataSource.fetchFilters,
           PatternDataSourceFilterManager.createFilter(
             FILTER_OPERATOR.IS,
-            'rule.level',
+            'wazuh.rule.level',
             severityKey,
             indexPatternId,
           ),
@@ -190,7 +190,7 @@ export const LastAlertsCountBySeverity = withDataSourceFetchOnStart({
           title={
             <EuiToolTip
               position='top'
-              content={`Click to see rule.level: ${severityKey}`}
+              content={`Click to see wazuh.rule.level: ${severityKey}`}
             >
               <EuiLink
                 className='statWithLink'
@@ -253,7 +253,7 @@ export function LastAlertsStat({
         );
         const ruleLevelFilter = PatternDataSourceFilterManager.createFilter(
           FILTER_OPERATOR.IS,
-          'rule.level',
+          'wazuh.rule.level',
           severityKey,
           indexPatternId,
         );
@@ -292,7 +292,7 @@ export function LastAlertsStat({
           title={
             <EuiToolTip
               position='top'
-              content={`Click to see rule.level: ${severityKey}`}
+              content={`Click to see wazuh.rule.level: ${severityKey}`}
             >
               <EuiLink
                 className='statWithLink'

@@ -2,7 +2,7 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_NIS2_EXIST } from '../../../../../../../common/constants';
 import { EventsDataSource } from '../events-data-source';
 
-const KEY_EXIST = 'rule.compliance.nis2';
+const KEY_EXIST = 'wazuh.rule.compliance.nis2';
 
 export class Nis2DataSource extends EventsDataSource {
   constructor(id: string, title: string) {

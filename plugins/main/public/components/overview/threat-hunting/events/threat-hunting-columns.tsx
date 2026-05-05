@@ -8,12 +8,12 @@ const threatHuntingTableCommonColumns = {
   icon: {
     id: 'icon',
   },
-  'rule.mitre.id': {
-    id: 'rule.mitre.id',
+  'wazuh.rule.mitre.id': {
+    id: 'wazuh.rule.mitre.id',
     initialWidth: 123,
   },
-  'rule.mitre.tactic': {
-    id: 'rule.mitre.tactic',
+  'wazuh.rule.mitre.tactic': {
+    id: 'wazuh.rule.mitre.tactic',
     initialWidth: 266,
   },
 } as Record<string, tDataGridColumn>;
@@ -21,19 +21,19 @@ const threatHuntingTableCommonColumns = {
 export const threatHuntingTableDefaultColumns: tDataGridColumn[] = [
   threatHuntingTableCommonColumns.icon,
   commonColumns['wazuh.agent.id'],
-  threatHuntingTableCommonColumns['rule.mitre.id'],
-  threatHuntingTableCommonColumns['rule.mitre.tactic'],
-  commonColumns['rule.description'],
-  commonColumns['rule.level'],
-  commonColumns['rule.id'],
+  threatHuntingTableCommonColumns['wazuh.rule.mitre.id'],
+  threatHuntingTableCommonColumns['wazuh.rule.mitre.tactic'],
+  commonColumns['wazuh.rule.description'],
+  commonColumns['wazuh.rule.level'],
+  commonColumns['wazuh.rule.id'],
 ];
 
 export const threatHuntingTableAgentColumns: EuiDataGridColumn[] = [
   threatHuntingTableCommonColumns.icon,
   commonColumns.timestamp,
-  threatHuntingTableCommonColumns['rule.mitre.id'],
-  threatHuntingTableCommonColumns['rule.mitre.tactic'],
-  commonColumns['rule.description'],
-  commonColumns['rule.level'],
-  commonColumns['rule.id'],
+  threatHuntingTableCommonColumns['wazuh.rule.mitre.id'],
+  threatHuntingTableCommonColumns['wazuh.rule.mitre.tactic'],
+  commonColumns['wazuh.rule.description'],
+  commonColumns['wazuh.rule.level'],
+  commonColumns['wazuh.rule.id'],
 ];

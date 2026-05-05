@@ -13,7 +13,7 @@
  * https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171r2.pdf
  *
  * NOTE: Key format follows the Rev. 2 numbering scheme (3.X.X) to match
- * values stored in the rule.compliance.nist_800_171 index field.
+ * values stored in the wazuh.rule.compliance.nist_800_171 index field.
  */
 export const nist171RequirementsFile = {
   // 3.1 Access Control
