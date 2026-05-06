@@ -20,7 +20,7 @@ export const CtiDeviceAuthLinks: React.FC<Props> = ({ deviceAuth }) => (
     title={
       <FormattedMessage
         id='wazuhCheckUpdates.ctiRegistration.deviceAuthTitle'
-        defaultMessage='Complete registration in your browser'
+        defaultMessage='Your user code and activation link'
       />
     }
     color='primary'
@@ -48,10 +48,6 @@ export const CtiDeviceAuthLinks: React.FC<Props> = ({ deviceAuth }) => (
       >
         {deviceAuth.verification_uri}
       </EuiLink>
-    </EuiText>
-    <EuiSpacer size='s' />
-    <EuiText size='xs' color='subdued' style={{ wordBreak: 'break-all' }}>
-      {deviceAuth.verification_uri_complete}
     </EuiText>
     <EuiSpacer size='s' />
     <EuiCopy textToCopy={deviceAuth.verification_uri_complete}>

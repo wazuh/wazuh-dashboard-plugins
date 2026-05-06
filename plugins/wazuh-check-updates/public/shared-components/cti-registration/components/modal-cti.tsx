@@ -147,12 +147,6 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     }
   };
 
-  const handleOpenActivationPage = () => {
-    if (deviceAuth?.verification_uri_complete) {
-      window.open(deviceAuth.verification_uri_complete, 'wazuh_cti');
-    }
-  };
-
   const awaitingServerSnapshot =
     !serverSnapshotReady &&
     statusCTI.status === statusCodes.NOT_FOUND &&
@@ -177,36 +171,53 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
   return (
     <EuiModal onClose={handleModalToggle}>
       <EuiModalHeader>
-        <EuiModalHeaderTitle>
-          <EuiTitle>
-            {showSuccess ? (
-              <FormattedMessage
-                id='wazuhCheckUpdates.ctiRegistration.modalTitleSuccess'
-                defaultMessage='CTI updates registration'
-              />
-            ) : showRegistrationFailed ? (
-              <FormattedMessage
-                id='wazuhCheckUpdates.ctiRegistration.modalTitleFailed'
-                defaultMessage='CTI registration'
-              />
-            ) : awaitingServerSnapshot ? (
-              <FormattedMessage
-                id='wazuhCheckUpdates.ctiRegistration.modalTitleLoading'
-                defaultMessage='CTI registration'
-              />
-            ) : deviceAuth ? (
-              <FormattedMessage
-                id='wazuhCheckUpdates.ctiRegistration.modalTitleInProgress'
-                defaultMessage='Registration in progress'
-              />
-            ) : (
-              <FormattedMessage
-                id='wazuhCheckUpdates.ctiRegistration.modalTitle'
-                defaultMessage='Do you want to register to CTI updates?'
-              />
-            )}
-          </EuiTitle>
-        </EuiModalHeaderTitle>
+        <div>
+          <EuiModalHeaderTitle>
+            <EuiTitle>
+              {showSuccess ? (
+                <FormattedMessage
+                  id='wazuhCheckUpdates.ctiRegistration.modalTitleSuccess'
+                  defaultMessage='CTI updates registration'
+                />
+              ) : showRegistrationFailed ? (
+                <FormattedMessage
+                  id='wazuhCheckUpdates.ctiRegistration.modalTitleFailed'
+                  defaultMessage='CTI registration'
+                />
+              ) : awaitingServerSnapshot ? (
+                <FormattedMessage
+                  id='wazuhCheckUpdates.ctiRegistration.modalTitleLoading'
+                  defaultMessage='CTI registration'
+                />
+              ) : deviceAuth ? (
+                <FormattedMessage
+                  id='wazuhCheckUpdates.ctiRegistration.modalTitleInProgress'
+                  defaultMessage='Complete activation in CTI Console'
+                />
+              ) : (
+                <FormattedMessage
+                  id='wazuhCheckUpdates.ctiRegistration.modalTitle'
+                  defaultMessage='Do you want to register to CTI updates?'
+                />
+              )}
+            </EuiTitle>
+          </EuiModalHeaderTitle>
+          {deviceAuth && !showSuccess && !showRegistrationFailed ? (
+            <>
+              <EuiSpacer size='s' />
+              <EuiText
+                size='s'
+                color='subdued'
+                data-test-subj='ctiModalDeviceFlowSubtitle'
+              >
+                <FormattedMessage
+                  id='wazuhCheckUpdates.ctiRegistration.modalSubtitleDeviceFlow'
+                  defaultMessage='Complete your registration in the CTI Console using the user code on the activation page. You can use the tab that opened automatically or the link below.'
+                />
+              </EuiText>
+            </>
+          ) : null}
+        </div>
       </EuiModalHeader>
 
       <EuiModalBody>
@@ -253,8 +264,8 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
             <EuiSpacer size='m' />
             <EuiText size='s' color='subdued' data-test-subj='ctiRegistrationInProgress'>
               <FormattedMessage
-                id='wazuhCheckUpdates.ctiRegistration.inProgress'
-                defaultMessage='Registration in progress'
+                id='wazuhCheckUpdates.ctiRegistration.waitingForActivation'
+                defaultMessage='Checking activation status…'
               />
             </EuiText>
             <EuiSpacer size='xs' />
@@ -346,20 +357,12 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
             />
           </EuiButtonEmpty>
         ) : deviceAuth ? (
-          <>
-            <EuiButtonEmpty onClick={handleModalToggle}>
-              <FormattedMessage
-                id='wazuhCheckUpdates.ctiRegistration.modalButtonClose'
-                defaultMessage='Close'
-              />
-            </EuiButtonEmpty>
-            <EuiButtonEmpty onClick={handleOpenActivationPage}>
-              <FormattedMessage
-                id='wazuhCheckUpdates.ctiRegistration.openActivationAgain'
-                defaultMessage='Open activation page'
-              />
-            </EuiButtonEmpty>
-          </>
+          <EuiButtonEmpty onClick={handleModalToggle}>
+            <FormattedMessage
+              id='wazuhCheckUpdates.ctiRegistration.modalButtonClose'
+              defaultMessage='Close'
+            />
+          </EuiButtonEmpty>
         ) : (
           <>
             <EuiButtonEmpty onClick={handleModalToggle}>

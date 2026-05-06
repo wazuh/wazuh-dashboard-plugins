@@ -99,7 +99,10 @@ describe('ModalCti component', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Registration in progress')).toBeInTheDocument();
+      expect(
+        screen.getByText('Complete activation in CTI Console'),
+      ).toBeInTheDocument();
+      expect(getByTestId('ctiModalDeviceFlowSubtitle')).toBeInTheDocument();
       expect(getByTestId('ctiDeviceUserCode')).toHaveTextContent('WZH-REST');
     });
     expect(
@@ -128,11 +131,10 @@ describe('ModalCti component', () => {
         }),
       );
       expect(ctiFlowState.getDeviceCode()).toBe('mock_device_code_123');
-      expect(
-        screen.getByText(
-          /https:\/\/console\.wazuh\.com\/platform\/environments\/register\?user_code=WZH-999/,
-        ),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('ctiDeviceVerificationLink')).toHaveAttribute(
+        'href',
+        'https://console.wazuh.com/platform/environments/register?user_code=WZH-999',
+      );
     });
     expect(screen.getByText('WZH-999')).toBeInTheDocument();
     expect(window.open).toHaveBeenCalledWith(
