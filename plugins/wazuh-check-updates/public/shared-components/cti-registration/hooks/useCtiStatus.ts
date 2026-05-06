@@ -17,9 +17,7 @@ export const useCtiStatus = (deviceFlowNonce = 0) => {
       if (!options?.silent) {
         setLoading(true);
       }
-      const response = await fetchCtiRegistrationStatus({
-        skipHydrate: Boolean(options?.silent),
-      });
+      const response = await fetchCtiRegistrationStatus();
       setStatusCTI({
         status: response.statusCode,
         message: response.message,
@@ -98,6 +96,28 @@ export const useCtiStatus = (deviceFlowNonce = 0) => {
       }
     };
   }, [deviceFlowNonce, pollingSeed, fetchStatus]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') {
+      return undefined;
+    }
+    const onVisibilityChange = () => {
+      if (document.visibilityState !== 'visible') {
+        return;
+      }
+      if (
+        !ctiFlowState.getDeviceCode() ||
+        ctiFlowState.isRegistrationComplete() ||
+        ctiFlowState.hasPersistedCtiCredentials()
+      ) {
+        return;
+      }
+      void fetchStatus({ silent: true });
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () =>
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, [fetchStatus]);
 
   return { statusCTI, loading, refetchStatus: fetchStatus };
 };

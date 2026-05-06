@@ -87,15 +87,12 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
   }
 }
 
-export async function fetchCtiRegistrationStatus(options?: {
-  skipHydrate?: boolean;
-}): Promise<{
+export async function fetchCtiRegistrationStatus(): Promise<{
   statusCode: number;
   message: string;
 }> {
-  if (!options?.skipHydrate) {
-    await hydrateCtiFlowFromServer();
-  }
+  /** Always hydrate from GET /status so background polls stay in sync (server expiry, store clear, etc.). */
+  await hydrateCtiFlowFromServer();
 
   try {
     if (ctiFlowState.hasPersistedCtiCredentials()) {
