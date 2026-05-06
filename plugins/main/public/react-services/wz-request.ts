@@ -34,9 +34,11 @@ const displayAPINotAvailableToast = throttle(({ title, text }) => {
     text,
   });
 }, 500);
+
 export class WzRequest {
   static wazuhConfig: any;
   static serverAPIAvailable$ = new BehaviorSubject(true);
+  static recoveringPrimaryApi: Promise<boolean> | null = null;
   static serverAPIAvailableChanged$ = this.serverAPIAvailable$.pipe(
     distinctUntilChanged(),
   );
@@ -134,6 +136,68 @@ export class WzRequest {
     });
   }
 
+  private static async runPrimaryApiRecovery(): Promise<boolean> {
+    try {
+      const hosts = await getCore().http.get('/hosts/apis');
+      const host = hosts?.[0];
+      if (!host?.id) {
+        return false;
+      }
+
+      const response = await ApiCheck.checkApi(host, true);
+      const clusterInfo = response?.data || {};
+      if (!clusterInfo || !clusterInfo.cluster) {
+        return false;
+      }
+
+      AppState.setClusterInfo(clusterInfo);
+      AppState.setCurrentAPI(
+        JSON.stringify({
+          name: clusterInfo.cluster,
+          id: host.id,
+        }),
+      );
+
+      this.serverAPIAvailable$.next(true);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  static async recoverPrimaryAPI() {
+    if (this.recoveringPrimaryApi) {
+      return this.recoveringPrimaryApi;
+    }
+
+    this.recoveringPrimaryApi = this.runPrimaryApiRecovery().finally(() => {
+      this.recoveringPrimaryApi = null;
+    });
+
+    return this.recoveringPrimaryApi;
+  }
+
+  static syncApiRequestPayloadWithSession(path: any, payload: any) {
+    if (path !== '/api/request' || !payload || typeof payload !== 'object') {
+      return payload;
+    }
+    if (payload?.body?.devTools === true) return payload;
+
+    const currentApiId = JSON.parse(AppState.getCurrentAPI() || '{}').id;
+    if (!currentApiId) return payload;
+
+    return {
+      ...payload,
+      id: currentApiId,
+      body:
+        payload.body &&
+        typeof payload.body === 'object' &&
+        'idHost' in payload.body
+          ? { ...payload.body, idHost: currentApiId }
+          : payload.body,
+    };
+  }
+
   /**
    * Permorn a generic request
    * @param {String} method
@@ -199,8 +263,47 @@ export class WzRequest {
         const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
         if (currentApi && currentApi.id) {
           try {
-            await ApiCheck.checkStored(currentApi.id);
+            const checkStoredResponse = await ApiCheck.checkStored(
+              currentApi.id,
+            );
+            const nextApiID = checkStoredResponse?.data?.idChanged;
+            const clusterInfo = checkStoredResponse?.data?.data?.cluster_info;
+
+            if (nextApiID && nextApiID !== currentApi.id && clusterInfo) {
+              AppState.setClusterInfo(clusterInfo);
+              AppState.setCurrentAPI(
+                JSON.stringify({
+                  name: clusterInfo.cluster,
+                  id: nextApiID,
+                }),
+              );
+
+              return this.genericReq(
+                method,
+                path,
+                this.syncApiRequestPayloadWithSession(path, payload),
+                {
+                  shouldRetry,
+                  checkCurrentApiIsUp: false,
+                  overwriteHeaders,
+                },
+              );
+            }
           } catch (error) {
+            const recovered = await this.recoverPrimaryAPI();
+            if (recovered) {
+              return this.genericReq(
+                method,
+                path,
+                this.syncApiRequestPayloadWithSession(path, payload),
+                {
+                  shouldRetry,
+                  checkCurrentApiIsUp: false,
+                  overwriteHeaders,
+                },
+              );
+            }
+
             const wzMisc = new WzMisc();
             wzMisc.setApiIsDown(true);
             this.serverAPIAvailable$.next(false);
@@ -226,7 +329,12 @@ export class WzRequest {
       ) {
         try {
           await WzAuthentication.refresh(true);
-          return this.genericReq(method, path, payload, { shouldRetry: false });
+          return this.genericReq(
+            method,
+            path,
+            this.syncApiRequestPayloadWithSession(path, payload),
+            { shouldRetry: false },
+          );
         } catch (error) {
           return ((error || {}).data || {}).message || false
             ? Promise.reject(

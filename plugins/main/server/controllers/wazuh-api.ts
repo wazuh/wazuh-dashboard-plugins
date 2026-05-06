@@ -620,18 +620,46 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} api response or ErrorResponse
    */
-  requestApi(
+  async requestApi(
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
   ) {
     const idApi = getCookieValueByName(request.headers.cookie, 'wz-api');
-    if (idApi !== request.body.id) {
-      // if the current token belongs to a different API id, we relogin to obtain a new token
+    const bodyId = request.body?.id;
+    const devTools = !!(
+      request.body?.body &&
+      typeof request.body.body === 'object' &&
+      request.body.body.devTools === true
+    );
+
+    if (devTools && idApi !== bodyId) {
       return ErrorResponse(
         'status code 401',
         HTTP_STATUS_CODES.UNAUTHORIZED,
         HTTP_STATUS_CODES.UNAUTHORIZED,
+        response,
+      );
+    }
+
+    let apiHostId = devTools ? bodyId : idApi || bodyId;
+
+    if (!devTools && idApi && bodyId && idApi !== bodyId) {
+      try {
+        await context.wazuh_core.manageHosts.get(idApi, {
+          excludePassword: true,
+        });
+        apiHostId = idApi;
+      } catch {
+        apiHostId = bodyId;
+      }
+    }
+
+    if (!apiHostId) {
+      return ErrorResponse(
+        'Missing param: id',
+        3015,
+        HTTP_STATUS_CODES.BAD_REQUEST,
         response,
       );
     }
@@ -673,7 +701,7 @@ export class WazuhApiCtrl {
         request.body.method,
         request.body.path,
         request.body.body,
-        request.body.id,
+        apiHostId,
         response,
       );
     }
