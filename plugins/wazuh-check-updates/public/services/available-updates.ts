@@ -4,7 +4,6 @@ import { getCore } from '../plugin-services';
 
 export const getAvailableUpdates = async (
   queryApi = false,
-  forceQuery = false,
 ): Promise<AvailableUpdates> => {
   const checkUpdates = sessionStorage.getItem('checkUpdates');
   const alreadyCheckUpdates = checkUpdates === 'executed';
@@ -12,7 +11,6 @@ export const getAvailableUpdates = async (
   const availableUpdates = await getCore().http.get(routes.checkUpdates, {
     query: {
       query_api: queryApi || !alreadyCheckUpdates,
-      force_query: forceQuery,
     },
   });
 

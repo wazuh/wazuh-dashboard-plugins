@@ -9,12 +9,12 @@ jest.mock('./update-detail', () => ({
 
 describe('AvailableUpdatesFlyout component', () => {
   test('should return the AvailableUpdatesFlyout component', async () => {
-    const { container, getByText, getByRole } = render(
+    const { container, getByText } = render(
       <AvailableUpdatesFlyout
-        api={{
-          api_id: 'api id',
+        updates={{
           current_version: '4.3.1',
           status: 'availableUpdates' as any,
+          last_check_date_dashboard: new Date('2023-09-30T14:00:00.000Z'),
           last_available_patch: {
             description:
               '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
@@ -28,12 +28,13 @@ describe('AvailableUpdatesFlyout component', () => {
             title: 'Wazuh v4.3.8',
           },
         }}
+        isVisible={true}
+        onClose={() => {}}
       />,
     );
 
     expect(container).toMatchSnapshot();
 
-    expect(getByText('api id')).toBeInTheDocument();
     expect(getByText('4.3.1')).toBeInTheDocument();
   });
 });

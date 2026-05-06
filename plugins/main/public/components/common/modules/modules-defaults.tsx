@@ -337,6 +337,7 @@ export const ModulesDefaults = {
               moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
             />
           ),
+          ButtonModuleGenerateReport,
         ],
       },
       {

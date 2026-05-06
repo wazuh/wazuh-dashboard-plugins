@@ -1,0 +1,18 @@
+---
+plugin: openapi
+specFile: openapi.yml
+
+system:
+  stores:
+    storeCti:
+      preloadData:
+        pollCount: 0
+
+resources:
+  # Single endpoint that handles both Device Authorization Request and
+  # Access Token polling. The dispatch is performed in the script based on
+  # the request body and the optional X-Mock-Scenario header.
+  - method: POST
+    path: /api/v1/platform/environments/token
+    response:
+      scriptFile: token.js
