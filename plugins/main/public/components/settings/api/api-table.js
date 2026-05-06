@@ -822,13 +822,13 @@ export const ApiTable = compose(withErrorBoundary)(
             ) : !api ? (
               <EuiText color='subdued'>No API connection configured.</EuiText>
             ) : (
-              <>
-                <EuiDescriptionList
-                  compressed
-                  type='responsiveColumn'
-                  listItems={listItems}
-                />
-              </>
+              <EuiFlexGroup>
+                {listItems.map(item => (
+                  <EuiFlexItem key={item.title}>
+                    <EuiDescriptionList compressed listItems={[item]} />
+                  </EuiFlexItem>
+                ))}
+              </EuiFlexGroup>
             )}
           </EuiPanel>
         </EuiPage>
