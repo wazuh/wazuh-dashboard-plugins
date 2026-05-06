@@ -8,7 +8,7 @@ jest.mock(
   '../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
-  })
+  }),
 );
 
 const mockedUseUserPreferences = useUserPreferences as jest.Mock;
@@ -19,12 +19,7 @@ describe('DismissNotificationCheck component', () => {
     mockedUseUserPreferences.mockImplementation(() => ({
       isLoading: false,
       userPreferences: {
-        last_dismissed_updates: [
-          {
-            api_id: 'api id',
-            last_patch: 'v4.3.1',
-          },
-        ],
+        last_dismissed_updates: { last_patch: 'v4.3.1' },
         hide_update_notifications: false,
       },
       updateUserPreferences: () => {},

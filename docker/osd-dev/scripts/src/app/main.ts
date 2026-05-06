@@ -369,6 +369,10 @@ export async function mainWithDeps(
   ) {
     profiles.add(PROFILES.SAML);
   }
+  // If Mailpit flag is enabled, include the mailpit profile
+  if (config.enableMailpit) {
+    profiles.add('mailpit');
+  }
 
   const defaultRunner = { execSync, spawn };
   const code = await runDockerCompose(

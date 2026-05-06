@@ -7,7 +7,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 5.0.0
-- Added default notification channels through health check [#7827](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7827)
 - Added sample data generators for agents monitoring and server statistics [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Added "form-data": "^4.0.4" to the resolutions section to ensure this specific version is installed [#7662](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7662)
 - Added prompts to some views related to problems with server API and alerts index pattern [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694)
@@ -50,13 +49,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed dashboards renderer by saved objects [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842) [#7847](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7847) [#7916](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7916) [#7938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7938) [#8310](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8310)
 - Changed `rule.groups` filter to `wazuh.integration.decoders` [#7934](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7934)
 - Applied the new home page navigation style to all dashboards [#7981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7981)
-- Updated Office 365 dashboards to use new index pattern [#8081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8081)
+- Updated Office 365 dashboards to use new index pattern [#8081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8081) [#8408](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8408)
 - Updated GitHub dashboards to use new index pattern [#8072](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8072) [#8354](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8354)
 - Updated File Integrity Monitoring dashboards to use new index pattern [#8074](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8074) [#8247](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8247)
 - Updated Google Cloud dashboard to use new index pattern [#8069](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8069)
 - Updated Amazon web services dashboard to use new index pattern [#8065](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8065)
 - Updated Microsoft Graph API dashboard to use new index pattern [#8073](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8073) [#8335](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8335) [#8343](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8343)
-- Updated Threat Hunting dashboard with new index pattern definition [#8063](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8063)
+- Updated Threat Hunting dashboard with new index pattern definition [#8063](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8063) [#8421](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8421)
 - Upgraded axios to 1.13.3 [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
 - Upgraded axios to 1.13.5 [8179](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8179)
 - Upgraded loglovel to 1.9.2 [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
@@ -84,6 +83,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Reduce the request done to get the index pattern to use in some views [#8318](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8318)
 - Changed default columns in Configuration assessment [#8320](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8320)
 - Set the downloaded local agent package name same to the remote one [#8350](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8350)
+- Changed FIM findings default columns [#8417](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8417)
 
 ### Fixed
 
