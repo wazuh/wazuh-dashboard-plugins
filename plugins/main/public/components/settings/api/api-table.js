@@ -31,6 +31,7 @@ import {
   EuiCodeBlock,
   EuiButton,
   EuiDescriptionList,
+  EuiProgress,
 } from '@elastic/eui';
 import { AppState } from '../../../react-services/app-state';
 import { withErrorBoundary } from '../../common/hocs';
@@ -609,6 +610,11 @@ export const ApiTable = compose(withErrorBoundary)(
       return (
         <EuiPage>
           <EuiPanel paddingSize='m'>
+            {this.state.refreshingEntries && (
+              <>
+                <EuiProgress size='xs' color='primary' position='absolute' />
+              </>
+            )}
             <EuiFlexGroup alignItems='center'>
               <EuiFlexItem>
                 <EuiFlexGroup>
