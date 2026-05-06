@@ -5,7 +5,7 @@
 export interface CtiRegistrationStatusApiBody {
   registrationComplete: boolean;
   inProgress: boolean;
-  hasPersistedCtiCredentials: boolean;
+  isRegistered: boolean;
   device_code?: string;
   user_code?: string;
   verification_uri?: string;

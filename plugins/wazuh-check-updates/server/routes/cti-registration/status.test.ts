@@ -5,7 +5,7 @@ import { ByteSizeValue } from '@osd/config-schema';
 import { routes } from '../../../common/constants';
 import { getCtiRegistrationStatusRoute } from './status';
 import {
-  hasPersistedCtiCredentials,
+  isCtiRegistered,
   resolveCtiOAuthClientId,
 } from '../../services/cti-registration';
 import {
@@ -18,11 +18,11 @@ const serverAddress = '127.0.0.1';
 const port = 11007;
 
 const mockedResolve = resolveCtiOAuthClientId as jest.Mock;
-const mockedHasPersistedCtiCredentials = hasPersistedCtiCredentials as jest.Mock;
+const mockedIsCtiRegistered = isCtiRegistered as jest.Mock;
 
 jest.mock('../../services/cti-registration', () => ({
   resolveCtiOAuthClientId: jest.fn(),
-  hasPersistedCtiCredentials: jest.fn().mockResolvedValue(false),
+  isCtiRegistered: jest.fn().mockResolvedValue(false),
 }));
 
 const loggingService = loggingSystemMock.create();
@@ -75,7 +75,7 @@ describe('CTI registration status route', () => {
   beforeEach(() => {
     CtiRegistrationStore.resetForTests();
     mockedResolve.mockResolvedValue('env-uuid-1');
-    mockedHasPersistedCtiCredentials.mockResolvedValue(false);
+    mockedIsCtiRegistered.mockResolvedValue(false);
   });
 
   test(`GET ${routes.ctiRegistrationStatus} when store is empty`, async () => {
@@ -86,12 +86,13 @@ describe('CTI registration status route', () => {
     expect(response.body).toEqual({
       registrationComplete: false,
       inProgress: false,
-      hasPersistedCtiCredentials: false,
+      isRegistered: false,
     });
+    expect(mockedIsCtiRegistered).toHaveBeenCalledWith('env-uuid-1');
   });
 
-  test(`GET ${routes.ctiRegistrationStatus} when CTI credentials already persisted`, async () => {
-    mockedHasPersistedCtiCredentials.mockResolvedValueOnce(true);
+  test(`GET ${routes.ctiRegistrationStatus} when CTI subscription is registered`, async () => {
+    mockedIsCtiRegistered.mockResolvedValueOnce(true);
 
     const response = await supertest(innerServer.listener)
       .get(routes.ctiRegistrationStatus)
@@ -100,7 +101,7 @@ describe('CTI registration status route', () => {
     expect(response.body).toEqual({
       registrationComplete: false,
       inProgress: false,
-      hasPersistedCtiCredentials: true,
+      isRegistered: true,
     });
   });
 
@@ -124,7 +125,7 @@ describe('CTI registration status route', () => {
     expect(response.body.user_code).toBe('WZH-9');
     expect(response.body.poll_interval_sec).toBe(8);
     expect(typeof response.body.expires_in_remaining_sec).toBe('number');
-    expect(response.body.hasPersistedCtiCredentials).toBe(false);
+    expect(response.body.isRegistered).toBe(false);
   });
 
   test(`GET ${routes.ctiRegistrationStatus} when registration completed`, async () => {
@@ -146,7 +147,7 @@ describe('CTI registration status route', () => {
     expect(response.body).toEqual({
       registrationComplete: true,
       inProgress: false,
-      hasPersistedCtiCredentials: false,
+      isRegistered: false,
     });
   });
 });

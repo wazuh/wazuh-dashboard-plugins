@@ -2,7 +2,7 @@ import { IRouter } from 'opensearch-dashboards/server';
 import { routes } from '../../../common/constants';
 import type { CtiRegistrationStatusApiBody } from '../../../common/cti-registration-status-api';
 import {
-  hasPersistedCtiCredentials,
+  isCtiRegistered,
   resolveCtiOAuthClientId,
 } from '../../services/cti-registration';
 import { CtiConfigurationError } from '../../services/cti-registration/cti-console-url';
@@ -10,15 +10,16 @@ import { CtiRegistrationStore } from '../../services/cti-registration/cti-regist
 
 type StatusWithoutCtiCredentialsFlag = Omit<
   CtiRegistrationStatusApiBody,
-  'hasPersistedCtiCredentials'
+  'isRegistered'
 >;
 
 async function withCtiCredentialsFlag(
   base: StatusWithoutCtiCredentialsFlag,
+  clientId: string,
 ): Promise<CtiRegistrationStatusApiBody> {
   return {
     ...base,
-    hasPersistedCtiCredentials: await hasPersistedCtiCredentials(),
+    isRegistered: await isCtiRegistered(clientId),
   };
 }
 
@@ -39,7 +40,7 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
             body: await withCtiCredentialsFlag({
               registrationComplete: false,
               inProgress: false,
-            }),
+            }, environmentUuid),
           });
         }
 
@@ -48,7 +49,7 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
             body: await withCtiCredentialsFlag({
               registrationComplete: true,
               inProgress: false,
-            }),
+            }, environmentUuid),
           });
         }
 
@@ -58,7 +59,7 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
             body: await withCtiCredentialsFlag({
               registrationComplete: false,
               inProgress: false,
-            }),
+            }, environmentUuid),
           });
         }
 
@@ -77,7 +78,7 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
             verification_uri_complete: rec.verification_uri_complete,
             poll_interval_sec: rec.poll_interval_sec,
             expires_in_remaining_sec,
-          }),
+          }, environmentUuid),
         });
       } catch (error) {
         const finalError =

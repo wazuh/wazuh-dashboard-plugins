@@ -34,7 +34,7 @@ export const useCtiStatus = (deviceFlowNonce = 0) => {
         if (
           ctiFlowState.getDeviceCode() &&
           !ctiFlowState.isRegistrationComplete() &&
-          !ctiFlowState.hasPersistedCtiCredentials()
+          !ctiFlowState.isRegistered()
         ) {
           setPollingSeed(s => s + 1);
         }
@@ -47,7 +47,7 @@ export const useCtiStatus = (deviceFlowNonce = 0) => {
   }, [fetchStatus]);
 
   useEffect(() => {
-    if (ctiFlowState.hasPersistedCtiCredentials()) {
+    if (ctiFlowState.isRegistered()) {
       return undefined;
     }
     if (ctiFlowState.isRegistrationComplete()) {
@@ -69,7 +69,7 @@ export const useCtiStatus = (deviceFlowNonce = 0) => {
         if (
           !ctiFlowState.getDeviceCode() ||
           ctiFlowState.isRegistrationComplete() ||
-          ctiFlowState.hasPersistedCtiCredentials()
+          ctiFlowState.isRegistered()
         ) {
           return;
         }
@@ -80,7 +80,7 @@ export const useCtiStatus = (deviceFlowNonce = 0) => {
         if (
           !ctiFlowState.getDeviceCode() ||
           ctiFlowState.isRegistrationComplete() ||
-          ctiFlowState.hasPersistedCtiCredentials()
+          ctiFlowState.isRegistered()
         ) {
           return;
         }
@@ -108,7 +108,7 @@ export const useCtiStatus = (deviceFlowNonce = 0) => {
       if (
         !ctiFlowState.getDeviceCode() ||
         ctiFlowState.isRegistrationComplete() ||
-        ctiFlowState.hasPersistedCtiCredentials()
+        ctiFlowState.isRegistered()
       ) {
         return;
       }

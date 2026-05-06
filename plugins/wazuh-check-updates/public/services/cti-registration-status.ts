@@ -50,16 +50,14 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
     routes.ctiRegistrationStatus,
   );
 
-  ctiFlowState.setPersistedCtiCredentials(
-    Boolean(body.hasPersistedCtiCredentials),
-  );
+  ctiFlowState.setIsRegistered(Boolean(body.isRegistered));
 
   if (body.registrationComplete) {
     ctiFlowState.setRegistrationComplete(true);
     return;
   }
 
-  if (body.hasPersistedCtiCredentials) {
+  if (body.isRegistered) {
     ctiFlowState.setRegistrationComplete(false);
     ctiFlowState.setDeviceCode(null);
     return;
@@ -91,11 +89,10 @@ export async function fetchCtiRegistrationStatus(): Promise<{
   statusCode: number;
   message: string;
 }> {
-  /** Always hydrate from GET /status so background polls stay in sync (server expiry, store clear, etc.). */
   await hydrateCtiFlowFromServer();
 
   try {
-    if (ctiFlowState.hasPersistedCtiCredentials()) {
+    if (ctiFlowState.isRegistered()) {
       return {
         statusCode: statusCodes.SUCCESS,
         message: CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE,

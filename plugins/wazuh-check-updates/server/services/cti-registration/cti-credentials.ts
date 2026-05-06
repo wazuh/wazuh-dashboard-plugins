@@ -1,45 +1,39 @@
-import { getCore } from '../../plugin-services';
+import axios from 'axios';
+import { contentManagerRoutes } from '../../../common/constants';
+import { getContentManagerBaseUrl } from './content-manager-url';
 
-/** Hidden index `.wazuh-credentials` — CTI credentials present when at least one hit. */
-const CTI_CREDENTIALS_INDEX_PATH = '/.wazuh-credentials';
+interface ContentManagerSubscriptionsResponse {
+  message?: {
+    is_registered?: boolean;
+  };
+}
 
-async function queryCtiCredentialsPresent(): Promise<boolean> {
+async function queryCtiRegistrationStatus(clientId: string): Promise<boolean> {
+  const base = getContentManagerBaseUrl();
+  if (!base) {
+    return false;
+  }
+
   try {
-    const clusterResp = await getCore().opensearch.client.asInternalUser.transport.request(
+    const response = await axios.get<ContentManagerSubscriptionsResponse>(
+      `${base}${contentManagerRoutes.subscription}`,
       {
-        method: 'POST',
-        path: `${CTI_CREDENTIALS_INDEX_PATH}/_search`,
-        body: JSON.stringify({
-          size: 1,
-          _source: false,
-        }),
+        params: { clientId },
+        headers: { 'Content-Type': 'application/json' },
+        validateStatus: status => status >= 200 && status < 300,
       },
     );
 
-    const body = (clusterResp as { body?: { hits?: { total?: number | { value?: number }; hits?: unknown[] } } })
-      .body;
-    const hitsArr = body?.hits?.hits ?? [];
-    if (hitsArr.length > 0) {
-      return true;
-    }
-    const total = body?.hits?.total;
-    const n =
-      typeof total === 'number'
-        ? total
-        : typeof total === 'object' && total !== null && 'value' in total
-        ? Number((total as { value: number }).value)
-        : 0;
-    return n > 0;
+    return Boolean(response.data?.message?.is_registered);
   } catch {
     return false;
   }
 }
 
 /**
- * Whether CTI credentials already exist in the cluster index (read on each call;
- * same pattern as `fetchClusterUuid` — no in-process cache).
- * Never returns document contents — only a boolean for routing/UI.
+ * Reads CTI registration state from Content Manager subscription API.
+ * Falls back to `false` when the endpoint is unavailable or fails.
  */
-export async function hasPersistedCtiCredentials(): Promise<boolean> {
-  return queryCtiCredentialsPresent();
+export async function isCtiRegistered(clientId: string): Promise<boolean> {
+  return queryCtiRegistrationStatus(clientId);
 }

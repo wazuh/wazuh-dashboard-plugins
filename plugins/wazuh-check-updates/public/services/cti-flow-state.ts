@@ -11,15 +11,15 @@ let registrationComplete = false;
 let pollIntervalSeconds = CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC;
 let deviceAuthExpiresAt: number | null = null;
 let deviceAuthLinks: CtiDeviceAuthorization | null = null;
-let persistedCtiCredentials = false;
+let isRegistered = false;
 
 export const ctiFlowState = {
-  setPersistedCtiCredentials(value: boolean): void {
-    persistedCtiCredentials = value;
+  setIsRegistered(value: boolean): void {
+    isRegistered = value;
   },
 
-  hasPersistedCtiCredentials(): boolean {
-    return persistedCtiCredentials;
+  isRegistered(): boolean {
+    return isRegistered;
   },
 
   getDeviceCode(): string | null {
