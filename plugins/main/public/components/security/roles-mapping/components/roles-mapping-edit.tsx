@@ -42,9 +42,9 @@ export const RolesMappingEdit = ({
   };
 
   const [selectedRoles, setSelectedRoles] = useState<any[]>(
-    getEquivalences(wazuh.rule.roles),
+    getEquivalences(rule.roles),
   );
-  const [ruleName, setRuleName] = useState<string>(wazuh.rule.name);
+  const [ruleName, setRuleName] = useState<string>(rule.name);
   const [isLoading, setIsLoading] = useState(false);
   const [hasChangeMappingRules, setHasChangeMappingRules] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -64,26 +64,24 @@ export const RolesMappingEdit = ({
         return item.id;
       });
 
-      await RulesServices.UpdateRule(wazuh.rule.id, {
+      await RulesServices.UpdateRule(rule.id, {
         name: ruleName,
         rule: toSaveRule,
       });
 
-      const toAdd = formattedRoles.filter(
-        value => !wazuh.rule.roles.includes(value),
-      );
-      const toRemove = wazuh.rule.roles.filter(
+      const toAdd = formattedRoles.filter(value => !rule.roles.includes(value));
+      const toRemove = rule.roles.filter(
         value => !formattedRoles.includes(value),
       );
       await Promise.all(
         toAdd.map(async role => {
-          return RolesServices.AddRoleRules(role, [wazuh.rule.id]);
+          return RolesServices.AddRoleRules(role, [rule.id]);
         }),
       );
 
       await Promise.all(
         toRemove.map(async role => {
-          return RolesServices.RemoveRoleRules(role, [wazuh.rule.id]);
+          return RolesServices.RemoveRoleRules(role, [rule.id]);
         }),
       );
 
@@ -132,9 +130,9 @@ export const RolesMappingEdit = ({
   }
 
   useEffect(() => {
-    const initialRoles = getEquivalences(wazuh.rule.roles);
+    const initialRoles = getEquivalences(rule.roles);
     if (
-      wazuh.rule.name != ruleName ||
+      rule.name != ruleName ||
       !_.isEqual(initialRoles, selectedRoles) ||
       hasChangeMappingRules
     ) {
@@ -154,8 +152,8 @@ export const RolesMappingEdit = ({
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size='m'>
             <h2>
-              Edit <strong>{wazuh.rule.name}&nbsp;&nbsp;</strong>
-              {WzAPIUtils.isReservedID(wazuh.rule.id) && (
+              Edit <strong>{rule.name}&nbsp;&nbsp;</strong>
+              {WzAPIUtils.isReservedID(rule.id) && (
                 <EuiBadge color='primary'>Reserved</EuiBadge>
               )}
             </h2>
@@ -171,7 +169,7 @@ export const RolesMappingEdit = ({
             >
               <EuiFieldText
                 placeholder=''
-                disabled={WzAPIUtils.isReservedID(wazuh.rule.id)}
+                disabled={WzAPIUtils.isReservedID(rule.id)}
                 value={ruleName}
                 onChange={e => setRuleName(e.target.value)}
                 aria-label=''
@@ -186,7 +184,7 @@ export const RolesMappingEdit = ({
               <EuiComboBox
                 placeholder='Select roles'
                 options={getRolesList(roles)}
-                isDisabled={WzAPIUtils.isReservedID(wazuh.rule.id)}
+                isDisabled={WzAPIUtils.isReservedID(rule.id)}
                 selectedOptions={selectedRoles}
                 onChange={roles => {
                   setSelectedRoles(roles);
@@ -205,31 +203,30 @@ export const RolesMappingEdit = ({
                   // Require security:update:{rule_id} if some roles were added
                   ...(selectedRoles
                     .map(item => item.id)
-                    .filter(value => !wazuh.rule.roles.includes(value)).length >
-                  0
+                    .filter(value => !rule.roles.includes(value)).length > 0
                     ? [
                         {
                           action: 'security:update',
-                          resource: `rule:id:${wazuh.rule.id}`,
+                          resource: `rule:id:${rule.id}`,
                         },
                       ]
                     : []),
                   // Require security:delete:{rule_id} if some roles were removed
-                  ...(wazuh.rule.roles.filter(
+                  ...(rule.roles.filter(
                     value =>
                       !selectedRoles.map(item => item.id).includes(value),
                   ) > 0
                     ? [
                         {
                           action: 'security:delete',
-                          resource: `rule:id:${wazuh.rule.id}`,
+                          resource: `rule:id:${rule.id}`,
                         },
                       ]
                     : []),
                 ]}
-                initialRule={wazuh.rule.rule}
+                initialRule={rule.rule}
                 isLoading={isLoading}
-                isReserved={WzAPIUtils.isReservedID(wazuh.rule.id)}
+                isReserved={WzAPIUtils.isReservedID(rule.id)}
                 internalUsers={internalUsers}
                 currentPlatform={currentPlatform}
                 onFormChange={hasChange => setHasChangeMappingRules(hasChange)}

@@ -29,7 +29,7 @@ export const getLastAlertsQuery = (
       },
       {
         term: {
-          'wazuh.rule.level': ruleLevel,
+          'rule.level': ruleLevel,
         },
       },
       {

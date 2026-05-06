@@ -253,7 +253,7 @@ export function LastAlertsStat({
         );
         const ruleLevelFilter = PatternDataSourceFilterManager.createFilter(
           FILTER_OPERATOR.IS,
-          'wazuh.rule.level',
+          'rule.level',
           severityKey,
           indexPatternId,
         );
@@ -292,7 +292,7 @@ export function LastAlertsStat({
           title={
             <EuiToolTip
               position='top'
-              content={`Click to see wazuh.rule.level: ${severityKey}`}
+              content={`Click to see rule.level: ${severityKey}`}
             >
               <EuiLink
                 className='statWithLink'
