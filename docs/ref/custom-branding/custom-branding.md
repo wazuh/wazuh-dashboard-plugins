@@ -14,19 +14,21 @@ Edit `opensearch_dashboards.yml` and set the branding URLs:
 ```yml
 opensearchDashboards.branding:
   logo:
-    defaultUrl: 'https://domain.org/default-logo.png'
+    defaultUrl: 'https://domain.org/light-logo.png'
     darkModeUrl: 'https://domain.org/dark-mode-logo.png'
   loadingLogo:
-    defaultUrl: 'https://domain.org/default-logo.png'
-    darkModeUrl: 'https://domain.org/dark-mode-logo.png'
+    defaultUrl: 'https://domain.org/light-loading-logo.png'
+    darkModeUrl: 'https://domain.org/dark-loading-logo.png'
   mark:
-    defaultUrl: 'https://domain.org/default-logo.png'
-    darkModeUrl: 'https://domain.org/dark-mode-logo.png'
+    defaultUrl: 'https://domain.org/light-mark-logo.png'
+    darkModeUrl: 'https://domain.org/dark-mark-logo.png'
 ```
 
-- **logo**: home and expanded header logo. Allowed formats: PNG, GIF, SVG.
+- **logo**: expanded header logo (if `opensearchDashboards.branding.useExpandedHeader: true`). Allowed formats: PNG, GIF, SVG.
 - **loadingLogo**: logo used while loading. Allowed formats: PNG, GIF, SVG.
-- **mark**: used in other views. Allowed formats: PNG, GIF, SVG.
+- **mark**: used in header home button and other views. Allowed formats: PNG, GIF, SVG. The customization of this logo can replace other logos if they are not customized, e.g. the loading logo.
+
+> Note: the URLs should ends with the image extension, avoid the usage of query parameters.
 
 Restart the service after changes:
 
@@ -139,7 +141,7 @@ To host the images in the dashboard server, place them in the `src/core/server/c
 
 ```yml
 opensearchDashboards.branding:
-  logo:
+  mark:
     defaultUrl: '/ui/custom-logo.png'
     darkModeUrl: '/ui/custom-logo.png'
 ```
