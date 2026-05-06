@@ -2,24 +2,25 @@ import { IRouter } from 'opensearch-dashboards/server';
 import { routes } from '../../../common/constants';
 import type { CtiRegistrationStatusApiBody } from '../../../common/cti-registration-status-api';
 import {
-  isCtiRegistered,
+  getCtiSubscriptionStatus,
   resolveCtiOAuthClientId,
 } from '../../services/cti-registration';
 import { CtiConfigurationError } from '../../services/cti-registration/cti-console-url';
 import { CtiRegistrationStore } from '../../services/cti-registration/cti-registration-store';
 
-type StatusWithoutCtiCredentialsFlag = Omit<
+type StatusWithoutSubscriptionFields = Omit<
   CtiRegistrationStatusApiBody,
-  'isRegistered'
+  'subscription'
 >;
 
-async function withCtiCredentialsFlag(
-  base: StatusWithoutCtiCredentialsFlag,
+async function withSubscriptionFields(
+  base: StatusWithoutSubscriptionFields,
   clientId: string,
 ): Promise<CtiRegistrationStatusApiBody> {
+  const subscription = await getCtiSubscriptionStatus(clientId);
   return {
     ...base,
-    isRegistered: await isCtiRegistered(clientId),
+    subscription,
   };
 }
 
@@ -37,7 +38,7 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
 
         if (!rec) {
           return response.ok({
-            body: await withCtiCredentialsFlag({
+            body: await withSubscriptionFields({
               registrationComplete: false,
               inProgress: false,
             }, environmentUuid),
@@ -46,7 +47,7 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
 
         if (rec.registrationComplete) {
           return response.ok({
-            body: await withCtiCredentialsFlag({
+            body: await withSubscriptionFields({
               registrationComplete: true,
               inProgress: false,
             }, environmentUuid),
@@ -56,7 +57,7 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
         if (Date.now() > rec.deviceAuthExpiresAtMs) {
           store.clear(environmentUuid);
           return response.ok({
-            body: await withCtiCredentialsFlag({
+            body: await withSubscriptionFields({
               registrationComplete: false,
               inProgress: false,
             }, environmentUuid),
@@ -69,7 +70,7 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
         );
 
         return response.ok({
-          body: await withCtiCredentialsFlag({
+          body: await withSubscriptionFields({
             registrationComplete: false,
             inProgress: true,
             device_code: rec.device_code ?? undefined,

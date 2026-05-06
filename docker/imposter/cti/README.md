@@ -29,12 +29,20 @@ instance exposes:
 
 ```
 POST /_plugins/_content_manager/subscription
+GET  /_plugins/_content_manager/subscription?clientId=<cluster_uuid>
 ```
 
 | JSON body | HTTP | Response body |
 | --------- | ---- | --------------- |
 | `{ "access_token": "<non-empty>" }` | **201** | `{ "message": "Credentials received", "status": 201 }` |
 | Missing, empty, or invalid JSON / no `access_token` | **400** | `{ "message": "Missing [access_token] field.", "status": 400 }` |
+
+For registration status (used by CTI status route):
+
+| Query | HTTP | Response body |
+| ----- | ---- | --------------- |
+| `clientId=<non-empty>` | **200** | `{ "message": { "plan": { "name": "Premium Plan", "is_public": true }, "is_registered": true }, "status": 200 }` |
+| Missing or empty `clientId` | **400** | `{ "message": "Missing [clientId] query parameter.", "status": 400 }` |
 
 **Security:** the `access_token` is a secret. Only the dashboard **server**
 should POST it to this URL (or to the real indexer later). Do not surface it
@@ -62,7 +70,7 @@ the header `X-Mock-Scenario` with one of:
 - `openapi.yml` — OpenAPI 3.0 specification consumed by Imposter.
 - `cti-config.yml` — Imposter resource configuration.
 - `token.js` — Dispatch logic (body parsing, scenario selection, poll counter).
-- `subscription.js` — Content Manager subscription mock (JSON `access_token` validation).
+- `subscription.js` — Content Manager subscription mock (`GET /subscription?clientId=...` + POST fallback).
 - `responses/*.json` — Static payloads for each response.
 
 > **Note:** Imposter scripts run on **Nashorn (ES5 only)**. Avoid trailing
@@ -106,4 +114,7 @@ curl -i -X POST http://imposter:8080/_plugins/_content_manager/subscription \
 curl -i -X POST http://imposter:8080/_plugins/_content_manager/subscription \
   -H 'Content-Type: application/json' \
   -d '{}'
+
+# 6. Query subscription registration status
+curl -i "http://imposter:8080/_plugins/_content_manager/subscription?clientId=a17c21ed"
 ```

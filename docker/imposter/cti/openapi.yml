@@ -44,6 +44,45 @@ tags:
 
 paths:
   /_plugins/_content_manager/subscription:
+    get:
+      summary: Read subscription registration status (mock)
+      description: |
+        Returns a static registration state used by the dashboard status check.
+        Requires `clientId` query parameter.
+      operationId: getContentManagerSubscriptionStatus
+      tags:
+        - Content Manager
+      parameters:
+        - in: query
+          name: clientId
+          required: true
+          description: Environment UUID (cluster UUID).
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Registration status payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentManagerSubscriptionStatusResponse'
+              example:
+                message:
+                  plan:
+                    name: Premium Plan
+                    is_public: true
+                  is_registered: true
+                status: 200
+        '400':
+          description: Missing required query parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentManagerSubscriptionError'
+              example:
+                message: Missing [clientId] query parameter.
+                status: 400
+
     post:
       summary: Register subscription credentials (mock)
       description: |
@@ -215,6 +254,37 @@ components:
         status:
           type: integer
           example: 400
+      required:
+        - message
+        - status
+
+    ContentManagerSubscriptionStatusResponse:
+      type: object
+      properties:
+        message:
+          type: object
+          properties:
+            plan:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Premium Plan
+                is_public:
+                  type: boolean
+                  example: true
+              required:
+                - name
+                - is_public
+            is_registered:
+              type: boolean
+              example: true
+          required:
+            - plan
+            - is_registered
+        status:
+          type: integer
+          example: 200
       required:
         - message
         - status

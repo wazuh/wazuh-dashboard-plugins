@@ -1,0 +1,10 @@
+{
+  "message": {
+    "plan": {
+      "name": "Premium Plan",
+      "is_public": true
+    },
+    "is_registered": true
+  },
+  "status": 200
+}

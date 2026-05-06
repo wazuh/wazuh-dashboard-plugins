@@ -5,7 +5,7 @@ import { ByteSizeValue } from '@osd/config-schema';
 import { routes } from '../../../common/constants';
 import { getCtiRegistrationStatusRoute } from './status';
 import {
-  isCtiRegistered,
+  getCtiSubscriptionStatus,
   resolveCtiOAuthClientId,
 } from '../../services/cti-registration';
 import {
@@ -18,11 +18,14 @@ const serverAddress = '127.0.0.1';
 const port = 11007;
 
 const mockedResolve = resolveCtiOAuthClientId as jest.Mock;
-const mockedIsCtiRegistered = isCtiRegistered as jest.Mock;
+const mockedGetCtiSubscriptionStatus = getCtiSubscriptionStatus as jest.Mock;
 
 jest.mock('../../services/cti-registration', () => ({
   resolveCtiOAuthClientId: jest.fn(),
-  isCtiRegistered: jest.fn().mockResolvedValue(false),
+  getCtiSubscriptionStatus: jest.fn().mockResolvedValue({
+    message: null,
+    status: null,
+  }),
 }));
 
 const loggingService = loggingSystemMock.create();
@@ -75,7 +78,10 @@ describe('CTI registration status route', () => {
   beforeEach(() => {
     CtiRegistrationStore.resetForTests();
     mockedResolve.mockResolvedValue('env-uuid-1');
-    mockedIsCtiRegistered.mockResolvedValue(false);
+    mockedGetCtiSubscriptionStatus.mockResolvedValue({
+      message: null,
+      status: null,
+    });
   });
 
   test(`GET ${routes.ctiRegistrationStatus} when store is empty`, async () => {
@@ -86,13 +92,19 @@ describe('CTI registration status route', () => {
     expect(response.body).toEqual({
       registrationComplete: false,
       inProgress: false,
-      isRegistered: false,
+      subscription: { message: null, status: null },
     });
-    expect(mockedIsCtiRegistered).toHaveBeenCalledWith('env-uuid-1');
+    expect(mockedGetCtiSubscriptionStatus).toHaveBeenCalledWith('env-uuid-1');
   });
 
   test(`GET ${routes.ctiRegistrationStatus} when CTI subscription is registered`, async () => {
-    mockedIsCtiRegistered.mockResolvedValueOnce(true);
+    mockedGetCtiSubscriptionStatus.mockResolvedValueOnce({
+      message: {
+        plan: { name: 'Premium Plan', is_public: true },
+        is_registered: true,
+      },
+      status: 200,
+    });
 
     const response = await supertest(innerServer.listener)
       .get(routes.ctiRegistrationStatus)
@@ -101,7 +113,13 @@ describe('CTI registration status route', () => {
     expect(response.body).toEqual({
       registrationComplete: false,
       inProgress: false,
-      isRegistered: true,
+      subscription: {
+        message: {
+          plan: { name: 'Premium Plan', is_public: true },
+          is_registered: true,
+        },
+        status: 200,
+      },
     });
   });
 
@@ -125,7 +143,10 @@ describe('CTI registration status route', () => {
     expect(response.body.user_code).toBe('WZH-9');
     expect(response.body.poll_interval_sec).toBe(8);
     expect(typeof response.body.expires_in_remaining_sec).toBe('number');
-    expect(response.body.isRegistered).toBe(false);
+    expect(response.body.subscription).toEqual({
+      message: null,
+      status: null,
+    });
   });
 
   test(`GET ${routes.ctiRegistrationStatus} when registration completed`, async () => {
@@ -147,7 +168,7 @@ describe('CTI registration status route', () => {
     expect(response.body).toEqual({
       registrationComplete: true,
       inProgress: false,
-      isRegistered: false,
+      subscription: { message: null, status: null },
     });
   });
 });

@@ -1,21 +1,55 @@
 import axios from 'axios';
+import type {
+  CtiSubscriptionMessage,
+  CtiSubscriptionSnapshot,
+} from '../../../common/cti-registration-status-api';
 import { contentManagerRoutes } from '../../../common/constants';
 import { getContentManagerBaseUrl } from './content-manager-url';
 
-interface ContentManagerSubscriptionsResponse {
+interface ContentManagerSubscriptionGetResponse {
   message?: {
+    plan?: { name?: string; is_public?: boolean };
     is_registered?: boolean;
   };
+  status?: number;
 }
 
-async function queryCtiRegistrationStatus(clientId: string): Promise<boolean> {
+function normalizeSubscriptionMessage(
+  raw: ContentManagerSubscriptionGetResponse['message'],
+): CtiSubscriptionMessage | null {
+  if (!raw || typeof raw !== 'object') {
+    return null;
+  }
+  const planRaw = raw.plan;
+  const message: CtiSubscriptionMessage = {
+    is_registered: Boolean(raw.is_registered),
+  };
+  if (planRaw && typeof planRaw === 'object') {
+    message.plan = {
+      name:
+        typeof planRaw.name === 'string'
+          ? planRaw.name
+          : String(planRaw.name ?? ''),
+      is_public: Boolean(planRaw.is_public),
+    };
+  }
+  return message;
+}
+
+/**
+ * Reads CTI subscription payload from Content Manager `GET …/subscription`.
+ * On missing base URL or request failure returns nulls (same as “not registered” for UX).
+ */
+export async function getCtiSubscriptionStatus(
+  clientId: string,
+): Promise<CtiSubscriptionSnapshot> {
   const base = getContentManagerBaseUrl();
   if (!base) {
-    return false;
+    return { message: null, status: null };
   }
 
   try {
-    const response = await axios.get<ContentManagerSubscriptionsResponse>(
+    const response = await axios.get<ContentManagerSubscriptionGetResponse>(
       `${base}${contentManagerRoutes.subscription}`,
       {
         params: { clientId },
@@ -24,16 +58,16 @@ async function queryCtiRegistrationStatus(clientId: string): Promise<boolean> {
       },
     );
 
-    return Boolean(response.data?.message?.is_registered);
-  } catch {
-    return false;
-  }
-}
+    const body = response.data;
+    const message = normalizeSubscriptionMessage(body?.message);
+    const statusFromBody =
+      typeof body?.status === 'number' ? body.status : response.status;
 
-/**
- * Reads CTI registration state from Content Manager subscription API.
- * Falls back to `false` when the endpoint is unavailable or fails.
- */
-export async function isCtiRegistered(clientId: string): Promise<boolean> {
-  return queryCtiRegistrationStatus(clientId);
+    return {
+      message,
+      status: Number.isFinite(statusFromBody) ? statusFromBody : null,
+    };
+  } catch {
+    return { message: null, status: null };
+  }
 }

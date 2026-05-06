@@ -50,14 +50,14 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
     routes.ctiRegistrationStatus,
   );
 
-  ctiFlowState.setIsRegistered(Boolean(body.isRegistered));
+  ctiFlowState.setSubscription(body.subscription ?? null);
 
   if (body.registrationComplete) {
     ctiFlowState.setRegistrationComplete(true);
     return;
   }
 
-  if (body.isRegistered) {
+  if (Boolean(body.subscription?.message?.is_registered)) {
     ctiFlowState.setRegistrationComplete(false);
     ctiFlowState.setDeviceCode(null);
     return;

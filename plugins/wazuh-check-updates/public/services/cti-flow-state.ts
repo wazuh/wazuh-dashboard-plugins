@@ -4,6 +4,7 @@ import {
   CTI_MIN_DEVICE_POLL_INTERVAL_SEC,
   CTI_SLOW_DOWN_EXTRA_INTERVAL_SEC,
 } from '../../common/constants';
+import type { CtiSubscriptionSnapshot } from '../../common/cti-registration-status-api';
 import type { CtiDeviceAuthorization } from '../shared-components/cti-registration/types';
 
 let deviceCode: string | null = null;
@@ -11,15 +12,20 @@ let registrationComplete = false;
 let pollIntervalSeconds = CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC;
 let deviceAuthExpiresAt: number | null = null;
 let deviceAuthLinks: CtiDeviceAuthorization | null = null;
-let isRegistered = false;
+let subscription: CtiSubscriptionSnapshot | null = null;
 
 export const ctiFlowState = {
-  setIsRegistered(value: boolean): void {
-    isRegistered = value;
+  /** Whether CM subscription reports this environment as registered. */
+  isRegistered(): boolean {
+    return Boolean(subscription?.message?.is_registered);
   },
 
-  isRegistered(): boolean {
-    return isRegistered;
+  setSubscription(value: CtiSubscriptionSnapshot | null): void {
+    subscription = value;
+  },
+
+  getSubscription(): CtiSubscriptionSnapshot | null {
+    return subscription;
   },
 
   getDeviceCode(): string | null {
@@ -95,5 +101,6 @@ export const ctiFlowState = {
     pollIntervalSeconds = CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC;
     deviceAuthExpiresAt = null;
     deviceAuthLinks = null;
+    subscription = null;
   },
 };
