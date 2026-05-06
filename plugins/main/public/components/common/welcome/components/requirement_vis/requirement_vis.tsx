@@ -114,7 +114,7 @@ const RequirementVisBody = compose(
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
-        `rule.compliance.${requirement}`,
+        `wazuh.rule.compliance.${requirement}`,
         key,
         props.dataSource.dataSource.indexPattern.id,
       ),
@@ -138,7 +138,7 @@ const RequirementVisBody = compose(
           ...props.dataSource.fetchFilters,
           PatternDataSourceFilterManager.createFilter(
             FILTER_OPERATOR.EXISTS,
-            `rule.compliance.${selectedOptionValue}`,
+            `wazuh.rule.compliance.${selectedOptionValue}`,
             null,
             props.dataSource.dataSource.indexPattern.id,
           ),
@@ -151,7 +151,7 @@ const RequirementVisBody = compose(
         aggs: {
           top_alerts_compliance: {
             terms: {
-              field: `rule.compliance.${selectedOptionValue}`,
+              field: `wazuh.rule.compliance.${selectedOptionValue}`,
               size: 5,
             },
           },

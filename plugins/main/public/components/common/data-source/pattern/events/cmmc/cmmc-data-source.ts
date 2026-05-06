@@ -2,7 +2,7 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_CMMC_EXIST } from '../../../../../../../common/constants';
 import { EventsDataSource } from '../events-data-source';
 
-const KEY_EXIST = 'rule.compliance.cmmc';
+const KEY_EXIST = 'wazuh.rule.compliance.cmmc';
 
 export class CMMCDataSource extends EventsDataSource {
   constructor(id: string, title: string) {

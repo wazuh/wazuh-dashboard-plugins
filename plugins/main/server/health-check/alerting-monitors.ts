@@ -145,12 +145,12 @@ function buildMonitorBody(
           query: {
             size: 0,
             query: {
-              // Use a more meaningful default: alerts with rule.level > 3
+              // Use a more meaningful default: alerts with wazuh.rule.level > 3
               bool: {
                 filter: [
                   {
                     range: {
-                      'rule.level': { gt: 3 },
+                      'wazuh.rule.level': { gt: 3 },
                     },
                   },
                 ],

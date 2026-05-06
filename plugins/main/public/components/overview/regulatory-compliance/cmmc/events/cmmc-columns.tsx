@@ -5,10 +5,10 @@ export const cmmcColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   commonColumns['wazuh.agent.name'],
   {
-    id: 'rule.compliance.cmmc',
+    id: 'wazuh.rule.compliance.cmmc',
     initialWidth: 180,
   },
-  { id: 'rule.id' },
-  { id: 'rule.title' },
+  { id: 'wazuh.rule.id' },
+  { id: 'wazuh.rule.title' },
   { id: 'wazuh.integration.decoders' },
 ];

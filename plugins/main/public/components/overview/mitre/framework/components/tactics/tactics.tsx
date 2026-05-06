@@ -87,7 +87,7 @@ export const Tactics = (props: tTacticsProps) => {
       const aggs = {
         tactics: {
           terms: {
-            field: 'rule.mitre.tactic',
+            field: 'wazuh.rule.mitre.tactic',
             size: 1000,
           },
         },
