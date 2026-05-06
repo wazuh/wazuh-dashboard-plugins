@@ -399,7 +399,7 @@ services:
       - '55000:55000'
 
   wazuh.agent.deb.local:
-    image: ubuntu:24.04
+    image: ubuntu:26.04
     profiles:
       - 'server-local' # server profile to use the local packages with agents deb and rpm
       - 'server-local-deb' # server profile to use the local packages with agent deb
