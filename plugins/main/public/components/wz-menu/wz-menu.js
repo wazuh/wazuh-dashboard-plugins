@@ -137,6 +137,7 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
             isInvalid={isInvalid}
             append={
               <EuiButtonIcon
+                aria-label='Refresh API list'
                 iconType='refresh'
                 color='primary'
                 isDisabled={action.running}
@@ -204,6 +205,7 @@ export const WzMenu = withWindowSize(
                   grow={false}
                   onClick={() => NavigationService.getInstance().reload()}
                   className='WzNotReadyButton'
+                  aria-label='Reload'
                 >
                   <span> Reload </span>
                 </EuiButtonEmpty>

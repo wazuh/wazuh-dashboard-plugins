@@ -39,8 +39,88 @@ servers:
 tags:
   - name: CTI Console
     description: CTI Console registration and authorization endpoints
+  - name: Content Manager
+    description: Indexer Content Manager subscription (mock until plugin ships)
 
 paths:
+  /_plugins/_content_manager/subscription:
+    get:
+      summary: Read subscription registration status (mock)
+      description: |
+        Returns a static registration state used by the dashboard status check.
+        Requires `clientId` query parameter.
+      operationId: getContentManagerSubscriptionStatus
+      tags:
+        - Content Manager
+      parameters:
+        - in: query
+          name: clientId
+          required: true
+          description: Environment UUID (cluster UUID).
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Registration status payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentManagerSubscriptionStatusResponse'
+              example:
+                message:
+                  plan:
+                    name: Premium Plan
+                    is_public: true
+                  is_registered: true
+                status: 200
+        '400':
+          description: Missing required query parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentManagerSubscriptionError'
+              example:
+                message: Missing [clientId] query parameter.
+                status: 400
+
+    post:
+      summary: Register subscription credentials (mock)
+      description: |
+        Accepts a JSON body with `access_token` only. Intended to mirror the
+        future cluster `/_plugins/_content_manager/subscription` contract.
+        The dashboard must call this from the **server** only; never expose the
+        token to the browser.
+      operationId: contentManagerSubscription
+      tags:
+        - Content Manager
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentManagerSubscriptionRequest'
+            example:
+              access_token: dev_placeholder_only
+      responses:
+        '201':
+          description: Credentials accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentManagerSubscriptionAccepted'
+              example:
+                message: Credentials received
+                status: 201
+        '400':
+          description: Missing or empty required field
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentManagerSubscriptionError'
+              example:
+                message: Missing [access_token] field.
+                status: 400
+
   /api/v1/platform/environments/token:
     post:
       summary: Device Authorization Grant endpoint
@@ -143,6 +223,72 @@ paths:
 
 components:
   schemas:
+    ContentManagerSubscriptionRequest:
+      type: object
+      description: Secret access token from CTI device flow (server-side only).
+      properties:
+        access_token:
+          type: string
+      required:
+        - access_token
+
+    ContentManagerSubscriptionAccepted:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Credentials received
+        status:
+          type: integer
+          example: 201
+      required:
+        - message
+        - status
+
+    ContentManagerSubscriptionError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Missing [access_token] field.
+        status:
+          type: integer
+          example: 400
+      required:
+        - message
+        - status
+
+    ContentManagerSubscriptionStatusResponse:
+      type: object
+      properties:
+        message:
+          type: object
+          properties:
+            plan:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Premium Plan
+                is_public:
+                  type: boolean
+                  example: true
+              required:
+                - name
+                - is_public
+            is_registered:
+              type: boolean
+              example: true
+          required:
+            - plan
+            - is_registered
+        status:
+          type: integer
+          example: 200
+      required:
+        - message
+        - status
+
     DeviceAuthorizationRequest:
       type: object
       description: Initial request to start the Device Authorization Grant flow.
