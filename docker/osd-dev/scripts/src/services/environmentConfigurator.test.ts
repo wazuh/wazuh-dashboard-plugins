@@ -10,12 +10,32 @@ import {
 import type { EnvironmentPaths, ScriptConfig } from '../types/config';
 import { PathAccessError, ValidationError } from '../errors';
 
+const MINIMAL_OSD_CONFIG = `wazuh_core.hosts:
+  first-host:
+    url: https://first.example.com
+  manager-local:
+    url: https://manager.local
+`;
+
 describe('services/environmentConfigurator', () => {
   let tmpdir = '';
+  let savedCwd = '';
   let envPaths: EnvironmentPaths;
 
   beforeEach(() => {
+    savedCwd = process.cwd();
     tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'wdp-env-'));
+    process.chdir(tmpdir);
+    const osdConfigDir = path.join(tmpdir, 'config', '2.x', 'osd');
+    fs.mkdirSync(osdConfigDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(osdConfigDir, 'opensearch_dashboards.yml'),
+      MINIMAL_OSD_CONFIG,
+    );
+    fs.writeFileSync(
+      path.join(osdConfigDir, 'opensearch_dashboards_saml.yml'),
+      MINIMAL_OSD_CONFIG,
+    );
     const containerRoot = path.join(tmpdir, 'container');
     fs.mkdirSync(containerRoot, { recursive: true });
     envPaths = {
@@ -35,6 +55,9 @@ describe('services/environmentConfigurator', () => {
   });
 
   afterEach(() => {
+    try {
+      process.chdir(savedCwd);
+    } catch {}
     try {
       fs.rmSync(tmpdir, { recursive: true, force: true });
     } catch {}
