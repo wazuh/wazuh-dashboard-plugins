@@ -5,6 +5,7 @@ import {
   EuiFlexItem,
   EuiText,
   EuiTextColor,
+  EuiTitle,
 } from '@elastic/eui';
 
 export const SettingsAboutAppInfo = ({

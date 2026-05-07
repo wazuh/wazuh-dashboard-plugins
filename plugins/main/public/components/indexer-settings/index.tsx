@@ -278,7 +278,7 @@ export const WzIndexerSettings: React.FC = () => {
                     title={<span>Update CTI content feeds</span>}
                     description={
                       <div>
-                        Triggers an update of hreat intelligence content from{' '}
+                        Triggers an update of threat intelligence content from{' '}
                         <strong>subscribed CTI</strong> feeds.
                       </div>
                     }

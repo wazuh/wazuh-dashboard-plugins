@@ -1033,7 +1033,7 @@ export class WazuhApiCtrl {
    * @param {Object} context
    * @param {Object} request
    * @param {Object} response
-   * @returns {Object} TODO -> Indexer returns a task identifier because it takes a lot of time
+   * @returns {Object} update started message or update is ongoing
    */
   async updateCTIFeeds(
     context: RequestHandlerContext,
