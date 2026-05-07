@@ -37,13 +37,24 @@ import { extractErrorMessage } from '../lib/extract-error-message';
 export class WazuhApiCtrl {
   constructor() {}
 
+  private async resolveFirstHostId(
+    context: RequestHandlerContext,
+  ): Promise<string | undefined> {
+    const hosts = await context.wazuh_core.manageHosts.getEntries({
+      excludePassword: true,
+    });
+    return hosts?.[0]?.id;
+  }
+
   async getToken(
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const { force, idHost } = request.body;
+      const { force } = request.body;
+      const idHost: string =
+        (await this.resolveFirstHostId(context)) ?? request.body.idHost;
       const { username } = await context.wazuh.security.getCurrentUser(
         request,
         context,
@@ -124,8 +135,8 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      // Get config from configuration
-      const id = request.body.id;
+      const id: string =
+        (await this.resolveFirstHostId(context)) ?? request.body.id;
       context.wazuh.logger.debug(`Getting server API host by ID: ${id}`);
       const apiHostData = await context.wazuh_core.manageHosts.get(id, {
         excludePassword: true,
@@ -654,6 +665,13 @@ export class WazuhApiCtrl {
         apiHostId = bodyId;
       }
     }
+
+    try {
+      const firstHostId = await this.resolveFirstHostId(context);
+      if (firstHostId) {
+        apiHostId = firstHostId;
+      }
+    } catch {}
 
     if (!apiHostId) {
       return ErrorResponse(
