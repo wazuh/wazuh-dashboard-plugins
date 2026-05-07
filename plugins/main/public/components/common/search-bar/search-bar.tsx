@@ -1,7 +1,13 @@
 import React from 'react';
 import { getPlugins } from '../../../kibana-services';
 import './search-bar.scss';
-import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiBadge } from '@elastic/eui';
+import {
+  EuiPanel,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiBadge,
+  EuiButton,
+} from '@elastic/eui';
 import {
   SearchBarProps,
   Filter,
@@ -19,6 +25,7 @@ export interface WzSearchBarProps extends SearchBarProps {
   hideFixedFilters?: boolean;
   showSaveQueryButton?: boolean;
   showSaveQuery?: boolean;
+  onManualRefresh?: () => void;
 }
 
 export const WzSearchBar = ({
@@ -29,6 +36,7 @@ export const WzSearchBar = ({
   preQueryBar,
   hideFixedFilters,
   postFilters,
+  onManualRefresh,
   ...restProps
 }: WzSearchBarProps) => {
   const SearchBar = getPlugins().data.ui.SearchBar;
@@ -53,10 +61,29 @@ export const WzSearchBar = ({
           className='wz-search-bar-query'
           gutterSize='s'
           alignItems='center'
-          responsive={false}
           wrap={true}
         >
-          {preQueryBar ? <EuiFlexItem>{preQueryBar}</EuiFlexItem> : null}
+          {preQueryBar ? (
+            <EuiFlexItem>
+              <EuiFlexGroup alignItems='center' gutterSize='s'>
+                <EuiFlexItem>{preQueryBar}</EuiFlexItem>
+                {/* When preQueryBar is present and the date picker is disabled, the native SearchBar
+                  (which includes the platform Refresh button) is suppressed by the WORKAROUND below.
+                  Render an explicit Refresh button to compensate when the caller provides onManualRefresh. */}
+                {onManualRefresh && !restProps.showDatePicker ? (
+                  <EuiFlexItem grow={false}>
+                    <EuiButton
+                      size='s'
+                      iconType='refresh'
+                      onClick={onManualRefresh}
+                    >
+                      Refresh
+                    </EuiButton>
+                  </EuiFlexItem>
+                ) : null}
+              </EuiFlexGroup>
+            </EuiFlexItem>
+          ) : null}
           {/* WORKAROUND: The search bar is not displayed when the preQueryBar is enabled and the date picker is disabled to avoid rendering an empty flexItem */}
           {!preQueryBar || restProps?.showDatePicker ? (
             <EuiFlexItem grow={!preQueryBar}>

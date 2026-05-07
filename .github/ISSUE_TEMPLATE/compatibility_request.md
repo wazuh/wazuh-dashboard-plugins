@@ -17,6 +17,7 @@ For that, we need to:
 - [ ] Identify improvements and potential impact on the UI.
 - [ ] Check if any dependencies were upgraded and upgrade it in our plugins.
 - [ ] Develop a testing environment to verify our components would work under this new build.
+- [ ] Update the mdBook `/docs` documentation OpenSearch version references.
 
 ## Issues
 

@@ -246,6 +246,18 @@ export const CustomSearchBar = ({
           fixedFilters={fixedFilters}
           showQueryInput={avancedFiltersState}
           onFiltersUpdated={onFiltersUpdated}
+          onManualRefresh={() =>
+            searchBarProps.onQuerySubmit(
+              {
+                dateRange: {
+                  from: searchBarProps.dateRangeFrom,
+                  to: searchBarProps.dateRangeTo,
+                },
+                query: searchBarProps.query,
+              },
+              false,
+            )
+          }
           preQueryBar={
             !avancedFiltersState ? (
               <EuiFlexGroup

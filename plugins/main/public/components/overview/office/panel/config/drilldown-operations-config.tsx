@@ -12,111 +12,25 @@
  */
 
 import React from 'react';
-import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import { getPlugins } from '../../../../../kibana-services';
-import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-import {
-  getVisStateTopOfficeUsers,
-  getVisStateOfficeCountryTagCloud,
-  getVisStateOfficeAlertsEvolutionByUserID,
-} from './visualizations';
-
-const DashboardByRenderer =
-  getPlugins().dashboard.DashboardContainerByValueRenderer;
-
-const getDashboardPanels = (
-  indexPatternId: string,
-): {
-  [panelId: string]: DashboardPanelState<
-    EmbeddableInput & { [k: string]: unknown }
-  >;
-} => {
-  return {
-    d0: {
-      gridData: {
-        w: 19,
-        h: 14,
-        x: 0,
-        y: 0,
-        i: 'd0',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd0',
-        savedVis: getVisStateTopOfficeUsers(indexPatternId),
-      },
-    },
-    d1: {
-      gridData: {
-        w: 29,
-        h: 14,
-        x: 19,
-        y: 0,
-        i: 'd1',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd1',
-        savedVis: getVisStateOfficeCountryTagCloud(indexPatternId),
-      },
-    },
-    d2: {
-      gridData: {
-        w: 48,
-        h: 11,
-        x: 0,
-        y: 14,
-        i: 'd2',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'd2',
-        savedVis: getVisStateOfficeAlertsEvolutionByUserID(indexPatternId),
-      },
-    },
-  };
-};
+import DashboardRenderer from '../../../../common/dashboards/dashboard-renderer/dashboard-renderer';
 
 export const drilldownOperationsConfig = props => {
-  const { fetchFilters, searchBarProps, indexPattern } = props;
-
+  const { fetchFilters, searchBarProps } = props;
   return {
     rows: [
       {
         columns: [
           {
             width: 100,
-            component: props => {
-              return (
-                <div style={{ width: '100%' }}>
-                  <DashboardByRenderer
-                    input={{
-                      viewMode: ViewMode.VIEW,
-                      panels: getDashboardPanels(indexPattern.id),
-                      isFullScreenMode: false,
-                      filters: fetchFilters ?? [],
-                      useMargins: true,
-                      id: 'office-drilldown-operations-config-panel-tab',
-                      timeRange: {
-                        from: searchBarProps.dateRangeFrom,
-                        to: searchBarProps.dateRangeTo,
-                      },
-                      title: 'Office drilldown operations config dashboard',
-                      description:
-                        'Dashboard of the Office drilldown operations config',
-                      query: searchBarProps.query,
-                      refreshConfig: {
-                        pause: false,
-                        value: 15,
-                      },
-                      hidePanelTitles: false,
-                    }}
-                    onInputUpdated={() => {}}
-                  />
-                </div>
-              );
-            },
+            component: () => (
+              <div style={{ width: '100%' }}>
+                <DashboardRenderer
+                  dashboardId='office-drilldown-operations-config-panel-tab'
+                  hasPinnedAgent={false}
+                  config={{ dataSource: { fetchFilters, searchBarProps } }}
+                />
+              </div>
+            ),
           },
         ],
       },

@@ -18,6 +18,13 @@ jest.mock('../../services/updates');
 const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
 const context = {
+  core: {
+    opensearch: {
+      client: {
+        asCurrentUser: {},
+      },
+    },
+  },
   wazuh: {
     security: {
       getCurrentUser: () => {
@@ -77,26 +84,21 @@ describe(`[endpoint] GET ${routes.checkUpdates}`, () => {
 
   test('get available updates', async () => {
     const mockResponse: AvailableUpdates = {
-      last_check_date: new Date('2023-09-30T14:00:00.000Z'),
-      apis_available_updates: [
-        {
-          api_id: 'api id',
-          current_version: '4.3.1',
-          status: API_UPDATES_STATUS.UP_TO_DATE,
-          last_available_patch: {
-            description:
-              '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
-            published_date: '2022-05-18T10:12:43Z',
-            semver: {
-              major: 4,
-              minor: 3,
-              patch: 8,
-            },
-            tag: 'v4.3.8',
-            title: 'Wazuh v4.3.8',
-          },
+      last_check_date_dashboard: new Date('2023-09-30T14:00:00.000Z'),
+      current_version: 'v4.3.1',
+      status: API_UPDATES_STATUS.UP_TO_DATE,
+      last_available_patch: {
+        description:
+          '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
+        published_date: '2022-05-18T10:12:43Z',
+        semver: {
+          major: 4,
+          minor: 3,
+          patch: 8,
         },
-      ],
+        tag: 'v4.3.8',
+        title: 'Wazuh v4.3.8',
+      },
     };
 
     mockedGetUpdates.mockImplementation(() => mockResponse);
@@ -107,7 +109,7 @@ describe(`[endpoint] GET ${routes.checkUpdates}`, () => {
 
     expect(response.body).toEqual({
       ...mockResponse,
-      last_check_date: '2023-09-30T14:00:00.000Z',
+      last_check_date_dashboard: '2023-09-30T14:00:00.000Z',
     });
   });
 });

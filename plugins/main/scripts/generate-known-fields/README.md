@@ -62,9 +62,6 @@ The generated files are stored in the destination directory and consumed by:
 To add support for a new template:
 
 1. Add configuration to `TEMPLATE_SOURCES` in `generate-known-fields.js`
-2. Import the generated JSON in `known-fields-loader.js`
-3. Add mapping entry to `KnownFieldsByIndexType`
-4. Update the corresponding index type constants if needed
 
 ## Recent Improvements
 
