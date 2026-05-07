@@ -11,7 +11,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added "form-data": "^4.0.4" to the resolutions section to ensure this specific version is installed [#7662](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7662)
 - Added prompts to some views related to problems with server API and alerts index pattern [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694)
 - Added "Not applicable" status to SCA CheckResult enum with corresponding color mapping (#B9A888) and sample data support
-- Added Alerting sample monitors health check [#7833](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7833)
 - Added default `wazuh-events*` index pattern [#7924](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7924)
 - Added SSL certificate support for Wazuh API connections, allowing the dashboard to use client certificates and CA certificate validation when connecting to Wazuh Manager APIs configured with custom SSL certificates. The `verify_ca` value is automatically calculated based on whether certificate paths (`key`, `cert`, `ca`) are configured [#8015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8015) [#8212](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8212)
 - Added "Verify CA" column in the API Connections table to display whether CA certificate verification is enabled for each API host. The value is automatically determined based on certificate configuration [#8015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8015)
