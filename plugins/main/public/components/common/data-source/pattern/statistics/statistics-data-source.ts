@@ -1,6 +1,9 @@
-import { tFilter } from '../../index';
+import { tFilter, PatternDataSourceFilterManager } from '../../index';
 import { PatternDataSource } from '../pattern-data-source';
-import { WAZUH_METRICS_COMMS_PATTERN } from '../../../../../../common/constants';
+import {
+  WAZUH_METRICS_COMMS_PATTERN,
+  DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
+} from '../../../../../../common/constants';
 
 export class StatisticsDataSource extends PatternDataSource {
   constructor(id: string, title: string) {
@@ -17,8 +20,12 @@ export class StatisticsDataSource extends PatternDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    // getFixedFilters is overridden so that it does not return the pinned agent's fixed filter.
-    return [];
+    return [
+      ...PatternDataSourceFilterManager.getClusterFilters(
+        this.id,
+        DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
+      ),
+    ];
   }
 
   getAPIFilter(): tFilter[] {
