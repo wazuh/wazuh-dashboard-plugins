@@ -71,7 +71,7 @@ Once installed, configure:
 
 1. **[Configuration](../configuration.md)** - Basic plugin settings and API connections
 2. **[Single Sign-On](../sso.md)** (optional) - Set up SAML authentication
-3. **[Custom Branding](../custom-branding.md)** (optional) - Customize the UI appearance
+3. **[Custom Branding](../custom-branding/custom-branding.md)** (optional) - Customize the UI appearance
 4. **[Security](../security.md)** - Apply security best practices
 
 ## Next steps
