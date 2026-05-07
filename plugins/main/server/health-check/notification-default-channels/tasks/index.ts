@@ -1,7 +1,6 @@
 import { ILegacyClusterClient } from '../../../../../../src/core/server';
 import { ChannelDefinition, defaultChannels } from '../common/constants';
 import type { InitializationTaskRunContext } from '../../types';
-import { createSampleAlertingMonitors } from '../../alerting-monitors';
 
 const verifyExistingDefaultChannels = async (
   client: ILegacyClusterClient,
@@ -42,10 +41,9 @@ const verifyExistingDefaultChannels = async (
 
 export const initializeDefaultNotificationChannel = (
   client: ILegacyClusterClient,
-  isAlertingDashboardsAvailable?: boolean,
 ): Record<string, any> => {
   return {
-    name: 'integrations:default-notifications-channels-and-alerting-monitors',
+    name: 'integrations:default-notifications-channels',
     async run(ctx: InitializationTaskRunContext) {
       try {
         ctx.logger.info(
@@ -70,26 +68,6 @@ export const initializeDefaultNotificationChannel = (
           ctx.logger.warn(
             `${stillMissing} default notification channels are missing`,
           );
-        }
-
-        // If Alerting is available, create sample monitors passing available channel IDs
-        if (isAlertingDashboardsAvailable) {
-          const availableDefaultChannelIds = new Set<string>(
-            defaultChannelsFound.map(ch => ch.id),
-          );
-          try {
-            await createSampleAlertingMonitors(ctx as any, {
-              availableDefaultChannelIds,
-            });
-          } catch (err) {
-            // Surface but don’t fail the notification channels task
-            const _err = err as Error;
-            ctx.logger.error(
-              `Sample monitors creation reported an issue: ${
-                _err?.message || _err
-              }`,
-            );
-          }
         }
       } catch (error: any) {
         const message = `Error verifying default notification channels: ${error.message}`;

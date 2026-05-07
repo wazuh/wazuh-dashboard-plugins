@@ -218,10 +218,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     return !!plugins.notificationsDashboards;
   }
 
-  isAlertingDashboardsAvailable(plugins: PluginSetup): boolean {
-    return !!plugins.alertingDashboards;
-  }
-
   public async setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('Wazuh-wui: Setup');
 
@@ -260,10 +256,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     // Detect Notifications plugin availability to conditionally register tasks
     if (this.isNotificationsDashboardsAvailable(plugins)) {
       core.healthCheck.register(
-        initializeDefaultNotificationChannel(
-          notificationClient,
-          this.isAlertingDashboardsAvailable(plugins),
-        ),
+        initializeDefaultNotificationChannel(notificationClient),
       );
     } else {
       this.logger.debug(
