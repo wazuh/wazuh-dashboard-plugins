@@ -89,7 +89,10 @@ export function setVersionDerivedEnvironment(
 }
 
 export function configureModeAndSecurity(config: ScriptConfig): string {
-  const buildServerLocalDashboardConfig = (baseConfigPath: string) => {
+  const buildServerLocalDashboardConfig = (
+    baseConfigPath: string,
+    primaryHostId: string,
+  ) => {
     const absoluteBaseConfigPath = resolve(baseConfigPath);
     const content = readFileSync(absoluteBaseConfigPath, 'utf-8');
     const lines = content.split('\n');
@@ -127,17 +130,17 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
       hostBlocks.push({ id: hostMatch[1], lines: blockLines });
     }
 
-    const managerLocalIndex = hostBlocks.findIndex(
-      hostBlock => hostBlock.id === 'manager-local',
+    const primaryIndex = hostBlocks.findIndex(
+      hostBlock => hostBlock.id === primaryHostId,
     );
-    if (managerLocalIndex <= 0) {
+    if (primaryIndex <= 0) {
       return baseConfigPath;
     }
 
     const orderedHostBlocks = [
-      hostBlocks[managerLocalIndex],
-      ...hostBlocks.slice(0, managerLocalIndex),
-      ...hostBlocks.slice(managerLocalIndex + 1),
+      hostBlocks[primaryIndex],
+      ...hostBlocks.slice(0, primaryIndex),
+      ...hostBlocks.slice(primaryIndex + 1),
     ];
 
     const generatedConfigPath = baseConfigPath.replace(
@@ -181,6 +184,10 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
       throw new ValidationError(MSG_SERVER_MODE_REQUIRES_VERSION);
     }
     process.env.WAZUH_STACK = config.modeVersion;
+    process.env.WAZUH_DASHBOARD_CONF = buildServerLocalDashboardConfig(
+      process.env.WAZUH_DASHBOARD_CONF,
+      'manager',
+    );
     return PROFILES.SERVER;
   }
 
@@ -190,6 +197,7 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
     }
     process.env.WAZUH_DASHBOARD_CONF = buildServerLocalDashboardConfig(
       process.env.WAZUH_DASHBOARD_CONF,
+      'manager-local',
     );
     process.env.IMAGE_TAG = config.modeVersion;
     return config.agentsUp
