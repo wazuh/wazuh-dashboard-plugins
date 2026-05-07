@@ -5,7 +5,7 @@ INDEXER_HOME=/usr/share/wazuh-indexer
 # Change permissions
 chown -R wazuh-indexer:wazuh-indexer /etc/wazuh-indexer
 chown -R wazuh-indexer:wazuh-indexer /etc/wazuh-indexer/certs
-chown -R wazuh-indexer:wazuh-indexer /var/lib/os1
+chown -R wazuh-indexer:wazuh-indexer /var/lib/wazuh-indexer
 
 if [ -x "$INDEXER_HOME/engine/run_engine.sh" ]; then
   nohup "$INDEXER_HOME/engine/run_engine.sh" > /dev/null 2>&1 &

@@ -5,15 +5,12 @@
     "size": 2048
   },
   "names": [
-  {
-    "C": "US",
-    "L": "California",
-    "O": "Wazuh",
-    "OU": "Wazuh"
-  }
+    {
+      "C": "US",
+      "L": "California",
+      "O": "Wazuh",
+      "OU": "Wazuh"
+    }
   ],
-  "hosts": [
-    "HOST",
-    "localhost"
-  ]
+  "hosts": ["HOST", "wazuh.HOST", "localhost"]
 }

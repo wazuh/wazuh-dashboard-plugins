@@ -97,7 +97,7 @@ export function generateOverrideFile(
   if (useIndexerFromPackage) {
     // TODO: review if it is possible removing the merged volumes that are not used
     content += `
-  os1:
+  wazuh.indexer:
     depends_on:
       idpsetup:
         condition: service_completed_successfully
@@ -128,8 +128,8 @@ export function generateOverrideFile(
     volumes:
       - wi_certs:/etc/wazuh-indexer/certs/
       - ./config/\${OSD_MAJOR}/os/opensearch.yml:/etc/wazuh-indexer/opensearch.yml
-      - os_logs:/var/log/os1
-      - os_data:/var/lib/os1
+      - os_logs:/var/log/wazuh-indexer
+      - os_data:/var/lib/wazuh-indexer
     ports:
       - 9200:9200
       - 9300:9300
@@ -140,7 +140,7 @@ export function generateOverrideFile(
     healthcheck:
       test: [
           'CMD-SHELL',
-          "curl -v --cacert /etc/wazuh-indexer/certs/root-ca.pem https://os1:9200 2>&1 | grep -q '401'",
+          "curl -v --cacert /etc/wazuh-indexer/certs/root-ca.pem https://wazuh.indexer:9200 2>&1 | grep -q '401'",
         ]
       interval: 1s
       timeout: 5s

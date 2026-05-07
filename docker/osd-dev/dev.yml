@@ -24,7 +24,7 @@ services:
       - os-dev
       - mon
     command:
-      - '--es.uri=https://admin:${PASSWORD}@os1:9200'
+      - '--es.uri=https://admin:${PASSWORD}@wazuh.indexer:9200'
       - '--es.ssl-skip-verify'
       - '--es.all'
 
@@ -78,7 +78,7 @@ services:
         cfssl gencert -initca /conf/ca.json | cfssljson -bare root-ca
 
         echo "Generating servers certificates"
-        for i in os1 osd imposter; do
+        for i in indexer osd imposter; do
           echo "Generating cert for $$i"
           cat /conf/host.json | \
           sed "s/HOST/$$i/g" | \
@@ -109,7 +109,7 @@ services:
 
           rm /certs/wi/* /certs/wd/* /certs/wm/*
 
-          mv $$certs/os1* /certs/wi
+          mv $$certs/indexer* /certs/wi
           mv $$certs/admin* /certs/wi
           mv /certs/wi/admin.key /certs/wi/admin-key.pem
           cp $$certs/*ca* /certs/wi
@@ -132,12 +132,12 @@ services:
           sleep 300
       '
     healthcheck:
-      test: ['CMD-SHELL', '[ -r /certs/wi/os1.pem ]']
+      test: ['CMD-SHELL', '[ -r /certs/wi/indexer.pem ]']
       interval: 2s
       timeout: 5s
       retries: 10
 
-  os1:
+  wazuh.indexer:
     depends_on:
       idpsetup:
         condition: service_completed_successfully
@@ -156,9 +156,9 @@ services:
       - 'server-local-without' # server profile to use the local packages without agent
     environment:
       - cluster.name=os-dev-cluster
-      - node.name=os1
-      - discovery.seed_hosts=os1
-      - cluster.initial_master_nodes=os1
+      - node.name=wazuh.indexer
+      - discovery.seed_hosts=wazuh.indexer
+      - cluster.initial_master_nodes=wazuh.indexer
       - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
       - 'OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g' # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
     ulimits:
@@ -170,14 +170,9 @@ services:
         hard: 65536
     volumes:
       - wi_certs:/usr/share/wazuh-indexer/config/certs/
-      - ./config/${OSD_MAJOR}/os/opensearch.yml:/usr/share/wazuh-indexer/config/opensearch.yml
-      - ./config/${OSD_MAJOR}/os/internal_users.yml:${SEC_CONFIG_PATH}/internal_users.yml
-      - ${SEC_CONFIG_FILE}:${SEC_CONFIG_PATH}/config.yml
-      - ./config/${OSD_MAJOR}/os/roles_mapping.yml:${SEC_CONFIG_PATH}/roles_mapping.yml
-      - ./config/${OSD_MAJOR}/os/roles.yml:${SEC_CONFIG_PATH}/roles.yml
 
-      - os_logs:/var/log/os1
-      - os_data:/var/lib/os1
+      - os_logs:/var/log/wazuh-indexer
+      - os_data:/var/lib/wazuh-indexer
     ports:
       - 9200:9200
       - 9300:9300
@@ -188,7 +183,7 @@ services:
       test:
         [
           'CMD-SHELL',
-          "curl -v --cacert config/certs/root-ca.pem https://os1:9200 2>&1 | grep -q '401'",
+          "curl -v --cacert config/certs/root-ca.pem https://wazuh.indexer:9200 2>&1 | grep -q '401'",
         ]
       interval: 1s
       timeout: 5s
@@ -196,7 +191,7 @@ services:
 
   osd:
     depends_on:
-      os1:
+      wazuh.indexer:
         condition: service_healthy
     image: quay.io/wazuh/osd-dev:${OSD_VERSION}
     profiles:
@@ -270,7 +265,7 @@ services:
     command: >
       -c '
         # trust store
-        for i in /certs/idp/root-ca.pem /certs/wd/osd.pem /certs/wi/os1.pem
+        for i in /certs/idp/root-ca.pem /certs/wd/osd.pem /certs/wi/indexer.pem
         do
           keytool -import -alias $$(basename $$i .pem) -file $$i -keystore /certs/idp/truststore.jks -storepass SecretPassword -trustcacerts -noprompt
         done
@@ -336,7 +331,7 @@ services:
       '
   wazuh.manager:
     depends_on:
-      os1:
+      wazuh.indexer:
         condition: service_healthy
     image: wazuh/wazuh-manager:${WAZUH_STACK}
     profiles:
@@ -347,7 +342,7 @@ services:
       - os-dev
       - mon
     environment:
-      - INDEXER_URL=https://os1:9200
+      - INDEXER_URL=https://wazuh.indexer:9200
       - INDEXER_USERNAME=admin
       - INDEXER_PASSWORD=admin
       - FILEBEAT_SSL_VERIFICATION_MODE=full
@@ -367,7 +362,7 @@ services:
 
   wazuh.manager.local:
     depends_on:
-      os1:
+      wazuh.indexer:
         condition: service_healthy
     image: wazuh-manager-pkg:${IMAGE_TAG:-latest}
     build:
@@ -383,7 +378,7 @@ services:
       - os-dev
       - mon
     environment:
-      - INDEXER_URL=https://os1:9200
+      - INDEXER_URL=https://wazuh.indexer:9200
       - INDEXER_USERNAME=admin
       - INDEXER_PASSWORD=admin
       - INDEXER_SSL_CA=/etc/server_certs/root-ca.pem
