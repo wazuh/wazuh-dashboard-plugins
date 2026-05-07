@@ -207,7 +207,7 @@ If you have custom scripts or integrations:
 | -------------------------- | ---------------------------------------- |
 | `/app/wazuh#/overview`     | `/app/wz-home`                           |
 | `/app/wazuh#/settings`     | Dashboard Management > Advanced Settings |
-| `/app/wazuh#/health-check` | **☰ Menu > Management > Health Check**  |
+| `/app/wazuh#/health-check` | **☰ Menu > Management > Health Check**   |
 
 ---
 
