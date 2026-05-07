@@ -85,6 +85,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Set the downloaded local agent package name same to the remote one [#8350](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8350)
 - Changed FIM findings default columns [#8417](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8417)
 - Allowed only 1 server API configuration per indexer [#8436](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8436)
+- Reworked Statistics dashboard [#8254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8254)
 
 ### Fixed
 
