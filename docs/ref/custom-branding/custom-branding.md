@@ -121,7 +121,7 @@ The PDF reports can be customized through a report definition that allows to def
 3. Define the report name and description, source and other settings.
 4. In the **Report definition** section, click on the **Add header** option to customize it.
 
-> ⚠️ The UI allows to configure the footer using the **Add footere** button but the generated report does not include the footer. This is a known issue.
+> ⚠️ The UI allows to configure the footer using the **Add footer** button but the generated report does not include the footer. This is a known issue.
 
 <!-- Footer known issue: https://github.com/opensearch-project/dashboards-reporting/issues/53-->
 
