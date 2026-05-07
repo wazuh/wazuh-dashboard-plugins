@@ -11,7 +11,7 @@ export interface ChannelDefinition {
   type: ChannelType;
 }
 
-export const DEFAULT_CHANNELS_ID = {
+const DEFAULT_CHANNELS_ID = {
   SLACK: 'default_slack_channel',
   JIRA: 'default_jira_channel',
   PAGERDUTY: 'default_pagerduty_channel',
