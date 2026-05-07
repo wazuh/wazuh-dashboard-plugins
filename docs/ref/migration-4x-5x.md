@@ -169,7 +169,7 @@ admin: true
 
 **Replacement**:
 
-- **Custom branding**: Use `opensearchDashboards.branding.*` (see [Custom Branding](custom-branding.md))
+- **Custom branding**: Use `opensearchDashboards.branding.*` (see [Custom Branding](./custom-branding/custom-branding.md))
 - **Monitoring**: Configured via index lifecycle management
 - **Admin mode**: Replaced by role-based access control
 
@@ -207,7 +207,7 @@ If you have custom scripts or integrations:
 | -------------------------- | ---------------------------------------- |
 | `/app/wazuh#/overview`     | `/app/wz-home`                           |
 | `/app/wazuh#/settings`     | Dashboard Management > Advanced Settings |
-| `/app/wazuh#/health-check` | **☰ Menu > Management > Health Check**   |
+| `/app/wazuh#/health-check` | **☰ Menu > Management > Health Check**  |
 
 ---
 
@@ -602,7 +602,7 @@ opensearchDashboards.branding:
   darkMode: false
 ```
 
-See [Custom Branding](custom-branding.md).
+See [Custom Branding](./custom-branding/custom-branding.md).
 
 ### Issue 5: Plugins not loading
 

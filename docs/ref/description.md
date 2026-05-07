@@ -44,7 +44,7 @@ For administrators deploying the plugins:
 
 - [Configuration](configuration.md) - Plugin settings and customization
 - [Single Sign-On](sso.md) - SAML SSO setup with role mapping
-- [Custom Branding](custom-branding.md) - UI theming and personalization
+- [Custom Branding](./custom-branding/custom-branding.md) - UI theming and personalization
 - [Agent Deploy One-Liner](agent-deploy-one-liner.md) - Quick agent deployment commands
 
 ### Modules
