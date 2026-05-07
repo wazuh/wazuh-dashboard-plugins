@@ -40,6 +40,11 @@ For the **2.x** dev stack, hosts are inlined in
 `docker/osd-dev/config/2.x/osd/opensearch_dashboards.yml` (and
 `opensearch_dashboards_saml.yml` when using SAML).
 
+When running with `--server-local`, the script dynamically generates a
+dashboard config from the selected 2.x base config and rewrites
+`wazuh_core.hosts` so `manager-local` is placed first. That file is removed
+when you run `./dev.sh down` (same idea as the generated compose override).
+
 ## Usage
 
 Always use the provided script to bring up or down the development environment. The only allowed positional argument is the action.

@@ -33,6 +33,7 @@ import {
   initializeBaseEnvironment,
   setVersionDerivedEnvironment,
   configureModeAndSecurity,
+  removeGeneratedServerLocalDashboardFiles,
 } from '../services/environmentConfigurator';
 import { parseArguments, printUsageAndExit } from '../services/argumentParser';
 import { resolveRequiredRepositories } from '../services/repoResolver';
@@ -385,6 +386,10 @@ export async function mainWithDeps(
   );
   if (code !== 0) {
     process.exit(code);
+  }
+
+  if (config.action === ACTIONS.DOWN) {
+    removeGeneratedServerLocalDashboardFiles(envPaths, deps.logger);
   }
 
   if (
