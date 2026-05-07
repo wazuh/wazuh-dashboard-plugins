@@ -125,9 +125,9 @@ describe('CTI token route', () => {
     mockedGetCtiToken.mockResolvedValue({
       device_code: 'dc1',
       user_code: 'WZH-1',
-      verification_uri: 'https://console.wazuh.com/register',
+      verification_uri: 'https://example.test/register',
       verification_uri_complete:
-        'https://console.wazuh.com/register?user_code=WZH-1',
+        'https://example.test/register?user_code=WZH-1',
       expires_in: 600,
       interval: 7,
     });
@@ -149,7 +149,7 @@ describe('CTI token route', () => {
     const parsed = parseDeviceAuthorizationForStore({
       device_code: 'dc1',
       user_code: 'WZH-1',
-      verification_uri: 'https://console.wazuh.com/register',
+      verification_uri: 'https://example.test/register',
       expires_in: 600,
       interval: 5,
     });
@@ -171,6 +171,18 @@ describe('CTI token route', () => {
   });
 
   test(`POST ${routes.token} polling returns success marker without token fields`, async () => {
+    CtiRegistrationStore.getInstance().setInProgress(
+      'resolved-client-id',
+      parseDeviceAuthorizationForStore({
+        device_code: 'dc1',
+        user_code: 'WZH-1',
+        verification_uri: 'https://example.test/register',
+        verification_uri_complete:
+          'https://example.test/register?user_code=WZH-1',
+        expires_in: 600,
+        interval: 5,
+      }),
+    );
     mockedPollCtiToken.mockResolvedValue({ access_token: 'tok' });
 
     const response = await supertest(innerServer.listener)

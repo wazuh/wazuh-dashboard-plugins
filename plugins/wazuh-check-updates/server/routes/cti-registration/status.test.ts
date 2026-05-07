@@ -127,7 +127,7 @@ describe('CTI registration status route', () => {
     const parsed = parseDeviceAuthorizationForStore({
       device_code: 'dc-store',
       user_code: 'WZH-9',
-      verification_uri: 'https://console.wazuh.com/register',
+      verification_uri: 'https://example.test/register',
       expires_in: 600,
       interval: 8,
     });
@@ -153,7 +153,7 @@ describe('CTI registration status route', () => {
     const parsed = parseDeviceAuthorizationForStore({
       device_code: 'dc1',
       user_code: 'WZH-1',
-      verification_uri: 'https://console.wazuh.com/register',
+      verification_uri: 'https://example.test/register',
       expires_in: 600,
       interval: 5,
     });

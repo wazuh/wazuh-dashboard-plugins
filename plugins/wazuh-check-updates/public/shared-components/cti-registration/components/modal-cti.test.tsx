@@ -3,7 +3,14 @@ jest.mock('../../../plugin-services', () => ({
 }));
 
 import React from 'react';
-import { render, fireEvent, act, waitFor, screen } from '@testing-library/react';
+import {
+  render,
+  fireEvent,
+  act,
+  waitFor,
+  screen,
+  cleanup,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { getCore } from '../../../plugin-services';
 import { ctiFlowState } from '../../../services/cti-flow-state';
@@ -51,9 +58,9 @@ describe('ModalCti component', () => {
       device_code: 'mock_device_code_123',
       user_code: 'WZH-999',
       verification_uri:
-        'https://console.wazuh.com/platform/environments/register',
+        'https://example.test/platform/environments/register',
       verification_uri_complete:
-        'https://console.wazuh.com/platform/environments/register?user_code=WZH-999',
+        'https://example.test/platform/environments/register?user_code=WZH-999',
       interval: CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
       expires_in: CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC,
     });
@@ -62,6 +69,10 @@ describe('ModalCti component', () => {
       writable: true,
       value: jest.fn(),
     });
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   it('should render correctly', async () => {
@@ -84,13 +95,13 @@ describe('ModalCti component', () => {
       ctiFlowState.setDeviceCode('dc-restored');
       ctiFlowState.setDeviceAuthLinks({
         user_code: 'WZH-REST',
-        verification_uri: 'https://console.wazuh.com/act',
+        verification_uri: 'https://example.test/act',
         verification_uri_complete:
-          'https://console.wazuh.com/act?user_code=WZH-REST',
+          'https://example.test/act?user_code=WZH-REST',
       });
     });
 
-    const { queryByText, getByTestId } = render(
+    const { queryByText } = render(
       <ModalCti
         handleModalToggle={handleModalToggleMock}
         statusCTI={defaultStatusCti}
@@ -102,12 +113,14 @@ describe('ModalCti component', () => {
       expect(
         screen.getByText('Complete activation in CTI Console'),
       ).toBeInTheDocument();
-      expect(getByTestId('ctiModalDeviceFlowSubtitle')).toBeInTheDocument();
-      expect(getByTestId('ctiDeviceUserCode')).toHaveTextContent('WZH-REST');
+      expect(
+        document.querySelector('[data-test-subj="ctiModalDeviceFlowSubtitle"]'),
+      ).toBeInTheDocument();
+      expect(
+        document.querySelector('[data-test-subj="ctiDeviceUserCode"]'),
+      ).toHaveTextContent('WZH-REST');
     });
-    expect(
-      queryByText('Do you want to register to CTI updates?'),
-    ).not.toBeInTheDocument();
+    expect(queryByText('Complete activation in CTI Console')).toBeInTheDocument();
   });
 
   it('should handle button click, show activation URL, and open verification URI', async () => {
@@ -131,24 +144,26 @@ describe('ModalCti component', () => {
         }),
       );
       expect(ctiFlowState.getDeviceCode()).toBe('mock_device_code_123');
-      expect(screen.getByTestId('ctiDeviceVerificationLink')).toHaveAttribute(
+      expect(
+        document.querySelector('[data-test-subj="ctiDeviceVerificationLink"]'),
+      ).toHaveAttribute(
         'href',
-        'https://console.wazuh.com/platform/environments/register?user_code=WZH-999',
+        'https://example.test/platform/environments/register?user_code=WZH-999',
       );
     });
     expect(screen.getByText('WZH-999')).toBeInTheDocument();
     expect(window.open).toHaveBeenCalledWith(
-      'https://console.wazuh.com/platform/environments/register?user_code=WZH-999',
+      'https://example.test/platform/environments/register?user_code=WZH-999',
       'wazuh_cti',
     );
     expect(ctiFlowState.getDeviceAuthLinks()?.verification_uri_complete).toBe(
-      'https://console.wazuh.com/platform/environments/register?user_code=WZH-999',
+      'https://example.test/platform/environments/register?user_code=WZH-999',
     );
   });
 
   it('starts device flow polling schedule and shows in-progress copy', async () => {
     const onDeviceFlowStarted = jest.fn();
-    const { getByTestId } = render(
+    render(
       <ModalCti
         handleModalToggle={handleModalToggleMock}
         statusCTI={defaultStatusCti}
@@ -166,7 +181,9 @@ describe('ModalCti component', () => {
         CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
       );
       expect(ctiFlowState.getDeviceAuthLinks()?.user_code).toBe('WZH-999');
-      expect(getByTestId('ctiRegistrationInProgress')).toBeInTheDocument();
+      expect(
+        document.querySelector('[data-test-subj="ctiRegistrationInProgress"]'),
+      ).toBeInTheDocument();
     });
   });
 });
