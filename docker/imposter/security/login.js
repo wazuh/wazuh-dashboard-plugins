@@ -1,6 +1,6 @@
 exports = {};
 
-load('https://raw.githubusercontent.com/kjur/jsrsasign/master/npm/lib/jsrsasign.js', exports);
+load('https://raw.githubusercontent.com/kjur/jsrsasign/11.0.0/npm/lib/jsrsasign.js', exports);
 header = {
   "alg": "HS256",
   "typ": "JWT",

@@ -14,7 +14,7 @@ import { LoadingSearchbarProgress } from '../../../../../components/common/loadi
 import { FormattedMessage } from '@osd/i18n/react';
 
 interface ClusterOverviewState {
-  clusterEnabled: boolean;
+  isClusterEnabled: boolean;
   isClusterRunning: boolean;
   statusRunning: string;
 }
@@ -29,7 +29,7 @@ const checkClusterIsEnabledAndRunning = async () => {
     return {
       ok: !(isClusterEnabled && isClusterRunning),
       data: {
-        clusterEnabled,
+        isClusterEnabled,
         isClusterRunning,
         statusRunning,
       },
@@ -52,10 +52,10 @@ export const ClusterOverview = compose(
   ]),
   withGuardAsync(
     checkClusterIsEnabledAndRunning,
-    ({ clusterEnabled, isClusterRunning, error }) => (
+    ({ isClusterEnabled, isClusterRunning, error }) => (
       <ClusterDisabled
         error={error}
-        enabled={clusterEnabled}
+        enabled={isClusterEnabled}
         running={isClusterRunning}
       />
     ),
@@ -72,13 +72,13 @@ export const ClusterOverview = compose(
   ),
 )(
   ({
-    clusterEnabled,
+    isClusterEnabled,
     isClusterRunning,
     statusRunning,
   }: ClusterOverviewState) => {
     return (
       <>
-        {clusterEnabled && isClusterRunning ? (
+        {isClusterEnabled && isClusterRunning ? (
           <ClusterDashboard statusRunning={statusRunning} />
         ) : null}
       </>
