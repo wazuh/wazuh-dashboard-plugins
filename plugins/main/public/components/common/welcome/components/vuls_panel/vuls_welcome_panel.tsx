@@ -149,7 +149,7 @@ const VulsPanel = ({ agent }) => {
                 iconType='popout'
                 color='primary'
                 className='EuiButtonIcon'
-                href={NavigationService.getInstance().getUrlForApp(
+                href={NavigationService.getInstance().getAppURL(
                   vulnerabilityDetection.id,
                 )}
                 aria-label='Open Vulnerability Detection'

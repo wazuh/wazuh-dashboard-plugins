@@ -27,6 +27,7 @@ import { nis2RequirementsFile } from '../../../../common/compliance-requirements
 import {
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
   UI_LOGGER_LEVELS,
+  WAZUH_MODULES_ID,
 } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
@@ -80,60 +81,60 @@ function buildComplianceObject({ section }) {
     let complianceRequirements = {};
     let descriptions = {};
     let selectedRequirements = {}; // all enabled by default
-    if (section === 'pci') {
+    if (section === WAZUH_MODULES_ID.PCI_DSS) {
       const r = buildComplianceRequirements(pciRequirementsFile, 1, '.');
       complianceRequirements = r.complianceRequirements;
       descriptions = r.descriptions;
       selectedRequirements = r.selectedRequirements;
     }
-    if (section === 'gdpr') {
+    if (section === WAZUH_MODULES_ID.GDPR) {
       const r = buildComplianceRequirements(gdprRequirementsFile, 1, '_');
       complianceRequirements = r.complianceRequirements;
       descriptions = r.descriptions;
       selectedRequirements = r.selectedRequirements;
     }
 
-    if (section === 'hipaa') {
+    if (section === WAZUH_MODULES_ID.HIPAA) {
       const r = buildComplianceRequirements(hipaaRequirementsFile, 3, '.');
       complianceRequirements = r.complianceRequirements;
       descriptions = r.descriptions;
       selectedRequirements = r.selectedRequirements;
     }
 
-    if (section === 'nist') {
+    if (section === WAZUH_MODULES_ID.NIST_800_53) {
       const r = buildComplianceRequirements(nistRequirementsFile, 1, '-');
       complianceRequirements = r.complianceRequirements;
       descriptions = r.descriptions;
       selectedRequirements = r.selectedRequirements;
     }
-    if (section === 'nist-800-171') {
+    if (section === WAZUH_MODULES_ID.NIST_800_171) {
       const r = buildComplianceRequirements(nist171RequirementsFile, 2, '.');
       complianceRequirements = r.complianceRequirements;
       descriptions = r.descriptions;
       selectedRequirements = r.selectedRequirements;
     }
-    if (section === 'tsc') {
+    if (section === WAZUH_MODULES_ID.TSC) {
       const r = buildComplianceRequirements(tscRequirementsFile, 1, '.');
       complianceRequirements = r.complianceRequirements;
       descriptions = r.descriptions;
       selectedRequirements = r.selectedRequirements;
     }
 
-    if (section === 'iso-27001') {
+    if (section === WAZUH_MODULES_ID.ISO_27001) {
       const r = buildComplianceRequirements(iso27001RequirementsFile, 2, '.');
       complianceRequirements = r.complianceRequirements;
       descriptions = r.descriptions;
       selectedRequirements = r.selectedRequirements;
     }
 
-    if (section === 'cmmc') {
+    if (section === WAZUH_MODULES_ID.CMMC) {
       const r = buildComplianceRequirements(cmmcRequirementsFile, 1, '.');
       complianceRequirements = r.complianceRequirements;
       descriptions = r.descriptions;
       selectedRequirements = r.selectedRequirements;
     }
 
-    if (section === 'nis2') {
+    if (section === WAZUH_MODULES_ID.NIS2) {
       descriptions = nis2RequirementsFile;
       Object.keys(nis2RequirementsFile).forEach(item => {
         const parts = item.split('.');
@@ -157,7 +158,7 @@ function buildComplianceObject({ section }) {
       }); // forEach
     }
 
-    if (section === 'fedramp') {
+    if (section === WAZUH_MODULES_ID.FEDRAMP) {
       const r = buildComplianceRequirements(fedrampRequirementsFile, 2, '.');
       complianceRequirements = r.complianceRequirements;
       descriptions = r.descriptions;
@@ -258,16 +259,16 @@ export const ComplianceTable = compose(
   }) => {
     try {
       const mapFieldAgg = {
-        pci: 'rule.compliance.pci_dss',
-        gdpr: 'rule.compliance.gdpr',
-        hipaa: 'rule.compliance.hipaa',
-        nist: 'rule.compliance.nist_800_53',
-        'nist-800-171': 'rule.compliance.nist_800_171',
-        tsc: 'rule.compliance.tsc',
-        cmmc: 'rule.compliance.cmmc',
-        fedramp: 'rule.compliance.fedramp',
-        'iso-27001': 'rule.compliance.iso_27001',
-        nis2: 'rule.compliance.nis2',
+        [WAZUH_MODULES_ID.CMMC]: 'rule.compliance.cmmc',
+        [WAZUH_MODULES_ID.FEDRAMP]: 'rule.compliance.fedramp',
+        [WAZUH_MODULES_ID.GDPR]: 'rule.compliance.gdpr',
+        [WAZUH_MODULES_ID.HIPAA]: 'rule.compliance.hipaa',
+        [WAZUH_MODULES_ID.ISO_27001]: 'rule.compliance.iso_27001',
+        [WAZUH_MODULES_ID.NIS2]: 'rule.compliance.nis2',
+        [WAZUH_MODULES_ID.NIST_800_53]: 'rule.compliance.nist_800_53',
+        [WAZUH_MODULES_ID.NIST_800_171]: 'rule.compliance.nist_800_171',
+        [WAZUH_MODULES_ID.PCI_DSS]: 'rule.compliance.pci_dss',
+        [WAZUH_MODULES_ID.TSC]: 'rule.compliance.tsc',
       };
       const aggs = {
         tactics: {

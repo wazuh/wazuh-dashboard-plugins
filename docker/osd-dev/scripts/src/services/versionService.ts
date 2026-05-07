@@ -24,12 +24,8 @@ export function getAppVersionFromPackageJson(
 ): string {
   const pkg = readJsonFile<any>(envPaths.packageJsonPath);
   const version = pkg?.version;
-  const revision =
-    pkg?.revision?.startsWith('0') && pkg?.revision.length > 1
-      ? pkg.revision.slice(1)
-      : pkg.revision;
 
-  const appVersionWithRevision = `${version}-${revision}`;
+  const appVersionWithRevision = `${version}-latest`;
 
   if (!version) {
     throw new VersionResolutionError(

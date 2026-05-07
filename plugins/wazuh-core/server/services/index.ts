@@ -15,3 +15,4 @@ export * from './cookie';
 export * from './manage-hosts';
 export * from './security-factory';
 export * from './server-api-client';
+export * from './cti-feeds-client';

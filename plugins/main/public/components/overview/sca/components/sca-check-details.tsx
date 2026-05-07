@@ -5,7 +5,6 @@ import {
   EuiTitle,
   EuiText,
   EuiSpacer,
-  EuiPanel,
 } from '@elastic/eui';
 
 interface CheckDetailsProps {
@@ -15,13 +14,11 @@ interface CheckDetailsProps {
     remediation: string;
     condition: string;
     rules: string[];
-    compliance: string[];
+    compliance: Record<string, string[]>;
+    mitre: Record<string, string[]>;
   };
 }
-
-export const CheckDetails: React.FC<CheckDetailsProps> = ({ document }) => {
-  const { check } = document._source;
-
+export const CheckDetails: React.FC<CheckDetailsProps> = ({ check }) => {
   return (
     <EuiFlexGroup direction='column' gutterSize='m' style={{ padding: 16 }}>
       <EuiFlexItem>
@@ -75,24 +72,29 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ document }) => {
         <EuiSpacer size='s' />
         <EuiText>
           <ul>
-            {check.compliance.map((compliance: string, index: number) => {
-              if (!compliance.includes(':')) {
-                return (
-                  <li key={index}>
-                    <code>{compliance}</code>
-                  </li>
-                );
-              }
-              const complianceSplitted = compliance.split(':');
-              const complianceLabel = complianceSplitted[0];
-              const complianceValue = complianceSplitted[1];
-              return (
-                <li key={index}>
-                  <strong>{complianceLabel}: </strong>
-                  <code>{complianceValue}</code>
-                </li>
-              );
-            })}
+            {Object.entries(check.compliance || {}).map(([key, values]) => (
+              <li key={key}>
+                <strong>{key}: </strong>
+                <code>{(values || []).join(', ')}</code>
+              </li>
+            ))}
+          </ul>
+        </EuiText>
+      </EuiFlexItem>
+
+      <EuiFlexItem>
+        <EuiTitle size='s'>
+          <h3>Mitre</h3>
+        </EuiTitle>
+        <EuiSpacer size='s' />
+        <EuiText>
+          <ul>
+            {Object.entries(check.mitre || {}).map(([key, values]) => (
+              <li key={key}>
+                <strong>{key}: </strong>
+                <code>{(values || []).join(', ')}</code>
+              </li>
+            ))}
           </ul>
         </EuiText>
       </EuiFlexItem>

@@ -1,0 +1,7 @@
+{
+  "device_code": "mock_device_code_123",
+  "user_code": "WZH-999",
+  "verification_uri": "https://cti.wazuh.com/activate",
+  "expires_in": 600,
+  "interval": 5
+}

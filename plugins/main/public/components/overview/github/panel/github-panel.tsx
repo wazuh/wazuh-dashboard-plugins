@@ -15,13 +15,13 @@ import React from 'react';
 import { MainPanel } from '../../../common/modules/panel';
 import { ModuleConfiguration } from './views';
 import { ModuleConfig, filtersValues } from './config';
-import { FindingsApplicationsDataSourceRepository } from '../../../common/data-source';
+import { FindingsCloudServicesDataSourceRepository } from '../../../common/data-source';
 import { GitHubDataSource } from '../../../common/data-source/pattern/events/github/github-data-source';
 import { createPanel } from '../../../common/dashboards';
 
 export const GitHubPanel = createPanel({
   DataSource: GitHubDataSource,
-  DataSourceRepositoryCreator: FindingsApplicationsDataSourceRepository,
+  DataSourceRepositoryCreator: FindingsCloudServicesDataSourceRepository,
   MainPanel,
   ModuleConfiguration,
   ModuleConfig,

@@ -47,7 +47,9 @@ export const createPatternDataSourceRepositoryUseValue = (
       return [];
     }
 
-    getDefault(dataSources: tParsedIndexPattern[]) {
+    async getDefault(
+      dataSources: tParsedIndexPattern[],
+    ): Promise<tParsedIndexPattern | null> {
       // This gets the index pattern obtained by getAll method
       const [dataSource] = dataSources;
 

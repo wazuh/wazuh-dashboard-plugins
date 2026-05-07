@@ -30,7 +30,7 @@ export const techniquesColumns: tDataGridColumn[] = [
 
 export const agentTechniquesColumns: tDataGridColumn[] = [
   {
-    id: 'timestamp',
+    id: '@timestamp',
     isSortable: true,
     defaultSortDirection: 'desc',
     displayAsText: 'Time',

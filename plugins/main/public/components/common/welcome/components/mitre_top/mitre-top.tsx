@@ -143,7 +143,7 @@ const MitreTopTacticsTechniquesBody = compose(
     DataSource: MitreAttackDataSource,
     DataSourceRepositoryCreator: FindingsDataSourceRepository,
     mapRequestParams(props) {
-      const [, , dateRange, selectedTactic] = props.dependencies;
+      const [, dateRange, selectedTactic] = props.dependencies;
       return {
         filters: [
           ...props.dataSource.fetchFilters,
@@ -174,7 +174,6 @@ const MitreTopTacticsTechniquesBody = compose(
       ];
     },
     mapResponse(response, props) {
-      return [];
       return response?.aggregations?.tactics?.buckets;
     },
     FetchingDataComponent: () => (
@@ -195,7 +194,7 @@ const MitreTopTacticsTechniquesBody = compose(
   };
 
   const goToDashboardWithFilter = async (e, techniqueID) => {
-    const indexPatternId = dataSource.dataSourece.indexPattern.id;
+    const indexPatternId = dataSource.dataSource.indexPattern.id;
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
@@ -214,7 +213,7 @@ const MitreTopTacticsTechniquesBody = compose(
   };
 
   const goToEventsWithFilter = async (e, techniqueID) => {
-    const indexPatternId = dataSource.dataSourece.indexPattern.id;
+    const indexPatternId = dataSource.dataSource.indexPattern.id;
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,

@@ -2,8 +2,34 @@
 
 exports[`Table With Search Bar component renders correctly to match the snapshot 1`] = `
 <TableWithSearchBar
-  onSearch={[Function]}
-  reload={[Function]}
+  endpoint="/test-endpoint"
+  onSearch={
+    [MockFunction] {
+      "calls": Array [
+        Array [
+          "/test-endpoint",
+          Object {},
+          Object {
+            "pageIndex": 0,
+            "pageSize": 15,
+          },
+          Object {
+            "sort": Object {
+              "direction": "asc",
+              "field": "",
+            },
+          },
+        ],
+      ],
+      "results": Array [
+        Object {
+          "type": "return",
+          "value": Promise {},
+        },
+      ],
+    }
+  }
+  reload={0}
   rowProps={[Function]}
   searchBarSuggestions={Array []}
   searchBarWQL={
@@ -16,6 +42,14 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
         "value": [Function],
       },
     }
+  }
+  selectedFields={
+    Array [
+      "version",
+      "architecture",
+      "cve",
+      "name",
+    ]
   }
   tableColumns={
     Array [
@@ -581,7 +615,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
     }
     data-test-subj="table-with-search-bar"
     items={Array []}
-    loading={true}
+    loading={false}
     onChange={[Function]}
     pagination={
       Object {
@@ -637,7 +671,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
       isExpandable={false}
       itemIdToExpandedRowMap={false}
       items={Array []}
-      loading={true}
+      loading={false}
       noItemsMessage="No items found"
       onChange={[Function]}
       pagination={
@@ -666,7 +700,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
       tableLayout="fixed"
     >
       <div
-        className="euiBasicTable euiBasicTable-loading"
+        className="euiBasicTable"
         data-test-subj="table-with-search-bar"
       >
         <div>

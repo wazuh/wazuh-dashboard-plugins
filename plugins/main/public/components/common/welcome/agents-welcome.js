@@ -219,7 +219,7 @@ export const AgentsWelcome = compose(
                 >
                   <RedirectAppLinks application={getCore().application}>
                     <EuiButtonEmpty
-                      href={NavigationService.getInstance().getUrlForApp(
+                      href={NavigationService.getInstance().getAppURL(
                         applicationId,
                       )}
                       style={{ cursor: 'pointer' }}
@@ -393,9 +393,9 @@ export const AgentsWelcome = compose(
                     <EuiButtonIcon
                       iconType='popout'
                       color='primary'
-                      href={`${NavigationService.getInstance().getUrlForApp(
+                      href={NavigationService.getInstance().getAppURL(
                         mitreAttack.id,
-                      )}`}
+                      )}
                       aria-label='Open MITRE ATT&CK'
                     />
                   </RedirectAppLinks>
@@ -488,7 +488,7 @@ export const AgentsWelcome = compose(
                     >
                       {this.renderFindingCountVisualization()}
                     </EuiFlexItem>
-                    {/* <EuiFlexItem grow={3}>
+                    <EuiFlexItem grow={3}>
                       <EuiFlexGroup>
                         <EuiFlexItem
                           key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
@@ -500,7 +500,7 @@ export const AgentsWelcome = compose(
                           {this.renderCompliancePanel()}
                         </EuiFlexItem>
                       </EuiFlexGroup>
-                    </EuiFlexItem> */}
+                    </EuiFlexItem>
                   </EuiFlexGroup>
                   <EuiSpacer size='l' />
                   <EuiFlexGroup direction={responsiveGroupDirection}>

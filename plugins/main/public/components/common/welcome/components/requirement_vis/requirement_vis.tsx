@@ -20,8 +20,6 @@ import {
   VisualizationBasicWidgetSelectorHeader,
 } from '../../../charts/visualizations/basic';
 import { useTimeFilter } from '../../../hooks';
-import { AppState } from '../../../../../react-services/app-state';
-import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import {
   FILTER_OPERATOR,
@@ -40,28 +38,39 @@ import {
 } from '../../../data-source';
 import { LoadingSearchbarProgress } from '../../../loading-searchbar-progress/loading-searchbar-progress';
 import { compose } from 'redux';
+import { regulatoryCompliance } from '../../../../../utils/applications';
+import { WAZUH_MODULES_ID } from '../../../../../../common/constants';
 
 const selectionOptionsCompliance = [
-  { value: 'pci_dss', text: 'PCI DSS' },
+  { value: 'cmmc', text: 'CMMC' },
+  { value: 'fedramp', text: 'FedRAMP' },
   { value: 'gdpr', text: 'GDPR' },
-  { value: 'nist_800_53', text: 'NIST 800-53' },
   { value: 'hipaa', text: 'HIPAA' },
-  { value: 'gpg13', text: 'GPG13' },
+  { value: 'iso_27001', text: 'ISO 27001' },
+  { value: 'nis2', text: 'NIS2' },
+  { value: 'nist_800_53', text: 'NIST 800-53' },
+  { value: 'nist_800_171', text: 'NIST 800-171' },
+  { value: 'pci_dss', text: 'PCI DSS' },
   { value: 'tsc', text: 'TSC' },
 ];
 
 const requirementNameModuleID = {
-  pci_dss: 'pci',
-  gdpr: 'gdpr',
-  nist_800_53: 'nist',
-  hipaa: 'hipaa',
-  gpg13: '',
-  tsc: 'tsc',
+  cmmc: WAZUH_MODULES_ID.CMMC,
+  fedramp: WAZUH_MODULES_ID.FEDRAMP,
+  gdpr: WAZUH_MODULES_ID.GDPR,
+  hipaa: WAZUH_MODULES_ID.HIPAA,
+  iso_27001: WAZUH_MODULES_ID.ISO_27001,
+  nis2: WAZUH_MODULES_ID.NIS2,
+  nist_800_53: WAZUH_MODULES_ID.NIST_800_53,
+  nist_800_171: WAZUH_MODULES_ID.NIST_800_171,
+  pci_dss: WAZUH_MODULES_ID.PCI_DSS,
+  tsc: WAZUH_MODULES_ID.TSC,
 };
 
 export const RequirementVis = withPanel({ paddingSize: 'm' })(props => {
   const { selectedOption, onChange } = useVisualizationBasicWidgetSelector(
     selectionOptionsCompliance,
+    'pci_dss', // default option
   );
 
   return (
@@ -102,25 +111,23 @@ const RequirementVisBody = compose(
 
   const goToDashboardWithFilter = async (requirement, key, agent) => {
     pinnedAgentManager.pinAgent(agent);
-    const indexPatternId = AppState.getCurrentPattern();
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
-        `rule.${requirement}`,
+        `rule.compliance.${requirement}`,
         key,
-        indexPatternId,
+        props.dataSource.dataSource.indexPattern.id,
       ),
     ];
     const tabName = requirementNameModuleID[requirement];
-    const params = `tab=${tabName}&agentId=${
+    const params = `tab=${
+      regulatoryCompliance.id
+    }&tabView=${tabName}&tabSubView=dashboard&agentId=${
       agent.id
     }&_g=${PatternDataSourceFilterManager.filtersToURLFormat(filters)}`;
-    NavigationService.getInstance().navigateToApp(
-      WAZUH_MODULES[tabName].appId,
-      {
-        path: `#/overview?${params}`,
-      },
-    );
+    NavigationService.getInstance().navigateToApp(regulatoryCompliance.id, {
+      path: `#/overview?${params}`,
+    });
   };
 
   const fetchData = useCallback(
@@ -131,7 +138,7 @@ const RequirementVisBody = compose(
           ...props.dataSource.fetchFilters,
           PatternDataSourceFilterManager.createFilter(
             FILTER_OPERATOR.EXISTS,
-            `rule.${selectedOptionValue}`,
+            `rule.compliance.${selectedOptionValue}`,
             null,
             props.dataSource.dataSource.indexPattern.id,
           ),
@@ -144,7 +151,7 @@ const RequirementVisBody = compose(
         aggs: {
           top_alerts_compliance: {
             terms: {
-              field: `rule.${selectedOptionValue}`,
+              field: `rule.compliance.${selectedOptionValue}`,
               size: 5,
             },
           },
@@ -158,11 +165,8 @@ const RequirementVisBody = compose(
             label: key,
             value: doc_count,
             color: colors[index],
-            onClick:
-              selectedOptionValue === 'gpg13'
-                ? undefined
-                : () =>
-                    goToDashboardWithFilter(selectedOptionValue, key, agent),
+            onClick: () =>
+              goToDashboardWithFilter(selectedOptionValue, key, agent),
           }))
         : null;
     },

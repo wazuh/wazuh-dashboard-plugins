@@ -1,4 +1,4 @@
-import { TPluginSettingWithKey } from '../../../../../wazuh-core/common/constants';
+import type { TPluginSettingWithKey } from '../../../../../wazuh-core/common/constants';
 
 export interface IInputFormType {
   field: TPluginSettingWithKey;

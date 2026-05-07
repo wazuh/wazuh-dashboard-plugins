@@ -74,47 +74,45 @@ describe('AgentStats', () => {
   });
 
   it('should render stats info ribbon', async () => {
+    let container: HTMLElement;
+
     await act(async () => {
-      const { container } = render(<AgentStats agent={{ id: '002' }} />);
-
-      expect(
-        container.querySelector(queryDataTestAttr('ribbon-item-status')),
-      ).toBeTruthy();
-
-      expect(
-        container.querySelector(
-          queryDataTestAttr('ribbon-item-buffer_enabled'),
-        ),
-      ).toBeTruthy();
-
-      expect(
-        container.querySelector(queryDataTestAttr('ribbon-item-msg_buffer')),
-      ).toBeTruthy();
-
-      expect(
-        container.querySelector(queryDataTestAttr('ribbon-item-msg_count')),
-      ).toBeTruthy();
-
-      expect(
-        container.querySelector(queryDataTestAttr('ribbon-item-msg_sent')),
-      ).toBeTruthy();
-
-      expect(
-        container.querySelector(queryDataTestAttr('ribbon-item-last_ack')),
-      ).toBeTruthy();
-
-      expect(
-        container.querySelector(
-          queryDataTestAttr('ribbon-item-last_keepalive'),
-        ),
-      ).toBeTruthy();
-
-      expect(
-        container.querySelectorAll(
-          queryDataTestAttr('ribbon-item-', CSS.Attribute.Substring),
-        ),
-      ).toHaveLength(7);
+      ({ container } = render(<AgentStats agent={{ id: '002' }} />));
     });
+
+    expect(
+      container!.querySelector(queryDataTestAttr('ribbon-item-status')),
+    ).toBeTruthy();
+
+    expect(
+      container!.querySelector(queryDataTestAttr('ribbon-item-buffer_enabled')),
+    ).toBeTruthy();
+
+    expect(
+      container!.querySelector(queryDataTestAttr('ribbon-item-msg_buffer')),
+    ).toBeTruthy();
+
+    expect(
+      container!.querySelector(queryDataTestAttr('ribbon-item-msg_count')),
+    ).toBeTruthy();
+
+    expect(
+      container!.querySelector(queryDataTestAttr('ribbon-item-msg_sent')),
+    ).toBeTruthy();
+
+    expect(
+      container!.querySelector(queryDataTestAttr('ribbon-item-last_ack')),
+    ).toBeTruthy();
+
+    expect(
+      container!.querySelector(queryDataTestAttr('ribbon-item-last_keepalive')),
+    ).toBeTruthy();
+
+    expect(
+      container!.querySelectorAll(
+        queryDataTestAttr('ribbon-item-', CSS.Attribute.Substring),
+      ),
+    ).toHaveLength(7);
   });
 
   it('should call api with correct agent ids and endpoints when changing agent', async () => {

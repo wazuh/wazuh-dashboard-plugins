@@ -52,15 +52,13 @@ export const SCAInventory: React.FC<{}> = compose(
       ]}
       tableId='sca-policies-inventory'
       categoriesSampleData={[WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT]}
-      additionalDocumentDetailsTabs={[
+      additionalDocumentDetailsTabs={({ document }) => [
         {
           id: 'sca-dashboard-tab',
           title: 'Security Configuration Assessment dashboard',
           description: 'Dashboard of the Security Configuration Assessment',
           name: 'Check Details',
-          // This is rendered in the document details view
-          // It is a custom component that shows the details of the check of a policy
-          content: props => <CheckDetails {...props} />,
+          content: <CheckDetails check={document?._source?.check} />,
         },
       ]}
     />

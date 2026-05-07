@@ -203,6 +203,14 @@ export const WAZUH_FINDINGS_UNCLASSIFIED_PATTERN =
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_UNCLASSIFIED =
   'index-pattern:findings-unclassified';
 
+// Index patterns - Threat Intel enrichments
+export const WAZUH_INDEX_TYPE_THREATINTEL_ENRICHMENTS =
+  'threatintel-enrichments';
+export const WAZUH_THREATINTEL_ENRICHMENTS_PATTERN =
+  'wazuh-threatintel-enrichments*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS =
+  'index-pattern:threatintel-enrichments';
+
 // Time field
 export const FIELD_TIMESTAMP = '@timestamp';
 
@@ -561,12 +569,15 @@ export enum WAZUH_MODULES_ID {
   VULNERABILITIES = 'vuls',
   DOCKER = 'docker',
   MITRE_ATTACK = 'mitre',
-  PCI_DSS = 'pci',
+  CMMC = 'cmmc',
+  FEDRAMP = 'fedramp',
   HIPAA = 'hipaa',
-  NIST_800_53 = 'nist',
-  NIST_800_171 = 'nist-800-171',
-  TSC = 'tsc',
+  ISO_27001 = 'iso-27001',
   NIS2 = 'nis2',
+  NIST_800_53 = 'nist-800-53',
+  NIST_800_171 = 'nist-800-171',
+  PCI_DSS = 'pci-dss',
+  TSC = 'tsc',
   VIRUSTOTAL = 'virustotal',
   GDPR = 'gdpr',
   GITHUB = 'github',

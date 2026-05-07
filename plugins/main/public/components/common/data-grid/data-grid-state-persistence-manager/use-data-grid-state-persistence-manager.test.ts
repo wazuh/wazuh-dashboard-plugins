@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react-hooks';
+import { renderHook, act } from '@testing-library/react';
 import { useDataGridStatePersistenceManager } from './use-data-grid-state-persistence-manager';
 import { DataGridState } from './types';
 import { DEFAULT_PAGE_SIZE } from '../constants';

@@ -54,7 +54,7 @@ jobs:
             {
               name: 'Main',
               path: 'wazuh/plugins/main',
-              container_path: 'wazuh',
+              container_path: 'main',
             },
             {
               name: 'Wazuh Check Updates',

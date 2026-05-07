@@ -5,15 +5,17 @@ import { iso27001Columns as tableColumns } from './events/iso-27001-columns';
 import { ComplianceModule } from '../shared/compliance-module';
 
 import { buildStandardComplianceTabs } from '../shared/compliance-tab-factory';
+import { WAZUH_MODULES_ID } from '../../../../../common/constants';
 
+const moduleId = WAZUH_MODULES_ID.ISO_27001;
 export const RegulatoryComplianceISO27001 = () => {
   const tabs = buildStandardComplianceTabs({
     dashboardComponent: DashboardISO27001,
-    section: 'iso-27001',
-    moduleId: 'iso-27001',
+    section: moduleId,
+    moduleId: moduleId,
     dataSource: ISO27001DataSource,
     tableColumns: tableColumns,
   });
 
-  return <ComplianceModule moduleId='iso-27001' tabs={tabs} />;
+  return <ComplianceModule moduleId={moduleId} tabs={tabs} />;
 };

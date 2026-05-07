@@ -1,9 +1,15 @@
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { IWzSuggestItem, WzSearchBar } from './wz-search-bar';
 import { WZ_SEARCH_BADGE_NAME } from './components/wz-search-badges/wz-search-badges';
 import React from 'react';
 import { CASES_SEARCHBAR } from './wz-search-bar.test-cases';
+
+jest.mock('../../react-services/common-services', () => ({
+  getErrorOrchestrator: () => ({
+    handleError: jest.fn(),
+  }),
+}));
 
 const getSuggestionsFilters = async (field, value, filters = {}) => {
   // here is returned filter to call api and get suggestions
@@ -141,7 +147,7 @@ describe('WzSearchBar', () => {
   describe('Valid cases', () => {
     it.each(CASES_SEARCHBAR)(
       'should take query inputs "%j" and create search badges when queries are VALID/COMPLETE',
-      inputs => {
+      async inputs => {
         const spyReactConsoleError = jest.spyOn(console, 'error');
         spyReactConsoleError.mockImplementation(() => {});
         const spyOnChange = jest.spyOn(
@@ -157,21 +163,22 @@ describe('WzSearchBar', () => {
           fireEvent.change(searchInput, { target: { value } });
           fireEvent.keyPress(searchInput, {
             key: 'Enter',
-            code: 13,
+            code: 'Enter',
             charCode: 13,
           });
         });
 
-        inputs.forEach((filterText, index) => {
-          // check all badges created
-          expect(
-            getByTestId(`${WZ_SEARCH_BADGE_NAME}-${index}`),
-          ).toHaveTextContent(filterText);
-          expect(getByText(filterText)).toBeInTheDocument();
+        await waitFor(() => {
+          inputs.forEach((filterText, index) => {
+            expect(
+              getByTestId(`${WZ_SEARCH_BADGE_NAME}-${index}`),
+            ).toHaveTextContent(filterText);
+            expect(getByText(filterText)).toBeInTheDocument();
+          });
         });
 
         // check the input value if filter was applied
-        expect(searchInput.value).toBe('');
+        await waitFor(() => expect(searchInput.value).toBe(''));
         spyOnChange.mockRestore();
         spyReactConsoleError.mockRestore();
       },
@@ -206,7 +213,7 @@ describe('WzSearchBar', () => {
         fireEvent.change(searchInput, { target: { value: inputQuery } });
         fireEvent.keyPress(searchInput, {
           key: 'Enter',
-          code: 13,
+          code: 'Enter',
           charCode: 13,
         });
         expect(searchInput.value).toBe(inputQuery);
@@ -224,7 +231,11 @@ describe('WzSearchBar', () => {
       );
       const { getByRole } = render(<ComponentWithWzSearchBar />);
       const searchInput = getByRole('textbox') as HTMLInputElement;
-      fireEvent.keyPress(searchInput, { key: 'Enter', code: 13, charCode: 13 });
+      fireEvent.keyPress(searchInput, {
+        key: 'Enter',
+        code: 'Enter',
+        charCode: 13,
+      });
       expect(searchInput.value).toBe('');
       expect(spyOnChange).toHaveBeenCalledTimes(1);
       expect(spyOnChange).toBeCalledWith([]);

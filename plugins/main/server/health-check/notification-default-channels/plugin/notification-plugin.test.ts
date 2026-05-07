@@ -28,32 +28,25 @@ describe('InitializeClientNotificationConfigs', () => {
   });
 
   describe('Plugin registration', () => {
-    it('should register notifications namespace and methods', () => {
-      // Call the plugin function to register methods
+    it('should register notifications namespace and the getConfigs method', () => {
       initializeClientNotificationConfigs(
         MockClient,
         mockConfig,
         mockComponents,
       );
 
-      // Verify that the plugin registered the namespace
       expect(mockComponents.clientAction.namespaceFactory).toHaveBeenCalled();
-
-      // Verify that clientAction.factory was called for each method
-      expect(mockComponents.clientAction.factory).toHaveBeenCalledTimes(2); // getConfigs and createConfig
-
-      // Verify the methods are added to the prototype
+      expect(mockComponents.clientAction.factory).toHaveBeenCalledTimes(1);
       expect(MockClient.prototype.notifications).toBeDefined();
     });
 
-    it('should configure getConfigs method correctly', () => {
+    it('should configure getConfigs with the correct API path and method', () => {
       initializeClientNotificationConfigs(
         MockClient,
         mockConfig,
         mockComponents,
       );
 
-      // Verify getConfigs was configured with correct parameters
       expect(mockComponents.clientAction.factory).toHaveBeenCalledWith({
         url: {
           fmt: '/_plugins/_notifications/configs',
@@ -62,30 +55,9 @@ describe('InitializeClientNotificationConfigs', () => {
       });
     });
 
-    it('should configure createConfig method correctly', () => {
-      initializeClientNotificationConfigs(
-        MockClient,
-        mockConfig,
-        mockComponents,
-      );
-
-      // Verify createConfig was configured with correct parameters
-      expect(mockComponents.clientAction.factory).toHaveBeenCalledWith({
-        url: {
-          fmt: '/_plugins/_notifications/configs',
-        },
-        method: 'POST',
-        needBody: true,
-      });
-    });
-
-    it('should register both methods on notifications prototype', () => {
+    it('should expose getConfigs on the notifications prototype', () => {
       const mockGetConfigs = jest.fn();
-      const mockCreateConfig = jest.fn();
-      const mockFactory = jest
-        .fn()
-        .mockReturnValueOnce(mockGetConfigs)
-        .mockReturnValueOnce(mockCreateConfig);
+      const mockFactory = jest.fn().mockReturnValueOnce(mockGetConfigs);
 
       const mockNamespace = jest.fn();
       mockNamespace.prototype = {};
@@ -100,55 +72,8 @@ describe('InitializeClientNotificationConfigs', () => {
 
       initializeClientNotificationConfigs(MockClient, mockConfig, components);
 
-      // Verify both methods are assigned
       const notificationsProto = MockClient.prototype.notifications.prototype;
       expect(notificationsProto.getConfigs).toBe(mockGetConfigs);
-      expect(notificationsProto.createConfig).toBe(mockCreateConfig);
-    });
-  });
-
-  describe('API endpoint configuration', () => {
-    it('should use correct OpenSearch API path for both methods', () => {
-      initializeClientNotificationConfigs(
-        MockClient,
-        mockConfig,
-        mockComponents,
-      );
-
-      // Both methods should use the same API endpoint
-      const expectedUrl = { fmt: '/_plugins/_notifications/configs' };
-
-      expect(mockComponents.clientAction.factory).toHaveBeenCalledWith({
-        url: expectedUrl,
-        method: 'GET',
-      });
-
-      expect(mockComponents.clientAction.factory).toHaveBeenCalledWith({
-        url: expectedUrl,
-        method: 'POST',
-        needBody: true,
-      });
-    });
-
-    it('should set needBody for POST method only', () => {
-      initializeClientNotificationConfigs(
-        MockClient,
-        mockConfig,
-        mockComponents,
-      );
-
-      // Verify GET method doesn't have needBody
-      expect(mockComponents.clientAction.factory).toHaveBeenCalledWith({
-        url: { fmt: '/_plugins/_notifications/configs' },
-        method: 'GET',
-      });
-
-      // Verify POST method has needBody
-      expect(mockComponents.clientAction.factory).toHaveBeenCalledWith({
-        url: { fmt: '/_plugins/_notifications/configs' },
-        method: 'POST',
-        needBody: true,
-      });
     });
   });
 });

@@ -50,6 +50,9 @@ export function printUsageAndExit(log: Logger): never {
     `  ${FLAGS.SAML}                 Enable SAML profile (can be combined with ${FLAGS.SERVER}/${FLAGS.SERVER_LOCAL})`,
   );
   log.infoPlain(
+    `  ${FLAGS.MAILPIT}              Enable Mailpit email testing service (web UI: http://localhost:8025, SMTP: localhost:1025)`,
+  );
+  log.infoPlain(
     `  ${FLAGS.SERVER} <version>    Enable server mode with the given version`,
   );
   log.infoPlain(
@@ -147,6 +150,12 @@ export function parseArguments(
 
       case FLAGS.SAML: {
         config.setEnableSaml(true, 'argumentParser');
+        index++;
+        break;
+      }
+
+      case FLAGS.MAILPIT: {
+        config.setEnableMailpit(true, 'argumentParser');
         index++;
         break;
       }

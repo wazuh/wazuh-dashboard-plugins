@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { getTasks } from '../services';
 import { useGetUpgradeTasks } from './upgrade-tasks';
 import { API_NAME_TASK_STATUS } from '../../../../common/constants';
@@ -27,9 +27,7 @@ describe('useGetUpgradeTasks hook', () => {
       return { total_affected_items: 2 };
     });
 
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useGetUpgradeTasks(false),
-    );
+    const { result } = renderHook(() => useGetUpgradeTasks(false));
 
     expect(result.current.getInProgressIsLoading).toBe(true);
     expect(result.current.totalInProgressTasks).toBe(0);
@@ -43,20 +41,15 @@ describe('useGetUpgradeTasks hook', () => {
     expect(result.current.totalErrorUpgradeTasks).toBe(0);
     expect(result.current.getErrorTasksError).toBeUndefined();
 
-    await waitForNextUpdate();
-    jest.advanceTimersByTime(500);
+    await waitFor(() => expect(result.current.getTimeoutIsLoading).toBe(false));
 
     expect(result.current.getInProgressIsLoading).toBe(false);
     expect(result.current.totalInProgressTasks).toBe(5);
     expect(result.current.getInProgressError).toBeUndefined();
 
-    jest.advanceTimersByTime(500);
-
     expect(result.current.getSuccessIsLoading).toBe(false);
     expect(result.current.totalSuccessTasks).toBe(3);
     expect(result.current.getSuccessError).toBeUndefined();
-
-    jest.advanceTimersByTime(500);
 
     expect(result.current.getErrorIsLoading).toBe(false);
     expect(result.current.totalErrorUpgradeTasks).toBe(2);
@@ -67,10 +60,9 @@ describe('useGetUpgradeTasks hook', () => {
     const mockGetTasks = jest.requireMock('../services').getTasks;
     mockGetTasks.mockResolvedValue({ total_affected_items: 0 });
 
-    const { waitForNextUpdate } = renderHook(() => useGetUpgradeTasks(false));
+    renderHook(() => useGetUpgradeTasks(false));
 
-    await waitForNextUpdate();
-    jest.advanceTimersByTime(500);
+    await waitFor(() => expect(clearInterval).toHaveBeenCalled());
 
     expect(clearInterval).toHaveBeenCalledTimes(1);
   });
@@ -79,12 +71,12 @@ describe('useGetUpgradeTasks hook', () => {
     const mockErrorMessage = 'Some error occurred';
     (getTasks as jest.Mock).mockRejectedValue(mockErrorMessage);
 
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useGetUpgradeTasks(0),
-    );
+    const { result } = renderHook(() => useGetUpgradeTasks(0));
 
     expect(result.current.getInProgressIsLoading).toBeTruthy();
-    await waitForNextUpdate();
+    await waitFor(() =>
+      expect(result.current.getInProgressIsLoading).toBeFalsy(),
+    );
     expect(result.current.getInProgressError).toBe(mockErrorMessage);
     expect(result.current.getInProgressIsLoading).toBeFalsy();
   });

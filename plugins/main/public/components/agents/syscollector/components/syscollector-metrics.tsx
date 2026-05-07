@@ -171,7 +171,7 @@ export const InventoryMetrics = compose(
                     iconType='popout'
                     color='primary'
                     className='EuiButtonIcon'
-                    href={NavigationService.getInstance().getUrlForApp(
+                    href={NavigationService.getInstance().getAppURL(
                       ITHygiene.id,
                     )}
                     aria-label={`Open ${ITHygiene.title}`}

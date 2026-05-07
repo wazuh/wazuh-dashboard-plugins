@@ -26,8 +26,8 @@ import { Typography } from '../../../typography/typography';
 import { getCore, getDataPlugin } from '../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { fileIntegrityMonitoring } from '../../../../../utils/applications';
-import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import NavigationService from '../../../../../react-services/navigation-service';
+import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import { withDataSourceFetch } from '../../../hocs';
 import { FIMDataSourceRepository, FIMDataSource } from '../../../data-source';
 import { formatUIDate } from '../../../../../react-services';
@@ -48,9 +48,9 @@ export function FimEventsTable({ agent }) {
                     iconType='popout'
                     color='primary'
                     onClick={() => navigateToFim(agent)}
-                    href={`${NavigationService.getInstance().getUrlForApp(
+                    href={NavigationService.getInstance().getAppURL(
                       fileIntegrityMonitoring.id,
-                    )}`}
+                    )}
                     aria-label='Open FIM'
                   />
                 </RedirectAppLinks>

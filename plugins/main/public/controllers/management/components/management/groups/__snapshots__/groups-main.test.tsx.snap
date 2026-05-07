@@ -4,6 +4,9 @@ exports[`Group main component renders correctly to match the snapshot 1`] = `
 <ContextProvider
   value={
     Object {
+      "getServerState": undefined,
+      "noopCheck": "once",
+      "stabilityCheck": "once",
       "store": Object {
         "clearActions": [Function],
         "dispatch": [Function],
@@ -18,7 +21,6 @@ exports[`Group main component renders correctly to match the snapshot 1`] = `
         "handleChangeWrapper": [Function],
         "isSubscribed": [Function],
         "notifyNestedSubs": [Function],
-        "onStateChange": [Function],
         "trySubscribe": [Function],
         "tryUnsubscribe": [Function],
       },

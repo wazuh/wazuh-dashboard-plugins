@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderHook, act } from '@testing-library/react-hooks';
+import { renderHook, act } from '@testing-library/react';
 import { EuiDataGridCellValueElementProps } from '@elastic/eui';
 import { useDataGrid, DataGridProps } from './use-data-grid';
 import { DEFAULT_PAGINATION_OPTIONS, MAX_ENTRIES_PER_QUERY } from './constants';

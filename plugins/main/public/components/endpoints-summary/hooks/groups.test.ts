@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react-hooks';
+import { renderHook, waitFor } from '@testing-library/react';
 import { useGetGroups } from './groups';
 import { getGroupsService } from '../services';
 
@@ -22,10 +22,10 @@ describe('useGetGroups hook', () => {
     });
 
     const mockGroups = ['group1', 'group2', 'group3'];
-    const { result, waitForNextUpdate } = renderHook(() => useGetGroups());
+    const { result } = renderHook(() => useGetGroups());
 
     expect(result.current.isLoading).toBeTruthy();
-    await waitForNextUpdate();
+    await waitFor(() => expect(result.current.isLoading).toBeFalsy());
     expect(result.current.groups).toEqual(mockGroups);
     expect(result.current.isLoading).toBeFalsy();
   });
@@ -34,10 +34,10 @@ describe('useGetGroups hook', () => {
     const mockErrorMessage = 'Some error occurred';
     (getGroupsService as jest.Mock).mockRejectedValue(mockErrorMessage);
 
-    const { result, waitForNextUpdate } = renderHook(() => useGetGroups());
+    const { result } = renderHook(() => useGetGroups());
 
     expect(result.current.isLoading).toBeTruthy();
-    await waitForNextUpdate();
+    await waitFor(() => expect(result.current.isLoading).toBeFalsy());
     expect(result.current.error).toBe(mockErrorMessage);
     expect(result.current.isLoading).toBeFalsy();
   });

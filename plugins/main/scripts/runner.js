@@ -86,13 +86,13 @@ function setupAbortController() {
  * Start the container.
  */
 function startRunner() {
-  const runner = childProcess.spawn('docker', [
-    'compose',
-    '--project-directory',
-    COMPOSE_DIR,
-    'up',
-    '--no-log-prefix',
-  ]);
+  const runner = childProcess.spawn(
+    'docker',
+    ['compose', '--project-directory', COMPOSE_DIR, 'up', '--no-log-prefix'],
+    {
+      env: { ...process.env, GIT_REF: 'main' },
+    },
+  );
 
   runner.stdout.on('data', data => {
     console.log(`${data}`);

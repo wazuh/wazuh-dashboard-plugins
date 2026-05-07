@@ -3,7 +3,7 @@
   "version": "5.0.0",
   "revision": "01",
   "pluginPlatform": {
-    "version": "3.5.0"
+    "version": "3.6.0"
   },
   "description": "Wazuh dashboard",
   "keywords": [
@@ -23,7 +23,7 @@
     "tar-fs": "2.1.4",
     "cookie": "0.7.0",
     "@tootallnate/once": "^3.0.1",
-    "lodash": "4.17.23"
+    "lodash": "4.18.1"
   },
   "repository": {
     "type": "git",

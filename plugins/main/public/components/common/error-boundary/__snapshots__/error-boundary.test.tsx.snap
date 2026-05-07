@@ -6,9 +6,9 @@ exports[`ErrorBoundary component renders correctly to match the snapshot 1`] = `
     errorInfo={
       Object {
         "componentStack": "
-    in ComponentWithError
-    in ErrorBoundary (created by WrapperComponent)
-    in WrapperComponent",
+    at ComponentWithError (/home/node/kbn/plugins/main/public/components/common/error-boundary/error-boundary.test.tsx:28:11)
+    at ErrorBoundary (/home/node/kbn/plugins/main/public/components/common/error-boundary/error-boundary.tsx:28:5)
+    at WrapperComponent (/home/node/kbn/node_modules/@cfaester/enzyme-adapter-react-18/dist/enzyme-adapter-utils/createMountWrapper.js:47:13)",
       }
     }
     errorTitle={[Error: I crashed! I crash very hard]}
@@ -35,9 +35,9 @@ exports[`ErrorBoundary component renders correctly to match the snapshot 1`] = `
             <br />
             <span>
               
-    in ComponentWithError
-    in ErrorBoundary (created by WrapperComponent)
-    in WrapperComponent
+    at ComponentWithError (/home/node/kbn/plugins/main/public/components/common/error-boundary/error-boundary.test.tsx:28:11)
+    at ErrorBoundary (/home/node/kbn/plugins/main/public/components/common/error-boundary/error-boundary.tsx:28:5)
+    at WrapperComponent (/home/node/kbn/node_modules/@cfaester/enzyme-adapter-react-18/dist/enzyme-adapter-utils/createMountWrapper.js:47:13)
             </span>
           </details>
         </div>
@@ -114,9 +114,9 @@ exports[`ErrorBoundary component renders correctly to match the snapshot 1`] = `
                     <br />
                     <span>
                       
-    in ComponentWithError
-    in ErrorBoundary (created by WrapperComponent)
-    in WrapperComponent
+    at ComponentWithError (/home/node/kbn/plugins/main/public/components/common/error-boundary/error-boundary.test.tsx:28:11)
+    at ErrorBoundary (/home/node/kbn/plugins/main/public/components/common/error-boundary/error-boundary.tsx:28:5)
+    at WrapperComponent (/home/node/kbn/node_modules/@cfaester/enzyme-adapter-react-18/dist/enzyme-adapter-utils/createMountWrapper.js:47:13)
                     </span>
                   </details>
                 </div>

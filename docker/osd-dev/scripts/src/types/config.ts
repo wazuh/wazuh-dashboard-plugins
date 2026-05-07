@@ -27,6 +27,8 @@ export interface ScriptConfig {
   serverLocalFlagVersion: string; // from --server-local <tag>
   /** Whether to auto-discover and mount all sibling repos via --all-forks. */
   allForks: boolean;
+  /** Whether to enable Mailpit email testing service via --mailpit. */
+  enableMailpit: boolean;
 }
 
 export interface GenerateOverrideOptions {
@@ -74,6 +76,7 @@ export class Config implements ScriptConfig {
   private _serverFlagVersion = '';
   private _serverLocalFlagVersion = '';
   private _allForks = false;
+  private _enableMailpit = false;
 
   private _changeLog: Array<{
     key: string;
@@ -313,5 +316,18 @@ export class Config implements ScriptConfig {
     const prev = this._allForks;
     this._allForks = value;
     this.logChange('allForks', prev, value, source);
+  }
+
+  // enableMailpit
+  get enableMailpit(): boolean {
+    return this._enableMailpit;
+  }
+  set enableMailpit(value: boolean) {
+    this.setEnableMailpit(value);
+  }
+  setEnableMailpit(value: boolean, source?: string): void {
+    const prev = this._enableMailpit;
+    this._enableMailpit = value;
+    this.logChange('enableMailpit', prev, value, source);
   }
 }
