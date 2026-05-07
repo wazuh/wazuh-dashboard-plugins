@@ -74,6 +74,32 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     }
   }, [statusCTI.status]);
 
+  useEffect(() => {
+    const hasActiveDeviceFlow =
+      Boolean(ctiFlowState.getDeviceCode()) &&
+      !ctiFlowState.isRegistrationComplete() &&
+      !ctiFlowState.isRegistered();
+    const latestDeviceAuth = ctiFlowState.getDeviceAuthLinks();
+
+    if (!hasActiveDeviceFlow) {
+      if (deviceAuth) {
+        setDeviceAuth(null);
+      }
+      return;
+    }
+
+    if (!latestDeviceAuth) {
+      if (deviceAuth) {
+        setDeviceAuth(null);
+      }
+      return;
+    }
+
+    if (!deviceAuth) {
+      setDeviceAuth(latestDeviceAuth);
+    }
+  }, [statusCTI, deviceAuth]);
+
   const handleStartRegistration = async () => {
     setError(null);
     setLoading(true);
