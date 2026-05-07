@@ -139,7 +139,6 @@
         "registerIP": "any",
         "id": "006",
         "ip": "any",
-        "os": { "type": "linux" },
         "group_config_status": "not synced",
         "status_code": 5
       },
@@ -151,7 +150,6 @@
         "registerIP": "any",
         "id": "007",
         "ip": "any",
-        "os": { "type": "linux" },
         "group_config_status": "not synced",
         "status_code": 5
       },
