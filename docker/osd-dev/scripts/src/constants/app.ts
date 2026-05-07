@@ -48,6 +48,7 @@ export const FLAGS = {
   BASE: '--base',
   INDEXER_LOCAL: '--indexer-local',
   ALL_FORKS: '--all-forks',
+  MAILPIT: '--mailpit',
 } as const;
 
 /**

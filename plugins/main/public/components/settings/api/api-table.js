@@ -116,6 +116,7 @@ export const ApiTable = compose(withErrorBoundary)(
       this.isUpdatesEnabled = !(await getWazuhCorePlugin().configuration.get(
         'wazuh.updates.disabled',
       ));
+
       if (this.isUpdatesEnabled) {
         this.getApisAvailableUpdates();
       }
@@ -370,13 +371,9 @@ export const ApiTable = compose(withErrorBoundary)(
       const isLoading =
         this.state.refreshingEntries || this.state.refreshingAvailableUpdates;
 
+      const versionData = this.state.availableUpdates || {};
       const items = [
         ...this.state.apiEntries?.map(apiEntry => {
-          const versionData =
-            this.state.availableUpdates?.apis_available_updates?.find(
-              apiAvailableUpdates => apiAvailableUpdates.api_id === apiEntry.id,
-            ) || {};
-
           return {
             ...versionData,
             ...apiEntry,
@@ -645,7 +642,7 @@ export const ApiTable = compose(withErrorBoundary)(
                       tooltip={{ content: 'View available updates' }}
                       flyoutTitle={'Available updates'}
                       flyoutBody={() => {
-                        return <AvailableUpdatesFlyout api={api} />;
+                        return <AvailableUpdatesFlyout updates={versionData} />;
                       }}
                       buttonProps={{
                         buttonType: 'icon',
@@ -754,7 +751,8 @@ export const ApiTable = compose(withErrorBoundary)(
                         <EuiToolTip
                           title='Last dashboard check'
                           content={
-                            this.state.availableUpdates?.last_check_date
+                            this.state.availableUpdates
+                              ?.last_check_date_dashboard
                               ? getWazuhCorePlugin().utils.formatUIDate(
                                   this.state.availableUpdates.last_check_date,
                                 )

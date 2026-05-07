@@ -10,7 +10,6 @@ export const getUpdatesRoute = (router: IRouter) => {
       validate: {
         query: schema.object({
           query_api: schema.maybe(schema.string()),
-          force_query: schema.maybe(schema.string()),
         }),
       },
     },
@@ -18,7 +17,7 @@ export const getUpdatesRoute = (router: IRouter) => {
       try {
         const updates = await getUpdates(
           request.query?.query_api === 'true',
-          request.query?.force_query === 'true',
+          context.core.opensearch.client,
         );
         return response.ok({
           body: updates,
