@@ -26,6 +26,9 @@ import { getToasts } from '../../kibana-services';
 import { GenericRequest } from '../../react-services';
 import { EngineSwitch } from './engine-switch';
 import type { Engine, IndexerSettings } from './types';
+import { getErrorOrchestrator } from '../../react-services/common-services';
+import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../common/constants';
 
 export const WzIndexerSettings: React.FC = () => {
   const [savedSettings, setSavedSettings] = useState<IndexerSettings | null>(
@@ -38,6 +41,7 @@ export const WzIndexerSettings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [bottomBarHost, setBottomBarHost] = useState<HTMLElement | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useLayoutEffect(() => {
     setBottomBarHost(document.getElementById('app-wrapper') ?? document.body);
@@ -123,6 +127,34 @@ export const WzIndexerSettings: React.FC = () => {
     }
   };
 
+  const handleUpdateClick = async () => {
+    setIsLoading(true);
+
+    try {
+      await GenericRequest.request('POST', '/api/cti-feeds/update');
+      getToasts().add({
+        color: 'success',
+        title: 'CTI update requested',
+        text: 'The update has been requested successfully',
+        toastLifeTimeMs: 5000,
+      });
+    } catch (error) {
+      const options = {
+        context: `${WzIndexerSettings.name}.handleUpdateClick`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: 'Error updating CTI feeds',
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const bottomBar = hasUnsavedChanges ? (
     <EuiBottomBar data-test-subj='indexerSettings-bottomBar' position='sticky'>
       <EuiFlexGroup
@@ -202,29 +234,72 @@ export const WzIndexerSettings: React.FC = () => {
               </EuiButton>
             </EuiCallOut>
           ) : draftSettings ? (
-            <EuiPanel paddingSize='none' hasBorder={false} hasShadow={false}>
-              <EuiDescribedFormGroup
-                fullWidth
-                id='indexer-settings-enable-raw-events-group'
-                title={<span>Enable raw events</span>}
-                description={
-                  <div>
-                    Enables indexing of raw events into the{' '}
-                    <strong>wazuh-events-raw-v5</strong> indices.
-                  </div>
-                }
-                descriptionFlexItemProps={{ style: { alignSelf: 'center' } }}
-                fieldFlexItemProps={{ style: { alignSelf: 'center' } }}
-              >
-                <EngineSwitch
-                  field='index_raw_events'
-                  ariaLabel='Enable raw events'
-                  engine={draftSettings.engine}
-                  updateEngine={updateEngine}
-                  saving={saving}
-                />
-              </EuiDescribedFormGroup>
-            </EuiPanel>
+            <EuiFlexGroup direction='column'>
+              <EuiFlexItem>
+                <EuiPanel
+                  paddingSize='none'
+                  hasBorder={false}
+                  hasShadow={false}
+                >
+                  <EuiDescribedFormGroup
+                    fullWidth
+                    id='indexer-settings-enable-raw-events-group'
+                    title={<span>Enable raw events</span>}
+                    description={
+                      <div>
+                        Enables indexing of raw events into the{' '}
+                        <strong>wazuh-events-raw-v5</strong> indices.
+                      </div>
+                    }
+                    descriptionFlexItemProps={{
+                      style: { alignSelf: 'center' },
+                    }}
+                    fieldFlexItemProps={{ style: { alignSelf: 'center' } }}
+                  >
+                    <EngineSwitch
+                      field='index_raw_events'
+                      ariaLabel='Enable raw events'
+                      engine={draftSettings.engine}
+                      updateEngine={updateEngine}
+                      saving={saving}
+                    />
+                  </EuiDescribedFormGroup>
+                </EuiPanel>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiPanel
+                  paddingSize='none'
+                  hasBorder={false}
+                  hasShadow={false}
+                >
+                  <EuiDescribedFormGroup
+                    fullWidth
+                    id='indexer-settings-enable-raw-events-group'
+                    title={<span>Update CTI content feeds</span>}
+                    description={
+                      <div>
+                        Triggers an update of threat intelligence content from{' '}
+                        <strong>subscribed CTI</strong> feeds.
+                      </div>
+                    }
+                    descriptionFlexItemProps={{
+                      style: { alignSelf: 'center' },
+                    }}
+                    fieldFlexItemProps={{ style: { alignSelf: 'center' } }}
+                  >
+                    <EuiButton
+                      size='s'
+                      isLoading={isLoading}
+                      onClick={handleUpdateClick}
+                      iconType='refresh'
+                      style={{ width: 'fit-content' }}
+                    >
+                      Update CTI content
+                    </EuiButton>
+                  </EuiDescribedFormGroup>
+                </EuiPanel>
+              </EuiFlexItem>
+            </EuiFlexGroup>
           ) : null}
         </EuiPanel>
         {bottomBar && bottomBarHost
