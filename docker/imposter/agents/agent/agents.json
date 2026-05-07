@@ -4,12 +4,18 @@
       {
         "os": {
           "arch": "x86_64",
-          "major": "9",
+          "major": "12",
+          "minor": "0",
           "name": "Debian GNU/Linux",
           "platform": "debian",
-          "uname": "Linux |ip-10-0-1-106 |4.9.0-9-amd64 |#1 SMP Debian 4.9.168-1+deb9u2 (2019-05-13) |x86_64",
-          "version": "9"
+          "type": "linux",
+          "version": "12 (bookworm)"
         },
+        "group_config_status": "not synced",
+        "dateAdd": "2026-05-07T16:00:34+00:00",
+        "id": "001",
+        "mergedSum": "ca35f9148a3273413eccb79f149f4757",
+        "version": "v5.0.0",
         "group": [
           "default",
           "test",
@@ -21,18 +27,13 @@
           "test7",
           "test8"
         ],
-        "ip": "FE80:1234:2223:A000:2202:B3FF:FE1E:8329",
-        "id": "001",
-        "registerIP": "FE80:1234:2223:A000:2202:B3FF:FE1E:8329",
-        "dateAdd": "2022-08-25T16:17:46Z",
-        "name": "Debian agent",
         "status": "active",
-        "manager": "wazuh-manager-master-0",
-        "node_name": "master",
+        "name": "Debian agent",
+        "status_code": 0,
+        "ip": "FE80:1234:2223:A000:2202:B3FF:FE1E:8329",
         "lastKeepAlive": "9999-12-31T23:59:59Z",
-        "version": "Wazuh v4.5.0",
-        "group_config_status": "not synced",
-        "status_code": 0
+        "node_name": "node01",
+        "registerIP": "any"
       },
       {
         "os": {
@@ -40,6 +41,7 @@
           "major": "2",
           "name": "Amazon Linux",
           "platform": "amzn",
+          "type": "linux",
           "uname": "Linux |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
           "version": "2"
         },
@@ -64,48 +66,46 @@
           "minor": "0",
           "name": "Microsoft Windows 10 Home Single Language",
           "platform": "windows",
-          "uname": "Microsoft Windows 10 Home Single Language",
+          "type": "windows",
           "version": "10.0.19045"
         },
-        "disconnection_time": "2023-03-14T04:37:42Z",
-        "manager": "test.com",
+        "group_config_status": "not synced",
+        "dateAdd": "2026-05-07T16:00:50+00:00",
+        "id": "003",
+        "mergedSum": "e669d89eba52f6897060fc65a45300ac",
+        "version": "v5.0.0",
+        "group": ["default", "test"],
         "status": "active",
         "name": "Windows-agent",
-        "dateAdd": "1970-01-01T00:00:00Z",
-        "group": ["default", "test"],
-        "lastKeepAlive": "2023-03-14T04:20:51Z",
-        "node_name": "node01",
-        "registerIP": "any",
-        "id": "003",
-        "version": "Wazuh v4.3.10",
+        "status_code": 1,
         "ip": "111.111.1.111",
-        "mergedSum": "e669d89eba52f6897060fc65a45300ac",
-        "configSum": "97fccbb67e250b7c80aadc8d0dc59abe",
-        "group_config_status": "not synced",
-        "status_code": 1
+        "lastKeepAlive": "2026-05-07T16:39:10+00:00",
+        "node_name": "node01",
+        "registerIP": "any"
       },
       {
         "os": {
           "arch": "x86_64",
-          "major": "2",
-          "name": "macOS High Sierra",
+          "major": "15",
+          "minor": "4",
+          "name": "macOS Sequoia",
           "platform": "darwin",
-          "uname": "macOS High Sierra |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
-          "version": "2"
+          "type": "macos",
+          "version": "15.4"
         },
-        "ip": "127.0.0.1",
-        "id": "004",
-        "group": ["default"],
-        "registerIP": "127.0.0.1",
-        "dateAdd": "2022-08-25T16:17:46Z",
-        "name": "macOS High Sierra agent",
-        "status": "active",
-        "manager": "wazuh-manager-master-0",
-        "node_name": "master",
-        "lastKeepAlive": "9999-12-31T23:59:59Z",
-        "version": "Wazuh v4.5.0",
         "group_config_status": "synced",
-        "status_code": 3
+        "dateAdd": "2026-05-07T16:01:10+00:00",
+        "id": "004",
+        "mergedSum": "ca35f9148a3273413eccb79f149f4758",
+        "version": "v5.0.0",
+        "group": ["default"],
+        "status": "active",
+        "name": "macOS Sequoia agent",
+        "status_code": 3,
+        "ip": "127.0.0.1",
+        "lastKeepAlive": "9999-12-31T23:59:59Z",
+        "node_name": "node01",
+        "registerIP": "any"
       },
       {
         "os": {
@@ -113,6 +113,7 @@
           "major": "2",
           "name": "macOS High Sierra",
           "platform": "darwin",
+          "type": "macos",
           "uname": "macOS High Sierra |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
           "version": "2"
         },
@@ -138,6 +139,7 @@
         "registerIP": "any",
         "id": "006",
         "ip": "any",
+        "os": { "type": "linux" },
         "group_config_status": "not synced",
         "status_code": 5
       },
@@ -149,6 +151,7 @@
         "registerIP": "any",
         "id": "007",
         "ip": "any",
+        "os": { "type": "linux" },
         "group_config_status": "not synced",
         "status_code": 5
       },
@@ -158,6 +161,7 @@
           "major": "2",
           "name": "macOS High Sierra",
           "platform": "darwin",
+          "type": "macos",
           "uname": "macOS High Sierra |wazuh-manager-master-0 |4.14.114-105.126.amzn2.x86_64 |#1 SMP Tue May 7 02:26:40 UTC 2019 |x86_64",
           "version": "2"
         },
@@ -182,6 +186,7 @@
           "minor": "0",
           "name": "Microsoft Windows 10 Home Single Language",
           "platform": "windows",
+          "type": "windows",
           "uname": "Microsoft Windows 10 Home Single Language",
           "version": "10.0.19045"
         },
