@@ -156,6 +156,31 @@ describe.skip('Wazuh API', () => {
         });
     });
 
+    test('[200] Get agents when body.id differs from wz-api cookie (session id wins)', () => {
+      const options = buildAxiosOptions(
+        'post',
+        '/api/request',
+        {
+          id: 'stale-body-id',
+          method: 'GET',
+          path: '/agents',
+          body: {},
+        },
+        {
+          cookie: `wz-token=${userToken}; wz-api=default;`,
+        },
+      );
+      return axios(options)
+        .then(response => {
+          expect(response.status).toBe(200);
+          expect(typeof response.data.data).toBe('object');
+          expect(Array.isArray(response.data.data.affected_items)).toBe(true);
+        })
+        .catch(error => {
+          throw error;
+        });
+    });
+
     test('[200] Get agents with a not working user token', () => {
       const options = buildAxiosOptions(
         'post',

@@ -1,12 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`WzMenu tests should render a WzMenu 1`] = `
-<WzMenu
-  windowSize={
-    Object {
-      "height": 768,
-      "width": 1024,
-    }
-  }
-/>
+<Fragment>
+  <MountPointPortal
+    setMountPoint={[Function]}
+  >
+    <EuiFlexGroup
+      alignItems="center"
+      className="wz-margin-left-10 wz-margin-right-10 font-size-14"
+      responsive={false}
+    >
+      <EuiFlexItem
+        grow={false}
+      >
+        <ServerAPISelector
+          showSelectorsInPopover={false}
+        />
+      </EuiFlexItem>
+    </EuiFlexGroup>
+  </MountPointPortal>
+</Fragment>
 `;

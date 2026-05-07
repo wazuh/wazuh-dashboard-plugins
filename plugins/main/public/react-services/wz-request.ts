@@ -34,9 +34,11 @@ const displayAPINotAvailableToast = throttle(({ title, text }) => {
     text,
   });
 }, 500);
+
 export class WzRequest {
   static wazuhConfig: any;
   static serverAPIAvailable$ = new BehaviorSubject(true);
+  static recoveringPrimaryApi: Promise<boolean> | null = null;
   static serverAPIAvailableChanged$ = this.serverAPIAvailable$.pipe(
     distinctUntilChanged(),
   );
@@ -63,13 +65,12 @@ export class WzRequest {
       ({ name, status }) =>
         name === 'server-api:connection-compatibility' && status === 'finished',
     );
-    if (check) {
-      const availableApiID = check?.data?.find(
-        ({ connection, compatibility }) => connection && compatibility,
-      )?.id;
+    if (check?.data?.[0]) {
+      const first = check.data[0];
+      const availableApiID =
+        first.connection && first.compatibility ? first.id : null;
 
       if (availableApiID) {
-        // WARNING: the checkStored API can return information about another API host that is available
         const response = await ApiCheck.checkStored(availableApiID);
         if (response?.data?.data?.cluster_info) {
           // WORKAROUND: this sets the API according to the return taking into account the warning
@@ -90,25 +91,24 @@ export class WzRequest {
   static async setupAPITryHosts() {
     try {
       const hosts = await getCore().http.get('/hosts/apis');
-
-      for (var i = 0; i < hosts.length; i++) {
-        try {
-          // WARNING: the checkStored API can return information about another API host that is available
-          const response = await ApiCheck.checkStored(hosts[i].id);
-          if (response?.data?.data?.cluster_info) {
-            // WORKAROUND: this sets the API according to the return taking into account the warning
-            const apiID = response?.data?.idChanged || hosts[i].id;
-            AppState.setClusterInfo(response?.data?.data?.cluster_info);
-            AppState.setCurrentAPI(
-              JSON.stringify({
-                name: response?.data?.data?.cluster_info?.cluster,
-                id: apiID,
-              }),
-            );
-            return true;
-          }
-        } catch {}
+      if (!hosts?.length) {
+        return;
       }
+      const host = hosts[0];
+      try {
+        const response = await ApiCheck.checkStored(host.id);
+        if (response?.data?.data?.cluster_info) {
+          const apiID = response?.data?.idChanged || host.id;
+          AppState.setClusterInfo(response?.data?.data?.cluster_info);
+          AppState.setCurrentAPI(
+            JSON.stringify({
+              name: response?.data?.data?.cluster_info?.cluster,
+              id: apiID,
+            }),
+          );
+          return true;
+        }
+      } catch {}
     } catch {}
   }
 
@@ -134,6 +134,68 @@ export class WzRequest {
       text: 'No API host available to connect, this requires the connection and compatibility are ok. Ensure at least one of them fullfil these conditions. Run the health check to update the check status and refresh the page.',
       toastLifeTimeMs: 120000,
     });
+  }
+
+  private static async runPrimaryApiRecovery(): Promise<boolean> {
+    try {
+      const hosts = await getCore().http.get('/hosts/apis');
+      const host = hosts?.[0];
+      if (!host?.id) {
+        return false;
+      }
+
+      const response = await ApiCheck.checkApi(host, true);
+      const clusterInfo = response?.data || {};
+      if (!clusterInfo || !clusterInfo.cluster) {
+        return false;
+      }
+
+      AppState.setClusterInfo(clusterInfo);
+      AppState.setCurrentAPI(
+        JSON.stringify({
+          name: clusterInfo.cluster,
+          id: host.id,
+        }),
+      );
+
+      this.serverAPIAvailable$.next(true);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  static async recoverPrimaryAPI() {
+    if (this.recoveringPrimaryApi) {
+      return this.recoveringPrimaryApi;
+    }
+
+    this.recoveringPrimaryApi = this.runPrimaryApiRecovery().finally(() => {
+      this.recoveringPrimaryApi = null;
+    });
+
+    return this.recoveringPrimaryApi;
+  }
+
+  static syncApiRequestPayloadWithSession(path: any, payload: any) {
+    if (path !== '/api/request' || !payload || typeof payload !== 'object') {
+      return payload;
+    }
+    if (payload?.body?.devTools === true) return payload;
+
+    const currentApiId = JSON.parse(AppState.getCurrentAPI() || '{}').id;
+    if (!currentApiId) return payload;
+
+    return {
+      ...payload,
+      id: currentApiId,
+      body:
+        payload.body &&
+        typeof payload.body === 'object' &&
+        'idHost' in payload.body
+          ? { ...payload.body, idHost: currentApiId }
+          : payload.body,
+    };
   }
 
   /**
@@ -201,13 +263,52 @@ export class WzRequest {
         const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
         if (currentApi && currentApi.id) {
           try {
-            await ApiCheck.checkStored(currentApi.id);
+            const checkStoredResponse = await ApiCheck.checkStored(
+              currentApi.id,
+            );
+            const nextApiID = checkStoredResponse?.data?.idChanged;
+            const clusterInfo = checkStoredResponse?.data?.data?.cluster_info;
+
+            if (nextApiID && nextApiID !== currentApi.id && clusterInfo) {
+              AppState.setClusterInfo(clusterInfo);
+              AppState.setCurrentAPI(
+                JSON.stringify({
+                  name: clusterInfo.cluster,
+                  id: nextApiID,
+                }),
+              );
+
+              return this.genericReq(
+                method,
+                path,
+                this.syncApiRequestPayloadWithSession(path, payload),
+                {
+                  shouldRetry,
+                  checkCurrentApiIsUp: false,
+                  overwriteHeaders,
+                },
+              );
+            }
           } catch (error) {
+            const recovered = await this.recoverPrimaryAPI();
+            if (recovered) {
+              return this.genericReq(
+                method,
+                path,
+                this.syncApiRequestPayloadWithSession(path, payload),
+                {
+                  shouldRetry,
+                  checkCurrentApiIsUp: false,
+                  overwriteHeaders,
+                },
+              );
+            }
+
             const wzMisc = new WzMisc();
             wzMisc.setApiIsDown(true);
             this.serverAPIAvailable$.next(false);
             const title = `API with ID [${currentApi.id}] is not available.`;
-            const text = `This could indicate a problem in the network of the server API, review or change the API host in the API host selector if configurated other hosts. Cause: ${error.message}`;
+            const text = `This could indicate a problem reaching the configured Manager API. Cause: ${error.message}`;
 
             displayAPINotAvailableToast({ title, text });
 
@@ -228,7 +329,12 @@ export class WzRequest {
       ) {
         try {
           await WzAuthentication.refresh(true);
-          return this.genericReq(method, path, payload, { shouldRetry: false });
+          return this.genericReq(
+            method,
+            path,
+            this.syncApiRequestPayloadWithSession(path, payload),
+            { shouldRetry: false },
+          );
         } catch (error) {
           return ((error || {}).data || {}).message || false
             ? Promise.reject(

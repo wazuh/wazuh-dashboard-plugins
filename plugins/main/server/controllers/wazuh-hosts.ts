@@ -36,8 +36,9 @@ export class WazuhHostsCtrl {
       const result = await context.wazuh_core.manageHosts.getEntries({
         excludePassword: true,
       });
+      const primaryOnly = result.length > 0 ? [result[0]] : [];
       return response.ok({
-        body: result,
+        body: primaryOnly,
       });
     } catch (error) {
       context.wazuh.logger.error(error.message || error);
