@@ -1,153 +1,97 @@
+import { IScopedClusterClient } from 'opensearch-dashboards/server';
 import {
   API_UPDATES_STATUS,
   AvailableUpdates,
-  ResponseApiAvailableUpdates,
+  ResponseIndexerAvailableUpdates,
+  Update,
 } from '../../../common/types';
 import { SAVED_OBJECT_UPDATES } from '../../../common/constants';
 import { getSavedObject, setSavedObject } from '../saved-object';
-import {
-  getWazuhCheckUpdatesServices,
-  getWazuhCore,
-} from '../../plugin-services';
-import { IAPIHost } from '../../../../wazuh-core/server/services';
+import { getWazuhCheckUpdatesServices } from '../../plugin-services';
+
+const CONTENT_MANAGER_VERSION_CHECK_PATH =
+  '/_plugins/_content_manager/version/check';
+
+const getStatus = ({
+  last_available_major,
+  last_available_minor,
+  last_available_patch,
+}: ResponseIndexerAvailableUpdates): API_UPDATES_STATUS =>
+  last_available_major?.tag ||
+  last_available_minor?.tag ||
+  last_available_patch?.tag
+    ? API_UPDATES_STATUS.AVAILABLE_UPDATES
+    : API_UPDATES_STATUS.UP_TO_DATE;
+
+const presentUpdate = (update?: Update): Update | undefined =>
+  update?.tag ? update : undefined;
+
+const saveAndReturn = async (
+  result: AvailableUpdates,
+): Promise<AvailableUpdates> => {
+  await setSavedObject(SAVED_OBJECT_UPDATES, result);
+  return result;
+};
 
 export const getUpdates = async (
   queryApi = false,
-  forceQuery = false,
+  opensearchClient?: IScopedClusterClient,
 ): Promise<AvailableUpdates> => {
   const { logger } = getWazuhCheckUpdatesServices();
 
-  try {
-    if (!queryApi) {
-      const availableUpdates = (await getSavedObject(
-        SAVED_OBJECT_UPDATES,
-      )) as AvailableUpdates;
+  if (!queryApi) {
+    return (await getSavedObject(SAVED_OBJECT_UPDATES)) as AvailableUpdates;
+  }
 
-      return availableUpdates;
+  if (!opensearchClient) {
+    return Promise.reject(
+      new Error('OpenSearch client is required to query updates'),
+    );
+  }
+
+  try {
+    const response = await opensearchClient.asCurrentUser.transport.request({
+      method: 'GET',
+      path: CONTENT_MANAGER_VERSION_CHECK_PATH,
+    });
+
+    const { message, status } = response.body as {
+      message: ResponseIndexerAvailableUpdates | string;
+      status: number;
+    };
+
+    if (status !== 200 || typeof message === 'string') {
+      return saveAndReturn({
+        last_check_date_dashboard: new Date(),
+        status: API_UPDATES_STATUS.ERROR,
+        error: {
+          detail: typeof message === 'string' ? message : 'Unknown error',
+        },
+      });
     }
 
-    const getStatus = ({
-      update_check,
-      last_available_major,
-      last_available_minor,
-      last_available_patch,
-    }: ResponseApiAvailableUpdates) => {
-      if (update_check === false) {
-        return API_UPDATES_STATUS.DISABLED;
-      }
-
-      if (
-        last_available_major?.tag ||
-        last_available_minor?.tag ||
-        last_available_patch?.tag
-      ) {
-        return API_UPDATES_STATUS.AVAILABLE_UPDATES;
-      }
-
-      return API_UPDATES_STATUS.UP_TO_DATE;
-    };
-
-    const { manageHosts, api: wazuhApiClient } = getWazuhCore();
-
-    const hosts = (await manageHosts.get()) as IAPIHost[];
-
-    const apisAvailableUpdates = await Promise.all(
-      hosts?.map(async api => {
-        const data = {};
-        const method = 'GET';
-        const path = `/cluster/version/check?force_query=${forceQuery}`;
-        const options = {
-          apiHostID: api.id,
-          forceRefresh: true,
-        };
-        let currentVersion: string | undefined = undefined;
-        let availableUpdates: ResponseApiAvailableUpdates = {};
-
-        try {
-          const {
-            data: {
-              data: { api_version },
-            },
-          } = await wazuhApiClient.client.asInternalUser.request(
-            'GET',
-            '/',
-            {},
-            options,
-          );
-          if (api_version !== undefined) {
-            currentVersion = `v${api_version}`;
-          }
-        } catch {
-          logger.debug('[ERROR]: Cannot get the API version');
-        }
-
-        try {
-          const response = await wazuhApiClient.client.asInternalUser.request(
-            method,
-            path,
-            data,
-            options,
-          );
-
-          availableUpdates = response.data.data as ResponseApiAvailableUpdates;
-
-          const {
-            update_check,
-            last_available_major,
-            last_available_minor,
-            last_available_patch,
-            last_check_date,
-          } = availableUpdates;
-
-          // If for some reason, the previous request fails
-          if (currentVersion === undefined) {
-            currentVersion = availableUpdates.current_version;
-          }
-
-          return {
-            current_version: currentVersion,
-            update_check,
-            last_available_major,
-            last_available_minor,
-            last_available_patch,
-            last_check_date: last_check_date || undefined,
-            api_id: api.id,
-            status: getStatus(availableUpdates),
-          };
-        } catch (error: any) {
-          logger.debug('[ERROR]: Cannot get the API status');
-          const errorResponse = {
-            title: error.response?.data?.title ?? error.message,
-            detail: error.response?.data?.detail ?? error.message,
-          };
-
-          return {
-            api_id: api.id,
-            status: API_UPDATES_STATUS.ERROR,
-            current_version: currentVersion,
-            error: errorResponse,
-          };
-        }
-      }),
+    return saveAndReturn({
+      uuid: message.uuid,
+      current_version: message.current_version,
+      last_available_major: presentUpdate(message.last_available_major),
+      last_available_minor: presentUpdate(message.last_available_minor),
+      last_available_patch: presentUpdate(message.last_available_patch),
+      last_check_date: message.last_check_date,
+      last_check_date_dashboard: new Date(),
+      status: getStatus(message),
+    });
+  } catch (error: any) {
+    logger.error(
+      `[ERROR]: Cannot get available updates from indexer. Message: ${
+        error.message
+      }. Status: ${error.meta?.statusCode}. Body: ${JSON.stringify(
+        error.meta?.body,
+      )}`,
     );
-
-    const savedObject = {
-      apis_available_updates: apisAvailableUpdates,
-      last_check_date: new Date(),
-    };
-
-    await setSavedObject(SAVED_OBJECT_UPDATES, savedObject);
-
-    return savedObject;
-  } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : typeof error === 'string'
-        ? error
-        : 'Error trying to get available updates';
-
-    logger.error(message);
-    return Promise.reject(error);
+    return saveAndReturn({
+      last_check_date_dashboard: new Date(),
+      status: API_UPDATES_STATUS.ERROR,
+      error: { title: error.message, detail: error.message },
+    });
   }
 };
