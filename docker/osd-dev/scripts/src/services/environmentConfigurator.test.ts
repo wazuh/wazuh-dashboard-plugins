@@ -7,7 +7,7 @@ import {
   configureModeAndSecurity,
 } from './environmentConfigurator';
 import type { EnvironmentPaths, ScriptConfig } from '../types/config';
-import { PathAccessError, ValidationError } from '../errors';
+import { ValidationError } from '../errors';
 
 describe('services/environmentConfigurator', () => {
   let tmpdir = '';
@@ -77,7 +77,6 @@ describe('services/environmentConfigurator', () => {
     expect(process.env.OSD_MAJOR_NUMBER).toBe('2');
     expect(process.env.COMPOSE_PROJECT_NAME).toBe('os-dev-291');
     expect(process.env.WAZUH_VERSION_DEVELOPMENT).toBe('4.12.0');
-    expect(process.env.OSD_MAJOR).toBe('2.x');
   });
 
   describe('configureModeAndSecurity', () => {
@@ -100,10 +99,9 @@ describe('services/environmentConfigurator', () => {
     };
 
     it('returns standard profile by default and sets security paths', () => {
-      process.env.OSD_MAJOR = '2.x';
       const profile = configureModeAndSecurity({ ...baseCfg });
       expect(profile).toBe('standard');
-      expect(process.env.WAZUH_DASHBOARD_CONF).toContain('/config/2.x/osd/');
+      expect(process.env.WAZUH_DASHBOARD_CONF).toContain('/config/osd/');
       expect(process.env.SEC_CONFIG_PATH).toContain(
         '/usr/share/wazuh-indexer/config',
       );

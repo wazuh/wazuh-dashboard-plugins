@@ -95,7 +95,6 @@ export function generateOverrideFile(
   }
 
   if (useIndexerFromPackage) {
-    // TODO: review if it is possible removing the merged volumes that are not used
     content += `
   wazuh.indexer:
     depends_on:
@@ -127,7 +126,6 @@ export function generateOverrideFile(
         hard: 65536
     volumes:
       - wi_certs:/etc/wazuh-indexer/certs/
-      - ./config/\${OSD_MAJOR}/os/opensearch.yml:/etc/wazuh-indexer/opensearch.yml
       - os_logs:/var/log/wazuh-indexer
       - os_data:/var/lib/wazuh-indexer
     ports:

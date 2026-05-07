@@ -61,7 +61,7 @@ services:
       - wd_certs:/certs/wd
       - wm_certs:/certs/wm
       - idp_certs:/certs/idp
-      - ./config/${OSD_MAJOR}/certs:/conf
+      - ./config/certs:/conf
       - os_logs:/logs
       - os_data:/data
     # Included to avoid docker from creating duplicated networks

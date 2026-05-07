@@ -6,6 +6,7 @@ INDEXER_HOME=/usr/share/wazuh-indexer
 chown -R wazuh-indexer:wazuh-indexer /etc/wazuh-indexer
 chown -R wazuh-indexer:wazuh-indexer /etc/wazuh-indexer/certs
 chown -R wazuh-indexer:wazuh-indexer /var/lib/wazuh-indexer
+chown -R wazuh-indexer:wazuh-indexer /var/log/wazuh-indexer
 
 if [ -x "$INDEXER_HOME/engine/run_engine.sh" ]; then
   nohup "$INDEXER_HOME/engine/run_engine.sh" > /dev/null 2>&1 &

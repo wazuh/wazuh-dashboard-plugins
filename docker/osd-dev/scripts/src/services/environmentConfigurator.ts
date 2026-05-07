@@ -2,10 +2,7 @@ import { existsSync, readFileSync } from 'fs';
 import {
   DEFAULTS,
   PROFILES,
-  OSD_MAJOR_2X,
-  OSD_MAJOR_1X,
-  SECURITY_CONFIG_PATHS,
-  FLAGS,
+  SECURITY_CONFIG_PATH,
 } from '../constants/app';
 import { EnvironmentPaths, ScriptConfig } from '../types/config';
 import { ValidationError } from '../errors';
@@ -40,31 +37,24 @@ export function setVersionDerivedEnvironment(
     );
     process.env.WAZUH_VERSION_DEVELOPMENT = packageJson.version;
   }
-
-  // Always target OSD 2.x for development scripts.
-  process.env.OSD_MAJOR = OSD_MAJOR_2X;
 }
 
 export function configureModeAndSecurity(config: ScriptConfig): string {
-  // Defaults for standard mode
   let primaryProfile = PROFILES.STANDARD;
 
-  // Fixed to OSD 2.x configuration
-  const osdMajor = OSD_MAJOR_2X;
-  process.env.WAZUH_DASHBOARD_CONF = `./config/${osdMajor}/osd/opensearch_dashboards.yml`;
-  process.env.SEC_CONFIG_FILE = `./config/${osdMajor}/os/config.yml`;
-  process.env.SEC_CONFIG_PATH = SECURITY_CONFIG_PATHS[OSD_MAJOR_2X];
+  process.env.WAZUH_DASHBOARD_CONF = './config/osd/opensearch_dashboards.yml';
+  process.env.SEC_CONFIG_FILE = './config/os/config.yml';
+  process.env.SEC_CONFIG_PATH = SECURITY_CONFIG_PATH;
 
   const enableSaml =
     Boolean(config.enableSaml) || config.mode === PROFILES.SAML;
 
   if (enableSaml) {
-    // Assume environment/network is preconfigured for SAML.
-    process.env.WAZUH_DASHBOARD_CONF = `./config/${osdMajor}/osd/opensearch_dashboards_saml.yml`;
-    process.env.SEC_CONFIG_FILE = `./config/${osdMajor}/os/config-saml.yml`;
+    process.env.WAZUH_DASHBOARD_CONF =
+      './config/osd/opensearch_dashboards_saml.yml';
+    process.env.SEC_CONFIG_FILE = './config/os/config-saml.yml';
   }
 
-  // Determine primary profile based on explicit server/server-local first (flags take precedence via parser)
   // Reject direct server-local-* composite modes; users must set -a together with FLAGS.SERVER_LOCAL
   if (new RegExp(`^${PROFILES.SERVER_LOCAL}-`).test(config.mode)) {
     throw new ValidationError(msgUnsupportedModeToken());
