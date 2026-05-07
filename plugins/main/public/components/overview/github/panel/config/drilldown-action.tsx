@@ -18,7 +18,7 @@ import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/
 import {
   getVisStateTopActors,
   getVisStateRuleLevelEvolution,
-  getVisStateTopCountries,
+  getVisStateTopSourceIPs,
   getVisStateTopOrganizations,
   getVisStateTopRepositories,
 } from './visualizations';
@@ -88,7 +88,7 @@ const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'd3',
-        savedVis: getVisStateTopCountries(indexPatternId),
+        savedVis: getVisStateTopSourceIPs(indexPatternId),
       },
     },
     d4: {
