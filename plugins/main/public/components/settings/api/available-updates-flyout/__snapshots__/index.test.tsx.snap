@@ -14,24 +14,6 @@ exports[`AvailableUpdatesFlyout component should return the AvailableUpdatesFlyo
         <dt
           class="euiDescriptionList__title"
         >
-          API ID
-        </dt>
-        <dd
-          class="euiDescriptionList__description"
-        >
-          api id
-        </dd>
-      </dl>
-    </div>
-    <div
-      class="euiFlexItem euiFlexItem--flexGrowZero"
-    >
-      <dl
-        class="euiDescriptionList euiDescriptionList--row"
-      >
-        <dt
-          class="euiDescriptionList__title"
-        >
           Version
         </dt>
         <dd

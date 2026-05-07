@@ -8,11 +8,8 @@ export const userPreferencesObject: SavedObjectsType = {
   mappings: {
     properties: {
       last_dismissed_updates: {
-        type: 'nested',
+        type: 'object',
         properties: {
-          api_id: {
-            type: 'text',
-          },
           last_major: {
             type: 'text',
           },
