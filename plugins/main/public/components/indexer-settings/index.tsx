@@ -294,7 +294,7 @@ export const WzIndexerSettings: React.FC = () => {
                       iconType='refresh'
                       style={{ width: 'fit-content' }}
                     >
-                      Request CTI update
+                      Update CTI content
                     </EuiButton>
                   </EuiDescribedFormGroup>
                 </EuiPanel>
