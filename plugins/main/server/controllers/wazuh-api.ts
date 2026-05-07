@@ -1054,7 +1054,9 @@ export class WazuhApiCtrl {
     } catch (error) {
       context.wazuh.logger.error(error);
       return ErrorResponse(
-        `Could not update the content from subscribed CTI feeds due to ${error}`,
+        `Could not update the content from subscribed CTI feeds: ${
+          error.meta.body.message || error
+        }`,
         4005,
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response,
