@@ -16,7 +16,7 @@ import {
   OpenSearchDashboardsResponseFactory,
 } from 'src/core/server';
 import { ErrorResponse } from '../lib/error-response';
-import { detectCCS } from '../lib/ccs-detector';
+import { detectCCS, invalidateCCSCache } from '../lib/ccs-detector';
 
 export class WazuhHostsCtrl {
   constructor() {}
@@ -63,6 +63,7 @@ export class WazuhHostsCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
+      invalidateCCSCache();
       const isCCS = await detectCCS(context);
       return response.ok({ body: { isCCS } });
     } catch (error) {

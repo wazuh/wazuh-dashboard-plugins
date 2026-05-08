@@ -44,6 +44,18 @@ import { useEffect } from 'react';
 import { updateIsCCS } from '../../redux/actions/appStateActions';
 import { WzAuthentication } from '../../react-services/wz-authentication';
 
+const CCSStatusSync = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    GenericRequest.request('GET', '/hosts/ccs/status', {})
+      .then(response => dispatch(updateIsCCS(response?.data?.isCCS ?? false)))
+      .catch(() => {});
+  }, []);
+
+  return null;
+};
+
 async function getServerAPIList() {
   const response = await GenericRequest.request('GET', '/hosts/apis', {});
   return response?.data;
@@ -277,6 +289,7 @@ export const WzMenu = withWindowSize(
 
       return (
         <>
+          <CCSStatusSync />
           <MountPointPortal setMountPoint={getHeaderActionMenuMounter()}>
             <EuiFlexGroup
               alignItems='center'
