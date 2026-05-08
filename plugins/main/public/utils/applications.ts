@@ -643,7 +643,7 @@ export const serverApis = {
     defaultMessage: 'Server API',
   }),
   description: i18n.translate('wz-app-server-apis-description', {
-    defaultMessage: 'View the primary Manager API connection.',
+    defaultMessage: 'View and manage the server API connection.',
   }),
   euiIconType: 'indexRollupApp',
   order: 10003,
