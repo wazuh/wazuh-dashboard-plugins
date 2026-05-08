@@ -3,6 +3,21 @@
 The Wazuh dashboard provides a **Deploy new agent** wizard, but you can also
 use one-line commands on Linux endpoints by passing deployment variables.
 
+## Generate the one-liner from the dashboard UI
+
+Use these steps when the deployment command must be obtained through the
+interface, for example in end-to-end testing scenarios.
+
+1. Open the Wazuh dashboard and go to **Agents management** > **Summary**.
+2. Select **Deploy new agent** at the top of the agents table.
+3. Select the package to download and install on your system. For example, `Linux` > `DEB amd64`
+4. In **Server address**, set the manager address that the agent will use.
+5. **Optional settings:**
+   - In **Agent name**, set the name of the agent.
+   - In **Agent group**, select an existing group (for example, `default`).
+6. Copy the generated command from the wizard and run it on the machine where the agent will be installed.
+7. Enable and start the Wazuh agent service. See the next section for instructions.
+
 ## Example (APT)
 
 ```bash
