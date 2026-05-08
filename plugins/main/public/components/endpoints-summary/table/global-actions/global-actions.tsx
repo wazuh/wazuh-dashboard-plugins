@@ -17,9 +17,8 @@ export interface AgentsTableGlobalActionsProps {
   selectedAgents: Agent[];
   allAgentsSelected: boolean;
   allAgentsCount: number;
-  filters: any;
+  filters: unknown;
   allowEditGroups: boolean;
-  allowRemove: boolean;
   allowUpgrade: boolean;
   allowGetTasks: boolean;
   reloadAgents: () => void;
@@ -33,7 +32,6 @@ export const AgentsTableGlobalActions = ({
   allAgentsCount,
   filters,
   allowEditGroups,
-  allowRemove,
   allowUpgrade,
   allowGetTasks,
   reloadAgents,
@@ -199,34 +197,19 @@ export const AgentsTableGlobalActions = ({
           <EuiHorizontalRule margin='xs' />
           <EuiContextMenuItem
             icon='trash'
-            disabled={!totalAgents || !allowRemove}
+            disabled={!totalAgents}
             onClick={() => {
               closePopover();
               setIsRemoveAgentsModalVisible(true);
             }}
           >
-            {allowRemove && !totalAgents ? (
+            {!totalAgents ? (
               selectAgentsTooltip(actions.remove)
             ) : (
-              <WzElementPermissions
-                permissions={[
-                  [
-                    {
-                      action: 'agent:delete',
-                      resource: 'agent:id:*',
-                    },
-                    {
-                      action: 'agent:delete',
-                      resource: 'agent:group:*',
-                    },
-                  ],
-                ]}
-              >
-                <span>
-                  {actions.remove}
-                  {totalAgents ? ` (${totalAgents})` : ''}
-                </span>
-              </WzElementPermissions>
+              <span>
+                {actions.remove}
+                {totalAgents ? ` (${totalAgents})` : ''}
+              </span>
             )}
           </EuiContextMenuItem>
         </EuiContextMenuPanel>

@@ -31,8 +31,7 @@ export const agentsTableColumns = (
   {
     // TODO: consider moving the positional arguments to this to avoid bug related to position and allow to extend easily.
     setIsRemoveModalVisible,
-    allowRemove,
-  }: { setIsRemoveModalVisible: SetModalIsVisible; allowRemove: boolean },
+  }: { setIsRemoveModalVisible: SetModalIsVisible },
 ) => [
   {
     field: 'id',
@@ -170,7 +169,7 @@ export const agentsTableColumns = (
       setIsEditGroupsVisible,
       setIsUpgradeModalVisible,
       apiVersion,
-      { setIsRemoveModalVisible, allowRemove },
+      { setIsRemoveModalVisible },
     ),
   },
 ];

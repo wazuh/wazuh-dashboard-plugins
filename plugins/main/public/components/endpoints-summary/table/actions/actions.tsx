@@ -18,11 +18,10 @@ export const agentsTableActions = (
   {
     // TODO: consider moving the positional arguments to this to avoid bug related to position and allow to extend easily.
     setIsRemoveModalVisible,
-    allowRemove,
-  }: { setIsRemoveModalVisible: SetModalIsVisible; allowRemove: boolean },
+  }: { setIsRemoveModalVisible: SetModalIsVisible },
 ) => [
   {
-    name: agent => {
+    name: (agent: Agent) => {
       const name = 'View agent details';
 
       if (agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
@@ -40,14 +39,15 @@ export const agentsTableActions = (
     type: 'icon',
     isPrimary: true,
     color: 'primary',
-    enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
-    onClick: agent =>
+    enabled: (agent: Agent) =>
+      agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
+    onClick: (agent: Agent) =>
       NavigationService.getInstance().navigate(
         `/agents?tab=welcome&agent=${agent.id}`,
       ),
   },
   {
-    name: agent => {
+    name: (agent: Agent) => {
       const name = 'Agent configuration';
 
       if (agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
@@ -63,11 +63,12 @@ export const agentsTableActions = (
     description: 'Agent configuration',
     icon: 'wrench',
     type: 'icon',
-    onClick: agent =>
+    onClick: (agent: Agent) =>
       NavigationService.getInstance().navigate(
         `/agents?tab=configuration&agent=${agent.id}`,
       ),
-    enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
+    enabled: (agent: Agent) =>
+      agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
     'data-test-subj': 'action-configuration',
   },
   {
@@ -119,7 +120,7 @@ export const agentsTableActions = (
     description: 'Upgrade',
     icon: 'package',
     type: 'icon',
-    onClick: agent => {
+    onClick: (agent: Agent) => {
       setAgent(agent);
       setIsUpgradeModalVisible(true);
     },
@@ -134,29 +135,15 @@ export const agentsTableActions = (
     },
   },
   {
-    name: (agent: Agent) => {
-      return (
-        <WzElementPermissions
-          permissions={[
-            // FIXME: this should use the group permissions too adn the agent ID should be specific
-            { action: 'agent:delete', resource: `agent:id:*` },
-          ]}
-        >
-          <span>Remove</span>
-        </WzElementPermissions>
-      );
-    },
+    name: 'Remove',
     description: 'Remove',
     icon: 'trash',
     type: 'icon',
-    onClick: agent => {
+    onClick: (agent: Agent) => {
       setAgent(agent);
       setIsRemoveModalVisible(true);
     },
     'data-test-subj': 'action-remove',
-    enabled: (agent: Agent) => {
-      // FIXME: this should use the user permissions with agent:id and agent:group resources instead the generic allowRemove flag
-      return allowRemove;
-    },
+    enabled: () => true,
   },
 ];
