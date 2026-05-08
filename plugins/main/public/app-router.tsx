@@ -2,7 +2,12 @@ import React, { useEffect } from 'react';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import { ToolsRouter } from './components/tools/tools-router';
 import { getWazuhCorePlugin, getWzMainParams } from './kibana-services';
-import { updateCurrentPlatform } from './redux/actions/appStateActions';
+import {
+  updateCurrentPlatform,
+  updateIsCCS,
+} from './redux/actions/appStateActions';
+import store from './redux/store';
+import { GenericRequest } from './react-services/generic-request';
 import { useDispatch } from 'react-redux';
 import { checkPluginVersion } from './utils';
 import { WzAuthentication, loadAppConfig } from './react-services';
@@ -32,6 +37,12 @@ export const Application = withGuardAsync(
         WzRequest.setupAPI(),
         // Load the app state
         loadAppConfig(),
+        // Detect CCS before first render so the API selector shows immediately
+        GenericRequest.request('GET', '/hosts/ccs/status', {}).then(
+          (response: any) => {
+            store.dispatch(updateIsCCS(response?.data?.isCCS));
+          },
+        ),
       ]);
     } catch {}
 

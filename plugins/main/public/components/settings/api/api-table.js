@@ -36,6 +36,7 @@ import {
 import { AppState } from '../../../react-services/app-state';
 import { withErrorBoundary } from '../../common/hocs';
 import { compose } from 'redux';
+import { connect } from 'react-redux';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
@@ -44,14 +45,24 @@ import {
   getWazuhCorePlugin,
 } from '../../../kibana-services';
 import { AvailableUpdatesFlyout } from './available-updates-flyout';
-import { WzButtonOpenFlyout } from '../../common/buttons';
+import { AddApi } from './add-api';
+import { ApiTableCCS } from './api-table-ccs';
+import {
+  WzButtonOpenFlyout,
+  WzButtonPermissionsOpenFlyout,
+} from '../../common/buttons';
+import { WzButtonPermissions } from '../../common/permissions/button';
 import {
   ApiCheck,
   ErrorHandler,
   GenericRequest,
 } from '../../../react-services';
+import { WzAuthentication } from '../../../react-services/wz-authentication';
 
-export const ApiTable = compose(withErrorBoundary)(
+export const ApiTable = compose(
+  withErrorBoundary,
+  connect(state => ({ isCCS: state.appStateReducers.isCCS })),
+)(
   class ApiTable extends Component {
     constructor(props) {
       super(props);
@@ -221,6 +232,9 @@ export const ApiTable = compose(withErrorBoundary)(
           }),
         );
 
+        // Update the server-side wz-api cookie to match the newly selected host
+        await WzAuthentication.refresh(true);
+
         const currentApi = AppState.getCurrentAPI();
         const currentApiJSON = JSON.parse(currentApi);
 
@@ -241,7 +255,7 @@ export const ApiTable = compose(withErrorBoundary)(
         getErrorOrchestrator().handleError(options);
       }
     }
-    async refreshAPI(APIconnection, options) {
+    async refreshAPI(APIconnection) {
       try {
         const data = await ApiCheck.checkApi(APIconnection, true);
         const clusterInfo = data.data || {};
@@ -250,9 +264,6 @@ export const ApiTable = compose(withErrorBoundary)(
         APIconnection.cluster_info = cluster_info;
         APIconnection.allow_run_as = allow_run_as;
         APIconnection.verify_ca = verify_ca;
-        if (options?.selectAPIHostOnAvailable) {
-          await this.setDefault(APIconnection);
-        }
       } catch (error) {
         const code = ((error || {}).data || {}).code;
         const downReason =
@@ -263,10 +274,6 @@ export const ApiTable = compose(withErrorBoundary)(
               'API is not reachable';
         const status = code === 3099 ? 'down' : 'unknown';
         APIconnection.status = { status, downReason };
-        if (APIconnection.id === this.state.selectedAPIConnection) {
-          // if the selected API is down, we remove it so a new one will selected
-          AppState.removeCurrentAPI();
-        }
         throw error;
       }
     }
@@ -276,7 +283,6 @@ export const ApiTable = compose(withErrorBoundary)(
     async refresh(options = {}) {
       const { selectAPIHostOnAvailable = false, notifyCheckFailure = false } =
         options;
-      const refreshApiOptions = { selectAPIHostOnAvailable };
       try {
         let status = 'complete';
         this.setState({ error: false, refreshingEntries: true });
@@ -295,7 +301,7 @@ export const ApiTable = compose(withErrorBoundary)(
         for (let idx in entries) {
           const entry = entries[idx];
           try {
-            await this.refreshAPI(entry, refreshApiOptions);
+            await this.refreshAPI(entry);
           } catch (error) {
             numErr = numErr + 1;
             if (!refreshCheckError) {
@@ -305,6 +311,17 @@ export const ApiTable = compose(withErrorBoundary)(
         }
         if (notifyCheckFailure && refreshCheckError) {
           this.notifyManagerCheckFailure(refreshCheckError, 'refresh');
+        }
+        if (selectAPIHostOnAvailable) {
+          const isCCS = this.props.isCCS;
+          const selectedId = this.state.selectedAPIConnection;
+          const onlineEntries = entries.filter(e => e.status === 'online');
+          const target = isCCS
+            ? onlineEntries.find(e => e.id === selectedId) ?? onlineEntries[0]
+            : onlineEntries[0];
+          if (target) {
+            await this.setDefault(target);
+          }
         }
         this.setState({
           apiEntries: entries,
@@ -324,6 +341,47 @@ export const ApiTable = compose(withErrorBoundary)(
         notifyCheckFailure: true,
         selectAPIHostOnAvailable: true,
       });
+    }
+
+    async checkApi(api) {
+      try {
+        const entries = this.state.apiEntries;
+        const idx = entries.map(e => e.id).indexOf(api.id);
+        try {
+          await this.checkManager(api);
+          entries[idx].status = 'online';
+        } catch (error) {
+          const code = ((error || {}).data || {}).code;
+          const downReason =
+            typeof error === 'string'
+              ? error
+              : (error || {}).message ||
+                ((error || {}).data || {}).message ||
+                'API is not reachable';
+          const status = code === 3099 ? 'down' : 'unknown';
+          entries[idx].status = { status, downReason };
+          throw error;
+        } finally {
+          this.setState({
+            apiEntries: entries,
+          });
+        }
+      } catch (error) {
+        const options = {
+          context: `${ApiTable.name}.checkApi`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: true,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: `Error checking manager connection: ${
+              error.message || error
+            }`,
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+      }
     }
 
     renderStatusCell(item) {
@@ -451,41 +509,35 @@ export const ApiTable = compose(withErrorBoundary)(
       );
     }
 
-    render() {
-      const { DismissNotificationCheck } = getWazuhCheckUpdatesPlugin();
+    renderTable(items, versionData, isLoading) {
+      return (
+        <ApiTableCCS
+          items={items}
+          versionData={versionData}
+          isLoading={isLoading}
+          isUpdatesEnabled={this.isUpdatesEnabled}
+          selectedAPIConnection={this.state.selectedAPIConnection}
+          refreshingAvailableUpdates={this.state.refreshingAvailableUpdates}
+          refreshingEntries={this.state.refreshingEntries}
+          incremental={this.state.incremental}
+          apiIsDown={this.state.apiIsDown}
+          availableUpdates={this.state.availableUpdates}
+          copyToClipBoard={this.copyToClipBoard.bind(this)}
+          setDefault={this.setDefault.bind(this)}
+          checkApi={this.checkApi.bind(this)}
+          refresh={this.refresh.bind(this)}
+          getApisAvailableUpdates={this.getApisAvailableUpdates.bind(this)}
+        />
+      );
+    }
 
+    renderDescriptionList(items, versionData, isLoading) {
       const API_UPDATES_STATUS_COLUMN = {
-        upToDate: {
-          text: 'Up to date',
-          color: 'success',
-        },
-        availableUpdates: {
-          text: 'Available updates',
-          color: 'warning',
-        },
-        disabled: {
-          text: 'Checking updates disabled',
-          color: 'subdued',
-        },
-        error: {
-          text: 'Error checking updates',
-          color: 'danger',
-        },
+        upToDate: { text: 'Up to date', color: 'success' },
+        availableUpdates: { text: 'Available updates', color: 'warning' },
+        disabled: { text: 'Checking updates disabled', color: 'subdued' },
+        error: { text: 'Error checking updates', color: 'danger' },
       };
-
-      const isLoading =
-        this.state.refreshingEntries || this.state.refreshingAvailableUpdates;
-
-      const versionData = this.state.availableUpdates || {};
-      const items = [
-        ...this.state.apiEntries?.map(apiEntry => {
-          return {
-            ...versionData,
-            ...apiEntry,
-            version_status: versionData.status,
-          };
-        }),
-      ];
 
       const api = items[0];
       const listItems = [];
@@ -508,10 +560,7 @@ export const ApiTable = compose(withErrorBoundary)(
             title: 'Username',
             description: <EuiText size='s'>{api.username}</EuiText>,
           },
-          {
-            title: 'Status',
-            description: this.renderStatusCell(api.status),
-          },
+          { title: 'Status', description: this.renderStatusCell(api.status) },
           {
             title: 'Run as',
             description: this.renderRunAsCell(api.allow_run_as),
@@ -547,7 +596,7 @@ export const ApiTable = compose(withErrorBoundary)(
                       {content}
                     </EuiHealth>
                   </EuiFlexItem>
-                  {!vs ? (
+                  {!vs && (
                     <EuiFlexItem grow={false}>
                       <EuiToolTip
                         position='top'
@@ -563,23 +612,20 @@ export const ApiTable = compose(withErrorBoundary)(
                         />
                       </EuiToolTip>
                     </EuiFlexItem>
-                  ) : null}
-                  {vs === 'availableUpdates' ? (
+                  )}
+                  {vs === 'availableUpdates' && (
                     <EuiFlexItem grow={false}>
                       <WzButtonOpenFlyout
                         tooltip={{ content: 'View available updates' }}
-                        flyoutTitle={'Available updates'}
+                        flyoutTitle='Available updates'
                         flyoutBody={() => (
                           <AvailableUpdatesFlyout updates={versionData} />
                         )}
-                        buttonProps={{
-                          buttonType: 'icon',
-                          iconType: 'eye',
-                        }}
+                        buttonProps={{ buttonType: 'icon', iconType: 'eye' }}
                       />
                     </EuiFlexItem>
-                  ) : null}
-                  {vs === 'error' && api.error?.detail ? (
+                  )}
+                  {vs === 'error' && api.error?.detail && (
                     <EuiFlexItem grow={false}>
                       <EuiToolTip
                         position='top'
@@ -594,18 +640,59 @@ export const ApiTable = compose(withErrorBoundary)(
                         />
                       </EuiToolTip>
                     </EuiFlexItem>
-                  ) : null}
+                  )}
                 </EuiFlexGroup>
               ) : (
                 <span>
                   <EuiLoadingSpinner size='s' />
-                  <span>&nbsp;&nbsp;Checking</span>
+                  &nbsp;&nbsp;Checking
                 </span>
               ),
             },
           );
         }
       }
+
+      if (isLoading && !api) {
+        return (
+          <EuiText>
+            <EuiLoadingSpinner size='m' /> Loading…
+          </EuiText>
+        );
+      }
+      if (!api) {
+        return <EuiText color='subdued'>No API connection configured.</EuiText>;
+      }
+      return (
+        <EuiFlexGroup>
+          {listItems.map(item => (
+            <EuiFlexItem key={item.title}>
+              <EuiDescriptionList compressed listItems={[item]} />
+            </EuiFlexItem>
+          ))}
+        </EuiFlexGroup>
+      );
+    }
+
+    render() {
+      const isLoading =
+        this.state.refreshingEntries || this.state.refreshingAvailableUpdates;
+
+      const versionData = this.state.availableUpdates || {};
+      const items = [
+        ...this.state.apiEntries?.map(apiEntry => ({
+          ...versionData,
+          ...apiEntry,
+          version_status: versionData.status,
+        })),
+      ];
+
+      if (this.props.isCCS) {
+        return this.renderTable(items, versionData, isLoading);
+      }
+
+      const { DismissNotificationCheck } = getWazuhCheckUpdatesPlugin();
+      const firstItem = items[0];
 
       return (
         <EuiPage>
@@ -704,7 +791,9 @@ export const ApiTable = compose(withErrorBoundary)(
               </EuiFlexItem>
             </EuiFlexGroup>
             {this.state.apiIsDown && (
-              <EuiFlexGroup style={{ marginBottom: api ? '15px' : '0px' }}>
+              <EuiFlexGroup
+                style={{ marginBottom: firstItem ? '15px' : '0px' }}
+              >
                 <EuiFlexItem>
                   <EuiCallOut
                     title='Connection issue detected on the active API'
@@ -815,21 +904,7 @@ export const ApiTable = compose(withErrorBoundary)(
                 </EuiFlexItem>
               </EuiFlexGroup>
             )}
-            {isLoading && !api ? (
-              <EuiText>
-                <EuiLoadingSpinner size='m' /> Loading…
-              </EuiText>
-            ) : !api ? (
-              <EuiText color='subdued'>No API connection configured.</EuiText>
-            ) : (
-              <EuiFlexGroup>
-                {listItems.map(item => (
-                  <EuiFlexItem key={item.title}>
-                    <EuiDescriptionList compressed listItems={[item]} />
-                  </EuiFlexItem>
-                ))}
-              </EuiFlexGroup>
-            )}
+            {this.renderDescriptionList(items, versionData, isLoading)}
           </EuiPanel>
         </EuiPage>
       );

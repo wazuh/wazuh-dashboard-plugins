@@ -20,13 +20,15 @@ import {
   EuiToolTip,
   EuiLoadingSpinner,
   EuiSelect,
+  EuiPopover,
 } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 
-import { connect } from 'react-redux';
+import { connect, useSelector, useDispatch } from 'react-redux';
 import { getHeaderActionMenuMounter } from '../../kibana-services';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
+import { withWindowSize } from '../../components/common/hocs/withWindowSize';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
@@ -38,6 +40,9 @@ import { useAsyncActionRunOnStart } from '../common/hooks';
 import { useSelectedServerApi } from '../common/hooks/use-selected-server-api';
 import { Selector, SelectorContainer, SelectorLabel } from './selectors';
 import { isEqual } from 'lodash';
+import { useEffect } from 'react';
+import { updateIsCCS } from '../../redux/actions/appStateActions';
+import { WzAuthentication } from '../../react-services/wz-authentication';
 
 async function getServerAPIList() {
   const response = await GenericRequest.request('GET', '/hosts/apis', {});
@@ -46,6 +51,36 @@ async function getServerAPIList() {
 
 const ServerAPISelector = ({ showSelectorsInPopover }) => {
   const action = useAsyncActionRunOnStart(getServerAPIList, []);
+  const dispatch = useDispatch();
+  const isCCS = useSelector(state => state.appStateReducers.isCCS);
+
+  useEffect(() => {
+    if (action.running || !action.data) return;
+    GenericRequest.request('GET', '/hosts/ccs/status', {}).then(
+      response => dispatch(updateIsCCS(response?.data?.isCCS ?? false)),
+    ).catch(() => {});
+  }, [action.data, action.running]);
+
+  useEffect(() => {
+    if (!action.data?.length || isCCS) return;
+    const firstHost = action.data[0];
+    let currentId = null;
+    try {
+      const raw = AppState.getCurrentAPI();
+      currentId = raw ? JSON.parse(raw)?.id : null;
+    } catch {}
+    if (currentId === firstHost.id) return;
+    ApiCheck.checkApi(firstHost, true)
+      .then(response => {
+        const { allow_run_as, verify_ca, ...cluster_info } =
+          response.data || {};
+        AppState.setClusterInfo(cluster_info);
+        AppState.setCurrentAPI(
+          JSON.stringify({ name: cluster_info.cluster, id: firstHost.id }),
+        );
+      })
+      .catch(() => {});
+  }, [action.data, isCCS]);
 
   const { selectedAPI: currentAPI } = useSelectedServerApi();
 
@@ -113,8 +148,8 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
   return (
     <div
       className='wz-server-api-selector-hidden'
-      style={{ display: 'none' }}
-      aria-hidden='true'
+      style={{ display: isCCS ? undefined : 'none' }}
+      aria-hidden={!isCCS}
     >
       <SelectorContainer>
         <SelectorLabel
@@ -156,80 +191,140 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
   );
 };
 
-export class WzMenu extends Component {
-  async componentDidMount() {
-    setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb);
-  }
+export const WzMenu = withWindowSize(
+  class WzMenu extends Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        isSelectorsPopoverOpen: false,
+      };
+    }
 
-  async componentDidUpdate(prevProps) {
-    if (
-      !isEqual(
-        this.props.globalBreadcrumbReducers.breadcrumb,
-        prevProps.globalBreadcrumbReducers.breadcrumb,
-      )
-    ) {
+    async componentDidMount() {
       setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb);
     }
-  }
 
-  buildWazuhNotReadyYet() {
-    const container = document.getElementsByClassName('wazuhNotReadyYet');
-    return ReactDOM.createPortal(
-      <EuiCallOut title={this.props.state.wazuhNotReadyYet} color='warning'>
-        <EuiFlexGroup
-          responsive={false}
-          direction='row'
-          style={{ maxHeight: '40px', marginTop: '-45px' }}
-        >
-          <EuiFlexItem>
-            <p></p>
-          </EuiFlexItem>
-          {typeof this.props.state.wazuhNotReadyYet === 'string' &&
-            this.props.state.wazuhNotReadyYet.includes('Restarting') && (
+    async componentDidUpdate(prevProps) {
+      if (
+        !isEqual(
+          this.props.globalBreadcrumbReducers.breadcrumb,
+          prevProps.globalBreadcrumbReducers.breadcrumb,
+        )
+      ) {
+        setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb);
+      }
+    }
+
+    switchSelectorsPopOver() {
+      this.setState({
+        isSelectorsPopoverOpen: !this.state.isSelectorsPopoverOpen,
+      });
+    }
+
+    buildWazuhNotReadyYet() {
+      const container = document.getElementsByClassName('wazuhNotReadyYet');
+      return ReactDOM.createPortal(
+        <EuiCallOut title={this.props.state.wazuhNotReadyYet} color='warning'>
+          <EuiFlexGroup
+            responsive={false}
+            direction='row'
+            style={{ maxHeight: '40px', marginTop: '-45px' }}
+          >
+            <EuiFlexItem>
+              <p></p>
+            </EuiFlexItem>
+            {typeof this.props.state.wazuhNotReadyYet === 'string' &&
+              this.props.state.wazuhNotReadyYet.includes('Restarting') && (
+                <EuiFlexItem grow={false}>
+                  <p>
+                    {' '}
+                    <EuiLoadingSpinner size='l' /> &nbsp; &nbsp;{' '}
+                  </p>
+                </EuiFlexItem>
+              )}
+            {this.props.state.wazuhNotReadyYet ===
+              'Server could not be recovered.' && (
               <EuiFlexItem grow={false}>
-                <p>
-                  {' '}
-                  <EuiLoadingSpinner size='l' /> &nbsp; &nbsp;{' '}
-                </p>
+                <EuiButtonEmpty
+                  grow={false}
+                  onClick={() => NavigationService.getInstance().reload()}
+                  className='WzNotReadyButton'
+                >
+                  <span> Reload </span>
+                </EuiButtonEmpty>
               </EuiFlexItem>
             )}
-          {this.props.state.wazuhNotReadyYet ===
-            'Server could not be recovered.' && (
-            <EuiFlexItem grow={false}>
-              <EuiButtonEmpty
-                grow={false}
-                onClick={() => NavigationService.getInstance().reload()}
-                className='WzNotReadyButton'
-              >
-                <span> Reload </span>
-              </EuiButtonEmpty>
-            </EuiFlexItem>
-          )}
-        </EuiFlexGroup>
-      </EuiCallOut>,
-      container[0],
-    );
-  }
-
-  render() {
-    return (
-      <>
-        <MountPointPortal setMountPoint={getHeaderActionMenuMounter()}>
-          <EuiFlexGroup
-            alignItems='center'
-            responsive={false}
-            className='wz-margin-left-10 wz-margin-right-10 font-size-14'
-          >
-            <EuiFlexItem grow={false}>
-              <ServerAPISelector showSelectorsInPopover={false} />
-            </EuiFlexItem>
-            {this.props.state.wazuhNotReadyYet && this.buildWazuhNotReadyYet()}
           </EuiFlexGroup>
-        </MountPointPortal>
-      </>
-    );
-  }
-}
+        </EuiCallOut>,
+        container[0],
+      );
+    }
+
+    render() {
+      const openSelectorsButton = (
+        <EuiToolTip position='bottom' content='Show selectors'>
+          <EuiButtonEmpty
+            iconType='boxesVertical'
+            iconSide='right'
+            style={{ position: 'relative', right: 0 }}
+            onClick={() => this.switchSelectorsPopOver()}
+            size='s'
+            aria-label='Open selectors'
+          ></EuiButtonEmpty>
+        </EuiToolTip>
+      );
+
+      const showSelectorsInPopover =
+        this.props.windowSize && this.props.windowSize.width < 1100;
+
+      return (
+        <>
+          <MountPointPortal setMountPoint={getHeaderActionMenuMounter()}>
+            <EuiFlexGroup
+              alignItems='center'
+              responsive={false}
+              className='wz-margin-left-10 wz-margin-right-10 font-size-14'
+            >
+              {(showSelectorsInPopover && (
+                <>
+                  <EuiFlexItem grow={false}>
+                    <EuiPopover
+                      ownFocus
+                      anchorPosition='downCenter'
+                      button={openSelectorsButton}
+                      isOpen={this.state.isSelectorsPopoverOpen}
+                      closePopover={() => this.switchSelectorsPopOver()}
+                    >
+                      <EuiFlexGroup
+                        alignItems='center'
+                        style={{ paddingTop: 5 }}
+                        direction='row'
+                      >
+                        <ServerAPISelector
+                          showSelectorsInPopover={showSelectorsInPopover}
+                        />
+                      </EuiFlexGroup>
+                    </EuiPopover>
+                  </EuiFlexItem>
+                </>
+              )) || (
+                <>
+                  <EuiFlexItem grow={showSelectorsInPopover}>
+                    <ServerAPISelector
+                      showSelectorsInPopover={showSelectorsInPopover}
+                    />
+                  </EuiFlexItem>
+                </>
+              )}
+              {this.props.state.wazuhNotReadyYet &&
+                this.buildWazuhNotReadyYet()}
+            </EuiFlexGroup>
+          </MountPointPortal>
+        </>
+      );
+    }
+  },
+);
 
 const mapStateToProps = state => {
   return {
