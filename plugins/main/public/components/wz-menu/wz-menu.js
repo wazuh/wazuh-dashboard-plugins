@@ -148,11 +148,7 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
   };
 
   return (
-    <div
-      className='wz-server-api-selector-hidden'
-      style={{ display: isCCS ? undefined : 'none' }}
-      aria-hidden={!isCCS}
-    >
+    <div className='wz-server-api-selector-hidden'>
       <SelectorContainer>
         <SelectorLabel
           actionError={actionError}
@@ -287,8 +283,8 @@ export const WzMenu = withWindowSize(
               responsive={false}
               className='wz-margin-left-10 wz-margin-right-10 font-size-14'
             >
-              {(showSelectorsInPopover && (
-                <>
+              {this.props.state.isCCS &&
+                (showSelectorsInPopover ? (
                   <EuiFlexItem grow={false}>
                     <EuiPopover
                       ownFocus
@@ -308,16 +304,13 @@ export const WzMenu = withWindowSize(
                       </EuiFlexGroup>
                     </EuiPopover>
                   </EuiFlexItem>
-                </>
-              )) || (
-                <>
-                  <EuiFlexItem grow={showSelectorsInPopover}>
+                ) : (
+                  <EuiFlexItem grow={false}>
                     <ServerAPISelector
                       showSelectorsInPopover={showSelectorsInPopover}
                     />
                   </EuiFlexItem>
-                </>
-              )}
+                ))}
               {this.props.state.wazuhNotReadyYet &&
                 this.buildWazuhNotReadyYet()}
             </EuiFlexGroup>
