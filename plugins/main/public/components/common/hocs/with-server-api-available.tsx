@@ -5,8 +5,6 @@ import { useSelectedServerApi } from '../hooks/use-selected-server-api';
 import { useServerApiAvailable } from '../hooks/use-server-api-available';
 
 const MESSAGES = {
-  UNAVAILABLE:
-    'The server API is not available. Check the connection, ensure the service is running, and verify the API host configuration.',
   NOT_SELECTED_CCS:
     'No server API selected. Please choose one from the server API selector.',
   NOT_SELECTED:
@@ -14,7 +12,15 @@ const MESSAGES = {
 };
 
 const PromptServerAPIUnavailable = () => (
-  <EuiEmptyPrompt iconType='alert' body={<p>{MESSAGES.UNAVAILABLE}</p>} />
+  <EuiEmptyPrompt
+    iconType='alert'
+    body={
+      <p>
+        The server API is not available. Check the connection, ensure the
+        service is running, and verify the API host configuration.
+      </p>
+    }
+  />
 );
 
 export const withServerAPIAvailable =

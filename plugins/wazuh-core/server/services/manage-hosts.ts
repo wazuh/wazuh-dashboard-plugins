@@ -328,8 +328,11 @@ export class ManageHosts {
         return;
       }
 
-      const primaryHost = hosts[0];
-      await this.getRegistryDataByHost(primaryHost, { throwError: false });
+      await Promise.all(
+        hosts.map(host =>
+          this.getRegistryDataByHost(host, { throwError: false }),
+        ),
+      );
 
       this.logger.debug('API hosts data stored in the registry');
     } catch (error) {

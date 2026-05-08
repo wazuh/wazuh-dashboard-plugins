@@ -38,7 +38,7 @@ import { detectCCS } from '../lib/ccs-detector';
 export class WazuhApiCtrl {
   constructor() {}
 
-  private async resolveFirstHostId(
+  private async resolveHostId(
     context: RequestHandlerContext,
     sessionHostId?: string,
   ): Promise<string | undefined> {
@@ -66,7 +66,7 @@ export class WazuhApiCtrl {
     try {
       const { force } = request.body;
       const idHost: string =
-        (await this.resolveFirstHostId(context, request.body.idHost)) ??
+        (await this.resolveHostId(context, request.body.idHost)) ??
         request.body.idHost;
       const { username } = await context.wazuh.security.getCurrentUser(
         request,
@@ -149,8 +149,7 @@ export class WazuhApiCtrl {
   ) {
     try {
       const id: string =
-        (await this.resolveFirstHostId(context, request.body.id)) ??
-        request.body.id;
+        (await this.resolveHostId(context, request.body.id)) ?? request.body.id;
       context.wazuh.logger.debug(`Getting server API host by ID: ${id}`);
       const apiHostData = await context.wazuh_core.manageHosts.get(id, {
         excludePassword: true,
@@ -667,7 +666,7 @@ export class WazuhApiCtrl {
       );
     }
 
-    let apiHostId = devTools ? bodyId : idApi || bodyId;
+    let apiHostId = devTools ? bodyId : idApi;
 
     if (!devTools && idApi && bodyId && idApi !== bodyId) {
       try {
@@ -681,7 +680,7 @@ export class WazuhApiCtrl {
     }
 
     try {
-      const resolved = await this.resolveFirstHostId(context, idApi || bodyId);
+      const resolved = await this.resolveHostId(context, idApi || bodyId);
       if (resolved) {
         apiHostId = resolved;
       }

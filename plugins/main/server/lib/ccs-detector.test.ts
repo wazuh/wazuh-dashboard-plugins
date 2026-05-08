@@ -16,7 +16,7 @@ const makeContext = (remoteInfoBody: object) =>
       },
     },
     wazuh: { logger: { error: jest.fn() } },
-  }) as any;
+  } as any);
 
 beforeEach(() => {
   invalidateCCSCache();
