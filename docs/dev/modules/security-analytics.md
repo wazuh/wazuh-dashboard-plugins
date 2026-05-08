@@ -70,7 +70,7 @@ Filter has the following properties:
 | `documentation` | A link to the documentation of the filter. |
 | `references` | A list of references related to the filter. |
 
-Document mapping reference: https://github.com/wazuh/wazuh-indexer-plugins/blob/main/plugins/setup/src/main/resources/templates/content/filters.json
+[Document mapping reference](https://github.com/wazuh/wazuh-indexer-plugins/blob/main/plugins/setup/src/main/resources/templates/content/filters.json)
 
 ## Enrichment
 
@@ -83,7 +83,7 @@ Enrichment has the following properties:
 | --------------- | -------------------------------------------------------- |
 TBD
 
-Document mapping reference: https://github.com/wazuh/wazuh-indexer-plugins/blob/main/plugins/setup/src/main/resources/templates/content/ioc.json
+[Document mapping reference](https://github.com/wazuh/wazuh-indexer-plugins/blob/main/plugins/setup/src/main/resources/templates/content/ioc.json)
 
 ## Decoder
 
@@ -233,6 +233,6 @@ The test is performed in two steps:
 
 The process of generating findings from the logs can be summarized in the following steps:
 
-- **Log** -> **Decoder** -> **Event** -> **Detector** -> **Rule** -> **Finding**
+- **Log** -> **Filter (pre-filter)** -> **Decoder** -> **Filter (post-filter)** -> **Event** -> **Detector** -> **Rule** -> **Finding**
 
 <!-- TODO: add information about the filters in the process -->
