@@ -31,11 +31,11 @@ const MESSAGES = {
   NO_API_AVAILABLE_CCS:
     'No API hosts available to connect. Ensure all configured hosts fulfill the connection and compatibility requirements. Run the health check to update the check status and refresh the page.',
   NO_API_AVAILABLE:
-    'No API host available to connect, this requires the connection and compatibility are ok. Ensure at least one of them fullfil these conditions. Run the health check to update the check status and refresh the page.',
+    'The API host is not available. Verify the connection and compatibility in Dashboard Management > Server API. Run the health check to update the check status and refresh the page.',
   NO_API_SELECTED_CCS:
     'There is no selected server API. Ensure a server API is selected and is online.',
   NO_API_SELECTED:
-    'There is no selected server API. Ensure the server API is selected and this is online.',
+    'There is no selected server API. Go to Dashboard Management > Server API to verify the connection.',
 };
 
 // throttle to avoid multiple toasts
