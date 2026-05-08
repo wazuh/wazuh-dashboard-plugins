@@ -223,7 +223,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               ) : (
                 <FormattedMessage
                   id='wazuhCheckUpdates.ctiRegistration.modalTitle'
-                  defaultMessage='Do you want to register to CTI updates?'
+                  defaultMessage='Wazuh XDR registration'
                 />
               )}
             </EuiTitle>
@@ -262,7 +262,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
           <EuiText>
             <FormattedMessage
               id='wazuhCheckUpdates.ctiRegistration.modalBodyAdditional'
-              defaultMessage='If you register, you will receive updates about CTI changes and improvements. For more information, visit our {documentationCTIWazuh}.'
+              defaultMessage='Register your Wazuh XDR to receive the latest Cyber Threat Intelligence content. For more information, visit our {documentationCTIWazuh}.'
               values={{
                 documentationCTIWazuh: (
                   <EuiLink
@@ -404,7 +404,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
             >
               <FormattedMessage
                 id='wazuhCheckUpdates.ctiRegistration.modalButtonRegister'
-                defaultMessage='Yes, I want to register'
+                defaultMessage='Register'
               />
             </EuiButton>
           </>

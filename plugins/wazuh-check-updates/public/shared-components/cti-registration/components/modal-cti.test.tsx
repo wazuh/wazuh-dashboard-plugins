@@ -83,10 +83,8 @@ describe('ModalCti component', () => {
         refetchStatus={mockRefetchStatus}
       />,
     );
-    expect(
-      await screen.findByText('Do you want to register to CTI updates?'),
-    ).toBeInTheDocument();
-    expect(screen.getByText('Yes, I want to register')).toBeInTheDocument();
+    expect(await screen.findByText('Wazuh XDR registration')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Register' })).toBeInTheDocument();
   });
 
   it('reopens to in-progress links when refetch restores server snapshot', async () => {
@@ -131,7 +129,7 @@ describe('ModalCti component', () => {
         refetchStatus={mockRefetchStatus}
       />,
     );
-    const button = await screen.findByText('Yes, I want to register');
+    const button = await screen.findByRole('button', { name: 'Register' });
     act(() => {
       fireEvent.click(button);
     });
@@ -171,7 +169,7 @@ describe('ModalCti component', () => {
         onDeviceFlowStarted={onDeviceFlowStarted}
       />,
     );
-    const registerBtn = await screen.findByText('Yes, I want to register');
+    const registerBtn = await screen.findByRole('button', { name: 'Register' });
     act(() => {
       fireEvent.click(registerBtn);
     });

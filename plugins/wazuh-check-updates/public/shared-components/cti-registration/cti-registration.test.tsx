@@ -73,8 +73,9 @@ describe('CtiRegistration', () => {
     });
 
     expect(screen.queryByText('Register')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Register to CTI updates' })).not
-      .toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Wazuh XDR registration' }),
+    ).not.toBeInTheDocument();
     expect(screen.getByText('CTI Status')).toBeInTheDocument();
     expect(mockHttpPost).not.toHaveBeenCalled();
     expect(ctiFlowState.isRegistered()).toBe(true);
@@ -96,8 +97,9 @@ describe('CtiRegistration', () => {
     });
 
     expect(screen.queryByText('Register')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Register to CTI updates' })).not
-      .toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Wazuh XDR registration' }),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', {
         name: 'View available CTI registration status',

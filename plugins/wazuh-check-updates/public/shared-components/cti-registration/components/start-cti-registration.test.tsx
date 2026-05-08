@@ -59,10 +59,10 @@ describe('StartCtiRegistration component', () => {
 
     const buttonIcon = getByRole('button');
 
-    expect(buttonIcon).toHaveAttribute('aria-label', 'Register to CTI updates');
+    expect(buttonIcon).toHaveAttribute('aria-label', 'Wazuh XDR registration');
     fireEvent.mouseEnter(buttonIcon);
 
-    const tooltip = await findByText('Register to CTI updates');
+    const tooltip = await findByText('Register your Wazuh XDR');
     expect(tooltip).toBeInTheDocument();
   });
 
