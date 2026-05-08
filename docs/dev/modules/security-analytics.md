@@ -72,7 +72,7 @@ Filter has the following properties:
 
 Document mapping reference: https://github.com/wazuh/wazuh-indexer-plugins/blob/main/plugins/setup/src/main/resources/templates/content/filters.json
 
-# Enrichment
+## Enrichment
 
 An enrichment is a set of conditions that allows to add information to the events based on specific criteria of the analysis flow.
 
