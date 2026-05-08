@@ -1,15 +1,17 @@
-import { detectCCS, invalidateCCSCache } from './ccs-detector';
+import { checkCCS, detectCCS, invalidateCCSCache } from './ccs-detector';
+
+const makeClient = (remoteInfoBody: object) => ({
+  transport: {
+    request: jest.fn().mockResolvedValue({ body: remoteInfoBody }),
+  },
+});
 
 const makeContext = (remoteInfoBody: object) =>
   ({
     core: {
       opensearch: {
         client: {
-          asInternalUser: {
-            transport: {
-              request: jest.fn().mockResolvedValue({ body: remoteInfoBody }),
-            },
-          },
+          asInternalUser: makeClient(remoteInfoBody),
         },
       },
     },
@@ -18,6 +20,25 @@ const makeContext = (remoteInfoBody: object) =>
 
 beforeEach(() => {
   invalidateCCSCache();
+});
+
+describe('checkCCS', () => {
+  it('returns false when /_remote/info is empty', async () => {
+    expect(await checkCCS(makeClient({}))).toBe(false);
+  });
+
+  it('returns true when /_remote/info has remote clusters', async () => {
+    expect(await checkCCS(makeClient({ 'cluster-a': { connected: true } }))).toBe(true);
+  });
+
+  it('throws when the request fails', async () => {
+    const client = {
+      transport: {
+        request: jest.fn().mockRejectedValue(new Error('unreachable')),
+      },
+    };
+    await expect(checkCCS(client)).rejects.toThrow('unreachable');
+  });
 });
 
 describe('detectCCS', () => {

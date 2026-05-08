@@ -56,9 +56,9 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
 
   useEffect(() => {
     if (action.running || !action.data) return;
-    GenericRequest.request('GET', '/hosts/ccs/status', {}).then(
-      response => dispatch(updateIsCCS(response?.data?.isCCS ?? false)),
-    ).catch(() => {});
+    GenericRequest.request('GET', '/hosts/ccs/status', {})
+      .then(response => dispatch(updateIsCCS(response?.data?.isCCS ?? false)))
+      .catch(() => {});
   }, [action.data, action.running]);
 
   useEffect(() => {
@@ -122,6 +122,8 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
       if (isPinnedAgent) {
         pinnedAgentManager.unPinAgent();
       }
+
+      await WzAuthentication.refresh(true);
 
       /* TODO: this reloads the page to force the components are remounted with the new
           selection of. To avoid this refresh, we would have to do the components are able to react

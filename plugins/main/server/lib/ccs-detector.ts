@@ -21,6 +21,22 @@ interface CacheEntry {
 
 let cache: CacheEntry | null = null;
 
+export async function checkCCS(opensearchClient: {
+  transport: { request: (params: any) => Promise<any> };
+}): Promise<boolean> {
+  const response = await opensearchClient.transport.request({
+    method: 'GET',
+    path: '/_remote/info',
+  });
+  const data = response?.body;
+  return (
+    data != null && typeof data === 'object' && Object.keys(data).length > 0
+  );
+}
+
+/**
+ * Cached wrapper around checkCCS for use in route handlers.
+ */
 export async function detectCCS(
   context: RequestHandlerContext,
 ): Promise<boolean> {
@@ -30,14 +46,7 @@ export async function detectCCS(
   }
 
   try {
-    const response =
-      await context.core.opensearch.client.asInternalUser.transport.request({
-        method: 'GET',
-        path: '/_remote/info',
-      });
-    const data = response?.body;
-    const isCCS =
-      data != null && typeof data === 'object' && Object.keys(data).length > 0;
+    const isCCS = await checkCCS(context.core.opensearch.client.asInternalUser);
     cache = { isCCS, cachedAt: now };
     return isCCS;
   } catch (error) {

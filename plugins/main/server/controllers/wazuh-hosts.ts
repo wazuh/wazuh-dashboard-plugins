@@ -16,6 +16,7 @@ import {
   OpenSearchDashboardsResponseFactory,
 } from 'src/core/server';
 import { ErrorResponse } from '../lib/error-response';
+import { detectCCS } from '../lib/ccs-detector';
 
 export class WazuhHostsCtrl {
   constructor() {}
@@ -36,13 +37,37 @@ export class WazuhHostsCtrl {
       const result = await context.wazuh_core.manageHosts.getEntries({
         excludePassword: true,
       });
-      const primaryOnly = result.length > 0 ? [result[0]] : [];
+      if (!result.length) {
+        return response.ok({ body: [] });
+      }
+
+      const isCCS = await detectCCS(context);
+      if (isCCS) {
+        return response.ok({ body: result });
+      }
+
+      const primaryHost = result[0];
+
       return response.ok({
-        body: primaryOnly,
+        body: [primaryHost],
       });
     } catch (error) {
       context.wazuh.logger.error(error.message || error);
       return ErrorResponse(error.message || error, 2001, 500, response);
+    }
+  }
+
+  async getCCSStatus(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const isCCS = await detectCCS(context);
+      return response.ok({ body: { isCCS } });
+    } catch (error) {
+      context.wazuh.logger.error(error.message || error);
+      return response.ok({ body: { isCCS: false } });
     }
   }
 }

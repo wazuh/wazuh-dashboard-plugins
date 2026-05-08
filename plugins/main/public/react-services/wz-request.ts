@@ -25,6 +25,18 @@ import { request } from '../services/request-handler';
 import { BehaviorSubject } from 'rxjs';
 import { first, distinctUntilChanged } from 'rxjs/operators';
 import { throttle } from 'lodash';
+import store from '../redux/store';
+
+const MESSAGES = {
+  NO_API_AVAILABLE_CCS:
+    'No API hosts available to connect. Ensure all configured hosts fulfill the connection and compatibility requirements. Run the health check to update the check status and refresh the page.',
+  NO_API_AVAILABLE:
+    'No API host available to connect, this requires the connection and compatibility are ok. Ensure at least one of them fullfil these conditions. Run the health check to update the check status and refresh the page.',
+  NO_API_SELECTED_CCS:
+    'There is no selected server API. Ensure a server API is selected and is online.',
+  NO_API_SELECTED:
+    'There is no selected server API. Ensure the server API is selected and this is online.',
+};
 
 // throttle to avoid multiple toasts
 const displayAPINotAvailableToast = throttle(({ title, text }) => {
@@ -51,7 +63,18 @@ export class WzRequest {
       try {
         currentApiID = JSON.parse(currentApiDataCookie).id;
         if (currentApiID) {
-          return Object.keys(AppState.getClusterInfo()).length > 0;
+          const response = await ApiCheck.checkStored(currentApiID);
+          if (response?.data?.data?.cluster_info) {
+            const apiID = response?.data?.idChanged || currentApiID;
+            AppState.setClusterInfo(response.data.data.cluster_info);
+            AppState.setCurrentAPI(
+              JSON.stringify({
+                name: response.data.data.cluster_info.cluster,
+                id: apiID,
+              }),
+            );
+            return true;
+          }
         }
       } catch {}
     }
@@ -129,9 +152,10 @@ export class WzRequest {
     }
 
     this.serverAPIAvailable$.next(false);
+    const isCCS = store.getState()?.appStateReducers?.isCCS ?? false;
     getToasts.add({
       color: 'danger',
-      text: 'No API host available to connect, this requires the connection and compatibility are ok. Ensure at least one of them fullfil these conditions. Run the health check to update the check status and refresh the page.',
+      text: isCCS ? MESSAGES.NO_API_AVAILABLE_CCS : MESSAGES.NO_API_AVAILABLE,
       toastLifeTimeMs: 120000,
     });
   }
@@ -387,9 +411,10 @@ export class WzRequest {
       const id = JSON.parse(AppState.getCurrentAPI() as string).id;
 
       if (!id) {
+        const isCCS = store.getState()?.appStateReducers?.isCCS ?? false;
         return Promise.reject(
           new Error(
-            'There is no selected server API. Ensure the server API is selected and this is online.',
+            isCCS ? MESSAGES.NO_API_SELECTED_CCS : MESSAGES.NO_API_SELECTED,
           ),
         );
       }

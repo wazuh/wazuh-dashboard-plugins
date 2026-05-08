@@ -33,17 +33,29 @@ import {
   revision as pluginRevision,
 } from '../../package.json';
 import { extractErrorMessage } from '../lib/extract-error-message';
+import { detectCCS } from '../lib/ccs-detector';
 
 export class WazuhApiCtrl {
   constructor() {}
 
   private async resolveFirstHostId(
     context: RequestHandlerContext,
+    sessionHostId?: string,
   ): Promise<string | undefined> {
     const hosts = await context.wazuh_core.manageHosts.getEntries({
       excludePassword: true,
     });
-    return hosts?.[0]?.id;
+    const firstHostId = hosts?.[0]?.id;
+    if (!firstHostId) return undefined;
+
+    if (sessionHostId && hosts.some(h => h.id === sessionHostId)) {
+      const isCCS = await detectCCS(context);
+      if (isCCS) {
+        return sessionHostId;
+      }
+    }
+
+    return firstHostId;
   }
 
   async getToken(
@@ -54,7 +66,8 @@ export class WazuhApiCtrl {
     try {
       const { force } = request.body;
       const idHost: string =
-        (await this.resolveFirstHostId(context)) ?? request.body.idHost;
+        (await this.resolveFirstHostId(context, request.body.idHost)) ??
+        request.body.idHost;
       const { username } = await context.wazuh.security.getCurrentUser(
         request,
         context,
@@ -136,7 +149,8 @@ export class WazuhApiCtrl {
   ) {
     try {
       const id: string =
-        (await this.resolveFirstHostId(context)) ?? request.body.id;
+        (await this.resolveFirstHostId(context, request.body.id)) ??
+        request.body.id;
       context.wazuh.logger.debug(`Getting server API host by ID: ${id}`);
       const apiHostData = await context.wazuh_core.manageHosts.get(id, {
         excludePassword: true,
@@ -667,9 +681,9 @@ export class WazuhApiCtrl {
     }
 
     try {
-      const firstHostId = await this.resolveFirstHostId(context);
-      if (firstHostId) {
-        apiHostId = firstHostId;
+      const resolved = await this.resolveFirstHostId(context, idApi || bodyId);
+      if (resolved) {
+        apiHostId = resolved;
       }
     } catch {}
 
