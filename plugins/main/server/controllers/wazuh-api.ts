@@ -1027,4 +1027,40 @@ export class WazuhApiCtrl {
       return Promise.reject(error);
     }
   }
+
+  /**
+   * This updates the threat intelligence content from subscribed CTI feeds
+   * @param {Object} context
+   * @param {Object} request
+   * @param {Object} response
+   * @returns {Object} update started message or update is ongoing
+   */
+  async updateCTIFeeds(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const ctiFeedsClient = context.wazuh_core.ctiFeedsClient;
+
+      const result = await ctiFeedsClient.updateCTIFeeds(context);
+
+      return response.ok({
+        body: {
+          message: 'CTI feeds update initiated',
+          ...result,
+        },
+      });
+    } catch (error) {
+      context.wazuh.logger.error(error);
+      return ErrorResponse(
+        `Could not update the content from subscribed CTI feeds: ${
+          error.meta.body.message || error
+        }`,
+        4005,
+        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+        response,
+      );
+    }
+  }
 }

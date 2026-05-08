@@ -52,10 +52,11 @@ export class WzStatisticsOverview extends Component {
         id: 'remoted',
         name: 'Listener Engine',
       },
-      {
-        id: 'analysisd',
-        name: 'Analysis Engine',
-      },
+      // TODO: analysisd tab is commented out until analysisd metrics have a new data stream
+      // {
+      //   id: 'analysisd',
+      //   name: 'Analysis Engine',
+      // },
     ];
   }
 
