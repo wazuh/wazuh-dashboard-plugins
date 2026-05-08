@@ -50,7 +50,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed `rule.groups` filter to `wazuh.integration.decoders` [#7934](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7934)
 - Applied the new home page navigation style to all dashboards [#7981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7981)
 - Updated Office 365 dashboards to use new index pattern [#8081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8081) [#8408](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8408)
-- Updated GitHub dashboards to use new index pattern [#8072](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8072) [#8354](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8354)
+- Updated GitHub dashboards to use new index pattern [#8072](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8072) [#8354](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8354) [#8420](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8420)
 - Updated File Integrity Monitoring dashboards to use new index pattern [#8074](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8074) [#8247](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8247)
 - Updated Google Cloud dashboard to use new index pattern [#8069](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8069)
 - Updated Amazon web services dashboard to use new index pattern [#8065](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8065)
@@ -85,6 +85,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Set the downloaded local agent package name same to the remote one [#8350](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8350)
 - Changed FIM findings default columns [#8417](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8417)
 - Allowed only 1 server API configuration per indexer [#8436](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8436)
+- Updated the OS icon source field in the Endpoints summary table to display Linux agent icons [#8459](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8459)
 - Reworked Statistics dashboard [#8254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8254)
 
 ### Fixed
