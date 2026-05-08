@@ -16,7 +16,7 @@ const makeContext = (remoteInfoBody: object) =>
       },
     },
     wazuh: { logger: { error: jest.fn() } },
-  } as any);
+  }) as any;
 
 beforeEach(() => {
   invalidateCCSCache();
@@ -28,7 +28,9 @@ describe('checkCCS', () => {
   });
 
   it('returns true when /_remote/info has remote clusters', async () => {
-    expect(await checkCCS(makeClient({ 'cluster-a': { connected: true } }))).toBe(true);
+    expect(
+      await checkCCS(makeClient({ 'cluster-a': { connected: true } })),
+    ).toBe(true);
   });
 
   it('throws when the request fails', async () => {
