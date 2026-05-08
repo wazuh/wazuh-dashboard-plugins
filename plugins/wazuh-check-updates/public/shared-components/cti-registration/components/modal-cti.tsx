@@ -22,10 +22,38 @@ import { ctiFlowState } from '../../../services/cti-flow-state';
 import {
   CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC,
   CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
+  WAZUH_CLOUD_CONSOLE_HREF,
+  WAZUH_CLOUD_PORTAL_HREF,
   routes,
   statusCodes,
 } from '../../../../common/constants';
 import { CtiDeviceAuthLinks } from './cti-device-auth-links';
+
+type CtiHrefLinkProps = {
+  href: string;
+  children: React.ReactNode;
+};
+
+const CtiHrefLink: React.FC<CtiHrefLinkProps> = ({ href, children }) => {
+  const placeholder = href.length === 0;
+  return (
+    <EuiLink
+      data-test-subj={placeholder ? 'ctiHrefLinkPlaceholder' : undefined}
+      href={placeholder ? '#' : href}
+      rel={placeholder ? undefined : 'noopener noreferrer'}
+      target={placeholder ? undefined : '_blank'}
+      onClick={
+        placeholder
+          ? (event: React.MouseEvent) => {
+              event.preventDefault();
+            }
+          : undefined
+      }
+    >
+      {children}
+    </EuiLink>
+  );
+};
 
 export const ModalCti: React.FC<LinkCtiProps> = ({
   handleModalToggle,
@@ -193,6 +221,9 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     !showRegistrationFailed &&
     !deviceAuth;
 
+  const subscriptionPlanName =
+    ctiFlowState.getSubscription()?.message?.plan?.name;
+
   return (
     <EuiModal onClose={handleModalToggle}>
       <EuiModalHeader>
@@ -200,10 +231,24 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
           <EuiModalHeaderTitle>
             <EuiTitle>
               {showSuccess ? (
-                <FormattedMessage
-                  id='wazuhCheckUpdates.ctiRegistration.modalTitleSuccess'
-                  defaultMessage='CTI updates registration'
-                />
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 12,
+                  }}
+                >
+                  <EuiIcon
+                    type='checkInCircleFilled'
+                    color='success'
+                    size='xl'
+                    aria-hidden
+                  />
+                  <FormattedMessage
+                    id='wazuhCheckUpdates.ctiRegistration.modalTitleSuccess'
+                    defaultMessage='Your Wazuh XDR registration is complete'
+                  />
+                </span>
               ) : showRegistrationFailed ? (
                 <FormattedMessage
                   id='wazuhCheckUpdates.ctiRegistration.modalTitleFailed'
@@ -280,18 +325,17 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         ) : null}
         {deviceAuth && !showSuccess && !showRegistrationFailed && (
           <>
-            <EuiSpacer size='m' />
             <CtiDeviceAuthLinks deviceAuth={deviceAuth} />
           </>
         )}
         {showInProgress && (
           <>
-            <EuiSpacer size='m' />
+          <EuiSpacer size='m' />
             <div
               className='ctiRegistrationActivationPending'
               data-test-subj='ctiRegistrationInProgress'
             >
-             
+              
               <EuiText size='s' color='subdued'>
                 <FormattedMessage
                   id='wazuhCheckUpdates.ctiRegistration.waitingForActivation'
@@ -304,30 +348,37 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         )}
         {showSuccess && (
           <>
-            <EuiSpacer size='m' />
-            <EuiText color='success' data-test-subj='ctiRegistrationSuccess'>
-              <EuiIcon
-                type='checkInCircleFilled'
-                color='success'
-                style={{ marginRight: 8 }}
-              />
-              <FormattedMessage
-                id='wazuhCheckUpdates.ctiRegistration.success'
-                defaultMessage='Registration successful'
-              />
-            </EuiText>
-            {statusCTI.message ? (
-              <>
-                <EuiSpacer size='s' />
-                <EuiText
-                  size='s'
-                  color='subdued'
-                  data-test-subj='ctiRegistrationSuccessDetail'
-                >
-                  {statusCTI.message}
-                </EuiText>
-              </>
-            ) : null}
+
+            <div data-test-subj='ctiRegistrationSuccessContent'>
+              <EuiText size='s'>
+                <FormattedMessage
+                  id='wazuhCheckUpdates.ctiRegistration.successManageBody'
+                  defaultMessage='To manage your Wazuh XDR registration, unlock additional capabilities, or explore other services, please visit your {cloudLink}.'
+                  values={{
+                    cloudLink: (
+                      <CtiHrefLink href={WAZUH_CLOUD_PORTAL_HREF}>
+                        <FormattedMessage
+                          id='wazuhCheckUpdates.ctiRegistration.successCloudLink'
+                          defaultMessage='Wazuh Cloud'
+                        />
+                      </CtiHrefLink>
+                    ),
+                  }}
+                />
+              </EuiText>
+              {subscriptionPlanName ? (
+                <>
+                  <EuiSpacer size='m' />
+                  <EuiText size='s' data-test-subj='ctiRegistrationPlan'>
+                    <FormattedMessage
+                      id='wazuhCheckUpdates.ctiRegistration.successPlan'
+                      defaultMessage='Plan: {planName}'
+                      values={{ planName: subscriptionPlanName }}
+                    />
+                  </EuiText>
+                </>
+              ) : null}
+            </div>
           </>
         )}
         {showRegistrationFailed && (

@@ -76,7 +76,7 @@ describe('CtiRegistration', () => {
     expect(
       screen.queryByRole('button', { name: 'Wazuh XDR registration' }),
     ).not.toBeInTheDocument();
-    expect(screen.getByText('CTI Status')).toBeInTheDocument();
+    expect(screen.getByText('Wazuh Cloud')).toBeInTheDocument();
     expect(mockHttpPost).not.toHaveBeenCalled();
     expect(ctiFlowState.isRegistered()).toBe(true);
   });

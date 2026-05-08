@@ -137,6 +137,7 @@ export async function fetchCtiRegistrationStatus(): Promise<{
         CTI_REGISTRATION_COMPLETED_BODY.success
     ) {
       ctiFlowState.setRegistrationComplete(true);
+      await hydrateCtiFlowFromServer();
       return {
         statusCode: statusCodes.SUCCESS,
         message: CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE,

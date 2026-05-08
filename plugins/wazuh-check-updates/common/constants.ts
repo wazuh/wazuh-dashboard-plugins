@@ -45,6 +45,9 @@ export const CTI_REGISTRATION_COMPLETED_BODY = { success: true } as const;
 export const CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE =
   'This environment is registered for CTI updates. You will be notified about relevant changes when they are available.';
 
+/** Wazuh Cloud portal / product URL. Uses `#` in the UI until set. */
+export const WAZUH_CLOUD_PORTAL_HREF = '';
+
 /**
  * Paths appended to `WAZUH_CTI_CONSOLE_BASE_URL` (e.g. Wazuh Cloud API or local Imposter).
  * See `docker/imposter/cti/README.md` for the offline mock contract.

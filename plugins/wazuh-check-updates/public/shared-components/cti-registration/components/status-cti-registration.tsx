@@ -53,7 +53,7 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
         <span style={inlineRow}>
           <FormattedMessage
             id='wazuhCheckUpdates.ctiRegistration.statusNavTop'
-            defaultMessage='CTI Status'
+            defaultMessage='Wazuh Cloud'
           />
           {backgroundSpinner}
         </span>
