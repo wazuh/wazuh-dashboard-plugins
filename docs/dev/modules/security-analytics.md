@@ -78,10 +78,11 @@ An enrichment is a set of conditions that allows to add information to the event
 
 Store: `wazuh-threatintel-enrichments` index.
 
+<!--
 Enrichment has the following properties:
 | Property | Description |
 | --------------- | -------------------------------------------------------- |
-TBD
+-->
 
 [Document mapping reference](https://github.com/wazuh/wazuh-indexer-plugins/blob/main/plugins/setup/src/main/resources/templates/content/ioc.json)
 
@@ -149,7 +150,7 @@ Rule has the following properties:
 
 A detector is a scheduled task that runs the detector rules against the documents stored in a `wazuh-events` data stream and generates the findings that match the conditions defined in the rules.
 
-Store: TODO
+Store: `.opensearch-sap-detectors-config` index.
 
 Detector has the following properties:
 | Property | Description |
@@ -166,7 +167,7 @@ A space is a container for the integrations, enrichments and filters.
 
 Store: `wazuh-threatintel-policies` index.
 
-There are four spaces that contain the integrations:
+There are four spaces:
 
 - **Draft** (`draft`): User-defined space that contains the integrations that are being created or edited. They can not be tested or work in the normal usage of the system.
 - **Test** (`test`): User-defined space that contains the integrations that can be tested and do not work in the normal usage of the system.
