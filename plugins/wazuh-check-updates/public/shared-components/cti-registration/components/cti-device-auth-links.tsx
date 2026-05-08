@@ -38,7 +38,7 @@ export const CtiDeviceAuthLinks: React.FC<Props> = ({ deviceAuth }) => (
     <EuiText size='s'>
       <FormattedMessage
         id='wazuhCheckUpdates.ctiRegistration.verificationLinkLabel'
-        defaultMessage='Activation page:'
+        defaultMessage='Activation link:'
       />{' '}
       <EuiLink
         href={deviceAuth.verification_uri_complete}
@@ -60,7 +60,7 @@ export const CtiDeviceAuthLinks: React.FC<Props> = ({ deviceAuth }) => (
         >
           <FormattedMessage
             id='wazuhCheckUpdates.ctiRegistration.copyActivationUrl'
-            defaultMessage='Copy activation URL'
+            defaultMessage='Copy activation link'
           />
         </EuiButtonEmpty>
       )}

@@ -12,7 +12,6 @@ import {
   EuiModalFooter,
   EuiModalHeader,
   EuiModalHeaderTitle,
-  EuiProgress,
   EuiSpacer,
   EuiText,
   EuiTitle,
@@ -218,7 +217,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               ) : deviceAuth ? (
                 <FormattedMessage
                   id='wazuhCheckUpdates.ctiRegistration.modalTitleInProgress'
-                  defaultMessage='Complete activation in CTI Console'
+                  defaultMessage='Complete activation in Wazuh Cloud'
                 />
               ) : (
                 <FormattedMessage
@@ -238,7 +237,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               >
                 <FormattedMessage
                   id='wazuhCheckUpdates.ctiRegistration.modalSubtitleDeviceFlow'
-                  defaultMessage='Complete your registration in the CTI Console using the user code on the activation page. You can use the tab that opened automatically or the link below.'
+                  defaultMessage='Complete your registration in Wazuh Cloud using the user code on the activation page. Alternatively, you can click on the link below.'
                 />
               </EuiText>
             </>
@@ -288,15 +287,18 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         {showInProgress && (
           <>
             <EuiSpacer size='m' />
-            <EuiText size='s' color='subdued' data-test-subj='ctiRegistrationInProgress'>
-              <FormattedMessage
-                id='wazuhCheckUpdates.ctiRegistration.waitingForActivation'
-                defaultMessage='Checking activation status…'
-              />
-            </EuiText>
-            <EuiSpacer size='xs' />
-            <div className='ctiRegistrationModalProgress'>
-              <EuiProgress size='xs' color='primary' />
+            <div
+              className='ctiRegistrationActivationPending'
+              data-test-subj='ctiRegistrationInProgress'
+            >
+             
+              <EuiText size='s' color='subdued'>
+                <FormattedMessage
+                  id='wazuhCheckUpdates.ctiRegistration.waitingForActivation'
+                  defaultMessage='Checking activation status'
+                />
+              </EuiText>
+              <EuiLoadingSpinner size='m' />
             </div>
           </>
         )}

@@ -109,7 +109,7 @@ describe('ModalCti component', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('Complete activation in CTI Console'),
+        screen.getByText('Complete activation in Wazuh Cloud'),
       ).toBeInTheDocument();
       expect(
         document.querySelector('[data-test-subj="ctiModalDeviceFlowSubtitle"]'),
@@ -118,7 +118,7 @@ describe('ModalCti component', () => {
         document.querySelector('[data-test-subj="ctiDeviceUserCode"]'),
       ).toHaveTextContent('WZH-REST');
     });
-    expect(queryByText('Complete activation in CTI Console')).toBeInTheDocument();
+    expect(queryByText('Complete activation in Wazuh Cloud')).toBeInTheDocument();
   });
 
   it('should handle button click, show activation URL, and open verification URI', async () => {

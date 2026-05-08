@@ -2,13 +2,8 @@
   margin: 0 12px;
 }
 
-.ctiRegistrationModalProgress {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-}
-
-.ctiRegistrationModalProgress .euiProgress {
-  max-width: none;
-  width: 100%;
+.ctiRegistrationActivationPending {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
