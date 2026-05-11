@@ -36,7 +36,7 @@ interface, for example in end-to-end testing scenarios.
 
 Choose the procedure that matches the endpoint operating system.
 
-### Systemd
+**Systemd**
 
 ```bash
 systemctl daemon-reload
@@ -44,7 +44,7 @@ systemctl enable wazuh-agent
 systemctl start wazuh-agent
 ```
 
-### SysV init
+**SysV init**
 
 RPM-based operating systems:
 
@@ -60,7 +60,7 @@ update-rc.d wazuh-agent defaults 95 10
 service wazuh-agent start
 ```
 
-### No service manager
+**No service manager**
 
 On some systems, start the agent manually:
 
@@ -72,7 +72,7 @@ On some systems, start the agent manually:
 
 ![Check agent status](../img/agent-deploy-oneliner/go-back-to-summary.webp)
 
-## Notes:
+## Notes
 
 Use the manager FQDN for both `WAZUH_MANAGER` and `WAZUH_REGISTRATION_SERVER`
 when enrollment is performed through DNS. Add additional variables as needed,
