@@ -11,7 +11,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added "form-data": "^4.0.4" to the resolutions section to ensure this specific version is installed [#7662](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7662)
 - Added prompts to some views related to problems with server API and alerts index pattern [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694)
 - Added "Not applicable" status to SCA CheckResult enum with corresponding color mapping (#B9A888) and sample data support
-- Added Alerting sample monitors health check [#7833](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7833)
 - Added default `wazuh-events*` index pattern [#7924](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7924)
 - Added SSL certificate support for Wazuh API connections, allowing the dashboard to use client certificates and CA certificate validation when connecting to Wazuh Manager APIs configured with custom SSL certificates. The `verify_ca` value is automatically calculated based on whether certificate paths (`key`, `cert`, `ca`) are configured [#8015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8015) [#8212](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8212)
 - Added "Verify CA" column in the API Connections table to display whether CA certificate verification is enabled for each API host. The value is automatically determined based on certificate configuration [#8015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8015)
@@ -27,9 +26,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added ISO 27001 regulatory compliance module [#8286](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8286)
 - Added NIS2 regulatory compliance module [#8298](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8298)
 - Added NIST 800-171 regulatory compliance module [#8294](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8294)
-- Added `wazuh-threatintel-enrichments*` and `wazuh-threatintel-vulnerabilities*` index patterns [#8357](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8357)
+- Added `wazuh-threatintel-enrichments*` index patterns [#8357](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8357) [#8430](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8430)
 - Added Refresh button to the suggested filters search bar [#8398](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8398)
 - Added ability to generate PDF report in Vulnerabilities dashboard [#8403](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8403)
+- Added button that allows to request CTI content update [#8201](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8201)
 
 ### Changed
 
@@ -50,7 +50,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed `rule.groups` filter to `wazuh.integration.decoders` [#7934](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7934)
 - Applied the new home page navigation style to all dashboards [#7981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7981)
 - Updated Office 365 dashboards to use new index pattern [#8081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8081) [#8408](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8408)
-- Updated GitHub dashboards to use new index pattern [#8072](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8072) [#8354](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8354)
+- Updated GitHub dashboards to use new index pattern [#8072](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8072) [#8354](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8354) [#8420](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8420)
 - Updated File Integrity Monitoring dashboards to use new index pattern [#8074](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8074) [#8247](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8247)
 - Updated Google Cloud dashboard to use new index pattern [#8069](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8069)
 - Updated Amazon web services dashboard to use new index pattern [#8065](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8065)
@@ -84,6 +84,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed default columns in Configuration assessment [#8320](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8320)
 - Set the downloaded local agent package name same to the remote one [#8350](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8350)
 - Changed FIM findings default columns [#8417](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8417)
+- Allowed only 1 server API configuration per indexer [#8436](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8436)
+- Updated the OS icon source field in the Endpoints summary table to display Linux agent icons [#8459](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8459)
+- Reworked Statistics dashboard [#8254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8254)
 
 ### Fixed
 

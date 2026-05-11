@@ -22,6 +22,7 @@ const initialState = {
   userPermissions: false,
   toastNotification: false,
   withUserLogged: false,
+  isCCS: false,
   userAccount: {
     administrator: false,
     administrator_requirements: '',
@@ -100,6 +101,13 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       withUserLogged: action.withUserLogged,
+    };
+  }
+
+  if (action.type === 'UPDATE_IS_CCS') {
+    return {
+      ...state,
+      isCCS: action.isCCS,
     };
   }
 
