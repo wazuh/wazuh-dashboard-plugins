@@ -33,9 +33,30 @@ import {
   revision as pluginRevision,
 } from '../../package.json';
 import { extractErrorMessage } from '../lib/extract-error-message';
+import { detectCCS } from '../lib/ccs-detector';
 
 export class WazuhApiCtrl {
   constructor() {}
+
+  private async resolveHostId(
+    context: RequestHandlerContext,
+    sessionHostId?: string,
+  ): Promise<string | undefined> {
+    const hosts = await context.wazuh_core.manageHosts.getEntries({
+      excludePassword: true,
+    });
+    const firstHostId = hosts?.[0]?.id;
+    if (!firstHostId) return undefined;
+
+    if (sessionHostId && hosts.some(h => h.id === sessionHostId)) {
+      const isCCS = await detectCCS(context);
+      if (isCCS) {
+        return sessionHostId;
+      }
+    }
+
+    return firstHostId;
+  }
 
   async getToken(
     context: RequestHandlerContext,
@@ -43,7 +64,10 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const { force, idHost } = request.body;
+      const { force } = request.body;
+      const idHost: string =
+        (await this.resolveHostId(context, request.body.idHost)) ??
+        request.body.idHost;
       const { username } = await context.wazuh.security.getCurrentUser(
         request,
         context,
@@ -124,8 +148,8 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      // Get config from configuration
-      const id = request.body.id;
+      const id: string =
+        (await this.resolveHostId(context, request.body.id)) ?? request.body.id;
       context.wazuh.logger.debug(`Getting server API host by ID: ${id}`);
       const apiHostData = await context.wazuh_core.manageHosts.get(id, {
         excludePassword: true,
@@ -197,46 +221,6 @@ export class WazuhApiCtrl {
           },
         });
       } else {
-        try {
-          const apis = await context.wazuh_core.manageHosts.get();
-          for (const api of apis) {
-            try {
-              const { id } = api;
-
-              const responseClusterInfo =
-                await context.wazuh.api.client.asInternalUser.request(
-                  'GET',
-                  `/cluster/local/info`,
-                  {},
-                  { apiHostID: id },
-                );
-
-              if (this.checkResponseIsDown(context, responseClusterInfo)) {
-                return ErrorResponse(
-                  `ERROR3099 - ${
-                    responseClusterInfo.detail || 'Server not ready yet'
-                  }`,
-                  3099,
-                  HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
-                  response,
-                );
-              }
-              if (responseClusterInfo.status === HTTP_STATUS_CODES.OK) {
-                request.body.id = id;
-                request.body.idChanged = id;
-                return await this.checkStoredAPI(context, request, response);
-              }
-            } catch (error) {} // eslint-disable-line
-          }
-        } catch (error) {
-          context.wazuh.logger.error(error.message || error);
-          return ErrorResponse(
-            error.message || error,
-            3020,
-            error?.response?.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-            response,
-          );
-        }
         context.wazuh.logger.error(error.message || error);
         return ErrorResponse(
           error.message || error,
@@ -660,18 +644,53 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} api response or ErrorResponse
    */
-  requestApi(
+  async requestApi(
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
   ) {
     const idApi = getCookieValueByName(request.headers.cookie, 'wz-api');
-    if (idApi !== request.body.id) {
-      // if the current token belongs to a different API id, we relogin to obtain a new token
+    const bodyId = request.body?.id;
+    const devTools = !!(
+      request.body?.body &&
+      typeof request.body.body === 'object' &&
+      request.body.body.devTools === true
+    );
+
+    if (devTools && idApi !== bodyId) {
       return ErrorResponse(
         'status code 401',
         HTTP_STATUS_CODES.UNAUTHORIZED,
         HTTP_STATUS_CODES.UNAUTHORIZED,
+        response,
+      );
+    }
+
+    let apiHostId = devTools ? bodyId : idApi;
+
+    if (!devTools && idApi && bodyId && idApi !== bodyId) {
+      try {
+        await context.wazuh_core.manageHosts.get(idApi, {
+          excludePassword: true,
+        });
+        apiHostId = idApi;
+      } catch {
+        apiHostId = bodyId;
+      }
+    }
+
+    try {
+      const resolved = await this.resolveHostId(context, idApi || bodyId);
+      if (resolved) {
+        apiHostId = resolved;
+      }
+    } catch {}
+
+    if (!apiHostId) {
+      return ErrorResponse(
+        'Missing param: id',
+        3015,
+        HTTP_STATUS_CODES.BAD_REQUEST,
         response,
       );
     }
@@ -713,7 +732,7 @@ export class WazuhApiCtrl {
         request.body.method,
         request.body.path,
         request.body.body,
-        request.body.id,
+        apiHostId,
         response,
       );
     }

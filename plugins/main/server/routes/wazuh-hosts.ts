@@ -24,4 +24,13 @@ export function WazuhHostsRoutes(router: IRouter, services) {
     async (context, request, response) =>
       ctrl.getHostsEntries(context, request, response),
   );
+
+  router.get(
+    {
+      path: '/hosts/ccs/status',
+      validate: false,
+    },
+    async (context, request, response) =>
+      ctrl.getCCSStatus(context, request, response),
+  );
 }

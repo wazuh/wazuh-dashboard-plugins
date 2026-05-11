@@ -18,21 +18,35 @@ import {
 } from '../../../utils/errors';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { getCore } from '../../../kibana-services';
+import store from '../../../redux/store';
 import { tUseSearchBarProps } from '../search-bar';
+
+const SERVER_APIS_APP_PATH = '/app/server-apis#/settings?tab=api';
 
 export const PromptErrorDataSourceServerAPIContextFilter = ({
   error,
 }: {
   error: ErrorDataSourceServerAPIContextFilter;
 }) => {
+  const isCCS = store.getState()?.appStateReducers?.isCCS ?? false;
   return (
     <EuiEmptyPrompt
       iconType='alert'
       body={
-        <p>
-          Filter could not be created because no server API is selected. Make
-          sure a server API is available and choose one in the selector.
-        </p>
+        isCCS ? (
+          <p>
+            Filter could not be created because no server API is selected. Make
+            sure a server API is available and choose one in the selector.
+          </p>
+        ) : (
+          <p>
+            Filter could not be created because no server API is selected. Go to{' '}
+            <EuiLink href={SERVER_APIS_APP_PATH}>
+              Dashboard Management &gt; Server API
+            </EuiLink>{' '}
+            to verify the connection.
+          </p>
+        )
       }
     />
   );
