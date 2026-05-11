@@ -59,7 +59,7 @@ export const ctiConsoleApiPaths = {
 /** Content Manager plugin HTTP path prefix (cluster plugin / Imposter mock). */
 const WAZUH_CONTENT_MANAGER_BASE_PATH = '/_plugins/_content_manager';
 
-/** Relative paths appended to `WAZUH_CONTENT_MANAGER_BASE_URL` (server-side only). */
+/** Indexer Content Manager plugin paths (used with `context.core.opensearch.client`). */
 export const enum contentManagerRoutes {
   subscription = `${WAZUH_CONTENT_MANAGER_BASE_PATH}/subscription`,
   contentUpdate = `${WAZUH_CONTENT_MANAGER_BASE_PATH}/update`,

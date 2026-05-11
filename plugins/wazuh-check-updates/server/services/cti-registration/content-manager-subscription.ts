@@ -1,34 +1,39 @@
-import axios from 'axios';
+import { IScopedClusterClient } from 'opensearch-dashboards/server';
 import { contentManagerRoutes } from '../../../common/constants';
 import { getWazuhCheckUpdatesServices } from '../../plugin-services';
-import { getContentManagerBaseUrl } from './content-manager-url';
 
 /**
- * Forwards the CTI OAuth access token to Content Manager `POST …/subscription`.
- * Server-only: never send this body from the browser.
- *
- * No-op when `WAZUH_CONTENT_MANAGER_BASE_URL` is unset (deployments without CM yet).
+ * Forwards the CTI OAuth access token to the indexer Content Manager plugin
+ * `POST /_plugins/_content_manager/subscription`.
+ * Uses the same cluster connection as other CM calls (e.g. version check).
  */
 export async function postContentManagerSubscription(
+  wazuhClient: IScopedClusterClient,
   accessToken: string,
 ): Promise<void> {
-  const base = getContentManagerBaseUrl();
-  if (!base) {
-    return;
-  }
-
   const { logger } = getWazuhCheckUpdatesServices();
-  const url = `${base}${contentManagerRoutes.subscription}`;
 
   try {
-    await axios.post(
-      url,
-      { access_token: accessToken },
-      {
-        headers: { 'Content-Type': 'application/json' },
-        validateStatus: status => status >= 200 && status < 300,
-      },
-    );
+    const response = await wazuhClient.asCurrentUser.transport.request({
+      method: 'POST',
+      path: contentManagerRoutes.subscription,
+      body: { access_token: accessToken },
+    });
+
+    const body = response.body as {
+      message?: unknown;
+      status?: number;
+    } | null;
+    const statusFromBody =
+      body && typeof body.status === 'number' ? body.status : undefined;
+    const statusFromMeta = (response as { statusCode?: number }).statusCode;
+    const status = statusFromBody ?? statusFromMeta;
+
+    if (status !== undefined && (status < 200 || status >= 300)) {
+      throw new Error(
+        `Content Manager subscription rejected with status ${status}`,
+      );
+    }
   } catch (error) {
     const message =
       error instanceof Error

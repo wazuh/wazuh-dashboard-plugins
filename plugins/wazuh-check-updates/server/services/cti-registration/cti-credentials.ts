@@ -1,10 +1,9 @@
-import axios from 'axios';
+import type { IScopedClusterClient } from 'opensearch-dashboards/server';
 import type {
   CtiSubscriptionMessage,
   CtiSubscriptionSnapshot,
 } from '../../../common/cti-registration-status-api';
 import { contentManagerRoutes } from '../../../common/constants';
-import { getContentManagerBaseUrl } from './content-manager-url';
 
 interface ContentManagerSubscriptionGetResponse {
   message?: {
@@ -37,35 +36,33 @@ function normalizeSubscriptionMessage(
 }
 
 /**
- * Reads CTI subscription payload from Content Manager `GET …/subscription`.
- * On missing base URL or request failure returns nulls (same as “not registered” for UX).
+ * Reads CTI subscription payload from the indexer Content Manager plugin
+ * `GET /_plugins/_content_manager/subscription` (no query params; cluster-scoped).
+ * On request failure returns nulls (same as “not registered” for UX).
  */
 export async function getCtiSubscriptionStatus(
-  clientId: string,
+  wazuhClient: IScopedClusterClient,
 ): Promise<CtiSubscriptionSnapshot> {
-  const base = getContentManagerBaseUrl();
-  if (!base) {
-    return { message: null, status: null };
-  }
-
   try {
-    const response = await axios.get<ContentManagerSubscriptionGetResponse>(
-      `${base}${contentManagerRoutes.subscription}`,
-      {
-        params: { clientId },
-        headers: { 'Content-Type': 'application/json' },
-        validateStatus: status => status >= 200 && status < 300,
-      },
-    );
+    const response = await wazuhClient.asCurrentUser.transport.request({
+      method: 'GET',
+      path: contentManagerRoutes.subscription,
+    });
 
-    const body = response.data;
+    const body = response.body as ContentManagerSubscriptionGetResponse | null;
     const message = normalizeSubscriptionMessage(body?.message);
     const statusFromBody =
-      typeof body?.status === 'number' ? body.status : response.status;
+      typeof body?.status === 'number' ? body.status : undefined;
+    const statusFromMeta = (response as { statusCode?: number }).statusCode;
+    const statusFromResponse =
+      statusFromBody ?? statusFromMeta ?? undefined;
 
     return {
       message,
-      status: Number.isFinite(statusFromBody) ? statusFromBody : null,
+      status:
+        statusFromResponse !== undefined && Number.isFinite(statusFromResponse)
+          ? statusFromResponse
+          : null,
     };
   } catch {
     return { message: null, status: null };

@@ -3,7 +3,7 @@
  * Used to rehydrate the browser after reload (in-memory store on the server).
  */
 
-/** Shape of `message` from Content Manager `GET …/subscription?clientId=…`. */
+/** Shape of `message` from Content Manager `GET …/subscription`. */
 export interface CtiSubscriptionPlan {
   name: string;
   is_public: boolean;

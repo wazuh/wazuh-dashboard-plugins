@@ -30,7 +30,13 @@ jest.mock('../../services/cti-registration', () => ({
 
 const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
+const mockWazuhClient = { asCurrentUser: {} };
 const context = {
+  core: {
+    opensearch: {
+      client: mockWazuhClient,
+    },
+  },
   wazuh_check_updates: {
     security: {
       getCurrentUser: () => ({ username: 'admin' }),
@@ -94,7 +100,7 @@ describe('CTI registration status route', () => {
       inProgress: false,
       subscription: { message: null, status: null },
     });
-    expect(mockedGetCtiSubscriptionStatus).toHaveBeenCalledWith('env-uuid-1');
+    expect(mockedGetCtiSubscriptionStatus).toHaveBeenCalledWith(mockWazuhClient);
   });
 
   test(`GET ${routes.ctiRegistrationStatus} when CTI subscription is registered`, async () => {

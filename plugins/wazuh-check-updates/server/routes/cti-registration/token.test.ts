@@ -47,7 +47,13 @@ jest.mock('../../services/cti-registration', () => ({
 
 const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
+const mockWazuhClient = { asCurrentUser: {} };
 const context = {
+  core: {
+    opensearch: {
+      client: mockWazuhClient,
+    },
+  },
   wazuh_check_updates: {
     security: {
       getCurrentUser: () => ({ username: 'admin' }),
@@ -196,7 +202,10 @@ describe('CTI token route', () => {
     expect(response.body).toEqual(CTI_REGISTRATION_COMPLETED_BODY);
     expect(mockedPollCtiToken).toHaveBeenCalledWith('resolved-client-id', 'dc1');
     expect(mockedGetCtiToken).not.toHaveBeenCalled();
-    expect(mockedPostContentManagerSubscription).toHaveBeenCalledWith('tok');
+    expect(mockedPostContentManagerSubscription).toHaveBeenCalledWith(
+      mockWazuhClient,
+      'tok',
+    );
     expect(
       CtiRegistrationStore.getInstance().getStatus('resolved-client-id')
         ?.registrationComplete,

@@ -38,7 +38,7 @@ export const getCtiTokenRoute = (router: IRouter) => {
         }),
       },
     },
-    async (_context, request, response) => {
+    async (context, request, response) => {
       try {
         const { client_id, grant_type, device_code } = request.body;
 
@@ -69,7 +69,8 @@ export const getCtiTokenRoute = (router: IRouter) => {
           if (isSuccessfulUpstreamDevicePoll(pollBody)) {
             const accessToken = pollBody.access_token as string;
             try {
-              await postContentManagerSubscription(accessToken);
+              const wazuhClient = context.core.opensearch.client;
+              await postContentManagerSubscription(wazuhClient, accessToken);
             } catch {
               store.clear(clientId);
               return response.customError({
