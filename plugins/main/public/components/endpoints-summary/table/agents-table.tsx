@@ -79,9 +79,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Agent[]>([]);
   const [allAgentsSelected, setAllAgentsSelected] = useState(false);
-  const [denyGetTasks] = useUserPermissionsRequirements([
-    { action: 'task:status', resource: '*:*:*' },
-  ]);
 
   const [isUpgradeTasksModalVisible, setIsUpgradeTasksModalVisible] =
     useState(false);
@@ -221,7 +218,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                 setIsModalVisible={setIsUpgradeTasksModalVisible}
                 isPanelClosed={isUpgradePanelClosed}
                 setIsPanelClosed={setIsUpgradePanelClosed}
-                allowGetTasks={!denyGetTasks}
               />
             }
             actionButtons={
@@ -248,7 +244,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                   allAgentsSelected={allAgentsSelected}
                   allAgentsCount={agentList.totalItems}
                   filters={filters?.q}
-                  allowGetTasks={!denyGetTasks}
                   reloadAgents={() => reloadAgents()}
                   setIsUpgradeTasksModalVisible={setIsUpgradeTasksModalVisible}
                   setIsUpgradePanelClosed={setIsUpgradePanelClosed}
