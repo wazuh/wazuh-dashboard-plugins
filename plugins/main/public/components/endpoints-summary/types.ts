@@ -10,8 +10,8 @@ export type Agent = {
     minor: string;
     name: string;
     platform: string;
-    uname: string;
     version: string;
+    type: string;
   };
   lastKeepAlive: Date;
   dateAdd: Date;
