@@ -25,11 +25,9 @@ describe('AgentsTableGlobalActions component', () => {
         allAgentsSelected={false}
         allAgentsCount={3}
         filters={{}}
-        allowEditGroups={true}
         reloadAgents={() => {}}
         setIsUpgradeTasksModalVisible={() => {}}
         setIsUpgradePanelClosed={() => {}}
-        allowUpgrade={true}
         allowGetTasks={true}
       />,
     );
@@ -47,11 +45,9 @@ describe('AgentsTableGlobalActions component', () => {
         allAgentsSelected={false}
         allAgentsCount={3}
         filters={{}}
-        allowEditGroups={true}
         reloadAgents={() => {}}
         setIsUpgradeTasksModalVisible={() => {}}
         setIsUpgradePanelClosed={() => {}}
-        allowUpgrade={true}
         allowGetTasks={true}
       />,
     );

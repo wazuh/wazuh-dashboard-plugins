@@ -79,12 +79,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Agent[]>([]);
   const [allAgentsSelected, setAllAgentsSelected] = useState(false);
-  const [denyEditGroups] = useUserPermissionsRequirements([
-    { action: 'group:modify_assignments', resource: 'group:id:*' },
-  ]);
-  const [denyUpgrade] = useUserPermissionsRequirements([
-    { action: 'agent:upgrade', resource: 'agent:id:*' },
-  ]);
   const [denyGetTasks] = useUserPermissionsRequirements([
     { action: 'task:status', resource: '*:*:*' },
   ]);
@@ -254,8 +248,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                   allAgentsSelected={allAgentsSelected}
                   allAgentsCount={agentList.totalItems}
                   filters={filters?.q}
-                  allowEditGroups={!denyEditGroups}
-                  allowUpgrade={!denyUpgrade}
                   allowGetTasks={!denyGetTasks}
                   reloadAgents={() => reloadAgents()}
                   setIsUpgradeTasksModalVisible={setIsUpgradeTasksModalVisible}
@@ -265,8 +257,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
             )}
             endpoint={'/agents'}
             tableColumns={agentsTableColumns(
-              !denyEditGroups,
-              !denyUpgrade,
               setAgent,
               setIsEditGroupsVisible,
               setIsUpgradeModalVisible,
