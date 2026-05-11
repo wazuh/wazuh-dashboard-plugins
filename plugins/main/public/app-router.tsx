@@ -2,13 +2,12 @@ import React, { useEffect } from 'react';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import { ToolsRouter } from './components/tools/tools-router';
 import { getWazuhCorePlugin, getWzMainParams } from './kibana-services';
+import { updateCurrentPlatform } from './redux/actions/appStateActions';
 import {
-  updateCurrentPlatform,
-  updateIsCCS,
-} from './redux/actions/appStateActions';
-import store from './redux/store';
-import { GenericRequest } from './react-services/generic-request';
-import { useDispatch } from 'react-redux';
+  fetchCcsStatusForApplicationMount,
+  syncSessionToPrimaryWhenMismatch,
+} from './react-services/manager-api-session-sync';
+import { useDispatch, useSelector } from 'react-redux';
 import { checkPluginVersion } from './utils';
 import { WzAuthentication, loadAppConfig } from './react-services';
 import { WzMenuWrapper } from './components/wz-menu/wz-menu-wrapper';
@@ -28,6 +27,29 @@ import { SECTIONS } from './sections';
 import { withGuardAsync } from './components/common/hocs';
 import { WzRequest } from './react-services/wz-request';
 
+const SyncPrimaryApiWhenNotCCS = () => {
+  const isCCS = useSelector(
+    (state: { appStateReducers?: { isCCS?: boolean } }) =>
+      state.appStateReducers?.isCCS,
+  );
+
+  useEffect(() => {
+    if (isCCS) return;
+
+    const cancelledRef = { current: false };
+
+    syncSessionToPrimaryWhenMismatch({
+      isCancelled: () => cancelledRef.current,
+    }).catch(() => {});
+
+    return () => {
+      cancelledRef.current = true;
+    };
+  }, [isCCS]);
+
+  return null;
+};
+
 export const Application = withGuardAsync(
   async (_props: any) => {
     try {
@@ -37,12 +59,7 @@ export const Application = withGuardAsync(
         WzRequest.setupAPI(),
         // Load the app state
         loadAppConfig(),
-        // Detect CCS before first render so the API selector shows immediately
-        GenericRequest.request('GET', '/hosts/ccs/status', {}).then(
-          (response: any) => {
-            store.dispatch(updateIsCCS(response?.data?.isCCS));
-          },
-        ),
+        fetchCcsStatusForApplicationMount(),
       ]);
     } catch {}
 
@@ -88,6 +105,7 @@ export const Application = withGuardAsync(
   return (
     <Router history={history}>
       <div className='wazuhNotReadyYet'></div>
+      <SyncPrimaryApiWhenNotCCS />
       {/* TODO: The plugins/main/public/components/wz-menu/wz-menu.js defines a portal to mount here. We could avoid the usage of the React portal and render the component instead*/}
       <WzMenuWrapper />
       <ToastNotificationsModal /> {/* TODO: check if this is being used */}

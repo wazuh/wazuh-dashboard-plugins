@@ -24,9 +24,8 @@ import {
 } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 
-import { connect, useSelector, useDispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import { getHeaderActionMenuMounter } from '../../kibana-services';
-import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { withWindowSize } from '../../components/common/hocs/withWindowSize';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
@@ -40,59 +39,15 @@ import { useAsyncActionRunOnStart } from '../common/hooks';
 import { useSelectedServerApi } from '../common/hooks/use-selected-server-api';
 import { Selector, SelectorContainer, SelectorLabel } from './selectors';
 import { isEqual } from 'lodash';
-import { useEffect } from 'react';
-import { updateIsCCS } from '../../redux/actions/appStateActions';
 import { WzAuthentication } from '../../react-services/wz-authentication';
+import { fetchManagerApiHostsList } from '../../react-services/manager-api-session-sync';
 
-const CCSStatusSync = () => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    GenericRequest.request('GET', '/hosts/ccs/status', {})
-      .then(response => dispatch(updateIsCCS(response?.data?.isCCS ?? false)))
-      .catch(() => {});
-  }, []);
-
-  return null;
-};
-
-async function getServerAPIList() {
-  const response = await GenericRequest.request('GET', '/hosts/apis', {});
-  return response?.data;
-}
+// =============================================================================
+// Header: Server API selector (only rendered when isCCS)
+// =============================================================================
 
 const ServerAPISelector = ({ showSelectorsInPopover }) => {
-  const action = useAsyncActionRunOnStart(getServerAPIList, []);
-  const dispatch = useDispatch();
-  const isCCS = useSelector(state => state.appStateReducers.isCCS);
-
-  useEffect(() => {
-    if (action.running || !action.data) return;
-    GenericRequest.request('GET', '/hosts/ccs/status', {})
-      .then(response => dispatch(updateIsCCS(response?.data?.isCCS ?? false)))
-      .catch(() => {});
-  }, [action.data, action.running]);
-
-  useEffect(() => {
-    if (!action.data?.length || isCCS) return;
-    const firstHost = action.data[0];
-    let currentId = null;
-    try {
-      const raw = AppState.getCurrentAPI();
-      currentId = raw ? JSON.parse(raw)?.id : null;
-    } catch {}
-    if (currentId === firstHost.id) return;
-    ApiCheck.checkApi(firstHost, true)
-      .then(response => {
-        const { allow_run_as, verify_ca, ...cluster_info } =
-          response.data || {};
-        AppState.setClusterInfo(cluster_info);
-        AppState.setCurrentAPI(
-          JSON.stringify({ name: cluster_info.cluster, id: firstHost.id }),
-        );
-      })
-      .catch(() => {});
-  }, [action.data, isCCS]);
+  const action = useAsyncActionRunOnStart(fetchManagerApiHostsList, []);
 
   const { selectedAPI: currentAPI } = useSelectedServerApi();
 
@@ -289,7 +244,6 @@ export const WzMenu = withWindowSize(
 
       return (
         <>
-          <CCSStatusSync />
           <MountPointPortal setMountPoint={getHeaderActionMenuMounter()}>
             <EuiFlexGroup
               alignItems='center'
