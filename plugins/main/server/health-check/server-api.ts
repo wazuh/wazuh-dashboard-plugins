@@ -5,6 +5,18 @@ import {
 import { webDocumentationLink } from '../../common/services/web_documentation';
 import { version as appVersion } from '../../package.json';
 import type { InitializationTaskRunContext } from './types';
+import { checkCCS } from '../lib/ccs-detector';
+
+const MESSAGES = {
+  NO_SERVER_AVAILABLE_CCS:
+    'No server API hosts available to connect. Ensure all configured hosts are reachable and compatible with the dashboard.',
+  NO_SERVER_AVAILABLE:
+    'No server API available to connect. Ensure the server API host is reachable and compatible with the dashboard.',
+  RUN_AS_NOT_ENABLED_CCS: (summary: string) =>
+    `The configured server API hosts have not enabled run_as, or the API user cannot use it: ${summary}. Ensure all configured API hosts allow run_as for the API user.`,
+  RUN_AS_NOT_ENABLED: (summary: string) =>
+    `The configured server API host has not enabled run_as, or the API user cannot use it: ${summary}. Ensure the configured API host allows run_as for the API user.`,
+};
 
 export function checkAppServerCompatibility(
   appVersion: string,
@@ -105,9 +117,18 @@ async function serversAPIConnectionCompatibility(
 
     ctx.logger.debug(`APP version [${appVersion}]`);
 
+    if (!hosts?.length) {
+      return [];
+    }
+
+    const isCCS = await checkCCS(
+      ctx.context.services.core.opensearch.client.asInternalUser,
+    ).catch(() => false);
+    const hostsToCheck = isCCS ? hosts : [hosts[0]];
+
     return await Promise.all(
-      hosts.map(async ({ id: apiHostID }: { id: string }) =>
-        serverAPIConnectionCompatibility(ctx, services, apiHostID, appVersion),
+      hostsToCheck.map(async ({ id }: { id: string }) =>
+        serverAPIConnectionCompatibility(ctx, services, id, appVersion),
       ),
     );
   }
@@ -133,15 +154,17 @@ export const initializationTaskCreatorServerAPIConnectionCompatibility = ({
         'Start check server API connection and compatibility finished',
       );
 
-      if (
-        results?.some(
-          ({ compatibility, connection }) => compatibility && connection,
-        )
-      ) {
+      const hasAvailable = results?.some(
+        ({ compatibility, connection }) => compatibility && connection,
+      );
+
+      if (hasAvailable) {
         return results;
       }
+
+      const isCCS = results?.length > 1;
       throw new Error(
-        `No server API available to connect. Ensure at least a server API is reachable and compatible with the dashboard. Review the server API hosts configuration, ensure the service is up, is reachable and compatible with the dashboard.`,
+        isCCS ? MESSAGES.NO_SERVER_AVAILABLE_CCS : MESSAGES.NO_SERVER_AVAILABLE,
       );
     } catch (error) {
       const message = `Error checking server API connection and compatibility: ${error.message}`;
@@ -170,7 +193,12 @@ export const initializationTaskCreatorServerAPIRunAs = ({
 
       const API_USER_STATUS_RUN_AS = services.API_USER_STATUS_RUN_AS;
 
-      const results = hosts.map(
+      const isCCS = await checkCCS(
+        ctx.context.services.core.opensearch.client.asInternalUser,
+      ).catch(() => false);
+      const hostsToValidate = isCCS ? hosts : hosts.slice(0, 1);
+
+      const results = hostsToValidate.map(
         (host: { id: string; allow_run_as?: number }) => ({
           id: host.id,
           allow_run_as:
@@ -217,7 +245,9 @@ export const initializationTaskCreatorServerAPIRunAs = ({
           )
           .join(', ');
 
-        const message = `Some server API hosts have not enabled the run_as or the user has no the ability to use it or both are not enabled: ${notEnabledSummary}. Ensure every configured API host allows run_as for the API user.`;
+        const message = isCCS
+          ? MESSAGES.RUN_AS_NOT_ENABLED_CCS(notEnabledSummary)
+          : MESSAGES.RUN_AS_NOT_ENABLED(notEnabledSummary);
         ctx.logger.warn(message);
 
         throw new Error(message);
@@ -225,7 +255,7 @@ export const initializationTaskCreatorServerAPIRunAs = ({
 
       if (unableToCheckHosts.length > 0) {
         ctx.logger.warn(
-          `Server API hosts where allow_run_as could not be checked: ${unableToCheckHosts
+          `Server API host where allow_run_as could not be checked: ${unableToCheckHosts
             .map((result: { id: string }) => result.id)
             .join(', ')}`,
         );
@@ -236,7 +266,7 @@ export const initializationTaskCreatorServerAPIRunAs = ({
       );
 
       ctx.logger.debug(
-        `Server API hosts with run_as permission enabled: ${enabledHosts
+        `Server API host with run_as permission enabled: ${enabledHosts
           .map((result: { id: string }) => result.id)
           .join(', ')}`,
       );

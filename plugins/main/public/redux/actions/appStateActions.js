@@ -119,3 +119,10 @@ export const updateWithUserLogged = withUserLogged => {
     withUserLogged,
   };
 };
+
+export const updateIsCCS = isCCS => {
+  return {
+    type: 'UPDATE_IS_CCS',
+    isCCS,
+  };
+};
