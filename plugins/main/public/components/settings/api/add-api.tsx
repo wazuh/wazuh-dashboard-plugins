@@ -12,8 +12,9 @@ import { getWazuhCorePlugin } from '../../../kibana-services';
 
 export const AddApi = withErrorBoundary(() => {
   const data = React.useMemo(() => {
+
     const settings = Object.entries(
-      getWazuhCorePlugin().configuration._settings.get('hosts').options.arrayOf,
+      getWazuhCorePlugin().configuration.getSettingDefinition('hosts').options.objectOf
     ).map(([key, { description }]) => [
       key,
       description.charAt(0).toLowerCase() + description.slice(1), // lower case the first letter
@@ -21,12 +22,12 @@ export const AddApi = withErrorBoundary(() => {
 
     return {
       settings,
-      example: `hosts:
+      example: `wazuh_core.hosts:
     - <id>:
      ${settings
-       .filter(([key]) => key !== 'id')
-       .map(([key]) => `${key}: <${key}>`)
-       .join('\n     ')}`,
+          .filter(([key]) => key !== 'id')
+          .map(([key]) => `${key}: <${key}>`)
+          .join('\n     ')}`,
     };
   }, []);
 
@@ -36,7 +37,7 @@ export const AddApi = withErrorBoundary(() => {
         <EuiFlexItem>
           <EuiText>
             Modify{' '}
-            <EuiCode>{getWazuhCorePlugin().configuration.store.file}</EuiCode>{' '}
+            <EuiCode>opensearch_dashboards.yml</EuiCode>{' '}
             to set the connection information.
           </EuiText>
         </EuiFlexItem>
