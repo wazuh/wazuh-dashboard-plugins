@@ -259,16 +259,16 @@ export const ComplianceTable = compose(
   }) => {
     try {
       const mapFieldAgg = {
-        [WAZUH_MODULES_ID.CMMC]: 'rule.compliance.cmmc',
-        [WAZUH_MODULES_ID.FEDRAMP]: 'rule.compliance.fedramp',
-        [WAZUH_MODULES_ID.GDPR]: 'rule.compliance.gdpr',
-        [WAZUH_MODULES_ID.HIPAA]: 'rule.compliance.hipaa',
-        [WAZUH_MODULES_ID.ISO_27001]: 'rule.compliance.iso_27001',
-        [WAZUH_MODULES_ID.NIS2]: 'rule.compliance.nis2',
-        [WAZUH_MODULES_ID.NIST_800_53]: 'rule.compliance.nist_800_53',
-        [WAZUH_MODULES_ID.NIST_800_171]: 'rule.compliance.nist_800_171',
-        [WAZUH_MODULES_ID.PCI_DSS]: 'rule.compliance.pci_dss',
-        [WAZUH_MODULES_ID.TSC]: 'rule.compliance.tsc',
+        [WAZUH_MODULES_ID.CMMC]: 'wazuh.rule.compliance.cmmc',
+        [WAZUH_MODULES_ID.FEDRAMP]: 'wazuh.rule.compliance.fedramp',
+        [WAZUH_MODULES_ID.GDPR]: 'wazuh.rule.compliance.gdpr',
+        [WAZUH_MODULES_ID.HIPAA]: 'wazuh.rule.compliance.hipaa',
+        [WAZUH_MODULES_ID.ISO_27001]: 'wazuh.rule.compliance.iso_27001',
+        [WAZUH_MODULES_ID.NIS2]: 'wazuh.rule.compliance.nis2',
+        [WAZUH_MODULES_ID.NIST_800_53]: 'wazuh.rule.compliance.nist_800_53',
+        [WAZUH_MODULES_ID.NIST_800_171]: 'wazuh.rule.compliance.nist_800_171',
+        [WAZUH_MODULES_ID.PCI_DSS]: 'wazuh.rule.compliance.pci_dss',
+        [WAZUH_MODULES_ID.TSC]: 'wazuh.rule.compliance.tsc',
       };
       const aggs = {
         tactics: {

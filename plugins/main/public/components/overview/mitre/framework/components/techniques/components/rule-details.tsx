@@ -110,23 +110,23 @@ const getFormattedDetails = value => {
 
 const getComplianceKey = key => {
   if (key === 'pci') {
-    return 'rule.compliance.pci_dss';
+    return 'wazuh.rule.compliance.pci_dss';
   }
   if (key === 'gdpr') {
-    return 'rule.compliance.gdpr';
+    return 'wazuh.rule.compliance.gdpr';
   }
   if (key === 'gpg13') {
-    return 'rule.compliance.gpg13';
+    return 'wazuh.rule.compliance.gpg13';
   }
   if (key === 'hipaa') {
-    return 'rule.compliance.hipaa';
+    return 'wazuh.rule.compliance.hipaa';
   }
   if (key === 'nist-800-53') {
-    return 'rule.compliance.nist_800_53';
+    return 'wazuh.rule.compliance.nist_800_53';
   }
   // TODO: add the remaining regulatory compliances when the component is readded
   if (key === 'mitre') {
-    return 'rule.mitre.technique';
+    return 'wazuh.rule.mitre.technique';
   }
 
   return '';
@@ -254,13 +254,17 @@ const RuleDetails = (props: Props) => {
         <EuiFlexItem key='id' grow={1}>
           <b style={{ paddingBottom: 6 }}>ID</b>
           <EuiToolTip position='top' content={`Filter by this rule ID: ${id}`}>
-            <EuiLink onClick={() => addFilter({ 'rule.id': id })}>{id}</EuiLink>
+            <EuiLink onClick={() => addFilter({ 'wazuh.rule.id': id })}>
+              {id}
+            </EuiLink>
           </EuiToolTip>
         </EuiFlexItem>
         <EuiFlexItem key='level' grow={1}>
           <b style={{ paddingBottom: 6 }}>Level</b>
           <EuiToolTip position='top' content={`Filter by this level: ${level}`}>
-            <EuiLink onClick={async () => addFilter({ 'rule.level': level })}>
+            <EuiLink
+              onClick={async () => addFilter({ 'wazuh.rule.level': level })}
+            >
               {level}
             </EuiLink>
           </EuiToolTip>

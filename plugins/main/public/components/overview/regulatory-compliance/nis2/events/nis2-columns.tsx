@@ -5,7 +5,7 @@ export const nis2Columns: tDataGridColumn[] = [
   commonColumns.timestamp,
   commonColumns['wazuh.agent.name'],
   {
-    id: 'rule.compliance.nis2',
+    id: 'wazuh.rule.compliance.nis2',
     initialWidth: 160,
   },
   { id: 'wazuh.integration.name' },
