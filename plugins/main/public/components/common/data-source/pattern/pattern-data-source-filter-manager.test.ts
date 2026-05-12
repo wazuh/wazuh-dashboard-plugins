@@ -290,7 +290,7 @@ describe('PatternDataSourceFilterManager', () => {
     it('should return the filters to fetch the data from the data source', () => {
       const dataSource = new DataSourceMocked('my-index', 'my-title');
       const storedFilter = createFilter('fetch.filter', '1', 'my-index');
-      const defaultFilters = createFilter('rule.level', '3', 'my-index');
+      const defaultFilters = createFilter('wazuh.rule.level', '3', 'my-index');
       storedFilter.meta.controlledBy =
         DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT;
       jest.spyOn(dataSource, 'getFetchFilters').mockReturnValue([storedFilter]);
@@ -379,7 +379,7 @@ describe('PatternDataSourceFilterManager', () => {
       try {
         PatternDataSourceFilterManager.createFilter(
           '',
-          'rule.id',
+          'wazuh.rule.id',
           '1',
           'my-index',
         );
@@ -391,7 +391,7 @@ describe('PatternDataSourceFilterManager', () => {
     it('should return and filter with controlledBy property when is received', () => {
       const filter = PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
-        'rule.id',
+        'wazuh.rule.id',
         '1',
         'my-index',
         'controlledByValue',
@@ -786,7 +786,7 @@ describe('PatternDataSourceFilterManager', () => {
     it('should return a filter transformed to the URL format', () => {
       const filter = PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
-        'rule.id',
+        'wazuh.rule.id',
         '1',
         'my-index',
       );
