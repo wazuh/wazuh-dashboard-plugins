@@ -4,7 +4,7 @@
 
 | Symptom                                                                          | Likely cause                                                                    | Action                                                                                   |
 | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| The active response is not listed in the trigger selector                        | The monitor is not _Per document_, or the active response is muted              | Recreate the monitor as _Per document_; unmute the active response from its details page |
+| The active response is not listed in the trigger selector                        | The monitor is not _Active Response_, or the active response is muted           | Recreate the monitor as _Active Response_; unmute the active response from its details page |
 | No execution record shows up in **Discover**                                     | The indexer notifications or alerting plugins are missing                       | Ask your administrator to verify the plugin installation                                 |
 | The execution record is present but the action does not take effect on the agent | The manager did not deliver the command, or the agent is disconnected           | Check the manager service and the agent connection                                       |
 | The target agent reports that the executable is missing                          | The executable is not available on that agent                                   | Ask your administrator to make it available on the target agent                          |
@@ -30,7 +30,7 @@ Yes. Each **Add active response** action runs independently and produces its own
 The change applies to future executions only. Past executions keep the previous value in their records.
 
 **The _Add active response_ button does not appear in my monitor — is this a bug?**
-No. It is only shown when **Monitor type = Per document monitor**. Change the monitor type.
+No. It is only shown when **Monitor type = Active Response**. Change the monitor type.
 
 **How do I manually revert a stateful active response that should have expired but is still active?**
 Ask your administrator to revert the action directly on the target agent — the dashboard cannot trigger a manual reversal.

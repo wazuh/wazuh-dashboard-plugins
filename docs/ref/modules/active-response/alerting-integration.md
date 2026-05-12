@@ -1,6 +1,6 @@
 # Attach an active response to a monitor trigger
 
-An active response only runs when an Alerting trigger invokes it. This walkthrough connects the `Block-IP-stateful-response` active response (created in [Create an active response](./create.md)) to a Per document monitor that detects SSH root logins via password authentication.
+An active response only runs when an Alerting trigger invokes it. This walkthrough connects the `Block-IP-stateful-response` active response (created in [Create an active response](./create.md)) to an Active Response monitor that detects SSH root logins via password authentication.
 
 **Prerequisites:** the `Block-IP-stateful-response` active response exists and has `Status = Active`.
 
@@ -14,19 +14,19 @@ Navigate to **Alerting → Monitors → Create monitor**. If no monitors exist y
 
 ---
 
-## Step 2: Select **Per document monitor**
+## Step 2: Select **Active Response**
 
-In the **Monitor type** selector, choose **Per document monitor**. This is mandatory: any other monitor type (Per query, Per bucket, Per cluster metrics, Composite) will hide the **Add active response** button in the trigger step.
+In the **Monitor type** selector, choose **Active Response**. This is mandatory: any other monitor type (Per query, Per bucket, Per cluster metrics, Composite) will hide the **Add active response** button in the trigger step.
 
-![Monitor type - Per document monitor](images/09-monitor-type-per-document.png)
+![Monitor type - Active Response](images/09-monitor-type-active-response.png)
 
-Give the monitor a name — for this use case, `ssh-root-login-monitor` — and pick a **Schedule** (for example, `By interval`, every `1` minute).
+Give the monitor a name — for this use case, `Block-IP-monitor` — and pick a **Schedule** (for example, `By interval`, every `1` minute).
 
 ---
 
 ## Step 3: Configure the data source
 
-Under **Select data**, pick the findings index that holds the events to watch. For this SSH root-login use case, select `wazuh-findings-v5-access-management*` — the access-management findings index, which carries authentication events such as SSH logins. Other findings indices (`wazuh-findings-v5-security*`, `wazuh-findings-v5-network-activity*`, etc.) cover different categories; pick the one that matches the rules driving your active response.
+Under **Select data**, pick the findings index that holds the events to watch. For this SSH root-login use case, select `wazuh-findings-v5-system-activity*` — the access-management findings index, which carries authentication events such as SSH logins. Other findings indices (`wazuh-findings-v5-security*`, `wazuh-findings-v5-network-activity*`, etc.) cover different categories; pick the one that matches the rules driving your active response.
 
 ![Select data - Index picker](images/10-monitor-select-index.png)
 
@@ -34,7 +34,7 @@ Under **Select data**, pick the findings index that holds the events to watch. F
 
 ## Step 4: Define the query
 
-In the **Query** section, describe the conditions that the incoming alerts must meet. For this SSH root-login use case, target the built-in Wazuh rule that flags a root login via password authentication on SSH — `rule.title: "SSH Root Login via Password Authentication"`. Add a **Query name** (required, `ssh-root-login-query` for this use case) and fill in the condition:
+In the **Query** section, describe the conditions that the incoming alerts must meet. For this SSH root-login use case, target the built-in Wazuh rule that flags a root login via password authentication on SSH — `rule.title: "SSH Root Login via Password Authentication"`. Add a **Query name** (required, `Block-IP-query` for this use case) and fill in the condition:
 
 - **Field** — `rule.title`
 - **Operator** — `is`
@@ -48,13 +48,13 @@ In the **Query** section, describe the conditions that the incoming alerts must 
 
 ## Step 5: Add a trigger with an active response action
 
-Click **Add trigger**. Give the trigger a name — for this use case, `ssh-root-login-trigger` — and, under **Specify queries or tags**, select `ssh-root-login-query` (the query defined in the previous step). In the trigger editor, scroll to the **Actions** section: two buttons are available — **Add notification** (generic notifications) and **Add active response** (active responses).
+Click **Add trigger**. Give the trigger a name — for this use case, `Block-IP-trigger` — and, under **Specify queries or tags**, select `Block-IP-query` (the query defined in the previous step). In the trigger editor, scroll to the **Actions** section: two buttons are available — **Add notification** (generic notifications) and **Add active response** (active responses).
 
 ![Trigger - Add notification vs Add active response](images/12-trigger-two-buttons.png)
 
 Click **Add active response**. The action exposes:
 
-- A required **Action name** (letters, numbers, and special characters only) — for this use case, `block-ip-action`.
+- A required **Action name** (letters, numbers, and special characters only) — for this use case, `Block-IP-action`.
 - An **Active response** selector with the placeholder `Select active response to execute`.
 - A **Manage active responses** button that opens the Active Responses view in a new tab.
 
@@ -88,9 +88,9 @@ With the monitor saved, produce a real `SSH Root Login via Password Authenticati
 
 - A Linux agent enrolled and `Active` in **Endpoint Summary**, with `firewalld` (or `iptables`) running — the `block-ip` script needs one of them present to add and revert the rule.
 - Root login via password enabled on the agent, in `/etc/ssh/sshd_config`:
-    - `PermitRootLogin yes`
-    - `PasswordAuthentication yes`
-    - Restart with `systemctl restart sshd` if any value was changed.
+  - `PermitRootLogin yes`
+  - `PasswordAuthentication yes`
+  - Restart with `systemctl restart sshd` if any value was changed.
 - A known root password on the lab agent.
 - An attacker host (any Linux or macOS machine with `ssh`) that can reach the agent on TCP/22 and is **not** already firewalled.
 
@@ -117,7 +117,7 @@ Within about one minute, an alert with `rule.title: SSH Root Login via Password 
 
 Once the use case has been validated, roll back the lab setup:
 
-1. From the monitor overview, **disable** or **delete** `ssh-root-login-monitor`.
+1. From the monitor overview, **disable** or **delete** `Block-IP-monitor`.
 2. From **Explore → Active Responses**, delete `Block-IP-stateful-response`. The confirmation dialog requires typing the literal word `delete`.
 3. Restore the original `sshd_config` on the agent — in particular revert `PermitRootLogin yes` and `PasswordAuthentication yes` if you enabled them — and restart `sshd`.
 4. Verify on the agent that no leftover firewall rule remains (`firewall-cmd --reload` or `iptables -F WAZUH_ACTIVE_RESPONSE`). The stateful timeout should have reverted the rule, but confirm before closing the session.
