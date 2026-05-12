@@ -33,6 +33,7 @@ import {
   initializeBaseEnvironment,
   setVersionDerivedEnvironment,
   configureModeAndSecurity,
+  removeGeneratedServerLocalDashboardFiles,
 } from '../services/environmentConfigurator';
 import { parseArguments, printUsageAndExit } from '../services/argumentParser';
 import { resolveRequiredRepositories } from '../services/repoResolver';
@@ -369,6 +370,10 @@ export async function mainWithDeps(
   ) {
     profiles.add(PROFILES.SAML);
   }
+  // If Mailpit flag is enabled, include the mailpit profile
+  if (config.enableMailpit) {
+    profiles.add('mailpit');
+  }
 
   const defaultRunner = { execSync, spawn };
   const code = await runDockerCompose(
@@ -381,6 +386,10 @@ export async function mainWithDeps(
   );
   if (code !== 0) {
     process.exit(code);
+  }
+
+  if (config.action === ACTIONS.DOWN) {
+    removeGeneratedServerLocalDashboardFiles(envPaths, deps.logger);
   }
 
   if (

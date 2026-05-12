@@ -16,7 +16,7 @@ import { githubColumns } from '../components/overview/github/events/github-colum
 import { mitreAttackColumns } from '../components/overview/mitre/events/mitre-attack-columns';
 import { malwareDetectionColumns } from '../components/overview/malware-detection/events/malware-detection-columns';
 import { commonColumns } from '../components/overview/common/data-grid-columns';
-import { KnownFields } from './known-fields-loader';
+import FindingsKnownFields from '../../common/known-fields/findings.json';
 import {
   agentTechniquesColumns,
   techniquesColumns,
@@ -43,12 +43,12 @@ const eventsColumns = [
 ];
 
 test.skip('All events columns in KnowFields', () => {
-  expect(compareColumnsValue(KnownFields, eventsColumns)).toBe(true);
+  expect(compareColumnsValue(FindingsKnownFields, eventsColumns)).toBe(true);
 });
 
 test.skip('All technique columns in KnowFields', () => {
   expect(
-    compareColumnsValue(KnownFields, [
+    compareColumnsValue(FindingsKnownFields, [
       ...agentTechniquesColumns,
       ...techniquesColumns,
     ]),
@@ -58,7 +58,7 @@ test.skip('All technique columns in KnowFields', () => {
 test.skip('All commons columns in KnowFields', () => {
   expect(
     compareColumnsValue(
-      KnownFields,
+      FindingsKnownFields,
       Object.keys(commonColumns).map(key => ({ id: key })),
     ),
   ).toBe(true);

@@ -453,6 +453,23 @@ services:
         /var/ossec/bin/wazuh-control start
         tail -f /var/ossec/logs/ossec.log
 
+  mailpit:
+    image: axllent/mailpit
+    profiles:
+      - 'mailpit'
+    networks:
+      - os-dev
+      - devel
+      - mon
+    restart: unless-stopped
+    ports:
+      - 8025:8025
+      - 1025:1025
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
 networks:
   os-dev:
     name: os-dev-${OS_VERSION}

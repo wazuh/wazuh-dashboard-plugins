@@ -1,2 +1,5 @@
 # Auto-generated docker compose override for external plugin repos
 /dev.override.generated.yml
+
+# Server-local reorder of wazuh_core.hosts (regenerated on each --server-local up)
+**/osd/*.generated.server-local.yml

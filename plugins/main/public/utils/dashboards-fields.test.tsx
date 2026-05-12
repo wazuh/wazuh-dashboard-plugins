@@ -4,7 +4,7 @@ import {
   compareColumnsValue,
   clusterQExtractor,
 } from './functions-to-test';
-import { KnownFields } from './known-fields-loader';
+import FindingsKnownFields from '../../common/known-fields/findings.json';
 import { WAZUH_EVENTS_PATTERN } from '../../common/constants';
 import { tParsedIndexPattern } from '../components/common/data-source';
 
@@ -39,7 +39,7 @@ test.skip.each(panelEntries)(
     const panelFunction = module.getDashboardPanels;
     expect(
       compareColumnsValue(
-        KnownFields,
+        FindingsKnownFields,
         idExtractor(panelFunction(WAZUH_EVENTS_PATTERN, true)),
       ),
     ).toBe(true);
@@ -53,7 +53,7 @@ test.skip.each(panelEntries)(
     const panelFunction = module.getDashboardPanels;
     expect(
       compareColumnsValue(
-        KnownFields,
+        FindingsKnownFields,
         idExtractor(panelFunction(WAZUH_EVENTS_PATTERN, false)),
       ),
     ).toBe(true);
@@ -82,7 +82,7 @@ test.skip(`Test cluster panels`, () => {
   };
   expect(
     compareColumnsValue(
-      KnownFields,
+      FindingsKnownFields,
       clusterQExtractor(
         clusterPanels(mockIndexPattern, nodeListMock, 'manager'),
       ),
