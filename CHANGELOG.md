@@ -99,6 +99,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed home KPIs not being vertically centered [#8267](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8267)
 - Fixed MITRE ATT&CK Findings data grid not spanning the full available width [#8311](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8311)
 - Fixed pinned agent being lost when opening module links (FIM, SCA, Vulnerability Detection, MITRE ATT&CK, agent menu) in a new tab from the agent overview [#8358](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8358)
+- Fixed File Integrity Monitoring files inventory table layout by using smaller default widths for `file.owner`, `file.uid`, and `file.size`, allowing `file.path` to use more horizontal space [#8475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8475)
 - Fixed long labels in IT Hygiene horizontal bar visualizations causing display issues [#8330](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8330)
 
 ### Removed
