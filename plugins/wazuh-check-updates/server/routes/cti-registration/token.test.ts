@@ -143,9 +143,8 @@ describe('CTI token route', () => {
       .send({})
       .expect(200);
 
-    const stored = CtiRegistrationStore.getInstance().getStatus(
-      'resolved-client-id',
-    );
+    const stored =
+      CtiRegistrationStore.getInstance().getStatus('resolved-client-id');
     expect(stored?.device_code).toBe('dc1');
     expect(stored?.poll_interval_sec).toBe(7);
     expect(stored?.registrationComplete).toBe(false);
@@ -159,7 +158,10 @@ describe('CTI token route', () => {
       expires_in: 600,
       interval: 5,
     });
-    CtiRegistrationStore.getInstance().setInProgress('resolved-client-id', parsed);
+    CtiRegistrationStore.getInstance().setInProgress(
+      'resolved-client-id',
+      parsed,
+    );
 
     mockedPollCtiToken.mockResolvedValue({ error: 'access_denied' });
 
@@ -200,7 +202,10 @@ describe('CTI token route', () => {
       .expect(200);
 
     expect(response.body).toEqual(CTI_REGISTRATION_COMPLETED_BODY);
-    expect(mockedPollCtiToken).toHaveBeenCalledWith('resolved-client-id', 'dc1');
+    expect(mockedPollCtiToken).toHaveBeenCalledWith(
+      'resolved-client-id',
+      'dc1',
+    );
     expect(mockedGetCtiToken).not.toHaveBeenCalled();
     expect(mockedPostContentManagerSubscription).toHaveBeenCalledWith(
       mockWazuhClient,

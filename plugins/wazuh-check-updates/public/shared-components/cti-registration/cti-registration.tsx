@@ -43,7 +43,10 @@ export const CtiRegistration = () => {
         <EuiFlexGroup gutterSize='s' alignItems='center' responsive={false}>
           {loading ? (
             <EuiFlexItem grow={false}>
-              <EuiLoadingSpinner size='m' data-test-subj='ctiRegistrationNavLoading' />
+              <EuiLoadingSpinner
+                size='m'
+                data-test-subj='ctiRegistrationNavLoading'
+              />
             </EuiFlexItem>
           ) : null}
           {showStartCtiBar ? (
@@ -66,9 +69,7 @@ export const CtiRegistration = () => {
             handleModalToggle={handleModalToggle}
             statusCTI={statusCTI}
             refetchStatus={refetchStatus}
-            onDeviceFlowStarted={() =>
-              setDeviceFlowNonce(n => n + 1)
-            }
+            onDeviceFlowStarted={() => setDeviceFlowNonce(n => n + 1)}
           />
         )}
       </>

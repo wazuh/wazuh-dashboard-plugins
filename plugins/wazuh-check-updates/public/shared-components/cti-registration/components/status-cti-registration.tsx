@@ -1,10 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
-import {
-  EuiHealth,
-  EuiButtonEmpty,
-  EuiLoadingSpinner,
-} from '@elastic/eui';
+import { EuiHealth, EuiButtonEmpty, EuiLoadingSpinner } from '@elastic/eui';
 import { StatusCtiRegistrationProps } from '../types';
 import { getCore } from '../../../plugin-services';
 import { ctiFlowState } from '../../../services/cti-flow-state';

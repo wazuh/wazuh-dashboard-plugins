@@ -330,12 +330,11 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         )}
         {showInProgress && (
           <>
-          <EuiSpacer size='m' />
+            <EuiSpacer size='m' />
             <div
               className='ctiRegistrationActivationPending'
               data-test-subj='ctiRegistrationInProgress'
             >
-              
               <EuiText size='s' color='subdued'>
                 <FormattedMessage
                   id='wazuhCheckUpdates.ctiRegistration.waitingForActivation'
@@ -348,7 +347,6 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         )}
         {showSuccess && (
           <>
-
             <div data-test-subj='ctiRegistrationSuccessContent'>
               <EuiText size='s'>
                 <FormattedMessage

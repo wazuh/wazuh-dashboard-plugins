@@ -54,8 +54,7 @@ export async function getCtiSubscriptionStatus(
     const statusFromBody =
       typeof body?.status === 'number' ? body.status : undefined;
     const statusFromMeta = (response as { statusCode?: number }).statusCode;
-    const statusFromResponse =
-      statusFromBody ?? statusFromMeta ?? undefined;
+    const statusFromResponse = statusFromBody ?? statusFromMeta ?? undefined;
 
     return {
       message,

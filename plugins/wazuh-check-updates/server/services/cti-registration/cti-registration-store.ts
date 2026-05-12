@@ -31,7 +31,10 @@ function coerceNonEmptyString(value: unknown): string {
  */
 export function parseDeviceAuthorizationForStore(
   responseData: unknown,
-): Omit<CtiRegistrationStoreRecord, 'environmentUuid' | 'registrationComplete'> {
+): Omit<
+  CtiRegistrationStoreRecord,
+  'environmentUuid' | 'registrationComplete'
+> {
   const o = responseData as Record<string, unknown>;
   const device_code = coerceNonEmptyString(o.device_code);
   if (!device_code) {
@@ -78,7 +81,10 @@ export function parseDeviceAuthorizationForStore(
 export class CtiRegistrationStore {
   private static instance: CtiRegistrationStore | undefined;
 
-  private readonly byEnvironmentUuid = new Map<string, CtiRegistrationStoreRecord>();
+  private readonly byEnvironmentUuid = new Map<
+    string,
+    CtiRegistrationStoreRecord
+  >();
 
   private constructor() {}
 
@@ -101,7 +107,10 @@ export class CtiRegistrationStore {
 
   setInProgress(
     environmentUuid: string,
-    payload: Omit<CtiRegistrationStoreRecord, 'environmentUuid' | 'registrationComplete'>,
+    payload: Omit<
+      CtiRegistrationStoreRecord,
+      'environmentUuid' | 'registrationComplete'
+    >,
   ): void {
     this.byEnvironmentUuid.set(environmentUuid, {
       environmentUuid,

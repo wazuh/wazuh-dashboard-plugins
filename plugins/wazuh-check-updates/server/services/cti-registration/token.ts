@@ -4,10 +4,7 @@ import {
   ctiConsoleApiPaths,
 } from '../../../common/constants';
 import { getWazuhCheckUpdatesServices } from '../../plugin-services';
-import {
-  CtiConfigurationError,
-  getCtiConsoleBaseUrl,
-} from './cti-console-url';
+import { CtiConfigurationError, getCtiConsoleBaseUrl } from './cti-console-url';
 import { fetchClusterUuid } from './cluster-uuid';
 
 /**
@@ -43,7 +40,9 @@ export const getCtiToken = async (clientId: string): Promise<any> => {
   const { logger } = getWazuhCheckUpdatesServices();
 
   try {
-    const url = `${getCtiConsoleBaseUrl()}${ctiConsoleApiPaths.environmentsToken}`;
+    const url = `${getCtiConsoleBaseUrl()}${
+      ctiConsoleApiPaths.environmentsToken
+    }`;
     const body = new URLSearchParams({ client_id: clientId }).toString();
 
     const response = await axios.post(url, body, {
@@ -78,7 +77,9 @@ export const pollCtiToken = async (
   const { logger } = getWazuhCheckUpdatesServices();
 
   try {
-    const url = `${getCtiConsoleBaseUrl()}${ctiConsoleApiPaths.environmentsToken}`;
+    const url = `${getCtiConsoleBaseUrl()}${
+      ctiConsoleApiPaths.environmentsToken
+    }`;
     const body = new URLSearchParams({
       grant_type: CTI_OAUTH_DEVICE_GRANT_TYPE,
       client_id: clientId,

@@ -9,4 +9,7 @@ export function plugin(
 ) {
   return new WazuhCheckUpdatesPlugin(initializerContext);
 }
-export { WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart } from './types';
+export {
+  WazuhCheckUpdatesPluginSetup,
+  WazuhCheckUpdatesPluginStart,
+} from './types';

@@ -18,11 +18,15 @@ export const configSchema = schema.object({
 
 export type WazuhCheckUpdatesPluginConfigType = TypeOf<typeof configSchema>;
 
-export const config: PluginConfigDescriptor<WazuhCheckUpdatesPluginConfigType> = {
-  exposeToBrowser: {
-    ctiRegistrationUiEnabled: true,
-  },
-  schema: configSchema,
-};
+export const config: PluginConfigDescriptor<WazuhCheckUpdatesPluginConfigType> =
+  {
+    exposeToBrowser: {
+      ctiRegistrationUiEnabled: true,
+    },
+    schema: configSchema,
+  };
 
-export { WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart } from './types';
+export {
+  WazuhCheckUpdatesPluginSetup,
+  WazuhCheckUpdatesPluginStart,
+} from './types';

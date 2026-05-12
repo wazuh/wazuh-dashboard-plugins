@@ -21,9 +21,7 @@ import {
 function isSuccessfulUpstreamDevicePoll(
   body: Record<string, unknown>,
 ): boolean {
-  return (
-    typeof body.access_token === 'string' && body.access_token.length > 0
-  );
+  return typeof body.access_token === 'string' && body.access_token.length > 0;
 }
 
 export const getCtiTokenRoute = (router: IRouter) => {
@@ -124,15 +122,17 @@ export const getCtiTokenRoute = (router: IRouter) => {
           error &&
           typeof error === 'object' &&
           'response' in error &&
-          typeof (error as { response?: { status?: number } }).response?.status ===
-            'number'
+          typeof (error as { response?: { status?: number } }).response
+            ?.status === 'number'
             ? (error as { response: { status: number } }).response.status
             : undefined;
 
         const statusCode =
           error instanceof CtiConfigurationError
             ? 500
-            : axiosStatus ?? (error as { statusCode?: number })?.statusCode ?? 503;
+            : axiosStatus ??
+              (error as { statusCode?: number })?.statusCode ??
+              503;
 
         return response.customError({
           statusCode,

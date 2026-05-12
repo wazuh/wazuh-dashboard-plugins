@@ -19,12 +19,12 @@ jest.mock('@osd/i18n', () => ({
 }));
 
 jest.mock('@osd/i18n/react', () => ({
-  I18nProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  FormattedMessage: ({
-    defaultMessage,
-  }: {
-    defaultMessage?: string;
-  }) => <span>{defaultMessage}</span>,
+  I18nProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
+  FormattedMessage: ({ defaultMessage }: { defaultMessage?: string }) => (
+    <span>{defaultMessage}</span>
+  ),
   __esModule: true,
 }));
 
@@ -49,7 +49,9 @@ describe('CtiRegistration', () => {
       },
     });
 
-    mockHttpPost.mockRejectedValue(new Error('poll should not run when registered'));
+    mockHttpPost.mockRejectedValue(
+      new Error('poll should not run when registered'),
+    );
 
     (getCore as jest.Mock).mockReturnValue({
       http: { get: mockHttpGet, post: mockHttpPost },
@@ -69,7 +71,9 @@ describe('CtiRegistration', () => {
     });
 
     await waitFor(() => {
-      expect(screen.queryByTestId('ctiRegistrationNavLoading')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('ctiRegistrationNavLoading'),
+      ).not.toBeInTheDocument();
     });
 
     expect(screen.queryByText('Register')).not.toBeInTheDocument();
@@ -93,7 +97,9 @@ describe('CtiRegistration', () => {
     });
 
     await waitFor(() => {
-      expect(screen.queryByTestId('ctiRegistrationNavLoading')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('ctiRegistrationNavLoading'),
+      ).not.toBeInTheDocument();
     });
 
     expect(screen.queryByText('Register')).not.toBeInTheDocument();

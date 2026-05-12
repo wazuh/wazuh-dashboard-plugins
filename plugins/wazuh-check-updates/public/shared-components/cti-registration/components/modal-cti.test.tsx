@@ -28,11 +28,9 @@ jest.mock('@osd/i18n', () => ({
 }));
 
 jest.mock('@osd/i18n/react', () => ({
-  FormattedMessage: ({
-    defaultMessage,
-  }: {
-    defaultMessage?: string;
-  }) => <span>{defaultMessage}</span>,
+  FormattedMessage: ({ defaultMessage }: { defaultMessage?: string }) => (
+    <span>{defaultMessage}</span>
+  ),
   __esModule: true,
 }));
 
@@ -57,8 +55,7 @@ describe('ModalCti component', () => {
     mockHttpPost.mockResolvedValue({
       device_code: 'mock_device_code_123',
       user_code: 'WZH-999',
-      verification_uri:
-        'https://example.test/platform/environments/register',
+      verification_uri: 'https://example.test/platform/environments/register',
       verification_uri_complete:
         'https://example.test/platform/environments/register?user_code=WZH-999',
       interval: CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
@@ -83,8 +80,12 @@ describe('ModalCti component', () => {
         refetchStatus={mockRefetchStatus}
       />,
     );
-    expect(await screen.findByText('Wazuh XDR registration')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Register' })).toBeInTheDocument();
+    expect(
+      await screen.findByText('Wazuh XDR registration'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Register' }),
+    ).toBeInTheDocument();
   });
 
   it('reopens to in-progress links when refetch restores server snapshot', async () => {
@@ -118,7 +119,9 @@ describe('ModalCti component', () => {
         document.querySelector('[data-test-subj="ctiDeviceUserCode"]'),
       ).toHaveTextContent('WZH-REST');
     });
-    expect(queryByText('Complete activation in Wazuh Cloud')).toBeInTheDocument();
+    expect(
+      queryByText('Complete activation in Wazuh Cloud'),
+    ).toBeInTheDocument();
   });
 
   it('should handle button click, show activation URL, and open verification URI', async () => {

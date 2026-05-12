@@ -100,7 +100,9 @@ describe('CTI registration status route', () => {
       inProgress: false,
       subscription: { message: null, status: null },
     });
-    expect(mockedGetCtiSubscriptionStatus).toHaveBeenCalledWith(mockWazuhClient);
+    expect(mockedGetCtiSubscriptionStatus).toHaveBeenCalledWith(
+      mockWazuhClient,
+    );
   });
 
   test(`GET ${routes.ctiRegistrationStatus} when CTI subscription is registered`, async () => {
