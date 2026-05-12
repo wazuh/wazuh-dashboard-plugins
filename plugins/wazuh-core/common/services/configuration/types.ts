@@ -1,3 +1,4 @@
+import { TPluginSetting } from '../../constants';
 import { IConfigurationProvider } from './configuration-provider';
 
 export interface ILogger {
@@ -13,6 +14,7 @@ export interface IConfiguration {
   stop: () => Promise<any>;
   get: (settingsKey: string) => Promise<any>;
   getAll: () => Promise<Record<string, any>>;
+  getSettingDefinition: (key: string) => TPluginSetting | undefined;
 }
 
 export type IConfigurationStore = {
