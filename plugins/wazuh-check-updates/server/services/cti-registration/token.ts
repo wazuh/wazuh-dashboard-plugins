@@ -34,7 +34,7 @@ export async function resolveCtiOAuthClientId(
 
 /**
  * Starts OAuth 2.0 device authorization against the CTI Console (not the Wazuh manager).
- * Base URL comes only from WAZUH_CTI_CONSOLE_BASE_URL (required).
+ * Base URL comes from {@link getCtiConsoleBaseUrl} (env var override or compiled constant).
  */
 export const getCtiToken = async (clientId: string): Promise<any> => {
   const { logger } = getWazuhCheckUpdatesServices();

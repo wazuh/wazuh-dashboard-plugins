@@ -49,7 +49,16 @@ export const CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE =
 export const WAZUH_CLOUD_PORTAL_HREF = '';
 
 /**
- * Paths appended to `WAZUH_CTI_CONSOLE_BASE_URL` (e.g. Wazuh Cloud API or local Imposter).
+ * Base URL of the Wazuh Cloud CTI Console API (server-side OAuth device flow).
+ * Paths under {@link ctiConsoleApiPaths} are resolved against this host.
+ *
+ * Use the staging host while the device-flow endpoint only accepts pre-production
+ * environments; switch to `https://api.cloud.wazuh.com` when production CTI allows it.
+ */
+export const WAZUH_CTI_CONSOLE_BASE_URL = 'https://api.pre.cloud.wazuh.com';
+
+/**
+ * Paths appended to {@link WAZUH_CTI_CONSOLE_BASE_URL} (e.g. local Imposter mock).
  * See `docker/imposter/cti/README.md` for the offline mock contract.
  */
 export const ctiConsoleApiPaths = {

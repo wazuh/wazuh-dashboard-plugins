@@ -1,8 +1,8 @@
 /**
- * Base URL for the Wazuh Console CTI / environment token API.
- * Resolved from the dashboard server process environment (no hardcoded default).
- * Deployment / local dev: see project documentation for required settings.
+ * CTI Console URL resolution and configuration errors for CTI registration.
  */
+import { WAZUH_CTI_CONSOLE_BASE_URL } from '../../../common/constants';
+
 export class CtiConfigurationError extends Error {
   constructor(message: string) {
     super(message);
@@ -11,12 +11,5 @@ export class CtiConfigurationError extends Error {
   }
 }
 
-export const getCtiConsoleBaseUrl = (): string => {
-  const raw = process.env.WAZUH_CTI_CONSOLE_BASE_URL?.trim();
-  if (!raw) {
-    throw new CtiConfigurationError(
-      'The CTI Console service is not configured on this server.',
-    );
-  }
-  return raw.replace(/\/$/, '');
-};
+export const getCtiConsoleBaseUrl = (): string =>
+  WAZUH_CTI_CONSOLE_BASE_URL.trim().replace(/\/$/, '');
