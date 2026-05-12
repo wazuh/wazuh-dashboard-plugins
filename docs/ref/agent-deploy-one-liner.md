@@ -22,7 +22,7 @@ interface, for example in end-to-end testing scenarios.
 ![Set manager address](../img/agent-deploy-oneliner/set-server-address.webp)
 
 5. **Optional configuration** (when required):
-   - **Agent name**: define how the agent is identified in the dashboard.
+   - **Agent name**: define how the agent is identified.
    - **Agent group**: assign the agent to an existing group (for example, `default`).
 
 ![Set optional settings](../img/agent-deploy-oneliner/set-optional-settings.webp)
@@ -76,7 +76,7 @@ On some systems, start the agent manually:
 
 Use the manager FQDN for both `WAZUH_MANAGER` and `WAZUH_REGISTRATION_SERVER`
 when enrollment is performed through DNS. Add additional variables as needed,
-for example `WAZUH_AGENT_NAME` or `WAZUH_REGISTRATION_PASSWORD`. See [Deployment variables](#deployment-variables)
+for example `WAZUH_AGENT_NAME` or `WAZUH_REGISTRATION_PASSWORD`. See [Deployment variables](#deployment-variables).
 
 ## References
 
