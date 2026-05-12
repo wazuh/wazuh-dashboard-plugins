@@ -105,8 +105,9 @@ PagerDuty integration enables automatic incident creation and on-call alerting f
 4. For a new service:
    - **Name**: `Wazuh Security Monitoring`
    - **Escalation Policy**: Select or create an escalation policy
-   - **Integration Type**: Select **Events API v2**
-5. Click **Add Service** or **Add Integration**
+   - **AIOps**: Leave untouched or modify if needed
+   - **Integrations**: Select **Events API V2**
+5. In the **Integrations** section of the new service expand **Events API V2**
 6. Copy the **Integration Key** (32-character string)
 
 ### Step 2: Configure PagerDuty in Wazuh dashboard
@@ -115,11 +116,11 @@ PagerDuty integration enables automatic incident creation and on-call alerting f
 2. Click **Create channel**
 3. Configure the channel:
    - **Name**: `PagerDuty Critical Incidents`
-   - **Type**: Select **PagerDuty**
+   - **Webhook URL**: Add Europe extension if needed: `https://events.eu.pagerduty...`
    - **Integration Key**: Paste the integration key from Step 1
    - **Description**: (optional) `Critical security incidents to on-call team`
-4. Click **Create**
-5. Toggle the channel to **Unmuted** and **Enabled**
+4. Click **Save**
+5. Toggle the channel to **Unmuted**
 
 ### Step 3: Create monitors for incident creation
 
@@ -127,19 +128,46 @@ PagerDuty integration enables automatic incident creation and on-call alerting f
 2. Click **Create monitor**
 3. Configure for critical events:
    - **Monitor name**: `Critical Security Incidents`
-   - **Query**: `rule.level >= 14 OR rule.groups: "authentication_failed" OR rule.groups: "exploit_attempt"`
-   - **Trigger conditions**: Immediate alerting for matches
-4. In **Notifications**:
-   - Select your PagerDuty channel
-   - Set **Severity**: High or Critical
+   - **Monitor type**: `Per document monitor`
+   - **Index**: `wazuh-findings-v5-security`
+   - **Query**: `wazuh.rule.level is high`
+   - **Trigger conditions**: Select created query
+4. Configure Actions:
+   - Click on **Add notification**
+   - **Action name**: `High security alert trigger`
+   - **Channel**: Select PagerDuty channel
+   - **Message**: Create the content based on the PagerDuty documentation:
+     - [PagerDuty docs](https://developer.pagerduty.com/docs/send-alert-event)
+     - Example message: `{"event_action":"trigger","payload":{"summary":"⚠️ Security Alert","source":"Wazuh","severity":"critical"}`
 5. Click **Create**
 
 ### Step 4: Test incident creation
 
-1. In the Channels list, select your PagerDuty channel
-2. Click **Send test message**
-3. Log in to PagerDuty and verify a test incident was created
-4. Acknowledge and resolve the test incident
+> **⚠️ Warning:** The **Send test message** doesn't work yet because PagerDuty expects a custom payload
+
+1. Use `Indexer Management > Dev Tools` to create a document that will trigger the monitor:
+
+```json
+POST /wazuh-findings-v5-security/_doc
+{
+  "wazuh": {
+      "agent": {
+      "id": "001",
+      "name": "wazuh.agent.deb.local"
+   },
+   "rule": {
+      "level": "high"
+   }
+},
+   "event": {
+      "original": "Testing the pagerDuty channel"
+   },
+   "@timestamp": "2026-05-12T09:21:20.310Z"
+}
+```
+
+2. Wait until the monitor scans the document and generates the alert
+3. Verify that the incident is created in the configured PagerDuty account
 
 ### PagerDuty incident details
 
@@ -235,19 +263,16 @@ Common security automation workflows:
 Monitor the health and performance of external integrations:
 
 1. **Check notification channels**:
-
    - Navigate to **☰ Menu > Explore > Notifications > Channels**
    - Verify all channels show **Enabled** and **Unmuted**
    - Use **Send test message** periodically
 
 2. **Review monitor status**:
-
    - Navigate to **☰ Menu > Explore > Alerting > Monitors**
    - Check for failed monitors or error states
    - Review trigger history
 
 3. **Audit integration logs**:
-
    - Wazuh manager: `/var/ossec/logs/integrations.log`
    - OpenSearch Dashboards: `/var/log/wazuh-dashboard/opensearch_dashboards.log`
 
