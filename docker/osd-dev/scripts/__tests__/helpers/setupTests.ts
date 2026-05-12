@@ -34,9 +34,26 @@ export function restoreProcessState(state: SavedProcessState): void {
   process.argv = [...state.argv];
 }
 
+const MINIMAL_OSD_CONFIG = `wazuh_core.hosts:
+  first-host:
+    url: https://first.example.com
+  manager-local:
+    url: https://manager.local
+`;
+
 export function makeTempCwd(prefix = 'wdp-jest-'): { tmpdir: string } {
   const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
   process.chdir(tmpdir);
+  const osdConfigDir = path.join(tmpdir, 'config', '2.x', 'osd');
+  fs.mkdirSync(osdConfigDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(osdConfigDir, 'opensearch_dashboards.yml'),
+    MINIMAL_OSD_CONFIG,
+  );
+  fs.writeFileSync(
+    path.join(osdConfigDir, 'opensearch_dashboards_saml.yml'),
+    MINIMAL_OSD_CONFIG,
+  );
   return { tmpdir };
 }
 
