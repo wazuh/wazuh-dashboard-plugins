@@ -58,7 +58,7 @@ A **stateless** active response runs the action once and does not revert anythin
 | Mode          | When to use it                                                              | Main risk                                                                  |
 | ------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | **Stateless** | Definitive or idempotent actions (kill process, notify, restart).           | If fired on a false positive, there is no automatic reversal.              |
-| **Stateful**  | Temporary enforcement with automatic reversal (block an IP for 10 minutes). | Works only if the action itself supports reversal; ask your administrator. |
+| **Stateful**  | Temporary enforcement with automatic reversal (block an IP for 30 seconds). | Works only if the action itself supports reversal; ask your administrator. |
 
 > **Important:** `Stateful timeout` is expressed in **seconds**. Ask your administrator to verify, in a non-production environment, that the chosen executable can be both applied and reverted before enabling it in production.
 

@@ -1,6 +1,6 @@
 # Create an active response
 
-The following walkthrough shows how to create an active response that blocks the offending IP for 10 minutes when an SSH brute-force alert fires, and automatically unblocks it afterwards.
+The following walkthrough shows how to create an active response that blocks the offending IP for 30 seconds when an SSH root login via password authentication alert fires, and automatically unblocks it afterwards.
 
 **Prerequisites:**
 
@@ -31,8 +31,8 @@ Click **Create active response**. The form is organized in two panels: **Name an
 
 ## Step 3: Fill the **Name and description** panel
 
-- **Name** — required. For this example: `block-ip-10min`. An empty value shows the error `Active response name cannot be empty.`
-- **Description** — optional. For this example: `Blocks the offending IP for 10 minutes via firewalld`.
+- **Name** — required. For this example: `Block-IP-stateful-response`. An empty value shows the error `Active response name cannot be empty.`
+- **Description** — optional. For this example: `Blocks the offending IP for 30 seconds`.
 
 ![Create active response - Name and description](images/02-create-form-name-panel.png)
 
@@ -42,11 +42,11 @@ Click **Create active response**. The form is organized in two panels: **Name an
 
 Complete the fields in order:
 
-- **Executable** — `firewalld-drop`. Required. This script is one of the default executables shipped with the Wazuh agent (see [Concepts → About the executable](index.md#about-the-executable)); enter only its name, without a path. An empty value shows the error `Executable name cannot be empty.`
+- **Executable** — `block-ip`. Required. Enter exactly this name. The `block-ip` script is one of the default executables shipped with the Wazuh agent (see [Concepts → About the executable](index.md#about-the-executable)); enter only its name, without a path. An empty value shows the error `Executable name cannot be empty.`
 - **Extra arguments** — leave empty for this example. Optional.
 - **Type** — select `Stateful`. This makes the **Stateful timeout (seconds)** field appear.
-- **Stateful timeout (seconds)** — `600` (ten minutes). Default: `180`. Validations: non-numeric values show `Stateful timeout must be a number.`; values `≤ 0` show `Stateful timeout must be greater than 0.`
-- **Location** — keep `Local` (the default). For this use case, the block must apply on the agent that reported the SSH brute-force attempt, not on every agent in the environment — `All` would push the firewall rule to every agent and is rarely what you want. Switching to `Defined agent` makes the **Agent ID** field appear; it accepts only digits.
+- **Stateful timeout (seconds)** — `30` (thirty seconds — the time after which the agent will undo the block-IP action). Default: `180`. Validations: non-numeric values show `Stateful timeout must be a number.`; values `≤ 0` show `Stateful timeout must be greater than 0.`
+- **Location** — keep `Local` (the default). For this use case, the block must apply on the agent that reported the SSH root login attempt, not on every agent in the environment — `All` would push the firewall rule to every agent and is rarely what you want. Switching to `Defined agent` makes the **Agent ID** field appear; it accepts only digits.
 
 > **Important:** **Stateful timeout** and **Agent ID** are conditional. If you don't see them, check the value of **Type** or **Location** respectively.
 
