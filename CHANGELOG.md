@@ -76,7 +76,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated Vulnerability Detection Discover tab filters, and inventory columns [#8262](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8262) [#8283](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8283) [#8292](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8292)
 - Changed FIM table columns and index source in the agent view [#8269](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8269)
 - Changed index pattern usage in MITRE ATT&CK and Compliance panels in agent overview [#8307](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8307)
-- Updated Threat Hunting dashboard with new index pattern definition [#8281](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8281)
+- Updated Threat Hunting dashboard with new index pattern definition [#8281](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8281) [#8479](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8479)
 - Changed Cluster and Logging configuration sections in Server Management Settings to use the full node configuration endpoint [#8289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8289)
 - Changed last alerts home KPIs title to findings [#8285](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8285)
 - Changed IT Hygiene memory visualization [#8313](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8313)
@@ -87,7 +87,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Allowed only 1 server API configuration per indexer [#8436](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8436)
 - Updated the OS icon source field in the Endpoints summary table to display Linux agent icons [#8459](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8459)
 - Reworked Statistics dashboard [#8254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8254)
-- Improved threat hunting dashboard and findings tab [#8479](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8479)
 
 ### Fixed
 
