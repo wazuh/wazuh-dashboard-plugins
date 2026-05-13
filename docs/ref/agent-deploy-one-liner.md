@@ -1,7 +1,7 @@
 # Agent deploy one-liner (FQDN and group)
 
-The Wazuh dashboard provides a **Deploy new agent** wizard, but you can also
-use one-line commands on Linux endpoints by passing deployment variables.
+The Wazuh dashboard provides a **Deploy new agent** wizard that guides to the user in the process
+of installing, registering and initializing an agent in a host.
 
 ## Generate the one-liner from the dashboard UI
 
