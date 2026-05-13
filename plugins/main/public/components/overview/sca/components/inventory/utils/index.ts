@@ -1,8 +1,9 @@
 export const tableColumns = [
   { id: 'wazuh.agent.name' },
   { id: 'policy.name' },
-  { id: 'check.id' },
+  { id: 'check.id', initialWidth: 100 },
   { id: 'check.name' },
+  { id: 'check.result' },
 ];
 
 export const managedFilters = [
