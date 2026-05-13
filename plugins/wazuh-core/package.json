@@ -28,7 +28,7 @@
     "knip": "knip --files"
   },
   "dependencies": {
-    "axios": "1.13.5",
+    "axios": "1.15.2",
     "jwt-decode": "^3.1.2",
     "md5": "^2.3.0",
     "node-cron": "^3.0.2"
