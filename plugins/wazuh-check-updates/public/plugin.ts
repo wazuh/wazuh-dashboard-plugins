@@ -10,12 +10,16 @@ import { setCore, setWazuhCore } from './plugin-services';
 import { getAvailableUpdates } from './services';
 
 export class WazuhCheckUpdatesPlugin
-  implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart> {
+  implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart>
+{
   public setup(core: CoreSetup): WazuhCheckUpdatesPluginSetup {
     return {};
   }
 
-  public start(core: CoreStart, plugins: AppPluginStartDependencies): WazuhCheckUpdatesPluginStart {
+  public start(
+    core: CoreStart,
+    plugins: AppPluginStartDependencies,
+  ): WazuhCheckUpdatesPluginStart {
     setCore(core);
     setWazuhCore(plugins.wazuhCore);
 

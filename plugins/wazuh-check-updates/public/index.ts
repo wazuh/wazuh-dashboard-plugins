@@ -5,4 +5,7 @@ import { WazuhCheckUpdatesPlugin } from './plugin';
 export function plugin() {
   return new WazuhCheckUpdatesPlugin();
 }
-export { WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart } from './types';
+export {
+  WazuhCheckUpdatesPluginSetup,
+  WazuhCheckUpdatesPluginStart,
+} from './types';
