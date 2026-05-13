@@ -17,10 +17,11 @@ import { getAvailableUpdates } from './services';
 import { CtiRegistration } from './shared-components/cti-registration/cti-registration';
 
 export class WazuhCheckUpdatesPlugin
-  implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart> {
+  implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart>
+{
   constructor(
     private readonly initializerContext: PluginInitializerContext<WazuhCheckUpdatesPluginConfigType>,
-  ) { }
+  ) {}
 
   public setup(core: CoreSetup): WazuhCheckUpdatesPluginSetup {
     void core;
@@ -45,5 +46,5 @@ export class WazuhCheckUpdatesPlugin
     };
   }
 
-  public stop() { }
+  public stop() {}
 }
