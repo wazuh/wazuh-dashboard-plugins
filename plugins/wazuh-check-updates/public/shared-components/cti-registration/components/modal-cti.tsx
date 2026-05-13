@@ -22,7 +22,6 @@ import { ctiFlowState } from '../../../services/cti-flow-state';
 import {
   CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC,
   CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
-  WAZUH_CLOUD_CONSOLE_HREF,
   WAZUH_CLOUD_PORTAL_HREF,
   routes,
   statusCodes,
