@@ -31,6 +31,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added ability to generate PDF report in Vulnerabilities dashboard [#8403](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8403)
 - Added button that allows to request CTI content update [#8201](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8201)
 - Added `wazuh-metrics-normalization*` index pattern [#8480](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8480)
+- Added Engine Health dashboard [#8485](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8485)
 
 ### Changed
 
