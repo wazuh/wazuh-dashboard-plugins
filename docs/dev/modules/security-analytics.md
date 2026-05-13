@@ -1,8 +1,8 @@
 # Security Analytics
 
-This module allows to manage the analysis of the security events logs and generate alerts based on the defined rules. It provides a set of tools to create, edit, and manage the decoders, integrations, filters, KVDBs, detectors and rules and test the logs against the defined integrations in logtest.
+This module allows to manage the analysis of the security events logs and generate alerts based on the defined rules. It provides a set of tools to create, edit, and manage decoders, integrations, filters, KVDBs, detectors and rules, and test the logs against the defined integrations in logtest.
 
-The feature is provided by the [wazuh-dashboard-security-analytics](https://github.com/wazuh/wazuh-dashboard-security-analytics) plugin, that is based in the OpenSearch Dashboards plugin and adapted to our requirements. This is included in the distribution of the Wazuh dashboard.
+The feature is provided by the [wazuh-dashboard-security-analytics](https://github.com/wazuh/wazuh-dashboard-security-analytics) plugin based on the OpenSearch Dashboards plugin and adapted to our requirements. This is included in the distribution of the Wazuh dashboard.
 
 # Glossary
 
@@ -65,7 +65,7 @@ Filter has the following properties:
 | `description` | A description of the filter. |
 | `type` | The type of the filter. It can be `pre-filter` or `post-filter`. |
 | `enabled` | Indicates if the filter is enabled or not. |
-| `check expression` | The check expression that defines the conditions of the filter. |
+| `check` | An array of objects, e.g., [{field: value}, ...], that defines the filter conditions. |
 | `author` | The author of the filter. |
 | `documentation` | A link to the documentation of the filter. |
 | `references` | A list of references related to the filter. |
