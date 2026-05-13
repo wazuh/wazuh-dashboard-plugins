@@ -214,6 +214,7 @@ export const WzMenu = withWindowSize(
                   grow={false}
                   onClick={() => NavigationService.getInstance().reload()}
                   className='WzNotReadyButton'
+                  aria-label='Reload'
                 >
                   <span> Reload </span>
                 </EuiButtonEmpty>

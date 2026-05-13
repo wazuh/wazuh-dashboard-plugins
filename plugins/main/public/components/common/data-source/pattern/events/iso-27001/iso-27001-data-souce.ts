@@ -2,7 +2,7 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_ISO27001_EXIST } from '../../../../../../../common/constants';
 import { EventsDataSource } from '../events-data-source';
 
-const KEY_EXIST = 'rule.compliance.iso_27001';
+const KEY_EXIST = 'wazuh.rule.compliance.iso_27001';
 
 export class ISO27001DataSource extends EventsDataSource {
   constructor(id: string, title: string) {
