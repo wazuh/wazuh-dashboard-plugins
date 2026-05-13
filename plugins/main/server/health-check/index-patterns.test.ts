@@ -40,6 +40,13 @@ const mockContext = () => ({
                       version: null,
                       composed_of: '',
                     },
+                    {
+                      name: 'metrics-normalization',
+                      index_patterns: '[wazuh-metrics-normalization*',
+                      order: '0',
+                      version: null,
+                      composed_of: '',
+                    },
                   ],
                 };
               },
