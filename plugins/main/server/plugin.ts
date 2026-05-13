@@ -124,9 +124,11 @@ import {
   WAZUH_METRICS_AGENTS_PATTERN,
   WAZUH_SCA_PATTERN,
   WAZUH_METRICS_COMMS_PATTERN,
+  WAZUH_METRICS_NORMALIZATION_PATTERN,
   WAZUH_VULNERABILITIES_PATTERN,
   WAZUH_ACTIVE_RESPONSES_PATTERN,
   HEALTH_CHECK_TASK_INDEX_PATTERN_ACTIVE_RESPONSES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_NORMALIZATION,
 } from '../common/constants';
 
 import { notificationSetup } from './health-check/notification-default-channels';
@@ -171,6 +173,7 @@ import IndexPatternITHygieneUsersKnownFields from '../common/known-fields/states
 import IndexPatternMetricsAgentsKnownFields from '../common/known-fields/metrics-agents.json';
 import IndexPatternSCAKnownFields from '../common/known-fields/states-sca.json';
 import IndexPatternMetricsCommsKnownFields from '../common/known-fields/metrics-comms.json';
+import IndexPatternMetricsNormalizationKnownFields from '../common/known-fields/metrics-normalization.json';
 import IndexPatternVulnerabilitiesKnownFields from '../common/known-fields/states-vulnerabilities.json';
 import IndexPatternActiveResponsesKnownFields from '../common/known-fields/active-responses.json';
 import IndexPatternThreatintelEnrichmentsKnownFields from '../common/known-fields/threatintel-enrichments.json';
@@ -306,6 +309,19 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
           hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternMetricsCommsKnownFields,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_NORMALIZATION,
+        indexPatternID: WAZUH_METRICS_NORMALIZATION_PATTERN,
+        options: {
+          savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
+          hasTimeFieldName: true,
+          fieldsNoIndices: IndexPatternMetricsNormalizationKnownFields,
         },
       }),
     );

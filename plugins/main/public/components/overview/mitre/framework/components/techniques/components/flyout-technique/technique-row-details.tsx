@@ -35,7 +35,7 @@ const TechniqueRowDetails = ({
 
   const getRuleData = async () => {
     // TODO: adapt to the detector rule
-    const params = { q: `id=${item.rule.id}` };
+    const params = { q: `id=${item.wazuh.rule.id}` };
     const rulesDataResponse = await WzRequest.apiReq('GET', `/rules`, {
       params,
     });

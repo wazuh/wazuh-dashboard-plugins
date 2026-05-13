@@ -2,7 +2,7 @@ import { tFilter } from '../../../index';
 import { DATA_SOURCE_FILTER_CONTROLLED_NIST_800_171_EXIST } from '../../../../../../../common/constants';
 import { EventsDataSource } from '../events-data-source';
 
-const KEY_EXIST = 'rule.compliance.nist_800_171';
+const KEY_EXIST = 'wazuh.rule.compliance.nist_800_171';
 
 export class NIST800171DataSource extends EventsDataSource {
   constructor(id: string, title: string) {

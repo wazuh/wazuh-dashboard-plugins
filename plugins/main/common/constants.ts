@@ -34,8 +34,13 @@ export const WAZUH_INDEX_TYPE_METRICS_AGENTS = 'metrics-agents';
 export const WAZUH_METRICS_AGENTS_PATTERN = 'wazuh-metrics-agents*';
 
 // Job - Wazuh metrics comms
-export const WAZUH_INDEX_TYPE_METRICS_COMMS = 'metrics-commns';
+export const WAZUH_INDEX_TYPE_METRICS_COMMS = 'metrics-comms';
 export const WAZUH_METRICS_COMMS_PATTERN = 'wazuh-metrics-comms*';
+
+// Job - Wazuh metrics normalization
+export const WAZUH_INDEX_TYPE_METRICS_NORMALIZATION = 'metrics-normalization';
+export const WAZUH_METRICS_NORMALIZATION_PATTERN =
+  'wazuh-metrics-normalization*';
 
 // Wazuh vulnerabilities
 export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities*';
@@ -231,6 +236,7 @@ export const WAZUH_SAMPLE_INVENTORY_AGENT = 'wazuh-inventory-agent';
 export const WAZUH_SAMPLE_VULNERABILITIES = 'wazuh-vulnerabilities';
 export const WAZUH_SAMPLE_METRICS_AGENTS = 'metrics-agents';
 export const WAZUH_SAMPLE_METRICS_COMMS = 'metrics-comms';
+export const WAZUH_SAMPLE_METRICS_NORMALIZATION = 'metrics-normalization';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 1500;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_EVENTS_PATTERN.replace('*', ''),
@@ -319,6 +325,10 @@ export const WAZUH_SETTING_METRICS_AGENTS_SAMPLE_PREFIX = {
 export const WAZUH_SETTING_METRICS_COMMS_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_METRICS_COMMS_PATTERN.replace('*', ''),
   dataSet: 'metrics-comms',
+};
+export const WAZUH_SETTING_METRICS_NORMALIZATION_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_METRICS_NORMALIZATION_PATTERN.replace('*', ''),
+  dataSet: 'metrics-normalization',
 };
 
 export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
@@ -515,6 +525,13 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
       indexPatternPrefix:
         WAZUH_SETTING_METRICS_COMMS_SAMPLE_PREFIX.indexPatternPrefix,
       dataSet: WAZUH_SETTING_METRICS_COMMS_SAMPLE_PREFIX.dataSet,
+    },
+  ],
+  [WAZUH_SAMPLE_METRICS_NORMALIZATION]: [
+    {
+      indexPatternPrefix:
+        WAZUH_SETTING_METRICS_NORMALIZATION_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_METRICS_NORMALIZATION_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_VULNERABILITIES]: [
@@ -927,6 +944,8 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_AGENTS =
   'index-pattern:metrics-agents';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_COMMS =
   'index-pattern:metrics-comms';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_NORMALIZATION =
+  'index-pattern:metrics-normalization';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES =
   'index-pattern:states-inventory';
@@ -1035,8 +1054,9 @@ export const GDPR_AGENT_DASHBOARD_ID = 'gdpr-pinned-agent-dashboard';
 export const HIPAA_DASHBOARD_ID = 'hipaa-overview-dashboard-tab';
 export const HIPAA_AGENT_DASHBOARD_ID = 'hipaa-pinned-agent-dashboard-tab';
 
-export const NIST_800_53_DASHBOARD_ID = 'nist-overview-dashboard-tab';
-export const NIST_800_53_AGENT_DASHBOARD_ID = 'nist-pinned-agent-dashboard-tab';
+export const NIST_800_53_DASHBOARD_ID = 'nist-800-53-overview-dashboard-tab';
+export const NIST_800_53_AGENT_DASHBOARD_ID =
+  'nist-800-53-pinned-agent-dashboard-tab';
 
 export const NIST_800_171_DASHBOARD_ID = 'nist-800-171-overview-dashboard-tab';
 export const NIST_800_171_AGENT_DASHBOARD_ID =
