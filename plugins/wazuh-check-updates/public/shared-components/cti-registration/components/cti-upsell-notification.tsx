@@ -79,7 +79,11 @@ export const CtiUpsellNotification = () => {
               gutterSize='m'
             >
               <EuiFlexItem grow={false}>
-                <EuiFlexGroup gutterSize='s' alignItems='center' responsive={false}>
+                <EuiFlexGroup
+                  gutterSize='s'
+                  alignItems='center'
+                  responsive={false}
+                >
                   <EuiFlexItem grow={false}>
                     <EuiIcon type='globe' color='ghost' size='m' aria-hidden />
                   </EuiFlexItem>
@@ -94,7 +98,11 @@ export const CtiUpsellNotification = () => {
                 </EuiFlexGroup>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
-                <EuiFlexGroup gutterSize='m' alignItems='center' responsive={false}>
+                <EuiFlexGroup
+                  gutterSize='m'
+                  alignItems='center'
+                  responsive={false}
+                >
                   <EuiFlexItem grow={false}>
                     <EuiButtonEmpty
                       color='ghost'
