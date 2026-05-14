@@ -25,14 +25,6 @@ const isDismissed = (): boolean => {
   }
 };
 
-const persistDismiss = (): void => {
-  try {
-    localStorage.setItem(UPSELL_DISMISSED_KEY, 'true');
-  } catch {
-    // ignore storage errors
-  }
-};
-
 export const CtiUpsellNotification = () => {
   const [dismissed, setDismissed] = useState<boolean>(isDismissed);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
@@ -56,7 +48,11 @@ export const CtiUpsellNotification = () => {
       statusCTI.status === statusCodes.REGISTRATION_FAILED);
 
   const handleDismiss = () => {
-    persistDismiss();
+    try {
+      localStorage.setItem(UPSELL_DISMISSED_KEY, 'true');
+    } catch (error: unknown) {
+      console.warn('Failed to persist CTI upsell dismiss preference:', error);
+    }
     setDismissed(true);
   };
 
