@@ -22,6 +22,10 @@ import {
   StatisticsDataSource,
   StatisticsDataSourceRepository,
 } from '../../../common/data-source/pattern/statistics';
+import {
+  MetricsNormalizationDataSource,
+  MetricsNormalizationDataSourceRepository,
+} from '../../../common/data-source/pattern/metrics-normalization';
 import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import {
   ErrorFactory,
@@ -32,8 +36,12 @@ import { DiscoverNoResults } from '../../../common/no-results/no-results';
 // TODO: DashboardAnalysisEngineStatistics is commented out until analysisd metrics have a new data stream
 // import { DashboardAnalysisEngineStatistics } from './dashboard_analysis_engine';
 import { DashboardListenerEngineStatistics } from './dashboard_listener_engine';
+import { DashboardEngineHealthStatistics } from './dashboard_engine_health';
 import { SampleDataWarning } from '../../../visualize/components';
-import { WAZUH_SAMPLE_METRICS_COMMS } from '../../../../../common/constants';
+import {
+  WAZUH_SAMPLE_METRICS_COMMS,
+  WAZUH_SAMPLE_METRICS_NORMALIZATION,
+} from '../../../../../common/constants';
 import { PromptErrorInitializatingDataSource } from '../../../common/hocs';
 
 const SearchBar = getPlugins().data.ui.SearchBar;
@@ -53,6 +61,27 @@ export const DashboardTabsPanels = ({
   clusterNodeSelected,
   onSelectNode,
 }: DashboardTabsPanelsProps) => {
+  const remotedDataSource = useDataSource<
+    tParsedIndexPattern,
+    PatternDataSource
+  >({
+    DataSource: StatisticsDataSource,
+    repository: new StatisticsDataSourceRepository(),
+  });
+
+  const engineHealthDataSource = useDataSource<
+    tParsedIndexPattern,
+    PatternDataSource
+  >({
+    DataSource: MetricsNormalizationDataSource,
+    repository: new MetricsNormalizationDataSourceRepository(),
+  });
+
+  const statisticsDataSource =
+    selectedTab === 'engine-health'
+      ? engineHealthDataSource
+      : remotedDataSource;
+
   const {
     filters,
     fetchFilters,
@@ -61,16 +90,15 @@ export const DashboardTabsPanels = ({
     setFilters,
     isLoading: isDataSourceLoading,
     error,
-  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: StatisticsDataSource,
-    repository: new StatisticsDataSourceRepository(),
-  });
+  } = statisticsDataSource;
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
-  const infoMessage = {
+  const infoMessage: Record<string, string> = {
     remoted:
       'Remoted statistics are cumulative, this means that the information shown is since the data exists.',
+    'engine-health':
+      'Engine Health uses metrics from the normalization data stream (wazuh-metrics-normalization).',
     // TODO: analysisd tab is commented out until analysisd metrics have a new data stream
     // analysisd:
     //   "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'.",
@@ -106,6 +134,8 @@ export const DashboardTabsPanels = ({
         ErrorHandler.handleError(searchError);
       });
   }, [
+    selectedTab,
+    dataSource?.id,
     isDataSourceLoading,
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
@@ -190,11 +220,29 @@ export const DashboardTabsPanels = ({
       {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
         <>
           <SampleDataWarning
-            categoriesSampleData={[WAZUH_SAMPLE_METRICS_COMMS]}
+            categoriesSampleData={
+              selectedTab === 'engine-health'
+                ? [WAZUH_SAMPLE_METRICS_NORMALIZATION]
+                : [WAZUH_SAMPLE_METRICS_COMMS]
+            }
           />
           {selectedTab === 'remoted' && !loadingNode && (
             <div>
               <DashboardListenerEngineStatistics
+                indexPatternId={dataSource?.id}
+                searchBarProps={searchBarProps}
+                lastReloadRequestTime={fingerprint}
+                filters={
+                  clusterNodeSelected !== 'all'
+                    ? [...fetchFilters, selectedNodeFilter]
+                    : [...(fetchFilters ?? [])]
+                }
+              />
+            </div>
+          )}
+          {selectedTab === 'engine-health' && !loadingNode && (
+            <div>
+              <DashboardEngineHealthStatistics
                 indexPatternId={dataSource?.id}
                 searchBarProps={searchBarProps}
                 lastReloadRequestTime={fingerprint}
