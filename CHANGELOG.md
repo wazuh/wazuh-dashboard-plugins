@@ -30,6 +30,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added Refresh button to the suggested filters search bar [#8398](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8398)
 - Added ability to generate PDF report in Vulnerabilities dashboard [#8403](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8403)
 - Added button that allows to request CTI content update [#8201](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8201)
+- Added CTI Console registration flow (UI and registration status API) [#8486](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8486)[#7663](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7663)
 - Added `wazuh-metrics-normalization*` index pattern [#8480](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8480)
 
 ### Changed
