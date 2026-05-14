@@ -111,8 +111,8 @@ export const Application = withGuardAsync(
       <WzMenuWrapper />
       <ToastNotificationsModal /> {/* TODO: check if this is being used */}
       <WzAgentSelectorWrapper />
-      <WzUpdatesNotification />
       <WzCtiUpsellNotification />
+      <WzUpdatesNotification />
       <Switch>
         <Route
           path={`/${SECTIONS.AGENTS_PREVIEW}/deploy`}
