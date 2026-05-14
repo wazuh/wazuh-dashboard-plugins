@@ -7,7 +7,6 @@ import {
   DashboardConfig,
   DashboardLayoutDefinition,
 } from '../../../../../../lib/dashboard-config-service';
-import { getVisStateUniqueNetworkIPsMetric } from './vis-states';
 
 export class ITHygieneNetworksInventoriesNetworksDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor(indexPatternId: string) {
@@ -30,7 +29,13 @@ export class ITHygieneNetworksInventoriesNetworksDashboardLayoutDefinition exten
             fieldCustomLabel: 'Type',
           },
         ),
-        getVisStateUniqueNetworkIPsMetric(indexPatternId),
+        getVisStateHorizontalBarByField(
+          indexPatternId,
+          'network.ip',
+          'Top 5 networks',
+          'it-hygiene-networks',
+          { fieldCustomLabel: 'Network IP' },
+        ),
         getVisStateHorizontalBarByField(
           indexPatternId,
           'interface.name',
