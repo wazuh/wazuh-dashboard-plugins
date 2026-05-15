@@ -135,7 +135,7 @@ const getVisStateTopVulnerabilitiesScore = (indexPatternId: string) => {
 const getVisStateTopVulnerableOSFamilies = (indexPatternId: string) => {
   return {
     id: 'most_vulnerable_endpoints_vulnerabilities',
-    title: 'Most vulnerable OS families',
+    title: 'Most vulnerable OS types',
     type: 'horizontal_bar',
     params: {
       type: 'histogram',
