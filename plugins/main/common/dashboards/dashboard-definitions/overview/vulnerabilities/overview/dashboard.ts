@@ -5,7 +5,7 @@ import {
 import {
   getVisStateAccumulationMostDetectedVulnerabilities,
   getVisStateTopVulnerabilitiesScore,
-  getVisStateTopVulnerableOSFamilies,
+  getVisStateTopVulnerableOSTypes,
 } from '../vis-states';
 
 export class VulnerabilitiesOverviewDashboardLayoutDefinition extends DashboardLayoutDefinition {
@@ -38,7 +38,7 @@ export class VulnerabilitiesOverviewDashboardLayoutDefinition extends DashboardL
         type: 'visualization',
         explicitInput: {
           id: '7',
-          savedVis: getVisStateTopVulnerableOSFamilies(indexPatternId),
+          savedVis: getVisStateTopVulnerableOSTypes(indexPatternId),
         },
       },
       '8': {
