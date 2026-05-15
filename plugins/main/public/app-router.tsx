@@ -14,6 +14,7 @@ import { WzMenuWrapper } from './components/wz-menu/wz-menu-wrapper';
 import { WzAgentSelectorWrapper } from './components/wz-agent-selector/wz-agent-selector-wrapper';
 import { ToastNotificationsModal } from './components/notifications/modal';
 import { WzUpdatesNotification } from './components/wz-updates-notification';
+import { WzCtiUpsellNotification } from './components/wz-cti-upsell-notification';
 import { RegisterAgent } from './components/endpoints-summary/register-agent';
 import { MainEndpointsSummary } from './components/endpoints-summary';
 import { AgentView } from './components/endpoints-summary/agent';
@@ -110,6 +111,7 @@ export const Application = withGuardAsync(
       <WzMenuWrapper />
       <ToastNotificationsModal /> {/* TODO: check if this is being used */}
       <WzAgentSelectorWrapper />
+      <WzCtiUpsellNotification />
       <WzUpdatesNotification />
       <Switch>
         <Route
