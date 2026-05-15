@@ -21,7 +21,7 @@ export const WAZUH_ENGINE_SETTINGS_INDEX = '.wazuh-settings';
 
 // Index patterns - Wazuh events (previously alerts)
 export const WAZUH_INDEX_TYPE_EVENTS = 'events';
-export const WAZUH_EVENTS_PATTERN = 'wazuh-events*';
+export const WAZUH_EVENTS_PATTERN = 'wazuh-events-v5*';
 
 // Index patterns - Wazuh findings
 export const WAZUH_INDEX_TYPE_FINDINGS = 'findings';

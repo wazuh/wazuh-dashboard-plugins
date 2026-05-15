@@ -24,7 +24,7 @@ export const WAZUH_ENGINE_SETTINGS_INDEX = '.wazuh-settings';
 
 // Index patterns - Wazuh events
 export const WAZUH_INDEX_TYPE_EVENTS = 'events';
-export const WAZUH_EVENTS_PATTERN = 'wazuh-events*';
+export const WAZUH_EVENTS_PATTERN = 'wazuh-events-v5*';
 
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';

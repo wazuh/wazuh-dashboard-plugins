@@ -11,7 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added "form-data": "^4.0.4" to the resolutions section to ensure this specific version is installed [#7662](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7662)
 - Added prompts to some views related to problems with server API and alerts index pattern [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694)
 - Added "Not applicable" status to SCA CheckResult enum with corresponding color mapping (#B9A888) and sample data support
-- Added default `wazuh-events*` index pattern [#7924](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7924)
+- Added default `wazuh-events-v5*` index pattern [#7924](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7924) [#8512](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8512)
 - Added SSL certificate support for Wazuh API connections, allowing the dashboard to use client certificates and CA certificate validation when connecting to Wazuh Manager APIs configured with custom SSL certificates. The `verify_ca` value is automatically calculated based on whether certificate paths (`key`, `cert`, `ca`) are configured [#8015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8015) [#8212](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8212)
 - Added "Verify CA" column in the API Connections table to display whether CA certificate verification is enabled for each API host. The value is automatically determined based on certificate configuration [#8015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8015)
 - Added `server-api:run_as` health check to warn when `allow_run_as` is disabled for configured API hosts [#8050](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8050)
@@ -36,7 +36,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- Changed default index pattern settings key from `defaultIndex` to `wazuh-events*` [#8066](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8066)
+- Changed default index pattern settings key from `defaultIndex` to `wazuh-events-v5*` [#8066](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8066) [#8512](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8512)
 - Adapted alerts sample data to Wazuh Common Schema [#7848](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7848)
 - Set cluster mode as default for all Wazuh installations, including single-node deployments. Updated RBAC permissions to `cluster:*` actions [#7701](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7701) [#8147](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8147)
 - Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7602](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7602) [#7929](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7929) [#7974](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7974) [#7979](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7979) [#8242](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8242) [#8306](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8306) [#8382](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8382) [#8472](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8472)
@@ -125,7 +125,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Remove `Rules`, `Decoders`, `CDB List` and `Ruleset test` apps [#7901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7901)
 - Removed the legacy reporting application, including its server routes, UI, PDF generation logic, and related customization settings [#7899](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7899)
 - Removed some sections in Server Management > Settings and agent configuration [#7932](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7932) [#8271](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8271)
-- Removed `wazuh-alerts*` index pattern and replaced with `wazuh-events*` as the default index pattern. Removed index pattern selector from top navigation bar as index pattern selection is now handled through module-specific configurations [#7933](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7933)
+- Removed `wazuh-alerts*` index pattern and replaced with `wazuh-events-v5*` as the default index pattern. Removed index pattern selector from top navigation bar as index pattern selection is now handled through module-specific configurations [#7933](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7933) [#8512](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8512)
 - Removed `ip.ignore` , `pattern` settings [#7933](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7933)
 - Remove references to templates for alerts and archives [#7977](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7977)
 - Remove files related to indexer resources from the source code and obtained when installing the dependencies of the `wazuh` plugin [#7857](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7857) [#7868](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7868) [#7891](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7891) [#7982](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7982)
