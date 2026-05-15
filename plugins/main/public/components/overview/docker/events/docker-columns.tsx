@@ -8,14 +8,14 @@ export const dockerColumns: tDataGridColumn[] = [
     id: 'container.image.name',
   },
   {
-    id: 'event.action',
-    initialWidth: 161,
-  },
-  {
     id: 'wazuh.rule.title',
   },
   {
     id: 'container.name',
     initialWidth: 160,
+  },
+  {
+    id: 'event.action',
+    initialWidth: 161,
   },
 ];
