@@ -61,7 +61,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated Threat Hunting dashboard with new index pattern definition [#8063](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8063) [#8421](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8421)
 - Upgraded the `axios` dependency to `1.15.2` [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125) [#8179](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8179) [#8482](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8482)
 - Upgraded loglovel to 1.9.2 [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
-- Updated Docker module under Cloud Security, with new index pattern definition [#8128](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8128) [#8364](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8364)
+- Updated Docker module under Cloud Security, with new index pattern definition [#8128](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8128) [#8364](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8364) [#8513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8513)
 - Changed Ossec references to wazuh-manager [#8136](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8136)
 - Changed default Dev Tools request from deprecated `GET /manager/info` to `GET /cluster/<NODE_NAME>/info` [#8137](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8137)
 - Upgraded ESLint from version 8 to version 10 and migrated configuration from legacy `.eslintrc.json` to the new flat config format (`eslint.config.mjs`) [#8145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8145)
