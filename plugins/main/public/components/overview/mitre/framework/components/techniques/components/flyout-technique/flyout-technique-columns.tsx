@@ -18,8 +18,13 @@ export const techniquesColumns: tDataGridColumn[] = [
   {
     id: 'wazuh.rule.mitre.technique',
     displayAsText: 'Technique(s)',
+    initialWidth: 200,
   },
-  { id: 'wazuh.rule.mitre.tactic', displayAsText: 'Tactic(s)' },
+  {
+    id: 'wazuh.rule.mitre.tactic',
+    displayAsText: 'Tactic(s)',
+    initialWidth: 266,
+  },
   { id: 'wazuh.rule.level', displayAsText: 'Level' },
   {
     id: 'wazuh.rule.id',
@@ -39,8 +44,13 @@ export const agentTechniquesColumns: tDataGridColumn[] = [
   {
     id: 'wazuh.rule.mitre.technique',
     displayAsText: 'Technique(s)',
+    initialWidth: 200,
   },
-  { id: 'wazuh.rule.mitre.tactic', displayAsText: 'Tactic(s)' },
+  {
+    id: 'wazuh.rule.mitre.tactic',
+    displayAsText: 'Tactic(s)',
+    initialWidth: 266,
+  },
   { id: 'wazuh.rule.level', displayAsText: 'Level' },
   {
     id: 'wazuh.rule.id',
