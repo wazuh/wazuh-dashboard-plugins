@@ -430,7 +430,7 @@ export const endpointSummary = {
     defaultMessage: 'Summary',
   }),
   breadcrumbLabel: i18n.translate('wz-app-endpoints-summary-breadcrumbLabel', {
-    defaultMessage: 'Endpoints',
+    defaultMessage: 'Summary',
   }),
   description: i18n.translate('wz-app-endpoints-summary-description', {
     defaultMessage: 'Summary of agents and their status.',
