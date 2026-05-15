@@ -1,5 +1,5 @@
 import React from 'react';
-import { threatHuntingColumns } from '../components/common/wazuh-discover/config/data-grid-columns';
+import { threatHuntingColumns } from '../components/overview/threat-hunting/events/threat-hunting-columns';
 import { vulnerabilitiesColumns } from '../components/overview/vulnerabilities/events/vulnerabilities-columns';
 import { dockerColumns } from '../components/overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../components/overview/google-cloud/events/google-cloud-columns';
