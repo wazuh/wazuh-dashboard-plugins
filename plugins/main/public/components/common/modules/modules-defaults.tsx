@@ -432,7 +432,6 @@ export const ModulesDefaults = {
         tableColumns: createRegulatoryComplianceColumns(
           'wazuh.rule.compliance.pci_dss',
           300,
-          240,
         ),
         DataSource: PCIDSSDataSource,
         categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
@@ -546,8 +545,6 @@ export const ModulesDefaults = {
         moduleId: 'tsc',
         tableColumns: createRegulatoryComplianceColumns(
           'wazuh.rule.compliance.tsc',
-          260,
-          240,
         ),
         DataSource: TSCDataSource,
         categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
