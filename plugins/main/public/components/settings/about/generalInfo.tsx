@@ -30,7 +30,7 @@ export const SettingsAboutGeneralInfo = ({
     content: React.ReactNode;
   }) => (
     <EuiFlexItem>
-      <EuiPanel paddingSize='l'>
+      <EuiPanel paddingSize='m'>
         <EuiTitle size='m'>
           <h2>{title}</h2>
         </EuiTitle>

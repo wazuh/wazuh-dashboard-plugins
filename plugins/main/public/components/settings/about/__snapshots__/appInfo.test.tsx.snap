@@ -12,7 +12,7 @@ exports[`SettingsAboutAppInfo component should render version, revision, install
         class="euiTextColor euiTextColor--default"
       >
         <div
-          class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsFlexStart euiFlexGroup--directionRow euiFlexGroup--responsive"
         >
           <div
             class="euiFlexItem"
@@ -27,7 +27,7 @@ exports[`SettingsAboutAppInfo component should render version, revision, install
             </div>
           </div>
           <div
-            class="euiFlexItem"
+            class="euiFlexItem wzAboutAppInfoClusterItem"
           >
             <div
               class="euiText euiText--medium"
