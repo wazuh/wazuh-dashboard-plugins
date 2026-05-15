@@ -7,7 +7,11 @@ import { amazonWebServicesColumns } from '../components/overview/amazon-web-serv
 import { office365Columns } from '../components/overview/office/events/office-365-columns';
 import { fileIntegrityMonitoringColumns } from '../components/overview/fim/events/file-integrity-monitoring-columns';
 import { configurationAssessmentColumns } from '../components/overview/sca/events/configuration-assessment-columns';
-import { createRegulatoryComplianceColumns } from '../components/overview/regulatory-compliance/shared/create-regulatory-compliance-columns';
+import { pciColumns } from '../components/overview/regulatory-compliance/pci/events/pci-columns';
+import { hipaaColumns } from '../components/overview/regulatory-compliance/hipaa/events/hipaa-columns';
+import { nistColumns } from '../components/overview/regulatory-compliance/nist/events/nist-columns';
+import { gdprColumns } from '../components/overview/regulatory-compliance/gdpr/events/gdpr-columns';
+import { tscColumns } from '../components/overview/regulatory-compliance/tsc/events/tsc-columns';
 import { githubColumns } from '../components/overview/github/events/github-columns';
 import { mitreAttackColumns } from '../components/overview/mitre/events/mitre-attack-columns';
 import { malwareDetectionColumns } from '../components/overview/malware-detection/events/malware-detection-columns';
@@ -28,18 +32,11 @@ const eventsColumns = [
   ...office365Columns,
   ...fileIntegrityMonitoringColumns,
   ...configurationAssessmentColumns,
-  ...createRegulatoryComplianceColumns(
-    'wazuh.rule.compliance.pci_dss',
-    300,
-    240,
-  ),
-  ...createRegulatoryComplianceColumns('wazuh.rule.compliance.hipaa'),
-  ...createRegulatoryComplianceColumns(
-    'wazuh.rule.compliance.nist_800_53',
-    300,
-  ),
-  ...createRegulatoryComplianceColumns('wazuh.rule.compliance.gdpr'),
-  ...createRegulatoryComplianceColumns('wazuh.rule.compliance.tsc', 260, 240),
+  ...pciColumns,
+  ...hipaaColumns,
+  ...nistColumns,
+  ...gdprColumns,
+  ...tscColumns,
   ...githubColumns,
   ...mitreAttackColumns,
   ...malwareDetectionColumns,
