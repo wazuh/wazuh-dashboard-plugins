@@ -608,6 +608,12 @@ export const ModulesDefaults = {
     init: 'pci-dss',
     tabs: [
       {
+        id: WAZUH_MODULES_ID.PCI_DSS,
+        name: WAZUH_MODULES[WAZUH_MODULES_ID.PCI_DSS].title,
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryCompliancePCIDSS,
+      },
+      {
         id: WAZUH_MODULES_ID.CMMC,
         name: WAZUH_MODULES[WAZUH_MODULES_ID.CMMC].title,
         buttons: [ButtonExploreAgent],
@@ -654,12 +660,6 @@ export const ModulesDefaults = {
         name: WAZUH_MODULES[WAZUH_MODULES_ID.NIST_800_171].title,
         buttons: [ButtonExploreAgent],
         component: RegulatoryComplianceNIST800171,
-      },
-      {
-        id: WAZUH_MODULES_ID.PCI_DSS,
-        name: WAZUH_MODULES[WAZUH_MODULES_ID.PCI_DSS].title,
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryCompliancePCIDSS,
       },
       {
         id: WAZUH_MODULES_ID.TSC,
