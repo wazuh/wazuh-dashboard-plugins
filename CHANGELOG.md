@@ -88,6 +88,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Allowed only 1 server API configuration per indexer [#8436](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8436)
 - Updated the OS icon source field in the Endpoints summary table to display Linux agent icons [#8459](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8459)
 - Reworked Statistics dashboard [#8254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8254)
+- Updated the breadcrumb label in `Agents management / Summary` [#8498](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8498)
 
 ### Fixed
 
