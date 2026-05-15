@@ -147,6 +147,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.6
 
+### Fixed
+
+- Fixed message when the server cluster is disabled and access to **Cluster** app  [#8447](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8447)
+
 ## Wazuh v4.14.5 - OpenSearch Dashboards 2.19.5 - Revision 01
 
 ### Added
