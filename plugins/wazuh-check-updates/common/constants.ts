@@ -48,13 +48,7 @@ export const CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE =
 /** Wazuh Cloud portal / product URL. Uses `#` in the UI until set. */
 export const WAZUH_CLOUD_PORTAL_HREF = '';
 
-/**
- * Base URL of the Wazuh Cloud CTI Console API (server-side OAuth device flow).
- * Paths under {@link ctiConsoleApiPaths} are resolved against this host.
- *
- * Use the staging host while the device-flow endpoint only accepts pre-production
- * environments; switch to `https://api.cloud.wazuh.com` when production CTI allows it.
- */
+/** Base URL of the Wazuh Cloud CTI Console API (server-side OAuth device flow). */
 export const WAZUH_CTI_CONSOLE_BASE_URL = 'https://api.pre.cloud.wazuh.com';
 
 /**
@@ -68,7 +62,6 @@ export const ctiConsoleApiPaths = {
 /** Content Manager plugin HTTP path prefix (cluster plugin / Imposter mock). */
 const WAZUH_CONTENT_MANAGER_BASE_PATH = '/_plugins/_content_manager';
 
-/** Indexer Content Manager plugin paths (used with `context.core.opensearch.client`). */
 export const enum contentManagerRoutes {
   subscription = `${WAZUH_CONTENT_MANAGER_BASE_PATH}/subscription`,
   contentUpdate = `${WAZUH_CONTENT_MANAGER_BASE_PATH}/update`,

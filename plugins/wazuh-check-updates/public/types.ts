@@ -13,6 +13,7 @@ export interface WazuhCheckUpdatesPluginStart {
   DismissNotificationCheck: () => JSX.Element | null;
   ctiRegistrationUiEnabled: boolean;
   CtiRegistration: () => JSX.Element | null;
+  CtiUpsellNotification: () => JSX.Element | null;
 }
 
 export interface AppPluginStartDependencies {
