@@ -133,7 +133,7 @@ export const getVisStateTopVulnerabilitiesScore = (
   };
 };
 
-export const getVisStateTopVulnerableOSFamilies = (
+export const getVisStateTopVulnerableOSTypes = (
   indexPatternId: string,
 ): SavedVis => {
   return {

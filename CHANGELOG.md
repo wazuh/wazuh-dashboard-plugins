@@ -74,7 +74,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the Cluster app and relocated some panels to the Status app [#8220](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8220)
 - Changed the default value of `wazuh.updates.disabled` from `false` to `true` [#8236](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8236)
 - Centralized regulatory compliance modules (PCI DSS, GDPR, HIPAA, NIST 800-53, and TSC) into a single "Regulatory Compliance" application [#8239](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8239) [#8303](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8303)
-- Updated Vulnerability Detection Discover tab filters, and inventory columns [#8262](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8262) [#8283](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8283) [#8292](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8292)
+- Updated Vulnerability Detection Discover tab filters, and inventory columns [#8262](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8262) [#8283](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8283) [#8292](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8292) [#8507](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8507)
 - Changed FIM table columns and index source in the agent view [#8269](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8269)
 - Changed index pattern usage in MITRE ATT&CK and Compliance panels in agent overview [#8307](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8307)
 - Updated Threat Hunting dashboard with new index pattern definition [#8281](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8281) [#8479](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8479)

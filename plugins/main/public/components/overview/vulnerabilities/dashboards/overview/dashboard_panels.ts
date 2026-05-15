@@ -132,7 +132,7 @@ const getVisStateTopVulnerabilitiesScore = (indexPatternId: string) => {
   };
 };
 
-const getVisStateTopVulnerableOSFamilies = (indexPatternId: string) => {
+const getVisStateTopVulnerableOSTypes = (indexPatternId: string) => {
   return {
     id: 'most_vulnerable_endpoints_vulnerabilities',
     title: 'Most vulnerable OS types',
@@ -462,7 +462,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '7',
-        savedVis: getVisStateTopVulnerableOSFamilies(indexPatternId),
+        savedVis: getVisStateTopVulnerableOSTypes(indexPatternId),
       },
     },
     '8': {
