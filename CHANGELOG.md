@@ -30,6 +30,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added Refresh button to the suggested filters search bar [#8398](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8398)
 - Added ability to generate PDF report in Vulnerabilities dashboard [#8403](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8403)
 - Added button that allows to request CTI content update [#8201](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8201)
+- Added CTI Console registration flow (UI and registration status API) [#8486](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8486)[#7663](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7663)
 - Added `wazuh-metrics-normalization*` index pattern [#8480](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8480)
 - Added Engine Health dashboard [#8485](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8485)
 
@@ -48,7 +49,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Migrated the `wazuh.yml` settings to `opensearch_dashboards.yml` and advanced settings [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871) [#8467](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8467)
 - Changed the sample data index names [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 - Rework generate report button [#7900](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7900)
-- Changed dashboards renderer by saved objects [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842) [#7847](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7847) [#7916](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7916) [#7938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7938) [#8310](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8310)
+- Changed dashboards renderer by saved objects [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842) [#7847](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7847) [#7916](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7916) [#7938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7938) [#8310](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8310) [#8500] (https://github.com/wazuh/wazuh-dashboard-plugins/pull/500)
 - Changed `rule.groups` filter to `wazuh.integration.decoders` [#7934](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7934)
 - Applied the new home page navigation style to all dashboards [#7981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7981)
 - Updated Office 365 dashboards to use new index pattern [#8081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8081) [#8408](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8408)
@@ -60,7 +61,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated Threat Hunting dashboard with new index pattern definition [#8063](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8063) [#8421](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8421)
 - Upgraded the `axios` dependency to `1.15.2` [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125) [#8179](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8179) [#8482](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8482)
 - Upgraded loglovel to 1.9.2 [#8125](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8125)
-- Updated Docker module under Cloud Security, with new index pattern definition [#8128](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8128) [#8364](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8364)
+- Updated Docker module under Cloud Security, with new index pattern definition [#8128](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8128) [#8364](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8364) [#8513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8513)
 - Changed Ossec references to wazuh-manager [#8136](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8136)
 - Changed default Dev Tools request from deprecated `GET /manager/info` to `GET /cluster/<NODE_NAME>/info` [#8137](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8137)
 - Upgraded ESLint from version 8 to version 10 and migrated configuration from legacy `.eslintrc.json` to the new flat config format (`eslint.config.mjs`) [#8145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8145)
@@ -146,6 +147,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.14.6
+
+### Fixed
+
+- Fixed message when the server cluster is disabled and access to **Cluster** app [#8447](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8447)
 
 ## Wazuh v4.14.5 - OpenSearch Dashboards 2.19.5 - Revision 01
 
