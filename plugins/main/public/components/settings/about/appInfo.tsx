@@ -7,6 +7,8 @@ import {
   EuiTextColor,
 } from '@elastic/eui';
 
+import './appInfo.scss';
+
 export const SettingsAboutAppInfo = ({
   appInfo,
   clusterUuid,
@@ -28,7 +30,7 @@ export const SettingsAboutAppInfo = ({
             App version: <b>{appInfo}</b>
           </EuiText>
         </EuiFlexItem>
-        <EuiFlexItem style={{ paddingLeft: '16px' }}>
+        <EuiFlexItem className='wzAboutAppInfoClusterItem'>
           <EuiText>
             Cluster UUID:{' '}
             <b>

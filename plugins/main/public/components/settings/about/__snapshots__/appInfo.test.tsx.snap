@@ -27,7 +27,7 @@ exports[`SettingsAboutAppInfo component should render version, revision, install
             </div>
           </div>
           <div
-            class="euiFlexItem"
+            class="euiFlexItem wzAboutAppInfoClusterItem"
           >
             <div
               class="euiText euiText--medium"
