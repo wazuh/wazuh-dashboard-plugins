@@ -41,7 +41,7 @@ The script generates JSON files in the destination directory: events, states, mo
 | ----------------------- | -------------------------------------------------------------------------------- | ------------------------- |
 | `states-fim.json`       | `states-fim-files`, `states-fim-registries-keys`, `states-fim-registries-values` | `wazuh-states-fim*`       |
 | `states-inventory.json` | all `states-inventory-*`                                                         | `wazuh-states-inventory*` |
-| `events.json`           | all `events-*`                                                                   | `wazuh-events*`           |
+| `events.json`           | all `events-*`                                                                   | `wazuh-events-v5*`        |
 | `findings.json`         | all `findings-*`                                                                 | `wazuh-findings*`         |
 
 The templates can be retrieved from: https://github.com/wazuh/wazuh-indexer-plugins/tree/main/plugins/setup/src/main/resources
