@@ -1,7 +1,7 @@
 import React from 'react';
 import { DashboardTSC } from './dashboards/dashboard';
 import { TSCDataSource } from '../../../common/data-source';
-import { tscColumns } from './events/tsc-columns';
+import { createRegulatoryComplianceColumns } from '../shared/create-regulatory-compliance-columns';
 import { ComplianceModule } from '../shared/compliance-module';
 
 import { buildStandardComplianceTabs } from '../shared/compliance-tab-factory';
@@ -14,7 +14,10 @@ export const RegulatoryComplianceTSC = () => {
     section: moduleId,
     moduleId: moduleId,
     dataSource: TSCDataSource,
-    tableColumns: tscColumns,
+    tableColumns: createRegulatoryComplianceColumns(
+      'wazuh.rule.compliance.tsc',
+      260,
+    ),
   });
 
   return <ComplianceModule moduleId={moduleId} tabs={tabs} />;

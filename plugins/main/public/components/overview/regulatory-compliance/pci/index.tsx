@@ -1,7 +1,7 @@
 import React from 'react';
 import { DashboardPCIDSS } from './dashboards/dashboard';
 import { PCIDSSDataSource } from '../../../common/data-source';
-import { pciColumns } from './events/pci-columns';
+import { createRegulatoryComplianceColumns } from '../shared/create-regulatory-compliance-columns';
 import { ComplianceModule } from '../shared/compliance-module';
 
 import { buildStandardComplianceTabs } from '../shared/compliance-tab-factory';
@@ -14,7 +14,10 @@ export const RegulatoryCompliancePCIDSS = () => {
     section: moduleId,
     moduleId: moduleId,
     dataSource: PCIDSSDataSource,
-    tableColumns: pciColumns,
+    tableColumns: createRegulatoryComplianceColumns(
+      'wazuh.rule.compliance.pci_dss',
+      300,
+    ),
   });
 
   return <ComplianceModule moduleId={moduleId} tabs={tabs} />;

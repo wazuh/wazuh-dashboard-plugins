@@ -1,7 +1,7 @@
 import React from 'react';
 import { DashboardNIST80053 } from './dashboards/dashboard';
 import { NIST80053DataSource } from '../../../common/data-source';
-import { nistColumns } from './events/nist-columns';
+import { createRegulatoryComplianceColumns } from '../shared/create-regulatory-compliance-columns';
 import { ComplianceModule } from '../shared/compliance-module';
 
 import { buildStandardComplianceTabs } from '../shared/compliance-tab-factory';
@@ -14,7 +14,10 @@ export const RegulatoryComplianceNIST80053 = () => {
     section: moduleId,
     moduleId: moduleId,
     dataSource: NIST80053DataSource,
-    tableColumns: nistColumns,
+    tableColumns: createRegulatoryComplianceColumns(
+      'wazuh.rule.compliance.nist_800_53',
+      300,
+    ),
   });
 
   return <ComplianceModule moduleId={moduleId} tabs={tabs} />;
