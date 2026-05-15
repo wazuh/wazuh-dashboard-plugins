@@ -16,7 +16,6 @@ export const RegulatoryComplianceTSC = () => {
     dataSource: TSCDataSource,
     tableColumns: createRegulatoryComplianceColumns(
       'wazuh.rule.compliance.tsc',
-      260,
     ),
   });
 
