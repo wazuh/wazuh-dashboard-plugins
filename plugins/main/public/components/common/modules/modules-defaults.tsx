@@ -20,7 +20,7 @@ import {
   WazuhDiscover,
   WazuhDiscoverProps,
 } from '../wazuh-discover/wz-discover';
-import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
+import { threatHuntingColumns } from '../../overview/threat-hunting/events/threat-hunting-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
