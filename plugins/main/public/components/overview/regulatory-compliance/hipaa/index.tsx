@@ -1,7 +1,7 @@
 import React from 'react';
 import { DashboardHIPAA } from './dashboards/dashboard';
 import { HIPAADataSource } from '../../../common/data-source';
-import { hipaaColumns } from './events/hipaa-columns';
+import { createRegulatoryComplianceColumns } from '../shared/create-regulatory-compliance-columns';
 import { ComplianceModule } from '../shared/compliance-module';
 import { buildStandardComplianceTabs } from '../shared/compliance-tab-factory';
 import { WAZUH_MODULES_ID } from '../../../../../common/constants';
@@ -13,7 +13,9 @@ export const RegulatoryComplianceHIPAA = () => {
     section: moduleId,
     moduleId: moduleId,
     dataSource: HIPAADataSource,
-    tableColumns: hipaaColumns,
+    tableColumns: createRegulatoryComplianceColumns(
+      'wazuh.rule.compliance.hipaa',
+    ),
   });
 
   return <ComplianceModule moduleId={moduleId} tabs={tabs} />;
