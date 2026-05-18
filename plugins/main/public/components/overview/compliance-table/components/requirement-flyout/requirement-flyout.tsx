@@ -106,11 +106,13 @@ export const RequirementFlyout = connect(mapStateToProps)(
           isSortable: true,
           defaultSortDirection: 'desc',
           displayAsText: 'Time',
+          width: 140,
           render: value => formatUIDate(value),
         },
         {
           id: 'wazuh.agent.id',
           displayAsText: 'Agent',
+          width: 70,
         },
         {
           id: 'wazuh.agent.name',
@@ -121,7 +123,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
           displayAsText: 'Requirement',
         },
         { id: 'wazuh.integration.name', displayAsText: 'Integration' },
-        { id: 'wazuh.integration.decoders', displayAsText: 'Decoders' },
+        { id: 'wazuh.rule.title', displayAsText: 'Rule title' },
       ];
       const agentId = this.props.currentAgentData?.id;
       return agentId

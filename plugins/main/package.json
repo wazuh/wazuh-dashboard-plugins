@@ -23,7 +23,8 @@
     "tar-fs": "2.1.4",
     "cookie": "0.7.0",
     "@tootallnate/once": "^3.0.1",
-    "lodash": "4.18.1"
+    "lodash": "4.18.1",
+    "axios": "1.15.2"
   },
   "repository": {
     "type": "git",
@@ -55,10 +56,12 @@
     "prebuild": "node scripts/generate-build-version.js",
     "generate:indexer-resources": "if [ -f scripts/build-tools/update-indexer-resources ]; then bash scripts/build-tools/update-indexer-resources; else echo 'File does not exist. This could be related to the script file not being included at build time. Skipping...'; fi",
     "postinstall": "yarn run generate:indexer-resources",
-    "knip": "knip --files"
+    "knip": "knip --files",
+    "check:ndjson-descriptions": "node ../../scripts/check-ndjson-descriptions/index.mjs",
+    "fix:ndjson-descriptions": "node ../../scripts/check-ndjson-descriptions/index.mjs --fix"
   },
   "dependencies": {
-    "axios": "1.13.5",
+    "axios": "1.15.2",
     "dompurify": "3.3.2",
     "install": "^0.13.0",
     "js2xmlparser": "^5.0.0",

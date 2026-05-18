@@ -133,12 +133,12 @@ export const getVisStateTopVulnerabilitiesScore = (
   };
 };
 
-export const getVisStateTopVulnerableOSFamilies = (
+export const getVisStateTopVulnerableOSTypes = (
   indexPatternId: string,
 ): SavedVis => {
   return {
     id: 'most_vulnerable_endpoints_vulnerabilities',
-    title: 'Most vulnerable OS families',
+    title: 'Most vulnerable OS types',
     type: 'horizontal_bar',
     params: {
       type: 'histogram',

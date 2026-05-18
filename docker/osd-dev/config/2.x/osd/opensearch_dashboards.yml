@@ -44,3 +44,4 @@ wazuh_core.hosts:
     username: wazuh-wui
     password: wazuh-wui
     run_as: false
+wazuh_check_updates.ctiRegistrationUiEnabled: false

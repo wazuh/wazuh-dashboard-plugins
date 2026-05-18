@@ -5,8 +5,9 @@ import {
   EuiFlexItem,
   EuiText,
   EuiTextColor,
-  EuiTitle,
 } from '@elastic/eui';
+
+import './appInfo.scss';
 
 export const SettingsAboutAppInfo = ({
   appInfo,
@@ -19,16 +20,17 @@ export const SettingsAboutAppInfo = ({
     <EuiCallOut>
       <EuiFlexGroup
         direction='row'
-        alignItems='center'
+        alignItems='flexStart'
         justifyContent='flexStart'
-        gutterSize='none'
+        gutterSize='l'
+        responsive
       >
         <EuiFlexItem>
           <EuiText>
             App version: <b>{appInfo}</b>
           </EuiText>
         </EuiFlexItem>
-        <EuiFlexItem>
+        <EuiFlexItem className='wzAboutAppInfoClusterItem'>
           <EuiText>
             Cluster UUID:{' '}
             <b>

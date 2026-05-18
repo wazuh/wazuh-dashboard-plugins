@@ -1,7 +1,7 @@
 import React from 'react';
 import { DashboardNIS2 } from './dashboards/dashboard';
 import { Nis2DataSource } from '../../../common/data-source';
-import { nis2Columns } from './events/nis2-columns';
+import { createRegulatoryComplianceColumns } from '../shared/create-regulatory-compliance-columns';
 import { ComplianceModule } from '../shared/compliance-module';
 import { buildStandardComplianceTabs } from '../shared/compliance-tab-factory';
 import { WAZUH_MODULES_ID } from '../../../../../common/constants';
@@ -13,7 +13,9 @@ export const RegulatoryComplianceNIS2 = () => {
     section: moduleId,
     moduleId: moduleId,
     dataSource: Nis2DataSource,
-    tableColumns: nis2Columns,
+    tableColumns: createRegulatoryComplianceColumns(
+      'wazuh.rule.compliance.nis2',
+    ),
   });
 
   return <ComplianceModule moduleId={moduleId} tabs={tabs} />;

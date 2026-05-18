@@ -1,7 +1,8 @@
 {
   "device_code": "mock_device_code_123",
   "user_code": "WZH-999",
-  "verification_uri": "https://cti.wazuh.com/activate",
-  "expires_in": 600,
+  "verification_uri": "https://console.wazuh.com/platform/environments/register",
+  "verification_uri_complete": "https://console.wazuh.com/platform/environments/register?user_code=WZH-999",
+  "expires_in": 1800,
   "interval": 5
 }

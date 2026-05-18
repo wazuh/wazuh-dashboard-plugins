@@ -3,6 +3,8 @@ local development of the Wazuh Dashboard CTI integration.
 
 ## What it mocks
 
+### CTI Console (device flow)
+
 A single endpoint implementing the OAuth 2.0 Device Authorization Grant
 (RFC 8628):
 
@@ -19,6 +21,12 @@ The response depends on the request body:
 
 Both `application/x-www-form-urlencoded` and `application/json` request
 bodies are accepted.
+
+### Content Manager (`/_plugins/_content_manager/subscription`)
+
+**Not mocked here.** The dashboard calls those paths on the **OpenSearch
+cluster** configured for OpenSearch Dashboards. Use your indexer directly
+(e.g. `curl` against `:9200`) to test GET/POST subscription.
 
 ## Forcing a polling result
 
@@ -37,7 +45,6 @@ the header `X-Mock-Scenario` with one of:
 - `openapi.yml` — OpenAPI 3.0 specification consumed by Imposter.
 - `cti-config.yml` — Imposter resource configuration.
 - `token.js` — Dispatch logic (body parsing, scenario selection, poll counter).
-- `responses/*.json` — Static payloads for each response.
 
 > **Note:** Imposter scripts run on **Nashorn (ES5 only)**. Avoid trailing
 > commas in function calls, `const`/`let`, arrow functions, template literals,
@@ -52,6 +59,8 @@ under `/opt/imposter/config` is loaded, including `cti/cti-config.yml` alongside
 `wazuh-config.yml`. Paths do not collide with the Wazuh API mocks.
 
 ## Quick test
+
+`client_id` must match the **environment UID**: the same value as **`cluster_uuid`** from `GET /` on the cluster root (the dashboard uses that automatically). For ad-hoc curls against Imposter you can use any placeholder string the mock accepts.
 
 ```bash
 # 1. Device authorization request
