@@ -1024,7 +1024,9 @@ export class WazuhApiCtrl {
       const wazuhdbExists = typeof daemons['wazuh-manager-db'] !== 'undefined';
 
       const modulesd = daemons['wazuh-manager-modulesd'] === 'running';
-      const wazuhdb = wazuhdbExists ? daemons['wazuh-manager-db'] === 'running' : true;
+      const wazuhdb = wazuhdbExists
+        ? daemons['wazuh-manager-db'] === 'running'
+        : true;
 
       // In cluster by default, always check clusterd daemon
       const clusterd = daemons['wazuh-manager-clusterd'] === 'running';
