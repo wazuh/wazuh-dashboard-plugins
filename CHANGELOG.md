@@ -113,7 +113,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the monitoring and statistics jobs in the backend side [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Removed the settings related to monitoring and statistics job from the configuration [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597) [#7698](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7698)
 - Removed prompt related to statistic job is disabled in Statistics app [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
-- Removed the configuration for modules that relied on the following deprecated daemons: wazuh-agentlessd, wazuh-csyslogd, wazuh-dbd, wazuh-integratord, wazuh-maild, and wazuh-reportd. [#7612](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7612)
+- Removed the configuration for modules that relied on the following deprecated daemons: wazuh-agentlessd, wazuh-csyslogd, wazuh-dbd, wazuh-integratord, wazuh-maild, and wazuh-reportd. [#7612](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7612) [#8519](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8519)
 - Removed deprecated modules OpenSCAP, CIS-CAT, Osquery [#7645](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7645)
 - Removed `/health-check` and `/blank-screen` frontend routes [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
 - Removed `Miscellaneous` from `App Settings`[#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
