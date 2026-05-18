@@ -256,28 +256,20 @@ export const checkDaemons = async () => {
         [])[0] || {};
 
     const wazuhdbExists =
-      typeof daemons['wazuh-manager-db'] !== 'undefined' ||
-      typeof daemons['wazuh-db'] !== 'undefined';
-    const execdExists =
-      typeof daemons['wazuh-manager-execd'] !== 'undefined' ||
-      typeof daemons['wazuh-execd'] !== 'undefined';
+      typeof daemons['wazuh-manager-db'] !== 'undefined';
 
-    const execd = execdExists
-      ? (daemons['wazuh-manager-execd'] ?? daemons['wazuh-execd']) === 'running'
-      : true;
     const modulesd =
-      (daemons['wazuh-manager-modulesd'] ?? daemons['wazuh-modulesd']) ===
-      'running';
+      daemons['wazuh-manager-modulesd'] === 'running';
     const wazuhdb = wazuhdbExists
-      ? (daemons['wazuh-manager-db'] ?? daemons['wazuh-db']) === 'running'
+      ? daemons['wazuh-manager-db'] === 'running'
       : true;
 
     // In cluster by default, always check clusterd daemon
     const clusterd =
-      (daemons['wazuh-manager-clusterd'] ?? daemons['wazuh-clusterd']) ===
+      daemons['wazuh-manager-clusterd'] === 'running';
       'running';
 
-    const isValid = execd && modulesd && wazuhdb && clusterd;
+    const isValid = modulesd && wazuhdb && clusterd;
 
     if (isValid) {
       return { isValid };
