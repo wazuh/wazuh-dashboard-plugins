@@ -9,7 +9,7 @@ exports[`SettingsAboutGeneralInfo component should render a component 1`] = `
       class="euiFlexItem"
     >
       <div
-        class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <h2
           class="euiTitle euiTitle--medium"
@@ -32,7 +32,7 @@ exports[`SettingsAboutGeneralInfo component should render a component 1`] = `
       class="euiFlexItem"
     >
       <div
-        class="euiPanel euiPanel--paddingLarge euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+        class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
       >
         <h2
           class="euiTitle euiTitle--medium"

@@ -208,6 +208,14 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'metrics-comms.json',
   },
+  'metrics-normalization': {
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/templates/streams/metrics-normalization.json',
+      ),
+    ],
+    outputFile: 'metrics-normalization.json',
+  },
   // FIM templates
   'states-fim-files': {
     urls: [

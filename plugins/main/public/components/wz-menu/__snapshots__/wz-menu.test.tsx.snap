@@ -2,6 +2,16 @@
 
 exports[`WzMenu tests should render a WzMenu 1`] = `
 <WzMenu
+  globalBreadcrumbReducers={
+    Object {
+      "breadcrumb": Array [],
+    }
+  }
+  state={
+    Object {
+      "wazuhNotReadyYet": "",
+    }
+  }
   windowSize={
     Object {
       "height": 768,

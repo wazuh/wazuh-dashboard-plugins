@@ -1,4 +1,6 @@
 import { IConfiguration, IConfigurationStore, ILogger } from './types';
+import { PLUGIN_SETTINGS } from '../../constants';
+import { TPluginSetting } from '../../constants';
 
 export class Configuration implements IConfiguration {
   store: IConfigurationStore | null = null;
@@ -36,5 +38,9 @@ export class Configuration implements IConfiguration {
 
   async getAll() {
     return (await this.store?.getAll()) || {};
+  }
+
+  getSettingDefinition(key: string): TPluginSetting | undefined {
+    return PLUGIN_SETTINGS[key];
   }
 }

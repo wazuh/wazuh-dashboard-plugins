@@ -15,18 +15,17 @@ import {
   EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiPopover,
   EuiButtonEmpty,
   EuiCallOut,
   EuiToolTip,
   EuiLoadingSpinner,
   EuiSelect,
+  EuiPopover,
 } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 
 import { connect } from 'react-redux';
 import { getHeaderActionMenuMounter } from '../../kibana-services';
-import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { withWindowSize } from '../../components/common/hocs/withWindowSize';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
@@ -40,14 +39,15 @@ import { useAsyncActionRunOnStart } from '../common/hooks';
 import { useSelectedServerApi } from '../common/hooks/use-selected-server-api';
 import { Selector, SelectorContainer, SelectorLabel } from './selectors';
 import { isEqual } from 'lodash';
+import { WzAuthentication } from '../../react-services/wz-authentication';
+import { fetchManagerApiHostsList } from '../../react-services/manager-api-session-sync';
 
-async function getServerAPIList() {
-  const response = await GenericRequest.request('GET', '/hosts/apis', {});
-  return response?.data;
-}
+// =============================================================================
+// Header: Server API selector (only rendered when isCCS)
+// =============================================================================
 
 const ServerAPISelector = ({ showSelectorsInPopover }) => {
-  const action = useAsyncActionRunOnStart(getServerAPIList, []);
+  const action = useAsyncActionRunOnStart(fetchManagerApiHostsList, []);
 
   const { selectedAPI: currentAPI } = useSelectedServerApi();
 
@@ -90,6 +90,8 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
         pinnedAgentManager.unPinAgent();
       }
 
+      await WzAuthentication.refresh(true);
+
       /* TODO: this reloads the page to force the components are remounted with the new
           selection of. To avoid this refresh, we would have to do the components are able to react
           to these changes redoing the requests, etc... This will need a considerable time to
@@ -113,42 +115,44 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
   };
 
   return (
-    <SelectorContainer>
-      <SelectorLabel
-        actionError={actionError}
-        showSelectorsInPopover={showSelectorsInPopover}
-      >
-        Manager API
-      </SelectorLabel>
-      <Selector showSelectorsInPopover={showSelectorsInPopover}>
-        <div style={style}>
-          <EuiSelect
-            id='selectAPIBar'
-            fullWidth={true}
-            options={
-              action.data?.map(item => {
-                return { value: item.id, text: item.id };
-              }) || []
-            }
-            value={currentAPI?.id}
-            onChange={changeAPI}
-            aria-label='API selector'
-            hasNoInitialSelection={notSelected}
-            isInvalid={isInvalid}
-            append={
-              <EuiButtonIcon
-                iconType='refresh'
-                color='primary'
-                isDisabled={action.running}
-                onClick={() => {
-                  action.run();
-                }}
-              ></EuiButtonIcon>
-            }
-          />
-        </div>
-      </Selector>
-    </SelectorContainer>
+    <div className='wz-server-api-selector-hidden'>
+      <SelectorContainer>
+        <SelectorLabel
+          actionError={actionError}
+          showSelectorsInPopover={showSelectorsInPopover}
+        >
+          Manager API
+        </SelectorLabel>
+        <Selector showSelectorsInPopover={showSelectorsInPopover}>
+          <div style={style}>
+            <EuiSelect
+              id='selectAPIBar'
+              fullWidth={true}
+              options={
+                action.data?.map(item => {
+                  return { value: item.id, text: item.id };
+                }) || []
+              }
+              value={currentAPI?.id}
+              onChange={changeAPI}
+              aria-label='API selector'
+              hasNoInitialSelection={notSelected}
+              isInvalid={isInvalid}
+              append={
+                <EuiButtonIcon
+                  iconType='refresh'
+                  color='primary'
+                  isDisabled={action.running}
+                  onClick={() => {
+                    action.run();
+                  }}
+                ></EuiButtonIcon>
+              }
+            />
+          </div>
+        </Selector>
+      </SelectorContainer>
+    </div>
   );
 };
 
@@ -174,6 +178,12 @@ export const WzMenu = withWindowSize(
       ) {
         setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb);
       }
+    }
+
+    switchSelectorsPopOver() {
+      this.setState({
+        isSelectorsPopoverOpen: !this.state.isSelectorsPopoverOpen,
+      });
     }
 
     buildWazuhNotReadyYet() {
@@ -204,6 +214,7 @@ export const WzMenu = withWindowSize(
                   grow={false}
                   onClick={() => NavigationService.getInstance().reload()}
                   className='WzNotReadyButton'
+                  aria-label='Reload'
                 >
                   <span> Reload </span>
                 </EuiButtonEmpty>
@@ -213,12 +224,6 @@ export const WzMenu = withWindowSize(
         </EuiCallOut>,
         container[0],
       );
-    }
-
-    switchSelectorsPopOver() {
-      this.setState({
-        isSelectorsPopoverOpen: !this.state.isSelectorsPopoverOpen,
-      });
     }
 
     render() {
@@ -246,8 +251,8 @@ export const WzMenu = withWindowSize(
               responsive={false}
               className='wz-margin-left-10 wz-margin-right-10 font-size-14'
             >
-              {(showSelectorsInPopover && (
-                <>
+              {this.props.state.isCCS &&
+                (showSelectorsInPopover ? (
                   <EuiFlexItem grow={false}>
                     <EuiPopover
                       ownFocus
@@ -267,16 +272,13 @@ export const WzMenu = withWindowSize(
                       </EuiFlexGroup>
                     </EuiPopover>
                   </EuiFlexItem>
-                </>
-              )) || (
-                <>
-                  <EuiFlexItem grow={showSelectorsInPopover}>
+                ) : (
+                  <EuiFlexItem grow={false}>
                     <ServerAPISelector
                       showSelectorsInPopover={showSelectorsInPopover}
                     />
                   </EuiFlexItem>
-                </>
-              )}
+                ))}
               {this.props.state.wazuhNotReadyYet &&
                 this.buildWazuhNotReadyYet()}
             </EuiFlexGroup>

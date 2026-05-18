@@ -53,9 +53,14 @@ export class WzStatisticsOverview extends Component {
         name: 'Listener Engine',
       },
       {
-        id: 'analysisd',
-        name: 'Analysis Engine',
+        id: 'engine-health',
+        name: 'Engine Health',
       },
+      // TODO: analysisd tab is commented out until analysisd metrics have a new data stream
+      // {
+      //   id: 'analysisd',
+      //   name: 'Analysis Engine',
+      // },
     ];
   }
 

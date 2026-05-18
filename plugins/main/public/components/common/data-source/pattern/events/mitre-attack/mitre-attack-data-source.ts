@@ -5,7 +5,7 @@ import {
 } from '../../../../../../../common/constants';
 import { EventsDataSource } from '../events-data-source';
 
-const GROUP_KEY = 'rule.mitre.technique';
+const GROUP_KEY = 'wazuh.rule.mitre.technique';
 
 export class MitreAttackDataSource extends EventsDataSource {
   constructor(id: string, title: string) {

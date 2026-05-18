@@ -44,16 +44,63 @@ const renderLinksReference = (value: string) => {
   return links;
 };
 
-const renderMitreTechnique = technique => (
+const mitreList = (value: string | string[]) =>
+  (Array.isArray(value) ? value : value ? [value] : []).filter(Boolean);
+
+const renderMitreList = (
+  value: string | string[],
+  renderItem?: (item: string, isOnly: boolean) => React.ReactNode,
+) => {
+  const items = mitreList(value);
+
+  if (!items.length) {
+    return '-';
+  }
+
+  const label = items.join(', ');
+  const isOnly = items.length === 1;
+
+  if (isOnly) {
+    return renderItem ? (
+      renderItem(items[0], true)
+    ) : (
+      <span className='wz-ellipsis' style={{ display: 'block' }}>
+        {items[0]}
+      </span>
+    );
+  }
+
+  return (
+    <EuiToolTip position='top' content={label} anchorClassName='wz-width-100'>
+      <span className='wz-ellipsis' style={{ display: 'block' }}>
+        {items.map((item, index) => (
+          <React.Fragment key={`${item}-${index}`}>
+            {index > 0 && ', '}
+            {renderItem ? renderItem(item, false) : item}
+          </React.Fragment>
+        ))}
+      </span>
+    </EuiToolTip>
+  );
+};
+
+const renderMitreTechnique = (technique: string, showLinkTooltip = true) => (
   <WzLink
     appId={mitreAttack.id}
     path={`/overview?tab=mitre&tabView=intelligence&tabRedirect=techniques&idToRedirect=${technique}`}
-    toolTipProps={{
-      content: i18n.translate('discover.fieldLinkTooltip.mitreTechnique', {
-        defaultMessage:
-          'Navigate to MITRE ATT&CK - Intelligence and see the technique details',
-      }),
-    }}
+    toolTipProps={
+      showLinkTooltip
+        ? {
+            content: i18n.translate(
+              'discover.fieldLinkTooltip.mitreTechnique',
+              {
+                defaultMessage:
+                  'Navigate to MITRE ATT&CK - Intelligence and see the technique details',
+              },
+            ),
+          }
+        : undefined
+    }
   >
     {technique}
   </WzLink>
@@ -101,59 +148,53 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
     render: renderLinksReference,
   },
   {
-    id: 'rule.mitre.technique',
-    render: value =>
-      Array.isArray(value) ? (
-        <div style={{ display: 'flex', gap: 10 }}>
-          {value?.map((technique, index) => (
-            <div key={`${technique}-${index}`}>
-              {renderMitreTechnique(technique)}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div>{renderMitreTechnique(value)}</div>
-      ),
+    id: 'wazuh.rule.mitre.technique',
+    render: (value: string | string[]) =>
+      renderMitreList(value, renderMitreTechnique),
+  },
+  {
+    id: 'wazuh.rule.mitre.tactic',
+    render: (value: string | string[]) => renderMitreList(value),
   },
 
   {
-    id: 'rule.compliance.pci_dss',
+    id: 'wazuh.rule.compliance.pci_dss',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'rule.compliance.gdpr',
+    id: 'wazuh.rule.compliance.gdpr',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'rule.compliance.iso_27001',
+    id: 'wazuh.rule.compliance.iso_27001',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'rule.compliance.nist_800_53',
+    id: 'wazuh.rule.compliance.nist_800_53',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'rule.compliance.hipaa',
+    id: 'wazuh.rule.compliance.hipaa',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'rule.compliance.tsc',
+    id: 'wazuh.rule.compliance.tsc',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'rule.compliance.nist_800_171',
+    id: 'wazuh.rule.compliance.nist_800_171',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'rule.compliance.cmmc',
+    id: 'wazuh.rule.compliance.cmmc',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'rule.compliance.fedramp',
+    id: 'wazuh.rule.compliance.fedramp',
     render: renderRequirementsSecurityOperations,
   },
   {
-    id: 'rule.compliance.nis2',
+    id: 'wazuh.rule.compliance.nis2',
     render: renderRequirementsSecurityOperations,
   },
   {

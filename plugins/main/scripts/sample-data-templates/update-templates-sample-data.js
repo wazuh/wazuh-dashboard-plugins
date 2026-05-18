@@ -62,6 +62,7 @@ const config = {
   datasetToTemplateMapping: {
     'metrics-agents': 'templates/streams/metrics-agents.json',
     'metrics-comms': 'templates/streams/metrics-comms.json',
+    'metrics-normalization': 'templates/streams/metrics-normalization.json',
     'states-fim-files': 'templates/states/fim-files.json',
     'states-fim-registry-keys': 'templates/states/fim-registry-keys.json',
     'states-fim-registry-values': 'templates/states/fim-registry-values.json',

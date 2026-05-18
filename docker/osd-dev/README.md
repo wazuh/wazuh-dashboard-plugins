@@ -27,6 +27,24 @@
   - In macOS:
     `brew install jq`
 
+## Primary Manager API host
+
+The Wazuh dashboard uses **only the first** Manager API host defined in
+`wazuh_core.hosts`. Health checks, startup registry refresh, and the Server API
+settings screen all target that entry only; extra hosts are ignored.
+
+If you want to change which Manager API host is used, move that host to the
+first position under `wazuh_core.hosts` and restart the environment.
+
+For the **2.x** dev stack, hosts are inlined in
+`docker/osd-dev/config/2.x/osd/opensearch_dashboards.yml` (and
+`opensearch_dashboards_saml.yml` when using SAML).
+
+When running with `--server-local`, the script dynamically generates a
+dashboard config from the selected 2.x base config and rewrites
+`wazuh_core.hosts` so `manager-local` is placed first. That file is removed
+when you run `./dev.sh down` (same idea as the generated compose override).
+
 ## Usage
 
 Always use the provided script to bring up or down the development environment. The only allowed positional argument is the action.

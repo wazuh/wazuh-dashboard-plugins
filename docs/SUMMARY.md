@@ -14,6 +14,7 @@
 - [Run Tests](dev/run-tests.md)
 - [Modules](dev/modules/index.md)
   - [Active responses](dev/modules/active-responses.md)
+  - [Security analytics](dev/modules/security-analytics.md)
 
 # Reference Manual
 
@@ -28,7 +29,7 @@
 - [Agent Deploy One-Liner](ref/agent-deploy-one-liner.md)
 - [Configuration](ref/configuration.md)
 - [Single Sign-On](ref/sso.md)
-- [Custom Branding](ref/custom-branding.md)
+- [Custom Branding](ref/custom-branding/custom-branding.md)
 - [Modules](ref/modules/README.md)
   - [Health check](ref/modules/healthcheck.md)
   - [Notifications and Alerting](ref/modules/notifications-alerting.md)

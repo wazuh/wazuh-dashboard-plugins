@@ -430,7 +430,7 @@ export const endpointSummary = {
     defaultMessage: 'Summary',
   }),
   breadcrumbLabel: i18n.translate('wz-app-endpoints-summary-breadcrumbLabel', {
-    defaultMessage: 'Endpoints',
+    defaultMessage: 'Summary',
   }),
   description: i18n.translate('wz-app-endpoints-summary-description', {
     defaultMessage: 'Summary of agents and their status.',
@@ -637,13 +637,13 @@ export const serverApis = {
   category: 'wz-category-dashboard-management',
   id: 'server-apis',
   title: i18n.translate('wz-app-server-apis-title', {
-    defaultMessage: 'Server APIs',
+    defaultMessage: 'Server API',
   }),
   breadcrumbLabel: i18n.translate('wz-app-server-apis-breadcrumbLabel', {
-    defaultMessage: 'Server APIs',
+    defaultMessage: 'Server API',
   }),
   description: i18n.translate('wz-app-server-apis-description', {
-    defaultMessage: 'Manage and configure the API entries.',
+    defaultMessage: 'View and manage the server API connection.',
   }),
   euiIconType: 'indexRollupApp',
   order: 10003,
@@ -692,7 +692,7 @@ export const Applications = [
   endpointGroups,
   serverStatus,
   // cluster,
-  // statistics,
+  statistics,
   logs,
   settings,
   serverApis,

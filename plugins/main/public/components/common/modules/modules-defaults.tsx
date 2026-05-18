@@ -20,7 +20,7 @@ import {
   WazuhDiscover,
   WazuhDiscoverProps,
 } from '../wazuh-discover/wz-discover';
-import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
+import { threatHuntingColumns } from '../../overview/threat-hunting/events/threat-hunting-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
@@ -28,11 +28,7 @@ import { amazonWebServicesColumns } from '../../overview/amazon-web-services/eve
 import { office365Columns } from '../../overview/office/events/office-365-columns';
 import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
 import { configurationAssessmentColumns } from '../../overview/sca/events/configuration-assessment-columns';
-import { pciColumns } from '../../overview/regulatory-compliance/pci/events/pci-columns';
-import { hipaaColumns } from '../../overview/regulatory-compliance/hipaa/events/hipaa-columns';
-import { nistColumns } from '../../overview/regulatory-compliance/nist/events/nist-columns';
-import { gdprColumns } from '../../overview/regulatory-compliance/gdpr/events/gdpr-columns';
-import { tscColumns } from '../../overview/regulatory-compliance/tsc/events/tsc-columns';
+import { createRegulatoryComplianceColumns } from '../../overview/regulatory-compliance/shared/create-regulatory-compliance-columns';
 import { githubColumns } from '../../overview/github/events/github-columns';
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
@@ -329,7 +325,7 @@ export const ModulesDefaults = {
         id: TAB_VIEW_ID_DASHBOARD,
         name: TAB_VIEW_NAME_DASHBOARD,
         component: DashboardVuls,
-        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-events* */
+        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-events-v5* */
         buttons: [
           ({ ...props }) => (
             <ButtonExploreAgent
@@ -344,7 +340,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Inventory',
         component: InventoryVuls,
-        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-events* */
+        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-events-v5* */
         buttons: [
           ({ ...props }) => (
             <ButtonExploreAgent
@@ -433,7 +429,10 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         moduleId: 'pci',
-        tableColumns: pciColumns,
+        tableColumns: createRegulatoryComplianceColumns(
+          'wazuh.rule.compliance.pci_dss',
+          300,
+        ),
         DataSource: PCIDSSDataSource,
         categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
@@ -459,7 +458,9 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         moduleId: 'hipaa',
-        tableColumns: hipaaColumns,
+        tableColumns: createRegulatoryComplianceColumns(
+          'wazuh.rule.compliance.hipaa',
+        ),
         DataSource: HIPAADataSource,
         categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
@@ -485,7 +486,10 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         moduleId: 'nist',
-        tableColumns: nistColumns,
+        tableColumns: createRegulatoryComplianceColumns(
+          'wazuh.rule.compliance.nist_800_53',
+          300,
+        ),
         DataSource: NIST80053DataSource,
         categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
@@ -511,7 +515,9 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         moduleId: 'gdpr',
-        tableColumns: gdprColumns,
+        tableColumns: createRegulatoryComplianceColumns(
+          'wazuh.rule.compliance.gdpr',
+        ),
         DataSource: GDPRDataSource,
         categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
@@ -537,7 +543,9 @@ export const ModulesDefaults = {
       },
       renderDiscoverTab({
         moduleId: 'tsc',
-        tableColumns: tscColumns,
+        tableColumns: createRegulatoryComplianceColumns(
+          'wazuh.rule.compliance.tsc',
+        ),
         DataSource: TSCDataSource,
         categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
@@ -597,6 +605,12 @@ export const ModulesDefaults = {
     init: 'pci-dss',
     tabs: [
       {
+        id: WAZUH_MODULES_ID.PCI_DSS,
+        name: WAZUH_MODULES[WAZUH_MODULES_ID.PCI_DSS].title,
+        buttons: [ButtonExploreAgent],
+        component: RegulatoryCompliancePCIDSS,
+      },
+      {
         id: WAZUH_MODULES_ID.CMMC,
         name: WAZUH_MODULES[WAZUH_MODULES_ID.CMMC].title,
         buttons: [ButtonExploreAgent],
@@ -643,12 +657,6 @@ export const ModulesDefaults = {
         name: WAZUH_MODULES[WAZUH_MODULES_ID.NIST_800_171].title,
         buttons: [ButtonExploreAgent],
         component: RegulatoryComplianceNIST800171,
-      },
-      {
-        id: WAZUH_MODULES_ID.PCI_DSS,
-        name: WAZUH_MODULES[WAZUH_MODULES_ID.PCI_DSS].title,
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryCompliancePCIDSS,
       },
       {
         id: WAZUH_MODULES_ID.TSC,

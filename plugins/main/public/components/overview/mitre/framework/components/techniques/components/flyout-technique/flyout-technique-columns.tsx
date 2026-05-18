@@ -16,16 +16,21 @@ export const techniquesColumns: tDataGridColumn[] = [
   },
   { id: 'wazuh.agent.name', displayAsText: 'Agent Name' },
   {
-    id: 'rule.mitre.technique',
+    id: 'wazuh.rule.mitre.technique',
     displayAsText: 'Technique(s)',
+    initialWidth: 200,
   },
-  { id: 'rule.mitre.tactic', displayAsText: 'Tactic(s)' },
-  { id: 'rule.level', displayAsText: 'Level' },
   {
-    id: 'rule.id',
+    id: 'wazuh.rule.mitre.tactic',
+    displayAsText: 'Tactic(s)',
+    initialWidth: 266,
+  },
+  { id: 'wazuh.rule.level', displayAsText: 'Level' },
+  {
+    id: 'wazuh.rule.id',
     displayAsText: 'Rule ID',
   },
-  { id: 'rule.title', displayAsText: 'Title' },
+  { id: 'wazuh.rule.title', displayAsText: 'Title' },
 ];
 
 export const agentTechniquesColumns: tDataGridColumn[] = [
@@ -37,14 +42,19 @@ export const agentTechniquesColumns: tDataGridColumn[] = [
     render: value => formatUIDate(value),
   },
   {
-    id: 'rule.mitre.technique',
+    id: 'wazuh.rule.mitre.technique',
     displayAsText: 'Technique(s)',
+    initialWidth: 200,
   },
-  { id: 'rule.mitre.tactic', displayAsText: 'Tactic(s)' },
-  { id: 'rule.level', displayAsText: 'Level' },
   {
-    id: 'rule.id',
+    id: 'wazuh.rule.mitre.tactic',
+    displayAsText: 'Tactic(s)',
+    initialWidth: 266,
+  },
+  { id: 'wazuh.rule.level', displayAsText: 'Level' },
+  {
+    id: 'wazuh.rule.id',
     displayAsText: 'Rule ID',
   },
-  { id: 'rule.title', displayAsText: 'Title' },
+  { id: 'wazuh.rule.title', displayAsText: 'Title' },
 ];
