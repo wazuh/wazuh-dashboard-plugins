@@ -25,7 +25,7 @@ export const WAZUH_EVENTS_PATTERN = 'wazuh-events-v5*';
 
 // Index patterns - Wazuh findings
 export const WAZUH_INDEX_TYPE_FINDINGS = 'findings';
-export const WAZUH_FINDINGS_PATTERN = 'wazuh-findings*';
+export const WAZUH_FINDINGS_PATTERN = 'wazuh-findings-v5*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS =
   'index-pattern:findings';
 

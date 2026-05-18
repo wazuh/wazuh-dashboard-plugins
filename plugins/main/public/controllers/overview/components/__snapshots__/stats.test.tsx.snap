@@ -165,7 +165,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                 >
                   <p>
                     Index pattern [
-                    id: wazuh-findings*
+                    id: wazuh-findings-v5*
                     ] not found
                   </p>
                 </div>
