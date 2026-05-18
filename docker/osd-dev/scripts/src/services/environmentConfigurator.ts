@@ -31,9 +31,8 @@ export function removeGeneratedServerLocalDashboardFiles(
   if (!existsSync(configRoot)) {
     return;
   }
-  for (const major of [OSD_MAJOR_1X, OSD_MAJOR_2X]) {
-    const osdDir = resolve(configRoot, major, 'osd');
-    if (!existsSync(osdDir)) continue;
+  const osdDir = resolve(configRoot, 'osd');
+  if (existsSync(osdDir)) {
     for (const name of readdirSync(osdDir)) {
       if (!name.endsWith(GENERATED_SERVER_LOCAL_SUFFIX)) continue;
       const full = resolve(osdDir, name);

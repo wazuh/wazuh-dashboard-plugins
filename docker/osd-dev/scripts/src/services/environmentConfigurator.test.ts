@@ -26,7 +26,7 @@ describe('services/environmentConfigurator', () => {
     savedCwd = process.cwd();
     tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'wdp-env-'));
     process.chdir(tmpdir);
-    const osdConfigDir = path.join(tmpdir, 'config', '2.x', 'osd');
+    const osdConfigDir = path.join(tmpdir, 'config', 'osd');
     fs.mkdirSync(osdConfigDir, { recursive: true });
     fs.writeFileSync(
       path.join(osdConfigDir, 'opensearch_dashboards.yml'),
@@ -207,7 +207,7 @@ describe('services/environmentConfigurator', () => {
     it('removes *.generated.server-local.yml under docker/osd-dev/config/*/osd/', () => {
       const osdDir = path.join(
         envPaths.currentRepoContainerRoot,
-        'docker/osd-dev/config/2.x/osd',
+        'docker/osd-dev/config/osd',
       );
       fs.mkdirSync(osdDir, { recursive: true });
       const fake = path.join(

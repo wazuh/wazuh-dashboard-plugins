@@ -44,7 +44,7 @@ const MINIMAL_OSD_CONFIG = `wazuh_core.hosts:
 export function makeTempCwd(prefix = 'wdp-jest-'): { tmpdir: string } {
   const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
   process.chdir(tmpdir);
-  const osdConfigDir = path.join(tmpdir, 'config', '2.x', 'osd');
+  const osdConfigDir = path.join(tmpdir, 'config', 'osd');
   fs.mkdirSync(osdConfigDir, { recursive: true });
   fs.writeFileSync(
     path.join(osdConfigDir, 'opensearch_dashboards.yml'),
