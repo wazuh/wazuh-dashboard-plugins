@@ -2,7 +2,7 @@
 
 The **Active Response** module automates remediation actions on Wazuh agents when an alert meets a condition. Typical use cases include blocking an offending IP, isolating a compromised host, killing a suspicious process, or running a custom containment action.
 
-The feature is fully integrated with the Wazuh Dashboard: each active response is defined from the **Active Responses** view (under **Explore**), invoked from an **Alerting** monitor trigger, and audited from **Discover**.
+The feature is fully integrated with the Wazuh dashboard: each active response is defined from the **Active Responses** view (under **Explore**), invoked from an **Alerting** monitor trigger, and audited from **Discover**.
 
 This module exposes the following views:
 
@@ -13,13 +13,13 @@ This module exposes the following views:
 
 ## How it fits together
 
-Active Response combines three areas of the Wazuh Dashboard:
+Active Response combines three areas of the Wazuh dashboard:
 
-| Area                      | Role in Active Response                                                                                                                                                          |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Active Responses view** | Manage active responses from the Wazuh Dashboard (under **Explore → Active Responses**). Each entry defines the executable, type, timeout, and target location of a remediation. |
-| **Alerting**              | Active Response monitors expose an **Add active response** action that invokes one when the trigger condition is met.                                                            |
-| **Discover**              | The `wazuh-active-responses*` index pattern keeps an auditable record of every execution, retained for 3 days by default.                                                        |
+| Area                 | Role in Active Response                                                                                                                                                          |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Active Responses** | Manage active responses from the Wazuh dashboard (under **Explore → Active Responses**). Each entry defines the executable, type, timeout, and target location of a remediation. |
+| **Alerting**         | Active Response monitors expose an **Add active response** action that invokes one when the trigger condition is met.                                                            |
+| **Discover**         | The `wazuh-active-responses*` index pattern keeps an auditable record of every execution, retained for 3 days by default.                                                        |
 
 An active response never runs on its own: it must be attached to an Active Response monitor trigger. When the trigger fires, an execution record is stored in **Discover**, the manager picks it up within about one minute, and the target agent carries out the action.
 

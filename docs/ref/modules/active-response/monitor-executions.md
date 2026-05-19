@@ -17,20 +17,20 @@ When a monitor trigger fires an active response, a new document appears here wit
 
 ![Discover - Expanded active response document](images/18-discover-ar-document-expanded.png)
 
-The most useful fields for investigation are listed below. The **Expected value** column shows what each field should hold for the SSH root-login use case (`Block-IP-stateful-response` firing on a `SSH Root Login via Password Authentication` alert); use it as a quick sanity check against the document that was just written.
+The most useful fields for investigation are listed below. The **Expected value** column shows what each field should hold for the SSH root-login use case (`Block-IP-stateful-response` firing on a `SSH root login via password authentication` alert); use it as a quick sanity check against the document that was just written.
 
-| Field                                    | Content                                                         | Expected value (use case)                                            |
-| ---------------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------- |
-| `@timestamp`                             | Time the execution was recorded.                                | Within ~1 min of the original `SSH Root Login via Password Authentication` alert. |
-| `wazuh.active_response.name`             | Active response name.                                           | `Block-IP-stateful-response`                                         |
-| `wazuh.active_response.type`             | `stateful` or `stateless`.                                      | `stateful`                                                           |
-| `wazuh.active_response.executable`       | Executable that was run.                                        | `block-ip`                                                           |
-| `wazuh.active_response.extra_arguments`  | Extra arguments passed to the executable.                       | _(empty)_                                                            |
-| `wazuh.active_response.stateful_timeout` | Timeout in seconds (stateful active responses only).            | `30`                                                                 |
-| `wazuh.active_response.location`         | `all`, `defined-agent`, or `local`.                             | `local`                                                              |
-| `wazuh.active_response.agent_id`         | Target agent ID (only when `location = defined-agent`).         | _(not set — `location = local`)_                                     |
-| `wazuh.agent.id`, `.name`                | Agent that reported the original alert.                         | The agent that received the root SSH login.                          |
-| `event.doc_id`, `event.index`            | Original alert that triggered the action (useful for pivoting). | Points back to the `SSH Root Login via Password Authentication` finding. |
+| Field                                    | Content                                                         | Expected value (use case)                                                         |
+| ---------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `@timestamp`                             | Time the execution was recorded.                                | Within ~1 min of the original `SSH root login via password authentication` alert. |
+| `wazuh.active_response.name`             | Active response name.                                           | `Block-IP-stateful-response`                                                      |
+| `wazuh.active_response.type`             | `stateful` or `stateless`.                                      | `stateful`                                                                        |
+| `wazuh.active_response.executable`       | Executable that was run.                                        | `block-ip`                                                                        |
+| `wazuh.active_response.extra_arguments`  | Extra arguments passed to the executable.                       | _(empty)_                                                                         |
+| `wazuh.active_response.stateful_timeout` | Timeout in seconds (stateful active responses only).            | `30`                                                                              |
+| `wazuh.active_response.location`         | `all`, `defined-agent`, or `local`.                             | `local`                                                                           |
+| `wazuh.active_response.agent_id`         | Target agent ID (only when `location = defined-agent`).         | _(not set — `location = local`)_                                                  |
+| `wazuh.agent.id`, `.name`                | Agent that reported the original alert.                         | The agent that received the root SSH login.                                       |
+| `event.doc_id`, `event.index`            | Original alert that triggered the action (useful for pivoting). | Points back to the `SSH root login via password authentication` finding.          |
 
 > **Tip:** to narrow the list to a different active response, replace `Block-IP-stateful-response` in the filter with the value of `wazuh.active_response.name` you want to inspect.
 
@@ -79,6 +79,6 @@ After the `Stateful timeout` elapses (`30` seconds for `Block-IP-stateful-respon
 
 ## Step 4: Pivot to the source alert
 
-From any execution record, `event.doc_id` and `event.index` point back to the alert that fired the action. Switch the Discover index pattern to the value of `event.index` (for the SSH root-login use case, this resolves to `wazuh-findings-v5-access-management*`) and filter by `_id == event.doc_id` to open the original `SSH Root Login via Password Authentication` alert. This closes the loop between **detection → activation → execution**.
+From any execution record, `event.doc_id` and `event.index` point back to the alert that fired the action. Switch the Discover index pattern to the value of `event.index` (for the SSH root-login use case, this resolves to `wazuh-findings-v5-access-management*`) and filter by `_id == event.doc_id` to open the original `SSH root login via password authentication` alert. This closes the loop between **detection → activation → execution**.
 
 > **Note:** execution records are retained for **3 days** by default. If you need longer forensic retention, ask your administrator to adjust the retention policy or export the records to another index.

@@ -34,11 +34,11 @@ Under **Select data**, pick the findings index that holds the events to watch. F
 
 ## Step 4: Define the query
 
-In the **Query** section, describe the conditions that the incoming alerts must meet. For this SSH root-login use case, target the built-in Wazuh rule that flags a root login via password authentication on SSH — `rule.title: "SSH Root Login via Password Authentication"`. Add a **Query name** (required, `Block-IP-query` for this use case) and fill in the condition:
+In the **Query** section, describe the conditions that the incoming alerts must meet. For this SSH root-login use case, target the built-in Wazuh rule that flags a root login via password authentication on SSH — `wazuh.rule.title: "SSH root login via password authentication"`. Add a **Query name** (required, `Block-IP-query` for this use case) and fill in the condition:
 
-- **Field** — `rule.title`
+- **Field** — `wazuh.rule.title`
 - **Operator** — `is`
-- **Search term** — `SSH Root Login via Password Authentication`
+- **Search term** — `SSH root login via password authentication`
 
 ![Query - Filled query and performance preview](images/11-monitor-query-filled.png)
 
@@ -82,7 +82,7 @@ The action automatically wires the triggering alert to the active response, so t
 
 ## Step 7: Generate the triggering event
 
-With the monitor saved, produce a real `SSH Root Login via Password Authentication` alert so the trigger fires and the active response runs end-to-end. The procedure below is intended for a **lab agent** — do not run it against production hosts.
+With the monitor saved, produce a real `SSH root login via password authentication` alert so the trigger fires and the active response runs end-to-end. The procedure below is intended for a **lab agent** — do not run it against production hosts.
 
 **Pre-requisites on the target agent:**
 
@@ -96,7 +96,7 @@ With the monitor saved, produce a real `SSH Root Login via Password Authenticati
 
 > **Warning:** enabling `PermitRootLogin yes` on a non-lab host is a serious security risk. Roll it back in **Step 8: Clean up** as soon as the test has been validated.
 
-From the **attacker host**, perform an SSH login attempt as `root` using password authentication. The goal is to make the agent emit a `SSH Root Login via Password Authentication` event:
+From the **attacker host**, perform an SSH login attempt as `root` using password authentication. The goal is to make the agent emit a `SSH root login via password authentication` event:
 
 ```bash
 ssh -o PreferredAuthentications=password \
@@ -109,7 +109,7 @@ Enter the root password at the prompt. The login should succeed (otherwise the r
 
 ![SSH root login via password from the attacker host](images/19-ssh-root-login-simulation.png)
 
-Within about one minute, an alert with `rule.title: SSH Root Login via Password Authentication` is indexed under `wazuh-findings-v5-access-management*`, the monitor fires, and the trigger queues the active response action. Continue to [Monitor active response executions](./monitor-executions.md) to confirm the execution end-to-end.
+Within about one minute, a finding with `wazuh.rule.title: SSH root login via password authentication` is indexed under `wazuh-findings-v5-access-management*`, the monitor fires, and the trigger queues the active response action. Continue to [Monitor active response executions](./monitor-executions.md) to confirm the execution end-to-end.
 
 ---
 
