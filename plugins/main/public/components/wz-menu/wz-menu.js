@@ -188,6 +188,7 @@ export const WzMenu = withWindowSize(
 
     buildWazuhNotReadyYet() {
       const container = document.getElementsByClassName('wazuhNotReadyYet');
+      if (!container[0]) return null;
       return ReactDOM.createPortal(
         <EuiCallOut title={this.props.state.wazuhNotReadyYet} color='warning'>
           <EuiFlexGroup
