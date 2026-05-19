@@ -6,29 +6,29 @@
     "profiles": {
       "intermediate_ca": {
         "usages": [
-            "signing",
-            "digital signature",
-            "key encipherment",
-            "cert sign",
-            "crl sign",
-            "server auth",
-            "client auth"
+          "signing",
+          "digital signature",
+          "key encipherment",
+          "cert sign",
+          "crl sign",
+          "server auth",
+          "client auth"
         ],
         "expiry": "8760h",
         "ca_constraint": {
-            "is_ca": true,
-            "max_path_len": 0, 
-            "max_path_len_zero": true
+          "is_ca": true,
+          "max_path_len": 0,
+          "max_path_len_zero": true
         }
       },
       "peer": {
         "usages": [
-            "signing",
-            "digital signature",
-            "key encipherment", 
-            "data encipherment",
-            "client auth",
-            "server auth"
+          "signing",
+          "digital signature",
+          "key encipherment",
+          "data encipherment",
+          "client auth",
+          "server auth"
         ],
         "expiry": "8760h"
       },
@@ -46,7 +46,7 @@
         "usages": [
           "signing",
           "digital signature",
-          "key encipherment", 
+          "key encipherment",
           "data encipherment",
           "client auth"
         ],
@@ -55,4 +55,3 @@
     }
   }
 }
-

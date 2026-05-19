@@ -5,11 +5,11 @@
     "size": 2048
   },
   "names": [
-  {
-    "C": "US",
-    "L": "San Francisco",
-    "O": "Wazuh",
-    "OU": "Wazuh Root CA"
-  }
- ]
+    {
+      "C": "US",
+      "L": "San Francisco",
+      "O": "Wazuh",
+      "OU": "Wazuh Root CA"
+    }
+  ]
 }
