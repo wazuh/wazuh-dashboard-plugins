@@ -138,7 +138,7 @@ export function generateOverrideFile(
     healthcheck:
       test: [
           'CMD-SHELL',
-          "curl -v --cacert /etc/wazuh-indexer/certs/root-ca.pem https://wazuh.indexer:9200 2>&1 | grep -q '401'",
+          "curl -sk -u admin:admin --cacert /etc/wazuh-indexer/certs/root-ca.pem https://wazuh.indexer:9200 -o /dev/null -w '%{http_code}' | grep -q '200'",
         ]
       interval: 1s
       timeout: 5s
