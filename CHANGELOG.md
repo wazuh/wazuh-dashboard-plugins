@@ -90,6 +90,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated the OS icon source field in the Endpoints summary table to display Linux agent icons [#8459](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8459)
 - Reworked Statistics dashboard [#8254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8254)
 - Updated the breadcrumb label in `Agents management / Summary` [#8498](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8498)
+- Renamed Listener Engine and Engine Health tabs to Comms and Normalizations in Server management > Statistics section [#8524](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8524)
 
 ### Fixed
 
@@ -107,6 +108,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed long labels in IT Hygiene horizontal bar visualizations causing display issues [#8330](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8330)
 - Fixed rendering of the Tactics and Techniques cells in the MITRE ATT&CK flyout [#8516](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8516)
 - Fixed Wazuh Cloud registration in the header not updating after the environment was unregistered in the Console [#8529](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8529)
+- Fixed custom filter buttons not being rendered in pdf reports [#8525](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8525)
 
 ### Removed
 

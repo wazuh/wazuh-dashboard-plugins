@@ -36,7 +36,7 @@ import { DiscoverNoResults } from '../../../common/no-results/no-results';
 // TODO: DashboardAnalysisEngineStatistics is commented out until analysisd metrics have a new data stream
 // import { DashboardAnalysisEngineStatistics } from './dashboard_analysis_engine';
 import { DashboardListenerEngineStatistics } from './dashboard_listener_engine';
-import { DashboardEngineHealthStatistics } from './dashboard_engine_health';
+import { DashboardNormalizationStatistics } from './dashboard_engine_health';
 import { SampleDataWarning } from '../../../visualize/components';
 import {
   WAZUH_SAMPLE_METRICS_COMMS,
@@ -69,7 +69,7 @@ export const DashboardTabsPanels = ({
     repository: new StatisticsDataSourceRepository(),
   });
 
-  const engineHealthDataSource = useDataSource<
+  const NormalizationDataSource = useDataSource<
     tParsedIndexPattern,
     PatternDataSource
   >({
@@ -78,8 +78,8 @@ export const DashboardTabsPanels = ({
   });
 
   const statisticsDataSource =
-    selectedTab === 'engine-health'
-      ? engineHealthDataSource
+    selectedTab === 'normalization'
+      ? NormalizationDataSource
       : remotedDataSource;
 
   const {
@@ -96,9 +96,7 @@ export const DashboardTabsPanels = ({
 
   const infoMessage: Record<string, string> = {
     remoted:
-      'Remoted statistics are cumulative, this means that the information shown is since the data exists.',
-    'engine-health':
-      'Engine Health uses metrics from the normalization data stream (wazuh-metrics-normalization).',
+      'Statistics are cumulative, this means that the information shown is since the data exists.',
     // TODO: analysisd tab is commented out until analysisd metrics have a new data stream
     // analysisd:
     //   "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'.",
@@ -206,7 +204,9 @@ export const DashboardTabsPanels = ({
         // WORKAROUND: This style mitigates the include styles in the DiscoverNoResults component to align with the SampleDataWarning component and the EuiCallOut with information about the tab. The components should not include wrappers with margin/padding and this should be set by the layout instead
         style={{ margin: '0 8px 16px 8px' }}
       >
-        <EuiCallOut title={infoMessage[selectedTab]} iconType='iInCircle' />
+        {infoMessage[selectedTab] && (
+          <EuiCallOut title={infoMessage[selectedTab]} iconType='iInCircle' />
+        )}
       </div>
 
       {dataSource && results?.hits?.total === 0 ? (
@@ -221,7 +221,7 @@ export const DashboardTabsPanels = ({
         <>
           <SampleDataWarning
             categoriesSampleData={
-              selectedTab === 'engine-health'
+              selectedTab === 'normalization'
                 ? [WAZUH_SAMPLE_METRICS_NORMALIZATION]
                 : [WAZUH_SAMPLE_METRICS_COMMS]
             }
@@ -240,9 +240,9 @@ export const DashboardTabsPanels = ({
               />
             </div>
           )}
-          {selectedTab === 'engine-health' && !loadingNode && (
+          {selectedTab === 'normalization' && !loadingNode && (
             <div>
-              <DashboardEngineHealthStatistics
+              <DashboardNormalizationStatistics
                 indexPatternId={dataSource?.id}
                 searchBarProps={searchBarProps}
                 lastReloadRequestTime={fingerprint}
