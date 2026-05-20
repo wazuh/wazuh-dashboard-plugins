@@ -46,6 +46,7 @@ interface IStepsProps {
     isUDP: boolean;
   };
   wazuhPassword: string;
+  canReadAuthdPassword: boolean;
 }
 
 export const Steps = ({
@@ -54,7 +55,9 @@ export const Steps = ({
   osCard,
   connection,
   wazuhPassword,
+  canReadAuthdPassword,
 }: IStepsProps) => {
+  const passwordPermissionMissing = !canReadAuthdPassword;
   const initialParsedFormValues = {
     operatingSystem: {
       name: '',
@@ -64,7 +67,7 @@ export const Steps = ({
       agentGroups: '',
       agentName: '',
       serverAddress: '',
-      wazuhPassword,
+      wazuhPassword: 'simulated-registration-password',
       protocol: connection.isUDP ? 'UDP' : '',
     },
   } as IParseRegisterFormValues;
@@ -179,6 +182,22 @@ export const Steps = ({
           },
         ]
       : []),
+    ...(passwordPermissionMissing
+      ? [
+          {
+            title: 'Password',
+            children: (
+              <EuiCallOut
+                color='warning'
+                title='Missing permission to read the registration password'
+                iconType='iInCircle'
+                className='warningForAgentName'
+              />
+            ),
+            status: getPasswordStepStatus(form.fields),
+          },
+        ]
+      : []),
     {
       title: 'Optional settings:',
       children: <OptionalsInputs formFields={form.fields} />,
@@ -189,7 +208,18 @@ export const Steps = ({
     },
     {
       title: 'Run the following commands to download and install the agent:',
-      children: (
+      children: passwordPermissionMissing ? (
+        <EuiCallOut
+          color='warning'
+          title='Deployment commands hidden'
+          iconType='iInCircle'
+        >
+          <p>
+            You do not have the required permissions to view the deployment
+            commands.
+          </p>
+        </EuiCallOut>
+      ) : (
         <>
           {missingStepsName?.length ? (
             <EuiCallOut
@@ -230,7 +260,17 @@ export const Steps = ({
     },
     {
       title: 'Start the agent:',
-      children: (
+      children: passwordPermissionMissing ? (
+        <EuiCallOut
+          color='warning'
+          title='Start command hidden'
+          iconType='iInCircle'
+        >
+          <p>
+            You do not have the required permissions to view the start command.
+          </p>
+        </EuiCallOut>
+      ) : (
         <>
           {missingStepsName?.length ? (
             <EuiCallOut

@@ -30,6 +30,7 @@ import {
   withRouteResolvers,
   withUserAuthorizationPrompt,
 } from '../../../../common/hocs';
+import { useUserPermissionsRequirements } from '../../../../common/hooks/useUserPermissions';
 import GroupInput from '../../components/group-input/group-input';
 import { OsCard } from '../../components/os-selector/os-card/os-card';
 import { validateAgentName } from '../../utils/validations';
@@ -69,6 +70,13 @@ export const RegisterAgent = compose(
   const [wazuhPassword, setWazuhPassword] = useState('');
   const [groups, setGroups] = useState([]);
   const [needsPassword, setNeedsPassword] = useState<boolean>(false);
+  const [missingPasswordReadPermissions] = useUserPermissionsRequirements([
+    [
+      { action: 'manager:update_config', resource: '*:*:*' },
+      { action: 'cluster:update_config', resource: 'node:id:*' },
+    ],
+  ]);
+  const canReadAuthdPassword = !missingPasswordReadPermissions;
 
   const initialFields: FormConfiguration = {
     operatingSystemSelection: {
@@ -213,6 +221,7 @@ export const RegisterAgent = compose(
                       form={form}
                       needsPassword={needsPassword}
                       wazuhPassword={wazuhPassword}
+                      canReadAuthdPassword={canReadAuthdPassword}
                       osCard={osCard}
                       connection={{
                         isUDP: haveUdpProtocol ? true : false,
