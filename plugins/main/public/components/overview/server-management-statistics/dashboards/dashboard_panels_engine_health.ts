@@ -140,7 +140,7 @@ const lineChartParamsBase = (yAxisText: string) => ({
   },
 });
 
-const getEngineHealthLineVis = (
+const getNormalizationLineVis = (
   visId: string,
   title: string,
   yAxisText: string,
@@ -199,7 +199,7 @@ const getEngineHealthLineVis = (
   },
 });
 
-export const getDashboardPanelsEngineHealth = (
+export const getDashboardPanelsNormalization = (
   indexPatternId?: string,
 ): {
   [panelId: string]: DashboardPanelState<
@@ -218,8 +218,8 @@ export const getDashboardPanelsEngineHealth = (
       type: 'visualization',
       explicitInput: {
         id: '1',
-        savedVis: getEngineHealthLineVis(
-          'wz-vis-statistics-engine-health-server-bytes-received',
+        savedVis: getNormalizationLineVis(
+          'wz-vis-statistics-normalization-server-bytes-received',
           'Bytes received',
           'Bytes received',
           'server.bytes.received',
@@ -238,8 +238,8 @@ export const getDashboardPanelsEngineHealth = (
       type: 'visualization',
       explicitInput: {
         id: '2',
-        savedVis: getEngineHealthLineVis(
-          'wz-vis-statistics-engine-health-router-events-processed',
+        savedVis: getNormalizationLineVis(
+          'wz-vis-statistics-normalization-router-events-processed',
           'Events processed',
           'Events processed',
           'router.events.processed',
@@ -258,8 +258,8 @@ export const getDashboardPanelsEngineHealth = (
       type: 'visualization',
       explicitInput: {
         id: '3',
-        savedVis: getEngineHealthLineVis(
-          'wz-vis-statistics-engine-health-server-events-received',
+        savedVis: getNormalizationLineVis(
+          'wz-vis-statistics-normalization-server-events-received',
           'Events received',
           'Events received',
           'server.events.received',
@@ -278,8 +278,8 @@ export const getDashboardPanelsEngineHealth = (
       type: 'visualization',
       explicitInput: {
         id: '4',
-        savedVis: getEngineHealthLineVis(
-          'wz-vis-statistics-engine-health-router-events-dropped',
+        savedVis: getNormalizationLineVis(
+          'wz-vis-statistics-normalization-router-events-dropped',
           'Events dropped',
           'Events dropped',
           'router.events.dropped',
