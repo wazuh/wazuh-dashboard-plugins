@@ -50,11 +50,11 @@ export class WzStatisticsOverview extends Component {
     this.tabs = [
       {
         id: 'remoted',
-        name: 'Listener Engine',
+        name: 'Comms',
       },
       {
-        id: 'engine-health',
-        name: 'Engine Health',
+        id: 'normalization',
+        name: 'Normalization',
       },
       // TODO: analysisd tab is commented out until analysisd metrics have a new data stream
       // {
