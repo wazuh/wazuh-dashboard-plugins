@@ -32,13 +32,13 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
           isFullScreenMode: false,
           filters: filters,
           useMargins: true,
-          id: 'listener-engine-statistics-dashboard',
+          id: 'comms-statistics-dashboard',
           timeRange: {
             from: searchBarProps.dateRangeFrom,
             to: searchBarProps.dateRangeTo,
           },
-          title: 'Listener Engine Statistics dashboard',
-          description: 'Dashboard of the Listener Engine Statistics',
+          title: 'Comms Statistics dashboard',
+          description: 'Dashboard of the Comms Statistics',
           query: searchBarProps.query,
           refreshConfig: {
             pause: false,

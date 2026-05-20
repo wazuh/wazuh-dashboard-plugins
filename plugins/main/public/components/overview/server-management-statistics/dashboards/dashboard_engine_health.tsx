@@ -1,7 +1,7 @@
 import React from 'react';
 import { getPlugins } from '../../../../kibana-services';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
-import { getDashboardPanelsEngineHealth } from './dashboard_panels_engine_health';
+import { getDashboardPanelsNormalization } from './dashboard_panels_engine_health';
 import { withErrorBoundary } from '../../../common/hocs/error-boundary/with-error-boundary';
 import { tFilter } from '../../../common/data-source';
 import './statistics_dashboard.scss';
@@ -10,14 +10,14 @@ const plugins = getPlugins();
 
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-interface DashboardEngineHealthProps {
+interface DashboardNormalizationProps {
   indexPatternId: string;
   filters: tFilter[];
   searchBarProps: any;
   lastReloadRequestTime: number;
 }
 
-const DashboardEngineHealth: React.FC<DashboardEngineHealthProps> = ({
+const DashboardNormalization: React.FC<DashboardNormalizationProps> = ({
   indexPatternId,
   filters,
   searchBarProps,
@@ -28,18 +28,18 @@ const DashboardEngineHealth: React.FC<DashboardEngineHealthProps> = ({
       <DashboardByRenderer
         input={{
           viewMode: ViewMode.VIEW,
-          panels: getDashboardPanelsEngineHealth(indexPatternId),
+          panels: getDashboardPanelsNormalization(indexPatternId),
           isFullScreenMode: false,
           filters: filters,
           useMargins: true,
-          id: 'engine-health-statistics-dashboard',
+          id: 'normalization-statistics-dashboard',
           timeRange: {
             from: searchBarProps.dateRangeFrom,
             to: searchBarProps.dateRangeTo,
           },
-          title: 'Engine Health',
+          title: 'Normalization',
           description:
-            'Consolidated engine health metrics from the normalization data stream',
+            'Consolidated Normalization metrics from the normalization data stream',
           query: searchBarProps.query,
           refreshConfig: {
             pause: false,
@@ -53,6 +53,6 @@ const DashboardEngineHealth: React.FC<DashboardEngineHealthProps> = ({
   );
 };
 
-export const DashboardEngineHealthStatistics = withErrorBoundary(
-  DashboardEngineHealth,
+export const DashboardNormalizationStatistics = withErrorBoundary(
+  DashboardNormalization,
 );
