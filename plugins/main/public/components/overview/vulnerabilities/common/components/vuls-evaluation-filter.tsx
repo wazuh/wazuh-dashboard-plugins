@@ -43,10 +43,12 @@ const VulsEvaluationFilter = ({
     {
       id: 'evaluated',
       label: 'Evaluated',
+      className: 'keep-for-report',
     },
     {
       id: 'underEvaluation',
       label: 'Under evaluation',
+      className: 'keep-for-report',
     },
   ];
 
