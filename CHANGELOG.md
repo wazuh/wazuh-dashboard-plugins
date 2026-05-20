@@ -106,6 +106,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed File Integrity Monitoring files inventory table layout by using smaller default widths for `file.owner`, `file.uid`, and `file.size`, allowing `file.path` to use more horizontal space [#8475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8475)
 - Fixed long labels in IT Hygiene horizontal bar visualizations causing display issues [#8330](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8330)
 - Fixed rendering of the Tactics and Techniques cells in the MITRE ATT&CK flyout [#8516](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8516)
+- Fixed Wazuh Cloud registration in the header not updating after the environment was unregistered in the Console [#8529](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8529)
 
 ### Removed
 
