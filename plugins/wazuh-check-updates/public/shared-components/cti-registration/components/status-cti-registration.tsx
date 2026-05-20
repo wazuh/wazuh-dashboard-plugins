@@ -32,7 +32,6 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
     isBackgroundRegistrationActive();
 
   const openRegistrationModal = () => {
-    void refetchStatus();
     onOpenModal();
   };
 

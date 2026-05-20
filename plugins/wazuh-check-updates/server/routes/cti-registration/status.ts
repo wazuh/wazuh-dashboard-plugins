@@ -47,12 +47,17 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
         }
 
         if (rec.registrationComplete) {
-          return response.ok({
-            body: await withSubscriptionFields(wazuhClient, {
-              registrationComplete: true,
-              inProgress: false,
-            }),
+          const completedBody = await withSubscriptionFields(wazuhClient, {
+            registrationComplete: true,
+            inProgress: false,
           });
+          if (!completedBody.subscription?.message?.is_registered) {
+            store.clear(environmentUuid);
+            return response.ok({
+              body: { ...completedBody, registrationComplete: false },
+            });
+          }
+          return response.ok({ body: completedBody });
         }
 
         if (Date.now() > rec.deviceAuthExpiresAtMs) {
