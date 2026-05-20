@@ -90,7 +90,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated the OS icon source field in the Endpoints summary table to display Linux agent icons [#8459](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8459)
 - Reworked Statistics dashboard [#8254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8254)
 - Updated the breadcrumb label in `Agents management / Summary` [#8498](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8498)
-- Renamed Listener Engine and Engine Health tabs to Comms and Normalizations [#8524](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8524)
+- Renamed Listener Engine and Engine Health tabs to Comms and Normalizations in Server management > Statistics section [#8524](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8524)
 
 ### Fixed
 
