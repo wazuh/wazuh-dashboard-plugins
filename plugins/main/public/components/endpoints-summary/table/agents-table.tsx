@@ -79,19 +79,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Agent[]>([]);
   const [allAgentsSelected, setAllAgentsSelected] = useState(false);
-  const [denyEditGroups] = useUserPermissionsRequirements([
-    { action: 'group:modify_assignments', resource: 'group:id:*' },
-  ]);
-  const [denyUpgrade] = useUserPermissionsRequirements([
-    { action: 'agent:upgrade', resource: 'agent:id:*' },
-  ]);
-  // FIXME: This defines if the user has the capability to not remove agent, negating it we got the capability to this action. This is used to enable the action despite this should use the specific agent ID and group. Same happens with the upgrade and probably with the edition of groups too.
-  const [denyRemove] = useUserPermissionsRequirements([
-    { action: 'agent:delete', resource: 'agent:id:*' },
-  ]);
-  const [denyGetTasks] = useUserPermissionsRequirements([
-    { action: 'task:status', resource: '*:*:*' },
-  ]);
 
   const [isUpgradeTasksModalVisible, setIsUpgradeTasksModalVisible] =
     useState(false);
@@ -231,7 +218,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                 setIsModalVisible={setIsUpgradeTasksModalVisible}
                 isPanelClosed={isUpgradePanelClosed}
                 setIsPanelClosed={setIsUpgradePanelClosed}
-                allowGetTasks={!denyGetTasks}
               />
             }
             actionButtons={
@@ -258,10 +244,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                   allAgentsSelected={allAgentsSelected}
                   allAgentsCount={agentList.totalItems}
                   filters={filters?.q}
-                  allowEditGroups={!denyEditGroups}
-                  allowRemove={!denyRemove}
-                  allowUpgrade={!denyUpgrade}
-                  allowGetTasks={!denyGetTasks}
                   reloadAgents={() => reloadAgents()}
                   setIsUpgradeTasksModalVisible={setIsUpgradeTasksModalVisible}
                   setIsUpgradePanelClosed={setIsUpgradePanelClosed}
@@ -270,14 +252,12 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
             )}
             endpoint={'/agents'}
             tableColumns={agentsTableColumns(
-              !denyEditGroups,
-              !denyUpgrade,
               setAgent,
               setIsEditGroupsVisible,
               setIsUpgradeModalVisible,
               setFilters,
               apiVersion,
-              { setIsRemoveModalVisible, allowRemove: !denyRemove },
+              { setIsRemoveModalVisible },
             )}
             tableInitialSortingField='id'
             tablePageSizeOptions={[10, 25, 50, 100]}

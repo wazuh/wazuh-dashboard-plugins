@@ -21,8 +21,6 @@ type SetModalIsVisible = (visible: boolean) => void;
 // Columns with the property truncateText: true won't wrap the text
 // This is added to prevent the wrap because of the table-layout: auto
 export const agentsTableColumns = (
-  allowEditGroups: boolean,
-  allowUpgrade: boolean,
   setAgent: (agents: Agent) => void,
   setIsEditGroupsVisible: SetModalIsVisible,
   setIsUpgradeModalVisible: SetModalIsVisible,
@@ -31,8 +29,7 @@ export const agentsTableColumns = (
   {
     // TODO: consider moving the positional arguments to this to avoid bug related to position and allow to extend easily.
     setIsRemoveModalVisible,
-    allowRemove,
-  }: { setIsRemoveModalVisible: SetModalIsVisible; allowRemove: boolean },
+  }: { setIsRemoveModalVisible: SetModalIsVisible },
 ) => [
   {
     field: 'id',
@@ -164,13 +161,11 @@ export const agentsTableColumns = (
     name: 'Actions',
     show: true,
     actions: agentsTableActions(
-      allowEditGroups,
-      allowUpgrade,
       setAgent,
       setIsEditGroupsVisible,
       setIsUpgradeModalVisible,
       apiVersion,
-      { setIsRemoveModalVisible, allowRemove },
+      { setIsRemoveModalVisible },
     ),
   },
 ];

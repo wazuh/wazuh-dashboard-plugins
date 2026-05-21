@@ -58,6 +58,17 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
     const [isLoading, setIsLoading] = useState(false);
     const [packageType, setPackageType] = useState<'deb' | 'rpm'>();
 
+    const getUpgradeErrorMessage = (error: any) => {
+      const apiMessage = error?.response?.data?.message;
+      const message = apiMessage || error?.message || 'Unknown error';
+
+      if (/permission denied/i.test(message)) {
+        return `No permissions to upgrade this agent. ${message}`;
+      }
+
+      return message;
+    };
+
     const showToast = (
       color: string,
       title: string = '',
@@ -80,7 +91,8 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
         showToast('success', 'Upgrade agent', 'Upgrade task in progress');
         reloadAgents();
         setIsUpgradePanelClosed(false);
-      } catch (error) {
+      } catch (error: any) {
+        const errorMessage = getUpgradeErrorMessage(error);
         const options = {
           context: `UpgradeAgentModal.handleOnSave`,
           level: UI_LOGGER_LEVELS.ERROR,
@@ -88,7 +100,7 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
           store: true,
           error: {
             error,
-            message: error.message || error,
+            message: errorMessage,
             title: `Could not upgrade agent`,
           },
         };

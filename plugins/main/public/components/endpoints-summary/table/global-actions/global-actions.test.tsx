@@ -5,7 +5,9 @@ import { AgentsTableGlobalActions } from './global-actions';
 import { Agent } from '../../types';
 
 jest.mock('../../../common/permissions/element', () => ({
-  WzElementPermissions: ({ children }) => <div>{children}</div>,
+  WzElementPermissions: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 // the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.
@@ -16,20 +18,17 @@ jest.mock('@osd/monaco', () => ({
 }));
 
 describe('AgentsTableGlobalActions component', () => {
-  test('should return the component', async () => {
+  test('should return the component', () => {
     const { container, getByText } = render(
       <AgentsTableGlobalActions
         selectedAgents={[{ id: '001', name: 'agent1' } as Agent]}
         allAgentsSelected={false}
         allAgentsCount={3}
         filters={{}}
-        allowEditGroups={true}
         reloadAgents={() => {}}
         setIsUpgradeTasksModalVisible={() => {}}
         setIsUpgradePanelClosed={() => {}}
-        allowUpgrade={true}
         allowGetTasks={true}
-        allowRemove={true}
       />,
     );
 
@@ -46,13 +45,10 @@ describe('AgentsTableGlobalActions component', () => {
         allAgentsSelected={false}
         allAgentsCount={3}
         filters={{}}
-        allowEditGroups={true}
         reloadAgents={() => {}}
         setIsUpgradeTasksModalVisible={() => {}}
         setIsUpgradePanelClosed={() => {}}
-        allowUpgrade={true}
         allowGetTasks={true}
-        allowRemove={true}
       />,
     );
 

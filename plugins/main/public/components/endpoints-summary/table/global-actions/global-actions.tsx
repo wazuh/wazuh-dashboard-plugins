@@ -17,11 +17,7 @@ export interface AgentsTableGlobalActionsProps {
   selectedAgents: Agent[];
   allAgentsSelected: boolean;
   allAgentsCount: number;
-  filters: any;
-  allowEditGroups: boolean;
-  allowRemove: boolean;
-  allowUpgrade: boolean;
-  allowGetTasks: boolean;
+  filters: unknown;
   reloadAgents: () => void;
   setIsUpgradeTasksModalVisible: (isModalVisible: boolean) => void;
   setIsUpgradePanelClosed: (isUpgradePanelClosed: boolean) => void;
@@ -32,10 +28,6 @@ export const AgentsTableGlobalActions = ({
   allAgentsSelected,
   allAgentsCount,
   filters,
-  allowEditGroups,
-  allowRemove,
-  allowUpgrade,
-  allowGetTasks,
   reloadAgents,
   setIsUpgradeTasksModalVisible,
   setIsUpgradePanelClosed,
@@ -98,135 +90,84 @@ export const AgentsTableGlobalActions = ({
         <EuiContextMenuPanel>
           <EuiContextMenuItem
             icon='plusInCircle'
-            disabled={!totalAgents || !allowEditGroups}
+            disabled={!totalAgents}
             onClick={() => {
               setAddOrRemoveGroups('add');
               closePopover();
               setIsEditGroupsVisible(true);
             }}
           >
-            {allowEditGroups && !totalAgents ? (
+            {!totalAgents ? (
               selectAgentsTooltip(actions.addGroups)
             ) : (
-              <WzElementPermissions
-                permissions={[
-                  {
-                    action: 'group:modify_assignments',
-                    resource: 'group:id:*',
-                  },
-                ]}
-              >
-                <span>
-                  {actions.addGroups}
-                  {totalAgents ? ` (${totalAgents})` : ''}
-                </span>
-              </WzElementPermissions>
+              <span>
+                {actions.addGroups}
+                {totalAgents ? ` (${totalAgents})` : ''}
+              </span>
             )}
           </EuiContextMenuItem>
           <EuiContextMenuItem
             icon='trash'
-            disabled={!totalAgents || !allowEditGroups}
+            disabled={!totalAgents}
             onClick={() => {
               setAddOrRemoveGroups('remove');
               closePopover();
               setIsEditGroupsVisible(true);
             }}
           >
-            {allowEditGroups && !totalAgents ? (
+            {!totalAgents ? (
               selectAgentsTooltip(actions.removeGroups)
             ) : (
-              <WzElementPermissions
-                permissions={[
-                  {
-                    action: 'group:modify_assignments',
-                    resource: 'group:id:*',
-                  },
-                ]}
-              >
-                <span>
-                  {actions.removeGroups}
-                  {totalAgents ? ` (${totalAgents})` : ''}
-                </span>
-              </WzElementPermissions>
+              <span>
+                {actions.removeGroups}
+                {totalAgents ? ` (${totalAgents})` : ''}
+              </span>
             )}
           </EuiContextMenuItem>
           <EuiHorizontalRule margin='xs' />
           <EuiContextMenuItem
             icon='package'
-            disabled={!totalAgents || !allowUpgrade}
+            disabled={!totalAgents}
             onClick={() => {
               closePopover();
               setIsUpgradeAgentsVisible(true);
             }}
           >
-            {allowUpgrade && !totalAgents ? (
+            {!totalAgents ? (
               selectAgentsTooltip(actions.upgrade)
             ) : (
-              <WzElementPermissions
-                permissions={[
-                  {
-                    action: 'agent:upgrade',
-                    resource: 'agent:id:*',
-                  },
-                ]}
-              >
-                <span>
-                  {actions.upgrade}
-                  {totalAgents ? ` (${totalAgents})` : ''}
-                </span>
-              </WzElementPermissions>
+              <span>
+                {actions.upgrade}
+                {totalAgents ? ` (${totalAgents})` : ''}
+              </span>
             )}
           </EuiContextMenuItem>
           <EuiContextMenuItem
             icon='eye'
-            disabled={!allowGetTasks}
+            disabled={!totalAgents}
             onClick={() => {
               closePopover();
               setIsUpgradeTasksModalVisible(true);
             }}
           >
-            <WzElementPermissions
-              permissions={[
-                {
-                  action: 'task:status',
-                  resource: '*:*:*',
-                },
-              ]}
-            >
-              <span>Upgrade task details</span>
-            </WzElementPermissions>
+            <span>Upgrade task details</span>
           </EuiContextMenuItem>
           <EuiHorizontalRule margin='xs' />
           <EuiContextMenuItem
             icon='trash'
-            disabled={!totalAgents || !allowRemove}
+            disabled={!totalAgents}
             onClick={() => {
               closePopover();
               setIsRemoveAgentsModalVisible(true);
             }}
           >
-            {allowRemove && !totalAgents ? (
+            {!totalAgents ? (
               selectAgentsTooltip(actions.remove)
             ) : (
-              <WzElementPermissions
-                permissions={[
-                  [
-                    {
-                      action: 'agent:delete',
-                      resource: 'agent:id:*',
-                    },
-                    {
-                      action: 'agent:delete',
-                      resource: 'agent:group:*',
-                    },
-                  ],
-                ]}
-              >
-                <span>
-                  {actions.remove}
-                  {totalAgents ? ` (${totalAgents})` : ''}
-                </span>
-              </WzElementPermissions>
+              <span>
+                {actions.remove}
+                {totalAgents ? ` (${totalAgents})` : ''}
+              </span>
             )}
           </EuiContextMenuItem>
         </EuiContextMenuPanel>
