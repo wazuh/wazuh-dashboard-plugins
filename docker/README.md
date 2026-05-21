@@ -278,12 +278,6 @@ Folder: [osd-dev](./osd-dev/)
 This will bring up a development environment for Wazuh using the given
 OpenSearch and OpenSearch-Dashboards versions.
 
-### **knb-dev** - Kibana 7.X & Kibana 8.X development environment
-
-Folder: [kbn-dev](./kbn-dev/)
-
-This will bring up a development environment for Wazuh using the
-Kibana development container versions of the 7 series and 8 series.
 ## Troubleshooting
 
 1. Error pulling Docker image from Quay.io
