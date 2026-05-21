@@ -67,7 +67,7 @@ export const Steps = ({
       agentGroups: '',
       agentName: '',
       serverAddress: '',
-      wazuhPassword: '',
+      wazuhPassword,
       protocol: connection.isUDP ? 'UDP' : '',
     },
   } as IParseRegisterFormValues;
