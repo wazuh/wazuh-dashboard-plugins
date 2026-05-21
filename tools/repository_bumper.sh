@@ -196,7 +196,7 @@ update_branch_reference_defaults() {
     return 0
   fi
 
-  local bump_string="$VERSION"
+  local bump_string="$GIT_REF_REPLACEMENT"
   local files=(
     "${REPO_PATH}/.github/workflows/5_testunit_jest.yml"
     "${REPO_PATH}/.github/workflows/5_testunit_dev_sh.yml"
@@ -248,15 +248,7 @@ update_imposter_config() {
     return
   fi
 
-  local replacement
-  if [ "$TAG" = true ]; then
-    replacement="v${VERSION}"
-    if [ -n "$STAGE" ]; then
-      replacement+="-${STAGE}"
-    fi
-  else
-    replacement="${VERSION}"
-  fi
+  local replacement="$GIT_REF_REPLACEMENT"
 
   # Extract current reference from URL
   local current_spec_ref
@@ -310,7 +302,7 @@ parse_arguments() {
       ;;
     esac
   done
-  
+
   if [[ -n "$SET_AS_MAIN" ]]; then
     SKIP_URLS="yes"
   else
@@ -579,6 +571,20 @@ update_changelog() {
   fi
 }
 
+get_git_ref_replacement(){
+  local replacement
+  if [ "$TAG" = true ]; then
+    replacement="v${VERSION}"
+    if [ -n "$STAGE" ]; then
+      replacement+="-${STAGE}"
+    fi
+  else
+    replacement="${VERSION}"
+  fi
+
+  echo "$replacement"
+}
+
 # --- Main Execution ---
 main() {
   # Initialize log file
@@ -618,6 +624,8 @@ main() {
     log "ERROR: Plugins directory not found at $plugins_dir"
     exit 1
   fi
+
+  GIT_REF_REPLACEMENT=$(get_git_ref_replacement)
 
   # Start file modifications
   log "Starting file modifications..."
