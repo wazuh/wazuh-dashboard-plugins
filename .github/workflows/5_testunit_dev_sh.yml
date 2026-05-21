@@ -7,7 +7,7 @@ on:
       - 'docker/osd-dev/dev.yml'
       - 'docker/osd-dev/scripts/**'
     branches:
-      - main
+      - 5.0.0
 
 jobs:
   scripts-tests:
