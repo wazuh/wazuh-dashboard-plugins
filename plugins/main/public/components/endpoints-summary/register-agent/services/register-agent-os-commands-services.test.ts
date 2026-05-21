@@ -58,19 +58,19 @@ describe('getDEBAMD64InstallCommand', () => {
         protocol: 'http',
       },
       urlPackage: 'https://example.com/package.deb',
-      packageName: 'wazuh-agent_4.0.0-beta1_amd64.deb',
+      packageName: 'wazuh-agent_4.0.0-beta2_amd64.deb',
       wazuhVersion: '4.0.0',
     };
     const result = getDEBAMD64InstallCommand(props);
     expect(result).toBe(
-      'wget https://example.com/package.deb && sudo localhost password group1 agent1 http dpkg -i ./wazuh-agent_4.0.0-beta1_amd64.deb',
+      'wget https://example.com/package.deb && sudo localhost password group1 agent1 http dpkg -i ./wazuh-agent_4.0.0-beta2_amd64.deb',
     );
   });
 });
 
 describe('getDEBAMD64InstallCommand', () => {
   it('should return the correct command', () => {
-    test.packageName = `wazuh-agent_${test.wazuhVersion}-beta1_amd64.deb`;
+    test.packageName = `wazuh-agent_${test.wazuhVersion}-beta2_amd64.deb`;
     let expected = `wget ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} dpkg -i ./${test.packageName}`;
     const withAllOptionals = getDEBAMD64InstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
@@ -87,7 +87,7 @@ describe('getDEBAMD64InstallCommand', () => {
 
 describe('getDEBARM64InstallCommand', () => {
   it('should return the correct command', () => {
-    test.packageName = `wazuh-agent_${test.wazuhVersion}-beta1_arm64.deb`;
+    test.packageName = `wazuh-agent_${test.wazuhVersion}-beta2_arm64.deb`;
     let expected = `wget ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} dpkg -i ./${test.packageName}`;
     const withAllOptionals = getDEBARM64InstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
@@ -104,7 +104,7 @@ describe('getDEBARM64InstallCommand', () => {
 
 describe('getRPMAMD64InstallCommand', () => {
   it('should return the correct command', () => {
-    test.packageName = `wazuh-agent-${test.wazuhVersion}-beta1.x86_64.rpm`;
+    test.packageName = `wazuh-agent-${test.wazuhVersion}-beta2.x86_64.rpm`;
     let expected = `curl -o ${test.packageName} ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} rpm -ihv ${test.packageName}`;
     const withAllOptionals = getRPMAMD64InstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
@@ -121,7 +121,7 @@ describe('getRPMAMD64InstallCommand', () => {
 
 describe('getRPMARM64InstallCommand', () => {
   it('should return the correct command', () => {
-    test.packageName = `wazuh-agent-${test.wazuhVersion}-beta1.aarch64.rpm`;
+    test.packageName = `wazuh-agent-${test.wazuhVersion}-beta2.aarch64.rpm`;
     let expected = `curl -o ${test.packageName} ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} rpm -ihv ${test.packageName}`;
     const withAllOptionals = getRPMARM64InstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
@@ -150,7 +150,7 @@ describe('getLinuxStartCommand', () => {
 
 describe('getWindowsInstallCommand', () => {
   it('should return the correct install command', () => {
-    test.packageName = `wazuh-agent-${test.wazuhVersion}-beta1.msi`;
+    test.packageName = `wazuh-agent-${test.wazuhVersion}-beta2.msi`;
     let expected = `Invoke-WebRequest -Uri ${test.urlPackage} -OutFile \$env:tmp\\${test.packageName}; msiexec.exe /i \$env:tmp\\${test.packageName} /q ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} `;
 
     const withAllOptionals = getWindowsInstallCommand(test);
@@ -211,7 +211,7 @@ describe('transformOptionalsParamatersMacOSCommand', () => {
 
 describe('getMacOsInstallCommand', () => {
   it('should return the correct macOS installation script', () => {
-    test.packageName = `wazuh-agent-${test.wazuhVersion}-beta1.intel64.pkg`;
+    test.packageName = `wazuh-agent-${test.wazuhVersion}-beta2.intel64.pkg`;
     let expected = `curl -so ${test.packageName} ${test.urlPackage} && echo "${test.optionals.serverAddress} && ${test.optionals.agentGroups} && ${test.optionals.agentName} && ${test.optionals.wazuhPassword}\" > /tmp/wazuh_envs && sudo installer -pkg ./${test.packageName} -target /`;
 
     const withAllOptionals = getMacOsInstallCommand(test);
