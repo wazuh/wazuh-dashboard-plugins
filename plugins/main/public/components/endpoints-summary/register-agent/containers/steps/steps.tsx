@@ -215,8 +215,8 @@ export const Steps = ({
           iconType='iInCircle'
         >
           <p>
-            You do not have the required permissions to view the deployment
-            commands.
+            Missing permissions to read the manager configuration required to
+            view the deployment commands.
           </p>
         </EuiCallOut>
       ) : (
@@ -267,7 +267,8 @@ export const Steps = ({
           iconType='iInCircle'
         >
           <p>
-            You do not have the required permissions to view the start command.
+            Missing permissions to read the manager configuration required to
+            view the start command.
           </p>
         </EuiCallOut>
       ) : (
