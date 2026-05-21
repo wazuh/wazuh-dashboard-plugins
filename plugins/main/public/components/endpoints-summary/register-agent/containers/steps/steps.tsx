@@ -57,7 +57,7 @@ export const Steps = ({
   wazuhPassword,
   canReadAuthdPassword,
 }: IStepsProps) => {
-  const passwordPermissionMissing = !canReadAuthdPassword;
+  const passwordPermissionMissing = needsPassword && !canReadAuthdPassword;
   const initialParsedFormValues = {
     operatingSystem: {
       name: '',
@@ -67,7 +67,7 @@ export const Steps = ({
       agentGroups: '',
       agentName: '',
       serverAddress: '',
-      wazuhPassword: 'simulated-registration-password',
+      wazuhPassword: '',
       protocol: connection.isUDP ? 'UDP' : '',
     },
   } as IParseRegisterFormValues;
