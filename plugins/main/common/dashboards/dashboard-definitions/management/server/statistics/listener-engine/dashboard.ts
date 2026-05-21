@@ -8,7 +8,7 @@ import {
   getVisStateTotalNumberOfBytesReceived,
 } from './vis-states';
 
-export class ServerManagementStatisticsListenerEngineDashboardLayoutDefinition extends DashboardLayoutDefinition {
+export class ServerManagementStatisticsCommsDashboardLayoutDefinition extends DashboardLayoutDefinition {
   constructor(indexPatternId: string) {
     super();
 
@@ -64,23 +64,23 @@ export class ServerManagementStatisticsListenerEngineDashboardLayoutDefinition e
   }
 }
 
-export class ServerManagementStatisticsListenerEngineDashboardConfig extends DashboardConfig {
+export class ServerManagementStatisticsCommsDashboardConfig extends DashboardConfig {
   constructor(indexPatternId: string) {
     super(
       indexPatternId,
-      new ServerManagementStatisticsListenerEngineDashboardLayoutDefinition(
+      new ServerManagementStatisticsCommsDashboardLayoutDefinition(
         indexPatternId,
       ),
     );
   }
 
   protected override getId(): string {
-    return 'server-management-statistics-listener-engine-dashboard';
+    return 'server-management-statistics-comms-dashboard';
   }
   protected override getTitle(): string {
-    return 'Server Management Statistics Listener Engine Dashboard';
+    return 'Server Management Statistics Comms Dashboard';
   }
   protected override getDescription(): string {
-    return 'Dashboard for Server Management Statistics Listener Engine';
+    return 'Dashboard for Server Management Statistics Comms';
   }
 }
