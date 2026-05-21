@@ -284,7 +284,6 @@ Folder: [kbn-dev](./kbn-dev/)
 
 This will bring up a development environment for Wazuh using the
 Kibana development container versions of the 7 series and 8 series.
-
 ## Troubleshooting
 
 1. Error pulling Docker image from Quay.io
