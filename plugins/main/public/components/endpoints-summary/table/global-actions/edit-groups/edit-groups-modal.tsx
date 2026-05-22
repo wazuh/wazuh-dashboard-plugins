@@ -64,6 +64,17 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
     reloadAgents,
     addOrRemove,
   }: EditAgentsGroupsModalProps) => {
+    const getEditGroupsErrorMessage = (error: any) => {
+      const apiMessage = error?.response?.data?.message;
+      const message = apiMessage || error?.message || 'Unknown error';
+
+      if (/permission denied/i.test(message)) {
+        return `No permissions to modify groups for one or more selected agents. ${message}`;
+      }
+
+      return message;
+    };
+
     const [selectedGroups, setSelectedGroups] = useState<Option[]>([]);
     const [finalAgents, setFinalAgents] = useState<Agent[]>([]);
     const [getAgentsStatus, setGetAgentsStatus] = useState('disabled');
@@ -164,15 +175,16 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
               return [...results, newGroupResult];
             });
           })
-          .catch(error => {
+          .catch((error: any) => {
+            const errorMessage = getEditGroupsErrorMessage(error);
             setGroupResults(results => {
               const newResult: GroupResult = {
                 group,
                 result: RESULT_TYPE.ERROR,
-                errorMessage: error.message,
+                errorMessage,
                 errorAgents: [
                   {
-                    error: { message: error.message },
+                    error: { message: errorMessage },
                     id: agentIds,
                   },
                 ],
@@ -186,7 +198,7 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
               store: true,
               error: {
                 error,
-                message: error.message || error,
+                message: errorMessage,
                 title:
                   addOrRemove === 'add'
                     ? `Could not add agents to group`
@@ -254,6 +266,23 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
             clearOnBlur
           />
         </EuiFormRow>
+        {errorGetGroups ? (
+          <EuiFormRow>
+            <EuiCallOut
+              color='danger'
+              iconType='alert'
+              title='Could not load groups. Check your permissions.'
+            />
+          </EuiFormRow>
+        ) : !isGroupsLoading && !groups?.length ? (
+          <EuiFormRow>
+            <EuiCallOut
+              color='warning'
+              iconType='iInCircle'
+              title='No groups available for your permissions.'
+            />
+          </EuiFormRow>
+        ) : null}
       </EuiForm>
     );
 
