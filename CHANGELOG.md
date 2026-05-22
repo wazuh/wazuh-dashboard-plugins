@@ -145,6 +145,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed some options of the manager and agent configuration [#8243](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8243)
 - Removed GPG13 option in Compliance panel in agent overview [#8307](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8307)
 
+## Wazuh v4.14.7 - OpenSearch Dashboards 2.19.5 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.14.7
+
 ## Wazuh v4.14.6 - OpenSearch Dashboards 2.19.5 - Revision 00
 
 ### Added
@@ -154,6 +160,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed message when the server cluster is disabled and access to **Cluster** app [#8447](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8447)
+- Fixed agent removal, group editing, upgrading, and upgrade task details authorization by delegating RBAC enforcement to the API instead of the UI, and avoiding duplicated permission error toasts in upgrade task queries [#8464](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8464)
 
 ## Wazuh v4.14.5 - OpenSearch Dashboards 2.19.5 - Revision 01
 

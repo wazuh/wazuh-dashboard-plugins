@@ -15,6 +15,7 @@ import {
   EuiDescriptionList,
   EuiDescriptionListTitle,
   EuiDescriptionListDescription,
+  EuiCallOut,
 } from '@elastic/eui';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../../../common/hocs';
@@ -77,6 +78,17 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
       });
     };
 
+    const getEditGroupsErrorMessage = (error: any) => {
+      const apiMessage = error?.response?.data?.message;
+      const message = apiMessage || error?.message || 'Unknown error';
+
+      if (/permission denied/i.test(message)) {
+        return `No permissions to edit this agent groups. ${message}`;
+      }
+
+      return message;
+    };
+
     const handleOnSave = async () => {
       setIsSaving(true);
 
@@ -106,7 +118,8 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
           }));
         showToast('success', 'Edit agent groups', 'Groups saved successfully');
         reloadAgents();
-      } catch (error) {
+      } catch (error: any) {
+        const errorMessage = getEditGroupsErrorMessage(error);
         const options = {
           context: `EditAgentGroupsModal.handleOnSave`,
           level: UI_LOGGER_LEVELS.ERROR,
@@ -114,7 +127,7 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
           store: true,
           error: {
             error,
-            message: error.message || error,
+            message: errorMessage,
             title: `Could not save agent groups`,
           },
         };
@@ -163,6 +176,19 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
                 clearOnBlur
               />
             </EuiFormRow>
+            {errorGroups ? (
+              <EuiCallOut
+                color='danger'
+                iconType='alert'
+                title='Could not load groups. Check your permissions.'
+              />
+            ) : !isGroupsLoading && !groups?.length ? (
+              <EuiCallOut
+                color='warning'
+                iconType='iInCircle'
+                title='No groups available.'
+              />
+            ) : null}
           </EuiFlexItem>
         </EuiFlexGroup>
       </EuiForm>
