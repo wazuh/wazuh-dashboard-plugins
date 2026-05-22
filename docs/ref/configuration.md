@@ -35,7 +35,7 @@ A host has the following properties:
 | cert     | Path to the SSL/TLS client certificate file                    | No       | -             | absolute or relative file path     |
 | ca       | Path to the CA certificate file for server verification        | No       | -             | absolute or relative file path     |
 
-This is an example of a multi-host configuration:
+This is an example of a multi-host configuration (used only when [Cross-Cluster Search](https://docs.opensearch.org/latest/search-plugins/cross-cluster-search/) is configured; otherwise only the first entry is used):
 
 ```yml
 wazuh_core.hosts:

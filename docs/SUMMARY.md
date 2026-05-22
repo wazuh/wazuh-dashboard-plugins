@@ -40,6 +40,15 @@
 - [Upgrade](ref/upgrade.md)
 - [Migration 4.x to 5.x](ref/migration-4x-5x.md)
 - [Uninstall](ref/uninstall.md)
+
+# Migration Guide
+
+- [Overview](guide/migration/README.md)
+  - [Configuration](guide/migration/configuration.md)
+  - [Custom dashboards and visualizations](guide/migration/dashboards.md)
+  - [Reports](guide/migration/reports.md)
+  - [Multi-manager environments](guide/migration/multi-manager.md)
+
 - [Back Up and Restore](ref/backup-restore.md)
 - [Security](ref/security.md)
 - [Performance](ref/performance.md)

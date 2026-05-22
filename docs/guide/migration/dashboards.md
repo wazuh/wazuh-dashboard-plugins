@@ -1,0 +1,201 @@
+# Custom dashboards and visualizations migration
+
+The Wazuh dashboard stores user-created dashboards and visualizations as **saved objects** in the OpenSearch index. These objects can be exported from a 4.x deployment and imported into a 5.x deployment using the **Saved objects** management interface.
+
+> **Scope**: This guide covers only **custom** dashboards and visualizations created or modified by users. Default Wazuh dashboards and visualizations are provisioned automatically by the Wazuh 5.x plugin on first start and do not require manual migration.
+>
+> **Do not re-import default Wazuh objects.** Overwriting the default dashboards and visualizations with 4.x versions may cause broken panels, stale index pattern references, or conflicts with features introduced in 5.x. If you are unsure whether an object is custom or default, open **☰ Menu > Dashboard Management > Saved objects** after installation and look for objects whose description includes `Provided by Wazuh` — those are provisioned automatically and must not be re-imported.
+
+---
+
+## Understanding saved objects
+
+Saved objects in the Wazuh dashboard include:
+
+- **Dashboards** — Panels composed of one or more visualizations.
+- **Visualizations** — Individual charts, tables, maps, and metrics.
+- **Searches** — Saved queries and filters.
+- **Index patterns** — Definitions of data source field mappings.
+
+All of these are exported and imported as a single `.ndjson` (newline-delimited JSON) file.
+
+---
+
+## Before you export: note the index pattern and field name changes
+
+In Wazuh 4.x, the default index pattern is `wazuh-alerts-*`. In Wazuh 5.x, the default index pattern is `wazuh-events*`.
+
+The 5.x data model uses a family of data streams (`wazuh-events-v5-*`, `wazuh-findings-v5-*`, `wazuh-states-*`, and others). The `wazuh-events*` index pattern covers all event and alert data streams and is the correct replacement for `wazuh-alerts-*` in most visualizations.
+
+Custom visualizations and searches that reference `wazuh-alerts-*` will not display data after import until the index pattern reference is updated. When importing saved objects, the dashboard will prompt you to select a replacement index pattern for any unresolved references.
+
+### Field name changes in the 5.x data model
+
+Beyond the index pattern rename, the 5.x data model uses a different field schema. Fields that were available at the root level in 4.x are now nested under the `wazuh.*` prefix. Visualizations that aggregate or filter on those fields must be updated manually after import.
+
+Common field mappings:
+
+| 4.x field | 5.x field | Notes |
+| --- | --- | --- |
+| `rule.level` | `wazuh.rule.level` | Type changed: integer (1–15) → string (`low`, `medium`, `high`, `critical`, `informational`) |
+| `rule.description` | `wazuh.rule.title` | |
+| `rule.id` | `wazuh.rule.id` | |
+| `rule.groups` | `wazuh.rule.tags` | |
+| `agent.name` | `wazuh.agent.name` | |
+| `agent.id` | `wazuh.agent.id` | |
+
+> **Note**: The index pattern to use depends on the type of data being visualized. Use `wazuh-findings-v5*` for rule-based alerts (the closest equivalent to `wazuh-alerts-*`), and `wazuh-events*` for raw event data. Visualizations that filter on `rule.*` fields will need to target `wazuh-findings-v5*` and use the `wazuh.*` field names above.
+
+After completing the import, open each migrated visualization in the editor and update the index pattern and any field references that use the old names.
+
+---
+
+## Step 1: Export saved objects from Wazuh 4.x
+
+Export only the objects you created or modified. Exporting default Wazuh objects is unnecessary because they are re-created automatically on the first start of the 5.x plugin.
+
+### Using the UI
+
+1. Navigate to **☰ Menu > Dashboard Management > Saved objects**.
+2. To export all custom objects, select the checkboxes next to each user-created dashboard or visualization and click **Export** in the action bar.
+3. Enable **Include related objects** to include all referenced visualizations and searches.
+4. Save the exported `.ndjson` file to a secure location.
+
+If you need to export everything at once as a fallback:
+
+1. Select **Export X objects** (the button label shows the total count).
+2. In the export dialog, ensure that **Include related objects** is selected.
+3. Save the file. When importing into 5.x, use the **Check for existing objects** conflict strategy (see Step 3) to avoid overwriting default Wazuh objects that were already provisioned.
+
+### Using the API
+
+The following command exports all dashboards, visualizations, searches, and index patterns from a 4.x deployment:
+
+```bash
+curl -X POST "https://<DASHBOARD_HOST>:5601/api/saved_objects/_export" \
+  -H "osd-xsrf: true" \
+  -H "Content-Type: application/json" \
+  -u admin:<PASSWORD> \
+  --cacert /etc/wazuh-dashboard/certs/root-ca.pem \
+  -d '{
+    "type": ["dashboard", "visualization", "search", "index-pattern"],
+    "includeReferencesDeep": true
+  }' \
+  -o saved-objects-backup-$(date +%Y%m%d).ndjson
+```
+
+Replace `<DASHBOARD_HOST>` and `<PASSWORD>` with values from your environment.
+
+---
+
+## Step 2: Install and start Wazuh dashboard 5.x
+
+Complete the Wazuh 5.x installation and verify that the dashboard is accessible before proceeding with the import.
+
+---
+
+## Step 3: Import saved objects into Wazuh 5.x
+
+### Using the UI
+
+1. Navigate to **☰ Menu > Dashboard Management > Saved objects**.
+2. Click **Import**.
+3. Select the `.ndjson` file exported from the 4.x deployment.
+4. Choose a conflict resolution strategy:
+   - **Check for existing objects** (recommended): Skips objects that already exist. Preserves any objects already provisioned by the health check.
+   - **Automatically overwrite all conflicts**: Replaces any existing objects with the same ID. Use with caution if Wazuh default dashboards have already been provisioned.
+5. Click **Import**.
+
+### Using the API
+
+Import all objects. The response body contains two fields: `successResults` (objects accepted) and `errors` (objects that could not be imported). Visualizations and saved searches that reference `wazuh-alerts-*` will appear in `errors` with `"type": "missing_references"`.
+
+```bash
+curl -X POST "https://<DASHBOARD_HOST>:5601/api/saved_objects/_import?overwrite=false" \
+  -H "osd-xsrf: true" \
+  -u admin:<PASSWORD> \
+  --cacert /etc/wazuh-dashboard/certs/root-ca.pem \
+  --form file=@saved-objects-backup-<DATE>.ndjson
+```
+
+Set `overwrite=true` to replace existing objects with the same ID.
+
+> **Important**: When objects in the import file fail with `missing_references` (for example, visualizations and saved searches that reference `wazuh-alerts-*`), any dashboard in the same file that references those objects may be reported as a success but **silently not persisted**, depending on the OpenSearch Dashboards build. Always proceed with Step 4 to resolve reference errors and then re-import the dashboards separately, regardless of whether the initial import reports success.
+
+---
+
+## Step 4: Resolve index pattern conflicts
+
+### Using the UI
+
+After import, any saved object that referenced the old `wazuh-alerts-*` index pattern will show an unresolved reference. The dashboard prompts you to select a replacement.
+
+1. When prompted, select `wazuh-events*` as the replacement index pattern.
+2. If the `wazuh-events*` pattern does not appear in the list, create it first:
+   1. Navigate to **☰ Menu > Dashboard Management > Index patterns**.
+   2. Click **Create index pattern**.
+   3. Enter `wazuh-events*` as the pattern.
+   4. Select `@timestamp` as the time field.
+   5. Click **Create index pattern**.
+3. Repeat step 1 to re-import or re-map affected objects.
+
+### Using the API
+
+Use the `_resolve_import_errors` endpoint to retry the failed objects with a remapped index pattern reference. For each object that failed with `"type": "missing_references"`, include a `replaceReferences` entry that maps `wazuh-alerts-*` to `wazuh-events*`:
+
+**Step 4a — Resolve references for visualizations and saved searches:**
+
+```bash
+curl -X POST "https://<DASHBOARD_HOST>:5601/api/saved_objects/_resolve_import_errors" \
+  -H "osd-xsrf: true" \
+  -u admin:<PASSWORD> \
+  --cacert /etc/wazuh-dashboard/certs/root-ca.pem \
+  --form file=@saved-objects-backup-<DATE>.ndjson \
+  --form 'retries=[
+    {"type":"visualization","id":"<VIZ_ID>","overwrite":false,"replaceReferences":[{"type":"index-pattern","from":"wazuh-alerts-*","to":"wazuh-events*"}]},
+    {"type":"search","id":"<SEARCH_ID>","overwrite":false,"replaceReferences":[{"type":"index-pattern","from":"wazuh-alerts-*","to":"wazuh-events*"}]}
+  ]'
+```
+
+Populate the `retries` array from the `errors` list in the Step 3 response. Include one entry per failed object.
+
+**Step 4b — Re-import dashboards:**
+
+After the visualizations and saved searches are successfully imported, extract the dashboard objects from the backup file and re-import them so that their panel references are satisfied:
+
+```bash
+# Extract only dashboard objects from the backup file
+python3 -c "
+import json, sys
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    obj = json.loads(line)
+    if obj.get('type') == 'dashboard':
+        print(json.dumps(obj))
+" < saved-objects-backup-<DATE>.ndjson > dashboards-only.ndjson
+
+# Re-import just the dashboards
+curl -X POST "https://<DASHBOARD_HOST>:5601/api/saved_objects/_import?overwrite=false" \
+  -H "osd-xsrf: true" \
+  -u admin:<PASSWORD> \
+  --cacert /etc/wazuh-dashboard/certs/root-ca.pem \
+  --form file=@dashboards-only.ndjson
+```
+
+---
+
+## Verification
+
+After importing, verify that the migrated objects are accessible and displaying data:
+
+1. Navigate to **☰ Menu > Dashboard Management > Saved objects** and confirm that the expected dashboards and visualizations appear in the list.
+2. Open each migrated dashboard and confirm that panels load without errors.
+3. If a panel shows a "No results found" message, verify that: (a) the index pattern referenced by its visualizations points to `wazuh-events*` or `wazuh-findings-v5*` as appropriate; (b) any aggregation or filter fields use the 5.x field names (for example, `wazuh.rule.level` instead of `rule.level`); and (c) the selected time range contains data.
+
+---
+
+## Notes
+
+- Saved objects exported from OpenSearch Dashboards 2.x (used in Wazuh 4.x) are compatible with OpenSearch Dashboards 3.x (used in Wazuh 5.x) for the standard object types listed above. However, objects that carry a `migrationVersion` field referencing a schema version newer than what OpenSearch Dashboards 3.x recognizes will be rejected with a 422 error during import. If you encounter this error, remove or downgrade the `migrationVersion` entry for the affected object type before re-importing. Objects created natively by Wazuh 4.x use `migrationVersion` values that are compatible with OpenSearch Dashboards 3.x.
+- If multitenancy was enabled in the 4.x deployment, repeat the export and import steps for each tenant separately. Use the tenant selector in the top navigation bar to switch tenants before exporting or importing.
