@@ -48,3 +48,7 @@
 # Diagnostic Documentation
 
 - [Diagnostic Guide](diag/diagnostic.md)
+
+# Guides
+
+- [Mail Forwarding and Reporting Migration](guide/migration/mail-forwarding-reporting.md)
