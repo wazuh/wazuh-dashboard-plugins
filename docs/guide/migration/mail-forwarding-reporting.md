@@ -8,34 +8,27 @@ Starting with Wazuh 5.0, these backend mail forwarding capabilities have been re
 
 ## Configuration mapping (4.x -> 5.x)
 
-The following table maps each `ossec.conf` element from 4.x to the corresponding feature in the Wazuh 5.x Dashboard:
+The following table maps each `ossec.conf` element from 4.x to the corresponding feature in the Wazuh 5.x Dashboard. Entries use the form `section.element` - for example, `global.smtp_server` refers to `<global><smtp_server>` in your `ossec.conf`.
+
+> See the [ossec.conf reference](#ossecconf-reference) below for the full XML context of each section.
 
 ### Email alerts mapping
 
-| 4.x `ossec.conf`                 | 5.x Dashboard                                                        |
-| -------------------------------- | -------------------------------------------------------------------- |
-| `<global><smtp_server>`          | Notifications > Email Senders (SMTP host/port)                       |
-| `<global><email_from>`           | Notifications > Email Senders (outbound address)                     |
-| `<email_alerts><email_to>`       | Notifications > Email Recipient Groups                               |
-| `<email_alerts><level>`          | Alerting > Monitor > Query (condition on `wazuh.rule.level`)         |
-| `<email_alerts><group>`          | Alerting > Monitor > Query (condition on `wazuh.rule.group`)         |
-| `<email_alerts><event_location>` | Alerting > Monitor > Query (condition on `agent.name` or `agent.ip`) |
-| `<email_alerts><rule_id>`        | Alerting > Monitor > Query (condition on `wazuh.rule.id`)            |
-| `<email_alerts><do_not_delay>`   | Alerting > Monitor > Action > Per execution                          |
-| `<email_alerts><do_not_group>`   | Alerting > Monitor > Action > Per alert                              |
-| `<alerts><email_alert_level>`    | Alerting > Monitor > Query (condition on `wazuh.rule.level`)         |
-
-> `<format>` is not mapped - in 4.x it only controlled full vs SMS format. In 5.x, the message body is fully customizable via the notification template, so format is determined by your template content, not a toggle.
+| 4.x `ossec.conf`        | 5.x Dashboard                                    | Guide                                          |
+| ----------------------- | ------------------------------------------------ | ---------------------------------------------- |
+| `global.smtp_server`    | Notifications > Email Senders (SMTP host/port)   | [Step 1](#1-creating-an-email-sender)          |
+| `global.email_from`     | Notifications > Email Senders (outbound address) | [Step 1](#1-creating-an-email-sender)          |
+| `email_alerts.email_to` | Notifications > Email Recipient Groups           | [Step 2](#2-creating-an-email-recipient-group) |
 
 ### Reports mapping
 
-| 4.x `ossec.conf`      | 5.x Dashboard                                            |
-| --------------------- | -------------------------------------------------------- |
-| `<reports><title>`    | Reporting > Report Definition > Name                     |
-| `<reports><email_to>` | Reporting > Report Definition > Notification > Channels  |
-| `<reports><showlogs>` | Reporting > Report Definition > (include details toggle) |
+| 4.x `ossec.conf`   | 5.x Dashboard                                            | Guide                                     |
+| ------------------ | -------------------------------------------------------- | ----------------------------------------- |
+| `reports.title`    | Reporting > Report Definition > Name                     | [Step 5](#5-recreating-scheduled-reports) |
+| `reports.email_to` | Reporting > Report Definition > Notification > Channels  | [Step 5](#5-recreating-scheduled-reports) |
+| `reports.showlogs` | Reporting > Report Definition > (include details toggle) | [Step 5](#5-recreating-scheduled-reports) |
 
-> Filters like `<group>`, `<rule>`, `<level>`, `<srcip>`, `<location>`, and `<user>` were used in 4.x to scope the report content. In 5.x, this is achieved by selecting the appropriate source dashboard or visualization - the filtering is inherent to the source, not configured on the report definition itself.
+> Filters like `reports.group`, `reports.rule`, `reports.level`, `reports.srcip`, `reports.location`, and `reports.user` were used in 4.x to scope the report content. In 5.x, this is achieved by selecting the appropriate source dashboard or visualization - the filtering is inherent to the source, not configured on the report definition itself.
 
 ## ossec.conf reference
 
@@ -142,8 +135,8 @@ With your sender and recipient group created, you can now set up the Notificatio
 3. (Optional) Provide a **Description** clarifying the purpose of this channel (e.g., `Email channel used to deliver Wazuh security alerts, findings, and incident notifications.`)
 4. Under **Configurations**, select **Email** as the **Channel type**.
 5. Choose your **Sender type** (e.g., **SMTP sender**).
-6. In the **SMTP name** field, select the sender you created in Step 1 (e.g., `wazuh-security-smtp-sender`).
-7. Under **Default recipients**, select the recipient group you created in Step 2 (e.g., `wazuh-security-recipients`).
+6. In the **SMTP sender** field, select the sender you created in [Step 1](#1-creating-an-email-sender) (e.g., `wazuh-security-smtp-sender`).
+7. Under **Default recipients**, select the recipient group you created in [Step 2](#2-creating-an-email-recipient-group) (e.g., `wazuh-security-recipients`).
 
 ![Setting up an Email Notification Channel](../../img/email-reporting/create-channel-with-data.png)
 
@@ -158,62 +151,37 @@ In 4.x, alerts were triggered by rule severity, groups, or specific rule IDs via
 
 ### 4.1. Creating a Monitor
 
-1. Navigate to the **Alerting** plugin and under **Monitors** tab click **Create monitor**.
-
-![Create monitor view](../../img/email-reporting/create-monitor-base.png)
-
-2. Give your monitor a descriptive name (e.g., `SSH root login` if alerting on SSH events).
-3. Under **Monitor type**, select your monitor type (e.g., **Per document monitor**).
-4. Under **Monitor defining method**, select your defining method (e.g., **Visual editor**).
-5. Set the **Schedule** frequency (e.g., By interval, **1 Minute(s)**).
+Create a **monitor** in the **Alerting plugin** according to your needs (for example, a **per-document monitor** to trigger on individual matching documents). Define a query that selects the findings you want to alert on and set the checking schedule. The image below shows an example configured for SSH root login events.
 
 ![Recreating Email Alerts with Monitors](../../img/email-reporting/create-monitor-with-data-one.png)
-
-6. In **Select data**, choose the index pattern that contains your findings (e.g., `wazuh-findings-v5-system-activity`).
-7. Define your **Query** using the fields relevant to your use case (the image below shows an SSH rule example):
-   - **Query name**: A descriptive name for the query
-   - **Field**: e.g., `wazuh.rule.title`, `wazuh.rule.level`, `wazuh.rule.group`
-   - **Operator**: `is`, `is not`, `is greater than`, etc.
-   - **Value**: The value to match
-
-![Recreating Email Alerts with Monitors](../../img/email-reporting/create-monitor-with-data-two.png)
+![Configuring query](../../img/email-reporting/create-monitor-with-data-two.png)
 
 ### 4.2. Configuring Triggers and Actions
 
-Triggers define the condition that must be met to send a notification.
+Once the monitor is created, add a trigger and configure the action to use your notification channel. This is the key migration step - it connects the monitor to the email channel you created earlier.
 
-1. Scroll down to the **Triggers** section and click **Add trigger**.
+1. Add a trigger with a name, query and severity level.
 
-![Configuring Triggers and Actions](../../img/email-reporting/create-monitor-with-data-three.png)
+![Configuring Triggers](../../img/email-reporting/create-monitor-with-data-trigger.png)
 
-2. Provide a **Trigger name** (e.g., `SSH-trigger` for an SSH alert).
-3. Set the **Severity level** (1 to 5).
-4. Under **Trigger conditions**, specify the query you defined.
-5. Under **Actions**, click **Add notification**.
-
-![Configuring Triggers and Actions](../../img/email-reporting/create-monitor-with-data-trigger.png)
-
-6. Give it an **Action name** (e.g., `SSH-alert`).
-7. For the **Channel**, select the email channel you created in Step 3.
-8. Enter a **Message subject** (e.g., `SSH Root Connection`) and customize the **Message** body using Mustache templates or plain text.
-9. Set the **Action configuration** (e.g., `Per execution` or `Per alert`).
+2. Under **Actions**, click **Add notification** and configure:
+   - **Channel**: Select the email channel you created in [Step 3](#3-setting-up-an-email-notification-channel)
+   - **Message subject**: e.g., `SSH Root Connection`
+   - **Message**: Customize the body using Mustache templates or plain text
+   - **Action configuration**: `Per execution` or `Per alert`
 
 ![Configuring Triggers and Actions](../../img/email-reporting/create-monitor-with-data-action.png)
 
-10. Click **Create** to save the monitor and its triggers.
-
-![Created monitor](../../img/email-reporting/created-monitor.png)
+3. Click **Create** to save the monitor.
 
 ### 4.3. Testing the Monitor
 
 1. Trigger the condition by generating an event that matches your query.
-2. Navigate to the **Alerting** plugin and under the **Alerts** tab to verify the alert was created.
+2. Verify the alert appears in the **Alerting** plugin under the **Alerts** tab.
+3. Confirm the email notification is received in the recipient's inbox.
 
 ![Alert tab](../../img/email-reporting/alert-tab.png)
-
-3. Check the recipient's inbox for the email notification.
-
-![Email received](../../img/email-reporting/mail-received.png)
+![Received email](../../img/email-reporting/mail-received.png)
 
 <details>
 <summary>Example: recreating an `sshd` rule from 4.x</summary>
@@ -246,9 +214,9 @@ You can recreate it with the following monitor configuration:
 
 **Action:**
 
-- **Channel**: Your email channel from Step 3
+- **Channel**: Your email channel from [Step 3](#3-setting-up-an-email-notification-channel)
 - **Subject**: `SSH Root Connection`
-- **Configuration**: Per execution (equivalent to `do_not_delay`)
+- **Configuration**: Per execution
 
 </details>
 
@@ -273,7 +241,7 @@ If you previously used the `<reports>` block in `ossec.conf` to generate daily o
 
 5. In **Notification settings**:
    - Check the **Send notification when report is available** option.
-   - **Channels**: Select the Email channel you created in Step 3 (e.g., `[Channel] wazuh-security-mail-channel`).
+   - **Channels**: Select the Email channel you created in [Step 3](#3-setting-up-an-email-notification-channel) (e.g., `[Channel] wazuh-security-mail-channel`).
    - **Notification subject**: `Vulnerability Detection Report`
 6. Configure your notification message using the text editor or use the default HTML template provided.
 
