@@ -4,7 +4,7 @@ In previous Wazuh versions (4.x), email alerts and reporting were configured dir
 
 Starting with Wazuh 5.0, these backend mail forwarding capabilities have been removed from the manager. Mail forwarding and scheduled reporting must now be configured directly through the Wazuh Dashboard using the **Notifications**, **Alerting**, and **Reporting** capabilities.
 
-> **Note:** There is no automatic upgrade tooling to migrate your existing 4.x email configurations. You must manually recreate your alerting and reporting logic in the Wazuh Dashboard.
+> **Note:** There is no automatic upgrade tooling to migrate your existing 4.x email configurations. You must manually recreate your alerting and reporting logic in the Wazuh Dashboard. Use the mapping tables below to identify which 5.x feature corresponds to each element in your `ossec.conf`.
 
 ## Configuration mapping (4.x -> 5.x)
 
@@ -160,7 +160,7 @@ Create a **monitor** in the **Alerting plugin** according to your needs (for exa
 
 Once the monitor is created, add a trigger and configure the action to use your notification channel. This is the key migration step - it connects the monitor to the email channel you created earlier.
 
-1. Add a trigger with a name, query and severity level.
+1. Add a trigger with a name, severity level and trigger condition.
 
 ![Configuring Triggers](../../img/email-reporting/create-monitor-with-data-trigger.png)
 
@@ -222,28 +222,27 @@ You can recreate it with the following monitor configuration:
 
 ## 5. Recreating Scheduled Reports
 
-If you previously used the `<reports>` block in `ossec.conf` to generate daily or weekly summaries, you can replicate this behavior using the Reporting plugin. For this example, we will configure a daily PDF report for the **Vulnerability detection - Overview** dashboard and set up an email notification using an HTML template.
+If you previously used the `<reports>` block in `ossec.conf` to generate daily or weekly summaries, you can replicate this behavior using the Reporting plugin. Create a report definition configured to your needs, then set up email notification to deliver it through your channel. The images below show a daily vulnerability report as an example.
 
 1. Navigate to the **Reporting** plugin in the Wazuh Dashboard.
 
 ![Reporting page](../../img/email-reporting/reporting-base.png)
 
 2. Click **Create report definition**.
-3. Under **Report settings**, configure the following:
-   - **Name**: `Vulnerability Detection Daily Report`
-   - **Description**: `Morning daily reports for vulnerability detection overview`
-   - **Report source**: Select **Dashboard** (and choose `Vulnerability detection - Overview` from the list).
-   - **Time range**: `Last 24 hours`
-   - **File format**: `PDF`
-4. Under **Report trigger**, select **On demand**.
+3. Under **Report settings**, configure the following according to your needs (example values shown in the images):
+   - **Name**: e.g., `Vulnerability Detection Daily Report`
+   - **Report source**: Select **Dashboard** and pick the dashboard to export
+   - **Time range**: e.g., `Last 24 hours`
+   - **File format**: e.g., `PDF`
+4. Under **Report trigger**, select **On demand** or set a schedule.
 
 ![Configuring Report Data](../../img/email-reporting/create-report-definition-with-data-one.png)
 
 5. In **Notification settings**:
    - Check the **Send notification when report is available** option.
-   - **Channels**: Select the Email channel you created in [Step 3](#3-setting-up-an-email-notification-channel) (e.g., `[Channel] wazuh-security-mail-channel`).
-   - **Notification subject**: `Vulnerability Detection Report`
-6. Configure your notification message using the text editor or use the default HTML template provided.
+   - **Channels**: Select the Email channel you created in [Step 3](#3-setting-up-an-email-notification-channel).
+   - **Notification subject**: e.g., `Vulnerability Detection Report`
+6. Configure your notification message using the text editor or use the default template.
 
 ![Configuring Report Schedule and Notifications](../../img/email-reporting/create-report-definition-with-data-two.png)
 
@@ -258,7 +257,7 @@ If you previously used the `<reports>` block in `ossec.conf` to generate daily o
 
 ![Report list](../../img/email-reporting/listed-report-and-report-definition.png)
 
-2. The email with the custom HTML format and report link button will be delivered to the recipients.
+2. The email with the custom format and report link will be delivered to the recipients.
 
 ![Report Email Received](../../img/email-reporting/received-mail-final.png)
 
