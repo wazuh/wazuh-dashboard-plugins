@@ -33,6 +33,17 @@ interface RemoveAgentModalProps {
 
 export const RemoveAgentModal = compose(withErrorBoundary)(
   ({ agent, onClose, reloadAgents }: RemoveAgentModalProps) => {
+    const getDeleteErrorMessage = (error: any) => {
+      const apiMessage = error?.response?.data?.message;
+      const message = apiMessage || error?.message || 'Unknown error';
+
+      if (/permission denied/i.test(message)) {
+        return `No permissions to remove this agent. ${message}`;
+      }
+
+      return message;
+    };
+
     const action = useAsyncAction(async agent => {
       try {
         const response = await removeAgentService(agent.id);
@@ -46,7 +57,9 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
           });
         }
         reloadAgents();
-      } catch (error) {
+      } catch (error: any) {
+        const errorMessage = getDeleteErrorMessage(error);
+
         const options = {
           context: `RemoveAgentModal.handleOnSave`,
           level: UI_LOGGER_LEVELS.ERROR,
@@ -54,7 +67,7 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
           store: true,
           error: {
             error,
-            message: error.message || error,
+            message: errorMessage,
             title: `Could not remove agent`,
           },
         };
