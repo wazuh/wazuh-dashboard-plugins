@@ -5,24 +5,23 @@ import { AgentsTableGlobalActions } from './global-actions';
 import { Agent } from '../../types';
 
 jest.mock('../../../common/permissions/element', () => ({
-  WzElementPermissions: ({ children }) => <div>{children}</div>,
+  WzElementPermissions: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 describe('AgentsTableGlobalActions component', () => {
-  test('should return the component', async () => {
+  test('should return the component', () => {
     const { container, getByText } = render(
       <AgentsTableGlobalActions
         selectedAgents={[{ id: '001', name: 'agent1' } as Agent]}
         allAgentsSelected={false}
         allAgentsCount={3}
         filters={{}}
-        allowEditGroups={true}
         reloadAgents={() => {}}
         setIsUpgradeTasksModalVisible={() => {}}
         setIsUpgradePanelClosed={() => {}}
-        allowUpgrade={true}
         allowGetTasks={true}
-        allowRemove={true}
       />,
     );
 
@@ -39,13 +38,10 @@ describe('AgentsTableGlobalActions component', () => {
         allAgentsSelected={false}
         allAgentsCount={3}
         filters={{}}
-        allowEditGroups={true}
         reloadAgents={() => {}}
         setIsUpgradeTasksModalVisible={() => {}}
         setIsUpgradePanelClosed={() => {}}
-        allowUpgrade={true}
         allowGetTasks={true}
-        allowRemove={true}
       />,
     );
 

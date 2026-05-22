@@ -49,6 +49,17 @@ export const RemoveAgentsModal = compose(withErrorBoundary)(
     reloadAgents,
     setIsUpgradePanelClosed,
   }: RemoveAgentsModalProps) => {
+    const getDeleteErrorMessage = (error: any) => {
+      const apiMessage = error?.response?.data?.message;
+      const message = apiMessage || error?.message || 'Unknown error';
+
+      if (/permission denied/i.test(message)) {
+        return `No permissions to remove one or more selected agents. ${message}`;
+      }
+
+      return message;
+    };
+
     const [finalAgents, setFinalAgents] = useState<Agent[]>([]);
     const [getAgentsStatus, setGetAgentsStatus] = useState('disabled');
     const [getAgentsError, setGetAgentsError] = useState();
@@ -65,7 +76,7 @@ export const RemoveAgentsModal = compose(withErrorBoundary)(
         const { affected_items } = await getAgentsService({ filters });
         setGetAgentsStatus('complete');
         return affected_items;
-      } catch (error) {
+      } catch (error: any) {
         setGetAgentsStatus('danger');
         setGetAgentsError(error);
 
@@ -123,12 +134,14 @@ export const RemoveAgentsModal = compose(withErrorBoundary)(
         });
 
         setSaveChangesStatus('complete');
-      } catch (error) {
+      } catch (error: any) {
+        const errorMessage = getDeleteErrorMessage(error);
+
         setResult({
-          errorMessage: error.message,
+          errorMessage,
           errorAgents: [
             {
-              error: { message: error.message },
+              error: { message: errorMessage },
               id: agentIds,
             },
           ],
@@ -141,7 +154,7 @@ export const RemoveAgentsModal = compose(withErrorBoundary)(
           store: true,
           error: {
             error,
-            message: error.message || error,
+            message: errorMessage,
             title: `Could not remove agents`,
           },
         };
