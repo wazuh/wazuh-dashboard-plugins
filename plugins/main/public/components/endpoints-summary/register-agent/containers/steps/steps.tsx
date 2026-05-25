@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { EuiCallOut, EuiLink, EuiSteps, EuiButton } from '@elastic/eui';
+import {
+  EuiCallOut,
+  EuiLink,
+  EuiSteps,
+  EuiButton,
+  EuiCode,
+} from '@elastic/eui';
 import './steps.scss';
 import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/register-agent-data';
 import {
@@ -46,6 +52,7 @@ interface IStepsProps {
     isUDP: boolean;
   };
   wazuhPassword: string;
+  canReadAuthdPassword: boolean;
 }
 
 export const Steps = ({
@@ -54,7 +61,9 @@ export const Steps = ({
   osCard,
   connection,
   wazuhPassword,
+  canReadAuthdPassword,
 }: IStepsProps) => {
+  const passwordPermissionMissing = needsPassword && !canReadAuthdPassword;
   const initialParsedFormValues = {
     operatingSystem: {
       name: '',
@@ -179,6 +188,27 @@ export const Steps = ({
           },
         ]
       : []),
+    ...(passwordPermissionMissing
+      ? [
+          {
+            title: 'Password',
+            children: (
+              <EuiCallOut
+                color='warning'
+                title='Missing permission to read the registration password'
+                iconType='iInCircle'
+                className='warningForAgentName'
+              >
+                <p>
+                  Require <EuiCode>manager:config_update</EuiCode> or{' '}
+                  <EuiCode>cluster:config_update</EuiCode> permission.
+                </p>
+              </EuiCallOut>
+            ),
+            status: getPasswordStepStatus(form.fields),
+          },
+        ]
+      : []),
     {
       title: 'Optional settings:',
       children: <OptionalsInputs formFields={form.fields} />,
@@ -189,7 +219,18 @@ export const Steps = ({
     },
     {
       title: 'Run the following commands to download and install the agent:',
-      children: (
+      children: passwordPermissionMissing ? (
+        <EuiCallOut
+          color='warning'
+          title='Deployment commands hidden'
+          iconType='iInCircle'
+        >
+          <p>
+            Missing permissions to read the manager configuration required to
+            view the deployment commands.
+          </p>
+        </EuiCallOut>
+      ) : (
         <>
           {missingStepsName?.length ? (
             <EuiCallOut
@@ -230,7 +271,18 @@ export const Steps = ({
     },
     {
       title: 'Start the agent:',
-      children: (
+      children: passwordPermissionMissing ? (
+        <EuiCallOut
+          color='warning'
+          title='Start command hidden'
+          iconType='iInCircle'
+        >
+          <p>
+            Missing permissions to read the manager configuration required to
+            view the start command.
+          </p>
+        </EuiCallOut>
+      ) : (
         <>
           {missingStepsName?.length ? (
             <EuiCallOut

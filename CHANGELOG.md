@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed message when the server cluster is disabled and access to **Cluster** app [#8447](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8447)
 - Fixed agent removal, group editing, upgrading, and upgrade task details authorization by delegating RBAC enforcement to the API instead of the UI, and avoiding duplicated permission error toasts in upgrade task queries [#8464](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8464)
+- Fixed deployment and start commands being shown in the agent registration flow when the user lacks 'manager:update_config'/'cluster:update_config' permissions required to read the registration password [#8522](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8522)
 
 ## Wazuh v4.14.5 - OpenSearch Dashboards 2.19.5 - Revision 01
 
