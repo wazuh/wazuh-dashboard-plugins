@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { EuiCallOut, EuiLink, EuiSteps, EuiButton } from '@elastic/eui';
+import {
+  EuiCallOut,
+  EuiLink,
+  EuiSteps,
+  EuiButton,
+  EuiCode,
+} from '@elastic/eui';
 import './steps.scss';
 import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/register-agent-data';
 import {
@@ -192,7 +198,12 @@ export const Steps = ({
                 title='Missing permission to read the registration password'
                 iconType='iInCircle'
                 className='warningForAgentName'
-              />
+              >
+                <p>
+                  Require <EuiCode>manager:config_update</EuiCode> or{' '}
+                  <EuiCode>cluster:config_update</EuiCode> permission.
+                </p>
+              </EuiCallOut>
             ),
             status: getPasswordStepStatus(form.fields),
           },
