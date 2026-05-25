@@ -200,8 +200,8 @@ export const Steps = ({
                 className='warningForAgentName'
               >
                 <p>
-                  Require <EuiCode>manager:config_update</EuiCode> or{' '}
-                  <EuiCode>cluster:config_update</EuiCode> permission.
+                  Require <EuiCode>manager:update_config</EuiCode> or{' '}
+                  <EuiCode>cluster:update_config</EuiCode> permission.
                 </p>
               </EuiCallOut>
             ),
