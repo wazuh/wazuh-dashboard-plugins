@@ -47,6 +47,17 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
     reloadAgents,
     setIsUpgradePanelClosed,
   }: UpgradeAgentsModalProps) => {
+    const getUpgradeErrorMessage = (error: any) => {
+      const apiMessage = error?.response?.data?.message;
+      const message = apiMessage || error?.message || 'Unknown error';
+
+      if (/permission denied/i.test(message)) {
+        return `No permissions to upgrade one or more selected agents. ${message}`;
+      }
+
+      return message;
+    };
+
     const [finalAgents, setFinalAgents] = useState<Agent[]>([]);
     const [getAgentsStatus, setGetAgentsStatus] = useState('disabled');
     const [getAgentsError, setGetAgentsError] = useState();
@@ -127,12 +138,13 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
         }
 
         setSaveChangesStatus('complete');
-      } catch (error) {
+      } catch (error: any) {
+        const errorMessage = getUpgradeErrorMessage(error);
         setResult({
-          errorMessage: error.message,
+          errorMessage,
           errorAgents: [
             {
-              error: { message: error.message },
+              error: { message: errorMessage },
               id: agentIds,
             },
           ],
@@ -145,7 +157,7 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
           store: true,
           error: {
             error,
-            message: error.message || error,
+            message: errorMessage,
             title: `Could not upgrade agents`,
           },
         };
