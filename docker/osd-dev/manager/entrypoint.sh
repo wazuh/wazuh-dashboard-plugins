@@ -23,6 +23,11 @@ if [ -n "$INDEXER_SSL_CERTIFICATE_KEY" ]; then
   chmod 400 $INDEXER_SSL_CERTIFICATE_KEY
 fi
 
+# Clean up stale PID and socket files from previous unclean shutdowns
+# (e.g. after docker stop + docker start without recreating the container)
+find /var/wazuh-manager/var/run -name "*.pid" -delete 2>/dev/null || true
+find /var/wazuh-manager/queue -name "*.sock" -o -name "wdb" -type s -delete 2>/dev/null || true
+
 # Start service
 /var/wazuh-manager/bin/wazuh-manager-control start
 
