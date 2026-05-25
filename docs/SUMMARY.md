@@ -50,6 +50,10 @@
 - [Performance](ref/performance.md)
 - [Glossary](ref/glossary.md)
 
+# Migration Guide
+
+- [Active Response](guide/migration/active-response.md)
+
 # Diagnostic Documentation
 
 - [Diagnostic Guide](diag/diagnostic.md)
