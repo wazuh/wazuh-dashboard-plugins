@@ -278,47 +278,6 @@ Folder: [osd-dev](./osd-dev/)
 This will bring up a development environment for Wazuh using the given
 OpenSearch and OpenSearch-Dashboards versions.
 
-### **knb-dev** - Kibana 7.X & Kibana 8.X development environment
-
-Folder: [kbn-dev](./kbn-dev/)
-
-This will bring up a development environment for Wazuh using the
-Kibana development container versions of the 7 series and 8 series.
-
-### Wazuh 4.3.X testing environment with Elastic Stack
-
-Folder: [wazuh-4.3-es](./wazuh-4.3-es)
-
-Within this folder, there are two scripts:
-
-- `rel.sh` brings up released versions
-- `pre.sh` brings up unreleased versions
-
-### Wazuh 4.3.X testing environment with wazuh-dashboard and wazuh-indexer
-
-Folder: [wazuh-4.3-wz](./wazuh-4.3-wz)
-
-Within this folder, there are two scripts:
-
-- `rel.sh` brings up released versions
-- `pre.sh` brings up unreleased versions
-
-### Wazuh 4.2.X testing environment with Elastic Stack
-
-Folder: [wazuh-4.2-es](./wazuh-4.2-es)
-
-### Wazuh 4.2.X testing environment with OpenDistro
-
-Folder: [wazuh-4.2-od](./wazuh-4.2-od)
-
-### Wazuh 3.13.X testing environment with Elastic Stack
-
-Folder: [wazuh-3.13.X-es](./wazuh-3.13.X-es)
-
-### Wazuh 3.13.X testing environment with OpenDistro
-
-Folder: [wazuh-3.13.X-od](./wazuh-3.13.X-od)
-
 ## Troubleshooting
 
 1. Error pulling Docker image from Quay.io
