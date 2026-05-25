@@ -177,6 +177,8 @@ This setting controls whether the CTI (Cyber Threat Intelligence) registration U
 
 ### 1. Open the 4.x configuration file
 
+Run the following command **on the 4.x dashboard server**:
+
 ```bash
 sudo cat /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
 ```
@@ -186,6 +188,8 @@ sudo cat /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
 Take note of every value that differs from the defaults listed in the tables above.
 
 ### 2. Edit the 5.x configuration file
+
+Run the following command **on the 5.x dashboard server**:
 
 ```bash
 sudo nano /etc/wazuh-dashboard/opensearch_dashboards.yml

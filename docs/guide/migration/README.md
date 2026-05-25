@@ -52,7 +52,9 @@ Complete the following steps before performing any migration task:
 
 ### Back up the configuration file
 
-The 4.x plugin configuration file is located under the `path.data` directory defined in `opensearch_dashboards.yml` (default: `/usr/share/wazuh-dashboard/data`):
+The 4.x plugin configuration file is located under the `path.data` directory defined in `opensearch_dashboards.yml` (default: `/usr/share/wazuh-dashboard/data`).
+
+Run the following command **on the 4.x dashboard server**:
 
 ```bash
 sudo cp /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml \
@@ -60,6 +62,8 @@ sudo cp /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml \
 ```
 
 ### Back up the dashboard configuration
+
+Run the following command **on the 4.x dashboard server**:
 
 ```bash
 sudo cp /etc/wazuh-dashboard/opensearch_dashboards.yml \
@@ -76,7 +80,7 @@ Export only the dashboards and visualizations you created or modified. Default W
 
 If you export all objects as a fallback, use the **Check for existing objects** conflict strategy when importing into 5.x. See [Custom dashboards and visualizations](./dashboards.md) for details.
 
-Alternatively, use the API:
+Alternatively, use the API. Run the following command from **any machine with network access to the 4.x dashboard**, replacing `<DASHBOARD_HOST>` with the 4.x dashboard hostname or IP and `<PASSWORD>` with the admin password. The output file is saved in the current working directory:
 
 ```bash
 curl -X POST "https://<DASHBOARD_HOST>:5601/api/saved_objects/_export" \
@@ -87,8 +91,6 @@ curl -X POST "https://<DASHBOARD_HOST>:5601/api/saved_objects/_export" \
   -d '{"type": ["dashboard", "visualization", "search", "index-pattern"], "includeReferencesDeep": true}' \
   -o saved-objects-backup-$(date +%Y%m%d).ndjson
 ```
-
-Replace `<DASHBOARD_HOST>` and `<PASSWORD>` with the appropriate values for your environment.
 
 ### Download existing reports
 
@@ -106,7 +108,7 @@ On a standard installation, the base directory is:
 
 Each user's PDFs are stored in a subdirectory named after a hash of their username (for example, `/usr/share/wazuh-dashboard/data/wazuh/downloads/reports/<hashed_username>/`).
 
-Copy the entire `reports/` directory (including all per-user subdirectories) to a safe location before uninstalling the 4.x package:
+Copy the entire `reports/` directory (including all per-user subdirectories) to a safe location before uninstalling the 4.x package. Run the following command **on the 4.x dashboard server**:
 
 ```bash
 sudo cp -r /usr/share/wazuh-dashboard/data/wazuh/downloads/reports/ \

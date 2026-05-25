@@ -69,7 +69,7 @@ If you need to export everything at once as a fallback:
 
 ### Using the API
 
-The following command exports all dashboards, visualizations, searches, and index patterns from a 4.x deployment:
+Run the following command from **any machine with network access to the 4.x dashboard**, replacing `<DASHBOARD_HOST>` with the 4.x dashboard hostname or IP and `<PASSWORD>` with the admin password. The output file is saved in the current working directory:
 
 ```bash
 curl -X POST "https://<DASHBOARD_HOST>:5601/api/saved_objects/_export" \
@@ -83,8 +83,6 @@ curl -X POST "https://<DASHBOARD_HOST>:5601/api/saved_objects/_export" \
   }' \
   -o saved-objects-backup-$(date +%Y%m%d).ndjson
 ```
-
-Replace `<DASHBOARD_HOST>` and `<PASSWORD>` with values from your environment.
 
 ---
 
@@ -108,7 +106,9 @@ Complete the Wazuh 5.x installation and verify that the dashboard is accessible 
 
 ### Using the API
 
-Import all objects. The response body contains two fields: `successResults` (objects accepted) and `errors` (objects that could not be imported). Visualizations and saved searches that reference `wazuh-alerts-*` will appear in `errors` with `"type": "missing_references"`.
+Run the following command from **the machine where the `.ndjson` backup file is located**, with network access to the 5.x dashboard. Replace `<DASHBOARD_HOST>` with the 5.x dashboard hostname or IP, `<PASSWORD>` with the admin password, and `<DATE>` with the date suffix of your backup file.
+
+The response body contains two fields: `successResults` (objects accepted) and `errors` (objects that could not be imported). Visualizations and saved searches that reference `wazuh-alerts-*` will appear in `errors` with `"type": "missing_references"`.
 
 ```bash
 curl -X POST "https://<DASHBOARD_HOST>:5601/api/saved_objects/_import?overwrite=false" \
@@ -141,7 +141,9 @@ After import, any saved object that referenced the old `wazuh-alerts-*` index pa
 
 ### Using the API
 
-Use the `_resolve_import_errors` endpoint to retry the failed objects with a remapped index pattern reference. For each object that failed with `"type": "missing_references"`, include a `replaceReferences` entry that maps `wazuh-alerts-*` to `wazuh-events*`:
+Use the `_resolve_import_errors` endpoint to retry the failed objects with a remapped index pattern reference. For each object that failed with `"type": "missing_references"`, include a `replaceReferences` entry that maps `wazuh-alerts-*` to `wazuh-events*`.
+
+Run all commands below from **the machine where the `.ndjson` backup file is located**, with network access to the 5.x dashboard.
 
 **Step 4a — Resolve references for visualizations and saved searches:**
 
@@ -161,21 +163,23 @@ Populate the `retries` array from the `errors` list in the Step 3 response. Incl
 
 **Step 4b — Re-import dashboards:**
 
-After the visualizations and saved searches are successfully imported, extract the dashboard objects from the backup file and re-import them so that their panel references are satisfied:
+After the visualizations and saved searches are successfully imported, extract the dashboard objects from the backup file and re-import them so that their panel references are satisfied. Run the following commands **on the same machine where the backup file is located**:
+
+Extract using `jq` (recommended):
 
 ```bash
-# Extract only dashboard objects from the backup file
-python3 -c "
-import json, sys
-for line in sys.stdin:
-    line = line.strip()
-    if not line: continue
-    obj = json.loads(line)
-    if obj.get('type') == 'dashboard':
-        print(json.dumps(obj))
-" < saved-objects-backup-<DATE>.ndjson > dashboards-only.ndjson
+jq -c 'select(.type == "dashboard")' saved-objects-backup-<DATE>.ndjson > dashboards-only.ndjson
+```
 
-# Re-import just the dashboards
+If `jq` is not available, use `grep` as a fallback. The OpenSearch Dashboards export format uses compact JSON (no spaces around `:`), so a literal match is reliable:
+
+```bash
+grep '"type":"dashboard"' saved-objects-backup-<DATE>.ndjson > dashboards-only.ndjson
+```
+
+Then re-import just the dashboards:
+
+```bash
 curl -X POST "https://<DASHBOARD_HOST>:5601/api/saved_objects/_import?overwrite=false" \
   -H "osd-xsrf: true" \
   -u admin:<PASSWORD> \

@@ -66,7 +66,7 @@ Copy all existing PDF reports from the server filesystem before uninstalling the
 
 ### Copy reports from the filesystem
 
-On the dashboard server, execute the following command. Adjust the source path if `path.data` was customized in your `opensearch_dashboards.yml`:
+Run the following command **on the 4.x dashboard server**. Adjust the source path if `path.data` was customized in your `opensearch_dashboards.yml`:
 
 ```bash
 sudo cp -r /usr/share/wazuh-dashboard/data/wazuh/downloads/reports/ \
