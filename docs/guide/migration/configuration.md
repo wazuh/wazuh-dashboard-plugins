@@ -16,10 +16,10 @@ Some settings have been removed entirely; others have been relocated to the **Ad
 
 ### Where each setting belongs in 5.x
 
-| Location | Settings |
-| --- | --- |
-| `opensearch_dashboards.yml` | `wazuh_core.hosts`, `healthcheck.*`, `opensearchDashboards.branding.*`, `wazuh_check_updates.ctiRegistrationUiEnabled` |
-| **☰ Menu > Dashboard Management > Advanced Settings** | `timeout`, `enrollment.dns`, `reports.csv.maxRows`, `wazuh.updates.disabled` |
+| Location                                              | Settings                                                                                                               |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `opensearch_dashboards.yml`                           | `wazuh_core.hosts`, `healthcheck.*`, `opensearchDashboards.branding.*`, `wazuh_check_updates.ctiRegistrationUiEnabled` |
+| **☰ Menu > Dashboard Management > Advanced Settings** | `timeout`, `enrollment.dns`, `reports.csv.maxRows`, `wazuh.updates.disabled`                                           |
 
 Do not place the Advanced Settings keys in `opensearch_dashboards.yml`. They are tenant-level preferences managed through the UI (or the saved objects API), not server configuration file entries.
 
@@ -61,16 +61,16 @@ The key differences are:
 
 ### Available host properties in 5.x
 
-| Property | Description | Required | Default |
-| --- | --- | --- | --- |
-| `url` | URL of the Wazuh server API | Yes | — |
-| `port` | TCP port of the Wazuh server API | Yes | — |
-| `username` | API user | Yes | — |
-| `password` | API user password | Yes | — |
-| `run_as` | Use the logged-in user context to retrieve permissions | No | `false` |
-| `key` | Path to an SSL/TLS client private key file | No | — |
-| `cert` | Path to an SSL/TLS client certificate file | No | — |
-| `ca` | Path to a CA certificate file for server verification | No | — |
+| Property   | Description                                            | Required | Default |
+| ---------- | ------------------------------------------------------ | -------- | ------- |
+| `url`      | URL of the Wazuh server API                            | Yes      | —       |
+| `port`     | TCP port of the Wazuh server API                       | Yes      | —       |
+| `username` | API user                                               | Yes      | —       |
+| `password` | API user password                                      | Yes      | —       |
+| `run_as`   | Use the logged-in user context to retrieve permissions | No       | `false` |
+| `key`      | Path to an SSL/TLS client private key file             | No       | —       |
+| `cert`     | Path to an SSL/TLS client certificate file             | No       | —       |
+| `ca`       | Path to a CA certificate file for server verification  | No       | —       |
 
 For full details on these properties, see the [Configuration reference](../../ref/configuration.md).
 
@@ -82,37 +82,37 @@ The table below maps every 4.x `wazuh.yml` setting to its 5.x equivalent.
 
 ### Host configuration
 
-| 4.x setting | 5.x location | 5.x key / action |
-| --- | --- | --- |
-| `hosts[].url` | `opensearch_dashboards.yml` | `wazuh_core.hosts.<name>.url` |
-| `hosts[].port` | `opensearch_dashboards.yml` | `wazuh_core.hosts.<name>.port` |
+| 4.x setting        | 5.x location                | 5.x key / action                   |
+| ------------------ | --------------------------- | ---------------------------------- |
+| `hosts[].url`      | `opensearch_dashboards.yml` | `wazuh_core.hosts.<name>.url`      |
+| `hosts[].port`     | `opensearch_dashboards.yml` | `wazuh_core.hosts.<name>.port`     |
 | `hosts[].username` | `opensearch_dashboards.yml` | `wazuh_core.hosts.<name>.username` |
 | `hosts[].password` | `opensearch_dashboards.yml` | `wazuh_core.hosts.<name>.password` |
-| `hosts[].run_as` | `opensearch_dashboards.yml` | `wazuh_core.hosts.<name>.run_as` |
+| `hosts[].run_as`   | `opensearch_dashboards.yml` | `wazuh_core.hosts.<name>.run_as`   |
 
 ### General settings
 
 The following settings have a direct equivalent in 5.x:
 
-| 4.x setting | Default | 5.x location | 5.x key / action |
-| --- | --- | --- | --- |
-| `timeout` | `20000` | Advanced Settings | `timeout` (milliseconds) |
-| `enrollment.dns` | `''` | Advanced Settings | `enrollment.dns` |
-| `reports.csv.maxRows` | `10000` | Advanced Settings | `reports.csv.maxRows` |
+| 4.x setting              | Default | 5.x location      | 5.x key / action                                            |
+| ------------------------ | ------- | ----------------- | ----------------------------------------------------------- |
+| `timeout`                | `20000` | Advanced Settings | `timeout` (milliseconds)                                    |
+| `enrollment.dns`         | `''`    | Advanced Settings | `enrollment.dns`                                            |
+| `reports.csv.maxRows`    | `10000` | Advanced Settings | `reports.csv.maxRows`                                       |
 | `wazuh.updates.disabled` | `false` | Advanced Settings | `wazuh.updates.disabled` (default changed to `true` in 5.x) |
 
 > **Note**: The default value of `wazuh.updates.disabled` changed from `false` in 4.x to `true` in 5.x. If update notifications were enabled in your 4.x deployment (setting set to `false`), reconfigure the same behavior in Advanced Settings after migration.
 
 The following settings have no equivalent in 5.x and must not be carried over to `opensearch_dashboards.yml`:
 
-| 4.x setting | Default | Action in 5.x |
-| --- | --- | --- |
-| `pattern` | `wazuh-alerts-*` | Removed; default index pattern is `wazuh-events*` (provisioned by health check) |
-| `ip.selector` | `true` | Removed |
-| `ip.ignore` | `[]` | Removed |
-| `hideManagerAlerts` | `false` | Removed |
-| `configuration.ui_api_editable` | `true` | Removed |
-| `alerts.sample.prefix` | (sample prefix) | Removed |
+| 4.x setting                     | Default          | Action in 5.x                                                                   |
+| ------------------------------- | ---------------- | ------------------------------------------------------------------------------- |
+| `pattern`                       | `wazuh-alerts-*` | Removed; default index pattern is `wazuh-events*` (provisioned by health check) |
+| `ip.selector`                   | `true`           | Removed                                                                         |
+| `ip.ignore`                     | `[]`             | Removed                                                                         |
+| `hideManagerAlerts`             | `false`          | Removed                                                                         |
+| `configuration.ui_api_editable` | `true`           | Removed                                                                         |
+| `alerts.sample.prefix`          | (sample prefix)  | Removed                                                                         |
 
 ### Health check settings
 
@@ -120,16 +120,16 @@ In 4.x, individual health check steps could be enabled or disabled using separat
 
 The 4.x boolean settings do not map one-to-one to 5.x check names. For example, the old `checks.pattern` toggle covered a single index-pattern validation, whereas 5.x registers separate checks such as `index-pattern:alerts`, `index-pattern:events-security`, and dozens of others. See the [Health check reference](../../ref/modules/healthcheck.md) for the full list of 5.x check names.
 
-| 4.x setting | Default | 5.x equivalent |
-| --- | --- | --- |
-| `checks.api` | `true` | Controlled by `healthcheck.checks_enabled` (matches checks such as `server-api:connection-compatibility`) |
-| `checks.fields` | `true` | Controlled by `healthcheck.checks_enabled` |
-| `checks.maxBuckets` | `true` | Controlled by `healthcheck.checks_enabled` |
-| `checks.metaFields` | `true` | Controlled by `healthcheck.checks_enabled` |
-| `checks.pattern` | `true` | Controlled by `healthcheck.checks_enabled` (matches checks such as `index-pattern:*`) |
-| `checks.setup` | `true` | Controlled by `healthcheck.checks_enabled` |
-| `checks.template` | `true` | Controlled by `healthcheck.checks_enabled` |
-| `checks.timeFilter` | `true` | Controlled by `healthcheck.checks_enabled` |
+| 4.x setting         | Default | 5.x equivalent                                                                                            |
+| ------------------- | ------- | --------------------------------------------------------------------------------------------------------- |
+| `checks.api`        | `true`  | Controlled by `healthcheck.checks_enabled` (matches checks such as `server-api:connection-compatibility`) |
+| `checks.fields`     | `true`  | Controlled by `healthcheck.checks_enabled`                                                                |
+| `checks.maxBuckets` | `true`  | Controlled by `healthcheck.checks_enabled`                                                                |
+| `checks.metaFields` | `true`  | Controlled by `healthcheck.checks_enabled`                                                                |
+| `checks.pattern`    | `true`  | Controlled by `healthcheck.checks_enabled` (matches checks such as `index-pattern:*`)                     |
+| `checks.setup`      | `true`  | Controlled by `healthcheck.checks_enabled`                                                                |
+| `checks.template`   | `true`  | Controlled by `healthcheck.checks_enabled`                                                                |
+| `checks.timeFilter` | `true`  | Controlled by `healthcheck.checks_enabled`                                                                |
 
 To disable a specific check in 5.x, set `healthcheck.checks_enabled` to a pattern that does not match it. To enable all checks (the default), set the value to `.*` or leave it unset.
 
@@ -154,9 +154,9 @@ If your deployment had dashboards or alerts that depended on either index, those
 
 Custom branding configured through `customization.*` must be migrated to the native `opensearchDashboards.branding.*` key in `opensearch_dashboards.yml`:
 
-| 4.x setting | 5.x key in `opensearch_dashboards.yml` |
-| --- | --- |
-| `customization.logo.app` | `opensearchDashboards.branding.logo.defaultUrl` |
+| 4.x setting                      | 5.x key in `opensearch_dashboards.yml`          |
+| -------------------------------- | ----------------------------------------------- |
+| `customization.logo.app`         | `opensearchDashboards.branding.logo.defaultUrl` |
 | `customization.logo.healthcheck` | `opensearchDashboards.branding.mark.defaultUrl` |
 
 The settings `customization.enabled`, `customization.logo.reports`, `customization.reports.header`, and `customization.reports.footer` have no equivalent in 5.x and must be removed. PDF report branding is not configurable because report generation is now handled by the OpenSearch Dashboards Reporting plugin.
@@ -165,8 +165,8 @@ For a full branding migration example, see [Custom Branding](../../ref/custom-br
 
 ### Check updates settings
 
-| 4.x setting | 5.x key in `opensearch_dashboards.yml` | Default |
-| --- | --- | --- |
+| 4.x setting     | 5.x key in `opensearch_dashboards.yml`         | Default |
+| --------------- | ---------------------------------------------- | ------- |
 | (no equivalent) | `wazuh_check_updates.ctiRegistrationUiEnabled` | `false` |
 
 This setting controls whether the CTI (Cyber Threat Intelligence) registration UI is shown in the Wazuh dashboard. It has no equivalent in 4.x. If your 5.x deployment shows unexpected CTI registration prompts, set this key to `false` in `opensearch_dashboards.yml`.
@@ -228,12 +228,12 @@ Settings that cannot be placed in `opensearch_dashboards.yml` must be reconfigur
 1. Navigate to **☰ Menu > Dashboard Management > Advanced Settings**.
 2. Locate and update the following settings if they were customized in your 4.x deployment:
 
-   | Setting | Description |
-   | --- | --- |
-   | `timeout` | Request timeout in milliseconds (default: `20000`) |
-   | `enrollment.dns` | Wazuh server DNS name used in the agent deployment guide |
-   | `reports.csv.maxRows` | Maximum rows in exported CSV tables (default: `10000`) |
-   | `wazuh.updates.disabled` | Disable the update check notification (default: `true`) |
+   | Setting                  | Description                                              |
+   | ------------------------ | -------------------------------------------------------- |
+   | `timeout`                | Request timeout in milliseconds (default: `20000`)       |
+   | `enrollment.dns`         | Wazuh server DNS name used in the agent deployment guide |
+   | `reports.csv.maxRows`    | Maximum rows in exported CSV tables (default: `10000`)   |
+   | `wazuh.updates.disabled` | Disable the update check notification (default: `true`)  |
 
 ### 6. Remove deprecated settings
 

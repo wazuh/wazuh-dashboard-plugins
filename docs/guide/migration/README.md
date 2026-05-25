@@ -6,11 +6,11 @@ Wazuh 5.0 does not provide an automatic upgrade path from 4.x. This guide descri
 
 ## Platform compatibility
 
-| Component | 4.x | 5.x |
-| --- | --- | --- |
+| Component          | 4.x                       | 5.x                       |
+| ------------------ | ------------------------- | ------------------------- |
 | Dashboard platform | OpenSearch Dashboards 2.x | OpenSearch Dashboards 3.x |
-| Indexer | OpenSearch 2.x | OpenSearch 3.x |
-| Manager | Wazuh 4.x | Wazuh 5.x |
+| Indexer            | OpenSearch 2.x            | OpenSearch 3.x            |
+| Manager            | Wazuh 4.x                 | Wazuh 5.x                 |
 
 > All Wazuh stack components (indexer, manager, dashboard) must be upgraded to 5.x together. Mixed-version deployments are not supported.
 
@@ -18,24 +18,24 @@ Wazuh 5.0 does not provide an automatic upgrade path from 4.x. This guide descri
 
 The following areas of the Wazuh dashboard have changed significantly between 4.x and 5.x:
 
-| Area | 4.x | 5.x |
-| --- | --- | --- |
-| Plugin structure | `wazuh` + `wazuh-core` + `wazuh-check-updates` (split introduced in 4.x) | `wazuh` (main) + `wazuh-core` + `wazuh-check-updates` |
-| Plugin configuration file | `wazuh.yml` | `opensearch_dashboards.yml` |
-| Wazuh server host setting key | `hosts[].id` | `wazuh_core.hosts.<name>` |
-| Default index pattern | `wazuh-alerts-*` | `wazuh-events*` |
-| Health check individual toggles (`checks.*`) | Individual boolean settings per check | Single `healthcheck.checks_enabled` regex/list |
-| Statistics indices (`wazuh-statistics-*`) | Collected automatically via `cron.*` tasks | Removed; data model replaced by `wazuh-states-*` indices |
-| Agent monitoring indices (`wazuh-monitoring-*`) | Collected automatically via `wazuh.monitoring.*` | Removed; agent status queried on demand from API |
-| Custom report branding (logo, header, footer) | Configurable via `customization.logo.reports`, `customization.reports.*` | Removed; not available in 5.x |
-| Custom dashboard and app branding | `customization.*` in `wazuh.yml` | `opensearchDashboards.branding.*` in `opensearch_dashboards.yml` |
-| Index pattern selector | Configurable via `ip.selector` / `ip.ignore` | Removed |
-| Custom dashboards and visualizations | Saved objects in OpenSearch (custom objects only) | Saved objects in OpenSearch — export and re-import custom objects only; default Wazuh objects are auto-provisioned |
-| Plugin reporting feature | Built-in; PDFs stored at `<path.data>/wazuh/downloads/reports/<hashed_username>/` | **Deprecated**; replaced by the OpenSearch Dashboards Reporting plugin |
-| Multiple Wazuh manager APIs | Supported via UI API selector | One active manager by default; multiple `wazuh_core.hosts` entries require [Cross-Cluster Search](./multi-manager.md#option-d-cross-cluster-search-with-multiple-manager-apis) |
-| Navigation — home | `/app/wazuh#/overview` | `/app/wz-home` |
-| Navigation — settings | `/app/wazuh#/settings` | **☰ Menu > Dashboard Management > Advanced Settings** |
-| Navigation — health check | `/app/wazuh#/health-check` | **☰ Menu > Dashboard management > Health Check** |
+| Area                                            | 4.x                                                                               | 5.x                                                                                                                                                                            |
+| ----------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Plugin structure                                | `wazuh` + `wazuh-core` + `wazuh-check-updates` (split introduced in 4.x)          | `wazuh` (main) + `wazuh-core` + `wazuh-check-updates`                                                                                                                          |
+| Plugin configuration file                       | `wazuh.yml`                                                                       | `opensearch_dashboards.yml`                                                                                                                                                    |
+| Wazuh server host setting key                   | `hosts[].id`                                                                      | `wazuh_core.hosts.<name>`                                                                                                                                                      |
+| Default index pattern                           | `wazuh-alerts-*`                                                                  | `wazuh-events*`                                                                                                                                                                |
+| Health check individual toggles (`checks.*`)    | Individual boolean settings per check                                             | Single `healthcheck.checks_enabled` regex/list                                                                                                                                 |
+| Statistics indices (`wazuh-statistics-*`)       | Collected automatically via `cron.*` tasks                                        | Removed; data model replaced by `wazuh-states-*` indices                                                                                                                       |
+| Agent monitoring indices (`wazuh-monitoring-*`) | Collected automatically via `wazuh.monitoring.*`                                  | Removed; agent status queried on demand from API                                                                                                                               |
+| Custom report branding (logo, header, footer)   | Configurable via `customization.logo.reports`, `customization.reports.*`          | Removed; not available in 5.x                                                                                                                                                  |
+| Custom dashboard and app branding               | `customization.*` in `wazuh.yml`                                                  | `opensearchDashboards.branding.*` in `opensearch_dashboards.yml`                                                                                                               |
+| Index pattern selector                          | Configurable via `ip.selector` / `ip.ignore`                                      | Removed                                                                                                                                                                        |
+| Custom dashboards and visualizations            | Saved objects in OpenSearch (custom objects only)                                 | Saved objects in OpenSearch — export and re-import custom objects only; default Wazuh objects are auto-provisioned                                                             |
+| Plugin reporting feature                        | Built-in; PDFs stored at `<path.data>/wazuh/downloads/reports/<hashed_username>/` | **Deprecated**; replaced by the OpenSearch Dashboards Reporting plugin                                                                                                         |
+| Multiple Wazuh manager APIs                     | Supported via UI API selector                                                     | One active manager by default; multiple `wazuh_core.hosts` entries require [Cross-Cluster Search](./multi-manager.md#option-d-cross-cluster-search-with-multiple-manager-apis) |
+| Navigation — home                               | `/app/wazuh#/overview`                                                            | `/app/wz-home`                                                                                                                                                                 |
+| Navigation — settings                           | `/app/wazuh#/settings`                                                            | **☰ Menu > Dashboard Management > Advanced Settings**                                                                                                                          |
+| Navigation — health check                       | `/app/wazuh#/health-check`                                                        | **☰ Menu > Dashboard management > Health Check**                                                                                                                               |
 
 ## Migration topics
 

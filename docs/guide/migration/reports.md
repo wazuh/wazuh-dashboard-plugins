@@ -50,11 +50,11 @@ The Wazuh plugin no longer provides a dedicated reporting section. PDF and CSV r
 
 ## What can and cannot be migrated
 
-| Item | Migratable |
-| --- | --- |
-| PDF files generated in 4.x | **No** — 5.x stores reports in an OpenSearch index; 4.x PDF files cannot be imported. |
-| The ability to regenerate reports | **Yes** — Migrate the underlying dashboards (see [Custom dashboards and visualizations](./dashboards.md)) and generate new reports from them using the Reporting plugin. |
-| Custom report branding (logo, header, footer) | **No** — Not configurable in 5.x. |
+| Item                                          | Migratable                                                                                                                                                               |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| PDF files generated in 4.x                    | **No** — 5.x stores reports in an OpenSearch index; 4.x PDF files cannot be imported.                                                                                    |
+| The ability to regenerate reports             | **Yes** — Migrate the underlying dashboards (see [Custom dashboards and visualizations](./dashboards.md)) and generate new reports from them using the Reporting plugin. |
+| Custom report branding (logo, header, footer) | **No** — Not configurable in 5.x.                                                                                                                                        |
 
 There is no automated path to import 4.x report files into the 5.x reporting system. Preserve 4.x PDF files as standalone documents if they are needed for compliance, auditing, or reference.
 

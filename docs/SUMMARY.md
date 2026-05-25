@@ -49,6 +49,7 @@
 # Migration Guide
 
 - [Overview](guide/migration/README.md)
+
   - [Configuration](guide/migration/configuration.md)
   - [Custom dashboards and visualizations](guide/migration/dashboards.md)
   - [Reports](guide/migration/reports.md)
