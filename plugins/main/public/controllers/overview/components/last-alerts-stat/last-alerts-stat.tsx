@@ -31,7 +31,7 @@ import {
 } from '../../../../components/common/hocs';
 import {
   FindingsDataSourceRepository,
-  ThreatHuntingDataSource,
+  OverviewDataSource,
 } from '../../../../components/common/data-source';
 import { LoadingSearchbarProgress } from '../../../../components/common/loading-searchbar-progress/loading-searchbar-progress';
 
@@ -63,7 +63,7 @@ const discoverLocation = {
 
 export const LastAlertsSummaryBySeverity = compose(
   withDataSource({
-    DataSource: ThreatHuntingDataSource,
+    DataSource: OverviewDataSource,
     DataSourceRepositoryCreator: FindingsDataSourceRepository,
   }),
   withDataSourceLoading({
