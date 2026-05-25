@@ -41,7 +41,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Set cluster mode as default for all Wazuh installations, including single-node deployments. Updated RBAC permissions to `cluster:*` actions [#7701](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7701) [#8147](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8147)
 - Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7602](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7602) [#7929](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7929) [#7974](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7974) [#7979](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7979) [#8242](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8242) [#8306](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8306) [#8382](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8382) [#8472](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8472)
 - Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data [#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
-- Reworked health check [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622) [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694) [#7756](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7756) [#7829](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7829) [#8317](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8317)
+- Reworked health check [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622) [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694) [#7756](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7756) [#7829](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7829) [#8317](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8317) [#8551](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8551)
 - Reworked some view components to use data source [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
 - Fixed date and more format errors [#7754](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7754)
 - Upgraded the `brace-expansion` dependency to `1.1.12` and `2.0.2` [#7812](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7812)
@@ -108,7 +108,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed long labels in IT Hygiene horizontal bar visualizations causing display issues [#8330](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8330)
 - Fixed rendering of the Tactics and Techniques cells in the MITRE ATT&CK flyout [#8516](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8516)
 - Fixed custom filter buttons not being rendered in pdf reports [#8525](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8525)
-- Fixed home severity visualization by removing pinned agent filter [#8551](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8551)
 
 ### Removed
 
