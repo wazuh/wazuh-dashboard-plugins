@@ -107,7 +107,7 @@ The following settings have no equivalent in 5.x and must not be carried over to
 
 | 4.x setting                     | Default          | Action in 5.x                                                                   |
 | ------------------------------- | ---------------- | ------------------------------------------------------------------------------- |
-| `pattern`                       | `wazuh-alerts-*` | Removed; default index pattern is `wazuh-events*` (provisioned by health check) |
+| `pattern`                       | `wazuh-alerts-*` | Removed; default index pattern is `wazuh-events-v5*` (provisioned by health check) |
 | `ip.selector`                   | `true`           | Removed                                                                         |
 | `ip.ignore`                     | `[]`             | Removed                                                                         |
 | `hideManagerAlerts`             | `false`          | Removed                                                                         |
@@ -148,7 +148,7 @@ The periodic data collection features from 4.x are removed in 5.x:
 - **`cron.*` settings** — The statistics collection tasks that wrote agent state data to `wazuh-statistics-*` indices no longer exist. Remove all `cron.*` entries from your configuration. The `wazuh-statistics-*` indices are not created in 5.x.
 - **`wazuh.monitoring.*` settings** — The agent monitoring feature that periodically created `wazuh-monitoring-*` index snapshots no longer exists. Remove all `wazuh.monitoring.*` entries. Agent status is now queried on demand from the Wazuh manager API.
 
-If your deployment had dashboards or alerts that depended on either index, those will need to be rebuilt against the new data model (`wazuh-metrics-comms`, `wazuh-metrics-agents`, and `wazuh-metrics-normalization` indices).
+If your deployment had dashboards or alerts that depended on either index, those will need to be rebuilt against the new data model (`wazuh-metrics-comms` and `wazuh-metrics-normalization` indices).
 
 ### Customization settings
 

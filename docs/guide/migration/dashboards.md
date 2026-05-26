@@ -23,9 +23,9 @@ All of these are exported and imported as a single `.ndjson` (newline-delimited 
 
 ## Before you export: note the index pattern and field name changes
 
-In Wazuh 4.x, the default index pattern is `wazuh-alerts-*`. In Wazuh 5.x, the default index pattern is `wazuh-events*`.
+In Wazuh 4.x, the default index pattern is `wazuh-alerts-*`. In Wazuh 5.x, the default index pattern is `wazuh-events-v5*`.
 
-The 5.x data model uses a family of data streams (`wazuh-events-v5-*`, `wazuh-findings-v5-*`, `wazuh-states-*`, and others). The `wazuh-events*` index pattern covers all event and alert data streams and is the correct replacement for `wazuh-alerts-*` in most visualizations.
+The 5.x data model uses a family of data streams (`wazuh-events-v5-*`, `wazuh-findings-v5-*`, and others). For rule-based alert data — the closest equivalent to `wazuh-alerts-*` — the correct 5.x index pattern is `wazuh-findings-v5*`. This is the pattern used by most default Wazuh dashboards and visualizations in 5.x that previously targeted `wazuh-alerts-*`.
 
 Custom visualizations and searches that reference `wazuh-alerts-*` will not display data after import until the index pattern reference is updated. When importing saved objects, the dashboard will prompt you to select a replacement index pattern for any unresolved references.
 
@@ -44,7 +44,7 @@ Common field mappings:
 | `agent.name`       | `wazuh.agent.name` |                                                                                              |
 | `agent.id`         | `wazuh.agent.id`   |                                                                                              |
 
-> **Note**: The index pattern to use depends on the type of data being visualized. Use `wazuh-findings-v5*` for rule-based alerts (the closest equivalent to `wazuh-alerts-*`), and `wazuh-events*` for raw event data. Visualizations that filter on `rule.*` fields will need to target `wazuh-findings-v5*` and use the `wazuh.*` field names above.
+> **Note**: The index pattern to use depends on the type of data being visualized. Use `wazuh-findings-v5*` for rule-based alerts (the closest equivalent to `wazuh-alerts-*`), and `wazuh-events-v5*` for raw event data. Visualizations that filter on `rule.*` fields will need to target `wazuh-findings-v5*` and use the `wazuh.*` field names above.
 
 After completing the import, open each migrated visualization in the editor and update the index pattern and any field references that use the old names.
 
@@ -130,18 +130,12 @@ Set `overwrite=true` to replace existing objects with the same ID.
 
 After import, any saved object that referenced the old `wazuh-alerts-*` index pattern will show an unresolved reference. The dashboard prompts you to select a replacement.
 
-1. When prompted, select `wazuh-events*` as the replacement index pattern.
-2. If the `wazuh-events*` pattern does not appear in the list, create it first:
-   1. Navigate to **☰ Menu > Dashboard Management > Index patterns**.
-   2. Click **Create index pattern**.
-   3. Enter `wazuh-events*` as the pattern.
-   4. Select `@timestamp` as the time field.
-   5. Click **Create index pattern**.
-3. Repeat step 1 to re-import or re-map affected objects.
+1. When prompted to select a replacement index pattern, choose the pattern that matches the type of data your visualization was displaying. For visualizations that previously targeted `wazuh-alerts-*` (rule-based alert data), select `wazuh-findings-v5*`. The 5.x health check provisions this pattern automatically on first start.
+2. Repeat step 1 for each affected object.
 
 ### Using the API
 
-Use the `_resolve_import_errors` endpoint to retry the failed objects with a remapped index pattern reference. For each object that failed with `"type": "missing_references"`, include a `replaceReferences` entry that maps `wazuh-alerts-*` to `wazuh-events*`.
+Use the `_resolve_import_errors` endpoint to retry the failed objects with a remapped index pattern reference. For each object that failed with `"type": "missing_references"`, include a `replaceReferences` entry that maps `wazuh-alerts-*` to the appropriate 5.x pattern. For most alert-based visualizations, the replacement is `wazuh-findings-v5*`.
 
 Run all commands below from **the machine where the `.ndjson` backup file is located**, with network access to the 5.x dashboard.
 
@@ -154,8 +148,8 @@ curl -X POST "https://<DASHBOARD_HOST>:5601/api/saved_objects/_resolve_import_er
   --cacert /etc/wazuh-dashboard/certs/root-ca.pem \
   --form file=@saved-objects-backup-<DATE>.ndjson \
   --form 'retries=[
-    {"type":"visualization","id":"<VIZ_ID>","overwrite":false,"replaceReferences":[{"type":"index-pattern","from":"wazuh-alerts-*","to":"wazuh-events*"}]},
-    {"type":"search","id":"<SEARCH_ID>","overwrite":false,"replaceReferences":[{"type":"index-pattern","from":"wazuh-alerts-*","to":"wazuh-events*"}]}
+    {"type":"visualization","id":"<VIZ_ID>","overwrite":false,"replaceReferences":[{"type":"index-pattern","from":"wazuh-alerts-*","to":"wazuh-findings-v5*"}]},
+    {"type":"search","id":"<SEARCH_ID>","overwrite":false,"replaceReferences":[{"type":"index-pattern","from":"wazuh-alerts-*","to":"wazuh-findings-v5*"}]}
   ]'
 ```
 
@@ -195,7 +189,7 @@ After importing, verify that the migrated objects are accessible and displaying 
 
 1. Navigate to **☰ Menu > Dashboard Management > Saved objects** and confirm that the expected dashboards and visualizations appear in the list.
 2. Open each migrated dashboard and confirm that panels load without errors.
-3. If a panel shows a "No results found" message, verify that: (a) the index pattern referenced by its visualizations points to `wazuh-events*` or `wazuh-findings-v5*` as appropriate; (b) any aggregation or filter fields use the 5.x field names (for example, `wazuh.rule.level` instead of `rule.level`); and (c) the selected time range contains data.
+3. If a panel shows a "No results found" message, verify that: (a) the index pattern referenced by its visualizations points to `wazuh-findings-v5*` (for alert-based visualizations) or another appropriate 5.x pattern; (b) any aggregation or filter fields use the 5.x field names (for example, `wazuh.rule.level` instead of `rule.level`); and (c) the selected time range contains data.
 
 ---
 
