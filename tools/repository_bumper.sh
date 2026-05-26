@@ -196,20 +196,17 @@ update_branch_reference_defaults() {
     return 0
   fi
 
-  local bump_string="$VERSION"
+  local bump_string="$GIT_REF_REPLACEMENT"
   local files=(
     "${REPO_PATH}/.github/workflows/5_testunit_jest.yml"
-    "${REPO_PATH}/.github/workflows/5_testunit_dev_sh.yml"
     "${REPO_PATH}/.github/workflows/5_builderpackage_plugins.yml"
     "${REPO_PATH}/.github/workflows/5_builderprecompiled_base-dev-environment.yml"
 
     "${REPO_PATH}/.github/workflows/6_builderpackage_plugins.yml"
     "${REPO_PATH}/.github/workflows/6_builderprecompiled_base-dev-environment.yml"
     "${REPO_PATH}/.github/workflows/6_builderprecompiled_playground.yml"
-    "${REPO_PATH}/.github/workflows/6_documentation_deploy-to-gh-pages.yml"
     "${REPO_PATH}/.github/workflows/6_testunit_jest.yml"
 
-    "${REPO_PATH}/.github/workflows/deploy-docs.yml"
     "${REPO_PATH}/.github/workflows/dev-environment.yml"
     "${REPO_PATH}/.github/workflows/manual-build.yml"
     "${REPO_PATH}/.github/workflows/playground.yml"
@@ -228,8 +225,6 @@ update_branch_reference_defaults() {
     sed_inplace "s/^\\([[:space:]]*default:[[:space:]]*\\)main\\([[:space:]]*\\)$/\\1${bump_string}\\2/" "$f"
     sed_inplace "s/^\\([[:space:]]*default:[[:space:]]*'\\)main'\\([[:space:]]*\\)$/\\1${bump_string}'\\2/" "$f"
     sed_inplace "s/^\\([[:space:]]*default:[[:space:]]*\"\\)main\"\\([[:space:]]*\\)$/\\1${bump_string}\"\\2/" "$f"
-
-    sed_inplace "s/^\\([[:space:]]*- \\)main$/\\1${bump_string}/" "$f"
   done
 }
 
@@ -248,15 +243,7 @@ update_imposter_config() {
     return
   fi
 
-  local replacement
-  if [ "$TAG" = true ]; then
-    replacement="v${VERSION}"
-    if [ -n "$STAGE" ]; then
-      replacement+="-${STAGE}"
-    fi
-  else
-    replacement="${VERSION}"
-  fi
+  local replacement="$GIT_REF_REPLACEMENT"
 
   # Extract current reference from URL
   local current_spec_ref
@@ -310,7 +297,7 @@ parse_arguments() {
       ;;
     esac
   done
-  
+
   if [[ -n "$SET_AS_MAIN" ]]; then
     SKIP_URLS="yes"
   else
@@ -579,6 +566,20 @@ update_changelog() {
   fi
 }
 
+get_git_ref_replacement(){
+  local replacement
+  if [ "$TAG" = true ]; then
+    replacement="v${VERSION}"
+    if [ -n "$STAGE" ]; then
+      replacement+="-${STAGE}"
+    fi
+  else
+    replacement="${VERSION}"
+  fi
+
+  GIT_REF_REPLACEMENT="$replacement"
+}
+
 # --- Main Execution ---
 main() {
   # Initialize log file
@@ -618,6 +619,8 @@ main() {
     log "ERROR: Plugins directory not found at $plugins_dir"
     exit 1
   fi
+
+  get_git_ref_replacement
 
   # Start file modifications
   log "Starting file modifications..."
