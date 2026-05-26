@@ -16,10 +16,10 @@ Some settings have been removed entirely; others have been relocated to the **Ad
 
 ### Where each setting belongs in 5.x
 
-| Location                                              | Settings                                                                                                               |
-| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `opensearch_dashboards.yml`                           | `wazuh_core.hosts`, `healthcheck.*`, `opensearchDashboards.branding.*`                                                 |
-| **☰ Menu > Dashboard Management > Advanced Settings** | `timeout`, `enrollment.dns`, `reports.csv.maxRows`, `wazuh.updates.disabled`                                           |
+| Location                                              | Settings                                                                     |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `opensearch_dashboards.yml`                           | `wazuh_core.hosts`, `healthcheck.*`, `opensearchDashboards.branding.*`       |
+| **☰ Menu > Dashboard Management > Advanced Settings** | `timeout`, `enrollment.dns`, `reports.csv.maxRows`, `wazuh.updates.disabled` |
 
 Do not place the Advanced Settings keys in `opensearch_dashboards.yml`. They are tenant-level preferences managed through the UI (or the saved objects API), not server configuration file entries.
 
@@ -105,14 +105,14 @@ The following settings have a direct equivalent in 5.x:
 
 The following settings have no equivalent in 5.x and must not be carried over to `opensearch_dashboards.yml`:
 
-| 4.x setting                     | Default          | Action in 5.x                                                                   |
-| ------------------------------- | ---------------- | ------------------------------------------------------------------------------- |
+| 4.x setting                     | Default          | Action in 5.x                                                                      |
+| ------------------------------- | ---------------- | ---------------------------------------------------------------------------------- |
 | `pattern`                       | `wazuh-alerts-*` | Removed; default index pattern is `wazuh-events-v5*` (provisioned by health check) |
-| `ip.selector`                   | `true`           | Removed                                                                         |
-| `ip.ignore`                     | `[]`             | Removed                                                                         |
-| `hideManagerAlerts`             | `false`          | Removed                                                                         |
-| `configuration.ui_api_editable` | `true`           | Removed                                                                         |
-| `alerts.sample.prefix`          | (sample prefix)  | Removed                                                                         |
+| `ip.selector`                   | `true`           | Removed                                                                            |
+| `ip.ignore`                     | `[]`             | Removed                                                                            |
+| `hideManagerAlerts`             | `false`          | Removed                                                                            |
+| `configuration.ui_api_editable` | `true`           | Removed                                                                            |
+| `alerts.sample.prefix`          | (sample prefix)  | Removed                                                                            |
 
 ### Health check settings
 
