@@ -126,7 +126,7 @@ When CCS is active, the dashboard:
 2. Validates every configured host during the health check.
 3. Shows the **Manager API** selector in the navigation bar so users can switch between managers (similar to 4.x).
 
-> **Important**: CCS alone does not enable the manager selector. The selector appears only when **both** conditions are met: remote clusters are registered in OpenSearch **and** multiple entries exist in `wazuh_core.hosts`. CCS is still required to query event data across indexer clusters using cross-cluster index patterns.
+> **Important**: The **Manager API** selector appears in the navigation bar as soon as the dashboard detects that remote clusters are registered in OpenSearch — even if only one `wazuh_core.hosts` entry is configured. To make the selector functional for switching between managers, define one `wazuh_core.hosts` entry per manager. CCS is also required to query event data across indexer clusters using cross-cluster index patterns.
 
 #### High-level setup
 
