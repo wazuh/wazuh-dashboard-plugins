@@ -18,7 +18,7 @@ Some settings have been removed entirely; others have been relocated to the **Ad
 
 | Location                                              | Settings                                                                                                               |
 | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `opensearch_dashboards.yml`                           | `wazuh_core.hosts`, `healthcheck.*`, `opensearchDashboards.branding.*`, `wazuh_check_updates.ctiRegistrationUiEnabled` |
+| `opensearch_dashboards.yml`                           | `wazuh_core.hosts`, `healthcheck.*`, `opensearchDashboards.branding.*`                                                 |
 | **☰ Menu > Dashboard Management > Advanced Settings** | `timeout`, `enrollment.dns`, `reports.csv.maxRows`, `wazuh.updates.disabled`                                           |
 
 Do not place the Advanced Settings keys in `opensearch_dashboards.yml`. They are tenant-level preferences managed through the UI (or the saved objects API), not server configuration file entries.
@@ -148,7 +148,7 @@ The periodic data collection features from 4.x are removed in 5.x:
 - **`cron.*` settings** — The statistics collection tasks that wrote agent state data to `wazuh-statistics-*` indices no longer exist. Remove all `cron.*` entries from your configuration. The `wazuh-statistics-*` indices are not created in 5.x.
 - **`wazuh.monitoring.*` settings** — The agent monitoring feature that periodically created `wazuh-monitoring-*` index snapshots no longer exists. Remove all `wazuh.monitoring.*` entries. Agent status is now queried on demand from the Wazuh manager API.
 
-If your deployment had dashboards or alerts that depended on either index, those will need to be rebuilt against the new data model (`wazuh-states-*` indices).
+If your deployment had dashboards or alerts that depended on either index, those will need to be rebuilt against the new data model (`wazuh-metrics-comms`, `wazuh-metrics-agents`, and `wazuh-metrics-normalization` indices).
 
 ### Customization settings
 
@@ -162,14 +162,6 @@ Custom branding configured through `customization.*` must be migrated to the nat
 The settings `customization.enabled`, `customization.logo.reports`, `customization.reports.header`, and `customization.reports.footer` have no equivalent in 5.x and must be removed. PDF report branding is not configurable because report generation is now handled by the OpenSearch Dashboards Reporting plugin.
 
 For a full branding migration example, see [Custom Branding](../../ref/custom-branding/custom-branding.md).
-
-### Check updates settings
-
-| 4.x setting     | 5.x key in `opensearch_dashboards.yml`         | Default |
-| --------------- | ---------------------------------------------- | ------- |
-| (no equivalent) | `wazuh_check_updates.ctiRegistrationUiEnabled` | `false` |
-
-This setting controls whether the CTI (Cyber Threat Intelligence) registration UI is shown in the Wazuh dashboard. It has no equivalent in 4.x. If your 5.x deployment shows unexpected CTI registration prompts, set this key to `false` in `opensearch_dashboards.yml`.
 
 ---
 
