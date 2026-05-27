@@ -23,7 +23,6 @@ interface AgentUpgradesInProgress {
   setIsModalVisible: (isModalVisible: boolean) => void;
   isPanelClosed: boolean;
   setIsPanelClosed: (isPanelClosed: boolean) => void;
-  allowGetTasks: boolean;
 }
 
 export const AgentUpgradesInProgress = ({
@@ -31,9 +30,9 @@ export const AgentUpgradesInProgress = ({
   setIsModalVisible,
   isPanelClosed,
   setIsPanelClosed,
-  allowGetTasks,
 }: AgentUpgradesInProgress) => {
   const [isUpgrading, setIsUpgrading] = useState(false);
+  const [errorShown, setErrorShown] = useState(false);
 
   const {
     totalInProgressTasks = 0,
@@ -44,7 +43,7 @@ export const AgentUpgradesInProgress = ({
     getErrorTasksError = undefined,
     totalTimeoutUpgradeTasks = 0,
     getTimeoutError = undefined,
-  } = allowGetTasks ? useGetUpgradeTasks(reload) : {};
+  } = useGetUpgradeTasks(reload);
 
   useEffect(() => {
     if (totalInProgressTasks > 0) {
@@ -52,37 +51,58 @@ export const AgentUpgradesInProgress = ({
     }
   }, [totalInProgressTasks]);
 
-  const showErrorToast = (status: string, error: any) => {
-    API_NAME_TASK_STATUS;
-    const options = {
-      context: `AgentUpgradesInProgress.useGetUpgradeTasks`,
-      level: UI_LOGGER_LEVELS.ERROR,
-      severity: UI_ERROR_SEVERITIES.BUSINESS,
-      store: true,
-      error: {
-        error,
-        message: error.message || error,
-        title: `Could not get upgrade tasks: ${status}`,
-      },
+  const anyError =
+    getInProgressError ||
+    getSuccessError ||
+    getErrorTasksError ||
+    getTimeoutError;
+  const isPermissionError = anyError?.response?.status === 403;
+
+  // Show error toast only once per error
+  useEffect(() => {
+    if (!anyError || errorShown) return;
+
+    const showErrorToast = (status: string, error: any) => {
+      const options = {
+        context: `AgentUpgradesInProgress.useGetUpgradeTasks`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        store: true,
+        error: {
+          error,
+          message: error.message || error,
+          title: isPermissionError
+            ? 'No permissions to view upgrade tasks'
+            : `Could not get upgrade tasks: ${status}`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     };
-    getErrorOrchestrator().handleError(options);
-  };
 
-  if (getInProgressError) {
-    showErrorToast(API_NAME_TASK_STATUS.IN_PROGRESS, getInProgressError);
-  }
+    if (isPermissionError) {
+      showErrorToast('', anyError);
+    } else {
+      if (getInProgressError) {
+        showErrorToast(API_NAME_TASK_STATUS.IN_PROGRESS, getInProgressError);
+      } else if (getSuccessError) {
+        showErrorToast(API_NAME_TASK_STATUS.DONE, getSuccessError);
+      } else if (getErrorTasksError) {
+        showErrorToast(API_NAME_TASK_STATUS.FAILED, getErrorTasksError);
+      } else if (getTimeoutError) {
+        showErrorToast(API_NAME_TASK_STATUS.TIMEOUT, getTimeoutError);
+      }
+    }
 
-  if (getSuccessError) {
-    showErrorToast(API_NAME_TASK_STATUS.DONE, getSuccessError);
-  }
-
-  if (getErrorTasksError) {
-    showErrorToast(API_NAME_TASK_STATUS.FAILED, getErrorTasksError);
-  }
-
-  if (getTimeoutError) {
-    showErrorToast(API_NAME_TASK_STATUS.TIMEOUT, getTimeoutError);
-  }
+    setErrorShown(true);
+  }, [
+    anyError,
+    errorShown,
+    isPermissionError,
+    getInProgressError,
+    getSuccessError,
+    getErrorTasksError,
+    getTimeoutError,
+  ]);
 
   const showTasks = isUpgrading || totalSuccessTasks || totalErrorUpgradeTasks;
   if (isPanelClosed || !showTasks) return null;

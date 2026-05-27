@@ -1,7 +1,6 @@
 import React from 'react';
 import { EuiToolTip } from '@elastic/eui';
 import { API_NAME_AGENT_STATUS } from '../../../../../common/constants';
-import { WzElementPermissions } from '../../../common/permissions/element';
 import { Agent } from '../../types';
 import NavigationService from '../../../../react-services/navigation-service';
 import { isVersionLower } from '../utils';
@@ -9,7 +8,6 @@ import { isVersionLower } from '../utils';
 type SetModalIsVisible = (visible: boolean) => void;
 
 export const agentsTableActions = (
-  allowEditGroups: boolean,
   setAgent: (agent: Agent) => void,
   setIsEditGroupsVisible: (visible: boolean) => void,
   setIsUpgradeModalVisible: (visible: boolean) => void,
@@ -20,7 +18,7 @@ export const agentsTableActions = (
   }: { setIsRemoveModalVisible: SetModalIsVisible },
 ) => [
   {
-    name: agent => {
+    name: (agent: Agent) => {
       const name = 'View agent details';
 
       if (agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
@@ -38,14 +36,15 @@ export const agentsTableActions = (
     type: 'icon',
     isPrimary: true,
     color: 'primary',
-    enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
-    onClick: agent =>
+    enabled: (agent: Agent) =>
+      agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
+    onClick: (agent: Agent) =>
       NavigationService.getInstance().navigate(
         `/agents?tab=welcome&agent=${agent.id}`,
       ),
   },
   {
-    name: agent => {
+    name: (agent: Agent) => {
       const name = 'Agent configuration';
 
       if (agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
@@ -61,23 +60,16 @@ export const agentsTableActions = (
     description: 'Agent configuration',
     icon: 'wrench',
     type: 'icon',
-    onClick: agent =>
+    onClick: (agent: Agent) =>
       NavigationService.getInstance().navigate(
         `/agents?tab=configuration&agent=${agent.id}`,
       ),
-    enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
+    enabled: (agent: Agent) =>
+      agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
     'data-test-subj': 'action-configuration',
   },
   {
-    name: (
-      <WzElementPermissions
-        permissions={[
-          { action: 'group:modify_assignments', resource: 'group:id:*' },
-        ]}
-      >
-        <span>Edit groups</span>
-      </WzElementPermissions>
-    ),
+    name: 'Edit groups',
     description: 'Edit groups',
     icon: 'pencil',
     type: 'icon',
@@ -86,7 +78,7 @@ export const agentsTableActions = (
       setIsEditGroupsVisible(true);
     },
     'data-test-subj': 'action-groups',
-    enabled: () => allowEditGroups,
+    enabled: () => true,
   },
   {
     name: (agent: Agent) => {
@@ -111,7 +103,7 @@ export const agentsTableActions = (
     description: 'Upgrade',
     icon: 'package',
     type: 'icon',
-    onClick: agent => {
+    onClick: (agent: Agent) => {
       setAgent(agent);
       setIsUpgradeModalVisible(true);
     },
@@ -122,19 +114,15 @@ export const agentsTableActions = (
     },
   },
   {
-    name: (agent: Agent) => {
-      return 'Remove';
-    },
+    name: 'Remove',
     description: 'Remove',
     icon: 'trash',
     type: 'icon',
-    onClick: agent => {
+    onClick: (agent: Agent) => {
       setAgent(agent);
       setIsRemoveModalVisible(true);
     },
     'data-test-subj': 'action-remove',
-    enabled: (agent: Agent) => {
-      return true;
-    },
+    enabled: () => true,
   },
 ];

@@ -8,7 +8,7 @@ import {
   removeGeneratedServerLocalDashboardFiles,
 } from './environmentConfigurator';
 import type { EnvironmentPaths, ScriptConfig } from '../types/config';
-import { PathAccessError, ValidationError } from '../errors';
+import { ValidationError } from '../errors';
 
 const MINIMAL_OSD_CONFIG = `wazuh_core.hosts:
   first-host:
@@ -26,7 +26,7 @@ describe('services/environmentConfigurator', () => {
     savedCwd = process.cwd();
     tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'wdp-env-'));
     process.chdir(tmpdir);
-    const osdConfigDir = path.join(tmpdir, 'config', '2.x', 'osd');
+    const osdConfigDir = path.join(tmpdir, 'config', 'osd');
     fs.mkdirSync(osdConfigDir, { recursive: true });
     fs.writeFileSync(
       path.join(osdConfigDir, 'opensearch_dashboards.yml'),
@@ -101,7 +101,6 @@ describe('services/environmentConfigurator', () => {
     expect(process.env.OSD_MAJOR_NUMBER).toBe('2');
     expect(process.env.COMPOSE_PROJECT_NAME).toBe('os-dev-291');
     expect(process.env.WAZUH_VERSION_DEVELOPMENT).toBe('4.12.0');
-    expect(process.env.OSD_MAJOR).toBe('2.x');
   });
 
   describe('configureModeAndSecurity', () => {
@@ -124,10 +123,9 @@ describe('services/environmentConfigurator', () => {
     };
 
     it('returns standard profile by default and sets security paths', () => {
-      process.env.OSD_MAJOR = '2.x';
       const profile = configureModeAndSecurity({ ...baseCfg });
       expect(profile).toBe('standard');
-      expect(process.env.WAZUH_DASHBOARD_CONF).toContain('/config/2.x/osd/');
+      expect(process.env.WAZUH_DASHBOARD_CONF).toContain('/config/osd/');
       expect(process.env.SEC_CONFIG_PATH).toContain(
         '/usr/share/wazuh-indexer/config',
       );
@@ -209,7 +207,7 @@ describe('services/environmentConfigurator', () => {
     it('removes *.generated.server-local.yml under docker/osd-dev/config/*/osd/', () => {
       const osdDir = path.join(
         envPaths.currentRepoContainerRoot,
-        'docker/osd-dev/config/2.x/osd',
+        'docker/osd-dev/config/osd',
       );
       fs.mkdirSync(osdDir, { recursive: true });
       const fake = path.join(

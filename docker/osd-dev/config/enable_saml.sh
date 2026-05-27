@@ -5,7 +5,7 @@
 # continuing
 sleep 7
 
-indexer="$1-os1-1"
+indexer="$1-wazuh.indexer-1"
 dashboard="$1-osd-1"
 
 # Setup keycloack to be used with wazuh-dashboards
