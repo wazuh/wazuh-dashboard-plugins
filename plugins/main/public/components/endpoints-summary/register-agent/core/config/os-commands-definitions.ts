@@ -16,6 +16,7 @@ import {
 } from '../../services/wazuh-password-service';
 import { IOSDefinition, tOptionalParams } from '../register-commands/types';
 import { PLUGIN_MAJOR_VERSION } from '../../../../../../common/constants';
+import { stage as RELEASE_STAGE } from '../../../../../../package.json';
 
 // Defined OS combinations
 
@@ -83,7 +84,8 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
   options: [
     {
       architecture: 'DEB amd64',
-      packageName: props => `wazuh-agent_${props.wazuhVersion}-beta2_amd64.deb`,
+      packageName: props =>
+        `wazuh-agent_${props.wazuhVersion}-${RELEASE_STAGE}_amd64.deb`,
       urlPackage: props =>
         `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/apt/pool/main/w/wazuh-agent/${props.packageName}`,
       installCommand: props => getDEBAMD64InstallCommand(props),
@@ -92,7 +94,7 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
     {
       architecture: 'RPM amd64',
       packageName: props =>
-        `wazuh-agent-${props.wazuhVersion}-beta2.x86_64.rpm`,
+        `wazuh-agent-${props.wazuhVersion}-${RELEASE_STAGE}.x86_64.rpm`,
       urlPackage: props =>
         `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/yum/${props.packageName}`,
       installCommand: props => getRPMAMD64InstallCommand(props),
@@ -100,7 +102,8 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
     },
     {
       architecture: 'DEB aarch64',
-      packageName: props => `wazuh-agent_${props.wazuhVersion}-beta2_arm64.deb`,
+      packageName: props =>
+        `wazuh-agent_${props.wazuhVersion}-${RELEASE_STAGE}_arm64.deb`,
       urlPackage: props =>
         `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/apt/pool/main/w/wazuh-agent/${props.packageName}`,
       installCommand: props => getDEBARM64InstallCommand(props),
@@ -109,7 +112,7 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
     {
       architecture: 'RPM aarch64',
       packageName: props =>
-        `wazuh-agent-${props.wazuhVersion}-beta2.aarch64.rpm`,
+        `wazuh-agent-${props.wazuhVersion}-${RELEASE_STAGE}.aarch64.rpm`,
       urlPackage: props =>
         `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/yum/${props.packageName}`,
       installCommand: props => getRPMARM64InstallCommand(props),
@@ -123,7 +126,8 @@ const windowsDefinition: IOSDefinition<IWindowsOSTypes, tOptionalParameters> = {
   options: [
     {
       architecture: 'MSI 32/64 bits',
-      packageName: props => `wazuh-agent-${props.wazuhVersion}-beta2.msi`,
+      packageName: props =>
+        `wazuh-agent-${props.wazuhVersion}-${RELEASE_STAGE}.msi`,
       urlPackage: props =>
         `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/windows/${props.packageName}`,
       installCommand: props => getWindowsInstallCommand(props),
@@ -138,7 +142,7 @@ const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
     {
       architecture: 'Intel',
       packageName: props =>
-        `wazuh-agent-${props.wazuhVersion}-beta2.intel64.pkg`,
+        `wazuh-agent-${props.wazuhVersion}-${RELEASE_STAGE}.intel64.pkg`,
       urlPackage: props =>
         `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/macos/${props.packageName}`,
       installCommand: props => getMacOsInstallCommand(props),
@@ -146,7 +150,8 @@ const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
     },
     {
       architecture: 'Apple silicon',
-      packageName: props => `wazuh-agent-${props.wazuhVersion}-beta2.arm64.pkg`,
+      packageName: props =>
+        `wazuh-agent-${props.wazuhVersion}-${RELEASE_STAGE}.arm64.pkg`,
       urlPackage: props =>
         `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/macos/${props.packageName}`,
       installCommand: props => getMacOsInstallCommand(props),
