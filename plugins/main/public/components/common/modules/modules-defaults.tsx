@@ -20,6 +20,7 @@ import {
   WazuhDiscover,
   WazuhDiscoverProps,
 } from '../wazuh-discover/wz-discover';
+import { CaseManagementTab } from '../document-details/case-management';
 import { threatHuntingColumns } from '../../overview/threat-hunting/events/threat-hunting-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
@@ -123,6 +124,30 @@ const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   };
 };
 
+/**
+ * Additional tabs included in the Document details flyout for all modules
+ * backed by wazuh-findings-v5* indices (see wazuh-indexer-plugins#1220).
+ *
+ * The case management tab lets analysts triage and annotate individual findings
+ * directly from the flyout without leaving the dashboard.
+ */
+const findingsDocumentDetailsTabs: WazuhDiscoverProps['additionalDocumentDetailsTabs'] =
+  ({ document }) => [
+    {
+      id: 'case-management',
+      name: 'Case',
+      content: <CaseManagementTab document={document as any} />,
+    },
+  ];
+
+const renderFindingsDiscoverTab = (
+  props: WazuhDiscoverProps,
+): ReturnType<typeof renderDiscoverTab> =>
+  renderDiscoverTab({
+    ...props,
+    additionalDocumentDetailsTabs: findingsDocumentDetailsTabs,
+  });
+
 export const ModulesDefaults = {
   general: {
     init: TAB_VIEW_ID_DASHBOARD, // The apps define a redirection URL when accessing so this value could be ignored. There is a recovery mechanism to select an available tab if the tabView URL query parameter has a value that is not one of the availabels in the tabs IDs
@@ -133,7 +158,7 @@ export const ModulesDefaults = {
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardThreatHunting,
       },
-      renderDiscoverTab({
+      renderFindingsDiscoverTab({
         moduleId: 'threat-hunting',
         tableColumns: threatHuntingColumns,
         DataSource: ThreatHuntingDataSource,
@@ -161,7 +186,7 @@ export const ModulesDefaults = {
         buttons: [ButtonExploreAgent],
         component: InventoryFIM,
       },
-      renderDiscoverTab({
+      renderFindingsDiscoverTab({
         moduleId: 'fim',
         tableColumns: fileIntegrityMonitoringColumns,
         DataSource: FIMFindingsDataSource,
@@ -179,7 +204,7 @@ export const ModulesDefaults = {
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardAzure,
       },
-      renderDiscoverTab({
+      renderFindingsDiscoverTab({
         moduleId: 'microsoftGraphAPI',
         tableColumns: azureColumns,
         DataSource: AzureDataSource,
@@ -197,7 +222,7 @@ export const ModulesDefaults = {
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardAWS,
       },
-      renderDiscoverTab({
+      renderFindingsDiscoverTab({
         moduleId: 'aws',
         tableColumns: amazonWebServicesColumns,
         DataSource: AWSDataSource,
@@ -215,7 +240,7 @@ export const ModulesDefaults = {
         component: DashboardGoogleCloud,
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
       },
-      renderDiscoverTab({
+      renderFindingsDiscoverTab({
         moduleId: 'gcp',
         tableColumns: googleCloudColumns,
         DataSource: GoogleCloudDataSource,
@@ -234,7 +259,7 @@ export const ModulesDefaults = {
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardMalwareDetection,
       },
-      renderDiscoverTab({
+      renderFindingsDiscoverTab({
         moduleId: 'pm',
         tableColumns: malwareDetectionColumns,
         DataSource: MalwareDetectionDataSource,
@@ -260,7 +285,7 @@ export const ModulesDefaults = {
         buttons: [ButtonExploreAgent],
         component: SCAInventory,
       },
-      renderDiscoverTab({
+      renderFindingsDiscoverTab({
         moduleId: 'sca',
         tableColumns: configurationAssessmentColumns,
         DataSource: ConfigurationAssessmentDataSource,
@@ -285,7 +310,7 @@ export const ModulesDefaults = {
         buttons: [ButtonExploreAgent],
         component: OfficePanel,
       },
-      renderDiscoverTab({
+      renderFindingsDiscoverTab({
         moduleId: 'office',
         tableColumns: office365Columns,
         DataSource: Office365DataSource,
@@ -309,7 +334,7 @@ export const ModulesDefaults = {
         buttons: [ButtonExploreAgent],
         component: GitHubPanel,
       },
-      renderDiscoverTab({
+      renderFindingsDiscoverTab({
         moduleId: 'github',
         tableColumns: githubColumns,
         DataSource: GitHubDataSource,
@@ -380,7 +405,7 @@ export const ModulesDefaults = {
         buttons: [ButtonExploreAgent],
         component: MainMitre,
       },
-      renderDiscoverTab({
+      renderFindingsDiscoverTab({
         moduleId: 'mitre',
         DataSource: MitreAttackDataSource,
         tableColumns: mitreAttackColumns,
@@ -401,7 +426,7 @@ export const ModulesDefaults = {
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardDocker,
       },
-      renderDiscoverTab({
+      renderFindingsDiscoverTab({
         moduleId: 'docker',
         tableColumns: dockerColumns,
         DataSource: DockerDataSource,
@@ -427,7 +452,7 @@ export const ModulesDefaults = {
           <ComplianceTable {...props} DataSource={PCIDSSDataSource} />
         ),
       },
-      renderDiscoverTab({
+      renderFindingsDiscoverTab({
         moduleId: 'pci',
         tableColumns: createRegulatoryComplianceColumns(
           'wazuh.rule.compliance.pci_dss',
@@ -456,7 +481,7 @@ export const ModulesDefaults = {
           <ComplianceTable {...props} DataSource={HIPAADataSource} />
         ),
       },
-      renderDiscoverTab({
+      renderFindingsDiscoverTab({
         moduleId: 'hipaa',
         tableColumns: createRegulatoryComplianceColumns(
           'wazuh.rule.compliance.hipaa',
@@ -484,7 +509,7 @@ export const ModulesDefaults = {
           <ComplianceTable {...props} DataSource={NIST80053DataSource} />
         ),
       },
-      renderDiscoverTab({
+      renderFindingsDiscoverTab({
         moduleId: 'nist',
         tableColumns: createRegulatoryComplianceColumns(
           'wazuh.rule.compliance.nist_800_53',
@@ -513,7 +538,7 @@ export const ModulesDefaults = {
           <ComplianceTable {...props} DataSource={GDPRDataSource} />
         ),
       },
-      renderDiscoverTab({
+      renderFindingsDiscoverTab({
         moduleId: 'gdpr',
         tableColumns: createRegulatoryComplianceColumns(
           'wazuh.rule.compliance.gdpr',
@@ -541,7 +566,7 @@ export const ModulesDefaults = {
           <ComplianceTable {...props} DataSource={TSCDataSource} />
         ),
       },
-      renderDiscoverTab({
+      renderFindingsDiscoverTab({
         moduleId: 'tsc',
         tableColumns: createRegulatoryComplianceColumns(
           'wazuh.rule.compliance.tsc',
