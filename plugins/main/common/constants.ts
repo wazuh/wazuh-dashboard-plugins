@@ -653,8 +653,8 @@ export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE_ID =
   'hidden-mitre-attack-rule-id';
 export const DATA_SOURCE_FILTER_CONTROLLED_GOOGLE_CLOUD_RULE_GROUP =
   'gcp-rule-group';
-export const DATA_SOURCE_FILTER_CONTROLLED_MALWARE_DETECTION_RULE_GROUP =
-  'malware-detection-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_MALWARE_DETECTION_THREAT_ENRICHMENTS_EXIST =
+  'malware-detection-threat-enrichments-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_AWS_RULE_GROUP = 'aws-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_AZURE_RULE_GROUP =
   'azure-rule-group'; // TODO: change this to 'azure-rule-group' if needed when Azure data source is implemented
