@@ -105,11 +105,13 @@ export const useCtiStatus = (deviceFlowNonce = 0) => {
       if (document.visibilityState !== 'visible') {
         return;
       }
-      if (
-        !ctiFlowState.getDeviceCode() ||
-        ctiFlowState.isRegistrationComplete() ||
-        ctiFlowState.isRegistered()
-      ) {
+      const hasActiveDeviceFlow =
+        Boolean(ctiFlowState.getDeviceCode()) &&
+        !ctiFlowState.isRegistrationComplete() &&
+        !ctiFlowState.isRegistered();
+      const isCurrentlyRegistered =
+        ctiFlowState.isRegistered() || ctiFlowState.isRegistrationComplete();
+      if (!hasActiveDeviceFlow && !isCurrentlyRegistered) {
         return;
       }
       void fetchStatus({ silent: true });
