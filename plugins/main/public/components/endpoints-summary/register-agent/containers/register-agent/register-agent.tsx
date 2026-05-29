@@ -67,10 +67,7 @@ export const RegisterAgent = compose(
   const [groups, setGroups] = useState([]);
   const [needsPassword, setNeedsPassword] = useState<boolean>(false);
   const [missingPasswordReadPermissions] = useUserPermissionsRequirements([
-    [
-      { action: 'manager:update_config', resource: '*:*:*' },
-      { action: 'cluster:update_config', resource: 'node:id:*' },
-    ],
+    [{ action: 'cluster:update_config', resource: 'node:id:*' }],
   ]);
   const canReadAuthdPassword = !missingPasswordReadPermissions;
 
