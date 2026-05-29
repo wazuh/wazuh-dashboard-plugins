@@ -8,7 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.7
 
-## Wazuh v4.14.6 - OpenSearch Dashboards 2.19.5 - Revision 00
+## Wazuh v4.14.6 - OpenSearch Dashboards 2.19.5 - Revision 01
 
 ### Added
 
@@ -18,6 +18,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed message when the server cluster is disabled and access to **Cluster** app [#8447](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8447)
 - Fixed agent removal, group editing, upgrading, and upgrade task details authorization by delegating RBAC enforcement to the API instead of the UI, and avoiding duplicated permission error toasts in upgrade task queries [#8464](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8464)
+- Fixed deployment and start commands being shown in the agent registration flow when the user lacks 'manager:update_config'/'cluster:update_config' permissions required to read the registration password [#8522](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8522) [#8555](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8555)
 
 ## Wazuh v4.14.5 - OpenSearch Dashboards 2.19.5 - Revision 01
 
@@ -250,6 +251,40 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Removed
 
 - Remove unused `node_build` field in package manifest of `wazuh` plugin [#7245](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7245)
+
+## Wazuh v4.10.5 - OpenSearch Dashboards 2.19.5 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.10.5
+
+## Wazuh v4.10.4 - OpenSearch Dashboards 2.19.5 - Revision 01
+
+### Added
+
+- Support for Wazuh 4.10.4
+- Added API selector warning in case run_as is false in the wazuh.yml file [#8026](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8135)
+
+### Changed
+
+- Set run_as as true by default in the wazuh.yml file [#8026](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8135)
+
+## Wazuh v4.10.3 - OpenSearch Dashboards 2.16.0 - Revision 01
+
+### Added
+
+- Support for Wazuh 4.10.3
+
+### Fixed
+
+- Fixed a bug that caused a format issue in csv reports [#7648](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7648)
+
+## Wazuh v4.10.2 - OpenSearch Dashboards 2.16.0 - Revision 01
+
+### Added
+
+- Support for Wazuh 4.10.2
+- Added a test to check the tables columns fields are known and new fields are added to the known fields of alerts index [#7433](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7433)
 
 ## Wazuh v4.10.1 - OpenSearch Dashboards 2.16.0 - Revision 01
 
