@@ -81,3 +81,49 @@ export function getDiscoverModule() {
 }
 
 export const [getCookies, setCookies] = createGetterSetter<any>('Cookies');
+
+let _wazuhStage = '';
+let _wazuhRevision = '01';
+
+type WazuhInjectedMetadata = {
+  getWazuhStage?: () => string;
+  getWazuhRevision?: () => string;
+};
+
+/** Stores the Wazuh release stage injected from the dashboard (e.g. "beta2", "" for production). */
+export function setWazuhBuildInfo(stage: string, revision: string) {
+  _wazuhStage = stage;
+  _wazuhRevision = revision;
+}
+
+/** Reads Wazuh build info from core.injectedMetadata (requires wazuh-dashboard plugin_context support). */
+export function initWazuhBuildInfoFromCore(
+  injectedMetadata: WazuhInjectedMetadata,
+): void {
+  if (
+    typeof injectedMetadata.getWazuhStage !== 'function' ||
+    typeof injectedMetadata.getWazuhRevision !== 'function'
+  ) {
+    return;
+  }
+
+  setWazuhBuildInfo(
+    injectedMetadata.getWazuhStage(),
+    injectedMetadata.getWazuhRevision(),
+  );
+}
+
+/** Returns the Wazuh release stage (e.g. "beta2", "" for production). */
+export function getWazuhStage(): string {
+  return _wazuhStage;
+}
+
+/** Returns the Wazuh package release revision (e.g. "01", "02"). */
+export function getWazuhRevision(): string {
+  return _wazuhRevision;
+}
+
+/** Returns true when the build is a pre-release (alpha/beta/rc). */
+export function isWazuhPreRelease(): boolean {
+  return _wazuhStage !== '' && !/^\d+$/.test(_wazuhStage);
+}
