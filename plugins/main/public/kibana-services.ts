@@ -84,16 +84,23 @@ export const [getCookies, setCookies] = createGetterSetter<any>('Cookies');
 
 let _wazuhStage = '';
 let _wazuhRevision = '01';
+let _wazuhIsProduction = false;
 
 type WazuhInjectedMetadata = {
   getWazuhStage?: () => string;
   getWazuhRevision?: () => string;
+  getWazuhIsProduction?: () => boolean;
 };
 
 /** Stores the Wazuh release stage injected from the dashboard (e.g. "beta2", "" for production). */
-export function setWazuhBuildInfo(stage: string, revision: string) {
+export function setWazuhBuildInfo(
+  stage: string,
+  revision: string,
+  isProduction = false,
+) {
   _wazuhStage = stage;
   _wazuhRevision = revision;
+  _wazuhIsProduction = isProduction;
 }
 
 /** Reads Wazuh build info from core.injectedMetadata (requires wazuh-dashboard plugin_context support). */
@@ -107,9 +114,15 @@ export function initWazuhBuildInfoFromCore(
     return;
   }
 
+  const isProduction =
+    typeof injectedMetadata.getWazuhIsProduction === 'function'
+      ? injectedMetadata.getWazuhIsProduction()
+      : false;
+
   setWazuhBuildInfo(
     injectedMetadata.getWazuhStage(),
     injectedMetadata.getWazuhRevision(),
+    isProduction,
   );
 }
 
@@ -123,7 +136,12 @@ export function getWazuhRevision(): string {
   return _wazuhRevision;
 }
 
-/** Returns true when the build is a pre-release (alpha/beta/rc). */
+/** Returns true when the dashboard build uses production package nomenclature. */
+export function isWazuhProductionBuild(): boolean {
+  return _wazuhIsProduction;
+}
+
+/** Returns true when the build is a pre-release (uses staging package repository). */
 export function isWazuhPreRelease(): boolean {
-  return _wazuhStage !== '' && !/^\d+$/.test(_wazuhStage);
+  return !_wazuhIsProduction;
 }
