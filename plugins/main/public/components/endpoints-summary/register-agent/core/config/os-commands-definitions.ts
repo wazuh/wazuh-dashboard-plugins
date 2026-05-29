@@ -113,36 +113,46 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
     {
       architecture: 'DEB amd64',
       packageName: props =>
-        `wazuh-agent_${props.wazuhVersion}-${getPackageBuildQualifier()}_amd64.deb`,
+        `wazuh-agent_${
+          props.wazuhVersion
+        }-${getPackageBuildQualifier()}_amd64.deb`,
       urlPackage: props =>
-        `${getPackagesBaseUrl()}/apt/pool/main/w/wazuh-agent/${props.packageName}`,
+        `${getPackagesBaseUrl()}/apt/pool/main/w/wazuh-agent/${
+          props.packageName
+        }`,
       installCommand: props => getDEBAMD64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
       architecture: 'RPM amd64',
       packageName: props =>
-        `wazuh-agent-${props.wazuhVersion}-${getPackageBuildQualifier()}.x86_64.rpm`,
-      urlPackage: props =>
-        `${getPackagesBaseUrl()}/yum/${props.packageName}`,
+        `wazuh-agent-${
+          props.wazuhVersion
+        }-${getPackageBuildQualifier()}.x86_64.rpm`,
+      urlPackage: props => `${getPackagesBaseUrl()}/yum/${props.packageName}`,
       installCommand: props => getRPMAMD64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
       architecture: 'DEB aarch64',
       packageName: props =>
-        `wazuh-agent_${props.wazuhVersion}-${getPackageBuildQualifier()}_arm64.deb`,
+        `wazuh-agent_${
+          props.wazuhVersion
+        }-${getPackageBuildQualifier()}_arm64.deb`,
       urlPackage: props =>
-        `${getPackagesBaseUrl()}/apt/pool/main/w/wazuh-agent/${props.packageName}`,
+        `${getPackagesBaseUrl()}/apt/pool/main/w/wazuh-agent/${
+          props.packageName
+        }`,
       installCommand: props => getDEBARM64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
       architecture: 'RPM aarch64',
       packageName: props =>
-        `wazuh-agent-${props.wazuhVersion}-${getPackageBuildQualifier()}.aarch64.rpm`,
-      urlPackage: props =>
-        `${getPackagesBaseUrl()}/yum/${props.packageName}`,
+        `wazuh-agent-${
+          props.wazuhVersion
+        }-${getPackageBuildQualifier()}.aarch64.rpm`,
+      urlPackage: props => `${getPackagesBaseUrl()}/yum/${props.packageName}`,
       installCommand: props => getRPMARM64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
@@ -170,18 +180,20 @@ const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
     {
       architecture: 'Intel',
       packageName: props =>
-        `wazuh-agent-${props.wazuhVersion}-${getPackageBuildQualifier()}.intel64.pkg`,
-      urlPackage: props =>
-        `${getPackagesBaseUrl()}/macos/${props.packageName}`,
+        `wazuh-agent-${
+          props.wazuhVersion
+        }-${getPackageBuildQualifier()}.intel64.pkg`,
+      urlPackage: props => `${getPackagesBaseUrl()}/macos/${props.packageName}`,
       installCommand: props => getMacOsInstallCommand(props),
       startCommand: props => getMacosStartCommand(props),
     },
     {
       architecture: 'Apple silicon',
       packageName: props =>
-        `wazuh-agent-${props.wazuhVersion}-${getPackageBuildQualifier()}.arm64.pkg`,
-      urlPackage: props =>
-        `${getPackagesBaseUrl()}/macos/${props.packageName}`,
+        `wazuh-agent-${
+          props.wazuhVersion
+        }-${getPackageBuildQualifier()}.arm64.pkg`,
+      urlPackage: props => `${getPackagesBaseUrl()}/macos/${props.packageName}`,
       installCommand: props => getMacOsInstallCommand(props),
       startCommand: props => getMacosStartCommand(props),
     },
