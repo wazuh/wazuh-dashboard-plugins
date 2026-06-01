@@ -16,12 +16,12 @@ export const techniquesColumns: tDataGridColumn[] = [
   },
   { id: 'wazuh.agent.name', displayAsText: 'Agent Name' },
   {
-    id: 'wazuh.rule.mitre.technique',
+    id: 'wazuh.rule.mitre.technique.id',
     displayAsText: 'Technique(s)',
     initialWidth: 200,
   },
   {
-    id: 'wazuh.rule.mitre.tactic',
+    id: 'wazuh.rule.mitre.tactic.id',
     displayAsText: 'Tactic(s)',
     initialWidth: 266,
   },
@@ -42,12 +42,12 @@ export const agentTechniquesColumns: tDataGridColumn[] = [
     render: value => formatUIDate(value),
   },
   {
-    id: 'wazuh.rule.mitre.technique',
+    id: 'wazuh.rule.mitre.technique.id',
     displayAsText: 'Technique(s)',
     initialWidth: 200,
   },
   {
-    id: 'wazuh.rule.mitre.tactic',
+    id: 'wazuh.rule.mitre.tactic.id',
     displayAsText: 'Tactic(s)',
     initialWidth: 266,
   },
