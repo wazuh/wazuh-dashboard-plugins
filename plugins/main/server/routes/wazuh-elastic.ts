@@ -50,6 +50,43 @@ export function WazuhElasticRoutes(router: IRouter) {
       ctrl.getCurrentPlatform(context, request, response),
   );
 
+  router.get(
+    {
+      path: '/elastic/security/current-user',
+      validate: false,
+    },
+    async (context, request, response) =>
+      ctrl.getCurrentUser(context, request, response),
+  );
+
+  router.post(
+    {
+      path: '/elastic/findings/case/{index}/{documentId}',
+      validate: {
+        params: schema.object({
+          index: schema.string(),
+          documentId: schema.string(),
+        }),
+        body: schema.object({
+          status: schema.maybe(
+            schema.oneOf([
+              schema.literal('ACTIVE'),
+              schema.literal('ACKNOWLEDGED'),
+              schema.literal('COMPLETED'),
+              schema.literal('ERROR'),
+              schema.literal('DELETED'),
+              schema.literal('AUDIT'),
+            ]),
+          ),
+          comment: schema.maybe(schema.string()),
+          tags: schema.maybe(schema.arrayOf(schema.string())),
+        }),
+      },
+    },
+    async (context, request, response) =>
+      ctrl.updateFindingsCase(context, request, response),
+  );
+
   // TODO: this seems that is unused and could be removed
   router.get(
     {

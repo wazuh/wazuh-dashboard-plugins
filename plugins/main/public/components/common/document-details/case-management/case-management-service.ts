@@ -11,7 +11,6 @@
  */
 
 import { GenericRequest } from '../../../../react-services/generic-request';
-import { WzRequest } from '../../../../react-services/wz-request';
 
 export type CaseStatus =
   | 'ACTIVE'
@@ -43,13 +42,16 @@ export interface UpdateCasePayload {
 }
 
 /**
- * Retrieves the current Wazuh API user name by calling /security/users/me.
- * Returns an empty string if the request fails.
+ * Retrieves the OpenSearch Dashboards logged-in user (not the Wazuh API user).
  */
-export async function getCurrentApiUsername(): Promise<string> {
+export async function getCurrentDashboardUsername(): Promise<string> {
   try {
-    const response = await WzRequest.apiReq('GET', '/security/users/me', {});
-    return (response?.data?.data?.affected_items?.[0]?.username as string) ?? '';
+    const response = await GenericRequest.request(
+      'GET',
+      '/elastic/security/current-user',
+      {},
+    );
+    return (response?.data?.username as string) ?? '';
   } catch {
     return '';
   }
@@ -58,31 +60,19 @@ export async function getCurrentApiUsername(): Promise<string> {
 /**
  * Updates the case management fields of a findings document.
  *
- * TODO: This stub will be replaced once the Wazuh Dashboard endpoint is
- * implemented (related: wazuh-indexer-plugins#1220).
+ * POST /elastic/findings/case/<index>/<documentId>
+ * Body: { status, comment, tags }
  *
- * The endpoint is expected to:
- *   POST /internal/wazuh/case/<index>/<documentId>
- *   Body: { status, comment, tags }
- *
- * The backend is responsible for:
- *  - Setting wazuh.case.user.name to the logged-in user.
- *  - Setting wazuh.case.created_at on first write.
- *  - Updating wazuh.case.updated_at on every write.
- *
- * @param index   - Index where the document lives (e.g. wazuh-findings-v5-security-000001)
- * @param docId   - OpenSearch document _id
- * @param payload - Editable case fields
+ * The backend sets wazuh.case.user.name, created_at and updated_at.
  */
 export async function updateDocumentCase(
   index: string,
   docId: string,
   payload: UpdateCasePayload,
 ): Promise<void> {
-  // TODO: replace with real endpoint path when the backend is ready.
   await GenericRequest.request(
     'POST',
-    `/internal/wazuh/case/${encodeURIComponent(index)}/${encodeURIComponent(docId)}`,
+    `/elastic/findings/case/${encodeURIComponent(index)}/${encodeURIComponent(docId)}`,
     payload,
   );
 }

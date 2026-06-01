@@ -235,7 +235,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 size='s'
                 onClick={handleSave}
                 isLoading={isSaving}
-                disabled={!isNewCase && !isDirty}
+                disabled={!status || (!isNewCase && !isDirty)}
               >
                 {isNewCase ? 'Create case' : 'Update case'}
               </EuiButton>

@@ -281,6 +281,142 @@ export class WazuhElasticCtrl {
   }
 
   /**
+   * Returns the OpenSearch Dashboards logged-in user (not the Wazuh API user).
+   */
+  async getCurrentUser(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const { username } = await context.wazuh.security.getCurrentUser(
+        request,
+        context,
+      );
+      return response.ok({
+        body: { username: username ?? '' },
+      });
+    } catch (error) {
+      context.wazuh.logger.error(error.message || error);
+      return ErrorResponse(error.message || error, 4012, 500, response);
+    }
+  }
+
+  /**
+   * Updates wazuh.case.* fields on a findings document (wazuh-findings-v5* indices).
+   */
+  async updateFindingsCase(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest<{
+      index: string;
+      documentId: string;
+    }>,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const { index, documentId } = request.params;
+      const { status, comment, tags } = request.body as {
+        status?: string;
+        comment?: string;
+        tags?: string[];
+      };
+
+      if (!this.isFindingsIndex(index)) {
+        return ErrorResponse(
+          'Case management is only supported on wazuh-findings-v5 indices',
+          4013,
+          HTTP_STATUS_CODES.BAD_REQUEST,
+          response,
+        );
+      }
+
+      const { username } = await context.wazuh.security.getCurrentUser(
+        request,
+        context,
+      );
+      if (!username) {
+        return ErrorResponse(
+          'Could not resolve the current user',
+          4014,
+          HTTP_STATUS_CODES.UNAUTHORIZED,
+          response,
+        );
+      }
+
+      const client = context.core.opensearch.client.asCurrentUser;
+      const encodedIndex = encodeURIComponent(index);
+      const encodedDocumentId = encodeURIComponent(documentId);
+
+      let existingCreatedAt: string | undefined;
+      try {
+        const getResponse = await client.transport.request({
+          method: 'GET',
+          path: `/${encodedIndex}/_doc/${encodedDocumentId}`,
+        });
+        existingCreatedAt = getResponse?.body?._source?.wazuh?.case?.created_at;
+      } catch (error: any) {
+        if (error?.meta?.statusCode !== 404) {
+          throw error;
+        }
+      }
+
+      const now = Date.now().toString();
+      const caseUpdate: Record<string, unknown> = {
+        user: { name: username },
+        updated_at: now,
+        created_at: existingCreatedAt ?? now,
+      };
+
+      if (status !== undefined) {
+        caseUpdate.status = status;
+      }
+      if (comment !== undefined) {
+        caseUpdate.comment = comment;
+      }
+      if (tags !== undefined) {
+        caseUpdate.tags = tags;
+      }
+
+      await client.transport.request({
+        method: 'POST',
+        path: `/${encodedIndex}/_update/${encodedDocumentId}`,
+        body: {
+          doc: {
+            wazuh: {
+              case: caseUpdate,
+            },
+          },
+        },
+      });
+
+      return response.ok({
+        body: {
+          message: 'Case updated successfully',
+          case: caseUpdate,
+        },
+      });
+    } catch (error: any) {
+      const [statusCode, errorMessage] = this.getErrorDetails(error);
+      context.wazuh.logger.error(
+        `Error updating findings case: ${errorMessage}`,
+      );
+      return ErrorResponse(
+        errorMessage,
+        WAZUH_STATUS_CODES.UNKNOWN,
+        statusCode,
+        response,
+      );
+    }
+  }
+
+  private isFindingsIndex(index: string): boolean {
+    return (
+      /^wazuh-findings-v5/i.test(index) ||
+      /^\.ds-wazuh-findings-v5/i.test(index)
+    );
+  }
+
+  /**
    * This creates sample data in wazuh-sample-data
    * GET /indexer/sampledata/{category}
    * @param {*} context

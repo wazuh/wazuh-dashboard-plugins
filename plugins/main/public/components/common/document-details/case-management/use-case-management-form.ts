@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useReducer } from 'react';
 import { EuiComboBoxOptionOption } from '@elastic/eui';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import {
@@ -24,7 +24,7 @@ import { getToasts } from '../../../../kibana-services';
 import {
   CaseStatus,
   UpdateCasePayload,
-  getCurrentApiUsername,
+  getCurrentDashboardUsername,
   updateDocumentCase,
 } from './case-management-service';
 
@@ -53,11 +53,141 @@ export interface UseCaseManagementFormReturn {
   handleReset: () => void;
 }
 
+type CaseFormBaseline = {
+  status: CaseStatus | undefined;
+  comment: string;
+  tags: string[];
+};
+
+type CaseFormState = {
+  status: CaseStatus | undefined;
+  comment: string;
+  tags: EuiComboBoxOptionOption[];
+  currentUsername: string;
+  isLoadingUser: boolean;
+  existingCreatedAt: string | number | undefined;
+  existingUpdatedAt: string | number | undefined;
+  isSaving: boolean;
+  baseline: CaseFormBaseline;
+};
+
+type DocumentCaseValues = {
+  status: CaseStatus | undefined;
+  comment: string;
+  tags: string[];
+  userName: string;
+  createdAt: string | number | undefined;
+  updatedAt: string | number | undefined;
+};
+
+type CaseFormAction =
+  | { type: 'LOAD_DOCUMENT'; payload: DocumentCaseValues }
+  | { type: 'SET_DASHBOARD_USER'; payload: string }
+  | { type: 'SET_LOADING_USER'; payload: boolean }
+  | { type: 'SET_STATUS'; payload: CaseStatus }
+  | { type: 'SET_COMMENT'; payload: string }
+  | { type: 'SET_TAGS'; payload: EuiComboBoxOptionOption[] }
+  | { type: 'ADD_TAG'; payload: string }
+  | { type: 'RESET' }
+  | { type: 'SAVE_START' }
+  | { type: 'SAVE_END' }
+  | {
+      type: 'SAVE_SUCCESS';
+      payload: {
+        status: CaseStatus;
+        comment: string;
+        tags: string[];
+        createdAt: string | number;
+        updatedAt: string | number;
+      };
+    };
+
+const tagsToOptions = (tagLabels: string[]): EuiComboBoxOptionOption[] =>
+  tagLabels.map(label => ({ label }));
+
+const createInitialState = (): CaseFormState => ({
+  status: undefined,
+  comment: '',
+  tags: [],
+  currentUsername: '',
+  isLoadingUser: true,
+  existingCreatedAt: undefined,
+  existingUpdatedAt: undefined,
+  isSaving: false,
+  baseline: { status: undefined, comment: '', tags: [] },
+});
+
+function caseFormReducer(state: CaseFormState, action: CaseFormAction): CaseFormState {
+  switch (action.type) {
+    case 'LOAD_DOCUMENT': {
+      const { status, comment, tags, userName, createdAt, updatedAt } = action.payload;
+      const baseline: CaseFormBaseline = { status, comment, tags };
+      return {
+        ...state,
+        status,
+        comment,
+        tags: tagsToOptions(tags),
+        baseline,
+        existingCreatedAt: createdAt,
+        existingUpdatedAt: updatedAt,
+        currentUsername: userName,
+        isLoadingUser: !userName,
+        isSaving: false,
+      };
+    }
+    case 'SET_DASHBOARD_USER':
+      return {
+        ...state,
+        currentUsername: action.payload,
+        isLoadingUser: false,
+      };
+    case 'SET_LOADING_USER':
+      return { ...state, isLoadingUser: action.payload };
+    case 'SET_STATUS':
+      return { ...state, status: action.payload };
+    case 'SET_COMMENT':
+      return { ...state, comment: action.payload };
+    case 'SET_TAGS':
+      return { ...state, tags: action.payload };
+    case 'ADD_TAG': {
+      const trimmed = action.payload.trim();
+      if (!trimmed) return state;
+      return { ...state, tags: [...state.tags, { label: trimmed }] };
+    }
+    case 'RESET':
+      return {
+        ...state,
+        status: state.baseline.status,
+        comment: state.baseline.comment,
+        tags: tagsToOptions(state.baseline.tags),
+      };
+    case 'SAVE_START':
+      return { ...state, isSaving: true };
+    case 'SAVE_END':
+      return { ...state, isSaving: false };
+    case 'SAVE_SUCCESS': {
+      const { status, comment, tags, createdAt, updatedAt } = action.payload;
+      return {
+        ...state,
+        status,
+        comment,
+        tags: tagsToOptions(tags),
+        baseline: { status, comment, tags },
+        existingCreatedAt: state.existingCreatedAt ?? createdAt,
+        existingUpdatedAt: updatedAt,
+        isSaving: false,
+      };
+    }
+    default:
+      return state;
+  }
+}
+
 /**
  * Reads a nested dotted key (e.g. `"wazuh.case.status"`) from a flat _source
  * object that may store it either flattened or truly nested.
  */
-function readSourceField<T = unknown>(
+export function readSourceField<T = unknown>(
   source: Record<string, unknown> | undefined,
   dotKey: string,
 ): T | undefined {
@@ -74,83 +204,125 @@ function readSourceField<T = unknown>(
   return current as T | undefined;
 }
 
+function extractCaseValuesFromDocument(
+  document: CaseManagementFormDocument,
+): DocumentCaseValues {
+  const source = document._source;
+  return {
+    status: readSourceField<CaseStatus>(source, 'wazuh.case.status'),
+    comment: readSourceField<string>(source, 'wazuh.case.comment') ?? '',
+    tags: readSourceField<string[]>(source, 'wazuh.case.tags') ?? [],
+    userName: readSourceField<string>(source, 'wazuh.case.user.name') ?? '',
+    createdAt: readSourceField<string | number>(source, 'wazuh.case.created_at'),
+    updatedAt: readSourceField<string | number>(source, 'wazuh.case.updated_at'),
+  };
+}
+
+function isFormDirty(state: CaseFormState): boolean {
+  const { baseline, status, comment, tags } = state;
+  return (
+    status !== baseline.status ||
+    comment !== baseline.comment ||
+    tags.map(t => t.label).join(',') !== baseline.tags.join(',')
+  );
+}
+
 export function useCaseManagementForm(
   document: CaseManagementFormDocument,
 ): UseCaseManagementFormReturn {
-  const source = document._source;
+  const documentKey = `${document._index}:${document._id}`;
+  const [state, dispatch] = useReducer(caseFormReducer, undefined, createInitialState);
 
-  // ── Extract existing values from the document ──────────────────────────
-  const existingStatus = readSourceField<CaseStatus>(source, 'wazuh.case.status');
-  const existingComment = readSourceField<string>(source, 'wazuh.case.comment') ?? '';
-  const existingTags = readSourceField<string[]>(source, 'wazuh.case.tags') ?? [];
-  const existingUserName = readSourceField<string>(source, 'wazuh.case.user.name') ?? '';
-  const existingCreatedAt = readSourceField<string | number>(source, 'wazuh.case.created_at');
-  const existingUpdatedAt = readSourceField<string | number>(source, 'wazuh.case.updated_at');
+  const isNewCase = state.baseline.status === undefined;
+  const isDirty = isFormDirty(state);
 
-  const isNewCase = !existingStatus;
-
-  // ── Capture initial form values once (used for dirty detection) ─────────
-  const initialRef = useRef({
-    status: existingStatus,
-    comment: existingComment,
-    tags: existingTags,
-  });
-
-  // ── Form state ─────────────────────────────────────────────────────────
-  const [status, setStatus] = useState<CaseStatus | undefined>(existingStatus);
-  const [comment, setComment] = useState<string>(existingComment);
-  const [tags, setTags] = useState<EuiComboBoxOptionOption[]>(
-    existingTags.map(t => ({ label: t })),
-  );
-  const [currentUsername, setCurrentUsername] = useState<string>(existingUserName);
-  const [isLoadingUser, setIsLoadingUser] = useState<boolean>(!existingUserName);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
-
-  // ── Dirty check — no fallbacks, compare against initial captured values ─
-  const isDirty =
-    status !== initialRef.current.status ||
-    comment !== initialRef.current.comment ||
-    tags.map(t => t.label).join(',') !== initialRef.current.tags.join(',');
-
-  // ── Load current user name if the document doesn't have one yet ─────────
   useEffect(() => {
-    if (existingUserName) return;
+    dispatch({
+      type: 'LOAD_DOCUMENT',
+      payload: extractCaseValuesFromDocument(document),
+    });
+  }, [documentKey, document._source]);
+
+  useEffect(() => {
+    const { userName } = extractCaseValuesFromDocument(document);
+    if (userName) {
+      return;
+    }
+
     let cancelled = false;
-    setIsLoadingUser(true);
-    getCurrentApiUsername()
+    dispatch({ type: 'SET_LOADING_USER', payload: true });
+    getCurrentDashboardUsername()
       .then(username => {
-        if (!cancelled) setCurrentUsername(username);
+        if (!cancelled) {
+          dispatch({ type: 'SET_DASHBOARD_USER', payload: username });
+        }
       })
-      .finally(() => {
-        if (!cancelled) setIsLoadingUser(false);
+      .catch(() => {
+        if (!cancelled) {
+          dispatch({ type: 'SET_LOADING_USER', payload: false });
+        }
       });
+
     return () => {
       cancelled = true;
     };
-  }, [existingUserName]);
+  }, [documentKey, document._source]);
 
-  // ── Handlers ───────────────────────────────────────────────────────────
+  const setStatus = useCallback(
+    (status: CaseStatus) => dispatch({ type: 'SET_STATUS', payload: status }),
+    [],
+  );
+  const setComment = useCallback(
+    (comment: string) => dispatch({ type: 'SET_COMMENT', payload: comment }),
+    [],
+  );
+  const setTags = useCallback(
+    (tags: EuiComboBoxOptionOption[]) => dispatch({ type: 'SET_TAGS', payload: tags }),
+    [],
+  );
+
   const handleTagCreate = useCallback((searchValue: string) => {
-    const trimmed = searchValue.trim();
-    if (!trimmed) return;
-    setTags(prev => [...prev, { label: trimmed }]);
+    dispatch({ type: 'ADD_TAG', payload: searchValue });
   }, []);
 
   const handleReset = useCallback(() => {
-    setStatus(initialRef.current.status);
-    setComment(initialRef.current.comment);
-    setTags(initialRef.current.tags.map(t => ({ label: t })));
+    dispatch({ type: 'RESET' });
   }, []);
 
   const handleSave = useCallback(async () => {
-    setIsSaving(true);
+    if (!state.status) {
+      getToasts().add({
+        color: 'warning',
+        title: 'Status is required',
+        toastLifeTimeMs: 3000,
+      });
+      return;
+    }
+
+    const trimmedComment = state.comment.trim();
+    const tagLabels = state.tags.map(t => t.label).filter(Boolean);
+
+    dispatch({ type: 'SAVE_START' });
     try {
       const payload: UpdateCasePayload = {
-        status,
-        comment: comment.trim() || undefined,
-        tags: tags.map(t => t.label).filter(Boolean),
+        status: state.status,
+        comment: trimmedComment || undefined,
+        tags: tagLabels,
       };
       await updateDocumentCase(document._index, document._id, payload);
+
+      const now = Date.now();
+      dispatch({
+        type: 'SAVE_SUCCESS',
+        payload: {
+          status: state.status,
+          comment: trimmedComment,
+          tags: tagLabels,
+          createdAt: now,
+          updatedAt: now,
+        },
+      });
+
       getToasts().add({
         color: 'success',
         title: isNewCase ? 'Case created' : 'Case updated',
@@ -170,20 +342,19 @@ export function useCaseManagementForm(
         },
       };
       getErrorOrchestrator().handleError(options);
-    } finally {
-      setIsSaving(false);
+      dispatch({ type: 'SAVE_END' });
     }
-  }, [document._index, document._id, status, comment, tags, isNewCase]);
+  }, [document._index, document._id, state.status, state.comment, state.tags, isNewCase]);
 
   return {
-    status,
-    comment,
-    tags,
-    currentUsername,
-    isLoadingUser,
-    existingCreatedAt,
-    existingUpdatedAt,
-    isSaving,
+    status: state.status,
+    comment: state.comment,
+    tags: state.tags,
+    currentUsername: state.currentUsername,
+    isLoadingUser: state.isLoadingUser,
+    existingCreatedAt: state.existingCreatedAt,
+    existingUpdatedAt: state.existingUpdatedAt,
+    isSaving: state.isSaving,
     isDirty,
     isNewCase,
     setStatus,
