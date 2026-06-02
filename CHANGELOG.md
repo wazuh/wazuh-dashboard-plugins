@@ -17,7 +17,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added `server-api:run_as` health check to warn when `allow_run_as` is disabled for configured API hosts [#8050](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8050)
 - Fixed styling issues for v9 theme [#8064](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8064)
 - Added Indexer management **Settings** [#8206](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8206)
-- Added `wazuh-findings-v5*` index patterns [#8233](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8233) [#8520](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8520)
+- Added `wazuh-findings-v5*` index patterns [#8233](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8233) [#8520](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8520) [#8577](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8577)
 - Added `policy.name`, `policy.description`, `policy.file` and `event.outcome` columns to the Configuration Assessment Findings table [#8264](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8264)
 - Added `wazuh-state-fim*` index pattern [#8248](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8248)
 - Added Indexer configuration UI section in Server Management Settings [#8289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8289)
