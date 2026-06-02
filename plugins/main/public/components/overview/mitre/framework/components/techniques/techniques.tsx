@@ -225,8 +225,8 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
       return props.windowSize.width < 930
         ? 2
         : props.windowSize.width < 1200
-        ? 3
-        : 4;
+          ? 3
+          : 4;
     } else {
       return 4;
     }
@@ -363,8 +363,8 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
         state.filteredTechniques
           ? state.filteredTechniques.includes(technique.id)
           : technique.id && hash[technique.id]
-          ? false
-          : (hash[technique.id] = true),
+            ? false
+            : (hash[technique.id] = true),
       )
       .map(technique => {
         return {
