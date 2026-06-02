@@ -440,7 +440,17 @@ function isAggregatable(fieldProps, esType) {
  */
 function shouldReadFromDocValues(fieldProps, esType) {
   // These field types don't use doc values
-  if (['_id', '_index', '_source', '_type', 'text', 'flat_object', 'nested'].includes(esType))
+  if (
+    [
+      '_id',
+      '_index',
+      '_source',
+      '_type',
+      'text',
+      'flat_object',
+      'nested',
+    ].includes(esType)
+  )
     return false;
 
   // Check if explicitly disabled
@@ -472,7 +482,12 @@ function createExtractionIssuesContext() {
 /**
  * Recursively extracts field definitions from template mappings
  */
-function extractFieldsFromProperties(properties, prefix = '', issues, nestedPath = null) {
+function extractFieldsFromProperties(
+  properties,
+  prefix = '',
+  issues,
+  nestedPath = null,
+) {
   const fields = [];
 
   // Add basic index meta fields if we're at root level
@@ -569,7 +584,8 @@ function extractFieldsFromProperties(properties, prefix = '', issues, nestedPath
       // Handle nested or object type with properties
       if ((esType === 'nested' || esType === 'object') && fieldDef.properties) {
         // When entering a nested type, set it as the new nestedPath
-        const childNestedPath = esType === 'nested' ? fullFieldName : nestedPath;
+        const childNestedPath =
+          esType === 'nested' ? fullFieldName : nestedPath;
         fields.push(
           ...extractFieldsFromProperties(
             fieldDef.properties,
