@@ -375,13 +375,17 @@ function mapIndexFieldType(esType, field) {
   const typeMapping = {
     keyword: 'string',
     text: 'string',
+    flat_object: 'string',
     date: 'date',
     long: 'number',
     integer: 'number',
+    short: 'number',
     double: 'number',
     float: 'number',
     byte: 'number',
+    half_float: 'number',
     scaled_float: 'number',
+    unsigned_long: 'number',
     boolean: 'boolean',
     ip: 'ip',
     geo_point: 'geo_point',
@@ -428,7 +432,7 @@ function isAggregatable(fieldProps, esType) {
     return false;
 
   // Most structured types are aggregatable
-  return !['text', '_source', 'nested'].includes(esType);
+  return !['text', 'flat_object', '_source', 'nested'].includes(esType);
 }
 
 /**
@@ -436,7 +440,7 @@ function isAggregatable(fieldProps, esType) {
  */
 function shouldReadFromDocValues(fieldProps, esType) {
   // These field types don't use doc values
-  if (['_id', '_index', '_source', '_type', 'text', 'nested'].includes(esType))
+  if (['_id', '_index', '_source', '_type', 'text', 'flat_object', 'nested'].includes(esType))
     return false;
 
   // Check if explicitly disabled
@@ -468,7 +472,7 @@ function createExtractionIssuesContext() {
 /**
  * Recursively extracts field definitions from template mappings
  */
-function extractFieldsFromProperties(properties, prefix = '', issues) {
+function extractFieldsFromProperties(properties, prefix = '', issues, nestedPath = null) {
   const fields = [];
 
   // Add basic index meta fields if we're at root level
@@ -532,6 +536,11 @@ function extractFieldsFromProperties(properties, prefix = '', issues) {
         readFromDocValues: shouldReadFromDocValues(fieldDef, esType),
       };
 
+      // Add subType for fields that live inside a nested object
+      if (nestedPath && esType !== 'nested' && esType !== 'object') {
+        field.subType = { nested: { path: nestedPath } };
+      }
+
       if (!(esType === 'object' || esType === 'nested') || !fieldDef.properties)
         fields.push(field);
 
@@ -550,17 +559,23 @@ function extractFieldsFromProperties(properties, prefix = '', issues) {
             aggregatable: isAggregatable(subFieldDef, subEsType),
             readFromDocValues: shouldReadFromDocValues(subFieldDef, subEsType),
           };
+          if (nestedPath) {
+            subField.subType = { nested: { path: nestedPath } };
+          }
           fields.push(subField);
         }
       }
 
       // Handle nested or object type with properties
       if ((esType === 'nested' || esType === 'object') && fieldDef.properties) {
+        // When entering a nested type, set it as the new nestedPath
+        const childNestedPath = esType === 'nested' ? fullFieldName : nestedPath;
         fields.push(
           ...extractFieldsFromProperties(
             fieldDef.properties,
             fullFieldName,
             issues,
+            childNestedPath,
           ),
         );
       }
@@ -571,6 +586,7 @@ function extractFieldsFromProperties(properties, prefix = '', issues) {
           fieldDef.properties,
           fullFieldName,
           issues,
+          nestedPath,
         ),
       );
     }
