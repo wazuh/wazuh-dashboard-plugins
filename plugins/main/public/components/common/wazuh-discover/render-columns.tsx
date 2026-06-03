@@ -1,6 +1,6 @@
 import React from 'react';
 import { EuiLink, EuiToolTip } from '@elastic/eui';
-import { tDataGridRenderColumn } from '../data-grid';
+import { RenderColumnOptions, tDataGridRenderColumn } from '../data-grid';
 import { endpointSummary, mitreAttack } from '../../../utils/applications';
 import { WzLink } from '../../wz-link/wz-link';
 import { i18n } from '@osd/i18n';
@@ -50,11 +50,32 @@ const mitreList = (value: string | string[]) =>
 const renderMitreList = (
   value: string | string[],
   renderItem?: (item: string, isOnly: boolean) => React.ReactNode,
+  options?: RenderColumnOptions,
 ) => {
   const items = mitreList(value);
 
   if (!items.length) {
     return '-';
+  }
+
+  if (options?.context === 'doc-viewer') {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          gap: '0 4px',
+        }}
+      >
+        {items.map((item, index) => (
+          <span key={`${item}-${index}`} style={{ whiteSpace: 'nowrap' }}>
+            {renderItem ? renderItem(item, true) : item}
+            {index < items.length - 1 ? ',' : ''}
+          </span>
+        ))}
+      </div>
+    );
   }
 
   const label = items.join(', ');
@@ -149,14 +170,16 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   },
   {
     id: 'wazuh.rule.mitre.technique',
-    render: (value: string | string[]) =>
-      renderMitreList(value, renderMitreTechnique),
+    render: (
+      value: string | string[],
+      _row: object,
+      options?: RenderColumnOptions,
+    ) => renderMitreList(value, renderMitreTechnique, options),
   },
   {
     id: 'wazuh.rule.mitre.tactic',
     render: (value: string | string[]) => renderMitreList(value),
   },
-
   {
     id: 'wazuh.rule.compliance.pci_dss',
     render: renderRequirementsSecurityOperations,
