@@ -169,7 +169,7 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
     render: renderLinksReference,
   },
   {
-    id: 'wazuh.rule.mitre.technique',
+    id: 'wazuh.rule.mitre.technique.id',
     render: (
       value: string | string[],
       _row: object,
@@ -177,7 +177,24 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
     ) => renderMitreList(value, renderMitreTechnique, options),
   },
   {
-    id: 'wazuh.rule.mitre.tactic',
+    id: 'wazuh.rule.mitre.technique.name',
+    render: (value: string | string[]) => renderMitreList(value),
+  },
+  {
+    id: 'wazuh.rule.mitre.tactic.id',
+    render: (value: string | string[]) => renderMitreList(value),
+  },
+  {
+    id: 'wazuh.rule.mitre.tactic.name',
+    render: (value: string | string[]) => renderMitreList(value),
+  },
+  {
+    id: 'wazuh.rule.mitre.subtechnique.id',
+    render: (value: string | string[]) =>
+      renderMitreList(value, renderMitreTechnique),
+  },
+  {
+    id: 'wazuh.rule.mitre.subtechnique.name',
     render: (value: string | string[]) => renderMitreList(value),
   },
   {
