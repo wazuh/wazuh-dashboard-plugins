@@ -222,7 +222,9 @@ const DocViewer = (props: tDocViewerProps) => {
                       ) ? (
                         renderFields
                           ?.find((field: string) => field.id === displayName)
-                          .render(flattened[displayName], docJSON)
+                          .render(flattened[displayName], docJSON, {
+                            context: 'doc-viewer',
+                          })
                       ) : (
                         <div
                           className={valueClassName}
