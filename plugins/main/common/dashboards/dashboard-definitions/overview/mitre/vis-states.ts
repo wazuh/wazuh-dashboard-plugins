@@ -121,8 +121,8 @@ export const getVisStateAlertsEvolution = (
           type: 'terms',
           schema: 'group',
           params: {
-            field: 'rule.mitre.technique',
-            customLabel: 'Attack ID',
+            field: 'wazuh.rule.mitre.technique.name',
+            customLabel: 'Technique Name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -210,7 +210,7 @@ export const getVisStateTopTactics = (indexPatternId: string): SavedVis => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'rule.mitre.tactic',
+            field: 'wazuh.rule.mitre.tactic.name',
             orderBy: '1',
             order: 'desc',
             size: 10,
@@ -328,7 +328,7 @@ export const getVisStateAttacksByTechnique = (
           type: 'terms',
           schema: 'group',
           params: {
-            field: 'rule.mitre.technique',
+            field: 'wazuh.rule.mitre.technique.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -344,7 +344,7 @@ export const getVisStateAttacksByTechnique = (
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'rule.mitre.tactic',
+            field: 'wazuh.rule.mitre.tactic.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -475,7 +475,7 @@ export const getVisStateTopTacticsByAgent = (
           type: 'terms',
           schema: 'group',
           params: {
-            field: 'rule.mitre.tactic',
+            field: 'wazuh.rule.mitre.tactic.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -567,7 +567,7 @@ export const getVisStateTechniqueByAgent = (
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'rule.mitre.technique',
+            field: 'wazuh.rule.mitre.technique.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -668,7 +668,7 @@ export const getVisStateAlertsLevelByAttack = (
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'rule.mitre.technique',
+            field: 'wazuh.rule.mitre.technique.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -676,7 +676,7 @@ export const getVisStateAlertsLevelByAttack = (
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'Attack ID',
+            customLabel: 'Technique Name',
           },
         },
         {
@@ -804,7 +804,7 @@ export const getVisStateMitreAttacksByTactic = (
           type: 'terms',
           schema: 'group',
           params: {
-            field: 'rule.mitre.technique',
+            field: 'wazuh.rule.mitre.technique.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -820,7 +820,7 @@ export const getVisStateMitreAttacksByTactic = (
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'rule.mitre.tactic',
+            field: 'wazuh.rule.mitre.tactic.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -908,7 +908,7 @@ export const getVisStateAlertsLevelByTactic = (
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'rule.mitre.tactic',
+            field: 'wazuh.rule.mitre.tactic.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -916,7 +916,7 @@ export const getVisStateAlertsLevelByTactic = (
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'Attack ID',
+            customLabel: 'Tactic Name',
           },
         },
         {

@@ -56,7 +56,7 @@ const MitreTopTacticsTactics = compose(
         aggs: {
           tactics: {
             terms: {
-              field: 'wazuh.rule.mitre.tactic',
+              field: 'wazuh.rule.mitre.tactic.name',
               size: 5,
             },
           },
@@ -149,7 +149,7 @@ const MitreTopTacticsTechniquesBody = compose(
           ...props.dataSource.fetchFilters,
           PatternDataSourceFilterManager.createFilter(
             FILTER_OPERATOR.IS,
-            'wazuh.rule.mitre.tactic',
+            'wazuh.rule.mitre.tactic.name',
             selectedTactic,
             props.dataSource.dataSource.indexPattern.id,
           ),
@@ -157,7 +157,7 @@ const MitreTopTacticsTechniquesBody = compose(
         aggs: {
           tactics: {
             terms: {
-              field: 'wazuh.rule.mitre.technique',
+              field: 'wazuh.rule.mitre.technique.id',
               size: 5,
             },
           },
@@ -198,7 +198,7 @@ const MitreTopTacticsTechniquesBody = compose(
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
-        `wazuh.rule.mitre.technique`,
+        `wazuh.rule.mitre.technique.id`,
         techniqueID,
         indexPatternId,
       ),
@@ -217,7 +217,7 @@ const MitreTopTacticsTechniquesBody = compose(
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
-        `wazuh.rule.mitre.technique`,
+        `wazuh.rule.mitre.technique.id`,
         techniqueID,
         indexPatternId,
       ),
