@@ -23,6 +23,7 @@ import {
   EuiFlexItem,
   EuiForm,
   EuiFormRow,
+  EuiLoadingSpinner,
   EuiSelect,
   EuiSpacer,
   EuiText,
@@ -169,16 +170,18 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({ document }
         />
       </EuiFlexItem>
 
-      <EuiSpacer size='s' />
+      {!isNewCase && <EuiSpacer size='s' />}
 
       {/* Editable fields */}
       <EuiFlexItem>
       <EuiForm component='form'>
           <EuiFormRow
+            fullWidth
             label='Status'
             helpText='Current lifecycle status of this finding.'
           >
           <EuiSelect
+            fullWidth
             options={CASE_STATUS_OPTIONS}
             value={status}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
@@ -193,10 +196,12 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({ document }
           <EuiSpacer size='m' />
 
           <EuiFormRow
+            fullWidth
             label='Tags'
             helpText='Type a tag name and press Enter to add it.'
           >
           <EuiComboBox
+            fullWidth
             noSuggestions
             placeholder='Add tags…'
             selectedOptions={tags}
