@@ -54,11 +54,13 @@ const STATUS_BADGE_COLOR: Record<CaseStatus, string> = {
   DELETED: 'default',
 };
 
-/**
- * Formats an epoch-milliseconds or ISO timestamp for human-readable display.
- */
 function formatTimestamp(value: string | number): string {
-  const date = new Date(typeof value === 'string' ? value : Number(value));
+  const ms = typeof value === 'number' ? value : Number(value);
+  if (!isNaN(ms)) {
+    const date = new Date(ms);
+    if (!isNaN(date.getTime())) return date.toLocaleString();
+  }
+  const date = new Date(value as string);
   return isNaN(date.getTime()) ? String(value) : date.toLocaleString();
 }
 
