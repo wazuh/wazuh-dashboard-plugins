@@ -68,15 +68,13 @@ interface CaseManagementTabProps {
   document: CaseManagementFormDocument;
 }
 
-export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
-  document,
-}) => {
+export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({ document }) => {
   const {
     status,
     comment,
     tags,
     currentUsername,
-    isLoadingUser,
+    isLoadingCase,
     existingCreatedAt,
     existingUpdatedAt,
     isSaving,
@@ -90,12 +88,22 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     handleReset,
   } = useCaseManagementForm(document);
 
+  if (isLoadingCase) {
+    return (
+      <EuiFlexGroup justifyContent='center' alignItems='center' style={{ padding: '32px' }}>
+        <EuiFlexItem grow={false}>
+          <EuiLoadingSpinner size='l' />
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    );
+  }
+
   const metadataItems = [
     {
       title: <EuiDescriptionListTitle>User</EuiDescriptionListTitle>,
       description: (
         <EuiDescriptionListDescription>
-          {isLoadingUser ? <EuiLoadingSpinner size='s' /> : currentUsername || '—'}
+          {isLoadingCase ? <EuiLoadingSpinner size='s' /> : currentUsername || '—'}
         </EuiDescriptionListDescription>
       ),
     },
@@ -129,24 +137,24 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     <EuiFlexGroup direction='column' gutterSize='m' style={{ padding: '16px' }}>
       {/* Header */}
       <EuiFlexItem grow={false}>
-        <EuiFlexGroup alignItems='center' gutterSize='s'>
+      <EuiFlexGroup alignItems='center' gutterSize='s'>
+        <EuiFlexItem grow={false}>
+          <EuiTitle size='xs'>
+            <h3>Case management</h3>
+          </EuiTitle>
+        </EuiFlexItem>
+        {status && (
           <EuiFlexItem grow={false}>
-            <EuiTitle size='xs'>
-              <h3>Case management</h3>
-            </EuiTitle>
+            <EuiBadge color={STATUS_BADGE_COLOR[status]}>{status}</EuiBadge>
           </EuiFlexItem>
-          {status && (
-            <EuiFlexItem grow={false}>
-              <EuiBadge color={STATUS_BADGE_COLOR[status]}>{status}</EuiBadge>
-            </EuiFlexItem>
-          )}
-          {isNewCase && (
+        )}
+      {isNewCase && (
             <EuiFlexItem grow={false}>
               <EuiText size='s' color='subdued'>
                 <em>No case data yet — fill in the form to create one.</em>
               </EuiText>
             </EuiFlexItem>
-          )}
+      )}
         </EuiFlexGroup>
       </EuiFlexItem>
 
@@ -164,21 +172,21 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
 
       {/* Editable fields */}
       <EuiFlexItem>
-        <EuiForm component='form'>
+      <EuiForm component='form'>
           <EuiFormRow
             label='Status'
             helpText='Current lifecycle status of this finding.'
           >
-            <EuiSelect
-              options={CASE_STATUS_OPTIONS}
-              value={status}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                setStatus(e.target.value as CaseStatus)
-              }
-              disabled={isSaving}
-              hasNoInitialSelection={isNewCase && !status}
-              aria-label='Case status'
-            />
+          <EuiSelect
+            options={CASE_STATUS_OPTIONS}
+            value={status}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              setStatus(e.target.value as CaseStatus)
+            }
+            disabled={isSaving}
+            hasNoInitialSelection={isNewCase && !status}
+            aria-label='Case status'
+          />
           </EuiFormRow>
 
           <EuiSpacer size='m' />
@@ -187,63 +195,63 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
             label='Tags'
             helpText='Type a tag name and press Enter to add it.'
           >
-            <EuiComboBox
-              noSuggestions
-              placeholder='Add tags…'
-              selectedOptions={tags}
-              onCreateOption={handleTagCreate}
-              onChange={setTags}
-              isDisabled={isSaving}
-              aria-label='Case tags'
-            />
+          <EuiComboBox
+            noSuggestions
+            placeholder='Add tags…'
+            selectedOptions={tags}
+            onCreateOption={handleTagCreate}
+            onChange={setTags}
+            isDisabled={isSaving}
+            aria-label='Case tags'
+          />
           </EuiFormRow>
 
           <EuiSpacer size='m' />
 
           <EuiFormRow
-            label='Comment'
+          label='Comment'
             helpText='Add a free-text note about this finding.'
-            fullWidth
-          >
+          fullWidth
+        >
             <EuiTextArea
-              placeholder='Write a comment…'
-              value={comment}
+            placeholder='Write a comment…'
+            value={comment}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 setComment(e.target.value)
               }
-              disabled={isSaving}
-              rows={4}
-              fullWidth
-              resize='vertical'
-              aria-label='Case comment'
-            />
+            disabled={isSaving}
+            rows={4}
+            fullWidth
+            resize='vertical'
+            aria-label='Case comment'
+          />
           </EuiFormRow>
 
           <EuiSpacer size='l' />
 
           <EuiFlexGroup gutterSize='s' justifyContent='flexEnd'>
-            <EuiFlexItem grow={false}>
+          <EuiFlexItem grow={false}>
               <EuiButtonEmpty
                 onClick={handleReset}
                 disabled={isSaving || !isDirty}
                 size='s'
               >
-                Reset
-              </EuiButtonEmpty>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiButton
-                fill
-                size='s'
-                onClick={handleSave}
-                isLoading={isSaving}
-                disabled={!status || (!isNewCase && !isDirty)}
-              >
-                {isNewCase ? 'Create case' : 'Update case'}
-              </EuiButton>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiForm>
+              Reset
+            </EuiButtonEmpty>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton
+              fill
+              size='s'
+              onClick={handleSave}
+              isLoading={isSaving}
+              disabled={!status || (!isNewCase && !isDirty)}
+            >
+              {isNewCase ? 'Create case' : 'Update case'}
+            </EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </EuiForm>
       </EuiFlexItem>
     </EuiFlexGroup>
   );

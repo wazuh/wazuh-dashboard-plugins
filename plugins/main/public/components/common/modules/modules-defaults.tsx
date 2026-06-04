@@ -136,7 +136,7 @@ const findingsDocumentDetailsTabs: WazuhDiscoverProps['additionalDocumentDetails
     {
       id: 'case-management',
       name: 'Case',
-      content: <CaseManagementTab document={document as any} />,
+      content: <CaseManagementTab document={{ _index: document._index, _id: document._id }} />,
     },
   ];
 

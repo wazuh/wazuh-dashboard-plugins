@@ -303,6 +303,50 @@ export class WazuhElasticCtrl {
   }
 
   /**
+   * Retrieves the wazuh.case.* fields of a findings document.
+   */
+  async getFindingsCase(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest<{ index: string; documentId: string }>,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const { index, documentId } = request.params;
+
+      if (!this.isFindingsIndex(index)) {
+        return ErrorResponse(
+          'Case management is only supported on wazuh-findings-v5 indices',
+          4015,
+          HTTP_STATUS_CODES.BAD_REQUEST,
+          response,
+        );
+      }
+
+      const client = context.core.opensearch.client.asCurrentUser;
+      const encodedIndex = encodeURIComponent(index);
+      const encodedDocumentId = encodeURIComponent(documentId);
+
+      try {
+        const getResponse = await client.transport.request({
+          method: 'GET',
+          path: `/${encodedIndex}/_doc/${encodedDocumentId}`,
+        });
+        const caseFields = getResponse?.body?._source?.wazuh?.case ?? null;
+        return response.ok({ body: { case: caseFields } });
+      } catch (error: any) {
+        if (error?.meta?.statusCode === 404) {
+          return response.ok({ body: { case: null } });
+        }
+        throw error;
+      }
+    } catch (error: any) {
+      const [statusCode, errorMessage] = this.getErrorDetails(error);
+      context.wazuh.logger.error(`Error fetching findings case: ${errorMessage}`);
+      return ErrorResponse(errorMessage, WAZUH_STATUS_CODES.UNKNOWN, statusCode, response);
+    }
+  }
+
+  /**
    * Updates wazuh.case.* fields on a findings document (wazuh-findings-v5* indices).
    */
   async updateFindingsCase(

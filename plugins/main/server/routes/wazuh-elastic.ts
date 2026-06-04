@@ -59,6 +59,20 @@ export function WazuhElasticRoutes(router: IRouter) {
       ctrl.getCurrentUser(context, request, response),
   );
 
+  router.get(
+    {
+      path: '/elastic/findings/case/{index}/{documentId}',
+      validate: {
+        params: schema.object({
+          index: schema.string(),
+          documentId: schema.string(),
+        }),
+      },
+    },
+    async (context, request, response) =>
+      ctrl.getFindingsCase(context, request, response),
+  );
+
   router.post(
     {
       path: '/elastic/findings/case/{index}/{documentId}',

@@ -20,19 +20,13 @@ export type CaseStatus =
   | 'DELETED'
   | 'AUDIT';
 
-export interface CaseManagementFields {
-  /** Current user - set by the backend */
-  'wazuh.case.user.name'?: string;
-  /** Case status */
-  'wazuh.case.status'?: CaseStatus;
-  /** Creation timestamp - set by the backend */
-  'wazuh.case.created_at'?: string;
-  /** Last update timestamp - set by the backend */
-  'wazuh.case.updated_at'?: string;
-  /** Free-text comment */
-  'wazuh.case.comment'?: string;
-  /** Custom user-defined tags */
-  'wazuh.case.tags'?: string[];
+export interface CaseData {
+  status?: CaseStatus;
+  comment?: string;
+  tags?: string[];
+  created_at?: string;
+  updated_at?: string;
+  user?: { name?: string };
 }
 
 export interface UpdateCasePayload {
@@ -46,15 +40,27 @@ export interface UpdateCasePayload {
  */
 export async function getCurrentDashboardUsername(): Promise<string> {
   try {
-    const response = await GenericRequest.request(
-      'GET',
-      '/elastic/security/current-user',
-      {},
-    );
+    const response = await GenericRequest.request('GET', '/elastic/security/current-user', {});
     return (response?.data?.username as string) ?? '';
   } catch {
     return '';
   }
+}
+
+/**
+ * Fetches the current wazuh.case.* fields for a findings document.
+ * Returns null when the document exists but has no case data yet.
+ */
+export async function getFindingsCase(
+  index: string,
+  docId: string,
+): Promise<CaseData | null> {
+  const response: { data?: { case?: CaseData | null } } = await GenericRequest.request(
+    'GET',
+    `/elastic/findings/case/${encodeURIComponent(index)}/${encodeURIComponent(docId)}`,
+    {},
+  );
+  return (response?.data?.case ?? null);
 }
 
 /**
@@ -69,10 +75,11 @@ export async function updateDocumentCase(
   index: string,
   docId: string,
   payload: UpdateCasePayload,
-): Promise<void> {
-  await GenericRequest.request(
+): Promise<CaseData> {
+  const response: { data: { case: CaseData } } = await GenericRequest.request(
     'POST',
     `/elastic/findings/case/${encodeURIComponent(index)}/${encodeURIComponent(docId)}`,
     payload,
   );
+  return response?.data?.case;
 }
