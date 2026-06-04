@@ -52,7 +52,10 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
 
   ctiFlowState.setSubscription(body.subscription ?? null);
 
-  if (body.registrationComplete) {
+  if (
+    body.registrationComplete &&
+    Boolean(body.subscription?.message?.is_registered)
+  ) {
     ctiFlowState.setRegistrationComplete(true);
     return;
   }

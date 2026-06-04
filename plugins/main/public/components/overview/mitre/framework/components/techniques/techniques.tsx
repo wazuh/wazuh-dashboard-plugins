@@ -96,7 +96,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
   const { isFlyoutVisible, techniquesCount, currentTechnique } = state;
 
   const getMitreRuleIdFilter = (value: string) => {
-    const GROUP_KEY = 'wazuh.rule.mitre.technique';
+    const GROUP_KEY = 'wazuh.rule.mitre.technique.id';
     if (!value) return [];
     return [
       {
@@ -149,7 +149,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
       const aggs = {
         techniques: {
           terms: {
-            field: 'wazuh.rule.mitre.technique',
+            field: 'wazuh.rule.mitre.technique.id',
             size: 1000,
           },
         },
@@ -328,7 +328,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
 
   const openDiscover = (e, techniqueID) => {
     addFilter({
-      key: 'wazuh.rule.mitre.technique',
+      key: 'wazuh.rule.mitre.technique.id',
       value: techniqueID,
       negate: false,
     });
@@ -337,7 +337,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
 
   const openDashboard = (e, techniqueID) => {
     addFilter({
-      key: 'wazuh.rule.mitre.technique',
+      key: 'wazuh.rule.mitre.technique.id',
       value: techniqueID,
       negate: false,
     });

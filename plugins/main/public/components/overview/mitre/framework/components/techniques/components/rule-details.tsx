@@ -126,7 +126,7 @@ const getComplianceKey = key => {
   }
   // TODO: add the remaining regulatory compliances when the component is readded
   if (key === 'mitre') {
-    return 'wazuh.rule.mitre.technique';
+    return 'wazuh.rule.mitre.technique.id';
   }
 
   return '';
