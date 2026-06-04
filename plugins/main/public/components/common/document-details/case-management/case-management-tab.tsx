@@ -66,10 +66,12 @@ function formatTimestamp(value: string | number): string {
 
 interface CaseManagementTabProps {
   document: CaseManagementFormDocument;
+  onSaveSuccess?: () => void;
 }
 
 export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
   document,
+  onSaveSuccess,
 }) => {
   const {
     status,
@@ -88,7 +90,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     handleTagCreate,
     handleSave,
     handleReset,
-  } = useCaseManagementForm(document);
+  } = useCaseManagementForm(document, onSaveSuccess);
 
   if (isLoadingCase) {
     return (
