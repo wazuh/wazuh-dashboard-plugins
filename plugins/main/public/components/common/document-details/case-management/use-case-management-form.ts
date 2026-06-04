@@ -99,13 +99,17 @@ const createInitialState = (): CaseFormState => ({
   baseline: { status: undefined, comment: '', tags: [] },
 });
 
-function caseFormReducer(state: CaseFormState, action: CaseFormAction): CaseFormState {
+function caseFormReducer(
+  state: CaseFormState,
+  action: CaseFormAction,
+): CaseFormState {
   switch (action.type) {
     case 'LOAD_START':
       return { ...createInitialState(), isLoadingCase: true };
 
     case 'LOAD_SUCCESS': {
-      const { status, comment, tags, created_at, updated_at, user } = action.payload;
+      const { status, comment, tags, created_at, updated_at, user } =
+        action.payload;
       const resolvedTags = tags ?? [];
       const baseline: CaseFormBaseline = {
         status,
@@ -159,7 +163,8 @@ function caseFormReducer(state: CaseFormState, action: CaseFormAction): CaseForm
       return { ...state, isSaving: false };
 
     case 'SAVE_SUCCESS': {
-      const { status, comment, tags, created_at, updated_at, user } = action.payload;
+      const { status, comment, tags, created_at, updated_at, user } =
+        action.payload;
       const resolvedTags = tags ?? [];
       return {
         ...state,
@@ -192,7 +197,11 @@ export function useCaseManagementForm(
   document: CaseManagementFormDocument,
 ): UseCaseManagementFormReturn {
   const documentKey = `${document._index}:${document._id}`;
-  const [state, dispatch] = useReducer(caseFormReducer, undefined, createInitialState);
+  const [state, dispatch] = useReducer(
+    caseFormReducer,
+    undefined,
+    createInitialState,
+  );
 
   const isNewCase = state.baseline.status === undefined;
   const isDirty = isFormDirty(state);
@@ -227,7 +236,8 @@ export function useCaseManagementForm(
     [],
   );
   const setTags = useCallback(
-    (tags: EuiComboBoxOptionOption[]) => dispatch({ type: 'SET_TAGS', payload: tags }),
+    (tags: EuiComboBoxOptionOption[]) =>
+      dispatch({ type: 'SET_TAGS', payload: tags }),
     [],
   );
   const handleTagCreate = useCallback((searchValue: string) => {
@@ -239,7 +249,11 @@ export function useCaseManagementForm(
     if (isSaving) return;
 
     if (!state.status) {
-      getToasts().add({ color: 'warning', title: 'Status is required', toastLifeTimeMs: 3000 });
+      getToasts().add({
+        color: 'warning',
+        title: 'Status is required',
+        toastLifeTimeMs: 3000,
+      });
       return;
     }
 
@@ -253,7 +267,11 @@ export function useCaseManagementForm(
         comment: trimmedComment || undefined,
         tags: tagLabels,
       };
-      const savedCase = await updateDocumentCase(document._index, document._id, payload);
+      const savedCase = await updateDocumentCase(
+        document._index,
+        document._id,
+        payload,
+      );
 
       dispatch({ type: 'SAVE_SUCCESS', payload: savedCase });
       getToasts().add({
@@ -269,14 +287,23 @@ export function useCaseManagementForm(
         store: true,
         error: {
           error,
-          message: error instanceof Error ? error.message : 'Could not save case data',
+          message:
+            error instanceof Error ? error.message : 'Could not save case data',
           title: 'Case management error',
         },
       };
       getErrorOrchestrator().handleError(options);
       dispatch({ type: 'SAVE_END' });
     }
-  }, [document._index, document._id, isSaving, state.status, state.comment, state.tags, isNewCase]);
+  }, [
+    document._index,
+    document._id,
+    isSaving,
+    state.status,
+    state.comment,
+    state.tags,
+    isNewCase,
+  ]);
 
   return {
     status: state.status,

@@ -68,7 +68,9 @@ interface CaseManagementTabProps {
   document: CaseManagementFormDocument;
 }
 
-export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({ document }) => {
+export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
+  document,
+}) => {
   const {
     status,
     comment,
@@ -90,7 +92,11 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({ document }
 
   if (isLoadingCase) {
     return (
-      <EuiFlexGroup justifyContent='center' alignItems='center' style={{ padding: '32px' }}>
+      <EuiFlexGroup
+        justifyContent='center'
+        alignItems='center'
+        style={{ padding: '32px' }}
+      >
         <EuiFlexItem grow={false}>
           <EuiLoadingSpinner size='l' />
         </EuiFlexItem>
@@ -104,7 +110,9 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({ document }
           {
             title: <EuiDescriptionListTitle>User</EuiDescriptionListTitle>,
             description: (
-              <EuiDescriptionListDescription>{caseUsername || '—'}</EuiDescriptionListDescription>
+              <EuiDescriptionListDescription>
+                {caseUsername || '—'}
+              </EuiDescriptionListDescription>
             ),
           },
         ]
@@ -112,7 +120,9 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({ document }
     ...(existingCreatedAt
       ? [
           {
-            title: <EuiDescriptionListTitle>Created at</EuiDescriptionListTitle>,
+            title: (
+              <EuiDescriptionListTitle>Created at</EuiDescriptionListTitle>
+            ),
             description: (
               <EuiDescriptionListDescription>
                 {formatTimestamp(existingCreatedAt)}
@@ -124,7 +134,9 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({ document }
     ...(existingUpdatedAt
       ? [
           {
-            title: <EuiDescriptionListTitle>Updated at</EuiDescriptionListTitle>,
+            title: (
+              <EuiDescriptionListTitle>Updated at</EuiDescriptionListTitle>
+            ),
             description: (
               <EuiDescriptionListDescription>
                 {formatTimestamp(existingUpdatedAt)}
@@ -139,24 +151,24 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({ document }
     <EuiFlexGroup direction='column' gutterSize='m' style={{ padding: '16px' }}>
       {/* Header */}
       <EuiFlexItem grow={false}>
-      <EuiFlexGroup alignItems='center' gutterSize='s'>
-        <EuiFlexItem grow={false}>
-          <EuiTitle size='xs'>
-            <h3>Case management</h3>
-          </EuiTitle>
-        </EuiFlexItem>
-        {status && (
+        <EuiFlexGroup alignItems='center' gutterSize='s'>
           <EuiFlexItem grow={false}>
-            <EuiBadge color={STATUS_BADGE_COLOR[status]}>{status}</EuiBadge>
+            <EuiTitle size='xs'>
+              <h3>Case management</h3>
+            </EuiTitle>
           </EuiFlexItem>
-        )}
-      {isNewCase && (
+          {status && (
+            <EuiFlexItem grow={false}>
+              <EuiBadge color={STATUS_BADGE_COLOR[status]}>{status}</EuiBadge>
+            </EuiFlexItem>
+          )}
+          {isNewCase && (
             <EuiFlexItem grow={false}>
               <EuiText size='s' color='subdued'>
                 <em>No case data yet — fill in the form to create one.</em>
               </EuiText>
             </EuiFlexItem>
-      )}
+          )}
         </EuiFlexGroup>
       </EuiFlexItem>
 
@@ -174,23 +186,23 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({ document }
 
       {/* Editable fields */}
       <EuiFlexItem>
-      <EuiForm component='form'>
+        <EuiForm component='form'>
           <EuiFormRow
             fullWidth
             label='Status'
             helpText='Current lifecycle status of this finding.'
           >
-          <EuiSelect
-            fullWidth
-            options={CASE_STATUS_OPTIONS}
-            value={status}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-              setStatus(e.target.value as CaseStatus)
-            }
-            disabled={isSaving}
-            hasNoInitialSelection={isNewCase && !status}
-            aria-label='Case status'
-          />
+            <EuiSelect
+              fullWidth
+              options={CASE_STATUS_OPTIONS}
+              value={status}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                setStatus(e.target.value as CaseStatus)
+              }
+              disabled={isSaving}
+              hasNoInitialSelection={isNewCase && !status}
+              aria-label='Case status'
+            />
           </EuiFormRow>
 
           <EuiSpacer size='m' />
@@ -200,64 +212,64 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({ document }
             label='Tags'
             helpText='Type a tag name and press Enter to add it.'
           >
-          <EuiComboBox
-            fullWidth
-            noSuggestions
-            placeholder='Add tags…'
-            selectedOptions={tags}
-            onCreateOption={handleTagCreate}
-            onChange={setTags}
-            isDisabled={isSaving}
-            aria-label='Case tags'
-          />
+            <EuiComboBox
+              fullWidth
+              noSuggestions
+              placeholder='Add tags…'
+              selectedOptions={tags}
+              onCreateOption={handleTagCreate}
+              onChange={setTags}
+              isDisabled={isSaving}
+              aria-label='Case tags'
+            />
           </EuiFormRow>
 
           <EuiSpacer size='m' />
 
           <EuiFormRow
-          label='Comment'
+            label='Comment'
             helpText='Add a free-text note about this finding.'
-          fullWidth
-        >
+            fullWidth
+          >
             <EuiTextArea
-            placeholder='Write a comment…'
-            value={comment}
+              placeholder='Write a comment…'
+              value={comment}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 setComment(e.target.value)
               }
-            disabled={isSaving}
-            rows={4}
-            fullWidth
-            resize='vertical'
-            aria-label='Case comment'
-          />
+              disabled={isSaving}
+              rows={4}
+              fullWidth
+              resize='vertical'
+              aria-label='Case comment'
+            />
           </EuiFormRow>
 
           <EuiSpacer size='l' />
 
           <EuiFlexGroup gutterSize='s' justifyContent='flexEnd'>
-          <EuiFlexItem grow={false}>
+            <EuiFlexItem grow={false}>
               <EuiButtonEmpty
                 onClick={handleReset}
                 disabled={isSaving || !isDirty}
                 size='s'
               >
-              Reset
-            </EuiButtonEmpty>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButton
-              fill
-              size='s'
-              onClick={handleSave}
-              isLoading={isSaving}
-              disabled={!status || (!isNewCase && !isDirty)}
-            >
-              {isNewCase ? 'Create case' : 'Update case'}
-            </EuiButton>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </EuiForm>
+                Reset
+              </EuiButtonEmpty>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButton
+                fill
+                size='s'
+                onClick={handleSave}
+                isLoading={isSaving}
+                disabled={!status || (!isNewCase && !isDirty)}
+              >
+                {isNewCase ? 'Create case' : 'Update case'}
+              </EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiForm>
       </EuiFlexItem>
     </EuiFlexGroup>
   );

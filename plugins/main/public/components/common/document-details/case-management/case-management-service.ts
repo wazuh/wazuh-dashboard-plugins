@@ -43,12 +43,15 @@ export async function getFindingsCase(
   index: string,
   docId: string,
 ): Promise<CaseData | null> {
-  const response: { data?: { case?: CaseData | null } } = await GenericRequest.request(
-    'GET',
-    `/elastic/findings/case/${encodeURIComponent(index)}/${encodeURIComponent(docId)}`,
-    {},
-  );
-  return (response?.data?.case ?? null);
+  const response: { data?: { case?: CaseData | null } } =
+    await GenericRequest.request(
+      'GET',
+      `/elastic/findings/case/${encodeURIComponent(index)}/${encodeURIComponent(
+        docId,
+      )}`,
+      {},
+    );
+  return response?.data?.case ?? null;
 }
 
 /**
@@ -66,7 +69,9 @@ export async function updateDocumentCase(
 ): Promise<CaseData> {
   const response: { data: { case: CaseData } } = await GenericRequest.request(
     'POST',
-    `/elastic/findings/case/${encodeURIComponent(index)}/${encodeURIComponent(docId)}`,
+    `/elastic/findings/case/${encodeURIComponent(index)}/${encodeURIComponent(
+      docId,
+    )}`,
     payload,
   );
   return response?.data?.case;

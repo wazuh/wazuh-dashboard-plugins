@@ -319,8 +319,15 @@ export class WazuhElasticCtrl {
       }
     } catch (error: any) {
       const [statusCode, errorMessage] = this.getErrorDetails(error);
-      context.wazuh.logger.error(`Error fetching findings case: ${errorMessage}`);
-      return ErrorResponse(errorMessage, WAZUH_STATUS_CODES.UNKNOWN, statusCode, response);
+      context.wazuh.logger.error(
+        `Error fetching findings case: ${errorMessage}`,
+      );
+      return ErrorResponse(
+        errorMessage,
+        WAZUH_STATUS_CODES.UNKNOWN,
+        statusCode,
+        response,
+      );
     }
   }
 
