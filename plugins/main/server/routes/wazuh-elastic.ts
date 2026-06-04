@@ -52,7 +52,7 @@ export function WazuhElasticRoutes(router: IRouter) {
 
   router.get(
     {
-      path: '/elastic/findings/case/{index}/{documentId}',
+      path: '/indexer/findings/case/{index}/{documentId}',
       validate: {
         params: schema.object({
           index: schema.string(),
@@ -66,7 +66,7 @@ export function WazuhElasticRoutes(router: IRouter) {
 
   router.post(
     {
-      path: '/elastic/findings/case/{index}/{documentId}',
+      path: '/indexer/findings/case/{index}/{documentId}',
       validate: {
         params: schema.object({
           index: schema.string(),

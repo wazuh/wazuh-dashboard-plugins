@@ -46,7 +46,7 @@ export async function getFindingsCase(
   const response: { data?: { case?: CaseData | null } } =
     await GenericRequest.request(
       'GET',
-      `/elastic/findings/case/${encodeURIComponent(index)}/${encodeURIComponent(
+      `/indexer/findings/case/${encodeURIComponent(index)}/${encodeURIComponent(
         docId,
       )}`,
       {},
@@ -57,7 +57,7 @@ export async function getFindingsCase(
 /**
  * Updates the case management fields of a findings document.
  *
- * POST /elastic/findings/case/<index>/<documentId>
+ * POST /indexer/findings/case/<index>/<documentId>
  * Body: { status, comment, tags }
  *
  * The backend sets wazuh.case.user.name, created_at and updated_at.
@@ -69,7 +69,7 @@ export async function updateDocumentCase(
 ): Promise<CaseData> {
   const response: { data: { case: CaseData } } = await GenericRequest.request(
     'POST',
-    `/elastic/findings/case/${encodeURIComponent(index)}/${encodeURIComponent(
+    `/indexer/findings/case/${encodeURIComponent(index)}/${encodeURIComponent(
       docId,
     )}`,
     payload,
