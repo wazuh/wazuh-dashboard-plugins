@@ -23,7 +23,6 @@ import {
   EuiFlexItem,
   EuiForm,
   EuiFormRow,
-  EuiLoadingSpinner,
   EuiSelect,
   EuiSpacer,
   EuiText,
@@ -73,7 +72,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({ document }
     status,
     comment,
     tags,
-    currentUsername,
+    caseUsername,
     isLoadingCase,
     existingCreatedAt,
     existingUpdatedAt,
@@ -99,14 +98,16 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({ document }
   }
 
   const metadataItems = [
-    {
-      title: <EuiDescriptionListTitle>User</EuiDescriptionListTitle>,
-      description: (
-        <EuiDescriptionListDescription>
-          {isLoadingCase ? <EuiLoadingSpinner size='s' /> : currentUsername || '—'}
-        </EuiDescriptionListDescription>
-      ),
-    },
+    ...(!isNewCase
+      ? [
+          {
+            title: <EuiDescriptionListTitle>User</EuiDescriptionListTitle>,
+            description: (
+              <EuiDescriptionListDescription>{caseUsername || '—'}</EuiDescriptionListDescription>
+            ),
+          },
+        ]
+      : []),
     ...(existingCreatedAt
       ? [
           {

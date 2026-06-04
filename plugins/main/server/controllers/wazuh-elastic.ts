@@ -281,28 +281,6 @@ export class WazuhElasticCtrl {
   }
 
   /**
-   * Returns the OpenSearch Dashboards logged-in user (not the Wazuh API user).
-   */
-  async getCurrentUser(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      const { username } = await context.wazuh.security.getCurrentUser(
-        request,
-        context,
-      );
-      return response.ok({
-        body: { username: username ?? '' },
-      });
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return ErrorResponse(error.message || error, 4012, 500, response);
-    }
-  }
-
-  /**
    * Retrieves the wazuh.case.* fields of a findings document.
    */
   async getFindingsCase(

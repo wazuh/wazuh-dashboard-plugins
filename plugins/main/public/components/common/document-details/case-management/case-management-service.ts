@@ -36,18 +36,6 @@ export interface UpdateCasePayload {
 }
 
 /**
- * Retrieves the OpenSearch Dashboards logged-in user (not the Wazuh API user).
- */
-export async function getCurrentDashboardUsername(): Promise<string> {
-  try {
-    const response = await GenericRequest.request('GET', '/elastic/security/current-user', {});
-    return (response?.data?.username as string) ?? '';
-  } catch {
-    return '';
-  }
-}
-
-/**
  * Fetches the current wazuh.case.* fields for a findings document.
  * Returns null when the document exists but has no case data yet.
  */

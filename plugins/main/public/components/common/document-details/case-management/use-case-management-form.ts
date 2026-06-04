@@ -25,7 +25,6 @@ import {
   CaseData,
   CaseStatus,
   UpdateCasePayload,
-  getCurrentDashboardUsername,
   getFindingsCase,
   updateDocumentCase,
 } from './case-management-service';
@@ -39,7 +38,7 @@ export interface UseCaseManagementFormReturn {
   status: CaseStatus | undefined;
   comment: string;
   tags: EuiComboBoxOptionOption[];
-  currentUsername: string;
+  caseUsername: string | undefined;
   isLoadingCase: boolean;
   existingCreatedAt: string | undefined;
   existingUpdatedAt: string | undefined;
@@ -64,7 +63,7 @@ type CaseFormState = {
   status: CaseStatus | undefined;
   comment: string;
   tags: EuiComboBoxOptionOption[];
-  currentUsername: string;
+  caseUsername: string | undefined;
   isLoadingCase: boolean;
   existingCreatedAt: string | undefined;
   existingUpdatedAt: string | undefined;
@@ -74,7 +73,7 @@ type CaseFormState = {
 
 type CaseFormAction =
   | { type: 'LOAD_START' }
-  | { type: 'LOAD_SUCCESS'; payload: CaseData & { currentUsername: string } }
+  | { type: 'LOAD_SUCCESS'; payload: CaseData }
   | { type: 'LOAD_ERROR' }
   | { type: 'SET_STATUS'; payload: CaseStatus }
   | { type: 'SET_COMMENT'; payload: string }
@@ -92,7 +91,7 @@ const createInitialState = (): CaseFormState => ({
   status: undefined,
   comment: '',
   tags: [],
-  currentUsername: '',
+  caseUsername: undefined,
   isLoadingCase: true,
   existingCreatedAt: undefined,
   existingUpdatedAt: undefined,
@@ -106,8 +105,7 @@ function caseFormReducer(state: CaseFormState, action: CaseFormAction): CaseForm
       return { ...createInitialState(), isLoadingCase: true };
 
     case 'LOAD_SUCCESS': {
-      const { status, comment, tags, created_at, updated_at, user, currentUsername } =
-        action.payload;
+      const { status, comment, tags, created_at, updated_at, user } = action.payload;
       const resolvedTags = tags ?? [];
       const baseline: CaseFormBaseline = {
         status,
@@ -123,7 +121,7 @@ function caseFormReducer(state: CaseFormState, action: CaseFormAction): CaseForm
         baseline,
         existingCreatedAt: created_at,
         existingUpdatedAt: updated_at,
-        currentUsername: user?.name ?? currentUsername,
+        caseUsername: user?.name,
         isSaving: false,
       };
     }
@@ -171,7 +169,7 @@ function caseFormReducer(state: CaseFormState, action: CaseFormAction): CaseForm
         baseline: { status, comment: comment ?? '', tags: resolvedTags },
         existingCreatedAt: state.existingCreatedAt ?? created_at,
         existingUpdatedAt: updated_at,
-        currentUsername: user?.name ?? state.currentUsername,
+        caseUsername: user?.name ?? state.caseUsername,
         isSaving: false,
       };
     }
@@ -206,16 +204,9 @@ export function useCaseManagementForm(
 
     (async () => {
       try {
-        const [caseData, username] = await Promise.all([
-          getFindingsCase(document._index, document._id),
-          getCurrentDashboardUsername(),
-        ]);
-
+        const caseData = await getFindingsCase(document._index, document._id);
         if (!cancelled) {
-          dispatch({
-            type: 'LOAD_SUCCESS',
-            payload: { ...(caseData ?? {}), currentUsername: username },
-          });
+          dispatch({ type: 'LOAD_SUCCESS', payload: caseData ?? {} });
         }
       } catch {
         if (!cancelled) dispatch({ type: 'LOAD_ERROR' });
@@ -291,7 +282,7 @@ export function useCaseManagementForm(
     status: state.status,
     comment: state.comment,
     tags: state.tags,
-    currentUsername: state.currentUsername,
+    caseUsername: state.caseUsername,
     isLoadingCase: state.isLoadingCase,
     existingCreatedAt: state.existingCreatedAt,
     existingUpdatedAt: state.existingUpdatedAt,

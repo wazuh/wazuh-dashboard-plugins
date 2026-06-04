@@ -52,15 +52,6 @@ export function WazuhElasticRoutes(router: IRouter) {
 
   router.get(
     {
-      path: '/elastic/security/current-user',
-      validate: false,
-    },
-    async (context, request, response) =>
-      ctrl.getCurrentUser(context, request, response),
-  );
-
-  router.get(
-    {
       path: '/elastic/findings/case/{index}/{documentId}',
       validate: {
         params: schema.object({
