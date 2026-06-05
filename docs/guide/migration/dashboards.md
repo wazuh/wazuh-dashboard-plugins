@@ -1,10 +1,12 @@
 # Custom dashboards and visualizations migration
 
-The Wazuh dashboard stores user-created dashboards and visualizations as **saved objects** in the OpenSearch index. These objects can be exported from a 4.x deployment and imported into a 5.x deployment using the **Saved objects** management interface.
+The Wazuh dashboard stores user-created dashboards and visualizations as **saved objects** in the Wazuh indexer indices. These objects can be exported from a 4.x deployment and imported into a 5.x deployment using the **Saved objects** management interface.
 
 > **Scope**: This guide covers only **custom** dashboards and visualizations created or modified by users. Default Wazuh dashboards and visualizations are provisioned automatically by the Wazuh 5.x plugin on first start and do not require manual migration.
->
-> **Do not re-import default Wazuh objects.** Overwriting the default dashboards and visualizations with 4.x versions may cause broken panels, stale index pattern references, or conflicts with features introduced in 5.x. If you are unsure whether an object is custom or default, open **☰ Menu > Dashboard Management > Saved objects** after installation and look for objects whose description includes `Provided by Wazuh` — those are provisioned automatically and must not be re-imported.
+
+In Wazuh 4.x, default dashboard definitions were embedded in the plugin. In Wazuh 5.x, default dashboards are provisioned as saved objects by reference during the health check task on first start.
+
+> **Warning**: Do not re-import default Wazuh objects. Overwriting the default dashboards and visualizations with 4.x versions may cause broken panels, stale index pattern references, or conflicts with features introduced in 5.x. If you are unsure whether an object is custom or default, open **☰ Menu > Dashboard Management > Saved objects** after installation and look for objects whose description includes `Provided by Wazuh` — those are provisioned automatically and must not be re-imported.
 
 ---
 
