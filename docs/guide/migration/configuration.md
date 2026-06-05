@@ -50,7 +50,7 @@ wazuh_core.hosts:
     port: 55000
     username: wazuh-wui
     password: <YOUR_PASSWORD>
-    run_as: false
+    run_as: true
 ```
 
 The key differences are:
