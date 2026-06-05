@@ -67,7 +67,7 @@ The key differences are:
 | `port`     | TCP port of the Wazuh server API                       | Yes      | —       |
 | `username` | API user                                               | Yes      | —       |
 | `password` | API user password                                      | Yes      | —       |
-| `run_as`   | Use the logged-in user context to retrieve permissions | No       | `true` |
+| `run_as`   | Use the logged-in user context to retrieve permissions | No       | `true`  |
 | `key`      | Path to an SSL/TLS client private key file             | No       | —       |
 | `cert`     | Path to an SSL/TLS client certificate file             | No       | —       |
 | `ca`       | Path to a CA certificate file for server verification  | No       | —       |
@@ -154,8 +154,8 @@ If your deployment had dashboards or alerts that depended on either index, those
 
 Custom branding configured through `customization.*` must be migrated to the native `opensearchDashboards.branding.*` key in `opensearch_dashboards.yml`:
 
-| 4.x setting              | 5.x key in `opensearch_dashboards.yml`          | Notes                                                                                                      |
-| ------------------------ | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| 4.x setting              | 5.x key in `opensearch_dashboards.yml`          | Notes                                                                                                                                          |
+| ------------------------ | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | `customization.logo.app` | `opensearchDashboards.branding.logo.defaultUrl` | In 4.x, this image was also shown while connecting to the Wazuh server API. That loading screen now displays only a `Loading...` text message. |
 
 The settings `customization.enabled`, `customization.logo.healthcheck`, `customization.logo.reports`, `customization.reports.header`, and `customization.reports.footer` have no equivalent in 5.x and must be removed. The dedicated health check view that used `customization.logo.healthcheck` was removed in 5.x. PDF report branding is not configurable because report generation is now handled by the OpenSearch Dashboards Reporting plugin.

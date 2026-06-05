@@ -37,14 +37,14 @@ Beyond the index pattern rename, the 5.x data model uses a different field schem
 
 Common field mappings:
 
-| 4.x field          | 5.x field          | Notes                                                                                        |
-| ------------------ | ------------------ | -------------------------------------------------------------------------------------------- |
-| `rule.level`       | `wazuh.rule.level` | Type changed: integer (1–15) → string (`low`, `medium`, `high`, `critical`, `informational`) |
-| `rule.description` | `wazuh.rule.title` |                                                                                              |
-| `rule.id`          | `wazuh.rule.id`    |                                                                                              |
-| `rule.groups`      | `wazuh.integration.name` |                                                                                        |
-| `agent.name`       | `wazuh.agent.name` |                                                                                              |
-| `agent.id`         | `wazuh.agent.id`   |                                                                                              |
+| 4.x field          | 5.x field                | Notes                                                                                        |
+| ------------------ | ------------------------ | -------------------------------------------------------------------------------------------- |
+| `rule.level`       | `wazuh.rule.level`       | Type changed: integer (1–15) → string (`low`, `medium`, `high`, `critical`, `informational`) |
+| `rule.description` | `wazuh.rule.title`       |                                                                                              |
+| `rule.id`          | `wazuh.rule.id`          |                                                                                              |
+| `rule.groups`      | `wazuh.integration.name` |                                                                                              |
+| `agent.name`       | `wazuh.agent.name`       |                                                                                              |
+| `agent.id`         | `wazuh.agent.id`         |                                                                                              |
 
 > **Note**: The index pattern to use depends on the type of data being visualized. Use `wazuh-findings-v5*` for rule-based alerts (the closest equivalent to `wazuh-alerts-*`), and `wazuh-events-v5*` for raw event data. Visualizations that filter on `rule.*` fields will need to target `wazuh-findings-v5*` and use the `wazuh.*` field names above.
 
