@@ -148,7 +148,7 @@ The periodic data collection features from 4.x are removed in 5.x:
 - **`cron.*` settings** — The statistics collection tasks that wrote agent state data to `wazuh-statistics-*` indices no longer exist. Remove all `cron.*` entries from your configuration. The `wazuh-statistics-*` indices are not created in 5.x.
 - **`wazuh.monitoring.*` settings** — The agent monitoring feature that periodically created `wazuh-monitoring-*` index snapshots no longer exists. Remove all `wazuh.monitoring.*` entries. Agent status is now queried on demand from the Wazuh manager API.
 
-If your deployment had dashboards or alerts that depended on either index, those will need to be rebuilt against the new data model (`wazuh-metrics-comms` and `wazuh-metrics-normalization` indices).
+If your deployment had dashboards or alerts that depended on either index, those will need to be rebuilt against the new data model (`wazuh-metrics-comms` and `wazuh-metrics-agents` indices).
 
 ### Customization settings
 
