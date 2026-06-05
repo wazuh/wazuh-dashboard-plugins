@@ -93,7 +93,7 @@ After completing the migration to Wazuh dashboard 5.x:
 1. Ensure the **Reporting** plugin is installed and enabled. The plugin is included with the Wazuh dashboard 5.x package.
 2. Navigate to the dashboard view from which you want to generate a report.
 3. Click **Generate report** in the toolbar.
-4. The report is stored in the OpenSearch Dashboards Reporting index and is accessible from **☰ Menu > Reporting** (the Reporting app is registered under the **All** navigation group, not under Management).
+4. The report is stored in an index and is accessible from **☰ Menu > Explore > Reporting**.
 
 > **Note**: To generate reports, the logged-in user must have the appropriate permissions in the `reports_read` and `reports_write` roles, or an equivalent role with access to the reporting index and API endpoints.
 
