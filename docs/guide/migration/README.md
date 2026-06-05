@@ -50,25 +50,22 @@ Follow each topic in order before starting the Wazuh 5.x installation:
 
 Complete the following steps before performing any migration task:
 
-### Back up the configuration file
+### Back up configuration files
 
-The 4.x plugin configuration file is located under the `path.data` directory defined in `opensearch_dashboards.yml` (default: `/usr/share/wazuh-dashboard/data`).
-
-Run the following command **on the 4.x dashboard server**:
+Create a dated backup directory and copy the 4.x configuration files into it. Run the following commands **on the 4.x dashboard server**:
 
 ```bash
+BACKUP_DIR=~/wazuh-migration-backup-$(date +%Y%m%d)
+mkdir -p "$BACKUP_DIR"
+
 sudo cp /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml \
-   ~/wazuh-yml-backup-$(date +%Y%m%d).yml
-```
+   "$BACKUP_DIR/wazuh.yml"
 
-### Back up the dashboard configuration
-
-Run the following command **on the 4.x dashboard server**:
-
-```bash
 sudo cp /etc/wazuh-dashboard/opensearch_dashboards.yml \
-   ~/opensearch-dashboards-yml-backup-$(date +%Y%m%d).yml
+   "$BACKUP_DIR/opensearch_dashboards.yml"
 ```
+
+The plugin configuration file (`wazuh.yml`) is located under the `path.data` directory defined in `opensearch_dashboards.yml` (default: `/usr/share/wazuh-dashboard/data`).
 
 ### Export custom saved objects
 
@@ -80,14 +77,14 @@ Export only the dashboards and visualizations you created or modified. Default W
 
 If you export all objects as a fallback, use the **Check for existing objects** conflict strategy when importing into 5.x. See [Custom dashboards and visualizations](./dashboards.md) for details.
 
-Alternatively, use the API. Run the following command from **any machine with network access to the 4.x dashboard**, replacing `<DASHBOARD_HOST>` with the 4.x dashboard hostname or IP and `<PASSWORD>` with the admin password. The output file is saved in the current working directory:
+Alternatively, use the API. Run the following command from **any machine with network access to the 4.x dashboard**, replacing `<DASHBOARD_HOST>` with the 4.x dashboard hostname or IP, `<DASHBOARD_PORT>` with the dashboard port (default: `5601`), and `<PASSWORD>` with the admin password. The output file is saved in the current working directory:
 
 ```bash
-curl -X POST "https://<DASHBOARD_HOST>:5601/api/saved_objects/_export" \
+curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_export" \
   -H "osd-xsrf: true" \
   -H "Content-Type: application/json" \
   -u admin:<PASSWORD> \
-  --cacert /etc/wazuh-dashboard/certs/root-ca.pem \
+  -k \
   -d '{"type": ["dashboard", "visualization", "search", "index-pattern"], "includeReferencesDeep": true}' \
   -o saved-objects-backup-$(date +%Y%m%d).ndjson
 ```
@@ -108,11 +105,11 @@ On a standard installation, the base directory is:
 
 Each user's PDFs are stored in a subdirectory named after a hash of their username (for example, `/usr/share/wazuh-dashboard/data/wazuh/downloads/reports/<hashed_username>/`).
 
-Copy the entire `reports/` directory (including all per-user subdirectories) to a safe location before uninstalling the 4.x package. Run the following command **on the 4.x dashboard server**:
+Copy the entire `reports/` directory (including all per-user subdirectories) to the backup directory before uninstalling the 4.x package. Run the following commands **on the 4.x dashboard server** (use the same `BACKUP_DIR` created in the configuration backup step):
 
 ```bash
 sudo cp -r /usr/share/wazuh-dashboard/data/wazuh/downloads/reports/ \
-   ~/wazuh-reports-backup-$(date +%Y%m%d)/
+   "$BACKUP_DIR/reports/"
 ```
 
 > **Note**: The `reports/` directory is owned by the `wazuh-dashboard` system user. Run the command with `sudo` or as a user with sufficient permissions to read the directory.
