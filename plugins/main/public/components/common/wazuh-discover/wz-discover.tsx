@@ -64,6 +64,7 @@ export type WazuhDiscoverProps = {
   tableColumns: tDataGridColumn[];
   DataSource: IDataSourceFactoryConstructor<PatternDataSource>;
   categoriesSampleData: string[];
+  additionalDocumentDetailsTabs?: import('./components/document-view-table-and-json').DocumentViewTableAndJsonPropsAdditionalTabs;
 };
 
 const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
@@ -72,6 +73,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     DataSource,
     tableColumns: defaultTableColumns,
     categoriesSampleData,
+    additionalDocumentDetailsTabs,
   } = props;
 
   if (!DataSource) {
@@ -347,6 +349,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                           filters={filters}
                           setFilters={setFilters}
                           onFilter={closeFlyoutHandler}
+                          additionalTabs={additionalDocumentDetailsTabs}
+                          showFilterButtons={false}
                         />
                       </EuiFlexItem>
                     </EuiFlexGroup>
