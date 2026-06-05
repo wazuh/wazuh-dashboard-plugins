@@ -122,7 +122,7 @@ curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_impor
 
 Set `overwrite=true` to replace existing objects with the same ID.
 
-> **Important**: When objects in the import file fail with `missing_references` (for example, visualizations and saved searches that reference `wazuh-alerts-*`), any dashboard in the same file that references those objects may be reported as a success but **silently not persisted**, depending on the OpenSearch Dashboards build. Always proceed with Step 4 to resolve reference errors and then re-import the dashboards separately, regardless of whether the initial import reports success.
+> **Important**: When objects in the import file fail with `missing_references` (for example, visualizations and saved searches that reference `wazuh-alerts-*`), dashboards in the same import file that depend on those objects may appear in `successResults` but are not actually saved. This behavior depends on the Wazuh dashboard build. Always proceed with Step 4 to resolve reference errors and then re-import the dashboards separately, regardless of whether the initial import reports success.
 
 ---
 
@@ -191,11 +191,58 @@ After importing, verify that the migrated objects are accessible and displaying 
 
 1. Navigate to **☰ Menu > Dashboard Management > Saved objects** and confirm that the expected dashboards and visualizations appear in the list.
 2. Open each migrated dashboard and confirm that panels load without errors.
-3. If a panel shows a "No results found" message, verify that: (a) the index pattern referenced by its visualizations points to `wazuh-findings-v5*` (for alert-based visualizations) or another appropriate 5.x pattern; (b) any aggregation or filter fields use the 5.x field names (for example, `wazuh.rule.level` instead of `rule.level`); and (c) the selected time range contains data.
+3. If a panel shows a "No results found" message, verify that:
+   - the index pattern referenced by its visualizations points to `wazuh-findings-v5*` (for alert-based visualizations) or another appropriate 5.x pattern
+   - any aggregation or filter fields use the 5.x field names (for example, `wazuh.rule.level` instead of `rule.level`)
+   - the selected time range contains data
+
+---
+
+## Multitenancy
+
+If multitenancy was enabled in the 4.x deployment, repeat the export and import steps for each tenant separately. Saved objects are scoped per tenant — objects exported from one tenant must be imported into the same tenant in 5.x.
+
+### Using the UI
+
+1. Use the tenant selector in the top navigation bar to switch to the target tenant.
+2. Follow Steps 1–4 of this guide to export (4.x) or import (5.x) saved objects for that tenant.
+3. Repeat for each tenant.
+
+### Using the API
+
+Add the `securitytenant` header to each API request to target a specific tenant. Replace `<TENANT>` with the tenant name (for the Global tenant, use `global`). Use a separate backup file per tenant.
+
+Export example (4.x):
+
+```bash
+curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_export" \
+  -H "osd-xsrf: true" \
+  -H "Content-Type: application/json" \
+  -H "securitytenant: <TENANT>" \
+  -u admin:<PASSWORD> \
+  -k \
+  -d '{
+    "type": ["dashboard", "visualization", "search", "index-pattern"],
+    "includeReferencesDeep": true
+  }' \
+  -o saved-objects-backup-<TENANT>-$(date +%Y%m%d).ndjson
+```
+
+Import example (5.x):
+
+```bash
+curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_import?overwrite=false" \
+  -H "osd-xsrf: true" \
+  -H "securitytenant: <TENANT>" \
+  -u admin:<PASSWORD> \
+  -k \
+  --form file=@saved-objects-backup-<TENANT>-<DATE>.ndjson
+```
+
+Apply the same `securitytenant` header to the Step 4 `_resolve_import_errors` and re-import commands. This approach is useful for programmatic migration or environments with several tenants.
 
 ---
 
 ## Notes
 
 - Saved objects exported from OpenSearch Dashboards 2.x (used in Wazuh 4.x) are compatible with OpenSearch Dashboards 3.x (used in Wazuh 5.x) for the standard object types listed above. However, objects that carry a `migrationVersion` field referencing a schema version newer than what OpenSearch Dashboards 3.x recognizes will be rejected with a 422 error during import. If you encounter this error, remove or downgrade the `migrationVersion` entry for the affected object type before re-importing. Objects created natively by Wazuh 4.x use `migrationVersion` values that are compatible with OpenSearch Dashboards 3.x.
-- If multitenancy was enabled in the 4.x deployment, repeat the export and import steps for each tenant separately. Use the tenant selector in the top navigation bar to switch tenants before exporting or importing.
