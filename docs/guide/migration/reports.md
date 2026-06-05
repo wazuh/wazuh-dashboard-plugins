@@ -40,7 +40,7 @@ These settings are **not available in 5.x**. See the [Configuration migration](.
 
 ## How reports work in 5.x
 
-Report generation is now handled by the **OpenSearch Dashboards Reporting** plugin, which is included with the Wazuh dashboard 5.x package. Reports are generated directly from dashboard views and stored in an OpenSearch index, not on the server filesystem.
+Report generation is now handled by the **Reporting** plugin, which is included with the Wazuh dashboard 5.x package. Reports are generated directly from dashboard views and stored in an index, not on the server filesystem.
 
 > **Note**: The OpenSearch Dashboards Reporting plugin (`reportsDashboards`) is also bundled with Wazuh 4.14.x. The key difference in 5.x is that the Wazuh plugin's own built-in PDF generation (stored on the filesystem) has been removed entirely; the OSD Reporting plugin is now the sole reporting mechanism.
 
