@@ -167,7 +167,7 @@ Extract using `jq` (recommended):
 jq -c 'select(.type == "dashboard")' saved-objects-backup-<DATE>.ndjson > dashboards-only.ndjson
 ```
 
-If `jq` is not available, use `grep` as a fallback. The OpenSearch Dashboards export format uses compact JSON (no spaces around `:`), so a literal match is reliable:
+If `jq` is not available, use `grep` as a fallback. The Wazuh dashboard export format uses compact JSON (no spaces around `:`), so a literal match is reliable:
 
 ```bash
 grep '"type":"dashboard"' saved-objects-backup-<DATE>.ndjson > dashboards-only.ndjson
