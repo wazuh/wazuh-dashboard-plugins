@@ -67,7 +67,7 @@ The key differences are:
 | `port`     | TCP port of the Wazuh server API                       | Yes      | —       |
 | `username` | API user                                               | Yes      | —       |
 | `password` | API user password                                      | Yes      | —       |
-| `run_as`   | Use the logged-in user context to retrieve permissions | No       | `false` |
+| `run_as`   | Use the logged-in user context to retrieve permissions | No       | `true` |
 | `key`      | Path to an SSL/TLS client private key file             | No       | —       |
 | `cert`     | Path to an SSL/TLS client certificate file             | No       | —       |
 | `ca`       | Path to a CA certificate file for server verification  | No       | —       |
