@@ -94,10 +94,10 @@ After completing the migration to Wazuh dashboard 5.x:
 
 1. Ensure the **Reporting** plugin is installed and enabled. The plugin is included with the Wazuh dashboard 5.x package.
 2. Navigate to the dashboard view from which you want to generate a report.
-3. Click **Generate report** in the toolbar.
-4. The report is stored in an index and is accessible from **☰ Menu > Explore > Reporting**.
+3. Click **Generate report** in the toolbar. In Wazuh plugin module views, this exports to **PDF only**.
+4. Generated reports are stored in an index and are accessible from **☰ Menu > Reporting**.
 
-> **Note**: To generate reports, the logged-in user must have the appropriate permissions in the `reports_read` and `reports_write` roles, or an equivalent role with access to the reporting index and API endpoints.
+> **Note**: To generate reports, the logged-in user must have the appropriate permissions in the `reports_read` and `reports_write` roles, or an equivalent role with access to the reporting index and API endpoints. CSV exports from data tables are a separate feature governed by the `reports.csv.maxRows` Advanced Setting.
 
 ---
 
