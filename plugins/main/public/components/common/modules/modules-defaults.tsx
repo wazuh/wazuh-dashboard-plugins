@@ -22,7 +22,6 @@ import {
 } from '../wazuh-discover/wz-discover';
 import { CaseManagementTab } from '../document-details/case-management';
 import { threatHuntingColumns } from '../../overview/threat-hunting/events/threat-hunting-columns';
-import { CaseManagementTab } from '../document-details/case-management';
 import { ThreatHuntingCases } from '../../overview';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
