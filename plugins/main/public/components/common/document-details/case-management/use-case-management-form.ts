@@ -195,6 +195,7 @@ function isFormDirty(state: CaseFormState): boolean {
 
 export function useCaseManagementForm(
   document: CaseManagementFormDocument,
+  onSaveSuccess?: () => void,
 ): UseCaseManagementFormReturn {
   const documentKey = `${document._index}:${document._id}`;
   const [state, dispatch] = useReducer(
@@ -274,6 +275,7 @@ export function useCaseManagementForm(
       );
 
       dispatch({ type: 'SAVE_SUCCESS', payload: savedCase });
+      onSaveSuccess?.();
       getToasts().add({
         color: 'success',
         title: isNewCase ? 'Case created' : 'Case updated',

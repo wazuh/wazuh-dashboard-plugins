@@ -48,7 +48,13 @@ const InventoryDashboard = compose(
     categoriesSampleData,
     classNameDashboardWrapper,
     additionalDocumentDetailsTabs,
+    externalRefreshKey,
   }: InventoryDashboardTableProps) => {
+    const combinedFingerprint =
+      externalRefreshKey !== undefined
+        ? (fingerprint ?? 0) + externalRefreshKey
+        : fingerprint;
+
     const { results, dataGridProps, inspectedHit, removeInspectedHit } =
       useTableDataGridFetch({
         searchBarProps,
@@ -59,7 +65,7 @@ const InventoryDashboard = compose(
         fetchFilters,
         setFilters,
         fetchData,
-        fingerprint,
+        fingerprint: combinedFingerprint,
         autoRefreshFingerprint,
         isDataSourceLoading,
       });
@@ -110,7 +116,7 @@ const InventoryDashboard = compose(
                           ...dataSource,
                           searchBarProps,
                           fetchFilters,
-                          fingerprint,
+                          fingerprint: combinedFingerprint,
                           autoRefreshFingerprint,
                         },
                       }}
@@ -183,6 +189,7 @@ export interface InventoryDashboardTableProps {
   categoriesSampleData?: string[];
   classNameDashboardWrapper?: string;
   additionalDocumentDetailsTabs?: TableDataGridWithSearchBarInspectedHitProps<K>['additionalDocumentDetailsTabs'];
+  externalRefreshKey?: number;
 }
 
 export const InventoryDashboardTable = ({
@@ -196,6 +203,7 @@ export const InventoryDashboardTable = ({
   tableId,
   additionalDocumentDetailsTabs,
   categoriesSampleData,
+  externalRefreshKey,
 }: InventoryDashboardTableProps) => {
   const {
     dataSource,
@@ -234,6 +242,7 @@ export const InventoryDashboardTable = ({
       isDataSourceLoading={isDataSourceLoading}
       searchBarProps={searchBarProps}
       autoRefreshFingerprint={autoRefreshFingerprint}
+      externalRefreshKey={externalRefreshKey}
       tableDefaultColumns={tableDefaultColumns}
       getDashboardPanels={getDashboardPanels}
       managedFilters={managedFilters}

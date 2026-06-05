@@ -658,6 +658,7 @@ export const DATA_SOURCE_FILTER_CONTROLLED_MALWARE_DETECTION_THREAT_ENRICHMENTS_
 export const DATA_SOURCE_FILTER_CONTROLLED_AWS_RULE_GROUP = 'aws-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_AZURE_RULE_GROUP =
   'azure-rule-group'; // TODO: change this to 'azure-rule-group' if needed when Azure data source is implemented
+export const DATA_SOURCE_FILTER_CONTROLLED_CASES_EXIST = 'cases-status-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_FIM_RULE_GROUP = 'fim-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_CONFIGURATION_ASSASSMENT_RULE_GROUP =
   'configuration-assessment-rule-group';
@@ -1016,6 +1017,8 @@ export const INDEX_PATTERN_EVENTS_REQUIRED_FIELDS = [
 export const THREAT_HUNTING_DASHBOARD_ID = 'threat-hunting-overview-dashboard';
 export const THREAT_HUNTING_AGENT_DASHBOARD_ID =
   'threat-hunting-pinned-agent-dashboard';
+export const THREAT_HUNTING_CASES_DASHBOARD_ID =
+  'threat-hunting-cases-dashboard-tab';
 
 export const AMAZON_WEB_SERVICES_DASHBOARD_ID = 'aws-overview-dashboard-tab';
 export const AMAZON_WEB_SERVICES_AGENT_DASHBOARD_ID =
