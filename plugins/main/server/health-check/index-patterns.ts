@@ -1,0 +1,431 @@
+import { IndexPatternsFetcher } from '../../../../src/plugins/data/server';
+import {
+  indexPatternHasMissingFields,
+  indexPatternHasTimeField,
+} from '../../common/services/index-patterns';
+import type {
+  HealthCheckTaskContext,
+  InitializationTaskContext,
+  InitializationTaskRunContext,
+} from './types';
+
+interface EnsureIndexPatternExistenceContextTask {
+  indexPatternID: string;
+  options: any;
+}
+
+async function getFieldMappings(
+  { logger, indexPatternsClient },
+  indexPatternTitle: string,
+) {
+  logger.debug(`Getting index pattern fields for title [${indexPatternTitle}]`);
+
+  // https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.16.0/src/plugins/data/server/index_patterns/routes.ts#L74
+  const fields = await indexPatternsClient.getFieldsForWildcard({
+    pattern: indexPatternTitle,
+    // meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score
+    metaFields: ['_source', '_id', '_type', '_index', '_score'],
+  });
+
+  logger.debug(
+    `Fields for index pattern with title [${indexPatternTitle}]: ${JSON.stringify(
+      fields,
+    )}`,
+  );
+
+  return fields;
+}
+
+interface CreateIndexPatternOptions {
+  fieldsNoIndices?: any;
+  savedObjectOverwrite?:
+  | Record<string, any>
+  | ((params: any) => Record<string, any>);
+}
+
+async function createIndexPattern(
+  { logger, savedObjectsClient, indexPatternsClient },
+  indexPatternID,
+  options: CreateIndexPatternOptions = {},
+) {
+  try {
+    let fieldsObj;
+
+    // The creation of the index pattern will always rely on the defined known fields.
+    fieldsObj = options.fieldsNoIndices;
+
+    const title = indexPatternID;
+    const fields = JSON.stringify(fieldsObj);
+
+    let savedObjectData = {
+      title,
+      fields,
+    };
+
+    if (typeof options?.savedObjectOverwrite === 'function') {
+      const overwriteProps = options?.savedObjectOverwrite(savedObjectData);
+      savedObjectData = {
+        ...savedObjectData,
+        ...overwriteProps,
+      };
+    }
+
+    if (typeof options?.savedObjectOverwrite === 'object') {
+      savedObjectData = {
+        ...savedObjectData,
+        ...options?.savedObjectOverwrite,
+      };
+    }
+
+    logger.debug(
+      `Creating index pattern with ID [${indexPatternID}] title [${savedObjectData.title}]`,
+    );
+
+    const response = await savedObjectsClient.create(
+      'index-pattern',
+      savedObjectData,
+      {
+        id: indexPatternID,
+        overwrite: true,
+        refresh: true,
+      },
+    );
+    const indexPatternCreatedMessage = `Created index pattern with ID [${response.id}] title [${response.attributes.title}]`;
+
+    logger.info(indexPatternCreatedMessage);
+
+    return response;
+  } catch (error) {
+    throw new Error(
+      `index pattern with ID [${indexPatternID}] could not be created due to: ${error.message}. This could indicate the collection is disabled or there is a problem in the data collection or ingestion.`,
+    );
+  }
+}
+
+export const ensureIndexPatternExistence = async (
+  { logger, savedObjectsClient, indexPatternsClient },
+  { indexPatternID, options = {} }: EnsureIndexPatternExistenceContextTask,
+) => {
+  try {
+    logger.debug(
+      `Checking existence of index pattern with ID [${indexPatternID}]`,
+    );
+
+    const response = await savedObjectsClient.get(
+      'index-pattern',
+      indexPatternID,
+    );
+
+    logger.debug(`Index pattern with ID [${indexPatternID}] exists`);
+
+    return response;
+  } catch (error) {
+    // Get not found saved object
+    if (error?.output?.statusCode === 404) {
+      // Create index pattern
+      logger.info(`Index pattern with ID [${indexPatternID}] does not exist`);
+
+      return await createIndexPattern(
+        { logger, savedObjectsClient, indexPatternsClient },
+        indexPatternID,
+        options,
+      );
+    } else {
+      throw new Error(
+        `index pattern with ID [${indexPatternID}] existence could not be checked due to: ${error.message}`,
+      );
+    }
+  }
+};
+
+export const matchesPatternList = (listString, indexPatternTitle) => {
+  const [, cleanIndexPatterns] = listString.match(/\[(.+)]/) || [null, null];
+
+  if (!cleanIndexPatterns) {
+    return false;
+  }
+
+  const indexPatterns = cleanIndexPatterns.match(/([^\s,]+)/g);
+
+  if (!indexPatterns) {
+    return false;
+  }
+
+  const lastChar = indexPatternTitle.at(-1);
+  const indexPatternTitleCleaned =
+    lastChar === '*' ? indexPatternTitle.slice(0, -1) : indexPatternTitle;
+
+  return indexPatterns.some(indexPattern => {
+    const lastChar = indexPattern.at(-1);
+    const indexPatternCleaned =
+      lastChar === '*' ? indexPattern.slice(0, -1) : indexPattern;
+
+    return (
+      indexPatternCleaned.startsWith(indexPatternTitleCleaned) ||
+      indexPatternTitleCleaned.startsWith(indexPatternCleaned)
+    );
+  });
+};
+
+export const ensureIndexPatternHasTemplate = async (
+  ctx,
+  indexPatternTitle: string,
+) => {
+  ctx.logger.debug('Getting templates');
+  const data =
+    await ctx.services.core.opensearch.client.asInternalUser.cat.templates({
+      format: 'json',
+    });
+
+  const templates = data.body;
+
+  ctx.logger.debug(`Templates: [${templates}]`);
+
+  const templatesFound = templates.filter(template => {
+    if (!template?.index_patterns) {
+      return false;
+    }
+
+    return matchesPatternList(template?.index_patterns, indexPatternTitle);
+  });
+
+  if (templatesFound.length === 0) {
+    throw new Error(`Template was not found for [${indexPatternTitle}]`);
+  }
+
+  ctx.logger.info(
+    `Templates found [${templatesFound.map(({ name }) => name).join(', ')}]`,
+  );
+
+  return templatesFound;
+};
+
+function getSavedObjectsClient(
+  ctx: HealthCheckTaskContext,
+  scope: InitializationTaskContext,
+) {
+  if (scope.includes('internal')) {
+    return ctx.services.core.savedObjects.createInternalRepository();
+  }
+
+  if (scope.includes('user')) {
+    return ctx.services.core.savedObjects.savedObjectsStart.getScopedClient(
+      ctx.request,
+    );
+  }
+}
+
+function getIndexPatternsClient(
+  ctx: HealthCheckTaskContext,
+  scope: InitializationTaskContext,
+) {
+  if (scope.includes('internal')) {
+    return new IndexPatternsFetcher(
+      ctx.services.core.opensearch.legacy.client.callAsInternalUser,
+    );
+  }
+
+  if (scope.includes('user')) {
+    return new IndexPatternsFetcher(
+      ctx.services.core.opensearch.legacy.client.callAsCurrentUser,
+    );
+  }
+}
+
+async function validateIndexPattern(indexPattern, options, ctx, logger) {
+  logger.debug(
+    `Validating index pattern [title ${indexPattern.attributes.title}] [id ${indexPattern.id}]`,
+  );
+  if (
+    options.hasTimeFieldName &&
+    !indexPatternHasTimeField(indexPattern, options.hasTimeFieldName)
+  ) {
+    throw new Error(
+      `Index pattern has missing the time field name: [${options.hasTimeFieldName !== true
+        ? options.hasTimeFieldName
+        : 'any compatible field'
+      }]`,
+    );
+  }
+
+  if (options.hasFields && options.hasFields.length > 0) {
+    const requiredFields = options.hasFields;
+    const indedxPatternFields = JSON.parse(indexPattern.attributes.fields);
+
+    const missingFields = indexPatternHasMissingFields(
+      requiredFields,
+      indedxPatternFields as unknown as { name: string }[],
+    );
+
+    if (missingFields?.length > 0) {
+      throw new Error(
+        `Index pattern has missing some expected fields: ${missingFields.join(
+          ', ',
+        )}`,
+      );
+    }
+  }
+
+  if (options.hasTemplate) {
+    await ensureIndexPatternHasTemplate(
+      { ...ctx, logger },
+      indexPattern?.attributes?.title,
+    );
+  }
+}
+
+export const initializationTaskCreatorIndexPattern = ({
+  taskName,
+  options = {},
+  indexPatternID,
+  services,
+  taskProps = {},
+}: {
+  taskName: string;
+  options: CreateIndexPatternOptions & {
+    hasFields?: string[];
+    hasTemplate?: boolean;
+    hasTimeFieldName?: true | string;
+    checkDefaultIndexPattern?: boolean;
+  };
+  indexPatternID?: string;
+}) => ({
+  ...taskProps,
+  name: taskName,
+  async run({ context: ctx, logger }: InitializationTaskRunContext) {
+    try {
+      logger.debug('Starting index pattern saved object');
+      // Get clients depending on the scope
+      const savedObjectsClient = getSavedObjectsClient(ctx, ctx.scope);
+      const indexPatternsClient = getIndexPatternsClient(ctx, ctx.scope);
+
+      let compatibleIndexPatterns = [];
+
+      if (indexPatternID) {
+        const savedObject = await ensureIndexPatternExistence(
+          { ...ctx, indexPatternsClient, savedObjectsClient, logger },
+          {
+            indexPatternID: indexPatternID,
+            options,
+          },
+        );
+
+        if (options.checkDefaultIndexPattern) {
+          const uiSettingsClient =
+            ctx.services.core.uiSettings.asScopedToClient(savedObjectsClient);
+          const defaultIndex = await uiSettingsClient.get('defaultIndex');
+
+          // Set defaultIndex only when null (first launch), otherwise respect user configuration when it's '' or any other value.
+          if (defaultIndex === null) {
+            logger.debug(
+              `Default index pattern is null, setting to [${savedObject.id}]`,
+            );
+            if (savedObject.id) {
+              logger.info(
+                `Setting default index pattern to [${savedObject.id}] from health check initialization task`,
+              );
+              await uiSettingsClient.set('defaultIndex', savedObject.id);
+              logger.info(`Default index pattern set to [${savedObject.id}]`);
+            }
+          } else {
+            logger.debug(`Default index pattern already configured, skipping`);
+          }
+        }
+
+        await validateIndexPattern(savedObject, options, ctx, logger);
+        compatibleIndexPatterns.push(savedObject);
+      } else {
+        const { saved_objects: savedObjects } = await savedObjectsClient.find({
+          type: ['index-pattern'],
+          perPage: 10000, // TODO: This should iterate
+          page: 1,
+        });
+
+        for (const savedObject of savedObjects) {
+          try {
+            await validateIndexPattern(savedObject, options, ctx, logger);
+            compatibleIndexPatterns.push(savedObject);
+          } catch { }
+        }
+      }
+
+      if (compatibleIndexPatterns?.length === 0) {
+        throw new Error('No compatible index patterns were found');
+      }
+
+      return compatibleIndexPatterns?.map(({ id, attributes: { title } }) => ({
+        title,
+        id,
+      }));
+    } catch (error) {
+      const message = `Error initilizating index pattern with ID [${indexPatternID}]: ${error.message}`;
+
+      logger.error(message);
+      throw new Error(message);
+    }
+  },
+});
+
+const fieldMappers = {
+  bytes: ({ type }) => (type === 'number' ? { id: 'bytes' } : undefined),
+  // integer, remove thousand and decimal separators through the params.pattern
+  integer: ({ type }) =>
+    type === 'number' ? { id: 'number', params: { pattern: '0' } } : undefined,
+  percent: ({ type }) => {
+    return type === 'number'
+      ? { id: 'percent', params: { pattern: '0,0.[00]%' } }
+      : undefined;
+  },
+};
+
+export function mapFieldsFormat(expectedFields: {
+  [key: keyof typeof fieldMappers]: (field: any) => any;
+}) {
+  return ({ fields }) => {
+    const fieldsToMap = Object.keys(expectedFields);
+    const mappedFields = JSON.parse(fields)
+      ?.filter(({ name }) => fieldsToMap.includes(name))
+      .map(field => {
+        const { name } = field;
+        const mapper = fieldMappers[expectedFields[name]] || undefined;
+
+        if (!mapper) {
+          return undefined;
+        }
+        const result = mapper(field);
+        if (!result) {
+          return undefined;
+        }
+        return [name, result];
+      })
+      .filter(Boolean);
+
+    if (mappedFields.length) {
+      return {
+        fieldFormatMap: JSON.stringify(Object.fromEntries(mappedFields)),
+      }; // Add format map for expected fields
+    }
+    return {};
+  };
+}
+
+const DATE_TYPE = 'date';
+
+export function defineTimeFieldNameIfExist(timeFieldName: string) {
+  return function (savedObjectData) {
+    const fields = JSON.parse(savedObjectData.fields);
+
+    if (
+      !fields.some(
+        ({ name, type }) => name === timeFieldName && type === DATE_TYPE,
+      )
+    ) {
+      throw new Error(
+        `time field name was not found [${timeFieldName}] with [${DATE_TYPE}] type in the fields`,
+      );
+    }
+    return {
+      timeFieldName,
+    };
+  };
+}

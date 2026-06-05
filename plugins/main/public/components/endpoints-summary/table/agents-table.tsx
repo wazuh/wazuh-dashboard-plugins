@@ -41,13 +41,7 @@ import { AgentUpgradesTaskDetailsModal } from './upgrade-task-details-modal';
 import NavigationService from '../../../react-services/navigation-service';
 import { getWazuhAPIVersion } from '../services';
 import { RemoveAgentModal } from './actions/remove-agent-modal';
-
-const searchBarWQLOptions = {
-  implicitQuery: {
-    query: 'id!=000',
-    conjunction: ';',
-  },
-};
+import { getAgentVersion } from '../../../../common/services/wz-agent';
 
 type AgentList = {
   items: Agent[];
@@ -62,7 +56,6 @@ interface AgentsTableProps {
 
 export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   const defaultFilters = {
-    default: { q: 'id!=000' },
     ...(sessionStorage.getItem('wz-agents-overview-table-filter')
       ? JSON.parse(sessionStorage.getItem('wz-agents-overview-table-filter'))
       : {}),
@@ -279,7 +272,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                   v<NUMBER><ANYTHING>
                   */
                 ...(typeof item.version === 'string'
-                  ? { version: item.version.match(/(v\d.+)/)?.[1] }
+                  ? { version: getAgentVersion(item.version).raw }
                   : { version: '-' }),
               };
             }}
@@ -291,7 +284,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
             showFieldSelector
             searchTable
             searchBarWQL={{
-              options: searchBarWQLOptions,
               suggestions: {
                 field(currentValue) {
                   return [
@@ -358,10 +350,10 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                               sort: `+${field}`,
                               ...(currentValue
                                 ? {
-                                    q: `${searchBarWQLOptions.implicitQuery.query}${searchBarWQLOptions.implicitQuery.conjunction}${field}~${currentValue}`,
+                                    q: `${field}~${currentValue}`,
                                   }
                                 : {
-                                    q: `${searchBarWQLOptions.implicitQuery.query}`,
+                                    q: ``,
                                   }),
                             },
                           },

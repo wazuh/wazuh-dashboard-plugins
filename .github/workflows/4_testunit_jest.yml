@@ -14,7 +14,7 @@ on:
       reference:
         required: true
         type: string
-        default: 4.14.1
+        default: 4.14.0
         description: Source code reference (branch, tag or commit SHA)
       command:
         required: true

@@ -61,7 +61,7 @@ export const SampleDataWarning = ({
   };
 
   useEffect(() => {
-    request();
+    // request(); // Removed temporally
   }, []);
 
   if (isSampleData) {
@@ -78,7 +78,7 @@ export const SampleDataWarning = ({
           <p>
             {'The data displayed may contain sample data. Go '}
             <EuiLink
-              href={NavigationService.getInstance().getUrlForApp(sampleData.id)}
+              href={NavigationService.getInstance().getAppURL(sampleData.id)}
               aria-label='go to configure sample data'
             >
               {'here'}

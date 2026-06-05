@@ -22,6 +22,11 @@ jest.mock('../../../kibana-services', () => ({
       prepend: str => str,
     },
   }),
+  getCookies: () => {
+    return {
+      get: () => 'test',
+    };
+  },
 }));
 jest.mock(
   '../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',

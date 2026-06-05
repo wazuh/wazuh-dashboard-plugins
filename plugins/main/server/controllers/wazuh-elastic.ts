@@ -13,11 +13,11 @@ import { ErrorResponse, WAZUH_STATUS_CODES } from '../lib/error-response';
 import {
   WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
   WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
-  WAZUH_ALERTS_PREFIX,
   WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA,
   WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS,
   WAZUH_INDEXER_NAME,
   HTTP_STATUS_CODES,
+  WAZUH_ENGINE_SETTINGS_INDEX,
 } from '../../common/constants';
 import {
   OpenSearchDashboardsRequest,
@@ -66,7 +66,7 @@ export class WazuhElasticCtrl {
                 item.settingIndexPattern,
               )
             : item.indexPatternPrefix
-        }sample-${category}`,
+        }-sample`,
         dataSet: item?.dataSet,
       })),
     );
@@ -195,11 +195,6 @@ export class WazuhElasticCtrl {
         query: {
           bool: {
             must: [],
-            must_not: {
-              term: {
-                'agent.id': '000',
-              },
-            },
             filter: [
               {
                 range: { timestamp: {} },
@@ -234,7 +229,7 @@ export class WazuhElasticCtrl {
       if (request.query.agentsList)
         payload.query.bool.filter.push({
           terms: {
-            'agent.id': request.query.agentsList.split(','),
+            'wazuh.agent.id': request.query.agentsList.split(','),
           },
         });
       payload.aggs['2'].terms.field = request.params.field;
@@ -263,32 +258,6 @@ export class WazuhElasticCtrl {
   }
 
   /**
-   * Checks for minimum index pattern fields in a list of index patterns.
-   * @param {Array<Object>} indexPatternList List of index patterns
-   */
-  validateIndexPattern(indexPatternList) {
-    const minimum = ['timestamp', 'rule.groups', 'manager.name', 'agent.id'];
-    let list = [];
-    for (const index of indexPatternList) {
-      let valid, parsed;
-      try {
-        parsed = JSON.parse(index.attributes.fields);
-      } catch (error) {
-        continue;
-      }
-
-      valid = parsed.filter(item => minimum.includes(item.name));
-      if (valid.length === 4) {
-        list.push({
-          id: index.id,
-          title: index.attributes.title,
-        });
-      }
-    }
-    return list;
-  }
-
-  /**
    * Returns current security platform
    * @param {Object} req
    * @param {Object} reply
@@ -309,6 +278,171 @@ export class WazuhElasticCtrl {
       context.wazuh.logger.error(error.message || error);
       return ErrorResponse(error.message || error, 4011, 500, response);
     }
+  }
+
+  /**
+   * Retrieves the wazuh.case.* fields of a findings document.
+   */
+  async getFindingsCase(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest<{ index: string; documentId: string }>,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const { index, documentId } = request.params;
+
+      if (!this.isFindingsIndex(index)) {
+        return ErrorResponse(
+          'Case management is only supported on wazuh-findings-v5 indices',
+          4015,
+          HTTP_STATUS_CODES.BAD_REQUEST,
+          response,
+        );
+      }
+
+      const client = context.core.opensearch.client.asCurrentUser;
+      const encodedIndex = encodeURIComponent(index);
+      const encodedDocumentId = encodeURIComponent(documentId);
+
+      try {
+        const getResponse = await client.transport.request({
+          method: 'GET',
+          path: `/${encodedIndex}/_doc/${encodedDocumentId}`,
+        });
+        const caseFields = getResponse?.body?._source?.wazuh?.case ?? null;
+        return response.ok({ body: { case: caseFields } });
+      } catch (error: any) {
+        if (error?.meta?.statusCode === 404) {
+          return response.ok({ body: { case: null } });
+        }
+        throw error;
+      }
+    } catch (error: any) {
+      const [statusCode, errorMessage] = this.getErrorDetails(error);
+      context.wazuh.logger.error(
+        `Error fetching findings case: ${errorMessage}`,
+      );
+      return ErrorResponse(
+        errorMessage,
+        WAZUH_STATUS_CODES.UNKNOWN,
+        statusCode,
+        response,
+      );
+    }
+  }
+
+  /**
+   * Updates wazuh.case.* fields on a findings document (wazuh-findings-v5* indices).
+   */
+  async updateFindingsCase(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest<{
+      index: string;
+      documentId: string;
+    }>,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const { index, documentId } = request.params;
+      const { status, comment, tags } = request.body as {
+        status?: string;
+        comment?: string;
+        tags?: string[];
+      };
+
+      if (!this.isFindingsIndex(index)) {
+        return ErrorResponse(
+          'Case management is only supported on wazuh-findings-v5 indices',
+          4013,
+          HTTP_STATUS_CODES.BAD_REQUEST,
+          response,
+        );
+      }
+
+      const { username } = await context.wazuh.security.getCurrentUser(
+        request,
+        context,
+      );
+      if (!username) {
+        return ErrorResponse(
+          'Could not resolve the current user',
+          4014,
+          HTTP_STATUS_CODES.UNAUTHORIZED,
+          response,
+        );
+      }
+
+      const client = context.core.opensearch.client.asCurrentUser;
+      const encodedIndex = encodeURIComponent(index);
+      const encodedDocumentId = encodeURIComponent(documentId);
+
+      let existingCreatedAt: string | undefined;
+      try {
+        const getResponse = await client.transport.request({
+          method: 'GET',
+          path: `/${encodedIndex}/_doc/${encodedDocumentId}`,
+        });
+        existingCreatedAt = getResponse?.body?._source?.wazuh?.case?.created_at;
+      } catch (error: any) {
+        if (error?.meta?.statusCode !== 404) {
+          throw error;
+        }
+      }
+
+      const now = Date.now().toString();
+      const caseUpdate: Record<string, unknown> = {
+        user: { name: username },
+        updated_at: now,
+        created_at: existingCreatedAt ?? now,
+      };
+
+      if (status !== undefined) {
+        caseUpdate.status = status;
+      }
+      if (comment !== undefined) {
+        caseUpdate.comment = comment;
+      }
+      if (tags !== undefined) {
+        caseUpdate.tags = tags;
+      }
+
+      await client.transport.request({
+        method: 'POST',
+        path: `/${encodedIndex}/_update/${encodedDocumentId}`,
+        body: {
+          doc: {
+            wazuh: {
+              case: caseUpdate,
+            },
+          },
+        },
+      });
+
+      return response.ok({
+        body: {
+          message: 'Case updated successfully',
+          case: caseUpdate,
+        },
+      });
+    } catch (error: any) {
+      const [statusCode, errorMessage] = this.getErrorDetails(error);
+      context.wazuh.logger.error(
+        `Error updating findings case: ${errorMessage}`,
+      );
+      return ErrorResponse(
+        errorMessage,
+        WAZUH_STATUS_CODES.UNKNOWN,
+        statusCode,
+        response,
+      );
+    }
+  }
+
+  private isFindingsIndex(index: string): boolean {
+    return (
+      /^wazuh-findings-v5/i.test(index) ||
+      /^\.ds-wazuh-findings-v5/i.test(index)
+    );
   }
 
   /**
@@ -435,6 +569,7 @@ export class WazuhElasticCtrl {
                 mappedData.forEach((item: { sampleData: [] }) =>
                   sampleDataAndTemplate.sampleData.push(...item.sampleData),
                 );
+                sampleDataAndTemplate.template = mappedData[0].template;
               }
 
               if (mappedData.length === 1 && mappedData[0].template) {
@@ -461,11 +596,17 @@ export class WazuhElasticCtrl {
                 let configuration;
 
                 if (sampleDataAndTemplate?.template) {
-                  configuration = sampleDataAndTemplate.template.template;
+                  const templateData = sampleDataAndTemplate.template.template;
 
-                  delete configuration.index_patterns;
-                  delete configuration.priority;
+                  configuration = {
+                    settings: templateData.settings || {},
+                    mappings: templateData.mappings || {},
+                  };
 
+                  // Override shards and replicas for sample data
+                  if (!configuration.settings.index) {
+                    configuration.settings.index = {};
+                  }
                   configuration.settings.index.number_of_shards =
                     WAZUH_SAMPLE_ALERTS_INDEX_SHARDS;
                   configuration.settings.index.number_of_replicas =
@@ -490,6 +631,7 @@ export class WazuhElasticCtrl {
                 context.wazuh.logger.info(`Index ${indexName} created`);
               }
 
+              // FIX: This could not fail when there is a problem indexing data, for example when the template is strict and the document to index does not fullfil the data schema of the template
               await context.core.opensearch.client.asCurrentUser.bulk({
                 index: indexName,
                 body: bulk,
@@ -676,6 +818,93 @@ export class WazuhElasticCtrl {
     } catch (error) {
       context.wazuh.logger.error(error.message || error);
       return ErrorResponse(error.message || error, 4010, 500, response);
+    }
+  }
+
+  async getIndexerSettings(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const fallbackSearch =
+        await context.core.opensearch.client.asCurrentUser.search({
+          index: WAZUH_ENGINE_SETTINGS_INDEX,
+          size: 1,
+          body: {
+            query: { match_all: {} },
+          },
+        });
+      const hit = fallbackSearch?.body?.hits?.hits?.[0];
+      const source = hit?._source ?? {};
+
+      if (!source.engine) {
+        throw ErrorResponse(`Engine settings not found`, 404, 500, response);
+      }
+
+      return response.ok({
+        body: {
+          ...source,
+          engine: source.engine,
+        },
+      });
+    } catch (error: any) {
+      context.wazuh.logger.error(error.message || error);
+      return ErrorResponse(error.message || error, 4010, 500, response);
+    }
+  }
+
+  async updateIndexerSettings(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest<{ engine: Record<string, unknown> }>,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const osResp =
+        await context.core.opensearch.client.asCurrentUser.transport.request({
+          method: 'PUT',
+          path: '/_plugins/_setup/settings',
+          body: request.body,
+        });
+
+      const osBody = osResp?.body ?? {};
+      const message = osBody?.message ?? 'Settings updated successfully.';
+      const status = typeof osBody?.status === 'number' ? osBody.status : 200;
+
+      return response.custom({
+        statusCode: status,
+        body: { message, status },
+      });
+    } catch (error: any) {
+      const pluginBody = error?.meta?.body ?? {};
+      const hasPluginResponse =
+        typeof pluginBody?.message === 'string' &&
+        typeof pluginBody?.status === 'number';
+
+      if (hasPluginResponse) {
+        context.wazuh.logger.error(
+          `Error updating Indexer Setup settings: ${pluginBody.message}`,
+        );
+        return response.custom({
+          statusCode: pluginBody.status,
+          body: { message: pluginBody.message, status: pluginBody.status },
+        });
+      }
+
+      const message =
+        pluginBody?.detail ?? error?.message ?? 'Internal Server Error.';
+      const status = error?.meta?.statusCode ?? 500;
+
+      context.wazuh.logger.error(
+        `Error updating Indexer Setup settings: ${message}`,
+      );
+
+      return ErrorResponse(
+        message,
+        WAZUH_STATUS_CODES.UNKNOWN,
+        status,
+        response,
+      );
     }
   }
 

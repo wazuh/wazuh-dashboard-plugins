@@ -6,22 +6,31 @@ import {
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryPackagesDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
-import { ITHygieneInventoryDashboardTable } from '../../../common/components/inventory';
-import { getOverviewPackagesPackagesTab } from './dashboard';
+import { InventoryDashboardTable } from '../../../../../common/dashboards';
+import {
+  WAZUH_SAMPLE_INVENTORY_AGENT,
+  IT_HYGIENE_PACKAGES_INVENTORY_ID,
+  IT_HYGIENE_PACKAGES_AGENT_INVENTORY_ID,
+} from '../../../../../../../common/constants';
 
 export const ITHygienePackagesInventoryPackages =
-  withSystemInventoryPackagesDataSource(props => {
+  withSystemInventoryPackagesDataSource(() => {
     return (
-      <ITHygieneInventoryDashboardTable
+      <InventoryDashboardTable
         DataSource={SystemInventoryStatesDataSource}
         DataSourceRepositoryCreator={
           SystemInventoryPackagesStatesDataSourceRepository
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
-        getDashboardPanels={getOverviewPackagesPackagesTab}
+        getDashboardPanels={[
+          {
+            dashboardId: IT_HYGIENE_PACKAGES_INVENTORY_ID,
+            agentDashboardId: IT_HYGIENE_PACKAGES_AGENT_INVENTORY_ID,
+          },
+        ]}
         tableId='it-hygiene-inventory-packages'
-        indexPattern={props.indexPattern}
+        categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
       />
     );
   });

@@ -2,7 +2,6 @@ import rison from 'rison-node';
 import store from '../../../../redux/store';
 import { AppState } from '../../../../react-services/app-state';
 import { getDataPlugin } from '../../../../kibana-services';
-import { FilterHandler } from '../../../../utils/filter-handler';
 import {
   tDataSourceFilterManager,
   tFilter,
@@ -13,31 +12,7 @@ import {
 import { DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER } from '../../../../../common/constants';
 import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
 import { FilterStateStore } from '../../../../../common/constants';
-
-const MANAGER_AGENT_ID = '000';
-const AGENT_ID_KEY = 'agent.id';
-
-/**
- * Get the filter that excludes the data related to Wazuh servers
- * @param indexPatternId Index pattern id
- * @returns
- */
-export function getFilterExcludeManager(indexPatternId: string) {
-  return {
-    meta: {
-      alias: null,
-      disabled: false,
-      key: AGENT_ID_KEY,
-      negate: true,
-      params: { query: MANAGER_AGENT_ID },
-      type: 'phrase',
-      index: indexPatternId,
-      controlledBy: DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
-    },
-    query: { match_phrase: { [AGENT_ID_KEY]: MANAGER_AGENT_ID } },
-    $state: { store: FilterStateStore.APP_STATE },
-  };
-}
+import { ErrorDataSourceServerAPIContextFilter } from '../../../../utils/errors';
 
 export enum FILTER_OPERATOR {
   IS = 'is',
@@ -256,33 +231,31 @@ export class PatternDataSourceFilterManager
   }
 
   /**
-   * Return the filter when the cluster or manager are enabled
+   * Return the cluster filter
    */
-  static getClusterManagerFilters(
+  static getClusterFilters(
     indexPatternId: string,
     controlledByValue: string,
     key?: string,
   ): tFilter[] {
-    const filterHandler = new FilterHandler();
-    const isCluster = AppState.getClusterInfo().status == 'enabled';
-    const managerFilter = filterHandler.managerQuery(
-      isCluster
-        ? AppState.getClusterInfo().cluster
-        : AppState.getClusterInfo().manager,
-      isCluster,
-      key,
+    const { cluster } = AppState.getClusterInfo();
+    const filterValue = cluster;
+
+    if (filterValue === undefined) {
+      throw new ErrorDataSourceServerAPIContextFilter(
+        'Filter could not be created because no server API is selected. Make sure a server API is available and choose one in the selector.',
+      );
+    }
+
+    const clusterFilter = PatternDataSourceFilterManager.createFilter(
+      FILTER_OPERATOR.IS,
+      key || 'wazuh.cluster.name',
+      filterValue,
+      indexPatternId,
+      controlledByValue,
     );
-    managerFilter.meta = {
-      ...managerFilter.meta,
-      controlledBy: controlledByValue,
-      index: indexPatternId,
-    };
     //@ts-ignore
-    managerFilter.$state = {
-      store: FilterStateStore.APP_STATE,
-    };
-    //@ts-ignore
-    return [managerFilter] as tFilter[];
+    return [clusterFilter] as tFilter[];
   }
 
   /**
@@ -304,19 +277,6 @@ export class PatternDataSourceFilterManager
         PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
       ),
     ];
-  }
-
-  /**
-   * Return the filter to exclude the data related to servers (managers) due to the setting hideManagerAlerts is enabled
-   */
-  static getExcludeManagerFilter(indexPatternId: string): tFilter[] {
-    if (store.getState().appConfig?.data?.hideManagerAlerts) {
-      let excludeManagerFilter = getFilterExcludeManager(
-        indexPatternId,
-      ) as tFilter;
-      return [excludeManagerFilter];
-    }
-    return [];
   }
 
   /******************************************************************/

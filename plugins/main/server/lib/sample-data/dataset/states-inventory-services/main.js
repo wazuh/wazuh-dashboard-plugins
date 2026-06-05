@@ -1,5 +1,10 @@
 const random = require('../../lib/random');
-const { generateRandomWazuh, generateRandomAgent } = require('../shared-utils');
+const {
+  generateRandomWazuh,
+  generateRandomAgent,
+  generateRandomState,
+  generateRandomChecksum,
+} = require('../../shared-utils');
 
 function generateRandomService(os) {
   let service = {};
@@ -109,6 +114,15 @@ function generateDocument(params) {
   let document = {};
 
   const os = random.choice(['linux', 'windows', 'mac']);
+
+  document.agent = generateRandomAgent();
+  document.checksum = generateRandomChecksum();
+  document.service = generateRandomService(os);
+  document.process = generateRandomProcess(os, document.service.state);
+  document.wazuh = generateRandomWazuh(params);
+  document.state = generateRandomState();
+
+  // OS-specific fields
   if (os === 'linux') {
     document.file = {
       path: `/usr/lib/systemd/system/${random.choice([
@@ -118,9 +132,6 @@ function generateDocument(params) {
       ])}`,
     };
   } else if (os === 'mac') {
-    document.file = {
-      path: `/Applications/${random.choice(['App.app', 'Service.app'])}`,
-    };
     document.log = {
       file: {
         path: `/var/log/${random.choice([
@@ -141,10 +152,6 @@ function generateDocument(params) {
     };
   }
 
-  document.service = generateRandomService(os);
-  document.process = generateRandomProcess(os, document.service.state);
-  document.agent = generateRandomAgent();
-  document.wazuh = generateRandomWazuh(params);
   return document;
 }
 

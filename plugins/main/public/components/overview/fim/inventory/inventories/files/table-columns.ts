@@ -1,6 +1,6 @@
 export default [
   {
-    id: 'agent.name',
+    id: 'wazuh.agent.name',
   },
   {
     id: 'file.path',
@@ -10,11 +10,14 @@ export default [
   },
   {
     id: 'file.owner',
+    initialWidth: 120,
   },
   {
     id: 'file.uid',
+    initialWidth: 80,
   },
   {
     id: 'file.size',
+    initialWidth: 100,
   },
 ];

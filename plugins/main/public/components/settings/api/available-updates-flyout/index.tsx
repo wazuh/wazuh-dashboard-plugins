@@ -8,18 +8,18 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
 } from '@elastic/eui';
-import { ApiAvailableUpdates } from '../../../../../../wazuh-check-updates/common/types';
+import { AvailableUpdates } from '../../../../../../wazuh-check-updates/common/types';
 import { UpdateDetail } from './update-detail';
 import { WzFlyout } from '../../../../components/common/flyouts';
 
 interface AvailableUpdatesFlyoutProps {
-  api: ApiAvailableUpdates;
+  updates: AvailableUpdates;
   isVisible: boolean;
   onClose: () => void;
 }
 
 export const AvailableUpdatesFlyout = ({
-  api,
+  updates,
 }: AvailableUpdatesFlyoutProps) => {
   return (
     <>
@@ -28,18 +28,8 @@ export const AvailableUpdatesFlyout = ({
           <EuiDescriptionList
             listItems={[
               {
-                title: 'API ID',
-                description: api.api_id,
-              },
-            ]}
-          />
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiDescriptionList
-            listItems={[
-              {
                 title: 'Version',
-                description: api.current_version as string,
+                description: updates.current_version as string,
               },
             ]}
           />
@@ -47,15 +37,15 @@ export const AvailableUpdatesFlyout = ({
       </EuiFlexGroup>
       <EuiSpacer />
       <UpdateDetail
-        update={api.last_available_major || {}}
+        update={updates.last_available_major || {}}
         type='Last available major'
       />
       <UpdateDetail
-        update={api.last_available_minor || {}}
+        update={updates.last_available_minor || {}}
         type='Last available minor'
       />
       <UpdateDetail
-        update={api.last_available_patch || {}}
+        update={updates.last_available_patch || {}}
         type='Last available patch'
       />
     </>

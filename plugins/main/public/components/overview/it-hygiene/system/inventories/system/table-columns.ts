@@ -1,5 +1,5 @@
 export default [
-  { id: 'agent.name' },
+  { id: 'wazuh.agent.name' },
   { id: 'host.os.platform' },
   { id: 'host.os.name' },
   { id: 'host.os.version' },

@@ -23,47 +23,69 @@ import {
 } from '@elastic/eui';
 import { Typography, TypographySize } from '../../../typography/typography';
 import { FlyoutTechnique } from '../../../../overview/mitre/framework/components/techniques/components/flyout-technique';
-import { getMitreCount } from './lib';
-import { useAsyncActionRunOnStart, useTimeFilter } from '../../../hooks';
+import { useTimeFilter } from '../../../hooks';
 import NavigationService from '../../../../../react-services/navigation-service';
-import { AppState } from '../../../../../react-services';
 import { mitreAttack } from '../../../../../utils/applications';
 import {
   FILTER_OPERATOR,
   PatternDataSourceFilterManager,
 } from '../../../data-source/pattern/pattern-data-source-filter-manager';
+import { compose } from 'redux';
+import { withDataSourceFetch, withGuard } from '../../../hocs';
+import {
+  FindingsDataSourceRepository,
+  MitreAttackDataSource,
+} from '../../../data-source';
 
-const getTacticsData = async (agentId, timeFilter) => {
-  return await getMitreCount(agentId, timeFilter, undefined);
-};
+const PromptNoData = () => (
+  <EuiEmptyPrompt
+    iconType='stats'
+    title={<Typography level='prompt'>No results</Typography>}
+    titleSize={TypographySize({ level: 'prompt' })}
+    body={<p>No MITRE ATT&CK results were found in the selected time range.</p>}
+  />
+);
 
-const getTechniques = async (agentId, timeFilter, tacticID) => {
-  return await getMitreCount(agentId, timeFilter, tacticID);
-};
-
-const MitreTopTacticsTactics = ({
-  agentId,
-  renderEmpty,
-  setView,
-  setSelectedTactic,
-  timeFilter,
-}) => {
-  const getData = useAsyncActionRunOnStart(getTacticsData, [
-    agentId,
-    timeFilter,
-  ]);
-
-  if (getData.running) {
-    return (
+const MitreTopTacticsTactics = compose(
+  withDataSourceFetch({
+    DataSource: MitreAttackDataSource,
+    DataSourceRepositoryCreator: FindingsDataSourceRepository,
+    mapRequestParams(props) {
+      const [, , dateRange] = props.dependencies;
+      return {
+        aggs: {
+          tactics: {
+            terms: {
+              field: 'wazuh.rule.mitre.tactic.name',
+              size: 5,
+            },
+          },
+        },
+        dateRange,
+      };
+    },
+    mapFetchActionDependencies(props) {
+      return [
+        props.timeFilter,
+        /* Changing the agent causes the fetchFilters change, and the HOC manage this case so it is not
+    requried adding the agent to the dependencies */
+        ,
+      ];
+    },
+    mapResponse(response) {
+      return response?.aggregations?.tactics?.buckets;
+    },
+    FetchingDataComponent: () => (
       <div style={{ display: 'block', textAlign: 'center', paddingTop: 100 }}>
         <EuiLoadingChart size='xl' />
       </div>
-    );
-  }
-
-  if (getData?.data?.length === 0) {
-    return renderEmpty();
-  }
+    ),
+  }),
+  withGuard(
+    ({ dataSourceAction }) => dataSourceAction?.data?.length === 0,
+    PromptNoData,
+  ),
+)(({ dataSourceAction, setView, setSelectedTactic }) => {
   return (
     <>
       <div className='wz-agents-mitre'>
@@ -74,7 +96,7 @@ const MitreTopTacticsTactics = ({
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
-            {getData?.data?.map(tactic => (
+            {dataSourceAction?.data?.map(tactic => (
               <EuiFacetButton
                 key={tactic.key}
                 quantity={tactic.doc_count}
@@ -91,21 +113,80 @@ const MitreTopTacticsTactics = ({
       </div>
     </>
   );
-};
+});
 
-const MitreTopTacticsTechniques = ({
-  agentId,
-  renderEmpty,
-  selectedTactic,
-  setView,
-  timeFilter,
-}) => {
-  const getData = useAsyncActionRunOnStart(getTechniques, [
-    agentId,
-    timeFilter,
-    selectedTactic,
-  ]);
+const MitreTopTacticsTechniquesHeader = ({ selectedTactic, setView }) => (
+  <>
+    <EuiFlexGroup>
+      {/* TODO: this should be splitted separating the header, to allow go back */}
+      <EuiFlexItem grow={false}>
+        <EuiButtonIcon
+          size={'s'}
+          color={'primary'}
+          onClick={() => {
+            setView('tactics');
+          }}
+          iconType='sortLeft'
+          aria-label='Back Top Tactics'
+        />
+      </EuiFlexItem>
+      <EuiFlexItem>
+        <Typography level='card'>{selectedTactic}</Typography>
+      </EuiFlexItem>
+    </EuiFlexGroup>
+    <EuiSpacer size='s' />
+  </>
+);
 
+const MitreTopTacticsTechniquesBody = compose(
+  withDataSourceFetch({
+    DataSource: MitreAttackDataSource,
+    DataSourceRepositoryCreator: FindingsDataSourceRepository,
+    mapRequestParams(props) {
+      const [, dateRange, selectedTactic] = props.dependencies;
+      return {
+        filters: [
+          ...props.dataSource.fetchFilters,
+          PatternDataSourceFilterManager.createFilter(
+            FILTER_OPERATOR.IS,
+            'wazuh.rule.mitre.tactic.name',
+            selectedTactic,
+            props.dataSource.dataSource.indexPattern.id,
+          ),
+        ],
+        aggs: {
+          tactics: {
+            terms: {
+              field: 'wazuh.rule.mitre.technique.id',
+              size: 5,
+            },
+          },
+        },
+        dateRange,
+      };
+    },
+    mapFetchActionDependencies(props) {
+      return [
+        props.timeFilter,
+        props.selectedTactic,
+        /* Changing the agent causes the fetchFilters change, and the HOC manage this case so it is not
+    requried adding the agent to the dependencies */
+      ];
+    },
+    mapResponse(response, props) {
+      return response?.aggregations?.tactics?.buckets;
+    },
+    FetchingDataComponent: () => (
+      <div style={{ display: 'block', textAlign: 'center', paddingTop: 100 }}>
+        <EuiLoadingChart size='xl' />
+      </div>
+    ),
+  }),
+  withGuard(
+    ({ dataSourceAction }) => dataSourceAction?.data?.length === 0,
+    PromptNoData,
+  ),
+)(({ agentId, dataSource, dataSourceAction }) => {
   const [showTechniqueDetails, setShowTechniqueDetails] = useState<string>('');
 
   const onChangeFlyout = () => {
@@ -113,11 +194,11 @@ const MitreTopTacticsTechniques = ({
   };
 
   const goToDashboardWithFilter = async (e, techniqueID) => {
-    const indexPatternId = AppState.getCurrentPattern();
+    const indexPatternId = dataSource.dataSource.indexPattern.id;
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
-        `rule.mitre.id`,
+        `wazuh.rule.mitre.technique.id`,
         techniqueID,
         indexPatternId,
       ),
@@ -132,11 +213,11 @@ const MitreTopTacticsTechniques = ({
   };
 
   const goToEventsWithFilter = async (e, techniqueID) => {
-    const indexPatternId = AppState.getCurrentPattern();
+    const indexPatternId = dataSource.dataSource.indexPattern.id;
     const filters = [
       PatternDataSourceFilterManager.createFilter(
         FILTER_OPERATOR.IS,
-        `rule.mitre.id`,
+        `wazuh.rule.mitre.technique.id`,
         techniqueID,
         indexPatternId,
       ),
@@ -150,39 +231,11 @@ const MitreTopTacticsTechniques = ({
     });
   };
 
-  if (getData.running) {
-    return (
-      <div style={{ display: 'block', textAlign: 'center', paddingTop: 100 }}>
-        <EuiLoadingChart size='xl' />
-      </div>
-    );
-  }
-
-  if (getData?.data?.length === 0) {
-    return renderEmpty();
-  }
   return (
     <>
-      <EuiFlexGroup alignItems='center' gutterSize='s'>
-        <EuiFlexItem grow={false}>
-          <EuiButtonIcon
-            size={'s'}
-            color={'primary'}
-            onClick={() => {
-              setView('tactics');
-            }}
-            iconType='sortLeft'
-            aria-label='Back Top Tactics'
-          />
-        </EuiFlexItem>
-        <EuiFlexItem>
-          <Typography level='card'>{selectedTactic}</Typography>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-      <EuiSpacer size='s' />
       <EuiFlexGroup>
         <EuiFlexItem>
-          {getData.data.map(tactic => (
+          {dataSourceAction.data?.map(tactic => (
             <EuiFacetButton
               key={tactic.key}
               quantity={tactic.doc_count}
@@ -198,7 +251,7 @@ const MitreTopTacticsTechniques = ({
           <FlyoutTechnique
             openDashboard={(e, itemId) => goToDashboardWithFilter(e, itemId)}
             openDiscover={(e, itemId) => goToEventsWithFilter(e, itemId)}
-            implicitFilters={[{ 'agent.id': agentId }]}
+            implicitFilters={[{ 'wazuh.agent.id': agentId }]}
             agentId={agentId}
             onChangeFlyout={onChangeFlyout}
             currentTechnique={showTechniqueDetails}
@@ -207,7 +260,17 @@ const MitreTopTacticsTechniques = ({
       </EuiFlexGroup>
     </>
   );
-};
+});
+
+const MitreTopTacticsTechniques = props => (
+  <>
+    <MitreTopTacticsTechniquesHeader
+      selectedTactic={props.selectedTactic}
+      setView={props.setView}
+    />
+    <MitreTopTacticsTechniquesBody {...props} />
+  </>
+);
 
 export const MitreTopTactics = ({ agentId }) => {
   const [view, setView] = useState<'tactics' | 'techniques'>('tactics');
@@ -218,23 +281,11 @@ export const MitreTopTactics = ({ agentId }) => {
     setView('tactics');
   }, [agentId]);
 
-  const renderEmpty = () => (
-    <EuiEmptyPrompt
-      iconType='stats'
-      title={<Typography level='prompt'>No results</Typography>}
-      titleSize={TypographySize({ level: 'prompt' })}
-      body={
-        <p>No MITRE ATT&CK results were found in the selected time range.</p>
-      }
-    />
-  );
-
   if (view === 'tactics') {
     return (
       <MitreTopTacticsTactics
         agentId={agentId}
         timeFilter={timeFilter}
-        renderEmpty={renderEmpty}
         setSelectedTactic={setSelectedTactic}
         setView={setView}
       />
@@ -246,7 +297,6 @@ export const MitreTopTactics = ({ agentId }) => {
       <MitreTopTacticsTechniques
         agentId={agentId}
         timeFilter={timeFilter}
-        renderEmpty={renderEmpty}
         selectedTactic={selectedTactic}
         setSelectedTactic={setSelectedTactic}
         setView={setView}

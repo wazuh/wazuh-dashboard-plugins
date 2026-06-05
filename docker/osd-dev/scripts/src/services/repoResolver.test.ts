@@ -28,6 +28,8 @@ describe('services/repoResolver', () => {
     enableSaml: false,
     serverFlagVersion: '',
     serverLocalFlagVersion: '',
+    useIndexerFromPackage: false,
+    allForks: false,
   };
 
   beforeEach(() => {

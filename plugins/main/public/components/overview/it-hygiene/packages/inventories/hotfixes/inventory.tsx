@@ -6,13 +6,17 @@ import {
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryHotfixesDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
-import { ITHygieneInventoryDashboardTable } from '../../../common/components/inventory';
-import { getOverviewPackagesHotfixesTab } from './dashboard';
+import { InventoryDashboardTable } from '../../../../../common/dashboards';
+import {
+  WAZUH_SAMPLE_INVENTORY_AGENT,
+  IT_HYGIENE_HOTFIXES_INVENTORY_ID,
+  IT_HYGIENE_HOTFIXES_AGENT_INVENTORY_ID,
+} from '../../../../../../../common/constants';
 
 export const ITHygienePackagesInventoryHotfixes =
-  withSystemInventoryHotfixesDataSource(props => {
+  withSystemInventoryHotfixesDataSource(() => {
     return (
-      <ITHygieneInventoryDashboardTable
+      <InventoryDashboardTable
         DataSource={SystemInventoryStatesDataSource}
         DataSourceRepositoryCreator={
           SystemInventoryHotfixesStatesDataSourceRepository
@@ -20,9 +24,14 @@ export const ITHygienePackagesInventoryHotfixes =
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
         managedFiltersProps={{ style: { flexGrow: 0.25, minWidth: '300px' } }}
-        getDashboardPanels={getOverviewPackagesHotfixesTab}
+        getDashboardPanels={[
+          {
+            dashboardId: IT_HYGIENE_HOTFIXES_INVENTORY_ID,
+            agentDashboardId: IT_HYGIENE_HOTFIXES_AGENT_INVENTORY_ID,
+          },
+        ]}
         tableId='it-hygiene-inventory-hotfixes'
-        indexPattern={props.indexPattern}
+        categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
       />
     );
   });

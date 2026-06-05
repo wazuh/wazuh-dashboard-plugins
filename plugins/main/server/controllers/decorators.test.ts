@@ -1,8 +1,4 @@
-import {
-  routeDecoratorProtectedAdministrator,
-  routeDecoratorConfigurationAPIEditable,
-  compose,
-} from './decorators';
+import { routeDecoratorProtectedAdministrator, compose } from './decorators';
 
 const mockContext = ({
   isAdmin = false,
@@ -93,50 +89,11 @@ describe('route decorator: routeDecoratorProtectedAdministrator', () => {
   );
 });
 
-describe('route decorator: routeDecoratorConfigurationAPIEditable', () => {
-  it.each`
-    title                     | isConfigurationAPIEditable | isHandlerRun | responseBodyMessage
-    ${'Run handler'}          | ${true}                    | ${true}      | ${null}
-    ${'Avoid handler is run'} | ${false}                   | ${false}     | ${'The ability to edit the configuration from API is disabled. This can be enabled using configuration.ui_api_editable setting from the configuration file. Contact with an administrator.'}
-  `(
-    `$title`,
-    async ({
-      isConfigurationAPIEditable,
-      isHandlerRun,
-      responseBodyMessage,
-    }: {
-      isConfigurationAPIEditable: boolean;
-      isHandlerRun: boolean;
-      responseBodyMessage: string | null;
-    }) => {
-      const mockHandler = jest.fn();
-      const wrappedHandler =
-        routeDecoratorConfigurationAPIEditable(3021)(mockHandler);
-      const response = await wrappedHandler(
-        mockContext({ isConfigurationAPIEditable }),
-        mockRequest(),
-        mockResponse(),
-      );
-
-      if (isHandlerRun) {
-        expect(mockHandler).toHaveBeenCalled();
-      } else {
-        expect(mockHandler).not.toHaveBeenCalled();
-      }
-
-      responseBodyMessage &&
-        expect(response.body.message).toBe(responseBodyMessage);
-    },
-  );
-});
-
 describe('route decorators composition', () => {
   it.each`
-    title                     | config                                                   | isHandlerRun | responseBodyMessage
-    ${'Run handler'}          | ${{ isConfigurationAPIEditable: true, isAdmin: true }}   | ${true}      | ${null}
-    ${'Avoid handler is run'} | ${{ isConfigurationAPIEditable: false, isAdmin: true }}  | ${false}     | ${'The ability to edit the configuration from API is disabled. This can be enabled using configuration.ui_api_editable setting from the configuration file. Contact with an administrator.'}
-    ${'Avoid handler is run'} | ${{ isConfigurationAPIEditable: true, isAdmin: false }}  | ${false}     | ${'403 - User is not administrator'}
-    ${'Avoid handler is run'} | ${{ isConfigurationAPIEditable: false, isAdmin: false }} | ${false}     | ${'The ability to edit the configuration from API is disabled. This can be enabled using configuration.ui_api_editable setting from the configuration file. Contact with an administrator.'}
+    title                     | config                | isHandlerRun | responseBodyMessage
+    ${'Run handler'}          | ${{ isAdmin: true }}  | ${true}      | ${null}
+    ${'Avoid handler is run'} | ${{ isAdmin: false }} | ${false}     | ${'403 - User is not administrator'}
   `(
     `$title`,
     async ({
@@ -153,7 +110,6 @@ describe('route decorators composition', () => {
     }) => {
       const mockHandler = jest.fn();
       const wrappedHandler = compose(
-        routeDecoratorConfigurationAPIEditable(3021),
         routeDecoratorProtectedAdministrator(3021),
       )(mockHandler);
       const response = await wrappedHandler(

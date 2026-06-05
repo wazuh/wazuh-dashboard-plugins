@@ -110,7 +110,7 @@ const auditLogs = {
     groups: ['ms-graph'],
   },
   agent: {
-    id: '000',
+    id: '001',
     name: 'wazuh-test',
   },
   manager: {

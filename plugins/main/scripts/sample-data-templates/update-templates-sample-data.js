@@ -53,12 +53,38 @@ const getBranch = () => {
 // Configuration
 const config = {
   // GitHub repository base URL with dynamic branch
-  githubRepoBaseUrl: `https://raw.githubusercontent.com/wazuh/wazuh/${getBranch()}/src/wazuh_modules/inventory_harvester/indexer/template`,
-  githubRepoBaseUrlVulnerabilities: `https://raw.githubusercontent.com/wazuh/wazuh/${getBranch()}/src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json`,
+  githubRepoBaseUrl: `https://raw.githubusercontent.com/wazuh/wazuh-indexer-plugins/${getBranch()}/plugins/setup/src/main/resources`,
   // Local directory where datasets are located
   localDatasetDir: path.join(__dirname, '../../server/lib/sample-data/dataset'),
   // List of datasets to update (obtained from local directory)
   datasets: [],
+  // Mapping from local dataset names to remote template filenames
+  datasetToTemplateMapping: {
+    'metrics-agents': 'templates/streams/metrics-agents.json',
+    'metrics-comms': 'templates/streams/metrics-comms.json',
+    'metrics-normalization': 'templates/streams/metrics-normalization.json',
+    'states-fim-files': 'templates/states/fim-files.json',
+    'states-fim-registry-keys': 'templates/states/fim-registry-keys.json',
+    'states-fim-registry-values': 'templates/states/fim-registry-values.json',
+    'states-sca': 'templates/states/sca.json',
+    'states-vulnerabilities': 'templates/states/vulnerabilities.json',
+    'states-inventory-packages': 'templates/states/inventory-packages.json',
+    'states-inventory-processes': 'templates/states/inventory-processes.json',
+    'states-inventory-system': 'templates/states/inventory-system.json',
+    'states-inventory-networks': 'templates/states/inventory-networks.json',
+    'states-inventory-ports': 'templates/states/inventory-ports.json',
+    'states-inventory-hardware': 'templates/states/inventory-hardware.json',
+    'states-inventory-hotfixes': 'templates/states/inventory-hotfixes.json',
+    'states-inventory-interfaces': 'templates/states/inventory-interfaces.json',
+    'states-inventory-groups': 'templates/states/inventory-groups.json',
+    'states-inventory-users': 'templates/states/inventory-users.json',
+    'states-inventory-services': 'templates/states/inventory-services.json',
+    'states-inventory-protocols': 'templates/states/inventory-protocols.json',
+    'states-inventory-browser-extensions':
+      'templates/states/inventory-browser-extensions.json',
+  },
+  // WORKAROUND: This dataset is ignored due to issues with its template file (no existing in source repository). The wazuh-events dataset should be composed with the other wazuh-events related datasets in the future.
+  ignore_datasets: ['wazuh-events'],
 };
 
 // Function to get the list of datasets
@@ -66,8 +92,12 @@ function getDatasets() {
   try {
     const items = fs.readdirSync(config.localDatasetDir);
     config.datasets = items.filter(item => {
+      // Ignore specific datasets
+      if (config.ignore_datasets.includes(item)) {
+        return false;
+      }
       const itemPath = path.join(config.localDatasetDir, item);
-      return fs.statSync(itemPath).isDirectory() && item.startsWith('states-');
+      return fs.statSync(itemPath).isDirectory();
     });
     console.log(`Found ${config.datasets.length} datasets to update.`);
   } catch (error) {
@@ -78,14 +108,18 @@ function getDatasets() {
 
 // Function to download a file from GitHub
 function downloadFile(dataset) {
-  const templateFile = `wazuh-${dataset}.json`;
+  const templateFile = config.datasetToTemplateMapping[dataset];
+
+  if (!templateFile) {
+    return Promise.reject(
+      new Error(
+        `No template mapping found for dataset: ${dataset}. Add it to datasetToTemplateMapping in config.`,
+      ),
+    );
+  }
 
   return new Promise((resolve, reject) => {
-    // Use different URL for vulnerabilities dataset
-    const url =
-      dataset === 'states-vulnerabilities'
-        ? config.githubRepoBaseUrlVulnerabilities
-        : `${config.githubRepoBaseUrl}/${templateFile}`;
+    const url = `${config.githubRepoBaseUrl}/${templateFile}`;
 
     console.log(`Downloading: ${url}`);
 
@@ -116,7 +150,6 @@ function saveFile(dataset, filename, content) {
   return new Promise((resolve, reject) => {
     const filePath = path.join(config.localDatasetDir, dataset, filename);
 
-    // Save the new content
     fs.writeFile(filePath, content, 'utf8', error => {
       if (error) {
         reject(error);
@@ -182,6 +215,7 @@ async function updateTemplates() {
     results.failed.forEach(item => {
       console.log(`- ${item.dataset}: ${item.error}`);
     });
+    throw new Error('Some datasets failed to update.');
   }
 }
 

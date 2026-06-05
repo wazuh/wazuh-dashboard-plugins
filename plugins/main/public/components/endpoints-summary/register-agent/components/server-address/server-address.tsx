@@ -4,8 +4,8 @@ import {
   EuiText,
   EuiPopover,
   EuiButtonEmpty,
-  EuiLink,
   EuiSwitch,
+  EuiLink,
 } from '@elastic/eui';
 import React, { Fragment, useEffect, useState } from 'react';
 import { SERVER_ADDRESS_TEXTS } from '../../utils/register-agent-data';
@@ -14,10 +14,8 @@ import { InputForm } from '../../../../common/form';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import '../group-input/group-input.scss';
-import { WzRequest } from '../../../../../react-services';
 import { ErrorHandler } from '../../../../../react-services/error-management/error-handler/error-handler';
-import { WzButtonPermissions } from '../../../../common/permissions/button';
-import { useAppConfig } from '../../../../common/hooks';
+import { getUiSettings } from '../../../../../kibana-services';
 
 interface ServerAddressInputProps {
   formField: EnhancedFieldConfiguration;
@@ -51,7 +49,6 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
   const [defaultServerAddress, setDefaultServerAddress] = useState(
     formField?.initialValue ? formField?.initialValue : '',
   );
-  const appConfig = useAppConfig();
 
   const handleToggleRememberAddress = async event => {
     setRememberServerAddress(event.target.checked);
@@ -63,9 +60,8 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
 
   const saveServerAddress = async () => {
     try {
-      const res = await WzRequest.genericReq('PUT', '/utils/configuration', {
-        'enrollment.dns': formField.value,
-      });
+      // WORKAROUND: this could be done through the getWazuhCorePlugin().configuration but it requires the addition of a setter method
+      await getUiSettings().set('enrollment.dns', formField.value);
     } catch (error) {
       ErrorHandler.handleError(error, {
         message: error.message,
@@ -148,20 +144,16 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
           />
         </EuiFlexItem>
       </EuiFlexGroup>
-      {appConfig?.data?.['configuration.ui_api_editable'] && (
-        <EuiFlexGroup wrap>
-          <EuiFlexItem grow={false}>
-            <WzButtonPermissions
-              buttonType='switch'
-              administrator
-              disabled={rememberToggleIsDisabled()}
-              label='Remember server address'
-              checked={rememberServerAddress}
-              onChange={e => handleToggleRememberAddress(e)}
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      )}
+      <EuiFlexGroup wrap>
+        <EuiFlexItem grow={false}>
+          <EuiSwitch
+            disabled={rememberToggleIsDisabled()}
+            label='Remember server address'
+            checked={rememberServerAddress}
+            onChange={e => handleToggleRememberAddress(e)}
+          />
+        </EuiFlexItem>
+      </EuiFlexGroup>
     </Fragment>
   );
 };

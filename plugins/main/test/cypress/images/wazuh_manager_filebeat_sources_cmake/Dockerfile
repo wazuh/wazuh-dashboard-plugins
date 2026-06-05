@@ -30,7 +30,7 @@ RUN apt-get update -y \
 
 ENTRYPOINT /scripts/entrypoint.sh
 
-WORKDIR /var/ossec
+WORKDIR /var/wazuh-manager
 
 EXPOSE 514
 EXPOSE 1514

@@ -13,13 +13,6 @@ import {
   setCurrentRepoEnv,
   createSiblingRootUnder,
 } from './helpers/setupTests';
-import {
-  setupTestEnv,
-  teardownTestEnv,
-  SavedProcessState,
-  repoRoot,
-} from './helpers/setupTests';
-
 describe('dev.ts - Base startup with auto-detection (--base)', () => {
   let tmpdir: string;
   let siblingRoot: string;

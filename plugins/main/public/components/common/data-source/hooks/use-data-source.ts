@@ -10,7 +10,7 @@ import {
   tParsedIndexPattern,
   PatternDataSourceFilterManager,
   tFilterManager,
-} from '../index';
+} from '../pattern/index';
 import { createOsdUrlStateStorage } from '../../../../../../../src/plugins/opensearch_dashboards_utils/public';
 import NavigationService from '../../../../react-services/navigation-service';
 import { OSD_URL_STATE_STORAGE_ID } from '../../../../../common/constants';
@@ -117,7 +117,7 @@ export function useDataSource<
   const [fetchFilters, setFetchFilters] = useState<tFilter[]>([]);
   const [fixedFilters, setFixedFilters] = useState<tFilter[]>([]);
   const [allFilters, setAllFilters] = useState<tFilter[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
   const pinnedAgentManager = new PinnedAgentManager();
   const pinnedAgent = pinnedAgentManager.getPinnedAgent();
   const { isComponentMounted, getAbortController } = useIsMounted();
@@ -168,14 +168,18 @@ export function useDataSource<
         // what the filters update
         subscription = dataSourceFilterManager.getUpdates$().subscribe({
           next: () => {
-            if (!isComponentMounted()) return;
-            // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
-            dataSourceFilterManager.setFilters(
-              dataSourceFilterManager.getFilters(),
-            );
-            setAllFilters(dataSourceFilterManager.getFilters());
-            setFetchFilters(dataSourceFilterManager.getFetchFilters());
-            setFixedFilters(dataSourceFilterManager.getFixedFilters());
+            try {
+              if (!isComponentMounted()) return;
+              // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
+              dataSourceFilterManager.setFilters(
+                dataSourceFilterManager.getFilters(),
+              );
+              setAllFilters(dataSourceFilterManager.getFilters());
+              setFetchFilters(dataSourceFilterManager.getFetchFilters());
+              setFixedFilters(dataSourceFilterManager.getFixedFilters());
+            } catch (error) {
+              setError(error);
+            }
           },
         });
         setAllFilters(dataSourceFilterManager.getFilters());
@@ -183,7 +187,7 @@ export function useDataSource<
         setFixedFilters(dataSourceFilterManager.getFixedFilters());
         setDataSourceFilterManager(dataSourceFilterManager);
       } catch (e) {
-        setError(e?.message);
+        setError(e);
       } finally {
         setIsLoading(false);
       }
@@ -198,8 +202,12 @@ export function useDataSource<
 
   useEffect(() => {
     if (dataSourceFilterManager && dataSource) {
-      setFixedFilters(dataSourceFilterManager.getFixedFilters());
-      setFetchFilters(dataSourceFilterManager.getFetchFilters());
+      try {
+        setFixedFilters(dataSourceFilterManager.getFixedFilters());
+        setFetchFilters(dataSourceFilterManager.getFetchFilters());
+      } catch (error) {
+        setError(error);
+      }
     }
   }, [JSON.stringify(pinnedAgent)]);
 

@@ -84,7 +84,7 @@ export const WzElementPermissions = ({
       {userPermissionRequirements && userRequireAdministratorRequirements && (
         <EuiSpacer size='s' />
       )}
-      {userRequireAdministratorRequirements && (
+      {administrator && userRequireAdministratorRequirements && (
         <div>
           Require administrator privilegies:{' '}
           {userRequireAdministratorRequirements}

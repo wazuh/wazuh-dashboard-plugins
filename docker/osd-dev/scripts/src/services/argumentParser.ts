@@ -34,7 +34,7 @@ import type { Logger } from '../utils/logger';
 export function printUsageAndExit(log: Logger): never {
   log.infoPlain('');
   log.infoPlain(
-    `./dev.sh <action> [${FLAGS.PLUGINS_ROOT} /abs/path] [${FLAGS.OS_VERSION} os_version] [${FLAGS.OSD_VERSION} osd_version] [${FLAGS.AGENTS_UP} agents_up] [${FLAGS.REPO} repo=absolute_path ...] [${FLAGS.SAML} | ${FLAGS.SERVER} <version> | ${FLAGS.SERVER_LOCAL} <tag>] [${FLAGS.BASE} [absolute_path]]`,
+    `./dev.sh <action> [${FLAGS.PLUGINS_ROOT} /abs/path] [${FLAGS.OS_VERSION} os_version] [${FLAGS.OSD_VERSION} osd_version] [${FLAGS.AGENTS_UP} agents_up] [${FLAGS.REPO} repo=absolute_path ...] [${FLAGS.SAML} | ${FLAGS.SERVER} <version> | ${FLAGS.SERVER_LOCAL} <tag>] [${FLAGS.BASE} [absolute_path]] [${FLAGS.ALL_FORKS}]`,
   );
   log.infoPlain('');
   log.infoPlain('Flags');
@@ -44,10 +44,13 @@ export function printUsageAndExit(log: Logger): never {
   log.infoPlain(`  ${FLAGS.OS_VERSION} <os_version>      Optional OS version`);
   log.infoPlain(`  ${FLAGS.OSD_VERSION} <osd_version>    Optional OSD version`);
   log.infoPlain(
-    `  ${FLAGS.AGENTS_UP} <agents_up>       Optional for server-local: 'rpm' | 'deb' | 'without' (default: deploy 2 agents)`,
+    `  ${FLAGS.AGENTS_UP} <agents_up>        Optional for server-local: 'rpm' | 'deb' | 'without' (default: deploy 2 agents)`,
   );
   log.infoPlain(
     `  ${FLAGS.SAML}                 Enable SAML profile (can be combined with ${FLAGS.SERVER}/${FLAGS.SERVER_LOCAL})`,
+  );
+  log.infoPlain(
+    `  ${FLAGS.MAILPIT}              Enable Mailpit email testing service (web UI: http://localhost:8025, SMTP: localhost:1025)`,
   );
   log.infoPlain(
     `  ${FLAGS.SERVER} <version>    Enable server mode with the given version`,
@@ -60,6 +63,12 @@ export function printUsageAndExit(log: Logger): never {
   );
   log.infoPlain(
     `  ${FLAGS.BASE} [absolute_path] ${USAGE_NOTE_BASE_AUTODETECT}`,
+  );
+  log.infoPlain(
+    `  ${FLAGS.INDEXER_LOCAL} [image_tag] Use an indexer from package.`,
+  );
+  log.infoPlain(
+    `  ${FLAGS.ALL_FORKS}           Auto-discover and mount all sibling repositories (excludes wazuh-dashboard, use --base for that).`,
   );
   log.infoPlain('');
   log.infoPlain(
@@ -141,6 +150,12 @@ export function parseArguments(
 
       case FLAGS.SAML: {
         config.setEnableSaml(true, 'argumentParser');
+        index++;
+        break;
+      }
+
+      case FLAGS.MAILPIT: {
+        config.setEnableMailpit(true, 'argumentParser');
         index++;
         break;
       }
@@ -248,6 +263,33 @@ export function parseArguments(
         } else {
           index++;
         }
+        break;
+      }
+
+      case FLAGS.INDEXER_LOCAL: {
+        config.setUseIndexerFromPackage(true, 'argumentParser');
+        const nextArg = argv[index + 1];
+
+        if (nextArg) {
+          process.env.IMAGE_INDEXER_PACKAGE_TAG = nextArg;
+          index += 2;
+        } else if (
+          nextArg &&
+          !nextArg.startsWith('-') &&
+          !allowedActions.has(nextArg)
+        ) {
+          // Ignore and consume a relative token after FLAGS.BASE for backward compatibility
+          // (kept to satisfy tests that pass a placeholder like 'relative/path').
+          index += 2;
+        } else {
+          index++;
+        }
+        break;
+      }
+
+      case FLAGS.ALL_FORKS: {
+        config.setAllForks(true, 'argumentParser');
+        index++;
         break;
       }
 

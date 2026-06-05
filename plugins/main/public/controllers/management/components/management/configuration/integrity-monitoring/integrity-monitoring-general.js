@@ -21,7 +21,7 @@ import {
   renderValueOrNoValue,
   renderValueOrYes,
   renderValueOrNo,
-  renderValueNoThenEnabled
+  renderValueNoThenEnabled,
 } from '../utils/utils';
 
 import helpLinks from './help-links';
@@ -30,33 +30,33 @@ const mainSettings = [
   {
     field: 'disabled',
     label: 'Integrity monitoring status',
-    render: renderValueNoThenEnabled
+    render: renderValueNoThenEnabled,
   },
   {
     field: 'frequency',
-    label: 'Interval (in seconds) to run the integrity scan'
+    label: 'Interval (in seconds) to run the integrity scan',
   },
   {
     field: 'scan_time',
     label: 'Time of day to run integrity scans',
-    render: renderValueOrNoValue
+    render: renderValueOrNoValue,
   },
   {
     field: 'scan_day',
     label: 'Day of the week to run integrity scans',
-    render: renderValueOrNoValue
+    render: renderValueOrNoValue,
   },
   {
     field: 'auto_ignore',
     label: 'Ignore files that change too many times',
     render: renderValueOrNo,
-    when: 'manager'
+    when: 'manager',
   },
   {
     field: 'alert_new_files',
     label: 'Alert when new files are created',
     render: renderValueOrNo,
-    when: 'manager'
+    when: 'manager',
   },
   { field: 'scan_on_start', label: 'Scan on start' },
   { field: 'skip_nfs', label: 'Skip scan on CIFS/NFS mounts' },
@@ -66,28 +66,28 @@ const mainSettings = [
   {
     field: 'remove_old_diff',
     label: 'Remove old local snapshots',
-    render: renderValueOrYes
+    render: renderValueOrYes,
   },
   { field: 'restart_audit', label: 'Restart the Audit daemon' },
   {
     field: 'windows_audit_interval',
     label: "Interval (in seconds) to check directories' SACLs",
-    render: renderValueOrDefault('300')
+    render: renderValueOrDefault('300'),
   },
   {
     field: 'prefilter_cmd',
     label: 'Command to prevent prelinking',
-    render: renderValueOrNoValue
+    render: renderValueOrNoValue,
   },
   { field: 'max_eps', label: 'Maximum event reporting throughput' },
   { field: 'process_priority', label: 'Process priority' },
-  { field: 'database', label: 'Database type' }
+  { field: 'database', label: 'Database type' },
 ];
 
 const mainSettingsOfAgentOrManager = agent =>
-  agent.id === '000'
-    ? mainSettings
-    : mainSettings.filter(setting => setting.when !== 'manager');
+  agent
+    ? mainSettings.filter(setting => setting.when !== 'manager')
+    : mainSettings;
 
 class WzConfigurationIntegrityMonitoringGeneral extends Component {
   constructor(props) {
@@ -98,8 +98,8 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component {
     return (
       <Fragment>
         <WzConfigurationSettingsHeader
-          title="General"
-          description="The settings shown below are applied globally"
+          title='General'
+          description='The settings shown below are applied globally'
           help={helpLinks}
         >
           <WzSettingsGroup
@@ -113,7 +113,7 @@ class WzConfigurationIntegrityMonitoringGeneral extends Component {
 }
 
 WzConfigurationIntegrityMonitoringGeneral.proptTypes = {
-  agent: PropTypes.object
+  agent: PropTypes.object,
 };
 
 export default WzConfigurationIntegrityMonitoringGeneral;

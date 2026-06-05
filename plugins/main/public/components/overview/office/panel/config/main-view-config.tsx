@@ -17,7 +17,6 @@ import { EuiFlexItem } from '@elastic/eui';
 import { SecurityAlerts } from '../../../../visualize/components';
 
 export const MainViewConfig = (props: ModuleConfigProps) => {
-
   const { fetchFilters, searchBarProps, indexPattern } = props;
 
   const searchParams = {
@@ -27,7 +26,7 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
     dateRange: {
       from: searchBarProps.dateRangeFrom || '',
       to: searchBarProps.dateRangeTo || '',
-    }
+    },
   };
 
   return {
@@ -40,7 +39,7 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
               <EuiFlexItem grow={props.grow}>
                 <AggTable
                   tableTitle='Top users'
-                  aggTerm='data.office365.UserId'
+                  aggTerm='user.name'
                   aggLabel='User'
                   maxRows={5}
                   onRowClick={(field, value) => props.onRowClick(field, value)}
@@ -55,7 +54,7 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
               <EuiFlexItem grow={props.grow}>
                 <AggTable
                   tableTitle='Top client IP address'
-                  aggTerm='data.office365.ClientIP'
+                  aggTerm='client.ip'
                   aggLabel='Client IP address'
                   maxRows={5}
                   onRowClick={(field, value) => props.onRowClick(field, value)}
@@ -73,9 +72,9 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
             component: props => (
               <EuiFlexItem grow={props.grow}>
                 <AggTable
-                  tableTitle='Top rules'
-                  aggTerm='rule.description'
-                  aggLabel='Rule'
+                  tableTitle='Top actions'
+                  aggTerm='event.action'
+                  aggLabel='Action'
                   maxRows={5}
                   onRowClick={(field, value) => props.onRowClick(field, value)}
                   searchParams={searchParams}
@@ -88,9 +87,9 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
             component: props => (
               <EuiFlexItem grow={props.grow}>
                 <AggTable
-                  tableTitle='Top operations'
-                  aggTerm='data.office365.Operation'
-                  aggLabel='Operation'
+                  tableTitle='Top event types'
+                  aggTerm='event.type'
+                  aggLabel='Event Type'
                   maxRows={5}
                   onRowClick={(field, value) => props.onRowClick(field, value)}
                   searchParams={searchParams}
@@ -102,4 +101,4 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
       },
     ],
   };
-}
+};

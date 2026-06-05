@@ -16,13 +16,65 @@ import { delayAsPromise } from '../../../../../../../common/utils';
 import { AGENT_SYNCED_STATUS } from '../../../../../../../common/constants';
 
 /**
- * Get configuration for an agent/manager of request sections
- * @param {string} [agentId=000] Agent ID
+ * Fetch full node configuration and extract requested keys.
+ * Uses GET /cluster/{node}/configuration which returns the entire
+ * wazuh-manager.conf as a single response. Each section's key is
+ * extracted from affected_items[0].
+ *
+ * @param {string} node Cluster node name
+ * @param {array} sections Sections with { useFullEndpoint: true, key: string }
+ * @param {function} updateWazuhNotReadyYet
+ * @returns {object} Map of key → config object (or error string)
+ */
+const getFullEndpointConfig = async (
+  node,
+  sections,
+  updateWazuhNotReadyYet,
+) => {
+  const result = {};
+  try {
+    const url = `/cluster/${node}/configuration`;
+    const fullResult = await WzRequest.apiReq('GET', url, {});
+    const fullConfig =
+      fullResult?.data?.data?.total_affected_items !== 0
+        ? fullResult?.data?.data?.affected_items?.[0] || {}
+        : {};
+    for (const section of sections) {
+      result[section.key] = fullConfig[section.key] ?? {};
+    }
+  } catch (error) {
+    const errorMsg = await handleError(
+      error,
+      'Fetch configuration',
+      updateWazuhNotReadyYet,
+      node,
+    );
+    for (const section of sections) {
+      result[section.key] = errorMsg;
+    }
+  }
+  return result;
+};
+
+/**
+ * Get configuration for an agent of request sections.
+ *
+ * Supports two section formats:
+ *  - Standard:      { component: string, configuration: string }
+ *    Calls /cluster/{node}/configuration/{component}/{configuration}
+ *    or    /agents/{agentId}/config/{component}/{configuration}
+ *
+ *  - Full endpoint: { useFullEndpoint: true, key: string }
+ *    Delegates to getFullEndpointConfig which calls
+ *    /cluster/{node}/configuration once and extracts the requested
+ *    keys. Only valid in manager context (node must be set).
+ *
+ * @param {string} agentId Agent ID
  * @param {array} sections Sections
  * @param {false} [node=false] Node
  */
 export const getCurrentConfig = async (
-  agentId = '000',
+  agentId,
   sections,
   node = false,
   updateWazuhNotReadyYet,
@@ -40,7 +92,22 @@ export const getCurrentConfig = async (
     }
 
     const result = {};
-    for (const section of sections) {
+
+    const fullEndpointSections = sections.filter(s => s.useFullEndpoint);
+    const regularSections = sections.filter(s => !s.useFullEndpoint);
+
+    if (fullEndpointSections.length > 0 && node) {
+      Object.assign(
+        result,
+        await getFullEndpointConfig(
+          node,
+          fullEndpointSections,
+          updateWazuhNotReadyYet,
+        ),
+      );
+    }
+
+    for (const section of regularSections) {
       const { component, configuration } = section;
       if (
         !component ||
@@ -53,13 +120,11 @@ export const getCurrentConfig = async (
       try {
         const url = node
           ? `/cluster/${node}/configuration/${component}/${configuration}`
-          : !node && agentId === '000'
-          ? `/manager/configuration/${component}/${configuration}`
           : `/agents/${agentId}/config/${component}/${configuration}`;
 
         const partialResult = await WzRequest.apiReq('GET', url, {});
 
-        if (agentId === '000') {
+        if (node) {
           result[`${component}-${configuration}`] =
             partialResult.data.data.total_affected_items !== 0
               ? partialResult.data.data.affected_items[0]
@@ -145,7 +210,7 @@ export const handleError = async (
   try {
     if (messageIsString && message.includes('ERROR3099')) {
       updateWazuhNotReadyYet('Server not ready yet.');
-      await makePing(updateWazuhNotReadyYet, isCluster);
+      await makePing(updateWazuhNotReadyYet);
       return;
     }
 
@@ -166,39 +231,42 @@ export const handleError = async (
 };
 
 /**
- * Check daemons status
- * @param {boolean} isCluster
- * @returns {object|Promise}
+ * Check daemons status using cluster endpoints
+ * @returns {Promise<object>}
  */
-export const checkDaemons = async isCluster => {
+export const checkDaemons = async () => {
   try {
-    const response = await WzRequest.apiReq(
+    // First get the local node info
+    const localNodeInfo = await WzRequest.apiReq(
       'GET',
-      '/manager/status',
+      '/cluster/local/info',
+      {},
+    );
+    const nodeId = localNodeInfo.data.data.affected_items[0].node;
+
+    // Then check daemons status for this node
+    const daemonsStatus = await WzRequest.apiReq(
+      'GET',
+      `/cluster/${nodeId}/status`,
       {},
       { checkCurrentApiIsUp: false },
     );
     const daemons =
-      ((((response || {}).data || {}).data || {}).affected_items || [])[0] ||
-      {};
-    const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
+      ((((daemonsStatus || {}).data || {}).data || {}).affected_items ||
+        [])[0] || {};
 
-    const execd = daemons['wazuh-execd'] === 'running';
-    const modulesd = daemons['wazuh-modulesd'] === 'running';
-    const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
+    const wazuhdbExists = typeof daemons['wazuh-manager-db'] !== 'undefined';
 
-    let clusterd = true;
-    if (isCluster) {
-      const clusterStatus =
-        (((await clusterReq()) || {}).data || {}).data || {};
-      clusterd =
-        clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes'
-          ? daemons['wazuh-clusterd'] === 'running'
-          : false;
-    }
+    const modulesd = daemons['wazuh-manager-modulesd'] === 'running';
+    const wazuhdb = wazuhdbExists
+      ? daemons['wazuh-manager-db'] === 'running'
+      : true;
 
-    const isValid =
-      execd && modulesd && wazuhdb && (isCluster ? clusterd : true);
+    // In cluster by default, always check clusterd daemon
+    const clusterd = daemons['wazuh-manager-clusterd'] === 'running';
+    ('running');
+
+    const isValid = modulesd && wazuhdb && clusterd;
 
     if (isValid) {
       return { isValid };
@@ -213,21 +281,17 @@ export const checkDaemons = async isCluster => {
 /**
  * Make ping to Wazuh API
  * @param updateWazuhNotReadyYet
- * @param {boolean} isCluster
- * @param {number} [tries=10] Tries
+ * @param {number} [tries=30] Tries
  * @return {Promise}
  */
-export const makePing = async (
-  updateWazuhNotReadyYet,
-  isCluster,
-  tries = 30,
-) => {
+export const makePing = async (updateWazuhNotReadyYet, tries = 30) => {
   try {
     let isValid = false;
     while (tries--) {
       await delayAsPromise(2000);
       try {
-        isValid = await checkDaemons(isCluster);
+        const daemonCheck = await checkDaemons();
+        isValid = daemonCheck?.isValid;
         if (isValid) {
           updateWazuhNotReadyYet('');
           break;
@@ -246,31 +310,14 @@ export const makePing = async (
 };
 
 /**
- * Get Cluster status from Wazuh API
- * @returns {Promise}
- */
-export const clusterReq = async () => {
-  try {
-    return WzRequest.apiReq('GET', '/cluster/status', {});
-  } catch (error) {
-    return Promise.reject(error);
-  }
-};
-
-/**
- * Fetch a config file from cluster node or manager
+ * Fetch a config file from cluster node
  * @return {string}
  */
 export const fetchFile = async selectedNode => {
   try {
-    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {}; // TODO: Check, when FIX ISSUE /cluster/status
-    const isCluster =
-      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
     const data = await WzRequest.apiReq(
       'GET',
-      isCluster
-        ? `/cluster/${selectedNode}/configuration`
-        : `/manager/configuration`,
+      `/cluster/${selectedNode}/configuration`,
       {
         params: {
           raw: true,
@@ -292,7 +339,7 @@ export const fetchFile = async selectedNode => {
 };
 
 /**
- * Restart a node or manager
+ * Restart a node
  * @param {} selectedNode Cluster Node
  * @param updateWazuhNotReadyYet
  */
@@ -301,38 +348,9 @@ export const restartNodeSelected = async (
   updateWazuhNotReadyYet,
 ) => {
   try {
-    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
-    const isCluster =
-      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-    // Dispatch a Redux action
-    updateWazuhNotReadyYet(
-      `Restarting ${isCluster ? selectedNode : 'Manager'}, please wait.`,
-    ); //FIXME: if it enables/disables cluster, this will show Manager instead node name
-    isCluster ? await restartNode(selectedNode) : await restartManager();
-    return await makePing(updateWazuhNotReadyYet, isCluster);
-  } catch (error) {
-    throw error;
-  }
-};
-
-/**
- * Restart manager (single-node API call)
- * @returns {object|Promise}
- */
-export const restartManager = async () => {
-  try {
-    const validationError = await WzRequest.apiReq(
-      'GET',
-      `/manager/configuration/validation`,
-      {},
-    );
-    const isOk = validationError.status === 'OK';
-    if (!isOk && validationError.detail) {
-      const str = validationError.detail;
-      throw new Error(str);
-    }
-    const result = await WzRequest.apiReq('PUT', `/manager/restart`, {});
-    return result;
+    updateWazuhNotReadyYet(`Restarting ${selectedNode}, please wait.`);
+    await restartNode(selectedNode);
+    return await makePing(updateWazuhNotReadyYet);
   } catch (error) {
     throw error;
   }
@@ -402,23 +420,16 @@ export const restartNode = async node => {
 
 export const saveConfiguration = async (selectedNode, xml) => {
   try {
-    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
-    const enabledAndRunning =
-      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-    if (enabledAndRunning) {
-      await saveFileCluster(xml, selectedNode);
-    } else {
-      await saveFileManager(xml);
-    }
+    await saveFileCluster(xml, selectedNode);
   } catch (error) {
     throw error;
   }
 };
 
 /**
- * Send ossec.conf content for a cluster node
+ * Send wazuh-manager.conf content for a cluster node
  * @param {*} node Node name
- * @param {*} content XML raw content for ossec.conf file
+ * @param {*} content XML raw content for wazuh-manager.conf file
  */
 export const saveNodeConfiguration = async (node, content) => {
   try {
@@ -437,7 +448,7 @@ export const saveNodeConfiguration = async (node, content) => {
 };
 
 /**
- * Save text to ossec.conf cluster file
+ * Save text to wazuh-manager.conf cluster file
  * @param {string} text Text to save
  * @param {node}
  */
@@ -447,23 +458,7 @@ export const saveFileCluster = async (text, node) => {
       body: text.toString(),
       origin: 'raw',
     });
-    await validateAfterSent(node);
-  } catch (error) {
-    throw error;
-  }
-};
-
-/**
- * Save text to ossec.conf manager file
- * @param {string} text Text to save
- */
-export const saveFileManager = async text => {
-  try {
-    await WzRequest.apiReq('PUT', `/manager/configuration`, {
-      body: text.toString(),
-      origin: 'raw',
-    });
-    await validateAfterSent(false);
+    await validateAfterSent();
   } catch (error) {
     throw error;
   }
@@ -474,30 +469,13 @@ export const saveFileManager = async text => {
  * @param {} node Node
  * @returns{boolean|Promise}
  */
-export const validateAfterSent = async (node = false) => {
+export const validateAfterSent = async () => {
   try {
-    const clusterStatus = await WzRequest.apiReq('GET', `/cluster/status`, {});
-
-    const clusterData = ((clusterStatus || {}).data || {}).data || {};
-    const isCluster =
-      clusterData.enabled === 'yes' && clusterData.running === 'yes';
-
-    let validation = false;
-    if (node && isCluster) {
-      validation = await WzRequest.apiReq(
-        'GET',
-        `/cluster/configuration/validation`,
-        {},
-      );
-    } else {
-      validation = isCluster
-        ? await WzRequest.apiReq('GET', `/cluster/configuration/validation`, {})
-        : await WzRequest.apiReq(
-            'GET',
-            `/manager/configuration/validation`,
-            {},
-          );
-    }
+    const validation = await WzRequest.apiReq(
+      'GET',
+      `/cluster/configuration/validation`,
+      {},
+    );
     const data = ((validation || {}).data || {}).data || {};
     const isOk = data.status === 'OK';
     if (!isOk && Array.isArray(data.details)) {
@@ -527,32 +505,6 @@ export const agentIsSynchronized = async agent => {
 export const clusterNodes = async () => {
   try {
     const result = await WzRequest.apiReq('GET', `/cluster/nodes`, {});
-    return result;
-  } catch (error) {
-    throw error;
-  }
-};
-
-/**
- * Reload ruleset on all nodes using the new API endpoint.
- * @param {array} nodes List of nodes ID
- * @returns {Promise<object>}
- */
-export const reloadRuleset = async (nodes = []) => {
-  try {
-    const clusterStatus = await WzRequest.apiReq('GET', `/cluster/status`, {});
-
-    const clusterData = ((clusterStatus || {}).data || {}).data || {};
-    const isCluster =
-      clusterData.enabled === 'yes' && clusterData.running === 'yes';
-
-    const nodesString = nodes.join(',');
-    const nodes_param = nodesString ? `?nodes_list=${nodesString}` : '';
-    const reloadEndpoint = isCluster
-      ? `/cluster/analysisd/reload${nodes_param}`
-      : `/manager/analysisd/reload${nodes_param}`;
-
-    const result = await WzRequest.apiReq('PUT', reloadEndpoint, {});
     return result;
   } catch (error) {
     throw error;

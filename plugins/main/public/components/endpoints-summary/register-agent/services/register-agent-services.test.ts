@@ -43,10 +43,7 @@ describe('Register agent service', () => {
 
       WzRequest.apiReq = jest.fn().mockResolvedValueOnce(mockedResponse);
       const nodeName = 'example-node';
-      const res = await RegisterAgentService.getRemoteConfiguration(
-        nodeName,
-        false,
-      );
+      const res = await RegisterAgentService.getRemoteConfiguration(nodeName);
       expect(res.name).toBe(nodeName);
       expect(res.haveSecureConnection).toBe(true);
     });
@@ -74,10 +71,7 @@ describe('Register agent service', () => {
       };
       WzRequest.apiReq = jest.fn().mockResolvedValueOnce(mockedResponse);
       const nodeName = 'example-node';
-      const res = await RegisterAgentService.getRemoteConfiguration(
-        nodeName,
-        false,
-      );
+      const res = await RegisterAgentService.getRemoteConfiguration(nodeName);
       expect(res.name).toBe(nodeName);
       expect(res.haveSecureConnection).toBe(false);
     });
@@ -112,10 +106,7 @@ describe('Register agent service', () => {
       };
       WzRequest.apiReq = jest.fn().mockResolvedValueOnce(mockedResponse);
       const nodeName = 'example-node';
-      const res = await RegisterAgentService.getRemoteConfiguration(
-        nodeName,
-        false,
-      );
+      const res = await RegisterAgentService.getRemoteConfiguration(nodeName);
       expect(res.name).toBe(nodeName);
       expect(res.isUdp).toEqual(true);
     });
@@ -150,10 +141,7 @@ describe('Register agent service', () => {
       };
       WzRequest.apiReq = jest.fn().mockResolvedValueOnce(mockedResponse);
       const nodeName = 'example-node';
-      const res = await RegisterAgentService.getRemoteConfiguration(
-        nodeName,
-        false,
-      );
+      const res = await RegisterAgentService.getRemoteConfiguration(nodeName);
       expect(res.name).toBe(nodeName);
       expect(res.isUdp).toEqual(false);
     });
@@ -188,10 +176,7 @@ describe('Register agent service', () => {
       };
       WzRequest.apiReq = jest.fn().mockResolvedValueOnce(mockedResponse);
       const nodeName = 'example-node';
-      const res = await RegisterAgentService.getRemoteConfiguration(
-        nodeName,
-        false,
-      );
+      const res = await RegisterAgentService.getRemoteConfiguration(nodeName);
       expect(res.name).toBe(nodeName);
       expect(res.isUdp).toEqual(false);
     });

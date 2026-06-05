@@ -9,180 +9,177 @@ import {
 import { useDataSourceWithSearchBar } from '../hooks/use-data-source-search-context';
 import { IntlProvider } from 'react-intl';
 import { CustomSearchBar } from '../custom-search-bar';
-import { getPlugins } from '../../../kibana-services';
-import { ViewMode } from '../../../../../../src/plugins/embeddable/public';
+import DashboardRenderer from './dashboard-renderer/dashboard-renderer';
 import { CustomSearchBarProps } from '../custom-search-bar/custom-search-bar';
-import {
-  HideOnErrorInitializatingDataSource,
-  PromptErrorInitializatingDataSource,
-} from '../hocs';
+import { withDataSourceInitiated, withDataSourceLoading } from '../hocs';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { SampleDataWarning } from '../../visualize/components';
-import { IndexPattern } from '../../../../../../src/plugins/data/public/';
 import classnames from 'classnames';
+import { compose } from 'redux';
 
-const DashboardByRenderer =
-  getPlugins().dashboard.DashboardContainerByValueRenderer;
+const InventoryDashboard = compose(
+  withDataSourceLoading({
+    isLoadingNameProp: 'isDataSourceLoading',
+    LoadingComponent: LoadingSearchbarProgress,
+  }),
+  withDataSourceInitiated({
+    isLoadingNameProp: 'isDataSourceLoading',
+    dataSourceNameProp: 'dataSource',
+    dataSourceErrorNameProp: 'error',
+  }),
+)(
+  ({
+    dataSource,
+    filters,
+    fixedFilters,
+    fetchFilters,
+    setFilters,
+    fetchData,
+    fingerprint,
+    autoRefreshFingerprint,
+    searchBarProps,
+    isDataSourceLoading,
+    tableDefaultColumns,
+    getDashboardPanels,
+    managedFilters,
+    managedFiltersProps,
+    tableId,
+    categoriesSampleData,
+    classNameDashboardWrapper,
+    additionalDocumentDetailsTabs,
+  }: InventoryDashboardTableProps) => {
+    const { results, dataGridProps, inspectedHit, removeInspectedHit } =
+      useTableDataGridFetch({
+        searchBarProps,
+        tableId,
+        tableDefaultColumns,
+        dataSource,
+        filters,
+        fetchFilters,
+        setFilters,
+        fetchData,
+        fingerprint,
+        autoRefreshFingerprint,
+        isDataSourceLoading,
+      });
 
-const InventoryDashboard = ({
-  dataSource,
-  filters,
-  fixedFilters,
-  fetchFilters,
-  setFilters,
-  fetchData,
-  fingerprint,
-  autoRefreshFingerprint,
-  searchBarProps,
-  isDataSourceLoading,
-  tableDefaultColumns,
-  getDashboardPanels,
-  managedFilters,
-  managedFiltersProps,
-  tableId,
-  indexPattern,
-  error,
-  categoriesSampleData,
-  classNameDashboardWrapper,
-  additionalDocumentDetailsTabs,
-}: InventoryDashboardTableProps) => {
-  const { results, dataGridProps, inspectedHit, removeInspectedHit } =
-    useTableDataGridFetch({
-      searchBarProps,
-      tableId,
-      tableDefaultColumns,
-      dataSource,
-      filters,
-      fetchFilters,
-      setFilters,
-      fetchData,
-      fingerprint,
-      autoRefreshFingerprint,
-      isDataSourceLoading,
-    });
-  return (
-    <>
-      {isDataSourceLoading && !dataSource ? (
-        <LoadingSearchbarProgress />
-      ) : (
-        <>
-          {/* WORKAROUND1: Taking into account the workaround to mitigate the embedable dashboard
-              breaks due to navigation while this is being created, we are rendering the dashboard
-              with the index pattern provided by a HOC that checks if the index pattern exists
-              instead of the provided by the creation of he dataSource, this move does the dashboard
-              is created early, reducing the wait time and possibility to navigate to another view.
+    const shouldHideDashboard = !Boolean(results?.hits?.total > 0);
 
-              If there is an error with the creation of the dataSource, using the "wz-no-display"
-              class, "hides" the search bar, that with an additional optional rendering of a prompt
-              (for example: PromptErrorInitializatingDataSource), could similate the view is
-              protected, despite there are some components that are rendered.*/}
-          <HideOnErrorInitializatingDataSource error={error}>
-            <CustomSearchBar
-              searchBarProps={searchBarProps}
-              indexPattern={dataSource?.indexPattern}
-              setFilters={setFilters}
-              fixedFilters={fixedFilters}
-              filterInputs={managedFilters || []}
-              filterInputsProps={managedFiltersProps}
-            />
-          </HideOnErrorInitializatingDataSource>
+    return (
+      <>
+        <CustomSearchBar
+          searchBarProps={searchBarProps}
+          indexPattern={dataSource?.indexPattern}
+          setFilters={setFilters}
+          fixedFilters={fixedFilters}
+          filterInputs={managedFilters || []}
+          filterInputsProps={managedFiltersProps}
+        />
 
-          {dataSource && results?.hits?.total === 0 ? (
-            <DiscoverNoResults />
-          ) : null}
+        {results?.hits?.total === 0 ? <DiscoverNoResults /> : null}
+
+        {categoriesSampleData && (
           <div
-            className={classnames(
-              'wz-dashboard-responsive',
-              'wz-dashboard-hide-tables-pagination-export-csv-controls',
-              classNameDashboardWrapper,
-              {
-                'wz-no-display': !(dataSource && results?.hits?.total > 0),
-              },
-            )}
+            className={classnames(classNameDashboardWrapper, {
+              'wz-no-display': !shouldHideDashboard,
+            })}
           >
-            {categoriesSampleData && (
-              <SampleDataWarning categoriesSampleData={categoriesSampleData} />
-            )}
-            {getDashboardPanels && (
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    dataSource?.id || indexPattern?.id,
-                  ),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'it-hygiene-inventory-dashboard',
-                  timeRange: {
-                    from: searchBarProps.dateRangeFrom,
-                    to: searchBarProps.dateRangeTo,
-                  },
-                  title: 'IT Hygiene inventory dahsboard',
-                  description: 'IT Hygiene dashboard',
-                  query: searchBarProps.query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                  lastReloadRequestTime: fingerprint,
-                }}
-              />
-            )}
+            <SampleDataWarning categoriesSampleData={categoriesSampleData} />
           </div>
-          {dataSource && results?.hits?.total > 0 && (
-            <IntlProvider locale='en'>
-              <>
-                <EuiPageTemplate
-                  className='wz-table-data-grid'
-                  restrictWidth='100%'
-                  fullHeight={true}
-                  grow
-                  paddingSize='none'
-                  pageContentProps={{ color: 'transparent' }}
-                >
-                  <TableDataGridWithSearchBarInspectedHit
-                    dataSource={dataSource}
-                    filters={filters}
-                    fetchFilters={fetchFilters}
-                    fixedFilters={fixedFilters}
-                    isDataSourceLoading={isDataSourceLoading}
-                    setFilters={setFilters}
-                    searchBarProps={searchBarProps}
-                    displayOnlyNoResultsCalloutOnNoResults={true}
-                    showSearchBar={false}
-                    dataGridProps={dataGridProps}
-                    results={results}
-                    inspectedHit={inspectedHit}
-                    removeInspectedHit={removeInspectedHit}
-                    tableDefaultColumns={tableDefaultColumns}
-                    additionalDocumentDetailsTabs={
-                      additionalDocumentDetailsTabs
-                    }
-                  />
-                </EuiPageTemplate>
-              </>
-            </IntlProvider>
+        )}
+        <div className='wz-dashboard-responsive'>
+          {getDashboardPanels && (
+            <>
+              {getDashboardPanels.map(
+                ({ dashboardId, agentDashboardId, className = '' }) => {
+                  const dashboard = (
+                    <DashboardRenderer
+                      dashboardId={dashboardId}
+                      agentDashboardId={agentDashboardId}
+                      className={classnames(className, {
+                        'wz-no-display': shouldHideDashboard,
+                        'wz-dashboard-hide-tables-pagination-export-csv-controls':
+                          true,
+                      })}
+                      hasPinnedAgent={Boolean(
+                        dataSource?.getPinnedAgentFilter?.()?.length,
+                      )}
+                      config={{
+                        dataSource: {
+                          ...dataSource,
+                          searchBarProps,
+                          fetchFilters,
+                          fingerprint,
+                          autoRefreshFingerprint,
+                        },
+                      }}
+                    />
+                  );
+
+                  if (className) {
+                    return (
+                      <div key={dashboardId || agentDashboardId}>
+                        {dashboard}
+                      </div>
+                    );
+                  }
+
+                  return dashboard;
+                },
+              )}
+            </>
           )}
-          {/* Read WORKAROUND1 */}
-          {error && <PromptErrorInitializatingDataSource error={error} />}
-        </>
-      )}
-    </>
-  );
-};
+        </div>
+        {results?.hits?.total > 0 && (
+          <IntlProvider locale='en'>
+            <>
+              <EuiPageTemplate
+                className='wz-table-data-grid'
+                restrictWidth='100%'
+                fullHeight={true}
+                grow
+                paddingSize='none'
+                pageContentProps={{ color: 'transparent' }}
+              >
+                <TableDataGridWithSearchBarInspectedHit
+                  dataSource={dataSource}
+                  filters={filters}
+                  fetchFilters={fetchFilters}
+                  fixedFilters={fixedFilters}
+                  isDataSourceLoading={isDataSourceLoading}
+                  setFilters={setFilters}
+                  searchBarProps={searchBarProps}
+                  displayOnlyNoResultsCalloutOnNoResults={true}
+                  showSearchBar={false}
+                  dataGridProps={dataGridProps}
+                  results={results}
+                  inspectedHit={inspectedHit}
+                  removeInspectedHit={removeInspectedHit}
+                  tableDefaultColumns={tableDefaultColumns}
+                  additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
+                />
+              </EuiPageTemplate>
+            </>
+          </IntlProvider>
+        )}
+      </>
+    );
+  },
+);
 
 export interface InventoryDashboardTableProps {
   DataSource: any;
   DataSourceRepositoryCreator: any;
   tableDefaultColumns: { id: string }[];
-  getDashboardPanels: (indexPatternID: string) => any;
+  getDashboardPanels: Array<{
+    dashboardId: string;
+    agentDashboardId?: string;
+    className?: string;
+  }>;
   managedFilters: CustomSearchBarProps['filterInputs'];
   managedFiltersProps?: CustomSearchBarProps['filterInputsProps'];
   tableId: TableDataGridWithSearchBarInspectedHitFetchDataTableId;
-  indexPattern: IndexPattern;
   categoriesSampleData?: string[];
   classNameDashboardWrapper?: string;
   additionalDocumentDetailsTabs?: TableDataGridWithSearchBarInspectedHitProps<K>['additionalDocumentDetailsTabs'];
@@ -197,7 +194,6 @@ export const InventoryDashboardTable = ({
   managedFilters,
   managedFiltersProps,
   tableId,
-  indexPattern,
   additionalDocumentDetailsTabs,
   categoriesSampleData,
 }: InventoryDashboardTableProps) => {
@@ -220,7 +216,7 @@ export const InventoryDashboardTable = ({
 
   const searchBarProps = {
     ...managedSearchBarProps,
-    showDatePicker: false,
+    showDatePicker: Boolean(dataSource?.indexPattern?.timeFieldName),
     showQueryInput: true,
     showQueryBar: true,
     showSaveQuery: true,
@@ -244,7 +240,6 @@ export const InventoryDashboardTable = ({
       managedFiltersProps={managedFiltersProps}
       tableId={tableId}
       error={error}
-      indexPattern={indexPattern}
       classNameDashboardWrapper={classNameDashboardWrapper}
       additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
       categoriesSampleData={categoriesSampleData}

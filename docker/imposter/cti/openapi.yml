@@ -1,0 +1,244 @@
+openapi: 3.0.0
+info:
+  title: Wazuh CTI Console Mock API
+  description: |
+    Mock API for the CTI Console registration and authorization flow.
+
+    Implements the OAuth 2.0 Device Authorization Grant via a single endpoint:
+    `POST /api/v1/platform/environments/token`.
+
+    The endpoint behaviour depends on the request body:
+      - With only `client_id`: returns the device authorization response.
+      - With `grant_type=urn:ietf:params:oauth:grant-type:device_code`,
+        `client_id` and `device_code`: returns the access token (success) or
+        an OAuth error (`authorization_pending`, `slow_down`, `access_denied`,
+        `expired_token`).
+
+    The error scenario can be forced via the `X-Mock-Scenario` request header
+    with one of: `pending`, `slow_down`, `access_denied`, `expired_token`,
+    `success`. When not provided, the mock returns `authorization_pending`
+    for the first 2 polls and `success` afterwards.
+  version: 1.0.0
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: '{protocol}://{address}:{port}'
+    variables:
+      address:
+        default: localhost
+      port:
+        default: '8080'
+      protocol:
+        enum:
+          - http
+          - https
+        default: http
+
+tags:
+  - name: CTI Console
+    description: CTI Console registration and authorization endpoints
+
+paths:
+  /api/v1/platform/environments/token:
+    post:
+      summary: Device Authorization Grant endpoint
+      description: |
+        Single endpoint that handles both the Device Authorization Request
+        and the Access Token polling, following RFC 8628.
+      operationId: platformEnvironmentsToken
+      tags:
+        - CTI Console
+      parameters:
+        - in: header
+          name: X-Mock-Scenario
+          required: false
+          description: |
+            Forces a specific polling scenario. One of: `pending`, `slow_down`,
+            `access_denied`, `expired_token`, `success`.
+          schema:
+            type: string
+            enum:
+              - pending
+              - slow_down
+              - access_denied
+              - expired_token
+              - success
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/DeviceAuthorizationRequest'
+                - $ref: '#/components/schemas/TokenPollingRequest'
+            examples:
+              device_authorization_request:
+                summary: Device Authorization Request
+                value:
+                  client_id: a17c21ed
+              token_polling_request:
+                summary: Token Polling Request
+                value:
+                  grant_type: urn:ietf:params:oauth:grant-type:device_code
+                  client_id: a17c21ed
+                  device_code: mock_device_code_123
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/DeviceAuthorizationRequest'
+                - $ref: '#/components/schemas/TokenPollingRequest'
+      responses:
+        '200':
+          description: |
+            OK - Either the Device Authorization Response or a successful
+            Access Token Response, depending on the request body.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/DeviceAuthorizationResponse'
+                  - $ref: '#/components/schemas/TokenResponse'
+              examples:
+                device_authorization:
+                  summary: Device Authorization Response
+                  value:
+                    device_code: mock_device_code_123
+                    user_code: WZH-999
+                    verification_uri: https://cti.wazuh.com/activate
+                    expires_in: 600
+                    interval: 5
+                token_success:
+                  summary: Access Token Response
+                  value:
+                    access_token: asdf1234
+                    token_type: Bearer
+                    expires_in: 3600
+        '400':
+          description: |
+            Bad Request - OAuth 2.0 error response while polling for the
+            access token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                authorization_pending:
+                  summary: User has not yet authorized the device
+                  value:
+                    error: authorization_pending
+                slow_down:
+                  summary: Polling too frequently
+                  value:
+                    error: slow_down
+                access_denied:
+                  summary: User denied the authorization request
+                  value:
+                    error: access_denied
+                expired_token:
+                  summary: Device code expired
+                  value:
+                    error: expired_token
+
+components:
+  schemas:
+    DeviceAuthorizationRequest:
+      type: object
+      description: Initial request to start the Device Authorization Grant flow.
+      properties:
+        client_id:
+          type: string
+          description: The instance UID.
+          example: a17c21ed
+      required:
+        - client_id
+
+    TokenPollingRequest:
+      type: object
+      description: Polling request to obtain the access token.
+      properties:
+        grant_type:
+          type: string
+          description: OAuth 2.0 grant type for device authorization.
+          enum:
+            - urn:ietf:params:oauth:grant-type:device_code
+          example: urn:ietf:params:oauth:grant-type:device_code
+        client_id:
+          type: string
+          description: The instance UID.
+          example: a17c21ed
+        device_code:
+          type: string
+          description: Device verification code from the authorization response.
+          example: mock_device_code_123
+      required:
+        - grant_type
+        - client_id
+        - device_code
+
+    DeviceAuthorizationResponse:
+      type: object
+      description: Response containing the device and user codes.
+      properties:
+        device_code:
+          type: string
+          example: mock_device_code_123
+        user_code:
+          type: string
+          example: WZH-999
+        verification_uri:
+          type: string
+          format: uri
+          example: https://cti.wazuh.com/activate
+        expires_in:
+          type: integer
+          example: 600
+        interval:
+          type: integer
+          example: 5
+      required:
+        - device_code
+        - user_code
+        - verification_uri
+        - expires_in
+        - interval
+
+    TokenResponse:
+      type: object
+      description: Response containing the OAuth 2.0 access token.
+      properties:
+        access_token:
+          type: string
+          example: asdf1234
+        token_type:
+          type: string
+          enum:
+            - Bearer
+          example: Bearer
+        expires_in:
+          type: integer
+          example: 3600
+      required:
+        - access_token
+        - token_type
+        - expires_in
+
+    ErrorResponse:
+      type: object
+      description: OAuth 2.0 error response.
+      properties:
+        error:
+          type: string
+          enum:
+            - authorization_pending
+            - slow_down
+            - access_denied
+            - expired_token
+            - invalid_request
+          example: authorization_pending
+        error_description:
+          type: string
+          example: The authorization request is still pending
+      required:
+        - error

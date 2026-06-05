@@ -1,33 +1,38 @@
 import React from 'react';
 import {
-  FIMRegistriesStatesDataSourceRepository,
   FIMRegistryKeysStatesDataSource,
+  FIMRegistryKeysStatesDataSourceRepository,
 } from '../../../../../common/data-source';
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
-withSystemInventoryHardwareDataSource;
-import { getDashboard } from './dashboard';
-import { withSystemInventoryHardwareDataSource } from '../../../../it-hygiene/common/hocs/validate-system-inventory-index-pattern';
-import { withFIMRegistriesDataSource } from '../../../common/hocs/validate-fim-states-index-pattern';
+import { withFIMRegistryKeysDataSource } from '../../../common/hocs/validate-fim-states-index-pattern';
 import { InventoryDashboardTable } from '../../../../../common/dashboards';
-import { WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING } from '../../../../../../../common/constants';
+import {
+  WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
+  FIM_REGISTRY_KEYS_INVENTORY_ID,
+  FIM_REGISTRY_KEYS_AGENT_INVENTORY_ID,
+} from '../../../../../../../common/constants';
+import { withAgent } from '../../../../../common/hocs/with-agent';
 import { compose } from 'redux';
-import { withAgent } from '../hocs';
 
 export const InventoryFIMRegistryKeys = compose(
   withAgent,
-  withFIMRegistriesDataSource,
+  withFIMRegistryKeysDataSource,
 )(props => {
   return (
     <div style={{ margin: '0 12px' }}>
       <InventoryDashboardTable
         DataSource={FIMRegistryKeysStatesDataSource}
-        DataSourceRepositoryCreator={FIMRegistriesStatesDataSourceRepository}
+        DataSourceRepositoryCreator={FIMRegistryKeysStatesDataSourceRepository}
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
-        getDashboardPanels={getDashboard}
+        getDashboardPanels={[
+          {
+            dashboardId: FIM_REGISTRY_KEYS_INVENTORY_ID,
+            agentDashboardId: FIM_REGISTRY_KEYS_AGENT_INVENTORY_ID,
+          },
+        ]}
         tableId='fim-registry-keys-inventory'
-        indexPattern={props.indexPattern}
         categoriesSampleData={[WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]}
       />
     </div>

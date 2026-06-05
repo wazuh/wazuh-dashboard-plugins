@@ -1,0 +1,18 @@
+services:
+  osd:
+    volumes:
+      - 'plugin-alpha:/home/node/kbn/plugins/plugin-alpha'
+      - 'plugin-beta:/home/node/kbn/plugins/plugin-beta'
+volumes:
+  plugin-alpha:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${pluginAlphaPath}
+  plugin-beta:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${pluginBetaPath}

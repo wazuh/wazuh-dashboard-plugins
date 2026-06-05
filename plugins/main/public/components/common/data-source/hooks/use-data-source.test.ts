@@ -1,18 +1,37 @@
 import { useDataSource } from './use-data-source';
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react';
 import {
   tDataSourceRepository,
   tFilter,
   PatternDataSource,
   tParsedIndexPattern,
-} from '../index';
+} from '../pattern/index';
 import {
   IndexPatternsService,
   IndexPattern,
 } from '../../../../../../../src/plugins/data/common';
 
+jest.mock('../../../../react-services/navigation-service', () => ({
+  getInstance() {
+    return {
+      getHistory: () => ({ listen: jest.fn(), location: {} }),
+    };
+  },
+}));
+
+jest.mock(
+  '../../../../../../../src/plugins/opensearch_dashboards_utils/public',
+  () => ({
+    createOsdUrlStateStorage: jest.fn().mockReturnValue({
+      get: jest.fn().mockReturnValue(null),
+      set: jest.fn(),
+    }),
+  }),
+);
+
 jest.mock('../../../../kibana-services', () => ({
   ...(jest.requireActual('../../../../kibana-services') as object),
+  getUiSettings: () => ({ get: jest.fn().mockReturnValue(false) }),
   getDataPlugin: () => ({
     // mock indexPatterns getter
     indexPatterns: {
@@ -64,9 +83,8 @@ class DataSourceMocked implements PatternDataSource {
       title: this.title,
     } as tParsedIndexPattern;
   }
-  getClusterManagerFilters = mockedGetFilters;
+  getClusterFilters = mockedGetFilters;
   getPinnedAgentFilter = mockedGetFilters;
-  getExcludeManagerFilter = mockedGetFilters;
 }
 
 class ExampleRepository implements tDataSourceRepository<tParsedIndexPattern> {

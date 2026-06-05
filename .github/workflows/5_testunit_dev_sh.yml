@@ -1,0 +1,20 @@
+name: Dev Scripts Tests
+
+on:
+  pull_request:
+    paths:
+      - 'docker/osd-dev/dev.sh'
+      - 'docker/osd-dev/dev.yml'
+      - 'docker/osd-dev/scripts/**'
+    branches:
+      - main
+
+jobs:
+  scripts-tests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run dev scripts tests (Jest in container)
+        working-directory: docker/osd-dev/scripts/__tests__
+        run: |
+          ./run-tests.sh

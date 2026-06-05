@@ -2,28 +2,17 @@ import { commonInitialWidth } from './initial-width';
 
 export const commonColumns = {
   timestamp: {
-    id: 'timestamp',
+    id: '@timestamp',
     isSortable: true,
     defaultSortDirection: 'desc',
     initialWidth: commonInitialWidth.timestamp,
   },
-  'agent.id': {
-    id: 'agent.id',
-    initialWidth: commonInitialWidth['agent.id'],
+  'wazuh.agent.id': {
+    id: 'wazuh.agent.id',
+    initialWidth: commonInitialWidth['wazuh.agent.id'],
   },
-  'agent.name': {
-    id: 'agent.name',
-    initialWidth: commonInitialWidth['agent.name'],
-  },
-  'rule.description': {
-    id: 'rule.description',
-  },
-  'rule.level': {
-    id: 'rule.level',
-    initialWidth: commonInitialWidth['rule.level'],
-  },
-  'rule.id': {
-    id: 'rule.id',
-    initialWidth: commonInitialWidth['rule.id'],
+  'wazuh.agent.name': {
+    id: 'wazuh.agent.name',
+    initialWidth: commonInitialWidth['wazuh.agent.name'],
   },
 } as const;

@@ -1,7 +1,7 @@
 export const commonInitialWidth = {
   timestamp: 204,
-  'agent.id': 93,
-  'agent.name': 318,
-  'rule.level': 93,
-  'rule.id': 93,
+  'wazuh.agent.id': 93,
+  'wazuh.agent.name': 318,
+  'wazuh.rule.level': 93,
+  'wazuh.rule.id': 93,
 } as const;

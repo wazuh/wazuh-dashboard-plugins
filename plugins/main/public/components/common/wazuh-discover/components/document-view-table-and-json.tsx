@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { EuiFlexItem, EuiCodeBlock, EuiTabbedContent } from '@elastic/eui';
 import {
   IndexPattern,
@@ -48,50 +48,81 @@ export const DocumentViewTableAndJson = ({
     indexPattern: indexPattern as IndexPattern,
   });
 
-  return (
-    <EuiFlexItem>
-      <EuiTabbedContent
-        tabs={[
-          {
-            id: 'table',
-            name: 'Table',
-            content: (
-              <DocViewer
-                {...docViewerProps}
-                renderFields={renderFields}
-                filters={filters}
-                setFilters={setFilters}
-                onFilter={onFilter}
-                showFilterButtons={showFilterButtons}
-              />
-            ),
-          },
-          {
-            id: 'json',
-            name: 'JSON',
-            content: (
-              <EuiCodeBlock
-                aria-label={'Document details'}
-                language='json'
-                isCopyable
-                paddingSize='s'
-              >
-                {JSON.stringify(document, null, 2)}
-              </EuiCodeBlock>
-            ),
-          },
-          ...(Array.isArray(additionalTabs)
-            ? additionalTabs
-            : additionalTabs({
+  const tabs = useMemo(() => {
+    const baseTabs = [
+      {
+        id: 'table',
+        name: 'Table',
+        content: (
+          <DocViewer
+            {...docViewerProps}
+            renderFields={renderFields}
+            filters={filters}
+            setFilters={setFilters}
+            onFilter={onFilter}
+            showFilterButtons={showFilterButtons}
+          />
+        ),
+      },
+      {
+        id: 'json',
+        name: 'JSON',
+        content: (
+          <EuiCodeBlock
+            aria-label={'Document details'}
+            language='json'
+            isCopyable
+            paddingSize='s'
+          >
+            {JSON.stringify(document, null, 2)}
+          </EuiCodeBlock>
+        ),
+      },
+    ];
+
+    const resolvedAdditionalTabs = Array.isArray(additionalTabs)
+      ? additionalTabs
+      : additionalTabs({
+          document,
+          indexPattern,
+          renderFields,
+          filters,
+          setFilters,
+          onFilter,
+        });
+
+    return [
+      ...baseTabs,
+      ...resolvedAdditionalTabs.map(tab => ({
+        ...tab,
+        content:
+          typeof tab.content === 'function'
+            ? tab.content({
                 document,
                 indexPattern,
                 renderFields,
                 filters,
                 setFilters,
                 onFilter,
-              })),
-        ]}
-      />
+              })
+            : tab.content,
+      })),
+    ];
+  }, [
+    document,
+    indexPattern,
+    renderFields,
+    filters,
+    setFilters,
+    onFilter,
+    additionalTabs,
+    showFilterButtons,
+    docViewerProps,
+  ]);
+
+  return (
+    <EuiFlexItem>
+      <EuiTabbedContent tabs={tabs} />
     </EuiFlexItem>
   );
 };

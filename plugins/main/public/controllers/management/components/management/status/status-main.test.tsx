@@ -15,7 +15,6 @@
 import React from 'react';
 import WzStatus from './status-main';
 import { renderWithProviders } from '../../../../../redux/render-with-redux-provider';
-
 jest.mock('../../../../../kibana-services', () => ({
   getHttp: () => ({
     basePath: {
@@ -29,13 +28,11 @@ jest.mock('../../../../../kibana-services', () => ({
       }
     },
   }),
-}));
-
-// the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.
-// https://github.com/wazuh/wazuh-dashboard-plugins/pull/6921#issuecomment-2298289550
-
-jest.mock('@osd/monaco', () => ({
-  monaco: {},
+  getCookies: () => {
+    return {
+      get: () => 'test',
+    };
+  },
 }));
 
 describe('Status component', () => {

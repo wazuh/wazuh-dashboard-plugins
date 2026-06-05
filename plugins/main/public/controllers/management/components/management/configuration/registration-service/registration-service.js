@@ -16,11 +16,7 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
-import {
-  isString,
-  renderValueNoThenEnabled,
-  renderValueYesThenEnabled,
-} from '../utils/utils';
+import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
@@ -69,34 +65,6 @@ const mainSettings = [
   {
     field: 'force.disconnected_time.value',
     label: 'Seconds since an agent is in a disconnected state',
-  },
-];
-
-const keyRequestSettings = [
-  {
-    field: 'key_request.enabled',
-    label: 'Key request status',
-    render: renderValueYesThenEnabled,
-  },
-  {
-    field: 'key_request.exec_path',
-    label: 'Full path to the executable',
-  },
-  {
-    field: 'key_request.socket',
-    label: 'Full path to the Unix domain socket',
-  },
-  {
-    field: 'key_request.timeout',
-    label: 'Maximum time for waiting a response from the executable',
-  },
-  {
-    field: 'key_request.threads',
-    label: 'Number of threads for dispatching the external keys requests',
-  },
-  {
-    field: 'key_request.queue_size',
-    label: 'Indicates the maximum size of the queue for fetching external keys',
   },
 ];
 
@@ -151,12 +119,6 @@ class WzRegistrationService extends Component {
               <WzConfigurationSettingsGroup
                 config={currentConfig['auth-auth'].auth}
                 items={mainSettings}
-              />
-              <WzConfigurationSettingsGroup
-                title='Key request settings'
-                description='The key request feature allows to fetch agent keys from an external source, for example, a database'
-                config={currentConfig['auth-auth'].auth}
-                items={keyRequestSettings}
               />
               <WzConfigurationSettingsGroup
                 title='SSL settings'

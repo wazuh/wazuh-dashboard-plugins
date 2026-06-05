@@ -1,45 +1,13 @@
 # Install dependencies
 apt update
-apt install -y curl adduser lsb-release
+
+# Add en_US.UTF-8 locale required for some decoder
+# 2025/12/11 10:05:47 wazuh-analysisd: ERROR: CTI: deploy callback failed: Failed to push decoder 'decoder/f5-bigip-afm/0' to catalog: An error occurred while trying to validate 'decoder/f5-bigip-afm/0': In stage 'normalize' builder for block 'map' failed with error: Failed to build operation 'f5_bigip.log.date_time: parse_date($json.date_time, "%b %d %Y %H:%M:%S", "en_US.UTF-8")': Can't build date parser, locale 'en_US.UTF-8' not found
+apt install -y curl adduser lsb-release libterm-readline-perl-perl locales
+locale-gen en_US.UTF-8
 
 # Install Wazuh server
 dpkg -i /installer/wazuh-manager.deb
 
-# Configure Wazuh server-Wazuh indexer connection
-echo 'admin' | /var/ossec/bin/wazuh-keystore -f indexer -k username
-echo 'admin' | /var/ossec/bin/wazuh-keystore -f indexer -k password
-
-NODE="wazuh.manager.local"
-INDEXER_HOST="os1"
-CERTS_PATH="/etc/filebeat/certs"
-
-sed -i "s|https://0.0.0.0:9200|https://$INDEXER_HOST:9200|g" /var/ossec/etc/ossec.conf
-sed -i "s|/etc/filebeat/certs/root-ca.pem|$CERTS_PATH/ca.pem|g" /var/ossec/etc/ossec.conf
-sed -i "s|/etc/filebeat/certs/filebeat.pem|$CERTS_PATH/$NODE.pem|g" /var/ossec/etc/ossec.conf
-sed -i "s|/etc/filebeat/certs/filebeat-key.pem|$CERTS_PATH/$NODE-key.pem|g" /var/ossec/etc/ossec.conf
-
-# Install Filebeat
-apt install gnupg apt-transport-https -y
-curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && chmod 644 /usr/share/keyrings/wazuh.gpg
-echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" | tee -a /etc/apt/sources.list.d/wazuh.list
-apt-get update
-apt-get -y install filebeat
-
-# Configure Filebeat
-# Extract X.Y version from WAZUH_VERSION (e.g., v4.12.0 -> 4.12)
-WAZUH_VERSION_FILEBEAT_XY=$(echo "${WAZUH_VERSION_FILEBEAT#v}" | cut -d. -f1,2)
-# Extract X.x series from WAZUH_VERSION (e.g., v4.12.0 -> 4.x)
-WAZUH_MAJOR_VERSION_FILEBEAT=$(echo "${WAZUH_VERSION_FILEBEAT#v}" | cut -d. -f1)
-WAZUH_SERIES_X_FILEBEAT="${WAZUH_MAJOR_VERSION_FILEBEAT}.x"
-
-curl -so /etc/filebeat/filebeat.yml https://packages.wazuh.com/${WAZUH_VERSION_FILEBEAT_XY}/tpl/wazuh/filebeat/filebeat.yml
-sed -i "s|127.0.0.1|$INDEXER_HOST|g" /etc/filebeat/filebeat.yml
-sed -i "s|/etc/filebeat/certs/root-ca.pem|$CERTS_PATH/ca.pem|g" /etc/filebeat/filebeat.yml
-sed -i "s|/etc/filebeat/certs/filebeat.pem|$CERTS_PATH/$NODE.pem|g" /etc/filebeat/filebeat.yml
-sed -i "s|/etc/filebeat/certs/filebeat-key.pem|$CERTS_PATH/$NODE-key.pem|g" /etc/filebeat/filebeat.yml
-filebeat keystore create
-echo admin | filebeat keystore add username --stdin --force
-echo admin | filebeat keystore add password --stdin --force
-curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/$WAZUH_VERSION_DEVELOPMENT/extensions/elasticsearch/7.x/wazuh-template.json
-chmod go+r /etc/filebeat/wazuh-template.json
-curl -s https://packages.wazuh.com/${WAZUH_SERIES_X_FILEBEAT}/filebeat/wazuh-filebeat-0.4.tar.gz | tar -xvz -C /usr/share/filebeat/module
+# Remove package installer
+rm /installer/wazuh-manager.deb

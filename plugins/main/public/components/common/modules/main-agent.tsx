@@ -34,7 +34,7 @@ export class MainModuleAgent extends Component {
   renderTitle() {
     const { section } = this.props;
     return (
-      <EuiFlexGroup style={{ marginInline: 8 }}>
+      <EuiFlexGroup style={{ marginInline: 8 }} className='hide-for-sharing'>
         <EuiFlexItem style={{ marginInline: 0 }}>
           <EuiTabs data-test-subj='agent-tabs'>
             <EuiTab data-test-subj={`agent-tab-${section}`} isSelected={true}>

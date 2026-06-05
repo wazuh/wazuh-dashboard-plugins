@@ -3,15 +3,18 @@ import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import { ToolsRouter } from './components/tools/tools-router';
 import { getWazuhCorePlugin, getWzMainParams } from './kibana-services';
 import { updateCurrentPlatform } from './redux/actions/appStateActions';
-import { useDispatch } from 'react-redux';
+import {
+  fetchCcsStatusForApplicationMount,
+  syncSessionToPrimaryWhenMismatch,
+} from './react-services/manager-api-session-sync';
+import { useDispatch, useSelector } from 'react-redux';
 import { checkPluginVersion } from './utils';
 import { WzAuthentication, loadAppConfig } from './react-services';
 import { WzMenuWrapper } from './components/wz-menu/wz-menu-wrapper';
 import { WzAgentSelectorWrapper } from './components/wz-agent-selector/wz-agent-selector-wrapper';
 import { ToastNotificationsModal } from './components/notifications/modal';
 import { WzUpdatesNotification } from './components/wz-updates-notification';
-import { HealthCheck } from './components/health-check';
-import { WzBlankScreen } from './components/wz-blank-screen/wz-blank-screen';
+import { WzCtiUpsellNotification } from './components/wz-cti-upsell-notification';
 import { RegisterAgent } from './components/endpoints-summary/register-agent';
 import { MainEndpointsSummary } from './components/endpoints-summary';
 import { AgentView } from './components/endpoints-summary/agent';
@@ -22,8 +25,53 @@ import { WzSecurity } from './components/security';
 import $ from 'jquery';
 import NavigationService from './react-services/navigation-service';
 import { SECTIONS } from './sections';
+import { withGuardAsync } from './components/common/hocs';
+import { WzRequest } from './react-services/wz-request';
 
-export function Application(props) {
+const SyncPrimaryApiWhenNotCCS = () => {
+  const isCCS = useSelector(
+    (state: { appStateReducers?: { isCCS?: boolean } }) =>
+      state.appStateReducers?.isCCS,
+  );
+
+  useEffect(() => {
+    if (isCCS) return;
+
+    const cancelledRef = { current: false };
+
+    syncSessionToPrimaryWhenMismatch({
+      isCancelled: () => cancelledRef.current,
+    }).catch(() => {});
+
+    return () => {
+      cancelledRef.current = true;
+    };
+  }, [isCCS]);
+
+  return null;
+};
+
+export const Application = withGuardAsync(
+  async (_props: any) => {
+    try {
+      // Run in parallel
+      await Promise.allSettled([
+        // Setup the selected API
+        WzRequest.setupAPI(),
+        // Load the app state
+        loadAppConfig(),
+        fetchCcsStatusForApplicationMount(),
+      ]);
+    } catch {}
+
+    return {
+      ok: false,
+      data: {},
+    };
+  },
+  null,
+  null,
+)((_props: any) => {
   const dispatch = useDispatch();
   const navigationService = NavigationService.getInstance();
   const history = navigationService.getHistory();
@@ -42,9 +90,6 @@ export function Application(props) {
       WzAuthentication.refresh();
     });
 
-    // Load the app state
-    loadAppConfig();
-
     // TODO: Replace this with document insteat
     // Bind deleteExistentToken on Log out component.
     $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on(
@@ -61,17 +106,14 @@ export function Application(props) {
   return (
     <Router history={history}>
       <div className='wazuhNotReadyYet'></div>
+      <SyncPrimaryApiWhenNotCCS />
       {/* TODO: The plugins/main/public/components/wz-menu/wz-menu.js defines a portal to mount here. We could avoid the usage of the React portal and render the component instead*/}
       <WzMenuWrapper />
       <ToastNotificationsModal /> {/* TODO: check if this is being used */}
       <WzAgentSelectorWrapper />
+      <WzCtiUpsellNotification />
       <WzUpdatesNotification />
       <Switch>
-        <Route
-          path={`/${SECTIONS.HEALTH_CHECK}`}
-          exact
-          render={HealthCheck}
-        ></Route>
         <Route
           path={`/${SECTIONS.AGENTS_PREVIEW}/deploy`}
           exact
@@ -100,13 +142,8 @@ export function Application(props) {
           exact
           render={props => <ToolsRouter {...props} />}
         ></Route>
-        <Route
-          path={`/${SECTIONS.BLANK_SCREEN}`}
-          exact
-          render={props => <WzBlankScreen {...props} />}
-        ></Route>
         <Redirect from='/' to={getWzMainParams()} />
       </Switch>
     </Router>
   );
-}
+});

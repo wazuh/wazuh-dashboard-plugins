@@ -20,10 +20,15 @@ export interface ScriptConfig {
   modeVersion: string;
   dashboardBase: string;
   useDashboardFromSource: boolean;
+  useIndexerFromPackage: boolean;
   // Flags-based combination support (preferred over positional mode)
   enableSaml: boolean;
   serverFlagVersion: string; // from --server <version>
   serverLocalFlagVersion: string; // from --server-local <tag>
+  /** Whether to auto-discover and mount all sibling repos via --all-forks. */
+  allForks: boolean;
+  /** Whether to enable Mailpit email testing service via --mailpit. */
+  enableMailpit: boolean;
 }
 
 export interface GenerateOverrideOptions {
@@ -35,6 +40,8 @@ export interface GenerateOverrideOptions {
   useDashboardFromSource: boolean;
   /** Whether to include the security plugin mount when using sources. */
   includeSecurityPlugin: boolean;
+  /** Whether to use the indexer from package. */
+  useIndexerFromPackage: boolean;
 }
 
 /**
@@ -64,9 +71,12 @@ export class Config implements ScriptConfig {
   private _modeVersion = '';
   private _dashboardBase = '';
   private _useDashboardFromSource = false;
+  private _useIndexerFromPackage = false;
   private _enableSaml = false;
   private _serverFlagVersion = '';
   private _serverLocalFlagVersion = '';
+  private _allForks = false;
+  private _enableMailpit = false;
 
   private _changeLog: Array<{
     key: string;
@@ -243,6 +253,19 @@ export class Config implements ScriptConfig {
     this.logChange('useDashboardFromSource', prev, value, source);
   }
 
+  // useIndexerFromPackage
+  get useIndexerFromPackage(): boolean {
+    return this._useIndexerFromPackage;
+  }
+  set useIndexerFromPackage(value: boolean) {
+    this.setUseIndexerFromPackage(value);
+  }
+  setUseIndexerFromPackage(value: boolean, source?: string): void {
+    const prev = this.useIndexerFromPackage;
+    this._useIndexerFromPackage = value;
+    this.logChange('useIndexerFromPackage', prev, value, source);
+  }
+
   // enableSaml
   get enableSaml(): boolean {
     return this._enableSaml;
@@ -280,5 +303,31 @@ export class Config implements ScriptConfig {
     const prev = this._serverLocalFlagVersion;
     this._serverLocalFlagVersion = value;
     this.logChange('serverLocalFlagVersion', prev, value, source);
+  }
+
+  // allForks
+  get allForks(): boolean {
+    return this._allForks;
+  }
+  set allForks(value: boolean) {
+    this.setAllForks(value);
+  }
+  setAllForks(value: boolean, source?: string): void {
+    const prev = this._allForks;
+    this._allForks = value;
+    this.logChange('allForks', prev, value, source);
+  }
+
+  // enableMailpit
+  get enableMailpit(): boolean {
+    return this._enableMailpit;
+  }
+  set enableMailpit(value: boolean) {
+    this.setEnableMailpit(value);
+  }
+  setEnableMailpit(value: boolean, source?: string): void {
+    const prev = this._enableMailpit;
+    this._enableMailpit = value;
+    this.logChange('enableMailpit', prev, value, source);
   }
 }

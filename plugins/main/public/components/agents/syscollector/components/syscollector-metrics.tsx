@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  EuiPanel,
   EuiIcon,
   EuiFlexGroup,
   EuiFlexItem,
@@ -9,7 +8,12 @@ import {
   EuiText,
 } from '@elastic/eui';
 import _ from 'lodash';
-import WzRibbon from '../../../common/ribbon/ribbon';
+import {
+  IWzRibbonBody,
+  WzRibbonBody,
+  WzRibbonPanel,
+  WzRibbonTitle,
+} from '../../../common/ribbon/ribbon';
 import { IRibbonItem } from '../../../common/ribbon/ribbon-item';
 import {
   PatternDataSource,
@@ -28,8 +32,15 @@ import NavigationService from '../../../../react-services/navigation-service';
 import { ITHygiene } from '../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { IndexPatternFormattedField } from '../../../common/index-pattern';
+import { withDataSourceInitiated } from '../../../common/hocs';
 import { Typography } from '../../../common/typography/typography';
 import { compose } from 'redux';
+
+const RibbonBodyProtected = withDataSourceInitiated({})(
+  ({ items, 'data-test-subj': dataTestSubj }: IWzRibbonBody) => (
+    <WzRibbonBody items={items} data-test-subj={dataTestSubj}></WzRibbonBody>
+  ),
+);
 
 export const InventoryMetrics = compose(
   withSystemInventorySystemDataSource,
@@ -145,55 +156,55 @@ export const InventoryMetrics = compose(
     },
   ];
 
-  if (notEnoughData) {
-    return (
-      <EuiPanel>
+  return (
+    <WzRibbonPanel>
+      <WzRibbonTitle
+        title={
+          <EuiFlexGroup justifyContent='spaceBetween'>
+            <EuiFlexItem grow={false}>
+              <Typography level='section'>System inventory</Typography>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <RedirectAppLinks application={getCore().application}>
+                <EuiToolTip position='top' content={`Open ${ITHygiene.title}`}>
+                  <EuiButtonIcon
+                    iconType='popout'
+                    color='primary'
+                    className='EuiButtonIcon'
+                    href={NavigationService.getInstance().getAppURL(
+                      ITHygiene.id,
+                    )}
+                    aria-label={`Open ${ITHygiene.title}`}
+                  />
+                </EuiToolTip>
+              </RedirectAppLinks>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        }
+      ></WzRibbonTitle>
+      {notEnoughData ? (
         <EuiFlexGroup
           direction='row'
           alignItems='center'
           justifyContent='center'
           gutterSize='xs'
         >
-          <EuiFlexItem grow={false}>
+          <EuiFlexItem grow={false} responsive={false}>
             <EuiIcon type='iInCircle' />
           </EuiFlexItem>
-          <EuiFlexItem grow={false}>
+          <EuiFlexItem grow={false} responsive={false}>
             <EuiText size='s'>
               Not enough hardware or operating system information
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
-      </EuiPanel>
-    );
-  }
-
-  return (
-    <WzRibbon
-      data-test-subj='syscollector-metrics'
-      items={items}
-      title={
-        <EuiFlexGroup justifyContent='spaceBetween'>
-          <EuiFlexItem grow={false}>
-            <Typography level='section'>System inventory</Typography>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <RedirectAppLinks application={getCore().application}>
-              <EuiToolTip position='top' content={`Open ${ITHygiene.title}`}>
-                <EuiButtonIcon
-                  iconType='popout'
-                  color='primary'
-                  className='EuiButtonIcon'
-                  href={NavigationService.getInstance().getUrlForApp(
-                    ITHygiene.id,
-                  )}
-                  aria-label={`Open ${ITHygiene.title}`}
-                />
-              </EuiToolTip>
-            </RedirectAppLinks>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      }
-      titleAction
-    />
+      ) : (
+        <RibbonBodyProtected
+          items={items}
+          dataTestSubj='syscollector-metrics'
+          dataSource={itHygieneHardwareDataSource} // TODO: We need to validate the loading state of all the data sources used inside the RibbonBodyProtected. Now it only validates one.
+        />
+      )}
+    </WzRibbonPanel>
   );
 });

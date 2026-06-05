@@ -2,13 +2,20 @@
 
 ## Requirements
 
-- vm.max_map_count=262144
+- vm.max_map_count=262144, needed by Elasticsearch to prevent out-of-memory exceptions.
 
-  To modify the vm.max_map_count, you can run this command:
+  To modify the vm.max_map_count temporarily, you can run this command:
   `sudo sysctl -w vm.max_map_count=262144`
+
+  To make the change permanent in host machine:
+
+  - In host machine:
+    `sudo nano /etc/sysctl.conf`
+  - Add at the end of the file: vm.max_map_count=262144
 
 - jq
 
+  The jq tool is used by the scripts to process JSON files.
   To install jq, you can run this command:
 
   - In Debian/Ubuntu:
@@ -20,6 +27,24 @@
   - In macOS:
     `brew install jq`
 
+## Primary Manager API host
+
+The Wazuh dashboard uses **only the first** Manager API host defined in
+`wazuh_core.hosts`. Health checks, startup registry refresh, and the Server API
+settings screen all target that entry only; extra hosts are ignored.
+
+If you want to change which Manager API host is used, move that host to the
+first position under `wazuh_core.hosts` and restart the environment.
+
+For the **2.x** dev stack, hosts are inlined in
+`docker/osd-dev/config/2.x/osd/opensearch_dashboards.yml` (and
+`opensearch_dashboards_saml.yml` when using SAML).
+
+When running with `--server-local`, the script dynamically generates a
+dashboard config from the selected 2.x base config and rewrites
+`wazuh_core.hosts` so `manager-local` is placed first. That file is removed
+when you run `./dev.sh down` (same idea as the generated compose override).
+
 ## Usage
 
 Always use the provided script to bring up or down the development environment. The only allowed positional argument is the action.
@@ -30,8 +55,9 @@ Always use the provided script to bring up or down the development environment. 
   [-os <os_version>] [-osd <osd_version>] \
   [-a <rpm|deb|without>]  # aliases: none, 0 \
   [-r <repo>=</absolute/path> ...] \
-  [-saml | --server <version> | --server-local <tag>] \
-  [--base [</absolute/path>]]
+  [-saml | --server <version> | --server-local <tag> | --indexer-local [tag]] \
+  [--base [</absolute/path>]] \
+  [--mailpit]
 ```
 
 ### About <common-parent-directory>
@@ -45,6 +71,12 @@ Always use the provided script to bring up or down the development environment. 
 
 ### Parameters
 
+- Action (positional): One of up | down | stop | start | manager-local-up.
+  - `up` Launches the containers.
+  - `down` Removes the containers.
+  - `stop` Stops the containers, they go into "exited" state, useful to avoid re-optimization.
+  - `start` Restarts the containers that were in "exited" state.
+  - `manager-local-up` Launches only the manager.
 - -os <os_version> : (Optional) Specifies the OpenSearch version. If not provided, it's obtained from plugins/wazuh-core/package.json .
 - -osd <osd_version> : (Optional) Specifies the OpenSearch Dashboards version. If not provided, it's obtained from plugins/wazuh-core/package.json .
 - -a <agents_up> : (Optional) Relevant when using server-local mode. Specifies agent deployment:
@@ -56,17 +88,26 @@ Always use the provided script to bring up or down the development environment. 
   - Internal repositories (`main`, `wazuh-core`, `wazuh-check-updates`) are auto-detected under `<root>/plugins/` when running from this repo, or can be set via `--plugins-root` (aliases: `-wdp`, `--wz-home`).
   - External repositories passed with `-r` are dynamically added as volumes to the `osd` service via an auto-generated `dev.override.generated.yml` (git-ignored).
   - Paths MUST be absolute and must point to the repository ROOT (do not pass subfolders like `/plugins/...`). Shorthand is also supported: `-r <repo>` (no `=`), which resolves from your <common-parent-directory> using the same `<repo>` name. If not found, an error is raised.
-    Action (positional): One of up | down | stop | start | manager-local-up.
 - -saml: (Optional) Deploys a SAML-enabled environment with KeyCloak IDP.
   - Note for SAML: You need to add idp to your hosts file ( /etc/hosts on Linux/macOS, C:\\Windows\\System32\\drivers\\etc\\hosts on Windows) pointing to 127.0.0.1 . Also, based on previous configurations, KeyCloak IDP might need to be started with the --no-base-path option.
   ```
   # Example entry in /etc/hosts
   127.0.0.1 idp
   ```
+- --mailpit: (Optional) Enables Mailpit email testing service for development.
+  - Web UI: Access at http://localhost:8025 to view captured emails
+  - SMTP server: Available at localhost:1025
+  - Use this to test and debug email functionality during development
+  - Example SMTP configuration for applications:
+    - Host: `mailpit` (from within Docker network) or `localhost` (from host)
+    - Port: `1025`
+    - No authentication required (development mode)
 - --server <version>: (Optional) Deploys an environment with a real Wazuh server using the given release version (e.g., 4.7.2) for WAZUH_STACK.
 - --server-local <tag>: (Optional) Deploys an environment with a local Wazuh server package using the given image tag (e.g., my-custom-image) for IMAGE_TAG.
   - Important for `server-local`: Place the Wazuh manager installation packages (`.deb`) in `wazuh-dashboard-plugins/docker/osd-dev/manager/` and any Wazuh agent packages (`.rpm`/`.deb`) in `wazuh-dashboard-plugins/docker/osd-dev/agents/`.
   - If neither `--server` nor `--server-local` is specified, a standard development environment is deployed (profile standard).
+- --indexer-local [tag]: (Optional) Deploys an environment with a local Wazuh indexer package using the given image tag (e.g., my-custom-image) for IMAGE_INDEXER_PACKAGE_TAG.
+  - Important: Place the Wazuh indexer installation package (`.deb`) in `wazuh-dashboard-plugins/docker/osd-dev/indexer/`.
 
 If you run the script from inside this repository, internal repositories are auto-detected under `<root>/plugins/>`. Otherwise, pass `--plugins-root` (aliases: `-wdp`, `--wz-home`) to specify the root. Use `-r` only for external plugins.
 
@@ -167,9 +208,61 @@ Environment with a local Wazuh server build and no agents:
 ./dev.sh up --plugins-root /absolute/path/to/wazuh-dashboard-plugins/plugins --server-local my-custom-tag -a without
 ```
 
+Environment with a local Wazuh indexer build:
+
+```sh
+./dev.sh up --plugins-root /absolute/path/to/wazuh-dashboard-plugins/plugins --indexer-local my-custom-tag
+```
+
+Environment with Mailpit email testing:
+
+```sh
+./dev.sh up --mailpit
+```
+
+Environment with server and Mailpit:
+
+```sh
+./dev.sh up --server 4.7.2 --mailpit
+```
+
 Important Note about Plugin Version:
 
 The script will not select the appropriate version of the wazuh-dashboard-plugins to use, so be sure to check out the appropriate version before bringing up the environment!
+
+### Launch UI
+
+- Once the docker containers are online, use `yarn start` command to launch the UI:
+  - Find the osd-dev container_id:
+    `docker ps`
+  - Enter the shell.
+    `docker exec -it <CONTAINER_ID> bash`
+  - Launch the UI from the kbn folder.
+    `yarn start --no-base-path`
+  - Wait for `[success][@osd/optimizer]` to show in console (could take a lot of time).
+
+#### Warning
+
+- After using the yarn start command, an error about missing dependencies could appear, to fix the dependencies:
+
+  - In osd-dev container shell inside `/plugins` folder:
+    `for d in */; do (cd "$d" && yarn); done`
+
+  - If the following line stops the installation of dependencies:
+
+    ```bash
+    Enter the git reference (branch/tag) of the current source code. This reference will be used to get
+    the reference in the indexer git repository to update the resource files (e.g., main, develop):
+    ```
+
+    Provide the branch name of indexre repository to retrieve the resource files and generate in the
+    plugin directory.
+
+    e.g. if working in `main` (or derivated) branch of the plugins, type `main`.
+
+    Note the dashboard plugins repository branch name could be different to the indexer.
+
+Repeat `yarn start --no-base-path` command.
 
 ### UI Credentials
 
@@ -178,6 +271,51 @@ The default user and password to access the UI at https://0.0.0.0:5601/ are:
 ```
 admin:admin
 ```
+
+For SAML-enabled environments, use:
+
+```
+wazuh:wazuh
+```
+
+## Email Notifications Configuration
+
+### Mailpit Setup
+
+The development environment includes **Mailpit**, a development SMTP server that captures and displays emails sent from the application without actually sending them.
+
+#### Configuring the Notifications Sender
+
+To configure the notifications sender to use Mailpit:
+
+1. **Access notification settings** in Wazuh Dashboard:
+
+   - Go to the `Notifications` section
+
+2. **Configure the sender with these settings**:
+
+   ```
+   SMTP Host: mailpit
+   SMTP Port: 1025
+   Security: None (No SSL/TLS)
+   From Email: noreply@wazuh.local
+   ```
+
+   **Note**: The recipient email address doesn't matter when using Mailpit. All emails will be captured and displayed in the Mailpit interface regardless of the recipient address, and no actual emails will be delivered to real email accounts.
+
+3. **Access Mailpit web interface**:
+   - URL: http://localhost:8025
+   - Here you can view all captured emails during development
+
+#### Testing the Configuration
+
+To verify that notifications are working correctly:
+
+1. Set up a notification rule in Wazuh Dashboard
+2. Generate an event that triggers the notification
+3. Check that the email appears in the Mailpit interface (http://localhost:8025)
+
+**Note**: Mailpit is only available in the development environment and should not be used in production.
 
 ## Notes
 

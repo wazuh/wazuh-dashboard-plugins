@@ -41,7 +41,7 @@ describe.skip('Wazuh API', () => {
   });
 
   describe('Wazuh API - /api/check-api', () => {
-    test('[200] Check default api returns manager, node, cluster, status and allow_run_as params', () => {
+    test('[200] Check default api returns node, cluster, status and allow_run_as params', () => {
       const options = buildAxiosOptions('post', '/api/check-api', {
         id: 'default',
       });
@@ -49,7 +49,6 @@ describe.skip('Wazuh API', () => {
         .then(response => {
           expect(response.status).toBe(200);
           expect(typeof response.data).toBe('object');
-          expect(typeof response.data.manager).toBe('string');
           expect(typeof response.data.node).toBe('string');
           expect(typeof response.data.cluster).toBe('string');
           expect(typeof response.data.status).toBe('string');
@@ -78,7 +77,7 @@ describe.skip('Wazuh API', () => {
   });
 
   describe('Wazuh API - /api/check-stored-api', () => {
-    test('[200] Check default api returns manager, node, cluster, status and allow_run_as params', () => {
+    test('[200] Check default api returns node, cluster, status and allow_run_as params', () => {
       const options = buildAxiosOptions('post', '/api/check-stored-api', {
         id: 'default',
       });
@@ -96,7 +95,6 @@ describe.skip('Wazuh API', () => {
           expect(typeof response.data.data.cluster_info).toBe('object');
           expect(typeof response.data.data.cluster_info.status).toBe('string');
           expect(typeof response.data.data.cluster_info.node).toBe('string');
-          expect(typeof response.data.data.cluster_info.manager).toBe('string');
           expect(typeof response.data.data.cluster_info.cluster).toBe('string');
         })
         .catch(error => {
@@ -139,6 +137,31 @@ describe.skip('Wazuh API', () => {
         '/api/request',
         {
           id: 'default',
+          method: 'GET',
+          path: '/agents',
+          body: {},
+        },
+        {
+          cookie: `wz-token=${userToken}; wz-api=default;`,
+        },
+      );
+      return axios(options)
+        .then(response => {
+          expect(response.status).toBe(200);
+          expect(typeof response.data.data).toBe('object');
+          expect(Array.isArray(response.data.data.affected_items)).toBe(true);
+        })
+        .catch(error => {
+          throw error;
+        });
+    });
+
+    test('[200] Get agents when body.id differs from wz-api cookie (session id wins)', () => {
+      const options = buildAxiosOptions(
+        'post',
+        '/api/request',
+        {
+          id: 'stale-body-id',
           method: 'GET',
           path: '/agents',
           body: {},

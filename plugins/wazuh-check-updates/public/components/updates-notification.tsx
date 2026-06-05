@@ -58,7 +58,7 @@ export const UpdatesNotification = () => {
   }
 
   const mustNotifyUser = areThereNewUpdates(
-    availableUpdates?.apis_available_updates,
+    availableUpdates,
     userPreferences.last_dismissed_updates,
   );
 
@@ -68,22 +68,11 @@ export const UpdatesNotification = () => {
 
   const handleOnClose = () => {
     updateUserPreferences({
-      last_dismissed_updates: availableUpdates?.apis_available_updates?.map(
-        apiAvailableUpdates => {
-          const {
-            api_id,
-            last_available_major,
-            last_available_minor,
-            last_available_patch,
-          } = apiAvailableUpdates;
-          return {
-            api_id,
-            last_major: last_available_major?.tag,
-            last_minor: last_available_minor?.tag,
-            last_patch: last_available_patch?.tag,
-          };
-        },
-      ),
+      last_dismissed_updates: {
+        last_major: availableUpdates?.last_available_major?.tag,
+        last_minor: availableUpdates?.last_available_minor?.tag,
+        last_patch: availableUpdates?.last_available_patch?.tag,
+      },
       ...(dismissFutureUpdates ? { hide_update_notifications: true } : {}),
     });
     setIsDismissed(true);

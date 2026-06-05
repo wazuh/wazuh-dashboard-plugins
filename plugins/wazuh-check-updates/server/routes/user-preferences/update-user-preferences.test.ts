@@ -1,3 +1,4 @@
+/** @jest-environment node */
 import { Router } from '../../../../../src/core/server/http/router/router';
 import { HttpServer } from '../../../../../src/core/server/http/http_server';
 import { loggingSystemMock } from '../../../../../src/core/server/logging/logging_system.mock';
@@ -76,12 +77,9 @@ describe(`[endpoint] PATCH ${routes.userPreferences}`, () => {
 
   test('update user preferences', async () => {
     const mockResponse: UserPreferences = {
-      last_dismissed_updates: [
-        {
-          api_id: 'api id',
-          last_patch: '4.3.1',
-        },
-      ],
+      last_dismissed_updates: {
+        last_patch: '4.3.1',
+      },
       hide_update_notifications: false,
     };
 

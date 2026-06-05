@@ -32,6 +32,12 @@ export default [
         when: 'manager',
       },
       {
+        name: 'Indexer',
+        description: 'Indexer connection and SSL settings',
+        goto: 'indexer',
+        when: 'manager',
+      },
+      {
         name: 'Registration Service',
         description: 'Automatic agent registration service',
         goto: 'registration-service',
@@ -55,41 +61,18 @@ export default [
         goto: 'client-buffer',
         when: 'agent',
       },
-      {
-        name: 'Labels',
-        description:
-          'User-defined information about the agent included in alerts',
-        goto: 'alerts-agent',
-        when: 'agent',
-      },
-      // ,
-      // { //TODO: Uncomment this to activate Log Settings
-      //   name: 'Log settings',
-      //   description: 'Alerts, archives and internal settings',
-      //   goto: 'log-settings'
-      // }
+      // Wazuh: Removed this section for the agent.
+      // {
+      //   name: 'Labels',
+      //   description:
+      //     'User-defined information about the agent included in alerts',
+      //   goto: 'alerts-agent',
+      //   when: 'agent',
+      // },
     ],
   },
   {
-    title: 'Alerts and output management',
-    description: '',
-    settings: [
-      {
-        name: 'Alerts',
-        description: 'Settings related to the alerts and their format',
-        goto: 'alerts',
-        when: 'manager',
-      },
-      {
-        name: 'Integrations',
-        description:
-          'Slack, VirusTotal and PagerDuty integrations with external APIs',
-        goto: 'integrations',
-        when: 'manager',
-      },
-    ],
-  },
-  {
+    // Wazuh: Removed this section for the manager.
     title: 'Auditing and policy monitoring',
     description: '',
     settings: [
@@ -98,19 +81,7 @@ export default [
         description:
           'Configuration to ensure compliance with security policies, standards and hardening guides',
         goto: 'policy-monitoring',
-      },
-      {
-        name: 'OpenSCAP',
-        description:
-          'Configuration assessment and automation of compliance monitoring using SCAP checks',
-        goto: 'open-scap',
-        when: agent => hasAgentSupportModule(agent, WAZUH_MODULES_ID.OPEN_SCAP),
-      },
-      {
-        name: 'CIS-CAT',
-        description:
-          'Configuration assessment using CIS scanner and SCAP checks',
-        goto: 'cis-cat',
+        when: 'agent',
       },
     ],
   },
@@ -126,44 +97,23 @@ export default [
         when: 'manager',
       },
       {
-        name: 'Osquery',
-        description:
-          'Expose an operating system as a high-performance relational database',
-        goto: 'osquery',
-      },
-      {
+        // Wazuh: Removed this section for the manager.
         name: 'Inventory data',
         description:
           'Gather relevant information about system operating system, hardware, networking and packages',
         goto: 'inventory',
-      },
-      {
-        name: 'Active response',
-        description: 'Active threat addressing by immediate response',
-        goto: 'active-response',
-        when: 'manager',
-      },
-      {
-        name: 'Active response',
-        description: 'Active threat addressing by immediate response',
-        goto: 'active-response-agent',
         when: 'agent',
       },
       {
         name: 'Commands',
         description: 'Configuration options of the Command wodle',
         goto: 'commands',
-      },
-      {
-        name: 'Docker listener',
-        description:
-          'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events',
-        goto: 'docker-listener',
-        when: agent => hasAgentSupportModule(agent, dockerApp.id),
+        when: 'agent',
       },
     ],
   },
   {
+    // Wazuh: Removed this section for the manager.
     title: 'Log data analysis',
     description: '',
     settings: [
@@ -172,53 +122,14 @@ export default [
         description:
           'Log analysis from text files, Windows events or syslog outputs',
         goto: 'log-collection',
+        when: 'agent',
       },
       {
         name: 'Integrity monitoring',
         description:
           'Identify changes in content, permissions, ownership, and attributes of files',
         goto: 'integrity-monitoring',
-      },
-      {
-        name: 'Agentless',
-        description:
-          'Run integrity checks on devices such as routers, firewalls and switches',
-        goto: 'agentless',
-        when: 'manager',
-      },
-    ],
-  },
-  {
-    title: 'Cloud security monitoring',
-    description: '',
-    settings: [
-      {
-        name: 'Amazon S3',
-        description:
-          'Security events related to Amazon AWS services, collected directly via AWS API',
-        goto: 'aws-s3',
-      },
-      {
-        name: 'Azure Logs',
-        description: 'Configuration options of the Azure Logs wodle',
-        goto: 'azure-logs',
-        when: 'manager',
-      },
-      {
-        name: 'Google Cloud Pub/Sub',
-        description: 'Configuration options of the Google Cloud Pub/Sub module',
-        goto: 'gcp-pubsub',
-      },
-      {
-        name: 'GitHub',
-        description: 'Detect threats targeting GitHub organizations',
-        goto: 'github',
-      },
-      {
-        name: 'Office 365',
-        description: 'Configuration options of the Office 365 module',
-        goto: 'office365',
-        when: 'manager',
+        when: 'agent',
       },
     ],
   },

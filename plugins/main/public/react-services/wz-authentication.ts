@@ -29,6 +29,17 @@ import {
 } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
 
+const MESSAGES = {
+  NO_API_LOGIN_CCS:
+    'Cannot login: no server API selected. Ensure a server API is selected and is online.',
+  NO_API_LOGIN:
+    'Cannot login: no server API selected. Go to Dashboard Management > Server API to verify the connection.',
+  NO_API_PERMISSIONS_CCS:
+    'Cannot get user permissions: no server API selected. Ensure a server API is selected and is online.',
+  NO_API_PERMISSIONS:
+    'Cannot get user permissions: no server API selected. Go to Dashboard Management > Server API to verify the connection.',
+};
+
 /**
  * Wazuh user authentication class
  */
@@ -42,9 +53,12 @@ export class WzAuthentication {
   private static async login(force = false) {
     try {
       var idHost = JSON.parse(AppState.getCurrentAPI()).id;
-      while (!idHost) {
-        await new Promise(r => setTimeout(r, 500));
-        idHost = JSON.parse(AppState.getCurrentAPI()).id;
+
+      if (!idHost) {
+        const isCCS = store.getState().appStateReducers?.isCCS;
+        throw new Error(
+          isCCS ? MESSAGES.NO_API_LOGIN_CCS : MESSAGES.NO_API_LOGIN,
+        );
       }
 
       const response = await WzRequest.genericReq('POST', '/api/login', {
@@ -92,6 +106,9 @@ export class WzAuthentication {
         ),
       );
       store.dispatch(updateWithUserLogged(true));
+
+      // Set server API as available
+      WzRequest.serverAPIAvailable$.next(true);
     } catch (error) {
       const options: UIErrorLog = {
         context: `${WzAuthentication.name}.refresh`,
@@ -112,6 +129,8 @@ export class WzAuthentication {
         ),
       );
       store.dispatch(updateWithUserLogged(true));
+      // Set server API as unavailable
+      WzRequest.serverAPIAvailable$.next(false);
       return Promise.reject(error);
     }
   }
@@ -123,10 +142,12 @@ export class WzAuthentication {
    */
   private static async getUserPolicies() {
     try {
-      var idHost = JSON.parse(AppState.getCurrentAPI()).id;
-      while (!idHost) {
-        await new Promise(r => setTimeout(r, 500));
-        idHost = JSON.parse(AppState.getCurrentAPI()).id;
+      var idHost = JSON.parse(AppState.getCurrentAPI() as string).id;
+      if (!idHost) {
+        const isCCS = store.getState().appStateReducers?.isCCS;
+        throw new Error(
+          isCCS ? MESSAGES.NO_API_PERMISSIONS_CCS : MESSAGES.NO_API_PERMISSIONS,
+        );
       }
       const response = await WzRequest.apiReq(
         'GET',

@@ -14,15 +14,18 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import WzTabSelector, {
-  WzTabSelectorTab
+  WzTabSelectorTab,
 } from '../util-components/tab-selector';
 import WzConfigurationGlobalConfigurationGlobal from './global-configuration-global';
 import WzConfigurationGlobalConfigurationRemote from './global-configuration-remote';
+import { WzConfigurationGlobalConfigurationLogging } from './global-configuration-logging';
+import WzConfigurationAgentsConfigurationGlobal from './global-configuration-agents';
 
 import withWzConfig from '../util-hocs/wz-config';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+import { configurationAssessment } from '../../../../../../utils/applications';
 
 class WzConfigurationGlobalConfiguration extends Component {
   constructor(props) {
@@ -32,12 +35,13 @@ class WzConfigurationGlobalConfiguration extends Component {
     const { agent } = this.props;
     return (
       <Fragment>
-        {agent && agent.id === '000' ? (
+        {!agent ? (
           <WzTabSelector>
-            <WzTabSelectorTab label="Global">
-              <WzConfigurationGlobalConfigurationGlobal {...this.props} />
+            <WzTabSelectorTab label='Global'>
+              <WzConfigurationGlobalConfigurationLogging {...this.props} />
+              <WzConfigurationAgentsConfigurationGlobal {...this.props} />
             </WzTabSelectorTab>
-            <WzTabSelectorTab label="Remote">
+            <WzTabSelectorTab label='Remote'>
               <WzConfigurationGlobalConfigurationRemote {...this.props} />
             </WzTabSelectorTab>
           </WzTabSelector>
@@ -48,35 +52,33 @@ class WzConfigurationGlobalConfiguration extends Component {
     );
   }
 }
-
 const sectionsManager = [
-  { component: 'analysis', configuration: 'global' },
-  { component: 'mail', configuration: 'global' },
   { component: 'request', configuration: 'remote' },
-  { component: 'com', configuration: 'logging' }
+  { component: 'monitor', configuration: 'global' },
+  { useFullEndpoint: true, key: 'logging' },
 ];
 
 const sectionsAgent = [{ component: 'com', configuration: 'logging' }];
 
 const mapStateToProps = state => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
-  clusterNodeSelected: state.configurationReducers.clusterNodeSelected
+  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
 });
 
 export const WzConfigurationGlobalConfigurationManager = compose(
   connect(mapStateToProps),
-  withWzConfig(sectionsManager)
+  withWzConfig(sectionsManager),
 )(WzConfigurationGlobalConfiguration);
 
 export const WzConfigurationGlobalConfigurationAgent = compose(
   connect(mapStateToProps),
-  withWzConfig(sectionsAgent)
+  withWzConfig(sectionsAgent),
 )(WzConfigurationGlobalConfiguration);
 
 WzConfigurationGlobalConfigurationManager.propTypes = {
-  agent: PropTypes.object
+  agent: PropTypes.object,
 };
 
 WzConfigurationGlobalConfigurationAgent.propTypes = {
-  agent: PropTypes.object
+  agent: PropTypes.object,
 };

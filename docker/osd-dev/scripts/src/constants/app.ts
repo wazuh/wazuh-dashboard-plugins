@@ -46,7 +46,16 @@ export const FLAGS = {
   SERVER_LOCAL: '--server-local',
   REPO: '-r',
   BASE: '--base',
+  INDEXER_LOCAL: '--indexer-local',
+  ALL_FORKS: '--all-forks',
+  MAILPIT: '--mailpit',
 } as const;
+
+/**
+ * Repositories that --all-forks should never mount automatically.
+ * - 'wazuh-dashboard' is handled exclusively by --base.
+ */
+export const ALL_FORKS_EXCLUDED_REPOS = ['wazuh-dashboard'] as const;
 
 /** Relative path (from dev script dir) for the dashboard entrypoint wrapper. */
 export const DASHBOARD_ENTRYPOINT_PATH = './dashboard-src/entrypoint.sh';
@@ -81,20 +90,13 @@ export const WAZUH_DOWNLOADS_TMPFS_PATH =
 export const WAZUH_DOWNLOADS_TMPFS_OPTS =
   'uid=1000,gid=1000,mode=0775' as const;
 
-/** OSD major markers used to pick paths. */
-export const OSD_MAJOR_2X = '2.x' as const;
-export const OSD_MAJOR_1X = '1.x' as const;
-
-/** Security config base path per OSD major. */
-export const SECURITY_CONFIG_PATHS: Record<string, string> = {
-  [OSD_MAJOR_2X]: '/usr/share/opensearch/config/opensearch-security',
-  [OSD_MAJOR_1X]:
-    '/usr/share/opensearch/plugins/opensearch-security/securityconfig',
-};
+/** Security config base path inside the wazuh-indexer container. */
+export const SECURITY_CONFIG_PATH =
+  '/usr/share/wazuh-indexer/config/opensearch-security' as const;
 
 /** Default values for environment variables used by the script. */
 export const DEFAULTS = {
   defaultPassword: 'admin',
   osdPort: '5601',
-  imposterVersion: '3.44.1',
+  imposterVersion: '4.9.2',
 } as const;

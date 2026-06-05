@@ -111,6 +111,19 @@ export class CommandGenerator<
       architecture: this.osDefinitionSelected
         .architecture as OS['architecture'],
       name: this.os as OS['name'],
+      packageName: this.getPackageName(),
+    });
+  }
+
+  getPackageName(): string {
+    if (!this.osDefinitionSelected) {
+      throw new NoOSSelectedException();
+    }
+    return this.osDefinitionSelected.packageName({
+      wazuhVersion: this.wazuhVersion,
+      architecture: this.osDefinitionSelected
+        .architecture as OS['architecture'],
+      name: this.os as OS['name'],
     });
   }
 
@@ -129,6 +142,7 @@ export class CommandGenerator<
       architecture: this.osDefinitionSelected
         .architecture as OS['architecture'],
       urlPackage: this.getUrlPackage(),
+      packageName: this.getPackageName(),
       wazuhVersion: this.wazuhVersion,
       optionals: this.optionals as IOptionalParameters<Params>,
     });

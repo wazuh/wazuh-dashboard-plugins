@@ -3,7 +3,6 @@
     "affected_items": [
       {
         "global": {
-          "email_notification": "no",
           "logall": "no",
           "logall_json": "no",
           "integrity_checking": 8,

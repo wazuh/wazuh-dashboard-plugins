@@ -1,0 +1,51 @@
+# 🧪 **Jest Unit Testing Workflow**
+#
+# ⚡ **Overview:**
+# This GitHub Action runs Jest unit tests on the application’s source code.
+# It ensures that code changes pass the defined test suites, maintaining code reliability and functionality.
+#
+# 🛠️ **Key Features:**
+# - 🧬 Runs Jest tests on specified Git references (branches, tags, or commit SHAs).
+# - 🔄 Supports manual execution with selectable test commands.
+# - 📦 Reuses the `6_builderprecompiled_base-dev-environment` workflow for consistent test environments.
+# - 📊 Generates and notifies about Jest coverage summaries after execution.
+#
+# 🔗 Reference:
+# - Jest: https://jestjs.io/
+
+name: Run unit test
+
+on:
+  workflow_dispatch:
+    inputs:
+      reference:
+        required: true
+        type: string
+        default: main
+        description: Git reference (branch, tag, or commit SHA) to build from.
+      command:
+        required: true
+        type: choice
+        default: 'yarn test:jest'
+        description: Select the test command to run.
+        options:
+          - 'yarn test:jest'
+  pull_request:
+    branches:
+      - '6.x'
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Run unit tests with Jest
+  test:
+    name: Run unit tests
+    uses: ./.github/workflows/6_builderprecompiled_base-dev-environment.yml
+    with:
+      reference: ${{ github.event.inputs.reference }}
+      command: ${{ github.event.inputs.command || 'yarn test:jest' }}
+      notify_jest_coverage_summary: true
+    secrets: inherit

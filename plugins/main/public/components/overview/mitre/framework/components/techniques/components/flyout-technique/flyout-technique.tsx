@@ -31,7 +31,11 @@ import {
   FilterManager,
   IndexPattern,
 } from '../../../../../../../../../../../src/plugins/data/public/';
-import { UI_LOGGER_LEVELS } from '../../../../../../../../../common/constants';
+import {
+  TAB_VIEW_NAME_DASHBOARD,
+  TAB_VIEW_NAME_EVENTS,
+  UI_LOGGER_LEVELS,
+} from '../../../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../../../react-services/common-services';
 import { WzFlyout } from '../../../../../../../../components/common/flyouts';
@@ -39,11 +43,7 @@ import {
   techniquesColumns,
   agentTechniquesColumns,
 } from './flyout-technique-columns';
-import {
-  FILTER_OPERATOR,
-  PatternDataSourceFilterManager,
-  PatternDataSource,
-} from '../../../../../../../../components/common/data-source';
+import { PatternDataSource } from '../../../../../../../../components/common/data-source';
 import { WazuhFlyoutDiscover } from '../../../../../../../common/wazuh-discover/wz-flyout-discover';
 import { tFilterParams } from '../../../../mitre';
 import TechniqueRowDetails from './technique-row-details';
@@ -51,8 +51,6 @@ import { buildPhraseFilter } from '../../../../../../../../../../../src/plugins/
 import store from '../../../../../../../../redux/store';
 import NavigationService from '../../../../../../../../react-services/navigation-service';
 import { wzDiscoverRenderColumns } from '../../../../../../../common/wazuh-discover/render-columns';
-import { AppState } from '../../../../../../../../react-services';
-import { mitreAttack } from '../../../../../../../../utils/applications';
 import { setFilters } from '../../../../../../../common/search-bar/set-filters';
 
 type tFlyoutTechniqueProps = {
@@ -264,16 +262,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       : addRenderColumn(techniquesColumns);
   };
 
-  const goToTechniqueInIntelligence = async (e, currentTechnique) => {
-    const indexPatternId = AppState.getCurrentPattern();
-    const filters = [
-      PatternDataSourceFilterManager.createFilter(
-        FILTER_OPERATOR.IS,
-        `rule.mitre.id`,
-        currentTechnique,
-        indexPatternId,
-      ),
-    ];
+  const goToTechniqueInIntelligence = (e, currentTechnique) => {
     NavigationService.getInstance().updateAndNavigateSearchParams({
       tab: 'mitre',
       tabView: 'intelligence',
@@ -283,15 +272,6 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
   };
 
   const goToTacticInIntelligence = async (e, tactic) => {
-    const indexPatternId = AppState.getCurrentPattern();
-    const filters = [
-      PatternDataSourceFilterManager.createFilter(
-        FILTER_OPERATOR.IS,
-        `rule.mitre.id`,
-        tactic,
-        indexPatternId,
-      ),
-    ];
     NavigationService.getInstance().updateAndNavigateSearchParams({
       tab: 'mitre',
       tabView: 'intelligence',
@@ -392,7 +372,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
                   <span>
                     <EuiToolTip
                       position='top'
-                      content={'Show ' + currentTechnique + ' in Dashboard'}
+                      content={`Show ${currentTechnique} in ${TAB_VIEW_NAME_DASHBOARD}`}
                     >
                       <EuiIcon
                         onMouseDown={e => {
@@ -406,7 +386,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
                     </EuiToolTip>
                     <EuiToolTip
                       position='top'
-                      content={'Inspect ' + currentTechnique + ' in Events'}
+                      content={`Inspect ${currentTechnique} in ${TAB_VIEW_NAME_EVENTS}`}
                     >
                       <EuiIcon
                         onMouseDown={e => {

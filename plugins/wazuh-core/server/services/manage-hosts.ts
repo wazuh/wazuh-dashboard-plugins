@@ -9,7 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { Logger } from 'opensearch-dashboards/server';
+import { Logger, PluginInitializerContext } from 'opensearch-dashboards/server';
+import { first } from 'rxjs/operators';
 import { IConfiguration } from '../../common/services/configuration';
 import { ServerAPIClient } from './server-api-client';
 import { API_USER_STATUS_RUN_AS } from '../../common/api-user-status-run-as';
@@ -22,14 +23,16 @@ export interface IAPIHost {
   password: string;
   port: number;
   run_as: boolean;
+  key?: string;
+  cert?: string;
+  ca?: string;
 }
 
 interface IAPIHostRegistry {
-  manager: string | null;
   node: string | null;
-  status: string;
   cluster: string;
   allow_run_as: API_USER_STATUS_RUN_AS;
+  verify_ca: boolean | null;
 }
 
 interface GetRegistryDataByHostOptions {
@@ -51,12 +54,43 @@ interface GetRegistryDataByHostOptions {
  */
 export class ManageHosts {
   public serverAPIClient: ServerAPIClient | null = null;
-  private cacheRegistry: Map<string, IAPIHostRegistry> = new Map();
-  constructor(private logger: Logger, private configuration: IConfiguration) {}
+  private readonly cacheRegistry = new Map<string, IAPIHostRegistry>();
+
+  constructor(
+    private readonly logger: Logger,
+    private readonly configuration: IConfiguration,
+    private readonly initializerContext?: PluginInitializerContext,
+  ) {}
+
+  /**
+   * Calculate verify_ca based on certificate paths.
+   * If key, cert, and ca are all configured, verify_ca is true.
+   * Otherwise, verify_ca is null (not configured) or false (partially configured).
+   */
+  private calculateVerifyCa(host: IAPIHost): boolean | null {
+    // Check if certificate paths are defined
+    return Boolean(
+      host.ca && typeof host.ca === 'string' && host.ca.trim() !== '',
+    );
+  }
+
+  /**
+   * Resolve verify_ca for a host.
+   * Uses cached registry value when present, otherwise derives from host config.
+   */
+  public resolveVerifyCa(host: IAPIHost): boolean | null {
+    const registryHost = this.cacheRegistry.get(host.id);
+    if (registryHost && typeof registryHost.verify_ca !== 'undefined') {
+      return registryHost.verify_ca;
+    }
+
+    return this.calculateVerifyCa(host);
+  }
 
   setServerAPIClient(client: ServerAPIClient) {
     this.serverAPIClient = client;
   }
+
   /**
    * Exclude fields from an API host data
    * @param host
@@ -64,15 +98,19 @@ export class ManageHosts {
    * @returns
    */
   private filterAPIHostData(host: IAPIHost, exclude: string[]) {
-    return exclude?.length
-      ? Object.entries(host).reduce(
-          (accum, [key, value]) => ({
-            ...accum,
-            ...(!exclude.includes(key) ? { [key]: value } : {}),
-          }),
-          {},
-        )
-      : host;
+    if (!exclude?.length) {
+      return host;
+    }
+
+    const filteredHost: Partial<IAPIHost> = {};
+
+    for (const key in host) {
+      if (!exclude.includes(key)) {
+        filteredHost[key] = host[key];
+      }
+    }
+
+    return filteredHost;
   }
 
   /**
@@ -80,31 +118,43 @@ export class ManageHosts {
    */
   async get(
     hostID?: string,
-    options: { excludePassword: boolean } = { excludePassword: false },
+    options?: { excludePassword: boolean },
   ): Promise<IAPIHost[] | IAPIHost> {
     try {
-      hostID
-        ? this.logger.debug(`Getting API connection with ID [${hostID}]`)
-        : this.logger.debug('Getting API connections');
-      const hosts = await this.configuration.get('hosts');
-      this.logger.debug(`API connections: [${JSON.stringify(hosts)}]`);
+      const { excludePassword = false } = options || {};
+
       if (hostID) {
-        const host = hosts.find(({ id }: { id: string }) => id === hostID);
+        this.logger.debug(`Getting API connection with ID [${hostID}]`);
+      } else {
+        this.logger.debug('Getting API connections');
+      }
+
+      const hosts = await this.configuration.get('hosts');
+
+      this.logger.debug(`API connections: [${JSON.stringify(hosts)}]`);
+
+      if (hostID) {
+        const host = hosts[hostID];
+
         if (host) {
           this.logger.debug(`API connection with ID [${hostID}] found`);
+
           return this.filterAPIHostData(
-            host,
-            options.excludePassword ? ['password'] : undefined,
+            { ...host, id: hostID },
+            excludePassword ? ['password'] : undefined,
           );
         }
+
         const APIConnectionNotFound = `API connection with ID [${hostID}] not found`;
+
         this.logger.debug(APIConnectionNotFound);
         throw new Error(APIConnectionNotFound);
       }
-      return hosts.map(host =>
+
+      return Object.entries(hosts).map(([id, host]: [string, any]) =>
         this.filterAPIHostData(
-          host,
-          options.excludePassword ? ['password'] : undefined,
+          { ...host, id },
+          excludePassword ? ['password'] : undefined,
         ),
       );
     } catch (error) {
@@ -120,16 +170,26 @@ export class ManageHosts {
    * @param {Object} response
    * API entries
    */
-  async getEntries(
-    options: { excludePassword: boolean } = { excludePassword: false },
-  ) {
+  async getEntries(options?: { excludePassword: boolean }) {
     try {
       this.logger.debug('Getting the API connections');
+
       const hosts = (await this.get(undefined, options)) as IAPIHost[];
+
       this.logger.debug('Getting registry');
       const registry = Object.fromEntries([...this.cacheRegistry.entries()]);
 
       const hostsNeedingRegistry = hosts.filter(host => !registry[host.id]);
+      const enhanceHostWithRegistry = (host: IAPIHost, registryData: any) => {
+        const { allow_run_as, verify_ca, ca, cert, key, ...cluster_info } =
+          registryData || {};
+        return {
+          ...host,
+          allow_run_as,
+          verify_ca,
+          cluster_info,
+        };
+      };
       if (hostsNeedingRegistry.length > 0) {
         this.logger.debug(
           `Found ${hostsNeedingRegistry.length} hosts without registry data, updating cache`,
@@ -155,14 +215,13 @@ export class ManageHosts {
         ]);
         return hosts.map(host => {
           const { id } = host;
-          return { ...host, cluster_info: updatedRegistry[id] || {} };
+          return enhanceHostWithRegistry(host, updatedRegistry[id]);
         });
       }
 
       return hosts.map(host => {
         const { id } = host;
-
-        return { ...host, cluster_info: registry[id] || {} };
+        return enhanceHostWithRegistry(host, registry[id]);
       });
     } catch (error) {
       this.logger.error(error.message);
@@ -184,27 +243,15 @@ export class ManageHosts {
     options: GetRegistryDataByHostOptions,
   ): Promise<IAPIHostRegistry> {
     const apiHostID = host.id;
+
     this.logger.debug(`Getting registry data from host [${apiHostID}]`);
     // Get cluster info data
 
-    let manager = null,
-      node = null,
-      status = 'disabled',
-      cluster = 'Disabled',
+    let node = null,
+      cluster = null,
       allow_run_as = API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK;
 
     try {
-      const responseAgents = await this.serverAPIClient.asInternalUser.request(
-        'GET',
-        `/agents`,
-        { params: { agents_list: '000' } },
-        { apiHostID },
-      );
-
-      if (this.isServerAPIClientResponseOk(responseAgents)) {
-        manager = responseAgents.data.data.affected_items[0].manager;
-      }
-
       // Get allow_run_as
       const responseAllowRunAs =
         await this.serverAPIClient.asInternalUser.request(
@@ -225,34 +272,21 @@ export class ManageHosts {
             ? API_USER_STATUS_RUN_AS.HOST_DISABLED
             : API_USER_STATUS_RUN_AS.ALL_DISABLED;
         }
+      } else {
+        allow_run_as = API_USER_STATUS_RUN_AS.HOST_DISABLED;
       }
 
-      const responseClusterStatus =
+      const responseClusterLocal =
         await this.serverAPIClient.asInternalUser.request(
           'GET',
-          `/cluster/status`,
+          `/cluster/local/info`,
           {},
           { apiHostID },
         );
 
-      if (
-        this.isServerAPIClientResponseOk(responseClusterStatus) &&
-        responseClusterStatus.data?.data?.enabled === 'yes'
-      ) {
-        status = 'enabled';
-
-        const responseClusterLocal =
-          await this.serverAPIClient.asInternalUser.request(
-            'GET',
-            `/cluster/local/info`,
-            {},
-            { apiHostID },
-          );
-
-        if (this.isServerAPIClientResponseOk(responseClusterLocal)) {
-          node = responseClusterLocal.data.data.affected_items[0].node;
-          cluster = responseClusterLocal.data.data.affected_items[0].cluster;
-        }
+      if (this.isServerAPIClientResponseOk(responseClusterLocal)) {
+        node = responseClusterLocal.data.data.affected_items[0].node;
+        cluster = responseClusterLocal.data.data.affected_items[0].cluster;
       }
     } catch (error) {
       if (options?.throwError) {
@@ -260,14 +294,18 @@ export class ManageHosts {
       }
     }
 
+    // Calculate verify_ca based on certificate paths
+    const verify_ca = this.calculateVerifyCa(host);
+
     const data = {
-      manager,
       node,
-      status,
       cluster,
       allow_run_as,
+      verify_ca,
     };
+
     this.updateRegistryByHost(apiHostID, data);
+
     return data;
   }
 
@@ -279,19 +317,23 @@ export class ManageHosts {
   async start() {
     try {
       this.logger.debug('Start');
+
       const hosts = (await this.get(undefined, {
         excludePassword: true,
       })) as IAPIHost[];
-      if (!hosts.length) {
+
+      if (hosts.length === 0) {
         this.logger.debug('No hosts found. Skip.');
+
         return;
       }
 
       await Promise.all(
         hosts.map(host =>
-          (async () => [host.id, await this.getRegistryDataByHost(host)])(),
+          this.getRegistryDataByHost(host, { throwError: false }),
         ),
       );
+
       this.logger.debug('API hosts data stored in the registry');
     } catch (error) {
       this.logger.error(error.message);
@@ -301,22 +343,31 @@ export class ManageHosts {
 
   private getRegistryByHost(hostID: string) {
     this.logger.debug(`Getting cache for API host [${hostID}]`);
+
     const result = this.cacheRegistry.get(hostID);
+
     this.logger.debug(`Get cache for APIhost [${hostID}]`);
+
     return result;
   }
 
   private updateRegistryByHost(hostID: string, data: any) {
     this.logger.debug(`Updating cache for APIhost [${hostID}]`);
+
     const result = this.cacheRegistry.set(hostID, data);
+
     this.logger.debug(`Updated cache for APIhost [${hostID}]`);
+
     return result;
   }
 
   private deleteRegistryByHost(hostID: string) {
     this.logger.debug(`Deleting cache for API host [${hostID}]`);
+
     const result = this.cacheRegistry.delete(hostID);
+
     this.logger.debug(`Deleted cache for API host [${hostID}]`);
+
     return result;
   }
 
@@ -329,6 +380,7 @@ export class ManageHosts {
     this.logger.debug(`Checking if the API host [${apiId}] can use the run_as`);
 
     const registryHost = this.getRegistryByHost(apiId);
+
     if (!registryHost) {
       throw new Error(
         `API host with ID [${apiId}] was not found in the registry. This could be caused by a problem getting and storing the registry data or the API host was removed.`,

@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useState, useEffect } from 'react';
+import semver from 'semver';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -46,6 +47,7 @@ import NavigationService from '../../../react-services/navigation-service';
 import WzRibbon from '../../common/ribbon/ribbon';
 import { Agent } from '../../endpoints-summary/types';
 import { SECTIONS } from '../../../sections';
+import { getAgentVersion } from '../../../../common/services/wz-agent';
 
 const tableColumns = [
   {
@@ -132,11 +134,8 @@ export const MainAgentStats = compose(
   ),
   withGuard(
     ({ agent }) => {
-      const [major, minor, patch] = agent.version
-        .replace('Wazuh v', '')
-        .split('.')
-        .map(value => parseInt(value));
-      return !(major >= 4 && minor >= 2 && patch >= 0);
+      const { raw } = getAgentVersion(agent.version);
+      return semver.lt(raw, '4.2.0');
     },
     () => (
       <PromptAgentFeatureVersion version='equal or higher version than 4.2.0' />

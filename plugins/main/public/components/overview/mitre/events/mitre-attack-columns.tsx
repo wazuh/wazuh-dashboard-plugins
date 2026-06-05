@@ -3,16 +3,9 @@ import { commonColumns } from '../../common/data-grid-columns';
 
 export const mitreAttackColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
-  commonColumns['agent.name'],
-  {
-    id: 'rule.mitre.id',
-    initialWidth: 118,
-  },
-  {
-    id: 'rule.mitre.tactic',
-    initialWidth: 280,
-  },
-  commonColumns['rule.description'],
-  commonColumns['rule.level'],
-  commonColumns['rule.id'],
+  commonColumns['wazuh.agent.name'],
+  { id: 'wazuh.rule.title' },
+  { id: 'wazuh.rule.level', initialWidth: 150 },
+  { id: 'wazuh.rule.mitre.tactic.name' },
+  { id: 'wazuh.rule.mitre.technique.name' },
 ];

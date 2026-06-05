@@ -12,4 +12,8 @@ describe('DEV_TOOLS_INITIAL_BUFFER', () => {
       /https?:\/\/documentation\.wazuh\.com/i,
     );
   });
+
+  it('should match the snapshot', () => {
+    expect(DEV_TOOLS_INITIAL_BUFFER).toMatchSnapshot();
+  });
 });

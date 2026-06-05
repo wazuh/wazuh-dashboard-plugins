@@ -339,7 +339,7 @@ const getVisStateEvents = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'agent.name',
+            field: 'wazuh.agent.name',
             orderBy: '1',
             order: 'desc',
             size: 5,
@@ -347,7 +347,7 @@ const getVisStateEvents = (indexPatternId: string) => {
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'agent.name',
+            customLabel: 'wazuh.agent.name',
           },
           schema: 'bucket',
         },
@@ -808,7 +808,7 @@ const getVisStateAgentEvents = (indexPatternId: string) => {
 
 export const getDashboardPanels = (
   indexPatternId: string,
-  isPinnedAgent: boolean,
+  isPinnedAgent?: boolean,
 ): {
   [panelId: string]: DashboardPanelState<
     EmbeddableInput & { [k: string]: unknown }

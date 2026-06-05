@@ -13,7 +13,6 @@
 const { DECODER } = require('./common');
 
 module.exports.invalidLoginPassword = {
-  decoder: DECODER.SSHD,
   full_log:
     '{predecoder.timestamp} {predecoder.hostname} sshd[5330]: Failed password for {data.srcuser} from {data.srcip} port {data.srcport} ssh2',
   location: '/var/log/auth.log',
@@ -34,10 +33,14 @@ module.exports.invalidLoginPassword = {
     hipaa: ['164.312.b'],
     nist_800_53: ['AU.14', 'AC.7'],
   },
+  wazuh: {
+    integration: {
+      decoders: [DECODER.SSHD],
+    },
+  },
 };
 
 module.exports.invalidLoginUser = {
-  decoder: DECODER.SSHD,
   full_log:
     '{predecoder.timestamp} {predecoder.hostname} sshd[10022]: Invalid user {data.srcuser} from {data.srcuser} from {data.srcip} port {data.srcport} ssh2',
   location: '/var/log/secure',
@@ -57,10 +60,14 @@ module.exports.invalidLoginUser = {
     hipaa: ['164.312.b'],
     nist_800_53: ['AU.14', 'AC.7', 'AU.6'],
   },
+  wazuh: {
+    integration: {
+      decoders: [DECODER.SSHD],
+    },
+  },
 };
 
 module.exports.multipleAuthenticationFailures = {
-  decoder: DECODER.SSHD,
   full_log:
     '{predecoder.timestamp} {predecoder.hostname} sshd[5413]: Failed password for invalid user {data.srcuser} from {data.srcip} port {data.srcport} ssh2',
   location: '/var/log/secure',
@@ -80,6 +87,11 @@ module.exports.multipleAuthenticationFailures = {
     program_name: 'sshd',
     timestamp: 'Apr 17 00:17:52',
     hostname: 'ip-10-0-1-50',
+  },
+  wazuh: {
+    integration: {
+      decoders: [DECODER.SSHD],
+    },
   },
 };
 
@@ -113,7 +125,11 @@ module.exports.windowsInvalidLoginPassword = {
       version: '0',
     },
   },
-  decoder: DECODER.WINDOWS_EVENTCHANNEL,
+  wazuh: {
+    integration: {
+      decoders: [DECODER.WINDOWS_EVENTCHANNEL],
+    },
+  },
   location: 'EventChannel',
   rule: {
     description: 'Logon Failure - Unknown user or bad password',
@@ -146,7 +162,9 @@ module.exports.userLoginFailed = {
     timestamp: 'Apr 17 00:04:40',
     hostname: 'ip-10-0-1-178',
   },
-  decoder: DECODER.PAM,
+  wazuh: {
+    integration: { decoders: [DECODER.PAM] },
+  },
   location: '/var/log/secure',
   full_log:
     '{predecoder.timestamp} {predecoder.hostname} sshd[11294]: pam_unix(sshd:auth): authentication failure; logname= uid={data.uid} euid={data.euid} tty={data.tty} ruser= rhost={data.srcip}  user={data.dstuser}',
@@ -170,7 +188,9 @@ module.exports.passwordCheckFailed = {
     timestamp: 'Apr 17 00:07:04',
     hostname: 'ip-10-0-1-132',
   },
-  decoder: DECODER.UNIX_CHKPWD,
+  wazuh: {
+    integration: { decoders: [DECODER.UNIX_CHKPWD] },
+  },
   data: { srcuser: 'root' },
   location: '/var/log/secure',
   full_log:
@@ -193,6 +213,11 @@ module.exports.nonExistentUser = {
   full_log:
     '{predecoder.timestamp} {predecoder.hostname} sshd[15724]: Invalid user {data.srcuser} from {data.srcip} port {data.srcport}',
   location: '/var/log/secure',
+  wazuh: {
+    integration: {
+      decoders: [DECODER.SSHD],
+    },
+  },
 };
 
 module.exports.bruteForceTryingAccessSystem = {
@@ -216,6 +241,11 @@ module.exports.bruteForceTryingAccessSystem = {
   full_log:
     '{predecoder.timestamp} {predecoder.hostname} sshd[15722]: Invalid user {data.srcuser} from {data.srcip} port {data.srcport}',
   location: '/var/log/secure',
+  wazuh: {
+    integration: {
+      decoders: [DECODER.SSHD],
+    },
+  },
 };
 
 module.exports.authenticationSuccess = {
@@ -241,6 +271,11 @@ module.exports.authenticationSuccess = {
     gpg13: ['7.1', '7.2'],
     gdpr: ['IV_32.2'],
   },
+  wazuh: {
+    integration: {
+      decoders: [DECODER.SSHD],
+    },
+  },
 };
 
 module.exports.maximumAuthenticationAttemptsExceeded = {
@@ -260,4 +295,9 @@ module.exports.maximumAuthenticationAttemptsExceeded = {
   location: '/var/log/secure',
   full_log:
     '{predecoder.timestamp} {predecoder.hostname} sshd[19767]: error: maximum authentication attempts exceeded for {data.dstuser} from {data.srcip} port {data.srcport} ssh2 [preauth]',
+  wazuh: {
+    integration: {
+      decoders: [DECODER.SSHD],
+    },
+  },
 };

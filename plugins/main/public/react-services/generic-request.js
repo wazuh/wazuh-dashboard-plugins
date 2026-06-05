@@ -10,14 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { AppState } from './app-state';
-import { WazuhConfig } from './wazuh-config';
 import { ApiCheck } from './wz-api-check';
 import { WzMisc } from '../factories/misc';
-import { getHttp, getDataPlugin } from '../kibana-services';
+import { getHttp, getDataPlugin, getWazuhCorePlugin } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 import NavigationService from './navigation-service';
+import { AppState } from './app-state';
 
 export class GenericRequest {
   /**
@@ -34,8 +33,7 @@ export class GenericRequest {
       if (!method || !path) {
         throw new Error('Missing parameters');
       }
-      const wazuhConfig = new WazuhConfig();
-      const { timeout } = wazuhConfig.getConfig();
+      const timeout = await getWazuhCorePlugin().configuration.get('timeout');
       const requestHeaders = {
         ...PLUGIN_PLATFORM_REQUEST_HEADERS,
         'content-type': 'application/json',
@@ -43,8 +41,9 @@ export class GenericRequest {
       const tmpUrl = getHttp().basePath.prepend(path);
 
       try {
+        const patternId = AppState.getCurrentPattern();
         requestHeaders.pattern = (
-          await getDataPlugin().indexPatterns.get(AppState.getCurrentPattern())
+          await getDataPlugin().indexPatterns.get(patternId)
         ).title;
       } catch (error) {}
 
@@ -61,7 +60,7 @@ export class GenericRequest {
           method: method,
           headers: requestHeaders,
           url: tmpUrl,
-          timeout: timeout || 20000,
+          timeout: timeout,
         };
       }
       if (method === 'PUT') {
@@ -70,7 +69,7 @@ export class GenericRequest {
           headers: requestHeaders,
           data: payload,
           url: tmpUrl,
-          timeout: timeout || 20000,
+          timeout: timeout,
         };
       }
       if (method === 'POST') {
@@ -79,7 +78,7 @@ export class GenericRequest {
           headers: requestHeaders,
           data: payload,
           url: tmpUrl,
-          timeout: timeout || 20000,
+          timeout: timeout,
         };
       }
       if (method === 'DELETE') {
@@ -88,7 +87,7 @@ export class GenericRequest {
           headers: requestHeaders,
           data: payload,
           url: tmpUrl,
-          timeout: timeout || 20000,
+          timeout: timeout,
         };
       }
 
@@ -111,14 +110,14 @@ export class GenericRequest {
           wzMisc.setApiIsDown(true);
 
           if (
-            ['/settings', '/health-check', '/blank-screen'].every(
+            ['/settings'].every(
               pathname =>
                 !NavigationService.getInstance()
                   .getPathname()
                   .startsWith(pathname),
             )
           ) {
-            NavigationService.getInstance().navigate('/health-check');
+            // TODO: manage the API is inaccessible.
           }
         }
       }

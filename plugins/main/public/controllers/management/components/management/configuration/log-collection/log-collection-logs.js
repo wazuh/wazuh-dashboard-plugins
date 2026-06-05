@@ -75,13 +75,11 @@ const mainSettings = [
 ];
 
 const getMainSettingsAgentOrManager = agent =>
-  agent && agent.id === '000'
-    ? mainSettings.filter(setting => setting.when !== 'agent')
-    : mainSettings.filter(setting =>
-        setting.when === 'agent'
-          ? agent && agent.os && agent.os.platform === 'windows'
-          : true,
-      );
+  mainSettings.filter(setting =>
+    setting.when === 'agent'
+      ? agent && agent.os && agent.os.platform === 'windows'
+      : true,
+  );
 class WzConfigurationLogCollectionLogs extends Component {
   constructor(props) {
     super(props);

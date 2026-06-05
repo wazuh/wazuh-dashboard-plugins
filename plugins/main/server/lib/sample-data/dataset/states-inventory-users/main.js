@@ -1,5 +1,10 @@
 const random = require('../../lib/random');
-const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
+const {
+  generateRandomAgent,
+  generateRandomWazuh,
+  generateRandomState,
+  generateRandomChecksum,
+} = require('../../shared-utils');
 
 function generateRandomLetters(count) {
   const letters = 'abcdefghijqlmnopqrstuvwyz';
@@ -81,7 +86,7 @@ function generateRandomUser() {
     '/home/john.doe',
     '/home/sysadmin',
     '/home/developer',
-    '/var/ossec',
+    '/var/wazuh-manager',
     'C:\\Users\\Administrator',
     'C:\\Users\\admin.local',
     'C:\\Users\\marie.martin',
@@ -138,10 +143,13 @@ function generateRandomUser() {
 function generateDocument(params) {
   return {
     agent: generateRandomAgent(),
+    checksum: generateRandomChecksum(),
     host: generateRandomHost(),
     login: generateRandomLogin(),
     process: generateRandomProcess(),
     user: generateRandomUser(),
+    state: generateRandomState(),
+
     wazuh: generateRandomWazuh(params),
   };
 }

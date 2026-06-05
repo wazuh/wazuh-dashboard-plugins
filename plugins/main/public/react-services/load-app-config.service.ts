@@ -9,8 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
-import { GenericRequest } from './generic-request';
 import store from '../redux/store';
 import {
   setAppConfigIsLoading,
@@ -20,6 +18,7 @@ import {
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
+import { getWazuhCorePlugin } from '../kibana-services';
 
 /**
  * Retunrs the wazuh app config
@@ -27,17 +26,7 @@ import { getErrorOrchestrator } from './common-services';
 export const loadAppConfig = async () => {
   try {
     store.dispatch(setAppConfigIsLoading());
-    const config = await GenericRequest.request(
-      'GET',
-      '/utils/configuration',
-      {},
-    );
-
-    if (!config || !config.data || !config.data.data) {
-      throw new Error('No config available');
-    }
-
-    const configuration = config.data.data;
+    const configuration = await getWazuhCorePlugin().configuration.getAll();
     store.dispatch(updateAppConfig(configuration));
   } catch (error) {
     store.dispatch(setAppConfigHasError());

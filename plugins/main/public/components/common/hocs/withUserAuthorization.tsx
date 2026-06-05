@@ -16,20 +16,48 @@ import { useUserPermissionsIsAdminRequirements } from '../hooks/use-user-is-admi
 import { WzEmptyPromptNoPermissions } from '../permissions/prompt';
 import { compose } from 'redux';
 import { withUserLogged } from './withUserLogged';
-//
+import {
+  withSelectedServerAPI,
+  withServerAPIAvailable,
+} from './with-server-api-available';
+
+interface ActionResourcePermission {
+  action: string;
+  resource: string;
+}
+
+type ActionResourcePermissionRequirements =
+  | ActionResourcePermission[][]
+  | ActionResourcePermission[];
+
+interface PermissionResolver {
+  (params: any): ActionResourcePermissionRequirements;
+}
+
+type AccessPermission =
+  | ActionResourcePermissionRequirements
+  | PermissionResolver
+  | null;
+
+interface ExtraUserPermissions {
+  isAdministrator?: boolean | null;
+}
+
 const withUserAuthorizationPromptChanged =
-  (permissions = null, othersPermissions = { isAdmininistrator: null }) =>
-  WrappedComponent =>
-  props => {
-    const [userPermissionRequirements, userPermissions] =
-      useUserPermissionsRequirements(
-        typeof permissions === 'function' ? permissions(props) : permissions,
-      );
+  (
+    permissions: AccessPermission = null,
+    extraUserPermissions: ExtraUserPermissions = { isAdministrator: null },
+  ) =>
+  (WrappedComponent: React.FC) =>
+  (props: any) => {
+    const [userPermissionRequirements] = useUserPermissionsRequirements(
+      typeof permissions === 'function' ? permissions(props) : permissions,
+    );
     const [_userPermissionIsAdminRequirements] =
       useUserPermissionsIsAdminRequirements();
 
     const userPermissionIsAdminRequirements =
-      othersPermissions?.isAdmininistrator
+      extraUserPermissions?.isAdministrator
         ? _userPermissionIsAdminRequirements
         : null;
 
@@ -44,9 +72,14 @@ const withUserAuthorizationPromptChanged =
   };
 
 export const withUserAuthorizationPrompt =
-  (permissions = null, othersPermissions = { isAdmininistrator: null }) =>
-  WrappedComponent =>
+  (
+    permissions: AccessPermission = null,
+    extraPermissions: ExtraUserPermissions = { isAdministrator: null },
+  ) =>
+  (WrappedComponent: React.FC) =>
     compose(
       withUserLogged,
-      withUserAuthorizationPromptChanged(permissions, othersPermissions),
+      withSelectedServerAPI,
+      withServerAPIAvailable,
+      withUserAuthorizationPromptChanged(permissions, extraPermissions),
     )(WrappedComponent);

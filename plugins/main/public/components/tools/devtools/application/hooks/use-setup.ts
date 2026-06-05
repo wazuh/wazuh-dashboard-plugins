@@ -20,11 +20,6 @@ const useSetup = () => {
 
   useEffect(() => {
     (async function () {
-      // Ensure menu is visible when loading the tool
-      if (!showMenu) {
-        AppState.setWzMenu();
-      }
-
       editorInputRef.current = CodeMirror.fromTextArea(
         window.document.getElementById(EDITOR_MIRRORS.INPUT_ID),
         {

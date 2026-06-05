@@ -12,7 +12,6 @@
 
 const initialState = {
   currentAPI: '',
-  showMenu: false,
   wazuhNotReadyYet: '',
   currentTab: '',
   currentPlatform: false,
@@ -23,7 +22,7 @@ const initialState = {
   userPermissions: false,
   toastNotification: false,
   withUserLogged: false,
-  logtestToken: '',
+  isCCS: false,
   userAccount: {
     administrator: false,
     administrator_requirements: '',
@@ -35,13 +34,6 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       currentAPI: action.currentAPI,
-    };
-  }
-
-  if (action.type === 'SHOW_MENU') {
-    return {
-      ...state,
-      showMenu: action.showMenu,
     };
   }
 
@@ -112,10 +104,10 @@ const appStateReducers = (state = initialState, action) => {
     };
   }
 
-  if (action.type === 'UPDATE_LOGTEST_TOKEN') {
+  if (action.type === 'UPDATE_IS_CCS') {
     return {
       ...state,
-      logtestToken: action.logtestToken,
+      isCCS: action.isCCS,
     };
   }
 

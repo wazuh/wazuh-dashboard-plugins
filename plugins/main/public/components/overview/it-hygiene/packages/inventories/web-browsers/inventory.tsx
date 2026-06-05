@@ -6,22 +6,31 @@ import {
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryBrowserExtensionsDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
-import { ITHygieneInventoryDashboardTable } from '../../../common/components/inventory';
-import { getOverviewBrowserExtensionsTab } from './dashboard';
+import { InventoryDashboardTable } from '../../../../../common/dashboards';
+import {
+  WAZUH_SAMPLE_INVENTORY_AGENT,
+  IT_HYGIENE_BROWSER_EXTENSIONS_INVENTORY_ID,
+  IT_HYGIENE_BROWSER_EXTENSIONS_AGENT_INVENTORY_ID,
+} from '../../../../../../../common/constants';
 
 export const ITHygienePackagesInventoryWebBrowsers =
-  withSystemInventoryBrowserExtensionsDataSource(props => {
+  withSystemInventoryBrowserExtensionsDataSource(() => {
     return (
-      <ITHygieneInventoryDashboardTable
+      <InventoryDashboardTable
         DataSource={SystemInventoryStatesDataSource}
         DataSourceRepositoryCreator={
           SystemInventoryBrowserExtensionsStatesDataSourceRepository
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
-        getDashboardPanels={getOverviewBrowserExtensionsTab}
+        getDashboardPanels={[
+          {
+            dashboardId: IT_HYGIENE_BROWSER_EXTENSIONS_INVENTORY_ID,
+            agentDashboardId: IT_HYGIENE_BROWSER_EXTENSIONS_AGENT_INVENTORY_ID,
+          },
+        ]}
         tableId='it-hygiene-inventory-browser-extensions'
-        indexPattern={props.indexPattern}
+        categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
       />
     );
   });

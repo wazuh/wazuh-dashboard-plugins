@@ -1,6 +1,6 @@
 import { AppState } from '../../../../react-services/app-state';
 import { search } from '../../../../components/common/search-bar';
-import { getDataPlugin, getWazuhCorePlugin } from '../../../../kibana-services';
+import { getDataPlugin } from '../../../../kibana-services';
 import { getLastAlertsQuery } from './last-alerts-query';
 
 interface Last24HoursAlerts {
@@ -17,23 +17,19 @@ interface Last24HoursAlerts {
  * TODO: The search function should be moved to a common place
  */
 export const getLast24HoursAlerts = async (
-  ruleLevelRange,
+  ruleLevel: string,
 ): Promise<Last24HoursAlerts> => {
   try {
+    const patternId = AppState.getCurrentPattern();
     const currentIndexPattern = await getDataPlugin().indexPatterns.get(
-      AppState.getCurrentPattern() ||
-        getWazuhCorePlugin().configuration.getSettingValue('pattern'),
+      patternId,
     );
-    const isCluster = AppState.getClusterInfo().status == 'enabled';
-    const clusterValue = isCluster
-      ? AppState.getClusterInfo().cluster
-      : AppState.getClusterInfo().manager;
+    const clusterValue = AppState.getClusterInfo().cluster;
 
     const lastAlertsQuery = getLastAlertsQuery(
       currentIndexPattern,
-      isCluster,
       clusterValue,
-      ruleLevelRange,
+      ruleLevel,
     );
 
     const result = await search(lastAlertsQuery);
@@ -41,7 +37,7 @@ export const getLast24HoursAlerts = async (
     return {
       count,
       cluster: {
-        field: isCluster ? 'cluster.name' : 'manager.name',
+        field: 'cluster.name',
         name: clusterValue,
       },
       indexPatternId: currentIndexPattern.id,

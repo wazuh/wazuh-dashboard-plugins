@@ -8,11 +8,14 @@ export interface Rule {
   gdpr?: string[];
   pci_dss?: string[];
   tsc?: string[];
+  fedramp?: string[];
   hipaa?: string[];
   nist_800_53?: string[];
   nist_800_83?: string[];
+  nis2?: string[];
   gpg13?: string[];
   pci?: string[];
+  cmmc?: string[];
   frequency?: number;
   info?: string;
 }
@@ -47,7 +50,7 @@ export interface Location {
 }
 
 export interface Field {
-  timestamp: string;
+  '@timestamp': string;
 }
 
 export type GeoLocation = {
@@ -102,12 +105,10 @@ type DataKeys =
   | 'office365'
   | 'gcp'
   | 'audit'
-  | 'oscap'
   | 'title'
   | 'file'
   | 'virustotal'
   | 'vulnerability'
-  | 'osquery'
   | 'srcip'
   | 'srcuser'
   | 'srcport'
@@ -173,24 +174,18 @@ export type Params = {
   gcp: boolean;
   /* if true, set System Auditing fields */
   audit: boolean;
-  /* if true, set CIS-CAT fields */
-  ciscat: boolean;
   /* if true, set Docker fields */
   docker: boolean;
   /* if true, set Mitre att&ck fields */
   mitre: boolean;
-  /* if true, set OpenSCAP fields */
-  openscap: boolean;
   /* if true, set Policy monitoring fields */
-  rootcheck: boolean;
+  'wazuh-rootcheck': boolean;
   /* if true, set integrity monitoring fields (IMF) */
   syscheck: boolean;
   /* if true, set VirusTotal fields */
   virustotal: boolean;
   /* if true, set vulnerabilities fields */
   vulnerabilities: boolean;
-  /* if true, set Osquery fields */
-  osquery: boolean;
   /* if true, set pci_dss fields */
   pci_dss: boolean;
   /* if true, set gdpr fields */

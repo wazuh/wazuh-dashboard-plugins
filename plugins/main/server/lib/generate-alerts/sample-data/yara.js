@@ -23,7 +23,7 @@ const RULE_AUTHOR = [
 const LOG_TYPES = ['INFO', 'WARNING', 'ERROR'];
 const API_CUSTOMERS = ['demo', 'test', 'prod'];
 const DESCRIPTION = ['File "" is a positive match. Yara rule: '];
-const LOCATION = '/var/ossec/logs/active-responses.log';
+const LOCATION = '/var/wazuh-manager/logs/active-responses.log';
 
 /*
   ┌─────────────────────────────────────────────────────────────────────────┐

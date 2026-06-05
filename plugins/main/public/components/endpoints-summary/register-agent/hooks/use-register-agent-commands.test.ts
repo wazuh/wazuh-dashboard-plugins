@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react';
 import { useRegisterAgentCommands } from './use-register-agent-commands';
 import {
   IOSDefinition,
@@ -29,15 +29,18 @@ const linuxDefinition: IOSDefinition<tOperatingSystem, tOptionalParamsNames> = {
   options: [
     {
       architecture: '32/64',
+      packageName: props => `wazuh-agent-${props.wazuhVersion}-1.x86_64`,
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/yum/wazuh-agent-${props.wazuhVersion}-1.x86_64`,
+        `https://packages.wazuh.com/4.x/yum/${props.packageName}`,
       installCommand: props => `sudo yum install -y ${props.urlPackage}`,
       startCommand: props => `sudo systemctl start wazuh-agent`,
     },
     {
       architecture: 'x64',
+      packageName: props =>
+        `wazuh-agent_${props.wazuhVersion}-1_${props.architecture}`,
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/ wazuh-agent_${props.wazuhVersion}-1_${props.architecture}`,
+        `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/${props.packageName}`,
       installCommand: props =>
         `curl -so wazuh-agent.deb ${props.urlPackage} && sudo dpkg -i ./wazuh-agent.deb`,
       startCommand: props => `sudo systemctl start wazuh-agent`,
@@ -117,9 +120,7 @@ describe('useRegisterAgentCommands hook', () => {
 
     const optionSelected = osCommandsDefinitions
       .find(os => os.name === 'linux')
-      ?.options.find(
-        item => item.architecture === 'x64',
-      );
+      ?.options.find(item => item.architecture === 'x64');
     const spyInstall = jest.spyOn(optionSelected!, 'installCommand');
     const spyStart = jest.spyOn(optionSelected!, 'startCommand');
 
@@ -203,9 +204,7 @@ describe('useRegisterAgentCommands hook', () => {
     const { selectOS, setOptionalParams } = hook.result.current;
     const optionSelected = osCommandsDefinitions
       .find(os => os.name === 'linux')
-      ?.options.find(
-        item => item.architecture === 'x64',
-      );
+      ?.options.find(item => item.architecture === 'x64');
     const spyInstall = jest.spyOn(optionSelected!, 'installCommand');
     const spyStart = jest.spyOn(optionSelected!, 'startCommand');
 

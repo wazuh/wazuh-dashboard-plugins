@@ -6,22 +6,31 @@ import {
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryProcessesDataSource } from '../common/hocs/validate-system-inventory-index-pattern';
-import { ITHygieneInventoryDashboardTable } from '../common/components/inventory';
-import { getOverviewProcessesProcessesTab } from './dashboard';
+import {
+  WAZUH_SAMPLE_INVENTORY_AGENT,
+  IT_HYGIENE_PROCESSES_INVENTORY_ID,
+  IT_HYGIENE_PROCESSES_AGENT_INVENTORY_ID,
+} from '../../../../../common/constants';
+import { InventoryDashboardTable } from '../../../common/dashboards';
 
 export const ITHygieneProcessesInventory =
-  withSystemInventoryProcessesDataSource(props => {
+  withSystemInventoryProcessesDataSource(() => {
     return (
-      <ITHygieneInventoryDashboardTable
+      <InventoryDashboardTable
         DataSource={SystemInventoryStatesDataSource}
         DataSourceRepositoryCreator={
           SystemInventoryProcessesStatesDataSourceRepository
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
-        getDashboardPanels={getOverviewProcessesProcessesTab}
+        getDashboardPanels={[
+          {
+            dashboardId: IT_HYGIENE_PROCESSES_INVENTORY_ID,
+            agentDashboardId: IT_HYGIENE_PROCESSES_AGENT_INVENTORY_ID,
+          },
+        ]}
         tableId='it-hygiene-inventory-processes'
-        indexPattern={props.indexPattern}
+        categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
       />
     );
   });

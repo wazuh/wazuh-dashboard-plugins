@@ -12,7 +12,7 @@ exports[`SettingsAboutAppInfo component should render version, revision, install
         class="euiTextColor euiTextColor--default"
       >
         <div
-          class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsFlexStart euiFlexGroup--directionRow euiFlexGroup--responsive"
         >
           <div
             class="euiFlexItem"
@@ -20,10 +20,26 @@ exports[`SettingsAboutAppInfo component should render version, revision, install
             <div
               class="euiText euiText--medium"
             >
-              App version:
+              App version: 
+              <b>
+                v4.8.0
+              </b>
+            </div>
+          </div>
+          <div
+            class="euiFlexItem wzAboutAppInfoClusterItem"
+          >
+            <div
+              class="euiText euiText--medium"
+            >
+              Cluster UUID:
                
               <b>
-                4.8.0
+                <span
+                  class="euiTextColor euiTextColor--subdued"
+                >
+                  -
+                </span>
               </b>
             </div>
           </div>

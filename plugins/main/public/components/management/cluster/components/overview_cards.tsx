@@ -4,17 +4,11 @@ import {
   EuiButtonEmpty,
   EuiCard,
   EuiDescriptionList,
-  EuiSpacer,
   EuiToolTip,
   EuiFlexGroup,
   EuiTitle,
 } from '@elastic/eui';
-import { getDashboardPanels } from '../dashboard/dashboard_panels';
-import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import '../dashboard/cluster_dashboard.scss';
-import { getPlugins } from '../../../../kibana-services';
-import { DiscoverNoResults } from '../../../common/no-results/no-results';
-import { tFilter, tParsedIndexPattern } from '../../../common/data-source';
 import { formatUINumber } from '../../../../react-services/format-number';
 
 interface OverviewCardsProps {
@@ -22,39 +16,20 @@ interface OverviewCardsProps {
   goNodes: () => void;
   goConfiguration: () => void;
   configuration: any;
-  status: any;
   version: any;
   nodesCount: number;
   nodeList: any[];
   agentsCount: number;
-  searchBarProps: any;
-  results: any;
-  indexPattern: tParsedIndexPattern;
-  clusterName?: string;
-  filters: tFilter[];
-  lastReloadRequestTime: number;
 }
-
-const plugins = getPlugins();
-
-const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
 export const OverviewCards = ({
   goAgents,
   goNodes,
   goConfiguration,
   configuration,
-  status,
   version,
   nodesCount,
-  nodeList,
   agentsCount,
-  searchBarProps,
-  results,
-  indexPattern,
-  clusterName,
-  filters,
-  lastReloadRequestTime,
 }: OverviewCardsProps) => {
   return (
     <>
@@ -71,7 +46,7 @@ export const OverviewCards = ({
                 wrap
               >
                 <EuiFlexItem grow={false}>
-                  <EuiTitle size='s'>
+                  <EuiTitle>
                     <h2>Details</h2>
                   </EuiTitle>
                 </EuiFlexItem>
@@ -88,7 +63,6 @@ export const OverviewCards = ({
               </EuiFlexGroup>
             }
           >
-            <EuiSpacer size='m' />
             <EuiDescriptionList
               type='responsiveColumn'
               compressed
@@ -96,10 +70,6 @@ export const OverviewCards = ({
                 {
                   title: 'IP address',
                   description: configuration?.nodes[0] || '-',
-                },
-                {
-                  title: 'Running',
-                  description: status ?? 'no',
                 },
                 {
                   title: 'Version',
@@ -119,32 +89,17 @@ export const OverviewCards = ({
           <EuiCard
             textAlign='left'
             title={
-              <span className='euiTitle euiTitle--small euiCard__title'>
-                Information
-              </span>
+              <EuiTitle>
+                <h2>Information</h2>
+              </EuiTitle>
             }
           >
-            <EuiSpacer size='m' />
             <EuiDescriptionList
               type='column'
               compressed
               listItems={[
                 {
-                  title: (
-                    <EuiToolTip
-                      content='Click to open the list of nodes'
-                      position='left'
-                    >
-                      <EuiButtonEmpty
-                        color='primary'
-                        flush='left'
-                        onClick={goNodes}
-                        style={{ height: 'auto' }}
-                      >
-                        Nodes
-                      </EuiButtonEmpty>
-                    </EuiToolTip>
-                  ),
+                  title: 'Nodes',
                   description: (
                     <EuiToolTip
                       content='Click to open the list of nodes'
@@ -162,21 +117,7 @@ export const OverviewCards = ({
                   ),
                 },
                 {
-                  title: (
-                    <EuiToolTip
-                      content='Click to open the list of agents'
-                      position='left'
-                    >
-                      <EuiButtonEmpty
-                        color='primary'
-                        flush='left'
-                        onClick={goAgents}
-                        style={{ height: 'auto' }}
-                      >
-                        Agents
-                      </EuiButtonEmpty>
-                    </EuiToolTip>
-                  ),
+                  title: 'Agents',
                   description: (
                     <EuiToolTip
                       content='Click to open the list of agents'
@@ -204,38 +145,6 @@ export const OverviewCards = ({
           </EuiCard>
         </EuiFlexItem>
       </EuiFlexGroup>
-      {results?.hits?.total > 0 ? (
-        <div className='ct-dashboard-responsive'>
-          <DashboardByRenderer
-            input={{
-              viewMode: ViewMode.VIEW,
-              panels: getDashboardPanels(indexPattern, nodeList, clusterName),
-              isFullScreenMode: false,
-              filters: filters,
-              useMargins: true,
-              id: 'ct-dashboard-tab',
-              timeRange: {
-                from: searchBarProps?.dateRangeFrom,
-                to: searchBarProps?.dateRangeTo,
-              },
-              title: 'Cluster Timelions dashboard',
-              description: 'Dashboard of the Cluster Timelions',
-              query: searchBarProps.query,
-              refreshConfig: {
-                pause: false,
-                value: 15,
-              },
-              hidePanelTitles: false,
-              lastReloadRequestTime,
-            }}
-          />
-        </div>
-      ) : (
-        <DiscoverNoResults
-          message='There are no results for selected time range. Try another
-            one.'
-        />
-      )}
     </>
   );
 };

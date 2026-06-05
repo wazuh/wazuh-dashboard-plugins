@@ -49,16 +49,15 @@ describe('ManageHosts Service', () => {
 
   describe('getEntries - Regression Tests', () => {
     it('should handle missing cluster_info gracefully when host ID is not in registry cache', async () => {
-      const mockHosts = [
-        {
-          id: 'new-host-id',
+      const mockHosts = {
+        'new-host-id': {
           url: 'https://localhost',
           port: 55000,
           username: 'wazuh-wui',
           password: 'wazuh-wui',
           run_as: false,
         },
-      ];
+      };
 
       mockConfiguration.get.mockResolvedValue(mockHosts);
 
@@ -90,23 +89,22 @@ describe('ManageHosts Service', () => {
     });
 
     it('should return existing cluster_info when host ID exists in registry cache', async () => {
-      const mockHosts = [
-        {
-          id: 'existing-host',
+      const mockHosts = {
+        'existing-host': {
           url: 'https://localhost',
           port: 55000,
           username: 'wazuh-wui',
           password: 'wazuh-wui',
           run_as: false,
         },
-      ];
+      };
 
       const mockRegistryData = {
         manager: 'test-manager',
         node: 'test-node',
-        status: 'enabled',
         cluster: 'test-cluster',
         allow_run_as: 1,
+        verify_ca: null,
       };
 
       mockConfiguration.get.mockResolvedValue(mockHosts);
@@ -117,7 +115,14 @@ describe('ManageHosts Service', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('cluster_info');
-      expect(result[0].cluster_info).toEqual(mockRegistryData);
+      expect(result[0].cluster_info).toEqual({
+        manager: 'test-manager',
+        node: 'test-node',
+        cluster: 'test-cluster',
+      });
+
+      expect(result[0].allow_run_as).toBe(1);
+      expect(result[0].verify_ca).toBe(null);
       expect(result[0].id).toBe('existing-host');
     });
 
@@ -125,23 +130,24 @@ describe('ManageHosts Service', () => {
       const mockRegistryData = {
         manager: 'test-manager',
         node: 'test-node',
-        status: 'enabled',
         cluster: 'test-cluster',
         allow_run_as: 1,
+        verify_ca: null,
       };
 
       (manageHosts as any).cacheRegistry.set('default', mockRegistryData);
 
-      const changedHost = {
-        id: 'default2',
-        url: 'https://localhost',
-        port: 55000,
-        username: 'wazuh-wui',
-        password: 'wazuh-wui',
-        run_as: false,
+      const mockHosts = {
+        default2: {
+          url: 'https://localhost',
+          port: 55000,
+          username: 'wazuh-wui',
+          password: 'wazuh-wui',
+          run_as: false,
+        },
       };
 
-      mockConfiguration.get.mockResolvedValue([changedHost]);
+      mockConfiguration.get.mockResolvedValue(mockHosts);
 
       manageHosts.setServerAPIClient(mockServerAPIClient as any);
       mockServerAPIClient.asInternalUser.request
@@ -165,10 +171,6 @@ describe('ManageHosts Service', () => {
       expect(result[0].cluster_info).toBeDefined();
       expect(result[0].cluster_info).not.toBeUndefined();
       expect(result[0].id).toBe('default2');
-
-      expect(() => {
-        const uuid = result[0].cluster_info.uuid;
-      }).not.toThrow();
     });
   });
 });

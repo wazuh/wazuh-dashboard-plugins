@@ -3,11 +3,6 @@
     "affected_items": [
       {
         "global": {
-          "email_notification": "yes",
-          "email_notification": "yes",
-          "email_to": "me@test.com",
-          "smtp_server": "mail.test.com",
-          "email_from": "wazuh@test.com",
           "logall": "no",
           "logall_json": "no",
           "integrity_checking": 8,

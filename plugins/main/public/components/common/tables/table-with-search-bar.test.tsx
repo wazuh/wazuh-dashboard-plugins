@@ -13,15 +13,9 @@
  */
 
 import React from 'react';
+import { act, waitFor } from '@testing-library/react';
 import { mount } from 'enzyme';
 import { TableWithSearchBar } from './table-with-search-bar';
-
-// the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.
-// https://github.com/wazuh/wazuh-dashboard-plugins/pull/6921#issuecomment-2298289550
-
-jest.mock('@osd/monaco', () => ({
-  monaco: {},
-}));
 
 jest.mock('../../../kibana-services', () => ({
   getHttp: () => ({
@@ -29,6 +23,11 @@ jest.mock('../../../kibana-services', () => ({
       prepend: str => str,
     },
   }),
+  getCookies: () => {
+    return {
+      get: () => 'test',
+    };
+  },
 }));
 
 jest.mock('../../../react-services/common-services', () => ({
@@ -74,13 +73,15 @@ const searchBarWQLOptions = {
 };
 
 const tableProps = {
-  onSearch: () => {},
+  onSearch: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
   tableColumns: columns,
   tablePageSizeOptions: [15, 25, 50, 100],
-  tableInitialSortingDirection: 'asc',
+  tableInitialSortingDirection: 'asc' as const,
   tableInitialSortingField: '',
   tableProps: {},
-  reload: () => {},
+  reload: 0,
+  endpoint: '/test-endpoint',
+  selectedFields: columns.map(({ field }) => field),
   searchBarSuggestions: [],
   rowProps: () => {},
   searchBarWQL: {
@@ -103,8 +104,17 @@ beforeAll(() => {
 });
 
 describe('Table With Search Bar component', () => {
-  it('renders correctly to match the snapshot', () => {
-    const wrapper = mount(<TableWithSearchBar {...tableProps} />);
-    expect(wrapper).toMatchSnapshot();
+  it('renders correctly to match the snapshot', async () => {
+    let wrapper = null;
+
+    await act(async () => {
+      wrapper = mount(<TableWithSearchBar {...tableProps} />);
+    });
+
+    await waitFor(() => expect(tableProps.onSearch).toHaveBeenCalled());
+
+    wrapper!.update();
+    expect(wrapper!).toMatchSnapshot();
+    wrapper!.unmount();
   });
 });

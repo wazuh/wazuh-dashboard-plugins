@@ -82,13 +82,10 @@
     windows: { windows: { service_control_manager: true } },
     github: { github: true },
     office: { office: true },
-    rootcheck: { rootcheck: true },
+    'wazuh-rootcheck': { 'wazuh-rootcheck': true },
     audit: { audit: true },
-    openscap: { openscap: true },
-    ciscat: { ciscat: true },
     vulnerabilities: { vulnerabilities: true },
     virustotal: { virustotal: true },
-    osquery: { osquery: true },
     docker: { docker: true },
     mitre: { mitre: true },
     yara: { yara: true },
@@ -110,13 +107,11 @@
     ],
     'auditing-policy-monitoring': [
       'audit',
-      'ciscat',
-      'openscap',
-      'rootcheck',
+      'wazuh-rootcheck',
       'virustotal',
       'yara',
     ],
-    'thread-detection': ['docker', 'mitre', 'osquery', 'vulnerabilities'],
+    'thread-detection': ['docker', 'mitre', 'vulnerabilities'],
   };
 
   function displayHelp() {
@@ -175,8 +170,8 @@ ${Object.keys(outputs)
 - Generate alerts for all the modules in ndjson format and save to a output.ndjson file
 node ${cliFilePath} --all-modules > output.ndjson
 
-- Generate alerts for all the modules in OpenSearch/Elasticsearch Bulk API format to a wazuh-alerts index and save to a output.ndjson file
-node ${cliFilePath} --all-modules --format bulk-api --index wazuh-alerts > output.ndjson
+- Generate alerts for all the modules in OpenSearch/Elasticsearch Bulk API format to a wazuh-events index and save to a output.ndjson file
+node ${cliFilePath} --all-modules --format bulk-api --index wazuh-events > output.ndjson
 
 - Generate alerts for AWS module and save to output.ndjson file
 node ${cliFilePath} --module-aws > output.ndjson

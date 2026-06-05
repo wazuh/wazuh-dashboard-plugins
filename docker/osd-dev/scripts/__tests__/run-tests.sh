@@ -31,6 +31,6 @@ else
   fi
 fi
 
-cmd=("${compose_cmd[@]}" run --rm "$SERVICE_NAME" "${PASS_ARGS[@]}")
+cmd=("${compose_cmd[@]}" run --rm "$SERVICE_NAME" ${PASS_ARGS[@]+"${PASS_ARGS[@]}"})
 
 exec "${cmd[@]}"

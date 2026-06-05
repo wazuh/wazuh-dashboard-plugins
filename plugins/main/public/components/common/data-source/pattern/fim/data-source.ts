@@ -15,11 +15,11 @@ export class FIMFilesStatesDataSource extends PatternDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [...this.getClusterManagerFilters(), ...super.getFixedFilters()];
+    return [...this.getClusterFilters(), ...super.getFixedFilters()];
   }
 
-  getClusterManagerFilters() {
-    return PatternDataSourceFilterManager.getClusterManagerFilters(
+  getClusterFilters() {
+    return PatternDataSourceFilterManager.getClusterFilters(
       this.id,
       DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
       VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER,
@@ -33,27 +33,14 @@ export class FIMRegistryKeysStatesDataSource extends PatternDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [
-      ...this.getClusterManagerFilters(),
-      ...super.getFixedFilters(),
-      this.getRegistryTypeFilter(),
-    ];
+    return [...this.getClusterFilters(), ...super.getFixedFilters()];
   }
 
-  getClusterManagerFilters() {
-    return PatternDataSourceFilterManager.getClusterManagerFilters(
+  getClusterFilters() {
+    return PatternDataSourceFilterManager.getClusterFilters(
       this.id,
       DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
       VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER,
-    );
-  }
-
-  getRegistryTypeFilter() {
-    return PatternDataSourceFilterManager.createFilter(
-      FILTER_OPERATOR.IS,
-      'event.category',
-      'registry_key',
-      this.id,
     );
   }
 }
@@ -64,27 +51,14 @@ export class FIMRegistryValuesStatesDataSource extends PatternDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [
-      ...this.getClusterManagerFilters(),
-      ...super.getFixedFilters(),
-      this.getRegistryTypeFilter(),
-    ];
+    return [...this.getClusterFilters(), ...super.getFixedFilters()];
   }
 
-  getClusterManagerFilters() {
-    return PatternDataSourceFilterManager.getClusterManagerFilters(
+  getClusterFilters() {
+    return PatternDataSourceFilterManager.getClusterFilters(
       this.id,
       DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
       VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER,
-    );
-  }
-
-  getRegistryTypeFilter() {
-    return PatternDataSourceFilterManager.createFilter(
-      FILTER_OPERATOR.IS,
-      'event.category',
-      'registry_value',
-      this.id,
     );
   }
 }

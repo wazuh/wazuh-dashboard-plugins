@@ -4,47 +4,57 @@ import { tDataGridColumn } from '../../../../../../../common/data-grid';
 
 export const techniquesColumns: tDataGridColumn[] = [
   {
-    id: 'timestamp',
+    id: '@timestamp',
     isSortable: true,
     defaultSortDirection: 'desc',
     displayAsText: 'Time',
     render: value => formatUIDate(value),
   },
   {
-    id: 'agent.id',
+    id: 'wazuh.agent.id',
     displayAsText: 'Agent',
   },
-  { id: 'agent.name', displayAsText: 'Agent Name' },
+  { id: 'wazuh.agent.name', displayAsText: 'Agent Name' },
   {
-    id: 'rule.mitre.id',
+    id: 'wazuh.rule.mitre.technique.id',
     displayAsText: 'Technique(s)',
+    initialWidth: 200,
   },
-  { id: 'rule.mitre.tactic', displayAsText: 'Tactic(s)' },
-  { id: 'rule.level', displayAsText: 'Level' },
   {
-    id: 'rule.id',
+    id: 'wazuh.rule.mitre.tactic.id',
+    displayAsText: 'Tactic(s)',
+    initialWidth: 266,
+  },
+  { id: 'wazuh.rule.level', displayAsText: 'Level' },
+  {
+    id: 'wazuh.rule.id',
     displayAsText: 'Rule ID',
   },
-  { id: 'rule.description', displayAsText: 'Description' },
+  { id: 'wazuh.rule.title', displayAsText: 'Title' },
 ];
 
 export const agentTechniquesColumns: tDataGridColumn[] = [
   {
-    id: 'timestamp',
+    id: '@timestamp',
     isSortable: true,
     defaultSortDirection: 'desc',
     displayAsText: 'Time',
     render: value => formatUIDate(value),
   },
   {
-    id: 'rule.mitre.id',
+    id: 'wazuh.rule.mitre.technique.id',
     displayAsText: 'Technique(s)',
+    initialWidth: 200,
   },
-  { id: 'rule.mitre.tactic', displayAsText: 'Tactic(s)' },
-  { id: 'rule.level', displayAsText: 'Level' },
   {
-    id: 'rule.id',
+    id: 'wazuh.rule.mitre.tactic.id',
+    displayAsText: 'Tactic(s)',
+    initialWidth: 266,
+  },
+  { id: 'wazuh.rule.level', displayAsText: 'Level' },
+  {
+    id: 'wazuh.rule.id',
     displayAsText: 'Rule ID',
   },
-  { id: 'rule.description', displayAsText: 'Description' },
+  { id: 'wazuh.rule.title', displayAsText: 'Title' },
 ];

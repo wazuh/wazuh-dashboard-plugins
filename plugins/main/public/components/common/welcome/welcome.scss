@@ -6,8 +6,8 @@
 .wz-welcome-page-agent-tabs {
   padding: 12px 16px 1px 10px;
   min-height: 54px;
-  border-bottom: 1px solid #d3dae6;
-  background-color: white;
+  border-bottom: 1px solid $ouiBorderColor;
+  background-color: $ouiColorEmptyShade;
 }
 
 .statWithLink:hover .euiTitle {

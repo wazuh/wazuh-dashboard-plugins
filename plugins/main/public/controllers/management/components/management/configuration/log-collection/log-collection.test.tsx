@@ -42,7 +42,7 @@ const linuxCurrentConfigMocked = {
   'logcollector-localfile': {
     localfile: [
       {
-        file: '/var/ossec/logs/active-responses.log',
+        file: '/var/wazuh-manager/logs/active-responses.log',
         logformat: 'syslog',
         ignore_binaries: 'no',
         'only-future-events': 'yes',

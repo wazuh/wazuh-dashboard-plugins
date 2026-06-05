@@ -6,22 +6,31 @@ import {
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryHardwareDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
-import { ITHygieneInventoryDashboardTable } from '../../../common/components/inventory';
-import { getOverviewSystemHardwareTab } from './dashboard';
+import {
+  WAZUH_SAMPLE_INVENTORY_AGENT,
+  IT_HYGIENE_HARDWARE_INVENTORY_ID,
+  IT_HYGIENE_HARDWARE_AGENT_INVENTORY_ID,
+} from '../../../../../../../common/constants';
+import { InventoryDashboardTable } from '../../../../../common/dashboards';
 
 export const ITHygieneSystemInventoryHardware =
-  withSystemInventoryHardwareDataSource(props => {
+  withSystemInventoryHardwareDataSource(() => {
     return (
-      <ITHygieneInventoryDashboardTable
+      <InventoryDashboardTable
         DataSource={SystemInventoryStatesDataSource}
         DataSourceRepositoryCreator={
           SystemInventoryHardwareStatesDataSourceRepository
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
-        getDashboardPanels={getOverviewSystemHardwareTab}
+        getDashboardPanels={[
+          {
+            dashboardId: IT_HYGIENE_HARDWARE_INVENTORY_ID,
+            agentDashboardId: IT_HYGIENE_HARDWARE_AGENT_INVENTORY_ID,
+          },
+        ]}
         tableId='it-hygiene-inventory-hardware'
-        indexPattern={props.indexPattern}
+        categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
       />
     );
   });

@@ -5,16 +5,37 @@ import {
   initializeBaseEnvironment,
   setVersionDerivedEnvironment,
   configureModeAndSecurity,
+  removeGeneratedServerLocalDashboardFiles,
 } from './environmentConfigurator';
 import type { EnvironmentPaths, ScriptConfig } from '../types/config';
-import { PathAccessError, ValidationError } from '../errors';
+import { ValidationError } from '../errors';
+
+const MINIMAL_OSD_CONFIG = `wazuh_core.hosts:
+  first-host:
+    url: https://first.example.com
+  manager-local:
+    url: https://manager.local
+`;
 
 describe('services/environmentConfigurator', () => {
   let tmpdir = '';
+  let savedCwd = '';
   let envPaths: EnvironmentPaths;
 
   beforeEach(() => {
+    savedCwd = process.cwd();
     tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'wdp-env-'));
+    process.chdir(tmpdir);
+    const osdConfigDir = path.join(tmpdir, 'config', 'osd');
+    fs.mkdirSync(osdConfigDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(osdConfigDir, 'opensearch_dashboards.yml'),
+      MINIMAL_OSD_CONFIG,
+    );
+    fs.writeFileSync(
+      path.join(osdConfigDir, 'opensearch_dashboards_saml.yml'),
+      MINIMAL_OSD_CONFIG,
+    );
     const containerRoot = path.join(tmpdir, 'container');
     fs.mkdirSync(containerRoot, { recursive: true });
     envPaths = {
@@ -34,6 +55,9 @@ describe('services/environmentConfigurator', () => {
   });
 
   afterEach(() => {
+    try {
+      process.chdir(savedCwd);
+    } catch {}
     try {
       fs.rmSync(tmpdir, { recursive: true, force: true });
     } catch {}
@@ -55,6 +79,8 @@ describe('services/environmentConfigurator', () => {
       enableSaml: false,
       serverFlagVersion: '',
       serverLocalFlagVersion: '',
+      useIndexerFromPackage: false,
+      allForks: false,
     };
     initializeBaseEnvironment(cfg);
     expect(process.env.PASSWORD).toBeDefined();
@@ -75,7 +101,6 @@ describe('services/environmentConfigurator', () => {
     expect(process.env.OSD_MAJOR_NUMBER).toBe('2');
     expect(process.env.COMPOSE_PROJECT_NAME).toBe('os-dev-291');
     expect(process.env.WAZUH_VERSION_DEVELOPMENT).toBe('4.12.0');
-    expect(process.env.OSD_MAJOR).toBe('2.x');
   });
 
   describe('configureModeAndSecurity', () => {
@@ -93,15 +118,16 @@ describe('services/environmentConfigurator', () => {
       enableSaml: false,
       serverFlagVersion: '',
       serverLocalFlagVersion: '',
+      useIndexerFromPackage: false,
+      allForks: false,
     };
 
     it('returns standard profile by default and sets security paths', () => {
-      process.env.OSD_MAJOR = '2.x';
       const profile = configureModeAndSecurity({ ...baseCfg });
       expect(profile).toBe('standard');
-      expect(process.env.WAZUH_DASHBOARD_CONF).toContain('/config/2.x/osd/');
+      expect(process.env.WAZUH_DASHBOARD_CONF).toContain('/config/osd/');
       expect(process.env.SEC_CONFIG_PATH).toContain(
-        '/usr/share/opensearch/config',
+        '/usr/share/wazuh-indexer/config',
       );
     });
 
@@ -141,6 +167,9 @@ describe('services/environmentConfigurator', () => {
       });
       expect(serverLocalRpmProfile).toBe('server-local-rpm');
       expect(process.env.IMAGE_TAG).toBe('4.12.0');
+      expect(process.env.WAZUH_DASHBOARD_CONF).toContain(
+        'opensearch_dashboards.generated.server-local.yml',
+      );
 
       const serverLocalWithoutProfile = configureModeAndSecurity({
         ...baseCfg,
@@ -151,6 +180,18 @@ describe('services/environmentConfigurator', () => {
       expect(serverLocalWithoutProfile).toBe('server-local-without');
     });
 
+    it('server-local + saml uses server-local saml dashboard config', () => {
+      configureModeAndSecurity({
+        ...baseCfg,
+        mode: 'server-local',
+        modeVersion: '4.12.0',
+        enableSaml: true,
+      });
+      expect(process.env.WAZUH_DASHBOARD_CONF).toContain(
+        'opensearch_dashboards_saml.generated.server-local.yml',
+      );
+    });
+
     it('rejects direct server-local-* modes as unsupported', () => {
       expect(() =>
         configureModeAndSecurity({
@@ -159,6 +200,33 @@ describe('services/environmentConfigurator', () => {
           modeVersion: '4.12.0',
         }),
       ).toThrow(ValidationError);
+    });
+  });
+
+  describe('removeGeneratedServerLocalDashboardFiles', () => {
+    it('removes *.generated.server-local.yml under docker/osd-dev/config/*/osd/', () => {
+      const osdDir = path.join(
+        envPaths.currentRepoContainerRoot,
+        'docker/osd-dev/config/osd',
+      );
+      fs.mkdirSync(osdDir, { recursive: true });
+      const fake = path.join(
+        osdDir,
+        'opensearch_dashboards.generated.server-local.yml',
+      );
+      fs.writeFileSync(fake, 'generated');
+
+      const log = {
+        info: jest.fn(),
+        warn: jest.fn(),
+      };
+
+      removeGeneratedServerLocalDashboardFiles(envPaths, log as any);
+
+      expect(fs.existsSync(fake)).toBe(false);
+      expect(log.info).toHaveBeenCalledWith(
+        'Removed generated dashboard config: opensearch_dashboards.generated.server-local.yml',
+      );
     });
   });
 });

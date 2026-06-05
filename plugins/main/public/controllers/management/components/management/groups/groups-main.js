@@ -28,6 +28,7 @@ import { compose } from 'redux';
 import {
   withGlobalBreadcrumb,
   withRouterSearch,
+  withUserAuthorizationPrompt,
 } from '../../../../../components/common/hocs';
 import { endpointGroups } from '../../../../../utils/applications';
 import { MultipleAgentSelector } from '../../../../../components/management/groups/multiple-agent-selector';
@@ -54,7 +55,7 @@ class WzGroups extends Component {
         const options = {
           context: `${WzGroups.name}.componentDidMount`,
           level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.CRITICAL,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
           store: true,
           error: {
             error: error,
@@ -137,4 +138,7 @@ export default compose(
       : [{ text: endpointGroups.breadcrumbLabel }];
   }),
   withRouterSearch,
+  withUserAuthorizationPrompt([
+    { action: 'group:read', resource: 'group:id:*' },
+  ]),
 )(WzGroups);

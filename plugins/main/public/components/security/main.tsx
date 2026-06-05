@@ -29,12 +29,7 @@ import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/typ
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { security } from '../../utils/applications';
 import { getWazuhCorePlugin } from '../../kibana-services';
-import {
-  enableMenu,
-  ip,
-  nestedResolve,
-  savedSearch,
-} from '../../services/resolves';
+import { nestedResolve } from '../../services/resolves';
 import { Redirect, Route, Switch } from '../router-search';
 import { useRouterSearch } from '../common/hooks';
 import NavigationService from '../../react-services/navigation-service';
@@ -64,7 +59,7 @@ const tabs = [
 
 export const WzSecurity = compose(
   withErrorBoundary,
-  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
+  withRouteResolvers({ nestedResolve }),
   withGlobalBreadcrumb([{ text: security.breadcrumbLabel }]),
 )(() => {
   const navigationService = NavigationService.getInstance();

@@ -68,7 +68,7 @@ module.exports.arrayMitreRules = [
       id: ['T1017'],
       technique: ['Application Deployment Software'],
     },
-    groups: ['rootcheck', 'wazuh'],
+    groups: ['wazuh-rootcheck', 'wazuh'],
     description: 'Windows Adware/Spyware application found.',
   },
   {

@@ -37,19 +37,15 @@ import { validateAgentName } from '../../utils/validations';
 import { compose } from 'redux';
 import { endpointSummary } from '../../../../../utils/applications';
 import { getWazuhCorePlugin } from '../../../../../kibana-services';
-import {
-  enableMenu,
-  ip,
-  nestedResolve,
-  savedSearch,
-} from '../../../../../services/resolves';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { nestedResolve } from '../../../../../services/resolves';
 import NavigationService from '../../../../../react-services/navigation-service';
 import { SECTIONS } from '../../../../../sections';
 import { getWazuhAPIVersion } from '../../../services';
 
 export const RegisterAgent = compose(
   withErrorBoundary,
-  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
+  withRouteResolvers({ nestedResolve }),
   withGlobalBreadcrumb([
     {
       text: endpointSummary.breadcrumbLabel,
@@ -71,10 +67,7 @@ export const RegisterAgent = compose(
   const [groups, setGroups] = useState([]);
   const [needsPassword, setNeedsPassword] = useState<boolean>(false);
   const [missingPasswordReadPermissions] = useUserPermissionsRequirements([
-    [
-      { action: 'manager:update_config', resource: '*:*:*' },
-      { action: 'cluster:update_config', resource: 'node:id:*' },
-    ],
+    [{ action: 'cluster:update_config', resource: 'node:id:*' }],
   ]);
   const canReadAuthdPassword = !missingPasswordReadPermissions;
 
@@ -93,8 +86,8 @@ export const RegisterAgent = compose(
       type: 'text',
       initialValue: configuration['enrollment.dns'] || '',
       validate:
-        getWazuhCorePlugin().configuration._settings.get('enrollment.dns')
-          .validate,
+        getWazuhCorePlugin().SettingsValidator
+          .serverAddressHostnameFQDNIPv4IPv6,
     },
     agentName: {
       type: 'text',
@@ -126,12 +119,17 @@ export const RegisterAgent = compose(
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const [wazuhVersion, masterConfig, groups] = await Promise.all([
+      // Resolve all the
+      const [wazuhVersionResult, masterConfigResult, groupsResult] =
+        await Promise.allSettled([
           getWazuhAPIVersion('RegisterAgent.getWazuhVersion'),
           getMasterConfig(),
           getGroups(),
         ]);
+
+      // Handle master config
+      if (masterConfigResult.status === 'fulfilled') {
+        const masterConfig = masterConfigResult.value;
         const { auth: authConfig } = masterConfig;
         // get wazuh password configuration
         let wazuhPassword = '';
@@ -141,26 +139,43 @@ export const RegisterAgent = compose(
         }
         setNeedsPassword(needsPassword);
         setWazuhPassword(wazuhPassword);
-        setWazuhVersion(wazuhVersion || '');
-        setGroups(groups);
-        setLoading(false);
-      } catch (error) {
-        setWazuhVersion(wazuhVersion || '');
-        setLoading(false);
-        const options = {
-          context: 'RegisterAgent',
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          display: true,
-          store: false,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: error.name || error,
-          },
-        };
-        ErrorHandler.handleError(error, options);
       }
+
+      // Handle wazuh version
+      if (wazuhVersionResult.status === 'fulfilled') {
+        const wazuhVersion = wazuhVersionResult.value;
+        setWazuhVersion(wazuhVersion || '');
+      }
+
+      // Handle groups
+      if (groupsResult.status === 'fulfilled') {
+        const groups = groupsResult.value;
+        setGroups(groups);
+      }
+
+      // Handle individual errors
+      const errors = [wazuhVersionResult, masterConfigResult, groupsResult]
+        .filter(result => result.status === 'rejected')
+        .map(result => result.reason);
+
+      if (errors.length > 0) {
+        errors.forEach(error => {
+          const options = {
+            context: 'RegisterAgent',
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
+            display: true,
+            store: false,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: error.name || error,
+            },
+          };
+          ErrorHandler.handleError(error, options);
+        });
+      }
+      setLoading(false);
     };
 
     fetchData();

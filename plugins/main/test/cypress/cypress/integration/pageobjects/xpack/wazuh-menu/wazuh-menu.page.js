@@ -24,12 +24,9 @@ export const WAZUH_MENU_PAGE = {
   googleCloudPlatformLink: '[data-test-subj=menuModulesGcpLink]',
   policyMonitoringLink: '[data-test-subj=menuModulesPolicyMonitoringLink]',
   systemAuditingLink: '[data-test-subj=menuModulesAuditLink]',
-  openScapLink: '[data-test-subj=menuModulesOpenScapLink]',
-  cisCatLink: '[data-test-subj=menuModulesCiscatLink]',
   securityConfigurationAssessmentLink: '[data-test-subj=menuModulesScaLink]',
   vulnerabilitiesLink: '[data-test-subj=menuModulesVulsLink]',
   virusTotalLink: '[data-test-subj=menuModulesVirustotalLink]',
-  osqueryLink: '[data-test-subj=menuModulesOsqueryLink]',
   dockerListenerLink: '[data-test-subj=menuModulesDockerLink]',
   mitreAttackLink: '[data-test-subj=menuModulesMitreLink]',
   pciDssLink: '[data-test-subj=menuModulesPciLink]',
@@ -70,7 +67,8 @@ export const WAZUH_MENU_PAGE = {
   //endregion
   //region Settings
   settingsApiConfigurationLink: '[data-test-subj=menuSettingsApiLink]',
-  settingsModulesLink: '.wz-menu-right-side .WzManagementSideMenu [data-test-subj=menuSettingsModulesLink]',
+  settingsModulesLink:
+    '.wz-menu-right-side .WzManagementSideMenu [data-test-subj=menuSettingsModulesLink]',
   settingsSampleDataLink: '[data-test-subj=menuSettingsSampleDataLink]',
   settingsConfigurationLink: '[data-test-subj=menuSettingsConfigurationLink]',
   settingsLogsLink: '[data-test-subj=menuSettingsLogsLink]',

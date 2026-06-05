@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react-hooks';
+import { renderHook, act } from '@testing-library/react';
 import useDataGridColumns from './use-data-grid-columns';
 import { useDataGridStatePersistenceManager } from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
 import { tDataGridColumn } from './types';

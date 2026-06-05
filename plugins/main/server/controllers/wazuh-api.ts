@@ -33,9 +33,30 @@ import {
   revision as pluginRevision,
 } from '../../package.json';
 import { extractErrorMessage } from '../lib/extract-error-message';
+import { detectCCS } from '../lib/ccs-detector';
 
 export class WazuhApiCtrl {
   constructor() {}
+
+  private async resolveHostId(
+    context: RequestHandlerContext,
+    sessionHostId?: string,
+  ): Promise<string | undefined> {
+    const hosts = await context.wazuh_core.manageHosts.getEntries({
+      excludePassword: true,
+    });
+    const firstHostId = hosts?.[0]?.id;
+    if (!firstHostId) return undefined;
+
+    if (sessionHostId && hosts.some(h => h.id === sessionHostId)) {
+      const isCCS = await detectCCS(context);
+      if (isCCS) {
+        return sessionHostId;
+      }
+    }
+
+    return firstHostId;
+  }
 
   async getToken(
     context: RequestHandlerContext,
@@ -43,7 +64,10 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const { force, idHost } = request.body;
+      const { force } = request.body;
+      const idHost: string =
+        (await this.resolveHostId(context, request.body.idHost)) ??
+        request.body.idHost;
       const { username } = await context.wazuh.security.getCurrentUser(
         request,
         context,
@@ -124,8 +148,8 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      // Get config from configuration
-      const id = request.body.id;
+      const id: string =
+        (await this.resolveHostId(context, request.body.id)) ?? request.body.id;
       context.wazuh.logger.debug(`Getting server API host by ID: ${id}`);
       const apiHostData = await context.wazuh_core.manageHosts.get(id, {
         excludePassword: true,
@@ -137,21 +161,19 @@ export class WazuhApiCtrl {
 
       context.wazuh.logger.debug(`${id} exists`);
 
-      // Fetch needed information about the cluster and the manager itself
-      const responseManagerInfo =
+      // Fetch needed information about the cluster local node
+      const responseClusterInfo =
         await context.wazuh.api.client.asInternalUser.request(
           'get',
-          `/manager/info`,
+          `/cluster/local/info`,
           {},
           { apiHostID: id, forceRefresh: true },
         );
 
       // Look for socket-related errors
-      if (this.checkResponseIsDown(context, responseManagerInfo)) {
+      if (this.checkResponseIsDown(context, responseClusterInfo)) {
         return ErrorResponse(
-          `ERROR3099 - ${
-            responseManagerInfo.data.detail || 'Server not ready yet'
-          }`,
+          `ERROR3099 - ${responseClusterInfo.detail || 'Server not ready yet'}`,
           3099,
           HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
           response,
@@ -160,7 +182,7 @@ export class WazuhApiCtrl {
 
       // If we have a valid response from the Wazuh API
       try {
-        const { status, manager, node, cluster } =
+        const { node, cluster } =
           await context.wazuh_core.manageHosts.getRegistryDataByHost(
             apiHostData,
             {
@@ -168,7 +190,7 @@ export class WazuhApiCtrl {
             },
           );
 
-        api.cluster_info = { status, manager, node, cluster };
+        api.cluster_info = { node, cluster };
 
         return response.ok({
           body: {
@@ -180,8 +202,7 @@ export class WazuhApiCtrl {
       } catch (error) {
         // If we have an invalid response from the Wazuh API
         throw new Error(
-          responseManagerInfo.data.detail ||
-            `${api.url}:${api.port} is unreachable`,
+          responseClusterInfo.detail || `${api.url}:${api.port} is unreachable`,
         );
       }
     } catch (error) {
@@ -200,46 +221,6 @@ export class WazuhApiCtrl {
           },
         });
       } else {
-        try {
-          const apis = await context.wazuh_core.manageHosts.get();
-          for (const api of apis) {
-            try {
-              const { id } = api;
-
-              const responseManagerInfo =
-                await context.wazuh.api.client.asInternalUser.request(
-                  'GET',
-                  `/manager/info`,
-                  {},
-                  { apiHostID: id },
-                );
-
-              if (this.checkResponseIsDown(context, responseManagerInfo)) {
-                return ErrorResponse(
-                  `ERROR3099 - ${
-                    response.data.detail || 'Server not ready yet'
-                  }`,
-                  3099,
-                  HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
-                  response,
-                );
-              }
-              if (responseManagerInfo.status === HTTP_STATUS_CODES.OK) {
-                request.body.id = id;
-                request.body.idChanged = id;
-                return await this.checkStoredAPI(context, request, response);
-              }
-            } catch (error) {} // eslint-disable-line
-          }
-        } catch (error) {
-          context.wazuh.logger.error(error.message || error);
-          return ErrorResponse(
-            error.message || error,
-            3020,
-            error?.response?.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-            response,
-          );
-        }
         context.wazuh.logger.error(error.message || error);
         return ErrorResponse(
           error.message || error,
@@ -316,19 +297,21 @@ export class WazuhApiCtrl {
       if (request.body.forceRefresh) {
         options['forceRefresh'] = request.body.forceRefresh;
       }
-      let responseManagerInfo;
+      let responseClusterInfo;
       try {
-        responseManagerInfo =
+        responseClusterInfo =
           await context.wazuh.api.client.asInternalUser.request(
             'GET',
-            `/manager/info`,
+            `/cluster/local/info`,
             {},
             options,
           );
       } catch (error) {
         return ErrorResponse(
           `ERROR3099 - ${
-            error.response?.data?.detail || 'Server not ready yet'
+            error.response?.data?.detail ||
+            error.message ||
+            'Server not ready yet'
           }`,
           3099,
           error?.response?.status || HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
@@ -337,24 +320,22 @@ export class WazuhApiCtrl {
       }
       context.wazuh.logger.debug(`${request.body.id} credentials are valid`);
       if (
-        responseManagerInfo.status === HTTP_STATUS_CODES.OK &&
-        responseManagerInfo.data
+        responseClusterInfo.status === HTTP_STATUS_CODES.OK &&
+        responseClusterInfo.data
       ) {
-        // Check if UUID exists in the response
-        if (responseManagerInfo.data?.data?.affected_items?.[0]?.uuid) {
-          const uuid = responseManagerInfo.data.data.affected_items[0].uuid;
+        // Check if cluster node info exists in the response
+        if (responseClusterInfo.data?.data?.affected_items?.[0]?.node) {
           const result =
             await context.wazuh_core.manageHosts.getRegistryDataByHost(data);
           return response.ok({
-            body: {
-              ...result,
-              uuid,
-            },
+            body: result,
           });
         } else {
-          context.wazuh.logger.warn('Could not obtain manager UUID');
+          context.wazuh.logger.warn(
+            'Could not obtain cluster node information',
+          );
           return ErrorResponse(
-            'Could not obtain manager UUID',
+            'Could not obtain cluster node information',
             null,
             HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
             response,
@@ -421,54 +402,6 @@ export class WazuhApiCtrl {
       return isDown;
     }
     return false;
-  }
-
-  /**
-   * Check main Wazuh daemons status
-   * @param {*} context Endpoint context
-   * @param {*} api API entry stored in .wazuh
-   * @param {*} path Optional. Wazuh API target path.
-   */
-  async checkDaemons(context, api, path) {
-    try {
-      const response = await context.wazuh.api.client.asInternalUser.request(
-        'GET',
-        '/manager/status',
-        {},
-        { apiHostID: api.id },
-      );
-
-      const daemons =
-        ((((response || {}).data || {}).data || {}).affected_items || [])[0] ||
-        {};
-
-      const isCluster =
-        ((api || {}).cluster_info || {}).status === 'enabled' &&
-        typeof daemons['wazuh-clusterd'] !== 'undefined';
-      const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
-
-      const execd = daemons['wazuh-execd'] === 'running';
-      const modulesd = daemons['wazuh-modulesd'] === 'running';
-      const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
-      const clusterd = isCluster
-        ? daemons['wazuh-clusterd'] === 'running'
-        : true;
-
-      const isValid = execd && modulesd && wazuhdb && clusterd;
-
-      isValid && context.wazuh.logger.debug('Wazuh is ready');
-
-      if (path === '/ping') {
-        return { isValid };
-      }
-
-      if (!isValid) {
-        throw new Error('Server not ready yet');
-      }
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
   }
 
   sleep(timeMs) {
@@ -580,7 +513,9 @@ export class WazuhApiCtrl {
       if (path === '/ping') {
         try {
           const check = await this.checkDaemons(context, api, path);
-          return check;
+          return response.ok({
+            body: check,
+          });
         } catch (error) {
           const isDown = (error || {}).code === 'ECONNREFUSED';
           if (!isDown) {
@@ -709,18 +644,53 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} api response or ErrorResponse
    */
-  requestApi(
+  async requestApi(
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
   ) {
     const idApi = getCookieValueByName(request.headers.cookie, 'wz-api');
-    if (idApi !== request.body.id) {
-      // if the current token belongs to a different API id, we relogin to obtain a new token
+    const bodyId = request.body?.id;
+    const devTools = !!(
+      request.body?.body &&
+      typeof request.body.body === 'object' &&
+      request.body.body.devTools === true
+    );
+
+    if (devTools && idApi !== bodyId) {
       return ErrorResponse(
         'status code 401',
         HTTP_STATUS_CODES.UNAUTHORIZED,
         HTTP_STATUS_CODES.UNAUTHORIZED,
+        response,
+      );
+    }
+
+    let apiHostId = devTools ? bodyId : idApi;
+
+    if (!devTools && idApi && bodyId && idApi !== bodyId) {
+      try {
+        await context.wazuh_core.manageHosts.get(idApi, {
+          excludePassword: true,
+        });
+        apiHostId = idApi;
+      } catch {
+        apiHostId = bodyId;
+      }
+    }
+
+    try {
+      const resolved = await this.resolveHostId(context, idApi || bodyId);
+      if (resolved) {
+        apiHostId = resolved;
+      }
+    } catch {}
+
+    if (!apiHostId) {
+      return ErrorResponse(
+        'Missing param: id',
+        3015,
+        HTTP_STATUS_CODES.BAD_REQUEST,
         response,
       );
     }
@@ -762,7 +732,7 @@ export class WazuhApiCtrl {
         request.body.method,
         request.body.path,
         request.body.body,
-        request.body.id,
+        apiHostId,
         response,
       );
     }
@@ -780,12 +750,14 @@ export class WazuhApiCtrl {
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
   ) {
-    const appConfig = await context.wazuh_core.configuration.get();
-    const reportMaxRows = appConfig['reports.csv.maxRows'];
     try {
       if (!request.body || !request.body.path)
         throw new Error('Field path is required');
       if (!request.body.id) throw new Error('Field id is required');
+
+      const reportMaxRows = await context.core.uiSettings.client.get(
+        'reports.csv.maxRows',
+      );
 
       const filters = Array.isArray(((request || {}).body || {}).filters)
         ? request.body.filters
@@ -985,14 +957,24 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
+      const osResp =
+        await context.core.opensearch.client.asInternalUser.transport.request({
+          method: 'GET',
+          path: '/',
+        });
+      const clusterUuid = osResp?.body?.cluster_uuid ?? null;
+
+      const data = {
+        'app-version': pluginVersion,
+        revision: pluginRevision,
+        configuration_file: context.wazuh_core.configuration.store.file,
+        cluster_uuid: clusterUuid,
+      };
+
       return response.ok({
         body: {
           statusCode: HTTP_STATUS_CODES.OK,
-          data: {
-            'app-version': pluginVersion,
-            revision: pluginRevision,
-            configuration_file: context.wazuh_core.configuration.store.file,
-          },
+          data,
         },
       });
     } catch (error) {
@@ -1009,39 +991,93 @@ export class WazuhApiCtrl {
   }
 
   /**
-   * Gets custom logos configuration (path)
-   * @param context
-   * @param request
-   * @param response
+   * Check daemons status using cluster endpoints
+   * @param context Request context
+   * @param api API configuration
+   * @param path Request path
+   * @returns Promise with isValid status
    */
-  async getAppLogos(
+  async checkDaemons(context: RequestHandlerContext, api: any, path: string) {
+    try {
+      // First get the local node info
+      const localNodeInfo =
+        await context.wazuh.api.client.asCurrentUser.request(
+          'GET',
+          '/cluster/local/info',
+          {},
+        );
+
+      const nodeId = localNodeInfo.data.data.affected_items[0].node;
+
+      // Then check daemons status for this node
+      const daemonsStatus =
+        await context.wazuh.api.client.asCurrentUser.request(
+          'GET',
+          `/cluster/${nodeId}/status`,
+          {},
+        );
+
+      const daemons =
+        ((((daemonsStatus || {}).data || {}).data || {}).affected_items ||
+          [])[0] || {};
+
+      const wazuhdbExists = typeof daemons['wazuh-manager-db'] !== 'undefined';
+
+      const modulesd = daemons['wazuh-manager-modulesd'] === 'running';
+      const wazuhdb = wazuhdbExists
+        ? daemons['wazuh-manager-db'] === 'running'
+        : true;
+
+      // In cluster by default, always check clusterd daemon
+      const clusterd = daemons['wazuh-manager-clusterd'] === 'running';
+
+      const isValid = modulesd && wazuhdb && clusterd;
+
+      isValid && context.wazuh.logger.debug('Wazuh is ready');
+
+      if (path === '/ping') {
+        return { isValid };
+      }
+
+      if (!isValid) {
+        throw new Error('Server not ready yet');
+      }
+    } catch (error) {
+      context.wazuh.logger.error(error.message || error);
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * This updates the threat intelligence content from subscribed CTI feeds
+   * @param {Object} context
+   * @param {Object} request
+   * @param {Object} response
+   * @returns {Object} update started message or update is ongoing
+   */
+  async updateCTIFeeds(
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const APP_LOGO = 'customization.logo.app';
-      const HEALTHCHECK_LOGO = 'customization.logo.healthcheck';
+      const ctiFeedsClient = context.wazuh_core.ctiFeedsClient;
 
-      const logos = {
-        [APP_LOGO]:
-          await context.wazuh_core.configuration.getCustomizationSetting(
-            APP_LOGO,
-          ),
-        [HEALTHCHECK_LOGO]:
-          await context.wazuh_core.configuration.getCustomizationSetting(
-            HEALTHCHECK_LOGO,
-          ),
-      };
+      const result = await ctiFeedsClient.updateCTIFeeds(context);
 
       return response.ok({
-        body: { logos },
+        body: {
+          message: 'CTI feeds update initiated',
+          ...result,
+        },
       });
     } catch (error) {
-      context.wazuh.logger.error(error.message || error);
+      context.wazuh.logger.error(error);
       return ErrorResponse(
-        error.message || error,
-        3035,
+        `Could not update the content from subscribed CTI feeds: ${
+          error.meta.body.message || error
+        }`,
+        4005,
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response,
       );

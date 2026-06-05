@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 export * from './withWindowSize';
-export * from './withPluginPlatformContext';
 export * from './withUserPermissions';
 export * from './withUserAuthorization';
 export * from './withGlobalBreadcrumb';
@@ -22,7 +21,9 @@ export * from './error-boundary/with-error-boundary';
 export * from './with_module_not_for_agent';
 export * from './route-resolver';
 export * from './with-router-search';
-export * from './with-index-pattern';
 export * from './with-data-source';
 export * from './with-wrap-component';
 export * from './with-inject-props';
+export * from './with-health-check';
+export * from './with-agent';
+export * from './with-server-api-available';

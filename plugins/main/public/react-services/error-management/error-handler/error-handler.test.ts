@@ -21,6 +21,7 @@ jest.mock('../../../kibana-services', () => ({
     set: (name: string, value: string, options: any) => {
       return true;
     },
+    get: () => 'test',
   }),
 }));
 
@@ -77,11 +78,6 @@ describe('Error Handler', () => {
         name: 'WazuhApiError',
         message: 'Error WazuhApiError',
         url: '/api/request',
-      },
-      {
-        name: 'WazuhReportingError',
-        message: 'Error WazuhReportingError',
-        url: '/reports',
       },
       {
         name: 'HttpError',
@@ -152,11 +148,6 @@ describe('Error Handler', () => {
         name: 'WazuhApiError',
         message: 'Error WazuhApiError',
         url: '/api/request',
-      },
-      {
-        name: 'WazuhReportingError',
-        message: 'Error WazuhReportingError',
-        url: '/reports',
       },
       {
         name: 'HttpError',
@@ -244,11 +235,6 @@ describe('Error Handler', () => {
         name: 'WazuhApiError',
         message: 'Error WazuhApiError',
         url: '/api/request',
-      },
-      {
-        name: 'WazuhReportingError',
-        message: 'Error WazuhReportingError',
-        url: '/reports',
       },
       {
         name: 'HttpError',

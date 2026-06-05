@@ -1,49 +1,66 @@
-import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
+import {
+  CoreSetup,
+  CoreStart,
+  Plugin,
+  PluginInitializerContext,
+} from 'opensearch-dashboards/public';
 import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
 import { setChrome, setCore, setUiSettings } from './plugin-services';
 import * as utils from './utils';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
-import { ConfigurationStore } from './utils/configuration-store';
-import {
-  PLUGIN_SETTINGS,
-  PLUGIN_SETTINGS_CATEGORIES,
-} from '../common/constants';
+import { ConfigurationStore } from '../common/services/configuration/configuration-store';
+import { EConfigurationProviders } from '../common/constants';
+import { UISettingsConfigProvider } from './services/configuration/ui-settings-provider';
+import { InitializerConfigProvider } from './services/configuration/initializer-context-provider';
 import { DashboardSecurity } from './utils/dashboard-security';
 import * as hooks from './hooks';
+import { SettingsValidator } from '../common/services/settings-validator';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
 {
   _internal: { [key: string]: any } = {};
   services: { [key: string]: any } = {};
+
+  constructor(private readonly initializerContext: PluginInitializerContext) {
+    this.services = {};
+    this._internal = {};
+  }
+
   public async setup(core: CoreSetup): Promise<WazuhCorePluginSetup> {
+    // No operation logger
     const noop = () => {};
     const logger = {
       info: noop,
       error: noop,
       debug: noop,
       warn: noop,
+      trace: noop,
+      fatal: noop,
+      log: noop,
+      get: () => logger,
     };
-    this._internal.configurationStore = new ConfigurationStore(
-      logger,
-      core.http,
+
+    this._internal.configurationStore = new ConfigurationStore(logger);
+
+    this._internal.configurationStore.registerProvider(
+      EConfigurationProviders.INITIALIZER_CONTEXT,
+      new InitializerConfigProvider(this.initializerContext),
     );
+
+    // register the uiSettins on the configuration store to avoid the use inside of configuration service
+    this._internal.configurationStore.registerProvider(
+      EConfigurationProviders.PLUGIN_UI_SETTINGS,
+      new UISettingsConfigProvider(core.uiSettings),
+    );
+
     this.services.configuration = new Configuration(
       logger,
       this._internal.configurationStore,
     );
 
-    // Register the plugin settings
-    Object.entries(PLUGIN_SETTINGS).forEach(([key, value]) =>
-      this.services.configuration.register(key, value),
-    );
-
-    // Add categories to the configuration
-    Object.entries(PLUGIN_SETTINGS_CATEGORIES).forEach(([key, value]) => {
-      this.services.configuration.registerCategory({ ...value, id: key });
-    });
-
+    // Create dashboardSecurity
     this.services.dashboardSecurity = new DashboardSecurity(logger, core.http);
 
     await this.services.dashboardSecurity.setup();
@@ -52,6 +69,7 @@ export class WazuhCorePlugin
       ...this.services,
       utils,
       API_USER_STATUS_RUN_AS,
+      SettingsValidator,
     };
   }
 
@@ -67,6 +85,7 @@ export class WazuhCorePlugin
       utils,
       API_USER_STATUS_RUN_AS,
       hooks,
+      SettingsValidator,
     };
   }
 

@@ -1,6 +1,6 @@
 import { fireEvent, render } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { renderHook, act } from '@testing-library/react-hooks';
+import { renderHook, act } from '@testing-library/react';
 import React, { useState } from 'react';
 import {
   enhanceFormFields,

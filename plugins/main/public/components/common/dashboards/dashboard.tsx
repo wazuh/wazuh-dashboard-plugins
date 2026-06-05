@@ -1,0 +1,176 @@
+import React from 'react';
+import {
+  withDataSourceFetchSearchBar,
+  withErrorBoundary,
+  withInjectProps,
+} from '../hocs';
+import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
+import { useReportingCommunicateSearchContext } from '../hooks/use-reporting-communicate-search-context';
+import { WzSearchBar, ManagedFilter } from '../search-bar';
+import { DiscoverNoResults } from '../no-results/no-results';
+import { SampleDataWarning } from '../../visualize/components';
+import { compose } from 'redux';
+import DashboardRenderer from './dashboard-renderer/dashboard-renderer';
+import classnames from 'classnames';
+
+export const Dashboard = props => {
+  const hasPinnedAgent = Boolean(
+    props.dataSource.dataSource?.getPinnedAgentFilter()?.length,
+  );
+
+  // This is not used by the SCA dashboard.
+  useReportingCommunicateSearchContext({
+    isSearching: props.dataSource.dataSource.isLoading,
+    totalResults: props.dataSourceAction?.data?.hits?.total ?? 0,
+    indexPattern: props.dataSource.dataSource?.indexPattern,
+    dashboardSavedObjectId: hasPinnedAgent
+      ? props.getDashboardPanels[0].agentDashboardId
+      : props.getDashboardPanels[0].dashboardId,
+    filters: props.dataSource.fetchFilters,
+    query: props.dataSource.query,
+    time: {
+      from: props.dataSource.searchBarProps.dateRangeFrom,
+      to: props.dataSource.searchBarProps.dateRangeTo,
+    },
+  });
+
+  const shouldHideDashboard = !Boolean(
+    props.dataSourceAction?.data?.hits?.total > 0,
+  );
+
+  return (
+    <>
+      <WzSearchBar
+        appName='dashboard-searchbar'
+        {...props.dataSource.searchBarProps}
+        fixedFilters={props.dataSource.fixedFilters}
+        showDatePicker={Boolean(
+          props.dataSource.dataSource.indexPattern.timeFieldName,
+        )}
+        showQueryInput={true}
+        showQueryBar={true}
+      />
+      {props.dataSourceAction?.data?.hits?.total === 0 ? (
+        <DiscoverNoResults />
+      ) : null}
+      <div>
+        {props.sampleDataWarningCategories && (
+          <div
+            className={classnames({
+              'wz-no-display': shouldHideDashboard,
+            })}
+          >
+            <SampleDataWarning
+              categoriesSampleData={props.sampleDataWarningCategories}
+            />
+          </div>
+        )}
+
+        <div className='wz-dashboard-responsive' id='dashboardViewport'>
+          {props.getDashboardPanels.map(
+            ({ dashboardId, agentDashboardId, className = '' }) => {
+              const dashboard = (
+                <DashboardRenderer
+                  dashboardId={dashboardId}
+                  agentDashboardId={agentDashboardId}
+                  className={classnames(className, {
+                    'wz-dashboard-hide-tables-pagination-export-csv-controls':
+                      true,
+                    'wz-no-display': shouldHideDashboard,
+                  })}
+                  hasPinnedAgent={Boolean(
+                    props.dataSource.dataSource?.getPinnedAgentFilter()?.length,
+                  )}
+                  config={{
+                    dataSource: props.dataSource,
+                  }}
+                />
+              );
+
+              if (className) {
+                /* Add a wrapper div with the className to apply styles that allow to overwrite
+                some styles using CSS selectors */
+                return (
+                  <div
+                    className={className}
+                    key={dashboardId || agentDashboardId}
+                  >
+                    {dashboard}
+                  </div>
+                );
+              }
+
+              return dashboard;
+            },
+          )}
+        </div>
+      </div>
+    </>
+  );
+};
+
+/**
+ * Create a dashboard component using minimal dependencies: datasource, sample data warning
+ * categories, dashboard panels creator and dashboard metadata.
+ *
+ * This renders a search bar with a dashboard. Communicate the state with Generate Report button
+ * @param param0
+ * @returns
+ */
+export const createDashboard = ({
+  DataSource,
+  DataSourceRepositoryCreator,
+  sampleDataWarningCategories,
+  getDashboardPanels,
+  managedFilters,
+}: {
+  DataSource: any;
+  DataSourceRepositoryCreator: any;
+  sampleDataWarningCategories?: string[];
+  managedFilters?: {
+    [key: string]: ManagedFilter;
+  };
+  getDashboardPanels: Array<{
+    dashboardId: string;
+    agentDashboardId?: string;
+    className?: string;
+  }>;
+}) =>
+  compose(
+    withErrorBoundary,
+    withInjectProps({
+      sampleDataWarningCategories,
+      getDashboardPanels,
+      managedFilters,
+    }),
+    withDataSourceFetchSearchBar({
+      DataSource,
+      DataSourceRepositoryCreator,
+      nameProp: 'dataSource',
+      searchBarManagedFiltersSpec: managedFilters,
+      mapRequestParams: ({ dataSource, dependencies }) => {
+        const [, , query, dateRangeFrom, dateRangeTo] = dependencies;
+        return {
+          query: JSON.parse(query),
+          // Add conditionally the date range if the index pattern has a time field
+          ...(dataSource.dataSource.indexPattern.timeFieldName
+            ? {
+                dateRange: {
+                  from: dateRangeFrom,
+                  to: dateRangeTo,
+                },
+              }
+            : {}),
+        };
+      },
+      mapFetchActionDependencies: props => [
+        JSON.stringify(props.dataSource.fetchFilters),
+        JSON.stringify(props.dataSource.searchBarProps.query),
+        props.dataSource.searchBarProps.dateRangeFrom,
+        props.dataSource.searchBarProps.dateRangeTo,
+        props.dataSource.fingerprint,
+        props.dataSource.searchBarProps.autoRefreshFingerprint,
+      ],
+      LoadingDataSourceComponent: LoadingSearchbarProgress,
+    }),
+  )(Dashboard);

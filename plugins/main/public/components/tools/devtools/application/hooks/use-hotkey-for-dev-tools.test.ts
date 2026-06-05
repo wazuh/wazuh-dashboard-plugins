@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import useHotkeyForDevTools from './use-hotkey-for-dev-tools';
 

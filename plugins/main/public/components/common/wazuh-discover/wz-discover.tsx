@@ -34,13 +34,17 @@ import { getPlugins } from '../../../kibana-services';
 import { histogramChartInput } from './config/histogram-chart';
 import { getWazuhCorePlugin } from '../../../kibana-services';
 import './discover.scss';
-import { withErrorBoundary } from '../hocs';
+import {
+  HideOnErrorInitializatingDataSource,
+  PromptErrorInitializatingDataSource,
+  withErrorBoundary,
+} from '../hocs';
 import {
   IDataSourceFactoryConstructor,
   useDataSource,
   tParsedIndexPattern,
   PatternDataSource,
-  AlertsDataSourceRepository,
+  FindingsDataSourceRepository,
 } from '../data-source';
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
 import { wzDiscoverRenderColumns } from './render-columns';
@@ -60,6 +64,7 @@ export type WazuhDiscoverProps = {
   tableColumns: tDataGridColumn[];
   DataSource: IDataSourceFactoryConstructor<PatternDataSource>;
   categoriesSampleData: string[];
+  additionalDocumentDetailsTabs?: import('./components/document-view-table-and-json').DocumentViewTableAndJsonPropsAdditionalTabs;
 };
 
 const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
@@ -68,6 +73,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     DataSource,
     tableColumns: defaultTableColumns,
     categoriesSampleData,
+    additionalDocumentDetailsTabs,
   } = props;
 
   if (!DataSource) {
@@ -82,7 +88,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
 
-  const AlertsRepository = new AlertsDataSourceRepository();
+  const FindingsRepository = new FindingsDataSourceRepository();
 
   const {
     dataSource,
@@ -92,8 +98,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
+    error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    repository: AlertsRepository, // this makes only works with alerts index pattern
+    repository: FindingsRepository,
     DataSource,
   });
 
@@ -223,121 +230,141 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   return (
     <IntlProvider locale='en'>
-      {isDataSourceLoading ? (
-        <LoadingSearchbarProgress />
-      ) : (
-        <EuiPageTemplate
-          className='discoverContainer'
-          restrictWidth='100%'
-          fullHeight={true}
-          grow
-          paddingSize='none'
-          pageContentProps={{ color: 'transparent' }}
-        >
-          <WzSearchBar
-            appName='wazuh-discover-search-bar'
-            {...searchBarProps}
-            fixedFilters={fixedFilters}
-            showQueryInput={true}
-            showQueryBar={true}
-            showSaveQuery={true}
-          />
-          <SampleDataWarning categoriesSampleData={categoriesSampleData} />
-          {!isDataSourceLoading && results?.hits?.total === 0 ? (
-            <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
-          ) : null}
-          <div
+      <>
+        {isDataSourceLoading ? (
+          <LoadingSearchbarProgress />
+        ) : (
+          <EuiPageTemplate
             className={
-              !isDataSourceLoading && dataSource && results?.hits?.total > 0
-                ? ''
-                : 'wz-no-display'
-            }
+              dataSource ? 'discoverContainer' : ''
+            } /* WORKAROUND: The conditional class assignment avoid to set a container height that
+            moves down the error prompt if this is rendered. With thisthe error promtp is rendered
+            at the top of the view.
+            */
+            restrictWidth='100%'
+            fullHeight={true}
+            grow
+            paddingSize='none'
+            pageContentProps={{ color: 'transparent' }}
           >
-            <EuiPanel
-              paddingSize='s'
-              hasShadow={false}
-              hasBorder={false}
-              color='transparent'
+            {/* TODO: Using a page template wrapping these components causes different y render position
+            of data source error prompt. We should unify the different views. In the Dashboard tab, the
+            same prompt is rendered at top of view */}
+            <HideOnErrorInitializatingDataSource error={error}>
+              <WzSearchBar
+                appName='wazuh-discover-search-bar'
+                {...searchBarProps}
+                fixedFilters={fixedFilters}
+                showQueryInput={true}
+                showQueryBar={true}
+                showSaveQuery={true}
+              />
+              <SampleDataWarning categoriesSampleData={categoriesSampleData} />
+            </HideOnErrorInitializatingDataSource>
+            {!isDataSourceLoading && results?.hits?.total === 0 ? (
+              <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
+            ) : null}
+            <div
+              className={
+                !isDataSourceLoading && dataSource && results?.hits?.total > 0
+                  ? ''
+                  : 'wz-no-display'
+              }
             >
-              <EuiFlexGroup gutterSize='s' direction='column'>
-                <EuiFlexItem grow={false} className='discoverChartContainer'>
-                  <EuiPanel
-                    hasBorder={false}
-                    hasShadow={false}
-                    color='transparent'
-                    paddingSize='none'
-                  >
-                    <EuiPanel>
-                      <DashboardByRenderer
-                        input={histogramChartInput(
-                          AlertsRepository.getStoreIndexPatternId(),
-                          fetchFilters,
-                          query,
-                          dateRangeFrom,
-                          dateRangeTo,
-                          fingerprint,
-                        )}
-                      />
-                    </EuiPanel>
-                  </EuiPanel>
-                </EuiFlexItem>
-                <EuiFlexItem>
-                  <EuiDataGrid
-                    {...dataGridProps}
-                    className={sideNavDocked ? 'dataGridDockedNav' : ''}
-                    toolbarVisibility={{
-                      showColumnSelector: { allowHide: false },
-                      additionalControls: (
-                        <>
-                          <DiscoverDataGridAdditionalControls
-                            dataGridStatePersistenceManager={
-                              dataGridProps.dataGridStatePersistenceManager
-                            }
-                            totalHits={results?.hits?.total || 0}
-                            isExporting={isExporting}
-                            columnsAvailable={dataGridProps.columnsAvailable}
-                            columnVisibility={dataGridProps.columnVisibility}
-                            onClickExportResults={onClickExportResults}
-                            maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
-                            dateRange={absoluteDateRange}
+              <EuiPanel
+                paddingSize='s'
+                hasShadow={false}
+                hasBorder={false}
+                color='transparent'
+              >
+                <EuiFlexGroup gutterSize='s' direction='column'>
+                  <EuiFlexItem grow={false} className='discoverChartContainer'>
+                    <EuiPanel
+                      hasBorder={false}
+                      hasShadow={false}
+                      color='transparent'
+                      paddingSize='none'
+                    >
+                      <EuiPanel>
+                        {dataSource?.id && (
+                          <DashboardByRenderer
+                            input={histogramChartInput(
+                              dataSource?.id,
+                              fetchFilters,
+                              query,
+                              dateRangeFrom,
+                              dateRangeTo,
+                              fingerprint,
+                            )}
                           />
-                        </>
-                      ),
-                    }}
-                  />
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiPanel>
-            {inspectedHit && (
-              <EuiFlyout onClose={closeFlyoutHandler} size='m'>
-                <EuiFlyoutHeader>
-                  <DocDetailsHeader
-                    doc={inspectedHit}
-                    indexPattern={dataSource?.indexPattern}
-                  />
-                </EuiFlyoutHeader>
-                <EuiFlyoutBody>
-                  <EuiFlexGroup direction='column'>
-                    <EuiFlexItem>
-                      <DocumentViewTableAndJson
-                        document={inspectedHit}
-                        indexPattern={indexPattern}
-                        renderFields={getAllCustomRenders(
-                          defaultTableColumns,
-                          wzDiscoverRenderColumns,
                         )}
-                        filters={filters}
-                        setFilters={setFilters}
-                        onFilter={closeFlyoutHandler}
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiFlyoutBody>
-              </EuiFlyout>
-            )}
-          </div>
-        </EuiPageTemplate>
-      )}
+                      </EuiPanel>
+                    </EuiPanel>
+                  </EuiFlexItem>
+                  <EuiFlexItem>
+                    <EuiDataGrid
+                      {...dataGridProps}
+                      className={sideNavDocked ? 'dataGridDockedNav' : ''}
+                      toolbarVisibility={{
+                        showColumnSelector: { allowHide: false },
+                        additionalControls: (
+                          <>
+                            <DiscoverDataGridAdditionalControls
+                              dataGridStatePersistenceManager={
+                                dataGridProps.dataGridStatePersistenceManager
+                              }
+                              totalHits={results?.hits?.total || 0}
+                              isExporting={isExporting}
+                              columnsAvailable={dataGridProps.columnsAvailable}
+                              columnVisibility={dataGridProps.columnVisibility}
+                              onClickExportResults={onClickExportResults}
+                              maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
+                              dateRange={absoluteDateRange}
+                            />
+                          </>
+                        ),
+                      }}
+                    />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiPanel>
+              {inspectedHit && (
+                <EuiFlyout onClose={closeFlyoutHandler} size='m'>
+                  <EuiFlyoutHeader>
+                    <DocDetailsHeader
+                      doc={inspectedHit}
+                      indexPattern={dataSource?.indexPattern}
+                    />
+                  </EuiFlyoutHeader>
+                  <EuiFlyoutBody>
+                    <EuiFlexGroup direction='column'>
+                      <EuiFlexItem>
+                        <DocumentViewTableAndJson
+                          document={inspectedHit}
+                          indexPattern={indexPattern}
+                          renderFields={getAllCustomRenders(
+                            defaultTableColumns,
+                            wzDiscoverRenderColumns,
+                          )}
+                          filters={filters}
+                          setFilters={setFilters}
+                          onFilter={closeFlyoutHandler}
+                          additionalTabs={additionalDocumentDetailsTabs}
+                          showFilterButtons={false}
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiFlyoutBody>
+                </EuiFlyout>
+              )}
+            </div>
+            {/* TODO: this should be rendered with a guard instead optional rendering, but this
+            requires to refactor the creation of the data source. Consider the IT Hygiene tables
+            for the refactor. */}
+            {error && <PromptErrorInitializatingDataSource error={error} />}
+          </EuiPageTemplate>
+        )}
+      </>
     </IntlProvider>
   );
 };

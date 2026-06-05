@@ -10,13 +10,6 @@ jest.mock('../../../common/permissions/element', () => ({
   ),
 }));
 
-// the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.
-// https://github.com/wazuh/wazuh-dashboard-plugins/pull/6921#issuecomment-2298289550
-
-jest.mock('@osd/monaco', () => ({
-  monaco: {},
-}));
-
 describe('AgentsTableGlobalActions component', () => {
   test('should return the component', () => {
     const { container, getByText } = render(

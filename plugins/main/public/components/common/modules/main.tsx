@@ -20,6 +20,12 @@ import { MainModuleAgent } from './main-agent';
 import { MainModuleOverview } from './main-overview';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../hocs';
+import {
+  TAB_VIEW_ID_DASHBOARD,
+  TAB_VIEW_ID_EVENTS,
+  TAB_VIEW_NAME_DASHBOARD,
+  TAB_VIEW_NAME_EVENTS,
+} from '../../../../common/constants';
 
 export const MainModule = compose(withErrorBoundary)(
   class MainModule extends Component {
@@ -33,8 +39,8 @@ export const MainModule = compose(withErrorBoundary)(
       };
       if (!(ModulesDefaults[this.props.section] || {}).notModule) {
         this.tabs = (ModulesDefaults[this.props.section] || {}).tabs || [
-          { id: 'dashboard', name: 'Dashboard' },
-          { id: 'events', name: 'Events' },
+          { id: TAB_VIEW_ID_DASHBOARD, name: TAB_VIEW_NAME_DASHBOARD },
+          { id: TAB_VIEW_ID_EVENTS, name: TAB_VIEW_NAME_EVENTS },
         ];
         this.module = ModulesDefaults[this.props.section];
       }

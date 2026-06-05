@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 
-import { existsSync, readFileSync } from 'fs';
-import { resolve } from 'path';
+import { existsSync, readFileSync, readdirSync } from 'fs';
+import { basename, resolve } from 'path';
 import {
   OVERRIDE_COMPOSE_FILE,
   REQUIRED_REPOSITORIES,
@@ -10,7 +10,7 @@ import {
   PROFILES,
   DEV_COMPOSE_FILE,
   ACTIONS,
-  FLAGS,
+  ALL_FORKS_EXCLUDED_REPOS,
 } from '../constants/app';
 import {
   msgInvalidRepoSubfolder,
@@ -33,10 +33,14 @@ import {
   initializeBaseEnvironment,
   setVersionDerivedEnvironment,
   configureModeAndSecurity,
+  removeGeneratedServerLocalDashboardFiles,
 } from '../services/environmentConfigurator';
 import { parseArguments, printUsageAndExit } from '../services/argumentParser';
 import { resolveRequiredRepositories } from '../services/repoResolver';
-import { getPlatformVersionFromPackageJson } from '../services/versionService';
+import {
+  getAppVersionFromPackageJson,
+  getPlatformVersionFromPackageJson,
+} from '../services/versionService';
 import { EnvironmentPaths, ScriptConfig } from '../types/config';
 import { toRepositoryEnvVar } from '../utils/envUtils';
 import {
@@ -177,7 +181,7 @@ export async function mainWithDeps(
     deps.logger.info(
       `OS Version not received via flag, getting the version from ${envPaths.packageJsonPath}`,
     );
-    const resolvedOs = getPlatformVersionFromPackageJson('OS', envPaths);
+    const resolvedOs = getAppVersionFromPackageJson('OS', envPaths);
     // Record that main resolved this value from package.json
     config.setOsVersion(resolvedOs, 'main');
   }
@@ -187,6 +191,70 @@ export async function mainWithDeps(
     );
     const resolvedOsd = getPlatformVersionFromPackageJson('OSD', envPaths);
     config.setOsdVersion(resolvedOsd, 'main');
+  }
+
+  // --all-forks: auto-discover sibling repositories and add them as external repos
+  if (config.allForks) {
+    if (!envPaths.siblingRepoHostRoot) {
+      throw new ConfigurationError(
+        'SIBLING_REPO_HOST_ROOT is not set, cannot use --all-forks.',
+      );
+    }
+
+    const siblingContainerPath = toContainerPath(
+      envPaths.siblingRepoHostRoot,
+      envPaths,
+    );
+    if (!siblingContainerPath || !existsSync(siblingContainerPath)) {
+      throw new ConfigurationError(
+        `Sibling root '${envPaths.siblingRepoHostRoot}' is not accessible inside the container.`,
+      );
+    }
+
+    const currentRepoName = basename(envPaths.currentRepoHostRoot);
+    const excludedNames = new Set<string>([
+      currentRepoName,
+      ...(ALL_FORKS_EXCLUDED_REPOS as readonly string[]),
+      ...(REQUIRED_REPOSITORIES as readonly string[]),
+    ]);
+    const alreadyAdded = new Set(config.userRepositories.map(r => r.name));
+
+    const entries = readdirSync(siblingContainerPath, { withFileTypes: true });
+    const discovered: string[] = [];
+
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      if (excludedNames.has(entry.name)) continue;
+      if (alreadyAdded.has(entry.name)) continue;
+
+      const packageJsonContainerPath = resolve(
+        siblingContainerPath,
+        entry.name,
+        'package.json',
+      );
+      if (!existsSync(packageJsonContainerPath)) continue;
+
+      const hostPath = stripTrailingSlash(
+        resolve(envPaths.siblingRepoHostRoot, entry.name),
+      );
+      config.addUserRepositoryOverride(
+        { name: entry.name, path: hostPath },
+        'allForks',
+      );
+      discovered.push(entry.name);
+    }
+
+    if (discovered.length > 0) {
+      deps.logger.info(
+        `--all-forks: discovered ${
+          discovered.length
+        } sibling repo(s): ${discovered.join(', ')}`,
+      );
+    } else {
+      deps.logger.info(
+        '--all-forks: no additional sibling repositories found.',
+      );
+    }
   }
 
   // Resolve required repositories and apply env vars
@@ -279,6 +347,7 @@ export async function mainWithDeps(
       externalRepositories: externalDynamicRepos,
       repositoryEnvMap: repoEnvVars,
       useDashboardFromSource: config.useDashboardFromSource,
+      useIndexerFromPackage: config.useIndexerFromPackage,
       includeSecurityPlugin:
         Boolean(securityPluginHostPath) && config.useDashboardFromSource,
     },
@@ -301,6 +370,10 @@ export async function mainWithDeps(
   ) {
     profiles.add(PROFILES.SAML);
   }
+  // If Mailpit flag is enabled, include the mailpit profile
+  if (config.enableMailpit) {
+    profiles.add('mailpit');
+  }
 
   const defaultRunner = { execSync, spawn };
   const code = await runDockerCompose(
@@ -313,6 +386,10 @@ export async function mainWithDeps(
   );
   if (code !== 0) {
     process.exit(code);
+  }
+
+  if (config.action === ACTIONS.DOWN) {
+    removeGeneratedServerLocalDashboardFiles(envPaths, deps.logger);
   }
 
   if (

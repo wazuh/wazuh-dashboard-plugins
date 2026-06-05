@@ -1,5 +1,10 @@
 const random = require('../../lib/random');
-const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
+const {
+  generateRandomAgent,
+  generateRandomWazuh,
+  generateRandomState,
+  generateRandomChecksum,
+} = require('../../shared-utils');
 
 function generateRandomPackage() {
   return {
@@ -13,7 +18,10 @@ function generateDocument(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
     agent: generateRandomAgent(),
+    checksum: generateRandomChecksum(),
     package: generateRandomPackage(),
+    state: generateRandomState(),
+
     wazuh: generateRandomWazuh(params),
   };
 }

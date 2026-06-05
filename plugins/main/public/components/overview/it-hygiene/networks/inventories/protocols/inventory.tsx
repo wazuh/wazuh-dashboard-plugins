@@ -6,22 +6,31 @@ import {
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryProtocolsDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
-import { ITHygieneInventoryDashboardTable } from '../../../common/components/inventory';
-import { getOverviewNetworksProtocolsTab } from './dashboard';
+import { InventoryDashboardTable } from '../../../../../common/dashboards';
+import {
+  WAZUH_SAMPLE_INVENTORY_AGENT,
+  IT_HYGIENE_PROTOCOLS_INVENTORY_ID,
+  IT_HYGIENE_PROTOCOLS_AGENT_INVENTORY_ID,
+} from '../../../../../../../common/constants';
 
 export const ITHygieneNetworksInventoryProtocols =
-  withSystemInventoryProtocolsDataSource(props => {
+  withSystemInventoryProtocolsDataSource(() => {
     return (
-      <ITHygieneInventoryDashboardTable
+      <InventoryDashboardTable
         DataSource={SystemInventoryStatesDataSource}
         DataSourceRepositoryCreator={
           SystemInventoryProtocolsStatesDataSourceRepository
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
-        getDashboardPanels={getOverviewNetworksProtocolsTab}
+        getDashboardPanels={[
+          {
+            dashboardId: IT_HYGIENE_PROTOCOLS_INVENTORY_ID,
+            agentDashboardId: IT_HYGIENE_PROTOCOLS_AGENT_INVENTORY_ID,
+          },
+        ]}
         tableId='it-hygiene-inventory-protocols'
-        indexPattern={props.indexPattern}
+        categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
       />
     );
   });

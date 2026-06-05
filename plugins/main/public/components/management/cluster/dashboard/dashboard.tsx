@@ -17,23 +17,11 @@ import { endpointSummary } from '../../../../utils/applications';
 import { WzRequest } from '../../../../react-services';
 import { ConfigurationCards } from '../components/configuration_cards';
 import { NodeList } from '../node-list';
-import {
-  ClusterDataSource,
-  AlertsDataSourceRepository,
-  PatternDataSource,
-  tParsedIndexPattern,
-  useDataSource,
-} from '../../../common/data-source';
-import { WzSearchBar } from '../../../common/search-bar';
 import NavigationService from '../../../../react-services/navigation-service';
-
-interface DashboardCTProps {
-  statusRunning: string;
-}
-
+import { useRouterSearch } from '../../../common/hooks';
+import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 interface ClusterDashboardState {
-  showConfig: boolean;
-  showNodes: boolean;
   nodeList: any;
   configuration: any;
   version: any;
@@ -41,23 +29,13 @@ interface ClusterDashboardState {
   agentsCount: number;
 }
 
-const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
-  const {
-    filters,
-    dataSource,
-    fetchFilters,
-    fixedFilters,
-    isLoading: isDataSourceLoading,
-    fetchData,
-    setFilters,
-  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: ClusterDataSource,
-    repository: new AlertsDataSourceRepository(),
-  });
+const DashboardCT: React.FC<{}> = () => {
+  const navigationService = NavigationService.getInstance();
+  const { tabView } = useRouterSearch();
+  const showNodes = tabView === 'nodes';
+  const showConfig = tabView === 'config';
 
   const [state, setState] = useState<ClusterDashboardState>({
-    showConfig: false,
-    showNodes: false,
     nodeList: [],
     configuration: undefined,
     version: undefined,
@@ -65,92 +43,92 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
     agentsCount: 0,
   });
 
-  const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
-
-  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
-    indexPattern: dataSource?.indexPattern as IndexPattern,
-    filters,
-    setFilters,
-  });
-  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
-
-  useEffect(() => {
-    if (isDataSourceLoading) {
-      return;
-    }
-    fetchData({
-      query,
-      dateRange: {
-        from: dateRangeFrom,
-        to: dateRangeTo,
-      },
-    })
-      .then(results => {
-        setResults(results);
-      })
-      .catch(error => {
-        const searchError = ErrorFactory.create(HttpError, {
-          error,
-          message: 'Error fetching data',
-        });
-        ErrorHandler.handleError(searchError);
-      });
-  }, [
-    JSON.stringify(fetchFilters),
-    JSON.stringify(query),
-    dateRangeFrom,
-    dateRangeTo,
-    fingerprint,
-    autoRefreshFingerprint,
-  ]);
-
-  const setBooleans = (component: string | null) => {
-    setState({
-      ...state,
-      showConfig: component === 'showConfig',
-      showNodes: component === 'showNodes',
+  const switchClusterSubTab = (subTab: 'nodes' | 'config' | null) =>
+    navigationService.updateAndNavigateSearchParams({
+      tabView: subTab,
     });
-  };
 
   const goAgents = () => {
-    NavigationService.getInstance().navigateToApp(endpointSummary.id, {
+    navigationService.navigateToApp(endpointSummary.id, {
       path: '#/agents-preview',
     });
   };
 
   const goBack = () => {
-    setBooleans(null);
+    switchClusterSubTab(null);
   };
 
   const goNodes = () => {
-    setBooleans('showNodes');
+    switchClusterSubTab('nodes');
   };
 
   const goConfiguration = () => {
-    setBooleans('showConfig');
+    switchClusterSubTab('config');
   };
 
   useEffect(() => {
     const getData = async () => {
-      const data = await Promise.all([
+      const data = await Promise.allSettled([
         WzRequest.apiReq('GET', '/cluster/nodes', {}),
         WzRequest.apiReq('GET', '/cluster/local/config', {}),
         WzRequest.apiReq('GET', '/', {}),
-        WzRequest.apiReq('GET', '/agents', { limit: 1 }),
-        WzRequest.apiReq('GET', '/cluster/healthcheck', {}),
+        WzRequest.apiReq('GET', '/agents', {
+          params: { limit: 1 },
+        }),
+        // WzRequest.apiReq('GET', '/cluster/healthcheck', {}), // Endpoint returns Internal Server Error
       ]);
 
-      const nodeList = data[0]?.data?.data || {} || false;
-      const clusterConfig = data[1]?.data?.data || {} || false;
-      const agents = data[3]?.data?.data || {} || false;
-      setState({
-        ...state,
-        configuration: clusterConfig.affected_items[0],
-        version: data[2]?.data?.data?.api_version || false,
-        nodesCount: nodeList.total_affected_items,
-        agentsCount: agents.total_affected_items - 1,
-        nodeList: nodeList?.affected_items ?? [],
-      });
+      if (data[0].status === 'fulfilled') {
+        const nodeList = data[0].value.data.data;
+        setState(prevState => ({
+          ...prevState,
+          nodeList: nodeList.affected_items ?? [],
+          nodesCount: nodeList.total_affected_items ?? 0,
+        }));
+      }
+      if (data[1].status === 'fulfilled') {
+        const clusterConfig = data[1].value.data.data;
+        setState(prevState => ({
+          ...prevState,
+          configuration: clusterConfig.affected_items[0],
+        }));
+      }
+      if (data[2].status === 'fulfilled') {
+        const version = data[2].value.data.data;
+        setState(prevState => ({
+          ...prevState,
+          version: version.api_version,
+        }));
+      }
+      if (data[3].status === 'fulfilled') {
+        const agents = data[3].value.data.data;
+        setState(prevState => ({
+          ...prevState,
+          agentsCount: Number(agents.total_affected_items ?? 0),
+        }));
+      }
+
+      const errors = data
+        .filter(result => result.status === 'rejected')
+        .map(result => result.reason);
+
+      if (errors.length > 0) {
+        errors.forEach(error => {
+          const options = {
+            context: 'StatusDashboard',
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
+            display: true,
+            store: false,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: error.name || error,
+            },
+          };
+          ErrorHandler.handleError(error, options);
+        });
+      }
     };
 
     getData();
@@ -158,51 +136,27 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
 
   return (
     <I18nProvider>
-      <EuiFlexItem style={{ padding: '0 16px' }}>
-        {isDataSourceLoading && !dataSource ? (
-          <LoadingSearchbarProgress />
-        ) : !state.showNodes ? (
-          <WzSearchBar
-            appName='ct-searchbar'
-            {...searchBarProps}
-            fixedFilters={fixedFilters}
-          />
-        ) : null}
-        <EuiSpacer size='m' />
-        {!isDataSourceLoading &&
-        dataSource &&
-        !state.showConfig &&
-        !state.showNodes ? (
+      <EuiFlexItem>
+        {!showConfig && !showNodes ? (
           <OverviewCards
             goNodes={goNodes}
             goAgents={goAgents}
             goConfiguration={goConfiguration}
-            status={statusRunning}
             configuration={state?.configuration}
             version={state?.version}
             nodesCount={state?.nodesCount}
             nodeList={state?.nodeList}
             clusterName={state.configuration?.name}
             agentsCount={state?.agentsCount}
-            searchBarProps={searchBarProps}
-            results={results}
-            indexPattern={dataSource?.indexPattern}
-            filters={fetchFilters ?? []}
-            lastReloadRequestTime={fingerprint}
           />
         ) : null}
-        {state.showConfig ? (
+        {showConfig ? (
           <ConfigurationCards
             goBack={goBack}
             configuration={state?.configuration}
-            searchBarProps={searchBarProps}
-            results={results}
-            indexPatternId={dataSource?.id}
-            filters={fetchFilters ?? []}
-            lastReloadRequestTime={fingerprint}
           />
         ) : null}
-        {state.showNodes ? <NodeList goBack={goBack} /> : null}
+        {showNodes ? <NodeList goBack={goBack} /> : null}
       </EuiFlexItem>
     </I18nProvider>
   );

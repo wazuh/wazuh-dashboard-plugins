@@ -16,7 +16,6 @@ import React from 'react';
 import { render, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Stats } from './stats';
-import jsonBeautifier from '../../../utils/json-beautifier';
 
 jest.mock('../../../react-services/navigation-service', () => {
   return {
@@ -24,6 +23,9 @@ jest.mock('../../../react-services/navigation-service', () => {
       return {
         getUrlForApp() {
           return '';
+        },
+        getHistory() {
+          return {};
         },
       };
     },
@@ -63,7 +65,7 @@ jest.mock('./last-alerts-stat/last-alerts-service', () => ({
       field: 'cluster.name',
       name: 'master',
     },
-    indexPatternId: 'wazuh-alerts-*',
+    indexPatternId: 'wazuh-events-*',
   }),
 }));
 
@@ -77,6 +79,16 @@ jest.mock('../../../kibana-services', () => ({
       get: () => true,
     },
   }),
+  getCookies: jest.fn(() => {
+    return {
+      get: () => 'test',
+    };
+  }),
+  getUiSettings: jest.fn(() => {
+    return {
+      get: () => 'test',
+    };
+  }),
 }));
 
 jest.mock('../../../react-services/common-services', () => ({
@@ -85,18 +97,23 @@ jest.mock('../../../react-services/common-services', () => ({
   }),
 }));
 
-// the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.
-// https://github.com/wazuh/wazuh-dashboard-plugins/pull/6921#issuecomment-2298289550
-
-jest.mock('@osd/monaco', () => ({
-  monaco: {},
-}));
-
 describe('Stats component', () => {
   test('renders correctly to match the snapshot', async () => {
+    let container: HTMLElement;
     await act(async () => {
-      const { container } = render(<Stats />);
-      expect(container).toMatchSnapshot();
+      const { container: renderedContainer } = render(
+        <Stats
+          active={8}
+          disconnected={0}
+          never_connected={3}
+          pending={0}
+          total={11}
+          error={null}
+          isAgentsLoading={false}
+        />,
+      );
+      container = renderedContainer;
     });
+    expect(container).toMatchSnapshot();
   });
 });

@@ -13,7 +13,7 @@ import moment from 'moment-timezone';
 import { getUiSettings } from '../kibana-services';
 
 export const formatUIDate = date => {
-  if (typeof date !== 'string') {
+  if (typeof date !== 'string' && typeof date !== 'number') {
     return '-';
   }
   const dateFormat = getUiSettings().get('dateFormat');

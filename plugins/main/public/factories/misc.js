@@ -21,8 +21,6 @@ export class WzMisc {
     this.state = {
       apiIsDown: false,
       comeFromWizard: false,
-      blankScreenError: false,
-      lastRestart: null
     };
 
     WzMisc.instance = this;
@@ -57,28 +55,5 @@ export class WzMisc {
    */
   getWizard() {
     return this.state.comeFromWizard;
-  }
-
-  /**
-   * Set blank screen
-   * @param {String} value
-   */
-  setBlankScr(value) {
-    this.state.blankScreenError = value;
-  }
-
-  /**
-   * Get blank screen
-   */
-  getBlankScr() {
-    return this.state.blankScreenError;
-  }
-
-  /**
-   * Set last restart
-   * @param {String} value
-   */
-  setLastRestart(value) {
-    this.state.lastRestart = value;
   }
 }
