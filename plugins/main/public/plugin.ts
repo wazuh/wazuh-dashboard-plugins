@@ -25,6 +25,7 @@ import {
   setHeaderActionMenuMounter,
   setWazuhCorePlugin,
   getCookies,
+  initWazuhBuildInfoFromCore,
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -62,6 +63,10 @@ export class WazuhPlugin
     core: CoreSetup,
     plugins: WazuhSetupPlugins,
   ): Promise<WazuhSetup> {
+    // Store Wazuh build info from the dashboard's injected metadata so that
+    // public modules can access the release stage and revision at runtime.
+    initWazuhBuildInfoFromCore(core.injectedMetadata);
+
     // Get custom logos configuration to start up the app with the correct logos
 
     // Redefine the mapKeys method to change the properties sent to euiPaletteColorBlind.
