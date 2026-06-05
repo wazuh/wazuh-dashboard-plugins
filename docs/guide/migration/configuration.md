@@ -201,7 +201,7 @@ wazuh_core.hosts:
     run_as: false
 ```
 
-Replace `<WAZUH_MANAGER_IP_OR_HOSTNAME>` and `<YOUR_PASSWORD>` with the values from your 4.x configuration.
+Replace `<WAZUH_MANAGER_IP_OR_HOSTNAME>`, `<PORT>`, `<USERNAME>`, `<PASSWORD>` and `<RUN_AS>` with the values from your 4.x configuration.
 
 > **Note**: If you previously configured multiple hosts in `wazuh.yml`, review the [Multi-manager environments](./multi-manager.md) guide before adding more than one entry.
 
