@@ -195,10 +195,10 @@ Append the following block to `opensearch_dashboards.yml`, replacing the placeho
 wazuh_core.hosts:
   default:
     url: https://<WAZUH_MANAGER_IP_OR_HOSTNAME>
-    port: 55000
-    username: wazuh-wui
-    password: <YOUR_PASSWORD>
-    run_as: false
+    port: <PORT>
+    username: <USERNAME>
+    password: <PASSWORD>
+    run_as: <RUN_AS>
 ```
 
 Replace `<WAZUH_MANAGER_IP_OR_HOSTNAME>`, `<PORT>`, `<USERNAME>`, `<PASSWORD>` and `<RUN_AS>` with the values from your 4.x configuration.
