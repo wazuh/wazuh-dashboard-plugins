@@ -90,7 +90,7 @@ If you prefer to download reports individually before the backup:
 
 After completing the migration to Wazuh dashboard 5.x:
 
-1. Ensure the **OpenSearch Dashboards Reporting** plugin is installed and enabled. The plugin is included with the Wazuh dashboard 5.x package.
+1. Ensure the **Reporting** plugin is installed and enabled. The plugin is included with the Wazuh dashboard 5.x package.
 2. Navigate to the dashboard view from which you want to generate a report.
 3. Click **Generate report** in the toolbar.
 4. The report is stored in the OpenSearch Dashboards Reporting index and is accessible from **☰ Menu > Reporting** (the Reporting app is registered under the **All** navigation group, not under Management).
