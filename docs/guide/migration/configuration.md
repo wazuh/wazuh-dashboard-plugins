@@ -21,7 +21,7 @@ Some settings have been removed entirely; others have been relocated to the **Ad
 | `opensearch_dashboards.yml`                           | `wazuh_core.hosts`, `healthcheck.*`, `opensearchDashboards.branding.*`       |
 | **☰ Menu > Dashboard Management > Advanced Settings** | `timeout`, `enrollment.dns`, `reports.csv.maxRows`, `wazuh.updates.disabled` |
 
-Do not place the Advanced Settings keys in `opensearch_dashboards.yml`. They are tenant-level preferences managed through the UI (or the saved objects API), not server configuration file entries.
+By default, these settings are tenant-level preferences managed through the UI (or the saved objects API). They can also be forced globally for all tenants using `uiSettings.overrides` in `opensearch_dashboards.yml`.
 
 ---
 
@@ -154,12 +154,11 @@ If your deployment had dashboards or alerts that depended on either index, those
 
 Custom branding configured through `customization.*` must be migrated to the native `opensearchDashboards.branding.*` key in `opensearch_dashboards.yml`:
 
-| 4.x setting                      | 5.x key in `opensearch_dashboards.yml`          |
-| -------------------------------- | ----------------------------------------------- |
-| `customization.logo.app`         | `opensearchDashboards.branding.logo.defaultUrl` |
-| `customization.logo.healthcheck` | `opensearchDashboards.branding.mark.defaultUrl` |
+| 4.x setting              | 5.x key in `opensearch_dashboards.yml`          | Notes                                                                                                      |
+| ------------------------ | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `customization.logo.app` | `opensearchDashboards.branding.logo.defaultUrl` | In 4.x, this image was also shown while connecting to the Wazuh server API. That loading screen now displays only a `Loading...` text message. |
 
-The settings `customization.enabled`, `customization.logo.reports`, `customization.reports.header`, and `customization.reports.footer` have no equivalent in 5.x and must be removed. PDF report branding is not configurable because report generation is now handled by the OpenSearch Dashboards Reporting plugin.
+The settings `customization.enabled`, `customization.logo.healthcheck`, `customization.logo.reports`, `customization.reports.header`, and `customization.reports.footer` have no equivalent in 5.x and must be removed. The dedicated health check view that used `customization.logo.healthcheck` was removed in 5.x. PDF report branding is not configurable because report generation is now handled by the OpenSearch Dashboards Reporting plugin.
 
 For a full branding migration example, see [Custom Branding](../../ref/custom-branding/custom-branding.md).
 
@@ -198,10 +197,10 @@ wazuh_core.hosts:
     port: <PORT>
     username: <USERNAME>
     password: <PASSWORD>
-    run_as: <RUN_AS>
+    run_as: true
 ```
 
-Replace `<WAZUH_MANAGER_IP_OR_HOSTNAME>`, `<PORT>`, `<USERNAME>`, `<PASSWORD>` and `<RUN_AS>` with the values from your 4.x configuration.
+Replace `<WAZUH_MANAGER_IP_OR_HOSTNAME>`, `<PORT>`, `<USERNAME>`, and `<PASSWORD>` with the values from your 4.x configuration. Set `run_as` to the value from your 4.x `wazuh.yml` if it differed from the 5.x default (`true`).
 
 > **Note**: If you previously configured multiple hosts in `wazuh.yml`, review the [Multi-manager environments](./multi-manager.md) guide before adding more than one entry.
 
@@ -215,7 +214,7 @@ uiSettings.overrides.defaultRoute: /app/wz-home
 
 ### 5. Migrate Advanced Settings
 
-Settings that cannot be placed in `opensearch_dashboards.yml` must be reconfigured through the dashboard UI after the 5.x installation is complete:
+Reconfigure the following settings after the 5.x installation is complete. Use the dashboard UI, or force them globally for all tenants via `uiSettings.overrides` in `opensearch_dashboards.yml`:
 
 1. Navigate to **☰ Menu > Dashboard Management > Advanced Settings**.
 2. Locate and update the following settings if they were customized in your 4.x deployment:
@@ -231,10 +230,9 @@ Settings that cannot be placed in `opensearch_dashboards.yml` must be reconfigur
 
 The following key groups are not recognized in 5.x. Do not include them in `opensearch_dashboards.yml`; remove any matching lines if they were copied from a previous installation:
 
-- `customization.*` — replace the two logo keys as shown above; remove the rest.
+- `customization.*` — replace `customization.logo.app` as shown above; remove the rest.
 - `wazuh.monitoring.*` — entirely removed.
 - `cron.*` — entirely removed.
-- `admin` — removed.
 
 ---
 

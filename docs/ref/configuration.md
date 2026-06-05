@@ -35,7 +35,7 @@ A host has the following properties:
 | cert     | Path to the SSL/TLS client certificate file                    | No       | -             | absolute or relative file path     |
 | ca       | Path to the CA certificate file for server verification        | No       | -             | absolute or relative file path     |
 
-This is an example of a multi-host configuration (used only when [Cross-Cluster Search](https://docs.opensearch.org/latest/search-plugins/cross-cluster-search/) is configured; otherwise only the first entry is used):
+This is an example of a single-host configuration (default installation):
 
 ```yml
 wazuh_core.hosts:
@@ -44,7 +44,19 @@ wazuh_core.hosts:
     port: 55000
     username: wazuh-wui
     password: wazuh-wui
-    run_as: false
+    run_as: true
+```
+
+For environments with multiple managers, define one entry per host. This is used only when [Cross-Cluster Search](https://docs.opensearch.org/latest/search-plugins/cross-cluster-search/) is configured; otherwise only the first entry is used:
+
+```yml
+wazuh_core.hosts:
+  default:
+    url: https://localhost
+    port: 55000
+    username: wazuh-wui
+    password: wazuh-wui
+    run_as: true
   another_host:
     url: https://another_host_dns
     port: 55000
