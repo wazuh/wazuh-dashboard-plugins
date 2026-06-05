@@ -6,7 +6,7 @@ In Wazuh 4.x, the Wazuh dashboard plugin stored its settings in a dedicated file
 /usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
 ```
 
-This file is **no longer available in Wazuh 5.x**. All plugin settings have been consolidated into the main OpenSearch Dashboards configuration file:
+This file is **no longer available in Wazuh 5.x**. All plugin settings have been consolidated into the configuration file:
 
 ```
 /etc/wazuh-dashboard/opensearch_dashboards.yml
