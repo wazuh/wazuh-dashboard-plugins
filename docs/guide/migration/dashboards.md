@@ -71,7 +71,7 @@ If you need to export everything at once as a fallback:
 
 ### Using the API
 
-Run the following command from **any machine with network access to the 4.x dashboard**, replacing `<DASHBOARD_HOST>` with the 4.x dashboard hostname or IP, `<DASHBOARD_PORT>` with the dashboard port (default: `5601`), and `<PASSWORD>` with the admin password. The output file is saved in the current working directory:
+Run the following command from **any machine with network access to the 4.x dashboard**, replacing `<DASHBOARD_HOST>` with the 4.x dashboard hostname or IP, `<DASHBOARD_PORT>` with the dashboard port, and `<PASSWORD>` with the admin password. The output file is saved in the current working directory:
 
 ```bash
 curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_export" \
@@ -108,7 +108,7 @@ Complete the Wazuh 5.x installation and verify that the dashboard is accessible 
 
 ### Using the API
 
-Run the following command from **the machine where the `.ndjson` backup file is located**, with network access to the 5.x dashboard. Replace `<DASHBOARD_HOST>` with the 5.x dashboard hostname or IP, `<DASHBOARD_PORT>` with the dashboard port (default: `5601`), `<PASSWORD>` with the admin password, and `<DATE>` with the date suffix of your backup file.
+Run the following command from **the machine where the `.ndjson` backup file is located**, with network access to the 5.x dashboard. Replace `<DASHBOARD_HOST>` with the 5.x dashboard hostname or IP, `<DASHBOARD_PORT>` with the dashboard port, `<PASSWORD>` with the admin password, and `<DATE>` with the date suffix of your backup file.
 
 The response body contains two fields: `successResults` (objects accepted) and `errors` (objects that could not be imported). Visualizations and saved searches that reference `wazuh-alerts-*` will appear in `errors` with `"type": "missing_references"`.
 
@@ -139,7 +139,7 @@ After import, any saved object that referenced the old `wazuh-alerts-*` index pa
 
 Use the `_resolve_import_errors` endpoint to retry the failed objects with a remapped index pattern reference. For each object that failed with `"type": "missing_references"`, include a `replaceReferences` entry that maps `wazuh-alerts-*` to the appropriate 5.x pattern. For most alert-based visualizations, the replacement is `wazuh-findings-v5*`.
 
-Run all commands below from **the machine where the `.ndjson` backup file is located**, with network access to the 5.x dashboard. Replace `<DASHBOARD_HOST>` with the 5.x dashboard hostname or IP and `<DASHBOARD_PORT>` with the dashboard port (default: `5601`).
+Run all commands below from **the machine where the `.ndjson` backup file is located**, with network access to the 5.x dashboard. Replace `<DASHBOARD_HOST>` with the 5.x dashboard hostname or IP and `<DASHBOARD_PORT>` with the dashboard port.
 
 **Step 4a — Resolve references for visualizations and saved searches:**
 
