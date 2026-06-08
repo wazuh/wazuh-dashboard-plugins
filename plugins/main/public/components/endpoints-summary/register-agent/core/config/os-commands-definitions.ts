@@ -18,7 +18,6 @@ import { IOSDefinition, tOptionalParams } from '../register-commands/types';
 import { PLUGIN_MAJOR_VERSION } from '../../../../../../common/constants';
 import {
   getWazuhStage,
-  getWazuhRevision,
   isWazuhPreRelease,
 } from '../../../../../kibana-services';
 
@@ -86,11 +85,11 @@ export type tOptionalParameters =
 /**
  * Build qualifier appended to the package filename.
  * Pre-release builds use the stage label (e.g. "beta2").
- * Production builds use the numeric revision (e.g. "01").
+ * Production builds do not append any qualifier.
  * Evaluated lazily so the value from injectedMetadata is available.
  */
 const getPackageBuildQualifier = () =>
-  isWazuhPreRelease() ? getWazuhStage() : getWazuhRevision();
+  isWazuhPreRelease() ? `-${getWazuhStage()}` : '';
 
 /**
  * Base URL for the package repository.
@@ -115,7 +114,7 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
       packageName: props =>
         `wazuh-agent_${
           props.wazuhVersion
-        }-${getPackageBuildQualifier()}_amd64.deb`,
+        }${getPackageBuildQualifier()}_amd64.deb`,
       urlPackage: props =>
         `${getPackagesBaseUrl()}/apt/pool/main/w/wazuh-agent/${
           props.packageName
@@ -128,7 +127,7 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
       packageName: props =>
         `wazuh-agent-${
           props.wazuhVersion
-        }-${getPackageBuildQualifier()}.x86_64.rpm`,
+        }${getPackageBuildQualifier()}.x86_64.rpm`,
       urlPackage: props => `${getPackagesBaseUrl()}/yum/${props.packageName}`,
       installCommand: props => getRPMAMD64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
@@ -138,7 +137,7 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
       packageName: props =>
         `wazuh-agent_${
           props.wazuhVersion
-        }-${getPackageBuildQualifier()}_arm64.deb`,
+        }${getPackageBuildQualifier()}_arm64.deb`,
       urlPackage: props =>
         `${getPackagesBaseUrl()}/apt/pool/main/w/wazuh-agent/${
           props.packageName
@@ -151,7 +150,7 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
       packageName: props =>
         `wazuh-agent-${
           props.wazuhVersion
-        }-${getPackageBuildQualifier()}.aarch64.rpm`,
+        }${getPackageBuildQualifier()}.aarch64.rpm`,
       urlPackage: props => `${getPackagesBaseUrl()}/yum/${props.packageName}`,
       installCommand: props => getRPMARM64InstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
@@ -165,7 +164,7 @@ const windowsDefinition: IOSDefinition<IWindowsOSTypes, tOptionalParameters> = {
     {
       architecture: 'MSI 32/64 bits',
       packageName: props =>
-        `wazuh-agent-${props.wazuhVersion}-${getPackageBuildQualifier()}.msi`,
+        `wazuh-agent-${props.wazuhVersion}${getPackageBuildQualifier()}.msi`,
       urlPackage: props =>
         `${getPackagesBaseUrl()}/windows/${props.packageName}`,
       installCommand: props => getWindowsInstallCommand(props),
@@ -182,7 +181,7 @@ const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
       packageName: props =>
         `wazuh-agent-${
           props.wazuhVersion
-        }-${getPackageBuildQualifier()}.intel64.pkg`,
+        }${getPackageBuildQualifier()}.intel64.pkg`,
       urlPackage: props => `${getPackagesBaseUrl()}/macos/${props.packageName}`,
       installCommand: props => getMacOsInstallCommand(props),
       startCommand: props => getMacosStartCommand(props),
@@ -192,7 +191,7 @@ const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
       packageName: props =>
         `wazuh-agent-${
           props.wazuhVersion
-        }-${getPackageBuildQualifier()}.arm64.pkg`,
+        }${getPackageBuildQualifier()}.arm64.pkg`,
       urlPackage: props => `${getPackagesBaseUrl()}/macos/${props.packageName}`,
       installCommand: props => getMacOsInstallCommand(props),
       startCommand: props => getMacosStartCommand(props),

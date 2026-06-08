@@ -128,11 +128,6 @@ export function getWazuhStage(): string {
   return _wazuhBuildInfo.stage;
 }
 
-/** Returns the Wazuh package release revision (e.g. "01", "02"). */
-export function getWazuhRevision(): string {
-  return _wazuhBuildInfo.revision;
-}
-
 /** Returns true when the dashboard build uses production package nomenclature. */
 export function isWazuhProductionBuild(): boolean {
   return _wazuhBuildInfo.isProduction;
