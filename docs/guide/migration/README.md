@@ -75,7 +75,7 @@ See [Reports](./reports.md) for details on what can and cannot be migrated.
 
 Export only the dashboards and visualizations you created or modified. Default Wazuh objects are re-provisioned automatically in 5.x and must not be re-imported.
 
-1. In the Wazuh dashboard, navigate to **☰ Menu > Dashboard Management > Saved objects**.
+1. In the Wazuh dashboard, navigate to **☰ Menu > Dashboard management > Dashboard Management > Saved objects**.
 2. Select the checkboxes next to each custom dashboard or visualization and click **Export**.
 3. Enable **Include related objects** and save the resulting `.ndjson` file to a secure location.
 

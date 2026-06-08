@@ -2,11 +2,11 @@
 
 The Wazuh dashboard stores user-created dashboards and visualizations as **saved objects** in the Wazuh indexer indices. These objects can be exported from a 4.x deployment and imported into a 5.x deployment using the **Saved objects** management interface.
 
-> **Scope**: This guide covers only **custom** dashboards and visualizations created or modified by users. Default Wazuh dashboards and visualizations are provisioned automatically by the Wazuh 5.x plugin on first start and do not require manual migration.
+> **Scope**: This guide covers only **custom** dashboards and visualizations created or modified by users. Default dashboards and visualizations are provisioned automatically by the Wazuh 5.x plugin on first start and do not require manual migration.
 
 In Wazuh 4.x, default dashboard definitions were embedded in the plugin. In Wazuh 5.x, default dashboards are provisioned as saved objects by reference during the health check task on first start.
 
-> **Warning**: Do not re-import default Wazuh objects. Overwriting the default dashboards and visualizations with 4.x versions may cause broken panels, stale index pattern references, or conflicts with features introduced in 5.x. If you are unsure whether an object is custom or default, open **☰ Menu > Dashboard Management > Saved objects** after installation and look for objects whose description includes `Provided by Wazuh` — those are provisioned automatically and must not be re-imported.
+> **Warning**: Do not re-import default Wazuh objects. Overwriting the default dashboards and visualizations with 4.x versions may cause broken panels, stale index pattern references, or conflicts with features introduced in 5.x. If you are unsure whether an object is custom or default, open **☰ Menu > Dashboard management > Dashboard Management > Saved objects** after installation and look for objects whose description includes `Provided by Wazuh` — those are provisioned automatically and must not be re-imported.
 
 ---
 
@@ -27,7 +27,7 @@ All of these are exported and imported as a single `.ndjson` (newline-delimited 
 
 In Wazuh 4.x, the default index pattern is `wazuh-alerts-*`. In Wazuh 5.x, the default index pattern is `wazuh-events-v5*`.
 
-The 5.x data model uses a family of data streams (`wazuh-events-v5-*`, `wazuh-findings-v5-*`, and others). For rule-based alert data — the closest equivalent to `wazuh-alerts-*` — the correct 5.x index pattern is `wazuh-findings-v5*`. This is the pattern used by most default Wazuh dashboards and visualizations in 5.x that previously targeted `wazuh-alerts-*`.
+The 5.x data model uses a family of data streams and indices (`wazuh-events-v5-*`, `wazuh-findings-v5-*`, and others). For rule-based alert data — the closest equivalent to `wazuh-alerts-*` — the correct 5.x index pattern is `wazuh-findings-v5*`. This is the pattern used by most default dashboards and visualizations in 5.x that previously targeted `wazuh-alerts-*`.
 
 Custom visualizations and searches that reference `wazuh-alerts-*` will not display data after import until the index pattern reference is updated. When importing saved objects, the dashboard will prompt you to select a replacement index pattern for any unresolved references.
 
@@ -39,7 +39,7 @@ Common field mappings:
 
 | 4.x field          | 5.x field                | Notes                                                                                        |
 | ------------------ | ------------------------ | -------------------------------------------------------------------------------------------- |
-| `rule.level`       | `wazuh.rule.level`       | Type changed: integer (1–15) → string (`low`, `medium`, `high`, `critical`, `informational`) |
+| `rule.level`       | `wazuh.rule.level`       | Type changed: integer (0–16) → string (`low`, `medium`, `high`, `critical`, `informational`) |
 | `rule.description` | `wazuh.rule.title`       |                                                                                              |
 | `rule.id`          | `wazuh.rule.id`          |                                                                                              |
 | `rule.groups`      | `wazuh.integration.name` |                                                                                              |
@@ -54,11 +54,11 @@ After completing the import, open each migrated visualization in the editor and 
 
 ## Step 1: Export saved objects from Wazuh 4.x
 
-Export only the objects you created or modified. Exporting default Wazuh objects is unnecessary because they are re-created automatically on the first start of the 5.x plugin.
+Export only the objects you created or modified.
 
 ### Using the UI
 
-1. Navigate to **☰ Menu > Dashboard Management > Saved objects**.
+1. Navigate to **☰ Menu > Dashboard management > Dashboard Management > Saved objects**.
 2. To export all custom objects, select the checkboxes next to each user-created dashboard or visualization and click **Export** in the action bar.
 3. Enable **Include related objects** to include all referenced visualizations and searches.
 4. Save the exported `.ndjson` file to a secure location.
@@ -98,7 +98,7 @@ Complete the Wazuh 5.x installation and verify that the dashboard is accessible 
 
 ### Using the UI
 
-1. Navigate to **☰ Menu > Dashboard Management > Saved objects**.
+1. Navigate to **☰ Menu > Dashboard management > Dashboard Management > Saved objects**.
 2. Click **Import**.
 3. Select the `.ndjson` file exported from the 4.x deployment.
 4. Choose a conflict resolution strategy:
@@ -189,7 +189,7 @@ curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_impor
 
 After importing, verify that the migrated objects are accessible and displaying data:
 
-1. Navigate to **☰ Menu > Dashboard Management > Saved objects** and confirm that the expected dashboards and visualizations appear in the list.
+1. Navigate to **☰ Menu > Dashboard management > Dashboard Management > Saved objects** and confirm that the expected dashboards and visualizations appear in the list.
 2. Open each migrated dashboard and confirm that panels load without errors.
 3. If a panel shows a "No results found" message, verify that:
    - the index pattern referenced by its visualizations points to `wazuh-findings-v5*` (for alert-based visualizations) or another appropriate 5.x pattern

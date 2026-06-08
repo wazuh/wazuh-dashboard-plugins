@@ -38,7 +38,7 @@ hosts:
       port: 55000
       username: wazuh-wui
       password: <YOUR_PASSWORD>
-      run_as: false
+      run_as: true
 ```
 
 ### 5.x format (`opensearch_dashboards.yml`)
@@ -120,16 +120,16 @@ In 4.x, individual health check steps could be enabled or disabled using separat
 
 The 4.x boolean settings do not map one-to-one to 5.x check names. For example, the old `checks.pattern` toggle covered a single index-pattern validation, whereas 5.x registers separate checks such as `index-pattern:alerts`, `index-pattern:events-security`, and dozens of others. See the [Health check reference](../../ref/modules/healthcheck.md) for the full list of 5.x check names.
 
-| 4.x setting         | Default | 5.x equivalent                                                                                            |
-| ------------------- | ------- | --------------------------------------------------------------------------------------------------------- |
-| `checks.api`        | `true`  | Controlled by `healthcheck.checks_enabled` (matches checks such as `server-api:connection-compatibility`) |
-| `checks.fields`     | `true`  | Controlled by `healthcheck.checks_enabled`                                                                |
-| `checks.maxBuckets` | `true`  | Controlled by `healthcheck.checks_enabled`                                                                |
-| `checks.metaFields` | `true`  | Controlled by `healthcheck.checks_enabled`                                                                |
-| `checks.pattern`    | `true`  | Controlled by `healthcheck.checks_enabled` (matches checks such as `index-pattern:*`)                     |
-| `checks.setup`      | `true`  | Controlled by `healthcheck.checks_enabled`                                                                |
-| `checks.template`   | `true`  | Controlled by `healthcheck.checks_enabled`                                                                |
-| `checks.timeFilter` | `true`  | Controlled by `healthcheck.checks_enabled`                                                                |
+| 4.x setting         | Default | 5.x equivalent                                                                                                                        |
+| ------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `checks.api`        | `true`  | Controlled by `healthcheck.checks_enabled` (matches checks such as `server-api:connection-compatibility`)                             |
+| `checks.fields`     | `true`  | Removed health check task.                                                                                                            |
+| `checks.maxBuckets` | `true`  | Removed health check task.                                                                                                            |
+| `checks.metaFields` | `true`  | Removed health check task. Changed default value in the dashboard configuration. Managed in Dashboard Management > Advanced settings. |
+| `checks.pattern`    | `true`  | Controlled by `healthcheck.checks_enabled` (matches checks such as `index-pattern:*`)                                                 |
+| `checks.setup`      | `true`  | Controlled by `healthcheck.checks_enabled` (matches checks such as `server-api:connection-compatibility`)                             |
+| `checks.template`   | `true`  | Removed health check task.                                                                                                            |
+| `checks.timeFilter` | `true`  | Removed health check task. Changed default value in the dashboard configuration. Managed in Dashboard Management > Advanced settings. |
 
 To disable a specific check in 5.x, set `healthcheck.checks_enabled` to a pattern that does not match it. To enable all checks (the default), set the value to `.*` or leave it unset.
 
@@ -152,13 +152,7 @@ If your deployment had dashboards or alerts that depended on either index, those
 
 ### Customization settings
 
-Custom branding configured through `customization.*` must be migrated to the native `opensearchDashboards.branding.*` key in `opensearch_dashboards.yml`:
-
-| 4.x setting              | 5.x key in `opensearch_dashboards.yml`          | Notes                                                                                                                                          |
-| ------------------------ | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `customization.logo.app` | `opensearchDashboards.branding.logo.defaultUrl` | In 4.x, this image was also shown while connecting to the Wazuh server API. That loading screen now displays only a `Loading...` text message. |
-
-The settings `customization.enabled`, `customization.logo.healthcheck`, `customization.logo.reports`, `customization.reports.header`, and `customization.reports.footer` have no equivalent in 5.x and must be removed. The dedicated health check view that used `customization.logo.healthcheck` was removed in 5.x. PDF report branding is not configurable because report generation is now handled by the OpenSearch Dashboards Reporting plugin.
+The settings `customization.logo.app`, `customization.enabled`, `customization.logo.healthcheck`, `customization.logo.reports`, `customization.reports.header`, and `customization.reports.footer` have no equivalent in 5.x and must be removed. The dedicated health check view that used `customization.logo.healthcheck` was removed in 5.x. PDF report branding is not configurable because report generation is now handled by the Reporting plugin.
 
 For a full branding migration example, see [Custom Branding](../../ref/custom-branding/custom-branding.md).
 
@@ -197,10 +191,10 @@ wazuh_core.hosts:
     port: <PORT>
     username: <USERNAME>
     password: <PASSWORD>
-    run_as: true
+    run_as: <RUN_AS>
 ```
 
-Replace `<WAZUH_MANAGER_IP_OR_HOSTNAME>`, `<PORT>`, `<USERNAME>`, and `<PASSWORD>` with the values from your 4.x configuration. Set `run_as` to the value from your 4.x `wazuh.yml` if it differed from the 5.x default (`true`).
+Replace `<WAZUH_MANAGER_IP_OR_HOSTNAME>`, `<PORT>`, `<USERNAME>`, `<PASSWORD>`, and `<RUN_AS>` with the values from your 4.x configuration.
 
 > **Note**: If you previously configured multiple hosts in `wazuh.yml`, review the [Multi-manager environments](./multi-manager.md) guide before adding more than one entry.
 

@@ -41,7 +41,7 @@ Before starting the migration:
 
 #### Back up saved objects
 
-1. Navigate to **☰ Menu > Dashboard Management > Saved objects**
+1. Navigate to **☰ Menu > Dashboard management > Dashboard Management > Saved objects**
 2. Click **Export all**
 3. Save the exported `.ndjson` file to a safe location
 4. Alternatively, use the API:
@@ -386,7 +386,7 @@ Look for successful startup messages:
 ### Step 5: Import saved objects
 
 1. Log in to the dashboard at `https://your-dashboard-ip/`
-2. Navigate to **☰ Menu > Dashboard Management > Saved objects**
+2. Navigate to **☰ Menu > Dashboard management > Dashboard Management > Saved objects**
 3. Click **Import**
 4. Select your backed-up `.ndjson` file
 5. Handle conflicts:
@@ -560,7 +560,7 @@ Wazuh API is not reachable
 
 1. **Re-import saved objects**:
 
-   - Go to **Dashboard Management > Saved objects > Import**
+   - Go to **Dashboard management > Dashboard Management > Saved objects > Import**
    - Select backed-up `.ndjson` file
    - Choose **Automatically overwrite conflicts**
 
