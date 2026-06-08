@@ -13,6 +13,7 @@ export { DashboardPCIDSS } from './regulatory-compliance/pci/dashboards';
 export { DashboardNIS2 } from './regulatory-compliance/nis2/dashboards';
 export { DashboardOffice365 } from './office/dashboard';
 export { DashboardThreatHunting } from './threat-hunting/dashboard';
+export { ThreatHuntingCases } from './threat-hunting/cases';
 export { DashboardTSC } from './regulatory-compliance/tsc/dashboards';
 export { DashboardCMMC } from './regulatory-compliance/cmmc/dashboards';
 export { DashboardFedRAMP } from './regulatory-compliance/fedramp/dashboards';
