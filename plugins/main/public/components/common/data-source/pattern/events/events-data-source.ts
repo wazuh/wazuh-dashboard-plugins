@@ -48,6 +48,46 @@ export class EventsDataSource extends PatternDataSource {
     ];
   }
 
+  getWildcardFilter(
+    key: string,
+    value: string,
+    controlledByValue: string,
+  ) {
+    if (!key || !value) {
+      console.warn(
+        'key or value is missing to create the getWildcardFilter',
+      );
+      return [];
+    }
+    return [
+      {
+        meta: {
+          index: this.id,
+          negate: false,
+          disabled: false,
+          alias: `${key}: ${value}`,
+          type: 'wildcard',
+          key: key,
+          value: value,
+          params: {
+            value: value,
+          },
+          controlledBy: controlledByValue,
+        },
+        query: {
+          wildcard: {
+            [key]: {
+              value: value,
+            },
+          },
+        },
+        $state: {
+          store: 'appState',
+        },
+      } as tFilter,
+    ];
+  }
+
   getClusterFilters() {
     return PatternDataSourceFilterManager.getClusterFilters(
       this.id,
