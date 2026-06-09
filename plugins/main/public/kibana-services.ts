@@ -135,5 +135,7 @@ export function isWazuhProductionBuild(): boolean {
 
 /** Returns true when the build is a pre-release (uses staging package repository). */
 export function isWazuhPreRelease(): boolean {
-  return !_wazuhBuildInfo.isProduction;
+  // TODO: Review this logic once we have a better understanding of how the staging vs production package repositories will be used across different release stages (e.g. alpha, beta, release candidate). For now, we'll consider any non-production build as a pre-release.
+  // return !_wazuhBuildInfo.isProduction;
+  return true;
 }
