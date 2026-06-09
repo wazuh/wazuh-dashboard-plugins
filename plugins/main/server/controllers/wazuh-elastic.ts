@@ -413,13 +413,15 @@ export class WazuhElasticCtrl {
       await client.transport.request({
         method: 'PUT',
         path: '/_plugins/_security_analytics/findings/_update',
-        body: [
-          {
-            _id: documentId,
-            _index: index,
-            case: casePayload,
-          },
-        ],
+        body: {
+          findings: [
+            {
+              _id: documentId,
+              _index: index,
+              case: casePayload,
+            },
+          ],
+        },
       });
 
       return response.ok({
