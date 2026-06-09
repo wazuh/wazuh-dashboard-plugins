@@ -333,7 +333,7 @@ export class WazuhElasticCtrl {
 
   /**
    * Forwards a case management update for a findings document to the indexer
-   * endpoint PUT /_plugins/_security_analytics/cases.
+   * endpoint PUT /_plugins/_security_analytics/findings/_update.
    *
    * The indexer endpoint accepts an array of case updates, each containing the
    * document _id, _index, and the case payload with user, timestamps and fields.
@@ -412,7 +412,7 @@ export class WazuhElasticCtrl {
 
       await client.transport.request({
         method: 'PUT',
-        path: '/_plugins/_security_analytics/cases',
+        path: '/_plugins/_security_analytics/findings/_update',
         body: [
           {
             _id: documentId,
