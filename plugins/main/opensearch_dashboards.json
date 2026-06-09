@@ -1,6 +1,6 @@
 {
   "id": "wazuh",
-  "version": "5.0.0-02",
+  "version": "5.0.0-03",
   "opensearchDashboardsVersion": "opensearchDashboards",
   "configPath": ["wazuh"],
   "requiredPlugins": [
