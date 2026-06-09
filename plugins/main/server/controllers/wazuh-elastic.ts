@@ -332,7 +332,11 @@ export class WazuhElasticCtrl {
   }
 
   /**
-   * Updates wazuh.case.* fields on a findings document (wazuh-findings-v5* indices).
+   * Forwards a case management update for a findings document to the indexer
+   * endpoint PUT /_plugins/_security_analytics/findings/_update.
+   *
+   * The indexer endpoint accepts an array of case updates, each containing the
+   * document _id, _index, and the case payload with user, timestamps and fields.
    */
   async updateFindingsCase(
     context: RequestHandlerContext,
@@ -389,39 +393,41 @@ export class WazuhElasticCtrl {
         }
       }
 
-      const now = Date.now().toString();
-      const caseUpdate: Record<string, unknown> = {
+      const now = new Date().toISOString();
+      const casePayload: Record<string, unknown> = {
         user: { name: username },
         updated_at: now,
         created_at: existingCreatedAt ?? now,
       };
 
       if (status !== undefined) {
-        caseUpdate.status = status;
+        casePayload.status = status;
       }
       if (comment !== undefined) {
-        caseUpdate.comment = comment;
+        casePayload.comment = comment;
       }
       if (tags !== undefined) {
-        caseUpdate.tags = tags;
+        casePayload.tags = tags;
       }
 
       await client.transport.request({
-        method: 'POST',
-        path: `/${encodedIndex}/_update/${encodedDocumentId}`,
+        method: 'PUT',
+        path: '/_plugins/_security_analytics/findings/_update',
         body: {
-          doc: {
-            wazuh: {
-              case: caseUpdate,
+          findings: [
+            {
+              _id: documentId,
+              _index: index,
+              case: casePayload,
             },
-          },
+          ],
         },
       });
 
       return response.ok({
         body: {
           message: 'Case updated successfully',
-          case: caseUpdate,
+          case: casePayload,
         },
       });
     } catch (error: any) {
