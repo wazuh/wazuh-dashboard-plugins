@@ -33,7 +33,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added CTI Console registration flow (UI and registration status API) [#8486](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8486)[#7663](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7663)
 - Added `wazuh-metrics-normalization*` index pattern [#8480](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8480)
 - Added Engine Health dashboard [#8485](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8485)
-- Added Case Management tab to Findings document details flyout [#8580](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8580)[#8589](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8589)
+- Added Case Management tab to Findings document details flyout [#8580](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8580)[#8589](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8589) [#8598](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8598)
 - Added Cases tab to the Threat Hunting module [#8583](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8583)
 
 ### Changed
@@ -114,7 +114,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed rendering of the Tactics and Techniques cells in the MITRE ATT&CK flyout [#8516](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8516)
 - Fixed custom filter buttons not being rendered in pdf reports [#8525](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8525)
 - Fixed MITRE technique fields being truncated in the Document Details flyout by showing the full list of clickable items [#8579](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8579)
-- Fixed incorrect date format for Created at and Updated at fields in the Case Management tab [#8598](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8598)
 
 ### Removed
 
