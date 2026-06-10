@@ -19,3 +19,4 @@ export { DashboardCMMC } from './regulatory-compliance/cmmc/dashboards';
 export { DashboardFedRAMP } from './regulatory-compliance/fedramp/dashboards';
 export { DashboardVuls, InventoryVuls } from './vulnerabilities';
 export { DashboardAzure } from './azure/dashboards';
+export { DashboardActiveResponses } from './active-responses';
