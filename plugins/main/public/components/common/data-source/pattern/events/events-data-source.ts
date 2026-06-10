@@ -48,15 +48,9 @@ export class EventsDataSource extends PatternDataSource {
     ];
   }
 
-  getWildcardFilter(
-    key: string,
-    value: string,
-    controlledByValue: string,
-  ) {
+  getWildcardFilter(key: string, value: string, controlledByValue: string) {
     if (!key || !value) {
-      console.warn(
-        'key or value is missing to create the getWildcardFilter',
-      );
+      console.warn('key or value is missing to create the getWildcardFilter');
       return [];
     }
     return [
