@@ -30,6 +30,7 @@ import {
   EuiTextArea,
   EuiTitle,
 } from '@elastic/eui';
+import { formatUIDate } from '../../../../react-services';
 import { CaseStatus } from './case-management-service';
 import {
   CaseManagementFormDocument,
@@ -53,16 +54,6 @@ const STATUS_BADGE_COLOR: Record<CaseStatus, string> = {
   ERROR: 'danger',
   DELETED: 'default',
 };
-
-function formatTimestamp(value: string | number): string {
-  const ms = typeof value === 'number' ? value : Number(value);
-  if (!isNaN(ms)) {
-    const date = new Date(ms);
-    if (!isNaN(date.getTime())) return date.toLocaleString();
-  }
-  const date = new Date(value as string);
-  return isNaN(date.getTime()) ? String(value) : date.toLocaleString();
-}
 
 interface CaseManagementTabProps {
   document: CaseManagementFormDocument;
@@ -127,7 +118,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
             ),
             description: (
               <EuiDescriptionListDescription>
-                {formatTimestamp(existingCreatedAt)}
+                {formatUIDate(existingCreatedAt)}
               </EuiDescriptionListDescription>
             ),
           },
@@ -141,7 +132,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
             ),
             description: (
               <EuiDescriptionListDescription>
-                {formatTimestamp(existingUpdatedAt)}
+                {formatUIDate(existingUpdatedAt)}
               </EuiDescriptionListDescription>
             ),
           },
