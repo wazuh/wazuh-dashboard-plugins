@@ -1,8 +1,8 @@
 export default [
   {
-    type: 'multiSelectInput',
-    key: 'wazuh.agent.name',
-    placeholder: 'Agent name',
+    type: 'multiSelect',
+    key: 'vulnerability.id',
+    placeholder: 'CVEs',
   },
   {
     type: 'multiSelect',
@@ -10,7 +10,7 @@ export default [
     placeholder: 'Severity',
   },
   {
-    type: 'multiSelectInput',
+    type: 'multiSelect',
     key: 'package.name',
     placeholder: 'Package name',
   },
