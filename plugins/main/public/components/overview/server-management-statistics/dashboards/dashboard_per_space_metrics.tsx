@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   EuiPanel,
   EuiTitle,
@@ -12,13 +12,15 @@ import DashboardRenderer from '../../../common/dashboards/dashboard-renderer/das
 import { withErrorBoundary } from '../../../common/hocs/error-boundary/with-error-boundary';
 import { tFilter } from '../../../common/data-source';
 import { IndexPattern } from '../../../../../../../src/plugins/data/public';
-import { search } from '../../../common/search-bar/search-bar-service';
 
 interface DashboardPerSpaceMetricsProps {
   indexPattern: IndexPattern;
   filters: tFilter[];
   searchBarProps: any;
   lastReloadRequestTime: number;
+  spaces: string[];
+  selectedSpace: string;
+  onSelectSpace: (space: string) => void;
 }
 
 const PerSpaceMetrics: React.FC<DashboardPerSpaceMetricsProps> = ({
@@ -26,41 +28,10 @@ const PerSpaceMetrics: React.FC<DashboardPerSpaceMetricsProps> = ({
   filters,
   searchBarProps,
   lastReloadRequestTime,
+  spaces,
+  selectedSpace,
+  onSelectSpace,
 }) => {
-  const [spaces, setSpaces] = useState<string[]>([]);
-  const [selectedSpace, setSelectedSpace] = useState<string>('');
-
-  useEffect(() => {
-    if (!indexPattern) return;
-    let cancelled = false;
-
-    (async () => {
-      try {
-        const res: any = await search({
-          indexPattern,
-          aggs: {
-            spaces: { terms: { field: 'wazuh.space.name', size: 50 } },
-          },
-        } as any);
-
-        if (cancelled) return;
-        const buckets = res?.aggregations?.spaces?.buckets ?? [];
-        const names: string[] = buckets
-          .map((b: any) => b.key)
-          .filter((k: any) => typeof k === 'string' && k.length > 0);
-        setSpaces(names);
-        setSelectedSpace(prev =>
-          prev && names.includes(prev) ? prev : names[0] ?? '',
-        );
-      } catch {
-        /* ignore — selector will stay empty */
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [indexPattern?.id]);
 
   const spaceFilter: tFilter | null = selectedSpace
     ? ({
@@ -95,7 +66,7 @@ const PerSpaceMetrics: React.FC<DashboardPerSpaceMetricsProps> = ({
           <EuiSelect
             options={spaces.map(s => ({ value: s, text: s }))}
             value={selectedSpace}
-            onChange={e => setSelectedSpace(e.target.value)}
+            onChange={e => onSelectSpace(e.target.value)}
             disabled={!spaces.length}
             aria-label='Select space'
             compressed

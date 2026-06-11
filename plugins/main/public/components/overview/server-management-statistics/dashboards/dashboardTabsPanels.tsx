@@ -39,6 +39,7 @@ import { DashboardListenerEngineStatistics } from './dashboard_listener_engine';
 import { DashboardNormalizationStatistics } from './dashboard_engine_health';
 import { DashboardPerSpaceMetrics } from './dashboard_per_space_metrics';
 import { SampleDataWarning } from '../../../visualize/components';
+import { search } from '../../../common/search-bar/search-bar-service';
 import {
   WAZUH_SAMPLE_METRICS_COMMS,
   WAZUH_SAMPLE_METRICS_NORMALIZATION,
@@ -94,6 +95,8 @@ export const DashboardTabsPanels = ({
   } = statisticsDataSource;
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
+  const [spaces, setSpaces] = useState<string[]>([]);
+  const [selectedSpace, setSelectedSpace] = useState<string>('');
 
   const infoMessage: Record<string, string> = {
     remoted:
@@ -143,6 +146,60 @@ export const DashboardTabsPanels = ({
     fingerprint,
     autoRefreshFingerprint,
   ]);
+
+  useEffect(() => {
+    const indexPattern = NormalizationDataSource.dataSource?.indexPattern;
+
+    if (!indexPattern) {
+      return;
+    }
+
+    let isCancelled = false;
+
+    const loadSpaces = async () => {
+      try {
+        const response: any = await search({
+          indexPattern,
+          aggs: {
+            spaces: {
+              terms: {
+                field: 'wazuh.space.name',
+                size: 50,
+              },
+            },
+          },
+        } as any);
+
+        if (isCancelled) {
+          return;
+        }
+
+        const buckets = response?.aggregations?.spaces?.buckets ?? [];
+
+        const spaceNames: string[] = buckets
+          .map((bucket: any) => bucket.key)
+          .filter(
+            (spaceName: unknown): spaceName is string =>
+              typeof spaceName === 'string' && spaceName.length > 0,
+          );
+
+        setSpaces(spaceNames);
+        setSelectedSpace(currentSpace =>
+          currentSpace && spaceNames.includes(currentSpace)
+            ? currentSpace
+            : spaceNames[0] ?? '',
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    loadSpaces();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [NormalizationDataSource.dataSource?.indexPattern?.id]);
 
   const selectedNodeFilter: tFilter = {
     meta: {
@@ -262,6 +319,9 @@ export const DashboardTabsPanels = ({
                     ? [...fetchFilters, selectedNodeFilter]
                     : [...(fetchFilters ?? [])]
                 }
+                spaces={spaces}
+                selectedSpace={selectedSpace}
+                onSelectSpace={setSelectedSpace}
               />
             </div>
           )}
