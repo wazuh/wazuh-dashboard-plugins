@@ -35,6 +35,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added Engine Health dashboard [#8485](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8485)
 - Added Case Management tab to Findings document details flyout [#8580](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8580)[#8589](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8589) [#8598](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8598)
 - Added Cases tab to the Threat Hunting module [#8583](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8583) [#8608](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8608)
+- Added Active Responses dashboard [8601](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8601)
 
 ### Changed
 
@@ -95,7 +96,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated the breadcrumb label in `Agents management / Summary` [#8498](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8498)
 - Renamed Listener Engine and Engine Health tabs to Comms and Normalizations in Server management > Statistics section [#8524](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8524)
 - Reworked FIM overview and agent tab [#8552](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8552)
-- Updated MITRE ATT&CK dashboards to use techniques, subtechniques and tactics names [#8573](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8573)
+- Updated MITRE ATT&CK dashboards to use techniques, subtechniques and tactics names [#8573](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8573) [#8617](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8617)
 
 ### Fixed
 
