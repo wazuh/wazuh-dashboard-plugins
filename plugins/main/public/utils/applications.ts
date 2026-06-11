@@ -240,6 +240,31 @@ export const ITHygiene = {
     }`,
 };
 
+export const activeResponses = {
+  category: 'wz-category-security-operations',
+  id: 'active-response-dashboard',
+  title: i18n.translate('wz-app-active-response-title', {
+    defaultMessage: 'Active Response',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-active-response-breadcrumbLabel', {
+    defaultMessage: 'Active Response',
+  }),
+  description: i18n.translate('wz-app-active-response-description', {
+    defaultMessage:
+      'Analyze the active response actions triggered across your environment.',
+  }),
+  euiIconType: 'bolt',
+  order: 402,
+  showInOverviewApp: true,
+  showInAgentMenu: true,
+  redirectTo: () =>
+    `/overview/?tab=active-response-dashboard&tabView=dashboard${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
 export const regulatoryCompliance = {
   category: 'wz-category-security-operations',
   id: 'regulatory-compliance',
@@ -700,6 +725,7 @@ export const Applications = [
   // sampleData,
   about,
   ITHygiene,
+  activeResponses,
 ].sort((a, b) => {
   // Sort applications by order
   if (a.order < b.order) {
