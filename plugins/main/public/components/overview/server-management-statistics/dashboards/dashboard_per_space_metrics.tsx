@@ -32,7 +32,6 @@ const PerSpaceMetrics: React.FC<DashboardPerSpaceMetricsProps> = ({
   selectedSpace,
   onSelectSpace,
 }) => {
-
   const spaceFilter: tFilter | null = selectedSpace
     ? ({
         meta: {
