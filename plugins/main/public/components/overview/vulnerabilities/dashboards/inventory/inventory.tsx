@@ -53,7 +53,7 @@ import { useDataSource } from '../../../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/render-columns';
 import { DocumentViewTableAndJson } from '../../../../common/wazuh-discover/components/document-view-table-and-json';
-import { WzSearchBar } from '../../../../common/search-bar';
+import { CustomSearchBar } from '../../../../common/custom-search-bar';
 import { DataGridVisibleColumnsSelector } from '../../../../common/wazuh-discover/components/visible-columns-selector';
 import { SampleDataWarning } from '../../../../visualize/components';
 import {
@@ -62,8 +62,8 @@ import {
   VULNERABILITIES_INVENTORY_AGENT_DASHBOARD_ID,
 } from '../../../../../../common/constants';
 import RestoreStateColumnsButton from '../../../../common/wazuh-discover/components/restore-state-columns';
+import managedFilters from './managed-filters';
 import DashboardRenderer from '../../../../common/dashboards/dashboard-renderer/dashboard-renderer';
-import { vulnerabilityManagedFilters } from '../overview/dashboard';
 
 const InventoryVulsComponent = () => {
   const {
@@ -83,7 +83,6 @@ const InventoryVulsComponent = () => {
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
-    managedFiltersSpec: vulnerabilityManagedFilters,
   });
   const { query } = searchBarProps;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
@@ -210,14 +209,18 @@ const InventoryVulsComponent = () => {
             ) : (
               <>
                 <HideOnErrorInitializatingDataSource error={error}>
-                  <WzSearchBar
-                    appName='inventory-vuls'
-                    {...searchBarProps}
+                  <CustomSearchBar
+                    searchBarProps={{
+                      ...searchBarProps,
+                      showDatePicker: false,
+                      showQueryInput: true,
+                      showQueryBar: true,
+                      showSaveQuery: true,
+                    }}
+                    indexPattern={dataSource?.indexPattern}
+                    setFilters={setFilters}
                     fixedFilters={fixedFilters}
-                    showDatePicker={false}
-                    showQueryInput={true}
-                    showQueryBar={true}
-                    showSaveQuery={true}
+                    filterInputs={managedFilters}
                   />
                   <SampleDataWarning
                     categoriesSampleData={[WAZUH_SAMPLE_VULNERABILITIES]}
