@@ -243,13 +243,13 @@ export const ITHygiene = {
 export const activeResponses = {
   category: 'wz-category-security-operations',
   id: 'active-response-dashboard',
-  title: i18n.translate('wz-app-active-responses-title', {
+  title: i18n.translate('wz-app-active-response-title', {
     defaultMessage: 'Active Response',
   }),
-  breadcrumbLabel: i18n.translate('wz-app-active-responses-breadcrumbLabel', {
+  breadcrumbLabel: i18n.translate('wz-app-active-response-breadcrumbLabel', {
     defaultMessage: 'Active Response',
   }),
-  description: i18n.translate('wz-app-active-responses-description', {
+  description: i18n.translate('wz-app-active-response-description', {
     defaultMessage:
       'Analyze the active response actions triggered across your environment.',
   }),
@@ -258,7 +258,7 @@ export const activeResponses = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=active-responses-dashboard&tabView=dashboard${
+    `/overview/?tab=active-response-dashboard&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
