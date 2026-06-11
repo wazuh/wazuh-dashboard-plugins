@@ -56,8 +56,13 @@ import { DocumentViewTableAndJson } from '../../../../common/wazuh-discover/comp
 import { WzSearchBar } from '../../../../common/search-bar';
 import { DataGridVisibleColumnsSelector } from '../../../../common/wazuh-discover/components/visible-columns-selector';
 import { SampleDataWarning } from '../../../../visualize/components';
-import { WAZUH_SAMPLE_VULNERABILITIES } from '../../../../../../common/constants';
+import {
+  WAZUH_SAMPLE_VULNERABILITIES,
+  VULNERABILITIES_INVENTORY_DASHBOARD_ID,
+  VULNERABILITIES_INVENTORY_AGENT_DASHBOARD_ID,
+} from '../../../../../../common/constants';
 import RestoreStateColumnsButton from '../../../../common/wazuh-discover/components/restore-state-columns';
+import DashboardRenderer from '../../../../common/dashboards/dashboard-renderer/dashboard-renderer';
 import { vulnerabilityManagedFilters } from '../overview/dashboard';
 
 const InventoryVulsComponent = () => {
@@ -222,6 +227,28 @@ const InventoryVulsComponent = () => {
             )}
             {!isDataSourceLoading && results?.hits?.total === 0 ? (
               <DiscoverNoResults />
+            ) : null}
+            {!isDataSourceLoading && results?.hits?.total > 0 ? (
+              <div className='wz-dashboard-responsive'>
+                <DashboardRenderer
+                  dashboardId={VULNERABILITIES_INVENTORY_DASHBOARD_ID}
+                  agentDashboardId={
+                    VULNERABILITIES_INVENTORY_AGENT_DASHBOARD_ID
+                  }
+                  hasPinnedAgent={Boolean(
+                    dataSource?.getPinnedAgentFilter?.()?.length,
+                  )}
+                  className='wz-dashboard-hide-tables-pagination-export-csv-controls'
+                  config={{
+                    dataSource: {
+                      ...dataSource,
+                      searchBarProps,
+                      fetchFilters,
+                      fingerprint,
+                    },
+                  }}
+                />
+              </div>
             ) : null}
             {!isDataSourceLoading && results?.hits?.total > 0 ? (
               <EuiPanel
