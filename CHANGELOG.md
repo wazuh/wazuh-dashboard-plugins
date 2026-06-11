@@ -35,6 +35,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added Engine Health dashboard [#8485](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8485)
 - Added Case Management tab to Findings document details flyout [#8580](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8580)[#8589](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8589) [#8598](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8598)
 - Added Cases tab to the Threat Hunting module [#8583](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8583)
+- Added visualizations to Vulnerability Detection > Inventory [#8611](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8611)
 
 ### Changed
 
