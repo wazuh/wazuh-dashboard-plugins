@@ -598,6 +598,7 @@ export enum WAZUH_MODULES_ID {
   VIRUSTOTAL = 'virustotal',
   GDPR = 'gdpr',
   GITHUB = 'github',
+  ACTIVE_RESPONSE = 'active-response-dashboard',
 }
 
 export enum WAZUH_MENU_TOOLS_SECTIONS_ID {
@@ -1030,6 +1031,11 @@ export const AZURE_AGENT_DASHBOARD_ID = 'azure-pinned-agent-dashboard-tab';
 export const DOCKER_DASHBOARD_ID = 'docker-overview-dashboard-tab';
 export const DOCKER_AGENT_DASHBOARD_ID = 'docker-pinned-agent-dashboard-tab';
 
+export const ACTIVE_RESPONSES_DASHBOARD_ID =
+  'active-response-overview-dashboard-tab';
+export const ACTIVE_RESPONSES_AGENT_DASHBOARD_ID =
+  'active-response-pinned-agent-dashboard-tab';
+
 export const FIM_DASHBOARD_ID = 'fim-overview-dashboard';
 export const FIM_AGENT_DASHBOARD_ID = 'fim-pinned-agent-dashboard';
 
@@ -1180,6 +1186,10 @@ export const VULNERABILITIES_DASHBOARD_ID =
   'vulnerabilities-overview-dashboard-tab';
 export const VULNERABILITIES_AGENT_DASHBOARD_ID =
   'vulnerabilities-overview-dashboard-tab';
+export const VULNERABILITIES_INVENTORY_DASHBOARD_ID =
+  'vulnerabilities-inventory-dashboard-tab';
+export const VULNERABILITIES_INVENTORY_AGENT_DASHBOARD_ID =
+  'vulnerabilities-inventory-dashboard-tab';
 
 // Main module tabs
 export const TAB_VIEW_ID_EVENTS = 'findings';

@@ -45,6 +45,7 @@ import {
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
   WAZUH_VULNERABILITIES_PATTERN,
+  WAZUH_ACTIVE_RESPONSES_PATTERN,
 } from '../../../../common/constants';
 import {
   DashboardGitHub,
@@ -64,6 +65,7 @@ import {
   DashboardVuls,
   InventoryVuls,
   DashboardAzure,
+  DashboardActiveResponses,
 } from '../../overview';
 import {
   DockerDataSource,
@@ -633,6 +635,26 @@ export const ModulesDefaults = {
         name: 'Services',
         buttons: [ButtonExploreAgent],
         component: ITHygieneServicesInventory,
+      },
+    ],
+    availableFor: ['manager', 'agent'],
+  },
+  'active-response-dashboard': {
+    init: TAB_VIEW_ID_DASHBOARD,
+    tabs: [
+      {
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
+        buttons: [
+          ({ ...props }) => (
+            <ButtonExploreAgent
+              {...props}
+              moduleIndexPatternTitle={WAZUH_ACTIVE_RESPONSES_PATTERN}
+            />
+          ),
+          ButtonModuleGenerateReport,
+        ],
+        component: DashboardActiveResponses,
       },
     ],
     availableFor: ['manager', 'agent'],
