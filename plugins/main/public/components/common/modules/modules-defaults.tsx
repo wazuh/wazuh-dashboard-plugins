@@ -639,7 +639,7 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
-  'active-responses-dashboard': {
+  'active-response-dashboard': {
     init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {

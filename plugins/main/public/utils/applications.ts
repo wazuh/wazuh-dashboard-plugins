@@ -242,7 +242,7 @@ export const ITHygiene = {
 
 export const activeResponses = {
   category: 'wz-category-security-operations',
-  id: 'active-responses-dashboard',
+  id: 'active-response-dashboard',
   title: i18n.translate('wz-app-active-responses-title', {
     defaultMessage: 'Active Response',
   }),

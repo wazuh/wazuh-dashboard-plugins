@@ -598,7 +598,7 @@ export enum WAZUH_MODULES_ID {
   VIRUSTOTAL = 'virustotal',
   GDPR = 'gdpr',
   GITHUB = 'github',
-  ACTIVE_RESPONSES = 'active-responses-dashboard',
+  ACTIVE_RESPONSE = 'active-response-dashboard',
 }
 
 export enum WAZUH_MENU_TOOLS_SECTIONS_ID {
@@ -1032,9 +1032,9 @@ export const DOCKER_DASHBOARD_ID = 'docker-overview-dashboard-tab';
 export const DOCKER_AGENT_DASHBOARD_ID = 'docker-pinned-agent-dashboard-tab';
 
 export const ACTIVE_RESPONSES_DASHBOARD_ID =
-  'active-responses-overview-dashboard-tab';
+  'active-response-overview-dashboard-tab';
 export const ACTIVE_RESPONSES_AGENT_DASHBOARD_ID =
-  'active-responses-pinned-agent-dashboard-tab';
+  'active-response-pinned-agent-dashboard-tab';
 
 export const FIM_DASHBOARD_ID = 'fim-overview-dashboard';
 export const FIM_AGENT_DASHBOARD_ID = 'fim-pinned-agent-dashboard';
