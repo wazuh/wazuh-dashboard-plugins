@@ -37,6 +37,7 @@ import { DiscoverNoResults } from '../../../common/no-results/no-results';
 // import { DashboardAnalysisEngineStatistics } from './dashboard_analysis_engine';
 import { DashboardListenerEngineStatistics } from './dashboard_listener_engine';
 import { DashboardNormalizationStatistics } from './dashboard_engine_health';
+import { DashboardPerSpaceMetrics } from './dashboard_per_space_metrics';
 import { SampleDataWarning } from '../../../visualize/components';
 import {
   WAZUH_SAMPLE_METRICS_COMMS,
@@ -244,6 +245,16 @@ export const DashboardTabsPanels = ({
             <div>
               <DashboardNormalizationStatistics
                 indexPatternId={dataSource?.id}
+                searchBarProps={searchBarProps}
+                lastReloadRequestTime={fingerprint}
+                filters={
+                  clusterNodeSelected !== 'all'
+                    ? [...fetchFilters, selectedNodeFilter]
+                    : [...(fetchFilters ?? [])]
+                }
+              />
+              <DashboardPerSpaceMetrics
+                indexPattern={dataSource?.indexPattern as IndexPattern}
                 searchBarProps={searchBarProps}
                 lastReloadRequestTime={fingerprint}
                 filters={
