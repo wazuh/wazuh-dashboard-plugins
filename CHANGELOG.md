@@ -34,7 +34,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added `wazuh-metrics-normalization*` index pattern [#8480](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8480)
 - Added Engine Health dashboard [#8485](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8485)
 - Added Case Management tab to Findings document details flyout [#8580](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8580)[#8589](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8589) [#8598](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8598)
-- Added Cases tab to the Threat Hunting module [#8583](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8583)
+- Added Cases tab to the Threat Hunting module [#8583](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8583) [#8608](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8608)
 
 ### Changed
 
