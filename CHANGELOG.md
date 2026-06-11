@@ -34,7 +34,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added `wazuh-metrics-normalization*` index pattern [#8480](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8480)
 - Added Engine Health dashboard [#8485](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8485)
 - Added Case Management tab to Findings document details flyout [#8580](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8580)[#8589](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8589) [#8598](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8598)
-- Added Cases tab to the Threat Hunting module [#8583](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8583)
+- Added Cases tab to the Threat Hunting module [#8583](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8583) [#8608](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8608)
 - Added Active Responses dashboard [8601](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8601)
 
 ### Changed
@@ -68,7 +68,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed Ossec references to wazuh-manager [#8136](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8136)
 - Changed default Dev Tools request from deprecated `GET /manager/info` to `GET /cluster/<NODE_NAME>/info` [#8137](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8137)
 - Upgraded ESLint from version 8 to version 10 and migrated configuration from legacy `.eslintrc.json` to the new flat config format (`eslint.config.mjs`) [#8145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8145)
-- Updated Malware Detection dashboard with new index pattern definition [#8157](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8157) [#8335](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8335) [#8568](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8568)
+- Updated Malware Detection dashboard with new index pattern definition [#8157](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8157) [#8335](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8335) [#8568](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8568) [#8606](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8606)
 - Removed Manager UUID from Server APIs table and added Cluster UUID on About page [#8175](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8175) [#8209](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8209)
 - Updated Security Operations dashboards with new index pattern definition [#8146](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8146)
 - Changed the monitoring and statistics index patterns to `wazuh-metrics-agents*` and `wazuh-metrics-comms*` [#8224](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8224)
@@ -115,6 +115,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed rendering of the Tactics and Techniques cells in the MITRE ATT&CK flyout [#8516](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8516)
 - Fixed custom filter buttons not being rendered in pdf reports [#8525](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8525)
 - Fixed MITRE technique fields being truncated in the Document Details flyout by showing the full list of clickable items [#8579](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8579)
+- Fixed FIM visualizations height [#8610](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8610)
 
 ### Removed
 
