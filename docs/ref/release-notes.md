@@ -48,7 +48,7 @@
   - Plugin adaptation: white-labeled UI, Notebook-based reports removed, and report detail fixes [wazuh/wazuh-dashboard-reporting#54](https://github.com/wazuh/wazuh-dashboard-reporting/issues/54) [#51](https://github.com/wazuh/wazuh-dashboard-reporting/issues/51) [#50](https://github.com/wazuh/wazuh-dashboard-reporting/issues/50).
 - Fork of the Alerting and Notifications plugins. [[3][fork-alerting]] [[4][fork-notifications]]
   - Alerting and Notifications available under **Explore > Alerting** and **Explore > Notifications**.
-  - Health Check validates and provisions default notification channels (Slack, PagerDuty, Jira, Shuffle) and sample Alerting monitors on startup.
+  - Health Check validates the default notification channels (Slack, PagerDuty, Jira, Shuffle) and sample Alerting monitors on startup provided by indexer.
   - Multi-channel support: Slack, Microsoft Teams, Amazon Chime, Email (SMTP/SES), AWS SNS, and custom webhooks.
   - Active response channels kept as a dedicated channel type, separate from standard notification channels [#6](https://github.com/wazuh/wazuh-dashboard-alerting/issues/6).
 
