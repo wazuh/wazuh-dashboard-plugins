@@ -1186,6 +1186,10 @@ export const VULNERABILITIES_DASHBOARD_ID =
   'vulnerabilities-overview-dashboard-tab';
 export const VULNERABILITIES_AGENT_DASHBOARD_ID =
   'vulnerabilities-overview-dashboard-tab';
+export const VULNERABILITIES_INVENTORY_DASHBOARD_ID =
+  'vulnerabilities-inventory-dashboard-tab';
+export const VULNERABILITIES_INVENTORY_AGENT_DASHBOARD_ID =
+  'vulnerabilities-inventory-dashboard-tab';
 
 // Main module tabs
 export const TAB_VIEW_ID_EVENTS = 'findings';
