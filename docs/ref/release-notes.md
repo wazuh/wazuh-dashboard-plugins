@@ -10,7 +10,7 @@
   - Integrations section as the main entry point: manage integration definitions backed by the Wazuh integrations index, with creation form and root decoder selection per space [wazuh/wazuh-dashboard-security-analytics#32](https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/32).
   - Detection section: write and manage Sigma-based detection rules that generate findings from normalized events.
   - Log Test tool to validate decoder and detection rule output against real or sample events.
-  - Filters management for pre-processing event pipelines.
+  - Filters management allows defining conditions to drop events in the event processing pipeline.
   - Guided promotion workflow to move validated content from the Test space into the Custom (production) space.
 - New "[Active Response][active-response-module]" module [#34606](https://github.com/wazuh/wazuh/issues/34606).
   - Dedicated section under **Explore > Active Responses** to create, edit, mute, and delete active responses — managed as a dedicated channel type, strictly separate from standard notification channels [wazuh/wazuh-indexer-notifications#3](https://github.com/wazuh/wazuh-indexer-notifications/issues/3) [wazuh/wazuh-dashboard-notifications#12](https://github.com/wazuh/wazuh-dashboard-notifications/issues/12).
