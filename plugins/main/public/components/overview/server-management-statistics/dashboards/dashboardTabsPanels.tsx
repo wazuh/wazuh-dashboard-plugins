@@ -8,11 +8,10 @@ import {
   EuiSelect,
   EuiSpacer,
   EuiCallOut,
-  EuiPanel,
+  EuiButtonGroup,
 } from '@elastic/eui';
 import {
   PatternDataSource,
-  tFilter,
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
@@ -36,10 +35,8 @@ import { DiscoverNoResults } from '../../../common/no-results/no-results';
 // TODO: DashboardAnalysisEngineStatistics is commented out until analysisd metrics have a new data stream
 // import { DashboardAnalysisEngineStatistics } from './dashboard_analysis_engine';
 import { DashboardListenerEngineStatistics } from './dashboard_listener_engine';
-import { DashboardNormalizationStatistics } from './dashboard_engine_health';
-import { DashboardPerSpaceMetrics } from './dashboard_per_space_metrics';
+import { DashboardNormalizationPanel } from './dashboard_normalization_panel';
 import { SampleDataWarning } from '../../../visualize/components';
-import { search } from '../../../common/search-bar/search-bar-service';
 import {
   WAZUH_SAMPLE_METRICS_COMMS,
   WAZUH_SAMPLE_METRICS_NORMALIZATION,
@@ -95,8 +92,7 @@ export const DashboardTabsPanels = ({
   } = statisticsDataSource;
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
-  const [spaces, setSpaces] = useState<string[]>([]);
-  const [selectedSpace, setSelectedSpace] = useState<string>('');
+  const [selectedSubTab, setSelectedSubTab] = useState<string>('global');
 
   const infoMessage: Record<string, string> = {
     remoted:
@@ -147,84 +143,33 @@ export const DashboardTabsPanels = ({
     autoRefreshFingerprint,
   ]);
 
-  useEffect(() => {
-    const indexPattern = NormalizationDataSource.dataSource?.indexPattern;
-
-    if (!indexPattern) {
-      return;
-    }
-
-    let isCancelled = false;
-
-    const loadSpaces = async () => {
-      try {
-        const response: any = await search({
-          indexPattern,
-          aggs: {
-            spaces: {
-              terms: {
-                field: 'wazuh.space.name',
-                size: 50,
-              },
+  const selectedNodeFilter =
+    clusterNodeSelected !== 'all'
+      ? {
+          meta: {
+            removable: false,
+            index: dataSource?.id,
+            negate: false,
+            disabled: false,
+            alias: null,
+            type: 'phrase',
+            key: null,
+            value: null,
+            params: { query: null, type: 'phrase' },
+          },
+          query: {
+            match: {
+              'wazuh.cluster.node': clusterNodeSelected,
             },
           },
-        } as any);
-
-        if (isCancelled) {
-          return;
+          $state: { store: 'appState' },
         }
+      : null;
 
-        const buckets = response?.aggregations?.spaces?.buckets ?? [];
+  const combinedFilters = selectedNodeFilter
+    ? [...fetchFilters, selectedNodeFilter]
+    : [...fetchFilters];
 
-        const spaceNames: string[] = buckets
-          .map((bucket: any) => bucket.key)
-          .filter(
-            (spaceName: unknown): spaceName is string =>
-              typeof spaceName === 'string' && spaceName.length > 0,
-          );
-
-        setSpaces(spaceNames);
-        setSelectedSpace(currentSpace =>
-          currentSpace && spaceNames.includes(currentSpace)
-            ? currentSpace
-            : spaceNames[0] ?? '',
-        );
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    loadSpaces();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [NormalizationDataSource.dataSource?.indexPattern?.id]);
-
-  const selectedNodeFilter: tFilter = {
-    meta: {
-      removable: false,
-      index: dataSource?.id,
-      negate: false,
-      disabled: false,
-      alias: null,
-      type: 'phrase',
-      key: null,
-      value: null,
-      params: {
-        query: null,
-        type: 'phrase',
-      },
-    },
-    query: {
-      match: {
-        'wazuh.cluster.node': clusterNodeSelected,
-      },
-    },
-    $state: {
-      store: 'appState',
-    },
-  };
   return (
     <>
       {isDataSourceLoading && !dataSource ? (
@@ -232,29 +177,53 @@ export const DashboardTabsPanels = ({
       ) : (
         <EuiFlexGroup
           alignItems='center'
-          justifyContent='flexEnd'
+          justifyContent='spaceBetween'
           // WORKAROUND: This style aligns the search bar with the EuiCallOuts. The components should not include wrappers with margin/padding and this should be set by the layout instead
           style={{ margin: 0 }}
         >
-          {!!(clusterNodes && clusterNodes.length && clusterNodeSelected) && (
-            <EuiFlexItem grow={false}>
-              <EuiSelect
-                id='selectNode'
-                options={clusterNodes}
-                value={clusterNodeSelected}
-                onChange={onSelectNode}
-                aria-label='Select node'
+          <EuiFlexItem grow={false}>
+            {selectedTab === 'normalization' && (
+              <EuiButtonGroup
+                buttonSize='s'
+                isFullWidth={false}
+                color='primary'
+                legend='Normalization view'
+                options={[
+                  { id: 'global', label: 'Global' },
+                  { id: 'per-space-metrics', label: 'Per-Space' },
+                ]}
+                idSelected={selectedSubTab}
+                onChange={id => setSelectedSubTab(id)}
               />
-            </EuiFlexItem>
-          )}
-          <SearchBar
-            appName='statistics-searchbar'
-            {...searchBarProps}
-            showDatePicker={true}
-            showQueryInput={false}
-            showQueryBar={true}
-            showFilterBar={false}
-          />
+            )}
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiFlexGroup alignItems='center'>
+              {!!(
+                clusterNodes &&
+                clusterNodes.length &&
+                clusterNodeSelected
+              ) && (
+                <EuiFlexItem grow={false}>
+                  <EuiSelect
+                    id='selectNode'
+                    options={clusterNodes}
+                    value={clusterNodeSelected}
+                    onChange={onSelectNode}
+                    aria-label='Select node'
+                  />
+                </EuiFlexItem>
+              )}
+              <SearchBar
+                appName='statistics-searchbar'
+                {...searchBarProps}
+                showDatePicker={true}
+                showQueryInput={false}
+                showQueryBar={true}
+                showFilterBar={false}
+              />
+            </EuiFlexGroup>
+          </EuiFlexItem>
         </EuiFlexGroup>
       )}
       <EuiSpacer size={'m'} />
@@ -285,62 +254,23 @@ export const DashboardTabsPanels = ({
             }
           />
           {selectedTab === 'remoted' && !loadingNode && (
-            <div>
-              <DashboardListenerEngineStatistics
-                indexPatternId={dataSource?.id}
-                searchBarProps={searchBarProps}
-                lastReloadRequestTime={fingerprint}
-                filters={
-                  clusterNodeSelected !== 'all'
-                    ? [...fetchFilters, selectedNodeFilter]
-                    : [...(fetchFilters ?? [])]
-                }
-              />
-            </div>
-          )}
-          {selectedTab === 'normalization' && !loadingNode && (
-            <div>
-              <div style={{ minHeight: 800 }}>
-                <DashboardNormalizationStatistics
-                  indexPatternId={dataSource?.id}
-                  searchBarProps={searchBarProps}
-                  lastReloadRequestTime={fingerprint}
-                  filters={
-                    clusterNodeSelected !== 'all'
-                      ? [...fetchFilters, selectedNodeFilter]
-                      : [...(fetchFilters ?? [])]
-                  }
-                />
-              </div>
-              <DashboardPerSpaceMetrics
-                indexPattern={dataSource?.indexPattern as IndexPattern}
-                searchBarProps={searchBarProps}
-                lastReloadRequestTime={fingerprint}
-                filters={
-                  clusterNodeSelected !== 'all'
-                    ? [...fetchFilters, selectedNodeFilter]
-                    : [...(fetchFilters ?? [])]
-                }
-                spaces={spaces}
-                selectedSpace={selectedSpace}
-                onSelectSpace={setSelectedSpace}
-              />
-            </div>
-          )}
-          {/* TODO: analysisd tab is commented out until analysisd metrics have a new data stream
-          {selectedTab === 'analysisd' && !loadingNode && (
-            <DashboardAnalysisEngineStatistics
+            <DashboardListenerEngineStatistics
               indexPatternId={dataSource?.id}
               searchBarProps={searchBarProps}
               lastReloadRequestTime={fingerprint}
-              filters={
-                clusterNodeSelected !== 'all'
-                  ? [...fetchFilters, selectedNodeFilter]
-                  : [...(fetchFilters ?? [])]
-              }
+              filters={combinedFilters}
             />
           )}
-          */}
+          {selectedTab === 'normalization' && !loadingNode && (
+            <DashboardNormalizationPanel
+              indexPattern={dataSource?.indexPattern as IndexPattern}
+              searchBarProps={searchBarProps}
+              lastReloadRequestTime={fingerprint}
+              filters={combinedFilters}
+              dataSourceId={dataSource?.id}
+              selectedSubTab={selectedSubTab}
+            />
+          )}
         </>
       ) : null}
       {error && <PromptErrorInitializatingDataSource error={error} />}
