@@ -187,7 +187,7 @@ export const DashboardTabsPanels = ({
         setSelectedSpace(currentSpace =>
           currentSpace && spaceNames.includes(currentSpace)
             ? currentSpace
-            : (spaceNames[0] ?? ''),
+            : spaceNames[0] ?? '',
         );
       } catch (error) {
         console.error(error);
