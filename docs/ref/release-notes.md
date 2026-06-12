@@ -11,7 +11,7 @@
   - Detection section: write and manage Sigma-based detection rules that generate findings from normalized events.
   - Log Test tool to validate decoder and detection rule output against real or sample events.
   - Filters management allows defining conditions to drop events in the event processing pipeline.
-  - Guided promotion workflow to move validated content from the Test space into the Custom (production) space.
+  - Move validated content between spaces using the promotion
 - New "[Active Response][active-response-module]" module [#34606](https://github.com/wazuh/wazuh/issues/34606).
   - Dedicated section under **Explore > Active Responses** to create, edit, mute, and delete active responses — managed as a dedicated channel type, strictly separate from standard notification channels [wazuh/wazuh-indexer-notifications#3](https://github.com/wazuh/wazuh-indexer-notifications/issues/3) [wazuh/wazuh-dashboard-notifications#12](https://github.com/wazuh/wazuh-dashboard-notifications/issues/12).
   - Execution history browsable in Discover via the `wazuh-active-responses*` index pattern, provisioned automatically at startup [#8154](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8154).
