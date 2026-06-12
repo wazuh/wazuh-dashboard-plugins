@@ -42,6 +42,7 @@
     - [Normalization](ref/modules/security-analytics/normalization.md)
     - [Detection](ref/modules/security-analytics/detection.md)
 - [External Integrations](ref/external-integrations.md)
+- [Release notes](ref/release-notes.md)
 - [Upgrade](ref/upgrade.md)
 - [Migration 4.x to 5.x](ref/migration-4x-5x.md)
 - [Uninstall](ref/uninstall.md)
