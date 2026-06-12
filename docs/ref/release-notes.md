@@ -42,7 +42,7 @@
     - Platform header icon shows overall health state without interrupting navigation.
     - Refined check presentation: alerts-specific index pattern labeling, manager-aware API selector, warning-based messaging, and simplified filtering [#7744](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7744).
 - Reporting revamp [wazuh/wazuh-indexer-reporting#45](https://github.com/wazuh/wazuh-indexer-reporting/issues/45). [[2][fork-reporting]]
-  - Fork of OpenSearch Reporting integrated into Wazuh Dashboard packages, with scheduled email delivery as the initial use case [wazuh/wazuh-dashboard#288](https://github.com/wazuh/wazuh-dashboard/issues/288) [wazuh/wazuh-dashboard#753](https://github.com/wazuh/wazuh-dashboard/issues/753).
+  - Fork of OpenSearch Reporting integrated into Wazuh dashboard packages, with scheduled email delivery as the initial use case [wazuh/wazuh-dashboard#288](https://github.com/wazuh/wazuh-dashboard/issues/288) [wazuh/wazuh-dashboard#753](https://github.com/wazuh/wazuh-dashboard/issues/753).
   - PDF and CSV reports from dashboards and saved searches, on-demand or on a schedule, with email delivery.
   - Wazuh-branded HTML email template for report notifications with download link [wazuh/wazuh-dashboard-reporting#46](https://github.com/wazuh/wazuh-dashboard-reporting/issues/46).
   - Plugin adapted for Wazuh dashboard: white-labeled UI, Notebook-based reports removed, and report detail fixes [wazuh/wazuh-dashboard-reporting#54](https://github.com/wazuh/wazuh-dashboard-reporting/issues/54) [#51](https://github.com/wazuh/wazuh-dashboard-reporting/issues/51) [#50](https://github.com/wazuh/wazuh-dashboard-reporting/issues/50).
