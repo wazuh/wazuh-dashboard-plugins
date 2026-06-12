@@ -18,7 +18,7 @@
   - New "Active Response" monitor type in Alerting that allows defining the new active response action using the "Add Active Response" button in Alerting monitor trigger configuration — only active response channels are shown, independently of standard notifications [wazuh/wazuh-dashboard-alerting#6](https://github.com/wazuh/wazuh-dashboard-alerting/issues/6).
 - Dashboard revamp for Wazuh 5.0 [#8031](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8031).
   - Dashboards and visualizations migrated to saved objects, enabling sharing, PDF generation, and embedding across all modules — regenerated automatically on startup if missing [#7815](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7815) [#7846](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7846) [#7919](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7919).
-  - Legacy PDF reporting system removed from the dashboard plugins; PDF and CSV generation now handled by the Wazuh Reporting fork [#7813](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7813).
+  - Legacy PDF reporting system removed from the dashboard plugins [#7813](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7813).
   - Generate report button reworked to integrate with the saved objects renderer [#7895](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7895).
   - Threat Hunting dashboard redesigned for the Wazuh 5.0 data model [#8042](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8042).
   - Cloud Security module redesigned for the Wazuh 5.0 data model (GitHub, Docker, Office 365, AWS, GCP, Azure) [#8043](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8043).
