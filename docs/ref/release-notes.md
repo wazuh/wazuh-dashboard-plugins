@@ -4,8 +4,8 @@
 
 - New "[Security Analytics][security-analytics-module]" module [#7608](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7608). [[1][fork-security-analytics]]
   - Full lifecycle management for log normalization and event-based threat detection under a unified interface.
-  - Normalization module: manage decoders and KVDBs across four content spaces (Standard, Draft, Test, Custom) — full CRUD and duplication available in the Test space, read-only access in the Standard and Custom spaces [wazuh/wazuh-dashboard-security-analytics#22](https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/22).
-    - Decoders management with hierarchy relationship indicators (parent/child/sibling), space selector, and branch duplication options [wazuh/wazuh-dashboard-security-analytics#21](https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/21).
+  - Normalization module: manage decoders and KVDBs across four content spaces (**Standard**, **Draft**, **Test**, **Custom**). **Draft**, **Test**, and **Custom** are user-managed spaces for authoring, validation, and production content; **Standard** holds built-in Wazuh content and is read-only [wazuh/wazuh-dashboard-security-analytics#22](https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/22).
+    - Decoders management with hierarchy relationship indicators (parent/child/sibling), space selector, and **branch duplication** — copy a decoder and its dependent hierarchy as a new branch for isolated changes [wazuh/wazuh-dashboard-security-analytics#21](https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/21).
     - KVDBs management with the same layout and space-aware interaction as Decoders [wazuh/wazuh-dashboard-security-analytics#23](https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/23).
   - Integrations section as the main entry point: manage integration definitions backed by the Wazuh integrations index, with creation form and root decoder selection per space [wazuh/wazuh-dashboard-security-analytics#32](https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/32).
   - Detection section: write and manage Sigma-based detection rules that generate findings from normalized events.
@@ -29,10 +29,9 @@
   - Dashboard modules migrated to consume findings index patterns [#8174](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8174).
   - Monitoring and Statistics dashboards adapted to the new metrics data streams [#8159](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8159).
   - Updated to UI theme v9 [wazuh/wazuh-dashboard#1052](https://github.com/wazuh/wazuh-dashboard/issues/1052).
-  - Sample data aligned with the Wazuh Common Schema v5 [#7839](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7839).
 - Redesigned "[Health Check][healthcheck-module]" service [#7532](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7532).
   - Login no longer triggers a blocking health check — validation runs as a background service integrated with the server lifecycle [#7610](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7610).
-    - Initial startup blocks the service only when critical checks fail; index pattern validation and resource provisioning run at startup but do not block access.
+    - Initial startup blocks the server only when **critical** checks fail. Non-critical checks — including index pattern provisioning and saved-object dashboard creation — surface warnings without preventing the dashboard from starting. See the [Health check lifecycle][healthcheck-lifecycle] and [not-ready page behavior][healthcheck-not-ready] in the module reference, and [#7610](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7610).
     - Post-startup failures (e.g., API unavailable or a missing index pattern) surface as degraded status without blocking the rest of the dashboard.
     - Scheduled re-checks at a configurable interval (default 15 minutes, minimum 5 minutes) via `healthcheck.*` settings in `opensearch_dashboards.yml`.
     - Validates and provisions required resources: index patterns, saved-object dashboards. Validates: notification channels, manager API connectivity and compatibility and `run_as` configuration for the manager API hosts.
@@ -55,7 +54,6 @@
 ## Breaking changes
 
 - Wazuh Dashboard 4.x cannot be upgraded to 5.x. A fresh installation is required.
-- Upgrade to dashboard platform 3.x — plugins and configurations from 4.x (platform 2.x) are not compatible.
 - `wazuh.yml` configuration file removed. All plugin settings have been migrated to `opensearch_dashboards.yml` and the Advanced Settings UI [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871). See the [migration guide][migration-guide] for the full mapping.
   - Several settings removed with no replacement: `customization.*`, `alerts.sample.prefix`, `configuration.ui_api_editable`, `ip.selector`, `ip.ignore`, `pattern`, `hideManagerAlerts`, and all monitoring and statistics job settings [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871) [#7933](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7933) [#8102](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8102).
 - Default index pattern changed from `wazuh-alerts-*` to `wazuh-events-v5*`. The global index pattern selector has been removed from the navigation bar [#7933](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7933).
@@ -67,18 +65,19 @@
   - RBAC permissions updated: The legacy `manager:read`, `manager:update_config`, `manager:restart`, and `manager_read_api_config` have been consolidated into their existing `cluster:*` equivalents.
 - Removed deprecated modules: OpenSCAP, CIS-CAT, and Osquery [#7645](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7645).
 - Legacy reporting application removed from the dashboard plugins. PDF and CSV generation is now handled by the Reporting fork bundled with Wazuh Dashboard packages [#7813](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7813) [wazuh/wazuh-indexer-reporting#45](https://github.com/wazuh/wazuh-indexer-reporting/issues/45).
-- Rules, Decoders, CDB List, and Ruleset Test applications removed. Content management has moved to the [Wazuh Indexer Content Manager][content-manager-plugin] [#7901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7901).
+- Rules, Decoders, CDB List, and Ruleset Test applications removed from the dashboard [#7901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7901). Content management moved to the Wazuh Indexer Content Manager plugin [wazuh/wazuh-indexer-plugins#214](https://github.com/wazuh/wazuh-indexer-plugins/issues/214).
 - Backend monitoring and statistics jobs removed from the dashboard server [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597). Agent and communications telemetry is now written to dedicated metrics data streams managed by the Wazuh indexer.
 - App Settings application removed — settings are now managed via `opensearch_dashboards.yml` or **Dashboard Management > Advanced Settings** [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871).
-- Sample Data, Docker, Statistics, and Cluster standalone applications removed [#8214](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8214) [#8215](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8215) [#8218](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8218) [#8220](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8220). Their functionality has been redistributed across the relevant modules and Server Management.
+- Sample Data, Docker, Statistics, and Cluster standalone applications removed [#8214](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8214) [#8215](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8215) [#8218](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8218) [#8220](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8220). The Sample Data app is no longer registered in Wazuh 5.x; internal sample data generators were adapted to the Wazuh Common Schema v5 [#7839](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7839), but end users can no longer load sample data from the UI. Remaining functionality has been redistributed across the relevant modules and Server Management.
 
 <!-- Links -->
 
 [security-analytics-module]: ./modules/security-analytics/README.md
 [active-response-module]: ./modules/active-response/index.md
 [healthcheck-module]: ./modules/healthcheck.md
+[healthcheck-lifecycle]: ./modules/healthcheck.md#lifecycle
+[healthcheck-not-ready]: ./modules/healthcheck.md#wazuh-dashboard-is-not-ready-yet
 [migration-guide]: ./migration-4x-5x.md
-[content-manager-plugin]: https://wazuh.github.io/wazuh-indexer-plugins/ref/modules/content-manager/index.html
 [fork-security-analytics]: https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/1
 [fork-reporting]: https://github.com/wazuh/wazuh-dashboard-reporting/issues/1
 [fork-alerting]: https://github.com/wazuh/wazuh-dashboard-alerting/issues/1
