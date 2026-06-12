@@ -64,7 +64,7 @@
 - Cluster mode mandatory for all installations [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688) [wazuh/wazuh#31295](https://github.com/wazuh/wazuh/issues/31295) — the distinction between cluster and manager mode is removed; the dashboard always operates in cluster mode, including single-node deployments.
   - All filters and search queries use `wazuh.cluster.name` instead of `manager.name`.
   - API calls route through cluster endpoints; `/cluster/status` checks and cluster-disabled UI components are removed.
-  - RBAC permissions updated: `manager:read`, `manager:update_config`, and `manager:restart` are replaced by `cluster:read`, `cluster:update_config`, and `cluster:restart`; `cluster:status` is no longer used.
+  - RBAC permissions updated: The legacy `manager:read`, `manager:update_config`, `manager:restart`, and `manager_read_api_config` have been consolidated into their existing `cluster:*` equivalents.
 - Removed deprecated modules: OpenSCAP, CIS-CAT, and Osquery [#7645](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7645).
 - Legacy reporting application removed from the dashboard plugins. PDF and CSV generation is now handled by the Reporting fork bundled with Wazuh Dashboard packages [#7813](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7813) [wazuh/wazuh-indexer-reporting#45](https://github.com/wazuh/wazuh-indexer-reporting/issues/45).
 - Rules, Decoders, CDB List, and Ruleset Test applications removed. Content management has moved to the [Wazuh Indexer Content Manager][content-manager-plugin] [#7901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7901).
