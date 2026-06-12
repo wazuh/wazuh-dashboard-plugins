@@ -35,7 +35,7 @@
     - Initial startup blocks the service only when critical checks fail; index pattern validation and resource provisioning run at startup but do not block access.
     - Post-startup failures (e.g., API unavailable or a missing index pattern) surface as degraded status without blocking the rest of the dashboard.
     - Scheduled re-checks at a configurable interval (default 15 minutes, minimum 5 minutes) via `healthcheck.*` settings in `opensearch_dashboards.yml`.
-    - Validates and provisions required resources: index patterns, saved-object dashboards, notification channels, and API connectivity.
+    - Validates and provisions required resources: index patterns, saved-object dashboards. Validates: notification channels, manager API connectivity and compatibility and `run_as` configuration for the manager API hosts.
   - "Wazuh dashboard is not ready yet" blocking page redesigned with Wazuh look and feel, exportable diagnostics, and actionable check details [#7681](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7681) [wazuh/wazuh-dashboard#866](https://github.com/wazuh/wazuh-dashboard/issues/866).
   - Dashboard components adapted to self-contain requirement failures — missing index patterns or unavailable API no longer blank the screen; affected views show contextual prompts instead [#7680](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7680).
   - New **Dashboard Management > Health Check** app displays overall status, per-check details, and JSON export for troubleshooting [#7697](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7697) [wazuh/wazuh-dashboard#870](https://github.com/wazuh/wazuh-dashboard/issues/870).
