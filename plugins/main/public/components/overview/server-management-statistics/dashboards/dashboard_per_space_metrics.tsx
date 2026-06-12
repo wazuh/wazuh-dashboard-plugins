@@ -53,10 +53,6 @@ const PerSpaceMetrics: React.FC<DashboardPerSpaceMetricsProps> = ({
 
   return (
     <EuiPanel paddingSize='m' style={{ marginTop: 16 }}>
-      <EuiTitle size='s'>
-        <h3>Per-Space Metrics</h3>
-      </EuiTitle>
-      <EuiSpacer size='s' />
       <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
         <EuiFlexItem grow={false}>
           <EuiText size='s'>Space:</EuiText>
