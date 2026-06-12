@@ -187,7 +187,7 @@ export const DashboardTabsPanels = ({
         setSelectedSpace(currentSpace =>
           currentSpace && spaceNames.includes(currentSpace)
             ? currentSpace
-            : spaceNames[0] ?? '',
+            : (spaceNames[0] ?? ''),
         );
       } catch (error) {
         console.error(error);
@@ -300,16 +300,18 @@ export const DashboardTabsPanels = ({
           )}
           {selectedTab === 'normalization' && !loadingNode && (
             <div>
-              <DashboardNormalizationStatistics
-                indexPatternId={dataSource?.id}
-                searchBarProps={searchBarProps}
-                lastReloadRequestTime={fingerprint}
-                filters={
-                  clusterNodeSelected !== 'all'
-                    ? [...fetchFilters, selectedNodeFilter]
-                    : [...(fetchFilters ?? [])]
-                }
-              />
+              <div style={{ minHeight: 800 }}>
+                <DashboardNormalizationStatistics
+                  indexPatternId={dataSource?.id}
+                  searchBarProps={searchBarProps}
+                  lastReloadRequestTime={fingerprint}
+                  filters={
+                    clusterNodeSelected !== 'all'
+                      ? [...fetchFilters, selectedNodeFilter]
+                      : [...(fetchFilters ?? [])]
+                  }
+                />
+              </div>
               <DashboardPerSpaceMetrics
                 indexPattern={dataSource?.indexPattern as IndexPattern}
                 searchBarProps={searchBarProps}
