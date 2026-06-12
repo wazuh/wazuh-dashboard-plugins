@@ -45,7 +45,7 @@
   - Fork of OpenSearch Reporting integrated into Wazuh dashboard packages, with scheduled email delivery as the initial use case [wazuh/wazuh-dashboard#288](https://github.com/wazuh/wazuh-dashboard/issues/288) [wazuh/wazuh-dashboard#753](https://github.com/wazuh/wazuh-dashboard/issues/753).
   - PDF and CSV reports from dashboards and saved searches, on-demand or on a schedule, with email delivery.
   - Wazuh-branded HTML email template for report notifications with download link [wazuh/wazuh-dashboard-reporting#46](https://github.com/wazuh/wazuh-dashboard-reporting/issues/46).
-  - Plugin adapted for Wazuh dashboard: white-labeled UI, Notebook-based reports removed, and report detail fixes [wazuh/wazuh-dashboard-reporting#54](https://github.com/wazuh/wazuh-dashboard-reporting/issues/54) [#51](https://github.com/wazuh/wazuh-dashboard-reporting/issues/51) [#50](https://github.com/wazuh/wazuh-dashboard-reporting/issues/50).
+  - Plugin adaptation: white-labeled UI, Notebook-based reports removed, and report detail fixes [wazuh/wazuh-dashboard-reporting#54](https://github.com/wazuh/wazuh-dashboard-reporting/issues/54) [#51](https://github.com/wazuh/wazuh-dashboard-reporting/issues/51) [#50](https://github.com/wazuh/wazuh-dashboard-reporting/issues/50).
 - Fork of the Alerting and Notifications plugins. [[3][fork-alerting]] [[4][fork-notifications]]
   - Alerting and Notifications available under **Explore > Alerting** and **Explore > Notifications**.
   - Health Check validates and provisions default notification channels (Slack, PagerDuty, Jira, Shuffle) and sample Alerting monitors on startup.
