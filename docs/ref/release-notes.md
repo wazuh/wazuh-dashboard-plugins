@@ -5,13 +5,13 @@
 - New "[Security Analytics][security-analytics-module]" module [#7608](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7608). [[1][fork-security-analytics]]
   - Full lifecycle management for log normalization and event-based threat detection under a unified interface.
   - Normalization module: manage decoders and KVDBs across four content spaces (**Standard**, **Draft**, **Test**, **Custom**). **Draft**, **Test**, and **Custom** are user-managed spaces for authoring, validation, and production content; **Standard** holds built-in Wazuh content and is read-only [wazuh/wazuh-dashboard-security-analytics#22](https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/22).
+    - **Overview** section: unified entry point for integrations and **space policies** across all spaces. Create and edit integrations and configure space policies (enable status, root decoder) in **Draft**; **Test** and **Custom** display promoted content for validation and production [wazuh/wazuh-dashboard-security-analytics#32](https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/32).
     - Decoders management with hierarchy relationship indicators (parent/child/sibling), space selector, and **branch duplication** — copy a decoder and its dependent hierarchy as a new branch for isolated changes [wazuh/wazuh-dashboard-security-analytics#21](https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/21).
     - KVDBs management with the same layout and space-aware interaction as Decoders [wazuh/wazuh-dashboard-security-analytics#23](https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/23).
-  - Integrations section as the main entry point: manage integration definitions backed by the Wazuh integrations index, with creation form and root decoder selection per space [wazuh/wazuh-dashboard-security-analytics#32](https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/32).
   - Detection section: write and manage Sigma-based detection rules that generate findings from normalized events.
   - Log Test tool to validate decoder and detection rule output against real or sample events.
   - Filters management allows defining conditions to drop events in the event processing pipeline.
-  - Move validated content between spaces using the promotion
+  - Guided promotion workflow to move validated content from **Draft** to **Test**, and from **Test** to **Custom**.
 - New "[Active Response][active-response-module]" module [#34606](https://github.com/wazuh/wazuh/issues/34606).
   - Dedicated section under **Explore > Active Responses** to create, edit, mute, and delete active responses — managed as a dedicated channel type, strictly separate from standard notification channels [wazuh/wazuh-indexer-notifications#3](https://github.com/wazuh/wazuh-indexer-notifications/issues/3) [wazuh/wazuh-dashboard-notifications#12](https://github.com/wazuh/wazuh-dashboard-notifications/issues/12).
   - Execution history browsable in Discover via the `wazuh-active-responses*` index pattern, provisioned automatically at startup [#8154](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8154).
