@@ -50,19 +50,23 @@ const mainSettings = [
   },
   {
     field: 'force.after_registration_time',
-    label: 'Min seconds agent registered to allow replacement',
+    label: 'Min seconds since registration',
+    info: 'The agent replacement is performed only when the time (in seconds) passed since the agent registration is greater than the value configured in the setting.',
   },
   {
     field: 'force.key_mismatch',
     label: 'Re-register only on key mismatch',
+    info: 'Avoid re-registering agents that already have valid keys.',
   },
   {
     field: 'force.disconnected_time.enabled',
     label: 'Replace only disconnected agents',
+    info: 'The replacement is performed only for agents that have been disconnected longer than a certain time.',
   },
   {
     field: 'force.disconnected_time.value',
     label: 'Seconds an agent is disconnected',
+    info: 'Seconds since an agent is in a disconnected state.',
   },
 ];
 
