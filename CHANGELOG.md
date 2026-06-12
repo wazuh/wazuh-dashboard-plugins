@@ -101,8 +101,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated MITRE ATT&CK dashboards to use techniques, subtechniques and tactics names [#8573](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8573) [#8617](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8617)
 - Condensed the setting labels and added info tooltips in the registration service configuration view [#8616](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8616)
 
-
-
 ### Fixed
 
 - Fixed version hardcoded value in the deploy agent wizard [#7923](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7923)
