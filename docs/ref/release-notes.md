@@ -16,7 +16,7 @@
   - Dedicated section under **Explore > Active Responses** to create, edit, mute, and delete active responses — managed as a dedicated channel type, strictly separate from standard notification channels [wazuh/wazuh-indexer-notifications#3](https://github.com/wazuh/wazuh-indexer-notifications/issues/3) [wazuh/wazuh-dashboard-notifications#12](https://github.com/wazuh/wazuh-dashboard-notifications/issues/12).
   - Execution history browsable in Discover via the `wazuh-active-responses*` index pattern, provisioned automatically at startup [#8154](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8154).
   - New "Active Response" monitor type in Alerting that allows defining the new active response action using the "Add Active Response" button in Alerting monitor trigger configuration — only active response channels are shown, independently of standard notifications [wazuh/wazuh-dashboard-alerting#6](https://github.com/wazuh/wazuh-dashboard-alerting/issues/6).
-  - New `Active Response Dashboard` under `Security operations > Active Response` to monitor `Active Responses` execution data.
+  - New **Active Response** dashboard under **Security operations > Active Response** to monitor active response execution data [#8601](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8601).
 - Dashboard revamp for Wazuh 5.0 [#8031](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8031).
   - Dashboards and visualizations migrated to saved objects, enabling sharing, PDF generation, and embedding across all modules — regenerated automatically on startup if missing [#7815](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7815) [#7846](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7846) [#7919](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7919).
   - Legacy PDF reporting system removed from the dashboard plugins [#7813](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7813).
@@ -27,6 +27,9 @@
   - File Integrity Monitoring module redesigned for the Wazuh 5.0 data model [#8044](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8044).
   - Malware Detection module redesigned for the Wazuh 5.0 data model [#8138](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8138).
   - Security Operations module redesigned for the Wazuh 5.0 data model (PCI DSS, GDPR, HIPAA, NIST 800-53, TSC) [#8139](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8139).
+  - **Regulatory Compliance** application centralizes PCI DSS, GDPR, HIPAA, NIST 800-53, and TSC into a single module [#8239](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8239) [#8303](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8303), with new frameworks CMMC [#8290](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8290), FedRAMP [#8296](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8296), ISO 27001 [#8286](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8286), NIS2 [#8298](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8298), and NIST 800-171 [#8294](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8294).
+  - Case Management tab added to the Findings document details flyout [#8580](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8580) [#8589](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8589) [#8598](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8598).
+  - **Cases** tab added to the Threat Hunting module [#8583](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8583) [#8608](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8608).
   - Dashboard modules migrated to consume findings index patterns [#8174](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8174).
   - Monitoring and Statistics dashboards adapted to the new metrics data streams [#8159](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8159).
   - Updated to UI theme v9 [wazuh/wazuh-dashboard#1052](https://github.com/wazuh/wazuh-dashboard/issues/1052).
@@ -44,6 +47,7 @@
 - Reporting revamp [wazuh/wazuh-indexer-reporting#45](https://github.com/wazuh/wazuh-indexer-reporting/issues/45). [[2][fork-reporting]]
   - Fork of OpenSearch Reporting integrated into Wazuh dashboard packages, with scheduled email delivery as the initial use case [wazuh/wazuh-dashboard#288](https://github.com/wazuh/wazuh-dashboard/issues/288) [wazuh/wazuh-dashboard#753](https://github.com/wazuh/wazuh-dashboard/issues/753).
   - PDF and CSV reports from dashboards and saved searches, on-demand or on a schedule, with email delivery.
+  - PDF report generation added to the Vulnerabilities dashboard [#8403](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8403).
   - Wazuh-branded HTML email template for report notifications with download link [wazuh/wazuh-dashboard-reporting#46](https://github.com/wazuh/wazuh-dashboard-reporting/issues/46).
   - Plugin adaptation: white-labeled UI, Notebook-based reports removed, and report detail fixes [wazuh/wazuh-dashboard-reporting#54](https://github.com/wazuh/wazuh-dashboard-reporting/issues/54) [#51](https://github.com/wazuh/wazuh-dashboard-reporting/issues/51) [#50](https://github.com/wazuh/wazuh-dashboard-reporting/issues/50).
 - Fork of the Alerting and Notifications plugins. [[3][fork-alerting]] [[4][fork-notifications]]
@@ -51,6 +55,13 @@
   - Health Check validates the default notification channels (Slack, PagerDuty, Jira, Shuffle) and sample Alerting monitors on startup provided by indexer.
   - Multi-channel support: Slack, Microsoft Teams, Amazon Chime, Email (SMTP/SES), AWS SNS, and custom webhooks.
   - Active response channels kept as a dedicated channel type, separate from standard notification channels [#6](https://github.com/wazuh/wazuh-dashboard-alerting/issues/6).
+
+## Additional highlights
+
+- SSL certificate support for Wazuh manager API connections — client certificate authentication and CA verification via `key`, `cert`, and `ca` host settings; **Verify CA** column in the API Connections table [#8015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8015) [#8212](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8212). See [Configuration](./configuration.md#define-wazuh-server-hosts).
+- Indexer management **Settings** section in Server Management [#8206](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8206).
+- CTI content update button to request on-demand threat intelligence content updates [#8201](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8201).
+- CTI Console registration flow — UI and registration status API [#8486](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8486) [#7663](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7663).
 
 ## Breaking changes
 
@@ -69,6 +80,8 @@
 - Rules, Decoders, CDB List, and Ruleset Test applications removed from the dashboard [#7901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7901). Content management moved to the Wazuh Indexer Content Manager plugin [wazuh/wazuh-indexer-plugins#214](https://github.com/wazuh/wazuh-indexer-plugins/issues/214).
 - Backend monitoring and statistics jobs removed from the dashboard server [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597). Agent and communications telemetry is now written to dedicated metrics data streams managed by the Wazuh indexer.
 - App Settings application removed — settings are now managed via `opensearch_dashboards.yml` or **Dashboard Management > Advanced Settings** [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871).
+- Default value of `wazuh.updates.disabled` changed from `false` to `true` — update notifications are disabled by default in Advanced Settings [#8236](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8236).
+- Only one Wazuh server API host configuration is allowed per indexer [#8436](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8436).
 - Sample Data, Docker, Statistics, and Cluster standalone applications removed [#8214](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8214) [#8215](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8215) [#8218](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8218) [#8220](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8220). The Sample Data app is no longer registered in Wazuh 5.x; internal sample data generators were adapted to the Wazuh Common Schema v5 [#7839](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7839), but end users can no longer load sample data from the UI. Remaining functionality has been redistributed across the relevant modules and Server Management.
 
 <!-- Links -->
