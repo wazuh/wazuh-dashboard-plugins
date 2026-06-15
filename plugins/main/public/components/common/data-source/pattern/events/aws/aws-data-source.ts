@@ -3,7 +3,7 @@ import { DATA_SOURCE_FILTER_CONTROLLED_AWS_RULE_GROUP } from '../../../../../../
 import { EventsDataSource } from '../events-data-source';
 
 const AWS_GROUP_KEY = 'wazuh.integration.name';
-const AWS_GROUP_VALUE = 'aws';
+const AWS_GROUP_VALUE = 'aws*';
 
 export class AWSDataSource extends EventsDataSource {
   constructor(id: string, title: string) {
@@ -11,7 +11,7 @@ export class AWSDataSource extends EventsDataSource {
   }
 
   getRuleGroupsFilter() {
-    return super.getRuleGroupsFilter(
+    return super.getWildcardFilter(
       AWS_GROUP_KEY,
       AWS_GROUP_VALUE,
       DATA_SOURCE_FILTER_CONTROLLED_AWS_RULE_GROUP,
