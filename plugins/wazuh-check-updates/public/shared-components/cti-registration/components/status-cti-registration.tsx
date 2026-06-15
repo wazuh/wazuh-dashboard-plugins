@@ -31,6 +31,12 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
     statusCTI.status === statusCodes.NOT_FOUND &&
     isBackgroundRegistrationActive();
 
+  const subscriptionPlanName =
+    ctiFlowState.getSubscription()?.message?.plan?.name;
+
+  const showPlanName =
+    statusCTI.status === statusCodes.SUCCESS && Boolean(subscriptionPlanName);
+
   const openRegistrationModal = () => {
     onOpenModal();
   };
@@ -45,11 +51,19 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
         aria-label={statusData[statusCTI.status].onClickAriaLabel}
         color={statusData[statusCTI.status].color}
       >
-        <span style={inlineRow}>
-          <FormattedMessage
-            id='wazuhCheckUpdates.ctiRegistration.statusNavTop'
-            defaultMessage='Wazuh Cloud'
-          />
+        <span style={inlineRow} data-test-subj='ctiRegistrationNavStatus'>
+          {showPlanName ? (
+            <FormattedMessage
+              id='wazuhCheckUpdates.ctiRegistration.statusNavTopWithPlan'
+              defaultMessage='Wazuh Cloud - {planName}'
+              values={{ planName: subscriptionPlanName }}
+            />
+          ) : (
+            <FormattedMessage
+              id='wazuhCheckUpdates.ctiRegistration.statusNavTop'
+              defaultMessage='Wazuh Cloud'
+            />
+          )}
           {backgroundSpinner}
         </span>
       </EuiHealth>
