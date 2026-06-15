@@ -1,4 +1,10 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, {
+  useState,
+  useMemo,
+  useEffect,
+  useCallback,
+  useRef,
+} from 'react';
 import {
   EuiDataGrid,
   EuiPageTemplate,
@@ -51,6 +57,10 @@ import { wzDiscoverRenderColumns } from './render-columns';
 import { WzSearchBar } from '../search-bar';
 import { transformDateRange } from '../search-bar/search-bar-service';
 import DocDetailsHeader from './components/doc-details-header';
+import {
+  applyHitSourceUpdate,
+  applyResultsSourceUpdate,
+} from './apply-hit-source-update';
 import { tDataGridColumn } from '../data-grid/types';
 import { SampleDataWarning } from '../../visualize/components';
 
@@ -82,6 +92,32 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
+  const [caseRefreshKey, setCaseRefreshKey] = useState(0);
+
+  // Keep the latest inspected hit reachable from the stable mutation handler.
+  const inspectedHitRef = useRef(inspectedHit);
+  inspectedHitRef.current = inspectedHit;
+
+  // Called when the open document is mutated from its flyout.
+  // Patches both the flyout and its row in the grid with the
+  // returned payload so they update instantly and stay consistent, and bumps a key
+  // that refreshes the dashboard charts. The grid is updated optimistically here
+  // instead of refetching, since a _search would race the index refresh.
+  const handleDocumentMutated = useCallback(
+    (sourceUpdate?: Record<string, unknown>) => {
+      if (sourceUpdate) {
+        const documentId = inspectedHitRef.current?._id;
+        setInspectedHit(current => applyHitSourceUpdate(current, sourceUpdate));
+        if (documentId) {
+          setResults(current =>
+            applyResultsSourceUpdate(current, documentId, sourceUpdate),
+          );
+        }
+      }
+      setCaseRefreshKey(key => key + 1);
+    },
+    [],
+  );
   const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
     undefined,
   );
@@ -133,6 +169,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     setFilters,
   });
   const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const combinedFingerprint = (fingerprint ?? 0) + caseRefreshKey;
   const [absoluteDateRange, setAbsoluteDateRange] = useState<TimeRange>(
     transformDateRange({ from: dateRangeFrom, to: dateRangeTo }),
   );
@@ -294,7 +331,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                               query,
                               dateRangeFrom,
                               dateRangeTo,
-                              fingerprint,
+                              combinedFingerprint,
                             )}
                           />
                         )}
@@ -349,6 +386,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                           filters={filters}
                           setFilters={setFilters}
                           onFilter={closeFlyoutHandler}
+                          onDocumentMutated={handleDocumentMutated}
                           additionalTabs={additionalDocumentDetailsTabs}
                           showFilterButtons={false}
                         />

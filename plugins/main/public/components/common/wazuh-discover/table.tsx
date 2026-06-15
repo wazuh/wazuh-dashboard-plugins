@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { IntlProvider } from 'react-intl';
 import {
   EuiDataGrid,
@@ -38,6 +44,10 @@ import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-
 // common components/hooks
 import { IndexPattern } from '../../../../../../../src/plugins/data/public';
 import { wzDiscoverRenderColumns } from './render-columns';
+import {
+  applyHitSourceUpdate,
+  applyResultsSourceUpdate,
+} from './apply-hit-source-update';
 import {
   DocumentViewTableAndJson,
   DocumentViewTableAndJsonPropsAdditionalTabs,
@@ -306,6 +316,11 @@ export const useTableDataGridFetch = ({
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
+  const [caseRefreshKey, setCaseRefreshKey] = useState(0);
+
+  // Keep the latest inspected hit reachable from the stable mutation handler.
+  const inspectedHitRef = useRef(inspectedHit);
+  inspectedHitRef.current = inspectedHit;
 
   const onClickInspectDoc = useMemo(
     () => (index: number) => {
@@ -313,6 +328,28 @@ export const useTableDataGridFetch = ({
       setInspectedHit(rowClicked);
     },
     [results],
+  );
+
+  // Called when the open document is mutated from its flyout (e.g. a case
+  // create/edit/clean). Patches both the flyout and its row in the grid with the
+  // returned payload so they update instantly and stay consistent, and bumps a key
+  // that refreshes the dashboard charts (see InventoryDashboard). The grid is updated
+  // optimistically here instead of refetching, since a _search would race the index
+  // refresh.
+  const onDocumentMutated = useCallback(
+    (sourceUpdate?: Record<string, unknown>) => {
+      if (sourceUpdate) {
+        const documentId = inspectedHitRef.current?._id;
+        setInspectedHit(current => applyHitSourceUpdate(current, sourceUpdate));
+        if (documentId) {
+          setResults(current =>
+            applyResultsSourceUpdate(current, documentId, sourceUpdate),
+          );
+        }
+      }
+      setCaseRefreshKey(key => key + 1);
+    },
+    [],
   );
 
   const DocViewInspectButton = ({
@@ -408,6 +445,8 @@ export const useTableDataGridFetch = ({
     dataGridProps,
     inspectedHit,
     removeInspectedHit,
+    onDocumentMutated,
+    caseRefreshKey,
   };
 };
 
@@ -420,6 +459,7 @@ export type TableDataGridWithSearchBarInspectedHitProps<K> =
     results: any; // Enhance
     inspectedHit: any; // Enhance
     removeInspectedHit: () => void;
+    onDocumentMutated?: (sourceUpdate?: Record<string, unknown>) => void;
     tableDefaultColumns: tDataGridColumn[];
   };
 
@@ -461,6 +501,7 @@ export const TableDataGridWithSearchBarInspectedHit: React.FunctionComponent<
     query,
     inspectedHit,
     removeInspectedHit,
+    onDocumentMutated,
     dataGridProps,
   }: TableDataGridWithSearchBarInspectedHitProps) => {
     return (
@@ -491,6 +532,7 @@ export const TableDataGridWithSearchBarInspectedHit: React.FunctionComponent<
             setFilters={setFilters}
             onClose={removeInspectedHit}
             onFilter={removeInspectedHit}
+            onDocumentMutated={onDocumentMutated}
             additionalTabs={additionalDocumentDetailsTabs}
           />
         )}
@@ -550,20 +592,25 @@ export const TableDataGridWithSearchBarInspectedHitFetchData: React.FunctionComp
     showSearchBar,
     tableId,
   }: TableDataGridWithSearchBarInspectedHitFetchDataProps) => {
-    const { results, dataGridProps, inspectedHit, removeInspectedHit } =
-      useTableDataGridFetch({
-        searchBarProps,
-        tableId,
-        tableDefaultColumns,
-        dataSource,
-        filters,
-        setFilters,
-        isDataSourceLoading,
-        fetchData,
-        fetchFilters,
-        fingerprint,
-        autoRefreshFingerprint,
-      });
+    const {
+      results,
+      dataGridProps,
+      inspectedHit,
+      removeInspectedHit,
+      onDocumentMutated,
+    } = useTableDataGridFetch({
+      searchBarProps,
+      tableId,
+      tableDefaultColumns,
+      dataSource,
+      filters,
+      setFilters,
+      isDataSourceLoading,
+      fetchData,
+      fetchFilters,
+      fingerprint,
+      autoRefreshFingerprint,
+    });
 
     return (
       <TableDataGridWithSearchBarInspectedHit
@@ -584,6 +631,7 @@ export const TableDataGridWithSearchBarInspectedHitFetchData: React.FunctionComp
         setFilters={setFilters}
         inspectedHit={inspectedHit}
         removeInspectedHit={removeInspectedHit}
+        onDocumentMutated={onDocumentMutated}
         inspectDetailsTitle={inspectDetailsTitle}
         additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
         tableDefaultColumns={tableDefaultColumns}
@@ -602,6 +650,7 @@ export const DocumentDetails = withWrapComponent(({ children }) => (
     filters,
     setFilters,
     onFilter,
+    onDocumentMutated,
     additionalTabs,
     showFilterButtons,
   }) => {
@@ -616,6 +665,7 @@ export const DocumentDetails = withWrapComponent(({ children }) => (
         filters={filters}
         setFilters={setFilters}
         onFilter={onFilter}
+        onDocumentMutated={onDocumentMutated}
         additionalTabs={additionalTabs}
         showFilterButtons={showFilterButtons}
       />
