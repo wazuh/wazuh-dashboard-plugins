@@ -43,6 +43,7 @@ import {
   unregisterInterceptor,
 } from './services/request-handler';
 import { Applications, Categories } from './utils/applications';
+import { setSecurityAnalyticsConfig } from './utils/security-analytics-config';
 import { euiPaletteColorBlind } from '@elastic/eui';
 import NavigationService from './react-services/navigation-service';
 import { createHashHistory } from 'history';
@@ -202,6 +203,10 @@ export class WazuhPlugin
       core.chrome.navGroup.addNavLinksToGroup.bind(core.chrome.navGroup),
       core.chrome.navGroup.getNavGroupEnabled(),
     );
+
+    if (plugins.securityAnalyticsDashboards?.config) {
+      setSecurityAnalyticsConfig(plugins.securityAnalyticsDashboards.config);
+    }
 
     return {};
   }

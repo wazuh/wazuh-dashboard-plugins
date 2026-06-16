@@ -27,7 +27,8 @@
     "telemetry",
     "notificationsDashboards",
     "alertingDashboards",
-    "reportsDashboards"
+    "reportsDashboards",
+    "securityAnalyticsDashboards"
   ],
   "server": true,
   "ui": true

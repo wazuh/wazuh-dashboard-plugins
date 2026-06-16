@@ -1,12 +1,13 @@
-import { getCore } from '../kibana-services';
+let saConfig: { disabledSettings?: string[] } = {};
 
-const SECURITY_ANALYTICS_PLUGIN_ID = 'securityAnalyticsDashboards';
+export function setSecurityAnalyticsConfig(config: {
+  disabledSettings?: string[];
+}) {
+  saConfig = config;
+}
 
 export function isSecurityAnalyticsSettingDisabled(
   settingId: string,
 ): boolean {
-  const config = getCore().injectedMetadata.getInjectedVar<{
-    disabledSettings?: string[];
-  }>(SECURITY_ANALYTICS_PLUGIN_ID, {});
-  return (config.disabledSettings ?? []).includes(settingId);
+  return (saConfig.disabledSettings ?? []).includes(settingId);
 }

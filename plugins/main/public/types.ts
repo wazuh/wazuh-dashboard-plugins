@@ -46,6 +46,9 @@ export type WazuhSetupPlugins = {
   data: DataPublicPluginSetup;
   navigation: NavigationPublicPluginStart;
   telemetry: TelemetryPluginSetup;
+  securityAnalyticsDashboards?: {
+    config?: { disabledSettings?: string[] };
+  };
 };
 
 export type WazuhStartPlugins = AppPluginStartDependencies;
