@@ -41,6 +41,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
+- Load the index pattern known fields JSON files lazily from disk during the health check task instead of importing them statically at startup, reducing steady state memory usage [#8627](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8627)
 - Changed default index pattern settings key from `defaultIndex` to `wazuh-events-v5*` [#8066](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8066) [#8512](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8512)
 - Adapted alerts sample data to Wazuh Common Schema [#7848](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7848)
 - Set cluster mode as default for all Wazuh installations, including single-node deployments. Updated RBAC permissions to `cluster:*` actions [#7701](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7701) [#8147](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8147)
