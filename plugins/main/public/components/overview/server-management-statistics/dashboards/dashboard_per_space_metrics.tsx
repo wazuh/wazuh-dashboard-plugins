@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   EuiPanel,
-  EuiTitle,
   EuiSpacer,
   EuiSelect,
   EuiFlexGroup,
@@ -12,6 +11,7 @@ import DashboardRenderer from '../../../common/dashboards/dashboard-renderer/das
 import { withErrorBoundary } from '../../../common/hocs/error-boundary/with-error-boundary';
 import { tFilter } from '../../../common/data-source';
 import { IndexPattern } from '../../../../../../../src/plugins/data/public';
+import { DiscoverNoResults } from '../../../common/no-results/no-results';
 
 interface DashboardPerSpaceMetricsProps {
   indexPattern: IndexPattern;
@@ -50,6 +50,10 @@ const PerSpaceMetrics: React.FC<DashboardPerSpaceMetricsProps> = ({
     : null;
 
   const combinedFilters = spaceFilter ? [...filters, spaceFilter] : filters;
+
+  if (!spaces.length) {
+    return <DiscoverNoResults />;
+  }
 
   return (
     <EuiPanel paddingSize='m' style={{ marginTop: 16 }}>

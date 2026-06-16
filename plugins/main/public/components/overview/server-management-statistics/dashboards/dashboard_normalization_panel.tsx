@@ -70,7 +70,7 @@ export const DashboardNormalizationPanel: React.FC<
     return () => {
       isCancelled = true;
     };
-  }, [indexPattern?.id]);
+  }, [indexPattern?.id, lastReloadRequestTime]);
 
   return (
     <div>
