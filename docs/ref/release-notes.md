@@ -31,7 +31,7 @@
   - Case Management tab added to the Findings document details flyout [#8580](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8580) [#8589](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8589) [#8598](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8598).
   - **Cases** tab added to the Threat Hunting module [#8583](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8583) [#8608](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8608).
   - Dashboard modules migrated to consume findings index patterns [#8174](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8174).
-  - Monitoring and Statistics dashboards adapted to the new metrics data streams [#8159](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8159).
+  - Statistics dashboard adapted to the new metrics data streams [#8159](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8159).
   - Updated to UI theme v9 [wazuh/wazuh-dashboard#1052](https://github.com/wazuh/wazuh-dashboard/issues/1052).
 - Redesigned "[Health Check][healthcheck-module]" service [#7532](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7532).
   - Login no longer triggers a blocking health check — validation runs as a background service integrated with the server lifecycle [#7610](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7610).
