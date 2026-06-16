@@ -58,10 +58,10 @@
 
 ## Additional highlights
 
-- SSL certificate support for Wazuh manager API connections — client certificate authentication and CA verification via `key`, `cert`, and `ca` host settings; **Verify CA** column in the API Connections table [#8015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8015) [#8212](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8212). See [Configuration](./configuration.md#define-wazuh-server-hosts).
-- Indexer management **Settings** section in Server Management [#8206](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8206).
-- CTI content update button to request on-demand threat intelligence content updates [#8201](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8201).
-- CTI Console registration flow — UI and registration status API [#8486](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8486) [#7663](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7663).
+- Added ability to configure SSL for manager API host communications [#8015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8015) [#8212](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8212). See [Configuration](./configuration.md#define-wazuh-server-hosts).
+- Added **Settings** app to Indexer management section [#8206](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8206).
+- Added CTI content update button to request on-demand threat intelligence content updates [#8201](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8201).
+- Added CTI Console registration flow — UI and registration status API [#8486](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8486) [#7663](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7663).
 
 ## Breaking changes
 
