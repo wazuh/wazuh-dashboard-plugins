@@ -70,10 +70,13 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [isCleanModalVisible, setIsCleanModalVisible] = useState(false);
 
-  const handleOperationSuccess = useCallback((caseData: CaseData | null) => {
-    setIsEditing(false);
-    onSaveSuccess?.(caseData);
-  }, [onSaveSuccess]);
+  const handleOperationSuccess = useCallback(
+    (caseData: CaseData | null) => {
+      setIsEditing(false);
+      onSaveSuccess?.(caseData);
+    },
+    [onSaveSuccess],
+  );
 
   const {
     status,
@@ -126,10 +129,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
         <EuiDescriptionListDescription>
           {tags.length
             ? tags.map(tag => (
-              <EuiBadge key={tag.label} color='hollow'>
-                {tag.label}
-              </EuiBadge>
-            ))
+                <EuiBadge key={tag.label} color='hollow'>
+                  {tag.label}
+                </EuiBadge>
+              ))
             : '—'}
         </EuiDescriptionListDescription>
       ),
@@ -144,43 +147,43 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     },
     ...(!isNewCase
       ? [
-        {
-          title: <EuiDescriptionListTitle>User</EuiDescriptionListTitle>,
-          description: (
-            <EuiDescriptionListDescription>
-              {caseUsername || '—'}
-            </EuiDescriptionListDescription>
-          ),
-        },
-      ]
+          {
+            title: <EuiDescriptionListTitle>User</EuiDescriptionListTitle>,
+            description: (
+              <EuiDescriptionListDescription>
+                {caseUsername || '—'}
+              </EuiDescriptionListDescription>
+            ),
+          },
+        ]
       : []),
     ...(existingCreatedAt
       ? [
-        {
-          title: (
-            <EuiDescriptionListTitle>Created at</EuiDescriptionListTitle>
-          ),
-          description: (
-            <EuiDescriptionListDescription>
-              {formatUIDate(existingCreatedAt)}
-            </EuiDescriptionListDescription>
-          ),
-        },
-      ]
+          {
+            title: (
+              <EuiDescriptionListTitle>Created at</EuiDescriptionListTitle>
+            ),
+            description: (
+              <EuiDescriptionListDescription>
+                {formatUIDate(existingCreatedAt)}
+              </EuiDescriptionListDescription>
+            ),
+          },
+        ]
       : []),
     ...(existingUpdatedAt
       ? [
-        {
-          title: (
-            <EuiDescriptionListTitle>Updated at</EuiDescriptionListTitle>
-          ),
-          description: (
-            <EuiDescriptionListDescription>
-              {formatUIDate(existingUpdatedAt)}
-            </EuiDescriptionListDescription>
-          ),
-        },
-      ]
+          {
+            title: (
+              <EuiDescriptionListTitle>Updated at</EuiDescriptionListTitle>
+            ),
+            description: (
+              <EuiDescriptionListDescription>
+                {formatUIDate(existingUpdatedAt)}
+              </EuiDescriptionListDescription>
+            ),
+          },
+        ]
       : []),
   ];
 
@@ -216,7 +219,9 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
               </EuiFlexItem>
               {status && (
                 <EuiFlexItem grow={false}>
-                  <EuiBadge color={STATUS_BADGE_COLOR[status]}>{status}</EuiBadge>
+                  <EuiBadge color={STATUS_BADGE_COLOR[status]}>
+                    {status}
+                  </EuiBadge>
                 </EuiFlexItem>
               )}
               {isNewCase && (
