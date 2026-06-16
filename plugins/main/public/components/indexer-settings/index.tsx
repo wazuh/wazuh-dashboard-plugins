@@ -23,6 +23,7 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import { getToasts } from '../../kibana-services';
+import { isSecurityAnalyticsSettingDisabled } from '../../utils/security-analytics-config';
 import { GenericRequest } from '../../react-services';
 import { EngineSwitch } from './engine-switch';
 import type { Engine, IndexerSettings } from './types';
@@ -42,6 +43,9 @@ export const WzIndexerSettings: React.FC = () => {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [bottomBarHost, setBottomBarHost] = useState<HTMLElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const isIndexRawEventsDisabled =
+    isSecurityAnalyticsSettingDisabled('index-raw-events');
 
   useLayoutEffect(() => {
     setBottomBarHost(document.getElementById('app-wrapper') ?? document.body);
@@ -235,37 +239,39 @@ export const WzIndexerSettings: React.FC = () => {
             </EuiCallOut>
           ) : draftSettings ? (
             <EuiFlexGroup direction='column'>
-              <EuiFlexItem>
-                <EuiPanel
-                  paddingSize='none'
-                  hasBorder={false}
-                  hasShadow={false}
-                >
-                  <EuiDescribedFormGroup
-                    fullWidth
-                    id='indexer-settings-enable-raw-events-group'
-                    title={<span>Enable raw events</span>}
-                    description={
-                      <div>
-                        Enables indexing of raw events into the{' '}
-                        <strong>wazuh-events-raw-v5</strong> indices.
-                      </div>
-                    }
-                    descriptionFlexItemProps={{
-                      style: { alignSelf: 'center' },
-                    }}
-                    fieldFlexItemProps={{ style: { alignSelf: 'center' } }}
+              {!isIndexRawEventsDisabled && (
+                <EuiFlexItem>
+                  <EuiPanel
+                    paddingSize='none'
+                    hasBorder={false}
+                    hasShadow={false}
                   >
-                    <EngineSwitch
-                      field='index_raw_events'
-                      ariaLabel='Enable raw events'
-                      engine={draftSettings.engine}
-                      updateEngine={updateEngine}
-                      saving={saving}
-                    />
-                  </EuiDescribedFormGroup>
-                </EuiPanel>
-              </EuiFlexItem>
+                    <EuiDescribedFormGroup
+                      fullWidth
+                      id='indexer-settings-enable-raw-events-group'
+                      title={<span>Enable raw events</span>}
+                      description={
+                        <div>
+                          Enables indexing of raw events into the{' '}
+                          <strong>wazuh-events-raw-v5</strong> indices.
+                        </div>
+                      }
+                      descriptionFlexItemProps={{
+                        style: { alignSelf: 'center' },
+                      }}
+                      fieldFlexItemProps={{ style: { alignSelf: 'center' } }}
+                    >
+                      <EngineSwitch
+                        field='index_raw_events'
+                        ariaLabel='Enable raw events'
+                        engine={draftSettings.engine}
+                        updateEngine={updateEngine}
+                        saving={saving}
+                      />
+                    </EuiDescribedFormGroup>
+                  </EuiPanel>
+                </EuiFlexItem>
+              )}
               <EuiFlexItem>
                 <EuiPanel
                   paddingSize='none'
