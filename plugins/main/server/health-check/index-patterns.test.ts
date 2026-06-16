@@ -259,7 +259,10 @@ describe('initializationTaskCreatorIndexPattern - known fields lazy loading', ()
     savedObjectsClient.get.mockRejectedValue({ output: { statusCode: 404 } });
     savedObjectsClient.create.mockResolvedValue({
       id: 'wazuh-events-*',
-      attributes: { title: 'wazuh-events-*', fields: JSON.stringify(knownFields) },
+      attributes: {
+        title: 'wazuh-events-*',
+        fields: JSON.stringify(knownFields),
+      },
     });
 
     const task = initializationTaskCreatorIndexPattern({
@@ -271,7 +274,10 @@ describe('initializationTaskCreatorIndexPattern - known fields lazy loading', ()
     await task.run({ context, logger: mockLogger });
 
     expect(readFileSpy).toHaveBeenCalledTimes(1);
-    expect(readFileSpy).toHaveBeenCalledWith('/known-fields/events.json', 'utf8');
+    expect(readFileSpy).toHaveBeenCalledWith(
+      '/known-fields/events.json',
+      'utf8',
+    );
     // The fields parsed from disk are forwarded to the saved object creation
     expect(savedObjectsClient.create).toHaveBeenCalledWith(
       'index-pattern',
