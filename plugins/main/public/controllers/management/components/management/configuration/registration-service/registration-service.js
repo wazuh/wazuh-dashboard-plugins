@@ -39,32 +39,34 @@ const mainSettings = [
   { field: 'port', label: 'Listen to connections at port' },
   { field: 'use_source_ip', label: "Use client's source IP address" },
   { field: 'use_password', label: 'Use a password to register agents' },
-  { field: 'purge', label: 'Purge agents list when removing agents' },
+  { field: 'purge', label: 'Purge agents list on removal' },
   {
     field: 'limit_maxagents',
-    label: 'Limit registration to maximum number of agents',
+    label: 'Limit registration to max agents',
   },
   {
     field: 'force.enabled',
-    label: 'Force registration when using an existing IP address',
+    label: 'Force registration on existing IP',
   },
   {
     field: 'force.after_registration_time',
-    label:
-      'Specifies that the agent replacement will be performed only when the time (seconds) passed since the agent registration is greater than the value configured in the setting',
+    label: 'Min seconds since registration',
+    info: 'Agent replacement only occurs when the time elapsed since registration (in seconds) exceeds this value.',
   },
   {
     field: 'force.key_mismatch',
-    label: 'Avoid re-registering agents that already have valid keys',
+    label: 'Re-register only on key mismatch',
+    info: 'Avoid re-registering agents that already have valid keys.',
   },
   {
     field: 'force.disconnected_time.enabled',
-    label:
-      'Specifies that the replacement will be performed only for agents that have been disconnected longer than a certain time',
+    label: 'Replace only disconnected agents',
+    info: 'Agent replacement only applies to agents disconnected for longer than the configured duration.',
   },
   {
     field: 'force.disconnected_time.value',
-    label: 'Seconds since an agent is in a disconnected state',
+    label: 'Seconds an agent is disconnected',
+    info: 'Number of seconds an agent must be disconnected before it can be replaced.',
   },
 ];
 
