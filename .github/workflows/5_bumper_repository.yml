@@ -28,6 +28,10 @@ on:
         description: 'Issue link in format https://github.com/wazuh/<REPO>/issues/<ISSUE-NUMBER>'
         required: true
         type: string
+      bump-issue-link:
+        description: 'Issue link used in the original bump (required for revert if different from issue-link)'
+        required: false
+        type: string
       id:
         description: 'Optional identifier for the run'
         required: false
@@ -37,10 +41,6 @@ on:
         default: false
         required: false
         type: boolean
-      bump-issue-link:
-        description: 'Issue link used in the original bump (required for revert if different from issue-link)'
-        required: false
-        type: string
 
 jobs:
   bump:
