@@ -82,7 +82,7 @@
 - App Settings application removed — settings are now managed via `opensearch_dashboards.yml` or **Dashboard Management > Advanced Settings** [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871).
 - Default value of `wazuh.updates.disabled` changed from `false` to `true` — update notifications are disabled by default in Advanced Settings [#8236](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8236).
 - Only one Wazuh server API host configuration is allowed per indexer [#8436](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8436).
-- Sample Data, Docker, Statistics, and Cluster standalone applications removed [#8214](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8214) [#8215](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8215) [#8218](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8218) [#8220](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8220). The Sample Data app is no longer registered in Wazuh 5.x; internal sample data generators were adapted to the Wazuh Common Schema v5 [#7839](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7839), but end users can no longer load sample data from the UI. Remaining functionality has been redistributed across the relevant modules and Server Management.
+- Sample Data, and Cluster standalone applications removed [#8214](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8214) [#8220](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8220). The views of cluster has been redistributed to the Status app.
 
 <!-- Links -->
 
