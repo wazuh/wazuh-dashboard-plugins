@@ -43,6 +43,13 @@ interface CreateIndexPatternOptions {
   | ((params: any) => Record<string, any>);
 }
 
+interface IndexPatternOptions extends CreateIndexPatternOptions {
+  hasFields?: string[];
+  hasTemplate?: boolean;
+  hasTimeFieldName?: true | string;
+  checkDefaultIndexPattern?: boolean;
+}
+
 async function createIndexPattern(
   { logger, savedObjectsClient, indexPatternsClient },
   indexPatternID,
@@ -274,6 +281,87 @@ async function validateIndexPattern(indexPattern, options, ctx, logger) {
   }
 }
 
+export interface IndexPatternTaskDefinition {
+  taskName: string;
+  indexPatternID?: string;
+  options: IndexPatternOptions;
+}
+
+async function runIndexPatternTask(
+  { context: ctx, logger }: InitializationTaskRunContext,
+  { indexPatternID, options = {} }: Omit<IndexPatternTaskDefinition, 'taskName'>,
+) {
+  try {
+    logger.debug('Starting index pattern saved object');
+    const savedObjectsClient = getSavedObjectsClient(ctx, ctx.scope);
+    const indexPatternsClient = getIndexPatternsClient(ctx, ctx.scope);
+
+    let compatibleIndexPatterns = [];
+
+    if (indexPatternID) {
+      const savedObject = await ensureIndexPatternExistence(
+        { ...ctx, indexPatternsClient, savedObjectsClient, logger },
+        {
+          indexPatternID: indexPatternID,
+          options,
+        },
+      );
+
+      if (options.checkDefaultIndexPattern) {
+        const uiSettingsClient =
+          ctx.services.core.uiSettings.asScopedToClient(savedObjectsClient);
+        const defaultIndex = await uiSettingsClient.get('defaultIndex');
+
+        // Set defaultIndex only when null (first launch), otherwise respect user configuration when it's '' or any other value.
+        if (defaultIndex === null) {
+          logger.debug(
+            `Default index pattern is null, setting to [${savedObject.id}]`,
+          );
+          if (savedObject.id) {
+            logger.info(
+              `Setting default index pattern to [${savedObject.id}] from health check initialization task`,
+            );
+            await uiSettingsClient.set('defaultIndex', savedObject.id);
+            logger.info(`Default index pattern set to [${savedObject.id}]`);
+          }
+        } else {
+          logger.debug(`Default index pattern already configured, skipping`);
+        }
+      }
+
+      await validateIndexPattern(savedObject, options, ctx, logger);
+      compatibleIndexPatterns.push(savedObject);
+    } else {
+      const { saved_objects: savedObjects } = await savedObjectsClient.find({
+        type: ['index-pattern'],
+        perPage: 10000, // TODO: This should iterate
+        page: 1,
+      });
+
+      for (const savedObject of savedObjects) {
+        try {
+          await validateIndexPattern(savedObject, options, ctx, logger);
+          compatibleIndexPatterns.push(savedObject);
+        } catch { }
+      }
+    }
+
+    if (compatibleIndexPatterns?.length === 0) {
+      throw new Error('No compatible index patterns were found');
+    }
+
+    return compatibleIndexPatterns?.map(({ id, attributes: { title } }) => ({
+      title,
+      id,
+    }));
+  } catch (error) {
+    const message = `Error initilizating index pattern with ID [${indexPatternID}]: ${error.message}`;
+
+    logger.error(message);
+    throw new Error(message);
+  }
+}
+
 export const initializationTaskCreatorIndexPattern = ({
   taskName,
   options = {},
@@ -282,87 +370,66 @@ export const initializationTaskCreatorIndexPattern = ({
   taskProps = {},
 }: {
   taskName: string;
-  options: CreateIndexPatternOptions & {
-    hasFields?: string[];
-    hasTemplate?: boolean;
-    hasTimeFieldName?: true | string;
-    checkDefaultIndexPattern?: boolean;
-  };
+  options?: IndexPatternOptions;
   indexPatternID?: string;
+  services?: any;
+  taskProps?: Record<string, any>;
 }) => ({
   ...taskProps,
   name: taskName,
-  async run({ context: ctx, logger }: InitializationTaskRunContext) {
-    try {
-      logger.debug('Starting index pattern saved object');
-      // Get clients depending on the scope
-      const savedObjectsClient = getSavedObjectsClient(ctx, ctx.scope);
-      const indexPatternsClient = getIndexPatternsClient(ctx, ctx.scope);
+  run: (runCtx: InitializationTaskRunContext) =>
+    runIndexPatternTask(runCtx, { indexPatternID, options }),
+});
 
-      let compatibleIndexPatterns = [];
+export const initializationTaskCreatorIndexPatternBatch = ({
+  taskName,
+  indexPatterns,
+  batchSize = 5,
+  taskProps = {},
+}: {
+  taskName: string;
+  indexPatterns: IndexPatternTaskDefinition[];
+  batchSize?: number;
+  taskProps?: Record<string, any>;
+}) => ({
+  ...taskProps,
+  name: taskName,
+  async run(runCtx: InitializationTaskRunContext) {
+    const { logger } = runCtx;
+    const results: Array<{ title: string; id: string }> = [];
+    const failures: Array<{ indexPatternID?: string; message: string }> = [];
 
-      if (indexPatternID) {
-        const savedObject = await ensureIndexPatternExistence(
-          { ...ctx, indexPatternsClient, savedObjectsClient, logger },
-          {
-            indexPatternID: indexPatternID,
-            options,
-          },
-        );
-
-        if (options.checkDefaultIndexPattern) {
-          const uiSettingsClient =
-            ctx.services.core.uiSettings.asScopedToClient(savedObjectsClient);
-          const defaultIndex = await uiSettingsClient.get('defaultIndex');
-
-          // Set defaultIndex only when null (first launch), otherwise respect user configuration when it's '' or any other value.
-          if (defaultIndex === null) {
-            logger.debug(
-              `Default index pattern is null, setting to [${savedObject.id}]`,
-            );
-            if (savedObject.id) {
-              logger.info(
-                `Setting default index pattern to [${savedObject.id}] from health check initialization task`,
-              );
-              await uiSettingsClient.set('defaultIndex', savedObject.id);
-              logger.info(`Default index pattern set to [${savedObject.id}]`);
-            }
-          } else {
-            logger.debug(`Default index pattern already configured, skipping`);
-          }
+    for (let i = 0; i < indexPatterns.length; i += batchSize) {
+      const batch = indexPatterns.slice(i, i + batchSize);
+      logger.debug(
+        `Processing index pattern batch ${Math.floor(i / batchSize) + 1}` +
+          ` (patterns ${i + 1}-${Math.min(i + batchSize, indexPatterns.length)}` +
+          ` of ${indexPatterns.length})`,
+      );
+      const settled = await Promise.allSettled(
+        batch.map(({ indexPatternID, options }) =>
+          runIndexPatternTask(runCtx, { indexPatternID, options }),
+        ),
+      );
+      settled.forEach((outcome, idx) => {
+        if (outcome.status === 'fulfilled') {
+          results.push(...outcome.value);
+        } else {
+          failures.push({
+            indexPatternID: batch[idx].indexPatternID,
+            message: outcome.reason?.message ?? String(outcome.reason),
+          });
         }
-
-        await validateIndexPattern(savedObject, options, ctx, logger);
-        compatibleIndexPatterns.push(savedObject);
-      } else {
-        const { saved_objects: savedObjects } = await savedObjectsClient.find({
-          type: ['index-pattern'],
-          perPage: 10000, // TODO: This should iterate
-          page: 1,
-        });
-
-        for (const savedObject of savedObjects) {
-          try {
-            await validateIndexPattern(savedObject, options, ctx, logger);
-            compatibleIndexPatterns.push(savedObject);
-          } catch { }
-        }
-      }
-
-      if (compatibleIndexPatterns?.length === 0) {
-        throw new Error('No compatible index patterns were found');
-      }
-
-      return compatibleIndexPatterns?.map(({ id, attributes: { title } }) => ({
-        title,
-        id,
-      }));
-    } catch (error) {
-      const message = `Error initilizating index pattern with ID [${indexPatternID}]: ${error.message}`;
-
-      logger.error(message);
-      throw new Error(message);
+      });
     }
+
+    if (failures.length > 0) {
+      throw new Error(
+        `Some index patterns could not be initialized: ` +
+          failures.map(f => `[${f.indexPatternID}] ${f.message}`).join('; '),
+      );
+    }
+    return results;
   },
 });
 
