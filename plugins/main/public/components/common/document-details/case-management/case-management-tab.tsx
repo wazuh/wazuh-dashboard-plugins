@@ -123,43 +123,41 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
   const readOnlyItems = [
     {
       title: 'Tags',
-      description: (
-        tags.length
-          ? tags.map(tag => (
+      description: tags.length
+        ? tags.map(tag => (
             <EuiBadge key={tag.label} color='hollow'>
               {tag.label}
             </EuiBadge>
           ))
-          : '—'
-      ),
+        : '—',
     },
     {
       title: 'Comment',
-      description: comment || '—'
+      description: comment || '—',
     },
     ...(!isNewCase
       ? [
-        {
-          title: 'User',
-          description: caseUsername || '—'
-        },
-      ]
+          {
+            title: 'User',
+            description: caseUsername || '—',
+          },
+        ]
       : []),
     ...(existingCreatedAt
       ? [
-        {
-          title: 'Created at',
-          description: formatUIDate(existingCreatedAt)
-        },
-      ]
+          {
+            title: 'Created at',
+            description: formatUIDate(existingCreatedAt),
+          },
+        ]
       : []),
     ...(existingUpdatedAt
       ? [
-        {
-          title: 'Updated at',
-          description: formatUIDate(existingUpdatedAt)
-        },
-      ]
+          {
+            title: 'Updated at',
+            description: formatUIDate(existingUpdatedAt),
+          },
+        ]
       : []),
   ];
 
