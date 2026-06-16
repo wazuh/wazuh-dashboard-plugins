@@ -18,8 +18,6 @@ import {
   EuiComboBox,
   EuiConfirmModal,
   EuiDescriptionList,
-  EuiDescriptionListDescription,
-  EuiDescriptionListTitle,
   EuiFlexGroup,
   EuiFlexItem,
   EuiForm,
@@ -124,66 +122,44 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
 
   const readOnlyItems = [
     {
-      title: <EuiDescriptionListTitle>Tags</EuiDescriptionListTitle>,
+      title: 'Tags',
       description: (
-        <EuiDescriptionListDescription>
-          {tags.length
-            ? tags.map(tag => (
-                <EuiBadge key={tag.label} color='hollow'>
-                  {tag.label}
-                </EuiBadge>
-              ))
-            : '—'}
-        </EuiDescriptionListDescription>
+        tags.length
+          ? tags.map(tag => (
+            <EuiBadge key={tag.label} color='hollow'>
+              {tag.label}
+            </EuiBadge>
+          ))
+          : '—'
       ),
     },
     {
-      title: <EuiDescriptionListTitle>Comment</EuiDescriptionListTitle>,
-      description: (
-        <EuiDescriptionListDescription>
-          {comment || '—'}
-        </EuiDescriptionListDescription>
-      ),
+      title: 'Comment',
+      description: comment || '—'
     },
     ...(!isNewCase
       ? [
-          {
-            title: <EuiDescriptionListTitle>User</EuiDescriptionListTitle>,
-            description: (
-              <EuiDescriptionListDescription>
-                {caseUsername || '—'}
-              </EuiDescriptionListDescription>
-            ),
-          },
-        ]
+        {
+          title: 'User',
+          description: caseUsername || '—'
+        },
+      ]
       : []),
     ...(existingCreatedAt
       ? [
-          {
-            title: (
-              <EuiDescriptionListTitle>Created at</EuiDescriptionListTitle>
-            ),
-            description: (
-              <EuiDescriptionListDescription>
-                {formatUIDate(existingCreatedAt)}
-              </EuiDescriptionListDescription>
-            ),
-          },
-        ]
+        {
+          title: 'Created at',
+          description: formatUIDate(existingCreatedAt)
+        },
+      ]
       : []),
     ...(existingUpdatedAt
       ? [
-          {
-            title: (
-              <EuiDescriptionListTitle>Updated at</EuiDescriptionListTitle>
-            ),
-            description: (
-              <EuiDescriptionListDescription>
-                {formatUIDate(existingUpdatedAt)}
-              </EuiDescriptionListDescription>
-            ),
-          },
-        ]
+        {
+          title: 'Updated at',
+          description: formatUIDate(existingUpdatedAt)
+        },
+      ]
       : []),
   ];
 
@@ -273,6 +249,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
             compressed
             listItems={readOnlyItems}
             columnWidths={[1, 3]}
+            descriptionProps={{ style: { textAlign: 'justify' } }}
           />
         </EuiFlexItem>
       )}
@@ -286,6 +263,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 compressed
                 listItems={readOnlyItems.slice(2)}
                 columnWidths={[1, 3]}
+                descriptionProps={{ style: { textAlign: 'justify' } }}
               />
             </EuiFlexItem>
           )}
