@@ -14,7 +14,7 @@
   - Guided promotion workflow to move validated content from **Draft** to **Test**, and from **Test** to **Custom**.
 - New "[Active Response][active-response-module]" module [#34606](https://github.com/wazuh/wazuh/issues/34606).
   - Dedicated section under **Explore > Active Responses** to create, edit, mute, and delete active responses — managed as a dedicated channel type, strictly separate from standard notification channels [wazuh/wazuh-indexer-notifications#3](https://github.com/wazuh/wazuh-indexer-notifications/issues/3) [wazuh/wazuh-dashboard-notifications#12](https://github.com/wazuh/wazuh-dashboard-notifications/issues/12).
-  - Execution history browsable in Discover via the `wazuh-active-responses*` index pattern, provisioned automatically at startup [#8154](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8154).
+  - Active response dispatch records browsable in Discover via the `wazuh-active-responses*` index pattern, provisioned automatically at startup [#8154](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8154).
   - New "Active Response" monitor type in Alerting that allows defining the new active response action using the "Add Active Response" button in Alerting monitor trigger configuration — only active response channels are shown, independently of standard notifications [wazuh/wazuh-dashboard-alerting#6](https://github.com/wazuh/wazuh-dashboard-alerting/issues/6).
   - New **Active Response** dashboard under **Security operations > Active Response** to monitor active response execution data [#8601](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8601).
 - Dashboard revamp for Wazuh 5.0 [#8031](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8031).
