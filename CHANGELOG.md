@@ -32,7 +32,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added button that allows to request CTI content update [#8201](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8201)
 - Added CTI Console registration flow (UI and registration status API) [#8486](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8486)[#7663](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7663)[#8629](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8629)
 - Added `wazuh-metrics-normalization*` index pattern [#8480](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8480)
-- Added Engine Health dashboard [#8485](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8485)
+- Added Normalization tab and dashboard in `Server Management` > `Statistics`[#8485](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8485) [#8600](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8600) [#8524](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8524)
 - Added Case Management tab to Findings document details flyout [#8580](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8580)[#8589](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8589) [#8598](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8598)
 - Added Cases tab to the Threat Hunting module [#8583](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8583)
 - Added visualizations to Vulnerability Detection > Inventory [#8611](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8611)
@@ -96,7 +96,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Updated the OS icon source field in the Endpoints summary table to display Linux agent icons [#8459](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8459)
 - Reworked Statistics dashboard [#8254](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8254)
 - Updated the breadcrumb label in `Agents management / Summary` [#8498](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8498)
-- Renamed Listener Engine and Engine Health tabs to Comms and Normalizations in Server management > Statistics section [#8524](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8524)
+- Renamed Listener Engine tab to Comms in Server management > Statistics section [#8524](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8524)
 - Reworked FIM overview and agent tab [#8552](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8552)
 - Updated MITRE ATT&CK dashboards to use techniques, subtechniques and tactics names [#8573](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8573) [#8617](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8617)
 
