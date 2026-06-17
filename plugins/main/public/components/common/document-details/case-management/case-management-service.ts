@@ -49,7 +49,6 @@ export async function getFindingsCase(
       `/indexer/findings/case/${encodeURIComponent(index)}/${encodeURIComponent(
         docId,
       )}`,
-      {},
     );
   return response?.data?.case ?? null;
 }
@@ -75,4 +74,22 @@ export async function updateDocumentCase(
     payload,
   );
   return response?.data?.case;
+}
+
+/**
+ * Removes the case management fields from a findings document.
+ */
+export async function cleanDocumentCase(
+  index: string,
+  docId: string,
+): Promise<CaseData | null> {
+  const response: { data: { case: CaseData | null } } =
+    await GenericRequest.request(
+      'DELETE',
+      `/indexer/findings/case/${encodeURIComponent(index)}/${encodeURIComponent(
+        docId,
+      )}`,
+      {},
+    );
+  return response?.data?.case ?? null;
 }
