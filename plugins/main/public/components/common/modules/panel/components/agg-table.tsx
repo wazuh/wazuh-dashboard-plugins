@@ -50,18 +50,17 @@ export const AggTable = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | undefined>(undefined);
   const [esResults, setEsResults] = useState<SearchResponse | undefined>(undefined);
-  const preAppliedAggs = useMemo(() => {
-    return {
-      buckets: {
-        terms: {
-          field: aggTerm,
-          size: maxRows,
-          order,
-        },
+ const preAppliedAggs = useMemo(() => {
+  return {
+    buckets: {
+      terms: {
+        field: aggTerm,
+        size: maxRows,
+        order,
       },
-    };
-  }, []);
-
+    },
+  };
+}, [aggTerm, maxRows, order]);
   const fetchAggData = async () => {
     setIsLoading(true);
     try {
@@ -130,20 +129,26 @@ export const AggTable = ({
     }
   };
   return (
-    <EuiPanel data-test-subj={`${aggTerm}-aggTable`} {...panelProps}>
+   <EuiPanel
+  data-test-subj={`${aggTerm}-aggTable`}
+  paddingSize="l"
+  borderRadius="m"
+  {...panelProps}
+>
       <EuiTitle {...titleProps}>
         <h2>{tableTitle}</h2>
       </EuiTitle>
       <EuiInMemoryTable
-        columns={columns}
-        items={buckets}
-        loading={isLoading}
-        rowProps={getRowProps}
-        error={error ? error.message : undefined}
-        pagination={pagination}
-        onTableChange={onTableChange}
-        sorting={sorting}
-      />
+  columns={columns}
+  items={buckets}
+  loading={isLoading}
+  rowProps={getRowProps}
+  error={error ? error.message : undefined}
+  pagination={pagination}
+  onTableChange={onTableChange}
+  sorting={sorting}
+  tableLayout="auto"
+/>
     </EuiPanel>
   );
 }
