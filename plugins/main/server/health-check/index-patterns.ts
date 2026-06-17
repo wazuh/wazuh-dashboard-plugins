@@ -39,8 +39,8 @@ async function getFieldMappings(
 interface CreateIndexPatternOptions {
   fieldsNoIndices?: any;
   savedObjectOverwrite?:
-  | Record<string, any>
-  | ((params: any) => Record<string, any>);
+    | Record<string, any>
+    | ((params: any) => Record<string, any>);
 }
 
 interface IndexPatternOptions extends CreateIndexPatternOptions {
@@ -248,9 +248,10 @@ async function validateIndexPattern(indexPattern, options, ctx, logger) {
     !indexPatternHasTimeField(indexPattern, options.hasTimeFieldName)
   ) {
     throw new Error(
-      `Index pattern has missing the time field name: [${options.hasTimeFieldName !== true
-        ? options.hasTimeFieldName
-        : 'any compatible field'
+      `Index pattern has missing the time field name: [${
+        options.hasTimeFieldName !== true
+          ? options.hasTimeFieldName
+          : 'any compatible field'
       }]`,
     );
   }
@@ -289,7 +290,10 @@ export interface IndexPatternTaskDefinition {
 
 async function runIndexPatternTask(
   { context: ctx, logger }: InitializationTaskRunContext,
-  { indexPatternID, options = {} }: Omit<IndexPatternTaskDefinition, 'taskName'>,
+  {
+    indexPatternID,
+    options = {},
+  }: Omit<IndexPatternTaskDefinition, 'taskName'>,
 ) {
   try {
     logger.debug('Starting index pattern saved object');
@@ -342,7 +346,7 @@ async function runIndexPatternTask(
         try {
           await validateIndexPattern(savedObject, options, ctx, logger);
           compatibleIndexPatterns.push(savedObject);
-        } catch { }
+        } catch {}
       }
     }
 
@@ -403,7 +407,10 @@ export const initializationTaskCreatorIndexPatternBatch = ({
       const batch = indexPatterns.slice(i, i + batchSize);
       logger.debug(
         `Processing index pattern batch ${Math.floor(i / batchSize) + 1}` +
-          ` (patterns ${i + 1}-${Math.min(i + batchSize, indexPatterns.length)}` +
+          ` (patterns ${i + 1}-${Math.min(
+            i + batchSize,
+            indexPatterns.length,
+          )}` +
           ` of ${indexPatterns.length})`,
       );
       const settled = await Promise.allSettled(

@@ -376,7 +376,8 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
     },
   },
   {
-    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_BROWSER_EXTENSIONS_STATES,
+    taskName:
+      HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_BROWSER_EXTENSIONS_STATES,
     indexPatternID: WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN,
     options: {
       fieldsNoIndices: IndexPatternITHygieneBrowserExtensionsKnownFields,
