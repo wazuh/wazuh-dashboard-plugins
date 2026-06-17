@@ -38,6 +38,7 @@ import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-
 // common components/hooks
 import { IndexPattern } from '../../../../../../../src/plugins/data/public';
 import { wzDiscoverRenderColumns } from './render-columns';
+import { useDocumentMutationSync } from './use-document-mutation-sync';
 import {
   DocumentViewTableAndJson,
   DocumentViewTableAndJsonPropsAdditionalTabs,
@@ -306,6 +307,11 @@ export const useTableDataGridFetch = ({
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
+  const { onDocumentMutated, caseRefreshKey } = useDocumentMutationSync({
+    inspectedHit,
+    setInspectedHit,
+    setResults,
+  });
 
   const onClickInspectDoc = useMemo(
     () => (index: number) => {
@@ -408,6 +414,8 @@ export const useTableDataGridFetch = ({
     dataGridProps,
     inspectedHit,
     removeInspectedHit,
+    onDocumentMutated,
+    caseRefreshKey,
   };
 };
 
@@ -420,6 +428,7 @@ export type TableDataGridWithSearchBarInspectedHitProps<K> =
     results: any; // Enhance
     inspectedHit: any; // Enhance
     removeInspectedHit: () => void;
+    onDocumentMutated?: (sourceUpdate?: Record<string, unknown>) => void;
     tableDefaultColumns: tDataGridColumn[];
   };
 
@@ -461,6 +470,7 @@ export const TableDataGridWithSearchBarInspectedHit: React.FunctionComponent<
     query,
     inspectedHit,
     removeInspectedHit,
+    onDocumentMutated,
     dataGridProps,
   }: TableDataGridWithSearchBarInspectedHitProps) => {
     return (
@@ -491,6 +501,7 @@ export const TableDataGridWithSearchBarInspectedHit: React.FunctionComponent<
             setFilters={setFilters}
             onClose={removeInspectedHit}
             onFilter={removeInspectedHit}
+            onDocumentMutated={onDocumentMutated}
             additionalTabs={additionalDocumentDetailsTabs}
           />
         )}
@@ -550,20 +561,25 @@ export const TableDataGridWithSearchBarInspectedHitFetchData: React.FunctionComp
     showSearchBar,
     tableId,
   }: TableDataGridWithSearchBarInspectedHitFetchDataProps) => {
-    const { results, dataGridProps, inspectedHit, removeInspectedHit } =
-      useTableDataGridFetch({
-        searchBarProps,
-        tableId,
-        tableDefaultColumns,
-        dataSource,
-        filters,
-        setFilters,
-        isDataSourceLoading,
-        fetchData,
-        fetchFilters,
-        fingerprint,
-        autoRefreshFingerprint,
-      });
+    const {
+      results,
+      dataGridProps,
+      inspectedHit,
+      removeInspectedHit,
+      onDocumentMutated,
+    } = useTableDataGridFetch({
+      searchBarProps,
+      tableId,
+      tableDefaultColumns,
+      dataSource,
+      filters,
+      setFilters,
+      isDataSourceLoading,
+      fetchData,
+      fetchFilters,
+      fingerprint,
+      autoRefreshFingerprint,
+    });
 
     return (
       <TableDataGridWithSearchBarInspectedHit
@@ -584,6 +600,7 @@ export const TableDataGridWithSearchBarInspectedHitFetchData: React.FunctionComp
         setFilters={setFilters}
         inspectedHit={inspectedHit}
         removeInspectedHit={removeInspectedHit}
+        onDocumentMutated={onDocumentMutated}
         inspectDetailsTitle={inspectDetailsTitle}
         additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
         tableDefaultColumns={tableDefaultColumns}
@@ -602,6 +619,7 @@ export const DocumentDetails = withWrapComponent(({ children }) => (
     filters,
     setFilters,
     onFilter,
+    onDocumentMutated,
     additionalTabs,
     showFilterButtons,
   }) => {
@@ -616,6 +634,7 @@ export const DocumentDetails = withWrapComponent(({ children }) => (
         filters={filters}
         setFilters={setFilters}
         onFilter={onFilter}
+        onDocumentMutated={onDocumentMutated}
         additionalTabs={additionalTabs}
         showFilterButtons={showFilterButtons}
       />
