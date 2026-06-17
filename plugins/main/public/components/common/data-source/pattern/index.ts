@@ -7,3 +7,4 @@ export * from './events';
 export * from './fim';
 export * from './system-inventory';
 export * from './vulnerabilities';
+export * from './active-responses';

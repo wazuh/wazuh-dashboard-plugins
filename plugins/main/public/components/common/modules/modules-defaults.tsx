@@ -20,7 +20,7 @@ import {
   WazuhDiscover,
   WazuhDiscoverProps,
 } from '../wazuh-discover/wz-discover';
-import { CaseManagementTab } from '../document-details/case-management';
+import { caseManagementDocumentDetailsTabs as findingsDocumentDetailsTabs } from '../document-details/case-management';
 import { threatHuntingColumns } from '../../overview/threat-hunting/events/threat-hunting-columns';
 import { ThreatHuntingCases } from '../../overview';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
@@ -45,6 +45,7 @@ import {
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
   WAZUH_VULNERABILITIES_PATTERN,
+  WAZUH_ACTIVE_RESPONSES_PATTERN,
 } from '../../../../common/constants';
 import {
   DashboardGitHub,
@@ -64,6 +65,7 @@ import {
   DashboardVuls,
   InventoryVuls,
   DashboardAzure,
+  DashboardActiveResponses,
 } from '../../overview';
 import {
   DockerDataSource,
@@ -126,25 +128,11 @@ const renderDiscoverTab = (props: WazuhDiscoverProps) => {
 };
 
 /**
- * Additional tabs included in the Document details flyout for all modules
- * backed by wazuh-findings-v5* indices (see wazuh-indexer-plugins#1220).
- *
- * The case management tab lets analysts triage and annotate individual findings
- * directly from the flyout without leaving the dashboard.
+ * Renders a findings discover tab with the shared Case management tab in its
+ * Document details flyout, available for all modules backed by wazuh-findings-v5*
+ * indices (see wazuh-indexer-plugins#1220). The case tab lets analysts triage and
+ * annotate individual findings directly from the flyout without leaving the dashboard.
  */
-const findingsDocumentDetailsTabs: WazuhDiscoverProps['additionalDocumentDetailsTabs'] =
-  ({ document }) => [
-    {
-      id: 'case-management',
-      name: 'Case',
-      content: (
-        <CaseManagementTab
-          document={{ _index: document._index, _id: document._id }}
-        />
-      ),
-    },
-  ];
-
 const renderFindingsDiscoverTab = (
   props: WazuhDiscoverProps,
 ): ReturnType<typeof renderDiscoverTab> =>
@@ -633,6 +621,26 @@ export const ModulesDefaults = {
         name: 'Services',
         buttons: [ButtonExploreAgent],
         component: ITHygieneServicesInventory,
+      },
+    ],
+    availableFor: ['manager', 'agent'],
+  },
+  'active-response-dashboard': {
+    init: TAB_VIEW_ID_DASHBOARD,
+    tabs: [
+      {
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
+        buttons: [
+          ({ ...props }) => (
+            <ButtonExploreAgent
+              {...props}
+              moduleIndexPatternTitle={WAZUH_ACTIVE_RESPONSES_PATTERN}
+            />
+          ),
+          ButtonModuleGenerateReport,
+        ],
+        component: DashboardActiveResponses,
       },
     ],
     availableFor: ['manager', 'agent'],

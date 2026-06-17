@@ -22,9 +22,21 @@ jest.mock('@osd/i18n/react', () => ({
   I18nProvider: ({ children }: { children: React.ReactNode }) => (
     <>{children}</>
   ),
-  FormattedMessage: ({ defaultMessage }: { defaultMessage?: string }) => (
-    <span>{defaultMessage}</span>
-  ),
+  FormattedMessage: ({
+    defaultMessage,
+    values,
+  }: {
+    defaultMessage?: string;
+    values?: Record<string, string>;
+  }) => {
+    let text = defaultMessage ?? '';
+    if (values) {
+      Object.entries(values).forEach(([key, value]) => {
+        text = text.replace(`{${key}}`, value);
+      });
+    }
+    return <span>{text}</span>;
+  },
   __esModule: true,
 }));
 
@@ -80,7 +92,7 @@ describe('CtiRegistration', () => {
     expect(
       screen.queryByRole('button', { name: 'Wazuh XDR registration' }),
     ).not.toBeInTheDocument();
-    expect(screen.getByText('Wazuh Cloud')).toBeInTheDocument();
+    expect(screen.getByText('Wazuh Cloud - Premium Plan')).toBeInTheDocument();
     expect(mockHttpPost).not.toHaveBeenCalled();
     expect(ctiFlowState.isRegistered()).toBe(true);
   });

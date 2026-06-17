@@ -48,27 +48,29 @@ const InventoryDashboard = compose(
     categoriesSampleData,
     classNameDashboardWrapper,
     additionalDocumentDetailsTabs,
-    externalRefreshKey,
   }: InventoryDashboardTableProps) => {
-    const combinedFingerprint =
-      externalRefreshKey !== undefined
-        ? (fingerprint ?? 0) + externalRefreshKey
-        : fingerprint;
+    const {
+      results,
+      dataGridProps,
+      inspectedHit,
+      removeInspectedHit,
+      onDocumentMutated,
+      caseRefreshKey,
+    } = useTableDataGridFetch({
+      searchBarProps,
+      tableId,
+      tableDefaultColumns,
+      dataSource,
+      filters,
+      fetchFilters,
+      setFilters,
+      fetchData,
+      fingerprint,
+      autoRefreshFingerprint,
+      isDataSourceLoading,
+    });
 
-    const { results, dataGridProps, inspectedHit, removeInspectedHit } =
-      useTableDataGridFetch({
-        searchBarProps,
-        tableId,
-        tableDefaultColumns,
-        dataSource,
-        filters,
-        fetchFilters,
-        setFilters,
-        fetchData,
-        fingerprint: combinedFingerprint,
-        autoRefreshFingerprint,
-        isDataSourceLoading,
-      });
+    const dashboardFingerprint = (fingerprint ?? 0) + caseRefreshKey;
 
     const shouldHideDashboard = !Boolean(results?.hits?.total > 0);
 
@@ -116,7 +118,7 @@ const InventoryDashboard = compose(
                           ...dataSource,
                           searchBarProps,
                           fetchFilters,
-                          fingerprint: combinedFingerprint,
+                          fingerprint: dashboardFingerprint,
                           autoRefreshFingerprint,
                         },
                       }}
@@ -162,6 +164,7 @@ const InventoryDashboard = compose(
                   results={results}
                   inspectedHit={inspectedHit}
                   removeInspectedHit={removeInspectedHit}
+                  onDocumentMutated={onDocumentMutated}
                   tableDefaultColumns={tableDefaultColumns}
                   additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
                 />
@@ -189,7 +192,6 @@ export interface InventoryDashboardTableProps {
   categoriesSampleData?: string[];
   classNameDashboardWrapper?: string;
   additionalDocumentDetailsTabs?: TableDataGridWithSearchBarInspectedHitProps<K>['additionalDocumentDetailsTabs'];
-  externalRefreshKey?: number;
 }
 
 export const InventoryDashboardTable = ({
@@ -203,7 +205,6 @@ export const InventoryDashboardTable = ({
   tableId,
   additionalDocumentDetailsTabs,
   categoriesSampleData,
-  externalRefreshKey,
 }: InventoryDashboardTableProps) => {
   const {
     dataSource,
@@ -242,7 +243,6 @@ export const InventoryDashboardTable = ({
       isDataSourceLoading={isDataSourceLoading}
       searchBarProps={searchBarProps}
       autoRefreshFingerprint={autoRefreshFingerprint}
-      externalRefreshKey={externalRefreshKey}
       tableDefaultColumns={tableDefaultColumns}
       getDashboardPanels={getDashboardPanels}
       managedFilters={managedFilters}

@@ -11,6 +11,7 @@
  */
 
 export { CaseManagementTab } from './case-management-tab';
+export { caseManagementDocumentDetailsTabs } from './case-management-document-details-tabs';
 export { useCaseManagementForm } from './use-case-management-form';
 export type {
   CaseManagementFormDocument,

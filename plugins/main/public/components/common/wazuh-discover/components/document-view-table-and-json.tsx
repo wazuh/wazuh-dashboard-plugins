@@ -14,6 +14,7 @@ interface DocumentViewTableAndJsonPropsDoc {
   filters: Filter[];
   setFilters: (filters: Filter[]) => void;
   onFilter?: () => void;
+  onDocumentMutated?: (sourceUpdate?: Record<string, unknown>) => void;
 }
 
 type DocumentViewTableAndJsonPropsAdditionalTabsObject = {
@@ -40,6 +41,7 @@ export const DocumentViewTableAndJson = ({
   filters,
   setFilters,
   onFilter,
+  onDocumentMutated,
   additionalTabs = [],
   showFilterButtons,
 }: DocumentViewTableAndJsonProps) => {
@@ -89,6 +91,7 @@ export const DocumentViewTableAndJson = ({
           filters,
           setFilters,
           onFilter,
+          onDocumentMutated,
         });
 
     return [
@@ -104,6 +107,7 @@ export const DocumentViewTableAndJson = ({
                 filters,
                 setFilters,
                 onFilter,
+                onDocumentMutated,
               })
             : tab.content,
       })),
