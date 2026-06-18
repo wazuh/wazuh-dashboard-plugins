@@ -48,7 +48,7 @@ jobs:
   test-packages:
     needs: build
     name: Test packages
-    runs-on: ubuntu-latest
+    runs-on: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
 
     steps:
       - name: Step 01 - Download the plugin's source code
