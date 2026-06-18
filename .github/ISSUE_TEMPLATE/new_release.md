@@ -27,7 +27,7 @@ Example:
 ### Post-release
 - [ ] Make draft releases final and public.
 - [ ] Sync branches.
-- [ ] Update [Compatibility Matrix](https://github.com/wazuh/wazuh-kibana-app/wiki/Compatibility).
+- [ ] Update [Compatibility Matrix](https://github.com/wazuh/wazuh-dashboard-plugins/wiki/Compatibility).
 
 ### Supported versions
 
