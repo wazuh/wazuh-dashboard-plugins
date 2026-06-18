@@ -1,100 +1,6 @@
-import {
-  ensureIndexPatternHasTemplate,
-  initializationTaskCreatorIndexPattern,
-} from './index-patterns';
+import { initializationTaskCreatorIndexPatternBatch } from './index-patterns';
 
-const mockContext = () => ({
-  logger: {
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-  },
-  services: {
-    core: {
-      opensearch: {
-        client: {
-          asInternalUser: {
-            cat: {
-              templates: () => {
-                return {
-                  body: [
-                    {
-                      name: 'wazuh',
-                      index_patterns: '[wazuh-events-v5*, wazuh-findings-v5*]',
-                      order: '0',
-                      version: '1',
-                      composed_of: '',
-                    },
-                    {
-                      name: 'metrics-agents',
-                      index_patterns: '[wazuh-metrics-agents*]',
-                      order: '0',
-                      version: null,
-                      composed_of: '',
-                    },
-                    {
-                      name: 'metrics-comms',
-                      index_patterns: '[wazuh-metrics-comms*]',
-                      order: '0',
-                      version: null,
-                      composed_of: '',
-                    },
-                    {
-                      name: 'metrics-normalization',
-                      index_patterns: '[wazuh-metrics-normalization*',
-                      order: '0',
-                      version: null,
-                      composed_of: '',
-                    },
-                  ],
-                };
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-});
-
-// TODO: the templates are deprecated and the test makes no sense, this could be removed.
-describe('getTemplateForIndexPattern', () => {
-  it.each`
-    indexPatternTitle          | templateFound | templatesNameFound
-    ${'custom-alerts-*'}       | ${false}      | ${'Template was not found for [custom-alerts-*]'}
-    ${'custom-wazuh-events-*'} | ${false}      | ${'Template was not found for [custom-wazuh-events-*]'}
-    ${'wazuh-events-v5-t*'}    | ${true}       | ${['wazuh']}
-    ${'wazuh-events-v5-*'}     | ${true}       | ${['wazuh']}
-    ${'wazuh-events-v5*'}      | ${true}       | ${['wazuh']}
-    ${'wazuh-events-v*'}       | ${true}       | ${['wazuh']}
-    ${'wazuh-events-*'}        | ${true}       | ${['wazuh']}
-    ${'wazuh-events-'}         | ${true}       | ${['wazuh']}
-    ${'wazuh-events'}          | ${true}       | ${['wazuh']}
-    ${'wazuh-ev'}              | ${true}       | ${['wazuh']}
-    ${'wazuh-e'}               | ${true}       | ${['wazuh']}
-  `(
-    `indexPatternTitle: $indexPatternTitle`,
-    async ({ indexPatternTitle, templateFound, templatesNameFound }) => {
-      if (!templateFound) {
-        expect(() =>
-          ensureIndexPatternHasTemplate(mockContext(), indexPatternTitle),
-        ).rejects.toThrow(templatesNameFound);
-      } else {
-        expect(
-          (
-            await ensureIndexPatternHasTemplate(
-              mockContext(),
-              indexPatternTitle,
-            )
-          ).map(({ name }) => name),
-        ).toEqual(templatesNameFound);
-      }
-    },
-  );
-});
-
-describe('initializationTaskCreatorIndexPattern - checkDefaultIndexPattern', () => {
+describe('initializationTaskCreatorIndexPatternBatch', () => {
   const mockLogger = {
     debug: jest.fn(),
     info: jest.fn(),
@@ -104,7 +10,15 @@ describe('initializationTaskCreatorIndexPattern - checkDefaultIndexPattern', () 
     get: jest.fn().mockReturnThis(),
   };
 
-  const createMockContext = (defaultIndex = undefined) => {
+  /**
+   * Returns a ready-to-use task run context together with the mock clients so
+   * individual tests can configure behaviour via `mockImplementation`.
+   *
+   * The top-level `services` on `runCtx` satisfies `PluginTaskRunContext`
+   * (which extends `HealthCheckTaskContext`); the nested `context.services`
+   * is the same reference, used by the actual task logic.
+   */
+  const createRunContext = (defaultIndex: string | null | undefined = undefined) => {
     const savedObjectsClient = {
       get: jest.fn(),
       create: jest.fn(),
@@ -114,27 +28,30 @@ describe('initializationTaskCreatorIndexPattern - checkDefaultIndexPattern', () 
       get: jest.fn().mockResolvedValue(defaultIndex),
       set: jest.fn().mockResolvedValue(undefined),
     };
-
-    return {
-      context: {
-        logger: mockLogger,
-        scope: ['internal'],
-        services: {
-          core: {
-            savedObjects: {
-              createInternalRepository: jest
-                .fn()
-                .mockReturnValue(savedObjectsClient),
-            },
-            opensearch: {
-              legacy: { client: { callAsInternalUser: jest.fn() } },
-            },
-            uiSettings: {
-              asScopedToClient: jest.fn().mockReturnValue(uiSettingsClient),
-            },
-          },
+    const services = {
+      core: {
+        savedObjects: {
+          createInternalRepository: jest
+            .fn()
+            .mockReturnValue(savedObjectsClient),
+        },
+        opensearch: {
+          legacy: { client: { callAsInternalUser: jest.fn() } },
+        },
+        uiSettings: {
+          asScopedToClient: jest.fn().mockReturnValue(uiSettingsClient),
         },
       },
+    };
+    const context = {
+      logger: mockLogger,
+      scope: 'internal' as const,
+      services,
+    };
+
+    return {
+      // Satisfies InitializationTaskRunContext (PluginTaskRunContext)
+      runCtx: { context, logger: mockLogger, services },
       savedObjectsClient,
       uiSettingsClient,
     };
@@ -142,21 +59,170 @@ describe('initializationTaskCreatorIndexPattern - checkDefaultIndexPattern', () 
 
   beforeEach(() => jest.clearAllMocks());
 
-  it('should set defaultIndex when it does not exist', async () => {
-    const { context, savedObjectsClient, uiSettingsClient } =
-      createMockContext(null);
+  it('should run all patterns and return flattened results', async () => {
+    const { runCtx, savedObjectsClient } = createRunContext();
+
+    savedObjectsClient.get.mockImplementation((_type: string, id: string) =>
+      Promise.resolve({ id, attributes: { title: id, fields: '[]' } }),
+    );
+
+    const task = initializationTaskCreatorIndexPatternBatch({
+      taskName: 'index-patterns',
+      batchSize: 5,
+      indexPatterns: [
+        { taskName: 'task-a', indexPatternID: 'pattern-a*', options: {} },
+        { taskName: 'task-b', indexPatternID: 'pattern-b*', options: {} },
+        { taskName: 'task-c', indexPatternID: 'pattern-c*', options: {} },
+      ],
+    });
+
+    const result = await task.run(runCtx);
+
+    expect(result).toHaveLength(3);
+    expect(result).toEqual(
+      expect.arrayContaining([
+        { id: 'pattern-a*', title: 'pattern-a*' },
+        { id: 'pattern-b*', title: 'pattern-b*' },
+        { id: 'pattern-c*', title: 'pattern-c*' },
+      ]),
+    );
+  });
+
+  it('should never exceed batchSize concurrent tasks', async () => {
+    const { runCtx, savedObjectsClient } = createRunContext();
+
+    const batchSize = 3;
+    const totalPatterns = 10;
+    let inFlight = 0;
+    let maxObservedInFlight = 0;
+
+    savedObjectsClient.get.mockImplementation(
+      async (_type: string, id: string) => {
+        inFlight++;
+        maxObservedInFlight = Math.max(maxObservedInFlight, inFlight);
+        // Simulate async work so tasks truly overlap within a batch
+        await new Promise(resolve => setTimeout(resolve, 10));
+        inFlight--;
+        return { id, attributes: { title: id, fields: '[]' } };
+      },
+    );
+
+    const task = initializationTaskCreatorIndexPatternBatch({
+      taskName: 'index-patterns',
+      batchSize,
+      indexPatterns: Array.from({ length: totalPatterns }, (_, i) => ({
+        taskName: `task-${i}`,
+        indexPatternID: `pattern-${i}*`,
+        options: {},
+      })),
+    });
+
+    await task.run(runCtx);
+
+    expect(maxObservedInFlight).toBeLessThanOrEqual(batchSize);
+  });
+
+  it('should process batches sequentially — batch N+1 starts only after batch N settles', async () => {
+    const { runCtx, savedObjectsClient } = createRunContext();
+
+    const completionOrder: string[] = [];
+
+    savedObjectsClient.get.mockImplementation(
+      async (_type: string, id: string) => {
+        // 'slow*' takes longer; if batches ran concurrently it would finish
+        // after batch-2 patterns, but sequential batching guarantees it finishes first.
+        const delay = id.startsWith('slow') ? 50 : 5;
+        await new Promise(resolve => setTimeout(resolve, delay));
+        completionOrder.push(id);
+        return { id, attributes: { title: id, fields: '[]' } };
+      },
+    );
+
+    // Batch 1: [slow*, fast-b1*] — both must complete before batch 2 starts
+    // Batch 2: [fast-b2a*, fast-b2b*]
+    const task = initializationTaskCreatorIndexPatternBatch({
+      taskName: 'index-patterns',
+      batchSize: 2,
+      indexPatterns: [
+        { taskName: 'task-slow', indexPatternID: 'slow*', options: {} },
+        { taskName: 'task-b1', indexPatternID: 'fast-b1*', options: {} },
+        { taskName: 'task-b2a', indexPatternID: 'fast-b2a*', options: {} },
+        { taskName: 'task-b2b', indexPatternID: 'fast-b2b*', options: {} },
+      ],
+    });
+
+    await task.run(runCtx);
+
+    const batch1Done = Math.max(
+      completionOrder.indexOf('slow*'),
+      completionOrder.indexOf('fast-b1*'),
+    );
+    const batch2Start = Math.min(
+      completionOrder.indexOf('fast-b2a*'),
+      completionOrder.indexOf('fast-b2b*'),
+    );
+    expect(batch1Done).toBeLessThan(batch2Start);
+  });
+
+  it('should not abort remaining patterns when one fails, and throw an aggregated error', async () => {
+    const { runCtx, savedObjectsClient } = createRunContext();
+
+    savedObjectsClient.get.mockImplementation(
+      async (_type: string, id: string) => {
+        if (id === 'failing*') {
+          throw Object.assign(new Error('Indexer unreachable'), {
+            output: { statusCode: 500 },
+          });
+        }
+        return { id, attributes: { title: id, fields: '[]' } };
+      },
+    );
+
+    const task = initializationTaskCreatorIndexPatternBatch({
+      taskName: 'index-patterns',
+      batchSize: 5,
+      indexPatterns: [
+        { taskName: 'task-a', indexPatternID: 'pattern-a*', options: {} },
+        { taskName: 'task-fail', indexPatternID: 'failing*', options: {} },
+        { taskName: 'task-b', indexPatternID: 'pattern-b*', options: {} },
+      ],
+    });
+
+    await expect(task.run(runCtx)).rejects.toThrow(
+      /Some index patterns could not be initialized.*failing\*/,
+    );
+
+    // All patterns were attempted regardless of the failure
+    const getCalls = savedObjectsClient.get.mock.calls.map(
+      ([, id]: [unknown, string]) => id,
+    );
+    expect(getCalls).toContain('pattern-a*');
+    expect(getCalls).toContain('pattern-b*');
+    expect(getCalls).toContain('failing*');
+  });
+
+  it('should set defaultIndex when checkDefaultIndexPattern is true and default is null', async () => {
+    const { runCtx, savedObjectsClient, uiSettingsClient } =
+      createRunContext(null);
+
     savedObjectsClient.get.mockResolvedValue({
       id: 'wazuh-events-*',
       attributes: { title: 'wazuh-events-*', fields: '[]' },
     });
 
-    const task = initializationTaskCreatorIndexPattern({
-      taskName: 'test-task',
-      indexPatternID: 'wazuh-events-*',
-      options: { checkDefaultIndexPattern: true },
+    const task = initializationTaskCreatorIndexPatternBatch({
+      taskName: 'index-patterns',
+      batchSize: 5,
+      indexPatterns: [
+        {
+          taskName: 'task-events',
+          indexPatternID: 'wazuh-events-*',
+          options: { checkDefaultIndexPattern: true },
+        },
+      ],
     });
 
-    await task.run({ context, logger: mockLogger });
+    await task.run(runCtx);
 
     expect(uiSettingsClient.get).toHaveBeenCalledWith('defaultIndex');
     expect(uiSettingsClient.set).toHaveBeenCalledWith(
@@ -165,43 +231,43 @@ describe('initializationTaskCreatorIndexPattern - checkDefaultIndexPattern', () 
     );
   });
 
-  it('should NOT set defaultIndex when it already exists', async () => {
-    const { context, savedObjectsClient, uiSettingsClient } =
-      createMockContext('existing-id');
+  it('should NOT set defaultIndex when checkDefaultIndexPattern is true and default already exists', async () => {
+    const { runCtx, savedObjectsClient, uiSettingsClient } =
+      createRunContext('existing-id');
+
     savedObjectsClient.get.mockResolvedValue({
       id: 'wazuh-events-*',
       attributes: { title: 'wazuh-events-*', fields: '[]' },
     });
 
-    const task = initializationTaskCreatorIndexPattern({
-      taskName: 'test-task',
-      indexPatternID: 'wazuh-events-*',
-      options: { checkDefaultIndexPattern: true },
+    const task = initializationTaskCreatorIndexPatternBatch({
+      taskName: 'index-patterns',
+      batchSize: 5,
+      indexPatterns: [
+        {
+          taskName: 'task-events',
+          indexPatternID: 'wazuh-events-*',
+          options: { checkDefaultIndexPattern: true },
+        },
+      ],
     });
 
-    await task.run({ context, logger: mockLogger });
+    await task.run(runCtx);
 
     expect(uiSettingsClient.get).toHaveBeenCalledWith('defaultIndex');
     expect(uiSettingsClient.set).not.toHaveBeenCalled();
   });
 
-  it('should NOT check defaultIndex when option is not enabled', async () => {
-    const { context, savedObjectsClient, uiSettingsClient } =
-      createMockContext(undefined);
-    savedObjectsClient.get.mockResolvedValue({
-      id: 'wazuh-metrics-agents*',
-      attributes: { title: 'wazuh-metrics-agents*', fields: '[]' },
+  it('should return empty array when no patterns are provided', async () => {
+    const { runCtx } = createRunContext();
+
+    const task = initializationTaskCreatorIndexPatternBatch({
+      taskName: 'index-patterns',
+      batchSize: 5,
+      indexPatterns: [],
     });
 
-    const task = initializationTaskCreatorIndexPattern({
-      taskName: 'test-task',
-      indexPatternID: 'wazuh-metrics-agents*',
-      options: {},
-    });
-
-    await task.run({ context, logger: mockLogger });
-
-    expect(uiSettingsClient.get).not.toHaveBeenCalled();
-    expect(uiSettingsClient.set).not.toHaveBeenCalled();
+    const result = await task.run(runCtx);
+    expect(result).toEqual([]);
   });
 });

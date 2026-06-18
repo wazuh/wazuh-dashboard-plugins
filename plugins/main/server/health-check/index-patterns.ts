@@ -14,28 +14,6 @@ interface EnsureIndexPatternExistenceContextTask {
   options: any;
 }
 
-async function getFieldMappings(
-  { logger, indexPatternsClient },
-  indexPatternTitle: string,
-) {
-  logger.debug(`Getting index pattern fields for title [${indexPatternTitle}]`);
-
-  // https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.16.0/src/plugins/data/server/index_patterns/routes.ts#L74
-  const fields = await indexPatternsClient.getFieldsForWildcard({
-    pattern: indexPatternTitle,
-    // meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score
-    metaFields: ['_source', '_id', '_type', '_index', '_score'],
-  });
-
-  logger.debug(
-    `Fields for index pattern with title [${indexPatternTitle}]: ${JSON.stringify(
-      fields,
-    )}`,
-  );
-
-  return fields;
-}
-
 interface CreateIndexPatternOptions {
   fieldsNoIndices?: any;
   savedObjectOverwrite?:
@@ -365,25 +343,6 @@ async function runIndexPatternTask(
     throw new Error(message);
   }
 }
-
-export const initializationTaskCreatorIndexPattern = ({
-  taskName,
-  options = {},
-  indexPatternID,
-  services,
-  taskProps = {},
-}: {
-  taskName: string;
-  options?: IndexPatternOptions;
-  indexPatternID?: string;
-  services?: any;
-  taskProps?: Record<string, any>;
-}) => ({
-  ...taskProps,
-  name: taskName,
-  run: (runCtx: InitializationTaskRunContext) =>
-    runIndexPatternTask(runCtx, { indexPatternID, options }),
-});
 
 export const initializationTaskCreatorIndexPatternBatch = ({
   taskName,
