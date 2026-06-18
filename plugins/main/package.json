@@ -61,7 +61,6 @@
     "fix:ndjson-descriptions": "node ../../scripts/check-ndjson-descriptions/index.mjs --fix"
   },
   "dependencies": {
-    "dompurify": "3.3.2",
     "install": "^0.13.0",
     "js2xmlparser": "^5.0.0",
     "jsdom": "^16.6.0",
