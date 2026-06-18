@@ -255,7 +255,7 @@ bash run-docker-compose.sh \
     --reporting $WAZUH_REPORTING_DASHBOARDS_PLUGIN_BRANCH \
     --security $WAZUH_SECURITY_DASHBOARDS_PLUGIN_BRANCH \
     --securityAnalytics $WAZUH_SECURITY_ANALYTICS_DASHBOARDS_PLUGIN_BRANCH \
-    --node-version 22.22.0
+    --node-version 22.22.3
 ```
 
 > Note: for `arm` package adds the `--arm` option.
