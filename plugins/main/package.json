@@ -76,8 +76,8 @@
     "@eslint/compat": "^1.1.1",
     "@eslint/js": "^10.0.1",
     "@types/node-cron": "^2.0.3",
-    "@typescript-eslint/eslint-plugin": "^8.56.1",
-    "@typescript-eslint/parser": "^8.56.1",
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
+    "@typescript-eslint/parser": "^8.58.0",
     "eslint": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "3.5.5",
@@ -93,7 +93,7 @@
     "prettier": "^2.7.1",
     "redux-mock-store": "^1.5.4",
     "swagger-client": "^3.37.1",
-    "typescript": "^5.5.2",
-    "typescript-eslint": "^8.56.1"
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.58.0"
   }
 }
