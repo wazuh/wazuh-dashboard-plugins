@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { IndexPatternsFetcher } from '../../../../src/plugins/data/server';
 import {
   indexPatternHasMissingFields,
@@ -15,7 +16,11 @@ interface EnsureIndexPatternExistenceContextTask {
 }
 
 interface CreateIndexPatternOptions {
-  fieldsNoIndices?: any;
+  // Path to the known-fields JSON file used to seed the index pattern when no
+  // backing indices exist yet. It is a path instead of a preloaded object so
+  // the (large) JSON is read from disk only when an index pattern actually
+  // needs to be created, and is released for garbage collection afterwards.
+  fieldsNoIndicesFilePath?: string;
   savedObjectOverwrite?:
     | Record<string, any>
     | ((params: any) => Record<string, any>);
@@ -28,16 +33,24 @@ interface IndexPatternOptions extends CreateIndexPatternOptions {
   checkDefaultIndexPattern?: boolean;
 }
 
+async function loadKnownFields(filePath: string) {
+  const rawContent = await fs.promises.readFile(filePath, 'utf8');
+
+  return JSON.parse(rawContent);
+}
+
 async function createIndexPattern(
   { logger, savedObjectsClient, indexPatternsClient },
   indexPatternID,
   options: CreateIndexPatternOptions = {},
 ) {
   try {
-    let fieldsObj;
-
-    // The creation of the index pattern will always rely on the defined known fields.
-    fieldsObj = options.fieldsNoIndices;
+    // The creation of the index pattern will always rely on the defined known
+    // fields. The JSON is read from disk here, scoped to this execution, so it
+    // becomes eligible for garbage collection once the task completes.
+    const fieldsObj = options.fieldsNoIndicesFilePath
+      ? await loadKnownFields(options.fieldsNoIndicesFilePath)
+      : undefined;
 
     const title = indexPatternID;
     const fields = JSON.stringify(fieldsObj);
