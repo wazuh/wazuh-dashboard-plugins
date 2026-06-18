@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { CoreStart } from 'opensearch_dashboards/public';
 
 export const registerHeaderNavControl = (
@@ -14,11 +14,10 @@ export const registerHeaderNavControl = (
   ]({
     order: 100,
     mount: (el: HTMLElement) => {
-      ReactDOM.render(<Components {...params} />, el);
+      const root = createRoot(el);
+      root.render(<Components {...params} />);
 
-      return () => {
-        ReactDOM.unmountComponentAtNode(el);
-      };
+      return () => root.unmount();
     },
   });
 };

@@ -1,5 +1,5 @@
-import React, { useEffect, useRef} from "react";
-import ReactDOM from "react-dom";
+import React, { useEffect, useRef } from "react";
+import { createRoot } from 'react-dom/client';
 import d3 from 'd3';
 import { useChartDimensions } from '../hooks/use_chart_dimensions';
 
@@ -23,12 +23,13 @@ export const ChartDonut = (props : ChartDonutProps) => {
   const pieRef: null | any = useRef();
   const cache = useRef(props.data);
   const [ref, dms] = useChartDimensions({}, pieRef);
-  
+  const tooltipRootRef = useRef();
+
   const size = dms.height;
   const outerRadius = size / 2;
   const innerRadius = outerRadius - Math.min(20, size * 0.2);
   let tooltip;
-  
+
   const createPie = d3.layout
     .pie()
     .value(d => d.value)
@@ -54,6 +55,8 @@ export const ChartDonut = (props : ChartDonutProps) => {
     tooltip = d3.select("body")
       .append("div")
       .attr("class", "wz-chart-tooltip visTooltip");
+
+    tooltipRootRef.current = createRoot(tooltip[0][0]);
   }
 
   const onMove = (d) => {
@@ -66,10 +69,14 @@ export const ChartDonut = (props : ChartDonutProps) => {
       .style("visibility", 'visible')
       .style("position", 'absolute')
       .style("display", "block");
-    ReactDOM.render(<TooltipContent data={d.data} />, tooltip[0][0]);
+    tooltipRootRef.current.render(<TooltipContent data={d.data} />)
   }
 
-  const onOut = () => d3.select("body > div.wz-chart-tooltip").remove()
+  const onOut = () => {
+    tooltipRootRef.current?.unmount();
+    tooltipRootRef.current = null;
+    d3.select("body > div.wz-chart-tooltip").remove()
+  }
   // end of chart mouse events
 
   useEffect(() => {
@@ -80,7 +87,7 @@ export const ChartDonut = (props : ChartDonutProps) => {
 
     groupWithData.exit().remove();
 
-    
+
     groupWithData
       .enter()
       .append("g")
@@ -88,7 +95,7 @@ export const ChartDonut = (props : ChartDonutProps) => {
       .on("mouseenter", () => onEnter())
       .on("mousemove", (d) => onMove(d))
       .on("mouseout", onOut)
-      
+
     const path = groupWithData.select('path')[0].filter(item => item != null).length ? groupWithData.select("path") : groupWithData.append("path");
 
     const arcTween = (d, i) => {
