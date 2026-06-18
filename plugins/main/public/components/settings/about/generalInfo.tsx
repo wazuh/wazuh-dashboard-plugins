@@ -99,7 +99,7 @@ export const SettingsAboutGeneralInfo = ({
                   aria-label='Github'
                   iconType='logoGithub'
                   iconSize='xxl'
-                  href='https://github.com/wazuh/wazuh-kibana-app'
+                  href='https://github.com/wazuh/wazuh-dashboard-plugins'
                   target='_blank'
                 >
                   Github
