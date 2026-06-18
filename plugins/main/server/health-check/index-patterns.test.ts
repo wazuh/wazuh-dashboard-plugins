@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { initializationTaskCreatorIndexPatternBatch } from './index-patterns';
 
 describe('initializationTaskCreatorIndexPatternBatch', () => {
@@ -18,7 +19,9 @@ describe('initializationTaskCreatorIndexPatternBatch', () => {
    * (which extends `HealthCheckTaskContext`); the nested `context.services`
    * is the same reference, used by the actual task logic.
    */
-  const createRunContext = (defaultIndex: string | null | undefined = undefined) => {
+  const createRunContext = (
+    defaultIndex: string | null | undefined = undefined,
+  ) => {
     const savedObjectsClient = {
       get: jest.fn(),
       create: jest.fn(),
@@ -272,7 +275,7 @@ describe('initializationTaskCreatorIndexPatternBatch', () => {
   });
 });
 
-describe('initializationTaskCreatorIndexPattern - known fields lazy loading', () => {
+describe('initializationTaskCreatorIndexPatternBatch - known fields lazy loading', () => {
   const mockLogger = {
     debug: jest.fn(),
     info: jest.fn(),
@@ -289,23 +292,26 @@ describe('initializationTaskCreatorIndexPattern - known fields lazy loading', ()
       find: jest.fn(),
     };
 
+    const services = {
+      core: {
+        savedObjects: {
+          createInternalRepository: jest
+            .fn()
+            .mockReturnValue(savedObjectsClient),
+        },
+        opensearch: {
+          legacy: { client: { callAsInternalUser: jest.fn() } },
+        },
+      },
+    };
+
     return {
       context: {
         logger: mockLogger,
-        scope: ['internal'],
-        services: {
-          core: {
-            savedObjects: {
-              createInternalRepository: jest
-                .fn()
-                .mockReturnValue(savedObjectsClient),
-            },
-            opensearch: {
-              legacy: { client: { callAsInternalUser: jest.fn() } },
-            },
-          },
-        },
+        scope: 'internal' as const,
+        services,
       },
+      services,
       savedObjectsClient,
     };
   };
@@ -319,7 +325,7 @@ describe('initializationTaskCreatorIndexPattern - known fields lazy loading', ()
       .spyOn(fs.promises, 'readFile')
       .mockResolvedValue(JSON.stringify(knownFields));
 
-    const { context, savedObjectsClient } = createMockContext();
+    const { context, services, savedObjectsClient } = createMockContext();
     // Index pattern does not exist yet -> creation path is taken
     savedObjectsClient.get.mockRejectedValue({ output: { statusCode: 404 } });
     savedObjectsClient.create.mockResolvedValue({
@@ -330,13 +336,19 @@ describe('initializationTaskCreatorIndexPattern - known fields lazy loading', ()
       },
     });
 
-    const task = initializationTaskCreatorIndexPattern({
+    const task = initializationTaskCreatorIndexPatternBatch({
       taskName: 'test-task',
-      indexPatternID: 'wazuh-events-*',
-      options: { fieldsNoIndicesFilePath: '/known-fields/events.json' },
+      batchSize: 1,
+      indexPatterns: [
+        {
+          taskName: 'test-task',
+          indexPatternID: 'wazuh-events-*',
+          options: { fieldsNoIndicesFilePath: '/known-fields/events.json' },
+        },
+      ],
     });
 
-    await task.run({ context, logger: mockLogger });
+    await task.run({ context, logger: mockLogger, services });
 
     expect(readFileSpy).toHaveBeenCalledTimes(1);
     expect(readFileSpy).toHaveBeenCalledWith(
@@ -354,20 +366,26 @@ describe('initializationTaskCreatorIndexPattern - known fields lazy loading', ()
   it('does NOT read the known fields file when the index pattern already exists', async () => {
     const readFileSpy = jest.spyOn(fs.promises, 'readFile');
 
-    const { context, savedObjectsClient } = createMockContext();
+    const { context, services, savedObjectsClient } = createMockContext();
     // Index pattern already exists -> creation path is skipped
     savedObjectsClient.get.mockResolvedValue({
       id: 'wazuh-events-*',
       attributes: { title: 'wazuh-events-*', fields: '[]' },
     });
 
-    const task = initializationTaskCreatorIndexPattern({
+    const task = initializationTaskCreatorIndexPatternBatch({
       taskName: 'test-task',
-      indexPatternID: 'wazuh-events-*',
-      options: { fieldsNoIndicesFilePath: '/known-fields/events.json' },
+      batchSize: 1,
+      indexPatterns: [
+        {
+          taskName: 'test-task',
+          indexPatternID: 'wazuh-events-*',
+          options: { fieldsNoIndicesFilePath: '/known-fields/events.json' },
+        },
+      ],
     });
 
-    await task.run({ context, logger: mockLogger });
+    await task.run({ context, logger: mockLogger, services });
 
     expect(readFileSpy).not.toHaveBeenCalled();
     expect(savedObjectsClient.create).not.toHaveBeenCalled();
