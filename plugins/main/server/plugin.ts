@@ -204,14 +204,18 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
     options: {
       savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
       hasTimeFieldName: true,
-      fieldsNoIndicesFilePath: knownFieldsFilePath('metrics-normalization.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'metrics-normalization.json',
+      ),
     },
   },
   {
     taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
     indexPatternID: WAZUH_VULNERABILITIES_PATTERN,
     options: {
-      fieldsNoIndicesFilePath: knownFieldsFilePath('states-vulnerabilities.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-vulnerabilities.json',
+      ),
     },
   },
   {
@@ -238,7 +242,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
     taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_GROUPS_STATES,
     indexPatternID: WAZUH_IT_HYGIENE_GROUPS_PATTERN,
     options: {
-      fieldsNoIndicesFilePath: knownFieldsFilePath('states-inventory-groups.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-groups.json',
+      ),
     },
   },
   {
@@ -251,14 +257,18 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
         'host.memory.used': 'bytes',
         'host.memory.usage': 'percent',
       }),
-      fieldsNoIndicesFilePath: knownFieldsFilePath('states-inventory-hardware.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-hardware.json',
+      ),
     },
   },
   {
     taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HOTFIXES_STATES,
     indexPatternID: WAZUH_IT_HYGIENE_HOTFIXES_PATTERN,
     options: {
-      fieldsNoIndicesFilePath: knownFieldsFilePath('states-inventory-hotfixes.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-hotfixes.json',
+      ),
     },
   },
   {
@@ -269,14 +279,18 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
         'host.network.egress.bytes': 'bytes',
         'host.network.ingress.bytes': 'bytes',
       }),
-      fieldsNoIndicesFilePath: knownFieldsFilePath('states-inventory-interfaces.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-interfaces.json',
+      ),
     },
   },
   {
     taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_NETWORKS_STATES,
     indexPatternID: WAZUH_IT_HYGIENE_NETWORKS_PATTERN,
     options: {
-      fieldsNoIndicesFilePath: knownFieldsFilePath('states-inventory-networks.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-networks.json',
+      ),
     },
   },
   {
@@ -286,7 +300,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
       savedObjectOverwrite: mapFieldsFormat({
         'package.size': 'bytes',
       }),
-      fieldsNoIndicesFilePath: knownFieldsFilePath('states-inventory-packages.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-packages.json',
+      ),
     },
   },
   {
@@ -298,7 +314,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
         'process.pid': 'integer',
         'source.port': 'integer',
       }),
-      fieldsNoIndicesFilePath: knownFieldsFilePath('states-inventory-ports.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-ports.json',
+      ),
     },
   },
   {
@@ -309,35 +327,45 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
         'process.parent.pid': 'integer',
         'process.pid': 'integer',
       }),
-      fieldsNoIndicesFilePath: knownFieldsFilePath('states-inventory-processes.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-processes.json',
+      ),
     },
   },
   {
     taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROTOCOLS_STATES,
     indexPatternID: WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN,
     options: {
-      fieldsNoIndicesFilePath: knownFieldsFilePath('states-inventory-protocols.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-protocols.json',
+      ),
     },
   },
   {
     taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES,
     indexPatternID: WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
     options: {
-      fieldsNoIndicesFilePath: knownFieldsFilePath('states-inventory-system.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-system.json',
+      ),
     },
   },
   {
     taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES,
     indexPatternID: WAZUH_IT_HYGIENE_USERS_PATTERN,
     options: {
-      fieldsNoIndicesFilePath: knownFieldsFilePath('states-inventory-users.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-users.json',
+      ),
     },
   },
   {
     taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SERVICES_STATES,
     indexPatternID: WAZUH_IT_HYGIENE_SERVICES_PATTERN,
     options: {
-      fieldsNoIndicesFilePath: knownFieldsFilePath('states-inventory-services.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-services.json',
+      ),
     },
   },
   {
@@ -345,7 +373,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
       HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_BROWSER_EXTENSIONS_STATES,
     indexPatternID: WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN,
     options: {
-      fieldsNoIndicesFilePath: knownFieldsFilePath('states-inventory-browser-extensions.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-browser-extensions.json',
+      ),
     },
   },
   {
@@ -373,7 +403,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
     taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
     indexPatternID: WAZUH_FIM_REGISTRY_KEYS_PATTERN,
     options: {
-      fieldsNoIndicesFilePath: knownFieldsFilePath('states-fim-registries-keys.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-fim-registries-keys.json',
+      ),
     },
   },
   {
@@ -383,7 +415,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
       savedObjectOverwrite: mapFieldsFormat({
         'registry.size': 'bytes',
       }),
-      fieldsNoIndicesFilePath: knownFieldsFilePath('states-fim-registries-values.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-fim-registries-values.json',
+      ),
     },
   },
   {
@@ -399,7 +433,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
     options: {
       savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
       hasTimeFieldName: true,
-      fieldsNoIndicesFilePath: knownFieldsFilePath('events-system-activity.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'events-system-activity.json',
+      ),
     },
   },
   {
@@ -417,7 +453,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
     options: {
       savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
       hasTimeFieldName: true,
-      fieldsNoIndicesFilePath: knownFieldsFilePath('events-access-management.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'events-access-management.json',
+      ),
     },
   },
   {
@@ -444,7 +482,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
     options: {
       savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
       hasTimeFieldName: true,
-      fieldsNoIndicesFilePath: knownFieldsFilePath('events-network-activity.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'events-network-activity.json',
+      ),
     },
   },
   {
@@ -453,7 +493,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
     options: {
       savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
       hasTimeFieldName: true,
-      fieldsNoIndicesFilePath: knownFieldsFilePath('events-cloud-services.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'events-cloud-services.json',
+      ),
     },
   },
   {
@@ -499,7 +541,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
     options: {
       savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
       hasTimeFieldName: true,
-      fieldsNoIndicesFilePath: knownFieldsFilePath('findings-system-activity.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'findings-system-activity.json',
+      ),
     },
   },
   {
@@ -517,7 +561,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
     options: {
       savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
       hasTimeFieldName: true,
-      fieldsNoIndicesFilePath: knownFieldsFilePath('findings-access-management.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'findings-access-management.json',
+      ),
     },
   },
   {
@@ -526,7 +572,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
     options: {
       savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
       hasTimeFieldName: true,
-      fieldsNoIndicesFilePath: knownFieldsFilePath('findings-applications.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'findings-applications.json',
+      ),
     },
   },
   {
@@ -544,7 +592,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
     options: {
       savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
       hasTimeFieldName: true,
-      fieldsNoIndicesFilePath: knownFieldsFilePath('findings-network-activity.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'findings-network-activity.json',
+      ),
     },
   },
   {
@@ -553,7 +603,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
     options: {
       savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
       hasTimeFieldName: true,
-      fieldsNoIndicesFilePath: knownFieldsFilePath('findings-cloud-services.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'findings-cloud-services.json',
+      ),
     },
   },
   {
@@ -562,7 +614,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
     options: {
       savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
       hasTimeFieldName: true,
-      fieldsNoIndicesFilePath: knownFieldsFilePath('findings-unclassified.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'findings-unclassified.json',
+      ),
     },
   },
   {
@@ -578,7 +632,9 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
     taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS,
     indexPatternID: WAZUH_THREATINTEL_ENRICHMENTS_PATTERN,
     options: {
-      fieldsNoIndicesFilePath: knownFieldsFilePath('threatintel-enrichments.json'),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'threatintel-enrichments.json',
+      ),
     },
   },
 ];
