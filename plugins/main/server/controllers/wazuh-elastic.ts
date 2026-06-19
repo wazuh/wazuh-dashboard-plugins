@@ -444,6 +444,65 @@ export class WazuhElasticCtrl {
     }
   }
 
+  /**
+   * Removes the wazuh.case fields from a findings document.
+   */
+  async cleanFindingsCase(
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest<{
+      index: string;
+      documentId: string;
+    }>,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    try {
+      const { index, documentId } = request.params;
+
+      if (!this.isFindingsIndex(index)) {
+        return ErrorResponse(
+          'Case management is only supported on wazuh-findings-v5 indices',
+          4016,
+          HTTP_STATUS_CODES.BAD_REQUEST,
+          response,
+        );
+      }
+
+      const client = context.core.opensearch.client.asCurrentUser;
+      const encodedIndex = encodeURIComponent(index);
+      const encodedDocumentId = encodeURIComponent(documentId);
+
+      await client.transport.request({
+        method: 'POST',
+        path: `/${encodedIndex}/_update/${encodedDocumentId}`,
+        body: {
+          script: {
+            lang: 'painless',
+            source:
+              "if (ctx._source.containsKey('wazuh') && ctx._source.wazuh != null) { ctx._source.wazuh.remove('case'); }",
+          },
+        },
+      });
+
+      return response.ok({
+        body: {
+          message: 'Case cleaned successfully',
+          case: null,
+        },
+      });
+    } catch (error) {
+      const [statusCode, errorMessage] = this.getErrorDetails(error);
+      context.wazuh.logger.error(
+        `Error cleaning findings case: ${errorMessage}`,
+      );
+      return ErrorResponse(
+        errorMessage,
+        WAZUH_STATUS_CODES.UNKNOWN,
+        statusCode,
+        response,
+      );
+    }
+  }
+
   private isFindingsIndex(index: string): boolean {
     return (
       /^wazuh-findings-v5/i.test(index) ||

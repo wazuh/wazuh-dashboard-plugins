@@ -1,3 +1,4 @@
+import fs from 'fs';
 import {
   ensureIndexPatternHasTemplate,
   initializationTaskCreatorIndexPattern,
@@ -203,5 +204,107 @@ describe('initializationTaskCreatorIndexPattern - checkDefaultIndexPattern', () 
 
     expect(uiSettingsClient.get).not.toHaveBeenCalled();
     expect(uiSettingsClient.set).not.toHaveBeenCalled();
+  });
+});
+
+describe('initializationTaskCreatorIndexPattern - known fields lazy loading', () => {
+  const mockLogger = {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    log: jest.fn(),
+    get: jest.fn().mockReturnThis(),
+  };
+
+  const createMockContext = () => {
+    const savedObjectsClient = {
+      get: jest.fn(),
+      create: jest.fn(),
+      find: jest.fn(),
+    };
+
+    return {
+      context: {
+        logger: mockLogger,
+        scope: ['internal'],
+        services: {
+          core: {
+            savedObjects: {
+              createInternalRepository: jest
+                .fn()
+                .mockReturnValue(savedObjectsClient),
+            },
+            opensearch: {
+              legacy: { client: { callAsInternalUser: jest.fn() } },
+            },
+          },
+        },
+      },
+      savedObjectsClient,
+    };
+  };
+
+  beforeEach(() => jest.restoreAllMocks());
+  afterEach(() => jest.restoreAllMocks());
+
+  it('reads the known fields file from disk only when the index pattern is created', async () => {
+    const knownFields = [{ name: '@timestamp', type: 'date' }];
+    const readFileSpy = jest
+      .spyOn(fs.promises, 'readFile')
+      .mockResolvedValue(JSON.stringify(knownFields));
+
+    const { context, savedObjectsClient } = createMockContext();
+    // Index pattern does not exist yet -> creation path is taken
+    savedObjectsClient.get.mockRejectedValue({ output: { statusCode: 404 } });
+    savedObjectsClient.create.mockResolvedValue({
+      id: 'wazuh-events-*',
+      attributes: {
+        title: 'wazuh-events-*',
+        fields: JSON.stringify(knownFields),
+      },
+    });
+
+    const task = initializationTaskCreatorIndexPattern({
+      taskName: 'test-task',
+      indexPatternID: 'wazuh-events-*',
+      options: { fieldsNoIndicesFilePath: '/known-fields/events.json' },
+    });
+
+    await task.run({ context, logger: mockLogger });
+
+    expect(readFileSpy).toHaveBeenCalledTimes(1);
+    expect(readFileSpy).toHaveBeenCalledWith(
+      '/known-fields/events.json',
+      'utf8',
+    );
+    // The fields parsed from disk are forwarded to the saved object creation
+    expect(savedObjectsClient.create).toHaveBeenCalledWith(
+      'index-pattern',
+      expect.objectContaining({ fields: JSON.stringify(knownFields) }),
+      expect.any(Object),
+    );
+  });
+
+  it('does NOT read the known fields file when the index pattern already exists', async () => {
+    const readFileSpy = jest.spyOn(fs.promises, 'readFile');
+
+    const { context, savedObjectsClient } = createMockContext();
+    // Index pattern already exists -> creation path is skipped
+    savedObjectsClient.get.mockResolvedValue({
+      id: 'wazuh-events-*',
+      attributes: { title: 'wazuh-events-*', fields: '[]' },
+    });
+
+    const task = initializationTaskCreatorIndexPattern({
+      taskName: 'test-task',
+      indexPatternID: 'wazuh-events-*',
+      options: { fieldsNoIndicesFilePath: '/known-fields/events.json' },
+    });
+
+    await task.run({ context, logger: mockLogger });
+
+    expect(readFileSpy).not.toHaveBeenCalled();
+    expect(savedObjectsClient.create).not.toHaveBeenCalled();
   });
 });

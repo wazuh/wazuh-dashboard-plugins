@@ -92,6 +92,20 @@ export function WazuhElasticRoutes(router: IRouter) {
       ctrl.updateFindingsCase(context, request, response),
   );
 
+  router.delete(
+    {
+      path: '/indexer/findings/case/{index}/{documentId}',
+      validate: {
+        params: schema.object({
+          index: schema.string(),
+          documentId: schema.string(),
+        }),
+      },
+    },
+    (context, request, response) =>
+      ctrl.cleanFindingsCase(context, request, response),
+  );
+
   // TODO: this seems that is unused and could be removed
   router.get(
     {

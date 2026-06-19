@@ -51,6 +51,7 @@ import { wzDiscoverRenderColumns } from './render-columns';
 import { WzSearchBar } from '../search-bar';
 import { transformDateRange } from '../search-bar/search-bar-service';
 import DocDetailsHeader from './components/doc-details-header';
+import { useDocumentMutationSync } from './use-document-mutation-sync';
 import { tDataGridColumn } from '../data-grid/types';
 import { SampleDataWarning } from '../../visualize/components';
 
@@ -82,6 +83,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
+  const { onDocumentMutated: handleDocumentMutated, caseRefreshKey } =
+    useDocumentMutationSync({ inspectedHit, setInspectedHit, setResults });
   const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
     undefined,
   );
@@ -133,6 +136,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     setFilters,
   });
   const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const combinedFingerprint = (fingerprint ?? 0) + caseRefreshKey;
   const [absoluteDateRange, setAbsoluteDateRange] = useState<TimeRange>(
     transformDateRange({ from: dateRangeFrom, to: dateRangeTo }),
   );
@@ -294,7 +298,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                               query,
                               dateRangeFrom,
                               dateRangeTo,
-                              fingerprint,
+                              combinedFingerprint,
                             )}
                           />
                         )}
@@ -349,6 +353,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                           filters={filters}
                           setFilters={setFilters}
                           onFilter={closeFlyoutHandler}
+                          onDocumentMutated={handleDocumentMutated}
                           additionalTabs={additionalDocumentDetailsTabs}
                           showFilterButtons={false}
                         />

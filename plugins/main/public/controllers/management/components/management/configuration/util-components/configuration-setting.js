@@ -12,7 +12,14 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EuiFieldText, EuiSpacer, EuiTextAlign, EuiAccordion, EuiBasicTable } from '@elastic/eui';
+import {
+  EuiFieldText,
+  EuiSpacer,
+  EuiTextAlign,
+  EuiAccordion,
+  EuiBasicTable,
+  EuiIconTip,
+} from '@elastic/eui';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import helpLinks from '../log-collection/help-links';
 
@@ -59,6 +66,17 @@ class WzConfigurationSetting extends Component {
             >
               <EuiTextAlign textAlign={isMobile ? 'left' : 'right'}>
                 {label}
+                {info && (
+                  <>
+                    {' '}
+                    <EuiIconTip
+                      content={info}
+                      type='iInCircle'
+                      color='subdued'
+                      size='m'
+                    />
+                  </>
+                )}
               </EuiTextAlign>
             </div>
           )}

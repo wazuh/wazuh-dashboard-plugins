@@ -17,6 +17,7 @@
  * under the License.
  */
 
+import path from 'path';
 import {
   CoreSetup,
   CoreStart,
@@ -133,50 +134,14 @@ import {
 
 import { notificationSetup } from './health-check/notification-default-channels';
 import { initializeDefaultNotificationChannel } from './health-check/notification-default-channels/tasks';
-import IndexPatternEventsKnownFields from '../common/known-fields/events.json';
-import IndexPatternEventsAccessManagementKnownFields from '../common/known-fields/events-access-management.json';
-import IndexPatternEventsApplicationsKnownFields from '../common/known-fields/events-applications.json';
-import IndexPatternEventsCloudServicesKnownFields from '../common/known-fields/events-cloud-services.json';
-import IndexPatternEventsNetworkActivityKnownFields from '../common/known-fields/events-network-activity.json';
-import IndexPatternEventsOtherKnownFields from '../common/known-fields/events-other.json';
-import IndexPatternEventsSecurityKnownFields from '../common/known-fields/events-security.json';
-import IndexPatternEventsSystemActivityKnownFields from '../common/known-fields/events-system-activity.json';
-import IndexPatternEventsUnclassifiedKnownFields from '../common/known-fields/events-unclassified.json';
-import IndexPatternEventsRawKnownFields from '../common/known-fields/events-raw.json';
-import IndexPatternFindingsKnownFields from '../common/known-fields/findings.json';
-import IndexPatternFindingsAccessManagementKnownFields from '../common/known-fields/findings-access-management.json';
-import IndexPatternFindingsApplicationsKnownFields from '../common/known-fields/findings-applications.json';
-import IndexPatternFindingsCloudServicesKnownFields from '../common/known-fields/findings-cloud-services.json';
-import IndexPatternFindingsNetworkActivityKnownFields from '../common/known-fields/findings-network-activity.json';
-import IndexPatternFindingsOtherKnownFields from '../common/known-fields/findings-other.json';
-import IndexPatternFindingsSecurityKnownFields from '../common/known-fields/findings-security.json';
-import IndexPatternFindingsSystemActivityKnownFields from '../common/known-fields/findings-system-activity.json';
-import IndexPatternFindingsUnclassifiedKnownFields from '../common/known-fields/findings-unclassified.json';
-import IndexPatternFIMKnownFields from '../common/known-fields/states-fim.json';
-import IndexPatternFIMFilesKnownFields from '../common/known-fields/states-fim-files.json';
-import IndexPatternFIMRegistriesKeysKnownFields from '../common/known-fields/states-fim-registries-keys.json';
-import IndexPatternFIMRegistriesValuesKnownFields from '../common/known-fields/states-fim-registries-values.json';
-import IndexPatternITHygieneBrowserExtensionsKnownFields from '../common/known-fields/states-inventory-browser-extensions.json';
-import IndexPatternITHygieneGroupsKnownFields from '../common/known-fields/states-inventory-groups.json';
-import IndexPatternITHygieneHardwareKnownFields from '../common/known-fields/states-inventory-hardware.json';
-import IndexPatternITHygieneHotfixesKnownFields from '../common/known-fields/states-inventory-hotfixes.json';
-import IndexPatternITHygieneInterfacesKnownFields from '../common/known-fields/states-inventory-interfaces.json';
-import IndexPatternITHygieneInventoryKnownFields from '../common/known-fields/states-inventory.json';
-import IndexPatternITHygieneNetworkKnownFields from '../common/known-fields/states-inventory-networks.json';
-import IndexPatternITHygienePackagesKnownFields from '../common/known-fields/states-inventory-packages.json';
-import IndexPatternITHygienePortsKnownFields from '../common/known-fields/states-inventory-ports.json';
-import IndexPatternITHygieneProcessesKnownFields from '../common/known-fields/states-inventory-processes.json';
-import IndexPatternITHygieneProtocolsKnownFields from '../common/known-fields/states-inventory-protocols.json';
-import IndexPatternITHygieneServicesKnownFields from '../common/known-fields/states-inventory-services.json';
-import IndexPatternITHygieneSystemKnownFields from '../common/known-fields/states-inventory-system.json';
-import IndexPatternITHygieneUsersKnownFields from '../common/known-fields/states-inventory-users.json';
-import IndexPatternMetricsAgentsKnownFields from '../common/known-fields/metrics-agents.json';
-import IndexPatternSCAKnownFields from '../common/known-fields/states-sca.json';
-import IndexPatternMetricsCommsKnownFields from '../common/known-fields/metrics-comms.json';
-import IndexPatternMetricsNormalizationKnownFields from '../common/known-fields/metrics-normalization.json';
-import IndexPatternVulnerabilitiesKnownFields from '../common/known-fields/states-vulnerabilities.json';
-import IndexPatternActiveResponsesKnownFields from '../common/known-fields/active-responses.json';
-import IndexPatternThreatintelEnrichmentsKnownFields from '../common/known-fields/threatintel-enrichments.json';
+
+// Resolve a known-fields JSON file path. The files are intentionally not
+// imported statically: they are large and only needed when an index pattern
+// must be created. The index-pattern health-check task reads the file from disk
+// on demand so the parsed objects are not pinned in memory for the whole
+// process lifetime.
+const knownFieldsFilePath = (fileName: string) =>
+  path.resolve(__dirname, '../common/known-fields', fileName);
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -295,7 +260,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternMetricsAgentsKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath('metrics-agents.json'),
         },
       }),
     );
@@ -308,7 +273,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternMetricsCommsKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath('metrics-comms.json'),
         },
       }),
     );
@@ -321,7 +286,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternMetricsNormalizationKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'metrics-normalization.json',
+          ),
         },
       }),
     );
@@ -332,7 +299,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
         indexPatternID: WAZUH_VULNERABILITIES_PATTERN,
         options: {
-          fieldsNoIndices: IndexPatternVulnerabilitiesKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'states-vulnerabilities.json',
+          ),
         },
       }),
     );
@@ -355,7 +324,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
             'process.pid': 'integer',
             'source.port': 'integer',
           }),
-          fieldsNoIndices: IndexPatternITHygieneInventoryKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath('states-inventory.json'),
         },
         indexPatternID: WAZUH_IT_HYGIENE_PATTERN,
       }),
@@ -367,7 +336,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_GROUPS_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_GROUPS_PATTERN,
         options: {
-          fieldsNoIndices: IndexPatternITHygieneGroupsKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'states-inventory-groups.json',
+          ),
         },
       }),
     );
@@ -384,7 +355,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
             'host.memory.used': 'bytes',
             'host.memory.usage': 'percent',
           }),
-          fieldsNoIndices: IndexPatternITHygieneHardwareKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'states-inventory-hardware.json',
+          ),
         },
       }),
     );
@@ -395,7 +368,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HOTFIXES_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_HOTFIXES_PATTERN,
         options: {
-          fieldsNoIndices: IndexPatternITHygieneHotfixesKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'states-inventory-hotfixes.json',
+          ),
         },
       }),
     );
@@ -409,7 +384,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
             'host.network.egress.bytes': 'bytes',
             'host.network.ingress.bytes': 'bytes',
           }),
-          fieldsNoIndices: IndexPatternITHygieneInterfacesKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'states-inventory-interfaces.json',
+          ),
         },
         indexPatternID: WAZUH_IT_HYGIENE_INTERFACES_PATTERN,
       }),
@@ -421,7 +398,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_NETWORKS_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_NETWORKS_PATTERN,
         options: {
-          fieldsNoIndices: IndexPatternITHygieneNetworkKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'states-inventory-networks.json',
+          ),
         },
       }),
     );
@@ -434,7 +413,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           savedObjectOverwrite: mapFieldsFormat({
             'package.size': 'bytes',
           }),
-          fieldsNoIndices: IndexPatternITHygienePackagesKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'states-inventory-packages.json',
+          ),
         },
         indexPatternID: WAZUH_IT_HYGIENE_PACKAGES_PATTERN,
       }),
@@ -450,7 +431,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
             'process.pid': 'integer',
             'source.port': 'integer',
           }),
-          fieldsNoIndices: IndexPatternITHygienePortsKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'states-inventory-ports.json',
+          ),
         },
         indexPatternID: WAZUH_IT_HYGIENE_PORTS_PATTERN,
       }),
@@ -465,7 +448,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
             'process.parent.pid': 'integer',
             'process.pid': 'integer',
           }),
-          fieldsNoIndices: IndexPatternITHygieneProcessesKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'states-inventory-processes.json',
+          ),
         },
         indexPatternID: WAZUH_IT_HYGIENE_PROCESSES_PATTERN,
       }),
@@ -477,7 +462,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROTOCOLS_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN,
         options: {
-          fieldsNoIndices: IndexPatternITHygieneProtocolsKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'states-inventory-protocols.json',
+          ),
         },
       }),
     );
@@ -488,7 +475,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
         options: {
-          fieldsNoIndices: IndexPatternITHygieneSystemKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'states-inventory-system.json',
+          ),
         },
       }),
     );
@@ -499,7 +488,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_USERS_PATTERN,
         options: {
-          fieldsNoIndices: IndexPatternITHygieneUsersKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'states-inventory-users.json',
+          ),
         },
       }),
     );
@@ -510,7 +501,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SERVICES_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_SERVICES_PATTERN,
         options: {
-          fieldsNoIndices: IndexPatternITHygieneServicesKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'states-inventory-services.json',
+          ),
         },
       }),
     );
@@ -522,7 +515,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_BROWSER_EXTENSIONS_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN,
         options: {
-          fieldsNoIndices: IndexPatternITHygieneBrowserExtensionsKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'states-inventory-browser-extensions.json',
+          ),
         },
       }),
     );
@@ -537,7 +532,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
             'file.size': 'bytes',
             'registry.size': 'bytes',
           }),
-          fieldsNoIndices: IndexPatternFIMKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath('states-fim.json'),
         },
       }),
     );
@@ -550,7 +545,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           savedObjectOverwrite: mapFieldsFormat({
             'file.size': 'bytes',
           }),
-          fieldsNoIndices: IndexPatternFIMFilesKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath('states-fim-files.json'),
         },
         indexPatternID: WAZUH_FIM_FILES_PATTERN,
       }),
@@ -562,7 +557,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
         indexPatternID: WAZUH_FIM_REGISTRY_KEYS_PATTERN,
         options: {
-          fieldsNoIndices: IndexPatternFIMRegistriesKeysKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'states-fim-registries-keys.json',
+          ),
         },
       }),
     );
@@ -575,7 +572,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           savedObjectOverwrite: mapFieldsFormat({
             'registry.size': 'bytes',
           }),
-          fieldsNoIndices: IndexPatternFIMRegistriesValuesKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'states-fim-registries-values.json',
+          ),
         },
         indexPatternID: WAZUH_FIM_REGISTRY_VALUES_PATTERN,
       }),
@@ -587,7 +586,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES,
         indexPatternID: WAZUH_SCA_PATTERN,
         options: {
-          fieldsNoIndices: IndexPatternSCAKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath('states-sca.json'),
         },
       }),
     );
@@ -600,7 +599,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsSystemActivityKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'events-system-activity.json',
+          ),
         },
       }),
     );
@@ -613,7 +614,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsSecurityKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath('events-security.json'),
         },
       }),
     );
@@ -626,7 +627,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsAccessManagementKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'events-access-management.json',
+          ),
         },
       }),
     );
@@ -639,7 +642,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsApplicationsKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'events-applications.json',
+          ),
         },
       }),
     );
@@ -652,7 +657,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsOtherKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath('events-other.json'),
         },
       }),
     );
@@ -665,7 +670,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsNetworkActivityKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'events-network-activity.json',
+          ),
         },
       }),
     );
@@ -678,7 +685,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsCloudServicesKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'events-cloud-services.json',
+          ),
         },
       }),
     );
@@ -691,7 +700,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath('events.json'),
           checkDefaultIndexPattern: true,
         },
       }),
@@ -705,7 +714,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternActiveResponsesKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath('active-responses.json'),
         },
       }),
     );
@@ -718,7 +727,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsUnclassifiedKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'events-unclassified.json',
+          ),
         },
       }),
     );
@@ -731,7 +742,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternEventsRawKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath('events-raw.json'),
         },
       }),
     );
@@ -744,7 +755,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternFindingsSystemActivityKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'findings-system-activity.json',
+          ),
         },
       }),
     );
@@ -757,7 +770,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternFindingsSecurityKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'findings-security.json',
+          ),
         },
       }),
     );
@@ -770,7 +785,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternFindingsAccessManagementKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'findings-access-management.json',
+          ),
         },
       }),
     );
@@ -783,7 +800,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternFindingsApplicationsKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'findings-applications.json',
+          ),
         },
       }),
     );
@@ -796,7 +815,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternFindingsOtherKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath('findings-other.json'),
         },
       }),
     );
@@ -809,7 +828,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternFindingsNetworkActivityKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'findings-network-activity.json',
+          ),
         },
       }),
     );
@@ -822,7 +843,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternFindingsCloudServicesKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'findings-cloud-services.json',
+          ),
         },
       }),
     );
@@ -835,7 +858,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternFindingsUnclassifiedKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'findings-unclassified.json',
+          ),
         },
       }),
     );
@@ -848,7 +873,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
-          fieldsNoIndices: IndexPatternFindingsKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath('findings.json'),
         },
       }),
     );
@@ -859,7 +884,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS,
         indexPatternID: WAZUH_THREATINTEL_ENRICHMENTS_PATTERN,
         options: {
-          fieldsNoIndices: IndexPatternThreatintelEnrichmentsKnownFields,
+          fieldsNoIndicesFilePath: knownFieldsFilePath(
+            'threatintel-enrichments.json',
+          ),
         },
       }),
     );
