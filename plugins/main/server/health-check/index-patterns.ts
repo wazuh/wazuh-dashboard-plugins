@@ -95,7 +95,7 @@ async function createIndexPattern(
     return response;
   } catch (error) {
     throw new Error(
-      `index pattern with ID [${indexPatternID}] could not be created due to: ${error.message}. This could indicate the collection is disabled or there is a problem in the data collection or ingestion.`,
+      `${error.message}. This could indicate the collection is disabled or there is a problem in the data collection or ingestion.`,
     );
   }
 }
@@ -350,10 +350,10 @@ async function runIndexPatternTask(
       id,
     }));
   } catch (error) {
-    const message = `Error initilizating index pattern with ID [${indexPatternID}]: ${error.message}`;
-
-    logger.error(message);
-    throw new Error(message);
+    logger.error(
+      `Index pattern [${indexPatternID}] initialization failed: ${error.message}`,
+    );
+    throw error;
   }
 }
 
@@ -405,7 +405,7 @@ export const initializationTaskCreatorIndexPatternBatch = ({
     if (failures.length > 0) {
       throw new Error(
         `Some index patterns could not be initialized:\n` +
-          failures.map(f => `[${f.indexPatternID}] ${f.message}`).join(';\n'),
+          failures.map(f => `  [${f.indexPatternID}]: ${f.message}`).join('\n'),
       );
     }
     return results;

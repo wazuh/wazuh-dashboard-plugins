@@ -192,7 +192,7 @@ describe('initializationTaskCreatorIndexPatternBatch', () => {
     });
 
     await expect(task.run(runCtx)).rejects.toThrow(
-      /Some index patterns could not be initialized.*failing\*/,
+      /Some index patterns could not be initialized[\s\S]*failing\*/,
     );
 
     // All patterns were attempted regardless of the failure
