@@ -23,7 +23,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-24.04
+    runs-on: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
     permissions:
       contents: write # To push a branch
       pages: write # To push to a GitHub Pages site
