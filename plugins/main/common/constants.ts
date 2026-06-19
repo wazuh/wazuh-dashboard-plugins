@@ -1006,7 +1006,7 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES =
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES =
   'index-pattern:states-sca';
 
-export const HEALTH_CHECK_TASK_INDEX_PATTERNS = 'index-patterns';
+export const HEALTH_CHECK_TASK_INDEX_PATTERNS = 'saved-objects:index-patterns';
 
 export const INDEX_PATTERN_EVENTS_REQUIRED_FIELDS = [
   FIELD_TIMESTAMP,
