@@ -86,7 +86,7 @@
 
 <!-- Links -->
 
-[security-analytics-module]: ./modules/security-analytics/README.md
+[security-analytics-module]: ./modules/security-analytics/index.md
 [active-response-module]: ./modules/active-response/index.md
 [healthcheck-module]: ./modules/healthcheck.md
 [healthcheck-lifecycle]: ./modules/healthcheck.md#lifecycle
