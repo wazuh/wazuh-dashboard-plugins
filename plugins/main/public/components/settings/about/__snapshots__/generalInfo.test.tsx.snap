@@ -98,7 +98,7 @@ exports[`SettingsAboutGeneralInfo component should render a component 1`] = `
               <a
                 aria-label="Github"
                 class="euiButtonIcon euiButtonIcon--primary euiButtonIcon--empty euiButtonIcon--xSmall"
-                href="https://github.com/wazuh/wazuh-kibana-app"
+                href="https://github.com/wazuh/wazuh-dashboard-plugins"
                 rel="noopener noreferrer"
                 target="_blank"
               >
