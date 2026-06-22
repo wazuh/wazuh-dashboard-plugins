@@ -2,7 +2,7 @@
 
 ARG OSD_VERSION
 
-FROM public.ecr.aws/opensearchproject/opensearch-dashboards:${OSD_VERSION}
+FROM opensearchproject/opensearch-dashboards:${OSD_VERSION}
 
 ARG PACKAGE_NAME
 
