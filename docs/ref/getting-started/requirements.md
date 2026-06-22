@@ -27,7 +27,7 @@ Supported Linux distributions:
 
 - **Debian-based** (DEB packages):
   - Debian 10, 11, 12
-  - Ubuntu 18.04, 20.04, 22.04, 24.04
+  - Ubuntu 18.04, 20.04, 22.04, 24.04, 26.04
 - **Red Hat-based** (RPM packages):
   - RHEL 7, 8, 9
   - CentOS 7, 8

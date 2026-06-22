@@ -8,7 +8,7 @@ We support the operating system versions and architectures included in the table
 | Name | Version | Architecture |
 | ------------ | ------------ | --------------- |
 | Red Hat | 9, 10 | x86_64, aarch64 |
-| Ubuntu | 22.04, 24.04 | x86_64, aarch64 |
+| Ubuntu | 22.04, 24.04, 26.04 | x86_64, aarch64 |
 | Amazon Linux | 2023 | x86_64, aarch64 |
 
 ## Hardware requirements
