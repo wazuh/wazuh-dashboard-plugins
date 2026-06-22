@@ -404,8 +404,10 @@ export const initializationTaskCreatorIndexPatternBatch = ({
 
     if (failures.length > 0) {
       throw new Error(
-        `Some index patterns could not be initialized:\n` +
-          failures.map(f => `  [${f.indexPatternID}]: ${f.message}`).join('\n'),
+        `Some index patterns could not be initialized:\n\n` +
+          failures
+            .map(f => `  - [${f.indexPatternID}]: ${f.message}`)
+            .join('\n'),
       );
     }
     return results;
