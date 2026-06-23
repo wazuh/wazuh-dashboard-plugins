@@ -61,12 +61,7 @@ import {
   VULNERABILITIES_INVENTORY_DASHBOARD_ID,
   VULNERABILITIES_INVENTORY_AGENT_DASHBOARD_ID,
 } from '../../../../../../common/constants';
-import VulsEvaluationFilter, {
-  getUnderEvaluationFilterValue,
-  createUnderEvaluationFilter,
-  UNDER_EVALUATION_FIELD,
-} from '../../common/components/vuls-evaluation-filter';
-import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../../../common/constants';
+import { vulnerabilityManagedFilters } from '../overview/dashboard';
 import RestoreStateColumnsButton from '../../../../common/wazuh-discover/components/restore-state-columns';
 import managedFilters from './managed-filters';
 import DashboardRenderer from '../../../../common/dashboards/dashboard-renderer/dashboard-renderer';
@@ -89,6 +84,7 @@ const InventoryVulsComponent = () => {
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
+    managedFiltersSpec: vulnerabilityManagedFilters,
   });
   const { query } = searchBarProps;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
@@ -97,28 +93,6 @@ const InventoryVulsComponent = () => {
     undefined,
   );
   const [isExporting, setIsExporting] = useState<boolean>(false);
-
-  const underEvaluationFilter = filters.find(
-    f => f.meta?.key === UNDER_EVALUATION_FIELD && f.meta?.type === 'phrase',
-  );
-
-  const onChangeEvaluationFilter = (underEvaluation: boolean | null) => {
-    const withoutEvalFilter = filters.filter(
-      f =>
-        !(f.meta?.key === UNDER_EVALUATION_FIELD && f.meta?.type === 'phrase'),
-    );
-    setFilters(
-      underEvaluation !== null
-        ? [
-            ...withoutEvalFilter,
-            createUnderEvaluationFilter(
-              underEvaluation,
-              WAZUH_VULNERABILITIES_PATTERN,
-            ),
-          ]
-        : withoutEvalFilter,
-    );
-  };
 
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
 
@@ -249,10 +223,6 @@ const InventoryVulsComponent = () => {
                     setFilters={setFilters}
                     fixedFilters={fixedFilters}
                     filterInputs={managedFilters}
-                  />
-                  <VulsEvaluationFilter
-                    value={getUnderEvaluationFilterValue(underEvaluationFilter)}
-                    setValue={onChangeEvaluationFilter}
                   />
                   <SampleDataWarning
                     categoriesSampleData={[WAZUH_SAMPLE_VULNERABILITIES]}
