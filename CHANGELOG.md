@@ -48,6 +48,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
+- Reduced peak resource usage during plugin startup by processing index-pattern initialization tasks in small batches instead of all at once [#8644](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8644)
 - Changed default index pattern settings key from `defaultIndex` to `wazuh-events-v5*` [#8066](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8066) [#8512](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8512)
 - Adapted alerts sample data to Wazuh Common Schema [#7848](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7848)
 - Set cluster mode as default for all Wazuh installations, including single-node deployments. Updated RBAC permissions to `cluster:*` actions [#7701](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7701) [#8147](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8147)
