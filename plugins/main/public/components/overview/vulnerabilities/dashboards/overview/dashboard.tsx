@@ -18,37 +18,7 @@ import VulsEvaluationFilter, {
   createUnderEvaluationFilter,
   UNDER_EVALUATION_FIELD,
 } from '../../common/components/vuls-evaluation-filter';
-
-export const vulnerabilityManagedFilters = {
-  underEvaluation: {
-    managedField: UNDER_EVALUATION_FIELD,
-    selector: f =>
-      f.meta?.key === UNDER_EVALUATION_FIELD && f.meta?.type === 'phrase',
-    component: (props: {
-      managedFilter?: any;
-      setManagedFilter: (filters: any[]) => void;
-    }) => {
-      const onChange = (underEvaluation: boolean | null) => {
-        const newFilters = [];
-        if (underEvaluation !== null) {
-          const indexId = WAZUH_VULNERABILITIES_PATTERN;
-          newFilters.push(
-            createUnderEvaluationFilter(underEvaluation, indexId),
-          );
-        }
-        props?.setManagedFilter(newFilters);
-      };
-
-      return (
-        <VulsEvaluationFilter
-          value={getUnderEvaluationFilterValue(props?.managedFilter)}
-          setValue={onChange}
-        />
-      );
-    },
-    order: 1,
-  },
-};
+import { vulnerabilityManagedFilters } from '../../common/vulnerability-managed-filters';
 
 export const DashboardVuls = withErrorBoundary(
   withVulnerabilitiesStateDataSource(
