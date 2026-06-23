@@ -7,6 +7,18 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 
+type MitreCategory = { id?: string[]; name?: string[] } | string[];
+
+const getMitreDisplayValues = (value: MitreCategory): string[] => {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (value?.name?.length) {
+    return value.name;
+  }
+  return value?.id ?? [];
+};
+
 interface CheckDetailsProps {
   check: {
     description: string;
@@ -15,7 +27,7 @@ interface CheckDetailsProps {
     condition: string;
     rules: string[];
     compliance: Record<string, string[]>;
-    mitre: Record<string, string[]>;
+    mitre: Record<string, MitreCategory>;
   };
 }
 export const CheckDetails: React.FC<CheckDetailsProps> = ({ check }) => {
@@ -89,12 +101,18 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ check }) => {
         <EuiSpacer size='s' />
         <EuiText>
           <ul>
-            {Object.entries(check.mitre || {}).map(([key, values]) => (
-              <li key={key}>
-                <strong>{key}: </strong>
-                <code>{(values || []).join(', ')}</code>
-              </li>
-            ))}
+            {Object.entries(check.mitre || {})
+              .map(
+                ([key, value]) =>
+                  [key, getMitreDisplayValues(value)] as [string, string[]],
+              )
+              .filter(([, values]) => values.length > 0)
+              .map(([key, values]) => (
+                <li key={key}>
+                  <strong>{key}: </strong>
+                  <code>{values.join(', ')}</code>
+                </li>
+              ))}
           </ul>
         </EuiText>
       </EuiFlexItem>
