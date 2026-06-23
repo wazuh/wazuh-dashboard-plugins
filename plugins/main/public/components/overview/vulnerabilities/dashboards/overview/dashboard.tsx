@@ -1,4 +1,3 @@
-import React, { useCallback, useState } from 'react';
 import { withErrorBoundary } from '../../../../common/hocs';
 
 import {
@@ -11,13 +10,7 @@ import {
   WAZUH_SAMPLE_VULNERABILITIES,
   VULNERABILITIES_DASHBOARD_ID,
   VULNERABILITIES_AGENT_DASHBOARD_ID,
-  WAZUH_VULNERABILITIES_PATTERN,
 } from '../../../../../../common/constants';
-import VulsEvaluationFilter, {
-  getUnderEvaluationFilterValue,
-  createUnderEvaluationFilter,
-  UNDER_EVALUATION_FIELD,
-} from '../../common/components/vuls-evaluation-filter';
 import { vulnerabilityManagedFilters } from '../../common/vulnerability-managed-filters';
 
 export const DashboardVuls = withErrorBoundary(
