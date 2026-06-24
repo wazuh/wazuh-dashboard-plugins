@@ -119,6 +119,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed custom filter buttons not being rendered in pdf reports [#8525](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8525)
 - Fixed MITRE technique fields being truncated in the Document Details flyout by showing the full list of clickable items [#8579](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8579)
 - Fixed FIM visualizations height [#8610](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8610)
+- Fixed the suggested valued on multi select filters are not displayed when switching tabs in a short period of time [#8666](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8666)
 
 ### Removed
 
