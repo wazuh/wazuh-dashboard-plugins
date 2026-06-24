@@ -132,6 +132,7 @@ import {
   WAZUH_ACTIVE_RESPONSES_PATTERN,
   HEALTH_CHECK_TASK_INDEX_PATTERN_ACTIVE_RESPONSES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_NORMALIZATION,
+  WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS,
 } from '../common/constants';
 
 import { notificationSetup } from './health-check/notification-default-channels';
@@ -695,7 +696,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
     core.capabilities.registerSwitcher(() => ({
       wazuh: {
-        showIndexRawEvents: !config.disabledSettings.includes('index-raw-events'),
+        showIndexRawEvents: !config.disabledSettings.includes(WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS),
       },
     }));
 

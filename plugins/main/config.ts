@@ -3,9 +3,10 @@
  */
 
 import { schema, TypeOf } from '@osd/config-schema';
+import { WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS } from './common/constants';
 
 export const DISABLED_SETTING_IDS = [
-  'index-raw-events',
+  WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS,
 ] as const;
 
 export type DisabledSettingId = (typeof DISABLED_SETTING_IDS)[number];
