@@ -29,7 +29,10 @@ import { EngineSwitch } from './engine-switch';
 import type { Engine, IndexerSettings } from './types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import {
+  UI_LOGGER_LEVELS,
+  WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS,
+} from '../../../common/constants';
 
 export const WzIndexerSettings: React.FC = () => {
   const [savedSettings, setSavedSettings] = useState<IndexerSettings | null>(
@@ -44,8 +47,9 @@ export const WzIndexerSettings: React.FC = () => {
   const [bottomBarHost, setBottomBarHost] = useState<HTMLElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const isIndexRawEventsDisabled =
-    isSecurityAnalyticsSettingDisabled('index-raw-events');
+  const isIndexRawEventsDisabled = isSecurityAnalyticsSettingDisabled(
+    WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS,
+  );
 
   useLayoutEffect(() => {
     setBottomBarHost(document.getElementById('app-wrapper') ?? document.body);
