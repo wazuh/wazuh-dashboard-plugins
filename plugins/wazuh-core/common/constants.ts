@@ -11,7 +11,6 @@
  */
 import path from 'path';
 import { version } from '../package.json';
-// import { validate as validateNodeCronInterval } from 'node-cron';
 import { SettingsValidator } from '../common/services/settings-validator';
 
 // Plugin

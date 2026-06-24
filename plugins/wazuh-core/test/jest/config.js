@@ -35,7 +35,7 @@ export default {
     '^.+\\.html?$': `${kbnDir}/src/dev/jest/babel_transform.js`,
   },
   transformIgnorePatterns: [
-    '[/\\\\]node_modules(?![\\/\\\\](node-cron|uuid))[/\\\\].+\\.js$',
+    '[/\\\\]node_modules(?![\\/\\\\](uuid))[/\\\\].+\\.js$',
   ],
   snapshotSerializers: [`${kbnDir}/node_modules/enzyme-to-json/serializer`],
   testEnvironment: 'jest-environment-jsdom',
