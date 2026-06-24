@@ -1,13 +1,11 @@
-let saConfig: { disabledSettings?: string[] } = {};
+import { getCapabilities } from '../kibana-services';
 
-export function setSecurityAnalyticsConfig(config: {
-  disabledSettings?: string[];
-}) {
-  saConfig = config;
-}
+export function isSecurityAnalyticsSettingDisabled(settingId: string): boolean {
+  const caps = getCapabilities();
 
-export function isSecurityAnalyticsSettingDisabled(
-  settingId: string,
-): boolean {
-  return (saConfig.disabledSettings ?? []).includes(settingId);
+  if (settingId === 'index-raw-events') {
+    return caps?.wazuh?.showIndexRawEvents === false;
+  }
+
+  return false;
 }

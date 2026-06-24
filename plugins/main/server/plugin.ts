@@ -177,6 +177,7 @@ import IndexPatternMetricsNormalizationKnownFields from '../common/known-fields/
 import IndexPatternVulnerabilitiesKnownFields from '../common/known-fields/states-vulnerabilities.json';
 import IndexPatternActiveResponsesKnownFields from '../common/known-fields/active-responses.json';
 import IndexPatternThreatintelEnrichmentsKnownFields from '../common/known-fields/threatintel-enrichments.json';
+import { WazuhPluginConfigType } from '../config';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -252,6 +253,22 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     const router = core.http.createRouter();
 
     setupRoutes(router, plugins.wazuhCore);
+
+    // Wazuh: register capabilities based on disabledSettings config
+    const config$ = this.initializerContext.config.create<WazuhPluginConfigType>();
+    const config = await config$.pipe(first()).toPromise();
+
+    core.capabilities.registerProvider(() => ({
+      wazuh: {
+        showIndexRawEvents: true,
+      },
+    }));
+
+    core.capabilities.registerSwitcher(() => ({
+      wazuh: {
+        showIndexRawEvents: !config.disabledSettings.includes('index-raw-events'),
+      },
+    }));
 
     // Register health check tasks
 
@@ -901,5 +918,5 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     return {};
   }
 
-  public stop() {}
+  public stop() { }
 }

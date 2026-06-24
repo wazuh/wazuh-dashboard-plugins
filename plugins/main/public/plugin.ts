@@ -26,6 +26,7 @@ import {
   setWazuhCorePlugin,
   getCookies,
   initWazuhBuildInfoFromCore,
+  setCapabilities,
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -54,9 +55,8 @@ import _ from 'lodash';
 
 export class WazuhPlugin
   implements
-    Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins>
-{
-  constructor(private readonly initializerContext: PluginInitializerContext) {}
+  Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins> {
+  constructor(private readonly initializerContext: PluginInitializerContext) { }
 
   private hideTelemetryBanner?: () => void;
 
@@ -204,10 +204,6 @@ export class WazuhPlugin
       core.chrome.navGroup.getNavGroupEnabled(),
     );
 
-    if (plugins.securityAnalyticsDashboards?.config) {
-      setSecurityAnalyticsConfig(plugins.securityAnalyticsDashboards.config);
-    }
-
     return {};
   }
 
@@ -244,6 +240,7 @@ export class WazuhPlugin
     setErrorOrchestrator(ErrorOrchestratorService);
     setWazuhCheckUpdatesPlugin(plugins.wazuhCheckUpdates);
     setWazuhCorePlugin(plugins.wazuhCore);
+    setCapabilities(core.application.capabilities);
     return {};
   }
 }
