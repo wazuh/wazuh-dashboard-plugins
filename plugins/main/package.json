@@ -63,7 +63,6 @@
   "dependencies": {
     "install": "^0.13.0",
     "js2xmlparser": "^5.0.0",
-    "jsdom": "^16.6.0",
     "json-2-csv": "^3.20.0",
     "jwt-decode": "^3.1.2",
     "loglevel": "1.9.2",
