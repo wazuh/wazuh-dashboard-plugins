@@ -18,7 +18,9 @@ const disabledSettingSchema = schema.string({
     if (disabledSettingIdsSet.has(value)) {
       return;
     }
-    return `invalid disabled setting '${value}', expected one of: ${DISABLED_SETTING_IDS.join(', ')}`;
+    return `invalid disabled setting '${value}', expected one of: ${DISABLED_SETTING_IDS.join(
+      ', ',
+    )}`;
   },
 });
 

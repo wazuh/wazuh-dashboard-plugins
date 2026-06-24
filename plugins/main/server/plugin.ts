@@ -685,7 +685,8 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     setupRoutes(router, plugins.wazuhCore);
 
     // Wazuh: register capabilities based on disabledSettings config
-    const config$ = this.initializerContext.config.create<WazuhPluginConfigType>();
+    const config$ =
+      this.initializerContext.config.create<WazuhPluginConfigType>();
     const config = await config$.pipe(first()).toPromise();
 
     core.capabilities.registerProvider(() => ({
@@ -696,7 +697,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
     core.capabilities.registerSwitcher(() => ({
       wazuh: {
-        showIndexRawEvents: !config.disabledSettings.includes(WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS),
+        showIndexRawEvents: !config.disabledSettings.includes(
+          WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS,
+        ),
       },
     }));
 
@@ -781,5 +784,5 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     return {};
   }
 
-  public stop() { }
+  public stop() {}
 }

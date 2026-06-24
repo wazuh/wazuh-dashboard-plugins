@@ -1,4 +1,7 @@
-import { PluginConfigDescriptor, PluginInitializerContext } from 'opensearch_dashboards/server';
+import {
+  PluginConfigDescriptor,
+  PluginInitializerContext,
+} from 'opensearch_dashboards/server';
 
 import { WazuhPlugin } from './plugin';
 import { configSchema, WazuhPluginConfigType } from '../config';

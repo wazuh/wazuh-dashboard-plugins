@@ -55,8 +55,9 @@ import _ from 'lodash';
 
 export class WazuhPlugin
   implements
-  Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins> {
-  constructor(private readonly initializerContext: PluginInitializerContext) { }
+    Plugin<WazuhSetup, WazuhStart, WazuhSetupPlugins, WazuhStartPlugins>
+{
+  constructor(private readonly initializerContext: PluginInitializerContext) {}
 
   private hideTelemetryBanner?: () => void;
 
