@@ -149,7 +149,7 @@ export const CustomSearchBar = ({
   };
 
   const refreshCustomSelectedFilter = () => {
-    setSelectedOptions(defaultSelectedOptions());
+    let state = defaultSelectedOptions();
     // The dropdown filters could be added like fixed filters and user filters
     const currentFilters =
       [...filters, ...fixedFilters]
@@ -189,13 +189,18 @@ export const CustomSearchBar = ({
     if (filterCustom.length != 0) {
       filterCustom.forEach(item => {
         item.forEach(element => {
-          setSelectedOptions(prevState => ({
-            ...prevState,
-            [element.value]: [...prevState[element.value], element],
-          }));
+          state = {
+            ...state,
+            [element.value]: [...state[element.value], element],
+          };
         });
       });
     }
+
+    setSelectedOptions(prevState => ({
+      ...prevState,
+      ...state,
+    }));
   };
 
   const onChange = (values: any[], id: string) => {
