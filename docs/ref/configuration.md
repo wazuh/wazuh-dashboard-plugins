@@ -15,6 +15,7 @@ The following settings can be defined in the configuration file `opensearch_dash
 | `healthcheck.retries_delay`                         | define the wait time after a failed overall health check                                                               | 2.5s              | 0 to 1m                                |
 | `healthcheck.max_retries`                           | define the maximum count of retries of the overall health check that can be executed                                   | 5                 | integer, minimum 1                     |
 | `healthcheck.server_not_ready_troubleshooting_link` | define the troubleshooting link in the not-ready server                                                                | URL to Wazuh docs | a valid URL                            |
+| `wazuh.disabledSettings`                            | Define which indexer settings are hidden from the UI                                                                   | `[]`              | list of: `index-raw-events`            |
 
 ## Define Wazuh server hosts
 
