@@ -192,7 +192,7 @@ export const CustomSearchBar = ({
           state = {
             ...state,
             [element.value]: [...state[element.value], element],
-          }
+          };
         });
       });
     }
@@ -242,8 +242,6 @@ export const CustomSearchBar = ({
     };
     return types[item.type] || types.default;
   };
-
-  console.log('CustomSearchBar', { selectedOptions, filters, fixedFilters });
 
   return (
     <I18nProvider>
