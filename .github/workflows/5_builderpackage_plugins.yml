@@ -22,14 +22,14 @@ on:
       reference:
         required: true
         type: string
-        default: main
+        default: 5.0.0
         description: Source code reference (branch, tag or commit SHA)
   workflow_dispatch:
     inputs:
       reference:
         required: true
         type: string
-        default: main
+        default: 5.0.0
         description: Source code reference (branch, tag or commit SHA)
 
 jobs:
@@ -48,7 +48,7 @@ jobs:
   test-packages:
     needs: build
     name: Test packages
-    runs-on: wz-linux-amd64
+    runs-on: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
 
     steps:
       - name: Step 01 - Download the plugin's source code
@@ -69,25 +69,28 @@ jobs:
       - name: Step 03 - Download the main plugin's artifact
         uses: actions/download-artifact@v4
         with:
-          name: wazuh-dashboard-plugins_wazuh_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          overwrite: true
+          name: wazuh-dashboard-plugins_main_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
+          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_main_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
 
       - name: Step 04 - Download the core plugin's artifact
         uses: actions/download-artifact@v4
         with:
           name: wazuh-dashboard-plugins_wazuh-core_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-core_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          overwrite: true
 
       - name: Step 05 - Download the check-updates plugin's artifact
         uses: actions/download-artifact@v4
         with:
           name: wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          overwrite: true
 
-      - name: Step 06 - Build the Docker image
+      - name: Step 06 - Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Step 07 - Build the Docker image
         run: |
           echo "current=${{ env.currentDir }}"
           cd ./wazuh/scripts/test-packages

@@ -12,7 +12,7 @@ on:
       reference:
         required: true
         type: string
-        default: main
+        default: 5.0.0
         description: Source code reference (branch, tag or commit SHA).
       command:
         required: true
@@ -46,7 +46,7 @@ jobs:
     permissions:
       pull-requests: write
     name: Deploy and run command
-    runs-on: wz-linux-amd64
+    runs-on: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
     strategy:
       matrix:
         plugins:
