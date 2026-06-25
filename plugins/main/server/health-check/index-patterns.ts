@@ -39,8 +39,8 @@ async function getFieldMappings(
 interface CreateIndexPatternOptions {
   fieldsNoIndices?: any;
   savedObjectOverwrite?:
-  | Record<string, any>
-  | ((params: any) => Record<string, any>);
+    | Record<string, any>
+    | ((params: any) => Record<string, any>);
 }
 
 async function createIndexPattern(
@@ -241,9 +241,10 @@ async function validateIndexPattern(indexPattern, options, ctx, logger) {
     !indexPatternHasTimeField(indexPattern, options.hasTimeFieldName)
   ) {
     throw new Error(
-      `Index pattern has missing the time field name: [${options.hasTimeFieldName !== true
-        ? options.hasTimeFieldName
-        : 'any compatible field'
+      `Index pattern has missing the time field name: [${
+        options.hasTimeFieldName !== true
+          ? options.hasTimeFieldName
+          : 'any compatible field'
       }]`,
     );
   }
@@ -345,7 +346,7 @@ export const initializationTaskCreatorIndexPattern = ({
           try {
             await validateIndexPattern(savedObject, options, ctx, logger);
             compatibleIndexPatterns.push(savedObject);
-          } catch { }
+          } catch {}
         }
       }
 
