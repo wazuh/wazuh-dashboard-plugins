@@ -32,6 +32,13 @@ on:
         default: 4.14.0
         description: Source code reference (branch, tag or commit SHA)
 
+env:
+  CI_DEV_INTERNAL_BUCKET: s3://xdrsiem-ci-dev-internal
+  CI_ARTIFACTS_REPO: wazuh-dashboard-plugins
+  CI_BASE_WORKFLOW: 4_builderprecompiled_base-dev-environment
+  CI_ARTIFACTS_WORKFLOW: 4_builderpackage_plugins
+  CI_PLUGINS: 'wazuh wazuh-core wazuh-check-updates'
+
 jobs:
   # Build an app package from the given source code reference.
   build:
@@ -47,18 +54,18 @@ jobs:
 
   test-packages:
     needs: build
-    name: Test packages
+    name: Test packages and upload artifacts to S3
     runs-on: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
 
     steps:
-      - name: Step 01 - Download the plugin's source code
+      - name: Download the plugin's source code
         uses: actions/checkout@v4
         with:
           repository: wazuh/wazuh-dashboard-plugins
           ref: ${{ inputs.reference }}
           path: wazuh
 
-      - name: Step 02 - Set variables
+      - name: Set variables
         run: |
           echo "githubReference=$(echo ${{ inputs.reference }} | sed 's/\//-/g')" >> $GITHUB_ENV
           echo "currentDir=$(pwd -P)" >> $GITHUB_ENV
@@ -66,29 +73,52 @@ jobs:
           echo "revision=$(jq -r '.revision' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
           echo "versionPlatform=$(jq -r '.pluginPlatform.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
 
-      - name: Step 03 - Download the main plugin's artifact
-        uses: actions/download-artifact@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
         with:
-          name: wazuh-dashboard-plugins_wazuh_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          overwrite: true
+          role-to-assume: ${{ secrets.AWS_QA_AUTOMATION_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Step 04 - Download the core plugin's artifact
-        uses: actions/download-artifact@v4
+      - name: Download plugin artifacts from S3
+        run: |
+          plugins_dir="${{ env.currentDir }}/wazuh/scripts/test-packages/plugins"
+          mkdir -p "${plugins_dir}"
+          for plugin in ${{ env.CI_PLUGINS }}; do
+            aws s3 cp \
+              "${{ env.CI_DEV_INTERNAL_BUCKET }}/${{ env.CI_ARTIFACTS_REPO }}/${{ env.CI_BASE_WORKFLOW }}/${plugin}_${{ github.run_id }}.zip" \
+              "${plugins_dir}/${plugin}_${{ github.run_id }}.zip"
+          done
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
         with:
-          name: wazuh-dashboard-plugins_wazuh-core_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-core_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          overwrite: true
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Step 05 - Download the check-updates plugin's artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          overwrite: true
-
-      - name: Step 06 - Build the Docker image
+      - name: Build the Docker image
         run: |
           echo "current=${{ env.currentDir }}"
           cd ./wazuh/scripts/test-packages
           docker build --build-arg OSD_VERSION=${{ env.versionPlatform }} -f osd-test-packages.Dockerfile ./
+
+      - name: Bundle plugin artifacts and upload to S3
+        run: |
+          plugins_dir="${{ env.currentDir }}/wazuh/scripts/test-packages/plugins"
+          final_zip="artifacts_${{ github.run_id }}.zip"
+          pushd "${plugins_dir}"
+          zip -r "${GITHUB_WORKSPACE}/${final_zip}" .
+          popd
+          aws s3 cp "${GITHUB_WORKSPACE}/${final_zip}" \
+            "${{ env.CI_DEV_INTERNAL_BUCKET }}/${{ env.CI_ARTIFACTS_REPO }}/${{ env.CI_ARTIFACTS_WORKFLOW }}/${final_zip}"
+          echo "::notice::Bundle uploaded to ${{ env.CI_DEV_INTERNAL_BUCKET }}/${{ env.CI_ARTIFACTS_REPO }}/${{ env.CI_ARTIFACTS_WORKFLOW }}/${final_zip}"
+
+      - name: Clean up staging artifacts
+        if: always()
+        run: |
+          plugins_dir="${{ env.currentDir }}/wazuh/scripts/test-packages/plugins"
+          for plugin in ${{ env.CI_PLUGINS }}; do
+            aws s3 rm \
+              "${{ env.CI_DEV_INTERNAL_BUCKET }}/${{ env.CI_ARTIFACTS_REPO }}/${{ env.CI_BASE_WORKFLOW }}/${plugin}_${{ github.run_id }}.zip" \
+              || true
+          done
+          rm -rf "${plugins_dir}"

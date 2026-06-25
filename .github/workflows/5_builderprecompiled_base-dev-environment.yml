@@ -39,6 +39,11 @@ on:
         default: false
         required: false
 
+env:
+  CI_DEV_INTERNAL_BUCKET: s3://xdrsiem-ci-dev-internal
+  CI_ARTIFACTS_REPO: wazuh-dashboard-plugins
+  CI_ARTIFACTS_WORKFLOW: 5_builderprecompiled_base-dev-environment
+
 jobs:
   # Deploy the plugin in a development environment and run a command
   # using a pre-built Docker image, hosted in Quay.io.
@@ -69,7 +74,7 @@ jobs:
           ]
 
     steps:
-      - name: Step 01 - Download the plugin's source code
+      - name: Download the plugin's source code
         uses: actions/checkout@v4
         with:
           repository: wazuh/wazuh-dashboard-plugins
@@ -78,10 +83,10 @@ jobs:
 
       # Fix source code ownership so the internal user of the Docker
       # container is also owner.
-      - name: Step 02 - Change code ownership
+      - name: Change code ownership
         run: sudo chown 1000:1000 -R wazuh;
 
-      - name: Step 03 - Set up the environment and run the command
+      - name: Set up the environment and run the command
         run: |
           # Detect which platform to use from source code
           platform=kbn;
@@ -127,16 +132,25 @@ jobs:
           echo "version=$(jq -r '.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
           echo "revision=$(jq -r '.revision' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
 
-      - name: Step 04 - Upload artifact to GitHub
+      - name: Configure AWS credentials
         if: ${{ inputs.artifact_name && inputs.artifact_path }}
-        uses: actions/upload-artifact@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
-          name: ${{ inputs.artifact_name }}_${{ matrix.plugins.container_path }}_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          path: ${{ matrix.plugins.path }}/${{ inputs.artifact_path }}
-          if-no-files-found: 'error'
-          overwrite: true
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Step 05 - Upload coverage results to GitHub
+      - name: Upload artifact to S3
+        if: ${{ inputs.artifact_name && inputs.artifact_path }}
+        run: |
+          artifact_zip="${{ matrix.plugins.container_path }}_${{ github.run_id }}.zip"
+          s3_path="${{ env.CI_DEV_INTERNAL_BUCKET }}/${{ env.CI_ARTIFACTS_REPO }}/${{ env.CI_ARTIFACTS_WORKFLOW }}/${artifact_zip}"
+          pushd "${{ matrix.plugins.path }}/${{ inputs.artifact_path }}"
+          zip -r "${GITHUB_WORKSPACE}/${artifact_zip}" .
+          popd
+          aws s3 cp "${GITHUB_WORKSPACE}/${artifact_zip}" "${s3_path}"
+          echo "::notice::Artifact uploaded to ${s3_path}"
+
+      - name: Upload coverage results to GitHub
         if: ${{ inputs.notify_jest_coverage_summary && github.event_name == 'pull_request' }}
         uses: ./wazuh/.github/actions/comment-test-coverage
         with:
