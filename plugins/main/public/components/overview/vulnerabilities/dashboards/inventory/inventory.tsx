@@ -61,6 +61,7 @@ import {
   VULNERABILITIES_INVENTORY_DASHBOARD_ID,
   VULNERABILITIES_INVENTORY_AGENT_DASHBOARD_ID,
 } from '../../../../../../common/constants';
+import { vulnerabilityManagedFilters } from '../../common/vulnerability-managed-filters';
 import RestoreStateColumnsButton from '../../../../common/wazuh-discover/components/restore-state-columns';
 import managedFilters from './managed-filters';
 import DashboardRenderer from '../../../../common/dashboards/dashboard-renderer/dashboard-renderer';
@@ -83,6 +84,7 @@ const InventoryVulsComponent = () => {
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
+    managedFiltersSpec: vulnerabilityManagedFilters,
   });
   const { query } = searchBarProps;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);

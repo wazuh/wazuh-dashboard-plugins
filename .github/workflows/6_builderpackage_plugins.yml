@@ -22,14 +22,14 @@ on:
       reference:
         required: true
         type: string
-        default: main
+        default: 5.0.0
         description: 'Git reference (branch, tag, or commit SHA) to build from.'
   workflow_dispatch:
     inputs:
       reference:
         required: true
         type: string
-        default: main
+        default: 5.0.0
         description: 'Git reference (branch, tag, or commit SHA) to build from.'
 
 jobs:
@@ -46,7 +46,7 @@ jobs:
   test-packages:
     needs: build
     name: Test packages
-    runs-on: wz-linux-amd64
+    runs-on: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
     strategy:
       matrix:
         plugin: [wazuh-core, wazuh-check-updates]

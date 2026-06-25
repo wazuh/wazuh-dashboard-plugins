@@ -69,7 +69,6 @@ export const SettingsAboutGeneralInfo = ({
             <EuiFlexGroup
               alignItems='center'
               justifyContent='center'
-              gutterSize='xl'
               responsive={false}
             >
               <EuiFlexItem grow={false}>
@@ -98,8 +97,9 @@ export const SettingsAboutGeneralInfo = ({
                 <EuiButtonIcon
                   aria-label='Github'
                   iconType='logoGithub'
+                  color='text'
                   iconSize='xxl'
-                  href='https://github.com/wazuh/wazuh-kibana-app'
+                  href='https://github.com/wazuh/wazuh-dashboard-plugins'
                   target='_blank'
                 >
                   Github

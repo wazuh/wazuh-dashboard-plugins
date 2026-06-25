@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { IndexPatternsFetcher } from '../../../../src/plugins/data/server';
 import {
   indexPatternHasMissingFields,
@@ -14,33 +15,28 @@ interface EnsureIndexPatternExistenceContextTask {
   options: any;
 }
 
-async function getFieldMappings(
-  { logger, indexPatternsClient },
-  indexPatternTitle: string,
-) {
-  logger.debug(`Getting index pattern fields for title [${indexPatternTitle}]`);
-
-  // https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.16.0/src/plugins/data/server/index_patterns/routes.ts#L74
-  const fields = await indexPatternsClient.getFieldsForWildcard({
-    pattern: indexPatternTitle,
-    // meta_fields=_source&meta_fields=_id&meta_fields=_type&meta_fields=_index&meta_fields=_score
-    metaFields: ['_source', '_id', '_type', '_index', '_score'],
-  });
-
-  logger.debug(
-    `Fields for index pattern with title [${indexPatternTitle}]: ${JSON.stringify(
-      fields,
-    )}`,
-  );
-
-  return fields;
-}
-
 interface CreateIndexPatternOptions {
-  fieldsNoIndices?: any;
+  // Path to the known-fields JSON file used to seed the index pattern when no
+  // backing indices exist yet. It is a path instead of a preloaded object so
+  // the (large) JSON is read from disk only when an index pattern actually
+  // needs to be created, and is released for garbage collection afterwards.
+  fieldsNoIndicesFilePath?: string;
   savedObjectOverwrite?:
     | Record<string, any>
     | ((params: any) => Record<string, any>);
+}
+
+interface IndexPatternOptions extends CreateIndexPatternOptions {
+  hasFields?: string[];
+  hasTemplate?: boolean;
+  hasTimeFieldName?: true | string;
+  checkDefaultIndexPattern?: boolean;
+}
+
+async function loadKnownFields(filePath: string) {
+  const rawContent = await fs.promises.readFile(filePath, 'utf8');
+
+  return JSON.parse(rawContent);
 }
 
 async function createIndexPattern(
@@ -49,10 +45,12 @@ async function createIndexPattern(
   options: CreateIndexPatternOptions = {},
 ) {
   try {
-    let fieldsObj;
-
-    // The creation of the index pattern will always rely on the defined known fields.
-    fieldsObj = options.fieldsNoIndices;
+    // The creation of the index pattern will always rely on the defined known
+    // fields. The JSON is read from disk here, scoped to this execution, so it
+    // becomes eligible for garbage collection once the task completes.
+    const fieldsObj = options.fieldsNoIndicesFilePath
+      ? await loadKnownFields(options.fieldsNoIndicesFilePath)
+      : undefined;
 
     const title = indexPatternID;
     const fields = JSON.stringify(fieldsObj);
@@ -97,7 +95,7 @@ async function createIndexPattern(
     return response;
   } catch (error) {
     throw new Error(
-      `index pattern with ID [${indexPatternID}] could not be created due to: ${error.message}. This could indicate the collection is disabled or there is a problem in the data collection or ingestion.`,
+      `${error.message}. This could indicate the collection is disabled or there is a problem in the data collection or ingestion.`,
     );
   }
 }
@@ -275,95 +273,144 @@ async function validateIndexPattern(indexPattern, options, ctx, logger) {
   }
 }
 
-export const initializationTaskCreatorIndexPattern = ({
+export interface IndexPatternTaskDefinition {
+  taskName: string;
+  indexPatternID?: string;
+  options: IndexPatternOptions;
+}
+
+async function runIndexPatternTask(
+  { context: ctx, logger }: InitializationTaskRunContext,
+  {
+    indexPatternID,
+    options = {},
+  }: Omit<IndexPatternTaskDefinition, 'taskName'>,
+) {
+  try {
+    logger.debug('Starting index pattern saved object');
+    const savedObjectsClient = getSavedObjectsClient(ctx, ctx.scope);
+    const indexPatternsClient = getIndexPatternsClient(ctx, ctx.scope);
+
+    let compatibleIndexPatterns = [];
+
+    if (indexPatternID) {
+      const savedObject = await ensureIndexPatternExistence(
+        { ...ctx, indexPatternsClient, savedObjectsClient, logger },
+        {
+          indexPatternID: indexPatternID,
+          options,
+        },
+      );
+
+      if (options.checkDefaultIndexPattern) {
+        const uiSettingsClient =
+          ctx.services.core.uiSettings.asScopedToClient(savedObjectsClient);
+        const defaultIndex = await uiSettingsClient.get('defaultIndex');
+
+        // Set defaultIndex only when null (first launch), otherwise respect user configuration when it's '' or any other value.
+        if (defaultIndex === null) {
+          logger.debug(
+            `Default index pattern is null, setting to [${savedObject.id}]`,
+          );
+          if (savedObject.id) {
+            logger.info(
+              `Setting default index pattern to [${savedObject.id}] from health check initialization task`,
+            );
+            await uiSettingsClient.set('defaultIndex', savedObject.id);
+            logger.info(`Default index pattern set to [${savedObject.id}]`);
+          }
+        } else {
+          logger.debug(`Default index pattern already configured, skipping`);
+        }
+      }
+
+      await validateIndexPattern(savedObject, options, ctx, logger);
+      compatibleIndexPatterns.push(savedObject);
+    } else {
+      const { saved_objects: savedObjects } = await savedObjectsClient.find({
+        type: ['index-pattern'],
+        perPage: 10000, // TODO: This should iterate
+        page: 1,
+      });
+
+      for (const savedObject of savedObjects) {
+        try {
+          await validateIndexPattern(savedObject, options, ctx, logger);
+          compatibleIndexPatterns.push(savedObject);
+        } catch {}
+      }
+    }
+
+    if (compatibleIndexPatterns?.length === 0) {
+      throw new Error('No compatible index patterns were found');
+    }
+
+    return compatibleIndexPatterns?.map(({ id, attributes: { title } }) => ({
+      title,
+      id,
+    }));
+  } catch (error) {
+    logger.error(
+      `Index pattern [${indexPatternID}] initialization failed: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+export const initializationTaskCreatorIndexPatternBatch = ({
   taskName,
-  options = {},
-  indexPatternID,
-  services,
+  indexPatterns,
+  batchSize = 5,
   taskProps = {},
 }: {
   taskName: string;
-  options: CreateIndexPatternOptions & {
-    hasFields?: string[];
-    hasTemplate?: boolean;
-    hasTimeFieldName?: true | string;
-    checkDefaultIndexPattern?: boolean;
-  };
-  indexPatternID?: string;
+  indexPatterns: IndexPatternTaskDefinition[];
+  batchSize?: number;
+  taskProps?: Record<string, any>;
 }) => ({
   ...taskProps,
   name: taskName,
-  async run({ context: ctx, logger }: InitializationTaskRunContext) {
-    try {
-      logger.debug('Starting index pattern saved object');
-      // Get clients depending on the scope
-      const savedObjectsClient = getSavedObjectsClient(ctx, ctx.scope);
-      const indexPatternsClient = getIndexPatternsClient(ctx, ctx.scope);
+  async run(runCtx: InitializationTaskRunContext) {
+    const { logger } = runCtx;
+    const results: Array<{ title: string; id: string }> = [];
+    const failures: Array<{ indexPatternID?: string; message: string }> = [];
 
-      let compatibleIndexPatterns = [];
-
-      if (indexPatternID) {
-        const savedObject = await ensureIndexPatternExistence(
-          { ...ctx, indexPatternsClient, savedObjectsClient, logger },
-          {
-            indexPatternID: indexPatternID,
-            options,
-          },
-        );
-
-        if (options.checkDefaultIndexPattern) {
-          const uiSettingsClient =
-            ctx.services.core.uiSettings.asScopedToClient(savedObjectsClient);
-          const defaultIndex = await uiSettingsClient.get('defaultIndex');
-
-          // Set defaultIndex only when null (first launch), otherwise respect user configuration when it's '' or any other value.
-          if (defaultIndex === null) {
-            logger.debug(
-              `Default index pattern is null, setting to [${savedObject.id}]`,
-            );
-            if (savedObject.id) {
-              logger.info(
-                `Setting default index pattern to [${savedObject.id}] from health check initialization task`,
-              );
-              await uiSettingsClient.set('defaultIndex', savedObject.id);
-              logger.info(`Default index pattern set to [${savedObject.id}]`);
-            }
-          } else {
-            logger.debug(`Default index pattern already configured, skipping`);
-          }
+    for (let i = 0; i < indexPatterns.length; i += batchSize) {
+      const batch = indexPatterns.slice(i, i + batchSize);
+      logger.debug(
+        `Processing index pattern batch ${Math.floor(i / batchSize) + 1}` +
+          ` (patterns ${i + 1}-${Math.min(
+            i + batchSize,
+            indexPatterns.length,
+          )}` +
+          ` of ${indexPatterns.length})`,
+      );
+      const settled = await Promise.allSettled(
+        batch.map(({ indexPatternID, options }) =>
+          runIndexPatternTask(runCtx, { indexPatternID, options }),
+        ),
+      );
+      settled.forEach((outcome, idx) => {
+        if (outcome.status === 'fulfilled') {
+          results.push(...outcome.value);
+        } else {
+          failures.push({
+            indexPatternID: batch[idx].indexPatternID,
+            message: outcome.reason?.message ?? String(outcome.reason),
+          });
         }
-
-        await validateIndexPattern(savedObject, options, ctx, logger);
-        compatibleIndexPatterns.push(savedObject);
-      } else {
-        const { saved_objects: savedObjects } = await savedObjectsClient.find({
-          type: ['index-pattern'],
-          perPage: 10000, // TODO: This should iterate
-          page: 1,
-        });
-
-        for (const savedObject of savedObjects) {
-          try {
-            await validateIndexPattern(savedObject, options, ctx, logger);
-            compatibleIndexPatterns.push(savedObject);
-          } catch {}
-        }
-      }
-
-      if (compatibleIndexPatterns?.length === 0) {
-        throw new Error('No compatible index patterns were found');
-      }
-
-      return compatibleIndexPatterns?.map(({ id, attributes: { title } }) => ({
-        title,
-        id,
-      }));
-    } catch (error) {
-      const message = `Error initilizating index pattern with ID [${indexPatternID}]: ${error.message}`;
-
-      logger.error(message);
-      throw new Error(message);
+      });
     }
+
+    if (failures.length > 0) {
+      throw new Error(
+        `Some index patterns could not be initialized:\n\n` +
+          failures
+            .map(f => `  - [${f.indexPatternID}]: ${f.message}`)
+            .join('\n'),
+      );
+    }
+    return results;
   },
 });
 
