@@ -138,7 +138,13 @@ const getScaMitreDisplayValues = (
 
 const renderScaMitreCategory =
   (category: 'tactic' | 'technique' | 'subtechnique') =>
-  (_value: string | string[], row: any, options?: RenderColumnOptions) =>
+  (
+    _value: string | string[],
+    row: {
+      check?: { mitre?: Record<string, { id?: string[]; name?: string[] }> };
+    },
+    options?: RenderColumnOptions,
+  ) =>
     renderMitreList(
       getScaMitreDisplayValues(row?.check?.mitre?.[category]),
       undefined,

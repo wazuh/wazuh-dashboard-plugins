@@ -10,10 +10,20 @@ import {
 type MitreCategory = { id?: string[]; name?: string[] };
 
 const getMitreDisplayValues = (value?: MitreCategory): string[] => {
-  if (value?.name?.length) {
-    return value.name;
+  const ids = value?.id ?? [];
+  const names = value?.name ?? [];
+  const length = Math.max(ids.length, names.length);
+  const result: string[] = [];
+  for (let index = 0; index < length; index++) {
+    const id = ids[index];
+    const name = names[index];
+    if (id && name) {
+      result.push(`${id} - ${name}`);
+    } else if (id || name) {
+      result.push(id || name);
+    }
   }
-  return value?.id ?? [];
+  return result;
 };
 
 interface CheckDetailsProps {
