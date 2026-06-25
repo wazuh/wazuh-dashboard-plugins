@@ -7,12 +7,9 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 
-type MitreCategory = { id?: string[]; name?: string[] } | string[];
+type MitreCategory = { id?: string[]; name?: string[] };
 
-const getMitreDisplayValues = (value: MitreCategory): string[] => {
-  if (Array.isArray(value)) {
-    return value;
-  }
+const getMitreDisplayValues = (value?: MitreCategory): string[] => {
   if (value?.name?.length) {
     return value.name;
   }

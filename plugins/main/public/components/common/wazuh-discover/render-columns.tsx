@@ -127,6 +127,24 @@ const renderMitreTechnique = (technique: string, showLinkTooltip = true) => (
   </WzLink>
 );
 
+const getScaMitreDisplayValues = (
+  category: { id?: string[]; name?: string[] } | undefined,
+): string[] => {
+  if (category?.name?.length) {
+    return category.name;
+  }
+  return category?.id ?? [];
+};
+
+const renderScaMitreCategory =
+  (category: 'tactic' | 'technique' | 'subtechnique') =>
+  (_value: string | string[], row: any, options?: RenderColumnOptions) =>
+    renderMitreList(
+      getScaMitreDisplayValues(row?.check?.mitre?.[category]),
+      undefined,
+      options,
+    );
+
 export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
     id: 'wazuh.agent.id',
@@ -196,6 +214,18 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
     id: 'wazuh.rule.mitre.subtechnique.name',
     render: (value: string | string[]) => renderMitreList(value),
+  },
+  {
+    id: 'check.mitre.tactic.name',
+    render: renderScaMitreCategory('tactic'),
+  },
+  {
+    id: 'check.mitre.technique.name',
+    render: renderScaMitreCategory('technique'),
+  },
+  {
+    id: 'check.mitre.subtechnique.name',
+    render: renderScaMitreCategory('subtechnique'),
   },
   {
     id: 'wazuh.rule.compliance.pci_dss',
