@@ -666,7 +666,14 @@ export const ModulesDefaults = {
             DataSource={ActiveResponsesDataSource}
             DataSourceRepository={ActiveResponsesDataSourceRepository}
             categoriesSampleData={[]}
-            renderFlyoutBody={(hit) => <ActiveResponseFlyoutBody hit={hit} />}
+            flyoutTitle='Active Response Details'
+            additionalDocumentDetailsTabs={({ document }) => [
+              {
+                id: 'source-finding',
+                name: 'Source Finding',
+                content: <ActiveResponseFlyoutBody hit={document} />,
+              },
+            ]}
           />
         ),
       },

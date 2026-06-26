@@ -4,13 +4,25 @@ import {
   EuiLoadingSpinner,
   EuiText,
 } from '@elastic/eui';
-import { DocumentViewTableAndJson } from '../../../common/wazuh-discover/components/document-view-table-and-json';
+import DocViewer from '../../../common/doc-viewer/doc-viewer';
+import { useDocViewer } from '../../../common/doc-viewer';
 import { resolveOriginalFinding } from './active-responses-service';
 
 type Resolution =
   | { type: 'loading' }
   | { type: 'found'; document: any; indexPattern: any }
   | { type: 'notFound' };
+
+const SourceFindingTable = ({
+  document,
+  indexPattern,
+}: {
+  document: any;
+  indexPattern: any;
+}) => {
+  const docViewerProps = useDocViewer({ doc: document, indexPattern });
+  return <DocViewer {...docViewerProps} filters={[]} setFilters={() => {}} showFilterButtons={false} />;
+};
 
 export const ActiveResponseFlyoutBody = ({ hit }: { hit: any }) => {
   const [resolution, setResolution] = useState<Resolution>({
@@ -58,12 +70,9 @@ export const ActiveResponseFlyoutBody = ({ hit }: { hit: any }) => {
   }
 
   return (
-    <DocumentViewTableAndJson
+    <SourceFindingTable
       document={resolution.document}
       indexPattern={resolution.indexPattern}
-      filters={[]}
-      setFilters={() => {}}
-      showFilterButtons={false}
     />
   );
 };

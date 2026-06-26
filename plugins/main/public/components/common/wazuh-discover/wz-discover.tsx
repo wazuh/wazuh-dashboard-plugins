@@ -68,7 +68,7 @@ export type WazuhDiscoverProps = {
   DataSourceRepository?: new () => tDataSourceRepository<tParsedIndexPattern>;
   categoriesSampleData: string[];
   additionalDocumentDetailsTabs?: import('./components/document-view-table-and-json').DocumentViewTableAndJsonPropsAdditionalTabs;
-  renderFlyoutBody?: (hit: any) => React.ReactNode;
+  flyoutTitle?: string;
 };
 
 const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
@@ -79,7 +79,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     tableColumns: defaultTableColumns,
     categoriesSampleData,
     additionalDocumentDetailsTabs,
-    renderFlyoutBody,
+    flyoutTitle,
   } = props;
 
   if (!DataSource) {
@@ -345,29 +345,26 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                     <DocDetailsHeader
                       doc={inspectedHit}
                       indexPattern={dataSource?.indexPattern}
+                      title={flyoutTitle}
                     />
                   </EuiFlyoutHeader>
                   <EuiFlyoutBody>
                     <EuiFlexGroup direction='column'>
                       <EuiFlexItem>
-                        {renderFlyoutBody ? (
-                          renderFlyoutBody(inspectedHit)
-                        ) : (
-                          <DocumentViewTableAndJson
-                            document={inspectedHit}
-                            indexPattern={indexPattern}
-                            renderFields={getAllCustomRenders(
-                              defaultTableColumns,
-                              wzDiscoverRenderColumns,
-                            )}
-                            filters={filters}
-                            setFilters={setFilters}
-                            onFilter={closeFlyoutHandler}
-                            onDocumentMutated={handleDocumentMutated}
-                            additionalTabs={additionalDocumentDetailsTabs}
-                            showFilterButtons={false}
-                          />
-                        )}
+                        <DocumentViewTableAndJson
+                          document={inspectedHit}
+                          indexPattern={indexPattern}
+                          renderFields={getAllCustomRenders(
+                            defaultTableColumns,
+                            wzDiscoverRenderColumns,
+                          )}
+                          filters={filters}
+                          setFilters={setFilters}
+                          onFilter={closeFlyoutHandler}
+                          onDocumentMutated={handleDocumentMutated}
+                          additionalTabs={additionalDocumentDetailsTabs}
+                          showFilterButtons={false}
+                        />
                       </EuiFlexItem>
                     </EuiFlexGroup>
                   </EuiFlyoutBody>
