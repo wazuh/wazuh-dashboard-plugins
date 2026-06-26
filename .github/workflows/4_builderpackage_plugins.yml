@@ -54,7 +54,7 @@ jobs:
       reference: ${{ inputs.reference }}
       command: 'yarn build'
       artifact_name: 'wazuh-dashboard-plugins'
-      workflow_run: ${{ env.workflow_run }}
+      workflow_run: 4_builderpackage_plugins
     secrets: inherit
 
   test-packages:
