@@ -112,14 +112,14 @@ const renderMitreTechnique = (technique: string, showLinkTooltip = true) => (
     toolTipProps={
       showLinkTooltip
         ? {
-          content: i18n.translate(
-            'discover.fieldLinkTooltip.mitreTechnique',
-            {
-              defaultMessage:
-                'Navigate to MITRE ATT&CK - Intelligence and see the technique details',
-            },
-          ),
-        }
+            content: i18n.translate(
+              'discover.fieldLinkTooltip.mitreTechnique',
+              {
+                defaultMessage:
+                  'Navigate to MITRE ATT&CK - Intelligence and see the technique details',
+              },
+            ),
+          }
         : undefined
     }
   >
