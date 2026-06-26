@@ -18,14 +18,43 @@ import type { SavedObjectsClientContract } from 'opensearch_dashboards/server';
 import type { InitializationTaskRunContext } from '../services';
 import { readDashboardDefinitionFiles } from './dashboard-definition-reader';
 import type {
+  GenericAttributes,
   SavedObject,
   SavedObjectDashboard,
   SavedObjectVisualization,
 } from './saved-object.types';
-import { DEFAULT_DEFINITIONS_FOLDER, DEFAULT_EXTENSION } from './constants';
+import {
+  DEFAULT_DEFINITIONS_FOLDER,
+  DEFAULT_EXTENSION,
+  DESCRIPTION_PREFIX,
+} from './constants';
 
 function toSentenceCase(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+/**
+ * Returns the attributes with `description` guaranteed to start with the
+ * required "Provided by Wazuh. " prefix, so the provisioned saved objects can
+ * be reliably targeted by filters regardless of what the source `.ndjson`
+ * file contains. The original attributes are not mutated, and the operation is
+ * idempotent (a description that already has the prefix is returned unchanged).
+ */
+function withDescriptionPrefix<T extends GenericAttributes>(attributes: T): T {
+  const { description } = attributes;
+
+  if (
+    typeof description === 'string' &&
+    description.startsWith(DESCRIPTION_PREFIX)
+  ) {
+    return attributes;
+  }
+
+  return {
+    ...attributes,
+    description:
+      DESCRIPTION_PREFIX + (typeof description === 'string' ? description : ''),
+  };
 }
 
 async function isSavedObjectPresent(
@@ -76,7 +105,7 @@ async function ensureVisualizationSavedObject(
 
   const visualizationSavedObject = await client.create(
     'visualization',
-    attributes,
+    withDescriptionPrefix(attributes),
     {
       id,
       overwrite: shouldOverwrite,
@@ -111,12 +140,16 @@ async function ensureDashboardSavedObject(
     if (existingDashId) return existingDashId;
   }
 
-  const dashboardSavedObject = await client.create('dashboard', attributes, {
-    id,
-    overwrite: shouldOverwrite,
-    refresh: true,
-    references,
-  });
+  const dashboardSavedObject = await client.create(
+    'dashboard',
+    withDescriptionPrefix(attributes),
+    {
+      id,
+      overwrite: shouldOverwrite,
+      refresh: true,
+      references,
+    },
+  );
   logger.debug(
     `Dashboard ensured [${dashboardSavedObject.id}] title [${dashboardSavedObject.attributes.title}]`,
   );
