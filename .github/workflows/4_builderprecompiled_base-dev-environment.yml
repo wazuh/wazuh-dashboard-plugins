@@ -153,7 +153,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_QA_AUTOMATION_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Step 05 - Upload artifact to S3
+      - name: Upload artifact to S3
         if: ${{ inputs.artifact_name && inputs.artifact_path }}
         run: |
           artifact_zip="${{ inputs.artifact_name }}_${{ matrix.plugins.container_path }}_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip"
