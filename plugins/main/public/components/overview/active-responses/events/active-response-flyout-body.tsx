@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { EuiEmptyPrompt, EuiLoadingSpinner, EuiText } from '@elastic/eui';
+import { EuiEmptyPrompt, EuiLoadingSpinner, EuiSpacer, EuiText } from '@elastic/eui';
 import DocViewer from '../../../common/doc-viewer/doc-viewer';
 import { useDocViewer } from '../../../common/doc-viewer';
 import { resolveOriginalFinding } from './active-responses-service';
@@ -68,7 +68,9 @@ export const ActiveResponseFlyoutBody = ({ hit }: { hit: any }) => {
 
   if (resolution.type === 'notFound') {
     return (
-      <EuiEmptyPrompt
+      <>
+        <EuiSpacer size='l' />
+        <EuiEmptyPrompt
         iconType='search'
         title={<h3>Missing source finding</h3>}
         body={
@@ -77,6 +79,7 @@ export const ActiveResponseFlyoutBody = ({ hit }: { hit: any }) => {
           </EuiText>
         }
       />
+      </>
     );
   }
 
