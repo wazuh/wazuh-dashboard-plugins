@@ -27,14 +27,14 @@ export async function renderApp(params) {
   /* Load or initiate the dependencies, async styles, etc... */
 
   const deps = {}; // dependencies
-  ReactDOM.render(
+  const root = createRoot(params.element);
+  root.render(
     <I18nProvider>
       <Provider store={store}>
         <Application {...deps} />
       </Provider>
     </I18nProvider>,
-    params.element,
   );
-  return () => ReactDOM.unmountComponentAtNode(params.element);
+  return () => root.unmount();
 }
 ```

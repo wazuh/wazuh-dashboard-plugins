@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v5.0.0 - OpenSearch Dashboards 3.6.0 - Revision 03
+## Wazuh v5.0.0 - OpenSearch Dashboards 3.7.0 - Revision 03
 
 ### Added
 
@@ -121,6 +121,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed MITRE technique fields being truncated in the Document Details flyout by showing the full list of clickable items [#8579](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8579)
 - Fixed FIM visualizations height [#8610](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8610)
 - Fixed the GitHub link in the About page pointing to the legacy `wazuh-kibana-app` repository [#8653](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8653)
+- Fixed the suggested valued on multi select filters are not displayed when switching tabs in a short period of time [#8666](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8666)
 
 ### Removed
 
