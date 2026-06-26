@@ -37,7 +37,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added Cases tab to the Threat Hunting module [#8583](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8583)
 - Added visualizations to Vulnerability Detection > Inventory [#8611](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8611) [#8663](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8663)
 - Added Cases tab to the Threat Hunting module [#8583](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8583) [#8608](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8608) [#8630](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8630)
-- Added Active Responses dashboard [8601](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8601)
+- Added Active Responses dashboard [#8601](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8601) [#8679](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8679)
 
 ### Changed
 
