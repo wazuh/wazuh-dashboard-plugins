@@ -72,7 +72,6 @@ jobs:
       - name: Set variables
         run: |
           echo "githubReference=$(echo ${{ inputs.reference }} | sed 's/\//-/g')" >> $GITHUB_ENV
-
           echo "version=$(jq -r '.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
           echo "revision=$(jq -r '.revision' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
           echo "versionPlatform=$(jq -r '.pluginPlatform.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
