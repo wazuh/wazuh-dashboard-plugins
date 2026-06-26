@@ -44,7 +44,6 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       >
                         <path
                           class="arc"
-                          d="M0,0A0,0 0 1,1 0,0A0,0 0 1,1 0,0Z"
                           fill="#007871"
                         />
                       </g>
@@ -53,7 +52,6 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                       >
                         <path
                           class="arc"
-                          d="M0,0L0,0Z"
                           fill="#BD271E"
                         />
                       </g>
