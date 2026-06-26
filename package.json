@@ -1,0 +1,31 @@
+{
+  "type": "commonjs",
+  "scripts": {
+    "lint:staged": "eslint $(git diff-index --cached --name-only --diff-filter=ACMR HEAD | grep 'plugins/' | grep -E '.*\\.[jt]sx?$')",
+    "lint:staged:fix": "yarn lint:staged --fix",
+    "prepare": "husky",
+    "format:staged": "prettier --ignore-unknown --write $(git diff-index --cached --name-only --diff-filter=ACMR HEAD | grep -vE 'yarn.lock')"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^1.1.1",
+    "@eslint/js": "^10.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
+    "@typescript-eslint/parser": "^8.58.0",
+    "eslint": "^10.0.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "3.5.5",
+    "eslint-plugin-async-await": "^0.0.0",
+    "eslint-plugin-cypress": "^6.1.0",
+    "eslint-plugin-unicorn": "^56.0.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^17.4.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^10.2.0",
+    "prettier": "^3.4.1",
+    "prettier-eslint": "^16.3.0",
+    "typescript": "~6.0.2"
+  }
+}

@@ -11,11 +11,9 @@ name: ESLint
 
 on:
   pull_request:
-    branches-ignore:
-      - 2.*
-      - 3.*
-      - 4.*
+    branches:
       - main
+      - 5.*
     types: [opened, synchronize, reopened, ready_for_review]
 jobs:
   linter:

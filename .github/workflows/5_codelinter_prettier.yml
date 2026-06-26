@@ -3,7 +3,7 @@ name: (5.x) Prettier
 on:
   pull_request:
     branches:
-      - main # Remove this when main changes to 6.x
+      - main
       - 5.*
     types: [opened, synchronize, reopened, ready_for_review]
 jobs:
@@ -38,8 +38,6 @@ jobs:
           echo "Changed files:"
           echo "${CHANGED_FILES}"
           git checkout $GITHUB_HEAD_REF
-          plugin_package_json=$(ls -d plugins/* | head -n1)
-          echo "Installing dependencies from plugin: ${plugin_package_json}"
-          SKIP_DOWNLOAD_INDEXER_RESOURCES=true yarn --cwd "${plugin_package_json}" --modules-folder ../../node_modules
+          SKIP_DOWNLOAD_INDEXER_RESOURCES=true yarn
           echo "Running prettier on the changed files"
           npx prettier ${CHANGED_FILES} --check --ignore-unknown

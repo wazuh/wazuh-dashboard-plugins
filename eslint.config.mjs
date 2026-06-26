@@ -3,7 +3,7 @@ import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import prettier from 'eslint-plugin-prettier';
-import filenamesSimple from 'eslint-plugin-filenames-simple';
+import unicorn from 'eslint-plugin-unicorn';
 import { fixupPluginRules } from '@eslint/compat';
 import globals from 'globals';
 import tsParser from '@typescript-eslint/parser';
@@ -16,8 +16,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const compat = new FlatCompat({
   baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
 });
 
 export default defineConfig([
@@ -26,9 +24,9 @@ export default defineConfig([
     'public/utils/codemirror/',
     'public/kibana-integrations/',
   ]),
+  js.configs.recommended,
   {
     extends: compat.extends(
-      'eslint:recommended',
       'plugin:react/recommended',
       'plugin:@typescript-eslint/recommended',
       'prettier',
@@ -39,7 +37,7 @@ export default defineConfig([
       'react-hooks': fixupPluginRules(reactHooks),
       '@typescript-eslint': typescriptEslint,
       prettier,
-      'filenames-simple': filenamesSimple,
+      unicorn,
     },
 
     languageOptions: {
@@ -71,7 +69,8 @@ export default defineConfig([
     },
 
     rules: {
-      'filenames-simple/naming-convention': 'error',
+      'unicorn/filename-case': [ 'error',
+        { case: 'kebabCase' } ],
 
       indent: [
         'error',
@@ -81,8 +80,10 @@ export default defineConfig([
         },
       ],
 
-      quotes: ['error', 'single'],
-      semi: ['error', 'always'],
+      quotes: [ 'error',
+        'single' ],
+      semi: [ 'error',
+        'always' ],
       'react/react-in-jsx-scope': 'off',
       camelcase: 'error',
       'spaced-comment': 'error',
@@ -106,7 +107,8 @@ export default defineConfig([
       eqeqeq: 'error',
       'no-var': 'error',
       'require-await': 'error',
-      'array-bracket-newline': ['error', 'consistent'],
+      'array-bracket-newline': [ 'error',
+        'consistent' ],
 
       'array-bracket-spacing': [
         'error',
@@ -116,8 +118,10 @@ export default defineConfig([
         },
       ],
 
-      'array-element-newline': ['error', 'always'],
-      'arrow-parens': ['error', 'as-needed'],
+      'array-element-newline': [ 'error',
+        'always' ],
+      'arrow-parens': [ 'error',
+        'as-needed' ],
       'arrow-spacing': 'error',
       'block-spacing': 'error',
 
@@ -129,8 +133,10 @@ export default defineConfig([
         },
       ],
 
-      'func-call-spacing': ['error', 'never'],
-      'function-call-argument-newline': ['error', 'consistent'],
+      'func-call-spacing': [ 'error',
+        'never' ],
+      'function-call-argument-newline': [ 'error',
+        'consistent' ],
 
       'max-len': [
         'error',
