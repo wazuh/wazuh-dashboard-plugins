@@ -87,7 +87,7 @@ jobs:
         run: |
           plugins_dir="${{ github.workspace }}/wazuh/scripts/test-packages/plugins"
           mkdir -p "${plugins_dir}"
-          aws s3 cp \
+          aws s3 cp --recursive \
             "${{ env.CI_DEV_INTERNAL_BUCKET }}/${{ env.CI_ARTIFACTS_REPO }}/${{ env.CI_BASE_WORKFLOW }}/${{github.run_id}}" \
             "${plugins_dir}"
           ls -l "${plugins_dir}"
