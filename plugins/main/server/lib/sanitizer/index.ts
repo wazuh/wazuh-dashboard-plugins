@@ -1,1 +1,0 @@
-export { sanitizeSVG } from './sanitizer';
