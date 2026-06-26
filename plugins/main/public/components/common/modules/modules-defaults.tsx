@@ -670,7 +670,7 @@ export const ModulesDefaults = {
             additionalDocumentDetailsTabs={({ document }) => [
               {
                 id: 'source-finding',
-                name: 'Source Finding',
+                name: 'Source finding',
                 content: <ActiveResponseFlyoutBody hit={document} />,
               },
             ]}

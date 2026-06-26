@@ -7,5 +7,5 @@ export const activeResponsesColumns: tDataGridColumn[] = [
   { id: 'wazuh.active_response.name' },
   { id: 'wazuh.active_response.executable' },
   { id: 'wazuh.active_response.location' },
-  { id: 'event.doc_id' },
+  { id: 'wazuh.active_response.type' },
 ];
