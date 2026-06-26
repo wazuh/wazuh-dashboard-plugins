@@ -64,6 +64,10 @@ export const CustomSearchBar = ({
 }: CustomSearchBarProps) => {
   const { filters } = searchBarProps;
 
+  /* Use the search bar's onFiltersUpdated handler, which re attaches the managed filters kept out of
+  the filter list so they are not dropped. */
+  const updateFilters = searchBarProps.onFiltersUpdated ?? setFilters;
+
   const defaultSelectedOptions = () => {
     const array: string[][] = [];
     filterInputs.forEach(item => {
@@ -93,10 +97,6 @@ export const CustomSearchBar = ({
       filterDrillDownValue.value != ''
       ? true
       : false;
-  };
-
-  const onFiltersUpdated = (filters?: Filter[]) => {
-    setFilters([filters]);
   };
 
   const changeSwitch = () => {
@@ -145,7 +145,7 @@ export const CustomSearchBar = ({
     if (values.length != 0) {
       customFilter = [buildCustomFilter(values)];
     }
-    setFilters([...currentFilters, ...customFilter]);
+    updateFilters([...currentFilters, ...customFilter]);
   };
 
   const refreshCustomSelectedFilter = () => {
@@ -210,7 +210,7 @@ export const CustomSearchBar = ({
 
   const onRemove = filter => {
     const currentFilters = filters.filter(item => item.meta.key != filter);
-    setFilters(currentFilters);
+    updateFilters(currentFilters);
     refreshCustomSelectedFilter();
   };
 
@@ -250,7 +250,7 @@ export const CustomSearchBar = ({
           {...searchBarProps}
           fixedFilters={fixedFilters}
           showQueryInput={avancedFiltersState}
-          onFiltersUpdated={onFiltersUpdated}
+          onFiltersUpdated={updateFilters}
           onManualRefresh={() =>
             searchBarProps.onQuerySubmit(
               {

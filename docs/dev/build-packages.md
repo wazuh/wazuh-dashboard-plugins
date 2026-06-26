@@ -35,6 +35,8 @@ To use the `build-packages.sh` script, you first need to generate the packages f
 - `wazuh-dashboard-plugins`
 - `wazuh-dashboard-reporting`
 - `wazuh-dashboard-security-analytics`
+- `wazuh-dashboard-alerting`
+- `wazuh-dashboard-notifications`
 
 Follow the steps below to build the packages:
 
@@ -123,7 +125,35 @@ yarn
 yarn build
 ```
 
-6. Zip the packages and move them to the packages folder
+6. Clone the [wazuh-dashboard-alerting](https://github.com/wazuh/wazuh-dashboard-alerting.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-alerting/` folder, and build the plugin:
+
+> The yarn build command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
+> Replace the `GIT_REF` by the branch or tag for the Wazuh alerting plugin, e.g. `v5.0.0`.
+
+```bash
+GIT_REF=<REPLACE_PLACEHOLDER>
+cd ../
+git clone -b $GIT_REF https://github.com/wazuh/wazuh-dashboard-alerting.git
+cd wazuh-dashboard-alerting/
+yarn
+yarn build
+```
+
+7. Clone the [wazuh-dashboard-notifications](https://github.com/wazuh/wazuh-dashboard-notifications.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-notifications/` folder, and build the plugin:
+
+> The yarn build command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
+> Replace the `GIT_REF` by the branch or tag for the Wazuh notifications plugin, e.g. `v5.0.0`.
+
+```bash
+GIT_REF=<REPLACE_PLACEHOLDER>
+cd ../
+git clone -b $GIT_REF https://github.com/wazuh/wazuh-dashboard-notifications.git
+cd wazuh-dashboard-notifications/
+yarn
+yarn build
+```
+
+8. Zip the packages and move them to the packages folder
 
 ```bash
 cd ../../../
@@ -134,39 +164,45 @@ zip -r -j ./dashboard-package.zip ../wazuh-dashboard/target/opensearch-dashboard
 zip -r -j ./security-package.zip ../wazuh-dashboard/plugins/wazuh-security-dashboards-plugin/build/security-dashboards-3.*.*.0.zip
 zip -r -j ./reporting-package.zip ../wazuh-dashboard/plugins/wazuh-dashboard-reporting/build/reportsDashboards-3.*.*.zip
 zip -r -j ./security-analytics-package.zip ../wazuh-dashboard/plugins/wazuh-dashboard-security-analytics/build/security-analytics-dashboards-3.*.*.0.zip
+zip -r -j ./alerting-package.zip ../wazuh-dashboard/plugins/wazuh-dashboard-alerting/build/alertingDashboards-3.*.*.0.zip
+zip -r -j ./notifications-package.zip ../wazuh-dashboard/plugins/wazuh-dashboard-notifications/build/notifications-dashboards-3.*.*.0.zip
 zip -r -j ./wazuh-package.zip ../wazuh-dashboard/plugins/wazuh-check-updates/build/wazuhCheckUpdates-3.*.*.zip ../wazuh-dashboard/plugins/main/build/wazuh-3.*.*.zip ../wazuh-dashboard/plugins/wazuh-core/build/wazuhCore-3.*.*.zip
 ls
 ```
 
-After completing the previous steps, you will have three packages in the packages folder:
+After completing the previous steps, you will have the following packages in the packages folder:
 
+- `alerting-package.zip`
 - `dashboard-package.zip`
+- `notifications-package.zip`
 - `reporting-package.zip`
 - `security-analytics-package.zip`
 - `security-package.zip`
 - `wazuh-package.zip`
 
-7. Run the `build-packages.sh` script in the `dev-tools/build-packages/` folder of the `wazuh-dashboard` repository. The script requires the following parameters:
+9. Run the `build-packages.sh` script in the `dev-tools/build-packages/` folder of the `wazuh-dashboard` repository. The script requires the following parameters:
 
 - `-c`, `--commit-sha`: Commit SHA identifier for the build (see [Generating commit SHA](#generating-commit-sha) below).
 - `-r`: Revision of the package.
 - `--deb` or `--rpm`: Distribution of the package.
 - `-a`: Path to the `wazuh-package.zip`.
 - `-b`: Path to the `dashboard-package.zip`.
-- `-r`: Path to the `reporting-package.zip`.
+- `-rp`: Path to the `reporting-package.zip`.
 - `-s`: Path to the `security-package.zip`.
 - `-sa`: Path to the `security-analytics-package.zip`.
+- `-al`: Path to the `alerting-package.zip`.
+- `-no`: Path to the `notifications-package.zip`.
 
 ```bash
 cd ../wazuh-dashboard/dev-tools/build-packages/
-./build-packages.sh --commit-sha <COMMIT_SHA> -r <REVISION> --<DISTRIBUTION> -b file://$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip -a file://$WZD_ZIPPED_PACKAGES_DIR/wazuh-package.zip -rp file://$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip -s file://$WZD_ZIPPED_PACKAGES_DIR/security-package.zip  -sa file://$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip
+./build-packages.sh --commit-sha <COMMIT_SHA> -r <REVISION> --<DISTRIBUTION> -b file://$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip -a file://$WZD_ZIPPED_PACKAGES_DIR/wazuh-package.zip -rp file://$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip -s file://$WZD_ZIPPED_PACKAGES_DIR/security-package.zip -sa file://$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip -al file://$WZD_ZIPPED_PACKAGES_DIR/alerting-package.zip -no file://$WZD_ZIPPED_PACKAGES_DIR/notifications-package.zip
 ```
 
 Replace the placeholders as shown in the example below.
 
 ```bash
 cd ../wazuh-dashboard/dev-tools/build-packages/
-./build-packages.sh --commit-sha f05d58cce5-ec559ea-7aa1b2c86-8f60762-ff51705 -r 1 --deb -b file://$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip -a file://$WZD_ZIPPED_PACKAGES_DIR/wazuh-package.zip -rp file://$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip -s file://$WZD_ZIPPED_PACKAGES_DIR/security-package.zip  -sa file://$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip
+./build-packages.sh --commit-sha f05d58cce5-ec559ea-7aa1b2c86-8f60762-ff51705-abc1234-def5678 -r 1 --deb -b file://$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip -a file://$WZD_ZIPPED_PACKAGES_DIR/wazuh-package.zip -rp file://$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip -s file://$WZD_ZIPPED_PACKAGES_DIR/security-package.zip -sa file://$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip -al file://$WZD_ZIPPED_PACKAGES_DIR/alerting-package.zip -no file://$WZD_ZIPPED_PACKAGES_DIR/notifications-package.zip
 ```
 
 The script generates the package in the `output` folder of the same directory where it is located. To see the generated package, run the command: `ls output`.
@@ -186,17 +222,19 @@ git rev-parse --short HEAD
 | wazuh-security-dashboards-plugin   | SECURITY_COMMIT_SHA           |
 | wazuh-dashboard-reporting          | REPORTING_COMMIT_SHA          |
 | wazuh-dashboard-security-analytics | SECURITY_ANALYTICS_COMMIT_SHA |
+| wazuh-dashboard-alerting           | ALERTING_COMMIT_SHA           |
+| wazuh-dashboard-notifications      | NOTIFICATIONS_COMMIT_SHA      |
 
 2. Concatenate individual SHAs in the following format. The resulting commit SHA is used for package versioning and build tracking.
 
 ```
-<DASHBOARD_COMMIT_SHA>-<PLUGINS_COMMIT_SHA>-<SECURITY_COMMIT_SHA>-<REPORTING_COMMIT_SHA>-<SECURITY_ANALYTICS_COMMIT_SHA>
+<DASHBOARD_COMMIT_SHA>-<PLUGINS_COMMIT_SHA>-<SECURITY_COMMIT_SHA>-<REPORTING_COMMIT_SHA>-<SECURITY_ANALYTICS_COMMIT_SHA>-<ALERTING_COMMIT_SHA>-<NOTIFICATIONS_COMMIT_SHA>
 ```
 
 Example:
 
 ```
-0c1f888bb4-46d76ffe0-ec559ea-8f60762-ff51705
+0c1f888bb4-46d76ffe0-ec559ea-8f60762-ff51705-abc1234-def5678
 ```
 
 ```bash
@@ -206,7 +244,9 @@ PLUGINS_COMMIT_SHA=$(git -C plugins/wazuh-security-dashboards-plugin rev-parse -
 SECURITY_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-plugins rev-parse --short HEAD)
 REPORTING_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-reporting rev-parse --short HEAD)
 SECURITY_ANALYTICS_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-security-analytics rev-parse --short HEAD)
-ALL_COMMIT_SHAS="$DASHBOARD_COMMIT_SHA-$PLUGINS_COMMIT_SHA-$SECURITY_COMMIT_SHA-$REPORTING_COMMIT_SHA-$SECURITY_ANALYTICS_COMMIT_SHA"
+ALERTING_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-alerting rev-parse --short HEAD)
+NOTIFICATIONS_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-notifications rev-parse --short HEAD)
+ALL_COMMIT_SHAS="$DASHBOARD_COMMIT_SHA-$PLUGINS_COMMIT_SHA-$SECURITY_COMMIT_SHA-$REPORTING_COMMIT_SHA-$SECURITY_ANALYTICS_COMMIT_SHA-$ALERTING_COMMIT_SHA-$NOTIFICATIONS_COMMIT_SHA"
 echo $ALL_COMMIT_SHAS
 ```
 
@@ -239,7 +279,9 @@ cd wazuh-dashboard/dev-tools/build-packages/base-packages-to-base/
    - `WAZUH_DASHBOARDS_PLUGINS`: Branch of the Wazuh dashboards Plugins repository.
    - `WAZUH_SECURITY_DASHBOARDS_PLUGIN_BRANCH`: Branch of the Wazuh Security Dashboards Plugin repository.
    - `WAZUH_REPORTING_DASHBOARDS_PLUGIN_BRANCH`: Branch of the Wazuh reporting plugin repository.
-   - `WAZUH_SECURITY_ANALYTICS_DASHBOARDS_PLUGIN_BRANCH`: Branch of the Wazuh Security Dashboards Plugin repository.
+   - `WAZUH_SECURITY_ANALYTICS_DASHBOARDS_PLUGIN_BRANCH`: Branch of the Wazuh Security Analytics plugin repository.
+   - `WAZUH_DASHBOARD_ALERTING_BRANCH`: Branch of the Wazuh alerting plugin repository.
+   - `WAZUH_DASHBOARD_NOTIFICATIONS_BRANCH`: Branch of the Wazuh notifications plugin repository.
    - `OPENSEARCH_DASHBOARDS_VERSION`: Version of the OpenSearch Dashboards. You can find the version in the `package.json` file of the Wazuh dashboards repository.
    - `-t`: Tag of the image.
 
@@ -249,12 +291,16 @@ WAZUH_DASHBOARDS_PLUGINS='<REPLACE_PLACEHOLDER>' && \
 WAZUH_SECURITY_DASHBOARDS_PLUGIN_BRANCH='<REPLACE_PLACEHOLDER>' && \
 WAZUH_SECURITY_ANALYTICS_DASHBOARDS_PLUGIN_BRANCH='<REPLACE_PLACEHOLDER>' && \
 WAZUH_REPORTING_DASHBOARDS_PLUGIN_BRANCH='<REPLACE_PLACEHOLDER>' && \
+WAZUH_DASHBOARD_ALERTING_BRANCH='<REPLACE_PLACEHOLDER>' && \
+WAZUH_DASHBOARD_NOTIFICATIONS_BRANCH='<REPLACE_PLACEHOLDER>' && \
 bash run-docker-compose.sh \
     --base $WAZUH_DASHBOARDS_BRANCH \
     --app $WAZUH_DASHBOARDS_PLUGINS \
     --reporting $WAZUH_REPORTING_DASHBOARDS_PLUGIN_BRANCH \
     --security $WAZUH_SECURITY_DASHBOARDS_PLUGIN_BRANCH \
     --securityAnalytics $WAZUH_SECURITY_ANALYTICS_DASHBOARDS_PLUGIN_BRANCH \
+    --alerting $WAZUH_DASHBOARD_ALERTING_BRANCH \
+    --notifications $WAZUH_DASHBOARD_NOTIFICATIONS_BRANCH \
     --node-version 22.22.3
 ```
 
@@ -277,7 +323,9 @@ WZD_ZIPPED_PACKAGES_DIR=$(pwd)
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard/opensearch-dashboards-3.*.*-linux-*.tar.gz
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-security-dashboards-plugin/security-dashboards-3.*.*.0.zip
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-reporting/reportsDashboards-3.*.*.zip
-zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-security-analytics-plugin/security-analytics-dashboards-3.*.*.0.zip
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-security-analytics/security-analytics-dashboards-3.*.*.0.zip
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/alerting-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-alerting/alertingDashboards-3.*.*.0.zip
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/notifications-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-notifications/notifications-dashboards-3.*.*.0.zip
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/wazuh-dashboard-plugins-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuhCheckUpdates-3.*.*.zip $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuh-3.*.*.zip $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuhCore-3.*.*.zip
 ```
 
@@ -293,6 +341,8 @@ bash build-packages.sh \
     -s file://$WZD_ZIPPED_PACKAGES_DIR/security-package.zip \
     -rp file://$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip \
     -sa file://$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip \
+    -al file://$WZD_ZIPPED_PACKAGES_DIR/alerting-package.zip \
+    -no file://$WZD_ZIPPED_PACKAGES_DIR/notifications-package.zip \
     --revision 2 --deb --silent
 ```
 

@@ -35,12 +35,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added Normalization tab and dashboard in `Server Management` > `Statistics`[#8485](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8485) [#8600](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8600) [#8524](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8524)
 - Added Case Management tab to Findings document details flyout [#8580](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8580)[#8589](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8589) [#8598](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8598) [#8630](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8630)
 - Added Cases tab to the Threat Hunting module [#8583](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8583)
-- Added visualizations to Vulnerability Detection > Inventory [#8611](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8611)
+- Added visualizations to Vulnerability Detection > Inventory [#8611](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8611) [#8663](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8663)
 - Added Cases tab to the Threat Hunting module [#8583](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8583) [#8608](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8608) [#8630](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8630)
-- Added Active Responses dashboard [8601](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8601)
+- Added Active Responses dashboard [#8601](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8601) [#8679](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8679)
 
 ### Changed
 
+- Reduced peak resource usage during plugin startup by processing index-pattern initialization tasks in small batches instead of all at once [#8644](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8644)
 - Changed default index pattern settings key from `defaultIndex` to `wazuh-events-v5*` [#8066](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8066) [#8512](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8512)
 - Adapted alerts sample data to Wazuh Common Schema [#7848](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7848)
 - Set cluster mode as default for all Wazuh installations, including single-node deployments. Updated RBAC permissions to `cluster:*` actions [#7701](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7701) [#8147](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8147)
@@ -54,7 +55,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Migrated the `wazuh.yml` settings to `opensearch_dashboards.yml` and advanced settings [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871) [#8467](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8467)
 - Changed the sample data index names [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871)
 - Rework generate report button [#7900](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7900)
-- Changed dashboards renderer by saved objects [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842) [#7847](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7847) [#7916](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7916) [#7938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7938) [#8310](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8310) [#8500] (https://github.com/wazuh/wazuh-dashboard-plugins/pull/500)
+- Changed dashboards renderer by saved objects [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842) [#7847](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7847) [#7916](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7916) [#7938](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7938) [#8310](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8310) [#8500] (https://github.com/wazuh/wazuh-dashboard-plugins/pull/8500) [#8678](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8678)
 - Changed `rule.groups` filter to `wazuh.integration.decoders` [#7934](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7934)
 - Applied the new home page navigation style to all dashboards [#7981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7981)
 - Updated Office 365 dashboards to use new index pattern [#8081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8081) [#8408](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8408)
@@ -119,6 +120,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed custom filter buttons not being rendered in pdf reports [#8525](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8525)
 - Fixed MITRE technique fields being truncated in the Document Details flyout by showing the full list of clickable items [#8579](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8579)
 - Fixed FIM visualizations height [#8610](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8610)
+- Fixed the GitHub link in the About page pointing to the legacy `wazuh-kibana-app` repository [#8653](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8653)
 - Fixed the suggested valued on multi select filters are not displayed when switching tabs in a short period of time [#8666](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8666)
 
 ### Removed
