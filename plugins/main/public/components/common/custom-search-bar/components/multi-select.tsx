@@ -136,33 +136,36 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
     }
   };
 
-  const buildSelectedOptions = () => {
-    const result = items.map(item => ({
-      ...item,
-      checked: selectedOptions.find(element => element.label === item.label)
-        ? (Switch.ON as FilterChecked)
-        : (Switch.OFF as FilterChecked),
-      key: setSelectedKey(item),
-    }));
-
-    return orderByChecked(orderByLabel(result));
-  };
-
   useEffect(() => {
-    setItems(buildSelectedOptions());
     setActiveFilters(selectedOptions.length);
   }, [selectedOptions]);
 
+  // Define the checked state depending on the selected options coming from props and the items coming from the suggested values
+  const enhancedItems = items.map(item => ({
+    ...item,
+    checked: selectedOptions.find(element => element.label === item.label)
+      ? (Switch.ON as FilterChecked)
+      : (Switch.OFF as FilterChecked),
+    key: setSelectedKey(item),
+  }));
+
   const toggleFilter = (item: Item) => {
-    items.map(item => (item.key = setSelectedKey(item)));
-    item.checked = item.checked === Switch.ON ? Switch.OFF : Switch.ON;
-    item.key = setSelectedKey(item);
-    updateFilters(item.value);
+    const newItems = enhancedItems.map(element => ({
+      ...element,
+      key: setSelectedKey(element),
+      checked:
+        element.label === item.label
+          ? item.checked === Switch.ON
+            ? Switch.OFF
+            : Switch.ON
+          : element.checked,
+    }));
+    updateFilters(item.value, newItems);
   };
 
-  const updateFilters = (id: string) => {
-    const selectedItems = items.filter(item => item.checked === Switch.ON);
-    setActiveFilters(selectedItems.length);
+  const updateFilters = (id: string, newItems: Item[]) => {
+    const selectedItems = newItems.filter(item => item.checked === Switch.ON);
+    // This updated the selectedOptions count state, but this has been delegated to be updated when the props selectedOptions change. This avoids a problem where the current component update to the current selected options in the toogleFilter function, but the useEffect depending on the selectedOptions props is executed with a not updated state, causing the state is updated to previous state (e.g. current - 1 when increasing or current + 1 when decreasing, which causes a mismatch in the count of selected options.
     if (selectedItems.length) {
       onChange(selectedItems, id);
     } else {
@@ -212,7 +215,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
           <EuiFieldSearch onChange={onSearch} />
         </EuiPopoverTitle>
         <div className='euiFilterSelect__items'>
-          {items.map(item => (
+          {enhancedItems.map(item => (
             <EuiFilterSelectItem
               checked={item.checked}
               key={item.key}
