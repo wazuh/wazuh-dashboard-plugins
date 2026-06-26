@@ -160,10 +160,8 @@ jobs:
           s3_path="${{ env.CI_DEV_INTERNAL_BUCKET }}/${{ env.CI_ARTIFACTS_REPO }}/${{ env.CI_ARTIFACTS_WORKFLOW }}/${{ github.run_id}}/${artifact_zip}"
           pushd "${{ matrix.plugins.path }}/${{ inputs.artifact_path }}"
           popd
-          echo "ls -lh ${GITHUB_WORKSPACE}/${{ matrix.plugins.path }}/${{ inputs.artifact_path }}"
-          ls -lh "${GITHUB_WORKSPACE}/${{ matrix.plugins.path }}/${{ inputs.artifact_path }}"
-          echo "ls -lh ${GITHUB_WORKSPACE}/"
-          # aws s3 cp "${GITHUB_WORKSPACE}/${{matrix.plugins.container_path}}" "${s3_path}"
+          packagePath=$(find "${GITHUB_WORKSPACE}/${{ matrix.plugins.path }}/${{ inputs.artifact_path }}"  )
+          aws s3 cp "${packagePath}" "${s3_path}"
           echo "::notice::Artifact uploaded to ${s3_path}"
 
       - name: Upload coverage results to GitHub
