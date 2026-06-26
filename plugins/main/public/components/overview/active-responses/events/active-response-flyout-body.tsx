@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  EuiEmptyPrompt,
-  EuiLoadingSpinner,
-  EuiText,
-} from '@elastic/eui';
+import { EuiEmptyPrompt, EuiLoadingSpinner, EuiText } from '@elastic/eui';
 import DocViewer from '../../../common/doc-viewer/doc-viewer';
 import { useDocViewer } from '../../../common/doc-viewer';
 import { resolveOriginalFinding } from './active-responses-service';
@@ -25,7 +21,14 @@ const SourceFindingTable = ({
     _source: { _id: document._id, ...document._source },
   };
   const docViewerProps = useDocViewer({ doc: docWithId, indexPattern });
-  return <DocViewer {...docViewerProps} filters={[]} setFilters={() => {}} showFilterButtons={false} />;
+  return (
+    <DocViewer
+      {...docViewerProps}
+      filters={[]}
+      setFilters={() => {}}
+      showFilterButtons={false}
+    />
+  );
 };
 
 export const ActiveResponseFlyoutBody = ({ hit }: { hit: any }) => {
@@ -40,7 +43,11 @@ export const ActiveResponseFlyoutBody = ({ hit }: { hit: any }) => {
       if (!cancelled) {
         setResolution(
           result
-            ? { type: 'found', document: result.document, indexPattern: result.indexPattern }
+            ? {
+                type: 'found',
+                document: result.document,
+                indexPattern: result.indexPattern,
+              }
             : { type: 'notFound' },
         );
       }

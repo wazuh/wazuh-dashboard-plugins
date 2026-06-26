@@ -8,14 +8,18 @@ export async function resolveOriginalFinding(
   if (!docId) return null;
 
   try {
-    const indexPattern =
-      await getDataPlugin().indexPatterns.get(WAZUH_FINDINGS_PATTERN);
+    const indexPattern = await getDataPlugin().indexPatterns.get(
+      WAZUH_FINDINGS_PATTERN,
+    );
     const searchSource = await getDataPlugin().search.searchSource.create();
     const result = await searchSource
       .setParent(undefined)
       .setField('index', indexPattern)
       .setField('size', 1)
-      .setField('query', { language: 'lucene', query: { ids: { values: [docId] } } })
+      .setField('query', {
+        language: 'lucene',
+        query: { ids: { values: [docId] } },
+      })
       .fetch();
 
     const document = result?.hits?.hits?.[0];

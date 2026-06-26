@@ -4,7 +4,11 @@ import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_da
 import { getCore } from '../../../../kibana-services';
 import NavigationService from '../../../../react-services/navigation-service';
 
-const DocDetailsHeader = ({ doc, indexPattern, title = 'Document Details' }) => {
+const DocDetailsHeader = ({
+  doc,
+  indexPattern,
+  title = 'Document Details',
+}) => {
   return (
     <EuiFlexGroup>
       <EuiFlexItem>
