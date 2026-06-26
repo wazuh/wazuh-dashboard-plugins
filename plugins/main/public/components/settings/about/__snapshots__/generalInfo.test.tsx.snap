@@ -54,7 +54,7 @@ exports[`SettingsAboutGeneralInfo component should render a component 1`] = `
             class="euiSpacer euiSpacer--l"
           />
           <div
-            class="euiFlexGroup euiFlexGroup--gutterExtraLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentCenter euiFlexGroup--directionRow"
+            class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentCenter euiFlexGroup--directionRow"
           >
             <div
               class="euiFlexItem euiFlexItem--flexGrowZero"
@@ -97,7 +97,7 @@ exports[`SettingsAboutGeneralInfo component should render a component 1`] = `
             >
               <a
                 aria-label="Github"
-                class="euiButtonIcon euiButtonIcon--primary euiButtonIcon--empty euiButtonIcon--xSmall"
+                class="euiButtonIcon euiButtonIcon--text euiButtonIcon--empty euiButtonIcon--xSmall"
                 href="https://github.com/wazuh/wazuh-dashboard-plugins"
                 rel="noopener noreferrer"
                 target="_blank"

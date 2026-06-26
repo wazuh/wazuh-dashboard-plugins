@@ -34,7 +34,8 @@ import { jobInitializeRun, jobQueueRun } from './start';
 import { first } from 'rxjs/operators';
 import {
   defineTimeFieldNameIfExist,
-  initializationTaskCreatorIndexPattern,
+  IndexPatternTaskDefinition,
+  initializationTaskCreatorIndexPatternBatch,
   initializationTaskCreatorServerAPIConnectionCompatibility,
   initializationTaskCreatorServerAPIRunAs,
   mapFieldsFormat,
@@ -42,6 +43,7 @@ import {
 import { initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations } from './health-check';
 import {
   FIELD_TIMESTAMP,
+  HEALTH_CHECK_TASK_INDEX_PATTERNS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_AGENTS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT,
@@ -130,10 +132,12 @@ import {
   WAZUH_ACTIVE_RESPONSES_PATTERN,
   HEALTH_CHECK_TASK_INDEX_PATTERN_ACTIVE_RESPONSES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_NORMALIZATION,
+  WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS,
 } from '../common/constants';
 
 import { notificationSetup } from './health-check/notification-default-channels';
 import { initializeDefaultNotificationChannel } from './health-check/notification-default-channels/tasks';
+import { WazuhPluginConfigType } from '../config';
 
 // Resolve a known-fields JSON file path. The files are intentionally not
 // imported statically: they are large and only needed when an index pattern
@@ -174,6 +178,468 @@ declare module 'opensearch_dashboards/server' {
     };
   }
 }
+
+// All 44 index-pattern definitions processed in batches during startup to limit
+// peak concurrent connections to the indexer (see issue #8641).
+const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_AGENTS,
+    indexPatternID: WAZUH_METRICS_AGENTS_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath('metrics-agents.json'),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_COMMS,
+    indexPatternID: WAZUH_METRICS_COMMS_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath('metrics-comms.json'),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_NORMALIZATION,
+    indexPatternID: WAZUH_METRICS_NORMALIZATION_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'metrics-normalization.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
+    indexPatternID: WAZUH_VULNERABILITIES_PATTERN,
+    options: {
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-vulnerabilities.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES,
+    indexPatternID: WAZUH_IT_HYGIENE_PATTERN,
+    options: {
+      savedObjectOverwrite: mapFieldsFormat({
+        'destination.port': 'integer',
+        'host.memory.free': 'bytes',
+        'host.memory.total': 'bytes',
+        'host.memory.used': 'bytes',
+        'host.memory.usage': 'percent',
+        'host.network.egress.bytes': 'bytes',
+        'host.network.ingress.bytes': 'bytes',
+        'package.size': 'bytes',
+        'process.parent.pid': 'integer',
+        'process.pid': 'integer',
+        'source.port': 'integer',
+      }),
+      fieldsNoIndicesFilePath: knownFieldsFilePath('states-inventory.json'),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_GROUPS_STATES,
+    indexPatternID: WAZUH_IT_HYGIENE_GROUPS_PATTERN,
+    options: {
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-groups.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HARDWARE_STATES,
+    indexPatternID: WAZUH_IT_HYGIENE_HARDWARE_PATTERN,
+    options: {
+      savedObjectOverwrite: mapFieldsFormat({
+        'host.memory.free': 'bytes',
+        'host.memory.total': 'bytes',
+        'host.memory.used': 'bytes',
+        'host.memory.usage': 'percent',
+      }),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-hardware.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HOTFIXES_STATES,
+    indexPatternID: WAZUH_IT_HYGIENE_HOTFIXES_PATTERN,
+    options: {
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-hotfixes.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_INTERFACES_STATES,
+    indexPatternID: WAZUH_IT_HYGIENE_INTERFACES_PATTERN,
+    options: {
+      savedObjectOverwrite: mapFieldsFormat({
+        'host.network.egress.bytes': 'bytes',
+        'host.network.ingress.bytes': 'bytes',
+      }),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-interfaces.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_NETWORKS_STATES,
+    indexPatternID: WAZUH_IT_HYGIENE_NETWORKS_PATTERN,
+    options: {
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-networks.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PACKAGES_STATES,
+    indexPatternID: WAZUH_IT_HYGIENE_PACKAGES_PATTERN,
+    options: {
+      savedObjectOverwrite: mapFieldsFormat({
+        'package.size': 'bytes',
+      }),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-packages.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PORTS_STATES,
+    indexPatternID: WAZUH_IT_HYGIENE_PORTS_PATTERN,
+    options: {
+      savedObjectOverwrite: mapFieldsFormat({
+        'destination.port': 'integer',
+        'process.pid': 'integer',
+        'source.port': 'integer',
+      }),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-ports.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROCESSES_STATES,
+    indexPatternID: WAZUH_IT_HYGIENE_PROCESSES_PATTERN,
+    options: {
+      savedObjectOverwrite: mapFieldsFormat({
+        'process.parent.pid': 'integer',
+        'process.pid': 'integer',
+      }),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-processes.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROTOCOLS_STATES,
+    indexPatternID: WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN,
+    options: {
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-protocols.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES,
+    indexPatternID: WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
+    options: {
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-system.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES,
+    indexPatternID: WAZUH_IT_HYGIENE_USERS_PATTERN,
+    options: {
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-users.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SERVICES_STATES,
+    indexPatternID: WAZUH_IT_HYGIENE_SERVICES_PATTERN,
+    options: {
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-services.json',
+      ),
+    },
+  },
+  {
+    taskName:
+      HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_BROWSER_EXTENSIONS_STATES,
+    indexPatternID: WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN,
+    options: {
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-inventory-browser-extensions.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_STATES,
+    indexPatternID: WAZUH_FIM_PATTERN,
+    options: {
+      savedObjectOverwrite: mapFieldsFormat({
+        'file.size': 'bytes',
+        'registry.size': 'bytes',
+      }),
+      fieldsNoIndicesFilePath: knownFieldsFilePath('states-fim.json'),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES,
+    indexPatternID: WAZUH_FIM_FILES_PATTERN,
+    options: {
+      savedObjectOverwrite: mapFieldsFormat({
+        'file.size': 'bytes',
+      }),
+      fieldsNoIndicesFilePath: knownFieldsFilePath('states-fim-files.json'),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
+    indexPatternID: WAZUH_FIM_REGISTRY_KEYS_PATTERN,
+    options: {
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-fim-registries-keys.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES,
+    indexPatternID: WAZUH_FIM_REGISTRY_VALUES_PATTERN,
+    options: {
+      savedObjectOverwrite: mapFieldsFormat({
+        'registry.size': 'bytes',
+      }),
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'states-fim-registries-values.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES,
+    indexPatternID: WAZUH_SCA_PATTERN,
+    options: {
+      fieldsNoIndicesFilePath: knownFieldsFilePath('states-sca.json'),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SYSTEM_ACTIVITY,
+    indexPatternID: WAZUH_EVENTS_SYSTEM_ACTIVITY_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'events-system-activity.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SECURITY,
+    indexPatternID: WAZUH_EVENTS_SECURITY_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath('events-security.json'),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT,
+    indexPatternID: WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'events-access-management.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_APLICATIONS,
+    indexPatternID: WAZUH_EVENTS_APLICATIONS_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath('events-applications.json'),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_OTHER,
+    indexPatternID: WAZUH_EVENTS_OTHER_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath('events-other.json'),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_NETWORK_ACTIVITY,
+    indexPatternID: WAZUH_EVENTS_NETWORK_ACTIVITY_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'events-network-activity.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES,
+    indexPatternID: WAZUH_EVENTS_CLOUD_SERVICES_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'events-cloud-services.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS,
+    indexPatternID: WAZUH_EVENTS_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath('events.json'),
+      checkDefaultIndexPattern: true,
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_ACTIVE_RESPONSES,
+    indexPatternID: WAZUH_ACTIVE_RESPONSES_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath('active-responses.json'),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_UNCLASSIFIED,
+    indexPatternID: WAZUH_EVENTS_UNCLASSIFIED_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath('events-unclassified.json'),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_RAW,
+    indexPatternID: WAZUH_EVENTS_RAW_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath('events-raw.json'),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SYSTEM_ACTIVITY,
+    indexPatternID: WAZUH_FINDINGS_SYSTEM_ACTIVITY_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'findings-system-activity.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SECURITY,
+    indexPatternID: WAZUH_FINDINGS_SECURITY_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath('findings-security.json'),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_ACCESS_MANAGEMENT,
+    indexPatternID: WAZUH_FINDINGS_ACCESS_MANAGEMENT_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'findings-access-management.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_APPLICATIONS,
+    indexPatternID: WAZUH_FINDINGS_APPLICATIONS_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'findings-applications.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_OTHER,
+    indexPatternID: WAZUH_FINDINGS_OTHER_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath('findings-other.json'),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_NETWORK_ACTIVITY,
+    indexPatternID: WAZUH_FINDINGS_NETWORK_ACTIVITY_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'findings-network-activity.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_CLOUD_SERVICES,
+    indexPatternID: WAZUH_FINDINGS_CLOUD_SERVICES_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'findings-cloud-services.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_UNCLASSIFIED,
+    indexPatternID: WAZUH_FINDINGS_UNCLASSIFIED_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'findings-unclassified.json',
+      ),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS,
+    indexPatternID: WAZUH_FINDINGS_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath('findings.json'),
+    },
+  },
+  {
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS,
+    indexPatternID: WAZUH_THREATINTEL_ENRICHMENTS_PATTERN,
+    options: {
+      fieldsNoIndicesFilePath: knownFieldsFilePath(
+        'threatintel-enrichments.json',
+      ),
+    },
+  },
+];
 
 export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
   private readonly logger: Logger;
@@ -218,6 +684,25 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
     setupRoutes(router, plugins.wazuhCore);
 
+    // Wazuh: register capabilities based on disabledSettings config
+    const config$ =
+      this.initializerContext.config.create<WazuhPluginConfigType>();
+    const config = await config$.pipe(first()).toPromise();
+
+    core.capabilities.registerProvider(() => ({
+      wazuh: {
+        showIndexRawEvents: true,
+      },
+    }));
+
+    core.capabilities.registerSwitcher(() => ({
+      wazuh: {
+        showIndexRawEvents: !config.disabledSettings.includes(
+          WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS,
+        ),
+      },
+    }));
+
     // Register health check tasks
 
     const notificationClient: ILegacyClusterClient = notificationSetup(core);
@@ -252,642 +737,13 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations(),
     );
 
+    // Register all index-pattern tasks as a single batched health-check task,
+    // processing up to 5 patterns concurrently to limit peak indexer connections.
     core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_AGENTS,
-        indexPatternID: WAZUH_METRICS_AGENTS_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath('metrics-agents.json'),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_COMMS,
-        indexPatternID: WAZUH_METRICS_COMMS_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath('metrics-comms.json'),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_NORMALIZATION,
-        indexPatternID: WAZUH_METRICS_NORMALIZATION_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'metrics-normalization.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
-        indexPatternID: WAZUH_VULNERABILITIES_PATTERN,
-        options: {
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'states-vulnerabilities.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES,
-        options: {
-          savedObjectOverwrite: mapFieldsFormat({
-            'destination.port': 'integer',
-            'host.memory.free': 'bytes',
-            'host.memory.total': 'bytes',
-            'host.memory.used': 'bytes',
-            'host.memory.usage': 'percent',
-            'host.network.egress.bytes': 'bytes',
-            'host.network.ingress.bytes': 'bytes',
-            'package.size': 'bytes',
-            'process.parent.pid': 'integer',
-            'process.pid': 'integer',
-            'source.port': 'integer',
-          }),
-          fieldsNoIndicesFilePath: knownFieldsFilePath('states-inventory.json'),
-        },
-        indexPatternID: WAZUH_IT_HYGIENE_PATTERN,
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_GROUPS_STATES,
-        indexPatternID: WAZUH_IT_HYGIENE_GROUPS_PATTERN,
-        options: {
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'states-inventory-groups.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HARDWARE_STATES,
-        indexPatternID: WAZUH_IT_HYGIENE_HARDWARE_PATTERN,
-        options: {
-          savedObjectOverwrite: mapFieldsFormat({
-            'host.memory.free': 'bytes',
-            'host.memory.total': 'bytes',
-            'host.memory.used': 'bytes',
-            'host.memory.usage': 'percent',
-          }),
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'states-inventory-hardware.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HOTFIXES_STATES,
-        indexPatternID: WAZUH_IT_HYGIENE_HOTFIXES_PATTERN,
-        options: {
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'states-inventory-hotfixes.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_INTERFACES_STATES,
-        options: {
-          savedObjectOverwrite: mapFieldsFormat({
-            'host.network.egress.bytes': 'bytes',
-            'host.network.ingress.bytes': 'bytes',
-          }),
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'states-inventory-interfaces.json',
-          ),
-        },
-        indexPatternID: WAZUH_IT_HYGIENE_INTERFACES_PATTERN,
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_NETWORKS_STATES,
-        indexPatternID: WAZUH_IT_HYGIENE_NETWORKS_PATTERN,
-        options: {
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'states-inventory-networks.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PACKAGES_STATES,
-        options: {
-          savedObjectOverwrite: mapFieldsFormat({
-            'package.size': 'bytes',
-          }),
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'states-inventory-packages.json',
-          ),
-        },
-        indexPatternID: WAZUH_IT_HYGIENE_PACKAGES_PATTERN,
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PORTS_STATES,
-        options: {
-          savedObjectOverwrite: mapFieldsFormat({
-            'destination.port': 'integer',
-            'process.pid': 'integer',
-            'source.port': 'integer',
-          }),
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'states-inventory-ports.json',
-          ),
-        },
-        indexPatternID: WAZUH_IT_HYGIENE_PORTS_PATTERN,
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROCESSES_STATES,
-        options: {
-          savedObjectOverwrite: mapFieldsFormat({
-            'process.parent.pid': 'integer',
-            'process.pid': 'integer',
-          }),
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'states-inventory-processes.json',
-          ),
-        },
-        indexPatternID: WAZUH_IT_HYGIENE_PROCESSES_PATTERN,
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROTOCOLS_STATES,
-        indexPatternID: WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN,
-        options: {
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'states-inventory-protocols.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES,
-        indexPatternID: WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
-        options: {
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'states-inventory-system.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES,
-        indexPatternID: WAZUH_IT_HYGIENE_USERS_PATTERN,
-        options: {
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'states-inventory-users.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SERVICES_STATES,
-        indexPatternID: WAZUH_IT_HYGIENE_SERVICES_PATTERN,
-        options: {
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'states-inventory-services.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName:
-          HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_BROWSER_EXTENSIONS_STATES,
-        indexPatternID: WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN,
-        options: {
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'states-inventory-browser-extensions.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_STATES,
-        indexPatternID: WAZUH_FIM_PATTERN,
-        options: {
-          savedObjectOverwrite: mapFieldsFormat({
-            'file.size': 'bytes',
-            'registry.size': 'bytes',
-          }),
-          fieldsNoIndicesFilePath: knownFieldsFilePath('states-fim.json'),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES,
-        options: {
-          savedObjectOverwrite: mapFieldsFormat({
-            'file.size': 'bytes',
-          }),
-          fieldsNoIndicesFilePath: knownFieldsFilePath('states-fim-files.json'),
-        },
-        indexPatternID: WAZUH_FIM_FILES_PATTERN,
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
-        indexPatternID: WAZUH_FIM_REGISTRY_KEYS_PATTERN,
-        options: {
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'states-fim-registries-keys.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES,
-        options: {
-          savedObjectOverwrite: mapFieldsFormat({
-            'registry.size': 'bytes',
-          }),
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'states-fim-registries-values.json',
-          ),
-        },
-        indexPatternID: WAZUH_FIM_REGISTRY_VALUES_PATTERN,
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES,
-        indexPatternID: WAZUH_SCA_PATTERN,
-        options: {
-          fieldsNoIndicesFilePath: knownFieldsFilePath('states-sca.json'),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SYSTEM_ACTIVITY,
-        indexPatternID: WAZUH_EVENTS_SYSTEM_ACTIVITY_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'events-system-activity.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SECURITY,
-        indexPatternID: WAZUH_EVENTS_SECURITY_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath('events-security.json'),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT,
-        indexPatternID: WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'events-access-management.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_APLICATIONS,
-        indexPatternID: WAZUH_EVENTS_APLICATIONS_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'events-applications.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_OTHER,
-        indexPatternID: WAZUH_EVENTS_OTHER_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath('events-other.json'),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_NETWORK_ACTIVITY,
-        indexPatternID: WAZUH_EVENTS_NETWORK_ACTIVITY_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'events-network-activity.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES,
-        indexPatternID: WAZUH_EVENTS_CLOUD_SERVICES_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'events-cloud-services.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS,
-        indexPatternID: WAZUH_EVENTS_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath('events.json'),
-          checkDefaultIndexPattern: true,
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_ACTIVE_RESPONSES,
-        indexPatternID: WAZUH_ACTIVE_RESPONSES_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath('active-responses.json'),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_UNCLASSIFIED,
-        indexPatternID: WAZUH_EVENTS_UNCLASSIFIED_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'events-unclassified.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_RAW,
-        indexPatternID: WAZUH_EVENTS_RAW_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath('events-raw.json'),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SYSTEM_ACTIVITY,
-        indexPatternID: WAZUH_FINDINGS_SYSTEM_ACTIVITY_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'findings-system-activity.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_SECURITY,
-        indexPatternID: WAZUH_FINDINGS_SECURITY_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'findings-security.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_ACCESS_MANAGEMENT,
-        indexPatternID: WAZUH_FINDINGS_ACCESS_MANAGEMENT_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'findings-access-management.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_APPLICATIONS,
-        indexPatternID: WAZUH_FINDINGS_APPLICATIONS_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'findings-applications.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_OTHER,
-        indexPatternID: WAZUH_FINDINGS_OTHER_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath('findings-other.json'),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_NETWORK_ACTIVITY,
-        indexPatternID: WAZUH_FINDINGS_NETWORK_ACTIVITY_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'findings-network-activity.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_CLOUD_SERVICES,
-        indexPatternID: WAZUH_FINDINGS_CLOUD_SERVICES_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'findings-cloud-services.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_UNCLASSIFIED,
-        indexPatternID: WAZUH_FINDINGS_UNCLASSIFIED_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'findings-unclassified.json',
-          ),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS,
-        indexPatternID: WAZUH_FINDINGS_PATTERN,
-        options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: true,
-          fieldsNoIndicesFilePath: knownFieldsFilePath('findings.json'),
-        },
-      }),
-    );
-
-    core.healthCheck.register(
-      initializationTaskCreatorIndexPattern({
-        services: plugins.wazuhCore,
-        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS,
-        indexPatternID: WAZUH_THREATINTEL_ENRICHMENTS_PATTERN,
-        options: {
-          fieldsNoIndicesFilePath: knownFieldsFilePath(
-            'threatintel-enrichments.json',
-          ),
-        },
+      initializationTaskCreatorIndexPatternBatch({
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERNS,
+        batchSize: 5,
+        indexPatterns: INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS,
       }),
     );
 

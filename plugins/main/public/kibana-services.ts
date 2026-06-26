@@ -51,6 +51,8 @@ export const [getHeaderActionMenuMounter, setHeaderActionMenuMounter] =
   createGetterSetter<AppMountParameters['setHeaderActionMenu']>(
     'headerActionMenuMounter',
   );
+export const [getCapabilities, setCapabilities] =
+  createGetterSetter<CoreStart['application']['capabilities']>('Capabilities');
 
 /**
  * set bootstrapped inner angular module

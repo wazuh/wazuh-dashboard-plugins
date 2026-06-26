@@ -20,7 +20,7 @@ on:
       reference:
         required: true
         type: string
-        default: main
+        default: 6.0.0
         description: Git reference (branch, tag, or commit SHA) to build from.
       command:
         required: true
@@ -52,7 +52,7 @@ jobs:
   # using a pre-built Docker image, hosted in Quay.io.
   deploy_and_run_command:
     name: Deploy and run command
-    runs-on: wz-linux-amd64
+    runs-on: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
     strategy:
       matrix:
         plugins:
