@@ -158,9 +158,7 @@ jobs:
         run: |
           artifact_zip="${{ inputs.artifact_name }}_${{ matrix.plugins.container_path }}_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip"
           s3_path="${{ env.CI_DEV_INTERNAL_BUCKET }}/${{ env.CI_ARTIFACTS_REPO }}/${{ env.CI_ARTIFACTS_WORKFLOW }}/${{ github.run_id}}/${artifact_zip}"
-          pushd "${{ matrix.plugins.path }}/${{ inputs.artifact_path }}"
-          popd
-          packagePath=$(find "${GITHUB_WORKSPACE}/${{ matrix.plugins.path }}/${{ inputs.artifact_path }}"  )
+          packagePath=$(find "${GITHUB_WORKSPACE}/${{ matrix.plugins.path }}/${{ inputs.artifact_path }}" -type f)
           aws s3 cp "${packagePath}" "${s3_path}"
           echo "::notice::Artifact uploaded to ${s3_path}"
 
