@@ -106,7 +106,7 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
     expect(mockClient.get).toHaveBeenCalledWith('dashboard', mockDashboard.id);
     expect(mockClient.create).toHaveBeenCalledWith(
       'visualization',
-      mockVisualization.attributes,
+      { ...mockVisualization.attributes, description: 'Provided by Wazuh. ' },
       {
         id: mockVisualization.id,
         overwrite: false,
@@ -116,7 +116,7 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
     );
     expect(mockClient.create).toHaveBeenCalledWith(
       'dashboard',
-      mockDashboard.attributes,
+      { ...mockDashboard.attributes, description: 'Provided by Wazuh. ' },
       {
         id: mockDashboard.id,
         overwrite: false,
@@ -145,7 +145,7 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
     expect(mockClient.get).not.toHaveBeenCalled();
     expect(mockClient.create).toHaveBeenCalledWith(
       'visualization',
-      mockVisualization.attributes,
+      { ...mockVisualization.attributes, description: 'Provided by Wazuh. ' },
       {
         id: mockVisualization.id,
         overwrite: true,
@@ -155,7 +155,7 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
     );
     expect(mockClient.create).toHaveBeenCalledWith(
       'dashboard',
-      mockDashboard.attributes,
+      { ...mockDashboard.attributes, description: 'Provided by Wazuh. ' },
       {
         id: mockDashboard.id,
         overwrite: true,
@@ -163,5 +163,80 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
         references: mockDashboard.references,
       },
     );
+  });
+
+  describe('"Provided by Wazuh. " description prefix normalization', () => {
+    const getCreatedAttributes = (type: 'visualization' | 'dashboard') => {
+      const call = mockClient.create.mock.calls.find(([t]) => t === type);
+      return call?.[1] as { description?: string };
+    };
+
+    beforeEach(() => {
+      ctx.context.scope = 'internal-initial';
+      mockClient.create.mockResolvedValue(mockDashboard);
+    });
+
+    it('adds the prefix when the description is missing', async () => {
+      mockReadDashboardDefinitionFiles.mockReturnValue([mockDefinition]);
+
+      const task =
+        initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations();
+      await task.run(ctx);
+
+      expect(getCreatedAttributes('visualization').description).toBe(
+        'Provided by Wazuh. ',
+      );
+      expect(getCreatedAttributes('dashboard').description).toBe(
+        'Provided by Wazuh. ',
+      );
+    });
+
+    it('prepends the prefix to an existing description', async () => {
+      mockReadDashboardDefinitionFiles.mockReturnValue([
+        {
+          ...mockDefinition,
+          dashboard: {
+            ...mockDashboard,
+            attributes: {
+              ...mockDashboard.attributes,
+              description: 'HIPAA overview dashboard',
+            },
+          },
+          visualizations: [],
+        },
+      ]);
+
+      const task =
+        initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations();
+      await task.run(ctx);
+
+      expect(getCreatedAttributes('dashboard').description).toBe(
+        'Provided by Wazuh. HIPAA overview dashboard',
+      );
+    });
+
+    it('leaves an already-compliant description unchanged (idempotent)', async () => {
+      mockReadDashboardDefinitionFiles.mockReturnValue([
+        {
+          ...mockDefinition,
+          dashboard: {
+            ...mockDashboard,
+            attributes: {
+              ...mockDashboard.attributes,
+              description: 'Provided by Wazuh. Already compliant',
+            },
+          },
+          visualizations: [],
+        },
+      ]);
+
+      const task =
+        initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations();
+      await task.run(ctx);
+
+      expect(getCreatedAttributes('dashboard').description).toBe(
+        'Provided by Wazuh. Already compliant',
+      );
+    });
   });
 });
