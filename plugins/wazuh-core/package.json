@@ -32,8 +32,6 @@
     "md5": "^2.3.0"
   },
   "devDependencies": {
-    "@testing-library/user-event": "^14.5.0",
-    "@types/": "testing-library/user-event",
     "@types/md5": "^2.3.2",
     "knip": "^5.88.1",
     "typescript": "~6.0.2"

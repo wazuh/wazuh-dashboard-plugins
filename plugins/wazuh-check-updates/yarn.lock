@@ -144,10 +144,6 @@
   dependencies:
     tslib "^2.4.0"
 
-"@types/@testing-library/user-event":
-  version "0.0.0-semantically-released"
-  resolved "https://codeload.github.com/testing-library/user-event/tar.gz/4be87b3452f524bcc256d43cfb891ba1f0e236d6"
-
 "@types/cookie@^0.3.3":
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/@types/cookie/-/cookie-0.3.3.tgz#85bc74ba782fb7aa3a514d11767832b0e3bc6803"
