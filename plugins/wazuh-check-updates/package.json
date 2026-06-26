@@ -8,7 +8,6 @@
   "description": "Wazuh Check Updates",
   "private": true,
   "resolutions": {
-    "**/follow-redirects": "^1.15.6",
     "cross-spawn": "^7.0.5",
     "micromatch": "4.0.8",
     "form-data": "^4.0.4",

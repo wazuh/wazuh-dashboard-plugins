@@ -9,13 +9,10 @@ const mockedFilesContents = [
 
 
 
-
 </svg>`,
     clean: `<svg xml:space="preserve" style="enable-background:new 0 0 100 100;" viewBox="0 0 100 100" height="100px" width="100px" y="0px" x="0px" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" id="Capa_1" version="1.1">
 
-
   <circle id="foo" fill="green" r="45" cy="50" cx="50"></circle>
-
 
 
 
