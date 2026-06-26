@@ -20,7 +20,11 @@ const SourceFindingTable = ({
   document: any;
   indexPattern: any;
 }) => {
-  const docViewerProps = useDocViewer({ doc: document, indexPattern });
+  const docWithId = {
+    ...document,
+    _source: { _id: document._id, ...document._source },
+  };
+  const docViewerProps = useDocViewer({ doc: docWithId, indexPattern });
   return <DocViewer {...docViewerProps} filters={[]} setFilters={() => {}} showFilterButtons={false} />;
 };
 
