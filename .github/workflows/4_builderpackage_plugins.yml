@@ -41,7 +41,7 @@ env:
   CI_DEV_INTERNAL_BUCKET: s3://xdrsiem-ci-dev-internal
   CI_ARTIFACTS_REPO: wazuh-dashboard-plugins
   # Workflow name of the base workflow used to build the artifacts. This is used to locate the artifacts in S3.
-  CI_BASE_WORKFLOW: 4_builderprecompiled_base-dev-environment
+  CI_BASE_WORKFLOW: 4_builderpackage_plugins
 
 jobs:
   # Build an app package from the given source code reference.
@@ -54,6 +54,7 @@ jobs:
       reference: ${{ inputs.reference }}
       command: 'yarn build'
       artifact_name: 'wazuh-dashboard-plugins'
+      workflow_run: ${{ env.workflow_run }}
     secrets: inherit
 
   test-packages:
