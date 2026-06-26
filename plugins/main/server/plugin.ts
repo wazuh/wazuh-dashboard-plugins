@@ -132,10 +132,12 @@ import {
   WAZUH_ACTIVE_RESPONSES_PATTERN,
   HEALTH_CHECK_TASK_INDEX_PATTERN_ACTIVE_RESPONSES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_NORMALIZATION,
+  WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS,
 } from '../common/constants';
 
 import { notificationSetup } from './health-check/notification-default-channels';
 import { initializeDefaultNotificationChannel } from './health-check/notification-default-channels/tasks';
+import { WazuhPluginConfigType } from '../config';
 
 // Resolve a known-fields JSON file path. The files are intentionally not
 // imported statically: they are large and only needed when an index pattern
@@ -681,6 +683,25 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     const router = core.http.createRouter();
 
     setupRoutes(router, plugins.wazuhCore);
+
+    // Wazuh: register capabilities based on disabledSettings config
+    const config$ =
+      this.initializerContext.config.create<WazuhPluginConfigType>();
+    const config = await config$.pipe(first()).toPromise();
+
+    core.capabilities.registerProvider(() => ({
+      wazuh: {
+        showIndexRawEvents: true,
+      },
+    }));
+
+    core.capabilities.registerSwitcher(() => ({
+      wazuh: {
+        showIndexRawEvents: !config.disabledSettings.includes(
+          WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS,
+        ),
+      },
+    }));
 
     // Register health check tasks
 
