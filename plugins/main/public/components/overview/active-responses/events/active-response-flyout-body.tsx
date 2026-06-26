@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { EuiEmptyPrompt, EuiLoadingSpinner, EuiSpacer, EuiText } from '@elastic/eui';
+import {
+  EuiEmptyPrompt,
+  EuiLoadingSpinner,
+  EuiSpacer,
+  EuiText,
+} from '@elastic/eui';
 import DocViewer from '../../../common/doc-viewer/doc-viewer';
 import { useDocViewer } from '../../../common/doc-viewer';
 import { resolveOriginalFinding } from './active-responses-service';
@@ -71,14 +76,15 @@ export const ActiveResponseFlyoutBody = ({ hit }: { hit: any }) => {
       <>
         <EuiSpacer size='l' />
         <EuiEmptyPrompt
-        iconType='search'
-        title={<h3>Missing source finding</h3>}
-        body={
-          <EuiText size='s'>
-            The source finding for this active response could not be found. It may have been deleted from its index.
-          </EuiText>
-        }
-      />
+          iconType='search'
+          title={<h3>Missing source finding</h3>}
+          body={
+            <EuiText size='s'>
+              The source finding for this active response could not be found. It
+              may have been deleted from its index.
+            </EuiText>
+          }
+        />
       </>
     );
   }
