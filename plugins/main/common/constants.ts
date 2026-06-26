@@ -18,6 +18,7 @@ export const PLUGIN_MAJOR_VERSION = version.split('.')[0];
 
 // Index - Wazuh engine/indexer settings located in Indexer management > Settings
 export const WAZUH_ENGINE_SETTINGS_INDEX = '.wazuh-settings';
+export const WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS = 'index-raw-events';
 
 // Index patterns - Wazuh events (previously alerts)
 export const WAZUH_INDEX_TYPE_EVENTS = 'events';
@@ -1005,6 +1006,8 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES =
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES =
   'index-pattern:states-sca';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERNS = 'saved-objects:index-patterns';
 
 export const INDEX_PATTERN_EVENTS_REQUIRED_FIELDS = [
   FIELD_TIMESTAMP,

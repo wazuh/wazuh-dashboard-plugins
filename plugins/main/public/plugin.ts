@@ -26,6 +26,7 @@ import {
   setWazuhCorePlugin,
   getCookies,
   initWazuhBuildInfoFromCore,
+  setCapabilities,
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -43,6 +44,7 @@ import {
   unregisterInterceptor,
 } from './services/request-handler';
 import { Applications, Categories } from './utils/applications';
+import { setSecurityAnalyticsConfig } from './utils/security-analytics-config';
 import { euiPaletteColorBlind } from '@elastic/eui';
 import NavigationService from './react-services/navigation-service';
 import { createHashHistory } from 'history';
@@ -239,6 +241,7 @@ export class WazuhPlugin
     setErrorOrchestrator(ErrorOrchestratorService);
     setWazuhCheckUpdatesPlugin(plugins.wazuhCheckUpdates);
     setWazuhCorePlugin(plugins.wazuhCore);
+    setCapabilities(core.application.capabilities);
     return {};
   }
 }

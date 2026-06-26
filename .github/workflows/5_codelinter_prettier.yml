@@ -9,7 +9,7 @@ on:
 jobs:
   prettier:
     name: Ensure the code format on the changed files
-    runs-on: ubuntu-24.04
+    runs-on: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
     if: github.event.pull_request.draft == false
     steps:
       # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
