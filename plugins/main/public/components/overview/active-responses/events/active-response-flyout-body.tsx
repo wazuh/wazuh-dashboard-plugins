@@ -70,10 +70,10 @@ export const ActiveResponseFlyoutBody = ({ hit }: { hit: any }) => {
     return (
       <EuiEmptyPrompt
         iconType='search'
-        title={<h3>No linked finding found</h3>}
+        title={<h3>Missing source finding</h3>}
         body={
           <EuiText size='s'>
-            No finding linked to this active response was found.
+            The source finding for this active response could not be found. It may have been deleted from its index.
           </EuiText>
         }
       />
