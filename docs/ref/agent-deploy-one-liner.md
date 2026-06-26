@@ -86,10 +86,10 @@ in the `wazuh-dashboard` repository `VERSION.json`
 
 ### Routing rules
 
-| Stage value | Repository | Package name |
-|---|---|---|
-| Starts with `alpha` or `beta` | `https://packages-staging.xdrsiem.wazuh.info/pre-release/5.x` | Includes `-{stage}` suffix. e.g. `wazuh-agent_5.0.0-beta3_amd64.deb` |
-| `rc`, empty, or any other value | `https://packages.wazuh.com/production/5.x` | No suffix. e.g. `wazuh-agent_5.0.0_amd64.deb` |
+| Stage value                     | Repository                                                    | Package name                                                         |
+| ------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Starts with `alpha` or `beta`   | `https://packages-staging.xdrsiem.wazuh.info/pre-release/5.x` | Includes `-{stage}` suffix. e.g. `wazuh-agent_5.0.0-beta3_amd64.deb` |
+| `rc`, empty, or any other value | `https://packages.wazuh.com/production/5.x`                   | No suffix. e.g. `wazuh-agent_5.0.0_amd64.deb`                        |
 
 The detection is case-insensitive prefix matching on the `stage` field.
 Anything that is not clearly `alpha` or `beta` defaults to the production

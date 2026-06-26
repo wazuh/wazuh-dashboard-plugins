@@ -1,12 +1,22 @@
 import { isWazuhPreRelease, setWazuhBuildInfo } from './kibana-services';
 
 const setStage = (stage: string) =>
-  setWazuhBuildInfo({ version: '5.0.0', revision: '01', stage, isProduction: false });
+  setWazuhBuildInfo({
+    version: '5.0.0',
+    revision: '01',
+    stage,
+    isProduction: false,
+  });
 
 describe('isWazuhPreRelease()', () => {
   afterEach(() => {
     // Reset to default empty stage after each test
-    setWazuhBuildInfo({ version: '', revision: '01', stage: '', isProduction: false });
+    setWazuhBuildInfo({
+      version: '',
+      revision: '01',
+      stage: '',
+      isProduction: false,
+    });
   });
 
   describe('pre-release stages → true', () => {
@@ -26,16 +36,12 @@ describe('isWazuhPreRelease()', () => {
   });
 
   describe('production / unknown stages → false', () => {
-    it.each([
-      ['rc'],
-      ['rc1'],
-      ['RC'],
-      [''],
-      ['stable'],
-      ['unknown'],
-    ])('stage "%s" should return false', stage => {
-      setStage(stage);
-      expect(isWazuhPreRelease()).toBe(false);
-    });
+    it.each([['rc'], ['rc1'], ['RC'], [''], ['stable'], ['unknown']])(
+      'stage "%s" should return false',
+      stage => {
+        setStage(stage);
+        expect(isWazuhPreRelease()).toBe(false);
+      },
+    );
   });
 });
