@@ -15,7 +15,7 @@ export async function resolveOriginalFinding(
       .setParent(undefined)
       .setField('index', indexPattern)
       .setField('size', 1)
-      .setField('query', { ids: { values: [docId] } })
+      .setField('query', { language: 'lucene', query: { ids: { values: [docId] } } })
       .fetch();
 
     const document = result?.hits?.hits?.[0];
