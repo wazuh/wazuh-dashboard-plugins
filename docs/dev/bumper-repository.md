@@ -12,23 +12,16 @@ It has two parts:
   that run the script in CI, then create and merge a pull request with the
   result.
 
-> **Note**: This document describes the files as they exist in **`wazuh-dashboard-plugins`**.
-> The same workflow exists in the other Wazuh dashboard repositories
-> (`wazuh-dashboard`, `wazuh-security-dashboards-plugin`, `wazuh-dashboard-reporting`,
-> `wazuh-dashboard-security-analytics`, `wazuh-dashboard-alerting`,
-> `wazuh-dashboard-notifications`) and its contents may differ per repository,
-> because each repository tracks a different set of files.
-
 ## Workflow files in this repository
 
 This repository keeps several **generations** of each CI workflow, distinguished
 by a numeric prefix. For the bumper there are three files:
 
-| File | Relationship |
-| --- | --- |
-| `.github/workflows/4_bumper_repository.yml` | Base version. |
+| File                                        | Relationship                                                           |
+| ------------------------------------------- | ---------------------------------------------------------------------- |
+| `.github/workflows/4_bumper_repository.yml` | Base version.                                                          |
 | `.github/workflows/5_bumper_repository.yml` | Extended version (adds `set_as_main`, `bump-issue-link` and `revert`). |
-| `.github/workflows/6_bumper_repository.yml` | Byte-for-byte identical to `4_bumper_repository.yml`. |
+| `.github/workflows/6_bumper_repository.yml` | Byte-for-byte identical to `4_bumper_repository.yml`.                  |
 
 The numeric prefix denotes a workflow generation, not strictly a Wazuh major
 version: on the `5.0.0` branch the sibling `5_*` and `6_*` build/test workflows
@@ -53,13 +46,13 @@ version metadata across the repository. It is compatible with macOS and Linux
 Derived from the script's `usage()` output and `validate_input` (parameter
 names and required rules are exact; descriptions are summarized):
 
-| Parameter | Required | Description |
-| --- | --- | --- |
-| `--version VERSION` | Required unless `--tag` is used | Target version in `x.y.z` form (e.g. `4.6.0`). |
-| `--stage STAGE` | Required unless `--tag` is used | Stage in `<letters><number>` form (e.g. `alpha0`, `beta1`, `rc2`). |
-| `--tag` | — | Use tag-like references. With `--stage` it produces `v<version>-<stage>`; without it, `v<version>`. When set, `--version` and `--stage` are not required. |
-| `--set-as-main` | — | Skip updating branch/URL references (used when bumping `main` itself). Version values are still bumped. |
-| `--help` | — | Print usage and exit. |
+| Parameter           | Required                        | Description                                                                                                                                               |
+| ------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--version VERSION` | Required unless `--tag` is used | Target version in `x.y.z` form (e.g. `4.6.0`).                                                                                                            |
+| `--stage STAGE`     | Required unless `--tag` is used | Stage in `<letters><number>` form (e.g. `alpha0`, `beta1`, `rc2`).                                                                                        |
+| `--tag`             | —                               | Use tag-like references. With `--stage` it produces `v<version>-<stage>`; without it, `v<version>`. When set, `--version` and `--stage` are not required. |
+| `--set-as-main`     | —                               | Skip updating branch/URL references (used when bumping `main` itself). Version values are still bumped.                                                   |
+| `--help`            | —                               | Print usage and exit.                                                                                                                                     |
 
 Input validation (`validate_input`):
 
@@ -73,15 +66,15 @@ All paths below were confirmed to exist in this repository. The script targets
 plugin files dynamically via `git ls-files`, so the lists reflect the tracked
 files at run time.
 
-| File / pattern | Field updated |
-| --- | --- |
-| `VERSION.json` | `version`, `stage` |
-| `plugins/*/package.json` (tracked, excluding `test/cypress/package.json`) | `version`, `revision` |
-| `plugins/*/opensearch_dashboards.json` (tracked) | `version` set to `<version>-<revision>` |
-| `CHANGELOG.md` | Inserts/updates the `## Wazuh v<version> - OpenSearch Dashboards <platform> - Revision <rev>` entry |
-| `plugins/main/common/api-info/endpoints.json` | Documentation URLs `documentation.wazuh.com/<major.minor>` |
-| `.github/workflows/*.yml` (selected, see below) | `default:` branch references |
-| `docker/imposter/wazuh-config.yml` | `specFile` Git reference in the URL |
+| File / pattern                                                            | Field updated                                                                                       |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `VERSION.json`                                                            | `version`, `stage`                                                                                  |
+| `plugins/*/package.json` (tracked, excluding `test/cypress/package.json`) | `version`, `revision`                                                                               |
+| `plugins/*/opensearch_dashboards.json` (tracked)                          | `version` set to `<version>-<revision>`                                                             |
+| `CHANGELOG.md`                                                            | Inserts/updates the `## Wazuh v<version> - OpenSearch Dashboards <platform> - Revision <rev>` entry |
+| `plugins/main/common/api-info/endpoints.json`                             | Documentation URLs `documentation.wazuh.com/<major.minor>`                                          |
+| `.github/workflows/*.yml` (selected, see below)                           | `default:` branch references                                                                        |
+| `docker/imposter/wazuh-config.yml`                                        | `specFile` Git reference in the URL                                                                 |
 
 In this repository the tracked plugin files currently are:
 
@@ -207,34 +200,34 @@ High-level steps:
 
 #### `4_bumper_repository.yml` (and identical `6_bumper_repository.yml`)
 
-| Input | Required | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `version` | no | string | `''` | Target version (e.g. `1.2.3`). |
-| `stage` | no | string | `''` | Version stage (e.g. `alpha0`). |
-| `tag` | no | boolean | `false` | Change branch references to tag-like references (e.g. `v4.12.0-alpha7`). |
-| `issue-link` | **yes** | string | — | Issue link `https://github.com/wazuh/<REPO>/issues/<NUMBER>`. |
-| `id` | no | string | — | Optional identifier shown in the run name. |
+| Input        | Required | Type    | Default | Description                                                              |
+| ------------ | -------- | ------- | ------- | ------------------------------------------------------------------------ |
+| `version`    | no       | string  | `''`    | Target version (e.g. `1.2.3`).                                           |
+| `stage`      | no       | string  | `''`    | Version stage (e.g. `alpha0`).                                           |
+| `tag`        | no       | boolean | `false` | Change branch references to tag-like references (e.g. `v4.12.0-alpha7`). |
+| `issue-link` | **yes**  | string  | —       | Issue link `https://github.com/wazuh/<REPO>/issues/<NUMBER>`.            |
+| `id`         | no       | string  | —       | Optional identifier shown in the run name.                               |
 
 #### `5_bumper_repository.yml`
 
 All inputs above, plus:
 
-| Input | Required | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `set_as_main` | no | boolean | `false` | Bump version values only; keep branch references pointing to `main` (maps to `--set-as-main`). |
-| `bump-issue-link` | no | string | — | Issue link used in the original bump; needed for revert when it differs from `issue-link`. |
-| `revert` | no | boolean | `false` | Revert the bump previously applied for the issue. |
+| Input             | Required | Type    | Default | Description                                                                                    |
+| ----------------- | -------- | ------- | ------- | ---------------------------------------------------------------------------------------------- |
+| `set_as_main`     | no       | boolean | `false` | Bump version values only; keep branch references pointing to `main` (maps to `--set-as-main`). |
+| `bump-issue-link` | no       | string  | —       | Issue link used in the original bump; needed for revert when it differs from `issue-link`.     |
+| `revert`          | no       | boolean | `false` | Revert the bump previously applied for the issue.                                              |
 
 ### How inputs map to script parameters
 
 The `Determine branch name` step translates the inputs into script flags:
 
-| Inputs provided | Script call |
-| --- | --- |
-| `version` **and** `stage`, `tag` = false | `--version <version> --stage <stage>` |
-| `stage` only, `tag` = true | `--stage <stage> --tag` |
-| neither `version` nor `stage`, `tag` = true | `--tag` |
-| (`5_` only) `set_as_main` = true | the above **plus** `--set-as-main` |
+| Inputs provided                             | Script call                           |
+| ------------------------------------------- | ------------------------------------- |
+| `version` **and** `stage`, `tag` = false    | `--version <version> --stage <stage>` |
+| `stage` only, `tag` = true                  | `--stage <stage> --tag`               |
+| neither `version` nor `stage`, `tag` = true | `--tag`                               |
+| (`5_` only) `set_as_main` = true            | the above **plus** `--set-as-main`    |
 
 > **Important**: any other combination produces **empty** parameters. In
 > particular, providing `version` without `stage`, or providing `version`
