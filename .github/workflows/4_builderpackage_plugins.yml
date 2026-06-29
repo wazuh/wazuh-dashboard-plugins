@@ -24,6 +24,11 @@ on:
         type: string
         default: 4.14.1
         description: Source code reference (branch, tag or commit SHA)
+      workflow_name:
+        required: true
+        type: string
+        default: ''
+        description: Name of the workflow that will be used to build the artifacts. This is used to locate the artifacts in S3.
     secrets:
       DOCKERHUB_USERNAME:
         required: true
@@ -54,7 +59,7 @@ jobs:
       reference: ${{ inputs.reference }}
       command: 'yarn build'
       artifact_name: 'wazuh-dashboard-plugins'
-      workflow_run: 4_builderpackage_plugins
+      workflow_run: ${{ inputs.workflow_name || '4_builderpackage_plugins' }}
     secrets: inherit
 
   test-packages:
