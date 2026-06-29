@@ -24,11 +24,11 @@ on:
         type: string
         default: 4.14.1
         description: Source code reference (branch, tag or commit SHA)
-      workflow_name:
+      execution_repository:
         required: true
         type: string
         default: ''
-        description: Name of the workflow that will be used to build the artifacts. This is used to locate the artifacts in S3.
+        description: 'Repository and workflow run to upload the artifact to (format: repo/workflow). This is used to locate the artifacts in S3.'
     secrets:
       DOCKERHUB_USERNAME:
         required: true
@@ -44,9 +44,7 @@ on:
 
 env:
   CI_DEV_INTERNAL_BUCKET: s3://xdrsiem-ci-dev-internal
-  CI_ARTIFACTS_REPO: wazuh-dashboard-plugins
-  # Workflow name of the base workflow used to build the artifacts. This is used to locate the artifacts in S3.
-  CI_BASE_WORKFLOW: 4_builderpackage_plugins
+  EXECUTION_REPOSITORY: 'wazuh-dashboard-plugins/4_builderpackage_plugins'
 
 jobs:
   # Build an app package from the given source code reference.
@@ -59,7 +57,7 @@ jobs:
       reference: ${{ inputs.reference }}
       command: 'yarn build'
       artifact_name: 'wazuh-dashboard-plugins'
-      workflow_run: ${{ inputs.workflow_name || '4_builderpackage_plugins' }}
+      execution_repository: ${{ inputs.execution_repository || 'wazuh-dashboard-plugins/4_builderpackage_plugins' }}
     secrets: inherit
 
   test-packages:
@@ -93,7 +91,7 @@ jobs:
           plugins_dir="${{ github.workspace }}/wazuh/scripts/test-packages/plugins"
           mkdir -p "${plugins_dir}"
           aws s3 cp --recursive \
-            "${{ env.CI_DEV_INTERNAL_BUCKET }}/${{ env.CI_ARTIFACTS_REPO }}/${{ env.CI_BASE_WORKFLOW }}/${{github.run_id}}" \
+            "${{ env.CI_DEV_INTERNAL_BUCKET }}/${{ inputs.execution_repository || env.EXECUTION_REPOSITORY }}/${{github.run_id}}" \
             "${plugins_dir}"
           ls -l "${plugins_dir}"
 
