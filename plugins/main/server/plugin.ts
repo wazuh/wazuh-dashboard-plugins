@@ -137,7 +137,7 @@ import {
 
 import { notificationSetup } from './health-check/notification-default-channels';
 import { initializeDefaultNotificationChannel } from './health-check/notification-default-channels/tasks';
-import { WazuhPluginConfigType } from '../config';
+import { WazuhPluginConfigType } from './config';
 
 // Resolve a known-fields JSON file path. The files are intentionally not
 // imported statically: they are large and only needed when an index pattern
