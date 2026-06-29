@@ -29,11 +29,6 @@ on:
         type: string
         default: ''
         description: 'Repository and workflow run to upload the artifact to (format: repo/workflow). This is used to locate the artifacts in S3.'
-    secrets:
-      DOCKERHUB_USERNAME:
-        required: true
-      DOCKERHUB_TOKEN:
-        required: true
   workflow_dispatch:
     inputs:
       reference:
