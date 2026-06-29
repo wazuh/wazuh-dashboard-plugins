@@ -45,7 +45,7 @@ on:
         required: false
 
 env:
-  CI_DEV_INTERNAL_BUCKET: s3://xdrsiem-ci-dev-internal
+  CI_DEV_INTERNAL_BUCKET: ${{ secrets.CI_DEV_INTERNAL_BUCKET }}
 
 jobs:
   # Deploy the plugin in a development environment and run a command
@@ -153,7 +153,7 @@ jobs:
         if: ${{ inputs.artifact_name && inputs.artifact_path }}
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: ${{ secrets.AWS_QA_AUTOMATION_ROLE }}
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Upload artifact to S3

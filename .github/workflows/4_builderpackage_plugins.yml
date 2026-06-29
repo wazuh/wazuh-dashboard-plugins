@@ -43,7 +43,7 @@ on:
         description: Source code reference (branch, tag or commit SHA)
 
 env:
-  CI_DEV_INTERNAL_BUCKET: s3://xdrsiem-ci-dev-internal
+  CI_DEV_INTERNAL_BUCKET: ${{ secrets.CI_DEV_INTERNAL_BUCKET }}
   EXECUTION_REPOSITORY: 'wazuh-dashboard-plugins/4_builderpackage_plugins'
 
 jobs:
@@ -83,7 +83,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: ${{ secrets.AWS_QA_AUTOMATION_ROLE }}
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Download plugin artifacts from S3
