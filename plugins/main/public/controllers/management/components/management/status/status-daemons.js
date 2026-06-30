@@ -112,7 +112,7 @@ export class WzStatusDaemons extends Component {
                       color={statusColor}
                       size='m'
                       aria-label='Daemon status info'
-                      content={`Ready:  ${ready ? 'yes' : 'no'}. Running: ${
+                      content={`ready:  ${ready ? 'yes' : 'no'}, running: ${
                         running ? 'yes' : 'no'
                       }`}
                     />
