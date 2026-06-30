@@ -13,6 +13,7 @@ import React from 'react';
 import MarkdownIt from 'markdown-it';
 import MarkdownItLinkAttributes from 'markdown-it-link-attributes';
 import classnames from 'classnames';
+import DOMPurify from 'dompurify';
 
 const md = new MarkdownIt({
   html: true,
@@ -39,6 +40,6 @@ export const Markdown = ({markdown, className = ''}: MarkdownProps) => (
      * Render HTML elements from a markdown text using a function to transform the
      * Markdown into HTML elements
      */
-    dangerouslySetInnerHTML={{__html: md.render(markdown)}}>
+    dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(md.render(markdown))}}>
   </div>
 );
