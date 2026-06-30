@@ -98,7 +98,7 @@ repository as a safe fallback.
 ### Stage value source
 
 The `stage` field originates from `VERSION.json` at the `wazuh-dashboard` repository and is
-injected into the browser at startup via the OpenSearch Dashboards plugin
+injected into the browser at startup via the dashboards plugin
 lifecycle (`initWazuhBuildInfoFromCore`).
 
 To test a different routing locally, change `"stage"` in `VERSION.json` before
