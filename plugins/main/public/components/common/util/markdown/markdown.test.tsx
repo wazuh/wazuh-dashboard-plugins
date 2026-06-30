@@ -23,7 +23,9 @@ describe('Markdown container', () => {
   });
 
   test('should render a link', () => {
-    const component = shallow(<Markdown markdown={`[label](https://example.com)`} />);
+    const component = shallow(
+      <Markdown markdown={`[label](https://example.com)`} />,
+    );
     const html = component.html();
     expect(html).toContain('href="https://example.com"');
     expect(html).toContain('rel="noopener noreferrer"');
@@ -31,7 +33,9 @@ describe('Markdown container', () => {
   });
 
   test('should sanitize dangerous HTML', () => {
-    const component = shallow(<Markdown markdown={'<script>alert("xss")</script>text'} />);
+    const component = shallow(
+      <Markdown markdown={'<script>alert("xss")</script>text'} />,
+    );
     const html = component.html();
     expect(html).not.toContain('<script>');
     expect(html).toContain('text');

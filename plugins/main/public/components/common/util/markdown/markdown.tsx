@@ -34,7 +34,11 @@ interface MarkdownProps {
 
 export const Markdown = ({ markdown, className = '' }: MarkdownProps) => (
   <div
-    className={classnames('wz-markdown-margin', 'wz-markdown-wrapper', className)}
+    className={classnames(
+      'wz-markdown-margin',
+      'wz-markdown-wrapper',
+      className,
+    )}
     /*
      * Justification for dangerouslySetInnerHTML:
      * Render HTML elements from a markdown text using a function to transform the
