@@ -28,6 +28,11 @@ const statusColors = {
   error: '#ff645c',
 };
 
+const chunk = (arr, size) =>
+  Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+    arr.slice(i * size, i * size + size),
+  );
+
 export class WzStatusDaemons extends Component {
   constructor(props) {
     super(props);
@@ -43,6 +48,11 @@ export class WzStatusDaemons extends Component {
 
     const generalStatus =
       listDaemons.find(({ key }) => key === 'ready')?.value === true;
+
+    const groupedDaemons = chunk(
+      listDaemons.filter(({ key }) => key !== 'ready'),
+      2,
+    );
 
     return (
       <EuiPanel>
@@ -74,47 +84,41 @@ export class WzStatusDaemons extends Component {
             </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiFlexGroup wrap responsive={true}>
-          <EuiFlexItem>
-            <EuiFlexGroup wrap responsive={true}>
-              <div className='daemons-card'>
-                {listDaemons
-                  .filter(({ key }) => key !== 'ready')
-                  .map(daemon => {
-                    const ready = daemon.value?.['ready'] === true;
-                    const running = daemon.value?.['running'] === true;
+        {groupedDaemons.map((daemonGroup, index) => (
+          <EuiFlexGroup key={`daemon_group_${index}`}>
+            {daemonGroup.map(daemon => {
+              const ready = daemon.value?.['ready'] === true;
+              const running = daemon.value?.['running'] === true;
 
-                    let statusColor = '';
+              let statusColor = '';
 
-                    if (running && ready) {
-                      statusColor = statusColors.ok;
-                    } else if (!running) {
-                      statusColor = statusColors.error;
-                    } else {
-                      statusColor = statusColors.warn;
-                    }
+              if (running && ready) {
+                statusColor = statusColors.ok;
+              } else if (!running) {
+                statusColor = statusColors.error;
+              } else {
+                statusColor = statusColors.warn;
+              }
 
-                    return (
-                      <div className='daemon-label' key={daemon.key}>
-                        <EuiText>
-                          <EuiIconTip
-                            type='dot'
-                            color={statusColor}
-                            size='m'
-                            aria-label='Daemon status info'
-                            content={`Ready:  ${
-                              ready ? 'yes' : 'no'
-                            }. Running: ${running ? 'yes' : 'no'}`}
-                          />
-                          <span style={textStyle}>{daemon.key}</span>
-                        </EuiText>
-                      </div>
-                    );
-                  })}
-              </div>
-            </EuiFlexGroup>
-          </EuiFlexItem>
-        </EuiFlexGroup>
+              return (
+                <EuiFlexItem key={daemon.key}>
+                  <EuiText>
+                    <EuiIconTip
+                      type='dot'
+                      color={statusColor}
+                      size='m'
+                      aria-label='Daemon status info'
+                      content={`Ready:  ${ready ? 'yes' : 'no'}. Running: ${
+                        running ? 'yes' : 'no'
+                      }`}
+                    />
+                    <span style={textStyle}>{daemon.key}</span>
+                  </EuiText>
+                </EuiFlexItem>
+              );
+            })}
+          </EuiFlexGroup>
+        ))}
       </EuiPanel>
     );
   }
