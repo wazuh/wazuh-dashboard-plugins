@@ -53,6 +53,7 @@ jobs:
   deploy_and_run_command:
     permissions:
       pull-requests: write
+      id-token: write
     name: Deploy and run command
     runs-on: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
     strategy:
