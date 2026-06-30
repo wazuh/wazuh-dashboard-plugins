@@ -7,5 +7,5 @@ export const configurationAssessmentColumns: tDataGridColumn[] = [
   { id: 'policy.name' },
   { id: 'check.id', initialWidth: 100 },
   { id: 'check.name' },
-  { id: 'check.result' },
+  { id: 'check.result', initialWidth: 130 },
 ];
