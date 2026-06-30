@@ -167,6 +167,7 @@ export const LastAlertsCountBySeverity = withDataSourceFetchOnStart({
             'wazuh.rule.level',
             severityKey,
             indexPatternId,
+            'wazuh-rule-level-severity',
           ),
         ]);
 
