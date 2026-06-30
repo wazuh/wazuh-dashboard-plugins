@@ -34,12 +34,16 @@ import { createRegulatoryComplianceColumns } from '../../overview/regulatory-com
 import { githubColumns } from '../../overview/github/events/github-columns';
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
+import { activeResponsesColumns } from '../../overview/active-responses/events/active-responses-columns';
+import { ActiveResponseFlyoutBody } from '../../overview/active-responses/events/active-response-flyout-body';
 import { azureColumns } from '../../overview/azure/events/azure-columns';
 import {
   TAB_VIEW_ID_DASHBOARD,
   TAB_VIEW_ID_EVENTS,
+  TAB_VIEW_ID_RESPONSES,
   TAB_VIEW_NAME_DASHBOARD,
   TAB_VIEW_NAME_EVENTS,
+  TAB_VIEW_NAME_RESPONSES,
   WAZUH_MODULES_ID,
   WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
@@ -85,6 +89,8 @@ import {
   Office365DataSource,
   ThreatHuntingDataSource,
   AzureDataSource,
+  ActiveResponsesDataSource,
+  ActiveResponsesDataSourceRepository,
 } from '../data-source';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 import {
@@ -641,6 +647,35 @@ export const ModulesDefaults = {
           ButtonModuleGenerateReport,
         ],
         component: DashboardActiveResponses,
+      },
+      {
+        id: TAB_VIEW_ID_RESPONSES,
+        name: TAB_VIEW_NAME_RESPONSES,
+        buttons: [
+          ({ ...props }) => (
+            <ButtonExploreAgent
+              {...props}
+              moduleIndexPatternTitle={WAZUH_ACTIVE_RESPONSES_PATTERN}
+            />
+          ),
+        ],
+        component: () => (
+          <WazuhDiscover
+            moduleId='active-response-dashboard-responses'
+            tableColumns={activeResponsesColumns}
+            DataSource={ActiveResponsesDataSource}
+            DataSourceRepository={ActiveResponsesDataSourceRepository}
+            categoriesSampleData={[]}
+            flyoutTitle='Active response details'
+            additionalDocumentDetailsTabs={({ document }) => [
+              {
+                id: 'source-finding',
+                name: 'Source finding',
+                content: <ActiveResponseFlyoutBody hit={document} />,
+              },
+            ]}
+          />
+        ),
       },
     ],
     availableFor: ['manager', 'agent'],

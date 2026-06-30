@@ -18,6 +18,7 @@ export const PLUGIN_MAJOR_VERSION = version.split('.')[0];
 
 // Index - Wazuh engine/indexer settings located in Indexer management > Settings
 export const WAZUH_ENGINE_SETTINGS_INDEX = '.wazuh-settings';
+export const WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS = 'index-raw-events';
 
 // Index patterns - Wazuh events (previously alerts)
 export const WAZUH_INDEX_TYPE_EVENTS = 'events';
@@ -1198,6 +1199,8 @@ export const TAB_VIEW_ID_EVENTS = 'findings';
 export const TAB_VIEW_NAME_EVENTS = 'Findings';
 export const TAB_VIEW_ID_DASHBOARD = 'dashboard';
 export const TAB_VIEW_NAME_DASHBOARD = 'Dashboard';
+export const TAB_VIEW_ID_RESPONSES = 'responses';
+export const TAB_VIEW_NAME_RESPONSES = 'Responses';
 
 export const CTI_CVE_LINK_BASE_PATH =
   'https://cti.wazuh.com/vulnerabilities/cves/';
