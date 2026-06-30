@@ -255,11 +255,11 @@ export const checkDaemons = async () => {
       ((((daemonsStatus || {}).data || {}).data || {}).affected_items ||
         [])[0] || {};
 
-    const modulesd = daemons?.['wazuh-manager-modulesd']?.['running'] === true;
-    const wazuhdb = daemons?.['wazuh-manager-db']?.['running'] === true;
+    const modulesd = daemons?.['wazuh-manager-modulesd']?.running === true;
+    const wazuhdb = daemons?.['wazuh-manager-db']?.running === true;
 
     // In cluster by default, always check clusterd daemon
-    const clusterd = daemons?.['wazuh-manager-clusterd']?.['running'] === true;
+    const clusterd = daemons?.['wazuh-manager-clusterd']?.running === true;
 
     const isValid = modulesd && wazuhdb && clusterd;
 

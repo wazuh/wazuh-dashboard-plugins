@@ -91,8 +91,8 @@ export class WzStatusDaemons extends Component {
         {groupedDaemons.map((daemonGroup, index) => (
           <EuiFlexGroup key={`daemon_group_${index}`}>
             {daemonGroup.map(daemon => {
-              const ready = daemon.value?.['ready'] === true;
-              const running = daemon.value?.['running'] === true;
+              const ready = daemon.value?.ready === true;
+              const running = daemon.value?.running === true;
 
               let statusColor = '';
 
