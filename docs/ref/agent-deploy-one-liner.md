@@ -91,9 +91,10 @@ in the `wazuh-dashboard` repository `VERSION.json`
 | Starts with `alpha` or `beta`   | `https://packages-staging.xdrsiem.wazuh.info/pre-release/5.x` | Includes `-{stage}` suffix. e.g. `wazuh-agent_5.0.0-beta3_amd64.deb` |
 | `rc`, empty, or any other value | `https://packages.wazuh.com/production/5.x`                   | No suffix. e.g. `wazuh-agent_5.0.0_amd64.deb`                        |
 
-The detection is case-insensitive prefix matching on the `stage` field.
-Anything that is not clearly `alpha` or `beta` defaults to the production
-repository as a safe fallback.
+The detection combines two signals in order:
+
+1. If `isProduction` is `true` (set by the package build scripts via `--production`), the build always routes to production regardless of `stage`.
+2. Otherwise, `stage` prefix matching applies: `alpha` or `beta` routes to staging, everything else routes to production.
 
 ### Stage value source
 

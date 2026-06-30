@@ -44,4 +44,19 @@ describe('isWazuhPreRelease()', () => {
       },
     );
   });
+
+  describe('isProduction flag takes precedence → false', () => {
+    it.each([['alpha'], ['beta2'], ['rc'], ['']])(
+      'stage "%s" with isProduction=true should return false',
+      stage => {
+        setWazuhBuildInfo({
+          version: '5.0.0',
+          revision: '01',
+          stage,
+          isProduction: true,
+        });
+        expect(isWazuhPreRelease()).toBe(false);
+      },
+    );
+  });
 });

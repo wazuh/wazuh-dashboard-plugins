@@ -130,18 +130,14 @@ export function getWazuhStage(): string {
   return _wazuhBuildInfo.stage;
 }
 
-/** Returns true when the dashboard build uses production package nomenclature. */
-export function isWazuhProductionBuild(): boolean {
-  return _wazuhBuildInfo.isProduction;
-}
-
 /**
  * Returns true when the build is a pre-release (uses staging package repository).
  *
- * Detection rule: the stage field starts with "alpha" or "beta" (case-insensitive).
- * - alpha, alpha1, beta, beta2, etc. → true  (staging repository)
- * - rc, rc1, "" (empty), "stable", or any unknown value → false (production repository)
+ * Detection uses two signals:
+ * - isProduction flag (set by the package build scripts) takes precedence.
+ * - stage prefix ("alpha" or "beta") is the fallback when isProduction is false.
  */
 export function isWazuhPreRelease(): boolean {
+  if (_wazuhBuildInfo.isProduction) return false;
   return /^(alpha|beta)/i.test(_wazuhBuildInfo.stage);
 }
