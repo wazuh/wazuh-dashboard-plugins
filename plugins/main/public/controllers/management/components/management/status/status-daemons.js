@@ -78,7 +78,7 @@ export class WzStatusDaemons extends Component {
                     color={generalStatus ? statusColors.ok : statusColors.warn}
                     size='l'
                     aria-label='Daemon status general'
-                    content={`Ready: ${generalStatus ? 'yes' : 'no'}`}
+                    content={`ready: ${generalStatus ? 'yes' : 'no'}`}
                   />
                   <span style={textStyle}>
                     {generalStatus ? 'ready' : 'not ready'}
