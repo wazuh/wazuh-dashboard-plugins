@@ -1,0 +1,18 @@
+{
+  "name": "wazuh-dashboard-plugins",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "lint-staged": "lint-staged"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
+    "prettier": "^2.7.1"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,css,scss,json,md,yml,yaml}": [
+      "prettier --check --ignore-unknown --config .prettierrc"
+    ]
+  }
+}
