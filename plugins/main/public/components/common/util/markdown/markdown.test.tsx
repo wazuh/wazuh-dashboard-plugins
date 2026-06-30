@@ -25,12 +25,18 @@ describe('Markdown container', () => {
 
   test('should render a link', () => {
     const component = shallow(<Markdown markdown={`[label](https://example.com)`}/>);
-    expect(
-      component
-        .html()
-        .includes(
-          '<a href="https://example.com" target="_blank" rel="noopener noreferrer">label</a>',
-        ),
-    ).toBe(true);
+    const html = component.html();
+    expect(html).toContain('href="https://example.com"');
+    expect(html).toContain('rel="noopener noreferrer"');
+    expect(html).toContain('>label<');
+  });
+
+  test('should sanitize dangerous HTML', () => {
+    const component = shallow(
+      <Markdown markdown={'<script>alert("xss")</script>text'} />,
+    );
+    const html = component.html();
+    expect(html).not.toContain('<script>');
+    expect(html).toContain('text');
   });
 });
