@@ -19,6 +19,7 @@ import {
   EuiText,
   EuiTitle,
 } from '@elastic/eui';
+import { sortBy } from 'lodash';
 
 import { connect } from 'react-redux';
 
@@ -50,7 +51,10 @@ export class WzStatusDaemons extends Component {
       listDaemons.find(({ key }) => key === 'ready')?.value === true;
 
     const groupedDaemons = chunk(
-      listDaemons.filter(({ key }) => key !== 'ready'),
+      sortBy(
+        listDaemons.filter(({ key }) => key !== 'ready'),
+        'key',
+      ),
       2,
     );
 
