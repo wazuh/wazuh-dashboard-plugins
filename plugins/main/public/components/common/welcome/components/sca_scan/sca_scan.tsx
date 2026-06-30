@@ -35,16 +35,31 @@ import {
   SCAStatesDataSourceRepository,
 } from '../../../data-source/pattern/sca';
 import { LoadingSearchbarProgress } from '../../../loading-searchbar-progress/loading-searchbar-progress';
-import { CheckResult } from '../../../../overview/sca/utils/constants';
 import { groupBy } from 'lodash';
-import { decimalFormat } from '../../../../overview/sca/components/dashboard/utils/visualization-helpers';
-import d3 from 'd3';
+import { PercentFormat } from '../../../../../../../../src/plugins/data/common';
 
 type ScaScanProps = {
   agent: { [key in string]: any };
 };
 
 const TOP_POLICIES_SIZE = 20;
+
+enum CheckResult {
+  Passed = 'Passed',
+  Failed = 'Failed',
+  NotApplicable = 'Not applicable',
+}
+
+const decimalFormat = () => {
+  const pattern =
+    getCore().uiSettings.get('format:percent:defaultPattern') ?? '0,0.[00]%';
+
+  const decimalFormat = new PercentFormat({
+    pattern: pattern,
+    fractional: true,
+  });
+  return decimalFormat;
+};
 
 const ScaScanHeader = ({ agent }) => {
   return (
