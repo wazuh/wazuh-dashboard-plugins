@@ -1023,6 +1023,7 @@ export const THREAT_HUNTING_AGENT_DASHBOARD_ID =
   'threat-hunting-pinned-agent-dashboard';
 export const THREAT_HUNTING_CASES_DASHBOARD_ID =
   'threat-hunting-cases-dashboard-tab';
+export const CASE_MANAGEMENT_DASHBOARD_ID = 'case-management-dashboard-tab';
 
 export const AMAZON_WEB_SERVICES_DASHBOARD_ID = 'aws-overview-dashboard-tab';
 export const AMAZON_WEB_SERVICES_AGENT_DASHBOARD_ID =

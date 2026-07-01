@@ -20,10 +20,28 @@ export type CaseStatus =
   | 'DELETED'
   | 'AUDIT';
 
+// TODO: confirm exact enum literal values against backend contract (wazuh-indexer-plugins#1220).
+export type CaseSeverity = string;
+export type CasePriority = string;
+export type CaseTLP = string;
+
+export interface CaseComment {
+  author?: string;
+  comment?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface CaseData {
   status?: CaseStatus;
   comment?: string;
   tags?: string[];
+  title?: string;
+  description?: string;
+  severity?: CaseSeverity;
+  priority?: CasePriority;
+  tlp?: CaseTLP;
+  comments?: CaseComment[];
   created_at?: string;
   updated_at?: string;
   user?: { name?: string };
