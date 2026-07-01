@@ -22,7 +22,6 @@ import {
 } from '../wazuh-discover/wz-discover';
 import { caseManagementDocumentDetailsTabs as findingsDocumentDetailsTabs } from '../document-details/case-management';
 import { threatHuntingColumns } from '../../overview/threat-hunting/events/threat-hunting-columns';
-import { ThreatHuntingCases } from '../../overview';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
@@ -70,6 +69,8 @@ import {
   InventoryVuls,
   DashboardAzure,
   DashboardActiveResponses,
+  CaseManagementCases,
+  DashboardCaseManagement,
 } from '../../overview';
 import {
   DockerDataSource,
@@ -167,14 +168,26 @@ export const ModulesDefaults = {
           WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
         ],
       }),
+    ],
+    availableFor: ['manager', 'agent'],
+  },
+  caseManagement: {
+    init: TAB_VIEW_ID_DASHBOARD,
+    tabs: [
+      {
+        id: TAB_VIEW_ID_DASHBOARD,
+        name: TAB_VIEW_NAME_DASHBOARD,
+        buttons: [ButtonModuleGenerateReport],
+        component: DashboardCaseManagement,
+      },
       {
         id: 'cases',
         name: 'Cases',
-        buttons: [ButtonExploreAgent],
-        component: ThreatHuntingCases,
+        buttons: [],
+        component: CaseManagementCases,
       },
     ],
-    availableFor: ['manager', 'agent'],
+    availableFor: ['manager'],
   },
   fim: {
     init: TAB_VIEW_ID_DASHBOARD,

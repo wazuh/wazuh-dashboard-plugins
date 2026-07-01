@@ -13,7 +13,7 @@ const CASES_DASHBOARD_PANELS = [
   { dashboardId: THREAT_HUNTING_CASES_DASHBOARD_ID },
 ];
 
-export const ThreatHuntingCases = () => {
+export const CaseManagementCases = () => {
   return (
     <InventoryDashboardTable
       DataSource={CasesDataSource}
@@ -21,7 +21,7 @@ export const ThreatHuntingCases = () => {
       tableDefaultColumns={tableColumns}
       managedFilters={managedFilters}
       getDashboardPanels={CASES_DASHBOARD_PANELS}
-      tableId='threat-hunting-cases'
+      tableId='case-management-cases'
       additionalDocumentDetailsTabs={caseManagementDocumentDetailsTabs}
     />
   );
