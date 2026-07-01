@@ -8,30 +8,48 @@ It has two parts:
 
 - **`tools/repository_bumper.sh`** — the shell script that performs all file
   edits. It is the engine and can be run locally.
-- **`.github/workflows/*_bumper_repository.yml`** — the GitHub Actions workflows
-  that run the script in CI, then create and merge a pull request with the
-  result.
+- **`.github/workflows/5_bumper_repository.yml`** — the GitHub Actions workflow
+  that runs the script in CI, then creates and merges a pull request with the
+  result. CI workflows are prefixed by the Wazuh major version they target, so
+  this `5.0.0` guide documents the `5_` bumper (see
+  [Workflow version prefix](#workflow-version-prefix)).
 
-## Workflow files in this repository
+## The bumper across Wazuh dashboard repositories
 
-This repository keeps several **generations** of each CI workflow, distinguished
-by a numeric prefix. For the bumper there are three files:
+The bumper is a **shared mechanism** used by every Wazuh dashboard repository, not
+a single central script. Each repository keeps its **own**
+`tools/repository_bumper.sh` — a per-repository fork adapted to that repository's
+file layout — together with the same GitHub Actions wrapper: the
+`BUMP_SCRIPT_PATH=tools/repository_bumper.sh` environment variable, a `wazuhci`
+signed committer, the `4_/5_/6_` version prefix, and the extended `5_` generation
+described below.
 
-| File                                        | Relationship                                                           |
-| ------------------------------------------- | ---------------------------------------------------------------------- |
-| `.github/workflows/4_bumper_repository.yml` | Base version.                                                          |
-| `.github/workflows/5_bumper_repository.yml` | Extended version (adds `set_as_main`, `bump-issue-link` and `revert`). |
-| `.github/workflows/6_bumper_repository.yml` | Byte-for-byte identical to `4_bumper_repository.yml`.                  |
+Every bumper edits the same **core** files — the repository's top-level
+`package.json` (here the monorepo's `plugins/main/package.json`), `VERSION.json`
+and `CHANGELOG.md`. Beyond that core, the file set differs per repository:
 
-The numeric prefix denotes a workflow generation, not strictly a Wazuh major
-version: on the `5.0.0` branch the sibling `5_*` and `6_*` build/test workflows
-default their `reference` input to `5.0.0`, while the `4_*` workflows default to
-`4.14.0`. The bumper script only rewrites branch defaults for the `5_*` and `6_*`
-generations on this branch (see [Branch reference updates](#branch-reference-updates)).
+| Repository                           | Bumper generations | `reference` default                       | Extra files bumped (beyond the core)                                                                     |
+| ------------------------------------ | ------------------ | ----------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `wazuh-dashboard-plugins`            | `4_` / `5_` / `6_` | version-pinned (`4.14.0` / `5.0.0`)       | per-plugin `opensearch_dashboards.json`, `docker/imposter/*`, `api-info` endpoints                       |
+| `wazuh-dashboard`                    | `4_` / `5_` / `6_` | branch-pinned (`main`)                    | RPM `.spec`, DEB `changelog`, base-packages Dockerfile, `.nvmrc`, rendering snapshot, healthcheck config |
+| `wazuh-security-dashboards-plugin`   | `4_` / `5_` / `6_` | version-pinned (`4.14.1`/`5.0.0`/`6.0.0`) | — (core only)                                                                                            |
+| `wazuh-dashboard-reporting`          | `5_` / `6_`        | branch-pinned (`main`)                    | its build workflow file, `docker/imposter/*`                                                             |
+| `wazuh-dashboard-notifications`      | `5_` only          | version-pinned (`5.0.0`)                  | its build workflow file                                                                                  |
+| `wazuh-dashboard-alerting`           | `5_` only          | branch-pinned (`main`)                    | — (core only)                                                                                            |
+| `wazuh-dashboard-security-analytics` | `5_` / `6_`        | branch-pinned (`main`)                    | `docker/imposter/*`                                                                                      |
 
-This guide documents `4_bumper_repository.yml` and `5_bumper_repository.yml` in
-detail; `6_bumper_repository.yml` is byte-identical to `4_bumper_repository.yml`
-and is therefore covered by the same description.
+The rest of this guide describes the bumper as it exists in
+**`wazuh-dashboard-plugins`**; the exact file list and workflow generations differ
+per repository as shown above.
+
+## Workflow version prefix
+
+CI workflows are prefixed by the **Wazuh major version** they target (the `N.x`
+release line). The build and test workflows spell the major out in their `name:`
+field (`4_* → "(4.x) …"`, `5_* → "(5.x) …"`, `6_* → "(6.x) …"`), and the repository
+has matching `5.0.0` and `6.0.0` release branches.
+
+This guide documents **`5_bumper_repository.yml`**, the bumper for the `5.x` line.
 
 ---
 
@@ -173,9 +191,9 @@ the git repository.
 
 ---
 
-## The workflows
+## The workflow
 
-All three bumper workflows share the same shape:
+`5_bumper_repository.yml` has this shape (the bumper generations share it):
 
 - **Trigger:** `workflow_dispatch` only (manual run from the Actions tab or
   `gh workflow run`).
@@ -198,22 +216,15 @@ High-level steps:
 
 ### Inputs
 
-#### `4_bumper_repository.yml` (and identical `6_bumper_repository.yml`)
-
-| Input        | Required | Type    | Default | Description                                                              |
-| ------------ | -------- | ------- | ------- | ------------------------------------------------------------------------ |
-| `version`    | no       | string  | `''`    | Target version (e.g. `1.2.3`).                                           |
-| `stage`      | no       | string  | `''`    | Version stage (e.g. `alpha0`).                                           |
-| `tag`        | no       | boolean | `false` | Change branch references to tag-like references (e.g. `v4.12.0-alpha7`). |
-| `issue-link` | **yes**  | string  | —       | Issue link `https://github.com/wazuh/<REPO>/issues/<NUMBER>`.            |
-| `id`         | no       | string  | —       | Optional identifier shown in the run name.                               |
-
-#### `5_bumper_repository.yml`
-
-All inputs above, plus:
+`5_bumper_repository.yml` exposes these `workflow_dispatch` inputs:
 
 | Input             | Required | Type    | Default | Description                                                                                    |
 | ----------------- | -------- | ------- | ------- | ---------------------------------------------------------------------------------------------- |
+| `version`         | no       | string  | `''`    | Target version (e.g. `1.2.3`).                                                                 |
+| `stage`           | no       | string  | `''`    | Version stage (e.g. `alpha0`).                                                                 |
+| `tag`             | no       | boolean | `false` | Change branch references to tag-like references (e.g. `v4.12.0-alpha7`).                       |
+| `issue-link`      | **yes**  | string  | —       | Issue link `https://github.com/wazuh/<REPO>/issues/<NUMBER>`.                                  |
+| `id`              | no       | string  | —       | Optional identifier shown in the run name.                                                     |
 | `set_as_main`     | no       | boolean | `false` | Bump version values only; keep branch references pointing to `main` (maps to `--set-as-main`). |
 | `bump-issue-link` | no       | string  | —       | Issue link used in the original bump; needed for revert when it differs from `issue-link`.     |
 | `revert`          | no       | boolean | `false` | Revert the bump previously applied for the issue.                                              |
@@ -227,7 +238,7 @@ The `Determine branch name` step translates the inputs into script flags:
 | `version` **and** `stage`, `tag` = false    | `--version <version> --stage <stage>` |
 | `stage` only, `tag` = true                  | `--stage <stage> --tag`               |
 | neither `version` nor `stage`, `tag` = true | `--tag`                               |
-| (`5_` only) `set_as_main` = true            | the above **plus** `--set-as-main`    |
+| `set_as_main` = true                        | the above **plus** `--set-as-main`    |
 
 > **Important**: any other combination produces **empty** parameters. In
 > particular, providing `version` without `stage`, or providing `version`
@@ -239,9 +250,11 @@ The bump branch is named `enhancement/wqa<issue_number>-bump-<ref_name>`
 (the `<issue_number>` is the trailing path segment of `issue-link`). The PR is
 opened against the branch the workflow was triggered on (`github.ref_name`).
 
-### Differences between `4_` and `5_`
+### The extended `5_` generation
 
-`5_bumper_repository.yml` extends the base workflow with:
+`5_bumper_repository.yml` is the **extended** generation. The simpler base
+generation (`4_`, and the scaffolded `6_`) only ever runs the script, commits, and
+creates and merges a PR. `5_` adds:
 
 - **`set_as_main` input** → appends `--set-as-main` to the script call.
 - **No-op detection** (`Check for changes`): if the script produces no diff, the
@@ -255,6 +268,3 @@ opened against the branch the workflow was triggered on (`github.ref_name`).
   `enhancement/wqa<issue_number>-revert-bump-<ref_name>`.
 - **`fetch-depth: 0`** on checkout (full history, required to locate and revert the
   original commit).
-
-`4_bumper_repository.yml` (and `6_`) has none of these: it always runs the script,
-always commits, and always creates and merges a PR.
