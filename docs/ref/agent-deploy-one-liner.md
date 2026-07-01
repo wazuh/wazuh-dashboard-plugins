@@ -78,9 +78,40 @@ Use the manager FQDN for both `WAZUH_MANAGER` and `WAZUH_REGISTRATION_SERVER`
 when enrollment is performed through DNS. Add additional variables as needed,
 for example `WAZUH_AGENT_NAME` or `WAZUH_REGISTRATION_PASSWORD`. See [Deployment variables](#deployment-variables).
 
+## How the download URL and package name are built
+
+The wizard generates the install command at runtime in the browser. The
+download URL and package filename change depending on the build stage declared
+in the `wazuh-dashboard` repository `VERSION.json`
+
+### Routing rules
+
+| Stage value                     | Repository                                                    | Package name                                                         |
+| ------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Starts with `alpha` or `beta`   | `https://packages-staging.xdrsiem.wazuh.info/pre-release/5.x` | Includes `-{stage}` suffix. e.g. `wazuh-agent_5.0.0-beta3_amd64.deb` |
+| `rc`, empty, or any other value | `https://packages.wazuh.com/production/5.x`                   | No suffix. e.g. `wazuh-agent_5.0.0_amd64.deb`                        |
+
+The detection combines two signals in order:
+
+1. If `isProduction` is `true` (set by the package build scripts via `--production`), the build always routes to production regardless of `stage`.
+2. Otherwise, `stage` prefix matching applies: `alpha` or `beta` routes to staging, everything else routes to production.
+
+### Stage value source
+
+The `stage` field originates from `VERSION.json` at the `wazuh-dashboard` repository and is
+injected into the browser at startup via the dashboards plugin
+lifecycle (`initWazuhBuildInfoFromCore`).
+
+To test a different routing locally, change `"stage"` in `VERSION.json` before
+starting the dev server:
+
+```json
+{ "version": "5.0.0", "stage": "rc1" }
+```
+
 ## References
 
-### Deployment variables:
+### Deployment variables
 
 | Option                         | Description                                                                                                                                                                                                                                                                                |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

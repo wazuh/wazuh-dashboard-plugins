@@ -130,14 +130,14 @@ export function getWazuhStage(): string {
   return _wazuhBuildInfo.stage;
 }
 
-/** Returns true when the dashboard build uses production package nomenclature. */
-export function isWazuhProductionBuild(): boolean {
-  return _wazuhBuildInfo.isProduction;
-}
-
-/** Returns true when the build is a pre-release (uses staging package repository). */
+/**
+ * Returns true when the build is a pre-release (uses staging package repository).
+ *
+ * Detection uses two signals:
+ * - isProduction flag (set by the package build scripts) takes precedence.
+ * - stage prefix ("alpha" or "beta") is the fallback when isProduction is false.
+ */
 export function isWazuhPreRelease(): boolean {
-  // TODO: Review this logic once we have a better understanding of how the staging vs production package repositories will be used across different release stages (e.g. alpha, beta, release candidate). For now, we'll consider any non-production build as a pre-release.
-  // return !_wazuhBuildInfo.isProduction;
-  return true;
+  if (_wazuhBuildInfo.isProduction) return false;
+  return /^(alpha|beta)/i.test(_wazuhBuildInfo.stage);
 }
