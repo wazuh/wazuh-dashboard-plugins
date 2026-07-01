@@ -39,7 +39,7 @@ on:
 
 env:
   CI_DEV_INTERNAL_BUCKET: ${{ secrets.CI_DEV_INTERNAL_BUCKET }}
-  EXECUTION_REPOSITORY: 'wazuh-dashboard-plugins/4_builderpackage_plugins'
+  EXECUTION_REPOSITORY: 'wazuh-dashboard-plugins/5_builderpackage_plugins'
 
 jobs:
   # Build an app package from the given source code reference.
@@ -53,7 +53,7 @@ jobs:
       reference: ${{ inputs.reference }}
       command: 'yarn build'
       artifact_name: 'wazuh-dashboard-plugins'
-      execution_repository: ${{ inputs.execution_repository || 'wazuh-dashboard-plugins/4_builderpackage_plugins' }}
+      execution_repository: ${{ inputs.execution_repository || 'wazuh-dashboard-plugins/5_builderpackage_plugins' }}
     secrets: inherit
 
   test-packages:
