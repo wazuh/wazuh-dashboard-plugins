@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.14.7
+- Added sanitization in markdown component [#8713](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8713)
 
 ## Wazuh v4.14.6 - OpenSearch Dashboards 2.19.5 - Revision 02
 
