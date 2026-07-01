@@ -73,7 +73,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed Ossec references to wazuh-manager [#8136](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8136)
 - Changed default Dev Tools request from deprecated `GET /manager/info` to `GET /cluster/<NODE_NAME>/info` [#8137](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8137)
 - Upgraded ESLint from version 8 to version 10 and migrated configuration from legacy `.eslintrc.json` to the new flat config format (`eslint.config.mjs`) [#8145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8145)
-- Updated Malware Detection dashboard with new index pattern definition [#8157](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8157) [#8335](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8335) [#8568](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8568) [#8606](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8606) [#8628](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8628) [8633](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8633) [#8674](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8674)
+- Updated Malware Detection dashboard with new index pattern definition [#8157](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8157) [#8335](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8335) [#8568](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8568) [#8606](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8606) [#8628](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8628) [8633](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8633) [#8674](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8674) [#8703](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8703)
 - Removed Manager UUID from Server APIs table and added Cluster UUID on About page [#8175](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8175) [#8209](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8209)
 - Updated Security Operations dashboards with new index pattern definition [#8146](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8146)
 - Changed the monitoring and statistics index patterns to `wazuh-metrics-agents*` and `wazuh-metrics-comms*` [#8224](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8224)
@@ -103,6 +103,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Reworked FIM overview and agent tab [#8552](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8552)
 - Updated MITRE ATT&CK dashboards to use techniques, subtechniques and tactics names [#8573](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8573) [#8617](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8617)
 - Condensed the setting labels and added info tooltips in the registration service configuration view [#8616](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8616)
+- Adapt management of daemons status to the new API response schema [#8706](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8706)
 
 ### Fixed
 

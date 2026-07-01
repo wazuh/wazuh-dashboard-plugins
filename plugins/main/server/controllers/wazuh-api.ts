@@ -1021,15 +1021,11 @@ export class WazuhApiCtrl {
         ((((daemonsStatus || {}).data || {}).data || {}).affected_items ||
           [])[0] || {};
 
-      const wazuhdbExists = typeof daemons['wazuh-manager-db'] !== 'undefined';
-
-      const modulesd = daemons['wazuh-manager-modulesd'] === 'running';
-      const wazuhdb = wazuhdbExists
-        ? daemons['wazuh-manager-db'] === 'running'
-        : true;
+      const modulesd = daemons?.['wazuh-manager-modulesd']?.running === true;
+      const wazuhdb = daemons?.['wazuh-manager-db']?.running === true;
 
       // In cluster by default, always check clusterd daemon
-      const clusterd = daemons['wazuh-manager-clusterd'] === 'running';
+      const clusterd = daemons?.['wazuh-manager-clusterd']?.running === true;
 
       const isValid = modulesd && wazuhdb && clusterd;
 
