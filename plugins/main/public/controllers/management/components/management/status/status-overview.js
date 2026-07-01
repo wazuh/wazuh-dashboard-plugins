@@ -184,12 +184,15 @@ export class WzStatusOverview extends Component {
               <EuiFlexGroup>
                 <EuiFlexItem>
                   {isLoading && <EuiProgress size='xs' color='primary' />}
-                  {!isLoading && listDaemons && <WzStatusDaemons />}
-                  <EuiSpacer size='l' />
                   {!isLoading && stats && <WzStatusStats />}
                   <EuiSpacer size='l' />
                   {!isLoading && (
-                    <EuiFlexGrid columns={2}>
+                    <EuiFlexGrid columns={3}>
+                      {listDaemons && (
+                        <EuiFlexItem>
+                          <WzStatusDaemons />
+                        </EuiFlexItem>
+                      )}
                       {nodeInfo && (
                         <EuiFlexItem>
                           <WzStatusNodeInfo />
