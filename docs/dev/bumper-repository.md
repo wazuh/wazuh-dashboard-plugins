@@ -16,38 +16,41 @@ It has two parts:
 
 ## The bumper across Wazuh dashboard repositories
 
-The bumper is a **shared mechanism** used by every Wazuh dashboard repository, not
-a single central script. Each repository keeps its **own**
-`tools/repository_bumper.sh` — a per-repository fork adapted to that repository's
-file layout — together with the same GitHub Actions wrapper: the
-`BUMP_SCRIPT_PATH=tools/repository_bumper.sh` environment variable, a `wazuhci`
-signed committer, the `4_/5_/6_` version prefix, and the extended `5_` generation
-described below.
+The bumper is a **shared mechanism**, not a single central script. Every Wazuh
+dashboard repository keeps its **own** `tools/repository_bumper.sh` — a
+per-repository fork adapted to that repository's file layout — wrapped by the same
+GitHub Actions workflow: the `BUMP_SCRIPT_PATH=tools/repository_bumper.sh`
+environment variable, a `wazuhci` signed committer, the `4_/5_/6_` version prefix,
+and the extended `5_` generation described below.
 
-Every bumper edits the same **core** files — the repository's top-level
-`package.json` (here the monorepo's `plugins/main/package.json`), `VERSION.json`
-and `CHANGELOG.md`. Beyond that core, the file set differs per repository:
+What every fork has in common:
 
-| Repository                           | Bumper generations | `reference` default                       | Extra files bumped (beyond the core)                                                                     |
-| ------------------------------------ | ------------------ | ----------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `wazuh-dashboard-plugins`            | `4_` / `5_` / `6_` | version-pinned (`4.14.0` / `5.0.0`)       | per-plugin `opensearch_dashboards.json`, `docker/imposter/*`, `api-info` endpoints                       |
-| `wazuh-dashboard`                    | `4_` / `5_` / `6_` | branch-pinned (`main`)                    | RPM `.spec`, DEB `changelog`, base-packages Dockerfile, `.nvmrc`, rendering snapshot, healthcheck config |
-| `wazuh-security-dashboards-plugin`   | `4_` / `5_` / `6_` | version-pinned (`4.14.1`/`5.0.0`/`6.0.0`) | — (core only)                                                                                            |
-| `wazuh-dashboard-reporting`          | `5_` / `6_`        | branch-pinned (`main`)                    | its build workflow file, `docker/imposter/*`                                                             |
-| `wazuh-dashboard-notifications`      | `5_` only          | version-pinned (`5.0.0`)                  | its build workflow file                                                                                  |
-| `wazuh-dashboard-alerting`           | `5_` only          | branch-pinned (`main`)                    | — (core only)                                                                                            |
-| `wazuh-dashboard-security-analytics` | `5_` / `6_`        | branch-pinned (`main`)                    | `docker/imposter/*`                                                                                      |
+- It bumps the same **core** files: the repository's top-level `package.json`,
+  `VERSION.json` and `CHANGELOG.md`. Every repository bumps a single root
+  `package.json` **except this monorepo**, which bumps one `package.json` per
+  tracked plugin (see [What the script modifies](#what-the-script-modifies)).
+- It rewrites `default: main` workflow branch references to the **same** value in
+  every fork: `v<version>[-<stage>]` when `--tag` is used, otherwise the plain
+  `<version>`. No fork pins these references to a branch name — a checkout simply
+  shows whatever the last bump wrote (`main` after a `--set-as-main` bump, a
+  version on a release branch), so the value you see is a property of the branch,
+  not of the repository.
+
+What differs is the concrete file set. The workflow files a fork rewrites are
+named after its **own** build artifact, so each fork's list is different; and
+beyond the core, each fork bumps a different **kind** of extra file.
 
 The rest of this guide describes the bumper as it exists in
-**`wazuh-dashboard-plugins`**; the exact file list and workflow generations differ
-per repository as shown above.
+**`wazuh-dashboard-plugins`**.
 
 ## Workflow version prefix
 
-CI workflows are prefixed by the **Wazuh major version** they target (the `N.x`
-release line). The build and test workflows spell the major out in their `name:`
-field (`4_* → "(4.x) …"`, `5_* → "(5.x) …"`, `6_* → "(6.x) …"`), and the repository
-has matching `5.0.0` and `6.0.0` release branches.
+CI workflows that target a specific release line are prefixed by its **Wazuh
+major version** in the filename (`4_*`, `5_*`, `6_*`); shared workflows
+(`dev-environment.yml`, `manual-build.yml`, `playground.yml`) carry no prefix.
+Some version-specific workflows also spell the major in their `name:` field
+(e.g. `"(5.x) Run unit test"`), though not all do. The repository has matching
+`5.0.0` and `6.0.0` release branches.
 
 This guide documents **`5_bumper_repository.yml`**, the bumper for the `5.x` line.
 
@@ -107,8 +110,10 @@ In this repository the tracked plugin files currently are:
 > `security-actions.json`) followed by `yarn prettier --write`. If that command
 > fails — for example when dependencies are not installed — it falls back to a
 > `sed` rewrite of the `documentation.wazuh.com/<major.minor>` URLs in
-> `endpoints.json` only. Either way, the update is **skipped** when the
-> major.minor version does not change.
+> `endpoints.json` only. That `sed` fallback is **skipped** when the major.minor
+> version does not change (`update_endpoints_json` compares `CURRENT_MAJOR_MINOR`
+> against `NEW_MAJOR_MINOR`); the `yarn` path, when it succeeds, regenerates the
+> files unconditionally.
 
 ### Revision logic
 
@@ -148,13 +153,13 @@ this fixed list of workflows:
 .github/workflows/dev-environment.yml
 .github/workflows/manual-build.yml
 .github/workflows/playground.yml
-.github/workflows/wazuh-build-push-docker-action.yml
 ```
 
 The replacement value is `v<version>[-<stage>]` when `--tag` is set, otherwise the
-plain `<version>`. Files in the list that do not exist are skipped with a
-`WARNING` — in this repository `wazuh-build-push-docker-action.yml` is **not
-present**, so it is always skipped.
+plain `<version>`. The script guards each path with an existence check, so any
+file in the list that is not present is skipped with a `WARNING`. This list is
+specific to `wazuh-dashboard-plugins` (see
+[The bumper across Wazuh dashboard repositories](#the-bumper-across-wazuh-dashboard-repositories)).
 
 `docker/imposter/wazuh-config.yml` is updated the same way: the
 `specFile: https://raw.githubusercontent.com/wazuh/wazuh/<ref>/…` reference is
