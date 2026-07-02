@@ -242,7 +242,7 @@ export const ITHygiene = {
 
 export const activeResponses = {
   category: 'wz-category-security-operations',
-  id: 'active-response-dashboard',
+  id: 'incident-response-dashboard',
   title: i18n.translate('wz-app-active-response-title', {
     defaultMessage: 'Incident Response',
   }),
@@ -258,7 +258,7 @@ export const activeResponses = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=active-response-dashboard&tabView=dashboard${
+    `/overview/?tab=incident-response-dashboard&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
