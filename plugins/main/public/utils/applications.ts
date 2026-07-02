@@ -244,10 +244,10 @@ export const activeResponses = {
   category: 'wz-category-security-operations',
   id: 'active-response-dashboard',
   title: i18n.translate('wz-app-active-response-title', {
-    defaultMessage: 'Active Response',
+    defaultMessage: 'Incident Response',
   }),
   breadcrumbLabel: i18n.translate('wz-app-active-response-breadcrumbLabel', {
-    defaultMessage: 'Active Response',
+    defaultMessage: 'Incident Response',
   }),
   description: i18n.translate('wz-app-active-response-description', {
     defaultMessage:
