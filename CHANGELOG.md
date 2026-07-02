@@ -124,6 +124,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed FIM visualizations height [#8610](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8610)
 - Fixed the GitHub link in the About page pointing to the legacy `wazuh-kibana-app` repository [#8653](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8653)
 - Fixed SCA module columns width [#8699](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8699)
+- Fixed Linux Deploy new agent command altering passwords with special characters [#8736](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8736)
 
 ### Removed
 
