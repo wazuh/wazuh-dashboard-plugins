@@ -24,6 +24,11 @@ on:
         type: string
         default: 4.14.0
         description: Source code reference (branch, tag or commit SHA)
+      execution_repository:
+        required: true
+        type: string
+        default: ''
+        description: 'Repository and workflow run to upload the artifact to (format: repo/workflow). This is used to locate the artifacts in S3.'
     secrets:
       DOCKERHUB_USERNAME:
         required: true
@@ -37,6 +42,10 @@ on:
         default: 4.14.0
         description: Source code reference (branch, tag or commit SHA)
 
+env:
+  CI_DEV_INTERNAL_BUCKET: ${{ secrets.CI_DEV_INTERNAL_BUCKET }}
+  EXECUTION_REPOSITORY: 'wazuh-dashboard-plugins/4_builderpackage_plugins'
+
 jobs:
   # Build an app package from the given source code reference.
   build:
@@ -44,62 +53,59 @@ jobs:
     uses: ./.github/workflows/4_builderprecompiled_base-dev-environment.yml
     permissions:
       pull-requests: write
+      id-token: write
     with:
       reference: ${{ inputs.reference }}
       command: 'yarn build'
       artifact_name: 'wazuh-dashboard-plugins'
+      execution_repository: ${{ inputs.execution_repository || 'wazuh-dashboard-plugins/4_builderpackage_plugins' }}
     secrets: inherit
 
   test-packages:
     needs: build
     name: Test packages
     runs-on: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
+    permissions:
+      id-token: write
 
     steps:
-      - name: Step 01 - Download the plugin's source code
+      - name: Download the plugin's source code
         uses: actions/checkout@v4
         with:
           repository: wazuh/wazuh-dashboard-plugins
           ref: ${{ inputs.reference }}
           path: wazuh
 
-      - name: Step 02 - Set variables
+      - name: Set variables
         run: |
           echo "githubReference=$(echo ${{ inputs.reference }} | sed 's/\//-/g')" >> $GITHUB_ENV
-          echo "currentDir=$(pwd -P)" >> $GITHUB_ENV
           echo "version=$(jq -r '.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
           echo "revision=$(jq -r '.revision' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
           echo "versionPlatform=$(jq -r '.pluginPlatform.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
 
-      - name: Step 03 - Download the main plugin's artifact
-        uses: actions/download-artifact@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
         with:
-          name: wazuh-dashboard-plugins_wazuh_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          overwrite: true
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Step 04 - Download the core plugin's artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: wazuh-dashboard-plugins_wazuh-core_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-core_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          overwrite: true
+      - name: Download plugin artifacts from S3
+        run: |
+          plugins_dir="${{ github.workspace }}/wazuh/scripts/test-packages/plugins"
+          mkdir -p "${plugins_dir}"
+          aws s3 cp --recursive \
+            "${{ env.CI_DEV_INTERNAL_BUCKET }}/${{ inputs.execution_repository || env.EXECUTION_REPOSITORY }}/${{github.run_id}}" \
+            "${plugins_dir}"
+          ls -l "${plugins_dir}"
 
-      - name: Step 05 - Download the check-updates plugin's artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          overwrite: true
-
-      - name: Step 06 - Log in to Docker Hub
+      - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Step 07 - Build the Docker image
+      - name: Build the Docker image
         run: |
-          echo "current=${{ env.currentDir }}"
+          echo "current=${{ github.workspace }}"
           cd ./wazuh/scripts/test-packages
           docker build --build-arg OSD_VERSION=${{ env.versionPlatform }} -f osd-test-packages.Dockerfile ./
