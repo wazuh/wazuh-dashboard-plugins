@@ -50,8 +50,8 @@ Use the following template when creating a Pull Request:
 -->
 
 ### Check List
-...
 
+...
 ```
 
 Always link the related issue in **Issues Resolved** with a closing keyword (`closes`, `fixes`, `fix`) so it auto closes on merge, and describe **why** rather than just **what**, the diff already shows what changed, so the description should explain the motivation. Any change to the UI **must** include a screenshot or video as evidence.
@@ -135,4 +135,14 @@ on:
 jobs:
   <job_name>:
     if: ${{ !github.event.pull_request.draft }}
+```
+
+### Concurrency
+
+All PR-triggered workflows **must** define a concurrency group scoped to the branch/PR, with `cancel-in-progress` enabled. Without it, pushing several commits in a row queues a run per push, and older, now-outdated runs keep consuming runner time after a newer commit has already superseded them. Add the following to every PR-triggered workflow:
+
+```yaml
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 ```
