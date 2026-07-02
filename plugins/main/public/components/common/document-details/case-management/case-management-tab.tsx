@@ -15,9 +15,14 @@ import {
   EuiBadge,
   EuiButton,
   EuiButtonEmpty,
+  EuiButtonIcon,
+  EuiCallOut,
   EuiComboBox,
+  EuiComment,
+  EuiCommentList,
   EuiConfirmModal,
   EuiDescriptionList,
+  EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
   EuiForm,
@@ -32,7 +37,15 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import { formatUIDate } from '../../../../react-services';
-import { CaseData, CaseStatus } from './case-management-service';
+import {
+  CaseComment,
+  CaseData,
+  CasePriority,
+  CaseSeverity,
+  CaseStatus,
+  CaseTLP,
+  MAX_CASE_COMMENTS,
+} from './case-management-service';
 import {
   CaseManagementFormDocument,
   useCaseManagementForm,
@@ -47,6 +60,33 @@ const CASE_STATUS_OPTIONS: Array<{ value: CaseStatus; text: string }> = [
   { value: 'DELETED', text: 'Deleted' },
 ];
 
+const CASE_SEVERITY_OPTIONS: Array<{ value: CaseSeverity | ''; text: string }> =
+  [
+    { value: '', text: '—' },
+    { value: 'INFORMATIONAL', text: 'Informational' },
+    { value: 'LOW', text: 'Low' },
+    { value: 'MEDIUM', text: 'Medium' },
+    { value: 'HIGH', text: 'High' },
+    { value: 'CRITICAL', text: 'Critical' },
+  ];
+
+const CASE_PRIORITY_OPTIONS: Array<{ value: CasePriority | ''; text: string }> =
+  [
+    { value: '', text: '—' },
+    { value: 'URGENT', text: 'Urgent' },
+    { value: 'HIGH', text: 'High' },
+    { value: 'MEDIUM', text: 'Medium' },
+    { value: 'LOW', text: 'Low' },
+  ];
+
+const CASE_TLP_OPTIONS: Array<{ value: CaseTLP | ''; text: string }> = [
+  { value: '', text: '—' },
+  { value: 'TLP:RED', text: 'TLP:RED' },
+  { value: 'TLP:AMBER', text: 'TLP:AMBER' },
+  { value: 'TLP:GREEN', text: 'TLP:GREEN' },
+  { value: 'TLP:CLEAR', text: 'TLP:CLEAR' },
+];
+
 const STATUS_BADGE_COLOR: Record<CaseStatus, string> = {
   ACTIVE: 'primary',
   ACKNOWLEDGED: 'warning',
@@ -55,6 +95,33 @@ const STATUS_BADGE_COLOR: Record<CaseStatus, string> = {
   ERROR: 'danger',
   DELETED: 'default',
 };
+
+const SEVERITY_BADGE_COLOR: Record<CaseSeverity, string> = {
+  INFORMATIONAL: 'default',
+  LOW: 'success',
+  MEDIUM: 'warning',
+  HIGH: 'accent',
+  CRITICAL: 'danger',
+};
+
+const PRIORITY_BADGE_COLOR: Record<CasePriority, string> = {
+  LOW: 'default',
+  MEDIUM: 'warning',
+  HIGH: 'accent',
+  URGENT: 'danger',
+};
+
+const TLP_BADGE_COLOR: Record<CaseTLP, string> = {
+  'TLP:RED': 'danger',
+  'TLP:AMBER': 'warning',
+  'TLP:GREEN': 'success',
+  'TLP:CLEAR': 'hollow',
+};
+
+const optionText = (
+  options: Array<{ value: string; text: string }>,
+  value: string | undefined,
+): string | undefined => options.find(option => option.value === value)?.text;
 
 interface CaseManagementTabProps {
   document: CaseManagementFormDocument;
@@ -67,21 +134,40 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isCleanModalVisible, setIsCleanModalVisible] = useState(false);
+  const [editingCommentKey, setEditingCommentKey] = useState<
+    string | undefined
+  >();
+  const [editingCommentDraft, setEditingCommentDraft] = useState('');
+
+  const stopEditingComment = useCallback(() => {
+    setEditingCommentKey(undefined);
+    setEditingCommentDraft('');
+  }, []);
 
   const handleOperationSuccess = useCallback(
     (caseData: CaseData | null) => {
       setIsEditing(false);
+      stopEditingComment();
       onSaveSuccess?.(caseData);
     },
-    [onSaveSuccess],
+    [onSaveSuccess, stopEditingComment],
   );
 
   const {
     status,
-    comment,
+    title,
+    description,
+    severity,
+    priority,
+    tlp,
     tags,
+    comments,
+    newComment,
+    editedComments,
+    currentUsername,
     caseUsername,
     isLoadingCase,
+    loadFailed,
     existingCreatedAt,
     existingUpdatedAt,
     isSaving,
@@ -89,9 +175,16 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     isDirty,
     isNewCase,
     setStatus,
-    setComment,
+    setTitle,
+    setDescription,
+    setSeverity,
+    setPriority,
+    setTlp,
     setTags,
     handleTagCreate,
+    setNewComment,
+    applyCommentEdit,
+    discardCommentEdit,
     handleSave,
     handleClean,
     handleReset,
@@ -118,9 +211,181 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     );
   }
 
-  const showForm = isEditing || isNewCase;
+  if (loadFailed) {
+    return (
+      <div style={{ padding: '16px' }}>
+        <EuiCallOut
+          title='Could not load the case data'
+          color='danger'
+          iconType='alert'
+        >
+          Reopen the document details to retry.
+        </EuiCallOut>
+      </div>
+    );
+  }
 
-  const readOnlyItems = [
+  const showForm = isEditing || isNewCase;
+  const commentLimitReached = comments.length >= MAX_CASE_COMMENTS;
+
+  const renderCommentsThread = (editable: boolean) => {
+    if (!comments.length) {
+      return null;
+    }
+    return (
+      <>
+        <EuiTitle size='xxs'>
+          <h4>{`Comments (${comments.length}/${MAX_CASE_COMMENTS})`}</h4>
+        </EuiTitle>
+        <EuiSpacer size='s' />
+        <EuiCommentList>
+          {comments.map((comment: CaseComment, index: number) => {
+            const commentKey = comment.created_at;
+            const isOwn = Boolean(
+              currentUsername &&
+                commentKey &&
+                comment.author === currentUsername,
+            );
+            const isEditingThis =
+              editable && !!commentKey && editingCommentKey === commentKey;
+            const pendingText = commentKey
+              ? editedComments[commentKey]
+              : undefined;
+            const wasEdited =
+              comment.updated_at && comment.updated_at !== comment.created_at;
+
+            return (
+              <EuiComment
+                key={commentKey ?? `comment-${index}`}
+                username={comment.author ?? '—'}
+                timestamp={
+                  comment.created_at
+                    ? formatUIDate(comment.created_at)
+                    : undefined
+                }
+                event={wasEdited ? 'edited' : undefined}
+                actions={
+                  editable && isOwn && !isEditingThis ? (
+                    <EuiButtonIcon
+                      iconType='pencil'
+                      color='text'
+                      aria-label='Edit comment'
+                      isDisabled={
+                        isSaving ||
+                        isCleaning ||
+                        // One inline edit at a time: switching pencils would
+                        // silently discard the current draft.
+                        editingCommentKey !== undefined
+                      }
+                      onClick={() => {
+                        setEditingCommentKey(commentKey);
+                        setEditingCommentDraft(
+                          pendingText ?? comment.comment ?? '',
+                        );
+                      }}
+                    />
+                  ) : undefined
+                }
+              >
+                {isEditingThis ? (
+                  <>
+                    <EuiTextArea
+                      value={editingCommentDraft}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                        setEditingCommentDraft(e.target.value)
+                      }
+                      rows={3}
+                      fullWidth
+                      resize='vertical'
+                      aria-label='Edit comment text'
+                    />
+                    <EuiSpacer size='xs' />
+                    <EuiFlexGroup
+                      gutterSize='xs'
+                      justifyContent='flexEnd'
+                      responsive={false}
+                    >
+                      <EuiFlexItem grow={false}>
+                        <EuiButtonIcon
+                          iconType='cross'
+                          color='danger'
+                          aria-label='Cancel comment edit'
+                          onClick={stopEditingComment}
+                        />
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>
+                        <EuiButtonIcon
+                          iconType='check'
+                          aria-label='Apply comment edit'
+                          isDisabled={!editingCommentDraft.trim()}
+                          onClick={() => {
+                            applyCommentEdit(
+                              commentKey as string,
+                              editingCommentDraft,
+                            );
+                            stopEditingComment();
+                          }}
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </>
+                ) : (
+                  <>
+                    <EuiText size='s'>
+                      {pendingText ?? comment.comment ?? ''}
+                    </EuiText>
+                    {pendingText !== undefined && (
+                      <EuiText size='xs' color='subdued'>
+                        <em>Edited — pending save</em>
+                      </EuiText>
+                    )}
+                  </>
+                )}
+              </EuiComment>
+            );
+          })}
+        </EuiCommentList>
+      </>
+    );
+  };
+
+  const detailItems = [
+    {
+      title: 'Title',
+      description: title || '—',
+    },
+    {
+      title: 'Description',
+      description: description || '—',
+    },
+    {
+      title: 'Severity',
+      description: severity ? (
+        <EuiBadge color={SEVERITY_BADGE_COLOR[severity]}>
+          {optionText(CASE_SEVERITY_OPTIONS, severity)}
+        </EuiBadge>
+      ) : (
+        '—'
+      ),
+    },
+    {
+      title: 'Priority',
+      description: priority ? (
+        <EuiBadge color={PRIORITY_BADGE_COLOR[priority]}>
+          {optionText(CASE_PRIORITY_OPTIONS, priority)}
+        </EuiBadge>
+      ) : (
+        '—'
+      ),
+    },
+    {
+      title: 'TLP',
+      description: tlp ? (
+        <EuiBadge color={TLP_BADGE_COLOR[tlp]}>{tlp}</EuiBadge>
+      ) : (
+        '—'
+      ),
+    },
     {
       title: 'Tags',
       description: tags.length
@@ -131,10 +396,9 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
           ))
         : '—',
     },
-    {
-      title: 'Comment',
-      description: comment || '—',
-    },
+  ];
+
+  const metadataItems = [
     ...(!isNewCase
       ? [
           {
@@ -241,25 +505,30 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
       </EuiFlexItem>
 
       {!showForm && (
-        <EuiFlexItem grow={false}>
-          <EuiDescriptionList
-            type='column'
-            compressed
-            listItems={readOnlyItems}
-            columnWidths={[1, 3]}
-            descriptionProps={{ style: { textAlign: 'justify' } }}
-          />
-        </EuiFlexItem>
+        <>
+          <EuiFlexItem grow={false}>
+            <EuiDescriptionList
+              type='column'
+              compressed
+              listItems={[...detailItems, ...metadataItems]}
+              columnWidths={[1, 3]}
+              descriptionProps={{ style: { textAlign: 'justify' } }}
+            />
+          </EuiFlexItem>
+          {comments.length > 0 && (
+            <EuiFlexItem grow={false}>{renderCommentsThread(false)}</EuiFlexItem>
+          )}
+        </>
       )}
 
       {!showForm ? null : (
         <>
-          {readOnlyItems.length > 3 && (
+          {metadataItems.length > 0 && (
             <EuiFlexItem grow={false}>
               <EuiDescriptionList
                 type='column'
                 compressed
-                listItems={readOnlyItems.slice(2)}
+                listItems={metadataItems}
                 columnWidths={[1, 3]}
                 descriptionProps={{ style: { textAlign: 'justify' } }}
               />
@@ -271,6 +540,47 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
           {/* Editable fields */}
           <EuiFlexItem>
             <EuiForm component='form'>
+              <EuiFormRow
+                fullWidth
+                label='Title'
+                helpText='Short summary of this case.'
+              >
+                <EuiFieldText
+                  fullWidth
+                  placeholder='Case title…'
+                  value={title}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setTitle(e.target.value)
+                  }
+                  disabled={isSaving || isCleaning}
+                  maxLength={1024}
+                  aria-label='Case title'
+                />
+              </EuiFormRow>
+
+              <EuiSpacer size='m' />
+
+              <EuiFormRow
+                fullWidth
+                label='Description'
+                helpText='Detailed description of this case.'
+              >
+                <EuiTextArea
+                  fullWidth
+                  placeholder='Describe the case…'
+                  value={description}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                    setDescription(e.target.value)
+                  }
+                  disabled={isSaving || isCleaning}
+                  rows={3}
+                  resize='vertical'
+                  aria-label='Case description'
+                />
+              </EuiFormRow>
+
+              <EuiSpacer size='m' />
+
               <EuiFormRow
                 fullWidth
                 label='Status'
@@ -286,6 +596,63 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                   disabled={isSaving || isCleaning}
                   hasNoInitialSelection={isNewCase && !status}
                   aria-label='Case status'
+                />
+              </EuiFormRow>
+
+              <EuiSpacer size='m' />
+
+              <EuiFormRow
+                fullWidth
+                label='Severity'
+                helpText='Impact severity of this case.'
+              >
+                <EuiSelect
+                  fullWidth
+                  options={CASE_SEVERITY_OPTIONS}
+                  value={severity}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                    setSeverity(e.target.value as CaseSeverity | '')
+                  }
+                  disabled={isSaving || isCleaning}
+                  aria-label='Case severity'
+                />
+              </EuiFormRow>
+
+              <EuiSpacer size='m' />
+
+              <EuiFormRow
+                fullWidth
+                label='Priority'
+                helpText='Triage priority of this case.'
+              >
+                <EuiSelect
+                  fullWidth
+                  options={CASE_PRIORITY_OPTIONS}
+                  value={priority}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                    setPriority(e.target.value as CasePriority | '')
+                  }
+                  disabled={isSaving || isCleaning}
+                  aria-label='Case priority'
+                />
+              </EuiFormRow>
+
+              <EuiSpacer size='m' />
+
+              <EuiFormRow
+                fullWidth
+                label='TLP'
+                helpText='Traffic Light Protocol sharing level.'
+              >
+                <EuiSelect
+                  fullWidth
+                  options={CASE_TLP_OPTIONS}
+                  value={tlp}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                    setTlp(e.target.value as CaseTLP | '')
+                  }
+                  disabled={isSaving || isCleaning}
+                  aria-label='Case TLP'
                 />
               </EuiFormRow>
 
@@ -310,22 +677,30 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
 
               <EuiSpacer size='m' />
 
+              {renderCommentsThread(true)}
+
+              {comments.length > 0 && <EuiSpacer size='s' />}
+
               <EuiFormRow
-                label='Comment'
-                helpText='Add a free-text note about this finding.'
                 fullWidth
+                label='New comment'
+                helpText={
+                  commentLimitReached
+                    ? `Comment limit reached (${MAX_CASE_COMMENTS}).`
+                    : 'The comment is added with your username when you save.'
+                }
               >
                 <EuiTextArea
-                  placeholder='Write a comment…'
-                  value={comment}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    setComment(e.target.value)
-                  }
-                  disabled={isSaving || isCleaning}
-                  rows={4}
                   fullWidth
+                  placeholder='Write a comment…'
+                  value={newComment}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                    setNewComment(e.target.value)
+                  }
+                  disabled={isSaving || isCleaning || commentLimitReached}
+                  rows={3}
                   resize='vertical'
-                  aria-label='Case comment'
+                  aria-label='New case comment'
                 />
               </EuiFormRow>
 
@@ -336,6 +711,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                   <EuiButtonEmpty
                     onClick={() => {
                       handleReset();
+                      stopEditingComment();
                       setIsEditing(false);
                     }}
                     disabled={isSaving || isCleaning}
@@ -346,7 +722,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
                   <EuiButtonEmpty
-                    onClick={handleReset}
+                    onClick={() => {
+                      handleReset();
+                      stopEditingComment();
+                    }}
                     disabled={isSaving || isCleaning || !isDirty}
                     size='s'
                   >
@@ -359,7 +738,14 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                     size='s'
                     onClick={handleSave}
                     isLoading={isSaving}
-                    disabled={!status || (!isNewCase && !isDirty) || isCleaning}
+                    disabled={
+                      !status ||
+                      (!isNewCase && !isDirty) ||
+                      isCleaning ||
+                      // Confirm or cancel the open inline comment edit first,
+                      // otherwise its draft would be silently discarded.
+                      editingCommentKey !== undefined
+                    }
                   >
                     {isNewCase ? 'Create case' : 'Update case'}
                   </EuiButton>

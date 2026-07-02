@@ -22,8 +22,12 @@ import {
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 import { getToasts } from '../../../../kibana-services';
 import {
+  CaseComment,
   CaseData,
+  CasePriority,
+  CaseSeverity,
   CaseStatus,
+  CaseTLP,
   UpdateCasePayload,
   cleanDocumentCase,
   getFindingsCase,
@@ -37,10 +41,19 @@ export interface CaseManagementFormDocument {
 
 export interface UseCaseManagementFormReturn {
   status: CaseStatus | undefined;
-  comment: string;
+  title: string;
+  description: string;
+  severity: CaseSeverity | '';
+  priority: CasePriority | '';
+  tlp: CaseTLP | '';
   tags: EuiComboBoxOptionOption[];
+  comments: CaseComment[];
+  newComment: string;
+  editedComments: Record<string, string>;
+  currentUsername: string | undefined;
   caseUsername: string | undefined;
   isLoadingCase: boolean;
+  loadFailed: boolean;
   existingCreatedAt: string | undefined;
   existingUpdatedAt: string | undefined;
   isSaving: boolean;
@@ -48,9 +61,16 @@ export interface UseCaseManagementFormReturn {
   isDirty: boolean;
   isNewCase: boolean;
   setStatus: (status: CaseStatus) => void;
-  setComment: (comment: string) => void;
+  setTitle: (title: string) => void;
+  setDescription: (description: string) => void;
+  setSeverity: (severity: CaseSeverity | '') => void;
+  setPriority: (priority: CasePriority | '') => void;
+  setTlp: (tlp: CaseTLP | '') => void;
   setTags: (tags: EuiComboBoxOptionOption[]) => void;
   handleTagCreate: (value: string) => void;
+  setNewComment: (comment: string) => void;
+  applyCommentEdit: (createdAt: string, comment: string) => void;
+  discardCommentEdit: (createdAt: string) => void;
   handleSave: () => Promise<void>;
   handleClean: () => Promise<void>;
   handleReset: () => void;
@@ -58,16 +78,29 @@ export interface UseCaseManagementFormReturn {
 
 type CaseFormBaseline = {
   status: CaseStatus | undefined;
-  comment: string;
+  title: string;
+  description: string;
+  severity: CaseSeverity | '';
+  priority: CasePriority | '';
+  tlp: CaseTLP | '';
   tags: string[];
 };
 
-type CaseFormState = {
+export type CaseFormState = {
   status: CaseStatus | undefined;
-  comment: string;
+  title: string;
+  description: string;
+  severity: CaseSeverity | '';
+  priority: CasePriority | '';
+  tlp: CaseTLP | '';
   tags: EuiComboBoxOptionOption[];
+  comments: CaseComment[];
+  newComment: string;
+  editedComments: Record<string, string>;
+  currentUsername: string | undefined;
   caseUsername: string | undefined;
   isLoadingCase: boolean;
+  loadFailed: boolean;
   existingCreatedAt: string | undefined;
   existingUpdatedAt: string | undefined;
   isSaving: boolean;
@@ -75,18 +108,25 @@ type CaseFormState = {
   baseline: CaseFormBaseline;
 };
 
-type CaseFormAction =
+export type CaseFormAction =
   | { type: 'LOAD_START' }
-  | { type: 'LOAD_SUCCESS'; payload: CaseData }
+  | { type: 'LOAD_SUCCESS'; payload: { caseData: CaseData; username?: string } }
   | { type: 'LOAD_ERROR' }
   | { type: 'SET_STATUS'; payload: CaseStatus }
-  | { type: 'SET_COMMENT'; payload: string }
+  | { type: 'SET_TITLE'; payload: string }
+  | { type: 'SET_DESCRIPTION'; payload: string }
+  | { type: 'SET_SEVERITY'; payload: CaseSeverity | '' }
+  | { type: 'SET_PRIORITY'; payload: CasePriority | '' }
+  | { type: 'SET_TLP'; payload: CaseTLP | '' }
   | { type: 'SET_TAGS'; payload: EuiComboBoxOptionOption[] }
   | { type: 'ADD_TAG'; payload: string }
+  | { type: 'SET_NEW_COMMENT'; payload: string }
+  | { type: 'SET_COMMENT_EDIT'; payload: { createdAt: string; comment: string } }
+  | { type: 'DISCARD_COMMENT_EDIT'; payload: { createdAt: string } }
   | { type: 'RESET' }
   | { type: 'SAVE_START' }
   | { type: 'SAVE_END' }
-  | { type: 'SAVE_SUCCESS'; payload: CaseData }
+  | { type: 'SAVE_SUCCESS'; payload: { caseData: CaseData; username?: string } }
   | { type: 'CLEAN_START' }
   | { type: 'CLEAN_END' }
   | { type: 'CLEAN_SUCCESS'; payload: CaseData | null };
@@ -94,20 +134,68 @@ type CaseFormAction =
 const tagsToOptions = (tagLabels: string[]): EuiComboBoxOptionOption[] =>
   tagLabels.map(label => ({ label }));
 
-const createInitialState = (): CaseFormState => ({
+const baselineFromCase = (caseData: CaseData): CaseFormBaseline => ({
+  status: caseData.status,
+  title: caseData.title ?? '',
+  description: caseData.description ?? '',
+  severity: caseData.severity ?? '',
+  priority: caseData.priority ?? '',
+  tlp: caseData.tlp ?? '',
+  tags: caseData.tags ?? [],
+});
+
+const stateFromCase = (
+  state: CaseFormState,
+  caseData: CaseData,
+): CaseFormState => {
+  const baseline = baselineFromCase(caseData);
+  return {
+    ...state,
+    status: baseline.status,
+    title: baseline.title,
+    description: baseline.description,
+    severity: baseline.severity,
+    priority: baseline.priority,
+    tlp: baseline.tlp,
+    tags: tagsToOptions(baseline.tags),
+    comments: caseData.comments ?? [],
+    newComment: '',
+    editedComments: {},
+    baseline,
+  };
+};
+
+export const createInitialState = (): CaseFormState => ({
   status: undefined,
-  comment: '',
+  title: '',
+  description: '',
+  severity: '',
+  priority: '',
+  tlp: '',
   tags: [],
+  comments: [],
+  newComment: '',
+  editedComments: {},
+  currentUsername: undefined,
   caseUsername: undefined,
   isLoadingCase: true,
+  loadFailed: false,
   existingCreatedAt: undefined,
   existingUpdatedAt: undefined,
   isSaving: false,
   isCleaning: false,
-  baseline: { status: undefined, comment: '', tags: [] },
+  baseline: {
+    status: undefined,
+    title: '',
+    description: '',
+    severity: '',
+    priority: '',
+    tlp: '',
+    tags: [],
+  },
 });
 
-function caseFormReducer(
+export function caseFormReducer(
   state: CaseFormState,
   action: CaseFormAction,
 ): CaseFormState {
@@ -116,43 +204,41 @@ function caseFormReducer(
       return { ...createInitialState(), isLoadingCase: true };
 
     case 'LOAD_SUCCESS': {
-      const {
-        status,
-        comment,
-        tags,
-        created_at: createdAt,
-        updated_at: updatedAt,
-        user,
-      } = action.payload;
-      const resolvedTags = tags ?? [];
-      const baseline: CaseFormBaseline = {
-        status,
-        comment: comment ?? '',
-        tags: resolvedTags,
-      };
+      const { caseData, username } = action.payload;
       return {
-        ...state,
+        ...stateFromCase(state, caseData),
         isLoadingCase: false,
-        status,
-        comment: comment ?? '',
-        tags: tagsToOptions(resolvedTags),
-        baseline,
-        existingCreatedAt: createdAt,
-        existingUpdatedAt: updatedAt,
-        caseUsername: user?.name,
+        existingCreatedAt: caseData.created_at,
+        existingUpdatedAt: caseData.updated_at,
+        caseUsername: caseData.user?.name,
+        currentUsername: username ?? state.currentUsername,
         isSaving: false,
         isCleaning: false,
       };
     }
 
     case 'LOAD_ERROR':
-      return { ...state, isLoadingCase: false };
+      // The case may exist but could not be read: rendering the "create
+      // case" form here would let a save blank the existing case.
+      return { ...state, isLoadingCase: false, loadFailed: true };
 
     case 'SET_STATUS':
       return { ...state, status: action.payload };
 
-    case 'SET_COMMENT':
-      return { ...state, comment: action.payload };
+    case 'SET_TITLE':
+      return { ...state, title: action.payload };
+
+    case 'SET_DESCRIPTION':
+      return { ...state, description: action.payload };
+
+    case 'SET_SEVERITY':
+      return { ...state, severity: action.payload };
+
+    case 'SET_PRIORITY':
+      return { ...state, priority: action.payload };
+
+    case 'SET_TLP':
+      return { ...state, tlp: action.payload };
 
     case 'SET_TAGS':
       return { ...state, tags: action.payload };
@@ -165,12 +251,49 @@ function caseFormReducer(
       return { ...state, tags: [...state.tags, { label: trimmed }] };
     }
 
+    case 'SET_NEW_COMMENT':
+      return { ...state, newComment: action.payload };
+
+    case 'SET_COMMENT_EDIT': {
+      const { createdAt, comment } = action.payload;
+      if (!comment.trim()) {
+        // Comments cannot be blanked out (no deletion supported).
+        return state;
+      }
+      const original = state.comments.find(c => c.created_at === createdAt);
+      if (!original) {
+        return state;
+      }
+      if (comment === original.comment) {
+        // Back to the original text: drop the pending edit.
+        const { [createdAt]: _removed, ...editedComments } =
+          state.editedComments;
+        return { ...state, editedComments };
+      }
+      return {
+        ...state,
+        editedComments: { ...state.editedComments, [createdAt]: comment },
+      };
+    }
+
+    case 'DISCARD_COMMENT_EDIT': {
+      const { [action.payload.createdAt]: _removed, ...editedComments } =
+        state.editedComments;
+      return { ...state, editedComments };
+    }
+
     case 'RESET':
       return {
         ...state,
         status: state.baseline.status,
-        comment: state.baseline.comment,
+        title: state.baseline.title,
+        description: state.baseline.description,
+        severity: state.baseline.severity,
+        priority: state.baseline.priority,
+        tlp: state.baseline.tlp,
         tags: tagsToOptions(state.baseline.tags),
+        newComment: '',
+        editedComments: {},
       };
 
     case 'SAVE_START':
@@ -180,24 +303,13 @@ function caseFormReducer(
       return { ...state, isSaving: false };
 
     case 'SAVE_SUCCESS': {
-      const {
-        status,
-        comment,
-        tags,
-        created_at: createdAt,
-        updated_at: updatedAt,
-        user,
-      } = action.payload;
-      const resolvedTags = tags ?? [];
+      const { caseData, username } = action.payload;
       return {
-        ...state,
-        status,
-        comment: comment ?? '',
-        tags: tagsToOptions(resolvedTags),
-        baseline: { status, comment: comment ?? '', tags: resolvedTags },
-        existingCreatedAt: state.existingCreatedAt ?? createdAt,
-        existingUpdatedAt: updatedAt,
-        caseUsername: user?.name ?? state.caseUsername,
+        ...stateFromCase(state, caseData),
+        existingCreatedAt: state.existingCreatedAt ?? caseData.created_at,
+        existingUpdatedAt: caseData.updated_at,
+        caseUsername: caseData.user?.name ?? state.caseUsername,
+        currentUsername: username ?? state.currentUsername,
         isSaving: false,
       };
     }
@@ -209,24 +321,12 @@ function caseFormReducer(
       return { ...state, isCleaning: false };
 
     case 'CLEAN_SUCCESS': {
-      const {
-        status,
-        comment,
-        tags,
-        created_at: createdAt,
-        updated_at: updatedAt,
-        user,
-      } = action.payload ?? {};
-      const resolvedTags = tags ?? [];
+      const caseData = action.payload ?? {};
       return {
-        ...state,
-        status,
-        comment: comment ?? '',
-        tags: tagsToOptions(resolvedTags),
-        baseline: { status, comment: comment ?? '', tags: resolvedTags },
-        existingCreatedAt: createdAt,
-        existingUpdatedAt: updatedAt,
-        caseUsername: user?.name,
+        ...stateFromCase(state, caseData),
+        existingCreatedAt: caseData.created_at,
+        existingUpdatedAt: caseData.updated_at,
+        caseUsername: caseData.user?.name,
         isCleaning: false,
       };
     }
@@ -236,12 +336,18 @@ function caseFormReducer(
   }
 }
 
-function isFormDirty(state: CaseFormState): boolean {
-  const { baseline, status, comment, tags } = state;
+export function isFormDirty(state: CaseFormState): boolean {
+  const { baseline } = state;
   return (
-    status !== baseline.status ||
-    comment !== baseline.comment ||
-    tags.map(t => t.label).join(',') !== baseline.tags.join(',')
+    state.status !== baseline.status ||
+    state.title !== baseline.title ||
+    state.description !== baseline.description ||
+    state.severity !== baseline.severity ||
+    state.priority !== baseline.priority ||
+    state.tlp !== baseline.tlp ||
+    state.tags.map(t => t.label).join(',') !== baseline.tags.join(',') ||
+    state.newComment.trim() !== '' ||
+    Object.keys(state.editedComments).length > 0
   );
 }
 
@@ -266,9 +372,15 @@ export function useCaseManagementForm(
 
     (async () => {
       try {
-        const caseData = await getFindingsCase(document._index, document._id);
+        const { case: caseData, username } = await getFindingsCase(
+          document._index,
+          document._id,
+        );
         if (!cancelled) {
-          dispatch({ type: 'LOAD_SUCCESS', payload: caseData ?? {} });
+          dispatch({
+            type: 'LOAD_SUCCESS',
+            payload: { caseData: caseData ?? {}, username },
+          });
         }
       } catch {
         if (!cancelled) {
@@ -286,8 +398,27 @@ export function useCaseManagementForm(
     (status: CaseStatus) => dispatch({ type: 'SET_STATUS', payload: status }),
     [],
   );
-  const setComment = useCallback(
-    (comment: string) => dispatch({ type: 'SET_COMMENT', payload: comment }),
+  const setTitle = useCallback(
+    (title: string) => dispatch({ type: 'SET_TITLE', payload: title }),
+    [],
+  );
+  const setDescription = useCallback(
+    (description: string) =>
+      dispatch({ type: 'SET_DESCRIPTION', payload: description }),
+    [],
+  );
+  const setSeverity = useCallback(
+    (severity: CaseSeverity | '') =>
+      dispatch({ type: 'SET_SEVERITY', payload: severity }),
+    [],
+  );
+  const setPriority = useCallback(
+    (priority: CasePriority | '') =>
+      dispatch({ type: 'SET_PRIORITY', payload: priority }),
+    [],
+  );
+  const setTlp = useCallback(
+    (tlp: CaseTLP | '') => dispatch({ type: 'SET_TLP', payload: tlp }),
     [],
   );
   const setTags = useCallback(
@@ -298,6 +429,20 @@ export function useCaseManagementForm(
   const handleTagCreate = useCallback((searchValue: string) => {
     dispatch({ type: 'ADD_TAG', payload: searchValue });
   }, []);
+  const setNewComment = useCallback(
+    (comment: string) => dispatch({ type: 'SET_NEW_COMMENT', payload: comment }),
+    [],
+  );
+  const applyCommentEdit = useCallback(
+    (createdAt: string, comment: string) =>
+      dispatch({ type: 'SET_COMMENT_EDIT', payload: { createdAt, comment } }),
+    [],
+  );
+  const discardCommentEdit = useCallback(
+    (createdAt: string) =>
+      dispatch({ type: 'DISCARD_COMMENT_EDIT', payload: { createdAt } }),
+    [],
+  );
   const handleReset = useCallback(() => dispatch({ type: 'RESET' }), []);
 
   const handleSave = useCallback(async () => {
@@ -314,23 +459,47 @@ export function useCaseManagementForm(
       return;
     }
 
-    const trimmedComment = state.comment.trim();
     const tagLabels = state.tags.map(t => t.label).filter(Boolean);
+    const trimmedNewComment = state.newComment.trim();
+    const editedComments = Object.entries(state.editedComments).map(
+      ([created_at, comment]) => ({ created_at, comment: comment.trim() }),
+    );
 
     dispatch({ type: 'SAVE_START' });
     try {
+      const { baseline } = state;
+      // The new wazuh.case fields are only sent when the user changed them:
+      // on a findings index without the new mappings (dynamic strict) any
+      // unmapped key is rejected, so a status-only save must keep working.
       const payload: UpdateCasePayload = {
         status: state.status,
-        comment: trimmedComment || undefined,
         tags: tagLabels,
+        ...(state.title !== baseline.title
+          ? { title: state.title.trim() }
+          : {}),
+        ...(state.description !== baseline.description
+          ? { description: state.description.trim() }
+          : {}),
+        ...(state.severity !== baseline.severity
+          ? { severity: state.severity }
+          : {}),
+        ...(state.priority !== baseline.priority
+          ? { priority: state.priority }
+          : {}),
+        ...(state.tlp !== baseline.tlp ? { tlp: state.tlp } : {}),
+        ...(trimmedNewComment ? { newComment: trimmedNewComment } : {}),
+        ...(editedComments.length ? { editedComments } : {}),
       };
-      const savedCase = await updateDocumentCase(
+      const { case: savedCase, username } = await updateDocumentCase(
         document._index,
         document._id,
         payload,
       );
 
-      dispatch({ type: 'SAVE_SUCCESS', payload: savedCase });
+      dispatch({
+        type: 'SAVE_SUCCESS',
+        payload: { caseData: savedCase ?? {}, username },
+      });
       onSaveSuccess?.(savedCase);
       getToasts().add({
         color: 'success',
@@ -359,8 +528,15 @@ export function useCaseManagementForm(
     isSaving,
     isCleaning,
     state.status,
-    state.comment,
+    state.title,
+    state.description,
+    state.severity,
+    state.priority,
+    state.tlp,
+    state.baseline,
     state.tags,
+    state.newComment,
+    state.editedComments,
     isNewCase,
     onSaveSuccess,
   ]);
@@ -412,10 +588,19 @@ export function useCaseManagementForm(
 
   return {
     status: state.status,
-    comment: state.comment,
+    title: state.title,
+    description: state.description,
+    severity: state.severity,
+    priority: state.priority,
+    tlp: state.tlp,
     tags: state.tags,
+    comments: state.comments,
+    newComment: state.newComment,
+    editedComments: state.editedComments,
+    currentUsername: state.currentUsername,
     caseUsername: state.caseUsername,
     isLoadingCase: state.isLoadingCase,
+    loadFailed: state.loadFailed,
     existingCreatedAt: state.existingCreatedAt,
     existingUpdatedAt: state.existingUpdatedAt,
     isSaving,
@@ -423,9 +608,16 @@ export function useCaseManagementForm(
     isDirty,
     isNewCase,
     setStatus,
-    setComment,
+    setTitle,
+    setDescription,
+    setSeverity,
+    setPriority,
+    setTlp,
     setTags,
     handleTagCreate,
+    setNewComment,
+    applyCommentEdit,
+    discardCommentEdit,
     handleSave,
     handleClean,
     handleReset,

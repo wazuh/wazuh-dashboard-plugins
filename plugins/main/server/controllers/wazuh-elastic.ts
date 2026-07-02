@@ -27,6 +27,31 @@ import {
 import { routeDecoratorProtectedAdministrator } from './decorators';
 import { generateSampleData } from '../lib/generate-sample-data';
 
+const CASE_MAX_COMMENTS = 20;
+
+interface FindingsCaseComment {
+  author?: string;
+  comment?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+interface FindingsCase {
+  title?: string;
+  description?: string;
+  tags?: string[];
+  user?: { name?: string };
+  status?: string;
+  severity?: string;
+  priority?: string;
+  tlp?: string;
+  created_at?: string;
+  updated_at?: string;
+  comments?: FindingsCaseComment[];
+  /** Legacy single-comment field: read-only, never written anymore. */
+  comment?: string;
+}
+
 /**
  * Get the an array of unique objects by settingIndexPattern-dataSet par
  * @param arr
@@ -300,6 +325,22 @@ export class WazuhElasticCtrl {
         );
       }
 
+      // The username lets the UI mark the current user's comments as
+      // editable; its resolution failing must not break reading the case.
+      let username: string | null = null;
+      try {
+        ({ username = null } = await context.wazuh.security.getCurrentUser(
+          request,
+          context,
+        ));
+      } catch (error: any) {
+        context.wazuh.logger.warn(
+          `Could not resolve the current user for findings case: ${
+            error?.message ?? error
+          }`,
+        );
+      }
+
       const client = context.core.opensearch.client.asCurrentUser;
       const encodedIndex = encodeURIComponent(index);
       const encodedDocumentId = encodeURIComponent(documentId);
@@ -310,10 +351,10 @@ export class WazuhElasticCtrl {
           path: `/${encodedIndex}/_doc/${encodedDocumentId}`,
         });
         const caseFields = getResponse?.body?._source?.wazuh?.case ?? null;
-        return response.ok({ body: { case: caseFields } });
+        return response.ok({ body: { case: caseFields, username } });
       } catch (error: any) {
         if (error?.meta?.statusCode === 404) {
-          return response.ok({ body: { case: null } });
+          return response.ok({ body: { case: null, username } });
         }
         throw error;
       }
@@ -348,10 +389,26 @@ export class WazuhElasticCtrl {
   ) {
     try {
       const { index, documentId } = request.params;
-      const { status, comment, tags } = request.body as {
+      const {
+        status,
+        tags,
+        title,
+        description,
+        severity,
+        priority,
+        tlp,
+        newComment,
+        editedComments,
+      } = request.body as {
         status?: string;
-        comment?: string;
         tags?: string[];
+        title?: string;
+        description?: string;
+        severity?: string;
+        priority?: string;
+        tlp?: string;
+        newComment?: string;
+        editedComments?: Array<{ created_at: string; comment: string }>;
       };
 
       if (!this.isFindingsIndex(index)) {
@@ -380,13 +437,13 @@ export class WazuhElasticCtrl {
       const encodedIndex = encodeURIComponent(index);
       const encodedDocumentId = encodeURIComponent(documentId);
 
-      let existingCreatedAt: string | undefined;
+      let existingCase: FindingsCase | undefined;
       try {
         const getResponse = await client.transport.request({
           method: 'GET',
           path: `/${encodedIndex}/_doc/${encodedDocumentId}`,
         });
-        existingCreatedAt = getResponse?.body?._source?.wazuh?.case?.created_at;
+        existingCase = getResponse?.body?._source?.wazuh?.case;
       } catch (error: any) {
         if (error?.meta?.statusCode !== 404) {
           throw error;
@@ -394,23 +451,97 @@ export class WazuhElasticCtrl {
       }
 
       const now = new Date().toISOString();
+
+      // Comment authorship and timestamps are always derived from the
+      // logged-in user, never from the client.
+      const comments = [...(existingCase?.comments ?? [])];
+      let commentsTouched = false;
+
+      for (const edit of editedComments ?? []) {
+        const commentIndex = comments.findIndex(
+          comment => comment?.created_at === edit.created_at,
+        );
+        if (commentIndex === -1) {
+          return ErrorResponse(
+            `Comment with created_at "${edit.created_at}" was not found`,
+            4017,
+            HTTP_STATUS_CODES.BAD_REQUEST,
+            response,
+          );
+        }
+        if (comments[commentIndex].author !== username) {
+          return ErrorResponse(
+            'Comments can only be edited by their author',
+            4017,
+            HTTP_STATUS_CODES.BAD_REQUEST,
+            response,
+          );
+        }
+        comments[commentIndex] = {
+          ...comments[commentIndex],
+          comment: edit.comment,
+          updated_at: now,
+        };
+        commentsTouched = true;
+      }
+
+      if (newComment !== undefined && newComment.trim() !== '') {
+        comments.push({
+          author: username,
+          comment: newComment,
+          created_at: now,
+          updated_at: now,
+        });
+        commentsTouched = true;
+      }
+
+      // Only enforced when the request touches comments so documents that
+      // already exceed the limit (e.g. written out-of-band) can still get
+      // scalar updates.
+      if (commentsTouched && comments.length > CASE_MAX_COMMENTS) {
+        return ErrorResponse(
+          `A case supports a maximum of ${CASE_MAX_COMMENTS} comments`,
+          4017,
+          HTTP_STATUS_CODES.BAD_REQUEST,
+          response,
+        );
+      }
+
       const casePayload: Record<string, unknown> = {
         user: { name: username },
         updated_at: now,
-        created_at: existingCreatedAt ?? now,
+        created_at: existingCase?.created_at ?? now,
       };
 
       if (status !== undefined) {
         casePayload.status = status;
       }
-      if (comment !== undefined) {
-        casePayload.comment = comment;
-      }
       if (tags !== undefined) {
         casePayload.tags = tags;
       }
+      if (title !== undefined) {
+        casePayload.title = title;
+      }
+      if (description !== undefined) {
+        casePayload.description = description;
+      }
+      if (severity !== undefined) {
+        casePayload.severity = severity;
+      }
+      if (priority !== undefined) {
+        casePayload.priority = priority;
+      }
+      if (tlp !== undefined) {
+        casePayload.tlp = tlp;
+      }
+      // The indexer endpoint merges documents (objects merge, arrays are
+      // replaced wholesale), so comments are only sent when they changed.
+      // The legacy single `comment` field is never written anymore.
+      if (commentsTouched) {
+        casePayload.comments = comments;
+      }
 
-      await client.transport.request({
+      const updateResponse = await client.transport.request({
         method: 'PUT',
         path: '/_plugins/_security_analytics/findings/_update',
         body: {
@@ -424,10 +555,29 @@ export class WazuhElasticCtrl {
         },
       });
 
+      // The indexer endpoint reports per-item failures (missing document,
+      // mapping rejection...) inside a 2xx response.
+      if (updateResponse?.body?.errors) {
+        const itemError = updateResponse?.body?.items?.[0]?.error;
+        return ErrorResponse(
+          `The findings index rejected the case update: ${
+            typeof itemError === 'string'
+              ? itemError
+              : JSON.stringify(itemError ?? 'unknown error')
+          }`,
+          4017,
+          HTTP_STATUS_CODES.BAD_REQUEST,
+          response,
+        );
+      }
+
+      // Respond with the full resulting case: the UI re-baselines the form
+      // from it and replaces wazuh.case wholesale in the open flyout/grid.
       return response.ok({
         body: {
           message: 'Case updated successfully',
-          case: casePayload,
+          case: { ...(existingCase ?? {}), ...casePayload },
+          username,
         },
       });
     } catch (error: any) {

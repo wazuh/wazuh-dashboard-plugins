@@ -20,60 +20,115 @@ export type CaseStatus =
   | 'DELETED'
   | 'AUDIT';
 
-export interface CaseData {
-  status?: CaseStatus;
+export type CaseSeverity =
+  | 'INFORMATIONAL'
+  | 'LOW'
+  | 'MEDIUM'
+  | 'HIGH'
+  | 'CRITICAL';
+
+export type CasePriority = 'URGENT' | 'HIGH' | 'MEDIUM' | 'LOW';
+
+export type CaseTLP = 'TLP:RED' | 'TLP:AMBER' | 'TLP:GREEN' | 'TLP:CLEAR';
+
+export const MAX_CASE_COMMENTS = 20;
+
+export interface CaseComment {
+  author?: string;
   comment?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface CaseData {
+  title?: string;
+  description?: string;
+  status?: CaseStatus;
+  severity?: CaseSeverity;
+  priority?: CasePriority;
+  tlp?: CaseTLP;
   tags?: string[];
+  comments?: CaseComment[];
+  /** Legacy single-comment field: no longer written nor displayed. */
+  comment?: string;
   created_at?: string;
   updated_at?: string;
   user?: { name?: string };
 }
 
+export interface UpdateCaseEditedComment {
+  created_at: string;
+  comment: string;
+}
+
 export interface UpdateCasePayload {
   status?: CaseStatus;
-  comment?: string;
   tags?: string[];
+  title?: string;
+  description?: string;
+  severity?: CaseSeverity | '';
+  priority?: CasePriority | '';
+  tlp?: CaseTLP | '';
+  newComment?: string;
+  editedComments?: UpdateCaseEditedComment[];
+}
+
+export interface CaseApiResponse {
+  case: CaseData | null;
+  username?: string;
 }
 
 /**
- * Fetches the current wazuh.case.* fields for a findings document.
- * Returns null when the document exists but has no case data yet.
+ * Fetches the current wazuh.case.* fields for a findings document, along
+ * with the logged-in username (used to mark own comments as editable).
+ * `case` is null when the document exists but has no case data yet.
  */
 export async function getFindingsCase(
   index: string,
   docId: string,
-): Promise<CaseData | null> {
-  const response: { data?: { case?: CaseData | null } } =
+): Promise<CaseApiResponse> {
+  const response: { data?: { case?: CaseData | null; username?: string } } =
     await GenericRequest.request(
       'GET',
       `/indexer/findings/case/${encodeURIComponent(index)}/${encodeURIComponent(
         docId,
       )}`,
     );
-  return response?.data?.case ?? null;
+  return {
+    case: response?.data?.case ?? null,
+    username: response?.data?.username ?? undefined,
+  };
 }
 
 /**
  * Updates the case management fields of a findings document.
  *
  * POST /indexer/findings/case/<index>/<documentId>
- * Body: { status, comment, tags }
+ * Body: { status, tags, title, description, severity, priority, tlp,
+ *         newComment, editedComments }
  *
- * The backend sets wazuh.case.user.name, created_at and updated_at.
+ * The backend sets wazuh.case.user.name and the case/comment timestamps,
+ * assigns the logged-in user as the author of the new comment, only allows
+ * editing own comments, and enforces the maximum of MAX_CASE_COMMENTS
+ * comments. The response carries the full resulting case.
  */
 export async function updateDocumentCase(
   index: string,
   docId: string,
   payload: UpdateCasePayload,
-): Promise<CaseData> {
-  const response: { data: { case: CaseData } } = await GenericRequest.request(
-    'POST',
-    `/indexer/findings/case/${encodeURIComponent(index)}/${encodeURIComponent(
-      docId,
-    )}`,
-    payload,
-  );
-  return response?.data?.case;
+): Promise<CaseApiResponse> {
+  const response: { data: { case: CaseData; username?: string } } =
+    await GenericRequest.request(
+      'POST',
+      `/indexer/findings/case/${encodeURIComponent(index)}/${encodeURIComponent(
+        docId,
+      )}`,
+      payload,
+    );
+  return {
+    case: response?.data?.case,
+    username: response?.data?.username ?? undefined,
+  };
 }
 
 /**

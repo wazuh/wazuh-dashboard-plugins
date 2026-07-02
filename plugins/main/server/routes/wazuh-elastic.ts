@@ -83,8 +83,50 @@ export function WazuhElasticRoutes(router: IRouter) {
               schema.literal('AUDIT'),
             ]),
           ),
-          comment: schema.maybe(schema.string()),
+          title: schema.maybe(schema.string({ maxLength: 1024 })),
+          description: schema.maybe(schema.string()),
           tags: schema.maybe(schema.arrayOf(schema.string())),
+          // '' is the "clear the value" sentinel on the optional enums: the
+          // indexer update endpoint merges documents, so keys cannot be
+          // removed, only overwritten.
+          severity: schema.maybe(
+            schema.oneOf([
+              schema.literal('INFORMATIONAL'),
+              schema.literal('LOW'),
+              schema.literal('MEDIUM'),
+              schema.literal('HIGH'),
+              schema.literal('CRITICAL'),
+              schema.literal(''),
+            ]),
+          ),
+          priority: schema.maybe(
+            schema.oneOf([
+              schema.literal('URGENT'),
+              schema.literal('HIGH'),
+              schema.literal('MEDIUM'),
+              schema.literal('LOW'),
+              schema.literal(''),
+            ]),
+          ),
+          tlp: schema.maybe(
+            schema.oneOf([
+              schema.literal('TLP:RED'),
+              schema.literal('TLP:AMBER'),
+              schema.literal('TLP:GREEN'),
+              schema.literal('TLP:CLEAR'),
+              schema.literal(''),
+            ]),
+          ),
+          newComment: schema.maybe(schema.string({ minLength: 1 })),
+          editedComments: schema.maybe(
+            schema.arrayOf(
+              schema.object({
+                created_at: schema.string(),
+                comment: schema.string({ minLength: 1 }),
+              }),
+              { maxSize: 20 },
+            ),
+          ),
         }),
       },
     },
