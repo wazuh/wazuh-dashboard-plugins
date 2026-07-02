@@ -1,9 +1,11 @@
+import { commonColumns } from '../../../../common/data-grid-columns';
+
 export const tableColumns = [
-  { id: 'wazuh.agent.name' },
+  commonColumns['wazuh.agent.name'],
   { id: 'policy.name' },
   { id: 'check.id', initialWidth: 100 },
   { id: 'check.name' },
-  { id: 'check.result' },
+  { id: 'check.result', initialWidth: 130 },
 ];
 
 export const managedFilters = [

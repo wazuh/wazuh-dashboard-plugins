@@ -45,6 +45,7 @@ import {
   tParsedIndexPattern,
   PatternDataSource,
   FindingsDataSourceRepository,
+  tDataSourceRepository,
 } from '../data-source';
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
 import { wzDiscoverRenderColumns } from './render-columns';
@@ -64,17 +65,21 @@ export type WazuhDiscoverProps = {
   moduleId: string;
   tableColumns: tDataGridColumn[];
   DataSource: IDataSourceFactoryConstructor<PatternDataSource>;
+  DataSourceRepository?: new () => tDataSourceRepository<tParsedIndexPattern>;
   categoriesSampleData: string[];
   additionalDocumentDetailsTabs?: import('./components/document-view-table-and-json').DocumentViewTableAndJsonPropsAdditionalTabs;
+  flyoutTitle?: string;
 };
 
 const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   const {
     moduleId,
     DataSource,
+    DataSourceRepository,
     tableColumns: defaultTableColumns,
     categoriesSampleData,
     additionalDocumentDetailsTabs,
+    flyoutTitle,
   } = props;
 
   if (!DataSource) {
@@ -91,7 +96,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
 
-  const FindingsRepository = new FindingsDataSourceRepository();
+  const repository = DataSourceRepository
+    ? new DataSourceRepository()
+    : new FindingsDataSourceRepository();
 
   const {
     dataSource,
@@ -103,7 +110,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     setFilters,
     error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    repository: FindingsRepository,
+    repository,
     DataSource,
   });
 
@@ -338,6 +345,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                     <DocDetailsHeader
                       doc={inspectedHit}
                       indexPattern={dataSource?.indexPattern}
+                      title={flyoutTitle}
                     />
                   </EuiFlyoutHeader>
                   <EuiFlyoutBody>
