@@ -13,32 +13,39 @@ import React from 'react';
 import MarkdownIt from 'markdown-it';
 import MarkdownItLinkAttributes from 'markdown-it-link-attributes';
 import classnames from 'classnames';
+import DOMPurify from 'dompurify';
 
 const md = new MarkdownIt({
   html: true,
   linkify: true,
   breaks: true,
-  typographer: true
+  typographer: true,
 }).use(MarkdownItLinkAttributes, {
   attrs: {
     target: '_blank',
-    rel: 'noopener noreferrer'
-  }
+    rel: 'noopener noreferrer',
+  },
 });
 
-interface MarkdownProps{
-  markdown: string
-  className?: string
-};
+interface MarkdownProps {
+  markdown: string;
+  className?: string;
+}
 
-export const Markdown = ({markdown, className = ''}: MarkdownProps) => (
+export const Markdown = ({ markdown, className = '' }: MarkdownProps) => (
   <div
-    className={classnames('wz-markdown-margin', 'wz-markdown-wrapper', className)}
+    className={classnames(
+      'wz-markdown-margin',
+      'wz-markdown-wrapper',
+      className,
+    )}
     /*
      * Justification for dangerouslySetInnerHTML:
      * Render HTML elements from a markdown text using a function to transform the
      * Markdown into HTML elements
      */
-    dangerouslySetInnerHTML={{__html: md.render(markdown)}}>
-  </div>
+    dangerouslySetInnerHTML={{
+      __html: DOMPurify.sanitize(md.render(markdown)),
+    }}
+  ></div>
 );
