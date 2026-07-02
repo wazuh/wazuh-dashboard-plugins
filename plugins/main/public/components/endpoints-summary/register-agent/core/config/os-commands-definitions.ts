@@ -253,7 +253,7 @@ export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
         let osName = selectedOS.name.toLocaleLowerCase();
         switch (osName) {
           case 'linux':
-            return `${property}=$'${scapeSpecialCharsForLinux(value)}'`;
+            return `${property}='${scapeSpecialCharsForLinux(value)}'`;
           case 'macos':
             return `${property}='${scapeSpecialCharsForMacOS(value)}'`;
           case 'windows':

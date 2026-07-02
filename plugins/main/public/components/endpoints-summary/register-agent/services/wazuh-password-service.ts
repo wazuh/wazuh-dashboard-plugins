@@ -55,9 +55,9 @@ export const osdfucatePasswordInCommand = (password: string, commandText: string
     case 'linux':
     {
       const replacedString = command.replace(
-        `WAZUH_REGISTRATION_PASSWORD=\$'${scapeSpecialCharsForLinux(password)}'`,
+        `WAZUH_REGISTRATION_PASSWORD=\'${scapeSpecialCharsForLinux(password)}'`,
         () => {
-          return `WAZUH_REGISTRATION_PASSWORD=\$\'${'*'.repeat(scapeSpecialCharsForLinux(password).length)}\'`;
+          return `WAZUH_REGISTRATION_PASSWORD=\'${'*'.repeat(scapeSpecialCharsForLinux(password).length)}\'`;
         }
       );
       return replacedString;
