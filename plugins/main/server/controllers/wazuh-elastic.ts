@@ -48,8 +48,6 @@ interface FindingsCase {
   created_at?: string;
   updated_at?: string;
   comments?: FindingsCaseComment[];
-  /** Legacy single-comment field: read-only, never written anymore. */
-  comment?: string;
 }
 
 /**

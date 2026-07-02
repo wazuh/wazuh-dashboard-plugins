@@ -49,8 +49,6 @@ export interface CaseData {
   tlp?: CaseTLP;
   tags?: string[];
   comments?: CaseComment[];
-  /** Legacy single-comment field: no longer written nor displayed. */
-  comment?: string;
   created_at?: string;
   updated_at?: string;
   user?: { name?: string };
