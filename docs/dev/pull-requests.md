@@ -62,7 +62,27 @@ Start from the linked issue to understand the context and acceptance criteria, t
 
 ### Changelog
 
-Every PR is expected to include a changelog entry in [`CHANGELOG.md`](../../CHANGELOG.md).
+Every PR is expected to include an entry in `CHANGELOG.md`, under the `Added`, `Changed`, `Fixed` or `Removed` section for the upcoming version. This is enforced by the **Changelog Verifier** workflow (`5_changelog_verifier.yml`).
+
+**When an entry is required**: whenever the change affects the published package, the UI, or any other user-facing behavior.
+
+**Exceptions**: PRs that only touch internal development tooling or process, with no impact on the published package, don't need one. Common cases:
+
+- CI/CD pipeline changes (GitHub Actions, workflows, build scripts)
+- Documentation-only changes
+- Linting, formatting, or pre-commit hook configuration
+- Dev container / local development tooling changes
+- Test-only changes (no behavior change)
+- Repository configuration (`.gitignore`, editor configs, issue/PR templates)
+- Dependency bumps that don't affect the public API or behavior (e.g. devDependencies)
+- Merge, version bump, or bump-revert PRs
+- Internal refactoring with no observable change to consumers of the project
+
+If you're unsure whether your PR qualifies, default to adding an entry, or ask a maintainer for guidance in the PR description.
+
+**Grouping entries**: if a PR continues or refines a previously merged feature (e.g. another PR for the same module), append to that entry instead of adding a new one, as long as it still matches the entry's description, don't attach unrelated changes to it just because they touch the same module. Existing entries can also be edited later if a subsequent PR changes or removes what they introduced.
+
+**Skipping the changelog check**: A GitHub Action automatically validates that every PR includes an update to `CHANGELOG.md`. If your PR qualifies for the exception above, add the `no changelog` label to the PR — the workflow detects this label and skips the validation step, allowing the PR to pass checks without a changelog entry.
 
 ### Best practices
 
