@@ -123,7 +123,6 @@ The prefix is drawn from the following set of use cases:
 | Precompiled object builder                          | `builderprecompiled` | Subsystem          | `5_builderprecompiled_base-dev-environment` |
 | Version bumping                                     | `bumper`             | Repository         | `5_bumper_repository`                       |
 
-
 When composing jobs from Actions, a single job step **cannot** mix Actions with different prefixes, and steps **must** use matrices whenever possible.
 
 ### Runners
