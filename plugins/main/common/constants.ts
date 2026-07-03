@@ -1021,7 +1021,7 @@ export const INDEX_PATTERN_EVENTS_REQUIRED_FIELDS = [
 export const THREAT_HUNTING_DASHBOARD_ID = 'threat-hunting-overview-dashboard';
 export const THREAT_HUNTING_AGENT_DASHBOARD_ID =
   'threat-hunting-pinned-agent-dashboard';
-export const THREAT_HUNTING_CASES_DASHBOARD_ID =
+export const CASE_MANAGEMENT_CASES_DASHBOARD_ID =
   'threat-hunting-cases-dashboard-tab';
 export const CASE_MANAGEMENT_DASHBOARD_ID = 'case-management-dashboard-tab';
 
