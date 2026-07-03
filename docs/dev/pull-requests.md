@@ -103,12 +103,6 @@ The prefix is drawn from the following set of use cases:
 | Precompiled object builder                          | `builderprecompiled` | Subsystem          | `5_builderprecompiled_base-dev-environment` |
 | Version bumping                                     | `bumper`             | Repository         | `5_bumper_repository`                       |
 
-For workflows triggered on PR or push events, append `_onpush` to the name to distinguish them from their `workflow_dispatch` counterparts:
-
-```
-5_builderpackage_plugins.yml          ← workflow_dispatch (manual)
-5_builderpackage_plugins_onpush.yml   ← PR / push trigger (automatic)
-```
 
 When composing jobs from Actions, a single job step **cannot** mix Actions with different prefixes, and steps **must** use matrices whenever possible.
 
