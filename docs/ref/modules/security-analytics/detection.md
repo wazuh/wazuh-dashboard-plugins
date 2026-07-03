@@ -213,7 +213,7 @@ The **Selected rules** panel displays the rules that will be active for this det
 
 ### Step 3: Review and Create
 
-Review the configuration and click **Create detector**. A *Detector created successfully* toast confirms it, and the detector opens on its **Detector configuration** page with status **Active** — showing the **Detector details** and an **Active rules** table (here, `SSH Failed Password Detection`). The detector then runs on its schedule against the configured data source using the selected rules.
+Review the configuration and click **Create detector**. A _Detector created successfully_ toast confirms it, and the detector opens on its **Detector configuration** page with status **Active** — showing the **Detector details** and an **Active rules** table (here, `SSH Failed Password Detection`). The detector then runs on its schedule against the configured data source using the selected rules.
 
 <!-- IMAGE: Detector created and visible in the detectors list -->
 <!-- Suggested filename: images/detection/07-detector-created.png -->

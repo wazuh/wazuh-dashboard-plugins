@@ -142,7 +142,7 @@ The space's **space policy** defines the **root decoder** — the decoder the en
 
 ![Space policy - Enabled with root decoder](images/normalization/06-enable-integration-status.png)
 
-After **Save**, the **Settings** tab reflects the change — **Status: Enabled** and **Root decoder: decoder/custom-ssh-auth/0** — confirmed by a *Successfully updated [draft] space* toast.
+After **Save**, the **Settings** tab reflects the change — **Status: Enabled** and **Root decoder: decoder/custom-ssh-auth/0** — confirmed by a _Successfully updated [draft] space_ toast.
 
 ![Space policy saved](images/normalization/06b-space-policy-saved.png)
 
@@ -164,7 +164,7 @@ Once the **Draft** policy is **enabled** and the **root decoder** is set, the in
 
 ![Promote to Test - confirm](images/normalization/08b-promote-confirm-modal.png)
 
-A *Successfully promoted [draft] space* toast confirms it, and the integration is now available in the **Test** space.
+A _Successfully promoted [draft] space_ toast confirms it, and the integration is now available in the **Test** space.
 
 ![Promote to Test - Success](images/normalization/09-promote-to-test-success.png)
 
@@ -188,7 +188,7 @@ The **Test Result** panel shows a status badge (**200** on success) and two tabs
 
 ![Log test - Result](images/normalization/11-log-test-result.png)
 
-The **Detection** tab evaluates the rules of the integration selected under the form's **Detection** section. Until rules exist for `custom-ssh-auth`, it reports *0 rules evaluated* — revisit it after creating a rule in [Detection](./detection.md).
+The **Detection** tab evaluates the rules of the integration selected under the form's **Detection** section. Until rules exist for `custom-ssh-auth`, it reports _0 rules evaluated_ — revisit it after creating a rule in [Detection](./detection.md).
 
 ![Log test - Detection tab](images/normalization/11b-log-test-detection.png)
 
@@ -248,6 +248,7 @@ Apply changes with **Save**.
 
 <!-- IMAGE: Edit <space> flyout showing the Details and Settings groups -->
 <!-- Suggested filename: images/normalization/16-space-policy-settings.png -->
+
 ![Space policy settings - Edit Draft flyout](images/normalization/16-space-policy-settings.png)
 
 ### Event indexing (Wazuh 5.0)
