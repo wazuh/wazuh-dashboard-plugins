@@ -43,12 +43,6 @@ on:
         type: boolean
         default: false
         required: false
-      runner:
-        type: string
-        default: 'ubuntu-24.04'
-        required: false
-        description: Runner to use for the job.
-
 env:
   CI_DEV_INTERNAL_BUCKET: ${{ secrets.CI_DEV_INTERNAL_BUCKET }}
 
@@ -60,7 +54,7 @@ jobs:
       pull-requests: write
       id-token: write
     name: Deploy and run command
-    runs-on: ${{ inputs.runner }}
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         plugins:
