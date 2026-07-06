@@ -31,7 +31,7 @@ const linuxDefinition: IOSDefinition<tOperatingSystem, tOptionalParamsNames> = {
       architecture: '32/64',
       packageName: props => `wazuh-agent-${props.wazuhVersion}-1.x86_64`,
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/yum/${props.packageName}`,
+        `https://packages.wazuh.com/production/5.x/yum/${props.packageName}`,
       installCommand: props => `sudo yum install -y ${props.urlPackage}`,
       startCommand: props => `sudo systemctl start wazuh-agent`,
     },
@@ -40,7 +40,7 @@ const linuxDefinition: IOSDefinition<tOperatingSystem, tOptionalParamsNames> = {
       packageName: props =>
         `wazuh-agent_${props.wazuhVersion}-1_${props.architecture}`,
       urlPackage: props =>
-        `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/${props.packageName}`,
+        `https://packages.wazuh.com/production/5.x/apt/pool/main/w/wazuh-agent/${props.packageName}`,
       installCommand: props =>
         `curl -so wazuh-agent.deb ${props.urlPackage} && sudo dpkg -i ./wazuh-agent.deb`,
       startCommand: props => `sudo systemctl start wazuh-agent`,

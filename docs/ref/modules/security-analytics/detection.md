@@ -4,9 +4,10 @@ The **Detection** module is part of the **Security Analytics** section in the Wa
 
 This module exposes the following sections:
 
-- **Overview** — Displays all integrations available across spaces, consistent with the Normalization view.
 - **Rules** — Lists all detection rules across the active spaces, with filtering and inspection capabilities.
 - **Detectors** — Allows creating and managing detectors that connect one or more rules to specific data sources (indexes or aliases) for continuous threat monitoring.
+
+Integrations are managed from the top-level **Overview** page, shared with the Normalization module.
 
 ---
 
@@ -53,9 +54,9 @@ A detection rule is composed of the following main blocks:
 
 ## Use Case: Creating a Custom Detection Rule
 
-The following walkthrough demonstrates how to create a detection rule for SSH brute force attempts in the **Draft** space, as part of the **Custom Ssh Auth** integration created in the [Normalization](./normalization.md) use case.
+The following walkthrough demonstrates how to create a detection rule for SSH brute force attempts in the **Draft** space, as part of the `custom-ssh-auth` integration created in the [Normalization](./normalization.md) use case.
 
-**Prerequisites:** The **Custom Ssh Auth** integration exists in the **Draft** space with its decoder already defined.
+**Prerequisites:** The `custom-ssh-auth` integration exists in the **Draft** space with its decoder already defined.
 
 ---
 
@@ -67,7 +68,7 @@ Navigate to **Security Analytics → Detection → Rules** and ensure the **Draf
 
 ### Step 2: Create a Custom Rule
 
-Select **Create rule**. In the creation form, choose between **Form editor** or the **YAML Editor** mode and select the target integration — in this case, **Custom Ssh Auth**.
+Select **Create rule**. In the creation form, choose between **Visual Editor** or the **YAML Editor** mode and select the target integration — in this case, `custom-ssh-auth`.
 
 <!-- IMAGE: Create rule form with YAML Editor selected and integration chosen -->
 <!-- Suggested filename: images/detection/01-create-rule-form.png -->
@@ -136,20 +137,17 @@ Click **Create rule**. The engine validates the definition automatically.
 
 ### Step 3: Verify the Rule in the Draft List
 
-After creation, the rule appears in the **Rules** list under the **Draft** space, associated with the **Custom Ssh Auth** integration.
+After creation, the rule appears in the **Rules** list under the **Draft** space, associated with the `custom-ssh-auth` integration.
 
 ---
 
 ### Step 4: Promote Draft → Test → Custom
 
-The promotion flow is identical to the one described in [Normalization — Step 4](./normalization.md#step-4-promote-draft--test). Navigate to **Security Analytics → Detection → Overview**, ensure the **Draft** space is selected, and click **Actions → Promote** on the integration.
+The promotion flow is identical to the one described in [Normalization — Step 4](./normalization.md#step-4-promote-draft--test). Navigate to **Security Analytics → Overview**, ensure the **Draft** space is selected, and click **Actions → Promote**.
 
-The promotion dialog lists all entities that will be synchronized. Because the integration already existed and the rule is new, each entity is labeled with the operation that will be applied:
+The **Promote** page lists each entity with the operation that will be applied. Because the integration already exists in **Test** and the rule is new, they are tagged **`custom-ssh-auth (update)`** and **`SSH Failed Password Detection (add)`**. Click **Promote**, then type `promote` in the confirmation dialog (**Promote to Test space?**) to confirm — the action is irreversible.
 
-- **Integrations** — `custom-ssh-auth (update)` — the integration metadata is refreshed.
-- **Rules** — `SSH Failed Password Detection (add)` — the new rule is added for the first time.
-
-<!-- IMAGE: Promotion dialog showing integration as (update) and rule as (add) -->
+<!-- IMAGE: Promote page showing the integration as (update) and the rule as (add) -->
 
 ![Promote Draft to Test - entities](images/detection/04-promote-draft-confirm.png)
 
@@ -163,7 +161,7 @@ After promotion to **Custom**, the rule is active in the engine. Any incoming ev
 
 A **detector** connects detection rules to a specific data source (an index or alias) and runs continuously to identify security findings. Detectors operate on top of rules that are already active in the **Custom** or **Standard** space.
 
-**Prerequisites:** The **Custom Ssh Auth** integration and its rules are promoted to the **Custom** space.
+**Prerequisites:** The `custom-ssh-auth` integration and its rules are promoted to the **Custom** space.
 
 ---
 
@@ -180,7 +178,7 @@ Navigate to **Security Analytics → Detection → Detectors**.
 
 ### Step 2: Configure Detector Details
 
-Click on **Create detector** to add a new detecor:
+Click **+ Create detector** (top right) to open the **Define detector** form:
 
 **Detector details**
 
@@ -191,16 +189,20 @@ Click on **Create detector** to add a new detecor:
 
 Select the index or alias that contains the log data to be monitored. Aliases and data streams are recommended for optimal functioning.
 
-- **Select indexes/aliases** — Choose the index that receives the SSH authentication logs (e.g., `wazuh-events-v5-system-activity`).
+- **Select indexes/aliases** — Choose the index or alias that receives this integration's events. For the **Access Management** category used in this walkthrough, that is `wazuh-events-v5-access-management`. Only `wazuh-events-v5*` indices and aliases are listed.
 
 **Rules**
 
 Rules are automatically populated based on the selected integration. Choose the space and integration to filter the available rules:
 
 - **Space** — Select `Custom` to use rules already promoted to production.
-- **Integration** — Select `Custom Ssh Auth` to load its associated rules.
+- **Integration** — Select `custom-ssh-auth` to load its associated rules.
 
-The **Selected rules** panel displays the rules that will be active for this detector. Use **Manage** to add or remove individual rules.
+The **Selected rules** panel displays the rules that will be active for this detector (here, `SSH Failed Password Detection` is loaded automatically). Use **Manage** to add or remove individual rules.
+
+**Detector schedule**
+
+- **Run every** — How often the detector evaluates the data source (for example, every `1` minute).
 
 <!-- IMAGE: Detector creation form filled with SSH Brute Force Monitor config -->
 <!-- Suggested filename: images/detection/06-define-detector-form.png -->
@@ -211,7 +213,7 @@ The **Selected rules** panel displays the rules that will be active for this det
 
 ### Step 3: Review and Create
 
-Review the detector configuration and click **Create detector**. The detector begins running immediately against the configured data source using the selected rules.
+Review the configuration and click **Create detector**. A _Detector created successfully_ toast confirms it, and the detector opens on its **Detector configuration** page with status **Active** — showing the **Detector details** and an **Active rules** table (here, `SSH Failed Password Detection`). The detector then runs on its schedule against the configured data source using the selected rules.
 
 <!-- IMAGE: Detector created and visible in the detectors list -->
 <!-- Suggested filename: images/detection/07-detector-created.png -->
