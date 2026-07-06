@@ -529,7 +529,7 @@ update_changelog() {
 
   # Build prior version link for current (soon to be prior) version
   local current_version_link
-  current_version_link="- [v${current_version}](${remote_url}/blob/v${current_version}/CHANGELOG.md)"
+  current_version_link="- [v${current_version}](${remote_url}/blob/${current_version}/CHANGELOG.md)"
 
   # Extract existing Prior versions links and prune to last 2 minors
   local existing_prior filtered_prior link link_version link_major link_minor
