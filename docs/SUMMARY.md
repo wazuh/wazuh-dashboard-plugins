@@ -13,6 +13,7 @@
 - [Get external resouces](dev/get-external-resources.md)
 - [Run Tests](dev/run-tests.md)
 - [Pull Requests](dev/pull-requests.md)
+- [Repository Bumper](dev/bumper-repository.md)
 - [Modules](dev/modules/index.md)
   - [Active responses](dev/modules/active-responses.md)
   - [Security analytics](dev/modules/security-analytics.md)
