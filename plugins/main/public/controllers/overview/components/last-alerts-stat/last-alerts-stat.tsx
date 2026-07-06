@@ -115,7 +115,7 @@ export const LastAlertsCountBySeverity = withDataSourceFetchOnStart({
 
     return {
       filters: [
-        ...dataSource.fetchFilters,
+        ...dataSource.fixedFilters,
         PatternDataSourceFilterManager.createFilter(
           FILTER_OPERATOR.IS,
           'wazuh.rule.level',
@@ -161,7 +161,7 @@ export const LastAlertsCountBySeverity = withDataSourceFetchOnStart({
       const indexPatternId = dataSource.dataSource.indexPattern.id;
       const predefinedFilters =
         PatternDataSourceFilterManager.filtersToURLFormat([
-          ...dataSource.fetchFilters,
+          ...dataSource.fixedFilters,
           PatternDataSourceFilterManager.createFilter(
             FILTER_OPERATOR.IS,
             'wazuh.rule.level',

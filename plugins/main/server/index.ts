@@ -4,7 +4,7 @@ import {
 } from 'opensearch_dashboards/server';
 
 import { WazuhPlugin } from './plugin';
-import { configSchema, WazuhPluginConfigType } from '../config';
+import { configSchema, WazuhPluginConfigType } from './config';
 
 //  This exports static code and TypeScript types,
 //  as well as, plugin platform `plugin()` initializer.
