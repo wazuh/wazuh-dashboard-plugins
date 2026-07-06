@@ -9,4 +9,14 @@ export default [
     key: 'wazuh.case.user.name',
     placeholder: 'User',
   },
+  {
+    type: 'multiSelect',
+    key: 'wazuh.case.severity',
+    placeholder: 'Severity',
+  },
+  {
+    type: 'multiSelect',
+    key: 'wazuh.case.priority',
+    placeholder: 'Priority',
+  },
 ];
