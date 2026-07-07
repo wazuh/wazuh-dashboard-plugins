@@ -17,7 +17,7 @@ concurrency:
 jobs:
   scripts-tests:
     if: github.event.pull_request.draft == false
-    runs-on: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Run dev scripts tests (Jest in container)
