@@ -18,9 +18,9 @@
 # Candidate prior versions are gathered from the remote version-shaped tags
 # ("X.Y.Z" or "vX.Y.Z") only, since tags are the already-released versions.
 #
-# Stage-only bumps (version unchanged) only resync the "## Prior versions"
-# section, leaving the changelog entries untouched. Tag generation (--tag)
-# leaves CHANGELOG.md untouched.
+# Stage-only bumps (version unchanged) and tag generation (--tag) only
+# resync the "## Prior versions" section, leaving the changelog entries
+# untouched.
 #
 # Usage: changelog_bump.sh <new_version> <current_version> [--tag]
 
@@ -39,7 +39,7 @@ function usage() {
     echo "Arguments:"
     echo "  new_version       Version being bumped to (e.g., 5.1.0)"
     echo "  current_version   Version being replaced (e.g., 5.0.0)"
-    echo "  --tag             Tag generation: skip the CHANGELOG.md update"
+    echo "  --tag             Tag generation: only resync the Prior versions section"
 }
 
 # ====
