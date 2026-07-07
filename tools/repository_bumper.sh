@@ -497,80 +497,26 @@ update_osd_json_files() {
   done
 }
 
-# Function to update CHANGELOG.md
+# Function to update CHANGELOG.md (delegates to changelog_bump.sh)
 update_changelog() {
   log "Updating CHANGELOG.md..."
-  local changelog_file="${REPO_PATH}/CHANGELOG.md"
+  local changelog_script="${SCRIPT_PATH}/changelog_bump.sh"
+  local args=("$VERSION" "$CURRENT_VERSION")
 
-  if [ ! -f "$changelog_file" ]; then
-    log "ERROR: CHANGELOG.md not found at $changelog_file"
+  if [ ! -f "$changelog_script" ]; then
+    log "ERROR: changelog_bump.sh not found at $changelog_script"
     exit 1
   fi
 
-  local new_version="$VERSION"
-  local current_version="$CURRENT_VERSION"
-
-  # Get GitHub remote URL to build prior version links
-  local remote_url
-  remote_url=$(git -C "$REPO_PATH" remote get-url origin 2>/dev/null \
-    | sed 's|git@github.com:|https://github.com/|' \
-    | sed 's|\.git$||')
-  if [ -z "$remote_url" ]; then
-    log "WARNING: Could not determine remote URL. Using placeholder."
-    remote_url="https://github.com/wazuh/REPO"
+  if [ "$TAG" = true ]; then
+    args+=("--tag")
   fi
 
-  # Determine minimum minor version to keep (last 2 minors)
-  local new_major new_minor min_minor
-  new_major=$(echo "$new_version" | cut -d. -f1)
-  new_minor=$(echo "$new_version" | cut -d. -f2)
-  min_minor=$((new_minor - 1))
-  if [ "$min_minor" -lt 0 ]; then min_minor=0; fi
-
-  # Build prior version link for current (soon to be prior) version
-  local current_version_link
-  current_version_link="- [v${current_version}](${remote_url}/blob/${current_version}/CHANGELOG.md)"
-
-  # Extract existing Prior versions links and prune to last 2 minors
-  local existing_prior filtered_prior link link_version link_major link_minor
-  existing_prior=$(awk '/^## Prior versions/{found=1; next} found && /^- \[/{print}' "$changelog_file" || true)
-
-  filtered_prior=""
-  if [ -n "$existing_prior" ]; then
-    while IFS= read -r link; do
-      [ -z "$link" ] && continue
-      link_version=$(echo "$link" | sed 's/.*\[v\([0-9]*\.[0-9]*\.[0-9]*\)\].*/\1/')
-      link_major=$(echo "$link_version" | cut -d. -f1)
-      link_minor=$(echo "$link_version" | cut -d. -f2)
-      if [ "$link_major" -eq "$new_major" ] && [ "$link_minor" -ge "$min_minor" ]; then
-        filtered_prior="${filtered_prior}${link}
-"
-      fi
-    done <<< "$existing_prior"
-  fi
-
-  # Build new CHANGELOG.md
-  local temp_file
-  temp_file=$(mktemp)
-
-  {
-    printf "# Change Log\n\n"
-    printf "## [v%s]\n\n" "$new_version"
-    printf "### Added\n\n"
-    echo "- Support for Wazuh ${new_version}"
-    echo ""
-    printf "## Prior versions\n\n"
-    echo "$current_version_link"
-    if [ -n "$filtered_prior" ]; then
-      printf "%s" "$filtered_prior"
-    fi
-  } > "$temp_file"
-
-  mv "$temp_file" "$changelog_file" || {
-    log "ERROR: Failed to update $changelog_file"
+  bash "$changelog_script" "${args[@]}" 2>&1 | tee -a "$LOG_FILE"
+  if [ "${PIPESTATUS[0]}" -ne 0 ]; then
+    log "ERROR: Failed to update CHANGELOG.md"
     exit 1
-  }
-  log "CHANGELOG.md updated successfully."
+  fi
 }
 
 get_git_ref_replacement(){
