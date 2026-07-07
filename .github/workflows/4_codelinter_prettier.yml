@@ -5,6 +5,11 @@ on:
     branches:
       - 4.*
     types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   prettier:
     name: Ensure the code format on the changed files

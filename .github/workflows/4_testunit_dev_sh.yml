@@ -8,9 +8,15 @@ on:
       - 'docker/osd-dev/scripts/**'
     branches:
       - 4.*
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   scripts-tests:
+    if: github.event.pull_request.draft == false
     runs-on: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v4
