@@ -117,7 +117,7 @@ const TEMPLATE_SOURCES = {
   'events-unclassified': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/unclassified.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-unclassified.json',
