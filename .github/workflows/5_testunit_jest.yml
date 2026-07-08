@@ -29,6 +29,8 @@ on:
       - main # Remove this when main changes to 6.x
       - 5.*
     types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'plugins/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
