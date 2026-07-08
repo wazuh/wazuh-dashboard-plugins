@@ -24,4 +24,4 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
       - uses: dangoslen/changelog-enforcer@v3
         with:
-          skipLabels: 'no changelog'
+          skipLabels: 'no-changelog'
