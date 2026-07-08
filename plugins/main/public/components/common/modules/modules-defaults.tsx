@@ -177,17 +177,17 @@ export const ModulesDefaults = {
       {
         id: TAB_VIEW_ID_DASHBOARD,
         name: TAB_VIEW_NAME_DASHBOARD,
-        buttons: [ButtonModuleGenerateReport],
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardCaseManagement,
       },
       {
         id: 'cases',
         name: 'Cases',
-        buttons: [],
+        buttons: [ButtonExploreAgent],
         component: CaseManagementCases,
       },
     ],
-    availableFor: ['manager'],
+    availableFor: ['manager', 'agent'],
   },
   fim: {
     init: TAB_VIEW_ID_DASHBOARD,
