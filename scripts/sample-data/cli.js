@@ -1,17 +1,34 @@
 #!/usr/bin/env node
 
-const { generateSampleDataWithDataset } = require('./lib/index');
+const {
+  generateSampleDataWithDataset,
+  generateSampleDataWithFinding,
+  listFindings,
+} = require('./lib/index');
 const path = require('path');
 const fs = require('fs');
 
-// Get available datasets first
+// Root of the sample-data module (holds ./dataset and ./findings).
+const SAMPLE_DATA_DIR = path.join(
+  __dirname,
+  '../../plugins/main/server/lib/sample-data',
+);
+
+// --- Available catalogues ---------------------------------------------------
+
+// Synthesized datasets: first-level folders under ./dataset (excluding stray
+// .js files), each with a main.js that GENERATES documents on the fly.
 const datasets = fs
-  .readdirSync(
-    path.join(__dirname, '../../plugins/main/server/lib/sample-data/dataset'),
-  )
+  .readdirSync(path.join(SAMPLE_DATA_DIR, 'dataset'))
   .filter(file => !file.endsWith('.js'));
 
-// Default alert generation parameters
+// Pre-generated findings: folders under ./findings that contain a main.js.
+// May be nested (e.g. "aws/cloudtrail", "wazuh-sca"). Reported as paths
+// relative to ./findings.
+const findings = listFindings();
+
+// --- Default parameters -----------------------------------------------------
+
 const defaultAlertGenerationParams = {
   manager: {
     name: 'wazuh-manager',
@@ -22,28 +39,30 @@ const defaultAlertGenerationParams = {
   },
 };
 
-// Define the formats
+// --- Output formats ---------------------------------------------------------
+
 const formats = {
   ndjson: {
-    description: 'Format the alerts to ndjson. Each line is an alert.',
-    run: alerts => {
-      return alerts.map(item => JSON.stringify(item)).join('\n');
-    },
+    description: 'Format the documents to ndjson. Each line is a document.',
+    run: docs => docs.map(item => JSON.stringify(item)).join('\n'),
   },
   'bulk-api': {
-    description: 'Format the alerts to OpenSearch or Elasticsearch Bulk API.',
-    run: (alerts, index) => {
+    description:
+      'Format the documents to OpenSearch or Elasticsearch Bulk API.',
+    run: (docs, index) => {
       if (!index) {
         console.error(
           'Index is not defined. Use --index parameter with bulk-api format.',
         );
         process.exit(1);
       }
+      // "create" (instead of "index") keeps re-seeding idempotent when the
+      // documents carry a deterministic _id; with auto-ids it still avoids
+      // silently overwriting existing docs.
       return (
-        alerts
+        docs
           .map(
-            alert =>
-              `{"index": {"_index": "${index}"}}\n${JSON.stringify(alert)}`,
+            doc => `{"create": {"_index": "${index}"}}\n${JSON.stringify(doc)}`,
           )
           .join('\n') + '\n'
       );
@@ -51,20 +70,43 @@ const formats = {
   },
 };
 
-// Parse command line arguments
+// --- Usage ------------------------------------------------------------------
+
 const args = process.argv.slice(2);
 const usage = `
-Usage: node cli.js [options]
+Usage: node cli.js (--dataset <name> | --finding <path> | --all-findings) [options]
 
-Options:
-  --dataset <name>     Dataset name to use (required) (available datasets: ${datasets.join(
-    ', ',
-  )})
-  --count <number>     Number of alerts to generate (default: 100)
-  --output <file>      Output file to save the generated sample data (optional)
-  --format <format>    Output format (default: ndjson)
-                       Available formats: ${Object.keys(formats).join(', ')}
-  --index <name>       Index name for bulk-api format (required when using bulk-api format)
+This CLI can seed sample data from two catalogues:
+
+  1. dataset   Synthesized data. Each dataset GENERATES fresh random documents
+               on every call. Use --count to choose how many to generate.
+
+  2. findings  Pre-generated data catalogued by module. Documents are loaded
+               from disk; their timestamps are reajusted and the manager/cluster
+               params injected on the fly. --count samples (with repetition) N
+               documents from the module's base set; if --count is omitted for a
+               finding, every base document is emitted once.
+
+Source selection (choose one):
+  --dataset <name>       Synthesized dataset to generate
+                         (available: ${datasets.join(', ')})
+  --finding <path>       Pre-generated finding to load, path relative to
+                         ./findings (available: ${
+                           findings.join(', ') || '(none yet)'
+                         })
+  --all-findings         Load every available finding. --count (if given)
+                         applies PER module; if omitted, every base document of
+                         each module is emitted once.
+
+Common options:
+  --count <number>       Number of documents to generate/sample.
+                         Default for --dataset: 100.
+                         Default for --finding / --all-findings: all base docs.
+  --output <file>        Output file to save the generated data (optional;
+                         defaults to stdout)
+  --format <format>      Output format (default: ndjson)
+                         Available formats: ${Object.keys(formats).join(', ')}
+  --index <name>         Index name for bulk-api format (required with bulk-api)
   --param-manager-name <name>  Set the manager name (default: ${
     defaultAlertGenerationParams.manager.name
   })
@@ -74,22 +116,38 @@ Options:
   --param-cluster-node <name>  Set the cluster node (default: ${
     defaultAlertGenerationParams.cluster.node
   })
-  --help               Show this help message
+  --help                 Show this help message
 
-Example:
+Examples:
+  # Synthesized dataset (unchanged legacy behaviour)
   node cli.js --dataset states-fim-files --count 500
   node cli.js --dataset states-fim-files --count 500 --output sample-data.ndjson
-  node cli.js --dataset states-fim-files --count 500 --format bulk-api --index wazuh-states-fim-files-sample --output bulk-data.json
-  node cli.js --dataset states-fim-files --param-manager-name my-manager --param-cluster-name my-cluster
+
+  # Pre-generated finding
+  node cli.js --finding aws/cloudtrail
+  node cli.js --finding aws/cloudtrail --count 20 --output cloudtrail.ndjson
+  node cli.js --finding wazuh-sca --format bulk-api --index wazuh-alerts-sample
+
+  # Every finding at once (20 documents per module)
+  node cli.js --all-findings --count 20 --output all.ndjson
+
+  # Every finding, each base document once
+  node cli.js --all-findings --format bulk-api --index wazuh-alerts-sample
 `;
 
-// Parse arguments
+// --- Argument parsing -------------------------------------------------------
+
 let dataset = null;
-let count = 100;
+let finding = null;
+let allFindings = false;
+let count = null; // resolved to a default later, depending on source
 let outputFile = null;
 let format = 'ndjson';
 let index = null;
-const alertGenerationParams = { ...defaultAlertGenerationParams };
+const alertGenerationParams = {
+  manager: { ...defaultAlertGenerationParams.manager },
+  cluster: { ...defaultAlertGenerationParams.cluster },
+};
 
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--help') {
@@ -98,6 +156,11 @@ for (let i = 0; i < args.length; i++) {
   } else if (args[i] === '--dataset' && i + 1 < args.length) {
     dataset = args[i + 1];
     i++;
+  } else if (args[i] === '--finding' && i + 1 < args.length) {
+    finding = args[i + 1];
+    i++;
+  } else if (args[i] === '--all-findings') {
+    allFindings = true;
   } else if (args[i] === '--count' && i + 1 < args.length) {
     count = parseInt(args[i + 1], 10);
     if (isNaN(count)) {
@@ -138,89 +201,127 @@ for (let i = 0; i < args.length; i++) {
   }
 }
 
-// Validate required arguments
-if (!dataset) {
-  console.error('Error: --dataset is required');
+// --- Validation -------------------------------------------------------------
+
+const sourcesSelected = [dataset, finding, allFindings ? 'all' : null].filter(
+  Boolean,
+).length;
+
+if (sourcesSelected === 0) {
+  console.error(
+    'Error: choose a source: --dataset <name>, --finding <path>, or --all-findings',
+  );
+  console.log(usage);
+  process.exit(1);
+}
+if (sourcesSelected > 1) {
+  console.error(
+    'Error: --dataset, --finding and --all-findings are mutually exclusive',
+  );
   console.log(usage);
   process.exit(1);
 }
 
-// Validate index parameter when using bulk-api format
+if (dataset && !datasets.includes(dataset)) {
+  console.error(
+    `Error: unknown dataset '${dataset}'. Available: ${datasets.join(', ')}`,
+  );
+  console.log(usage);
+  process.exit(1);
+}
+if (finding && !findings.includes(finding)) {
+  console.error(
+    `Error: unknown finding '${finding}'. Available: ${findings.join(', ')}`,
+  );
+  console.log(usage);
+  process.exit(1);
+}
+
 if (format === 'bulk-api' && !index) {
   console.error('Error: --index is required when using bulk-api format');
   console.log(usage);
   process.exit(1);
 }
 
-try {
-  const resultOrPromise = [];
+// --- Generation -------------------------------------------------------------
 
-  for (let i = 0; i < count; i++) {
-    resultOrPromise.push(
-      generateSampleDataWithDataset(dataset, alertGenerationParams),
-    );
+// Generates `n` documents from a single finding module, cycling over its base
+// documents by passing a sequential index (so --count is deterministic).
+function generateFinding(name, n, params) {
+  const docs = [];
+  for (let i = 0; i < n; i++) {
+    docs.push(generateSampleDataWithFinding(name, { ...params, index: i }));
   }
-
-  // Check if the result is a Promise
-  if (resultOrPromise && typeof resultOrPromise.then === 'function') {
-    // Handle as Promise
-    resultOrPromise
-      .then(result => {
-        handleResult(result);
-      })
-      .catch(error => {
-        console.error('Error generating alerts:', error);
-        process.exit(1);
-      });
-  } else {
-    // Handle as direct result
-    handleResult(resultOrPromise);
-  }
-} catch (error) {
-  console.error('Error generating alerts:', error);
-  process.exit(1);
+  return docs;
 }
 
-// Function to handle the result
-function handleResult(result) {
-  // Check if result exists
-  if (!result) {
-    console.log('No alerts were generated');
-    return;
-  }
+let allDocs = [];
 
-  // Ensure result is an array
-  const alertsArray = Array.isArray(result) ? result : [result];
-
-  // Save to file if output file is specified
-  if (outputFile) {
-    const outputPath = path.resolve(outputFile);
-
-    try {
-      // Format the data according to the selected format
-      let formattedData;
-      if (format === 'ndjson') {
-        formattedData = formats.ndjson.run(alertsArray);
-      } else if (format === 'bulk-api') {
-        formattedData = formats['bulk-api'].run(alertsArray, index);
-      }
-
-      fs.writeFileSync(outputPath, formattedData);
-      console.log(`Alerts saved to ${outputPath} in ${format} format`);
-    } catch (error) {
-      console.error('Error saving to file:', error);
-      console.log('Result type:', typeof result);
-      console.log(
-        'Result structure:',
-        JSON.stringify(result).substring(0, 200) + '...',
+try {
+  if (dataset) {
+    const n = count == null ? 100 : count; // legacy default
+    for (let i = 0; i < n; i++) {
+      allDocs.push(
+        generateSampleDataWithDataset(dataset, alertGenerationParams),
       );
     }
   } else {
-    // Output to console in the selected format
-    if (format === 'ndjson') {
-      console.log(formats.ndjson.run(alertsArray));
-    } else if (format === 'bulk-api') {
-      console.log(formats['bulk-api'].run(alertsArray, index));
+    const targets = allFindings ? findings : [finding];
+    for (const name of targets) {
+      const baseLen = findingBaseLength(name);
+      const n = count == null ? baseLen : count;
+      allDocs.push(...generateFinding(name, n, alertGenerationParams));
     }
+  }
+} catch (error) {
+  console.error('Error generating documents:', error);
+  process.exit(1);
+}
+
+// --- Output -----------------------------------------------------------------
+
+handleResult(allDocs);
+
+function handleResult(result) {
+  if (!result || result.length === 0) {
+    console.log('No documents were generated');
+    return;
+  }
+
+  const docsArray = Array.isArray(result) ? result : [result];
+
+  const formatted =
+    format === 'bulk-api'
+      ? formats['bulk-api'].run(docsArray, index)
+      : formats.ndjson.run(docsArray);
+
+  if (outputFile) {
+    const outputPath = path.resolve(outputFile);
+    try {
+      fs.writeFileSync(outputPath, formatted);
+      console.error(
+        `Saved ${docsArray.length} documents to ${outputPath} in ${format} format`,
+      );
+    } catch (error) {
+      console.error('Error saving to file:', error);
+    }
+  } else {
+    process.stdout.write(formatted + '\n');
+  }
+}
+
+// --- Helpers ----------------------------------------------------------------
+
+// Number of base documents in a finding module, read directly from its
+// findings.json so "--count omitted" can emit each once.
+function findingBaseLength(name) {
+  const file = path.join(SAMPLE_DATA_DIR, 'findings', name, 'findings.json');
+  const content = fs.readFileSync(file, 'utf8').trim();
+  if (!content) return 0;
+  try {
+    const parsed = JSON.parse(content);
+    return Array.isArray(parsed) ? parsed.length : 1;
+  } catch (e) {
+    return content.split('\n').filter(l => l.trim()).length;
   }
 }
