@@ -1,0 +1,47 @@
+# This workflow runs the unit tests of the tools/ scripts (repository bump
+# and changelog bump) on pull requests that modify anything under tools/.
+#
+# Draft pull requests are skipped; the workflow runs once the PR is ready
+# for review.
+#
+# The tests are plain Bash and run fully offline against throwaway fixture
+# repositories (see tools/tests/README.md).
+
+name: Run tools unit tests
+permissions:
+  contents: read
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'tools/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    if: github.event.pull_request.draft == false
+    name: Run tools unit tests
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Run tools unit tests
+        run: bash tools/tests/run_all.sh
+
+      # On failure run_all.sh keeps the fixture repositories (named after
+      # their test case) in tools/tests/tmp/, including the bumper logs, so
+      # upload them to inspect what happened.
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tools-tests-results
+          path: tools/tests/tmp/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 5
