@@ -27,10 +27,9 @@ function generateFinding(params = {}, targetDir) {
   }
 
   doc.wazuh = doc.wazuh || {};
-  doc.wazuh.manager = { name: params?.manager?.name || 'wazuh-manager' };
   doc.wazuh.cluster = {
-    name: params?.cluster?.name || 'wazuh-cluster',
-    node: params?.cluster?.node || 'wazuh-manager',
+    name: params?.cluster?.name || 'wazuh',
+    node: params?.cluster?.node || 'node01',
   };
 
   return doc;
