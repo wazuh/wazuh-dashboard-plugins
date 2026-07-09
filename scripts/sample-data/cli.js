@@ -3,6 +3,7 @@
 const { generateSampleDataWithDataset } = require('./lib/index');
 const path = require('path');
 const fs = require('fs');
+const { spawnSync } = require('child_process');
 
 // Get avalible datasets
 const datasets = fs
@@ -73,6 +74,13 @@ Options:
   --count <number>      Number of documents to generate per dataset (default: 100)
   --output <file>       Output file to save the generated data (optional;
                         defaults to stdout)
+  --output insert       Value to auto insert the output instead of defaulting to
+                        stout or a file. The curl command with the data will be 
+                        still saved on a log file, inside the logs folder.
+                        insert overrides the format flag to default bulk-api.
+                        Requires WAZUH_INDEXER_HOST, WAZUH_INDEXER_PORT, WAZUH_USERNAME and
+                        WAZUH_PASSWORD environment variables to be set; any
+                        missing value will trigger an interactive prompt.
   --format <format>     Output format (default: ndjson)
                         Available formats: ${Object.keys(formats).join(', ')}
   --index <name>        Index name for bulk-api format (required with bulk-api)
@@ -100,7 +108,7 @@ let dataset = null;
 let all = false;
 let all_findings = false;
 let count = 100;
-let outputFile = null;
+let output = null;
 let format = 'ndjson';
 let index = null;
 const documentGenerationParams = { ...defaultDocumentGenerationParams };
@@ -124,9 +132,6 @@ for (let i = 0; i < args.length; i++) {
       process.exit(1);
     }
     i++;
-  } else if (args[i] === '--output' && i + 1 < args.length) {
-    outputFile = args[i + 1];
-    i++;
   } else if (args[i] === '--format' && i + 1 < args.length) {
     const requestedFormat = args[i + 1];
     if (formats[requestedFormat]) {
@@ -139,6 +144,13 @@ for (let i = 0; i < args.length; i++) {
       );
       console.log(usage);
       process.exit(1);
+    }
+    i++;
+  } else if (args[i] === '--output' && i + 1 < args.length) {
+    output = args[i + 1];
+    if (output === 'insert') {
+      format = 'bulk-api';
+      console.log('output set as "insert", override format as bulk-api');
     }
     i++;
   } else if (args[i] === '--index' && i + 1 < args.length) {
@@ -204,6 +216,121 @@ try {
 // Output
 handleResult(allDocs);
 
+/**
+ * Inserts using curl the data directly to the defined host.
+ * Used by --output insert
+ * It will create a log on ./logs folder.
+ * @param {string} data string with ndsjon format build by bulk-api
+ * @param {Object} config object with the configuration: HOST, PORT, USERNAME, PASSWORD
+ */
+function insertData(data, config) {
+  const { HOST, PORT, USERNAME, PASSWORD } = config;
+  const url = `https://${HOST}:${PORT}/_bulk`;
+
+  const curlArgs = [
+    '-s',
+    '-k',
+    '-u',
+    `${USERNAME}:${PASSWORD}`,
+    '-X',
+    'POST',
+    url,
+    '-H',
+    'Content-Type: application/x-ndjson',
+    '--data-binary',
+    '@-',
+  ];
+
+  const date = new Date().toISOString().replace(/[:.]/g, '-');
+  const logPath = path.join(
+    __dirname,
+    'logs',
+    `cli_sample_data_insert_${date}.log`,
+  );
+
+  const quotedArgs = curlArgs.map(arg => `'${arg}'`).join(' ');
+  log(logPath, `curl ${quotedArgs} <<'EOF'\n${data}\nEOF\n`);
+
+  const result = spawnSync('curl', curlArgs, {
+    input: data,
+    encoding: 'utf-8',
+  });
+
+  if (result.error) {
+    console.error('Error running curl:', result.error.message);
+    log(logPath, `\nError running curl: ${result.error.message}\n`);
+    return;
+  }
+
+  if (result.status !== 0) {
+    console.error(`curl exited with code ${result.status}:`, result.stderr);
+    log(
+      logPath,
+      `\ncurl exited with code ${result.status}:\n${result.stderr}\n`,
+    );
+    return;
+  }
+
+  log(logPath, `\nResponse:\n${result.stdout}\n`);
+
+  try {
+    const response = JSON.parse(result.stdout);
+    const failed = response.errors
+      ? response.items.filter(item => (item.create || item.index)?.error)
+      : [];
+    console.error(
+      failed.length
+        ? `Inserted with ${failed.length} error(s) out of ${response.items.length} documents`
+        : `Successfully inserted ${response.items.length} documents`,
+    );
+  } catch (error) {
+    console.error('Could not parse curl response:', result.stdout);
+  }
+}
+
+/**
+ * Appends content to a log file, creating the 'logs' folder and the file
+ * itself if they don't exist yet.
+ * @param {string} logPath full path of the log file to write to
+ * @param {string} content text to append
+ */
+function log(logPath, content) {
+  fs.mkdirSync(path.dirname(logPath), { recursive: true });
+  fs.appendFileSync(logPath, content);
+}
+
+/**
+ * Validates that the configuration is complete and prompts the user for
+ * missing values.
+ * @param {Object} config empty object or with the configuration:
+ *                        HOST, PORT, USERNAME, PASSWORD
+ * @returns {Object} Will return the configuration completed in case it was
+ *                   missing something.
+ */
+function validateConfig(config) {
+  const defaults = { HOST: 'localhost', PORT: '9200' };
+
+  for (const key of ['HOST', 'PORT', 'USERNAME', 'PASSWORD']) {
+    if (!config[key]) {
+      const fallback = defaults[key];
+      const answer = prompt(`${key}${fallback ? ` (${fallback})` : ''}: `);
+      config[key] = answer || fallback;
+    }
+  }
+
+  return config;
+}
+
+/**
+ * Helper function for validateConfig to prompt the user.
+ */
+function prompt(question) {
+  process.stdout.write(question);
+  const buffer = Buffer.alloc(1024);
+  const bytesRead = fs.readSync(0, buffer, 0, 1024);
+  return buffer.toString('utf8', 0, bytesRead).trim();
+}
+
 function handleResult(result) {
   if (!result || result.length === 0) {
     console.log('No documents were generated');
@@ -217,15 +344,26 @@ function handleResult(result) {
       ? formats['bulk-api'].run(docsArray, index)
       : formats.ndjson.run(docsArray);
 
-  if (outputFile) {
-    const outputPath = path.resolve(outputFile);
-    try {
-      fs.writeFileSync(outputPath, formatted);
-      console.error(
-        `Saved ${docsArray.length} documents to ${outputPath} in ${format} format`,
-      );
-    } catch (error) {
-      console.error('Error saving to file:', error);
+  if (output) {
+    if (output === 'insert') {
+      let config = {
+        HOST: process.env.WAZUH_INDEXER_HOST,
+        PORT: process.env.WAZUH_INDEXER_PORT,
+        USERNAME: process.env.WAZUH_USERNAME,
+        PASSWORD: process.env.WAZUH_PASSWORD,
+      };
+      config = validateConfig(config);
+      insertData(formatted, config);
+    } else {
+      const outputPath = path.resolve(output);
+      try {
+        fs.writeFileSync(outputPath, formatted);
+        console.error(
+          `Saved ${docsArray.length} documents to ${outputPath} in ${format} format`,
+        );
+      } catch (error) {
+        console.error('Error saving to file:', error);
+      }
     }
   } else {
     process.stdout.write(formatted + '\n');

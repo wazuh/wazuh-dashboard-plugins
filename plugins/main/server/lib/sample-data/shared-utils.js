@@ -139,7 +139,7 @@ function generateRandomChecksum() {
 // Loader Functions - For pre-generated documents
 // ============================================================================
 /**
- *Load every .json/.ndjson file in a data directory into one flat array of documents
+ * Load every .json/.ndjson file in a data directory into one flat array of documents
  * @param {string} target - Absolute path to a directory
  * @returns {Object[]} Array with the parsed data
  */

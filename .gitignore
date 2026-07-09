@@ -94,3 +94,6 @@ bin/
 site-packages/
 lib64
 pyvenv.cfg
+
+# Sample data cli logs
+scripts/sample-data/logs
