@@ -19,6 +19,12 @@ export interface CtiSubscriptionSnapshot {
   status: number | null;
 }
 
+/** Outcome of a best-effort Content Manager update attempt for this poll cycle. */
+export interface CtiContentUpdateOutcome {
+  triggered: boolean;
+  failed: boolean;
+}
+
 export interface CtiRegistrationStatusApiBody {
   registrationComplete: boolean;
   inProgress: boolean;
@@ -30,4 +36,6 @@ export interface CtiRegistrationStatusApiBody {
   poll_interval_sec?: number;
   /** Seconds remaining for the device code (derived from server expiry). */
   expires_in_remaining_sec?: number;
+  /** Present only when a content update was attempted for this poll cycle. */
+  contentUpdate?: CtiContentUpdateOutcome;
 }

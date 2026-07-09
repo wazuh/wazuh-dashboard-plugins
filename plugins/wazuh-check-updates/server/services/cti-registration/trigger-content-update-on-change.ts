@@ -1,16 +1,16 @@
 import { IScopedClusterClient } from 'opensearch-dashboards/server';
 import { contentManagerRoutes } from '../../../common/constants';
-import type { CtiSubscriptionSnapshot } from '../../../common/cti-registration-status-api';
+import type {
+  CtiContentUpdateOutcome,
+  CtiSubscriptionSnapshot,
+} from '../../../common/cti-registration-status-api';
 import { getWazuhCheckUpdatesServices } from '../../plugin-services';
 import {
   CtiRegistrationStore,
   SubscriptionSnapshot,
 } from './cti-registration-store';
 
-export type CtiContentUpdateOutcome = {
-  triggered: boolean;
-  failed: boolean;
-};
+export type { CtiContentUpdateOutcome };
 
 function toSnapshot(
   subscription: CtiSubscriptionSnapshot,
