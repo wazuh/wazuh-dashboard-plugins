@@ -75,36 +75,33 @@ export function WazuhElasticRoutes(router: IRouter) {
         body: schema.object({
           status: schema.maybe(
             schema.oneOf([
-              schema.literal('ACTIVE'),
-              schema.literal('ACKNOWLEDGED'),
-              schema.literal('COMPLETED'),
-              schema.literal('ERROR'),
-              schema.literal('DELETED'),
-              schema.literal('AUDIT'),
+              schema.literal('active'),
+              schema.literal('acknowledged'),
+              schema.literal('completed'),
+              schema.literal('error'),
+              schema.literal('deleted'),
+              schema.literal('audit'),
             ]),
           ),
           title: schema.maybe(schema.string({ maxLength: 1024 })),
           description: schema.maybe(schema.string()),
           tags: schema.maybe(schema.arrayOf(schema.string())),
-          // '' is the "clear the value" sentinel on the optional enums: the
-          // indexer update endpoint merges documents, so keys cannot be
-          // removed, only overwritten.
           severity: schema.maybe(
             schema.oneOf([
-              schema.literal('INFORMATIONAL'),
-              schema.literal('LOW'),
-              schema.literal('MEDIUM'),
-              schema.literal('HIGH'),
-              schema.literal('CRITICAL'),
+              schema.literal('informational'),
+              schema.literal('low'),
+              schema.literal('medium'),
+              schema.literal('high'),
+              schema.literal('critical'),
               schema.literal(''),
             ]),
           ),
           priority: schema.maybe(
             schema.oneOf([
-              schema.literal('URGENT'),
-              schema.literal('HIGH'),
-              schema.literal('MEDIUM'),
-              schema.literal('LOW'),
+              schema.literal('urgent'),
+              schema.literal('high'),
+              schema.literal('medium'),
+              schema.literal('low'),
               schema.literal(''),
             ]),
           ),

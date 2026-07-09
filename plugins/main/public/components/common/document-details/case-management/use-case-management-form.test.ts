@@ -35,9 +35,9 @@ const LATER = '2026-07-01T12:00:00.000Z';
 const fullCase: CaseData = {
   title: 'a title',
   description: 'a description',
-  status: 'ACTIVE',
-  severity: 'HIGH',
-  priority: 'URGENT',
+  status: 'active',
+  severity: 'high',
+  priority: 'urgent',
   tlp: 'TLP:AMBER',
   tags: ['one', 'two'],
   comments: [
@@ -68,11 +68,11 @@ describe('caseFormReducer', () => {
     const state = loadedState(fullCase);
 
     expect(state).toMatchObject({
-      status: 'ACTIVE',
+      status: 'active',
       title: 'a title',
       description: 'a description',
-      severity: 'HIGH',
-      priority: 'URGENT',
+      severity: 'high',
+      priority: 'urgent',
       tlp: 'TLP:AMBER',
       tags: [{ label: 'one' }, { label: 'two' }],
       comments: fullCase.comments,
@@ -115,8 +115,8 @@ describe('caseFormReducer', () => {
   it.each([
     ['SET_TITLE', 'new title'],
     ['SET_DESCRIPTION', 'new description'],
-    ['SET_SEVERITY', 'CRITICAL'],
-    ['SET_PRIORITY', 'LOW'],
+    ['SET_SEVERITY', 'critical'],
+    ['SET_PRIORITY', 'low'],
     ['SET_TLP', 'TLP:RED'],
   ] as const)('%s marks the form dirty', (type, payload) => {
     const state = caseFormReducer(loadedState(fullCase), {
@@ -344,7 +344,7 @@ describe('useCaseManagementForm', () => {
       'wazuh-findings-v5-security',
       'doc-1',
       {
-        status: 'ACTIVE',
+        status: 'active',
         tags: ['one', 'two'],
         title: 'edited title',
         severity: '',
@@ -386,11 +386,11 @@ describe('useCaseManagementForm', () => {
 
   it('sends none of the new schema fields on a status-only change', async () => {
     (getFindingsCase as jest.Mock).mockResolvedValue({
-      case: { status: 'ACTIVE', tags: ['one'] },
+      case: { status: 'active', tags: ['one'] },
       username: 'admin',
     });
     (updateDocumentCase as jest.Mock).mockResolvedValue({
-      case: { status: 'COMPLETED', tags: ['one'] },
+      case: { status: 'completed', tags: ['one'] },
       username: 'admin',
     });
 
@@ -398,7 +398,7 @@ describe('useCaseManagementForm', () => {
     await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
 
     act(() => {
-      result.current.setStatus('COMPLETED');
+      result.current.setStatus('completed');
     });
     await act(async () => {
       await result.current.handleSave();
@@ -407,7 +407,7 @@ describe('useCaseManagementForm', () => {
     expect(updateDocumentCase).toHaveBeenCalledWith(
       'wazuh-findings-v5-security',
       'doc-1',
-      { status: 'COMPLETED', tags: ['one'] },
+      { status: 'completed', tags: ['one'] },
     );
   });
 

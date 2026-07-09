@@ -18,7 +18,7 @@ beforeEach(() => {
 describe('getFindingsCase', () => {
   it('GETs the encoded route and returns the case and username', async () => {
     mockRequest.mockResolvedValue({
-      data: { case: { status: 'ACTIVE' }, username: 'admin' },
+      data: { case: { status: 'active' }, username: 'admin' },
     });
 
     const result = await getFindingsCase('.ds-wazuh/findings', 'doc/1');
@@ -27,7 +27,7 @@ describe('getFindingsCase', () => {
       'GET',
       '/indexer/findings/case/.ds-wazuh%2Ffindings/doc%2F1',
     );
-    expect(result).toEqual({ case: { status: 'ACTIVE' }, username: 'admin' });
+    expect(result).toEqual({ case: { status: 'active' }, username: 'admin' });
   });
 
   it('maps a missing case to null', async () => {
@@ -43,11 +43,11 @@ describe('getFindingsCase', () => {
 describe('updateDocumentCase', () => {
   it('POSTs the payload verbatim and returns the saved case and username', async () => {
     const payload = {
-      status: 'ACTIVE' as const,
+      status: 'active' as const,
       tags: ['a'],
       title: 't',
       description: 'd',
-      severity: 'HIGH' as const,
+      severity: 'high' as const,
       priority: '' as const,
       tlp: 'TLP:GREEN' as const,
       newComment: 'note',
@@ -56,7 +56,7 @@ describe('updateDocumentCase', () => {
       ],
     };
     mockRequest.mockResolvedValue({
-      data: { case: { status: 'ACTIVE' }, username: 'admin' },
+      data: { case: { status: 'active' }, username: 'admin' },
     });
 
     const result = await updateDocumentCase('index', 'doc', payload);
@@ -66,7 +66,7 @@ describe('updateDocumentCase', () => {
       '/indexer/findings/case/index/doc',
       payload,
     );
-    expect(result).toEqual({ case: { status: 'ACTIVE' }, username: 'admin' });
+    expect(result).toEqual({ case: { status: 'active' }, username: 'admin' });
   });
 });
 

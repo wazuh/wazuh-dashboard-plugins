@@ -524,13 +524,13 @@ export class WazuhElasticCtrl {
         casePayload.description = description;
       }
       if (severity !== undefined) {
-        casePayload.severity = severity;
+        casePayload.severity = severity === '' ? null : severity;
       }
       if (priority !== undefined) {
-        casePayload.priority = priority;
+        casePayload.priority = priority === '' ? null : priority;
       }
       if (tlp !== undefined) {
-        casePayload.tlp = tlp;
+        casePayload.tlp = tlp === '' ? null : tlp;
       }
       // The indexer endpoint merges documents (objects merge, arrays are
       // replaced wholesale), so comments are only sent when they changed.

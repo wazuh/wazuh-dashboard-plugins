@@ -52,31 +52,31 @@ import {
 } from './use-case-management-form';
 
 const CASE_STATUS_OPTIONS: Array<{ value: CaseStatus; text: string }> = [
-  { value: 'ACTIVE', text: 'Active' },
-  { value: 'ACKNOWLEDGED', text: 'Acknowledged' },
-  { value: 'COMPLETED', text: 'Completed' },
-  { value: 'AUDIT', text: 'Audit' },
-  { value: 'ERROR', text: 'Error' },
-  { value: 'DELETED', text: 'Deleted' },
+  { value: 'active', text: 'Active' },
+  { value: 'acknowledged', text: 'Acknowledged' },
+  { value: 'completed', text: 'Completed' },
+  { value: 'audit', text: 'Audit' },
+  { value: 'error', text: 'Error' },
+  { value: 'deleted', text: 'Deleted' },
 ];
 
 const CASE_SEVERITY_OPTIONS: Array<{ value: CaseSeverity | ''; text: string }> =
   [
     { value: '', text: '—' },
-    { value: 'INFORMATIONAL', text: 'Informational' },
-    { value: 'LOW', text: 'Low' },
-    { value: 'MEDIUM', text: 'Medium' },
-    { value: 'HIGH', text: 'High' },
-    { value: 'CRITICAL', text: 'Critical' },
+    { value: 'informational', text: 'Informational' },
+    { value: 'low', text: 'Low' },
+    { value: 'medium', text: 'Medium' },
+    { value: 'high', text: 'High' },
+    { value: 'critical', text: 'Critical' },
   ];
 
 const CASE_PRIORITY_OPTIONS: Array<{ value: CasePriority | ''; text: string }> =
   [
     { value: '', text: '—' },
-    { value: 'URGENT', text: 'Urgent' },
-    { value: 'HIGH', text: 'High' },
-    { value: 'MEDIUM', text: 'Medium' },
-    { value: 'LOW', text: 'Low' },
+    { value: 'urgent', text: 'Urgent' },
+    { value: 'high', text: 'High' },
+    { value: 'medium', text: 'Medium' },
+    { value: 'low', text: 'Low' },
   ];
 
 const CASE_TLP_OPTIONS: Array<{ value: CaseTLP | ''; text: string }> = [
@@ -88,27 +88,27 @@ const CASE_TLP_OPTIONS: Array<{ value: CaseTLP | ''; text: string }> = [
 ];
 
 const STATUS_BADGE_COLOR: Record<CaseStatus, string> = {
-  ACTIVE: 'primary',
-  ACKNOWLEDGED: 'warning',
-  COMPLETED: 'success',
-  AUDIT: 'accent',
-  ERROR: 'danger',
-  DELETED: 'default',
+  active: 'primary',
+  acknowledged: 'warning',
+  completed: 'success',
+  audit: 'accent',
+  error: 'danger',
+  deleted: 'default',
 };
 
 const SEVERITY_BADGE_COLOR: Record<CaseSeverity, string> = {
-  INFORMATIONAL: 'default',
-  LOW: 'success',
-  MEDIUM: 'warning',
-  HIGH: 'accent',
-  CRITICAL: 'danger',
+  informational: 'default',
+  low: 'success',
+  medium: 'warning',
+  high: 'accent',
+  critical: 'danger',
 };
 
 const PRIORITY_BADGE_COLOR: Record<CasePriority, string> = {
-  LOW: 'default',
-  MEDIUM: 'warning',
-  HIGH: 'accent',
-  URGENT: 'danger',
+  low: 'default',
+  medium: 'warning',
+  high: 'accent',
+  urgent: 'danger',
 };
 
 const TLP_BADGE_COLOR: Record<CaseTLP, string> = {
@@ -457,8 +457,8 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
               </EuiFlexItem>
               {status && (
                 <EuiFlexItem grow={false}>
-                  <EuiBadge color={STATUS_BADGE_COLOR[status]}>
-                    {status}
+                  <EuiBadge color={STATUS_BADGE_COLOR[status] ?? 'default'}>
+                    {optionText(CASE_STATUS_OPTIONS, status) ?? status}
                   </EuiBadge>
                 </EuiFlexItem>
               )}
@@ -516,7 +516,9 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
             />
           </EuiFlexItem>
           {comments.length > 0 && (
-            <EuiFlexItem grow={false}>{renderCommentsThread(false)}</EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              {renderCommentsThread(false)}
+            </EuiFlexItem>
           )}
         </>
       )}

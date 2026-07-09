@@ -13,21 +13,21 @@
 import { GenericRequest } from '../../../../react-services/generic-request';
 
 export type CaseStatus =
-  | 'ACTIVE'
-  | 'ACKNOWLEDGED'
-  | 'COMPLETED'
-  | 'ERROR'
-  | 'DELETED'
-  | 'AUDIT';
+  | 'active'
+  | 'acknowledged'
+  | 'completed'
+  | 'error'
+  | 'deleted'
+  | 'audit';
 
 export type CaseSeverity =
-  | 'INFORMATIONAL'
-  | 'LOW'
-  | 'MEDIUM'
-  | 'HIGH'
-  | 'CRITICAL';
+  | 'informational'
+  | 'low'
+  | 'medium'
+  | 'high'
+  | 'critical';
 
-export type CasePriority = 'URGENT' | 'HIGH' | 'MEDIUM' | 'LOW';
+export type CasePriority = 'urgent' | 'high' | 'medium' | 'low';
 
 export type CaseTLP = 'TLP:RED' | 'TLP:AMBER' | 'TLP:GREEN' | 'TLP:CLEAR';
 
