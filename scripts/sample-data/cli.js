@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
-const { generateSampleDataWithDataset } = require('./lib/index');
+const {
+  generateSampleDataWithDataset,
+  getDatasetIndex,
+} = require('./lib/index');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -29,36 +32,29 @@ const defaultDocumentGenerationParams = {
   },
 };
 
-// Output formats
+// Output formats. Each entry is { doc, index } so bulk-api can route every
+// document to its own resolved index (needed when --all / --all-findings mixes
+// datasets with different default indices).
 const formats = {
   ndjson: {
     description: 'Format the documents to ndjson. Each line is a document.',
-    run: docs => docs.map(item => JSON.stringify(item)).join('\n'),
+    run: entries => entries.map(e => JSON.stringify(e.doc)).join('\n'),
   },
   'bulk-api': {
     description:
       'Format the documents to OpenSearch or Elasticsearch Bulk API.',
-    run: (docs, index) => {
-      if (!index) {
-        console.error(
-          'Index is not defined. Use --index parameter with bulk-api format.',
-        );
-        process.exit(1);
-      }
-      return (
-        docs
-          .map(
-            doc => `{"create": {"_index": "${index}"}}\n${JSON.stringify(doc)}`,
-          )
-          .join('\n') + '\n'
-      );
-    },
+    run: entries =>
+      entries
+        .map(
+          e => `{"create": {"_index": "${e.index}"}}\n${JSON.stringify(e.doc)}`,
+        )
+        .join('\n') + '\n',
   },
 };
 
 const args = process.argv.slice(2);
 const usage = `
-Usage: node cli.js (--dataset <name> | --all) [options]
+Usage: node cli.js (--dataset <name> | --all | --all-findings) [options]
 
 There are two kinds of dataset, both used the same way from this CLI:
 
@@ -67,6 +63,11 @@ There are two kinds of dataset, both used the same way from this CLI:
   - Pre-generated findings (prefixed findings-, e.g. findings-aws):
     load documents from a findings.json, reajust their timestamps and inject
     the manager/cluster params. --count cycles over the base documents.
+
+Each dataset may declare a default index (DATASET_INDEX in its main.js). For
+bulk-api, the index is resolved as: --index (if given) wins for every dataset;
+otherwise each dataset uses its own default. If neither is available for a
+dataset, that dataset errors out.
 
 Options:
   --dataset <name>      Dataset name to use (required) (available datasets: ${datasets.join(
@@ -86,7 +87,8 @@ Options:
                         missing value will trigger an interactive prompt.
   --format <format>     Output format (default: ndjson)
                         Available formats: ${Object.keys(formats).join(', ')}
-  --index <name>        Index name for bulk-api format (required with bulk-api)
+  --index <name>        Index name for bulk-api format. Overrides each dataset's
+                        default index. Required only if a dataset has no default.
   TODO: REMOVE: --param-manager-name  <name>  Set the manager name (default: ${
     defaultDocumentGenerationParams.manager.name
   })
@@ -100,10 +102,10 @@ Options:
 
 Examples:
   node cli.js --dataset states-fim-files --count 500
-  node cli.js --dataset findings-aws/cloudtrail --count 20
-  node cli.js --dataset findings-wazuh-sca --format bulk-api --index wazuh-findings-v5
+  node cli.js --dataset findings-aws --count 20
+  node cli.js --dataset findings-sca --format bulk-api
   node cli.js --all --count 50 --output all.ndjson
-  node cli.js --dataset states-fim-files --param-cluster-name my-cluster
+  node cli.js --all-findings --output insert
 `;
 
 // Parse arguments
@@ -173,7 +175,9 @@ for (let i = 0; i < args.length; i++) {
 
 // Validation
 if (!dataset && !all && !all_findings) {
-  console.error('Error: choose a source: --dataset <name> or --all');
+  console.error(
+    'Error: choose a source: --dataset <name>, --all or --all-findings',
+  );
   console.log(usage);
   process.exit(1);
 }
@@ -191,25 +195,45 @@ if (dataset && !datasets.includes(dataset)) {
   console.log(usage);
   process.exit(1);
 }
-if (format === 'bulk-api' && !index) {
-  console.error('Error: --index is required when using bulk-api format');
-  console.log(usage);
-  process.exit(1);
+
+// Resolve the target datasets up front so indices can be validated before
+// generating anything.
+const targets = all ? datasets : all_findings ? findings_datasets : [dataset];
+
+// For bulk-api, resolve each dataset's index (--index wins; otherwise the
+// dataset's own default) and fail early listing every dataset with no index.
+if (format === 'bulk-api') {
+  const missing = [];
+  for (const name of targets) {
+    if (!(index || getDatasetIndex(name))) {
+      missing.push(name);
+    }
+  }
+  if (missing.length > 0) {
+    console.error(
+      `Error: no index for bulk-api on: ${missing.join(', ')}. ` +
+        `Pass --index, or declare DATASET_INDEX in each dataset's main.js.`,
+    );
+    console.log(usage);
+    process.exit(1);
+  }
 }
 
-// Generation
-const allDocs = [];
+// Generation. Each entry keeps its resolved index alongside the document.
+const entries = [];
 try {
-  const targets = all ? datasets : all_findings ? findings_datasets : [dataset];
   for (const name of targets) {
     console.time(`generate-${name}`);
+    const resolvedIndex = index || getDatasetIndex(name) || null;
+
     for (let i = 0; i < count; i++) {
-      allDocs.push(
-        generateSampleDataWithDataset(name, {
+      entries.push({
+        doc: generateSampleDataWithDataset(name, {
           ...documentGenerationParams,
           index: i,
         }),
-      );
+        index: resolvedIndex,
+      });
     }
     console.timeEnd(`generate-${name}`);
   }
@@ -418,18 +442,29 @@ function handleResult(result) {
 
   const formatted =
     format === 'bulk-api'
-      ? formats['bulk-api'].run(docsArray, index)
-      : formats.ndjson.run(docsArray);
+      ? formats['bulk-api'].run(result)
+      : formats.ndjson.run(result);
 
   if (output) {
-    const outputPath = path.resolve(output);
-    try {
-      fs.writeFileSync(outputPath, formatted);
-      console.error(
-        `Saved ${docsArray.length} documents to ${outputPath} in ${format} format`,
-      );
-    } catch (error) {
-      console.error('Error saving to file:', error);
+    if (output === 'insert') {
+      let config = {
+        HOST: process.env.WAZUH_INDEXER_HOST,
+        PORT: process.env.WAZUH_INDEXER_PORT,
+        USERNAME: process.env.WAZUH_USERNAME,
+        PASSWORD: process.env.WAZUH_PASSWORD,
+      };
+      config = validateConfig(config);
+      insertData(formatted, config);
+    } else {
+      const outputPath = path.resolve(output);
+      try {
+        fs.writeFileSync(outputPath, formatted);
+        console.error(
+          `Saved ${result.length} documents to ${outputPath} in ${format} format`,
+        );
+      } catch (error) {
+        console.error('Error saving to file:', error);
+      }
     }
   } else {
     process.stdout.write(formatted + '\n');

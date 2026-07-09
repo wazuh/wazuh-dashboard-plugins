@@ -6,4 +6,4 @@ function generateDocument(params = {}) {
   return generateFinding(params, __dirname);
 }
 
-module.exports = { generateDocument };
+module.exports = { generateDocument, DATASET_INDEX };
