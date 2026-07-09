@@ -1,0 +1,200 @@
+import { CtiRegistrationStore } from './cti-registration-store';
+import { triggerContentUpdateOnChange } from './trigger-content-update-on-change';
+import { getWazuhCheckUpdatesServices } from '../../plugin-services';
+
+jest.mock('../../plugin-services', () => ({
+  getWazuhCheckUpdatesServices: jest.fn(),
+}));
+
+const mockedGetWazuhCheckUpdatesServices =
+  getWazuhCheckUpdatesServices as jest.Mock;
+
+function buildWazuhClient(requestImpl: jest.Mock) {
+  return {
+    asCurrentUser: {
+      transport: {
+        request: requestImpl,
+      },
+    },
+  } as any;
+}
+
+describe('triggerContentUpdateOnChange', () => {
+  const logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
+
+  beforeEach(() => {
+    CtiRegistrationStore.resetForTests();
+    logger.error.mockClear();
+    mockedGetWazuhCheckUpdatesServices.mockReturnValue({ logger });
+  });
+
+  test('first observation stores baseline only, does not fire', async () => {
+    const contentUpdate = jest.fn().mockResolvedValue({});
+    const wazuhClient = buildWazuhClient(contentUpdate);
+
+    const outcome = await triggerContentUpdateOnChange(
+      wazuhClient,
+      'env-uuid-1',
+      { message: { is_registered: true, plan: { name: 'basic', is_public: true } }, status: 200 },
+    );
+
+    expect(outcome).toEqual({ triggered: false, failed: false });
+    expect(contentUpdate).not.toHaveBeenCalled();
+    expect(CtiRegistrationStore.getInstance().getSubscriptionSnapshot('env-uuid-1')).toEqual({
+      isRegistered: true,
+      planName: 'basic',
+    });
+  });
+
+  test('fires when unregistered transitions to registered', async () => {
+    const contentUpdate = jest.fn().mockResolvedValue({});
+    const wazuhClient = buildWazuhClient(contentUpdate);
+    const store = CtiRegistrationStore.getInstance();
+    store.setSubscriptionSnapshot('env-uuid-1', {
+      isRegistered: false,
+      planName: '',
+    });
+
+    const outcome = await triggerContentUpdateOnChange(
+      wazuhClient,
+      'env-uuid-1',
+      { message: { is_registered: true, plan: { name: 'basic', is_public: true } }, status: 200 },
+    );
+
+    expect(outcome).toEqual({ triggered: true, failed: false });
+    expect(contentUpdate).toHaveBeenCalledTimes(1);
+    expect(contentUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ method: 'POST', body: {} }),
+    );
+  });
+
+  test('fires when plan name changes while registered', async () => {
+    const contentUpdate = jest.fn().mockResolvedValue({});
+    const wazuhClient = buildWazuhClient(contentUpdate);
+    const store = CtiRegistrationStore.getInstance();
+    store.setSubscriptionSnapshot('env-uuid-1', {
+      isRegistered: true,
+      planName: 'basic',
+    });
+
+    const outcome = await triggerContentUpdateOnChange(
+      wazuhClient,
+      'env-uuid-1',
+      { message: { is_registered: true, plan: { name: 'advanced', is_public: true } }, status: 200 },
+    );
+
+    expect(outcome).toEqual({ triggered: true, failed: false });
+    expect(contentUpdate).toHaveBeenCalledTimes(1);
+  });
+
+  test('does not fire on steady state (no change)', async () => {
+    const contentUpdate = jest.fn().mockResolvedValue({});
+    const wazuhClient = buildWazuhClient(contentUpdate);
+    const store = CtiRegistrationStore.getInstance();
+    store.setSubscriptionSnapshot('env-uuid-1', {
+      isRegistered: true,
+      planName: 'advanced',
+    });
+
+    const outcome = await triggerContentUpdateOnChange(
+      wazuhClient,
+      'env-uuid-1',
+      { message: { is_registered: true, plan: { name: 'advanced', is_public: true } }, status: 200 },
+    );
+
+    expect(outcome).toEqual({ triggered: false, failed: false });
+    expect(contentUpdate).not.toHaveBeenCalled();
+  });
+
+  test('skips firing on unregistration', async () => {
+    const contentUpdate = jest.fn().mockResolvedValue({});
+    const wazuhClient = buildWazuhClient(contentUpdate);
+    const store = CtiRegistrationStore.getInstance();
+    store.setSubscriptionSnapshot('env-uuid-1', {
+      isRegistered: true,
+      planName: 'advanced',
+    });
+
+    const outcome = await triggerContentUpdateOnChange(
+      wazuhClient,
+      'env-uuid-1',
+      { message: { is_registered: false, plan: { name: 'advanced', is_public: true } }, status: 200 },
+    );
+
+    expect(outcome).toEqual({ triggered: false, failed: false });
+    expect(contentUpdate).not.toHaveBeenCalled();
+    expect(
+      CtiRegistrationStore.getInstance().getSubscriptionSnapshot('env-uuid-1'),
+    ).toEqual({ isRegistered: false, planName: 'advanced' });
+  });
+
+  test('failure path returns triggered+failed and logs the error', async () => {
+    const contentUpdate = jest.fn().mockRejectedValue(new Error('boom'));
+    const wazuhClient = buildWazuhClient(contentUpdate);
+    const store = CtiRegistrationStore.getInstance();
+    store.setSubscriptionSnapshot('env-uuid-1', {
+      isRegistered: false,
+      planName: '',
+    });
+
+    const outcome = await triggerContentUpdateOnChange(
+      wazuhClient,
+      'env-uuid-1',
+      { message: { is_registered: true, plan: { name: 'basic', is_public: true } }, status: 200 },
+    );
+
+    expect(outcome).toEqual({ triggered: true, failed: true });
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    expect(logger.error.mock.calls[0][0]).toContain('env-uuid-1');
+  });
+
+  test('releases the lock so a subsequent qualifying call is not blocked', async () => {
+    const contentUpdate = jest.fn().mockResolvedValue({});
+    const wazuhClient = buildWazuhClient(contentUpdate);
+    const store = CtiRegistrationStore.getInstance();
+    store.setSubscriptionSnapshot('env-uuid-1', {
+      isRegistered: false,
+      planName: '',
+    });
+
+    await triggerContentUpdateOnChange(wazuhClient, 'env-uuid-1', {
+      message: { is_registered: true, plan: { name: 'basic', is_public: true } },
+      status: 200,
+    });
+
+    store.setSubscriptionSnapshot('env-uuid-1', {
+      isRegistered: true,
+      planName: 'basic',
+    });
+
+    const outcome = await triggerContentUpdateOnChange(wazuhClient, 'env-uuid-1', {
+      message: { is_registered: true, plan: { name: 'advanced', is_public: true } },
+      status: 200,
+    });
+
+    expect(outcome).toEqual({ triggered: true, failed: false });
+    expect(contentUpdate).toHaveBeenCalledTimes(2);
+  });
+
+  test('skips firing when the update lock is already held (concurrent race)', async () => {
+    const contentUpdate = jest.fn().mockResolvedValue({});
+    const wazuhClient = buildWazuhClient(contentUpdate);
+    const store = CtiRegistrationStore.getInstance();
+    store.setSubscriptionSnapshot('env-uuid-1', {
+      isRegistered: false,
+      planName: '',
+    });
+    store.tryAcquireUpdateLock('env-uuid-1');
+
+    const outcome = await triggerContentUpdateOnChange(wazuhClient, 'env-uuid-1', {
+      message: { is_registered: true, plan: { name: 'basic', is_public: true } },
+      status: 200,
+    });
+
+    expect(outcome).toEqual({ triggered: false, failed: false });
+    expect(contentUpdate).not.toHaveBeenCalled();
+    expect(
+      CtiRegistrationStore.getInstance().getSubscriptionSnapshot('env-uuid-1'),
+    ).toEqual({ isRegistered: true, planName: 'basic' });
+  });
+});
