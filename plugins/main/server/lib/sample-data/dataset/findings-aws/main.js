@@ -1,40 +1,7 @@
-const { loadDocs } = require('../../shared-utils');
-
-const docs = loadDocs(__dirname);
-
-const EVENT_TIMESTAMPS = ['created', 'start', 'end'];
-
-function setIfPresent(obj, key, value) {
-  if (obj && Object.prototype.hasOwnProperty.call(obj, key)) {
-    obj[key] = value;
-  }
-}
+const { generateFinding } = require('../../finding-generator');
 
 function generateDocument(params = {}) {
-  const { index } = params;
-  const baseIdx =
-    typeof index === 'number'
-      ? index % docs.length
-      : Math.floor(Math.random() * docs.length);
-
-  const doc = JSON.parse(JSON.stringify(docs[baseIdx]));
-
-  const iso = new Date().toISOString();
-  doc['@timestamp'] = iso;
-  if (doc.event && typeof doc.event === 'object') {
-    for (const key of EVENT_TIMESTAMPS) {
-      setIfPresent(doc.event, key, iso);
-    }
-  }
-
-  doc.wazuh = doc.wazuh || {};
-  doc.wazuh.manager = { name: params?.manager?.name || 'wazuh-manager' };
-  doc.wazuh.cluster = {
-    name: params?.cluster?.name || 'wazuh-cluster',
-    node: params?.cluster?.node || 'wazuh-manager',
-  };
-
-  return doc;
+  return generateFinding(params, __dirname);
 }
 
 module.exports = { generateDocument };
