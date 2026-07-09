@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const random = require('./lib/random');
+
 // ============================================================================
 // Constants - Realistic values for sample data generation
 // ============================================================================
@@ -135,44 +136,30 @@ function generateRandomChecksum() {
   };
 }
 // ============================================================================
-// Loader Functions - For pre-generated findings catalogued by module
+// Loader Functions - For pre-generated documents
 // ============================================================================
 /**
- * Parses the raw content of a sample-data file. Supports a single JSON value
- * (object or array) and NDJSON (one JSON object per line).
- * @param {string} content - Raw file content
- * @returns {Object[]} Array of parsed documents
+ *Load every .json/.ndjson file in a data directory into one flat array of documents
+ * @param {string} target - Absolute path to a directory
+ * @returns {Object[]} Array with the parsed data
  */
-function parseContent(content) {
-  const trimmed = content.trim();
-  if (!trimmed) return [];
-  try {
-    const parsed = JSON.parse(trimmed);
-    return Array.isArray(parsed) ? parsed : [parsed];
-  } catch (e) {
-    // NDJSON: one JSON object per line
-    return trimmed
-      .split('\n')
-      .map(l => l.trim())
-      .filter(Boolean)
-      .map(l => JSON.parse(l));
-  }
-}
-/**
- * Loads sample documents from a target path. The target may be either a single
- * .json/.ndjson file or a directory containing such files.
- * @param {string} target - Absolute path to a file or directory
- * @returns {Object[]} Flat array of parsed documents
- */
-function loadDocs(target) {
-  const stat = fs.statSync(target);
-  if (stat.isFile()) {
-    return parseContent(fs.readFileSync(target, 'utf8'));
-  }
-  const files = fs.readdirSync(target).filter(f => /\.(json|ndjson)$/.test(f));
-  return files.flatMap(f =>
-    parseContent(fs.readFileSync(path.join(target, f), 'utf8')),
-  );
+function loadDocs(dataDir) {
+  const files = fs.readdirSync(dataDir).filter(f => /\.(json|ndjson)$/.test(f));
+
+  return files.flatMap(f => {
+    const content = fs.readFileSync(path.join(dataDir, f), 'utf8').trim();
+    if (!content) return [];
+    try {
+      const parsed = JSON.parse(content);
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch (e) {
+      return content
+        .split('\n')
+        .map(l => l.trim())
+        .filter(Boolean)
+        .map(l => JSON.parse(l));
+    }
+  });
 }
 module.exports = {
   generateRandomAgent,

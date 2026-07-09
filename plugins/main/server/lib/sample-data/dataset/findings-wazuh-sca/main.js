@@ -1,7 +1,6 @@
-const path = require('path');
 const { loadDocs } = require('../../shared-utils');
 
-const docs = loadDocs(path.join(__dirname, 'findings.json'));
+const docs = loadDocs(__dirname);
 
 const EVENT_TIMESTAMPS = ['created', 'start', 'end'];
 
