@@ -9,7 +9,7 @@ const datasets = fs
   .readdirSync(
     path.join(__dirname, '../../plugins/main/server/lib/sample-data/dataset'),
   )
-  .filter(file => !file.endsWith('.js'));
+  .filter(file => !file.startsWith('.') && !file.endsWith('.js'));
 
 const findings_datasets = datasets.filter(file => file.startsWith('findings'));
 
