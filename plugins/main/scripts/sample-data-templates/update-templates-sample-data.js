@@ -139,7 +139,7 @@ function downloadFile(dataset) {
 
         if (res.statusCode < 200 || res.statusCode >= 300) {
           res.resume();
-          reject(new Error(`Failed to fetch ${url}: HTTP ${res.statusCode}`));
+          reject(new Error(`Failed to fetch [${url}]: HTTP ${res.statusCode}`));
           return;
         }
 

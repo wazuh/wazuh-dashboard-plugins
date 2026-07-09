@@ -735,7 +735,7 @@ function fetchTemplate(url) {
 
         if (res.statusCode < 200 || res.statusCode >= 300) {
           res.resume();
-          reject(new Error(`Failed to fetch ${url}: HTTP ${res.statusCode}`));
+          reject(new Error(`Failed to fetch [${url}]: HTTP ${res.statusCode}`));
           return;
         }
 
@@ -752,14 +752,14 @@ function fetchTemplate(url) {
           } catch (error) {
             reject(
               new Error(
-                `Failed to parse template from ${url}: ${error.message}`,
+                `Failed to parse template from [${url}]: ${error.message}`,
               ),
             );
           }
         });
       })
       .on('error', error => {
-        reject(new Error(`Failed to fetch ${url}: ${error.message}`));
+        reject(new Error(`Failed to fetch [${url}]: ${error.message}`));
       });
   });
 }
@@ -822,7 +822,7 @@ async function fetchTemplateFromUrls(urls) {
       return { template, url };
     } catch (error) {
       lastError = error;
-      console.log(`  ⚠️  Failed to fetch from ${url}: ${error.message}`);
+      console.log(`  ⚠️  Failed to fetch from [${url}]: ${error.message}`);
     }
   }
 
