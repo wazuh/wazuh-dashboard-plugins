@@ -532,9 +532,6 @@ export class WazuhElasticCtrl {
       if (tlp !== undefined) {
         casePayload.tlp = tlp === '' ? null : tlp;
       }
-      // The indexer endpoint merges documents (objects merge, arrays are
-      // replaced wholesale), so comments are only sent when they changed.
-      // The legacy single `comment` field is never written anymore.
       if (commentsTouched) {
         casePayload.comments = comments;
       }

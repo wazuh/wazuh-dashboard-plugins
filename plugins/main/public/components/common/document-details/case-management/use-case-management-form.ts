@@ -121,7 +121,10 @@ export type CaseFormAction =
   | { type: 'SET_TAGS'; payload: EuiComboBoxOptionOption[] }
   | { type: 'ADD_TAG'; payload: string }
   | { type: 'SET_NEW_COMMENT'; payload: string }
-  | { type: 'SET_COMMENT_EDIT'; payload: { createdAt: string; comment: string } }
+  | {
+      type: 'SET_COMMENT_EDIT';
+      payload: { createdAt: string; comment: string };
+    }
   | { type: 'DISCARD_COMMENT_EDIT'; payload: { createdAt: string } }
   | { type: 'RESET' }
   | { type: 'SAVE_START' }
@@ -430,7 +433,8 @@ export function useCaseManagementForm(
     dispatch({ type: 'ADD_TAG', payload: searchValue });
   }, []);
   const setNewComment = useCallback(
-    (comment: string) => dispatch({ type: 'SET_NEW_COMMENT', payload: comment }),
+    (comment: string) =>
+      dispatch({ type: 'SET_NEW_COMMENT', payload: comment }),
     [],
   );
   const applyCommentEdit = useCallback(
