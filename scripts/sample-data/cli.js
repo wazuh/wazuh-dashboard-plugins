@@ -225,7 +225,6 @@ try {
   for (const name of targets) {
     console.time(`generate-${name}`);
     const resolvedIndex = index || getDatasetIndex(name) || null;
-
     for (let i = 0; i < count; i++) {
       entries.push({
         doc: generateSampleDataWithDataset(name, {
@@ -283,10 +282,7 @@ function insertData(data, config, logPath, batchNumber, totalBatches) {
   );
 
   const quotedArgs = curlArgs.map(arg => `'${arg}'`).join(' ');
-  log(
-    logPath,
-    `${quotedArgs.replace(/^/, 'curl ')}\n\nPayload (${tmpFile}):\n${data}\n`,
-  );
+  log(logPath, `${quotedArgs.replace(/^/, 'curl ')}\n\n${data}\n`);
 
   const result = spawnSync('curl', curlArgs, {
     encoding: 'utf-8',
@@ -486,4 +482,4 @@ function batch(array, size) {
 }
 
 // Output
-handleResult(allDocs);
+handleResult(entries);
