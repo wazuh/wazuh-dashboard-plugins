@@ -15,6 +15,17 @@ export type CtiRegistrationStoreRecord = {
   poll_interval_sec: number;
 };
 
+/** Minimal subscription shape persisted per environment UUID to detect plan/registration changes. */
+export type SubscriptionSnapshot = {
+  isRegistered: boolean;
+  planName: string; // '' when no plan
+};
+
+type SnapshotEntry = {
+  snapshot: SubscriptionSnapshot;
+  updateInFlight: boolean;
+};
+
 function coercePositiveInt(value: unknown, fallback: number): number {
   if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
     return Math.floor(value);
@@ -86,6 +97,15 @@ export class CtiRegistrationStore {
     CtiRegistrationStoreRecord
   >();
 
+  /**
+   * Per-environment subscription snapshot used to detect plan/registration changes,
+   * kept SEPARATE from `byEnvironmentUuid` (device-flow scoped, cleared on completion/expiry).
+   */
+  private readonly subscriptionByEnvironmentUuid = new Map<
+    string,
+    SnapshotEntry
+  >();
+
   private constructor() {}
 
   static getInstance(): CtiRegistrationStore {
@@ -98,7 +118,55 @@ export class CtiRegistrationStore {
   /** Test-only: drop singleton and all entries. */
   static resetForTests(): void {
     CtiRegistrationStore.instance?.byEnvironmentUuid.clear();
+    CtiRegistrationStore.instance?.subscriptionByEnvironmentUuid.clear();
     CtiRegistrationStore.instance = undefined;
+  }
+
+  /** Returns the last-known subscription snapshot for the given environment UUID, if any. */
+  getSubscriptionSnapshot(
+    environmentUuid: string,
+  ): SubscriptionSnapshot | undefined {
+    return this.subscriptionByEnvironmentUuid.get(environmentUuid)?.snapshot;
+  }
+
+  /** Persists the subscription snapshot for the given environment UUID. */
+  setSubscriptionSnapshot(
+    environmentUuid: string,
+    snapshot: SubscriptionSnapshot,
+  ): void {
+    const cur = this.subscriptionByEnvironmentUuid.get(environmentUuid);
+    this.subscriptionByEnvironmentUuid.set(environmentUuid, {
+      snapshot,
+      updateInFlight: cur?.updateInFlight ?? false,
+    });
+  }
+
+  /**
+   * Attempts to acquire the content-update in-flight lock for an environment.
+   * Returns `false` if the lock is already held (a content-update is in progress).
+   */
+  tryAcquireUpdateLock(environmentUuid: string): boolean {
+    const cur = this.subscriptionByEnvironmentUuid.get(environmentUuid);
+    if (cur?.updateInFlight) {
+      return false;
+    }
+    this.subscriptionByEnvironmentUuid.set(environmentUuid, {
+      snapshot: cur?.snapshot ?? { isRegistered: false, planName: '' },
+      updateInFlight: true,
+    });
+    return true;
+  }
+
+  /** Releases the content-update in-flight lock for an environment. */
+  releaseUpdateLock(environmentUuid: string): void {
+    const cur = this.subscriptionByEnvironmentUuid.get(environmentUuid);
+    if (!cur) {
+      return;
+    }
+    this.subscriptionByEnvironmentUuid.set(environmentUuid, {
+      ...cur,
+      updateInFlight: false,
+    });
   }
 
   getStatus(environmentUuid: string): CtiRegistrationStoreRecord | undefined {
