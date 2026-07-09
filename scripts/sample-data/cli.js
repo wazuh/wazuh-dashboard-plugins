@@ -1,34 +1,23 @@
 #!/usr/bin/env node
 
-const {
-  generateSampleDataWithDataset,
-  generateSampleDataWithFinding,
-  listFindings,
-} = require('./lib/index');
+const { generateSampleDataWithDataset, listDatasets } = require('./lib/index');
 const path = require('path');
 const fs = require('fs');
 
-// Root of the sample-data module (holds ./dataset and ./findings).
+// Root of the sample-data module (holds ./dataset).
 const SAMPLE_DATA_DIR = path.join(
   __dirname,
   '../../plugins/main/server/lib/sample-data',
 );
 
-// --- Available catalogues ---------------------------------------------------
+// Available datasets: every folder under ./dataset containing a main.js,
+// reported as a path relative to ./dataset. May be nested (e.g.
+// "findings-aws/cloudtrail"). Synthesized datasets (states-*, metrics-*)
+// generate fresh random documents; findings-* datasets load pre-generated
+// documents from a findings.json and reajust them.
+const datasets = listDatasets();
 
-// Synthesized datasets: first-level folders under ./dataset (excluding stray
-// .js files), each with a main.js that GENERATES documents on the fly.
-const datasets = fs
-  .readdirSync(path.join(SAMPLE_DATA_DIR, 'dataset'))
-  .filter(file => !file.endsWith('.js'));
-
-// Pre-generated findings: folders under ./findings that contain a main.js.
-// May be nested (e.g. "aws/cloudtrail", "wazuh-sca"). Reported as paths
-// relative to ./findings.
-const findings = listFindings();
-
-// --- Default parameters -----------------------------------------------------
-
+// Default alert generation parameters
 const defaultAlertGenerationParams = {
   manager: {
     name: 'wazuh-manager',
@@ -39,8 +28,7 @@ const defaultAlertGenerationParams = {
   },
 };
 
-// --- Output formats ---------------------------------------------------------
-
+// Output formats
 const formats = {
   ndjson: {
     description: 'Format the documents to ndjson. Each line is a document.',
@@ -56,9 +44,9 @@ const formats = {
         );
         process.exit(1);
       }
-      // "create" (instead of "index") keeps re-seeding idempotent when the
-      // documents carry a deterministic _id; with auto-ids it still avoids
-      // silently overwriting existing docs.
+      // "create" (instead of "index") avoids silently overwriting existing
+      // documents and keeps re-seeding idempotent when docs carry a
+      // deterministic _id.
       return (
         docs
           .map(
@@ -70,43 +58,31 @@ const formats = {
   },
 };
 
-// --- Usage ------------------------------------------------------------------
-
 const args = process.argv.slice(2);
 const usage = `
-Usage: node cli.js (--dataset <name> | --finding <path> | --all-findings) [options]
+Usage: node cli.js (--dataset <name> | --all) [options]
 
-This CLI can seed sample data from two catalogues:
+Seeds sample data from the ./dataset catalogue. Every dataset exposes a
+generateDocument(params) and is referenced by its path relative to ./dataset.
 
-  1. dataset   Synthesized data. Each dataset GENERATES fresh random documents
-               on every call. Use --count to choose how many to generate.
+There are two kinds of dataset, both used the same way from this CLI:
 
-  2. findings  Pre-generated data catalogued by module. Documents are loaded
-               from disk; their timestamps are reajusted and the manager/cluster
-               params injected on the fly. --count samples (with repetition) N
-               documents from the module's base set; if --count is omitted for a
-               finding, every base document is emitted once.
+  - Synthesized (e.g. states-fim-files, metrics-agents): generate fresh random
+    documents on every call.
+  - Pre-generated findings (prefixed findings-, e.g. findings-aws/cloudtrail):
+    load documents from a findings.json, reajust their timestamps and inject
+    the manager/cluster params. --count cycles over the base documents.
 
-Source selection (choose one):
-  --dataset <name>       Synthesized dataset to generate
-                         (available: ${datasets.join(', ')})
-  --finding <path>       Pre-generated finding to load, path relative to
-                         ./findings (available: ${
-                           findings.join(', ') || '(none yet)'
-                         })
-  --all-findings         Load every available finding. --count (if given)
-                         applies PER module; if omitted, every base document of
-                         each module is emitted once.
-
-Common options:
-  --count <number>       Number of documents to generate/sample.
-                         Default for --dataset: 100.
-                         Default for --finding / --all-findings: all base docs.
-  --output <file>        Output file to save the generated data (optional;
-                         defaults to stdout)
-  --format <format>      Output format (default: ndjson)
-                         Available formats: ${Object.keys(formats).join(', ')}
-  --index <name>         Index name for bulk-api format (required with bulk-api)
+Options:
+  --dataset <name>     Dataset to use, path relative to ./dataset
+                       (available: ${datasets.join(', ')})
+  --all                Generate --count documents for EVERY dataset
+  --count <number>     Number of documents to generate per dataset (default: 100)
+  --output <file>      Output file to save the generated data (optional;
+                       defaults to stdout)
+  --format <format>    Output format (default: ndjson)
+                       Available formats: ${Object.keys(formats).join(', ')}
+  --index <name>       Index name for bulk-api format (required with bulk-api)
   --param-manager-name <name>  Set the manager name (default: ${
     defaultAlertGenerationParams.manager.name
   })
@@ -116,31 +92,20 @@ Common options:
   --param-cluster-node <name>  Set the cluster node (default: ${
     defaultAlertGenerationParams.cluster.node
   })
-  --help                 Show this help message
+  --help               Show this help message
 
 Examples:
-  # Synthesized dataset (unchanged legacy behaviour)
   node cli.js --dataset states-fim-files --count 500
-  node cli.js --dataset states-fim-files --count 500 --output sample-data.ndjson
-
-  # Pre-generated finding
-  node cli.js --finding aws/cloudtrail
-  node cli.js --finding aws/cloudtrail --count 20 --output cloudtrail.ndjson
-  node cli.js --finding wazuh-sca --format bulk-api --index wazuh-alerts-sample
-
-  # Every finding at once (20 documents per module)
-  node cli.js --all-findings --count 20 --output all.ndjson
-
-  # Every finding, each base document once
-  node cli.js --all-findings --format bulk-api --index wazuh-alerts-sample
+  node cli.js --dataset findings-aws/cloudtrail --count 20
+  node cli.js --dataset findings-wazuh-sca --format bulk-api --index wazuh-alerts-sample
+  node cli.js --all --count 50 --output all.ndjson
+  node cli.js --dataset states-fim-files --param-manager-name my-manager
 `;
 
-// --- Argument parsing -------------------------------------------------------
-
+// Argument parsing
 let dataset = null;
-let finding = null;
-let allFindings = false;
-let count = null; // resolved to a default later, depending on source
+let all = false;
+let count = 100;
 let outputFile = null;
 let format = 'ndjson';
 let index = null;
@@ -156,11 +121,8 @@ for (let i = 0; i < args.length; i++) {
   } else if (args[i] === '--dataset' && i + 1 < args.length) {
     dataset = args[i + 1];
     i++;
-  } else if (args[i] === '--finding' && i + 1 < args.length) {
-    finding = args[i + 1];
-    i++;
-  } else if (args[i] === '--all-findings') {
-    allFindings = true;
+  } else if (args[i] === '--all') {
+    all = true;
   } else if (args[i] === '--count' && i + 1 < args.length) {
     count = parseInt(args[i + 1], 10);
     if (isNaN(count)) {
@@ -201,27 +163,17 @@ for (let i = 0; i < args.length; i++) {
   }
 }
 
-// --- Validation -------------------------------------------------------------
-
-const sourcesSelected = [dataset, finding, allFindings ? 'all' : null].filter(
-  Boolean,
-).length;
-
-if (sourcesSelected === 0) {
-  console.error(
-    'Error: choose a source: --dataset <name>, --finding <path>, or --all-findings',
-  );
+// Validation
+if (!dataset && !all) {
+  console.error('Error: choose a source: --dataset <name> or --all');
   console.log(usage);
   process.exit(1);
 }
-if (sourcesSelected > 1) {
-  console.error(
-    'Error: --dataset, --finding and --all-findings are mutually exclusive',
-  );
+if (dataset && all) {
+  console.error('Error: --dataset and --all are mutually exclusive');
   console.log(usage);
   process.exit(1);
 }
-
 if (dataset && !datasets.includes(dataset)) {
   console.error(
     `Error: unknown dataset '${dataset}'. Available: ${datasets.join(', ')}`,
@@ -229,48 +181,24 @@ if (dataset && !datasets.includes(dataset)) {
   console.log(usage);
   process.exit(1);
 }
-if (finding && !findings.includes(finding)) {
-  console.error(
-    `Error: unknown finding '${finding}'. Available: ${findings.join(', ')}`,
-  );
-  console.log(usage);
-  process.exit(1);
-}
-
 if (format === 'bulk-api' && !index) {
   console.error('Error: --index is required when using bulk-api format');
   console.log(usage);
   process.exit(1);
 }
 
-// --- Generation -------------------------------------------------------------
-
-// Generates `n` documents from a single finding module, cycling over its base
-// documents by passing a sequential index (so --count is deterministic).
-function generateFinding(name, n, params) {
-  const docs = [];
-  for (let i = 0; i < n; i++) {
-    docs.push(generateSampleDataWithFinding(name, { ...params, index: i }));
-  }
-  return docs;
-}
-
-let allDocs = [];
-
+// Generation
+const allDocs = [];
 try {
-  if (dataset) {
-    const n = count == null ? 100 : count; // legacy default
-    for (let i = 0; i < n; i++) {
+  const targets = all ? datasets : [dataset];
+  for (const name of targets) {
+    for (let i = 0; i < count; i++) {
       allDocs.push(
-        generateSampleDataWithDataset(dataset, alertGenerationParams),
+        generateSampleDataWithDataset(name, {
+          ...alertGenerationParams,
+          index: i,
+        }),
       );
-    }
-  } else {
-    const targets = allFindings ? findings : [finding];
-    for (const name of targets) {
-      const baseLen = findingBaseLength(name);
-      const n = count == null ? baseLen : count;
-      allDocs.push(...generateFinding(name, n, alertGenerationParams));
     }
   }
 } catch (error) {
@@ -278,8 +206,7 @@ try {
   process.exit(1);
 }
 
-// --- Output -----------------------------------------------------------------
-
+// Output
 handleResult(allDocs);
 
 function handleResult(result) {
@@ -307,21 +234,5 @@ function handleResult(result) {
     }
   } else {
     process.stdout.write(formatted + '\n');
-  }
-}
-
-// --- Helpers ----------------------------------------------------------------
-
-// Number of base documents in a finding module, read directly from its
-// findings.json so "--count omitted" can emit each once.
-function findingBaseLength(name) {
-  const file = path.join(SAMPLE_DATA_DIR, 'findings', name, 'findings.json');
-  const content = fs.readFileSync(file, 'utf8').trim();
-  if (!content) return 0;
-  try {
-    const parsed = JSON.parse(content);
-    return Array.isArray(parsed) ? parsed.length : 1;
-  } catch (e) {
-    return content.split('\n').filter(l => l.trim()).length;
   }
 }

@@ -6,13 +6,8 @@ function generateSampleDataWithDataset(dataset, options) {
   return datasetDefinition.generateDocument(options);
 }
 
-function generateSampleDataWithFinding(finding, options) {
-  const findingDefinition = require(`./findings/${finding}/main`);
-  return findingDefinition.generateDocument(options);
-}
-
-function listFindings() {
-  const root = path.join(__dirname, 'findings');
+function listDatasets() {
+  const root = path.join(__dirname, 'dataset');
   const out = [];
   (function walk(dir) {
     for (const entry of fs.readdirSync(dir)) {
@@ -28,5 +23,4 @@ function listFindings() {
 }
 
 module.exports.generateSampleDataWithDataset = generateSampleDataWithDataset;
-module.exports.generateSampleDataWithFinding = generateSampleDataWithFinding;
-module.exports.listFindings = listFindings;
+module.exports.listDatasets = listDatasets;

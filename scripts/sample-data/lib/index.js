@@ -1,11 +1,9 @@
 const {
   generateSampleDataWithDataset,
-  generateSampleDataWithFinding,
-  listFindings,
+  listDatasets,
 } = require('../../../plugins/main/server/lib/sample-data/index');
 
 module.exports = {
   generateSampleDataWithDataset,
-  generateSampleDataWithFinding,
-  listFindings,
+  listDatasets,
 };
