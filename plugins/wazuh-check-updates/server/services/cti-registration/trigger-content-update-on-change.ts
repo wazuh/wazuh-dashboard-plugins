@@ -27,8 +27,7 @@ function hasChanged(
   next: SubscriptionSnapshot,
 ): boolean {
   return (
-    prior.isRegistered !== next.isRegistered ||
-    prior.planName !== next.planName
+    prior.isRegistered !== next.isRegistered || prior.planName !== next.planName
   );
 }
 

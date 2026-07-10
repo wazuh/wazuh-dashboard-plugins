@@ -43,12 +43,20 @@ describe('triggerContentUpdateOnChange', () => {
     const outcome = await triggerContentUpdateOnChange(
       wazuhClient,
       'env-uuid-1',
-      { message: { is_registered: true, plan: { name: 'basic', is_public: true } }, status: 200 },
+      {
+        message: {
+          is_registered: true,
+          plan: { name: 'basic', is_public: true },
+        },
+        status: 200,
+      },
     );
 
     expect(outcome).toEqual({ triggered: false, failed: false });
     expect(contentUpdate).not.toHaveBeenCalled();
-    expect(CtiRegistrationStore.getInstance().getSubscriptionSnapshot('env-uuid-1')).toEqual({
+    expect(
+      CtiRegistrationStore.getInstance().getSubscriptionSnapshot('env-uuid-1'),
+    ).toEqual({
       isRegistered: true,
       planName: 'basic',
     });
@@ -66,7 +74,13 @@ describe('triggerContentUpdateOnChange', () => {
     const outcome = await triggerContentUpdateOnChange(
       wazuhClient,
       'env-uuid-1',
-      { message: { is_registered: true, plan: { name: 'basic', is_public: true } }, status: 200 },
+      {
+        message: {
+          is_registered: true,
+          plan: { name: 'basic', is_public: true },
+        },
+        status: 200,
+      },
     );
 
     expect(outcome).toEqual({ triggered: true, failed: false });
@@ -88,7 +102,13 @@ describe('triggerContentUpdateOnChange', () => {
     const outcome = await triggerContentUpdateOnChange(
       wazuhClient,
       'env-uuid-1',
-      { message: { is_registered: true, plan: { name: 'advanced', is_public: true } }, status: 200 },
+      {
+        message: {
+          is_registered: true,
+          plan: { name: 'advanced', is_public: true },
+        },
+        status: 200,
+      },
     );
 
     expect(outcome).toEqual({ triggered: true, failed: false });
@@ -107,7 +127,13 @@ describe('triggerContentUpdateOnChange', () => {
     const outcome = await triggerContentUpdateOnChange(
       wazuhClient,
       'env-uuid-1',
-      { message: { is_registered: true, plan: { name: 'advanced', is_public: true } }, status: 200 },
+      {
+        message: {
+          is_registered: true,
+          plan: { name: 'advanced', is_public: true },
+        },
+        status: 200,
+      },
     );
 
     expect(outcome).toEqual({ triggered: false, failed: false });
@@ -126,7 +152,13 @@ describe('triggerContentUpdateOnChange', () => {
     const outcome = await triggerContentUpdateOnChange(
       wazuhClient,
       'env-uuid-1',
-      { message: { is_registered: false, plan: { name: 'advanced', is_public: true } }, status: 200 },
+      {
+        message: {
+          is_registered: false,
+          plan: { name: 'advanced', is_public: true },
+        },
+        status: 200,
+      },
     );
 
     expect(outcome).toEqual({ triggered: false, failed: false });
@@ -148,7 +180,13 @@ describe('triggerContentUpdateOnChange', () => {
     const outcome = await triggerContentUpdateOnChange(
       wazuhClient,
       'env-uuid-1',
-      { message: { is_registered: true, plan: { name: 'basic', is_public: true } }, status: 200 },
+      {
+        message: {
+          is_registered: true,
+          plan: { name: 'basic', is_public: true },
+        },
+        status: 200,
+      },
     );
 
     expect(outcome).toEqual({ triggered: true, failed: true });
@@ -166,7 +204,10 @@ describe('triggerContentUpdateOnChange', () => {
     });
 
     await triggerContentUpdateOnChange(wazuhClient, 'env-uuid-1', {
-      message: { is_registered: true, plan: { name: 'basic', is_public: true } },
+      message: {
+        is_registered: true,
+        plan: { name: 'basic', is_public: true },
+      },
       status: 200,
     });
 
@@ -175,10 +216,17 @@ describe('triggerContentUpdateOnChange', () => {
       planName: 'basic',
     });
 
-    const outcome = await triggerContentUpdateOnChange(wazuhClient, 'env-uuid-1', {
-      message: { is_registered: true, plan: { name: 'advanced', is_public: true } },
-      status: 200,
-    });
+    const outcome = await triggerContentUpdateOnChange(
+      wazuhClient,
+      'env-uuid-1',
+      {
+        message: {
+          is_registered: true,
+          plan: { name: 'advanced', is_public: true },
+        },
+        status: 200,
+      },
+    );
 
     expect(outcome).toEqual({ triggered: true, failed: false });
     expect(contentUpdate).toHaveBeenCalledTimes(2);
@@ -200,7 +248,10 @@ describe('triggerContentUpdateOnChange', () => {
       wazuhClient,
       'env-uuid-1',
       {
-        message: { is_registered: true, plan: { name: 'basic', is_public: true } },
+        message: {
+          is_registered: true,
+          plan: { name: 'basic', is_public: true },
+        },
         status: 200,
       },
     );
