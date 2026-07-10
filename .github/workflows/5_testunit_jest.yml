@@ -8,6 +8,7 @@
 name: (5.x) Run unit test
 permissions:
   pull-requests: write
+  id-token: write
 on:
   workflow_dispatch:
     inputs:
@@ -28,6 +29,10 @@ on:
       - main # Remove this when main changes to 6.x
       - 5.*
     types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   # Run unit tests with Jest

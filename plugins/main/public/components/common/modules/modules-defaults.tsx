@@ -631,7 +631,7 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
-  'active-response-dashboard': {
+  'incident-response-dashboard': {
     init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
       {

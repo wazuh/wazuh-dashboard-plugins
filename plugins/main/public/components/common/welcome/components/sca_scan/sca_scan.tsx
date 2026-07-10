@@ -37,8 +37,7 @@ import {
 import { LoadingSearchbarProgress } from '../../../loading-searchbar-progress/loading-searchbar-progress';
 import { CheckResult } from '../../../../overview/sca/utils/constants';
 import { groupBy } from 'lodash';
-import { decimalFormat } from '../../../../overview/sca/components/dashboard/utils/visualization-helpers';
-import d3 from 'd3';
+import { decimalFormat } from '../../utils/helpers';
 
 type ScaScanProps = {
   agent: { [key in string]: any };

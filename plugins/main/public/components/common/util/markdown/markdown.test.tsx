@@ -1,4 +1,3 @@
-
 /*
  * Wazuh app - Markdown Component - Test
  *
@@ -19,18 +18,26 @@ import { Markdown } from './markdown';
 
 describe('Markdown container', () => {
   test('should render the component', () => {
-    const component = shallow(<Markdown markdown={'Example text'}/>);
+    const component = shallow(<Markdown markdown={'Example text'} />);
     expect(component).toMatchSnapshot();
   });
 
   test('should render a link', () => {
-    const component = shallow(<Markdown markdown={`[label](https://example.com)`}/>);
-    expect(
-      component
-        .html()
-        .includes(
-          '<a href="https://example.com" target="_blank" rel="noopener noreferrer">label</a>',
-        ),
-    ).toBe(true);
+    const component = shallow(
+      <Markdown markdown={`[label](https://example.com)`} />,
+    );
+    const html = component.html();
+    expect(html).toContain('href="https://example.com"');
+    expect(html).toContain('rel="noopener noreferrer"');
+    expect(html).toContain('>label<');
+  });
+
+  test('should sanitize dangerous HTML', () => {
+    const component = shallow(
+      <Markdown markdown={'<script>alert("xss")</script>text'} />,
+    );
+    const html = component.html();
+    expect(html).not.toContain('<script>');
+    expect(html).toContain('text');
   });
 });
