@@ -235,9 +235,9 @@ describe('CTI registration status route', () => {
   });
 
   describe('content-update trigger integration', () => {
-    test('omits contentUpdate from the response when nothing was triggered', async () => {
+    test('fires the trigger silently and never surfaces its outcome on the response', async () => {
       mockedTriggerContentUpdateOnChange.mockResolvedValue({
-        triggered: false,
+        triggered: true,
         failed: false,
       });
 
@@ -253,23 +253,7 @@ describe('CTI registration status route', () => {
       );
     });
 
-    test('includes contentUpdate with success outcome when triggered', async () => {
-      mockedTriggerContentUpdateOnChange.mockResolvedValue({
-        triggered: true,
-        failed: false,
-      });
-
-      const response = await supertest(innerServer.listener)
-        .get(routes.ctiRegistrationStatus)
-        .expect(200);
-
-      expect(response.body.contentUpdate).toEqual({
-        triggered: true,
-        failed: false,
-      });
-    });
-
-    test('includes contentUpdate with failure outcome and still returns HTTP 200', async () => {
+    test('does not fail the response when the trigger rejects', async () => {
       mockedTriggerContentUpdateOnChange.mockResolvedValue({
         triggered: true,
         failed: true,
@@ -279,10 +263,7 @@ describe('CTI registration status route', () => {
         .get(routes.ctiRegistrationStatus)
         .expect(200);
 
-      expect(response.body.contentUpdate).toEqual({
-        triggered: true,
-        failed: true,
-      });
+      expect(response.body.contentUpdate).toBeUndefined();
     });
   });
 });

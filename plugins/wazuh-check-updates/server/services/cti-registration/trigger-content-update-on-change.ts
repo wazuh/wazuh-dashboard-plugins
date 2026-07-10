@@ -1,16 +1,17 @@
 import { IScopedClusterClient } from 'opensearch-dashboards/server';
 import { contentManagerRoutes } from '../../../common/constants';
-import type {
-  CtiContentUpdateOutcome,
-  CtiSubscriptionSnapshot,
-} from '../../../common/cti-registration-status-api';
+import type { CtiSubscriptionSnapshot } from '../../../common/cti-registration-status-api';
 import { getWazuhCheckUpdatesServices } from '../../plugin-services';
 import {
   CtiRegistrationStore,
   SubscriptionSnapshot,
 } from './cti-registration-store';
 
-export type { CtiContentUpdateOutcome };
+/** Outcome of a best-effort Content Manager update attempt for this poll cycle. */
+export interface CtiContentUpdateOutcome {
+  triggered: boolean;
+  failed: boolean;
+}
 
 function toSnapshot(
   subscription: CtiSubscriptionSnapshot,

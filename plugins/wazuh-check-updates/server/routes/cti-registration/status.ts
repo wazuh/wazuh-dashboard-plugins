@@ -11,7 +11,7 @@ import { triggerContentUpdateOnChange } from '../../services/cti-registration/tr
 
 type StatusWithoutSubscriptionFields = Omit<
   CtiRegistrationStatusApiBody,
-  'subscription' | 'contentUpdate'
+  'subscription'
 >;
 
 async function withSubscriptionFields(
@@ -20,18 +20,11 @@ async function withSubscriptionFields(
   base: StatusWithoutSubscriptionFields,
 ): Promise<CtiRegistrationStatusApiBody> {
   const subscription = await getCtiSubscriptionStatus(wazuhClient);
-  const contentUpdateOutcome = await triggerContentUpdateOnChange(
-    wazuhClient,
-    environmentUuid,
-    subscription,
-  );
+  triggerContentUpdateOnChange(wazuhClient, environmentUuid, subscription);
 
   return {
     ...base,
     subscription,
-    ...(contentUpdateOutcome.triggered
-      ? { contentUpdate: contentUpdateOutcome }
-      : {}),
   };
 }
 
