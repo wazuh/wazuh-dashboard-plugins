@@ -60,6 +60,17 @@ const config = {
   datasets: [],
   // Mapping from local dataset names to remote template filenames
   datasetToTemplateMapping: {
+    'findings-aws': 'templates/streams/findings.json',
+    'findings-azure': 'templates/streams/findings.json',
+    'findings-docker': 'templates/streams/findings.json',
+    'findings-fim': 'templates/streams/findings.json',
+    'findings-gcp': 'templates/streams/findings.json',
+    'findings-github': 'templates/streams/findings.json',
+    'findings-malware-detection': 'templates/streams/findings.json',
+    'findings-o365': 'templates/streams/findings.json',
+    'findings-sca': 'templates/streams/findings.json',
+    'findings-threat-hunting': 'templates/streams/findings.json',
+    'findings-vulnerability-detection': 'templates/streams/findings.json',
     'metrics-agents': 'templates/streams/metrics-agents.json',
     'metrics-comms': 'templates/streams/metrics-comms.json',
     'metrics-normalization': 'templates/streams/metrics-normalization.json',
