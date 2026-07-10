@@ -242,6 +242,23 @@ try {
 }
 
 /**
+ * Redacts the credentials in a curl argument list before logging, so the
+ * username:password passed to -u never lands in the log file.
+ * @param {string[]} curlArgs the argument array passed to curl
+ * @returns {string} a shell-like, credential-free representation
+ */
+function redactCurlArgs(curlArgs) {
+  const redacted = curlArgs.map((arg, i) => {
+    // The value following a "-u" flag is "user:pass"; mask it.
+    if (i > 0 && curlArgs[i - 1] === '-u') {
+      return '***:***';
+    }
+    return arg;
+  });
+  return 'curl ' + redacted.map(arg => `'${arg}'`).join(' ');
+}
+
+/**
  * Inserts using curl the data directly to the defined host.
  * Used by --output insert
  * It will append to a single log file per CLI execution, inside ./logs.
@@ -278,11 +295,13 @@ function insertData(data, config, logPath, batchNumber, totalBatches) {
 
   log(
     logPath,
-    `\n${'='.repeat(60)}\nBatch ${batchNumber}/${totalBatches}\n${'='.repeat(60)}\n`,
+    `\n${'='.repeat(60)}\nBatch ${batchNumber}/${totalBatches}\n${'='.repeat(
+      60,
+    )}\n`,
   );
 
-  const quotedArgs = curlArgs.map(arg => `'${arg}'`).join(' ');
-  log(logPath, `${quotedArgs.replace(/^/, 'curl ')}\n\n${data}\n`);
+  // Log the curl command with credentials redacted, followed by the payload.
+  log(logPath, `${redactCurlArgs(curlArgs)}\n\n${data}\n`);
 
   const result = spawnSync('curl', curlArgs, {
     encoding: 'utf-8',
@@ -410,7 +429,9 @@ function handleResult(result) {
 
       batches.forEach((batchDocs, i) => {
         console.error(
-          `Inserting batch ${i + 1}/${batches.length} (${batchDocs.length} documents)...`,
+          `Inserting batch ${i + 1}/${batches.length} (${
+            batchDocs.length
+          } documents)...`,
         );
         const batchFormatted = formats['bulk-api'].run(batchDocs, index);
         const failed = insertData(
@@ -424,17 +445,19 @@ function handleResult(result) {
       });
 
       if (allFailed.length > 0) {
-        console.error(`\n${allFailed.length} document(s) failed to insert:`);
+        console.error(
+          `\n${allFailed.length} document(s) failed to insert. See the log for details.`,
+        );
 
         const errorLines = allFailed
           .map(item => `${item._id} | ${item.status} | ${item.reason}`)
           .join('\n');
 
-        console.error(errorLines);
-
         log(
           logPath,
-          `\n${'='.repeat(60)}\nErrors Summary: ${allFailed.length} document(s) failed\n${'='.repeat(60)}\n${errorLines}\n`,
+          `\n${'='.repeat(60)}\nErrors Summary: ${
+            allFailed.length
+          } document(s) failed\n${'='.repeat(60)}\n${errorLines}\n`,
         );
       }
 
