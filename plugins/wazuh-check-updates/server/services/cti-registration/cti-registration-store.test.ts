@@ -67,9 +67,8 @@ describe('CtiRegistrationStore — subscription snapshot + update lock', () => {
     expect(store.tryAcquireUpdateLock('env-uuid-1')).toBe(true);
   });
 
-  test('tryAcquireUpdateLock works even without a prior snapshot entry', () => {
+  test('tryAcquireUpdateLock refuses when there is no snapshot entry yet', () => {
     const store = CtiRegistrationStore.getInstance();
-    expect(store.tryAcquireUpdateLock('env-uuid-new')).toBe(true);
     expect(store.tryAcquireUpdateLock('env-uuid-new')).toBe(false);
   });
 

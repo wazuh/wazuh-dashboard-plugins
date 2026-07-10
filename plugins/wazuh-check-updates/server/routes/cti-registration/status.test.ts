@@ -254,10 +254,9 @@ describe('CTI registration status route', () => {
     });
 
     test('does not fail the response when the trigger rejects', async () => {
-      mockedTriggerContentUpdateOnChange.mockResolvedValue({
-        triggered: true,
-        failed: true,
-      });
+      mockedTriggerContentUpdateOnChange.mockRejectedValue(
+        new Error('Content Manager unreachable'),
+      );
 
       const response = await supertest(innerServer.listener)
         .get(routes.ctiRegistrationStatus)

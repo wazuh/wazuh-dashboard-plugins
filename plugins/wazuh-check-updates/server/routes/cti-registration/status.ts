@@ -20,7 +20,9 @@ async function withSubscriptionFields(
   base: StatusWithoutSubscriptionFields,
 ): Promise<CtiRegistrationStatusApiBody> {
   const subscription = await getCtiSubscriptionStatus(wazuhClient);
-  triggerContentUpdateOnChange(wazuhClient, environmentUuid, subscription);
+  triggerContentUpdateOnChange(wazuhClient, environmentUuid, subscription).catch(
+    () => {},
+  );
 
   return {
     ...base,

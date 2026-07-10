@@ -48,8 +48,12 @@ export async function triggerContentUpdateOnChange(
   const priorSnapshot = store.getSubscriptionSnapshot(environmentUuid);
   const nextSnapshot = toSnapshot(subscription);
 
+  // Persisted synchronously, before any `await`, so an overlapping poll
+  // always diffs against the freshest observation and can never have its
+  // snapshot clobbered by a slower call finishing later with stale data.
+  store.setSubscriptionSnapshot(environmentUuid, nextSnapshot);
+
   if (!priorSnapshot) {
-    store.setSubscriptionSnapshot(environmentUuid, nextSnapshot);
     return { triggered: false, failed: false };
   }
 
@@ -57,12 +61,10 @@ export async function triggerContentUpdateOnChange(
   const shouldFire = changed && nextSnapshot.isRegistered === true;
 
   if (!shouldFire) {
-    store.setSubscriptionSnapshot(environmentUuid, nextSnapshot);
     return { triggered: false, failed: false };
   }
 
   if (!store.tryAcquireUpdateLock(environmentUuid)) {
-    store.setSubscriptionSnapshot(environmentUuid, nextSnapshot);
     return { triggered: false, failed: false };
   }
 
@@ -72,7 +74,6 @@ export async function triggerContentUpdateOnChange(
       path: contentManagerRoutes.contentUpdate,
       body: {},
     });
-    store.setSubscriptionSnapshot(environmentUuid, nextSnapshot);
     return { triggered: true, failed: false };
   } catch (error) {
     const message =
@@ -87,7 +88,6 @@ export async function triggerContentUpdateOnChange(
       `Content update trigger failed for environment ${environmentUuid}: ${message}`,
     );
 
-    store.setSubscriptionSnapshot(environmentUuid, nextSnapshot);
     return { triggered: true, failed: true };
   } finally {
     store.releaseUpdateLock(environmentUuid);

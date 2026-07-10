@@ -143,15 +143,16 @@ export class CtiRegistrationStore {
 
   /**
    * Attempts to acquire the content-update in-flight lock for an environment.
-   * Returns `false` if the lock is already held (a content-update is in progress).
+   * Returns `false` if the lock is already held, or if no snapshot has been
+   * recorded yet (callers always persist a snapshot before locking).
    */
   tryAcquireUpdateLock(environmentUuid: string): boolean {
     const cur = this.subscriptionByEnvironmentUuid.get(environmentUuid);
-    if (cur?.updateInFlight) {
+    if (!cur || cur.updateInFlight) {
       return false;
     }
     this.subscriptionByEnvironmentUuid.set(environmentUuid, {
-      snapshot: cur?.snapshot ?? { isRegistered: false, planName: '' },
+      ...cur,
       updateInFlight: true,
     });
     return true;
