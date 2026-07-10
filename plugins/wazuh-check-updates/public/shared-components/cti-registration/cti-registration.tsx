@@ -28,8 +28,9 @@ export const CtiRegistration = () => {
   const showStartCtiBar =
     !loading &&
     !isSuccess &&
+    !isFailed &&
     !deviceFlowActive &&
-    (isFailed || statusCTI.status === statusCodes.NOT_FOUND);
+    statusCTI.status === statusCodes.NOT_FOUND;
 
   const showStatusBar =
     !loading &&
