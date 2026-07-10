@@ -40,6 +40,19 @@ jest.mock(
   }),
 );
 
+jest.mock('../../plugin-services', () => {
+  const loggerError = jest.fn();
+  return {
+    getWazuhCheckUpdatesServices: jest.fn().mockReturnValue({
+      logger: { error: loggerError },
+    }),
+  };
+});
+
+import { getWazuhCheckUpdatesServices } from '../../plugin-services';
+const mockedLoggerError = (getWazuhCheckUpdatesServices as jest.Mock)().logger
+  .error as jest.Mock;
+
 const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
 const mockWazuhClient = { asCurrentUser: {} };
@@ -104,6 +117,7 @@ describe('CTI registration status route', () => {
       triggered: false,
       failed: false,
     });
+    mockedLoggerError.mockClear();
   });
 
   test(`GET ${routes.ctiRegistrationStatus} when store is empty`, async () => {
@@ -253,7 +267,7 @@ describe('CTI registration status route', () => {
       );
     });
 
-    test('does not fail the response when the trigger rejects', async () => {
+    test('does not fail the response when the trigger rejects, and logs it instead', async () => {
       mockedTriggerContentUpdateOnChange.mockRejectedValue(
         new Error('Content Manager unreachable'),
       );
@@ -263,6 +277,11 @@ describe('CTI registration status route', () => {
         .expect(200);
 
       expect(response.body.contentUpdate).toBeUndefined();
+
+      // Give the un-awaited trigger's rejection handler a microtask turn.
+      await new Promise(resolve => setImmediate(resolve));
+      expect(mockedLoggerError).toHaveBeenCalledTimes(1);
+      expect(mockedLoggerError.mock.calls[0][0]).toContain('env-uuid-1');
     });
   });
 });

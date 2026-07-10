@@ -8,6 +8,7 @@ import {
 import { CtiConfigurationError } from '../../services/cti-registration/cti-console-url';
 import { CtiRegistrationStore } from '../../services/cti-registration/cti-registration-store';
 import { triggerContentUpdateOnChange } from '../../services/cti-registration/trigger-content-update-on-change';
+import { getWazuhCheckUpdatesServices } from '../../plugin-services';
 
 type StatusWithoutSubscriptionFields = Omit<
   CtiRegistrationStatusApiBody,
@@ -20,9 +21,21 @@ async function withSubscriptionFields(
   base: StatusWithoutSubscriptionFields,
 ): Promise<CtiRegistrationStatusApiBody> {
   const subscription = await getCtiSubscriptionStatus(wazuhClient);
-  triggerContentUpdateOnChange(wazuhClient, environmentUuid, subscription).catch(
-    () => {},
-  );
+  triggerContentUpdateOnChange(
+    wazuhClient,
+    environmentUuid,
+    subscription,
+  ).catch(error => {
+    try {
+      getWazuhCheckUpdatesServices().logger.error(
+        `Unexpected error triggering CTI content update for ${environmentUuid}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    } catch {
+      // Logger itself unavailable; nothing more we can safely do here.
+    }
+  });
 
   return {
     ...base,
