@@ -23,6 +23,7 @@ import {
   EuiConfirmModal,
   EuiDescriptionList,
   EuiFieldText,
+  EuiFlexGrid,
   EuiFlexGroup,
   EuiFlexItem,
   EuiForm,
@@ -237,7 +238,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
         <EuiTitle size='xxs'>
           <h4>{`Comments (${comments.length}/${MAX_CASE_COMMENTS})`}</h4>
         </EuiTitle>
-        <EuiSpacer size='s' />
+        <EuiSpacer size='l' />
         <EuiCommentList>
           {comments.map((comment: CaseComment, index: number) => {
             const commentKey = comment.created_at;
@@ -349,7 +350,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     );
   };
 
-  const detailItems = [
+  const summaryItems = [
     {
       title: 'Title',
       description: title || '—',
@@ -358,6 +359,9 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
       title: 'Description',
       description: description || '—',
     },
+  ];
+
+  const shortItems = [
     {
       title: 'Severity',
       description: severity ? (
@@ -386,17 +390,18 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
         '—'
       ),
     },
-    {
-      title: 'Tags',
-      description: tags.length
-        ? tags.map(tag => (
-            <EuiBadge key={tag.label} color='hollow'>
-              {tag.label}
-            </EuiBadge>
-          ))
-        : '—',
-    },
   ];
+
+  const tagsItem = {
+    title: 'Tags',
+    description: tags.length
+      ? tags.map(tag => (
+          <EuiBadge key={tag.label} color='hollow'>
+            {tag.label}
+          </EuiBadge>
+        ))
+      : '—',
+  };
 
   const metadataItems = [
     ...(!isNewCase
@@ -508,12 +513,24 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
         <>
           <EuiFlexItem grow={false}>
             <EuiDescriptionList
-              type='column'
+              type='row'
               compressed
-              listItems={[...detailItems, ...metadataItems]}
-              columnWidths={[1, 3]}
-              descriptionProps={{ style: { textAlign: 'justify' } }}
+              listItems={summaryItems}
             />
+            <EuiSpacer size='s' />
+            <EuiFlexGrid columns={2} gutterSize='s'>
+              {[...shortItems, ...metadataItems].map(item => (
+                <EuiFlexItem key={item.title}>
+                  <EuiDescriptionList
+                    type='row'
+                    compressed
+                    listItems={[item]}
+                  />
+                </EuiFlexItem>
+              ))}
+            </EuiFlexGrid>
+            <EuiSpacer size='s' />
+            <EuiDescriptionList type='row' compressed listItems={[tagsItem]} />
           </EuiFlexItem>
           {comments.length > 0 && (
             <EuiFlexItem grow={false}>
@@ -527,13 +544,17 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
         <>
           {metadataItems.length > 0 && (
             <EuiFlexItem grow={false}>
-              <EuiDescriptionList
-                type='column'
-                compressed
-                listItems={metadataItems}
-                columnWidths={[1, 3]}
-                descriptionProps={{ style: { textAlign: 'justify' } }}
-              />
+              <EuiFlexGrid columns={2} gutterSize='s'>
+                {metadataItems.map(item => (
+                  <EuiFlexItem key={item.title}>
+                    <EuiDescriptionList
+                      type='row'
+                      compressed
+                      listItems={[item]}
+                    />
+                  </EuiFlexItem>
+                ))}
+              </EuiFlexGrid>
             </EuiFlexItem>
           )}
 
@@ -583,80 +604,86 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
 
               <EuiSpacer size='m' />
 
-              <EuiFormRow
-                fullWidth
-                label='Status'
-                helpText='Current lifecycle status of this finding.'
-              >
-                <EuiSelect
-                  fullWidth
-                  options={CASE_STATUS_OPTIONS}
-                  value={status}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    setStatus(e.target.value as CaseStatus)
-                  }
-                  disabled={isSaving || isCleaning}
-                  hasNoInitialSelection={isNewCase && !status}
-                  aria-label='Case status'
-                />
-              </EuiFormRow>
+              <EuiFlexGroup gutterSize='m'>
+                <EuiFlexItem>
+                  <EuiFormRow
+                    fullWidth
+                    label='Status'
+                    helpText='Current lifecycle status of this finding.'
+                  >
+                    <EuiSelect
+                      fullWidth
+                      options={CASE_STATUS_OPTIONS}
+                      value={status}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                        setStatus(e.target.value as CaseStatus)
+                      }
+                      disabled={isSaving || isCleaning}
+                      hasNoInitialSelection={isNewCase && !status}
+                      aria-label='Case status'
+                    />
+                  </EuiFormRow>
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  <EuiFormRow
+                    fullWidth
+                    label='Severity'
+                    helpText='Impact severity of this case.'
+                  >
+                    <EuiSelect
+                      fullWidth
+                      options={CASE_SEVERITY_OPTIONS}
+                      value={severity}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                        setSeverity(e.target.value as CaseSeverity | '')
+                      }
+                      disabled={isSaving || isCleaning}
+                      aria-label='Case severity'
+                    />
+                  </EuiFormRow>
+                </EuiFlexItem>
+              </EuiFlexGroup>
 
               <EuiSpacer size='m' />
 
-              <EuiFormRow
-                fullWidth
-                label='Severity'
-                helpText='Impact severity of this case.'
-              >
-                <EuiSelect
-                  fullWidth
-                  options={CASE_SEVERITY_OPTIONS}
-                  value={severity}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    setSeverity(e.target.value as CaseSeverity | '')
-                  }
-                  disabled={isSaving || isCleaning}
-                  aria-label='Case severity'
-                />
-              </EuiFormRow>
-
-              <EuiSpacer size='m' />
-
-              <EuiFormRow
-                fullWidth
-                label='Priority'
-                helpText='Triage priority of this case.'
-              >
-                <EuiSelect
-                  fullWidth
-                  options={CASE_PRIORITY_OPTIONS}
-                  value={priority}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    setPriority(e.target.value as CasePriority | '')
-                  }
-                  disabled={isSaving || isCleaning}
-                  aria-label='Case priority'
-                />
-              </EuiFormRow>
-
-              <EuiSpacer size='m' />
-
-              <EuiFormRow
-                fullWidth
-                label='TLP'
-                helpText='Traffic Light Protocol sharing level.'
-              >
-                <EuiSelect
-                  fullWidth
-                  options={CASE_TLP_OPTIONS}
-                  value={tlp}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    setTlp(e.target.value as CaseTLP | '')
-                  }
-                  disabled={isSaving || isCleaning}
-                  aria-label='Case TLP'
-                />
-              </EuiFormRow>
+              <EuiFlexGroup gutterSize='m'>
+                <EuiFlexItem>
+                  <EuiFormRow
+                    fullWidth
+                    label='Priority'
+                    helpText='Triage priority of this case.'
+                  >
+                    <EuiSelect
+                      fullWidth
+                      options={CASE_PRIORITY_OPTIONS}
+                      value={priority}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                        setPriority(e.target.value as CasePriority | '')
+                      }
+                      disabled={isSaving || isCleaning}
+                      aria-label='Case priority'
+                    />
+                  </EuiFormRow>
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  <EuiFormRow
+                    fullWidth
+                    label='TLP'
+                    helpText='Traffic Light Protocol sharing level.'
+                  >
+                    <EuiSelect
+                      fullWidth
+                      options={CASE_TLP_OPTIONS}
+                      value={tlp}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                        setTlp(e.target.value as CaseTLP | '')
+                      }
+                      disabled={isSaving || isCleaning}
+                      aria-label='Case TLP'
+                    />
+                  </EuiFormRow>
+                </EuiFlexItem>
+              </EuiFlexGroup>
 
               <EuiSpacer size='m' />
 
