@@ -122,9 +122,9 @@ export type CaseFormAction =
   | { type: 'ADD_TAG'; payload: string }
   | { type: 'SET_NEW_COMMENT'; payload: string }
   | {
-      type: 'SET_COMMENT_EDIT';
-      payload: { createdAt: string; comment: string };
-    }
+    type: 'SET_COMMENT_EDIT';
+    payload: { createdAt: string; comment: string };
+  }
   | { type: 'DISCARD_COMMENT_EDIT'; payload: { createdAt: string } }
   | { type: 'RESET' }
   | { type: 'SAVE_START' }
@@ -384,6 +384,9 @@ export function useCaseManagementForm(
             type: 'LOAD_SUCCESS',
             payload: { caseData: caseData ?? {}, username },
           });
+          if (!caseData?.status && !caseData?.title) {
+            dispatch({ type: 'SET_TITLE', payload: `Case_${document._id}` });
+          }
         }
       } catch {
         if (!cancelled) {
@@ -447,17 +450,27 @@ export function useCaseManagementForm(
       dispatch({ type: 'DISCARD_COMMENT_EDIT', payload: { createdAt } }),
     [],
   );
-  const handleReset = useCallback(() => dispatch({ type: 'RESET' }), []);
+  const handleReset = useCallback(() => {
+    dispatch({ type: 'RESET' });
+    if (!state.baseline.status && !state.baseline.title) {
+      dispatch({ type: 'SET_TITLE', payload: `Case_${document._id}` });
+    }
+  }, [state.baseline.status, state.baseline.title, document._id]);
 
   const handleSave = useCallback(async () => {
     if (isSaving || isCleaning) {
       return;
     }
 
-    if (!state.status) {
+    const missingRequiredField = [
+      ['Status', state.status],
+      ['Title', state.title.trim()],
+      ['Severity', state.severity],
+    ].find(([, value]) => !value)?.[0];
+    if (missingRequiredField) {
       getToasts().add({
         color: 'warning',
-        title: 'Status is required',
+        title: `${missingRequiredField} is required`,
         toastLifeTimeMs: 3000,
       });
       return;
@@ -557,6 +570,9 @@ export function useCaseManagementForm(
         document._id,
       );
       dispatch({ type: 'CLEAN_SUCCESS', payload: cleanedCase });
+      if (!cleanedCase?.status && !cleanedCase?.title) {
+        dispatch({ type: 'SET_TITLE', payload: `Case_${document._id}` });
+      }
       onSaveSuccess?.(cleanedCase);
       getToasts().add({
         color: 'success',

@@ -291,6 +291,45 @@ describe('useCaseManagementForm', () => {
     expect(result.current.isDirty).toBe(false);
   });
 
+  it('prefills the title with Case_<document id> for a new case and sends it on create', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: null,
+      username: 'admin',
+    });
+    (updateDocumentCase as jest.Mock).mockResolvedValue({
+      case: { status: 'active', title: 'Case_doc-1', severity: 'low' },
+      username: 'admin',
+    });
+
+    const { result } = renderHook(() => useCaseManagementForm(documentRef));
+    await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
+
+    expect(result.current.title).toBe('Case_doc-1');
+    expect(result.current.isNewCase).toBe(true);
+
+    act(() => {
+      result.current.setTitle('custom');
+    });
+    act(() => {
+      result.current.handleReset();
+    });
+    expect(result.current.title).toBe('Case_doc-1');
+
+    act(() => {
+      result.current.setStatus('active');
+      result.current.setSeverity('low');
+    });
+    await act(async () => {
+      await result.current.handleSave();
+    });
+
+    expect(updateDocumentCase).toHaveBeenCalledWith(
+      'wazuh-findings-v5-security',
+      'doc-1',
+      expect.objectContaining({ title: 'Case_doc-1' }),
+    );
+  });
+
   it('requires a status before saving', async () => {
     (getFindingsCase as jest.Mock).mockResolvedValue({
       case: null,
@@ -306,6 +345,38 @@ describe('useCaseManagementForm', () => {
 
     expect(mockToastAdd).toHaveBeenCalledWith(
       expect.objectContaining({ title: 'Status is required' }),
+    );
+    expect(updateDocumentCase).not.toHaveBeenCalled();
+  });
+
+  it('requires a title and a severity before saving', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: null,
+      username: 'admin',
+    });
+
+    const { result } = renderHook(() => useCaseManagementForm(documentRef));
+    await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
+
+    act(() => {
+      result.current.setStatus('active');
+      result.current.setTitle('   ');
+    });
+    await act(async () => {
+      await result.current.handleSave();
+    });
+    expect(mockToastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Title is required' }),
+    );
+
+    act(() => {
+      result.current.setTitle('a case');
+    });
+    await act(async () => {
+      await result.current.handleSave();
+    });
+    expect(mockToastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Severity is required' }),
     );
     expect(updateDocumentCase).not.toHaveBeenCalled();
   });
@@ -329,7 +400,7 @@ describe('useCaseManagementForm', () => {
 
     act(() => {
       result.current.setTitle('  edited title  ');
-      result.current.setSeverity('');
+      result.current.setSeverity('critical');
       result.current.setNewComment('  a note  ');
       result.current.applyCommentEdit(EARLIER, 'first edited');
     });
@@ -347,7 +418,7 @@ describe('useCaseManagementForm', () => {
         status: 'active',
         tags: ['one', 'two'],
         title: 'edited title',
-        severity: '',
+        severity: 'critical',
         newComment: 'a note',
         editedComments: [{ created_at: EARLIER, comment: 'first edited' }],
       },
@@ -386,7 +457,12 @@ describe('useCaseManagementForm', () => {
 
   it('sends none of the new schema fields on a status-only change', async () => {
     (getFindingsCase as jest.Mock).mockResolvedValue({
-      case: { status: 'active', tags: ['one'] },
+      case: {
+        status: 'active',
+        tags: ['one'],
+        title: 'a title',
+        severity: 'low',
+      },
       username: 'admin',
     });
     (updateDocumentCase as jest.Mock).mockResolvedValue({

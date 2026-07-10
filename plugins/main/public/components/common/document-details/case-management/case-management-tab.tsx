@@ -21,12 +21,11 @@ import {
   EuiComment,
   EuiCommentList,
   EuiConfirmModal,
-  EuiDescriptionList,
   EuiFieldText,
-  EuiFlexGrid,
   EuiFlexGroup,
   EuiFlexItem,
   EuiForm,
+  EuiFormLabel,
   EuiFormRow,
   EuiLoadingSpinner,
   EuiOverlayMask,
@@ -61,15 +60,13 @@ const CASE_STATUS_OPTIONS: Array<{ value: CaseStatus; text: string }> = [
   { value: 'deleted', text: 'Deleted' },
 ];
 
-const CASE_SEVERITY_OPTIONS: Array<{ value: CaseSeverity | ''; text: string }> =
-  [
-    { value: '', text: '—' },
-    { value: 'informational', text: 'Informational' },
-    { value: 'low', text: 'Low' },
-    { value: 'medium', text: 'Medium' },
-    { value: 'high', text: 'High' },
-    { value: 'critical', text: 'Critical' },
-  ];
+const CASE_SEVERITY_OPTIONS: Array<{ value: CaseSeverity; text: string }> = [
+  { value: 'informational', text: 'Informational' },
+  { value: 'low', text: 'Low' },
+  { value: 'medium', text: 'Medium' },
+  { value: 'high', text: 'High' },
+  { value: 'critical', text: 'Critical' },
+];
 
 const CASE_PRIORITY_OPTIONS: Array<{ value: CasePriority | ''; text: string }> =
   [
@@ -123,6 +120,52 @@ const optionText = (
   options: Array<{ value: string; text: string }>,
   value: string | undefined,
 ): string | undefined => options.find(option => option.value === value)?.text;
+
+const renderTwoColumnRows = (
+  items: Array<{
+    title: string;
+    description: React.ReactNode;
+    fullWidth?: boolean;
+  }>,
+) => {
+  const rows: Array<typeof items> = [];
+  let pending: (typeof items)[number] | undefined;
+  for (const item of items) {
+    if (item.fullWidth) {
+      if (pending) {
+        rows.push([pending]);
+        pending = undefined;
+      }
+      rows.push([item]);
+    } else if (pending) {
+      rows.push([pending, item]);
+      pending = undefined;
+    } else {
+      pending = item;
+    }
+  }
+  if (pending) {
+    rows.push([pending]);
+  }
+  return rows.map((row, rowIndex) => (
+    <React.Fragment key={row[0].title}>
+      {rowIndex > 0 && <EuiSpacer />}
+      <EuiFlexGroup justifyContent='flexEnd'>
+        {row.map(item => (
+          <EuiFlexItem key={item.title}>
+            <EuiFormLabel>{item.title}</EuiFormLabel>
+            <EuiSpacer size='s' />
+            {typeof item.description === 'string' ? (
+              <EuiText size='s'>{item.description}</EuiText>
+            ) : (
+              <div>{item.description}</div>
+            )}
+          </EuiFlexItem>
+        ))}
+      </EuiFlexGroup>
+    </React.Fragment>
+  ));
+};
 
 interface CaseManagementTabProps {
   document: CaseManagementFormDocument;
@@ -332,7 +375,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                   </>
                 ) : (
                   <>
-                    <EuiText size='s'>
+                    <EuiText size='s' style={{ textAlign: 'justify' }}>
                       {pendingText ?? comment.comment ?? ''}
                     </EuiText>
                     {pendingText !== undefined && (
@@ -354,10 +397,18 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     {
       title: 'Title',
       description: title || '—',
+      fullWidth: true,
     },
     {
       title: 'Description',
-      description: description || '—',
+      description: description ? (
+        <EuiText size='s' style={{ textAlign: 'justify' }}>
+          {description}
+        </EuiText>
+      ) : (
+        '—'
+      ),
+      fullWidth: true,
     },
   ];
 
@@ -401,6 +452,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
           </EuiBadge>
         ))
       : '—',
+    fullWidth: true,
   };
 
   const metadataItems = [
@@ -512,25 +564,12 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
       {!showForm && (
         <>
           <EuiFlexItem grow={false}>
-            <EuiDescriptionList
-              type='row'
-              compressed
-              listItems={summaryItems}
-            />
-            <EuiSpacer size='s' />
-            <EuiFlexGrid columns={2} gutterSize='s'>
-              {[...shortItems, ...metadataItems].map(item => (
-                <EuiFlexItem key={item.title}>
-                  <EuiDescriptionList
-                    type='row'
-                    compressed
-                    listItems={[item]}
-                  />
-                </EuiFlexItem>
-              ))}
-            </EuiFlexGrid>
-            <EuiSpacer size='s' />
-            <EuiDescriptionList type='row' compressed listItems={[tagsItem]} />
+            {renderTwoColumnRows([
+              ...summaryItems,
+              ...shortItems,
+              ...metadataItems,
+              tagsItem,
+            ])}
           </EuiFlexItem>
           {comments.length > 0 && (
             <EuiFlexItem grow={false}>
@@ -544,17 +583,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
         <>
           {metadataItems.length > 0 && (
             <EuiFlexItem grow={false}>
-              <EuiFlexGrid columns={2} gutterSize='s'>
-                {metadataItems.map(item => (
-                  <EuiFlexItem key={item.title}>
-                    <EuiDescriptionList
-                      type='row'
-                      compressed
-                      listItems={[item]}
-                    />
-                  </EuiFlexItem>
-                ))}
-              </EuiFlexGrid>
+              {renderTwoColumnRows(metadataItems)}
             </EuiFlexItem>
           )}
 
@@ -565,7 +594,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
             <EuiForm component='form'>
               <EuiFormRow
                 fullWidth
-                label='Title'
+                label='Title *'
                 helpText='Short summary of this case.'
               >
                 <EuiFieldText
@@ -608,7 +637,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 <EuiFlexItem>
                   <EuiFormRow
                     fullWidth
-                    label='Status'
+                    label='Status *'
                     helpText='Current lifecycle status of this finding.'
                   >
                     <EuiSelect
@@ -627,7 +656,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 <EuiFlexItem>
                   <EuiFormRow
                     fullWidth
-                    label='Severity'
+                    label='Severity *'
                     helpText='Impact severity of this case.'
                   >
                     <EuiSelect
@@ -635,9 +664,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                       options={CASE_SEVERITY_OPTIONS}
                       value={severity}
                       onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        setSeverity(e.target.value as CaseSeverity | '')
+                        setSeverity(e.target.value as CaseSeverity)
                       }
                       disabled={isSaving || isCleaning}
+                      hasNoInitialSelection={!severity}
                       aria-label='Case severity'
                     />
                   </EuiFormRow>
@@ -769,6 +799,8 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                     isLoading={isSaving}
                     disabled={
                       !status ||
+                      !title.trim() ||
+                      !severity ||
                       (!isNewCase && !isDirty) ||
                       isCleaning ||
                       // Confirm or cancel the open inline comment edit first,
