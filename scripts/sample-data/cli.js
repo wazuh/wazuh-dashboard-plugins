@@ -383,59 +383,6 @@ function handleResult(result) {
 
   const docsArray = Array.isArray(result) ? result : [result];
 
-  if (output === 'insert') {
-    let config = {
-      HOST: process.env.WAZUH_HOST,
-      PORT: process.env.WAZUH_PORT,
-      USERNAME: process.env.WAZUH_USERNAME,
-      PASSWORD: process.env.WAZUH_PASSWORD,
-    };
-    config = validateConfig(config);
-
-    const date = new Date().toISOString().replace(/[:.]/g, '-');
-    const logPath = path.join(
-      __dirname,
-      'logs',
-      `cli_sample_data_insert_${date}.log`,
-    );
-
-    const batches = batch(docsArray, INSERT_BATCH_SIZE);
-    const allFailed = [];
-
-    batches.forEach((batchDocs, i) => {
-      console.error(
-        `Inserting batch ${i + 1}/${batches.length} (${batchDocs.length} documents)...`,
-      );
-      const batchFormatted = formats['bulk-api'].run(batchDocs, index);
-      const failed = insertData(
-        batchFormatted,
-        config,
-        logPath,
-        i + 1,
-        batches.length,
-      );
-      allFailed.push(...failed);
-    });
-
-    if (allFailed.length > 0) {
-      console.error(`\n${allFailed.length} document(s) failed to insert:`);
-
-      const errorLines = allFailed
-        .map(item => `${item._id} | ${item.status} | ${item.reason}`)
-        .join('\n');
-
-      console.error(errorLines);
-
-      log(
-        logPath,
-        `\n${'='.repeat(60)}\nErrors Summary: ${allFailed.length} document(s) failed\n${'='.repeat(60)}\n${errorLines}\n`,
-      );
-    }
-
-    console.error(`\nFull log saved to ${logPath}`);
-    return;
-  }
-
   const formatted =
     format === 'bulk-api'
       ? formats['bulk-api'].run(result)
@@ -443,14 +390,58 @@ function handleResult(result) {
 
   if (output) {
     if (output === 'insert') {
-      let config = {
-        HOST: process.env.WAZUH_INDEXER_HOST,
-        PORT: process.env.WAZUH_INDEXER_PORT,
-        USERNAME: process.env.WAZUH_USERNAME,
-        PASSWORD: process.env.WAZUH_PASSWORD,
-      };
-      config = validateConfig(config);
-      insertData(formatted, config);
+      if (output === 'insert') {
+        let config = {
+          HOST: process.env.WAZUH_INDEXER_HOST,
+          PORT: process.env.WAZUH_INDEXER_PORT,
+          USERNAME: process.env.WAZUH_USERNAME,
+          PASSWORD: process.env.WAZUH_PASSWORD,
+        };
+        config = validateConfig(config);
+
+        const date = new Date().toISOString().replace(/[:.]/g, '-');
+        const logPath = path.join(
+          __dirname,
+          'logs',
+          `cli_sample_data_insert_${date}.log`,
+        );
+
+        const batches = batch(docsArray, INSERT_BATCH_SIZE);
+        const allFailed = [];
+
+        batches.forEach((batchDocs, i) => {
+          console.error(
+            `Inserting batch ${i + 1}/${batches.length} (${batchDocs.length} documents)...`,
+          );
+          const batchFormatted = formats['bulk-api'].run(batchDocs, index);
+          const failed = insertData(
+            batchFormatted,
+            config,
+            logPath,
+            i + 1,
+            batches.length,
+          );
+          allFailed.push(...failed);
+        });
+
+        if (allFailed.length > 0) {
+          console.error(`\n${allFailed.length} document(s) failed to insert:`);
+
+          const errorLines = allFailed
+            .map(item => `${item._id} | ${item.status} | ${item.reason}`)
+            .join('\n');
+
+          console.error(errorLines);
+
+          log(
+            logPath,
+            `\n${'='.repeat(60)}\nErrors Summary: ${allFailed.length} document(s) failed\n${'='.repeat(60)}\n${errorLines}\n`,
+          );
+        }
+
+        console.error(`\nFull log saved to ${logPath}`);
+        return;
+      }
     } else {
       const outputPath = path.resolve(output);
       try {
