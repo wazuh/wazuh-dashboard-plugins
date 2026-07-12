@@ -77,7 +77,6 @@ describe('caseFormReducer', () => {
       tags: [{ label: 'one' }, { label: 'two' }],
       comments: fullCase.comments,
       newComment: '',
-      editedComments: {},
       currentUsername: 'admin',
       caseUsername: 'admin',
       existingCreatedAt: EARLIER,
@@ -127,103 +126,35 @@ describe('caseFormReducer', () => {
     expect(isFormDirty(state)).toBe(true);
   });
 
-  it('typing only a new comment marks the form dirty', () => {
+  it('typing a new comment does not mark the form dirty', () => {
     const state = caseFormReducer(loadedState(fullCase), {
       type: 'SET_NEW_COMMENT',
       payload: 'a new note',
     });
 
-    expect(isFormDirty(state)).toBe(true);
-  });
-
-  it('a whitespace-only new comment does not mark the form dirty', () => {
-    const state = caseFormReducer(loadedState(fullCase), {
-      type: 'SET_NEW_COMMENT',
-      payload: '   ',
-    });
-
     expect(isFormDirty(state)).toBe(false);
   });
 
-  it('SET_COMMENT_EDIT registers a pending edit and marks dirty', () => {
-    const state = caseFormReducer(loadedState(fullCase), {
-      type: 'SET_COMMENT_EDIT',
-      payload: { createdAt: EARLIER, comment: 'edited text' },
-    });
-
-    expect(state.editedComments).toEqual({ [EARLIER]: 'edited text' });
-    expect(isFormDirty(state)).toBe(true);
-  });
-
-  it('re-applying the original text drops the pending edit', () => {
-    let state = caseFormReducer(loadedState(fullCase), {
-      type: 'SET_COMMENT_EDIT',
-      payload: { createdAt: EARLIER, comment: 'edited text' },
-    });
-    state = caseFormReducer(state, {
-      type: 'SET_COMMENT_EDIT',
-      payload: { createdAt: EARLIER, comment: 'first' },
-    });
-
-    expect(state.editedComments).toEqual({});
-    expect(isFormDirty(state)).toBe(false);
-  });
-
-  it('ignores empty comment edits and edits of unknown comments', () => {
-    const loaded = loadedState(fullCase);
-
-    expect(
-      caseFormReducer(loaded, {
-        type: 'SET_COMMENT_EDIT',
-        payload: { createdAt: EARLIER, comment: '   ' },
-      }).editedComments,
-    ).toEqual({});
-    expect(
-      caseFormReducer(loaded, {
-        type: 'SET_COMMENT_EDIT',
-        payload: { createdAt: 'does-not-exist', comment: 'x' },
-      }).editedComments,
-    ).toEqual({});
-  });
-
-  it('DISCARD_COMMENT_EDIT removes the pending edit', () => {
-    let state = caseFormReducer(loadedState(fullCase), {
-      type: 'SET_COMMENT_EDIT',
-      payload: { createdAt: EARLIER, comment: 'edited text' },
-    });
-    state = caseFormReducer(state, {
-      type: 'DISCARD_COMMENT_EDIT',
-      payload: { createdAt: EARLIER },
-    });
-
-    expect(state.editedComments).toEqual({});
-  });
-
-  it('RESET restores scalars and clears comment drafts', () => {
+  it('RESET restores scalars but keeps the comment draft', () => {
     let state = loadedState(fullCase);
     state = caseFormReducer(state, { type: 'SET_TITLE', payload: 'changed' });
     state = caseFormReducer(state, {
       type: 'SET_NEW_COMMENT',
       payload: 'draft',
     });
-    state = caseFormReducer(state, {
-      type: 'SET_COMMENT_EDIT',
-      payload: { createdAt: EARLIER, comment: 'edited' },
-    });
 
     state = caseFormReducer(state, { type: 'RESET' });
 
     expect(state.title).toBe('a title');
-    expect(state.newComment).toBe('');
-    expect(state.editedComments).toEqual({});
+    expect(state.newComment).toBe('draft');
     expect(isFormDirty(state)).toBe(false);
   });
 
-  it('SAVE_SUCCESS re-baselines and replaces comments', () => {
+  it('SAVE_SUCCESS re-baselines, replaces comments and keeps the comment draft', () => {
     let state = loadedState(fullCase);
     state = caseFormReducer(state, {
       type: 'SET_NEW_COMMENT',
-      payload: 'to append',
+      payload: 'not submitted yet',
     });
 
     const savedCase: CaseData = {
@@ -233,7 +164,7 @@ describe('caseFormReducer', () => {
         ...(fullCase.comments ?? []),
         {
           author: 'admin',
-          comment: 'to append',
+          comment: 'second',
           created_at: LATER,
           updated_at: LATER,
         },
@@ -245,9 +176,54 @@ describe('caseFormReducer', () => {
     });
 
     expect(state.comments).toHaveLength(2);
-    expect(state.newComment).toBe('');
+    expect(state.newComment).toBe('not submitted yet');
     expect(state.existingUpdatedAt).toBe(LATER);
     expect(isFormDirty(state)).toBe(false);
+  });
+
+  it('COMMENT_SAVE_START and COMMENT_SAVE_END toggle the flag', () => {
+    let state = caseFormReducer(loadedState(fullCase), {
+      type: 'COMMENT_SAVE_START',
+    });
+    expect(state.isSavingComment).toBe(true);
+
+    state = caseFormReducer(state, { type: 'COMMENT_SAVE_END' });
+    expect(state.isSavingComment).toBe(false);
+  });
+
+  it('COMMENT_SAVE_SUCCESS refreshes comments without touching form drafts', () => {
+    let state = loadedState(fullCase);
+    state = caseFormReducer(state, {
+      type: 'SET_TITLE',
+      payload: 'draft title',
+    });
+    state = caseFormReducer(state, { type: 'COMMENT_SAVE_START' });
+
+    const savedCase: CaseData = {
+      ...fullCase,
+      updated_at: LATER,
+      comments: [
+        ...(fullCase.comments ?? []),
+        {
+          author: 'admin',
+          comment: 'a note',
+          created_at: LATER,
+          updated_at: LATER,
+        },
+      ],
+    };
+    state = caseFormReducer(state, {
+      type: 'COMMENT_SAVE_SUCCESS',
+      payload: { caseData: savedCase, username: 'admin' },
+    });
+
+    expect(state.comments).toHaveLength(2);
+    expect(state.existingUpdatedAt).toBe(LATER);
+    expect(state.isSavingComment).toBe(false);
+    // The unsaved form draft and its baseline must survive a comment save.
+    expect(state.title).toBe('draft title');
+    expect(state.baseline.title).toBe('a title');
+    expect(isFormDirty(state)).toBe(true);
   });
 
   it('CLEAN_SUCCESS with null empties the form and makes the case new again', () => {
@@ -409,8 +385,6 @@ describe('useCaseManagementForm', () => {
     act(() => {
       result.current.setTitle('  edited title  ');
       result.current.setSeverity('critical');
-      result.current.setNewComment('  a note  ');
-      result.current.applyCommentEdit(EARLIER, 'first edited');
     });
 
     await act(async () => {
@@ -427,8 +401,6 @@ describe('useCaseManagementForm', () => {
         tags: ['one', 'two'],
         title: 'edited title',
         severity: 'critical',
-        newComment: 'a note',
-        editedComments: [{ created_at: EARLIER, comment: 'first edited' }],
       },
     );
     expect(onSaveSuccess).toHaveBeenCalledWith(savedCase);
@@ -438,7 +410,7 @@ describe('useCaseManagementForm', () => {
     );
   });
 
-  it('omits newComment and editedComments when there are none', async () => {
+  it('never sends comment fields on a form save', async () => {
     (getFindingsCase as jest.Mock).mockResolvedValue({
       case: fullCase,
       username: 'admin',
@@ -453,6 +425,8 @@ describe('useCaseManagementForm', () => {
 
     act(() => {
       result.current.setTitle('another title');
+      // A typed comment draft belongs to the composer, not to the form.
+      result.current.setNewComment('a typed draft');
     });
     await act(async () => {
       await result.current.handleSave();
@@ -461,6 +435,205 @@ describe('useCaseManagementForm', () => {
     const payload = (updateDocumentCase as jest.Mock).mock.calls[0][2];
     expect(payload).not.toHaveProperty('newComment');
     expect(payload).not.toHaveProperty('editedComments');
+    expect(result.current.newComment).toBe('a typed draft');
+  });
+
+  it('a typed comment counts as unsaved changes but not as form dirty', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: fullCase,
+      username: 'admin',
+    });
+
+    const { result } = renderHook(() => useCaseManagementForm(documentRef));
+    await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
+
+    act(() => {
+      result.current.setNewComment('a note');
+    });
+
+    expect(result.current.isDirty).toBe(false);
+    expect(result.current.hasUnsavedChanges).toBe(true);
+  });
+
+  it('adds a comment through its own submit without touching the form', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: fullCase,
+      username: 'admin',
+    });
+    const savedCase: CaseData = {
+      ...fullCase,
+      updated_at: LATER,
+      comments: [
+        ...(fullCase.comments ?? []),
+        {
+          author: 'admin',
+          comment: 'a note',
+          created_at: LATER,
+          updated_at: LATER,
+        },
+      ],
+    };
+    (updateDocumentCase as jest.Mock).mockResolvedValue({
+      case: savedCase,
+      username: 'admin',
+    });
+    const onSaveSuccess = jest.fn();
+    const onCommentSaveSuccess = jest.fn();
+
+    const { result } = renderHook(() =>
+      useCaseManagementForm(documentRef, onSaveSuccess, onCommentSaveSuccess),
+    );
+    await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
+
+    act(() => {
+      result.current.setTitle('draft title');
+      result.current.setNewComment('  a note  ');
+    });
+    await act(async () => {
+      await result.current.handleCommentAdd();
+    });
+
+    expect(updateDocumentCase).toHaveBeenCalledWith(
+      'wazuh-findings-v5-security',
+      'doc-1',
+      { newComment: 'a note' },
+    );
+    expect(result.current.comments).toHaveLength(2);
+    expect(result.current.newComment).toBe('');
+    // The unsaved form draft must survive the comment save.
+    expect(result.current.title).toBe('draft title');
+    expect(result.current.isDirty).toBe(true);
+    expect(onCommentSaveSuccess).toHaveBeenCalledWith(savedCase);
+    expect(onSaveSuccess).not.toHaveBeenCalled();
+    expect(mockToastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Comment added' }),
+    );
+  });
+
+  it('handleCommentAdd ignores a whitespace-only comment', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: fullCase,
+      username: 'admin',
+    });
+
+    const { result } = renderHook(() => useCaseManagementForm(documentRef));
+    await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
+
+    act(() => {
+      result.current.setNewComment('   ');
+    });
+    await act(async () => {
+      await result.current.handleCommentAdd();
+    });
+
+    expect(updateDocumentCase).not.toHaveBeenCalled();
+  });
+
+  it('keeps the comment draft and reports the error when adding fails', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: fullCase,
+      username: 'admin',
+    });
+    (updateDocumentCase as jest.Mock).mockRejectedValue(new Error('boom'));
+
+    const { result } = renderHook(() => useCaseManagementForm(documentRef));
+    await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
+
+    act(() => {
+      result.current.setNewComment('a note');
+    });
+    await act(async () => {
+      await result.current.handleCommentAdd();
+    });
+
+    expect(mockHandleError).toHaveBeenCalled();
+    expect(result.current.isSavingComment).toBe(false);
+    expect(result.current.newComment).toBe('a note');
+  });
+
+  it('persists an inline comment edit immediately', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: fullCase,
+      username: 'admin',
+    });
+    const savedCase: CaseData = {
+      ...fullCase,
+      updated_at: LATER,
+      comments: [
+        {
+          author: 'admin',
+          comment: 'first edited',
+          created_at: EARLIER,
+          updated_at: LATER,
+        },
+      ],
+    };
+    (updateDocumentCase as jest.Mock).mockResolvedValue({
+      case: savedCase,
+      username: 'admin',
+    });
+
+    const { result } = renderHook(() => useCaseManagementForm(documentRef));
+    await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
+
+    let saved = false;
+    await act(async () => {
+      saved = await result.current.handleCommentEditSave(
+        EARLIER,
+        '  first edited  ',
+      );
+    });
+
+    expect(saved).toBe(true);
+    expect(updateDocumentCase).toHaveBeenCalledWith(
+      'wazuh-findings-v5-security',
+      'doc-1',
+      { editedComments: [{ created_at: EARLIER, comment: 'first edited' }] },
+    );
+    expect(result.current.comments[0].comment).toBe('first edited');
+    expect(mockToastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Comment updated' }),
+    );
+  });
+
+  it('handleCommentEditSave skips the request when the text is unchanged', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: fullCase,
+      username: 'admin',
+    });
+
+    const { result } = renderHook(() => useCaseManagementForm(documentRef));
+    await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
+
+    let saved = false;
+    await act(async () => {
+      saved = await result.current.handleCommentEditSave(EARLIER, 'first');
+    });
+
+    expect(saved).toBe(true);
+    expect(updateDocumentCase).not.toHaveBeenCalled();
+  });
+
+  it('handleCommentEditSave rejects blank edits and unknown comments', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: fullCase,
+      username: 'admin',
+    });
+
+    const { result } = renderHook(() => useCaseManagementForm(documentRef));
+    await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
+
+    let saved = true;
+    await act(async () => {
+      saved = await result.current.handleCommentEditSave(EARLIER, '   ');
+    });
+    expect(saved).toBe(false);
+
+    await act(async () => {
+      saved = await result.current.handleCommentEditSave('does-not-exist', 'x');
+    });
+    expect(saved).toBe(false);
+    expect(updateDocumentCase).not.toHaveBeenCalled();
   });
 
   it('sends none of the new schema fields on a status-only change', async () => {

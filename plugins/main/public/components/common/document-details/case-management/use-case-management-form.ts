@@ -49,7 +49,6 @@ export interface UseCaseManagementFormReturn {
   tags: EuiComboBoxOptionOption[];
   comments: CaseComment[];
   newComment: string;
-  editedComments: Record<string, string>;
   currentUsername: string | undefined;
   caseUsername: string | undefined;
   isLoadingCase: boolean;
@@ -58,6 +57,7 @@ export interface UseCaseManagementFormReturn {
   existingUpdatedAt: string | undefined;
   isSaving: boolean;
   isCleaning: boolean;
+  isSavingComment: boolean;
   isDirty: boolean;
   hasUnsavedChanges: boolean;
   isNewCase: boolean;
@@ -70,8 +70,11 @@ export interface UseCaseManagementFormReturn {
   setTags: (tags: EuiComboBoxOptionOption[]) => void;
   handleTagCreate: (value: string) => void;
   setNewComment: (comment: string) => void;
-  applyCommentEdit: (createdAt: string, comment: string) => void;
-  discardCommentEdit: (createdAt: string) => void;
+  handleCommentAdd: () => Promise<void>;
+  handleCommentEditSave: (
+    createdAt: string,
+    comment: string,
+  ) => Promise<boolean>;
   handleSave: () => Promise<void>;
   handleClean: () => Promise<void>;
   handleReset: () => void;
@@ -97,7 +100,6 @@ export type CaseFormState = {
   tags: EuiComboBoxOptionOption[];
   comments: CaseComment[];
   newComment: string;
-  editedComments: Record<string, string>;
   currentUsername: string | undefined;
   caseUsername: string | undefined;
   isLoadingCase: boolean;
@@ -106,6 +108,7 @@ export type CaseFormState = {
   existingUpdatedAt: string | undefined;
   isSaving: boolean;
   isCleaning: boolean;
+  isSavingComment: boolean;
   baseline: CaseFormBaseline;
 };
 
@@ -122,15 +125,16 @@ export type CaseFormAction =
   | { type: 'SET_TAGS'; payload: EuiComboBoxOptionOption[] }
   | { type: 'ADD_TAG'; payload: string }
   | { type: 'SET_NEW_COMMENT'; payload: string }
-  | {
-    type: 'SET_COMMENT_EDIT';
-    payload: { createdAt: string; comment: string };
-  }
-  | { type: 'DISCARD_COMMENT_EDIT'; payload: { createdAt: string } }
   | { type: 'RESET' }
   | { type: 'SAVE_START' }
   | { type: 'SAVE_END' }
   | { type: 'SAVE_SUCCESS'; payload: { caseData: CaseData; username?: string } }
+  | { type: 'COMMENT_SAVE_START' }
+  | { type: 'COMMENT_SAVE_END' }
+  | {
+      type: 'COMMENT_SAVE_SUCCESS';
+      payload: { caseData: CaseData; username?: string };
+    }
   | { type: 'CLEAN_START' }
   | { type: 'CLEAN_END' }
   | { type: 'CLEAN_SUCCESS'; payload: CaseData | null };
@@ -164,7 +168,6 @@ const stateFromCase = (
     tags: tagsToOptions(baseline.tags),
     comments: caseData.comments ?? [],
     newComment: '',
-    editedComments: {},
     baseline,
   };
 };
@@ -179,7 +182,6 @@ export const createInitialState = (): CaseFormState => ({
   tags: [],
   comments: [],
   newComment: '',
-  editedComments: {},
   currentUsername: undefined,
   caseUsername: undefined,
   isLoadingCase: true,
@@ -188,6 +190,7 @@ export const createInitialState = (): CaseFormState => ({
   existingUpdatedAt: undefined,
   isSaving: false,
   isCleaning: false,
+  isSavingComment: false,
   baseline: {
     status: undefined,
     title: '',
@@ -258,34 +261,6 @@ export function caseFormReducer(
     case 'SET_NEW_COMMENT':
       return { ...state, newComment: action.payload };
 
-    case 'SET_COMMENT_EDIT': {
-      const { createdAt, comment } = action.payload;
-      if (!comment.trim()) {
-        // Comments cannot be blanked out (no deletion supported).
-        return state;
-      }
-      const original = state.comments.find(c => c.created_at === createdAt);
-      if (!original) {
-        return state;
-      }
-      if (comment === original.comment) {
-        // Back to the original text: drop the pending edit.
-        const { [createdAt]: _removed, ...editedComments } =
-          state.editedComments;
-        return { ...state, editedComments };
-      }
-      return {
-        ...state,
-        editedComments: { ...state.editedComments, [createdAt]: comment },
-      };
-    }
-
-    case 'DISCARD_COMMENT_EDIT': {
-      const { [action.payload.createdAt]: _removed, ...editedComments } =
-        state.editedComments;
-      return { ...state, editedComments };
-    }
-
     case 'RESET':
       return {
         ...state,
@@ -296,8 +271,6 @@ export function caseFormReducer(
         priority: state.baseline.priority,
         tlp: state.baseline.tlp,
         tags: tagsToOptions(state.baseline.tags),
-        newComment: '',
-        editedComments: {},
       };
 
     case 'SAVE_START':
@@ -310,11 +283,36 @@ export function caseFormReducer(
       const { caseData, username } = action.payload;
       return {
         ...stateFromCase(state, caseData),
+        // The comment composer is independent of the form: a form save must
+        // not wipe a typed-but-unsubmitted comment draft.
+        newComment: state.newComment,
         existingCreatedAt: state.existingCreatedAt ?? caseData.created_at,
         existingUpdatedAt: caseData.updated_at,
         caseUsername: caseData.user?.name ?? state.caseUsername,
         currentUsername: username ?? state.currentUsername,
         isSaving: false,
+      };
+    }
+
+    case 'COMMENT_SAVE_START':
+      return { ...state, isSavingComment: true };
+
+    case 'COMMENT_SAVE_END':
+      return { ...state, isSavingComment: false };
+
+    case 'COMMENT_SAVE_SUCCESS': {
+      const { caseData, username } = action.payload;
+      // Comments persist on their own: refresh only the comment thread and
+      // the case metadata so unsaved form drafts (and their baseline) are
+      // never clobbered by a comment save.
+      return {
+        ...state,
+        comments: caseData.comments ?? state.comments,
+        existingCreatedAt: state.existingCreatedAt ?? caseData.created_at,
+        existingUpdatedAt: caseData.updated_at ?? state.existingUpdatedAt,
+        caseUsername: caseData.user?.name ?? state.caseUsername,
+        currentUsername: username ?? state.currentUsername,
+        isSavingComment: false,
       };
     }
 
@@ -349,15 +347,14 @@ export function isFormDirty(state: CaseFormState): boolean {
     state.severity !== baseline.severity ||
     state.priority !== baseline.priority ||
     state.tlp !== baseline.tlp ||
-    state.tags.map(t => t.label).join(',') !== baseline.tags.join(',') ||
-    state.newComment.trim() !== '' ||
-    Object.keys(state.editedComments).length > 0
+    state.tags.map(t => t.label).join(',') !== baseline.tags.join(',')
   );
 }
 
 export function useCaseManagementForm(
   document: CaseManagementFormDocument,
   onSaveSuccess?: (caseData: CaseData | null) => void,
+  onCommentSaveSuccess?: (caseData: CaseData | null) => void,
 ): UseCaseManagementFormReturn {
   const [state, dispatch] = useReducer(
     caseFormReducer,
@@ -371,11 +368,16 @@ export function useCaseManagementForm(
     isNewCase &&
     !state.baseline.title &&
     state.title === `Case_${document._id}`;
-  const hasUnsavedChanges = titleIsAutoSuggestion
-    ? isFormDirty({ ...state, title: state.baseline.title })
-    : isDirty;
+  const hasUnsavedChanges =
+    (titleIsAutoSuggestion
+      ? isFormDirty({ ...state, title: state.baseline.title })
+      : isDirty) ||
+    // The comment composer is not form state, but a typed draft would still
+    // be lost on close: it must keep triggering the unsaved-changes guard.
+    state.newComment.trim() !== '';
   const isSaving = state.isSaving;
   const isCleaning = state.isCleaning;
+  const isSavingComment = state.isSavingComment;
 
   useEffect(() => {
     let cancelled = false;
@@ -448,16 +450,6 @@ export function useCaseManagementForm(
       dispatch({ type: 'SET_NEW_COMMENT', payload: comment }),
     [],
   );
-  const applyCommentEdit = useCallback(
-    (createdAt: string, comment: string) =>
-      dispatch({ type: 'SET_COMMENT_EDIT', payload: { createdAt, comment } }),
-    [],
-  );
-  const discardCommentEdit = useCallback(
-    (createdAt: string) =>
-      dispatch({ type: 'DISCARD_COMMENT_EDIT', payload: { createdAt } }),
-    [],
-  );
   const handleReset = useCallback(() => {
     dispatch({ type: 'RESET' });
     if (!state.baseline.status && !state.baseline.title) {
@@ -466,7 +458,7 @@ export function useCaseManagementForm(
   }, [state.baseline.status, state.baseline.title, document._id]);
 
   const handleSave = useCallback(async () => {
-    if (isSaving || isCleaning) {
+    if (isSaving || isCleaning || isSavingComment) {
       return;
     }
 
@@ -485,10 +477,6 @@ export function useCaseManagementForm(
     }
 
     const tagLabels = state.tags.map(t => t.label).filter(Boolean);
-    const trimmedNewComment = state.newComment.trim();
-    const editedComments = Object.entries(state.editedComments).map(
-      ([created_at, comment]) => ({ created_at, comment: comment.trim() }),
-    );
 
     dispatch({ type: 'SAVE_START' });
     try {
@@ -512,8 +500,6 @@ export function useCaseManagementForm(
           ? { priority: state.priority }
           : {}),
         ...(state.tlp !== baseline.tlp ? { tlp: state.tlp } : {}),
-        ...(trimmedNewComment ? { newComment: trimmedNewComment } : {}),
-        ...(editedComments.length ? { editedComments } : {}),
       };
       const { case: savedCase, username } = await updateDocumentCase(
         document._index,
@@ -552,6 +538,7 @@ export function useCaseManagementForm(
     document._id,
     isSaving,
     isCleaning,
+    isSavingComment,
     state.status,
     state.title,
     state.description,
@@ -560,14 +547,12 @@ export function useCaseManagementForm(
     state.tlp,
     state.baseline,
     state.tags,
-    state.newComment,
-    state.editedComments,
     isNewCase,
     onSaveSuccess,
   ]);
 
   const handleClean = useCallback(async () => {
-    if (isSaving || isCleaning || isNewCase) {
+    if (isSaving || isCleaning || isSavingComment || isNewCase) {
       return;
     }
 
@@ -610,9 +595,114 @@ export function useCaseManagementForm(
     document._id,
     isSaving,
     isCleaning,
+    isSavingComment,
     isNewCase,
     onSaveSuccess,
   ]);
+
+  // Comments persist on their own submit: the server appends/edits them from
+  // a partial payload and stamps author and timestamps, so the form fields
+  // never travel with a comment save.
+  const submitComment = useCallback(
+    async (
+      payload: UpdateCasePayload,
+      successTitle: string,
+      context: string,
+    ): Promise<boolean> => {
+      // The server update is an unguarded read-modify-write of wazuh.case:
+      // never run two writes from this client at the same time.
+      if (isSaving || isCleaning || isSavingComment) {
+        return false;
+      }
+
+      dispatch({ type: 'COMMENT_SAVE_START' });
+      try {
+        const { case: savedCase, username } = await updateDocumentCase(
+          document._index,
+          document._id,
+          payload,
+        );
+        dispatch({
+          type: 'COMMENT_SAVE_SUCCESS',
+          payload: { caseData: savedCase ?? {}, username },
+        });
+        onCommentSaveSuccess?.(savedCase);
+        getToasts().add({
+          color: 'success',
+          title: successTitle,
+          toastLifeTimeMs: 3000,
+        });
+        return true;
+      } catch (error: unknown) {
+        const options: UIErrorLog = {
+          context,
+          level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
+          severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
+          store: true,
+          error: {
+            error,
+            message:
+              error instanceof Error
+                ? error.message
+                : 'Could not save the comment',
+            title: 'Case management error',
+          },
+        };
+        getErrorOrchestrator().handleError(options);
+        dispatch({ type: 'COMMENT_SAVE_END' });
+        return false;
+      }
+    },
+    [
+      document._index,
+      document._id,
+      isSaving,
+      isCleaning,
+      isSavingComment,
+      onCommentSaveSuccess,
+    ],
+  );
+
+  const handleCommentAdd = useCallback(async () => {
+    const trimmed = state.newComment.trim();
+    // A comment-only save on a caseless document would create a partial case
+    // without the required fields: comments start after the case exists.
+    if (!trimmed || isNewCase) {
+      return;
+    }
+    const saved = await submitComment(
+      { newComment: trimmed },
+      'Comment added',
+      'CaseManagementTab.handleCommentAdd',
+    );
+    if (saved) {
+      dispatch({ type: 'SET_NEW_COMMENT', payload: '' });
+    }
+  }, [state.newComment, isNewCase, submitComment]);
+
+  const handleCommentEditSave = useCallback(
+    async (createdAt: string, comment: string): Promise<boolean> => {
+      const trimmed = comment.trim();
+      if (!trimmed) {
+        // Comments cannot be blanked out (no deletion supported).
+        return false;
+      }
+      const original = state.comments.find(c => c.created_at === createdAt);
+      if (!original) {
+        return false;
+      }
+      if (trimmed === original.comment) {
+        // Unchanged text: nothing to persist, the editor can just close.
+        return true;
+      }
+      return submitComment(
+        { editedComments: [{ created_at: createdAt, comment: trimmed }] },
+        'Comment updated',
+        'CaseManagementTab.handleCommentEditSave',
+      );
+    },
+    [state.comments, submitComment],
+  );
 
   return {
     status: state.status,
@@ -624,7 +714,6 @@ export function useCaseManagementForm(
     tags: state.tags,
     comments: state.comments,
     newComment: state.newComment,
-    editedComments: state.editedComments,
     currentUsername: state.currentUsername,
     caseUsername: state.caseUsername,
     isLoadingCase: state.isLoadingCase,
@@ -633,6 +722,7 @@ export function useCaseManagementForm(
     existingUpdatedAt: state.existingUpdatedAt,
     isSaving,
     isCleaning,
+    isSavingComment,
     isDirty,
     hasUnsavedChanges,
     isNewCase,
@@ -645,8 +735,8 @@ export function useCaseManagementForm(
     setTags,
     handleTagCreate,
     setNewComment,
-    applyCommentEdit,
-    discardCommentEdit,
+    handleCommentAdd,
+    handleCommentEditSave,
     handleSave,
     handleClean,
     handleReset,

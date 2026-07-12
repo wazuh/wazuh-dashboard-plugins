@@ -208,7 +208,6 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     tags,
     comments,
     newComment,
-    editedComments,
     currentUsername,
     caseUsername,
     isLoadingCase,
@@ -217,6 +216,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     existingUpdatedAt,
     isSaving,
     isCleaning,
+    isSavingComment,
     isDirty,
     hasUnsavedChanges,
     isNewCase,
@@ -229,12 +229,14 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     setTags,
     handleTagCreate,
     setNewComment,
-    applyCommentEdit,
-    discardCommentEdit,
+    handleCommentAdd,
+    handleCommentEditSave,
     handleSave,
     handleClean,
     handleReset,
-  } = useCaseManagementForm(document, handleOperationSuccess);
+    // Comment saves patch the host grid through the tab's own onSaveSuccess
+    // but must not leave edit mode nor close the inline comment editor.
+  } = useCaseManagementForm(document, handleOperationSuccess, onSaveSuccess);
 
   const openCleanModal = useCallback(() => setIsCleanModalVisible(true), []);
   const closeCleanModal = useCallback(() => setIsCleanModalVisible(false), []);
@@ -276,16 +278,17 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
   const showForm = isEditing || isNewCase;
   const commentLimitReached = comments.length >= MAX_CASE_COMMENTS;
 
-  const renderCommentsThread = (editable: boolean) => {
-    if (!comments.length) {
-      return null;
-    }
-    return (
-      <>
-        <EuiTitle size='xxs'>
-          <h4>{`Comments (${comments.length}/${MAX_CASE_COMMENTS})`}</h4>
-        </EuiTitle>
-        <EuiSpacer size='l' />
+  const renderCommentsThread = () => (
+    <>
+      <EuiTitle size='xxs'>
+        <h4>{`Comments (${comments.length}/${MAX_CASE_COMMENTS})`}</h4>
+      </EuiTitle>
+      <EuiSpacer size='l' />
+      {!comments.length ? (
+        <EuiText size='s' color='subdued'>
+          No comments yet.
+        </EuiText>
+      ) : (
         <EuiCommentList>
           {comments.map((comment: CaseComment, index: number) => {
             const commentKey = comment.created_at;
@@ -295,10 +298,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 comment.author === currentUsername,
             );
             const isEditingThis =
-              editable && !!commentKey && editingCommentKey === commentKey;
-            const pendingText = commentKey
-              ? editedComments[commentKey]
-              : undefined;
+              !!commentKey && editingCommentKey === commentKey;
             const wasEdited =
               comment.updated_at && comment.updated_at !== comment.created_at;
 
@@ -313,7 +313,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 }
                 event={wasEdited ? 'edited' : undefined}
                 actions={
-                  editable && isOwn && !isEditingThis ? (
+                  isOwn && !isEditingThis ? (
                     <EuiButtonIcon
                       iconType='pencil'
                       color='text'
@@ -321,15 +321,14 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                       isDisabled={
                         isSaving ||
                         isCleaning ||
+                        isSavingComment ||
                         // One inline edit at a time: switching pencils would
                         // silently discard the current draft.
                         editingCommentKey !== undefined
                       }
                       onClick={() => {
                         setEditingCommentKey(commentKey);
-                        setEditingCommentDraft(
-                          pendingText ?? comment.comment ?? '',
-                        );
+                        setEditingCommentDraft(comment.comment ?? '');
                       }}
                     />
                   ) : undefined
@@ -345,6 +344,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                       rows={3}
                       fullWidth
                       resize='vertical'
+                      disabled={isSavingComment}
                       aria-label='Edit comment text'
                     />
                     <EuiSpacer size='xs' />
@@ -358,44 +358,47 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                           iconType='cross'
                           color='danger'
                           aria-label='Cancel comment edit'
+                          isDisabled={isSavingComment}
                           onClick={stopEditingComment}
                         />
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
                         <EuiButtonIcon
                           iconType='check'
-                          aria-label='Apply comment edit'
-                          isDisabled={!editingCommentDraft.trim()}
-                          onClick={() => {
-                            applyCommentEdit(
+                          aria-label='Save comment'
+                          isDisabled={
+                            !editingCommentDraft.trim() ||
+                            isSaving ||
+                            isCleaning ||
+                            isSavingComment
+                          }
+                          onClick={async () => {
+                            const saved = await handleCommentEditSave(
                               commentKey as string,
                               editingCommentDraft,
                             );
-                            stopEditingComment();
+                            // On failure the editor stays open so the typed
+                            // text is not lost.
+                            if (saved) {
+                              stopEditingComment();
+                            }
                           }}
                         />
                       </EuiFlexItem>
                     </EuiFlexGroup>
                   </>
                 ) : (
-                  <>
-                    <EuiText size='s' style={{ textAlign: 'justify' }}>
-                      {pendingText ?? comment.comment ?? ''}
-                    </EuiText>
-                    {pendingText !== undefined && (
-                      <EuiText size='xs' color='subdued'>
-                        <em>Edited — pending save</em>
-                      </EuiText>
-                    )}
-                  </>
+                  <EuiText size='s' style={{ textAlign: 'justify' }}>
+                    {comment.comment ?? ''}
+                  </EuiText>
                 )}
               </EuiComment>
             );
           })}
         </EuiCommentList>
-      </>
-    );
-  };
+      )}
+    </>
+  );
 
   const summaryItems = [
     {
@@ -553,7 +556,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                     color='danger'
                     iconType='trash'
                     onClick={openCleanModal}
-                    disabled={isSaving || isCleaning}
+                    disabled={isSaving || isCleaning || isSavingComment}
                     isLoading={isCleaning}
                   >
                     Clean
@@ -566,21 +569,14 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
       </EuiFlexItem>
 
       {!showForm && (
-        <>
-          <EuiFlexItem grow={false}>
-            {renderTwoColumnRows([
-              ...summaryItems,
-              ...shortItems,
-              ...metadataItems,
-              tagsItem,
-            ])}
-          </EuiFlexItem>
-          {comments.length > 0 && (
-            <EuiFlexItem grow={false}>
-              {renderCommentsThread(false)}
-            </EuiFlexItem>
-          )}
-        </>
+        <EuiFlexItem grow={false}>
+          {renderTwoColumnRows([
+            ...summaryItems,
+            ...shortItems,
+            ...metadataItems,
+            tagsItem,
+          ])}
+        </EuiFlexItem>
       )}
 
       {!showForm ? null : (
@@ -738,35 +734,6 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 />
               </EuiFormRow>
 
-              <EuiSpacer size='m' />
-
-              {renderCommentsThread(true)}
-
-              {comments.length > 0 && <EuiSpacer size='s' />}
-
-              <EuiFormRow
-                fullWidth
-                label='New comment'
-                helpText={
-                  commentLimitReached
-                    ? `Comment limit reached (${MAX_CASE_COMMENTS}).`
-                    : 'The comment is added with your username when you save.'
-                }
-              >
-                <EuiTextArea
-                  fullWidth
-                  placeholder='Write a comment…'
-                  value={newComment}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    setNewComment(e.target.value)
-                  }
-                  disabled={isSaving || isCleaning || commentLimitReached}
-                  rows={3}
-                  resize='vertical'
-                  aria-label='New case comment'
-                />
-              </EuiFormRow>
-
               <EuiSpacer size='l' />
 
               <EuiFlexGroup gutterSize='s' justifyContent='flexEnd'>
@@ -807,8 +774,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                       !severity ||
                       (!isNewCase && !isDirty) ||
                       isCleaning ||
-                      // Confirm or cancel the open inline comment edit first,
-                      // otherwise its draft would be silently discarded.
+                      isSavingComment ||
+                      // Confirm or cancel the open inline comment edit first:
+                      // a form save closes the editor and would silently
+                      // discard its draft.
                       editingCommentKey !== undefined
                     }
                   >
@@ -819,6 +788,61 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
             </EuiForm>
           </EuiFlexItem>
         </>
+      )}
+
+      {/* Comments live outside the form: they are added and edited with
+          their own immediate submit, in read and edit mode alike. */}
+      {!isNewCase && (
+        <EuiFlexItem grow={false}>
+          {renderCommentsThread()}
+          <EuiSpacer size='s' />
+          <EuiFormRow
+            fullWidth
+            label='New comment'
+            helpText={
+              commentLimitReached
+                ? `Comment limit reached (${MAX_CASE_COMMENTS}).`
+                : 'The comment is added with your username.'
+            }
+          >
+            <EuiTextArea
+              fullWidth
+              placeholder='Write a comment…'
+              value={newComment}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setNewComment(e.target.value)
+              }
+              disabled={
+                isSaving || isCleaning || isSavingComment || commentLimitReached
+              }
+              rows={3}
+              resize='vertical'
+              aria-label='New case comment'
+            />
+          </EuiFormRow>
+          <EuiSpacer size='s' />
+          <EuiFlexGroup
+            gutterSize='s'
+            justifyContent='flexEnd'
+            responsive={false}
+          >
+            <EuiFlexItem grow={false}>
+              <EuiButton
+                size='s'
+                onClick={handleCommentAdd}
+                isLoading={isSavingComment}
+                disabled={
+                  !newComment.trim() ||
+                  commentLimitReached ||
+                  isSaving ||
+                  isCleaning
+                }
+              >
+                Add comment
+              </EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiFlexItem>
       )}
     </EuiFlexGroup>
   );
