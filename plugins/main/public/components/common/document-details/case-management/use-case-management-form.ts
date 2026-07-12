@@ -59,6 +59,7 @@ export interface UseCaseManagementFormReturn {
   isSaving: boolean;
   isCleaning: boolean;
   isDirty: boolean;
+  hasUnsavedChanges: boolean;
   isNewCase: boolean;
   setStatus: (status: CaseStatus) => void;
   setTitle: (title: string) => void;
@@ -366,6 +367,13 @@ export function useCaseManagementForm(
 
   const isNewCase = state.baseline.status === undefined;
   const isDirty = isFormDirty(state);
+  const titleIsAutoSuggestion =
+    isNewCase &&
+    !state.baseline.title &&
+    state.title === `Case_${document._id}`;
+  const hasUnsavedChanges = titleIsAutoSuggestion
+    ? isFormDirty({ ...state, title: state.baseline.title })
+    : isDirty;
   const isSaving = state.isSaving;
   const isCleaning = state.isCleaning;
 
@@ -626,6 +634,7 @@ export function useCaseManagementForm(
     isSaving,
     isCleaning,
     isDirty,
+    hasUnsavedChanges,
     isNewCase,
     setStatus,
     setTitle,

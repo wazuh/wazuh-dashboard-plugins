@@ -289,6 +289,7 @@ describe('useCaseManagementForm', () => {
     expect(result.current.currentUsername).toBe('admin');
     expect(result.current.isNewCase).toBe(false);
     expect(result.current.isDirty).toBe(false);
+    expect(result.current.hasUnsavedChanges).toBe(false);
   });
 
   it('prefills the title with Case_<document id> for a new case and sends it on create', async () => {
@@ -306,19 +307,26 @@ describe('useCaseManagementForm', () => {
 
     expect(result.current.title).toBe('Case_doc-1');
     expect(result.current.isNewCase).toBe(true);
+    // The suggested title makes the form dirty, but it is not a user edit:
+    // it must not count as unsaved changes.
+    expect(result.current.isDirty).toBe(true);
+    expect(result.current.hasUnsavedChanges).toBe(false);
 
     act(() => {
       result.current.setTitle('custom');
     });
+    expect(result.current.hasUnsavedChanges).toBe(true);
     act(() => {
       result.current.handleReset();
     });
     expect(result.current.title).toBe('Case_doc-1');
+    expect(result.current.hasUnsavedChanges).toBe(false);
 
     act(() => {
       result.current.setStatus('active');
       result.current.setSeverity('low');
     });
+    expect(result.current.hasUnsavedChanges).toBe(true);
     await act(async () => {
       await result.current.handleSave();
     });

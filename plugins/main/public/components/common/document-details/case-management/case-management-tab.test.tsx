@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { CaseManagementTab } from './case-management-tab';
 import { CaseData, getFindingsCase } from './case-management-service';
+import { UnsavedChangesGuardedFlyout } from '../../unsaved-changes-guard';
 
 jest.mock('../../../../react-services/generic-request', () => ({
   GenericRequest: { request: jest.fn() },
@@ -105,5 +106,79 @@ describe('CaseManagementTab required fields', () => {
       target: { value: '' },
     });
     expect(updateButton).toBeDisabled();
+  });
+});
+
+describe('CaseManagementTab unsaved-changes guard', () => {
+  const closeFlyout = () =>
+    fireEvent.click(
+      document.querySelector(
+        '[data-test-subj="euiFlyoutCloseButton"]',
+      ) as Element,
+    );
+
+  it('guards the flyout close while the form has unsaved changes', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: null,
+      username: 'admin',
+    });
+    const onClose = jest.fn();
+    render(
+      <UnsavedChangesGuardedFlyout onClose={onClose}>
+        <CaseManagementTab document={documentRef} />
+      </UnsavedChangesGuardedFlyout>,
+    );
+    await screen.findByRole('button', { name: 'Create case' });
+
+    // The auto-suggested title alone must not guard the close.
+    closeFlyout();
+    expect(onClose).toHaveBeenCalledTimes(1);
+
+    fireEvent.change(screen.getByLabelText('Case description'), {
+      target: { value: 'a draft' },
+    });
+    closeFlyout();
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Unsubmitted changes')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("No, don't do it"));
+    expect(screen.getByLabelText('Case description')).toHaveValue('a draft');
+
+    closeFlyout();
+    fireEvent.click(screen.getByText('Yes, do it'));
+    expect(onClose).toHaveBeenCalledTimes(2);
+  });
+
+  it('guards while an inline comment edit is open', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: {
+        ...fullCase,
+        comments: [
+          {
+            author: 'admin',
+            comment: 'first comment',
+            created_at: '2026-06-30T09:00:00.000Z',
+            updated_at: '2026-06-30T09:00:00.000Z',
+          },
+        ],
+      },
+      username: 'admin',
+    });
+    const onClose = jest.fn();
+    render(
+      <UnsavedChangesGuardedFlyout onClose={onClose}>
+        <CaseManagementTab document={documentRef} />
+      </UnsavedChangesGuardedFlyout>,
+    );
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
+    fireEvent.click(screen.getByLabelText('Edit comment'));
+
+    closeFlyout();
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByText('Unsubmitted changes')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Yes, do it'));
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

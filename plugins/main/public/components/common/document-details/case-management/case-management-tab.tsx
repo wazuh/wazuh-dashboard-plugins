@@ -50,6 +50,7 @@ import {
   CaseManagementFormDocument,
   useCaseManagementForm,
 } from './use-case-management-form';
+import { useReportUnsavedChanges } from '../../unsaved-changes-guard';
 
 const CASE_STATUS_OPTIONS: Array<{ value: CaseStatus; text: string }> = [
   { value: 'active', text: 'Active' },
@@ -217,6 +218,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     isSaving,
     isCleaning,
     isDirty,
+    hasUnsavedChanges,
     isNewCase,
     setStatus,
     setTitle,
@@ -240,6 +242,8 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     closeCleanModal();
     await handleClean();
   }, [closeCleanModal, handleClean]);
+
+  useReportUnsavedChanges(hasUnsavedChanges || editingCommentKey !== undefined);
 
   if (isLoadingCase) {
     return (
