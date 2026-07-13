@@ -37,6 +37,7 @@ import {
   EuiTitle,
   EuiToolTip,
   EuiAccordion,
+  EuiAvatar,
 } from '@elastic/eui';
 import { formatUIDate } from '../../../../react-services';
 import {
@@ -337,6 +338,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
               <EuiComment
                 key={commentKey ?? `comment-${index}`}
                 username={comment.author ?? '—'}
+                timelineIcon={<EuiAvatar size="l" name={comment.author ?? '—'} />}
                 timestamp={
                   comment.created_at
                     ? formatUIDate(comment.created_at)
