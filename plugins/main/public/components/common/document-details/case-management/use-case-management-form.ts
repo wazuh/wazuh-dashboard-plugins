@@ -75,6 +75,7 @@ export interface UseCaseManagementFormReturn {
     createdAt: string,
     comment: string,
   ) => Promise<boolean>;
+  handleCommentDelete: (createdAt: string) => Promise<boolean>;
   handleSave: () => Promise<void>;
   handleClean: () => Promise<void>;
   handleReset: () => void;
@@ -684,7 +685,7 @@ export function useCaseManagementForm(
     async (createdAt: string, comment: string): Promise<boolean> => {
       const trimmed = comment.trim();
       if (!trimmed) {
-        // Comments cannot be blanked out (no deletion supported).
+        // Comments cannot be blanked out; use handleCommentDelete instead.
         return false;
       }
       const original = state.comments.find(c => c.created_at === createdAt);
@@ -699,6 +700,21 @@ export function useCaseManagementForm(
         { editedComments: [{ created_at: createdAt, comment: trimmed }] },
         'Comment updated',
         'CaseManagementTab.handleCommentEditSave',
+      );
+    },
+    [state.comments, submitComment],
+  );
+
+  const handleCommentDelete = useCallback(
+    async (createdAt: string): Promise<boolean> => {
+      const original = state.comments.find(c => c.created_at === createdAt);
+      if (!original) {
+        return false;
+      }
+      return submitComment(
+        { deletedComments: [createdAt] },
+        'Comment deleted',
+        'CaseManagementTab.handleCommentDelete',
       );
     },
     [state.comments, submitComment],
@@ -737,6 +753,7 @@ export function useCaseManagementForm(
     setNewComment,
     handleCommentAdd,
     handleCommentEditSave,
+    handleCommentDelete,
     handleSave,
     handleClean,
     handleReset,

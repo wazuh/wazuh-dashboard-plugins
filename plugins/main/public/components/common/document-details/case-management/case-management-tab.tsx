@@ -35,6 +35,8 @@ import {
   EuiText,
   EuiTextArea,
   EuiTitle,
+  EuiToolTip,
+  EuiAccordion,
 } from '@elastic/eui';
 import { formatUIDate } from '../../../../react-services';
 import {
@@ -183,6 +185,9 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     string | undefined
   >();
   const [editingCommentDraft, setEditingCommentDraft] = useState('');
+  const [deletingCommentKey, setDeletingCommentKey] = useState<
+    string | undefined
+  >();
 
   const stopEditingComment = useCallback(() => {
     setEditingCommentKey(undefined);
@@ -231,6 +236,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     setNewComment,
     handleCommentAdd,
     handleCommentEditSave,
+    handleCommentDelete,
     handleSave,
     handleClean,
     handleReset,
@@ -244,6 +250,27 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     closeCleanModal();
     await handleClean();
   }, [closeCleanModal, handleClean]);
+
+  const closeDeleteCommentModal = useCallback(
+    () => setDeletingCommentKey(undefined),
+    [],
+  );
+  const confirmDeleteComment = useCallback(async () => {
+    if (!deletingCommentKey) {
+      return;
+    }
+    const commentKey = deletingCommentKey;
+    setDeletingCommentKey(undefined);
+    if (editingCommentKey === commentKey) {
+      stopEditingComment();
+    }
+    await handleCommentDelete(commentKey);
+  }, [
+    deletingCommentKey,
+    editingCommentKey,
+    stopEditingComment,
+    handleCommentDelete,
+  ]);
 
   useReportUnsavedChanges(hasUnsavedChanges || editingCommentKey !== undefined);
 
@@ -279,10 +306,14 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
   const commentLimitReached = comments.length >= MAX_CASE_COMMENTS;
 
   const renderCommentsThread = () => (
-    <>
-      <EuiTitle size='xxs'>
-        <h4>{`Comments (${comments.length}/${MAX_CASE_COMMENTS})`}</h4>
-      </EuiTitle>
+    <EuiAccordion
+      id='case-comments-accordion'
+      buttonContent={
+        <EuiTitle size='xxs'>
+          <h4>{`Comments (${comments.length}/${MAX_CASE_COMMENTS})`}</h4>
+        </EuiTitle>
+      }
+    >
       <EuiSpacer size='l' />
       {!comments.length ? (
         <EuiText size='s' color='subdued'>
@@ -294,8 +325,8 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
             const commentKey = comment.created_at;
             const isOwn = Boolean(
               currentUsername &&
-                commentKey &&
-                comment.author === currentUsername,
+              commentKey &&
+              comment.author === currentUsername,
             );
             const isEditingThis =
               !!commentKey && editingCommentKey === commentKey;
@@ -314,23 +345,50 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 event={wasEdited ? 'edited' : undefined}
                 actions={
                   isOwn && !isEditingThis ? (
-                    <EuiButtonIcon
-                      iconType='pencil'
-                      color='text'
-                      aria-label='Edit comment'
-                      isDisabled={
-                        isSaving ||
-                        isCleaning ||
-                        isSavingComment ||
-                        // One inline edit at a time: switching pencils would
-                        // silently discard the current draft.
-                        editingCommentKey !== undefined
-                      }
-                      onClick={() => {
-                        setEditingCommentKey(commentKey);
-                        setEditingCommentDraft(comment.comment ?? '');
-                      }}
-                    />
+                    <EuiFlexGroup
+                      gutterSize='xs'
+                      justifyContent='flexEnd'
+                      responsive={false}>
+                      <EuiFlexItem grow={false}>
+                        <EuiToolTip content='Edit comment'>
+                          <EuiButtonIcon
+                            iconType='pencil'
+                            color='text'
+                            aria-label='Edit comment'
+                            isDisabled={
+                              isSaving ||
+                              isCleaning ||
+                              isSavingComment ||
+                              // One inline edit at a time: switching pencils would
+                              // silently discard the current draft.
+                              editingCommentKey !== undefined
+                            }
+                            onClick={() => {
+                              setEditingCommentKey(commentKey);
+                              setEditingCommentDraft(comment.comment ?? '');
+                            }}
+                          />
+                        </EuiToolTip>
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>
+                        <EuiToolTip content='Delete comment'>
+                          <EuiButtonIcon
+                            iconType='trash'
+                            color='danger'
+                            aria-label='Delete comment'
+                            isDisabled={
+                              isSaving ||
+                              isCleaning ||
+                              isSavingComment ||
+                              // One inline edit at a time: deleting while another
+                              // comment's edit is open would discard its draft.
+                              editingCommentKey !== undefined
+                            }
+                            onClick={() => setDeletingCommentKey(commentKey)}
+                          />
+                        </EuiToolTip>
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
                   ) : undefined
                 }
               >
@@ -354,36 +412,40 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                       responsive={false}
                     >
                       <EuiFlexItem grow={false}>
-                        <EuiButtonIcon
-                          iconType='cross'
-                          color='danger'
-                          aria-label='Cancel comment edit'
-                          isDisabled={isSavingComment}
-                          onClick={stopEditingComment}
-                        />
+                        <EuiToolTip content='Cancel'>
+                          <EuiButtonIcon
+                            iconType='cross'
+                            color='danger'
+                            aria-label='Cancel comment edit'
+                            isDisabled={isSavingComment}
+                            onClick={stopEditingComment}
+                          />
+                        </EuiToolTip>
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
-                        <EuiButtonIcon
-                          iconType='check'
-                          aria-label='Save comment'
-                          isDisabled={
-                            !editingCommentDraft.trim() ||
-                            isSaving ||
-                            isCleaning ||
-                            isSavingComment
-                          }
-                          onClick={async () => {
-                            const saved = await handleCommentEditSave(
-                              commentKey as string,
-                              editingCommentDraft,
-                            );
-                            // On failure the editor stays open so the typed
-                            // text is not lost.
-                            if (saved) {
-                              stopEditingComment();
+                        <EuiToolTip content='Save comment'>
+                          <EuiButtonIcon
+                            iconType='check'
+                            aria-label='Save comment'
+                            isDisabled={
+                              !editingCommentDraft.trim() ||
+                              isSaving ||
+                              isCleaning ||
+                              isSavingComment
                             }
-                          }}
-                        />
+                            onClick={async () => {
+                              const saved = await handleCommentEditSave(
+                                commentKey as string,
+                                editingCommentDraft,
+                              );
+                              // On failure the editor stays open so the typed
+                              // text is not lost.
+                              if (saved) {
+                                stopEditingComment();
+                              }
+                            }}
+                          />
+                        </EuiToolTip>
                       </EuiFlexItem>
                     </EuiFlexGroup>
                   </>
@@ -397,7 +459,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
           })}
         </EuiCommentList>
       )}
-    </>
+    </EuiAccordion>
   );
 
   const summaryItems = [
@@ -454,10 +516,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     title: 'Tags',
     description: tags.length
       ? tags.map(tag => (
-          <EuiBadge key={tag.label} color='hollow'>
-            {tag.label}
-          </EuiBadge>
-        ))
+        <EuiBadge key={tag.label} color='hollow'>
+          {tag.label}
+        </EuiBadge>
+      ))
       : '—',
     fullWidth: true,
   };
@@ -465,27 +527,27 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
   const metadataItems = [
     ...(!isNewCase
       ? [
-          {
-            title: 'User',
-            description: caseUsername || '—',
-          },
-        ]
+        {
+          title: 'User',
+          description: caseUsername || '—',
+        },
+      ]
       : []),
     ...(existingCreatedAt
       ? [
-          {
-            title: 'Created at',
-            description: formatUIDate(existingCreatedAt),
-          },
-        ]
+        {
+          title: 'Created at',
+          description: formatUIDate(existingCreatedAt),
+        },
+      ]
       : []),
     ...(existingUpdatedAt
       ? [
-          {
-            title: 'Updated at',
-            description: formatUIDate(existingUpdatedAt),
-          },
-        ]
+        {
+          title: 'Updated at',
+          description: formatUIDate(existingUpdatedAt),
+        },
+      ]
       : []),
   ];
 
@@ -504,6 +566,24 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
               defaultFocusedButton='confirm'
             >
               This action removes the case data from the finding.
+            </EuiConfirmModal>
+          </EuiOutsideClickDetector>
+        </EuiOverlayMask>
+      )}
+
+      {deletingCommentKey !== undefined && (
+        <EuiOverlayMask>
+          <EuiOutsideClickDetector onOutsideClick={closeDeleteCommentModal}>
+            <EuiConfirmModal
+              title='Delete comment'
+              onCancel={closeDeleteCommentModal}
+              onConfirm={confirmDeleteComment}
+              cancelButtonText='Cancel'
+              confirmButtonText='Delete'
+              buttonColor='danger'
+              defaultFocusedButton='confirm'
+            >
+              This action cannot be undone.
             </EuiConfirmModal>
           </EuiOutsideClickDetector>
         </EuiOverlayMask>

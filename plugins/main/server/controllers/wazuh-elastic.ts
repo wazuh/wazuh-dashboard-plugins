@@ -397,6 +397,7 @@ export class WazuhElasticCtrl {
         tlp,
         newComment,
         editedComments,
+        deletedComments,
       } = request.body as {
         status?: string;
         tags?: string[];
@@ -407,6 +408,7 @@ export class WazuhElasticCtrl {
         tlp?: string;
         newComment?: string;
         editedComments?: Array<{ created_at: string; comment: string }>;
+        deletedComments?: string[];
       };
 
       if (!this.isFindingsIndex(index)) {
@@ -480,6 +482,30 @@ export class WazuhElasticCtrl {
           comment: edit.comment,
           updated_at: now,
         };
+        commentsTouched = true;
+      }
+
+      for (const createdAt of deletedComments ?? []) {
+        const commentIndex = comments.findIndex(
+          comment => comment?.created_at === createdAt,
+        );
+        if (commentIndex === -1) {
+          return ErrorResponse(
+            `Comment with created_at "${createdAt}" was not found`,
+            4017,
+            HTTP_STATUS_CODES.BAD_REQUEST,
+            response,
+          );
+        }
+        if (comments[commentIndex].author !== username) {
+          return ErrorResponse(
+            'Comments can only be deleted by their author',
+            4017,
+            HTTP_STATUS_CODES.BAD_REQUEST,
+            response,
+          );
+        }
+        comments.splice(commentIndex, 1);
         commentsTouched = true;
       }
 

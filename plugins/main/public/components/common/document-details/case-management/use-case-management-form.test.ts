@@ -636,6 +636,58 @@ describe('useCaseManagementForm', () => {
     expect(updateDocumentCase).not.toHaveBeenCalled();
   });
 
+  it('deletes an own comment immediately', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: fullCase,
+      username: 'admin',
+    });
+    const savedCase: CaseData = {
+      ...fullCase,
+      updated_at: LATER,
+      comments: [],
+    };
+    (updateDocumentCase as jest.Mock).mockResolvedValue({
+      case: savedCase,
+      username: 'admin',
+    });
+
+    const { result } = renderHook(() => useCaseManagementForm(documentRef));
+    await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
+
+    let deleted = false;
+    await act(async () => {
+      deleted = await result.current.handleCommentDelete(EARLIER);
+    });
+
+    expect(deleted).toBe(true);
+    expect(updateDocumentCase).toHaveBeenCalledWith(
+      'wazuh-findings-v5-security',
+      'doc-1',
+      { deletedComments: [EARLIER] },
+    );
+    expect(result.current.comments).toHaveLength(0);
+    expect(mockToastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Comment deleted' }),
+    );
+  });
+
+  it('handleCommentDelete rejects an unknown comment', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: fullCase,
+      username: 'admin',
+    });
+
+    const { result } = renderHook(() => useCaseManagementForm(documentRef));
+    await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
+
+    let deleted = true;
+    await act(async () => {
+      deleted = await result.current.handleCommentDelete('does-not-exist');
+    });
+    expect(deleted).toBe(false);
+    expect(updateDocumentCase).not.toHaveBeenCalled();
+  });
+
   it('sends none of the new schema fields on a status-only change', async () => {
     (getFindingsCase as jest.Mock).mockResolvedValue({
       case: {

@@ -124,6 +124,9 @@ export function WazuhElasticRoutes(router: IRouter) {
               { maxSize: 20 },
             ),
           ),
+          deletedComments: schema.maybe(
+            schema.arrayOf(schema.string(), { maxSize: 20 }),
+          ),
         }),
       },
     },

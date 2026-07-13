@@ -69,6 +69,7 @@ export interface UpdateCasePayload {
   tlp?: CaseTLP | '';
   newComment?: string;
   editedComments?: UpdateCaseEditedComment[];
+  deletedComments?: string[];
 }
 
 export interface CaseApiResponse {
@@ -103,12 +104,12 @@ export async function getFindingsCase(
  *
  * POST /indexer/findings/case/<index>/<documentId>
  * Body: { status, tags, title, description, severity, priority, tlp,
- *         newComment, editedComments }
+ *         newComment, editedComments, deletedComments }
  *
  * The backend sets wazuh.case.user.name and the case/comment timestamps,
  * assigns the logged-in user as the author of the new comment, only allows
- * editing own comments, and enforces the maximum of MAX_CASE_COMMENTS
- * comments. The response carries the full resulting case.
+ * editing or deleting own comments, and enforces the maximum of
+ * MAX_CASE_COMMENTS comments. The response carries the full resulting case.
  */
 export async function updateDocumentCase(
   index: string,
