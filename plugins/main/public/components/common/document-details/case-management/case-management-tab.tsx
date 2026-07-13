@@ -326,8 +326,8 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
             const commentKey = comment.created_at;
             const isOwn = Boolean(
               currentUsername &&
-              commentKey &&
-              comment.author === currentUsername,
+                commentKey &&
+                comment.author === currentUsername,
             );
             const isEditingThis =
               !!commentKey && editingCommentKey === commentKey;
@@ -338,7 +338,9 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
               <EuiComment
                 key={commentKey ?? `comment-${index}`}
                 username={comment.author ?? '—'}
-                timelineIcon={<EuiAvatar size="l" name={comment.author ?? '—'} />}
+                timelineIcon={
+                  <EuiAvatar size='l' name={comment.author ?? '—'} />
+                }
                 timestamp={
                   comment.created_at
                     ? formatUIDate(comment.created_at)
@@ -350,7 +352,8 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                     <EuiFlexGroup
                       gutterSize='xs'
                       justifyContent='flexEnd'
-                      responsive={false}>
+                      responsive={false}
+                    >
                       <EuiFlexItem grow={false}>
                         <EuiToolTip content='Edit comment'>
                           <EuiButtonIcon
@@ -518,10 +521,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     title: 'Tags',
     description: tags.length
       ? tags.map(tag => (
-        <EuiBadge key={tag.label} color='hollow'>
-          {tag.label}
-        </EuiBadge>
-      ))
+          <EuiBadge key={tag.label} color='hollow'>
+            {tag.label}
+          </EuiBadge>
+        ))
       : '—',
     fullWidth: true,
   };
@@ -529,27 +532,27 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
   const metadataItems = [
     ...(!isNewCase
       ? [
-        {
-          title: 'User',
-          description: caseUsername || '—',
-        },
-      ]
+          {
+            title: 'User',
+            description: caseUsername || '—',
+          },
+        ]
       : []),
     ...(existingCreatedAt
       ? [
-        {
-          title: 'Created at',
-          description: formatUIDate(existingCreatedAt),
-        },
-      ]
+          {
+            title: 'Created at',
+            description: formatUIDate(existingCreatedAt),
+          },
+        ]
       : []),
     ...(existingUpdatedAt
       ? [
-        {
-          title: 'Updated at',
-          description: formatUIDate(existingUpdatedAt),
-        },
-      ]
+          {
+            title: 'Updated at',
+            description: formatUIDate(existingUpdatedAt),
+          },
+        ]
       : []),
   ];
 
