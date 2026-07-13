@@ -215,6 +215,31 @@ export const mitreAttack = {
     }`,
 };
 
+export const caseManagement = {
+  category: 'wz-category-threat-intelligence',
+  id: 'case-management',
+  title: i18n.translate('wz-app-case-management-title', {
+    defaultMessage: 'Case Management',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-case-management-breadcrumbLabel', {
+    defaultMessage: 'Case Management',
+  }),
+  description: i18n.translate('wz-app-case-management-description', {
+    defaultMessage:
+      'Track, triage, and manage cases created from security findings across your environment.',
+  }),
+  euiIconType: 'securityApp',
+  order: 303,
+  showInOverviewApp: true,
+  showInAgentMenu: false,
+  redirectTo: () =>
+    `/overview/?tab=caseManagement&tabView=dashboard${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
 export const ITHygiene = {
   category: 'wz-category-security-operations',
   id: 'it-hygiene',
@@ -242,12 +267,12 @@ export const ITHygiene = {
 
 export const activeResponses = {
   category: 'wz-category-security-operations',
-  id: 'active-response-dashboard',
+  id: 'incident-response-dashboard',
   title: i18n.translate('wz-app-active-response-title', {
-    defaultMessage: 'Active Response',
+    defaultMessage: 'Incident Response',
   }),
   breadcrumbLabel: i18n.translate('wz-app-active-response-breadcrumbLabel', {
-    defaultMessage: 'Active Response',
+    defaultMessage: 'Incident Response',
   }),
   description: i18n.translate('wz-app-active-response-description', {
     defaultMessage:
@@ -258,7 +283,7 @@ export const activeResponses = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=active-response-dashboard&tabView=dashboard${
+    `/overview/?tab=incident-response-dashboard&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -704,6 +729,7 @@ export const Applications = [
   threatHunting,
   vulnerabilityDetection,
   mitreAttack,
+  caseManagement,
   regulatoryCompliance,
   devTools,
   security,

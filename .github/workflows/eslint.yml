@@ -15,8 +15,14 @@ on:
       - 2.*
       - 3.*
       - 4.*
+      - 5.*
       - main
     types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   linter:
     name: Ensure the code format on the changed files
