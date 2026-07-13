@@ -7,7 +7,6 @@ import {
   EuiButtonIcon,
   EuiDataGridCellValueElementProps,
   EuiFlexGroup,
-  EuiFlyout,
   EuiFlyoutBody,
   EuiFlyoutHeader,
   EuiTitle,
@@ -43,6 +42,7 @@ import {
   DocumentViewTableAndJson,
   DocumentViewTableAndJsonPropsAdditionalTabs,
 } from './components/document-view-table-and-json';
+import { UnsavedChangesGuardedFlyout } from '../unsaved-changes-guard';
 import { WzSearchBar } from '../search-bar';
 import { DataGridVisibleColumnsSelector } from './components/visible-columns-selector';
 import {
@@ -647,14 +647,14 @@ export const FlyoutDocumentDetails = ({
   children,
   onClose,
 }) => (
-  <EuiFlyout onClose={onClose} size='m'>
+  <UnsavedChangesGuardedFlyout onClose={onClose} size='m'>
     <EuiFlyoutHeader>
       <EuiTitle>
         <h2>{title}</h2>
       </EuiTitle>
     </EuiFlyoutHeader>
     <EuiFlyoutBody>{children}</EuiFlyoutBody>
-  </EuiFlyout>
+  </UnsavedChangesGuardedFlyout>
 );
 
 export const withFlyoutDocumentDetails = withWrapComponent(
