@@ -1,6 +1,7 @@
 import { CtiRegistrationStore } from './cti-registration-store';
 import { triggerContentUpdateOnChange } from './trigger-content-update-on-change';
 import { getWazuhCheckUpdatesServices } from '../../plugin-services';
+import { ctiContentUpdateReasons } from '../../../common/constants';
 
 jest.mock('../../plugin-services', () => ({
   getWazuhCheckUpdatesServices: jest.fn(),
@@ -55,7 +56,7 @@ describe('triggerContentUpdateOnChange', () => {
     expect(outcome).toEqual({
       triggered: false,
       failed: false,
-      reason: 'none',
+      reason: ctiContentUpdateReasons.NONE,
     });
     expect(contentUpdate).not.toHaveBeenCalled();
     expect(
@@ -90,14 +91,14 @@ describe('triggerContentUpdateOnChange', () => {
     expect(outcome).toEqual({
       triggered: true,
       failed: false,
-      reason: 'registration-changed',
+      reason: ctiContentUpdateReasons.REGISTRATION_CHANGED,
     });
     expect(contentUpdate).toHaveBeenCalledTimes(1);
     expect(contentUpdate).toHaveBeenCalledWith(
       expect.objectContaining({ method: 'POST', body: {} }),
     );
     expect(logger.info).toHaveBeenCalledWith(
-      expect.stringContaining('registration-changed'),
+      expect.stringContaining(ctiContentUpdateReasons.REGISTRATION_CHANGED),
     );
   });
 
@@ -125,7 +126,7 @@ describe('triggerContentUpdateOnChange', () => {
     expect(outcome).toEqual({
       triggered: true,
       failed: false,
-      reason: 'plan-name-changed',
+      reason: ctiContentUpdateReasons.PLAN_NAME_CHANGED,
     });
     expect(contentUpdate).toHaveBeenCalledTimes(1);
   });
@@ -154,7 +155,7 @@ describe('triggerContentUpdateOnChange', () => {
     expect(outcome).toEqual({
       triggered: true,
       failed: false,
-      reason: 'registration-changed',
+      reason: ctiContentUpdateReasons.REGISTRATION_CHANGED,
     });
   });
 
@@ -182,12 +183,12 @@ describe('triggerContentUpdateOnChange', () => {
     expect(outcome).toEqual({
       triggered: false,
       failed: false,
-      reason: 'none',
+      reason: ctiContentUpdateReasons.NONE,
     });
     expect(contentUpdate).not.toHaveBeenCalled();
   });
 
-  test('fires on unregistration too, since the isRegistered===true gate was removed', async () => {
+  test('fires on unregistration too', async () => {
     const contentUpdate = jest.fn().mockResolvedValue({});
     const wazuhClient = buildWazuhClient(contentUpdate);
     const store = CtiRegistrationStore.getInstance();
@@ -211,7 +212,7 @@ describe('triggerContentUpdateOnChange', () => {
     expect(outcome).toEqual({
       triggered: true,
       failed: false,
-      reason: 'registration-changed',
+      reason: ctiContentUpdateReasons.REGISTRATION_CHANGED,
     });
     expect(contentUpdate).toHaveBeenCalledTimes(1);
     expect(
@@ -243,11 +244,11 @@ describe('triggerContentUpdateOnChange', () => {
     expect(outcome).toEqual({
       triggered: true,
       failed: true,
-      reason: 'registration-changed',
+      reason: ctiContentUpdateReasons.REGISTRATION_CHANGED,
     });
     expect(logger.error).toHaveBeenCalledTimes(1);
     expect(logger.error.mock.calls[0][0]).toContain('env-uuid-1');
-    expect(logger.error.mock.calls[0][0]).toContain('registration-changed');
+    expect(logger.error.mock.calls[0][0]).toContain(ctiContentUpdateReasons.REGISTRATION_CHANGED);
   });
 
   test('releases the lock so a subsequent qualifying call is not blocked', async () => {
@@ -287,7 +288,7 @@ describe('triggerContentUpdateOnChange', () => {
     expect(outcome).toEqual({
       triggered: true,
       failed: false,
-      reason: 'registration-changed',
+      reason: ctiContentUpdateReasons.REGISTRATION_CHANGED,
     });
     expect(contentUpdate).toHaveBeenCalledTimes(2);
   });
@@ -333,7 +334,7 @@ describe('triggerContentUpdateOnChange', () => {
     expect(outcomeB).toEqual({
       triggered: false,
       failed: false,
-      reason: 'plan-name-changed',
+      reason: ctiContentUpdateReasons.PLAN_NAME_CHANGED,
     });
     expect(contentUpdate).toHaveBeenCalledTimes(1);
     expect(
@@ -348,7 +349,7 @@ describe('triggerContentUpdateOnChange', () => {
     expect(outcomeA).toEqual({
       triggered: true,
       failed: false,
-      reason: 'registration-changed',
+      reason: ctiContentUpdateReasons.REGISTRATION_CHANGED,
     });
     expect(
       CtiRegistrationStore.getInstance().getSubscriptionSnapshot('env-uuid-1'),

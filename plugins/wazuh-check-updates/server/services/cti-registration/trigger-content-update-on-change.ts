@@ -1,5 +1,8 @@
 import { IScopedClusterClient } from 'opensearch-dashboards/server';
-import { contentManagerRoutes } from '../../../common/constants';
+import {
+  contentManagerRoutes,
+  ctiContentUpdateReasons,
+} from '../../../common/constants';
 import type { CtiSubscriptionSnapshot } from '../../../common/cti-registration-status-api';
 import { getWazuhCheckUpdatesServices } from '../../plugin-services';
 import {
@@ -7,10 +10,7 @@ import {
   SubscriptionSnapshot,
 } from './cti-registration-store';
 
-export type CtiContentUpdateReason =
-  | 'none'
-  | 'registration-changed'
-  | 'plan-name-changed';
+export type CtiContentUpdateReason = ctiContentUpdateReasons;
 
 /** Outcome of a best-effort Content Manager update attempt for this poll cycle. */
 export interface CtiContentUpdateOutcome {
@@ -41,12 +41,12 @@ function getChangeReason(
   const planNameChanged = prior.planName !== next.planName;
 
   if (registrationFlipped) {
-    return 'registration-changed';
+    return ctiContentUpdateReasons.REGISTRATION_CHANGED;
   }
   if (planNameChanged) {
-    return 'plan-name-changed';
+    return ctiContentUpdateReasons.PLAN_NAME_CHANGED;
   }
-  return 'none';
+  return ctiContentUpdateReasons.NONE;
 }
 
 /**
@@ -71,11 +71,15 @@ export async function triggerContentUpdateOnChange(
   store.setSubscriptionSnapshot(environmentUuid, nextSnapshot);
 
   if (!priorSnapshot) {
-    return { triggered: false, failed: false, reason: 'none' };
+    return {
+      triggered: false,
+      failed: false,
+      reason: ctiContentUpdateReasons.NONE,
+    };
   }
 
   const reason = getChangeReason(priorSnapshot, nextSnapshot);
-  const shouldFire = reason !== 'none';
+  const shouldFire = reason !== ctiContentUpdateReasons.NONE;
 
   if (!shouldFire) {
     return { triggered: false, failed: false, reason };
