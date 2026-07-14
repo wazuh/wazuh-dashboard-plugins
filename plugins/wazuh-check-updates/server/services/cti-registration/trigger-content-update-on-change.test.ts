@@ -248,7 +248,9 @@ describe('triggerContentUpdateOnChange', () => {
     });
     expect(logger.error).toHaveBeenCalledTimes(1);
     expect(logger.error.mock.calls[0][0]).toContain('env-uuid-1');
-    expect(logger.error.mock.calls[0][0]).toContain(ctiContentUpdateReasons.REGISTRATION_CHANGED);
+    expect(logger.error.mock.calls[0][0]).toContain(
+      ctiContentUpdateReasons.REGISTRATION_CHANGED,
+    );
   });
 
   test('releases the lock so a subsequent qualifying call is not blocked', async () => {
