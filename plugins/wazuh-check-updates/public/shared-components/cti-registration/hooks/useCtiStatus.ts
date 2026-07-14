@@ -75,6 +75,11 @@ export const useCtiStatus = (
         message: response.message,
       });
     } catch (error: unknown) {
+      // A failed request never means "no longer registered", only a real
+      // server response can change that.
+      if (isSteadyRegistered()) {
+        return;
+      }
       const e = error as { statusCode?: number; message?: string };
       setStatusCTI({
         status: e.statusCode ?? statusCodes.NOT_FOUND,
