@@ -3,11 +3,17 @@
 const {
   generateSampleDataWithDataset,
   getDatasetIndex,
+  getDatasetTemplate,
 } = require('./lib/index');
+const { batch, formats } = require('./lib/output-formats');
+const {
+  log,
+  ensureIndicesExist,
+  insertData,
+  validateConfig,
+} = require('./lib/curl-indexer');
 const path = require('path');
 const fs = require('fs');
-const os = require('os');
-const { spawnSync } = require('child_process');
 
 const INSERT_BATCH_SIZE = 500; // docs per curl call when --output insert is used
 
@@ -28,26 +34,6 @@ const defaultDocumentGenerationParams = {
   cluster: {
     name: 'wazuh',
     node: 'node01',
-  },
-};
-
-// Output formats. Each entry is { doc, index } so bulk-api can route every
-// document to its own resolved index (needed when --all / --all-findings mixes
-// datasets with different default indices).
-const formats = {
-  ndjson: {
-    description: 'Format the documents to ndjson. Each line is a document.',
-    run: entries => entries.map(e => JSON.stringify(e.doc)).join('\n'),
-  },
-  'bulk-api': {
-    description:
-      'Format the documents to OpenSearch or Elasticsearch Bulk API.',
-    run: entries =>
-      entries
-        .map(
-          e => `{"create": {"_index": "${e.index}"}}\n${JSON.stringify(e.doc)}`,
-        )
-        .join('\n') + '\n',
   },
 };
 
@@ -78,12 +64,15 @@ Options:
   --output <file>       Output file to save the generated data (optional;
                         defaults to stdout)
   --output insert       Value to auto insert the output instead of defaulting to
-                        stout or a file. The curl command with the data will be 
+                        stout or a file. The curl command with the data will be
                         still saved on a log file, inside the logs folder.
                         insert overrides the format flag to default bulk-api.
-                        Requires WAZUH_INDEXER_HOST, WAZUH_INDEXER_PORT, WAZUH_USERNAME and
-                        WAZUH_PASSWORD environment variables to be set; any
+                        Requires SAMPLE_DATA_SERVER_ADDRESS, SAMPLE_DATA_USERNAME and
+                        SAMPLE_DATA_USER_PASSWORD environment variables to be set; any
                         missing value will trigger an interactive prompt.
+                        Before inserting, each target index is created (if it
+                        doesn't exist yet) using the settings/mappings from its
+                        dataset's template.json, when one is declared.
   --format <format>     Output format (default: ndjson)
                         Available formats: ${Object.keys(formats).join(', ')}
   --index <name>        Index name for bulk-api format. Overrides each dataset's
@@ -109,10 +98,10 @@ Examples:
 
 /**
  * Example POST curl:
- * curl -k -u USERNAME:PASSWORD -X POST "https://WAZUH_INDEXER_HOST:WAZUH_INDEXER_PORT/_bulk" -H "Content-Type: application/x-ndjson" --data-binary "@bulk-data.json"
+ * curl -k -u USERNAME:PASSWORD -X POST "SAMPLE_DATA_SERVER_ADDRESS/_bulk" -H "Content-Type: application/x-ndjson" --data-binary "@bulk-data.json"
  *
  * Exampl DELETE curl:
- * curl -u USERNAME:PASSWORD -k -H "Content-Type: application/json"   -XPOST "https://WAZUH_INDEXER_HOST:WAZUH_INDEXER_PORT/INDEX_PATTERN/_delete_by_query?conflicts=proceed"   -d '{"query"{"match_all": {}}}'
+ * curl -u USERNAME:PASSWORD -k -H "Content-Type: application/json"   -XPOST "SAMPLE_DATA_SERVER_ADDRESS/INDEX_PATTERN/_delete_by_query?conflicts=proceed"   -d '{"query"{"match_all": {}}}'
  */
 
 // Parse arguments
@@ -238,165 +227,13 @@ try {
           index: i,
         }),
         index: resolvedIndex,
+        dataset: name,
       });
     }
   }
 } catch (error) {
   console.error('Error generating documents:', error);
   process.exit(1);
-}
-
-/**
- * Redacts the credentials in a curl argument list before logging, so the
- * username:password passed to -u never lands in the log file.
- * @param {string[]} curlArgs the argument array passed to curl
- * @returns {string} a shell-like, credential-free representation
- */
-function redactCurlArgs(curlArgs) {
-  const redacted = curlArgs.map((arg, i) => {
-    // The value following a "-u" flag is "user:pass"; mask it.
-    if (i > 0 && curlArgs[i - 1] === '-u') {
-      return '***:***';
-    }
-    return arg;
-  });
-  return 'curl ' + redacted.map(arg => `'${arg}'`).join(' ');
-}
-
-/**
- * Inserts using curl the data directly to the defined host.
- * Used by --output insert
- * It will append to a single log file per CLI execution, inside ./logs.
- * @param {string} data string with ndsjon format build by bulk-api
- * @param {Object} config object with the configuration: HOST, PORT, USERNAME, PASSWORD
- * @param {string} logPath full path of the log file to append this insert to
- * @param {number} batchNumber current batch number (1-indexed)
- * @param {number} totalBatches total number of batches for this run
- * @returns {Array} list of failed items ({_id, status, reason}) for this batch, empty if none or on curl failure
- */
-function insertData(data, config, logPath, batchNumber, totalBatches) {
-  const { HOST, PORT, USERNAME, PASSWORD } = config;
-  const url = `https://${HOST}:${PORT}/_bulk`;
-
-  const tmpFile = path.join(
-    os.tmpdir(),
-    `wazuh-sample-data-${Date.now()}.ndjson`,
-  );
-  fs.writeFileSync(tmpFile, data);
-
-  const curlArgs = [
-    '-s',
-    '-k',
-    '-u',
-    `${USERNAME}:${PASSWORD}`,
-    '-X',
-    'POST',
-    url,
-    '-H',
-    'Content-Type: application/x-ndjson',
-    '--data-binary',
-    `@${tmpFile}`,
-  ];
-
-  log(
-    logPath,
-    `\n${'='.repeat(60)}\nBatch ${batchNumber}/${totalBatches}\n${'='.repeat(
-      60,
-    )}\n`,
-  );
-
-  // Log the curl command with credentials redacted, followed by the payload.
-  log(logPath, `${redactCurlArgs(curlArgs)}\n\n${data}\n`);
-
-  const result = spawnSync('curl', curlArgs, {
-    encoding: 'utf-8',
-    maxBuffer: 1024 * 1024 * 20,
-  });
-
-  fs.unlinkSync(tmpFile);
-
-  if (result.error) {
-    console.error('Error running curl:', result.error.message);
-    log(logPath, `\nError running curl: ${result.error.message}\n`);
-    return [];
-  }
-
-  if (result.status !== 0) {
-    console.error(`curl exited with code ${result.status}:`, result.stderr);
-    log(
-      logPath,
-      `\ncurl exited with code ${result.status}:\n${result.stderr}\n`,
-    );
-    return [];
-  }
-
-  log(logPath, `\nResponse:\n${result.stdout}\n`);
-
-  try {
-    const response = JSON.parse(result.stdout);
-    const failedItems = response.errors
-      ? response.items.filter(item => (item.create || item.index)?.error)
-      : [];
-    console.error(
-      failedItems.length
-        ? `Inserted with ${failedItems.length} error(s) out of ${response.items.length} documents`
-        : `Successfully inserted ${response.items.length} documents`,
-    );
-    return failedItems.map(item => {
-      const action = item.create || item.index;
-      return {
-        _id: action._id,
-        status: action.status,
-        reason: action.error.reason,
-      };
-    });
-  } catch (error) {
-    console.error('Could not parse curl response:', result.stdout);
-    return [];
-  }
-}
-
-/**
- * Appends content to a log file, creating the 'logs' folder and the file
- * itself if they don't exist yet.
- * @param {string} logPath full path of the log file to write to
- * @param {string} content text to append
- */
-function log(logPath, content) {
-  fs.mkdirSync(path.dirname(logPath), { recursive: true });
-  fs.appendFileSync(logPath, content);
-}
-
-/**
- * Validates that the configuration is complete and prompts the user for
- * missing values.
- * @param {Object} config empty object or with the configuration:
- *                        HOST, PORT, USERNAME, PASSWORD
- * @returns {Object} Will return the configuration completed in case it was
- *                   missing something.
- */
-function validateConfig(config) {
-  const defaults = { HOST: 'localhost', PORT: '9200' };
-
-  for (const key of ['HOST', 'PORT', 'USERNAME', 'PASSWORD']) {
-    if (!config[key]) {
-      const fallback = defaults[key];
-      const answer = prompt(`${key}${fallback ? ` (${fallback})` : ''}: `);
-      config[key] = answer || fallback;
-    }
-  }
-
-  return config;
-}
-
-/**
- * Helper function for validateConfig to prompt the user.
- */
-function prompt(question) {
-  process.stdout.write(question);
-  const buffer = Buffer.alloc(1024);
-  const bytesRead = fs.readSync(0, buffer, 0, 1024);
-  return buffer.toString('utf8', 0, bytesRead).trim();
 }
 
 function handleResult(result) {
@@ -415,10 +252,9 @@ function handleResult(result) {
   if (output) {
     if (output === 'insert') {
       let config = {
-        HOST: process.env.WAZUH_INDEXER_HOST,
-        PORT: process.env.WAZUH_INDEXER_PORT,
-        USERNAME: process.env.WAZUH_USERNAME,
-        PASSWORD: process.env.WAZUH_PASSWORD,
+        SERVER_ADDRESS: process.env.SAMPLE_DATA_SERVER_ADDRESS,
+        USERNAME: process.env.SAMPLE_DATA_USERNAME,
+        PASSWORD: process.env.SAMPLE_DATA_USER_PASSWORD,
       };
       config = validateConfig(config);
 
@@ -428,6 +264,8 @@ function handleResult(result) {
         'logs',
         `cli_sample_data_insert_${date}.log`,
       );
+
+      ensureIndicesExist(docsArray, config, logPath, getDatasetTemplate);
 
       const batches = batch(docsArray, INSERT_BATCH_SIZE);
       const allFailed = [];
@@ -482,20 +320,6 @@ function handleResult(result) {
   } else {
     process.stdout.write(formatted + '\n');
   }
-}
-
-/**
- * Splits an array into batches of at most `size` elements each.
- * @param {Array} array array to split
- * @param {number} size max size of each batch
- * @returns {Array[]} array of batches
- */
-function batch(array, size) {
-  const batches = [];
-  for (let i = 0; i < array.length; i += size) {
-    batches.push(array.slice(i, i + size));
-  }
-  return batches;
 }
 
 // Output

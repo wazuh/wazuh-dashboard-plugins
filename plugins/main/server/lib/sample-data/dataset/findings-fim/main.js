@@ -1,6 +1,6 @@
 const { generateFinding } = require('../../finding-generator');
 
-const DATASET_INDEX = 'wazuh-findings-v5';
+const DATASET_INDEX = 'wazuh-findings-v5-sample';
 
 function generateDocument(params = {}) {
   return generateFinding(params, __dirname);
