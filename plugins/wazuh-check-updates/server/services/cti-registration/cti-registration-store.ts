@@ -122,14 +122,12 @@ export class CtiRegistrationStore {
     CtiRegistrationStore.instance = undefined;
   }
 
-  /** Returns the last-known subscription snapshot for the given environment UUID, if any. */
   getSubscriptionSnapshot(
     environmentUuid: string,
   ): SubscriptionSnapshot | undefined {
     return this.subscriptionByEnvironmentUuid.get(environmentUuid)?.snapshot;
   }
 
-  /** Persists the subscription snapshot for the given environment UUID. */
   setSubscriptionSnapshot(
     environmentUuid: string,
     snapshot: SubscriptionSnapshot,
@@ -158,7 +156,6 @@ export class CtiRegistrationStore {
     return true;
   }
 
-  /** Releases the content-update in-flight lock for an environment. */
   releaseUpdateLock(environmentUuid: string): void {
     const cur = this.subscriptionByEnvironmentUuid.get(environmentUuid);
     if (!cur) {
