@@ -3,10 +3,12 @@ import { WazuhApiRoutes } from './wazuh-api';
 import { WazuhElasticRoutes } from './wazuh-elastic';
 import { WazuhHostsRoutes } from './wazuh-hosts';
 import { UiLogsRoutes } from './wazuh-utils';
+import { CtiConsumersRoutes } from './cti-consumers';
 
 export const setupRoutes = (router: IRouter, services) => {
   WazuhApiRoutes(router, services);
   WazuhElasticRoutes(router, services);
   WazuhHostsRoutes(router, services);
   UiLogsRoutes(router, services);
+  CtiConsumersRoutes(router);
 };
