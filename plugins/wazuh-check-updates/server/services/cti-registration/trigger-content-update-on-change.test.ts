@@ -52,7 +52,11 @@ describe('triggerContentUpdateOnChange', () => {
       },
     );
 
-    expect(outcome).toEqual({ triggered: false, failed: false });
+    expect(outcome).toEqual({
+      triggered: false,
+      failed: false,
+      reason: 'none',
+    });
     expect(contentUpdate).not.toHaveBeenCalled();
     expect(
       CtiRegistrationStore.getInstance().getSubscriptionSnapshot('env-uuid-1'),
@@ -83,10 +87,17 @@ describe('triggerContentUpdateOnChange', () => {
       },
     );
 
-    expect(outcome).toEqual({ triggered: true, failed: false });
+    expect(outcome).toEqual({
+      triggered: true,
+      failed: false,
+      reason: 'registration-completed',
+    });
     expect(contentUpdate).toHaveBeenCalledTimes(1);
     expect(contentUpdate).toHaveBeenCalledWith(
       expect.objectContaining({ method: 'POST', body: {} }),
+    );
+    expect(logger.info).toHaveBeenCalledWith(
+      expect.stringContaining('registration-completed'),
     );
   });
 
@@ -111,8 +122,43 @@ describe('triggerContentUpdateOnChange', () => {
       },
     );
 
-    expect(outcome).toEqual({ triggered: true, failed: false });
+    expect(outcome).toEqual({
+      triggered: true,
+      failed: false,
+      reason: 'plan-name-changed',
+    });
     expect(contentUpdate).toHaveBeenCalledTimes(1);
+    expect(logger.info).toHaveBeenCalledWith(
+      expect.stringContaining('plan-name-changed'),
+    );
+  });
+
+  test('reason is registration-completed when registration and plan name change coincide', async () => {
+    const contentUpdate = jest.fn().mockResolvedValue({});
+    const wazuhClient = buildWazuhClient(contentUpdate);
+    const store = CtiRegistrationStore.getInstance();
+    store.setSubscriptionSnapshot('env-uuid-1', {
+      isRegistered: false,
+      planName: 'basic',
+    });
+
+    const outcome = await triggerContentUpdateOnChange(
+      wazuhClient,
+      'env-uuid-1',
+      {
+        message: {
+          is_registered: true,
+          plan: { name: 'advanced', is_public: true },
+        },
+        status: 200,
+      },
+    );
+
+    expect(outcome).toEqual({
+      triggered: true,
+      failed: false,
+      reason: 'registration-completed',
+    });
   });
 
   test('does not fire on steady state (no change)', async () => {
@@ -136,7 +182,11 @@ describe('triggerContentUpdateOnChange', () => {
       },
     );
 
-    expect(outcome).toEqual({ triggered: false, failed: false });
+    expect(outcome).toEqual({
+      triggered: false,
+      failed: false,
+      reason: 'none',
+    });
     expect(contentUpdate).not.toHaveBeenCalled();
   });
 
@@ -161,7 +211,11 @@ describe('triggerContentUpdateOnChange', () => {
       },
     );
 
-    expect(outcome).toEqual({ triggered: false, failed: false });
+    expect(outcome).toEqual({
+      triggered: false,
+      failed: false,
+      reason: 'registration-completed',
+    });
     expect(contentUpdate).not.toHaveBeenCalled();
     expect(
       CtiRegistrationStore.getInstance().getSubscriptionSnapshot('env-uuid-1'),
@@ -189,9 +243,14 @@ describe('triggerContentUpdateOnChange', () => {
       },
     );
 
-    expect(outcome).toEqual({ triggered: true, failed: true });
+    expect(outcome).toEqual({
+      triggered: true,
+      failed: true,
+      reason: 'registration-completed',
+    });
     expect(logger.error).toHaveBeenCalledTimes(1);
     expect(logger.error.mock.calls[0][0]).toContain('env-uuid-1');
+    expect(logger.error.mock.calls[0][0]).toContain('registration-completed');
   });
 
   test('releases the lock so a subsequent qualifying call is not blocked', async () => {
@@ -228,7 +287,11 @@ describe('triggerContentUpdateOnChange', () => {
       },
     );
 
-    expect(outcome).toEqual({ triggered: true, failed: false });
+    expect(outcome).toEqual({
+      triggered: true,
+      failed: false,
+      reason: 'plan-name-changed',
+    });
     expect(contentUpdate).toHaveBeenCalledTimes(2);
   });
 
@@ -270,7 +333,11 @@ describe('triggerContentUpdateOnChange', () => {
       },
     );
 
-    expect(outcomeB).toEqual({ triggered: false, failed: false });
+    expect(outcomeB).toEqual({
+      triggered: false,
+      failed: false,
+      reason: 'plan-name-changed',
+    });
     expect(contentUpdate).toHaveBeenCalledTimes(1);
     expect(
       CtiRegistrationStore.getInstance().getSubscriptionSnapshot('env-uuid-1'),
@@ -281,7 +348,11 @@ describe('triggerContentUpdateOnChange', () => {
     deferred.resolve({});
     const outcomeA = await outcomeAPromise;
 
-    expect(outcomeA).toEqual({ triggered: true, failed: false });
+    expect(outcomeA).toEqual({
+      triggered: true,
+      failed: false,
+      reason: 'registration-completed',
+    });
     expect(
       CtiRegistrationStore.getInstance().getSubscriptionSnapshot('env-uuid-1'),
     ).toEqual({ isRegistered: true, planName: 'advanced' });

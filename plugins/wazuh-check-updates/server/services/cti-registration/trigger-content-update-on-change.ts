@@ -7,10 +7,16 @@ import {
   SubscriptionSnapshot,
 } from './cti-registration-store';
 
+export type CtiContentUpdateReason =
+  | 'none'
+  | 'registration-completed'
+  | 'plan-name-changed';
+
 /** Outcome of a best-effort Content Manager update attempt for this poll cycle. */
 export interface CtiContentUpdateOutcome {
   triggered: boolean;
   failed: boolean;
+  reason?: CtiContentUpdateReason;
 }
 
 function toSnapshot(
@@ -22,13 +28,25 @@ function toSnapshot(
   };
 }
 
-function hasChanged(
+/**
+ * Computes the discriminated reason for a subscription transition.
+ * Precedence: a registration-state flip always wins over a coincident
+ * plan-name diff, keeping the reason a single, unambiguous value.
+ */
+function getChangeReason(
   prior: SubscriptionSnapshot,
   next: SubscriptionSnapshot,
-): boolean {
-  return (
-    prior.isRegistered !== next.isRegistered || prior.planName !== next.planName
-  );
+): CtiContentUpdateReason {
+  const registrationFlipped = prior.isRegistered !== next.isRegistered;
+  const planNameChanged = prior.planName !== next.planName;
+
+  if (registrationFlipped) {
+    return 'registration-completed';
+  }
+  if (planNameChanged) {
+    return 'plan-name-changed';
+  }
+  return 'none';
 }
 
 /**
@@ -53,19 +71,21 @@ export async function triggerContentUpdateOnChange(
   store.setSubscriptionSnapshot(environmentUuid, nextSnapshot);
 
   if (!priorSnapshot) {
-    return { triggered: false, failed: false };
+    return { triggered: false, failed: false, reason: 'none' };
   }
 
-  const changed = hasChanged(priorSnapshot, nextSnapshot);
-  const shouldFire = changed && nextSnapshot.isRegistered === true;
+  const reason = getChangeReason(priorSnapshot, nextSnapshot);
+  const shouldFire = reason !== 'none' && nextSnapshot.isRegistered === true;
 
   if (!shouldFire) {
-    return { triggered: false, failed: false };
+    return { triggered: false, failed: false, reason };
   }
 
   if (!store.tryAcquireUpdateLock(environmentUuid)) {
-    return { triggered: false, failed: false };
+    return { triggered: false, failed: false, reason };
   }
+
+  const { logger } = getWazuhCheckUpdatesServices();
 
   try {
     await wazuhClient.asCurrentUser.transport.request({
@@ -73,7 +93,10 @@ export async function triggerContentUpdateOnChange(
       path: contentManagerRoutes.contentUpdate,
       body: {},
     });
-    return { triggered: true, failed: false };
+    logger.info(
+      `Content update triggered for environment ${environmentUuid} (reason: ${reason})`,
+    );
+    return { triggered: true, failed: false, reason };
   } catch (error) {
     const message =
       error instanceof Error
@@ -82,12 +105,11 @@ export async function triggerContentUpdateOnChange(
         ? error
         : 'Content Manager content update request failed';
 
-    const { logger } = getWazuhCheckUpdatesServices();
     logger.error(
-      `Content update trigger failed for environment ${environmentUuid}: ${message}`,
+      `Content update trigger failed for environment ${environmentUuid} (reason: ${reason}): ${message}`,
     );
 
-    return { triggered: true, failed: true };
+    return { triggered: true, failed: true, reason };
   } finally {
     store.releaseUpdateLock(environmentUuid);
   }
