@@ -8,11 +8,15 @@ import { ModalCti } from './components/modal-cti';
 import { useCtiStatus } from './hooks/useCtiStatus';
 import { statusCodes } from '../../../common/constants';
 import { ctiFlowState } from '../../services/cti-flow-state';
+import { getCtiRegistrationStatusPollIntervalSec } from '../../plugin-services';
 
 export const CtiRegistration = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deviceFlowNonce, setDeviceFlowNonce] = useState(0);
-  const { statusCTI, loading, refetchStatus } = useCtiStatus(deviceFlowNonce);
+  const { statusCTI, loading, refetchStatus } = useCtiStatus(
+    deviceFlowNonce,
+    getCtiRegistrationStatusPollIntervalSec(),
+  );
 
   const handleModalToggle = () => {
     setIsModalOpen(!isModalOpen);
