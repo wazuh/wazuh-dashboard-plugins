@@ -27,6 +27,7 @@ import {
   statusCodes,
 } from '../../../../common/constants';
 import { CtiDeviceAuthLinks } from './cti-device-auth-links';
+import { CtiConsumersAccordion } from './cti-consumers-accordion';
 
 type CtiHrefLinkProps = {
   href: string;
@@ -375,6 +376,8 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
                   </EuiText>
                 </>
               ) : null}
+              <EuiSpacer size='m' />
+              <CtiConsumersAccordion />
             </div>
           </>
         )}

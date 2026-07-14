@@ -12,6 +12,7 @@ export enum routes {
   token = `${ctiBasePath}/token`,
   ctiRegistrationStatus = `${ctiBasePath}/status`,
   contentUpdate = `${ctiBasePath}/update`,
+  ctiConsumers = `${ctiBasePath}/consumers`,
 }
 
 /** OAuth 2.0 device authorization grant type (RFC 8628) for CTI Console token polling. */

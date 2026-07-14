@@ -26,7 +26,6 @@ import { getToasts } from '../../kibana-services';
 import { isSecurityAnalyticsSettingDisabled } from '../../utils/security-analytics-config';
 import { GenericRequest } from '../../react-services';
 import { EngineSwitch } from './engine-switch';
-import { CtiConsumersAccordion } from './cti-consumers-accordion';
 import type { Engine, IndexerSettings } from './types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
@@ -308,15 +307,6 @@ export const WzIndexerSettings: React.FC = () => {
                       Update CTI content
                     </EuiButton>
                   </EuiDescribedFormGroup>
-                </EuiPanel>
-              </EuiFlexItem>
-              <EuiFlexItem>
-                <EuiPanel
-                  paddingSize='none'
-                  hasBorder={false}
-                  hasShadow={false}
-                >
-                  <CtiConsumersAccordion />
                 </EuiPanel>
               </EuiFlexItem>
             </EuiFlexGroup>

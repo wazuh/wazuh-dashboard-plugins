@@ -1,10 +1,9 @@
-import { IRouter } from 'opensearch_dashboards/server';
-import { HTTP_STATUS_CODES } from '../../../common/constants';
+import { IRouter } from 'opensearch-dashboards/server';
+import { routes } from '../../../common/constants';
 import type {
   CtiConsumer,
   CtiConsumersResponse,
 } from '../../../common/cti-consumers';
-import { ErrorResponse } from '../../lib/error-response';
 
 const CTI_CONSUMERS_INDEX = '.wazuh-cti-consumers';
 
@@ -21,16 +20,16 @@ function mapHitToConsumer(source: Record<string, unknown>): CtiConsumer {
   };
 }
 
-export const CtiConsumersRoutes = (router: IRouter) => {
+export const getCtiConsumersRoute = (router: IRouter) => {
   router.get(
     {
-      path: '/api/cti-consumers',
-      validate: false,
+      path: routes.ctiConsumers,
+      validate: {},
     },
     async (context, _request, response) => {
       try {
         const result =
-          await context.core.opensearch.client.asInternalUser.search({
+          await context.core.opensearch.client.asCurrentUser.search({
             index: CTI_CONSUMERS_INDEX,
             body: { query: { match_all: {} }, size: 1000 },
           });
@@ -42,23 +41,28 @@ export const CtiConsumersRoutes = (router: IRouter) => {
 
         return response.ok<CtiConsumersResponse>({ body: { data } });
       } catch (error) {
-        const statusCode =
-          (error as { statusCode?: number })?.statusCode ??
-          HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR;
+        const statusCode = (error as { statusCode?: number })?.statusCode;
 
         // Index not created yet is a normal, expected empty state, not an error.
-        if (statusCode === HTTP_STATUS_CODES.NOT_FOUND) {
+        if (statusCode === 404) {
           return response.ok<CtiConsumersResponse>({ body: { data: [] } });
         }
 
-        return ErrorResponse(
-          `Could not fetch CTI consumers: ${
-            (error as Error)?.message || error
-          }`,
-          4006,
-          HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-          response,
+        const message =
+          error instanceof Error
+            ? error.message
+            : typeof (error as { message?: unknown })?.message === 'string'
+            ? (error as { message: string }).message
+            : 'Could not fetch CTI consumers';
+
+        const finalError = new Error(
+          `Could not fetch CTI consumers: ${message}`,
         );
+
+        return response.customError({
+          statusCode: statusCode ?? 503,
+          body: finalError,
+        });
       }
     },
   );

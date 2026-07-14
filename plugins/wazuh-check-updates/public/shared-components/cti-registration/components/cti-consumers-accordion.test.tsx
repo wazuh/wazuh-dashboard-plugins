@@ -1,24 +1,26 @@
+jest.mock('../../../plugin-services', () => ({
+  getCore: jest.fn(),
+}));
+
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { GenericRequest } from '../../react-services';
+import { getCore } from '../../../plugin-services';
+import { routes } from '../../../../common/constants';
 import { CtiConsumersAccordion } from './cti-consumers-accordion';
 
-jest.mock('../../react-services', () => ({
-  GenericRequest: {
-    request: jest.fn(),
-  },
-}));
-
-const mockedRequest = GenericRequest.request as jest.Mock;
+const mockedHttpGet = jest.fn();
 
 describe('CtiConsumersAccordion', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (getCore as jest.Mock).mockReturnValue({
+      http: { get: mockedHttpGet },
+    });
   });
 
   it('renders each consumer field in a 2-column grid with resource spanning the full row', async () => {
-    mockedRequest.mockResolvedValue({
+    mockedHttpGet.mockResolvedValue({
       data: [
         {
           name: 'consumer-1',
@@ -36,7 +38,7 @@ describe('CtiConsumersAccordion', () => {
     render(<CtiConsumersAccordion />);
 
     await waitFor(() =>
-      expect(mockedRequest).toHaveBeenCalledWith('GET', '/api/cti-consumers'),
+      expect(mockedHttpGet).toHaveBeenCalledWith(routes.ctiConsumers),
     );
 
     expect(await screen.findByText('consumer-1')).toBeInTheDocument();
@@ -55,7 +57,7 @@ describe('CtiConsumersAccordion', () => {
   });
 
   it('shows an empty state when no consumers are returned', async () => {
-    mockedRequest.mockResolvedValue({ data: [] });
+    mockedHttpGet.mockResolvedValue({ data: [] });
 
     render(<CtiConsumersAccordion />);
 
@@ -63,7 +65,7 @@ describe('CtiConsumersAccordion', () => {
   });
 
   it('shows an error state when the request fails', async () => {
-    mockedRequest.mockRejectedValue(new Error('network error'));
+    mockedHttpGet.mockRejectedValue(new Error('network error'));
 
     render(<CtiConsumersAccordion />);
 

@@ -3,24 +3,37 @@ import {
   EuiAccordion,
   EuiButton,
   EuiCallOut,
-  EuiDescriptionList,
   EuiFlexGrid,
   EuiFlexItem,
+  EuiLink,
   EuiLoadingSpinner,
   EuiPanel,
   EuiSpacer,
   EuiText,
+  EuiTitle,
 } from '@elastic/eui';
-import { GenericRequest } from '../../react-services';
+import { getCore } from '../../../plugin-services';
+import { routes } from '../../../../common/constants';
 import type {
   CtiConsumer,
   CtiConsumersResponse,
-} from '../../../common/cti-consumers';
+} from '../../../../common/cti-consumers';
 
-const CTI_CONSUMER_FIELDS: Array<{ key: keyof CtiConsumer; label: string }> = [
+const CTI_CONSUMER_FIELDS: Array<{
+  key: keyof CtiConsumer;
+  label: string;
+  isLink?: boolean;
+  dataTestSubj?: string;
+}> = [
   { key: 'name', label: 'Name' },
   { key: 'context', label: 'Context' },
   { key: 'type', label: 'Type' },
+  {
+    key: 'resource',
+    label: 'Resource',
+    isLink: true,
+    dataTestSubj: 'ctiConsumersResourceItem',
+  },
   { key: 'is_public', label: 'Public' },
   { key: 'status', label: 'Status' },
   { key: 'local_offset', label: 'Local offset' },
@@ -34,6 +47,40 @@ function formatFieldValue(value: unknown): string {
   return String(value ?? '');
 }
 
+const truncateStyle: React.CSSProperties = {
+  display: 'block',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+};
+
+const ConsumerField: React.FC<{
+  title: string;
+  value: string;
+  href?: string;
+  dataTestSubj?: string;
+}> = ({ title, value, href, dataTestSubj }) => (
+  <EuiFlexItem data-test-subj={dataTestSubj} style={{ minWidth: 0 }}>
+    <EuiTitle size='xxs'>
+      <h6>{title}</h6>
+    </EuiTitle>
+    <EuiSpacer size='xs' />
+    {href ? (
+      <EuiLink
+        href={href}
+        target='_blank'
+        rel='noopener noreferrer'
+        title={value}
+        style={truncateStyle}
+      >
+        {value}
+      </EuiLink>
+    ) : (
+      <EuiText size='s'>{value}</EuiText>
+    )}
+  </EuiFlexItem>
+);
+
 export const CtiConsumersAccordion: React.FC = () => {
   const [consumers, setConsumers] = useState<CtiConsumer[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,9 +90,8 @@ export const CtiConsumersAccordion: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await GenericRequest.request<CtiConsumersResponse>(
-        'GET',
-        '/api/cti-consumers',
+      const response = await getCore().http.get<CtiConsumersResponse>(
+        routes.ctiConsumers,
       );
       setConsumers(response.data ?? []);
     } catch (fetchError: any) {
@@ -94,29 +140,17 @@ export const CtiConsumersAccordion: React.FC = () => {
             hasBorder
             style={{ marginBottom: 8 }}
           >
-            <EuiFlexGrid columns={2}>
+            <EuiFlexGrid columns={2} gutterSize='m'>
               {CTI_CONSUMER_FIELDS.map(field => (
-                <EuiFlexItem key={String(field.key)}>
-                  <EuiDescriptionList
-                    type='column'
-                    listItems={[
-                      {
-                        title: field.label,
-                        description: formatFieldValue(consumer[field.key]),
-                      },
-                    ]}
-                  />
-                </EuiFlexItem>
+                <ConsumerField
+                  key={String(field.key)}
+                  title={field.label}
+                  value={formatFieldValue(consumer[field.key])}
+                  href={field.isLink ? consumer.resource : undefined}
+                  dataTestSubj={field.dataTestSubj}
+                />
               ))}
             </EuiFlexGrid>
-            <EuiFlexItem data-test-subj='ctiConsumersResourceItem'>
-              <EuiDescriptionList
-                type='column'
-                listItems={[
-                  { title: 'Resource', description: consumer.resource },
-                ]}
-              />
-            </EuiFlexItem>
           </EuiPanel>
         ))
       )}

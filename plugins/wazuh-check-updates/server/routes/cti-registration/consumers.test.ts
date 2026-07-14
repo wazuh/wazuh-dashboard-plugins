@@ -3,17 +3,18 @@ import { HttpServer } from '../../../../../src/core/server/http/http_server';
 import { loggingSystemMock } from '../../../../../src/core/server/logging/logging_system.mock';
 import { ByteSizeValue } from '@osd/config-schema';
 import supertest from 'supertest';
-import { CtiConsumersRoutes } from './index';
+import { routes } from '../../../common/constants';
+import { getCtiConsumersRoute } from './consumers';
 
 const serverAddress = '127.0.0.1';
-const port = 11107;
+const port = 11207;
 
 const mockSearch = jest.fn();
 const context = {
   core: {
     opensearch: {
       client: {
-        asInternalUser: {
+        asCurrentUser: {
           search: mockSearch,
         },
       },
@@ -49,7 +50,7 @@ beforeAll(async () => {
   );
   innerServer = innerServerTest;
 
-  CtiConsumersRoutes(router);
+  getCtiConsumersRoute(router);
   registerRouter(router);
   await server.start();
 });
@@ -59,7 +60,7 @@ afterAll(async () => {
   jest.clearAllMocks();
 });
 
-describe('GET /api/cti-consumers', () => {
+describe(`GET ${routes.ctiConsumers}`, () => {
   beforeEach(() => {
     mockSearch.mockReset();
   });
@@ -87,7 +88,7 @@ describe('GET /api/cti-consumers', () => {
     });
 
     const response = await supertest(innerServer.listener)
-      .get('/api/cti-consumers')
+      .get(routes.ctiConsumers)
       .expect(200);
 
     expect(response.body).toEqual({
@@ -115,7 +116,7 @@ describe('GET /api/cti-consumers', () => {
     });
 
     const response = await supertest(innerServer.listener)
-      .get('/api/cti-consumers')
+      .get(routes.ctiConsumers)
       .expect(200);
 
     expect(response.body).toEqual({ data: [] });
@@ -128,7 +129,7 @@ describe('GET /api/cti-consumers', () => {
     });
 
     const response = await supertest(innerServer.listener)
-      .get('/api/cti-consumers')
+      .get(routes.ctiConsumers)
       .expect(200);
 
     expect(response.body).toEqual({ data: [] });
@@ -138,7 +139,7 @@ describe('GET /api/cti-consumers', () => {
     mockSearch.mockRejectedValue({ statusCode: 500, message: 'boom' });
 
     const response = await supertest(innerServer.listener)
-      .get('/api/cti-consumers')
+      .get(routes.ctiConsumers)
       .expect(500);
 
     expect(response.body.message).toContain('boom');
