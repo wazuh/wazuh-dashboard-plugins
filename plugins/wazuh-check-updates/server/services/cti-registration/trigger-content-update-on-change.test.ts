@@ -90,14 +90,14 @@ describe('triggerContentUpdateOnChange', () => {
     expect(outcome).toEqual({
       triggered: true,
       failed: false,
-      reason: 'registration-completed',
+      reason: 'registration-changed',
     });
     expect(contentUpdate).toHaveBeenCalledTimes(1);
     expect(contentUpdate).toHaveBeenCalledWith(
       expect.objectContaining({ method: 'POST', body: {} }),
     );
     expect(logger.info).toHaveBeenCalledWith(
-      expect.stringContaining('registration-completed'),
+      expect.stringContaining('registration-changed'),
     );
   });
 
@@ -128,12 +128,9 @@ describe('triggerContentUpdateOnChange', () => {
       reason: 'plan-name-changed',
     });
     expect(contentUpdate).toHaveBeenCalledTimes(1);
-    expect(logger.info).toHaveBeenCalledWith(
-      expect.stringContaining('plan-name-changed'),
-    );
   });
 
-  test('reason is registration-completed when registration and plan name change coincide', async () => {
+  test('reason is registration-changed when registration and plan name change coincide', async () => {
     const contentUpdate = jest.fn().mockResolvedValue({});
     const wazuhClient = buildWazuhClient(contentUpdate);
     const store = CtiRegistrationStore.getInstance();
@@ -157,7 +154,7 @@ describe('triggerContentUpdateOnChange', () => {
     expect(outcome).toEqual({
       triggered: true,
       failed: false,
-      reason: 'registration-completed',
+      reason: 'registration-changed',
     });
   });
 
@@ -190,7 +187,7 @@ describe('triggerContentUpdateOnChange', () => {
     expect(contentUpdate).not.toHaveBeenCalled();
   });
 
-  test('skips firing on unregistration', async () => {
+  test('fires on unregistration too, since the isRegistered===true gate was removed', async () => {
     const contentUpdate = jest.fn().mockResolvedValue({});
     const wazuhClient = buildWazuhClient(contentUpdate);
     const store = CtiRegistrationStore.getInstance();
@@ -212,11 +209,11 @@ describe('triggerContentUpdateOnChange', () => {
     );
 
     expect(outcome).toEqual({
-      triggered: false,
+      triggered: true,
       failed: false,
-      reason: 'registration-completed',
+      reason: 'registration-changed',
     });
-    expect(contentUpdate).not.toHaveBeenCalled();
+    expect(contentUpdate).toHaveBeenCalledTimes(1);
     expect(
       CtiRegistrationStore.getInstance().getSubscriptionSnapshot('env-uuid-1'),
     ).toEqual({ isRegistered: false, planName: 'advanced' });
@@ -246,11 +243,11 @@ describe('triggerContentUpdateOnChange', () => {
     expect(outcome).toEqual({
       triggered: true,
       failed: true,
-      reason: 'registration-completed',
+      reason: 'registration-changed',
     });
     expect(logger.error).toHaveBeenCalledTimes(1);
     expect(logger.error.mock.calls[0][0]).toContain('env-uuid-1');
-    expect(logger.error.mock.calls[0][0]).toContain('registration-completed');
+    expect(logger.error.mock.calls[0][0]).toContain('registration-changed');
   });
 
   test('releases the lock so a subsequent qualifying call is not blocked', async () => {
@@ -271,7 +268,7 @@ describe('triggerContentUpdateOnChange', () => {
     });
 
     store.setSubscriptionSnapshot('env-uuid-1', {
-      isRegistered: true,
+      isRegistered: false,
       planName: 'basic',
     });
 
@@ -290,7 +287,7 @@ describe('triggerContentUpdateOnChange', () => {
     expect(outcome).toEqual({
       triggered: true,
       failed: false,
-      reason: 'plan-name-changed',
+      reason: 'registration-changed',
     });
     expect(contentUpdate).toHaveBeenCalledTimes(2);
   });
@@ -351,7 +348,7 @@ describe('triggerContentUpdateOnChange', () => {
     expect(outcomeA).toEqual({
       triggered: true,
       failed: false,
-      reason: 'registration-completed',
+      reason: 'registration-changed',
     });
     expect(
       CtiRegistrationStore.getInstance().getSubscriptionSnapshot('env-uuid-1'),

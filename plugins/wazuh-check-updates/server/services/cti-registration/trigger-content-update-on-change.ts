@@ -9,7 +9,7 @@ import {
 
 export type CtiContentUpdateReason =
   | 'none'
-  | 'registration-completed'
+  | 'registration-changed'
   | 'plan-name-changed';
 
 /** Outcome of a best-effort Content Manager update attempt for this poll cycle. */
@@ -41,7 +41,7 @@ function getChangeReason(
   const planNameChanged = prior.planName !== next.planName;
 
   if (registrationFlipped) {
-    return 'registration-completed';
+    return 'registration-changed';
   }
   if (planNameChanged) {
     return 'plan-name-changed';
@@ -75,7 +75,7 @@ export async function triggerContentUpdateOnChange(
   }
 
   const reason = getChangeReason(priorSnapshot, nextSnapshot);
-  const shouldFire = reason !== 'none' && nextSnapshot.isRegistered === true;
+  const shouldFire = reason !== 'none';
 
   if (!shouldFire) {
     return { triggered: false, failed: false, reason };
