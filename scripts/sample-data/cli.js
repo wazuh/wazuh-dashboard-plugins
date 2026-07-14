@@ -20,7 +20,6 @@ const datasets = fs
 
 const findings_datasets = datasets.filter(file => file.startsWith('findings'));
 
-// TODO: Remove at least the manager component if the states datasets are refactored or removed, not an existing field
 // Default document generation parameters
 const defaultDocumentGenerationParams = {
   manager: {
@@ -107,6 +106,14 @@ Examples:
   node cli.js --all --count 50 --output all.ndjson
   node cli.js --all-findings --output insert
 `;
+
+/**
+ * Example POST curl:
+ * curl -k -u USERNAME:PASSWORD -X POST "https://WAZUH_INDEXER_HOST:WAZUH_INDEXER_PORT/_bulk" -H "Content-Type: application/x-ndjson" --data-binary "@bulk-data.json"
+ *
+ * Exampl DELETE curl:
+ * curl -u USERNAME:PASSWORD -k -H "Content-Type: application/json"   -XPOST "https://WAZUH_INDEXER_HOST:WAZUH_INDEXER_PORT/INDEX_PATTERN/_delete_by_query?conflicts=proceed"   -d '{"query"{"match_all": {}}}'
+ */
 
 // Parse arguments
 let dataset = null;
@@ -223,7 +230,6 @@ if (format === 'bulk-api') {
 const entries = [];
 try {
   for (const name of targets) {
-    console.time(`generate-${name}`);
     const resolvedIndex = index || getDatasetIndex(name) || null;
     for (let i = 0; i < count; i++) {
       entries.push({
@@ -234,7 +240,6 @@ try {
         index: resolvedIndex,
       });
     }
-    console.timeEnd(`generate-${name}`);
   }
 } catch (error) {
   console.error('Error generating documents:', error);

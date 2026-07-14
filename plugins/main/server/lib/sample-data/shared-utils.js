@@ -144,7 +144,9 @@ function generateRandomChecksum() {
  * @returns {Object[]} Array with the parsed data
  */
 function loadDocs(dataDir) {
-  const files = fs.readdirSync(dataDir).filter(f => /\.(json|ndjson)$/.test(f));
+  const files = fs
+    .readdirSync(dataDir)
+    .filter(f => /\.(json|ndjson)$/.test(f) && f !== 'template.json');
 
   return files.flatMap(f => {
     const content = fs.readFileSync(path.join(dataDir, f), 'utf8').trim();
