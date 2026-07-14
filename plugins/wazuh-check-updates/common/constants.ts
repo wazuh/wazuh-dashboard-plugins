@@ -74,3 +74,9 @@ export const enum statusCodes {
   /** OAuth terminal errors (access_denied, expired_token, etc.) after device flow. */
   REGISTRATION_FAILED = 460,
 }
+
+export const enum ctiContentUpdateReasons {
+  NONE = 'none',
+  REGISTRATION_CHANGED = 'registration-changed',
+  PLAN_NAME_CHANGED = 'plan-name-changed',
+}
