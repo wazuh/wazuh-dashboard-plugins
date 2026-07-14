@@ -12,6 +12,7 @@ import {
   CtiRegistrationStore,
   parseDeviceAuthorizationForStore,
 } from '../../services/cti-registration/cti-registration-store';
+import { triggerContentUpdateOnChange } from '../../services/cti-registration/trigger-content-update-on-change';
 import supertest from 'supertest';
 
 const serverAddress = '127.0.0.1';
@@ -19,6 +20,8 @@ const port = 11007;
 
 const mockedResolve = resolveCtiOAuthClientId as jest.Mock;
 const mockedGetCtiSubscriptionStatus = getCtiSubscriptionStatus as jest.Mock;
+const mockedTriggerContentUpdateOnChange =
+  triggerContentUpdateOnChange as jest.Mock;
 
 jest.mock('../../services/cti-registration', () => ({
   resolveCtiOAuthClientId: jest.fn(),
@@ -27,6 +30,28 @@ jest.mock('../../services/cti-registration', () => ({
     status: null,
   }),
 }));
+
+jest.mock(
+  '../../services/cti-registration/trigger-content-update-on-change',
+  () => ({
+    triggerContentUpdateOnChange: jest
+      .fn()
+      .mockResolvedValue({ triggered: false, failed: false }),
+  }),
+);
+
+jest.mock('../../plugin-services', () => {
+  const loggerError = jest.fn();
+  return {
+    getWazuhCheckUpdatesServices: jest.fn().mockReturnValue({
+      logger: { error: loggerError },
+    }),
+  };
+});
+
+import { getWazuhCheckUpdatesServices } from '../../plugin-services';
+const mockedLoggerError = (getWazuhCheckUpdatesServices as jest.Mock)().logger
+  .error as jest.Mock;
 
 const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
@@ -88,6 +113,11 @@ describe('CTI registration status route', () => {
       message: null,
       status: null,
     });
+    mockedTriggerContentUpdateOnChange.mockResolvedValue({
+      triggered: false,
+      failed: false,
+    });
+    mockedLoggerError.mockClear();
   });
 
   test(`GET ${routes.ctiRegistrationStatus} when store is empty`, async () => {
@@ -216,5 +246,42 @@ describe('CTI registration status route', () => {
       subscription: { message: null, status: null },
     });
     expect(store.getStatus('env-uuid-1')).toBeUndefined();
+  });
+
+  describe('content-update trigger integration', () => {
+    test('fires the trigger silently and never surfaces its outcome on the response', async () => {
+      mockedTriggerContentUpdateOnChange.mockResolvedValue({
+        triggered: true,
+        failed: false,
+      });
+
+      const response = await supertest(innerServer.listener)
+        .get(routes.ctiRegistrationStatus)
+        .expect(200);
+
+      expect(response.body.contentUpdate).toBeUndefined();
+      expect(mockedTriggerContentUpdateOnChange).toHaveBeenCalledWith(
+        mockWazuhClient,
+        'env-uuid-1',
+        { message: null, status: null },
+      );
+    });
+
+    test('does not fail the response when the trigger rejects, and logs it instead', async () => {
+      mockedTriggerContentUpdateOnChange.mockRejectedValue(
+        new Error('Content Manager unreachable'),
+      );
+
+      const response = await supertest(innerServer.listener)
+        .get(routes.ctiRegistrationStatus)
+        .expect(200);
+
+      expect(response.body.contentUpdate).toBeUndefined();
+
+      // Give the un-awaited trigger's rejection handler a microtask turn.
+      await new Promise(resolve => setImmediate(resolve));
+      expect(mockedLoggerError).toHaveBeenCalledTimes(1);
+      expect(mockedLoggerError.mock.calls[0][0]).toContain('env-uuid-1');
+    });
   });
 });
