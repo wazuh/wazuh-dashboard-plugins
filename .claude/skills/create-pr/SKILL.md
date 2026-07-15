@@ -22,7 +22,7 @@ you to create/open/submit it.
   `6.0.0`), which is **not always `main`**. Never guess — confirm it.
 - **Every commit must be DCO-signed** (`git commit --signoff`).
 - **Validate locally before "Ready for review"** using the `check-standards` skill.
-- **English everywhere.** Describe the *why*, not just the *what*.
+- **English everywhere.** Describe the _why_, not just the _what_.
 - **Issues arrive as URLs** and may live in a different repo. Read them with
   `gh issue view <url>` and classify the source (see below) — it changes both
   "Issues Resolved" and the CHANGELOG.
@@ -118,18 +118,23 @@ item exactly).
 
 ```markdown
 ### Description
+
 <why this change exists and what it achieves>
 
 ### Issues Resolved
+
 closes #<issue-number>
 
 ### Evidence
+
 <screenshots or videos — REQUIRED for any UI change>
 
 ### Test
+
 <instructions to test this PR>
 
 ### Check List
+
 - [ ] All tests pass
   - [ ] `yarn test:jest`
 - [ ] New functionality includes testing.

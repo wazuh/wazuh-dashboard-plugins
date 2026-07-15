@@ -7,7 +7,7 @@ doc before doing non-trivial work.
 ## What this repo is
 
 A set of **OpenSearch Dashboards (OSD) plugins** that make up the Wazuh UI. It is
-*not* the platform — the platform is the sibling repo `wazuh-dashboard` (an OSD
+_not_ the platform — the platform is the sibling repo `wazuh-dashboard` (an OSD
 fork), into which these plugins are installed under its `plugins/` directory.
 
 - Node: see [`.nvmrc`](.nvmrc) (currently 22.22.0). Package manager: Yarn v1.
@@ -19,11 +19,11 @@ fork), into which these plugins are installed under its `plugins/` directory.
 
 Three plugins under `plugins/`, in dependency order:
 
-| Plugin folder            | OSD id              | Role                                             |
-| ------------------------ | ------------------- | ------------------------------------------------ |
-| `plugins/wazuh-core`     | `wazuhCore`         | Base services: config, API hosts, Server API client, security. Depended on by the others. |
-| `plugins/wazuh-check-updates` | `wazuhCheckUpdates` | Update notifications + CTI registration. Depends on `wazuhCore`. |
-| `plugins/main`           | `wazuh`             | Main app (alerts, agents, modules, Dev Tools…). Depends on both above. |
+| Plugin folder                 | OSD id              | Role                                                                                      |
+| ----------------------------- | ------------------- | ----------------------------------------------------------------------------------------- |
+| `plugins/wazuh-core`          | `wazuhCore`         | Base services: config, API hosts, Server API client, security. Depended on by the others. |
+| `plugins/wazuh-check-updates` | `wazuhCheckUpdates` | Update notifications + CTI registration. Depends on `wazuhCore`.                          |
+| `plugins/main`                | `wazuh`             | Main app (alerts, agents, modules, Dev Tools…). Depends on both above.                    |
 
 Each plugin is **self-contained**: its own `package.json`, `yarn.lock`,
 `eslint.config.mjs`, `knip.json`, and Jest config.
