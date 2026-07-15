@@ -18,7 +18,11 @@ export type {
   UseCaseManagementFormReturn,
 } from './use-case-management-form';
 export type {
-  CaseManagementFields,
+  CaseData,
+  CaseComment,
   CaseStatus,
+  CaseSeverity,
+  CasePriority,
+  CaseTLP,
   UpdateCasePayload,
 } from './case-management-service';

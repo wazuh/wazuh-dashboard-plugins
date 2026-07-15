@@ -215,6 +215,31 @@ export const mitreAttack = {
     }`,
 };
 
+export const caseManagement = {
+  category: 'wz-category-threat-intelligence',
+  id: 'case-management',
+  title: i18n.translate('wz-app-case-management-title', {
+    defaultMessage: 'Case Management',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-case-management-breadcrumbLabel', {
+    defaultMessage: 'Case Management',
+  }),
+  description: i18n.translate('wz-app-case-management-description', {
+    defaultMessage:
+      'Track, triage, and manage cases created from security findings across your environment.',
+  }),
+  euiIconType: 'securityApp',
+  order: 303,
+  showInOverviewApp: true,
+  showInAgentMenu: false,
+  redirectTo: () =>
+    `/overview/?tab=caseManagement&tabView=dashboard${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
 export const ITHygiene = {
   category: 'wz-category-security-operations',
   id: 'it-hygiene',
@@ -704,6 +729,7 @@ export const Applications = [
   threatHunting,
   vulnerabilityDetection,
   mitreAttack,
+  caseManagement,
   regulatoryCompliance,
   devTools,
   security,

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 import {
+  EuiBadge,
   EuiButton,
   EuiButtonEmpty,
   EuiCallOut,
@@ -27,6 +28,7 @@ import {
   statusCodes,
 } from '../../../../common/constants';
 import { CtiDeviceAuthLinks } from './cti-device-auth-links';
+import { CtiConsumersAccordion } from './cti-consumers-accordion';
 
 type CtiHrefLinkProps = {
   href: string;
@@ -366,15 +368,32 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               {subscriptionPlanName ? (
                 <>
                   <EuiSpacer size='m' />
-                  <EuiText size='s' data-test-subj='ctiRegistrationPlan'>
-                    <FormattedMessage
-                      id='wazuhCheckUpdates.ctiRegistration.successPlan'
-                      defaultMessage='Plan: {planName}'
-                      values={{ planName: subscriptionPlanName }}
-                    />
-                  </EuiText>
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                    }}
+                  >
+                    <EuiText size='s'>
+                      <strong>
+                        <FormattedMessage
+                          id='wazuhCheckUpdates.ctiRegistration.successPlanLabel'
+                          defaultMessage='Plan:'
+                        />
+                      </strong>
+                    </EuiText>
+                    <EuiBadge
+                      color='hollow'
+                      data-test-subj='ctiRegistrationPlan'
+                    >
+                      {subscriptionPlanName}
+                    </EuiBadge>
+                  </span>
                 </>
               ) : null}
+              <EuiSpacer size='m' />
+              <CtiConsumersAccordion />
             </div>
           </>
         )}
