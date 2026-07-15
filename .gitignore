@@ -87,6 +87,9 @@ public/assets/custom/*
 .claude/settings.local.json
 CLAUDE.local.md
 
+# Scratch dir for AI skill reports (CVE analysis/resolution, etc.)
+tmp/
+
 #Vulnerabilities events injector config and data
 scripts/vulnerabilities-events-injector/DIS_Settings.json
 scripts/vulnerabilities-events-injector/generatedData.json
