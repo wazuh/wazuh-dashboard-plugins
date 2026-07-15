@@ -545,7 +545,7 @@ hosts:
   'reports.csv.maxRows': {
     title: 'Maximum rows in CSV reports',
     description:
-      'Maximum number of rows included in CSV reports. If the number of rows exceeds this value, the report will be truncated. Reports exceeding this value will be truncated. Increasing this value above 10,000 rows may cause performance issues — you will also need to raise the "index.max_result_window" setting on your indices.',
+      'Maximum number of rows included in CSV reports. Reports exceeding this value will be truncated. Increasing this value above 10,000 rows may cause performance issues — you will also need to raise the "index.max_result_window" setting on your indices.',
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.number,
