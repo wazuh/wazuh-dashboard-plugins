@@ -99,6 +99,7 @@
 - Updated MITRE ATT&CK dashboards to use techniques, subtechniques and tactics names [#8573](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8573) [#8617](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8617)
 - Condensed the setting labels and added info tooltips in the registration service configuration view [#8616](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8616)
 - Adapt management of daemons status to the new API response schema [#8706](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8706)
+- Enhanced description of `reports.csv.maxRows` setting [#1434](https://github.com/wazuh/wazuh-dashboard/issues/1434)
 
 ### Fixed
 
