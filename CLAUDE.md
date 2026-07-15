@@ -97,6 +97,21 @@ Run per-plugin commands from that plugin's folder (`plugins/main`,
 `plugins/wazuh-core`, `plugins/wazuh-check-updates`). Fallback host setup:
 [`docs/dev/setup.md`](docs/dev/setup.md).
 
+### Running the full stack — this repo drives the local dev env
+
+`docker/osd-dev` is the local run/dev environment for the **entire Wazuh dashboard
+stack**, and it lives **here**, not in `wazuh-dashboard`. `./dev.sh up` starts the
+OSD platform plus the internal plugins (`main`, `wazuh-core`, `wazuh-check-updates`,
+auto-detected under `plugins/`). To develop the **other repos** locally, mount them:
+
+- `-r <repo>=/abs/path` (or `-r <repo>`, resolved from the sibling parent dir) —
+  external plugin repos: `security`, `alerting`, `notifications`, `reporting`,
+  `security-analytics`.
+- `--base [path]` — the `wazuh-dashboard` platform base.
+
+Hybrid model, **not a monorepo**: some plugins live here, others stay in their own
+repos. Full options: [`docker/osd-dev/README.md`](docker/osd-dev/README.md).
+
 ## Code conventions
 
 Enforced by tooling — run the linter/formatter, don't hand-format:
