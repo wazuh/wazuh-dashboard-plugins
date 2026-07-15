@@ -8,13 +8,19 @@ jest.mock('../../hooks', () => ({
   useGetUpgradeTasks: jest.fn(),
 }));
 
+const mockHandleError = jest.fn();
+
 jest.mock('../../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: () => {},
+    handleError: (...args: any[]) => mockHandleError(...args),
   }),
 }));
 
 describe('AgentUpgradesInProgress component', () => {
+  beforeEach(() => {
+    mockHandleError.mockClear();
+  });
+
   test('should return the component', async () => {
     (useGetUpgradeTasks as jest.Mock).mockReturnValue({
       getInProgressIsLoading: false,
@@ -61,5 +67,65 @@ describe('AgentUpgradesInProgress component', () => {
     act(() => {
       fireEvent.click(openModalButton);
     });
+  });
+
+  test('should show a single permission toast when the user lacks task:status', async () => {
+    const permissionError = new Error(
+      'API error: ERR_BAD_REQUEST - Permission denied: Resource type: *:*',
+    );
+
+    (useGetUpgradeTasks as jest.Mock).mockReturnValue({
+      totalInProgressTasks: 0,
+      getInProgressError: permissionError,
+      getSuccessError: permissionError,
+      getErrorTasksError: permissionError,
+      getTimeoutError: permissionError,
+    });
+
+    render(
+      <AgentUpgradesInProgress
+        reload={0}
+        setIsModalVisible={() => {}}
+        isPanelClosed={false}
+        setIsPanelClosed={() => {}}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mockHandleError).toHaveBeenCalledTimes(1);
+    });
+
+    const [options] = mockHandleError.mock.calls[0];
+    expect(options.severity).toBe('BUSINESS');
+    expect(options.level).toBe('WARNING');
+    expect(options.error.title).toBe('No permissions to view upgrade tasks');
+    expect(typeof options.error.error).toBe('string');
+    expect(options.error.message).not.toContain('Permission denied');
+    expect(options.error.message).toContain('task:status');
+  });
+
+  test('should call handleError once for a genuine non-permission error', async () => {
+    const genericError = new Error('Internal Server Error');
+
+    (useGetUpgradeTasks as jest.Mock).mockReturnValue({
+      totalInProgressTasks: 0,
+      getInProgressError: genericError,
+    });
+
+    render(
+      <AgentUpgradesInProgress
+        reload={0}
+        setIsModalVisible={() => {}}
+        isPanelClosed={false}
+        setIsPanelClosed={() => {}}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mockHandleError).toHaveBeenCalledTimes(1);
+    });
+
+    const [options] = mockHandleError.mock.calls[0];
+    expect(options.severity).toBe('BUSINESS');
   });
 });

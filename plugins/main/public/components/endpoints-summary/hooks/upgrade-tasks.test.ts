@@ -5,6 +5,8 @@ import { API_NAME_TASK_STATUS } from '../../../../common/constants';
 
 jest.mock('../services', () => ({
   getTasks: jest.fn(),
+  isPermissionError: jest.requireActual('../services/is-permission-error')
+    .isPermissionError,
 }));
 
 jest.useFakeTimers();
@@ -87,5 +89,104 @@ describe('useGetUpgradeTasks hook', () => {
     await waitForNextUpdate();
     expect(result.current.getInProgressError).toBe(mockErrorMessage);
     expect(result.current.getInProgressIsLoading).toBeFalsy();
+  });
+
+  it('should stop polling when a permission error is detected on the In progress query', async () => {
+    const mockGetTasks = jest.requireMock('../services').getTasks;
+    const permissionError = new Error(
+      'API error: ERR_BAD_REQUEST - Permission denied: Resource type: *:*',
+    );
+
+    mockGetTasks.mockImplementation(async ({ status }) => {
+      if (status === API_NAME_TASK_STATUS.IN_PROGRESS) {
+        throw permissionError;
+      }
+      return { total_affected_items: 0 };
+    });
+
+    const { waitForNextUpdate } = renderHook(() => useGetUpgradeTasks(false));
+
+    await waitForNextUpdate();
+    jest.advanceTimersByTime(3000);
+    jest.advanceTimersByTime(3000);
+
+    const inProgressCalls = mockGetTasks.mock.calls.filter(
+      ([params]: any[]) => params.status === API_NAME_TASK_STATUS.IN_PROGRESS,
+    );
+
+    expect(inProgressCalls).toHaveLength(1);
+  });
+
+  it('should not refetch the whole task set when the permission error is detected', async () => {
+    const mockGetTasks = jest.requireMock('../services').getTasks;
+    mockGetTasks.mockRejectedValue(
+      new Error(
+        'API error: ERR_BAD_REQUEST - Permission denied: Resource type: *:*',
+      ),
+    );
+
+    const { waitForNextUpdate } = renderHook(() => useGetUpgradeTasks(false));
+
+    await waitForNextUpdate();
+    jest.advanceTimersByTime(3000);
+    await Promise.resolve();
+
+    expect(mockGetTasks).toHaveBeenCalledTimes(4);
+  });
+
+  it('should stop polling when a permission error is detected on a query other than In progress', async () => {
+    const mockGetTasks = jest.requireMock('../services').getTasks;
+    const permissionError = new Error(
+      'API error: ERR_BAD_REQUEST - Permission denied: Resource type: *:*',
+    );
+
+    mockGetTasks.mockImplementation(async ({ status }) => {
+      if (status === API_NAME_TASK_STATUS.DONE) {
+        throw permissionError;
+      }
+      return { total_affected_items: 1 };
+    });
+
+    const { waitForNextUpdate } = renderHook(() => useGetUpgradeTasks(false));
+
+    await waitForNextUpdate();
+    jest.advanceTimersByTime(3000);
+    jest.advanceTimersByTime(3000);
+
+    const inProgressCalls = mockGetTasks.mock.calls.filter(
+      ([params]: any[]) => params.status === API_NAME_TASK_STATUS.IN_PROGRESS,
+    );
+
+    expect(inProgressCalls).toHaveLength(1);
+  });
+
+  it('should continue polling every 3s when in-progress tasks exist and there is no permission error', async () => {
+    const mockGetTasks = jest.requireMock('../services').getTasks;
+
+    mockGetTasks.mockImplementation(async ({ status }) => {
+      if (status === API_NAME_TASK_STATUS.IN_PROGRESS) {
+        return { total_affected_items: 1 };
+      }
+      return { total_affected_items: 0 };
+    });
+
+    const { waitForNextUpdate } = renderHook(() => useGetUpgradeTasks(false));
+
+    await waitForNextUpdate();
+
+    const inProgressCallsBefore = mockGetTasks.mock.calls.filter(
+      ([params]: any[]) => params.status === API_NAME_TASK_STATUS.IN_PROGRESS,
+    );
+    expect(inProgressCallsBefore).toHaveLength(1);
+
+    jest.advanceTimersByTime(3000);
+    await Promise.resolve();
+
+    const inProgressCallsAfter = mockGetTasks.mock.calls.filter(
+      ([params]: any[]) => params.status === API_NAME_TASK_STATUS.IN_PROGRESS,
+    );
+    expect(inProgressCallsAfter.length).toBeGreaterThan(
+      inProgressCallsBefore.length,
+    );
   });
 });

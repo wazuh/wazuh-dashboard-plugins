@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getTasks } from '../services';
+import { getTasks, isPermissionError } from '../services';
 import { API_NAME_TASK_STATUS } from '../../../../common/constants';
 
 const beforeMinutes = 60;
@@ -97,7 +97,20 @@ export const useGetUpgradeTasks = (reload: any) => {
     await getUpgradeTimeout();
   };
 
+  const permissionDenied = [
+    getInProgressError,
+    getSuccessError,
+    getErrorTasksError,
+    getTimeoutError,
+  ].some(isPermissionError);
+
   useEffect(() => {
+    // Fetching again would duplicate the denied requests: the error state
+    // change re-runs this effect.
+    if (permissionDenied) {
+      return;
+    }
+
     fetchData();
 
     const intervalId = setInterval(getUpgradesInProgress, 3000);
@@ -107,7 +120,7 @@ export const useGetUpgradeTasks = (reload: any) => {
     }
 
     return () => clearInterval(intervalId);
-  }, [totalInProgressTasks, reload]);
+  }, [totalInProgressTasks, permissionDenied, reload]);
 
   return {
     getInProgressIsLoading,
