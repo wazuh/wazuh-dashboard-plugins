@@ -55,12 +55,13 @@ function boolean() {
 
 /**
  * Generate a random date string in ISO format
+ * @param {number} daysAgo - How many days back the range should start (default: 10)
  * @returns {string} Random date string
  */
-function date() {
+function date(daysAgo = 10) {
   const startDate = new Date();
   const endDate = new Date(startDate);
-  endDate.setDate(endDate.getDate() - 10);
+  endDate.setDate(endDate.getDate() - daysAgo);
 
   // Random date between start_date and end_date
   const randomDate = new Date(

@@ -1,6 +1,8 @@
 const { loadDocs } = require('./shared-utils');
+const random = require('./lib/random');
 
 const EVENT_TIMESTAMPS = ['created', 'start', 'end'];
+const DAYS = 30;
 
 const docsCache = new Map();
 
@@ -25,7 +27,7 @@ function generateFinding(params = {}, targetDir) {
       ? index % docs.length
       : Math.floor(Math.random() * docs.length);
   const doc = JSON.parse(JSON.stringify(docs[baseIdx]));
-  const iso = new Date().toISOString();
+  const iso = random.date(DAYS);
   doc['@timestamp'] = iso;
   if (doc.event && typeof doc.event === 'object') {
     for (const key of EVENT_TIMESTAMPS) {
