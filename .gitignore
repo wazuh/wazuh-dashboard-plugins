@@ -83,6 +83,10 @@ public/assets/custom/*
 # Mac files
 .DS_Store
 
+# Claude Code: version the shared settings, ignore personal overrides
+.claude/settings.local.json
+CLAUDE.local.md
+
 #Vulnerabilities events injector config and data
 scripts/vulnerabilities-events-injector/DIS_Settings.json
 scripts/vulnerabilities-events-injector/generatedData.json
