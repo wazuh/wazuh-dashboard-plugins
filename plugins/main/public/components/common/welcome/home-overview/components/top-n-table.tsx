@@ -45,12 +45,14 @@ export const TopNTable: React.FC<TopNTableProps> = ({
   ];
 
   return (
-    <EuiBasicTable
-      items={items}
-      columns={columns}
-      tableLayout='fixed'
-      noItemsMessage={noItemsMessage}
-      data-test-subj={rest['data-test-subj']}
-    />
+    <div style={{ overflowX: 'auto', minWidth: 240 }}>
+      <EuiBasicTable
+        items={items}
+        columns={columns}
+        tableLayout='fixed'
+        noItemsMessage={noItemsMessage}
+        data-test-subj={rest['data-test-subj']}
+      />
+    </div>
   );
 };

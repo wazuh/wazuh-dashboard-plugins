@@ -52,12 +52,14 @@ export const ScaBenchmarksTable: React.FC<ScaBenchmarksTableProps> = ({
   ];
 
   return (
-    <EuiBasicTable
-      items={items}
-      columns={columns}
-      tableLayout='fixed'
-      noItemsMessage={NO_BENCHMARKS}
-      data-test-subj='sca-benchmarks-table'
-    />
+    <div style={{ overflowX: 'auto', minWidth: 400 }}>
+      <EuiBasicTable
+        items={items}
+        columns={columns}
+        tableLayout='fixed'
+        noItemsMessage={NO_BENCHMARKS}
+        data-test-subj='sca-benchmarks-table'
+      />
+    </div>
   );
 };

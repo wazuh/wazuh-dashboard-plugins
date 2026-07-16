@@ -55,7 +55,7 @@ export const ThreatHuntingSection: React.FC<ThreatHuntingSectionProps> = ({
       </EuiText>
       <EuiSpacer size='s' />
       <EuiFlexGroup wrap responsive={false}>
-        <EuiFlexItem style={{ minWidth: 0 }}>
+        <EuiFlexItem>
           <WidgetGroup
             status={findings.status}
             title={
@@ -82,7 +82,7 @@ export const ThreatHuntingSection: React.FC<ThreatHuntingSectionProps> = ({
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: 0 }}>
+        <EuiFlexItem>
           <WidgetGroup
             status={findings.status}
             title={<EuiLink onClick={goToMitre}>MITRE ATT&amp;CK</EuiLink>}
@@ -112,7 +112,7 @@ export const ThreatHuntingSection: React.FC<ThreatHuntingSectionProps> = ({
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: 0 }}>
+        <EuiFlexItem>
           <WidgetGroup
             status={vulnerabilities.status}
             title={

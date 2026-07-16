@@ -54,7 +54,7 @@ export const SecurityOperationsSection: React.FC = () => {
       </EuiText>
       <EuiSpacer size='s' />
       <EuiFlexGroup wrap responsive={false}>
-        <EuiFlexItem style={{ minWidth: 0 }}>
+        <EuiFlexItem>
           <WidgetGroup
             status={itHygieneStatus}
             title={<EuiLink onClick={goToItHygiene}>IT Hygiene</EuiLink>}
@@ -69,7 +69,7 @@ export const SecurityOperationsSection: React.FC = () => {
             />
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: 0 }}>
+        <EuiFlexItem>
           <WidgetGroup
             status={activeResponse.status}
             title={
@@ -92,7 +92,7 @@ export const SecurityOperationsSection: React.FC = () => {
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: 0 }}>
+        <EuiFlexItem>
           <EuiPanel
             paddingSize='m'
             hasBorder
