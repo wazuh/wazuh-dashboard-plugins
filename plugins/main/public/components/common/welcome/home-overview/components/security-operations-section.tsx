@@ -60,6 +60,7 @@ const SecurityOperationsSectionComponent: React.FC = () => {
             status={itHygieneStatus}
             title={<EuiLink onClick={goToItHygiene}>IT Hygiene</EuiLink>}
             caption='Current'
+            centerBody
             data-test-subj='home-overview-it-hygiene'
           >
             <ItHygieneTiles
@@ -77,6 +78,7 @@ const SecurityOperationsSectionComponent: React.FC = () => {
               <EuiLink onClick={goToActiveResponse}>Active Response</EuiLink>
             }
             caption='Last 24 hours'
+            centerBody
             data-test-subj='home-overview-active-response'
           >
             {activeResponse.data !== undefined && (

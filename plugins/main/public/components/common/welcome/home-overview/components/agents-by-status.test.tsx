@@ -36,7 +36,7 @@ describe('AgentsByStatus', () => {
   });
 
   it('shows a "deploy new agent" prompt instead of counts when the fleet is empty', () => {
-    render(
+    const { container } = render(
       <AgentsByStatus
         data={{
           active: 0,
@@ -48,9 +48,9 @@ describe('AgentsByStatus', () => {
         deployAgentUrl='https://example.test/deploy'
       />,
     );
-    expect(
-      screen.getByText('This instance has no agents registered'),
-    ).toBeInTheDocument();
+    expect(container.textContent).toContain(
+      'This instance has no agents registered.',
+    );
     const cta = screen.getByText('Deploy new agent').closest('a');
     expect(cta).toHaveAttribute('href', 'https://example.test/deploy');
     expect(screen.queryByText('agents active')).not.toBeInTheDocument();

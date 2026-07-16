@@ -22,10 +22,13 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
   if (data.total === 0) {
     return (
       <EuiEmptyPrompt
-        iconType='indexOpen'
-        titleSize='xs'
-        title={<h4>This instance has no agents registered</h4>}
-        body={<p>Deploy an agent to begin monitoring your endpoints.</p>}
+        body={
+          <p>
+            This instance has no agents registered.
+            <br />
+            Please deploy agents to begin monitoring your endpoints.
+          </p>
+        }
         actions={
           <WzButtonPermissions
             color='primary'

@@ -157,10 +157,12 @@ describe('OverviewSection', () => {
       status: 'available',
       data: { active: 0, disconnected: 0, pending: 0, neverConnected: 0, total: 0 },
     });
-    render(<OverviewSection findings={findingsAvailable} />);
-    expect(
-      screen.getByText('This instance has no agents registered'),
-    ).toBeInTheDocument();
+    const { container } = render(
+      <OverviewSection findings={findingsAvailable} />,
+    );
+    expect(container.textContent).toContain(
+      'This instance has no agents registered.',
+    );
     expect(screen.queryByText('agents active')).not.toBeInTheDocument();
   });
 });

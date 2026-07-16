@@ -64,6 +64,13 @@ export interface WidgetGroupProps {
   caption?: string;
   headerLink?: WidgetGroupHeaderLink;
   errorLabel?: string;
+  /** Vertically centers the body within the panel when a taller sibling
+   * card stretches it. Only appropriate for a body that's just a KPI/tile
+   * row with nothing else below it — floating alone at the top with dead
+   * space underneath looks wrong. A hero/tiles-then-table body reads fine
+   * top-anchored (tables naturally have trailing space below them), so
+   * this defaults to `false`. */
+  centerBody?: boolean;
   children: React.ReactNode;
   ['data-test-subj']?: string;
 }
@@ -82,6 +89,7 @@ export const WidgetGroup: React.FC<WidgetGroupProps> = ({
   caption,
   headerLink,
   errorLabel,
+  centerBody = false,
   children,
   ...rest
 }) => {
@@ -90,8 +98,18 @@ export const WidgetGroup: React.FC<WidgetGroupProps> = ({
   }
 
   return (
-    <EuiPanel paddingSize='m' hasBorder data-test-subj={rest['data-test-subj']}>
-      <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
+    <EuiPanel
+      paddingSize='m'
+      hasBorder
+      data-test-subj={rest['data-test-subj']}
+      style={{ display: 'flex', flexDirection: 'column' }}
+    >
+      <EuiFlexGroup
+        alignItems='center'
+        gutterSize='s'
+        responsive={false}
+        style={{ flexGrow: 0 }}
+      >
         <EuiFlexItem>
           <EuiTitle size='xxs'>
             <h3>{title}</h3>
@@ -110,10 +128,32 @@ export const WidgetGroup: React.FC<WidgetGroupProps> = ({
           </EuiFlexItem>
         )}
       </EuiFlexGroup>
-      <div style={{ marginTop: 10 }}>
-        <WidgetGroupBody status={status} errorLabel={errorLabel}>
-          {children}
-        </WidgetGroupBody>
+      <div
+        style={
+          centerBody
+            ? {
+                marginTop: 10,
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+              }
+            : { marginTop: 10 }
+        }
+      >
+        {/* A plain block wrapper: when centering, `children` is often an
+         * EuiFlexGroup or EuiPanel, both of which default to
+         * `flex-grow: 1` in their own CSS — as a *direct* child of the
+         * flex container above, that would make it greedily fill 100% of
+         * the available height, leaving nothing for `justifyContent:
+         * center` to center against. Since this wrapper isn't itself a
+         * flex container, that flex-grow is inert and the block sizes to
+         * its content instead. */}
+        <div>
+          <WidgetGroupBody status={status} errorLabel={errorLabel}>
+            {children}
+          </WidgetGroupBody>
+        </div>
       </div>
     </EuiPanel>
   );

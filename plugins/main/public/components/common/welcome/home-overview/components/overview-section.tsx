@@ -50,6 +50,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             status={agents.status}
             title='Agents by status'
             headerLink={{ label: 'Agents', onClick: goToAgents }}
+            centerBody
             data-test-subj='home-overview-agents'
           >
             {agents.data && (
@@ -66,6 +67,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             title='Findings — last 24 hours'
             caption='Last 24 hours'
             headerLink={{ label: 'Threat Hunting', onClick: goToThreatHunting }}
+            centerBody
             data-test-subj='home-overview-findings-severity'
           >
             {findings.data && (
