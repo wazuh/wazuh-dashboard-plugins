@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiSpacer } from '@elastic/eui';
+import { withErrorBoundary } from '../../../hocs/error-boundary/with-error-boundary';
 import { WidgetGroup } from './widget-group';
 import { AgentsByStatus } from './agents-by-status';
 import { FindingSeverityTiles } from './finding-severity-tiles';
@@ -14,6 +15,8 @@ import {
   useTopNetworkServices,
 } from '../services/use-overview-data';
 import {
+  getDeployAgentUrl,
+  goToAgents,
   goToThreatHunting,
   goToMitre,
   goToItHygiene,
@@ -31,7 +34,7 @@ export interface OverviewSectionProps {
  * inventory. Owns navigation wiring; widgets stay pure and receive href/onClick.
  * Findings (severity + tactics) fire on mount; the inventory row is lazy.
  */
-export const OverviewSection: React.FC<OverviewSectionProps> = ({
+const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
   findings,
 }) => {
   const agents = useAgentStatus();
@@ -46,9 +49,15 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
           <WidgetGroup
             status={agents.status}
             title='Agents by status'
+            headerLink={{ label: 'Agents', onClick: goToAgents }}
             data-test-subj='home-overview-agents'
           >
-            {agents.data && <AgentsByStatus data={agents.data} />}
+            {agents.data && (
+              <AgentsByStatus
+                data={agents.data}
+                deployAgentUrl={getDeployAgentUrl()}
+              />
+            )}
           </WidgetGroup>
         </EuiFlexItem>
         <EuiFlexItem>
@@ -118,3 +127,5 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
     </div>
   );
 };
+
+export const OverviewSection = withErrorBoundary(OverviewSectionComponent);

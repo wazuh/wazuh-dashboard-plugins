@@ -9,6 +9,7 @@ import {
   vulnerabilityDetection,
   activeResponses,
   regulatoryCompliance,
+  endpointSummary,
 } from '../../../../../utils/applications';
 import {
   FILTER_OPERATOR,
@@ -24,6 +25,15 @@ import { MITRE_TACTIC_NAME_FIELD, MITRE_TECHNIQUE_NAME_FIELD } from './aggs';
 
 const navigate = (appId: string, options?: Record<string, unknown>) =>
   NavigationService.getInstance().navigateToApp(appId, options);
+
+export const goToAgents = () => navigate(endpointSummary.id);
+
+/** URL for the "deploy a new agent" wizard, used by the no-agents-registered
+ * empty state (`WzButtonPermissions` needs an `href`, not a navigate call). */
+export const getDeployAgentUrl = (): string =>
+  NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
+    path: `#${endpointSummary.redirectTo()}deploy`,
+  });
 
 export const goToThreatHunting = () => navigate(threatHunting.id);
 export const goToMitre = () => navigate(mitreAttack.id);

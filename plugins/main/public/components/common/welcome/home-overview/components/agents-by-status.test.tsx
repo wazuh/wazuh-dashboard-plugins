@@ -3,6 +3,15 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { AgentsByStatus } from './agents-by-status';
 
+// WzButtonPermissions pulls in a react-redux `useSelector` for RBAC checks —
+// out of scope for this presentational widget's tests, so stub it down to a
+// plain link/button.
+jest.mock('../../../permissions/button', () => ({
+  WzButtonPermissions: ({ children, ...rest }: any) => (
+    <a {...rest}>{children}</a>
+  ),
+}));
+
 describe('AgentsByStatus', () => {
   it('shows the active count as the hero and the other statuses as secondary', () => {
     const { container } = render(
@@ -14,6 +23,7 @@ describe('AgentsByStatus', () => {
           neverConnected: 2,
           total: 7,
         }}
+        deployAgentUrl='https://example.test/deploy'
       />,
     );
     expect(
@@ -23,5 +33,26 @@ describe('AgentsByStatus', () => {
     expect(screen.getByText('agents active')).toBeInTheDocument();
     expect(screen.getByText(/disconnected/)).toBeInTheDocument();
     expect(screen.getByText(/never connected/)).toBeInTheDocument();
+  });
+
+  it('shows a "deploy new agent" prompt instead of counts when the fleet is empty', () => {
+    render(
+      <AgentsByStatus
+        data={{
+          active: 0,
+          disconnected: 0,
+          pending: 0,
+          neverConnected: 0,
+          total: 0,
+        }}
+        deployAgentUrl='https://example.test/deploy'
+      />,
+    );
+    expect(
+      screen.getByText('This instance has no agents registered'),
+    ).toBeInTheDocument();
+    const cta = screen.getByText('Deploy new agent').closest('a');
+    expect(cta).toHaveAttribute('href', 'https://example.test/deploy');
+    expect(screen.queryByText('agents active')).not.toBeInTheDocument();
   });
 });

@@ -18,6 +18,8 @@ jest.mock('../services/use-overview-data', () => ({
   useTopNetworkServices: jest.fn(),
 }));
 jest.mock('../services/navigation', () => ({
+  getDeployAgentUrl: jest.fn(() => 'https://example.test/deploy'),
+  goToAgents: jest.fn(),
   goToThreatHunting: jest.fn(),
   goToMitre: jest.fn(),
   goToItHygiene: jest.fn(),
@@ -25,6 +27,14 @@ jest.mock('../services/navigation', () => ({
 }));
 jest.mock('../../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),
+}));
+// WzButtonPermissions pulls in a react-redux `useSelector` for RBAC checks —
+// out of scope here, so stub it down to a plain link (same as
+// agents-by-status.test.tsx).
+jest.mock('../../../permissions/button', () => ({
+  WzButtonPermissions: ({ children, ...rest }: any) => (
+    <a {...rest}>{children}</a>
+  ),
 }));
 
 const asMock = (fn: unknown) => fn as jest.Mock;
@@ -134,5 +144,23 @@ describe('OverviewSection', () => {
       'Initial Access',
       'idx-1',
     );
+  });
+
+  it('navigates to Agents from the "Agents by status" header link', () => {
+    render(<OverviewSection findings={findingsAvailable} />);
+    fireEvent.click(screen.getByText('Agents'));
+    expect(navigation.goToAgents).toHaveBeenCalled();
+  });
+
+  it('shows a "deploy new agent" prompt instead of counts when the fleet is empty', () => {
+    asMock(useAgentStatus).mockReturnValue({
+      status: 'available',
+      data: { active: 0, disconnected: 0, pending: 0, neverConnected: 0, total: 0 },
+    });
+    render(<OverviewSection findings={findingsAvailable} />);
+    expect(
+      screen.getByText('This instance has no agents registered'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('agents active')).not.toBeInTheDocument();
   });
 });
