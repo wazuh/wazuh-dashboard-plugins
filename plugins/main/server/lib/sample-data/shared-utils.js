@@ -1,9 +1,10 @@
+const fs = require('fs');
+const path = require('path');
 const random = require('./lib/random');
 
 // ============================================================================
 // Constants - Realistic values for sample data generation
 // ============================================================================
-
 /**
  * Hostnames inspired by solar system planets for memorable sample data
  * Source: Aligned with wazuh-indexer-plugins generators
@@ -18,12 +19,10 @@ const HOSTNAMES = [
   'uranus',
   'neptune',
 ];
-
 /**
  * Operating system names - Specific distributions for realistic data
  */
 const OS_NAMES = ['Ubuntu', 'Windows', 'macOS', 'Debian', 'CentOS', 'RHEL'];
-
 /**
  * Operating system platforms - Matching OS names for consistency
  */
@@ -35,17 +34,14 @@ const OS_PLATFORMS = [
   'centos',
   'rhel',
 ];
-
 /**
  * Operating system types - Common deployment types
  */
 const OS_TYPES = ['linux', 'windows', 'macos', 'server'];
-
 /**
  * Realistic OS versions mapped to common releases
  */
 const OS_VERSIONS = ['22.04', '10.0.17763', '13.5', '11', '8', '9.0'];
-
 /**
  * Agent groups - Infrastructure and environment based grouping
  */
@@ -57,16 +53,13 @@ const AGENT_GROUPS = [
   'production',
   'development',
 ];
-
 /**
  * System architectures - Common CPU architectures
  */
 const ARCHITECTURES = ['x86_64', 'arm64'];
-
 // ============================================================================
 // Generator Functions
 // ============================================================================
-
 /**
  * Generates a random host object with realistic values
  * @returns {Object} Random host object following Wazuh ECS schema
@@ -84,7 +77,6 @@ function generateRandomHost() {
     },
   };
 }
-
 /**
  * Generates a random agent object with realistic values
  * @returns {Object} Random agent object following Wazuh ECS schema
@@ -98,7 +90,6 @@ function generateRandomAgent() {
     host: generateRandomHost(),
   };
 }
-
 /**
  * Generates a random wazuh object
  * @param {Object} params - Parameters that may contain cluster information
@@ -116,7 +107,6 @@ function generateRandomWazuh(params) {
     schema: { version: '1.7.0' },
   };
 }
-
 /**
  * Generates a random state object for Wazuh
  * @returns {Object} Random state object
@@ -129,7 +119,6 @@ function generateRandomState() {
     ).toISOString(),
   };
 }
-
 /**
  * Generates a random checksum object
  * @returns {Object} Random checksum object with SHA1 hash
@@ -146,11 +135,39 @@ function generateRandomChecksum() {
     },
   };
 }
+// ============================================================================
+// Loader Functions - For pre-generated documents
+// ============================================================================
+/**
+ * Load every .json/.ndjson file in a data directory into one flat array of documents
+ * @param {string} target - Absolute path to a directory
+ * @returns {Object[]} Array with the parsed data
+ */
+function loadDocs(dataDir) {
+  const files = fs
+    .readdirSync(dataDir)
+    .filter(f => /\.(json|ndjson)$/.test(f) && f !== 'template.json');
 
+  return files.flatMap(f => {
+    const content = fs.readFileSync(path.join(dataDir, f), 'utf8').trim();
+    if (!content) return [];
+    try {
+      const parsed = JSON.parse(content);
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch (e) {
+      return content
+        .split('\n')
+        .map(l => l.trim())
+        .filter(Boolean)
+        .map(l => JSON.parse(l));
+    }
+  });
+}
 module.exports = {
   generateRandomAgent,
   generateRandomHost,
   generateRandomWazuh,
   generateRandomState,
   generateRandomChecksum,
+  loadDocs,
 };
