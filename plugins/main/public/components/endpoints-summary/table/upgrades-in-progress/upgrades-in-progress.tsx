@@ -17,7 +17,6 @@ import {
 } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
-import { isPermissionError } from '../../services';
 
 interface AgentUpgradesInProgress {
   reload: any;
@@ -57,6 +56,8 @@ export const AgentUpgradesInProgress = ({
     getSuccessError ||
     getErrorTasksError ||
     getTimeoutError;
+  const isPermissionError = anyError?.response?.status === 403;
+
   // Show error toast only once per error
   useEffect(() => {
     if (!anyError || errorShown) return;
@@ -70,45 +71,33 @@ export const AgentUpgradesInProgress = ({
         error: {
           error,
           message: error.message || error,
-          title: `Could not get upgrade tasks: ${status}`,
+          title: isPermissionError
+            ? 'No permissions to view upgrade tasks'
+            : `Could not get upgrade tasks: ${status}`,
         },
       };
       getErrorOrchestrator().handleError(options);
     };
 
-    if (isPermissionError(anyError)) {
-      const permissionMessage =
-        'Your role does not have permission to view upgrade tasks (task:status).';
-
-      getErrorOrchestrator().handleError({
-        context: `AgentUpgradesInProgress.useGetUpgradeTasks`,
-        level: UI_LOGGER_LEVELS.WARNING,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error: permissionMessage,
-          message: permissionMessage,
-          title: 'No permissions to view upgrade tasks',
-        },
-      });
-      setErrorShown(true);
-      return;
-    }
-
-    if (getInProgressError) {
-      showErrorToast(API_NAME_TASK_STATUS.IN_PROGRESS, getInProgressError);
-    } else if (getSuccessError) {
-      showErrorToast(API_NAME_TASK_STATUS.DONE, getSuccessError);
-    } else if (getErrorTasksError) {
-      showErrorToast(API_NAME_TASK_STATUS.FAILED, getErrorTasksError);
-    } else if (getTimeoutError) {
-      showErrorToast(API_NAME_TASK_STATUS.TIMEOUT, getTimeoutError);
+    if (isPermissionError) {
+      showErrorToast('', anyError);
+    } else {
+      if (getInProgressError) {
+        showErrorToast(API_NAME_TASK_STATUS.IN_PROGRESS, getInProgressError);
+      } else if (getSuccessError) {
+        showErrorToast(API_NAME_TASK_STATUS.DONE, getSuccessError);
+      } else if (getErrorTasksError) {
+        showErrorToast(API_NAME_TASK_STATUS.FAILED, getErrorTasksError);
+      } else if (getTimeoutError) {
+        showErrorToast(API_NAME_TASK_STATUS.TIMEOUT, getTimeoutError);
+      }
     }
 
     setErrorShown(true);
   }, [
     anyError,
     errorShown,
+    isPermissionError,
     getInProgressError,
     getSuccessError,
     getErrorTasksError,

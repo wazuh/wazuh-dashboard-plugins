@@ -9,4 +9,3 @@ export { upgradeAgentsService } from './upgrade-agents';
 export { getTasks } from './get-tasks';
 export { getAgentsInfo } from './get-agents-info';
 export { getWazuhAPIVersion } from './get-api-version';
-export { isPermissionError } from './is-permission-error';

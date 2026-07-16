@@ -8,10 +8,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.8
 
-### Fixed
-
-- Fixed unhandled RBAC permission error on the Endpoint summary Upgrade tasks panel for users lacking `task:status` by handling permission denials in a controlled way and stopping the upgrade tasks polling [#8756](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8756)
-
 ## Wazuh v4.14.7 - OpenSearch Dashboards 2.19.5 - Revision 00
 
 ### Added
