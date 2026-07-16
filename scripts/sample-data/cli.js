@@ -28,9 +28,6 @@ const findings_datasets = datasets.filter(file => file.startsWith('findings'));
 
 // Default document generation parameters
 const defaultDocumentGenerationParams = {
-  manager: {
-    name: 'wazuh-manager',
-  },
   cluster: {
     name: 'wazuh',
     node: 'node01',
@@ -47,7 +44,7 @@ There are two kinds of dataset, both used the same way from this CLI:
     documents on every call.
   - Pre-generated findings (prefixed findings-, e.g. findings-aws):
     load documents from a findings.json, reajust their timestamps and inject
-    the manager/cluster params. --count cycles over the base documents.
+    the cluster params. --count cycles over the base documents.
 
 Each dataset may declare a default index (DATASET_INDEX in its main.js). For
 bulk-api, the index is resolved as: --index (if given) wins for every dataset;
@@ -77,9 +74,6 @@ Options:
                         Available formats: ${Object.keys(formats).join(', ')}
   --index <name>        Index name for bulk-api format. Overrides each dataset's
                         default index. Required only if a dataset has no default.
-  TODO: REMOVE: --param-manager-name  <name>  Set the manager name (default: ${
-    defaultDocumentGenerationParams.manager.name
-  })
   --param-cluster-name <name>  Set the cluster name (default: ${
     defaultDocumentGenerationParams.cluster.name
   })
@@ -156,9 +150,6 @@ for (let i = 0; i < args.length; i++) {
     i++;
   } else if (args[i] === '--index' && i + 1 < args.length) {
     index = args[i + 1];
-    i++;
-  } else if (args[i] === '--param-manager-name' && i + 1 < args.length) {
-    documentGenerationParams.manager.name = args[i + 1];
     i++;
   } else if (args[i] === '--param-cluster-name' && i + 1 < args.length) {
     documentGenerationParams.cluster.name = args[i + 1];

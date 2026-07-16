@@ -73,7 +73,7 @@ available datasets and examples. In summary:
 - `--output <file>` — write the result to a file instead of stdout.
 - `--output insert` — generate, create missing indices from `template.json`,
   and insert directly into the indexer (see below). Forces `--format bulk-api`.
-- `--param-cluster-name`, `--param-cluster-node`, `--param-manager-name` — override the generated `wazuh.cluster`/`manager` fields.
+- `--param-cluster-name`, `--param-cluster-node` — override the generated `wazuh.cluster` fields.
 
 ## Use cases
 
@@ -106,8 +106,7 @@ For each target index, the CLI:
 
 > Note: if you intend to browse the sample data in a Wazuh dashboard, make
 > sure the cluster name field matches the value you are using. Add
-> `--param-cluster-name VALUE` and/or `--param-manager-name VALUE` with the
-> expected values.
+> `--param-cluster-name VALUE` with the expected value.
 
 ### Use case: dataset with no default index
 
