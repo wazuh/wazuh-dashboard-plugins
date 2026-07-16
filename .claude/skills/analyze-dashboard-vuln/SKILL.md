@@ -11,7 +11,7 @@ Run in **two beats**: investigate and present findings for confirmation (Beat 1)
 
 Once a row is confirmed **affected** and the user wants it fixed, hand off to the **resolve-cve** skill for remediation.
 
-> **repo-specific (local environment):** the Wazuh dashboard repos sit side by side under the workspace root (on this machine `/home/asus/wazuh/`). Write scratch files and issue drafts to a git-ignored dir such as `tmp/vuln-issues/`.
+> **repo-specific (local environment):** the Wazuh dashboard repos sit side by side under the workspace root (the parent directory that contains the sibling dashboard checkouts). Write scratch files and issue drafts to a git-ignored dir such as `tmp/vuln-issues/`.
 
 ## Input
 
