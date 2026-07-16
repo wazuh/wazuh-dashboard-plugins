@@ -8,6 +8,7 @@ import {
   EuiText,
   EuiTitle,
 } from '@elastic/eui';
+import { withErrorBoundary } from '../../../hocs/error-boundary/with-error-boundary';
 import { WidgetGroup } from './widget-group';
 import { StatTile } from './stat-tile';
 import { ItHygieneTiles } from './it-hygiene-tiles';
@@ -29,7 +30,7 @@ import { formatUINumber } from '../../../../../react-services/format-number';
  * the section approaches the viewport; Regulatory Compliance is static and
  * renders immediately.
  */
-export const SecurityOperationsSection: React.FC = () => {
+const SecurityOperationsSectionComponent: React.FC = () => {
   const [sectionRef, visible] = useInViewport<HTMLDivElement>();
   const operatingSystems = useItHygieneOperatingSystemsCount(visible);
   const packages = useItHygienePackagesCount(visible);
@@ -110,3 +111,7 @@ export const SecurityOperationsSection: React.FC = () => {
     </div>
   );
 };
+
+export const SecurityOperationsSection = withErrorBoundary(
+  SecurityOperationsSectionComponent,
+);

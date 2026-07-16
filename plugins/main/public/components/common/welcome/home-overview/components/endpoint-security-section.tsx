@@ -7,6 +7,7 @@ import {
   EuiText,
   EuiTitle,
 } from '@elastic/eui';
+import { withErrorBoundary } from '../../../hocs/error-boundary/with-error-boundary';
 import { WidgetGroup } from './widget-group';
 import { ScaTiles } from './sca-tiles';
 import { ScaBenchmarksTable } from './sca-benchmarks-table';
@@ -30,7 +31,7 @@ import { formatUINumber } from '../../../../../react-services/format-number';
  * Monitoring, and Malware Detection. Loads its data lazily, once the section
  * approaches the viewport.
  */
-export const EndpointSecuritySection: React.FC = () => {
+const EndpointSecuritySectionComponent: React.FC = () => {
   const [sectionRef, visible] = useInViewport<HTMLDivElement>();
   const sca = useSCAOverview(visible);
   const fim = useFIMOverview(visible);
@@ -103,3 +104,7 @@ export const EndpointSecuritySection: React.FC = () => {
     </div>
   );
 };
+
+export const EndpointSecuritySection = withErrorBoundary(
+  EndpointSecuritySectionComponent,
+);

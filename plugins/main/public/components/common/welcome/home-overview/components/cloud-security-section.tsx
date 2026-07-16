@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiSpacer, EuiText, EuiTitle } from '@elastic/eui';
+import { withErrorBoundary } from '../../../hocs/error-boundary/with-error-boundary';
 import { CloudSecurityCards } from './cloud-security-cards';
 
 /**
@@ -7,7 +8,7 @@ import { CloudSecurityCards } from './cloud-security-cards';
  * integrations. No data fetch, so it renders immediately (no lazy load,
  * skeleton, or capability-hide behavior applies).
  */
-export const CloudSecuritySection: React.FC = () => (
+const CloudSecuritySectionComponent: React.FC = () => (
   <div>
     <EuiTitle size='xs'>
       <h2>Cloud security</h2>
@@ -18,4 +19,8 @@ export const CloudSecuritySection: React.FC = () => (
     <EuiSpacer size='s' />
     <CloudSecurityCards />
   </div>
+);
+
+export const CloudSecuritySection = withErrorBoundary(
+  CloudSecuritySectionComponent,
 );

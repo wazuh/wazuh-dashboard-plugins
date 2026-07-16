@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiPanel, EuiSpacer, EuiText, EuiTitle } from '@elastic/eui';
+import { withErrorBoundary } from '../../../hocs/error-boundary/with-error-boundary';
 import { ThreatIntelTiles } from './threat-intel-tiles';
 import { useInViewport } from '../../../hooks';
 import {
@@ -22,7 +23,7 @@ import {
  * Security Analytics IOC catalog, but that endpoint doesn't exist on this
  * backend — confirmed live — so it was dropped.)
  */
-export const ThreatIntelligenceFeedSection: React.FC = () => {
+const ThreatIntelligenceFeedSectionComponent: React.FC = () => {
   const [sectionRef, visible] = useInViewport<HTMLDivElement>();
   const rules = useRulesCount(visible);
   const decoders = useDecodersCount(visible);
@@ -68,3 +69,7 @@ export const ThreatIntelligenceFeedSection: React.FC = () => {
     </div>
   );
 };
+
+export const ThreatIntelligenceFeedSection = withErrorBoundary(
+  ThreatIntelligenceFeedSectionComponent,
+);

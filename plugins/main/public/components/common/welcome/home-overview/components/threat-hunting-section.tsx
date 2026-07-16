@@ -7,6 +7,7 @@ import {
   EuiText,
   EuiTitle,
 } from '@elastic/eui';
+import { withErrorBoundary } from '../../../hocs/error-boundary/with-error-boundary';
 import { WidgetGroup } from './widget-group';
 import { StatTile } from './stat-tile';
 import { TopRulesTable } from './top-rules-table';
@@ -38,7 +39,7 @@ export interface ThreatHuntingSectionProps {
  * search; Vulnerability Detection loads lazily once the section approaches
  * the viewport.
  */
-export const ThreatHuntingSection: React.FC<ThreatHuntingSectionProps> = ({
+const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
   findings,
 }) => {
   const [sectionRef, visible] = useInViewport<HTMLDivElement>();
@@ -139,3 +140,7 @@ export const ThreatHuntingSection: React.FC<ThreatHuntingSectionProps> = ({
     </div>
   );
 };
+
+export const ThreatHuntingSection = withErrorBoundary(
+  ThreatHuntingSectionComponent,
+);
