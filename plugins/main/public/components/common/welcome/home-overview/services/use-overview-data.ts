@@ -161,7 +161,7 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
     ready: Boolean(dataSource && fetchData),
     fetch: async () => {
       const response = await fetchData({
-        aggs: buildFindingsOverviewAggs(10, 5, 5),
+        aggs: buildFindingsOverviewAggs(5, 5, 5),
         dateRange: LAST_24H,
         pagination: NO_HITS,
       });

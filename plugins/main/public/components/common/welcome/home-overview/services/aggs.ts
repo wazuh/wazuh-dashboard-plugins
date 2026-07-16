@@ -80,7 +80,7 @@ export function buildTopTermsAgg(name: string, field: string, size = 5) {
  * Threat Hunting's total findings + top rules + techniques observed/top-5 —
  * all carried by the one findings search that fires on mount. */
 export function buildFindingsOverviewAggs(
-  topTacticsSize = 10,
+  topTacticsSize = 5,
   topRulesSize = 5,
   topTechniquesSize = 5,
 ) {
