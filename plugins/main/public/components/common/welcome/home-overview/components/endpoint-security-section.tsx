@@ -16,7 +16,6 @@ import { MalwareDetectionPanel } from './malware-detection-panel';
 import { useInViewport } from '../../../hooks';
 import {
   useFIMOverview,
-  useIocFeedByType,
   useMalwareOverview,
   useSCAOverview,
 } from '../services/use-overview-data';
@@ -36,7 +35,6 @@ export const EndpointSecuritySection: React.FC = () => {
   const sca = useSCAOverview(visible);
   const fim = useFIMOverview(visible);
   const malware = useMalwareOverview(visible);
-  const iocFeed = useIocFeedByType(visible);
 
   return (
     <div ref={sectionRef}>
@@ -99,7 +97,7 @@ export const EndpointSecuritySection: React.FC = () => {
           </WidgetGroup>
         </EuiFlexItem>
         <EuiFlexItem>
-          <MalwareDetectionPanel malware={malware} iocFeed={iocFeed} />
+          <MalwareDetectionPanel malware={malware} />
         </EuiFlexItem>
       </EuiFlexGroup>
     </div>

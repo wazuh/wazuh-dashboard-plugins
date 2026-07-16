@@ -29,6 +29,14 @@ export const SCA_POLICY_NAME_FIELD = 'policy.name';
 export const FIM_PLATFORM_FIELD = 'wazuh.agent.host.os.platform';
 export const VULNERABILITY_SEVERITY_FIELD = 'vulnerability.severity';
 export const VULNERABILITY_OS_NAME_FIELD = 'host.os.name';
+/** The CVE identifier field — distinct from the vulnerabilities index's doc
+ * count, since one CVE can match many findings/assets. */
+export const VULNERABILITY_CVE_ID_FIELD = 'vulnerability.id';
+/** A single event can carry more than one threat-enrichment match, so the
+ * Malware Detection module counts distinct events via this field rather
+ * than the raw doc count (confirmed against that module's own dashboard
+ * panels, which all use `cardinality(event.doc_id)`). */
+export const EVENT_DOC_ID_FIELD = 'event.doc_id';
 
 /** `vulnerability.severity` values are capitalized, unlike the lowercase
  * finding-severity bands, so they get their own filters agg. */
@@ -131,4 +139,44 @@ export function buildFIMTopPlatformsAgg(size = 5) {
 
 export function buildVulnerabilityTopOsAgg(size = 5) {
   return buildTopTermsAgg('vulnerabilities_by_os', VULNERABILITY_OS_NAME_FIELD, size);
+}
+
+/** CVEs matched: distinct-CVE count, not the total (match-document) count. */
+export function buildCvesMatchedAgg() {
+  return {
+    cves_matched: { cardinality: { field: VULNERABILITY_CVE_ID_FIELD } },
+  };
+}
+
+/** IOC Match hero: distinct events with a threat-enrichment match, matching
+ * the Malware Detection module's own dashboard metric shape (not a raw doc
+ * count — one event can carry more than one enrichment match). */
+export function buildIocMatchesAgg() {
+  return {
+    ioc_matches: { cardinality: { field: EVENT_DOC_ID_FIELD } },
+  };
+}
+
+/** IOC indicator type, e.g. "domain" / "ip" / "hash" — confirmed against
+ * the Malware Detection module's own "Enrichment types" panel, which
+ * aggregates this same field on the same findings index (not the separate
+ * Security Analytics IOC catalog). */
+export const IOC_INDICATOR_TYPE_FIELD = 'wazuh.threat.enrichments.indicator.type';
+
+/** IOC feed by type (top `size`): distinct-event count per indicator type,
+ * carried on the same findings search as the IOC Match hero — one search,
+ * no extra request. */
+export function buildIocFeedByTypeAgg(size = 5) {
+  return {
+    ioc_feed_by_type: {
+      terms: {
+        field: IOC_INDICATOR_TYPE_FIELD,
+        size,
+        order: { distinct_events: 'desc' },
+      },
+      aggs: {
+        distinct_events: { cardinality: { field: EVENT_DOC_ID_FIELD } },
+      },
+    },
+  };
 }

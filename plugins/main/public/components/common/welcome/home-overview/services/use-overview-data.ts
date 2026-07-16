@@ -26,8 +26,11 @@ import {
 import { WzRequest } from '../../../../../react-services';
 import { useRefresh } from '../context/refresh-context';
 import {
+  buildCvesMatchedAgg,
   buildFindingsOverviewAggs,
   buildFIMTopPlatformsAgg,
+  buildIocFeedByTypeAgg,
+  buildIocMatchesAgg,
   buildSCATilesAgg,
   buildSCATopBenchmarksAgg,
   buildTopTermsAgg,
@@ -44,8 +47,14 @@ import {
   shapeScaTiles,
   shapeSeverityCounts,
   shapeTopBuckets,
+  shapeTopBucketsByMetric,
 } from './shapers';
-import { fetchIocFeedByType } from './security-analytics-client';
+import {
+  fetchDecodersCount,
+  fetchDetectorsCount,
+  fetchIntegrationsCount,
+  fetchRulesCount,
+} from './security-analytics-client';
 import {
   AgentStatus,
   DATA_SOURCE_NOT_FOUND,
@@ -67,6 +76,9 @@ import {
  */
 
 const LAST_24H = { from: 'now-24h', to: 'now' };
+/** Every OVERVIEW search only reads aggregations or `hits.total` — never
+ * the matching documents themselves — so none of them need actual hits. */
+const NO_HITS: { pageSize: number } = { pageSize: 0 };
 
 /**
  * Drives the loading → available/unavailable/error state machine for one group.
@@ -153,6 +165,7 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
       const response = await fetchData({
         aggs: buildFindingsOverviewAggs(10, 5, 5),
         dateRange: LAST_24H,
+        pagination: NO_HITS,
       });
       return {
         severity: shapeSeverityCounts(response?.aggregations),
@@ -201,6 +214,7 @@ export function useTopOperatingSystems(
     fetch: async () => {
       const response = await fetchData({
         aggs: buildTopTermsAgg('top_os', HOST_OS_NAME_FIELD, 5),
+        pagination: NO_HITS,
       });
       return shapeTopBuckets(response?.aggregations, 'top_os');
     },
@@ -230,6 +244,7 @@ export function useTopNetworkServices(
     fetch: async () => {
       const response = await fetchData({
         aggs: buildTopTermsAgg('top_services', PROCESS_NAME_FIELD, 5),
+        pagination: NO_HITS,
       });
       return shapeTopBuckets(response?.aggregations, 'top_services');
     },
@@ -286,6 +301,7 @@ export function useSCAOverview(enabled: boolean): DataGroupResult<ScaOverview> {
     fetch: async () => {
       const response = await fetchData({
         aggs: { ...buildSCATilesAgg(), ...buildSCATopBenchmarksAgg(5) },
+        pagination: NO_HITS,
       });
       return {
         tiles: shapeScaTiles(response?.aggregations),
@@ -311,7 +327,10 @@ export function useFIMOverview(enabled: boolean): DataGroupResult<FimOverview> {
     enabled,
     ready: Boolean(dataSource && fetchData),
     fetch: async () => {
-      const response = await fetchData({ aggs: buildFIMTopPlatformsAgg(5) });
+      const response = await fetchData({
+        aggs: buildFIMTopPlatformsAgg(5),
+        pagination: NO_HITS,
+      });
       return {
         total: shapeDocCount(response),
         platforms: shapeTopBuckets(response?.aggregations, 'fim_platforms'),
@@ -321,8 +340,10 @@ export function useFIMOverview(enabled: boolean): DataGroupResult<FimOverview> {
   });
 }
 
-/** IOC Match hero — findings filtered on threat enrichments, last 24h. Lazy,
- * and independent of Security Analytics (the findings index always has it). */
+/** IOC Match hero + IOC feed by type — findings filtered on threat
+ * enrichments, last 24h, one search. Lazy, and independent of Security
+ * Analytics (the findings index always has it; the type breakdown is the
+ * same field the Malware Detection module's own dashboard aggregates). */
 export function useMalwareOverview(
   enabled: boolean,
 ): DataGroupResult<MalwareOverview> {
@@ -339,26 +360,60 @@ export function useMalwareOverview(
     enabled,
     ready: Boolean(dataSource && fetchData),
     fetch: async () => {
-      const response = await fetchData({ dateRange: LAST_24H });
-      return { iocMatches: shapeDocCount(response) };
+      const response = await fetchData({
+        aggs: { ...buildIocMatchesAgg(), ...buildIocFeedByTypeAgg(5) },
+        dateRange: LAST_24H,
+        pagination: NO_HITS,
+      });
+      return {
+        iocMatches: shapeCardinality(response?.aggregations, 'ioc_matches'),
+        iocFeedByType: shapeTopBucketsByMetric(
+          response?.aggregations,
+          'ioc_feed_by_type',
+          'distinct_events',
+        ),
+      };
     },
     deps: [isLoading, error, dataSource, enabled, refreshToken],
   });
 }
 
-/** IOC feed by type (top 5) via the Security Analytics count client. Lazy;
- * hides (rather than errors) when Security Analytics isn't installed. */
-export function useIocFeedByType(enabled: boolean): DataGroupResult<TopItem[]> {
+/** Shared shape for a Security Analytics-backed widget: no index pattern to
+ * wait on, just a `core.http` call gated by the section's viewport/refresh. */
+function useSecurityAnalyticsFetch<T>(
+  enabled: boolean,
+  fetcher: () => Promise<T>,
+): DataGroupResult<T> {
   const { refreshToken } = useRefresh();
 
-  return useDataGroup<TopItem[]>({
+  return useDataGroup<T>({
     isLoading: false,
     initError: null,
     enabled,
     ready: true,
-    fetch: () => fetchIocFeedByType(5),
+    fetch: fetcher,
     deps: [enabled, refreshToken],
   });
+}
+
+/** Rules tile (pre-packaged only). Lazy. */
+export function useRulesCount(enabled: boolean): DataGroupResult<number> {
+  return useSecurityAnalyticsFetch(enabled, fetchRulesCount);
+}
+
+/** Decoders tile. Lazy. */
+export function useDecodersCount(enabled: boolean): DataGroupResult<number> {
+  return useSecurityAnalyticsFetch(enabled, fetchDecodersCount);
+}
+
+/** Integrations tile. Lazy. */
+export function useIntegrationsCount(enabled: boolean): DataGroupResult<number> {
+  return useSecurityAnalyticsFetch(enabled, fetchIntegrationsCount);
+}
+
+/** Detectors tile. Lazy. */
+export function useDetectorsCount(enabled: boolean): DataGroupResult<number> {
+  return useSecurityAnalyticsFetch(enabled, fetchDetectorsCount);
 }
 
 /** Vulnerability Severity tiles + top OS (vulnerabilities state index). Lazy. */
@@ -386,6 +441,7 @@ export function useVulnerabilityOverview(
           ...buildVulnerabilitySeverityFiltersAgg(),
           ...buildVulnerabilityTopOsAgg(5),
         },
+        pagination: NO_HITS,
       });
       return {
         severity: shapeSeverityCounts(
@@ -419,7 +475,8 @@ function useIndexDocCount(
     initError: error,
     enabled,
     ready: Boolean(dataSource && fetchData),
-    fetch: async () => shapeDocCount(await fetchData({ dateRange })),
+    fetch: async () =>
+      shapeDocCount(await fetchData({ dateRange, pagination: NO_HITS })),
     deps: [isLoading, error, dataSource, enabled, refreshToken],
   });
 }
@@ -476,4 +533,33 @@ export function useActiveResponseOverview(
     enabled,
     LAST_24H,
   );
+}
+
+/** CVEs matched — distinct CVE count (cardinality), not the total
+ * vulnerability match-document count. Lazy. */
+export function useCvesMatchedCount(enabled: boolean): DataGroupResult<number> {
+  const { refreshToken } = useRefresh();
+  const repository = useMemo(
+    () => new VulnerabilitiesDataSourceRepository(),
+    [],
+  );
+  const { isLoading, dataSource, error, fetchData } = useDataSource({
+    DataSource: VulnerabilitiesDataSource,
+    repository,
+  });
+
+  return useDataGroup<number>({
+    isLoading,
+    initError: error,
+    enabled,
+    ready: Boolean(dataSource && fetchData),
+    fetch: async () => {
+      const response = await fetchData({
+        aggs: buildCvesMatchedAgg(),
+        pagination: NO_HITS,
+      });
+      return shapeCardinality(response?.aggregations, 'cves_matched');
+    },
+    deps: [isLoading, error, dataSource, enabled, refreshToken],
+  });
 }

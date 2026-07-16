@@ -8,6 +8,9 @@ import {
   buildSCATopBenchmarksAgg,
   buildFIMTopPlatformsAgg,
   buildVulnerabilityTopOsAgg,
+  buildCvesMatchedAgg,
+  buildIocMatchesAgg,
+  buildIocFeedByTypeAgg,
   SEVERITY_BANDS,
   FINDING_SEVERITY_FIELD,
   MITRE_TACTIC_NAME_FIELD,
@@ -19,6 +22,9 @@ import {
   SCA_POLICY_NAME_FIELD,
   FIM_PLATFORM_FIELD,
   VULNERABILITY_OS_NAME_FIELD,
+  VULNERABILITY_CVE_ID_FIELD,
+  EVENT_DOC_ID_FIELD,
+  IOC_INDICATOR_TYPE_FIELD,
 } from './aggs';
 
 describe('aggs builders', () => {
@@ -100,6 +106,30 @@ describe('aggs builders', () => {
       vulnerabilities_by_os: {
         terms: { field: VULNERABILITY_OS_NAME_FIELD, size: 5 },
       },
+    });
+  });
+
+  it('builds the CVEs-matched agg as a cardinality, not a doc count', () => {
+    expect(buildCvesMatchedAgg()).toEqual({
+      cves_matched: { cardinality: { field: VULNERABILITY_CVE_ID_FIELD } },
+    });
+  });
+
+  it('builds the IOC Match agg as a cardinality over distinct events', () => {
+    expect(buildIocMatchesAgg()).toEqual({
+      ioc_matches: { cardinality: { field: EVENT_DOC_ID_FIELD } },
+    });
+  });
+
+  it('builds the IOC-feed-by-type agg with a distinct-events sub-metric', () => {
+    const agg = buildIocFeedByTypeAgg(5);
+    expect(agg.ioc_feed_by_type.terms).toEqual({
+      field: IOC_INDICATOR_TYPE_FIELD,
+      size: 5,
+      order: { distinct_events: 'desc' },
+    });
+    expect(agg.ioc_feed_by_type.aggs.distinct_events).toEqual({
+      cardinality: { field: EVENT_DOC_ID_FIELD },
     });
   });
 });

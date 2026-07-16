@@ -14,6 +14,7 @@ import { EndpointSecuritySection } from './components/endpoint-security-section'
 import { ThreatHuntingSection } from './components/threat-hunting-section';
 import { SecurityOperationsSection } from './components/security-operations-section';
 import { CloudSecuritySection } from './components/cloud-security-section';
+import { ThreatIntelligenceFeedSection } from './components/threat-intelligence-feed-section';
 import { useFindingsOverview } from './services/use-overview-data';
 
 const HomeOverviewHeader: React.FC = () => {
@@ -54,6 +55,8 @@ const HomeOverviewBody: React.FC = () => {
       <EndpointSecuritySection />
       <EuiSpacer size='l' />
       <ThreatHuntingSection findings={findings} />
+      <EuiSpacer size='l' />
+      <ThreatIntelligenceFeedSection />
       <EuiSpacer size='l' />
       <SecurityOperationsSection />
       <EuiSpacer size='l' />

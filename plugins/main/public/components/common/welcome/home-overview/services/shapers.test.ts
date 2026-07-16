@@ -2,6 +2,7 @@
 import {
   shapeSeverityCounts,
   shapeTopBuckets,
+  shapeTopBucketsByMetric,
   shapeAgentStatus,
   shapeCardinality,
   shapeDocCount,
@@ -64,6 +65,38 @@ describe('shapers', () => {
     it('returns an empty array when the agg is missing', () => {
       expect(shapeTopBuckets(undefined, 'tactics')).toEqual([]);
       expect(shapeTopBuckets({}, 'tactics')).toEqual([]);
+    });
+  });
+
+  describe('shapeTopBucketsByMetric', () => {
+    it('reads each bucket count from a nested metric sub-agg, not doc_count', () => {
+      const aggregations = {
+        ioc_feed_by_type: {
+          buckets: [
+            { key: 'domain', doc_count: 999, distinct_events: { value: 2 } },
+            { key: 'ip', doc_count: 999, distinct_events: { value: 1 } },
+          ],
+        },
+      };
+      expect(
+        shapeTopBucketsByMetric(
+          aggregations,
+          'ioc_feed_by_type',
+          'distinct_events',
+        ),
+      ).toEqual([
+        { key: 'domain', count: 2 },
+        { key: 'ip', count: 1 },
+      ]);
+    });
+
+    it('returns an empty array when the agg is missing', () => {
+      expect(
+        shapeTopBucketsByMetric(undefined, 'ioc_feed_by_type', 'distinct_events'),
+      ).toEqual([]);
+      expect(
+        shapeTopBucketsByMetric({}, 'ioc_feed_by_type', 'distinct_events'),
+      ).toEqual([]);
     });
   });
 

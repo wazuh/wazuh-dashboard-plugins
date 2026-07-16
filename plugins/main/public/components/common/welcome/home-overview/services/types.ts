@@ -70,6 +70,9 @@ export interface FimOverview {
 export interface MalwareOverview {
   /** IOC matches, last 24 hours. */
   iocMatches: number;
+  /** IOC feed by type (top 5), from the same findings search as
+   * `iocMatches` — not a separate Security Analytics call. */
+  iocFeedByType: TopItem[];
 }
 
 export interface VulnerabilityOverview {

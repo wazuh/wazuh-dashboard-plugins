@@ -123,6 +123,27 @@ export function shapeTopBuckets(
   }));
 }
 
+/** Like `shapeTopBuckets`, but reads each bucket's count from a nested
+ * metric sub-aggregation (e.g. `cardinality`) rather than `doc_count` —
+ * used where the per-bucket count needs to be a distinct-value count. */
+export function shapeTopBucketsByMetric(
+  aggregations: Aggregations,
+  aggName: string,
+  metricName: string,
+): TopItem[] {
+  const buckets = aggregations?.[aggName]?.buckets;
+  if (!Array.isArray(buckets)) {
+    return [];
+  }
+  return (
+    buckets as Array<{ key: string | number; [metric: string]: unknown }>
+  ).map(bucket => ({
+    key: String(bucket.key),
+    count:
+      (bucket[metricName] as { value?: number } | undefined)?.value ?? 0,
+  }));
+}
+
 /** The Wazuh API `/agents/summary/status` returns a `connection` object. */
 export function shapeAgentStatus(
   connection: AgentConnectionSummary | undefined,

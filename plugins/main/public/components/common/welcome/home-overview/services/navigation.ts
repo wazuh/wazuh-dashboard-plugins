@@ -48,6 +48,25 @@ export const goToRegulatoryCompliance = (tabView: string): void =>
  * fixed one-off links above). */
 export const goToCloudModule = (appId: string): void => navigate(appId);
 
+/** App ids registered by the separately-installed Security Analytics
+ * dashboards plugin (verified against its own `core.application.register`
+ * calls, not guessed) — used by the Threat Intelligence Feed's clickable
+ * tiles. Absent when the plugin isn't installed, but by then the tile that
+ * would use it has already hidden itself via the count-fetch's own 404. */
+const SECURITY_ANALYTICS_APP_IDS = {
+  rules: 'rules',
+  decoders: 'decoders',
+  integrations: 'sa-integrations',
+  detectors: 'detectors',
+};
+
+export const goToRules = () => navigate(SECURITY_ANALYTICS_APP_IDS.rules);
+export const goToDecoders = () => navigate(SECURITY_ANALYTICS_APP_IDS.decoders);
+export const goToIntegrations = () =>
+  navigate(SECURITY_ANALYTICS_APP_IDS.integrations);
+export const goToDetectors = () =>
+  navigate(SECURITY_ANALYTICS_APP_IDS.detectors);
+
 /** Open MITRE ATT&CK filtered to the given field/value (falls back to
  * unfiltered when the findings index pattern isn't known yet). */
 const goToMitreFilteredBy = (

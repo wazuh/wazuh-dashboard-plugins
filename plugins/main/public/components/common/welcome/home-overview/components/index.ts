@@ -23,3 +23,5 @@ export * from './regulatory-compliance-badges';
 export * from './cloud-security-cards';
 export * from './security-operations-section';
 export * from './cloud-security-section';
+export * from './threat-intel-tiles';
+export * from './threat-intelligence-feed-section';

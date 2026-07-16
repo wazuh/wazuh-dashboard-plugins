@@ -4,7 +4,6 @@ import { render, screen } from '@testing-library/react';
 import { EndpointSecuritySection } from './endpoint-security-section';
 import {
   useFIMOverview,
-  useIocFeedByType,
   useMalwareOverview,
   useSCAOverview,
 } from '../services/use-overview-data';
@@ -14,7 +13,6 @@ jest.mock('../services/use-overview-data', () => ({
   useSCAOverview: jest.fn(),
   useFIMOverview: jest.fn(),
   useMalwareOverview: jest.fn(),
-  useIocFeedByType: jest.fn(),
 }));
 jest.mock('../services/navigation', () => ({
   goToConfigurationAssessment: jest.fn(),
@@ -49,11 +47,7 @@ beforeEach(() => {
   });
   asMock(useMalwareOverview).mockReturnValue({
     status: 'available',
-    data: { iocMatches: 0 },
-  });
-  asMock(useIocFeedByType).mockReturnValue({
-    status: 'available',
-    data: [{ key: 'Domains', count: 92700 }],
+    data: { iocMatches: 0, iocFeedByType: [{ key: 'Domains', count: 92700 }] },
   });
   asMock(useInViewport).mockReturnValue([{ current: null }, true]);
 });
@@ -75,6 +69,7 @@ describe('EndpointSecuritySection', () => {
     expect(
       screen.getByText('IOC matches, last 24 hours'),
     ).toBeInTheDocument();
+    expect(screen.getAllByText('Domains').length).toBeGreaterThan(0);
   });
 
   it('hides Configuration Assessment when the SCA index is unavailable', () => {
@@ -86,12 +81,21 @@ describe('EndpointSecuritySection', () => {
     expect(screen.getByText('File Integrity Monitoring')).toBeInTheDocument();
   });
 
+  it('hides Malware Detection when its findings search is unavailable', () => {
+    asMock(useMalwareOverview).mockReturnValue({ status: 'unavailable' });
+    const { container } = render(<EndpointSecuritySection />);
+    expect(
+      container.querySelector(
+        '[data-test-subj="home-overview-malware-detection"]',
+      ),
+    ).not.toBeInTheDocument();
+  });
+
   it('fetches lazily once the section enters the viewport', () => {
     asMock(useInViewport).mockReturnValue([{ current: null }, false]);
     render(<EndpointSecuritySection />);
     expect(asMock(useSCAOverview)).toHaveBeenCalledWith(false);
     expect(asMock(useFIMOverview)).toHaveBeenCalledWith(false);
     expect(asMock(useMalwareOverview)).toHaveBeenCalledWith(false);
-    expect(asMock(useIocFeedByType)).toHaveBeenCalledWith(false);
   });
 });

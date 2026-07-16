@@ -1,5 +1,11 @@
 import { getHttp } from '../../../../../kibana-services';
-import { fetchIocFeedByType, SECURITY_ANALYTICS_ROUTES } from './security-analytics-client';
+import {
+  fetchDecodersCount,
+  fetchDetectorsCount,
+  fetchIntegrationsCount,
+  fetchRulesCount,
+  SECURITY_ANALYTICS_ROUTES,
+} from './security-analytics-client';
 import { DATA_SOURCE_NOT_FOUND } from './types';
 
 jest.mock('../../../../../kibana-services', () => ({
@@ -8,69 +14,93 @@ jest.mock('../../../../../kibana-services', () => ({
 
 const asMock = (fn: unknown) => fn as jest.Mock;
 
-describe('fetchIocFeedByType', () => {
-  it('GETs the IOC catalog route and counts a bounded page by type', async () => {
-    const get = jest.fn().mockResolvedValue({
+describe('fetchRulesCount', () => {
+  it('POSTs size:0 with an explicit match_all query and prePackaged=true, and reads hits.total', async () => {
+    const post = jest.fn().mockResolvedValue({
       ok: true,
-      response: {
-        total: 3,
-        iocs: [
-          { type: 'domain' },
-          { type: 'domain' },
-          { type: 'ip' },
-        ],
-      },
+      response: { hits: { total: { value: 482 } } },
     });
-    asMock(getHttp).mockReturnValue({ get });
+    asMock(getHttp).mockReturnValue({ post });
 
-    const result = await fetchIocFeedByType(5);
-
-    expect(get).toHaveBeenCalledWith(
-      SECURITY_ANALYTICS_ROUTES.iocs,
-      expect.objectContaining({ query: expect.objectContaining({ size: expect.any(Number) }) }),
-    );
-    expect(result).toEqual([
-      { key: 'domain', count: 2 },
-      { key: 'ip', count: 1 },
-    ]);
+    expect(await fetchRulesCount()).toBe(482);
+    const [route, options] = post.mock.calls[0];
+    expect(route).toBe(SECURITY_ANALYTICS_ROUTES.rulesSearch);
+    // Verified live: a bare `{ size: 0 }` throws
+    // `illegal_argument_exception: inner bool query clause cannot be null`
+    // server-side — an explicit query is required.
+    expect(JSON.parse(options.body)).toEqual({
+      size: 0,
+      query: { match_all: {} },
+    });
+    expect(options.query).toEqual({ prePackaged: true });
   });
 
-  it('caps the result at the requested top size', async () => {
-    const get = jest.fn().mockResolvedValue({
-      ok: true,
-      response: {
-        iocs: [{ type: 'a' }, { type: 'b' }, { type: 'b' }, { type: 'c' }],
-      },
-    });
-    asMock(getHttp).mockReturnValue({ get });
+  it('hides (capability-absent) on a 404', async () => {
+    const post = jest.fn().mockRejectedValue({ statusCode: 404 });
+    asMock(getHttp).mockReturnValue({ post });
 
-    expect(await fetchIocFeedByType(2)).toEqual([
-      { key: 'b', count: 2 },
-      { key: 'a', count: 1 },
-    ]);
-  });
-
-  it('throws the shared "capability absent" shape on a 404 (Security Analytics not installed)', async () => {
-    const get = jest.fn().mockRejectedValue({ response: { status: 404 } });
-    asMock(getHttp).mockReturnValue({ get });
-
-    await expect(fetchIocFeedByType(5)).rejects.toEqual({
+    await expect(fetchRulesCount()).rejects.toEqual({
       type: DATA_SOURCE_NOT_FOUND,
     });
   });
 
-  it('rethrows any other transport error unchanged', async () => {
-    const error = new Error('boom');
-    const get = jest.fn().mockRejectedValue(error);
-    asMock(getHttp).mockReturnValue({ get });
+  it('treats an in-envelope ok:false as a query failure', async () => {
+    const post = jest.fn().mockResolvedValue({ ok: false, error: 'boom' });
+    asMock(getHttp).mockReturnValue({ post });
 
-    await expect(fetchIocFeedByType(5)).rejects.toBe(error);
+    await expect(fetchRulesCount()).rejects.toThrow('boom');
   });
 
-  it('treats an in-envelope ok:false as a query failure, not "absent"', async () => {
-    const get = jest.fn().mockResolvedValue({ ok: false, error: 'boom' });
-    asMock(getHttp).mockReturnValue({ get });
+  it('treats OpenSearch\'s "no handler found for uri" as capability-absent (cluster-side plugin lacks this endpoint)', async () => {
+    const post = jest.fn().mockResolvedValue({
+      ok: false,
+      error:
+        'no handler found for uri [/_plugins/_security_analytics/rules/_search] and method [POST]',
+    });
+    asMock(getHttp).mockReturnValue({ post });
 
-    await expect(fetchIocFeedByType(5)).rejects.toThrow('boom');
+    await expect(fetchRulesCount()).rejects.toEqual({
+      type: DATA_SOURCE_NOT_FOUND,
+    });
+  });
+});
+
+describe('fetchDecodersCount', () => {
+  it('reads the custom response.total shape (not hits.total)', async () => {
+    const post = jest.fn().mockResolvedValue({
+      ok: true,
+      response: { total: 128, items: [] },
+    });
+    asMock(getHttp).mockReturnValue({ post });
+
+    expect(await fetchDecodersCount()).toBe(128);
+  });
+});
+
+describe('fetchIntegrationsCount', () => {
+  it('sends no body (the route misreads a body as its ES query) and reads hits.total', async () => {
+    const post = jest.fn().mockResolvedValue({
+      ok: true,
+      response: { hits: { total: 14 } },
+    });
+    asMock(getHttp).mockReturnValue({ post });
+
+    expect(await fetchIntegrationsCount()).toBe(14);
+    const [, options] = post.mock.calls[0];
+    expect(options.body).toBeUndefined();
+  });
+});
+
+describe('fetchDetectorsCount', () => {
+  it('sends an empty body object (the route throws on null/undefined) and reads hits.total', async () => {
+    const post = jest.fn().mockResolvedValue({
+      ok: true,
+      response: { hits: { total: { value: 9 } } },
+    });
+    asMock(getHttp).mockReturnValue({ post });
+
+    expect(await fetchDetectorsCount()).toBe(9);
+    const [, options] = post.mock.calls[0];
+    expect(JSON.parse(options.body)).toEqual({});
   });
 });
