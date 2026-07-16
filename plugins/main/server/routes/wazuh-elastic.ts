@@ -75,16 +75,58 @@ export function WazuhElasticRoutes(router: IRouter) {
         body: schema.object({
           status: schema.maybe(
             schema.oneOf([
-              schema.literal('ACTIVE'),
-              schema.literal('ACKNOWLEDGED'),
-              schema.literal('COMPLETED'),
-              schema.literal('ERROR'),
-              schema.literal('DELETED'),
-              schema.literal('AUDIT'),
+              schema.literal('active'),
+              schema.literal('acknowledged'),
+              schema.literal('completed'),
+              schema.literal('error'),
+              schema.literal('deleted'),
+              schema.literal('audit'),
             ]),
           ),
-          comment: schema.maybe(schema.string()),
+          title: schema.maybe(schema.string({ maxLength: 1024 })),
+          description: schema.maybe(schema.string()),
           tags: schema.maybe(schema.arrayOf(schema.string())),
+          severity: schema.maybe(
+            schema.oneOf([
+              schema.literal('informational'),
+              schema.literal('low'),
+              schema.literal('medium'),
+              schema.literal('high'),
+              schema.literal('critical'),
+              schema.literal(''),
+            ]),
+          ),
+          priority: schema.maybe(
+            schema.oneOf([
+              schema.literal('urgent'),
+              schema.literal('high'),
+              schema.literal('medium'),
+              schema.literal('low'),
+              schema.literal(''),
+            ]),
+          ),
+          tlp: schema.maybe(
+            schema.oneOf([
+              schema.literal('TLP:RED'),
+              schema.literal('TLP:AMBER'),
+              schema.literal('TLP:GREEN'),
+              schema.literal('TLP:CLEAR'),
+              schema.literal(''),
+            ]),
+          ),
+          newComment: schema.maybe(schema.string({ minLength: 1 })),
+          editedComments: schema.maybe(
+            schema.arrayOf(
+              schema.object({
+                created_at: schema.string(),
+                comment: schema.string({ minLength: 1 }),
+              }),
+              { maxSize: 20 },
+            ),
+          ),
+          deletedComments: schema.maybe(
+            schema.arrayOf(schema.string(), { maxSize: 20 }),
+          ),
         }),
       },
     },

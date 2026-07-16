@@ -7,7 +7,6 @@ import {
   EuiDataGridCellValueElementProps,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiFlyout,
   EuiFlyoutBody,
   EuiFlyoutHeader,
   EuiPanel,
@@ -55,6 +54,7 @@ import DocDetailsHeader from './components/doc-details-header';
 import { useDocumentMutationSync } from './use-document-mutation-sync';
 import { tDataGridColumn } from '../data-grid/types';
 import { SampleDataWarning } from '../../visualize/components';
+import { UnsavedChangesGuardedFlyout } from '../unsaved-changes-guard';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -340,7 +340,10 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                 </EuiFlexGroup>
               </EuiPanel>
               {inspectedHit && (
-                <EuiFlyout onClose={closeFlyoutHandler} size='m'>
+                <UnsavedChangesGuardedFlyout
+                  onClose={closeFlyoutHandler}
+                  size='m'
+                >
                   <EuiFlyoutHeader>
                     <DocDetailsHeader
                       doc={inspectedHit}
@@ -368,7 +371,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                       </EuiFlexItem>
                     </EuiFlexGroup>
                   </EuiFlyoutBody>
-                </EuiFlyout>
+                </UnsavedChangesGuardedFlyout>
               )}
             </div>
             {/* TODO: this should be rendered with a guard instead optional rendering, but this

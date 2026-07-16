@@ -1,5 +1,6 @@
 jest.mock('../../plugin-services', () => ({
   getCore: jest.fn(),
+  getCtiRegistrationStatusPollIntervalSec: jest.fn(() => 30),
 }));
 
 import React from 'react';

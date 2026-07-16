@@ -12,7 +12,11 @@ import {
 } from './types';
 import { UpdatesNotification } from './components/updates-notification';
 import { DismissNotificationCheck } from './components/dismiss-notification-check';
-import { setCore, setWazuhCore } from './plugin-services';
+import {
+  setCore,
+  setWazuhCore,
+  setCtiRegistrationStatusPollIntervalSec,
+} from './plugin-services';
 import { getAvailableUpdates } from './services';
 import { CtiRegistration } from './shared-components/cti-registration/cti-registration';
 import { CtiUpsellNotification } from './shared-components/cti-registration/components/cti-upsell-notification';
@@ -36,13 +40,19 @@ export class WazuhCheckUpdatesPlugin
     setCore(core);
     setWazuhCore(plugins.wazuhCore);
 
-    const { ctiRegistrationUiEnabled } = this.initializerContext.config.get();
+    const { ctiRegistrationUiEnabled, ctiRegistrationStatusPollIntervalSec } =
+      this.initializerContext.config.get();
+
+    setCtiRegistrationStatusPollIntervalSec(
+      ctiRegistrationStatusPollIntervalSec,
+    );
 
     return {
       UpdatesNotification,
       getAvailableUpdates,
       DismissNotificationCheck,
       ctiRegistrationUiEnabled,
+      ctiRegistrationStatusPollIntervalSec,
       CtiRegistration,
       CtiUpsellNotification,
     };
