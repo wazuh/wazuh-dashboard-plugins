@@ -20,14 +20,21 @@ import {
   goToMitreTactic,
 } from '../services/navigation';
 
+export interface OverviewSectionProps {
+  /** Owned by the page shell so the Threat Hunting section can reuse the
+   * same on-mount findings search rather than issuing a second scan. */
+  findings: ReturnType<typeof useFindingsOverview>;
+}
+
 /**
  * The OVERVIEW section: fleet health, recent findings, MITRE activity, and
  * inventory. Owns navigation wiring; widgets stay pure and receive href/onClick.
  * Findings (severity + tactics) fire on mount; the inventory row is lazy.
  */
-export const OverviewSection: React.FC = () => {
+export const OverviewSection: React.FC<OverviewSectionProps> = ({
+  findings,
+}) => {
   const agents = useAgentStatus();
-  const findings = useFindingsOverview();
   const [inventoryRef, inventoryVisible] = useInViewport<HTMLDivElement>();
   const topOs = useTopOperatingSystems(inventoryVisible);
   const topServices = useTopNetworkServices(inventoryVisible);

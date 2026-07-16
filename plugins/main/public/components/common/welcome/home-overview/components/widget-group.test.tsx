@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { WidgetGroup } from './widget-group';
+import { WidgetGroup, WidgetGroupBody } from './widget-group';
 
 const child = <div>widget body</div>;
 
@@ -63,5 +63,35 @@ describe('WidgetGroup', () => {
     );
     fireEvent.click(screen.getByText('Threat Hunting'));
     expect(onClick).toHaveBeenCalled();
+  });
+});
+
+describe('WidgetGroupBody', () => {
+  it('renders only the status content, without any panel or title chrome', () => {
+    const { container } = render(
+      <WidgetGroupBody status='available'>{child}</WidgetGroupBody>,
+    );
+    expect(screen.getByText('widget body')).toBeInTheDocument();
+    expect(container.querySelector('.euiPanel')).not.toBeInTheDocument();
+  });
+
+  it('supports composing two independently-gated groups in one panel', () => {
+    const { container } = render(
+      <div>
+        <WidgetGroupBody status='available'>
+          <div>hero</div>
+        </WidgetGroupBody>
+        <WidgetGroupBody status='error' errorLabel='Feed unavailable'>
+          <div>feed table</div>
+        </WidgetGroupBody>
+      </div>,
+    );
+    expect(screen.getByText('hero')).toBeInTheDocument();
+    expect(screen.queryByText('feed table')).not.toBeInTheDocument();
+    expect(screen.getByText('Feed unavailable')).toBeInTheDocument();
+    expect(
+      container.querySelectorAll('[data-test-subj="widget-group-error"]')
+        .length,
+    ).toBe(1);
   });
 });

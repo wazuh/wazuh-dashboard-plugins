@@ -20,10 +20,15 @@ const SEVERITY_PRESENTATION: Array<{
 
 export interface FindingSeverityTilesProps {
   counts: SeverityCounts;
+  /** Distinguishes this instance's `data-test-subj`s when more than one
+   * severity-tiles group renders on the same page (e.g. Findings vs.
+   * Vulnerability Severity). */
+  testSubjPrefix?: string;
 }
 
 export const FindingSeverityTiles: React.FC<FindingSeverityTilesProps> = ({
   counts,
+  testSubjPrefix = 'finding-severity',
 }) => (
   <EuiFlexGroup gutterSize='m' responsive={false} wrap>
     {SEVERITY_PRESENTATION.map(severity => (
@@ -36,7 +41,7 @@ export const FindingSeverityTiles: React.FC<FindingSeverityTilesProps> = ({
           }
           label={severity.label}
           color={severity.color}
-          data-test-subj={`finding-severity-${severity.band}`}
+          data-test-subj={`${testSubjPrefix}-${severity.band}`}
         />
       </EuiFlexItem>
     ))}

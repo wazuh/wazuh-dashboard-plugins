@@ -6,7 +6,7 @@ function Probe() {
   const { refreshToken, refresh } = useRefresh();
   return (
     <div>
-      <span data-testid='token'>{refreshToken}</span>
+      <span data-test-subj='token'>{refreshToken}</span>
       <button onClick={refresh}>refresh</button>
     </div>
   );

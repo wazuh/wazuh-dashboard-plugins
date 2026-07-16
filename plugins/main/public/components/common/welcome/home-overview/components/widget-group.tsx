@@ -17,6 +17,46 @@ export interface WidgetGroupHeaderLink {
   onClick?: () => void;
 }
 
+export interface WidgetGroupBodyProps {
+  status: DataGroupStatus;
+  errorLabel?: string;
+  children: React.ReactNode;
+}
+
+/**
+ * Maps a data group's status to what renders — skeleton / error callout /
+ * content — without any panel or title chrome. Extracted so a panel that
+ * hosts more than one independently-gated group (e.g. the Malware Detection
+ * panel's IOC Match hero + IOC-feed-by-type table, which can degrade
+ * separately) can reuse the same status→content mapping without nesting a
+ * second panel inside the first. `WidgetGroup` below is the common case
+ * (one group per panel) built on top of this.
+ */
+export const WidgetGroupBody: React.FC<WidgetGroupBodyProps> = ({
+  status,
+  errorLabel = 'Could not load data',
+  children,
+}) => (
+  <>
+    {status === 'loading' && (
+      <div data-test-subj='widget-group-loading'>
+        <EuiLoadingContent lines={3} />
+      </div>
+    )}
+    {status === 'error' && (
+      <div data-test-subj='widget-group-error'>
+        <EuiCallOut
+          size='s'
+          color='danger'
+          iconType='alert'
+          title={errorLabel}
+        />
+      </div>
+    )}
+    {status === 'available' && children}
+  </>
+);
+
 export interface WidgetGroupProps {
   status: DataGroupStatus;
   title: React.ReactNode;
@@ -41,7 +81,7 @@ export const WidgetGroup: React.FC<WidgetGroupProps> = ({
   title,
   caption,
   headerLink,
-  errorLabel = 'Could not load data',
+  errorLabel,
   children,
   ...rest
 }) => {
@@ -71,22 +111,9 @@ export const WidgetGroup: React.FC<WidgetGroupProps> = ({
         )}
       </EuiFlexGroup>
       <div style={{ marginTop: 10 }}>
-        {status === 'loading' && (
-          <div data-test-subj='widget-group-loading'>
-            <EuiLoadingContent lines={3} />
-          </div>
-        )}
-        {status === 'error' && (
-          <div data-test-subj='widget-group-error'>
-            <EuiCallOut
-              size='s'
-              color='danger'
-              iconType='alert'
-              title={errorLabel}
-            />
-          </div>
-        )}
-        {status === 'available' && children}
+        <WidgetGroupBody status={status} errorLabel={errorLabel}>
+          {children}
+        </WidgetGroupBody>
       </div>
     </EuiPanel>
   );

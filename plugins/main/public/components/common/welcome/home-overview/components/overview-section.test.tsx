@@ -4,7 +4,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { OverviewSection } from './overview-section';
 import {
   useAgentStatus,
-  useFindingsOverview,
   useTopOperatingSystems,
   useTopNetworkServices,
 } from '../services/use-overview-data';
@@ -15,7 +14,6 @@ import * as navigation from '../services/navigation';
 // are never loaded — this section is tested purely against the seam boundary.
 jest.mock('../services/use-overview-data', () => ({
   useAgentStatus: jest.fn(),
-  useFindingsOverview: jest.fn(),
   useTopOperatingSystems: jest.fn(),
   useTopNetworkServices: jest.fn(),
 }));
@@ -32,10 +30,14 @@ jest.mock('../../../hooks', () => ({
 const asMock = (fn: unknown) => fn as jest.Mock;
 
 const findingsAvailable = {
-  status: 'available',
+  status: 'available' as const,
   data: {
     severity: { critical: 1, high: 2, medium: 35682, low: 4 },
     topTactics: [{ key: 'Initial Access', count: 36231 }],
+    totalFindings: 40614,
+    topRules: [],
+    techniquesCount: 7,
+    topTechniques: [],
   },
   indexPatternId: 'idx-1',
 };
@@ -52,7 +54,6 @@ beforeEach(() => {
       total: 7,
     },
   });
-  asMock(useFindingsOverview).mockReturnValue(findingsAvailable);
   asMock(useTopOperatingSystems).mockReturnValue({
     status: 'available',
     data: [{ key: 'Ubuntu 24.04.2 LTS', count: 2 }],
@@ -66,7 +67,7 @@ beforeEach(() => {
 
 describe('OverviewSection', () => {
   it('renders every OVERVIEW widget when all groups are available', () => {
-    render(<OverviewSection />);
+    render(<OverviewSection findings={findingsAvailable} />);
     expect(screen.getByText('Agents by status')).toBeInTheDocument();
     expect(screen.getByText('Findings — last 24 hours')).toBeInTheDocument();
     expect(
@@ -83,7 +84,9 @@ describe('OverviewSection', () => {
 
   it('hides a widget whose dependency is unavailable (not an error)', () => {
     asMock(useTopNetworkServices).mockReturnValue({ status: 'unavailable' });
-    const { container } = render(<OverviewSection />);
+    const { container } = render(
+      <OverviewSection findings={findingsAvailable} />,
+    );
     expect(
       container.querySelector(
         '[data-test-subj="home-overview-top-network-services"]',
@@ -94,8 +97,9 @@ describe('OverviewSection', () => {
   });
 
   it('shows a contained error for a failed group (distinct from hidden)', () => {
-    asMock(useFindingsOverview).mockReturnValue({ status: 'error' });
-    const { container } = render(<OverviewSection />);
+    const { container } = render(
+      <OverviewSection findings={{ status: 'error' }} />,
+    );
     // findings + mitre panels (same group) render, with error boxes
     expect(
       container.querySelectorAll('[data-test-subj="widget-group-error"]')
@@ -106,25 +110,25 @@ describe('OverviewSection', () => {
 
   it('defers the inventory groups until the row enters the viewport', () => {
     asMock(useInViewport).mockReturnValue([{ current: null }, false]);
-    render(<OverviewSection />);
+    render(<OverviewSection findings={findingsAvailable} />);
     expect(asMock(useTopOperatingSystems)).toHaveBeenCalledWith(false);
     expect(asMock(useTopNetworkServices)).toHaveBeenCalledWith(false);
   });
 
   it('enables the inventory groups once visible', () => {
     asMock(useInViewport).mockReturnValue([{ current: null }, true]);
-    render(<OverviewSection />);
+    render(<OverviewSection findings={findingsAvailable} />);
     expect(asMock(useTopOperatingSystems)).toHaveBeenCalledWith(true);
   });
 
   it('navigates to Threat Hunting from the findings header link', () => {
-    render(<OverviewSection />);
+    render(<OverviewSection findings={findingsAvailable} />);
     fireEvent.click(screen.getByText('Threat Hunting'));
     expect(navigation.goToThreatHunting).toHaveBeenCalled();
   });
 
   it('navigates to the selected MITRE tactic with the findings index pattern', () => {
-    render(<OverviewSection />);
+    render(<OverviewSection findings={findingsAvailable} />);
     fireEvent.click(screen.getByText('Initial Access'));
     expect(navigation.goToMitreTactic).toHaveBeenCalledWith(
       'Initial Access',
