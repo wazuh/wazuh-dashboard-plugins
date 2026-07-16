@@ -10,6 +10,7 @@ import { HTTP_STATUS_CODES } from '../../common/constants';
 
 const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
+const mockApiRequest = jest.fn();
 const context = {
   wazuh: {
     security: {
@@ -20,6 +21,13 @@ const context = {
       info: jest.fn(),
       warn: jest.fn(),
       error: jest.fn(),
+    },
+    api: {
+      client: {
+        asCurrentUser: {
+          request: mockApiRequest,
+        },
+      },
     },
   },
   wazuh_core: {
@@ -91,6 +99,55 @@ afterAll(async () => {
 
   // Clear all mocks
   jest.clearAllMocks();
+});
+
+describe('[endpoint] POST /api/request - upstream API error status mapping', () => {
+  beforeEach(() => {
+    mockApiRequest.mockReset();
+  });
+
+  const requestBody = {
+    method: 'GET',
+    path: '/tasks/status',
+    body: {},
+    id: 'default',
+  };
+
+  it.each`
+    upstreamStatus | message                                           | expectedStatusCode
+    ${403}         | ${'3013 - Permission denied: Resource type: *:*'} | ${HTTP_STATUS_CODES.FORBIDDEN}
+    ${401}         | ${'3000 - Invalid credentials'}                   | ${HTTP_STATUS_CODES.UNAUTHORIZED}
+  `(
+    'API error with upstream status $upstreamStatus responds $expectedStatusCode',
+    async ({ upstreamStatus, message, expectedStatusCode }) => {
+      mockApiRequest.mockRejectedValue({
+        message,
+        code: 'ERR_BAD_REQUEST',
+        response: {
+          status: upstreamStatus,
+          data: { detail: message },
+        },
+      });
+
+      const response = await supertest(innerServer.listener)
+        .post('/api/request')
+        .set('Cookie', 'wz-api=default')
+        .send(requestBody)
+        .expect(expectedStatusCode);
+
+      expect(response.body.message).toBeDefined();
+    },
+  );
+
+  it('unexpected error without upstream status responds 500', async () => {
+    mockApiRequest.mockRejectedValue(new Error('Unexpected error'));
+
+    await supertest(innerServer.listener)
+      .post('/api/request')
+      .set('Cookie', 'wz-api=default')
+      .send(requestBody)
+      .expect(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR);
+  });
 });
 
 describe('[endpoint] GET /api/check-api', () => {
