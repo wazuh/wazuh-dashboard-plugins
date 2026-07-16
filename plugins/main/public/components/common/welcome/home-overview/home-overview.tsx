@@ -12,6 +12,8 @@ import { RefreshProvider, useRefresh } from './context/refresh-context';
 import { OverviewSection } from './components/overview-section';
 import { EndpointSecuritySection } from './components/endpoint-security-section';
 import { ThreatHuntingSection } from './components/threat-hunting-section';
+import { SecurityOperationsSection } from './components/security-operations-section';
+import { CloudSecuritySection } from './components/cloud-security-section';
 import { useFindingsOverview } from './services/use-overview-data';
 
 const HomeOverviewHeader: React.FC = () => {
@@ -52,6 +54,10 @@ const HomeOverviewBody: React.FC = () => {
       <EndpointSecuritySection />
       <EuiSpacer size='l' />
       <ThreatHuntingSection findings={findings} />
+      <EuiSpacer size='l' />
+      <SecurityOperationsSection />
+      <EuiSpacer size='l' />
+      <CloudSecuritySection />
     </>
   );
 };

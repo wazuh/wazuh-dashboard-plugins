@@ -15,6 +15,14 @@ jest.mock('./components/endpoint-security-section', () => ({
 jest.mock('./components/threat-hunting-section', () => ({
   ThreatHuntingSection: () => <div data-test-subj='threat-hunting-section' />,
 }));
+jest.mock('./components/security-operations-section', () => ({
+  SecurityOperationsSection: () => (
+    <div data-test-subj='security-operations-section' />
+  ),
+}));
+jest.mock('./components/cloud-security-section', () => ({
+  CloudSecuritySection: () => <div data-test-subj='cloud-security-section' />,
+}));
 jest.mock('./services/use-overview-data', () => ({
   useFindingsOverview: jest.fn(() => ({ status: 'loading' })),
 }));
@@ -33,6 +41,10 @@ describe('HomeOverview shell', () => {
       screen.getByTestId('endpoint-security-section'),
     ).toBeInTheDocument();
     expect(screen.getByTestId('threat-hunting-section')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('security-operations-section'),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('cloud-security-section')).toBeInTheDocument();
   });
 
   it('keeps rendering after Refresh is clicked (token bump does not throw)', () => {

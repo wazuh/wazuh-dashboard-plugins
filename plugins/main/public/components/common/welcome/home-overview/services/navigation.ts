@@ -7,6 +7,8 @@ import {
   fileIntegrityMonitoring,
   malwareDetection,
   vulnerabilityDetection,
+  activeResponses,
+  regulatoryCompliance,
 } from '../../../../../utils/applications';
 import {
   FILTER_OPERATOR,
@@ -33,6 +35,18 @@ export const goToFileIntegrityMonitoring = () =>
 export const goToMalwareDetection = () => navigate(malwareDetection.id);
 export const goToVulnerabilityDetection = () =>
   navigate(vulnerabilityDetection.id);
+export const goToActiveResponse = () => navigate(activeResponses.id);
+
+/** Open Regulatory Compliance filtered to a specific framework tab. */
+export const goToRegulatoryCompliance = (tabView: string): void =>
+  navigate(regulatoryCompliance.id, {
+    path: `#/overview?tab=regulatory-compliance&tabView=${tabView}&tabSubView=dashboard`,
+  });
+
+/** Open a Cloud Security module by its app id (Docker / AWS / GCP / GitHub /
+ * Microsoft Graph / Office 365 — a list-driven set of nav cards, unlike the
+ * fixed one-off links above). */
+export const goToCloudModule = (appId: string): void => navigate(appId);
 
 /** Open MITRE ATT&CK filtered to the given field/value (falls back to
  * unfiltered when the findings index pattern isn't known yet). */

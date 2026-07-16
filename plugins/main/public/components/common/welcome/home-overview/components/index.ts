@@ -18,3 +18,8 @@ export * from './top-techniques-table';
 export * from './vulnerabilities-by-os-table';
 export * from './endpoint-security-section';
 export * from './threat-hunting-section';
+export * from './it-hygiene-tiles';
+export * from './regulatory-compliance-badges';
+export * from './cloud-security-cards';
+export * from './security-operations-section';
+export * from './cloud-security-section';

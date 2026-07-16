@@ -6,6 +6,9 @@ import {
   SystemInventoryStatesDataSource,
   SystemInventorySystemStatesDataSourceRepository,
   SystemInventoryTrafficStatesDataSourceRepository,
+  SystemInventoryPackagesStatesDataSourceRepository,
+  SystemInventoryUsersStatesDataSourceRepository,
+  SystemInventoryServicesStatesDataSourceRepository,
   SCAStatesDataSource,
   SCAStatesDataSourceRepository,
   FIMFilesStatesDataSource,
@@ -13,6 +16,12 @@ import {
   MalwareDetectionDataSource,
   VulnerabilitiesDataSource,
   VulnerabilitiesDataSourceRepository,
+  ActiveResponsesDataSource,
+  ActiveResponsesDataSourceRepository,
+  IDataSourceFactoryConstructor,
+  PatternDataSource,
+  tDataSourceRepository,
+  tParsedIndexPattern,
 } from '../../../data-source';
 import { WzRequest } from '../../../../../react-services';
 import { useRefresh } from '../context/refresh-context';
@@ -388,4 +397,83 @@ export function useVulnerabilityOverview(
     },
     deps: [isLoading, error, dataSource, enabled, refreshToken],
   });
+}
+
+/** Shared shape for a single-index doc-count widget (IT Hygiene tiles, Active
+ * Response): one search, no aggregations, just `hits.total`. */
+function useIndexDocCount(
+  DataSourceClass: IDataSourceFactoryConstructor<PatternDataSource>,
+  createRepository: () => tDataSourceRepository<tParsedIndexPattern>,
+  enabled: boolean,
+  dateRange?: { from: string; to: string },
+): DataGroupResult<number> {
+  const { refreshToken } = useRefresh();
+  const repository = useMemo(createRepository, []);
+  const { isLoading, dataSource, error, fetchData } = useDataSource({
+    DataSource: DataSourceClass,
+    repository,
+  });
+
+  return useDataGroup<number>({
+    isLoading,
+    initError: error,
+    enabled,
+    ready: Boolean(dataSource && fetchData),
+    fetch: async () => shapeDocCount(await fetchData({ dateRange })),
+    deps: [isLoading, error, dataSource, enabled, refreshToken],
+  });
+}
+
+/** IT Hygiene summary tiles — one independent doc-count search per inventory
+ * index, so a single missing index hides only its own tile. Lazy. */
+export function useItHygieneOperatingSystemsCount(
+  enabled: boolean,
+): DataGroupResult<number> {
+  return useIndexDocCount(
+    SystemInventoryStatesDataSource,
+    () => new SystemInventorySystemStatesDataSourceRepository(),
+    enabled,
+  );
+}
+
+export function useItHygienePackagesCount(
+  enabled: boolean,
+): DataGroupResult<number> {
+  return useIndexDocCount(
+    SystemInventoryStatesDataSource,
+    () => new SystemInventoryPackagesStatesDataSourceRepository(),
+    enabled,
+  );
+}
+
+export function useItHygieneUsersCount(
+  enabled: boolean,
+): DataGroupResult<number> {
+  return useIndexDocCount(
+    SystemInventoryStatesDataSource,
+    () => new SystemInventoryUsersStatesDataSourceRepository(),
+    enabled,
+  );
+}
+
+export function useItHygieneServicesCount(
+  enabled: boolean,
+): DataGroupResult<number> {
+  return useIndexDocCount(
+    SystemInventoryStatesDataSource,
+    () => new SystemInventoryServicesStatesDataSourceRepository(),
+    enabled,
+  );
+}
+
+/** Active Response actions triggered, last 24h. Lazy. */
+export function useActiveResponseOverview(
+  enabled: boolean,
+): DataGroupResult<number> {
+  return useIndexDocCount(
+    ActiveResponsesDataSource,
+    () => new ActiveResponsesDataSourceRepository(),
+    enabled,
+    LAST_24H,
+  );
 }
