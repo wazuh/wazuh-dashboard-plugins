@@ -1,0 +1,31 @@
+import '@testing-library/jest-dom';
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { BarList } from './bar-list';
+
+const items = [
+  { key: 'Initial Access', count: 36231 },
+  { key: 'Discovery', count: 3899 },
+];
+
+describe('BarList', () => {
+  it('renders each item label and comma-formatted value', () => {
+    render(<BarList items={items} />);
+    expect(screen.getByText('Initial Access')).toBeInTheDocument();
+    expect(screen.getByText('36,231')).toBeInTheDocument();
+    expect(screen.getByText('3,899')).toBeInTheDocument();
+  });
+
+  it('calls onSelect with the item when a row is clicked', () => {
+    const onSelect = jest.fn();
+    render(<BarList items={items} onSelect={onSelect} />);
+    fireEvent.click(screen.getByText('Initial Access'));
+    expect(onSelect).toHaveBeenCalledWith(items[0]);
+  });
+
+  it('renders row labels as links when getHref is provided', () => {
+    render(<BarList items={items} getHref={item => `#/mitre/${item.key}`} />);
+    const link = screen.getByText('Discovery').closest('a');
+    expect(link).toHaveAttribute('href', '#/mitre/Discovery');
+  });
+});
