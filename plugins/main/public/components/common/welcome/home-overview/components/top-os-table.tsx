@@ -11,6 +11,7 @@ export const TopOsTable: React.FC<TopOsTableProps> = ({ items }) => (
   <TopNTable
     items={items}
     keyColumnName='Operating system'
+    noItemsMessage='No operating systems found'
     data-test-subj='top-os-table'
   />
 );

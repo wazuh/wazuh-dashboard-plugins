@@ -1,14 +1,5 @@
 import React from 'react';
-import {
-  EuiPage,
-  EuiPageBody,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiTitle,
-  EuiButtonEmpty,
-  EuiSpacer,
-} from '@elastic/eui';
-import { RefreshProvider, useRefresh } from './context/refresh-context';
+import { EuiPage, EuiPageBody, EuiTitle, EuiSpacer } from '@elastic/eui';
 import { OverviewSection } from './components/overview-section';
 import { EndpointSecuritySection } from './components/endpoint-security-section';
 import { ThreatHuntingSection } from './components/threat-hunting-section';
@@ -17,31 +8,16 @@ import { CloudSecuritySection } from './components/cloud-security-section';
 import { ThreatIntelligenceFeedSection } from './components/threat-intelligence-feed-section';
 import { useFindingsOverview } from './services/use-overview-data';
 
-const HomeOverviewHeader: React.FC = () => {
-  const { refresh } = useRefresh();
-  return (
-    <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
-      <EuiFlexItem>
-        <EuiTitle size='s'>
-          <h1>Overview</h1>
-        </EuiTitle>
-      </EuiFlexItem>
-      <EuiFlexItem grow={false}>
-        <EuiButtonEmpty
-          iconType='refresh'
-          onClick={refresh}
-          data-test-subj='home-overview-refresh'
-        >
-          Refresh
-        </EuiButtonEmpty>
-      </EuiFlexItem>
-    </EuiFlexGroup>
-  );
-};
+const HomeOverviewHeader: React.FC = () => (
+  <EuiTitle size='s'>
+    <h1>Overview</h1>
+  </EuiTitle>
+);
 
 /**
- * The page body, rendered inside `RefreshProvider` so the shared findings
- * search (read by both OVERVIEW and Threat Hunting) picks up Refresh clicks.
+ * The page body. The shared findings search (read by both OVERVIEW and
+ * Threat Hunting) is owned here so both sections read the same result
+ * rather than each issuing their own scan.
  */
 const HomeOverviewBody: React.FC = () => {
   const findings = useFindingsOverview();
@@ -70,11 +46,9 @@ const HomeOverviewBody: React.FC = () => {
  * static module catalog.
  */
 export const HomeOverview: React.FC = () => (
-  <RefreshProvider>
-    <EuiPage paddingSize='l'>
-      <EuiPageBody>
-        <HomeOverviewBody />
-      </EuiPageBody>
-    </EuiPage>
-  </RefreshProvider>
+  <EuiPage paddingSize='l'>
+    <EuiPageBody>
+      <HomeOverviewBody />
+    </EuiPageBody>
+  </EuiPage>
 );

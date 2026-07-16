@@ -41,6 +41,7 @@ export const FindingSeverityTiles: React.FC<FindingSeverityTilesProps> = ({
           }
           label={severity.label}
           color={severity.color}
+          reverse
           data-test-subj={`${testSubjPrefix}-${severity.band}`}
         />
       </EuiFlexItem>

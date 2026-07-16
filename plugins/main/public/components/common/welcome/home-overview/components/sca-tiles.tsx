@@ -22,6 +22,7 @@ export const ScaTiles: React.FC<ScaTilesProps> = ({ tiles }) => (
         }
         label='Passed'
         color={UI_COLOR_STATUS.success}
+        reverse
         data-test-subj='sca-tile-passed'
       />
     </EuiFlexItem>
@@ -32,6 +33,7 @@ export const ScaTiles: React.FC<ScaTilesProps> = ({ tiles }) => (
         }
         label='Failed'
         color={UI_COLOR_STATUS.failed}
+        reverse
         data-test-subj='sca-tile-failed'
       />
     </EuiFlexItem>
@@ -44,6 +46,7 @@ export const ScaTiles: React.FC<ScaTilesProps> = ({ tiles }) => (
         }
         label='N/A'
         color={UI_COLOR_STATUS.notApplicable}
+        reverse
         data-test-subj='sca-tile-not-applicable'
       />
     </EuiFlexItem>
@@ -56,6 +59,7 @@ export const ScaTiles: React.FC<ScaTilesProps> = ({ tiles }) => (
             ? UI_COLOR_STATUS.success
             : UI_COLOR_STATUS.danger
         }
+        reverse
         data-test-subj='sca-tile-score'
       />
     </EuiFlexItem>

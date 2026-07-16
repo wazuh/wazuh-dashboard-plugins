@@ -13,6 +13,7 @@ export const TopNetworkServicesTable: React.FC<
   <TopNTable
     items={items}
     keyColumnName='Process name'
+    noItemsMessage='No network services found'
     data-test-subj='top-network-services-table'
   />
 );

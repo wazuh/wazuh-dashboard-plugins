@@ -13,6 +13,7 @@ export const FimPlatformsTable: React.FC<FimPlatformsTableProps> = ({
   <TopNTable
     items={items}
     keyColumnName='Top 5 by platform'
+    noItemsMessage='No files or registry objects baselined yet'
     data-test-subj='fim-platforms-table'
   />
 );

@@ -15,6 +15,8 @@ export interface BarListProps {
   getHref?: (item: TopItem) => string | undefined;
   /** If provided, clicking a row label calls this (SPA navigation). */
   onSelect?: (item: TopItem) => void;
+  /** Shown in place of the (otherwise blank) list when `items` is empty. */
+  emptyMessage?: React.ReactNode;
   ['data-test-subj']?: string;
 }
 
@@ -23,8 +25,13 @@ export const BarList: React.FC<BarListProps> = ({
   items,
   getHref,
   onSelect,
+  emptyMessage,
   ...rest
 }) => {
+  if (items.length === 0) {
+    return <div data-test-subj={rest['data-test-subj']}>{emptyMessage}</div>;
+  }
+
   const max = Math.max(1, ...items.map(item => item.count));
   const isInteractive = Boolean(getHref || onSelect);
 

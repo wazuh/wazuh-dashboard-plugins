@@ -46,8 +46,8 @@ export const EndpointSecuritySection: React.FC = () => {
         across your fleet.
       </EuiText>
       <EuiSpacer size='s' />
-      <EuiFlexGroup>
-        <EuiFlexItem>
+      <EuiFlexGroup wrap responsive={false}>
+        <EuiFlexItem style={{ minWidth: 0 }}>
           <WidgetGroup
             status={sca.status}
             title={
@@ -67,7 +67,7 @@ export const EndpointSecuritySection: React.FC = () => {
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: 0 }}>
           <WidgetGroup
             status={fim.status}
             title={
@@ -96,7 +96,7 @@ export const EndpointSecuritySection: React.FC = () => {
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: 0 }}>
           <MalwareDetectionPanel malware={malware} />
         </EuiFlexItem>
       </EuiFlexGroup>

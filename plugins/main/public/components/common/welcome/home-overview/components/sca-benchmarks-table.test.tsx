@@ -25,4 +25,13 @@ describe('ScaBenchmarksTable', () => {
     expect(screen.getAllByText('79').length).toBeGreaterThan(0);
     expect(screen.getAllByText('71.68%').length).toBeGreaterThan(0);
   });
+
+  it('shows a specific empty prompt instead of the OUI default when there are no benchmarks', () => {
+    render(<ScaBenchmarksTable items={[]} />);
+    expect(screen.getAllByText('No SCA benchmarks found').length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(/Check your agents. SCA configuration/).length,
+    ).toBeGreaterThan(0);
+    expect(screen.queryByText('No items found')).not.toBeInTheDocument();
+  });
 });

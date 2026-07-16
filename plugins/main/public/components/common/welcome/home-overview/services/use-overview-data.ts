@@ -24,7 +24,6 @@ import {
   tParsedIndexPattern,
 } from '../../../data-source';
 import { WzRequest } from '../../../../../react-services';
-import { useRefresh } from '../context/refresh-context';
 import {
   buildCvesMatchedAgg,
   buildFindingsOverviewAggs,
@@ -149,7 +148,6 @@ function useDataGroup<T>(options: {
 export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
   indexPatternId?: string;
 } {
-  const { refreshToken } = useRefresh();
   const repository = useMemo(() => new FindingsDataSourceRepository(), []);
   const { isLoading, dataSource, error, fetchData } = useDataSource({
     DataSource: OverviewDataSource,
@@ -182,7 +180,7 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
         ),
       };
     },
-    deps: [isLoading, error, dataSource, refreshToken],
+    deps: [isLoading, error, dataSource],
   });
 
   const indexPatternId = (
@@ -196,7 +194,6 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
 export function useTopOperatingSystems(
   enabled: boolean,
 ): DataGroupResult<TopItem[]> {
-  const { refreshToken } = useRefresh();
   const repository = useMemo(
     () => new SystemInventorySystemStatesDataSourceRepository(),
     [],
@@ -218,7 +215,7 @@ export function useTopOperatingSystems(
       });
       return shapeTopBuckets(response?.aggregations, 'top_os');
     },
-    deps: [isLoading, error, dataSource, enabled, refreshToken],
+    deps: [isLoading, error, dataSource, enabled],
   });
 }
 
@@ -226,7 +223,6 @@ export function useTopOperatingSystems(
 export function useTopNetworkServices(
   enabled: boolean,
 ): DataGroupResult<TopItem[]> {
-  const { refreshToken } = useRefresh();
   const repository = useMemo(
     () => new SystemInventoryTrafficStatesDataSourceRepository(),
     [],
@@ -248,13 +244,12 @@ export function useTopNetworkServices(
       });
       return shapeTopBuckets(response?.aggregations, 'top_services');
     },
-    deps: [isLoading, error, dataSource, enabled, refreshToken],
+    deps: [isLoading, error, dataSource, enabled],
   });
 }
 
 /** Agent connection summary via the Wazuh server API. Fires on mount. */
 export function useAgentStatus(): DataGroupResult<AgentStatus> {
-  const { refreshToken } = useRefresh();
   const [result, setResult] = useState<DataGroupResult<AgentStatus>>({
     status: 'loading',
   });
@@ -279,14 +274,13 @@ export function useAgentStatus(): DataGroupResult<AgentStatus> {
     return () => {
       cancelled = true;
     };
-  }, [refreshToken]);
+  }, []);
 
   return result;
 }
 
 /** Configuration Assessment tiles + top benchmarks (SCA state index). Lazy. */
 export function useSCAOverview(enabled: boolean): DataGroupResult<ScaOverview> {
-  const { refreshToken } = useRefresh();
   const repository = useMemo(() => new SCAStatesDataSourceRepository(), []);
   const { isLoading, dataSource, error, fetchData } = useDataSource({
     DataSource: SCAStatesDataSource,
@@ -308,13 +302,12 @@ export function useSCAOverview(enabled: boolean): DataGroupResult<ScaOverview> {
         benchmarks: shapeScaBenchmarks(response?.aggregations),
       };
     },
-    deps: [isLoading, error, dataSource, enabled, refreshToken],
+    deps: [isLoading, error, dataSource, enabled],
   });
 }
 
 /** Fleet-wide baselined objects hero + top platforms (FIM state index). Lazy. */
 export function useFIMOverview(enabled: boolean): DataGroupResult<FimOverview> {
-  const { refreshToken } = useRefresh();
   const repository = useMemo(() => new FIMDataSourceRepository(), []);
   const { isLoading, dataSource, error, fetchData } = useDataSource({
     DataSource: FIMFilesStatesDataSource,
@@ -336,7 +329,7 @@ export function useFIMOverview(enabled: boolean): DataGroupResult<FimOverview> {
         platforms: shapeTopBuckets(response?.aggregations, 'fim_platforms'),
       };
     },
-    deps: [isLoading, error, dataSource, enabled, refreshToken],
+    deps: [isLoading, error, dataSource, enabled],
   });
 }
 
@@ -347,7 +340,6 @@ export function useFIMOverview(enabled: boolean): DataGroupResult<FimOverview> {
 export function useMalwareOverview(
   enabled: boolean,
 ): DataGroupResult<MalwareOverview> {
-  const { refreshToken } = useRefresh();
   const repository = useMemo(() => new FindingsDataSourceRepository(), []);
   const { isLoading, dataSource, error, fetchData } = useDataSource({
     DataSource: MalwareDetectionDataSource,
@@ -374,25 +366,23 @@ export function useMalwareOverview(
         ),
       };
     },
-    deps: [isLoading, error, dataSource, enabled, refreshToken],
+    deps: [isLoading, error, dataSource, enabled],
   });
 }
 
 /** Shared shape for a Security Analytics-backed widget: no index pattern to
- * wait on, just a `core.http` call gated by the section's viewport/refresh. */
+ * wait on, just a `core.http` call gated by the section's viewport. */
 function useSecurityAnalyticsFetch<T>(
   enabled: boolean,
   fetcher: () => Promise<T>,
 ): DataGroupResult<T> {
-  const { refreshToken } = useRefresh();
-
   return useDataGroup<T>({
     isLoading: false,
     initError: null,
     enabled,
     ready: true,
     fetch: fetcher,
-    deps: [enabled, refreshToken],
+    deps: [enabled],
   });
 }
 
@@ -420,7 +410,6 @@ export function useDetectorsCount(enabled: boolean): DataGroupResult<number> {
 export function useVulnerabilityOverview(
   enabled: boolean,
 ): DataGroupResult<VulnerabilityOverview> {
-  const { refreshToken } = useRefresh();
   const repository = useMemo(
     () => new VulnerabilitiesDataSourceRepository(),
     [],
@@ -451,7 +440,7 @@ export function useVulnerabilityOverview(
         byOs: shapeTopBuckets(response?.aggregations, 'vulnerabilities_by_os'),
       };
     },
-    deps: [isLoading, error, dataSource, enabled, refreshToken],
+    deps: [isLoading, error, dataSource, enabled],
   });
 }
 
@@ -463,7 +452,6 @@ function useIndexDocCount(
   enabled: boolean,
   dateRange?: { from: string; to: string },
 ): DataGroupResult<number> {
-  const { refreshToken } = useRefresh();
   const repository = useMemo(createRepository, []);
   const { isLoading, dataSource, error, fetchData } = useDataSource({
     DataSource: DataSourceClass,
@@ -477,7 +465,7 @@ function useIndexDocCount(
     ready: Boolean(dataSource && fetchData),
     fetch: async () =>
       shapeDocCount(await fetchData({ dateRange, pagination: NO_HITS })),
-    deps: [isLoading, error, dataSource, enabled, refreshToken],
+    deps: [isLoading, error, dataSource, enabled],
   });
 }
 
@@ -538,7 +526,6 @@ export function useActiveResponseOverview(
 /** CVEs matched — distinct CVE count (cardinality), not the total
  * vulnerability match-document count. Lazy. */
 export function useCvesMatchedCount(enabled: boolean): DataGroupResult<number> {
-  const { refreshToken } = useRefresh();
   const repository = useMemo(
     () => new VulnerabilitiesDataSourceRepository(),
     [],
@@ -560,6 +547,6 @@ export function useCvesMatchedCount(enabled: boolean): DataGroupResult<number> {
       });
       return shapeCardinality(response?.aggregations, 'cves_matched');
     },
-    deps: [isLoading, error, dataSource, enabled, refreshToken],
+    deps: [isLoading, error, dataSource, enabled],
   });
 }

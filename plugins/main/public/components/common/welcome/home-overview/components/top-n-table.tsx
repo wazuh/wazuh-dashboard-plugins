@@ -9,6 +9,9 @@ export interface TopNTableProps {
   countColumnName?: string;
   /** Optional custom render for the key cell (e.g. a link). */
   renderKey?: (item: TopItem) => React.ReactNode;
+  /** Shown in place of the OUI default "No items found" when `items` is
+   * empty. */
+  noItemsMessage?: React.ReactNode;
   ['data-test-subj']?: string;
 }
 
@@ -18,6 +21,7 @@ export const TopNTable: React.FC<TopNTableProps> = ({
   keyColumnName,
   countColumnName = 'Count',
   renderKey,
+  noItemsMessage,
   ...rest
 }) => {
   const columns: Array<EuiBasicTableColumn<TopItem>> = [
@@ -44,7 +48,8 @@ export const TopNTable: React.FC<TopNTableProps> = ({
     <EuiBasicTable
       items={items}
       columns={columns}
-      tableLayout='auto'
+      tableLayout='fixed'
+      noItemsMessage={noItemsMessage}
       data-test-subj={rest['data-test-subj']}
     />
   );

@@ -18,6 +18,7 @@ export const MitreTopTactics: React.FC<MitreTopTacticsProps> = ({
     items={items}
     getHref={getHref}
     onSelect={onSelect}
+    emptyMessage='No MITRE ATT&CK tactics observed in the last 24 hours'
     data-test-subj='mitre-top-tactics'
   />
 );

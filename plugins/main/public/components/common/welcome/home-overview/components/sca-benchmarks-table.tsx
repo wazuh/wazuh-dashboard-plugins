@@ -1,11 +1,20 @@
 import React from 'react';
-import { EuiBasicTable, EuiBasicTableColumn } from '@elastic/eui';
+import { EuiBasicTable, EuiBasicTableColumn, EuiEmptyPrompt } from '@elastic/eui';
 import { ScaBenchmark } from '../services/types';
 import { formatUINumber } from '../../../../../react-services/format-number';
 
 export interface ScaBenchmarksTableProps {
   items: ScaBenchmark[];
 }
+
+const NO_BENCHMARKS = (
+  <EuiEmptyPrompt
+    iconType='visVega'
+    titleSize='xs'
+    title={<h4>No SCA benchmarks found</h4>}
+    body={<p>Check your agents&apos; SCA configuration to generate scans.</p>}
+  />
+);
 
 /** Top 5 benchmarks by checks, with a per-benchmark pass/fail/score readout. */
 export const ScaBenchmarksTable: React.FC<ScaBenchmarksTableProps> = ({
@@ -46,7 +55,8 @@ export const ScaBenchmarksTable: React.FC<ScaBenchmarksTableProps> = ({
     <EuiBasicTable
       items={items}
       columns={columns}
-      tableLayout='auto'
+      tableLayout='fixed'
+      noItemsMessage={NO_BENCHMARKS}
       data-test-subj='sca-benchmarks-table'
     />
   );

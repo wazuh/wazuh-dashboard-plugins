@@ -28,4 +28,12 @@ describe('BarList', () => {
     const link = screen.getByText('Discovery').closest('a');
     expect(link).toHaveAttribute('href', '#/mitre/Discovery');
   });
+
+  it('renders the empty message instead of a blank list when items is empty', () => {
+    const { container } = render(
+      <BarList items={[]} emptyMessage='No tactics observed' data-test-subj='bar-list' />,
+    );
+    expect(screen.getByText('No tactics observed')).toBeInTheDocument();
+    expect(container.querySelector('.euiProgress')).not.toBeInTheDocument();
+  });
 });

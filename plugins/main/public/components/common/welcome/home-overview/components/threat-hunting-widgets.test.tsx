@@ -67,4 +67,31 @@ describe('Endpoint Security / Threat Hunting top-N table widgets', () => {
       count: 35378,
     });
   });
+
+  it('shows specific empty-state messages instead of the OUI default', () => {
+    render(<FimPlatformsTable items={[]} />);
+    expect(
+      screen.getAllByText('No files or registry objects baselined yet').length,
+    ).toBeGreaterThan(0);
+
+    render(<IocFeedByTypeTable items={[]} />);
+    expect(
+      screen.getAllByText('No IOC matches in the last 24 hours').length,
+    ).toBeGreaterThan(0);
+
+    render(<TopRulesTable items={[]} />);
+    expect(
+      screen.getAllByText('No rules triggered in the last 24 hours').length,
+    ).toBeGreaterThan(0);
+
+    render(<VulnerabilitiesByOsTable items={[]} />);
+    expect(
+      screen.getAllByText('No vulnerabilities found').length,
+    ).toBeGreaterThan(0);
+
+    render(<TopTechniquesTable items={[]} onSelect={jest.fn()} />);
+    expect(
+      screen.getAllByText('No techniques observed in the last 24 hours').length,
+    ).toBeGreaterThan(0);
+  });
 });

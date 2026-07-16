@@ -89,6 +89,7 @@ export const ThreatIntelTiles: React.FC<ThreatIntelTilesProps> = props => (
                     </span>
                   }
                   label={tile.label}
+                  reverse
                 />
               </EuiPanel>
             )}

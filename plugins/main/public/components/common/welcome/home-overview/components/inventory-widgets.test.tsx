@@ -29,4 +29,21 @@ describe('OVERVIEW inventory / tactics widgets', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('Initial Access')).toBeInTheDocument();
   });
+
+  it('shows specific empty-state messages instead of a blank/generic default', () => {
+    render(<TopOsTable items={[]} />);
+    expect(
+      screen.getAllByText('No operating systems found').length,
+    ).toBeGreaterThan(0);
+
+    render(<TopNetworkServicesTable items={[]} />);
+    expect(
+      screen.getAllByText('No network services found').length,
+    ).toBeGreaterThan(0);
+
+    render(<MitreTopTactics items={[]} />);
+    expect(
+      screen.getByText('No MITRE ATT&CK tactics observed in the last 24 hours'),
+    ).toBeInTheDocument();
+  });
 });

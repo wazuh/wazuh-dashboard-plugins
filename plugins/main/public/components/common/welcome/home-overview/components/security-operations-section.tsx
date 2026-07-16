@@ -53,8 +53,8 @@ export const SecurityOperationsSection: React.FC = () => {
         regulatory frameworks you can jump to.
       </EuiText>
       <EuiSpacer size='s' />
-      <EuiFlexGroup>
-        <EuiFlexItem>
+      <EuiFlexGroup wrap responsive={false}>
+        <EuiFlexItem style={{ minWidth: 0 }}>
           <WidgetGroup
             status={itHygieneStatus}
             title={<EuiLink onClick={goToItHygiene}>IT Hygiene</EuiLink>}
@@ -69,7 +69,7 @@ export const SecurityOperationsSection: React.FC = () => {
             />
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: 0 }}>
           <WidgetGroup
             status={activeResponse.status}
             title={
@@ -92,7 +92,7 @@ export const SecurityOperationsSection: React.FC = () => {
             )}
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: 0 }}>
           <EuiPanel
             paddingSize='m'
             hasBorder

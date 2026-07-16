@@ -48,6 +48,7 @@ export const ItHygieneTiles: React.FC<ItHygieneTilesProps> = props => (
                   </span>
                 }
                 label={tile.label}
+                reverse
                 data-test-subj={tile.testSubj}
               />
             )}
