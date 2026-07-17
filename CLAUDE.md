@@ -140,7 +140,8 @@ Full detail in [`docs/dev/pull-requests.md`](docs/dev/pull-requests.md) and
   `internal-devel-requests` are internal: don't expose their link in the PR
   (`## Description` omits it) and add no CHANGELOG entry.
 - UI changes require a screenshot/video in the PR (`### Results and Evidence`
-  section of the [PR template](.github/pull_request_template.md)).
+  section of the [PR template](.github/pull_request_template.md)); manual
+  verification steps go in `### How to Test`.
 
 ## Fork coexistence
 
