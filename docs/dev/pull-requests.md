@@ -25,36 +25,22 @@ To address review feedback, push new commits on top of the branch and re-request
 
 ### Body template
 
-Use the following template when creating a Pull Request:
+Use the repository's [pull request template](../../.github/pull_request_template.md)
+when creating a Pull Request. Its structure:
 
 ```markdown
-### Description
-
-<!-- Describe what this change achieves -->
-
-### Issues Resolved
-
-<!-- List any issues this PR will resolve. Prefix the issue with the keyword closes, fixes, fix -->
-<!-- Example: closes #1234 or fixes <Issue_URL> -->
-
-### Evidence
-
-<!-- Attach any evidence. Any change to the UI requires an attached screenshot in the PR Description -->
-
-### Testing the changes
-
-<!--
-  Please provide detailed steps for validating your changes. This could involve specific commands to run,
-  pages to visit, scenarios to try or any other information that would help reviewers verify
-  the functionality of your change
--->
-
-### Check List
-
-...
+## Description
+## Proposed Changes
+### Results and Evidence
+### Artifacts Affected
+### Configuration Changes
+### Documentation Updates
+### Tests Introduced
+### How to Test
+### Review Checklist
 ```
 
-Always link the related issue in **Issues Resolved** with a closing keyword (`closes`, `fixes`, `fix`) so it auto closes on merge, and describe **why** rather than just **what**, the diff already shows what changed, so the description should explain the motivation. Any change to the UI **must** include a screenshot or video as evidence.
+Always link the related issue in **`## Description`** with a closing keyword (`Closes`, `Fixes`, `Fix`) so it auto closes on merge, and describe **why** rather than just **what**, the diff already shows what changed, so the description should explain the motivation. Any change to the UI **must** include a screenshot or video as evidence under **`### Results and Evidence`**.
 
 ### Reviewing a PR
 
