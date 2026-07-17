@@ -25,7 +25,7 @@ To address review feedback, push new commits on top of the branch and re-request
 
 ### Body template
 
-Every Pull Request must use the repository's [pull request template](../../.github/pull_request_template.md). Its full content:
+Every Pull Request must use the repository's pull request template. Its full content:
 
 ```markdown
 ## Description
