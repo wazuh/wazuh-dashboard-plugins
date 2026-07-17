@@ -42,6 +42,9 @@ export const goToVulnerabilityDetection = () =>
   navigate(vulnerabilityDetection.id);
 export const goToActiveResponse = () => navigate(activeResponses.id);
 
+export const goToRegulatoryComplianceHome = () =>
+  navigate(regulatoryCompliance.id);
+
 export const goToRegulatoryCompliance = (tabView: string): void =>
   navigate(regulatoryCompliance.id, {
     path: `#/overview?tab=regulatory-compliance&tabView=${tabView}&tabSubView=dashboard`,

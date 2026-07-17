@@ -23,6 +23,7 @@ jest.mock('../../utils/navigation', () => ({
   goToItHygiene: jest.fn(),
   goToActiveResponse: jest.fn(),
   goToRegulatoryCompliance: jest.fn(),
+  goToRegulatoryComplianceHome: jest.fn(),
 }));
 jest.mock('../../../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),

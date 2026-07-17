@@ -3,7 +3,6 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiLink,
-  EuiPanel,
   EuiSpacer,
   EuiText,
   EuiTitle,
@@ -20,7 +19,11 @@ import {
   useItHygieneServicesCount,
   useItHygieneUsersCount,
 } from '../../hooks/use-overview-data';
-import { goToActiveResponse, goToItHygiene } from '../../utils/navigation';
+import {
+  goToActiveResponse,
+  goToItHygiene,
+  goToRegulatoryComplianceHome,
+} from '../../utils/navigation';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 
 /** IT Hygiene and Active Response load lazily; Regulatory Compliance is static. */
@@ -91,18 +94,19 @@ const SecurityOperationsSectionComponent: React.FC = () => {
           </WidgetGroup>
         </EuiFlexItem>
         <EuiFlexItem>
-          <EuiPanel
-            paddingSize='m'
-            hasBorder
+          <WidgetGroup
+            status='available'
+            title={
+              <EuiLink onClick={goToRegulatoryComplianceHome}>
+                Regulatory Compliance
+              </EuiLink>
+            }
+            caption='Frameworks'
+            centerBody
             data-test-subj='home-overview-regulatory-compliance'
           >
-            <EuiTitle size='xxs'>
-              <h3>Regulatory Compliance</h3>
-            </EuiTitle>
-            <div style={{ marginTop: 10 }}>
-              <RegulatoryComplianceBadges />
-            </div>
-          </EuiPanel>
+            <RegulatoryComplianceBadges />
+          </WidgetGroup>
         </EuiFlexItem>
       </EuiFlexGroup>
     </div>
