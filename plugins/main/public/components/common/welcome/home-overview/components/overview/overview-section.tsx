@@ -1,7 +1,11 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiSpacer } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
-import { WidgetGroup, FindingSeverityTiles } from '../common';
+import {
+  WidgetGroup,
+  FindingSeverityTiles,
+  WIDGET_LOADING_MIN_HEIGHT,
+} from '../common';
 import { AgentsByStatus } from './agents-by-status';
 import { MitreTopTactics } from './mitre-top-tactics';
 import { TopOsTable } from './top-os-table';
@@ -78,6 +82,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
         title='MITRE ATT&CK — last 24 hours (top tactics)'
         caption='Last 24 hours'
         headerLink={{ label: 'MITRE ATT&CK', onClick: goToMitre }}
+        loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
         data-test-subj='home-overview-mitre-tactics'
       >
         {findings.data && (
@@ -100,6 +105,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               title='Top 5 operating systems'
               caption='Current'
               headerLink={{ label: 'IT Hygiene', onClick: goToItHygiene }}
+              loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
               data-test-subj='home-overview-top-os'
             >
               {topOs.data && <TopOsTable items={topOs.data} />}
@@ -111,6 +117,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               title='Top 5 network services'
               caption='Current'
               headerLink={{ label: 'IT Hygiene', onClick: goToItHygiene }}
+              loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
               data-test-subj='home-overview-top-network-services'
             >
               {topServices.data && (

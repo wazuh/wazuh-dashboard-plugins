@@ -8,7 +8,12 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
-import { WidgetGroup, StatTile, FindingSeverityTiles } from '../common';
+import {
+  WidgetGroup,
+  StatTile,
+  FindingSeverityTiles,
+  WIDGET_LOADING_MIN_HEIGHT,
+} from '../common';
 import { TopRulesTable } from './top-rules-table';
 import { TopTechniquesTable } from './top-techniques-table';
 import { VulnerabilitiesByOsTable } from './vulnerabilities-by-os-table';
@@ -53,6 +58,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
               <EuiLink onClick={goToThreatHunting}>Threat Hunting</EuiLink>
             }
             caption='Last 24 hours'
+            loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-threat-hunting-findings'
           >
             {findings.data && (
@@ -78,6 +84,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
             status={findings.status}
             title={<EuiLink onClick={goToMitre}>MITRE ATT&amp;CK</EuiLink>}
             caption='Last 24 hours'
+            loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-techniques'
           >
             {findings.data && (
@@ -112,6 +119,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
               </EuiLink>
             }
             caption='Current'
+            loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-vulnerabilities'
           >
             {vulnerabilities.data && (

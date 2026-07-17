@@ -17,9 +17,18 @@ export interface WidgetGroupHeaderLink {
   onClick?: () => void;
 }
 
+export const WIDGET_LOADING_MIN_HEIGHT = {
+  /** A top-5 bar list or small table, no hero stat above it. */
+  list: 110,
+  /** A hero stat tile followed by a top-5 table. */
+  heroAndList: 190,
+} as const;
+
 export interface WidgetGroupBodyProps {
   status: DataGroupStatus;
   errorLabel?: string;
+  /** Skeleton height reserved while loading; see WIDGET_LOADING_MIN_HEIGHT. */
+  loadingMinHeight?: number;
   children: React.ReactNode;
 }
 
@@ -34,16 +43,17 @@ export interface WidgetGroupBodyProps {
 export const WidgetGroupBody: React.FC<WidgetGroupBodyProps> = ({
   status,
   errorLabel = 'Could not load data',
+  loadingMinHeight,
   children,
 }) => (
   <>
     {status === 'loading' && (
-      <div data-test-subj='widget-group-loading'>
+      <div data-test-subj='widget-group-loading' style={{ minHeight: loadingMinHeight }}>
         <EuiLoadingContent lines={3} />
       </div>
     )}
     {status === 'error' && (
-      <div data-test-subj='widget-group-error'>
+      <div data-test-subj='widget-group-error' style={{ minHeight: loadingMinHeight }}>
         <EuiCallOut
           size='s'
           color='danger'
@@ -70,18 +80,12 @@ export interface WidgetGroupProps {
    * have their own trailing space), so this defaults to false.
    */
   centerBody?: boolean;
+  /** Skeleton height reserved while loading; see WIDGET_LOADING_MIN_HEIGHT. */
+  loadingMinHeight?: number;
   children: React.ReactNode;
   ['data-test-subj']?: string;
 }
 
-/**
- * Maps a data group's status to what renders:
- * - unavailable: nothing (widget hidden)
- * - loading: a skeleton
- * - error: a contained error callout (distinct from unavailable)
- * - available: the widget content
- * Owns the panel + title chrome so hiding removes the panel entirely.
- */
 export const WidgetGroup: React.FC<WidgetGroupProps> = ({
   status,
   title,
@@ -89,6 +93,7 @@ export const WidgetGroup: React.FC<WidgetGroupProps> = ({
   headerLink,
   errorLabel,
   centerBody = false,
+  loadingMinHeight,
   children,
   ...rest
 }) => {
@@ -140,14 +145,12 @@ export const WidgetGroup: React.FC<WidgetGroupProps> = ({
             : { marginTop: 10 }
         }
       >
-        {/* Plain block wrapper: children is often an EuiFlexGroup/EuiPanel,
-            both flex-grow:1 by default. As a direct child of the flex
-            container above that would fill 100% of the height, leaving
-            nothing for justifyContent:center to center against. This
-            wrapper isn't a flex container, so that flex-grow is inert and
-            the block sizes to its content. */}
         <div>
-          <WidgetGroupBody status={status} errorLabel={errorLabel}>
+          <WidgetGroupBody
+            status={status}
+            errorLabel={errorLabel}
+            loadingMinHeight={loadingMinHeight}
+          >
             {children}
           </WidgetGroupBody>
         </div>

@@ -8,7 +8,7 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
-import { WidgetGroup, StatTile } from '../common';
+import { WidgetGroup, StatTile, WIDGET_LOADING_MIN_HEIGHT } from '../common';
 import { ScaTiles } from './sca-tiles';
 import { ScaBenchmarksTable } from './sca-benchmarks-table';
 import { FimPlatformsTable } from './fim-platforms-table';
@@ -66,6 +66,7 @@ const EndpointSecuritySectionComponent: React.FC<
               </EuiLink>
             }
             caption='Current'
+            loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-sca'
           >
             {sca.data && (
@@ -86,6 +87,7 @@ const EndpointSecuritySectionComponent: React.FC<
               </EuiLink>
             }
             caption='Current'
+            loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-fim'
           >
             {fim.data && (
