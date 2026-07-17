@@ -38,6 +38,11 @@ const vulnerabilitiesAvailable = {
   },
 };
 
+const threatIntelAvailable = {
+  status: 'available' as const,
+  data: { total: 2048, feedByType: [] },
+};
+
 beforeEach(() => {
   jest.clearAllMocks();
   asMock(useRulesCount).mockReturnValue(available(482));
@@ -50,10 +55,14 @@ beforeEach(() => {
 describe('ThreatIntelligenceFeedSection', () => {
   it('renders the section with all tiles when everything is available', () => {
     render(
-      <ThreatIntelligenceFeedSection vulnerabilities={vulnerabilitiesAvailable} />,
+      <ThreatIntelligenceFeedSection
+        vulnerabilities={vulnerabilitiesAvailable}
+        threatIntel={threatIntelAvailable}
+      />,
     );
     expect(screen.getByText('Threat intelligence feed')).toBeInTheDocument();
     expect(screen.getByText('Rules')).toBeInTheDocument();
+    expect(screen.getByText('IOCs')).toBeInTheDocument();
     expect(screen.getByText('CVEs matched')).toBeInTheDocument();
     expect(screen.getByText('482')).toBeInTheDocument();
   });
@@ -70,12 +79,13 @@ describe('ThreatIntelligenceFeedSection', () => {
     const { container } = render(
       <ThreatIntelligenceFeedSection
         vulnerabilities={{ status: 'unavailable' }}
+        threatIntel={{ status: 'unavailable' }}
       />,
     );
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('keeps the section (showing CVEs matched) when Security Analytics is absent but vulnerabilities data is not', () => {
+  it('keeps the section (showing IOCs and CVEs matched) when Security Analytics is absent but the feed and vulnerabilities data are not', () => {
     for (const mock of [
       useRulesCount,
       useDecodersCount,
@@ -85,9 +95,13 @@ describe('ThreatIntelligenceFeedSection', () => {
       asMock(mock).mockReturnValue({ status: 'unavailable' });
     }
     render(
-      <ThreatIntelligenceFeedSection vulnerabilities={vulnerabilitiesAvailable} />,
+      <ThreatIntelligenceFeedSection
+        vulnerabilities={vulnerabilitiesAvailable}
+        threatIntel={threatIntelAvailable}
+      />,
     );
     expect(screen.getByText('Threat intelligence feed')).toBeInTheDocument();
+    expect(screen.getByText('IOCs')).toBeInTheDocument();
     expect(screen.getByText('CVEs matched')).toBeInTheDocument();
     expect(screen.queryByText('Rules')).not.toBeInTheDocument();
   });
@@ -95,7 +109,10 @@ describe('ThreatIntelligenceFeedSection', () => {
   it('fetches the Security Analytics tiles lazily once the section enters the viewport', () => {
     asMock(useInViewport).mockReturnValue([{ current: null }, false]);
     render(
-      <ThreatIntelligenceFeedSection vulnerabilities={vulnerabilitiesAvailable} />,
+      <ThreatIntelligenceFeedSection
+        vulnerabilities={vulnerabilitiesAvailable}
+        threatIntel={threatIntelAvailable}
+      />,
     );
     expect(asMock(useRulesCount)).toHaveBeenCalledWith(false);
   });

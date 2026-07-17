@@ -38,6 +38,10 @@ jest.mock('./hooks/use-overview-data', () => ({
       cvesMatched: 0,
     },
   })),
+  useThreatIntelEnrichments: jest.fn(() => ({
+    status: 'available',
+    data: { total: 0, feedByType: [] },
+  })),
 }));
 jest.mock('../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),

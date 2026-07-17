@@ -23,7 +23,6 @@ const findingsAvailable = {
       { key: 'Exploit Public-Facing Application', count: 35378 },
     ],
     iocMatches: 0,
-    iocFeedByType: [],
   },
   indexPatternId: 'idx-1',
 };

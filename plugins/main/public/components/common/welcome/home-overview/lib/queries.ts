@@ -5,7 +5,6 @@ import {
   EVENT_DOC_ID_FIELD,
   FIM_PLATFORM_FIELD,
   FINDING_SEVERITY_FIELD,
-  IOC_INDICATOR_TYPE_FIELD,
   MITRE_TACTIC_NAME_FIELD,
   MITRE_TECHNIQUE_ID_FIELD,
   MITRE_TECHNIQUE_NAME_FIELD,
@@ -14,6 +13,7 @@ import {
   SCA_POLICY_NAME_FIELD,
   SEVERITY_BANDS,
   THREAT_ENRICHMENTS_FIELD,
+  THREAT_INTEL_TYPE_FIELD,
   VULNERABILITY_CVE_ID_FIELD,
   VULNERABILITY_OS_NAME_FIELD,
   VULNERABILITY_SEVERITY_FIELD,
@@ -146,33 +146,25 @@ export function buildIocMatchesAgg() {
 }
 
 /**
- * IOC feed by type (top size): distinct-event count per indicator type, on
- * the same findings search as the IOC Match hero, no extra request.
+ * Malware IOC-match hero on the threat-enrichment subset, as a filter sub-agg
+ * so it rides the shared findings search instead of a separate query. The IOC
+ * feed-by-type composition is a distinct concept sourced from the threat-intel
+ * catalog (see `buildThreatIntelFeedByTypeAgg`), not this findings search.
  */
-export function buildIocFeedByTypeAgg(size = TOP_N) {
+export function buildMalwareFilterAgg() {
   return {
-    [AGG.iocFeedByType]: {
-      terms: {
-        field: IOC_INDICATOR_TYPE_FIELD,
-        size,
-        order: { [AGG.distinctEvents]: 'desc' },
-      },
-      aggs: {
-        [AGG.distinctEvents]: { cardinality: { field: EVENT_DOC_ID_FIELD } },
-      },
+    [AGG.malware]: {
+      filter: { exists: { field: THREAT_ENRICHMENTS_FIELD } },
+      aggs: { ...buildIocMatchesAgg() },
     },
   };
 }
 
 /**
- * Malware/IOC metrics on the threat-enrichment subset, as a filter sub-agg
- * so they ride the shared findings search instead of a separate query.
+ * IOC feed composition by type (top size): a terms agg on the threat-intel
+ * enrichments catalog (`wazuh-threatintel-enrichments*`), counting the feed's
+ * own indicators by `document.type` — what the feed contains, not what matched.
  */
-export function buildMalwareFilterAgg(size = TOP_N) {
-  return {
-    [AGG.malware]: {
-      filter: { exists: { field: THREAT_ENRICHMENTS_FIELD } },
-      aggs: { ...buildIocMatchesAgg(), ...buildIocFeedByTypeAgg(size) },
-    },
-  };
+export function buildThreatIntelFeedByTypeAgg(size = TOP_N) {
+  return buildTopTermsAgg(AGG.iocFeedByType, THREAT_INTEL_TYPE_FIELD, size);
 }

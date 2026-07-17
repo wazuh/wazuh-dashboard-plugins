@@ -4,6 +4,7 @@ import {
   OverviewDataSource,
   FindingsDataSourceRepository,
   SystemInventoryStatesDataSource,
+  SystemInventoryServicesStatesDataSource,
   SystemInventorySystemStatesDataSourceRepository,
   SystemInventoryTrafficStatesDataSourceRepository,
   SystemInventoryPackagesStatesDataSourceRepository,
@@ -17,6 +18,8 @@ import {
   VulnerabilitiesDataSourceRepository,
   ActiveResponsesDataSource,
   ActiveResponsesDataSourceRepository,
+  ThreatIntelEnrichmentsStatesDataSource,
+  ThreatIntelEnrichmentsStatesDataSourceRepository,
   IDataSourceFactoryConstructor,
   PatternDataSource,
   tDataSourceRepository,
@@ -31,6 +34,7 @@ import {
   buildMalwareFilterAgg,
   buildSCATilesAgg,
   buildSCATopBenchmarksAgg,
+  buildThreatIntelFeedByTypeAgg,
   buildTopTermsAgg,
   buildVulnerabilitySeverityFiltersAgg,
   buildVulnerabilityTopOsAgg,
@@ -45,7 +49,6 @@ import {
   mapScaTiles,
   mapSeverityCounts,
   mapTopBuckets,
-  mapTopBucketsByMetric,
 } from '../lib/mappers';
 import {
   fetchDecodersCount,
@@ -58,6 +61,7 @@ import {
   FimOverview,
   FindingsOverview,
   ScaOverview,
+  ThreatIntelEnrichments,
   TopItem,
   VulnerabilityOverview,
 } from '../interfaces/types';
@@ -198,11 +202,6 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
         ),
         topTechniques: mapTopBuckets(response?.aggregations, AGG.topTechniques),
         iocMatches: mapCardinality(malware, AGG.iocMatches),
-        iocFeedByType: mapTopBucketsByMetric(
-          malware,
-          AGG.iocFeedByType,
-          AGG.distinctEvents,
-        ),
       };
     },
   });
@@ -238,7 +237,9 @@ export function useTopNetworkServices(
   enabled: boolean,
 ): DataGroupResult<TopItem[]> {
   return useAggregationGroup<TopItem[]>({
-    DataSource: SystemInventoryStatesDataSource,
+    // Listeners view: the ports index filtered to listening sockets
+    // (destination.port IS 0), mirroring IT Hygiene > Network > Listeners.
+    DataSource: SystemInventoryServicesStatesDataSource,
     createRepository: () =>
       new SystemInventoryTrafficStatesDataSourceRepository(),
     enabled,
@@ -321,7 +322,7 @@ function useSecurityAnalyticsFetch<T>(
   });
 }
 
-/** Rules count (pre-packaged only). */
+/** Enabled rules count, across both the standard and custom content spaces. */
 export function useRulesCount(enabled: boolean): DataGroupResult<number> {
   return useSecurityAnalyticsFetch(enabled, fetchRulesCount);
 }
@@ -361,6 +362,33 @@ export function useVulnerabilityOverview(
         ),
         byOs: mapTopBuckets(response?.aggregations, AGG.vulnerabilitiesByOs),
         cvesMatched: mapCardinality(response?.aggregations, AGG.cvesMatched),
+      };
+    },
+  });
+}
+
+/**
+ * Threat-intel enrichments catalog: the total IOC count (the "IOCs" tile) and
+ * the feed composition by type (Malware Detection's "IOC feed by type"), in one
+ * search over `wazuh-threatintel-enrichments*`. Current-state, so no time range.
+ * Shared by the Endpoint Security and Threat Intelligence Feed sections.
+ */
+export function useThreatIntelEnrichments(
+  enabled: boolean,
+): DataGroupResult<ThreatIntelEnrichments> {
+  return useAggregationGroup<ThreatIntelEnrichments>({
+    DataSource: ThreatIntelEnrichmentsStatesDataSource,
+    createRepository: () =>
+      new ThreatIntelEnrichmentsStatesDataSourceRepository(),
+    enabled,
+    fetch: async fetchData => {
+      const response = await fetchData({
+        aggs: buildThreatIntelFeedByTypeAgg(),
+        pagination: NO_HITS,
+      });
+      return {
+        total: mapDocCount(response),
+        feedByType: mapTopBuckets(response?.aggregations, AGG.iocFeedByType),
       };
     },
   });

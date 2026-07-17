@@ -23,25 +23,30 @@ import {
 } from '../../utils/navigation';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 import { DataGroupResult } from '../../interfaces/data-group';
-import { MalwareOverview } from '../../interfaces/types';
+import { ThreatIntelEnrichments, TopItem } from '../../interfaces/types';
 
 export interface EndpointSecuritySectionProps {
-  /** Malware Detection's IOC metrics ride the shared findings search. */
+  /** Malware Detection's IOC-match hero rides the shared findings search. */
   findings: ReturnType<typeof useFindingsOverview>;
+  /** Feed-by-type comes from the shared threat-intel enrichments catalog. */
+  threatIntel: DataGroupResult<ThreatIntelEnrichments>;
 }
 
 const EndpointSecuritySectionComponent: React.FC<
   EndpointSecuritySectionProps
-> = ({ findings }) => {
+> = ({ findings, threatIntel }) => {
   const [sectionRef, visible] = useInViewport<HTMLDivElement>();
   const sca = useSCAOverview(visible);
   const fim = useFIMOverview(visible);
-  const malware: DataGroupResult<MalwareOverview> = {
+  // Hero (detections, last 24h) and feed-by-type (catalog, current) have
+  // distinct sources, so each carries its own status.
+  const iocMatches: DataGroupResult<number> = {
     status: findings.status,
-    data: findings.data && {
-      iocMatches: findings.data.iocMatches,
-      iocFeedByType: findings.data.iocFeedByType,
-    },
+    data: findings.data?.iocMatches,
+  };
+  const feedByType: DataGroupResult<TopItem[]> = {
+    status: threatIntel.status,
+    data: threatIntel.data?.feedByType,
   };
 
   return (
@@ -104,7 +109,10 @@ const EndpointSecuritySectionComponent: React.FC<
           </WidgetGroup>
         </EuiFlexItem>
         <EuiFlexItem>
-          <MalwareDetectionPanel malware={malware} />
+          <MalwareDetectionPanel
+            iocMatches={iocMatches}
+            feedByType={feedByType}
+          />
         </EuiFlexItem>
       </EuiFlexGroup>
     </div>

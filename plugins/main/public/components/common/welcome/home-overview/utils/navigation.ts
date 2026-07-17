@@ -109,8 +109,10 @@ export const goToDetectors = () =>
   navigate(SECURITY_ANALYTICS_APP_IDS.detectors);
 
 /**
- * Open MITRE ATT&CK filtered to the given field/value; falls back to
- * unfiltered when the findings index pattern isn't known yet.
+ * Open the MITRE ATT&CK Framework tab filtered to the given field/value; falls
+ * back to unfiltered when the findings index pattern isn't known yet. The
+ * Framework tab (`tabView=inventory`) reads the `_g` global filter through the
+ * same data-source/filter-manager the dashboard uses.
  */
 const goToMitreFilteredBy = (
   field: string,
@@ -129,7 +131,7 @@ const goToMitreFilteredBy = (
       indexPatternId,
     ),
   ];
-  const params = `tab=mitre&tabView=dashboard&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
+  const params = `tab=mitre&tabView=inventory&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
     filters,
   )}`;
   navigate(mitreAttack.id, { path: `#/overview?${params}` });

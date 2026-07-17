@@ -20,11 +20,11 @@ export const AGG = {
   fimPlatforms: 'fim_platforms',
   vulnerabilitiesByOs: 'vulnerabilities_by_os',
   cvesMatched: 'cves_matched',
+  /** Distinct-event IOC match count (hero), inside the findings `malware` filter. */
   iocMatches: 'ioc_matches',
-  iocFeedByType: 'ioc_feed_by_type',
   malware: 'malware',
-  /** Per-bucket distinct-event metric inside `ioc_feed_by_type`. */
-  distinctEvents: 'distinct_events',
+  /** Terms on `document.type` over the threat-intel enrichments catalog. */
+  iocFeedByType: 'ioc_feed_by_type',
 } as const;
 
 /** Named buckets in the SCA `sca_result` filters agg. */

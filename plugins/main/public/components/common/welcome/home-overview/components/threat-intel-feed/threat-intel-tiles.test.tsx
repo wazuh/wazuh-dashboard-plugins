@@ -21,9 +21,10 @@ const available = (value: number) => ({ status: 'available' as const, data: valu
 const allAvailable = {
   rules: available(482),
   decoders: available(128),
+  iocs: available(2048),
+  cvesMatched: available(3521),
   integrations: available(14),
   detectors: available(9),
-  cvesMatched: available(3521),
 };
 
 describe('ThreatIntelTiles', () => {
@@ -39,12 +40,15 @@ describe('ThreatIntelTiles', () => {
     expect(goToDetectors).toHaveBeenCalled();
   });
 
-  it('the CVEs matched tile has no click handler (informational only)', () => {
+  it('the IOCs and CVEs matched tiles have no click handler (reference only)', () => {
     const { container } = render(<ThreatIntelTiles {...allAvailable} />);
-    const cvesTile = container.querySelector(
-      '[data-test-subj="threat-intel-tile-cves-matched"]',
-    );
-    expect(cvesTile?.tagName.toLowerCase()).not.toBe('button');
+    for (const testSubj of [
+      'threat-intel-tile-iocs',
+      'threat-intel-tile-cves-matched',
+    ]) {
+      const tile = container.querySelector(`[data-test-subj="${testSubj}"]`);
+      expect(tile?.tagName.toLowerCase()).not.toBe('button');
+    }
   });
 
   it('hides only the tile whose Security Analytics dependency is absent', () => {

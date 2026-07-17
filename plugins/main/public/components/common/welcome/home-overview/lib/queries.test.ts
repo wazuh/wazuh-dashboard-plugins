@@ -10,8 +10,8 @@ import {
   buildVulnerabilityTopOsAgg,
   buildCvesMatchedAgg,
   buildIocMatchesAgg,
-  buildIocFeedByTypeAgg,
   buildMalwareFilterAgg,
+  buildThreatIntelFeedByTypeAgg,
 } from './queries';
 import {
   SEVERITY_BANDS,
@@ -27,8 +27,8 @@ import {
   VULNERABILITY_OS_NAME_FIELD,
   VULNERABILITY_CVE_ID_FIELD,
   EVENT_DOC_ID_FIELD,
-  IOC_INDICATOR_TYPE_FIELD,
   THREAT_ENRICHMENTS_FIELD,
+  THREAT_INTEL_TYPE_FIELD,
 } from './fields';
 
 describe('query builders', () => {
@@ -125,30 +125,21 @@ describe('query builders', () => {
     });
   });
 
-  it('builds the IOC-feed-by-type agg with a distinct-events sub-metric', () => {
-    const agg = buildIocFeedByTypeAgg(5);
-    expect(agg.ioc_feed_by_type.terms).toEqual({
-      field: IOC_INDICATOR_TYPE_FIELD,
-      size: 5,
-      order: { distinct_events: 'desc' },
-    });
-    expect(agg.ioc_feed_by_type.aggs.distinct_events).toEqual({
-      cardinality: { field: EVENT_DOC_ID_FIELD },
+  it('builds the IOC-feed-by-type agg as a terms agg on the enrichments catalog type', () => {
+    expect(buildThreatIntelFeedByTypeAgg(5)).toEqual({
+      ioc_feed_by_type: { terms: { field: THREAT_INTEL_TYPE_FIELD, size: 5 } },
     });
   });
 
-  it('builds the malware filter agg on the threat-enrichment subset, nesting IOC matches and IOC feed by type', () => {
-    const agg = buildMalwareFilterAgg(5);
+  it('builds the malware filter agg on the threat-enrichment subset, nesting only the IOC-match hero', () => {
+    const agg = buildMalwareFilterAgg();
     expect(agg.malware.filter).toEqual({
       exists: { field: THREAT_ENRICHMENTS_FIELD },
     });
     expect(agg.malware.aggs.ioc_matches).toEqual({
       cardinality: { field: EVENT_DOC_ID_FIELD },
     });
-    expect(agg.malware.aggs.ioc_feed_by_type.terms).toEqual({
-      field: IOC_INDICATOR_TYPE_FIELD,
-      size: 5,
-      order: { distinct_events: 'desc' },
-    });
+    // Feed-by-type is no longer part of the findings search.
+    expect(agg.malware.aggs.ioc_feed_by_type).toBeUndefined();
   });
 });

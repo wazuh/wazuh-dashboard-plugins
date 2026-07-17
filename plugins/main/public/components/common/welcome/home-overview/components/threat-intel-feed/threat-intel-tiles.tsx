@@ -13,16 +13,17 @@ import {
 export interface ThreatIntelTilesProps {
   rules: DataGroupResult<number>;
   decoders: DataGroupResult<number>;
+  iocs: DataGroupResult<number>;
+  cvesMatched: DataGroupResult<number>;
   integrations: DataGroupResult<number>;
   detectors: DataGroupResult<number>;
-  cvesMatched: DataGroupResult<number>;
 }
 
 const TILES: Array<{
   key: keyof ThreatIntelTilesProps;
   label: string;
   testSubj: string;
-  /** Present only for the four clickable tiles; CVEs matched is informational-only. */
+  /** Present only for clickable tiles; IOCs and CVEs matched are reference-only. */
   onSelect?: () => void;
 }> = [
   { key: 'rules', label: 'Rules', testSubj: 'threat-intel-tile-rules', onSelect: goToRules },
@@ -31,6 +32,12 @@ const TILES: Array<{
     label: 'Decoders',
     testSubj: 'threat-intel-tile-decoders',
     onSelect: goToDecoders,
+  },
+  { key: 'iocs', label: 'IOCs', testSubj: 'threat-intel-tile-iocs' },
+  {
+    key: 'cvesMatched',
+    label: 'CVEs matched',
+    testSubj: 'threat-intel-tile-cves-matched',
   },
   {
     key: 'integrations',
@@ -43,11 +50,6 @@ const TILES: Array<{
     label: 'Detectors',
     testSubj: 'threat-intel-tile-detectors',
     onSelect: goToDetectors,
-  },
-  {
-    key: 'cvesMatched',
-    label: 'CVEs matched',
-    testSubj: 'threat-intel-tile-cves-matched',
   },
 ];
 

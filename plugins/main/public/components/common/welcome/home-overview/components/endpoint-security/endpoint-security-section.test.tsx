@@ -56,13 +56,22 @@ const findingsAvailable = {
     techniquesCount: 0,
     topTechniques: [],
     iocMatches: 0,
-    iocFeedByType: [{ key: 'Domains', count: 92700 }],
   },
+};
+
+const threatIntelAvailable = {
+  status: 'available' as const,
+  data: { total: 2048, feedByType: [{ key: 'Domains', count: 92700 }] },
 };
 
 describe('EndpointSecuritySection', () => {
   it('renders Configuration Assessment, File Integrity Monitoring, and Malware Detection', () => {
-    render(<EndpointSecuritySection findings={findingsAvailable} />);
+    render(
+      <EndpointSecuritySection
+        findings={findingsAvailable}
+        threatIntel={threatIntelAvailable}
+      />,
+    );
     expect(screen.getByText('Configuration Assessment')).toBeInTheDocument();
     expect(screen.getByText('File Integrity Monitoring')).toBeInTheDocument();
     expect(screen.getByText('Malware Detection')).toBeInTheDocument();
@@ -83,7 +92,10 @@ describe('EndpointSecuritySection', () => {
   it('hides Configuration Assessment when the SCA index is unavailable', () => {
     asMock(useSCAOverview).mockReturnValue({ status: 'unavailable' });
     const { container } = render(
-      <EndpointSecuritySection findings={findingsAvailable} />,
+      <EndpointSecuritySection
+        findings={findingsAvailable}
+        threatIntel={threatIntelAvailable}
+      />,
     );
     expect(
       container.querySelector('[data-test-subj="home-overview-sca"]'),
@@ -91,9 +103,12 @@ describe('EndpointSecuritySection', () => {
     expect(screen.getByText('File Integrity Monitoring')).toBeInTheDocument();
   });
 
-  it('hides Malware Detection when the shared findings search is unavailable', () => {
+  it('hides Malware Detection when the findings-backed hero is unavailable', () => {
     const { container } = render(
-      <EndpointSecuritySection findings={{ status: 'unavailable' }} />,
+      <EndpointSecuritySection
+        findings={{ status: 'unavailable' }}
+        threatIntel={threatIntelAvailable}
+      />,
     );
     expect(
       container.querySelector(
@@ -104,7 +119,12 @@ describe('EndpointSecuritySection', () => {
 
   it('fetches Configuration Assessment and File Integrity Monitoring lazily once the section enters the viewport', () => {
     asMock(useInViewport).mockReturnValue([{ current: null }, false]);
-    render(<EndpointSecuritySection findings={findingsAvailable} />);
+    render(
+      <EndpointSecuritySection
+        findings={findingsAvailable}
+        threatIntel={threatIntelAvailable}
+      />,
+    );
     expect(asMock(useSCAOverview)).toHaveBeenCalledWith(false);
     expect(asMock(useFIMOverview)).toHaveBeenCalledWith(false);
   });

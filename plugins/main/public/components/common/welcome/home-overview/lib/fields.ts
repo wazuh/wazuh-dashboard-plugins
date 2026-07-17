@@ -30,16 +30,18 @@ export const VULNERABILITY_CVE_ID_FIELD = 'vulnerability.id';
 export const EVENT_DOC_ID_FIELD = 'event.doc_id';
 
 /**
- * IOC indicator type (domain/ip/hash) — the field the Malware Detection
- * dashboard aggregates, not the separate Security Analytics IOC catalog.
- */
-export const IOC_INDICATOR_TYPE_FIELD = 'wazuh.threat.enrichments.indicator.type';
-
-/**
  * Presence marks a finding carrying a threat-intel enrichment (IOC) match:
- * the Malware Detection subset of the findings index.
+ * the Malware Detection subset of the findings index. Drives the "IOC matches,
+ * last 24h" hero (a detection metric — distinct from the feed catalog below).
  */
 export const THREAT_ENRICHMENTS_FIELD = 'wazuh.threat.enrichments';
+
+/**
+ * IOC indicator type (domain/url/ip/hash) on the threat-intel enrichments
+ * catalog index (`wazuh-threatintel-enrichments*`). Drives the "IOC feed by
+ * type" breakdown — the composition of the feed itself, not what matched.
+ */
+export const THREAT_INTEL_TYPE_FIELD = 'document.type';
 
 /**
  * vulnerability.severity values are capitalized, unlike the lowercase

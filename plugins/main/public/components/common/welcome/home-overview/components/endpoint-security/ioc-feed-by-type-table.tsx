@@ -12,7 +12,7 @@ export const IocFeedByTypeTable: React.FC<IocFeedByTypeTableProps> = ({
   <TopNTable
     items={items}
     keyColumnName='IOC feed by type (top 5)'
-    noItemsMessage='No IOC matches in the last 24 hours'
+    noItemsMessage='No IOC indicators in the threat-intel feed'
     data-test-subj='ioc-feed-by-type-table'
   />
 );

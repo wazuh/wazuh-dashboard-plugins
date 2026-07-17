@@ -22,9 +22,8 @@ export interface FindingsOverview {
   topRules: TopItem[];
   techniquesCount: number;
   topTechniques: TopItem[];
-  /** IOC metrics, from the same findings search. */
+  /** IOC matches (last 24h detection metric), from the same findings search. */
   iocMatches: number;
-  iocFeedByType: TopItem[];
 }
 
 export interface ScaTilesData {
@@ -54,10 +53,15 @@ export interface FimOverview {
   platforms: TopItem[];
 }
 
-export interface MalwareOverview {
-  iocMatches: number;
-  /** IOC feed by type, from the same findings search. */
-  iocFeedByType: TopItem[];
+/**
+ * Threat-intel enrichments catalog (`wazuh-threatintel-enrichments*`): the feed
+ * of IOC indicators the platform detects with. Current-state, not time-bounded.
+ */
+export interface ThreatIntelEnrichments {
+  /** Total IOC indicators in the feed catalog (the "IOCs" tile). */
+  total: number;
+  /** Feed composition by indicator type (the Malware "IOC feed by type" table). */
+  feedByType: TopItem[];
 }
 
 export interface VulnerabilityOverview {
