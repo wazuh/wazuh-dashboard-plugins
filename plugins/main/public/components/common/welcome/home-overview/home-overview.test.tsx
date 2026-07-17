@@ -4,32 +4,43 @@ import { render, screen } from '@testing-library/react';
 
 // Stub the sections and the shared findings hook so the shell test doesn't
 // pull the data-access seam.
-jest.mock('./components/overview-section', () => ({
+jest.mock('./components/overview', () => ({
   OverviewSection: () => <div data-test-subj='overview-section' />,
 }));
-jest.mock('./components/endpoint-security-section', () => ({
+jest.mock('./components/endpoint-security', () => ({
   EndpointSecuritySection: () => (
     <div data-test-subj='endpoint-security-section' />
   ),
 }));
-jest.mock('./components/threat-hunting-section', () => ({
+jest.mock('./components/threat-hunting', () => ({
   ThreatHuntingSection: () => <div data-test-subj='threat-hunting-section' />,
 }));
-jest.mock('./components/security-operations-section', () => ({
+jest.mock('./components/security-operations', () => ({
   SecurityOperationsSection: () => (
     <div data-test-subj='security-operations-section' />
   ),
 }));
-jest.mock('./components/cloud-security-section', () => ({
+jest.mock('./components/cloud-security', () => ({
   CloudSecuritySection: () => <div data-test-subj='cloud-security-section' />,
 }));
-jest.mock('./components/threat-intelligence-feed-section', () => ({
+jest.mock('./components/threat-intel-feed', () => ({
   ThreatIntelligenceFeedSection: () => (
     <div data-test-subj='threat-intelligence-feed-section' />
   ),
 }));
-jest.mock('./services/use-overview-data', () => ({
+jest.mock('./hooks/use-overview-data', () => ({
   useFindingsOverview: jest.fn(() => ({ status: 'loading' })),
+  useVulnerabilityOverview: jest.fn(() => ({
+    status: 'available',
+    data: {
+      severity: { critical: 0, high: 0, medium: 0, low: 0 },
+      byOs: [],
+      cvesMatched: 0,
+    },
+  })),
+}));
+jest.mock('../../hooks', () => ({
+  useInViewport: jest.fn(() => [{ current: null }, true]),
 }));
 
 import { HomeOverview } from './home-overview';

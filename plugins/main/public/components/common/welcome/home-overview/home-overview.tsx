@@ -1,12 +1,16 @@
 import React from 'react';
 import { EuiPage, EuiPageBody, EuiTitle, EuiSpacer } from '@elastic/eui';
-import { OverviewSection } from './components/overview-section';
-import { EndpointSecuritySection } from './components/endpoint-security-section';
-import { ThreatHuntingSection } from './components/threat-hunting-section';
-import { SecurityOperationsSection } from './components/security-operations-section';
-import { CloudSecuritySection } from './components/cloud-security-section';
-import { ThreatIntelligenceFeedSection } from './components/threat-intelligence-feed-section';
-import { useFindingsOverview } from './services/use-overview-data';
+import { OverviewSection } from './components/overview';
+import { EndpointSecuritySection } from './components/endpoint-security';
+import { ThreatHuntingSection } from './components/threat-hunting';
+import { SecurityOperationsSection } from './components/security-operations';
+import { CloudSecuritySection } from './components/cloud-security';
+import { ThreatIntelligenceFeedSection } from './components/threat-intel-feed';
+import {
+  useFindingsOverview,
+  useVulnerabilityOverview,
+} from './hooks/use-overview-data';
+import { useInViewport } from '../../hooks';
 
 const HomeOverviewHeader: React.FC = () => (
   <EuiTitle size='s'>
@@ -15,12 +19,14 @@ const HomeOverviewHeader: React.FC = () => (
 );
 
 /**
- * The page body. The shared findings search (read by both OVERVIEW and
- * Threat Hunting) is owned here so both sections read the same result
- * rather than each issuing their own scan.
+ * Findings (on mount) and vulnerabilities (lazy) are searched once here and
+ * shared across sections.
  */
 const HomeOverviewBody: React.FC = () => {
   const findings = useFindingsOverview();
+  const [vulnerabilitiesRef, vulnerabilitiesVisible] =
+    useInViewport<HTMLDivElement>();
+  const vulnerabilities = useVulnerabilityOverview(vulnerabilitiesVisible);
 
   return (
     <>
@@ -28,11 +34,13 @@ const HomeOverviewBody: React.FC = () => {
       <EuiSpacer size='m' />
       <OverviewSection findings={findings} />
       <EuiSpacer size='l' />
-      <EndpointSecuritySection />
+      <EndpointSecuritySection findings={findings} />
       <EuiSpacer size='l' />
-      <ThreatHuntingSection findings={findings} />
+      <div ref={vulnerabilitiesRef}>
+        <ThreatHuntingSection findings={findings} vulnerabilities={vulnerabilities} />
+      </div>
       <EuiSpacer size='l' />
-      <ThreatIntelligenceFeedSection />
+      <ThreatIntelligenceFeedSection vulnerabilities={vulnerabilities} />
       <EuiSpacer size='l' />
       <SecurityOperationsSection />
       <EuiSpacer size='l' />
@@ -41,10 +49,6 @@ const HomeOverviewBody: React.FC = () => {
   );
 };
 
-/**
- * The Home overview landing page: a live security dashboard that replaces the
- * static module catalog.
- */
 export const HomeOverview: React.FC = () => (
   <EuiPage paddingSize='l'>
     <EuiPageBody>
