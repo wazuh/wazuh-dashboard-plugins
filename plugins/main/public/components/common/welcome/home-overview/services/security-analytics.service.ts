@@ -1,24 +1,11 @@
 /* eslint-disable camelcase */
 import { getHttp } from '../../../../../kibana-services';
-import { DATA_SOURCE_NOT_FOUND } from '../interfaces/data-group';
+import { ErrorDataSourceNotFound } from '../../../../../utils/errors';
 
 /**
- * Shared count client for Rules/Decoders/Integrations/Detectors. Every
- * Security Analytics dashboards-plugin route answers via core.http with an
- * { ok, response, error } envelope. Two distinct "capability absent" signals
- * both map to the same data_source_not_found a missing index pattern
- * throws, so callers hide the widget instead of showing an error:
- * - HTTP 404: dashboards-side plugin not installed, so the OSD proxy route
- *   doesn't exist.
- * - ok:false, error "no handler found for uri [...]": proxy route exists
- *   and forwarded the request, but the cluster-side native plugin doesn't
- *   implement that endpoint (verified live: these are separate plugins that
- *   can be out of sync).
- * Any other ok:false is a genuine query failure.
- *
- * IOC catalog (IOCs tile, IOC-feed-by-type) used to be served here too; that
- * endpoint doesn't exist on this backend, so IOC-feed-by-type now reads off
- * the shared findings search instead (buildIocFeedByTypeAgg in queries.ts).
+ * Count client for the Security Analytics Rules/Decoders/Integrations/Detectors
+ * `_search` routes. Each replies via `core.http` with an
+ * `{ ok, response, error }` response.
  */
 
 const SECURITY_ANALYTICS_BASE = '../_plugins/_security_analytics';
@@ -30,7 +17,18 @@ export const SECURITY_ANALYTICS_ROUTES = {
   detectorsSearch: `${SECURITY_ANALYTICS_BASE}/detectors/_search`,
 };
 
-interface SecurityAnalyticsEnvelope<T> {
+/**
+ * Content documents live in a `space.name` (`standard` = pre-packaged, `custom`
+ * = user-defined) and carry a `document.enabled` flag. Counts sum both spaces
+ * and include only enabled entities.
+ */
+const CONTENT_SPACES = ['standard', 'custom'];
+const ENABLED_ONLY = { term: { 'document.enabled': true } };
+const SPACES_AND_ENABLED = {
+  bool: { filter: [{ terms: { 'space.name': CONTENT_SPACES } }, ENABLED_ONLY] },
+};
+
+interface SecurityAnalyticsResponse<T> {
   ok?: boolean;
   error?: string;
   response?: T;
@@ -49,36 +47,31 @@ function isSecurityAnalyticsNotFound(error: unknown): boolean {
   );
 }
 
-/** OpenSearch's "no handler found for uri" response: cluster-side plugin doesn't implement this endpoint. */
 function isUnhandledUri(errorMessage: string | undefined): boolean {
-  return typeof errorMessage === 'string' && errorMessage.includes('no handler found for uri');
+  return (
+    typeof errorMessage === 'string' &&
+    errorMessage.includes('no handler found for uri')
+  );
 }
 
-/**
- * Throws data_source_not_found if capability-absent, else a genuine
- * query-failure Error. Callers still check `ok` for the success path.
- */
 function throwIfCapabilityAbsent(error: string | undefined): never {
   if (isUnhandledUri(error)) {
-    throw { type: DATA_SOURCE_NOT_FOUND };
+    throw new ErrorDataSourceNotFound(
+      error ?? 'Security Analytics endpoint not found',
+    );
   }
   throw new Error(error ?? 'Security Analytics returned an error');
 }
 
 interface SecurityAnalyticsSearchRequest {
   route: string;
-  /** Omit entirely for a route that misreads an explicit body as its ES query. */
   body?: Record<string, unknown>;
   query?: Record<string, unknown>;
 }
 
 /**
- * POSTs to a Rules/Decoders/Integrations/Detectors _search route via
- * core.http and reads the count. The four routes are genuinely inconsistent
- * (confirmed against the SA plugin source):
- * - Decoders: count is response.total, not hits.total.
- * - Rules: body goes straight to the native OpenSearch SA REST API, so
- *   size:0 + hits.total works as-is.
+ * POSTs a `_search` to one of the SA routes and reads the total. Decoders
+ * report the count as `response.total`; the others as `hits.total`.
  */
 async function fetchSecurityAnalyticsSearchCount({
   route,
@@ -89,15 +82,17 @@ async function fetchSecurityAnalyticsSearchCount({
     hits?: { total?: number | { value?: number } };
     total?: number;
   };
-  let envelope: SecurityAnalyticsEnvelope<SearchResponse>;
+  let envelope: SecurityAnalyticsResponse<SearchResponse>;
   try {
     envelope = (await getHttp().post(route, {
       ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
       ...(query ? { query } : {}),
-    })) as SecurityAnalyticsEnvelope<SearchResponse>;
+    })) as SecurityAnalyticsResponse<SearchResponse>;
   } catch (error) {
     if (isSecurityAnalyticsNotFound(error)) {
-      throw { type: DATA_SOURCE_NOT_FOUND };
+      throw new ErrorDataSourceNotFound(
+        'Security Analytics dashboards plugin not found',
+      );
     }
     throw error;
   }
@@ -112,30 +107,34 @@ async function fetchSecurityAnalyticsSearchCount({
   );
 }
 
-/**
- * Rules tile: pre-packaged only (combined pre-packaged+custom total needs a
- * second call). Verified live: needs an explicit query; a bare { size: 0 }
- * throws illegal_argument_exception: inner bool query clause cannot be null.
- */
 export async function fetchRulesCount(): Promise<number> {
-  return fetchSecurityAnalyticsSearchCount({
-    route: SECURITY_ANALYTICS_ROUTES.rulesSearch,
-    body: { size: 0, query: { match_all: {} } },
-    query: { prePackaged: true },
-  });
+  const [standard, custom] = await Promise.all(
+    [true, false].map(prePackaged =>
+      fetchSecurityAnalyticsSearchCount({
+        route: SECURITY_ANALYTICS_ROUTES.rulesSearch,
+        body: { size: 0, query: ENABLED_ONLY },
+        query: { prePackaged },
+      }),
+    ),
+  );
+  return standard + custom;
 }
 
 export async function fetchDecodersCount(): Promise<number> {
   return fetchSecurityAnalyticsSearchCount({
     route: SECURITY_ANALYTICS_ROUTES.decodersSearch,
-    body: { size: 0 },
+    body: { size: 0, query: SPACES_AND_ENABLED },
   });
 }
 
+/**
+ * The integrations route treats the whole body (minus `size`/`_source`) as the
+ * ES query, so the filter goes at the top level, not under `query`.
+ */
 export async function fetchIntegrationsCount(): Promise<number> {
   return fetchSecurityAnalyticsSearchCount({
     route: SECURITY_ANALYTICS_ROUTES.integrationsSearch,
-    body: { size: 0 },
+    body: { size: 0, ...SPACES_AND_ENABLED },
   });
 }
 

@@ -6,13 +6,8 @@ import {
   TopItem,
 } from '../interfaces/types';
 import { SEVERITY_BANDS } from './fields';
-import { AGG, SCA_RESULT_BUCKET } from './agg-names';
+import { AGG, SCA_RESULT_BUCKET } from './constants';
 import { CheckResult } from '../../../../overview/sca/utils/constants';
-
-/**
- * Pure transforms from OpenSearch/API responses to widget data. `camelcase`
- * is off because response fields (doc_count, never_connected) are snake_case.
- */
 
 interface FiltersAggBucket {
   doc_count?: number;

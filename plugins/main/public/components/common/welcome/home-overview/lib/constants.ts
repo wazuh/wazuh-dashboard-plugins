@@ -1,7 +1,7 @@
 /**
  * Aggregation and bucket keys shared between the query builders (queries.ts)
  * and the mappers/hooks that read the responses back. Naming each key once here
- * keeps the producer and consumer from drifting — a mismatch would otherwise
+ * keeps the producer and consumer from drifting, a mismatch would otherwise
  * fail silently (the read just returns nothing).
  */
 export const AGG = {

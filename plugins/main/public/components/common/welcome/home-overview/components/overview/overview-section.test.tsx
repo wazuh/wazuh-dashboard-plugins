@@ -79,7 +79,7 @@ describe('OverviewSection', () => {
   it('renders every OVERVIEW widget when all groups are available', () => {
     render(<OverviewSection findings={findingsAvailable} />);
     expect(screen.getByText('Agents by status')).toBeInTheDocument();
-    expect(screen.getByText('Findings — last 24 hours')).toBeInTheDocument();
+    expect(screen.getByText('Findings')).toBeInTheDocument();
     expect(
       screen.getByText('MITRE ATT&CK — last 24 hours (top tactics)'),
     ).toBeInTheDocument();
@@ -115,7 +115,7 @@ describe('OverviewSection', () => {
       container.querySelectorAll('[data-test-subj="widget-group-error"]')
         .length,
     ).toBeGreaterThan(0);
-    expect(screen.getByText('Findings — last 24 hours')).toBeInTheDocument();
+    expect(screen.getByText('Findings')).toBeInTheDocument();
   });
 
   it('defers the inventory groups until the row enters the viewport', () => {

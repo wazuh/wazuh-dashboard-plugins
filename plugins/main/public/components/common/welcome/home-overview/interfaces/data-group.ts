@@ -1,14 +1,16 @@
+import { ErrorDataSourceNotFound } from '../../../../../utils/errors';
+
 /**
- * Status of a single data group: distinguishes "dependency absent" (hide)
- * from "query failed" (error box).
+ * Status of a single data group
  */
 export type DataGroupStatus = 'loading' | 'available' | 'unavailable' | 'error';
 
 /**
- * Thrown to mark a group unavailable (not error): the shape a missing index
- * pattern throws, reused for a missing Security Analytics plugin.
+ * A fetch throwing an error of this `type` marks its group unavailable rather
+ * than errored. Sourced from the app's `ErrorDataSourceNotFound` so the check
+ * matches what the data-source layer already throws for a missing index pattern.
  */
-export const DATA_SOURCE_NOT_FOUND = 'data_source_not_found';
+export const DATA_SOURCE_NOT_FOUND = ErrorDataSourceNotFound.type;
 
 export interface DataGroupResult<T> {
   status: DataGroupStatus;

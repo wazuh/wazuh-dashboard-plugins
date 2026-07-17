@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { CheckResult } from '../../../../overview/sca/utils/constants';
-import { AGG, SCA_RESULT_BUCKET, TOP_N } from './agg-names';
+import { AGG, SCA_RESULT_BUCKET, TOP_N } from './constants';
 import {
   EVENT_DOC_ID_FIELD,
   FIM_PLATFORM_FIELD,
@@ -21,7 +21,7 @@ import {
 } from './fields';
 
 /**
- * OpenSearch aggregation builders for Overview, Endpoint Security and Threat
+ * Aggregation builders for Overview, Endpoint Security and Threat
  * Hunting. Pure (no data-source coupling), reused across the batched
  * findings search and the per-index-group searches.
  */

@@ -35,7 +35,7 @@ import {
   buildVulnerabilityTopOsAgg,
 } from '../lib/queries';
 import { HOST_OS_NAME_FIELD, PROCESS_NAME_FIELD } from '../lib/fields';
-import { AGG } from '../lib/agg-names';
+import { AGG } from '../lib/constants';
 import {
   mapAgentStatus,
   mapCardinality,
@@ -62,18 +62,16 @@ import {
 } from '../interfaces/types';
 import { DATA_SOURCE_NOT_FOUND, DataGroupResult } from '../interfaces/data-group';
 
-/**
- * Data hooks for the Home overview. Every widget reads its data through one of
- * these; they wrap SearchSource aggregations, the Wazuh API, and Security
- * Analytics.
- */
+// Data hooks for the Home overview. Every widget reads its data through one of
+// these; they wrap SearchSource aggregations, the Wazuh API, and Security
+// Analytics.
 
 const LAST_24H = { from: 'now-24h', to: 'now' };
 /** Aggregations and counts only; never fetch document hits. */
 const NO_HITS: { pageSize: number } = { pageSize: 0 };
 
 /**
- * State machine for one group. `data_source_not_found` → unavailable (hidden);
+ * State handling for one group. `data_source_not_found` → unavailable (hidden);
  * any other error → error.
  */
 function useDataGroup<T>(options: {
@@ -136,7 +134,7 @@ function useDataGroup<T>(options: {
 type FetchData = ReturnType<typeof useDataSource>['fetchData'];
 
 /**
- * Runs one aggregation search and drives the state machine. `fetch` gets the
+ * Runs one aggregation search and drives the state handling. `fetch` gets the
  * bound `fetchData`; `dataSource` is returned for the findings index-pattern id.
  */
 function useAggregationGroup<T>(options: {

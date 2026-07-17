@@ -26,7 +26,6 @@ export const VULNERABILITY_CVE_ID_FIELD = 'vulnerability.id';
 /**
  * One event can carry more than one threat-enrichment match, so Malware
  * Detection counts distinct events via this field rather than raw doc count
- * (confirmed: its own dashboard panels all use cardinality(event.doc_id)).
  */
 export const EVENT_DOC_ID_FIELD = 'event.doc_id';
 
