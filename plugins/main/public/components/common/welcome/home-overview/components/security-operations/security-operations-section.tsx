@@ -1,7 +1,7 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiLink } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
-import { WidgetGroup, StatTile, SectionHeader } from '../common';
+import { WidgetGroup, StatTile, TabNumber, SectionHeader } from '../common';
 import { ItHygieneTiles } from './it-hygiene-tiles';
 import { RegulatoryComplianceBadges } from './regulatory-compliance-badges';
 import { useInViewport } from '../../../../hooks';
@@ -17,7 +17,6 @@ import {
   goToItHygiene,
   goToRegulatoryComplianceHome,
 } from '../../utils/navigation';
-import { formatUINumber } from '../../../../../../react-services/format-number';
 
 /** IT Hygiene and Active Response load lazily; Regulatory Compliance is static. */
 const SecurityOperationsSectionComponent: React.FC = () => {
@@ -71,11 +70,7 @@ const SecurityOperationsSectionComponent: React.FC = () => {
               <StatTile
                 textAlign='center'
                 reverse
-                value={
-                  <span className='tab-num'>
-                    {formatUINumber(activeResponse.data)}
-                  </span>
-                }
+                value={<TabNumber value={activeResponse.data} />}
                 label='Actions triggered, last 24 hours'
                 data-test-subj='active-response-stat'
               />

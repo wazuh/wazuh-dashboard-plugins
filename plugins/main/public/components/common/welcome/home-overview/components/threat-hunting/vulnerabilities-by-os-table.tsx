@@ -1,18 +1,7 @@
-import React from 'react';
-import { TopNTable } from '../common';
-import { TopItem } from '../../interfaces/types';
+import { createTopNTable } from '../common';
 
-export interface VulnerabilitiesByOsTableProps {
-  items: TopItem[];
-}
-
-export const VulnerabilitiesByOsTable: React.FC<
-  VulnerabilitiesByOsTableProps
-> = ({ items }) => (
-  <TopNTable
-    items={items}
-    keyColumnName='Vulnerabilities by OS'
-    noItemsMessage='No vulnerabilities found'
-    data-test-subj='vulnerabilities-by-os-table'
-  />
-);
+export const VulnerabilitiesByOsTable = createTopNTable({
+  keyColumnName: 'Vulnerabilities by OS',
+  noItemsMessage: 'No vulnerabilities found',
+  'data-test-subj': 'vulnerabilities-by-os-table',
+});

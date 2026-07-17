@@ -51,17 +51,19 @@ import { HomeOverview } from './home-overview';
 
 describe('HomeOverview shell', () => {
   it('renders the header and every section', () => {
-    render(<HomeOverview />);
+    const { container } = render(<HomeOverview />);
     expect(screen.getByText('Overview')).toBeInTheDocument();
-    expect(screen.getByTestId('overview-section')).toBeInTheDocument();
-    expect(screen.getByTestId('endpoint-security-section')).toBeInTheDocument();
-    expect(screen.getByTestId('threat-hunting-section')).toBeInTheDocument();
-    expect(
-      screen.getByTestId('security-operations-section'),
-    ).toBeInTheDocument();
-    expect(screen.getByTestId('cloud-security-section')).toBeInTheDocument();
-    expect(
-      screen.getByTestId('threat-intelligence-feed-section'),
-    ).toBeInTheDocument();
+    for (const section of [
+      'overview-section',
+      'endpoint-security-section',
+      'threat-hunting-section',
+      'security-operations-section',
+      'cloud-security-section',
+      'threat-intelligence-feed-section',
+    ]) {
+      expect(
+        container.querySelector(`[data-test-subj="${section}"]`),
+      ).toBeInTheDocument();
+    }
   });
 });

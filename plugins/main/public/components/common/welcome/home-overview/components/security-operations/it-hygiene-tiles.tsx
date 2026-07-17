@@ -1,8 +1,6 @@
 import React from 'react';
-import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
-import { WidgetGroupBody, StatTile } from '../common';
+import { StatTileGroup, StatTileSpec } from '../common';
 import { DataGroupResult } from '../../interfaces/data-group';
-import { formatUINumber } from '../../../../../../react-services/format-number';
 
 export interface ItHygieneTilesProps {
   operatingSystems: DataGroupResult<number>;
@@ -11,11 +9,7 @@ export interface ItHygieneTilesProps {
   services: DataGroupResult<number>;
 }
 
-const TILES: Array<{
-  key: keyof ItHygieneTilesProps;
-  label: string;
-  testSubj: string;
-}> = [
+const TILES: ReadonlyArray<StatTileSpec<keyof ItHygieneTilesProps>> = [
   {
     key: 'operatingSystems',
     label: 'Operating systems',
@@ -31,28 +25,5 @@ const TILES: Array<{
  * so a missing inventory index hides only its own tile, not the whole panel.
  */
 export const ItHygieneTiles: React.FC<ItHygieneTilesProps> = props => (
-  <EuiFlexGroup gutterSize='m' responsive={false} wrap>
-    {TILES.map(tile => {
-      const result = props[tile.key];
-      if (result.status === 'unavailable') {
-        return null;
-      }
-      return (
-        <EuiFlexItem key={tile.key}>
-          <WidgetGroupBody status={result.status}>
-            {result.data !== undefined && (
-              <StatTile
-                value={
-                  <span className='tab-num'>{formatUINumber(result.data)}</span>
-                }
-                label={tile.label}
-                reverse
-                data-test-subj={tile.testSubj}
-              />
-            )}
-          </WidgetGroupBody>
-        </EuiFlexItem>
-      );
-    })}
-  </EuiFlexGroup>
+  <StatTileGroup tiles={TILES} results={props} />
 );

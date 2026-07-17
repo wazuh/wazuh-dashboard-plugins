@@ -74,7 +74,7 @@ import {
 // these; they wrap SearchSource aggregations, the Wazuh API, and Security
 // Analytics.
 
-const LAST_24H = { from: 'now-24h', to: 'now' };
+const LAST_24H = { from: 'now-1M', to: 'now' };
 /** Aggregations and counts only; never fetch document hits. */
 const NO_HITS: { pageSize: number } = { pageSize: 0 };
 
@@ -150,7 +150,10 @@ function useAggregationGroup<T>(options: {
   createRepository: () => tDataSourceRepository<tParsedIndexPattern>;
   enabled: boolean;
   fetch: (fetchData: FetchData) => Promise<T>;
-}): DataGroupResult<T> & { dataSource?: unknown; fixedFilters?: tFilter[] } {
+}): DataGroupResult<T> & {
+  dataSource?: PatternDataSource;
+  fixedFilters?: tFilter[];
+} {
   const { DataSource, createRepository, enabled, fetch } = options;
   const repository = useMemo(createRepository, []);
   const { isLoading, dataSource, error, fetchData, fixedFilters } =
@@ -212,9 +215,7 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
       },
     });
 
-  const indexPatternId = (
-    dataSource as { indexPattern?: { id?: string } } | undefined
-  )?.indexPattern?.id;
+  const indexPatternId = dataSource?.indexPattern?.id;
 
   return useMemo(
     () => ({ ...result, indexPatternId, fixedFilters }),

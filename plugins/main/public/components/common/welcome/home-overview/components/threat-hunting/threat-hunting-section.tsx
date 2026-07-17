@@ -4,6 +4,7 @@ import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-bo
 import {
   WidgetGroup,
   StatTile,
+  TabNumber,
   FindingSeverityTiles,
   SectionHeader,
   WIDGET_LOADING_MIN_HEIGHT,
@@ -21,7 +22,6 @@ import {
   goToThreatHunting,
   goToVulnerabilityDetection,
 } from '../../utils/navigation';
-import { formatUINumber } from '../../../../../../react-services/format-number';
 
 export interface ThreatHuntingSectionProps {
   /** Reuses the Overview on-mount findings search. */
@@ -56,11 +56,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                 <StatTile
                   textAlign='center'
                   reverse
-                  value={
-                    <span className='tab-num'>
-                      {formatUINumber(findings.data.totalFindings)}
-                    </span>
-                  }
+                  value={<TabNumber value={findings.data.totalFindings} />}
                   label='Total findings, last 24 hours'
                   data-test-subj='total-findings-hero'
                 />
@@ -83,11 +79,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                 <StatTile
                   textAlign='center'
                   reverse
-                  value={
-                    <span className='tab-num'>
-                      {formatUINumber(findings.data.techniquesCount)}
-                    </span>
-                  }
+                  value={<TabNumber value={findings.data.techniquesCount} />}
                   label='Techniques observed, last 24 hours'
                   data-test-subj='techniques-hero'
                 />

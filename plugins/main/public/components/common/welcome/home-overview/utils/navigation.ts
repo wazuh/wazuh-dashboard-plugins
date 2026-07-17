@@ -15,13 +15,14 @@ import rison from 'rison-node';
 import {
   FILTER_OPERATOR,
   PatternDataSourceFilterManager,
-} from '../../../data-source/pattern/pattern-data-source-filter-manager';
-import { tFilter } from '../../../data-source';
+  tFilter,
+} from '../../../data-source';
 import {
   FINDING_SEVERITY_FIELD,
   MITRE_TACTIC_NAME_FIELD,
   MITRE_TECHNIQUE_NAME_FIELD,
 } from '../lib/fields';
+import { SeverityBand } from '../interfaces/types';
 
 /** Navigation helpers, kept in one module so sections depend on one boundary. */
 
@@ -44,7 +45,7 @@ const DISCOVER_APP_ID = 'data-explorer';
  * Open Discover filtered to a findings severity band. `IS` on `wazuh.rule.level`
  */
 export const goToDiscoverFindingsBySeverity = (
-  band: string,
+  band: SeverityBand,
   indexPatternId?: string,
   fixedFilters: tFilter[] = [],
 ): void => {

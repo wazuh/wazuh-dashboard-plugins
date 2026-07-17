@@ -1,7 +1,7 @@
 import React from 'react';
 import { EuiBasicTable, EuiBasicTableColumn } from '@elastic/eui';
 import { TopItem } from '../../interfaces/types';
-import { formatUINumber } from '../../../../../../react-services/format-number';
+import { TabNumber } from './tab-number';
 
 export interface TopNTableProps {
   items: TopItem[];
@@ -34,9 +34,7 @@ export const TopNTable: React.FC<TopNTableProps> = ({
       name: countColumnName,
       align: 'right',
       width: '90px',
-      render: (count: number) => (
-        <span className='tab-num'>{formatUINumber(count)}</span>
-      ),
+      render: (count: number) => <TabNumber value={count} />,
     },
   ];
 
@@ -51,4 +49,17 @@ export const TopNTable: React.FC<TopNTableProps> = ({
       />
     </div>
   );
+};
+
+/** Fixed presentation for a Top-N table, bound once by `createTopNTable`. */
+export type TopNTableConfig = Omit<TopNTableProps, 'items'>;
+
+export const createTopNTable = (
+  config: TopNTableConfig,
+): React.FC<{ items: TopItem[] }> => {
+  const Table: React.FC<{ items: TopItem[] }> = ({ items }) => (
+    <TopNTable items={items} {...config} />
+  );
+  Table.displayName = `TopNTable(${config['data-test-subj'] ?? 'unnamed'})`;
+  return Table;
 };

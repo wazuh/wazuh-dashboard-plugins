@@ -4,6 +4,7 @@ import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-bo
 import {
   WidgetGroup,
   StatTile,
+  TabNumber,
   SectionHeader,
   WIDGET_LOADING_MIN_HEIGHT,
 } from '../common';
@@ -21,7 +22,6 @@ import {
   goToConfigurationAssessment,
   goToFileIntegrityMonitoring,
 } from '../../utils/navigation';
-import { formatUINumber } from '../../../../../../react-services/format-number';
 import { DataGroupResult } from '../../interfaces/data-group';
 import { ThreatIntelEnrichments, TopItem } from '../../interfaces/types';
 
@@ -92,11 +92,7 @@ const EndpointSecuritySectionComponent: React.FC<
             {fim.data && (
               <>
                 <StatTile
-                  value={
-                    <span className='tab-num'>
-                      {formatUINumber(fim.data.total)}
-                    </span>
-                  }
+                  value={<TabNumber value={fim.data.total} />}
                   label='Files & registry objects baselined fleet-wide'
                   reverse
                   textAlign='center'

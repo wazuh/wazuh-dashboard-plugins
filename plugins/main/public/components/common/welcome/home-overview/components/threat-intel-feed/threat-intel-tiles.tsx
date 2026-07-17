@@ -1,8 +1,6 @@
 import React from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiPanel } from '@elastic/eui';
-import { WidgetGroupBody, StatTile } from '../common';
+import { StatTileGroup, StatTileSpec } from '../common';
 import { DataGroupResult } from '../../interfaces/data-group';
-import { formatUINumber } from '../../../../../../react-services/format-number';
 import {
   goToDecoders,
   goToDetectors,
@@ -19,13 +17,7 @@ export interface ThreatIntelTilesProps {
   detectors: DataGroupResult<number>;
 }
 
-const TILES: Array<{
-  key: keyof ThreatIntelTilesProps;
-  label: string;
-  testSubj: string;
-  /** Present only for clickable tiles; IOCs and CVEs matched are reference-only. */
-  onSelect?: () => void;
-}> = [
+const TILES: ReadonlyArray<StatTileSpec<keyof ThreatIntelTilesProps>> = [
   {
     key: 'rules',
     label: 'Rules',
@@ -38,6 +30,7 @@ const TILES: Array<{
     testSubj: 'threat-intel-tile-decoders',
     onSelect: goToDecoders,
   },
+  // IOCs and CVEs matched are reference-only, so they carry no `onSelect`.
   { key: 'iocs', label: 'IOCs', testSubj: 'threat-intel-tile-iocs' },
   {
     key: 'cvesMatched',
@@ -63,36 +56,5 @@ const TILES: Array<{
  * tile, not the whole panel.
  */
 export const ThreatIntelTiles: React.FC<ThreatIntelTilesProps> = props => (
-  <EuiFlexGroup gutterSize='m' responsive={false} wrap>
-    {TILES.map(tile => {
-      const result = props[tile.key];
-      if (result.status === 'unavailable') {
-        return null;
-      }
-      return (
-        <EuiFlexItem key={tile.key}>
-          <WidgetGroupBody status={result.status}>
-            {result.data !== undefined && (
-              <EuiPanel
-                paddingSize='s'
-                hasBorder
-                onClick={tile.onSelect}
-                data-test-subj={tile.testSubj}
-              >
-                <StatTile
-                  value={
-                    <span className='tab-num'>
-                      {formatUINumber(result.data)}
-                    </span>
-                  }
-                  label={tile.label}
-                  reverse
-                />
-              </EuiPanel>
-            )}
-          </WidgetGroupBody>
-        </EuiFlexItem>
-      );
-    })}
-  </EuiFlexGroup>
+  <StatTileGroup tiles={TILES} results={props} />
 );

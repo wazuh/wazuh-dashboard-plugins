@@ -1,23 +1,6 @@
-import React from 'react';
-import { BarList } from '../common';
-import { TopItem } from '../../interfaces/types';
+import { createBarList } from '../common';
 
-export interface MitreTopTacticsProps {
-  items: TopItem[];
-  getHref?: (item: TopItem) => string | undefined;
-  onSelect?: (item: TopItem) => void;
-}
-
-export const MitreTopTactics: React.FC<MitreTopTacticsProps> = ({
-  items,
-  getHref,
-  onSelect,
-}) => (
-  <BarList
-    items={items}
-    getHref={getHref}
-    onSelect={onSelect}
-    emptyMessage='No MITRE ATT&CK tactics observed in the last 24 hours'
-    data-test-subj='mitre-top-tactics'
-  />
-);
+export const MitreTopTactics = createBarList({
+  emptyMessage: 'No MITRE ATT&CK tactics observed in the last 24 hours',
+  'data-test-subj': 'mitre-top-tactics',
+});

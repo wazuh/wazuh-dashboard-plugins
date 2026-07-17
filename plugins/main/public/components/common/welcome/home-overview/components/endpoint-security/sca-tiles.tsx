@@ -1,8 +1,7 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
-import { StatTile } from '../common';
+import { StatTile, TabNumber } from '../common';
 import { ScaTilesData } from '../../interfaces/types';
-import { formatUINumber } from '../../../../../../react-services/format-number';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 
 export interface ScaTilesProps {
@@ -16,7 +15,7 @@ export const ScaTiles: React.FC<ScaTilesProps> = ({ tiles }) => (
   <EuiFlexGroup gutterSize='m' responsive={false} wrap>
     <EuiFlexItem>
       <StatTile
-        value={<span className='tab-num'>{formatUINumber(tiles.passed)}</span>}
+        value={<TabNumber value={tiles.passed} />}
         label='Passed'
         color={UI_COLOR_STATUS.success}
         reverse
@@ -25,7 +24,7 @@ export const ScaTiles: React.FC<ScaTilesProps> = ({ tiles }) => (
     </EuiFlexItem>
     <EuiFlexItem>
       <StatTile
-        value={<span className='tab-num'>{formatUINumber(tiles.failed)}</span>}
+        value={<TabNumber value={tiles.failed} />}
         label='Failed'
         color={UI_COLOR_STATUS.failed}
         reverse
@@ -34,9 +33,7 @@ export const ScaTiles: React.FC<ScaTilesProps> = ({ tiles }) => (
     </EuiFlexItem>
     <EuiFlexItem>
       <StatTile
-        value={
-          <span className='tab-num'>{formatUINumber(tiles.notApplicable)}</span>
-        }
+        value={<TabNumber value={tiles.notApplicable} />}
         label='N/A'
         color={UI_COLOR_STATUS.notApplicable}
         reverse

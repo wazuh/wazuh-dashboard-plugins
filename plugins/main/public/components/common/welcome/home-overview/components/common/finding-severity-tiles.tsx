@@ -1,6 +1,7 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiLink, EuiToolTip } from '@elastic/eui';
 import { StatTile } from './stat-tile';
+import { TabNumber } from './tab-number';
 import { SeverityBand, SeverityCounts } from '../../interfaces/types';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
@@ -34,9 +35,7 @@ export const FindingSeverityTiles: React.FC<FindingSeverityTilesProps> = ({
 }) => (
   <EuiFlexGroup gutterSize='m' responsive={false} wrap>
     {SEVERITY_PRESENTATION.map(severity => {
-      const count = (
-        <span className='tab-num'>{formatUINumber(counts[severity.band])}</span>
-      );
+      const count = <TabNumber value={counts[severity.band]} />;
       const value = onSelect ? (
         <EuiToolTip position='top' content={getTooltip?.(severity.band)}>
           <EuiLink

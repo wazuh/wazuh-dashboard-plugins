@@ -2,37 +2,55 @@ import { renderHook, act } from '@testing-library/react';
 import { useInViewport } from './use-in-viewport';
 
 describe('useInViewport', () => {
-  function createObserverHarness() {
-    let capturedCallback: IntersectionObserverCallback | undefined;
-    const observe = jest.fn();
-    const disconnect = jest.fn();
-    const factory = jest.fn((callback: IntersectionObserverCallback) => {
+  const originalIntersectionObserver = window.IntersectionObserver;
+
+  let capturedCallback: IntersectionObserverCallback | undefined;
+  const observe = jest.fn();
+  const disconnect = jest.fn();
+
+  /** Install a fake window.IntersectionObserver that captures its callback. */
+  function installObserver() {
+    capturedCallback = undefined;
+    observe.mockClear();
+    disconnect.mockClear();
+    (
+      window as unknown as {
+        IntersectionObserver: unknown;
+      }
+    ).IntersectionObserver = jest.fn(function (
+      this: IntersectionObserver,
+      callback: IntersectionObserverCallback,
+    ) {
       capturedCallback = callback;
-      return { observe, disconnect } as unknown as IntersectionObserver;
+      this.observe = observe;
+      this.disconnect = disconnect;
     });
-    const trigger = (isIntersecting: boolean) =>
-      act(() => {
-        capturedCallback?.(
-          [{ isIntersecting } as IntersectionObserverEntry],
-          {} as IntersectionObserver,
-        );
-      });
-    return { factory, observe, disconnect, trigger };
   }
 
+  const trigger = (isIntersecting: boolean) =>
+    act(() => {
+      capturedCallback?.(
+        [{ isIntersecting } as IntersectionObserverEntry],
+        {} as IntersectionObserver,
+      );
+    });
+
+  afterEach(() => {
+    window.IntersectionObserver = originalIntersectionObserver;
+  });
+
   it('starts not visible and does not observe until a node is attached', () => {
-    const { factory } = createObserverHarness();
-    const { result } = renderHook(() =>
-      useInViewport({ observerFactory: factory }),
-    );
+    installObserver();
+    const { result } = renderHook(() => useInViewport());
     // No node attached in this bare hook render, so nothing is observed yet.
     expect(result.current[1]).toBe(false);
+    expect(observe).not.toHaveBeenCalled();
   });
 
   it('latches to visible when the element intersects', () => {
-    const { factory, trigger } = createObserverHarness();
+    installObserver();
     const { result } = renderHook(() => {
-      const [ref, visible] = useInViewport({ observerFactory: factory });
+      const [ref, visible] = useInViewport();
       // attach the ref to a real node so the observer is created
       (ref as { current: Element }).current = document.createElement('div');
       return visible;
@@ -47,12 +65,14 @@ describe('useInViewport', () => {
   });
 
   it('falls back to immediately visible when no observer is available', () => {
+    // jsdom has no IntersectionObserver; ensure none is installed.
+    delete (window as unknown as { IntersectionObserver?: unknown })
+      .IntersectionObserver;
     const { result } = renderHook(() => {
-      const [ref, visible] = useInViewport({ observerFactory: undefined });
+      const [ref, visible] = useInViewport();
       (ref as { current: Element }).current = document.createElement('div');
       return visible;
     });
-    // jsdom has no IntersectionObserver and no factory injected.
     expect(result.current).toBe(true);
   });
 });

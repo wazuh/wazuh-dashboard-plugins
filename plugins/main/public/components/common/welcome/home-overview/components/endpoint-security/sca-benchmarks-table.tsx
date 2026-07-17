@@ -5,7 +5,7 @@ import {
   EuiEmptyPrompt,
 } from '@elastic/eui';
 import { ScaBenchmark } from '../../interfaces/types';
-import { formatUINumber } from '../../../../../../react-services/format-number';
+import { TabNumber } from '../common';
 
 export interface ScaBenchmarksTableProps {
   items: ScaBenchmark[];
@@ -30,18 +30,14 @@ export const ScaBenchmarksTable: React.FC<ScaBenchmarksTableProps> = ({
       name: 'Passed',
       align: 'right',
       width: '90px',
-      render: (count: number) => (
-        <span className='tab-num'>{formatUINumber(count)}</span>
-      ),
+      render: (count: number) => <TabNumber value={count} />,
     },
     {
       field: 'failed',
       name: 'Failed',
       align: 'right',
       width: '90px',
-      render: (count: number) => (
-        <span className='tab-num'>{formatUINumber(count)}</span>
-      ),
+      render: (count: number) => <TabNumber value={count} />,
     },
     {
       field: 'score',
