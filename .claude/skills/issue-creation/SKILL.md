@@ -33,34 +33,7 @@ ambiguous between two rows.
 | Wazuh release tracking (wazuh-team only) | `new_release.md` | `enhancement` |
 | Objective documentation & evidence gathering | `objective_delivery.md` | `level/task, type/test` |
 | Release-candidate UI regression testing | `regression_testing.md` | `level/task, type/test` |
-
-> **repo-specific (wazuh-dashboard-plugins) — label frontmatter is stale, do
-> not repeat it verbatim without checking:** `bug_report.md` and
-> `feature_request.md` declare bare `bug` / `enhancement` labels, but this
-> repo's actual label set has no such labels — only the prefixed
-> `type/bug` / `type/enhancement` (confirmed via
-> `gh label list --repo wazuh/wazuh-dashboard-plugins`). GitHub only applies a
-> template's `labels:` frontmatter if that exact label already exists in the
-> repo, so filing `bug_report.md` or `feature_request.md` as-is **silently
-> applies no label at all**. Tell the user this and offer to add `type/bug` /
-> `type/enhancement` manually instead of the template default.
-> `compatibility_request.md`, `new_release.md` (via `enhancement`, same caveat
-> as `feature_request.md`), `objective_delivery.md`, and `regression_testing.md`
-> all reference labels that **do** exist as declared
-> (`request/operational`, `level/task`, `type/maintenance`, `type/test`).
-> There is also a **`revision-manual_test.md`** file in
-> [`.github/ISSUE_TEMPLATE`](../../../.github/ISSUE_TEMPLATE) with **no YAML
-> frontmatter at all** — it won't appear in GitHub's template chooser and has
-> no default labels; only use it if the user explicitly points to it (e.g. a
-> Python/footprint test report), and copy its body manually.
-> There is **no [`config.yml`](../../../.github/ISSUE_TEMPLATE/config.yml)** in
-> this repo, so there is no `blank_issues_enabled` override and no
-> `contact_links` — blank issues are allowed by default and there are no extra
-> support links to surface.
-> No workflow in [`.github/workflows`](../../../.github/workflows) auto-labels
-> new issues (e.g. no `untriaged`-on-open action) — unlike some sibling repos,
-> whatever labels you apply here are the only labels the issue gets; there is
-> no auto-added triage label to account for.
+| Engineering task / improvement (not bug, feature, or docs gap) | `task_template.md` | `level/task` |
 
 ### 2. Issue-first duplicate check
 
@@ -80,11 +53,38 @@ Reference the chosen file under
 [`.github/ISSUE_TEMPLATE`](../../../.github/ISSUE_TEMPLATE) — read it first and
 fill it verbatim; do not inline template bodies in this skill.
 
+> **repo-specific (wazuh-dashboard-plugins):** label frontmatter is stale, do
+> not repeat it verbatim without checking — `bug_report.md` and
+> `feature_request.md` declare bare `bug` / `enhancement` labels, but this
+> repo's actual label set has no such labels — only the prefixed
+> `type/bug` / `type/enhancement` (confirmed via
+> `gh label list --repo wazuh/wazuh-dashboard-plugins`). GitHub only applies a
+> template's `labels:` frontmatter if that exact label already exists in the
+> repo, so filing `bug_report.md` or `feature_request.md` as-is **silently
+> applies no label at all**. Tell the user this and offer to add `type/bug` /
+> `type/enhancement` manually instead of the template default.
+> `compatibility_request.md`, `new_release.md` (via `enhancement`, same caveat
+> as `feature_request.md`), `objective_delivery.md`, `regression_testing.md`,
+> and `task_template.md` all reference labels that **do** exist as declared
+> (`request/operational`, `level/task`, `type/maintenance`, `type/test`).
+> There is also a **`revision-manual_test.md`** file in
+> [`.github/ISSUE_TEMPLATE`](../../../.github/ISSUE_TEMPLATE) with **no YAML
+> frontmatter at all** — it won't appear in GitHub's template chooser and has
+> no default labels; only use it if the user explicitly points to it (e.g. a
+> Python/footprint test report), and copy its body manually.
+> There is **no [`config.yml`](../../../.github/ISSUE_TEMPLATE/config.yml)** in
+> this repo, so there is no `blank_issues_enabled` override and no
+> `contact_links` — blank issues are allowed by default and there are no extra
+> support links to surface.
+> No workflow in [`.github/workflows`](../../../.github/workflows) auto-labels
+> new issues (e.g. no `untriaged`-on-open action) — unlike some sibling repos,
+> whatever labels you apply here are the only labels the issue gets; there is
+> no auto-added triage label to account for.
+
 ### 4. Labels
 
-Keep the template's default labels as-is (subject to the staleness caveat
-above); add an extra triage label only if the user explicitly names one. Do
-not invent labels or an approval workflow.
+Keep the template's default labels as-is; add an extra triage label only if
+the user explicitly names one. Do not invent labels or an approval workflow.
 
 ### 5. Emit the ready-to-file body + report
 
@@ -94,7 +94,7 @@ report for the human to review:
 ```
 Issue pre-flight
 - Template: <file>
-- Labels: <label list> (flag if a label is stale — see label caveat above)
+- Labels: <label list>
 - Duplicate check: no matches found / possible match: <issue-url>
 - Command to open it: gh issue create --template <file> --label "<labels>"
 ```
