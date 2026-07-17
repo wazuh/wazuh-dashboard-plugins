@@ -159,7 +159,7 @@ function useAggregationGroup<T>(options: {
     deps: [isLoading, error, dataSource, enabled],
   });
 
-  return { ...result, dataSource };
+  return useMemo(() => ({ ...result, dataSource }), [result, dataSource]);
 }
 
 /**
@@ -204,7 +204,10 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
     dataSource as { indexPattern?: { id?: string } } | undefined
   )?.indexPattern?.id;
 
-  return { ...result, indexPatternId };
+  return useMemo(
+    () => ({ ...result, indexPatternId }),
+    [result.status, result.data, indexPatternId],
+  );
 }
 
 export function useTopOperatingSystems(

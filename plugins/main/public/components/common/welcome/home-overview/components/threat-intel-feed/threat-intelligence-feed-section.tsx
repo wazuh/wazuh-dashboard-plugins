@@ -70,6 +70,6 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
   );
 };
 
-export const ThreatIntelligenceFeedSection = withErrorBoundary(
-  ThreatIntelligenceFeedSectionComponent,
+export const ThreatIntelligenceFeedSection = React.memo(
+  withErrorBoundary(ThreatIntelligenceFeedSectionComponent),
 );

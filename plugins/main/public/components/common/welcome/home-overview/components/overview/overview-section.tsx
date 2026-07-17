@@ -131,4 +131,6 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
   );
 };
 
-export const OverviewSection = withErrorBoundary(OverviewSectionComponent);
+export const OverviewSection = React.memo(
+  withErrorBoundary(OverviewSectionComponent),
+);

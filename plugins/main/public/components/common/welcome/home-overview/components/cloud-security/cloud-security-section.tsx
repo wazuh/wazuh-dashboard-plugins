@@ -13,6 +13,6 @@ const CloudSecuritySectionComponent: React.FC = () => (
   </div>
 );
 
-export const CloudSecuritySection = withErrorBoundary(
-  CloudSecuritySectionComponent,
+export const CloudSecuritySection = React.memo(
+  withErrorBoundary(CloudSecuritySectionComponent),
 );

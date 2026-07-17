@@ -102,6 +102,6 @@ const SecurityOperationsSectionComponent: React.FC = () => {
   );
 };
 
-export const SecurityOperationsSection = withErrorBoundary(
-  SecurityOperationsSectionComponent,
+export const SecurityOperationsSection = React.memo(
+  withErrorBoundary(SecurityOperationsSectionComponent),
 );

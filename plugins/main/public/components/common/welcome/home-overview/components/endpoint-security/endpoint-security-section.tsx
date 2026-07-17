@@ -111,6 +111,6 @@ const EndpointSecuritySectionComponent: React.FC<
   );
 };
 
-export const EndpointSecuritySection = withErrorBoundary(
-  EndpointSecuritySectionComponent,
+export const EndpointSecuritySection = React.memo(
+  withErrorBoundary(EndpointSecuritySectionComponent),
 );

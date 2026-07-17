@@ -131,6 +131,6 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
   );
 };
 
-export const ThreatHuntingSection = withErrorBoundary(
-  ThreatHuntingSectionComponent,
+export const ThreatHuntingSection = React.memo(
+  withErrorBoundary(ThreatHuntingSectionComponent),
 );
