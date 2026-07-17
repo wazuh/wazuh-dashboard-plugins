@@ -11,6 +11,7 @@ import {
   regulatoryCompliance,
   endpointSummary,
 } from '../../../../../utils/applications';
+import rison from 'rison-node';
 import {
   FILTER_OPERATOR,
   PatternDataSourceFilterManager,
@@ -40,10 +41,7 @@ export const goToThreatHunting = () => navigate(threatHunting.id);
 const DISCOVER_APP_ID = 'data-explorer';
 
 /**
- * Open Discover filtered to a findings severity band, preserving the findings
- * data source's fixed filters. `IS` on `wazuh.rule.level` mirrors how the tile
- * counts are aggregated, so the opened view matches the number clicked. Without
- * an index pattern (data not loaded yet) it falls back to Threat Hunting.
+ * Open Discover filtered to a findings severity band. `IS` on `wazuh.rule.level`
  */
 export const goToDiscoverFindingsBySeverity = (
   band: string,
@@ -54,17 +52,20 @@ export const goToDiscoverFindingsBySeverity = (
     navigate(threatHunting.id);
     return;
   }
-  const filters = PatternDataSourceFilterManager.filtersToURLFormat([
-    ...fixedFilters,
-    PatternDataSourceFilterManager.createFilter(
-      FILTER_OPERATOR.IS,
-      FINDING_SEVERITY_FIELD,
-      band,
-      indexPatternId,
-    ),
-  ]);
+  const queryState = rison.encode({
+    filters: [
+      ...fixedFilters,
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        FINDING_SEVERITY_FIELD,
+        band,
+        indexPatternId,
+      ),
+    ],
+    query: { language: 'kuery', query: '' },
+  });
   navigate(DISCOVER_APP_ID, {
-    path: `discover#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternId}',view:discover))&_g=${filters}&_q=(filters:!(),query:(language:kuery,query:''))`,
+    path: `discover#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternId}',view:discover))&_g=()&_q=${queryState}`,
   });
 };
 export const goToMitre = () => navigate(mitreAttack.id);
