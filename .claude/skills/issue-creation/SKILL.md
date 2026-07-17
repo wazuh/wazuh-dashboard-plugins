@@ -3,7 +3,7 @@ name: issue-creation
 description: Create a well-formed GitHub issue in a Wazuh Dashboard repo — pick the right issue template, run an issue-first duplicate check, and produce a ready-to-file body with the template's default labels. Use when the user asks to create, open, file, or draft an issue.
 ---
 
-# Create a wazuh-dashboard-plugins issue
+# Create a Wazuh Dashboard issue
 
 Pick the right issue template, check for duplicates first, then fill the
 template verbatim and hand off a ready-to-file body.
