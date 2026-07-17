@@ -1,17 +1,11 @@
 import React from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiLink,
-  EuiSpacer,
-  EuiText,
-  EuiTitle,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiLink, EuiSpacer } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
 import {
   WidgetGroup,
   StatTile,
   FindingSeverityTiles,
+  SectionHeader,
   WIDGET_LOADING_MIN_HEIGHT,
 } from '../common';
 import { TopRulesTable } from './top-rules-table';
@@ -42,14 +36,10 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
 }) => {
   return (
     <div>
-      <EuiTitle size='xs'>
-        <h2>Threat hunting</h2>
-      </EuiTitle>
-      <EuiText size='s' color='subdued'>
-        Hunt for threats, map activity to MITRE ATT&amp;CK, and detect known
-        vulnerabilities.
-      </EuiText>
-      <EuiSpacer size='s' />
+      <SectionHeader
+        title='Threat hunting'
+        description='Hunt for threats, map activity to MITRE ATT&CK, and detect known vulnerabilities.'
+      />
       <EuiFlexGroup wrap responsive={false}>
         <EuiFlexItem>
           <WidgetGroup

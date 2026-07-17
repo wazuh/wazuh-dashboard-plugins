@@ -1,6 +1,7 @@
 import React from 'react';
-import { EuiPanel, EuiSpacer, EuiText, EuiTitle } from '@elastic/eui';
+import { EuiPanel } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
+import { SectionHeader } from '../common';
 import { ThreatIntelTiles } from './threat-intel-tiles';
 import { useInViewport } from '../../../../hooks';
 import {
@@ -48,14 +49,10 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
 
   return (
     <div ref={sectionRef}>
-      <EuiTitle size='xs'>
-        <h2>Threat intelligence feed</h2>
-      </EuiTitle>
-      <EuiText size='s' color='subdued'>
-        What the platform is detecting with — detection content and
-        knowledge base.
-      </EuiText>
-      <EuiSpacer size='s' />
+      <SectionHeader
+        title='Threat intelligence feed'
+        description='What the platform is detecting with — detection content and knowledge base.'
+      />
       <EuiPanel
         paddingSize='m'
         hasBorder

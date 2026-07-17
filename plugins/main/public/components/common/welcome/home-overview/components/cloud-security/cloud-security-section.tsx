@@ -1,17 +1,14 @@
 import React from 'react';
-import { EuiSpacer, EuiText, EuiTitle } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
+import { SectionHeader } from '../common';
 import { CloudSecurityCards } from './cloud-security-cards';
 
 const CloudSecuritySectionComponent: React.FC = () => (
   <div>
-    <EuiTitle size='xs'>
-      <h2>Cloud security</h2>
-    </EuiTitle>
-    <EuiText size='s' color='subdued'>
-      Reach your cloud and SaaS integrations from the Overview.
-    </EuiText>
-    <EuiSpacer size='s' />
+    <SectionHeader
+      title='Cloud security'
+      description='Reach your cloud and SaaS integrations from the Overview.'
+    />
     <CloudSecurityCards />
   </div>
 );

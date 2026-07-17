@@ -1,14 +1,12 @@
 import React from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiLink,
-  EuiSpacer,
-  EuiText,
-  EuiTitle,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiLink, EuiSpacer } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
-import { WidgetGroup, StatTile, WIDGET_LOADING_MIN_HEIGHT } from '../common';
+import {
+  WidgetGroup,
+  StatTile,
+  SectionHeader,
+  WIDGET_LOADING_MIN_HEIGHT,
+} from '../common';
 import { ScaTiles } from './sca-tiles';
 import { ScaBenchmarksTable } from './sca-benchmarks-table';
 import { FimPlatformsTable } from './fim-platforms-table';
@@ -48,14 +46,10 @@ const EndpointSecuritySectionComponent: React.FC<
 
   return (
     <div ref={sectionRef}>
-      <EuiTitle size='xs'>
-        <h2>Endpoint security</h2>
-      </EuiTitle>
-      <EuiText size='s' color='subdued'>
-        Harden configurations, detect malware, and monitor file integrity
-        across your fleet.
-      </EuiText>
-      <EuiSpacer size='s' />
+      <SectionHeader
+        title='Endpoint security'
+        description='Harden configurations, detect malware, and monitor file integrity across your fleet.'
+      />
       <EuiFlexGroup wrap responsive={false}>
         <EuiFlexItem>
           <WidgetGroup

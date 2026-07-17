@@ -1,5 +1,6 @@
 import React from 'react';
-import { EuiPage, EuiPageBody, EuiTitle, EuiSpacer } from '@elastic/eui';
+import { EuiPage, EuiPageBody, EuiSpacer } from '@elastic/eui';
+import { SectionHeader } from './components/common';
 import { OverviewSection } from './components/overview';
 import { EndpointSecuritySection } from './components/endpoint-security';
 import { ThreatHuntingSection } from './components/threat-hunting';
@@ -11,12 +12,6 @@ import {
   useVulnerabilityOverview,
 } from './hooks/use-overview-data';
 import { useInViewport } from '../../hooks';
-
-const HomeOverviewHeader: React.FC = () => (
-  <EuiTitle size='s'>
-    <h1>Overview</h1>
-  </EuiTitle>
-);
 
 /**
  * Findings (on mount) and vulnerabilities (lazy) are searched once here and
@@ -30,8 +25,10 @@ const HomeOverviewBody: React.FC = () => {
 
   return (
     <>
-      <HomeOverviewHeader />
-      <EuiSpacer size='m' />
+      <SectionHeader
+        title='Overview'
+        description='Fleet health, findings, and MITRE ATT&CK activity across your environment.'
+      />
       <OverviewSection findings={findings} />
       <EuiSpacer size='l' />
       <EndpointSecuritySection findings={findings} />

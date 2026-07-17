@@ -1,14 +1,7 @@
 import React from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiLink,
-  EuiSpacer,
-  EuiText,
-  EuiTitle,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiLink } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
-import { WidgetGroup, StatTile } from '../common';
+import { WidgetGroup, StatTile, SectionHeader } from '../common';
 import { ItHygieneTiles } from './it-hygiene-tiles';
 import { RegulatoryComplianceBadges } from './regulatory-compliance-badges';
 import { useInViewport } from '../../../../hooks';
@@ -43,14 +36,10 @@ const SecurityOperationsSectionComponent: React.FC = () => {
 
   return (
     <div ref={sectionRef}>
-      <EuiTitle size='xs'>
-        <h2>Security operations</h2>
-      </EuiTitle>
-      <EuiText size='s' color='subdued'>
-        Fleet inventory scale, automated response activity, and the
-        regulatory frameworks you can jump to.
-      </EuiText>
-      <EuiSpacer size='s' />
+      <SectionHeader
+        title='Security operations'
+        description='Fleet inventory scale, automated response activity, and the regulatory frameworks you can jump to.'
+      />
       <EuiFlexGroup wrap responsive={false}>
         <EuiFlexItem>
           <WidgetGroup
