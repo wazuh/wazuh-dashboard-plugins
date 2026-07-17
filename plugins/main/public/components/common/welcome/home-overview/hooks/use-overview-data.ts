@@ -20,6 +20,7 @@ import {
   IDataSourceFactoryConstructor,
   PatternDataSource,
   tDataSourceRepository,
+  tFilter,
   tParsedIndexPattern,
 } from '../../../data-source';
 import { WzRequest } from '../../../../../react-services';
@@ -142,13 +143,14 @@ function useAggregationGroup<T>(options: {
   createRepository: () => tDataSourceRepository<tParsedIndexPattern>;
   enabled: boolean;
   fetch: (fetchData: FetchData) => Promise<T>;
-}): DataGroupResult<T> & { dataSource?: unknown } {
+}): DataGroupResult<T> & { dataSource?: unknown; fixedFilters?: tFilter[] } {
   const { DataSource, createRepository, enabled, fetch } = options;
   const repository = useMemo(createRepository, []);
-  const { isLoading, dataSource, error, fetchData } = useDataSource({
-    DataSource,
-    repository,
-  });
+  const { isLoading, dataSource, error, fetchData, fixedFilters } =
+    useDataSource({
+      DataSource,
+      repository,
+    });
 
   const result = useDataGroup<T>({
     isLoading,
@@ -159,7 +161,10 @@ function useAggregationGroup<T>(options: {
     deps: [isLoading, error, dataSource, enabled],
   });
 
-  return useMemo(() => ({ ...result, dataSource }), [result, dataSource]);
+  return useMemo(
+    () => ({ ...result, dataSource, fixedFilters }),
+    [result, dataSource, fixedFilters],
+  );
 }
 
 /**
@@ -168,8 +173,10 @@ function useAggregationGroup<T>(options: {
  */
 export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
   indexPatternId?: string;
+  fixedFilters?: tFilter[];
 } {
-  const { dataSource, ...result } = useAggregationGroup<FindingsOverview>({
+  const { dataSource, fixedFilters, ...result } =
+    useAggregationGroup<FindingsOverview>({
     DataSource: OverviewDataSource,
     createRepository: () => new FindingsDataSourceRepository(),
     enabled: true,
@@ -205,8 +212,8 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
   )?.indexPattern?.id;
 
   return useMemo(
-    () => ({ ...result, indexPatternId }),
-    [result.status, result.data, indexPatternId],
+    () => ({ ...result, indexPatternId, fixedFilters }),
+    [result.status, result.data, indexPatternId, fixedFilters],
   );
 }
 

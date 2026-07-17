@@ -15,7 +15,12 @@ import {
   FILTER_OPERATOR,
   PatternDataSourceFilterManager,
 } from '../../../data-source/pattern/pattern-data-source-filter-manager';
-import { MITRE_TACTIC_NAME_FIELD, MITRE_TECHNIQUE_NAME_FIELD } from '../lib/fields';
+import { tFilter } from '../../../data-source';
+import {
+  FINDING_SEVERITY_FIELD,
+  MITRE_TACTIC_NAME_FIELD,
+  MITRE_TECHNIQUE_NAME_FIELD,
+} from '../lib/fields';
 
 /** Navigation helpers, kept in one module so sections depend on one boundary. */
 
@@ -31,6 +36,37 @@ export const getDeployAgentUrl = (): string =>
   });
 
 export const goToThreatHunting = () => navigate(threatHunting.id);
+
+const DISCOVER_APP_ID = 'data-explorer';
+
+/**
+ * Open Discover filtered to a findings severity band, preserving the findings
+ * data source's fixed filters. `IS` on `wazuh.rule.level` mirrors how the tile
+ * counts are aggregated, so the opened view matches the number clicked. Without
+ * an index pattern (data not loaded yet) it falls back to Threat Hunting.
+ */
+export const goToDiscoverFindingsBySeverity = (
+  band: string,
+  indexPatternId?: string,
+  fixedFilters: tFilter[] = [],
+): void => {
+  if (!indexPatternId) {
+    navigate(threatHunting.id);
+    return;
+  }
+  const filters = PatternDataSourceFilterManager.filtersToURLFormat([
+    ...fixedFilters,
+    PatternDataSourceFilterManager.createFilter(
+      FILTER_OPERATOR.IS,
+      FINDING_SEVERITY_FIELD,
+      band,
+      indexPatternId,
+    ),
+  ]);
+  navigate(DISCOVER_APP_ID, {
+    path: `discover#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternId}',view:discover))&_g=${filters}&_q=(filters:!(),query:(language:kuery,query:''))`,
+  });
+};
 export const goToMitre = () => navigate(mitreAttack.id);
 export const goToItHygiene = () => navigate(ITHygiene.id);
 export const goToConfigurationAssessment = () =>

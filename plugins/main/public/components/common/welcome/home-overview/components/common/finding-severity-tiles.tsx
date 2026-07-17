@@ -1,5 +1,5 @@
 import React from 'react';
-import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiLink, EuiToolTip } from '@elastic/eui';
 import { StatTile } from './stat-tile';
 import { SeverityBand, SeverityCounts } from '../../interfaces/types';
 import { formatUINumber } from '../../../../../../react-services/format-number';
@@ -20,27 +20,47 @@ export interface FindingSeverityTilesProps {
   counts: SeverityCounts;
   /** Distinct data-test-subjs when two tile groups share a page. */
   testSubjPrefix?: string;
+  /** When set, each number becomes a link that drills into that band. */
+  onSelect?: (band: SeverityBand) => void;
+  /** Tooltip content per band, shown only when `onSelect` is set. */
+  getTooltip?: (band: SeverityBand) => React.ReactNode;
 }
 
 export const FindingSeverityTiles: React.FC<FindingSeverityTilesProps> = ({
   counts,
   testSubjPrefix = 'finding-severity',
+  onSelect,
+  getTooltip,
 }) => (
   <EuiFlexGroup gutterSize='m' responsive={false} wrap>
-    {SEVERITY_PRESENTATION.map(severity => (
-      <EuiFlexItem key={severity.band}>
-        <StatTile
-          value={
-            <span className='tab-num'>
-              {formatUINumber(counts[severity.band])}
-            </span>
-          }
-          label={severity.label}
-          color={severity.color}
-          reverse
-          data-test-subj={`${testSubjPrefix}-${severity.band}`}
-        />
-      </EuiFlexItem>
-    ))}
+    {SEVERITY_PRESENTATION.map(severity => {
+      const count = (
+        <span className='tab-num'>{formatUINumber(counts[severity.band])}</span>
+      );
+      const value = onSelect ? (
+        <EuiToolTip position='top' content={getTooltip?.(severity.band)}>
+          <EuiLink
+            className='tab-num'
+            style={{ fontWeight: 'normal', color: severity.color }}
+            onClick={() => onSelect(severity.band)}
+          >
+            {formatUINumber(counts[severity.band])}
+          </EuiLink>
+        </EuiToolTip>
+      ) : (
+        count
+      );
+      return (
+        <EuiFlexItem key={severity.band}>
+          <StatTile
+            value={value}
+            label={severity.label}
+            color={severity.color}
+            reverse
+            data-test-subj={`${testSubjPrefix}-${severity.band}`}
+          />
+        </EuiFlexItem>
+      );
+    })}
   </EuiFlexGroup>
 );

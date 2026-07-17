@@ -24,7 +24,9 @@ import {
   goToMitre,
   goToItHygiene,
   goToMitreTactic,
+  goToDiscoverFindingsBySeverity,
 } from '../../utils/navigation';
+import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
 
 export interface OverviewSectionProps {
   /** Owned by the page shell so Threat Hunting reuses the same on-mount search. */
@@ -69,7 +71,19 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             data-test-subj='home-overview-findings-severity'
           >
             {findings.data && (
-              <FindingSeverityTiles counts={findings.data.severity} />
+              <FindingSeverityTiles
+                counts={findings.data.severity}
+                onSelect={band =>
+                  goToDiscoverFindingsBySeverity(
+                    band,
+                    findings.indexPatternId,
+                    findings.fixedFilters,
+                  )
+                }
+                getTooltip={band =>
+                  `Click to see ${FINDING_SEVERITY_FIELD}: ${band}`
+                }
+              />
             )}
           </WidgetGroup>
         </EuiFlexItem>
