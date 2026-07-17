@@ -77,6 +77,7 @@ const SecurityOperationsSectionComponent: React.FC = () => {
           >
             {activeResponse.data !== undefined && (
               <StatTile
+                textAlign='center'
                 reverse
                 value={
                   <span className='tab-num'>
@@ -84,7 +85,6 @@ const SecurityOperationsSectionComponent: React.FC = () => {
                   </span>
                 }
                 label='Actions triggered, last 24 hours'
-                textAlign='left'
                 data-test-subj='active-response-stat'
               />
             )}

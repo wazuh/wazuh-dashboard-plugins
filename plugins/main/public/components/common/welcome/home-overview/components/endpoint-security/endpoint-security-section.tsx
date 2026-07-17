@@ -99,7 +99,8 @@ const EndpointSecuritySectionComponent: React.FC<
                     </span>
                   }
                   label='Files & registry objects baselined fleet-wide'
-                  textAlign='left'
+                  reverse
+                  textAlign='center'
                   data-test-subj='fim-hero'
                 />
                 <EuiSpacer size='s' />

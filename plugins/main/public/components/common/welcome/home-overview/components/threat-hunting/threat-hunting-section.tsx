@@ -64,13 +64,14 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
             {findings.data && (
               <>
                 <StatTile
+                  textAlign='center'
+                  reverse
                   value={
                     <span className='tab-num'>
                       {formatUINumber(findings.data.totalFindings)}
                     </span>
                   }
                   label='Total findings, last 24 hours'
-                  textAlign='left'
                   data-test-subj='total-findings-hero'
                 />
                 <EuiSpacer size='s' />
@@ -90,13 +91,14 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
             {findings.data && (
               <>
                 <StatTile
+                  textAlign='center'
+                  reverse
                   value={
                     <span className='tab-num'>
                       {formatUINumber(findings.data.techniquesCount)}
                     </span>
                   }
                   label='Techniques observed, last 24 hours'
-                  textAlign='left'
                   data-test-subj='techniques-hero'
                 />
                 <EuiSpacer size='s' />
