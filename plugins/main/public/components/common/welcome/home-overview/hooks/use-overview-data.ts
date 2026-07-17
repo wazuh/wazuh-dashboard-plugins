@@ -74,7 +74,7 @@ import {
 // these; they wrap SearchSource aggregations, the Wazuh API, and Security
 // Analytics.
 
-const LAST_24H = { from: 'now-1M', to: 'now' };
+const LAST_24H = { from: 'now-24h', to: 'now' };
 /** Aggregations and counts only; never fetch document hits. */
 const NO_HITS: { pageSize: number } = { pageSize: 0 };
 
