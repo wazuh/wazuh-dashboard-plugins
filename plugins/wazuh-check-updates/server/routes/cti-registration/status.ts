@@ -7,6 +7,8 @@ import {
 } from '../../services/cti-registration';
 import { CtiConfigurationError } from '../../services/cti-registration/cti-console-url';
 import { CtiRegistrationStore } from '../../services/cti-registration/cti-registration-store';
+import { triggerContentUpdateOnChange } from '../../services/cti-registration/trigger-content-update-on-change';
+import { getWazuhCheckUpdatesServices } from '../../plugin-services';
 
 type StatusWithoutSubscriptionFields = Omit<
   CtiRegistrationStatusApiBody,
@@ -15,9 +17,26 @@ type StatusWithoutSubscriptionFields = Omit<
 
 async function withSubscriptionFields(
   wazuhClient: IScopedClusterClient,
+  environmentUuid: string,
   base: StatusWithoutSubscriptionFields,
 ): Promise<CtiRegistrationStatusApiBody> {
   const subscription = await getCtiSubscriptionStatus(wazuhClient);
+  triggerContentUpdateOnChange(
+    wazuhClient,
+    environmentUuid,
+    subscription,
+  ).catch(error => {
+    try {
+      getWazuhCheckUpdatesServices().logger.error(
+        `Unexpected error triggering CTI content update for ${environmentUuid}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    } catch {
+      // Logger itself unavailable; nothing more we can safely do here.
+    }
+  });
+
   return {
     ...base,
     subscription,
@@ -39,7 +58,7 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
 
         if (!rec) {
           return response.ok({
-            body: await withSubscriptionFields(wazuhClient, {
+            body: await withSubscriptionFields(wazuhClient, environmentUuid, {
               registrationComplete: false,
               inProgress: false,
             }),
@@ -47,10 +66,14 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
         }
 
         if (rec.registrationComplete) {
-          const completedBody = await withSubscriptionFields(wazuhClient, {
-            registrationComplete: true,
-            inProgress: false,
-          });
+          const completedBody = await withSubscriptionFields(
+            wazuhClient,
+            environmentUuid,
+            {
+              registrationComplete: true,
+              inProgress: false,
+            },
+          );
           if (!completedBody.subscription?.message?.is_registered) {
             store.clear(environmentUuid);
             return response.ok({
@@ -63,7 +86,7 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
         if (Date.now() > rec.deviceAuthExpiresAtMs) {
           store.clear(environmentUuid);
           return response.ok({
-            body: await withSubscriptionFields(wazuhClient, {
+            body: await withSubscriptionFields(wazuhClient, environmentUuid, {
               registrationComplete: false,
               inProgress: false,
             }),
@@ -76,7 +99,7 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
         );
 
         return response.ok({
-          body: await withSubscriptionFields(wazuhClient, {
+          body: await withSubscriptionFields(wazuhClient, environmentUuid, {
             registrationComplete: false,
             inProgress: true,
             device_code: rec.device_code ?? undefined,

@@ -22,7 +22,7 @@ export const StartCtiRegistration: React.FC<
       <EuiButtonEmpty iconType='globe' onClick={() => handleModalToggle()}>
         <FormattedMessage
           id='wazuhCheckUpdates.ctiRegistration.openModalRegister'
-          defaultMessage='Register'
+          defaultMessage='CTI'
         />
       </EuiButtonEmpty>
     </EuiToolTip>
