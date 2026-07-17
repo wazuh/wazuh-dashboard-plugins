@@ -51,15 +51,15 @@ export const FindingSeverityTiles: React.FC<FindingSeverityTilesProps> = ({
         count
       );
       return (
-      <EuiFlexItem key={severity.band}>
-        <StatTile
+        <EuiFlexItem key={severity.band}>
+          <StatTile
             value={value}
-          label={severity.label}
-          color={severity.color}
-          reverse
-          data-test-subj={`${testSubjPrefix}-${severity.band}`}
-        />
-      </EuiFlexItem>
+            label={severity.label}
+            color={severity.color}
+            reverse
+            data-test-subj={`${testSubjPrefix}-${severity.band}`}
+          />
+        </EuiFlexItem>
       );
     })}
   </EuiFlexGroup>

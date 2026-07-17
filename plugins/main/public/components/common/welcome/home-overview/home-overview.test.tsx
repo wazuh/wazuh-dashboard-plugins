@@ -54,9 +54,7 @@ describe('HomeOverview shell', () => {
     render(<HomeOverview />);
     expect(screen.getByText('Overview')).toBeInTheDocument();
     expect(screen.getByTestId('overview-section')).toBeInTheDocument();
-    expect(
-      screen.getByTestId('endpoint-security-section'),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('endpoint-security-section')).toBeInTheDocument();
     expect(screen.getByTestId('threat-hunting-section')).toBeInTheDocument();
     expect(
       screen.getByTestId('security-operations-section'),

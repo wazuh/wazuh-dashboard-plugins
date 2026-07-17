@@ -64,9 +64,8 @@ beforeAll(async () => {
 
   server = new HttpServer(loggingService, 'tests');
   const router = new Router('', logger, enhanceWithContext);
-  const { registerRouter, server: innerServerTest } = await server.setup(
-    config,
-  );
+  const { registerRouter, server: innerServerTest } =
+    await server.setup(config);
   innerServer = innerServerTest;
 
   getCtiRegistrationStatusRoute(router);

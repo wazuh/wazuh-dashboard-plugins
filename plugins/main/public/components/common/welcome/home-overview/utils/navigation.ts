@@ -140,10 +140,15 @@ const goToMitreFilteredBy = (
 export const goToMitreTactic = (
   tacticName: string,
   indexPatternId?: string,
-): void => goToMitreFilteredBy(MITRE_TACTIC_NAME_FIELD, tacticName, indexPatternId);
+): void =>
+  goToMitreFilteredBy(MITRE_TACTIC_NAME_FIELD, tacticName, indexPatternId);
 
 export const goToMitreTechnique = (
   techniqueName: string,
   indexPatternId?: string,
 ): void =>
-  goToMitreFilteredBy(MITRE_TECHNIQUE_NAME_FIELD, techniqueName, indexPatternId);
+  goToMitreFilteredBy(
+    MITRE_TECHNIQUE_NAME_FIELD,
+    techniqueName,
+    indexPatternId,
+  );

@@ -27,7 +27,10 @@ jest.mock('../../../../hooks', () => ({
 }));
 
 const asMock = (fn: unknown) => fn as jest.Mock;
-const available = (value: number) => ({ status: 'available' as const, data: value });
+const available = (value: number) => ({
+  status: 'available' as const,
+  data: value,
+});
 
 const vulnerabilitiesAvailable = {
   status: 'available' as const,

@@ -1,5 +1,11 @@
 import React from 'react';
-import { EuiEmptyPrompt, EuiFlexGroup, EuiFlexItem, EuiTitle, EuiText } from '@elastic/eui';
+import {
+  EuiEmptyPrompt,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiTitle,
+  EuiText,
+} from '@elastic/eui';
 import { AgentStatus } from '../../interfaces/types';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
@@ -16,7 +22,12 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
   data,
   deployAgentUrl,
 }) => {
-  if (data.active === 0 && data.disconnected === 0 && data.pending === 0 && data.neverConnected === 0) {
+  if (
+    data.active === 0 &&
+    data.disconnected === 0 &&
+    data.pending === 0 &&
+    data.neverConnected === 0
+  ) {
     return (
       <EuiEmptyPrompt
         body={
@@ -80,7 +91,8 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiText size='xs' color='subdued'>
-            <strong>{formatUINumber(data.neverConnected)}</strong> never connected
+            <strong>{formatUINumber(data.neverConnected)}</strong> never
+            connected
           </EuiText>
         </EuiFlexItem>
       </EuiFlexGroup>

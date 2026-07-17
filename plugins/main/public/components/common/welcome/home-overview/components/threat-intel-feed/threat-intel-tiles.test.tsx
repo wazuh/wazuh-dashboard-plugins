@@ -16,7 +16,10 @@ jest.mock('../../utils/navigation', () => ({
   goToDetectors: jest.fn(),
 }));
 
-const available = (value: number) => ({ status: 'available' as const, data: value });
+const available = (value: number) => ({
+  status: 'available' as const,
+  data: value,
+});
 
 const allAvailable = {
   rules: available(482),

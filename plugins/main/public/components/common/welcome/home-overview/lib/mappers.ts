@@ -37,8 +37,8 @@ export function mapSeverityCounts(
 ): SeverityCounts {
   const buckets = aggregations?.[aggName]?.buckets ?? {};
   return SEVERITY_BANDS.reduce((acc, band) => {
-    acc[band] = (buckets as Record<string, FiltersAggBucket>)?.[band]
-      ?.doc_count ?? 0;
+    acc[band] =
+      (buckets as Record<string, FiltersAggBucket>)?.[band]?.doc_count ?? 0;
     return acc;
   }, {} as SeverityCounts);
 }
@@ -54,17 +54,22 @@ export function mapCardinality(
 }
 
 /** Total hits count, for heroes that are the whole result set, not an agg. */
-export function mapDocCount(response: { hits?: { total?: number } } | undefined): number {
+export function mapDocCount(
+  response: { hits?: { total?: number } } | undefined,
+): number {
   return response?.hits?.total ?? 0;
 }
 
 export function mapScaTiles(aggregations: Aggregations): ScaTilesData {
-  const buckets = (aggregations?.[AGG.scaResult] as unknown as
-    | { buckets?: Record<string, FiltersAggBucket> }
-    | undefined)?.buckets ?? {};
+  const buckets =
+    (
+      aggregations?.[AGG.scaResult] as unknown as
+        { buckets?: Record<string, FiltersAggBucket> } | undefined
+    )?.buckets ?? {};
   const passed = buckets[SCA_RESULT_BUCKET.passed]?.doc_count ?? 0;
   const failed = buckets[SCA_RESULT_BUCKET.failed]?.doc_count ?? 0;
-  const notApplicable = buckets[SCA_RESULT_BUCKET.notApplicable]?.doc_count ?? 0;
+  const notApplicable =
+    buckets[SCA_RESULT_BUCKET.notApplicable]?.doc_count ?? 0;
   const total = passed + failed;
   return {
     passed,
@@ -75,9 +80,16 @@ export function mapScaTiles(aggregations: Aggregations): ScaTilesData {
 }
 
 export function mapScaBenchmarks(aggregations: Aggregations): ScaBenchmark[] {
-  const buckets = (aggregations?.[AGG.scaBenchmarks] as unknown as
-    | { buckets?: Array<{ key: string | number; result?: { buckets?: TermsBucket[] } }> }
-    | undefined)?.buckets;
+  const buckets = (
+    aggregations?.[AGG.scaBenchmarks] as unknown as
+      | {
+          buckets?: Array<{
+            key: string | number;
+            result?: { buckets?: TermsBucket[] };
+          }>;
+        }
+      | undefined
+  )?.buckets;
   if (!Array.isArray(buckets)) {
     return [];
   }
@@ -130,8 +142,7 @@ export function mapTopBucketsByMetric(
     buckets as Array<{ key: string | number; [metric: string]: unknown }>
   ).map(bucket => ({
     key: String(bucket.key),
-    count:
-      (bucket[metricName] as { value?: number } | undefined)?.value ?? 0,
+    count: (bucket[metricName] as { value?: number } | undefined)?.value ?? 0,
   }));
 }
 

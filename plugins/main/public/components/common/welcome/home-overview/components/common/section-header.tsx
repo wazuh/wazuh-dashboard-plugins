@@ -23,12 +23,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   description,
 }) => (
   <>
-    <EuiFlexGroup
-      gutterSize='s'
-      alignItems='baseline'
-      responsive={false}
-      wrap
-    >
+    <EuiFlexGroup gutterSize='s' alignItems='baseline' responsive={false} wrap>
       <EuiFlexItem grow={false}>
         <EuiBreadcrumbs
           breadcrumbs={[{ text: title }]}

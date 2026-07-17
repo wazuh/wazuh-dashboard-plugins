@@ -48,12 +48,18 @@ export const WidgetGroupBody: React.FC<WidgetGroupBodyProps> = ({
 }) => (
   <>
     {status === 'loading' && (
-      <div data-test-subj='widget-group-loading' style={{ minHeight: loadingMinHeight }}>
+      <div
+        data-test-subj='widget-group-loading'
+        style={{ minHeight: loadingMinHeight }}
+      >
         <EuiLoadingContent lines={3} />
       </div>
     )}
     {status === 'error' && (
-      <div data-test-subj='widget-group-error' style={{ minHeight: loadingMinHeight }}>
+      <div
+        data-test-subj='widget-group-error'
+        style={{ minHeight: loadingMinHeight }}
+      >
         <EuiCallOut
           size='s'
           color='danger'

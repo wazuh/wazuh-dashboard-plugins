@@ -19,9 +19,7 @@ const findingsAvailable = {
     totalFindings: 40614,
     topRules: [{ key: 'Wazuh IT Hygiene – Item modified', count: 3899 }],
     techniquesCount: 7,
-    topTechniques: [
-      { key: 'Exploit Public-Facing Application', count: 35378 },
-    ],
+    topTechniques: [{ key: 'Exploit Public-Facing Application', count: 35378 }],
     iocMatches: 0,
   },
   indexPatternId: 'idx-1',
@@ -69,7 +67,9 @@ describe('ThreatHuntingSection', () => {
       />,
     );
     expect(
-      container.querySelector('[data-test-subj="home-overview-vulnerabilities"]'),
+      container.querySelector(
+        '[data-test-subj="home-overview-vulnerabilities"]',
+      ),
     ).not.toBeInTheDocument();
     expect(screen.getByText('Threat Hunting')).toBeInTheDocument();
   });

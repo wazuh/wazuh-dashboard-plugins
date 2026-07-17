@@ -112,9 +112,9 @@ describe('mappers', () => {
           },
         },
       };
-      expect(
-        mapSeverityCounts(aggregations, 'vulnerability_severity'),
-      ).toEqual({ critical: 179, high: 5456, medium: 31517, low: 1980 });
+      expect(mapSeverityCounts(aggregations, 'vulnerability_severity')).toEqual(
+        { critical: 179, high: 5456, medium: 31517, low: 1980 },
+      );
     });
   });
 

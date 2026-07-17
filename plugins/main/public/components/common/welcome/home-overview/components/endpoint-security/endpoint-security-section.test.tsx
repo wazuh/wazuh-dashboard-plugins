@@ -2,10 +2,7 @@ import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { EndpointSecuritySection } from './endpoint-security-section';
-import {
-  useFIMOverview,
-  useSCAOverview,
-} from '../../hooks/use-overview-data';
+import { useFIMOverview, useSCAOverview } from '../../hooks/use-overview-data';
 import { useInViewport } from '../../../../hooks';
 
 jest.mock('../../hooks/use-overview-data', () => ({
@@ -83,9 +80,7 @@ describe('EndpointSecuritySection', () => {
     expect(
       screen.getByText('Files & registry objects baselined fleet-wide'),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText('IOC matches, last 24 hours'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('IOC matches, last 24 hours')).toBeInTheDocument();
     expect(screen.getAllByText('Domains').length).toBeGreaterThan(0);
   });
 

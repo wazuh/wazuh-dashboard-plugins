@@ -43,9 +43,7 @@ export const ItHygieneTiles: React.FC<ItHygieneTilesProps> = props => (
             {result.data !== undefined && (
               <StatTile
                 value={
-                  <span className='tab-num'>
-                    {formatUINumber(result.data)}
-                  </span>
+                  <span className='tab-num'>{formatUINumber(result.data)}</span>
                 }
                 label={tile.label}
                 reverse

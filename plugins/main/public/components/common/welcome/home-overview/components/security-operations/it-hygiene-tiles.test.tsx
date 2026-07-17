@@ -3,7 +3,10 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { ItHygieneTiles } from './it-hygiene-tiles';
 
-const available = (value: number) => ({ status: 'available' as const, data: value });
+const available = (value: number) => ({
+  status: 'available' as const,
+  data: value,
+});
 
 describe('ItHygieneTiles', () => {
   it('hides only the tile whose index is unavailable, keeping the others', () => {
@@ -16,9 +19,7 @@ describe('ItHygieneTiles', () => {
       />,
     );
     expect(
-      container.querySelector(
-        '[data-test-subj="it-hygiene-tile-packages"]',
-      ),
+      container.querySelector('[data-test-subj="it-hygiene-tile-packages"]'),
     ).not.toBeInTheDocument();
     expect(
       container.querySelector(

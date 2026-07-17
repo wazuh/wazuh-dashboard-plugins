@@ -30,7 +30,9 @@ describe('TopNTable', () => {
         noItemsMessage='No operating systems found'
       />,
     );
-    expect(screen.getAllByText('No operating systems found').length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText('No operating systems found').length,
+    ).toBeGreaterThan(0);
     expect(screen.queryByText('No items found')).not.toBeInTheDocument();
   });
 });

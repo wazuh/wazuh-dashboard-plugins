@@ -4,7 +4,6 @@ import { WAZUH_MODULES_ID } from '../../../../../../../common/constants';
 import { WAZUH_MODULES } from '../../../../../../../common/wazuh-modules';
 import { goToRegulatoryCompliance } from '../../utils/navigation';
 
-
 const FRAMEWORK_IDS = [
   WAZUH_MODULES_ID.PCI_DSS,
   WAZUH_MODULES_ID.GDPR,

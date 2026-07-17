@@ -27,8 +27,14 @@ describe('fetchRulesCount', () => {
   it('sums enabled pre-packaged (standard) + custom rules across two calls', async () => {
     const post = jest
       .fn()
-      .mockResolvedValueOnce({ ok: true, response: { hits: { total: { value: 482 } } } })
-      .mockResolvedValueOnce({ ok: true, response: { hits: { total: { value: 18 } } } });
+      .mockResolvedValueOnce({
+        ok: true,
+        response: { hits: { total: { value: 482 } } },
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        response: { hits: { total: { value: 18 } } },
+      });
     asMock(getHttp).mockReturnValue({ post });
 
     expect(await fetchRulesCount()).toBe(500);
@@ -41,7 +47,10 @@ describe('fetchRulesCount', () => {
     // Each call filters to enabled only (the space comes from prePackaged).
     // Verified live: a bare `{ size: 0 }` throws `illegal_argument_exception`,
     // so an explicit query is required.
-    const enabledQuery = { size: 0, query: { term: { 'document.enabled': true } } };
+    const enabledQuery = {
+      size: 0,
+      query: { term: { 'document.enabled': true } },
+    };
     expect(JSON.parse(standardOpts.body)).toEqual(enabledQuery);
     expect(JSON.parse(customOpts.body)).toEqual(enabledQuery);
   });
@@ -50,7 +59,9 @@ describe('fetchRulesCount', () => {
     const post = jest.fn().mockRejectedValue({ statusCode: 404 });
     asMock(getHttp).mockReturnValue({ post });
 
-    await expect(fetchRulesCount()).rejects.toBeInstanceOf(ErrorDataSourceNotFound);
+    await expect(fetchRulesCount()).rejects.toBeInstanceOf(
+      ErrorDataSourceNotFound,
+    );
   });
 
   it('treats an in-envelope ok:false as a real query failure', async () => {
@@ -68,7 +79,9 @@ describe('fetchRulesCount', () => {
     });
     asMock(getHttp).mockReturnValue({ post });
 
-    await expect(fetchRulesCount()).rejects.toBeInstanceOf(ErrorDataSourceNotFound);
+    await expect(fetchRulesCount()).rejects.toBeInstanceOf(
+      ErrorDataSourceNotFound,
+    );
   });
 });
 
@@ -82,7 +95,10 @@ describe('fetchDecodersCount', () => {
 
     expect(await fetchDecodersCount()).toBe(128);
     const [, options] = post.mock.calls[0];
-    expect(JSON.parse(options.body)).toEqual({ size: 0, query: SPACES_AND_ENABLED });
+    expect(JSON.parse(options.body)).toEqual({
+      size: 0,
+      query: SPACES_AND_ENABLED,
+    });
   });
 });
 
@@ -96,7 +112,10 @@ describe('fetchIntegrationsCount', () => {
 
     expect(await fetchIntegrationsCount()).toBe(14);
     const [, options] = post.mock.calls[0];
-    expect(JSON.parse(options.body)).toEqual({ size: 0, ...SPACES_AND_ENABLED });
+    expect(JSON.parse(options.body)).toEqual({
+      size: 0,
+      ...SPACES_AND_ENABLED,
+    });
   });
 });
 

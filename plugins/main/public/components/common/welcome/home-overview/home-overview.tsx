@@ -37,11 +37,17 @@ const HomeOverviewBody: React.FC = () => {
       <OverviewSection findings={findings} />
       <EuiSpacer size='l' />
       <div ref={enrichmentsRef}>
-        <EndpointSecuritySection findings={findings} threatIntel={threatIntel} />
+        <EndpointSecuritySection
+          findings={findings}
+          threatIntel={threatIntel}
+        />
       </div>
       <EuiSpacer size='l' />
       <div ref={vulnerabilitiesRef}>
-        <ThreatHuntingSection findings={findings} vulnerabilities={vulnerabilities} />
+        <ThreatHuntingSection
+          findings={findings}
+          vulnerabilities={vulnerabilities}
+        />
       </div>
       <EuiSpacer size='l' />
       <ThreatIntelligenceFeedSection

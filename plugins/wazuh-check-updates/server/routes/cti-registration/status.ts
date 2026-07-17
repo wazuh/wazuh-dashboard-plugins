@@ -92,13 +92,13 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
           error instanceof Error
             ? error
             : typeof error === 'string'
-            ? new Error(error)
-            : new Error('Error reading CTI registration status');
+              ? new Error(error)
+              : new Error('Error reading CTI registration status');
 
         const statusCode =
           error instanceof CtiConfigurationError
             ? 500
-            : (error as { statusCode?: number })?.statusCode ?? 503;
+            : ((error as { statusCode?: number })?.statusCode ?? 503);
 
         return response.customError({
           statusCode,

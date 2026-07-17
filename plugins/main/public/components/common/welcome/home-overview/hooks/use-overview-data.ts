@@ -65,7 +65,10 @@ import {
   TopItem,
   VulnerabilityOverview,
 } from '../interfaces/types';
-import { DATA_SOURCE_NOT_FOUND, DataGroupResult } from '../interfaces/data-group';
+import {
+  DATA_SOURCE_NOT_FOUND,
+  DataGroupResult,
+} from '../interfaces/data-group';
 
 // Data hooks for the Home overview. Every widget reads its data through one of
 // these; they wrap SearchSource aggregations, the Wazuh API, and Security
@@ -181,30 +184,33 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
 } {
   const { dataSource, fixedFilters, ...result } =
     useAggregationGroup<FindingsOverview>({
-    DataSource: OverviewDataSource,
-    createRepository: () => new FindingsDataSourceRepository(),
-    enabled: true,
-    fetch: async fetchData => {
-      const response = await fetchData({
-        aggs: { ...buildFindingsOverviewAggs(), ...buildMalwareFilterAgg() },
-        dateRange: LAST_24H,
-        pagination: NO_HITS,
-      });
-      const malware = response?.aggregations?.[AGG.malware];
-      return {
-        severity: mapSeverityCounts(response?.aggregations),
-        topTactics: mapTopBuckets(response?.aggregations, AGG.tactics),
-        totalFindings: mapDocCount(response),
-        topRules: mapTopBuckets(response?.aggregations, AGG.topRules),
-        techniquesCount: mapCardinality(
-          response?.aggregations,
-          AGG.techniquesCount,
-        ),
-        topTechniques: mapTopBuckets(response?.aggregations, AGG.topTechniques),
-        iocMatches: mapCardinality(malware, AGG.iocMatches),
-      };
-    },
-  });
+      DataSource: OverviewDataSource,
+      createRepository: () => new FindingsDataSourceRepository(),
+      enabled: true,
+      fetch: async fetchData => {
+        const response = await fetchData({
+          aggs: { ...buildFindingsOverviewAggs(), ...buildMalwareFilterAgg() },
+          dateRange: LAST_24H,
+          pagination: NO_HITS,
+        });
+        const malware = response?.aggregations?.[AGG.malware];
+        return {
+          severity: mapSeverityCounts(response?.aggregations),
+          topTactics: mapTopBuckets(response?.aggregations, AGG.tactics),
+          totalFindings: mapDocCount(response),
+          topRules: mapTopBuckets(response?.aggregations, AGG.topRules),
+          techniquesCount: mapCardinality(
+            response?.aggregations,
+            AGG.techniquesCount,
+          ),
+          topTechniques: mapTopBuckets(
+            response?.aggregations,
+            AGG.topTechniques,
+          ),
+          iocMatches: mapCardinality(malware, AGG.iocMatches),
+        };
+      },
+    });
 
   const indexPatternId = (
     dataSource as { indexPattern?: { id?: string } } | undefined
@@ -221,7 +227,8 @@ export function useTopOperatingSystems(
 ): DataGroupResult<TopItem[]> {
   return useAggregationGroup<TopItem[]>({
     DataSource: SystemInventoryStatesDataSource,
-    createRepository: () => new SystemInventorySystemStatesDataSourceRepository(),
+    createRepository: () =>
+      new SystemInventorySystemStatesDataSourceRepository(),
     enabled,
     fetch: async fetchData => {
       const response = await fetchData({
@@ -331,7 +338,9 @@ export function useDecodersCount(enabled: boolean): DataGroupResult<number> {
   return useSecurityAnalyticsFetch(enabled, fetchDecodersCount);
 }
 
-export function useIntegrationsCount(enabled: boolean): DataGroupResult<number> {
+export function useIntegrationsCount(
+  enabled: boolean,
+): DataGroupResult<number> {
   return useSecurityAnalyticsFetch(enabled, fetchIntegrationsCount);
 }
 

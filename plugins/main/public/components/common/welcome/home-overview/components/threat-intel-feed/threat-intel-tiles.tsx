@@ -26,7 +26,12 @@ const TILES: Array<{
   /** Present only for clickable tiles; IOCs and CVEs matched are reference-only. */
   onSelect?: () => void;
 }> = [
-  { key: 'rules', label: 'Rules', testSubj: 'threat-intel-tile-rules', onSelect: goToRules },
+  {
+    key: 'rules',
+    label: 'Rules',
+    testSubj: 'threat-intel-tile-rules',
+    onSelect: goToRules,
+  },
   {
     key: 'decoders',
     label: 'Decoders',

@@ -16,9 +16,7 @@ export const ScaTiles: React.FC<ScaTilesProps> = ({ tiles }) => (
   <EuiFlexGroup gutterSize='m' responsive={false} wrap>
     <EuiFlexItem>
       <StatTile
-        value={
-          <span className='tab-num'>{formatUINumber(tiles.passed)}</span>
-        }
+        value={<span className='tab-num'>{formatUINumber(tiles.passed)}</span>}
         label='Passed'
         color={UI_COLOR_STATUS.success}
         reverse
@@ -27,9 +25,7 @@ export const ScaTiles: React.FC<ScaTilesProps> = ({ tiles }) => (
     </EuiFlexItem>
     <EuiFlexItem>
       <StatTile
-        value={
-          <span className='tab-num'>{formatUINumber(tiles.failed)}</span>
-        }
+        value={<span className='tab-num'>{formatUINumber(tiles.failed)}</span>}
         label='Failed'
         color={UI_COLOR_STATUS.failed}
         reverse
@@ -39,9 +35,7 @@ export const ScaTiles: React.FC<ScaTilesProps> = ({ tiles }) => (
     <EuiFlexItem>
       <StatTile
         value={
-          <span className='tab-num'>
-            {formatUINumber(tiles.notApplicable)}
-          </span>
+          <span className='tab-num'>{formatUINumber(tiles.notApplicable)}</span>
         }
         label='N/A'
         color={UI_COLOR_STATUS.notApplicable}

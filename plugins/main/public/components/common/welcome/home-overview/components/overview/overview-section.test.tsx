@@ -155,7 +155,13 @@ describe('OverviewSection', () => {
   it('shows a "deploy new agent" prompt instead of counts when the fleet is empty', () => {
     asMock(useAgentStatus).mockReturnValue({
       status: 'available',
-      data: { active: 0, disconnected: 0, pending: 0, neverConnected: 0, total: 0 },
+      data: {
+        active: 0,
+        disconnected: 0,
+        pending: 0,
+        neverConnected: 0,
+        total: 0,
+      },
     });
     const { container } = render(
       <OverviewSection findings={findingsAvailable} />,

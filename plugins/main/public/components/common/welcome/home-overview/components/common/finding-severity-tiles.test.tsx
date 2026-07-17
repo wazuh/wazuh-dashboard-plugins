@@ -12,7 +12,9 @@ describe('FindingSeverityTiles', () => {
       />,
     );
     expect(
-      container.querySelector('[data-test-subj="vulnerability-severity-critical"]'),
+      container.querySelector(
+        '[data-test-subj="vulnerability-severity-critical"]',
+      ),
     ).toBeInTheDocument();
     expect(
       container.querySelector('[data-test-subj="finding-severity-critical"]'),
