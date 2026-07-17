@@ -2,9 +2,9 @@ import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThreatHuntingSection } from './threat-hunting-section';
-import * as navigation from '../../navigation';
+import * as navigation from '../../utils/navigation';
 
-jest.mock('../../navigation', () => ({
+jest.mock('../../utils/navigation', () => ({
   goToThreatHunting: jest.fn(),
   goToMitre: jest.fn(),
   goToMitreTechnique: jest.fn(),

@@ -2,9 +2,9 @@ import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { CloudSecurityCards } from './cloud-security-cards';
-import { goToCloudModule } from '../../navigation';
+import { goToCloudModule } from '../../utils/navigation';
 
-jest.mock('../../navigation', () => ({
+jest.mock('../../utils/navigation', () => ({
   goToCloudModule: jest.fn(),
 }));
 

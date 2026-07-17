@@ -9,7 +9,7 @@ import {
   EuiCallOut,
   EuiText,
 } from '@elastic/eui';
-import { DataGroupStatus } from '../../data-group';
+import { DataGroupStatus } from '../../interfaces/data-group';
 
 export interface WidgetGroupHeaderLink {
   label: string;

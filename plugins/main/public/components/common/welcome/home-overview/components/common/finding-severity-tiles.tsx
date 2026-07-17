@@ -1,7 +1,7 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { StatTile } from './stat-tile';
-import { SeverityBand, SeverityCounts } from '../../types';
+import { SeverityBand, SeverityCounts } from '../../interfaces/types';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 

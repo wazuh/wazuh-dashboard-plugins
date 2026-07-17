@@ -21,7 +21,7 @@ import {
   goToMitreTechnique,
   goToThreatHunting,
   goToVulnerabilityDetection,
-} from '../../navigation';
+} from '../../utils/navigation';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 
 export interface ThreatHuntingSectionProps {

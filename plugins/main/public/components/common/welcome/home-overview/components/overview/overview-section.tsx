@@ -20,7 +20,7 @@ import {
   goToMitre,
   goToItHygiene,
   goToMitreTactic,
-} from '../../navigation';
+} from '../../utils/navigation';
 
 export interface OverviewSectionProps {
   /** Owned by the page shell so Threat Hunting reuses the same on-mount search. */
@@ -58,7 +58,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
         <EuiFlexItem>
           <WidgetGroup
             status={findings.status}
-            title='Findings — last 24 hours'
+            title='Findings'
             caption='Last 24 hours'
             headerLink={{ label: 'Threat Hunting', onClick: goToThreatHunting }}
             centerBody

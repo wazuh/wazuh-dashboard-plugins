@@ -8,7 +8,7 @@ import {
   office365,
   microsoftGraphAPI,
 } from '../../../../../../utils/applications';
-import { goToCloudModule } from '../../navigation';
+import { goToCloudModule } from '../../utils/navigation';
 
 const CLOUD_MODULES = [
   docker,

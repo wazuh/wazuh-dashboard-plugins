@@ -33,9 +33,9 @@ import {
   buildTopTermsAgg,
   buildVulnerabilitySeverityFiltersAgg,
   buildVulnerabilityTopOsAgg,
-} from '../queries';
-import { HOST_OS_NAME_FIELD, PROCESS_NAME_FIELD } from '../fields';
-import { AGG } from '../agg-names';
+} from '../lib/queries';
+import { HOST_OS_NAME_FIELD, PROCESS_NAME_FIELD } from '../lib/fields';
+import { AGG } from '../lib/agg-names';
 import {
   mapAgentStatus,
   mapCardinality,
@@ -45,7 +45,7 @@ import {
   mapSeverityCounts,
   mapTopBuckets,
   mapTopBucketsByMetric,
-} from '../mappers';
+} from '../lib/mappers';
 import {
   fetchDecodersCount,
   fetchDetectorsCount,
@@ -59,8 +59,8 @@ import {
   ScaOverview,
   TopItem,
   VulnerabilityOverview,
-} from '../types';
-import { DATA_SOURCE_NOT_FOUND, DataGroupResult } from '../data-group';
+} from '../interfaces/types';
+import { DATA_SOURCE_NOT_FOUND, DataGroupResult } from '../interfaces/data-group';
 
 /**
  * Data hooks for the Home overview. Every widget reads its data through one of

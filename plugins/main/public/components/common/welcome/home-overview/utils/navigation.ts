@@ -1,4 +1,4 @@
-import NavigationService from '../../../../react-services/navigation-service';
+import NavigationService from '../../../../../react-services/navigation-service';
 import {
   threatHunting,
   mitreAttack,
@@ -10,12 +10,12 @@ import {
   activeResponses,
   regulatoryCompliance,
   endpointSummary,
-} from '../../../../utils/applications';
+} from '../../../../../utils/applications';
 import {
   FILTER_OPERATOR,
   PatternDataSourceFilterManager,
-} from '../../data-source/pattern/pattern-data-source-filter-manager';
-import { MITRE_TACTIC_NAME_FIELD, MITRE_TECHNIQUE_NAME_FIELD } from './fields';
+} from '../../../data-source/pattern/pattern-data-source-filter-manager';
+import { MITRE_TACTIC_NAME_FIELD, MITRE_TECHNIQUE_NAME_FIELD } from '../lib/fields';
 
 /** Navigation helpers, kept in one module so sections depend on one boundary. */
 

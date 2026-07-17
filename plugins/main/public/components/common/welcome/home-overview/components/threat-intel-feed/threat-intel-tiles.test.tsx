@@ -7,9 +7,9 @@ import {
   goToDetectors,
   goToIntegrations,
   goToRules,
-} from '../../navigation';
+} from '../../utils/navigation';
 
-jest.mock('../../navigation', () => ({
+jest.mock('../../utils/navigation', () => ({
   goToRules: jest.fn(),
   goToDecoders: jest.fn(),
   goToIntegrations: jest.fn(),

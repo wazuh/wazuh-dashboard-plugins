@@ -1,7 +1,7 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { WidgetGroupBody, StatTile } from '../common';
-import { DataGroupResult } from '../../data-group';
+import { DataGroupResult } from '../../interfaces/data-group';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 
 export interface ItHygieneTilesProps {

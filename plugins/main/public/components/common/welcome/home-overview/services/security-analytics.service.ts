@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { getHttp } from '../../../../../kibana-services';
-import { DATA_SOURCE_NOT_FOUND } from '../data-group';
+import { DATA_SOURCE_NOT_FOUND } from '../interfaces/data-group';
 
 /**
  * Shared count client for Rules/Decoders/Integrations/Detectors. Every

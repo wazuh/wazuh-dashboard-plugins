@@ -8,7 +8,7 @@ import {
   useTopNetworkServices,
 } from '../../hooks/use-overview-data';
 import { useInViewport } from '../../../../hooks';
-import * as navigation from '../../navigation';
+import * as navigation from '../../utils/navigation';
 
 // Explicit factories so the real modules (and their heavy data-source imports)
 // are never loaded — this section is tested purely against the seam boundary.
@@ -17,7 +17,7 @@ jest.mock('../../hooks/use-overview-data', () => ({
   useTopOperatingSystems: jest.fn(),
   useTopNetworkServices: jest.fn(),
 }));
-jest.mock('../../navigation', () => ({
+jest.mock('../../utils/navigation', () => ({
   getDeployAgentUrl: jest.fn(() => 'https://example.test/deploy'),
   goToAgents: jest.fn(),
   goToThreatHunting: jest.fn(),

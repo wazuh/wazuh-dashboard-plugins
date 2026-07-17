@@ -10,7 +10,7 @@ import {
   useItHygieneUsersCount,
 } from '../../hooks/use-overview-data';
 import { useInViewport } from '../../../../hooks';
-import * as navigation from '../../navigation';
+import * as navigation from '../../utils/navigation';
 
 jest.mock('../../hooks/use-overview-data', () => ({
   useItHygieneOperatingSystemsCount: jest.fn(),
@@ -19,7 +19,7 @@ jest.mock('../../hooks/use-overview-data', () => ({
   useItHygieneServicesCount: jest.fn(),
   useActiveResponseOverview: jest.fn(),
 }));
-jest.mock('../../navigation', () => ({
+jest.mock('../../utils/navigation', () => ({
   goToItHygiene: jest.fn(),
   goToActiveResponse: jest.fn(),
   goToRegulatoryCompliance: jest.fn(),

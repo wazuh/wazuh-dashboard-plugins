@@ -1,6 +1,6 @@
 import React from 'react';
 import { EuiEmptyPrompt, EuiFlexGroup, EuiFlexItem, EuiTitle, EuiText } from '@elastic/eui';
-import { AgentStatus } from '../../types';
+import { AgentStatus } from '../../interfaces/types';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 import { WzButtonPermissions } from '../../../../permissions/button';

@@ -10,7 +10,7 @@ import {
   useRulesCount,
   useVulnerabilityOverview,
 } from '../../hooks/use-overview-data';
-import { DataGroupResult } from '../../data-group';
+import { DataGroupResult } from '../../interfaces/data-group';
 
 export interface ThreatIntelligenceFeedSectionProps {
   /** Shared vulnerabilities search; provides the CVEs-matched tile. */

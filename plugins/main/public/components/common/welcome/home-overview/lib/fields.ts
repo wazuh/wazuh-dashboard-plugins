@@ -1,4 +1,4 @@
-import { SeverityBand } from './types';
+import { SeverityBand } from '../interfaces/types';
 
 /** Field-name constants shared by the query builders, mappers and navigation. */
 

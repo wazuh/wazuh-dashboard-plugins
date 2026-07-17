@@ -12,7 +12,7 @@ jest.mock('../../hooks/use-overview-data', () => ({
   useSCAOverview: jest.fn(),
   useFIMOverview: jest.fn(),
 }));
-jest.mock('../../navigation', () => ({
+jest.mock('../../utils/navigation', () => ({
   goToConfigurationAssessment: jest.fn(),
   goToFileIntegrityMonitoring: jest.fn(),
   goToMalwareDetection: jest.fn(),

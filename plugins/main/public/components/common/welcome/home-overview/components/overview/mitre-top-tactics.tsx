@@ -1,6 +1,6 @@
 import React from 'react';
 import { BarList } from '../common';
-import { TopItem } from '../../types';
+import { TopItem } from '../../interfaces/types';
 
 export interface MitreTopTacticsProps {
   items: TopItem[];

@@ -6,7 +6,7 @@ import {
   fetchRulesCount,
   SECURITY_ANALYTICS_ROUTES,
 } from './security-analytics.service';
-import { DATA_SOURCE_NOT_FOUND } from '../data-group';
+import { DATA_SOURCE_NOT_FOUND } from '../interfaces/data-group';
 
 jest.mock('../../../../../kibana-services', () => ({
   getHttp: jest.fn(),

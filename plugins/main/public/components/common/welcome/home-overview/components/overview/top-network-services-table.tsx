@@ -1,6 +1,6 @@
 import React from 'react';
 import { TopNTable } from '../common';
-import { TopItem } from '../../types';
+import { TopItem } from '../../interfaces/types';
 
 export interface TopNetworkServicesTableProps {
   items: TopItem[];

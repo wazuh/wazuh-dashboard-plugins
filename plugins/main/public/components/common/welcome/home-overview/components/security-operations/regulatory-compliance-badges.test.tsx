@@ -2,9 +2,9 @@ import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { RegulatoryComplianceBadges } from './regulatory-compliance-badges';
-import { goToRegulatoryCompliance } from '../../navigation';
+import { goToRegulatoryCompliance } from '../../utils/navigation';
 
-jest.mock('../../navigation', () => ({
+jest.mock('../../utils/navigation', () => ({
   goToRegulatoryCompliance: jest.fn(),
 }));
 

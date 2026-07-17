@@ -20,7 +20,7 @@ import {
   useItHygieneServicesCount,
   useItHygieneUsersCount,
 } from '../../hooks/use-overview-data';
-import { goToActiveResponse, goToItHygiene } from '../../navigation';
+import { goToActiveResponse, goToItHygiene } from '../../utils/navigation';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 
 /** IT Hygiene and Active Response load lazily; Regulatory Compliance is static. */
@@ -77,6 +77,7 @@ const SecurityOperationsSectionComponent: React.FC = () => {
           >
             {activeResponse.data !== undefined && (
               <StatTile
+                reverse
                 value={
                   <span className='tab-num'>
                     {formatUINumber(activeResponse.data)}

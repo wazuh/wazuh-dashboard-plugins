@@ -1,6 +1,6 @@
 import React from 'react';
 import { EuiBasicTable, EuiBasicTableColumn, EuiEmptyPrompt } from '@elastic/eui';
-import { ScaBenchmark } from '../../types';
+import { ScaBenchmark } from '../../interfaces/types';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 
 export interface ScaBenchmarksTableProps {

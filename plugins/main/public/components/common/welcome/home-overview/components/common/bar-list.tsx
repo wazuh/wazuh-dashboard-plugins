@@ -6,7 +6,7 @@ import {
   EuiLink,
   EuiText,
 } from '@elastic/eui';
-import { TopItem } from '../../types';
+import { TopItem } from '../../interfaces/types';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 
 export interface BarListProps {

@@ -22,10 +22,10 @@ import {
 import {
   goToConfigurationAssessment,
   goToFileIntegrityMonitoring,
-} from '../../navigation';
+} from '../../utils/navigation';
 import { formatUINumber } from '../../../../../../react-services/format-number';
-import { DataGroupResult } from '../../data-group';
-import { MalwareOverview } from '../../types';
+import { DataGroupResult } from '../../interfaces/data-group';
+import { MalwareOverview } from '../../interfaces/types';
 
 export interface EndpointSecuritySectionProps {
   /** Malware Detection's IOC metrics ride the shared findings search. */

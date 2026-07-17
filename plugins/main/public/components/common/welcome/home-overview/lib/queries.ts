@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { CheckResult } from '../../../overview/sca/utils/constants';
+import { CheckResult } from '../../../../overview/sca/utils/constants';
 import { AGG, SCA_RESULT_BUCKET, TOP_N } from './agg-names';
 import {
   EVENT_DOC_ID_FIELD,

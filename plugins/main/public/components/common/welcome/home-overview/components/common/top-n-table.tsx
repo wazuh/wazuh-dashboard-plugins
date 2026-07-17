@@ -1,6 +1,6 @@
 import React from 'react';
 import { EuiBasicTable, EuiBasicTableColumn } from '@elastic/eui';
-import { TopItem } from '../../types';
+import { TopItem } from '../../interfaces/types';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 
 export interface TopNTableProps {

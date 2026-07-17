@@ -1,22 +1,21 @@
 import React from 'react';
 import { EuiBadge, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
-import { goToRegulatoryCompliance } from '../../navigation';
+import { WAZUH_MODULES_ID } from '../../../../../../../common/constants';
+import { WAZUH_MODULES } from '../../../../../../../common/wazuh-modules';
+import { goToRegulatoryCompliance } from '../../utils/navigation';
 
-/**
- * The 10 supported regulatory frameworks; tabView matches each framework's
- * module id in the Regulatory Compliance app.
- */
-const FRAMEWORKS = [
-  { label: 'PCI DSS', tabView: 'pci' },
-  { label: 'GDPR', tabView: 'gdpr' },
-  { label: 'HIPAA', tabView: 'hipaa' },
-  { label: 'NIST 800-53', tabView: 'nist' },
-  { label: 'NIST 800-171', tabView: 'nist-800-171' },
-  { label: 'TSC', tabView: 'tsc' },
-  { label: 'CMMC', tabView: 'cmmc' },
-  { label: 'FedRAMP', tabView: 'fedramp' },
-  { label: 'ISO 27001', tabView: 'iso-27001' },
-  { label: 'NIS2', tabView: 'nis2' },
+
+const FRAMEWORK_IDS = [
+  WAZUH_MODULES_ID.PCI_DSS,
+  WAZUH_MODULES_ID.GDPR,
+  WAZUH_MODULES_ID.HIPAA,
+  WAZUH_MODULES_ID.NIST_800_53,
+  WAZUH_MODULES_ID.NIST_800_171,
+  WAZUH_MODULES_ID.TSC,
+  WAZUH_MODULES_ID.CMMC,
+  WAZUH_MODULES_ID.FEDRAMP,
+  WAZUH_MODULES_ID.ISO_27001,
+  WAZUH_MODULES_ID.NIS2,
 ];
 
 export const RegulatoryComplianceBadges: React.FC = () => (
@@ -26,17 +25,20 @@ export const RegulatoryComplianceBadges: React.FC = () => (
     wrap
     data-test-subj='regulatory-compliance-badges'
   >
-    {FRAMEWORKS.map(framework => (
-      <EuiFlexItem grow={false} key={framework.tabView}>
-        <EuiBadge
-          color='hollow'
-          onClick={() => goToRegulatoryCompliance(framework.tabView)}
-          onClickAriaLabel={`Open ${framework.label}`}
-          data-test-subj={`regulatory-compliance-badge-${framework.tabView}`}
-        >
-          {framework.label}
-        </EuiBadge>
-      </EuiFlexItem>
-    ))}
+    {FRAMEWORK_IDS.map(id => {
+      const label = WAZUH_MODULES[id].title;
+      return (
+        <EuiFlexItem grow={false} key={id}>
+          <EuiBadge
+            color='hollow'
+            onClick={() => goToRegulatoryCompliance(id)}
+            onClickAriaLabel={`Open ${label}`}
+            data-test-subj={`regulatory-compliance-badge-${id}`}
+          >
+            {label}
+          </EuiBadge>
+        </EuiFlexItem>
+      );
+    })}
   </EuiFlexGroup>
 );

@@ -4,10 +4,10 @@ import {
   ScaTilesData,
   SeverityCounts,
   TopItem,
-} from './types';
+} from '../interfaces/types';
 import { SEVERITY_BANDS } from './fields';
 import { AGG, SCA_RESULT_BUCKET } from './agg-names';
-import { CheckResult } from '../../../overview/sca/utils/constants';
+import { CheckResult } from '../../../../overview/sca/utils/constants';
 
 /**
  * Pure transforms from OpenSearch/API responses to widget data. `camelcase`

@@ -16,7 +16,7 @@ jest.mock('../../hooks/use-overview-data', () => ({
   useIntegrationsCount: jest.fn(),
   useDetectorsCount: jest.fn(),
 }));
-jest.mock('../../navigation', () => ({
+jest.mock('../../utils/navigation', () => ({
   goToRules: jest.fn(),
   goToDecoders: jest.fn(),
   goToIntegrations: jest.fn(),

@@ -1,7 +1,7 @@
 import React from 'react';
 import { EuiLink } from '@elastic/eui';
 import { TopNTable } from '../common';
-import { TopItem } from '../../types';
+import { TopItem } from '../../interfaces/types';
 
 export interface TopTechniquesTableProps {
   items: TopItem[];

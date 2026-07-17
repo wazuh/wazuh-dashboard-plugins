@@ -1,14 +1,14 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiPanel } from '@elastic/eui';
 import { WidgetGroupBody, StatTile } from '../common';
-import { DataGroupResult } from '../../data-group';
+import { DataGroupResult } from '../../interfaces/data-group';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 import {
   goToDecoders,
   goToDetectors,
   goToIntegrations,
   goToRules,
-} from '../../navigation';
+} from '../../utils/navigation';
 
 export interface ThreatIntelTilesProps {
   rules: DataGroupResult<number>;
