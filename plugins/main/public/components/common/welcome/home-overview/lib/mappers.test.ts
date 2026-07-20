@@ -2,7 +2,6 @@
 import {
   mapSeverityCounts,
   mapTopBuckets,
-  mapTopBucketsByMetric,
   mapAgentStatus,
   mapCardinality,
   mapDocCount,
@@ -65,38 +64,6 @@ describe('mappers', () => {
     it('returns an empty array when the agg is missing', () => {
       expect(mapTopBuckets(undefined, 'tactics')).toEqual([]);
       expect(mapTopBuckets({}, 'tactics')).toEqual([]);
-    });
-  });
-
-  describe('mapTopBucketsByMetric', () => {
-    it('reads each bucket count from a nested metric sub-agg, not doc_count', () => {
-      const aggregations = {
-        ioc_feed_by_type: {
-          buckets: [
-            { key: 'domain', doc_count: 999, distinct_events: { value: 2 } },
-            { key: 'ip', doc_count: 999, distinct_events: { value: 1 } },
-          ],
-        },
-      };
-      expect(
-        mapTopBucketsByMetric(
-          aggregations,
-          'ioc_feed_by_type',
-          'distinct_events',
-        ),
-      ).toEqual([
-        { key: 'domain', count: 2 },
-        { key: 'ip', count: 1 },
-      ]);
-    });
-
-    it('returns an empty array when the agg is missing', () => {
-      expect(
-        mapTopBucketsByMetric(undefined, 'ioc_feed_by_type', 'distinct_events'),
-      ).toEqual([]);
-      expect(
-        mapTopBucketsByMetric({}, 'ioc_feed_by_type', 'distinct_events'),
-      ).toEqual([]);
     });
   });
 

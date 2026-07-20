@@ -4,10 +4,10 @@ import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-bo
 import {
   WidgetGroup,
   FindingSeverityTiles,
+  BarList,
   WIDGET_LOADING_MIN_HEIGHT,
 } from '../common';
 import { AgentsByStatus } from './agents-by-status';
-import { MitreTopTactics } from './mitre-top-tactics';
 import { TopOsTable } from './top-os-table';
 import { TopNetworkServicesTable } from './top-network-services-table';
 import { useInViewport } from '../../../../hooks';
@@ -100,11 +100,13 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
         data-test-subj='home-overview-mitre-tactics'
       >
         {findings.data && (
-          <MitreTopTactics
+          <BarList
             items={findings.data.topTactics}
             onSelect={item =>
               goToMitreTactic(item.key, findings.indexPatternId)
             }
+            emptyMessage='No MITRE ATT&CK tactics observed in the last 24 hours'
+            data-test-subj='mitre-top-tactics'
           />
         )}
       </WidgetGroup>

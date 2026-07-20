@@ -126,27 +126,6 @@ export function mapTopBuckets(
   }));
 }
 
-/**
- * Like mapTopBuckets, but each bucket's count comes from a nested metric
- * sub-agg (e.g. cardinality) instead of doc_count.
- */
-export function mapTopBucketsByMetric(
-  aggregations: Aggregations,
-  aggName: string,
-  metricName: string,
-): TopItem[] {
-  const buckets = aggregations?.[aggName]?.buckets;
-  if (!Array.isArray(buckets)) {
-    return [];
-  }
-  return (
-    buckets as Array<{ key: string | number; [metric: string]: unknown }>
-  ).map(bucket => ({
-    key: String(bucket.key),
-    count: (bucket[metricName] as { value?: number } | undefined)?.value ?? 0,
-  }));
-}
-
 export function mapAgentStatus(
   connection: AgentConnectionSummary | undefined,
 ): AgentStatus {

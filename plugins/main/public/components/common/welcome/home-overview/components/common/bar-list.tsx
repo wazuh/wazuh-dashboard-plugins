@@ -68,18 +68,3 @@ export const BarList: React.FC<BarListProps> = ({
     </div>
   );
 };
-
-export type BarListConfig = Pick<
-  BarListProps,
-  'emptyMessage' | 'data-test-subj'
->;
-
-export const createBarList = (
-  config: BarListConfig,
-): React.FC<Pick<BarListProps, 'items' | 'getHref' | 'onSelect'>> => {
-  const List: React.FC<
-    Pick<BarListProps, 'items' | 'getHref' | 'onSelect'>
-  > = props => <BarList {...props} {...config} />;
-  List.displayName = `BarList(${config['data-test-subj'] ?? 'unnamed'})`;
-  return List;
-};
