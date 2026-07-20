@@ -13,6 +13,8 @@ import {
   useVulnerabilityOverview,
 } from './hooks/use-overview-data';
 import { useInViewport } from '../../hooks';
+import { withErrorBoundary, withGlobalBreadcrumb } from '../../hocs';
+import { overview } from '../../../../utils/applications';
 
 /**
  * Findings (on mount) and the lazy searches (vulnerabilities, threat-intel
@@ -62,10 +64,12 @@ const HomeOverviewBody: React.FC = () => {
   );
 };
 
-export const HomeOverview: React.FC = () => (
-  <EuiPage paddingSize='l'>
-    <EuiPageBody>
-      <HomeOverviewBody />
-    </EuiPageBody>
-  </EuiPage>
+export const HomeOverview = withErrorBoundary(
+  withGlobalBreadcrumb(() => [{ text: overview.breadcrumbLabel }])(() => (
+    <EuiPage paddingSize='l'>
+      <EuiPageBody>
+        <HomeOverviewBody />
+      </EuiPageBody>
+    </EuiPage>
+  )),
 );

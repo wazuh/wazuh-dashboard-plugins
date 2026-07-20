@@ -22,12 +22,7 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
   data,
   deployAgentUrl,
 }) => {
-  if (
-    data.active === 0 &&
-    data.disconnected === 0 &&
-    data.pending === 0 &&
-    data.neverConnected === 0
-  ) {
+  if (data.total === 0) {
     return (
       <EuiEmptyPrompt
         body={

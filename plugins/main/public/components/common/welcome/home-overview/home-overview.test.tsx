@@ -46,6 +46,10 @@ jest.mock('./hooks/use-overview-data', () => ({
 jest.mock('../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),
 }));
+jest.mock('../../hocs', () => ({
+  withGlobalBreadcrumb: () => (Component: React.FC) => Component,
+  withErrorBoundary: (Component: React.FC) => Component,
+}));
 
 import { HomeOverview } from './home-overview';
 
