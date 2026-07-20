@@ -13,6 +13,7 @@ let pollIntervalSeconds = CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC;
 let deviceAuthExpiresAt: number | null = null;
 let deviceAuthLinks: CtiDeviceAuthorization | null = null;
 let subscription: CtiSubscriptionSnapshot | null = null;
+let lastStatusFetchAtMs: number | null = null;
 
 export const ctiFlowState = {
   /** Whether CM subscription reports this environment as registered. */
@@ -95,6 +96,15 @@ export const ctiFlowState = {
     return deviceAuthExpiresAt != null && Date.now() > deviceAuthExpiresAt;
   },
 
+  /** Kept on this module-level singleton so it survives a component remount. */
+  getLastStatusFetchAtMs(): number | null {
+    return lastStatusFetchAtMs;
+  },
+
+  markStatusFetched(): void {
+    lastStatusFetchAtMs = Date.now();
+  },
+
   reset(): void {
     deviceCode = null;
     registrationComplete = false;
@@ -102,5 +112,6 @@ export const ctiFlowState = {
     deviceAuthExpiresAt = null;
     deviceAuthLinks = null;
     subscription = null;
+    lastStatusFetchAtMs = null;
   },
 };

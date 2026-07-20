@@ -28,6 +28,7 @@ export const caseManagementDocumentDetailsTabs: DocumentViewTableAndJsonPropsAdd
     {
       id: 'case-management',
       name: 'Case',
+      guardUnsavedChanges: true,
       content: (
         <CaseManagementTab
           document={{ _index: document._index, _id: document._id }}

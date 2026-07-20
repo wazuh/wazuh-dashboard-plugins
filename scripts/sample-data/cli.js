@@ -1,95 +1,112 @@
 #!/usr/bin/env node
 
-const { generateSampleDataWithDataset } = require('./lib/index');
+const {
+  generateSampleDataWithDataset,
+  getDatasetIndex,
+  getDatasetTemplate,
+} = require('./lib/index');
+const { batch, formats } = require('./lib/output-formats');
+const {
+  log,
+  ensureIndicesExist,
+  insertData,
+  validateConfig,
+} = require('./lib/curl-indexer');
 const path = require('path');
 const fs = require('fs');
 
-// Get available datasets first
+const INSERT_BATCH_SIZE = 500; // docs per curl call when --output insert is used
+
+// Get avalible datasets
 const datasets = fs
   .readdirSync(
     path.join(__dirname, '../../plugins/main/server/lib/sample-data/dataset'),
   )
-  .filter(file => !file.endsWith('.js'));
+  .filter(file => !file.startsWith('.') && !file.endsWith('.js'));
 
-// Default alert generation parameters
-const defaultAlertGenerationParams = {
-  manager: {
-    name: 'wazuh-manager',
-  },
+const findings_datasets = datasets.filter(file => file.startsWith('findings'));
+
+// Default document generation parameters
+const defaultDocumentGenerationParams = {
   cluster: {
-    name: 'wazuh-cluster',
-    node: 'wazuh-manager',
+    name: 'wazuh',
+    node: 'node01',
   },
 };
 
-// Define the formats
-const formats = {
-  ndjson: {
-    description: 'Format the alerts to ndjson. Each line is an alert.',
-    run: alerts => {
-      return alerts.map(item => JSON.stringify(item)).join('\n');
-    },
-  },
-  'bulk-api': {
-    description: 'Format the alerts to OpenSearch or Elasticsearch Bulk API.',
-    run: (alerts, index) => {
-      if (!index) {
-        console.error(
-          'Index is not defined. Use --index parameter with bulk-api format.',
-        );
-        process.exit(1);
-      }
-      return (
-        alerts
-          .map(
-            alert =>
-              `{"index": {"_index": "${index}"}}\n${JSON.stringify(alert)}`,
-          )
-          .join('\n') + '\n'
-      );
-    },
-  },
-};
-
-// Parse command line arguments
 const args = process.argv.slice(2);
 const usage = `
-Usage: node cli.js [options]
+Usage: node cli.js (--dataset <name> | --all | --all-findings) [options]
+
+There are two kinds of dataset, both used the same way from this CLI:
+
+  - Synthesized (e.g. states-fim-files, metrics-agents): generate fresh random
+    documents on every call.
+  - Pre-generated findings (prefixed findings-, e.g. findings-aws):
+    load documents from a findings.json, reajust their timestamps and inject
+    the cluster params. --count cycles over the base documents.
+
+Each dataset may declare a default index (DATASET_INDEX in its main.js). For
+bulk-api, the index is resolved as: --index (if given) wins for every dataset;
+otherwise each dataset uses its own default. If neither is available for a
+dataset, that dataset errors out.
 
 Options:
-  --dataset <name>     Dataset name to use (required) (available datasets: ${datasets.join(
+  --dataset <name>      Dataset name to use (required) (available datasets: ${datasets.join(
     ', ',
   )})
-  --count <number>     Number of alerts to generate (default: 100)
-  --output <file>      Output file to save the generated sample data (optional)
-  --format <format>    Output format (default: ndjson)
-                       Available formats: ${Object.keys(formats).join(', ')}
-  --index <name>       Index name for bulk-api format (required when using bulk-api format)
-  --param-manager-name <name>  Set the manager name (default: ${
-    defaultAlertGenerationParams.manager.name
-  })
+  --all                 Generate --count documents for EVERY dataset
+  --all-findings        Generate --count documents for EVERY finding dataset
+  --count <number>      Number of documents to generate per dataset (default: 100)
+  --output <file>       Output file to save the generated data (optional;
+                        defaults to stdout)
+  --output insert       Value to auto insert the output instead of defaulting to
+                        stout or a file. The curl command with the data will be
+                        still saved on a log file, inside the logs folder.
+                        insert overrides the format flag to default bulk-api.
+                        Requires SAMPLE_DATA_SERVER_ADDRESS, SAMPLE_DATA_USERNAME and
+                        SAMPLE_DATA_USER_PASSWORD environment variables to be set; any
+                        missing value will trigger an interactive prompt.
+                        Before inserting, each target index is created (if it
+                        doesn't exist yet) using the settings/mappings from its
+                        dataset's template.json, when one is declared.
+  --format <format>     Output format (default: ndjson)
+                        Available formats: ${Object.keys(formats).join(', ')}
+  --index <name>        Index name for bulk-api format. Overrides each dataset's
+                        default index. Required only if a dataset has no default.
   --param-cluster-name <name>  Set the cluster name (default: ${
-    defaultAlertGenerationParams.cluster.name
+    defaultDocumentGenerationParams.cluster.name
   })
   --param-cluster-node <name>  Set the cluster node (default: ${
-    defaultAlertGenerationParams.cluster.node
+    defaultDocumentGenerationParams.cluster.node
   })
   --help               Show this help message
 
-Example:
+Examples:
   node cli.js --dataset states-fim-files --count 500
-  node cli.js --dataset states-fim-files --count 500 --output sample-data.ndjson
-  node cli.js --dataset states-fim-files --count 500 --format bulk-api --index wazuh-states-fim-files-sample --output bulk-data.json
-  node cli.js --dataset states-fim-files --param-manager-name my-manager --param-cluster-name my-cluster
+  node cli.js --dataset findings-aws --count 20
+  node cli.js --dataset findings-sca --format bulk-api
+  node cli.js --all --count 50 --output all.ndjson
+  node cli.js --all-findings --output insert
 `;
+
+/**
+ * Example POST curl:
+ * curl -k -u USERNAME:PASSWORD -X POST "SAMPLE_DATA_SERVER_ADDRESS/_bulk" -H "Content-Type: application/x-ndjson" --data-binary "@bulk-data.json"
+ *
+ * Exampl DELETE curl:
+ * curl -u USERNAME:PASSWORD -k -H "Content-Type: application/json"   -XPOST "SAMPLE_DATA_SERVER_ADDRESS/INDEX_PATTERN/_delete_by_query?conflicts=proceed"   -d '{"query"{"match_all": {}}}'
+ */
 
 // Parse arguments
 let dataset = null;
+let all = false;
+let all_findings = false;
 let count = 100;
-let outputFile = null;
+let output = null;
 let format = 'ndjson';
 let index = null;
-const alertGenerationParams = { ...defaultAlertGenerationParams };
+const documentGenerationParams = { ...defaultDocumentGenerationParams };
 
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--help') {
@@ -98,6 +115,10 @@ for (let i = 0; i < args.length; i++) {
   } else if (args[i] === '--dataset' && i + 1 < args.length) {
     dataset = args[i + 1];
     i++;
+  } else if (args[i] === '--all') {
+    all = true;
+  } else if (args[i] === '--all-findings') {
+    all_findings = true;
   } else if (args[i] === '--count' && i + 1 < args.length) {
     count = parseInt(args[i + 1], 10);
     if (isNaN(count)) {
@@ -105,9 +126,6 @@ for (let i = 0; i < args.length; i++) {
       console.log(usage);
       process.exit(1);
     }
-    i++;
-  } else if (args[i] === '--output' && i + 1 < args.length) {
-    outputFile = args[i + 1];
     i++;
   } else if (args[i] === '--format' && i + 1 < args.length) {
     const requestedFormat = args[i + 1];
@@ -123,104 +141,177 @@ for (let i = 0; i < args.length; i++) {
       process.exit(1);
     }
     i++;
+  } else if (args[i] === '--output' && i + 1 < args.length) {
+    output = args[i + 1];
+    if (output === 'insert') {
+      format = 'bulk-api';
+      console.log('output set as "insert", override format as bulk-api');
+    }
+    i++;
   } else if (args[i] === '--index' && i + 1 < args.length) {
     index = args[i + 1];
     i++;
-  } else if (args[i] === '--param-manager-name' && i + 1 < args.length) {
-    alertGenerationParams.manager.name = args[i + 1];
-    i++;
   } else if (args[i] === '--param-cluster-name' && i + 1 < args.length) {
-    alertGenerationParams.cluster.name = args[i + 1];
+    documentGenerationParams.cluster.name = args[i + 1];
     i++;
   } else if (args[i] === '--param-cluster-node' && i + 1 < args.length) {
-    alertGenerationParams.cluster.node = args[i + 1];
+    documentGenerationParams.cluster.node = args[i + 1];
     i++;
   }
 }
 
-// Validate required arguments
-if (!dataset) {
-  console.error('Error: --dataset is required');
+// Validation
+if (!dataset && !all && !all_findings) {
+  console.error(
+    'Error: choose a source: --dataset <name>, --all or --all-findings',
+  );
+  console.log(usage);
+  process.exit(1);
+}
+if ((dataset && all) || (dataset && all_findings) || (all_findings && all)) {
+  console.error(
+    'Error: --dataset, --all and --all-findings are mutually exclusive',
+  );
+  console.log(usage);
+  process.exit(1);
+}
+if (dataset && !datasets.includes(dataset)) {
+  console.error(
+    `Error: unknown dataset '${dataset}'. Available: ${datasets.join(', ')}`,
+  );
   console.log(usage);
   process.exit(1);
 }
 
-// Validate index parameter when using bulk-api format
-if (format === 'bulk-api' && !index) {
-  console.error('Error: --index is required when using bulk-api format');
-  console.log(usage);
-  process.exit(1);
-}
+// Resolve the target datasets up front so indices can be validated before
+// generating anything.
+const targets = all ? datasets : all_findings ? findings_datasets : [dataset];
 
-try {
-  const resultOrPromise = [];
-
-  for (let i = 0; i < count; i++) {
-    resultOrPromise.push(
-      generateSampleDataWithDataset(dataset, alertGenerationParams),
-    );
+// For bulk-api, resolve each dataset's index (--index wins; otherwise the
+// dataset's own default) and fail early listing every dataset with no index.
+if (format === 'bulk-api') {
+  const missing = [];
+  for (const name of targets) {
+    if (!(index || getDatasetIndex(name))) {
+      missing.push(name);
+    }
   }
+  if (missing.length > 0) {
+    console.error(
+      `Error: no index for bulk-api on: ${missing.join(', ')}. ` +
+        `Pass --index, or declare DATASET_INDEX in each dataset's main.js.`,
+    );
+    console.log(usage);
+    process.exit(1);
+  }
+}
 
-  // Check if the result is a Promise
-  if (resultOrPromise && typeof resultOrPromise.then === 'function') {
-    // Handle as Promise
-    resultOrPromise
-      .then(result => {
-        handleResult(result);
-      })
-      .catch(error => {
-        console.error('Error generating alerts:', error);
-        process.exit(1);
+// Generation. Each entry keeps its resolved index alongside the document.
+const entries = [];
+try {
+  for (const name of targets) {
+    const resolvedIndex = index || getDatasetIndex(name) || null;
+    for (let i = 0; i < count; i++) {
+      entries.push({
+        doc: generateSampleDataWithDataset(name, {
+          ...documentGenerationParams,
+          index: i,
+        }),
+        index: resolvedIndex,
+        dataset: name,
       });
-  } else {
-    // Handle as direct result
-    handleResult(resultOrPromise);
+    }
   }
 } catch (error) {
-  console.error('Error generating alerts:', error);
+  console.error('Error generating documents:', error);
   process.exit(1);
 }
 
-// Function to handle the result
 function handleResult(result) {
-  // Check if result exists
-  if (!result) {
-    console.log('No alerts were generated');
+  if (!result || result.length === 0) {
+    console.log('No documents were generated');
     return;
   }
 
-  // Ensure result is an array
-  const alertsArray = Array.isArray(result) ? result : [result];
+  const docsArray = Array.isArray(result) ? result : [result];
 
-  // Save to file if output file is specified
-  if (outputFile) {
-    const outputPath = path.resolve(outputFile);
+  const formatted =
+    format === 'bulk-api'
+      ? formats['bulk-api'].run(result)
+      : formats.ndjson.run(result);
 
-    try {
-      // Format the data according to the selected format
-      let formattedData;
-      if (format === 'ndjson') {
-        formattedData = formats.ndjson.run(alertsArray);
-      } else if (format === 'bulk-api') {
-        formattedData = formats['bulk-api'].run(alertsArray, index);
+  if (output) {
+    if (output === 'insert') {
+      let config = {
+        SERVER_ADDRESS: process.env.SAMPLE_DATA_SERVER_ADDRESS,
+        USERNAME: process.env.SAMPLE_DATA_USERNAME,
+        PASSWORD: process.env.SAMPLE_DATA_USER_PASSWORD,
+      };
+      config = validateConfig(config);
+
+      const date = new Date().toISOString().replace(/[:.]/g, '-');
+      const logPath = path.join(
+        __dirname,
+        'logs',
+        `cli_sample_data_insert_${date}.log`,
+      );
+
+      ensureIndicesExist(docsArray, config, logPath, getDatasetTemplate);
+
+      const batches = batch(docsArray, INSERT_BATCH_SIZE);
+      const allFailed = [];
+
+      batches.forEach((batchDocs, i) => {
+        console.error(
+          `Inserting batch ${i + 1}/${batches.length} (${
+            batchDocs.length
+          } documents)...`,
+        );
+        const batchFormatted = formats['bulk-api'].run(batchDocs, index);
+        const failed = insertData(
+          batchFormatted,
+          config,
+          logPath,
+          i + 1,
+          batches.length,
+        );
+        allFailed.push(...failed);
+      });
+
+      if (allFailed.length > 0) {
+        console.error(
+          `\n${allFailed.length} document(s) failed to insert. See the log for details.`,
+        );
+
+        const errorLines = allFailed
+          .map(item => `${item._id} | ${item.status} | ${item.reason}`)
+          .join('\n');
+
+        log(
+          logPath,
+          `\n${'='.repeat(60)}\nErrors Summary: ${
+            allFailed.length
+          } document(s) failed\n${'='.repeat(60)}\n${errorLines}\n`,
+        );
       }
 
-      fs.writeFileSync(outputPath, formattedData);
-      console.log(`Alerts saved to ${outputPath} in ${format} format`);
-    } catch (error) {
-      console.error('Error saving to file:', error);
-      console.log('Result type:', typeof result);
-      console.log(
-        'Result structure:',
-        JSON.stringify(result).substring(0, 200) + '...',
-      );
+      console.error(`\nFull log saved to ${logPath}`);
+      return;
+    } else {
+      const outputPath = path.resolve(output);
+      try {
+        fs.writeFileSync(outputPath, formatted);
+        console.error(
+          `Saved ${result.length} documents to ${outputPath} in ${format} format`,
+        );
+      } catch (error) {
+        console.error('Error saving to file:', error);
+      }
     }
   } else {
-    // Output to console in the selected format
-    if (format === 'ndjson') {
-      console.log(formats.ndjson.run(alertsArray));
-    } else if (format === 'bulk-api') {
-      console.log(formats['bulk-api'].run(alertsArray, index));
-    }
+    process.stdout.write(formatted + '\n');
   }
 }
+
+// Output
+handleResult(entries);
