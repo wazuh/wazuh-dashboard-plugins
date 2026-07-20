@@ -25,36 +25,87 @@ To address review feedback, push new commits on top of the branch and re-request
 
 ### Body template
 
-Use the following template when creating a Pull Request:
+Every Pull Request must use the repository's pull request template. Its full content:
 
 ```markdown
-### Description
-
-<!-- Describe what this change achieves -->
-
-### Issues Resolved
-
-<!-- List any issues this PR will resolve. Prefix the issue with the keyword closes, fixes, fix -->
-<!-- Example: closes #1234 or fixes <Issue_URL> -->
-
-### Evidence
-
-<!-- Attach any evidence. Any change to the UI requires an attached screenshot in the PR Description -->
-
-### Testing the changes
+## Description
 
 <!--
-  Please provide detailed steps for validating your changes. This could involve specific commands to run,
-  pages to visit, scenarios to try or any other information that would help reviewers verify
-  the functionality of your change
+Provide a brief description of the problem this pull request addresses. Include relevant context to help reviewers understand the purpose and scope of the changes.
+
+If this pull request resolves an existing issue, reference it here. For example:
+Closes #<issue_number>
 -->
 
-### Check List
+## Proposed Changes
 
-...
+<!--
+Summarize the changes made in this pull request. Include:
+- Features added
+- Bugs fixed
+- Any relevant technical details
+-->
+
+### Results and Evidence
+
+<!--
+Provide evidence of the changes made, such as:
+- Logs
+- Screenshots
+- Before/after comparisons
+-->
+
+### Artifacts Affected
+
+<!--
+List the artifacts impacted by this pull request, such as:
+- Executables (specify platforms if applicable)
+- Default configuration files
+- Packages
+-->
+
+### Configuration Changes
+
+<!--
+If applicable, list any configuration changes introduced by this pull request, including:
+- New configuration parameters
+- Changes to default values
+- Backward compatibility notes
+-->
+
+### Documentation Updates
+
+<!--
+If applicable, list the sections of documentation that have been updated as part of this pull request.
+-->
+
+### Tests Introduced
+
+<!--
+If applicable, describe any new unit or integration tests added as part of this pull request. Include:
+- Scope of the tests
+- Any relevant details about test coverage
+-->
+
+## Review Checklist
+
+<!--
+List any manual tests completed to verify the functionality of the changes. Include any manual tests that are still required for final approval.
+-->
+
+- [ ] Code changes reviewed
+- [ ] Relevant evidence provided
+- [ ] Tests cover the new functionality
+- [ ] Configuration changes documented
+- [ ] Developer documentation reflects the changes
+- [ ] Meets requirements and/or definition of done
+- [ ] No unresolved dependencies with other issues
+- [ ] PR is linked to the relevant issue(s)
+- [ ] Correct labels applied (e.g., `no-changelog`)
+- [ ] ...
 ```
 
-Always link the related issue in **Issues Resolved** with a closing keyword (`closes`, `fixes`, `fix`) so it auto closes on merge, and describe **why** rather than just **what**, the diff already shows what changed, so the description should explain the motivation. Any change to the UI **must** include a screenshot or video as evidence.
+Always link the related issue in **`## Description`** with a closing keyword (`Closes`, `Fixes`, `Fix`) so it auto closes on merge, and describe **why** rather than just **what**, the diff already shows what changed, so the description should explain the motivation. Any change to the UI **must** include a screenshot or video as evidence under **`### Results and Evidence`**.
 
 ### Reviewing a PR
 
