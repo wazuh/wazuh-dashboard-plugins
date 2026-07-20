@@ -137,11 +137,15 @@ PR pre-flight
 
 ### 6. Create as Draft — only when explicitly asked
 
+Write the body filled in step 5 (not the blank template) to a temp file, then
+pass that file — never point `--body-file` at the template path itself, or the
+PR is created with the empty placeholder text.
+
 ```bash
 gh pr create --draft \
   --base <version-branch> \
   --title "<Imperative, capitalized subject>" \
-  --body-file <path-to-filled-pull_request_template.md>
+  --body-file /tmp/pr-body.md
 ```
 
 ### 7. Mark Ready for review — only when explicitly asked
