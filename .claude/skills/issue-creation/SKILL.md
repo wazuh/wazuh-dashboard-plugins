@@ -25,15 +25,15 @@ Copy this checklist and track progress:
 Map the user's intent to a template. Ask the user only when genuinely
 ambiguous between two rows.
 
-| Intent | Template | Labels (from template frontmatter) |
-|--------|----------|--------|
-| Bug / defect report | `bug_report.md` | `bug` |
-| New feature / enhancement request | `feature_request.md` | `enhancement` |
-| OpenSearch platform compatibility check | `compatibility_request.md` | `request/operational, level/task, type/maintenance` |
-| Wazuh release tracking (wazuh-team only) | `new_release.md` | `enhancement` |
-| Objective documentation & evidence gathering | `objective_delivery.md` | `level/task, type/test` |
-| Release-candidate UI regression testing | `regression_testing.md` | `level/task, type/test` |
-| Engineering task / improvement (not bug, feature, or docs gap) | `task_template.md` | `level/task` |
+| Intent                                                         | Template                   | Labels (from template frontmatter)                  |
+| -------------------------------------------------------------- | -------------------------- | --------------------------------------------------- |
+| Bug / defect report                                            | `bug_report.md`            | `bug`                                               |
+| New feature / enhancement request                              | `feature_request.md`       | `enhancement`                                       |
+| OpenSearch platform compatibility check                        | `compatibility_request.md` | `request/operational, level/task, type/maintenance` |
+| Wazuh release tracking (wazuh-team only)                       | `new_release.md`           | `enhancement`                                       |
+| Objective documentation & evidence gathering                   | `objective_delivery.md`    | `level/task, type/test`                             |
+| Release-candidate UI regression testing                        | `regression_testing.md`    | `level/task, type/test`                             |
+| Engineering task / improvement (not bug, feature, or docs gap) | `task_template.md`         | `level/task`                                        |
 
 ### 2. Issue-first duplicate check
 
@@ -83,12 +83,12 @@ frontmatter (bare `bug`, `enhancement`) that don't exist as real labels here
 filing the template as-is can result in no type label at all. Standardize on
 the real Wazuh label set instead of trusting the frontmatter verbatim:
 
-| Intent | Real label to apply |
-|--------|--------|
-| Bug / defect | `type/bug` |
-| Feature / enhancement | `type/enhancement` |
-| Engineering task / chore | `level/task` |
-| Every issue | `untriaged` — no auto-label workflow exists in this repo (unlike sibling repos), add it manually if you want every new issue triaged this way |
+| Intent                   | Real label to apply                                                                                                                           |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Bug / defect             | `type/bug`                                                                                                                                    |
+| Feature / enhancement    | `type/enhancement`                                                                                                                            |
+| Engineering task / chore | `level/task`                                                                                                                                  |
+| Every issue              | `untriaged` — no auto-label workflow exists in this repo (unlike sibling repos), add it manually if you want every new issue triaged this way |
 
 Do not invent labels beyond this set, and do not invent an approval workflow.
 
