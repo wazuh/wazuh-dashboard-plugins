@@ -87,23 +87,22 @@ If applicable, describe any new unit or integration tests added as part of this 
 - Any relevant details about test coverage
 -->
 
-### How to Test
+## Review Checklist
 
 <!--
-Describe the manual steps a reviewer can follow to verify this change works, such as:
-- Steps to reproduce/validate the change
-- Environment or setup needed (branch, data, feature flags, etc.)
-- Expected result
+List any manual tests completed to verify the functionality of the changes. Include any manual tests that are still required for final approval.
 -->
 
-### Review Checklist
-
-- [ ] All tests pass
-  - [ ] `yarn test:jest`
-- [ ] New functionality includes testing.
-- [ ] New functionality has been documented.
-- [ ] Update [CHANGELOG.md](./../CHANGELOG.md)
-- [ ] Commits are signed per the DCO using --signoff
+- [ ] Code changes reviewed
+- [ ] Relevant evidence provided
+- [ ] Tests cover the new functionality
+- [ ] Configuration changes documented
+- [ ] Developer documentation reflects the changes
+- [ ] Meets requirements and/or definition of done
+- [ ] No unresolved dependencies with other issues
+- [ ] PR is linked to the relevant issue(s)
+- [ ] Correct labels applied (e.g., `no-changelog`)
+- [ ] ...
 ```
 
 Always link the related issue in **`## Description`** with a closing keyword (`Closes`, `Fixes`, `Fix`) so it auto closes on merge, and describe **why** rather than just **what**, the diff already shows what changed, so the description should explain the motivation. Any change to the UI **must** include a screenshot or video as evidence under **`### Results and Evidence`**.
