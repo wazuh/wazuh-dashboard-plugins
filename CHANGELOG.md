@@ -35,6 +35,7 @@
 - Added Incident Response app [#8601](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8601) [#8679](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8679) [#8681](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8681) [#8724](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8724)
 - Added `wazuh.disabledSettings` configuration to hide specific settings in the Indexer Settings UI [#8643](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8643) [8693](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8693)
 - Expanded the case management form with title, description, severity, priority and TLP fields, comments that can be added or edited individually, and a confirmation dialog before discarding unsaved changes [#8718](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8718)
+- Added queue usage in bytes and agent cache visualizations to `Server Management` > `Statistics`, and relabeled the Comms "Queue usage" Y-axis to Bytes [#8768](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8768)
 
 ### Changed
 
