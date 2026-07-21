@@ -84,6 +84,9 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
     useState(false);
   const [isUpgradePanelClosed, setIsUpgradePanelClosed] = useState(false);
   const [apiVersion, setApiVersion] = useState('');
+  const [denyGetTasks] = useUserPermissionsRequirements([
+    { action: 'task:status', resource: '*:*:*' },
+  ]);
 
   const getApiVersion = async () => {
     const response = await getWazuhAPIVersion('AgentsTable.getApiVersion');
@@ -218,6 +221,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                 setIsModalVisible={setIsUpgradeTasksModalVisible}
                 isPanelClosed={isUpgradePanelClosed}
                 setIsPanelClosed={setIsUpgradePanelClosed}
+                allowGetTasks={!denyGetTasks}
               />
             }
             actionButtons={
