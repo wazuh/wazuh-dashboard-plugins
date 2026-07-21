@@ -32,7 +32,10 @@ export function StatTileGroup<K extends string>({
         }
         return (
           <EuiFlexItem key={tile.key}>
-            <WidgetGroupBody status={result.status}>
+            <WidgetGroupBody
+              status={result.status}
+              errorLabel={`Could not load ${tile.label}`}
+            >
               {result.data !== undefined &&
                 (bordered ? (
                   <EuiPanel

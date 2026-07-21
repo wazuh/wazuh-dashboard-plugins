@@ -20,6 +20,7 @@ import {
 import {
   getDeployAgentUrl,
   goToAgents,
+  goToAgentsByStatus,
   goToThreatHunting,
   goToMitre,
   goToItHygiene,
@@ -57,6 +58,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               <AgentsByStatus
                 data={agents.data}
                 deployAgentUrl={getDeployAgentUrl()}
+                onStatusSelect={goToAgentsByStatus}
               />
             )}
           </WidgetGroup>

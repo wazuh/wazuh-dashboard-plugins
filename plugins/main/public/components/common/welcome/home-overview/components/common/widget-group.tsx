@@ -114,30 +114,27 @@ export const WidgetGroup: React.FC<WidgetGroupProps> = ({
       data-test-subj={rest['data-test-subj']}
       style={{ display: 'flex', flexDirection: 'column' }}
     >
-      <EuiFlexGroup
-        alignItems='center'
-        gutterSize='s'
-        responsive={false}
-        style={{ flexGrow: 0 }}
-      >
-        <EuiFlexItem>
-          <EuiTitle size='xxs'>
-            <h3>{title}</h3>
-          </EuiTitle>
-          {caption && (
-            <EuiText size='xs' color='subdued'>
-              {caption}
-            </EuiText>
-          )}
-        </EuiFlexItem>
-        {headerLink && (
-          <EuiFlexItem grow={false}>
-            <EuiLink href={headerLink.href} onClick={headerLink.onClick}>
-              {headerLink.label}
-            </EuiLink>
+      <div style={{ flexGrow: 0 }}>
+        <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
+          <EuiFlexItem>
+            <EuiTitle size='xxs'>
+              <h3>{title}</h3>
+            </EuiTitle>
           </EuiFlexItem>
+          {headerLink && (
+            <EuiFlexItem grow={false}>
+              <EuiLink href={headerLink.href} onClick={headerLink.onClick}>
+                {headerLink.label}
+              </EuiLink>
+            </EuiFlexItem>
+          )}
+        </EuiFlexGroup>
+        {caption && (
+          <EuiText size='xs' color='subdued'>
+            {caption}
+          </EuiText>
         )}
-      </EuiFlexGroup>
+      </div>
       <div
         style={
           centerBody

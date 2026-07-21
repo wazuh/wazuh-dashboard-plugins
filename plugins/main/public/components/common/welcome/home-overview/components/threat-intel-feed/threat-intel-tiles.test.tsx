@@ -64,7 +64,7 @@ describe('ThreatIntelTiles', () => {
     expect(screen.getByText('Decoders')).toBeInTheDocument();
   });
 
-  it('shows a contained error for a failed tile, distinct from hidden', () => {
+  it('shows a contained error naming the failed stat, distinct from hidden', () => {
     const { container } = render(
       <ThreatIntelTiles {...allAvailable} decoders={{ status: 'error' }} />,
     );
@@ -72,5 +72,6 @@ describe('ThreatIntelTiles', () => {
       container.querySelectorAll('[data-test-subj="widget-group-error"]')
         .length,
     ).toBe(1);
+    expect(screen.getByText('Could not load Decoders')).toBeInTheDocument();
   });
 });

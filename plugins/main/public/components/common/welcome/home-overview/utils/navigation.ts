@@ -30,6 +30,14 @@ const navigate = (appId: string, options?: Record<string, unknown>) =>
 
 export const goToAgents = () => navigate(endpointSummary.id);
 
+export const goToAgentsByStatus = (status: string): void => {
+  sessionStorage.setItem(
+    'wz-agents-overview-table-filter',
+    JSON.stringify({ q: `status=${status}` }),
+  );
+  navigate(endpointSummary.id, { path: `#${endpointSummary.redirectTo()}` });
+};
+
 /** URL for the deploy-agent wizard (WzButtonPermissions needs an href). */
 export const getDeployAgentUrl = (): string =>
   NavigationService.getInstance().getUrlForApp(endpointSummary.id, {

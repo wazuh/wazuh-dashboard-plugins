@@ -5,22 +5,28 @@ import {
   EuiFlexItem,
   EuiTitle,
   EuiText,
+  EuiLink,
 } from '@elastic/eui';
 import { AgentStatus } from '../../interfaces/types';
 import { formatUINumber } from '../../../../../../react-services/format-number';
-import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
+import {
+  API_NAME_AGENT_STATUS,
+  UI_COLOR_STATUS,
+} from '../../../../../../../common/constants';
 import { WzButtonPermissions } from '../../../../permissions/button';
 
 export interface AgentsByStatusProps {
   data: AgentStatus;
   /** Deploy-agent CTA href; passed in so this stays a pure presentational widget. */
   deployAgentUrl: string;
+  onStatusSelect?: (apiStatus: string) => void;
 }
 
 /** Shows a deploy prompt when the fleet is empty. */
 export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
   data,
   deployAgentUrl,
+  onStatusSelect,
 }) => {
   if (data.total === 0) {
     return (
@@ -53,13 +59,14 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
       <EuiFlexGroup alignItems='baseline' gutterSize='s' responsive={false}>
         <EuiFlexItem grow={false}>
           <EuiTitle size='l'>
-            <span
+            <EuiLink
               className='tab-num'
-              style={{ color: UI_COLOR_STATUS.success }}
+              style={{ color: UI_COLOR_STATUS.success, fontWeight: 'inherit' }}
+              onClick={() => onStatusSelect?.(API_NAME_AGENT_STATUS.ACTIVE)}
               data-test-subj='agents-active-count'
             >
               {formatUINumber(data.active)}
-            </span>
+            </EuiLink>
           </EuiTitle>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
@@ -76,18 +83,40 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
       >
         <EuiFlexItem grow={false}>
           <EuiText size='xs' color='subdued'>
-            <strong>{formatUINumber(data.disconnected)}</strong> disconnected
+            <EuiLink
+              color='subdued'
+              onClick={() =>
+                onStatusSelect?.(API_NAME_AGENT_STATUS.DISCONNECTED)
+              }
+              data-test-subj='agents-disconnected-count'
+            >
+              <strong>{formatUINumber(data.disconnected)}</strong> disconnected
+            </EuiLink>
           </EuiText>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiText size='xs' color='subdued'>
-            <strong>{formatUINumber(data.pending)}</strong> pending
+            <EuiLink
+              color='subdued'
+              onClick={() => onStatusSelect?.(API_NAME_AGENT_STATUS.PENDING)}
+              data-test-subj='agents-pending-count'
+            >
+              <strong>{formatUINumber(data.pending)}</strong> pending
+            </EuiLink>
           </EuiText>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiText size='xs' color='subdued'>
-            <strong>{formatUINumber(data.neverConnected)}</strong> never
-            connected
+            <EuiLink
+              color='subdued'
+              onClick={() =>
+                onStatusSelect?.(API_NAME_AGENT_STATUS.NEVER_CONNECTED)
+              }
+              data-test-subj='agents-never-connected-count'
+            >
+              <strong>{formatUINumber(data.neverConnected)}</strong> never
+              connected
+            </EuiLink>
           </EuiText>
         </EuiFlexItem>
       </EuiFlexGroup>
