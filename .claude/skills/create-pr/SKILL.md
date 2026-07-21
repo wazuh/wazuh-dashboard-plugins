@@ -25,7 +25,7 @@ you to create/open/submit it.
 - **English everywhere.** Describe the _why_, not just the _what_.
 - **Issues arrive as URLs** and may live in a different repo. Read them with
   `gh issue view <url>` and classify the source (see below) — it changes both
-  "Issues Resolved" and the CHANGELOG.
+  `## Description` and the CHANGELOG.
 
 ## Issue source: public vs internal
 
@@ -33,11 +33,12 @@ Detect the source repo from the issue URL:
 
 - **Internal** — the URL/repo contains `internal-devel-request` (e.g.
   `https://github.com/wazuh/internal-devel-requests/issues/5526`):
-  - PR "Issues Resolved": **leave empty** — never expose the internal link.
+  - PR `## Description`: **do not reference the issue** — never expose the
+    internal link.
   - CHANGELOG: **no entry** for internal-devel-requests issues.
 - **Public** — any other repo (e.g.
   `https://github.com/wazuh/wazuh-dashboard-plugins/issues/8760`):
-  - PR "Issues Resolved": `closes #<n>` (same repo) or `closes <issue-url>`
+  - PR `## Description`: `Closes #<n>` (same repo) or `Closes <issue-url>`
     (another public repo).
   - CHANGELOG: add an entry linking to the **issue** (see step 4).
 
@@ -109,44 +110,15 @@ When unsure (and the issue is public), add an entry.
 
 ### 5. Fill the PR body
 
-Fill the repository PR template **verbatim** (keep every heading and checklist
-item exactly).
+Fill [`.github/pull_request_template.md`](../../../.github/pull_request_template.md)
+**verbatim** (keep every heading exactly) — read it first, don't inline its
+sections here.
 
-> **repo-specific (wazuh-dashboard-plugins):** this mirrors
-> [`.github/pull_request_template.md`](../../../.github/pull_request_template.md).
-> Read it first and keep this block in sync if the repo template changes.
-
-```markdown
-### Description
-
-<why this change exists and what it achieves>
-
-### Issues Resolved
-
-closes #<issue-number>
-
-### Evidence
-
-<screenshots or videos — REQUIRED for any UI change>
-
-### Test
-
-<instructions to test this PR>
-
-### Check List
-
-- [ ] All tests pass
-  - [ ] `yarn test:jest`
-- [ ] New functionality includes testing.
-- [ ] New functionality has been documented.
-- [ ] Update [CHANGELOG.md](./../CHANGELOG.md)
-- [ ] Commits are signed per the DCO using --signoff
-```
-
-Fill each section with real content; check the boxes that genuinely apply. For
-**Issues Resolved**: public issue → closing keyword (`closes`, `fixes`, `fix`)
-with `#<n>` or the full issue URL; **internal-devel-requests issue → leave the
-section empty** (see "Issue source" above).
+Fill each section with real content; check the boxes that genuinely apply. In
+`## Description`: public issue → closing keyword (`Closes`, `Fixes`, `Fix`)
+with `#<n>` or the full issue URL; **internal-devel-requests issue → do not
+reference the issue at all** (see "Issue source" above). UI changes require
+evidence under `### Results and Evidence`.
 
 **Default deliverable — pre-flight report.** Unless the user asked you to create the
 PR, stop here and output the filled body plus this report for the human to act on:
@@ -165,15 +137,15 @@ PR pre-flight
 
 ### 6. Create as Draft — only when explicitly asked
 
+Write the body filled in step 5 (not the blank template) to a temp file, then
+pass that file — never point `--body-file` at the template path itself, or the
+PR is created with the empty placeholder text.
+
 ```bash
 gh pr create --draft \
   --base <version-branch> \
   --title "<Imperative, capitalized subject>" \
-  --body "$(cat <<'EOF'
-### Description
-...
-EOF
-)"
+  --body-file /tmp/pr-body.md
 ```
 
 ### 7. Mark Ready for review — only when explicitly asked

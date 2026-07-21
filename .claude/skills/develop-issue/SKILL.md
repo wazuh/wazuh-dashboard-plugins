@@ -33,7 +33,7 @@ gh issue view <issue-url>
 
 - **Internal** — URL contains `internal-devel-request` (e.g.
   `wazuh/internal-devel-requests`): the issue link is **not** exposed in the PR
-  ("Issues Resolved" stays empty) and there is **no CHANGELOG entry**.
+  (`## Description` does not reference it) and there is **no CHANGELOG entry**.
 - **Public** — any other repo (e.g. `wazuh/wazuh-dashboard-plugins`): link it in
   the PR and add a CHANGELOG entry pointing to the issue.
 
@@ -79,9 +79,10 @@ for **internal-devel-requests** issues, and for tooling/docs/test-only changes
 
 Invoke **create-pr** in its default prepare-and-hand-off mode. Output:
 
-- The filled PR-template body, with **`### Evidence` left empty** for the developer
-  to attach the screenshot/video, and **`### Issues Resolved` left empty** for
-  internal-devel-requests issues (or `closes #<n>` / issue URL for public ones).
+- The filled PR-template body, with **`### Results and Evidence` left empty**
+  for the developer to attach the screenshot/video, and **`## Description`
+  without an issue reference** for internal-devel-requests issues (or
+  `Closes #<n>` / issue URL for public ones).
 - The pre-flight report (branch, suggested base, DCO status, check-standards
   result, CHANGELOG status, and the `gh pr create` command to run when ready).
 
