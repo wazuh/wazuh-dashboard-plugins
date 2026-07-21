@@ -60,7 +60,7 @@ const SecurityOperationsSectionComponent: React.FC = () => {
           <WidgetGroup
             status={activeResponse.status}
             title={
-              <EuiLink onClick={goToActiveResponse}>Active Response</EuiLink>
+              <EuiLink onClick={goToActiveResponse}>Incident Response</EuiLink>
             }
             caption='Last 24 hours'
             centerBody
