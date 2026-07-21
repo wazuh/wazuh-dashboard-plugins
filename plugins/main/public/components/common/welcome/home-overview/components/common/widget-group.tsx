@@ -58,7 +58,11 @@ export const WidgetGroupBody: React.FC<WidgetGroupBodyProps> = ({
     {status === 'error' && (
       <div
         data-test-subj='widget-group-error'
-        style={{ minHeight: loadingMinHeight }}
+        style={{
+          minHeight: loadingMinHeight,
+          height: '100%',
+          alignContent: 'center',
+        }}
       >
         <EuiCallOut
           size='s'
