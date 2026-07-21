@@ -66,8 +66,7 @@ export function mapScaTiles(aggregations: Aggregations): ScaTilesData {
   const buckets =
     (
       aggregations?.[AGG.scaResult] as unknown as
-        | { buckets?: Record<string, FiltersAggBucket> }
-        | undefined
+        { buckets?: Record<string, FiltersAggBucket> } | undefined
     )?.buckets ?? {};
   const passed = buckets[SCA_RESULT_BUCKET.passed]?.doc_count ?? 0;
   const failed = buckets[SCA_RESULT_BUCKET.failed]?.doc_count ?? 0;
