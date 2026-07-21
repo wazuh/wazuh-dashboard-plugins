@@ -65,10 +65,10 @@ export interface FimOverview {
 
 /**
  * Threat-intel enrichments catalog (`wazuh-threatintel-enrichments*`): the feed
- * of IOC indicators the platform detects with. Current-state, not time-bounded.
+ * of IOCs the platform detects with. Current-state, not time-bounded.
  */
 export interface ThreatIntelEnrichments {
-  /** Total IOC indicators in the feed catalog (the "IOCs" tile). */
+  /** Total IOCs in the feed catalog (the "IOCs" tile). */
   total: number;
   /** Feed composition by indicator type (the Malware "IOC feed by type" table). */
   feedByType: TopItem[];

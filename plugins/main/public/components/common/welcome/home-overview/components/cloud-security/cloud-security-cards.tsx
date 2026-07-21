@@ -1,27 +1,11 @@
 import React from 'react';
 import { EuiCard, EuiFlexGrid, EuiFlexItem, EuiIcon } from '@elastic/eui';
-import {
-  docker,
-  amazonWebServices,
-  googleCloud,
-  github,
-  office365,
-  microsoftGraphAPI,
-} from '../../../../../../utils/applications';
+import { CloudSecurityApplications } from '../../../../../../utils/applications';
 import { goToCloudModule } from '../../utils/navigation';
-
-const CLOUD_MODULES = [
-  docker,
-  amazonWebServices,
-  googleCloud,
-  github,
-  office365,
-  microsoftGraphAPI,
-];
 
 export const CloudSecurityCards: React.FC = () => (
   <EuiFlexGrid columns={3} data-test-subj='cloud-security-cards'>
-    {CLOUD_MODULES.map(module => (
+    {CloudSecurityApplications.map(module => (
       <EuiFlexItem key={module.id}>
         <EuiCard
           layout='horizontal'

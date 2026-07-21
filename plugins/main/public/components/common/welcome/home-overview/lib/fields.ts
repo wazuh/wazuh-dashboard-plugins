@@ -46,7 +46,7 @@ export const EVENT_DOC_ID_FIELD = 'event.doc_id';
 export const THREAT_ENRICHMENTS_FIELD = 'wazuh.threat.enrichments';
 
 /**
- * IOC indicator type (domain/url/ip/hash) on the threat-intel enrichments
+ * IOC type (domain/url/ip/hash) on the threat-intel enrichments
  * catalog index (`wazuh-threatintel-enrichments*`). Drives the "IOC feed by
  * type" breakdown — the composition of the feed itself, not what matched.
  */

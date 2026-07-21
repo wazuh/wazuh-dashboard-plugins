@@ -473,6 +473,15 @@ export const microsoftGraphAPI = {
     }`,
 };
 
+export const CloudSecurityApplications = [
+  docker,
+  amazonWebServices,
+  googleCloud,
+  github,
+  office365,
+  microsoftGraphAPI,
+];
+
 export const endpointSummary = {
   category: 'wz-category-agents-management',
   id: 'endpoints-summary',
