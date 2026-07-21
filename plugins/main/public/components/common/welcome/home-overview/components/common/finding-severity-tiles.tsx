@@ -15,6 +15,11 @@ const SEVERITY_PRESENTATION: Array<{
   { band: 'high', label: 'High', color: UI_COLOR_STATUS.warning },
   { band: 'medium', label: 'Medium', color: UI_COLOR_STATUS.info },
   { band: 'low', label: 'Low', color: UI_COLOR_STATUS.success },
+  {
+    band: 'informational',
+    label: 'Informational',
+    color: UI_COLOR_STATUS.disabled,
+  },
 ];
 
 export interface FindingSeverityTilesProps {
@@ -34,8 +39,11 @@ export const FindingSeverityTiles: React.FC<FindingSeverityTilesProps> = ({
   getTooltip,
 }) => (
   <EuiFlexGroup gutterSize='m' responsive={false} wrap>
-    {SEVERITY_PRESENTATION.map(severity => {
-      const count = <TabNumber value={counts[severity.band]} />;
+    {SEVERITY_PRESENTATION.filter(
+      severity => counts[severity.band] !== undefined,
+    ).map(severity => {
+      const bandCount = counts[severity.band] ?? 0;
+      const count = <TabNumber value={bandCount} />;
       const value = onSelect ? (
         <EuiToolTip position='top' content={getTooltip?.(severity.band)}>
           <EuiLink
@@ -43,7 +51,7 @@ export const FindingSeverityTiles: React.FC<FindingSeverityTilesProps> = ({
             style={{ fontWeight: 'normal', color: severity.color }}
             onClick={() => onSelect(severity.band)}
           >
-            {formatUINumber(counts[severity.band])}
+            {formatUINumber(bandCount)}
           </EuiLink>
         </EuiToolTip>
       ) : (

@@ -39,7 +39,11 @@ import {
   buildVulnerabilitySeverityFiltersAgg,
   buildVulnerabilityTopOsAgg,
 } from '../lib/queries';
-import { HOST_OS_NAME_FIELD, PROCESS_NAME_FIELD } from '../lib/fields';
+import {
+  HOST_OS_NAME_FIELD,
+  PROCESS_NAME_FIELD,
+  VULNERABILITY_SEVERITY_BANDS,
+} from '../lib/fields';
 import { AGG } from '../lib/constants';
 import {
   mapAgentStatus,
@@ -369,6 +373,7 @@ export function useVulnerabilityOverview(
         severity: mapSeverityCounts(
           response?.aggregations,
           AGG.vulnerabilitySeverity,
+          VULNERABILITY_SEVERITY_BANDS,
         ),
         byOs: mapTopBuckets(response?.aggregations, AGG.vulnerabilitiesByOs),
         cvesMatched: mapCardinality(response?.aggregations, AGG.cvesMatched),

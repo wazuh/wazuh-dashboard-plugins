@@ -2,7 +2,15 @@ import { SeverityBand } from '../interfaces/types';
 
 /** Field-name constants shared by the query builders, mappers and navigation. */
 
-export const SEVERITY_BANDS: SeverityBand[] = [
+export const FINDING_SEVERITY_BANDS: SeverityBand[] = [
+  'critical',
+  'high',
+  'medium',
+  'low',
+  'informational',
+];
+
+export const VULNERABILITY_SEVERITY_BANDS: SeverityBand[] = [
   'critical',
   'high',
   'medium',
@@ -47,7 +55,9 @@ export const THREAT_INTEL_TYPE_FIELD = 'document.type';
  * vulnerability.severity values are capitalized, unlike the lowercase
  * finding-severity bands, so they get their own filters agg.
  */
-export const VULNERABILITY_SEVERITY_VALUES: Record<SeverityBand, string> = {
+export const VULNERABILITY_SEVERITY_VALUES: Partial<
+  Record<SeverityBand, string>
+> = {
   critical: 'Critical',
   high: 'High',
   medium: 'Medium',

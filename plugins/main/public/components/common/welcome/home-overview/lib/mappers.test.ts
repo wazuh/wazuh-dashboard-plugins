@@ -8,10 +8,11 @@ import {
   mapScaTiles,
   mapScaBenchmarks,
 } from './mappers';
+import { VULNERABILITY_SEVERITY_BANDS } from './fields';
 
 describe('mappers', () => {
   describe('mapSeverityCounts', () => {
-    it('reads doc_count for each band from a filters agg', () => {
+    it('reads doc_count for each finding band, including informational', () => {
       const aggregations = {
         severity: {
           buckets: {
@@ -19,6 +20,7 @@ describe('mappers', () => {
             high: { doc_count: 5456 },
             medium: { doc_count: 31517 },
             low: { doc_count: 1980 },
+            informational: { doc_count: 42 },
           },
         },
       };
@@ -27,6 +29,7 @@ describe('mappers', () => {
         high: 5456,
         medium: 31517,
         low: 1980,
+        informational: 42,
       });
     });
 
@@ -36,12 +39,19 @@ describe('mappers', () => {
         high: 0,
         medium: 0,
         low: 0,
+        informational: 0,
       });
       expect(
         mapSeverityCounts({
           severity: { buckets: { high: { doc_count: 3 } } },
         }),
-      ).toEqual({ critical: 0, high: 3, medium: 0, low: 0 });
+      ).toEqual({
+        critical: 0,
+        high: 3,
+        medium: 0,
+        low: 0,
+        informational: 0,
+      });
     });
   });
 
@@ -67,8 +77,8 @@ describe('mappers', () => {
     });
   });
 
-  describe('mapSeverityCounts with a custom agg name', () => {
-    it('reads doc_count for each band from the named filters agg', () => {
+  describe('mapSeverityCounts with a custom agg name and band list', () => {
+    it('reads only the given bands from the named filters agg (no informational)', () => {
       const aggregations = {
         vulnerability_severity: {
           buckets: {
@@ -79,9 +89,13 @@ describe('mappers', () => {
           },
         },
       };
-      expect(mapSeverityCounts(aggregations, 'vulnerability_severity')).toEqual(
-        { critical: 179, high: 5456, medium: 31517, low: 1980 },
-      );
+      expect(
+        mapSeverityCounts(
+          aggregations,
+          'vulnerability_severity',
+          VULNERABILITY_SEVERITY_BANDS,
+        ),
+      ).toEqual({ critical: 179, high: 5456, medium: 31517, low: 1980 });
     });
   });
 

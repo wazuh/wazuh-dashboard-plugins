@@ -14,7 +14,8 @@ import {
   buildThreatIntelFeedByTypeAgg,
 } from './queries';
 import {
-  SEVERITY_BANDS,
+  FINDING_SEVERITY_BANDS,
+  VULNERABILITY_SEVERITY_BANDS,
   FINDING_SEVERITY_FIELD,
   MITRE_TACTIC_NAME_FIELD,
   MITRE_TECHNIQUE_ID_FIELD,
@@ -32,12 +33,17 @@ import {
 } from './fields';
 
 describe('query builders', () => {
-  it('builds one filters-agg bucket per severity band', () => {
+  it('builds one filters-agg bucket per finding severity band', () => {
     const agg = buildSeverityFiltersAgg();
     const filters = agg.severity.filters.filters;
-    expect(Object.keys(filters).sort()).toEqual([...SEVERITY_BANDS].sort());
+    expect(Object.keys(filters).sort()).toEqual(
+      [...FINDING_SEVERITY_BANDS].sort(),
+    );
     expect(filters.critical).toEqual({
       match_phrase: { [FINDING_SEVERITY_FIELD]: 'critical' },
+    });
+    expect(filters.informational).toEqual({
+      match_phrase: { [FINDING_SEVERITY_FIELD]: 'informational' },
     });
   });
 
@@ -67,7 +73,9 @@ describe('query builders', () => {
   it('builds one filters-agg bucket per capitalized vulnerability severity value', () => {
     const agg = buildVulnerabilitySeverityFiltersAgg();
     const filters = agg.vulnerability_severity.filters.filters;
-    expect(Object.keys(filters).sort()).toEqual([...SEVERITY_BANDS].sort());
+    expect(Object.keys(filters).sort()).toEqual(
+      [...VULNERABILITY_SEVERITY_BANDS].sort(),
+    );
     expect(filters.critical).toEqual({
       match_phrase: { [VULNERABILITY_SEVERITY_FIELD]: 'Critical' },
     });

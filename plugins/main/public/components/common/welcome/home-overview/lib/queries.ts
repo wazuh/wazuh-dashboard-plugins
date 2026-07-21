@@ -11,7 +11,8 @@ import {
   RULE_TITLE_FIELD,
   SCA_CHECK_RESULT_FIELD,
   SCA_POLICY_NAME_FIELD,
-  SEVERITY_BANDS,
+  FINDING_SEVERITY_BANDS,
+  VULNERABILITY_SEVERITY_BANDS,
   THREAT_ENRICHMENTS_FIELD,
   THREAT_INTEL_TYPE_FIELD,
   VULNERABILITY_CVE_ID_FIELD,
@@ -26,10 +27,10 @@ import {
  * findings search and the per-index-group searches.
  */
 
-/** One filters agg, one bucket per severity band: all four counts in a single search. */
+/** One filters agg, one bucket per finding severity band, all counts in a single search. */
 export function buildSeverityFiltersAgg() {
   const filters: Record<string, unknown> = {};
-  for (const band of SEVERITY_BANDS) {
+  for (const band of FINDING_SEVERITY_BANDS) {
     filters[band] = { match_phrase: { [FINDING_SEVERITY_FIELD]: band } };
   }
   return { [AGG.severity]: { filters: { filters } } };
@@ -38,7 +39,7 @@ export function buildSeverityFiltersAgg() {
 /** Vulnerability Severity tiles: one filters aggregation, one search. */
 export function buildVulnerabilitySeverityFiltersAgg() {
   const filters: Record<string, unknown> = {};
-  for (const band of SEVERITY_BANDS) {
+  for (const band of VULNERABILITY_SEVERITY_BANDS) {
     filters[band] = {
       match_phrase: {
         [VULNERABILITY_SEVERITY_FIELD]: VULNERABILITY_SEVERITY_VALUES[band],

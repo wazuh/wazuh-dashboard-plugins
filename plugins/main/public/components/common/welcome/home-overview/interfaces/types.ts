@@ -1,6 +1,11 @@
-export type SeverityBand = 'critical' | 'high' | 'medium' | 'low';
+export type SeverityBand =
+  | 'critical'
+  | 'high'
+  | 'medium'
+  | 'low'
+  | 'informational';
 
-export type SeverityCounts = Record<SeverityBand, number>;
+export type SeverityCounts = Partial<Record<SeverityBand, number>>;
 
 export interface TopItem {
   key: string;

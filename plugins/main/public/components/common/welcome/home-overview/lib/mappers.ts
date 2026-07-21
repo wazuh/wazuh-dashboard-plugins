@@ -2,10 +2,11 @@ import {
   AgentStatus,
   ScaBenchmark,
   ScaTilesData,
+  SeverityBand,
   SeverityCounts,
   TopItem,
 } from '../interfaces/types';
-import { SEVERITY_BANDS } from './fields';
+import { FINDING_SEVERITY_BANDS } from './fields';
 import { AGG, SCA_RESULT_BUCKET } from './constants';
 import { CheckResult } from '../../../../overview/sca/utils/constants';
 
@@ -34,9 +35,10 @@ interface AgentConnectionSummary {
 export function mapSeverityCounts(
   aggregations: Aggregations,
   aggName: string = AGG.severity,
+  bands: SeverityBand[] = FINDING_SEVERITY_BANDS,
 ): SeverityCounts {
   const buckets = aggregations?.[aggName]?.buckets ?? {};
-  return SEVERITY_BANDS.reduce((acc, band) => {
+  return bands.reduce((acc, band) => {
     acc[band] =
       (buckets as Record<string, FiltersAggBucket>)?.[band]?.doc_count ?? 0;
     return acc;
