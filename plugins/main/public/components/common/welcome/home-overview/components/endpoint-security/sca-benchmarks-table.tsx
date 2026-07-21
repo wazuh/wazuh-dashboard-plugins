@@ -2,6 +2,7 @@ import React from 'react';
 import { EuiBasicTable, EuiBasicTableColumn } from '@elastic/eui';
 import { ScaBenchmark } from '../../interfaces/types';
 import { TabNumber } from '../common';
+import { decimalFormat } from '../../../utils/helpers';
 
 export interface ScaBenchmarksTableProps {
   items: ScaBenchmark[];
@@ -10,6 +11,7 @@ export interface ScaBenchmarksTableProps {
 export const ScaBenchmarksTable: React.FC<ScaBenchmarksTableProps> = ({
   items,
 }) => {
+  const scoreFormatter = decimalFormat();
   const columns: Array<EuiBasicTableColumn<ScaBenchmark>> = [
     { field: 'name', name: 'Top 5 benchmarks', truncateText: true },
     {
@@ -32,7 +34,7 @@ export const ScaBenchmarksTable: React.FC<ScaBenchmarksTableProps> = ({
       align: 'right',
       width: '90px',
       render: (score: number) => (
-        <span className='tab-num'>{score.toFixed(2)}%</span>
+        <span className='tab-num'>{scoreFormatter.convert(score)}</span>
       ),
     },
   ];

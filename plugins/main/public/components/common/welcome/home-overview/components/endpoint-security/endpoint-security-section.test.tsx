@@ -17,6 +17,11 @@ jest.mock('../../utils/navigation', () => ({
 jest.mock('../../../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),
 }));
+jest.mock('../../../utils/helpers', () => ({
+  decimalFormat: () => ({
+    convert: (value: number) => `${Math.round(value * 100)}%`,
+  }),
+}));
 
 const asMock = (fn: unknown) => fn as jest.Mock;
 
@@ -25,13 +30,13 @@ beforeEach(() => {
   asMock(useSCAOverview).mockReturnValue({
     status: 'available',
     data: {
-      tiles: { passed: 321, failed: 547, notApplicable: 52, score: 36.98 },
+      tiles: { passed: 321, failed: 547, notApplicable: 52, score: 0.3698 },
       benchmarks: [
         {
           name: 'CIS Ubuntu Linux 24.04 LTS v1.0.0',
           passed: 200,
           failed: 79,
-          score: 71.68,
+          score: 0.7168,
         },
       ],
     },

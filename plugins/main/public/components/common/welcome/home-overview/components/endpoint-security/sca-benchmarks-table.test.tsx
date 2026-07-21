@@ -1,6 +1,11 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+jest.mock('../../../utils/helpers', () => ({
+  decimalFormat: () => ({
+    convert: (value: number) => `${Math.round(value * 100)}%`,
+  }),
+}));
 import { ScaBenchmarksTable } from './sca-benchmarks-table';
 
 describe('ScaBenchmarksTable', () => {

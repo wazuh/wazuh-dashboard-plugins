@@ -66,7 +66,8 @@ export function mapScaTiles(aggregations: Aggregations): ScaTilesData {
   const buckets =
     (
       aggregations?.[AGG.scaResult] as unknown as
-        { buckets?: Record<string, FiltersAggBucket> } | undefined
+        | { buckets?: Record<string, FiltersAggBucket> }
+        | undefined
     )?.buckets ?? {};
   const passed = buckets[SCA_RESULT_BUCKET.passed]?.doc_count ?? 0;
   const failed = buckets[SCA_RESULT_BUCKET.failed]?.doc_count ?? 0;
@@ -77,7 +78,7 @@ export function mapScaTiles(aggregations: Aggregations): ScaTilesData {
     passed,
     failed,
     notApplicable,
-    score: total > 0 ? (passed / total) * 100 : 0,
+    score: total > 0 ? passed / total : 0,
   };
 }
 
@@ -108,7 +109,7 @@ export function mapScaBenchmarks(aggregations: Aggregations): ScaBenchmark[] {
       name: String(bucket.key),
       passed,
       failed,
-      score: total > 0 ? (passed / total) * 100 : 0,
+      score: total > 0 ? passed / total : 0,
     };
   });
 }

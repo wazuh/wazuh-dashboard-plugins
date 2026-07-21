@@ -57,10 +57,10 @@ beforeEach(() => {
 });
 
 describe('SecurityOperationsSection', () => {
-  it('renders IT Hygiene, Active Response, and Regulatory Compliance', () => {
+  it('renders IT Hygiene, Incident Response, and Regulatory Compliance', () => {
     render(<SecurityOperationsSection />);
     expect(screen.getByText('IT Hygiene')).toBeInTheDocument();
-    expect(screen.getByText('Active Response')).toBeInTheDocument();
+    expect(screen.getByText('Incident Response')).toBeInTheDocument();
     expect(screen.getByText('Regulatory Compliance')).toBeInTheDocument();
     expect(screen.getByText('Operating systems')).toBeInTheDocument();
     expect(screen.getByText('35,682')).toBeInTheDocument();
@@ -86,7 +86,7 @@ describe('SecurityOperationsSection', () => {
       container.querySelector('[data-test-subj="home-overview-it-hygiene"]'),
     ).not.toBeInTheDocument();
     // sibling panels are unaffected
-    expect(screen.getByText('Active Response')).toBeInTheDocument();
+    expect(screen.getByText('Incident Response')).toBeInTheDocument();
   });
 
   it('keeps the IT Hygiene panel when only some tiles are unavailable', () => {
@@ -102,7 +102,7 @@ describe('SecurityOperationsSection', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('hides Active Response when its index is unavailable', () => {
+  it('hides Incident Response when its index is unavailable', () => {
     asMock(useActiveResponseOverview).mockReturnValue({
       status: 'unavailable',
     });

@@ -137,7 +137,7 @@ describe('mappers', () => {
         passed: 321,
         failed: 547,
         notApplicable: 52,
-        score: (321 / (321 + 547)) * 100,
+        score: 321 / (321 + 547),
       });
     });
 
@@ -173,7 +173,7 @@ describe('mappers', () => {
           name: 'CIS Ubuntu Linux 24.04 LTS v1.0.0',
           passed: 200,
           failed: 79,
-          score: (200 / (200 + 79)) * 100,
+          score: 200 / (200 + 79),
         },
       ]);
     });
