@@ -19,7 +19,6 @@ import {
 } from '../../../data-source';
 import {
   FINDING_SEVERITY_FIELD,
-  MITRE_TACTIC_NAME_FIELD,
   MITRE_TECHNIQUE_NAME_FIELD,
 } from '../lib/fields';
 import { SeverityBand } from '../interfaces/types';
@@ -85,7 +84,7 @@ export const goToRegulatoryComplianceHome = () =>
 
 export const goToRegulatoryCompliance = (tabView: string): void =>
   navigate(regulatoryCompliance.id, {
-    path: `#/overview?tab=regulatory-compliance&tabView=${tabView}&tabSubView=dashboard`,
+    path: `#/overview?tab=regulatory-compliance&tabView=${tabView}&tabSubView=controls`,
   });
 
 /** Open a Cloud Security module by app id (list-driven, unlike the fixed links above). */
@@ -110,25 +109,46 @@ export const goToDetectors = () =>
   navigate(SECURITY_ANALYTICS_APP_IDS.detectors);
 
 /**
- * Open the MITRE ATT&CK Framework tab filtered to the given field/value; falls
- * back to unfiltered when the findings index pattern isn't known yet. The
+ * Open the MITRE ATT&CK Intelligence tab on a specific resource. Intelligence
+ * resolves the resource by its external id (`resource.tsx` queries
+ * `?q=external_id=<idToRedirect>`), so the id is required.
+ * Falls back to the module home when the id isn't known.
+ */
+const goToMitreIntelligence = (
+  tabRedirect: 'tactics' | 'techniques',
+  externalId?: string,
+): void => {
+  if (!externalId) {
+    navigate(mitreAttack.id);
+    return;
+  }
+  const params = `tab=mitre&tabView=intelligence&tabRedirect=${tabRedirect}&idToRedirect=${externalId}`;
+  navigate(mitreAttack.id, { path: `#/overview?${params}` });
+};
+
+/** Top-tactic labels deep-link into the Intelligence resource for that tactic. */
+export const goToMitreTactic = (externalId?: string): void =>
+  goToMitreIntelligence('tactics', externalId);
+
+/**
+ * Open the MITRE ATT&CK Framework tab filtered to a technique by name; falls
+ * back to the module home when the findings index pattern isn't known yet. The
  * Framework tab (`tabView=inventory`) reads the `_g` global filter through the
  * same data-source/filter-manager the dashboard uses.
  */
-const goToMitreFilteredBy = (
-  field: string,
-  value: string,
+export const goToMitreTechnique = (
+  techniqueName?: string,
   indexPatternId?: string,
 ): void => {
-  if (!indexPatternId) {
+  if (!techniqueName || !indexPatternId) {
     navigate(mitreAttack.id);
     return;
   }
   const filters = [
     PatternDataSourceFilterManager.createFilter(
       FILTER_OPERATOR.IS,
-      field,
-      value,
+      MITRE_TECHNIQUE_NAME_FIELD,
+      techniqueName,
       indexPatternId,
     ),
   ];
@@ -137,19 +157,3 @@ const goToMitreFilteredBy = (
   )}`;
   navigate(mitreAttack.id, { path: `#/overview?${params}` });
 };
-
-export const goToMitreTactic = (
-  tacticName: string,
-  indexPatternId?: string,
-): void =>
-  goToMitreFilteredBy(MITRE_TACTIC_NAME_FIELD, tacticName, indexPatternId);
-
-export const goToMitreTechnique = (
-  techniqueName: string,
-  indexPatternId?: string,
-): void =>
-  goToMitreFilteredBy(
-    MITRE_TECHNIQUE_NAME_FIELD,
-    techniqueName,
-    indexPatternId,
-  );

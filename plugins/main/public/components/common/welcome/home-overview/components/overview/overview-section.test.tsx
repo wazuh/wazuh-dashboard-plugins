@@ -43,7 +43,7 @@ const findingsAvailable = {
   status: 'available' as const,
   data: {
     severity: { critical: 1, high: 2, medium: 35682, low: 4 },
-    topTactics: [{ key: 'Initial Access', count: 36231 }],
+    topTactics: [{ key: 'Initial Access', count: 36231, id: 'TA0001' }],
     totalFindings: 40614,
     topRules: [],
     techniquesCount: 7,
@@ -137,13 +137,10 @@ describe('OverviewSection', () => {
     expect(navigation.goToThreatHunting).toHaveBeenCalled();
   });
 
-  it('navigates to the selected MITRE tactic with the findings index pattern', () => {
+  it('navigates to the selected MITRE tactic by its external id', () => {
     render(<OverviewSection findings={findingsAvailable} />);
     fireEvent.click(screen.getByText('Initial Access'));
-    expect(navigation.goToMitreTactic).toHaveBeenCalledWith(
-      'Initial Access',
-      'idx-1',
-    );
+    expect(navigation.goToMitreTactic).toHaveBeenCalledWith('TA0001');
   });
 
   it('navigates to Agents from the "Agents by status" header link', () => {

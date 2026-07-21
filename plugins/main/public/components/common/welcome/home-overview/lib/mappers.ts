@@ -122,10 +122,18 @@ export function mapTopBuckets(
   if (!Array.isArray(buckets)) {
     return [];
   }
-  return (buckets as TermsBucket[]).map(bucket => ({
-    key: String(bucket.key),
-    count: bucket.doc_count ?? 0,
-  }));
+  return (buckets as TermsBucket[]).map(bucket => {
+    // Present only for aggs built with an external-id sub-agg (MITRE
+    // tactics/techniques); plain term lists have no id.
+    const externalId = (
+      bucket as Record<string, { buckets?: TermsBucket[] } | undefined>
+    )[AGG.externalId]?.buckets?.[0]?.key;
+    return {
+      key: String(bucket.key),
+      count: bucket.doc_count ?? 0,
+      ...(externalId !== undefined ? { id: String(externalId) } : {}),
+    };
+  });
 }
 
 export function mapAgentStatus(

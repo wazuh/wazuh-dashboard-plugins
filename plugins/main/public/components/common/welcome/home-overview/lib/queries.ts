@@ -6,6 +6,7 @@ import {
   FIM_PLATFORM_FIELD,
   FINDING_SEVERITY_FIELD,
   MITRE_TACTIC_NAME_FIELD,
+  MITRE_TACTIC_ID_FIELD,
   MITRE_TECHNIQUE_ID_FIELD,
   MITRE_TECHNIQUE_NAME_FIELD,
   RULE_TITLE_FIELD,
@@ -54,6 +55,26 @@ export function buildTopTermsAgg(name: string, field: string, size = TOP_N) {
 }
 
 /**
+ * Top terms by `field`, each bucket carrying its `idField` value (e.g. the MITRE
+ * external id) via a size-1 sub-agg, so the widget can display the name but link
+ * by id. Names map 1:1 to ids, so one bucket is enough. Used for the Overview
+ * top-tactics list, whose labels deep-link into the MITRE Intelligence tab.
+ */
+export function buildTopTermsWithExternalIdAgg(
+  name: string,
+  field: string,
+  idField: string,
+  size = TOP_N,
+) {
+  return {
+    [name]: {
+      terms: { field, size },
+      aggs: { [AGG.externalId]: { terms: { field: idField, size: 1 } } },
+    },
+  };
+}
+
+/**
  * Overview findings batch: severity bands + top MITRE tactics, plus Threat
  * Hunting's total findings + top rules + techniques, all in the one
  * findings search fired on mount.
@@ -65,7 +86,12 @@ export function buildFindingsOverviewAggs(
 ) {
   return {
     ...buildSeverityFiltersAgg(),
-    ...buildTopTermsAgg(AGG.tactics, MITRE_TACTIC_NAME_FIELD, topTacticsSize),
+    ...buildTopTermsWithExternalIdAgg(
+      AGG.tactics,
+      MITRE_TACTIC_NAME_FIELD,
+      MITRE_TACTIC_ID_FIELD,
+      topTacticsSize,
+    ),
     ...buildTopTermsAgg(AGG.topRules, RULE_TITLE_FIELD, topRulesSize),
     [AGG.techniquesCount]: { cardinality: { field: MITRE_TECHNIQUE_ID_FIELD } },
     ...buildTopTermsAgg(

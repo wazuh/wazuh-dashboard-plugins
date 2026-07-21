@@ -166,12 +166,17 @@ function useAggregationGroup<T>(options: {
       repository,
     });
 
+  // Scope every search to the data source's fixed filters only, so global /
+  // pinned filters set elsewhere in the app don't leak into the Home overview
+  const scopedFetchData: FetchData = params =>
+    fetchData({ ...params, filters: fixedFilters } as Parameters<FetchData>[0]);
+
   const result = useDataGroup<T>({
     isLoading,
     initError: error,
     enabled,
     ready: Boolean(dataSource && fetchData),
-    fetch: () => fetch(fetchData),
+    fetch: () => fetch(scopedFetchData),
     deps: [isLoading, error, dataSource, enabled],
   });
 
@@ -417,10 +422,11 @@ function useIndexDocCount(
   dateRange?: { from: string; to: string },
 ): DataGroupResult<number> {
   const repository = useMemo(createRepository, []);
-  const { isLoading, dataSource, error, fetchData } = useDataSource({
-    DataSource: DataSourceClass,
-    repository,
-  });
+  const { isLoading, dataSource, error, fetchData, fixedFilters } =
+    useDataSource({
+      DataSource: DataSourceClass,
+      repository,
+    });
 
   return useDataGroup<number>({
     isLoading,
@@ -428,7 +434,13 @@ function useIndexDocCount(
     enabled,
     ready: Boolean(dataSource && fetchData),
     fetch: async () =>
-      mapDocCount(await fetchData({ dateRange, pagination: NO_HITS })),
+      mapDocCount(
+        await fetchData({
+          dateRange,
+          pagination: NO_HITS,
+          filters: fixedFilters,
+        } as Parameters<typeof fetchData>[0]),
+      ),
     deps: [isLoading, error, dataSource, enabled],
   });
 }

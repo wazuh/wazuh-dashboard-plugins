@@ -10,6 +10,11 @@ export type SeverityCounts = Partial<Record<SeverityBand, number>>;
 export interface TopItem {
   key: string;
   count: number;
+  /**
+   * Stable identifier for the bucket when one exists (e.g. a MITRE external id
+   * `TA0001`/`T1078`), used for navigation. Absent for plain term lists.
+   */
+  id?: string;
 }
 
 export interface AgentStatus {

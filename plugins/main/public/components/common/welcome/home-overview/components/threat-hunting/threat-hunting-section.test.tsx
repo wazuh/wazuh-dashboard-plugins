@@ -98,7 +98,7 @@ describe('ThreatHuntingSection', () => {
     expect(navigation.goToThreatHunting).toHaveBeenCalled();
   });
 
-  it('navigates to the selected MITRE technique with the findings index pattern', () => {
+  it('navigates to the selected MITRE technique in the Framework, filtered by name', () => {
     render(
       <ThreatHuntingSection
         findings={findingsAvailable}

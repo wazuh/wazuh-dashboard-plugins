@@ -19,6 +19,7 @@ export const VULNERABILITY_SEVERITY_BANDS: SeverityBand[] = [
 
 export const FINDING_SEVERITY_FIELD = 'wazuh.rule.level';
 export const MITRE_TACTIC_NAME_FIELD = 'wazuh.rule.mitre.tactic.name';
+export const MITRE_TACTIC_ID_FIELD = 'wazuh.rule.mitre.tactic.id';
 export const MITRE_TECHNIQUE_ID_FIELD = 'wazuh.rule.mitre.technique.id';
 export const MITRE_TECHNIQUE_NAME_FIELD = 'wazuh.rule.mitre.technique.name';
 export const RULE_TITLE_FIELD = 'wazuh.rule.title';

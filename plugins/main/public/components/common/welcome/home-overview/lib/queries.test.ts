@@ -18,6 +18,7 @@ import {
   VULNERABILITY_SEVERITY_BANDS,
   FINDING_SEVERITY_FIELD,
   MITRE_TACTIC_NAME_FIELD,
+  MITRE_TACTIC_ID_FIELD,
   MITRE_TECHNIQUE_ID_FIELD,
   MITRE_TECHNIQUE_NAME_FIELD,
   RULE_TITLE_FIELD,
@@ -58,6 +59,9 @@ describe('query builders', () => {
     expect(aggs.severity).toBeDefined();
     expect(aggs.tactics).toEqual({
       terms: { field: MITRE_TACTIC_NAME_FIELD, size: 7 },
+      aggs: {
+        external_id: { terms: { field: MITRE_TACTIC_ID_FIELD, size: 1 } },
+      },
     });
     expect(aggs.top_rules).toEqual({
       terms: { field: RULE_TITLE_FIELD, size: 5 },
