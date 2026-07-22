@@ -20,6 +20,11 @@ const SEVERITY_PRESENTATION: Array<{
     label: 'Informational',
     color: UI_COLOR_STATUS.disabled,
   },
+  {
+    band: 'pending',
+    label: 'Pending',
+    color: UI_COLOR_STATUS.disabled,
+  },
 ];
 
 export interface FindingSeverityTilesProps {

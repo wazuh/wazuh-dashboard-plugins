@@ -3,7 +3,8 @@ export type SeverityBand =
   | 'high'
   | 'medium'
   | 'low'
-  | 'informational';
+  | 'informational'
+  | 'pending';
 
 export type SeverityCounts = Partial<Record<SeverityBand, number>>;
 
