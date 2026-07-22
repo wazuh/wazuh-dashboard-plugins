@@ -123,6 +123,7 @@
 - Fixed the GitHub link in the About page pointing to the legacy `wazuh-kibana-app` repository [#8653](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8653)
 - Fixed SCA module columns width [#8699](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8699)
 - Fixed Home KPI's visualization persistent filters [#8708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8708)
+- Fixed the osd-dev environment by pinning the TypeScript tooling of the scripts image and configuring a matching agent enrollment password for the local server profiles [#8778](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8778)
 
 ### Removed
 

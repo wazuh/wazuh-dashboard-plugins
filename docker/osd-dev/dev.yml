@@ -384,6 +384,7 @@ services:
       - INDEXER_SSL_CA=/etc/server_certs/root-ca.pem
       - INDEXER_SSL_CERTIFICATE=/etc/server_certs/server.pem
       - INDEXER_SSL_CERTIFICATE_KEY=/etc/server_certs/server-key.pem
+      - WAZUH_REGISTRATION_PASSWORD=WazuhRegistrationDev123
     volumes:
       - wm_certs:/etc/server_certs
     ports:
@@ -413,7 +414,7 @@ services:
         apt install -y lsb-release adduser
 
         # Install Wazuh agent
-        WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' dpkg -i /packages-agents/wazuh-agent*.deb
+        WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_PASSWORD='WazuhRegistrationDev123' dpkg -i /packages-agents/wazuh-agent*.deb
 
         # Start Wazuh agent
         /etc/init.d/wazuh-agent start
@@ -442,7 +443,7 @@ services:
         yum upgrade -y
 
         # Install wazuh-agent
-        WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' yum localinstall -y /packages-agents/wazuh-agent*.rpm
+        WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_PASSWORD='WazuhRegistrationDev123' yum localinstall -y /packages-agents/wazuh-agent*.rpm
 
         # Start wazuh-agent
         /var/ossec/bin/wazuh-control start
