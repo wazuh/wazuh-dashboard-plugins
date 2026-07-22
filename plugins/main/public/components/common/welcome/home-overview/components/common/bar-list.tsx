@@ -8,6 +8,8 @@ import {
 } from '@elastic/eui';
 import { TopItem } from '../../interfaces/types';
 import { formatUINumber } from '../../../../../../react-services/format-number';
+import { getCore } from '../../../../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 export interface BarListProps {
   items: TopItem[];
@@ -44,12 +46,14 @@ export const BarList: React.FC<BarListProps> = ({
           <EuiFlexItem grow={3} style={{ overflow: 'hidden' }}>
             <EuiText size='xs' className='eui-textTruncate'>
               {isInteractive ? (
-                <EuiLink
-                  href={getHref?.(item)}
-                  onClick={onSelect ? () => onSelect(item) : undefined}
-                >
-                  {item.key}
-                </EuiLink>
+                <RedirectAppLinks application={getCore().application}>
+                  <EuiLink
+                    href={getHref?.(item)}
+                    onClick={onSelect ? () => onSelect(item) : undefined}
+                  >
+                    {item.key}
+                  </EuiLink>
+                </RedirectAppLinks>
               ) : (
                 item.key
               )}

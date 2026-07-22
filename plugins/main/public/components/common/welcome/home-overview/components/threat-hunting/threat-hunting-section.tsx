@@ -1,6 +1,8 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiLink, EuiSpacer } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
+import { getCore } from '../../../../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import {
   WidgetGroup,
   StatTile,
@@ -45,7 +47,9 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
           <WidgetGroup
             status={findings.status}
             title={
-              <EuiLink onClick={goToThreatHunting}>Threat Hunting</EuiLink>
+              <RedirectAppLinks application={getCore().application}>
+                <EuiLink href={goToThreatHunting()}>Threat Hunting</EuiLink>
+              </RedirectAppLinks>
             }
             caption='Last 24 hours'
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
@@ -69,7 +73,11 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
         <EuiFlexItem>
           <WidgetGroup
             status={findings.status}
-            title={<EuiLink onClick={goToMitre}>MITRE ATT&amp;CK</EuiLink>}
+            title={
+              <RedirectAppLinks application={getCore().application}>
+                <EuiLink href={goToMitre()}>MITRE ATT&amp;CK</EuiLink>
+              </RedirectAppLinks>
+            }
             caption='Last 24 hours'
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-techniques'
@@ -98,11 +106,13 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
           <WidgetGroup
             status={vulnerabilities.status}
             title={
-              <EuiLink onClick={goToVulnerabilityDetection}>
-                Vulnerability Detection
-              </EuiLink>
+              <RedirectAppLinks application={getCore().application}>
+                <EuiLink href={goToVulnerabilityDetection()}>
+                  Vulnerability Detection
+                </EuiLink>
+              </RedirectAppLinks>
             }
-            caption='Current'
+            caption='Current state'
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-vulnerabilities'
           >

@@ -7,6 +7,8 @@ import {
   EuiText,
   EuiLink,
 } from '@elastic/eui';
+import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { getCore } from '../../../../../../kibana-services';
 import { AgentStatus } from '../../interfaces/types';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 import {
@@ -19,7 +21,7 @@ export interface AgentsByStatusProps {
   data: AgentStatus;
   /** Deploy-agent CTA href; passed in so this stays a pure presentational widget. */
   deployAgentUrl: string;
-  onStatusSelect?: (apiStatus: string) => void;
+  onStatusSelect?: string;
 }
 
 /** Shows a deploy prompt when the fleet is empty. */
@@ -55,71 +57,71 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
   }
 
   return (
-    <div>
-      <EuiFlexGroup alignItems='baseline' gutterSize='s' responsive={false}>
-        <EuiFlexItem grow={false}>
-          <EuiTitle size='l'>
-            <EuiLink
-              className='tab-num'
-              style={{ color: UI_COLOR_STATUS.success, fontWeight: 'inherit' }}
-              onClick={() => onStatusSelect?.(API_NAME_AGENT_STATUS.ACTIVE)}
-              data-test-subj='agents-active-count'
-            >
-              {formatUINumber(data.active)}
-            </EuiLink>
-          </EuiTitle>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiText size='s' color='subdued'>
-            agents active
-          </EuiText>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-      <EuiFlexGroup
-        gutterSize='l'
-        responsive={false}
-        wrap
-        style={{ marginTop: 8 }}
-      >
-        <EuiFlexItem grow={false}>
-          <EuiText size='xs' color='subdued'>
-            <EuiLink
-              color='subdued'
-              onClick={() =>
-                onStatusSelect?.(API_NAME_AGENT_STATUS.DISCONNECTED)
-              }
-              data-test-subj='agents-disconnected-count'
-            >
-              <strong>{formatUINumber(data.disconnected)}</strong> disconnected
-            </EuiLink>
-          </EuiText>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiText size='xs' color='subdued'>
-            <EuiLink
-              color='subdued'
-              onClick={() => onStatusSelect?.(API_NAME_AGENT_STATUS.PENDING)}
-              data-test-subj='agents-pending-count'
-            >
-              <strong>{formatUINumber(data.pending)}</strong> pending
-            </EuiLink>
-          </EuiText>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiText size='xs' color='subdued'>
-            <EuiLink
-              color='subdued'
-              onClick={() =>
-                onStatusSelect?.(API_NAME_AGENT_STATUS.NEVER_CONNECTED)
-              }
-              data-test-subj='agents-never-connected-count'
-            >
-              <strong>{formatUINumber(data.neverConnected)}</strong> never
-              connected
-            </EuiLink>
-          </EuiText>
-        </EuiFlexItem>
-      </EuiFlexGroup>
+    <div style={{ textDecoration: 'none' }}>
+      <RedirectAppLinks application={getCore().application}>
+        <EuiFlexGroup alignItems='baseline' gutterSize='s' responsive={false}>
+          <EuiFlexItem grow={false}>
+            <EuiTitle size='l'>
+              <EuiLink
+                className='tab-num'
+                style={{ color: UI_COLOR_STATUS.success, fontWeight: 'inherit' }}
+                href={onStatusSelect?.(API_NAME_AGENT_STATUS.ACTIVE)}
+                data-test-subj='agents-active-count'
+              >
+                {formatUINumber(data.active)}
+              </EuiLink>
+            </EuiTitle>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiText size='s' color='subdued'>
+              agents active
+            </EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup
+          gutterSize='l'
+          responsive={false}
+          wrap
+          style={{ marginTop: 8 }}
+        >
+          <EuiFlexItem grow={false}>
+            <EuiText size='xs' color='subdued'>
+              <EuiLink
+                color='subdued'
+                href={
+                  onStatusSelect?.(API_NAME_AGENT_STATUS.DISCONNECTED)
+                }
+                data-test-subj='agents-disconnected-count'
+              >
+                <strong>{formatUINumber(data.disconnected)}</strong> disconnected
+              </EuiLink>
+            </EuiText>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiText size='xs' color='subdued'>
+              <EuiLink
+                color='subdued'
+                href={onStatusSelect?.(API_NAME_AGENT_STATUS.PENDING)}
+                data-test-subj='agents-pending-count'
+              >
+                <strong>{formatUINumber(data.pending)}</strong> pending
+              </EuiLink>
+            </EuiText>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiText size='xs' color='subdued'>
+              <EuiLink
+                color='subdued'
+                href={onStatusSelect?.(API_NAME_AGENT_STATUS.NEVER_CONNECTED)}
+                data-test-subj='agents-never-connected-count'
+              >
+                <strong>{formatUINumber(data.neverConnected)}</strong> never
+                connected
+              </EuiLink>
+            </EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </RedirectAppLinks>
     </div>
   );
 };

@@ -5,27 +5,29 @@ import { TabNumber } from './tab-number';
 import { SeverityBand, SeverityCounts } from '../../interfaces/types';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
+import { getCore } from '../../../../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const SEVERITY_PRESENTATION: Array<{
   band: SeverityBand;
   label: string;
   color: string;
 }> = [
-  { band: 'critical', label: 'Critical', color: UI_COLOR_STATUS.danger },
-  { band: 'high', label: 'High', color: UI_COLOR_STATUS.warning },
-  { band: 'medium', label: 'Medium', color: UI_COLOR_STATUS.info },
-  { band: 'low', label: 'Low', color: UI_COLOR_STATUS.success },
-  {
-    band: 'informational',
-    label: 'Informational',
-    color: UI_COLOR_STATUS.disabled,
-  },
-  {
-    band: 'pending',
-    label: 'Pending',
-    color: UI_COLOR_STATUS.disabled,
-  },
-];
+    { band: 'critical', label: 'Critical', color: UI_COLOR_STATUS.danger },
+    { band: 'high', label: 'High', color: UI_COLOR_STATUS.warning },
+    { band: 'medium', label: 'Medium', color: UI_COLOR_STATUS.info },
+    { band: 'low', label: 'Low', color: UI_COLOR_STATUS.success },
+    {
+      band: 'informational',
+      label: 'Informational',
+      color: UI_COLOR_STATUS.disabled,
+    },
+    {
+      band: 'pending',
+      label: 'Pending',
+      color: UI_COLOR_STATUS.disabled,
+    },
+  ];
 
 export interface FindingSeverityTilesProps {
   counts: SeverityCounts;
@@ -51,13 +53,15 @@ export const FindingSeverityTiles: React.FC<FindingSeverityTilesProps> = ({
       const count = <TabNumber value={bandCount} />;
       const value = onSelect ? (
         <EuiToolTip position='top' content={getTooltip?.(severity.band)}>
-          <EuiLink
-            className='tab-num'
-            style={{ fontWeight: 'normal', color: severity.color }}
-            onClick={() => onSelect(severity.band)}
-          >
-            {formatUINumber(bandCount)}
-          </EuiLink>
+          <RedirectAppLinks application={getCore().application}>
+            <EuiLink
+              className='tab-num'
+              style={{ fontWeight: 'normal', color: severity.color }}
+              href={onSelect(severity.band)}
+            >
+              {formatUINumber(bandCount)}
+            </EuiLink>
+          </RedirectAppLinks>
         </EuiToolTip>
       ) : (
         count

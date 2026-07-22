@@ -5,6 +5,7 @@ import {
   EuiFlexItem,
   EuiText,
   EuiSpacer,
+  EuiBetaBadge,
 } from '@elastic/eui';
 
 export interface SectionHeaderProps {
@@ -25,11 +26,9 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   <>
     <EuiFlexGroup gutterSize='s' alignItems='baseline' responsive={false} wrap>
       <EuiFlexItem grow={false}>
-        <EuiBreadcrumbs
-          breadcrumbs={[{ text: title }]}
-          responsive={false}
-          truncate={false}
-          max={0}
+        <EuiBetaBadge
+          color='subdued'
+          label={`${title}`}
           aria-label={`${title} section`}
         />
       </EuiFlexItem>

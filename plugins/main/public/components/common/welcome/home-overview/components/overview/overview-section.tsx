@@ -50,7 +50,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
           <WidgetGroup
             status={agents.status}
             title='Agents by status'
-            headerLink={{ label: 'Agents', onClick: goToAgents }}
+            headerLink={{ label: 'Agents', href: goToAgents() }}
             centerBody
             data-test-subj='home-overview-agents'
           >
@@ -58,7 +58,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               <AgentsByStatus
                 data={agents.data}
                 deployAgentUrl={getDeployAgentUrl()}
-                onStatusSelect={goToAgentsByStatus}
+                onStatusSelect={goToAgentsByStatus()}
               />
             )}
           </WidgetGroup>
@@ -68,7 +68,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             status={findings.status}
             title='Findings'
             caption='Last 24 hours'
-            headerLink={{ label: 'Threat Hunting', onClick: goToThreatHunting }}
+            headerLink={{ label: 'Threat Hunting', href: goToThreatHunting() }}
             centerBody
             data-test-subj='home-overview-findings-severity'
           >
@@ -97,14 +97,14 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
         status={findings.status}
         title='MITRE ATT&CK — last 24 hours (top tactics)'
         caption='Last 24 hours'
-        headerLink={{ label: 'MITRE ATT&CK', onClick: goToMitre }}
+        headerLink={{ label: 'MITRE ATT&CK', href: goToMitre() }}
         loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
         data-test-subj='home-overview-mitre-tactics'
       >
         {findings.data && (
           <BarList
             items={findings.data.topTactics}
-            onSelect={item => goToMitreTactic(item.id)}
+            getHref={item => goToMitreTactic(item.id)}
             emptyMessage='No MITRE ATT&CK tactics observed in the last 24 hours'
             data-test-subj='mitre-top-tactics'
           />
@@ -119,8 +119,8 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             <WidgetGroup
               status={topOs.status}
               title='Top 5 operating systems'
-              caption='Current'
-              headerLink={{ label: 'IT Hygiene', onClick: goToItHygiene }}
+              caption='Current state'
+              headerLink={{ label: 'IT Hygiene', href: goToItHygiene() }}
               loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
               data-test-subj='home-overview-top-os'
             >
@@ -131,8 +131,8 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             <WidgetGroup
               status={topServices.status}
               title='Top 5 network services'
-              caption='Current'
-              headerLink={{ label: 'IT Hygiene', onClick: goToItHygiene }}
+              caption='Current state'
+              headerLink={{ label: 'IT Hygiene', href: goToItHygiene() }}
               loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
               data-test-subj='home-overview-top-network-services'
             >

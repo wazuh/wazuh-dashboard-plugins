@@ -86,6 +86,7 @@ describe('mappers', () => {
             high: { doc_count: 5456 },
             medium: { doc_count: 31517 },
             low: { doc_count: 1980 },
+            pending: { doc_count: 0 }
           },
         },
       };
@@ -95,7 +96,7 @@ describe('mappers', () => {
           'vulnerability_severity',
           VULNERABILITY_SEVERITY_BANDS,
         ),
-      ).toEqual({ critical: 179, high: 5456, medium: 31517, low: 1980 });
+      ).toEqual({ critical: 179, high: 5456, medium: 31517, low: 1980, pending: 0 });
     });
   });
 

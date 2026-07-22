@@ -1,5 +1,7 @@
 import React from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiPanel } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiPanel, EuiLink } from '@elastic/eui';
+import { getCore } from '../../../../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { WidgetGroupBody } from './widget-group';
 import { StatTile } from './stat-tile';
 import { TabNumber } from './tab-number';
@@ -41,14 +43,35 @@ export function StatTileGroup<K extends string>({
                   <EuiPanel
                     paddingSize='s'
                     hasBorder
-                    onClick={tile.onSelect}
                     data-test-subj={tile.testSubj}
                   >
-                    <StatTile
-                      value={<TabNumber value={result.data} />}
-                      label={tile.label}
-                      reverse
-                    />
+                    {tile.onSelect ? (
+                      <RedirectAppLinks application={getCore().application}>
+
+                        <StatTile
+                          value={
+                            <EuiLink
+                              style={{ fontWeight: 'normal' }}
+                              href={tile.onSelect()}
+                              color='text'
+                              data-test-subj={`${tile.testSubj}-link`}
+                            >
+                              <TabNumber value={result.data} />
+                            </EuiLink>
+                          }
+                          label={tile.label}
+                          reverse
+                          data-test-subj={tile.testSubj}
+                        />
+
+                      </RedirectAppLinks>
+                    ) : (
+                      <StatTile
+                        value={<TabNumber value={result.data} />}
+                        label={tile.label}
+                        reverse
+                      />
+                    )}
                   </EuiPanel>
                 ) : (
                   <StatTile

@@ -24,6 +24,8 @@ import {
 } from '../../utils/navigation';
 import { DataGroupResult } from '../../interfaces/data-group';
 import { ThreatIntelEnrichments, TopItem } from '../../interfaces/types';
+import { getCore } from '../../../../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 export interface EndpointSecuritySectionProps {
   /** Malware Detection's IOC-match hero rides the shared findings search. */
@@ -60,11 +62,13 @@ const EndpointSecuritySectionComponent: React.FC<
           <WidgetGroup
             status={sca.status}
             title={
-              <EuiLink onClick={goToConfigurationAssessment}>
-                Configuration Assessment
-              </EuiLink>
+              <RedirectAppLinks application={getCore().application}>
+                <EuiLink href={goToConfigurationAssessment()}>
+                  Configuration Assessment
+                </EuiLink>
+              </RedirectAppLinks>
             }
-            caption='Current'
+            caption='Current state'
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-sca'
           >
@@ -81,11 +85,13 @@ const EndpointSecuritySectionComponent: React.FC<
           <WidgetGroup
             status={fim.status}
             title={
-              <EuiLink onClick={goToFileIntegrityMonitoring}>
-                File Integrity Monitoring
-              </EuiLink>
+              <RedirectAppLinks application={getCore().application}>
+                <EuiLink href={goToFileIntegrityMonitoring()}>
+                  File Integrity Monitoring
+                </EuiLink>
+              </RedirectAppLinks>
             }
-            caption='Current'
+            caption='Current state'
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-fim'
           >

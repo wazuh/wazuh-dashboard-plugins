@@ -10,6 +10,8 @@ import {
   EuiText,
 } from '@elastic/eui';
 import { DataGroupStatus } from '../../interfaces/data-group';
+import { getCore } from '../../../../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 export interface WidgetGroupHeaderLink {
   label: string;
@@ -127,9 +129,11 @@ export const WidgetGroup: React.FC<WidgetGroupProps> = ({
           </EuiFlexItem>
           {headerLink && (
             <EuiFlexItem grow={false}>
-              <EuiLink href={headerLink.href} onClick={headerLink.onClick}>
-                {headerLink.label}
-              </EuiLink>
+              <RedirectAppLinks application={getCore().application}>
+                <EuiLink href={headerLink.href} onClick={headerLink.onClick}>
+                  {headerLink.label}
+                </EuiLink>
+              </RedirectAppLinks>
             </EuiFlexItem>
           )}
         </EuiFlexGroup>
@@ -143,12 +147,12 @@ export const WidgetGroup: React.FC<WidgetGroupProps> = ({
         style={
           centerBody
             ? {
-                marginTop: 10,
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-              }
+              marginTop: 10,
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }
             : { marginTop: 10 }
         }
       >

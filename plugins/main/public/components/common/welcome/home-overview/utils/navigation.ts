@@ -26,7 +26,9 @@ import { SeverityBand } from '../interfaces/types';
 /** Navigation helpers, kept in one module so sections depend on one boundary. */
 
 const navigate = (appId: string, options?: Record<string, unknown>) =>
-  NavigationService.getInstance().navigateToApp(appId, options);
+  NavigationService.getInstance().getUrlForApp(appId, options);
+// const getUrlForApp = (appId: string, options?: Record<string, unknown>) =>
+//   NavigationService.getInstance().getUrlForApp(appId, options);
 
 export const goToAgents = () => navigate(endpointSummary.id);
 
@@ -55,10 +57,9 @@ export const goToDiscoverFindingsBySeverity = (
   band: SeverityBand,
   indexPatternId?: string,
   fixedFilters: tFilter[] = [],
-): void => {
+): string => {
   if (!indexPatternId) {
-    navigate(threatHunting.id);
-    return;
+    return navigate(threatHunting.id);
   }
   const queryState = rison.encode({
     filters: [
@@ -72,7 +73,7 @@ export const goToDiscoverFindingsBySeverity = (
     ],
     query: { language: 'kuery', query: '' },
   });
-  navigate(DISCOVER_APP_ID, {
+  return navigate(DISCOVER_APP_ID, {
     path: `discover#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternId}',view:discover))&_g=()&_q=${queryState}`,
   });
 };

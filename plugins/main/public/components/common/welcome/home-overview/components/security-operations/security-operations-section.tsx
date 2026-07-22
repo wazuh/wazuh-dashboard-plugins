@@ -1,5 +1,7 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiLink } from '@elastic/eui';
+import { getCore } from '../../../../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
 import { WidgetGroup, StatTile, TabNumber, SectionHeader } from '../common';
 import { ItHygieneTiles } from './it-hygiene-tiles';
@@ -43,8 +45,12 @@ const SecurityOperationsSectionComponent: React.FC = () => {
         <EuiFlexItem>
           <WidgetGroup
             status={itHygieneStatus}
-            title={<EuiLink onClick={goToItHygiene}>IT Hygiene</EuiLink>}
-            caption='Current'
+            title={
+              <RedirectAppLinks application={getCore().application}>
+                <EuiLink href={goToItHygiene()}>IT Hygiene</EuiLink>
+              </RedirectAppLinks>
+            }
+            caption='Current state'
             centerBody
             data-test-subj='home-overview-it-hygiene'
           >
@@ -60,7 +66,9 @@ const SecurityOperationsSectionComponent: React.FC = () => {
           <WidgetGroup
             status={activeResponse.status}
             title={
-              <EuiLink onClick={goToActiveResponse}>Incident Response</EuiLink>
+              <RedirectAppLinks application={getCore().application}>
+                <EuiLink href={goToActiveResponse()}>Incident Response</EuiLink>
+              </RedirectAppLinks>
             }
             caption='Last 24 hours'
             centerBody
@@ -81,9 +89,11 @@ const SecurityOperationsSectionComponent: React.FC = () => {
           <WidgetGroup
             status='available'
             title={
-              <EuiLink onClick={goToRegulatoryComplianceHome}>
-                Regulatory Compliance
-              </EuiLink>
+              <RedirectAppLinks application={getCore().application}>
+                <EuiLink href={goToRegulatoryComplianceHome()}>
+                  Regulatory Compliance
+                </EuiLink>
+              </RedirectAppLinks>
             }
             caption='Frameworks'
             centerBody

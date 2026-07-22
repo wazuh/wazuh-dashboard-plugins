@@ -3,6 +3,8 @@ import { EuiBadge, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { WAZUH_MODULES_ID } from '../../../../../../../common/constants';
 import { WAZUH_MODULES } from '../../../../../../../common/wazuh-modules';
 import { goToRegulatoryCompliance } from '../../utils/navigation';
+import { getCore } from '../../../../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 const FRAMEWORK_IDS = [
   WAZUH_MODULES_ID.PCI_DSS,
@@ -28,14 +30,16 @@ export const RegulatoryComplianceBadges: React.FC = () => (
       const label = WAZUH_MODULES[id].title;
       return (
         <EuiFlexItem grow={false} key={id}>
-          <EuiBadge
-            color='hollow'
-            onClick={() => goToRegulatoryCompliance(id)}
-            onClickAriaLabel={`Open ${label}`}
-            data-test-subj={`regulatory-compliance-badge-${id}`}
-          >
-            {label}
-          </EuiBadge>
+          <RedirectAppLinks application={getCore().application}>
+            <EuiBadge
+              color='hollow'
+              href={goToRegulatoryCompliance(id)}
+              onClickAriaLabel={`Open ${label}`}
+              data-test-subj={`regulatory-compliance-badge-${id}`}
+            >
+              {label}
+            </EuiBadge>
+          </RedirectAppLinks>
         </EuiFlexItem>
       );
     })}
