@@ -41,3 +41,5 @@ export const SCA_RESULT_BUCKET = {
 
 /** Default "top N" size for the ranked (terms) aggregations. */
 export const TOP_N = 5;
+
+export const VALUE_PLACEHOLDER = '-';

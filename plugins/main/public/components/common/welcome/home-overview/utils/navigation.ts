@@ -25,7 +25,8 @@ import { SeverityBand } from '../interfaces/types';
 
 /** Navigation helpers, kept in one module so sections depend on one boundary. */
 
-const getUrlForApp = (appId: string, options?: Record<string, unknown>) => NavigationService.getInstance().getUrlForApp(appId, options);
+const getUrlForApp = (appId: string, options?: Record<string, unknown>) =>
+  NavigationService.getInstance().getUrlForApp(appId, options);
 
 const navigate = (appId: string, options?: Record<string, unknown>) =>
   NavigationService.getInstance().navigateToApp(appId, options);
@@ -111,7 +112,8 @@ const SECURITY_ANALYTICS_APP_IDS = {
 };
 
 export const goToRules = () => getUrlForApp(SECURITY_ANALYTICS_APP_IDS.rules);
-export const goToDecoders = () => getUrlForApp(SECURITY_ANALYTICS_APP_IDS.decoders);
+export const goToDecoders = () =>
+  getUrlForApp(SECURITY_ANALYTICS_APP_IDS.decoders);
 export const goToIntegrations = () =>
   getUrlForApp(SECURITY_ANALYTICS_APP_IDS.integrations);
 export const goToDetectors = () =>
@@ -129,7 +131,6 @@ const goToMitreIntelligence = (
 ): string => {
   if (!externalId) {
     return getUrlForApp(mitreAttack.id);
-
   }
   const params = `tab=mitre&tabView=intelligence&tabRedirect=${tabRedirect}&idToRedirect=${externalId}`;
   return getUrlForApp(mitreAttack.id, { path: `#/overview?${params}` });

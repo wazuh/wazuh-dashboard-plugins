@@ -9,7 +9,7 @@ const available = (value: number) => ({
 });
 
 describe('ItHygieneTiles', () => {
-  it('hides only the tile whose index is unavailable, keeping the others', () => {
+  it('keeps every tile (never hidden); an unavailable index shows "-"', () => {
     const { container } = render(
       <ItHygieneTiles
         operatingSystems={available(12)}
@@ -18,9 +18,11 @@ describe('ItHygieneTiles', () => {
         services={available(320)}
       />,
     );
-    expect(
-      container.querySelector('[data-test-subj="it-hygiene-tile-packages"]'),
-    ).not.toBeInTheDocument();
+    const packages = container.querySelector(
+      '[data-test-subj="it-hygiene-tile-packages"]',
+    );
+    expect(packages).toBeInTheDocument();
+    expect(packages?.textContent).toContain('-');
     expect(
       container.querySelector(
         '[data-test-subj="it-hygiene-tile-operating-systems"]',
@@ -28,7 +30,7 @@ describe('ItHygieneTiles', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows a contained error for a failed tile, distinct from hidden', () => {
+  it('shows "-" for a failed tile (never a hidden tile), no per-tile callout', () => {
     const { container } = render(
       <ItHygieneTiles
         operatingSystems={available(12)}
@@ -37,9 +39,15 @@ describe('ItHygieneTiles', () => {
         services={available(320)}
       />,
     );
+    // Error surfaces via a toast (upstream).
     expect(
       container.querySelectorAll('[data-test-subj="widget-group-error"]')
         .length,
-    ).toBe(1);
+    ).toBe(0);
+    const packages = container.querySelector(
+      '[data-test-subj="it-hygiene-tile-packages"]',
+    );
+    expect(packages).toBeInTheDocument();
+    expect(packages?.textContent).toContain('-');
   });
 });

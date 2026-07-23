@@ -19,11 +19,13 @@ jest.mock('../../hooks/use-overview-data', () => ({
 }));
 jest.mock('../../utils/navigation', () => ({
   getDeployAgentUrl: jest.fn(() => 'https://example.test/deploy'),
-  goToAgents: jest.fn(),
-  goToThreatHunting: jest.fn(),
+  goToAgents: jest.fn(() => '#agents'),
+  goToAgentsByStatus: jest.fn(),
+  goToThreatHunting: jest.fn(() => '#threat-hunting'),
   goToMitre: jest.fn(),
-  goToItHygiene: jest.fn(),
+  goToItHygiene: jest.fn(() => '#it-hygiene'),
   goToMitreTactic: jest.fn(),
+  goToDiscoverFindingsBySeverity: jest.fn(() => '#discover'),
 }));
 jest.mock('../../../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),
@@ -80,9 +82,7 @@ describe('OverviewSection', () => {
     render(<OverviewSection findings={findingsAvailable} />);
     expect(screen.getByText('Agents by status')).toBeInTheDocument();
     expect(screen.getByText('Findings')).toBeInTheDocument();
-    expect(
-      screen.getByText('MITRE ATT&CK — last 24 hours (top tactics)'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('MITRE ATT&CK top tactics')).toBeInTheDocument();
     expect(screen.getByText('Top 5 operating systems')).toBeInTheDocument();
     expect(screen.getByText('Top 5 network services')).toBeInTheDocument();
     // data flowed through: active hero + a severity value + a tactic + a row
@@ -92,17 +92,17 @@ describe('OverviewSection', () => {
     expect(screen.getAllByText('svchost.exe').length).toBeGreaterThan(0);
   });
 
-  it('hides a widget whose dependency is unavailable (not an error)', () => {
+  it('keeps a widget whose dependency is unavailable (never hidden)', () => {
     asMock(useTopNetworkServices).mockReturnValue({ status: 'unavailable' });
     const { container } = render(
       <OverviewSection findings={findingsAvailable} />,
     );
-    expect(
-      container.querySelector(
-        '[data-test-subj="home-overview-top-network-services"]',
-      ),
-    ).not.toBeInTheDocument();
-    // a sibling group is still shown
+    const panel = container.querySelector(
+      '[data-test-subj="home-overview-top-network-services"]',
+    );
+    expect(panel).toBeInTheDocument();
+    // a table panel shows a neutral placeholder when its data source is absent
+    expect(panel?.textContent).toContain('Not available');
     expect(screen.getByText('Top 5 operating systems')).toBeInTheDocument();
   });
 

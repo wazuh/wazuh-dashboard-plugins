@@ -52,6 +52,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             title='Agents by status'
             headerLink={{ label: 'Agents', href: goToAgents() }}
             centerBody
+            errorDisplay='dash'
             data-test-subj='home-overview-agents'
           >
             {agents.data && (
@@ -70,6 +71,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             caption='Last 24 hours'
             headerLink={{ label: 'Threat Hunting', href: goToThreatHunting() }}
             centerBody
+            errorDisplay='dash'
             data-test-subj='home-overview-findings-severity'
           >
             {findings.data && (

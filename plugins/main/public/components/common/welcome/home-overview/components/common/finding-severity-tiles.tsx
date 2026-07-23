@@ -1,9 +1,8 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiLink, EuiToolTip } from '@elastic/eui';
 import { StatTile } from './stat-tile';
-import { TabNumber } from './tab-number';
+import { TabNumber, formatValueSafely } from './tab-number';
 import { SeverityBand, SeverityCounts } from '../../interfaces/types';
-import { formatUINumber } from '../../../../../../react-services/format-number';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -46,37 +45,37 @@ export const FindingSeverityTiles: React.FC<FindingSeverityTilesProps> = ({
   getTooltip,
 }) => (
   <EuiFlexGroup gutterSize='m' responsive={false} wrap>
-    {SEVERITY_PRESENTATION.filter(
-      severity => counts[severity.band] !== undefined,
-    ).map(severity => {
-      const bandCount = counts[severity.band] ?? 0;
-      const count = <TabNumber value={bandCount} />;
-      const value = onSelect ? (
-        <EuiToolTip position='top' content={getTooltip?.(severity.band)}>
-          <RedirectAppLinks application={getCore().application}>
-            <EuiLink
-              className='tab-num'
-              style={{ fontWeight: 'normal', color: severity.color }}
-              href={onSelect(severity.band)}
-            >
-              {formatUINumber(bandCount)}
-            </EuiLink>
-          </RedirectAppLinks>
-        </EuiToolTip>
-      ) : (
-        count
-      );
-      return (
-        <EuiFlexItem key={severity.band}>
-          <StatTile
-            value={value}
-            label={severity.label}
-            color={severity.color}
-            reverse
-            data-test-subj={`${testSubjPrefix}-${severity.band}`}
-          />
-        </EuiFlexItem>
-      );
-    })}
+    {SEVERITY_PRESENTATION.filter(severity => severity.band in counts).map(
+      severity => {
+        const bandCount = counts[severity.band];
+        const count = <TabNumber value={bandCount} />;
+        const value = onSelect ? (
+          <EuiToolTip position='top' content={getTooltip?.(severity.band)}>
+            <RedirectAppLinks application={getCore().application}>
+              <EuiLink
+                className='tab-num'
+                style={{ fontWeight: 'normal', color: severity.color }}
+                href={onSelect(severity.band)}
+              >
+                {formatValueSafely(bandCount)}
+              </EuiLink>
+            </RedirectAppLinks>
+          </EuiToolTip>
+        ) : (
+          count
+        );
+        return (
+          <EuiFlexItem key={severity.band}>
+            <StatTile
+              value={value}
+              label={severity.label}
+              color={severity.color}
+              reverse
+              data-test-subj={`${testSubjPrefix}-${severity.band}`}
+            />
+          </EuiFlexItem>
+        );
+      },
+    )}
   </EuiFlexGroup>
 );

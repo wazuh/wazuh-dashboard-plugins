@@ -73,6 +73,7 @@ import {
   DATA_SOURCE_NOT_FOUND,
   DataGroupResult,
 } from '../interfaces/data-group';
+import { reportQueryError } from '../lib/report-query-error';
 
 // Data hooks for the Home overview. Every widget reads its data through one of
 // these; they wrap SearchSource aggregations, the Wazuh API, and Security
@@ -82,9 +83,14 @@ const LAST_24H = { from: 'now-24h', to: 'now' };
 /** Aggregations and counts only; never fetch document hits. */
 const NO_HITS: { pageSize: number } = { pageSize: 0 };
 
+function isDataSourceNotFound(error: unknown): boolean {
+  return (error as { type?: string })?.type === DATA_SOURCE_NOT_FOUND;
+}
+
 /**
- * State handling for one group. `data_source_not_found` → unavailable (hidden);
- * any other error → error.
+ * State handling for one group. `data_source_not_found` → `unavailable` (benign,
+ * no toast); any other error → `error` and, when a `label` is given, a coalesced
+ * failure toast (see `reportQueryError`). Widgets are never hidden.
  */
 function useDataGroup<T>(options: {
   isLoading: boolean;
@@ -93,8 +99,9 @@ function useDataGroup<T>(options: {
   ready: boolean;
   fetch: () => Promise<T>;
   deps: unknown[];
+  label?: string;
 }): DataGroupResult<T> {
-  const { isLoading, initError, enabled, ready, fetch, deps } = options;
+  const { isLoading, initError, enabled, ready, fetch, deps, label = 'unknown' } = options;
   const [result, setResult] = useState<DataGroupResult<T>>({
     status: 'loading',
   });
@@ -102,15 +109,22 @@ function useDataGroup<T>(options: {
   useEffect(() => {
     let cancelled = false;
 
+    const handleError = (error: unknown) => {
+      if (isDataSourceNotFound(error)) {
+        setResult({ status: 'unavailable' });
+        reportQueryError(label, error);
+        return;
+      }
+      reportQueryError(label, error);
+      setResult({ status: 'error' });
+    };
+
     if (isLoading) {
       setResult({ status: 'loading' });
       return;
     }
     if (initError) {
-      const type = (initError as { type?: string })?.type;
-      setResult({
-        status: type === DATA_SOURCE_NOT_FOUND ? 'unavailable' : 'error',
-      });
+      handleError(initError);
       return;
     }
     if (!enabled || !ready) {
@@ -127,10 +141,7 @@ function useDataGroup<T>(options: {
       })
       .catch(error => {
         if (!cancelled) {
-          const type = (error as { type?: string })?.type;
-          setResult({
-            status: type === DATA_SOURCE_NOT_FOUND ? 'unavailable' : 'error',
-          });
+          handleError(error);
         }
       });
 
@@ -154,11 +165,12 @@ function useAggregationGroup<T>(options: {
   createRepository: () => tDataSourceRepository<tParsedIndexPattern>;
   enabled: boolean;
   fetch: (fetchData: FetchData) => Promise<T>;
+  label?: string;
 }): DataGroupResult<T> & {
   dataSource?: PatternDataSource;
   fixedFilters?: tFilter[];
 } {
-  const { DataSource, createRepository, enabled, fetch } = options;
+  const { DataSource, createRepository, enabled, fetch, label } = options;
   const repository = useMemo(createRepository, []);
   const { isLoading, dataSource, error, fetchData, fixedFilters } =
     useDataSource({
@@ -178,6 +190,7 @@ function useAggregationGroup<T>(options: {
     ready: Boolean(dataSource && fetchData),
     fetch: () => fetch(scopedFetchData),
     deps: [isLoading, error, dataSource, enabled],
+    label,
   });
 
   return useMemo(
@@ -199,6 +212,7 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
       DataSource: OverviewDataSource,
       createRepository: () => new FindingsDataSourceRepository(),
       enabled: true,
+      label: 'Findings',
       fetch: async fetchData => {
         const response = await fetchData({
           aggs: { ...buildFindingsOverviewAggs(), ...buildMalwareFilterAgg() },
@@ -240,6 +254,7 @@ export function useTopOperatingSystems(
     createRepository: () =>
       new SystemInventorySystemStatesDataSourceRepository(),
     enabled,
+    label: 'Top operating systems',
     fetch: async fetchData => {
       const response = await fetchData({
         aggs: buildTopTermsAgg(AGG.topOs, HOST_OS_NAME_FIELD),
@@ -260,6 +275,7 @@ export function useTopNetworkServices(
     createRepository: () =>
       new SystemInventoryTrafficStatesDataSourceRepository(),
     enabled,
+    label: 'Top network services',
     fetch: async fetchData => {
       const response = await fetchData({
         aggs: buildTopTermsAgg(AGG.topServices, PROCESS_NAME_FIELD),
@@ -285,6 +301,7 @@ export function useAgentStatus(): DataGroupResult<AgentStatus> {
       return mapAgentStatus(response?.data?.data?.connection);
     },
     deps: [],
+    label: 'Agents status',
   });
 }
 
@@ -293,6 +310,7 @@ export function useSCAOverview(enabled: boolean): DataGroupResult<ScaOverview> {
     DataSource: SCAStatesDataSource,
     createRepository: () => new SCAStatesDataSourceRepository(),
     enabled,
+    label: 'Configuration Assessment',
     fetch: async fetchData => {
       const response = await fetchData({
         aggs: { ...buildSCATilesAgg(), ...buildSCATopBenchmarksAgg() },
@@ -311,6 +329,7 @@ export function useFIMOverview(enabled: boolean): DataGroupResult<FimOverview> {
     DataSource: FIMFilesStatesDataSource,
     createRepository: () => new FIMDataSourceRepository(),
     enabled,
+    label: 'File Integrity Monitoring',
     fetch: async fetchData => {
       const response = await fetchData({
         aggs: buildFIMTopPlatformsAgg(),
@@ -328,6 +347,7 @@ export function useFIMOverview(enabled: boolean): DataGroupResult<FimOverview> {
 function useSecurityAnalyticsFetch<T>(
   enabled: boolean,
   fetcher: () => Promise<T>,
+  label: string,
 ): DataGroupResult<T> {
   return useDataGroup<T>({
     isLoading: false,
@@ -336,26 +356,31 @@ function useSecurityAnalyticsFetch<T>(
     ready: true,
     fetch: fetcher,
     deps: [enabled],
+    label,
   });
 }
 
 /** Enabled rules count, across both the standard and custom content spaces. */
 export function useRulesCount(enabled: boolean): DataGroupResult<number> {
-  return useSecurityAnalyticsFetch(enabled, fetchRulesCount);
+  return useSecurityAnalyticsFetch(enabled, fetchRulesCount, 'Rules');
 }
 
 export function useDecodersCount(enabled: boolean): DataGroupResult<number> {
-  return useSecurityAnalyticsFetch(enabled, fetchDecodersCount);
+  return useSecurityAnalyticsFetch(enabled, fetchDecodersCount, 'Decoders');
 }
 
 export function useIntegrationsCount(
   enabled: boolean,
 ): DataGroupResult<number> {
-  return useSecurityAnalyticsFetch(enabled, fetchIntegrationsCount);
+  return useSecurityAnalyticsFetch(
+    enabled,
+    fetchIntegrationsCount,
+    'Integrations',
+  );
 }
 
 export function useDetectorsCount(enabled: boolean): DataGroupResult<number> {
-  return useSecurityAnalyticsFetch(enabled, fetchDetectorsCount);
+  return useSecurityAnalyticsFetch(enabled, fetchDetectorsCount, 'Detectors');
 }
 
 export function useVulnerabilityOverview(
@@ -365,6 +390,7 @@ export function useVulnerabilityOverview(
     DataSource: VulnerabilitiesDataSource,
     createRepository: () => new VulnerabilitiesDataSourceRepository(),
     enabled,
+    label: 'Vulnerabilities',
     fetch: async fetchData => {
       const response = await fetchData({
         aggs: {
@@ -401,6 +427,7 @@ export function useThreatIntelEnrichments(
     createRepository: () =>
       new ThreatIntelEnrichmentsStatesDataSourceRepository(),
     enabled,
+    label: 'Threat intelligence',
     fetch: async fetchData => {
       const response = await fetchData({
         aggs: buildThreatIntelFeedByTypeAgg(),
@@ -419,8 +446,9 @@ function useIndexDocCount(
   DataSourceClass: IDataSourceFactoryConstructor<PatternDataSource>,
   createRepository: () => tDataSourceRepository<tParsedIndexPattern>,
   enabled: boolean,
+  label: string,
   dateRange?: { from: string; to: string },
-): DataGroupResult<number> {
+): DataGroupResult<number | undefined> {
   const repository = useMemo(createRepository, []);
   const { isLoading, dataSource, error, fetchData, fixedFilters } =
     useDataSource({
@@ -428,7 +456,7 @@ function useIndexDocCount(
       repository,
     });
 
-  return useDataGroup<number>({
+  return useDataGroup<number | undefined>({
     isLoading,
     initError: error,
     enabled,
@@ -442,60 +470,66 @@ function useIndexDocCount(
         } as Parameters<typeof fetchData>[0]),
       ),
     deps: [isLoading, error, dataSource, enabled],
+    label,
   });
 }
 
 /**
- * IT Hygiene counts: one search per inventory index, so a missing index hides
- * only its own tile.
+ * IT Hygiene counts: one search per inventory index, so a missing index shows
+ * "-" on only its own tile (never hidden).
  */
 export function useItHygieneOperatingSystemsCount(
   enabled: boolean,
-): DataGroupResult<number> {
+): DataGroupResult<number | undefined> {
   return useIndexDocCount(
     SystemInventoryStatesDataSource,
     () => new SystemInventorySystemStatesDataSourceRepository(),
     enabled,
+    'IT Hygiene: operating systems',
   );
 }
 
 export function useItHygienePackagesCount(
   enabled: boolean,
-): DataGroupResult<number> {
+): DataGroupResult<number | undefined> {
   return useIndexDocCount(
     SystemInventoryStatesDataSource,
     () => new SystemInventoryPackagesStatesDataSourceRepository(),
     enabled,
+    'IT Hygiene: packages',
   );
 }
 
 export function useItHygieneUsersCount(
   enabled: boolean,
-): DataGroupResult<number> {
+): DataGroupResult<number | undefined> {
   return useIndexDocCount(
     SystemInventoryStatesDataSource,
     () => new SystemInventoryUsersStatesDataSourceRepository(),
     enabled,
+    'IT Hygiene: users',
   );
 }
 
 export function useItHygieneServicesCount(
   enabled: boolean,
-): DataGroupResult<number> {
+): DataGroupResult<number | undefined> {
   return useIndexDocCount(
     SystemInventoryStatesDataSource,
     () => new SystemInventoryServicesStatesDataSourceRepository(),
     enabled,
+    'IT Hygiene: services',
   );
 }
 
 export function useActiveResponseOverview(
   enabled: boolean,
-): DataGroupResult<number> {
+): DataGroupResult<number | undefined> {
   return useIndexDocCount(
     ActiveResponsesDataSource,
     () => new ActiveResponsesDataSourceRepository(),
     enabled,
+    'Active Response',
     LAST_24H,
   );
 }

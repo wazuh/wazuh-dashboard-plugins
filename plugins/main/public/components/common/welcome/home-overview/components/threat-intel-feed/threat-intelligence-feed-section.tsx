@@ -21,10 +21,6 @@ export interface ThreatIntelligenceFeedSectionProps {
   threatIntel: DataGroupResult<ThreatIntelEnrichments>;
 }
 
-/**
- * Hides only when every tile lacks its dependency; IOCs and CVEs matched
- * aren't SA-backed, so the section still shows when Security Analytics is absent.
- */
 const ThreatIntelligenceFeedSectionComponent: React.FC<
   ThreatIntelligenceFeedSectionProps
 > = ({ vulnerabilities, threatIntel }) => {
@@ -33,27 +29,14 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
   const decoders = useDecodersCount(visible);
   const integrations = useIntegrationsCount(visible);
   const detectors = useDetectorsCount(visible);
-  const iocs: DataGroupResult<number> = {
+  const iocs: DataGroupResult<number | undefined> = {
     status: threatIntel.status,
     data: threatIntel.data?.total,
   };
-  const cvesMatched: DataGroupResult<number> = {
+  const cvesMatched: DataGroupResult<number | undefined> = {
     status: vulnerabilities.status,
     data: vulnerabilities.data?.cvesMatched,
   };
-
-  const everyTileUnavailable = [
-    rules,
-    decoders,
-    iocs,
-    cvesMatched,
-    integrations,
-    detectors,
-  ].every(result => result.status === 'unavailable');
-
-  if (everyTileUnavailable) {
-    return null;
-  }
 
   return (
     <div ref={sectionRef}>

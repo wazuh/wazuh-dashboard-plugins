@@ -55,13 +55,11 @@ describe('fetchRulesCount', () => {
     expect(JSON.parse(customOpts.body)).toEqual(enabledQuery);
   });
 
-  it('raises ErrorDataSourceNotFound (capability-absent) on a 404', async () => {
+  it('rethrows error', async () => {
     const post = jest.fn().mockRejectedValue({ statusCode: 404 });
     asMock(getHttp).mockReturnValue({ post });
 
-    await expect(fetchRulesCount()).rejects.toBeInstanceOf(
-      ErrorDataSourceNotFound,
-    );
+    await expect(fetchRulesCount()).rejects.toMatchObject({ statusCode: 404 });
   });
 
   it('treats an in-envelope ok:false as a real query failure', async () => {

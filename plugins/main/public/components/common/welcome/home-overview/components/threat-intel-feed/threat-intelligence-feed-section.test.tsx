@@ -70,7 +70,7 @@ describe('ThreatIntelligenceFeedSection', () => {
     expect(screen.getByText('482')).toBeInTheDocument();
   });
 
-  it('hides the whole section when every tile is unavailable', () => {
+  it('always renders the section, even when every tile is unavailable', () => {
     for (const mock of [
       useRulesCount,
       useDecodersCount,
@@ -79,13 +79,15 @@ describe('ThreatIntelligenceFeedSection', () => {
     ]) {
       asMock(mock).mockReturnValue({ status: 'unavailable' });
     }
-    const { container } = render(
+    render(
       <ThreatIntelligenceFeedSection
         vulnerabilities={{ status: 'unavailable' }}
         threatIntel={{ status: 'unavailable' }}
       />,
     );
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.getByText('Threat intelligence feed')).toBeInTheDocument();
+    expect(screen.getByText('Rules')).toBeInTheDocument();
+    expect(screen.getByText('IOCs')).toBeInTheDocument();
   });
 
   it('keeps the section (showing IOCs and CVEs matched) when Security Analytics is absent but the feed and vulnerabilities data are not', () => {
@@ -106,7 +108,7 @@ describe('ThreatIntelligenceFeedSection', () => {
     expect(screen.getByText('Threat intelligence feed')).toBeInTheDocument();
     expect(screen.getByText('IOCs')).toBeInTheDocument();
     expect(screen.getByText('CVEs matched')).toBeInTheDocument();
-    expect(screen.queryByText('Rules')).not.toBeInTheDocument();
+    expect(screen.getByText('Rules')).toBeInTheDocument();
   });
 
   it('fetches the Security Analytics tiles lazily once the section enters the viewport', () => {

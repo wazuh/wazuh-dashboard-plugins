@@ -89,7 +89,7 @@ describe('EndpointSecuritySection', () => {
     expect(screen.getAllByText('Domains').length).toBeGreaterThan(0);
   });
 
-  it('hides Configuration Assessment when the SCA index is unavailable', () => {
+  it('still renders Configuration Assessment when the SCA index is unavailable', () => {
     asMock(useSCAOverview).mockReturnValue({ status: 'unavailable' });
     const { container } = render(
       <EndpointSecuritySection
@@ -99,11 +99,11 @@ describe('EndpointSecuritySection', () => {
     );
     expect(
       container.querySelector('[data-test-subj="home-overview-sca"]'),
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
     expect(screen.getByText('File Integrity Monitoring')).toBeInTheDocument();
   });
 
-  it('hides Malware Detection when the findings-backed hero is unavailable', () => {
+  it('still renders Malware Detection when the findings-backed hero is unavailable', () => {
     const { container } = render(
       <EndpointSecuritySection
         findings={{ status: 'unavailable' }}
@@ -114,7 +114,7 @@ describe('EndpointSecuritySection', () => {
       container.querySelector(
         '[data-test-subj="home-overview-malware-detection"]',
       ),
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
   });
 
   it('fetches Configuration Assessment and File Integrity Monitoring lazily once the section enters the viewport', () => {

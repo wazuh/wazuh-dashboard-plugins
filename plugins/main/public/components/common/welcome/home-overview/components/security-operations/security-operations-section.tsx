@@ -29,12 +29,6 @@ const SecurityOperationsSectionComponent: React.FC = () => {
   const services = useItHygieneServicesCount(visible);
   const activeResponse = useActiveResponseOverview(visible);
 
-  const itHygieneStatus = [operatingSystems, packages, users, services].every(
-    result => result.status === 'unavailable',
-  )
-    ? 'unavailable'
-    : 'available';
-
   return (
     <div ref={sectionRef}>
       <SectionHeader
@@ -44,7 +38,7 @@ const SecurityOperationsSectionComponent: React.FC = () => {
       <EuiFlexGroup wrap responsive={false}>
         <EuiFlexItem>
           <WidgetGroup
-            status={itHygieneStatus}
+            status='available'
             title={
               <RedirectAppLinks application={getCore().application}>
                 <EuiLink href={goToItHygiene()}>IT Hygiene</EuiLink>
@@ -72,17 +66,16 @@ const SecurityOperationsSectionComponent: React.FC = () => {
             }
             caption='Last 24 hours'
             centerBody
+            errorDisplay='dash'
             data-test-subj='home-overview-active-response'
           >
-            {activeResponse.data !== undefined && (
-              <StatTile
-                textAlign='center'
-                reverse
-                value={<TabNumber value={activeResponse.data} />}
-                label='Actions triggered, last 24 hours'
-                data-test-subj='active-response-stat'
-              />
-            )}
+            <StatTile
+              textAlign='center'
+              reverse
+              value={<TabNumber value={activeResponse.data} />}
+              label='Actions triggered, last 24 hours'
+              data-test-subj='active-response-stat'
+            />
           </WidgetGroup>
         </EuiFlexItem>
         <EuiFlexItem>

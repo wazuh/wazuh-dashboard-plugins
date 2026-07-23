@@ -19,30 +19,29 @@ export interface TopItem {
 }
 
 export interface AgentStatus {
-  active: number;
-  disconnected: number;
-  pending: number;
-  neverConnected: number;
-  total: number;
+  active?: number;
+  disconnected?: number;
+  pending?: number;
+  neverConnected?: number;
+  total?: number;
 }
 
 export interface FindingsOverview {
   severity: SeverityCounts;
   topTactics: TopItem[];
-  totalFindings: number;
+  totalFindings?: number;
   topRules: TopItem[];
-  techniquesCount: number;
+  techniquesCount?: number;
   topTechniques: TopItem[];
   /** IOC matches (last 24h detection metric), from the same findings search. */
-  iocMatches: number;
+  iocMatches?: number;
 }
 
 export interface ScaTilesData {
-  passed: number;
-  failed: number;
-  notApplicable: number;
-  /** Percentage (0-100): passed / (passed + failed). */
-  score: number;
+  passed?: number;
+  failed?: number;
+  notApplicable?: number;
+  score?: number;
 }
 
 export interface ScaBenchmark {
@@ -60,7 +59,7 @@ export interface ScaOverview {
 
 export interface FimOverview {
   /** Fleet-wide files & registry objects baselined. */
-  total: number;
+  total?: number;
   platforms: TopItem[];
 }
 
@@ -70,7 +69,7 @@ export interface FimOverview {
  */
 export interface ThreatIntelEnrichments {
   /** Total IOCs in the feed catalog (the "IOCs" tile). */
-  total: number;
+  total?: number;
   /** Feed composition by indicator type (the Malware "IOC feed by type" table). */
   feedByType: TopItem[];
 }
@@ -79,5 +78,5 @@ export interface VulnerabilityOverview {
   severity: SeverityCounts;
   byOs: TopItem[];
   /** Distinct CVE count (cardinality). */
-  cvesMatched: number;
+  cvesMatched?: number;
 }

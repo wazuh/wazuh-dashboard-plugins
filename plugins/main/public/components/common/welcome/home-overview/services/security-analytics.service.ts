@@ -34,19 +34,6 @@ interface SecurityAnalyticsResponse<T> {
   response?: T;
 }
 
-function isSecurityAnalyticsNotFound(error: unknown): boolean {
-  const err = error as {
-    response?: { status?: number };
-    body?: { statusCode?: number };
-    statusCode?: number;
-  };
-  return (
-    err?.response?.status === 404 ||
-    err?.body?.statusCode === 404 ||
-    err?.statusCode === 404
-  );
-}
-
 function isUnhandledUri(errorMessage: string | undefined): boolean {
   return (
     typeof errorMessage === 'string' &&
@@ -89,11 +76,6 @@ async function fetchSecurityAnalyticsSearchCount({
       ...(query ? { query } : {}),
     })) as SecurityAnalyticsResponse<SearchResponse>;
   } catch (error) {
-    if (isSecurityAnalyticsNotFound(error)) {
-      throw new ErrorDataSourceNotFound(
-        'Security Analytics dashboards plugin not found',
-      );
-    }
     throw error;
   }
   if (!envelope?.ok) {

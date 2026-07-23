@@ -33,25 +33,19 @@ describe('mappers', () => {
       });
     });
 
-    it('defaults missing bands and missing aggregations to 0', () => {
-      expect(mapSeverityCounts(undefined)).toEqual({
-        critical: 0,
-        high: 0,
-        medium: 0,
-        low: 0,
-        informational: 0,
+    it('leaves absent bands undefined, keeps explicit 0', () => {
+      const empty = mapSeverityCounts(undefined);
+      expect(empty.critical).toBeUndefined();
+      expect(empty.high).toBeUndefined();
+
+      const partial = mapSeverityCounts({
+        severity: {
+          buckets: { high: { doc_count: 3 }, low: { doc_count: 0 } },
+        },
       });
-      expect(
-        mapSeverityCounts({
-          severity: { buckets: { high: { doc_count: 3 } } },
-        }),
-      ).toEqual({
-        critical: 0,
-        high: 3,
-        medium: 0,
-        low: 0,
-        informational: 0,
-      });
+      expect(partial.high).toBe(3);
+      expect(partial.low).toBe(0); // explicit 0 preserved
+      expect(partial.critical).toBeUndefined(); // absent → undefined, not 0
     });
   });
 
@@ -86,7 +80,7 @@ describe('mappers', () => {
             high: { doc_count: 5456 },
             medium: { doc_count: 31517 },
             low: { doc_count: 1980 },
-            pending: { doc_count: 0 }
+            pending: { doc_count: 0 },
           },
         },
       };
@@ -96,7 +90,13 @@ describe('mappers', () => {
           'vulnerability_severity',
           VULNERABILITY_SEVERITY_BANDS,
         ),
-      ).toEqual({ critical: 179, high: 5456, medium: 31517, low: 1980, pending: 0 });
+      ).toEqual({
+        critical: 179,
+        high: 5456,
+        medium: 31517,
+        low: 1980,
+        pending: 0,
+      });
     });
   });
 
@@ -107,19 +107,26 @@ describe('mappers', () => {
       ).toBe(7);
     });
 
-    it('defaults to 0 when the agg is missing', () => {
-      expect(mapCardinality(undefined, 'techniques_count')).toBe(0);
-      expect(mapCardinality({}, 'techniques_count')).toBe(0);
+    it('reads an explicit 0 value', () => {
+      expect(
+        mapCardinality({ techniques_count: { value: 0 } }, 'techniques_count'),
+      ).toBe(0);
+    });
+
+    it('returns undefined when the agg is missing (no fabricated 0)', () => {
+      expect(mapCardinality(undefined, 'techniques_count')).toBeUndefined();
+      expect(mapCardinality({}, 'techniques_count')).toBeUndefined();
     });
   });
 
   describe('mapDocCount', () => {
-    it('reads hits.total from a search response', () => {
+    it('reads hits.total from a search response (incl. explicit 0)', () => {
       expect(mapDocCount({ hits: { total: 40614 } })).toBe(40614);
+      expect(mapDocCount({ hits: { total: 0 } })).toBe(0);
     });
 
-    it('defaults to 0 when the response is missing', () => {
-      expect(mapDocCount(undefined)).toBe(0);
+    it('returns undefined when the response is missing (no fabricated 0)', () => {
+      expect(mapDocCount(undefined)).toBeUndefined();
     });
   });
 
@@ -142,13 +149,26 @@ describe('mappers', () => {
       });
     });
 
-    it('defaults to zeroes and a 0 score when there is no data', () => {
-      expect(mapScaTiles(undefined)).toEqual({
-        passed: 0,
-        failed: 0,
-        notApplicable: 0,
-        score: 0,
+    it('scores 0 only when passed and failed are explicit 0s', () => {
+      const tiles = mapScaTiles({
+        sca_result: {
+          buckets: {
+            passed: { doc_count: 0 },
+            failed: { doc_count: 0 },
+            not_applicable: { doc_count: 0 },
+          },
+        },
       });
+      expect(tiles.passed).toBe(0);
+      expect(tiles.score).toBe(0);
+    });
+
+    it('leaves values and score undefined when there is no data', () => {
+      const tiles = mapScaTiles(undefined);
+      expect(tiles.passed).toBeUndefined();
+      expect(tiles.failed).toBeUndefined();
+      expect(tiles.notApplicable).toBeUndefined();
+      expect(tiles.score).toBeUndefined();
     });
   });
 
@@ -204,14 +224,5 @@ describe('mappers', () => {
       });
     });
 
-    it('defaults everything to 0 when payload is empty', () => {
-      expect(mapAgentStatus(undefined)).toEqual({
-        active: 0,
-        disconnected: 0,
-        pending: 0,
-        neverConnected: 0,
-        total: 0,
-      });
-    });
   });
 });

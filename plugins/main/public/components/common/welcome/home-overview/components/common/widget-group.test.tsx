@@ -16,13 +16,28 @@ describe('WidgetGroup', () => {
     expect(screen.getByText('widget body')).toBeInTheDocument();
   });
 
-  it('renders nothing when the dependency is unavailable (hide)', () => {
+  it('still renders, with a placeholder when the dependency is unavailable', () => {
     const { container } = render(
       <WidgetGroup status='unavailable' title='My widget'>
         {child}
       </WidgetGroup>,
     );
-    expect(container).toBeEmptyDOMElement();
+    // Panel + title still render; the body shows a neutral placeholder, not content.
+    expect(screen.getByText('My widget')).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-test-subj="widget-group-unavailable"]'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('widget body')).not.toBeInTheDocument();
+  });
+
+  it('renders a "-" placeholder for errorDisplay="dash" on a non-data state', () => {
+    render(
+      <WidgetGroup status='error' title='My widget' errorDisplay='dash'>
+        {child}
+      </WidgetGroup>,
+    );
+    expect(screen.getByText('-')).toBeInTheDocument();
+    expect(screen.queryByText('widget body')).not.toBeInTheDocument();
   });
 
   it('shows a skeleton while loading and not the content', () => {

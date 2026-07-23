@@ -54,24 +54,31 @@ describe('ThreatIntelTiles', () => {
     }
   });
 
-  it('hides only the tile whose Security Analytics dependency is absent', () => {
+  it('keeps every tile (never hidden); an absent dependency shows "-"', () => {
     const { container } = render(
       <ThreatIntelTiles {...allAvailable} rules={{ status: 'unavailable' }} />,
     );
-    expect(
-      container.querySelector('[data-test-subj="threat-intel-tile-rules"]'),
-    ).not.toBeInTheDocument();
+    const rules = container.querySelector(
+      '[data-test-subj="threat-intel-tile-rules"]',
+    );
+    expect(rules).toBeInTheDocument();
+    expect(rules?.textContent).toContain('-');
     expect(screen.getByText('Decoders')).toBeInTheDocument();
   });
 
-  it('shows a contained error naming the failed stat, distinct from hidden', () => {
+  it('shows "-" for a failed tile (never hidden), no per-tile callout', () => {
     const { container } = render(
       <ThreatIntelTiles {...allAvailable} decoders={{ status: 'error' }} />,
     );
+    // The failure is surfaced by a toast (raised upstream), not a per-tile callout.
     expect(
       container.querySelectorAll('[data-test-subj="widget-group-error"]')
         .length,
-    ).toBe(1);
-    expect(screen.getByText('Could not load Decoders')).toBeInTheDocument();
+    ).toBe(0);
+    const decoders = container.querySelector(
+      '[data-test-subj="threat-intel-tile-decoders"]',
+    );
+    expect(decoders).toBeInTheDocument();
+    expect(decoders?.textContent).toContain('-');
   });
 });

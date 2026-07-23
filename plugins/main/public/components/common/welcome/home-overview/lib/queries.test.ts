@@ -71,6 +71,9 @@ describe('query builders', () => {
     });
     expect(aggs.top_techniques).toEqual({
       terms: { field: MITRE_TECHNIQUE_NAME_FIELD, size: 5 },
+      aggs: {
+        external_id: { terms: { field: MITRE_TECHNIQUE_ID_FIELD, size: 1 } },
+      },
     });
   });
 

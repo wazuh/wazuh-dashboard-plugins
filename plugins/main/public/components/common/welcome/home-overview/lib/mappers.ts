@@ -39,8 +39,9 @@ export function mapSeverityCounts(
 ): SeverityCounts {
   const buckets = aggregations?.[aggName]?.buckets ?? {};
   return bands.reduce((acc, band) => {
-    acc[band] =
-      (buckets as Record<string, FiltersAggBucket>)?.[band]?.doc_count ?? 0;
+    acc[band] = (buckets as Record<string, FiltersAggBucket>)?.[
+      band
+    ]?.doc_count;
     return acc;
   }, {} as SeverityCounts);
 }
@@ -48,18 +49,16 @@ export function mapSeverityCounts(
 export function mapCardinality(
   aggregations: Aggregations,
   aggName: string,
-): number {
-  return (
-    (aggregations?.[aggName] as unknown as { value?: number } | undefined)
-      ?.value ?? 0
-  );
+): number | undefined {
+  return (aggregations?.[aggName] as unknown as { value?: number } | undefined)
+    ?.value;
 }
 
 /** Total hits count, for heroes that are the whole result set, not an agg. */
 export function mapDocCount(
   response: { hits?: { total?: number } } | undefined,
-): number {
-  return response?.hits?.total ?? 0;
+): number | undefined {
+  return response?.hits?.total;
 }
 
 export function mapScaTiles(aggregations: Aggregations): ScaTilesData {
@@ -69,17 +68,16 @@ export function mapScaTiles(aggregations: Aggregations): ScaTilesData {
         | { buckets?: Record<string, FiltersAggBucket> }
         | undefined
     )?.buckets ?? {};
-  const passed = buckets[SCA_RESULT_BUCKET.passed]?.doc_count ?? 0;
-  const failed = buckets[SCA_RESULT_BUCKET.failed]?.doc_count ?? 0;
-  const notApplicable =
-    buckets[SCA_RESULT_BUCKET.notApplicable]?.doc_count ?? 0;
-  const total = passed + failed;
-  return {
-    passed,
-    failed,
-    notApplicable,
-    score: total > 0 ? passed / total : 0,
-  };
+  const passed = buckets[SCA_RESULT_BUCKET.passed]?.doc_count;
+  const failed = buckets[SCA_RESULT_BUCKET.failed]?.doc_count;
+  const notApplicable = buckets[SCA_RESULT_BUCKET.notApplicable]?.doc_count;
+  const score =
+    typeof passed === 'number' && typeof failed === 'number'
+      ? passed + failed > 0
+        ? passed / (passed + failed)
+        : 0
+      : undefined;
+  return { passed, failed, notApplicable, score };
 }
 
 export function mapScaBenchmarks(aggregations: Aggregations): ScaBenchmark[] {
@@ -140,10 +138,10 @@ export function mapAgentStatus(
   connection: AgentConnectionSummary | undefined,
 ): AgentStatus {
   return {
-    active: connection?.active ?? 0,
-    disconnected: connection?.disconnected ?? 0,
-    pending: connection?.pending ?? 0,
-    neverConnected: connection?.never_connected ?? 0,
-    total: connection?.total ?? 0,
+    active: connection?.active,
+    disconnected: connection?.disconnected,
+    pending: connection?.pending,
+    neverConnected: connection?.never_connected,
+    total: connection?.total,
   };
 }

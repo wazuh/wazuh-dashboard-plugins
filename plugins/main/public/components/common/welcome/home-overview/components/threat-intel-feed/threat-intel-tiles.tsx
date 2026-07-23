@@ -51,10 +51,6 @@ const TILES: ReadonlyArray<StatTileSpec<keyof ThreatIntelTilesProps>> = [
   },
 ];
 
-/**
- * Each tile is independently gated: one absent dependency hides only its own
- * tile, not the whole panel.
- */
 export const ThreatIntelTiles: React.FC<ThreatIntelTilesProps> = props => (
   <StatTileGroup tiles={TILES} results={props} />
 );

@@ -70,7 +70,7 @@ describe('SecurityOperationsSection', () => {
     expect(screen.getByText('PCI DSS')).toBeInTheDocument();
   });
 
-  it('hides the whole IT Hygiene panel only when every tile is unavailable', () => {
+  it('keeps the IT Hygiene panel (never hidden) even when every tile is unavailable', () => {
     asMock(useItHygieneOperatingSystemsCount).mockReturnValue({
       status: 'unavailable',
     });
@@ -84,12 +84,11 @@ describe('SecurityOperationsSection', () => {
     const { container } = render(<SecurityOperationsSection />);
     expect(
       container.querySelector('[data-test-subj="home-overview-it-hygiene"]'),
-    ).not.toBeInTheDocument();
-    // sibling panels are unaffected
+    ).toBeInTheDocument();
     expect(screen.getByText('Incident Response')).toBeInTheDocument();
   });
 
-  it('keeps the IT Hygiene panel when only some tiles are unavailable', () => {
+  it('keeps every IT Hygiene tile; an unavailable one shows "-"', () => {
     asMock(useItHygienePackagesCount).mockReturnValue({
       status: 'unavailable',
     });
@@ -97,12 +96,14 @@ describe('SecurityOperationsSection', () => {
     expect(
       container.querySelector('[data-test-subj="home-overview-it-hygiene"]'),
     ).toBeInTheDocument();
-    expect(
-      container.querySelector('[data-test-subj="it-hygiene-tile-packages"]'),
-    ).not.toBeInTheDocument();
+    const packages = container.querySelector(
+      '[data-test-subj="it-hygiene-tile-packages"]',
+    );
+    expect(packages).toBeInTheDocument();
+    expect(packages?.textContent).toContain('-');
   });
 
-  it('hides Incident Response when its index is unavailable', () => {
+  it('keeps Incident Response (never hidden) when its index is unavailable', () => {
     asMock(useActiveResponseOverview).mockReturnValue({
       status: 'unavailable',
     });
@@ -111,7 +112,7 @@ describe('SecurityOperationsSection', () => {
       container.querySelector(
         '[data-test-subj="home-overview-active-response"]',
       ),
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
   });
 
   it('navigates to IT Hygiene from the panel title', () => {

@@ -5,7 +5,7 @@ import { TopItem } from '../../interfaces/types';
 
 export interface TopTechniquesTableProps {
   items: TopItem[];
-  onSelect: (item: TopItem) => void;
+  onSelect: (item: TopItem) => string | undefined;
 }
 
 export const TopTechniquesTable: React.FC<TopTechniquesTableProps> = ({

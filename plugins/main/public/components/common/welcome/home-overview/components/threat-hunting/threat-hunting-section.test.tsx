@@ -19,7 +19,9 @@ const findingsAvailable = {
     totalFindings: 40614,
     topRules: [{ key: 'Wazuh IT Hygiene – Item modified', count: 3899 }],
     techniquesCount: 7,
-    topTechniques: [{ key: 'Exploit Public-Facing Application', count: 35378 }],
+    topTechniques: [
+      { key: 'Exploit Public-Facing Application', count: 35378, id: 'T1190' },
+    ],
     iocMatches: 0,
   },
   indexPatternId: 'idx-1',
@@ -59,7 +61,7 @@ describe('ThreatHuntingSection', () => {
     ).toBeGreaterThan(0);
   });
 
-  it('hides Vulnerability Detection when the vulnerabilities search is unavailable', () => {
+  it('keeps Vulnerability Detection when the search is unavailable', () => {
     const { container } = render(
       <ThreatHuntingSection
         findings={findingsAvailable}
@@ -70,7 +72,7 @@ describe('ThreatHuntingSection', () => {
       container.querySelector(
         '[data-test-subj="home-overview-vulnerabilities"]',
       ),
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
     expect(screen.getByText('Threat Hunting')).toBeInTheDocument();
   });
 
@@ -98,7 +100,7 @@ describe('ThreatHuntingSection', () => {
     expect(navigation.goToThreatHunting).toHaveBeenCalled();
   });
 
-  it('navigates to the selected MITRE technique in the Framework, filtered by name', () => {
+  it('navigates to the selected MITRE technique by its external id', () => {
     render(
       <ThreatHuntingSection
         findings={findingsAvailable}
@@ -109,7 +111,7 @@ describe('ThreatHuntingSection', () => {
       screen.getAllByText('Exploit Public-Facing Application')[0],
     );
     expect(navigation.goToMitreTechnique).toHaveBeenCalledWith(
-      'Exploit Public-Facing Application',
+      'T1190',
       'idx-1',
     );
   });

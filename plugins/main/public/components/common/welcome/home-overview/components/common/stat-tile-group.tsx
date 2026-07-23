@@ -12,12 +12,12 @@ export interface StatTileSpec<K extends string> {
   label: string;
   testSubj: string;
   /** Present only for clickable tiles; reference-only tiles omit it. */
-  onSelect?: () => void;
+  onSelect?: () => string;
 }
 
 export interface StatTileGroupProps<K extends string> {
   tiles: ReadonlyArray<StatTileSpec<K>>;
-  results: Record<K, DataGroupResult<number>>;
+  results: Record<K, DataGroupResult<number | undefined>>;
 }
 
 export function StatTileGroup<K extends string>({
@@ -29,59 +29,56 @@ export function StatTileGroup<K extends string>({
     <EuiFlexGroup gutterSize='m' responsive={false} wrap>
       {tiles.map(tile => {
         const result = results[tile.key];
-        if (result.status === 'unavailable') {
-          return null;
+        const value = result.status === 'available' ? result.data : undefined;
+        const number = <TabNumber value={value} />;
+
+        let tileNode: React.ReactNode;
+        if (tile.onSelect) {
+          tileNode = (
+            <EuiPanel paddingSize='s' hasBorder data-test-subj={tile.testSubj}>
+              <RedirectAppLinks application={getCore().application}>
+                <StatTile
+                  value={
+                    <EuiLink
+                      style={{ fontWeight: 'normal' }}
+                      href={tile.onSelect()}
+                      color='text'
+                      data-test-subj={`${tile.testSubj}-link`}
+                    >
+                      {number}
+                    </EuiLink>
+                  }
+                  label={tile.label}
+                  reverse
+                  data-test-subj={tile.testSubj}
+                />
+              </RedirectAppLinks>
+            </EuiPanel>
+          );
+        } else if (bordered) {
+          tileNode = (
+            <EuiPanel paddingSize='s' hasBorder data-test-subj={tile.testSubj}>
+              <StatTile value={number} label={tile.label} reverse />
+            </EuiPanel>
+          );
+        } else {
+          tileNode = (
+            <StatTile
+              value={number}
+              label={tile.label}
+              reverse
+              data-test-subj={tile.testSubj}
+            />
+          );
         }
+
         return (
           <EuiFlexItem key={tile.key}>
-            <WidgetGroupBody
-              status={result.status}
-              errorLabel={`Could not load ${tile.label}`}
-            >
-              {result.data !== undefined &&
-                (bordered ? (
-                  <EuiPanel
-                    paddingSize='s'
-                    hasBorder
-                    data-test-subj={tile.testSubj}
-                  >
-                    {tile.onSelect ? (
-                      <RedirectAppLinks application={getCore().application}>
-
-                        <StatTile
-                          value={
-                            <EuiLink
-                              style={{ fontWeight: 'normal' }}
-                              href={tile.onSelect()}
-                              color='text'
-                              data-test-subj={`${tile.testSubj}-link`}
-                            >
-                              <TabNumber value={result.data} />
-                            </EuiLink>
-                          }
-                          label={tile.label}
-                          reverse
-                          data-test-subj={tile.testSubj}
-                        />
-
-                      </RedirectAppLinks>
-                    ) : (
-                      <StatTile
-                        value={<TabNumber value={result.data} />}
-                        label={tile.label}
-                        reverse
-                      />
-                    )}
-                  </EuiPanel>
-                ) : (
-                  <StatTile
-                    value={<TabNumber value={result.data} />}
-                    label={tile.label}
-                    reverse
-                    data-test-subj={tile.testSubj}
-                  />
-                ))}
-            </WidgetGroupBody>
+            {result.status === 'loading' ? (
+              <WidgetGroupBody status='loading'>{null}</WidgetGroupBody>
+            ) : (
+              tileNode
+            )}
           </EuiFlexItem>
         );
       })}
