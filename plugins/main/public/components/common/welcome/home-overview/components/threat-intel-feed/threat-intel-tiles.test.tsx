@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import '../../test-utils/setup-home-overview-test';
 import { ThreatIntelTiles } from './threat-intel-tiles';
 import {
   getDecodersUrl,
@@ -15,7 +16,6 @@ jest.mock('../../utils/navigation', () => ({
   getIntegrationsUrl: jest.fn(),
   getDetectorsUrl: jest.fn(),
 }));
-
 const available = (value: number) => ({
   status: 'available' as const,
   data: value,

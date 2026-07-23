@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import '../../test-utils/setup-home-overview-test';
 import { SecurityOperationsSection } from './security-operations-section';
 import {
   useActiveResponseOverview,
@@ -28,7 +29,6 @@ jest.mock('../../utils/navigation', () => ({
 jest.mock('../../../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),
 }));
-
 const asMock = (fn: unknown) => fn as jest.Mock;
 
 beforeEach(() => {

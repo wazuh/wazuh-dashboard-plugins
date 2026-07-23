@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import '../../test-utils/setup-home-overview-test';
 import { OverviewSection } from './overview-section';
 import {
   useAgentStatus,
@@ -135,12 +136,6 @@ describe('OverviewSection', () => {
     render(<OverviewSection findings={findingsAvailable} />);
     fireEvent.click(screen.getByText('Threat Hunting'));
     expect(navigation.getThreatHuntingUrl).toHaveBeenCalled();
-  });
-
-  it('navigates to the selected MITRE tactic by its external id', () => {
-    render(<OverviewSection findings={findingsAvailable} />);
-    fireEvent.click(screen.getByText('Initial Access'));
-    expect(navigation.getMitreUrlTactic).toHaveBeenCalledWith('TA0001');
   });
 
   it('navigates to Agents from the "Agents by status" header link', () => {

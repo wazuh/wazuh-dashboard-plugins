@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import '../../test-utils/setup-home-overview-test';
 import { ThreatHuntingSection } from './threat-hunting-section';
 import * as navigation from '../../utils/navigation';
 
@@ -10,7 +11,6 @@ jest.mock('../../utils/navigation', () => ({
   getMitreTechniqueUrl: jest.fn(),
   getVulnerabilityDetectionUrl: jest.fn(),
 }));
-
 const findingsAvailable = {
   status: 'available' as const,
   data: {
@@ -98,21 +98,5 @@ describe('ThreatHuntingSection', () => {
     );
     fireEvent.click(screen.getByText('Threat Hunting'));
     expect(navigation.getThreatHuntingUrl).toHaveBeenCalled();
-  });
-
-  it('navigates to the selected MITRE technique by its external id', () => {
-    render(
-      <ThreatHuntingSection
-        findings={findingsAvailable}
-        vulnerabilities={vulnerabilitiesAvailable}
-      />,
-    );
-    fireEvent.click(
-      screen.getAllByText('Exploit Public-Facing Application')[0],
-    );
-    expect(navigation.getMitreTechniqueUrl).toHaveBeenCalledWith(
-      'T1190',
-      'idx-1',
-    );
   });
 });

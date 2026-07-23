@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import '../../test-utils/setup-home-overview-test';
 import { ThreatIntelligenceFeedSection } from './threat-intelligence-feed-section';
 import {
   useDecodersCount,
@@ -25,7 +26,6 @@ jest.mock('../../utils/navigation', () => ({
 jest.mock('../../../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),
 }));
-
 const asMock = (fn: unknown) => fn as jest.Mock;
 const available = (value: number) => ({
   status: 'available' as const,

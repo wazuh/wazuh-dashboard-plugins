@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import '../../test-utils/setup-home-overview-test';
 import { EndpointSecuritySection } from './endpoint-security-section';
 import { useFIMOverview, useSCAOverview } from '../../hooks/use-overview-data';
 import { useInViewport } from '../../../../hooks';
@@ -22,7 +23,6 @@ jest.mock('../../../utils/helpers', () => ({
     convert: (value: number) => `${Math.round(value * 100)}%`,
   }),
 }));
-
 const asMock = (fn: unknown) => fn as jest.Mock;
 
 beforeEach(() => {

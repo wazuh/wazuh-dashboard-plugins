@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import '../../test-utils/setup-home-overview-test';
 import { WidgetGroup, WidgetGroupBody } from './widget-group';
 
 const child = <div>widget body</div>;
