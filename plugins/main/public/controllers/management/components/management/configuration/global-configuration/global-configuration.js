@@ -26,6 +26,7 @@ import withWzConfig from '../util-hocs/wz-config';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { configurationAssessment } from '../../../../../../utils/applications';
+import { withUserAuthorizationPrompt } from '../../../../../../components/common/hocs';
 
 class WzConfigurationGlobalConfiguration extends Component {
   constructor(props) {
@@ -66,6 +67,9 @@ const mapStateToProps = state => ({
 });
 
 export const WzConfigurationGlobalConfigurationManager = compose(
+  withUserAuthorizationPrompt([
+    { action: 'cluster:read', resource: 'node:id:*' },
+  ]),
   connect(mapStateToProps),
   withWzConfig(sectionsManager),
 )(WzConfigurationGlobalConfiguration);

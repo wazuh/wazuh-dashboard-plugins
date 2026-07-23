@@ -23,6 +23,7 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { withUserAuthorizationPrompt } from '../../../../../../components/common/hocs';
 
 const mainSettings = [
   { field: 'name', label: 'Cluster name' },
@@ -150,6 +151,9 @@ WzCluster.propTypes = {
 };
 
 export default compose(
+  withUserAuthorizationPrompt([
+    { action: 'cluster:read', resource: 'node:id:*' },
+  ]),
   withWzConfig(sections),
   connect(mapStateToProps),
 )(WzCluster);
