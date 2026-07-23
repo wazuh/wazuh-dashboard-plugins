@@ -104,7 +104,6 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
         {findings.data && (
           <BarList
             items={findings.data.topTactics}
-            getHref={item => goToMitreTactic(item.id)}
             emptyMessage='No MITRE ATT&CK tactics observed in the last 24 hours'
             data-test-subj='mitre-top-tactics'
           />

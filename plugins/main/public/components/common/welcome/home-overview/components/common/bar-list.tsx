@@ -55,7 +55,17 @@ export const BarList: React.FC<BarListProps> = ({
                 </EuiLink>
               </RedirectAppLinks>
             ) : (
-              item.key
+              <span
+                style={{
+                  cursor: 'default',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+                title={item.key}
+              >
+                {item.key}
+              </span>
             )}
           </EuiText>
           <EuiProgress value={item.count} max={max} size='m' />

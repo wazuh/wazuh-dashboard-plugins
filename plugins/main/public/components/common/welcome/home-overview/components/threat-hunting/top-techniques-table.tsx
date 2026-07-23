@@ -16,9 +16,6 @@ export const TopTechniquesTable: React.FC<TopTechniquesTableProps> = ({
     items={items}
     keyColumnName='Top 5 techniques'
     countColumnName='Alerts'
-    renderKey={item => (
-      <EuiLink title={item.key} href={onSelect(item)}>{item.key}</EuiLink>
-    )}
     noItemsMessage='No techniques observed in the last 24 hours'
     data-test-subj='top-techniques-table'
   />
