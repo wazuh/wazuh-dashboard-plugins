@@ -23,6 +23,15 @@ if [ -n "$INDEXER_SSL_CERTIFICATE_KEY" ]; then
   chmod 400 $INDEXER_SSL_CERTIFICATE_KEY
 fi
 
+# Configure the agent enrollment password expected by authd (use_password is
+# enabled by default in the manager package; without this file authd generates
+# a random password and agent enrollment fails with "Invalid password")
+if [ -n "$WAZUH_REGISTRATION_PASSWORD" ]; then
+  echo "$WAZUH_REGISTRATION_PASSWORD" > /var/wazuh-manager/etc/authd.pass
+  chmod 640 /var/wazuh-manager/etc/authd.pass
+  chown root:wazuh-manager /var/wazuh-manager/etc/authd.pass
+fi
+
 # Clean up stale PID and socket files from previous unclean shutdowns
 # (e.g. after docker stop + docker start without recreating the container)
 find /var/wazuh-manager/var/run -name "*.pid" -delete 2>/dev/null || true
