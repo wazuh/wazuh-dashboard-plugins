@@ -81,7 +81,6 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
                   goToDiscoverFindingsBySeverity(
                     band,
                     findings.indexPatternId,
-                    findings.fixedFilters,
                   )
                 }
                 getTooltip={band =>
