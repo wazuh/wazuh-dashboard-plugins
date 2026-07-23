@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiProgress,
-  EuiLink,
-  EuiText,
-} from '@elastic/eui';
+import { EuiProgress, EuiLink, EuiText } from '@elastic/eui';
 import { TopItem } from '../../interfaces/types';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 import { getCore } from '../../../../../../kibana-services';
@@ -34,40 +28,41 @@ export const BarList: React.FC<BarListProps> = ({
   const isInteractive = Boolean(getHref || onSelect);
 
   return (
-    <div data-test-subj={rest['data-test-subj']}>
+    <div
+      data-test-subj={rest['data-test-subj']}
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, max-content) 1fr max-content',
+        columnGap: 8,
+        rowGap: 4,
+        alignItems: 'center',
+      }}
+    >
       {items.map(item => (
-        <EuiFlexGroup
-          key={item.key}
-          gutterSize='s'
-          alignItems='center'
-          responsive={false}
-          style={{ marginBottom: 4 }}
-        >
-          <EuiFlexItem grow={3} style={{ overflow: 'hidden' }}>
-            <EuiText size='xs' className='eui-textTruncate'>
-              {isInteractive ? (
-                <RedirectAppLinks application={getCore().application}>
-                  <EuiLink
-                    href={getHref?.(item)}
-                    onClick={onSelect ? () => onSelect(item) : undefined}
-                  >
-                    {item.key}
-                  </EuiLink>
-                </RedirectAppLinks>
-              ) : (
-                item.key
-              )}
-            </EuiText>
-          </EuiFlexItem>
-          <EuiFlexItem grow={5}>
-            <EuiProgress value={item.count} max={max} size='m' />
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiText size='xs' className='tab-num'>
-              <strong>{formatUINumber(item.count)}</strong>
-            </EuiText>
-          </EuiFlexItem>
-        </EuiFlexGroup>
+        <React.Fragment key={item.key}>
+          <EuiText
+            size='xs'
+            className='eui-textTruncate'
+            style={{ overflow: 'hidden' }}
+          >
+            {isInteractive ? (
+              <RedirectAppLinks application={getCore().application}>
+                <EuiLink
+                  href={getHref?.(item)}
+                  onClick={onSelect ? () => onSelect(item) : undefined}
+                >
+                  {item.key}
+                </EuiLink>
+              </RedirectAppLinks>
+            ) : (
+              item.key
+            )}
+          </EuiText>
+          <EuiProgress value={item.count} max={max} size='m' />
+          <EuiText size='xs' className='tab-num'>
+            <strong>{formatUINumber(item.count)}</strong>
+          </EuiText>
+        </React.Fragment>
       ))}
     </div>
   );

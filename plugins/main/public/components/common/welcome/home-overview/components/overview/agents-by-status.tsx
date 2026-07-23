@@ -65,7 +65,7 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
               <EuiLink
                 className='tab-num'
                 style={{ color: UI_COLOR_STATUS.success, fontWeight: 'inherit' }}
-                href={onStatusSelect?.(API_NAME_AGENT_STATUS.ACTIVE)}
+                onClick={() => onStatusSelect?.(API_NAME_AGENT_STATUS.ACTIVE)}
                 data-test-subj='agents-active-count'
               >
                 {formatUINumber(data.active)}
@@ -88,9 +88,7 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
             <EuiText size='xs' color='subdued'>
               <EuiLink
                 color='subdued'
-                href={
-                  onStatusSelect?.(API_NAME_AGENT_STATUS.DISCONNECTED)
-                }
+                onClick={() => onStatusSelect?.(API_NAME_AGENT_STATUS.DISCONNECTED)}
                 data-test-subj='agents-disconnected-count'
               >
                 <strong>{formatUINumber(data.disconnected)}</strong> disconnected
@@ -101,7 +99,7 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
             <EuiText size='xs' color='subdued'>
               <EuiLink
                 color='subdued'
-                href={onStatusSelect?.(API_NAME_AGENT_STATUS.PENDING)}
+                onClick={() => onStatusSelect?.(API_NAME_AGENT_STATUS.PENDING)}
                 data-test-subj='agents-pending-count'
               >
                 <strong>{formatUINumber(data.pending)}</strong> pending
@@ -112,7 +110,7 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
             <EuiText size='xs' color='subdued'>
               <EuiLink
                 color='subdued'
-                href={onStatusSelect?.(API_NAME_AGENT_STATUS.NEVER_CONNECTED)}
+                onClick={() => onStatusSelect?.(API_NAME_AGENT_STATUS.NEVER_CONNECTED)}
                 data-test-subj='agents-never-connected-count'
               >
                 <strong>{formatUINumber(data.neverConnected)}</strong> never

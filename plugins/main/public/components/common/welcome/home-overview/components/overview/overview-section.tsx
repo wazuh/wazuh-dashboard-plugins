@@ -58,7 +58,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               <AgentsByStatus
                 data={agents.data}
                 deployAgentUrl={getDeployAgentUrl()}
-                onStatusSelect={goToAgentsByStatus()}
+                onStatusSelect={goToAgentsByStatus}
               />
             )}
           </WidgetGroup>
@@ -95,7 +95,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
 
       <WidgetGroup
         status={findings.status}
-        title='MITRE ATT&CK — last 24 hours (top tactics)'
+        title='MITRE ATT&CK top tactics'
         caption='Last 24 hours'
         headerLink={{ label: 'MITRE ATT&CK', href: goToMitre() }}
         loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}

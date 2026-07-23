@@ -92,12 +92,14 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                   data-test-subj='techniques-hero'
                 />
                 <EuiSpacer size='s' />
-                <TopTechniquesTable
-                  items={findings.data.topTechniques}
-                  onSelect={item =>
-                    goToMitreTechnique(item.key, findings.indexPatternId)
-                  }
-                />
+                <RedirectAppLinks application={getCore().application}>
+                  <TopTechniquesTable
+                    items={findings.data.topTechniques}
+                    onSelect={item =>
+                      goToMitreTechnique(item.id, findings.indexPatternId)
+                    }
+                  />
+                </RedirectAppLinks>
               </>
             )}
           </WidgetGroup>

@@ -25,12 +25,12 @@ import { SeverityBand } from '../interfaces/types';
 
 /** Navigation helpers, kept in one module so sections depend on one boundary. */
 
-const navigate = (appId: string, options?: Record<string, unknown>) =>
-  NavigationService.getInstance().getUrlForApp(appId, options);
-// const getUrlForApp = (appId: string, options?: Record<string, unknown>) =>
-//   NavigationService.getInstance().getUrlForApp(appId, options);
+const getUrlForApp = (appId: string, options?: Record<string, unknown>) => NavigationService.getInstance().getUrlForApp(appId, options);
 
-export const goToAgents = () => navigate(endpointSummary.id);
+const navigate = (appId: string, options?: Record<string, unknown>) =>
+  NavigationService.getInstance().navigateToApp(appId, options);
+
+export const goToAgents = () => getUrlForApp(endpointSummary.id);
 
 export const goToAgentsByStatus = (status: string): void => {
   sessionStorage.setItem(
@@ -46,7 +46,7 @@ export const getDeployAgentUrl = (): string =>
     path: `#${endpointSummary.redirectTo()}deploy`,
   });
 
-export const goToThreatHunting = () => navigate(threatHunting.id);
+export const goToThreatHunting = () => getUrlForApp(threatHunting.id);
 
 const DISCOVER_APP_ID = 'data-explorer';
 
@@ -59,7 +59,7 @@ export const goToDiscoverFindingsBySeverity = (
   fixedFilters: tFilter[] = [],
 ): string => {
   if (!indexPatternId) {
-    return navigate(threatHunting.id);
+    return getUrlForApp(threatHunting.id);
   }
   const queryState = rison.encode({
     filters: [
@@ -73,31 +73,31 @@ export const goToDiscoverFindingsBySeverity = (
     ],
     query: { language: 'kuery', query: '' },
   });
-  return navigate(DISCOVER_APP_ID, {
+  return getUrlForApp(DISCOVER_APP_ID, {
     path: `discover#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternId}',view:discover))&_g=()&_q=${queryState}`,
   });
 };
-export const goToMitre = () => navigate(mitreAttack.id);
-export const goToItHygiene = () => navigate(ITHygiene.id);
+export const goToMitre = () => getUrlForApp(mitreAttack.id);
+export const goToItHygiene = () => getUrlForApp(ITHygiene.id);
 export const goToConfigurationAssessment = () =>
-  navigate(configurationAssessment.id);
+  getUrlForApp(configurationAssessment.id);
 export const goToFileIntegrityMonitoring = () =>
-  navigate(fileIntegrityMonitoring.id);
-export const goToMalwareDetection = () => navigate(malwareDetection.id);
+  getUrlForApp(fileIntegrityMonitoring.id);
+export const goToMalwareDetection = () => getUrlForApp(malwareDetection.id);
 export const goToVulnerabilityDetection = () =>
-  navigate(vulnerabilityDetection.id);
-export const goToActiveResponse = () => navigate(activeResponses.id);
+  getUrlForApp(vulnerabilityDetection.id);
+export const goToActiveResponse = () => getUrlForApp(activeResponses.id);
 
 export const goToRegulatoryComplianceHome = () =>
-  navigate(regulatoryCompliance.id);
+  getUrlForApp(regulatoryCompliance.id);
 
-export const goToRegulatoryCompliance = (tabView: string): void =>
-  navigate(regulatoryCompliance.id, {
+export const goToRegulatoryCompliance = (tabView: string): string =>
+  getUrlForApp(regulatoryCompliance.id, {
     path: `#/overview?tab=regulatory-compliance&tabView=${tabView}&tabSubView=controls`,
   });
 
 /** Open a Cloud Security module by app id (list-driven, unlike the fixed links above). */
-export const goToCloudModule = (appId: string): void => navigate(appId);
+export const goToCloudModule = (appId: string): string => getUrlForApp(appId);
 
 /**
  * App ids registered by the Security Analytics dashboards plugin. Absent when
@@ -110,12 +110,12 @@ const SECURITY_ANALYTICS_APP_IDS = {
   detectors: 'detectors',
 };
 
-export const goToRules = () => navigate(SECURITY_ANALYTICS_APP_IDS.rules);
-export const goToDecoders = () => navigate(SECURITY_ANALYTICS_APP_IDS.decoders);
+export const goToRules = () => getUrlForApp(SECURITY_ANALYTICS_APP_IDS.rules);
+export const goToDecoders = () => getUrlForApp(SECURITY_ANALYTICS_APP_IDS.decoders);
 export const goToIntegrations = () =>
-  navigate(SECURITY_ANALYTICS_APP_IDS.integrations);
+  getUrlForApp(SECURITY_ANALYTICS_APP_IDS.integrations);
 export const goToDetectors = () =>
-  navigate(SECURITY_ANALYTICS_APP_IDS.detectors);
+  getUrlForApp(SECURITY_ANALYTICS_APP_IDS.detectors);
 
 /**
  * Open the MITRE ATT&CK Intelligence tab on a specific resource. Intelligence
@@ -126,17 +126,17 @@ export const goToDetectors = () =>
 const goToMitreIntelligence = (
   tabRedirect: 'tactics' | 'techniques',
   externalId?: string,
-): void => {
+): string => {
   if (!externalId) {
-    navigate(mitreAttack.id);
-    return;
+    return getUrlForApp(mitreAttack.id);
+
   }
   const params = `tab=mitre&tabView=intelligence&tabRedirect=${tabRedirect}&idToRedirect=${externalId}`;
-  navigate(mitreAttack.id, { path: `#/overview?${params}` });
+  return getUrlForApp(mitreAttack.id, { path: `#/overview?${params}` });
 };
 
 /** Top-tactic labels deep-link into the Intelligence resource for that tactic. */
-export const goToMitreTactic = (externalId?: string): void =>
+export const goToMitreTactic = (externalId?: string): string =>
   goToMitreIntelligence('tactics', externalId);
 
 /**
@@ -148,21 +148,9 @@ export const goToMitreTactic = (externalId?: string): void =>
 export const goToMitreTechnique = (
   techniqueName?: string,
   indexPatternId?: string,
-): void => {
+): string => {
   if (!techniqueName || !indexPatternId) {
-    navigate(mitreAttack.id);
-    return;
+    return getUrlForApp(mitreAttack.id);
   }
-  const filters = [
-    PatternDataSourceFilterManager.createFilter(
-      FILTER_OPERATOR.IS,
-      MITRE_TECHNIQUE_NAME_FIELD,
-      techniqueName,
-      indexPatternId,
-    ),
-  ];
-  const params = `tab=mitre&tabView=inventory&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
-    filters,
-  )}`;
-  navigate(mitreAttack.id, { path: `#/overview?${params}` });
+  return goToMitreIntelligence('techniques', techniqueName);
 };

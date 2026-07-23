@@ -99,9 +99,10 @@ export function buildFindingsOverviewAggs(
     ),
     ...buildTopTermsAgg(AGG.topRules, RULE_TITLE_FIELD, topRulesSize),
     [AGG.techniquesCount]: { cardinality: { field: MITRE_TECHNIQUE_ID_FIELD } },
-    ...buildTopTermsAgg(
+    ...buildTopTermsWithExternalIdAgg(
       AGG.topTechniques,
       MITRE_TECHNIQUE_NAME_FIELD,
+      MITRE_TECHNIQUE_ID_FIELD,
       topTechniquesSize,
     ),
   };
