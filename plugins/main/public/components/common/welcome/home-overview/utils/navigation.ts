@@ -73,8 +73,8 @@ export const goToDiscoverFindingsBySeverity = (
     ],
     query: { language: 'kuery', query: '' },
   });
-  return getUrlForApp(DISCOVER_APP_ID, {
-    path: `discover#?_a=(discover:(columns:!(_source),isDirty:!f,sort:!()),metadata:(indexPattern:'${indexPatternId}',view:discover))&_g=()&_q=${queryState}`,
+  return getUrlForApp(threatHunting.id, {
+    path: `#overview/?tab=general&tabView=findings&_a=${queryState}&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-24h,to:now))`,
   });
 };
 export const goToMitre = () => getUrlForApp(mitreAttack.id);
