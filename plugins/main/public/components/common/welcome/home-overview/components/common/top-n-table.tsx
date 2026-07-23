@@ -27,7 +27,7 @@ export const TopNTable: React.FC<TopNTableProps> = ({
       truncateText: true,
       render: renderKey
         ? (_value: string, item: TopItem) => renderKey(item)
-        : undefined,
+        : (value: string) => <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={value}>{value}</span>,
     },
     {
       field: 'count',

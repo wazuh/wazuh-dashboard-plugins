@@ -13,7 +13,12 @@ export const ScaBenchmarksTable: React.FC<ScaBenchmarksTableProps> = ({
 }) => {
   const scoreFormatter = decimalFormat();
   const columns: Array<EuiBasicTableColumn<ScaBenchmark>> = [
-    { field: 'name', name: 'Top 5 benchmarks', truncateText: true },
+    {
+      field: 'name',
+      name: 'Top 5 benchmarks',
+      truncateText: true,
+      render: (value: string) => <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={value}>{value}</span>,
+    },
     {
       field: 'passed',
       name: 'Passed',

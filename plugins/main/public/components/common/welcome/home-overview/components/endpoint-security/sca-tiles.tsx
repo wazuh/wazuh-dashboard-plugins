@@ -36,7 +36,7 @@ export const ScaTiles: React.FC<ScaTilesProps> = ({ tiles }) => (
       <StatTile
         value={<TabNumber value={tiles.notApplicable} />}
         label='N/A'
-        color={UI_COLOR_STATUS.notApplicable}
+        color={UI_COLOR_STATUS.info}
         reverse
         data-test-subj='sca-tile-not-applicable'
       />

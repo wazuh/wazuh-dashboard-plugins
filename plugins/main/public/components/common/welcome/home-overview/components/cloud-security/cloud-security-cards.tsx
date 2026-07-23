@@ -6,10 +6,10 @@ import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 export const CloudSecurityCards: React.FC = () => (
-  <EuiFlexGrid columns={3} data-test-subj='cloud-security-cards'>
-    {CloudSecurityApplications.map(module => (
-      <EuiFlexItem key={module.id}>
-        <RedirectAppLinks application={getCore().application}>
+  <RedirectAppLinks application={getCore().application}>
+    <EuiFlexGrid columns={3} data-test-subj='cloud-security-cards'>
+      {CloudSecurityApplications.map(module => (
+        <EuiFlexItem key={module.id}>
           <EuiCard
             layout='horizontal'
             icon={<EuiIcon size='xl' type={module.euiIconType} />}
@@ -19,8 +19,8 @@ export const CloudSecurityCards: React.FC = () => (
             href={goToCloudModule(module.id)}
             data-test-subj={`cloud-security-card-${module.id}`}
           />
-        </RedirectAppLinks>
-      </EuiFlexItem>
-    ))}
-  </EuiFlexGrid>
+        </EuiFlexItem>
+      ))}
+    </EuiFlexGrid>
+  </RedirectAppLinks>
 );
