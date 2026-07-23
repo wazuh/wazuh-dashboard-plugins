@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import { compose } from 'redux';
 
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
@@ -18,6 +19,7 @@ import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { withUserAuthorizationPrompt } from '../../../../../../components/common/hocs';
 
 const helpLinks = [
   {
@@ -135,6 +137,9 @@ class WzRegistrationService extends Component {
   }
 }
 
-export default withWzConfig([{ component: 'auth', configuration: 'auth' }])(
-  WzRegistrationService,
-);
+export default compose(
+  withUserAuthorizationPrompt([
+    { action: 'cluster:read', resource: 'node:id:*' },
+  ]),
+  withWzConfig([{ component: 'auth', configuration: 'auth' }]),
+)(WzRegistrationService);
