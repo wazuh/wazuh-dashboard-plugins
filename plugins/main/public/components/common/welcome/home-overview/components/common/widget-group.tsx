@@ -11,6 +11,7 @@ import {
 } from '@elastic/eui';
 import { DataGroupStatus } from '../../interfaces/data-group';
 import { VALUE_PLACEHOLDER } from '../../lib/constants';
+import { ErrorValuePlaceholder } from './tab-number';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
@@ -32,7 +33,8 @@ export interface WidgetGroupBodyProps {
   errorLabel?: string;
   /**
    * How a non-data state (`unavailable` / `error`) fills the body:
-   * - `'dash'`  → a value-styled "-" (pure KPI panels).
+   * - `'dash'`  → a value-styled "-"; danger-colored with a tooltip on `error`
+   *   (pure KPI panels).
    * - `'inline'`→ a compact line: an error callout, or a neutral "Not available".
    */
   errorDisplay?: 'inline' | 'dash';
@@ -84,9 +86,13 @@ export const WidgetGroupBody: React.FC<WidgetGroupBodyProps> = ({
         data-test-subj={testSubj}
         style={{ ...containerStyle, textAlign: 'center' }}
       >
-        <EuiText color='subdued' className='tab-num'>
-          {VALUE_PLACEHOLDER}
-        </EuiText>
+        {isError ? (
+          <ErrorValuePlaceholder tooltip={errorLabel} />
+        ) : (
+          <EuiText color='subdued' className='tab-num'>
+            {VALUE_PLACEHOLDER}
+          </EuiText>
+        )}
       </div>
     );
   }

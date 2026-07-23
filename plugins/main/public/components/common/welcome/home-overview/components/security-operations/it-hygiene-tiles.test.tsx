@@ -39,7 +39,7 @@ describe('ItHygieneTiles', () => {
         services={available(320)}
       />,
     );
-    // Error surfaces via a toast (upstream).
+    // Error surfaces via a toast (upstream)
     expect(
       container.querySelectorAll('[data-test-subj="widget-group-error"]')
         .length,
@@ -49,5 +49,28 @@ describe('ItHygieneTiles', () => {
     );
     expect(packages).toBeInTheDocument();
     expect(packages?.textContent).toContain('-');
+  });
+
+  it('marks a failed tile with a persistent danger indicator, distinct from an unavailable one', () => {
+    const { container } = render(
+      <ItHygieneTiles
+        operatingSystems={available(12)}
+        packages={{ status: 'error' }}
+        users={{ status: 'unavailable' }}
+        services={available(320)}
+      />,
+    );
+    const packages = container.querySelector(
+      '[data-test-subj="it-hygiene-tile-packages"]',
+    );
+    const users = container.querySelector(
+      '[data-test-subj="it-hygiene-tile-users"]',
+    );
+    expect(
+      packages?.querySelector('[data-euiicon-type="alert"]'),
+    ).toBeInTheDocument();
+    expect(
+      users?.querySelector('[data-euiicon-type="alert"]'),
+    ).not.toBeInTheDocument();
   });
 });

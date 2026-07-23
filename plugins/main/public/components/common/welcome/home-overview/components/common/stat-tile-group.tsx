@@ -30,7 +30,16 @@ export function StatTileGroup<K extends string>({
       {tiles.map(tile => {
         const result = results[tile.key];
         const value = result.status === 'available' ? result.data : undefined;
-        const number = <TabNumber value={value} />;
+        const number = (
+          <TabNumber
+            value={value}
+            errorTooltip={
+              result.status === 'error'
+                ? `Could not load ${tile.label}`
+                : undefined
+            }
+          />
+        );
 
         let tileNode: React.ReactNode;
         if (tile.onSelect) {

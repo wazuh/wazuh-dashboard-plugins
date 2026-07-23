@@ -31,14 +31,31 @@ describe('WidgetGroup', () => {
     expect(screen.queryByText('widget body')).not.toBeInTheDocument();
   });
 
-  it('renders a "-" placeholder for errorDisplay="dash" on a non-data state', () => {
-    render(
+  it('renders a "-" placeholder on a non-data state', () => {
+    const { container } = render(
+      <WidgetGroup status='unavailable' title='My widget' errorDisplay='dash'>
+        {child}
+      </WidgetGroup>,
+    );
+    expect(screen.getByText('-')).toBeInTheDocument();
+    expect(screen.queryByText('widget body')).not.toBeInTheDocument();
+    // Benign/unavailable stays plain: no danger styling.
+    expect(
+      container.querySelector('[data-euiicon-type="alert"]'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders a danger-colored "-" with an alert icon for errorDisplay="dash" on error (distinct from unavailable)', () => {
+    const { container } = render(
       <WidgetGroup status='error' title='My widget' errorDisplay='dash'>
         {child}
       </WidgetGroup>,
     );
     expect(screen.getByText('-')).toBeInTheDocument();
     expect(screen.queryByText('widget body')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('[data-euiicon-type="alert"]'),
+    ).toBeInTheDocument();
   });
 
   it('shows a skeleton while loading and not the content', () => {
