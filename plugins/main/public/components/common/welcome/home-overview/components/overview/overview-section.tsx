@@ -19,13 +19,13 @@ import {
 } from '../../hooks/use-overview-data';
 import {
   getDeployAgentUrl,
-  goToAgents,
+  getAgentsUrl,
   goToAgentsByStatus,
-  goToThreatHunting,
-  goToMitre,
-  goToItHygiene,
-  goToMitreTactic,
-  goToDiscoverFindingsBySeverity,
+  getThreatHuntingUrl,
+  getMitreUrl,
+  getItHygieneUrl,
+  getMitreUrlTactic,
+  getDiscoverFindingsBySeverityUrl,
 } from '../../utils/navigation';
 import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
 
@@ -50,7 +50,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
           <WidgetGroup
             status={agents.status}
             title='Agents by status'
-            headerLink={{ label: 'Agents', href: goToAgents() }}
+            headerLink={{ label: 'Agents', href: getAgentsUrl() }}
             centerBody
             errorDisplay='dash'
             data-test-subj='home-overview-agents'
@@ -69,7 +69,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             status={findings.status}
             title='Findings'
             caption='Last 24 hours'
-            headerLink={{ label: 'Threat Hunting', href: goToThreatHunting() }}
+            headerLink={{ label: 'Threat Hunting', href: getThreatHuntingUrl() }}
             centerBody
             errorDisplay='dash'
             data-test-subj='home-overview-findings-severity'
@@ -78,7 +78,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               <FindingSeverityTiles
                 counts={findings.data.severity}
                 onSelect={band =>
-                  goToDiscoverFindingsBySeverity(
+                  getDiscoverFindingsBySeverityUrl(
                     band,
                     findings.indexPatternId,
                   )
@@ -98,7 +98,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
         status={findings.status}
         title='MITRE ATT&CK top tactics'
         caption='Last 24 hours'
-        headerLink={{ label: 'MITRE ATT&CK', href: goToMitre() }}
+        headerLink={{ label: 'MITRE ATT&CK', href: getMitreUrl() }}
         loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
         data-test-subj='home-overview-mitre-tactics'
       >
@@ -120,7 +120,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               status={topOs.status}
               title='Top 5 operating systems'
               caption='Current state'
-              headerLink={{ label: 'IT Hygiene', href: goToItHygiene() }}
+              headerLink={{ label: 'IT Hygiene', href: getItHygieneUrl() }}
               loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
               data-test-subj='home-overview-top-os'
             >
@@ -132,7 +132,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               status={topServices.status}
               title='Top 5 network services'
               caption='Current state'
-              headerLink={{ label: 'IT Hygiene', href: goToItHygiene() }}
+              headerLink={{ label: 'IT Hygiene', href: getItHygieneUrl() }}
               loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
               data-test-subj='home-overview-top-network-services'
             >

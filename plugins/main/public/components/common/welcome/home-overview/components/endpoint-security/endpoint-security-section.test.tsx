@@ -10,9 +10,9 @@ jest.mock('../../hooks/use-overview-data', () => ({
   useFIMOverview: jest.fn(),
 }));
 jest.mock('../../utils/navigation', () => ({
-  goToConfigurationAssessment: jest.fn(),
-  goToFileIntegrityMonitoring: jest.fn(),
-  goToMalwareDetection: jest.fn(),
+  getConfigurationAssessmentUrl: jest.fn(),
+  getFileIntegrityMonitoringUrl: jest.fn(),
+  getMalwareDetectionUrl: jest.fn(),
 }));
 jest.mock('../../../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),

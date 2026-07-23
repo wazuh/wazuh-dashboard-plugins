@@ -19,10 +19,10 @@ import {
   useVulnerabilityOverview,
 } from '../../hooks/use-overview-data';
 import {
-  goToMitre,
-  goToMitreTechnique,
-  goToThreatHunting,
-  goToVulnerabilityDetection,
+  getMitreUrl,
+  getMitreTechniqueUrl,
+  getThreatHuntingUrl,
+  getVulnerabilityDetectionUrl,
 } from '../../utils/navigation';
 
 export interface ThreatHuntingSectionProps {
@@ -48,7 +48,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
             status={findings.status}
             title={
               <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={goToThreatHunting()}>Threat Hunting</EuiLink>
+                <EuiLink href={getThreatHuntingUrl()}>Threat Hunting</EuiLink>
               </RedirectAppLinks>
             }
             caption='Last 24 hours'
@@ -75,7 +75,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
             status={findings.status}
             title={
               <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={goToMitre()}>MITRE ATT&amp;CK</EuiLink>
+                <EuiLink href={getMitreUrl()}>MITRE ATT&amp;CK</EuiLink>
               </RedirectAppLinks>
             }
             caption='Last 24 hours'
@@ -96,7 +96,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                   <TopTechniquesTable
                     items={findings.data.topTechniques}
                     onSelect={item =>
-                      goToMitreTechnique(item.id, findings.indexPatternId)
+                      getMitreTechniqueUrl(item.id, findings.indexPatternId)
                     }
                   />
                 </RedirectAppLinks>
@@ -109,7 +109,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
             status={vulnerabilities.status}
             title={
               <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={goToVulnerabilityDetection()}>
+                <EuiLink href={getVulnerabilityDetectionUrl()}>
                   Vulnerability Detection
                 </EuiLink>
               </RedirectAppLinks>

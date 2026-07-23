@@ -20,10 +20,10 @@ jest.mock('../../hooks/use-overview-data', () => ({
   useActiveResponseOverview: jest.fn(),
 }));
 jest.mock('../../utils/navigation', () => ({
-  goToItHygiene: jest.fn(),
-  goToActiveResponse: jest.fn(),
-  goToRegulatoryCompliance: jest.fn(),
-  goToRegulatoryComplianceHome: jest.fn(),
+  getItHygieneUrl: jest.fn(),
+  getActiveResponseUrl: jest.fn(),
+  getRegulatoryComplianceUrl: jest.fn(),
+  getRegulatoryComplianceUrlHome: jest.fn(),
 }));
 jest.mock('../../../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),
@@ -118,7 +118,7 @@ describe('SecurityOperationsSection', () => {
   it('navigates to IT Hygiene from the panel title', () => {
     render(<SecurityOperationsSection />);
     fireEvent.click(screen.getByText('IT Hygiene'));
-    expect(navigation.goToItHygiene).toHaveBeenCalled();
+    expect(navigation.getItHygieneUrl).toHaveBeenCalled();
   });
 
   it('fetches lazily once the section enters the viewport', () => {

@@ -2,10 +2,10 @@ import React from 'react';
 import { StatTileGroup, StatTileSpec } from '../common';
 import { DataGroupResult } from '../../interfaces/data-group';
 import {
-  goToDecoders,
-  goToDetectors,
-  goToIntegrations,
-  goToRules,
+  getDecodersUrl,
+  getDetectorsUrl,
+  getIntegrationsUrl,
+  getRulesUrl,
 } from '../../utils/navigation';
 
 export interface ThreatIntelTilesProps {
@@ -22,13 +22,13 @@ const TILES: ReadonlyArray<StatTileSpec<keyof ThreatIntelTilesProps>> = [
     key: 'rules',
     label: 'Rules',
     testSubj: 'threat-intel-tile-rules',
-    onSelect: goToRules,
+    onSelect: getRulesUrl,
   },
   {
     key: 'decoders',
     label: 'Decoders',
     testSubj: 'threat-intel-tile-decoders',
-    onSelect: goToDecoders,
+    onSelect: getDecodersUrl,
   },
   // IOCs and CVEs matched are reference-only, so they carry no `onSelect`.
   { key: 'iocs', label: 'IOCs', testSubj: 'threat-intel-tile-iocs' },
@@ -41,13 +41,13 @@ const TILES: ReadonlyArray<StatTileSpec<keyof ThreatIntelTilesProps>> = [
     key: 'integrations',
     label: 'Integrations',
     testSubj: 'threat-intel-tile-integrations',
-    onSelect: goToIntegrations,
+    onSelect: getIntegrationsUrl,
   },
   {
     key: 'detectors',
     label: 'Detectors',
     testSubj: 'threat-intel-tile-detectors',
-    onSelect: goToDetectors,
+    onSelect: getDetectorsUrl,
   },
 ];
 

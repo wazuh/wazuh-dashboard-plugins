@@ -3,17 +3,17 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThreatIntelTiles } from './threat-intel-tiles';
 import {
-  goToDecoders,
-  goToDetectors,
-  goToIntegrations,
-  goToRules,
+  getDecodersUrl,
+  getDetectorsUrl,
+  getIntegrationsUrl,
+  getRulesUrl,
 } from '../../utils/navigation';
 
 jest.mock('../../utils/navigation', () => ({
-  goToRules: jest.fn(),
-  goToDecoders: jest.fn(),
-  goToIntegrations: jest.fn(),
-  goToDetectors: jest.fn(),
+  getRulesUrl: jest.fn(),
+  getDecodersUrl: jest.fn(),
+  getIntegrationsUrl: jest.fn(),
+  getDetectorsUrl: jest.fn(),
 }));
 
 const available = (value: number) => ({
@@ -34,13 +34,13 @@ describe('ThreatIntelTiles', () => {
   it('navigates to Rules/Decoders/Integrations/Detectors on click', () => {
     render(<ThreatIntelTiles {...allAvailable} />);
     fireEvent.click(screen.getByText('Rules'));
-    expect(goToRules).toHaveBeenCalled();
+    expect(getRulesUrl).toHaveBeenCalled();
     fireEvent.click(screen.getByText('Decoders'));
-    expect(goToDecoders).toHaveBeenCalled();
+    expect(getDecodersUrl).toHaveBeenCalled();
     fireEvent.click(screen.getByText('Integrations'));
-    expect(goToIntegrations).toHaveBeenCalled();
+    expect(getIntegrationsUrl).toHaveBeenCalled();
     fireEvent.click(screen.getByText('Detectors'));
-    expect(goToDetectors).toHaveBeenCalled();
+    expect(getDetectorsUrl).toHaveBeenCalled();
   });
 
   it('the IOCs and CVEs matched tiles have no click handler (reference only)', () => {

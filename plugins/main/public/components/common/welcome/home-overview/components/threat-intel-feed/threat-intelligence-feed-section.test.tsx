@@ -17,10 +17,10 @@ jest.mock('../../hooks/use-overview-data', () => ({
   useDetectorsCount: jest.fn(),
 }));
 jest.mock('../../utils/navigation', () => ({
-  goToRules: jest.fn(),
-  goToDecoders: jest.fn(),
-  goToIntegrations: jest.fn(),
-  goToDetectors: jest.fn(),
+  getRulesUrl: jest.fn(),
+  getDecodersUrl: jest.fn(),
+  getIntegrationsUrl: jest.fn(),
+  getDetectorsUrl: jest.fn(),
 }));
 jest.mock('../../../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),

@@ -19,13 +19,13 @@ jest.mock('../../hooks/use-overview-data', () => ({
 }));
 jest.mock('../../utils/navigation', () => ({
   getDeployAgentUrl: jest.fn(() => 'https://example.test/deploy'),
-  goToAgents: jest.fn(() => '#agents'),
+  getAgentsUrl: jest.fn(() => '#agents'),
   goToAgentsByStatus: jest.fn(),
-  goToThreatHunting: jest.fn(() => '#threat-hunting'),
-  goToMitre: jest.fn(),
-  goToItHygiene: jest.fn(() => '#it-hygiene'),
-  goToMitreTactic: jest.fn(),
-  goToDiscoverFindingsBySeverity: jest.fn(() => '#discover'),
+  getThreatHuntingUrl: jest.fn(() => '#threat-hunting'),
+  getMitreUrl: jest.fn(),
+  getItHygieneUrl: jest.fn(() => '#it-hygiene'),
+  getMitreUrlTactic: jest.fn(),
+  getDiscoverFindingsBySeverityUrl: jest.fn(() => '#discover'),
 }));
 jest.mock('../../../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),
@@ -134,19 +134,19 @@ describe('OverviewSection', () => {
   it('navigates to Threat Hunting from the findings header link', () => {
     render(<OverviewSection findings={findingsAvailable} />);
     fireEvent.click(screen.getByText('Threat Hunting'));
-    expect(navigation.goToThreatHunting).toHaveBeenCalled();
+    expect(navigation.getThreatHuntingUrl).toHaveBeenCalled();
   });
 
   it('navigates to the selected MITRE tactic by its external id', () => {
     render(<OverviewSection findings={findingsAvailable} />);
     fireEvent.click(screen.getByText('Initial Access'));
-    expect(navigation.goToMitreTactic).toHaveBeenCalledWith('TA0001');
+    expect(navigation.getMitreUrlTactic).toHaveBeenCalledWith('TA0001');
   });
 
   it('navigates to Agents from the "Agents by status" header link', () => {
     render(<OverviewSection findings={findingsAvailable} />);
     fireEvent.click(screen.getByText('Agents'));
-    expect(navigation.goToAgents).toHaveBeenCalled();
+    expect(navigation.getAgentsUrl).toHaveBeenCalled();
   });
 
   it('shows a "deploy new agent" prompt instead of counts when the fleet is empty', () => {

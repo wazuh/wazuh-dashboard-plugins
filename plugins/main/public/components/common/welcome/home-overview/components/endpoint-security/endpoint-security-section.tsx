@@ -19,8 +19,8 @@ import {
   useSCAOverview,
 } from '../../hooks/use-overview-data';
 import {
-  goToConfigurationAssessment,
-  goToFileIntegrityMonitoring,
+  getConfigurationAssessmentUrl,
+  getFileIntegrityMonitoringUrl,
 } from '../../utils/navigation';
 import { DataGroupResult } from '../../interfaces/data-group';
 import { ThreatIntelEnrichments, TopItem } from '../../interfaces/types';
@@ -63,7 +63,7 @@ const EndpointSecuritySectionComponent: React.FC<
             status={sca.status}
             title={
               <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={goToConfigurationAssessment()}>
+                <EuiLink href={getConfigurationAssessmentUrl()}>
                   Configuration Assessment
                 </EuiLink>
               </RedirectAppLinks>
@@ -86,7 +86,7 @@ const EndpointSecuritySectionComponent: React.FC<
             status={fim.status}
             title={
               <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={goToFileIntegrityMonitoring()}>
+                <EuiLink href={getFileIntegrityMonitoringUrl()}>
                   File Integrity Monitoring
                 </EuiLink>
               </RedirectAppLinks>

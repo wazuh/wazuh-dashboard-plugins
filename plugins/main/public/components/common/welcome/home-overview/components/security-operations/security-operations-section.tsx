@@ -15,9 +15,9 @@ import {
   useItHygieneUsersCount,
 } from '../../hooks/use-overview-data';
 import {
-  goToActiveResponse,
-  goToItHygiene,
-  goToRegulatoryComplianceHome,
+  getActiveResponseUrl,
+  getItHygieneUrl,
+  getRegulatoryComplianceUrlHome,
 } from '../../utils/navigation';
 
 /** IT Hygiene and Active Response load lazily; Regulatory Compliance is static. */
@@ -41,7 +41,7 @@ const SecurityOperationsSectionComponent: React.FC = () => {
             status='available'
             title={
               <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={goToItHygiene()}>IT Hygiene</EuiLink>
+                <EuiLink href={getItHygieneUrl()}>IT Hygiene</EuiLink>
               </RedirectAppLinks>
             }
             caption='Current state'
@@ -61,7 +61,7 @@ const SecurityOperationsSectionComponent: React.FC = () => {
             status={activeResponse.status}
             title={
               <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={goToActiveResponse()}>Incident Response</EuiLink>
+                <EuiLink href={getActiveResponseUrl()}>Incident Response</EuiLink>
               </RedirectAppLinks>
             }
             caption='Last 24 hours'
@@ -83,7 +83,7 @@ const SecurityOperationsSectionComponent: React.FC = () => {
             status='available'
             title={
               <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={goToRegulatoryComplianceHome()}>
+                <EuiLink href={getRegulatoryComplianceUrlHome()}>
                   Regulatory Compliance
                 </EuiLink>
               </RedirectAppLinks>

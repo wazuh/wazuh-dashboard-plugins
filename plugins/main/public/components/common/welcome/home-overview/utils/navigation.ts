@@ -31,7 +31,7 @@ const getUrlForApp = (appId: string, options?: Record<string, unknown>) =>
 const navigate = (appId: string, options?: Record<string, unknown>) =>
   NavigationService.getInstance().navigateToApp(appId, options);
 
-export const goToAgents = () => getUrlForApp(endpointSummary.id);
+export const getAgentsUrl = () => getUrlForApp(endpointSummary.id);
 
 export const goToAgentsByStatus = (status: string): void => {
   sessionStorage.setItem(
@@ -47,14 +47,14 @@ export const getDeployAgentUrl = (): string =>
     path: `#${endpointSummary.redirectTo()}deploy`,
   });
 
-export const goToThreatHunting = () => getUrlForApp(threatHunting.id);
+export const getThreatHuntingUrl = () => getUrlForApp(threatHunting.id);
 
 const DISCOVER_APP_ID = 'data-explorer';
 
 /**
  * Open Discover filtered to a findings severity band. `IS` on `wazuh.rule.level`
  */
-export const goToDiscoverFindingsBySeverity = (
+export const getDiscoverFindingsBySeverityUrl = (
   band: SeverityBand,
   indexPatternId?: string,
   fixedFilters: tFilter[] = [],
@@ -78,27 +78,27 @@ export const goToDiscoverFindingsBySeverity = (
     path: `#overview/?tab=general&tabView=findings&_a=${queryState}&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-24h,to:now))`,
   });
 };
-export const goToMitre = () => getUrlForApp(mitreAttack.id);
-export const goToItHygiene = () => getUrlForApp(ITHygiene.id);
-export const goToConfigurationAssessment = () =>
+export const getMitreUrl = () => getUrlForApp(mitreAttack.id);
+export const getItHygieneUrl = () => getUrlForApp(ITHygiene.id);
+export const getConfigurationAssessmentUrl = () =>
   getUrlForApp(configurationAssessment.id);
-export const goToFileIntegrityMonitoring = () =>
+export const getFileIntegrityMonitoringUrl = () =>
   getUrlForApp(fileIntegrityMonitoring.id);
-export const goToMalwareDetection = () => getUrlForApp(malwareDetection.id);
-export const goToVulnerabilityDetection = () =>
+export const getMalwareDetectionUrl = () => getUrlForApp(malwareDetection.id);
+export const getVulnerabilityDetectionUrl = () =>
   getUrlForApp(vulnerabilityDetection.id);
-export const goToActiveResponse = () => getUrlForApp(activeResponses.id);
+export const getActiveResponseUrl = () => getUrlForApp(activeResponses.id);
 
-export const goToRegulatoryComplianceHome = () =>
+export const getRegulatoryComplianceUrlHome = () =>
   getUrlForApp(regulatoryCompliance.id);
 
-export const goToRegulatoryCompliance = (tabView: string): string =>
+export const getRegulatoryComplianceUrl = (tabView: string): string =>
   getUrlForApp(regulatoryCompliance.id, {
     path: `#/overview?tab=regulatory-compliance&tabView=${tabView}&tabSubView=controls`,
   });
 
 /** Open a Cloud Security module by app id (list-driven, unlike the fixed links above). */
-export const goToCloudModule = (appId: string): string => getUrlForApp(appId);
+export const getCloudModuleUrl = (appId: string): string => getUrlForApp(appId);
 
 /**
  * App ids registered by the Security Analytics dashboards plugin. Absent when
@@ -111,12 +111,12 @@ const SECURITY_ANALYTICS_APP_IDS = {
   detectors: 'detectors',
 };
 
-export const goToRules = () => getUrlForApp(SECURITY_ANALYTICS_APP_IDS.rules);
-export const goToDecoders = () =>
+export const getRulesUrl = () => getUrlForApp(SECURITY_ANALYTICS_APP_IDS.rules);
+export const getDecodersUrl = () =>
   getUrlForApp(SECURITY_ANALYTICS_APP_IDS.decoders);
-export const goToIntegrations = () =>
+export const getIntegrationsUrl = () =>
   getUrlForApp(SECURITY_ANALYTICS_APP_IDS.integrations);
-export const goToDetectors = () =>
+export const getDetectorsUrl = () =>
   getUrlForApp(SECURITY_ANALYTICS_APP_IDS.detectors);
 
 /**
@@ -125,7 +125,7 @@ export const goToDetectors = () =>
  * `?q=external_id=<idToRedirect>`), so the id is required.
  * Falls back to the module home when the id isn't known.
  */
-const goToMitreIntelligence = (
+const getMitreIntelligenceUrl = (
   tabRedirect: 'tactics' | 'techniques',
   externalId?: string,
 ): string => {
@@ -137,8 +137,8 @@ const goToMitreIntelligence = (
 };
 
 /** Top-tactic labels deep-link into the Intelligence resource for that tactic. */
-export const goToMitreTactic = (externalId?: string): string =>
-  goToMitreIntelligence('tactics', externalId);
+export const getMitreUrlTactic = (externalId?: string): string =>
+  getMitreIntelligenceUrl('tactics', externalId);
 
 /**
  * Open the MITRE ATT&CK Framework tab filtered to a technique by name; falls
@@ -146,12 +146,12 @@ export const goToMitreTactic = (externalId?: string): string =>
  * Framework tab (`tabView=inventory`) reads the `_g` global filter through the
  * same data-source/filter-manager the dashboard uses.
  */
-export const goToMitreTechnique = (
+export const getMitreTechniqueUrl = (
   techniqueName?: string,
   indexPatternId?: string,
 ): string => {
   if (!techniqueName || !indexPatternId) {
     return getUrlForApp(mitreAttack.id);
   }
-  return goToMitreIntelligence('techniques', techniqueName);
+  return getMitreIntelligenceUrl('techniques', techniqueName);
 };

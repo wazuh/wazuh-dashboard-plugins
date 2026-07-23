@@ -2,7 +2,7 @@ import React from 'react';
 import { EuiBadge, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { WAZUH_MODULES_ID } from '../../../../../../../common/constants';
 import { WAZUH_MODULES } from '../../../../../../../common/wazuh-modules';
-import { goToRegulatoryCompliance } from '../../utils/navigation';
+import { getRegulatoryComplianceUrl } from '../../utils/navigation';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
@@ -33,7 +33,7 @@ export const RegulatoryComplianceBadges: React.FC = () => (
           <RedirectAppLinks application={getCore().application}>
             <EuiBadge
               color='hollow'
-              href={goToRegulatoryCompliance(id)}
+              href={getRegulatoryComplianceUrl(id)}
               onClickAriaLabel={`Open ${label}`}
               data-test-subj={`regulatory-compliance-badge-${id}`}
             >

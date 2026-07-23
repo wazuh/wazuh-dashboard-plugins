@@ -5,10 +5,10 @@ import { ThreatHuntingSection } from './threat-hunting-section';
 import * as navigation from '../../utils/navigation';
 
 jest.mock('../../utils/navigation', () => ({
-  goToThreatHunting: jest.fn(),
-  goToMitre: jest.fn(),
-  goToMitreTechnique: jest.fn(),
-  goToVulnerabilityDetection: jest.fn(),
+  getThreatHuntingUrl: jest.fn(),
+  getMitreUrl: jest.fn(),
+  getMitreTechniqueUrl: jest.fn(),
+  getVulnerabilityDetectionUrl: jest.fn(),
 }));
 
 const findingsAvailable = {
@@ -97,7 +97,7 @@ describe('ThreatHuntingSection', () => {
       />,
     );
     fireEvent.click(screen.getByText('Threat Hunting'));
-    expect(navigation.goToThreatHunting).toHaveBeenCalled();
+    expect(navigation.getThreatHuntingUrl).toHaveBeenCalled();
   });
 
   it('navigates to the selected MITRE technique by its external id', () => {
@@ -110,7 +110,7 @@ describe('ThreatHuntingSection', () => {
     fireEvent.click(
       screen.getAllByText('Exploit Public-Facing Application')[0],
     );
-    expect(navigation.goToMitreTechnique).toHaveBeenCalledWith(
+    expect(navigation.getMitreTechniqueUrl).toHaveBeenCalledWith(
       'T1190',
       'idx-1',
     );
