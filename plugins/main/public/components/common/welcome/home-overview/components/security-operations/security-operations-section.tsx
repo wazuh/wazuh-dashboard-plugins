@@ -68,7 +68,6 @@ const SecurityOperationsSectionComponent: React.FC = () => {
             }
             caption='Last 24 hours'
             centerBody
-            errorDisplay='dash'
             data-test-subj='home-overview-active-response'
           >
             <StatTile

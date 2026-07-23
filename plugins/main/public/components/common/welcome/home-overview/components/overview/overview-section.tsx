@@ -52,7 +52,6 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             title='Agents by status'
             headerLink={{ label: 'Agents', href: getAgentsUrl() }}
             centerBody
-            errorDisplay='dash'
             data-test-subj='home-overview-agents'
           >
             {agents.data && (
