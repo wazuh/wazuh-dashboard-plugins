@@ -223,6 +223,5 @@ describe('mappers', () => {
         total: 8,
       });
     });
-
   });
 });

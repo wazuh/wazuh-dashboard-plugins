@@ -12,8 +12,13 @@ jest.mock('../../../../../kibana-services', () => ({
   })),
 }));
 
-jest.mock('../../../../../../../../src/plugins/opensearch_dashboards_react/public', () => ({
-  RedirectAppLinks: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
+jest.mock(
+  '../../../../../../../../src/plugins/opensearch_dashboards_react/public',
+  () => ({
+    RedirectAppLinks: ({ children }: { children: React.ReactNode }) => (
+      <>{children}</>
+    ),
+  }),
+);
 
-export { };
+export {};

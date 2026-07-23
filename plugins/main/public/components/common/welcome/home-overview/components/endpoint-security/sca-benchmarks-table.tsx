@@ -17,12 +17,19 @@ export const ScaBenchmarksTable: React.FC<ScaBenchmarksTableProps> = ({
       field: 'name',
       name: 'Top 5 benchmarks',
       truncateText: true,
-      render: (value: string) => <span style={{
-        cursor: 'default',
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis'
-      }} title={value}>{value}</span>,
+      render: (value: string) => (
+        <span
+          style={{
+            cursor: 'default',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+          title={value}
+        >
+          {value}
+        </span>
+      ),
     },
     {
       field: 'passed',

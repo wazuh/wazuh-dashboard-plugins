@@ -61,7 +61,9 @@ const SecurityOperationsSectionComponent: React.FC = () => {
             status={activeResponse.status}
             title={
               <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getActiveResponseUrl()}>Incident Response</EuiLink>
+                <EuiLink href={getActiveResponseUrl()}>
+                  Incident Response
+                </EuiLink>
               </RedirectAppLinks>
             }
             caption='Last 24 hours'

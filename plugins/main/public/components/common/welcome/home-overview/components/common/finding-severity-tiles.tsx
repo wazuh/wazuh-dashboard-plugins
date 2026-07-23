@@ -12,21 +12,21 @@ const SEVERITY_PRESENTATION: Array<{
   label: string;
   color: string;
 }> = [
-    { band: 'critical', label: 'Critical', color: UI_COLOR_STATUS.danger },
-    { band: 'high', label: 'High', color: UI_COLOR_STATUS.warning },
-    { band: 'medium', label: 'Medium', color: UI_COLOR_STATUS.info },
-    { band: 'low', label: 'Low', color: UI_COLOR_STATUS.success },
-    {
-      band: 'informational',
-      label: 'Informational',
-      color: UI_COLOR_STATUS.disabled,
-    },
-    {
-      band: 'pending',
-      label: 'Pending',
-      color: UI_COLOR_STATUS.disabled,
-    },
-  ];
+  { band: 'critical', label: 'Critical', color: UI_COLOR_STATUS.danger },
+  { band: 'high', label: 'High', color: UI_COLOR_STATUS.warning },
+  { band: 'medium', label: 'Medium', color: UI_COLOR_STATUS.info },
+  { band: 'low', label: 'Low', color: UI_COLOR_STATUS.success },
+  {
+    band: 'informational',
+    label: 'Informational',
+    color: UI_COLOR_STATUS.disabled,
+  },
+  {
+    band: 'pending',
+    label: 'Pending',
+    color: UI_COLOR_STATUS.disabled,
+  },
+];
 
 export interface FindingSeverityTilesProps {
   counts: SeverityCounts;

@@ -69,7 +69,10 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             status={findings.status}
             title='Findings'
             caption='Last 24 hours'
-            headerLink={{ label: 'Threat Hunting', href: getThreatHuntingUrl() }}
+            headerLink={{
+              label: 'Threat Hunting',
+              href: getThreatHuntingUrl(),
+            }}
             centerBody
             errorDisplay='dash'
             data-test-subj='home-overview-findings-severity'

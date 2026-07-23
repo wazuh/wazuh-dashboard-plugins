@@ -101,7 +101,15 @@ function useDataGroup<T>(options: {
   deps: unknown[];
   label?: string;
 }): DataGroupResult<T> {
-  const { isLoading, initError, enabled, ready, fetch, deps, label = 'unknown' } = options;
+  const {
+    isLoading,
+    initError,
+    enabled,
+    ready,
+    fetch,
+    deps,
+    label = 'unknown',
+  } = options;
   const [result, setResult] = useState<DataGroupResult<T>>({
     status: 'loading',
   });
