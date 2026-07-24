@@ -45,7 +45,7 @@ describe('StartCtiRegistration component', () => {
       <StartCtiRegistration handleModalToggle={handleModalToggleMock} />,
     );
 
-    expect(getByText('Register')).toBeInTheDocument();
+    expect(getByText('CTI')).toBeInTheDocument();
     expect(getByRole('button')).toHaveClass('euiButtonEmpty');
   });
 

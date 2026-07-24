@@ -67,6 +67,32 @@ describe('useGetUpgradeTasks hook', () => {
     expect(clearInterval).toHaveBeenCalledTimes(1);
   });
 
+  it('should never call getTasks nor create an interval when enabled is false', async () => {
+    const mockGetTasks = jest.requireMock('../services').getTasks;
+    mockGetTasks.mockResolvedValue({ total_affected_items: 0 });
+
+    renderHook(() => useGetUpgradeTasks(false, false));
+
+    await Promise.resolve();
+    jest.advanceTimersByTime(3000);
+    jest.advanceTimersByTime(3000);
+
+    expect(mockGetTasks).not.toHaveBeenCalled();
+  });
+
+  it('should fetch data when enabled is true', async () => {
+    const mockGetTasks = jest.requireMock('../services').getTasks;
+    mockGetTasks.mockResolvedValue({ total_affected_items: 0 });
+
+    const { waitForNextUpdate } = renderHook(() =>
+      useGetUpgradeTasks(false, true),
+    );
+
+    await waitForNextUpdate();
+
+    expect(mockGetTasks).toHaveBeenCalled();
+  });
+
   it('should handle error while fetching data', async () => {
     const mockErrorMessage = 'Some error occurred';
     (getTasks as jest.Mock).mockRejectedValue(mockErrorMessage);

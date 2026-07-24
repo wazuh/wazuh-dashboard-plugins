@@ -40,3 +40,4 @@ wazuh_core.hosts:
     password: wazuh-wui
     run_as: false
 wazuh_check_updates.ctiRegistrationUiEnabled: false
+wazuh_check_updates.ctiRegistrationStatusPollIntervalSec: 30

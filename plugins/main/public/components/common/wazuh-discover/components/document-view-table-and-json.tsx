@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { EuiFlexItem, EuiCodeBlock, EuiTabbedContent } from '@elastic/eui';
 import {
   IndexPattern,
@@ -6,6 +6,7 @@ import {
 } from '../../../../../../../src/plugins/data/common';
 import DocViewer from '../../doc-viewer/doc-viewer';
 import { useDocViewer } from '../../doc-viewer';
+import { useUnsavedChangesGuard } from '../../unsaved-changes-guard';
 
 interface DocumentViewTableAndJsonPropsDoc {
   document: any;
@@ -21,6 +22,7 @@ type DocumentViewTableAndJsonPropsAdditionalTabsObject = {
   id: string;
   name: string;
   content: React.ReactNode;
+  guardUnsavedChanges?: boolean;
 }[];
 
 export type DocumentViewTableAndJsonPropsAdditionalTabs =
@@ -32,6 +34,28 @@ export type DocumentViewTableAndJsonPropsAdditionalTabs =
 type DocumentViewTableAndJsonProps = DocumentViewTableAndJsonPropsDoc & {
   additionalTabs?: DocumentViewTableAndJsonPropsAdditionalTabs;
   showFilterButtons: boolean;
+};
+
+const GuardedTabbedContent = ({
+  tabs,
+  guardAction,
+}: {
+  tabs: Array<{ id: string; name: string; content: React.ReactNode }>;
+  guardAction: (action: () => void) => void;
+}) => {
+  const [selectedTabId, setSelectedTabId] = useState(tabs[0].id);
+  return (
+    <EuiTabbedContent
+      tabs={tabs}
+      selectedTab={tabs.find(tab => tab.id === selectedTabId) ?? tabs[0]}
+      onTabClick={(tab: { id: string }) => {
+        if (tab.id === selectedTabId) {
+          return;
+        }
+        guardAction(() => setSelectedTabId(tab.id));
+      }}
+    />
+  );
 };
 
 export const DocumentViewTableAndJson = ({
@@ -49,9 +73,11 @@ export const DocumentViewTableAndJson = ({
     doc: document,
     indexPattern: indexPattern as IndexPattern,
   });
+  const { active: unsavedChangesGuardActive, guardAction } =
+    useUnsavedChangesGuard();
 
-  const tabs = useMemo(() => {
-    const baseTabs = [
+  const { tabs, hasGuardedTab } = useMemo(() => {
+    const baseTabs: DocumentViewTableAndJsonPropsAdditionalTabsObject = [
       {
         id: 'table',
         name: 'Table',
@@ -94,24 +120,29 @@ export const DocumentViewTableAndJson = ({
           onDocumentMutated,
         });
 
-    return [
-      ...baseTabs,
-      ...resolvedAdditionalTabs.map(tab => ({
-        ...tab,
-        content:
-          typeof tab.content === 'function'
-            ? tab.content({
-                document,
-                indexPattern,
-                renderFields,
-                filters,
-                setFilters,
-                onFilter,
-                onDocumentMutated,
-              })
-            : tab.content,
-      })),
-    ];
+    return {
+      hasGuardedTab: resolvedAdditionalTabs.some(
+        tab => tab.guardUnsavedChanges,
+      ),
+      tabs: [
+        ...baseTabs,
+        ...resolvedAdditionalTabs.map(({ guardUnsavedChanges, ...tab }) => ({
+          ...tab,
+          content:
+            typeof tab.content === 'function'
+              ? tab.content({
+                  document,
+                  indexPattern,
+                  renderFields,
+                  filters,
+                  setFilters,
+                  onFilter,
+                  onDocumentMutated,
+                })
+              : tab.content,
+        })),
+      ],
+    };
   }, [
     document,
     indexPattern,
@@ -124,9 +155,17 @@ export const DocumentViewTableAndJson = ({
     docViewerProps,
   ]);
 
+  const [guardTabSwitch] = useState(
+    () => unsavedChangesGuardActive && hasGuardedTab,
+  );
+
   return (
     <EuiFlexItem>
-      <EuiTabbedContent tabs={tabs} />
+      {guardTabSwitch ? (
+        <GuardedTabbedContent tabs={tabs} guardAction={guardAction} />
+      ) : (
+        <EuiTabbedContent tabs={tabs} />
+      )}
     </EuiFlexItem>
   );
 };

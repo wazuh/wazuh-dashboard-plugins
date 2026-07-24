@@ -23,6 +23,7 @@ interface AgentUpgradesInProgress {
   setIsModalVisible: (isModalVisible: boolean) => void;
   isPanelClosed: boolean;
   setIsPanelClosed: (isPanelClosed: boolean) => void;
+  allowGetTasks?: boolean;
 }
 
 export const AgentUpgradesInProgress = ({
@@ -30,6 +31,7 @@ export const AgentUpgradesInProgress = ({
   setIsModalVisible,
   isPanelClosed,
   setIsPanelClosed,
+  allowGetTasks = true,
 }: AgentUpgradesInProgress) => {
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [errorShown, setErrorShown] = useState(false);
@@ -43,7 +45,7 @@ export const AgentUpgradesInProgress = ({
     getErrorTasksError = undefined,
     totalTimeoutUpgradeTasks = 0,
     getTimeoutError = undefined,
-  } = useGetUpgradeTasks(reload);
+  } = useGetUpgradeTasks(reload, allowGetTasks);
 
   useEffect(() => {
     if (totalInProgressTasks > 0) {
@@ -105,7 +107,7 @@ export const AgentUpgradesInProgress = ({
   ]);
 
   const showTasks = isUpgrading || totalSuccessTasks || totalErrorUpgradeTasks;
-  if (isPanelClosed || !showTasks) return null;
+  if (!allowGetTasks || isPanelClosed || !showTasks) return null;
 
   return (
     <>

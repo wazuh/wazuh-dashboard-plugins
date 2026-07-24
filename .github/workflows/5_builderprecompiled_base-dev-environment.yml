@@ -12,7 +12,7 @@ on:
       reference:
         required: true
         type: string
-        default: main
+        default: 5.0.1
         description: Source code reference (branch, tag or commit SHA).
       command:
         required: true
@@ -43,6 +43,11 @@ on:
         type: boolean
         default: false
         required: false
+      runner:
+        type: string
+        default: 'ubuntu-24.04'
+        required: false
+        description: Runner to use for the job.
 
 env:
   CI_DEV_INTERNAL_BUCKET: ${{ secrets.CI_DEV_INTERNAL_BUCKET }}
@@ -55,7 +60,7 @@ jobs:
       pull-requests: write
       id-token: write
     name: Deploy and run command
-    runs-on: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: ${{ inputs.runner }}
     strategy:
       matrix:
         plugins:

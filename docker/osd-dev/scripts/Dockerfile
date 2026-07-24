@@ -12,7 +12,9 @@ RUN apk add --no-cache \
 WORKDIR /app
 
 # Install global TypeScript tooling (no app deps here)
-RUN npm install -g typescript ts-node @types/node
+# Pinned: ts-node 10.x is incompatible with TypeScript >= 7 (native compiler
+# drops the ts.sys JS API), so floating to latest breaks this image.
+RUN npm install -g typescript@6.0.3 ts-node@10.9.2 @types/node@26.0.0
 
 # Copy the wazuh-core package.json for version detection
 COPY plugins/wazuh-core/package.json /workspace/plugins/wazuh-core/package.json

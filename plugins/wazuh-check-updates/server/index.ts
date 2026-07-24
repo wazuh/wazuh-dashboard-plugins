@@ -14,6 +14,7 @@ export function plugin(initializerContext: PluginInitializerContext) {
 
 export const configSchema = schema.object({
   ctiRegistrationUiEnabled: schema.boolean({ defaultValue: false }),
+  ctiRegistrationStatusPollIntervalSec: schema.number({ defaultValue: 30 }),
 });
 
 export type WazuhCheckUpdatesPluginConfigType = TypeOf<typeof configSchema>;
@@ -22,6 +23,7 @@ export const config: PluginConfigDescriptor<WazuhCheckUpdatesPluginConfigType> =
   {
     exposeToBrowser: {
       ctiRegistrationUiEnabled: true,
+      ctiRegistrationStatusPollIntervalSec: true,
     },
     schema: configSchema,
   };

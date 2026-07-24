@@ -22,7 +22,7 @@ on:
       reference:
         required: true
         type: string
-        default: main
+        default: 5.0.1
         description: Source code reference (branch, tag or commit SHA)
       execution_repository:
         required: true
@@ -34,7 +34,7 @@ on:
       reference:
         required: true
         type: string
-        default: main
+        default: 5.0.1
         description: Source code reference (branch, tag or commit SHA)
 
 env:
@@ -54,6 +54,7 @@ jobs:
       command: 'yarn build'
       artifact_name: 'wazuh-dashboard-plugins'
       execution_repository: ${{ inputs.execution_repository || 'wazuh-dashboard-plugins/5_builderpackage_plugins' }}
+      runner: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
     secrets: inherit
 
   test-packages:

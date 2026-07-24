@@ -83,6 +83,13 @@ public/assets/custom/*
 # Mac files
 .DS_Store
 
+# Claude Code: version the shared settings, ignore personal overrides
+.claude/settings.local.json
+CLAUDE.local.md
+
+# Scratch dir for AI skill reports (CVE analysis/resolution, etc.)
+tmp/
+
 #Vulnerabilities events injector config and data
 scripts/vulnerabilities-events-injector/DIS_Settings.json
 scripts/vulnerabilities-events-injector/generatedData.json
@@ -94,3 +101,6 @@ bin/
 site-packages/
 lib64
 pyvenv.cfg
+
+# Sample data cli logs
+scripts/sample-data/logs

@@ -12,6 +12,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { compose } from 'redux';
 
 import withWzConfig from '../util-hocs/wz-config';
 import { wodleBuilder } from '../utils/builders';
@@ -20,6 +21,7 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzNoConfig from '../util-components/no-config';
 import { isString, renderValueYesThenEnabled } from '../utils/utils';
 import helpLinks from './help-links';
+import { withUserAuthorizationPrompt } from '../../../../../../components/common/hocs';
 
 const mainSettings = [
   {
@@ -109,4 +111,9 @@ WzConfigurationVulnerabilities.propTypes = {
   currentConfig: PropTypes.object.isRequired,
 };
 
-export default withWzConfig(sections)(WzConfigurationVulnerabilities);
+export default compose(
+  withUserAuthorizationPrompt([
+    { action: 'cluster:read', resource: 'node:id:*' },
+  ]),
+  withWzConfig(sections),
+)(WzConfigurationVulnerabilities);
