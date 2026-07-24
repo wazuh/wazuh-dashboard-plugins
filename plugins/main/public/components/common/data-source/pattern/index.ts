@@ -8,3 +8,5 @@ export * from './fim';
 export * from './system-inventory';
 export * from './vulnerabilities';
 export * from './active-responses';
+export * from './sca';
+export * from './threat-intel-enrichments';

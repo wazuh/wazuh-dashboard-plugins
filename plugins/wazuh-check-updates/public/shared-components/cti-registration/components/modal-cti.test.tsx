@@ -17,6 +17,7 @@ import { ctiFlowState } from '../../../services/cti-flow-state';
 import {
   CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC,
   CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
+  statusCodes,
 } from '../../../../common/constants';
 import { ModalCti } from './modal-cti';
 jest.mock('@osd/i18n', () => ({
@@ -37,6 +38,7 @@ jest.mock('@osd/i18n/react', () => ({
 const handleModalToggleMock = jest.fn();
 
 const mockHttpPost = jest.fn();
+const mockHttpGet = jest.fn();
 const mockRefetchStatus = jest.fn().mockResolvedValue(undefined);
 
 const defaultStatusCti = { status: 404, message: '' };
@@ -48,8 +50,9 @@ describe('ModalCti component', () => {
     mockRefetchStatus.mockResolvedValue(undefined);
     ctiFlowState.reset();
     ctiFlowState.setSubscription(null);
+    mockHttpGet.mockResolvedValue({ data: [] });
     (getCore as jest.Mock).mockReturnValue({
-      http: { post: mockHttpPost },
+      http: { post: mockHttpPost, get: mockHttpGet },
     });
     /* eslint-disable camelcase -- OAuth device authorization JSON uses snake_case */
     mockHttpPost.mockResolvedValue({
@@ -85,6 +88,20 @@ describe('ModalCti component', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Register' }),
+    ).toBeInTheDocument();
+  });
+
+  it('renders the Consumers accordion in the success view', async () => {
+    render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={{ status: statusCodes.SUCCESS, message: '' }}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+
+    expect(
+      await screen.findByRole('button', { name: 'Consumers' }),
     ).toBeInTheDocument();
   });
 

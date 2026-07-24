@@ -60,6 +60,17 @@ const config = {
   datasets: [],
   // Mapping from local dataset names to remote template filenames
   datasetToTemplateMapping: {
+    'findings-aws': 'templates/streams/findings.json',
+    'findings-azure': 'templates/streams/findings.json',
+    'findings-docker': 'templates/streams/findings.json',
+    'findings-fim': 'templates/streams/findings.json',
+    'findings-gcp': 'templates/streams/findings.json',
+    'findings-github': 'templates/streams/findings.json',
+    'findings-malware-detection': 'templates/streams/findings.json',
+    'findings-o365': 'templates/streams/findings.json',
+    'findings-sca': 'templates/streams/findings.json',
+    'findings-threat-hunting': 'templates/streams/findings.json',
+    'findings-vulnerability-detection': 'templates/streams/findings.json',
     'metrics-agents': 'templates/streams/metrics-agents.json',
     'metrics-comms': 'templates/streams/metrics-comms.json',
     'metrics-normalization': 'templates/streams/metrics-normalization.json',
@@ -124,18 +135,31 @@ function downloadFile(dataset) {
     console.log(`Downloading: ${url}`);
 
     https
-      .get(url, response => {
-        if (response.statusCode !== 200) {
-          reject(new Error(`Error downloading ${url}: ${response.statusCode}`));
+      .get(url, res => {
+        if (res.statusCode === 429 || res.statusCode === 403) {
+          // Drain the response so the socket can be reused, then reject with status info
+          res.resume();
+          const error = new Error(
+            `Rate limited fetching ${url} (status ${res.statusCode})`,
+          );
+          error.statusCode = res.statusCode;
+          error.headers = res.headers;
+          reject(error);
+          return;
+        }
+
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          res.resume();
+          reject(new Error(`Failed to fetch [${url}]: HTTP ${res.statusCode}`));
           return;
         }
 
         let data = '';
-        response.on('data', chunk => {
+        res.on('data', chunk => {
           data += chunk;
         });
 
-        response.on('end', () => {
+        res.on('end', () => {
           resolve(data);
         });
       })
@@ -144,6 +168,52 @@ function downloadFile(dataset) {
       });
   });
 }
+
+// The decorator: wraps any function that may reject with { statusCode, headers }
+function withRetryOn429(fn, { maxRetries = 5, baseDelay = 1000 } = {}) {
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  return async function (...args) {
+    let delay = baseDelay;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await fn(...args);
+      } catch (error) {
+        const isRateLimited =
+          error.statusCode === 429 || error.statusCode === 403;
+
+        if (!isRateLimited || attempt === maxRetries) {
+          throw error;
+        }
+
+        let waitTime = delay;
+        const retryAfter = error.headers?.['retry-after'];
+        const rateLimitReset = error.headers?.['x-ratelimit-reset'];
+
+        if (retryAfter) {
+          waitTime = parseInt(retryAfter, 10) * 1000;
+        } else if (rateLimitReset) {
+          const resetTime = parseInt(rateLimitReset, 10) * 1000;
+          waitTime = Math.max(resetTime - Date.now(), delay);
+        }
+
+        console.warn(
+          `Rate limited. Retrying in ${waitTime}ms (attempt ${
+            attempt + 1
+          }/${maxRetries})`,
+        );
+
+        await sleep(waitTime);
+        delay *= 2;
+      }
+    }
+  };
+}
+
+const downloadFileWithRetries = withRetryOn429(downloadFile);
 
 // Function to save the downloaded file
 function saveFile(dataset, filename, content) {
@@ -189,7 +259,7 @@ async function updateTemplates() {
       }
 
       // Download template.json file from GitHub
-      const content = await downloadFile(dataset);
+      const content = await downloadFileWithRetries(dataset);
 
       // Save the downloaded file
       await saveFile(dataset, 'template.json', content);

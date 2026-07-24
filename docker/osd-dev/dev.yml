@@ -384,6 +384,7 @@ services:
       - INDEXER_SSL_CA=/etc/server_certs/root-ca.pem
       - INDEXER_SSL_CERTIFICATE=/etc/server_certs/server.pem
       - INDEXER_SSL_CERTIFICATE_KEY=/etc/server_certs/server-key.pem
+      - WAZUH_REGISTRATION_PASSWORD=WazuhRegistrationDev123
     volumes:
       - wm_certs:/etc/server_certs
     ports:
@@ -402,6 +403,8 @@ services:
     networks:
       - os-dev
       - mon
+    environment:
+      - WAZUH_REGISTRATION_PASSWORD=${WAZUH_REGISTRATION_PASSWORD:-WazuhRegistrationDev123}
     volumes:
       - ./agents:/packages-agents
     command:
@@ -412,8 +415,12 @@ services:
         apt update -y
         apt install -y lsb-release adduser
 
-        # Install Wazuh agent
-        WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' dpkg -i /packages-agents/wazuh-agent*.deb
+        # Install Wazuh agent (registration password only if defined)
+        if [ -n "$$WAZUH_REGISTRATION_PASSWORD" ]; then
+          WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_PASSWORD="$$WAZUH_REGISTRATION_PASSWORD" dpkg -i /packages-agents/wazuh-agent*.deb
+        else
+          WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' dpkg -i /packages-agents/wazuh-agent*.deb
+        fi
 
         # Start Wazuh agent
         /etc/init.d/wazuh-agent start
@@ -428,6 +435,8 @@ services:
     networks:
       - os-dev
       - mon
+    environment:
+      - WAZUH_REGISTRATION_PASSWORD=${WAZUH_REGISTRATION_PASSWORD:-WazuhRegistrationDev123}
     volumes:
       - ./agents:/packages-agents
     command:
@@ -441,8 +450,12 @@ services:
         yum makecache
         yum upgrade -y
 
-        # Install wazuh-agent
-        WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' yum localinstall -y /packages-agents/wazuh-agent*.rpm
+        # Install wazuh-agent (registration password only if defined)
+        if [ -n "$$WAZUH_REGISTRATION_PASSWORD" ]; then
+          WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_PASSWORD="$$WAZUH_REGISTRATION_PASSWORD" yum localinstall -y /packages-agents/wazuh-agent*.rpm
+        else
+          WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' yum localinstall -y /packages-agents/wazuh-agent*.rpm
+        fi
 
         # Start wazuh-agent
         /var/ossec/bin/wazuh-control start

@@ -15,6 +15,17 @@ export type CtiRegistrationStoreRecord = {
   poll_interval_sec: number;
 };
 
+/** Minimal subscription shape persisted per environment UUID to detect plan/registration changes. */
+export type SubscriptionSnapshot = {
+  isRegistered: boolean;
+  planName: string; // '' when no plan
+};
+
+type SnapshotEntry = {
+  snapshot: SubscriptionSnapshot;
+  updateInFlight: boolean;
+};
+
 function coercePositiveInt(value: unknown, fallback: number): number {
   if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
     return Math.floor(value);
@@ -86,6 +97,15 @@ export class CtiRegistrationStore {
     CtiRegistrationStoreRecord
   >();
 
+  /**
+   * Per-environment subscription snapshot used to detect plan/registration changes,
+   * kept SEPARATE from `byEnvironmentUuid` (device-flow scoped, cleared on completion/expiry).
+   */
+  private readonly subscriptionByEnvironmentUuid = new Map<
+    string,
+    SnapshotEntry
+  >();
+
   private constructor() {}
 
   static getInstance(): CtiRegistrationStore {
@@ -98,7 +118,53 @@ export class CtiRegistrationStore {
   /** Test-only: drop singleton and all entries. */
   static resetForTests(): void {
     CtiRegistrationStore.instance?.byEnvironmentUuid.clear();
+    CtiRegistrationStore.instance?.subscriptionByEnvironmentUuid.clear();
     CtiRegistrationStore.instance = undefined;
+  }
+
+  getSubscriptionSnapshot(
+    environmentUuid: string,
+  ): SubscriptionSnapshot | undefined {
+    return this.subscriptionByEnvironmentUuid.get(environmentUuid)?.snapshot;
+  }
+
+  setSubscriptionSnapshot(
+    environmentUuid: string,
+    snapshot: SubscriptionSnapshot,
+  ): void {
+    const cur = this.subscriptionByEnvironmentUuid.get(environmentUuid);
+    this.subscriptionByEnvironmentUuid.set(environmentUuid, {
+      snapshot,
+      updateInFlight: cur?.updateInFlight ?? false,
+    });
+  }
+
+  /**
+   * Attempts to acquire the content-update in-flight lock for an environment.
+   * Returns `false` if the lock is already held, or if no snapshot has been
+   * recorded yet (callers always persist a snapshot before locking).
+   */
+  tryAcquireUpdateLock(environmentUuid: string): boolean {
+    const cur = this.subscriptionByEnvironmentUuid.get(environmentUuid);
+    if (!cur || cur.updateInFlight) {
+      return false;
+    }
+    this.subscriptionByEnvironmentUuid.set(environmentUuid, {
+      ...cur,
+      updateInFlight: true,
+    });
+    return true;
+  }
+
+  releaseUpdateLock(environmentUuid: string): void {
+    const cur = this.subscriptionByEnvironmentUuid.get(environmentUuid);
+    if (!cur) {
+      return;
+    }
+    this.subscriptionByEnvironmentUuid.set(environmentUuid, {
+      ...cur,
+      updateInFlight: false,
+    });
   }
 
   getStatus(environmentUuid: string): CtiRegistrationStoreRecord | undefined {

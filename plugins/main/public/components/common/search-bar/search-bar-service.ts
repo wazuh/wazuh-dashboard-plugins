@@ -80,7 +80,10 @@ export const search = async (
   }
   const data = getPlugins().data;
   const searchSource = await data.search.searchSource.create();
-  const paginationPageSize = pagination?.pageSize || DEFAULT_PAGE_SIZE;
+  // `??`, not `||` — an explicit `pageSize: 0` (aggregations-only, no hits
+  // needed) is a meaningful value and must not silently fall back to the
+  // default page size.
+  const paginationPageSize = pagination?.pageSize ?? DEFAULT_PAGE_SIZE;
   const fromField = (pagination?.pageIndex || 0) * paginationPageSize;
   // If the paginationPageSize + the offset exceeds the 10000 result limit of OpenSearch, truncates the page size
   // to avoid an exception

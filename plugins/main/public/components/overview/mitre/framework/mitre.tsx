@@ -67,7 +67,7 @@ const MitreComponent = compose(
   }),
 )(props => {
   const { onSelectedTabChanged, dataSource } = props;
-  const { dateRangeFrom, dateRangeTo } = dataSource;
+  const { dateRangeFrom, dateRangeTo } = dataSource.searchBarProps;
   const [mitreState, setMitreState] = useState<tMitreState>({
     tacticsObject: {},
     selectedTactics: {},
@@ -102,7 +102,7 @@ const MitreComponent = compose(
     initialize();
   }, [
     dataSource.searchBarProps.query,
-    JSON.stringify(dataSource.filters),
+    JSON.stringify(dataSource.fetchFilters),
     dateRangeFrom,
     dateRangeTo,
     dataSource.fingerprint,
