@@ -16,7 +16,7 @@ export const TopTechniquesTable: React.FC<TopTechniquesTableProps> = ({
     items={items}
     keyColumnName='Top 5 techniques'
     countColumnName='Alerts'
-    noItemsMessage='No techniques observed in the last 24 hours'
+    noItemsMessage='No techniques observed'
     data-test-subj='top-techniques-table'
   />
 );

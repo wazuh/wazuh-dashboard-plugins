@@ -107,7 +107,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
         {findings.data && (
           <BarList
             items={findings.data.topTactics}
-            emptyMessage='No MITRE ATT&CK tactics observed in the last 24 hours'
+            emptyMessage='No MITRE ATT&CK tactics observed'
             data-test-subj='mitre-top-tactics'
           />
         )}

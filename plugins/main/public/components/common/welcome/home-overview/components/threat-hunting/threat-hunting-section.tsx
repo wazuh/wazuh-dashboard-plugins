@@ -61,7 +61,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                   textAlign='center'
                   reverse
                   value={<TabNumber value={findings.data.totalFindings} />}
-                  label='Total findings, last 24 hours'
+                  label='Total findings'
                   data-test-subj='total-findings-hero'
                 />
                 <EuiSpacer size='s' />
@@ -88,7 +88,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                   textAlign='center'
                   reverse
                   value={<TabNumber value={findings.data.techniquesCount} />}
-                  label='Techniques observed, last 24 hours'
+                  label='Techniques observed'
                   data-test-subj='techniques-hero'
                 />
                 <EuiSpacer size='s' />
