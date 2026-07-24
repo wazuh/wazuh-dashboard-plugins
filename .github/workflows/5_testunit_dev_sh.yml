@@ -8,10 +8,16 @@ on:
       - 'docker/osd-dev/scripts/**'
     branches:
       - main
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   scripts-tests:
-    runs-on: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Run dev scripts tests (Jest in container)

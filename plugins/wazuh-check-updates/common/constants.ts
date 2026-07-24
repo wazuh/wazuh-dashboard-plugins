@@ -12,6 +12,7 @@ export enum routes {
   token = `${ctiBasePath}/token`,
   ctiRegistrationStatus = `${ctiBasePath}/status`,
   contentUpdate = `${ctiBasePath}/update`,
+  ctiConsumers = `${ctiBasePath}/consumers`,
 }
 
 /** OAuth 2.0 device authorization grant type (RFC 8628) for CTI Console token polling. */
@@ -72,4 +73,10 @@ export const enum statusCodes {
   NOT_FOUND = 404,
   /** OAuth terminal errors (access_denied, expired_token, etc.) after device flow. */
   REGISTRATION_FAILED = 460,
+}
+
+export const enum ctiContentUpdateReasons {
+  NONE = 'none',
+  REGISTRATION_CHANGED = 'registration-changed',
+  PLAN_NAME_CHANGED = 'plan-name-changed',
 }

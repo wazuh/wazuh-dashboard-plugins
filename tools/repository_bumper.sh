@@ -497,72 +497,25 @@ update_osd_json_files() {
   done
 }
 
-# Function to update CHANGELOG.md
+# Function to update CHANGELOG.md (delegates to changelog_bump.sh)
 update_changelog() {
   log "Updating CHANGELOG.md..."
-  local changelog_file="${REPO_PATH}/CHANGELOG.md"
-  local package_json_file="${REPO_PATH}/plugins/main/package.json" # Re-read after potential update
+  local changelog_script="${SCRIPT_PATH}/changelog_bump.sh"
+  local args=("$VERSION" "$CURRENT_VERSION")
 
-  # Check if package.json exists
-  if [ ! -f "$package_json_file" ]; then
-    log "ERROR: package.json not found at $package_json_file for changelog update"
+  if [ ! -f "$changelog_script" ]; then
+    log "ERROR: changelog_bump.sh not found at $changelog_script"
     exit 1
   fi
 
-  # Extract OpenSearch Dashboards version from package.json
-  # Attempt to extract OpenSearch Dashboards version using sed (WARNING: Fragile!)
-  # This assumes "pluginPlatform": { ... "version": "x.y.z" ... } structure
-  # It looks for the block starting with "pluginPlatform": { and ending with }
-  # Within that block, it finds the line starting with "version": "..." and extracts the value.
-  # This is significantly less reliable than using jq.
-  log "Attempting to extract pluginPlatform.version from $package_json_file using sed (Note: This is fragile)"
-  # Use a more targeted approach - look for the pluginPlatform block and extract version from it
-  OPENSEARCH_VERSION=$(grep -A 5 '"pluginPlatform"' "$package_json_file" | grep '"version"' | sed 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
-  if [ -z "$OPENSEARCH_VERSION" ] || [ "$OPENSEARCH_VERSION" == "null" ]; then
-    log "ERROR: Could not extract pluginPlatform.version from $package_json_file for changelog"
-    exit 1
+  if [ "$TAG" = true ]; then
+    args+=("--tag")
   fi
-  log "Detected OpenSearch Dashboards version for changelog: $OPENSEARCH_VERSION"
 
-  # Construct the new changelog entry
-  # Note: Using printf for better handling of newlines and potential special characters
-  # Use the calculated REVISION variable here
-  # Prepare the header to search for
-  local changelog_header="## Wazuh v${VERSION} - OpenSearch Dashboards ${OPENSEARCH_VERSION} - Revision "
-  local changelog_header_regex="^## Wazuh v${VERSION} - OpenSearch Dashboards ${OPENSEARCH_VERSION} - Revision [0-9]+"
-
-  # Check if an entry for this version and OpenSearch version already exists
-  if grep -qE "$changelog_header_regex" "$changelog_file"; then
-    if [ -n "$STAGE" ]; then
-      log "Changelog entry for this version and OpenSearch Dashboards version exists. Updating revision only."
-      # Use sed to update only the revision number in the header
-      if [[ "$OSTYPE" == "darwin"* ]]; then
-        sed -i '' -E "s|(${changelog_header_regex})|## Wazuh v${VERSION} - OpenSearch Dashboards ${OPENSEARCH_VERSION} - Revision ${REVISION}|" "$changelog_file"
-      else
-        # Try -E first, fall back to -r if it fails
-        sed -i -E "s|(${changelog_header_regex})|## Wazuh v${VERSION} - OpenSearch Dashboards ${OPENSEARCH_VERSION} - Revision ${REVISION}|" "$changelog_file" 2>/dev/null ||
-          sed -i -r "s|(${changelog_header_regex})|## Wazuh v${VERSION} - OpenSearch Dashboards ${OPENSEARCH_VERSION} - Revision ${REVISION}|" "$changelog_file"
-      fi &&
-        log "CHANGELOG.md revision updated successfully." || {
-        log "ERROR: Failed to update revision in $changelog_file"
-        exit 1
-      }
-    fi
-  else
-    log "No existing changelog entry for this version and OpenSearch Dashboards version. Inserting new entry."
-
-    # Create the new entry directly in the changelog using sed
-    local temp_file=$(mktemp)
-    head -n 4 "$changelog_file" >"$temp_file"
-    printf "\n## Wazuh v%s - OpenSearch Dashboards %s - Revision %s\n\n### Added\n\n- Support for Wazuh %s\n\n" "$VERSION" "$OPENSEARCH_VERSION" "$REVISION" "$VERSION" >>"$temp_file"
-    tail -n +5 "$changelog_file" >>"$temp_file"
-
-    mv "$temp_file" "$changelog_file" || {
-      log "ERROR: Failed to update $changelog_file"
-      rm -f "$temp_file" # Clean up temp file on error
-      exit 1
-    }
-    log "CHANGELOG.md updated successfully."
+  bash "$changelog_script" "${args[@]}" 2>&1 | tee -a "$LOG_FILE"
+  if [ "${PIPESTATUS[0]}" -ne 0 ]; then
+    log "ERROR: Failed to update CHANGELOG.md"
+    exit 1
   fi
 }
 

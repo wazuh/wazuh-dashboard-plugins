@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
-import { EuiHealth, EuiButtonEmpty, EuiLoadingSpinner } from '@elastic/eui';
+import { EuiButtonEmpty, EuiLoadingSpinner } from '@elastic/eui';
 import { StatusCtiRegistrationProps } from '../types';
 import { getCore } from '../../../plugin-services';
 import { ctiFlowState } from '../../../services/cti-flow-state';
@@ -46,27 +46,25 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
   ) : null;
 
   const statusNavTop = (
-    <EuiButtonEmpty onClick={openRegistrationModal}>
-      <EuiHealth
-        aria-label={statusData[statusCTI.status].onClickAriaLabel}
-        color={statusData[statusCTI.status].color}
-      >
-        <span style={inlineRow} data-test-subj='ctiRegistrationNavStatus'>
-          {showPlanName ? (
-            <FormattedMessage
-              id='wazuhCheckUpdates.ctiRegistration.statusNavTopWithPlan'
-              defaultMessage='Wazuh Cloud - {planName}'
-              values={{ planName: subscriptionPlanName }}
-            />
-          ) : (
-            <FormattedMessage
-              id='wazuhCheckUpdates.ctiRegistration.statusNavTop'
-              defaultMessage='Wazuh Cloud'
-            />
-          )}
-          {backgroundSpinner}
-        </span>
-      </EuiHealth>
+    <EuiButtonEmpty
+      aria-label={statusData[statusCTI.status].onClickAriaLabel}
+      onClick={openRegistrationModal}
+    >
+      <span style={inlineRow} data-test-subj='ctiRegistrationNavStatus'>
+        {showPlanName ? (
+          <FormattedMessage
+            id='wazuhCheckUpdates.ctiRegistration.statusNavTopWithPlan'
+            defaultMessage='Wazuh Cloud - {planName}'
+            values={{ planName: subscriptionPlanName }}
+          />
+        ) : (
+          <FormattedMessage
+            id='wazuhCheckUpdates.ctiRegistration.statusNavTop'
+            defaultMessage='Wazuh Cloud'
+          />
+        )}
+        {backgroundSpinner}
+      </span>
     </EuiButtonEmpty>
   );
 
@@ -76,10 +74,7 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
       onClick={openRegistrationModal}
       flush='both'
     >
-      <span style={inlineRow}>
-        <EuiHealth color={statusData[statusCTI.status].color} />
-        {backgroundSpinner}
-      </span>
+      <span style={inlineRow}>{backgroundSpinner}</span>
     </EuiButtonEmpty>
   );
 

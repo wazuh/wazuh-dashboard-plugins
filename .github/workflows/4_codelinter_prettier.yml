@@ -5,10 +5,15 @@ on:
     branches:
       - 4.*
     types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   prettier:
     name: Ensure the code format on the changed files
-    runs-on: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: ubuntu-24.04
     if: github.event.pull_request.draft == false
     steps:
       # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs

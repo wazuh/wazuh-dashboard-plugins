@@ -6,10 +6,15 @@ on:
       - main # Remove this when main changes to 6.x
       - 5.*
     types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   prettier:
     name: Ensure the code format on the changed files
-    runs-on: codebuild-github-actions-codebuild-runner-dashboard-amd-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: ubuntu-24.04
     if: github.event.pull_request.draft == false
     steps:
       # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
@@ -42,4 +47,4 @@ jobs:
           echo "Installing dependencies from plugin: ${plugin_package_json}"
           SKIP_DOWNLOAD_INDEXER_RESOURCES=true yarn --cwd "${plugin_package_json}" --modules-folder ../../node_modules
           echo "Running prettier on the changed files"
-          npx prettier ${CHANGED_FILES} --check --ignore-unknown
+          npx prettier ${CHANGED_FILES} --check --ignore-unknown --config .prettierrc
