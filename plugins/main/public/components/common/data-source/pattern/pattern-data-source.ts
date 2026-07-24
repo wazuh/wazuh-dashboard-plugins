@@ -94,7 +94,7 @@ export class PatternDataSource implements tDataSource {
 
       return results;
     } catch (error) {
-      throw new Error(`Error fetching data: ${error}`);
+      throw new Error(`Error fetching data: ${error?.message ?? error}`);
     }
   }
 
