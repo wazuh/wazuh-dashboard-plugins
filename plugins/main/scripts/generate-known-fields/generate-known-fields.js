@@ -117,7 +117,7 @@ const TEMPLATE_SOURCES = {
   'events-unclassified': {
     urls: [
       wazuhUrl(
-        'plugins/setup/src/main/resources/templates/streams/unclassified.json',
+        'plugins/setup/src/main/resources/templates/streams/events.json',
       ),
     ],
     outputFile: 'events-unclassified.json',
@@ -720,6 +720,25 @@ function fetchTemplate(url) {
   return new Promise((resolve, reject) => {
     https
       .get(url, res => {
+        // Handle rate limiting / retryable status codes
+        if (res.statusCode === 429 || res.statusCode === 403) {
+          // Drain the response so the socket can be reused, then reject with status info
+          res.resume();
+          const error = new Error(
+            `Rate limited fetching ${url} (status ${res.statusCode})`,
+          );
+          error.statusCode = res.statusCode;
+          error.headers = res.headers;
+          reject(error);
+          return;
+        }
+
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          res.resume();
+          reject(new Error(`Failed to fetch [${url}]: HTTP ${res.statusCode}`));
+          return;
+        }
+
         let data = '';
 
         res.on('data', chunk => {
@@ -733,17 +752,63 @@ function fetchTemplate(url) {
           } catch (error) {
             reject(
               new Error(
-                `Failed to parse template from ${url}: ${error.message}`,
+                `Failed to parse template from [${url}]: ${error.message}`,
               ),
             );
           }
         });
       })
       .on('error', error => {
-        reject(new Error(`Failed to fetch ${url}: ${error.message}`));
+        reject(new Error(`Failed to fetch [${url}]: ${error.message}`));
       });
   });
 }
+
+// The decorator: wraps any function that may reject with { statusCode, headers }
+function withRetryOn429(fn, { maxRetries = 5, baseDelay = 1000 } = {}) {
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  return async function (...args) {
+    let delay = baseDelay;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await fn(...args);
+      } catch (error) {
+        const isRateLimited =
+          error.statusCode === 429 || error.statusCode === 403;
+
+        if (!isRateLimited || attempt === maxRetries) {
+          throw error;
+        }
+
+        let waitTime = delay;
+        const retryAfter = error.headers?.['retry-after'];
+        const rateLimitReset = error.headers?.['x-ratelimit-reset'];
+
+        if (retryAfter) {
+          waitTime = parseInt(retryAfter, 10) * 1000;
+        } else if (rateLimitReset) {
+          const resetTime = parseInt(rateLimitReset, 10) * 1000;
+          waitTime = Math.max(resetTime - Date.now(), delay);
+        }
+
+        console.warn(
+          `Rate limited. Retrying in ${waitTime}ms (attempt ${
+            attempt + 1
+          }/${maxRetries})`,
+        );
+
+        await sleep(waitTime);
+        delay *= 2;
+      }
+    }
+  };
+}
+
+const fetchTemplateWithRetries = withRetryOn429(fetchTemplate);
 
 /**
  * Tries multiple URLs until one succeeds
@@ -753,11 +818,11 @@ async function fetchTemplateFromUrls(urls) {
 
   for (const url of urls) {
     try {
-      const template = await fetchTemplate(url);
+      const template = await fetchTemplateWithRetries(url);
       return { template, url };
     } catch (error) {
       lastError = error;
-      console.log(`  ⚠️  Failed to fetch from ${url}: ${error.message}`);
+      console.log(`  ⚠️  Failed to fetch from [${url}]: ${error.message}`);
     }
   }
 

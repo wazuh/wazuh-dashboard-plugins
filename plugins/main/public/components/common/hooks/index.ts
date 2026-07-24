@@ -15,6 +15,7 @@ export * from './use-kbn-loading-indicator';
 export * from './use-query';
 export * from './use-time-filter';
 export * from './useWindowSize';
+export * from './use-in-viewport';
 export * from './useUserPermissions';
 export * from './use-user-is-admin';
 export * from './useApiRequest';

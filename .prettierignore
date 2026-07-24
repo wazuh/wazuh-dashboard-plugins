@@ -1,0 +1,3 @@
+# NDJSON sample data: one JSON object per line, not a single JSON document.
+# Prettier's JSON parser expects one value per file and fails on these.
+plugins/*/server/lib/sample-data/dataset/**/*.json

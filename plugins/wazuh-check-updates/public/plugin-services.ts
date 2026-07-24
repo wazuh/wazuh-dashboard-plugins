@@ -5,3 +5,7 @@ import { WazuhCorePluginStart } from '../../wazuh-core/public';
 export const [getCore, setCore] = createGetterSetter<CoreStart>('Core');
 export const [getWazuhCore, setWazuhCore] =
   createGetterSetter<WazuhCorePluginStart>('WazuhCore');
+export const [
+  getCtiRegistrationStatusPollIntervalSec,
+  setCtiRegistrationStatusPollIntervalSec,
+] = createGetterSetter<number>('CtiRegistrationStatusPollIntervalSec');

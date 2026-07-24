@@ -23,6 +23,7 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { withUserAuthorizationPrompt } from '../../../../../../components/common/hocs';
 
 const renderCertificateAuthorities = value => {
   if (!value || !Array.isArray(value)) return '-';
@@ -111,6 +112,9 @@ WzIndexer.propTypes = {
 };
 
 export default compose(
+  withUserAuthorizationPrompt([
+    { action: 'cluster:read', resource: 'node:id:*' },
+  ]),
   withWzConfig(sections),
   connect(mapStateToProps),
 )(WzIndexer);
