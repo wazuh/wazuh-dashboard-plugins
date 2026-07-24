@@ -1,4 +1,9 @@
-import { clickElement, elementIsNotVisible, elementIsVisible, getSelector } from '../../../utils/driver';
+import {
+  clickElement,
+  elementIsNotVisible,
+  elementIsVisible,
+  getSelector,
+} from '../../../utils/driver';
 import { WAZUH_MENU_PAGE as pageName, MODULES_CARDS } from '../../../utils/pages-constants';
 const modulesButton = getSelector('modulesButton', pageName);
 const modulesDirectoryLink = getSelector('modulesDirectoryLink', pageName);
@@ -14,10 +19,10 @@ Then('The deactivated modules with {} are not displayed on home page', (moduleNa
   elementIsVisible(wazuhMenuRight);
   elementIsVisible(modulesButton);
   clickElement(modulesButton);
-  cy.wait(1000)
+  cy.wait(1000);
   elementIsVisible(wazuhMenuSettingRight);
   elementIsVisible(modulesDirectoryLink);
   clickElement(modulesDirectoryLink);
-  cy.get('react-component[name="OverviewWelcome"]', { timeout: 15000 });
+  cy.get('[data-test-subj="home-overview-agents"]', { timeout: 15000 });
   elementIsNotVisible(getSelector(moduleName, MODULES_CARDS));
 });

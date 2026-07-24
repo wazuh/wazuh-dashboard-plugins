@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { EuiPage, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import React, { useEffect } from 'react';
 import { getDataPlugin, getUiSettings } from '../../kibana-services';
-import { Stats } from '../../controllers/overview/components/stats';
-import { AppState, WzRequest } from '../../react-services';
-import { OverviewWelcome } from '../common/welcome/overview-welcome';
+import { AppState } from '../../react-services';
+import { HomeOverview } from '../common/welcome/home-overview';
 import { MainModule } from '../common/modules/main';
 import {
   APP_STATE_URL_KEY,
@@ -23,7 +21,7 @@ import {
 import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
 import { withRouteResolvers } from '../common/hocs';
 import { nestedResolve } from '../../services/resolves';
-import { useAsyncAction, useRouterSearch } from '../common/hooks';
+import { useRouterSearch } from '../common/hooks';
 import NavigationService from '../../react-services/navigation-service';
 import { cloneDeep } from 'lodash';
 import { migrateLegacyQuery } from '../../utils/migrate_legacy_query';
@@ -31,23 +29,12 @@ import { migrateLegacyQuery } from '../../utils/migrate_legacy_query';
 export const Overview: React.FC = withRouteResolvers({
   nestedResolve,
 })(() => {
-  const agentCountAction = useAsyncAction(async () => {
-    const {
-      data: {
-        data: { connection: data },
-      },
-    } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
-    return data;
-  }, []);
   const { tab = 'welcome', tabView = 'dashboard', agentId } = useRouterSearch();
   const navigationService = NavigationService.getInstance();
   const pinnedAgentManager = new PinnedAgentManager();
 
   useEffect(() => {
     pinnedAgentManager.syncPinnedAgentSources();
-    if (tab === 'welcome' || tab === undefined) {
-      agentCountAction.run();
-    }
 
     // TODO: Analyze if this behavior should be added to Navigationsservice
     // This is the code to sync the state of the URL with the state of the app
@@ -62,7 +49,7 @@ export const Overview: React.FC = withRouteResolvers({
     const appStateFromUrl = osdUrlStateStorage.get(
       APP_STATE_URL_KEY,
     ) as AppState;
-    let initialAppState = {
+    const initialAppState = {
       query: migrateLegacyQuery(data.query.queryString.getDefaultQuery()),
       ...appStateFromUrl,
     };
@@ -127,8 +114,6 @@ export const Overview: React.FC = withRouteResolvers({
     navigationService.switchSubTab(subTab);
   };
 
-  const agentsCount = agentCountAction.data || {};
-
   return (
     <>
       {tab && tab !== 'welcome' && (
@@ -148,22 +133,7 @@ export const Overview: React.FC = withRouteResolvers({
           />
         </>
       )}
-      {tab === 'welcome' && (
-        <EuiPage paddingSize='l'>
-          <EuiFlexGroup direction='column'>
-            <EuiFlexItem>
-              <Stats
-                {...agentsCount}
-                error={agentCountAction.error}
-                isAgentsLoading={agentCountAction.running}
-              />
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <OverviewWelcome {...agentsCount} />
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPage>
-      )}
+      {tab === 'welcome' && <HomeOverview />}
     </>
   );
 });

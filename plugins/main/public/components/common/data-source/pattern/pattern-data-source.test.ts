@@ -1,6 +1,13 @@
 import { IndexPatternsService } from '../../../../../../../src/plugins/data/common';
 import { RecordMock } from '../../../../../test/types';
 import { PatternDataSource } from './pattern-data-source';
+import { search } from '../../search-bar/search-bar-service';
+
+jest.mock('../../search-bar/search-bar-service', () => ({
+  search: jest.fn(),
+}));
+
+const mockSearch = search as jest.Mock;
 
 let patternService: RecordMock<IndexPatternsService>;
 let patternDataSource: PatternDataSource;
@@ -42,5 +49,52 @@ describe('PatternDataSource', () => {
 
   it('should not throw error when selecting from pattern data source', async () => {
     await expect(patternDataSource.select()).resolves.not.toThrow();
+  });
+
+  describe('fetch', () => {
+    beforeEach(() => {
+      mockSearch.mockReset();
+    });
+
+    type WrappedError = Error & { status?: number };
+
+    async function fetchAndCatch(): Promise<WrappedError | undefined> {
+      try {
+        await patternDataSource.fetch({});
+        return undefined;
+      } catch (error) {
+        return error as WrappedError;
+      }
+    }
+
+    it('returns the search results on success', async () => {
+      mockSearch.mockResolvedValue({ hits: { total: 0 } });
+      await expect(patternDataSource.fetch({})).resolves.toEqual({
+        hits: { total: 0 },
+      });
+    });
+
+    it('wraps a plain search failure without a status', async () => {
+      mockSearch.mockRejectedValue(new Error('boom'));
+      const caught = await fetchAndCatch();
+      expect(caught).toBeInstanceOf(Error);
+      expect(caught?.message).toBe('Error fetching data: boom');
+      expect(caught?.status).toBeUndefined();
+    });
+
+    it.each([
+      { statusCode: 403 },
+      { status: 403 },
+      { response: { status: 403 } },
+    ])(
+      'preserves a 403 status from shape %j onto the thrown error',
+      async shape => {
+        mockSearch.mockRejectedValue({ message: 'Forbidden', ...shape });
+        const caught = await fetchAndCatch();
+        expect(caught).toBeInstanceOf(Error);
+        expect(caught?.status).toBe(403);
+        expect(caught?.message).toBe('Error fetching data: Forbidden');
+      },
+    );
   });
 });

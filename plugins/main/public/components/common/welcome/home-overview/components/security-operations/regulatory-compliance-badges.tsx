@@ -1,0 +1,47 @@
+import React from 'react';
+import { EuiBadge, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import { WAZUH_MODULES_ID } from '../../../../../../../common/constants';
+import { WAZUH_MODULES } from '../../../../../../../common/wazuh-modules';
+import { getRegulatoryComplianceUrl } from '../../utils/navigation';
+import { getCore } from '../../../../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+
+const FRAMEWORK_IDS = [
+  WAZUH_MODULES_ID.PCI_DSS,
+  WAZUH_MODULES_ID.GDPR,
+  WAZUH_MODULES_ID.HIPAA,
+  WAZUH_MODULES_ID.NIST_800_53,
+  WAZUH_MODULES_ID.NIST_800_171,
+  WAZUH_MODULES_ID.TSC,
+  WAZUH_MODULES_ID.CMMC,
+  WAZUH_MODULES_ID.FEDRAMP,
+  WAZUH_MODULES_ID.ISO_27001,
+  WAZUH_MODULES_ID.NIS2,
+];
+
+export const RegulatoryComplianceBadges: React.FC = () => (
+  <EuiFlexGroup
+    gutterSize='s'
+    responsive={false}
+    wrap
+    data-test-subj='regulatory-compliance-badges'
+  >
+    {FRAMEWORK_IDS.map(id => {
+      const label = WAZUH_MODULES[id].title;
+      return (
+        <EuiFlexItem grow={false} key={id}>
+          <RedirectAppLinks application={getCore().application}>
+            <EuiBadge
+              color='hollow'
+              href={getRegulatoryComplianceUrl(id)}
+              onClickAriaLabel={`Open ${label}`}
+              data-test-subj={`regulatory-compliance-badge-${id}`}
+            >
+              {label}
+            </EuiBadge>
+          </RedirectAppLinks>
+        </EuiFlexItem>
+      );
+    })}
+  </EuiFlexGroup>
+);
