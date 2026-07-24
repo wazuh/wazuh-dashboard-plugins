@@ -58,6 +58,22 @@ describe('WidgetGroup', () => {
     ).toBeInTheDocument();
   });
 
+  it('renders a warning-colored "-" (not danger) for errorDisplay="dash" on a permission-denied error', () => {
+    const { container } = render(
+      <WidgetGroup
+        status='error'
+        title='My widget'
+        errorDisplay='dash'
+        isPermissionDenied
+      >
+        {child}
+      </WidgetGroup>,
+    );
+    const icon = container.querySelector('[data-euiicon-type="alert"]');
+    expect(icon).toBeInTheDocument();
+    expect(icon?.getAttribute('color')).toBe('warning');
+  });
+
   it('shows a skeleton while loading and not the content', () => {
     const { container } = render(
       <WidgetGroup status='loading' title='My widget'>
@@ -81,6 +97,77 @@ describe('WidgetGroup', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('Boom')).toBeInTheDocument();
     expect(screen.queryByText('widget body')).not.toBeInTheDocument();
+    expect(container.querySelector('.euiCallOut--danger')).toBeInTheDocument();
+  });
+
+  it('shows a permission-denied error as a warning, not a danger, callout', () => {
+    const { container } = render(
+      <WidgetGroup
+        status='error'
+        title='My widget'
+        errorLabel='No permission'
+        isPermissionDenied
+      >
+        {child}
+      </WidgetGroup>,
+    );
+    expect(screen.getByText('No permission')).toBeInTheDocument();
+    expect(container.querySelector('.euiCallOut--warning')).toBeInTheDocument();
+    expect(
+      container.querySelector('.euiCallOut--danger'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows a specific message on unavailable (distinct from the generic "Not available")', () => {
+    render(
+      <WidgetGroup
+        status='unavailable'
+        title='My widget'
+        errorLabel='Index pattern [id: wazuh-alerts-*] not found.'
+      >
+        {child}
+      </WidgetGroup>,
+    );
+    expect(
+      screen.getByText('Index pattern [id: wazuh-alerts-*] not found.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Not available')).not.toBeInTheDocument();
+  });
+
+  it('falls back to "Not available" on unavailable when no message is given', () => {
+    render(
+      <WidgetGroup status='unavailable' title='My widget'>
+        {child}
+      </WidgetGroup>,
+    );
+    expect(screen.getByText('Not available')).toBeInTheDocument();
+  });
+
+  it('adds a "Manage index patterns" link on unavailable when requested', () => {
+    render(
+      <WidgetGroup
+        status='unavailable'
+        title='My widget'
+        errorLabel='Index pattern [id: wazuh-alerts-*] not found.'
+        showManageIndexPatternsLink
+      >
+        {child}
+      </WidgetGroup>,
+    );
+    expect(
+      screen.getByRole('link', { name: 'Manage index patterns' }),
+    ).toBeInTheDocument();
+  });
+
+  it('omits the "Manage index patterns" link on a plain error', () => {
+    render(
+      <WidgetGroup status='error' title='My widget' errorLabel='Boom'>
+        {child}
+      </WidgetGroup>,
+    );
+    expect(
+      screen.queryByRole('link', { name: 'Manage index patterns' }),
+    ).not.toBeInTheDocument();
   });
 
   it('renders a header link and fires its onClick', () => {

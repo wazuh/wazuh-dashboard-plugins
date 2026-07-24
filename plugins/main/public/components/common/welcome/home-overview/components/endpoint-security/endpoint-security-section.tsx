@@ -45,10 +45,12 @@ const EndpointSecuritySectionComponent: React.FC<
   const iocMatches: DataGroupResult<number> = {
     status: findings.status,
     data: findings.data?.iocMatches,
+    error: findings.error,
   };
   const feedByType: DataGroupResult<TopItem[]> = {
     status: threatIntel.status,
     data: threatIntel.data?.feedByType,
+    error: threatIntel.error,
   };
 
   return (
@@ -61,6 +63,11 @@ const EndpointSecuritySectionComponent: React.FC<
         <EuiFlexItem>
           <WidgetGroup
             status={sca.status}
+            errorLabel={sca.error?.message}
+            showManageIndexPatternsLink={
+              sca.error?.kind === 'index-pattern-missing'
+            }
+            isPermissionDenied={sca.error?.kind === 'permission-denied'}
             title={
               <RedirectAppLinks application={getCore().application}>
                 <EuiLink href={getConfigurationAssessmentUrl()}>
@@ -84,6 +91,11 @@ const EndpointSecuritySectionComponent: React.FC<
         <EuiFlexItem>
           <WidgetGroup
             status={fim.status}
+            errorLabel={fim.error?.message}
+            showManageIndexPatternsLink={
+              fim.error?.kind === 'index-pattern-missing'
+            }
+            isPermissionDenied={fim.error?.kind === 'permission-denied'}
             title={
               <RedirectAppLinks application={getCore().application}>
                 <EuiLink href={getFileIntegrityMonitoringUrl()}>

@@ -8,7 +8,9 @@ jest.mock('../../../../../react-services/common-services', () => ({
 
 jest.mock('../../../../../kibana-services', () => ({
   getCore: jest.fn(() => ({
-    application: {},
+    application: {
+      getUrlForApp: jest.fn(() => '/mock-url'),
+    },
   })),
 }));
 

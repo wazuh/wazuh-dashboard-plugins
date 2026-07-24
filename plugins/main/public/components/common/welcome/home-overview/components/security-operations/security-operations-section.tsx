@@ -59,6 +59,13 @@ const SecurityOperationsSectionComponent: React.FC = () => {
         <EuiFlexItem>
           <WidgetGroup
             status={activeResponse.status}
+            errorLabel={activeResponse.error?.message}
+            showManageIndexPatternsLink={
+              activeResponse.error?.kind === 'index-pattern-missing'
+            }
+            isPermissionDenied={
+              activeResponse.error?.kind === 'permission-denied'
+            }
             title={
               <RedirectAppLinks application={getCore().application}>
                 <EuiLink href={getActiveResponseUrl()}>

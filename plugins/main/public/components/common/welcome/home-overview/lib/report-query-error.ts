@@ -3,6 +3,7 @@ import {
   ErrorHandler,
   HttpError,
 } from '../../../../../react-services/error-management';
+import { describeError } from './classify-query-error';
 
 /**
  * Coalesces Home overview query failures into a single toast.
@@ -20,28 +21,6 @@ import {
  */
 const pendingFailures = new Map<string, unknown>();
 let flushScheduled = false;
-
-function describeError(error: unknown): string {
-  if (error instanceof Error && error.message) {
-    return error.message;
-  }
-  if (typeof error === 'string' && error) {
-    return error;
-  }
-  if (error && typeof error === 'object') {
-    const { message, data } = error as {
-      message?: unknown;
-      data?: { message?: unknown };
-    };
-    if (typeof message === 'string' && message) {
-      return message;
-    }
-    if (typeof data?.message === 'string' && data.message) {
-      return data.message;
-    }
-  }
-  return 'Unknown error';
-}
 
 function flush(): void {
   const failures = [...pendingFailures.entries()];

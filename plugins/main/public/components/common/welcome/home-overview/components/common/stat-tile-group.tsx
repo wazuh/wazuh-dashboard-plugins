@@ -35,8 +35,14 @@ export function StatTileGroup<K extends string>({
             value={value}
             errorTooltip={
               result.status === 'error'
-                ? `Could not load ${tile.label}`
+                ? result.error?.message ?? `Could not load ${tile.label}`
                 : undefined
+            }
+            errorColor={
+              result.error?.kind === 'permission-denied' ? 'warning' : 'danger'
+            }
+            infoTooltip={
+              result.status === 'unavailable' ? result.error?.message : undefined
             }
           />
         );

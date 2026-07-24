@@ -46,6 +46,11 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
         <EuiFlexItem>
           <WidgetGroup
             status={findings.status}
+            errorLabel={findings.error?.message}
+            showManageIndexPatternsLink={
+              findings.error?.kind === 'index-pattern-missing'
+            }
+            isPermissionDenied={findings.error?.kind === 'permission-denied'}
             title={
               <RedirectAppLinks application={getCore().application}>
                 <EuiLink href={getThreatHuntingUrl()}>Threat Hunting</EuiLink>
@@ -73,6 +78,11 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
         <EuiFlexItem>
           <WidgetGroup
             status={findings.status}
+            errorLabel={findings.error?.message}
+            showManageIndexPatternsLink={
+              findings.error?.kind === 'index-pattern-missing'
+            }
+            isPermissionDenied={findings.error?.kind === 'permission-denied'}
             title={
               <RedirectAppLinks application={getCore().application}>
                 <EuiLink href={getMitreUrl()}>MITRE ATT&amp;CK</EuiLink>
@@ -107,6 +117,13 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
         <EuiFlexItem>
           <WidgetGroup
             status={vulnerabilities.status}
+            errorLabel={vulnerabilities.error?.message}
+            showManageIndexPatternsLink={
+              vulnerabilities.error?.kind === 'index-pattern-missing'
+            }
+            isPermissionDenied={
+              vulnerabilities.error?.kind === 'permission-denied'
+            }
             title={
               <RedirectAppLinks application={getCore().application}>
                 <EuiLink href={getVulnerabilityDetectionUrl()}>

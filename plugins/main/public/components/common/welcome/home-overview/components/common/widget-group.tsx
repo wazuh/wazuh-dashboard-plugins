@@ -8,6 +8,8 @@ import {
   EuiLoadingContent,
   EuiCallOut,
   EuiText,
+  EuiToolTip,
+  EuiEmptyPrompt,
 } from '@elastic/eui';
 import { DataGroupStatus } from '../../interfaces/data-group';
 import { VALUE_PLACEHOLDER } from '../../lib/constants';
@@ -32,6 +34,13 @@ export interface WidgetGroupBodyProps {
   status: DataGroupStatus;
   errorLabel?: string;
   /**
+   * Set when the failure is a missing index pattern, so a "Manage index
+   * patterns" link can be offered next to the message (only rendered on
+   * `unavailable`, the status a missing index pattern maps to).
+   */
+  showManageIndexPatternsLink?: boolean;
+  isPermissionDenied?: boolean;
+  /**
    * How a non-data state (`unavailable` / `error`) fills the body:
    * - `'dash'`  → a value-styled "-"; danger-colored with a tooltip on `error`
    *   (pure KPI panels).
@@ -43,6 +52,20 @@ export interface WidgetGroupBodyProps {
   children: React.ReactNode;
 }
 
+const MANAGE_INDEX_PATTERNS_PATH = '/opensearch-dashboards/indexPatterns';
+
+const ManageIndexPatternsLink: React.FC = () => (
+  <RedirectAppLinks application={getCore().application}>
+    <EuiLink
+      href={getCore().application.getUrlForApp('management', {
+        path: MANAGE_INDEX_PATTERNS_PATH,
+      })}
+    >
+      Manage index patterns
+    </EuiLink>
+  </RedirectAppLinks>
+);
+
 /**
  * Maps a data group's status to skeleton / placeholder / content, without panel
  * or title chrome. A widget is **never hidden**: `unavailable` (benign, data
@@ -52,7 +75,9 @@ export interface WidgetGroupBodyProps {
  */
 export const WidgetGroupBody: React.FC<WidgetGroupBodyProps> = ({
   status,
-  errorLabel = 'Could not load data',
+  errorLabel,
+  showManageIndexPatternsLink = false,
+  isPermissionDenied = false,
   errorDisplay = 'inline',
   loadingMinHeight,
   children,
@@ -74,6 +99,8 @@ export const WidgetGroupBody: React.FC<WidgetGroupBodyProps> = ({
   // 'unavailable' | 'error' — never hidden.
   const isError = status === 'error';
   const testSubj = isError ? 'widget-group-error' : 'widget-group-unavailable';
+  const label = errorLabel ?? (isError ? 'Could not load data' : 'Not available');
+  const errorColor = isPermissionDenied ? 'warning' : 'danger';
   const containerStyle = {
     minHeight: loadingMinHeight,
     height: '100%',
@@ -87,7 +114,13 @@ export const WidgetGroupBody: React.FC<WidgetGroupBodyProps> = ({
         style={{ ...containerStyle, textAlign: 'center' }}
       >
         {isError ? (
-          <ErrorValuePlaceholder tooltip={errorLabel} />
+          <ErrorValuePlaceholder tooltip={label} color={errorColor} />
+        ) : errorLabel ? (
+          <EuiToolTip position='top' content={errorLabel}>
+            <EuiText color='subdued' className='tab-num'>
+              {VALUE_PLACEHOLDER}
+            </EuiText>
+          </EuiToolTip>
         ) : (
           <EuiText color='subdued' className='tab-num'>
             {VALUE_PLACEHOLDER}
@@ -100,16 +133,16 @@ export const WidgetGroupBody: React.FC<WidgetGroupBodyProps> = ({
   return (
     <div data-test-subj={testSubj} style={containerStyle}>
       {isError ? (
-        <EuiCallOut
-          size='s'
-          color='danger'
-          iconType='alert'
-          title={errorLabel}
-        />
+        <EuiCallOut size='s' color={errorColor} iconType='alert' title={label} />
       ) : (
-        <EuiText size='s' color='subdued'>
-          Not available
-        </EuiText>
+        <EuiEmptyPrompt
+          iconType='alert'
+          paddingSize='s'
+          body={<p>{label}</p>}
+          actions={
+            showManageIndexPatternsLink ? <ManageIndexPatternsLink /> : undefined
+          }
+        />
       )}
     </div>
   );
@@ -122,6 +155,10 @@ export interface WidgetGroupProps {
   caption?: string;
   headerLink?: WidgetGroupHeaderLink;
   errorLabel?: string;
+  /** See WidgetGroupBody: only rendered on `unavailable`. */
+  showManageIndexPatternsLink?: boolean;
+  /** See WidgetGroupBody: warning instead of danger coloring on `error`. */
+  isPermissionDenied?: boolean;
   /** See WidgetGroupBody: 'dash' for pure-KPI panels, 'inline' (default) otherwise. */
   errorDisplay?: 'inline' | 'dash';
   /**
@@ -143,6 +180,8 @@ export const WidgetGroup: React.FC<WidgetGroupProps> = ({
   caption,
   headerLink,
   errorLabel,
+  showManageIndexPatternsLink,
+  isPermissionDenied,
   errorDisplay,
   centerBody = false,
   loadingMinHeight,
@@ -196,6 +235,8 @@ export const WidgetGroup: React.FC<WidgetGroupProps> = ({
           <WidgetGroupBody
             status={status}
             errorLabel={errorLabel}
+            showManageIndexPatternsLink={showManageIndexPatternsLink}
+            isPermissionDenied={isPermissionDenied}
             errorDisplay={errorDisplay}
             loadingMinHeight={loadingMinHeight}
           >

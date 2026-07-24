@@ -49,6 +49,8 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
         <EuiFlexItem>
           <WidgetGroup
             status={agents.status}
+            errorLabel={agents.error?.message}
+            isPermissionDenied={agents.error?.kind === 'permission-denied'}
             title='Agents by status'
             headerLink={{ label: 'Agents', href: getAgentsUrl() }}
             centerBody
@@ -66,6 +68,8 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
         <EuiFlexItem>
           <WidgetGroup
             status={findings.status}
+            errorLabel={findings.error?.message}
+            isPermissionDenied={findings.error?.kind === 'permission-denied'}
             title='Findings'
             caption='Last 24 hours'
             headerLink={{
@@ -73,7 +77,6 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               href: getThreatHuntingUrl(),
             }}
             centerBody
-            errorDisplay='dash'
             data-test-subj='home-overview-findings-severity'
           >
             {findings.data && (
@@ -98,6 +101,11 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
 
       <WidgetGroup
         status={findings.status}
+        errorLabel={findings.error?.message}
+        showManageIndexPatternsLink={
+          findings.error?.kind === 'index-pattern-missing'
+        }
+        isPermissionDenied={findings.error?.kind === 'permission-denied'}
         title='MITRE ATT&CK top tactics'
         caption='Last 24 hours'
         headerLink={{ label: 'MITRE ATT&CK', href: getMitreUrl() }}
@@ -120,6 +128,11 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
           <EuiFlexItem>
             <WidgetGroup
               status={topOs.status}
+              errorLabel={topOs.error?.message}
+              showManageIndexPatternsLink={
+                topOs.error?.kind === 'index-pattern-missing'
+              }
+              isPermissionDenied={topOs.error?.kind === 'permission-denied'}
               title='Top 5 operating systems'
               caption='Current state'
               headerLink={{ label: 'IT Hygiene', href: getItHygieneUrl() }}
@@ -132,6 +145,13 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
           <EuiFlexItem>
             <WidgetGroup
               status={topServices.status}
+              errorLabel={topServices.error?.message}
+              showManageIndexPatternsLink={
+                topServices.error?.kind === 'index-pattern-missing'
+              }
+              isPermissionDenied={
+                topServices.error?.kind === 'permission-denied'
+              }
               title='Top 5 network services'
               caption='Current state'
               headerLink={{ label: 'IT Hygiene', href: getItHygieneUrl() }}

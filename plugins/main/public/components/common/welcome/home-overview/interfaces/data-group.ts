@@ -1,4 +1,5 @@
 import { ErrorDataSourceNotFound } from '../../../../../utils/errors';
+import { ClassifiedQueryError } from '../lib/classify-query-error';
 
 /**
  * Status of a single data group
@@ -15,4 +16,6 @@ export const DATA_SOURCE_NOT_FOUND = ErrorDataSourceNotFound.type;
 export interface DataGroupResult<T> {
   status: DataGroupStatus;
   data?: T;
+  /** Present on `unavailable` / `error`; the classified, render-ready failure. */
+  error?: ClassifiedQueryError;
 }

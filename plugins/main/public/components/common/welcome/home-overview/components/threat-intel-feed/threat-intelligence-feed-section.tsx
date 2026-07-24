@@ -32,10 +32,12 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
   const iocs: DataGroupResult<number | undefined> = {
     status: threatIntel.status,
     data: threatIntel.data?.total,
+    error: threatIntel.error,
   };
   const cvesMatched: DataGroupResult<number | undefined> = {
     status: vulnerabilities.status,
     data: vulnerabilities.data?.cvesMatched,
+    error: vulnerabilities.error,
   };
 
   return (

@@ -74,6 +74,7 @@ import {
   DataGroupResult,
 } from '../interfaces/data-group';
 import { reportQueryError } from '../lib/report-query-error';
+import { classifyQueryError } from '../lib/classify-query-error';
 
 // Data hooks for the Home overview. Every widget reads its data through one of
 // these; they wrap SearchSource aggregations, the Wazuh API, and Security
@@ -90,7 +91,9 @@ function isDataSourceNotFound(error: unknown): boolean {
 /**
  * State handling for one group. `data_source_not_found` → `unavailable` (benign,
  * no toast); any other error → `error` and, when a `label` is given, a coalesced
- * failure toast (see `reportQueryError`). Widgets are never hidden.
+ * failure toast (see `reportQueryError`). Widgets are never hidden. Either way,
+ * the error is classified (see `classifyQueryError`) so the widget can render a
+ * specific message instead of a generic one.
  */
 function useDataGroup<T>(options: {
   isLoading: boolean;
@@ -118,13 +121,13 @@ function useDataGroup<T>(options: {
     let cancelled = false;
 
     const handleError = (error: unknown) => {
+      const classifiedError = classifyQueryError(error);
+      reportQueryError(label, error);
       if (isDataSourceNotFound(error)) {
-        setResult({ status: 'unavailable' });
-        reportQueryError(label, error);
+        setResult({ status: 'unavailable', error: classifiedError });
         return;
       }
-      reportQueryError(label, error);
-      setResult({ status: 'error' });
+      setResult({ status: 'error', error: classifiedError });
     };
 
     if (isLoading) {

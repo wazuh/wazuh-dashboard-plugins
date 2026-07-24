@@ -7,14 +7,17 @@ import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 export interface TabNumberProps {
   value?: number;
   errorTooltip?: string;
+  errorColor?: 'danger' | 'warning';
+  infoTooltip?: string;
 }
 
-export const ErrorValuePlaceholder: React.FC<{ tooltip?: string }> = ({
-  tooltip = 'Could not load data',
-}) => (
+export const ErrorValuePlaceholder: React.FC<{
+  tooltip?: string;
+  color?: 'danger' | 'warning';
+}> = ({ tooltip = 'Could not load data', color = 'danger' }) => (
   <EuiToolTip position='top' content={tooltip}>
-    <span className='tab-num' style={{ color: UI_COLOR_STATUS.danger }}>
-      {VALUE_PLACEHOLDER} <EuiIcon type='alert' size='s' color='danger' />
+    <span className='tab-num' style={{ color: UI_COLOR_STATUS[color] }}>
+      {VALUE_PLACEHOLDER} <EuiIcon type='alert' size='s' color={color} />
     </span>
   </EuiToolTip>
 );
@@ -22,9 +25,18 @@ export const ErrorValuePlaceholder: React.FC<{ tooltip?: string }> = ({
 export const TabNumber: React.FC<TabNumberProps> = ({
   value,
   errorTooltip,
+  errorColor,
+  infoTooltip,
 }) => {
   if (value === undefined && errorTooltip) {
-    return <ErrorValuePlaceholder tooltip={errorTooltip} />;
+    return <ErrorValuePlaceholder tooltip={errorTooltip} color={errorColor} />;
+  }
+  if (value === undefined && infoTooltip) {
+    return (
+      <EuiToolTip position='top' content={infoTooltip}>
+        <span className='tab-num'>{VALUE_PLACEHOLDER}</span>
+      </EuiToolTip>
+    );
   }
   return (
     <span className='tab-num'>
