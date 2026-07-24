@@ -12,7 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed permission error in Endpoints summary with a read-only user [#8763](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8763)
 
-## Wazuh v4.14.7 - OpenSearch Dashboards 2.19.5 - Revision 00
+## Wazuh v4.14.7 - OpenSearch Dashboards 2.19.5 - Revision 01
 
 ### Added
 
