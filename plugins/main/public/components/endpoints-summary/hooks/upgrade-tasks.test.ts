@@ -84,13 +84,9 @@ describe('useGetUpgradeTasks hook', () => {
     const mockGetTasks = jest.requireMock('../services').getTasks;
     mockGetTasks.mockResolvedValue({ total_affected_items: 0 });
 
-    const { waitForNextUpdate } = renderHook(() =>
-      useGetUpgradeTasks(false, true),
-    );
+    renderHook(() => useGetUpgradeTasks(false, true));
 
-    await waitForNextUpdate();
-
-    expect(mockGetTasks).toHaveBeenCalled();
+    await waitFor(() => expect(mockGetTasks).toHaveBeenCalled());
   });
 
   it('should handle error while fetching data', async () => {
