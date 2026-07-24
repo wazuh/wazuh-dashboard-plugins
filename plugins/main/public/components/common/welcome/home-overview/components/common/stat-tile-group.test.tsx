@@ -44,7 +44,10 @@ describe('StatTileGroup', () => {
     const results: Record<Key, DataGroupResult<number | undefined>> = {
       packages: {
         status: 'unavailable',
-        error: { kind: 'index-pattern-missing', message: 'Index pattern not found' },
+        error: {
+          kind: 'index-pattern-missing',
+          message: 'Index pattern not found',
+        },
       },
     };
     const { container } = render(

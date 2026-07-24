@@ -94,8 +94,11 @@ export class PatternDataSource implements tDataSource {
 
       return results;
     } catch (error) {
-      const wrapped = new Error(`Error fetching data: ${error?.message ?? error}`);
-      const status = error?.statusCode ?? error?.status ?? error?.response?.status;
+      const wrapped = new Error(
+        `Error fetching data: ${error?.message ?? error}`,
+      );
+      const status =
+        error?.statusCode ?? error?.status ?? error?.response?.status;
       if (status) {
         (wrapped as Error & { status?: number }).status = status;
       }

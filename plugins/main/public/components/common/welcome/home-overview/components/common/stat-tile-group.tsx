@@ -42,7 +42,9 @@ export function StatTileGroup<K extends string>({
               result.error?.kind === 'permission-denied' ? 'warning' : 'danger'
             }
             infoTooltip={
-              result.status === 'unavailable' ? result.error?.message : undefined
+              result.status === 'unavailable'
+                ? result.error?.message
+                : undefined
             }
           />
         );

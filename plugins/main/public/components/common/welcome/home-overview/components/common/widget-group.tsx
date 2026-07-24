@@ -99,7 +99,8 @@ export const WidgetGroupBody: React.FC<WidgetGroupBodyProps> = ({
   // 'unavailable' | 'error' — never hidden.
   const isError = status === 'error';
   const testSubj = isError ? 'widget-group-error' : 'widget-group-unavailable';
-  const label = errorLabel ?? (isError ? 'Could not load data' : 'Not available');
+  const label =
+    errorLabel ?? (isError ? 'Could not load data' : 'Not available');
   const errorColor = isPermissionDenied ? 'warning' : 'danger';
   const containerStyle = {
     minHeight: loadingMinHeight,
@@ -133,14 +134,21 @@ export const WidgetGroupBody: React.FC<WidgetGroupBodyProps> = ({
   return (
     <div data-test-subj={testSubj} style={containerStyle}>
       {isError ? (
-        <EuiCallOut size='s' color={errorColor} iconType='alert' title={label} />
+        <EuiCallOut
+          size='s'
+          color={errorColor}
+          iconType='alert'
+          title={label}
+        />
       ) : (
         <EuiEmptyPrompt
           iconType='alert'
           paddingSize='s'
           body={<p>{label}</p>}
           actions={
-            showManageIndexPatternsLink ? <ManageIndexPatternsLink /> : undefined
+            showManageIndexPatternsLink ? (
+              <ManageIndexPatternsLink />
+            ) : undefined
           }
         />
       )}

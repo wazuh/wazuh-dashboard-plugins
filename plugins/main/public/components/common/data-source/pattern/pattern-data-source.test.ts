@@ -86,12 +86,15 @@ describe('PatternDataSource', () => {
       { statusCode: 403 },
       { status: 403 },
       { response: { status: 403 } },
-    ])('preserves a 403 status from shape %j onto the thrown error', async shape => {
-      mockSearch.mockRejectedValue({ message: 'Forbidden', ...shape });
-      const caught = await fetchAndCatch();
-      expect(caught).toBeInstanceOf(Error);
-      expect(caught?.status).toBe(403);
-      expect(caught?.message).toBe('Error fetching data: Forbidden');
-    });
+    ])(
+      'preserves a 403 status from shape %j onto the thrown error',
+      async shape => {
+        mockSearch.mockRejectedValue({ message: 'Forbidden', ...shape });
+        const caught = await fetchAndCatch();
+        expect(caught).toBeInstanceOf(Error);
+        expect(caught?.status).toBe(403);
+        expect(caught?.message).toBe('Error fetching data: Forbidden');
+      },
+    );
   });
 });

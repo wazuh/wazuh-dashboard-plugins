@@ -21,8 +21,7 @@ describe('classifyQueryError', () => {
   ])('classifies a 403 as permission-denied ($status shape)', shape => {
     expect(classifyQueryError(shape)).toEqual({
       kind: 'permission-denied',
-      message:
-        "You don't have permission to view this data.",
+      message: "You don't have permission to view this data.",
     });
   });
 
@@ -54,9 +53,7 @@ describe('describeError', () => {
   });
 
   it('extracts a nested data.message', () => {
-    expect(describeError({ data: { message: 'Forbidden' } })).toBe(
-      'Forbidden',
-    );
+    expect(describeError({ data: { message: 'Forbidden' } })).toBe('Forbidden');
   });
 
   it('falls back to a generic message', () => {

@@ -27,7 +27,10 @@ function getHttpStatus(error: unknown): number | undefined {
     body?: { statusCode?: number };
   };
   return (
-    err?.status ?? err?.statusCode ?? err?.response?.status ?? err?.body?.statusCode
+    err?.status ??
+    err?.statusCode ??
+    err?.response?.status ??
+    err?.body?.statusCode
   );
 }
 
