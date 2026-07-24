@@ -62,4 +62,24 @@ describe('AgentUpgradesInProgress component', () => {
       fireEvent.click(openModalButton);
     });
   });
+
+  test('should disable the tasks fetch and render nothing when allowGetTasks is false', () => {
+    (useGetUpgradeTasks as jest.Mock).mockReturnValue({
+      totalInProgressTasks: 5,
+      totalErrorUpgradeTasks: 2,
+    });
+
+    const { container } = render(
+      <AgentUpgradesInProgress
+        reload={0}
+        setIsModalVisible={() => {}}
+        isPanelClosed={false}
+        setIsPanelClosed={() => {}}
+        allowGetTasks={false}
+      />,
+    );
+
+    expect(useGetUpgradeTasks).toHaveBeenCalledWith(0, false);
+    expect(container.firstChild).toBeNull();
+  });
 });

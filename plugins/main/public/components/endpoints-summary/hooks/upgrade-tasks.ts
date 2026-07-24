@@ -4,7 +4,7 @@ import { API_NAME_TASK_STATUS } from '../../../../common/constants';
 
 const beforeMinutes = 60;
 
-export const useGetUpgradeTasks = (reload: any) => {
+export const useGetUpgradeTasks = (reload: any, enabled: boolean = true) => {
   const [totalInProgressTasks, setTotalInProgressTasks] = useState<number>(0);
   const [getInProgressIsLoading, setGetInProgressIsLoading] = useState(true);
   const [getInProgressError, setGetInProgressError] = useState();
@@ -98,6 +98,10 @@ export const useGetUpgradeTasks = (reload: any) => {
   };
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
     fetchData();
 
     const intervalId = setInterval(getUpgradesInProgress, 3000);
@@ -107,7 +111,7 @@ export const useGetUpgradeTasks = (reload: any) => {
     }
 
     return () => clearInterval(intervalId);
-  }, [totalInProgressTasks, reload]);
+  }, [totalInProgressTasks, reload, enabled]);
 
   return {
     getInProgressIsLoading,
