@@ -22,6 +22,18 @@ import { describeError } from './classify-query-error';
 const pendingFailures = new Map<string, unknown>();
 let flushScheduled = false;
 
+const MAX_TOAST_MESSAGE_LINES = 6;
+
+function truncateForToast(message: string, maxLines: number): string {
+  const lines = message.split('\n');
+  if (lines.length <= maxLines) {
+    return message;
+  }
+  const shown = lines.slice(0, maxLines - 1);
+  const hiddenCount = lines.length - shown.length;
+  return [...shown, `… and ${hiddenCount} more`].join('\n');
+}
+
 function flush(): void {
   const failures = [...pendingFailures.entries()];
   pendingFailures.clear();
@@ -35,6 +47,7 @@ function flush(): void {
     .map(([label, error]) => `${label}: ${describeError(error)}`)
     .join('\n');
   const title = `Home overview: could not load ${labels}`;
+  const toastMessage = truncateForToast(detail, MAX_TOAST_MESSAGE_LINES);
 
   const lastError = failures[failures.length - 1][1];
   const representativeError =
@@ -43,9 +56,9 @@ function flush(): void {
   ErrorHandler.handleError(
     ErrorFactory.create(HttpError, {
       error: representativeError,
-      message: detail,
+      message: toastMessage,
     }),
-    { title, message: detail },
+    { title, message: toastMessage },
   );
 }
 
