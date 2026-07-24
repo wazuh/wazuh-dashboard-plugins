@@ -8,11 +8,11 @@ import { ErrorDataSourceNotFound } from '../../../../../utils/errors';
  * `{ ok, response, error }` response.
  */
 
-const SECURITY_ANALYTICS_BASE = '../_plugins/_security_anatics';
+const SECURITY_ANALYTICS_BASE = '../_plugins/_security_analytics';
 
 export const SECURITY_ANALYTICS_ROUTES = {
   rulesSearch: `${SECURITY_ANALYTICS_BASE}/rules/_search`,
-  decodersSearch: `${SECURITY_ANALYTICS_BASE}/decode/_search`,
+  decodersSearch: `${SECURITY_ANALYTICS_BASE}/decoders/_search`,
   integrationsSearch: `${SECURITY_ANALYTICS_BASE}/integrations/_search`,
   detectorsSearch: `${SECURITY_ANALYTICS_BASE}/detectors/_search`,
 };
