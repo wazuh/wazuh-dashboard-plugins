@@ -47,4 +47,4 @@ jobs:
           echo "Installing dependencies from plugin: ${plugin_package_json}"
           SKIP_DOWNLOAD_INDEXER_RESOURCES=true yarn --cwd "${plugin_package_json}" --modules-folder ../../node_modules
           echo "Running prettier on the changed files"
-          npx prettier ${CHANGED_FILES} --check --ignore-unknown
+          npx prettier ${CHANGED_FILES} --check --ignore-unknown --config .prettierrc
