@@ -79,7 +79,7 @@ export default [
       {
         name: 'Policy monitoring',
         description:
-          'Configuration to ensure compliance with security policies, standards and hardening guides',
+          'Configuration to ensure compliance with security policies, standards, and hardening guides',
         goto: 'policy-monitoring',
         when: 'agent',
       },
@@ -100,7 +100,7 @@ export default [
         // Wazuh: Removed this section for the manager.
         name: 'Inventory data',
         description:
-          'Gather relevant information about system operating system, hardware, networking and packages',
+          'Gather relevant information about system operating system, hardware, networking, and packages',
         goto: 'inventory',
         when: 'agent',
       },
