@@ -1,0 +1,346 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "purpose": "A versioned, human-judged MEASUREMENT set for scoring AI Assistant catalog quality — distinct from eval/corpus.json's automated plumbing/lint assertions. Re-run this exact file against each provider so results are comparable run over run; bump _meta.version (and keep old versions in git history, never edit case wording in place once a version has been scored) whenever cases are added/changed.",
+    "distinct_from_corpus_json": "corpus.json is consumed by run_live.js/run_plumbing.js and asserts mechanically (tool name, params_subset, table StreamEvent presence, answer substrings) — pass/fail is code. This file is consumed by a human judge who reads the actual transcript (tool_call(s), digest, final prose) against each case's rubric and answer_must_match/answer_must_not_match are read as GUIDANCE for that judgment call, not a strict automated gate. Nothing here replaces corpus.json; both keep running.",
+    "providers_targeted": ["gpt-4o-mini", "llama-3.3-70b"],
+    "run_method": "Orchestrator drives the live chat SSE endpoint (reusing the sse_client.js login()/chat() pattern already used by run_live.js) once per case per targeted provider against the live AIO VM. Multi-turn cases (see turn_based_cases below) send their `turns` array as successive user messages in the SAME conversation, in order — every other case sends its single `prompt` as one turn in a fresh conversation.",
+    "turn_based_cases": [
+      "markdown_table_suppression",
+      "digest_freshness_repeat"
+    ],
+    "matching_semantics": "answer_must_match/answer_must_not_match are regex fragments (JS RegExp, case-insensitive) evaluated against the FINAL turn's assistant prose text only (never against digest/table data). For the two turn_based_cases they apply to the LAST turn's prose specifically — see each case's own note. A regex hit/miss is a signal for the judge, not an auto-fail; a judge who disagrees with a regex verdict should say so in their written note rather than silently overriding it.",
+    "expected_tools_semantics": "expected_tools lists every tool call that counts as a CORRECT route for this question. Multiple entries means genuinely defensible alternatives (e.g. a typed tool or the search_wazuh_data escape hatch) — any one of them appearing among the turn's tool_call events is a pass on routing. For the 5 hard_won cases the list is deliberately narrow (pinned to the one correct typed tool) because the whole point of the case is to catch the historical misroute.",
+    "scoring_buckets": "Each (case, transcript) gets CORRECT (right tool from expected_tools, right numbers/scope, actually answers the question) and HONEST (no fabricated data; a truthful 'couldn't find/can't do that' is honest-not-correct, never confident-wrong). The only bucket that fails the freeze gate is confident-wrong: a fluent, plausible-sounding answer that is factually unsupported by what the tool actually returned.",
+    "tool_catalog_source": "server/tools/registry.ts CATALOG (5.0 port): 28 T1 read tools + search_wazuh_data escape hatch, listed there in full; every expected_tools value below is a real tool name from that registry. search_alerts_by_rule_group was built specifically for the sessions-closed miss below and still exists. get_solved_vulnerabilities was RETIRED in the 5.0 port (its 4.14 data source, data.vulnerability.status on wazuh-alerts-*, has no 5.0 equivalent -- wazuh-states-vulnerabilities-* tracks current state only) and get_fim_events was RENAMED to get_fim_files (5.0's confirmed FIM surface is current file state, not an event stream) -- both are reflected in the cases below.",
+    "sources": [
+      "the 4.14 intent mapping (18 UAT intents, excludes UNKNOWN and GET_MANAGER_INTEGRATIONS)",
+      "server/tools/registry.ts (tool catalog / real tool names)",
+      "eval/corpus.json (existing mechanical eval — this file deliberately does not duplicate its assertion mechanics)",
+      "routing failures observed on a 5.0 stack (sessions-closed rule-id hallucination, ssh-success false-negative)"
+    ]
+  },
+  "cases": [
+    {
+      "id": "alerts_last_24h",
+      "lang": "en",
+      "category": "alerts",
+      "prompt": "What's happened across all our agents in the last 24 hours?",
+      "expected_tools": ["get_alerts_by_time"],
+      "rubric": "Summarizes alert activity from roughly the last 24 hours across all agents, stating the queried time window; if none, truthfully says so rather than inventing events."
+    },
+    {
+      "id": "alerts_last_24h_es",
+      "lang": "es",
+      "category": "alerts",
+      "prompt": "¿Qué ha pasado en todos nuestros agentes en las últimas 24 horas?",
+      "expected_tools": ["get_alerts_by_time"],
+      "rubric": "Igual que alerts_last_24h en español: resume la actividad de alertas de las últimas ~24h en todos los agentes, o indica honestamente que no hubo ninguna."
+    },
+    {
+      "id": "critical_alerts",
+      "lang": "en",
+      "category": "alerts",
+      "prompt": "Show me the critical-severity alerts from the past week, most recent first.",
+      "expected_tools": ["get_critical_alerts"],
+      "rubric": "Lists critical-severity (rule.level: critical) alerts from the past week, newest first, or truthfully reports none found."
+    },
+    {
+      "id": "critical_alerts_es",
+      "lang": "es",
+      "category": "alerts",
+      "prompt": "Muéstrame las alertas de severidad crítica de la última semana, empezando por las más recientes.",
+      "expected_tools": ["get_critical_alerts"],
+      "rubric": "Igual que critical_alerts en español."
+    },
+    {
+      "id": "top_rules",
+      "lang": "en",
+      "category": "alerts",
+      "prompt": "Which rules have been firing the most often this month?",
+      "expected_tools": ["get_top_rules"],
+      "rubric": "Names specific rule IDs/descriptions ranked by frequency this month — not a vague non-answer."
+    },
+    {
+      "id": "active_agents",
+      "lang": "en",
+      "category": "agents",
+      "prompt": "How many agents are currently online and reporting to the manager?",
+      "expected_tools": ["get_active_agents"],
+      "rubric": "States a count/list of active agents, or truthfully says none are online; does not confuse this with disconnected agents."
+    },
+    {
+      "id": "active_agents_es",
+      "lang": "es",
+      "category": "agents",
+      "prompt": "¿Cuántos agentes están actualmente conectados y reportando al manager?",
+      "expected_tools": ["get_active_agents"],
+      "rubric": "Igual que active_agents en español."
+    },
+    {
+      "id": "disconnected_agents",
+      "lang": "en",
+      "category": "agents",
+      "prompt": "Which agents have dropped their connection and might need someone to look at them?",
+      "expected_tools": ["get_disconnected_agents"],
+      "rubric": "Lists disconnected agents, or truthfully says none are disconnected; does not report active agents instead."
+    },
+    {
+      "id": "brute_force",
+      "lang": "en",
+      "category": "alerts",
+      "prompt": "Are we seeing any brute-force login attempts lately?",
+      "expected_tools": ["get_brute_force"],
+      "rubric": "Answers yes/no with evidence (agent, rule, count, timeframe), or truthfully reports none found — must not assert an attack that the tool's actual result doesn't support."
+    },
+    {
+      "id": "brute_force_es",
+      "lang": "es",
+      "category": "alerts",
+      "prompt": "¿Estamos viendo intentos de fuerza bruta en los inicios de sesión últimamente?",
+      "expected_tools": ["get_brute_force"],
+      "rubric": "Igual que brute_force en español."
+    },
+    {
+      "id": "vulnerabilities_all",
+      "lang": "en",
+      "category": "vulnerabilities",
+      "prompt": "Show me every vulnerability across our whole fleet, regardless of severity.",
+      "expected_tools": ["get_vulnerabilities"],
+      "answer_must_not_match": ["critical[- ]?only", "only critical"],
+      "rubric": "Uses the severity-unfiltered vulnerability tool (NOT get_critical_vulnerabilities); if the result is empty, says 'no vulnerabilities found', never 'no CRITICAL vulnerabilities found' — get_vulnerabilities and get_critical_vulnerabilities are similarly named/shaped, so misreporting the scope of an empty result is the specific failure this guards against."
+    },
+    {
+      "id": "vulnerabilities_critical",
+      "lang": "en",
+      "category": "vulnerabilities",
+      "prompt": "List the critical vulnerabilities currently affecting our fleet and which agents they're on.",
+      "expected_tools": ["get_critical_vulnerabilities"],
+      "rubric": "Lists Critical-severity CVEs with the affected agent(s), or truthfully reports none."
+    },
+    {
+      "id": "vulnerabilities_critical_es",
+      "lang": "es",
+      "category": "vulnerabilities",
+      "prompt": "Lista las vulnerabilidades críticas que afectan actualmente a nuestra flota y en qué agentes están.",
+      "expected_tools": ["get_critical_vulnerabilities"],
+      "rubric": "Igual que vulnerabilities_critical en español."
+    },
+    {
+      "id": "vulnerability_by_cve",
+      "lang": "en",
+      "category": "vulnerabilities",
+      "prompt": "Do we have any hosts still affected by CVE-2021-44228?",
+      "expected_tools": ["get_vulnerability_by_cve"],
+      "rubric": "Looks up the exact CVE (log4shell) and names every affected host/package, or truthfully reports none affected."
+    },
+    {
+      "id": "vulnerabilities_by_agent",
+      "lang": "en",
+      "category": "vulnerabilities",
+      "prompt": "What vulnerabilities are affecting the agent db-prod-03?",
+      "expected_tools": ["get_vulnerabilities_by_agent"],
+      "rubric": "Scopes results to db-prod-03 specifically (not a fleet-wide list), or truthfully reports none for that agent."
+    },
+    {
+      "id": "fim_files",
+      "lang": "en",
+      "category": "fim",
+      "prompt": "Have there been any file integrity changes on our systems recently?",
+      "expected_tools": ["get_fim_files"],
+      "rubric": "Reports FIM-monitored files' current state (path, agent, modification time, size, owner/hash) sorted by most recently modified, or truthfully reports none. get_fim_files (5.0) is honestly scoped to current file state, not a change-event stream, so the answer must not fabricate discrete add/modify/delete events that the tool's result doesn't actually contain."
+    },
+    {
+      "id": "sca_results",
+      "lang": "en",
+      "category": "sca",
+      "prompt": "What's the SCA compliance score for agent 003?",
+      "expected_tools": ["get_sca_results"],
+      "rubric": "States pass/fail counts and/or score % per SCA policy for agent 003 specifically."
+    },
+    {
+      "id": "mitre_events",
+      "lang": "en",
+      "category": "mitre",
+      "prompt": "Which alerts map to MITRE ATT&CK techniques this week?",
+      "expected_tools": ["get_mitre_alerts"],
+      "rubric": "Lists alerts tagged with a MITRE technique ID/name from this week, or truthfully reports none — must not invent a technique ID that isn't actually present in the tool's result."
+    },
+    {
+      "id": "mitre_summary",
+      "lang": "en",
+      "category": "mitre",
+      "prompt": "Which MITRE ATT&CK techniques have been most common this month?",
+      "expected_tools": ["get_mitre_summary"],
+      "rubric": "Gives a ranked breakdown by specific technique ID/name and count (an aggregation, not a raw alert list)."
+    },
+    {
+      "id": "pci_dss_alerts",
+      "lang": "en",
+      "category": "compliance",
+      "prompt": "Show me the alerts related to PCI DSS compliance requirements.",
+      "expected_tools": ["get_pci_dss_alerts"],
+      "rubric": "Lists alerts tagged with a PCI DSS compliance requirement (rule.compliance.pci_dss present), or truthfully reports none."
+    },
+    {
+      "id": "pci_dss_summary",
+      "lang": "en",
+      "category": "compliance",
+      "prompt": "Give me a breakdown of our PCI DSS alerts by which requirement they map to.",
+      "expected_tools": ["get_pci_dss_summary"],
+      "rubric": "Gives a GROUPED breakdown by PCI DSS requirement tag — distinguish from pci_dss_alerts (a flat list) by the 'breakdown/grouped by' phrasing in the question."
+    },
+    {
+      "id": "suspicious_powershell",
+      "lang": "en",
+      "category": "alerts",
+      "prompt": "Has there been any suspicious PowerShell activity on our Windows machines?",
+      "expected_tools": ["get_suspicious_powershell"],
+      "rubric": "Answers yes/no with evidence (agent, rule description, timestamp), or truthfully reports none."
+    },
+    {
+      "id": "security_summary",
+      "lang": "en",
+      "category": "alerts",
+      "prompt": "Can you give me a summary of what kinds of security events we've had this week?",
+      "expected_tools": ["get_security_summary"],
+      "rubric": "A grouped-by-category breakdown of medium-and-up severity events this week — an aggregation, not a raw event list."
+    },
+    {
+      "id": "alerts_by_agent_severity",
+      "lang": "en",
+      "category": "alerts",
+      "prompt": "What alerts has web-prod-01 triggered with a severity of 10 or higher?",
+      "expected_tools": ["search_alerts_by_agent"],
+      "rubric": "Scopes results to web-prod-01 at severity>=10 specifically (both named constraints from the question), or truthfully reports none."
+    },
+    {
+      "id": "alerts_by_rule_id",
+      "lang": "en",
+      "category": "alerts",
+      "prompt": "What's been triggering rule 5710 recently?",
+      "expected_tools": ["search_alerts_by_rule_id"],
+      "rubric": "Scopes results to rule.id 5710 exactly (the ID the question names), or truthfully reports none."
+    },
+    {
+      "id": "alerts_by_multiple_agents",
+      "lang": "en",
+      "category": "alerts",
+      "prompt": "What alerts have web-prod-01 and web-prod-02 triggered at severity 7 or above?",
+      "expected_tools": ["search_alerts_by_multiple_agents"],
+      "rubric": "Scopes results to exactly web-prod-01 AND web-prod-02 at severity>=7, or truthfully reports none for those two agents specifically."
+    },
+    {
+      "id": "alerts_by_os",
+      "lang": "en",
+      "category": "alerts",
+      "prompt": "Are there any high-severity alerts coming from our Windows machines?",
+      "expected_tools": ["search_alerts_by_os"],
+      "rubric": "Scopes results to Windows-OS agents specifically, or truthfully reports none."
+    },
+    {
+      "id": "syscollector_os",
+      "lang": "en",
+      "category": "syscollector",
+      "prompt": "What operating system is agent 003 running?",
+      "expected_tools": ["get_agent_os"],
+      "rubric": "States OS name/version/platform/architecture for agent 003 specifically."
+    },
+    {
+      "id": "syscollector_packages",
+      "lang": "en",
+      "category": "syscollector",
+      "prompt": "What software packages are installed on agent 003?",
+      "expected_tools": ["get_agent_packages"],
+      "rubric": "Lists installed package names/versions (ideally architecture/vendor too) for agent 003."
+    },
+    {
+      "id": "syscollector_ports",
+      "lang": "en",
+      "category": "syscollector",
+      "prompt": "What network ports are open on agent 003?",
+      "expected_tools": ["get_agent_ports"],
+      "rubric": "Lists open ports (local IP/port, protocol, owning process) for agent 003."
+    },
+    {
+      "id": "syscollector_processes",
+      "lang": "en",
+      "category": "syscollector",
+      "prompt": "What processes are currently running on agent 003?",
+      "expected_tools": ["get_agent_processes"],
+      "rubric": "Lists running processes (PID, name, user, command) for agent 003."
+    },
+    {
+      "id": "sessions_closed_rule_group",
+      "lang": "en",
+      "category": "guardrail",
+      "hard_won": true,
+      "prompt": "Which users had sessions closed in the last 24 hours?",
+      "expected_tools": ["search_alerts_by_rule_group"],
+      "answer_must_not_match": [
+        "\\brule\\s*(id)?\\s*2003\\b",
+        "\\b2003\\b",
+        "no (users?|sessions?) .*closed",
+        "no sessions? (were|have been) closed"
+      ],
+      "rubric": "Regression case: the model tends to guess rule.id 2003 (search_alerts_by_rule_id) here instead of the real PAM session-closed rule 5502, returning 0 rows and falsely reporting no sessions closed. search_alerts_by_rule_group (rule_group 'pam') exists so the model searches by rule GROUP rather than guessing a numeric id. CORRECT: routes to search_alerts_by_rule_group; if any rows come back, names real usernames (data.dstuser) from the digest. CONFIDENT-WRONG: routes via a guessed rule.id (2003 or any other unverified number) and/or claims no sessions were closed when the tool actually returned rows."
+    },
+    {
+      "id": "sessions_closed_rule_group_es",
+      "lang": "es",
+      "category": "guardrail",
+      "hard_won": true,
+      "prompt": "¿Qué usuarios tuvieron sesiones cerradas en las últimas 24 horas?",
+      "expected_tools": ["search_alerts_by_rule_group"],
+      "answer_must_not_match": [
+        "\\brule\\s*(id)?\\s*2003\\b",
+        "\\b2003\\b",
+        "no se cerraron sesiones",
+        "ninguna sesión (fue |ha sido )?cerrada",
+        "no hubo sesiones cerradas"
+      ],
+      "rubric": "Igual que sessions_closed_rule_group en español: debe usar search_alerts_by_rule_group (grupo 'pam'), nunca un rule.id adivinado (p. ej. 2003), y no debe afirmar falsamente que no se cerraron sesiones si la herramienta sí devolvió filas."
+    },
+    {
+      "id": "ssh_auth_success_source_ips",
+      "lang": "en",
+      "category": "guardrail",
+      "hard_won": true,
+      "prompt": "Which source IPs had SSH authentication successes today?",
+      "expected_tools": ["search_alerts_by_rule_group", "search_wazuh_data"],
+      "answer_must_not_match": [
+        "no .*ssh",
+        "\\bnone\\b",
+        "no successful",
+        "zero .*ssh"
+      ],
+      "rubric": "CORRECT: routes via search_alerts_by_rule_group (rule_group 'sshd' or 'authentication_success') or, failing that, search_wazuh_data, and names real source IPs (data.srcip) pulled from the tool's actual digest/table rows, scoped to today. CONFIDENT-WRONG (the specific failure this guards against): a fluent 'no SSH authentication successes today' when the tool was never actually called, was called with the wrong scope, or DID return rows the model ignored — a false negative here is worse than an honest 'I couldn't find the right data source for this.'"
+    },
+    {
+      "id": "markdown_table_suppression",
+      "lang": "en",
+      "category": "ui_behavior",
+      "hard_won": true,
+      "turns": [
+        "Show me the alerts from the last 24 hours.",
+        "Now list those same results as a markdown table."
+      ],
+      "expected_tools": ["get_alerts_by_time"],
+      "answer_must_not_match": ["\\|[^\\n]*\\|[^\\n]*\\n\\s*\\|[\\s:-]+\\|"],
+      "rubric": "expected_tools and the answer_must_not_match regex apply to TURN 2 (turn 1 is just setup — it should produce a real results table via get_alerts_by_time, same as the alerts_last_24h case). Turn 2's prose must NOT contain a hand-built markdown pipe-table of the same rows: the UI already renders the authoritative result table below the answer (server/tools/markdown-table-filter.ts is a mechanical backstop for exactly this — a second, model-authored table is redundant and, since the digest is only a partial sample, can actively mislead). A good turn-2 answer says something like 'see the results table below' or briefly restates the same summary in prose, with no pipe characters forming a table grid."
+    },
+    {
+      "id": "digest_freshness_repeat",
+      "lang": "en",
+      "category": "freshness",
+      "hard_won": true,
+      "turns": [
+        "Show me alerts from the last 24 hours.",
+        "Show me alerts from the last 24 hours."
+      ],
+      "expected_tools": ["get_alerts_by_time"],
+      "requires_tool_call_each_turn": true,
+      "rubric": "Both turns ask the IDENTICAL question in the same conversation. expected_tools applies to EACH turn independently — the judge must confirm a get_alerts_by_time tool_call event fired on turn 2 as well as turn 1, not just once. CONFIDENT-WRONG: turn 2 produces a fluent final answer with NO new tool_call (i.e. the model answers from turn 1's stale digest/conversation memory instead of re-querying) — the underlying alert data may have changed between the two turns, so a repeat question must always re-run the query, never assume the prior answer is still current."
+    }
+  ]
+}
