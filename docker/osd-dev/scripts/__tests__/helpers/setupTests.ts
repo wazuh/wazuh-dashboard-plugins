@@ -25,7 +25,7 @@ export function saveProcessState(): SavedProcessState {
 export function restoreProcessState(state: SavedProcessState): void {
   try {
     process.chdir(state.cwd);
-  } catch {}
+  } catch { }
 
   // Safer env reset: clear current keys, then restore snapshot
   for (const key of Object.keys(process.env)) delete (process.env as any)[key];
@@ -71,6 +71,7 @@ export function clearRepoDerivedEnv(): void {
   delete process.env.REPO_MAIN;
   delete process.env.REPO_WAZUH_CORE;
   delete process.env.REPO_WAZUH_CHECK_UPDATES;
+  delete process.env.REPO_WAZUH_AI_ASSISTANT;
   delete process.env.COMPOSE_PROJECT_NAME;
 }
 
