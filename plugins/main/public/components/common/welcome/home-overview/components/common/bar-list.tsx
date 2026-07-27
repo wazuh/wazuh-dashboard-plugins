@@ -6,6 +6,7 @@ import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { EmptyState } from './empty-state';
 import { WIDGET_LOADING_MIN_HEIGHT } from './widget-group';
+import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 
 export interface BarListProps {
   items: TopItem[];
@@ -93,7 +94,7 @@ export const BarList: React.FC<BarListProps> = ({
                 )}
               </EuiText>
               <div style={{ padding: '6px 0' }}>
-                <EuiProgress value={item.count} max={max} size='m' />
+                <EuiProgress value={item.count} max={max} size='m' color={UI_COLOR_STATUS.info} />
               </div>
               <EuiText size='s' className='tab-num'>
                 <strong>{formatUINumber(item.count)}</strong>
