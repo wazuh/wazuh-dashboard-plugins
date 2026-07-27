@@ -8,8 +8,6 @@ import {
   WIDGET_LOADING_MIN_HEIGHT,
 } from '../common';
 import { AgentsByStatus } from './agents-by-status';
-import { TopOsTable } from './top-os-table';
-import { TopNetworkServicesTable } from './top-network-services-table';
 import { useInViewport } from '../../../../hooks';
 import {
   useAgentStatus,
@@ -24,7 +22,6 @@ import {
   getThreatHuntingUrl,
   getMitreUrl,
   getItHygieneUrl,
-  getMitreUrlTactic,
   getDiscoverFindingsBySeverityUrl,
 } from '../../utils/navigation';
 import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
@@ -139,7 +136,13 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
               data-test-subj='home-overview-top-os'
             >
-              {topOs.data && <TopOsTable items={topOs.data} />}
+              {topOs.data && (
+                <BarList
+                  items={topOs.data}
+                  emptyMessage='No operating systems found'
+                  data-test-subj='top-os'
+                />
+              )}
             </WidgetGroup>
           </EuiFlexItem>
           <EuiFlexItem>
@@ -159,7 +162,11 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               data-test-subj='home-overview-top-network-services'
             >
               {topServices.data && (
-                <TopNetworkServicesTable items={topServices.data} />
+                <BarList
+                  items={topServices.data}
+                  emptyMessage='No network services found'
+                  data-test-subj='top-network-services'
+                />
               )}
             </WidgetGroup>
           </EuiFlexItem>

@@ -5,12 +5,13 @@ import {
   WidgetGroup,
   StatTile,
   TabNumber,
+  ScoreGauge,
+  DualBarList,
   SectionHeader,
   WIDGET_LOADING_MIN_HEIGHT,
 } from '../common';
 import { ScaTiles } from './sca-tiles';
-import { ScaBenchmarksTable } from './sca-benchmarks-table';
-import { FimPlatformsTable } from './fim-platforms-table';
+import { FimTopFilesTable } from './fim-top-files-table';
 import { MalwareDetectionPanel } from './malware-detection-panel';
 import { useInViewport } from '../../../../hooks';
 import {
@@ -82,8 +83,25 @@ const EndpointSecuritySectionComponent: React.FC<
             {sca.data && (
               <>
                 <ScaTiles tiles={sca.data.tiles} />
-                <EuiSpacer size='s' />
-                <ScaBenchmarksTable items={sca.data.benchmarks} />
+                <EuiSpacer size='m' />
+                <ScoreGauge
+                  title='Overall score'
+                  score={sca.data.tiles.score}
+                  data-test-subj='sca-score-gauge'
+                />
+                <EuiSpacer size='m' />
+                <DualBarList
+                  title='Top 5 benchmarks'
+                  items={sca.data.benchmarks.map(benchmark => ({
+                    key: benchmark.name,
+                    label: benchmark.name,
+                    passed: benchmark.passed,
+                    failed: benchmark.failed,
+                    score: benchmark.score,
+                  }))}
+                  emptyMessage='No SCA benchmarks found'
+                  data-test-subj='sca-benchmarks'
+                />
               </>
             )}
           </WidgetGroup>
@@ -117,7 +135,7 @@ const EndpointSecuritySectionComponent: React.FC<
                   data-test-subj='fim-hero'
                 />
                 <EuiSpacer size='s' />
-                <FimPlatformsTable items={fim.data.platforms} />
+                <FimTopFilesTable items={fim.data.files} />
               </>
             )}
           </WidgetGroup>

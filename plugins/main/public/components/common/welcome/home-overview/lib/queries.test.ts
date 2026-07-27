@@ -6,8 +6,8 @@ import {
   buildVulnerabilitySeverityFiltersAgg,
   buildSCATilesAgg,
   buildSCATopBenchmarksAgg,
-  buildFIMTopPlatformsAgg,
-  buildVulnerabilityTopOsAgg,
+  buildFIMTopFilesAgg,
+  buildVulnerabilityTopPackagesAgg,
   buildCvesMatchedAgg,
   buildIocMatchesAgg,
   buildMalwareFilterAgg,
@@ -25,8 +25,8 @@ import {
   VULNERABILITY_SEVERITY_FIELD,
   SCA_CHECK_RESULT_FIELD,
   SCA_POLICY_NAME_FIELD,
-  FIM_PLATFORM_FIELD,
-  VULNERABILITY_OS_NAME_FIELD,
+  FIM_FILE_PATH_FIELD,
+  VULNERABILITY_PACKAGE_NAME_FIELD,
   VULNERABILITY_CVE_ID_FIELD,
   EVENT_DOC_ID_FIELD,
   THREAT_ENRICHMENTS_FIELD,
@@ -114,16 +114,16 @@ describe('query builders', () => {
     );
   });
 
-  it('builds the FIM top-platforms agg', () => {
-    expect(buildFIMTopPlatformsAgg(5)).toEqual({
-      fim_platforms: { terms: { field: FIM_PLATFORM_FIELD, size: 5 } },
+  it('builds the FIM top-modified-files agg', () => {
+    expect(buildFIMTopFilesAgg(5)).toEqual({
+      fim_top_files: { terms: { field: FIM_FILE_PATH_FIELD, size: 5 } },
     });
   });
 
-  it('builds the vulnerabilities-by-OS agg', () => {
-    expect(buildVulnerabilityTopOsAgg(5)).toEqual({
-      vulnerabilities_by_os: {
-        terms: { field: VULNERABILITY_OS_NAME_FIELD, size: 5 },
+  it('builds the vulnerabilities-by-package agg', () => {
+    expect(buildVulnerabilityTopPackagesAgg(5)).toEqual({
+      vulnerabilities_by_package: {
+        terms: { field: VULNERABILITY_PACKAGE_NAME_FIELD, size: 5 },
       },
     });
   });

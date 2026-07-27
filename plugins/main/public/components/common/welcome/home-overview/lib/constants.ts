@@ -17,8 +17,8 @@ export const AGG = {
   scaBenchmarks: 'sca_benchmarks',
   /** Nested check-result breakdown inside each `sca_benchmarks` bucket. */
   scaBenchmarkResult: 'result',
-  fimPlatforms: 'fim_platforms',
-  vulnerabilitiesByOs: 'vulnerabilities_by_os',
+  fimTopFiles: 'fim_top_files',
+  vulnerabilitiesByPackage: 'vulnerabilities_by_package',
   cvesMatched: 'cves_matched',
   /** Distinct-event IOC match count (hero), inside the findings `malware` filter. */
   iocMatches: 'ioc_matches',

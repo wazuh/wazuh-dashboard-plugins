@@ -34,7 +34,7 @@ jest.mock('./hooks/use-overview-data', () => ({
     status: 'available',
     data: {
       severity: { critical: 0, high: 0, medium: 0, low: 0 },
-      byOs: [],
+      byPackage: [],
       cvesMatched: 0,
     },
   })),

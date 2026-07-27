@@ -2,6 +2,8 @@ import React from 'react';
 import { EuiBasicTable, EuiBasicTableColumn } from '@elastic/eui';
 import { TopItem } from '../../interfaces/types';
 import { TabNumber } from './tab-number';
+import { EmptyState } from './empty-state';
+import { WIDGET_LOADING_MIN_HEIGHT } from './widget-group';
 
 export interface TopNTableProps {
   items: TopItem[];
@@ -56,7 +58,14 @@ export const TopNTable: React.FC<TopNTableProps> = ({
         items={items}
         columns={columns}
         tableLayout='fixed'
-        noItemsMessage={noItemsMessage}
+        noItemsMessage={
+          noItemsMessage ? (
+            <EmptyState
+              message={noItemsMessage}
+              minHeight={WIDGET_LOADING_MIN_HEIGHT.list}
+            />
+          ) : undefined
+        }
         data-test-subj={rest['data-test-subj']}
       />
     </div>

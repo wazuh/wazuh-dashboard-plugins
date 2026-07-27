@@ -17,10 +17,7 @@ import {
   PatternDataSourceFilterManager,
   tFilter,
 } from '../../../data-source';
-import {
-  FINDING_SEVERITY_FIELD,
-  MITRE_TECHNIQUE_NAME_FIELD,
-} from '../lib/fields';
+import { FINDING_SEVERITY_FIELD } from '../lib/fields';
 import { SeverityBand } from '../interfaces/types';
 
 /** Navigation helpers, kept in one module so sections depend on one boundary. */
@@ -48,8 +45,6 @@ export const getDeployAgentUrl = (): string =>
   });
 
 export const getThreatHuntingUrl = () => getUrlForApp(threatHunting.id);
-
-const DISCOVER_APP_ID = 'data-explorer';
 
 /**
  * Open Discover filtered to a findings severity band. `IS` on `wazuh.rule.level`
@@ -139,19 +134,3 @@ const getMitreIntelligenceUrl = (
 /** Top-tactic labels deep-link into the Intelligence resource for that tactic. */
 export const getMitreUrlTactic = (externalId?: string): string =>
   getMitreIntelligenceUrl('tactics', externalId);
-
-/**
- * Open the MITRE ATT&CK Framework tab filtered to a technique by name; falls
- * back to the module home when the findings index pattern isn't known yet. The
- * Framework tab (`tabView=inventory`) reads the `_g` global filter through the
- * same data-source/filter-manager the dashboard uses.
- */
-export const getMitreTechniqueUrl = (
-  techniqueName?: string,
-  indexPatternId?: string,
-): string => {
-  if (!techniqueName || !indexPatternId) {
-    return getUrlForApp(mitreAttack.id);
-  }
-  return getMitreIntelligenceUrl('techniques', techniqueName);
-};

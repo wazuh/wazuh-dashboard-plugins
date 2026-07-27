@@ -60,7 +60,8 @@ export interface ScaOverview {
 export interface FimOverview {
   /** Fleet-wide files & registry objects baselined. */
   total?: number;
-  platforms: TopItem[];
+  /** Top 5 most recently modified files (`file.path`). */
+  files: TopItem[];
 }
 
 /**
@@ -76,7 +77,8 @@ export interface ThreatIntelEnrichments {
 
 export interface VulnerabilityOverview {
   severity: SeverityCounts;
-  byOs: TopItem[];
+  /** Top 5 vulnerable package names (`package.name`). */
+  byPackage: TopItem[];
   /** Distinct CVE count (cardinality). */
   cvesMatched?: number;
 }

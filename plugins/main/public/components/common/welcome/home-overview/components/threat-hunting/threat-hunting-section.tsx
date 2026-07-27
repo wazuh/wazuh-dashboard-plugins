@@ -1,5 +1,11 @@
 import React from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiLink, EuiSpacer } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiLink,
+  EuiSpacer,
+  EuiText,
+} from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -7,20 +13,19 @@ import {
   WidgetGroup,
   StatTile,
   TabNumber,
-  FindingSeverityTiles,
+  BarList,
+  SeverityDistributionBar,
   SectionHeader,
+  formatValueSafely,
   WIDGET_LOADING_MIN_HEIGHT,
 } from '../common';
 import { TopRulesTable } from './top-rules-table';
-import { TopTechniquesTable } from './top-techniques-table';
-import { VulnerabilitiesByOsTable } from './vulnerabilities-by-os-table';
 import {
   useFindingsOverview,
   useVulnerabilityOverview,
 } from '../../hooks/use-overview-data';
 import {
   getMitreUrl,
-  getMitreTechniqueUrl,
   getThreatHuntingUrl,
   getVulnerabilityDetectionUrl,
 } from '../../utils/navigation';
@@ -43,6 +48,43 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
         description='Hunt for threats, map activity to MITRE ATT&CK, and detect known vulnerabilities.'
       />
       <EuiFlexGroup wrap responsive={false}>
+        <EuiFlexItem>
+          <WidgetGroup
+            status={findings.status}
+            errorLabel={findings.error?.message}
+            showManageIndexPatternsLink={
+              findings.error?.kind === 'index-pattern-missing'
+            }
+            isPermissionDenied={findings.error?.kind === 'permission-denied'}
+            title={
+              <RedirectAppLinks application={getCore().application}>
+                <EuiLink href={getMitreUrl()}>MITRE ATT&amp;CK</EuiLink>
+              </RedirectAppLinks>
+            }
+            caption='Last 24 hours'
+            loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
+            data-test-subj='home-overview-techniques'
+          >
+            {findings.data && (
+              <>
+                <StatTile
+                  textAlign='center'
+                  reverse
+                  value={<TabNumber value={findings.data.techniquesCount} />}
+                  label='Techniques observed'
+                  data-test-subj='techniques-hero'
+                />
+                <EuiSpacer size='s' />
+                <BarList
+                  title='Top 5 techniques'
+                  items={findings.data.topTechniques}
+                  emptyMessage='No techniques observed'
+                  data-test-subj='top-techniques'
+                />
+              </>
+            )}
+          </WidgetGroup>
+        </EuiFlexItem>
         <EuiFlexItem>
           <WidgetGroup
             status={findings.status}
@@ -77,45 +119,6 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
         </EuiFlexItem>
         <EuiFlexItem>
           <WidgetGroup
-            status={findings.status}
-            errorLabel={findings.error?.message}
-            showManageIndexPatternsLink={
-              findings.error?.kind === 'index-pattern-missing'
-            }
-            isPermissionDenied={findings.error?.kind === 'permission-denied'}
-            title={
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getMitreUrl()}>MITRE ATT&amp;CK</EuiLink>
-              </RedirectAppLinks>
-            }
-            caption='Last 24 hours'
-            loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
-            data-test-subj='home-overview-techniques'
-          >
-            {findings.data && (
-              <>
-                <StatTile
-                  textAlign='center'
-                  reverse
-                  value={<TabNumber value={findings.data.techniquesCount} />}
-                  label='Techniques observed'
-                  data-test-subj='techniques-hero'
-                />
-                <EuiSpacer size='s' />
-                <RedirectAppLinks application={getCore().application}>
-                  <TopTechniquesTable
-                    items={findings.data.topTechniques}
-                    onSelect={item =>
-                      getMitreTechniqueUrl(item.id, findings.indexPatternId)
-                    }
-                  />
-                </RedirectAppLinks>
-              </>
-            )}
-          </WidgetGroup>
-        </EuiFlexItem>
-        <EuiFlexItem>
-          <WidgetGroup
             status={vulnerabilities.status}
             errorLabel={vulnerabilities.error?.message}
             showManageIndexPatternsLink={
@@ -137,12 +140,30 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
           >
             {vulnerabilities.data && (
               <>
-                <FindingSeverityTiles
+                <SeverityDistributionBar
                   counts={vulnerabilities.data.severity}
+                  headline={
+                    <EuiText size='s'>
+                      <strong className='tab-num'>
+                        {formatValueSafely(
+                          Object.values(vulnerabilities.data.severity).reduce(
+                            (sum: number, count) => sum + (count ?? 0),
+                            0,
+                          ),
+                        )}
+                      </strong>{' '}
+                      open vulnerabilities
+                    </EuiText>
+                  }
                   testSubjPrefix='vulnerability-severity'
                 />
                 <EuiSpacer size='s' />
-                <VulnerabilitiesByOsTable items={vulnerabilities.data.byOs} />
+                <BarList
+                  title='Top 5 package name'
+                  items={vulnerabilities.data.byPackage}
+                  emptyMessage='No vulnerabilities found'
+                  data-test-subj='vulnerabilities-by-package'
+                />
               </>
             )}
           </WidgetGroup>

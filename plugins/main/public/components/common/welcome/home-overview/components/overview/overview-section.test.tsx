@@ -80,14 +80,16 @@ beforeEach(() => {
 
 describe('OverviewSection', () => {
   it('renders every OVERVIEW widget when all groups are available', () => {
-    render(<OverviewSection findings={findingsAvailable} />);
+    const { container } = render(
+      <OverviewSection findings={findingsAvailable} />,
+    );
     expect(screen.getByText('Agents by status')).toBeInTheDocument();
     expect(screen.getByText('Findings')).toBeInTheDocument();
     expect(screen.getByText('MITRE ATT&CK top tactics')).toBeInTheDocument();
     expect(screen.getByText('Top 5 operating systems')).toBeInTheDocument();
     expect(screen.getByText('Top 5 network services')).toBeInTheDocument();
     // data flowed through: active hero + a severity value + a tactic + a row
-    expect(screen.getByText('agents active')).toBeInTheDocument();
+    expect(container.textContent).toContain('agents active');
     expect(screen.getByText('35,682')).toBeInTheDocument();
     expect(screen.getByText('Initial Access')).toBeInTheDocument();
     expect(screen.getAllByText('svchost.exe').length).toBeGreaterThan(0);
@@ -102,7 +104,7 @@ describe('OverviewSection', () => {
       '[data-test-subj="home-overview-top-network-services"]',
     );
     expect(panel).toBeInTheDocument();
-    // a table panel shows a neutral placeholder when its data source is absent
+    // a bar-list panel shows a neutral placeholder when its data source is absent
     expect(panel?.textContent).toContain('Not available');
     expect(screen.getByText('Top 5 operating systems')).toBeInTheDocument();
   });

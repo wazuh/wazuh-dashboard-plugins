@@ -28,9 +28,11 @@ export const HOST_OS_NAME_FIELD = 'host.os.name';
 export const PROCESS_NAME_FIELD = 'process.name';
 export const SCA_CHECK_RESULT_FIELD = 'check.result';
 export const SCA_POLICY_NAME_FIELD = 'policy.name';
-export const FIM_PLATFORM_FIELD = 'wazuh.agent.host.os.platform';
+/** Modified-file path on a FIM state document, for the "Top 5 modified files" bars. */
+export const FIM_FILE_PATH_FIELD = 'file.path';
 export const VULNERABILITY_SEVERITY_FIELD = 'vulnerability.severity';
-export const VULNERABILITY_OS_NAME_FIELD = 'host.os.name';
+/** Package name on a vulnerability state document, for "Top 5 package name". */
+export const VULNERABILITY_PACKAGE_NAME_FIELD = 'package.name';
 /** CVE identifier field; distinct from doc count since one CVE can match many findings/assets. */
 export const VULNERABILITY_CVE_ID_FIELD = 'vulnerability.id';
 /**

@@ -3,7 +3,7 @@ import { CheckResult } from '../../../../overview/sca/utils/constants';
 import { AGG, SCA_RESULT_BUCKET, TOP_N } from './constants';
 import {
   EVENT_DOC_ID_FIELD,
-  FIM_PLATFORM_FIELD,
+  FIM_FILE_PATH_FIELD,
   FINDING_SEVERITY_FIELD,
   MITRE_TACTIC_NAME_FIELD,
   MITRE_TACTIC_ID_FIELD,
@@ -17,7 +17,7 @@ import {
   THREAT_ENRICHMENTS_FIELD,
   THREAT_INTEL_TYPE_FIELD,
   VULNERABILITY_CVE_ID_FIELD,
-  VULNERABILITY_OS_NAME_FIELD,
+  VULNERABILITY_PACKAGE_NAME_FIELD,
   VULNERABILITY_SEVERITY_FIELD,
   VULNERABILITY_SEVERITY_VALUES,
 } from './fields';
@@ -148,14 +148,16 @@ export function buildSCATopBenchmarksAgg(size = TOP_N) {
   };
 }
 
-export function buildFIMTopPlatformsAgg(size = TOP_N) {
-  return buildTopTermsAgg(AGG.fimPlatforms, FIM_PLATFORM_FIELD, size);
+/** Top 5 modified files (`file.path`) for the FIM ranked-bar list. */
+export function buildFIMTopFilesAgg(size = TOP_N) {
+  return buildTopTermsAgg(AGG.fimTopFiles, FIM_FILE_PATH_FIELD, size);
 }
 
-export function buildVulnerabilityTopOsAgg(size = TOP_N) {
+/** Top 5 vulnerable package names for the Vulnerability Detection ranked-bar list. */
+export function buildVulnerabilityTopPackagesAgg(size = TOP_N) {
   return buildTopTermsAgg(
-    AGG.vulnerabilitiesByOs,
-    VULNERABILITY_OS_NAME_FIELD,
+    AGG.vulnerabilitiesByPackage,
+    VULNERABILITY_PACKAGE_NAME_FIELD,
     size,
   );
 }

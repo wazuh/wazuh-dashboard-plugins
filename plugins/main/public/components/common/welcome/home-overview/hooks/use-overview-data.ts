@@ -30,14 +30,14 @@ import { WzRequest } from '../../../../../react-services';
 import {
   buildCvesMatchedAgg,
   buildFindingsOverviewAggs,
-  buildFIMTopPlatformsAgg,
+  buildFIMTopFilesAgg,
   buildMalwareFilterAgg,
   buildSCATilesAgg,
   buildSCATopBenchmarksAgg,
   buildThreatIntelFeedByTypeAgg,
   buildTopTermsAgg,
   buildVulnerabilitySeverityFiltersAgg,
-  buildVulnerabilityTopOsAgg,
+  buildVulnerabilityTopPackagesAgg,
 } from '../lib/queries';
 import {
   HOST_OS_NAME_FIELD,
@@ -343,12 +343,12 @@ export function useFIMOverview(enabled: boolean): DataGroupResult<FimOverview> {
     label: 'File Integrity Monitoring',
     fetch: async fetchData => {
       const response = await fetchData({
-        aggs: buildFIMTopPlatformsAgg(),
+        aggs: buildFIMTopFilesAgg(),
         pagination: NO_HITS,
       });
       return {
         total: mapDocCount(response),
-        platforms: mapTopBuckets(response?.aggregations, AGG.fimPlatforms),
+        files: mapTopBuckets(response?.aggregations, AGG.fimTopFiles),
       };
     },
   });
@@ -406,7 +406,7 @@ export function useVulnerabilityOverview(
       const response = await fetchData({
         aggs: {
           ...buildVulnerabilitySeverityFiltersAgg(),
-          ...buildVulnerabilityTopOsAgg(),
+          ...buildVulnerabilityTopPackagesAgg(),
           ...buildCvesMatchedAgg(),
         },
         pagination: NO_HITS,
@@ -417,7 +417,10 @@ export function useVulnerabilityOverview(
           AGG.vulnerabilitySeverity,
           VULNERABILITY_SEVERITY_BANDS,
         ),
-        byOs: mapTopBuckets(response?.aggregations, AGG.vulnerabilitiesByOs),
+        byPackage: mapTopBuckets(
+          response?.aggregations,
+          AGG.vulnerabilitiesByPackage,
+        ),
         cvesMatched: mapCardinality(response?.aggregations, AGG.cvesMatched),
       };
     },

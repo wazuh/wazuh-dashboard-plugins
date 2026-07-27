@@ -43,7 +43,7 @@ beforeEach(() => {
   });
   asMock(useFIMOverview).mockReturnValue({
     status: 'available',
-    data: { total: 38822, platforms: [{ key: 'Ubuntu', count: 8435 }] },
+    data: { total: 38822, files: [{ key: '/etc/passwd', count: 8435 }] },
   });
   asMock(useInViewport).mockReturnValue([{ current: null }, true]);
 });
@@ -77,15 +77,17 @@ describe('EndpointSecuritySection', () => {
     expect(screen.getByText('Configuration Assessment')).toBeInTheDocument();
     expect(screen.getByText('File Integrity Monitoring')).toBeInTheDocument();
     expect(screen.getByText('Malware Detection')).toBeInTheDocument();
-    // "Passed" also appears as a benchmarks-table column header, so scope to the tile.
     expect(
       document.querySelector('[data-test-subj="sca-tile-passed"]'),
     ).toBeInTheDocument();
-    expect(screen.getAllByText('Ubuntu').length).toBeGreaterThan(0);
+    expect(
+      screen.getByText('CIS Ubuntu Linux 24.04 LTS v1.0.0'),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText('/etc/passwd').length).toBeGreaterThan(0);
     expect(
       screen.getByText('Files & registry objects baselined fleet-wide'),
     ).toBeInTheDocument();
-    expect(screen.getByText('IOC matches, last 24 hours')).toBeInTheDocument();
+    expect(screen.getByText('IOC matches')).toBeInTheDocument();
     expect(screen.getAllByText('Domains').length).toBeGreaterThan(0);
   });
 

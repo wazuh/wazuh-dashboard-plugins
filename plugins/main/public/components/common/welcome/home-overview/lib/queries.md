@@ -173,17 +173,18 @@ SCA scan (`welcome/components/sca_scan/sca_scan.tsx`).
 
 ## 5. File Integrity Monitoring — `wazuh-states-fim*`, current
 
-`buildFIMTopPlatformsAgg()`. The `wazuh-states-fim*` pattern spans files +
+`buildFIMTopFilesAgg()`. The `wazuh-states-fim*` pattern spans files +
 registry keys + registry values.
 
-**Represents:** total baselined objects (`hits.total`) and the top 5 platforms.
+**Represents:** total baselined objects (`hits.total`) and the top 5 modified
+files by path.
 
 ```jsonc
 {
   "size": 0, // total comes from hits.total (mapDocCount)
   "aggs": {
-    "fim_platforms": {
-      "terms": { "field": "wazuh.agent.host.os.platform", "size": 5 }
+    "fim_top_files": {
+      "terms": { "field": "file.path", "size": 5 }
     }
   }
 }
@@ -193,12 +194,13 @@ DQL: `*`.
 
 ## 6. Vulnerabilities — `wazuh-states-vulnerabilities*`, current
 
-`buildVulnerabilitySeverityFiltersAgg()` + `buildVulnerabilityTopOsAgg()` +
+`buildVulnerabilitySeverityFiltersAgg()` + `buildVulnerabilityTopPackagesAgg()` +
 `buildCvesMatchedAgg()`.
 
-**Represents:** vulnerability severity tiles, top affected OS, and the distinct
-"CVEs matched" count. Note `vulnerability.severity` values are **Capitalized**
-(unlike the lowercase finding bands) and there is **no** informational band.
+**Represents:** vulnerability severity distribution, top affected package
+names, and the distinct "CVEs matched" count. Note `vulnerability.severity`
+values are **Capitalized** (unlike the lowercase finding bands) and there is
+**no** informational band.
 
 ```jsonc
 {
@@ -216,8 +218,8 @@ DQL: `*`.
         }
       }
     },
-    "vulnerabilities_by_os": {
-      "terms": { "field": "host.os.name", "size": 5 }
+    "vulnerabilities_by_package": {
+      "terms": { "field": "package.name", "size": 5 }
     },
     // distinct CVEs, not the match-document count (one CVE matches many assets)
     "cves_matched": { "cardinality": { "field": "vulnerability.id" } }
