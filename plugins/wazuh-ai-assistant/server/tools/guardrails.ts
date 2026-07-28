@@ -6,6 +6,8 @@
  * depth) or the future free-DSL escape hatch (its only line of defense).
  */
 
+import { WAZUH_FIELD, SEVERITY_LEVELS } from '../../common/wazuh-fields';
+
 export type GuardrailCheck = { ok: true } | { ok: false; reason: string };
 
 /**
@@ -26,8 +28,9 @@ export type GuardrailCheck = { ok: true } | { ok: false; reason: string };
  *
  * Callers stay responsible for any NaN guard and for truncation; this only does the clamp.
  *
- * Exported so `common.ts`'s `clampLimit` can share it. This file has no imports of its own, which
- * is what lets its unit tests run without the rest of the plugin; sharing this one primitive as an
+ * Exported so `common.ts`'s `clampLimit` can share it. This file's only import is the shared,
+ * dependency-free `common/wazuh-fields.ts` field-vocabulary module (issue #8802), so its unit
+ * tests still run without pulling in the rest of the plugin; sharing this one primitive as an
  * export keeps that property intact.
  */
 export function clampInt(value: number, floor: number, cap: number): number {
@@ -187,39 +190,39 @@ function normalizeMustToFilter(node: unknown): unknown {
   return out;
 }
 
-/** Low-cardinality fields vetted safe for terms/composite/cardinality/significant_terms aggs. */
+/**
+ * Low-cardinality fields vetted safe for terms/composite/cardinality/significant_terms aggs.
+ *
+ * Wazuh 5.0 (issue #8802): every `rule.*`/`agent.*` entry lives under the `wazuh.*` namespace
+ * (see `common/wazuh-fields.ts`'s module doc comment for the full rationale). Four entries that
+ * were on this list under the 4.x/bare vocabulary have NO 5.0 equivalent and are deliberately
+ * DROPPED rather than renamed (confirmed zero matches across every 5.0 known-fields template —
+ * see `LEGACY_4X_FIELDS` in `common/wazuh-fields.ts`):
+ * - `rule.groups` — replaced by `rule.category` (single) + `rule.tags` (array).
+ * - `rule.mitre.id` / `rule.mitre.technique` (bare, non-leaf) — moved to the leaf-typed
+ *   `rule.mitre.technique.{id,name}`, which remain on this list under their `wazuh.*` names.
+ * - `agent.os.name` — the OS field moved to ECS `host.os.name` in the 5.0 catalog tools
+ *   (see `search-alerts-by-os.ts`); nothing in this plugin aggregates on the agent's OS anymore.
+ */
 const AGG_FIELD_ALLOWLIST = new Set([
-  'rule.id',
-  'rule.level',
-  'rule.groups',
-  'rule.description',
-  'agent.id',
-  'agent.name',
+  WAZUH_FIELD.RULE_ID,
+  WAZUH_FIELD.RULE_LEVEL,
+  WAZUH_FIELD.RULE_DESCRIPTION,
+  WAZUH_FIELD.AGENT_ID,
+  WAZUH_FIELD.AGENT_NAME,
   'vulnerability.severity',
-  'agent.os.name',
-  // Wazuh 5.0 findings-v5 agg fields: rule.groups has no 5.0 equivalent
-  // (replaced by rule.category (single) + rule.tags (array)); the PCI summary aggregates the
-  // per-requirement compliance tag. All keyword, low-cardinality (finite rule taxonomy /
-  // compliance requirement list). rule.mitre.technique moved to rule.mitre.technique.{id,name}.
-  'rule.category',
-  'rule.tags',
-  'rule.compliance.pci_dss',
-  'rule.mitre.technique.id',
-  'rule.mitre.technique.name',
-  'rule.mitre.tactic.name',
-  // get_mitre_summary: MITRE ATT&CK technique id/name, both mapped `keyword` and low-cardinality
-  // (finite technique catalog) — confirmed in wazuh-dashboard-plugins' known-fields cache
-  // (plugins/main/public/utils/known-fields/alerts.json, rule.mitre.id and rule.mitre.technique
-  // entries both `esTypes: ["keyword"]`).
-  'rule.mitre.id',
-  'rule.mitre.technique',
-  // Wazuh 5.0: SCA policy summary is now DERIVED via a terms agg on
-  // `policy.id` (keyword, low-cardinality — a handful of benchmark policies per agent; mapping
-  // live-verified against wazuh-states-sca on 5.0.0-beta3). `wazuh.agent.id`/`wazuh.agent.name`
-  // are the 5.0 ECS envelope duplicates of the 4.14 agent.id/agent.name entries above.
+  // Wazuh 5.0 findings-v5 agg fields, all keyword/low-cardinality (finite rule taxonomy /
+  // compliance requirement list / MITRE technique catalog).
+  WAZUH_FIELD.RULE_CATEGORY,
+  WAZUH_FIELD.RULE_TAGS,
+  WAZUH_FIELD.RULE_COMPLIANCE_PCI_DSS,
+  WAZUH_FIELD.RULE_MITRE_TECHNIQUE_ID,
+  WAZUH_FIELD.RULE_MITRE_TECHNIQUE_NAME,
+  WAZUH_FIELD.RULE_MITRE_TACTIC_NAME,
+  // Wazuh 5.0: SCA policy summary is DERIVED via a terms agg on `policy.id` (keyword,
+  // low-cardinality — a handful of benchmark policies per agent; mapping live-verified against
+  // wazuh-states-sca on 5.0.0-beta3).
   'policy.id',
-  'wazuh.agent.id',
-  'wazuh.agent.name',
 ]);
 
 const TIME_FIELD_RE = /(^|\.)(timestamp|@timestamp)$/;
@@ -279,6 +282,64 @@ const VULN_FIELD_CLAUSE_KEYS = new Set([
   'prefix',
 ]);
 
+/**
+ * Fields that were re-typed from a numeric Wazuh 4.x `long`/`integer` to a Wazuh 5.0 keyword
+ * (string) severity vocabulary (issue #8802, proposal open question O1). `wazuh.rule.level` is
+ * now one of `SEVERITY_LEVELS` (`informational`/`low`/`medium`/`high`/`critical`) rather than a
+ * 0-15 integer. A numeric `range` against a keyword field does not error in OpenSearch — it
+ * silently falls back to lexicographic string comparison ("informational" < "low" < "medium" by
+ * dictionary order, NOT by severity), so it must be actively REJECTED rather than left to produce
+ * a wrong-but-successful answer. `term`/`terms` against one of the five string values is the
+ * correct replacement and is unaffected by this check.
+ */
+const KEYWORD_RANGE_REJECT_FIELDS = new Set<string>([WAZUH_FIELD.RULE_LEVEL]);
+
+/**
+ * True when a `range` clause anywhere in the tree targets one of `KEYWORD_RANGE_REJECT_FIELDS`
+ * with at least one numeric bound. A non-numeric bound (e.g. a caller mistakenly trying
+ * `{gte: "low"}`) is not this check's concern — that is still nonsensical on a `range` query
+ * against a keyword field, but it does not silently produce a plausible-looking wrong answer the
+ * way a numeric bound does, so it is left alone here.
+ */
+function findNumericRangeOnKeywordField(
+  body: Record<string, unknown>,
+): string | undefined {
+  let reason: string | undefined;
+  walk(body, (key, value) => {
+    if (reason || key !== 'range' || !value || typeof value !== 'object') {
+      return;
+    }
+    for (const [field, rangeValue] of Object.entries(
+      value as Record<string, unknown>,
+    )) {
+      if (
+        !KEYWORD_RANGE_REJECT_FIELDS.has(field) ||
+        !rangeValue ||
+        typeof rangeValue !== 'object'
+      ) {
+        continue;
+      }
+      const bounds = rangeValue as Record<string, unknown>;
+      const hasNumericBound = [
+        bounds.gte,
+        bounds.gt,
+        bounds.lte,
+        bounds.lt,
+      ].some(bound => typeof bound === 'number');
+      if (hasNumericBound) {
+        reason =
+          `Range on "${field}" is not allowed: it is a keyword field holding one of the string ` +
+          `severity levels (${SEVERITY_LEVELS.join(
+            '/',
+          )}), not a number. Use "term" or "terms" ` +
+          `against one or more of those string values instead.`;
+        return;
+      }
+    }
+  });
+  return reason;
+}
+
 const VULN_FIELD_ON_ALERTS_REASON =
   'Vulnerability data is not in the findings/events index. Use the vulnerability tools ' +
   '(get_vulnerabilities, get_critical_vulnerabilities, ' +
@@ -330,6 +391,15 @@ export function lintDsl(
 
   if (findKey(body, 'regexp')) {
     return { ok: false, reason: '"regexp" queries are not allowed.' };
+  }
+
+  // Same "unfixable by editing the range" class as the structural bans above (issue #8802): a
+  // numeric range against a re-typed keyword field does not error, it silently does the WRONG
+  // thing (lexicographic string comparison), so it must be caught before any range-shaped check
+  // below that would otherwise treat this body as a well-formed, in-range query.
+  const keywordRangeReason = findNumericRangeOnKeywordField(body);
+  if (keywordRangeReason) {
+    return { ok: false, reason: keywordRangeReason };
   }
 
   // Same "unfixable by editing the range" reasoning as the structural bans above, so this too
