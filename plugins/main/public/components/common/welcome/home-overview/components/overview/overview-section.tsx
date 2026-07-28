@@ -25,6 +25,7 @@ import {
   getDiscoverFindingsBySeverityUrl,
 } from '../../utils/navigation';
 import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
+import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 
 export interface OverviewSectionProps {
   /** Owned by the page shell so Threat Hunting reuses the same on-mount search. */
@@ -114,6 +115,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             items={findings.data.topTactics}
             emptyMessage='No MITRE ATT&CK tactics observed'
             data-test-subj='mitre-top-tactics'
+            barColor={UI_COLOR_STATUS.success}
           />
         )}
       </WidgetGroup>

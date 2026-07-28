@@ -15,6 +15,7 @@ export interface BarListProps {
   getHref?: (item: TopItem) => string | undefined;
   onSelect?: (item: TopItem) => void;
   emptyMessage?: React.ReactNode;
+  barColor?: string;
   ['data-test-subj']?: string;
 }
 
@@ -24,6 +25,7 @@ export const BarList: React.FC<BarListProps> = ({
   getHref,
   onSelect,
   emptyMessage,
+  barColor = UI_COLOR_STATUS.info,
   ...rest
 }) => {
   const max = Math.max(1, ...items.map(item => item.count));
@@ -94,7 +96,7 @@ export const BarList: React.FC<BarListProps> = ({
                 )}
               </EuiText>
               <div style={{ padding: '6px 0' }}>
-                <EuiProgress value={item.count} max={max} size='m' color={UI_COLOR_STATUS.info} />
+                <EuiProgress value={item.count} max={max} size='m' color={barColor} />
               </div>
               <EuiText size='s' className='tab-num'>
                 <strong>{formatUINumber(item.count)}</strong>
