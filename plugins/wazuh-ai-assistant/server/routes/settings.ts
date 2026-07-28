@@ -22,6 +22,7 @@ import { getProviderAdapter } from '../providers/registry';
 import { assertProviderUrlAllowed } from '../providers/url-guard';
 import { AssistantSettingsAttributes } from '../saved_objects/assistant-settings';
 import { FIELD_POLICY_DEFAULTS } from '../tools/privacy';
+import { normalizeFieldPolicy } from '../tools/field-policy-normalizer';
 import { getApiKeyCipher, getSavedObjectsStart } from '../plugin-services';
 import { isEncrypted, isLegacyV1Encrypted } from '../crypto/api-key-cipher';
 import { resolveApiHostId } from '../tools/api-host';
@@ -833,12 +834,22 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       const client = assistantSettingsClient(request);
       // Ensures the object exists (first-ever PUT with no prior GET) before updating it.
       await getOrCreateAssistantSettings(request);
+      // Write-time hardening (issue #8802, Slice D): a browser tab that loaded the Settings page
+      // BEFORE the 5.0 field-policy migration ran (a GET -> edit -> PUT round trip) would
+      // otherwise PUT an old-vocabulary `fieldPolicy` array straight back over an already-migrated
+      // document. Normalizing here — the same pure normalizer the saved-object migration uses — is
+      // additive, not a substitute for that migration: it closes this one stale-client write path,
+      // one call per settings save.
+      const body = {
+        ...request.body,
+        fieldPolicy: normalizeFieldPolicy(request.body.fieldPolicy),
+      };
       await client.update<AssistantSettingsAttributes>(
         ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE,
         ASSISTANT_SETTINGS_ID,
-        request.body,
+        body,
       );
-      return response.ok({ body: request.body });
+      return response.ok({ body });
     },
   );
 }

@@ -1,4 +1,5 @@
 import { Digest } from './digest';
+import { WAZUH_FIELD } from '../../common/wazuh-fields';
 
 /**
  * Privacy mode: reversible pseudonymization at
@@ -22,45 +23,15 @@ export interface FieldPolicyEntry {
 }
 
 /**
- * Curated defaults. `full_log` is 'never' (Never-send: stripped from the digest entirely);
- * everything else here is 'anonymize'. `GeoLocation.*` uses the trailing `.*` prefix-match
- * convention (matches "GeoLocation" itself or any "GeoLocation.<subfield>").
- *
- * `data.username` is deliberately singular. A plural `data.usernames` variant could not be
- * confirmed against the wazuh-dashboard-plugins known-fields cache, and inventing a field name
- * that does not exist would add a policy entry that silently never matches.
+ * Curated defaults, `wazuh.*` field vocabulary (issue #8802, Slice D). `full_log` (see the
+ * LEGACY_4X block below) is the only 'never' entry; everything else live is 'anonymize' or a
+ * reviewed 'allow'. `GeoLocation.*` (legacy) uses the trailing `.*` prefix-match convention
+ * (matches "GeoLocation" itself or any "GeoLocation.<subfield>").
  */
 export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
-  { field: 'agent.name', action: 'anonymize' },
-  { field: 'agent.ip', action: 'anonymize' },
-  // Wazuh 5.0 ECS rename: the states/inventory families carry the
-  // agent identity under `wazuh.agent.*`. The retargeted vulnerability tools' digests emit
-  // `wazuh.agent.name`; keep the bare `agent.*` entries above too, since alert tools not yet moved
-  // off wazuh-alerts-* still emit those during the transition.
-  { field: 'wazuh.agent.name', action: 'anonymize', kind: 'HOST' },
-  { field: 'wazuh.agent.id', action: 'allow' },
-  { field: 'data.srcip', action: 'anonymize' },
-  { field: 'data.dstip', action: 'anonymize' },
-  { field: 'data.srcuser', action: 'anonymize' },
-  { field: 'data.dstuser', action: 'anonymize' },
-  { field: 'data.username', action: 'anonymize' },
-  { field: 'predecoder.hostname', action: 'anonymize' },
-  { field: 'GeoLocation.*', action: 'anonymize' },
-  { field: 'data.url', action: 'anonymize' },
-  { field: 'full_log', action: 'never' },
-  // Every field the row/digest widening (server/tools/catalog/common.ts's
-  // ALERT_INVESTIGATION_ROW_FIELDS/ALERT_DIGEST_EXTRA_COLUMNS) exposes to the model must be
-  // classified here.
-  // `data.srcip`/`data.srcuser`/`data.dstuser` are already covered above (anonymize, kind inferred
-  // as IP/USER from the field name). `data.command` can embed hostnames/paths/usernames — VAL (not
-  // USER/HOST) since it is free-text shell input, not a single identifier. `rule.groups`,
-  // `rule.mitre.id`, and `predecoder.program_name` are curated taxonomy/decoder fields, not
-  // analyst-supplied data — explicit 'allow' entries so a future audit sees them as reviewed, not
-  // merely unlisted.
-  { field: 'data.command', action: 'anonymize', kind: 'VAL' },
-  { field: 'rule.groups', action: 'allow' },
-  { field: 'rule.mitre.id', action: 'allow' },
-  { field: 'predecoder.program_name', action: 'allow' },
+  { field: WAZUH_FIELD.AGENT_NAME, action: 'anonymize', kind: 'HOST' },
+  { field: WAZUH_FIELD.AGENT_IP, action: 'anonymize', kind: 'IP' },
+  { field: WAZUH_FIELD.AGENT_ID, action: 'allow' },
   // Manager-API tools carry bare, generic digest field names ("name", "ip") that must be scoped
   // per tool: "name" is an agent hostname here but a package name in get_agent_packages (which
   // must stay readable for the model to be useful).
@@ -73,9 +44,8 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // (get_agent_os/hostname, get_agent_ports/local.ip + remote.ip, get_agent_processes/euser +
   // ruser, get_sca_checks/*) were replaced by the BARE entries below — the ECS paths are
   // unambiguous across tools (host.hostname is always a hostname, source.ip always an IP), so
-  // tool scoping is no longer needed, and the same entries will cover the alert tools once they
-  // move to the findings index (same ECS namespace). euser/ruser died with 4.14 (no owner field
-  // in 5.0 process inventory — see get-agent-processes.ts).
+  // tool scoping is no longer needed. euser/ruser died with 4.14 (no owner field in 5.0 process
+  // inventory — see get-agent-processes.ts).
   { field: 'host.hostname', action: 'anonymize', kind: 'HOST' },
   { field: 'source.ip', action: 'anonymize', kind: 'IP' },
   { field: 'destination.ip', action: 'anonymize', kind: 'IP' },
@@ -83,15 +53,15 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'destination.user.name', action: 'anonymize', kind: 'USER' },
   { field: 'process.command_line', action: 'anonymize', kind: 'VAL' },
   { field: 'file.owner', action: 'anonymize', kind: 'USER' },
-  // Curated rule taxonomy / MITRE catalog / compliance requirements on findings-v5 (Wave 3):
-  // not analyst/attacker-supplied — reviewed 'allow', replacing the 4.14 rule.groups/rule.mitre.id
-  // entries below (kept inert for the not-yet-migrated escape-hatch paths).
-  { field: 'rule.tags', action: 'allow' },
-  { field: 'rule.category', action: 'allow' },
-  { field: 'rule.compliance.pci_dss', action: 'allow' },
-  { field: 'rule.mitre.technique.id', action: 'allow' },
-  { field: 'rule.mitre.technique.name', action: 'allow' },
-  { field: 'rule.mitre.tactic.name', action: 'allow' },
+  // Curated rule taxonomy / MITRE catalog / compliance requirements on findings-v5: not
+  // analyst/attacker-supplied — reviewed 'allow'.
+  { field: WAZUH_FIELD.RULE_TAGS, action: 'allow' },
+  { field: WAZUH_FIELD.RULE_CATEGORY, action: 'allow' },
+  { field: WAZUH_FIELD.RULE_COMPLIANCE_PCI_DSS, action: 'allow' },
+  { field: WAZUH_FIELD.RULE_MITRE_TECHNIQUE_ID, action: 'allow' },
+  { field: WAZUH_FIELD.RULE_MITRE_TECHNIQUE_NAME, action: 'allow' },
+  { field: WAZUH_FIELD.RULE_MITRE_TACTIC, action: 'allow' },
+  { field: WAZUH_FIELD.RULE_MITRE_TACTIC_NAME, action: 'allow' },
   // Curated benchmark/policy content (CIS etc.), not analyst/attacker-supplied — reviewed 'allow'
   // (same rationale as the 4.14 get_sca_checks/* entries these replace).
   { field: 'check.id', action: 'allow' },
@@ -102,16 +72,30 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // NOT anonymized: package/process/policy names are what the analyst asked about, and known
   // mapped identifiers embedded in free text (e.g. a hostname inside a cmd path) are still caught
   // by the outbound applyToText scrub in chat.ts.
-  // MITRE tactic and vulnerability CVSS/architecture fields: `rule.mitre.tactic` and the vulnerability/package fields are
-  // curated taxonomy/public-CVE-database data (like `rule.mitre.id`/`vulnerability.severity`
-  // above), not analyst/attacker-supplied text, so they are 'allow'.
-  { field: 'rule.mitre.tactic', action: 'allow' },
   { field: 'vulnerability.score.base', action: 'allow' },
   { field: 'package.architecture', action: 'allow' },
-  // syscheck.uname_after (4.14 FIM "who changed it") died with get_fim_events — the 5.0 states
-  // surface has no equivalent; get_fim_files' file.owner is classified above. The old tool-scoped
-  // get_agent_ports/remote.ip, get_agent_processes/euser+ruser and get_sca_checks/* entries were
-  // likewise replaced by the bare ECS entries above (see the 5.0-rewrites comment block).
+
+  // --- LEGACY 4.x entries (fenced, per common/wazuh-fields.ts's LEGACY_4X_FIELDS) --------------
+  // These are the ~40% of pre-5.0 `FIELD_POLICY_DEFAULTS` entries confirmed to have ZERO matches
+  // in any 5.0 Indexer known-fields template (see design ADR-2 / mem "sdd/update-index-references/
+  // design"). They are DELIBERATELY KEPT, not deleted: a dead 'anonymize'/'never' entry is a
+  // harmless no-op (it never matches any real field), while REMOVING one is the only direction
+  // that could silently create a leak if a future index ever resurrects the field under the same
+  // name. `rule.groups` is retired outright (bundled retirement, no 5.0 equivalent) and is fenced
+  // here too rather than deleted for the same fail-safe reason.
+  { field: 'data.srcip', action: 'anonymize', kind: 'IP' },
+  { field: 'data.dstip', action: 'anonymize', kind: 'IP' },
+  { field: 'data.srcuser', action: 'anonymize', kind: 'USER' },
+  { field: 'data.dstuser', action: 'anonymize', kind: 'USER' },
+  { field: 'data.username', action: 'anonymize', kind: 'USER' },
+  { field: 'predecoder.hostname', action: 'anonymize', kind: 'HOST' },
+  { field: 'GeoLocation.*', action: 'anonymize', kind: 'VAL' },
+  { field: 'data.url', action: 'anonymize', kind: 'URL' },
+  { field: 'full_log', action: 'never' },
+  { field: 'data.command', action: 'anonymize', kind: 'VAL' },
+  { field: 'rule.groups', action: 'allow' },
+  { field: 'rule.mitre.id', action: 'allow' },
+  { field: 'predecoder.program_name', action: 'allow' },
 ];
 
 export type PseudonymKind = 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
@@ -143,6 +127,7 @@ export function inferPseudonymKind(field: string): PseudonymKind {
   if (
     lower.includes('hostname') ||
     lower === 'agent.name' ||
+    lower === 'wazuh.agent.name' ||
     lower.endsWith('.name')
   ) {
     return 'HOST';

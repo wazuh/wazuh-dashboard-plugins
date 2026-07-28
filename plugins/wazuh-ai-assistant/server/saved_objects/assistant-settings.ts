@@ -1,6 +1,10 @@
-import { SavedObjectsType } from '../../../../src/core/server';
+import {
+  SavedObjectMigrationFn,
+  SavedObjectsType,
+} from '../../../../src/core/server';
 import { ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE } from '../../common/constants';
 import { FieldPolicyEntry } from '../tools/privacy';
+import { normalizeFieldPolicy } from '../tools/field-policy-normalizer';
 
 /**
  * Attributes of the `wazuh-ai-assistant-settings` singleton. Scoped
@@ -28,6 +32,40 @@ export interface AssistantSettingsAttributes {
   conversationRetentionDays: number;
 }
 
+/**
+ * Migrates a persisted `fieldPolicy` array from the retired 4.x/ECS-generic field vocabulary
+ * (`rule.*`/`agent.*`/`data.*`/...) to the `wazuh.*` 5.0 vocabulary (issue #8802, Slice D).
+ *
+ * Guarded pass-through: any document whose `fieldPolicy` attribute is missing or not an array
+ * (should not happen for this type, but a throwing migration blocks OSD startup entirely, so this
+ * is deliberately conservative) is returned completely untouched. All the real logic lives in the
+ * pure, independently-unit-tested `normalizeFieldPolicy` (server/tools/field-policy-normalizer.ts)
+ * — this wrapper only adapts it to the saved-objects migration function shape.
+ *
+ * Version key `'3.6.0'` matches this plugin's `package.json`'s `pluginPlatform.version` — the only
+ * key available for the whole 5.0 platform line (see design ADR-2). Because `normalizeFieldPolicy`
+ * is a convergent normalizer (idempotent via `mapRetiredField`'s `wazuh.`-prefix short-circuit),
+ * running it again on an already-migrated document is a safe no-op — there is no risk in it
+ * running more than once even though OSD only runs a given migration key once per document.
+ */
+export const migrateFieldPolicyTo50: SavedObjectMigrationFn<
+  Partial<AssistantSettingsAttributes>,
+  Partial<AssistantSettingsAttributes>
+> = doc => {
+  if (!Array.isArray(doc.attributes?.fieldPolicy)) {
+    return doc;
+  }
+  return {
+    ...doc,
+    attributes: {
+      ...doc.attributes,
+      fieldPolicy: normalizeFieldPolicy(
+        doc.attributes.fieldPolicy as FieldPolicyEntry[],
+      ),
+    },
+  };
+};
+
 export const assistantSettingsSavedObjectType: SavedObjectsType = {
   name: ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE,
   // Hidden: this singleton holds the field policy / actions guardrails / privacy
@@ -39,7 +77,9 @@ export const assistantSettingsSavedObjectType: SavedObjectsType = {
   // `getOrCreateAssistantSettings`).
   hidden: true,
   namespaceType: 'single',
-  migrations: {},
+  migrations: {
+    '3.6.0': migrateFieldPolicyTo50,
+  },
   management: {
     importableAndExportable: false,
     icon: 'securityApp',
