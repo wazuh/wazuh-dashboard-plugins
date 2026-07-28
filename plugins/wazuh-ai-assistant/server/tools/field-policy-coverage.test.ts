@@ -221,10 +221,11 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
  * nothing — a wrong answer with no error.
  *
  * This scans the SOURCE of `server/tools/catalog/*.ts` (excluding test files), `digest.ts`, and
- * `guardrails.ts` for a quoted literal matching one of the retired keys. It is expected to FAIL
- * against the current (pre-rename) tree — Slices B/C haven't renamed the catalog tools/guardrails
- * yet — and is meant to keep failing loudly until every one of those files is migrated off the
- * retired vocabulary. Do NOT weaken this test to make it pass before the rename actually lands.
+ * `guardrails.ts` for a quoted literal matching one of the retired keys. Slices B/C have renamed
+ * the catalog tools/guardrails off the retired vocabulary, so this is now a permanent green
+ * regression guard: it must keep passing, and any future PR that reintroduces a retired bare
+ * `rule.*`/`agent.*` literal should fail it loudly. Do NOT weaken this test to make a future
+ * regression pass.
  */
 function findRetiredFieldLiteralOccurrences(): string[] {
   const catalogDir = path.join(__dirname, 'catalog');
@@ -251,7 +252,7 @@ function findRetiredFieldLiteralOccurrences(): string[] {
   return failures;
 }
 
-test('no retired bare rule.*/agent.* field literal survives in catalog/digest/guardrails source (RED until Slices B/C land)', () => {
+test('no retired bare rule.*/agent.* field literal survives in catalog/digest/guardrails source (permanent regression guard)', () => {
   const failures = findRetiredFieldLiteralOccurrences();
   assert.deepEqual(
     failures,
