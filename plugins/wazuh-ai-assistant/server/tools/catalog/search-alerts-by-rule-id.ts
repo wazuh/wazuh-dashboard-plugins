@@ -13,7 +13,7 @@ import {
 } from './common';
 
 /**
- * Ported from SEARCH_ALERTS_BY_RULE_ID: exact match on `rule.id` plus a time range. `rule.id` is
+ * Ported from SEARCH_ALERTS_BY_RULE_ID: exact match on `wazuh.rule.id` plus a time range. `wazuh.rule.id` is
  * mapped `keyword`, so a `term` query with
  * the value converted to a string is the correct exact-match form; kept string-form deliberately
  * (rather than a bare numeric term) as defense-in-depth, since OpenSearch would also coerce a
@@ -58,7 +58,7 @@ export const searchAlertsByRuleIdTool: ToolDefinition = {
         query: {
           bool: {
             filter: [
-              { term: { 'rule.id': String(ruleId) } },
+              { term: { 'wazuh.rule.id': String(ruleId) } },
               { range: { '@timestamp': { gte, lte } } },
             ],
           },

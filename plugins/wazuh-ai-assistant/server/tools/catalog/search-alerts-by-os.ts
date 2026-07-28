@@ -17,22 +17,22 @@ const TABLE_COLUMNS = [
   { field: '@timestamp', label: 'Time' },
   { field: 'wazuh.agent.name', label: 'Agent' },
   { field: 'host.os.name', label: 'OS' },
-  { field: 'rule.description', label: 'Description' },
-  { field: 'rule.level', label: 'Level', severity: true },
+  { field: 'wazuh.rule.description', label: 'Description' },
+  { field: 'wazuh.rule.level', label: 'Level', severity: true },
 ];
 const SAMPLE_COLUMNS = [
   '@timestamp',
   'wazuh.agent.name',
   'host.os.name',
-  'rule.level',
+  'wazuh.rule.level',
 ];
 
 /**
  * Ported from 4.14, which used `agent.os.name:*{{os_name}}*`; a plain
- * analyzed `match` on `agent.os.name` reproduces this for the common cases ("Windows", "Ubuntu",
- * "CentOS", ...) without a wildcard — `agent.os.name` is already on the guardrail agg allowlist,
+ * analyzed `match` on `wazuh.agent.host.os.name` reproduces this for the common cases ("Windows", "Ubuntu",
+ * "CentOS", ...) without a wildcard — `wazuh.agent.host.os.name` is already on the guardrail agg allowlist,
  * confirming it is a real, low-cardinality field on this index.
- * 5.0: retargeted to wazuh-findings-v5*; the OS field moved from `agent.os.name` to
+ * 5.0: retargeted to wazuh-findings-v5*; the OS field moved from `wazuh.agent.host.os.name` to
  * `host.os.name` (ECS), and min_severity is now a categorical severity word (see common.ts's
  * severitiesAtOrAbove) applied only when supplied, rather than a numeric rule.level floor
  * defaulting to 0.
@@ -86,7 +86,7 @@ export const searchAlertsByOsTool: ToolDefinition = {
     ];
     if (minSeverity) {
       filter.push({
-        terms: { 'rule.level': severitiesAtOrAbove(minSeverity) },
+        terms: { 'wazuh.rule.level': severitiesAtOrAbove(minSeverity) },
       });
     }
     return {

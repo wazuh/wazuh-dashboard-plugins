@@ -44,7 +44,7 @@ export const getCriticalAlertsTool: ToolDefinition = {
         query: {
           bool: {
             filter: [
-              { terms: { 'rule.level': ['critical'] } },
+              { terms: { 'wazuh.rule.level': ['critical'] } },
               { range: { '@timestamp': { gte, lte } } },
             ],
           },

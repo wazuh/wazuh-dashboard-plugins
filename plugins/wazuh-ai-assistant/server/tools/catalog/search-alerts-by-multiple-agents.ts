@@ -16,7 +16,7 @@ import {
 } from './common';
 
 /**
- * Ported from SEARCH_ALERTS_BY_MULTIPLE_AGENTS. `agent.name` is mapped `keyword` at the top level
+ * Ported from SEARCH_ALERTS_BY_MULTIPLE_AGENTS. `wazuh.agent.name` is mapped `keyword` at the top level
  * with no `.keyword` subfield needed, so this filters with a single `terms` clause on the exact
  * agent names rather than one `match` clause per name.
  * 5.0: retargeted to wazuh-findings-v5*; agent name field moved to `wazuh.agent.name`, and
@@ -68,7 +68,7 @@ export const searchAlertsByMultipleAgentsTool: ToolDefinition = {
     ];
     if (minSeverity) {
       filter.push({
-        terms: { 'rule.level': severitiesAtOrAbove(minSeverity) },
+        terms: { 'wazuh.rule.level': severitiesAtOrAbove(minSeverity) },
       });
     }
     return {

@@ -62,7 +62,7 @@ export function optionalStringParam(value: unknown): string | undefined {
 }
 
 /**
- * Wazuh 5.0 severity model: `rule.level` on wazuh-findings-v5* is a
+ * Wazuh 5.0 severity model: `wazuh.rule.level` on wazuh-findings-v5* is a
  * KEYWORD with these five ordered values — NOT the 4.14 integer 0-15 scale. A numeric range query
  * on it would do lexicographic string comparison (silently wrong), so severity floors are
  * expressed as a `terms` filter over the tail of this ordered list instead (`severitiesAtOrAbove`).
@@ -150,28 +150,28 @@ export function objectSchema(
 export const STANDARD_ALERT_TABLE_COLUMNS: ToolTableColumnSpec[] = [
   { field: '@timestamp', label: 'Time' },
   { field: 'wazuh.agent.name', label: 'Agent' },
-  { field: 'rule.description', label: 'Description' },
-  { field: 'rule.level', label: 'Level', severity: true },
-  { field: 'rule.id', label: 'Rule ID' },
+  { field: 'wazuh.rule.description', label: 'Description' },
+  { field: 'wazuh.rule.level', label: 'Level', severity: true },
+  { field: 'wazuh.rule.id', label: 'Rule ID' },
 ];
 export const STANDARD_ALERT_TABLE_COLUMN_FIELDS =
   STANDARD_ALERT_TABLE_COLUMNS.map(column => column.field);
 export const STANDARD_ALERT_SAMPLE_COLUMNS = [
   '@timestamp',
   'wazuh.agent.name',
-  'rule.description',
-  'rule.level',
+  'wazuh.rule.description',
+  'wazuh.rule.level',
 ];
 
 /**
  * Investigation field set added to every alert-hits tool's table ROWS: revealed by the row
  * expander (and available to `digest.sampleColumns`, see `alertDigestColumns` below), never as
- * a visible `tableSpec.columns` entry (visible columns stay exactly as they are). `full_log` is
- * deliberately excluded (heavy, PII-rich).
+ * a visible `tableSpec.columns` entry (visible columns stay exactly as they are). The retired
+ * 4.x full_log field (heavy, PII-rich, and with no 5.0 equivalent) is deliberately excluded.
  */
 export const ALERT_INVESTIGATION_ROW_FIELDS = [
-  'rule.tags',
-  'rule.mitre.technique.id',
+  'wazuh.rule.tags',
+  'wazuh.rule.mitre.technique.id',
   'source.ip',
   'source.port',
   'source.user.name',
@@ -184,20 +184,20 @@ export const ALERT_INVESTIGATION_ROW_FIELDS = [
  * the investigation row set (deliberately narrower: `source.port`/`process.command_line` stay
  * row-only, not sent to the model). Every one of these has a `server/tools/privacy.ts`
  * `FIELD_POLICY_DEFAULTS` entry before it reaches a digest. (Wazuh 5.0: these are the ECS
- * findings-v5 field names — replacing 4.14's data.* and rule.groups.)
+ * findings-v5 field names — replacing 4.14's data.* and the retired rule.groups.)
  */
 export const ALERT_DIGEST_EXTRA_COLUMNS = [
-  'rule.tags',
+  'wazuh.rule.tags',
   'destination.user.name',
   'source.user.name',
   'source.ip',
-  'rule.mitre.technique.id',
+  'wazuh.rule.mitre.technique.id',
 ];
 
 /**
  * Returns `ALERT_INVESTIGATION_ROW_FIELDS` minus whatever the calling tool already declares as a
- * visible `tableSpec.columns` field (e.g. `get_pci_dss_alerts`'s `rule.groups`) — so
- * `buildTableSpec` (digest.ts) never assigns the same dot-path into a row twice.
+ * visible `tableSpec.columns` field (e.g. `get_pci_dss_alerts`'s `wazuh.rule.compliance.pci_dss`)
+ * — so `buildTableSpec` (digest.ts) never assigns the same dot-path into a row twice.
  */
 export function alertRowFields(existingColumnFields: string[]): string[] {
   return ALERT_INVESTIGATION_ROW_FIELDS.filter(
@@ -243,7 +243,7 @@ export const VULN_SOURCE_FIELDS = [
 
 /**
  * Shared outbound `_source` list for get_vulnerabilities_by_agent and get_vulnerability_by_cve —
- * Identical (same fields, same order, `agent.id` first) at every call site. Part of the outbound Indexer request: order and contents must stay exactly as
+ * Identical (same fields, same order, `wazuh.agent.id` first) at every call site. Part of the outbound Indexer request: order and contents must stay exactly as
  * below.
  */
 export const VULN_SOURCE_FIELDS_WITH_AGENT_ID = [

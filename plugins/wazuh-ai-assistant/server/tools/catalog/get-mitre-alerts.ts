@@ -12,18 +12,19 @@ import {
 
 /**
  * NEW module (MITRE ATT&CK). Verified against the wazuh-dashboard-plugins clone (v4.14.6):
- * MITRE-tagged alerts are detected via an `exists` filter on `rule.mitre.id`
+ * MITRE-tagged alerts were detected via an `exists` filter on the retired 4.14 rule.mitre.id field
  * (`plugins/main/public/components/common/data-source/pattern/alerts/mitre-attack/
- * mitre-attack-data-source.ts:8,23-34`, `GROUP_KEY = 'rule.mitre.id'`,
- * `{ exists: { field: GROUP_KEY } }`); `rule.mitre.technique` and `rule.mitre.tactic` are sibling
- * display columns (`plugins/main/public/components/overview/mitre/events/
+ * mitre-attack-data-source.ts:8,23-34`), with the retired 4.14 rule.mitre.technique/rule.mitre.tactic
+ * fields as sibling display columns (`plugins/main/public/components/overview/mitre/events/
  * mitre-attack-columns.tsx:8,12`). All three confirmed `keyword`-mapped arrays in
  * `plugins/main/public/utils/known-fields/alerts.json:730-752`. `technique_id` narrows to one
- * exact technique (`term` on `rule.mitre.id`, e.g. "T1110"); omitted, the tool falls back to the
- * `exists` filter for "any MITRE-tagged alert".
- * 5.0: retargeted to wazuh-findings-v5*; `rule.mitre.id` -> `rule.mitre.technique.id`,
- * `rule.mitre.technique` -> `rule.mitre.technique.name`, `rule.mitre.tactic` ->
- * `rule.mitre.tactic.name`.
+ * exact technique; omitted, the tool falls back to the `exists` filter for "any MITRE-tagged
+ * alert".
+ * 5.0: retargeted to wazuh-findings-v5*; the retired 4.14 rule.mitre.id field has no 5.0
+ * equivalent and is replaced by `wazuh.rule.mitre.technique.id` (used for both the `exists`
+ * filter and the exact-technique `term` match), the retired 4.14 `rule.mitre.technique` field is
+ * replaced by `wazuh.rule.mitre.technique.name`, and the retired 4.14 rule.mitre.tactic field is
+ * replaced by `wazuh.rule.mitre.tactic.name`.
  */
 export const getMitreAlertsTool: ToolDefinition = {
   spec: {
@@ -50,8 +51,8 @@ export const getMitreAlertsTool: ToolDefinition = {
     const { gte, lte } = resolveTimeRange(params);
     const techniqueId = optionalStringParam(params.technique_id);
     const mitreFilter = techniqueId
-      ? { term: { 'rule.mitre.technique.id': techniqueId } }
-      : { exists: { field: 'rule.mitre.technique.id' } };
+      ? { term: { 'wazuh.rule.mitre.technique.id': techniqueId } }
+      : { exists: { field: 'wazuh.rule.mitre.technique.id' } };
     return {
       target: 'indexer',
       index: 'wazuh-findings-v5*',
@@ -70,34 +71,34 @@ export const getMitreAlertsTool: ToolDefinition = {
     columns: [
       { field: '@timestamp', label: 'Time' },
       { field: 'wazuh.agent.name', label: 'Agent' },
-      { field: 'rule.description', label: 'Description' },
-      { field: 'rule.mitre.technique.id', label: 'Technique ID' },
-      { field: 'rule.mitre.technique.name', label: 'Technique' },
-      { field: 'rule.mitre.tactic.name', label: 'Tactic' },
-      { field: 'rule.level', label: 'Level', severity: true },
+      { field: 'wazuh.rule.description', label: 'Description' },
+      { field: 'wazuh.rule.mitre.technique.id', label: 'Technique ID' },
+      { field: 'wazuh.rule.mitre.technique.name', label: 'Technique' },
+      { field: 'wazuh.rule.mitre.tactic.name', label: 'Tactic' },
+      { field: 'wazuh.rule.level', label: 'Level', severity: true },
     ],
     // Same alert-hits investigation row set as the other alert tools
-    // (server/tools/catalog/common.ts). `rule.mitre.technique.id` is already a visible column
+    // (server/tools/catalog/common.ts). `wazuh.rule.mitre.technique.id` is already a visible column
     // above, so `alertRowFields` filters it back out — no duplicate row key.
     rowFields: alertRowFields([
       '@timestamp',
       'wazuh.agent.name',
-      'rule.description',
-      'rule.mitre.technique.id',
-      'rule.mitre.technique.name',
-      'rule.mitre.tactic.name',
-      'rule.level',
+      'wazuh.rule.description',
+      'wazuh.rule.mitre.technique.id',
+      'wazuh.rule.mitre.technique.name',
+      'wazuh.rule.mitre.tactic.name',
+      'wazuh.rule.level',
     ]),
   },
   digest: {
-    // `rule.mitre.tactic.name` is included — it is what the
+    // `wazuh.rule.mitre.tactic.name` is included — it is what the
     // official Wazuh MITRE dashboard surfaces by default — alongside the shared alert-hits extras.
     sampleColumns: alertDigestColumns([
       '@timestamp',
       'wazuh.agent.name',
-      'rule.mitre.technique.id',
-      'rule.mitre.technique.name',
-      'rule.mitre.tactic.name',
+      'wazuh.rule.mitre.technique.id',
+      'wazuh.rule.mitre.technique.name',
+      'wazuh.rule.mitre.tactic.name',
     ]),
   },
 };

@@ -72,7 +72,7 @@ function hitsToRows(
 /**
  * Rows from an aggregation-only response (`size:0`, `aggs.<name>.buckets[]`), e.g. get_top_rules.
  * Any `top_hits` sub-aggregation's sampled `_source` is merged into the row (still nested, not
- * flattened) so a tool's tableSpec/digest columns can dot-path into it (e.g. "rule.description").
+ * flattened) so a tool's tableSpec/digest columns can dot-path into it (e.g. "wazuh.rule.description").
  * A metric sub-aggregation (avg/sum/min/max/cardinality — shaped `{value: number|null}`) merges as
  * `row[subAggName] = value`. A `filter` sub-aggregation (shaped `{doc_count: number}` with no
  * `buckets`/`hits` of its own — e.g. get_sca_results' passed/failed/not_applicable counters)
@@ -248,9 +248,9 @@ const DERIVED_COLUMN_CAP = 8;
 const PREFERRED_DERIVED_COLUMNS = [
   '@timestamp',
   'wazuh.agent.name',
-  'rule.description',
-  'rule.level',
-  'rule.id',
+  'wazuh.rule.description',
+  'wazuh.rule.level',
+  'wazuh.rule.id',
 ];
 
 /** Dot-path keys of a row's own (nested-object) fields; arrays and scalars are leaves. */
@@ -312,7 +312,7 @@ function deriveResultColumns(
   return columns.slice(0, DERIVED_COLUMN_CAP);
 }
 
-/** Last path segment, capitalized (e.g. "rule.description" -> "Description"); falls back to the
+/** Last path segment, capitalized (e.g. "wazuh.rule.description" -> "Description"); falls back to the
  * full path when two derived columns share a last segment (e.g. two differently-nested "id"s). */
 function deriveColumnLabel(path: string, allPaths: string[]): string {
   const lastSegment = path.split('.').pop() ?? path;

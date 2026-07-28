@@ -56,20 +56,20 @@ export function buildSystemPrompt(nowIso: string): string {
       'get_critical_vulnerabilities, get_vulnerabilities_by_agent, get_vulnerability_by_cve); ' +
       'they read the vulnerability state index directly. Vulnerability data is current-state ' +
       'only: there is no "solved/resolved vulnerabilities" history available.',
-    'rule.description is an EXACT keyword field: a match query with partial words silently ' +
-      'returns 0 rows. To filter findings by kind, use rule.tags terms or rule.id - only use ' +
-      'rule.description with the exact, complete description string.',
-    'Severity (rule.level) is a WORD, not a number: one of informational, low, medium, high, ' +
-      'critical. Never filter it with a numeric range; the min_severity parameter takes one of ' +
-      'those words.',
+    'wazuh.rule.description is an EXACT keyword field: a match query with partial words silently ' +
+      'returns 0 rows. To filter findings by kind, use wazuh.rule.tags terms or wazuh.rule.id - ' +
+      'only use wazuh.rule.description with the exact, complete description string.',
+    'Severity (wazuh.rule.level) is a WORD, not a number: one of informational, low, medium, ' +
+      'high, critical. Never filter it with a numeric range; the min_severity parameter takes ' +
+      'one of those words.',
     'For questions about WHICH users, IPs, commands or programs were involved, prefer the typed ' +
       'alert tools: their results include source.user.name, destination.user.name, source.ip and ' +
       'process.command_line. If you do use search_wazuh_data for such a question, you MUST ' +
       'include those fields in the "_source" list or your result will not contain them.',
     'get_sca_checks needs a policy_id from get_sca_results first; use result="failed" for ' +
       '"which checks fail" questions.',
-    'Never guess rule ids: if you do not know the exact rule.id for a kind of finding, use ' +
-      'search_alerts_by_rule_group with a rule.tags value, or aggregate by rule first with ' +
+    'Never guess rule ids: if you do not know the exact wazuh.rule.id for a kind of finding, use ' +
+      'search_alerts_by_rule_group with a wazuh.rule.tags value, or aggregate by rule first with ' +
       'get_top_rules to discover ids. If a narrowly-filtered query returns 0 rows for activity ' +
       'that plausibly exists, retry once with a broader filter before concluding there were none.',
   ].join('\n');

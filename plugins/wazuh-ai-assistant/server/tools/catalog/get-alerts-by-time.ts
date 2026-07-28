@@ -50,7 +50,7 @@ export const getAlertsByTimeTool: ToolDefinition = {
     ];
     if (minSeverity !== undefined) {
       filter.push({
-        terms: { 'rule.level': severitiesAtOrAbove(minSeverity) },
+        terms: { 'wazuh.rule.level': severitiesAtOrAbove(minSeverity) },
       });
     }
     return {

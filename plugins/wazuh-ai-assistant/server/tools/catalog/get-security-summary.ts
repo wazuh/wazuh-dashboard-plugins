@@ -14,7 +14,8 @@ import {
  * `get_top_rules`.
  * 5.0: retargeted to wazuh-findings-v5*; the old `rule.level >= 7` numeric floor became a `terms`
  * filter over severity words at or above `medium` (see common.ts's severitiesAtOrAbove), and the
- * aggregation field moved from `rule.groups` (removed) to `rule.category`.
+ * aggregation field moved from the retired rule.groups (no 5.0 equivalent) to
+ * `wazuh.rule.category`.
  */
 export const getSecuritySummaryTool: ToolDefinition = {
   spec: {
@@ -42,13 +43,15 @@ export const getSecuritySummaryTool: ToolDefinition = {
         query: {
           bool: {
             filter: [
-              { terms: { 'rule.level': severitiesAtOrAbove('medium') } },
+              { terms: { 'wazuh.rule.level': severitiesAtOrAbove('medium') } },
               { range: { '@timestamp': { gte, lte } } },
             ],
           },
         },
         aggs: {
-          alert_categories: { terms: { field: 'rule.category', size: limit } },
+          alert_categories: {
+            terms: { field: 'wazuh.rule.category', size: limit },
+          },
         },
         size: 0,
       },
