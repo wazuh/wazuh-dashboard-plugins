@@ -37,12 +37,13 @@ const WAZUH_APP_CATEGORY: AppCategory = {
 
 export class WazuhAiAssistantPlugin
   implements
-  Plugin<
-    WazuhAiAssistantPluginSetup,
-    WazuhAiAssistantPluginStart,
-    WazuhAiAssistantPluginSetupDependencies,
-    WazuhAiAssistantPluginStartDependencies
-  > {
+    Plugin<
+      WazuhAiAssistantPluginSetup,
+      WazuhAiAssistantPluginStart,
+      WazuhAiAssistantPluginSetupDependencies,
+      WazuhAiAssistantPluginStartDependencies
+    >
+{
   public setup(core: CoreSetup): WazuhAiAssistantPluginSetup {
     core.application.register({
       id: PLUGIN_ID,
@@ -67,5 +68,5 @@ export class WazuhAiAssistantPlugin
     return {};
   }
 
-  public stop(): void { }
+  public stop(): void {}
 }

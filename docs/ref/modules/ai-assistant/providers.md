@@ -14,11 +14,11 @@ reaches the provider (see [Tool catalog](./tool-catalog.md)).
 All adapters (`plugins/wazuh-ai-assistant/server/providers/`) translate to and from one canonical
 internal tool-calling contract — no provider wire format leaks past the adapter boundary.
 
-| Adapter                             | Works with                                                                     | Notes                                                                                                                                                                                                          |
-| ----------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **OpenAI-compatible**               | OpenAI, Groq, Ollama, vLLM, LiteLLM, and any `/chat/completions`-style gateway | `tools` + `tool_choice`, index-based streaming deltas, `parallel_tool_calls: false`. |
-| **Anthropic**                       | Anthropic Messages API                                                         | `tool_use` content blocks + `input_json_delta` streaming, `disable_parallel_tool_use: true`.                                                                                                                   |
-| **Wazuh AI Assistant hosted brain** | The Wazuh-hosted webhook endpoint                                              | Modeled as "another provider" behind the same adapter seam; non-incremental responses.                                                                                                                         |
+| Adapter                             | Works with                                                                     | Notes                                                                                        |
+| ----------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| **OpenAI-compatible**               | OpenAI, Groq, Ollama, vLLM, LiteLLM, and any `/chat/completions`-style gateway | `tools` + `tool_choice`, index-based streaming deltas, `parallel_tool_calls: false`.         |
+| **Anthropic**                       | Anthropic Messages API                                                         | `tool_use` content blocks + `input_json_delta` streaming, `disable_parallel_tool_use: true`. |
+| **Wazuh AI Assistant hosted brain** | The Wazuh-hosted webhook endpoint                                              | Modeled as "another provider" behind the same adapter seam; non-incremental responses.       |
 
 A model with weak function-calling support is handled, not worked around. When a provider rejects
 the model's own malformed tool call (the OpenAI-compatible `tool_use_failed` shape),

@@ -25,7 +25,7 @@ export function saveProcessState(): SavedProcessState {
 export function restoreProcessState(state: SavedProcessState): void {
   try {
     process.chdir(state.cwd);
-  } catch { }
+  } catch {}
 
   // Safer env reset: clear current keys, then restore snapshot
   for (const key of Object.keys(process.env)) delete (process.env as any)[key];

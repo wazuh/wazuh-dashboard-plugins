@@ -80,12 +80,12 @@ Every Indexer query — from typed tools and the escape hatch alike — passes t
 
 Values injected on every `_search`, overriding whatever the model proposed:
 
-| Valve                          | Value                                                |
-| ------------------------------ | ---------------------------------------------------- |
-| `timeout`                      | `10s`                                                |
-| `size`                         | clamped ≤ 500                                        |
-| `track_total_hits`             | bounded at 10,000 (exact counts go through `_count`) |
-| `from`                         | rejected above 1,000 (no LLM-driven deep pagination) |
+| Valve              | Value                                                |
+| ------------------ | ---------------------------------------------------- |
+| `timeout`          | `10s`                                                |
+| `size`             | clamped ≤ 500                                        |
+| `track_total_hits` | bounded at 10,000 (exact counts go through `_count`) |
+| `from`             | rejected above 1,000 (no LLM-driven deep pagination) |
 
 Static DSL lint (recursive tree walk; rejection reason returned to the model for one bounded
 retry):
