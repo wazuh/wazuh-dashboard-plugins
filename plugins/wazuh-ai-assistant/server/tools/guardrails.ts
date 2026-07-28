@@ -194,15 +194,10 @@ function normalizeMustToFilter(node: unknown): unknown {
  * Low-cardinality fields vetted safe for terms/composite/cardinality/significant_terms aggs.
  *
  * Wazuh 5.0 (issue #8802): every `rule.*`/`agent.*` entry lives under the `wazuh.*` namespace
- * (see `common/wazuh-fields.ts`'s module doc comment for the full rationale). Four entries that
- * were on this list under the 4.x/bare vocabulary have NO 5.0 equivalent and are deliberately
- * DROPPED rather than renamed (confirmed zero matches across every 5.0 known-fields template —
- * see `LEGACY_4X_FIELDS` in `common/wazuh-fields.ts`):
- * - rule.groups — replaced by rule.category (single) + rule.tags (array).
- * - rule.mitre.id / rule.mitre.technique (bare, non-leaf) — moved to the leaf-typed
- *   rule.mitre.technique.{id,name}, which remain on this list under their `wazuh.*` names.
- * - agent.os.name — the OS field moved to ECS `host.os.name` in the 5.0 catalog tools
- *   (see `search-alerts-by-os.ts`); nothing in this plugin aggregates on the agent's OS anymore.
+ * (see `common/wazuh-fields.ts`'s module doc comment for the full rationale). This plugin ships
+ * new in 5.0 with no prior installations, so only live, populated 5.0 fields are listed here —
+ * bare 4.x fields with no 5.0 equivalent (e.g. the retired rule groups, rule MITRE id, and agent
+ * OS name paths; see RETIRED_FIELD_MAP in common/wazuh-fields.ts) are simply never added.
  */
 const AGG_FIELD_ALLOWLIST = new Set([
   WAZUH_FIELD.RULE_ID,

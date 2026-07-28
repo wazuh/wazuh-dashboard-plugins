@@ -23,10 +23,9 @@ export interface FieldPolicyEntry {
 }
 
 /**
- * Curated defaults, `wazuh.*` field vocabulary (issue #8802, Slice D). `full_log` (see the
- * LEGACY_4X block below) is the only 'never' entry; everything else live is 'anonymize' or a
- * reviewed 'allow'. `GeoLocation.*` (legacy) uses the trailing `.*` prefix-match convention
- * (matches "GeoLocation" itself or any "GeoLocation.<subfield>").
+ * Curated defaults, `wazuh.*` field vocabulary (issue #8802). Every entry here targets a live,
+ * populated Wazuh 5.0 field — this plugin ships new in 5.0 with no prior installations, so there
+ * is no retired 4.x/ECS-generic vocabulary to keep around for compatibility.
  */
 export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: WAZUH_FIELD.AGENT_NAME, action: 'anonymize', kind: 'HOST' },
@@ -74,28 +73,6 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // by the outbound applyToText scrub in chat.ts.
   { field: 'vulnerability.score.base', action: 'allow' },
   { field: 'package.architecture', action: 'allow' },
-
-  // --- LEGACY 4.x entries (fenced, per common/wazuh-fields.ts's LEGACY_4X_FIELDS) --------------
-  // These are the ~40% of pre-5.0 `FIELD_POLICY_DEFAULTS` entries confirmed to have ZERO matches
-  // in any 5.0 Indexer known-fields template (see design ADR-2 / mem "sdd/update-index-references/
-  // design"). They are DELIBERATELY KEPT, not deleted: a dead 'anonymize'/'never' entry is a
-  // harmless no-op (it never matches any real field), while REMOVING one is the only direction
-  // that could silently create a leak if a future index ever resurrects the field under the same
-  // name. `rule.groups` is retired outright (bundled retirement, no 5.0 equivalent) and is fenced
-  // here too rather than deleted for the same fail-safe reason.
-  { field: 'data.srcip', action: 'anonymize', kind: 'IP' },
-  { field: 'data.dstip', action: 'anonymize', kind: 'IP' },
-  { field: 'data.srcuser', action: 'anonymize', kind: 'USER' },
-  { field: 'data.dstuser', action: 'anonymize', kind: 'USER' },
-  { field: 'data.username', action: 'anonymize', kind: 'USER' },
-  { field: 'predecoder.hostname', action: 'anonymize', kind: 'HOST' },
-  { field: 'GeoLocation.*', action: 'anonymize', kind: 'VAL' },
-  { field: 'data.url', action: 'anonymize', kind: 'URL' },
-  { field: 'full_log', action: 'never' },
-  { field: 'data.command', action: 'anonymize', kind: 'VAL' },
-  { field: 'rule.groups', action: 'allow' },
-  { field: 'rule.mitre.id', action: 'allow' },
-  { field: 'predecoder.program_name', action: 'allow' },
 ];
 
 export type PseudonymKind = 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';

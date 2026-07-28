@@ -149,7 +149,7 @@ describe('ResultTable', () => {
       expect(screen.getByText('Informational')).toBeInTheDocument();
     });
 
-    it('renders "informational" as its own distinct bucket, never the same as "low"', () => {
+    it('renders "informational" as its own visually distinct bucket, never the same badge color as "low"', () => {
       const { unmount } = render(
         <ResultTable
           spec={spec({
@@ -164,7 +164,16 @@ describe('ResultTable', () => {
       );
       const informationalBadge = screen.getByText('Informational');
       expect(informationalBadge).toBeInTheDocument();
-      expect(screen.queryByText('Low')).toBeNull();
+      // "low" renders with EUI's 'hollow' color, which is the only color with no background-color
+      // style (an outline-only badge via the ouiBadge--hollow class). Asserting that
+      // "informational" does NOT get that same hollow treatment — and instead gets an actual
+      // background color — is what proves the two severities are visually distinct, not just
+      // textually distinct (the previous version of this test only checked the label).
+      const informationalBadgeEl = informationalBadge.closest(
+        '.euiBadge',
+      ) as HTMLElement;
+      expect(informationalBadgeEl.className).not.toMatch(/hollow/i);
+      expect(informationalBadgeEl.style.backgroundColor).not.toBe('');
       unmount();
 
       render(
@@ -181,7 +190,9 @@ describe('ResultTable', () => {
       );
       const lowBadge = screen.getByText('Low');
       expect(lowBadge).toBeInTheDocument();
-      expect(screen.queryByText('Informational')).toBeNull();
+      const lowBadgeEl = lowBadge.closest('.euiBadge') as HTMLElement;
+      expect(lowBadgeEl.className).toMatch(/hollow/i);
+      expect(lowBadgeEl.style.backgroundColor).toBe('');
     });
 
     it('falls back to the raw value for an unrecognized severity word', () => {

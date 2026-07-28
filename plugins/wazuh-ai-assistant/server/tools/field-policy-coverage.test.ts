@@ -188,11 +188,19 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
   // Sanity check the positive cases too, so a change to KNOWN_SAFE_STRUCTURAL_FIELDS/
   // FIELD_POLICY_DEFAULTS that accidentally drops an entry is itself caught here.
   assert.equal(
-    isFieldCovered('data.srcip', 'get_critical_alerts', FIELD_POLICY_DEFAULTS),
+    isFieldCovered(
+      'wazuh.agent.host.ip',
+      'get_critical_alerts',
+      FIELD_POLICY_DEFAULTS,
+    ),
     true,
   );
   assert.equal(
-    isFieldCovered('rule.groups', 'get_pci_dss_alerts', FIELD_POLICY_DEFAULTS),
+    isFieldCovered(
+      'wazuh.rule.tags',
+      'get_pci_dss_alerts',
+      FIELD_POLICY_DEFAULTS,
+    ),
     true,
   );
   assert.equal(

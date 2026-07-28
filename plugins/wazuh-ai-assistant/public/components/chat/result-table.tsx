@@ -38,7 +38,7 @@ const SEVERITY_BUCKETS: Record<
   { color: string; label: string }
 > = {
   informational: {
-    color: 'hollow',
+    color: 'accent',
     label: i18n.translate(
       'wazuhAiAssistant.resultTable.severity.informational',
       {
