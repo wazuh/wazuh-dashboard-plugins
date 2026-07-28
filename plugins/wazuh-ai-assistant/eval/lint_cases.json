@@ -73,7 +73,7 @@
       "body": {
         "query": {
           "regexp": {
-            "rule.description": {
+            "wazuh.rule.description": {
               "value": ".*brute.*"
             }
           }
@@ -90,7 +90,7 @@
       "body": {
         "query": {
           "wildcard": {
-            "agent.name": {
+            "wazuh.agent.name": {
               "value": "*prod*"
             }
           }
@@ -322,7 +322,7 @@
         "aggs": {
           "by_rule": {
             "terms": {
-              "field": "rule.id",
+              "field": "wazuh.rule.id",
               "size": 500
             }
           }
@@ -331,7 +331,7 @@
       },
       "expect": "reject",
       "reason_match": "exceeds the maximum",
-      "citation": "guardrails.ts:84 MAX_AGG_SIZE=100; guardrails.ts:251-253 checkAggs rejects when an allowlisted field's terms agg 'size' still exceeds 100 (rule.id itself IS allowlisted, guardrails.ts:65, so only the size trips this one)."
+      "citation": "guardrails.ts:84 MAX_AGG_SIZE=100; guardrails.ts:251-253 checkAggs rejects when an allowlisted field's terms agg 'size' still exceeds 100 (wazuh.rule.id itself IS allowlisted, guardrails.ts:65, so only the size trips this one)."
     },
     {
       "name": "index_not_on_allowlist",
@@ -389,7 +389,7 @@
             "filter": [
               {
                 "range": {
-                  "rule.level": {
+                  "wazuh.rule.level": {
                     "gte": 15
                   }
                 }
@@ -439,7 +439,7 @@
         "aggs": {
           "top_rules": {
             "terms": {
-              "field": "rule.id",
+              "field": "wazuh.rule.id",
               "size": 20
             }
           }
@@ -448,7 +448,7 @@
       },
       "expect": "pass",
       "reason_match": null,
-      "citation": "Shape of get_top_rules.ts:32-44's real, in-production aggregation query (minus the top_hits sub-agg, irrelevant to guardrails) -- rule.id is allowlisted and size is well under the 100 cap."
+      "citation": "Shape of get_top_rules.ts:32-44's real, in-production aggregation query (minus the top_hits sub-agg, irrelevant to guardrails) -- wazuh.rule.id is allowlisted and size is well under the 100 cap."
     },
     {
       "name": "time_range_in_should_bypasses_mandatory_check",
@@ -534,7 +534,7 @@
                   "field": "data.srcip"
                 },
                 {
-                  "field": "agent.id"
+                  "field": "wazuh.agent.id"
                 }
               ],
               "size": 10000
@@ -545,7 +545,7 @@
       },
       "expect": "reject",
       "reason_match": "not on the allowed low-cardinality field list",
-      "citation": "(returns data.srcip buckets with size 10000 honored). checkAggs now iterates multi_terms.terms[].field against AGG_FIELD_ALLOWLIST and checks multi_terms.size."
+      "citation": "(returns data.srcip buckets with size 10000 honored). checkAggs now iterates multi_terms.terms[].field against AGG_FIELD_ALLOWLIST and checks multi_terms.size (wazuh.agent.id itself IS allowlisted; data.srcip is the field that trips the rejection)."
     },
     {
       "name": "composite_agg_size_never_checked",
@@ -573,7 +573,7 @@
                 {
                   "agent": {
                     "terms": {
-                      "field": "agent.id"
+                      "field": "wazuh.agent.id"
                     }
                   }
                 }
@@ -585,7 +585,7 @@
       },
       "expect": "reject",
       "reason_match": "exceeds the maximum",
-      "citation": ". agent.id is allowlisted so only composite.size=10000 trips the check, which the composite branch now enforces against MAX_AGG_SIZE."
+      "citation": ". wazuh.agent.id is allowlisted so only composite.size=10000 trips the check, which the composite branch now enforces against MAX_AGG_SIZE."
     },
     {
       "name": "date_histogram_tiny_interval_bucket_explosion",

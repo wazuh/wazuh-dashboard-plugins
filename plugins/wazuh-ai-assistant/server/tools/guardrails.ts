@@ -198,10 +198,10 @@ function normalizeMustToFilter(node: unknown): unknown {
  * were on this list under the 4.x/bare vocabulary have NO 5.0 equivalent and are deliberately
  * DROPPED rather than renamed (confirmed zero matches across every 5.0 known-fields template —
  * see `LEGACY_4X_FIELDS` in `common/wazuh-fields.ts`):
- * - `rule.groups` — replaced by `rule.category` (single) + `rule.tags` (array).
- * - `rule.mitre.id` / `rule.mitre.technique` (bare, non-leaf) — moved to the leaf-typed
- *   `rule.mitre.technique.{id,name}`, which remain on this list under their `wazuh.*` names.
- * - `agent.os.name` — the OS field moved to ECS `host.os.name` in the 5.0 catalog tools
+ * - rule.groups — replaced by rule.category (single) + rule.tags (array).
+ * - rule.mitre.id / rule.mitre.technique (bare, non-leaf) — moved to the leaf-typed
+ *   rule.mitre.technique.{id,name}, which remain on this list under their `wazuh.*` names.
+ * - agent.os.name — the OS field moved to ECS `host.os.name` in the 5.0 catalog tools
  *   (see `search-alerts-by-os.ts`); nothing in this plugin aggregates on the agent's OS anymore.
  */
 const AGG_FIELD_ALLOWLIST = new Set([

@@ -300,8 +300,8 @@ async function discoverLiveFixtures() {
       size: 0,
       aggs: {
         agents: { terms: { field: 'wazuh.agent.name', size: 10 } },
-        tags: { terms: { field: 'rule.tags', size: 10 } },
-        rule_ids: { terms: { field: 'rule.id', size: 10 } },
+        tags: { terms: { field: 'wazuh.rule.tags', size: 10 } },
+        rule_ids: { terms: { field: 'wazuh.rule.id', size: 10 } },
         os: { terms: { field: 'host.os.name', size: 10 } },
       },
     });
@@ -418,8 +418,10 @@ async function discoverLiveFixtures() {
     familyCounts.powershellSignals = await esCount('wazuh-findings-v5*', {
       bool: {
         should: [
-          { term: { 'rule.mitre.technique.id': 'T1059.001' } },
-          { terms: { 'rule.tags': ['powershell', 'windows_powershell'] } },
+          { term: { 'wazuh.rule.mitre.technique.id': 'T1059.001' } },
+          {
+            terms: { 'wazuh.rule.tags': ['powershell', 'windows_powershell'] },
+          },
           {
             terms: {
               'process.name': ['powershell.exe', 'pwsh.exe', 'powershell'],
