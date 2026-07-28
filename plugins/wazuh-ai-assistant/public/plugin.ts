@@ -5,6 +5,7 @@ import {
   CoreSetup,
   CoreStart,
   Plugin,
+  DEFAULT_APP_CATEGORIES,
 } from '../../../src/core/public';
 import { i18n } from '@osd/i18n';
 import { PLUGIN_ID } from '../common/constants';
@@ -36,13 +37,12 @@ const WAZUH_APP_CATEGORY: AppCategory = {
 
 export class WazuhAiAssistantPlugin
   implements
-    Plugin<
-      WazuhAiAssistantPluginSetup,
-      WazuhAiAssistantPluginStart,
-      WazuhAiAssistantPluginSetupDependencies,
-      WazuhAiAssistantPluginStartDependencies
-    >
-{
+  Plugin<
+    WazuhAiAssistantPluginSetup,
+    WazuhAiAssistantPluginStart,
+    WazuhAiAssistantPluginSetupDependencies,
+    WazuhAiAssistantPluginStartDependencies
+  > {
   public setup(core: CoreSetup): WazuhAiAssistantPluginSetup {
     core.application.register({
       id: PLUGIN_ID,
@@ -50,8 +50,8 @@ export class WazuhAiAssistantPlugin
         defaultMessage: 'AI Assistant',
       }),
       euiIconType: 'chatRight',
-      order: 9040,
-      category: WAZUH_APP_CATEGORY,
+      order: 9070,
+      category: DEFAULT_APP_CATEGORIES.explore,
       navLinkStatus: AppNavLinkStatus.default,
       mount: async (params: AppMountParameters) => {
         const [coreStart] = await core.getStartServices();
@@ -67,5 +67,5 @@ export class WazuhAiAssistantPlugin
     return {};
   }
 
-  public stop(): void {}
+  public stop(): void { }
 }
