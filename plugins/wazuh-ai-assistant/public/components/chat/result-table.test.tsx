@@ -149,6 +149,41 @@ describe('ResultTable', () => {
       expect(screen.getByText('Informational')).toBeInTheDocument();
     });
 
+    it('renders "informational" as its own distinct bucket, never the same as "low"', () => {
+      const { unmount } = render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'severity', label: 'Severity' },
+            ],
+            rows: [{ agent: 'a', severity: 'informational' }],
+            severityColumn: 'severity',
+          })}
+        />,
+      );
+      const informationalBadge = screen.getByText('Informational');
+      expect(informationalBadge).toBeInTheDocument();
+      expect(screen.queryByText('Low')).toBeNull();
+      unmount();
+
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'severity', label: 'Severity' },
+            ],
+            rows: [{ agent: 'a', severity: 'low' }],
+            severityColumn: 'severity',
+          })}
+        />,
+      );
+      const lowBadge = screen.getByText('Low');
+      expect(lowBadge).toBeInTheDocument();
+      expect(screen.queryByText('Informational')).toBeNull();
+    });
+
     it('falls back to the raw value for an unrecognized severity word', () => {
       render(
         <ResultTable

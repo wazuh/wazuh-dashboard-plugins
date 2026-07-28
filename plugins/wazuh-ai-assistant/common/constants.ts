@@ -75,10 +75,11 @@ export const PROVIDER_TYPES = [
 
 export type ProviderType = (typeof PROVIDER_TYPES)[number];
 
-/** Severity levels recognised by the result table's severity column colouring. */
-export const SEVERITY_LEVELS = ['critical', 'high', 'medium', 'low'] as const;
-
-export type SeverityLevel = (typeof SEVERITY_LEVELS)[number];
+/** Severity levels recognised by the result table's severity column colouring.
+ * Re-exported from `wazuh-fields.ts` (the single source of truth for the 5.0 severity
+ * vocabulary) so `common/constants.ts` never drifts from it — see issue #8802. */
+export { SEVERITY_LEVELS } from './wazuh-fields';
+export type { SeverityLevel } from './wazuh-fields';
 
 export const DEFAULT_ANTHROPIC_MAX_TOKENS = 4096;
 export const DEFAULT_ANTHROPIC_VERSION = '2023-06-01';

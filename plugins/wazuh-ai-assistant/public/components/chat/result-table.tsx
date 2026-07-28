@@ -30,38 +30,56 @@ const TABLE_SCROLL_MAX_HEIGHT = 400;
 const DEFAULT_PAGE_SIZE = 25;
 const PAGE_SIZE_OPTIONS = [25, 50, 100];
 
-const SEVERITY_COLORS: Record<SeverityLevel, string> = {
-  critical: 'danger',
-  high: 'warning',
-  medium: 'default',
-  low: 'hollow',
-};
-
-/** Localized badge text for each canonical severity level (color mapping above stays keyed by the
- * English level regardless — only the displayed label is translated). */
-const SEVERITY_LABELS: Record<SeverityLevel, string> = {
-  critical: i18n.translate('wazuhAiAssistant.resultTable.severity.critical', {
-    defaultMessage: 'Critical',
-  }),
-  high: i18n.translate('wazuhAiAssistant.resultTable.severity.high', {
-    defaultMessage: 'High',
-  }),
-  medium: i18n.translate('wazuhAiAssistant.resultTable.severity.medium', {
-    defaultMessage: 'Medium',
-  }),
-  low: i18n.translate('wazuhAiAssistant.resultTable.severity.low', {
-    defaultMessage: 'Low',
-  }),
+/** Canonical 5-bucket severity classification table: badge color + localized label for each
+ * `SeverityLevel` word. `informational` is its own distinct bucket (never folded into `low`) —
+ * see `common/wazuh-fields.ts`'s `SEVERITY_LEVELS` doc comment for the locked decision. */
+const SEVERITY_BUCKETS: Record<
+  SeverityLevel,
+  { color: string; label: string }
+> = {
+  informational: {
+    color: 'hollow',
+    label: i18n.translate(
+      'wazuhAiAssistant.resultTable.severity.informational',
+      {
+        defaultMessage: 'Informational',
+      },
+    ),
+  },
+  low: {
+    color: 'hollow',
+    label: i18n.translate('wazuhAiAssistant.resultTable.severity.low', {
+      defaultMessage: 'Low',
+    }),
+  },
+  medium: {
+    color: 'default',
+    label: i18n.translate('wazuhAiAssistant.resultTable.severity.medium', {
+      defaultMessage: 'Medium',
+    }),
+  },
+  high: {
+    color: 'warning',
+    label: i18n.translate('wazuhAiAssistant.resultTable.severity.high', {
+      defaultMessage: 'High',
+    }),
+  },
+  critical: {
+    color: 'danger',
+    label: i18n.translate('wazuhAiAssistant.resultTable.severity.critical', {
+      defaultMessage: 'Critical',
+    }),
+  },
 };
 
 /**
  * LEGACY numeric rule.level -> severity-word classification (0-6 low, 7-11 medium, 12-14 high,
  * 15+ critical), the Wazuh 4.14 model. In Wazuh 5.0 (findings-v5) rule.level is ALREADY a
  * categorical word (informational/low/medium/high/critical) and never numeric, so this function is
- * now only a fallback for any severity column whose value still arrives numeric; the word path in
- * `renderSeverityBadge` is the normal 5.0 route. Kept so a mixed/older data source still renders.
+ * only a defensive fallback reachable when a severity column's value still arrives numeric (e.g. a
+ * mixed/older data source); the string path in `renderSeverityBadge` is the normal 5.0 route.
  */
-function severityWordFromLevel(level: number): SeverityLevel {
+function legacySeverityWordFromNumericLevel(level: number): SeverityLevel {
   if (level >= 15) {
     return 'critical';
   }
@@ -74,9 +92,10 @@ function severityWordFromLevel(level: number): SeverityLevel {
   return 'low';
 }
 
-/** `value` is numeric (or a numeric-looking string) when it came from a rule.level column; a
- * severity column sourced from a field that is already a word (e.g. vulnerability.severity)
- * fails this check and falls through to the pre-existing word-matching path below unchanged. */
+/** `value` is numeric (or a numeric-looking string) when it came from a legacy rule.level column;
+ * a severity column sourced from a field that is already a word (the normal 5.0 case, e.g.
+ * `wazuh.rule.level`/`vulnerability.severity`) fails this check and falls through to the string
+ * path below unchanged. */
 function toSeverityLevelNumber(value: unknown): number | undefined {
   if (typeof value === 'number') {
     return value;
@@ -95,26 +114,14 @@ function renderSeverityBadge(value: unknown): React.ReactNode {
   const numericLevel = toSeverityLevelNumber(value);
   const word =
     numericLevel !== undefined
-      ? severityWordFromLevel(numericLevel)
+      ? legacySeverityWordFromNumericLevel(numericLevel)
       : String(value ?? '').toLowerCase();
-  // Wazuh 5.0 findings add an "informational" severity below "low";
-  // it is not one of the four canonical SeverityLevel badge colors, so render it as a subdued
-  // badge with its own label rather than falling through to the raw-value default.
-  if (word === 'informational') {
-    return (
-      <EuiBadge color='hollow'>
-        {i18n.translate('wazuhAiAssistant.resultTable.severity.informational', {
-          defaultMessage: 'Informational',
-        })}
-      </EuiBadge>
-    );
-  }
   const isKnown = (SEVERITY_LEVELS as readonly string[]).includes(word);
-  const color = isKnown ? SEVERITY_COLORS[word as SeverityLevel] : 'default';
-  const label = isKnown
-    ? SEVERITY_LABELS[word as SeverityLevel]
-    : String(value ?? '');
-  return <EuiBadge color={color}>{label}</EuiBadge>;
+  if (!isKnown) {
+    return <EuiBadge color='default'>{String(value ?? '')}</EuiBadge>;
+  }
+  const bucket = SEVERITY_BUCKETS[word as SeverityLevel];
+  return <EuiBadge color={bucket.color}>{bucket.label}</EuiBadge>;
 }
 
 interface ResultTableProps {
