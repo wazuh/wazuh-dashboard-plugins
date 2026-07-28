@@ -1,0 +1,211 @@
+import React from 'react';
+import {
+  EuiPanel,
+  EuiText,
+  EuiTextColor,
+  EuiSpacer,
+  EuiLoadingSpinner,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiAvatar,
+  EuiMarkdownFormat,
+} from '@elastic/eui';
+import { i18n } from '@osd/i18n';
+import { ChatRole, TableSpec } from '../../../common/types';
+import { ResultTable } from './result-table';
+import { ResolveDiscoverUrl } from './discover-link';
+
+export interface UiChatMessage {
+  id: string;
+  role: ChatRole;
+  content: string;
+  table?: TableSpec;
+  /** True while this assistant message is still receiving delta events. */
+  isStreaming?: boolean;
+  /** Transient progress line from a `status` stream event (e.g. "Querying Wazuh..."). */
+  statusMessage?: string;
+  createdAt: number;
+}
+
+interface MessageBubbleProps {
+  message: UiChatMessage;
+  /** Basepath-prepended URL for the Wazuh mark, used as the assistant avatar. */
+  aiAvatarUrl: string;
+  /** Threaded down to ResultTable's "Open in Discover" link; see discover-link.tsx. */
+  resolveDiscoverUrl: ResolveDiscoverUrl;
+}
+
+function formatTimestamp(epochMs: number): string {
+  return new Date(epochMs).toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+/**
+ * Renders a single chat turn. User messages are always plain text. Assistant messages are
+ * plain text while still streaming (re-parsing Markdown on every delta token is wasteful and
+ * can flicker), then switch to EuiMarkdownFormat once the message has finished streaming so
+ * bold text, lists, and code blocks in the model's response render correctly.
+ */
+/**
+ * Memoized (perf): without this, every keystroke in the chat input
+ * re-renders ChatPage, which re-renders MessageList, which re-renders EVERY MessageBubble
+ * (including their ResultTables, up to 500 rows each) even though none of their own props
+ * changed. `message`/`aiAvatarUrl`/`resolveDiscoverUrl` are all referentially stable across a
+ * keystroke (see message-list.tsx's own memo doc comment for why), so the default shallow
+ * prop comparison is enough here — no custom comparator needed.
+ */
+const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
+  message,
+  aiAvatarUrl,
+  resolveDiscoverUrl,
+}) => {
+  const isUser = message.role === 'user';
+  // 'accent' rendered pink in this EUI theme, which reads off-brand for Wazuh; 'subdued' is a
+  // neutral grey that still visually separates the user bubble from the assistant's 'plain'.
+  const panelColor = isUser ? 'subdued' : 'plain';
+
+  // color="plain" keeps both avatars on a neutral background so the Wazuh mark reads exactly
+  // like the brand mark in the dashboard chrome, instead of EUI's auto-assigned name color.
+  const avatar = isUser ? (
+    <EuiAvatar
+      size='m'
+      iconType='user'
+      color='plain'
+      name={i18n.translate('wazuhAiAssistant.chat.userAvatarName', {
+        defaultMessage: 'You',
+      })}
+    />
+  ) : (
+    // imageUrl renders the Wazuh mark as a CSS background-image; EuiAvatar has no built-in
+    // onError fallback, but this asset ships with every OSD core build so it is always present.
+    // name="AI" still backs the aria-label/title and would be the initials shown if this prop
+    // were ever removed.
+    <EuiAvatar
+      size='m'
+      imageUrl={aiAvatarUrl}
+      color='plain'
+      name={i18n.translate('wazuhAiAssistant.chat.aiAvatarName', {
+        defaultMessage: 'AI',
+      })}
+    />
+  );
+
+  const bubble = (
+    // minWidth keeps a streaming bubble from starting pin-tiny on the first token and visibly
+    // growing token by token; harmless for user bubbles, which never stream.
+    <EuiFlexItem grow={false} style={{ maxWidth: '75%', minWidth: 180 }}>
+      {/* hasBorder only on the user bubble: gives its flatter "subdued" fill a defined edge,
+          while the assistant bubble keeps reading as an elevated card via hasShadow instead —
+          a calm, low-color way to tell the two apart. borderRadius is a shared inline override
+          (wins over EuiPanel's own smaller default) so both bubble kinds match the rest of this
+          surface's rounding. */}
+      <EuiPanel
+        color={panelColor}
+        paddingSize='m'
+        hasShadow={!isUser}
+        hasBorder={isUser}
+        style={{ borderRadius: 14 }}
+      >
+        {isUser || message.isStreaming ? (
+          // aria-live only for the assistant's streaming text (never the user bubble, which this
+          // branch also covers): announces incoming delta tokens to screen readers, which
+          // otherwise stay silent for the whole stream since nothing else here changes focus.
+          <div
+            {...(!isUser
+              ? {
+                  'aria-live': 'polite' as const,
+                  'aria-atomic': 'false' as const,
+                }
+              : {})}
+          >
+            <EuiText size='s'>
+              {/* Shown only before real content has arrived; a delta event clears statusMessage. */}
+              {message.statusMessage && !message.content && (
+                <p style={{ margin: 0, fontStyle: 'italic' }}>
+                  <EuiTextColor color='subdued'>
+                    {message.statusMessage}
+                  </EuiTextColor>
+                </p>
+              )}
+              <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>
+                {message.content}
+              </p>
+            </EuiText>
+          </div>
+        ) : (
+          <EuiText size='s'>
+            <EuiMarkdownFormat>{message.content}</EuiMarkdownFormat>
+          </EuiText>
+        )}
+        {message.table && (
+          <>
+            <EuiSpacer size='s' />
+            <ResultTable
+              spec={message.table}
+              resolveDiscoverUrl={resolveDiscoverUrl}
+            />
+          </>
+        )}
+      </EuiPanel>
+      <EuiText
+        size='xs'
+        color='subdued'
+        textAlign={isUser ? 'right' : 'left'}
+        className='wzAiAssistantMessageTimestamp'
+      >
+        <p style={{ margin: '2px 4px 0' }}>
+          {formatTimestamp(message.createdAt)}
+        </p>
+      </EuiText>
+    </EuiFlexItem>
+  );
+
+  const avatarItem = (
+    <EuiFlexItem grow={false}>
+      <EuiFlexGroup direction='column' alignItems='center' gutterSize='xs'>
+        <EuiFlexItem grow={false}>{avatar}</EuiFlexItem>
+        {message.isStreaming && (
+          <EuiFlexItem grow={false}>
+            <EuiLoadingSpinner
+              size='s'
+              aria-label={i18n.translate('wazuhAiAssistant.chat.generating', {
+                defaultMessage: 'Generating response',
+              })}
+            />
+          </EuiFlexItem>
+        )}
+      </EuiFlexGroup>
+    </EuiFlexItem>
+  );
+
+  return (
+    // wzMsgRow (chat-page.tsx's CHAT_SURFACE_STYLES): a reduced-motion-guarded fade/slide-up that
+    // plays once when this row is first inserted into the DOM. Applying the class unconditionally
+    // (not toggled by any state) is what keeps it a MOUNT-only effect — a later re-render of this
+    // same MessageBubble instance (a streamed delta, a table arriving, etc.) never re-inserts the
+    // element, so the CSS animation never restarts; only a genuinely NEW message (new `key` in
+    // message-list.tsx, so a new DOM node) plays it again.
+    <EuiFlexGroup
+      className='wzMsgRow'
+      justifyContent={isUser ? 'flexEnd' : 'flexStart'}
+      gutterSize='s'
+      responsive={false}
+    >
+      {isUser ? (
+        <>
+          {bubble}
+          {avatarItem}
+        </>
+      ) : (
+        <>
+          {avatarItem}
+          {bubble}
+        </>
+      )}
+    </EuiFlexGroup>
+  );
+};
+
+export const MessageBubble = React.memo(MessageBubbleComponent);

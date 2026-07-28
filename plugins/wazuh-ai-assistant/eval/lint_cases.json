@@ -1,0 +1,709 @@
+{
+  "_meta": {
+    "description": "Adversarial DSL corpus for server/tools/guardrails.ts, run by eval/run_lint.js against the COMPILED guardrails module (path via EVAL_GUARDRAILS_JS -- see eval/README.md).",
+    "pipeline_order_note": "executor.ts's executeIndexerRequest runs checkIndexAllowlist(index) FIRST, then applySafetyValves(body), then lintDsl(valved.body, index) -- in that order. run_lint.js replicates that exact order per case so 'reject' cases are attributed to the correct function/reason. lintDsl no longer takes a `toolName` 3rd argument as of the 5.0 port (the get_solved_vulnerabilities tool it used to exempt was retired, so the vulnerability-field-on-a-time-based-index check has no per-tool carve-out anymore).",
+    "expect_values": "reject: the relevant function must return {ok:false}, with `reason` matching `reason_match`. clamp: the relevant function must return {ok:true} AND the named field(s) in `body` (after applySafetyValves) must equal the documented clamp value. pass: every function in the pipeline for this case must return {ok:true} (silent field rewrites like a forced track_total_hits are expected and not a failure)."
+  },
+  "cases": [
+    {
+      "name": "script_in_query",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "script_score": {
+            "query": {
+              "match_all": {}
+            },
+            "script": {
+              "source": "doc['rule.level'].value > 5"
+            }
+          }
+        },
+        "size": 10
+      },
+      "expect": "reject",
+      "reason_match": "[Ss]cript",
+      "citation": "guardrails.ts:97-103 findKey(body,'script') walks the full tree (guardrails.ts:127-144) and rejects on ANY key literally named \"script\", anywhere."
+    },
+    {
+      "name": "script_fields",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "match_all": {}
+        },
+        "script_fields": {
+          "level_doubled": {
+            "script": {
+              "lang": "painless",
+              "source": "doc['rule.level'].value * 2"
+            }
+          }
+        },
+        "size": 10
+      },
+      "expect": "reject",
+      "reason_match": "[Ss]cript",
+      "citation": "guardrails.ts's comment (line 3-4, 98) names script_fields explicitly, but the CODE only ever checks for a literal \"script\" key (findKey, guardrails.ts:146-154); this case is rejected because real OpenSearch script_fields syntax nests an actual \"script\" key inside each field entry, not because \"script_fields\" itself is special-cased."
+    },
+    {
+      "name": "runtime_mappings",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "runtime_mappings": {
+          "day_of_week": {
+            "type": "keyword",
+            "script": {
+              "source": "emit(doc['timestamp'].value.dayOfWeekEnum.toString())"
+            }
+          }
+        },
+        "query": {
+          "match_all": {}
+        },
+        "size": 10
+      },
+      "expect": "reject",
+      "reason_match": "[Ss]cript",
+      "citation": "Same mechanism as script_fields above: guardrails.ts never checks for a \"runtime_mappings\" key specifically, but the field definition nests a real \"script\" key, so findKey(body,'script') (guardrails.ts:97) still catches it."
+    },
+    {
+      "name": "regexp_query",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "regexp": {
+            "rule.description": {
+              "value": ".*brute.*"
+            }
+          }
+        },
+        "size": 10
+      },
+      "expect": "reject",
+      "reason_match": "regexp",
+      "citation": "guardrails.ts:110-112 -- findKey(body,'regexp') hard-blocks unconditionally, no allowlist."
+    },
+    {
+      "name": "leading_wildcard_wildcard_clause",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "wildcard": {
+            "agent.name": {
+              "value": "*prod*"
+            }
+          }
+        },
+        "size": 10
+      },
+      "expect": "reject",
+      "reason_match": "leading wildcard",
+      "citation": "guardrails.ts:86-88 LEADING_WILDCARD_KEYS includes 'wildcard'; guardrails.ts:169-180 findLeadingWildcard walks the tree and flags any string value starting with * or ? (or after whitespace/(/: per LEADING_WILDCARD_PATTERN, guardrails.ts:88)."
+    },
+    {
+      "name": "leading_wildcard_query_string_clause",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "query_string": {
+            "query": "*powershell*"
+          }
+        },
+        "size": 10
+      },
+      "expect": "reject",
+      "reason_match": "leading wildcard",
+      "citation": "guardrails.ts:86 LEADING_WILDCARD_KEYS also includes 'query_string' (and 'simple_query_string') -- this is exactly the 4.14 pattern get_suspicious_powershell.ts documents having to route around."
+    },
+    {
+      "name": "date_range_over_90_days",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-180d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 20
+      },
+      "expect": "reject",
+      "reason_match": "90-day maximum lookback",
+      "citation": "guardrails.ts:83 MAX_LOOKBACK_MS = 90*24*60*60*1000; guardrails.ts:226-231 rejects when lteMs-gteMs exceeds it. now-180d resolves via resolveDateMath (guardrails.ts:182-198, the now-Nd/h/m branch) to 180 days before 'now', comfortably over the cap."
+    },
+    {
+      "name": "time_range_missing_lte_bound",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-7d"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 20
+      },
+      "expect": "reject",
+      "reason_match": "must specify both",
+      "citation": "guardrails.ts:212-214 -- a range on a recognized time field (TIME_FIELD_RE, guardrails.ts:82, matches 'timestamp' or '@timestamp') with only one of gte/lte present is rejected outright, regardless of span."
+    },
+    {
+      "name": "no_time_range_at_all_on_time_index",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "match_all": {}
+        },
+        "size": 20
+      },
+      "expect": "reject",
+      "reason_match": "must include a .range. clause",
+      "citation": "lintDsl now takes the target index and rejects any query against a time-based index (TIME_BASED_INDEX_RE, wazuh-events-v5-*/wazuh-findings-v5-* as of the 5.0 port) that contains no range clause on a time field at all (hasTimeRange walk). wazuh-states-* stays exempt -- see states_index_no_time_range_still_passes."
+    },
+    {
+      "name": "states_index_no_time_range_still_passes",
+      "index": "wazuh-states-vulnerabilities-*",
+      "body": {
+        "query": {
+          "match": {
+            "vulnerability.severity": "Critical"
+          }
+        },
+        "size": 20
+      },
+      "expect": "pass",
+      "reason_match": null,
+      "citation": "Regression guard for the mandatory-time-bound check's exemption: wazuh-states-* indices are current-state snapshots with no event-time axis (guardrails.ts TIME_BASED_INDEX_RE matches only wazuh-events-v5-*/wazuh-findings-v5-* as of the 5.0 port), so a rangeless query against them must keep passing -- this is the shape of get_critical_vulnerabilities.ts's real query."
+    },
+    {
+      "name": "size_over_500_clamped",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-1d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 5000
+      },
+      "expect": "clamp",
+      "clampField": "size",
+      "clampValue": 500,
+      "reason_match": null,
+      "citation": "guardrails.ts:53-54 -- next.size = Math.min(Math.max(requestedSize,0), MAX_SIZE=500) -- 5000 clamps to 500, applySafetyValves still returns ok:true (this is a silent rewrite, not a rejection)."
+    },
+    {
+      "name": "track_total_hits_always_forced",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-1d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "track_total_hits": true,
+        "size": 20
+      },
+      "expect": "clamp",
+      "clampField": "track_total_hits",
+      "clampValue": 10000,
+      "reason_match": null,
+      "citation": "guardrails.ts:55 -- next.track_total_hits = MAX_TRACK_TOTAL_HITS (10000) unconditionally, overwriting whatever the caller sent (true, false, or a number) every single time."
+    },
+    {
+      "name": "from_deep_pagination_rejected",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-1d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "from": 5000,
+        "size": 20
+      },
+      "expect": "reject",
+      "reason_match": "exceeds the maximum",
+      "citation": "guardrails.ts:12,42-50 -- MAX_FROM=1000; from>1000 is a hard rejection (not a clamp) inside applySafetyValves, before lintDsl even runs (executor.ts:92-100 order)."
+    },
+    {
+      "name": "terms_agg_non_allowlisted_field",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-1d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "aggs": {
+          "by_src_ip": {
+            "terms": {
+              "field": "data.srcip",
+              "size": 10
+            }
+          }
+        },
+        "size": 0
+      },
+      "expect": "reject",
+      "reason_match": "not on the allowed low-cardinality field list",
+      "citation": "guardrails.ts:64-80 AGG_FIELD_ALLOWLIST does not include data.srcip (a genuinely high-cardinality field); guardrails.ts:244-249 checkAggs rejects any terms/cardinality/significant_terms agg whose field isn't on that allowlist."
+    },
+    {
+      "name": "terms_agg_size_over_100",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-1d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "aggs": {
+          "by_rule": {
+            "terms": {
+              "field": "rule.id",
+              "size": 500
+            }
+          }
+        },
+        "size": 0
+      },
+      "expect": "reject",
+      "reason_match": "exceeds the maximum",
+      "citation": "guardrails.ts:84 MAX_AGG_SIZE=100; guardrails.ts:251-253 checkAggs rejects when an allowlisted field's terms agg 'size' still exceeds 100 (rule.id itself IS allowlisted, guardrails.ts:65, so only the size trips this one)."
+    },
+    {
+      "name": "index_not_on_allowlist",
+      "index": "wazuh-monitoring-3.x-2026.07.12",
+      "body": {
+        "query": {
+          "match_all": {}
+        },
+        "size": 10
+      },
+      "expect": "reject",
+      "reason_match": "not in the allowed set",
+      "citation": "guardrails.ts INDEX_ALLOWLIST_RE = /^wazuh-(events-v5|findings-v5|states)[^,\\s]*$/ (5.0 port; wazuh-alerts-*/wazuh-archives-* were dropped from the allowlist) -- wazuh-monitoring-* (agent connection-status history, a real Wazuh index family) is deliberately outside the three-family allowlist and is rejected by checkIndexAllowlist before applySafetyValves/lintDsl ever run."
+    },
+    {
+      "name": "bool_must_normalized_to_filter",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "must": [
+              {
+                "term": {
+                  "level": 3
+                }
+              }
+            ],
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-1d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 10
+      },
+      "expect": "clamp",
+      "clampField": "query.bool.filter.1.term.level",
+      "clampValue": 3,
+      "absentField": "query.bool.must",
+      "reason_match": null,
+      "citation": "applySafetyValves now runs normalizeMustToFilter (recursive, copy-on-write) -- every bool.must's entries are appended to that bool's filter array and the must key removed, making the escape hatch's 'filter context' contract true by normalization instead of a rejection round-trip. Matching semantics identical (scoring-only difference); should/must_not deliberately untouched. This case asserts the moved clause lands at filter[1] (after the pre-existing filter[0]) and that must is gone."
+    },
+    {
+      "name": "clean_query_filter_context_time_bounded",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "rule.level": {
+                    "gte": 15
+                  }
+                }
+              },
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-7d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "sort": [
+          {
+            "@timestamp": {
+              "order": "desc"
+            }
+          }
+        ],
+        "size": 20
+      },
+      "expect": "pass",
+      "reason_match": null,
+      "citation": "Shape of get_critical_alerts.ts:34-46's real, in-production query -- must pass cleanly end to end (checkIndexAllowlist, applySafetyValves, lintDsl all ok:true)."
+    },
+    {
+      "name": "clean_aggregation_query",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-30d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "aggs": {
+          "top_rules": {
+            "terms": {
+              "field": "rule.id",
+              "size": 20
+            }
+          }
+        },
+        "size": 0
+      },
+      "expect": "pass",
+      "reason_match": null,
+      "citation": "Shape of get_top_rules.ts:32-44's real, in-production aggregation query (minus the top_hits sub-agg, irrelevant to guardrails) -- rule.id is allowlisted and size is well under the 100 cap."
+    },
+    {
+      "name": "time_range_in_should_bypasses_mandatory_check",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "match_all": {}
+              }
+            ],
+            "should": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-1d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 500
+      },
+      "expect": "reject",
+      "reason_match": "must include a .range. clause",
+      "citation": "A decorative should-range runs unbounded (measured at 2272 full-corpus docs vs 1650 bounded), so hasTimeRange only credits a time range in REQUIRED context (bool.filter/must), not bool.should — a decorative should-range no longer satisfies the mandatory bound."
+    },
+    {
+      "name": "time_range_in_must_not_bypasses_mandatory_check",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "match_all": {}
+              }
+            ],
+            "must_not": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-90d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 500
+      },
+      "expect": "reject",
+      "reason_match": "must include a .range. clause",
+      "citation": "Must_not variant: a negated range EXCLUDES the window, worse than decorative). Same required-context fix as time_range_in_should_bypasses_mandatory_check."
+    },
+    {
+      "name": "multi_terms_agg_bypasses_field_allowlist",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-1d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "aggs": {
+          "by_src_dst": {
+            "multi_terms": {
+              "terms": [
+                {
+                  "field": "data.srcip"
+                },
+                {
+                  "field": "agent.id"
+                }
+              ],
+              "size": 10000
+            }
+          }
+        },
+        "size": 0
+      },
+      "expect": "reject",
+      "reason_match": "not on the allowed low-cardinality field list",
+      "citation": "(returns data.srcip buckets with size 10000 honored). checkAggs now iterates multi_terms.terms[].field against AGG_FIELD_ALLOWLIST and checks multi_terms.size."
+    },
+    {
+      "name": "composite_agg_size_never_checked",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-1d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "aggs": {
+          "c": {
+            "composite": {
+              "size": 10000,
+              "sources": [
+                {
+                  "agent": {
+                    "terms": {
+                      "field": "agent.id"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "size": 0
+      },
+      "expect": "reject",
+      "reason_match": "exceeds the maximum",
+      "citation": ". agent.id is allowlisted so only composite.size=10000 trips the check, which the composite branch now enforces against MAX_AGG_SIZE."
+    },
+    {
+      "name": "date_histogram_tiny_interval_bucket_explosion",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-90d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "aggs": {
+          "explode": {
+            "date_histogram": {
+              "field": "@timestamp",
+              "fixed_interval": "1s"
+            }
+          }
+        },
+        "size": 0
+      },
+      "expect": "reject",
+      "reason_match": "too fine",
+      "citation": "(cluster backstops at max_buckets=65535->503, but wastes compute). checkAggs now enforces a >=1m interval floor on date_histogram/histogram."
+    },
+    {
+      "name": "query_string_leading_wildcard_behind_plus_operator",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-1d",
+                    "lte": "now"
+                  }
+                }
+              },
+              {
+                "query_string": {
+                  "query": "+*powershell*"
+                }
+              }
+            ]
+          }
+        },
+        "size": 20
+      },
+      "expect": "reject",
+      "reason_match": "leading wildcard",
+      "citation": "(ran 3.4s as an expensive leading-wildcard scan). LEADING_WILDCARD_PATTERN boundary class now includes the Lucene operators + - ! ^ ~."
+    },
+    {
+      "name": "index_allowlist_comma_smuggling",
+      "index": "wazuh-findings-v5-*,wazuh-monitoring-3.x-2026.07.12",
+      "body": {
+        "query": {
+          "match_all": {}
+        },
+        "size": 10
+      },
+      "expect": "reject",
+      "reason_match": "not in the allowed set",
+      "citation": "/latent (not reachable today: index is enum-locked in schema_validator). INDEX_ALLOWLIST_RE now rejects a comma/whitespace-smuggled disallowed index appended after a valid prefix."
+    },
+    {
+      "name": "vuln_field_match_on_alerts_index_rejected",
+      "index": "wazuh-findings-v5-*",
+      "body": {
+        "query": {
+          "bool": {
+            "filter": [
+              {
+                "match": {
+                  "data.vulnerability.status": "Solved"
+                }
+              },
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": "now-30d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "size": 20
+      },
+      "expect": "reject",
+      "reason_match": "Vulnerability data is not in the findings/events index",
+      "citation": "Observed against the 4.14 equivalent of this query: this is the shape of escape-hatch query the model hand-builds instead of calling a typed vulnerability tool. guardrails.ts's findVulnerabilityFieldOnAlertsIndex (called from lintDsl, before the mandatory-time-range check) rejects any match/match_phrase/term/terms/range/exists clause on a data.vulnerability.*/vulnerability.* field against a time-based (wazuh-events-v5-*/wazuh-findings-v5-*) index, naming the typed vulnerability tools so the model self-corrects in the same turn. The 5.0 port retired both get_solved_vulnerabilities and its per-tool exemption on this check (lintDsl no longer takes a toolName argument), so this rejection is now unconditional on a time-based index -- there is no legitimate caller of vulnerability fields on the findings/events timeline."
+    },
+    {
+      "name": "vuln_field_match_on_states_index_still_passes",
+      "index": "wazuh-states-vulnerabilities-*",
+      "body": {
+        "query": {
+          "match": {
+            "data.vulnerability.status": "Solved"
+          }
+        },
+        "size": 20
+      },
+      "expect": "pass",
+      "reason_match": null,
+      "citation": "Regression guard against overreach for vuln_field_match_on_alerts_index_rejected: the check keys on TIME_BASED_INDEX_RE (wazuh-events-v5-*/wazuh-findings-v5-* only, as of the 5.0 port), so the exact same field filter against wazuh-states-vulnerabilities-* -- the real current-state index every vulnerability tool targets -- must never be rejected by this rule. wazuh-states-* is also exempt from the mandatory-time-range check (see states_index_no_time_range_still_passes), so this case passes end to end."
+    }
+  ]
+}

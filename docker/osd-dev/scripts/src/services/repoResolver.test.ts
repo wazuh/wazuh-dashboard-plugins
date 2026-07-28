@@ -121,7 +121,12 @@ describe('services/repoResolver', () => {
 
   it('resolveRequiredRepositories builds env map of names to paths', () => {
     // Prepare three repos under plugins
-    const repos = ['main', 'wazuh-core', 'wazuh-check-updates'];
+    const repos = [
+      'main',
+      'wazuh-core',
+      'wazuh-check-updates',
+      'wazuh-ai-assistant',
+    ];
     for (const repo of repos) {
       const host = path.join(hostRoot, 'plugins', repo);
       const cont = path.join(containerRoot, 'plugins', repo);
@@ -139,7 +144,12 @@ describe('services/repoResolver', () => {
       envPaths,
     );
     expect(Array.from(map.keys()).sort()).toEqual(
-      ['REPO_MAIN', 'REPO_WAZUH_CHECK_UPDATES', 'REPO_WAZUH_CORE'].sort(),
+      [
+        'REPO_MAIN',
+        'REPO_WAZUH_CHECK_UPDATES',
+        'REPO_WAZUH_CORE',
+        'REPO_WAZUH_AI_ASSISTANT',
+      ].sort(),
     );
     expect(map.get('REPO_MAIN')).toBe(path.join(hostRoot, 'plugins', 'main'));
   });
