@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { listToolDefinitions } from './registry';
 import { FIELD_POLICY_DEFAULTS, FieldPolicyEntry } from './privacy';
+import { RETIRED_FIELD_MAP } from '../../common/wazuh-fields';
 
 /**
  * Guard test for the rule ("a new field without a privacy classification
@@ -33,11 +36,22 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   'rule.level',
   'rule.description',
   'rule.mitre.technique',
+  // Wazuh 5.0 wazuh.* renames of the above (issue #8802 / Slice A): added ahead of the Slice B
+  // catalog-tool rename so this allowlist is ready to cover the renamed digest columns once they
+  // land, without removing the still-in-use bare entries during the transition.
+  'wazuh.rule.id',
+  'wazuh.rule.level',
+  'wazuh.rule.description',
+  'wazuh.rule.mitre.technique.id',
+  'wazuh.rule.mitre.technique.name',
   // Aggregation-bucket shape (get_top_rules and the *_summary tools).
   'key',
   'doc_count',
   // agent.os.name / os.* / architecture / vendor / version: OS/package metadata, not identifiers.
   'agent.os.name',
+  // wazuh.agent.host.os.name is agent.os.name's real Wazuh 5.0 home (NOT a naive
+  // wazuh.agent.os.name prefix — see common/wazuh-fields.ts).
+  'wazuh.agent.host.os.name',
   'os.name',
   'os.version',
   'architecture',
@@ -188,5 +202,54 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
   assert.equal(
     isFieldCovered('name', 'get_active_agents', FIELD_POLICY_DEFAULTS),
     true,
+  );
+});
+
+/**
+ * Regression guard for issue #8802 (update-index-references): every field the AI assistant
+ * queries the Indexer with must resolve to a field actually populated in Wazuh 5.0
+ * `wazuh-findings-v5*`/`wazuh-events-v5*` documents. A retired bare `rule.*`/`agent.*` literal
+ * (see `RETIRED_FIELD_MAP` in `common/wazuh-fields.ts`) silently produces a query that matches
+ * nothing — a wrong answer with no error.
+ *
+ * This scans the SOURCE of `server/tools/catalog/*.ts` (excluding test files), `digest.ts`, and
+ * `guardrails.ts` for a quoted literal matching one of the retired keys. It is expected to FAIL
+ * against the current (pre-rename) tree — Slices B/C haven't renamed the catalog tools/guardrails
+ * yet — and is meant to keep failing loudly until every one of those files is migrated off the
+ * retired vocabulary. Do NOT weaken this test to make it pass before the rename actually lands.
+ */
+function findRetiredFieldLiteralOccurrences(): string[] {
+  const catalogDir = path.join(__dirname, 'catalog');
+  const filesToScan: string[] = fs
+    .readdirSync(catalogDir)
+    .filter(name => name.endsWith('.ts') && !name.endsWith('.test.ts'))
+    .map(name => path.join(catalogDir, name));
+  filesToScan.push(path.join(__dirname, 'digest.ts'));
+  filesToScan.push(path.join(__dirname, 'guardrails.ts'));
+
+  const retiredKeys = Object.keys(RETIRED_FIELD_MAP);
+  const failures: string[] = [];
+
+  for (const filePath of filesToScan) {
+    const source = fs.readFileSync(filePath, 'utf8');
+    for (const key of retiredKeys) {
+      const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const literalRe = new RegExp(`['"\`]${escaped}['"\`]`);
+      if (literalRe.test(source)) {
+        failures.push(`${path.relative(process.cwd(), filePath)}: '${key}'`);
+      }
+    }
+  }
+  return failures;
+}
+
+test('no retired bare rule.*/agent.* field literal survives in catalog/digest/guardrails source (RED until Slices B/C land)', () => {
+  const failures = findRetiredFieldLiteralOccurrences();
+  assert.deepEqual(
+    failures,
+    [],
+    `retired field literal(s) found — rename to the wazuh.* equivalent (see common/wazuh-fields.ts RETIRED_FIELD_MAP): ${failures.join(
+      ', ',
+    )}`,
   );
 });
