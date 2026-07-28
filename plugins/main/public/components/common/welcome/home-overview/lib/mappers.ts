@@ -1,5 +1,6 @@
 import {
   AgentStatus,
+  NewestIndicator,
   ScaBenchmark,
   ScaTilesData,
   SeverityBand,
@@ -112,6 +113,20 @@ export function mapScaBenchmarks(aggregations: Aggregations): ScaBenchmark[] {
   });
 }
 
+/** Cloud Security card counts: doc_count per bucket key (app id) from a filters agg. */
+export function mapCloudSecurityByModule(
+  aggregations: Aggregations,
+): Record<string, number | undefined> {
+  const buckets =
+    (aggregations?.[AGG.cloudSecurityByModule]?.buckets as
+      | Record<string, FiltersAggBucket>
+      | undefined) ?? {};
+  return Object.entries(buckets).reduce((acc, [appId, bucket]) => {
+    acc[appId] = bucket?.doc_count;
+    return acc;
+  }, {} as Record<string, number | undefined>);
+}
+
 export function mapTopBuckets(
   aggregations: Aggregations,
   aggName: string,
@@ -132,6 +147,29 @@ export function mapTopBuckets(
       ...(externalId !== undefined ? { id: String(externalId) } : {}),
     };
   });
+}
+
+interface NewestIndicatorSource {
+  document?: {
+    feed?: { name?: string };
+    last_seen?: string;
+  };
+}
+
+/** Reads the `top_hits` (size 1) built by `buildThreatIntelNewestIndicatorAgg`. */
+export function mapNewestIndicator(
+  aggregations: Aggregations,
+): NewestIndicator | undefined {
+  const hit = (
+    aggregations?.[AGG.newestIndicator] as unknown as
+      | { hits?: { hits?: Array<{ _source?: NewestIndicatorSource }> } }
+      | undefined
+  )?.hits?.hits?.[0];
+  const lastSeen = hit?._source?.document?.last_seen;
+  if (!lastSeen) {
+    return undefined;
+  }
+  return { feedName: hit?._source?.document?.feed?.name, lastSeen };
 }
 
 export function mapAgentStatus(

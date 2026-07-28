@@ -35,6 +35,8 @@ export interface FindingsOverview {
   topTechniques: TopItem[];
   /** IOC matches (last 24h detection metric), from the same findings search. */
   iocMatches?: number;
+  /** Findings count per Cloud Security module (app id), last 24h. */
+  cloudSecurityByModule: Record<string, number | undefined>;
 }
 
 export interface ScaTilesData {
@@ -64,6 +66,14 @@ export interface FimOverview {
   files: TopItem[];
 }
 
+/** The single most-recent indicator in the threat-intel enrichments catalog. */
+export interface NewestIndicator {
+  /** Source feed name (`document.feed.name`, e.g. `threat-fox`), if set. */
+  feedName?: string;
+  /** ISO timestamp (`document.last_seen`) of the newest indicator. */
+  lastSeen: string;
+}
+
 /**
  * Threat-intel enrichments catalog (`wazuh-threatintel-enrichments*`): the feed
  * of IOCs the platform detects with. Current-state, not time-bounded.
@@ -73,6 +83,8 @@ export interface ThreatIntelEnrichments {
   total?: number;
   /** Feed composition by indicator type (the Malware "IOC feed by type" table). */
   feedByType: TopItem[];
+  /** Freshness readout on the Threat catalog card; absent if the catalog is empty. */
+  newestIndicator?: NewestIndicator;
 }
 
 export interface VulnerabilityOverview {

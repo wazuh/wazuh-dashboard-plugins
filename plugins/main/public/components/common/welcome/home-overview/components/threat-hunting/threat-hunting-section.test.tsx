@@ -22,6 +22,7 @@ const findingsAvailable = {
       { key: 'Exploit Public-Facing Application', count: 35378, id: 'T1190' },
     ],
     iocMatches: 0,
+    cloudSecurityByModule: {},
   },
   indexPatternId: 'idx-1',
 };

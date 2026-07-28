@@ -4,7 +4,9 @@ import {
   mapTopBuckets,
   mapAgentStatus,
   mapCardinality,
+  mapCloudSecurityByModule,
   mapDocCount,
+  mapNewestIndicator,
   mapScaTiles,
   mapScaBenchmarks,
 } from './mappers';
@@ -202,6 +204,81 @@ describe('mappers', () => {
     it('returns an empty array when the agg is missing', () => {
       expect(mapScaBenchmarks(undefined)).toEqual([]);
       expect(mapScaBenchmarks({})).toEqual([]);
+    });
+  });
+
+  describe('mapCloudSecurityByModule', () => {
+    it('reads doc_count per module bucket, keyed by app id', () => {
+      const aggregations = {
+        cloud_security_by_module: {
+          buckets: {
+            docker: { doc_count: 12 },
+            'amazon-web-services': { doc_count: 0 },
+            github: { doc_count: 3 },
+          },
+        },
+      };
+      expect(mapCloudSecurityByModule(aggregations)).toEqual({
+        docker: 12,
+        'amazon-web-services': 0,
+        github: 3,
+      });
+    });
+
+    it('returns an empty object when the agg is missing', () => {
+      expect(mapCloudSecurityByModule(undefined)).toEqual({});
+      expect(mapCloudSecurityByModule({})).toEqual({});
+    });
+  });
+
+  describe('mapNewestIndicator', () => {
+    it('reads the feed name and last_seen from the top_hits agg', () => {
+      const aggregations = {
+        newest_indicator: {
+          hits: {
+            hits: [
+              {
+                _source: {
+                  document: {
+                    feed: { name: 'threat-fox' },
+                    last_seen: '2026-07-03T00:00:00.000Z',
+                  },
+                },
+              },
+            ],
+          },
+        },
+      };
+      expect(mapNewestIndicator(aggregations)).toEqual({
+        feedName: 'threat-fox',
+        lastSeen: '2026-07-03T00:00:00.000Z',
+      });
+    });
+
+    it('returns undefined when there is no hit or no last_seen (empty catalog)', () => {
+      expect(mapNewestIndicator(undefined)).toBeUndefined();
+      expect(
+        mapNewestIndicator({ newest_indicator: { hits: { hits: [] } } }),
+      ).toBeUndefined();
+      expect(
+        mapNewestIndicator({
+          newest_indicator: { hits: { hits: [{ _source: {} }] } },
+        }),
+      ).toBeUndefined();
+    });
+
+    it('omits feedName when document.feed.name is absent', () => {
+      expect(
+        mapNewestIndicator({
+          newest_indicator: {
+            hits: {
+              hits: [
+                { _source: { document: { last_seen: '2026-07-20T00:00:00.000Z' } } },
+              ],
+            },
+          },
+        }),
+      ).toEqual({ lastSeen: '2026-07-20T00:00:00.000Z' });
     });
   });
 

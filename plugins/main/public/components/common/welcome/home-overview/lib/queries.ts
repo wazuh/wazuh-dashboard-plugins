@@ -5,6 +5,7 @@ import {
   EVENT_DOC_ID_FIELD,
   FIM_FILE_PATH_FIELD,
   FINDING_SEVERITY_FIELD,
+  INTEGRATION_NAME_FIELD,
   MITRE_TACTIC_NAME_FIELD,
   MITRE_TACTIC_ID_FIELD,
   MITRE_TECHNIQUE_ID_FIELD,
@@ -15,6 +16,8 @@ import {
   FINDING_SEVERITY_BANDS,
   VULNERABILITY_SEVERITY_BANDS,
   THREAT_ENRICHMENTS_FIELD,
+  THREAT_INTEL_FEED_NAME_FIELD,
+  THREAT_INTEL_LAST_SEEN_FIELD,
   THREAT_INTEL_TYPE_FIELD,
   VULNERABILITY_CVE_ID_FIELD,
   VULNERABILITY_PACKAGE_NAME_FIELD,
@@ -180,6 +183,25 @@ export function buildIocMatchesAgg() {
   };
 }
 
+const CLOUD_SECURITY_MODULE_FILTERS: Record<string, unknown> = {
+  docker: { match_phrase: { [INTEGRATION_NAME_FIELD]: 'docker' } },
+  'amazon-web-services': { wildcard: { [INTEGRATION_NAME_FIELD]: 'aws*' } },
+  'google-cloud': { match_phrase: { [INTEGRATION_NAME_FIELD]: 'gcp' } },
+  github: { match_phrase: { [INTEGRATION_NAME_FIELD]: 'github' } },
+  office365: { match_phrase: { [INTEGRATION_NAME_FIELD]: 'o365' } },
+  'microsoft-graph-api': {
+    match_phrase: { [INTEGRATION_NAME_FIELD]: 'azure' },
+  },
+};
+
+export function buildCloudSecurityByModuleAgg() {
+  return {
+    [AGG.cloudSecurityByModule]: {
+      filters: { filters: CLOUD_SECURITY_MODULE_FILTERS },
+    },
+  };
+}
+
 /**
  * Malware IOC-match hero on the threat-enrichment subset, as a filter sub-agg
  * so it rides the shared findings search instead of a separate query. The IOC
@@ -202,4 +224,22 @@ export function buildMalwareFilterAgg() {
  */
 export function buildThreatIntelFeedByTypeAgg(size = TOP_N) {
   return buildTopTermsAgg(AGG.iocFeedByType, THREAT_INTEL_TYPE_FIELD, size);
+}
+
+/**
+ * Newest indicator in the threat-intel enrichments catalog: a `top_hits`
+ * (size 1, sorted by `document.last_seen` desc) alongside the feed-by-type
+ * terms agg above, so the freshness readout rides the same single search —
+ * no new round trip.
+ */
+export function buildThreatIntelNewestIndicatorAgg() {
+  return {
+    [AGG.newestIndicator]: {
+      top_hits: {
+        size: 1,
+        sort: [{ [THREAT_INTEL_LAST_SEEN_FIELD]: { order: 'desc' } }],
+        _source: [THREAT_INTEL_FEED_NAME_FIELD, THREAT_INTEL_LAST_SEEN_FIELD],
+      },
+    },
+  };
 }

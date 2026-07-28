@@ -28,6 +28,7 @@ import {
 } from '../../../data-source';
 import { WzRequest } from '../../../../../react-services';
 import {
+  buildCloudSecurityByModuleAgg,
   buildCvesMatchedAgg,
   buildFindingsOverviewAggs,
   buildFIMTopFilesAgg,
@@ -35,6 +36,7 @@ import {
   buildSCATilesAgg,
   buildSCATopBenchmarksAgg,
   buildThreatIntelFeedByTypeAgg,
+  buildThreatIntelNewestIndicatorAgg,
   buildTopTermsAgg,
   buildVulnerabilitySeverityFiltersAgg,
   buildVulnerabilityTopPackagesAgg,
@@ -48,7 +50,9 @@ import { AGG } from '../lib/constants';
 import {
   mapAgentStatus,
   mapCardinality,
+  mapCloudSecurityByModule,
   mapDocCount,
+  mapNewestIndicator,
   mapScaBenchmarks,
   mapScaTiles,
   mapSeverityCounts,
@@ -57,7 +61,9 @@ import {
 import {
   fetchDecodersCount,
   fetchDetectorsCount,
+  fetchFiltersCount,
   fetchIntegrationsCount,
+  fetchKvdbsCount,
   fetchRulesCount,
 } from '../services/security-analytics.service';
 import {
@@ -226,7 +232,11 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
       label: 'Findings',
       fetch: async fetchData => {
         const response = await fetchData({
-          aggs: { ...buildFindingsOverviewAggs(), ...buildMalwareFilterAgg() },
+          aggs: {
+            ...buildFindingsOverviewAggs(),
+            ...buildMalwareFilterAgg(),
+            ...buildCloudSecurityByModuleAgg(),
+          },
           dateRange: LAST_24H,
           pagination: NO_HITS,
         });
@@ -245,6 +255,9 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
             AGG.topTechniques,
           ),
           iocMatches: mapCardinality(malware, AGG.iocMatches),
+          cloudSecurityByModule: mapCloudSecurityByModule(
+            response?.aggregations,
+          ),
         };
       },
     });
@@ -394,6 +407,14 @@ export function useDetectorsCount(enabled: boolean): DataGroupResult<number> {
   return useSecurityAnalyticsFetch(enabled, fetchDetectorsCount, 'Detectors');
 }
 
+export function useKvdbsCount(enabled: boolean): DataGroupResult<number> {
+  return useSecurityAnalyticsFetch(enabled, fetchKvdbsCount, 'KVDBs');
+}
+
+export function useFiltersCount(enabled: boolean): DataGroupResult<number> {
+  return useSecurityAnalyticsFetch(enabled, fetchFiltersCount, 'Filters');
+}
+
 export function useVulnerabilityOverview(
   enabled: boolean,
 ): DataGroupResult<VulnerabilityOverview> {
@@ -444,12 +465,16 @@ export function useThreatIntelEnrichments(
     label: 'Threat intelligence',
     fetch: async fetchData => {
       const response = await fetchData({
-        aggs: buildThreatIntelFeedByTypeAgg(),
+        aggs: {
+          ...buildThreatIntelFeedByTypeAgg(),
+          ...buildThreatIntelNewestIndicatorAgg(),
+        },
         pagination: NO_HITS,
       });
       return {
         total: mapDocCount(response),
         feedByType: mapTopBuckets(response?.aggregations, AGG.iocFeedByType),
+        newestIndicator: mapNewestIndicator(response?.aggregations),
       };
     },
   });

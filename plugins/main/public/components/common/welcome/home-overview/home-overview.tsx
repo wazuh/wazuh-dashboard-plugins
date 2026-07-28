@@ -1,6 +1,7 @@
 import React from 'react';
 import { EuiPage, EuiPageBody, EuiSpacer } from '@elastic/eui';
 import { SectionHeader } from './components/common';
+import { QuickAccessMenu } from './components/quick-access';
 import { OverviewSection } from './components/overview';
 import { EndpointSecuritySection } from './components/endpoint-security';
 import { ThreatHuntingSection } from './components/threat-hunting';
@@ -19,8 +20,8 @@ import { overview } from '../../../../utils/applications';
 /**
  * Findings (on mount) and the lazy searches (vulnerabilities, threat-intel
  * enrichments) are run once here and shared across sections. Enrichments feed
- * both Malware Detection (feed-by-type) and the Threat Intelligence Feed
- * (IOCs tile), so it's gated on the Endpoint Security section scrolling in.
+ * both Malware Detection (feed-by-type) and the Threat Catalog (IOCs tile),
+ * so it's gated on the Endpoint Security section scrolling in.
  */
 const HomeOverviewBody: React.FC = () => {
   const findings = useFindingsOverview();
@@ -35,6 +36,7 @@ const HomeOverviewBody: React.FC = () => {
       <SectionHeader
         title='Overview'
         description='Fleet health, findings, and MITRE ATT&CK activity across your environment.'
+        actions={<QuickAccessMenu />}
       />
       <OverviewSection findings={findings} />
       <EuiSpacer size='l' />
@@ -59,7 +61,7 @@ const HomeOverviewBody: React.FC = () => {
       <EuiSpacer size='l' />
       <SecurityOperationsSection />
       <EuiSpacer size='l' />
-      <CloudSecuritySection />
+      <CloudSecuritySection findings={findings} />
     </>
   );
 };

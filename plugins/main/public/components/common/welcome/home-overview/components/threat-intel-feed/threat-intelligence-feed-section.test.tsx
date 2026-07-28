@@ -1,27 +1,34 @@
 import '@testing-library/jest-dom';
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '../../test-utils/setup-home-overview-test';
 import { ThreatIntelligenceFeedSection } from './threat-intelligence-feed-section';
 import {
   useDecodersCount,
   useDetectorsCount,
+  useFiltersCount,
   useIntegrationsCount,
+  useKvdbsCount,
   useRulesCount,
 } from '../../hooks/use-overview-data';
 import { useInViewport } from '../../../../hooks';
+import * as navigation from '../../utils/navigation';
 
 jest.mock('../../hooks/use-overview-data', () => ({
   useRulesCount: jest.fn(),
   useDecodersCount: jest.fn(),
-  useIntegrationsCount: jest.fn(),
   useDetectorsCount: jest.fn(),
+  useIntegrationsCount: jest.fn(),
+  useKvdbsCount: jest.fn(),
+  useFiltersCount: jest.fn(),
 }));
 jest.mock('../../utils/navigation', () => ({
   getRulesUrl: jest.fn(),
   getDecodersUrl: jest.fn(),
-  getIntegrationsUrl: jest.fn(),
   getDetectorsUrl: jest.fn(),
+  getIntegrationsUrl: jest.fn(() => '/manage-content'),
+  getKvdbsUrl: jest.fn(),
+  getFiltersUrl: jest.fn(),
 }));
 jest.mock('../../../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),
@@ -50,13 +57,16 @@ beforeEach(() => {
   jest.clearAllMocks();
   asMock(useRulesCount).mockReturnValue(available(482));
   asMock(useDecodersCount).mockReturnValue(available(128));
-  asMock(useIntegrationsCount).mockReturnValue(available(14));
   asMock(useDetectorsCount).mockReturnValue(available(9));
+  asMock(useIntegrationsCount).mockReturnValue(available(14));
+  asMock(useKvdbsCount).mockReturnValue(available(6));
+  asMock(useFiltersCount).mockReturnValue(available(3));
   asMock(useInViewport).mockReturnValue([{ current: null }, true]);
+  asMock(navigation.getIntegrationsUrl).mockReturnValue('/manage-content');
 });
 
 describe('ThreatIntelligenceFeedSection', () => {
-  it('renders the section with all tiles when everything is available', () => {
+  it('renders one section with both the Security analytics and Threat catalog cards', () => {
     render(
       <ThreatIntelligenceFeedSection
         vulnerabilities={vulnerabilitiesAvailable}
@@ -64,18 +74,37 @@ describe('ThreatIntelligenceFeedSection', () => {
       />,
     );
     expect(screen.getByText('Threat intelligence feed')).toBeInTheDocument();
+    expect(screen.getByText('Security analytics')).toBeInTheDocument();
+    expect(screen.getByText('Threat catalog')).toBeInTheDocument();
     expect(screen.getByText('Rules')).toBeInTheDocument();
+    expect(screen.getByText('KVDBs')).toBeInTheDocument();
+    expect(screen.getByText('Filters')).toBeInTheDocument();
     expect(screen.getByText('IOCs')).toBeInTheDocument();
     expect(screen.getByText('CVEs matched')).toBeInTheDocument();
     expect(screen.getByText('482')).toBeInTheDocument();
   });
 
-  it('always renders the section, even when every tile is unavailable', () => {
+  it('navigates to the Security Analytics tiles on click, and to "Manage content" from the card header', () => {
+    render(
+      <ThreatIntelligenceFeedSection
+        vulnerabilities={vulnerabilitiesAvailable}
+        threatIntel={threatIntelAvailable}
+      />,
+    );
+    fireEvent.click(screen.getByText('Rules'));
+    expect(navigation.getRulesUrl).toHaveBeenCalled();
+    fireEvent.click(screen.getByText('Manage content'));
+    expect(navigation.getIntegrationsUrl).toHaveBeenCalled();
+  });
+
+  it('always renders both cards, even when every tile is unavailable', () => {
     for (const mock of [
       useRulesCount,
       useDecodersCount,
-      useIntegrationsCount,
       useDetectorsCount,
+      useIntegrationsCount,
+      useKvdbsCount,
+      useFiltersCount,
     ]) {
       asMock(mock).mockReturnValue({ status: 'unavailable' });
     }
@@ -85,30 +114,9 @@ describe('ThreatIntelligenceFeedSection', () => {
         threatIntel={{ status: 'unavailable' }}
       />,
     );
-    expect(screen.getByText('Threat intelligence feed')).toBeInTheDocument();
-    expect(screen.getByText('Rules')).toBeInTheDocument();
+    expect(screen.getByText('Security analytics')).toBeInTheDocument();
+    expect(screen.getByText('Threat catalog')).toBeInTheDocument();
     expect(screen.getByText('IOCs')).toBeInTheDocument();
-  });
-
-  it('keeps the section (showing IOCs and CVEs matched) when Security Analytics is absent but the feed and vulnerabilities data are not', () => {
-    for (const mock of [
-      useRulesCount,
-      useDecodersCount,
-      useIntegrationsCount,
-      useDetectorsCount,
-    ]) {
-      asMock(mock).mockReturnValue({ status: 'unavailable' });
-    }
-    render(
-      <ThreatIntelligenceFeedSection
-        vulnerabilities={vulnerabilitiesAvailable}
-        threatIntel={threatIntelAvailable}
-      />,
-    );
-    expect(screen.getByText('Threat intelligence feed')).toBeInTheDocument();
-    expect(screen.getByText('IOCs')).toBeInTheDocument();
-    expect(screen.getByText('CVEs matched')).toBeInTheDocument();
-    expect(screen.getByText('Rules')).toBeInTheDocument();
   });
 
   it('fetches the Security Analytics tiles lazily once the section enters the viewport', () => {
@@ -120,5 +128,27 @@ describe('ThreatIntelligenceFeedSection', () => {
       />,
     );
     expect(asMock(useRulesCount)).toHaveBeenCalledWith(false);
+    expect(asMock(useKvdbsCount)).toHaveBeenCalledWith(false);
+  });
+
+  it('shows the freshness readout when the catalog has a newest indicator', () => {
+    render(
+      <ThreatIntelligenceFeedSection
+        vulnerabilities={vulnerabilitiesAvailable}
+        threatIntel={{
+          status: 'available',
+          data: {
+            total: 2048,
+            feedByType: [],
+            newestIndicator: {
+              feedName: 'threat-fox',
+              lastSeen: new Date().toISOString(),
+            },
+          },
+        }}
+      />,
+    );
+    expect(screen.getByText('Newest indicator')).toBeInTheDocument();
+    expect(screen.getByText('Feed: threat-fox')).toBeInTheDocument();
   });
 });

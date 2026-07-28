@@ -24,6 +24,7 @@ export const MITRE_TACTIC_ID_FIELD = 'wazuh.rule.mitre.tactic.id';
 export const MITRE_TECHNIQUE_ID_FIELD = 'wazuh.rule.mitre.technique.id';
 export const MITRE_TECHNIQUE_NAME_FIELD = 'wazuh.rule.mitre.technique.name';
 export const RULE_TITLE_FIELD = 'wazuh.rule.title';
+export const INTEGRATION_NAME_FIELD = 'wazuh.integration.name';
 export const HOST_OS_NAME_FIELD = 'host.os.name';
 export const PROCESS_NAME_FIELD = 'process.name';
 export const SCA_CHECK_RESULT_FIELD = 'check.result';
@@ -54,6 +55,21 @@ export const THREAT_ENRICHMENTS_FIELD = 'wazuh.threat.enrichments';
  * type" breakdown — the composition of the feed itself, not what matched.
  */
 export const THREAT_INTEL_TYPE_FIELD = 'document.type';
+
+/**
+ * Source feed name (e.g. `threat-fox`, `alienvault-otx`) on a threat-intel
+ * enrichment document. Verified against the index's known-fields list
+ * (`common/known-fields/threatintel-enrichments.json`) — a `keyword` field,
+ * distinct from `document.type`. Drives the "Newest indicator" feed label.
+ */
+export const THREAT_INTEL_FEED_NAME_FIELD = 'document.feed.name';
+
+/**
+ * Last-seen timestamp on a threat-intel enrichment document. Also verified
+ * against the known-fields list (`date`, aggregatable). Drives the "Newest
+ * indicator" freshness readout on the Threat catalog card.
+ */
+export const THREAT_INTEL_LAST_SEEN_FIELD = 'document.last_seen';
 
 /**
  * vulnerability.severity values are capitalized, unlike the lowercase

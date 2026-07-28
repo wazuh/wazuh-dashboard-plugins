@@ -20,6 +20,7 @@ import {
   WIDGET_LOADING_MIN_HEIGHT,
 } from '../common';
 import { TopRulesTable } from './top-rules-table';
+import { TopPackagesTable } from './top-packages-table';
 import {
   useFindingsOverview,
   useVulnerabilityOverview,
@@ -158,12 +159,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                   testSubjPrefix='vulnerability-severity'
                 />
                 <EuiSpacer size='s' />
-                <BarList
-                  title='Top 5 package name'
-                  items={vulnerabilities.data.byPackage}
-                  emptyMessage='No vulnerabilities found'
-                  data-test-subj='vulnerabilities-by-package'
-                />
+                <TopPackagesTable items={vulnerabilities.data.byPackage} />
               </>
             )}
           </WidgetGroup>

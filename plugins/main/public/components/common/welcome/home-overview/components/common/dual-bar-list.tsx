@@ -104,7 +104,7 @@ export const DualBarList: React.FC<DualBarListProps> = ({
               <EuiText
                 size='s'
                 className='eui-textTruncate'
-                style={{ overflow: 'hidden' }}
+                style={{ overflow: 'hidden', maxWidth: '150px' }}
                 title={item.label}
               >
                 {item.label}

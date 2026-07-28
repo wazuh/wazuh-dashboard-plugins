@@ -12,11 +12,14 @@ import {
   buildIocMatchesAgg,
   buildMalwareFilterAgg,
   buildThreatIntelFeedByTypeAgg,
+  buildThreatIntelNewestIndicatorAgg,
+  buildCloudSecurityByModuleAgg,
 } from './queries';
 import {
   FINDING_SEVERITY_BANDS,
   VULNERABILITY_SEVERITY_BANDS,
   FINDING_SEVERITY_FIELD,
+  INTEGRATION_NAME_FIELD,
   MITRE_TACTIC_NAME_FIELD,
   MITRE_TACTIC_ID_FIELD,
   MITRE_TECHNIQUE_ID_FIELD,
@@ -30,6 +33,8 @@ import {
   VULNERABILITY_CVE_ID_FIELD,
   EVENT_DOC_ID_FIELD,
   THREAT_ENRICHMENTS_FIELD,
+  THREAT_INTEL_FEED_NAME_FIELD,
+  THREAT_INTEL_LAST_SEEN_FIELD,
   THREAT_INTEL_TYPE_FIELD,
 } from './fields';
 
@@ -143,6 +148,50 @@ describe('query builders', () => {
   it('builds the IOC-feed-by-type agg as a terms agg on the enrichments catalog type', () => {
     expect(buildThreatIntelFeedByTypeAgg(5)).toEqual({
       ioc_feed_by_type: { terms: { field: THREAT_INTEL_TYPE_FIELD, size: 5 } },
+    });
+  });
+
+  it('builds the newest-indicator agg as a size-1 top_hits sorted by last_seen desc', () => {
+    expect(buildThreatIntelNewestIndicatorAgg()).toEqual({
+      newest_indicator: {
+        top_hits: {
+          size: 1,
+          sort: [{ [THREAT_INTEL_LAST_SEEN_FIELD]: { order: 'desc' } }],
+          _source: [THREAT_INTEL_FEED_NAME_FIELD, THREAT_INTEL_LAST_SEEN_FIELD],
+        },
+      },
+    });
+  });
+
+  it('builds one filters-agg bucket per Cloud Security module, keyed by app id', () => {
+    const agg = buildCloudSecurityByModuleAgg();
+    const filters = agg.cloud_security_by_module.filters.filters;
+    expect(Object.keys(filters).sort()).toEqual(
+      [
+        'amazon-web-services',
+        'docker',
+        'github',
+        'google-cloud',
+        'microsoft-graph-api',
+        'office365',
+      ].sort(),
+    );
+    expect(filters.docker).toEqual({
+      match_phrase: { [INTEGRATION_NAME_FIELD]: 'docker' },
+    });
+    // AWS spans several sub-integrations (aws-cloudtrail, aws-guardduty, ...).
+    expect(filters['amazon-web-services']).toEqual({
+      wildcard: { [INTEGRATION_NAME_FIELD]: 'aws*' },
+    });
+    expect(filters['google-cloud']).toEqual({
+      match_phrase: { [INTEGRATION_NAME_FIELD]: 'gcp' },
+    });
+    expect(filters.office365).toEqual({
+      match_phrase: { [INTEGRATION_NAME_FIELD]: 'o365' },
+    });
+    // Microsoft Graph API reuses the Azure dashboard/data source.
+    expect(filters['microsoft-graph-api']).toEqual({
+      match_phrase: { [INTEGRATION_NAME_FIELD]: 'azure' },
     });
   });
 

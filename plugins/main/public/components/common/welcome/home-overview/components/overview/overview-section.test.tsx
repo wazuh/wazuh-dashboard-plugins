@@ -35,7 +35,10 @@ jest.mock('../../../../hooks', () => ({
 // out of scope here, so stub it down to a plain link (same as
 // agents-by-status.test.tsx).
 jest.mock('../../../../permissions/button', () => ({
-  WzButtonPermissions: ({ children, ...rest }: any) => (
+  WzButtonPermissions: ({
+    children,
+    ...rest
+  }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a {...rest}>{children}</a>
   ),
 }));
@@ -51,6 +54,7 @@ const findingsAvailable = {
     topRules: [],
     techniquesCount: 7,
     topTechniques: [],
+    cloudSecurityByModule: {},
   },
   indexPatternId: 'idx-1',
 };

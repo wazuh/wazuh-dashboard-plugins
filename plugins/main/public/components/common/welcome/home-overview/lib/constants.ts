@@ -17,6 +17,7 @@ export const AGG = {
   scaBenchmarks: 'sca_benchmarks',
   /** Nested check-result breakdown inside each `sca_benchmarks` bucket. */
   scaBenchmarkResult: 'result',
+  cloudSecurityByModule: 'cloud_security_by_module',
   fimTopFiles: 'fim_top_files',
   vulnerabilitiesByPackage: 'vulnerabilities_by_package',
   cvesMatched: 'cves_matched',
@@ -25,6 +26,8 @@ export const AGG = {
   malware: 'malware',
   /** Terms on `document.type` over the threat-intel enrichments catalog. */
   iocFeedByType: 'ioc_feed_by_type',
+  /** `top_hits` (size 1) for the single most-recent threat-intel enrichment. */
+  newestIndicator: 'newest_indicator',
   /**
    * Sub-agg capturing the MITRE external id (e.g. `TA0001`, `T1078`) for each
    * top tactic/technique bucket, so links can open the Intelligence resource.

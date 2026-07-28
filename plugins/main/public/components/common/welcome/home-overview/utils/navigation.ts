@@ -92,8 +92,8 @@ export const getRegulatoryComplianceUrl = (tabView: string): string =>
     path: `#/overview?tab=regulatory-compliance&tabView=${tabView}&tabSubView=controls`,
   });
 
-/** Open a Cloud Security module by app id (list-driven, unlike the fixed links above). */
-export const getCloudModuleUrl = (appId: string): string => getUrlForApp(appId);
+/** Open a module by app id (list-driven, unlike the fixed links above). */
+export const getModuleUrl = (appId: string): string => getUrlForApp(appId);
 
 /**
  * App ids registered by the Security Analytics dashboards plugin. Absent when
@@ -104,6 +104,7 @@ const SECURITY_ANALYTICS_APP_IDS = {
   decoders: 'decoders',
   integrations: 'sa-integrations',
   detectors: 'detectors',
+  kvdbs: 'kvdbs',
 };
 
 export const getRulesUrl = () => getUrlForApp(SECURITY_ANALYTICS_APP_IDS.rules);
@@ -113,6 +114,13 @@ export const getIntegrationsUrl = () =>
   getUrlForApp(SECURITY_ANALYTICS_APP_IDS.integrations);
 export const getDetectorsUrl = () =>
   getUrlForApp(SECURITY_ANALYTICS_APP_IDS.detectors);
+export const getKvdbsUrl = () => getUrlForApp(SECURITY_ANALYTICS_APP_IDS.kvdbs);
+/**
+ * Filters has no dedicated app id — it's a sub-route of the Integrations
+ * (Overview) app, e.g. `sa-integrations#/filters`.
+ */
+export const getFiltersUrl = () =>
+  getUrlForApp(SECURITY_ANALYTICS_APP_IDS.integrations, { path: '#/filters' });
 
 /**
  * Open the MITRE ATT&CK Intelligence tab on a specific resource. Intelligence
