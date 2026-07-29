@@ -331,11 +331,16 @@ test('applyFieldPolicy: a "*"-suffixed entry matches the prefix field itself and
     { field: 'wazuh.rule.compliance.*', action: 'allow' },
   ];
   const p = new Pseudonymizer();
+  // String values on purpose: applyFieldPolicy's fail-closed anonymize branch (isEscapeHatch:
+  // true) only triggers for `typeof value === 'string'`, so an array-valued sample (the real
+  // shape of these compliance fields) would pass through unchanged in the `else` branch
+  // regardless of whether the wildcard actually matched — that would prove nothing about
+  // resolveFieldEntry's prefix-match logic. Strings are what actually exercise it.
   const digest = baseDigest({
     samples: [
       {
-        'wazuh.rule.compliance.pci_dss': ['10.6'],
-        'wazuh.rule.compliance.hipaa': ['164.308.a.1.ii.D'],
+        'wazuh.rule.compliance.pci_dss': '10.6',
+        'wazuh.rule.compliance.hipaa': '164.308.a.1.ii.D',
         'wazuh.rule.compliance': 'top-level-value',
       },
     ],
@@ -343,10 +348,11 @@ test('applyFieldPolicy: a "*"-suffixed entry matches the prefix field itself and
   const out = applyFieldPolicy(digest, policy, p, undefined, undefined, true);
   // isEscapeHatch: true (fail-closed) would anonymize anything NOT matched by the wildcard —
   // these three all stay untouched only if the wildcard entry actually matched each of them.
-  assert.deepEqual(out.samples[0]['wazuh.rule.compliance.pci_dss'], ['10.6']);
-  assert.deepEqual(out.samples[0]['wazuh.rule.compliance.hipaa'], [
+  assert.equal(out.samples[0]['wazuh.rule.compliance.pci_dss'], '10.6');
+  assert.equal(
+    out.samples[0]['wazuh.rule.compliance.hipaa'],
     '164.308.a.1.ii.D',
-  ]);
+  );
   assert.equal(out.samples[0]['wazuh.rule.compliance'], 'top-level-value');
 });
 

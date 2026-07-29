@@ -203,6 +203,10 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // compliance requirement list / MITRE technique catalog).
   WAZUH_FIELD.RULE_CATEGORY,
   WAZUH_FIELD.RULE_TAGS,
+  // pci_dss only, not the whole compliance.* family privacy.ts allow-lists for visibility:
+  // aggregation cardinality is vetted per framework, and only pci_dss has a dedicated tool.
+  // Widening this to every framework needs its own cardinality check first, not a copy-paste
+  // of privacy's broader reasoning.
   WAZUH_FIELD.RULE_COMPLIANCE_PCI_DSS,
   WAZUH_FIELD.RULE_MITRE_TECHNIQUE_ID,
   WAZUH_FIELD.RULE_MITRE_TECHNIQUE_NAME,
