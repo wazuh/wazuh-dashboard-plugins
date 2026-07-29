@@ -129,6 +129,8 @@
 - Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775)
 - Fixed the AI Assistant losing an answer, leaving the chat input blocked, or mixing conversations when the user switched conversation, started a new one, or left the app while a response was still streaming [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
 - Fixed the AI Assistant chat coming back empty after a reload, a deep link, or a visit to its Settings tab: the open conversation is now restored from the URL and the tab's own session, and the Chat tab is no longer destroyed when Settings is opened [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
+- Fixed the AI Assistant losing a question asked while a reload or navigation interrupted the answer: the question is now saved before the response starts generating [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
+- Fixed a resumed AI Assistant conversation losing its result tables, its real message times, and the tool-call history a follow-up question depends on [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
 
 ### Removed
 

@@ -182,9 +182,34 @@ export interface ConversationSummary {
   updatedAt: string;
 }
 
+/**
+ * One message as a saved conversation stores it: a `ChatMessage` plus the two presentation fields a
+ * resumed conversation needs in order to be the SAME conversation rather than a summary of one.
+ *
+ * Both are optional, and deliberately so: conversations saved before they existed simply lack them
+ * and resume exactly as they did before (no migration — `messages` is an `enabled: false` opaque
+ * object in the saved-object mappings, see server/saved_objects/conversation.ts).
+ *
+ * What was lost without them: `createdAt` meant every message in a resumed conversation was stamped
+ * with the moment of the resume, so a conversation from last week read as seconds old; and dropping
+ * `table` meant the result tables disappeared, leaving the model's prose describing tables that were
+ * no longer on screen (and taking "Open in Discover" with them).
+ *
+ * The MODEL-facing half of a turn is not a new field: the `[assistant{toolCalls}, tool{content}]`
+ * pairs are persisted as ordinary `ChatMessage`s interleaved before the assistant's prose message,
+ * exactly the shape `common/chat-history.ts`'s `buildOutgoingMessages` already sends on the wire, so
+ * a resumed conversation can rebuild the tool history a follow-up question depends on.
+ */
+export interface PersistedChatMessage extends ChatMessage {
+  /** Epoch milliseconds, as `Date.now()` produced it when the message was first shown. */
+  createdAt?: number;
+  /** The result table this message was displayed with, row-capped at save time. */
+  table?: TableSpec;
+}
+
 export interface ConversationRecord extends ConversationSummary {
   createdAt: string;
-  messages: ChatMessage[];
+  messages: PersistedChatMessage[];
   /**
    * Optimistic-concurrency token (two tabs on the
    * same conversation previously overwrote each other, last-write-wins). Opaque, OSD-assigned

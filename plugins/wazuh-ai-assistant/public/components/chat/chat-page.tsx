@@ -26,6 +26,7 @@ import { ConversationsService } from '../../services/conversations-service';
 import {
   ChatMessage,
   ChatRequest,
+  PersistedChatMessage,
   ConversationRecord,
   ConversationSummary,
   ProviderSummary,
@@ -48,6 +49,7 @@ import {
   detectManagerAuthError,
   detectNavigationType,
   nextMessageId,
+  reconstructConversation,
   reconstructUiMessages,
   toPersistedMessages,
 } from '../../../common/chat-history';
@@ -71,6 +73,16 @@ interface ChatPageProps {
   onProviderChange: (id: string) => void;
   /** Switches the app shell to the Settings tab; wired from the top-level route state. */
   onNavigateToSettings: () => void;
+}
+
+/**
+ * The saved-conversation row one turn writes to, shared by that turn's two saves (one when the
+ * question is sent, one when the answer completes) and mutated by whichever of them creates the row.
+ * `null` means "not created yet"; `version` is the optimistic-concurrency token last seen for it.
+ */
+interface TurnConversationTarget {
+  conversationId: string | null;
+  version: string | undefined;
 }
 
 const CONVERSATION_MAX_WIDTH = 860;
@@ -544,8 +556,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const applyLoadedConversation = (record: ConversationRecord) => {
     // A resumed conversation opens at its latest turn (bottom), like every chat client.
     pinnedToBottomRef.current = true;
-    updateMessages(reconstructUiMessages(record.messages));
-    turnHistoryRef.current = [];
+    const restored = reconstructConversation(record.messages);
+    updateMessages(restored.messages);
+    // Restoring the tool history is what makes a resumed conversation continuable rather than just
+    // readable: the model gets back the tool calls whose results its prose describes, instead of
+    // re-running the same queries on the next question.
+    turnHistoryRef.current = restored.turnRecords;
     setPseudonymMap([]);
     setActiveConversationId(record.id);
     // Optimistic concurrency: this tab's last-known version starts at whatever the GET returned —
@@ -726,7 +742,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const saveConversationWithMerge = async (
     id: string,
     title: string,
-    localMessages: ChatMessage[],
+    localMessages: PersistedChatMessage[],
     expectedVersion: string | undefined,
     reflectInUi: boolean,
   ): Promise<ConversationRecord> => {
@@ -789,17 +805,31 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    * row via POST, so a partial first answer still shows up in the sidebar instead of vanishing.
    *
    * Serialized through `saveQueueRef` rather than dropped on overlap — see that ref's own comment.
+   *
+   * `target` is the row this TURN writes to, and it is mutable: a turn now saves twice (once when
+   * the question is sent, once when the answer completes), and the first of those may be what
+   * creates the conversation. Both saves share one target, so the second updates the row the first
+   * created instead of creating a second one — which is exactly what happened while the target was
+   * a plain id captured before the stream started.
    */
   const persistConversationTurn = (args: {
-    conversationId: string | null;
+    target: TurnConversationTarget;
     messages: UiChatMessage[];
-    expectedVersion: string | undefined;
+    turnRecords: AssistantTurnRecord[];
     adoptAsActive: boolean;
   }): Promise<void> => {
     const task = async () => {
       if (args.messages.length === 0) {
         return;
       }
+      const { target, turnRecords } = args;
+      const conversationId = target.conversationId;
+      // Prefer the component's live version while this still IS the conversation on screen: a merge
+      // or another save may have moved it on since the target was created.
+      const expectedVersion =
+        args.adoptAsActive && activeConversationIdRef.current === conversationId
+          ? conversationVersionRef.current
+          : target.version;
       try {
         // The untitled-fallback label is resolved here (not inside buildConversationTitle, which is
         // now a dependency-free common/ helper — see its own doc comment) via the same
@@ -810,25 +840,29 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             defaultMessage: 'Untitled conversation',
           }),
         );
-        const toPersist = toPersistedMessages(args.messages);
-        if (args.conversationId) {
+        const toPersist = toPersistedMessages(args.messages, turnRecords);
+        if (conversationId) {
           const record = await saveConversationWithMerge(
-            args.conversationId,
+            conversationId,
             title,
             toPersist,
-            args.expectedVersion,
+            expectedVersion,
             args.adoptAsActive,
           );
           // Only when this IS still the active conversation: an adopted save that raced with a
           // conversation switch must not stamp its version onto the newly opened one.
           if (
             args.adoptAsActive &&
-            activeConversationIdRef.current === args.conversationId
+            activeConversationIdRef.current === conversationId
           ) {
             conversationVersionRef.current = record.version;
           }
+          target.version = record.version;
         } else {
           const created = await conversationsService.create(title, toPersist);
+          // The turn now owns this row: its later saves update it instead of creating another.
+          target.conversationId = created.id;
+          target.version = created.version;
           if (args.adoptAsActive && activeConversationIdRef.current === null) {
             setActiveConversationId(created.id);
             conversationVersionRef.current = created.version;
@@ -865,12 +899,16 @@ export const ChatPage: React.FC<ChatPageProps> = ({
      * `finally` without reading React state — which, for an abandoned turn, has already been
      * replaced by whatever conversation the user opened next. */
     baseMessages: UiChatMessage[];
+    /** The row this turn saves to, already carrying the active conversation's id (or `null` for one
+     * that does not exist yet) and shared with the pre-send save `handleSend` fired. */
+    target: TurnConversationTarget;
     outgoingMessages: ChatMessage[];
     privacyPayload: ChatRequest['privacy'];
   }) => {
     const {
       assistantMessageId,
       baseMessages,
+      target,
       outgoingMessages,
       privacyPayload,
     } = args;
@@ -879,16 +917,18 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
-    // Turn identity + the conversation coordinates this turn belongs to, captured BEFORE the first
-    // await: if the user switches conversations mid-stream, `activeConversationIdRef` and
-    // `conversationVersionRef` will already point at the new one by the time `finally` runs.
     streamGenerationRef.current += 1;
     const generation = streamGenerationRef.current;
-    const turnConversationId = activeConversationIdRef.current;
-    const turnVersion = conversationVersionRef.current;
     /** False once this turn has been abandoned (`abandonActiveStream`) or superseded by a newer
      * one — every write into shared component state is gated on it. */
     const isTurnStillActive = () => generation === streamGenerationRef.current;
+    // This turn's own tool-call record, held by reference rather than looked up per event: the
+    // `tool_call`/`digest` handlers below used to search `turnHistoryRef` by assistant message id,
+    // which finds nothing once the ref has been reset by a conversation switch — so an abandoned
+    // turn's tool exchanges were dropped instead of saved with it.
+    const turnRecord = turnHistoryRef.current.find(
+      turn => turn.assistantMessageId === assistantMessageId,
+    );
 
     // Empty-table suppression: an empty `table` event is held back (not
     // committed to `message.table`) instead of rendered immediately, since a failed/empty first
@@ -1022,17 +1062,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           );
         } else if (event.type === 'tool_call') {
           // Digest-in-history bookkeeping only — never rendered as a UI message (message_bubble.tsx
-          // has no bubble type for it; it lives only in turnHistoryRef until a LATER turn's
-          // buildOutgoingMessages call resends it).
-          const turn = turnHistoryRef.current.find(
-            t => t.assistantMessageId === assistantMessageId,
-          );
-          turn?.toolExchanges.push({ toolCall: event.toolCall });
+          // has no bubble type for it; it lives in this turn's record until a LATER turn's
+          // buildOutgoingMessages call resends it, or until the turn is saved).
+          turnRecord?.toolExchanges.push({ toolCall: event.toolCall });
         } else if (event.type === 'digest') {
-          const turn = turnHistoryRef.current.find(
-            t => t.assistantMessageId === assistantMessageId,
-          );
-          const exchange = turn?.toolExchanges.find(
+          const exchange = turnRecord?.toolExchanges.find(
             entry => entry.toolCall.id === event.toolCallId,
           );
           if (exchange) {
@@ -1133,10 +1167,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               ),
           );
         void persistConversationTurn({
-          conversationId: turnConversationId,
-          messages: abandonedTranscript,
-          expectedVersion: turnVersion,
           adoptAsActive: false,
+          target,
+          messages: abandonedTranscript,
+          // `turnHistoryRef` has already been reset to whatever conversation the user opened
+          // instead, so this turn's own record is passed explicitly.
+          turnRecords: turnRecord ? [turnRecord] : [],
         });
       } else {
         if (detectManagerAuthError(accumulatedContent)) {
@@ -1156,10 +1192,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         // separate banner) and is handed `messagesRef.current`, which the `isStreaming: false`
         // update just above already applied synchronously (see `useSyncedState`'s doc comment).
         void persistConversationTurn({
-          conversationId: activeConversationIdRef.current,
-          messages: messagesRef.current,
-          expectedVersion: conversationVersionRef.current,
           adoptAsActive: true,
+          target,
+          messages: messagesRef.current,
+          turnRecords: turnHistoryRef.current,
         });
       }
     }
@@ -1222,9 +1258,27 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     const baseMessages = [...history, assistantMessage];
     updateMessages(baseMessages);
 
+    // Persist the question BEFORE generating, not only after the turn completes. A reload, a
+    // navigation, or a crash mid-answer used to lose the question too — the conversation was only
+    // created once the turn ended, so the user came back to an empty chat with no trace that they
+    // had asked anything. `history` excludes the still-empty assistant placeholder. Both of this
+    // turn's saves share `target`, so whichever runs first creates the row and the other updates it
+    // — see `TurnConversationTarget`.
+    const target: TurnConversationTarget = {
+      conversationId: activeConversationIdRef.current,
+      version: conversationVersionRef.current,
+    };
+    void persistConversationTurn({
+      adoptAsActive: true,
+      target,
+      messages: history,
+      turnRecords: turnHistoryRef.current,
+    });
+
     await runChatStream({
       assistantMessageId,
       baseMessages,
+      target,
       outgoingMessages,
       privacyPayload,
     });

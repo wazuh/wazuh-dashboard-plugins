@@ -6,9 +6,10 @@
  * common/conversation-merge.ts).
  *
  * `ChatHistoryMessage` below is a deliberately MINIMAL structural subset of
- * `public/components/chat/message-bubble.tsx`'s `UiChatMessage` (id/role/content/createdAt only —
- * none of `table`/`isStreaming`/`statusMessage`, which are UI-only and untouched by any function
- * here). Every real `UiChatMessage` the caller passes in already satisfies this shape (it only has
+ * `public/components/chat/message-bubble.tsx`'s `UiChatMessage`: id/role/content/createdAt plus the
+ * optional `table`, which is persisted and restored (see `toPersistedMessages`). `isStreaming` and
+ * `statusMessage` stay out — they describe a turn in progress, and no function here touches
+ * them. Every real `UiChatMessage` the caller passes in already satisfies this shape (it only has
  * MORE optional fields), and every `ChatHistoryMessage` this module hands back satisfies
  * `UiChatMessage` the same way (the extra fields on `UiChatMessage` are all optional) — so
  * chat-page.tsx passes/receives its own `UiChatMessage[]` at every call site with no cast needed,
@@ -23,11 +24,19 @@
  * the call site rather than lazily inside the old inline version changes nothing observable.
  */
 
-import { ChatMessage, ChatRole, ToolCall } from './types';
+import {
+  ChatMessage,
+  ChatRole,
+  PersistedChatMessage,
+  TableSpec,
+  ToolCall,
+} from './types';
 import { NavigationType } from './draft-stash';
 import {
   CONVERSATION_MAX_MESSAGES,
   CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH,
+  CONVERSATION_MAX_SERIALIZED_BYTES,
+  CONVERSATION_MAX_TABLE_ROWS,
 } from './constants';
 
 /** Minimal shape every function below needs — see the module doc comment for why this, and not
@@ -37,6 +46,8 @@ export interface ChatHistoryMessage {
   role: ChatRole;
   content: string;
   createdAt: number;
+  /** The result table this message was displayed with, when it had one. */
+  table?: TableSpec;
 }
 
 let messageCounter = 0;
@@ -187,64 +198,241 @@ export function buildConversationTitle(
     : raw;
 }
 
+/** UTF-8 byte length of a JSON payload, which is what a request body is actually measured in. */
+function serializedBytes(value: unknown): number {
+  const json = JSON.stringify(value);
+  return typeof TextEncoder === 'function'
+    ? new TextEncoder().encode(json).length
+    : // No TextEncoder (a very old runtime): the character count is a lower bound, which errs
+      // toward trimming more rather than less.
+      json.length;
+}
+
+/** Row-caps a table for persistence; `undefined` in, `undefined` out. */
+function toPersistedTable(table?: TableSpec): TableSpec | undefined {
+  if (!table) {
+    return undefined;
+  }
+  return table.rows.length > CONVERSATION_MAX_TABLE_ROWS
+    ? { ...table, rows: table.rows.slice(0, CONVERSATION_MAX_TABLE_ROWS) }
+    : table;
+}
+
 /**
- * Reduces a UI message list to the wire shape a saved conversation persists (server/
- * saved_objects/conversation.ts's PRIVACY INTERACTION doc comment): only `role`/`content` for
- * user/assistant turns — `table` (structured tool results), `statusMessage`, and `isStreaming`
- * are transient UI-only state and are never persisted; a resumed conversation shows its past
- * prose turns but not their old result tables. Tool/assistant-with-toolCalls entries never appear
- * in `messages` (React state) in the first place — those live only in `turnHistoryRef` for
- * digest-in-history (see `buildOutgoingMessages` below) — so no explicit filtering for them is
- * needed here.
+ * Reduces a UI message list, plus the tool exchanges recorded for its assistant turns, to the shape
+ * a saved conversation persists.
+ *
+ * Everything a resumed conversation needs to BE that conversation is included: `role`/`content` as
+ * before, plus each message's real `createdAt`, its result `table` (row-capped), and the
+ * `[assistant{toolCalls}, tool{digest}]` pairs for each turn's tool calls — interleaved before that
+ * turn's prose message, the same ordering `buildOutgoingMessages` uses on the wire, so
+ * `reconstructConversation` can rebuild both halves. `statusMessage`/`isStreaming` stay unpersisted:
+ * they describe a turn IN PROGRESS and are meaningless once it has ended.
+ *
+ * (server/saved_objects/conversation.ts's PRIVACY INTERACTION doc comment still governs what this
+ * means at rest: these messages are real-valued, and the pseudonym map is never persisted.)
+ *
+ * Everything is trimmed to what the server accepts (`common/constants.ts`) BEFORE the payload is
+ * built. Without this the two sides disagreed and produced a silent, PERMANENT failure: once a
+ * conversation exceeded a limit the route rejected the write with a 400/413, while auto-save (which
+ * treats a failed save as a non-fatal hiccup, with no error banner) resent the same, now
+ * permanently-oversized array on the next turn. Every later save failed too, so the user kept
+ * chatting believing history was still being persisted when it had silently stopped.
+ *
+ * The trim is deliberately lossy-but-working rather than a hard failure. Each message's content is
+ * clamped and the oldest messages roll off, first to `CONVERSATION_MAX_MESSAGES` and then to
+ * whatever prose fits `CONVERSATION_MAX_SERIALIZED_BYTES`; tables and tool history are then added
+ * back only while they still fit, tables first (they are what the user saw, and the prose describes
+ * them) and tool history last (a model-side aid, of which `buildOutgoingMessages` resends only the
+ * newest turns anyway).
  */
 export function toPersistedMessages(
   messages: ChatHistoryMessage[],
-): ChatMessage[] {
-  // Trim to the SERVER's own accepted limits (shared via common/constants.ts) before the payload is
-  // built. Without this the two sides disagreed and produced a silent, PERMANENT failure: once a
-  // conversation exceeded `CONVERSATION_MAX_MESSAGES` — or any single message exceeded
-  // `CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH` — the route rejected the write with a 400, while
-  // auto-save (which treats a failed save as a non-fatal hiccup, with no error banner) resent the
-  // same, now permanently-oversized array on the next turn. Every later save failed too, so the user
-  // kept chatting believing history was still being persisted when it had silently stopped.
-  //
-  // Trimming here makes "too big to save" unreachable: keep the NEWEST messages (the tail is what a
-  // resumed conversation needs; the oldest turns roll off) and clamp each message's content. This is
-  // deliberately a lossy-but-working trade instead of a hard failure — a capped conversation keeps
-  // saving, it just stops carrying its most ancient turns.
+  turnRecords: AssistantTurnRecord[] = [],
+): PersistedChatMessage[] {
+  // Keep the NEWEST messages: the tail is what a resumed conversation needs, so the oldest turns
+  // roll off first.
   const recent =
     messages.length > CONVERSATION_MAX_MESSAGES
       ? messages.slice(messages.length - CONVERSATION_MAX_MESSAGES)
       : messages;
-  return recent.map(message => ({
-    role: message.role,
-    content:
-      message.content.length > CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH
-        ? message.content.slice(0, CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH)
-        : message.content,
-  }));
+
+  const exchangesByMessageId = new Map(
+    turnRecords.map(turn => [turn.assistantMessageId, turn.toolExchanges]),
+  );
+
+  // Each message's three possible parts, built and measured ONCE. Everything below is arithmetic
+  // over these sizes rather than repeated build-and-serialize passes — a 1000-message conversation
+  // of maximum-length messages is ~100 MB, and re-serializing that per candidate made the trim
+  // itself the slowest thing in the app.
+  const parts = recent.map(message => {
+    const prose: PersistedChatMessage = {
+      role: message.role,
+      content:
+        message.content.length > CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH
+          ? message.content.slice(0, CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH)
+          : message.content,
+      createdAt: message.createdAt,
+    };
+    const table = toPersistedTable(message.table);
+    const toolEntries: PersistedChatMessage[] = [];
+    if (message.role === 'assistant') {
+      for (const exchange of exchangesByMessageId.get(message.id) ?? []) {
+        if (!exchange.digestContent) {
+          continue;
+        }
+        toolEntries.push({
+          role: 'assistant',
+          content: '',
+          toolCalls: [exchange.toolCall],
+        });
+        toolEntries.push({
+          role: 'tool',
+          toolCallId: exchange.toolCall.id,
+          content: exchange.digestContent,
+        });
+      }
+    }
+    return {
+      prose,
+      table,
+      toolEntries,
+      // `+ 1` per array element for the separating comma.
+      proseBytes: serializedBytes(prose) + 1,
+      tableBytes: table ? serializedBytes({ table }) : 0,
+      toolBytes: toolEntries.reduce(
+        (sum, entry) => sum + serializedBytes(entry) + 1,
+        0,
+      ),
+    };
+  });
+
+  // The `[]` the entries live in.
+  const ENVELOPE_BYTES = 2;
+
+  // Newest-first walk: keep the longest suffix of prose that fits. The tail is what a resumed
+  // conversation needs, so the oldest turns are what roll off.
+  let from = recent.length;
+  let proseTotal = ENVELOPE_BYTES;
+  for (let index = recent.length - 1; index >= 0; index -= 1) {
+    if (
+      proseTotal + parts[index].proseBytes >
+      CONVERSATION_MAX_SERIALIZED_BYTES
+    ) {
+      break;
+    }
+    proseTotal += parts[index].proseBytes;
+    from = index;
+  }
+
+  const kept = parts.slice(from);
+  const tableTotal = kept.reduce((sum, part) => sum + part.tableBytes, 0);
+  const toolTotal = kept.reduce((sum, part) => sum + part.toolBytes, 0);
+
+  // Add back what still fits, in order of what a resumed conversation loses most by not having.
+  // Tables come first: they are what the user SAW, and the model's prose describes them. Tool
+  // history is a model-side aid, and `buildOutgoingMessages` only ever resends the newest turns of
+  // it anyway, so it is the cheapest thing to drop.
+  const withTables =
+    proseTotal + tableTotal <= CONVERSATION_MAX_SERIALIZED_BYTES;
+  const withToolHistory =
+    proseTotal + (withTables ? tableTotal : 0) + toolTotal <=
+    CONVERSATION_MAX_SERIALIZED_BYTES;
+
+  const out: PersistedChatMessage[] = [];
+  for (const part of kept) {
+    if (withToolHistory) {
+      out.push(...part.toolEntries);
+    }
+    out.push(
+      withTables && part.table
+        ? { ...part.prose, table: part.table }
+        : part.prose,
+    );
+  }
+  return out;
 }
 
 /**
- * Inverse of `toPersistedMessages`, minus the fields that were never persisted in the first place
- * (`table`/`statusMessage`/`isStreaming` — see that function's doc comment). Reconstructed messages
- * get FRESH ids/timestamps, same as chat-page.tsx's `handleSelectConversation` resume logic (which
- * calls this instead of repeating the same `.filter().map()` inline) — there is no id/createdAt to
- * recover from a persisted `ChatMessage`, only `role`/`content`. Also used by the merge-conflict
- * path (`saveConversationWithMerge`) to reflect a server-side merge outcome back into the visible
- * chat, so what is on screen matches what was just saved.
+ * A saved conversation, restored into the two things chat-page.tsx needs to continue it: the visible
+ * message list and the per-turn tool-call bookkeeping a follow-up question is built from.
  */
-export function reconstructUiMessages(
-  messages: ChatMessage[],
-): ChatHistoryMessage[] {
-  return messages
-    .filter(message => message.role === 'user' || message.role === 'assistant')
-    .map(message => ({
-      id: nextMessageId(),
+export interface RestoredConversation {
+  messages: ChatHistoryMessage[];
+  turnRecords: AssistantTurnRecord[];
+}
+
+/**
+ * Inverse of `toPersistedMessages`: splits a persisted transcript back into the messages that are
+ * DISPLAYED and the `[assistant{toolCalls}, tool{digest}]` pairs that are not (they belong to the
+ * model's view of the conversation, and are re-sent as history by `buildOutgoingMessages`).
+ *
+ * Restoring the tool history is what makes a resumed conversation continuable rather than merely
+ * readable: without it the model saw only prose on the next turn, had no record of the queries whose
+ * results that prose described, and typically re-ran them.
+ *
+ * Ids are freshly minted — a message id is a client-side render key, never persisted — and each
+ * restored turn record is keyed to the new id of the assistant message it belongs to. `createdAt`
+ * falls back to now only for a conversation saved before timestamps were persisted.
+ */
+export function reconstructConversation(
+  persisted: PersistedChatMessage[],
+): RestoredConversation {
+  const messages: ChatHistoryMessage[] = [];
+  const turnRecords: AssistantTurnRecord[] = [];
+  let pendingExchanges: ToolExchange[] = [];
+
+  for (const message of persisted) {
+    // The model-facing half: an assistant message that only carries tool calls, immediately followed
+    // by the `role:'tool'` result for each of them. Neither is ever displayed.
+    if (message.role === 'assistant' && message.toolCalls?.length) {
+      for (const toolCall of message.toolCalls) {
+        pendingExchanges.push({ toolCall });
+      }
+      continue;
+    }
+    if (message.role === 'tool') {
+      const exchange = pendingExchanges.find(
+        candidate => candidate.toolCall.id === message.toolCallId,
+      );
+      if (exchange) {
+        exchange.digestContent = message.content;
+      }
+      continue;
+    }
+    if (message.role !== 'user' && message.role !== 'assistant') {
+      continue;
+    }
+
+    const id = nextMessageId();
+    messages.push({
+      id,
       role: message.role,
       content: message.content,
-      createdAt: Date.now(),
-    }));
+      createdAt: message.createdAt ?? Date.now(),
+      ...(message.table ? { table: message.table } : {}),
+    });
+    if (message.role === 'assistant' && pendingExchanges.length > 0) {
+      turnRecords.push({
+        assistantMessageId: id,
+        toolExchanges: pendingExchanges,
+      });
+    }
+    // Tool pairs belong to the turn they precede, so they never carry over past one.
+    pendingExchanges = [];
+  }
+
+  return { messages, turnRecords };
+}
+
+/**
+ * `reconstructConversation`'s message half alone, for the callers that only replace what is on
+ * screen (the merge-conflict path reflecting a server-side merge back into the visible chat).
+ */
+export function reconstructUiMessages(
+  messages: PersistedChatMessage[],
+): ChatHistoryMessage[] {
+  return reconstructConversation(messages).messages;
 }
 
 /** History budget: only the last N assistant turns' tool exchanges are resent —

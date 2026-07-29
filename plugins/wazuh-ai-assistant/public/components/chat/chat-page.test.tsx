@@ -3,8 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ChatPage } from './chat-page';
 import {
-  ChatMessage,
   ConversationRecord,
+  PersistedChatMessage,
   ProviderSummary,
   StreamEvent,
 } from '../../../common/types';
@@ -165,12 +165,21 @@ function lastStreamSignal(): AbortSignal {
 }
 
 /** The `messages` array of the last create/update save, whichever ran last. */
-function lastSavedMessages(mock: jest.Mock): ChatMessage[] {
+function lastSavedMessages(mock: jest.Mock): PersistedChatMessage[] {
   const call = mock.mock.calls[mock.mock.calls.length - 1];
   // create(title, messages) / update(id, title, messages, expectedVersion)
   return (
     mock === mockConversationsService.create ? call[1] : call[2]
-  ) as ChatMessage[];
+  ) as PersistedChatMessage[];
+}
+
+/** The last save's transcript reduced to `[role, content]`, for assertions that do not care about
+ * the persisted timestamps/tables. */
+function lastSavedRoleContent(mock: jest.Mock): Array<[string, string]> {
+  return lastSavedMessages(mock).map(message => [
+    message.role,
+    message.content,
+  ]);
 }
 
 /** An http error shaped the way `common/http-status.ts` reads a status off an OSD http failure. */
@@ -251,15 +260,40 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     fireEvent.click(screen.getByText('Older conversation'));
 
-    // The abandoned turn had no conversation id yet, so it is saved with a POST of its own rather
-    // than written into conv-b (which the user is now looking at).
+    // The question was already saved (POST) before the stream started, creating conv-new; the
+    // abandoned turn UPDATES that same row with the answer it managed to produce. Exactly one row
+    // exists for it, and conv-b — the conversation now on screen — is never written to.
+    await waitFor(() =>
+      expect(mockConversationsService.update).toHaveBeenCalledTimes(1),
+    );
+    expect(mockConversationsService.create).toHaveBeenCalledTimes(1);
+    expect(mockConversationsService.update.mock.calls[0][0]).toBe('conv-new');
+    expect(lastSavedRoleContent(mockConversationsService.update)).toEqual([
+      ['user', 'first question'],
+      ['assistant', 'partial answer'],
+    ]);
+  });
+
+  it('saves the question before generating, so a turn cut short still has it', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await waitFor(() =>
+      expect(
+        screen.getByText('Ask the AI Assistant something'),
+      ).toBeInTheDocument(),
+    );
+    await sendMessage('first question');
+
+    // Nothing has streamed back yet: the conversation already exists, carrying the question alone.
     await waitFor(() =>
       expect(mockConversationsService.create).toHaveBeenCalledTimes(1),
     );
-    expect(mockConversationsService.update).not.toHaveBeenCalled();
-    expect(lastSavedMessages(mockConversationsService.create)).toEqual([
-      { role: 'user', content: 'first question' },
-      { role: 'assistant', content: 'partial answer' },
+    expect(lastSavedRoleContent(mockConversationsService.create)).toEqual([
+      ['user', 'first question'],
     ]);
   });
 
@@ -344,9 +378,9 @@ describe('ChatPage — turn abandoned mid-stream', () => {
       expect(mockConversationsService.create).toHaveBeenCalledTimes(1),
     );
     expect(screen.getByText('partial answer')).toBeInTheDocument();
-    expect(lastSavedMessages(mockConversationsService.create)).toEqual([
-      { role: 'user', content: 'first question' },
-      { role: 'assistant', content: 'partial answer' },
+    expect(lastSavedRoleContent(mockConversationsService.update)).toEqual([
+      ['user', 'first question'],
+      ['assistant', 'partial answer'],
     ]);
   });
 
@@ -583,5 +617,112 @@ describe('ChatPage — restoring the open conversation', () => {
     expect(
       window.sessionStorage.getItem('wazuhAiAssistant.lastConversation'),
     ).toBeNull();
+  });
+});
+
+describe('ChatPage — a resumed conversation is the same conversation', () => {
+  it('restores past timestamps rather than stamping everything with the resume time', async () => {
+    const savedAt = Date.parse('2024-01-01T09:00:00.000Z');
+    mockConversationsService.get.mockResolvedValue(
+      conversationRecord({
+        messages: [
+          { role: 'user', content: 'earlier question', createdAt: savedAt },
+          { role: 'assistant', content: 'earlier answer', createdAt: savedAt },
+        ],
+      }),
+    );
+    window.location.hash = '#/conversation/conv-b';
+
+    renderChatPage();
+
+    await waitFor(() =>
+      expect(screen.getByText('earlier answer')).toBeInTheDocument(),
+    );
+    // message-bubble.tsx renders each message's own time, formatted in the viewer's locale — so the
+    // expected string is derived the same way rather than hardcoded.
+    const savedLabel = new Date(savedAt).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    const nowLabel = new Date().toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    expect(savedLabel).not.toBe(nowLabel);
+    expect(screen.getAllByText(savedLabel).length).toBe(2);
+    expect(screen.queryByText(nowLabel)).not.toBeInTheDocument();
+  });
+
+  it('restores the result table a past answer was shown with', async () => {
+    mockConversationsService.get.mockResolvedValue(
+      conversationRecord({
+        messages: [
+          { role: 'user', content: 'top agents?', createdAt: 1 },
+          {
+            role: 'assistant',
+            content: 'here they are',
+            createdAt: 2,
+            table: {
+              columns: [{ id: 'agent', label: 'Agent' }],
+              rows: [{ agent: 'web-01' }],
+            },
+          },
+        ],
+      }),
+    );
+    window.location.hash = '#/conversation/conv-b';
+
+    renderChatPage();
+
+    await waitFor(() =>
+      expect(screen.getByText('here they are')).toBeInTheDocument(),
+    );
+    expect(screen.getByText('web-01')).toBeInTheDocument();
+  });
+
+  it('resends the restored tool history with the next question', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    mockConversationsService.get.mockResolvedValue(
+      conversationRecord({
+        messages: [
+          { role: 'user', content: 'how many?', createdAt: 1 },
+          {
+            role: 'assistant',
+            content: '',
+            toolCalls: [
+              { id: 't1', name: 'search_wazuh_data', arguments: { size: 1 } },
+            ],
+          },
+          { role: 'tool', content: '{"count":42}', toolCallId: 't1' },
+          { role: 'assistant', content: '42 alerts', createdAt: 2 },
+        ],
+      }),
+    );
+    window.location.hash = '#/conversation/conv-b';
+
+    renderChatPage();
+    await waitFor(() =>
+      expect(screen.getByText('42 alerts')).toBeInTheDocument(),
+    );
+    // The tool pair is history, not a bubble.
+    expect(screen.queryByText('{"count":42}')).not.toBeInTheDocument();
+
+    await sendMessage('and yesterday?');
+
+    // Without the restored tool history the model would have seen prose only and re-run the query.
+    const sentMessages = mockStreamChat.mock
+      .calls[0][1] as PersistedChatMessage[];
+    expect(sentMessages.map(message => message.role)).toEqual([
+      'user',
+      'assistant',
+      'tool',
+      'assistant',
+      'user',
+    ]);
+    expect(sentMessages[2].content).toBe('{"count":42}');
+    expect(sentMessages[1].toolCalls?.[0].id).toBe('t1');
   });
 });
