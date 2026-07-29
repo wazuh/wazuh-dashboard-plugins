@@ -189,7 +189,8 @@ function normalizeMustToFilter(node: unknown): unknown {
 
 /**
  * Low-cardinality fields vetted safe for terms/composite/cardinality/significant_terms aggs.
- * Only live, populated `wazuh.*` fields are listed (see `common/wazuh-fields.ts`).
+ * Only schema-valid `wazuh.*` fields are listed (see `common/wazuh-fields.ts`); population is
+ * decoder-dependent.
  */
 const AGG_FIELD_ALLOWLIST = new Set([
   WAZUH_FIELD.RULE_ID,

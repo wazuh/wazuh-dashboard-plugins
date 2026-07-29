@@ -116,7 +116,7 @@
     "wazuhAiAssistant.settings.privacy.userCanOverrideLabel": "Allow users to override privacy mode from the chat page",
     "wazuhAiAssistant.settings.privacy.fieldPolicyTitle": "Field policy",
     "wazuhAiAssistant.settings.privacy.fieldPolicyHelp": "Controls which alert fields are anonymized (or dropped entirely) before reaching the AI provider when privacy mode is on.",
-    "wazuhAiAssistant.settings.privacy.fieldPlaceholder": "e.g. agent.name",
+    "wazuhAiAssistant.settings.privacy.fieldPlaceholder": "e.g. wazuh.agent.name",
     "wazuhAiAssistant.settings.privacy.fieldColumnLabel": "Field",
     "wazuhAiAssistant.settings.privacy.actionColumnLabel": "Action",
     "wazuhAiAssistant.settings.privacy.fieldColumnHeader": "Field",

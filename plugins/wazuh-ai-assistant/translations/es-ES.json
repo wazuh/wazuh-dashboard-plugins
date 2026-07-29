@@ -116,7 +116,7 @@
     "wazuhAiAssistant.settings.privacy.userCanOverrideLabel": "Permitir que los usuarios cambien el modo de privacidad desde la página de chat",
     "wazuhAiAssistant.settings.privacy.fieldPolicyTitle": "Política de campos",
     "wazuhAiAssistant.settings.privacy.fieldPolicyHelp": "Controla qué campos de las alertas se anonimizan (o se eliminan por completo) antes de llegar al proveedor de IA cuando el modo de privacidad está activado.",
-    "wazuhAiAssistant.settings.privacy.fieldPlaceholder": "p. ej. agent.name",
+    "wazuhAiAssistant.settings.privacy.fieldPlaceholder": "p. ej. wazuh.agent.name",
     "wazuhAiAssistant.settings.privacy.fieldColumnLabel": "Campo",
     "wazuhAiAssistant.settings.privacy.actionColumnLabel": "Acción",
     "wazuhAiAssistant.settings.privacy.fieldColumnHeader": "Campo",
