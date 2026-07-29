@@ -1153,6 +1153,40 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     expect(screen.getByText('half an ans')).toBeInTheDocument();
   });
 
+  it('does not ask when the clicked conversation is the one already open', async () => {
+    const stream = startGeneratingWithSidebar();
+    mockConversationsService.get.mockResolvedValue(
+      conversationRecord({ id: 'conv-b' }),
+    );
+    // Open conv-b, then start a turn inside it.
+    renderChatPage();
+    await waitFor(() =>
+      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByText('Older conversation'));
+    await waitFor(() =>
+      expect(screen.getByText('earlier question')).toBeInTheDocument(),
+    );
+    await sendMessage('a follow-up');
+    stream.push({ type: 'delta', content: 'half an ans' });
+    await waitFor(() =>
+      expect(screen.getByText('half an ans')).toBeInTheDocument(),
+    );
+    const signal = lastStreamSignal();
+    mockConversationsService.get.mockClear();
+
+    // Clicking the conversation that is already open changes nothing, so there is nothing to
+    // interrupt and nothing to confirm.
+    fireEvent.click(screen.getByText('Older conversation'));
+
+    await waitFor(() =>
+      expect(screen.getByText('half an ans')).toBeInTheDocument(),
+    );
+    expect(mockOpenConfirm).not.toHaveBeenCalled();
+    expect(mockConversationsService.get).not.toHaveBeenCalled();
+    expect(signal.aborted).toBe(false);
+  });
+
   it('does not ask when nothing is generating', async () => {
     mockConversationsService.list.mockResolvedValue([
       { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },

@@ -1550,9 +1550,17 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             // Both go through the confirm gate: each would cancel a running answer. Delete is not
             // gated — ConversationList already confirms it, and a second modal on top of that one
             // would be worse than the risk it guards against.
-            onSelect={id =>
-              void confirmIfGenerating(() => void handleSelectConversation(id))
-            }
+            //
+            // Clicking the conversation ALREADY open is not one of those actions: it is a no-op
+            // (`handleSelectConversation` returns immediately), so asking to confirm an interruption
+            // that was never going to happen only trains the user to dismiss the dialog. The check
+            // has to happen here, before the gate, not only inside the handler behind it.
+            onSelect={id => {
+              if (id === activeConversationIdRef.current) {
+                return;
+              }
+              void confirmIfGenerating(() => void handleSelectConversation(id));
+            }}
             onNewConversation={() =>
               void confirmIfGenerating(handleNewConversation)
             }
