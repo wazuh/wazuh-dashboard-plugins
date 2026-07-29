@@ -36,6 +36,7 @@ const mockSettingsService = {
   getSettingsAccess: jest.fn(),
 };
 const mockHealManagerSession = jest.fn();
+const mockOpenConfirm = jest.fn();
 
 jest.mock('../../services/chat-service', () => ({
   ChatService: jest.fn().mockImplementation(() => ({
@@ -135,6 +136,10 @@ function renderChatPage() {
     http: { basePath: { prepend: (path: string) => path } },
     uiSettings: { get: () => false },
     chrome: { setBreadcrumbs: jest.fn() },
+    // The interrupt confirmation is the PLATFORM's dialog (overlays.openConfirm), the same one OSD
+    // shows when leaving the app — so tests drive the user's answer through this mock rather than
+    // clicking a locally rendered modal.
+    overlays: { openConfirm: mockOpenConfirm },
   };
 
   return render(
@@ -183,19 +188,13 @@ function lastSavedRoleContent(mock: jest.Mock): Array<[string, string]> {
 }
 
 /**
- * Opens another conversation from the sidebar, confirming the "a response is still generating"
- * modal when it appears. Clicking a row while a turn runs now asks first, so every mid-stream switch
- * in these tests goes through here.
+ * Opens another conversation from the sidebar. A mid-stream switch asks for confirmation first
+ * (`overlays.openConfirm`, mocked to accept by default), so every such switch in these tests goes
+ * through here rather than assuming a bare click is enough.
  */
 async function leaveForConversation(title: string) {
   fireEvent.click(screen.getByText(title));
-  const confirm = screen.queryByText('Leave and stop it');
-  if (confirm) {
-    fireEvent.click(confirm);
-  }
-  await waitFor(() =>
-    expect(screen.queryByText('Leave and stop it')).not.toBeInTheDocument(),
-  );
+  await waitFor(() => expect(mockConversationsService.get).toHaveBeenCalled());
 }
 
 /** An http error shaped the way `common/http-status.ts` reads a status off an OSD http failure. */
@@ -207,6 +206,8 @@ function httpError(status: number): Error & { response: { status: number } } {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  // Default: the user confirms. Tests that care about declining override this.
+  mockOpenConfirm.mockResolvedValue(true);
   window.location.hash = '';
   window.sessionStorage.clear();
   mockSettingsService.getAssistantSettings.mockResolvedValue({
@@ -415,7 +416,6 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     const signal = lastStreamSignal();
     fireEvent.click(screen.getByText('New conversation'));
-    fireEvent.click(screen.getByText('Leave and stop it'));
 
     await waitFor(() => expect(signal.aborted).toBe(true));
     await waitFor(() =>
@@ -1065,9 +1065,9 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     return stream;
   }
 
-  it('asks before opening another conversation while a turn is generating', async () => {
-    const stream = startGeneratingWithSidebar();
-
+  async function renderAndStartTurn(stream: {
+    push: (event: StreamEvent) => void;
+  }) {
     renderChatPage();
     await waitFor(() =>
       expect(screen.getByText('Older conversation')).toBeInTheDocument(),
@@ -1077,38 +1077,47 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     await waitFor(() =>
       expect(screen.getByText('half an ans')).toBeInTheDocument(),
     );
+  }
+
+  it('asks through the platform confirmation, not a modal of its own', async () => {
+    const stream = startGeneratingWithSidebar();
+    await renderAndStartTurn(stream);
+
+    fireEvent.click(screen.getByText('Older conversation'));
+
+    await waitFor(() => expect(mockOpenConfirm).toHaveBeenCalledTimes(1));
+    // No styling overrides: the platform's own app-leave confirmation passes none either, and
+    // matching it is the point (see services/interrupt-confirm.ts).
+    const [message, options] = mockOpenConfirm.mock.calls[0];
+    expect(message).toContain('you can retry the question');
+    expect(options.title).toBe('A response is still generating');
+    expect(options.buttonColor).toBeUndefined();
+    expect(options.confirmButtonText).toBeUndefined();
+  });
+
+  it('nothing is cancelled until the user answers', async () => {
+    const stream = startGeneratingWithSidebar();
+    // A confirmation the test never resolves: the decision is still pending.
+    mockOpenConfirm.mockReturnValue(new Promise(() => undefined));
+    await renderAndStartTurn(stream);
     const signal = lastStreamSignal();
 
     fireEvent.click(screen.getByText('Older conversation'));
 
-    expect(screen.getByText('A response is still generating')).toBeVisible();
-    // Nothing has happened yet — the question is asked BEFORE anything is cancelled.
+    await waitFor(() => expect(mockOpenConfirm).toHaveBeenCalled());
     expect(signal.aborted).toBe(false);
     expect(mockConversationsService.get).not.toHaveBeenCalled();
   });
 
-  it('cancelling keeps the answer generating in the same conversation', async () => {
+  it('declining keeps the answer generating in the same conversation', async () => {
     const stream = startGeneratingWithSidebar();
-
-    renderChatPage();
-    await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
-    );
-    await sendMessage('first question');
-    stream.push({ type: 'delta', content: 'half an ans' });
-    await waitFor(() =>
-      expect(screen.getByText('half an ans')).toBeInTheDocument(),
-    );
+    mockOpenConfirm.mockResolvedValue(false);
+    await renderAndStartTurn(stream);
     const signal = lastStreamSignal();
 
     fireEvent.click(screen.getByText('Older conversation'));
-    fireEvent.click(screen.getByText('Stay in this conversation'));
+    await waitFor(() => expect(mockOpenConfirm).toHaveBeenCalled());
 
-    await waitFor(() =>
-      expect(
-        screen.queryByText('A response is still generating'),
-      ).not.toBeInTheDocument(),
-    );
     expect(signal.aborted).toBe(false);
     expect(mockConversationsService.get).not.toHaveBeenCalled();
 
@@ -1119,22 +1128,12 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     );
   });
 
-  it('confirming interrupts the turn and opens the other conversation', async () => {
+  it('accepting interrupts the turn and opens the other conversation', async () => {
     const stream = startGeneratingWithSidebar();
-
-    renderChatPage();
-    await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
-    );
-    await sendMessage('first question');
-    stream.push({ type: 'delta', content: 'half an ans' });
-    await waitFor(() =>
-      expect(screen.getByText('half an ans')).toBeInTheDocument(),
-    );
+    await renderAndStartTurn(stream);
     const signal = lastStreamSignal();
 
     fireEvent.click(screen.getByText('Older conversation'));
-    fireEvent.click(screen.getByText('Leave and stop it'));
 
     await waitFor(() => expect(signal.aborted).toBe(true));
     await waitFor(() =>
@@ -1144,17 +1143,13 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
 
   it('asks before starting a new conversation while a turn is generating', async () => {
     const stream = startGeneratingWithSidebar();
-
-    renderChatPage();
-    await sendMessage('first question');
-    stream.push({ type: 'delta', content: 'half an ans' });
-    await waitFor(() =>
-      expect(screen.getByText('half an ans')).toBeInTheDocument(),
-    );
+    mockOpenConfirm.mockResolvedValue(false);
+    await renderAndStartTurn(stream);
 
     fireEvent.click(screen.getByText('New conversation'));
 
-    expect(screen.getByText('A response is still generating')).toBeVisible();
+    await waitFor(() => expect(mockOpenConfirm).toHaveBeenCalledTimes(1));
+    // Declined, so the turn is untouched.
     expect(screen.getByText('half an ans')).toBeInTheDocument();
   });
 
@@ -1173,8 +1168,6 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     await waitFor(() =>
       expect(screen.getByText('earlier question')).toBeInTheDocument(),
     );
-    expect(
-      screen.queryByText('A response is still generating'),
-    ).not.toBeInTheDocument();
+    expect(mockOpenConfirm).not.toHaveBeenCalled();
   });
 });

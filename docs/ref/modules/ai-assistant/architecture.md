@@ -67,9 +67,12 @@ link or a trip through another dashboard app returns to it. A turn is saved twic
 question is sent, so an interrupted answer never loses the question, and once when the answer ends.
 A turn that ends without completing is stored as interrupted and can be retried.
 
-Anything that would interrupt a running answer asks first: opening another conversation or starting a
-new one prompts in-app, while leaving the app entirely (another dashboard app, a reload, closing the
-tab) goes through the platform's `onAppLeave` hook, registered once in `public/application.tsx`.
+Anything that would interrupt a running answer asks first, through one dialog: the platform's
+`overlays.openConfirm`. Leaving the app entirely (another dashboard app, a reload, closing the tab)
+reaches it through the `onAppLeave` hook registered in `public/application.tsx`; opening another
+conversation or starting a new one calls it directly. Both use the same copy and no styling
+overrides (`public/services/interrupt-confirm.ts`), since `onAppLeave` cannot carry button labels or
+a color and a plugin-side modal could not be made to match it.
 Switching to the Settings tab deliberately prompts nothing — the Chat tab stays mounted and the
 answer keeps streaming into it.
 

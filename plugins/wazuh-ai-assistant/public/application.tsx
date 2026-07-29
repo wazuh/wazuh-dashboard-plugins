@@ -7,6 +7,10 @@ import { i18n } from '@osd/i18n';
 import { ChatPage } from './components/chat/chat-page';
 import { SettingsPage } from './components/settings/settings-page';
 import { SettingsService } from './services/settings-service';
+import {
+  interruptConfirmationText,
+  interruptConfirmationTitle,
+} from './services/interrupt-confirm';
 import { ProviderSummary } from '../common/types';
 
 type Route = 'chat' | 'settings';
@@ -56,14 +60,11 @@ const App: React.FC<{
       if (!isGeneratingRef.current) {
         return actions.default();
       }
+      // The same copy the in-app confirmation uses (services/interrupt-confirm.ts) — one decision,
+      // one wording, whichever way the user is leaving.
       return actions.confirm(
-        i18n.translate('wazuhAiAssistant.app.leaveWhileGenerating.body', {
-          defaultMessage:
-            'A response is still being generated. If you leave, it stops — what has arrived so far is saved, and you can retry the question when you come back.',
-        }),
-        i18n.translate('wazuhAiAssistant.app.leaveWhileGenerating.title', {
-          defaultMessage: 'A response is still generating',
-        }),
+        interruptConfirmationText(),
+        interruptConfirmationTitle(),
       );
     });
   }, [onAppLeave]);

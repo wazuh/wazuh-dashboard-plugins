@@ -13,7 +13,6 @@ import {
   EuiPanel,
   EuiIcon,
   EuiSelect,
-  EuiConfirmModal,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { CoreStart } from '../../../../../src/core/public';
@@ -23,6 +22,7 @@ import {
   SettingsService,
 } from '../../services/settings-service';
 import { healManagerSession } from '../../services/session-heal';
+import { confirmInterruption } from '../../services/interrupt-confirm';
 import { ConversationsService } from '../../services/conversations-service';
 import {
   ChatMessage,
@@ -342,11 +342,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // swallow every failure silently, so a user could keep chatting for an hour believing their
   // history was being kept when it had stopped being saved after the first rejection.
   const [saveFailed, setSaveFailed] = useState(false);
-  // Set while the user is being asked to confirm an action that would interrupt the running answer
-  // (see `confirmIfGenerating`); holds the action to run if they go ahead.
-  const [pendingInterruption, setPendingInterruption] = useState<
-    (() => void) | null
-  >(null);
 
   // Conversation restore (common/conversation-location.ts): true while the conversation named by the
   // URL hash / this tab's stored pointer is being fetched on mount, so the chat shows a spinner
@@ -509,19 +504,20 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    * cancelling. Passing through untouched when nothing is generating is what keeps the common case
    * a single click.
    *
-   * This covers the in-app moves (opening another conversation, starting a new one). Leaving the app
-   * entirely — another dashboard app, a reload, closing the tab — is the platform's `onAppLeave`
-   * hook instead, registered in application.tsx. Switching to the Settings TAB deliberately asks
-   * nothing: that no longer interrupts anything, the answer keeps streaming into the Chat tab.
+   * Covers the in-app moves (opening another conversation, starting a new one), through the SAME
+   * `overlays.openConfirm` dialog the platform shows when the user leaves the app entirely — see
+   * services/interrupt-confirm.ts for why this is not a locally rendered modal. Switching to the
+   * Settings TAB deliberately asks nothing: that no longer interrupts anything, the answer keeps
+   * streaming into the Chat tab.
    */
-  const confirmIfGenerating = (proceed: () => void) => {
+  const confirmIfGenerating = async (proceed: () => void) => {
     if (!isGenerating) {
       proceed();
       return;
     }
-    // `setState(() => fn)` stores `fn` itself — the updater form is what makes storing a function in
-    // state possible at all.
-    setPendingInterruption(() => proceed);
+    if (await confirmInterruption(core.overlays)) {
+      proceed();
+    }
   };
 
   /**
@@ -1508,42 +1504,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       {/* Single injected <style> element for the whole chat surface — see CHAT_SURFACE_STYLES's own
         doc comment above for exactly what it does and does not cover. */}
       <style>{CHAT_SURFACE_STYLES}</style>
-      {/* Asked BEFORE anything is cancelled: the alternative was a click that silently threw away a
-          half-written answer. Confirming runs the action, which abandons the turn the same way it
-          always did — and the partial answer is still saved to the conversation it belongs to, which
-          is what the body text promises. */}
-      {pendingInterruption && (
-        <EuiConfirmModal
-          title={i18n.translate('wazuhAiAssistant.chat.interruptModal.title', {
-            defaultMessage: 'A response is still generating',
-          })}
-          onCancel={() => setPendingInterruption(null)}
-          onConfirm={() => {
-            const proceed = pendingInterruption;
-            setPendingInterruption(null);
-            proceed();
-          }}
-          cancelButtonText={i18n.translate(
-            'wazuhAiAssistant.chat.interruptModal.cancel',
-            { defaultMessage: 'Stay in this conversation' },
-          )}
-          confirmButtonText={i18n.translate(
-            'wazuhAiAssistant.chat.interruptModal.confirm',
-            { defaultMessage: 'Leave and stop it' },
-          )}
-          // 'danger', matching the plugin's other two confirm modals (conversation-list.tsx's
-          // delete, settings-page.tsx's) — this app uses no warning-yellow buttons anywhere.
-          buttonColor='danger'
-          defaultFocusedButton='cancel'
-        >
-          <p>
-            {i18n.translate('wazuhAiAssistant.chat.interruptModal.body', {
-              defaultMessage:
-                'Leaving stops the response being generated. What has arrived so far is saved with this conversation, and you can retry the question from there.',
-            })}
-          </p>
-        </EuiConfirmModal>
-      )}
       <div
         style={
           {
@@ -1591,9 +1551,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             // gated — ConversationList already confirms it, and a second modal on top of that one
             // would be worse than the risk it guards against.
             onSelect={id =>
-              confirmIfGenerating(() => void handleSelectConversation(id))
+              void confirmIfGenerating(() => void handleSelectConversation(id))
             }
-            onNewConversation={() => confirmIfGenerating(handleNewConversation)}
+            onNewConversation={() =>
+              void confirmIfGenerating(handleNewConversation)
+            }
             onDelete={handleDeleteConversation}
           />
         </EuiPanel>
