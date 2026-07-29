@@ -239,12 +239,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     setActiveConversationId,
     activeConversationIdRef,
   ] = useSyncedState<string | null>(null);
-  // In-flight guard: a save (POST or PUT) is already running. A simple boolean rather than a
-  // queue — the auto-save call sites (runChatStream's `finally`) always send the FULL, up-to-date
-  // `messagesRef.current` snapshot, so skipping an overlapping call never loses data: whichever
-  // save runs next (the following completed turn) re-sends everything, including what the skipped
-  // call would have sent.
-  const conversationSaveInFlightRef = useRef(false);
+  // Save serialization: every auto-save is chained onto this promise instead of being dropped when
+  // one is already in flight. Dropping an overlap was safe only while every save targeted the
+  // conversation on screen (the next turn's save would resend the same, fuller array) — it is NOT
+  // safe now that an abandoned turn saves a DIFFERENT conversation than the active one (see
+  // `persistConversationTurn`): dropping that save would silently lose the answer the user
+  // navigated away from, which is exactly what this is meant to preserve.
+  const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
   const [conversationsService] = useState(
     () => new ConversationsService(core.http),
   );
@@ -293,6 +294,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const [chatService] = useState(() => new ChatService(core.http.basePath));
   const [settingsService] = useState(() => new SettingsService(core.http));
   const abortControllerRef = useRef<AbortController | null>(null);
+  // Turn identity. Incremented when a turn starts AND when a turn is abandoned, so
+  // `runChatStream`'s own `finally` can tell whether the conversation it was streaming into is
+  // still the one on screen. Without it, switching conversations mid-stream let the outgoing
+  // turn's completion handler write its terminal state, its pseudonym entries and its auto-save
+  // into whichever conversation the user had just opened.
+  const streamGenerationRef = useRef(0);
   const chatInputRef = useRef<ChatInputHandle>(null);
   // Core ships this mark alongside every OSD build (src/core/server/core_app/assets/logos/), so
   // it is always present; served under the basePath the same way chat_service reaches the API.
@@ -416,8 +423,36 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     setPrivacyEnabled(current => !current);
   };
 
+  /**
+   * Stop button: cancels the provider stream but keeps the turn ATTACHED to the conversation on
+   * screen — the generation counter is deliberately not bumped, so `runChatStream`'s `finally`
+   * still takes its normal path (terminal state committed to the visible bubble, auto-save adopted
+   * into the active conversation). Whatever streamed in before the stop is kept, exactly as
+   * before.
+   */
   const handleStop = () => {
     abortControllerRef.current?.abort();
+    setIsGenerating(false);
+  };
+
+  /**
+   * Cancels the in-flight turn AND detaches it from this component's live state: the user is
+   * leaving the conversation that turn belongs to (conversation switch, new conversation, deleting
+   * the active one, or unmount). Bumping the generation counter is what makes `runChatStream`'s
+   * `finally` take its abandoned path — it persists the turn to the conversation it actually
+   * started in, and touches no state belonging to whatever the user opened next.
+   *
+   * Resetting `isGenerating` here (rather than leaving it to that `finally`, which will no longer
+   * do it for an abandoned turn) is what unblocks the newly opened conversation's input: the abort
+   * only settles a microtask later, and the abandoned path must not flip shared UI state at all.
+   */
+  const abandonActiveStream = () => {
+    if (!abortControllerRef.current) {
+      return;
+    }
+    streamGenerationRef.current += 1;
+    abortControllerRef.current.abort();
+    abortControllerRef.current = null;
     setIsGenerating(false);
   };
 
@@ -464,9 +499,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
   // Unmount cleanup: the app shell (application.tsx) swaps ChatPage<->SettingsPage on tab switch
   // rather than keeping ChatPage mounted, so without this a tab switch mid-generation orphans the
-  // in-flight SSE stream instead of cancelling it (mirrors handleStop's abort, just triggered by
-  // unmount instead of the Stop button).
-  useEffect(() => () => abortControllerRef.current?.abort(), []);
+  // in-flight SSE stream instead of cancelling it. `abandonActiveStream` (not a bare abort) so the
+  // turn's `finally` persists what streamed in to the conversation it belongs to instead of
+  // writing terminal state into a component that no longer exists. Empty deps with no exhaustive-
+  // deps exemption needed: everything `abandonActiveStream` touches is a ref or a stable setter,
+  // so the first render's closure stays correct for the whole component lifetime.
+  useEffect(() => () => abandonActiveStream(), []);
 
   /**
    * New conversation: resets messages AND the pseudonym map — fresh privacy state — plus
@@ -475,8 +513,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    * creates a new saved-conversation row instead of overwriting the one just left). Deliberately
    * leaves `privacyEnabled`/`privacyTouchedRef` and the selected provider untouched — those are
    * session-level choices, not per-conversation ones, per this component's existing convention.
+   *
+   * Abandons any in-flight turn first: it belongs to the conversation being left, and every
+   * `updateMessages` call it still has queued targets a message id that no longer exists in the
+   * list this replaces it with.
    */
   const handleNewConversation = () => {
+    abandonActiveStream();
     pinnedToBottomRef.current = true;
     updateMessages([]);
     turnHistoryRef.current = [];
@@ -505,6 +548,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     }
     try {
       const record = await conversationsService.get(id);
+      // Abandon the in-flight turn only once the switch is certain to happen — after the GET
+      // resolved, immediately before the message list is replaced. Aborting before the await would
+      // throw away a running answer even when the load fails and the user stays put.
+      abandonActiveStream();
       const resumed = reconstructUiMessages(record.messages);
       // A resumed conversation opens at its latest turn (bottom), like every chat client.
       pinnedToBottomRef.current = true;
@@ -546,8 +593,15 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   /**
    * PUT with optimistic concurrency and merge-on-conflict (two tabs on the SAME conversation
    * previously last-write-wins, silently erasing the
-   * faster tab's turns). Sends `conversationVersionRef.current` as `expectedVersion`; the server
-   * 409s when another tab's write landed first (server/routes/conversations.ts).
+   * faster tab's turns). Sends `expectedVersion` (the caller's last-known version for THIS
+   * conversation — the active conversation's `conversationVersionRef`, or the version captured when
+   * an abandoned turn started); the server 409s when another tab's write landed first
+   * (server/routes/conversations.ts).
+   *
+   * `reflectInUi` is false when saving a conversation the user has already navigated away from: a
+   * merge outcome for a conversation that is no longer on screen must not replace the visible
+   * message list, reset this tab's tool-history bookkeeping, or raise a notice about a conversation
+   * the user is no longer looking at.
    *
    * On a 409: fetches the server's current copy, merges it with THIS tab's own local messages via
    * the longest-common-prefix merge (common/conversation-merge.ts — "server messages, then this
@@ -568,13 +622,15 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     id: string,
     title: string,
     localMessages: ChatMessage[],
+    expectedVersion: string | undefined,
+    reflectInUi: boolean,
   ): Promise<ConversationRecord> => {
     try {
       return await conversationsService.update(
         id,
         title,
         localMessages,
-        conversationVersionRef.current,
+        expectedVersion,
       );
     } catch (firstError) {
       if (getHttpErrorStatus(firstError) !== 409) {
@@ -595,17 +651,19 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         merged,
         serverRecord.version,
       );
-      setMergeNotice('merged');
-      updateMessages(reconstructUiMessages(merged));
-      // The reconstructed messages above have fresh ids that don't match anything in
-      // turnHistoryRef's bookkeeping (built for THIS tab's own assistantMessageIds) — clearing it
-      // is the same reset `handleSelectConversation` already does after any wholesale message-list
-      // replacement, so a later turn's digest-in-history resend doesn't try to look up a
-      // now-nonexistent id.
-      turnHistoryRef.current = [];
+      if (reflectInUi) {
+        setMergeNotice('merged');
+        updateMessages(reconstructUiMessages(merged));
+        // The reconstructed messages above have fresh ids that don't match anything in
+        // turnHistoryRef's bookkeeping (built for THIS tab's own assistantMessageIds) — clearing it
+        // is the same reset `handleSelectConversation` already does after any wholesale message-list
+        // replacement, so a later turn's digest-in-history resend doesn't try to look up a
+        // now-nonexistent id.
+        turnHistoryRef.current = [];
+      }
       return retried;
     } catch (retryError) {
-      if (getHttpErrorStatus(retryError) === 409) {
+      if (reflectInUi && getHttpErrorStatus(retryError) === 409) {
         setMergeNotice('conflict');
       }
       throw retryError;
@@ -613,57 +671,82 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   };
 
   /**
-   * Auto-save: called from `runChatStream`'s `finally` block, i.e. after EVERY completed
-   * turn. Creates the conversation on the first completed turn (`activeConversationIdRef.current`
-   * still `null`), PUTs it (via `saveConversationWithMerge`) on every later turn.
-   * Guarded by `conversationSaveInFlightRef` against an overlapping call (see its own doc comment
-   * for why dropping an overlap is safe); never saves an empty message list.
+   * Auto-save, called from `runChatStream`'s `finally` after EVERY turn — including a turn the user
+   * navigated away from mid-stream, which is why the conversation being written is an explicit
+   * argument rather than read from `activeConversationIdRef` in here.
+   *
+   * `adoptAsActive` distinguishes the two callers. True for the turn the user is still watching:
+   * the created id and the returned version become this component's active conversation state, the
+   * same as before. False for an ABANDONED turn: its transcript is still persisted (that is the
+   * whole point — the answer the user walked away from is not lost), but nothing about this
+   * component's live state is touched, so it cannot overwrite the id/version of whatever
+   * conversation is now on screen. An abandoned turn with no `conversationId` yet gets its own new
+   * row via POST, so a partial first answer still shows up in the sidebar instead of vanishing.
+   *
+   * Serialized through `saveQueueRef` rather than dropped on overlap — see that ref's own comment.
    */
-  const persistConversationAfterTurn = async () => {
-    const currentMessages = messagesRef.current;
-    if (currentMessages.length === 0 || conversationSaveInFlightRef.current) {
-      return;
-    }
-    conversationSaveInFlightRef.current = true;
-    try {
-      // The untitled-fallback label is resolved here (not inside buildConversationTitle, which is
-      // now a dependency-free common/ helper — see its own doc comment) via the same
-      // i18n.translate call this file always made for it.
-      const title = buildConversationTitle(
-        currentMessages,
-        i18n.translate('wazuhAiAssistant.chat.conversations.untitled', {
-          defaultMessage: 'Untitled conversation',
-        }),
-      );
-      const toPersist = toPersistedMessages(currentMessages);
-      if (activeConversationIdRef.current) {
-        const record = await saveConversationWithMerge(
-          activeConversationIdRef.current,
-          title,
-          toPersist,
+  const persistConversationTurn = (args: {
+    conversationId: string | null;
+    messages: UiChatMessage[];
+    expectedVersion: string | undefined;
+    adoptAsActive: boolean;
+  }): Promise<void> => {
+    const task = async () => {
+      if (args.messages.length === 0) {
+        return;
+      }
+      try {
+        // The untitled-fallback label is resolved here (not inside buildConversationTitle, which is
+        // now a dependency-free common/ helper — see its own doc comment) via the same
+        // i18n.translate call this file always made for it.
+        const title = buildConversationTitle(
+          args.messages,
+          i18n.translate('wazuhAiAssistant.chat.conversations.untitled', {
+            defaultMessage: 'Untitled conversation',
+          }),
         );
-        conversationVersionRef.current = record.version;
-      } else {
-        const created = await conversationsService.create(title, toPersist);
-        setActiveConversationId(created.id);
-        conversationVersionRef.current = created.version;
+        const toPersist = toPersistedMessages(args.messages);
+        if (args.conversationId) {
+          const record = await saveConversationWithMerge(
+            args.conversationId,
+            title,
+            toPersist,
+            args.expectedVersion,
+            args.adoptAsActive,
+          );
+          // Only when this IS still the active conversation: an adopted save that raced with a
+          // conversation switch must not stamp its version onto the newly opened one.
+          if (
+            args.adoptAsActive &&
+            activeConversationIdRef.current === args.conversationId
+          ) {
+            conversationVersionRef.current = record.version;
+          }
+        } else {
+          const created = await conversationsService.create(title, toPersist);
+          if (args.adoptAsActive && activeConversationIdRef.current === null) {
+            setActiveConversationId(created.id);
+            conversationVersionRef.current = created.version;
+          }
+        }
+        refreshConversations();
+      } catch (persistError) {
+        // Session-expiry recovery UX: a conversation save can 401 the same way the chat POST
+        // can (same dashboard session, same 15-minute TTL) — this is the "and from the conversation
+        // save" half of that fix; the chat POST's own 401 is handled in runChatStream's event loop.
+        if (getHttpErrorStatus(persistError) === 401) {
+          handleSessionExpired();
+        }
+        // Otherwise non-fatal: no separate error banner for a persistence hiccup (version-conflict
+        // notices are the one exception, surfaced by saveConversationWithMerge itself above) — it
+        // would compete with the chat's own error state for something that doesn't block the
+        // conversation itself from continuing. The next completed turn's auto-save simply retries
+        // with the (still accurate, still-full) message list.
       }
-      refreshConversations();
-    } catch (persistError) {
-      // Session-expiry recovery UX: a conversation save can 401 the same way the chat POST
-      // can (same dashboard session, same 15-minute TTL) — this is the "and from the conversation
-      // save" half of that fix; the chat POST's own 401 is handled in runChatStream's event loop.
-      if (getHttpErrorStatus(persistError) === 401) {
-        handleSessionExpired();
-      }
-      // Otherwise non-fatal: no separate error banner for a persistence hiccup (version-conflict
-      // notices are the one exception, surfaced by saveConversationWithMerge itself above) — it
-      // would compete with the chat's own error state for something that doesn't block the
-      // conversation itself from continuing. The next completed turn's auto-save simply retries
-      // with the (still accurate, still-full) message list.
-    } finally {
-      conversationSaveInFlightRef.current = false;
-    }
+    };
+    // `task` handles its own errors, so the queue can never be poisoned by a rejected link.
+    saveQueueRef.current = saveQueueRef.current.then(task, task);
+    return saveQueueRef.current;
   };
 
   /**
@@ -672,14 +755,35 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    */
   const runChatStream = async (args: {
     assistantMessageId: string;
+    /** The full UI message list this turn started from, INCLUDING its own (still empty) assistant
+     * placeholder. Kept as a local copy so the turn can reconstruct its own complete transcript in
+     * `finally` without reading React state — which, for an abandoned turn, has already been
+     * replaced by whatever conversation the user opened next. */
+    baseMessages: UiChatMessage[];
     outgoingMessages: ChatMessage[];
     privacyPayload: ChatRequest['privacy'];
   }) => {
-    const { assistantMessageId, outgoingMessages, privacyPayload } = args;
+    const {
+      assistantMessageId,
+      baseMessages,
+      outgoingMessages,
+      privacyPayload,
+    } = args;
 
     setIsGenerating(true);
     const controller = new AbortController();
     abortControllerRef.current = controller;
+
+    // Turn identity + the conversation coordinates this turn belongs to, captured BEFORE the first
+    // await: if the user switches conversations mid-stream, `activeConversationIdRef` and
+    // `conversationVersionRef` will already point at the new one by the time `finally` runs.
+    streamGenerationRef.current += 1;
+    const generation = streamGenerationRef.current;
+    const turnConversationId = activeConversationIdRef.current;
+    const turnVersion = conversationVersionRef.current;
+    /** False once this turn has been abandoned (`abandonActiveStream`) or superseded by a newer
+     * one — every write into shared component state is gated on it. */
+    const isTurnStillActive = () => generation === streamGenerationRef.current;
 
     // Empty-table suppression: an empty `table` event is held back (not
     // committed to `message.table`) instead of rendered immediately, since a failed/empty first
@@ -688,12 +792,19 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // single empty table if it's the only one" (honest-empty stays correct). A plain local
     // variable, not a ref/state: scoped to this one stream's sequential event loop only.
     let pendingEmptyTable: TableSpec | undefined;
+    /** The table this turn will be remembered with — mirrors what the flushes below commit to
+     * React state, so the abandoned path can rebuild the turn without reading that state. */
+    let committedTable: TableSpec | undefined;
     const flushPendingEmptyTable = () => {
       if (!pendingEmptyTable) {
         return;
       }
       const spec = pendingEmptyTable;
       pendingEmptyTable = undefined;
+      committedTable = spec;
+      if (!isTurnStillActive()) {
+        return;
+      }
       updateMessages(current =>
         current.map(message =>
           message.id === assistantMessageId
@@ -725,6 +836,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       }
       const text = pendingDeltaText;
       pendingDeltaText = '';
+      // An abandoned turn keeps accumulating into `accumulatedContent` (which is what its own
+      // transcript is rebuilt from) but stops writing into the message list, which now belongs to
+      // a different conversation.
+      if (!isTurnStillActive()) {
+        return;
+      }
       updateMessages(current =>
         current.map(message =>
           message.id === assistantMessageId
@@ -777,15 +894,18 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             pendingEmptyTable = event.spec;
           } else {
             pendingEmptyTable = undefined;
-            updateMessages(current =>
-              current.map(message =>
-                message.id === assistantMessageId
-                  ? { ...message, table: event.spec }
-                  : message,
-              ),
-            );
+            committedTable = event.spec;
+            if (isTurnStillActive()) {
+              updateMessages(current =>
+                current.map(message =>
+                  message.id === assistantMessageId
+                    ? { ...message, table: event.spec }
+                    : message,
+                ),
+              );
+            }
           }
-        } else if (event.type === 'status') {
+        } else if (event.type === 'status' && isTurnStillActive()) {
           // Transient progress line (e.g. "Querying Wazuh...") from the orchestration loop; no
           // engine emits this yet, but the bubble already knows how to show it once one does.
           updateMessages(current =>
@@ -813,7 +933,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           if (exchange) {
             exchange.digestContent = event.content;
           }
-        } else if (event.type === 'privacy_map') {
+        } else if (event.type === 'privacy_map' && isTurnStillActive()) {
+          // Gated: the pseudonym map is PER-CONVERSATION state. An abandoned turn's entries used to
+          // be merged into whatever conversation the user had just opened, and then sent up with
+          // that conversation's next request.
           setPseudonymMap(current => {
             const known = new Set(current.map(entry => entry.pseudonym));
             const additions = event.entries.filter(
@@ -823,6 +946,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           });
         } else if (event.type === 'error') {
           flushPendingEmptyTable();
+          if (!isTurnStillActive()) {
+            // An error banner for a conversation the user already left is pure noise — the turn's
+            // own transcript (rebuilt in `finally`) simply carries whatever streamed in before it.
+            continue;
+          }
           if (detectManagerAuthError(event.message)) {
             setManagerAuthHint(true);
           } else {
@@ -843,9 +971,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         } else if (event.type === 'auth_expired') {
           // Session-expiry recovery UX: a genuine 401 on the chat POST itself, distinct
           // from the generic `error` branch above — same placeholder-cleanup, but a dedicated,
-          // persistent callout instead of the free-form error banner.
+          // persistent callout instead of the free-form error banner. Unlike the branch above this
+          // is NOT gated on the turn still being active: the session is gone for the whole app, so
+          // the callout is just as relevant to whatever conversation is now on screen.
           flushPendingEmptyTable();
           handleSessionExpired();
+          if (!isTurnStillActive()) {
+            continue;
+          }
           updateMessages(current =>
             current.filter(
               message =>
@@ -865,23 +998,65 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       // `for await` and lands here the same way).
       flushPendingDelta();
       flushPendingEmptyTable();
-      if (detectManagerAuthError(accumulatedContent)) {
-        setManagerAuthHint(true);
+
+      if (!isTurnStillActive()) {
+        // Abandoned turn: the user switched conversation, started a new one, or left the app while
+        // this was streaming. Persist what it produced to the conversation it actually belongs to,
+        // rebuilt from this turn's OWN local record (`baseMessages` + `accumulatedContent` +
+        // `committedTable`) rather than from React state, which now describes a different
+        // conversation. Nothing here touches shared state — `abandonActiveStream` already reset
+        // `isGenerating` and `abortControllerRef` at the moment of abandonment.
+        const abandonedTranscript = baseMessages
+          .map(message =>
+            message.id === assistantMessageId
+              ? {
+                  ...message,
+                  content: accumulatedContent,
+                  table: committedTable,
+                  isStreaming: false,
+                }
+              : message,
+          )
+          // Same rule the `error` branch applies to the visible list: an assistant placeholder that
+          // never received anything is not worth persisting.
+          .filter(
+            message =>
+              !(
+                message.id === assistantMessageId &&
+                message.content === '' &&
+                !message.table
+              ),
+          );
+        void persistConversationTurn({
+          conversationId: turnConversationId,
+          messages: abandonedTranscript,
+          expectedVersion: turnVersion,
+          adoptAsActive: false,
+        });
+      } else {
+        if (detectManagerAuthError(accumulatedContent)) {
+          setManagerAuthHint(true);
+        }
+        updateMessages(current =>
+          current.map(message =>
+            message.id === assistantMessageId
+              ? { ...message, isStreaming: false }
+              : message,
+          ),
+        );
+        setIsGenerating(false);
+        abortControllerRef.current = null;
+        chatInputRef.current?.focus();
+        // Auto-save: fire-and-forget — `persistConversationTurn` handles its own errors (no
+        // separate banner) and is handed `messagesRef.current`, which the `isStreaming: false`
+        // update just above already applied synchronously (see `useSyncedState`'s doc comment).
+        void persistConversationTurn({
+          conversationId: activeConversationIdRef.current,
+          messages: messagesRef.current,
+          expectedVersion: conversationVersionRef.current,
+          adoptAsActive: true,
+        });
       }
-      updateMessages(current =>
-        current.map(message =>
-          message.id === assistantMessageId
-            ? { ...message, isStreaming: false }
-            : message,
-        ),
-      );
-      setIsGenerating(false);
-      abortControllerRef.current = null;
-      chatInputRef.current?.focus();
-      // Auto-save: fire-and-forget — `persistConversationAfterTurn` handles its own errors
-      // (no separate banner) and reads `messagesRef.current`, which the `isStreaming: false`
-      // update just above already applied synchronously (see `updateMessages`'s doc comment).
-      void persistConversationAfterTurn();
     }
   };
 
@@ -939,10 +1114,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // Sending always snaps the pane to the new turn, even if the user had scrolled up — the one
     // case where overriding their scroll position is what they expect (see pinnedToBottomRef).
     pinnedToBottomRef.current = true;
-    updateMessages([...history, assistantMessage]);
+    const baseMessages = [...history, assistantMessage];
+    updateMessages(baseMessages);
 
     await runChatStream({
       assistantMessageId,
+      baseMessages,
       outgoingMessages,
       privacyPayload,
     });
