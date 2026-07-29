@@ -312,7 +312,7 @@ function deriveResultColumns(
   return columns.slice(0, DERIVED_COLUMN_CAP);
 }
 
-/** Last path segment, capitalized (e.g. "wazuh.rule.title" -> "Description"); falls back to the
+/** Last path segment, capitalized (e.g. "wazuh.rule.title" -> "Title"); falls back to the
  * full path when two derived columns share a last segment (e.g. two differently-nested "id"s). */
 function deriveColumnLabel(path: string, allPaths: string[]): string {
   const lastSegment = path.split('.').pop() ?? path;

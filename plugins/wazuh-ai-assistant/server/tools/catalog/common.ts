@@ -150,7 +150,7 @@ export function objectSchema(
 export const STANDARD_ALERT_TABLE_COLUMNS: ToolTableColumnSpec[] = [
   { field: '@timestamp', label: 'Time' },
   { field: 'wazuh.agent.name', label: 'Agent' },
-  { field: 'wazuh.rule.title', label: 'Description' },
+  { field: 'wazuh.rule.title', label: 'Title' },
   { field: 'wazuh.rule.level', label: 'Level', severity: true },
   { field: 'wazuh.rule.id', label: 'Rule ID' },
 ];

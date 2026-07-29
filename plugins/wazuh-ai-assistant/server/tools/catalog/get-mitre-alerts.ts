@@ -62,7 +62,7 @@ export const getMitreAlertsTool: ToolDefinition = {
     columns: [
       { field: '@timestamp', label: 'Time' },
       { field: 'wazuh.agent.name', label: 'Agent' },
-      { field: 'wazuh.rule.title', label: 'Description' },
+      { field: 'wazuh.rule.title', label: 'Title' },
       { field: 'wazuh.rule.mitre.technique.id', label: 'Technique ID' },
       { field: 'wazuh.rule.mitre.technique.name', label: 'Technique' },
       { field: 'wazuh.rule.mitre.tactic.name', label: 'Tactic' },

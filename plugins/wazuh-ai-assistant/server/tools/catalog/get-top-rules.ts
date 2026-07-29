@@ -17,7 +17,7 @@ export const getTopRulesTool: ToolDefinition = {
     name: 'get_top_rules',
     description:
       'Aggregates the most frequently triggered rules within a time range, with a sample ' +
-      'description per rule.',
+      'title per rule.',
     parameters: objectSchema({
       limit: limitProperty(
         'Max number of distinct rules to return (default 20, max 100).',
@@ -55,7 +55,7 @@ export const getTopRulesTool: ToolDefinition = {
     columns: [
       { field: 'key', label: 'Rule ID' },
       { field: 'doc_count', label: 'Count' },
-      { field: 'wazuh.rule.title', label: 'Description' },
+      { field: 'wazuh.rule.title', label: 'Title' },
     ],
   },
   digest: { sampleColumns: ['key', 'doc_count', 'wazuh.rule.title'] },
