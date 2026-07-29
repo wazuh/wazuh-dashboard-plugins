@@ -58,7 +58,6 @@
 - Changed `rule.groups` filter to `wazuh.integration.decoders` [#7934](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7934)
 - Applied the new home page navigation style to all dashboards [#7981](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7981)
 - Updated Office 365 dashboards to use new index pattern [#8081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8081) [#8408](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8408)
-- Changed the Users form password validation to require a minimum of 12 characters, matching the manager RBAC policy [#8806](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8806)
 - Updated GitHub dashboards to use new index pattern [#8072](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8072) [#8354](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8354) [#8420](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8420)
 - Updated File Integrity Monitoring dashboards to use new index pattern [#8074](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8074) [#8247](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8247) [#8496](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8496)
 - Updated Google Cloud dashboard to use new index pattern [#8069](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8069)
@@ -104,6 +103,7 @@
 - Adapt management of daemons status to the new API response schema [#8706](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8706)
 - Enhanced description of `reports.csv.maxRows` setting [#1434](https://github.com/wazuh/wazuh-dashboard/issues/1434)
 - Rework the Home page overview with more platform metrics [#8760](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8760) [#8792](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8792)
+- Changed the Users form password validation to require a minimum of 12 characters, matching the manager RBAC policy [#8806](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8806)
 
 ### Fixed
 
