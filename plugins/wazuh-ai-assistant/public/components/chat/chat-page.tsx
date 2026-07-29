@@ -1575,7 +1575,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   hasBorder
                   hasShadow={false}
                   paddingSize='s'
-                  style={{ borderRadius: 12 }}
+                  style={{ borderRadius: 12, marginBottom: 12 }}
                 >
                   <ChatInput
                     ref={chatInputRef}
