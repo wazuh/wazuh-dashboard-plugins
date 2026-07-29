@@ -1362,7 +1362,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   <p>
                     {i18n.translate('wazuhAiAssistant.chat.noProvider.body', {
                       defaultMessage:
-                        'The AI Assistant needs at least one connected provider (OpenAI-compatible, Anthropic, or the Wazuh AI Assistant brain) before it can answer questions. Add one to get started.',
+                        'The AI Assistant needs at least one connected provider (OpenAI-compatible or Anthropic) before it can answer questions. Add one to get started.',
                     })}
                   </p>
                 }
@@ -1569,7 +1569,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
             {!showLoadingProvidersState && !showNoProviderState && (
               <div style={{ position: 'sticky', bottom: 0 }}>
-                <EuiSpacer size='s' />
+                <EuiSpacer size='l' />
                 <EuiPanel
                   color='plain'
                   hasBorder
