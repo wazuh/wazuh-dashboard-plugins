@@ -80,6 +80,11 @@ jobs:
               path: 'wazuh/plugins/wazuh-core',
               container_path: 'wazuh-core',
             },
+            {
+              name: 'Wazuh AI Assistant',
+              path: 'wazuh/plugins/wazuh-ai-assistant',
+              container_path: 'wazuh-ai-assistant',
+            },
           ]
 
     steps:

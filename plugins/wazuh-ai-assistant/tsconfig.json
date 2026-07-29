@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./target/types",
+    "rootDir": "..",
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "jsx": "react",
+    "skipLibCheck": true,
+    "strict": true
+  },
+  "include": [
+    "common/**/*.ts",
+    "public/**/*.ts",
+    "public/**/*.tsx",
+    "server/**/*.ts",
+    "translations/**/*.json"
+  ],
+  "exclude": ["target/**/*"]
+}
