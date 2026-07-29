@@ -33,7 +33,7 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   '@timestamp',
   'wazuh.rule.id',
   'wazuh.rule.level',
-  'wazuh.rule.description',
+  'wazuh.rule.title',
   'wazuh.rule.mitre.technique.id',
   'wazuh.rule.mitre.technique.name',
   // Aggregation-bucket shape (get_top_rules and the *_summary tools).
@@ -211,6 +211,9 @@ const FORBIDDEN_LEGACY_LITERALS = [
   'rule.level',
   'rule.id',
   'rule.description',
+  // Not a bare/retired name — a wazuh.* path that was tried and confirmed never populated in
+  // real findings-v5 data (0 of 9906 sampled docs); wazuh.rule.title is the real field.
+  'wazuh.rule.description',
   'rule.tags',
   'rule.category',
   'rule.mitre.technique.id',

@@ -15,7 +15,7 @@ import {
 const TABLE_COLUMNS = [
   { field: '@timestamp', label: 'Time' },
   { field: 'wazuh.agent.name', label: 'Agent' },
-  { field: 'wazuh.rule.description', label: 'Description' },
+  { field: 'wazuh.rule.title', label: 'Description' },
   { field: 'wazuh.rule.level', label: 'Level', severity: true },
   { field: 'wazuh.rule.compliance.pci_dss', label: 'PCI DSS' },
   { field: 'wazuh.rule.id', label: 'Rule ID' },
@@ -23,7 +23,7 @@ const TABLE_COLUMNS = [
 const SAMPLE_COLUMNS = [
   '@timestamp',
   'wazuh.agent.name',
-  'wazuh.rule.description',
+  'wazuh.rule.title',
   'wazuh.rule.level',
 ];
 

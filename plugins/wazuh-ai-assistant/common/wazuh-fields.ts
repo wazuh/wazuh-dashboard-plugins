@@ -15,7 +15,7 @@
 export const WAZUH_FIELD = Object.freeze({
   RULE_LEVEL: 'wazuh.rule.level',
   RULE_ID: 'wazuh.rule.id',
-  RULE_DESCRIPTION: 'wazuh.rule.description',
+  RULE_TITLE: 'wazuh.rule.title',
   RULE_TAGS: 'wazuh.rule.tags',
   RULE_CATEGORY: 'wazuh.rule.category',
   RULE_MITRE_TECHNIQUE_ID: 'wazuh.rule.mitre.technique.id',

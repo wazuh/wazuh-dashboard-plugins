@@ -43,10 +43,10 @@ export const getSuspiciousPowershellTool: ToolDefinition = {
       body: {
         query: {
           bool: {
-            // `wazuh.rule.description` is mapped `keyword`, so a single-token analyzed `match` on it
-            // would only hit a document whose description is EXACTLY "powershell" — effectively
+            // `wazuh.rule.title` is mapped `keyword`, so a single-token analyzed `match` on it
+            // would only hit a document whose title is EXACTLY "powershell" — effectively
             // never matching real data. This tool avoids that trap entirely by ORing several
-            // robust signals instead of trusting the description: the canonical ATT&CK technique id
+            // robust signals instead of trusting the title: the canonical ATT&CK technique id
             // for PowerShell, the `wazuh.rule.tags` vocabulary, and the Windows PowerShell process
             // names. The mandatory time range stays in `filter` so the guardrail's required-context
             // time check still counts it.

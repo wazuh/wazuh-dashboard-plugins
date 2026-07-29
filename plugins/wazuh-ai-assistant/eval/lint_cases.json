@@ -73,7 +73,7 @@
       "body": {
         "query": {
           "regexp": {
-            "wazuh.rule.description": {
+            "wazuh.rule.title": {
               "value": ".*brute.*"
             }
           }

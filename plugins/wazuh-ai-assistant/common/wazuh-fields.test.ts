@@ -4,7 +4,7 @@ import { WAZUH_FIELD, SEVERITY_LEVELS } from './wazuh-fields';
 test('WAZUH_FIELD exposes the live wazuh.* rule/agent/integration paths', () => {
   assert.equal(WAZUH_FIELD.RULE_LEVEL, 'wazuh.rule.level');
   assert.equal(WAZUH_FIELD.RULE_ID, 'wazuh.rule.id');
-  assert.equal(WAZUH_FIELD.RULE_DESCRIPTION, 'wazuh.rule.description');
+  assert.equal(WAZUH_FIELD.RULE_TITLE, 'wazuh.rule.title');
   assert.equal(WAZUH_FIELD.RULE_TAGS, 'wazuh.rule.tags');
   assert.equal(WAZUH_FIELD.RULE_CATEGORY, 'wazuh.rule.category');
   assert.equal(

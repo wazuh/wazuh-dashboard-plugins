@@ -17,7 +17,7 @@ const TABLE_COLUMNS = [
   { field: '@timestamp', label: 'Time' },
   { field: 'wazuh.agent.name', label: 'Agent' },
   { field: 'host.os.name', label: 'OS' },
-  { field: 'wazuh.rule.description', label: 'Description' },
+  { field: 'wazuh.rule.title', label: 'Description' },
   { field: 'wazuh.rule.level', label: 'Level', severity: true },
 ];
 const SAMPLE_COLUMNS = [

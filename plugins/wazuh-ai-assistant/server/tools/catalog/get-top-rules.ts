@@ -9,7 +9,7 @@ import {
 
 /**
  * A `terms` aggregation on `wazuh.rule.id` (on the guardrail low-cardinality allowlist) with a
- * `top_hits` sub-aggregation sampling one `wazuh.rule.description` per bucket, `size: 0`
+ * `top_hits` sub-aggregation sampling one `wazuh.rule.title` per bucket, `size: 0`
  * (aggregation-only, no hit documents fetched).
  */
 export const getTopRulesTool: ToolDefinition = {
@@ -42,7 +42,7 @@ export const getTopRulesTool: ToolDefinition = {
             terms: { field: 'wazuh.rule.id', size: limit },
             aggs: {
               sample_doc: {
-                top_hits: { size: 1, _source: ['wazuh.rule.description'] },
+                top_hits: { size: 1, _source: ['wazuh.rule.title'] },
               },
             },
           },
@@ -55,8 +55,8 @@ export const getTopRulesTool: ToolDefinition = {
     columns: [
       { field: 'key', label: 'Rule ID' },
       { field: 'doc_count', label: 'Count' },
-      { field: 'wazuh.rule.description', label: 'Description' },
+      { field: 'wazuh.rule.title', label: 'Description' },
     ],
   },
-  digest: { sampleColumns: ['key', 'doc_count', 'wazuh.rule.description'] },
+  digest: { sampleColumns: ['key', 'doc_count', 'wazuh.rule.title'] },
 };

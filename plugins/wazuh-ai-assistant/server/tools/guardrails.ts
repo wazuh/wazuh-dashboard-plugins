@@ -194,7 +194,7 @@ function normalizeMustToFilter(node: unknown): unknown {
 const AGG_FIELD_ALLOWLIST = new Set([
   WAZUH_FIELD.RULE_ID,
   WAZUH_FIELD.RULE_LEVEL,
-  WAZUH_FIELD.RULE_DESCRIPTION,
+  WAZUH_FIELD.RULE_TITLE,
   WAZUH_FIELD.AGENT_ID,
   WAZUH_FIELD.AGENT_NAME,
   'vulnerability.severity',

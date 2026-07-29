@@ -22,9 +22,9 @@ import {
  *
  * Two tempting fourth signals are deliberately absent. A `*brute*` wildcard is rejected by this
  * plugin's lint (guardrails.ts's leading-wildcard check covers `query_string` bodies) and is
- * expensive cluster-side. An analyzed `match` on `wazuh.rule.description` for "brute force" is worse
- * than useless: `wazuh.rule.description` is mapped `keyword`, so a multi-token match only hits a
- * description that is *exactly* "brute force" — measured at 0 hits against data where this tool
+ * expensive cluster-side. An analyzed `match` on `wazuh.rule.title` for "brute force" is worse
+ * than useless: `wazuh.rule.title` is mapped `keyword`, so a multi-token match only hits a
+ * title that is *exactly* "brute force" — measured at 0 hits against data where this tool
  * returns 44 — while reading like a third safety net.
  *
  * The `wazuh.rule.tags` vocabulary below has not been confirmed against a

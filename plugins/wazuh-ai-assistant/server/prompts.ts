@@ -56,9 +56,9 @@ export function buildSystemPrompt(nowIso: string): string {
       'get_critical_vulnerabilities, get_vulnerabilities_by_agent, get_vulnerability_by_cve); ' +
       'they read the vulnerability state index directly. Vulnerability data is current-state ' +
       'only: there is no "solved/resolved vulnerabilities" history available.',
-    'wazuh.rule.description is an EXACT keyword field: a match query with partial words silently ' +
+    'wazuh.rule.title is an EXACT keyword field: a match query with partial words silently ' +
       'returns 0 rows. To filter findings by kind, use wazuh.rule.tags terms or wazuh.rule.id - ' +
-      'only use wazuh.rule.description with the exact, complete description string.',
+      'only use wazuh.rule.title with the exact, complete title string.',
     'Severity (wazuh.rule.level) is a WORD, not a number: one of informational, low, medium, ' +
       'high, critical. Never filter it with a numeric range; the min_severity parameter takes ' +
       'one of those words.',
