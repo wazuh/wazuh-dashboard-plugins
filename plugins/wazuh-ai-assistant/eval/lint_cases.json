@@ -688,7 +688,7 @@
       },
       "expect": "reject",
       "reason_match": "Vulnerability data is not in the findings/events index",
-      "citation": "Observed against the 4.14 equivalent of this query: this is the shape of escape-hatch query the model hand-builds instead of calling a typed vulnerability tool. guardrails.ts's findVulnerabilityFieldOnAlertsIndex (called from lintDsl, before the mandatory-time-range check) rejects any match/match_phrase/term/terms/range/exists clause on a data.vulnerability.*/vulnerability.* field against a time-based (wazuh-events-v5-*/wazuh-findings-v5-*) index, naming the typed vulnerability tools so the model self-corrects in the same turn. The 5.0 port retired both get_solved_vulnerabilities and its per-tool exemption on this check (lintDsl no longer takes a toolName argument), so this rejection is now unconditional on a time-based index -- there is no legitimate caller of vulnerability fields on the findings/events timeline."
+      "citation": "This is the shape of escape-hatch query the model hand-builds instead of calling a typed vulnerability tool. guardrails.ts's findVulnerabilityFieldOnAlertsIndex (called from lintDsl, before the mandatory-time-range check) rejects any match/match_phrase/term/terms/range/exists clause on a data.vulnerability.*/vulnerability.* field against a time-based (wazuh-events-v5-*/wazuh-findings-v5-*) index, naming the typed vulnerability tools so the model self-corrects in the same turn. There is no legitimate caller of vulnerability fields on the findings/events timeline."
     },
     {
       "name": "vuln_field_match_on_states_index_still_passes",

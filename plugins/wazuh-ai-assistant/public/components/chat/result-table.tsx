@@ -30,9 +30,7 @@ const TABLE_SCROLL_MAX_HEIGHT = 400;
 const DEFAULT_PAGE_SIZE = 25;
 const PAGE_SIZE_OPTIONS = [25, 50, 100];
 
-/** Canonical 5-bucket severity classification table: badge color + localized label for each
- * `SeverityLevel` word. `informational` is its own distinct bucket (never folded into `low`) —
- * see `common/wazuh-fields.ts`'s `SEVERITY_LEVELS` doc comment for the locked decision. */
+/** Badge color + localized label for each `SeverityLevel` word. */
 const SEVERITY_BUCKETS: Record<
   SeverityLevel,
   { color: string; label: string }
@@ -73,11 +71,9 @@ const SEVERITY_BUCKETS: Record<
 };
 
 /**
- * LEGACY numeric rule.level -> severity-word classification (0-6 low, 7-11 medium, 12-14 high,
- * 15+ critical), the Wazuh 4.14 model. In Wazuh 5.0 (findings-v5) rule.level is ALREADY a
- * categorical word (informational/low/medium/high/critical) and never numeric, so this function is
- * only a defensive fallback reachable when a severity column's value still arrives numeric (e.g. a
- * mixed/older data source); the string path in `renderSeverityBadge` is the normal 5.0 route.
+ * Numeric-to-word severity classification. `wazuh.rule.level` is a categorical word, never
+ * numeric, so this is only a defensive fallback for a severity value that arrives numeric from
+ * some other source; the string path in `renderSeverityBadge` is the normal route.
  */
 function legacySeverityWordFromNumericLevel(level: number): SeverityLevel {
   if (level >= 15) {

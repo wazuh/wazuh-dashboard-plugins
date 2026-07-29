@@ -74,8 +74,6 @@ export const RETIRED_FIELD_MAP: Readonly<Record<string, string | null>> =
     'syscheck.event': null,
   });
 
-/** Canonical 5-value severity vocabulary. `informational` is its own distinct bucket, never
- * folded into `low`. */
 export const SEVERITY_LEVELS = [
   'informational',
   'low',
