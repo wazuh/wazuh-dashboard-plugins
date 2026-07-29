@@ -8,11 +8,9 @@ import {
 } from './common';
 
 /**
- * Ported from GET_TOP_RULES: a `terms` aggregation on `wazuh.rule.id` (on the guardrail low-cardinality
- * allowlist) with a `top_hits` sub-aggregation sampling one `wazuh.rule.description` per bucket,
- * `size: 0` (aggregation-only, no hit documents fetched).
- * 5.0: retargeted to wazuh-findings-v5*; time field @timestamp.
- * rule.id/rule.description survive unchanged in the findings schema.
+ * A `terms` aggregation on `wazuh.rule.id` (on the guardrail low-cardinality allowlist) with a
+ * `top_hits` sub-aggregation sampling one `wazuh.rule.description` per bucket, `size: 0`
+ * (aggregation-only, no hit documents fetched).
  */
 export const getTopRulesTool: ToolDefinition = {
   spec: {

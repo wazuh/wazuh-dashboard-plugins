@@ -9,13 +9,10 @@ import {
 } from './common';
 
 /**
- * Ported from GET_SECURITY_SUMMARY: medium-to-critical alerts within a time range, aggregated by
- * rule category. `size: 0` (aggregation-only, no hit documents fetched) — same shape as
- * `get_top_rules`.
- * 5.0: retargeted to wazuh-findings-v5*; the old `rule.level >= 7` numeric floor became a `terms`
- * filter over severity words at or above `medium` (see common.ts's severitiesAtOrAbove), and the
- * aggregation field moved from the retired rule.groups (no 5.0 equivalent) to
- * `wazuh.rule.category`.
+ * Medium-to-critical alerts within a time range, aggregated by rule category. `size: 0`
+ * (aggregation-only, no hit documents fetched) — same shape as `get_top_rules`. The severity
+ * floor is a `terms` filter over severity words at or above `medium` (see common.ts's
+ * severitiesAtOrAbove), and the aggregation field is `wazuh.rule.category`.
  */
 export const getSecuritySummaryTool: ToolDefinition = {
   spec: {

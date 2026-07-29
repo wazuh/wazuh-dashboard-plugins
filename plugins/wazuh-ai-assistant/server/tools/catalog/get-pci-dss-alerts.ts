@@ -28,12 +28,9 @@ const SAMPLE_COLUMNS = [
 ];
 
 /**
- * Ported from 4.14, which used a `prefix` query on the retired rule.groups field to approximate
- * a PCI DSS compliance tag without a wildcard (values were specific requirement tags like
- * "pci_dss_10.2.5", never a bare "pci_dss").
- * 5.0: retargeted to wazuh-findings-v5*; the retired rule.groups field has no 5.0 equivalent,
- * and PCI DSS requirement tags now live directly on `wazuh.rule.compliance.pci_dss`, so the
- * `prefix` workaround is replaced by a plain `exists` filter on that field.
+ * Findings tagged with a PCI DSS compliance requirement, matched with a plain `exists` filter on
+ * `wazuh.rule.compliance.pci_dss` (PCI DSS requirement tags such as "pci_dss_10.2.5" live directly
+ * on that field, so no wildcard or prefix workaround is needed).
  */
 export const getPciDssAlertsTool: ToolDefinition = {
   spec: {

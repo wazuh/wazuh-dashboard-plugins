@@ -34,13 +34,10 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'get_active_agents/ip', action: 'anonymize', kind: 'IP' },
   { field: 'get_disconnected_agents/name', action: 'anonymize', kind: 'HOST' },
   { field: 'get_disconnected_agents/ip', action: 'anonymize', kind: 'IP' },
-  // Wazuh 5.0 rewrites: the syscollector/SCA tools moved from bare
-  // Manager JSON names to ECS Indexer paths, so the old tool-scoped entries
-  // (get_agent_os/hostname, get_agent_ports/local.ip + remote.ip, get_agent_processes/euser +
-  // ruser, get_sca_checks/*) were replaced by the BARE entries below — the ECS paths are
-  // unambiguous across tools (host.hostname is always a hostname, source.ip always an IP), so
-  // tool scoping is no longer needed. euser/ruser died with 4.14 (no owner field in 5.0 process
-  // inventory — see get-agent-processes.ts).
+  // The syscollector/SCA tools use ECS Indexer paths rather than bare tool-scoped names, so the
+  // BARE entries below apply — the ECS paths are unambiguous across tools (host.hostname is
+  // always a hostname, source.ip always an IP), so tool scoping is not needed. There is no owner
+  // field in the process inventory (see get-agent-processes.ts).
   { field: 'host.hostname', action: 'anonymize', kind: 'HOST' },
   { field: 'source.ip', action: 'anonymize', kind: 'IP' },
   { field: 'destination.ip', action: 'anonymize', kind: 'IP' },
@@ -57,8 +54,7 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: WAZUH_FIELD.RULE_MITRE_TECHNIQUE_NAME, action: 'allow' },
   { field: WAZUH_FIELD.RULE_MITRE_TACTIC, action: 'allow' },
   { field: WAZUH_FIELD.RULE_MITRE_TACTIC_NAME, action: 'allow' },
-  // Curated benchmark/policy content (CIS etc.), not analyst/attacker-supplied — reviewed 'allow'
-  // (same rationale as the 4.14 get_sca_checks/* entries these replace).
+  // Curated benchmark/policy content (CIS etc.), not analyst/attacker-supplied — reviewed 'allow'.
   { field: 'check.id', action: 'allow' },
   { field: 'check.name', action: 'allow' },
   { field: 'check.result', action: 'allow' },

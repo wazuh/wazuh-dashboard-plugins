@@ -17,12 +17,9 @@ import {
 } from './common';
 
 /**
- * Ported from 4.14, which matched agent name via `query_string`
- * (`agent.name:"X" AND rule.level:>=N`); rebuilt as `bool.filter` with a `match` clause on
- * `wazuh.agent.name` (exact free-text match, no wildcard) plus `range` clauses.
- * 5.0: retargeted to wazuh-findings-v5*; agent name field moved to `wazuh.agent.name`, and
- * min_severity is now a categorical severity word (see common.ts's severitiesAtOrAbove) applied
- * only when supplied, rather than a numeric rule.level floor defaulting to 0.
+ * Matches findings by agent name via `bool.filter` with a `match` clause on `wazuh.agent.name`
+ * (exact free-text match, no wildcard) plus a time-range clause. `min_severity` is a categorical
+ * severity word (see common.ts's severitiesAtOrAbove) applied only when supplied.
  */
 export const searchAlertsByAgentTool: ToolDefinition = {
   spec: {

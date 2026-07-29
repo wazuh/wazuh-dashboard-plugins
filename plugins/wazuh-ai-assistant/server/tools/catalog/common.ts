@@ -62,8 +62,8 @@ export function optionalStringParam(value: unknown): string | undefined {
 }
 
 /**
- * Wazuh 5.0 severity model: `wazuh.rule.level` on wazuh-findings-v5* is a
- * KEYWORD with these five ordered values — NOT the 4.14 integer 0-15 scale. A numeric range query
+ * Severity model: `wazuh.rule.level` on wazuh-findings-v5* is a
+ * KEYWORD with these five ordered values. A numeric range query
  * on it would do lexicographic string comparison (silently wrong), so severity floors are
  * expressed as a `terms` filter over the tail of this ordered list instead (`severitiesAtOrAbove`).
  */
@@ -166,8 +166,9 @@ export const STANDARD_ALERT_SAMPLE_COLUMNS = [
 /**
  * Investigation field set added to every alert-hits tool's table ROWS: revealed by the row
  * expander (and available to `digest.sampleColumns`, see `alertDigestColumns` below), never as
- * a visible `tableSpec.columns` entry (visible columns stay exactly as they are). The retired
- * 4.x full_log field (heavy, PII-rich, and with no 5.0 equivalent) is deliberately excluded.
+ * a visible `tableSpec.columns` entry (visible columns stay exactly as they are). The heavy,
+ * PII-rich raw full-log field is deliberately excluded — there is no equivalent field to
+ * include here.
  */
 export const ALERT_INVESTIGATION_ROW_FIELDS = [
   'wazuh.rule.tags',
@@ -183,8 +184,8 @@ export const ALERT_INVESTIGATION_ROW_FIELDS = [
  * Fields added to every alert-hits tool's digest `sampleColumns` — the model-facing subset of
  * the investigation row set (deliberately narrower: `source.port`/`process.command_line` stay
  * row-only, not sent to the model). Every one of these has a `server/tools/privacy.ts`
- * `FIELD_POLICY_DEFAULTS` entry before it reaches a digest. (Wazuh 5.0: these are the ECS
- * findings-v5 field names — replacing 4.14's data.* and the retired rule.groups.)
+ * `FIELD_POLICY_DEFAULTS` entry before it reaches a digest. These are the ECS
+ * findings-v5 field names.
  */
 export const ALERT_DIGEST_EXTRA_COLUMNS = [
   'wazuh.rule.tags',

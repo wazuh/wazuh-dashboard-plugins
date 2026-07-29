@@ -13,11 +13,9 @@ import {
 } from './common';
 
 /**
- * Ported from 4.14 (rule.level >= 15), which used a `query_string`
- * range-syntax template (`rule.level:>=15 AND timestamp:[...]`); rebuilt here as `bool.filter` of
- * two `range` clauses — same semantics, no free-text query parsing.
- * 5.0: retargeted to wazuh-findings-v5*; rule.level is now a categorical keyword, so the old
- * `rule.level >= 15` range became a `terms` filter on the literal `critical` severity word.
+ * Findings at the critical severity level within a time range, built as `bool.filter` of a
+ * `terms` filter on the literal `critical` severity word plus a time-range clause — no free-text
+ * query parsing.
  */
 export const getCriticalAlertsTool: ToolDefinition = {
   spec: {

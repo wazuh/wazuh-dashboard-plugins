@@ -8,13 +8,11 @@ import {
 } from './common';
 
 /**
- * Ported from GET_PCI_DSS_SUMMARY: same filter as `get_pci_dss_alerts.ts` (see that file for why
- * an `exists` filter on `wazuh.rule.compliance.pci_dss` replaces the 4.14 `prefix` workaround),
+ * Same filter as `get_pci_dss_alerts.ts` (an `exists` filter on `wazuh.rule.compliance.pci_dss`),
  * aggregated by the specific requirement tag via a `terms` agg directly on
- * `wazuh.rule.compliance.pci_dss` — its values ARE the requirement ids in 5.0, so the 4.14 `include`
- * regex narrowing the retired rule.groups buckets to `pci_dss_*` is no longer needed.
- * `wazuh.rule.compliance.pci_dss` is already on the guardrail agg allowlist (`guardrails.ts`).
- * 5.0: retargeted to wazuh-findings-v5*; the retired rule.groups field has no 5.0 equivalent.
+ * `wazuh.rule.compliance.pci_dss` — its values ARE the requirement ids, so no `include` regex is
+ * needed to narrow the buckets. `wazuh.rule.compliance.pci_dss` is already on the guardrail agg
+ * allowlist (`guardrails.ts`).
  */
 export const getPciDssSummaryTool: ToolDefinition = {
   spec: {

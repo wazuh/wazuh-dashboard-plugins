@@ -19,12 +19,10 @@ import {
  * closed. Models cannot be trusted to know exact Wazuh rule IDs, so this tool searches by a rule
  * CLASSIFICATION TAG instead of guessing an ID -- the thing to reach for whenever a question names
  * a category of activity rather than a specific rule number.
- * 5.0: retargeted to wazuh-findings-v5*; the 4.14 rule.groups array has no 5.0 equivalent (retired
- * outright, not renamed) and is replaced by `wazuh.rule.tags` (keyword array), matched with a
- * plain `term` (same pattern as search_alerts_by_rule_id.ts). IMPORTANT: the exact `wazuh.rule.tags` VOCABULARY on findings-v5 is
- * NOT yet confirmed against live data (the 4.14 group names like "pam"/"sshd" may or may not carry
- * over). The description below therefore does NOT assert specific tag values as ground truth --
- * unlike the frozen 4.14 tool, it tells the model to discover tags via get_top_rules rather than
+ * Searches `wazuh.rule.tags` (a keyword array) with a plain `term` match (same pattern as
+ * search_alerts_by_rule_id.ts). IMPORTANT: the exact `wazuh.rule.tags` vocabulary has not yet been
+ * confirmed against live data. The description below therefore does NOT assert specific tag
+ * values as ground truth -- it tells the model to discover tags via get_top_rules rather than
  * invent them, so a hallucinated tag can't masquerade as a verified one.
  */
 export const searchAlertsByRuleGroupTool: ToolDefinition = {

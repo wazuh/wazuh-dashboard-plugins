@@ -246,9 +246,8 @@ const TIME_BASED_INDEX_RE = /^wazuh-(events|findings)-v5/;
  * Vulnerability STATE lives in wazuh-states-vulnerabilities, not the findings/events timeline — so
  * a bare "data.vulnerability." / "vulnerability." filter on a time-based (findings-v5/events-v5)
  * index is structurally wrong: it steers the model back to the typed vulnerability tools instead
- * of letting the escape hatch hand-build a vulnerability query against the wrong index. (The 4.14
- * get_solved_vulnerabilities exemption is gone — that tool was retired in the 5.0 port, so there is
- * no longer any legitimate caller of vulnerability fields on a timeline index.)
+ * of letting the escape hatch hand-build a vulnerability query against the wrong index. There is
+ * no legitimate caller of vulnerability fields on a timeline index.
  */
 const VULN_FIELD_RE = /^(data\.)?vulnerability\./;
 

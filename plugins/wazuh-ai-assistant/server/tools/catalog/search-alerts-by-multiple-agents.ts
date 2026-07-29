@@ -16,12 +16,10 @@ import {
 } from './common';
 
 /**
- * Ported from SEARCH_ALERTS_BY_MULTIPLE_AGENTS. `wazuh.agent.name` is mapped `keyword` at the top level
- * with no `.keyword` subfield needed, so this filters with a single `terms` clause on the exact
- * agent names rather than one `match` clause per name.
- * 5.0: retargeted to wazuh-findings-v5*; agent name field moved to `wazuh.agent.name`, and
- * min_severity is now a categorical severity word (see common.ts's severitiesAtOrAbove) applied
- * only when supplied, rather than a numeric rule.level floor defaulting to 0.
+ * `wazuh.agent.name` is mapped `keyword` at the top level with no `.keyword` subfield needed, so
+ * this filters with a single `terms` clause on the exact agent names rather than one `match`
+ * clause per name. `min_severity` is a categorical severity word (see common.ts's
+ * severitiesAtOrAbove) applied only when supplied.
  */
 export const searchAlertsByMultipleAgentsTool: ToolDefinition = {
   spec: {

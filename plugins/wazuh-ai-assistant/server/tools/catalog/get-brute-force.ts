@@ -27,7 +27,7 @@ import {
  * description that is *exactly* "brute force" — measured at 0 hits against data where this tool
  * returns 44 — while reading like a third safety net.
  *
- * The `wazuh.rule.tags` vocabulary below is the 4.x spelling and has not been confirmed against a
+ * The `wazuh.rule.tags` vocabulary below has not been confirmed against a
  * populated findings-v5 index. If it turns out to be wrong the tool still works: the T1110 and
  * rule-id clauses carry it, and a wrong tag name matches nothing rather than over-matching.
  */

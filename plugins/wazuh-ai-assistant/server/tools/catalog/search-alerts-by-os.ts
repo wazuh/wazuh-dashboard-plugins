@@ -28,14 +28,9 @@ const SAMPLE_COLUMNS = [
 ];
 
 /**
- * Ported from 4.14, which used the retired agent.os.name field with a wildcard match
- * (agent.os.name:*{{os_name}}*); a plain analyzed match on that same retired field reproduced this
- * for the common cases ("Windows", "Ubuntu", "CentOS", ...) without a wildcard.
- * 5.0: retargeted to wazuh-findings-v5*; the OS field moved from that retired 4.x field to
- * `host.os.name` (ECS) — unchanged by this rename, since `host.os.name` was always an ECS field,
- * never a `wazuh.*`-prefixed one — and min_severity is now a categorical severity word (see
- * common.ts's severitiesAtOrAbove) applied only when supplied, rather than a numeric rule.level
- * floor defaulting to 0.
+ * Matches findings from agents running a given OS via the ECS `host.os.name`/`host.os.platform`
+ * fields, without a wildcard match. `min_severity` is a categorical severity word (see
+ * common.ts's severitiesAtOrAbove) applied only when supplied.
  */
 export const searchAlertsByOsTool: ToolDefinition = {
   spec: {
@@ -68,13 +63,9 @@ export const searchAlertsByOsTool: ToolDefinition = {
     const minSeverity = optionalStringParam(params.min_severity);
     const limit = clampLimit(params.limit, 20, 500);
     const { gte, lte } = resolveTimeRange(params);
-    // 5.0 CORRECTNESS FIX: `match` on `host.os.name` ALONE silently returned nothing for the most
-    // natural phrasing of this question. `host.os.name` is `keyword` in 5.0 and stores the full
-    // display string, so a single-token analyzed `match` only hits when that token IS the entire
-    // value. Proven live on identical data: `match "Windows"` -> 0, `match "Microsoft Windows Server
-    // 2019"` -> 41, `match "Ubuntu"` -> 188. "Ubuntu" worked only BY ACCIDENT (it happens to be the
-    // whole stored value) — which is exactly why this was easy to miss: the tool looked correct on
-    // Linux data and was dead on Windows data.
+    // `host.os.name` is `keyword` and stores the full display string, so a single-token analyzed
+    // `match` on it alone only hits when that token IS the entire value (e.g. it would match
+    // "Ubuntu" but not "Windows" when the stored value is "Microsoft Windows Server 2019").
     //
     // Matches the ECS-normalised `host.os.platform` (a low-cardinality keyword holding values like
     // `ubuntu`/`windows`) while KEEPING the `host.os.name` match so an exact full display name

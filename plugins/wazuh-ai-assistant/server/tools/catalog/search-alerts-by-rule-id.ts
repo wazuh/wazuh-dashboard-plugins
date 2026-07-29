@@ -13,14 +13,13 @@ import {
 } from './common';
 
 /**
- * Ported from SEARCH_ALERTS_BY_RULE_ID: exact match on `wazuh.rule.id` plus a time range. `wazuh.rule.id` is
+ * Exact match on `wazuh.rule.id` plus a time range. `wazuh.rule.id` is
  * mapped `keyword`, so a `term` query with
  * the value converted to a string is the correct exact-match form; kept string-form deliberately
  * (rather than a bare numeric term) as defense-in-depth, since OpenSearch would also coerce a
  * numeric-string term correctly if the mapping ever changed. The `rule_id` param is typed `number`
  * for a natural model-facing UX (rule IDs are numeric); `schema-validator.ts`'s coercion already
  * accepts a numeric-looking string too.
- * 5.0: retargeted to wazuh-findings-v5*.
  */
 export const searchAlertsByRuleIdTool: ToolDefinition = {
   spec: {

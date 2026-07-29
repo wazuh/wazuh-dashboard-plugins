@@ -8,17 +8,11 @@ import {
 } from './common';
 
 /**
- * NEW module (MITRE ATT&CK), same aggregation shape as `get_top_rules.ts`: a `terms` agg on the
- * technique-id field with a `top_hits` sub-aggregation sampling one technique-name/tactic-name
- * pair per bucket, `size: 0`. In 4.14 this was a `terms` agg on the retired rule.mitre.id sampling
- * the retired rule.mitre.technique/rule.mitre.tactic; those fields were added to `guardrails.ts`'s
- * `AGG_FIELD_ALLOWLIST` for this tool (both confirmed `keyword`-mapped and low-cardinality — a
- * finite technique catalog — in the wazuh-dashboard-plugins clone; see that file's comment for the
- * exact citation).
- * 5.0: retargeted to wazuh-findings-v5*; the retired 4.14 rule.mitre.id field has no 5.0
- * equivalent and is replaced by `wazuh.rule.mitre.technique.id`, the retired 4.14
- * `rule.mitre.technique` field is replaced by `wazuh.rule.mitre.technique.name`, and the retired
- * 4.14 rule.mitre.tactic field is replaced by `wazuh.rule.mitre.tactic.name`.
+ * MITRE ATT&CK summary, same aggregation shape as `get_top_rules.ts`: a `terms` agg on
+ * `wazuh.rule.mitre.technique.id` with a `top_hits` sub-aggregation sampling one
+ * technique-name/tactic-name pair per bucket, `size: 0`. `wazuh.rule.mitre.technique.id` is added
+ * to `guardrails.ts`'s `AGG_FIELD_ALLOWLIST` for this tool (`keyword`-mapped and low-cardinality —
+ * a finite technique catalog).
  */
 export const getMitreSummaryTool: ToolDefinition = {
   spec: {

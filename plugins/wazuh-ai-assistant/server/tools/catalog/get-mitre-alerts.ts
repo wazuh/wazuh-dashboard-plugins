@@ -11,20 +11,11 @@ import {
 } from './common';
 
 /**
- * NEW module (MITRE ATT&CK). Verified against the wazuh-dashboard-plugins clone (v4.14.6):
- * MITRE-tagged alerts were detected via an `exists` filter on the retired 4.14 rule.mitre.id field
- * (`plugins/main/public/components/common/data-source/pattern/alerts/mitre-attack/
- * mitre-attack-data-source.ts:8,23-34`), with the retired 4.14 rule.mitre.technique/rule.mitre.tactic
- * fields as sibling display columns (`plugins/main/public/components/overview/mitre/events/
- * mitre-attack-columns.tsx:8,12`). All three confirmed `keyword`-mapped arrays in
- * `plugins/main/public/utils/known-fields/alerts.json:730-752`. `technique_id` narrows to one
- * exact technique; omitted, the tool falls back to the `exists` filter for "any MITRE-tagged
- * alert".
- * 5.0: retargeted to wazuh-findings-v5*; the retired 4.14 rule.mitre.id field has no 5.0
- * equivalent and is replaced by `wazuh.rule.mitre.technique.id` (used for both the `exists`
- * filter and the exact-technique `term` match), the retired 4.14 `rule.mitre.technique` field is
- * replaced by `wazuh.rule.mitre.technique.name`, and the retired 4.14 rule.mitre.tactic field is
- * replaced by `wazuh.rule.mitre.tactic.name`.
+ * MITRE ATT&CK-tagged alerts. MITRE-tagged alerts are detected via an `exists` filter on
+ * `wazuh.rule.mitre.technique.id` (a `keyword`-mapped array), with `wazuh.rule.mitre.technique.name`
+ * and `wazuh.rule.mitre.tactic.name` as sibling display columns. `technique_id` narrows to one
+ * exact technique via a `term` match on `wazuh.rule.mitre.technique.id`; omitted, the tool falls
+ * back to the `exists` filter for "any MITRE-tagged alert".
  */
 export const getMitreAlertsTool: ToolDefinition = {
   spec: {

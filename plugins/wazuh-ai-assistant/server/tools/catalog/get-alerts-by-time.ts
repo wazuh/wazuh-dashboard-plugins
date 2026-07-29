@@ -16,12 +16,11 @@ import {
 } from './common';
 
 /**
- * Generalized port of the 4.14 last-24h alerts tool, which hard-coded `now-24h` with no severity
- * floor; this tool exposes the time range as params (defaulting via `resolveTimeRange`) plus an
- * optional `min_severity`, so "show me the alerts in the last 24 hours" routes here instead of to
- * `get_critical_alerts` (rule.level >= 15 only) — the reported gap this tool exists to fix.
- * 5.0: retargeted to wazuh-findings-v5*; min_severity is now one of the categorical severity
- * words (see common.ts's severitiesAtOrAbove) instead of a numeric rule.level floor.
+ * Searches findings across an arbitrary time range with no forced severity floor. The time range
+ * is exposed as params (defaulting via `resolveTimeRange`) plus an optional `min_severity`, so
+ * "show me the alerts in the last 24 hours" routes here instead of to `get_critical_alerts` (which
+ * is scoped to the critical severity word only). `min_severity` is one of the categorical severity
+ * words (see common.ts's severitiesAtOrAbove).
  */
 export const getAlertsByTimeTool: ToolDefinition = {
   spec: {
