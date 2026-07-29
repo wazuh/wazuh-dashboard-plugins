@@ -1,0 +1,27 @@
+{
+  // Eval-harness build config (`yarn test:eval:build`): emits plain CommonJS JS of common/ and
+  // server/ so the zero-dependency eval scripts can load compiled modules directly — e.g.
+  // eval/run_lint.js points EVAL_GUARDRAILS_JS at the compiled server/tools/guardrails.js.
+  // Unit tests themselves run under Jest (`yarn test:jest`, test/jest/config.js) and are NOT
+  // compiled here. Must be run from inside the wazuh-dashboard build tree because the plugin's
+  // type-only imports of ../../src/core resolve there (they erase from the emitted JS, so the
+  // output requires nothing from src/core at runtime).
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "emitDeclarationOnly": false,
+    "noEmit": false,
+    "module": "commonjs",
+    "target": "es2019",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "./target/test",
+    "rootDir": ".",
+    "noEmitOnError": false,
+    "types": ["node"]
+  },
+  "include": ["common/**/*.ts", "server/**/*.ts"],
+  "exclude": ["target/**/*", "public/**/*"]
+}

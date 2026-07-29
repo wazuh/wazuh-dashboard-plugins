@@ -7,6 +7,7 @@ export const REQUIRED_REPOSITORIES = [
   'main',
   'wazuh-core',
   'wazuh-check-updates',
+  'wazuh-ai-assistant',
 ] as const;
 
 /** Canonical repository name for the security plugin sources. */
