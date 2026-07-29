@@ -182,6 +182,22 @@ function lastSavedRoleContent(mock: jest.Mock): Array<[string, string]> {
   ]);
 }
 
+/**
+ * Opens another conversation from the sidebar, confirming the "a response is still generating"
+ * modal when it appears. Clicking a row while a turn runs now asks first, so every mid-stream switch
+ * in these tests goes through here.
+ */
+async function leaveForConversation(title: string) {
+  fireEvent.click(screen.getByText(title));
+  const confirm = screen.queryByText('Leave and stop it');
+  if (confirm) {
+    fireEvent.click(confirm);
+  }
+  await waitFor(() =>
+    expect(screen.queryByText('Leave and stop it')).not.toBeInTheDocument(),
+  );
+}
+
 /** An http error shaped the way `common/http-status.ts` reads a status off an OSD http failure. */
 function httpError(status: number): Error & { response: { status: number } } {
   return Object.assign(new Error(`HTTP ${status}`), {
@@ -234,7 +250,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
     const signal = lastStreamSignal();
     expect(signal.aborted).toBe(false);
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    await leaveForConversation('Older conversation');
 
     await waitFor(() => expect(signal.aborted).toBe(true));
   });
@@ -258,7 +274,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
       expect(screen.getByText('partial answer')).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    await leaveForConversation('Older conversation');
 
     // The question was already saved (POST) before the stream started, creating conv-new; the
     // abandoned turn UPDATES that same row with the answer it managed to produce. Exactly one row
@@ -316,7 +332,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
       expect(screen.getByText('partial answer')).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    await leaveForConversation('Older conversation');
     await waitFor(() =>
       expect(screen.getByText('earlier question')).toBeInTheDocument(),
     );
@@ -349,7 +365,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
     await sendMessage('first question');
     expect(screen.getByLabelText('Chat message')).toBeDisabled();
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    await leaveForConversation('Older conversation');
 
     await waitFor(() =>
       expect(screen.getByLabelText('Chat message')).toBeEnabled(),
@@ -399,6 +415,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     const signal = lastStreamSignal();
     fireEvent.click(screen.getByText('New conversation'));
+    fireEvent.click(screen.getByText('Leave and stop it'));
 
     await waitFor(() => expect(signal.aborted).toBe(true));
     await waitFor(() =>
@@ -458,7 +475,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
       expect(screen.getByText('partial answer')).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    await leaveForConversation('Older conversation');
     await waitFor(() =>
       expect(screen.getByLabelText('Chat message')).toBeEnabled(),
     );
@@ -1033,5 +1050,131 @@ describe('ChatPage — feedback while a turn runs', () => {
     );
     expect(screen.getByText('1 query executed')).toBeInTheDocument();
     expect(screen.getByText('search_wazuh_data')).toBeInTheDocument();
+  });
+});
+
+describe('ChatPage — confirming before interrupting a running answer', () => {
+  function startGeneratingWithSidebar() {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    mockConversationsService.list.mockResolvedValue([
+      { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+    ]);
+    return stream;
+  }
+
+  it('asks before opening another conversation while a turn is generating', async () => {
+    const stream = startGeneratingWithSidebar();
+
+    renderChatPage();
+    await waitFor(() =>
+      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+    );
+    await sendMessage('first question');
+    stream.push({ type: 'delta', content: 'half an ans' });
+    await waitFor(() =>
+      expect(screen.getByText('half an ans')).toBeInTheDocument(),
+    );
+    const signal = lastStreamSignal();
+
+    fireEvent.click(screen.getByText('Older conversation'));
+
+    expect(screen.getByText('A response is still generating')).toBeVisible();
+    // Nothing has happened yet — the question is asked BEFORE anything is cancelled.
+    expect(signal.aborted).toBe(false);
+    expect(mockConversationsService.get).not.toHaveBeenCalled();
+  });
+
+  it('cancelling keeps the answer generating in the same conversation', async () => {
+    const stream = startGeneratingWithSidebar();
+
+    renderChatPage();
+    await waitFor(() =>
+      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+    );
+    await sendMessage('first question');
+    stream.push({ type: 'delta', content: 'half an ans' });
+    await waitFor(() =>
+      expect(screen.getByText('half an ans')).toBeInTheDocument(),
+    );
+    const signal = lastStreamSignal();
+
+    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(screen.getByText('Stay in this conversation'));
+
+    await waitFor(() =>
+      expect(
+        screen.queryByText('A response is still generating'),
+      ).not.toBeInTheDocument(),
+    );
+    expect(signal.aborted).toBe(false);
+    expect(mockConversationsService.get).not.toHaveBeenCalled();
+
+    // And it really is still live: a later delta still lands in this conversation.
+    stream.push({ type: 'delta', content: 'wer, completed' });
+    await waitFor(() =>
+      expect(screen.getByText('half an answer, completed')).toBeInTheDocument(),
+    );
+  });
+
+  it('confirming interrupts the turn and opens the other conversation', async () => {
+    const stream = startGeneratingWithSidebar();
+
+    renderChatPage();
+    await waitFor(() =>
+      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+    );
+    await sendMessage('first question');
+    stream.push({ type: 'delta', content: 'half an ans' });
+    await waitFor(() =>
+      expect(screen.getByText('half an ans')).toBeInTheDocument(),
+    );
+    const signal = lastStreamSignal();
+
+    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(screen.getByText('Leave and stop it'));
+
+    await waitFor(() => expect(signal.aborted).toBe(true));
+    await waitFor(() =>
+      expect(screen.getByText('earlier question')).toBeInTheDocument(),
+    );
+  });
+
+  it('asks before starting a new conversation while a turn is generating', async () => {
+    const stream = startGeneratingWithSidebar();
+
+    renderChatPage();
+    await sendMessage('first question');
+    stream.push({ type: 'delta', content: 'half an ans' });
+    await waitFor(() =>
+      expect(screen.getByText('half an ans')).toBeInTheDocument(),
+    );
+
+    fireEvent.click(screen.getByText('New conversation'));
+
+    expect(screen.getByText('A response is still generating')).toBeVisible();
+    expect(screen.getByText('half an ans')).toBeInTheDocument();
+  });
+
+  it('does not ask when nothing is generating', async () => {
+    mockConversationsService.list.mockResolvedValue([
+      { id: 'conv-b', title: 'Older conversation', updatedAt: '2024-01-01' },
+    ]);
+
+    renderChatPage();
+    await waitFor(() =>
+      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+    );
+
+    fireEvent.click(screen.getByText('Older conversation'));
+
+    await waitFor(() =>
+      expect(screen.getByText('earlier question')).toBeInTheDocument(),
+    );
+    expect(
+      screen.queryByText('A response is still generating'),
+    ).not.toBeInTheDocument();
   });
 });

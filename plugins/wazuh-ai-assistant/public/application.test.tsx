@@ -1,7 +1,11 @@
 import React from 'react';
 import { act, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { AppMountParameters, CoreStart } from '../../../src/core/public';
+import {
+  AppLeaveHandler,
+  AppMountParameters,
+  CoreStart,
+} from '../../../src/core/public';
 import { renderApp } from './application';
 
 /**
@@ -19,14 +23,26 @@ const mockMountCounts = { chat: 0, settings: 0 };
 const mockReact = React;
 
 function mockMountCountingStub(page: 'chat' | 'settings') {
-  return () => {
+  return (props: { onGeneratingChange?: (generating: boolean) => void }) => {
     mockReact.useEffect(() => {
       mockMountCounts[page] += 1;
     }, []);
+    // The Chat stub exposes a button that flips the shell's "a turn is generating" flag, which is
+    // what the leave handler reads.
     return mockReact.createElement(
       'div',
       { 'data-test-subj': `${page}-marker` },
       `${page} page`,
+      props.onGeneratingChange
+        ? mockReact.createElement(
+            'button',
+            {
+              type: 'button',
+              onClick: () => props.onGeneratingChange?.(true),
+            },
+            'start generating',
+          )
+        : null,
     );
   };
 }
@@ -55,16 +71,31 @@ function coreMock(): CoreStart {
   } as unknown as CoreStart;
 }
 
+/** The leave handler the shell registered through `onAppLeave`, or undefined if it registered none. */
+let registeredLeaveHandler: AppLeaveHandler | undefined;
+
 /** Mounts the app the way core does, and returns core's unmount callback. */
 function mountApp(): () => void {
   const element = document.createElement('div');
   document.body.append(element);
+  registeredLeaveHandler = undefined;
   let unmount: () => void = () => undefined;
   act(() => {
-    unmount = renderApp(coreMock(), { element } as AppMountParameters);
+    unmount = renderApp(coreMock(), {
+      element,
+      onAppLeave: (handler: AppLeaveHandler) => {
+        registeredLeaveHandler = handler;
+      },
+    } as AppMountParameters);
   });
   return unmount;
 }
+
+/** Stand-in for the platform's action factory, so a test can see which action the handler picked. */
+const leaveActions = {
+  default: () => ({ type: 'default' }),
+  confirm: (text: string, title?: string) => ({ type: 'confirm', text, title }),
+};
 
 /** The rendered stub element for a page, or null when that page is not mounted at all. */
 function marker(page: 'chat' | 'settings'): HTMLElement | null {
@@ -132,6 +163,32 @@ describe('AI Assistant app shell', () => {
 
     expect(mockMountCounts.chat).toBe(1);
     expect(mockMountCounts.settings).toBe(1);
+  });
+
+  it('leaves without asking when no turn is generating', async () => {
+    mountApp();
+    await waitFor(() => expect(marker('chat')).not.toBeNull());
+
+    expect(registeredLeaveHandler).toBeDefined();
+    expect(registeredLeaveHandler?.(leaveActions as never)).toEqual({
+      type: 'default',
+    });
+  });
+
+  it('asks for confirmation before leaving while a turn is generating', async () => {
+    mountApp();
+    await waitFor(() => expect(marker('chat')).not.toBeNull());
+
+    fireEvent.click(screen.getByText('start generating'));
+
+    // Same handler instance, registered once — it must read the CURRENT state, not the state at
+    // registration time.
+    const action = registeredLeaveHandler?.(leaveActions as never) as {
+      type: string;
+      title?: string;
+    };
+    expect(action.type).toBe('confirm');
+    expect(action.title).toBe('A response is still generating');
   });
 
   it('unmounts everything when core unmounts the app', async () => {

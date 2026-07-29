@@ -67,6 +67,12 @@ link or a trip through another dashboard app returns to it. A turn is saved twic
 question is sent, so an interrupted answer never loses the question, and once when the answer ends.
 A turn that ends without completing is stored as interrupted and can be retried.
 
+Anything that would interrupt a running answer asks first: opening another conversation or starting a
+new one prompts in-app, while leaving the app entirely (another dashboard app, a reload, closing the
+tab) goes through the platform's `onAppLeave` hook, registered once in `public/application.tsx`.
+Switching to the Settings tab deliberately prompts nothing — the Chat tab stays mounted and the
+answer keeps streaming into it.
+
 ## Integration with wazuh-core
 
 The plugin declares `wazuhCore` in `requiredPlugins` and uses the two sanctioned mechanisms the

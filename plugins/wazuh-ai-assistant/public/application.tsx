@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { AppMountParameters, CoreStart } from '../../../src/core/public';
 import { I18nProvider } from '@osd/i18n/react';
@@ -24,7 +24,17 @@ const PROVIDERS_LOAD_TIMEOUT_MS = 20_000;
  * reads as part of the chat surface instead of a separate floating control — see
  * `onProviderChange` passed to ChatPage below.
  */
-const App: React.FC<{ core: CoreStart }> = ({ core }) => {
+/**
+ * `onAppLeave` is the platform's one hook for "the user is leaving this app": OSD calls it both for
+ * a navigation to another dashboard app (where it renders a confirm modal) and for a browser
+ * reload/tab close (where it arms the native `beforeunload` prompt) — see
+ * src/core/public/application/application_service.tsx. Registering it here, once, is what keeps a
+ * running answer from being thrown away without the user being asked.
+ */
+const App: React.FC<{
+  core: CoreStart;
+  onAppLeave: AppMountParameters['onAppLeave'];
+}> = ({ core, onAppLeave }) => {
   const [route, setRoute] = useState<Route>('chat');
   // Settings is mounted lazily (nothing should issue its requests for a user who never opens the
   // tab) but, once opened, stays mounted for the same reason ChatPage does — see the render below.
@@ -34,6 +44,29 @@ const App: React.FC<{ core: CoreStart }> = ({ core }) => {
   const [selectedProviderId, setSelectedProviderId] = useState('');
   const [providersError, setProvidersError] = useState<string | null>(null);
   const [settingsService] = useState(() => new SettingsService(core.http));
+  // Read by the leave handler below, which is registered ONCE and must always see the current value
+  // — hence a ref rather than state (a stale closure here would silently stop warning anyone).
+  const isGeneratingRef = useRef(false);
+  const handleGeneratingChange = useCallback((generating: boolean) => {
+    isGeneratingRef.current = generating;
+  }, []);
+
+  useEffect(() => {
+    onAppLeave(actions => {
+      if (!isGeneratingRef.current) {
+        return actions.default();
+      }
+      return actions.confirm(
+        i18n.translate('wazuhAiAssistant.app.leaveWhileGenerating.body', {
+          defaultMessage:
+            'A response is still being generated. If you leave, it stops — what has arrived so far is saved, and you can retry the question when you come back.',
+        }),
+        i18n.translate('wazuhAiAssistant.app.leaveWhileGenerating.title', {
+          defaultMessage: 'A response is still generating',
+        }),
+      );
+    });
+  }, [onAppLeave]);
 
   const refreshProviders = useCallback(() => {
     // Deadline for the FIRST load. `providersLoaded` gates the Chat tab's whole rendering — until it
@@ -144,6 +177,7 @@ const App: React.FC<{ core: CoreStart }> = ({ core }) => {
                 setSettingsEverOpened(true);
                 setRoute('settings');
               }}
+              onGeneratingChange={handleGeneratingChange}
             />
           </div>
           {settingsEverOpened && (
@@ -170,7 +204,7 @@ const App: React.FC<{ core: CoreStart }> = ({ core }) => {
  */
 export const renderApp = (
   core: CoreStart,
-  { element }: AppMountParameters,
+  { element, onAppLeave }: AppMountParameters,
 ): (() => void) => {
   core.chrome.setBreadcrumbs([
     {
@@ -180,6 +214,6 @@ export const renderApp = (
     },
   ]);
   const root = createRoot(element);
-  root.render(<App core={core} />);
+  root.render(<App core={core} onAppLeave={onAppLeave} />);
   return () => root.unmount();
 };

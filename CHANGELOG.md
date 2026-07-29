@@ -38,6 +38,7 @@
 - Added queue usage in bytes and agent cache visualizations to `Server Management` > `Statistics`, and relabeled the Comms "Queue usage" Y-axis to Bytes [#8768](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8768)
 - Added Wazuh AI Assistant plugin: provider-agnostic AI chat over Wazuh data with a read-only tool catalog, server-side guardrails, optional pseudonymization, and API-key encryption at rest [#8788](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8788)
 - Added placeholder lines in the AI Assistant while an answer is being prepared, and a collapsible panel showing the queries it executed with their arguments [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
+- Added a confirmation before an action that would interrupt an AI Assistant response in progress, both when switching conversation and when leaving the app [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
 
 ### Changed
 
