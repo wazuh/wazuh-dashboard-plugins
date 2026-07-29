@@ -35,8 +35,8 @@ import {
   buildMalwareFilterAgg,
   buildSCATilesAgg,
   buildSCATopBenchmarksAgg,
+  buildThreatIntelByThreatTypeAgg,
   buildThreatIntelFeedByTypeAgg,
-  buildThreatIntelNewestIndicatorAgg,
   buildTopTermsAgg,
   buildVulnerabilitySeverityFiltersAgg,
   buildVulnerabilityTopPackagesAgg,
@@ -52,7 +52,6 @@ import {
   mapCardinality,
   mapCloudSecurityByModule,
   mapDocCount,
-  mapNewestIndicator,
   mapScaBenchmarks,
   mapScaTiles,
   mapSeverityCounts,
@@ -449,9 +448,10 @@ export function useVulnerabilityOverview(
 }
 
 /**
- * Threat-intel enrichments catalog: the total IOC count (the "IOCs" tile) and
- * the feed composition by type (Malware Detection's "IOC feed by type"), in one
- * search over `wazuh-threatintel-enrichments*`. Current-state, so no time range.
+ * Threat-intel enrichments catalog: the total IOC count (the "IOCs" tile), the
+ * feed composition by indicator type (Malware Detection's "IOC feed by type")
+ * and the composition by threat type (the Threat catalog card), in one search
+ * over `wazuh-threatintel-enrichments*`. Current-state, so no time range.
  * Shared by the Endpoint Security and Threat Intelligence Feed sections.
  */
 export function useThreatIntelEnrichments(
@@ -467,14 +467,14 @@ export function useThreatIntelEnrichments(
       const response = await fetchData({
         aggs: {
           ...buildThreatIntelFeedByTypeAgg(),
-          ...buildThreatIntelNewestIndicatorAgg(),
+          ...buildThreatIntelByThreatTypeAgg(),
         },
         pagination: NO_HITS,
       });
       return {
         total: mapDocCount(response),
         feedByType: mapTopBuckets(response?.aggregations, AGG.iocFeedByType),
-        newestIndicator: mapNewestIndicator(response?.aggregations),
+        byThreatType: mapTopBuckets(response?.aggregations, AGG.threatTypes),
       };
     },
   });

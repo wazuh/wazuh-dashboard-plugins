@@ -157,10 +157,10 @@ export const DistributionBar: React.FC<DistributionBarProps> = ({
           ))}
       </div>
       <EuiFlexGroup
-        gutterSize='m'
+        gutterSize='s'
         wrap
         responsive={false}
-        style={{ marginTop: 10 }}
+        style={{ marginTop: 8, columnGap: 12 }}
       >
         {segments.map(segment => (
           <EuiFlexItem grow={false} key={segment.key}>

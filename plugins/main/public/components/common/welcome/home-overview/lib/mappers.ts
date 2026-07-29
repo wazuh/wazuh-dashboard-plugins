@@ -1,6 +1,5 @@
 import {
   AgentStatus,
-  NewestIndicator,
   ScaBenchmark,
   ScaTilesData,
   SeverityBand,
@@ -147,29 +146,6 @@ export function mapTopBuckets(
       ...(externalId !== undefined ? { id: String(externalId) } : {}),
     };
   });
-}
-
-interface NewestIndicatorSource {
-  document?: {
-    feed?: { name?: string };
-    last_seen?: string;
-  };
-}
-
-/** Reads the `top_hits` (size 1) built by `buildThreatIntelNewestIndicatorAgg`. */
-export function mapNewestIndicator(
-  aggregations: Aggregations,
-): NewestIndicator | undefined {
-  const hit = (
-    aggregations?.[AGG.newestIndicator] as unknown as
-      | { hits?: { hits?: Array<{ _source?: NewestIndicatorSource }> } }
-      | undefined
-  )?.hits?.hits?.[0];
-  const lastSeen = hit?._source?.document?.last_seen;
-  if (!lastSeen) {
-    return undefined;
-  }
-  return { feedName: hit?._source?.document?.feed?.name, lastSeen };
 }
 
 export function mapAgentStatus(

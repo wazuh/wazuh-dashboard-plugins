@@ -3,7 +3,7 @@ import { EuiFlexGroup, EuiFlexItem, EuiHorizontalRule } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
 import { SectionHeader, WidgetGroup } from '../common';
 import { SecurityAnalyticsTiles } from '../security-analytics';
-import { NewestIndicatorRow, ThreatCatalogTiles } from '../threat-catalog';
+import { ThreatCatalogTiles, ThreatTypeComposition } from '../threat-catalog';
 import { useInViewport } from '../../../../hooks';
 import {
   useDecodersCount,
@@ -15,13 +15,13 @@ import {
   useVulnerabilityOverview,
 } from '../../hooks/use-overview-data';
 import { DataGroupResult } from '../../interfaces/data-group';
-import { ThreatIntelEnrichments } from '../../interfaces/types';
+import { ThreatIntelEnrichments, TopItem } from '../../interfaces/types';
 import { getIntegrationsUrl } from '../../utils/navigation';
 
 export interface ThreatIntelligenceFeedSectionProps {
   /** Shared vulnerabilities search; provides the CVEs-matched tile. */
   vulnerabilities: ReturnType<typeof useVulnerabilityOverview>;
-  /** Shared threat-intel enrichments catalog; provides the IOCs tile and freshness readout. */
+  /** Shared threat-intel enrichments catalog; provides the IOCs tile and the threat-type composition. */
   threatIntel: DataGroupResult<ThreatIntelEnrichments>;
 }
 
@@ -44,6 +44,11 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
     status: vulnerabilities.status,
     data: vulnerabilities.data?.cvesMatched,
     error: vulnerabilities.error,
+  };
+  const byThreatType: DataGroupResult<TopItem[]> = {
+    status: threatIntel.status,
+    data: threatIntel.data?.byThreatType,
+    error: threatIntel.error,
   };
 
   return (
@@ -81,7 +86,7 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
           >
             <ThreatCatalogTiles iocs={iocs} cvesMatched={cvesMatched} />
             <EuiHorizontalRule margin='m' />
-            <NewestIndicatorRow newestIndicator={threatIntel.data?.newestIndicator} />
+            <ThreatTypeComposition byThreatType={byThreatType} />
           </WidgetGroup>
         </EuiFlexItem>
       </EuiFlexGroup>

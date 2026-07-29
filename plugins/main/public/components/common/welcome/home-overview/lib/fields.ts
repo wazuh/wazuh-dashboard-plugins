@@ -55,21 +55,7 @@ export const THREAT_ENRICHMENTS_FIELD = 'wazuh.threat.enrichments';
  * type" breakdown — the composition of the feed itself, not what matched.
  */
 export const THREAT_INTEL_TYPE_FIELD = 'document.type';
-
-/**
- * Source feed name (e.g. `threat-fox`, `alienvault-otx`) on a threat-intel
- * enrichment document. Verified against the index's known-fields list
- * (`common/known-fields/threatintel-enrichments.json`) — a `keyword` field,
- * distinct from `document.type`. Drives the "Newest indicator" feed label.
- */
-export const THREAT_INTEL_FEED_NAME_FIELD = 'document.feed.name';
-
-/**
- * Last-seen timestamp on a threat-intel enrichment document. Also verified
- * against the known-fields list (`date`, aggregatable). Drives the "Newest
- * indicator" freshness readout on the Threat catalog card.
- */
-export const THREAT_INTEL_LAST_SEEN_FIELD = 'document.last_seen';
+export const THREAT_INTEL_THREAT_TYPE_FIELD = 'document.software.type';
 
 /**
  * vulnerability.severity values are capitalized, unlike the lowercase

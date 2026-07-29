@@ -16,8 +16,7 @@ import {
   FINDING_SEVERITY_BANDS,
   VULNERABILITY_SEVERITY_BANDS,
   THREAT_ENRICHMENTS_FIELD,
-  THREAT_INTEL_FEED_NAME_FIELD,
-  THREAT_INTEL_LAST_SEEN_FIELD,
+  THREAT_INTEL_THREAT_TYPE_FIELD,
   THREAT_INTEL_TYPE_FIELD,
   VULNERABILITY_CVE_ID_FIELD,
   VULNERABILITY_PACKAGE_NAME_FIELD,
@@ -227,19 +226,16 @@ export function buildThreatIntelFeedByTypeAgg(size = TOP_N) {
 }
 
 /**
- * Newest indicator in the threat-intel enrichments catalog: a `top_hits`
- * (size 1, sorted by `document.last_seen` desc) alongside the feed-by-type
- * terms agg above, so the freshness readout rides the same single search —
- * no new round trip.
+ * Threat-type composition (top size): a terms agg on `document.software.type`
+ * alongside the feed-by-type terms agg above, so the Threat catalog's
+ * composition bar rides the same single search — no new round trip. Answers
+ * "what kind of threats is this catalog weighted toward", where feed-by-type
+ * answers "in what technical form".
  */
-export function buildThreatIntelNewestIndicatorAgg() {
-  return {
-    [AGG.newestIndicator]: {
-      top_hits: {
-        size: 1,
-        sort: [{ [THREAT_INTEL_LAST_SEEN_FIELD]: { order: 'desc' } }],
-        _source: [THREAT_INTEL_FEED_NAME_FIELD, THREAT_INTEL_LAST_SEEN_FIELD],
-      },
-    },
-  };
+export function buildThreatIntelByThreatTypeAgg(size = TOP_N) {
+  return buildTopTermsAgg(
+    AGG.threatTypes,
+    THREAT_INTEL_THREAT_TYPE_FIELD,
+    size,
+  );
 }

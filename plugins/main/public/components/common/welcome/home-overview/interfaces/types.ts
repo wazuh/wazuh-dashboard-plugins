@@ -66,14 +66,6 @@ export interface FimOverview {
   files: TopItem[];
 }
 
-/** The single most-recent indicator in the threat-intel enrichments catalog. */
-export interface NewestIndicator {
-  /** Source feed name (`document.feed.name`, e.g. `threat-fox`), if set. */
-  feedName?: string;
-  /** ISO timestamp (`document.last_seen`) of the newest indicator. */
-  lastSeen: string;
-}
-
 /**
  * Threat-intel enrichments catalog (`wazuh-threatintel-enrichments*`): the feed
  * of IOCs the platform detects with. Current-state, not time-bounded.
@@ -83,8 +75,11 @@ export interface ThreatIntelEnrichments {
   total?: number;
   /** Feed composition by indicator type (the Malware "IOC feed by type" table). */
   feedByType: TopItem[];
-  /** Freshness readout on the Threat catalog card; absent if the catalog is empty. */
-  newestIndicator?: NewestIndicator;
+  /**
+   * Catalog composition by threat type (`document.software.type`), top N by
+   * indicator count — the Threat catalog card's composition bar.
+   */
+  byThreatType: TopItem[];
 }
 
 export interface VulnerabilityOverview {

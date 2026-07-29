@@ -26,8 +26,8 @@ export const AGG = {
   malware: 'malware',
   /** Terms on `document.type` over the threat-intel enrichments catalog. */
   iocFeedByType: 'ioc_feed_by_type',
-  /** `top_hits` (size 1) for the single most-recent threat-intel enrichment. */
-  newestIndicator: 'newest_indicator',
+  /** Terms on `document.software.type` over the threat-intel enrichments catalog. */
+  threatTypes: 'threat_types',
   /**
    * Sub-agg capturing the MITRE external id (e.g. `TA0001`, `T1078`) for each
    * top tactic/technique bucket, so links can open the Intelligence resource.

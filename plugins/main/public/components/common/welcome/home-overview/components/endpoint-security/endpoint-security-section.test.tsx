@@ -64,7 +64,11 @@ const findingsAvailable = {
 
 const threatIntelAvailable = {
   status: 'available' as const,
-  data: { total: 2048, feedByType: [{ key: 'Domains', count: 92700 }] },
+  data: {
+    total: 2048,
+    feedByType: [{ key: 'Domains', count: 92700 }],
+    byThreatType: [],
+  },
 };
 
 describe('EndpointSecuritySection', () => {

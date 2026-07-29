@@ -40,7 +40,7 @@ jest.mock('./hooks/use-overview-data', () => ({
   })),
   useThreatIntelEnrichments: jest.fn(() => ({
     status: 'available',
-    data: { total: 0, feedByType: [] },
+    data: { total: 0, feedByType: [], byThreatType: [] },
   })),
 }));
 jest.mock('../../hooks', () => ({

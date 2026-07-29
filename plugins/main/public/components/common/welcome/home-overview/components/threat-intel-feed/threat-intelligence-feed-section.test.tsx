@@ -50,7 +50,7 @@ const vulnerabilitiesAvailable = {
 
 const threatIntelAvailable = {
   status: 'available' as const,
-  data: { total: 2048, feedByType: [] },
+  data: { total: 2048, feedByType: [], byThreatType: [] },
 };
 
 beforeEach(() => {
@@ -131,8 +131,8 @@ describe('ThreatIntelligenceFeedSection', () => {
     expect(asMock(useKvdbsCount)).toHaveBeenCalledWith(false);
   });
 
-  it('shows the freshness readout when the catalog has a newest indicator', () => {
-    render(
+  it('keeps the IOC and CVE counts and shows the threat-type composition below them', () => {
+    const { container } = render(
       <ThreatIntelligenceFeedSection
         vulnerabilities={vulnerabilitiesAvailable}
         threatIntel={{
@@ -140,15 +140,20 @@ describe('ThreatIntelligenceFeedSection', () => {
           data: {
             total: 2048,
             feedByType: [],
-            newestIndicator: {
-              feedName: 'threat-fox',
-              lastSeen: new Date().toISOString(),
-            },
+            byThreatType: [
+              { key: 'botnet_cc', count: 1420 },
+              { key: 'payload_delivery', count: 628 },
+            ],
           },
         }}
       />,
     );
-    expect(screen.getByText('Newest indicator')).toBeInTheDocument();
-    expect(screen.getByText('Feed: threat-fox')).toBeInTheDocument();
+    expect(screen.getAllByText('2,048').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('3,521').length).toBeGreaterThan(0);
+    expect(
+      container.querySelector('[data-test-subj="threat-catalog-threat-types"]'),
+    ).toBeTruthy();
+    expect(screen.getAllByText('Botnet CC').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Payload delivery').length).toBeGreaterThan(0);
   });
 });

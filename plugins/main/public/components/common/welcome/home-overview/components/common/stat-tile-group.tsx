@@ -52,7 +52,6 @@ export function StatTileGroup<K extends string>({
         let tileNode: React.ReactNode;
         if (tile.onSelect) {
           tileNode = (
-            <EuiPanel paddingSize='s' hasBorder data-test-subj={tile.testSubj}>
               <RedirectAppLinks application={getCore().application}>
                 <StatTile
                   value={
@@ -70,13 +69,10 @@ export function StatTileGroup<K extends string>({
                   data-test-subj={tile.testSubj}
                 />
               </RedirectAppLinks>
-            </EuiPanel>
           );
         } else if (bordered) {
           tileNode = (
-            <EuiPanel paddingSize='s' hasBorder data-test-subj={tile.testSubj}>
               <StatTile value={number} label={tile.label} reverse />
-            </EuiPanel>
           );
         } else {
           tileNode = (

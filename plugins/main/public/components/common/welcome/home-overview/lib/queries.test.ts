@@ -11,8 +11,8 @@ import {
   buildCvesMatchedAgg,
   buildIocMatchesAgg,
   buildMalwareFilterAgg,
+  buildThreatIntelByThreatTypeAgg,
   buildThreatIntelFeedByTypeAgg,
-  buildThreatIntelNewestIndicatorAgg,
   buildCloudSecurityByModuleAgg,
 } from './queries';
 import {
@@ -33,8 +33,7 @@ import {
   VULNERABILITY_CVE_ID_FIELD,
   EVENT_DOC_ID_FIELD,
   THREAT_ENRICHMENTS_FIELD,
-  THREAT_INTEL_FEED_NAME_FIELD,
-  THREAT_INTEL_LAST_SEEN_FIELD,
+  THREAT_INTEL_THREAT_TYPE_FIELD,
   THREAT_INTEL_TYPE_FIELD,
 } from './fields';
 
@@ -151,14 +150,10 @@ describe('query builders', () => {
     });
   });
 
-  it('builds the newest-indicator agg as a size-1 top_hits sorted by last_seen desc', () => {
-    expect(buildThreatIntelNewestIndicatorAgg()).toEqual({
-      newest_indicator: {
-        top_hits: {
-          size: 1,
-          sort: [{ [THREAT_INTEL_LAST_SEEN_FIELD]: { order: 'desc' } }],
-          _source: [THREAT_INTEL_FEED_NAME_FIELD, THREAT_INTEL_LAST_SEEN_FIELD],
-        },
+  it('builds the threat-types agg as a terms agg on the enrichments threat type', () => {
+    expect(buildThreatIntelByThreatTypeAgg(5)).toEqual({
+      threat_types: {
+        terms: { field: THREAT_INTEL_THREAT_TYPE_FIELD, size: 5 },
       },
     });
   });
