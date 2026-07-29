@@ -60,8 +60,11 @@ export function buildSystemPrompt(nowIso: string): string {
       'returns 0 rows. To filter findings by kind, use wazuh.rule.tags terms or wazuh.rule.id - ' +
       'only use wazuh.rule.title with the exact, complete title string.',
     'Severity (wazuh.rule.level) is a WORD, not a number: one of informational, low, medium, ' +
-      'high, critical. Never filter it with a numeric range; the min_severity parameter takes ' +
-      'one of those words.',
+      'high, critical. Never filter it with a numeric range. The severity parameter matches ' +
+      'that EXACT severity by default - "medium" means only medium, not medium-and-above. Only ' +
+      'set severity_comparison to at_or_above/at_or_below when the user explicitly says "or ' +
+      'above"/"or higher"/"or below"/"or lower" (or an equivalent phrase); otherwise leave it ' +
+      'unset for an exact match.',
     'For questions about WHICH users, IPs, commands or programs were involved, prefer the typed ' +
       'alert tools: their results include source.user.name, destination.user.name, source.ip and ' +
       'process.command_line. If you do use search_wazuh_data for such a question, you MUST ' +

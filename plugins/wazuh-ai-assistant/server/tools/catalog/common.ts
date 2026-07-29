@@ -86,14 +86,62 @@ export function severitiesAtOrAbove(min: string): SeverityWord[] {
   return idx === -1 ? [...SEVERITY_ORDER] : SEVERITY_ORDER.slice(idx);
 }
 
-/** The `min_severity` enum property shared by the alert tools that take a severity floor. */
-export function minSeverityProperty(): JsonSchemaProperty {
+/**
+ * The severity words at or below `max` (inclusive), for a `terms` filter — e.g. `'medium'` ->
+ * `['informational','low','medium']`. Case-insensitive; an unrecognized value returns the full
+ * list (no ceiling), failing OPEN toward showing more rather than silently hiding alerts.
+ */
+export function severitiesAtOrBelow(max: string): SeverityWord[] {
+  const idx = SEVERITY_ORDER.indexOf(max.trim().toLowerCase() as SeverityWord);
+  return idx === -1 ? [...SEVERITY_ORDER] : SEVERITY_ORDER.slice(0, idx + 1);
+}
+
+export type SeverityComparison = 'exact' | 'at_or_above' | 'at_or_below';
+
+/**
+ * Resolves a severity value + comparison mode to the `terms` list a query should filter on.
+ * `wazuh.rule.level` is a categorical word, not a numeric scale, so an exact match is the
+ * correct default — "medium" means medium, not "medium or worse". `at_or_above`/`at_or_below`
+ * are opt-in for when the user actually asks for a floor/ceiling ("medium or higher").
+ */
+export function severityFilterValues(
+  value: string,
+  comparison: SeverityComparison = 'exact',
+): SeverityWord[] {
+  if (comparison === 'at_or_above') {
+    return severitiesAtOrAbove(value);
+  }
+  if (comparison === 'at_or_below') {
+    return severitiesAtOrBelow(value);
+  }
+  const normalized = value.trim().toLowerCase() as SeverityWord;
+  return SEVERITY_ORDER.includes(normalized)
+    ? [normalized]
+    : [...SEVERITY_ORDER];
+}
+
+/** The `severity` enum property shared by the alert tools that take a severity filter. */
+export function severityProperty(): JsonSchemaProperty {
   return {
     type: 'string',
     description:
-      'Minimum severity (inclusive): one of informational, low, medium, high, critical. ' +
-      'Omit for no severity floor.',
+      'Severity to filter on: one of informational, low, medium, high, critical. Matches ' +
+      'that exact severity by default — use severity_comparison for "or above"/"or below". ' +
+      'Omit for no severity filter.',
     enum: [...SEVERITY_ORDER],
+  };
+}
+
+/** The `severity_comparison` enum property shared by the alert tools that take a severity
+ * filter — paired with `severityProperty()`. Defaults to an exact match. */
+export function severityComparisonProperty(): JsonSchemaProperty {
+  return {
+    type: 'string',
+    description:
+      'How to compare against severity: "exact" (default) matches only that severity; ' +
+      '"at_or_above" includes that severity and everything more severe; "at_or_below" ' +
+      'includes that severity and everything less severe. Only meaningful when severity is set.',
+    enum: ['exact', 'at_or_above', 'at_or_below'],
   };
 }
 

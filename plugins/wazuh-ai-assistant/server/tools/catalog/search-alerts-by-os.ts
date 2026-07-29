@@ -4,12 +4,13 @@ import {
   alertRowFields,
   clampLimit,
   limitProperty,
-  minSeverityProperty,
   objectSchema,
   optionalStringParam,
   requireNonEmptyString,
   resolveTimeRange,
-  severitiesAtOrAbove,
+  severityComparisonProperty,
+  severityFilterValues,
+  severityProperty,
   timeRangeProperties,
 } from './common';
 
@@ -29,22 +30,24 @@ const SAMPLE_COLUMNS = [
 
 /**
  * Matches findings from agents running a given OS via the ECS `host.os.name`/`host.os.platform`
- * fields, without a wildcard match. `min_severity` is a categorical severity word (see
- * common.ts's severitiesAtOrAbove) applied only when supplied.
+ * fields, without a wildcard match. `severity` matches that exact severity word by default;
+ * `severity_comparison` opts into "or above"/"or below" (see common.ts's severityFilterValues),
+ * applied only when `severity` is supplied.
  */
 export const searchAlertsByOsTool: ToolDefinition = {
   spec: {
     name: 'search_alerts_by_os',
     description:
       'Searches security findings for findings from agents running a given operating system ' +
-      '(e.g. "Windows", "Ubuntu"), at or above a minimum severity, within a time range.',
+      '(e.g. "Windows", "Ubuntu"), optionally filtered by severity, within a time range.',
     parameters: objectSchema(
       {
         os_name: {
           type: 'string',
           description: 'Operating system name to filter by, e.g. "Windows".',
         },
-        min_severity: minSeverityProperty(),
+        severity: severityProperty(),
+        severity_comparison: severityComparisonProperty(),
         limit: limitProperty(
           'Max number of alerts to return (default 20, max 500).',
         ),
@@ -60,7 +63,8 @@ export const searchAlertsByOsTool: ToolDefinition = {
       params.os_name,
       'Parameter "os_name" is required and must be a non-empty string.',
     );
-    const minSeverity = optionalStringParam(params.min_severity);
+    const severity = optionalStringParam(params.severity);
+    const severityComparison = optionalStringParam(params.severity_comparison);
     const limit = clampLimit(params.limit, 20, 500);
     const { gte, lte } = resolveTimeRange(params);
     // `host.os.name` is `keyword` and stores the full display string, so a single-token analyzed
@@ -75,9 +79,18 @@ export const searchAlertsByOsTool: ToolDefinition = {
     const filter: Record<string, unknown>[] = [
       { range: { '@timestamp': { gte, lte } } },
     ];
-    if (minSeverity) {
+    if (severity) {
       filter.push({
-        terms: { 'wazuh.rule.level': severitiesAtOrAbove(minSeverity) },
+        terms: {
+          'wazuh.rule.level': severityFilterValues(
+            severity,
+            severityComparison as
+              | 'exact'
+              | 'at_or_above'
+              | 'at_or_below'
+              | undefined,
+          ),
+        },
       });
     }
     return {

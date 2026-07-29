@@ -4,11 +4,12 @@ import {
   alertRowFields,
   clampLimit,
   limitProperty,
-  minSeverityProperty,
   objectSchema,
   optionalStringParam,
   resolveTimeRange,
-  severitiesAtOrAbove,
+  severityComparisonProperty,
+  severityFilterValues,
+  severityProperty,
   STANDARD_ALERT_SAMPLE_COLUMNS,
   STANDARD_ALERT_TABLE_COLUMN_FIELDS,
   STANDARD_ALERT_TABLE_COLUMNS,
@@ -18,16 +19,17 @@ import {
 /**
  * `wazuh.agent.name` is mapped `keyword` at the top level with no `.keyword` subfield needed, so
  * this filters with a single `terms` clause on the exact agent names rather than one `match`
- * clause per name. `min_severity` is a categorical severity word (see common.ts's
- * severitiesAtOrAbove) applied only when supplied.
+ * clause per name. `severity` matches that exact severity word by default; `severity_comparison`
+ * opts into "or above"/"or below" (see common.ts's severityFilterValues), applied only when
+ * `severity` is supplied.
  */
 export const searchAlertsByMultipleAgentsTool: ToolDefinition = {
   spec: {
     name: 'search_alerts_by_multiple_agents',
     description:
-      'Searches security findings for findings from any of several named agents, at or above a ' +
-      'minimum severity, within a time range. Use when the question names two or more agents; ' +
-      'use search_alerts_by_agent instead for a single agent.',
+      'Searches security findings for findings from any of several named agents, optionally ' +
+      'filtered by severity, within a time range. Use when the question names two or more ' +
+      'agents; use search_alerts_by_agent instead for a single agent.',
     parameters: objectSchema(
       {
         agent_names: {
@@ -35,7 +37,8 @@ export const searchAlertsByMultipleAgentsTool: ToolDefinition = {
           description: 'Exact agent names to filter by (matches any of them).',
           items: { type: 'string' },
         },
-        min_severity: minSeverityProperty(),
+        severity: severityProperty(),
+        severity_comparison: severityComparisonProperty(),
         limit: limitProperty(
           'Max number of alerts to return (default 20, max 500).',
         ),
@@ -57,16 +60,26 @@ export const searchAlertsByMultipleAgentsTool: ToolDefinition = {
         'Parameter "agent_names" is required and must be a non-empty array of strings.',
       );
     }
-    const minSeverity = optionalStringParam(params.min_severity);
+    const severity = optionalStringParam(params.severity);
+    const severityComparison = optionalStringParam(params.severity_comparison);
     const limit = clampLimit(params.limit, 20, 500);
     const { gte, lte } = resolveTimeRange(params);
     const filter: Record<string, unknown>[] = [
       { terms: { 'wazuh.agent.name': agentNames } },
       { range: { '@timestamp': { gte, lte } } },
     ];
-    if (minSeverity) {
+    if (severity) {
       filter.push({
-        terms: { 'wazuh.rule.level': severitiesAtOrAbove(minSeverity) },
+        terms: {
+          'wazuh.rule.level': severityFilterValues(
+            severity,
+            severityComparison as
+              | 'exact'
+              | 'at_or_above'
+              | 'at_or_below'
+              | undefined,
+          ),
+        },
       });
     }
     return {

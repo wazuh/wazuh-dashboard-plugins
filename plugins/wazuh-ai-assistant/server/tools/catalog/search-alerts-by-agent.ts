@@ -4,12 +4,13 @@ import {
   alertRowFields,
   clampLimit,
   limitProperty,
-  minSeverityProperty,
   objectSchema,
   optionalStringParam,
   requireNonEmptyString,
   resolveTimeRange,
-  severitiesAtOrAbove,
+  severityComparisonProperty,
+  severityFilterValues,
+  severityProperty,
   STANDARD_ALERT_SAMPLE_COLUMNS,
   STANDARD_ALERT_TABLE_COLUMN_FIELDS,
   STANDARD_ALERT_TABLE_COLUMNS,
@@ -18,14 +19,15 @@ import {
 
 /**
  * Matches findings by agent name via `bool.filter` with a `match` clause on `wazuh.agent.name`
- * (exact free-text match, no wildcard) plus a time-range clause. `min_severity` is a categorical
- * severity word (see common.ts's severitiesAtOrAbove) applied only when supplied.
+ * (exact free-text match, no wildcard) plus a time-range clause. `severity` matches that exact
+ * severity word by default; `severity_comparison` opts into "or above"/"or below" (see
+ * common.ts's severityFilterValues), applied only when `severity` is supplied.
  */
 export const searchAlertsByAgentTool: ToolDefinition = {
   spec: {
     name: 'search_alerts_by_agent',
     description:
-      'Searches security findings for findings from one named agent at or above a minimum ' +
+      'Searches security findings for findings from one named agent, optionally filtered by ' +
       'severity, within a time range.',
     parameters: objectSchema(
       {
@@ -33,7 +35,8 @@ export const searchAlertsByAgentTool: ToolDefinition = {
           type: 'string',
           description: 'Exact agent name to filter by.',
         },
-        min_severity: minSeverityProperty(),
+        severity: severityProperty(),
+        severity_comparison: severityComparisonProperty(),
         limit: limitProperty(
           'Max number of alerts to return (default 20, max 500).',
         ),
@@ -49,16 +52,26 @@ export const searchAlertsByAgentTool: ToolDefinition = {
       params.agent_name,
       'Parameter "agent_name" is required and must be a non-empty string.',
     );
-    const minSeverity = optionalStringParam(params.min_severity);
+    const severity = optionalStringParam(params.severity);
+    const severityComparison = optionalStringParam(params.severity_comparison);
     const limit = clampLimit(params.limit, 20, 500);
     const { gte, lte } = resolveTimeRange(params);
     const filter: Record<string, unknown>[] = [
       { match: { 'wazuh.agent.name': agentName } },
       { range: { '@timestamp': { gte, lte } } },
     ];
-    if (minSeverity) {
+    if (severity) {
       filter.push({
-        terms: { 'wazuh.rule.level': severitiesAtOrAbove(minSeverity) },
+        terms: {
+          'wazuh.rule.level': severityFilterValues(
+            severity,
+            severityComparison as
+              | 'exact'
+              | 'at_or_above'
+              | 'at_or_below'
+              | undefined,
+          ),
+        },
       });
     }
     return {

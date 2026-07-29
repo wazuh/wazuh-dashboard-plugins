@@ -55,11 +55,12 @@
         "tool": "search_alerts_by_agent",
         "params_subset": {
           "agent_name": "web-prod-01",
-          "min_severity": "high"
+          "severity": "high",
+          "severity_comparison": "at_or_above"
         },
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent SEARCH_ALERTS_BY_AGENT -> search_alerts_by_agent.ts. Both agent_name and min_severity are explicitly stated in the question, so both are pinned. 5.0 UPDATE: rule.level is categorical in Wazuh 5.0 (informational/low/medium/high/critical), so min_severity is a WORD, not a 0-15 number -- the prompt and the pinned value were both migrated off the 4.14 numeric scale (the pre-migration case asked for 'severity of 10 or higher' and pinned 10, which the model correctly answered with \"high\", failing the stale assertion)."
+      "notes": "UAT intent SEARCH_ALERTS_BY_AGENT -> search_alerts_by_agent.ts. agent_name, severity, and severity_comparison are all explicitly stated in the question ('high severity or above'), so all three are pinned -- severity defaults to an exact match, so the explicit 'or above' phrasing is what justifies pinning severity_comparison here."
     },
     {
       "id": "top_rules",
@@ -198,11 +199,12 @@
         "tool": "search_alerts_by_multiple_agents",
         "params_subset": {
           "agent_names": ["web-prod-01", "web-prod-02"],
-          "min_severity": "high"
+          "severity": "high",
+          "severity_comparison": "at_or_above"
         },
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent SEARCH_ALERTS_BY_MULTIPLE_AGENTS -> search_alerts_by_multiple_agents.ts. Two named agents should route here rather than to search_alerts_by_agent (search_alerts_by_multiple_agents.ts:23 description explicitly says so). 5.0 UPDATE: min_severity is a categorical WORD in Wazuh 5.0, not a 0-15 number -- prompt and pinned value migrated off the 4.14 numeric scale (see alerts_by_agent_severity's note)."
+      "notes": "UAT intent SEARCH_ALERTS_BY_MULTIPLE_AGENTS -> search_alerts_by_multiple_agents.ts. Two named agents should route here rather than to search_alerts_by_agent (search_alerts_by_multiple_agents.ts:23 description explicitly says so). severity_comparison is pinned to at_or_above since the question explicitly says 'or above' (see alerts_by_agent_severity's note -- severity defaults to an exact match otherwise)."
     },
     {
       "id": "alerts_by_os",
@@ -216,7 +218,7 @@
         },
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent SEARCH_ALERTS_BY_OS -> search_alerts_by_os.ts, match (not wildcard) on agent.os.name (search_alerts_by_os.ts:11-15). min_severity left unpinned ('high-severity' is fuzzy, not a stated number)."
+      "notes": "UAT intent SEARCH_ALERTS_BY_OS -> search_alerts_by_os.ts, match (not wildcard) on host.os.name/host.os.platform. severity left unpinned ('high-severity' is fuzzy phrasing, not confidently mappable to the exact-match default)."
     },
     {
       "id": "vulnerabilities_by_agent",
