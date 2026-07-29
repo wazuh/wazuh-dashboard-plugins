@@ -63,9 +63,10 @@ export function optionalStringParam(value: unknown): string | undefined {
 
 /**
  * Severity model: `wazuh.rule.level` on wazuh-findings-v5* is a
- * KEYWORD with these five ordered values. A numeric range query
- * on it would do lexicographic string comparison (silently wrong), so severity floors are
- * expressed as a `terms` filter over the tail of this ordered list instead (`severitiesAtOrAbove`).
+ * KEYWORD with these five ordered values. A numeric range query on it would do lexicographic
+ * string comparison (silently wrong), so severity filters are expressed as a `terms` filter
+ * instead — an exact match by default (`severityFilterValues`), or a floor/ceiling over this
+ * ordered list when opted into (`severitiesAtOrAbove`/`severitiesAtOrBelow`).
  */
 export const SEVERITY_ORDER = [
   'informational',
@@ -98,16 +99,33 @@ export function severitiesAtOrBelow(max: string): SeverityWord[] {
 
 export type SeverityComparison = 'exact' | 'at_or_above' | 'at_or_below';
 
+const VALID_SEVERITY_COMPARISONS: readonly string[] = [
+  'exact',
+  'at_or_above',
+  'at_or_below',
+];
+
 /**
  * Resolves a severity value + comparison mode to the `terms` list a query should filter on.
  * `wazuh.rule.level` is a categorical word, not a numeric scale, so an exact match is the
  * correct default — "medium" means medium, not "medium or worse". `at_or_above`/`at_or_below`
  * are opt-in for when the user actually asks for a floor/ceiling ("medium or higher").
+ *
+ * `comparison` is only trustworthy at the type level — a model can send any string for it, and
+ * the JSON Schema `enum` isn't runtime-enforced. An unrecognized comparison fails OPEN to the
+ * full severity list (same direction as an unrecognized `value`), not to a silent exact match —
+ * a hallucinated comparison should widen results, never narrow them without saying so.
  */
 export function severityFilterValues(
   value: string,
-  comparison: SeverityComparison = 'exact',
+  comparison?: string,
 ): SeverityWord[] {
+  if (
+    comparison !== undefined &&
+    !VALID_SEVERITY_COMPARISONS.includes(comparison)
+  ) {
+    return [...SEVERITY_ORDER];
+  }
   if (comparison === 'at_or_above') {
     return severitiesAtOrAbove(value);
   }

@@ -17,8 +17,8 @@ rearchitecting.
 
 Key properties:
 
-- **Typed parameters** with enums and clamps (`agent_identifier`, `min_severity`,
-  `time_range {gte, lte}` date-math, `limit` ≤ 500).
+- **Typed parameters** with enums and clamps (`agent_identifier`, `severity` +
+  `severity_comparison`, `time_range {gte, lte}` date-math, `limit` ≤ 500).
 - **The tool definition shapes the result table, never the model** — each tool's `tableSpec`
   declares the columns; the executor maps hits through the declared field paths. Rendering is
   deterministic across providers.

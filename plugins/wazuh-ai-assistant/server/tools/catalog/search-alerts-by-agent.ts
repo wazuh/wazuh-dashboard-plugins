@@ -27,8 +27,9 @@ export const searchAlertsByAgentTool: ToolDefinition = {
   spec: {
     name: 'search_alerts_by_agent',
     description:
-      'Searches security findings for findings from one named agent, optionally filtered by ' +
-      'severity, within a time range.',
+      'Searches security findings for findings from one named agent, within a time range. ' +
+      'Optional severity narrows to exactly that severity, or to a floor/ceiling via ' +
+      'severity_comparison.',
     parameters: objectSchema(
       {
         agent_name: {
@@ -65,11 +66,7 @@ export const searchAlertsByAgentTool: ToolDefinition = {
         terms: {
           'wazuh.rule.level': severityFilterValues(
             severity,
-            severityComparison as
-              | 'exact'
-              | 'at_or_above'
-              | 'at_or_below'
-              | undefined,
+            severityComparison,
           ),
         },
       });

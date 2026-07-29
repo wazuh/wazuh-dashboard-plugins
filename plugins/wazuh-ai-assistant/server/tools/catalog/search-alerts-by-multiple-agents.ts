@@ -27,9 +27,10 @@ export const searchAlertsByMultipleAgentsTool: ToolDefinition = {
   spec: {
     name: 'search_alerts_by_multiple_agents',
     description:
-      'Searches security findings for findings from any of several named agents, optionally ' +
-      'filtered by severity, within a time range. Use when the question names two or more ' +
-      'agents; use search_alerts_by_agent instead for a single agent.',
+      'Searches security findings for findings from any of several named agents, within a ' +
+      'time range. Optional severity narrows to exactly that severity, or to a floor/ceiling ' +
+      'via severity_comparison. Use when the question names two or more agents; use ' +
+      'search_alerts_by_agent instead for a single agent.',
     parameters: objectSchema(
       {
         agent_names: {
@@ -73,11 +74,7 @@ export const searchAlertsByMultipleAgentsTool: ToolDefinition = {
         terms: {
           'wazuh.rule.level': severityFilterValues(
             severity,
-            severityComparison as
-              | 'exact'
-              | 'at_or_above'
-              | 'at_or_below'
-              | undefined,
+            severityComparison,
           ),
         },
       });

@@ -80,3 +80,39 @@ test('severityFilterValues fails open to the full list for an unrecognized exact
     'critical',
   ]);
 });
+
+test('severityFilterValues is case-insensitive in exact mode', () => {
+  assert.deepEqual(severityFilterValues('MEDIUM'), ['medium']);
+  assert.deepEqual(severityFilterValues('  High  '), ['high']);
+});
+
+test('severityFilterValues fails open to the full list for an empty-string value', () => {
+  assert.deepEqual(severityFilterValues(''), [
+    'informational',
+    'low',
+    'medium',
+    'high',
+    'critical',
+  ]);
+});
+
+test('severityFilterValues fails open to the full list for an unrecognized comparison, never silently exact-matching', () => {
+  assert.deepEqual(severityFilterValues('medium', 'gte'), [
+    'informational',
+    'low',
+    'medium',
+    'high',
+    'critical',
+  ]);
+  assert.deepEqual(severityFilterValues('medium', 'at-or-above'), [
+    'informational',
+    'low',
+    'medium',
+    'high',
+    'critical',
+  ]);
+});
+
+test('severityFilterValues treats an undefined comparison as exact', () => {
+  assert.deepEqual(severityFilterValues('medium', undefined), ['medium']);
+});

@@ -51,16 +51,12 @@ export const getAlertsByTimeTool: ToolDefinition = {
     const filter: Record<string, unknown>[] = [
       { range: { '@timestamp': { gte, lte } } },
     ];
-    if (severity !== undefined) {
+    if (severity) {
       filter.push({
         terms: {
           'wazuh.rule.level': severityFilterValues(
             severity,
-            severityComparison as
-              | 'exact'
-              | 'at_or_above'
-              | 'at_or_below'
-              | undefined,
+            severityComparison,
           ),
         },
       });

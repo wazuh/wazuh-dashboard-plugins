@@ -39,7 +39,8 @@ export const searchAlertsByOsTool: ToolDefinition = {
     name: 'search_alerts_by_os',
     description:
       'Searches security findings for findings from agents running a given operating system ' +
-      '(e.g. "Windows", "Ubuntu"), optionally filtered by severity, within a time range.',
+      '(e.g. "Windows", "Ubuntu"), within a time range. Optional severity narrows to exactly ' +
+      'that severity, or to a floor/ceiling via severity_comparison.',
     parameters: objectSchema(
       {
         os_name: {
@@ -84,11 +85,7 @@ export const searchAlertsByOsTool: ToolDefinition = {
         terms: {
           'wazuh.rule.level': severityFilterValues(
             severity,
-            severityComparison as
-              | 'exact'
-              | 'at_or_above'
-              | 'at_or_below'
-              | undefined,
+            severityComparison,
           ),
         },
       });
