@@ -85,7 +85,7 @@ Always use the provided script to bring up or down the development environment. 
   - without : Deploys no agents.
   - If this option is not used with server-local mode (or an empty string is provided), the default agent configuration for the server-local profile is used ( 2 agents, one RPM-based and one DEB-based ).
 - -r <repo>=<path> : (Optional, repeatable) ONLY for external plugin repositories that are not stored inside this repository.
-  - Internal repositories (`main`, `wazuh-core`, `wazuh-check-updates`) are auto-detected under `<root>/plugins/` when running from this repo, or can be set via `--plugins-root` (aliases: `-wdp`, `--wz-home`).
+  - Internal repositories (`main`, `wazuh-core`, `wazuh-check-updates`, `wazuh-ai-assistant`) are auto-detected under `<root>/plugins/` when running from this repo, or can be set via `--plugins-root` (aliases: `-wdp`, `--wz-home`).
   - External repositories passed with `-r` are dynamically added as volumes to the `osd` service via an auto-generated `dev.override.generated.yml` (git-ignored).
   - Paths MUST be absolute and must point to the repository ROOT (do not pass subfolders like `/plugins/...`). Shorthand is also supported: `-r <repo>` (no `=`), which resolves from your <common-parent-directory> using the same `<repo>` name. If not found, an error is raised.
 - -saml: (Optional) Deploys a SAML-enabled environment with KeyCloak IDP.

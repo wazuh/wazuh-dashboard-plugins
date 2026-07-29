@@ -56,6 +56,9 @@ describe('dev.ts - Auto-detection (flags only)', () => {
     expect(process.env.REPO_WAZUH_CHECK_UPDATES).toBe(
       path.join(repoRoot, 'plugins', 'wazuh-check-updates'),
     );
+    expect(process.env.REPO_WAZUH_AI_ASSISTANT).toBe(
+      path.join(repoRoot, 'plugins', 'wazuh-ai-assistant'),
+    );
 
     // Verify compose project name derived from OSD version
     const osdVersion = getPluginPlatformVersion(repoRoot);

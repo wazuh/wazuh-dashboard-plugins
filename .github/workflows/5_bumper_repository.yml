@@ -228,7 +228,7 @@ jobs:
       - name: Merge pull request
         if: (inputs.revert != true && steps.check_changes.outputs.has_changes == 'true') || (inputs.revert == true && steps.revert_step.outputs.has_changes == 'true')
         run: |
-          gh pr merge "${{ steps.create_pr.outputs.pull_request_url }}" --merge --admin
+          gh pr merge "${{ steps.create_pr.outputs.pull_request_url }}" --squash --admin
 
       - name: Show logs
         if: inputs.revert != true

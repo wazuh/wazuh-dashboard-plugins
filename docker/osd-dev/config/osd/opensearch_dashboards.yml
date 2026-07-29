@@ -26,7 +26,7 @@ wazuh_core.hosts:
     port: 55000
     username: wazuh-wui
     password: MyS3cr37P450r.*-
-    run_as: false
+    run_as: true
   imposter-cli:
     url: 'http://<ip-local>'
     port: 8080
@@ -38,6 +38,6 @@ wazuh_core.hosts:
     port: 55000
     username: wazuh-wui
     password: wazuh-wui
-    run_as: false
+    run_as: true
 wazuh_check_updates.ctiRegistrationUiEnabled: false
 wazuh_check_updates.ctiRegistrationStatusPollIntervalSec: 30
