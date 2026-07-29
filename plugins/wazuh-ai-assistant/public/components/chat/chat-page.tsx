@@ -36,6 +36,12 @@ import { mergeConversationMessages } from '../../../common/conversation-merge';
 import { getHttpErrorStatus } from '../../../common/http-status';
 import { restoreAndClearDraft, stashDraft } from '../../../common/draft-stash';
 import {
+  buildConversationRoute,
+  parseConversationRoute,
+  readLastConversationId,
+  writeLastConversationId,
+} from '../../../common/conversation-location';
+import {
   AssistantTurnRecord,
   buildConversationTitle,
   buildOutgoingMessages,
@@ -207,6 +213,26 @@ const CHAT_SURFACE_STYLES = `
 
 `;
 
+/**
+ * Rewrites the location hash to address `conversationId` without adding a history entry and without
+ * touching the path or query, so this never fights the platform's own routing. `replaceState` fires
+ * no `hashchange`/`popstate`, so it cannot loop back into this component's own restore path.
+ * Swallows failures: some embedding contexts restrict History API access, and losing the shareable
+ * URL is a UX regression, not a functional one — the sessionStorage pointer still covers a reload.
+ */
+function replaceConversationRoute(conversationId: string | null): void {
+  try {
+    const { pathname, search } = window.location;
+    window.history.replaceState(
+      null,
+      '',
+      `${pathname}${search}${buildConversationRoute(conversationId)}`,
+    );
+  } catch {
+    // Intentionally ignored, see above.
+  }
+}
+
 export const ChatPage: React.FC<ChatPageProps> = ({
   core,
   providers,
@@ -290,6 +316,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // heuristic over the MODEL's own narration, this is a genuine platform-level auth rejection, so
   // it gets its own distinct, persistent (not auto-dismissed) callout with a reload action.
   const [sessionExpired, setSessionExpired] = useState(false);
+
+  // Conversation restore (common/conversation-location.ts): true while the conversation named by the
+  // URL hash / this tab's stored pointer is being fetched on mount, so the chat shows a spinner
+  // instead of flashing the welcome state and then swapping it for a transcript.
+  const [isRestoringConversation, setIsRestoringConversation] = useState(false);
+  // Guards the location-sync effect below from clobbering the hash it is supposed to READ on mount:
+  // set once the initial restore attempt has been decided, one way or the other.
+  const initialRestoreSettledRef = useRef(false);
 
   const [chatService] = useState(() => new ChatService(core.http.basePath));
   const [settingsService] = useState(() => new SettingsService(core.http));
@@ -497,9 +531,97 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Unmount cleanup: the app shell (application.tsx) swaps ChatPage<->SettingsPage on tab switch
-  // rather than keeping ChatPage mounted, so without this a tab switch mid-generation orphans the
-  // in-flight SSE stream instead of cancelling it. `abandonActiveStream` (not a bare abort) so the
+  /**
+   * Loads a saved conversation into the live chat. Shared by the sidebar's resume handler and by the
+   * mount-time restore below — the difference is only what each does around it (aborting an
+   * in-flight turn, showing a spinner, reacting to a conversation that no longer exists).
+   *
+   * The pseudonym map and `turnHistoryRef` both reset: a resumed conversation has no client-held
+   * pseudonym state to resume (server/saved_objects/conversation.ts's PRIVACY INTERACTION doc
+   * comment: the map is wire-only and never persisted) and no stored tool_call/digest pairs to
+   * replay as history either.
+   */
+  const applyLoadedConversation = (record: ConversationRecord) => {
+    // A resumed conversation opens at its latest turn (bottom), like every chat client.
+    pinnedToBottomRef.current = true;
+    updateMessages(reconstructUiMessages(record.messages));
+    turnHistoryRef.current = [];
+    setPseudonymMap([]);
+    setActiveConversationId(record.id);
+    // Optimistic concurrency: this tab's last-known version starts at whatever the GET returned —
+    // the baseline its NEXT save's `expectedVersion` is checked against.
+    conversationVersionRef.current = record.version;
+    setError(null);
+    setManagerAuthHint(false);
+    setMergeNotice(null);
+  };
+
+  /**
+   * Mount-time conversation restore: the open conversation used to live ONLY in this component's
+   * state, so a reload, a deep link, or coming back from another dashboard app landed on an empty
+   * chat with no way to tell which conversation the user had been in — and the next turn then
+   * created a second saved conversation instead of continuing theirs.
+   *
+   * The URL hash wins over this tab's stored pointer, so a pasted/bookmarked link always opens what
+   * it names. A conversation that is simply GONE (deleted in another tab, or pruned by the retention
+   * policy, which deletes on access) is not an error worth a banner: the pointer is forgotten and the
+   * user gets a clean new conversation, exactly as if they had never had one open. Any OTHER failure
+   * keeps the pointer (the conversation is probably still there; the request just failed) and
+   * surfaces the same load error the sidebar's own resume path uses.
+   */
+  useEffect(() => {
+    const restoreId =
+      parseConversationRoute(window.location.hash) ??
+      readLastConversationId(window.sessionStorage);
+    if (!restoreId) {
+      initialRestoreSettledRef.current = true;
+      return;
+    }
+    setIsRestoringConversation(true);
+    conversationsService
+      .get(restoreId)
+      .then(record => {
+        initialRestoreSettledRef.current = true;
+        applyLoadedConversation(record);
+      })
+      .catch(restoreError => {
+        initialRestoreSettledRef.current = true;
+        const status = getHttpErrorStatus(restoreError);
+        if (status === 404 || status === 403) {
+          writeLastConversationId(window.sessionStorage, null);
+          replaceConversationRoute(null);
+          return;
+        }
+        setError(
+          i18n.translate('wazuhAiAssistant.chat.conversations.loadError', {
+            defaultMessage: 'Could not load that conversation.',
+          }),
+        );
+      })
+      .finally(() => setIsRestoringConversation(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /**
+   * Keeps the two out-of-band records of "which conversation is open" in step with state, so the
+   * next reload/deep link can restore it. `replaceState` (not `push`) because opening a conversation
+   * is not a navigation the back button should have to walk back through turn by turn.
+   *
+   * Skipped until the mount-time restore above has settled — otherwise this effect's very first run
+   * would overwrite the hash it is supposed to read.
+   */
+  useEffect(() => {
+    if (!initialRestoreSettledRef.current) {
+      return;
+    }
+    writeLastConversationId(window.sessionStorage, activeConversationId);
+    replaceConversationRoute(activeConversationId);
+  }, [activeConversationId]);
+
+  // Unmount cleanup: the app shell (application.tsx) now KEEPS this component mounted across a
+  // Chat<->Settings tab switch, so unmount means the user really left the app (another dashboard
+  // app, a reload, a logout) — without this that orphans the in-flight SSE stream instead of
+  // cancelling it. `abandonActiveStream` (not a bare abort) so the
   // turn's `finally` persists what streamed in to the conversation it belongs to instead of
   // writing terminal state into a component that no longer exists. Empty deps with no exhaustive-
   // deps exemption needed: everything `abandonActiveStream` touches is a ref or a stable setter,
@@ -534,13 +656,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   };
 
   /**
-   * Resume a saved conversation: loads its full transcript and replaces the live chat with
-   * it. Reconstructed `UiChatMessage`s get FRESH ids/timestamps (the saved shape,
-   * `toPersistedMessages`'s doc comment, only ever kept `role`/`content` — no id/createdAt/table
-   * to restore). The pseudonym map and `turnHistoryRef` both reset the same as a brand new
-   * conversation: a resumed conversation has no client-held pseudonym state to resume (server/
-   * saved_objects/conversation.ts's PRIVACY INTERACTION doc comment: the map is wire-only and
-   * never persisted) and no stored tool_call/digest pairs to replay as history either.
+   * Resume a saved conversation from the sidebar: loads its full transcript and replaces the live
+   * chat with it (`applyLoadedConversation`, shared with the mount-time restore above).
    */
   const handleSelectConversation = async (id: string) => {
     if (id === activeConversationIdRef.current) {
@@ -552,19 +669,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       // resolved, immediately before the message list is replaced. Aborting before the await would
       // throw away a running answer even when the load fails and the user stays put.
       abandonActiveStream();
-      const resumed = reconstructUiMessages(record.messages);
-      // A resumed conversation opens at its latest turn (bottom), like every chat client.
-      pinnedToBottomRef.current = true;
-      updateMessages(resumed);
-      turnHistoryRef.current = [];
-      setPseudonymMap([]);
-      setActiveConversationId(id);
-      // Optimistic concurrency: this tab's last-known version starts at whatever GET just
-      // returned — the baseline its NEXT save's `expectedVersion` is checked against.
-      conversationVersionRef.current = record.version;
-      setError(null);
-      setManagerAuthHint(false);
-      setMergeNotice(null);
+      applyLoadedConversation(record);
     } catch {
       setError(
         i18n.translate('wazuhAiAssistant.chat.conversations.loadError', {
@@ -1127,11 +1232,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
   const hasProviders = providers.length > 0;
   const showNoProviderState = providersLoaded && !hasProviders;
-  const showWelcomeState = hasProviders && messages.length === 0;
   // Initial mount, before the app shell's provider load has resolved either way: neither the
   // no-provider nor the welcome state can render yet (both depend on `providersLoaded`), so without
-  // an explicit state here this window shows a blank pane.
-  const showLoadingProvidersState = !providersLoaded;
+  // an explicit state here this window shows a blank pane. Restoring a conversation shows the same
+  // spinner, so a reload lands on "loading" and then the transcript, instead of flashing the
+  // welcome state at a user who is not starting from scratch.
+  const showLoadingState = !providersLoaded || isRestoringConversation;
+  const showWelcomeState =
+    hasProviders && messages.length === 0 && !showLoadingState;
 
   const privacyBadgeLabel = privacyEnabled
     ? i18n.translate('wazuhAiAssistant.chat.privacy.on', {
@@ -1505,7 +1613,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               />
             )}
 
-            {showLoadingProvidersState && (
+            {showLoadingState && (
               <EuiFlexGroup
                 justifyContent='center'
                 alignItems='center'
@@ -1733,7 +1841,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 </>
               )}
 
-              {!showLoadingProvidersState &&
+              {!showLoadingState &&
                 !showNoProviderState &&
                 !showWelcomeState && (
                   <MessageList
@@ -1744,7 +1852,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 )}
             </div>
 
-            {!showLoadingProvidersState && !showNoProviderState && (
+            {!showLoadingState && !showNoProviderState && (
               <div style={{ position: 'sticky', bottom: 0 }}>
                 <EuiSpacer size='s' />
                 <EuiPanel

@@ -22,6 +22,9 @@ type Route = 'chat' | 'settings';
  */
 const App: React.FC<{ core: CoreStart }> = ({ core }) => {
   const [route, setRoute] = useState<Route>('chat');
+  // Settings is mounted lazily (nothing should issue its requests for a user who never opens the
+  // tab) but, once opened, stays mounted for the same reason ChatPage does — see the render below.
+  const [settingsEverOpened, setSettingsEverOpened] = useState(false);
   const [providers, setProviders] = useState<ProviderSummary[]>([]);
   const [providersLoaded, setProvidersLoaded] = useState(false);
   const [selectedProviderId, setSelectedProviderId] = useState('');
@@ -86,7 +89,10 @@ const App: React.FC<{ core: CoreStart }> = ({ core }) => {
           </EuiTab>
           <EuiTab
             isSelected={route === 'settings'}
-            onClick={() => setRoute('settings')}
+            onClick={() => {
+              setSettingsEverOpened(true);
+              setRoute('settings');
+            }}
           >
             {i18n.translate('wazuhAiAssistant.app.settingsTab', {
               defaultMessage: 'Settings',
@@ -94,8 +100,18 @@ const App: React.FC<{ core: CoreStart }> = ({ core }) => {
           </EuiTab>
         </EuiTabs>
         <EuiSpacer size='s' />
+        {/* Both tabs are HIDDEN, never unmounted. Swapping the two components on every tab switch
+            destroyed ChatPage's entire state: the visible transcript, the active conversation id
+            (so the next turn created a second saved conversation instead of continuing the one the
+            user was in), the per-conversation pseudonym map, and the tool-call history a follow-up
+            question depends on. Visiting Settings for five seconds is not a reason to lose the
+            conversation, so the Chat tab keeps living behind `display: none` — which, unlike
+            unmounting, also leaves an in-flight answer streaming into the transcript the user
+            returns to. */}
         <div style={{ flex: '1 1 auto', minHeight: 0, overflow: 'auto' }}>
-          {route === 'chat' ? (
+          <div
+            style={{ height: '100%', display: route === 'chat' ? '' : 'none' }}
+          >
             <ChatPage
               core={core}
               providers={providers}
@@ -103,10 +119,21 @@ const App: React.FC<{ core: CoreStart }> = ({ core }) => {
               providersError={providersError}
               selectedProviderId={selectedProviderId}
               onProviderChange={setSelectedProviderId}
-              onNavigateToSettings={() => setRoute('settings')}
+              onNavigateToSettings={() => {
+                setSettingsEverOpened(true);
+                setRoute('settings');
+              }}
             />
-          ) : (
-            <SettingsPage core={core} onProvidersChanged={refreshProviders} />
+          </div>
+          {settingsEverOpened && (
+            <div
+              style={{
+                height: '100%',
+                display: route === 'settings' ? '' : 'none',
+              }}
+            >
+              <SettingsPage core={core} onProvidersChanged={refreshProviders} />
+            </div>
           )}
         </div>
       </div>

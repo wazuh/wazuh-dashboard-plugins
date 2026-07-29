@@ -173,30 +173,39 @@ function lastSavedMessages(mock: jest.Mock): ChatMessage[] {
   ) as ChatMessage[];
 }
 
-describe('ChatPage — turn abandoned mid-stream', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockSettingsService.getAssistantSettings.mockResolvedValue({
-      privacyDefaultOn: false,
-      privacyDefaultPerProvider: {},
-      userCanOverride: true,
-      conversationRetentionDays: 0,
-    });
-    mockSettingsService.getSettingsAccess.mockResolvedValue({
-      administrator: true,
-      message: null,
-      defaultApiHostId: null,
-    });
-    mockConversationsService.list.mockResolvedValue([]);
-    mockConversationsService.create.mockResolvedValue(
-      conversationRecord({ id: 'conv-new', version: 'v1' }),
-    );
-    mockConversationsService.update.mockResolvedValue(
-      conversationRecord({ version: 'v2' }),
-    );
-    mockConversationsService.get.mockResolvedValue(conversationRecord());
+/** An http error shaped the way `common/http-status.ts` reads a status off an OSD http failure. */
+function httpError(status: number): Error & { response: { status: number } } {
+  return Object.assign(new Error(`HTTP ${status}`), {
+    response: { status },
   });
+}
 
+beforeEach(() => {
+  jest.clearAllMocks();
+  window.location.hash = '';
+  window.sessionStorage.clear();
+  mockSettingsService.getAssistantSettings.mockResolvedValue({
+    privacyDefaultOn: false,
+    privacyDefaultPerProvider: {},
+    userCanOverride: true,
+    conversationRetentionDays: 0,
+  });
+  mockSettingsService.getSettingsAccess.mockResolvedValue({
+    administrator: true,
+    message: null,
+    defaultApiHostId: null,
+  });
+  mockConversationsService.list.mockResolvedValue([]);
+  mockConversationsService.create.mockResolvedValue(
+    conversationRecord({ id: 'conv-new', version: 'v1' }),
+  );
+  mockConversationsService.update.mockResolvedValue(
+    conversationRecord({ version: 'v2' }),
+  );
+  mockConversationsService.get.mockResolvedValue(conversationRecord());
+});
+
+describe('ChatPage — turn abandoned mid-stream', () => {
   it('aborts the in-flight stream when the user opens another conversation', async () => {
     const stream = createControllableStream();
     mockStreamChat.mockImplementation(
@@ -425,5 +434,154 @@ describe('ChatPage — turn abandoned mid-stream', () => {
     // conversation must not be reseeded into this one.
     const privacyPayload = mockStreamChat.mock.calls[1][3];
     expect(privacyPayload).toBeUndefined();
+  });
+});
+
+describe('ChatPage — restoring the open conversation', () => {
+  it('restores the conversation named by the URL hash on mount', async () => {
+    window.location.hash = '#/conversation/conv-b';
+
+    renderChatPage();
+
+    await waitFor(() =>
+      expect(screen.getByText('earlier question')).toBeInTheDocument(),
+    );
+    expect(mockConversationsService.get).toHaveBeenCalledWith('conv-b');
+  });
+
+  it('falls back to this tab’s stored pointer when the URL carries no conversation', async () => {
+    window.sessionStorage.setItem(
+      'wazuhAiAssistant.lastConversation',
+      'conv-b',
+    );
+
+    renderChatPage();
+
+    await waitFor(() =>
+      expect(screen.getByText('earlier question')).toBeInTheDocument(),
+    );
+    expect(mockConversationsService.get).toHaveBeenCalledWith('conv-b');
+  });
+
+  it('prefers the URL hash over the stored pointer', async () => {
+    window.location.hash = '#/conversation/conv-from-url';
+    window.sessionStorage.setItem(
+      'wazuhAiAssistant.lastConversation',
+      'conv-from-storage',
+    );
+    mockConversationsService.get.mockResolvedValue(
+      conversationRecord({ id: 'conv-from-url' }),
+    );
+
+    renderChatPage();
+
+    await waitFor(() =>
+      expect(mockConversationsService.get).toHaveBeenCalledWith(
+        'conv-from-url',
+      ),
+    );
+    expect(mockConversationsService.get).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not fetch anything when there is nothing to restore', async () => {
+    renderChatPage();
+
+    await waitFor(() =>
+      expect(
+        screen.getByText('Ask the AI Assistant something'),
+      ).toBeInTheDocument(),
+    );
+    expect(mockConversationsService.get).not.toHaveBeenCalled();
+  });
+
+  it('starts clean and forgets the pointer when the conversation is gone', async () => {
+    window.location.hash = '#/conversation/conv-gone';
+    window.sessionStorage.setItem(
+      'wazuhAiAssistant.lastConversation',
+      'conv-gone',
+    );
+    mockConversationsService.get.mockRejectedValue(httpError(404));
+
+    renderChatPage();
+
+    // The welcome state, not an error banner: a deleted or retention-pruned conversation is an
+    // expected outcome, not a failure the user can act on.
+    await waitFor(() =>
+      expect(
+        screen.getByText('Ask the AI Assistant something'),
+      ).toBeInTheDocument(),
+    );
+    expect(
+      screen.queryByText('Could not load that conversation.'),
+    ).not.toBeInTheDocument();
+    expect(
+      window.sessionStorage.getItem('wazuhAiAssistant.lastConversation'),
+    ).toBeNull();
+    expect(window.location.hash).toBe('#/');
+  });
+
+  it('keeps the pointer and reports the failure when the load fails for another reason', async () => {
+    window.location.hash = '#/conversation/conv-b';
+    window.sessionStorage.setItem(
+      'wazuhAiAssistant.lastConversation',
+      'conv-b',
+    );
+    mockConversationsService.get.mockRejectedValue(httpError(503));
+
+    renderChatPage();
+
+    await waitFor(() =>
+      expect(
+        screen.getByText('Could not load that conversation.'),
+      ).toBeInTheDocument(),
+    );
+    expect(
+      window.sessionStorage.getItem('wazuhAiAssistant.lastConversation'),
+    ).toBe('conv-b');
+  });
+
+  it('records the conversation created by the first completed turn', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await waitFor(() =>
+      expect(
+        screen.getByText('Ask the AI Assistant something'),
+      ).toBeInTheDocument(),
+    );
+    await sendMessage('first question');
+    stream.push({ type: 'delta', content: 'an answer' });
+    stream.end();
+
+    await waitFor(() =>
+      expect(mockConversationsService.create).toHaveBeenCalled(),
+    );
+    // conv-new is the id the mocked POST returns — a later reload now lands back in this
+    // conversation instead of an empty chat.
+    await waitFor(() =>
+      expect(window.location.hash).toBe('#/conversation/conv-new'),
+    );
+    expect(
+      window.sessionStorage.getItem('wazuhAiAssistant.lastConversation'),
+    ).toBe('conv-new');
+  });
+
+  it('clears the recorded conversation when the user starts a new one', async () => {
+    window.location.hash = '#/conversation/conv-b';
+
+    renderChatPage();
+    await waitFor(() =>
+      expect(screen.getByText('earlier question')).toBeInTheDocument(),
+    );
+
+    fireEvent.click(screen.getByText('New conversation'));
+
+    await waitFor(() => expect(window.location.hash).toBe('#/'));
+    expect(
+      window.sessionStorage.getItem('wazuhAiAssistant.lastConversation'),
+    ).toBeNull();
   });
 });
