@@ -93,11 +93,10 @@ retry):
 - `script` anywhere (query, sort, aggs, `script_fields`, `runtime_mappings`) — hard block.
 - `regexp` blocked; `wildcard`/`query_string` values with leading `*`/`?` blocked.
 - Date `range` on time fields must be bounded on both sides; span ≤ 90 days.
-- A numeric `range` against a field re-typed from a Wazuh 4.x numeric type to a Wazuh 5.0
-  keyword (currently `wazuh.rule.level`, whose values are now categorical severity words such
-  as `critical`/`high`/`medium`/`low`) is rejected outright: OpenSearch does not error on a
-  numeric range against a keyword field, it just silently matches nothing, which would look
-  like a legitimate empty result to the model.
+- A numeric `range` against a keyword-typed severity field (currently `wazuh.rule.level`,
+  whose values are categorical severity words such as `critical`/`high`/`medium`/`low`) is
+  rejected outright: OpenSearch does not error on a numeric range against a keyword field, it
+  just silently matches nothing, which would look like a legitimate empty result to the model.
 - Bucket aggregations only on a vetted low-cardinality field allowlist; bucket `size` ≤ 100;
   at most 5 top-level aggregations.
 - Index pattern checked against the allowlist before anything else.
