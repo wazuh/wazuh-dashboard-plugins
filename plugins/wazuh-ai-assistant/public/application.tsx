@@ -11,6 +11,10 @@ import { ProviderSummary } from '../common/types';
 
 type Route = 'chat' | 'settings';
 
+/** How long the first provider load may take before the app stops waiting on it — see
+ * `refreshProviders`. Generous for a slow cluster, short enough that no one stares at a spinner. */
+const PROVIDERS_LOAD_TIMEOUT_MS = 20_000;
+
 /**
  * Provider list/selection is owned here (not by ChatPage) so a tab switch away from Chat and back
  * never loses the selection, and so SettingsPage can report back through onProvidersChanged
@@ -32,9 +36,25 @@ const App: React.FC<{ core: CoreStart }> = ({ core }) => {
   const [settingsService] = useState(() => new SettingsService(core.http));
 
   const refreshProviders = useCallback(() => {
+    // Deadline for the FIRST load. `providersLoaded` gates the Chat tab's whole rendering — until it
+    // flips, the tab shows a spinner and nothing else — so a request that never settles (a hung
+    // proxy, a dropped connection) left the chat spinning forever with no explanation and no way
+    // out. On expiry the app renders its normal "could not load providers" state instead, and a
+    // later successful response still takes effect.
+    const deadline = setTimeout(() => {
+      setProvidersError(
+        i18n.translate('wazuhAiAssistant.chat.providersLoadTimeout', {
+          defaultMessage:
+            'Loading the configured providers timed out. Reload the page, or check the Settings tab.',
+        }),
+      );
+      setProvidersLoaded(true);
+    }, PROVIDERS_LOAD_TIMEOUT_MS);
+
     settingsService
       .list()
       .then(list => {
+        clearTimeout(deadline);
         setProviders(list);
         setProvidersError(null);
         setSelectedProviderId(current => {
@@ -47,6 +67,7 @@ const App: React.FC<{ core: CoreStart }> = ({ core }) => {
         });
       })
       .catch(() => {
+        clearTimeout(deadline);
         setProvidersError(
           i18n.translate('wazuhAiAssistant.chat.providersLoadError', {
             defaultMessage:

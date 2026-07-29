@@ -205,6 +205,9 @@ export interface PersistedChatMessage extends ChatMessage {
   createdAt?: number;
   /** The result table this message was displayed with, row-capped at save time. */
   table?: TableSpec;
+  /** The answer was cut short (Stop, navigation, a dropped connection) rather than completed, so a
+   * resumed conversation can label it instead of presenting a partial answer as a finished one. */
+  interrupted?: boolean;
 }
 
 export interface ConversationRecord extends ConversationSummary {

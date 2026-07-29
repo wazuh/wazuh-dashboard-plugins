@@ -726,3 +726,164 @@ describe('ChatPage — a resumed conversation is the same conversation', () => {
     expect(sentMessages[1].toolCalls?.[0].id).toBe('t1');
   });
 });
+
+describe('ChatPage — interrupted turns and failed saves', () => {
+  it('labels a stopped answer as interrupted and offers a retry', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('first question');
+    stream.push({ type: 'delta', content: 'half an ans' });
+    await waitFor(() =>
+      expect(screen.getByText('half an ans')).toBeInTheDocument(),
+    );
+
+    fireEvent.click(screen.getByText('Stop'));
+
+    await waitFor(() =>
+      expect(screen.getByText('Response interrupted')).toBeInTheDocument(),
+    );
+    expect(screen.getByText('Retry')).toBeInTheDocument();
+    // The partial answer is persisted AS interrupted, so a reload does not present it as finished.
+    await waitFor(() =>
+      expect(mockConversationsService.update).toHaveBeenCalled(),
+    );
+    const saved = lastSavedMessages(mockConversationsService.update);
+    expect(saved[saved.length - 1].interrupted).toBe(true);
+  });
+
+  it('does not label a completed answer as interrupted', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('first question');
+    stream.push({ type: 'delta', content: 'a full answer' });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() =>
+      expect(mockConversationsService.update).toHaveBeenCalled(),
+    );
+    expect(screen.queryByText('Response interrupted')).not.toBeInTheDocument();
+    const saved = lastSavedMessages(mockConversationsService.update);
+    expect(saved[saved.length - 1].interrupted).toBeUndefined();
+  });
+
+  it('retrying replaces the interrupted answer instead of appending a second one', async () => {
+    const first = createControllableStream();
+    const second = createControllableStream();
+    mockStreamChat
+      .mockImplementationOnce((_providerId, _messages, signal: AbortSignal) =>
+        first.generate(signal),
+      )
+      .mockImplementationOnce((_providerId, _messages, signal: AbortSignal) =>
+        second.generate(signal),
+      );
+
+    renderChatPage();
+    await sendMessage('first question');
+    first.push({ type: 'delta', content: 'half an ans' });
+    await waitFor(() =>
+      expect(screen.getByText('half an ans')).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByText('Stop'));
+    await waitFor(() =>
+      expect(screen.getByText('Response interrupted')).toBeInTheDocument(),
+    );
+
+    fireEvent.click(screen.getByText('Retry'));
+    await waitFor(() => expect(mockStreamChat).toHaveBeenCalledTimes(2));
+    second.push({ type: 'delta', content: 'the whole answer' });
+    second.push({ type: 'done' });
+    second.end();
+
+    await waitFor(() =>
+      expect(screen.getByText('the whole answer')).toBeInTheDocument(),
+    );
+    // The partial answer is gone, and the question was not asked twice.
+    expect(screen.queryByText('half an ans')).not.toBeInTheDocument();
+    expect(screen.getAllByText('first question')).toHaveLength(1);
+    // The retry re-sends the SAME question, with no stale assistant turn in the history.
+    const resentRoles = (
+      mockStreamChat.mock.calls[1][1] as PersistedChatMessage[]
+    ).map(message => message.role);
+    expect(resentRoles).toEqual(['user']);
+  });
+
+  it('tells the user when the conversation could not be saved, and stops once a save succeeds', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    mockConversationsService.create.mockRejectedValueOnce(httpError(413));
+
+    renderChatPage();
+    await sendMessage('first question');
+
+    await waitFor(() =>
+      expect(
+        screen.getByText('This conversation is not being saved'),
+      ).toBeInTheDocument(),
+    );
+
+    // The next turn's save succeeds and the notice goes away on its own.
+    stream.push({ type: 'delta', content: 'an answer' });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() =>
+      expect(
+        screen.queryByText('This conversation is not being saved'),
+      ).not.toBeInTheDocument(),
+    );
+  });
+
+  it('does not raise the save notice for a 401, which has its own callout', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    mockConversationsService.create.mockRejectedValue(httpError(401));
+
+    renderChatPage();
+    await sendMessage('first question');
+
+    await waitFor(() =>
+      expect(screen.getByText('Your session expired')).toBeInTheDocument(),
+    );
+    expect(
+      screen.queryByText('This conversation is not being saved'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('restores an interrupted answer as interrupted', async () => {
+    mockConversationsService.get.mockResolvedValue(
+      conversationRecord({
+        messages: [
+          { role: 'user', content: 'earlier question', createdAt: 1 },
+          {
+            role: 'assistant',
+            content: 'half an ans',
+            createdAt: 2,
+            interrupted: true,
+          },
+        ],
+      }),
+    );
+    window.location.hash = '#/conversation/conv-b';
+
+    renderChatPage();
+
+    await waitFor(() =>
+      expect(screen.getByText('half an ans')).toBeInTheDocument(),
+    );
+    expect(screen.getByText('Response interrupted')).toBeInTheDocument();
+    expect(screen.getByText('Retry')).toBeInTheDocument();
+  });
+});

@@ -9,6 +9,12 @@ interface MessageListProps {
   aiAvatarUrl: string;
   /** Threaded down to every MessageBubble's ResultTable; see discover-link.tsx. */
   resolveDiscoverUrl: ResolveDiscoverUrl;
+  /**
+   * Re-asks the last question. Passed to the LAST message's bubble only, and only when that message
+   * is an interrupted assistant answer — retrying an older turn would mean rewriting the middle of
+   * the conversation, which nothing here supports. `undefined` while a turn is generating.
+   */
+  onRetryLastTurn?: () => void;
 }
 
 /**
@@ -38,6 +44,7 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
   messages,
   aiAvatarUrl,
   resolveDiscoverUrl,
+  onRetryLastTurn,
 }) {
   return (
     <div>
@@ -47,6 +54,9 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
             message={message}
             aiAvatarUrl={aiAvatarUrl}
             resolveDiscoverUrl={resolveDiscoverUrl}
+            onRetry={
+              index === messages.length - 1 ? onRetryLastTurn : undefined
+            }
           />
           {index < messages.length - 1 && <EuiSpacer size='m' />}
         </React.Fragment>

@@ -48,6 +48,8 @@ export interface ChatHistoryMessage {
   createdAt: number;
   /** The result table this message was displayed with, when it had one. */
   table?: TableSpec;
+  /** The answer was cut short rather than completed — see `PersistedChatMessage.interrupted`. */
+  interrupted?: boolean;
 }
 
 let messageCounter = 0;
@@ -273,6 +275,7 @@ export function toPersistedMessages(
           ? message.content.slice(0, CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH)
           : message.content,
       createdAt: message.createdAt,
+      ...(message.interrupted ? { interrupted: true } : {}),
     };
     const table = toPersistedTable(message.table);
     const toolEntries: PersistedChatMessage[] = [];
@@ -411,6 +414,7 @@ export function reconstructConversation(
       content: message.content,
       createdAt: message.createdAt ?? Date.now(),
       ...(message.table ? { table: message.table } : {}),
+      ...(message.interrupted ? { interrupted: true } : {}),
     });
     if (message.role === 'assistant' && pendingExchanges.length > 0) {
       turnRecords.push({

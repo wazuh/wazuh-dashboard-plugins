@@ -131,6 +131,8 @@
 - Fixed the AI Assistant chat coming back empty after a reload, a deep link, or a visit to its Settings tab: the open conversation is now restored from the URL and the tab's own session, and the Chat tab is no longer destroyed when Settings is opened [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
 - Fixed the AI Assistant losing a question asked while a reload or navigation interrupted the answer: the question is now saved before the response starts generating [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
 - Fixed a resumed AI Assistant conversation losing its result tables, its real message times, and the tool-call history a follow-up question depends on [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
+- Fixed the AI Assistant presenting an answer cut short by Stop, a navigation, or a dropped connection as though it were complete: it is now labelled as interrupted and can be retried [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
+- Fixed the AI Assistant silently failing to save a conversation, and the chat hanging on a loading spinner when the provider list never responded [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
 
 ### Removed
 

@@ -329,6 +329,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // it gets its own distinct, persistent (not auto-dismissed) callout with a reload action.
   const [sessionExpired, setSessionExpired] = useState(false);
 
+  // A save failed and the conversation on screen is now ahead of what is stored. Auto-save used to
+  // swallow every failure silently, so a user could keep chatting for an hour believing their
+  // history was being kept when it had stopped being saved after the first rejection.
+  const [saveFailed, setSaveFailed] = useState(false);
+
   // Conversation restore (common/conversation-location.ts): true while the conversation named by the
   // URL hash / this tab's stored pointer is being fetched on mount, so the chat shows a spinner
   // instead of flashing the welcome state and then swapping it for a transcript.
@@ -869,18 +874,24 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           }
         }
         refreshConversations();
+        if (args.adoptAsActive) {
+          setSaveFailed(false);
+        }
       } catch (persistError) {
         // Session-expiry recovery UX: a conversation save can 401 the same way the chat POST
         // can (same dashboard session, same 15-minute TTL) — this is the "and from the conversation
         // save" half of that fix; the chat POST's own 401 is handled in runChatStream's event loop.
         if (getHttpErrorStatus(persistError) === 401) {
           handleSessionExpired();
+          return;
         }
-        // Otherwise non-fatal: no separate error banner for a persistence hiccup (version-conflict
-        // notices are the one exception, surfaced by saveConversationWithMerge itself above) — it
-        // would compete with the chat's own error state for something that doesn't block the
-        // conversation itself from continuing. The next completed turn's auto-save simply retries
-        // with the (still accurate, still-full) message list.
+        // The chat itself keeps working — the transcript on screen is intact and the next turn's
+        // save retries with the full message list — but the user is TOLD, because "your history
+        // stopped being saved" is not something to discover later. Only for the conversation on
+        // screen: a notice about a conversation the user already left would be unactionable.
+        if (args.adoptAsActive) {
+          setSaveFailed(true);
+        }
       }
     };
     // `task` handles its own errors, so the queue can never be poisoned by a rejected link.
@@ -963,6 +974,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // so `detectManagerAuthError` can be checked once the stream ends, over exactly the text THIS
     // stream produced.
     let accumulatedContent = '';
+    /**
+     * Whether this turn reached a terminal state of its own — a `done` frame, or an `error`/
+     * `auth_expired` that has already been reported. Anything else means the stream simply STOPPED:
+     * Stop was pressed, the user navigated away, or the connection dropped. That case used to be
+     * indistinguishable from a finished answer, so a truncated response was saved and later resumed
+     * as though it were complete.
+     */
+    let turnCompleted = false;
 
     // Delta batching (typing-lag/streaming-jank fix): a fast-streaming provider can
     // emit a `delta` event per token, and without batching EVERY one committed its own React state
@@ -1083,7 +1102,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             );
             return additions.length > 0 ? [...current, ...additions] : current;
           });
+        } else if (event.type === 'done') {
+          turnCompleted = true;
         } else if (event.type === 'error') {
+          turnCompleted = true;
           flushPendingEmptyTable();
           if (!isTurnStillActive()) {
             // An error banner for a conversation the user already left is pure noise — the turn's
@@ -1113,6 +1135,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           // persistent callout instead of the free-form error banner. Unlike the branch above this
           // is NOT gated on the turn still being active: the session is gone for the whole app, so
           // the callout is just as relevant to whatever conversation is now on screen.
+          turnCompleted = true;
           flushPendingEmptyTable();
           handleSessionExpired();
           if (!isTurnStillActive()) {
@@ -1153,6 +1176,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   content: accumulatedContent,
                   table: committedTable,
                   isStreaming: false,
+                  ...(turnCompleted ? {} : { interrupted: true }),
                 }
               : message,
           )
@@ -1181,7 +1205,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         updateMessages(current =>
           current.map(message =>
             message.id === assistantMessageId
-              ? { ...message, isStreaming: false }
+              ? {
+                  ...message,
+                  isStreaming: false,
+                  ...(turnCompleted ? {} : { interrupted: true }),
+                }
               : message,
           ),
         );
@@ -1210,27 +1238,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       ? { enabled: privacyEnabled, map: pseudonymMap }
       : undefined;
 
-  const handleSend = async (text: string) => {
-    if (!selectedProviderId) {
-      setError(
-        i18n.translate('wazuhAiAssistant.chat.noProviderError', {
-          defaultMessage:
-            'Configure a provider in the Settings tab before starting a chat.',
-        }),
-      );
-      return;
-    }
-
-    setError(null);
-    setManagerAuthHint(false);
-    setMergeNotice(null);
-    setSessionExpired(false);
-    const userMessage: UiChatMessage = {
-      id: nextMessageId(),
-      role: 'user',
-      content: text,
-      createdAt: Date.now(),
-    };
+  /**
+   * Runs one assistant turn over `history`, whose LAST message must be the user message being
+   * answered. Shared by `handleSend` (which appends a new question) and `handleRetryLastTurn` (which
+   * re-answers the existing last question after dropping the interrupted answer), so both go through
+   * exactly the same placeholder/history/save/stream sequence.
+   */
+  const startTurn = async (history: UiChatMessage[]) => {
     const assistantMessageId = nextMessageId();
     const assistantMessage: UiChatMessage = {
       id: assistantMessageId,
@@ -1240,7 +1254,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       createdAt: Date.now(),
     };
 
-    const history = [...messages, userMessage];
     // Built from turnHistoryRef BEFORE this turn's own (still-empty) record is registered below, so
     // it only ever reflects PRIOR completed turns — see buildOutgoingMessages's doc comment.
     const outgoingMessages = buildOutgoingMessages(
@@ -1282,6 +1295,67 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       outgoingMessages,
       privacyPayload,
     });
+  };
+
+  const handleSend = async (text: string) => {
+    if (!selectedProviderId) {
+      setError(
+        i18n.translate('wazuhAiAssistant.chat.noProviderError', {
+          defaultMessage:
+            'Configure a provider in the Settings tab before starting a chat.',
+        }),
+      );
+      return;
+    }
+
+    setError(null);
+    setManagerAuthHint(false);
+    setMergeNotice(null);
+    setSessionExpired(false);
+    setSaveFailed(false);
+    await startTurn([
+      ...messages,
+      {
+        id: nextMessageId(),
+        role: 'user',
+        content: text,
+        createdAt: Date.now(),
+      },
+    ]);
+  };
+
+  /**
+   * Re-asks the question whose answer was interrupted. The interrupted answer is dropped from the
+   * transcript first, so the retry replaces it rather than appending a second answer to the same
+   * question — and the pre-send save then persists the conversation without it, which is what makes
+   * a retried turn look like one turn after a reload too.
+   *
+   * Only ever offered for the LAST message (message-list.tsx) and only while nothing is generating,
+   * so there is no case where this rewrites the middle of a conversation.
+   */
+  const handleRetryLastTurn = async () => {
+    const last = messages[messages.length - 1];
+    if (
+      isGenerating ||
+      !last ||
+      last.role !== 'assistant' ||
+      !last.interrupted
+    ) {
+      return;
+    }
+    const history = messages.slice(0, -1);
+    if (history[history.length - 1]?.role !== 'user') {
+      return;
+    }
+    // The dropped answer's tool exchanges go with it: they belong to a turn that is being replaced.
+    turnHistoryRef.current = turnHistoryRef.current.filter(
+      turn => turn.assistantMessageId !== last.id,
+    );
+    setError(null);
+    setManagerAuthHint(false);
+    setSaveFailed(false);
+    updateMessages(history);
+    await startTurn(history);
   };
 
   const hasProviders = providers.length > 0;
@@ -1667,6 +1741,30 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               />
             )}
 
+            {/* A failed auto-save is surfaced instead of swallowed: the conversation on screen is
+                ahead of what is stored, which the user cannot infer from anything else. Not
+                dismissible and not an action — the next turn's save retries on its own, and clears
+                this as soon as one succeeds. */}
+            {saveFailed && (
+              <StatusCallout
+                title={i18n.translate(
+                  'wazuhAiAssistant.chat.conversations.saveFailed.title',
+                  {
+                    defaultMessage: 'This conversation is not being saved',
+                  },
+                )}
+                color='warning'
+                iconType='alert'
+                body={i18n.translate(
+                  'wazuhAiAssistant.chat.conversations.saveFailed.body',
+                  {
+                    defaultMessage:
+                      'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
+                  },
+                )}
+              />
+            )}
+
             {showLoadingState && (
               <EuiFlexGroup
                 justifyContent='center'
@@ -1902,6 +2000,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     messages={messages}
                     aiAvatarUrl={aiAvatarUrl}
                     resolveDiscoverUrl={resolveDiscoverUrl}
+                    // Withheld while generating: retrying would abandon the turn already running.
+                    onRetryLastTurn={
+                      isGenerating ? undefined : handleRetryLastTurn
+                    }
                   />
                 )}
             </div>

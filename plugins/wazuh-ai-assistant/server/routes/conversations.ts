@@ -303,6 +303,7 @@ const chatMessageSchema = schema.object({
    * a client's clock is its own and this value is display-only. */
   createdAt: schema.maybe(schema.number({ min: 0 })),
   table: schema.maybe(tableSpecSchema),
+  interrupted: schema.maybe(schema.boolean()),
 });
 
 const createOrReplaceBodySchema = schema.object({

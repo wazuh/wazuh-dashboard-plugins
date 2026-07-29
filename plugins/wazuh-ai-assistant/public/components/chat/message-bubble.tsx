@@ -8,6 +8,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiAvatar,
+  EuiButtonEmpty,
   EuiMarkdownFormat,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
@@ -25,6 +26,12 @@ export interface UiChatMessage {
   /** Transient progress line from a `status` stream event (e.g. "Querying Wazuh..."). */
   statusMessage?: string;
   createdAt: number;
+  /**
+   * The turn ended before the answer was complete — the user pressed Stop, navigated away, or the
+   * connection dropped. Persisted, so a resumed conversation still shows which answer is a partial
+   * one instead of presenting it as finished.
+   */
+  interrupted?: boolean;
 }
 
 interface MessageBubbleProps {
@@ -33,6 +40,12 @@ interface MessageBubbleProps {
   aiAvatarUrl: string;
   /** Threaded down to ResultTable's "Open in Discover" link; see discover-link.tsx. */
   resolveDiscoverUrl: ResolveDiscoverUrl;
+  /**
+   * Re-asks the question this interrupted answer belongs to. Absent when retrying is not possible
+   * right now (another turn is generating, or this is not the conversation's last turn), in which
+   * case the interrupted notice is shown without an action.
+   */
+  onRetry?: () => void;
 }
 
 function formatTimestamp(epochMs: number): string {
@@ -60,6 +73,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   message,
   aiAvatarUrl,
   resolveDiscoverUrl,
+  onRetry,
 }) => {
   const isUser = message.role === 'user';
   // 'accent' rendered pink in this EUI theme, which reads off-brand for Wazuh; 'subdued' is a
@@ -146,6 +160,43 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
               spec={message.table}
               resolveDiscoverUrl={resolveDiscoverUrl}
             />
+          </>
+        )}
+        {/* An interrupted answer is labelled as one rather than left looking complete — the whole
+            point is that the reader can tell this text stops mid-thought on purpose. */}
+        {message.interrupted && !message.isStreaming && (
+          <>
+            <EuiSpacer size='xs' />
+            <EuiFlexGroup
+              gutterSize='s'
+              alignItems='center'
+              responsive={false}
+              justifyContent='flexStart'
+            >
+              <EuiFlexItem grow={false}>
+                <EuiText size='xs'>
+                  <EuiTextColor color='subdued'>
+                    {i18n.translate('wazuhAiAssistant.chat.interrupted', {
+                      defaultMessage: 'Response interrupted',
+                    })}
+                  </EuiTextColor>
+                </EuiText>
+              </EuiFlexItem>
+              {onRetry && (
+                <EuiFlexItem grow={false}>
+                  <EuiButtonEmpty
+                    size='xs'
+                    flush='both'
+                    iconType='refresh'
+                    onClick={onRetry}
+                  >
+                    {i18n.translate('wazuhAiAssistant.chat.retry', {
+                      defaultMessage: 'Retry',
+                    })}
+                  </EuiButtonEmpty>
+                </EuiFlexItem>
+              )}
+            </EuiFlexGroup>
           </>
         )}
       </EuiPanel>
