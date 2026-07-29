@@ -32,6 +32,7 @@ import {
   ProviderSummary,
   PseudonymEntry,
   TableSpec,
+  ToolCall,
 } from '../../../common/types';
 import { mergeConversationMessages } from '../../../common/conversation-merge';
 import { getHttpErrorStatus } from '../../../common/http-status';
@@ -948,6 +949,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // single empty table if it's the only one" (honest-empty stays correct). A plain local
     // variable, not a ref/state: scoped to this one stream's sequential event loop only.
     let pendingEmptyTable: TableSpec | undefined;
+    /** The tool calls issued this turn, in order — mirrors what the bubble displays so the abandoned
+     * path can rebuild the turn without reading React state. */
+    let committedToolCalls: ToolCall[] = [];
     /** The table this turn will be remembered with — mirrors what the flushes below commit to
      * React state, so the abandoned path can rebuild the turn without reading that state. */
     let committedTable: TableSpec | undefined;
@@ -1084,6 +1088,19 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           // has no bubble type for it; it lives in this turn's record until a LATER turn's
           // buildOutgoingMessages call resends it, or until the turn is saved).
           turnRecord?.toolExchanges.push({ toolCall: event.toolCall });
+          // Also surfaced in the bubble (message-bubble.tsx's collapsed "queries executed" panel),
+          // so the reader can check the query behind the answer as it runs.
+          committedToolCalls = [...committedToolCalls, event.toolCall];
+          if (isTurnStillActive()) {
+            const toolCallsForDisplay = committedToolCalls;
+            updateMessages(current =>
+              current.map(message =>
+                message.id === assistantMessageId
+                  ? { ...message, toolCalls: toolCallsForDisplay }
+                  : message,
+              ),
+            );
+          }
         } else if (event.type === 'digest') {
           const exchange = turnRecord?.toolExchanges.find(
             entry => entry.toolCall.id === event.toolCallId,
@@ -1175,6 +1192,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   ...message,
                   content: accumulatedContent,
                   table: committedTable,
+                  ...(committedToolCalls.length > 0
+                    ? { toolCalls: committedToolCalls }
+                    : {}),
                   isStreaming: false,
                   ...(turnCompleted ? {} : { interrupted: true }),
                 }
@@ -1335,15 +1355,19 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    */
   const handleRetryLastTurn = async () => {
     const last = messages[messages.length - 1];
-    if (
-      isGenerating ||
-      !last ||
-      last.role !== 'assistant' ||
-      !last.interrupted
-    ) {
+    if (isGenerating || !last) {
       return;
     }
-    const history = messages.slice(0, -1);
+    // Two shapes of unfinished turn. An interrupted ASSISTANT message is the one this tab marked
+    // itself (Stop, or leaving while the page stayed alive). A trailing USER message is the harder
+    // case: a reload or a navigation killed the page mid-answer, so nothing was left running to mark
+    // anything — the question was saved before generating started and that is all there is.
+    const isInterruptedAnswer =
+      last.role === 'assistant' && last.interrupted === true;
+    if (!isInterruptedAnswer && last.role !== 'user') {
+      return;
+    }
+    const history = isInterruptedAnswer ? messages.slice(0, -1) : messages;
     if (history[history.length - 1]?.role !== 'user') {
       return;
     }

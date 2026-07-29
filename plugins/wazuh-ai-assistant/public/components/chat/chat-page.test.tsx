@@ -887,3 +887,151 @@ describe('ChatPage — interrupted turns and failed saves', () => {
     expect(screen.getByText('Retry')).toBeInTheDocument();
   });
 });
+
+describe('ChatPage — an unanswered question is a retryable turn', () => {
+  it('offers a retry for a restored conversation that ends on a question', async () => {
+    // What a reload mid-answer leaves behind: the question was saved before generating started, and
+    // nothing survived to mark an assistant message as interrupted.
+    mockConversationsService.get.mockResolvedValue(
+      conversationRecord({
+        messages: [{ role: 'user', content: 'earlier question', createdAt: 1 }],
+      }),
+    );
+    window.location.hash = '#/conversation/conv-b';
+
+    renderChatPage();
+
+    await waitFor(() =>
+      expect(screen.getByText('earlier question')).toBeInTheDocument(),
+    );
+    expect(screen.getByText('Response interrupted')).toBeInTheDocument();
+    expect(screen.getByText('Retry')).toBeInTheDocument();
+  });
+
+  it('retrying an unanswered question re-asks it without duplicating it', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+    mockConversationsService.get.mockResolvedValue(
+      conversationRecord({
+        messages: [{ role: 'user', content: 'earlier question', createdAt: 1 }],
+      }),
+    );
+    window.location.hash = '#/conversation/conv-b';
+
+    renderChatPage();
+    await waitFor(() => expect(screen.getByText('Retry')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Retry'));
+    await waitFor(() => expect(mockStreamChat).toHaveBeenCalledTimes(1));
+    stream.push({ type: 'delta', content: 'the answer' });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() =>
+      expect(screen.getByText('the answer')).toBeInTheDocument(),
+    );
+    expect(screen.getAllByText('earlier question')).toHaveLength(1);
+    expect(screen.queryByText('Response interrupted')).not.toBeInTheDocument();
+    expect(
+      (mockStreamChat.mock.calls[0][1] as PersistedChatMessage[]).map(
+        message => message.content,
+      ),
+    ).toEqual(['earlier question']);
+  });
+
+  it('does not offer a retry while a turn is generating', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('first question');
+
+    // The transcript momentarily ends on the question, but a turn IS running for it.
+    expect(screen.queryByText('Retry')).not.toBeInTheDocument();
+  });
+});
+
+describe('ChatPage — feedback while a turn runs', () => {
+  it('shows placeholder lines until the first token arrives, then the text', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    const { container } = renderChatPage();
+    await sendMessage('first question');
+
+    await waitFor(() =>
+      expect(
+        container.querySelectorAll('.euiLoadingContent').length,
+      ).toBeGreaterThan(0),
+    );
+
+    stream.push({ type: 'delta', content: 'the answer' });
+
+    await waitFor(() =>
+      expect(screen.getByText('the answer')).toBeInTheDocument(),
+    );
+    expect(container.querySelectorAll('.euiLoadingContent')).toHaveLength(0);
+  });
+
+  it('shows the query that was executed, with its arguments', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('how many alerts?');
+    stream.push({
+      type: 'tool_call',
+      toolCall: {
+        id: 't1',
+        name: 'search_wazuh_data',
+        arguments: { index_pattern: 'wazuh-alerts-*', size: 5 },
+      },
+    });
+
+    await waitFor(() =>
+      expect(screen.getByText('1 query executed')).toBeInTheDocument(),
+    );
+    expect(screen.getByText('search_wazuh_data')).toBeInTheDocument();
+    expect(screen.getByText(/wazuh-alerts-\*/)).toBeInTheDocument();
+  });
+
+  it('shows the executed queries again on a resumed conversation', async () => {
+    mockConversationsService.get.mockResolvedValue(
+      conversationRecord({
+        messages: [
+          { role: 'user', content: 'how many?', createdAt: 1 },
+          {
+            role: 'assistant',
+            content: '',
+            toolCalls: [
+              {
+                id: 't1',
+                name: 'search_wazuh_data',
+                arguments: { index_pattern: 'wazuh-alerts-*' },
+              },
+            ],
+          },
+          { role: 'tool', content: '{"count":42}', toolCallId: 't1' },
+          { role: 'assistant', content: '42 alerts', createdAt: 2 },
+        ],
+      }),
+    );
+    window.location.hash = '#/conversation/conv-b';
+
+    renderChatPage();
+
+    await waitFor(() =>
+      expect(screen.getByText('42 alerts')).toBeInTheDocument(),
+    );
+    expect(screen.getByText('1 query executed')).toBeInTheDocument();
+    expect(screen.getByText('search_wazuh_data')).toBeInTheDocument();
+  });
+});

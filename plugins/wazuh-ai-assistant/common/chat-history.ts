@@ -50,6 +50,11 @@ export interface ChatHistoryMessage {
   table?: TableSpec;
   /** The answer was cut short rather than completed — see `PersistedChatMessage.interrupted`. */
   interrupted?: boolean;
+  /** The tool calls this turn ran, for display only (message-bubble.tsx's "queries executed"
+   * panel). Never persisted from here: `toPersistedMessages` writes the model-facing
+   * `[assistant{toolCalls}, tool{digest}]` pairs from the turn records instead, and
+   * `reconstructConversation` is what puts them back on the message for display. */
+  toolCalls?: ToolCall[];
 }
 
 let messageCounter = 0;
@@ -421,6 +426,11 @@ export function reconstructConversation(
         assistantMessageId: id,
         toolExchanges: pendingExchanges,
       });
+      // Also handed back for DISPLAY, so a resumed answer still shows the queries behind it rather
+      // than only replaying them to the model.
+      messages[messages.length - 1].toolCalls = pendingExchanges.map(
+        exchange => exchange.toolCall,
+      );
     }
     // Tool pairs belong to the turn they precede, so they never carry over past one.
     pendingExchanges = [];
