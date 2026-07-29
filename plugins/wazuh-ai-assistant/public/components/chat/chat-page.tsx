@@ -1531,7 +1531,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             'wazuhAiAssistant.chat.interruptModal.confirm',
             { defaultMessage: 'Leave and stop it' },
           )}
-          buttonColor='warning'
+          // 'danger', matching the plugin's other two confirm modals (conversation-list.tsx's
+          // delete, settings-page.tsx's) — this app uses no warning-yellow buttons anywhere.
+          buttonColor='danger'
           defaultFocusedButton='cancel'
         >
           <p>
