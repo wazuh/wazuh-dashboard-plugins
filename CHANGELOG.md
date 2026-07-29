@@ -36,7 +36,7 @@
 - Added `wazuh.disabledSettings` configuration to hide specific settings in the Indexer Settings UI [#8643](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8643) [8693](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8693)
 - Expanded the case management form with title, description, severity, priority and TLP fields, comments that can be added or edited individually, and a confirmation dialog before discarding unsaved changes [#8718](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8718)
 - Added queue usage in bytes and agent cache visualizations to `Server Management` > `Statistics`, and relabeled the Comms "Queue usage" Y-axis to Bytes [#8768](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8768)
-- Added Wazuh AI Assistant plugin: provider-agnostic AI chat over Wazuh data with a read-only tool catalog, server-side guardrails, optional pseudonymization, and API-key encryption at rest [#8788](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8788)
+- Added Wazuh AI Assistant plugin: provider-agnostic AI chat over Wazuh data with a read-only tool catalog, server-side guardrails, optional pseudonymization, and API-key encryption at rest [#8788](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8788) [#8802](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8802)
 
 ### Changed
 
@@ -127,7 +127,6 @@
 - Fixed Home KPI's visualization persistent filters [#8708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8708)
 - Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766)
 - Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775)
-- Fixed the AI Assistant querying retired Wazuh 4.x field names (bare `rule.*`/`agent.*`) that no longer exist in the Wazuh 5.0 data layer, which silently returned empty results for rule- and agent-related questions; queries, guardrails, and privacy field-policy defaults now use the `wazuh.*` field vocabulary. Also fixed the alert table's Description/Title column showing blank, since it was bound to `wazuh.rule.description` instead of `wazuh.rule.title`, the field consistently populated with a descriptive, environment-specific message. Also fixed severity filters (e.g. "show me medium alerts") returning findings of every severity instead of just the one asked for, since severity used to be a numeric range under Wazuh 4.x and is now a fixed word; severity filters now match the requested severity exactly by default, with an explicit option to match a floor or ceiling instead [#8802](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8802)
 
 ### Removed
 
