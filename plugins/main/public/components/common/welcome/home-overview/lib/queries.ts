@@ -2,6 +2,7 @@
 import { CheckResult } from '../../../../overview/sca/utils/constants';
 import { AGG, SCA_RESULT_BUCKET, TOP_N } from './constants';
 import {
+  COMPLIANCE_FRAMEWORK_FIELDS,
   EVENT_DOC_ID_FIELD,
   FIM_FILE_PATH_FIELD,
   FINDING_SEVERITY_FIELD,
@@ -108,6 +109,24 @@ export function buildFindingsOverviewAggs(
       topTechniquesSize,
     ),
   };
+}
+
+/**
+ * Distinct controls implicated per regulatory-compliance framework: one
+ * cardinality agg per framework field, rides the shared findings search. Every
+ * framework reports the same total findings count, so this is the number that
+ * actually differentiates the Regulatory Compliance chips.
+ */
+export function buildComplianceControlsAgg() {
+  return Object.entries(COMPLIANCE_FRAMEWORK_FIELDS).reduce(
+    (aggs, [frameworkId, field]) => {
+      aggs[`${AGG.complianceControlsPrefix}${frameworkId}`] = {
+        cardinality: { field },
+      };
+      return aggs;
+    },
+    {} as Record<string, unknown>,
+  );
 }
 
 /** Configuration Assessment tiles: Passed/Failed/N-A counts, one search. */

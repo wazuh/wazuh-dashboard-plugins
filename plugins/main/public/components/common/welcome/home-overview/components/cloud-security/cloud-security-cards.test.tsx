@@ -21,6 +21,7 @@ const available = (
     topRules: [],
     topTechniques: [],
     cloudSecurityByModule,
+    complianceControlsByFramework: {},
   },
 });
 

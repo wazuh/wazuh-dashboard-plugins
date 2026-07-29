@@ -37,6 +37,8 @@ export interface FindingsOverview {
   iocMatches?: number;
   /** Findings count per Cloud Security module (app id), last 24h. */
   cloudSecurityByModule: Record<string, number | undefined>;
+  /** Distinct controls implicated per regulatory-compliance framework, last 24h. */
+  complianceControlsByFramework: Record<string, number | undefined>;
 }
 
 export interface ScaTilesData {

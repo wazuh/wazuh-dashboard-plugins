@@ -59,6 +59,7 @@ const findingsAvailable = {
     topTechniques: [],
     iocMatches: 0,
     cloudSecurityByModule: {},
+    complianceControlsByFramework: {},
   },
 };
 

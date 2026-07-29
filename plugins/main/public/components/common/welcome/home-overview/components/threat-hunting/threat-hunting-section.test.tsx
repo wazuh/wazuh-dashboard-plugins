@@ -23,6 +23,7 @@ const findingsAvailable = {
     ],
     iocMatches: 0,
     cloudSecurityByModule: {},
+    complianceControlsByFramework: {},
   },
   indexPatternId: 'idx-1',
 };

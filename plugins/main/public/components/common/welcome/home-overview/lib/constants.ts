@@ -33,6 +33,12 @@ export const AGG = {
    * top tactic/technique bucket, so links can open the Intelligence resource.
    */
   externalId: 'external_id',
+  /**
+   * Prefix for the per-framework compliance-controls-implicated cardinality
+   * aggs (one per `COMPLIANCE_FRAMEWORK_FIELDS` entry) — see
+   * `buildComplianceControlsAgg`.
+   */
+  complianceControlsPrefix: 'compliance_controls_',
 } as const;
 
 /** Named buckets in the SCA `sca_result` filters agg. */

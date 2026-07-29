@@ -55,6 +55,7 @@ const findingsAvailable = {
     techniquesCount: 7,
     topTechniques: [],
     cloudSecurityByModule: {},
+    complianceControlsByFramework: {},
   },
   indexPatternId: 'idx-1',
 };
@@ -108,7 +109,7 @@ describe('OverviewSection', () => {
       '[data-test-subj="home-overview-top-network-services"]',
     );
     expect(panel).toBeInTheDocument();
-    // a bar-list panel shows a neutral placeholder when its data source is absent
+    // the panel shows a neutral placeholder when its data source is absent
     expect(panel?.textContent).toContain('Not available');
     expect(screen.getByText('Top 5 operating systems')).toBeInTheDocument();
   });

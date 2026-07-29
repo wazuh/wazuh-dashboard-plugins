@@ -46,13 +46,15 @@ the filter portion. Field/agg names come from [`fields.ts`](./fields.ts) and
 
 ## 1. Findings batch — `wazuh-findings-v5*`, last 24h
 
-Fired **on mount**; one search feeds three sections (Overview, Threat Hunting,
-Endpoint Security → Malware). Built by `buildFindingsOverviewAggs()` +
-`buildMalwareFilterAgg()`.
+Fired **on mount**; one search feeds four sections (Overview, Threat Hunting,
+Endpoint Security → Malware, Security Operations → Regulatory Compliance).
+Built by `buildFindingsOverviewAggs()` + `buildMalwareFilterAgg()` +
+`buildComplianceControlsAgg()`.
 
 **Represents:** finding severity distribution, top MITRE tactics, total findings,
-top rules, distinct techniques observed, top techniques, and the Malware
-IOC-match hero.
+top rules, distinct techniques observed, top techniques, the Malware
+IOC-match hero, and distinct controls implicated per regulatory-compliance
+framework.
 
 ```jsonc
 {
@@ -97,6 +99,40 @@ IOC-match hero.
     "malware": {
       "filter": { "exists": { "field": "wazuh.threat.enrichments" } },
       "aggs": { "ioc_matches": { "cardinality": { "field": "event.doc_id" } } }
+    },
+    // Regulatory Compliance chips: distinct controls implicated per framework.
+    // Every framework's total findings count ties (one finding can implicate
+    // several frameworks at once), so this cardinality — not doc_count — is
+    // what the chips rank and sort by. One agg per COMPLIANCE_FRAMEWORK_FIELDS entry.
+    "compliance_controls_pci-dss": {
+      "cardinality": { "field": "wazuh.rule.compliance.pci_dss" }
+    },
+    "compliance_controls_gdpr": {
+      "cardinality": { "field": "wazuh.rule.compliance.gdpr" }
+    },
+    "compliance_controls_hipaa": {
+      "cardinality": { "field": "wazuh.rule.compliance.hipaa" }
+    },
+    "compliance_controls_nist-800-53": {
+      "cardinality": { "field": "wazuh.rule.compliance.nist_800_53" }
+    },
+    "compliance_controls_nist-800-171": {
+      "cardinality": { "field": "wazuh.rule.compliance.nist_800_171" }
+    },
+    "compliance_controls_tsc": {
+      "cardinality": { "field": "wazuh.rule.compliance.tsc" }
+    },
+    "compliance_controls_cmmc": {
+      "cardinality": { "field": "wazuh.rule.compliance.cmmc" }
+    },
+    "compliance_controls_fedramp": {
+      "cardinality": { "field": "wazuh.rule.compliance.fedramp" }
+    },
+    "compliance_controls_iso-27001": {
+      "cardinality": { "field": "wazuh.rule.compliance.iso_27001" }
+    },
+    "compliance_controls_nis2": {
+      "cardinality": { "field": "wazuh.rule.compliance.nis2" }
     }
   }
 }
@@ -231,18 +267,23 @@ DQL: `*`.
 
 ## 7. Threat-intel enrichments catalog — `wazuh-threatintel-enrichments*`, current
 
-`buildThreatIntelFeedByTypeAgg()`. This is the feed **catalog** (what indicators
-the platform ships with) — distinct from the Malware IOC-match hero in §1 (what
-actually matched in findings).
+`buildThreatIntelFeedByTypeAgg()` + `buildThreatIntelByThreatTypeAgg()`. This is
+the feed **catalog** (what indicators the platform ships with) — distinct from
+the Malware IOC-match hero in §1 (what actually matched in findings).
 
-**Represents:** total IOCs in the feed (`hits.total`, the "IOCs" tile) and the
-feed composition by indicator type (domain/url/ip/hash).
+**Represents:** total IOCs in the feed (`hits.total`, the "IOCs" tile), the feed
+composition by indicator type (domain/url/ip/hash) and the composition by threat
+type (`botnet_cc`, `payload_delivery`, …) shown on the Threat catalog card.
 
 ```jsonc
 {
   "size": 0, // total IOCs from hits.total
   "aggs": {
-    "ioc_feed_by_type": { "terms": { "field": "document.type", "size": 5 } }
+    "ioc_feed_by_type": { "terms": { "field": "document.type", "size": 5 } },
+    // what kind of threats the catalog covers, not their technical form
+    "threat_types": {
+      "terms": { "field": "document.software.type", "size": 5 }
+    }
   }
 }
 ```

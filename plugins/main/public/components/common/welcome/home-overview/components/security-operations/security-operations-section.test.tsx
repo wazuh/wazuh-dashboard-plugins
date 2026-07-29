@@ -30,6 +30,7 @@ jest.mock('../../../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),
 }));
 const asMock = (fn: unknown) => fn as jest.Mock;
+const findings = { status: 'loading' } as const;
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -58,7 +59,7 @@ beforeEach(() => {
 
 describe('SecurityOperationsSection', () => {
   it('renders IT Hygiene, Incident Response, and Regulatory Compliance', () => {
-    render(<SecurityOperationsSection />);
+    render(<SecurityOperationsSection findings={findings} />);
     expect(screen.getByText('IT Hygiene')).toBeInTheDocument();
     expect(screen.getByText('Incident Response')).toBeInTheDocument();
     expect(screen.getByText('Regulatory Compliance')).toBeInTheDocument();
@@ -81,7 +82,7 @@ describe('SecurityOperationsSection', () => {
     asMock(useItHygieneServicesCount).mockReturnValue({
       status: 'unavailable',
     });
-    const { container } = render(<SecurityOperationsSection />);
+    const { container } = render(<SecurityOperationsSection findings={findings} />);
     expect(
       container.querySelector('[data-test-subj="home-overview-it-hygiene"]'),
     ).toBeInTheDocument();
@@ -92,7 +93,7 @@ describe('SecurityOperationsSection', () => {
     asMock(useItHygienePackagesCount).mockReturnValue({
       status: 'unavailable',
     });
-    const { container } = render(<SecurityOperationsSection />);
+    const { container } = render(<SecurityOperationsSection findings={findings} />);
     expect(
       container.querySelector('[data-test-subj="home-overview-it-hygiene"]'),
     ).toBeInTheDocument();
@@ -107,7 +108,7 @@ describe('SecurityOperationsSection', () => {
     asMock(useActiveResponseOverview).mockReturnValue({
       status: 'unavailable',
     });
-    const { container } = render(<SecurityOperationsSection />);
+    const { container } = render(<SecurityOperationsSection findings={findings} />);
     expect(
       container.querySelector(
         '[data-test-subj="home-overview-active-response"]',
@@ -116,14 +117,14 @@ describe('SecurityOperationsSection', () => {
   });
 
   it('navigates to IT Hygiene from the panel title', () => {
-    render(<SecurityOperationsSection />);
+    render(<SecurityOperationsSection findings={findings} />);
     fireEvent.click(screen.getByText('IT Hygiene'));
     expect(navigation.getItHygieneUrl).toHaveBeenCalled();
   });
 
   it('fetches lazily once the section enters the viewport', () => {
     asMock(useInViewport).mockReturnValue([{ current: null }, false]);
-    render(<SecurityOperationsSection />);
+    render(<SecurityOperationsSection findings={findings} />);
     expect(asMock(useItHygieneOperatingSystemsCount)).toHaveBeenCalledWith(
       false,
     );

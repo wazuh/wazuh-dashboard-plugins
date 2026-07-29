@@ -59,7 +59,7 @@ const HomeOverviewBody: React.FC = () => {
         threatIntel={threatIntel}
       />
       <EuiSpacer size='l' />
-      <SecurityOperationsSection />
+      <SecurityOperationsSection findings={findings} />
       <EuiSpacer size='l' />
       <CloudSecuritySection findings={findings} />
     </>

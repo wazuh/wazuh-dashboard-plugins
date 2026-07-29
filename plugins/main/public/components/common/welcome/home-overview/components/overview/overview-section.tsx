@@ -8,6 +8,7 @@ import {
   WIDGET_LOADING_MIN_HEIGHT,
 } from '../common';
 import { AgentsByStatus } from './agents-by-status';
+import { TopNetworkServicesTable } from './top-network-services-table';
 import { useInViewport } from '../../../../hooks';
 import {
   useAgentStatus,
@@ -164,11 +165,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               data-test-subj='home-overview-top-network-services'
             >
               {topServices.data && (
-                <BarList
-                  items={topServices.data}
-                  emptyMessage='No network services found'
-                  data-test-subj='top-network-services'
-                />
+                <TopNetworkServicesTable items={topServices.data} />
               )}
             </WidgetGroup>
           </EuiFlexItem>

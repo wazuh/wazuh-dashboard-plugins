@@ -9,6 +9,7 @@ import { RegulatoryComplianceBadges } from './regulatory-compliance-badges';
 import { useInViewport } from '../../../../hooks';
 import {
   useActiveResponseOverview,
+  useFindingsOverview,
   useItHygieneOperatingSystemsCount,
   useItHygienePackagesCount,
   useItHygieneServicesCount,
@@ -20,8 +21,19 @@ import {
   getRegulatoryComplianceUrlHome,
 } from '../../utils/navigation';
 
-/** IT Hygiene and Active Response load lazily; Regulatory Compliance is static. */
-const SecurityOperationsSectionComponent: React.FC = () => {
+export interface SecurityOperationsSectionProps {
+  findings: ReturnType<typeof useFindingsOverview>;
+}
+
+/**
+ * IT Hygiene and Active Response load lazily. Regulatory Compliance's chips
+ * always navigate (the panel never gates on `findings`); they're merely
+ * enriched with a controls-implicated count once the shared findings query
+ * on `findings` resolves.
+ */
+const SecurityOperationsSectionComponent: React.FC<
+  SecurityOperationsSectionProps
+> = ({ findings }) => {
   const [sectionRef, visible] = useInViewport<HTMLDivElement>();
   const operatingSystems = useItHygieneOperatingSystemsCount(visible);
   const packages = useItHygienePackagesCount(visible);
@@ -96,11 +108,11 @@ const SecurityOperationsSectionComponent: React.FC = () => {
                 </EuiLink>
               </RedirectAppLinks>
             }
-            caption='Frameworks'
+            caption='Controls implicated, last 24 hours'
             centerBody
             data-test-subj='home-overview-regulatory-compliance'
           >
-            <RegulatoryComplianceBadges />
+            <RegulatoryComplianceBadges findings={findings} />
           </WidgetGroup>
         </EuiFlexItem>
       </EuiFlexGroup>

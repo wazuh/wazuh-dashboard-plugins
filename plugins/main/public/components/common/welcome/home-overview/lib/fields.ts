@@ -1,4 +1,5 @@
 import { SeverityBand } from '../interfaces/types';
+import { WAZUH_MODULES_ID } from '../../../../../../common/constants';
 
 /** Field-name constants shared by the query builders, mappers and navigation. */
 
@@ -68,4 +69,24 @@ export const VULNERABILITY_SEVERITY_VALUES: Partial<
   high: 'High',
   medium: 'Medium',
   low: 'Low',
+};
+
+/**
+ * Compliance field per regulatory framework (`wazuh.rule.compliance.<key>`).
+ * Every framework reports the same total findings count (one finding can
+ * implicate several frameworks at once), so the Regulatory Compliance chips
+ * instead rank by *distinct controls implicated* — a cardinality agg on this
+ * field, one per framework.
+ */
+export const COMPLIANCE_FRAMEWORK_FIELDS: Record<string, string> = {
+  [WAZUH_MODULES_ID.PCI_DSS]: 'wazuh.rule.compliance.pci_dss',
+  [WAZUH_MODULES_ID.GDPR]: 'wazuh.rule.compliance.gdpr',
+  [WAZUH_MODULES_ID.HIPAA]: 'wazuh.rule.compliance.hipaa',
+  [WAZUH_MODULES_ID.NIST_800_53]: 'wazuh.rule.compliance.nist_800_53',
+  [WAZUH_MODULES_ID.NIST_800_171]: 'wazuh.rule.compliance.nist_800_171',
+  [WAZUH_MODULES_ID.TSC]: 'wazuh.rule.compliance.tsc',
+  [WAZUH_MODULES_ID.CMMC]: 'wazuh.rule.compliance.cmmc',
+  [WAZUH_MODULES_ID.FEDRAMP]: 'wazuh.rule.compliance.fedramp',
+  [WAZUH_MODULES_ID.ISO_27001]: 'wazuh.rule.compliance.iso_27001',
+  [WAZUH_MODULES_ID.NIS2]: 'wazuh.rule.compliance.nis2',
 };

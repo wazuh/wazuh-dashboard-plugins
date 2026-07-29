@@ -29,6 +29,7 @@ import {
 import { WzRequest } from '../../../../../react-services';
 import {
   buildCloudSecurityByModuleAgg,
+  buildComplianceControlsAgg,
   buildCvesMatchedAgg,
   buildFindingsOverviewAggs,
   buildFIMTopFilesAgg,
@@ -51,6 +52,7 @@ import {
   mapAgentStatus,
   mapCardinality,
   mapCloudSecurityByModule,
+  mapComplianceControls,
   mapDocCount,
   mapScaBenchmarks,
   mapScaTiles,
@@ -235,6 +237,7 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
             ...buildFindingsOverviewAggs(),
             ...buildMalwareFilterAgg(),
             ...buildCloudSecurityByModuleAgg(),
+            ...buildComplianceControlsAgg(),
           },
           dateRange: LAST_24H,
           pagination: NO_HITS,
@@ -255,6 +258,9 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
           ),
           iocMatches: mapCardinality(malware, AGG.iocMatches),
           cloudSecurityByModule: mapCloudSecurityByModule(
+            response?.aggregations,
+          ),
+          complianceControlsByFramework: mapComplianceControls(
             response?.aggregations,
           ),
         };
