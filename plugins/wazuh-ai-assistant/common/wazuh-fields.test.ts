@@ -1,9 +1,5 @@
 import assert from 'node:assert/strict';
-import {
-  WAZUH_FIELD,
-  RETIRED_FIELD_MAP,
-  SEVERITY_LEVELS,
-} from './wazuh-fields';
+import { WAZUH_FIELD, SEVERITY_LEVELS } from './wazuh-fields';
 
 test('WAZUH_FIELD exposes the live wazuh.* rule/agent/integration paths', () => {
   assert.equal(WAZUH_FIELD.RULE_LEVEL, 'wazuh.rule.level');
@@ -55,9 +51,4 @@ test('SEVERITY_LEVELS is the canonical 5-value vocabulary with informational as 
   ]);
   // informational must be distinct from low, not folded into it.
   assert.notEqual(SEVERITY_LEVELS[0], SEVERITY_LEVELS[1]);
-});
-
-test('RETIRED_FIELD_MAP explicitly lists the agent.os.name / agent.ip irregulars', () => {
-  assert.equal(RETIRED_FIELD_MAP['agent.os.name'], 'wazuh.agent.host.os.name');
-  assert.equal(RETIRED_FIELD_MAP['agent.ip'], 'wazuh.agent.host.ip');
 });

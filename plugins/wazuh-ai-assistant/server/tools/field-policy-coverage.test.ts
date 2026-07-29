@@ -3,7 +3,6 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { listToolDefinitions } from './registry';
 import { FIELD_POLICY_DEFAULTS, FieldPolicyEntry } from './privacy';
-import { RETIRED_FIELD_MAP } from '../../common/wazuh-fields';
 
 /**
  * Guard test for the rule ("a new field without a privacy classification
@@ -204,14 +203,51 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
 });
 
 /**
+ * Bare field literals this test denies — not part of the plugin's vocabulary (see
+ * `common/wazuh-fields.ts`'s `WAZUH_FIELD`), kept here only as this regression guard's own
+ * scan target.
+ */
+const FORBIDDEN_LEGACY_LITERALS = [
+  'rule.level',
+  'rule.id',
+  'rule.description',
+  'rule.tags',
+  'rule.category',
+  'rule.mitre.technique.id',
+  'rule.mitre.technique.name',
+  'rule.mitre.tactic',
+  'rule.mitre.tactic.name',
+  'rule.compliance.pci_dss',
+  'agent.id',
+  'agent.name',
+  'agent.os.name',
+  'agent.ip',
+  'rule.groups',
+  'rule.mitre.id',
+  'data.srcip',
+  'data.dstip',
+  'data.srcuser',
+  'data.dstuser',
+  'data.username',
+  'data.url',
+  'data.command',
+  'full_log',
+  'predecoder.hostname',
+  'predecoder.program_name',
+  'GeoLocation.*',
+  'syscheck.path',
+  'syscheck.event',
+];
+
+/**
  * Permanent regression guard: every field the AI assistant queries the Indexer with must resolve
  * to a field actually populated in Wazuh 5.0 `wazuh-findings-v5*`/`wazuh-events-v5*` documents. A
- * retired bare `rule.*`/`agent.*` literal (see `RETIRED_FIELD_MAP` in `common/wazuh-fields.ts`)
- * silently produces a query that matches nothing — a wrong answer with no error.
+ * bare `rule.*`/`agent.*` literal silently produces a query that matches nothing — a wrong
+ * answer with no error.
  *
  * Scans the SOURCE of `server/tools/catalog/*.ts` (excluding test files), `digest.ts`, and
- * `guardrails.ts` for a quoted literal matching one of the retired keys. Do NOT weaken this test
- * to make a future regression pass.
+ * `guardrails.ts` for a quoted literal matching one of `FORBIDDEN_LEGACY_LITERALS`. Do NOT weaken
+ * this test to make a future regression pass.
  */
 function findRetiredFieldLiteralOccurrences(): string[] {
   const catalogDir = path.join(__dirname, 'catalog');
@@ -222,12 +258,11 @@ function findRetiredFieldLiteralOccurrences(): string[] {
   filesToScan.push(path.join(__dirname, 'digest.ts'));
   filesToScan.push(path.join(__dirname, 'guardrails.ts'));
 
-  const retiredKeys = Object.keys(RETIRED_FIELD_MAP);
   const failures: string[] = [];
 
   for (const filePath of filesToScan) {
     const source = fs.readFileSync(filePath, 'utf8');
-    for (const key of retiredKeys) {
+    for (const key of FORBIDDEN_LEGACY_LITERALS) {
       const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const literalRe = new RegExp(`['"\`]${escaped}['"\`]`);
       if (literalRe.test(source)) {
@@ -238,12 +273,12 @@ function findRetiredFieldLiteralOccurrences(): string[] {
   return failures;
 }
 
-test('no retired bare rule.*/agent.* field literal survives in catalog/digest/guardrails source (permanent regression guard)', () => {
+test('no bare rule.*/agent.* field literal survives in catalog/digest/guardrails source (permanent regression guard)', () => {
   const failures = findRetiredFieldLiteralOccurrences();
   assert.deepEqual(
     failures,
     [],
-    `retired field literal(s) found — rename to the wazuh.* equivalent (see common/wazuh-fields.ts RETIRED_FIELD_MAP): ${failures.join(
+    `bare field literal(s) found — rename to the wazuh.* equivalent (see common/wazuh-fields.ts WAZUH_FIELD): ${failures.join(
       ', ',
     )}`,
   );

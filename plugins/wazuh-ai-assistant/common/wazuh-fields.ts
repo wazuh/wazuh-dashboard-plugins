@@ -36,44 +36,6 @@ export const WAZUH_FIELD = Object.freeze({
 export type WazuhFieldKey = keyof typeof WAZUH_FIELD;
 export type WazuhFieldValue = (typeof WAZUH_FIELD)[WazuhFieldKey];
 
-/**
- * Retired bare field path -> its `wazuh.*` equivalent, or `null` when there is no 5.0
- * equivalent at all. Enumeration source for the CI source-scan guard
- * (`field-policy-coverage.test.ts`).
- */
-export const RETIRED_FIELD_MAP: Readonly<Record<string, string | null>> =
-  Object.freeze({
-    'rule.level': WAZUH_FIELD.RULE_LEVEL,
-    'rule.id': WAZUH_FIELD.RULE_ID,
-    'rule.description': WAZUH_FIELD.RULE_DESCRIPTION,
-    'rule.tags': WAZUH_FIELD.RULE_TAGS,
-    'rule.category': WAZUH_FIELD.RULE_CATEGORY,
-    'rule.mitre.technique.id': WAZUH_FIELD.RULE_MITRE_TECHNIQUE_ID,
-    'rule.mitre.technique.name': WAZUH_FIELD.RULE_MITRE_TECHNIQUE_NAME,
-    'rule.mitre.tactic': WAZUH_FIELD.RULE_MITRE_TACTIC,
-    'rule.mitre.tactic.name': WAZUH_FIELD.RULE_MITRE_TACTIC_NAME,
-    'rule.compliance.pci_dss': WAZUH_FIELD.RULE_COMPLIANCE_PCI_DSS,
-    'agent.id': WAZUH_FIELD.AGENT_ID,
-    'agent.name': WAZUH_FIELD.AGENT_NAME,
-    'agent.os.name': WAZUH_FIELD.AGENT_OS_NAME,
-    'agent.ip': WAZUH_FIELD.AGENT_IP,
-    'rule.groups': null,
-    'rule.mitre.id': null,
-    'data.srcip': null,
-    'data.dstip': null,
-    'data.srcuser': null,
-    'data.dstuser': null,
-    'data.username': null,
-    'data.url': null,
-    'data.command': null,
-    full_log: null,
-    'predecoder.hostname': null,
-    'predecoder.program_name': null,
-    'GeoLocation.*': null,
-    'syscheck.path': null,
-    'syscheck.event': null,
-  });
-
 export const SEVERITY_LEVELS = [
   'informational',
   'low',
