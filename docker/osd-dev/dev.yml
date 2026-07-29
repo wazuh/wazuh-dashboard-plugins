@@ -221,6 +221,7 @@ services:
       - '${REPO_MAIN}:/home/node/kbn/plugins/main'
       - '${REPO_WAZUH_CORE}:/home/node/kbn/plugins/wazuh-core'
       - '${REPO_WAZUH_CHECK_UPDATES}:/home/node/kbn/plugins/wazuh-check-updates'
+      - '${REPO_WAZUH_AI_ASSISTANT}:/home/node/kbn/plugins/wazuh-ai-assistant'
       - wd_certs:/home/node/kbn/certs/
       - ${WAZUH_DASHBOARD_CONF}:/home/node/kbn/config/opensearch_dashboards.yml
 

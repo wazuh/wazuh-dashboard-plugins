@@ -1,0 +1,16 @@
+{
+  // Typecheck-only config (no emit), for CI and `tsc --noEmit` gating. The main tsconfig.json is a
+  // composite/declaration build config (emitDeclarationOnly), which cannot be combined with
+  // --noEmit; this overrides those emit flags so a clean type-soundness gate can run without CLI
+  // flag gymnastics. rootDir is widened to the dashboard root because plugin sources import from
+  // ../../src/core (outside plugins/), which the build config's plugins-rooted rootDir rejects.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "emitDeclarationOnly": false,
+    "noEmit": true,
+    "rootDir": "../.."
+  }
+}
