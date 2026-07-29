@@ -10,8 +10,9 @@
  * the vocabulary via a CI source-scan instead.
  */
 
-/** Live, populated Wazuh 5.0 field paths, consumed by the flat allowlist/enumeration surfaces
- * (guardrails.ts, privacy.ts, catalog/common.ts, digest.ts). */
+/** Valid Wazuh 5.0 field paths, consumed by the flat allowlist/enumeration surfaces (guardrails.ts,
+ * privacy.ts, catalog/common.ts, digest.ts). Population is decoder-dependent — a field being
+ * listed here means it belongs to the current schema, not that every decoder writes to it. */
 export const WAZUH_FIELD = Object.freeze({
   RULE_LEVEL: 'wazuh.rule.level',
   RULE_ID: 'wazuh.rule.id',

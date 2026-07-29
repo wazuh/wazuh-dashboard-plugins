@@ -127,7 +127,7 @@
 - Fixed Home KPI's visualization persistent filters [#8708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8708)
 - Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766)
 - Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775)
-- Fixed the AI Assistant querying retired Wazuh 4.x field names (bare `rule.*`/`agent.*`) that no longer exist in the Wazuh 5.0 data layer, which silently returned empty results for rule- and agent-related questions; queries, guardrails, privacy field-policy defaults, and saved settings now use the `wazuh.*` field vocabulary, with existing saved field-policy settings migrated automatically [#8802](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8802)
+- Fixed the AI Assistant querying retired Wazuh 4.x field names (bare `rule.*`/`agent.*`) that no longer exist in the Wazuh 5.0 data layer, which silently returned empty results for rule- and agent-related questions; queries, guardrails, and privacy field-policy defaults now use the `wazuh.*` field vocabulary. Also fixed the alert table's Description/Title column showing blank, since it was bound to `wazuh.rule.description`, a field that is never populated on Wazuh 5.0 — it now reads `wazuh.rule.title` instead [#8802](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8802)
 
 ### Removed
 

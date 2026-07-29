@@ -22,7 +22,8 @@ export interface FieldPolicyEntry {
   kind?: PseudonymKind;
 }
 
-/** Curated defaults. Every entry targets a live, populated `wazuh.*` field. */
+/** Curated defaults. Every entry targets a valid `wazuh.*`/ECS/WCS field — population is
+ * decoder-dependent, so an entry may currently be inert (no matching data) without being wrong. */
 export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: WAZUH_FIELD.AGENT_NAME, action: 'anonymize', kind: 'HOST' },
   { field: WAZUH_FIELD.AGENT_IP, action: 'anonymize', kind: 'IP' },

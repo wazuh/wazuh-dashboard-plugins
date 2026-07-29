@@ -131,7 +131,7 @@
         "params_subset": {},
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent GET_SUSPICIOUS_POWERSHELL -> get_suspicious_powershell.ts, match (not wildcard) on rule.description (get_suspicious_powershell.ts:11-19)."
+      "notes": "UAT intent GET_SUSPICIOUS_POWERSHELL -> get_suspicious_powershell.ts, ORs the MITRE T1059.001 technique id, wazuh.rule.tags, and PowerShell process names (get_suspicious_powershell.ts)."
     },
     {
       "id": "alerts_by_rule_id",

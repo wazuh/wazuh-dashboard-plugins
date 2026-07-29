@@ -23,8 +23,8 @@ export const getSuspiciousPowershellTool: ToolDefinition = {
   spec: {
     name: 'get_suspicious_powershell',
     description:
-      'Searches security findings for findings whose rule description mentions PowerShell, ' +
-      'within a time range, most recent first. Use for "suspicious PowerShell activity" questions.',
+      'Searches security findings for PowerShell-related activity within a time range, most ' +
+      'recent first. Use for "suspicious PowerShell activity" questions.',
     parameters: objectSchema({
       limit: limitProperty(
         'Max number of alerts to return (default 20, max 500).',

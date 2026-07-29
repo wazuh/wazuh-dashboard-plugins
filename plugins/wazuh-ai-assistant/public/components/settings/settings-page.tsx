@@ -1233,7 +1233,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                           placeholder={i18n.translate(
                             'wazuhAiAssistant.settings.privacy.fieldPlaceholder',
                             {
-                              defaultMessage: 'e.g. agent.name',
+                              defaultMessage: 'e.g. wazuh.agent.name',
                             },
                           )}
                           aria-label={i18n.translate(
