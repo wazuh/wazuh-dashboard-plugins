@@ -259,6 +259,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   // gate on every PUT regardless of what this banner shows).
   const [canSave, setCanSave] = useState(true);
   const [accessMessage, setAccessMessage] = useState<string | null>(null);
+  // Fail-open like `canSave`: a failed/slow probe never blocks the form; the server's 503 gate
+  // still refuses plaintext key writes regardless.
+  const [apiKeyEncryptionEnabled, setApiKeyEncryptionEnabled] = useState(true);
   // Session auto-heal: guards the one-shot POST /api/login retry below so a mount ever
   // attempts it AT MOST once, regardless of how many times the access probe itself is re-run (it
   // currently only runs once on mount, but this ref is what makes that invariant hold even if a
@@ -292,6 +295,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     service
       .getSettingsAccess()
       .then(async access => {
+        // Before the heal branch (its early return must not skip this); `!== false` stays
+        // fail-open when older servers omit the field.
+        setApiKeyEncryptionEnabled(access.apiKeyEncryptionEnabled !== false);
         // Session auto-heal: the failure this targets is a missing/expired
         // wz-token cookie, surfaced through the SAME actionable copy `describeAdministratorRequirement`
         // (server/routes/settings.ts) now maps both the three original token literals AND the raw
@@ -813,6 +819,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     },
   ];
 
+  const apiKeyBlockedByEncryption =
+    !apiKeyEncryptionEnabled && Boolean(form.apiKey?.trim());
+
   return (
     <EuiPage restrictWidth={960}>
       <EuiPageBody>
@@ -916,6 +925,49 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
               {isFormOpen && (
                 <>
+                  {!apiKeyEncryptionEnabled && (
+                    <>
+                      <EuiCallOut
+                        color='warning'
+                        iconType='alert'
+                        title={i18n.translate(
+                          'wazuhAiAssistant.settings.form.encryptionRequiredTitle',
+                          {
+                            defaultMessage: 'API keys cannot be saved',
+                          },
+                        )}
+                      >
+                        <p>
+                          {i18n.translate(
+                            'wazuhAiAssistant.settings.form.encryptionRequiredBody',
+                            {
+                              defaultMessage:
+                                'Encryption at rest is not configured, so provider API keys ' +
+                                'would be stored in plain text. Providers that do not need ' +
+                                'an API key can still be saved.',
+                            },
+                          )}
+                        </p>
+                        <p>
+                          {i18n.translate(
+                            'wazuhAiAssistant.settings.form.encryptionRequiredHow',
+                            {
+                              defaultMessage:
+                                'To enable saving keys, generate a base64-encoded 32-byte ' +
+                                'key (e.g. `openssl rand -base64 32`) and store it as ' +
+                                '`wazuh_ai_assistant.encryptionKey` — either with ' +
+                                '`opensearch-dashboards-keystore add ' +
+                                'wazuh_ai_assistant.encryptionKey` (recommended, the key ' +
+                                'never sits in a readable config file) or in ' +
+                                '`opensearch_dashboards.yml` — then restart OpenSearch ' +
+                                'Dashboards.',
+                            },
+                          )}
+                        </p>
+                      </EuiCallOut>
+                      <EuiSpacer size='m' />
+                    </>
+                  )}
                   <EuiForm component='div'>
                     <EuiFormRow
                       label={i18n.translate(
@@ -1033,7 +1085,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                       <EuiFlexItem grow={false}>
                         <EuiButton
                           onClick={handleSubmit}
-                          isDisabled={!canSave}
+                          isDisabled={!canSave || apiKeyBlockedByEncryption}
                           fill
                         >
                           {i18n.translate(

@@ -347,11 +347,14 @@ export async function requireAdministrator(
   return null;
 }
 
-/** Rendered in the settings form's error callout — keep short; never reference repo files. */
+/** Backstop for direct API calls — the UI blocks these writes first (see the access probe's
+ * `apiKeyEncryptionEnabled`). Keep short; never reference repo files. */
 export const ENCRYPTION_REQUIRED_MESSAGE =
-  'Cannot save the API key: encryption at rest is not configured, so it would be stored in ' +
-  'plain text. Configure a base64 32-byte key with `opensearch-dashboards-keystore add ' +
-  'wazuh_ai_assistant.encryptionKey`, restart OpenSearch Dashboards, and save again.';
+  'API keys cannot be saved: encryption at rest is not configured, so the key would be stored ' +
+  'in plain text. Generate a base64-encoded 32-byte key (e.g. `openssl rand -base64 32`) and ' +
+  'store it as `wazuh_ai_assistant.encryptionKey` — either with `opensearch-dashboards-keystore ' +
+  'add wazuh_ai_assistant.encryptionKey` (recommended) or in `opensearch_dashboards.yml` — then ' +
+  'restart OpenSearch Dashboards and try again.';
 
 /** Refuses a non-empty `apiKey` when no encryption key is configured. See docs/ENCRYPTION.md. */
 export function requireApiKeyEncryption(
@@ -801,7 +804,12 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         defaultApiHostId = null;
       }
       return response.ok({
-        body: { administrator, message, defaultApiHostId },
+        body: {
+          administrator,
+          message,
+          defaultApiHostId,
+          apiKeyEncryptionEnabled: getApiKeyCipher().enabled,
+        },
       });
     },
   );

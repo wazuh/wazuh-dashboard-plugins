@@ -50,13 +50,21 @@ Dashboards' own config file — no new npm dependency, no separate secrets servi
 
 The key is never generated automatically — an operator must configure it manually, once, as
 described above. With no `encryptionKey` configured, this plugin refuses to store provider API
-keys:
-`POST /api/wazuh_ai_assistant/providers` and `PUT /api/wazuh_ai_assistant/providers/{id}` reject
-any request carrying a non-empty `apiKey` with HTTP 503 and a message naming the keystore command
-above, which the Settings UI shows in the provider form's error callout (`requireApiKeyEncryption`
-in `server/routes/settings.ts`, covered by `provider-encryption-gate.test.ts`). Providers with no
-credential (the `wazuh_brain` hosted endpoint, unauthenticated local gateways such as Ollama) are
-unaffected, and reads are unaffected: values stored before the gate existed keep working in chat.
+keys, on both sides of the wire:
+
+- **Settings UI**: the provider form learns encryption is unconfigured from the
+  `GET /settings/access` probe (`apiKeyEncryptionEnabled`), shows a warning callout walking
+  through the setup above (generate a key, store it via the keystore — recommended — or
+  `opensearch_dashboards.yml`, restart), and keeps the Save button disabled while an API key is
+  typed.
+- **Server (backstop for direct API calls)**: `POST /api/wazuh_ai_assistant/providers` and
+  `PUT /api/wazuh_ai_assistant/providers/{id}` reject any request carrying a non-empty `apiKey`
+  with HTTP 503 and a message naming the same configuration options (`requireApiKeyEncryption`
+  in `server/routes/settings.ts`, covered by `provider-encryption-gate.test.ts`).
+
+Providers with no credential (the `wazuh_brain` hosted endpoint, unauthenticated local gateways
+such as Ollama) are unaffected, and reads are unaffected: values stored before the gate existed
+keep working in chat.
 
 ## Enabling encryption on an existing deployment
 
