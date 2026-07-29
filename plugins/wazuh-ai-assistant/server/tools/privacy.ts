@@ -10,7 +10,7 @@ import { WAZUH_FIELD } from '../../common/wazuh-fields';
 export type FieldPolicyAction = 'allow' | 'anonymize' | 'never';
 
 export interface FieldPolicyEntry {
-  /** Either a plain digest field path ("agent.name", "GeoLocation.*") or a tool-scoped form
+  /** Either a plain digest field path ("wazuh.agent.name") or a tool-scoped form
    * ("get_active_agents/name") for Manager-API tools whose digest fields are bare, generic names
    * ("name" means an agent hostname in get_active_agents but a package name in
    * get_agent_packages — only tool scoping can distinguish them). Scoped entries win over plain
@@ -22,11 +22,7 @@ export interface FieldPolicyEntry {
   kind?: PseudonymKind;
 }
 
-/**
- * Curated defaults, `wazuh.*` field vocabulary (issue #8802). Every entry here targets a live,
- * populated Wazuh 5.0 field — this plugin ships new in 5.0 with no prior installations, so there
- * is no retired 4.x/ECS-generic vocabulary to keep around for compatibility.
- */
+/** Curated defaults. Every entry targets a live, populated `wazuh.*` field. */
 export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: WAZUH_FIELD.AGENT_NAME, action: 'anonymize', kind: 'HOST' },
   { field: WAZUH_FIELD.AGENT_IP, action: 'anonymize', kind: 'IP' },
@@ -101,12 +97,7 @@ export function inferPseudonymKind(field: string): PseudonymKind {
   if (lower.includes('user')) {
     return 'USER';
   }
-  if (
-    lower.includes('hostname') ||
-    lower === 'agent.name' ||
-    lower === 'wazuh.agent.name' ||
-    lower.endsWith('.name')
-  ) {
+  if (lower.includes('hostname') || lower.endsWith('.name')) {
     return 'HOST';
   }
   return 'VAL';
@@ -369,7 +360,7 @@ const HOSTNAME_LABEL_SRC = '[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?';
 /** Matches `label.label[.label]+` — i.e. requires AT LEAST ONE dot, so a bare single-word hostname
  * ("webserver") is deliberately never matched here (documented limitation: see
  * `prescanAndMint`'s doc comment — the digest-boundary field policy still catches those once they
- * appear in a tool result field like `agent.name`). `\b`-anchored on both ends so a trailing
+ * appear in a tool result field like `wazuh.agent.name`). `\b`-anchored on both ends so a trailing
  * sentence period is never swept into the match. */
 const FQDN_TOKEN_RE = new RegExp(
   `\\b${HOSTNAME_LABEL_SRC}(?:\\.${HOSTNAME_LABEL_SRC})+\\b`,
@@ -401,7 +392,7 @@ const ALL_NUMERIC_DOTTED_RE = /^[0-9.]+Z?$/;
  * single-word hostname ("webserver", no dot) is NEVER matched — only `label.label[...]` forms are,
  * to avoid pseudonymizing ordinary prose words. A bare-word hostname is still caught later, once it
  * appears in a typed digest field, by the existing field-policy scrub in `applyFieldPolicy` (e.g.
- * `agent.name`/`predecoder.hostname`) — this pre-scan only closes the gap for the analyst's own
+ * `wazuh.agent.name`) — this pre-scan only closes the gap for the analyst's own
  * free-text wording and for hostnames/IPs surfacing in untyped free text (e.g. a tool's `message`).
  */
 export function prescanAndMint(
@@ -428,8 +419,8 @@ export function prescanAndMint(
 
 /**
  * JSON-aware variant of `prescanAndMint` for `role:'tool'` message content — which is normally a
- * serialized digest whose KEYS are dotted ECS field paths ("wazuh.agent.name",
- * "rule.mitre.technique.id"). Running the flat text scan over that JSON would match those keys as
+ * serialized digest whose KEYS are dotted `wazuh.*` field paths ("wazuh.agent.name",
+ * "wazuh.rule.mitre.technique.id"). Running the flat text scan over that JSON would match those keys as
  * FQDN-shaped tokens and mint garbage HOST_n pseudonyms for FIELD NAMES (corrupting the digest's
  * keys and polluting the client-held map). This variant parses the JSON and scans only STRING
  * VALUES — keys are never touched — then re-serializes (JSON.stringify preserves key order, so a

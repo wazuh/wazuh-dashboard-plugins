@@ -75,9 +75,7 @@ export const PROVIDER_TYPES = [
 
 export type ProviderType = (typeof PROVIDER_TYPES)[number];
 
-/** Severity levels recognised by the result table's severity column colouring.
- * Re-exported from `wazuh-fields.ts` (the single source of truth for the 5.0 severity
- * vocabulary) so `common/constants.ts` never drifts from it — see issue #8802. */
+/** Re-exported from `wazuh-fields.ts`, the single source of truth for the severity vocabulary. */
 export { SEVERITY_LEVELS } from './wazuh-fields';
 export type { SeverityLevel } from './wazuh-fields';
 

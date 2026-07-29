@@ -32,13 +32,6 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   // Timestamps / rule metadata (curated by the Wazuh ruleset, not analyst/attacker input).
   'timestamp',
   '@timestamp',
-  'rule.id',
-  'rule.level',
-  'rule.description',
-  'rule.mitre.technique',
-  // Wazuh 5.0 wazuh.* renames of the above (issue #8802 / Slice A): added ahead of the Slice B
-  // catalog-tool rename so this allowlist is ready to cover the renamed digest columns once they
-  // land, without removing the still-in-use bare entries during the transition.
   'wazuh.rule.id',
   'wazuh.rule.level',
   'wazuh.rule.description',
@@ -47,10 +40,7 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   // Aggregation-bucket shape (get_top_rules and the *_summary tools).
   'key',
   'doc_count',
-  // agent.os.name / os.* / architecture / vendor / version: OS/package metadata, not identifiers.
-  'agent.os.name',
-  // wazuh.agent.host.os.name is agent.os.name's real Wazuh 5.0 home (NOT a naive
-  // wazuh.agent.os.name prefix — see common/wazuh-fields.ts).
+  // os.* / architecture / vendor / version: OS/package metadata, not identifiers.
   'wazuh.agent.host.os.name',
   'os.name',
   'os.version',
@@ -214,18 +204,14 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
 });
 
 /**
- * Regression guard for issue #8802 (update-index-references): every field the AI assistant
- * queries the Indexer with must resolve to a field actually populated in Wazuh 5.0
- * `wazuh-findings-v5*`/`wazuh-events-v5*` documents. A retired bare `rule.*`/`agent.*` literal
- * (see `RETIRED_FIELD_MAP` in `common/wazuh-fields.ts`) silently produces a query that matches
- * nothing — a wrong answer with no error.
+ * Permanent regression guard: every field the AI assistant queries the Indexer with must resolve
+ * to a field actually populated in Wazuh 5.0 `wazuh-findings-v5*`/`wazuh-events-v5*` documents. A
+ * retired bare `rule.*`/`agent.*` literal (see `RETIRED_FIELD_MAP` in `common/wazuh-fields.ts`)
+ * silently produces a query that matches nothing — a wrong answer with no error.
  *
- * This scans the SOURCE of `server/tools/catalog/*.ts` (excluding test files), `digest.ts`, and
- * `guardrails.ts` for a quoted literal matching one of the retired keys. Slices B/C have renamed
- * the catalog tools/guardrails off the retired vocabulary, so this is now a permanent green
- * regression guard: it must keep passing, and any future PR that reintroduces a retired bare
- * `rule.*`/`agent.*` literal should fail it loudly. Do NOT weaken this test to make a future
- * regression pass.
+ * Scans the SOURCE of `server/tools/catalog/*.ts` (excluding test files), `digest.ts`, and
+ * `guardrails.ts` for a quoted literal matching one of the retired keys. Do NOT weaken this test
+ * to make a future regression pass.
  */
 function findRetiredFieldLiteralOccurrences(): string[] {
   const catalogDir = path.join(__dirname, 'catalog');

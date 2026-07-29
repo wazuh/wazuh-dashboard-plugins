@@ -735,7 +735,7 @@ test('lintDsl still rejects an inverted window written with exclusive bounds', (
   assert.equal(r.ok, false);
 });
 
-// --- numeric range on a re-typed keyword field (wazuh.rule.level, issue #8802) -----------------
+// --- numeric range on a keyword field (wazuh.rule.level) ---------------------------------------
 // Wazuh 5.0 re-types `rule.level` from a numeric 0-15 integer to a keyword severity word
 // (informational/low/medium/high/critical). A numeric `range` against a keyword field does not
 // error in OpenSearch -- it silently falls back to lexicographic string comparison, producing a

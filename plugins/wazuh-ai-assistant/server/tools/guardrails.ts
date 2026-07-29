@@ -28,10 +28,7 @@ export type GuardrailCheck = { ok: true } | { ok: false; reason: string };
  *
  * Callers stay responsible for any NaN guard and for truncation; this only does the clamp.
  *
- * Exported so `common.ts`'s `clampLimit` can share it. This file's only import is the shared,
- * dependency-free `common/wazuh-fields.ts` field-vocabulary module (issue #8802), so its unit
- * tests still run without pulling in the rest of the plugin; sharing this one primitive as an
- * export keeps that property intact.
+ * Exported so `common.ts`'s `clampLimit` can share it, keeping this file dependency-light.
  */
 export function clampInt(value: number, floor: number, cap: number): number {
   return Math.min(Math.max(value, floor), cap);
@@ -192,12 +189,7 @@ function normalizeMustToFilter(node: unknown): unknown {
 
 /**
  * Low-cardinality fields vetted safe for terms/composite/cardinality/significant_terms aggs.
- *
- * Wazuh 5.0 (issue #8802): every `rule.*`/`agent.*` entry lives under the `wazuh.*` namespace
- * (see `common/wazuh-fields.ts`'s module doc comment for the full rationale). This plugin ships
- * new in 5.0 with no prior installations, so only live, populated 5.0 fields are listed here —
- * bare 4.x fields with no 5.0 equivalent (e.g. the retired rule groups, rule MITRE id, and agent
- * OS name paths; see RETIRED_FIELD_MAP in common/wazuh-fields.ts) are simply never added.
+ * Only live, populated `wazuh.*` fields are listed (see `common/wazuh-fields.ts`).
  */
 const AGG_FIELD_ALLOWLIST = new Set([
   WAZUH_FIELD.RULE_ID,
@@ -278,14 +270,11 @@ const VULN_FIELD_CLAUSE_KEYS = new Set([
 ]);
 
 /**
- * Fields that were re-typed from a numeric Wazuh 4.x `long`/`integer` to a Wazuh 5.0 keyword
- * (string) severity vocabulary (issue #8802, proposal open question O1). `wazuh.rule.level` is
- * now one of `SEVERITY_LEVELS` (`informational`/`low`/`medium`/`high`/`critical`) rather than a
- * 0-15 integer. A numeric `range` against a keyword field does not error in OpenSearch — it
- * silently falls back to lexicographic string comparison ("informational" < "low" < "medium" by
- * dictionary order, NOT by severity), so it must be actively REJECTED rather than left to produce
- * a wrong-but-successful answer. `term`/`terms` against one of the five string values is the
- * correct replacement and is unaffected by this check.
+ * `wazuh.rule.level` is a keyword field holding one of `SEVERITY_LEVELS`
+ * (`informational`/`low`/`medium`/`high`/`critical`), not a numeric scale. A numeric `range`
+ * against it does not error in OpenSearch — it silently falls back to lexicographic string
+ * comparison ("informational" &lt; "low" &lt; "medium" by dictionary order, NOT by severity), so it
+ * must be actively rejected. `term`/`terms` against the string values is unaffected.
  */
 const KEYWORD_RANGE_REJECT_FIELDS = new Set<string>([WAZUH_FIELD.RULE_LEVEL]);
 
@@ -388,10 +377,10 @@ export function lintDsl(
     return { ok: false, reason: '"regexp" queries are not allowed.' };
   }
 
-  // Same "unfixable by editing the range" class as the structural bans above (issue #8802): a
-  // numeric range against a re-typed keyword field does not error, it silently does the WRONG
-  // thing (lexicographic string comparison), so it must be caught before any range-shaped check
-  // below that would otherwise treat this body as a well-formed, in-range query.
+  // Same "unfixable by editing the range" class as the structural bans above: a numeric range
+  // against a keyword field does not error, it silently does the WRONG thing (lexicographic
+  // string comparison), so it must be caught before any range-shaped check below that would
+  // otherwise treat this body as a well-formed, in-range query.
   const keywordRangeReason = findNumericRangeOnKeywordField(body);
   if (keywordRangeReason) {
     return { ok: false, reason: keywordRangeReason };
