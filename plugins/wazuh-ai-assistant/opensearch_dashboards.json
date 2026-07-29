@@ -1,0 +1,15 @@
+{
+  "id": "wazuhAiAssistant",
+  "version": "5.0.0-00",
+  "opensearchDashboardsVersion": "opensearchDashboards",
+  "requiredPlugins": [
+    "navigation",
+    "savedObjects",
+    "opensearchDashboardsReact",
+    "wazuhCore"
+  ],
+  "optionalPlugins": ["wazuh"],
+  "server": true,
+  "ui": true,
+  "configPath": ["wazuh_ai_assistant"]
+}

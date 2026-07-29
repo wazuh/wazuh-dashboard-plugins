@@ -1,0 +1,264 @@
+import { randomUUID } from 'crypto';
+import {
+  CanonicalToolChoice,
+  ChatMessage,
+  ProviderConfig,
+  StreamEvent,
+  ToolSpec,
+} from '../../common/types';
+import { describeError } from '../../common/errors';
+import {
+  ChatStreamOptions,
+  ProviderAdapter,
+  describeConnectionError,
+  trimTrailingSlash,
+} from './types';
+import { widenNumericTypes } from './wire-schema';
+import { iterateSseLines } from './sse-utils';
+import { fetchProviderWithRetry } from './retry';
+import {
+  DEFAULT_ANTHROPIC_MAX_TOKENS,
+  DEFAULT_ANTHROPIC_VERSION,
+} from '../../common/constants';
+import {
+  assertProviderUrlAllowed,
+  PROVIDER_FETCH_REDIRECT_POLICY,
+} from './url-guard';
+
+/** Per content-block-index accumulation of a streamed `tool_use` block until it closes. */
+interface ToolUseAccumulator {
+  id: string;
+  name: string;
+  json: string;
+}
+
+/**
+ * Adapter for the Anthropic Messages API. Unlike the OpenAI-compatible shape, system messages
+ * are a top-level field (not part of the messages array) and `max_tokens` is required.
+ */
+export class AnthropicAdapter implements ProviderAdapter {
+  async *chatStream(
+    config: ProviderConfig,
+    messages: ChatMessage[],
+    signal: AbortSignal,
+    options?: ChatStreamOptions,
+  ): AsyncIterable<StreamEvent> {
+    const url = `${trimTrailingSlash(config.baseUrl)}/v1/messages`;
+
+    // Fetch-time SSRF guard -- see server/providers/url-guard.ts for the full policy and
+    // why this must run here rather than only at settings.ts save time.
+    try {
+      await assertProviderUrlAllowed(url);
+    } catch (error) {
+      yield { type: 'error', message: describeError(error) };
+      return;
+    }
+
+    const systemMessages = messages.filter(
+      message => message.role === 'system',
+    );
+    const conversationMessages = messages.filter(
+      message => message.role !== 'system',
+    );
+
+    const toolChoice = options?.toolChoice ?? 'auto';
+    // 'none' means the model must not call any tool at all; the only way to guarantee that on
+    // the Anthropic wire is to omit `tools` entirely rather than pass a tool_choice value for it.
+    const includeTools =
+      Boolean(options?.tools?.length) && toolChoice !== 'none';
+
+    const response = yield* fetchProviderWithRetry(
+      () =>
+        fetch(url, {
+          method: 'POST',
+          signal,
+          redirect: PROVIDER_FETCH_REDIRECT_POLICY,
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': config.apiKey ?? '',
+            'anthropic-version': DEFAULT_ANTHROPIC_VERSION,
+          },
+          body: JSON.stringify({
+            model: config.model,
+            stream: true,
+            max_tokens: DEFAULT_ANTHROPIC_MAX_TOKENS,
+            ...(systemMessages.length
+              ? {
+                  system: systemMessages
+                    .map(message => message.content)
+                    .join('\n\n'),
+                }
+              : {}),
+            messages: conversationMessages.map(toAnthropicMessage),
+            ...(includeTools && options?.tools
+              ? {
+                  tools: toAnthropicTools(options.tools),
+                  tool_choice: {
+                    ...toAnthropicToolChoice(toolChoice),
+                    disable_parallel_tool_use: true,
+                  },
+                }
+              : {}),
+          }),
+        }),
+      signal,
+      // See server/providers/retry.ts's sanitizeProviderErrorBody doc comment for why the
+      // exact configured key is passed through here.
+      config.apiKey,
+    );
+    if (!response) {
+      return;
+    }
+
+    const toolUses = new Map<number, ToolUseAccumulator>();
+
+    try {
+      for await (const payload of iterateSseLines(response.body, signal)) {
+        let parsed: {
+          type?: string;
+          index?: number;
+          content_block?: { type?: string; id?: string; name?: string };
+          delta?: { type?: string; text?: string; partial_json?: string };
+          usage?: { input_tokens?: number; output_tokens?: number };
+          message?: {
+            usage?: { input_tokens?: number; output_tokens?: number };
+          };
+          error?: { message?: string };
+        };
+        try {
+          parsed = JSON.parse(payload);
+        } catch {
+          continue;
+        }
+
+        const blockIndex = parsed.index ?? 0;
+
+        if (
+          parsed.type === 'content_block_start' &&
+          parsed.content_block?.type === 'tool_use'
+        ) {
+          toolUses.set(blockIndex, {
+            id: parsed.content_block.id ?? randomUUID(),
+            name: parsed.content_block.name ?? '',
+            json: '',
+          });
+        } else if (
+          parsed.type === 'content_block_delta' &&
+          parsed.delta?.type === 'input_json_delta'
+        ) {
+          const entry = toolUses.get(blockIndex);
+          if (entry) {
+            entry.json += parsed.delta.partial_json ?? '';
+          }
+        } else if (
+          parsed.type === 'content_block_delta' &&
+          parsed.delta?.text
+        ) {
+          yield { type: 'delta', content: parsed.delta.text };
+        } else if (parsed.type === 'content_block_stop') {
+          const entry = toolUses.get(blockIndex);
+          if (entry) {
+            let parsedArguments: Record<string, unknown>;
+            try {
+              parsedArguments = entry.json.trim() ? JSON.parse(entry.json) : {};
+            } catch {
+              yield {
+                type: 'error',
+                message:
+                  `Provider returned malformed tool call arguments for ` +
+                  `"${entry.name}": ${entry.json}`,
+              };
+              return;
+            }
+            yield {
+              type: 'tool_call',
+              toolCall: {
+                id: entry.id,
+                name: entry.name,
+                arguments: parsedArguments,
+              },
+            };
+            toolUses.delete(blockIndex);
+          }
+        } else if (parsed.type === 'error') {
+          yield {
+            type: 'error',
+            message: parsed.error?.message ?? 'Unknown provider error',
+          };
+          return;
+        } else if (parsed.type === 'message_stop') {
+          yield { type: 'done' };
+          return;
+        } else if (parsed.type === 'message_delta' && parsed.usage) {
+          yield {
+            type: 'done',
+            usage: {
+              inputTokens: parsed.usage.input_tokens,
+              outputTokens: parsed.usage.output_tokens,
+            },
+          };
+          return;
+        }
+      }
+      yield { type: 'done' };
+    } catch (error) {
+      if (signal.aborted) {
+        return;
+      }
+      yield { type: 'error', message: describeConnectionError(error) };
+    }
+  }
+}
+
+/** Maps a canonical ChatMessage onto the Anthropic Messages API wire shape for one message. */
+function toAnthropicMessage(message: ChatMessage): Record<string, unknown> {
+  if (message.role === 'tool') {
+    return {
+      role: 'user',
+      content: [
+        {
+          type: 'tool_result',
+          tool_use_id: message.toolCallId,
+          content: message.content,
+        },
+      ],
+    };
+  }
+  if (message.role === 'assistant' && message.toolCalls?.length) {
+    const blocks: Array<Record<string, unknown>> = [];
+    if (message.content) {
+      blocks.push({ type: 'text', text: message.content });
+    }
+    for (const call of message.toolCalls) {
+      blocks.push({
+        type: 'tool_use',
+        id: call.id,
+        name: call.name,
+        input: call.arguments,
+      });
+    }
+    return { role: 'assistant', content: blocks };
+  }
+  return { role: message.role, content: message.content };
+}
+
+function toAnthropicTools(tools: ToolSpec[]): Array<Record<string, unknown>> {
+  return tools.map(tool => ({
+    name: tool.name,
+    description: tool.description,
+    input_schema: widenNumericTypes(tool.parameters),
+  }));
+}
+
+function toAnthropicToolChoice(
+  choice: CanonicalToolChoice,
+): Record<string, unknown> {
+  if (choice === 'required') {
+    return { type: 'any' };
+  }
+  if (typeof choice === 'object') {
+    return { type: 'tool', name: choice.name };
+  }
+  // 'auto' (and 'none', which never reaches here — see includeTools above).
+  return { type: 'auto' };
+}

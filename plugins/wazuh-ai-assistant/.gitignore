@@ -1,0 +1,10 @@
+node_modules/
+build/
+target/
+.DS_Store
+.local/
+eval/loadout/
+
+# Python bytecode from eval/seed_uat_dataset.py (generated on the VM when imported/compiled)
+__pycache__/
+*.pyc

@@ -27,6 +27,7 @@ import {
   tParsedIndexPattern,
 } from '../../../data-source';
 import { WzRequest } from '../../../../../react-services';
+import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import {
   buildCloudSecurityByModuleAgg,
   buildComplianceControlsAgg,
@@ -93,6 +94,14 @@ const NO_HITS: { pageSize: number } = { pageSize: 0 };
 
 function isDataSourceNotFound(error: unknown): boolean {
   return (error as { type?: string })?.type === DATA_SOURCE_NOT_FOUND;
+}
+
+function excludePinnedAgentFilter(filters: tFilter[] = []): tFilter[] {
+  return filters.filter(
+    filter =>
+      filter.meta?.controlledBy !==
+      PinnedAgentManager.FILTER_CONTROLLED_PINNED_AGENT_KEY,
+  );
 }
 
 /**
@@ -198,8 +207,12 @@ function useAggregationGroup<T>(options: {
 
   // Scope every search to the data source's fixed filters only, so global /
   // pinned filters set elsewhere in the app don't leak into the Home overview
+  const scopedFixedFilters = excludePinnedAgentFilter(fixedFilters);
   const scopedFetchData: FetchData = params =>
-    fetchData({ ...params, filters: fixedFilters } as Parameters<FetchData>[0]);
+    fetchData({
+      ...params,
+      filters: scopedFixedFilters,
+    } as Parameters<FetchData>[0]);
 
   const result = useDataGroup<T>({
     isLoading,
@@ -212,8 +225,8 @@ function useAggregationGroup<T>(options: {
   });
 
   return useMemo(
-    () => ({ ...result, dataSource, fixedFilters }),
-    [result, dataSource, fixedFilters],
+    () => ({ ...result, dataSource, fixedFilters: scopedFixedFilters }),
+    [result, dataSource, scopedFixedFilters],
   );
 }
 
@@ -501,6 +514,10 @@ function useIndexDocCount(
       repository,
     });
 
+  // Scope every search to the data source's fixed filters only, so global /
+  // pinned filters set elsewhere in the app don't leak into the Home overview
+  const scopedFixedFilters = excludePinnedAgentFilter(fixedFilters);
+
   return useDataGroup<number | undefined>({
     isLoading,
     initError: error,
@@ -511,7 +528,7 @@ function useIndexDocCount(
         await fetchData({
           dateRange,
           pagination: NO_HITS,
-          filters: fixedFilters,
+          filters: scopedFixedFilters,
         } as Parameters<typeof fetchData>[0]),
       ),
     deps: [isLoading, error, dataSource, enabled],
