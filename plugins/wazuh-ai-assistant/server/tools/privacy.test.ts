@@ -326,6 +326,47 @@ test('applyFieldPolicy: explicit "allow" entry is unaffected by isEscapeHatch', 
   assert.equal(out.samples[0]['data.win.system.computerName'], 'DESKTOP-01');
 });
 
+test('applyFieldPolicy: a "*"-suffixed entry matches the prefix field itself and any subfield', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'wazuh.rule.compliance.*', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [
+      {
+        'wazuh.rule.compliance.pci_dss': ['10.6'],
+        'wazuh.rule.compliance.hipaa': ['164.308.a.1.ii.D'],
+        'wazuh.rule.compliance': 'top-level-value',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, policy, p, undefined, undefined, true);
+  // isEscapeHatch: true (fail-closed) would anonymize anything NOT matched by the wildcard —
+  // these three all stay untouched only if the wildcard entry actually matched each of them.
+  assert.deepEqual(out.samples[0]['wazuh.rule.compliance.pci_dss'], ['10.6']);
+  assert.deepEqual(out.samples[0]['wazuh.rule.compliance.hipaa'], [
+    '164.308.a.1.ii.D',
+  ]);
+  assert.equal(out.samples[0]['wazuh.rule.compliance'], 'top-level-value');
+});
+
+test('applyFieldPolicy: a "*"-suffixed entry does not match an unrelated sibling field', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'wazuh.rule.compliance.*', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [{ 'wazuh.rule.compliance_other': 'should not match' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p, undefined, undefined, true);
+  // Fail-closed anonymizes it, proving the wildcard did NOT swallow this look-alike field —
+  // "wazuh.rule.compliance_other" is not "wazuh.rule.compliance" or a ".compliance." subfield.
+  assert.notEqual(
+    out.samples[0]['wazuh.rule.compliance_other'],
+    'should not match',
+  );
+});
+
 test('applyFieldPolicy: multi-agg breakdown scrubs each bucket under its own agg field', () => {
   const policy: FieldPolicyEntry[] = [
     { field: 'agent.name', action: 'anonymize' },

@@ -50,7 +50,11 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // analyst/attacker-supplied — reviewed 'allow'.
   { field: WAZUH_FIELD.RULE_TAGS, action: 'allow' },
   { field: WAZUH_FIELD.RULE_CATEGORY, action: 'allow' },
-  { field: WAZUH_FIELD.RULE_COMPLIANCE_PCI_DSS, action: 'allow' },
+  // Wildcard covers every compliance framework (pci_dss, hipaa, gdpr, iso_27001, nis2,
+  // nist_800_171, nist_800_53, fedramp, cmmc, tsc, ...), not just the one this plugin has a
+  // dedicated tool for — all are curated requirement-tag lists, equally not
+  // analyst/attacker-supplied.
+  { field: 'wazuh.rule.compliance.*', action: 'allow' },
   { field: WAZUH_FIELD.RULE_MITRE_TECHNIQUE_ID, action: 'allow' },
   { field: WAZUH_FIELD.RULE_MITRE_TECHNIQUE_NAME, action: 'allow' },
   { field: WAZUH_FIELD.RULE_MITRE_TACTIC, action: 'allow' },
