@@ -98,7 +98,7 @@ const SecurityOperationsSectionComponent: React.FC<
             />
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: 'min(540px, 100%)' }}>
+        <EuiFlexItem style={{ minWidth: 'min(640px, 100%)' }}>
           <WidgetGroup
             status='available'
             title={

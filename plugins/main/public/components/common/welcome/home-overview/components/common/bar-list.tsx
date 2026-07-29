@@ -5,7 +5,7 @@ import { formatUINumber } from '../../../../../../react-services/format-number';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { EmptyState } from './empty-state';
-import { WIDGET_LOADING_MIN_HEIGHT } from './widget-group';
+import { WIDGET_LOADING_MIN_HEIGHT, TOP_N_ROW_HEIGHT } from './widget-group';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 
 export interface BarListProps {
@@ -15,6 +15,8 @@ export interface BarListProps {
   getHref?: (item: TopItem) => string | undefined;
   onSelect?: (item: TopItem) => void;
   emptyMessage?: React.ReactNode;
+  totalSlots?: number;
+  moreItemsMessage?: React.ReactNode;
   barColor?: string;
   ['data-test-subj']?: string;
 }
@@ -25,11 +27,20 @@ export const BarList: React.FC<BarListProps> = ({
   getHref,
   onSelect,
   emptyMessage,
+  totalSlots,
+  moreItemsMessage = 'No more items to display',
   barColor = UI_COLOR_STATUS.info,
   ...rest
 }) => {
   const max = Math.max(1, ...items.map(item => item.count));
   const isInteractive = Boolean(getHref || onSelect);
+  const missingSlots = totalSlots
+    ? Math.max(0, totalSlots - items.length)
+    : 0;
+
+  const showMoreItemsNote = Boolean(
+    totalSlots && items.length > 0 && missingSlots >= totalSlots / 2,
+  );
 
   return (
     <div data-test-subj={rest['data-test-subj']}>
@@ -103,6 +114,21 @@ export const BarList: React.FC<BarListProps> = ({
               </EuiText>
             </React.Fragment>
           ))}
+        {showMoreItemsNote && (
+          <div
+            style={{
+              gridColumn: '1 / -1',
+              minHeight: missingSlots * TOP_N_ROW_HEIGHT,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <EuiText size='s' color='subdued'>
+              {moreItemsMessage}
+            </EuiText>
+          </div>
+        )}
       </div>
     </div>
   );

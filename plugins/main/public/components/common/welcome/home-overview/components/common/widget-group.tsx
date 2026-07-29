@@ -30,6 +30,14 @@ export const WIDGET_LOADING_MIN_HEIGHT = {
   heroAndList: 190,
 } as const;
 
+/**
+ * Approx. rendered height of one `BarList`/`TopNTable` row. Used to size the
+ * "no more items" filler proportionally when a ranked list has fewer entries
+ * than its declared `totalSlots`, so a short list doesn't leave a stretched
+ * sibling panel with a large blank gap underneath it.
+ */
+export const TOP_N_ROW_HEIGHT = 36;
+
 export interface WidgetGroupBodyProps {
   status: DataGroupStatus;
   errorLabel?: string;

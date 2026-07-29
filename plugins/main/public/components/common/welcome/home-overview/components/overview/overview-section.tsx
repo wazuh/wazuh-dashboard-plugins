@@ -137,12 +137,16 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               caption='Current state'
               headerLink={{ label: 'IT Hygiene', href: getItHygieneUrl() }}
               loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
+              centerBody
               data-test-subj='home-overview-top-os'
             >
               {topOs.data && (
                 <BarList
                   items={topOs.data}
                   emptyMessage='No operating systems found'
+                  title='OS name'
+                  totalSlots={5}
+                  moreItemsMessage='No more operating systems to display'
                   data-test-subj='top-os'
                 />
               )}

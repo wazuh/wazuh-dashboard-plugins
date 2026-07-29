@@ -1,9 +1,9 @@
 import React from 'react';
-import { EuiBasicTable, EuiBasicTableColumn } from '@elastic/eui';
+import { EuiBasicTable, EuiBasicTableColumn, EuiText } from '@elastic/eui';
 import { TopItem } from '../../interfaces/types';
 import { TabNumber } from './tab-number';
 import { EmptyState } from './empty-state';
-import { WIDGET_LOADING_MIN_HEIGHT } from './widget-group';
+import { WIDGET_LOADING_MIN_HEIGHT, TOP_N_ROW_HEIGHT } from './widget-group';
 
 export interface TopNTableProps {
   items: TopItem[];
@@ -11,6 +11,8 @@ export interface TopNTableProps {
   countColumnName?: string;
   renderKey?: (item: TopItem) => React.ReactNode;
   noItemsMessage?: React.ReactNode;
+  totalSlots?: number;
+  moreItemsMessage?: React.ReactNode;
   ['data-test-subj']?: string;
 }
 
@@ -20,8 +22,17 @@ export const TopNTable: React.FC<TopNTableProps> = ({
   countColumnName = 'Count',
   renderKey,
   noItemsMessage,
+  totalSlots,
+  moreItemsMessage = 'No more items to display',
   ...rest
 }) => {
+  const missingSlots = totalSlots
+    ? Math.max(0, totalSlots - items.length)
+    : 0;
+
+  const showMoreItemsNote = Boolean(
+    totalSlots && items.length > 0 && missingSlots >= totalSlots / 2,
+  );
   const columns: Array<EuiBasicTableColumn<TopItem>> = [
     {
       field: 'key',
@@ -68,6 +79,20 @@ export const TopNTable: React.FC<TopNTableProps> = ({
         }
         data-test-subj={rest['data-test-subj']}
       />
+      {showMoreItemsNote && (
+        <div
+          style={{
+            minHeight: missingSlots * TOP_N_ROW_HEIGHT,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <EuiText size='xs' color='subdued'>
+            {moreItemsMessage}
+          </EuiText>
+        </div>
+      )}
     </div>
   );
 };

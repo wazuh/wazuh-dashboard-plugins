@@ -49,7 +49,7 @@ export const RegulatoryComplianceBadges: React.FC<
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))',
           rowGap: '8px',
           columnGap: '8px',
         }}
@@ -69,15 +69,12 @@ export const RegulatoryComplianceBadges: React.FC<
                   <EuiFlexGroup
                     gutterSize='s'
                     alignItems='center'
-                    responsive={false}
                   >
                     <EuiFlexItem style={{ minWidth: 0 }}>
                       <EuiText
                         size='xs'
                         style={{
                           whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
                         }}
                       >
                         <strong>{label}</strong>
