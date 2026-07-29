@@ -96,7 +96,9 @@ retry):
 - A numeric `range` against a keyword-typed severity field (currently `wazuh.rule.level`,
   whose values are categorical severity words such as `critical`/`high`/`medium`/`low`) is
   rejected outright: OpenSearch does not error on a numeric range against a keyword field, it
-  just silently matches nothing, which would look like a legitimate empty result to the model.
+  silently falls back to lexicographic string comparison — a real but WRONG result (e.g.
+  `gte: "medium"` excludes `"high"`, since "h" sorts before "m"), which would look like a
+  legitimate answer to the model.
 - Bucket aggregations only on a vetted low-cardinality field allowlist; bucket `size` ≤ 100;
   at most 5 top-level aggregations.
 - Index pattern checked against the allowlist before anything else.

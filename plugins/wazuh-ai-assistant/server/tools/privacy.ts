@@ -82,7 +82,7 @@ export interface PseudonymEntry {
 /** Infers which pseudonym kind a field name should mint, from the field name alone ("kind
  * inferred from field name"). Checked in this order so a field matching more than one heuristic
  * (there are none in FIELD_POLICY_DEFAULTS today) resolves predictably; falls back to the generic
- * `VAL` kind (used by e.g. `GeoLocation.*`, which is neither a host/ip/user/url). */
+ * `VAL` kind for a field that is none of host/ip/user/url. */
 export function inferPseudonymKind(field: string): PseudonymKind {
   const lower = field.toLowerCase();
   if (lower.includes('url')) {
@@ -470,9 +470,9 @@ export function prescanAndMintToolContent(
 
 /** Resolves the policy entry for `field` (optionally scoped to `toolName`). Tool-scoped entries
  * ("toolName/field") are checked first and win over plain ones; plain entries support a trailing
- * `.*` prefix match (e.g. "GeoLocation.*" matches "GeoLocation" itself and
- * "GeoLocation.country_name"). First matching entry wins; `undefined` (no matching policy entry)
- * means "allow" by omission. */
+ * `.*` prefix match (e.g. "wazuh.rule.compliance.*" matches "wazuh.rule.compliance" itself and
+ * "wazuh.rule.compliance.pci_dss"). First matching entry wins; `undefined` (no matching policy
+ * entry) means "allow" by omission. */
 function resolveFieldEntry(
   field: string,
   policy: FieldPolicyEntry[],

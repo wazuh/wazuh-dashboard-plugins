@@ -243,14 +243,15 @@ const FORBIDDEN_LEGACY_LITERALS = [
 ];
 
 /**
- * Permanent regression guard: every field the AI assistant queries the Indexer with must resolve
- * to a field actually populated in Wazuh 5.0 `wazuh-findings-v5*`/`wazuh-events-v5*` documents. A
- * bare `rule.*`/`agent.*` literal silently produces a query that matches nothing — a wrong
- * answer with no error.
+ * Permanent regression guard: every field the AI assistant queries the Indexer with, or
+ * classifies for privacy purposes, must resolve to a field actually populated in Wazuh 5.0
+ * `wazuh-findings-v5*`/`wazuh-events-v5*` documents. A bare `rule.*`/`agent.*` literal silently
+ * produces a query that matches nothing (or a field-policy entry that never fires) — a wrong
+ * answer, or an unmasked PII leak, with no error.
  *
- * Scans the SOURCE of `server/tools/catalog/*.ts` (excluding test files), `digest.ts`, and
- * `guardrails.ts` for a quoted literal matching one of `FORBIDDEN_LEGACY_LITERALS`. Do NOT weaken
- * this test to make a future regression pass.
+ * Scans the SOURCE of `server/tools/catalog/*.ts` (excluding test files), `digest.ts`,
+ * `guardrails.ts`, `privacy.ts`, and `prompts.ts` for a quoted literal matching one of
+ * `FORBIDDEN_LEGACY_LITERALS`. Do NOT weaken this test to make a future regression pass.
  */
 function findRetiredFieldLiteralOccurrences(): string[] {
   const catalogDir = path.join(__dirname, 'catalog');
@@ -260,6 +261,8 @@ function findRetiredFieldLiteralOccurrences(): string[] {
     .map(name => path.join(catalogDir, name));
   filesToScan.push(path.join(__dirname, 'digest.ts'));
   filesToScan.push(path.join(__dirname, 'guardrails.ts'));
+  filesToScan.push(path.join(__dirname, 'privacy.ts'));
+  filesToScan.push(path.join(__dirname, '..', 'prompts.ts'));
 
   const failures: string[] = [];
 
