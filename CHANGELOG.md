@@ -106,6 +106,7 @@
 
 ### Fixed
 
+- Fixed AI Assistant provider API keys being stored unencrypted: saving a key now requires `wazuh_ai_assistant.encryptionKey` [#8801](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8801)
 - Fixed version hardcoded value in the deploy agent wizard [#7923](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7923)
 - Fixed a visual bug in SCA score decimal precision on the Agent Overview [#8099](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8099)
 - Fixed the agent stats view was innaccesible for some version combinations [#8150](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8150)

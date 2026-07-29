@@ -347,6 +347,29 @@ export async function requireAdministrator(
   return null;
 }
 
+/** Rendered in the settings form's error callout — keep short; never reference repo files. */
+export const ENCRYPTION_REQUIRED_MESSAGE =
+  'Cannot save the API key: encryption at rest is not configured, so it would be stored in ' +
+  'plain text. Configure a base64 32-byte key with `opensearch-dashboards-keystore add ' +
+  'wazuh_ai_assistant.encryptionKey`, restart OpenSearch Dashboards, and save again.';
+
+/** Refuses a non-empty `apiKey` when no encryption key is configured. See docs/ENCRYPTION.md. */
+export function requireApiKeyEncryption(
+  apiKey: string | undefined,
+  response: OpenSearchDashboardsResponseFactory,
+): IOpenSearchDashboardsResponse | null {
+  if (!apiKey || apiKey.length === 0) {
+    return null;
+  }
+  if (getApiKeyCipher().enabled) {
+    return null;
+  }
+  return response.customError({
+    statusCode: 503,
+    body: { message: ENCRYPTION_REQUIRED_MESSAGE },
+  });
+}
+
 export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
   // List all configured providers. API keys never leave the server. Paginated:
   // `page`/`perPage` query params, response carries `total`/`page`/`perPage` alongside `providers` —
@@ -405,6 +428,14 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         await assertProviderUrlAllowed(request.body.baseUrl);
       } catch (error) {
         return response.badRequest({ body: { message: describeError(error) } });
+      }
+      // Refuse plaintext before any saved-object write.
+      const encryptionGate = requireApiKeyEncryption(
+        request.body.apiKey,
+        response,
+      );
+      if (encryptionGate) {
+        return encryptionGate;
       }
       const client = providerClient(request);
       const existingCount = await client.find<StoredProviderAttributes>({
@@ -482,6 +513,14 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
         await assertProviderUrlAllowed(request.body.baseUrl);
       } catch (error) {
         return response.badRequest({ body: { message: describeError(error) } });
+      }
+      // Same gate as POST /providers; only fires when the caller re-supplies a key.
+      const encryptionGate = requireApiKeyEncryption(
+        request.body.apiKey,
+        response,
+      );
+      if (encryptionGate) {
+        return encryptionGate;
       }
       const client = providerClient(request);
       const existing = await client.get<StoredProviderAttributes>(
