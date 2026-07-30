@@ -31,6 +31,7 @@ import {
   EuiIcon,
   EuiHorizontalRule,
   EuiFieldSearch,
+  EuiAccordion,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { CoreStart } from '../../../../../src/core/public';
@@ -1238,7 +1239,18 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 <EuiSpacer size='s' />
 
                 {fieldPolicyDraft.length > 0 && (
-                  <>
+                  <EuiAccordion
+                    id='field-policy-accordion'
+                    initialIsOpen
+                    buttonContent={i18n.translate(
+                      'wazuhAiAssistant.settings.privacy.fieldPolicyAccordion',
+                      {
+                        defaultMessage: 'Field rules ({count})',
+                        values: { count: fieldPolicyDraft.length },
+                      },
+                    )}
+                    paddingSize='s'
+                  >
                     <EuiFieldSearch
                       compressed
                       placeholder={i18n.translate(
@@ -1260,9 +1272,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                           <strong>
                             {i18n.translate(
                               'wazuhAiAssistant.settings.privacy.fieldColumnHeader',
-                              {
-                                defaultMessage: 'Field',
-                              },
+                              { defaultMessage: 'Field' },
                             )}
                           </strong>
                         </EuiText>
@@ -1272,111 +1282,117 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                           <strong>
                             {i18n.translate(
                               'wazuhAiAssistant.settings.privacy.actionColumnHeader',
-                              {
-                                defaultMessage: 'Action',
-                              },
+                              { defaultMessage: 'Action' },
                             )}
                           </strong>
                         </EuiText>
                       </EuiFlexItem>
-                      {/* Spacer column matching the width of the delete icon button below. */}
                       <EuiFlexItem grow={false} style={{ width: 24 }} />
                     </EuiFlexGroup>
                     <EuiSpacer size='xs' />
-                  </>
+                    {fieldPolicyDraft
+                      .map((entry, index) => ({ entry, index }))
+                      .filter(
+                        ({ entry }) =>
+                          !fieldPolicyFilter ||
+                          entry._isNew ||
+                          entry.field
+                            .toLowerCase()
+                            .includes(fieldPolicyFilter.toLowerCase()),
+                      )
+                      .map(({ entry, index }) => (
+                        <React.Fragment key={index}>
+                          <EuiFlexGroup
+                            gutterSize='s'
+                            alignItems='center'
+                            responsive={false}
+                          >
+                            <EuiFlexItem>
+                              <EuiFieldText
+                                fullWidth
+                                compressed
+                                placeholder={i18n.translate(
+                                  'wazuhAiAssistant.settings.privacy.fieldPlaceholder',
+                                  { defaultMessage: 'e.g. agent.name' },
+                                )}
+                                aria-label={i18n.translate(
+                                  'wazuhAiAssistant.settings.privacy.fieldColumnLabel',
+                                  { defaultMessage: 'Field' },
+                                )}
+                                value={entry.field}
+                                onChange={event =>
+                                  handleFieldPolicyChange(index, {
+                                    field: event.target.value,
+                                  })
+                                }
+                              />
+                            </EuiFlexItem>
+                            <EuiFlexItem grow={false} style={{ minWidth: 160 }}>
+                              <EuiSelect
+                                compressed
+                                aria-label={i18n.translate(
+                                  'wazuhAiAssistant.settings.privacy.actionColumnLabel',
+                                  { defaultMessage: 'Action' },
+                                )}
+                                options={FIELD_POLICY_ACTIONS.map(action => ({
+                                  value: action,
+                                  text: FIELD_POLICY_ACTION_LABELS[action],
+                                }))}
+                                value={entry.action}
+                                onChange={event =>
+                                  handleFieldPolicyChange(index, {
+                                    action: event.target
+                                      .value as FieldPolicyAction,
+                                  })
+                                }
+                              />
+                            </EuiFlexItem>
+                            <EuiFlexItem grow={false}>
+                              <EuiButtonIcon
+                                iconType='trash'
+                                color='danger'
+                                aria-label={i18n.translate(
+                                  'wazuhAiAssistant.settings.privacy.removeField',
+                                  { defaultMessage: 'Remove field' },
+                                )}
+                                onClick={() =>
+                                  handleRemoveFieldPolicyRow(index)
+                                }
+                              />
+                            </EuiFlexItem>
+                          </EuiFlexGroup>
+                          <EuiSpacer size='xs' />
+                        </React.Fragment>
+                      ))}
+                    <EuiSpacer size='s' />
+                    <EuiButton
+                      size='s'
+                      iconType='plusInCircle'
+                      onClick={handleAddFieldPolicyRow}
+                    >
+                      {i18n.translate(
+                        'wazuhAiAssistant.settings.privacy.addField',
+                        { defaultMessage: 'Add field' },
+                      )}
+                    </EuiButton>
+                  </EuiAccordion>
                 )}
 
-                {fieldPolicyDraft
-                  .map((entry, index) => ({ entry, index }))
-                  .filter(
-                    ({ entry }) =>
-                      !fieldPolicyFilter ||
-                      entry._isNew ||
-                      entry.field
-                        .toLowerCase()
-                        .includes(fieldPolicyFilter.toLowerCase()),
-                  )
-                  .map(({ entry, index }) => (
-                    <React.Fragment key={index}>
-                      <EuiFlexGroup
-                        gutterSize='s'
-                        alignItems='center'
-                        responsive={false}
-                      >
-                        <EuiFlexItem>
-                          <EuiFieldText
-                            fullWidth
-                            compressed
-                            placeholder={i18n.translate(
-                              'wazuhAiAssistant.settings.privacy.fieldPlaceholder',
-                              {
-                                defaultMessage: 'e.g. agent.name',
-                              },
-                            )}
-                            aria-label={i18n.translate(
-                              'wazuhAiAssistant.settings.privacy.fieldColumnLabel',
-                              {
-                                defaultMessage: 'Field',
-                              },
-                            )}
-                            value={entry.field}
-                            onChange={event =>
-                              handleFieldPolicyChange(index, {
-                                field: event.target.value,
-                              })
-                            }
-                          />
-                        </EuiFlexItem>
-                        <EuiFlexItem grow={false} style={{ minWidth: 160 }}>
-                          <EuiSelect
-                            compressed
-                            aria-label={i18n.translate(
-                              'wazuhAiAssistant.settings.privacy.actionColumnLabel',
-                              {
-                                defaultMessage: 'Action',
-                              },
-                            )}
-                            options={FIELD_POLICY_ACTIONS.map(action => ({
-                              value: action,
-                              text: FIELD_POLICY_ACTION_LABELS[action],
-                            }))}
-                            value={entry.action}
-                            onChange={event =>
-                              handleFieldPolicyChange(index, {
-                                action: event.target.value as FieldPolicyAction,
-                              })
-                            }
-                          />
-                        </EuiFlexItem>
-                        <EuiFlexItem grow={false}>
-                          <EuiButtonIcon
-                            iconType='trash'
-                            color='danger'
-                            aria-label={i18n.translate(
-                              'wazuhAiAssistant.settings.privacy.removeField',
-                              {
-                                defaultMessage: 'Remove field',
-                              },
-                            )}
-                            onClick={() => handleRemoveFieldPolicyRow(index)}
-                          />
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                      <EuiSpacer size='xs' />
-                    </React.Fragment>
-                  ))}
-
-                <EuiSpacer size='s' />
-                <EuiButton
-                  size='s'
-                  iconType='plusInCircle'
-                  onClick={handleAddFieldPolicyRow}
-                >
-                  {i18n.translate(
-                    'wazuhAiAssistant.settings.privacy.addField',
-                    { defaultMessage: 'Add field' },
-                  )}
-                </EuiButton>
+                {fieldPolicyDraft.length === 0 && (
+                  <>
+                    <EuiSpacer size='s' />
+                    <EuiButton
+                      size='s'
+                      iconType='plusInCircle'
+                      onClick={handleAddFieldPolicyRow}
+                    >
+                      {i18n.translate(
+                        'wazuhAiAssistant.settings.privacy.addField',
+                        { defaultMessage: 'Add field' },
+                      )}
+                    </EuiButton>
+                  </>
+                )}
 
                 <EuiHorizontalRule margin='m' />
                 <EuiToolTip content={!canSave ? accessMessage : undefined}>
