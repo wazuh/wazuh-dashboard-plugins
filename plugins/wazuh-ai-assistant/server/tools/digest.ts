@@ -45,8 +45,10 @@ function getByPath(source: Record<string, unknown>, path: string): unknown {
 }
 
 /**
- * Rows from a plain hits-based `_search` response (`hits.hits[]._source`). An EMPTY hits array
- * returns undefined rather than [] so aggregation-only responses (`size:0` always carries an
+ * Rows from a plain hits-based `_search` response (`hits.hits[]._source`), with the hit's own
+ * OpenSearch document `_id` merged in under the `_id` key (a sibling of `_source`'s own fields,
+ * not nested inside them) so it can be surfaced the same way as any other row field. An EMPTY hits
+ * array returns undefined rather than [] so aggregation-only responses (`size:0` always carries an
  * empty hits section) fall through to bucketsToRows instead of short-circuiting to a blank table.
  */
 function hitsToRows(
@@ -64,7 +66,11 @@ function hitsToRows(
     if (!hit || typeof hit !== 'object') {
       continue;
     }
-    rows.push((hit as { _source?: Record<string, unknown> })._source ?? {});
+    const { _source, _id } = hit as {
+      _source?: Record<string, unknown>;
+      _id?: unknown;
+    };
+    rows.push(_id !== undefined ? { ...(_source ?? {}), _id } : _source ?? {});
   }
   return rows;
 }

@@ -218,7 +218,7 @@ export const STANDARD_FINDING_TABLE_COLUMNS: ToolTableColumnSpec[] = [
   { field: 'wazuh.agent.name', label: 'Agent' },
   { field: 'wazuh.rule.title', label: 'Title' },
   { field: 'wazuh.rule.level', label: 'Level', severity: true },
-  { field: 'wazuh.rule.category', label: 'Category' },
+  { field: 'wazuh.integration.category', label: 'Category' },
 ];
 export const STANDARD_FINDING_TABLE_COLUMN_FIELDS =
   STANDARD_FINDING_TABLE_COLUMNS.map(column => column.field);
@@ -237,6 +237,8 @@ export const STANDARD_FINDING_SAMPLE_COLUMNS = [
  * include here.
  */
 export const FINDING_INVESTIGATION_ROW_FIELDS = [
+  '_id',
+  'wazuh.rule.id',
   'wazuh.rule.tags',
   'wazuh.rule.mitre.technique.id',
   'source.ip',
