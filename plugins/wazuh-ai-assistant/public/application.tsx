@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { AppMountParameters, CoreStart } from '../../../src/core/public';
 import { I18nProvider } from '@osd/i18n/react';
@@ -7,9 +7,17 @@ import { i18n } from '@osd/i18n';
 import { ChatPage } from './components/chat/chat-page';
 import { SettingsPage } from './components/settings/settings-page';
 import { SettingsService } from './services/settings-service';
+import {
+  interruptConfirmationText,
+  interruptConfirmationTitle,
+} from './services/interrupt-confirm';
 import { ProviderSummary } from '../common/types';
 
 type Route = 'chat' | 'settings';
+
+/** How long the first provider load may take before the app stops waiting on it — see
+ * `refreshProviders`. Generous for a slow cluster, short enough that no one stares at a spinner. */
+const PROVIDERS_LOAD_TIMEOUT_MS = 20_000;
 
 /**
  * Provider list/selection is owned here (not by ChatPage) so a tab switch away from Chat and back
@@ -20,18 +28,67 @@ type Route = 'chat' | 'settings';
  * reads as part of the chat surface instead of a separate floating control — see
  * `onProviderChange` passed to ChatPage below.
  */
-const App: React.FC<{ core: CoreStart }> = ({ core }) => {
+/**
+ * `onAppLeave` is the platform's one hook for "the user is leaving this app": OSD calls it both for
+ * a navigation to another dashboard app (where it renders a confirm modal) and for a browser
+ * reload/tab close (where it arms the native `beforeunload` prompt) — see
+ * src/core/public/application/application_service.tsx. Registering it here, once, is what keeps a
+ * running answer from being thrown away without the user being asked.
+ */
+const App: React.FC<{
+  core: CoreStart;
+  onAppLeave: AppMountParameters['onAppLeave'];
+}> = ({ core, onAppLeave }) => {
   const [route, setRoute] = useState<Route>('chat');
+  // Settings is mounted lazily (nothing should issue its requests for a user who never opens the
+  // tab) but, once opened, stays mounted for the same reason ChatPage does — see the render below.
+  const [settingsEverOpened, setSettingsEverOpened] = useState(false);
   const [providers, setProviders] = useState<ProviderSummary[]>([]);
   const [providersLoaded, setProvidersLoaded] = useState(false);
   const [selectedProviderId, setSelectedProviderId] = useState('');
   const [providersError, setProvidersError] = useState<string | null>(null);
   const [settingsService] = useState(() => new SettingsService(core.http));
+  // Read by the leave handler below, which is registered ONCE and must always see the current value
+  // — hence a ref rather than state (a stale closure here would silently stop warning anyone).
+  const isGeneratingRef = useRef(false);
+  const handleGeneratingChange = useCallback((generating: boolean) => {
+    isGeneratingRef.current = generating;
+  }, []);
+
+  useEffect(() => {
+    onAppLeave(actions => {
+      if (!isGeneratingRef.current) {
+        return actions.default();
+      }
+      // The same copy the in-app confirmation uses (services/interrupt-confirm.ts) — one decision,
+      // one wording, whichever way the user is leaving.
+      return actions.confirm(
+        interruptConfirmationText(),
+        interruptConfirmationTitle(),
+      );
+    });
+  }, [onAppLeave]);
 
   const refreshProviders = useCallback(() => {
+    // Deadline for the FIRST load. `providersLoaded` gates the Chat tab's whole rendering — until it
+    // flips, the tab shows a spinner and nothing else — so a request that never settles (a hung
+    // proxy, a dropped connection) left the chat spinning forever with no explanation and no way
+    // out. On expiry the app renders its normal "could not load providers" state instead, and a
+    // later successful response still takes effect.
+    const deadline = setTimeout(() => {
+      setProvidersError(
+        i18n.translate('wazuhAiAssistant.chat.providersLoadTimeout', {
+          defaultMessage:
+            'Loading the configured providers timed out. Reload the page, or check the Settings tab.',
+        }),
+      );
+      setProvidersLoaded(true);
+    }, PROVIDERS_LOAD_TIMEOUT_MS);
+
     settingsService
       .list()
       .then(list => {
+        clearTimeout(deadline);
         setProviders(list);
         setProvidersError(null);
         setSelectedProviderId(current => {
@@ -44,6 +101,7 @@ const App: React.FC<{ core: CoreStart }> = ({ core }) => {
         });
       })
       .catch(() => {
+        clearTimeout(deadline);
         setProvidersError(
           i18n.translate('wazuhAiAssistant.chat.providersLoadError', {
             defaultMessage:
@@ -86,7 +144,10 @@ const App: React.FC<{ core: CoreStart }> = ({ core }) => {
           </EuiTab>
           <EuiTab
             isSelected={route === 'settings'}
-            onClick={() => setRoute('settings')}
+            onClick={() => {
+              setSettingsEverOpened(true);
+              setRoute('settings');
+            }}
           >
             {i18n.translate('wazuhAiAssistant.app.settingsTab', {
               defaultMessage: 'Settings',
@@ -94,8 +155,18 @@ const App: React.FC<{ core: CoreStart }> = ({ core }) => {
           </EuiTab>
         </EuiTabs>
         <EuiSpacer size='s' />
+        {/* Both tabs are HIDDEN, never unmounted. Swapping the two components on every tab switch
+            destroyed ChatPage's entire state: the visible transcript, the active conversation id
+            (so the next turn created a second saved conversation instead of continuing the one the
+            user was in), the per-conversation pseudonym map, and the tool-call history a follow-up
+            question depends on. Visiting Settings for five seconds is not a reason to lose the
+            conversation, so the Chat tab keeps living behind `display: none` — which, unlike
+            unmounting, also leaves an in-flight answer streaming into the transcript the user
+            returns to. */}
         <div style={{ flex: '1 1 auto', minHeight: 0, overflow: 'auto' }}>
-          {route === 'chat' ? (
+          <div
+            style={{ height: '100%', display: route === 'chat' ? '' : 'none' }}
+          >
             <ChatPage
               core={core}
               providers={providers}
@@ -103,10 +174,22 @@ const App: React.FC<{ core: CoreStart }> = ({ core }) => {
               providersError={providersError}
               selectedProviderId={selectedProviderId}
               onProviderChange={setSelectedProviderId}
-              onNavigateToSettings={() => setRoute('settings')}
+              onNavigateToSettings={() => {
+                setSettingsEverOpened(true);
+                setRoute('settings');
+              }}
+              onGeneratingChange={handleGeneratingChange}
             />
-          ) : (
-            <SettingsPage core={core} onProvidersChanged={refreshProviders} />
+          </div>
+          {settingsEverOpened && (
+            <div
+              style={{
+                height: '100%',
+                display: route === 'settings' ? '' : 'none',
+              }}
+            >
+              <SettingsPage core={core} onProvidersChanged={refreshProviders} />
+            </div>
           )}
         </div>
       </div>
@@ -122,7 +205,7 @@ const App: React.FC<{ core: CoreStart }> = ({ core }) => {
  */
 export const renderApp = (
   core: CoreStart,
-  { element }: AppMountParameters,
+  { element, onAppLeave }: AppMountParameters,
 ): (() => void) => {
   core.chrome.setBreadcrumbs([
     {
@@ -132,6 +215,6 @@ export const renderApp = (
     },
   ]);
   const root = createRoot(element);
-  root.render(<App core={core} />);
+  root.render(<App core={core} onAppLeave={onAppLeave} />);
   return () => root.unmount();
 };

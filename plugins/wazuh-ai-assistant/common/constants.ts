@@ -94,3 +94,25 @@ export const DEFAULT_ANTHROPIC_VERSION = '2023-06-01';
 export const CONVERSATION_MAX_TITLE_LENGTH = 200;
 export const CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH = 100_000;
 export const CONVERSATION_MAX_MESSAGES = 1000;
+
+/**
+ * Rows kept when a result table is persisted alongside the message it was shown with
+ * (`PersistedChatMessage.table`). The live table is already capped at 500 rows server-side
+ * (server/tools/digest.ts's `TABLE_ROW_CAP`); this second, tighter cap exists because a saved
+ * conversation multiplies that by every table-bearing turn it holds.
+ */
+export const CONVERSATION_MAX_TABLE_ROWS = 100;
+
+/**
+ * Total serialized budget for a conversation's `messages` payload, enforced CLIENT-side before the
+ * request is built (`common/chat-history.ts`'s `toPersistedMessages`).
+ *
+ * The per-message and per-conversation counts above bound the array's SHAPE but not its size: 1000
+ * messages of 100k characters is a ~100 MB payload on paper, while OSD's default
+ * `server.maxPayloadBytes` is 1 MB — so a conversation could satisfy every limit above and still be
+ * rejected with a 413, which auto-save treats as a non-fatal hiccup and therefore fails silently
+ * and permanently. Persisting tables and tool-call history makes that ceiling much easier to reach,
+ * so the trim now also drops content (oldest and least essential first) until the payload fits.
+ * Set well below 1 MB to leave room for the title, the JSON envelope and multi-byte characters.
+ */
+export const CONVERSATION_MAX_SERIALIZED_BYTES = 700_000;

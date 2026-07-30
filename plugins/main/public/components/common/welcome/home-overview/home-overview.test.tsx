@@ -30,17 +30,18 @@ jest.mock('./components/threat-intel-feed', () => ({
 }));
 jest.mock('./hooks/use-overview-data', () => ({
   useFindingsOverview: jest.fn(() => ({ status: 'loading' })),
+  useFindingsBreakdowns: jest.fn(() => ({ status: 'loading' })),
   useVulnerabilityOverview: jest.fn(() => ({
     status: 'available',
     data: {
       severity: { critical: 0, high: 0, medium: 0, low: 0 },
-      byOs: [],
+      byPackage: [],
       cvesMatched: 0,
     },
   })),
   useThreatIntelEnrichments: jest.fn(() => ({
     status: 'available',
-    data: { total: 0, feedByType: [] },
+    data: { total: 0, feedByType: [], byThreatType: [] },
   })),
 }));
 jest.mock('../../hooks', () => ({
