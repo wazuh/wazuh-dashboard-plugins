@@ -115,7 +115,7 @@ export interface TableSpec {
    * "Open in Discover" support (result-table.tsx / discover-link.tsx): only ever present for a
    * table built from the Indexer path (server/tools/executor.ts's `executeIndexerRequest`) — the
    * Manager API path has no index/DSL concept, so its tables never carry this field. `index` is the
-   * concrete index the search ran against (e.g. "wazuh-alerts-*"); `dsl` is the executed query
+   * concrete index the search ran against (e.g. "wazuh-findings-v5*"); `dsl` is the executed query
    * clause (the guardrail-clamped `body.query`, not a `{query: ...}` wrapper) that the client
    * rison-encodes verbatim into the Discover link's custom filter.
    */

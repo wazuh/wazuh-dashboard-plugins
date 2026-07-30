@@ -77,27 +77,27 @@ function sleep(ms) {
 const TOOL_CATEGORY = {
   get_active_agents: 'agents',
   get_disconnected_agents: 'agents',
-  get_critical_alerts: 'alerts',
-  search_alerts_by_agent: 'alerts',
-  get_top_rules: 'alerts',
+  get_critical_findings: 'findings',
+  search_findings_by_agent: 'findings',
+  get_top_rules: 'findings',
   get_critical_vulnerabilities: 'vulnerabilities',
-  get_alerts_by_time: 'alerts',
-  get_brute_force: 'alerts',
-  get_security_summary: 'alerts',
-  get_suspicious_powershell: 'alerts',
-  search_alerts_by_rule_id: 'alerts',
-  search_alerts_by_rule_group: 'alerts',
-  get_pci_dss_alerts: 'compliance',
+  get_findings_by_time: 'findings',
+  get_brute_force: 'findings',
+  get_security_summary: 'findings',
+  get_suspicious_powershell: 'findings',
+  search_findings_by_rule_title: 'findings',
+  search_findings_by_rule_group: 'findings',
+  get_pci_dss_findings: 'compliance',
   get_pci_dss_summary: 'compliance',
-  search_alerts_by_multiple_agents: 'alerts',
-  search_alerts_by_os: 'alerts',
+  search_findings_by_multiple_agents: 'findings',
+  search_findings_by_os: 'findings',
   get_vulnerabilities: 'vulnerabilities',
   get_vulnerabilities_by_agent: 'vulnerabilities',
   get_vulnerability_by_cve: 'vulnerabilities',
   get_fim_files: 'fim',
   get_sca_results: 'sca',
   get_sca_checks: 'sca',
-  get_mitre_alerts: 'mitre',
+  get_mitre_findings: 'mitre',
   get_mitre_summary: 'mitre',
   get_agent_os: 'inventory',
   get_agent_packages: 'inventory',
@@ -127,12 +127,12 @@ const TOOL_DEFS = [
     argsFn: () => ({ args: {} }),
   },
   {
-    name: 'get_critical_alerts',
+    name: 'get_critical_findings',
     family: 'findings',
     argsFn: () => ({ args: {} }),
   },
   {
-    name: 'search_alerts_by_agent',
+    name: 'search_findings_by_agent',
     family: 'findings',
     argsFn: f =>
       f.agentName
@@ -148,7 +148,7 @@ const TOOL_DEFS = [
     argsFn: () => ({ args: {} }),
   },
   {
-    name: 'get_alerts_by_time',
+    name: 'get_findings_by_time',
     family: 'findings',
     argsFn: () => ({ args: {} }),
   },
@@ -164,17 +164,17 @@ const TOOL_DEFS = [
     argsFn: () => ({ args: {} }),
   },
   {
-    name: 'search_alerts_by_rule_id',
+    name: 'search_findings_by_rule_title',
     family: 'findings',
     argsFn: f =>
-      typeof f.ruleId === 'number'
-        ? { args: { rule_id: f.ruleId } }
+      typeof f.ruleTitle === 'string' && f.ruleTitle.length > 0
+        ? { args: { rule_title: f.ruleTitle } }
         : {
-            skip: 'no real rule.id value discoverable from wazuh-findings-v5*',
+            skip: 'no real rule.title value discoverable from wazuh-findings-v5*',
           },
   },
   {
-    name: 'search_alerts_by_rule_group',
+    name: 'search_findings_by_rule_group',
     family: 'findings',
     argsFn: f =>
       f.ruleTag
@@ -184,7 +184,7 @@ const TOOL_DEFS = [
           },
   },
   {
-    name: 'get_pci_dss_alerts',
+    name: 'get_pci_dss_findings',
     family: 'findings',
     argsFn: () => ({ args: {} }),
   },
@@ -194,7 +194,7 @@ const TOOL_DEFS = [
     argsFn: () => ({ args: {} }),
   },
   {
-    name: 'search_alerts_by_multiple_agents',
+    name: 'search_findings_by_multiple_agents',
     family: 'findings',
     argsFn: f =>
       f.agentName
@@ -208,7 +208,7 @@ const TOOL_DEFS = [
           },
   },
   {
-    name: 'search_alerts_by_os',
+    name: 'search_findings_by_os',
     family: 'findings',
     argsFn: f =>
       f.osName
@@ -264,7 +264,7 @@ const TOOL_DEFS = [
           },
   },
   {
-    name: 'get_mitre_alerts',
+    name: 'get_mitre_findings',
     family: 'findings',
     argsFn: () => ({ args: {} }),
   },

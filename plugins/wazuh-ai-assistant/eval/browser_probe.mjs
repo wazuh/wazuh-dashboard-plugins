@@ -407,7 +407,9 @@ async function main() {
         );
         await cdp.send(
           'Input.insertText',
-          { text: `turn ${t} show me recent alerts [[mock:stream:600:1200]]` },
+          {
+            text: `turn ${t} show me recent findings [[mock:stream:600:1200]]`,
+          },
           sessionId,
         );
         await sleep(300);

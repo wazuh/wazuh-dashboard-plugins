@@ -203,36 +203,36 @@ the message -- prepending `[[route:...]]` keeps both markers usable in the same 
 Derived by reading every `server/tools/catalog/*.ts` file's `parameters` schema + `buildRequest`,
 supplying only the properties each tool actually requires:
 
-| Tool                                 | Args                                                                                   |
-| ------------------------------------ | -------------------------------------------------------------------------------------- |
-| `get_active_agents`                  | `{}`                                                                                   |
-| `get_disconnected_agents`            | `{}`                                                                                   |
-| `get_critical_findings`              | `{}`                                                                                   |
-| `search_findings_by_agent`           | `{agent_name:"wazuh-aio"}`                                                             |
-| `get_top_rules`                      | `{}`                                                                                   |
-| `get_critical_vulnerabilities`       | `{}`                                                                                   |
-| `get_findings_by_time`               | `{}`                                                                                   |
-| `get_brute_force`                    | `{}`                                                                                   |
-| `get_security_summary`               | `{}`                                                                                   |
-| `get_suspicious_powershell`          | `{}`                                                                                   |
-| `search_findings_by_rule_title`      | `{rule_title:"Wazuh Rootcheck - Rootkit or malware detected"}`                         |
-| `get_pci_dss_findings`               | `{}`                                                                                   |
-| `get_pci_dss_summary`                | `{}`                                                                                   |
-| `search_findings_by_multiple_agents` | `{agent_names:["wazuh-aio"]}`                                                          |
-| `search_findings_by_os`              | `{os_name:"Ubuntu"}`                                                                   |
-| `get_vulnerabilities`                | `{}`                                                                                   |
-| `get_vulnerabilities_by_agent`       | `{agent_identifier:"wazuh-aio"}`                                                       |
-| `get_solved_vulnerabilities`         | `{}`                                                                                   |
-| `get_vulnerability_by_cve`           | `{cve_id:"CVE-2021-44228"}`                                                            |
-| `get_fim_events`                     | `{}`                                                                                   |
-| `get_sca_results`                    | `{agent_id:"000"}`                                                                     |
-| `get_mitre_findings`                 | `{}`                                                                                   |
-| `get_mitre_summary`                  | `{}`                                                                                   |
-| `get_agent_os`                       | `{agent_id:"000"}`                                                                     |
-| `get_agent_packages`                 | `{agent_id:"000"}`                                                                     |
-| `get_agent_ports`                    | `{agent_id:"000"}`                                                                     |
-| `get_agent_processes`                | `{agent_id:"000"}`                                                                     |
-| `search_wazuh_data`                  | `{index_pattern:"wazuh-alerts-*", query_dsl:"<JSON-encoded body, 90d range, size 5>"}` |
+| Tool                                 | Args                                                                                        |
+| ------------------------------------ | ------------------------------------------------------------------------------------------- |
+| `get_active_agents`                  | `{}`                                                                                        |
+| `get_disconnected_agents`            | `{}`                                                                                        |
+| `get_critical_findings`              | `{}`                                                                                        |
+| `search_findings_by_agent`           | `{agent_name:"wazuh-aio"}`                                                                  |
+| `get_top_rules`                      | `{}`                                                                                        |
+| `get_critical_vulnerabilities`       | `{}`                                                                                        |
+| `get_findings_by_time`               | `{}`                                                                                        |
+| `get_brute_force`                    | `{}`                                                                                        |
+| `get_security_summary`               | `{}`                                                                                        |
+| `get_suspicious_powershell`          | `{}`                                                                                        |
+| `search_findings_by_rule_title`      | `{rule_title:"Wazuh Rootcheck - Rootkit or malware detected"}`                              |
+| `get_pci_dss_findings`               | `{}`                                                                                        |
+| `get_pci_dss_summary`                | `{}`                                                                                        |
+| `search_findings_by_multiple_agents` | `{agent_names:["wazuh-aio"]}`                                                               |
+| `search_findings_by_os`              | `{os_name:"Ubuntu"}`                                                                        |
+| `get_vulnerabilities`                | `{}`                                                                                        |
+| `get_vulnerabilities_by_agent`       | `{agent_identifier:"wazuh-aio"}`                                                            |
+| `get_solved_vulnerabilities`         | `{}`                                                                                        |
+| `get_vulnerability_by_cve`           | `{cve_id:"CVE-2021-44228"}`                                                                 |
+| `get_fim_events`                     | `{}`                                                                                        |
+| `get_sca_results`                    | `{agent_id:"000"}`                                                                          |
+| `get_mitre_findings`                 | `{}`                                                                                        |
+| `get_mitre_summary`                  | `{}`                                                                                        |
+| `get_agent_os`                       | `{agent_id:"000"}`                                                                          |
+| `get_agent_packages`                 | `{agent_id:"000"}`                                                                          |
+| `get_agent_ports`                    | `{agent_id:"000"}`                                                                          |
+| `get_agent_processes`                | `{agent_id:"000"}`                                                                          |
+| `search_wazuh_data`                  | `{index_pattern:"wazuh-findings-v5-*", query_dsl:"<JSON-encoded body, 90d range, size 5>"}` |
 
 **Risk flag**: `get_sca_results`/`get_agent_os`/`get_agent_packages`/`get_agent_ports`/
 `get_agent_processes` use agent id `"000"` (the manager's own pseudo-agent).

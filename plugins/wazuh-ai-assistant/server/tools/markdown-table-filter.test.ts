@@ -18,7 +18,7 @@ function run(sup: MarkdownTableSuppressor, chunks: string[]): string {
 test('MarkdownTableSuppressor: no table -> byte-identical passthrough', () => {
   const sup = new MarkdownTableSuppressor();
   const input =
-    'Here are the top 3 agents by alert count:\n\nAgent web01 leads with 42 alerts.\n';
+    'Here are the top 3 agents by finding count:\n\nAgent web01 leads with 42 findings.\n';
   assert.equal(run(sup, [input]), input);
 });
 
@@ -26,11 +26,11 @@ test('MarkdownTableSuppressor: a table block is dropped and replaced once', () =
   const sup = new MarkdownTableSuppressor();
   const input =
     'Summary:\n\n' +
-    '| agent | alerts |\n' +
+    '| agent | findings |\n' +
     '|---|---|\n' +
     '| web01 | 42 |\n' +
     '| web02 | 17 |\n\n' +
-    'web01 has the most alerts.\n';
+    'web01 has the most findings.\n';
   const out = run(sup, [input]);
 
   assert.equal(
@@ -38,7 +38,7 @@ test('MarkdownTableSuppressor: a table block is dropped and replaced once', () =
     'Summary:\n\n' +
       `${TABLE_REPLACEMENT_LINE}\n` +
       '\n' +
-      'web01 has the most alerts.\n',
+      'web01 has the most findings.\n',
   );
   // Exactly one replacement line for the one block.
   assert.equal(out.split(TABLE_REPLACEMENT_LINE).length - 1, 1);
@@ -99,7 +99,7 @@ test('MarkdownTableSuppressor: a table block split across many small chunks is s
   const sup = new MarkdownTableSuppressor();
   const full =
     'Before.\n' +
-    '| agent | alerts |\n' +
+    '| agent | findings |\n' +
     '|---|---|\n' +
     '| web01 | 42 |\n' +
     'After.\n';

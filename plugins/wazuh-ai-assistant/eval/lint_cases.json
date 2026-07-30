@@ -662,7 +662,7 @@
       "citation": "/latent (not reachable today: index is enum-locked in schema_validator). INDEX_ALLOWLIST_RE now rejects a comma/whitespace-smuggled disallowed index appended after a valid prefix."
     },
     {
-      "name": "vuln_field_match_on_alerts_index_rejected",
+      "name": "vuln_field_match_on_findings_index_rejected",
       "index": "wazuh-findings-v5-*",
       "body": {
         "query": {
@@ -688,7 +688,7 @@
       },
       "expect": "reject",
       "reason_match": "Vulnerability data is not in the findings/events index",
-      "citation": "This is the shape of escape-hatch query the model hand-builds instead of calling a typed vulnerability tool. guardrails.ts's findVulnerabilityFieldOnAlertsIndex (called from lintDsl, before the mandatory-time-range check) rejects any match/match_phrase/term/terms/range/exists clause on a data.vulnerability.*/vulnerability.* field against a time-based (wazuh-events-v5-*/wazuh-findings-v5-*) index, naming the typed vulnerability tools so the model self-corrects in the same turn. There is no legitimate caller of vulnerability fields on the findings/events timeline."
+      "citation": "This is the shape of escape-hatch query the model hand-builds instead of calling a typed vulnerability tool. guardrails.ts's findVulnerabilityFieldOnFindingsIndex (called from lintDsl, before the mandatory-time-range check) rejects any match/match_phrase/term/terms/range/exists clause on a data.vulnerability.*/vulnerability.* field against a time-based (wazuh-events-v5-*/wazuh-findings-v5-*) index, naming the typed vulnerability tools so the model self-corrects in the same turn. There is no legitimate caller of vulnerability fields on the findings/events timeline."
     },
     {
       "name": "vuln_field_match_on_states_index_still_passes",
@@ -703,7 +703,7 @@
       },
       "expect": "pass",
       "reason_match": null,
-      "citation": "Regression guard against overreach for vuln_field_match_on_alerts_index_rejected: the check keys on TIME_BASED_INDEX_RE (wazuh-events-v5-*/wazuh-findings-v5-* only, as of the 5.0 port), so the exact same field filter against wazuh-states-vulnerabilities-* -- the real current-state index every vulnerability tool targets -- must never be rejected by this rule. wazuh-states-* is also exempt from the mandatory-time-range check (see states_index_no_time_range_still_passes), so this case passes end to end."
+      "citation": "Regression guard against overreach for vuln_field_match_on_findings_index_rejected: the check keys on TIME_BASED_INDEX_RE (wazuh-events-v5-*/wazuh-findings-v5-* only, as of the 5.0 port), so the exact same field filter against wazuh-states-vulnerabilities-* -- the real current-state index every vulnerability tool targets -- must never be rejected by this rule. wazuh-states-* is also exempt from the mandatory-time-range check (see states_index_no_time_range_still_passes), so this case passes end to end."
     }
   ]
 }

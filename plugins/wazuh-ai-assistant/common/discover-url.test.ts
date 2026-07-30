@@ -6,7 +6,7 @@ import {
 } from './discover-url';
 
 test('risonEncode: plain string is single-quoted', () => {
-  assert.equal(risonEncode('wazuh-alerts-*'), "'wazuh-alerts-*'");
+  assert.equal(risonEncode('wazuh-findings-v5*'), "'wazuh-findings-v5*'");
 });
 
 test("risonEncode: internal single quote escaped as !'", () => {
