@@ -150,11 +150,15 @@ test('tamper (v1): flipping a char in the ciphertext body throws on decrypt (GCM
   );
 });
 
-test('legacy plaintext passthrough: decrypt of a non-enc:-prefixed string returns it unchanged', () => {
+test('NO PLAINTEXT: decrypt of a non-enc:-prefixed string throws, never returns it as a usable key', () => {
   const key = parseEncryptionKey(KEY_B64);
   const cipher = new ApiKeyCipher(key);
   const legacyPlaintext = 'sk-plain-legacy-key-not-encrypted';
-  assert.equal(cipher.decrypt(legacyPlaintext, PROVIDER_ID_A), legacyPlaintext);
+  assert.throws(
+    () => cipher.decrypt(legacyPlaintext, PROVIDER_ID_A),
+    /not encrypted/,
+    'a stored plaintext API key must be rejected, not passed through',
+  );
 });
 
 test('isEncrypted: true for both enc:v1: and enc:v2:-prefixed strings, false otherwise', () => {
@@ -173,11 +177,20 @@ test('isLegacyV1Encrypted: true only for enc:v1:, false for enc:v2: and plaintex
   assert.equal(isLegacyV1Encrypted(undefined), false);
 });
 
-test('encrypt/decrypt passthrough when cipher is disabled (no key) -- encrypt is a no-op', () => {
+test('NO PLAINTEXT: a disabled cipher (no key) refuses to encrypt and to decrypt plaintext', () => {
   const cipher = new ApiKeyCipher(undefined);
   const plaintext = 'unencrypted-key';
-  assert.equal(cipher.encrypt(plaintext, PROVIDER_ID_A), plaintext);
-  assert.equal(cipher.decrypt(plaintext, PROVIDER_ID_A), plaintext);
+  assert.equal(cipher.enabled, false);
+  assert.throws(
+    () => cipher.encrypt(plaintext, PROVIDER_ID_A),
+    /no encryptionKey is configured/,
+    'encrypt without a key must throw, never write plaintext',
+  );
+  assert.throws(
+    () => cipher.decrypt(plaintext, PROVIDER_ID_A),
+    /not encrypted/,
+    'a stored plaintext API key must be rejected even when the cipher is disabled',
+  );
 });
 
 test('decrypt throws when ciphertext is enc:v2: but cipher has no key configured', () => {

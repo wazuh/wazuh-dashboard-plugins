@@ -60,11 +60,13 @@ keys, on both sides of the wire:
 - **Server (backstop for direct API calls)**: `POST /api/wazuh_ai_assistant/providers` and
   `PUT /api/wazuh_ai_assistant/providers/{id}` reject any request carrying a non-empty `apiKey`
   with HTTP 503 and a message naming the same configuration options (`requireApiKeyEncryption`
-  in `server/routes/settings.ts`, covered by `provider-encryption-gate.test.ts`).
+  in `server/routes/settings.ts`, covered by `server/routes/provider-encryption-gate.test.ts`).
 
 Providers with no credential (the `wazuh_brain` hosted endpoint, unauthenticated local gateways
-such as Ollama) are unaffected, and reads are unaffected: values stored before the gate existed
-keep working in chat.
+such as Ollama) are unaffected. Stored keys are NOT readable without the encryption key either:
+plaintext API keys are not supported anywhere — a plaintext value written by a pre-release build
+fails decryption (chat and the provider connectivity test surface a clear error) until it is
+re-entered, or upgraded on write as described below.
 
 ## Enabling encryption on an existing deployment
 
@@ -72,11 +74,15 @@ Note on `enc:v1:`: this is the plugin's first release, so no released version ev
 format. It is read-only support for values written by a pre-release build, and the read path can
 be removed once pre-release deployments are out of scope.
 
-- Plaintext keys stored before encryption was enabled keep working — decrypting a plaintext value
-  is a no-op passthrough (see `ApiKeyCipher.decrypt` in `server/crypto/api-key-cipher.ts`).
+- Plaintext keys stored before encryption was enabled do NOT keep working — `ApiKeyCipher.decrypt`
+  (`server/crypto/api-key-cipher.ts`) rejects any value that is not `enc:v1:`/`enc:v2:` ciphertext,
+  so chat and the provider connectivity test fail with a clear error for such a provider until its
+  key is re-entered or upgraded on write (next bullets). While no encryption key is configured,
+  editing a provider that still holds a plaintext key is refused with the same 503 as re-supplying
+  a key (keeping it would re-store a plaintext credential); deleting it is always possible.
 - New and updated keys are encrypted once a key is configured, always in the current `enc:v2:`
   format (see "Format" below); `encrypt()` never writes `enc:v1:`.
-- Optional convenience: if you update a provider's OTHER fields (name, URL, model, default flag)
+- Migration on write: if you update a provider's OTHER fields (name, URL, model, default flag)
   without resupplying its API key, and a key is now configured, the stored key is transparently
   upgraded as part of that write:
 
@@ -122,12 +128,13 @@ generated on every encrypt call and a 16-byte auth tag verified on every decrypt
   / confused-deputy defense, not a confidentiality change (v1 and v2 are equally confidential); it
   is specifically about binding a ciphertext to where it belongs.
 
-Anything not starting with `enc:v1:` or `enc:v2:` is treated as legacy/plain plaintext.
+Anything not starting with `enc:v1:` or `enc:v2:` is rejected by `decrypt()` — plaintext API keys
+are not supported.
 
 ### The saved-object-id parameter
 
 `ApiKeyCipher.encrypt(plaintext, savedObjectId)` and `ApiKeyCipher.decrypt(stored, savedObjectId)`
-both take the provider's saved-object id as a **mandatory** second parameter. For plaintext and
+both take the provider's saved-object id as a **mandatory** second parameter. For
 `enc:v1:` values the id goes unused (there's no AAD to bind or check), but the parameter is still
 required — never optional — so no call site can forget to supply the real id once a value is (or
 becomes) `enc:v2:`. Every call site in `server/routes/settings.ts` and `server/routes/chat.ts`

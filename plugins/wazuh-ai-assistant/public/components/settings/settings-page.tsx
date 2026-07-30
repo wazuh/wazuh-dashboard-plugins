@@ -262,9 +262,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   // gate on every PUT regardless of what this banner shows).
   const [canSave, setCanSave] = useState(true);
   const [accessMessage, setAccessMessage] = useState<string | null>(null);
-  // Fail-open like `canSave`: a failed/slow probe never blocks the form; the server's 503 gate
-  // still refuses plaintext key writes regardless.
-  const [apiKeyEncryptionEnabled, setApiKeyEncryptionEnabled] = useState(true);
+  // Tri-state, fail-open like `canSave`: `null` = probe pending/failed → no callout and no Save
+  // block; only a confirmed server `false` gates the form. The server's 503 gate still refuses
+  // plaintext key writes regardless.
+  const [apiKeyEncryptionEnabled, setApiKeyEncryptionEnabled] = useState<
+    boolean | null
+  >(null);
   // Session auto-heal: guards the one-shot POST /api/login retry below so a mount ever
   // attempts it AT MOST once, regardless of how many times the access probe itself is re-run (it
   // currently only runs once on mount, but this ref is what makes that invariant hold even if a
@@ -823,7 +826,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   ];
 
   const apiKeyBlockedByEncryption =
-    !apiKeyEncryptionEnabled && Boolean(form.apiKey?.trim());
+    apiKeyEncryptionEnabled === false && Boolean(form.apiKey?.trim());
 
   return (
     <EuiPage restrictWidth={960}>
@@ -928,7 +931,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
               {isFormOpen && (
                 <>
-                  {!apiKeyEncryptionEnabled && (
+                  {apiKeyEncryptionEnabled === false && (
                     <>
                       <EuiCallOut
                         color='warning'

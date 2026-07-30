@@ -37,20 +37,21 @@ import { PROVIDER_SAVED_OBJECT_TYPE } from '../../common/constants';
  * ## The saved-object-id parameter
  *
  * Both `encrypt` and `decrypt` take a mandatory `savedObjectId: string` second parameter. For
- * legacy plaintext and `enc:v1:` values the id is UNUSED (v1 has no AAD to bind), but the
+ * `enc:v1:` values the id is UNUSED (v1 has no AAD to bind), but the
  * parameter is still required — not optional — so a caller can never forget to pass it once a
- * value becomes (or already is) `enc:v2:`. Threading a real id through in the plaintext/v1 case
+ * value becomes (or already is) `enc:v2:`. Threading a real id through in the v1 case
  * costs nothing and keeps the two methods' signatures uniform.
  *
- * ## Compatibility contract
+ * ## No-plaintext contract
  *
- * Every method here is a PASSTHROUGH when no valid key is configured (`enabled === false`) —
- * `encrypt` returns its input unchanged and `decrypt` only ever transforms strings that already
- * carry the `enc:v1:` or `enc:v2:` prefix, returning anything else (including plaintext keys
- * stored before encryption was enabled) unchanged. Encryption is therefore opt-in: a deployment
- * that never sets a key behaves exactly as if this module did not exist. `enc:v1:` values are NEVER silently re-encrypted to v2 on
- * read by anything in this module — the only place a v1 blob turns into a v2 blob is an explicit
- * upgrade-on-write call site (server/routes/settings.ts's PUT handler), which must decrypt the v1
+ * Plaintext API keys are NOT supported, in either direction: `encrypt` throws when no valid key
+ * is configured (`enabled === false`) instead of passing plaintext through, and `decrypt` only
+ * ever accepts `enc:v1:`/`enc:v2:` values — anything else (e.g. a plaintext key stored by a
+ * pre-release build) is a hard error, never returned as a usable credential. The only sanctioned
+ * exit for a stored plaintext value is server/routes/settings.ts's PUT handler, which re-encrypts
+ * it as `enc:v2:` on the next write while encryption is enabled. `enc:v1:` values are NEVER
+ * silently re-encrypted to v2 on read by anything in this module — the only place a v1 blob turns
+ * into a v2 blob is that same explicit upgrade-on-write call site, which must decrypt the v1
  * value (plaintext now in hand) and call `encrypt` again itself; this module does not do that
  * silently inside `decrypt`.
  */
@@ -88,9 +89,9 @@ export class ApiKeyCipher {
   private readonly key: Buffer | undefined;
 
   /**
-   * @param key Raw 32-byte AES-256 key material, or `undefined` to construct a disabled
-   *   (passthrough-only) cipher. Use `parseEncryptionKey` below to turn the base64 config string
-   *   into this Buffer — this constructor does not decode base64 itself.
+   * @param key Raw 32-byte AES-256 key material, or `undefined` to construct a disabled cipher
+   *   (refuses to encrypt/decrypt). Use `parseEncryptionKey` below to turn the base64 config
+   *   string into this Buffer — this constructor does not decode base64 itself.
    */
   constructor(key: Buffer | undefined) {
     if (key !== undefined && key.length !== KEY_LENGTH_BYTES) {
@@ -114,17 +115,19 @@ export class ApiKeyCipher {
   /**
    * Encrypts `plaintext`, binding the result to `savedObjectId` (the id of the
    * `wazuh-ai-assistant-provider` saved object `plaintext` will be stored on — see `buildAad`).
-   * When disabled, returns `plaintext` unchanged (today's behavior) — this is the "safe by
-   * default, no key configured" guarantee, not an error condition; `savedObjectId` is unused in
-   * that case but still required, so a passthrough call site can't accidentally omit it and then
-   * break the moment encryption gets enabled.
+   * Throws when disabled: this module never writes plaintext, so a call without a configured key
+   * is a bug in the caller (routes gate on `enabled`/`requireApiKeyEncryption` first), never a
+   * silent plaintext write.
    *
-   * Always produces `enc:v2:` output when enabled — this module never writes `enc:v1:` any more,
+   * Always produces `enc:v2:` output — this module never writes `enc:v1:` any more,
    * only reads it (see `decrypt`).
    */
   encrypt(plaintext: string, savedObjectId: string): string {
     if (!this.key) {
-      return plaintext;
+      throw new Error(
+        'wazuhAiAssistant: cannot encrypt a provider API key because no encryptionKey is ' +
+          'configured (wazuh_ai_assistant.encryptionKey). API keys are never stored in plain text.',
+      );
     }
     const iv = crypto.randomBytes(IV_LENGTH_BYTES);
     const cipher = crypto.createCipheriv(ALGORITHM, this.key, iv);
@@ -139,11 +142,12 @@ export class ApiKeyCipher {
   }
 
   /**
-   * Decrypts `stored`, which may be (in order of precedence): `enc:v2:` ciphertext (AAD checked
-   * against `savedObjectId` via `buildAad`), `enc:v1:` ciphertext (no AAD — decrypted exactly as
-   * before this format existed), or legacy/current plaintext (anything not carrying either
-   * prefix), returned unchanged — that is the backward-compat passthrough, not a failure mode.
-   * `savedObjectId` is REQUIRED even for the v1/plaintext paths where it goes unused, so a caller
+   * Decrypts `stored`, which must be either `enc:v2:` ciphertext (AAD checked against
+   * `savedObjectId` via `buildAad`) or `enc:v1:` ciphertext (no AAD — decrypted exactly as
+   * before this format existed). Anything else — e.g. a plaintext key stored by a pre-release
+   * build — throws: plaintext API keys are not supported and are never returned as a usable
+   * credential (re-enter the key, or let the PUT route's upgrade-on-write re-encrypt it).
+   * `savedObjectId` is REQUIRED even for the v1 path where it goes unused, so a caller
    * can never forget to supply the real id for a value that might be (or might one day become)
    * `enc:v2:`.
    *
@@ -219,7 +223,11 @@ export class ApiKeyCipher {
       return plaintext.toString('utf8');
     }
 
-    return stored;
+    throw new Error(
+      'wazuhAiAssistant: the stored provider API key is not encrypted. Plaintext API keys are ' +
+        'not supported — re-enter the provider API key in the Settings UI (with ' +
+        'wazuh_ai_assistant.encryptionKey configured) so it is stored encrypted.',
+    );
   }
 }
 

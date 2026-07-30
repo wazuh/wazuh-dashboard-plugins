@@ -404,16 +404,16 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
 
       // Decrypt-on-read (server/crypto/api-key-cipher.ts): the saved object may hold `enc:v2:`
       // ciphertext (AAD-bound to `providerId`, the id this exact saved object was fetched by
-      // above), legacy `enc:v1:` ciphertext (unbound, no AAD), or legacy plaintext — decrypt()
-      // passes plaintext through unchanged either way, so this is a no-op when no encryptionKey is
-      // configured. Passing `providerId` here is what makes the v2 substitution-attack detection
-      // real for chat: if this saved object's `apiKey` were ever a v2 blob copied in from a
-      // DIFFERENT provider's row, this call — using THIS provider's own id — would hard-fail
-      // rather than silently decrypt to the wrong provider's key. Kept in its own try/catch,
-      // separate from the "unknown provider" one above, so a decrypt failure (ciphertext present
-      // but no/rotated encryptionKey, or an AAD/id mismatch — both real server misconfigurations,
-      // the latter now also covering the substitution attack) is never misreported to the client
-      // as "unknown provider".
+      // above) or legacy `enc:v1:` ciphertext (unbound, no AAD) — anything else (a legacy
+      // PLAINTEXT key from a pre-release build) makes decrypt() throw: plaintext keys are never
+      // used, the admin must re-enter them. Passing `providerId` here is what makes the v2
+      // substitution-attack detection real for chat: if this saved object's `apiKey` were ever a
+      // v2 blob copied in from a DIFFERENT provider's row, this call — using THIS provider's own
+      // id — would hard-fail rather than silently decrypt to the wrong provider's key. Kept in its
+      // own try/catch, separate from the "unknown provider" one above, so a decrypt failure
+      // (plaintext value, ciphertext present but no/rotated encryptionKey, or an AAD/id mismatch —
+      // all real server misconfigurations, the latter also covering the substitution attack) is
+      // never misreported to the client as "unknown provider".
       let providerConfig: ProviderConfig;
       try {
         providerConfig = {

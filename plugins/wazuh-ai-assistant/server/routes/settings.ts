@@ -354,7 +354,7 @@ export const ENCRYPTION_REQUIRED_MESSAGE =
   'in plain text. Generate a base64-encoded 32-byte key (e.g. `openssl rand -base64 32`) and ' +
   'store it as `wazuh_ai_assistant.encryptionKey` — either with `opensearch-dashboards-keystore ' +
   'add wazuh_ai_assistant.encryptionKey` (recommended) or in `opensearch_dashboards.yml` — then ' +
-  'restart OpenSearch Dashboards and try again.';
+  'restart dashboard service and try again.';
 
 /** Refuses a non-empty `apiKey` when no encryption key is configured. See docs/ENCRYPTION.md. */
 export function requireApiKeyEncryption(
@@ -462,9 +462,9 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       // surfaced to the caller as the same 500 `withInternalErrorHandling` every other failure in
       // this route already produces. There is no partial/half-written state to reason about: no
       // second write exists that could fail after the first one succeeded.
-      // Encryption-at-rest (server/crypto/api-key-cipher.ts): a passthrough no-op when no
-      // encryptionKey is configured, so this is byte-identical to pre-encryption behavior by
-      // default. `request.body.apiKey` is `schema.maybe(schema.string())`; an absent/empty value
+      // Encryption-at-rest (server/crypto/api-key-cipher.ts): the encryption gate above
+      // guarantees the cipher is enabled whenever a non-empty apiKey reaches this point.
+      // `request.body.apiKey` is `schema.maybe(schema.string())`; an absent/empty value
       // stays absent/empty (encrypt() is only ever called with a truthy string).
       const providerId = crypto.randomUUID();
       const created = await client.create<StoredProviderAttributes>(
@@ -571,11 +571,23 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
           request.params.id,
         );
         nextApiKey = cipher.encrypt(recoveredPlaintext, request.params.id);
+      } else if (
+        existing.attributes.apiKey &&
+        !cipher.enabled &&
+        !isEncrypted(existing.attributes.apiKey)
+      ) {
+        // The stored key is legacy PLAINTEXT and encryption is not configured: keeping it would
+        // re-store a plaintext credential, which is no longer supported — same 503 the create/
+        // re-supply paths return. Configure the encryption key (the plaintext-migration branch
+        // above then upgrades it on this same write) or delete and re-create the provider.
+        return response.customError({
+          statusCode: 503,
+          body: { message: ENCRYPTION_REQUIRED_MESSAGE },
+        });
       } else {
-        // Keep the previously stored value untouched — either the cipher is disabled (legacy
-        // plaintext stays as-is) or the stored value is already `enc:v2:` (do NOT re-encrypt it —
-        // there is nowhere further to upgrade to, and encrypting an already-`enc:v2:` string again
-        // would wrap it as new "plaintext", making it undecryptable as a real key later).
+        // Keep the previously stored value untouched — it is either already encrypted (`enc:v1:`/
+        // `enc:v2:`; do NOT re-encrypt: encrypting an `enc:v2:` string again would wrap it as new
+        // "plaintext", making it undecryptable as a real key later) or absent.
         nextApiKey = existing.attributes.apiKey;
       }
       const nextIsDefault =
@@ -683,10 +695,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       );
       // Decrypt-on-read: the saved object may hold `enc:v2:` ciphertext (AAD-bound to
       // `request.params.id`, the id this exact row was fetched by — see
-      // server/crypto/api-key-cipher.ts), legacy `enc:v1:` ciphertext (unbound), or legacy
-      // plaintext — decrypt() passes plaintext through unchanged either way. A decrypt failure
-      // here means a real misconfiguration (ciphertext present but no/rotated encryptionKey, or —
-      // for a v2 value — an AAD/id mismatch) — surfaced as a failed test rather than crashing the
+      // server/crypto/api-key-cipher.ts) or legacy `enc:v1:` ciphertext (unbound). A decrypt
+      // failure here means a real misconfiguration (ciphertext present but no/rotated
+      // encryptionKey, a v2 AAD/id mismatch, or a legacy PLAINTEXT value — no longer usable, the
+      // admin must re-enter it) — surfaced as a failed test rather than crashing the
       // route or leaking the raw stored value to the adapter.
       let apiKey: string | undefined;
       try {
