@@ -22,36 +22,36 @@
   },
   "cases": [
     {
-      "id": "alerts_last_24h",
+      "id": "findings_last_24h",
       "lang": "en",
       "category": "findings",
       "prompt": "What's happened across all our agents in the last 24 hours?",
       "expected_tools": ["get_findings_by_time"],
-      "rubric": "Summarizes alert activity from roughly the last 24 hours across all agents, stating the queried time window; if none, truthfully says so rather than inventing events."
+      "rubric": "Summarizes finding activity from roughly the last 24 hours across all agents, stating the queried time window; if none, truthfully says so rather than inventing events."
     },
     {
-      "id": "alerts_last_24h_es",
+      "id": "findings_last_24h_es",
       "lang": "es",
       "category": "findings",
       "prompt": "¿Qué ha pasado en todos nuestros agentes en las últimas 24 horas?",
       "expected_tools": ["get_findings_by_time"],
-      "rubric": "Igual que alerts_last_24h en español: resume la actividad de alertas de las últimas ~24h en todos los agentes, o indica honestamente que no hubo ninguna."
+      "rubric": "Igual que findings_last_24h en español: resume la actividad de hallazgos de las últimas ~24h en todos los agentes, o indica honestamente que no hubo ninguna."
     },
     {
-      "id": "critical_alerts",
+      "id": "critical_findings",
       "lang": "en",
       "category": "findings",
-      "prompt": "Show me the critical-severity alerts from the past week, most recent first.",
+      "prompt": "Show me the critical-severity findings from the past week, most recent first.",
       "expected_tools": ["get_critical_findings"],
-      "rubric": "Lists critical-severity (rule.level: critical) alerts from the past week, newest first, or truthfully reports none found."
+      "rubric": "Lists critical-severity (rule.level: critical) findings from the past week, newest first, or truthfully reports none found."
     },
     {
-      "id": "critical_alerts_es",
+      "id": "critical_findings_es",
       "lang": "es",
       "category": "findings",
-      "prompt": "Muéstrame las alertas de severidad crítica de la última semana, empezando por las más recientes.",
+      "prompt": "Muéstrame los hallazgos de severidad crítica de la última semana, empezando por las más recientes.",
       "expected_tools": ["get_critical_findings"],
-      "rubric": "Igual que critical_alerts en español."
+      "rubric": "Igual que critical_findings en español."
     },
     {
       "id": "top_rules",
@@ -162,9 +162,9 @@
       "id": "mitre_events",
       "lang": "en",
       "category": "mitre",
-      "prompt": "Which alerts map to MITRE ATT&CK techniques this week?",
+      "prompt": "Which findings map to MITRE ATT&CK techniques this week?",
       "expected_tools": ["get_mitre_findings"],
-      "rubric": "Lists alerts tagged with a MITRE technique ID/name from this week, or truthfully reports none — must not invent a technique ID that isn't actually present in the tool's result."
+      "rubric": "Lists findings tagged with a MITRE technique ID/name from this week, or truthfully reports none — must not invent a technique ID that isn't actually present in the tool's result."
     },
     {
       "id": "mitre_summary",
@@ -172,23 +172,23 @@
       "category": "mitre",
       "prompt": "Which MITRE ATT&CK techniques have been most common this month?",
       "expected_tools": ["get_mitre_summary"],
-      "rubric": "Gives a ranked breakdown by specific technique ID/name and count (an aggregation, not a raw alert list)."
+      "rubric": "Gives a ranked breakdown by specific technique ID/name and count (an aggregation, not a raw finding list)."
     },
     {
-      "id": "pci_dss_alerts",
+      "id": "pci_dss_findings",
       "lang": "en",
       "category": "compliance",
-      "prompt": "Show me the alerts related to PCI DSS compliance requirements.",
+      "prompt": "Show me the findings related to PCI DSS compliance requirements.",
       "expected_tools": ["get_pci_dss_findings"],
-      "rubric": "Lists alerts tagged with a PCI DSS compliance requirement (rule.compliance.pci_dss present), or truthfully reports none."
+      "rubric": "Lists findings tagged with a PCI DSS compliance requirement (rule.compliance.pci_dss present), or truthfully reports none."
     },
     {
       "id": "pci_dss_summary",
       "lang": "en",
       "category": "compliance",
-      "prompt": "Give me a breakdown of our PCI DSS alerts by which requirement they map to.",
+      "prompt": "Give me a breakdown of our PCI DSS findings by which requirement they map to.",
       "expected_tools": ["get_pci_dss_summary"],
-      "rubric": "Gives a GROUPED breakdown by PCI DSS requirement tag — distinguish from pci_dss_alerts (a flat list) by the 'breakdown/grouped by' phrasing in the question."
+      "rubric": "Gives a GROUPED breakdown by PCI DSS requirement tag — distinguish from pci_dss_findings (a flat list) by the 'breakdown/grouped by' phrasing in the question."
     },
     {
       "id": "suspicious_powershell",
@@ -207,15 +207,15 @@
       "rubric": "A grouped-by-category breakdown of medium-and-up severity events this week — an aggregation, not a raw event list."
     },
     {
-      "id": "alerts_by_agent_severity",
+      "id": "findings_by_agent_severity",
       "lang": "en",
       "category": "findings",
-      "prompt": "What alerts has web-prod-01 triggered with a severity of 10 or higher?",
+      "prompt": "What findings has web-prod-01 triggered with a severity of 10 or higher?",
       "expected_tools": ["search_findings_by_agent"],
       "rubric": "Scopes results to web-prod-01 at severity>=10 specifically (both named constraints from the question), or truthfully reports none."
     },
     {
-      "id": "alerts_by_rule_title",
+      "id": "findings_by_rule_title",
       "lang": "en",
       "category": "findings",
       "prompt": "What's been triggering the \"Wazuh Rootcheck - Rootkit or malware detected\" rule recently?",
@@ -223,18 +223,18 @@
       "rubric": "Scopes results to that exact rule title (the rule the question names), or truthfully reports none."
     },
     {
-      "id": "alerts_by_multiple_agents",
+      "id": "findings_by_multiple_agents",
       "lang": "en",
       "category": "findings",
-      "prompt": "What alerts have web-prod-01 and web-prod-02 triggered at severity 7 or above?",
+      "prompt": "What findings have web-prod-01 and web-prod-02 triggered at severity 7 or above?",
       "expected_tools": ["search_findings_by_multiple_agents"],
       "rubric": "Scopes results to exactly web-prod-01 AND web-prod-02 at severity>=7, or truthfully reports none for those two agents specifically."
     },
     {
-      "id": "alerts_by_os",
+      "id": "findings_by_os",
       "lang": "en",
       "category": "findings",
-      "prompt": "Are there any high-severity alerts coming from our Windows machines?",
+      "prompt": "Are there any high-severity findings coming from our Windows machines?",
       "expected_tools": ["search_findings_by_os"],
       "rubric": "Scopes results to Windows-OS agents specifically, or truthfully reports none."
     },
@@ -322,12 +322,12 @@
       "category": "ui_behavior",
       "hard_won": true,
       "turns": [
-        "Show me the alerts from the last 24 hours.",
+        "Show me the findings from the last 24 hours.",
         "Now list those same results as a markdown table."
       ],
       "expected_tools": ["get_findings_by_time"],
       "answer_must_not_match": ["\\|[^\\n]*\\|[^\\n]*\\n\\s*\\|[\\s:-]+\\|"],
-      "rubric": "expected_tools and the answer_must_not_match regex apply to TURN 2 (turn 1 is just setup — it should produce a real results table via get_findings_by_time, same as the alerts_last_24h case). Turn 2's prose must NOT contain a hand-built markdown pipe-table of the same rows: the UI already renders the authoritative result table below the answer (server/tools/markdown-table-filter.ts is a mechanical backstop for exactly this — a second, model-authored table is redundant and, since the digest is only a partial sample, can actively mislead). A good turn-2 answer says something like 'see the results table below' or briefly restates the same summary in prose, with no pipe characters forming a table grid."
+      "rubric": "expected_tools and the answer_must_not_match regex apply to TURN 2 (turn 1 is just setup — it should produce a real results table via get_findings_by_time, same as the findings_last_24h case). Turn 2's prose must NOT contain a hand-built markdown pipe-table of the same rows: the UI already renders the authoritative result table below the answer (server/tools/markdown-table-filter.ts is a mechanical backstop for exactly this — a second, model-authored table is redundant and, since the digest is only a partial sample, can actively mislead). A good turn-2 answer says something like 'see the results table below' or briefly restates the same summary in prose, with no pipe characters forming a table grid."
     },
     {
       "id": "digest_freshness_repeat",
@@ -335,12 +335,12 @@
       "category": "freshness",
       "hard_won": true,
       "turns": [
-        "Show me alerts from the last 24 hours.",
-        "Show me alerts from the last 24 hours."
+        "Show me findings from the last 24 hours.",
+        "Show me findings from the last 24 hours."
       ],
       "expected_tools": ["get_findings_by_time"],
       "requires_tool_call_each_turn": true,
-      "rubric": "Both turns ask the IDENTICAL question in the same conversation. expected_tools applies to EACH turn independently — the judge must confirm a get_findings_by_time tool_call event fired on turn 2 as well as turn 1, not just once. CONFIDENT-WRONG: turn 2 produces a fluent final answer with NO new tool_call (i.e. the model answers from turn 1's stale digest/conversation memory instead of re-querying) — the underlying alert data may have changed between the two turns, so a repeat question must always re-run the query, never assume the prior answer is still current."
+      "rubric": "Both turns ask the IDENTICAL question in the same conversation. expected_tools applies to EACH turn independently — the judge must confirm a get_findings_by_time tool_call event fired on turn 2 as well as turn 1, not just once. CONFIDENT-WRONG: turn 2 produces a fluent final answer with NO new tool_call (i.e. the model answers from turn 1's stale digest/conversation memory instead of re-querying) — the underlying finding data may have changed between the two turns, so a repeat question must always re-run the query, never assume the prior answer is still current."
     }
   ]
 }

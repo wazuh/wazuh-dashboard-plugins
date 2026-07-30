@@ -55,15 +55,15 @@ node run_live.js
 
 ### Env vars
 
-| Var                | Default                  | Notes                                                          |
-| ------------------ | ------------------------ | -------------------------------------------------------------- |
-| `EVAL_BASE_URL`    | `https://localhost:8443` | dashboard base URL                                             |
-| `EVAL_USER`        | `admin`                  | dashboard username                                             |
-| `EVAL_PASS`        | —                        | **required**                                                   |
-| `EVAL_PROVIDER_ID` | —                        | **required**; a provider saved-object id                       |
-| `EVAL_LANG`        | `both`                   | `en` \| `es` \| `both`                                         |
-| `EVAL_FILTER`      | (all cases)              | comma-separated case ids, e.g. `active_agents,critical_alerts` |
-| `EVAL_SLEEP_S`     | `30`                     | seconds slept between calls -- see quota notes below           |
+| Var                | Default                  | Notes                                                            |
+| ------------------ | ------------------------ | ---------------------------------------------------------------- |
+| `EVAL_BASE_URL`    | `https://localhost:8443` | dashboard base URL                                               |
+| `EVAL_USER`        | `admin`                  | dashboard username                                               |
+| `EVAL_PASS`        | —                        | **required**                                                     |
+| `EVAL_PROVIDER_ID` | —                        | **required**; a provider saved-object id                         |
+| `EVAL_LANG`        | `both`                   | `en` \| `es` \| `both`                                           |
+| `EVAL_FILTER`      | (all cases)              | comma-separated case ids, e.g. `active_agents,critical_findings` |
+| `EVAL_SLEEP_S`     | `30`                     | seconds slept between calls -- see quota notes below             |
 
 Output: a `PASS`/`FAIL`/`SKIPPED-QUOTA` line per (case, language) with failure reasons indented
 underneath, a final case-x-language matrix, and a summary line. Exit code = number of FAILs
