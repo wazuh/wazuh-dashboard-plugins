@@ -17,6 +17,7 @@ import {
   EuiSelect,
   EuiCallOut,
   EuiCode,
+  EuiCodeBlock,
   EuiSpacer,
   EuiHealth,
   EuiText,
@@ -952,29 +953,21 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                           )}
                         </p>
                         <p>
-                          {/* Commands and setting names are interpolated as <EuiCode> values
-                              so translators can never alter them. */}
+                          {/* Setting/file names are interpolated as <EuiCode> values and the
+                              commands live in the code block below, outside the translatable
+                              string, so translators can never alter them. */}
                           <FormattedMessage
                             id='wazuhAiAssistant.settings.form.encryptionRequiredHow'
                             defaultMessage={
-                              'To enable saving keys, generate a base64-encoded 32-byte ' +
-                              'key with {generateCommand} and store it as {settingName} ' +
-                              '— either with {keystoreCommand} (recommended, the key ' +
-                              'never sits in a readable config file) or in {configFile} ' +
-                              '— then restart OpenSearch Dashboards.'
+                              'To enable saving keys, generate a base64-encoded ' +
+                              '32-byte key and store it as {settingName} in the ' +
+                              'OpenSearch Dashboards keystore (recommended — the ' +
+                              'key never sits in a readable config file) or in ' +
+                              '{configFile}, then restart OpenSearch Dashboards:'
                             }
                             values={{
-                              generateCommand: (
-                                <EuiCode>openssl rand -base64 32</EuiCode>
-                              ),
                               settingName: (
                                 <EuiCode>
-                                  wazuh_ai_assistant.encryptionKey
-                                </EuiCode>
-                              ),
-                              keystoreCommand: (
-                                <EuiCode>
-                                  opensearch-dashboards-keystore add
                                   wazuh_ai_assistant.encryptionKey
                                 </EuiCode>
                               ),
@@ -984,6 +977,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                             }}
                           />
                         </p>
+                        <EuiCodeBlock
+                          language='bash'
+                          paddingSize='s'
+                          fontSize='s'
+                          isCopyable
+                        >
+                          {'openssl rand -base64 32\n' +
+                            'opensearch-dashboards-keystore add wazuh_ai_assistant.encryptionKey'}
+                        </EuiCodeBlock>
                       </EuiCallOut>
                       <EuiSpacer size='m' />
                     </>
