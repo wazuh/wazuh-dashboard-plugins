@@ -11,14 +11,15 @@ import {
   API_PATHS,
   CONVERSATION_MAX_MESSAGES,
   CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH,
+  CONVERSATION_MAX_TABLE_ROWS,
   CONVERSATION_MAX_TITLE_LENGTH,
   CONVERSATION_OWNER_FALLBACK,
   CONVERSATION_SAVED_OBJECT_TYPE,
 } from '../../common/constants';
 import {
-  ChatMessage,
   ConversationRecord,
   ConversationSummary,
+  PersistedChatMessage,
 } from '../../common/types';
 import { ConversationAttributes } from '../saved_objects/conversation';
 import { getOrCreateAssistantSettings } from './settings';
@@ -236,12 +237,50 @@ const MAX_TITLE_LENGTH = CONVERSATION_MAX_TITLE_LENGTH;
 const MAX_MESSAGE_CONTENT_LENGTH = CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH;
 const MAX_MESSAGES_PER_CONVERSATION = CONVERSATION_MAX_MESSAGES;
 
-/** Mirrors server/routes/chat.ts's inline `messages` body schema exactly (role/content/toolCalls/
- * toolCallId) — duplicated here rather than imported so this file (and chat.ts) can each evolve
- * independently; both must be kept in sync with common/types.ts's `ChatMessage` if that ever
- * changes shape. `content` carries `maxLength: MAX_MESSAGE_CONTENT_LENGTH` (chat.ts's
- * own copy is intentionally NOT bounded the same way here — only what gets PERSISTED
- * needs this bound). */
+/** Longest column id/label and index name a persisted table may carry. Generous for real field
+ * names and index patterns; the point is only that they are bounded. */
+const MAX_TABLE_LABEL_LENGTH = 256;
+/** A displayed table has a handful of columns, never dozens. */
+const MAX_TABLE_COLUMNS = 50;
+
+/**
+ * The result table a message was displayed with (`common/types.ts`'s `TableSpec`), persisted so a
+ * resumed conversation still shows it. Row VALUES are `any` — they are whatever fields the query
+ * projected — but the row and column COUNTS are bounded here, and the client row-caps to the same
+ * `CONVERSATION_MAX_TABLE_ROWS` before sending (`common/chat-history.ts`'s `toPersistedMessages`),
+ * so the two sides cannot disagree about what is acceptable.
+ */
+const tableSpecSchema = schema.object({
+  columns: schema.arrayOf(
+    schema.object({
+      id: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
+      label: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
+    }),
+    { maxSize: MAX_TABLE_COLUMNS },
+  ),
+  rows: schema.arrayOf(schema.recordOf(schema.string(), schema.any()), {
+    maxSize: CONVERSATION_MAX_TABLE_ROWS,
+  }),
+  severityColumn: schema.maybe(
+    schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
+  ),
+  discover: schema.maybe(
+    schema.object({
+      index: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
+      dsl: schema.recordOf(schema.string(), schema.any()),
+    }),
+  ),
+});
+
+/** Mirrors server/routes/chat.ts's inline `messages` body schema (role/content/toolCalls/
+ * toolCallId) plus the two persistence-only fields `common/types.ts`'s `PersistedChatMessage` adds
+ * (`createdAt`, `table`) — duplicated here rather than imported so this file (and chat.ts) can each
+ * evolve independently; both must be kept in sync with common/types.ts if that ever changes shape.
+ * `content` carries `maxLength: MAX_MESSAGE_CONTENT_LENGTH` (chat.ts's own copy is intentionally NOT
+ * bounded the same way here — only what gets PERSISTED needs this bound).
+ *
+ * `createdAt` and `table` are BOTH optional, so a client that predates them — or a conversation
+ * saved by one — is accepted unchanged. */
 const chatMessageSchema = schema.object({
   role: schema.oneOf([
     schema.literal('system'),
@@ -260,6 +299,11 @@ const chatMessageSchema = schema.object({
     ),
   ),
   toolCallId: schema.maybe(schema.string()),
+  /** Epoch milliseconds. `min: 0` only rejects a nonsensical negative instant; no upper bound, since
+   * a client's clock is its own and this value is display-only. */
+  createdAt: schema.maybe(schema.number({ min: 0 })),
+  table: schema.maybe(tableSpecSchema),
+  interrupted: schema.maybe(schema.boolean()),
 });
 
 const createOrReplaceBodySchema = schema.object({
@@ -415,7 +459,7 @@ export function registerConversationRoutes(
           title: request.body.title,
           createdAt: nowIso,
           updatedAt: nowIso,
-          messages: request.body.messages as ChatMessage[],
+          messages: request.body.messages as PersistedChatMessage[],
         },
       );
       return response.ok({
@@ -497,7 +541,7 @@ export function registerConversationRoutes(
         return response.notFound();
       }
       const updatedAt = new Date().toISOString();
-      const messages = request.body.messages as ChatMessage[];
+      const messages = request.body.messages as PersistedChatMessage[];
       const { expectedVersion } = request.body;
 
       let updated;

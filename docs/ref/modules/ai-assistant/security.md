@@ -83,3 +83,11 @@ privacy on/off badge.
 Conversations are owner-scoped: list endpoints return only the caller's summaries, and requests
 for another owner's conversation return `404` — existence is never leaked across owners. The
 saved-object types are `hidden: true`, invisible to the generic saved-objects API and export UI.
+
+A saved conversation stores what the user actually saw, so that resuming one restores the same
+conversation rather than a summary of it: the prose turns, their timestamps, the result tables
+(row-capped) and the model's own tool calls with their arguments and result digests. All of that is
+real-valued — pseudonymization protects what goes to the PROVIDER, never what is stored locally —
+which is why owner-scoping above and the retention policy in
+[Configuration](./configuration.md) both exist. The client-held pseudonym map itself is never
+persisted anywhere.
