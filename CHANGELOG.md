@@ -36,9 +36,7 @@
 - Added `wazuh.disabledSettings` configuration to hide specific settings in the Indexer Settings UI [#8643](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8643) [8693](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8693)
 - Expanded the case management form with title, description, severity, priority and TLP fields, comments that can be added or edited individually, and a confirmation dialog before discarding unsaved changes [#8718](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8718)
 - Added queue usage in bytes and agent cache visualizations to `Server Management` > `Statistics`, and relabeled the Comms "Queue usage" Y-axis to Bytes [#8768](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8768)
-- Added Wazuh AI Assistant plugin: provider-agnostic AI chat over Wazuh data with a read-only tool catalog, server-side guardrails, optional pseudonymization, and API-key encryption at rest [#8788](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8788)
-- Added placeholder lines in the AI Assistant while an answer is being prepared, and a collapsible panel showing the queries it executed with their arguments [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
-- Added a confirmation before an action that would interrupt an AI Assistant response in progress, using the same dialog whether the user switches conversation or leaves the app [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
+- Added Wazuh AI Assistant plugin: provider-agnostic AI chat over Wazuh data with a read-only tool catalog, server-side guardrails, optional pseudonymization, and API-key encryption at rest [#8788](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8788) [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
 
 ### Changed
 
@@ -129,13 +127,6 @@
 - Fixed Home KPI's visualization persistent filters [#8708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8708)
 - Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766)
 - Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775)
-- Fixed the AI Assistant losing an answer, leaving the chat input blocked, or mixing conversations when the user switched conversation, started a new one, or left the app while a response was still streaming [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
-- Fixed the AI Assistant chat coming back empty after a reload, a deep link, or a visit to its Settings tab: the open conversation is now restored from the URL and the tab's own session, and the Chat tab is no longer destroyed when Settings is opened [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
-- Fixed the AI Assistant losing a question asked while a reload or navigation interrupted the answer: the question is now saved before the response starts generating [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
-- Fixed a resumed AI Assistant conversation losing its result tables, its real message times, and the tool-call history a follow-up question depends on [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
-- Fixed the AI Assistant presenting an answer cut short by Stop, a navigation, or a dropped connection as though it were complete: it is now labelled as interrupted and can be retried [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
-- Fixed the AI Assistant silently failing to save a conversation, and the chat hanging on a loading spinner when the provider list never responded [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
-- Fixed the AI Assistant leaving a question unanswered with no way to ask it again after a reload or a navigation interrupted the response: the unanswered turn is now labelled and retryable [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
 
 ### Removed
 
