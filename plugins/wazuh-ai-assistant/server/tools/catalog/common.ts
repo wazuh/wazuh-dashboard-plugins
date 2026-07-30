@@ -1,4 +1,5 @@
 import { JsonSchemaObject, JsonSchemaProperty } from '../../../common/types';
+import { SEVERITY_LEVELS, SeverityLevel } from '../../../common/wazuh-fields';
 import { ToolTableColumnSpec } from '../types';
 import { clampInt } from '../guardrails';
 
@@ -63,28 +64,23 @@ export function optionalStringParam(value: unknown): string | undefined {
 
 /**
  * Severity model: `wazuh.rule.level` on wazuh-findings-v5* is a
- * KEYWORD with these five ordered values. A numeric range query on it would do lexicographic
- * string comparison (silently wrong), so severity filters are expressed as a `terms` filter
- * instead — an exact match by default (`severityFilterValues`), or a floor/ceiling over this
- * ordered list when opted into (`severitiesAtOrAbove`/`severitiesAtOrBelow`).
+ * KEYWORD with these five ordered values (`SEVERITY_LEVELS`, `common/wazuh-fields.ts`). A numeric
+ * range query on it would do lexicographic string comparison (silently wrong), so severity
+ * filters are expressed as a `terms` filter instead — an exact match by default
+ * (`severityFilterValues`), or a floor/ceiling over this ordered list when opted into
+ * (`severitiesAtOrAbove`/`severitiesAtOrBelow`).
  */
-export const SEVERITY_ORDER = [
-  'informational',
-  'low',
-  'medium',
-  'high',
-  'critical',
-] as const;
-export type SeverityWord = (typeof SEVERITY_ORDER)[number];
 
 /**
  * The severity words at or above `min` (inclusive), for a `terms` filter — e.g. `'medium'` ->
  * `['medium','high','critical']`. Case-insensitive; an unrecognized value returns the full list
  * (no floor), failing OPEN toward showing more rather than silently hiding findings.
  */
-export function severitiesAtOrAbove(min: string): SeverityWord[] {
-  const idx = SEVERITY_ORDER.indexOf(min.trim().toLowerCase() as SeverityWord);
-  return idx === -1 ? [...SEVERITY_ORDER] : SEVERITY_ORDER.slice(idx);
+export function severitiesAtOrAbove(min: string): SeverityLevel[] {
+  const idx = SEVERITY_LEVELS.indexOf(
+    min.trim().toLowerCase() as SeverityLevel,
+  );
+  return idx === -1 ? [...SEVERITY_LEVELS] : SEVERITY_LEVELS.slice(idx);
 }
 
 /**
@@ -92,9 +88,11 @@ export function severitiesAtOrAbove(min: string): SeverityWord[] {
  * `['informational','low','medium']`. Case-insensitive; an unrecognized value returns the full
  * list (no ceiling), failing OPEN toward showing more rather than silently hiding findings.
  */
-export function severitiesAtOrBelow(max: string): SeverityWord[] {
-  const idx = SEVERITY_ORDER.indexOf(max.trim().toLowerCase() as SeverityWord);
-  return idx === -1 ? [...SEVERITY_ORDER] : SEVERITY_ORDER.slice(0, idx + 1);
+export function severitiesAtOrBelow(max: string): SeverityLevel[] {
+  const idx = SEVERITY_LEVELS.indexOf(
+    max.trim().toLowerCase() as SeverityLevel,
+  );
+  return idx === -1 ? [...SEVERITY_LEVELS] : SEVERITY_LEVELS.slice(0, idx + 1);
 }
 
 export type SeverityComparison = 'exact' | 'at_or_above' | 'at_or_below';
@@ -119,12 +117,12 @@ const VALID_SEVERITY_COMPARISONS: readonly string[] = [
 export function severityFilterValues(
   value: string,
   comparison?: string,
-): SeverityWord[] {
+): SeverityLevel[] {
   if (
     comparison !== undefined &&
     !VALID_SEVERITY_COMPARISONS.includes(comparison)
   ) {
-    return [...SEVERITY_ORDER];
+    return [...SEVERITY_LEVELS];
   }
   if (comparison === 'at_or_above') {
     return severitiesAtOrAbove(value);
@@ -132,10 +130,10 @@ export function severityFilterValues(
   if (comparison === 'at_or_below') {
     return severitiesAtOrBelow(value);
   }
-  const normalized = value.trim().toLowerCase() as SeverityWord;
-  return SEVERITY_ORDER.includes(normalized)
+  const normalized = value.trim().toLowerCase() as SeverityLevel;
+  return SEVERITY_LEVELS.includes(normalized)
     ? [normalized]
-    : [...SEVERITY_ORDER];
+    : [...SEVERITY_LEVELS];
 }
 
 /** The `severity` enum property shared by the finding tools that take a severity filter. */
@@ -146,7 +144,7 @@ export function severityProperty(): JsonSchemaProperty {
       'Severity to filter on: one of informational, low, medium, high, critical. Matches ' +
       'that exact severity by default — use severity_comparison for "or above"/"or below". ' +
       'Omit for no severity filter.',
-    enum: [...SEVERITY_ORDER],
+    enum: [...SEVERITY_LEVELS],
   };
 }
 
