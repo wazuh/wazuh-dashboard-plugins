@@ -39,10 +39,16 @@ const App: React.FC<{
   core: CoreStart;
   onAppLeave: AppMountParameters['onAppLeave'];
 }> = ({ core, onAppLeave }) => {
-  const [route, setRoute] = useState<Route>('chat');
+  const [route, setRoute] = useState<Route>(() => {
+    const hash = window.location.hash.replace('#', '');
+    return hash === 'settings' ? 'settings' : 'chat';
+  });
   // Settings is mounted lazily (nothing should issue its requests for a user who never opens the
   // tab) but, once opened, stays mounted for the same reason ChatPage does — see the render below.
-  const [settingsEverOpened, setSettingsEverOpened] = useState(false);
+  const [settingsEverOpened, setSettingsEverOpened] = useState(() => {
+    const hash = window.location.hash.replace('#', '');
+    return hash === 'settings';
+  });
   const [providers, setProviders] = useState<ProviderSummary[]>([]);
   const [providersLoaded, setProvidersLoaded] = useState(false);
   const [selectedProviderId, setSelectedProviderId] = useState('');
@@ -54,6 +60,10 @@ const App: React.FC<{
   const handleGeneratingChange = useCallback((generating: boolean) => {
     isGeneratingRef.current = generating;
   }, []);
+
+  useEffect(() => {
+    window.location.hash = route;
+  }, [route]);
 
   useEffect(() => {
     onAppLeave(actions => {
