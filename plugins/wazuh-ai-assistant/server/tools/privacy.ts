@@ -1,9 +1,22 @@
+import { TableSpec } from '../../common/types';
 import { Digest } from './digest';
 
 /**
  * Privacy mode: reversible pseudonymization at
  * the digest boundary. Everything in this module is pure/stateless-per-instance — no module-level
  * caches — so it is safe to construct fresh per HTTP request (see server/routes/chat.ts).
+ *
+ * The three actions do NOT all act at the same boundary, and the difference is deliberate:
+ *
+ * - `anonymize` is a MODEL-boundary control. The pseudonym map is reversible and stays inside the
+ *   deployment, so the value must still be retrieved and still renders in clear text in the locally
+ *   rendered result table — that is the whole point of pseudonymizing rather than dropping: the
+ *   analyst keeps their data, the provider only ever sees `HOST_1`.
+ * - `never` is a RETRIEVAL control. Nothing that is never allowed to leave should be fetched in the
+ *   first place, so the field is stripped from the outbound query's projections
+ *   (`applyProjectionPolicy`) and from the rendered table (`applyTablePolicy`) as well as from the
+ *   digest (`applyFieldPolicy`).
+ * - `allow` (also the default for an unlisted field on a typed tool) acts nowhere.
  */
 
 export type FieldPolicyAction = 'allow' | 'anonymize' | 'never';
@@ -552,6 +565,248 @@ function resolveFieldEntry(
   return undefined;
 }
 
+/** Effective action for `field` under `policy` — `'allow'` when no entry matches, since an
+ * unlisted field is allowed by omission (the escape hatch's fail-closed default is a digest-only
+ * concern, see `applyFieldPolicy`). Exported for the retrieval/display passes below, which need the
+ * action for a bare field path rather than the whole entry. */
+export function resolveFieldAction(
+  field: string,
+  policy: FieldPolicyEntry[],
+  toolName?: string,
+): FieldPolicyAction {
+  return resolveFieldEntry(field, policy, toolName)?.action ?? 'allow';
+}
+
+/**
+ * The `_source`-style exclude patterns covering every 'never' entry that applies to `toolName`.
+ * A tool-scoped entry ("get_active_agents/name") contributes only for its own tool, and only its
+ * bare field part — scoping exists to disambiguate identical Manager field names across tools, and
+ * that distinction is already made by the time we know which tool is executing. A prefix entry
+ * ("GeoLocation.*") contributes BOTH "GeoLocation" and "GeoLocation.*": OpenSearch's `.*` matches
+ * subfields only, so the parent has to be listed separately or a scalar `GeoLocation` would survive.
+ */
+function neverFieldExcludes(
+  policy: FieldPolicyEntry[],
+  toolName?: string,
+): string[] {
+  const patterns: string[] = [];
+  for (const entry of policy) {
+    if (entry.action !== 'never') {
+      continue;
+    }
+    let field = entry.field;
+    const separator = field.indexOf('/');
+    if (separator !== -1) {
+      if (!toolName || field.slice(0, separator) !== toolName) {
+        continue;
+      }
+      field = field.slice(separator + 1);
+    }
+    if (field.endsWith('.*')) {
+      const prefix = field.slice(0, -2);
+      patterns.push(prefix, `${prefix}.*`);
+    } else {
+      patterns.push(field);
+    }
+  }
+  return [...new Set(patterns)];
+}
+
+/** Projection keys (besides `_source`) whose value is a list of field names — none of the typed
+ * catalog tools use them today, but the search_wazuh_data escape hatch forwards whatever body the
+ * model produced, so a 'never' field must not be reachable through them either. */
+const PROJECTION_LIST_KEYS = new Set([
+  'docvalue_fields',
+  'stored_fields',
+  'fields',
+]);
+
+/** Drops every 'never' field name from one projection list — a bare `string[]`, a lone string, or
+ * the `{field}`-object form `docvalue_fields`/`fields` also accept. Any other shape passes through
+ * untouched rather than being guessed at. */
+function filterProjectionList(
+  value: unknown,
+  isNever: (field: string) => boolean,
+): unknown {
+  if (typeof value === 'string') {
+    return isNever(value) ? [] : value;
+  }
+  if (!Array.isArray(value)) {
+    return value;
+  }
+  return value.filter(item => {
+    if (typeof item === 'string') {
+      return !isNever(item);
+    }
+    const field = (item as { field?: unknown } | null)?.field;
+    return typeof field === 'string' ? !isNever(field) : true;
+  });
+}
+
+/** Rewrites one `_source` value, whatever form it took: a list/string of includes, or the
+ * `{includes, excludes}` object form (whose `includes` are filtered and whose `excludes` gain the
+ * never patterns). `false` is returned untouched — it already retrieves nothing. */
+function filterSourceValue(
+  value: unknown,
+  isNever: (field: string) => boolean,
+  excludes: string[],
+): unknown {
+  if (value === false) {
+    return value;
+  }
+  if (value === true || value === undefined) {
+    return { excludes };
+  }
+  if (typeof value === 'string' || Array.isArray(value)) {
+    // Shape-preserving on purpose: digest.ts's `deriveResultColumns` reads a plain `string[]`
+    // `_source` to name the escape hatch's columns, and rewriting it to the object form would
+    // silently fall back to key-union derivation. A wildcard include (e.g. "data.*") left in the
+    // list can still fetch a 'never' field, but it can never SHOW one: the derived column is the
+    // literal "data.*" path, which resolves to undefined in every row.
+    return filterProjectionList(value, isNever);
+  }
+  if (value && typeof value === 'object') {
+    const source = value as Record<string, unknown>;
+    const previousExcludes = filterProjectionList(
+      source.excludes ?? [],
+      () => false,
+    ) as unknown[];
+    return {
+      ...source,
+      ...(source.includes === undefined
+        ? {}
+        : { includes: filterProjectionList(source.includes, isNever) }),
+      excludes: [
+        ...new Set([
+          ...previousExcludes.filter(item => typeof item === 'string'),
+          ...excludes,
+        ]),
+      ],
+    };
+  }
+  return value;
+}
+
+/**
+ * Retrieval half of the 'never' action: returns a copy of the executed Indexer body with every
+ * 'never' field removed from its projections, so the value is never fetched from the indexer at all
+ * rather than fetched and filtered afterwards.
+ *
+ * Both directions matter. Where a tool declares an explicit `_source` list, the never fields are
+ * removed from it. Where it declares NONE (the alert-hits tools retrieve whole documents), an
+ * `_source.excludes` is added — otherwise a 'never' field like `full_log` still comes back on the
+ * wire even though nothing downstream displays it. Nested `_source` keys are rewritten too (a
+ * `top_hits` sub-aggregation has its own).
+ *
+ * `query`/`aggs` clauses are deliberately NOT touched: a policy entry says a field's VALUES must not
+ * be projected out, not that the field may not be used as a filter — rejecting the query would turn
+ * a privacy setting into a silent capability outage. An aggregation OVER a 'never' field is a
+ * projection in disguise (bucket keys are values), and that case is handled where the results are
+ * shaped: `applyFieldPolicy` drops those buckets from the digest and `applyTablePolicy` drops them
+ * from the table.
+ *
+ * Returns `body` itself (same reference) when the policy has no applicable 'never' entry, so a
+ * policy without one leaves the executed request byte-identical.
+ */
+export function applyProjectionPolicy(
+  body: Record<string, unknown>,
+  policy: FieldPolicyEntry[],
+  toolName?: string,
+): Record<string, unknown> {
+  const excludes = neverFieldExcludes(policy, toolName);
+  if (excludes.length === 0) {
+    return body;
+  }
+  const isNever = (field: string): boolean =>
+    resolveFieldAction(field, policy, toolName) === 'never';
+
+  const rewrite = (node: unknown): unknown => {
+    if (Array.isArray(node)) {
+      return node.map(rewrite);
+    }
+    if (!node || typeof node !== 'object') {
+      return node;
+    }
+    const out: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(
+      node as Record<string, unknown>,
+    )) {
+      if (key === '_source') {
+        out[key] = filterSourceValue(value, isNever, excludes);
+      } else if (PROJECTION_LIST_KEYS.has(key)) {
+        out[key] = filterProjectionList(value, isNever);
+      } else {
+        out[key] = rewrite(value);
+      }
+    }
+    return out;
+  };
+
+  const rewritten = rewrite(body) as Record<string, unknown>;
+  if (rewritten._source === undefined) {
+    // No `_source` anywhere in the body: the search returns whole documents, so the excludes have
+    // to be introduced rather than merely filtered.
+    rewritten._source = { excludes };
+  }
+  return rewritten;
+}
+
+/**
+ * Display half of the 'never' action: drops every 'never' field from the `table` StreamEvent — its
+ * column list, each row's keys (visible columns AND the row-only investigation fields the row
+ * expander reveals), and `severityColumn` if that column itself went away.
+ *
+ * 'anonymize' fields are deliberately left in clear text: the table renders locally in the browser
+ * and never reaches the provider, and the pseudonym map is reversible by design — a table of
+ * `HOST_1`/`IP_3` would cost the analyst their data for no privacy gain. See this module's header.
+ *
+ * `aggFields` (when given) covers the aggregation-table case, where a row's keys are `key`/
+ * `doc_count` rather than field paths and per-column resolution therefore can't see the underlying
+ * field: if the FIRST top-level aggregation's field is 'never', every bucket key IS a value of that
+ * field, so the rows are dropped entirely. Only the first aggregation is consulted because that is
+ * the only one `buildTableSpec` renders (documented in search_wazuh_data.ts).
+ */
+export function applyTablePolicy(
+  spec: TableSpec,
+  policy: FieldPolicyEntry[],
+  toolName?: string,
+  aggFields?: Record<string, string | undefined>,
+): TableSpec {
+  const isNever = (field: string): boolean =>
+    resolveFieldAction(field, policy, toolName) === 'never';
+
+  const firstAggField = aggFields
+    ? aggFields[Object.keys(aggFields)[0]]
+    : undefined;
+  if (firstAggField && isNever(firstAggField)) {
+    return { ...spec, columns: spec.columns, rows: [] };
+  }
+
+  const columns = spec.columns.filter(column => !isNever(column.id));
+  if (
+    columns.length === spec.columns.length &&
+    !spec.rows.some(row => Object.keys(row).some(isNever))
+  ) {
+    return spec;
+  }
+
+  const rows = spec.rows.map(row => {
+    const out: Record<string, unknown> = {};
+    for (const [field, value] of Object.entries(row)) {
+      if (!isNever(field)) {
+        out[field] = value;
+      }
+    }
+    return out;
+  });
+
+  const next: TableSpec = { ...spec, columns, rows };
+  if (next.severityColumn && isNever(next.severityColumn)) {
+    delete next.severityColumn;
+  }
+  return next;
+}
+
 /**
  * Reads the field name driving each of a digest's `breakdown` aggregations (a terms/
  * significant_terms/cardinality aggregation's bucket keys), from the EXECUTED request body — the
@@ -575,8 +830,7 @@ export function extractAggFields(
   // the escape hatch passes the model's raw body through. Reading only `aggs` would leave the
   // breakdown of an `aggregations`-spelled query unattributed, and therefore unscrubbed.
   const aggs = (body?.aggs ?? body?.aggregations) as
-    | Record<string, unknown>
-    | undefined;
+    Record<string, unknown> | undefined;
   if (!aggs) {
     return undefined;
   }
@@ -724,6 +978,14 @@ export function applyFieldPolicy(
   const scrubbedDigest: Digest = {
     ...digest,
     samples,
+    // `columns` is a schema hint naming the columns of the table already rendered to the user, so it
+    // has to agree with what that table shows: `applyTablePolicy` drops 'never' columns from the
+    // table, and advertising them here would describe a column the analyst cannot see. 'anonymize'
+    // and 'allow' column labels stay untouched — they are field PATHS, not data (the same reason
+    // prescanAndMintToolContent leaves them unscanned).
+    columns: digest.columns.filter(
+      column => resolveFieldAction(column, policy, toolName) !== 'never',
+    ),
     // `...digest` already spread the raw `message` through untouched when present; this explicit
     // key runs it through the whole-text scrub and overrides that spread (object spread is
     // left-to-right, so a later key wins). Omitted entirely when absent so there is no

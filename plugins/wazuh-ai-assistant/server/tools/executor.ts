@@ -2,7 +2,7 @@ import {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
 } from '../../../../src/core/server';
-import { StreamEvent, ToolCall } from '../../common/types';
+import { StreamEvent, TableSpec, ToolCall } from '../../common/types';
 import { describeError } from '../../common/errors';
 import { validate } from './schema-validator';
 import { getToolDefinition } from './registry';
@@ -16,6 +16,8 @@ import { buildDigest, buildTableSpec, capDigest, Digest } from './digest';
 import { IndexerRequest, ManagerRequest, ToolDefinition } from './types';
 import {
   applyFieldPolicy,
+  applyProjectionPolicy,
+  applyTablePolicy,
   extractAggFields,
   FieldPolicyEntry,
   Pseudonymizer,
@@ -66,6 +68,25 @@ function finalizeDigest(
       isEscapeHatch,
     ),
   );
+}
+
+/**
+ * Applies the display half of the field policy to a `table` StreamEvent's spec (when `privacy` is
+ * given): 'never' fields are dropped from its columns and rows. 'anonymize' fields keep their real
+ * values on purpose — the table renders locally and never reaches the provider, and the pseudonym
+ * map is reversible (see privacy.ts's module header). A no-op passthrough when `privacy` is
+ * undefined, so privacy-off tables are byte-identical to before this existed.
+ */
+function finalizeTable(
+  spec: TableSpec,
+  privacy: PrivacyContext | undefined,
+  toolName: string,
+  aggFields?: Record<string, string | undefined>,
+): TableSpec {
+  if (!privacy) {
+    return spec;
+  }
+  return applyTablePolicy(spec, privacy.fieldPolicy, toolName, aggFields);
 }
 
 function toolErrorContent(reason: string): string {
@@ -136,6 +157,16 @@ async function executeIndexerRequest(
     };
   }
 
+  // Retrieval half of the 'never' action: strip never-send fields from the body's
+  // projections BEFORE it is executed, so those values are never fetched from the indexer instead of
+  // being fetched and dropped afterwards. Done here, on the already guardrail-clamped body, so the
+  // executed body is the same one every downstream consumer sees — `deriveColumns`, `extractAggFields`
+  // and the "Open in Discover" DSL all read `body` below. A no-op passthrough (same reference) when
+  // privacy is off or the policy has no applicable 'never' entry.
+  if (privacy) {
+    body = applyProjectionPolicy(body, privacy.fieldPolicy, toolName);
+  }
+
   try {
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: indexerRequest.index,
@@ -147,25 +178,29 @@ async function executeIndexerRequest(
     // Static-column tools ignore the extra argument entirely. It is ALSO the only place the
     // aggregation fields driving `breakdown` (if any) can be read from — see privacy.ts's
     // `extractAggFields` doc comment — so it is reused for that below when privacy is active.
+    const aggFields = extractAggFields(body);
     const digest = buildDigest(toolName, result, def, body);
     const finalDigest = finalizeDigest(
       digest,
       privacy,
       toolName,
-      extractAggFields(body),
+      aggFields,
       def.deriveColumns,
     );
     // "Open in Discover" support (common/types.ts's `TableSpec.discover` doc comment): only this
     // Indexer path has an index/DSL to attach — `body.query` is the guardrail-clamped clause that
     // actually ran, falling back to `match_all` for a query-less body (matches this same result set).
-    const tableSpec = buildTableSpec(result, def, body);
+    const tableSpec = finalizeTable(
+      buildTableSpec(result, def, body),
+      privacy,
+      toolName,
+      aggFields,
+    );
     tableSpec.discover = {
       index: indexerRequest.index,
       dsl: (body.query as Record<string, unknown>) ?? { match_all: {} },
     };
     return {
-      // The `table` event built from `result` below is deliberately NOT run through field policy:
-      // it renders locally in the browser and never reaches the model.
       toolResultContent: JSON.stringify(finalDigest),
       tableEvent: { type: 'table', spec: tableSpec },
     };
@@ -217,7 +252,13 @@ async function executeManagerRequest(
     const finalDigest = finalizeDigest(digest, privacy, toolName);
     return {
       toolResultContent: JSON.stringify(finalDigest),
-      tableEvent: { type: 'table', spec: buildTableSpec(result, def) },
+      tableEvent: {
+        type: 'table',
+        // Manager tools carry bare, tool-scoped field names ("name", "ip"), so the table pass needs
+        // the same `toolName` scoping the digest pass uses. No `aggFields`: Manager responses have
+        // no aggregation concept.
+        spec: finalizeTable(buildTableSpec(result, def), privacy, toolName),
+      },
     };
   } catch (error) {
     return {
@@ -255,8 +296,7 @@ export interface BuiltToolCall {
 }
 
 export type BuildValidatedRequestResult =
-  | { ok: true; built: BuiltToolCall }
-  | { ok: false; toolResultContent: string };
+  { ok: true; built: BuiltToolCall } | { ok: false; toolResultContent: string };
 
 /**
  * Validates a model-issued tool call's arguments and builds its outbound request, WITHOUT

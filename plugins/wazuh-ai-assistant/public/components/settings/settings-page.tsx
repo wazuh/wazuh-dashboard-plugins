@@ -1174,7 +1174,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                       'wazuhAiAssistant.settings.privacy.fieldPolicyHelp',
                       {
                         defaultMessage:
-                          'Controls which alert fields are anonymized (or dropped entirely) before reaching the AI provider when privacy mode is on.',
+                          'Controls how each field is handled when privacy mode is on. "Anonymize" replaces the value with a reversible pseudonym (HOST_1, IP_2) before it reaches the AI provider; the field is still queried and the results table still shows the real value, which never leaves the cluster. "Never send" is stronger: the field is excluded from the query itself, so it is never retrieved, never shown in the results table and never sent to the provider.',
                       },
                     )}
                   </p>
