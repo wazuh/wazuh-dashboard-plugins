@@ -35,35 +35,36 @@
       "notes": "UAT intent GET_DISCONNECTED_AGENTS -> get_disconnected_agents.ts."
     },
     {
-      "id": "critical_alerts",
-      "category": "alerts",
-      "prompt_en": "Show me the critical-severity alerts from the past week, most recent first.",
-      "prompt_es": "Muéstrame las alertas de severidad crítica de la última semana, empezando por las más recientes.",
+      "id": "critical_findings",
+      "category": "findings",
+      "prompt_en": "Show me the critical-severity findings from the past week, most recent first.",
+      "prompt_es": "Muéstrame los hallazgos de severidad crítica de la última semana, empezando por las más recientes.",
       "expect": {
-        "tool": "get_critical_alerts",
+        "tool": "get_critical_findings",
         "params_subset": {},
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent GET_CRITICAL_ALERTS -> get_critical_alerts.ts, hardcodes rule.level>=15 (get_critical_alerts.ts:38); not a model-supplied param, so nothing to pin beyond tool identity."
+      "notes": "UAT intent GET_CRITICAL_ALERTS -> get_critical_findings.ts, hardcodes an exact terms match on wazuh.rule.level: 'critical' (get_critical_findings.ts:45; the 4.14 numeric rule.level>=15 threshold has no 5.0 equivalent, since wazuh.rule.level is now a keyword severity word, not a number); not a model-supplied param, so nothing to pin beyond tool identity."
     },
     {
-      "id": "alerts_by_agent_severity",
-      "category": "alerts",
-      "prompt_en": "What alerts has web-prod-01 triggered at high severity or above?",
-      "prompt_es": "¿Qué alertas ha generado web-prod-01 con severidad alta o superior?",
+      "id": "findings_by_agent_severity",
+      "category": "findings",
+      "prompt_en": "What findings has web-prod-01 triggered at high severity or above?",
+      "prompt_es": "¿Qué hallazgos ha generado web-prod-01 con severidad alta o superior?",
       "expect": {
-        "tool": "search_alerts_by_agent",
+        "tool": "search_findings_by_agent",
         "params_subset": {
           "agent_name": "web-prod-01",
-          "min_severity": "high"
+          "severity": "high",
+          "severity_comparison": "at_or_above"
         },
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent SEARCH_ALERTS_BY_AGENT -> search_alerts_by_agent.ts. Both agent_name and min_severity are explicitly stated in the question, so both are pinned. 5.0 UPDATE: rule.level is categorical in Wazuh 5.0 (informational/low/medium/high/critical), so min_severity is a WORD, not a 0-15 number -- the prompt and the pinned value were both migrated off the 4.14 numeric scale (the pre-migration case asked for 'severity of 10 or higher' and pinned 10, which the model correctly answered with \"high\", failing the stale assertion)."
+      "notes": "UAT intent SEARCH_ALERTS_BY_AGENT -> search_findings_by_agent.ts. agent_name, severity, and severity_comparison are all explicitly stated in the question ('high severity or above'), so all three are pinned -- severity defaults to an exact match, so the explicit 'or above' phrasing is what justifies pinning severity_comparison here."
     },
     {
       "id": "top_rules",
-      "category": "alerts",
+      "category": "findings",
       "prompt_en": "Which rules have been firing the most often this month?",
       "prompt_es": "¿Qué reglas se han estado disparando con más frecuencia este mes?",
       "expect": {
@@ -71,7 +72,7 @@
         "params_subset": {},
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent GET_TOP_RULES -> get_top_rules.ts, terms agg on rule.id (allowlisted, guardrails.ts:66)."
+      "notes": "UAT intent GET_TOP_RULES -> get_top_rules.ts, terms agg on wazuh.rule.id (allowlisted, guardrails.ts:66)."
     },
     {
       "id": "critical_vulnerabilities",
@@ -86,20 +87,20 @@
       "notes": "UAT intent GET_CRITICAL_VULNERABILITIES -> get_critical_vulnerabilities.ts, wazuh-states-vulnerabilities-* filtered to severity=Critical (hardcoded, get_critical_vulnerabilities.ts:26). Distinguish from get_vulnerabilities (no severity floor) -- see honesty_on_empty case below."
     },
     {
-      "id": "alerts_last_24h",
-      "category": "alerts",
+      "id": "findings_last_24h",
+      "category": "findings",
       "prompt_en": "What's happened across all our agents in the last 24 hours?",
       "prompt_es": "¿Qué ha pasado en todos nuestros agentes en las últimas 24 horas?",
       "expect": {
-        "tool": "get_alerts_by_time",
+        "tool": "get_findings_by_time",
         "params_subset": {},
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent GET_ALERTS_LAST_24H -> get_alerts_by_time.ts, the generalized port (get_alerts_by_time.ts explains it replaces the 4.14 hardcoded now-24h so ALL severities show, not just critical). time_range_gte deliberately left unpinned -- see params_subset_note in _meta."
+      "notes": "UAT intent GET_ALERTS_LAST_24H -> get_findings_by_time.ts, the generalized port (get_findings_by_time.ts explains it replaces the 4.14 hardcoded now-24h so ALL severities show, not just critical). time_range_gte deliberately left unpinned -- see params_subset_note in _meta."
     },
     {
       "id": "brute_force",
-      "category": "alerts",
+      "category": "findings",
       "prompt_en": "Are we seeing any brute-force login attempts lately?",
       "prompt_es": "¿Estamos viendo intentos de fuerza bruta en los inicios de sesión últimamente?",
       "expect": {
@@ -111,7 +112,7 @@
     },
     {
       "id": "security_summary",
-      "category": "alerts",
+      "category": "findings",
       "prompt_en": "Can you give me a summary of what kinds of security events we've had this week?",
       "prompt_es": "¿Puedes darme un resumen de los tipos de eventos de seguridad que hemos tenido esta semana?",
       "expect": {
@@ -119,11 +120,11 @@
         "params_subset": {},
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent GET_SECURITY_SUMMARY -> get_security_summary.ts. 5.0: severity words at or above 'medium' (was rule.level>=7), aggregated by rule.category (was rule.groups, get_security_summary.ts:15-17)."
+      "notes": "UAT intent GET_SECURITY_SUMMARY -> get_security_summary.ts. 5.0: severity words at or above 'medium' (was rule.level>=7), aggregated by wazuh.rule.category (was rule.groups, get_security_summary.ts:15-17)."
     },
     {
       "id": "suspicious_powershell",
-      "category": "alerts",
+      "category": "findings",
       "prompt_en": "Has there been any suspicious PowerShell activity on our Windows machines?",
       "prompt_es": "¿Ha habido actividad sospechosa de PowerShell en nuestras máquinas Windows?",
       "expect": {
@@ -131,31 +132,31 @@
         "params_subset": {},
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent GET_SUSPICIOUS_POWERSHELL -> get_suspicious_powershell.ts, match (not wildcard) on rule.description (get_suspicious_powershell.ts:11-19)."
+      "notes": "UAT intent GET_SUSPICIOUS_POWERSHELL -> get_suspicious_powershell.ts, ORs the MITRE T1059.001 technique id, wazuh.rule.tags, and PowerShell process names (get_suspicious_powershell.ts)."
     },
     {
-      "id": "alerts_by_rule_id",
-      "category": "alerts",
-      "prompt_en": "What's been triggering rule 5710 recently?",
-      "prompt_es": "¿Qué ha estado disparando la regla 5710 recientemente?",
+      "id": "findings_by_rule_title",
+      "category": "findings",
+      "prompt_en": "What's been triggering the \"Wazuh Rootcheck - Rootkit or malware detected\" rule recently?",
+      "prompt_es": "¿Qué ha estado disparando la regla \"Wazuh Rootcheck - Rootkit or malware detected\" recientemente?",
       "expect": {
-        "tool": "search_alerts_by_rule_id",
+        "tool": "search_findings_by_rule_title",
         "params_subset": {
-          "rule_id": 5710
+          "rule_title": "Wazuh Rootcheck - Rootkit or malware detected"
         },
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent SEARCH_ALERTS_BY_RULE_ID -> search_alerts_by_rule_id.ts. rule_id pinned since the question names an exact numeric ID (5710 is also one of the get_brute_force known rule IDs, get_brute_force.ts:50, but the question asks about the rule specifically so this tool is the right route, not get_brute_force)."
+      "notes": "UAT intent SEARCH_ALERTS_BY_RULE_TITLE -> search_findings_by_rule_title.ts. rule_title pinned since the question names an exact rule by its title text; in 5.0 wazuh.rule.id is a UUID, not a memorizable short numeric ID, so title is the reachable identifier for this kind of question."
     },
     {
-      "id": "alerts_by_rule_group",
-      "category": "alerts",
+      "id": "findings_by_rule_tag",
+      "category": "findings",
       "prompt_en": "Which users had sessions closed in the last 24 hours?",
       "prompt_es": "¿Qué usuarios tuvieron sesiones cerradas en las últimas 24 horas?",
       "expect": {
         "tool": [
-          "search_alerts_by_rule_group",
-          "get_alerts_by_time",
+          "search_findings_by_rule_tag",
+          "get_findings_by_time",
           "get_brute_force",
           "search_wazuh_data"
         ],
@@ -163,60 +164,61 @@
         "table": "required_empty_ok",
         "answer_must_not_match": ["rule (id )?2003"]
       },
-      "notes": "Regression case: this question makes the model guess rule.id 2003 (search_alerts_by_rule_id) instead of the real PAM session-closed rule 5502, returning 0 rows and falsely reporting no sessions closed. search-alerts-by-rule-group.ts was built specifically for this: rule_group is not pinned in params_subset because several values are defensible ('pam', 'session_closed', 'authentication_success') and prompts.ts's 'never guess rule ids' rule only requires SOME rule.groups value, not a specific one. answer_must_not_match guards against the specific hallucinated rule ID resurfacing. See also dstuser_sessions_closed below, the pre-existing case for this same question kept for its data.dstuser/multi-tool-tolerance coverage. 5.0 UPDATE (2026-07-26): the strict single-tool pin was BROADENED to the same set its sibling accepts. The assertion that actually encodes the original UAT bug is answer_must_not_match (rule id 2003) and it still passes; the model now answers this via search_wazuh_data, which is equally NOT a guessed rule id, so the regression this case exists to catch is still caught. The prompt is deliberately left identical to dstuser_sessions_closed (that duplication is intentional per the note above, NOT a copy-paste slip) so this case keeps guarding the exact phrasing that triggered the live miss."
+      "notes": "Regression case: this question makes the model guess rule.id 2003 (search_findings_by_rule_title) instead of the real PAM session-closed rule 5502, returning 0 rows and falsely reporting no sessions closed. search-findings-by-rule-tag.ts was built specifically for this: rule_tag is not pinned in params_subset because several values are defensible ('pam', 'session_closed', 'authentication_success') and prompts.ts's 'never guess rule ids' rule only requires SOME wazuh.rule.tags value, not a specific one. answer_must_not_match guards against the specific hallucinated rule ID resurfacing. See also dstuser_sessions_closed below, the pre-existing case for this same question kept for its destination.user.name/multi-tool-tolerance coverage. 5.0 UPDATE (2026-07-26): the strict single-tool pin was BROADENED to the same set its sibling accepts. The assertion that actually encodes the original UAT bug is answer_must_not_match (rule id 2003) and it still passes; the model now answers this via search_wazuh_data, which is equally NOT a guessed rule id, so the regression this case exists to catch is still caught. The prompt is deliberately left identical to dstuser_sessions_closed (that duplication is intentional per the note above, NOT a copy-paste slip) so this case keeps guarding the exact phrasing that triggered the live miss."
     },
     {
-      "id": "pci_dss_alerts",
+      "id": "pci_dss_findings",
       "category": "compliance",
-      "prompt_en": "Show me the alerts related to PCI DSS compliance requirements.",
-      "prompt_es": "Muéstrame las alertas relacionadas con los requisitos de cumplimiento PCI DSS.",
+      "prompt_en": "Show me the findings related to PCI DSS compliance requirements.",
+      "prompt_es": "Muéstrame los hallazgos relacionados con los requisitos de cumplimiento PCI DSS.",
       "expect": {
-        "tool": "get_pci_dss_alerts",
+        "tool": "get_pci_dss_findings",
         "params_subset": {},
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent GET_PCI_DSS_ALERTS -> get_pci_dss_alerts.ts. 5.0: rule.groups is gone; an exists filter on rule.compliance.pci_dss replaces the 4.14 prefix-match-on-rule.groups workaround (get_pci_dss_alerts.ts:32-34)."
+      "notes": "UAT intent GET_PCI_DSS_ALERTS -> get_pci_dss_findings.ts. 5.0: rule.groups is gone; an exists filter on wazuh.rule.compliance.pci_dss replaces the 4.14 prefix-match-on-rule.groups workaround (get_pci_dss_findings.ts:32-34)."
     },
     {
       "id": "pci_dss_summary",
       "category": "compliance",
-      "prompt_en": "Give me a breakdown of our PCI DSS alerts by which requirement they map to.",
-      "prompt_es": "Dame un desglose de nuestras alertas PCI DSS según a qué requisito corresponden.",
+      "prompt_en": "Give me a breakdown of our PCI DSS findings by which requirement they map to.",
+      "prompt_es": "Dame un desglose de nuestros hallazgos PCI DSS según a qué requisito corresponden.",
       "expect": {
         "tool": "get_pci_dss_summary",
         "params_subset": {},
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent GET_PCI_DSS_SUMMARY -> get_pci_dss_summary.ts. 5.0: terms agg directly on rule.compliance.pci_dss (was rule.groups with an include regex, get_pci_dss_summary.ts:13-17). Distinguish from pci_dss_alerts (a list, not a breakdown) via the 'breakdown'/'grouped by' phrasing."
+      "notes": "UAT intent GET_PCI_DSS_SUMMARY -> get_pci_dss_summary.ts. 5.0: terms agg directly on wazuh.rule.compliance.pci_dss (was rule.groups with an include regex, get_pci_dss_summary.ts:13-17). Distinguish from pci_dss_findings (a list, not a breakdown) via the 'breakdown'/'grouped by' phrasing."
     },
     {
-      "id": "alerts_by_multiple_agents",
-      "category": "alerts",
-      "prompt_en": "What alerts have web-prod-01 and web-prod-02 triggered at high severity or above?",
-      "prompt_es": "¿Qué alertas han generado web-prod-01 y web-prod-02 con severidad alta o superior?",
+      "id": "findings_by_multiple_agents",
+      "category": "findings",
+      "prompt_en": "What findings have web-prod-01 and web-prod-02 triggered at high severity or above?",
+      "prompt_es": "¿Qué hallazgos han generado web-prod-01 y web-prod-02 con severidad alta o superior?",
       "expect": {
-        "tool": "search_alerts_by_multiple_agents",
+        "tool": "search_findings_by_multiple_agents",
         "params_subset": {
           "agent_names": ["web-prod-01", "web-prod-02"],
-          "min_severity": "high"
+          "severity": "high",
+          "severity_comparison": "at_or_above"
         },
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent SEARCH_ALERTS_BY_MULTIPLE_AGENTS -> search_alerts_by_multiple_agents.ts. Two named agents should route here rather than to search_alerts_by_agent (search_alerts_by_multiple_agents.ts:23 description explicitly says so). 5.0 UPDATE: min_severity is a categorical WORD in Wazuh 5.0, not a 0-15 number -- prompt and pinned value migrated off the 4.14 numeric scale (see alerts_by_agent_severity's note)."
+      "notes": "UAT intent SEARCH_ALERTS_BY_MULTIPLE_AGENTS -> search_findings_by_multiple_agents.ts. Two named agents should route here rather than to search_findings_by_agent (search_findings_by_multiple_agents.ts:23 description explicitly says so). severity_comparison is pinned to at_or_above since the question explicitly says 'or above' (see findings_by_agent_severity's note -- severity defaults to an exact match otherwise)."
     },
     {
-      "id": "alerts_by_os",
-      "category": "alerts",
-      "prompt_en": "Are there any high-severity alerts coming from our Windows machines?",
-      "prompt_es": "¿Hay alertas de severidad alta procedentes de nuestras máquinas Windows?",
+      "id": "findings_by_os",
+      "category": "findings",
+      "prompt_en": "Are there any high-severity findings coming from our Windows machines?",
+      "prompt_es": "¿Hay hallazgos de severidad alta procedentes de nuestras máquinas Windows?",
       "expect": {
-        "tool": "search_alerts_by_os",
+        "tool": "search_findings_by_os",
         "params_subset": {
           "os_name": "Windows"
         },
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent SEARCH_ALERTS_BY_OS -> search_alerts_by_os.ts, match (not wildcard) on agent.os.name (search_alerts_by_os.ts:11-15). min_severity left unpinned ('high-severity' is fuzzy, not a stated number)."
+      "notes": "UAT intent SEARCH_ALERTS_BY_OS -> search_findings_by_os.ts, match (not wildcard) on host.os.name/host.os.platform. severity left unpinned ('high-severity' is fuzzy phrasing, not confidently mappable to the exact-match default)."
     },
     {
       "id": "vulnerabilities_by_agent",
@@ -230,7 +232,7 @@
         },
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent GET_VULNERABILITIES_BY_AGENT -> get_vulnerabilities_by_agent.ts, multi_match across agent.name/agent.id (get_vulnerabilities_by_agent.ts:42)."
+      "notes": "UAT intent GET_VULNERABILITIES_BY_AGENT -> get_vulnerabilities_by_agent.ts, multi_match across wazuh.agent.name/wazuh.agent.id (get_vulnerabilities_by_agent.ts:42)."
     },
     {
       "id": "vulnerability_by_cve",
@@ -249,24 +251,24 @@
     {
       "id": "guardrail_90_day",
       "category": "guardrail",
-      "prompt_en": "Can you show me every alert from the last 6 months, not just the recent ones?",
-      "prompt_es": "¿Puedes mostrarme todas las alertas de los últimos 6 meses, no solo las recientes?",
+      "prompt_en": "Can you show me every finding from the last 6 months, not just the recent ones?",
+      "prompt_es": "¿Puedes mostrarme todos los hallazgos de los últimos 6 meses, no solo los recientes?",
       "expect": {
         "tool": [
-          "get_alerts_by_time",
-          "get_critical_alerts",
+          "get_findings_by_time",
+          "get_critical_findings",
           "get_security_summary",
           "get_brute_force",
           "get_suspicious_powershell",
-          "get_pci_dss_alerts",
+          "get_pci_dss_findings",
           "get_pci_dss_summary",
-          "get_mitre_alerts",
+          "get_mitre_findings",
           "get_mitre_summary",
           "get_fim_files",
-          "search_alerts_by_agent",
-          "search_alerts_by_rule_id",
-          "search_alerts_by_multiple_agents",
-          "search_alerts_by_os",
+          "search_findings_by_agent",
+          "search_findings_by_rule_title",
+          "search_findings_by_multiple_agents",
+          "search_findings_by_os",
           "search_wazuh_data"
         ],
         "params_subset": {},
@@ -278,14 +280,14 @@
     {
       "id": "escape_hatch_long_tail",
       "category": "escape_hatch",
-      "prompt_en": "Break down all of our alerts by rule group across every severity level, not just medium-and-up, for the last 30 days.",
-      "prompt_es": "Desglosa todas nuestras alertas por grupo de reglas en todos los niveles de severidad, no solo medias o superiores, durante los últimos 30 días.",
+      "prompt_en": "Break down all of our findings by rule group across every severity level, not just medium-and-up, for the last 30 days.",
+      "prompt_es": "Desglosa todos nuestros hallazgos por grupo de reglas en todos los niveles de severidad, no solo medias o superiores, durante los últimos 30 días.",
       "expect": {
         "tool": ["search_wazuh_data", "get_security_summary"],
         "params_subset": {},
         "table": "required_empty_ok"
       },
-      "notes": "No typed tool covers an all-severity rule.groups breakdown: get_security_summary.ts hardcodes rule.level>=7 (get_security_summary.ts:20,40) and get_pci_dss_summary.ts filters to pci_dss-prefixed groups only (get_pci_dss_summary.ts:44). The correct route is search_wazuh_data.ts with a terms agg on rule.groups -- which IS on the guardrail allowlist (guardrails.ts:66) so the query should execute cleanly. get_security_summary is listed as an acceptable (if imprecise) alternative since a weaker model may approximate rather than reach for the escape hatch; per run_live.js's 'PASS if a listed tool was called at ANY point' rule this also passes if the model tries get_security_summary first, gets an approximate answer, then still reaches for search_wazuh_data, or vice versa."
+      "notes": "No typed tool covers an all-severity wazuh.rule.category breakdown: get_security_summary.ts floors at medium-and-above severity (severitiesAtOrAbove('medium'), get_security_summary.ts) and get_pci_dss_summary.ts aggregates on wazuh.rule.compliance.pci_dss only, not category. The correct route is search_wazuh_data.ts with a terms agg on wazuh.rule.category (or wazuh.rule.tags) -- both ARE on the guardrail allowlist (guardrails.ts's AGG_FIELD_ALLOWLIST) so the query should execute cleanly. get_security_summary is listed as an acceptable (if imprecise) alternative since a weaker model may approximate rather than reach for the escape hatch; per run_live.js's 'PASS if a listed tool was called at ANY point' rule this also passes if the model tries get_security_summary first, gets an approximate answer, then still reaches for search_wazuh_data, or vice versa."
     },
     {
       "id": "honesty_on_empty",
@@ -307,13 +309,13 @@
     },
     {
       "id": "dstuser_sessions_closed",
-      "category": "alerts",
+      "category": "findings",
       "prompt_en": "Which users had sessions closed in the last 24 hours?",
       "prompt_es": "¿Qué usuarios tuvieron sesiones cerradas en las últimas 24 horas?",
       "expect": {
         "tool": [
-          "search_alerts_by_rule_group",
-          "get_alerts_by_time",
+          "search_findings_by_rule_tag",
+          "get_findings_by_time",
           "get_brute_force",
           "search_wazuh_data"
         ],
@@ -325,7 +327,7 @@
           "no se cerraron sesiones"
         ]
       },
-      "notes": "Regression case: the model is prone to guessing rule.id 2003 (search_alerts_by_rule_id) here instead of the real PAM session-closed rule 5502, which returns 0 rows and reports no sessions closed at all. search_alerts_by_rule_group (rule_group: 'pam' or 'session_closed') is now the primary expected route per prompts.ts's 'never guess rule ids' rule; get_alerts_by_time/get_brute_force/search_wazuh_data remain acceptable alternates from before that tool existed, same 'any listed tool at any point' tolerance as escape_hatch_long_tail above. Also still exercises the D2/D3 alert investigation fields (server/tools/catalog/common.ts's ALERT_DIGEST_EXTRA_COLUMNS), specifically data.dstuser, which every alert-hits tool's digest carries. Time phrasing ('last 24 hours') is deliberately left unpinned in params_subset per this file's own params_subset_note. answer_must_not_match guards against the specific hallucinated rule ID and a false negative claim; no positive answer_must_match since whether the model surfaces a specific username depends on live data population (data.dstuser was measured ~90% populated over 7 days in Phase 0, not guaranteed in any single 24h window) -- this case's completeness is judged qualitatively by the SME reviewer beyond that guard."
+      "notes": "Regression case: the model is prone to guessing rule.id 2003 (search_findings_by_rule_title) here instead of the real PAM session-closed rule 5502, which returns 0 rows and reports no sessions closed at all. search_findings_by_rule_tag (rule_tag: 'pam' or 'session_closed') is now the primary expected route per prompts.ts's 'never guess rule ids' rule; get_findings_by_time/get_brute_force/search_wazuh_data remain acceptable alternates from before that tool existed, same 'any listed tool at any point' tolerance as escape_hatch_long_tail above. Also still exercises the D2/D3 finding investigation fields (server/tools/catalog/common.ts's FINDING_DIGEST_EXTRA_COLUMNS), specifically destination.user.name, which every finding-hits tool's digest carries. Time phrasing ('last 24 hours') is deliberately left unpinned in params_subset per this file's own params_subset_note. answer_must_not_match guards against the specific hallucinated rule ID and a false negative claim; no positive answer_must_match since whether the model surfaces a specific username depends on live data population (destination.user.name was measured ~90% populated over 7 days in Phase 0, not guaranteed in any single 24h window) -- this case's completeness is judged qualitatively by the SME reviewer beyond that guard."
     },
     {
       "id": "no_tool_conversational",

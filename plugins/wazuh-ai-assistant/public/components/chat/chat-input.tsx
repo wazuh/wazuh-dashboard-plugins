@@ -76,7 +76,7 @@ export const ChatInput = React.forwardRef<ChatInputHandle, ChatInputProps>(
               'wazuhAiAssistant.chat.inputPlaceholder',
               {
                 defaultMessage:
-                  'Ask the AI Assistant about your security alerts...',
+                  'Ask the AI Assistant about your security findings...',
               },
             )}
             aria-label={i18n.translate('wazuhAiAssistant.chat.inputAriaLabel', {

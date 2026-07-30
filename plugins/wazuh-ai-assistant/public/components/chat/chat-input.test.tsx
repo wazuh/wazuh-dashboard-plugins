@@ -24,7 +24,7 @@ describe('ChatInput', () => {
     expect(textarea.value).toBe('hello');
     expect(textarea).toHaveAttribute(
       'placeholder',
-      'Ask the AI Assistant about your security alerts...',
+      'Ask the AI Assistant about your security findings...',
     );
   });
 

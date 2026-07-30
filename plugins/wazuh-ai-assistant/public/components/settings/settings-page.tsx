@@ -1129,7 +1129,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 'wazuhAiAssistant.settings.privacy.description',
                 {
                   defaultMessage:
-                    'Control whether alert data is anonymized before reaching the configured AI provider. When privacy mode is off, hostnames, IP addresses, usernames, process command lines, and alert/rule text leave the cluster as-is.',
+                    'Control whether finding data is anonymized before reaching the configured AI provider. When privacy mode is off, hostnames, IP addresses, usernames, process command lines, and finding/rule text leave the cluster as-is.',
                 },
               )}
             />
@@ -1231,7 +1231,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                       'wazuhAiAssistant.settings.privacy.fieldPolicyHelp',
                       {
                         defaultMessage:
-                          'Controls which alert fields are anonymized (or dropped entirely) before reaching the AI provider when privacy mode is on.',
+                          'Controls which finding fields are anonymized (or dropped entirely) before reaching the AI provider when privacy mode is on.',
                       },
                     )}
                   </p>
@@ -1393,6 +1393,88 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                     </EuiButton>
                   </>
                 )}
+
+                {fieldPolicyDraft.map((entry, index) => (
+                  <React.Fragment key={index}>
+                    <EuiFlexGroup
+                      gutterSize='s'
+                      alignItems='center'
+                      responsive={false}
+                    >
+                      <EuiFlexItem>
+                        <EuiFieldText
+                          fullWidth
+                          compressed
+                          placeholder={i18n.translate(
+                            'wazuhAiAssistant.settings.privacy.fieldPlaceholder',
+                            {
+                              defaultMessage: 'e.g. wazuh.agent.name',
+                            },
+                          )}
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.settings.privacy.fieldColumnLabel',
+                            {
+                              defaultMessage: 'Field',
+                            },
+                          )}
+                          value={entry.field}
+                          onChange={event =>
+                            handleFieldPolicyChange(index, {
+                              field: event.target.value,
+                            })
+                          }
+                        />
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false} style={{ minWidth: 160 }}>
+                        <EuiSelect
+                          compressed
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.settings.privacy.actionColumnLabel',
+                            {
+                              defaultMessage: 'Action',
+                            },
+                          )}
+                          options={FIELD_POLICY_ACTIONS.map(action => ({
+                            value: action,
+                            text: FIELD_POLICY_ACTION_LABELS[action],
+                          }))}
+                          value={entry.action}
+                          onChange={event =>
+                            handleFieldPolicyChange(index, {
+                              action: event.target.value as FieldPolicyAction,
+                            })
+                          }
+                        />
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>
+                        <EuiButtonIcon
+                          iconType='trash'
+                          color='danger'
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.settings.privacy.removeField',
+                            {
+                              defaultMessage: 'Remove field',
+                            },
+                          )}
+                          onClick={() => handleRemoveFieldPolicyRow(index)}
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                    <EuiSpacer size='xs' />
+                  </React.Fragment>
+                ))}
+
+                <EuiSpacer size='s' />
+                <EuiButton
+                  size='s'
+                  iconType='plusInCircle'
+                  onClick={handleAddFieldPolicyRow}
+                >
+                  {i18n.translate(
+                    'wazuhAiAssistant.settings.privacy.addField',
+                    { defaultMessage: 'Add field' },
+                  )}
+                </EuiButton>
 
                 <EuiHorizontalRule margin='m' />
                 <EuiToolTip content={!canSave ? accessMessage : undefined}>
