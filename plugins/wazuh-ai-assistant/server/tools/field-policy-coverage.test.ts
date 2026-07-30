@@ -203,9 +203,11 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
 });
 
 /**
- * Bare field literals this test denies — not part of the plugin's vocabulary (see
- * `common/wazuh-fields.ts`'s `WAZUH_FIELD`), kept here only as this regression guard's own
- * scan target.
+ * Denylist, not vocabulary: every entry below is a retired 4.x/ECS-generic field name that must
+ * NEVER reappear as a literal in the files `findRetiredFieldLiteralOccurrences` scans. None of
+ * these are part of the plugin's actual field vocabulary (see `common/wazuh-fields.ts`'s
+ * `WAZUH_FIELD`) — they exist here purely as strings for the regression guard below to search
+ * for, the same way an antivirus signature list intentionally contains malware hashes.
  */
 const FORBIDDEN_LEGACY_LITERALS = [
   'rule.level',
