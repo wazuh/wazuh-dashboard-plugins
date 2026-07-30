@@ -102,7 +102,7 @@
 - Condensed the setting labels and added info tooltips in the registration service configuration view [#8616](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8616)
 - Adapt management of daemons status to the new API response schema [#8706](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8706)
 - Enhanced description of `reports.csv.maxRows` setting [#1434](https://github.com/wazuh/wazuh-dashboard/issues/1434)
-- Rework the Home page overview with more platform metrics [#8760](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8760) [#8792](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8792)
+- Rework the Home page overview with more platform metrics [#8760](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8760) [#8792](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8792) [#8795](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8795)
 
 ### Fixed
 

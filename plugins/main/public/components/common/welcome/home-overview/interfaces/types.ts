@@ -8,6 +8,12 @@ export type SeverityBand =
 
 export type SeverityCounts = Partial<Record<SeverityBand, number>>;
 
+/**
+ * A count per named thing (module app id, compliance framework id, ...).
+ * `undefined` where the search reported no bucket, shown as a placeholder.
+ */
+export type CountsByKey = Record<string, number | undefined>;
+
 export interface TopItem {
   key: string;
   count: number;
@@ -37,6 +43,14 @@ export interface FindingsOverview {
   iocMatches?: number;
 }
 
+/** Findings counts the two bottom sections need, from one lazy search. */
+export interface FindingsBreakdowns {
+  /** Findings per Cloud Security module, keyed by app id. */
+  cloudSecurityByModule: CountsByKey;
+  /** Distinct controls implicated per framework, keyed by framework id. */
+  complianceControlsByFramework: CountsByKey;
+}
+
 export interface ScaTilesData {
   passed?: number;
   failed?: number;
@@ -60,7 +74,8 @@ export interface ScaOverview {
 export interface FimOverview {
   /** Fleet-wide files & registry objects baselined. */
   total?: number;
-  platforms: TopItem[];
+  /** Top 5 most recently modified files (`file.path`). */
+  files: TopItem[];
 }
 
 /**
@@ -72,11 +87,14 @@ export interface ThreatIntelEnrichments {
   total?: number;
   /** Feed composition by indicator type (the Malware "IOC feed by type" table). */
   feedByType: TopItem[];
+  /** Catalog composition by threat type (`document.software.type`). */
+  byThreatType: TopItem[];
 }
 
 export interface VulnerabilityOverview {
   severity: SeverityCounts;
-  byOs: TopItem[];
+  /** Top 5 vulnerable package names (`package.name`). */
+  byPackage: TopItem[];
   /** Distinct CVE count (cardinality). */
   cvesMatched?: number;
 }
