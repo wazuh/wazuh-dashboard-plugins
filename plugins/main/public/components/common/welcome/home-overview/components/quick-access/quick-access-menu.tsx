@@ -17,16 +17,11 @@ import {
   getModuleUrl,
   getRulesUrl,
   getDecodersUrl,
-  getIntegrationsUrl,
   getDetectorsUrl,
+  getIntegrationsUrl,
+  getKvdbsUrl,
+  getFiltersUrl,
 } from '../../utils/navigation';
-
-const QUICK_ACCESS_CATEGORY_IDS = [
-  'wz-category-endpoint-security',
-  'wz-category-threat-intelligence',
-  'wz-category-security-operations',
-  'wz-category-cloud-security',
-];
 
 interface QuickAccessItem {
   id: string;
@@ -43,37 +38,40 @@ interface QuickAccessGroup {
 }
 
 const getDataDrivenGroups = (): QuickAccessGroup[] =>
-  Applications.filter(
-    app =>
-      app.showInOverviewApp && QUICK_ACCESS_CATEGORY_IDS.includes(app.category),
-  ).reduce<QuickAccessGroup[]>((groups, app) => {
-    let group = groups.find(({ id }) => id === app.category);
-    if (!group) {
-      const category = Categories.find(({ id }) => id === app.category);
-      if (!category) {
-        return groups;
+  Applications.filter(app => app.showInOverviewApp).reduce<QuickAccessGroup[]>(
+    (groups, app) => {
+      let group = groups.find(({ id }) => id === app.category);
+      if (!group) {
+        const category = Categories.find(({ id }) => id === app.category);
+        if (!category) {
+          return groups;
+        }
+        group = {
+          id: category.id,
+          label: category.label,
+          icon: category.euiIconType,
+          order: category.order,
+          items: [],
+        };
+        groups.push(group);
       }
-      group = {
-        id: category.id,
-        label: category.label,
-        icon: category.euiIconType,
-        order: category.order,
-        items: [],
-      };
-      groups.push(group);
-    }
-    group.items.push({
-      id: app.id,
-      title: app.title,
-      getHref: () => getModuleUrl(app.id),
-    });
-    return groups;
-  }, []);
+      group.items.push({
+        id: app.id,
+        title: app.title,
+        getHref: () => getModuleUrl(app.id),
+      });
+      return groups;
+    },
+    [],
+  );
 
 /**
  * The Security Analytics plugin is external to Wazuh's app registry, so its
- * group is declared here. `order` mirrors that plugin's own nav category, which
- * sits between Cloud security (500) and Agents management (600).
+ * group is declared here — nothing in `Applications` describes it. The entries
+ * mirror the Security analytics tiles on this page (see
+ * `security-analytics-tiles.tsx`), so both surfaces expose the same content
+ * types. `order` mirrors that plugin's own nav category, which sits between
+ * Cloud security (500) and Agents management (600).
  */
 const SECURITY_ANALYTICS_GROUP: QuickAccessGroup = {
   id: 'security-analytics',
@@ -83,8 +81,10 @@ const SECURITY_ANALYTICS_GROUP: QuickAccessGroup = {
   items: [
     { id: 'rules', title: 'Rules', getHref: getRulesUrl },
     { id: 'decoders', title: 'Decoders', getHref: getDecodersUrl },
-    { id: 'integrations', title: 'Integrations', getHref: getIntegrationsUrl },
     { id: 'detectors', title: 'Detectors', getHref: getDetectorsUrl },
+    { id: 'integrations', title: 'Integrations', getHref: getIntegrationsUrl },
+    { id: 'kvdbs', title: 'KVDBs', getHref: getKvdbsUrl },
+    { id: 'filters', title: 'Filters', getHref: getFiltersUrl },
   ],
 };
 

@@ -7,16 +7,20 @@ import {
   getModuleUrl,
   getRulesUrl,
   getDecodersUrl,
-  getIntegrationsUrl,
   getDetectorsUrl,
+  getIntegrationsUrl,
+  getKvdbsUrl,
+  getFiltersUrl,
 } from '../../utils/navigation';
 
 jest.mock('../../utils/navigation', () => ({
   getModuleUrl: jest.fn((appId: string) => `/mock/${appId}`),
   getRulesUrl: jest.fn(() => '/mock/rules'),
   getDecodersUrl: jest.fn(() => '/mock/decoders'),
-  getIntegrationsUrl: jest.fn(() => '/mock/sa-integrations'),
   getDetectorsUrl: jest.fn(() => '/mock/detectors'),
+  getIntegrationsUrl: jest.fn(() => '/mock/sa-integrations'),
+  getKvdbsUrl: jest.fn(() => '/mock/kvdbs'),
+  getFiltersUrl: jest.fn(() => '/mock/sa-integrations#/filters'),
 }));
 
 const openMenu = () => {
@@ -46,21 +50,43 @@ describe('QuickAccessMenu', () => {
     expect(getModuleUrl).toHaveBeenCalledWith('malware-detection');
   });
 
-  it('links the Security analytics group to Rules/Decoders/Integrations/Detectors', () => {
+  // Same content types as the Security analytics tiles on this page.
+  it('links every Security analytics content type', () => {
     openMenu();
-    expect(screen.getByText('Rules')).toBeInTheDocument();
-    expect(screen.getByText('Decoders')).toBeInTheDocument();
-    expect(screen.getByText('Integrations')).toBeInTheDocument();
-    expect(screen.getByText('Detectors')).toBeInTheDocument();
+    for (const label of [
+      'Rules',
+      'Decoders',
+      'Detectors',
+      'Integrations',
+      'KVDBs',
+      'Filters',
+    ]) {
+      expect(screen.getByText(label)).toBeInTheDocument();
+    }
     expect(getRulesUrl).toHaveBeenCalled();
     expect(getDecodersUrl).toHaveBeenCalled();
-    expect(getIntegrationsUrl).toHaveBeenCalled();
     expect(getDetectorsUrl).toHaveBeenCalled();
+    expect(getIntegrationsUrl).toHaveBeenCalled();
+    expect(getKvdbsUrl).toHaveBeenCalled();
+    expect(getFiltersUrl).toHaveBeenCalled();
   });
 
-  it('never shows apps outside the quick access categories', () => {
+  it('picks up every app the registry marks for the overview', () => {
     openMenu();
-    expect(screen.queryByText('Cluster')).not.toBeInTheDocument();
+    // One per category, including the one an id allow-list would have to be
+    // edited for (Case management, registered under Threat intelligence).
+    expect(screen.getByText('Configuration Assessment')).toBeInTheDocument();
+    expect(screen.getByText('Case Management')).toBeInTheDocument();
+    expect(screen.getByText('IT Hygiene')).toBeInTheDocument();
+    expect(screen.getByText('Docker')).toBeInTheDocument();
+  });
+
+  it('leaves out apps and categories the registry does not mark for the overview', () => {
+    openMenu();
+    // `showInOverviewApp: false`, so neither the app nor its category shows.
     expect(screen.queryByText('Dev Tools')).not.toBeInTheDocument();
+    expect(screen.queryByText('Summary')).not.toBeInTheDocument();
+    expect(screen.queryByText('Agents management')).not.toBeInTheDocument();
+    expect(screen.queryByText('Server management')).not.toBeInTheDocument();
   });
 });
