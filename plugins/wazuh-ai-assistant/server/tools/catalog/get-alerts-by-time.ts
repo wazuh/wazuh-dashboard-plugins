@@ -29,7 +29,7 @@ export const getAlertsByTimeTool: ToolDefinition = {
     name: 'get_alerts_by_time',
     description:
       'Searches security findings for ALL findings of any severity within a time range, most ' +
-      'recent first. Use for general "show me the alerts"/"what happened in the last N hours" ' +
+      'recent first. Use for general "show me the findings"/"what happened in the last N hours" ' +
       'questions — not restricted to critical alerts. Optional severity narrows to exactly ' +
       'that severity, or to a floor/ceiling via severity_comparison.',
     parameters: objectSchema({
