@@ -96,12 +96,6 @@ const PROVIDER_TYPE_SHORT_LABELS: Record<string, string> = {
   anthropic: i18n.translate('wazuhAiAssistant.settings.type.short.anthropic', {
     defaultMessage: 'Anthropic',
   }),
-  wazuh_brain: i18n.translate(
-    'wazuhAiAssistant.settings.type.short.wazuhBrain',
-    {
-      defaultMessage: 'Wazuh AI Assistant brain',
-    },
-  ),
 };
 
 const emptyForm: ProviderInput = {
@@ -226,9 +220,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     AssistantSettings,
     'privacyDefaultOn' | 'userCanOverride'
   > | null>(null);
-  const [fieldPolicyDraft, setFieldPolicyDraft] = useState<FieldPolicyEntry[]>(
-    [],
-  );
+  const [fieldPolicyDraft, setFieldPolicyDraft] = useState<
+    Array<FieldPolicyEntry & { _isNew?: true }>
+  >([]);
   const [privacyLoadError, setPrivacyLoadError] = useState<string | null>(null);
   const [privacySaveError, setPrivacySaveError] = useState<string | null>(null);
   const [isSavingPrivacy, setIsSavingPrivacy] = useState(false);
@@ -374,7 +368,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const handleAddFieldPolicyRow = () => {
     setFieldPolicyDraft(current => [
       ...current,
-      { field: '', action: 'anonymize' },
+      { field: '', action: 'anonymize', _isNew: true },
     ]);
   };
 
@@ -952,9 +946,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                       )}
                     >
                       <EuiSelect
-                        options={PROVIDER_TYPES.filter(
-                          type => type !== 'wazuh_brain',
-                        ).map(type => ({
+                        options={PROVIDER_TYPES.map(type => ({
                           value: type,
                           text: PROVIDER_TYPE_FORM_LABELS[type],
                         }))}
@@ -1252,6 +1244,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   .filter(
                     ({ entry }) =>
                       !fieldPolicyFilter ||
+                      entry._isNew ||
                       entry.field
                         .toLowerCase()
                         .includes(fieldPolicyFilter.toLowerCase()),
