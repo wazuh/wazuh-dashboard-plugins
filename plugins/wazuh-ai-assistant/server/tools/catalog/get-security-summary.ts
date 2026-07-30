@@ -19,8 +19,8 @@ export const getSecuritySummaryTool: ToolDefinition = {
     name: 'get_security_summary',
     description:
       'Aggregates medium-to-critical findings within a time range, grouped by rule category ' +
-      '(rule.category). Use for "summarize security events"/"what kinds of findings" questions, ' +
-      'not for a list of individual findings.',
+      '(wazuh.rule.category). Use for "summarize security events"/"what kinds of findings" ' +
+      'questions, not for a list of individual findings.',
     parameters: objectSchema({
       limit: limitProperty(
         'Max number of rule-category buckets to return (default 20, max 100).',

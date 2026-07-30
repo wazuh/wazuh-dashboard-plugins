@@ -43,7 +43,7 @@
       "category": "findings",
       "prompt": "Show me the critical-severity findings from the past week, most recent first.",
       "expected_tools": ["get_critical_findings"],
-      "rubric": "Lists critical-severity (rule.level: critical) findings from the past week, newest first, or truthfully reports none found."
+      "rubric": "Lists critical-severity (wazuh.rule.level: critical) findings from the past week, newest first, or truthfully reports none found."
     },
     {
       "id": "critical_findings_es",
@@ -180,7 +180,7 @@
       "category": "compliance",
       "prompt": "Show me the findings related to PCI DSS compliance requirements.",
       "expected_tools": ["get_pci_dss_findings"],
-      "rubric": "Lists findings tagged with a PCI DSS compliance requirement (rule.compliance.pci_dss present), or truthfully reports none."
+      "rubric": "Lists findings tagged with a PCI DSS compliance requirement (wazuh.rule.compliance.pci_dss present), or truthfully reports none."
     },
     {
       "id": "pci_dss_summary",

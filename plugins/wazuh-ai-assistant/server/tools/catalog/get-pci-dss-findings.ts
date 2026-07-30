@@ -9,7 +9,7 @@ import {
   timeRangeProperties,
 } from './common';
 
-// rule.compliance.pci_dss is already a visible column here (unlike the other finding-hits tools) —
+// wazuh.rule.compliance.pci_dss is already a visible column here (unlike the other finding-hits tools) —
 // passing it below lets findingRowFields/findingDigestColumns dedupe it out of the shared row/digest sets
 // instead of assigning the same dot-path twice.
 const TABLE_COLUMNS = [
@@ -18,7 +18,6 @@ const TABLE_COLUMNS = [
   { field: 'wazuh.rule.title', label: 'Title' },
   { field: 'wazuh.rule.level', label: 'Level', severity: true },
   { field: 'wazuh.rule.compliance.pci_dss', label: 'PCI DSS' },
-  { field: 'wazuh.rule.id', label: 'Rule ID' },
 ];
 const SAMPLE_COLUMNS = [
   '@timestamp',
@@ -37,7 +36,7 @@ export const getPciDssFindingsTool: ToolDefinition = {
     name: 'get_pci_dss_findings',
     description:
       'Searches security findings for findings tagged with any PCI DSS compliance requirement ' +
-      '(rule.compliance.pci_dss present), within a time range, most recent first.',
+      '(wazuh.rule.compliance.pci_dss present), within a time range, most recent first.',
     parameters: objectSchema({
       limit: limitProperty(
         'Max number of findings to return (default 20, max 500).',

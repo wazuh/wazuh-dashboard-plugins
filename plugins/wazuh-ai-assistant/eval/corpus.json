@@ -44,7 +44,7 @@
         "params_subset": {},
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent GET_CRITICAL_ALERTS -> get_critical_findings.ts, hardcodes rule.level>=15 (get_critical_findings.ts:38); not a model-supplied param, so nothing to pin beyond tool identity."
+      "notes": "UAT intent GET_CRITICAL_ALERTS -> get_critical_findings.ts, hardcodes an exact terms match on wazuh.rule.level: 'critical' (get_critical_findings.ts:45; the 4.14 numeric rule.level>=15 threshold has no 5.0 equivalent, since rule.level is now a keyword severity word, not a number); not a model-supplied param, so nothing to pin beyond tool identity."
     },
     {
       "id": "findings_by_agent_severity",
@@ -72,7 +72,7 @@
         "params_subset": {},
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent GET_TOP_RULES -> get_top_rules.ts, terms agg on rule.id (allowlisted, guardrails.ts:66)."
+      "notes": "UAT intent GET_TOP_RULES -> get_top_rules.ts, terms agg on wazuh.rule.id (allowlisted, guardrails.ts:66)."
     },
     {
       "id": "critical_vulnerabilities",
@@ -120,7 +120,7 @@
         "params_subset": {},
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent GET_SECURITY_SUMMARY -> get_security_summary.ts. 5.0: severity words at or above 'medium' (was rule.level>=7), aggregated by rule.category (was rule.groups, get_security_summary.ts:15-17)."
+      "notes": "UAT intent GET_SECURITY_SUMMARY -> get_security_summary.ts. 5.0: severity words at or above 'medium' (was rule.level>=7), aggregated by wazuh.rule.category (was rule.groups, get_security_summary.ts:15-17)."
     },
     {
       "id": "suspicious_powershell",
@@ -164,7 +164,7 @@
         "table": "required_empty_ok",
         "answer_must_not_match": ["rule (id )?2003"]
       },
-      "notes": "Regression case: this question makes the model guess rule.id 2003 (search_findings_by_rule_title) instead of the real PAM session-closed rule 5502, returning 0 rows and falsely reporting no sessions closed. search-findings-by-rule-group.ts was built specifically for this: rule_group is not pinned in params_subset because several values are defensible ('pam', 'session_closed', 'authentication_success') and prompts.ts's 'never guess rule ids' rule only requires SOME rule.groups value, not a specific one. answer_must_not_match guards against the specific hallucinated rule ID resurfacing. See also dstuser_sessions_closed below, the pre-existing case for this same question kept for its destination.user.name/multi-tool-tolerance coverage. 5.0 UPDATE (2026-07-26): the strict single-tool pin was BROADENED to the same set its sibling accepts. The assertion that actually encodes the original UAT bug is answer_must_not_match (rule id 2003) and it still passes; the model now answers this via search_wazuh_data, which is equally NOT a guessed rule id, so the regression this case exists to catch is still caught. The prompt is deliberately left identical to dstuser_sessions_closed (that duplication is intentional per the note above, NOT a copy-paste slip) so this case keeps guarding the exact phrasing that triggered the live miss."
+      "notes": "Regression case: this question makes the model guess rule.id 2003 (search_findings_by_rule_title) instead of the real PAM session-closed rule 5502, returning 0 rows and falsely reporting no sessions closed. search-findings-by-rule-group.ts was built specifically for this: rule_group is not pinned in params_subset because several values are defensible ('pam', 'session_closed', 'authentication_success') and prompts.ts's 'never guess rule ids' rule only requires SOME wazuh.rule.tags value, not a specific one. answer_must_not_match guards against the specific hallucinated rule ID resurfacing. See also dstuser_sessions_closed below, the pre-existing case for this same question kept for its destination.user.name/multi-tool-tolerance coverage. 5.0 UPDATE (2026-07-26): the strict single-tool pin was BROADENED to the same set its sibling accepts. The assertion that actually encodes the original UAT bug is answer_must_not_match (rule id 2003) and it still passes; the model now answers this via search_wazuh_data, which is equally NOT a guessed rule id, so the regression this case exists to catch is still caught. The prompt is deliberately left identical to dstuser_sessions_closed (that duplication is intentional per the note above, NOT a copy-paste slip) so this case keeps guarding the exact phrasing that triggered the live miss."
     },
     {
       "id": "pci_dss_findings",
@@ -176,7 +176,7 @@
         "params_subset": {},
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent GET_PCI_DSS_ALERTS -> get_pci_dss_findings.ts. 5.0: rule.groups is gone; an exists filter on rule.compliance.pci_dss replaces the 4.14 prefix-match-on-rule.groups workaround (get_pci_dss_findings.ts:32-34)."
+      "notes": "UAT intent GET_PCI_DSS_ALERTS -> get_pci_dss_findings.ts. 5.0: rule.groups is gone; an exists filter on wazuh.rule.compliance.pci_dss replaces the 4.14 prefix-match-on-rule.groups workaround (get_pci_dss_findings.ts:32-34)."
     },
     {
       "id": "pci_dss_summary",
@@ -188,7 +188,7 @@
         "params_subset": {},
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent GET_PCI_DSS_SUMMARY -> get_pci_dss_summary.ts. 5.0: terms agg directly on rule.compliance.pci_dss (was rule.groups with an include regex, get_pci_dss_summary.ts:13-17). Distinguish from pci_dss_findings (a list, not a breakdown) via the 'breakdown'/'grouped by' phrasing."
+      "notes": "UAT intent GET_PCI_DSS_SUMMARY -> get_pci_dss_summary.ts. 5.0: terms agg directly on wazuh.rule.compliance.pci_dss (was rule.groups with an include regex, get_pci_dss_summary.ts:13-17). Distinguish from pci_dss_findings (a list, not a breakdown) via the 'breakdown'/'grouped by' phrasing."
     },
     {
       "id": "findings_by_multiple_agents",
@@ -232,7 +232,7 @@
         },
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent GET_VULNERABILITIES_BY_AGENT -> get_vulnerabilities_by_agent.ts, multi_match across agent.name/agent.id (get_vulnerabilities_by_agent.ts:42)."
+      "notes": "UAT intent GET_VULNERABILITIES_BY_AGENT -> get_vulnerabilities_by_agent.ts, multi_match across wazuh.agent.name/wazuh.agent.id (get_vulnerabilities_by_agent.ts:42)."
     },
     {
       "id": "vulnerability_by_cve",
@@ -287,7 +287,7 @@
         "params_subset": {},
         "table": "required_empty_ok"
       },
-      "notes": "No typed tool covers an all-severity rule.groups breakdown: get_security_summary.ts hardcodes rule.level>=7 (get_security_summary.ts:20,40) and get_pci_dss_summary.ts filters to pci_dss-prefixed groups only (get_pci_dss_summary.ts:44). The correct route is search_wazuh_data.ts with a terms agg on rule.groups -- which IS on the guardrail allowlist (guardrails.ts:66) so the query should execute cleanly. get_security_summary is listed as an acceptable (if imprecise) alternative since a weaker model may approximate rather than reach for the escape hatch; per run_live.js's 'PASS if a listed tool was called at ANY point' rule this also passes if the model tries get_security_summary first, gets an approximate answer, then still reaches for search_wazuh_data, or vice versa."
+      "notes": "No typed tool covers an all-severity wazuh.rule.category breakdown: get_security_summary.ts floors at medium-and-above severity (severitiesAtOrAbove('medium'), get_security_summary.ts) and get_pci_dss_summary.ts aggregates on wazuh.rule.compliance.pci_dss only, not category. The correct route is search_wazuh_data.ts with a terms agg on wazuh.rule.category (or wazuh.rule.tags) -- both ARE on the guardrail allowlist (guardrails.ts's AGG_FIELD_ALLOWLIST) so the query should execute cleanly. get_security_summary is listed as an acceptable (if imprecise) alternative since a weaker model may approximate rather than reach for the escape hatch; per run_live.js's 'PASS if a listed tool was called at ANY point' rule this also passes if the model tries get_security_summary first, gets an approximate answer, then still reaches for search_wazuh_data, or vice versa."
     },
     {
       "id": "honesty_on_empty",

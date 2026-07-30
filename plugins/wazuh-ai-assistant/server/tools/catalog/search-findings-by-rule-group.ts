@@ -29,10 +29,11 @@ export const searchFindingsByRuleGroupTool: ToolDefinition = {
   spec: {
     name: 'search_findings_by_rule_group',
     description:
-      'Searches security findings belonging to one rule classification tag (rule.tags), within a ' +
-      'time range, most recent first. Use this for "which/what kind of findings" questions about a ' +
-      'category of activity (logins, SSH, sudo, file integrity, authentication) when you do not ' +
-      'know the exact numeric rule ID -- never guess a rule.id. The exact tag vocabulary is ' +
+      'Searches security findings belonging to one rule classification tag (wazuh.rule.tags), ' +
+      'within a time range, most recent first. Use this for "which/what kind of findings" ' +
+      'questions about a category of activity (logins, SSH, sudo, file integrity, authentication) ' +
+      'when you do not know the exact numeric rule ID -- never guess a wazuh.rule.id. The exact ' +
+      'tag vocabulary is ' +
       'deployment-specific: if you are unsure what tag to use, first aggregate with get_top_rules ' +
       'to see the real rules/tags in the data rather than guessing a tag value. If this tool ' +
       'returns 0 rows, your tag value was probably not present: broaden it or fall back to ' +
@@ -42,7 +43,7 @@ export const searchFindingsByRuleGroupTool: ToolDefinition = {
         rule_group: {
           type: 'string',
           description:
-            'Exact rule.tags value to match, e.g. a classification tag such as "pam", "sshd", ' +
+            'Exact wazuh.rule.tags value to match, e.g. a classification tag such as "pam", "sshd", ' +
             '"authentication_success".',
         },
         limit: limitProperty(
