@@ -31,6 +31,8 @@ the filter portion. Field/agg names come from [`fields.ts`](./fields.ts) and
 | Data source (hook)                                     | Index pattern                                              | Window   |
 | ------------------------------------------------------ | ---------------------------------------------------------- | -------- |
 | Findings (`useFindingsOverview`)                       | `wazuh-findings-v5*`                                       | last 24h |
+| Cloud security findings (`useCloudSecurityFindings`)   | `wazuh-findings-v5*`                                       | last 24h |
+| Compliance controls (`useComplianceControls`)          | `wazuh-findings-v5*`                                       | last 24h |
 | Top OS (`useTopOperatingSystems`)                      | `wazuh-states-inventory-system*`                           | current  |
 | Top network services (`useTopNetworkServices`)         | `wazuh-states-inventory-ports*`                            | current  |
 | SCA (`useSCAOverview`)                                 | `wazuh-states-sca*`                                        | current  |
@@ -46,15 +48,14 @@ the filter portion. Field/agg names come from [`fields.ts`](./fields.ts) and
 
 ## 1. Findings batch — `wazuh-findings-v5*`, last 24h
 
-Fired **on mount**; one search feeds four sections (Overview, Threat Hunting,
-Endpoint Security → Malware, Security Operations → Regulatory Compliance).
-Built by `buildFindingsOverviewAggs()` + `buildMalwareFilterAgg()` +
-`buildComplianceControlsAgg()`.
+Fired **on mount**; one search feeds three sections (Overview, Threat Hunting,
+Endpoint Security → Malware). Built by `buildFindingsOverviewAggs()` +
+`buildMalwareFilterAgg()`. The two other findings searches (§1.1, §1.2) are kept
+separate so this on-mount one stays as small as the above-the-fold widgets need.
 
 **Represents:** finding severity distribution, top MITRE tactics, total findings,
-top rules, distinct techniques observed, top techniques, the Malware
-IOC-match hero, and distinct controls implicated per regulatory-compliance
-framework.
+top rules, distinct techniques observed, top techniques, and the Malware
+IOC-match hero.
 
 ```jsonc
 {
@@ -99,40 +100,6 @@ framework.
     "malware": {
       "filter": { "exists": { "field": "wazuh.threat.enrichments" } },
       "aggs": { "ioc_matches": { "cardinality": { "field": "event.doc_id" } } }
-    },
-    // Regulatory Compliance chips: distinct controls implicated per framework.
-    // Every framework's total findings count ties (one finding can implicate
-    // several frameworks at once), so this cardinality — not doc_count — is
-    // what the chips rank and sort by. One agg per COMPLIANCE_FRAMEWORK_FIELDS entry.
-    "compliance_controls_pci-dss": {
-      "cardinality": { "field": "wazuh.rule.compliance.pci_dss" }
-    },
-    "compliance_controls_gdpr": {
-      "cardinality": { "field": "wazuh.rule.compliance.gdpr" }
-    },
-    "compliance_controls_hipaa": {
-      "cardinality": { "field": "wazuh.rule.compliance.hipaa" }
-    },
-    "compliance_controls_nist-800-53": {
-      "cardinality": { "field": "wazuh.rule.compliance.nist_800_53" }
-    },
-    "compliance_controls_nist-800-171": {
-      "cardinality": { "field": "wazuh.rule.compliance.nist_800_171" }
-    },
-    "compliance_controls_tsc": {
-      "cardinality": { "field": "wazuh.rule.compliance.tsc" }
-    },
-    "compliance_controls_cmmc": {
-      "cardinality": { "field": "wazuh.rule.compliance.cmmc" }
-    },
-    "compliance_controls_fedramp": {
-      "cardinality": { "field": "wazuh.rule.compliance.fedramp" }
-    },
-    "compliance_controls_iso-27001": {
-      "cardinality": { "field": "wazuh.rule.compliance.iso_27001" }
-    },
-    "compliance_controls_nis2": {
-      "cardinality": { "field": "wazuh.rule.compliance.nis2" }
     }
   }
 }
@@ -140,6 +107,73 @@ framework.
 
 **DQL (filter part):** whole search is `*` over the last 24h; the Malware subset
 is `wazuh.threat.enrichments: *` (field exists).
+
+## 1.1 Cloud security findings — `wazuh-findings-v5*`, last 24h
+
+`buildCloudSecurityByModuleAgg()`, once the Cloud security section scrolls in.
+
+**Represents:** the findings count badge on each Cloud Security card. One
+filters-agg bucket per module, keyed by the app id the card links to and matching
+what that module's own data source filters on.
+
+```jsonc
+{
+  "size": 0,
+  "aggs": {
+    "cloud_security_by_module": {
+      "filters": {
+        "filters": {
+          "docker": { "match_phrase": { "wazuh.integration.name": "docker" } },
+          // AWS spans aws-cloudtrail, aws-guardduty, ...
+          "amazon-web-services": {
+            "wildcard": { "wazuh.integration.name": "aws*" }
+          },
+          "google-cloud": {
+            "match_phrase": { "wazuh.integration.name": "gcp" }
+          },
+          "github": { "match_phrase": { "wazuh.integration.name": "github" } },
+          "office365": { "match_phrase": { "wazuh.integration.name": "o365" } },
+          "microsoft-graph-api": {
+            "match_phrase": { "wazuh.integration.name": "azure" }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+DQL: `*` over the last 24h.
+
+## 1.2 Compliance controls — `wazuh-findings-v5*`, last 24h
+
+`buildComplianceControlsAgg()`, once the Security operations section scrolls in.
+
+**Represents:** the count on each Regulatory Compliance chip. Every framework
+reports the same total findings count (one finding can implicate several
+frameworks at once), so the chips show _distinct controls implicated_ — a
+cardinality agg per `COMPLIANCE_FRAMEWORK_FIELDS` entry, not a doc count.
+
+```jsonc
+{
+  "size": 0,
+  "aggs": {
+    "compliance_controls_pci-dss": {
+      "cardinality": { "field": "wazuh.rule.compliance.pci_dss" }
+    },
+    "compliance_controls_gdpr": {
+      "cardinality": { "field": "wazuh.rule.compliance.gdpr" }
+    },
+    // ... one per framework: hipaa, nist-800-53, nist-800-171, tsc, cmmc,
+    // fedramp, iso-27001, nis2
+    "compliance_controls_nis2": {
+      "cardinality": { "field": "wazuh.rule.compliance.nis2" }
+    }
+  }
+}
+```
+
+DQL: `*` over the last 24h.
 
 ## 2. Top operating systems — `wazuh-states-inventory-system*`, current
 
@@ -212,15 +246,23 @@ SCA scan (`welcome/components/sca_scan/sca_scan.tsx`).
 `buildFIMTopFilesAgg()`. The `wazuh-states-fim*` pattern spans files +
 registry keys + registry values.
 
-**Represents:** total baselined objects (`hits.total`) and the top 5 modified
-files by path.
+**Represents:** total baselined objects (`hits.total`) and the top 5 **most
+recently modified** files. The terms agg orders by each path's latest
+`file.mtime`; its `doc_count` is how many agents monitor that path (the state
+index holds one document per agent and path), which is what the list's count
+column shows.
 
 ```jsonc
 {
   "size": 0, // total comes from hits.total (mapDocCount)
   "aggs": {
     "fim_top_files": {
-      "terms": { "field": "file.path", "size": 5 }
+      "terms": {
+        "field": "file.path",
+        "size": 5,
+        "order": { "last_modified": "desc" }
+      },
+      "aggs": { "last_modified": { "max": { "field": "file.mtime" } } }
     }
   }
 }

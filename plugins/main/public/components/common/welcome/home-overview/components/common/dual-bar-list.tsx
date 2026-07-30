@@ -2,8 +2,9 @@ import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiText } from '@elastic/eui';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 import { decimalFormat } from '../../../utils/helpers';
-import { LegendDot } from './distribution-bar';
+import { BarTrack, LegendItem } from './bar-track';
 import { EmptyState } from './empty-state';
+import { ListTitle } from './list-chrome';
 import { WIDGET_LOADING_MIN_HEIGHT } from './widget-group';
 
 export interface DualBarListItem {
@@ -22,6 +23,8 @@ export interface DualBarListProps {
   ['data-test-subj']?: string;
 }
 
+const LABEL_MAX_WIDTH = 150;
+
 /**
  * A ranked list of pass/fail dual-segment bars (e.g. SCA benchmarks), one row
  * per item: label, a two-color bar, and the resulting score. Same grid layout
@@ -33,12 +36,14 @@ export const DualBarList: React.FC<DualBarListProps> = ({
   emptyMessage,
   ...rest
 }) => {
+  const testSubj = rest['data-test-subj'];
+
   if (items.length === 0) {
     return (
       <EmptyState
         message={emptyMessage}
         minHeight={WIDGET_LOADING_MIN_HEIGHT.list}
-        data-test-subj={rest['data-test-subj']}
+        data-test-subj={testSubj ? `${testSubj}-empty` : undefined}
       />
     );
   }
@@ -46,44 +51,18 @@ export const DualBarList: React.FC<DualBarListProps> = ({
   const formatter = decimalFormat();
 
   return (
-    <div data-test-subj={rest['data-test-subj']}>
-      {title && (
-        <EuiText
-          size='xs'
-          style={{
-            paddingTop: 4,
-            paddingBottom: 6,
-            marginBottom: 10,
-            borderBottom: '1px solid rgba(128, 128, 128, 0.2)',
-          }}
-        >
-          <strong>{title}</strong>
-        </EuiText>
-      )}
+    <div data-test-subj={testSubj}>
+      {title && <ListTitle>{title}</ListTitle>}
       <EuiFlexGroup
         gutterSize='m'
         responsive={false}
         style={{ marginBottom: 10 }}
       >
         <EuiFlexItem grow={false}>
-          <EuiText
-            size='xs'
-            color='subdued'
-            style={{ display: 'inline-flex', alignItems: 'center' }}
-          >
-            <LegendDot color={UI_COLOR_STATUS.success} />
-            Passed
-          </EuiText>
+          <LegendItem color={UI_COLOR_STATUS.success} label='Passed' />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiText
-            size='xs'
-            color='subdued'
-            style={{ display: 'inline-flex', alignItems: 'center' }}
-          >
-            <LegendDot color={UI_COLOR_STATUS.failed} />
-            Failed
-          </EuiText>
+          <LegendItem color={UI_COLOR_STATUS.failed} label='Failed' />
         </EuiFlexItem>
       </EuiFlexGroup>
       <div
@@ -104,21 +83,13 @@ export const DualBarList: React.FC<DualBarListProps> = ({
               <EuiText
                 size='s'
                 className='eui-textTruncate'
-                style={{ overflow: 'hidden', maxWidth: '150px' }}
+                style={{ overflow: 'hidden', maxWidth: LABEL_MAX_WIDTH }}
                 title={item.label}
               >
                 {item.label}
               </EuiText>
               <div style={{ padding: '6px 0' }}>
-                <div
-                  style={{
-                    display: 'flex',
-                    height: 10,
-                    borderRadius: 4,
-                    overflow: 'hidden',
-                    background: 'rgba(128, 128, 128, 0.15)',
-                  }}
-                >
+                <BarTrack>
                   {passPct > 0 && (
                     <div
                       style={{
@@ -135,7 +106,7 @@ export const DualBarList: React.FC<DualBarListProps> = ({
                       }}
                     />
                   )}
-                </div>
+                </BarTrack>
               </div>
               <EuiText size='s' className='tab-num'>
                 <strong>{formatter.convert(item.score)}</strong>

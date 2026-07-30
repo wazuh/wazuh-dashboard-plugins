@@ -24,15 +24,23 @@ export const SeverityDistributionBar: React.FC<
   emptyMessage = 'No data available',
   testSubjPrefix = 'severity-distribution',
 }) => {
-  const segments: DistributionBarSegment[] = SEVERITY_PRESENTATION.filter(
-    presentation => presentation.band in counts,
-  ).map(presentation => ({
-    key: presentation.band,
-    label: presentation.label,
-    count: counts[presentation.band] ?? 0,
-    color: presentation.color,
-    href: onSelect ? onSelect(presentation.band) : undefined,
-  }));
+  // A band the search didn't report is left out; one that came back 0 is shown.
+  const segments: DistributionBarSegment[] = SEVERITY_PRESENTATION.flatMap(
+    presentation => {
+      const count = counts[presentation.band];
+      return count === undefined
+        ? []
+        : [
+            {
+              key: presentation.band,
+              label: presentation.label,
+              count,
+              color: presentation.color,
+              href: onSelect ? onSelect(presentation.band) : undefined,
+            },
+          ];
+    },
+  );
 
   return (
     <DistributionBar

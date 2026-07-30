@@ -11,6 +11,7 @@ import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { EmptyState } from './empty-state';
 import { WIDGET_LOADING_MIN_HEIGHT } from './widget-group';
+import { BAR_HEIGHT, BarTrack, LegendItem } from './bar-track';
 
 export interface DistributionBarSegment {
   key: string;
@@ -31,23 +32,6 @@ export interface DistributionBarProps {
   emptyMessage?: React.ReactNode;
   ['data-test-subj']?: string;
 }
-
-const BAR_HEIGHT = 10;
-
-/** A small colored square used by every legend (distribution bars, dual bars). */
-export const LegendDot: React.FC<{ color: string }> = ({ color }) => (
-  <span
-    style={{
-      display: 'inline-block',
-      width: 8,
-      height: 8,
-      borderRadius: 2,
-      background: color,
-      marginRight: 6,
-      flexShrink: 0,
-    }}
-  />
-);
 
 /**
  * A single proportional stacked bar (one segment per category) with a
@@ -78,17 +62,11 @@ export const DistributionBar: React.FC<DistributionBarProps> = ({
 
   const renderLegendItem = (segment: DistributionBarSegment) => {
     const content = (
-      <EuiText
-        size='xs'
-        color='subdued'
-        style={{ display: 'inline-flex', alignItems: 'center' }}
-      >
-        <LegendDot color={segment.color} />
-        <span>{segment.label}</span>
-        <strong className='tab-num' style={{ color: 'inherit', marginLeft: 4 }}>
-          {formatUINumber(segment.count)}
-        </strong>
-      </EuiText>
+      <LegendItem
+        color={segment.color}
+        label={segment.label}
+        count={segment.count}
+      />
     );
 
     if (!segment.href && !segment.onClick) {
@@ -116,15 +94,7 @@ export const DistributionBar: React.FC<DistributionBarProps> = ({
           {headline}
         </EuiText>
       )}
-      <div
-        style={{
-          display: 'flex',
-          height: BAR_HEIGHT,
-          borderRadius: 4,
-          overflow: 'hidden',
-          background: 'rgba(128, 128, 128, 0.15)',
-        }}
-      >
+      <BarTrack>
         {segments
           .filter(segment => segment.count > 0)
           .map(segment => (
@@ -155,7 +125,7 @@ export const DistributionBar: React.FC<DistributionBarProps> = ({
               </EuiToolTip>
             </div>
           ))}
-      </div>
+      </BarTrack>
       <EuiFlexGroup
         gutterSize='s'
         wrap

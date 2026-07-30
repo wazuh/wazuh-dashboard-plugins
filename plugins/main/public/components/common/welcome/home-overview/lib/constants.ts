@@ -19,6 +19,11 @@ export const AGG = {
   scaBenchmarkResult: 'result',
   cloudSecurityByModule: 'cloud_security_by_module',
   fimTopFiles: 'fim_top_files',
+  /**
+   * Latest `file.mtime` inside each `fim_top_files` bucket; the terms agg
+   * orders by it so the list is ranked by recency, not by document count.
+   */
+  fimLastModified: 'last_modified',
   vulnerabilitiesByPackage: 'vulnerabilities_by_package',
   cvesMatched: 'cves_matched',
   /** Distinct-event IOC match count (hero), inside the findings `malware` filter. */

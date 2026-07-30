@@ -42,7 +42,10 @@ describe('ThreatCatalogTiles', () => {
 
   it('shows "-" for a failed tile (never hidden), no per-tile callout', () => {
     const { container } = render(
-      <ThreatCatalogTiles {...allAvailable} cvesMatched={{ status: 'error' }} />,
+      <ThreatCatalogTiles
+        {...allAvailable}
+        cvesMatched={{ status: 'error' }}
+      />,
     );
     expect(
       container.querySelectorAll('[data-test-subj="widget-group-error"]')

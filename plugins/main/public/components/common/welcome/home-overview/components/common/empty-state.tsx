@@ -41,8 +41,6 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   >
     <EuiEmptyPrompt
       icon={<EuiIcon type={iconType} size={iconSize} color='subdued' />}
-      titleSize='xs'
-      paddingSize='xs'
       body={<p>{message}</p>}
     />
   </div>

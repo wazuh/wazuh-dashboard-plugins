@@ -8,6 +8,12 @@ export type SeverityBand =
 
 export type SeverityCounts = Partial<Record<SeverityBand, number>>;
 
+/**
+ * A count per named thing (module app id, compliance framework id, ...).
+ * `undefined` where the search reported no bucket, shown as a placeholder.
+ */
+export type CountsByKey = Record<string, number | undefined>;
+
 export interface TopItem {
   key: string;
   count: number;
@@ -35,10 +41,6 @@ export interface FindingsOverview {
   topTechniques: TopItem[];
   /** IOC matches (last 24h detection metric), from the same findings search. */
   iocMatches?: number;
-  /** Findings count per Cloud Security module (app id), last 24h. */
-  cloudSecurityByModule: Record<string, number | undefined>;
-  /** Distinct controls implicated per regulatory-compliance framework, last 24h. */
-  complianceControlsByFramework: Record<string, number | undefined>;
 }
 
 export interface ScaTilesData {

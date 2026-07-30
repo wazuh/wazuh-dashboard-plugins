@@ -10,7 +10,7 @@ jest.mock('../../utils/navigation', () => ({
 }));
 describe('RegulatoryComplianceBadges', () => {
   it('navigates to the clicked framework with its tabView', () => {
-    render(<RegulatoryComplianceBadges findings={{ status: 'loading' }} />);
+    render(<RegulatoryComplianceBadges controls={{ status: 'loading' }} />);
     fireEvent.click(screen.getByText('HIPAA'));
     expect(getRegulatoryComplianceUrl).toHaveBeenCalledWith('hipaa');
   });

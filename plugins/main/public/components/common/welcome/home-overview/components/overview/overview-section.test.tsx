@@ -25,7 +25,6 @@ jest.mock('../../utils/navigation', () => ({
   getThreatHuntingUrl: jest.fn(() => '#threat-hunting'),
   getMitreUrl: jest.fn(),
   getItHygieneUrl: jest.fn(() => '#it-hygiene'),
-  getMitreUrlTactic: jest.fn(),
   getDiscoverFindingsBySeverityUrl: jest.fn(() => '#discover'),
 }));
 jest.mock('../../../../hooks', () => ({
@@ -54,8 +53,6 @@ const findingsAvailable = {
     topRules: [],
     techniquesCount: 7,
     topTechniques: [],
-    cloudSecurityByModule: {},
-    complianceControlsByFramework: {},
   },
   indexPatternId: 'idx-1',
 };

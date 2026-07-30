@@ -24,7 +24,9 @@ export function StatTileGroup<K extends string>({
   tiles,
   results,
 }: StatTileGroupProps<K>) {
-  const bordered = tiles.some(tile => tile.onSelect);
+  // A navigable tile gets a panel so it reads as one click target; when the
+  // group has any, every tile is paneled (loading ones too) to keep the row even.
+  const paneled = tiles.some(tile => tile.onSelect);
   return (
     <EuiFlexGroup gutterSize='m' responsive={false} wrap>
       {tiles.map(tile => {
@@ -49,49 +51,42 @@ export function StatTileGroup<K extends string>({
           />
         );
 
-        let tileNode: React.ReactNode;
-        if (tile.onSelect) {
-          tileNode = (
-              <RedirectAppLinks application={getCore().application}>
-                <StatTile
-                  value={
-                    <EuiLink
-                      style={{ fontWeight: 'normal' }}
-                      href={tile.onSelect()}
-                      color='text'
-                      data-test-subj={`${tile.testSubj}-link`}
-                    >
-                      {number}
-                    </EuiLink>
-                  }
-                  label={tile.label}
-                  reverse
-                  data-test-subj={tile.testSubj}
-                />
-              </RedirectAppLinks>
-          );
-        } else if (bordered) {
-          tileNode = (
-              <StatTile value={number} label={tile.label} reverse />
-          );
-        } else {
-          tileNode = (
-            <StatTile
-              value={number}
-              label={tile.label}
-              reverse
-              data-test-subj={tile.testSubj}
-            />
+        const tileNode = (
+          <StatTile
+            value={
+              tile.onSelect ? (
+                <EuiLink
+                  style={{ fontWeight: 'normal' }}
+                  href={tile.onSelect()}
+                  color='text'
+                  data-test-subj={`${tile.testSubj}-link`}
+                >
+                  {number}
+                </EuiLink>
+              ) : (
+                number
+              )
+            }
+            label={tile.label}
+            reverse
+            data-test-subj={tile.testSubj}
+          />
+        );
+
+        let body: React.ReactNode = tileNode;
+        if (result.status === 'loading') {
+          body = <WidgetGroupBody status='loading'>{null}</WidgetGroupBody>;
+        } else if (tile.onSelect) {
+          body = (
+            <RedirectAppLinks application={getCore().application}>
+              {tileNode}
+            </RedirectAppLinks>
           );
         }
 
         return (
           <EuiFlexItem key={tile.key}>
-            {result.status === 'loading' ? (
-              <WidgetGroupBody status='loading'>{null}</WidgetGroupBody>
-            ) : (
-              tileNode
-            )}
+            {paneled ? <EuiPanel>{body}</EuiPanel> : body}
           </EuiFlexItem>
         );
       })}

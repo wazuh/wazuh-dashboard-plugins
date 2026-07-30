@@ -1,5 +1,6 @@
 import {
   AgentStatus,
+  CountsByKey,
   ScaBenchmark,
   ScaTilesData,
   SeverityBand,
@@ -115,7 +116,7 @@ export function mapScaBenchmarks(aggregations: Aggregations): ScaBenchmark[] {
 /** Cloud Security card counts: doc_count per bucket key (app id) from a filters agg. */
 export function mapCloudSecurityByModule(
   aggregations: Aggregations,
-): Record<string, number | undefined> {
+): CountsByKey {
   const buckets =
     (aggregations?.[AGG.cloudSecurityByModule]?.buckets as
       | Record<string, FiltersAggBucket>
@@ -123,23 +124,18 @@ export function mapCloudSecurityByModule(
   return Object.entries(buckets).reduce((acc, [appId, bucket]) => {
     acc[appId] = bucket?.doc_count;
     return acc;
-  }, {} as Record<string, number | undefined>);
+  }, {} as CountsByKey);
 }
 
 /** Distinct controls implicated per framework (cardinality), keyed by framework id. */
-export function mapComplianceControls(
-  aggregations: Aggregations,
-): Record<string, number | undefined> {
-  return Object.keys(COMPLIANCE_FRAMEWORK_FIELDS).reduce(
-    (acc, frameworkId) => {
-      acc[frameworkId] = mapCardinality(
-        aggregations,
-        `${AGG.complianceControlsPrefix}${frameworkId}`,
-      );
-      return acc;
-    },
-    {} as Record<string, number | undefined>,
-  );
+export function mapComplianceControls(aggregations: Aggregations): CountsByKey {
+  return Object.keys(COMPLIANCE_FRAMEWORK_FIELDS).reduce((acc, frameworkId) => {
+    acc[frameworkId] = mapCardinality(
+      aggregations,
+      `${AGG.complianceControlsPrefix}${frameworkId}`,
+    );
+    return acc;
+  }, {} as CountsByKey);
 }
 
 export function mapTopBuckets(

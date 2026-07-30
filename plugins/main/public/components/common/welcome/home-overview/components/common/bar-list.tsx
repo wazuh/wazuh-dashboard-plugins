@@ -5,7 +5,8 @@ import { formatUINumber } from '../../../../../../react-services/format-number';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { EmptyState } from './empty-state';
-import { WIDGET_LOADING_MIN_HEIGHT, TOP_N_ROW_HEIGHT } from './widget-group';
+import { WIDGET_LOADING_MIN_HEIGHT } from './widget-group';
+import { ListTitle, MoreItemsNote, getMissingSlots } from './list-chrome';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 
 export interface BarListProps {
@@ -22,7 +23,7 @@ export interface BarListProps {
 }
 
 export const BarList: React.FC<BarListProps> = ({
-  items = [],
+  items,
   title,
   getHref,
   onSelect,
@@ -32,31 +33,14 @@ export const BarList: React.FC<BarListProps> = ({
   barColor = UI_COLOR_STATUS.info,
   ...rest
 }) => {
+  const testSubj = rest['data-test-subj'];
   const max = Math.max(1, ...items.map(item => item.count));
   const isInteractive = Boolean(getHref || onSelect);
-  const missingSlots = totalSlots
-    ? Math.max(0, totalSlots - items.length)
-    : 0;
-
-  const showMoreItemsNote = Boolean(
-    totalSlots && items.length > 0 && missingSlots >= totalSlots / 2,
-  );
+  const missingSlots = getMissingSlots(items.length, totalSlots);
 
   return (
-    <div data-test-subj={rest['data-test-subj']}>
-      {title && (
-        <EuiText
-          size='xs'
-          style={{
-            paddingTop: 4,
-            paddingBottom: 6,
-            marginBottom: 10,
-            borderBottom: '1px solid rgba(128, 128, 128, 0.2)',
-          }}
-        >
-          <strong>{title}</strong>
-        </EuiText>
-      )}
+    <div data-test-subj={testSubj}>
+      {title && <ListTitle>{title}</ListTitle>}
       <div
         style={{
           display: 'grid',
@@ -67,15 +51,14 @@ export const BarList: React.FC<BarListProps> = ({
           width: '100%',
         }}
       >
-        {items.length === 0 && (
+        {items.length === 0 ? (
           <EmptyState
             message={emptyMessage}
             minHeight={WIDGET_LOADING_MIN_HEIGHT.list}
             style={{ gridColumn: '1 / -1' }}
-            data-test-subj={rest['data-test-subj']}
+            data-test-subj={testSubj ? `${testSubj}-empty` : undefined}
           />
-        )}
-        {items.length > 0 &&
+        ) : (
           items.map(item => (
             <React.Fragment key={item.key}>
               <EuiText
@@ -107,27 +90,25 @@ export const BarList: React.FC<BarListProps> = ({
                 )}
               </EuiText>
               <div style={{ padding: '6px 0' }}>
-                <EuiProgress value={item.count} max={max} size='m' color={barColor} />
+                <EuiProgress
+                  value={item.count}
+                  max={max}
+                  size='m'
+                  color={barColor}
+                />
               </div>
               <EuiText size='s' className='tab-num'>
                 <strong>{formatUINumber(item.count)}</strong>
               </EuiText>
             </React.Fragment>
-          ))}
-        {showMoreItemsNote && (
-          <div
-            style={{
-              gridColumn: '1 / -1',
-              minHeight: missingSlots * TOP_N_ROW_HEIGHT,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <EuiText size='s' color='subdued'>
-              {moreItemsMessage}
-            </EuiText>
-          </div>
+          ))
+        )}
+        {missingSlots.showNote && (
+          <MoreItemsNote
+            message={moreItemsMessage}
+            missingSlots={missingSlots.count}
+            style={{ gridColumn: '1 / -1' }}
+          />
         )}
       </div>
     </div>

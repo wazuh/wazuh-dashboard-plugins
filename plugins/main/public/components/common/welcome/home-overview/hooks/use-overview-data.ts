@@ -70,6 +70,7 @@ import {
 } from '../services/security-analytics.service';
 import {
   AgentStatus,
+  CountsByKey,
   FimOverview,
   FindingsOverview,
   ScaOverview,
@@ -249,8 +250,6 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
           aggs: {
             ...buildFindingsOverviewAggs(),
             ...buildMalwareFilterAgg(),
-            ...buildCloudSecurityByModuleAgg(),
-            ...buildComplianceControlsAgg(),
           },
           dateRange: LAST_24H,
           pagination: NO_HITS,
@@ -270,12 +269,6 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
             AGG.topTechniques,
           ),
           iocMatches: mapCardinality(malware, AGG.iocMatches),
-          cloudSecurityByModule: mapCloudSecurityByModule(
-            response?.aggregations,
-          ),
-          complianceControlsByFramework: mapComplianceControls(
-            response?.aggregations,
-          ),
         };
       },
     });
@@ -286,6 +279,54 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
     () => ({ ...result, indexPatternId, fixedFilters }),
     [result.status, result.data, indexPatternId, fixedFilters],
   );
+}
+
+/**
+ * Findings per Cloud Security module (last 24h) for the card badges. Its own
+ * lazy search rather than a rider on the on-mount findings batch, since the
+ * section it feeds is the last one on the page.
+ */
+export function useCloudSecurityFindings(
+  enabled: boolean,
+): DataGroupResult<CountsByKey> {
+  return useAggregationGroup<CountsByKey>({
+    DataSource: OverviewDataSource,
+    createRepository: () => new FindingsDataSourceRepository(),
+    enabled,
+    label: 'Cloud security findings',
+    fetch: async fetchData => {
+      const response = await fetchData({
+        aggs: buildCloudSecurityByModuleAgg(),
+        dateRange: LAST_24H,
+        pagination: NO_HITS,
+      });
+      return mapCloudSecurityByModule(response?.aggregations);
+    },
+  });
+}
+
+/**
+ * Distinct controls implicated per regulatory-compliance framework (last 24h)
+ * for the Compliance chips. One cardinality agg per framework, so like the
+ * cloud counts above it waits for its below-the-fold section.
+ */
+export function useComplianceControls(
+  enabled: boolean,
+): DataGroupResult<CountsByKey> {
+  return useAggregationGroup<CountsByKey>({
+    DataSource: OverviewDataSource,
+    createRepository: () => new FindingsDataSourceRepository(),
+    enabled,
+    label: 'Regulatory compliance',
+    fetch: async fetchData => {
+      const response = await fetchData({
+        aggs: buildComplianceControlsAgg(),
+        dateRange: LAST_24H,
+        pagination: NO_HITS,
+      });
+      return mapComplianceControls(response?.aggregations);
+    },
+  });
 }
 
 export function useTopOperatingSystems(

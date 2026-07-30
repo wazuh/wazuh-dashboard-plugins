@@ -25,13 +25,16 @@ export const MITRE_TACTIC_ID_FIELD = 'wazuh.rule.mitre.tactic.id';
 export const MITRE_TECHNIQUE_ID_FIELD = 'wazuh.rule.mitre.technique.id';
 export const MITRE_TECHNIQUE_NAME_FIELD = 'wazuh.rule.mitre.technique.name';
 export const RULE_TITLE_FIELD = 'wazuh.rule.title';
+/** Integration a finding came from; identifies the module that produced it. */
 export const INTEGRATION_NAME_FIELD = 'wazuh.integration.name';
 export const HOST_OS_NAME_FIELD = 'host.os.name';
 export const PROCESS_NAME_FIELD = 'process.name';
 export const SCA_CHECK_RESULT_FIELD = 'check.result';
 export const SCA_POLICY_NAME_FIELD = 'policy.name';
-/** Modified-file path on a FIM state document, for the "Top 5 modified files" bars. */
+/** Monitored-file path on a FIM state document, for the "Top 5 modified files" list. */
 export const FIM_FILE_PATH_FIELD = 'file.path';
+/** Last modification time of a monitored file; ranks the "modified files" list. */
+export const FIM_FILE_MTIME_FIELD = 'file.mtime';
 export const VULNERABILITY_SEVERITY_FIELD = 'vulnerability.severity';
 /** Package name on a vulnerability state document, for "Top 5 package name". */
 export const VULNERABILITY_PACKAGE_NAME_FIELD = 'package.name';

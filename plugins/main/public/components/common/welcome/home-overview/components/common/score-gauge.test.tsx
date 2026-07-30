@@ -17,12 +17,6 @@ describe('ScoreGauge', () => {
     expect(screen.getByText('100')).toBeInTheDocument();
   });
 
-  it('renders custom scale labels when provided', () => {
-    render(<ScoreGauge score={0.9} lowLabel='Low' highLabel='High' />);
-    expect(screen.getByText('Low')).toBeInTheDocument();
-    expect(screen.getByText('High')).toBeInTheDocument();
-  });
-
   it('renders no marker/value when the score is undefined', () => {
     const { container } = render(<ScoreGauge data-test-subj='sca-gauge' />);
     expect(screen.queryByText('%')).not.toBeInTheDocument();

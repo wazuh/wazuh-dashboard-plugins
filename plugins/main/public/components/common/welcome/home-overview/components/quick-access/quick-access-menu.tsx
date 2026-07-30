@@ -71,11 +71,9 @@ const getDataDrivenGroups = (): QuickAccessGroup[] =>
   }, []);
 
 /**
- * The Security Analytics dashboards plugin is optionally-mounted and external
- * to Wazuh's own Applications/Categories registry, so its group is defined
- * here rather than in utils/applications.ts. `order: 550` mirrors that
- * plugin's own nav-category order (between Cloud security's 500 and Agents
- * management's 600), so it sorts into 5th position alongside the other groups.
+ * The Security Analytics plugin is external to Wazuh's app registry, so its
+ * group is declared here. `order` mirrors that plugin's own nav category, which
+ * sits between Cloud security (500) and Agents management (600).
  */
 const SECURITY_ANALYTICS_GROUP: QuickAccessGroup = {
   id: 'security-analytics',
@@ -107,7 +105,7 @@ export const QuickAccessMenu: React.FC = () => {
           size='xs'
           iconType='arrowDown'
           iconSide='right'
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setIsOpen(open => !open)}
           data-test-subj='quick-access-menu-button'
         >
           Quick access

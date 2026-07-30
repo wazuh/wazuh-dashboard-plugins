@@ -121,24 +121,3 @@ export const getKvdbsUrl = () => getUrlForApp(SECURITY_ANALYTICS_APP_IDS.kvdbs);
  */
 export const getFiltersUrl = () =>
   getUrlForApp(SECURITY_ANALYTICS_APP_IDS.integrations, { path: '#/filters' });
-
-/**
- * Open the MITRE ATT&CK Intelligence tab on a specific resource. Intelligence
- * resolves the resource by its external id (`resource.tsx` queries
- * `?q=external_id=<idToRedirect>`), so the id is required.
- * Falls back to the module home when the id isn't known.
- */
-const getMitreIntelligenceUrl = (
-  tabRedirect: 'tactics' | 'techniques',
-  externalId?: string,
-): string => {
-  if (!externalId) {
-    return getUrlForApp(mitreAttack.id);
-  }
-  const params = `tab=mitre&tabView=intelligence&tabRedirect=${tabRedirect}&idToRedirect=${externalId}`;
-  return getUrlForApp(mitreAttack.id, { path: `#/overview?${params}` });
-};
-
-/** Top-tactic labels deep-link into the Intelligence resource for that tactic. */
-export const getMitreUrlTactic = (externalId?: string): string =>
-  getMitreIntelligenceUrl('tactics', externalId);

@@ -12,10 +12,12 @@ import { getModuleUrl } from '../../utils/navigation';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { formatValueSafely } from '../common';
-import { useFindingsOverview } from '../../hooks/use-overview-data';
+import { DataGroupResult } from '../../interfaces/data-group';
+import { CountsByKey } from '../../interfaces/types';
 
 export interface CloudSecurityCardsProps {
-  findings: ReturnType<typeof useFindingsOverview>;
+  /** Findings per module (app id) for the badges; cards navigate regardless. */
+  findings: DataGroupResult<CountsByKey>;
 }
 
 export const CloudSecurityCards: React.FC<CloudSecurityCardsProps> = ({
@@ -24,10 +26,7 @@ export const CloudSecurityCards: React.FC<CloudSecurityCardsProps> = ({
   <RedirectAppLinks application={getCore().application}>
     <EuiFlexGrid columns={3} data-test-subj='cloud-security-cards'>
       {CloudSecurityApplications.map(module => {
-        const count =
-          findings.status === 'available'
-            ? findings.data.cloudSecurityByModule[module.id]
-            : undefined;
+        const count = findings.data?.[module.id];
         return (
           <EuiFlexItem key={module.id}>
             <EuiCard

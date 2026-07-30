@@ -28,6 +28,7 @@ import {
   VULNERABILITY_SEVERITY_FIELD,
   SCA_CHECK_RESULT_FIELD,
   SCA_POLICY_NAME_FIELD,
+  FIM_FILE_MTIME_FIELD,
   FIM_FILE_PATH_FIELD,
   VULNERABILITY_PACKAGE_NAME_FIELD,
   VULNERABILITY_CVE_ID_FIELD,
@@ -118,9 +119,16 @@ describe('query builders', () => {
     );
   });
 
-  it('builds the FIM top-modified-files agg', () => {
+  it('builds the FIM top-modified-files agg ordered by the latest modification time', () => {
     expect(buildFIMTopFilesAgg(5)).toEqual({
-      fim_top_files: { terms: { field: FIM_FILE_PATH_FIELD, size: 5 } },
+      fim_top_files: {
+        terms: {
+          field: FIM_FILE_PATH_FIELD,
+          size: 5,
+          order: { last_modified: 'desc' },
+        },
+        aggs: { last_modified: { max: { field: FIM_FILE_MTIME_FIELD } } },
+      },
     });
   });
 

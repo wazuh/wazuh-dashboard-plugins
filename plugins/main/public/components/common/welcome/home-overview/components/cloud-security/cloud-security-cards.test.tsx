@@ -4,25 +4,16 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '../../test-utils/setup-home-overview-test';
 import { CloudSecurityCards } from './cloud-security-cards';
 import { getModuleUrl } from '../../utils/navigation';
-import { FindingsOverview } from '../../interfaces/types';
+import { CountsByKey } from '../../interfaces/types';
 import { DataGroupResult } from '../../interfaces/data-group';
 
 jest.mock('../../utils/navigation', () => ({
   getModuleUrl: jest.fn(),
 }));
 
-const available = (
-  cloudSecurityByModule: Record<string, number | undefined>,
-): DataGroupResult<FindingsOverview> => ({
+const available = (data: CountsByKey): DataGroupResult<CountsByKey> => ({
   status: 'available',
-  data: {
-    severity: {},
-    topTactics: [],
-    topRules: [],
-    topTechniques: [],
-    cloudSecurityByModule,
-    complianceControlsByFramework: {},
-  },
+  data,
 });
 
 // This repo doesn't use data-testid; look up elements by data-test-subj.

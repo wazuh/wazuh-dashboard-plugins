@@ -8,9 +8,21 @@ import {
 } from '../common';
 import {
   API_NAME_AGENT_STATUS,
-  UI_COLOR_STATUS,
+  UI_COLOR_AGENT_STATUS,
+  UI_LABEL_NAME_AGENT_STATUS,
+  UI_ORDER_AGENT_STATUS,
 } from '../../../../../../../common/constants';
 import { WzButtonPermissions } from '../../../../permissions/button';
+
+type AgentStatusName =
+  (typeof API_NAME_AGENT_STATUS)[keyof typeof API_NAME_AGENT_STATUS];
+
+const COUNT_BY_STATUS: Record<AgentStatusName, keyof AgentStatus> = {
+  [API_NAME_AGENT_STATUS.ACTIVE]: 'active',
+  [API_NAME_AGENT_STATUS.DISCONNECTED]: 'disconnected',
+  [API_NAME_AGENT_STATUS.PENDING]: 'pending',
+  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: 'neverConnected',
+};
 
 export interface AgentsByStatusProps {
   data: AgentStatus;
@@ -51,44 +63,15 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
     );
   }
 
-  const segments: DistributionBarSegment[] = [
-    {
-      key: API_NAME_AGENT_STATUS.ACTIVE,
-      label: 'Active',
-      count: data.active ?? 0,
-      color: UI_COLOR_STATUS.success,
-      onClick: onStatusSelect
-        ? () => onStatusSelect(API_NAME_AGENT_STATUS.ACTIVE)
-        : undefined,
-    },
-    {
-      key: API_NAME_AGENT_STATUS.DISCONNECTED,
-      label: 'Disconnected',
-      count: data.disconnected ?? 0,
-      color: UI_COLOR_STATUS.danger,
-      onClick: onStatusSelect
-        ? () => onStatusSelect(API_NAME_AGENT_STATUS.DISCONNECTED)
-        : undefined,
-    },
-    {
-      key: API_NAME_AGENT_STATUS.PENDING,
-      label: 'Pending',
-      count: data.pending ?? 0,
-      color: UI_COLOR_STATUS.warning,
-      onClick: onStatusSelect
-        ? () => onStatusSelect(API_NAME_AGENT_STATUS.PENDING)
-        : undefined,
-    },
-    {
-      key: API_NAME_AGENT_STATUS.NEVER_CONNECTED,
-      label: 'Never connected',
-      count: data.neverConnected ?? 0,
-      color: UI_COLOR_STATUS.disabled,
-      onClick: onStatusSelect
-        ? () => onStatusSelect(API_NAME_AGENT_STATUS.NEVER_CONNECTED)
-        : undefined,
-    },
-  ];
+  const segments: DistributionBarSegment[] = UI_ORDER_AGENT_STATUS.map(
+    status => ({
+      key: status,
+      label: UI_LABEL_NAME_AGENT_STATUS[status],
+      count: data[COUNT_BY_STATUS[status]] ?? 0,
+      color: UI_COLOR_AGENT_STATUS[status],
+      onClick: onStatusSelect ? () => onStatusSelect(status) : undefined,
+    }),
+  );
 
   return (
     <DistributionBar

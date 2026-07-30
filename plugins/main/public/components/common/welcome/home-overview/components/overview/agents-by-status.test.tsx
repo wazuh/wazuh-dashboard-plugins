@@ -8,7 +8,10 @@ import { AgentsByStatus } from './agents-by-status';
 // out of scope for this presentational widget's tests, so stub it down to a
 // plain link/button.
 jest.mock('../../../../permissions/button', () => ({
-  WzButtonPermissions: ({ children, ...rest }: any) => (
+  WzButtonPermissions: ({
+    children,
+    ...rest
+  }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a {...rest}>{children}</a>
   ),
 }));

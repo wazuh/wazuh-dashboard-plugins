@@ -18,10 +18,10 @@ import { withErrorBoundary, withGlobalBreadcrumb } from '../../hocs';
 import { overview } from '../../../../utils/applications';
 
 /**
- * Findings (on mount) and the lazy searches (vulnerabilities, threat-intel
- * enrichments) are run once here and shared across sections. Enrichments feed
- * both Malware Detection (feed-by-type) and the Threat Catalog (IOCs tile),
- * so it's gated on the Endpoint Security section scrolling in.
+ * Searches shared by more than one section are run once here: findings on mount,
+ * vulnerabilities and threat-intel enrichments once their sections scroll in.
+ * Enrichments feed both Malware Detection (feed-by-type) and the Threat Catalog
+ * (IOCs tile). Sections owning a single search fetch it themselves.
  */
 const HomeOverviewBody: React.FC = () => {
   const findings = useFindingsOverview();
@@ -59,9 +59,9 @@ const HomeOverviewBody: React.FC = () => {
         threatIntel={threatIntel}
       />
       <EuiSpacer size='l' />
-      <SecurityOperationsSection findings={findings} />
+      <SecurityOperationsSection />
       <EuiSpacer size='l' />
-      <CloudSecuritySection findings={findings} />
+      <CloudSecuritySection />
     </>
   );
 };

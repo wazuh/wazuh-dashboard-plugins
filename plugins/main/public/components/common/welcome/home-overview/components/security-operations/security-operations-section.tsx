@@ -9,7 +9,7 @@ import { RegulatoryComplianceBadges } from './regulatory-compliance-badges';
 import { useInViewport } from '../../../../hooks';
 import {
   useActiveResponseOverview,
-  useFindingsOverview,
+  useComplianceControls,
   useItHygieneOperatingSystemsCount,
   useItHygienePackagesCount,
   useItHygieneServicesCount,
@@ -21,25 +21,15 @@ import {
   getRegulatoryComplianceUrlHome,
 } from '../../utils/navigation';
 
-export interface SecurityOperationsSectionProps {
-  findings: ReturnType<typeof useFindingsOverview>;
-}
-
-/**
- * IT Hygiene and Active Response load lazily. Regulatory Compliance's chips
- * always navigate (the panel never gates on `findings`); they're merely
- * enriched with a controls-implicated count once the shared findings query
- * on `findings` resolves.
- */
-const SecurityOperationsSectionComponent: React.FC<
-  SecurityOperationsSectionProps
-> = ({ findings }) => {
+/** Every widget here loads lazily; the Compliance chips navigate regardless. */
+const SecurityOperationsSectionComponent: React.FC = () => {
   const [sectionRef, visible] = useInViewport<HTMLDivElement>();
   const operatingSystems = useItHygieneOperatingSystemsCount(visible);
   const packages = useItHygienePackagesCount(visible);
   const users = useItHygieneUsersCount(visible);
   const services = useItHygieneServicesCount(visible);
   const activeResponse = useActiveResponseOverview(visible);
+  const complianceControls = useComplianceControls(visible);
 
   return (
     <div ref={sectionRef}>
@@ -112,7 +102,7 @@ const SecurityOperationsSectionComponent: React.FC<
             centerBody
             data-test-subj='home-overview-regulatory-compliance'
           >
-            <RegulatoryComplianceBadges findings={findings} />
+            <RegulatoryComplianceBadges controls={complianceControls} />
           </WidgetGroup>
         </EuiFlexItem>
       </EuiFlexGroup>
