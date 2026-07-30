@@ -17,7 +17,7 @@ import {
  * Exact match on `wazuh.rule.title` plus a time range. `wazuh.rule.title` is mapped `keyword`, so a
  * `term` query is the correct exact-match form -- there is no partial/analyzed matching here, the
  * model must pass the exact title text (discover it via get_top_rules if unsure, same pattern as
- * search_findings_by_rule_group.ts).
+ * search_findings_by_rule_tag.ts).
  *
  * Replaces the former `search_alerts_by_rule_id` tool. In 5.0 `wazuh.rule.id` is a UUID, not the
  * short numeric id analysts memorized in 4.x (e.g. "5710"), so a "search by rule ID" premise no

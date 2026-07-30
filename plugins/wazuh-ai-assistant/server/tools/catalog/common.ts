@@ -209,7 +209,7 @@ export function objectSchema(
  * Shared baseline `tableSpec.columns`/`digest.sampleColumns` for the 8 finding-hits tools
  * (get_critical_findings, get_findings_by_time, get_brute_force, get_suspicious_powershell,
  * search_findings_by_agent, search_findings_by_multiple_agents, search_findings_by_rule_title,
- * search_findings_by_rule_group). Each previously kept its own identical copy.
+ * search_findings_by_rule_tag). Each previously kept its own identical copy.
  */
 export const STANDARD_FINDING_TABLE_COLUMNS: ToolTableColumnSpec[] = [
   { field: '@timestamp', label: 'Time' },

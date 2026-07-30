@@ -11,7 +11,7 @@ import { getBruteForceTool } from './catalog/get-brute-force';
 import { getSecuritySummaryTool } from './catalog/get-security-summary';
 import { getSuspiciousPowershellTool } from './catalog/get-suspicious-powershell';
 import { searchFindingsByRuleTitleTool } from './catalog/search-findings-by-rule-title';
-import { searchFindingsByRuleGroupTool } from './catalog/search-findings-by-rule-group';
+import { searchFindingsByRuleTagTool } from './catalog/search-findings-by-rule-tag';
 import { getPciDssFindingsTool } from './catalog/get-pci-dss-findings';
 import { getPciDssSummaryTool } from './catalog/get-pci-dss-summary';
 import { searchFindingsByMultipleAgentsTool } from './catalog/search-findings-by-multiple-agents';
@@ -55,7 +55,7 @@ const CATALOG: ToolDefinition[] = [
   getSecuritySummaryTool,
   getSuspiciousPowershellTool,
   searchFindingsByRuleTitleTool,
-  searchFindingsByRuleGroupTool,
+  searchFindingsByRuleTagTool,
   getPciDssFindingsTool,
   getPciDssSummaryTool,
   searchFindingsByMultipleAgentsTool,

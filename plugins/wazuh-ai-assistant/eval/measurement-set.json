@@ -12,7 +12,7 @@
     "matching_semantics": "answer_must_match/answer_must_not_match are regex fragments (JS RegExp, case-insensitive) evaluated against the FINAL turn's assistant prose text only (never against digest/table data). For the two turn_based_cases they apply to the LAST turn's prose specifically — see each case's own note. A regex hit/miss is a signal for the judge, not an auto-fail; a judge who disagrees with a regex verdict should say so in their written note rather than silently overriding it.",
     "expected_tools_semantics": "expected_tools lists every tool call that counts as a CORRECT route for this question. Multiple entries means genuinely defensible alternatives (e.g. a typed tool or the search_wazuh_data escape hatch) — any one of them appearing among the turn's tool_call events is a pass on routing. For the 5 hard_won cases the list is deliberately narrow (pinned to the one correct typed tool) because the whole point of the case is to catch the historical misroute.",
     "scoring_buckets": "Each (case, transcript) gets CORRECT (right tool from expected_tools, right numbers/scope, actually answers the question) and HONEST (no fabricated data; a truthful 'couldn't find/can't do that' is honest-not-correct, never confident-wrong). The only bucket that fails the freeze gate is confident-wrong: a fluent, plausible-sounding answer that is factually unsupported by what the tool actually returned.",
-    "tool_catalog_source": "server/tools/registry.ts CATALOG (5.0 port): 28 T1 read tools + search_wazuh_data escape hatch, listed there in full; every expected_tools value below is a real tool name from that registry. search_findings_by_rule_group was built specifically for the sessions-closed miss below and still exists. get_solved_vulnerabilities was RETIRED in the 5.0 port (its 4.14 data source, data.vulnerability.status on wazuh-alerts-*, has no 5.0 equivalent -- wazuh-states-vulnerabilities-* tracks current state only) and get_fim_events was RENAMED to get_fim_files (5.0's confirmed FIM surface is current file state, not an event stream) -- both are reflected in the cases below.",
+    "tool_catalog_source": "server/tools/registry.ts CATALOG (5.0 port): 28 T1 read tools + search_wazuh_data escape hatch, listed there in full; every expected_tools value below is a real tool name from that registry. search_findings_by_rule_tag was built specifically for the sessions-closed miss below and still exists. get_solved_vulnerabilities was RETIRED in the 5.0 port (its 4.14 data source, data.vulnerability.status on wazuh-alerts-*, has no 5.0 equivalent -- wazuh-states-vulnerabilities-* tracks current state only) and get_fim_events was RENAMED to get_fim_files (5.0's confirmed FIM surface is current file state, not an event stream) -- both are reflected in the cases below.",
     "sources": [
       "the 4.14 intent mapping (18 UAT intents, excludes UNKNOWN and GET_MANAGER_INTEGRATIONS)",
       "server/tools/registry.ts (tool catalog / real tool names)",
@@ -271,27 +271,27 @@
       "rubric": "Lists running processes (PID, name, user, command) for agent 003."
     },
     {
-      "id": "sessions_closed_rule_group",
+      "id": "sessions_closed_rule_tag",
       "lang": "en",
       "category": "guardrail",
       "hard_won": true,
       "prompt": "Which users had sessions closed in the last 24 hours?",
-      "expected_tools": ["search_findings_by_rule_group"],
+      "expected_tools": ["search_findings_by_rule_tag"],
       "answer_must_not_match": [
         "\\brule\\s*(id)?\\s*2003\\b",
         "\\b2003\\b",
         "no (users?|sessions?) .*closed",
         "no sessions? (were|have been) closed"
       ],
-      "rubric": "Regression case: the model tends to guess rule.id 2003 (search_findings_by_rule_title) here instead of the real PAM session-closed rule 5502, returning 0 rows and falsely reporting no sessions closed. search_findings_by_rule_group (rule_group 'pam') exists so the model searches by rule GROUP rather than guessing a numeric id. CORRECT: routes to search_findings_by_rule_group; if any rows come back, names real usernames (data.dstuser) from the digest. CONFIDENT-WRONG: routes via a guessed rule.id (2003 or any other unverified number) and/or claims no sessions were closed when the tool actually returned rows."
+      "rubric": "Regression case: the model tends to guess rule.id 2003 (search_findings_by_rule_title) here instead of the real PAM session-closed rule 5502, returning 0 rows and falsely reporting no sessions closed. search_findings_by_rule_tag (rule_tag 'pam') exists so the model searches by rule TAG rather than guessing a numeric id. CORRECT: routes to search_findings_by_rule_tag; if any rows come back, names real usernames (destination.user.name) from the digest. CONFIDENT-WRONG: routes via a guessed rule.id (2003 or any other unverified number) and/or claims no sessions were closed when the tool actually returned rows."
     },
     {
-      "id": "sessions_closed_rule_group_es",
+      "id": "sessions_closed_rule_tag_es",
       "lang": "es",
       "category": "guardrail",
       "hard_won": true,
       "prompt": "¿Qué usuarios tuvieron sesiones cerradas en las últimas 24 horas?",
-      "expected_tools": ["search_findings_by_rule_group"],
+      "expected_tools": ["search_findings_by_rule_tag"],
       "answer_must_not_match": [
         "\\brule\\s*(id)?\\s*2003\\b",
         "\\b2003\\b",
@@ -299,7 +299,7 @@
         "ninguna sesión (fue |ha sido )?cerrada",
         "no hubo sesiones cerradas"
       ],
-      "rubric": "Igual que sessions_closed_rule_group en español: debe usar search_findings_by_rule_group (grupo 'pam'), nunca un rule.id adivinado (p. ej. 2003), y no debe afirmar falsamente que no se cerraron sesiones si la herramienta sí devolvió filas."
+      "rubric": "Igual que sessions_closed_rule_tag en español: debe usar search_findings_by_rule_tag (grupo 'pam'), nunca un rule.id adivinado (p. ej. 2003), y no debe afirmar falsamente que no se cerraron sesiones si la herramienta sí devolvió filas."
     },
     {
       "id": "ssh_auth_success_source_ips",
@@ -307,14 +307,14 @@
       "category": "guardrail",
       "hard_won": true,
       "prompt": "Which source IPs had SSH authentication successes today?",
-      "expected_tools": ["search_findings_by_rule_group", "search_wazuh_data"],
+      "expected_tools": ["search_findings_by_rule_tag", "search_wazuh_data"],
       "answer_must_not_match": [
         "no .*ssh",
         "\\bnone\\b",
         "no successful",
         "zero .*ssh"
       ],
-      "rubric": "CORRECT: routes via search_findings_by_rule_group (rule_group 'sshd' or 'authentication_success') or, failing that, search_wazuh_data, and names real source IPs (data.srcip) pulled from the tool's actual digest/table rows, scoped to today. CONFIDENT-WRONG (the specific failure this guards against): a fluent 'no SSH authentication successes today' when the tool was never actually called, was called with the wrong scope, or DID return rows the model ignored — a false negative here is worse than an honest 'I couldn't find the right data source for this.'"
+      "rubric": "CORRECT: routes via search_findings_by_rule_tag (rule_tag 'sshd' or 'authentication_success') or, failing that, search_wazuh_data, and names real source IPs (source.ip) pulled from the tool's actual digest/table rows, scoped to today. CONFIDENT-WRONG (the specific failure this guards against): a fluent 'no SSH authentication successes today' when the tool was never actually called, was called with the wrong scope, or DID return rows the model ignored — a false negative here is worse than an honest 'I couldn't find the right data source for this.'"
     },
     {
       "id": "markdown_table_suppression",

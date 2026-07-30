@@ -52,10 +52,10 @@ their note rather than silently deferring to it.
 
 ## The 5 hard-won cases (each guards an observed routing failure)
 
-- `sessions_closed_rule_group` / `sessions_closed_rule_group_es` — "which users had sessions
+- `sessions_closed_rule_tag` / `sessions_closed_rule_tag_es` — "which users had sessions
   closed in the last 24 hours?" This question makes the model guess `rule.id 2003` instead of the
   real PAM session-closed rule (`5502`), return 0 rows, and falsely report no sessions closed.
-  `search_findings_by_rule_group` is the pinned correct route; both cases guard against the `2003`
+  `search_findings_by_rule_tag` is the pinned correct route; both cases guard against the `2003`
   hallucination reappearing and against a false "no sessions closed" claim.
 - `ssh_auth_success_source_ips` — "which source IPs had SSH authentication successes today?"
   Guards against a confident false-negative ("no SSH successes") standing in for a

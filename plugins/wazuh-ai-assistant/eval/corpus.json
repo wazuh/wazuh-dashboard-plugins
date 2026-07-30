@@ -44,7 +44,7 @@
         "params_subset": {},
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent GET_CRITICAL_ALERTS -> get_critical_findings.ts, hardcodes an exact terms match on wazuh.rule.level: 'critical' (get_critical_findings.ts:45; the 4.14 numeric rule.level>=15 threshold has no 5.0 equivalent, since rule.level is now a keyword severity word, not a number); not a model-supplied param, so nothing to pin beyond tool identity."
+      "notes": "UAT intent GET_CRITICAL_ALERTS -> get_critical_findings.ts, hardcodes an exact terms match on wazuh.rule.level: 'critical' (get_critical_findings.ts:45; the 4.14 numeric rule.level>=15 threshold has no 5.0 equivalent, since wazuh.rule.level is now a keyword severity word, not a number); not a model-supplied param, so nothing to pin beyond tool identity."
     },
     {
       "id": "findings_by_agent_severity",
@@ -149,13 +149,13 @@
       "notes": "UAT intent SEARCH_ALERTS_BY_RULE_TITLE -> search_findings_by_rule_title.ts. rule_title pinned since the question names an exact rule by its title text; in 5.0 wazuh.rule.id is a UUID, not a memorizable short numeric ID, so title is the reachable identifier for this kind of question."
     },
     {
-      "id": "findings_by_rule_group",
+      "id": "findings_by_rule_tag",
       "category": "findings",
       "prompt_en": "Which users had sessions closed in the last 24 hours?",
       "prompt_es": "¿Qué usuarios tuvieron sesiones cerradas en las últimas 24 horas?",
       "expect": {
         "tool": [
-          "search_findings_by_rule_group",
+          "search_findings_by_rule_tag",
           "get_findings_by_time",
           "get_brute_force",
           "search_wazuh_data"
@@ -164,7 +164,7 @@
         "table": "required_empty_ok",
         "answer_must_not_match": ["rule (id )?2003"]
       },
-      "notes": "Regression case: this question makes the model guess rule.id 2003 (search_findings_by_rule_title) instead of the real PAM session-closed rule 5502, returning 0 rows and falsely reporting no sessions closed. search-findings-by-rule-group.ts was built specifically for this: rule_group is not pinned in params_subset because several values are defensible ('pam', 'session_closed', 'authentication_success') and prompts.ts's 'never guess rule ids' rule only requires SOME wazuh.rule.tags value, not a specific one. answer_must_not_match guards against the specific hallucinated rule ID resurfacing. See also dstuser_sessions_closed below, the pre-existing case for this same question kept for its destination.user.name/multi-tool-tolerance coverage. 5.0 UPDATE (2026-07-26): the strict single-tool pin was BROADENED to the same set its sibling accepts. The assertion that actually encodes the original UAT bug is answer_must_not_match (rule id 2003) and it still passes; the model now answers this via search_wazuh_data, which is equally NOT a guessed rule id, so the regression this case exists to catch is still caught. The prompt is deliberately left identical to dstuser_sessions_closed (that duplication is intentional per the note above, NOT a copy-paste slip) so this case keeps guarding the exact phrasing that triggered the live miss."
+      "notes": "Regression case: this question makes the model guess rule.id 2003 (search_findings_by_rule_title) instead of the real PAM session-closed rule 5502, returning 0 rows and falsely reporting no sessions closed. search-findings-by-rule-tag.ts was built specifically for this: rule_tag is not pinned in params_subset because several values are defensible ('pam', 'session_closed', 'authentication_success') and prompts.ts's 'never guess rule ids' rule only requires SOME wazuh.rule.tags value, not a specific one. answer_must_not_match guards against the specific hallucinated rule ID resurfacing. See also dstuser_sessions_closed below, the pre-existing case for this same question kept for its destination.user.name/multi-tool-tolerance coverage. 5.0 UPDATE (2026-07-26): the strict single-tool pin was BROADENED to the same set its sibling accepts. The assertion that actually encodes the original UAT bug is answer_must_not_match (rule id 2003) and it still passes; the model now answers this via search_wazuh_data, which is equally NOT a guessed rule id, so the regression this case exists to catch is still caught. The prompt is deliberately left identical to dstuser_sessions_closed (that duplication is intentional per the note above, NOT a copy-paste slip) so this case keeps guarding the exact phrasing that triggered the live miss."
     },
     {
       "id": "pci_dss_findings",
@@ -314,7 +314,7 @@
       "prompt_es": "¿Qué usuarios tuvieron sesiones cerradas en las últimas 24 horas?",
       "expect": {
         "tool": [
-          "search_findings_by_rule_group",
+          "search_findings_by_rule_tag",
           "get_findings_by_time",
           "get_brute_force",
           "search_wazuh_data"
@@ -327,7 +327,7 @@
           "no se cerraron sesiones"
         ]
       },
-      "notes": "Regression case: the model is prone to guessing rule.id 2003 (search_findings_by_rule_title) here instead of the real PAM session-closed rule 5502, which returns 0 rows and reports no sessions closed at all. search_findings_by_rule_group (rule_group: 'pam' or 'session_closed') is now the primary expected route per prompts.ts's 'never guess rule ids' rule; get_findings_by_time/get_brute_force/search_wazuh_data remain acceptable alternates from before that tool existed, same 'any listed tool at any point' tolerance as escape_hatch_long_tail above. Also still exercises the D2/D3 finding investigation fields (server/tools/catalog/common.ts's FINDING_DIGEST_EXTRA_COLUMNS), specifically destination.user.name, which every finding-hits tool's digest carries. Time phrasing ('last 24 hours') is deliberately left unpinned in params_subset per this file's own params_subset_note. answer_must_not_match guards against the specific hallucinated rule ID and a false negative claim; no positive answer_must_match since whether the model surfaces a specific username depends on live data population (destination.user.name was measured ~90% populated over 7 days in Phase 0, not guaranteed in any single 24h window) -- this case's completeness is judged qualitatively by the SME reviewer beyond that guard."
+      "notes": "Regression case: the model is prone to guessing rule.id 2003 (search_findings_by_rule_title) here instead of the real PAM session-closed rule 5502, which returns 0 rows and reports no sessions closed at all. search_findings_by_rule_tag (rule_tag: 'pam' or 'session_closed') is now the primary expected route per prompts.ts's 'never guess rule ids' rule; get_findings_by_time/get_brute_force/search_wazuh_data remain acceptable alternates from before that tool existed, same 'any listed tool at any point' tolerance as escape_hatch_long_tail above. Also still exercises the D2/D3 finding investigation fields (server/tools/catalog/common.ts's FINDING_DIGEST_EXTRA_COLUMNS), specifically destination.user.name, which every finding-hits tool's digest carries. Time phrasing ('last 24 hours') is deliberately left unpinned in params_subset per this file's own params_subset_note. answer_must_not_match guards against the specific hallucinated rule ID and a false negative claim; no positive answer_must_match since whether the model surfaces a specific username depends on live data population (destination.user.name was measured ~90% populated over 7 days in Phase 0, not guaranteed in any single 24h window) -- this case's completeness is judged qualitatively by the SME reviewer beyond that guard."
     },
     {
       "id": "no_tool_conversational",

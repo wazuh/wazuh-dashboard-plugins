@@ -20,14 +20,19 @@ import {
  * CLASSIFICATION TAG instead of guessing an ID -- the thing to reach for whenever a question names
  * a category of activity rather than a specific rule number.
  * Searches `wazuh.rule.tags` (a keyword array) with a plain `term` match (same pattern as
- * search_findings_by_rule_title.ts). IMPORTANT: the exact `wazuh.rule.tags` vocabulary has not yet been
- * confirmed against live data. The description below therefore does NOT assert specific tag
- * values as ground truth -- it tells the model to discover tags via get_top_rules rather than
- * invent them, so a hallucinated tag can't masquerade as a verified one.
+ * search_findings_by_rule_title.ts). `wazuh.rule.tags` is confirmed populated and live-verified
+ * against the indexer -- observed values follow an `attack.<mitre-technique-id>` pattern plus
+ * severity words and generic rule descriptors (e.g. `attack.t1014`, `high`, `wazuh-rootcheck`).
+ * That verification only covers the malware/rootkit findings present in the dev dataset, though:
+ * the activity-category examples below ("pam", "sshd", "authentication_success") are illustrative,
+ * NOT confirmed against real data -- this dataset has no authentication/login findings to check
+ * them against. The description below therefore does NOT assert those specific values as ground
+ * truth -- it tells the model to discover tags via get_top_rules rather than invent them, so a
+ * hallucinated tag can't masquerade as a verified one.
  */
-export const searchFindingsByRuleGroupTool: ToolDefinition = {
+export const searchFindingsByRuleTagTool: ToolDefinition = {
   spec: {
-    name: 'search_findings_by_rule_group',
+    name: 'search_findings_by_rule_tag',
     description:
       'Searches security findings belonging to one rule classification tag (wazuh.rule.tags), ' +
       'within a time range, most recent first. Use this for "which/what kind of findings" ' +
@@ -40,7 +45,7 @@ export const searchFindingsByRuleGroupTool: ToolDefinition = {
       'get_top_rules before concluding there were none.',
     parameters: objectSchema(
       {
-        rule_group: {
+        rule_tag: {
           type: 'string',
           description:
             'Exact wazuh.rule.tags value to match, e.g. a classification tag such as "pam", "sshd", ' +
@@ -51,15 +56,15 @@ export const searchFindingsByRuleGroupTool: ToolDefinition = {
         ),
         ...timeRangeProperties(),
       },
-      ['rule_group'],
+      ['rule_tag'],
     ),
   },
   target: 'indexer',
   tier: 'T1',
   buildRequest(params) {
-    const ruleGroup = requireNonEmptyString(
-      params.rule_group,
-      'Parameter "rule_group" is required and must be a non-empty string.',
+    const ruleTag = requireNonEmptyString(
+      params.rule_tag,
+      'Parameter "rule_tag" is required and must be a non-empty string.',
     );
     const limit = clampLimit(params.limit, 20, 500);
     const { gte, lte } = resolveTimeRange(params);
@@ -70,7 +75,7 @@ export const searchFindingsByRuleGroupTool: ToolDefinition = {
         query: {
           bool: {
             filter: [
-              { term: { 'wazuh.rule.tags': ruleGroup } },
+              { term: { 'wazuh.rule.tags': ruleTag } },
               { range: { '@timestamp': { gte, lte } } },
             ],
           },

@@ -86,7 +86,7 @@ const TOOL_CATEGORY = {
   get_security_summary: 'findings',
   get_suspicious_powershell: 'findings',
   search_findings_by_rule_title: 'findings',
-  search_findings_by_rule_group: 'findings',
+  search_findings_by_rule_tag: 'findings',
   get_pci_dss_findings: 'compliance',
   get_pci_dss_summary: 'compliance',
   search_findings_by_multiple_agents: 'findings',
@@ -170,17 +170,17 @@ const TOOL_DEFS = [
       typeof f.ruleTitle === 'string' && f.ruleTitle.length > 0
         ? { args: { rule_title: f.ruleTitle } }
         : {
-            skip: 'no real rule.title value discoverable from wazuh-findings-v5*',
+            skip: 'no real wazuh.rule.title value discoverable from wazuh-findings-v5*',
           },
   },
   {
-    name: 'search_findings_by_rule_group',
+    name: 'search_findings_by_rule_tag',
     family: 'findings',
     argsFn: f =>
       f.ruleTag
-        ? { args: { rule_group: f.ruleTag } }
+        ? { args: { rule_tag: f.ruleTag } }
         : {
-            skip: 'no real rule.tags value discoverable from wazuh-findings-v5*',
+            skip: 'no real wazuh.rule.tags value discoverable from wazuh-findings-v5*',
           },
   },
   {

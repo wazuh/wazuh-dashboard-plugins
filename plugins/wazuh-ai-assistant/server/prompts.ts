@@ -72,7 +72,7 @@ export function buildSystemPrompt(nowIso: string): string {
     'get_sca_checks needs a policy_id from get_sca_results first; use result="failed" for ' +
       '"which checks fail" questions.',
     'Never guess rule ids: if you do not know the exact wazuh.rule.id for a kind of finding, use ' +
-      'search_findings_by_rule_group with a wazuh.rule.tags value, or aggregate by rule first with ' +
+      'search_findings_by_rule_tag with a wazuh.rule.tags value, or aggregate by rule first with ' +
       'get_top_rules to discover ids. If a narrowly-filtered query returns 0 rows for activity ' +
       'that plausibly exists, retry once with a broader filter before concluding there were none.',
   ].join('\n');

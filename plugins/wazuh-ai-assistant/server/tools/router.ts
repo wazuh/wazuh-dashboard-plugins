@@ -56,7 +56,7 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_security_summary: 'findings',
   get_suspicious_powershell: 'findings',
   search_findings_by_rule_title: 'findings',
-  search_findings_by_rule_group: 'findings',
+  search_findings_by_rule_tag: 'findings',
   search_findings_by_multiple_agents: 'findings',
   search_findings_by_os: 'findings',
 
@@ -110,7 +110,7 @@ const CATEGORY_ORDER: RouterCategory[] = [
 const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
   agents: 'Agent connectivity status (active or disconnected agents).',
   findings:
-    'Finding search/summaries: critical findings, by agent/rule/rule-group/OS/time, top rules, ' +
+    'Finding search/summaries: critical findings, by agent/rule/rule-tag/OS/time, top rules, ' +
     'brute-force, suspicious PowerShell, general security summary.',
   vulnerabilities:
     'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only.',
