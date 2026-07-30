@@ -66,10 +66,7 @@ const MAX_TREE_DEPTH = 100;
 // ("wazuh-findings-v5-*,wazuh-monitoring-*"): the Indexer treats a comma as a multi-index
 // separator, so `.*` would let a single match name two index patterns. Not reachable through the
 // catalog today (`index` is enum-locked at the tool-schema level), but this function is the
-// standalone boundary and must hold on its own. Wazuh 5.0 families: wazuh-events-v5-*,
-// wazuh-findings-v5-* (the finding data), and wazuh-states-* (SCA/FIM/inventory/vuln
-// current-state). wazuh-alerts-*/wazuh-archives-* no longer exist in 5.0 and are intentionally
-// dropped from the allowlist.
+// standalone boundary and must hold on its own.
 const INDEX_ALLOWLIST_RE = /^wazuh-(events-v5|findings-v5|states)[^,\s]*$/;
 
 /** The escape hatch's (and every catalog tool's) index-pattern allowlist. */
