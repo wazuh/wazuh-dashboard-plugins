@@ -242,7 +242,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     null,
   );
   const [isSavingRetention, setIsSavingRetention] = useState(false);
+  const [isRetentionDirty, setIsRetentionDirty] = useState(false);
   const [fieldPolicyFilter, setFieldPolicyFilter] = useState('');
+  const hasEmptyFieldPolicyRow = fieldPolicyDraft.some(
+    entry => entry.field.trim() === '',
+  );
+  const [isPrivacyDirty, setIsPrivacyDirty] = useState(false);
 
   // Pre-flight administrator probe: a live check (GET /settings/access),
   // not a stored setting — loaded once on mount, independent of the settings save/load cycle above.
@@ -269,6 +274,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         });
         setFieldPolicyDraft(loaded.fieldPolicy);
         setRetentionDraft(loaded.conversationRetentionDays);
+        setIsRetentionDirty(false);
         setPrivacyLoadError(null);
       })
       .catch(() =>
@@ -335,6 +341,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       );
       setLoadedAssistantSettings(saved);
       setRetentionDraft(saved.conversationRetentionDays);
+      setIsRetentionDirty(false);
       core.notifications.toasts.addSuccess(
         i18n.translate('wazuhAiAssistant.settings.retention.saveSuccess', {
           defaultMessage: 'Conversation history settings saved.',
@@ -363,6 +370,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         entryIndex === index ? { ...entry, ...patch } : entry,
       ),
     );
+    setIsPrivacyDirty(true);
   };
 
   const handleAddFieldPolicyRow = () => {
@@ -370,12 +378,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       ...current,
       { field: '', action: 'anonymize', _isNew: true },
     ]);
+    setIsPrivacyDirty(true);
   };
 
   const handleRemoveFieldPolicyRow = (index: number) => {
     setFieldPolicyDraft(current =>
       current.filter((_entry, entryIndex) => entryIndex !== index),
     );
+    setIsPrivacyDirty(true);
   };
 
   const handleSavePrivacySettings = async () => {
@@ -403,6 +413,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       });
       setFieldPolicyDraft(saved.fieldPolicy);
       setRetentionDraft(saved.conversationRetentionDays);
+      setIsPrivacyDirty(false);
       core.notifications.toasts.addSuccess(
         i18n.translate('wazuhAiAssistant.settings.privacy.saveSuccess', {
           defaultMessage: 'Privacy settings saved.',
@@ -1139,12 +1150,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                       },
                     )}
                     checked={privacyDraft.privacyDefaultOn}
-                    onChange={event =>
+                    onChange={event => {
                       setPrivacyDraft({
                         ...privacyDraft,
                         privacyDefaultOn: event.target.checked,
-                      })
-                    }
+                      });
+                      setIsPrivacyDirty(true);
+                    }}
                   />
                 </EuiFormRow>
                 <EuiSpacer size='s' />
@@ -1158,12 +1170,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                       },
                     )}
                     checked={privacyDraft.userCanOverride}
-                    onChange={event =>
+                    onChange={event => {
                       setPrivacyDraft({
                         ...privacyDraft,
                         userCanOverride: event.target.checked,
-                      })
-                    }
+                      });
+                      setIsPrivacyDirty(true);
+                    }}
                   />
                 </EuiFormRow>
 
@@ -1337,7 +1350,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   <EuiButton
                     onClick={handleSavePrivacySettings}
                     isLoading={isSavingPrivacy}
-                    isDisabled={!canSave}
+                    isDisabled={
+                      !canSave || hasEmptyFieldPolicyRow || !isPrivacyDirty
+                    }
                     fill
                   >
                     {i18n.translate('wazuhAiAssistant.settings.privacy.save', {
@@ -1419,6 +1434,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                       setRetentionDraft(
                         Number.isNaN(parsed) ? 0 : Math.max(0, parsed),
                       );
+                      setIsRetentionDirty(true);
                     }}
                   />
                 </EuiFormRow>
@@ -1428,7 +1444,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                   <EuiButton
                     onClick={handleSaveRetentionSettings}
                     isLoading={isSavingRetention}
-                    isDisabled={!canSave}
+                    isDisabled={!canSave || !isRetentionDirty}
                     fill
                   >
                     {i18n.translate(
