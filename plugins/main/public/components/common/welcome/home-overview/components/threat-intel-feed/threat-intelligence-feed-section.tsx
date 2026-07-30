@@ -94,6 +94,7 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
   );
 };
 
-export const ThreatIntelligenceFeedSection = React.memo(
-  withErrorBoundary(ThreatIntelligenceFeedSectionComponent),
-);
+// Annotated: `withErrorBoundary` is untyped, so without this the props
+// would reach every call site as `any`.
+export const ThreatIntelligenceFeedSection: React.FC<ThreatIntelligenceFeedSectionProps> =
+  React.memo(withErrorBoundary(ThreatIntelligenceFeedSectionComponent));

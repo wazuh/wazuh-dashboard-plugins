@@ -151,6 +151,7 @@ const EndpointSecuritySectionComponent: React.FC<
   );
 };
 
-export const EndpointSecuritySection = React.memo(
-  withErrorBoundary(EndpointSecuritySectionComponent),
-);
+// Annotated: `withErrorBoundary` is untyped, so without this the props
+// would reach every call site as `any`.
+export const EndpointSecuritySection: React.FC<EndpointSecuritySectionProps> =
+  React.memo(withErrorBoundary(EndpointSecuritySectionComponent));

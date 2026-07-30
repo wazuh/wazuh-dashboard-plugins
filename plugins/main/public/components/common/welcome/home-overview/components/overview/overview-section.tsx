@@ -179,6 +179,8 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
   );
 };
 
-export const OverviewSection = React.memo(
+// Annotated: `withErrorBoundary` is untyped, so without this the props
+// would reach every call site as `any`.
+export const OverviewSection: React.FC<OverviewSectionProps> = React.memo(
   withErrorBoundary(OverviewSectionComponent),
 );

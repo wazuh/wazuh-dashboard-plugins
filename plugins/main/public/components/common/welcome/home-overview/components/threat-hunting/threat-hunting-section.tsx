@@ -169,6 +169,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
   );
 };
 
-export const ThreatHuntingSection = React.memo(
-  withErrorBoundary(ThreatHuntingSectionComponent),
-);
+// Annotated: `withErrorBoundary` is untyped, so without this the props
+// would reach every call site as `any`.
+export const ThreatHuntingSection: React.FC<ThreatHuntingSectionProps> =
+  React.memo(withErrorBoundary(ThreatHuntingSectionComponent));

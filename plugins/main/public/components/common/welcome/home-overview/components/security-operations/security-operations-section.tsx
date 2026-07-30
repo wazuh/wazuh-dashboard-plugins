@@ -23,15 +23,14 @@ import {
   getRegulatoryComplianceUrlHome,
 } from '../../utils/navigation';
 
-export type SecurityOperationsSectionProps = Pick<
-  RegulatoryComplianceBadgesProps,
-  'controls'
->;
+export interface SecurityOperationsSectionProps {
+  complianceControls: RegulatoryComplianceBadgesProps['controls'];
+}
 
 /** IT Hygiene and Active Response load lazily; the chips navigate regardless. */
 const SecurityOperationsSectionComponent: React.FC<
   SecurityOperationsSectionProps
-> = ({ controls }) => {
+> = ({ complianceControls }) => {
   const [sectionRef, visible] = useInViewport<HTMLDivElement>();
   const operatingSystems = useItHygieneOperatingSystemsCount(visible);
   const packages = useItHygienePackagesCount(visible);
@@ -110,7 +109,7 @@ const SecurityOperationsSectionComponent: React.FC<
             centerBody
             data-test-subj='home-overview-regulatory-compliance'
           >
-            <RegulatoryComplianceBadges controls={controls} />
+            <RegulatoryComplianceBadges controls={complianceControls} />
           </WidgetGroup>
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -118,6 +117,7 @@ const SecurityOperationsSectionComponent: React.FC<
   );
 };
 
-export const SecurityOperationsSection = React.memo(
-  withErrorBoundary(SecurityOperationsSectionComponent),
-);
+// Annotated: `withErrorBoundary` is untyped, so without this the props
+// would reach every call site as `any`.
+export const SecurityOperationsSection: React.FC<SecurityOperationsSectionProps> =
+  React.memo(withErrorBoundary(SecurityOperationsSectionComponent));

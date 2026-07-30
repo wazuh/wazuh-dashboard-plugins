@@ -21,6 +21,7 @@ const CloudSecuritySectionComponent: React.FC<CloudSecuritySectionProps> = ({
   </div>
 );
 
-export const CloudSecuritySection = React.memo(
-  withErrorBoundary(CloudSecuritySectionComponent),
-);
+// Annotated: `withErrorBoundary` is untyped, so without this the props
+// would reach every call site as `any`.
+export const CloudSecuritySection: React.FC<CloudSecuritySectionProps> =
+  React.memo(withErrorBoundary(CloudSecuritySectionComponent));
