@@ -61,7 +61,7 @@ test('prescanAndMint: leaves an ISO-8601 timestamp fragment untouched (29.000Z)'
 test('prescanAndMintToolContent: never pseudonymizes dotted ECS field-name KEYS', () => {
   const p = new Pseudonymizer();
   const digest = JSON.stringify({
-    tool: 'get_alerts_by_time',
+    tool: 'get_findings_by_time',
     samples: [
       {
         'wazuh.agent.name': 'wazuh-server-01',
@@ -327,6 +327,53 @@ test('applyFieldPolicy: explicit "allow" entry is unaffected by isEscapeHatch', 
   });
   const out = applyFieldPolicy(digest, policy, p, undefined, undefined, true);
   assert.equal(out.samples[0]['data.win.system.computerName'], 'DESKTOP-01');
+});
+
+test('applyFieldPolicy: a "*"-suffixed entry matches the prefix field itself and any subfield', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'wazuh.rule.compliance.*', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  // String values on purpose: applyFieldPolicy's fail-closed anonymize branch (isEscapeHatch:
+  // true) only triggers for `typeof value === 'string'`, so an array-valued sample (the real
+  // shape of these compliance fields) would pass through unchanged in the `else` branch
+  // regardless of whether the wildcard actually matched — that would prove nothing about
+  // resolveFieldEntry's prefix-match logic. Strings are what actually exercise it.
+  const digest = baseDigest({
+    samples: [
+      {
+        'wazuh.rule.compliance.pci_dss': '10.6',
+        'wazuh.rule.compliance.hipaa': '164.308.a.1.ii.D',
+        'wazuh.rule.compliance': 'top-level-value',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, policy, p, undefined, undefined, true);
+  // isEscapeHatch: true (fail-closed) would anonymize anything NOT matched by the wildcard —
+  // these three all stay untouched only if the wildcard entry actually matched each of them.
+  assert.equal(out.samples[0]['wazuh.rule.compliance.pci_dss'], '10.6');
+  assert.equal(
+    out.samples[0]['wazuh.rule.compliance.hipaa'],
+    '164.308.a.1.ii.D',
+  );
+  assert.equal(out.samples[0]['wazuh.rule.compliance'], 'top-level-value');
+});
+
+test('applyFieldPolicy: a "*"-suffixed entry does not match an unrelated sibling field', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'wazuh.rule.compliance.*', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [{ 'wazuh.rule.compliance_other': 'should not match' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p, undefined, undefined, true);
+  // Fail-closed anonymizes it, proving the wildcard did NOT swallow this look-alike field —
+  // "wazuh.rule.compliance_other" is not "wazuh.rule.compliance" or a ".compliance." subfield.
+  assert.notEqual(
+    out.samples[0]['wazuh.rule.compliance_other'],
+    'should not match',
+  );
 });
 
 test('applyFieldPolicy: multi-agg breakdown scrubs each bucket under its own agg field', () => {

@@ -18,7 +18,7 @@ test('deriveSessionId: two conversations with different first messages get diffe
 });
 
 test('deriveSessionId: the same conversation (same first message, growing length) keeps the length component visibly changing but the hash stable', () => {
-  const first = userMessage('Investigate the alert on agent 042');
+  const first = userMessage('Investigate the finding on agent 042');
   const turn1 = deriveSessionId([first]);
   const turn2 = deriveSessionId([
     first,

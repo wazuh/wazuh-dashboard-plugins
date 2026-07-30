@@ -110,11 +110,11 @@ const EXAMPLE_CARDS = [
     title: i18n.translate(
       'wazuhAiAssistant.chat.example.criticalAlerts.title',
       {
-        defaultMessage: 'Critical alerts',
+        defaultMessage: 'Critical findings',
       },
     ),
     question: i18n.translate('wazuhAiAssistant.chat.example.criticalAlerts', {
-      defaultMessage: 'Show me the critical alerts of the last 24 hours',
+      defaultMessage: 'Show me the critical findings of the last 24 hours',
     }),
   },
   {
@@ -1505,11 +1505,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const privacyExplainerText = privacyEnabled
     ? i18n.translate('wazuhAiAssistant.chat.privacy.explainOn', {
         defaultMessage:
-          'Privacy on: hostnames, IP addresses, usernames, process command lines, and alert/rule text are pseudonymized before being sent to the configured AI provider.',
+          'Privacy on: hostnames, IP addresses, usernames, process command lines, and finding/rule text are pseudonymized before being sent to the configured AI provider.',
       })
     : i18n.translate('wazuhAiAssistant.chat.privacy.explainOff', {
         defaultMessage:
-          'Privacy off: hostnames, IP addresses, usernames, process command lines, and alert/rule text are sent to the configured AI provider as-is.',
+          'Privacy off: hostnames, IP addresses, usernames, process command lines, and finding/rule text are sent to the configured AI provider as-is.',
       });
 
   const providerOptions = providers.map(provider => ({

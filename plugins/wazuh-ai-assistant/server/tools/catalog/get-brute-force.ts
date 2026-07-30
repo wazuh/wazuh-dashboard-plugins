@@ -1,46 +1,48 @@
 import { ToolDefinition } from '../types';
 import {
-  alertDigestColumns,
-  alertRowFields,
+  findingDigestColumns,
+  findingRowFields,
   clampLimit,
   limitProperty,
   objectSchema,
   resolveTimeRange,
-  STANDARD_ALERT_SAMPLE_COLUMNS,
-  STANDARD_ALERT_TABLE_COLUMN_FIELDS,
-  STANDARD_ALERT_TABLE_COLUMNS,
+  STANDARD_FINDING_SAMPLE_COLUMNS,
+  STANDARD_FINDING_TABLE_COLUMN_FIELDS,
+  STANDARD_FINDING_TABLE_COLUMNS,
   timeRangeProperties,
 } from './common';
 
 /**
  * Brute-force and repeated-authentication-failure findings, most recent first.
  *
- * Three OR'd signals, each an exact match against a keyword-mapped field: the MITRE T1110 (Brute
- * Force) technique id, the authentication-failure `rule.tags`, and the well-known sshd
- * authentication-failure rule ids (sent as strings, which is correct whether `rule.id` is mapped
- * `keyword` or numeric — `search-alerts-by-rule-id.ts` documents the same reasoning).
+ * Two OR'd signals, each an exact match against a keyword-mapped field: the MITRE T1110 (Brute
+ * Force) technique id, and the `attack.t1110`/`attack.credential-access` `wazuh.rule.tags` pair —
+ * both confirmed against the real rule catalog (`wazuh-threatintel-rules-a`), which carries
+ * genuine T1110-tagged rules (e.g. "AWS GuardDuty brute force attack detected", "Failed
+ * authentication attempt", "User account locked out") even when none has fired in a given
+ * findings index yet.
  *
- * Two tempting fourth signals are deliberately absent. A `*brute*` wildcard is rejected by this
+ * A prior third signal — an exact `terms` match on 4.x-style numeric `wazuh.rule.id` values
+ * (e.g. "5710") — has been removed. In 5.0 `wazuh.rule.id` is always a UUID, so a fixed
+ * numeric-id allowlist can never match; 5.0 has no equivalent "well-known id" concept to replace
+ * it with.
+ *
+ * A tempting fourth signal is deliberately absent: a `*brute*` wildcard is rejected by this
  * plugin's lint (guardrails.ts's leading-wildcard check covers `query_string` bodies) and is
- * expensive cluster-side. An analyzed `match` on `rule.description` for "brute force" is worse
- * than useless: `rule.description` is mapped `keyword`, so a multi-token match only hits a
- * description that is *exactly* "brute force" — measured at 0 hits against data where this tool
+ * expensive cluster-side. An analyzed `match` on `wazuh.rule.title` for "brute force" is worse
+ * than useless: `wazuh.rule.title` is mapped `keyword`, so a multi-token match only hits a
+ * title that is *exactly* "brute force" — measured at 0 hits against data where this tool
  * returns 44 — while reading like a third safety net.
- *
- * The `rule.tags` vocabulary below is the 4.x spelling and has not been confirmed against a
- * populated findings-v5 index. If it turns out to be wrong the tool still works: the T1110 and
- * rule-id clauses carry it, and a wrong tag name matches nothing rather than over-matching.
  */
 export const getBruteForceTool: ToolDefinition = {
   spec: {
     name: 'get_brute_force',
     description:
       'Searches security findings for brute-force / repeated authentication-failure findings ' +
-      'within a time range (MITRE technique T1110, authentication-failure rule tags, or known ' +
-      'authentication-failure rule ids), most recent first.',
+      'within a time range (MITRE technique T1110 or its rule tags), most recent first.',
     parameters: objectSchema({
       limit: limitProperty(
-        'Max number of alerts to return (default 20, max 500).',
+        'Max number of findings to return (default 20, max 500).',
       ),
       ...timeRangeProperties(),
     }),
@@ -60,20 +62,13 @@ export const getBruteForceTool: ToolDefinition = {
               {
                 bool: {
                   should: [
-                    { term: { 'rule.mitre.technique.id': 'T1110' } },
+                    { term: { 'wazuh.rule.mitre.technique.id': 'T1110' } },
                     {
                       terms: {
-                        'rule.tags': [
-                          'authentication_failures',
-                          'authentication_failed',
+                        'wazuh.rule.tags': [
+                          'attack.t1110',
+                          'attack.credential-access',
                         ],
-                      },
-                    },
-                    // Well-known sshd authentication-failure rule ids (see this file's header for
-                    // why an exact `terms` filter is used rather than a description match).
-                    {
-                      terms: {
-                        'rule.id': ['5710', '5712', '5716', '5720', '5760'],
                       },
                     },
                   ],
@@ -90,8 +85,10 @@ export const getBruteForceTool: ToolDefinition = {
     };
   },
   tableSpec: {
-    columns: STANDARD_ALERT_TABLE_COLUMNS,
-    rowFields: alertRowFields(STANDARD_ALERT_TABLE_COLUMN_FIELDS),
+    columns: STANDARD_FINDING_TABLE_COLUMNS,
+    rowFields: findingRowFields(STANDARD_FINDING_TABLE_COLUMN_FIELDS),
   },
-  digest: { sampleColumns: alertDigestColumns(STANDARD_ALERT_SAMPLE_COLUMNS) },
+  digest: {
+    sampleColumns: findingDigestColumns(STANDARD_FINDING_SAMPLE_COLUMNS),
+  },
 };

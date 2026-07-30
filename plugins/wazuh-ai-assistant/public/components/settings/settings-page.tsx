@@ -1074,7 +1074,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 'wazuhAiAssistant.settings.privacy.description',
                 {
                   defaultMessage:
-                    'Control whether alert data is anonymized before reaching the configured AI provider. When privacy mode is off, hostnames, IP addresses, usernames, process command lines, and alert/rule text leave the cluster as-is.',
+                    'Control whether finding data is anonymized before reaching the configured AI provider. When privacy mode is off, hostnames, IP addresses, usernames, process command lines, and finding/rule text leave the cluster as-is.',
                 },
               )}
             />
@@ -1233,7 +1233,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                           placeholder={i18n.translate(
                             'wazuhAiAssistant.settings.privacy.fieldPlaceholder',
                             {
-                              defaultMessage: 'e.g. agent.name',
+                              defaultMessage: 'e.g. wazuh.agent.name',
                             },
                           )}
                           aria-label={i18n.translate(

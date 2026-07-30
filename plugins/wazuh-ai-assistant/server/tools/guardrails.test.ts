@@ -6,6 +6,7 @@ import {
   clampManagerParams,
   clampInt,
 } from './guardrails';
+import { WAZUH_FIELD } from '../../common/wazuh-fields';
 
 /** Minimal shape of a `bool` query after `normalizeMustToFilter` has folded `must` into `filter` --
  * `applySafetyValves` types its returned `body` as `Record<string, unknown>`, so this test-local
@@ -307,7 +308,7 @@ test('lintDsl: rejects multi_terms on a disallowed field', () => {
     aggs: {
       by_src_dst: {
         multi_terms: {
-          terms: [{ field: 'data.srcip' }, { field: 'agent.id' }],
+          terms: [{ field: 'data.srcip' }, { field: WAZUH_FIELD.AGENT_ID }],
           size: 10000,
         },
       },
@@ -328,7 +329,9 @@ test('lintDsl: rejects multi_terms.size over 100', () => {
   const wrapped = {
     query: timeBoundedFilter(),
     aggs: {
-      by_agent: { multi_terms: { terms: [{ field: 'agent.id' }], size: 200 } },
+      by_agent: {
+        multi_terms: { terms: [{ field: WAZUH_FIELD.AGENT_ID }], size: 200 },
+      },
     },
     size: 0,
   };
@@ -346,7 +349,7 @@ test('lintDsl: rejects composite.size over 100', () => {
       c: {
         composite: {
           size: 10000,
-          sources: [{ agent: { terms: { field: 'agent.id' } } }],
+          sources: [{ agent: { terms: { field: WAZUH_FIELD.AGENT_ID } } }],
         },
       },
     },
@@ -367,7 +370,7 @@ test('lintDsl: rejects a nested top_hits.size over 100 (uncapped resource-exhaus
     query: timeBoundedFilter(),
     aggs: {
       by_rule: {
-        terms: { field: 'rule.id', size: 100 },
+        terms: { field: WAZUH_FIELD.RULE_ID, size: 100 },
         aggs: { sample: { top_hits: { size: 10000 } } },
       },
     },
@@ -385,7 +388,7 @@ test('lintDsl: passes a top_hits.size within the cap', () => {
     query: timeBoundedFilter(),
     aggs: {
       by_rule: {
-        terms: { field: 'rule.id', size: 10 },
+        terms: { field: WAZUH_FIELD.RULE_ID, size: 10 },
         aggs: { sample: { top_hits: { size: 3 } } },
       },
     },
@@ -429,7 +432,7 @@ test('lintDsl: passes a date_histogram with a >=1m interval', () => {
 test('lintDsl: passes a clean terms aggregation on an allowlisted field within size cap', () => {
   const wrapped = {
     query: timeBoundedFilter({ gte: 'now-30d', lte: 'now' }),
-    aggs: { top_rules: { terms: { field: 'rule.id', size: 20 } } },
+    aggs: { top_rules: { terms: { field: WAZUH_FIELD.RULE_ID, size: 20 } } },
     size: 0,
   };
   const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
@@ -455,7 +458,7 @@ test('lintDsl: rejects a terms agg on a non-allowlisted (high-cardinality) field
 test('lintDsl: rejects a terms agg size over 100 even on an allowlisted field', () => {
   const wrapped = {
     query: timeBoundedFilter(),
-    aggs: { by_rule: { terms: { field: 'rule.id', size: 500 } } },
+    aggs: { by_rule: { terms: { field: WAZUH_FIELD.RULE_ID, size: 500 } } },
     size: 0,
   };
   const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
@@ -472,12 +475,12 @@ test('lintDsl: rejects more than 5 top-level sibling aggregations', () => {
   const wrapped = {
     query: timeBoundedFilter(),
     aggs: {
-      a: { terms: { field: 'rule.id', size: 10 } },
-      b: { terms: { field: 'rule.id', size: 10 } },
-      c: { terms: { field: 'rule.id', size: 10 } },
-      d: { terms: { field: 'rule.id', size: 10 } },
-      e: { terms: { field: 'rule.id', size: 10 } },
-      f: { terms: { field: 'rule.id', size: 10 } },
+      a: { terms: { field: WAZUH_FIELD.RULE_ID, size: 10 } },
+      b: { terms: { field: WAZUH_FIELD.RULE_ID, size: 10 } },
+      c: { terms: { field: WAZUH_FIELD.RULE_ID, size: 10 } },
+      d: { terms: { field: WAZUH_FIELD.RULE_ID, size: 10 } },
+      e: { terms: { field: WAZUH_FIELD.RULE_ID, size: 10 } },
+      f: { terms: { field: WAZUH_FIELD.RULE_ID, size: 10 } },
     },
     size: 0,
   };
@@ -492,11 +495,11 @@ test('lintDsl: allows exactly 5 top-level sibling aggregations', () => {
   const wrapped = {
     query: timeBoundedFilter(),
     aggs: {
-      a: { terms: { field: 'rule.id', size: 10 } },
-      b: { terms: { field: 'rule.id', size: 10 } },
-      c: { terms: { field: 'rule.id', size: 10 } },
-      d: { terms: { field: 'rule.id', size: 10 } },
-      e: { terms: { field: 'rule.id', size: 10 } },
+      a: { terms: { field: WAZUH_FIELD.RULE_ID, size: 10 } },
+      b: { terms: { field: WAZUH_FIELD.RULE_ID, size: 10 } },
+      c: { terms: { field: WAZUH_FIELD.RULE_ID, size: 10 } },
+      d: { terms: { field: WAZUH_FIELD.RULE_ID, size: 10 } },
+      e: { terms: { field: WAZUH_FIELD.RULE_ID, size: 10 } },
     },
     size: 0,
   };
@@ -512,14 +515,14 @@ test('lintDsl: nested sub-aggregations under a single top-level agg do not count
     query: timeBoundedFilter(),
     aggs: {
       by_rule: {
-        terms: { field: 'rule.id', size: 10 },
+        terms: { field: WAZUH_FIELD.RULE_ID, size: 10 },
         aggs: {
-          a: { terms: { field: 'agent.id', size: 5 } },
-          b: { terms: { field: 'agent.id', size: 5 } },
-          c: { terms: { field: 'agent.id', size: 5 } },
-          d: { terms: { field: 'agent.id', size: 5 } },
-          e: { terms: { field: 'agent.id', size: 5 } },
-          f: { terms: { field: 'agent.id', size: 5 } },
+          a: { terms: { field: WAZUH_FIELD.AGENT_ID, size: 5 } },
+          b: { terms: { field: WAZUH_FIELD.AGENT_ID, size: 5 } },
+          c: { terms: { field: WAZUH_FIELD.AGENT_ID, size: 5 } },
+          d: { terms: { field: WAZUH_FIELD.AGENT_ID, size: 5 } },
+          e: { terms: { field: WAZUH_FIELD.AGENT_ID, size: 5 } },
+          f: { terms: { field: WAZUH_FIELD.AGENT_ID, size: 5 } },
         },
       },
     },
@@ -730,6 +733,100 @@ test('lintDsl still rejects an inverted window written with exclusive bounds', (
     'wazuh-events-v5-*',
   );
   assert.equal(r.ok, false);
+});
+
+// --- numeric range on a keyword field (wazuh.rule.level) ---------------------------------------
+// Wazuh 5.0 re-types `rule.level` from a numeric 0-15 integer to a keyword severity word
+// (informational/low/medium/high/critical). A numeric `range` against a keyword field does not
+// error in OpenSearch -- it silently falls back to lexicographic string comparison, producing a
+// plausible-looking but WRONG answer. This must be actively rejected (proposal open question O1,
+// locked in as "MUST reject"), not left to silently misbehave.
+
+test('lintDsl: rejects a numeric range on the keyword field wazuh.rule.level (gte)', () => {
+  const wrapped = {
+    query: {
+      bool: {
+        filter: [
+          { range: { '@timestamp': { gte: 'now-1d', lte: 'now' } } },
+          { range: { [WAZUH_FIELD.RULE_LEVEL]: { gte: 12 } } },
+        ],
+      },
+    },
+    size: 20,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(result.reason, /keyword/);
+    assert.match(result.reason, /wazuh\.rule\.level/);
+  }
+});
+
+test('lintDsl: rejects a numeric range on wazuh.rule.level even with only an upper bound (lt)', () => {
+  const wrapped = {
+    query: {
+      bool: {
+        filter: [
+          { range: { '@timestamp': { gte: 'now-1d', lte: 'now' } } },
+          { range: { [WAZUH_FIELD.RULE_LEVEL]: { lt: 7 } } },
+        ],
+      },
+    },
+    size: 20,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(result.reason, /keyword/);
+  }
+});
+
+test('lintDsl: a "term" query against wazuh.rule.level with a string severity value is unaffected', () => {
+  const wrapped = {
+    query: {
+      bool: {
+        filter: [
+          { range: { '@timestamp': { gte: 'now-1d', lte: 'now' } } },
+          { term: { [WAZUH_FIELD.RULE_LEVEL]: 'critical' } },
+        ],
+      },
+    },
+    size: 20,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, true, result.ok ? '' : result.reason);
+});
+
+test('lintDsl: a "terms" query against wazuh.rule.level with string severity values is unaffected', () => {
+  const wrapped = {
+    query: {
+      bool: {
+        filter: [
+          { range: { '@timestamp': { gte: 'now-1d', lte: 'now' } } },
+          { terms: { [WAZUH_FIELD.RULE_LEVEL]: ['high', 'critical'] } },
+        ],
+      },
+    },
+    size: 20,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, true, result.ok ? '' : result.reason);
+});
+
+test('lintDsl: a range on a different field (not wazuh.rule.level) is unaffected by this check', () => {
+  const wrapped = {
+    query: {
+      bool: {
+        filter: [
+          { range: { '@timestamp': { gte: 'now-1d', lte: 'now' } } },
+          { range: { 'wazuh.rule.mitre.technique.id': { gte: 'T1000' } } },
+        ],
+      },
+    },
+    size: 20,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, true, result.ok ? '' : result.reason);
 });
 
 // --- clampInt ---------------------------------------------------------------------------------

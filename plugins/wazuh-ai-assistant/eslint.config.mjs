@@ -110,7 +110,7 @@ export default defineConfig([
       // does not control — LLM tool-calling schemas (tool names/params like
       // search_wazuh_data, agent_identifier), provider wire fields
       // (tool_choice, parallel_tool_calls), and OpenSearch DSL/document
-      // fields (track_total_hits, rule.mitre.id). Local variables and
+      // fields (track_total_hits, wazuh.rule.mitre.technique.id). Local variables and
       // declarations stay camelCase-enforced.
       'filenames-simple/naming-convention': 'error',
       camelcase: ['error', { properties: 'never', ignoreDestructuring: true }],

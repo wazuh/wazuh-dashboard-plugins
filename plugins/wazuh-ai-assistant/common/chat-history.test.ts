@@ -44,7 +44,7 @@ function uiAssistant(id: string, content: string): ChatHistoryMessage {
   return { id, role: 'assistant', content, createdAt: Date.now() };
 }
 function toolCall(id: string): ToolCall {
-  return { id, name: 'get_alerts', arguments: {} };
+  return { id, name: 'get_findings', arguments: {} };
 }
 function exchange(toolCallId: string, digestContent?: string): ToolExchange {
   return { toolCall: toolCall(toolCallId), digestContent };
@@ -290,11 +290,11 @@ test('toPersistedMessages: empty input returns empty output', () => {
 test('buildConversationTitle: uses the first USER message, trimmed, ignoring any assistant messages before it', () => {
   const messages: ChatHistoryMessage[] = [
     uiAssistant('a0', 'a stray assistant message somehow first'),
-    uiUser('u1', '  How many critical alerts today?  '),
+    uiUser('u1', '  How many critical findings today?  '),
     uiAssistant('a1', 'answer'),
   ];
   const title = buildConversationTitle(messages, 'Untitled conversation');
-  assert.equal(title, 'How many critical alerts today?');
+  assert.equal(title, 'How many critical findings today?');
 });
 
 test('buildConversationTitle: falls back to the untitled label when there is no user message', () => {
@@ -374,7 +374,7 @@ test('detectManagerAuthError: an answer about authentication failures does not m
 test('detectManagerAuthError: plain unrelated narration does not match', () => {
   assert.equal(
     detectManagerAuthError(
-      'Here are the top 5 critical alerts from the last 24 hours.',
+      'Here are the top 5 critical findings from the last 24 hours.',
     ),
     false,
   );
