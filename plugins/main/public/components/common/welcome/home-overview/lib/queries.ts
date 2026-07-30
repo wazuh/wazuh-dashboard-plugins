@@ -1,10 +1,21 @@
 /* eslint-disable camelcase */
 import { CheckResult } from '../../../../overview/sca/utils/constants';
+import {
+  amazonWebServices,
+  docker,
+  github,
+  googleCloud,
+  microsoftGraphAPI,
+  office365,
+} from '../../../../../utils/applications';
 import { AGG, SCA_RESULT_BUCKET, TOP_N } from './constants';
 import {
+  COMPLIANCE_FRAMEWORK_FIELDS,
   EVENT_DOC_ID_FIELD,
-  FIM_PLATFORM_FIELD,
+  FIM_FILE_MTIME_FIELD,
+  FIM_FILE_PATH_FIELD,
   FINDING_SEVERITY_FIELD,
+  INTEGRATION_NAME_FIELD,
   MITRE_TACTIC_NAME_FIELD,
   MITRE_TACTIC_ID_FIELD,
   MITRE_TECHNIQUE_ID_FIELD,
@@ -15,9 +26,10 @@ import {
   FINDING_SEVERITY_BANDS,
   VULNERABILITY_SEVERITY_BANDS,
   THREAT_ENRICHMENTS_FIELD,
+  THREAT_INTEL_THREAT_TYPE_FIELD,
   THREAT_INTEL_TYPE_FIELD,
   VULNERABILITY_CVE_ID_FIELD,
-  VULNERABILITY_OS_NAME_FIELD,
+  VULNERABILITY_PACKAGE_NAME_FIELD,
   VULNERABILITY_SEVERITY_FIELD,
   VULNERABILITY_SEVERITY_VALUES,
 } from './fields';
@@ -108,6 +120,22 @@ export function buildFindingsOverviewAggs(
   };
 }
 
+/**
+ * Distinct controls implicated per framework: one cardinality agg per framework
+ * field. The number that differentiates the chips, since finding counts tie.
+ */
+export function buildComplianceControlsAgg() {
+  return Object.entries(COMPLIANCE_FRAMEWORK_FIELDS).reduce(
+    (aggs, [frameworkId, field]) => {
+      aggs[`${AGG.complianceControlsPrefix}${frameworkId}`] = {
+        cardinality: { field },
+      };
+      return aggs;
+    },
+    {} as Record<string, unknown>,
+  );
+}
+
 /** Configuration Assessment tiles: Passed/Failed/N-A counts, one search. */
 export function buildSCATilesAgg() {
   return {
@@ -148,14 +176,31 @@ export function buildSCATopBenchmarksAgg(size = TOP_N) {
   };
 }
 
-export function buildFIMTopPlatformsAgg(size = TOP_N) {
-  return buildTopTermsAgg(AGG.fimPlatforms, FIM_PLATFORM_FIELD, size);
+/**
+ * Top 5 most recently modified files, ordered by each path's latest
+ * `file.mtime`. Ranking by `doc_count` instead would only say how many agents
+ * monitor the path (the state index holds one document per agent and path).
+ */
+export function buildFIMTopFilesAgg(size = TOP_N) {
+  return {
+    [AGG.fimTopFiles]: {
+      terms: {
+        field: FIM_FILE_PATH_FIELD,
+        size,
+        order: { [AGG.fimLastModified]: 'desc' },
+      },
+      aggs: {
+        [AGG.fimLastModified]: { max: { field: FIM_FILE_MTIME_FIELD } },
+      },
+    },
+  };
 }
 
-export function buildVulnerabilityTopOsAgg(size = TOP_N) {
+/** Top 5 vulnerable package names. */
+export function buildVulnerabilityTopPackagesAgg(size = TOP_N) {
   return buildTopTermsAgg(
-    AGG.vulnerabilitiesByOs,
-    VULNERABILITY_OS_NAME_FIELD,
+    AGG.vulnerabilitiesByPackage,
+    VULNERABILITY_PACKAGE_NAME_FIELD,
     size,
   );
 }
@@ -175,6 +220,43 @@ export function buildCvesMatchedAgg() {
 export function buildIocMatchesAgg() {
   return {
     [AGG.iocMatches]: { cardinality: { field: EVENT_DOC_ID_FIELD } },
+  };
+}
+
+/**
+ * The integration each Cloud Security card counts, keyed by the app id it links
+ * to. Values match what the module's own data source filters on
+ * (`data-source/pattern/events/*`), so card and dashboard count the same docs.
+ */
+const CLOUD_MODULE_INTEGRATION: Record<string, string> = {
+  [docker.id]: 'docker',
+  // AWS spans several sub-integrations (aws-cloudtrail, aws-guardduty, ...).
+  [amazonWebServices.id]: 'aws*',
+  [googleCloud.id]: 'gcp',
+  [github.id]: 'github',
+  [office365.id]: 'o365',
+  // Microsoft Graph API reads the same Azure integration as the Azure module.
+  [microsoftGraphAPI.id]: 'azure',
+};
+
+/** A wildcard value needs a `wildcard` query; an exact one a `match_phrase`. */
+const integrationFilter = (value: string) =>
+  value.includes('*')
+    ? { wildcard: { [INTEGRATION_NAME_FIELD]: value } }
+    : { match_phrase: { [INTEGRATION_NAME_FIELD]: value } };
+
+export function buildCloudSecurityByModuleAgg() {
+  return {
+    [AGG.cloudSecurityByModule]: {
+      filters: {
+        filters: Object.fromEntries(
+          Object.entries(CLOUD_MODULE_INTEGRATION).map(([appId, value]) => [
+            appId,
+            integrationFilter(value),
+          ]),
+        ),
+      },
+    },
   };
 }
 
@@ -200,4 +282,16 @@ export function buildMalwareFilterAgg() {
  */
 export function buildThreatIntelFeedByTypeAgg(size = TOP_N) {
   return buildTopTermsAgg(AGG.iocFeedByType, THREAT_INTEL_TYPE_FIELD, size);
+}
+
+/**
+ * Threat-type composition, riding the feed-by-type search above: what kind of
+ * threats the catalog covers, where feed-by-type says in what technical form.
+ */
+export function buildThreatIntelByThreatTypeAgg(size = TOP_N) {
+  return buildTopTermsAgg(
+    AGG.threatTypes,
+    THREAT_INTEL_THREAT_TYPE_FIELD,
+    size,
+  );
 }

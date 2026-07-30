@@ -6,7 +6,7 @@ import {
 } from './discover-url';
 
 test('risonEncode: plain string is single-quoted', () => {
-  assert.equal(risonEncode('wazuh-alerts-*'), "'wazuh-alerts-*'");
+  assert.equal(risonEncode('wazuh-findings-v5*'), "'wazuh-findings-v5*'");
 });
 
 test("risonEncode: internal single quote escaped as !'", () => {
@@ -42,13 +42,13 @@ test('risonEncode: full nested query DSL clause', () => {
   const dsl = {
     bool: {
       filter: [{ range: { timestamp: { gte: 'now-24h', lte: 'now' } } }],
-      must: [{ match: { 'rule.level': 12 } }],
+      must: [{ match: { 'wazuh.rule.level': 'medium' } }],
     },
   };
   const out = risonEncode(dsl);
   assert.equal(
     out,
-    "(bool:(filter:!((range:(timestamp:(gte:'now-24h',lte:'now')))),must:!((match:('rule.level':12)))))",
+    "(bool:(filter:!((range:(timestamp:(gte:'now-24h',lte:'now')))),must:!((match:('wazuh.rule.level':'medium')))))",
   );
 });
 

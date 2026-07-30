@@ -8,7 +8,6 @@ import * as navigation from '../../utils/navigation';
 jest.mock('../../utils/navigation', () => ({
   getThreatHuntingUrl: jest.fn(),
   getMitreUrl: jest.fn(),
-  getMitreTechniqueUrl: jest.fn(),
   getVulnerabilityDetectionUrl: jest.fn(),
 }));
 const findingsAvailable = {
@@ -31,7 +30,7 @@ const vulnerabilitiesAvailable = {
   status: 'available' as const,
   data: {
     severity: { critical: 179, high: 5456, medium: 31517, low: 1980 },
-    byOs: [{ key: 'Red Hat Enterprise Linux 9.5', count: 29685 }],
+    byPackage: [{ key: 'openssl', count: 29685 }],
     cvesMatched: 3521,
   },
 };
@@ -56,9 +55,19 @@ describe('ThreatHuntingSection', () => {
     expect(
       screen.getAllByText('Exploit Public-Facing Application').length,
     ).toBeGreaterThan(0);
+    expect(screen.getAllByText('openssl').length).toBeGreaterThan(0);
+  });
+
+  it('renders Top 5 techniques as plain text, not links (intentionally non-interactive)', () => {
+    render(
+      <ThreatHuntingSection
+        findings={findingsAvailable}
+        vulnerabilities={vulnerabilitiesAvailable}
+      />,
+    );
     expect(
-      screen.getAllByText('Red Hat Enterprise Linux 9.5').length,
-    ).toBeGreaterThan(0);
+      screen.getByText('Exploit Public-Facing Application').closest('a'),
+    ).toBeNull();
   });
 
   it('keeps Vulnerability Detection when the search is unavailable', () => {

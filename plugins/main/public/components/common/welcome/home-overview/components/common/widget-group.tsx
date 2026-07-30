@@ -143,7 +143,6 @@ export const WidgetGroupBody: React.FC<WidgetGroupBodyProps> = ({
       ) : (
         <EuiEmptyPrompt
           iconType='alert'
-          paddingSize='s'
           body={<p>{label}</p>}
           actions={
             showManageIndexPatternsLink ? (

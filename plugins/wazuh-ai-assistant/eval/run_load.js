@@ -118,11 +118,11 @@ function parseUsers(raw) {
  */
 const TOOL_CYCLE = [
   { tool: 'get_active_agents', category: 'agents', args: {} },
-  { tool: 'get_critical_alerts', category: 'alerts', args: {} },
-  { tool: 'get_top_rules', category: 'alerts', args: {} },
+  { tool: 'get_critical_findings', category: 'findings', args: {} },
+  { tool: 'get_top_rules', category: 'findings', args: {} },
   {
-    tool: 'search_alerts_by_agent',
-    category: 'alerts',
+    tool: 'search_findings_by_agent',
+    category: 'findings',
     args: { agent_name: 'wazuh-aio' },
   },
 ];
