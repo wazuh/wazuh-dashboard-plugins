@@ -59,7 +59,7 @@ export class WazuhAiAssistantPlugin
     // Exactly one line either way, ENABLED/DISABLED only — never the key material itself.
     // The DISABLED case is a WARN, not info: it means provider API keys sit in the saved-objects
     // index as plaintext, which is a real (if deliberate, backward-compatible) posture an operator
-    // should see rather than have to infer from an info line. Both messages name the OSD keystore
+    // should see rather than have to infer from an info line. Both messages name the keystore
     // FIRST, because that is where this key belongs: `opensearch_dashboards.yml` is world-readable
     // to anyone who can read the config file, whereas the keystore is the platform's own mechanism
     // for exactly this (Wazuh's installer already keeps `opensearch.password` there). Verified on
@@ -67,15 +67,15 @@ export class WazuhAiAssistantPlugin
     // wazuh_ai_assistant.encryptionKey` is picked up here with no yml entry at all.
     if (cipher.enabled) {
       this.logger.info(
-        'wazuhAiAssistant: provider API key encryption at rest is ENABLED (see docs/ENCRYPTION.md).',
+        'wazuhAiAssistant: provider API key encryption at rest is ENABLED.',
       );
     } else {
       this.logger.warn(
         'wazuhAiAssistant: provider API key encryption at rest is DISABLED — provider API keys are ' +
           'stored UNENCRYPTED in the saved-objects index. To enable, set a base64 32-byte key as ' +
-          'wazuh_ai_assistant.encryptionKey via the OSD keystore (recommended: ' +
+          'wazuh_ai_assistant.encryptionKey via the keystore (recommended: ' +
           'opensearch-dashboards-keystore add wazuh_ai_assistant.encryptionKey) or in ' +
-          'opensearch_dashboards.yml; see docs/ENCRYPTION.md.',
+          'opensearch_dashboards.yml.',
       );
     }
 

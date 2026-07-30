@@ -95,7 +95,7 @@ The full security model is documented in `docs/ref/modules/ai-assistant/security
 - **API keys** are never returned by any route (only a `hasApiKey` boolean), never logged, and
   redacted from upstream error echoes. Encryption at rest is opt-in; `enc:v2` binds the ciphertext
   to its saved object via AES-GCM AAD so a blob cannot be moved between providers. See
-  `docs/ENCRYPTION.md` — prefer the OSD keystore for the key.
+  `docs/ENCRYPTION.md` — prefer the keystore for the key.
 - **Concurrency cap**: 5 in-flight chat streams per user, 30 server-wide, and per-provider stall
   timeouts (30 s to first byte, 120 s idle).
 
