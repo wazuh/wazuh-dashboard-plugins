@@ -81,6 +81,9 @@ interface ChatPageProps {
    * never on unmount — by then the turn has been abandoned anyway.
    */
   onGeneratingChange?: (generating: boolean) => void;
+  /** Whether the chat view is the app shell's visible tab (default true). While hidden, the
+   * conversation hash stays out of the URL so a restore can't rewrite `/settings`. */
+  isActive?: boolean;
 }
 
 /**
@@ -262,6 +265,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   onProviderChange,
   onNavigateToSettings,
   onGeneratingChange,
+  isActive = true,
 }) => {
   // `useSyncedState` (public/hooks/use-synced-state.ts) is the `[value, setValue, ref]` pattern
   // used for `messages`, `inputText`, and `activeConversationId` below — see that hook's own doc
@@ -644,7 +648,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         const status = getHttpErrorStatus(restoreError);
         if (status === 404 || status === 403) {
           writeLastConversationId(window.sessionStorage, null);
-          replaceConversationRoute(null);
+          if (isActive) {
+            replaceConversationRoute(null);
+          }
           return;
         }
         setError(
@@ -662,6 +668,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    * next reload/deep link can restore it. `replaceState` (not `push`) because opening a conversation
    * is not a navigation the back button should have to walk back through turn by turn.
    *
+   * The hash is only written while the view is visible (`isActive`), and re-synced when it becomes
+   * visible again — a restore running behind Settings must not rewrite `/settings` (#8820).
+   *
    * Skipped until the mount-time restore above has settled — otherwise this effect's very first run
    * would overwrite the hash it is supposed to read.
    */
@@ -670,8 +679,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       return;
     }
     writeLastConversationId(window.sessionStorage, activeConversationId);
-    replaceConversationRoute(activeConversationId);
-  }, [activeConversationId]);
+    if (isActive) {
+      replaceConversationRoute(activeConversationId);
+    }
+  }, [activeConversationId, isActive]);
 
   // Unmount cleanup: the app shell (application.tsx) now KEEPS this component mounted across a
   // Chat<->Settings tab switch, so unmount means the user really left the app (another dashboard

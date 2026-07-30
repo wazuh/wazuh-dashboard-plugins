@@ -198,6 +198,7 @@ const App: React.FC<{
           >
             <ChatPage
               core={core}
+              isActive={route === 'chat'}
               providers={providers}
               providersLoaded={providersLoaded}
               providersError={providersError}

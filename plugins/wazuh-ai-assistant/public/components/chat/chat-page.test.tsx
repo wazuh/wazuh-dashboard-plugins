@@ -131,7 +131,9 @@ function conversationRecord(
   } as ConversationRecord;
 }
 
-function renderChatPage() {
+function renderChatPage(
+  overrides: Partial<React.ComponentProps<typeof ChatPage>> = {},
+) {
   const core = {
     http: { basePath: { prepend: (path: string) => path } },
     uiSettings: { get: () => false },
@@ -142,17 +144,24 @@ function renderChatPage() {
     overlays: { openConfirm: mockOpenConfirm },
   };
 
-  return render(
-    <ChatPage
-      core={core as never}
-      providers={[PROVIDER]}
-      providersLoaded
-      providersError={null}
-      selectedProviderId={PROVIDER.id}
-      onProviderChange={jest.fn()}
-      onNavigateToSettings={jest.fn()}
-    />,
-  );
+  const props: React.ComponentProps<typeof ChatPage> = {
+    core: core as never,
+    providers: [PROVIDER],
+    providersLoaded: true,
+    providersError: null,
+    selectedProviderId: PROVIDER.id,
+    onProviderChange: jest.fn(),
+    onNavigateToSettings: jest.fn(),
+    ...overrides,
+  };
+
+  const view = render(<ChatPage {...props} />);
+  return {
+    ...view,
+    // Re-renders with the SAME prop identities plus `next`, so only the overridden props change.
+    rerenderWith: (next: Partial<React.ComponentProps<typeof ChatPage>>) =>
+      view.rerender(<ChatPage {...props} {...next} />),
+  };
 }
 
 async function sendMessage(text: string) {
@@ -634,6 +643,39 @@ describe('ChatPage — restoring the open conversation', () => {
     expect(
       window.sessionStorage.getItem('wazuhAiAssistant.lastConversation'),
     ).toBeNull();
+  });
+
+  it('does not write the conversation hash while the chat view is hidden', async () => {
+    window.sessionStorage.setItem(
+      'wazuhAiAssistant.lastConversation',
+      'conv-b',
+    );
+
+    renderChatPage({ isActive: false });
+
+    await waitFor(() =>
+      expect(screen.getByText('earlier question')).toBeInTheDocument(),
+    );
+    expect(window.location.hash).toBe('');
+  });
+
+  it('re-syncs the hash when the chat view becomes active again', async () => {
+    window.sessionStorage.setItem(
+      'wazuhAiAssistant.lastConversation',
+      'conv-b',
+    );
+
+    const view = renderChatPage({ isActive: false });
+    await waitFor(() =>
+      expect(screen.getByText('earlier question')).toBeInTheDocument(),
+    );
+    expect(window.location.hash).toBe('');
+
+    view.rerenderWith({ isActive: true });
+
+    await waitFor(() =>
+      expect(window.location.hash).toBe('#/conversation/conv-b'),
+    );
   });
 });
 
