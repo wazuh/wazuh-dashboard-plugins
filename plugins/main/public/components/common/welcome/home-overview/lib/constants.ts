@@ -19,10 +19,7 @@ export const AGG = {
   scaBenchmarkResult: 'result',
   cloudSecurityByModule: 'cloud_security_by_module',
   fimTopFiles: 'fim_top_files',
-  /**
-   * Latest `file.mtime` inside each `fim_top_files` bucket; the terms agg
-   * orders by it so the list is ranked by recency, not by document count.
-   */
+  /** Latest `file.mtime` per `fim_top_files` bucket; the terms agg orders by it. */
   fimLastModified: 'last_modified',
   vulnerabilitiesByPackage: 'vulnerabilities_by_package',
   cvesMatched: 'cves_matched',
@@ -38,11 +35,7 @@ export const AGG = {
    * top tactic/technique bucket, so links can open the Intelligence resource.
    */
   externalId: 'external_id',
-  /**
-   * Prefix for the per-framework compliance-controls-implicated cardinality
-   * aggs (one per `COMPLIANCE_FRAMEWORK_FIELDS` entry) — see
-   * `buildComplianceControlsAgg`.
-   */
+  /** Prefix of the per-framework controls cardinality aggs, one per framework. */
   complianceControlsPrefix: 'compliance_controls_',
 } as const;
 

@@ -30,9 +30,8 @@ const zoneColor = (pct: number) => {
 };
 
 /**
- * A 0-100 score positioned on a threshold-zoned track (bad/warn/good), used
- * for posture-style scores (Configuration Assessment). No native EUI gauge
- * exists, so this is a small hand-built composition, same pattern as `BarList`.
+ * A 0-100 score marked on a threshold-zoned track (bad/warn/good). Hand-built
+ * because EUI has no gauge.
  */
 export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
   title,

@@ -53,9 +53,8 @@ describe('DistributionBar', () => {
   });
 
   it('gives a single 100%-count segment a fill that actually spans the bar', () => {
-    // Regression: the width must land on the flex item itself. EuiToolTip
-    // wraps the fill in its own element, which is NOT the flex item — sizing
-    // the tooltip's child instead of the flex item renders an invisible fill.
+    // Regression: EuiToolTip wraps the fill, so sizing the tooltip's child
+    // instead of the flex item renders an invisible fill.
     const { container } = render(
       <DistributionBar
         segments={[

@@ -27,11 +27,9 @@ export interface RegulatoryComplianceBadgesProps {
 }
 
 /**
- * Every framework reports the same total findings count (one finding can
- * implicate several frameworks at once), so the chips show distinct controls
- * implicated — the number that actually varies. Each chip is a plain `<a href>`
- * around an `EuiPanel` (which has no native link support) so all frameworks
- * stay reachable in one click regardless of the count's load state.
+ * Chips show distinct controls implicated, not findings: one finding can
+ * implicate several frameworks, so every framework's finding count ties.
+ * `EuiPanel` has no link support, hence the wrapping `<a href>`.
  */
 export const RegulatoryComplianceBadges: React.FC<
   RegulatoryComplianceBadgesProps

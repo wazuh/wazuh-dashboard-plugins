@@ -16,7 +16,7 @@ const available = (data: CountsByKey): DataGroupResult<CountsByKey> => ({
   data,
 });
 
-// This repo doesn't use data-testid; look up elements by data-test-subj.
+// This repo uses data-test-subj, not data-testid.
 const bySubj = (container: HTMLElement, testSubj: string) =>
   container.querySelector(`[data-test-subj="${testSubj}"]`);
 

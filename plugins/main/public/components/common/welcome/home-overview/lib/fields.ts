@@ -25,18 +25,18 @@ export const MITRE_TACTIC_ID_FIELD = 'wazuh.rule.mitre.tactic.id';
 export const MITRE_TECHNIQUE_ID_FIELD = 'wazuh.rule.mitre.technique.id';
 export const MITRE_TECHNIQUE_NAME_FIELD = 'wazuh.rule.mitre.technique.name';
 export const RULE_TITLE_FIELD = 'wazuh.rule.title';
-/** Integration a finding came from; identifies the module that produced it. */
+/** Integration a finding came from, i.e. the module that produced it. */
 export const INTEGRATION_NAME_FIELD = 'wazuh.integration.name';
 export const HOST_OS_NAME_FIELD = 'host.os.name';
 export const PROCESS_NAME_FIELD = 'process.name';
 export const SCA_CHECK_RESULT_FIELD = 'check.result';
 export const SCA_POLICY_NAME_FIELD = 'policy.name';
-/** Monitored-file path on a FIM state document, for the "Top 5 modified files" list. */
+/** Monitored-file path on a FIM state document. */
 export const FIM_FILE_PATH_FIELD = 'file.path';
-/** Last modification time of a monitored file; ranks the "modified files" list. */
+/** Last modification time of a monitored file; ranks the FIM list. */
 export const FIM_FILE_MTIME_FIELD = 'file.mtime';
 export const VULNERABILITY_SEVERITY_FIELD = 'vulnerability.severity';
-/** Package name on a vulnerability state document, for "Top 5 package name". */
+/** Package name on a vulnerability state document. */
 export const VULNERABILITY_PACKAGE_NAME_FIELD = 'package.name';
 /** CVE identifier field; distinct from doc count since one CVE can match many findings/assets. */
 export const VULNERABILITY_CVE_ID_FIELD = 'vulnerability.id';
@@ -75,11 +75,8 @@ export const VULNERABILITY_SEVERITY_VALUES: Partial<
 };
 
 /**
- * Compliance field per regulatory framework (`wazuh.rule.compliance.<key>`).
- * Every framework reports the same total findings count (one finding can
- * implicate several frameworks at once), so the Regulatory Compliance chips
- * instead rank by *distinct controls implicated* — a cardinality agg on this
- * field, one per framework.
+ * Compliance field per framework. The chips count *distinct controls* on these,
+ * since one finding can implicate several frameworks at once.
  */
 export const COMPLIANCE_FRAMEWORK_FIELDS: Record<string, string> = {
   [WAZUH_MODULES_ID.PCI_DSS]: 'wazuh.rule.compliance.pci_dss',

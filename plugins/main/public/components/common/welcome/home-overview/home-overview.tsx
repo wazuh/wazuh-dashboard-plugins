@@ -9,6 +9,7 @@ import { SecurityOperationsSection } from './components/security-operations';
 import { CloudSecuritySection } from './components/cloud-security';
 import { ThreatIntelligenceFeedSection } from './components/threat-intel-feed';
 import {
+  useFindingsBreakdowns,
   useFindingsOverview,
   useThreatIntelEnrichments,
   useVulnerabilityOverview,
@@ -18,10 +19,10 @@ import { withErrorBoundary, withGlobalBreadcrumb } from '../../hocs';
 import { overview } from '../../../../utils/applications';
 
 /**
- * Searches shared by more than one section are run once here: findings on mount,
- * vulnerabilities and threat-intel enrichments once their sections scroll in.
- * Enrichments feed both Malware Detection (feed-by-type) and the Threat Catalog
- * (IOCs tile). Sections owning a single search fetch it themselves.
+ * Searches feeding more than one section run once here: findings on mount, the
+ * rest once their sections scroll in. Enrichments feed Malware Detection
+ * (feed-by-type) and the Threat Catalog (IOCs); the findings breakdowns feed the
+ * Compliance chips and the Cloud Security badges.
  */
 const HomeOverviewBody: React.FC = () => {
   const findings = useFindingsOverview();
@@ -30,6 +31,8 @@ const HomeOverviewBody: React.FC = () => {
   const vulnerabilities = useVulnerabilityOverview(vulnerabilitiesVisible);
   const [enrichmentsRef, enrichmentsVisible] = useInViewport<HTMLDivElement>();
   const threatIntel = useThreatIntelEnrichments(enrichmentsVisible);
+  const [breakdownsRef, breakdownsVisible] = useInViewport<HTMLDivElement>();
+  const breakdowns = useFindingsBreakdowns(breakdownsVisible);
 
   return (
     <>
@@ -59,9 +62,21 @@ const HomeOverviewBody: React.FC = () => {
         threatIntel={threatIntel}
       />
       <EuiSpacer size='l' />
-      <SecurityOperationsSection />
-      <EuiSpacer size='l' />
-      <CloudSecuritySection />
+      <div ref={breakdownsRef}>
+        <SecurityOperationsSection
+          complianceControls={{
+            ...breakdowns,
+            data: breakdowns.data?.complianceControlsByFramework,
+          }}
+        />
+        <EuiSpacer size='l' />
+        <CloudSecuritySection
+          findings={{
+            ...breakdowns,
+            data: breakdowns.data?.cloudSecurityByModule,
+          }}
+        />
+      </div>
     </>
   );
 };

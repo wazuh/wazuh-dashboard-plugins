@@ -43,6 +43,14 @@ export interface FindingsOverview {
   iocMatches?: number;
 }
 
+/** Findings counts the two bottom sections need, from one lazy search. */
+export interface FindingsBreakdowns {
+  /** Findings per Cloud Security module, keyed by app id. */
+  cloudSecurityByModule: CountsByKey;
+  /** Distinct controls implicated per framework, keyed by framework id. */
+  complianceControlsByFramework: CountsByKey;
+}
+
 export interface ScaTilesData {
   passed?: number;
   failed?: number;
@@ -79,10 +87,7 @@ export interface ThreatIntelEnrichments {
   total?: number;
   /** Feed composition by indicator type (the Malware "IOC feed by type" table). */
   feedByType: TopItem[];
-  /**
-   * Catalog composition by threat type (`document.software.type`), top N by
-   * indicator count — the Threat catalog card's composition bar.
-   */
+  /** Catalog composition by threat type (`document.software.type`). */
   byThreatType: TopItem[];
 }
 

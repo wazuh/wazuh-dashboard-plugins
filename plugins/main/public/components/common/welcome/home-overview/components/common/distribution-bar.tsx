@@ -34,11 +34,8 @@ export interface DistributionBarProps {
 }
 
 /**
- * A single proportional stacked bar (one segment per category) with a
- * dot-legend below — the shared visual for any "counts by category"
- * breakdown (agent status, severity distribution, ...). Segments with a
- * `href`/`onClick` stay navigable in the legend, same as the tiles/tables
- * this replaces.
+ * One proportional stacked bar plus a dot-legend below — the shared visual for
+ * any "counts by category" breakdown (agent status, severity, ...).
  */
 export const DistributionBar: React.FC<DistributionBarProps> = ({
   segments,
@@ -98,8 +95,8 @@ export const DistributionBar: React.FC<DistributionBarProps> = ({
         {segments
           .filter(segment => segment.count > 0)
           .map(segment => (
-            // The width% must live on the flex item itself; EuiToolTip's own
-            // wrapper element is not a flex item, so it can't carry the size.
+            // The width% must live on the flex item; EuiToolTip's own wrapper
+            // is not one, so it can't carry the size.
             <div
               key={segment.key}
               style={{

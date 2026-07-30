@@ -12,7 +12,7 @@ export interface FindingSeverityTilesProps {
   /** Distinct data-test-subjs when two tile groups share a page. */
   testSubjPrefix?: string;
   /** When set, each number becomes a link that drills into that band. */
-  onSelect?: (band: SeverityBand) => void;
+  onSelect?: (band: SeverityBand) => string | undefined;
   /** Tooltip content per band, shown only when `onSelect` is set. */
   getTooltip?: (band: SeverityBand) => React.ReactNode;
 }

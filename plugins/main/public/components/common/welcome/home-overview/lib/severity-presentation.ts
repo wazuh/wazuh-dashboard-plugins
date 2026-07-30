@@ -7,10 +7,7 @@ export interface SeverityPresentation {
   color: string;
 }
 
-/**
- * Shared label/color mapping for every severity-band visualization (tiles,
- * distribution bars) so the two never drift apart.
- */
+/** Label and color per band, shared by every severity visualization. */
 export const SEVERITY_PRESENTATION: SeverityPresentation[] = [
   { band: 'critical', label: 'Critical', color: UI_COLOR_STATUS.danger },
   { band: 'high', label: 'High', color: UI_COLOR_STATUS.warning },

@@ -121,10 +121,8 @@ export function buildFindingsOverviewAggs(
 }
 
 /**
- * Distinct controls implicated per regulatory-compliance framework: one
- * cardinality agg per framework field, rides the shared findings search. Every
- * framework reports the same total findings count, so this is the number that
- * actually differentiates the Regulatory Compliance chips.
+ * Distinct controls implicated per framework: one cardinality agg per framework
+ * field. The number that differentiates the chips, since finding counts tie.
  */
 export function buildComplianceControlsAgg() {
   return Object.entries(COMPLIANCE_FRAMEWORK_FIELDS).reduce(
@@ -198,7 +196,7 @@ export function buildFIMTopFilesAgg(size = TOP_N) {
   };
 }
 
-/** Top 5 vulnerable package names for the Vulnerability Detection ranked-bar list. */
+/** Top 5 vulnerable package names. */
 export function buildVulnerabilityTopPackagesAgg(size = TOP_N) {
   return buildTopTermsAgg(
     AGG.vulnerabilitiesByPackage,
@@ -287,11 +285,8 @@ export function buildThreatIntelFeedByTypeAgg(size = TOP_N) {
 }
 
 /**
- * Threat-type composition (top size): a terms agg on `document.software.type`
- * alongside the feed-by-type terms agg above, so the Threat catalog's
- * composition bar rides the same single search — no new round trip. Answers
- * "what kind of threats is this catalog weighted toward", where feed-by-type
- * answers "in what technical form".
+ * Threat-type composition, riding the feed-by-type search above: what kind of
+ * threats the catalog covers, where feed-by-type says in what technical form.
  */
 export function buildThreatIntelByThreatTypeAgg(size = TOP_N) {
   return buildTopTermsAgg(

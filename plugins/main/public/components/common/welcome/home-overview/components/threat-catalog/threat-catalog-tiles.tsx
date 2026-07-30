@@ -3,12 +3,11 @@ import { StatTileGroup, StatTileSpec } from '../common';
 import { DataGroupResult } from '../../interfaces/data-group';
 
 export interface ThreatCatalogTilesProps {
-  iocs: DataGroupResult<number>;
-  cvesMatched: DataGroupResult<number>;
+  iocs: DataGroupResult<number | undefined>;
+  cvesMatched: DataGroupResult<number | undefined>;
 }
 
-// IOCs and CVEs matched are reference-only entities (a catalog of known
-// threats, not detection content), so neither tile carries an `onSelect`.
+// Reference-only entities (a catalog, not detection content): no `onSelect`.
 const TILES: ReadonlyArray<StatTileSpec<keyof ThreatCatalogTilesProps>> = [
   { key: 'iocs', label: 'IOCs', testSubj: 'threat-catalog-tile-iocs' },
   {

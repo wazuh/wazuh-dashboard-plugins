@@ -14,7 +14,7 @@ export interface ThreatTypeCompositionProps {
   byThreatType: DataGroupResult<TopItem[]>;
 }
 
-/** Short tokens in these terms are acronyms (`cc`, `c2`, `apt`), so they upcase. */
+/** Short tokens in these terms are acronyms (`cc`, `c2`, `apt`). */
 const ACRONYM_MAX_LENGTH = 3;
 
 function threatTypeLabel(key: string): string {
@@ -31,11 +31,7 @@ function threatTypeLabel(key: string): string {
   return [first.charAt(0).toUpperCase() + first.slice(1), ...rest].join(' ');
 }
 
-/**
- * Threat types have no severity or ordering semantics, so they take the
- * categorical colorblind-safe palette in rank order rather than any of the
- * status colors used by the severity/agent-status bars.
- */
+/** Threat types carry no severity, so they take the categorical palette. */
 const PALETTE = euiPaletteColorBlind();
 
 export const ThreatTypeComposition: React.FC<ThreatTypeCompositionProps> = ({

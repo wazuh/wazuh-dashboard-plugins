@@ -5,11 +5,13 @@ import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensea
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
 import { WidgetGroup, StatTile, TabNumber, SectionHeader } from '../common';
 import { ItHygieneTiles } from './it-hygiene-tiles';
-import { RegulatoryComplianceBadges } from './regulatory-compliance-badges';
+import {
+  RegulatoryComplianceBadges,
+  RegulatoryComplianceBadgesProps,
+} from './regulatory-compliance-badges';
 import { useInViewport } from '../../../../hooks';
 import {
   useActiveResponseOverview,
-  useComplianceControls,
   useItHygieneOperatingSystemsCount,
   useItHygienePackagesCount,
   useItHygieneServicesCount,
@@ -21,15 +23,21 @@ import {
   getRegulatoryComplianceUrlHome,
 } from '../../utils/navigation';
 
-/** Every widget here loads lazily; the Compliance chips navigate regardless. */
-const SecurityOperationsSectionComponent: React.FC = () => {
+export type SecurityOperationsSectionProps = Pick<
+  RegulatoryComplianceBadgesProps,
+  'controls'
+>;
+
+/** IT Hygiene and Active Response load lazily; the chips navigate regardless. */
+const SecurityOperationsSectionComponent: React.FC<
+  SecurityOperationsSectionProps
+> = ({ controls }) => {
   const [sectionRef, visible] = useInViewport<HTMLDivElement>();
   const operatingSystems = useItHygieneOperatingSystemsCount(visible);
   const packages = useItHygienePackagesCount(visible);
   const users = useItHygieneUsersCount(visible);
   const services = useItHygieneServicesCount(visible);
   const activeResponse = useActiveResponseOverview(visible);
-  const complianceControls = useComplianceControls(visible);
 
   return (
     <div ref={sectionRef}>
@@ -102,7 +110,7 @@ const SecurityOperationsSectionComponent: React.FC = () => {
             centerBody
             data-test-subj='home-overview-regulatory-compliance'
           >
-            <RegulatoryComplianceBadges controls={complianceControls} />
+            <RegulatoryComplianceBadges controls={controls} />
           </WidgetGroup>
         </EuiFlexItem>
       </EuiFlexGroup>

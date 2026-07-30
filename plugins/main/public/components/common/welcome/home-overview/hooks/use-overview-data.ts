@@ -70,8 +70,8 @@ import {
 } from '../services/security-analytics.service';
 import {
   AgentStatus,
-  CountsByKey,
   FimOverview,
+  FindingsBreakdowns,
   FindingsOverview,
   ScaOverview,
   ThreatIntelEnrichments,
@@ -282,49 +282,34 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
 }
 
 /**
- * Findings per Cloud Security module (last 24h) for the card badges. Its own
- * lazy search rather than a rider on the on-mount findings batch, since the
- * section it feeds is the last one on the page.
+ * Findings (last 24h) broken down per Cloud Security module and per compliance
+ * framework, for the two bottom sections. One lazy search for both: every
+ * `useAggregationGroup` costs an index-pattern lookup on mount even while
+ * disabled, and neither agg needs to weigh down the on-mount batch.
  */
-export function useCloudSecurityFindings(
+export function useFindingsBreakdowns(
   enabled: boolean,
-): DataGroupResult<CountsByKey> {
-  return useAggregationGroup<CountsByKey>({
+): DataGroupResult<FindingsBreakdowns> {
+  return useAggregationGroup<FindingsBreakdowns>({
     DataSource: OverviewDataSource,
     createRepository: () => new FindingsDataSourceRepository(),
     enabled,
-    label: 'Cloud security findings',
+    label: 'Findings breakdowns',
     fetch: async fetchData => {
       const response = await fetchData({
-        aggs: buildCloudSecurityByModuleAgg(),
+        aggs: {
+          ...buildCloudSecurityByModuleAgg(),
+          ...buildComplianceControlsAgg(),
+        },
         dateRange: LAST_24H,
         pagination: NO_HITS,
       });
-      return mapCloudSecurityByModule(response?.aggregations);
-    },
-  });
-}
-
-/**
- * Distinct controls implicated per regulatory-compliance framework (last 24h)
- * for the Compliance chips. One cardinality agg per framework, so like the
- * cloud counts above it waits for its below-the-fold section.
- */
-export function useComplianceControls(
-  enabled: boolean,
-): DataGroupResult<CountsByKey> {
-  return useAggregationGroup<CountsByKey>({
-    DataSource: OverviewDataSource,
-    createRepository: () => new FindingsDataSourceRepository(),
-    enabled,
-    label: 'Regulatory compliance',
-    fetch: async fetchData => {
-      const response = await fetchData({
-        aggs: buildComplianceControlsAgg(),
-        dateRange: LAST_24H,
-        pagination: NO_HITS,
-      });
-      return mapComplianceControls(response?.aggregations);
+      return {
+        cloudSecurityByModule: mapCloudSecurityByModule(response?.aggregations),
+        complianceControlsByFramework: mapComplianceControls(
+          response?.aggregations,
+        ),
+      };
     },
   });
 }
@@ -508,11 +493,9 @@ export function useVulnerabilityOverview(
 }
 
 /**
- * Threat-intel enrichments catalog: the total IOC count (the "IOCs" tile), the
- * feed composition by indicator type (Malware Detection's "IOC feed by type")
- * and the composition by threat type (the Threat catalog card), in one search
- * over `wazuh-threatintel-enrichments*`. Current-state, so no time range.
- * Shared by the Endpoint Security and Threat Intelligence Feed sections.
+ * Threat-intel enrichments catalog in one current-state search: total IOCs, the
+ * composition by indicator type and by threat type. Shared by the Endpoint
+ * Security and Threat Intelligence Feed sections.
  */
 export function useThreatIntelEnrichments(
   enabled: boolean,

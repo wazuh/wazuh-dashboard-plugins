@@ -8,10 +8,7 @@ export interface ScaTilesProps {
   tiles: ScaTilesData;
 }
 
-/**
- * Passed/Failed/N-A counts. The overall score has its own visual (`ScoreGauge`)
- * immediately below, so it isn't repeated as a fourth tile here.
- */
+/** Passed/Failed/N-A counts; the score has its own `ScoreGauge` below. */
 export const ScaTiles: React.FC<ScaTilesProps> = ({ tiles }) => (
   <EuiFlexGroup gutterSize='m' responsive={false} wrap>
     <EuiFlexItem>

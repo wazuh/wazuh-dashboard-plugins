@@ -26,9 +26,8 @@ export interface DualBarListProps {
 const LABEL_MAX_WIDTH = 150;
 
 /**
- * A ranked list of pass/fail dual-segment bars (e.g. SCA benchmarks), one row
- * per item: label, a two-color bar, and the resulting score. Same grid layout
- * as `BarList`, so the two read as one family of ranked-bar visualizations.
+ * Ranked pass/fail bars (e.g. SCA benchmarks): label, two-color bar, score.
+ * Same grid as `BarList`, so both read as one family.
  */
 export const DualBarList: React.FC<DualBarListProps> = ({
   items,

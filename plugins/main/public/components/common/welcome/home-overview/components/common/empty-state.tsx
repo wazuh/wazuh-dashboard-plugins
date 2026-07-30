@@ -4,22 +4,18 @@ import { EuiEmptyPrompt, EuiIcon, IconSize } from '@elastic/eui';
 export interface EmptyStateProps {
   message: React.ReactNode;
   iconType?: string;
-  /** `EuiEmptyPrompt` hardcodes `iconType` to a fixed "xxl" icon; passing a
-   * pre-sized `EuiIcon` via its `icon` prop is the only way around that. */
+  /** `EuiEmptyPrompt` forces `iconType` to "xxl"; only its `icon` prop resizes. */
   iconSize?: IconSize;
-  /** Reserves height so a widget with no data doesn't collapse next to a sibling that has content. */
+  /** Reserved height, so an empty widget doesn't collapse beside a full one. */
   minHeight?: number;
-  /** Merged with the centering styles — e.g. `{ gridColumn: '1 / -1' }` to span a grid parent. */
+  /** Merged with the centering styles, e.g. to span a grid parent. */
   style?: React.CSSProperties;
   ['data-test-subj']?: string;
 }
 
 /**
- * Shared "genuinely no data" treatment for ranked lists (`BarList`,
- * `DualBarList`, `DistributionBar`, `TopNTable`) — distinct from
- * `WidgetGroupBody`'s `alert`-icon unavailable/error states, which mean
- * something's actually wrong. `minHeight` keeps a widget with zero results
- * visually balanced next to a sibling panel that has a full 5-item list.
+ * The "no data" treatment for ranked lists, distinct from `WidgetGroupBody`'s
+ * `alert`-icon states, which mean something is actually wrong.
  */
 export const EmptyState: React.FC<EmptyStateProps> = ({
   message,

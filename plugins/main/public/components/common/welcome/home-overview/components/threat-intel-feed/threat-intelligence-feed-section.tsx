@@ -21,7 +21,7 @@ import { getIntegrationsUrl } from '../../utils/navigation';
 export interface ThreatIntelligenceFeedSectionProps {
   /** Shared vulnerabilities search; provides the CVEs-matched tile. */
   vulnerabilities: ReturnType<typeof useVulnerabilityOverview>;
-  /** Shared threat-intel enrichments catalog; provides the IOCs tile and the threat-type composition. */
+  /** Shared enrichments catalog: the IOCs tile and the threat-type bar. */
   threatIntel: DataGroupResult<ThreatIntelEnrichments>;
 }
 
