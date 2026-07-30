@@ -66,22 +66,24 @@ const TOOL_ARGS = {
   // Original 6 (production)
   get_active_agents: {},
   get_disconnected_agents: {},
-  get_critical_alerts: {},
-  search_alerts_by_agent: { agent_name: 'wazuh-aio' },
+  get_critical_findings: {},
+  search_findings_by_agent: { agent_name: 'wazuh-aio' },
   get_top_rules: {},
   get_critical_vulnerabilities: {},
 
-  // General alert search / summary
-  get_alerts_by_time: {},
+  // General finding search / summary
+  get_findings_by_time: {},
   get_brute_force: {},
   get_security_summary: {},
   get_suspicious_powershell: {},
-  search_alerts_by_rule_id: { rule_id: 5710 },
-  search_alerts_by_rule_group: { rule_group: 'sshd' },
-  get_pci_dss_alerts: {},
+  search_findings_by_rule_title: {
+    rule_title: 'Wazuh Rootcheck - Rootkit or malware detected',
+  },
+  search_findings_by_rule_tag: { rule_tag: 'sshd' },
+  get_pci_dss_findings: {},
   get_pci_dss_summary: {},
-  search_alerts_by_multiple_agents: { agent_names: ['wazuh-aio'] },
-  search_alerts_by_os: { os_name: 'Ubuntu' },
+  search_findings_by_multiple_agents: { agent_names: ['wazuh-aio'] },
+  search_findings_by_os: { os_name: 'Ubuntu' },
 
   // Vulnerabilities (get_solved_vulnerabilities retired in the 5.0 port)
   get_vulnerabilities: {},
@@ -92,7 +94,7 @@ const TOOL_ARGS = {
   get_fim_files: {},
   get_sca_results: { agent_id: '000' },
   get_sca_checks: { agent_id: '000', policy_id: 'cis_ubuntu22-04' },
-  get_mitre_alerts: {},
+  get_mitre_findings: {},
   get_mitre_summary: {},
 
   // Syscollector inventory
@@ -124,27 +126,27 @@ const TOOL_ARGS = {
 const TOOL_NAMES = [
   'get_active_agents',
   'get_disconnected_agents',
-  'get_critical_alerts',
-  'search_alerts_by_agent',
+  'get_critical_findings',
+  'search_findings_by_agent',
   'get_top_rules',
   'get_critical_vulnerabilities',
-  'get_alerts_by_time',
+  'get_findings_by_time',
   'get_brute_force',
   'get_security_summary',
   'get_suspicious_powershell',
-  'search_alerts_by_rule_id',
-  'search_alerts_by_rule_group',
-  'get_pci_dss_alerts',
+  'search_findings_by_rule_title',
+  'search_findings_by_rule_tag',
+  'get_pci_dss_findings',
   'get_pci_dss_summary',
-  'search_alerts_by_multiple_agents',
-  'search_alerts_by_os',
+  'search_findings_by_multiple_agents',
+  'search_findings_by_os',
   'get_vulnerabilities',
   'get_vulnerabilities_by_agent',
   'get_vulnerability_by_cve',
   'get_fim_files',
   'get_sca_results',
   'get_sca_checks',
-  'get_mitre_alerts',
+  'get_mitre_findings',
   'get_mitre_summary',
   'get_agent_os',
   'get_agent_packages',
@@ -166,27 +168,27 @@ const TOOL_NAMES = [
 const TOOL_CATEGORY = {
   get_active_agents: 'agents',
   get_disconnected_agents: 'agents',
-  get_critical_alerts: 'alerts',
-  search_alerts_by_agent: 'alerts',
-  get_top_rules: 'alerts',
+  get_critical_findings: 'findings',
+  search_findings_by_agent: 'findings',
+  get_top_rules: 'findings',
   get_critical_vulnerabilities: 'vulnerabilities',
-  get_alerts_by_time: 'alerts',
-  get_brute_force: 'alerts',
-  get_security_summary: 'alerts',
-  get_suspicious_powershell: 'alerts',
-  search_alerts_by_rule_id: 'alerts',
-  search_alerts_by_rule_group: 'alerts',
-  get_pci_dss_alerts: 'compliance',
+  get_findings_by_time: 'findings',
+  get_brute_force: 'findings',
+  get_security_summary: 'findings',
+  get_suspicious_powershell: 'findings',
+  search_findings_by_rule_title: 'findings',
+  search_findings_by_rule_tag: 'findings',
+  get_pci_dss_findings: 'compliance',
   get_pci_dss_summary: 'compliance',
-  search_alerts_by_multiple_agents: 'alerts',
-  search_alerts_by_os: 'alerts',
+  search_findings_by_multiple_agents: 'findings',
+  search_findings_by_os: 'findings',
   get_vulnerabilities: 'vulnerabilities',
   get_vulnerabilities_by_agent: 'vulnerabilities',
   get_vulnerability_by_cve: 'vulnerabilities',
   get_fim_files: 'fim',
   get_sca_results: 'sca',
   get_sca_checks: 'sca',
-  get_mitre_alerts: 'mitre',
+  get_mitre_findings: 'mitre',
   get_mitre_summary: 'mitre',
   get_agent_os: 'inventory',
   get_agent_packages: 'inventory',
@@ -590,8 +592,8 @@ async function main() {
     report('settings_routes_smoke', ok, reasons);
   }
 
-  // --- privacy_on_pseudonymization: get_alerts_by_time with privacy:{enabled:true, map:[]}.
-  // get_alerts_by_time rather than get_active_agents: a stack with no enrolled agents beyond the
+  // --- privacy_on_pseudonymization: get_findings_by_time with privacy:{enabled:true, map:[]}.
+  // get_findings_by_time rather than get_active_agents: a stack with no enrolled agents beyond the
   // excluded pseudo-agent 000 returns zero rows from the agents tools, leaving nothing to
   // pseudonymize. The findings index carries data either way, and its digest samples carry
   // "wazuh.agent.name" -- a plain FIELD_POLICY_DEFAULTS entry (kind HOST) that anonymizes its value.
@@ -606,7 +608,7 @@ async function main() {
         BASE_URL,
         cookies,
         providerId,
-        '[[route:alerts]] What alerts fired recently? [[mock:get_alerts_by_time:{}]]',
+        '[[route:findings]] What findings fired recently? [[mock:get_findings_by_time:{}]]',
         { privacy: { enabled: true, map: [] } },
       );
 
@@ -638,7 +640,7 @@ async function main() {
       // DERIVED from that entry rather than hard-coded.
       //
       // Asserting a specific host name here would only hold while the findings index contained
-      // exactly ONE agent: with several, `get_alerts_by_time`'s 20-most-recent window may not
+      // exactly ONE agent: with several, `get_findings_by_time`'s 20-most-recent window may not
       // include that host, failing the gate for a reason unrelated to privacy. Deriving from the
       // map keeps every property below identical — the real value must be minted, must NOT reach
       // the digest or the provider, and MUST still reach the local table — while staying
@@ -668,7 +670,7 @@ async function main() {
       // so the findings digest anonymizes its value to HOST_n out of the box -- no policy
       // modification required.
       const toolCallEvent = toolCallEvents.find(
-        event => event.toolCall.name === 'get_alerts_by_time',
+        event => event.toolCall.name === 'get_findings_by_time',
       );
       const digestEvent = toolCallEvent
         ? digestEvents.find(
@@ -677,7 +679,7 @@ async function main() {
         : undefined;
       if (!digestEvent) {
         reasons.push(
-          'expected a digest event correlated to the get_alerts_by_time tool_call, got none',
+          'expected a digest event correlated to the get_findings_by_time tool_call, got none',
         );
       } else {
         if (realHostValue && digestEvent.content.includes(realHostValue)) {
@@ -725,7 +727,7 @@ async function main() {
       // check isn't possible with this harness; see eval/README.md's privacy section.
       if (!toolCallEvent) {
         reasons.push(
-          'expected a tool_call event for get_alerts_by_time, got none',
+          'expected a tool_call event for get_findings_by_time, got none',
         );
       } else if (JSON.stringify(toolCallEvent.toolCall.arguments) !== '{}') {
         reasons.push(
@@ -757,7 +759,7 @@ async function main() {
         BASE_URL,
         cookies,
         providerId,
-        '[[route:alerts]] What alerts fired recently? [[mock:get_alerts_by_time:{}]]',
+        '[[route:findings]] What findings fired recently? [[mock:get_findings_by_time:{}]]',
       );
       const errorEvents = events.filter(
         event => event && event.type === 'error',
@@ -825,7 +827,7 @@ async function main() {
         BASE_URL,
         cookies,
         providerId,
-        '[[route:alerts]] And what fired before that? [[mock:get_alerts_by_time:{}]]',
+        '[[route:findings]] And what fired before that? [[mock:get_findings_by_time:{}]]',
         { privacy: { enabled: true, map: mintedEntries } },
       );
       const errorEvents = events.filter(
@@ -875,8 +877,8 @@ async function main() {
   }
 
   // --- privacy_new_fields_no_leak: widens the same no-leak pattern as
-  // privacy_on_pseudonymization above to the alert investigation fields
-  // (server/tools/catalog/common.ts's ALERT_DIGEST_EXTRA_COLUMNS), which must all be
+  // privacy_on_pseudonymization above to the finding investigation fields
+  // (server/tools/catalog/common.ts's FINDING_DIGEST_EXTRA_COLUMNS), which must all be
   // classified in the field policy. `data.dstuser` is chosen because a live population
   // probe measured it at ~90% over a 7-day window,
   // the most likely of the new fields to actually appear in a live 5-row digest sample -- but this
@@ -898,7 +900,7 @@ async function main() {
         BASE_URL,
         cookies,
         providerId,
-        '[[route:alerts]] Which users had sessions closed in the last 24 hours? [[mock:get_alerts_by_time:{}]]',
+        '[[route:findings]] Which users had sessions closed in the last 24 hours? [[mock:get_findings_by_time:{}]]',
       );
       const offDigest = offEvents.find(
         event => event && event.type === 'digest',
@@ -918,7 +920,7 @@ async function main() {
           BASE_URL,
           cookies,
           providerId,
-          '[[route:alerts]] Which users had sessions closed in the last 24 hours? [[mock:get_alerts_by_time:{}]]',
+          '[[route:findings]] Which users had sessions closed in the last 24 hours? [[mock:get_findings_by_time:{}]]',
           { privacy: { enabled: true, map: [] } },
         );
         const errorEvents = onEvents.filter(

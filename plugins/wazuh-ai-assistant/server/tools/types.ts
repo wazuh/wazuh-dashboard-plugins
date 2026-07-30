@@ -24,7 +24,7 @@ export interface ManagerRequest {
 export type ToolRequest = IndexerRequest | ManagerRequest;
 
 export interface ToolTableColumnSpec {
-  /** Dot-path into a normalized result row (e.g. "agent.name", "rule.level"). */
+  /** Dot-path into a normalized result row (e.g. "wazuh.agent.name", "wazuh.rule.level"). */
   field: string;
   label: string;
   /** Marks this column for severity-badge rendering in the client's ResultTable. */

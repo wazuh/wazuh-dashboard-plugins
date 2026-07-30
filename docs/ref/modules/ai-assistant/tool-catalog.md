@@ -2,7 +2,7 @@
 
 The assistant answers questions exclusively through a fixed catalog of **29 read-only tools**.
 There are **no mutating tools**: every tool is read-tier, and there is no code-execution sink.
-The worst an injected instruction (for example, text smuggled in through an ingested alert) can
+The worst an injected instruction (for example, text smuggled in through an ingested finding) can
 achieve is another read the requesting user could already perform.
 
 ## How tools are defined
@@ -17,8 +17,8 @@ rearchitecting.
 
 Key properties:
 
-- **Typed parameters** with enums and clamps (`agent_identifier`, `min_severity`,
-  `time_range {gte, lte}` date-math, `limit` ≤ 500).
+- **Typed parameters** with enums and clamps (`agent_identifier`, `severity` +
+  `severity_comparison`, `time_range {gte, lte}` date-math, `limit` ≤ 500).
 - **The tool definition shapes the result table, never the model** — each tool's `tableSpec`
   declares the columns; the executor maps hits through the declared field paths. Rendering is
   deterministic across providers.
@@ -27,17 +27,17 @@ Key properties:
 
 ## The 29 tools
 
-| Category                 | Tools                                                                                                                                                                                                                                                                                |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Agents                   | `get_active_agents`, `get_disconnected_agents`                                                                                                                                                                                                                                       |
-| Alerts                   | `get_critical_alerts`, `get_alerts_by_time`, `get_top_rules`, `get_security_summary`, `get_brute_force`, `get_suspicious_powershell`, `search_alerts_by_agent`, `search_alerts_by_multiple_agents`, `search_alerts_by_os`, `search_alerts_by_rule_group`, `search_alerts_by_rule_id` |
-| Vulnerabilities          | `get_vulnerabilities`, `get_critical_vulnerabilities`, `get_vulnerabilities_by_agent`, `get_vulnerability_by_cve`                                                                                                                                                                    |
-| FIM                      | `get_fim_files`                                                                                                                                                                                                                                                                      |
-| SCA                      | `get_sca_results`, `get_sca_checks`                                                                                                                                                                                                                                                  |
-| MITRE ATT&CK             | `get_mitre_alerts`, `get_mitre_summary`                                                                                                                                                                                                                                              |
-| Inventory (syscollector) | `get_agent_os`, `get_agent_packages`, `get_agent_ports`, `get_agent_processes`                                                                                                                                                                                                       |
-| Compliance               | `get_pci_dss_alerts`, `get_pci_dss_summary`                                                                                                                                                                                                                                          |
-| Free search              | `search_wazuh_data` (the escape hatch)                                                                                                                                                                                                                                               |
+| Category                 | Tools                                                                                                                                                                                                                                                                                               |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Agents                   | `get_active_agents`, `get_disconnected_agents`                                                                                                                                                                                                                                                      |
+| Findings                 | `get_critical_findings`, `get_findings_by_time`, `get_top_rules`, `get_security_summary`, `get_brute_force`, `get_suspicious_powershell`, `search_findings_by_agent`, `search_findings_by_multiple_agents`, `search_findings_by_os`, `search_findings_by_rule_tag`, `search_findings_by_rule_title` |
+| Vulnerabilities          | `get_vulnerabilities`, `get_critical_vulnerabilities`, `get_vulnerabilities_by_agent`, `get_vulnerability_by_cve`                                                                                                                                                                                   |
+| FIM                      | `get_fim_files`                                                                                                                                                                                                                                                                                     |
+| SCA                      | `get_sca_results`, `get_sca_checks`                                                                                                                                                                                                                                                                 |
+| MITRE ATT&CK             | `get_mitre_findings`, `get_mitre_summary`                                                                                                                                                                                                                                                           |
+| Inventory (syscollector) | `get_agent_os`, `get_agent_packages`, `get_agent_ports`, `get_agent_processes`                                                                                                                                                                                                                      |
+| Compliance               | `get_pci_dss_findings`, `get_pci_dss_summary`                                                                                                                                                                                                                                                       |
+| Free search              | `search_wazuh_data` (the escape hatch)                                                                                                                                                                                                                                                              |
 
 On Wazuh 5.0 the tools read from the 5.0 data layer: the `wazuh-events-v5-*` event indices,
 `wazuh-findings-v5-*`, and the `wazuh-states-*` state indices (vulnerabilities, FIM, SCA,
@@ -61,7 +61,7 @@ prefer 3–5. The router (`server/tools/router.ts`) therefore never exposes the 
 single call:
 
 1. **Stage 1 — route**: one cheap call with a single synthetic `route_question` tool picks 1–2
-   categories from a ten-entry menu (`agents`, `alerts`, `vulnerabilities`, `fim`, `sca`,
+   categories from a ten-entry menu (`agents`, `findings`, `vulnerabilities`, `fim`, `sca`,
    `mitre`, `inventory`, `compliance`, `free_search`, `general`).
 2. **Stage 2 — act**: the model is re-invoked with only the routed categories' tools. The escape
    hatch stays reachable when routed to `free_search`; `general` answers without touching Wazuh
@@ -93,6 +93,12 @@ retry):
 - `script` anywhere (query, sort, aggs, `script_fields`, `runtime_mappings`) — hard block.
 - `regexp` blocked; `wildcard`/`query_string` values with leading `*`/`?` blocked.
 - Date `range` on time fields must be bounded on both sides; span ≤ 90 days.
+- A numeric `range` against a keyword-typed severity field (currently `wazuh.rule.level`,
+  whose values are categorical severity words such as `critical`/`high`/`medium`/`low`) is
+  rejected outright: OpenSearch does not error on a numeric range against a keyword field, it
+  silently falls back to lexicographic string comparison — a real but WRONG result (e.g.
+  `gte: "medium"` excludes `"high"`, since "h" sorts before "m"), which would look like a
+  legitimate answer to the model.
 - Bucket aggregations only on a vetted low-cardinality field allowlist; bucket `size` ≤ 100;
   at most 5 top-level aggregations.
 - Index pattern checked against the allowlist before anything else.
