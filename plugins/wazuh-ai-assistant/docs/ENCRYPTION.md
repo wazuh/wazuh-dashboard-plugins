@@ -4,10 +4,10 @@ Provider API keys (`wazuh-ai-assistant-provider` saved object's `apiKey` attribu
 returned by this plugin's public API — `GET/POST/PUT /api/wazuh_ai_assistant/providers` only ever
 expose a `hasApiKey` boolean (see `server/routes/settings.ts`'s `toSummary`). But the saved object
 itself is stored in the `.kibana`/saved-objects index, which is readable in plaintext by anyone
-with direct access to that index (e.g. via the OpenSearch API, snapshots, or index backups).
+with direct access to that index (e.g. via the Wazuh indexer API, snapshots, or index backups).
 
-This plugin can encrypt `apiKey` at rest with AES-256-GCM using a key supplied through OpenSearch
-Dashboards' own config file — no new npm dependency, no separate secrets service, Node's builtin
+This plugin can encrypt `apiKey` at rest with AES-256-GCM using a key supplied through Wazuh dashboard
+own config file — no new npm dependency, no separate secrets service, Node's builtin
 `crypto` module only.
 
 ## Enabling it
@@ -16,7 +16,7 @@ Dashboards' own config file — no new npm dependency, no separate secrets servi
    ```
    openssl rand -base64 32
    ```
-2. Store it as `wazuh_ai_assistant.encryptionKey`. **Prefer the OpenSearch Dashboards keystore** —
+2. Store it as `wazuh_ai_assistant.encryptionKey`. **Prefer the keystore** —
    the key then never sits in a readable config file:
 
    ```
@@ -40,7 +40,7 @@ Dashboards' own config file — no new npm dependency, no separate secrets servi
    `configPath` (`opensearch_dashboards.json`'s `"configPath": ["wazuh_ai_assistant"]`), not its
    `wazuhAiAssistant` plugin id.
 
-3. Restart OpenSearch Dashboards. On startup this plugin logs one line stating whether encryption
+3. Restart Wazuh dashboard. On startup this plugin logs one line stating whether encryption
    is `ENABLED` (info) or `DISABLED` (a **warning**, since provider API keys cannot be saved until
    it is configured) — never the key itself; see `server/plugin.ts`'s `setup()`.
 4. Nothing else to do: every provider API key created or updated (via the Settings UI's provider

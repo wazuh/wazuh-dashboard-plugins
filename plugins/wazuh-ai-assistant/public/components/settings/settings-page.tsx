@@ -961,9 +961,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                             defaultMessage={
                               'To enable saving keys, generate a base64-encoded ' +
                               '32-byte key and store it as {settingName} in the ' +
-                              'OpenSearch Dashboards keystore (recommended — the ' +
+                              'keystore (recommended — the ' +
                               'key never sits in a readable config file) or in ' +
-                              '{configFile}, then restart OpenSearch Dashboards:'
+                              '{configFile}, then restart the dashboard service:'
                             }
                             values={{
                               settingName: (
