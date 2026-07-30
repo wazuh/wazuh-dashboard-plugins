@@ -274,13 +274,21 @@ const VULN_FIELD_CLAUSE_KEYS = new Set([
 ]);
 
 /**
- * `wazuh.rule.level` is a keyword field holding one of `SEVERITY_LEVELS`
- * (`informational`/`low`/`medium`/`high`/`critical`), not a numeric scale. A numeric `range`
- * against it does not error in OpenSearch — it silently falls back to lexicographic string
- * comparison ("informational" &lt; "low" &lt; "medium" by dictionary order, NOT by severity), so it
- * must be actively rejected. `term`/`terms` against the string values is unaffected.
+ * Keyword fields where a numeric `range` bound would silently fall back to lexicographic string
+ * comparison instead of erroring, mapped to a human description of their valid string values used
+ * to build an accurate rejection message per field. `wazuh.rule.level` is currently the only
+ * entry: it holds one of `SEVERITY_LEVELS` (`informational`/`low`/`medium`/`high`/`critical`), not
+ * a numeric scale, and a numeric `range` against it does not error in OpenSearch — it silently
+ * falls back to lexicographic string comparison ("informational" &lt; "low" &lt; "medium" by
+ * dictionary order, NOT by severity), so it must be actively rejected. `term`/`terms` against the
+ * string values is unaffected.
  */
-const KEYWORD_RANGE_REJECT_FIELDS = new Set<string>([WAZUH_FIELD.RULE_LEVEL]);
+const KEYWORD_RANGE_REJECT_FIELDS = new Map<string, string>([
+  [
+    WAZUH_FIELD.RULE_LEVEL,
+    `one of the severity levels (${SEVERITY_LEVELS.join('/')})`,
+  ],
+]);
 
 /**
  * True when a `range` clause anywhere in the tree targets one of `KEYWORD_RANGE_REJECT_FIELDS`
@@ -300,11 +308,8 @@ function findNumericRangeOnKeywordField(
     for (const [field, rangeValue] of Object.entries(
       value as Record<string, unknown>,
     )) {
-      if (
-        !KEYWORD_RANGE_REJECT_FIELDS.has(field) ||
-        !rangeValue ||
-        typeof rangeValue !== 'object'
-      ) {
+      const description = KEYWORD_RANGE_REJECT_FIELDS.get(field);
+      if (!description || !rangeValue || typeof rangeValue !== 'object') {
         continue;
       }
       const bounds = rangeValue as Record<string, unknown>;
@@ -316,11 +321,8 @@ function findNumericRangeOnKeywordField(
       ].some(bound => typeof bound === 'number');
       if (hasNumericBound) {
         reason =
-          `Range on "${field}" is not allowed: it is a keyword field holding one of the string ` +
-          `severity levels (${SEVERITY_LEVELS.join(
-            '/',
-          )}), not a number. Use "term" or "terms" ` +
-          `against one or more of those string values instead.`;
+          `Range on "${field}" is not allowed: it is a keyword field holding ${description}, ` +
+          `not a number. Use "term" or "terms" against one or more of those string values instead.`;
         return;
       }
     }
