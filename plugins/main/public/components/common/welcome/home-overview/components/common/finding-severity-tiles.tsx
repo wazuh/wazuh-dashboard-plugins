@@ -3,37 +3,16 @@ import { EuiFlexGroup, EuiFlexItem, EuiLink, EuiToolTip } from '@elastic/eui';
 import { StatTile } from './stat-tile';
 import { TabNumber, formatValueSafely } from './tab-number';
 import { SeverityBand, SeverityCounts } from '../../interfaces/types';
-import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
-
-const SEVERITY_PRESENTATION: Array<{
-  band: SeverityBand;
-  label: string;
-  color: string;
-}> = [
-  { band: 'critical', label: 'Critical', color: UI_COLOR_STATUS.danger },
-  { band: 'high', label: 'High', color: UI_COLOR_STATUS.warning },
-  { band: 'medium', label: 'Medium', color: UI_COLOR_STATUS.info },
-  { band: 'low', label: 'Low', color: UI_COLOR_STATUS.success },
-  {
-    band: 'informational',
-    label: 'Informational',
-    color: UI_COLOR_STATUS.disabled,
-  },
-  {
-    band: 'pending',
-    label: 'Pending',
-    color: UI_COLOR_STATUS.disabled,
-  },
-];
+import { SEVERITY_PRESENTATION } from '../../lib/severity-presentation';
 
 export interface FindingSeverityTilesProps {
   counts: SeverityCounts;
   /** Distinct data-test-subjs when two tile groups share a page. */
   testSubjPrefix?: string;
   /** When set, each number becomes a link that drills into that band. */
-  onSelect?: (band: SeverityBand) => void;
+  onSelect?: (band: SeverityBand) => string | undefined;
   /** Tooltip content per band, shown only when `onSelect` is set. */
   getTooltip?: (band: SeverityBand) => React.ReactNode;
 }

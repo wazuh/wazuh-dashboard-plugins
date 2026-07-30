@@ -34,4 +34,9 @@ describe('BarList', () => {
     expect(screen.getByText('No tactics observed')).toBeInTheDocument();
     expect(container.querySelector('.euiProgress')).not.toBeInTheDocument();
   });
+
+  it('renders the title caption above the list when provided', () => {
+    render(<BarList items={items} title='Top 5 modified files' />);
+    expect(screen.getByText('Top 5 modified files')).toBeInTheDocument();
+  });
 });

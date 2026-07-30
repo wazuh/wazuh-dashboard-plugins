@@ -8,7 +8,6 @@ import {
   WIDGET_LOADING_MIN_HEIGHT,
 } from '../common';
 import { AgentsByStatus } from './agents-by-status';
-import { TopOsTable } from './top-os-table';
 import { TopNetworkServicesTable } from './top-network-services-table';
 import { useInViewport } from '../../../../hooks';
 import {
@@ -24,10 +23,10 @@ import {
   getThreatHuntingUrl,
   getMitreUrl,
   getItHygieneUrl,
-  getMitreUrlTactic,
   getDiscoverFindingsBySeverityUrl,
 } from '../../utils/navigation';
 import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
+import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 
 export interface OverviewSectionProps {
   /** Owned by the page shell so Threat Hunting reuses the same on-mount search. */
@@ -117,6 +116,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             items={findings.data.topTactics}
             emptyMessage='No MITRE ATT&CK tactics observed'
             data-test-subj='mitre-top-tactics'
+            barColor={UI_COLOR_STATUS.success}
           />
         )}
       </WidgetGroup>
@@ -137,9 +137,19 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               caption='Current state'
               headerLink={{ label: 'IT Hygiene', href: getItHygieneUrl() }}
               loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
+              centerBody
               data-test-subj='home-overview-top-os'
             >
-              {topOs.data && <TopOsTable items={topOs.data} />}
+              {topOs.data && (
+                <BarList
+                  items={topOs.data}
+                  emptyMessage='No operating systems found'
+                  title='OS name'
+                  totalSlots={5}
+                  moreItemsMessage='No more operating systems to display'
+                  data-test-subj='top-os'
+                />
+              )}
             </WidgetGroup>
           </EuiFlexItem>
           <EuiFlexItem>
@@ -169,6 +179,8 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
   );
 };
 
-export const OverviewSection = React.memo(
+// Annotated: `withErrorBoundary` is untyped, so without this the props
+// would reach every call site as `any`.
+export const OverviewSection: React.FC<OverviewSectionProps> = React.memo(
   withErrorBoundary(OverviewSectionComponent),
 );

@@ -2,7 +2,9 @@ import { getHttp } from '../../../../../kibana-services';
 import {
   fetchDecodersCount,
   fetchDetectorsCount,
+  fetchFiltersCount,
   fetchIntegrationsCount,
+  fetchKvdbsCount,
   fetchRulesCount,
   SECURITY_ANALYTICS_ROUTES,
 } from './security-analytics.service';
@@ -130,6 +132,42 @@ describe('fetchDetectorsCount', () => {
     expect(JSON.parse(options.body)).toEqual({
       size: 0,
       query: { match_all: {} },
+    });
+  });
+});
+
+describe('fetchKvdbsCount', () => {
+  it('counts enabled KVDBs across both spaces, reading hits.total', async () => {
+    const post = jest.fn().mockResolvedValue({
+      ok: true,
+      response: { hits: { total: { value: 6 } } },
+    });
+    asMock(getHttp).mockReturnValue({ post });
+
+    expect(await fetchKvdbsCount()).toBe(6);
+    const [route, options] = post.mock.calls[0];
+    expect(route).toBe(SECURITY_ANALYTICS_ROUTES.kvdbsSearch);
+    expect(JSON.parse(options.body)).toEqual({
+      size: 0,
+      query: SPACES_AND_ENABLED,
+    });
+  });
+});
+
+describe('fetchFiltersCount', () => {
+  it('counts enabled filters across both spaces, reading hits.total', async () => {
+    const post = jest.fn().mockResolvedValue({
+      ok: true,
+      response: { hits: { total: { value: 3 } } },
+    });
+    asMock(getHttp).mockReturnValue({ post });
+
+    expect(await fetchFiltersCount()).toBe(3);
+    const [route, options] = post.mock.calls[0];
+    expect(route).toBe(SECURITY_ANALYTICS_ROUTES.filtersSearch);
+    expect(JSON.parse(options.body)).toEqual({
+      size: 0,
+      query: SPACES_AND_ENABLED,
     });
   });
 });
