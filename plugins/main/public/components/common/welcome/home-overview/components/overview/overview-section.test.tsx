@@ -25,7 +25,6 @@ jest.mock('../../utils/navigation', () => ({
   getThreatHuntingUrl: jest.fn(() => '#threat-hunting'),
   getMitreUrl: jest.fn(),
   getItHygieneUrl: jest.fn(() => '#it-hygiene'),
-  getMitreUrlTactic: jest.fn(),
   getDiscoverFindingsBySeverityUrl: jest.fn(() => '#discover'),
 }));
 jest.mock('../../../../hooks', () => ({
@@ -35,7 +34,10 @@ jest.mock('../../../../hooks', () => ({
 // out of scope here, so stub it down to a plain link (same as
 // agents-by-status.test.tsx).
 jest.mock('../../../../permissions/button', () => ({
-  WzButtonPermissions: ({ children, ...rest }: any) => (
+  WzButtonPermissions: ({
+    children,
+    ...rest
+  }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a {...rest}>{children}</a>
   ),
 }));
@@ -80,14 +82,16 @@ beforeEach(() => {
 
 describe('OverviewSection', () => {
   it('renders every OVERVIEW widget when all groups are available', () => {
-    render(<OverviewSection findings={findingsAvailable} />);
+    const { container } = render(
+      <OverviewSection findings={findingsAvailable} />,
+    );
     expect(screen.getByText('Agents by status')).toBeInTheDocument();
     expect(screen.getByText('Findings')).toBeInTheDocument();
     expect(screen.getByText('MITRE ATT&CK top tactics')).toBeInTheDocument();
     expect(screen.getByText('Top 5 operating systems')).toBeInTheDocument();
     expect(screen.getByText('Top 5 network services')).toBeInTheDocument();
     // data flowed through: active hero + a severity value + a tactic + a row
-    expect(screen.getByText('agents active')).toBeInTheDocument();
+    expect(container.textContent).toContain('agents active');
     expect(screen.getByText('35,682')).toBeInTheDocument();
     expect(screen.getByText('Initial Access')).toBeInTheDocument();
     expect(screen.getAllByText('svchost.exe').length).toBeGreaterThan(0);
@@ -102,7 +106,7 @@ describe('OverviewSection', () => {
       '[data-test-subj="home-overview-top-network-services"]',
     );
     expect(panel).toBeInTheDocument();
-    // a table panel shows a neutral placeholder when its data source is absent
+    // the panel shows a neutral placeholder when its data source is absent
     expect(panel?.textContent).toContain('Not available');
     expect(screen.getByText('Top 5 operating systems')).toBeInTheDocument();
   });

@@ -36,7 +36,7 @@
 - Added `wazuh.disabledSettings` configuration to hide specific settings in the Indexer Settings UI [#8643](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8643) [8693](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8693)
 - Expanded the case management form with title, description, severity, priority and TLP fields, comments that can be added or edited individually, and a confirmation dialog before discarding unsaved changes [#8718](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8718)
 - Added queue usage in bytes and agent cache visualizations to `Server Management` > `Statistics`, and relabeled the Comms "Queue usage" Y-axis to Bytes [#8768](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8768)
-- Added Wazuh AI Assistant plugin: provider-agnostic AI chat over Wazuh data with a read-only tool catalog, server-side guardrails, optional pseudonymization, and API-key encryption at rest [#8788](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8788) [#8802](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8802)
+- Added Wazuh AI Assistant plugin: provider-agnostic AI chat over Wazuh data with a read-only tool catalog, server-side guardrails, optional pseudonymization, and API-key encryption at rest [#8788](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8788) [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797)
 
 ### Changed
 
@@ -102,7 +102,7 @@
 - Condensed the setting labels and added info tooltips in the registration service configuration view [#8616](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8616)
 - Adapt management of daemons status to the new API response schema [#8706](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8706)
 - Enhanced description of `reports.csv.maxRows` setting [#1434](https://github.com/wazuh/wazuh-dashboard/issues/1434)
-- Rework the Home page overview with more platform metrics [#8760](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8760) [#8792](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8792)
+- Rework the Home page overview with more platform metrics [#8760](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8760) [#8792](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8792) [#8795](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8795)
 
 ### Fixed
 

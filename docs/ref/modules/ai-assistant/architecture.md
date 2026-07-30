@@ -56,10 +56,25 @@ saved-objects API and the Saved Objects export UI — back them up at the index/
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ---------------------- |
 | `wazuh-ai-assistant-provider`     | One per configured provider: name, type, base URL, model, `apiKey` (optionally encrypted, see [Security](./security.md)) | Global (admin-managed) |
 | `wazuh-ai-assistant-settings`     | Singleton: privacy defaults per provider, user-override flag, field policy                                               | Global (admin-managed) |
-| `wazuh-ai-assistant-conversation` | One per conversation: title, messages, owner                                                                             | Owner-scoped           |
+| `wazuh-ai-assistant-conversation` | One per conversation: title, owner, and messages with their timestamps, result tables and tool calls                     | Owner-scoped           |
 
 Conversation routes never leak cross-owner existence (`404` instead of `403`), list responses
 return summaries only (never `messages`), and writes use optimistic concurrency.
+
+Which conversation the browser has open is held outside React state — in the URL hash
+(`#/conversation/<id>`, shareable) and in a per-tab `sessionStorage` pointer — so a reload, a deep
+link or a trip through another dashboard app returns to it. A turn is saved twice: once when the
+question is sent, so an interrupted answer never loses the question, and once when the answer ends.
+A turn that ends without completing is stored as interrupted and can be retried.
+
+Anything that would interrupt a running answer asks first, through one dialog: the platform's
+`overlays.openConfirm`. Leaving the app entirely (another dashboard app, a reload, closing the tab)
+reaches it through the `onAppLeave` hook registered in `public/application.tsx`; opening another
+conversation or starting a new one calls it directly. Both use the same copy and no styling
+overrides (`public/services/interrupt-confirm.ts`), since `onAppLeave` cannot carry button labels or
+a color and a plugin-side modal could not be made to match it.
+Switching to the Settings tab deliberately prompts nothing — the Chat tab stays mounted and the
+answer keeps streaming into it.
 
 ## Integration with wazuh-core
 
@@ -88,6 +103,7 @@ enforcement boundary; the plugin adds no privileged path (see [Security](./secur
 | Concurrent chat streams          | 5 per user, 30 server-wide                                   |
 | Provider stall timeouts          | 30 s to first byte, 120 s idle                               |
 | Conversations per user           | 500 (title 200 chars, message 100,000 chars, 1,000 messages) |
+| Saved conversation payload       | 700 KB serialized, 100 rows per persisted table              |
 
 ## Developer documentation
 

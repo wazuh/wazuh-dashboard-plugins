@@ -5,7 +5,10 @@ import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensea
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
 import { WidgetGroup, StatTile, TabNumber, SectionHeader } from '../common';
 import { ItHygieneTiles } from './it-hygiene-tiles';
-import { RegulatoryComplianceBadges } from './regulatory-compliance-badges';
+import {
+  RegulatoryComplianceBadges,
+  RegulatoryComplianceBadgesProps,
+} from './regulatory-compliance-badges';
 import { useInViewport } from '../../../../hooks';
 import {
   useActiveResponseOverview,
@@ -20,8 +23,14 @@ import {
   getRegulatoryComplianceUrlHome,
 } from '../../utils/navigation';
 
-/** IT Hygiene and Active Response load lazily; Regulatory Compliance is static. */
-const SecurityOperationsSectionComponent: React.FC = () => {
+export interface SecurityOperationsSectionProps {
+  complianceControls: RegulatoryComplianceBadgesProps['controls'];
+}
+
+/** IT Hygiene and Active Response load lazily; the chips navigate regardless. */
+const SecurityOperationsSectionComponent: React.FC<
+  SecurityOperationsSectionProps
+> = ({ complianceControls }) => {
   const [sectionRef, visible] = useInViewport<HTMLDivElement>();
   const operatingSystems = useItHygieneOperatingSystemsCount(visible);
   const packages = useItHygienePackagesCount(visible);
@@ -86,7 +95,7 @@ const SecurityOperationsSectionComponent: React.FC = () => {
             />
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ minWidth: 'min(640px, 100%)' }}>
           <WidgetGroup
             status='available'
             title={
@@ -96,11 +105,11 @@ const SecurityOperationsSectionComponent: React.FC = () => {
                 </EuiLink>
               </RedirectAppLinks>
             }
-            caption='Frameworks'
+            caption='Controls implicated, last 24 hours'
             centerBody
             data-test-subj='home-overview-regulatory-compliance'
           >
-            <RegulatoryComplianceBadges />
+            <RegulatoryComplianceBadges controls={complianceControls} />
           </WidgetGroup>
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -108,6 +117,7 @@ const SecurityOperationsSectionComponent: React.FC = () => {
   );
 };
 
-export const SecurityOperationsSection = React.memo(
-  withErrorBoundary(SecurityOperationsSectionComponent),
-);
+// Annotated: `withErrorBoundary` is untyped, so without this the props
+// would reach every call site as `any`.
+export const SecurityOperationsSection: React.FC<SecurityOperationsSectionProps> =
+  React.memo(withErrorBoundary(SecurityOperationsSectionComponent));
