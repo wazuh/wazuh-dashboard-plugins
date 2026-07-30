@@ -208,6 +208,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     Record<string, { success: boolean; latencyMs: number; message?: string }>
   >({});
   const [testingIds, setTestingIds] = useState<Set<string>>(new Set());
+  const [dismissedErrorIds, setDismissedErrorIds] = useState<Set<string>>(
+    new Set(),
+  );
   const [deleteTarget, setDeleteTarget] = useState<ProviderSummary | null>(
     null,
   );
@@ -244,6 +247,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const [isSavingRetention, setIsSavingRetention] = useState(false);
   const [isRetentionDirty, setIsRetentionDirty] = useState(false);
   const [fieldPolicyFilter, setFieldPolicyFilter] = useState('');
+  const failedProviders = providers.filter(
+    p =>
+      testResults[p.id] &&
+      !testResults[p.id].success &&
+      !dismissedErrorIds.has(p.id),
+  );
   const hasEmptyFieldPolicyRow = fieldPolicyDraft.some(
     entry => entry.field.trim() === '',
   );
@@ -608,6 +617,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
   const handleTest = async (provider: ProviderSummary) => {
     setTestingIds(current => new Set(current).add(provider.id));
+    setDismissedErrorIds(current => {
+      const next = new Set(current);
+      next.delete(provider.id);
+      return next;
+    });
     try {
       const result = await service.test(provider.id);
       setTestResults(current => ({ ...current, [provider.id]: result }));
@@ -759,20 +773,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           );
         }
         return (
-          <EuiToolTip
-            content={
-              result.message ??
-              i18n.translate('wazuhAiAssistant.settings.testFailureUnknown', {
-                defaultMessage: 'Connection failed.',
-              })
-            }
-          >
-            <EuiBadge color='danger'>
-              {i18n.translate('wazuhAiAssistant.settings.testFailureBadge', {
-                defaultMessage: 'Failed',
-              })}
-            </EuiBadge>
-          </EuiToolTip>
+          <EuiBadge color='danger'>
+            {i18n.translate('wazuhAiAssistant.settings.testFailureBadge', {
+              defaultMessage: 'Failed',
+            })}
+          </EuiBadge>
         );
       },
     },
@@ -1082,6 +1087,34 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               )}
 
               <EuiBasicTable items={providers} columns={columns} itemId='id' />
+              {failedProviders.map(p => (
+                <React.Fragment key={p.id}>
+                  <EuiSpacer size='s' />
+                  <EuiCallOut
+                    color='danger'
+                    iconType='alert'
+                    size='s'
+                    title={i18n.translate(
+                      'wazuhAiAssistant.settings.testFailureCallout',
+                      {
+                        defaultMessage: '{name}: {message}',
+                        values: {
+                          name: p.name,
+                          message:
+                            testResults[p.id].message ??
+                            i18n.translate(
+                              'wazuhAiAssistant.settings.testFailureUnknown',
+                              { defaultMessage: 'Connection failed.' },
+                            ),
+                        },
+                      },
+                    )}
+                    onDismiss={() =>
+                      setDismissedErrorIds(prev => new Set([...prev, p.id]))
+                    }
+                  />
+                </React.Fragment>
+              ))}
             </EuiPanel>
 
             <EuiSpacer size='xl' />
