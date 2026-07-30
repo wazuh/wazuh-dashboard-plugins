@@ -89,32 +89,6 @@ describe('ResultTable', () => {
   });
 
   describe('severity badge rendering', () => {
-    it('maps a numeric rule.level to the legacy word thresholds (0-6 low, 7-11 medium, 12-14 high, 15+ critical)', () => {
-      const rows = [
-        { agent: 'a', level: 3 },
-        { agent: 'b', level: 9 },
-        { agent: 'c', level: 13 },
-        { agent: 'd', level: 15 },
-      ];
-      render(
-        <ResultTable
-          spec={spec({
-            columns: [
-              { id: 'agent', label: 'Agent' },
-              { id: 'level', label: 'Severity' },
-            ],
-            rows,
-            severityColumn: 'level',
-          })}
-        />,
-      );
-
-      expect(screen.getByText('Low')).toBeInTheDocument();
-      expect(screen.getByText('Medium')).toBeInTheDocument();
-      expect(screen.getByText('High')).toBeInTheDocument();
-      expect(screen.getByText('Critical')).toBeInTheDocument();
-    });
-
     it('renders an already-word severity value (Wazuh 5.0 findings) directly, case-insensitively', () => {
       render(
         <ResultTable

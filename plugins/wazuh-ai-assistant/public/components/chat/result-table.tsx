@@ -70,48 +70,8 @@ const SEVERITY_BUCKETS: Record<
   },
 };
 
-/**
- * Numeric-to-word severity classification. `wazuh.rule.level` is a categorical word, never
- * numeric, so this is only a defensive fallback for a severity value that arrives numeric from
- * some other source; the string path in `renderSeverityBadge` is the normal route.
- */
-function legacySeverityWordFromNumericLevel(level: number): SeverityLevel {
-  if (level >= 15) {
-    return 'critical';
-  }
-  if (level >= 12) {
-    return 'high';
-  }
-  if (level >= 7) {
-    return 'medium';
-  }
-  return 'low';
-}
-
-/** `value` is numeric (or a numeric-looking string) when it came from a legacy rule.level column;
- * a severity column sourced from a field that is already a word (the normal 5.0 case, e.g.
- * `wazuh.rule.level`/`vulnerability.severity`) fails this check and falls through to the string
- * path below unchanged. */
-function toSeverityLevelNumber(value: unknown): number | undefined {
-  if (typeof value === 'number') {
-    return value;
-  }
-  if (
-    typeof value === 'string' &&
-    value.trim() !== '' &&
-    !Number.isNaN(Number(value))
-  ) {
-    return Number(value);
-  }
-  return undefined;
-}
-
 function renderSeverityBadge(value: unknown): React.ReactNode {
-  const numericLevel = toSeverityLevelNumber(value);
-  const word =
-    numericLevel !== undefined
-      ? legacySeverityWordFromNumericLevel(numericLevel)
-      : String(value ?? '').toLowerCase();
+  const word = String(value ?? '').toLowerCase();
   const isKnown = (SEVERITY_LEVELS as readonly string[]).includes(word);
   if (!isKnown) {
     return <EuiBadge color='default'>{String(value ?? '')}</EuiBadge>;
