@@ -390,9 +390,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           privacyDefaultOn: privacyDraft.privacyDefaultOn,
           userCanOverride: privacyDraft.userCanOverride,
           // Drop any blank rows a user added via "Add field" but never filled in.
-          fieldPolicy: fieldPolicyDraft.filter(
-            entry => entry.field.trim().length > 0,
-          ),
+          // Strip the internal `_isNew` flag before sending — the server schema rejects unknown keys.
+          fieldPolicy: fieldPolicyDraft
+            .filter(entry => entry.field.trim().length > 0)
+            .map(({ _isNew: _removed, ...entry }) => entry),
         }),
       );
       setLoadedAssistantSettings(saved);
