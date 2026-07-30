@@ -15,6 +15,10 @@ import { ProviderSummary } from '../common/types';
 
 type Route = 'chat' | 'settings';
 
+/** Unknown paths fall back to chat so a stale/mistyped deep link still lands somewhere usable. */
+export const routeFromPathname = (pathname: string): Route =>
+  pathname.replace(/\/+$/, '') === '/settings' ? 'settings' : 'chat';
+
 /** How long the first provider load may take before the app stops waiting on it — see
  * `refreshProviders`. Generous for a slow cluster, short enough that no one stares at a spinner. */
 const PROVIDERS_LOAD_TIMEOUT_MS = 20_000;
@@ -37,12 +41,19 @@ const PROVIDERS_LOAD_TIMEOUT_MS = 20_000;
  */
 const App: React.FC<{
   core: CoreStart;
+  history: AppMountParameters['history'];
   onAppLeave: AppMountParameters['onAppLeave'];
-}> = ({ core, onAppLeave }) => {
-  const [route, setRoute] = useState<Route>('chat');
+}> = ({ core, history, onAppLeave }) => {
+  // The URL (scoped history) is the source of truth for the active tab, so a page refresh or
+  // back/forward navigation restores the view instead of always landing on chat (#8820).
+  const [route, setRoute] = useState<Route>(() =>
+    routeFromPathname(history.location.pathname),
+  );
   // Settings is mounted lazily (nothing should issue its requests for a user who never opens the
   // tab) but, once opened, stays mounted for the same reason ChatPage does — see the render below.
-  const [settingsEverOpened, setSettingsEverOpened] = useState(false);
+  const [settingsEverOpened, setSettingsEverOpened] = useState(
+    () => routeFromPathname(history.location.pathname) === 'settings',
+  );
   const [providers, setProviders] = useState<ProviderSummary[]>([]);
   const [providersLoaded, setProvidersLoaded] = useState(false);
   const [selectedProviderId, setSelectedProviderId] = useState('');
@@ -54,6 +65,27 @@ const App: React.FC<{
   const handleGeneratingChange = useCallback((generating: boolean) => {
     isGeneratingRef.current = generating;
   }, []);
+
+  useEffect(
+    () =>
+      history.listen(location => {
+        const next = routeFromPathname(location.pathname);
+        setRoute(next);
+        if (next === 'settings') {
+          setSettingsEverOpened(true);
+        }
+      }),
+    [history],
+  );
+
+  const navigateTo = useCallback(
+    (next: Route) => {
+      if (next !== routeFromPathname(history.location.pathname)) {
+        history.push(next === 'settings' ? '/settings' : '/');
+      }
+    },
+    [history],
+  );
 
   useEffect(() => {
     onAppLeave(actions => {
@@ -136,7 +168,7 @@ const App: React.FC<{
         <EuiTabs size='s'>
           <EuiTab
             isSelected={route === 'chat'}
-            onClick={() => setRoute('chat')}
+            onClick={() => navigateTo('chat')}
           >
             {i18n.translate('wazuhAiAssistant.app.chatTab', {
               defaultMessage: 'Chat',
@@ -144,10 +176,7 @@ const App: React.FC<{
           </EuiTab>
           <EuiTab
             isSelected={route === 'settings'}
-            onClick={() => {
-              setSettingsEverOpened(true);
-              setRoute('settings');
-            }}
+            onClick={() => navigateTo('settings')}
           >
             {i18n.translate('wazuhAiAssistant.app.settingsTab', {
               defaultMessage: 'Settings',
@@ -174,10 +203,7 @@ const App: React.FC<{
               providersError={providersError}
               selectedProviderId={selectedProviderId}
               onProviderChange={setSelectedProviderId}
-              onNavigateToSettings={() => {
-                setSettingsEverOpened(true);
-                setRoute('settings');
-              }}
+              onNavigateToSettings={() => navigateTo('settings')}
               onGeneratingChange={handleGeneratingChange}
             />
           </div>
@@ -205,7 +231,7 @@ const App: React.FC<{
  */
 export const renderApp = (
   core: CoreStart,
-  { element, onAppLeave }: AppMountParameters,
+  { element, history, onAppLeave }: AppMountParameters,
 ): (() => void) => {
   core.chrome.setBreadcrumbs([
     {
@@ -215,6 +241,6 @@ export const renderApp = (
     },
   ]);
   const root = createRoot(element);
-  root.render(<App core={core} onAppLeave={onAppLeave} />);
+  root.render(<App core={core} history={history} onAppLeave={onAppLeave} />);
   return () => root.unmount();
 };

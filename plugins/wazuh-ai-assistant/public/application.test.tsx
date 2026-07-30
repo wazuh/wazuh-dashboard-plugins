@@ -1,12 +1,13 @@
 import React from 'react';
 import { act, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { createMemoryHistory, MemoryHistory } from 'history';
 import {
   AppLeaveHandler,
   AppMountParameters,
   CoreStart,
 } from '../../../src/core/public';
-import { renderApp } from './application';
+import { renderApp, routeFromPathname } from './application';
 
 /**
  * Covers the app shell's ONE structural guarantee: the Chat tab is hidden, never unmounted, when the
@@ -74,19 +75,24 @@ function coreMock(): CoreStart {
 /** The leave handler the shell registered through `onAppLeave`, or undefined if it registered none. */
 let registeredLeaveHandler: AppLeaveHandler | undefined;
 
+/** The in-memory stand-in for the platform's scoped history the app was mounted with. */
+let mountedHistory: MemoryHistory;
+
 /** Mounts the app the way core does, and returns core's unmount callback. */
-function mountApp(): () => void {
+function mountApp(initialPath = '/'): () => void {
   const element = document.createElement('div');
   document.body.append(element);
   registeredLeaveHandler = undefined;
+  mountedHistory = createMemoryHistory({ initialEntries: [initialPath] });
   let unmount: () => void = () => undefined;
   act(() => {
     unmount = renderApp(coreMock(), {
       element,
+      history: mountedHistory,
       onAppLeave: (handler: AppLeaveHandler) => {
         registeredLeaveHandler = handler;
       },
-    } as AppMountParameters);
+    } as unknown as AppMountParameters);
   });
   return unmount;
 }
@@ -200,5 +206,62 @@ describe('AI Assistant app shell', () => {
     });
 
     expect(marker('chat')).toBeNull();
+  });
+
+  describe('view routing (#8820)', () => {
+    it.each([
+      ['/', 'chat'],
+      ['', 'chat'],
+      ['/settings', 'settings'],
+      ['/settings/', 'settings'],
+      ['/unknown', 'chat'],
+    ])('routeFromPathname maps %s to %s', (pathname, expected) => {
+      expect(routeFromPathname(pathname)).toBe(expected);
+    });
+
+    it('restores the Settings view from the URL on mount (page refresh)', async () => {
+      mountApp('/settings');
+      await waitFor(() => expect(marker('settings')).not.toBeNull());
+
+      expect(isHidden(marker('settings') as HTMLElement)).toBe(false);
+      expect(isHidden(marker('chat') as HTMLElement)).toBe(true);
+      expect(mockMountCounts.settings).toBe(1);
+    });
+
+    it('pushes /settings to the history when the Settings tab is clicked', async () => {
+      mountApp();
+      await waitFor(() => expect(marker('chat')).not.toBeNull());
+
+      fireEvent.click(screen.getByText('Settings'));
+
+      expect(mountedHistory.location.pathname).toBe('/settings');
+      expect(isHidden(marker('settings') as HTMLElement)).toBe(false);
+    });
+
+    it('returns to the Chat view on browser back, keeping Settings mounted', async () => {
+      mountApp();
+      await waitFor(() => expect(marker('chat')).not.toBeNull());
+      fireEvent.click(screen.getByText('Settings'));
+      await waitFor(() => expect(marker('settings')).not.toBeNull());
+
+      act(() => {
+        mountedHistory.goBack();
+      });
+
+      expect(mountedHistory.location.pathname).toBe('/');
+      expect(isHidden(marker('chat') as HTMLElement)).toBe(false);
+      expect(isHidden(marker('settings') as HTMLElement)).toBe(true);
+      expect(mockMountCounts.settings).toBe(1);
+    });
+
+    it('does not push a duplicate entry when the active tab is clicked again', async () => {
+      mountApp();
+      await waitFor(() => expect(marker('chat')).not.toBeNull());
+
+      fireEvent.click(screen.getByText('Chat'));
+
+      expect(mountedHistory.length).toBe(1);
+      expect(mountedHistory.location.pathname).toBe('/');
+    });
   });
 });

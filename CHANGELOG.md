@@ -127,6 +127,7 @@
 - Fixed Home KPI's visualization persistent filters [#8708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8708)
 - Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766)
 - Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775)
+- Fixed the AI Assistant app not managing the view routing, so refreshing the page always returned to the Chat tab [#8820](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8820)
 
 ### Removed
 
