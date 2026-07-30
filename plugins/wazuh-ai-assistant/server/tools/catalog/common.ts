@@ -210,7 +210,7 @@ export function objectSchema(
 /**
  * Shared baseline `tableSpec.columns`/`digest.sampleColumns` for the 8 alert-hits tools
  * (get_critical_alerts, get_alerts_by_time, get_brute_force, get_suspicious_powershell,
- * search_alerts_by_agent, search_alerts_by_multiple_agents, search_alerts_by_rule_id,
+ * search_alerts_by_agent, search_alerts_by_multiple_agents, search_alerts_by_rule_title,
  * search_alerts_by_rule_group). Each previously kept its own identical copy.
  */
 export const STANDARD_ALERT_TABLE_COLUMNS: ToolTableColumnSpec[] = [

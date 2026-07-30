@@ -215,12 +215,12 @@
       "rubric": "Scopes results to web-prod-01 at severity>=10 specifically (both named constraints from the question), or truthfully reports none."
     },
     {
-      "id": "alerts_by_rule_id",
+      "id": "alerts_by_rule_title",
       "lang": "en",
       "category": "alerts",
-      "prompt": "What's been triggering rule 5710 recently?",
-      "expected_tools": ["search_alerts_by_rule_id"],
-      "rubric": "Scopes results to rule.id 5710 exactly (the ID the question names), or truthfully reports none."
+      "prompt": "What's been triggering the \"Wazuh Rootcheck - Rootkit or malware detected\" rule recently?",
+      "expected_tools": ["search_alerts_by_rule_title"],
+      "rubric": "Scopes results to that exact rule title (the rule the question names), or truthfully reports none."
     },
     {
       "id": "alerts_by_multiple_agents",

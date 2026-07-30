@@ -10,7 +10,7 @@ import { getAlertsByTimeTool } from './catalog/get-alerts-by-time';
 import { getBruteForceTool } from './catalog/get-brute-force';
 import { getSecuritySummaryTool } from './catalog/get-security-summary';
 import { getSuspiciousPowershellTool } from './catalog/get-suspicious-powershell';
-import { searchAlertsByRuleIdTool } from './catalog/search-alerts-by-rule-id';
+import { searchAlertsByRuleTitleTool } from './catalog/search-alerts-by-rule-title';
 import { searchAlertsByRuleGroupTool } from './catalog/search-alerts-by-rule-group';
 import { getPciDssAlertsTool } from './catalog/get-pci-dss-alerts';
 import { getPciDssSummaryTool } from './catalog/get-pci-dss-summary';
@@ -54,7 +54,7 @@ const CATALOG: ToolDefinition[] = [
   getBruteForceTool,
   getSecuritySummaryTool,
   getSuspiciousPowershellTool,
-  searchAlertsByRuleIdTool,
+  searchAlertsByRuleTitleTool,
   searchAlertsByRuleGroupTool,
   getPciDssAlertsTool,
   getPciDssSummaryTool,

@@ -55,7 +55,7 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_brute_force: 'alerts',
   get_security_summary: 'alerts',
   get_suspicious_powershell: 'alerts',
-  search_alerts_by_rule_id: 'alerts',
+  search_alerts_by_rule_title: 'alerts',
   search_alerts_by_rule_group: 'alerts',
   search_alerts_by_multiple_agents: 'alerts',
   search_alerts_by_os: 'alerts',

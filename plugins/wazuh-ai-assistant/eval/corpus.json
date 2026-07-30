@@ -135,18 +135,18 @@
       "notes": "UAT intent GET_SUSPICIOUS_POWERSHELL -> get_suspicious_powershell.ts, ORs the MITRE T1059.001 technique id, wazuh.rule.tags, and PowerShell process names (get_suspicious_powershell.ts)."
     },
     {
-      "id": "alerts_by_rule_id",
+      "id": "alerts_by_rule_title",
       "category": "alerts",
-      "prompt_en": "What's been triggering rule 5710 recently?",
-      "prompt_es": "¿Qué ha estado disparando la regla 5710 recientemente?",
+      "prompt_en": "What's been triggering the \"Wazuh Rootcheck - Rootkit or malware detected\" rule recently?",
+      "prompt_es": "¿Qué ha estado disparando la regla \"Wazuh Rootcheck - Rootkit or malware detected\" recientemente?",
       "expect": {
-        "tool": "search_alerts_by_rule_id",
+        "tool": "search_alerts_by_rule_title",
         "params_subset": {
-          "rule_id": 5710
+          "rule_title": "Wazuh Rootcheck - Rootkit or malware detected"
         },
         "table": "required_empty_ok"
       },
-      "notes": "UAT intent SEARCH_ALERTS_BY_RULE_ID -> search_alerts_by_rule_id.ts. rule_id pinned since the question names an exact numeric ID (5710 is also one of the get_brute_force known rule IDs, get_brute_force.ts:50, but the question asks about the rule specifically so this tool is the right route, not get_brute_force)."
+      "notes": "UAT intent SEARCH_ALERTS_BY_RULE_TITLE -> search_alerts_by_rule_title.ts. rule_title pinned since the question names an exact rule by its title text; in 5.0 wazuh.rule.id is a UUID, not a memorizable short numeric ID, so title is the reachable identifier for this kind of question."
     },
     {
       "id": "alerts_by_rule_group",
@@ -164,7 +164,7 @@
         "table": "required_empty_ok",
         "answer_must_not_match": ["rule (id )?2003"]
       },
-      "notes": "Regression case: this question makes the model guess rule.id 2003 (search_alerts_by_rule_id) instead of the real PAM session-closed rule 5502, returning 0 rows and falsely reporting no sessions closed. search-alerts-by-rule-group.ts was built specifically for this: rule_group is not pinned in params_subset because several values are defensible ('pam', 'session_closed', 'authentication_success') and prompts.ts's 'never guess rule ids' rule only requires SOME rule.groups value, not a specific one. answer_must_not_match guards against the specific hallucinated rule ID resurfacing. See also dstuser_sessions_closed below, the pre-existing case for this same question kept for its destination.user.name/multi-tool-tolerance coverage. 5.0 UPDATE (2026-07-26): the strict single-tool pin was BROADENED to the same set its sibling accepts. The assertion that actually encodes the original UAT bug is answer_must_not_match (rule id 2003) and it still passes; the model now answers this via search_wazuh_data, which is equally NOT a guessed rule id, so the regression this case exists to catch is still caught. The prompt is deliberately left identical to dstuser_sessions_closed (that duplication is intentional per the note above, NOT a copy-paste slip) so this case keeps guarding the exact phrasing that triggered the live miss."
+      "notes": "Regression case: this question makes the model guess rule.id 2003 (search_alerts_by_rule_title) instead of the real PAM session-closed rule 5502, returning 0 rows and falsely reporting no sessions closed. search-alerts-by-rule-group.ts was built specifically for this: rule_group is not pinned in params_subset because several values are defensible ('pam', 'session_closed', 'authentication_success') and prompts.ts's 'never guess rule ids' rule only requires SOME rule.groups value, not a specific one. answer_must_not_match guards against the specific hallucinated rule ID resurfacing. See also dstuser_sessions_closed below, the pre-existing case for this same question kept for its destination.user.name/multi-tool-tolerance coverage. 5.0 UPDATE (2026-07-26): the strict single-tool pin was BROADENED to the same set its sibling accepts. The assertion that actually encodes the original UAT bug is answer_must_not_match (rule id 2003) and it still passes; the model now answers this via search_wazuh_data, which is equally NOT a guessed rule id, so the regression this case exists to catch is still caught. The prompt is deliberately left identical to dstuser_sessions_closed (that duplication is intentional per the note above, NOT a copy-paste slip) so this case keeps guarding the exact phrasing that triggered the live miss."
     },
     {
       "id": "pci_dss_alerts",
@@ -266,7 +266,7 @@
           "get_mitre_summary",
           "get_fim_files",
           "search_alerts_by_agent",
-          "search_alerts_by_rule_id",
+          "search_alerts_by_rule_title",
           "search_alerts_by_multiple_agents",
           "search_alerts_by_os",
           "search_wazuh_data"
@@ -327,7 +327,7 @@
           "no se cerraron sesiones"
         ]
       },
-      "notes": "Regression case: the model is prone to guessing rule.id 2003 (search_alerts_by_rule_id) here instead of the real PAM session-closed rule 5502, which returns 0 rows and reports no sessions closed at all. search_alerts_by_rule_group (rule_group: 'pam' or 'session_closed') is now the primary expected route per prompts.ts's 'never guess rule ids' rule; get_alerts_by_time/get_brute_force/search_wazuh_data remain acceptable alternates from before that tool existed, same 'any listed tool at any point' tolerance as escape_hatch_long_tail above. Also still exercises the D2/D3 alert investigation fields (server/tools/catalog/common.ts's ALERT_DIGEST_EXTRA_COLUMNS), specifically destination.user.name, which every alert-hits tool's digest carries. Time phrasing ('last 24 hours') is deliberately left unpinned in params_subset per this file's own params_subset_note. answer_must_not_match guards against the specific hallucinated rule ID and a false negative claim; no positive answer_must_match since whether the model surfaces a specific username depends on live data population (destination.user.name was measured ~90% populated over 7 days in Phase 0, not guaranteed in any single 24h window) -- this case's completeness is judged qualitatively by the SME reviewer beyond that guard."
+      "notes": "Regression case: the model is prone to guessing rule.id 2003 (search_alerts_by_rule_title) here instead of the real PAM session-closed rule 5502, which returns 0 rows and reports no sessions closed at all. search_alerts_by_rule_group (rule_group: 'pam' or 'session_closed') is now the primary expected route per prompts.ts's 'never guess rule ids' rule; get_alerts_by_time/get_brute_force/search_wazuh_data remain acceptable alternates from before that tool existed, same 'any listed tool at any point' tolerance as escape_hatch_long_tail above. Also still exercises the D2/D3 alert investigation fields (server/tools/catalog/common.ts's ALERT_DIGEST_EXTRA_COLUMNS), specifically destination.user.name, which every alert-hits tool's digest carries. Time phrasing ('last 24 hours') is deliberately left unpinned in params_subset per this file's own params_subset_note. answer_must_not_match guards against the specific hallucinated rule ID and a false negative claim; no positive answer_must_match since whether the model surfaces a specific username depends on live data population (destination.user.name was measured ~90% populated over 7 days in Phase 0, not guaranteed in any single 24h window) -- this case's completeness is judged qualitatively by the SME reviewer beyond that guard."
     },
     {
       "id": "no_tool_conversational",

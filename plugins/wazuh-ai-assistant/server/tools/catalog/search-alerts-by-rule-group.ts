@@ -20,7 +20,7 @@ import {
  * CLASSIFICATION TAG instead of guessing an ID -- the thing to reach for whenever a question names
  * a category of activity rather than a specific rule number.
  * Searches `wazuh.rule.tags` (a keyword array) with a plain `term` match (same pattern as
- * search_alerts_by_rule_id.ts). IMPORTANT: the exact `wazuh.rule.tags` vocabulary has not yet been
+ * search_alerts_by_rule_title.ts). IMPORTANT: the exact `wazuh.rule.tags` vocabulary has not yet been
  * confirmed against live data. The description below therefore does NOT assert specific tag
  * values as ground truth -- it tells the model to discover tags via get_top_rules rather than
  * invent them, so a hallucinated tag can't masquerade as a verified one.

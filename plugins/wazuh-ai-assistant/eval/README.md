@@ -215,7 +215,7 @@ supplying only the properties each tool actually requires:
 | `get_brute_force`                  | `{}`                                                                                   |
 | `get_security_summary`             | `{}`                                                                                   |
 | `get_suspicious_powershell`        | `{}`                                                                                   |
-| `search_alerts_by_rule_id`         | `{rule_id:5710}`                                                                       |
+| `search_alerts_by_rule_title`      | `{rule_title:"Wazuh Rootcheck - Rootkit or malware detected"}`                         |
 | `get_pci_dss_alerts`               | `{}`                                                                                   |
 | `get_pci_dss_summary`              | `{}`                                                                                   |
 | `search_alerts_by_multiple_agents` | `{agent_names:["wazuh-aio"]}`                                                          |
