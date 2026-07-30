@@ -16,6 +16,7 @@ import {
   EuiFieldPassword,
   EuiSelect,
   EuiCallOut,
+  EuiCode,
   EuiSpacer,
   EuiHealth,
   EuiText,
@@ -32,6 +33,7 @@ import {
   EuiHorizontalRule,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import { CoreStart } from '../../../../../src/core/public';
 import {
   AssistantSettings,
@@ -933,7 +935,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                         title={i18n.translate(
                           'wazuhAiAssistant.settings.form.encryptionRequiredTitle',
                           {
-                            defaultMessage: 'API keys cannot be saved',
+                            defaultMessage:
+                              'An encryption key is required to save API keys',
                           },
                         )}
                       >
@@ -949,20 +952,37 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                           )}
                         </p>
                         <p>
-                          {i18n.translate(
-                            'wazuhAiAssistant.settings.form.encryptionRequiredHow',
-                            {
-                              defaultMessage:
-                                'To enable saving keys, generate a base64-encoded 32-byte ' +
-                                'key (e.g. `openssl rand -base64 32`) and store it as ' +
-                                '`wazuh_ai_assistant.encryptionKey` — either with ' +
-                                '`opensearch-dashboards-keystore add ' +
-                                'wazuh_ai_assistant.encryptionKey` (recommended, the key ' +
-                                'never sits in a readable config file) or in ' +
-                                '`opensearch_dashboards.yml` — then restart OpenSearch ' +
-                                'Dashboards.',
-                            },
-                          )}
+                          {/* Commands and setting names are interpolated as <EuiCode> values
+                              so translators can never alter them. */}
+                          <FormattedMessage
+                            id='wazuhAiAssistant.settings.form.encryptionRequiredHow'
+                            defaultMessage={
+                              'To enable saving keys, generate a base64-encoded 32-byte ' +
+                              'key with {generateCommand} and store it as {settingName} ' +
+                              '— either with {keystoreCommand} (recommended, the key ' +
+                              'never sits in a readable config file) or in {configFile} ' +
+                              '— then restart OpenSearch Dashboards.'
+                            }
+                            values={{
+                              generateCommand: (
+                                <EuiCode>openssl rand -base64 32</EuiCode>
+                              ),
+                              settingName: (
+                                <EuiCode>
+                                  wazuh_ai_assistant.encryptionKey
+                                </EuiCode>
+                              ),
+                              keystoreCommand: (
+                                <EuiCode>
+                                  opensearch-dashboards-keystore add
+                                  wazuh_ai_assistant.encryptionKey
+                                </EuiCode>
+                              ),
+                              configFile: (
+                                <EuiCode>opensearch_dashboards.yml</EuiCode>
+                              ),
+                            }}
+                          />
                         </p>
                       </EuiCallOut>
                       <EuiSpacer size='m' />
