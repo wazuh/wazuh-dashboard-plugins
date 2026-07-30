@@ -42,7 +42,7 @@ test('risonEncode: full nested query DSL clause', () => {
   const dsl = {
     bool: {
       filter: [{ range: { timestamp: { gte: 'now-24h', lte: 'now' } } }],
-      must: [{ match: { 'wazuh.rule.level': 12 } }],
+      must: [{ match: { 'wazuh.rule.level': 'medium' } }],
     },
   };
   const out = risonEncode(dsl);
