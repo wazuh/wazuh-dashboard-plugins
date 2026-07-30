@@ -1,15 +1,15 @@
 import { ToolDefinition } from '../types';
 import {
-  alertDigestColumns,
-  alertRowFields,
+  findingDigestColumns,
+  findingRowFields,
   clampLimit,
   limitProperty,
   objectSchema,
   requireNonEmptyString,
   resolveTimeRange,
-  STANDARD_ALERT_SAMPLE_COLUMNS,
-  STANDARD_ALERT_TABLE_COLUMN_FIELDS,
-  STANDARD_ALERT_TABLE_COLUMNS,
+  STANDARD_FINDING_SAMPLE_COLUMNS,
+  STANDARD_FINDING_TABLE_COLUMN_FIELDS,
+  STANDARD_FINDING_TABLE_COLUMNS,
   timeRangeProperties,
 } from './common';
 
@@ -17,15 +17,15 @@ import {
  * Exact match on `wazuh.rule.title` plus a time range. `wazuh.rule.title` is mapped `keyword`, so a
  * `term` query is the correct exact-match form -- there is no partial/analyzed matching here, the
  * model must pass the exact title text (discover it via get_top_rules if unsure, same pattern as
- * search_alerts_by_rule_group.ts).
+ * search_findings_by_rule_group.ts).
  *
  * Replaces the former `search_alerts_by_rule_id` tool. In 5.0 `wazuh.rule.id` is a UUID, not the
  * short numeric id analysts memorized in 4.x (e.g. "5710"), so a "search by rule ID" premise no
  * longer works for a human-facing question -- the rule's title is now the reachable identifier.
  */
-export const searchAlertsByRuleTitleTool: ToolDefinition = {
+export const searchFindingsByRuleTitleTool: ToolDefinition = {
   spec: {
-    name: 'search_alerts_by_rule_title',
+    name: 'search_findings_by_rule_title',
     description:
       'Searches security findings for findings triggered by one exact rule title, within a time ' +
       'range, most recent first. Use when the question names a specific rule by its exact title ' +
@@ -40,7 +40,7 @@ export const searchAlertsByRuleTitleTool: ToolDefinition = {
             'detected".',
         },
         limit: limitProperty(
-          'Max number of alerts to return (default 20, max 500).',
+          'Max number of findings to return (default 20, max 500).',
         ),
         ...timeRangeProperties(),
       },
@@ -74,8 +74,10 @@ export const searchAlertsByRuleTitleTool: ToolDefinition = {
     };
   },
   tableSpec: {
-    columns: STANDARD_ALERT_TABLE_COLUMNS,
-    rowFields: alertRowFields(STANDARD_ALERT_TABLE_COLUMN_FIELDS),
+    columns: STANDARD_FINDING_TABLE_COLUMNS,
+    rowFields: findingRowFields(STANDARD_FINDING_TABLE_COLUMN_FIELDS),
   },
-  digest: { sampleColumns: alertDigestColumns(STANDARD_ALERT_SAMPLE_COLUMNS) },
+  digest: {
+    sampleColumns: findingDigestColumns(STANDARD_FINDING_SAMPLE_COLUMNS),
+  },
 };

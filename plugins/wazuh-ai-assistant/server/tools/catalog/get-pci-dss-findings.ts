@@ -1,7 +1,7 @@
 import { ToolDefinition } from '../types';
 import {
-  alertDigestColumns,
-  alertRowFields,
+  findingDigestColumns,
+  findingRowFields,
   clampLimit,
   limitProperty,
   objectSchema,
@@ -9,8 +9,8 @@ import {
   timeRangeProperties,
 } from './common';
 
-// rule.compliance.pci_dss is already a visible column here (unlike the other alert-hits tools) —
-// passing it below lets alertRowFields/alertDigestColumns dedupe it out of the shared row/digest sets
+// rule.compliance.pci_dss is already a visible column here (unlike the other finding-hits tools) —
+// passing it below lets findingRowFields/findingDigestColumns dedupe it out of the shared row/digest sets
 // instead of assigning the same dot-path twice.
 const TABLE_COLUMNS = [
   { field: '@timestamp', label: 'Time' },
@@ -32,15 +32,15 @@ const SAMPLE_COLUMNS = [
  * `wazuh.rule.compliance.pci_dss` (PCI DSS requirement tags such as "pci_dss_10.2.5" live directly
  * on that field, so no wildcard or prefix workaround is needed).
  */
-export const getPciDssAlertsTool: ToolDefinition = {
+export const getPciDssFindingsTool: ToolDefinition = {
   spec: {
-    name: 'get_pci_dss_alerts',
+    name: 'get_pci_dss_findings',
     description:
       'Searches security findings for findings tagged with any PCI DSS compliance requirement ' +
       '(rule.compliance.pci_dss present), within a time range, most recent first.',
     parameters: objectSchema({
       limit: limitProperty(
-        'Max number of alerts to return (default 20, max 500).',
+        'Max number of findings to return (default 20, max 500).',
       ),
       ...timeRangeProperties(),
     }),
@@ -69,7 +69,7 @@ export const getPciDssAlertsTool: ToolDefinition = {
   },
   tableSpec: {
     columns: TABLE_COLUMNS,
-    rowFields: alertRowFields(TABLE_COLUMNS.map(column => column.field)),
+    rowFields: findingRowFields(TABLE_COLUMNS.map(column => column.field)),
   },
-  digest: { sampleColumns: alertDigestColumns(SAMPLE_COLUMNS) },
+  digest: { sampleColumns: findingDigestColumns(SAMPLE_COLUMNS) },
 };

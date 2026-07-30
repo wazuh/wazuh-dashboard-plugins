@@ -1,14 +1,14 @@
 import { ToolDefinition } from '../types';
 import {
-  alertDigestColumns,
-  alertRowFields,
+  findingDigestColumns,
+  findingRowFields,
   clampLimit,
   limitProperty,
   objectSchema,
   resolveTimeRange,
-  STANDARD_ALERT_SAMPLE_COLUMNS,
-  STANDARD_ALERT_TABLE_COLUMN_FIELDS,
-  STANDARD_ALERT_TABLE_COLUMNS,
+  STANDARD_FINDING_SAMPLE_COLUMNS,
+  STANDARD_FINDING_TABLE_COLUMN_FIELDS,
+  STANDARD_FINDING_TABLE_COLUMNS,
   timeRangeProperties,
 } from './common';
 
@@ -42,7 +42,7 @@ export const getBruteForceTool: ToolDefinition = {
       'within a time range (MITRE technique T1110 or its rule tags), most recent first.',
     parameters: objectSchema({
       limit: limitProperty(
-        'Max number of alerts to return (default 20, max 500).',
+        'Max number of findings to return (default 20, max 500).',
       ),
       ...timeRangeProperties(),
     }),
@@ -85,8 +85,10 @@ export const getBruteForceTool: ToolDefinition = {
     };
   },
   tableSpec: {
-    columns: STANDARD_ALERT_TABLE_COLUMNS,
-    rowFields: alertRowFields(STANDARD_ALERT_TABLE_COLUMN_FIELDS),
+    columns: STANDARD_FINDING_TABLE_COLUMNS,
+    rowFields: findingRowFields(STANDARD_FINDING_TABLE_COLUMN_FIELDS),
   },
-  digest: { sampleColumns: alertDigestColumns(STANDARD_ALERT_SAMPLE_COLUMNS) },
+  digest: {
+    sampleColumns: findingDigestColumns(STANDARD_FINDING_SAMPLE_COLUMNS),
+  },
 };

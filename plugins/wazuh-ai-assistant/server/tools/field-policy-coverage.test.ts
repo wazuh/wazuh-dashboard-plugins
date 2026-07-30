@@ -167,7 +167,7 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
   assert.equal(
     isFieldCovered(
       'data.totally_new_field',
-      'get_critical_alerts',
+      'get_critical_findings',
       FIELD_POLICY_DEFAULTS,
     ),
     false,
@@ -177,7 +177,7 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
   assert.equal(
     isFieldCovered(
       'wazuh.agent.host.ip',
-      'get_critical_alerts',
+      'get_critical_findings',
       FIELD_POLICY_DEFAULTS,
     ),
     true,
@@ -185,7 +185,7 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
   assert.equal(
     isFieldCovered(
       'wazuh.rule.tags',
-      'get_pci_dss_alerts',
+      'get_pci_dss_findings',
       FIELD_POLICY_DEFAULTS,
     ),
     true,

@@ -240,7 +240,7 @@ function extractRows(result: unknown): ExtractedRows {
  *      `bucketsToRows` above): the first row's own keys, taken as-is (already the shape a bucket
  *      table wants).
  *   3. Otherwise: the union of the first `DERIVE_COLUMN_SAMPLE_SIZE` rows' flattened dot-path keys,
- *      preferring the common alert fields when present, capped at `DERIVED_COLUMN_CAP`.
+ *      preferring the common finding fields when present, capped at `DERIVED_COLUMN_CAP`.
  */
 const DERIVED_COLUMN_CAP = 8;
 // Wazuh 5.0 findings-v5 field names: the fields most worth surfacing
@@ -368,7 +368,7 @@ export function buildTableSpec(
     // The investigation field set (row-only, not a visible column): unlike the loop above, an
     // absent value is skipped rather than written as `undefined` — the row must stay JSON-sparse
     // (a field only costs bytes/appears in the expander when the underlying document actually has
-    // it), not padded with nulls for every alert that never populated e.g. data.srcip.
+    // it), not padded with nulls for every finding that never populated e.g. data.srcip.
     for (const field of rowFields) {
       const value = getByPath(row, field);
       if (value !== undefined) {

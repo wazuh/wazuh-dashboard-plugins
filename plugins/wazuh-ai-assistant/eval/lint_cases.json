@@ -416,7 +416,7 @@
       },
       "expect": "pass",
       "reason_match": null,
-      "citation": "Shape of get_critical_alerts.ts:34-46's real, in-production query -- must pass cleanly end to end (checkIndexAllowlist, applySafetyValves, lintDsl all ok:true)."
+      "citation": "Shape of get_critical_findings.ts:34-46's real, in-production query -- must pass cleanly end to end (checkIndexAllowlist, applySafetyValves, lintDsl all ok:true)."
     },
     {
       "name": "clean_aggregation_query",

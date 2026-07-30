@@ -8,7 +8,7 @@ import {
 } from './common';
 
 /**
- * Same filter as `get_pci_dss_alerts.ts` (an `exists` filter on `wazuh.rule.compliance.pci_dss`),
+ * Same filter as `get_pci_dss_findings.ts` (an `exists` filter on `wazuh.rule.compliance.pci_dss`),
  * aggregated by the specific requirement tag via a `terms` agg directly on
  * `wazuh.rule.compliance.pci_dss` — its values ARE the requirement ids, so no `include` regex is
  * needed to narrow the buckets. `wazuh.rule.compliance.pci_dss` is already on the guardrail agg
@@ -18,9 +18,9 @@ export const getPciDssSummaryTool: ToolDefinition = {
   spec: {
     name: 'get_pci_dss_summary',
     description:
-      'Aggregates PCI DSS compliance alerts within a time range, grouped by the specific PCI DSS ' +
+      'Aggregates PCI DSS compliance findings within a time range, grouped by the specific PCI DSS ' +
       'requirement tag (e.g. pci_dss_10.2.5). Use for "summarize PCI DSS compliance" questions, ' +
-      'not for a list of individual alerts.',
+      'not for a list of individual findings.',
     parameters: objectSchema({
       limit: limitProperty(
         'Max number of PCI DSS requirement buckets to return (default 20, max 100).',

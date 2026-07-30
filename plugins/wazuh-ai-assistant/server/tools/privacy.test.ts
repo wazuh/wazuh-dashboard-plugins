@@ -58,7 +58,7 @@ test('prescanAndMint: leaves an ISO-8601 timestamp fragment untouched (29.000Z)'
 test('prescanAndMintToolContent: never pseudonymizes dotted ECS field-name KEYS', () => {
   const p = new Pseudonymizer();
   const digest = JSON.stringify({
-    tool: 'get_alerts_by_time',
+    tool: 'get_findings_by_time',
     samples: [
       {
         'wazuh.agent.name': 'wazuh-server-01',

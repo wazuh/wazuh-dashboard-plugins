@@ -1,7 +1,7 @@
 import { ToolDefinition } from '../types';
 import {
-  alertDigestColumns,
-  alertRowFields,
+  findingDigestColumns,
+  findingRowFields,
   clampLimit,
   limitProperty,
   objectSchema,
@@ -10,9 +10,9 @@ import {
   severityComparisonProperty,
   severityFilterValues,
   severityProperty,
-  STANDARD_ALERT_SAMPLE_COLUMNS,
-  STANDARD_ALERT_TABLE_COLUMN_FIELDS,
-  STANDARD_ALERT_TABLE_COLUMNS,
+  STANDARD_FINDING_SAMPLE_COLUMNS,
+  STANDARD_FINDING_TABLE_COLUMN_FIELDS,
+  STANDARD_FINDING_TABLE_COLUMNS,
   timeRangeProperties,
 } from './common';
 
@@ -23,14 +23,14 @@ import {
  * opts into "or above"/"or below" (see common.ts's severityFilterValues), applied only when
  * `severity` is supplied.
  */
-export const searchAlertsByMultipleAgentsTool: ToolDefinition = {
+export const searchFindingsByMultipleAgentsTool: ToolDefinition = {
   spec: {
-    name: 'search_alerts_by_multiple_agents',
+    name: 'search_findings_by_multiple_agents',
     description:
       'Searches security findings for findings from any of several named agents, within a ' +
       'time range. Optional severity narrows to exactly that severity, or to a floor/ceiling ' +
       'via severity_comparison. Use when the question names two or more agents; use ' +
-      'search_alerts_by_agent instead for a single agent.',
+      'search_findings_by_agent instead for a single agent.',
     parameters: objectSchema(
       {
         agent_names: {
@@ -41,7 +41,7 @@ export const searchAlertsByMultipleAgentsTool: ToolDefinition = {
         severity: severityProperty(),
         severity_comparison: severityComparisonProperty(),
         limit: limitProperty(
-          'Max number of alerts to return (default 20, max 500).',
+          'Max number of findings to return (default 20, max 500).',
         ),
         ...timeRangeProperties(),
       },
@@ -90,8 +90,10 @@ export const searchAlertsByMultipleAgentsTool: ToolDefinition = {
     };
   },
   tableSpec: {
-    columns: STANDARD_ALERT_TABLE_COLUMNS,
-    rowFields: alertRowFields(STANDARD_ALERT_TABLE_COLUMN_FIELDS),
+    columns: STANDARD_FINDING_TABLE_COLUMNS,
+    rowFields: findingRowFields(STANDARD_FINDING_TABLE_COLUMN_FIELDS),
   },
-  digest: { sampleColumns: alertDigestColumns(STANDARD_ALERT_SAMPLE_COLUMNS) },
+  digest: {
+    sampleColumns: findingDigestColumns(STANDARD_FINDING_SAMPLE_COLUMNS),
+  },
 };

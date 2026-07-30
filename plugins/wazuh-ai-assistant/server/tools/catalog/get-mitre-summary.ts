@@ -18,9 +18,9 @@ export const getMitreSummaryTool: ToolDefinition = {
   spec: {
     name: 'get_mitre_summary',
     description:
-      'Aggregates MITRE ATT&CK-tagged alerts within a time range, grouped by technique ID, with a ' +
+      'Aggregates MITRE ATT&CK-tagged findings within a time range, grouped by technique ID, with a ' +
       'sample technique/tactic name per group. Use for "which techniques are most common" ' +
-      'questions, not for a list of individual alerts.',
+      'questions, not for a list of individual findings.',
     parameters: objectSchema({
       limit: limitProperty(
         'Max number of distinct techniques to return (default 20, max 100).',

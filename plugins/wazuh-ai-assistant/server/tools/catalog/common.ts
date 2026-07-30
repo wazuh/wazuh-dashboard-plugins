@@ -80,7 +80,7 @@ export type SeverityWord = (typeof SEVERITY_ORDER)[number];
 /**
  * The severity words at or above `min` (inclusive), for a `terms` filter — e.g. `'medium'` ->
  * `['medium','high','critical']`. Case-insensitive; an unrecognized value returns the full list
- * (no floor), failing OPEN toward showing more rather than silently hiding alerts.
+ * (no floor), failing OPEN toward showing more rather than silently hiding findings.
  */
 export function severitiesAtOrAbove(min: string): SeverityWord[] {
   const idx = SEVERITY_ORDER.indexOf(min.trim().toLowerCase() as SeverityWord);
@@ -90,7 +90,7 @@ export function severitiesAtOrAbove(min: string): SeverityWord[] {
 /**
  * The severity words at or below `max` (inclusive), for a `terms` filter — e.g. `'medium'` ->
  * `['informational','low','medium']`. Case-insensitive; an unrecognized value returns the full
- * list (no ceiling), failing OPEN toward showing more rather than silently hiding alerts.
+ * list (no ceiling), failing OPEN toward showing more rather than silently hiding findings.
  */
 export function severitiesAtOrBelow(max: string): SeverityWord[] {
   const idx = SEVERITY_ORDER.indexOf(max.trim().toLowerCase() as SeverityWord);
@@ -138,7 +138,7 @@ export function severityFilterValues(
     : [...SEVERITY_ORDER];
 }
 
-/** The `severity` enum property shared by the alert tools that take a severity filter. */
+/** The `severity` enum property shared by the finding tools that take a severity filter. */
 export function severityProperty(): JsonSchemaProperty {
   return {
     type: 'string',
@@ -150,7 +150,7 @@ export function severityProperty(): JsonSchemaProperty {
   };
 }
 
-/** The `severity_comparison` enum property shared by the alert tools that take a severity
+/** The `severity_comparison` enum property shared by the finding tools that take a severity
  * filter — paired with `severityProperty()`. Defaults to an exact match. */
 export function severityComparisonProperty(): JsonSchemaProperty {
   return {
@@ -208,21 +208,21 @@ export function objectSchema(
 }
 
 /**
- * Shared baseline `tableSpec.columns`/`digest.sampleColumns` for the 8 alert-hits tools
- * (get_critical_alerts, get_alerts_by_time, get_brute_force, get_suspicious_powershell,
- * search_alerts_by_agent, search_alerts_by_multiple_agents, search_alerts_by_rule_title,
- * search_alerts_by_rule_group). Each previously kept its own identical copy.
+ * Shared baseline `tableSpec.columns`/`digest.sampleColumns` for the 8 finding-hits tools
+ * (get_critical_findings, get_findings_by_time, get_brute_force, get_suspicious_powershell,
+ * search_findings_by_agent, search_findings_by_multiple_agents, search_findings_by_rule_title,
+ * search_findings_by_rule_group). Each previously kept its own identical copy.
  */
-export const STANDARD_ALERT_TABLE_COLUMNS: ToolTableColumnSpec[] = [
+export const STANDARD_FINDING_TABLE_COLUMNS: ToolTableColumnSpec[] = [
   { field: '@timestamp', label: 'Time' },
   { field: 'wazuh.agent.name', label: 'Agent' },
   { field: 'wazuh.rule.title', label: 'Title' },
   { field: 'wazuh.rule.level', label: 'Level', severity: true },
   { field: 'wazuh.rule.id', label: 'Rule ID' },
 ];
-export const STANDARD_ALERT_TABLE_COLUMN_FIELDS =
-  STANDARD_ALERT_TABLE_COLUMNS.map(column => column.field);
-export const STANDARD_ALERT_SAMPLE_COLUMNS = [
+export const STANDARD_FINDING_TABLE_COLUMN_FIELDS =
+  STANDARD_FINDING_TABLE_COLUMNS.map(column => column.field);
+export const STANDARD_FINDING_SAMPLE_COLUMNS = [
   '@timestamp',
   'wazuh.agent.name',
   'wazuh.rule.title',
@@ -230,13 +230,13 @@ export const STANDARD_ALERT_SAMPLE_COLUMNS = [
 ];
 
 /**
- * Investigation field set added to every alert-hits tool's table ROWS: revealed by the row
- * expander (and available to `digest.sampleColumns`, see `alertDigestColumns` below), never as
+ * Investigation field set added to every finding-hits tool's table ROWS: revealed by the row
+ * expander (and available to `digest.sampleColumns`, see `findingDigestColumns` below), never as
  * a visible `tableSpec.columns` entry (visible columns stay exactly as they are). The heavy,
  * PII-rich raw full-log field is deliberately excluded — there is no equivalent field to
  * include here.
  */
-export const ALERT_INVESTIGATION_ROW_FIELDS = [
+export const FINDING_INVESTIGATION_ROW_FIELDS = [
   'wazuh.rule.tags',
   'wazuh.rule.mitre.technique.id',
   'source.ip',
@@ -247,13 +247,13 @@ export const ALERT_INVESTIGATION_ROW_FIELDS = [
 ];
 
 /**
- * Fields added to every alert-hits tool's digest `sampleColumns` — the model-facing subset of
+ * Fields added to every finding-hits tool's digest `sampleColumns` — the model-facing subset of
  * the investigation row set (deliberately narrower: `source.port`/`process.command_line` stay
  * row-only, not sent to the model). Every one of these has a `server/tools/privacy.ts`
  * `FIELD_POLICY_DEFAULTS` entry before it reaches a digest. These are the ECS
  * findings-v5 field names.
  */
-export const ALERT_DIGEST_EXTRA_COLUMNS = [
+export const FINDING_DIGEST_EXTRA_COLUMNS = [
   'wazuh.rule.tags',
   'destination.user.name',
   'source.user.name',
@@ -262,22 +262,24 @@ export const ALERT_DIGEST_EXTRA_COLUMNS = [
 ];
 
 /**
- * Returns `ALERT_INVESTIGATION_ROW_FIELDS` minus whatever the calling tool already declares as a
- * visible `tableSpec.columns` field (e.g. `get_pci_dss_alerts`'s `wazuh.rule.compliance.pci_dss`)
+ * Returns `FINDING_INVESTIGATION_ROW_FIELDS` minus whatever the calling tool already declares as a
+ * visible `tableSpec.columns` field (e.g. `get_pci_dss_findings`'s `wazuh.rule.compliance.pci_dss`)
  * — so `buildTableSpec` (digest.ts) never assigns the same dot-path into a row twice.
  */
-export function alertRowFields(existingColumnFields: string[]): string[] {
-  return ALERT_INVESTIGATION_ROW_FIELDS.filter(
+export function findingRowFields(existingColumnFields: string[]): string[] {
+  return FINDING_INVESTIGATION_ROW_FIELDS.filter(
     field => !existingColumnFields.includes(field),
   );
 }
 
 /**
- * Appends `ALERT_DIGEST_EXTRA_COLUMNS` to a tool's own `digest.sampleColumns`, deduping any column
+ * Appends `FINDING_DIGEST_EXTRA_COLUMNS` to a tool's own `digest.sampleColumns`, deduping any column
  * the tool already whitelists, so a sample row never carries the same field twice.
  */
-export function alertDigestColumns(existingSampleColumns: string[]): string[] {
-  const extras = ALERT_DIGEST_EXTRA_COLUMNS.filter(
+export function findingDigestColumns(
+  existingSampleColumns: string[],
+): string[] {
+  const extras = FINDING_DIGEST_EXTRA_COLUMNS.filter(
     field => !existingSampleColumns.includes(field),
   );
   return [...existingSampleColumns, ...extras];

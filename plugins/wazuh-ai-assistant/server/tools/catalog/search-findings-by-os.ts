@@ -1,7 +1,7 @@
 import { ToolDefinition } from '../types';
 import {
-  alertDigestColumns,
-  alertRowFields,
+  findingDigestColumns,
+  findingRowFields,
   clampLimit,
   limitProperty,
   objectSchema,
@@ -34,9 +34,9 @@ const SAMPLE_COLUMNS = [
  * `severity_comparison` opts into "or above"/"or below" (see common.ts's severityFilterValues),
  * applied only when `severity` is supplied.
  */
-export const searchAlertsByOsTool: ToolDefinition = {
+export const searchFindingsByOsTool: ToolDefinition = {
   spec: {
-    name: 'search_alerts_by_os',
+    name: 'search_findings_by_os',
     description:
       'Searches security findings for findings from agents running a given operating system ' +
       '(e.g. "Windows", "Ubuntu"), within a time range. Optional severity narrows to exactly ' +
@@ -50,7 +50,7 @@ export const searchAlertsByOsTool: ToolDefinition = {
         severity: severityProperty(),
         severity_comparison: severityComparisonProperty(),
         limit: limitProperty(
-          'Max number of alerts to return (default 20, max 500).',
+          'Max number of findings to return (default 20, max 500).',
         ),
         ...timeRangeProperties(),
       },
@@ -111,7 +111,7 @@ export const searchAlertsByOsTool: ToolDefinition = {
   },
   tableSpec: {
     columns: TABLE_COLUMNS,
-    rowFields: alertRowFields(TABLE_COLUMNS.map(column => column.field)),
+    rowFields: findingRowFields(TABLE_COLUMNS.map(column => column.field)),
   },
-  digest: { sampleColumns: alertDigestColumns(SAMPLE_COLUMNS) },
+  digest: { sampleColumns: findingDigestColumns(SAMPLE_COLUMNS) },
 };

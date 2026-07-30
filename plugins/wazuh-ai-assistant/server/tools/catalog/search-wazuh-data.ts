@@ -41,7 +41,7 @@ export const searchWazuhDataTool: ToolDefinition = {
           type: 'string',
           description:
             'The exact index pattern to search. One of: "wazuh-findings-v5-*" (rule-match ' +
-            'findings — the security alerts, with rule.level/rule.mitre/severity), ' +
+            'findings — the security detections, with rule.level/rule.mitre/severity), ' +
             '"wazuh-events-v5-*" (all normalized events, matched or not), "wazuh-states-*" ' +
             '(current-state data: vulnerabilities, FIM, SCA, inventory).',
           enum: ['wazuh-findings-v5-*', 'wazuh-events-v5-*', 'wazuh-states-*'],

@@ -67,7 +67,7 @@ const MAX_TREE_DEPTH = 100;
 // separator, so `.*` would let a single match name two index patterns. Not reachable through the
 // catalog today (`index` is enum-locked at the tool-schema level), but this function is the
 // standalone boundary and must hold on its own. Wazuh 5.0 families: wazuh-events-v5-*,
-// wazuh-findings-v5-* (the alert/finding data), and wazuh-states-* (SCA/FIM/inventory/vuln
+// wazuh-findings-v5-* (the finding data), and wazuh-states-* (SCA/FIM/inventory/vuln
 // current-state). wazuh-alerts-*/wazuh-archives-* no longer exist in 5.0 and are intentionally
 // dropped from the allowlist.
 const INDEX_ALLOWLIST_RE = /^wazuh-(events-v5|findings-v5|states)[^,\s]*$/;
@@ -330,7 +330,7 @@ function findNumericRangeOnKeywordField(
   return reason;
 }
 
-const VULN_FIELD_ON_ALERTS_REASON =
+const VULN_FIELD_ON_FINDINGS_REASON =
   'Vulnerability data is not in the findings/events index. Use the vulnerability tools ' +
   '(get_vulnerabilities, get_critical_vulnerabilities, ' +
   'get_vulnerabilities_by_agent, get_vulnerability_by_cve) instead of querying vulnerability ' +
@@ -399,9 +399,9 @@ export function lintDsl(
   if (
     index !== undefined &&
     TIME_BASED_INDEX_RE.test(index) &&
-    findVulnerabilityFieldOnAlertsIndex(body)
+    findVulnerabilityFieldOnFindingsIndex(body)
   ) {
-    return { ok: false, reason: VULN_FIELD_ON_ALERTS_REASON };
+    return { ok: false, reason: VULN_FIELD_ON_FINDINGS_REASON };
   }
 
   // After the structural bans (script/wildcard/regexp) and the vulnerability-field check above:
@@ -511,7 +511,7 @@ function findLeadingWildcard(
  * MAX_TREE_DEPTH pre-check `lintDsl` already runs before any check below it gets here — no separate
  * recursion guard needed.
  */
-function findVulnerabilityFieldOnAlertsIndex(
+function findVulnerabilityFieldOnFindingsIndex(
   body: Record<string, unknown>,
 ): boolean {
   let found = false;

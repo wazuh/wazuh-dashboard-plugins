@@ -582,7 +582,7 @@ export function extractAggFields(
  *
  * `isEscapeHatch`: typed catalog tools only ever expose the ~10 fields curated in
  * `FIELD_POLICY_DEFAULTS`, so "unlisted = allow" was a safe default — but the search_wazuh_data
- * escape hatch's `deriveColumns` can pick ANY alert field into `samples`/`breakdown` (data.win.*,
+ * escape hatch's `deriveColumns` can pick ANY finding field into `samples`/`breakdown` (data.win.*,
  * data.office365.*, data.aws.*, syscheck.path, ...), and every one of those was passing through
  * untouched under privacy mode, defeating the guarantee for the one tool built to reach arbitrary
  * fields. When the caller sets `isEscapeHatch: true` (deriveColumns tools only — threaded from
@@ -624,7 +624,7 @@ export function applyFieldPolicy(
         value.length > 0
       ) {
         // Fail-closed: no explicit policy entry for this field, but the escape hatch can
-        // surface any alert field, so an unlisted one is NOT trusted as safe-by-omission here.
+        // surface any finding field, so an unlisted one is NOT trusted as safe-by-omission here.
         out[field] = pseudonymizer.pseudonymize(
           value,
           inferPseudonymKind(field),

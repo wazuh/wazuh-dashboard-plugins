@@ -1,15 +1,15 @@
 import { ToolDefinition } from '../types';
 import {
-  alertDigestColumns,
-  alertRowFields,
+  findingDigestColumns,
+  findingRowFields,
   clampLimit,
   limitProperty,
   objectSchema,
   requireNonEmptyString,
   resolveTimeRange,
-  STANDARD_ALERT_SAMPLE_COLUMNS,
-  STANDARD_ALERT_TABLE_COLUMN_FIELDS,
-  STANDARD_ALERT_TABLE_COLUMNS,
+  STANDARD_FINDING_SAMPLE_COLUMNS,
+  STANDARD_FINDING_TABLE_COLUMN_FIELDS,
+  STANDARD_FINDING_TABLE_COLUMNS,
   timeRangeProperties,
 } from './common';
 
@@ -20,17 +20,17 @@ import {
  * CLASSIFICATION TAG instead of guessing an ID -- the thing to reach for whenever a question names
  * a category of activity rather than a specific rule number.
  * Searches `wazuh.rule.tags` (a keyword array) with a plain `term` match (same pattern as
- * search_alerts_by_rule_title.ts). IMPORTANT: the exact `wazuh.rule.tags` vocabulary has not yet been
+ * search_findings_by_rule_title.ts). IMPORTANT: the exact `wazuh.rule.tags` vocabulary has not yet been
  * confirmed against live data. The description below therefore does NOT assert specific tag
  * values as ground truth -- it tells the model to discover tags via get_top_rules rather than
  * invent them, so a hallucinated tag can't masquerade as a verified one.
  */
-export const searchAlertsByRuleGroupTool: ToolDefinition = {
+export const searchFindingsByRuleGroupTool: ToolDefinition = {
   spec: {
-    name: 'search_alerts_by_rule_group',
+    name: 'search_findings_by_rule_group',
     description:
       'Searches security findings belonging to one rule classification tag (rule.tags), within a ' +
-      'time range, most recent first. Use this for "which/what kind of alerts" questions about a ' +
+      'time range, most recent first. Use this for "which/what kind of findings" questions about a ' +
       'category of activity (logins, SSH, sudo, file integrity, authentication) when you do not ' +
       'know the exact numeric rule ID -- never guess a rule.id. The exact tag vocabulary is ' +
       'deployment-specific: if you are unsure what tag to use, first aggregate with get_top_rules ' +
@@ -46,7 +46,7 @@ export const searchAlertsByRuleGroupTool: ToolDefinition = {
             '"authentication_success".',
         },
         limit: limitProperty(
-          'Max number of alerts to return (default 20, max 500).',
+          'Max number of findings to return (default 20, max 500).',
         ),
         ...timeRangeProperties(),
       },
@@ -80,8 +80,10 @@ export const searchAlertsByRuleGroupTool: ToolDefinition = {
     };
   },
   tableSpec: {
-    columns: STANDARD_ALERT_TABLE_COLUMNS,
-    rowFields: alertRowFields(STANDARD_ALERT_TABLE_COLUMN_FIELDS),
+    columns: STANDARD_FINDING_TABLE_COLUMNS,
+    rowFields: findingRowFields(STANDARD_FINDING_TABLE_COLUMN_FIELDS),
   },
-  digest: { sampleColumns: alertDigestColumns(STANDARD_ALERT_SAMPLE_COLUMNS) },
+  digest: {
+    sampleColumns: findingDigestColumns(STANDARD_FINDING_SAMPLE_COLUMNS),
+  },
 };

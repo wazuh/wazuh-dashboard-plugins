@@ -18,7 +18,7 @@ export const ROUTER_ENABLED = true;
 
 export type RouterCategory =
   | 'agents'
-  | 'alerts'
+  | 'findings'
   | 'vulnerabilities'
   | 'fim'
   | 'sca'
@@ -47,18 +47,18 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_active_agents: 'agents',
   get_disconnected_agents: 'agents',
 
-  // alerts
-  get_critical_alerts: 'alerts',
-  search_alerts_by_agent: 'alerts',
-  get_top_rules: 'alerts',
-  get_alerts_by_time: 'alerts',
-  get_brute_force: 'alerts',
-  get_security_summary: 'alerts',
-  get_suspicious_powershell: 'alerts',
-  search_alerts_by_rule_title: 'alerts',
-  search_alerts_by_rule_group: 'alerts',
-  search_alerts_by_multiple_agents: 'alerts',
-  search_alerts_by_os: 'alerts',
+  // findings
+  get_critical_findings: 'findings',
+  search_findings_by_agent: 'findings',
+  get_top_rules: 'findings',
+  get_findings_by_time: 'findings',
+  get_brute_force: 'findings',
+  get_security_summary: 'findings',
+  get_suspicious_powershell: 'findings',
+  search_findings_by_rule_title: 'findings',
+  search_findings_by_rule_group: 'findings',
+  search_findings_by_multiple_agents: 'findings',
+  search_findings_by_os: 'findings',
 
   // vulnerabilities
   get_vulnerabilities: 'vulnerabilities',
@@ -74,7 +74,7 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_sca_checks: 'sca',
 
   // mitre
-  get_mitre_alerts: 'mitre',
+  get_mitre_findings: 'mitre',
   get_mitre_summary: 'mitre',
 
   // inventory (syscollector)
@@ -84,7 +84,7 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_agent_processes: 'inventory',
 
   // compliance
-  get_pci_dss_alerts: 'compliance',
+  get_pci_dss_findings: 'compliance',
   get_pci_dss_summary: 'compliance',
 
   // free_search (escape hatch)
@@ -94,7 +94,7 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
 /** Fixed menu order for both the enum on the wire and the routing prompt's category list. */
 const CATEGORY_ORDER: RouterCategory[] = [
   'agents',
-  'alerts',
+  'findings',
   'vulnerabilities',
   'fim',
   'sca',
@@ -109,20 +109,20 @@ const CATEGORY_ORDER: RouterCategory[] = [
  * character here is paid for on every turn (stage-1 token budget). */
 const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
   agents: 'Agent connectivity status (active or disconnected agents).',
-  alerts:
-    'Alert search/summaries: critical alerts, by agent/rule/rule-group/OS/time, top rules, ' +
+  findings:
+    'Finding search/summaries: critical findings, by agent/rule/rule-group/OS/time, top rules, ' +
     'brute-force, suspicious PowerShell, general security summary.',
   vulnerabilities:
     'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only.',
   fim: 'File Integrity Monitoring: current state of monitored files (path, mtime, owner, hashes).',
   sca: 'Security Configuration Assessment (SCA) policy results.',
   mitre:
-    'MITRE ATT&CK technique/tactic alerts and technique-frequency summaries.',
+    'MITRE ATT&CK technique/tactic findings and technique-frequency summaries.',
   inventory:
     'Syscollector inventory: agent OS, installed packages, open ports, running processes.',
-  compliance: 'PCI DSS compliance alerts and summaries.',
+  compliance: 'PCI DSS compliance findings and summaries.',
   free_search:
-    'Anything else about Wazuh alert/vulnerability/state data (last resort).',
+    'Anything else about Wazuh finding/vulnerability/state data (last resort).',
   general:
     'No Wazuh data needed at all: greeting, meta-question, clarification, chit-chat.',
 };
