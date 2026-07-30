@@ -11,7 +11,7 @@ import {
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { TableSpec } from '../../../common/types';
-import { SEVERITY_LEVELS, SeverityLevel } from '../../../common/constants';
+import { SeverityLevel } from '../../../common/constants';
 import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
 
 /** Tables at or under this row count default to expanded (nothing to gain from collapsing them);
@@ -72,11 +72,16 @@ const SEVERITY_BUCKETS: Record<
 
 function renderSeverityBadge(value: unknown): React.ReactNode {
   const word = String(value ?? '').toLowerCase();
-  const isKnown = (SEVERITY_LEVELS as readonly string[]).includes(word);
-  if (!isKnown) {
+  // Look up directly in SEVERITY_BUCKETS (the single source of truth for what's renderable)
+  // instead of checking membership in SEVERITY_LEVELS first and casting — two collections
+  // staying in sync is an assumption this can't verify at runtime, an object property lookup
+  // can't throw, and `bucket` being `undefined` is a normal, handled outcome either way.
+  const bucket = SEVERITY_BUCKETS[word as SeverityLevel] as
+    | { color: string; label: string }
+    | undefined;
+  if (!bucket) {
     return <EuiBadge color='default'>{String(value ?? '')}</EuiBadge>;
   }
-  const bucket = SEVERITY_BUCKETS[word as SeverityLevel];
   return <EuiBadge color={bucket.color}>{bucket.label}</EuiBadge>;
 }
 
