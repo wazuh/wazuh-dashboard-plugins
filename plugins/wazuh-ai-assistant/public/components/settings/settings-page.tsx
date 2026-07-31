@@ -1350,7 +1350,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                         'wazuhAiAssistant.settings.privacy.fieldPolicyHelp',
                         {
                           defaultMessage:
-                            'Controls what the AI provider receives for each field when privacy mode is on. It never changes what you see: the field is always queried and always shown in full in the answer and in the results table, which stay inside the cluster. "Allow" sends the real value. "Anonymize" sends a reversible pseudonym instead (HOST_1, IP_2). "Never send" sends nothing at all for that field — not the value, not a pseudonym, not even the field name. Field names are matched exactly: an index field ("wazuh.agent.name") and a Wazuh API field of a specific tool ("get_active_agents/name") are different entries and must each be configured.',
+                            'What the AI provider gets per field: real value (Allow), pseudonym (Anonymize), or nothing (Never send).',
                         },
                       )}
                     />
