@@ -82,6 +82,7 @@ export const ChatInput = React.forwardRef<ChatInputHandle, ChatInputProps>(
           boxShadow: 'none',
           resize: 'none',
           overflow: 'hidden',
+          backgroundColor: 'inherit',
         }}
         placeholder={i18n.translate('wazuhAiAssistant.chat.inputPlaceholder', {
           defaultMessage:
