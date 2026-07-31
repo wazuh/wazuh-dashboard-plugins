@@ -39,6 +39,18 @@ function parseFrameworks(value: unknown): ComplianceFramework[] {
   return frameworks;
 }
 
+/** Same shape as `parseFrameworks` but optional (an absent/empty `exclude_framework` means "no
+ * exclusion"), for the "framework A but not framework B" case no single `should` clause can
+ * express. */
+function parseExcludeFrameworks(value: unknown): ComplianceFramework[] {
+  const raw = Array.isArray(value) ? value : [];
+  return raw.filter(
+    (entry): entry is ComplianceFramework =>
+      typeof entry === 'string' &&
+      (COMPLIANCE_FRAMEWORKS as readonly string[]).includes(entry),
+  );
+}
+
 /**
  * Replaces `get_pci_dss_summary` (retired): each requested framework aggregates on its own
  * `wazuh.rule.compliance.<framework>` field, so this builds one top-level `terms` aggregation per
@@ -53,7 +65,10 @@ export const getComplianceSummaryTool: ToolDefinition = {
     description:
       'Aggregates compliance findings within a time range, grouped by the specific requirement ' +
       'tag for one or more frameworks (e.g. pci_dss_10.2.5, gdpr_II_5.1.1). Use for "summarize ' +
-      '<framework> compliance" questions, not for a list of individual findings. Accepts at most ' +
+      '<framework> compliance" questions, not for a list of individual findings. Optional ' +
+      'exclude_framework excludes findings that also carry a requirement tag for any of those ' +
+      'frameworks -- use for "summarize framework A among findings that do not also have ' +
+      'framework B" questions. Accepts at most ' +
       `${MAX_FRAMEWORKS_PER_CALL} frameworks per call.`,
     parameters: objectSchema(
       {
@@ -62,6 +77,13 @@ export const getComplianceSummaryTool: ToolDefinition = {
           description: 'One or more compliance frameworks to summarize.',
           items: { type: 'string', enum: [...COMPLIANCE_FRAMEWORKS] },
           minItems: 1,
+        },
+        exclude_framework: {
+          type: 'array',
+          description:
+            'Optional: exclude findings that also carry a requirement tag for any of these ' +
+            'frameworks. Omit for no exclusion.',
+          items: { type: 'string', enum: [...COMPLIANCE_FRAMEWORKS] },
         },
         limit: limitProperty(
           'Max number of requirement buckets to return per framework (default 20, max 100).',
@@ -75,6 +97,7 @@ export const getComplianceSummaryTool: ToolDefinition = {
   tier: 'T1',
   buildRequest(params) {
     const frameworks = parseFrameworks(params.framework);
+    const excludeFrameworks = parseExcludeFrameworks(params.exclude_framework);
     const limit = clampLimit(params.limit, 20, 100);
     const { gte, lte } = resolveTimeRange(params);
     const existsClauses = frameworks.map(framework => ({
@@ -84,6 +107,9 @@ export const getComplianceSummaryTool: ToolDefinition = {
       existsClauses.length === 1
         ? existsClauses[0]
         : { bool: { should: existsClauses, minimum_should_match: 1 } };
+    const excludeClauses = excludeFrameworks.map(framework => ({
+      exists: { field: COMPLIANCE_FRAMEWORK_FIELDS[framework] },
+    }));
     const aggs: Record<string, unknown> = {};
     for (const framework of frameworks) {
       aggs[`${framework}_requirements`] = {
@@ -97,6 +123,7 @@ export const getComplianceSummaryTool: ToolDefinition = {
         query: {
           bool: {
             filter: [complianceFilter, { range: { '@timestamp': { gte, lte } } }],
+            ...(excludeClauses.length > 0 ? { must_not: excludeClauses } : {}),
           },
         },
         aggs,

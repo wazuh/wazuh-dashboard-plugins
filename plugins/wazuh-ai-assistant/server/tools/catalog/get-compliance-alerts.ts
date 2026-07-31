@@ -37,6 +37,18 @@ function parseFrameworks(value: unknown): ComplianceFramework[] {
   return frameworks;
 }
 
+/** Same shape as `parseFrameworks` but optional (an absent/empty `exclude_framework` means "no
+ * exclusion"), for the "framework A but not framework B" case no single `should` clause can
+ * express. */
+function parseExcludeFrameworks(value: unknown): ComplianceFramework[] {
+  const raw = Array.isArray(value) ? value : [];
+  return raw.filter(
+    (entry): entry is ComplianceFramework =>
+      typeof entry === 'string' &&
+      (COMPLIANCE_FRAMEWORKS as readonly string[]).includes(entry),
+  );
+}
+
 /**
  * Replaces `get_pci_dss_findings` (retired): each framework is its own
  * `wazuh.rule.compliance.<framework>` field, not a value of one shared field, so "one or many
@@ -49,7 +61,8 @@ export const getComplianceAlertsTool: ToolDefinition = {
     description:
       'Searches security findings tagged with a compliance requirement for one or more ' +
       'frameworks (wazuh.rule.compliance.<framework> present), within a time range, most recent ' +
-      'first.',
+      'first. Optional exclude_framework filters out findings that ALSO carry a requirement tag ' +
+      'for any of those frameworks -- use for "framework A but not framework B" questions.',
     parameters: objectSchema(
       {
         framework: {
@@ -58,6 +71,13 @@ export const getComplianceAlertsTool: ToolDefinition = {
             'One or more compliance frameworks to filter by (matches any of them).',
           items: { type: 'string', enum: [...COMPLIANCE_FRAMEWORKS] },
           minItems: 1,
+        },
+        exclude_framework: {
+          type: 'array',
+          description:
+            'Optional: exclude findings that also carry a requirement tag for any of these ' +
+            'frameworks. Omit for no exclusion.',
+          items: { type: 'string', enum: [...COMPLIANCE_FRAMEWORKS] },
         },
         limit: limitProperty(
           'Max number of findings to return (default 20, max 500).',
@@ -71,6 +91,7 @@ export const getComplianceAlertsTool: ToolDefinition = {
   tier: 'T1',
   buildRequest(params) {
     const frameworks = parseFrameworks(params.framework);
+    const excludeFrameworks = parseExcludeFrameworks(params.exclude_framework);
     const limit = clampLimit(params.limit, 20, 500);
     const { gte, lte } = resolveTimeRange(params);
     const existsClauses = frameworks.map(framework => ({
@@ -80,6 +101,9 @@ export const getComplianceAlertsTool: ToolDefinition = {
       existsClauses.length === 1
         ? existsClauses[0]
         : { bool: { should: existsClauses, minimum_should_match: 1 } };
+    const excludeClauses = excludeFrameworks.map(framework => ({
+      exists: { field: COMPLIANCE_FRAMEWORK_FIELDS[framework] },
+    }));
     return {
       target: 'indexer',
       index: 'wazuh-findings-v5*',
@@ -87,6 +111,7 @@ export const getComplianceAlertsTool: ToolDefinition = {
         query: {
           bool: {
             filter: [complianceFilter, { range: { '@timestamp': { gte, lte } } }],
+            ...(excludeClauses.length > 0 ? { must_not: excludeClauses } : {}),
           },
         },
         sort: [{ '@timestamp': { order: 'desc' } }],
