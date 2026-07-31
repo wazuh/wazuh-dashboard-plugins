@@ -1,3 +1,4 @@
+import './chat-page.scss';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   EuiSpacer,
@@ -2022,8 +2023,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             </div>
 
             {!showLoadingState && !showNoProviderState && (
-              <div style={{ position: 'sticky', bottom: 0 }}>
-                <EuiSpacer size='l' />
+              <div className='wzStickyInputPanel'>
+                <EuiSpacer size='xs' />
                 <EuiPanel
                   color='plain'
                   hasBorder
