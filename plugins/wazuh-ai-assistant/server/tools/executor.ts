@@ -2,7 +2,7 @@ import {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
 } from '../../../../src/core/server';
-import { StreamEvent, TableSpec, ToolCall } from '../../common/types';
+import { StreamEvent, ToolCall } from '../../common/types';
 import { describeError } from '../../common/errors';
 import { validate } from './schema-validator';
 import { getToolDefinition } from './registry';
@@ -16,12 +16,8 @@ import { buildDigest, buildTableSpec, capDigest, Digest } from './digest';
 import { IndexerRequest, ManagerRequest, ToolDefinition } from './types';
 import {
   applyFieldPolicy,
-  applyManagerParamPolicy,
-  applyProjectionPolicy,
-  applyTablePolicy,
   extractAggFields,
   FieldPolicyEntry,
-  findNeverAggregation,
   Pseudonymizer,
 } from './privacy';
 import { resolveApiHostId } from './api-host';
@@ -73,25 +69,12 @@ function finalizeDigest(
 }
 
 /**
- * Applies the display half of the field policy to a `table` StreamEvent's spec (when `privacy` is
- * given): 'never' fields are dropped from its columns and rows. 'anonymize' fields keep their real
- * values on purpose — the table is a LOCAL surface, and so are the answer text (de-pseudonymized by
- * chat.ts's `StreamDepseudonymizer` before it reaches the browser) and the tool-call panel; only the
- * provider ever sees pseudonyms. See common/field-policy.ts's module header.
- *
- * A no-op passthrough when `privacy` is undefined, so privacy-off tables are byte-identical.
+ * The rendered `table` StreamEvent is deliberately NOT policy-filtered — there is no display pass at
+ * all. The table, the answer text (de-pseudonymized by chat.ts's `StreamDepseudonymizer`) and the
+ * tool-call panel are LOCAL surfaces showing the analyst their own data; the policy's only boundary
+ * is the digest handed to the provider (`finalizeDigest` above). See common/field-policy.ts's header
+ * for the three actions and issue #8821 for why the two filtering attempts before this were wrong.
  */
-function finalizeTable(
-  spec: TableSpec,
-  privacy: PrivacyContext | undefined,
-  toolName: string,
-  aggFields?: Record<string, string | undefined>,
-): TableSpec {
-  if (!privacy) {
-    return spec;
-  }
-  return applyTablePolicy(spec, privacy.fieldPolicy, toolName, aggFields);
-}
 
 function toolErrorContent(reason: string): string {
   return JSON.stringify({ error: reason });
@@ -161,34 +144,10 @@ async function executeIndexerRequest(
     };
   }
 
-  // Retrieval half of the 'never' action: strip never-send fields from the body's
-  // projections BEFORE it is executed, so those values are never fetched from the indexer instead of
-  // being fetched and dropped afterwards. Done here, on the already guardrail-clamped body, so the
-  // executed body is the same one every downstream consumer sees — `deriveColumns`, `extractAggFields`
-  // and the "Open in Discover" DSL all read `body` below. A no-op passthrough (same reference) when
-  // privacy is off or the policy has no applicable 'never' entry.
-  if (privacy) {
-    // Aggregations first: an aggregation's bucket keys ARE values of the aggregated field, and no
-    // `_source` rewrite can suppress them — so a 'never' aggregation field has to reject the query
-    // rather than be filtered out of the response afterwards (issue #8821). Bounded and
-    // self-correctable: the model is told which field is off limits and can re-aggregate.
-    const neverAggField = findNeverAggregation(
-      body,
-      privacy.fieldPolicy,
-      toolName,
-    );
-    if (neverAggField) {
-      return {
-        toolResultContent: toolErrorContent(
-          `Aggregating over "${neverAggField}" is not allowed: the field's privacy policy is ` +
-            '"never send", and an aggregation would expose its values as bucket keys. Aggregate ' +
-            'over a different field.',
-        ),
-      };
-    }
-    body = applyProjectionPolicy(body, privacy.fieldPolicy, toolName);
-  }
-
+  // No projection rewrite happens here: every policy action leaves the EXECUTED query untouched, so
+  // the field is retrieved and can be displayed locally (issue #8821 — a field the analyst is meant
+  // to see in the results table has to be fetched). What must not leave is enforced one layer later,
+  // on the digest.
   try {
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: indexerRequest.index,
@@ -212,12 +171,7 @@ async function executeIndexerRequest(
     // "Open in Discover" support (common/types.ts's `TableSpec.discover` doc comment): only this
     // Indexer path has an index/DSL to attach — `body.query` is the guardrail-clamped clause that
     // actually ran, falling back to `match_all` for a query-less body (matches this same result set).
-    const tableSpec = finalizeTable(
-      buildTableSpec(result, def, body),
-      privacy,
-      toolName,
-      aggFields,
-    );
+    const tableSpec = buildTableSpec(result, def, body);
     tableSpec.discover = {
       index: indexerRequest.index,
       dsl: (body.query as Record<string, unknown>) ?? { match_all: {} },
@@ -250,33 +204,7 @@ async function executeManagerRequest(
     };
   }
 
-  let clampedParams = clampManagerParams(managerRequest.params);
-
-  // Retrieval half of the 'never' action for the Manager API (issue #8821): the API projects through
-  // `select`, not `_source`, so `applyProjectionPolicy` (Indexer-only) never covered this path and a
-  // 'never' field was fetched in full and only dropped when the table/digest were built. The field
-  // list is assembled from THIS tool's definition — visible columns, the row-only investigation
-  // fields the row expander shows, and the digest's sample columns — so `select` asks for exactly
-  // what is displayable and nothing more. A no-op passthrough when the policy has no applicable
-  // 'never' entry (see applyManagerParamPolicy), keeping privacy-off requests byte-identical.
-  // GET only: `select` is a query-string projection parameter, and only a GET's params reach the
-  // query string (a non-GET's params are sent as the request body — see the `data` build below), so
-  // adding it to a POST/PUT body would be a field the API ignores rather than a projection.
-  if (privacy && managerRequest.method === 'GET') {
-    const neededFields = [
-      ...new Set([
-        ...def.tableSpec.columns.map(column => column.field),
-        ...(def.tableSpec.rowFields ?? []),
-        ...def.digest.sampleColumns,
-      ]),
-    ];
-    clampedParams = applyManagerParamPolicy(
-      clampedParams,
-      privacy.fieldPolicy,
-      toolName,
-      neededFields,
-    );
-  }
+  const clampedParams = clampManagerParams(managerRequest.params);
 
   try {
     const apiHostID = await resolveApiHostId(context, request);
@@ -300,13 +228,7 @@ async function executeManagerRequest(
     const finalDigest = finalizeDigest(digest, privacy, toolName);
     return {
       toolResultContent: JSON.stringify(finalDigest),
-      tableEvent: {
-        type: 'table',
-        // Manager tools carry bare, tool-scoped field names ("name", "ip"), so the table pass needs
-        // the same `toolName` scoping the digest pass uses. No `aggFields`: Manager responses have
-        // no aggregation concept.
-        spec: finalizeTable(buildTableSpec(result, def), privacy, toolName),
-      },
+      tableEvent: { type: 'table', spec: buildTableSpec(result, def) },
     };
   } catch (error) {
     return {

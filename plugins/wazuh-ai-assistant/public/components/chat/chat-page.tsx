@@ -36,10 +36,6 @@ import {
   ToolCall,
 } from '../../../common/types';
 import { mergeConversationMessages } from '../../../common/conversation-merge';
-import {
-  applyPersistedTablePolicy,
-  FieldPolicyEntry,
-} from '../../../common/field-policy';
 import { getHttpErrorStatus } from '../../../common/http-status';
 import { restoreAndClearDraft, stashDraft } from '../../../common/draft-stash';
 import {
@@ -177,47 +173,6 @@ const EXAMPLE_CARDS = [
  * transition, no transform) even for reduced-motion users, since EUI's own hover affordances work
  * the same way.
  */
-/**
- * Re-applies the field privacy policy's DISPLAY half to the tables of already-materialized messages
- * (issue #8821). Streamed tables arrive filtered from the server; this exists for the tables that
- * come back from the conversation SAVED OBJECT, which were filtered under whatever policy was in
- * force when the turn ran — tightening a field to 'never'/'anonymize' has to take effect on that
- * history too, not only on new turns.
- *
- * The tool name a table is scoped to is taken from the message's LAST tool call: the `table` event a
- * turn displays is the one its last table-producing tool emitted, and a tool-scoped entry
- * ("get_active_agents/name") cannot resolve without it. Exported for chat-page.test.tsx.
- *
- * Only the 'never' half applies here: 'anonymize' values are shown in full on every local surface
- * (see common/field-policy.ts's module header). Idempotent, and allocation-free when the policy
- * changes nothing: `applyPersistedTablePolicy` returns the same spec reference, so the message object
- * — and therefore the array — is reused and no re-render is triggered.
- */
-export function applyFieldPolicyToMessages(
-  messages: UiChatMessage[],
-  policy: FieldPolicyEntry[] | undefined,
-): UiChatMessage[] {
-  if (!policy || policy.length === 0) {
-    return messages;
-  }
-  let changed = false;
-  const next = messages.map(message => {
-    if (!message.table) {
-      return message;
-    }
-    const toolName = message.toolCalls?.length
-      ? message.toolCalls[message.toolCalls.length - 1].name
-      : undefined;
-    const table = applyPersistedTablePolicy(message.table, policy, toolName);
-    if (table === message.table) {
-      return message;
-    }
-    changed = true;
-    return { ...message, table };
-  });
-  return changed ? next : messages;
-}
-
 const CHAT_SURFACE_STYLES = `
 .wzHeroIconWrap {
   position: relative;
@@ -379,10 +334,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     useState<AssistantSettings | null>(null);
   const [privacyEnabled, setPrivacyEnabled] = useState(false);
   const [pseudonymMap, setPseudonymMap] = useState<PseudonymEntry[]>([]);
-  // Mirror of `assistantSettings` for the non-render read paths (`applyLoadedConversation`, which the
-  // mount-time restore can call before the settings request has resolved).
-  const assistantSettingsRef = useRef<AssistantSettings | null>(null);
-  assistantSettingsRef.current = assistantSettings;
   // Set on the user's first manual toggle so the settings-driven default effect below stops
   // recomputing it (e.g. if the top-level provider selector changes later in the same session).
   const privacyTouchedRef = useRef(false);
@@ -465,23 +416,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       pane.scrollTop = pane.scrollHeight;
     }
   }, [messages]);
-
-  // Closes the mount-time race behind the persisted-table policy pass: the conversation restore and
-  // the settings request are independent, so a restore that lands FIRST applies an empty policy. This
-  // re-runs the (idempotent) pass the moment the real policy is known, and again if an admin changes
-  // it while the tab is open. Returns the same array when nothing changed, so it cannot loop.
-  useEffect(() => {
-    // Gated on `privacyEnabled` for the same reason the server gates its own passes on
-    // `privacyCtx`: with privacy mode off the field policy applies nowhere, and masking a column
-    // here would hide data from a user who never turned privacy on.
-    if (!assistantSettings || !privacyEnabled) {
-      return;
-    }
-    updateMessages(current =>
-      applyFieldPolicyToMessages(current, assistantSettings.fieldPolicy),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- `updateMessages` is a stable setter
-  }, [assistantSettings, privacyEnabled]);
 
   useEffect(() => {
     settingsService
@@ -678,16 +612,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // A resumed conversation opens at its latest turn (bottom), like every chat client.
     pinnedToBottomRef.current = true;
     const restored = reconstructConversation(record.messages);
-    // Persisted tables are re-checked against the CURRENT field policy: a table stored under a
-    // looser policy must not keep showing a field that is now 'never'/'anonymize'. `assistantSettings`
-    // may still be loading on the mount-time restore path, which is why the effect below re-runs this
-    // pass as soon as it arrives (the pass is idempotent).
-    updateMessages(
-      applyFieldPolicyToMessages(
-        restored.messages,
-        privacyEnabled ? assistantSettingsRef.current?.fieldPolicy : undefined,
-      ),
-    );
+    updateMessages(restored.messages);
     // Restoring the tool history is what makes a resumed conversation continuable rather than just
     // readable: the model gets back the tool calls whose results its prose describes, instead of
     // re-running the same queries on the next question.

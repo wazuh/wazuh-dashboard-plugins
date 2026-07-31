@@ -2,14 +2,13 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { createBrowserHistory } from 'history';
-import { ChatPage, applyFieldPolicyToMessages } from './chat-page';
+import { ChatPage } from './chat-page';
 import {
   ConversationRecord,
   PersistedChatMessage,
   ProviderSummary,
   StreamEvent,
 } from '../../../common/types';
-import { UiChatMessage } from './message-bubble';
 
 /**
  * First colocated coverage for `chat-page.tsx`, aimed squarely at the ABANDONED-TURN path — what
@@ -1336,85 +1335,5 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
       expect(screen.getByText('earlier question')).toBeInTheDocument(),
     );
     expect(mockOpenConfirm).not.toHaveBeenCalled();
-  });
-});
-
-/**
- * The persisted-table policy pass (issue #8821): a table that was stored with a conversation must be
- * re-checked against the CURRENT field policy when it is restored, so tightening a field also takes
- * effect on history instead of only on new turns.
- */
-describe('applyFieldPolicyToMessages', () => {
-  const message = (
-    table: UiChatMessage['table'],
-    toolCalls?: UiChatMessage['toolCalls'],
-  ): UiChatMessage => ({
-    id: 'm1',
-    role: 'assistant',
-    content: 'here are the agents',
-    createdAt: 0,
-    table,
-    ...(toolCalls ? { toolCalls } : {}),
-  });
-
-  it('drops a column the policy now marks "never"', () => {
-    const messages = [
-      message({
-        columns: [
-          { id: 'wazuh.rule.id', label: 'Rule' },
-          { id: 'wazuh.agent.name', label: 'Agent' },
-        ],
-        rows: [{ 'wazuh.rule.id': '5710', 'wazuh.agent.name': 'web-01' }],
-      }),
-    ];
-    const out = applyFieldPolicyToMessages(messages, [
-      { field: 'wazuh.agent.name', action: 'never' },
-    ]);
-    expect(out[0].table!.columns).toEqual([
-      { id: 'wazuh.rule.id', label: 'Rule' },
-    ]);
-    expect(out[0].table!.rows).toEqual([{ 'wazuh.rule.id': '5710' }]);
-  });
-
-  it("scopes the policy to the message's last tool call, so a Manager field resolves", () => {
-    const messages = [
-      message(
-        {
-          columns: [{ id: 'name', label: 'Agent' }],
-          rows: [{ name: 'web-01' }],
-        },
-        [{ id: 'c1', name: 'get_active_agents', arguments: {} }],
-      ),
-    ];
-    const out = applyFieldPolicyToMessages(messages, [
-      { field: 'get_active_agents/name', action: 'never' },
-    ]);
-    expect(out[0].table!.columns).toEqual([]);
-  });
-
-  it('returns the same array when the policy changes nothing (no re-render)', () => {
-    const messages = [
-      message({
-        columns: [{ id: 'wazuh.rule.id', label: 'Rule' }],
-        rows: [{ 'wazuh.rule.id': '5710' }],
-      }),
-    ];
-    expect(
-      applyFieldPolicyToMessages(messages, [
-        { field: 'wazuh.agent.name', action: 'never' },
-      ]),
-    ).toBe(messages);
-    // An empty/absent policy is a passthrough too.
-    expect(applyFieldPolicyToMessages(messages, [])).toBe(messages);
-    expect(applyFieldPolicyToMessages(messages, undefined)).toBe(messages);
-  });
-
-  it('leaves a message without a table untouched', () => {
-    const messages = [message(undefined)];
-    expect(
-      applyFieldPolicyToMessages(messages, [
-        { field: 'wazuh.agent.name', action: 'never' },
-      ]),
-    ).toBe(messages);
   });
 });

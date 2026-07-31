@@ -4,10 +4,6 @@ import {
   StreamDepseudonymizer,
   inferPseudonymKind,
   applyFieldPolicy,
-  applyManagerParamPolicy,
-  applyProjectionPolicy,
-  applyTablePolicy,
-  findNeverAggregation,
   extractAggFields,
   resolveFieldAction,
   prescanAndMint,
@@ -473,250 +469,6 @@ test('extractAggFields: returns undefined when body has no aggs', () => {
   assert.equal(extractAggFields(undefined), undefined);
 });
 
-// --- applyProjectionPolicy (retrieval half of the "never" action) ------------------------------
-
-test('applyProjectionPolicy: drops a "never" field from an explicit _source list', () => {
-  const policy: FieldPolicyEntry[] = [
-    { field: 'full_log', action: 'never' },
-    { field: 'wazuh.agent.name', action: 'anonymize' },
-  ];
-  const out = applyProjectionPolicy(
-    { _source: ['@timestamp', 'full_log', 'wazuh.agent.name'] },
-    policy,
-  );
-  assert.deepEqual(out._source, ['@timestamp', 'wazuh.agent.name']);
-});
-
-test('applyProjectionPolicy: adds _source.excludes when the body projects nothing', () => {
-  const policy: FieldPolicyEntry[] = [{ field: 'full_log', action: 'never' }];
-  const out = applyProjectionPolicy(
-    { query: { match_all: {} }, size: 10 },
-    policy,
-  );
-  assert.deepEqual(out._source, { excludes: ['full_log'] });
-  // The query itself is untouched: a policy entry bounds projection, not filtering.
-  assert.deepEqual(out.query, { match_all: {} });
-});
-
-test('applyProjectionPolicy: a prefix entry excludes the parent and its subfields', () => {
-  const policy: FieldPolicyEntry[] = [
-    { field: 'GeoLocation.*', action: 'never' },
-  ];
-  const out = applyProjectionPolicy({}, policy);
-  assert.deepEqual(out._source, {
-    excludes: ['GeoLocation', 'GeoLocation.*'],
-  });
-});
-
-test('applyProjectionPolicy: filters includes and merges into existing excludes', () => {
-  const policy: FieldPolicyEntry[] = [{ field: 'full_log', action: 'never' }];
-  const out = applyProjectionPolicy(
-    { _source: { includes: ['rule.id', 'full_log'], excludes: ['data.aws'] } },
-    policy,
-  );
-  assert.deepEqual(out._source, {
-    includes: ['rule.id'],
-    excludes: ['data.aws', 'full_log'],
-  });
-});
-
-test('applyProjectionPolicy: rewrites a nested top_hits _source too', () => {
-  const policy: FieldPolicyEntry[] = [{ field: 'full_log', action: 'never' }];
-  const out = applyProjectionPolicy(
-    {
-      _source: ['rule.id'],
-      aggs: {
-        top: {
-          terms: { field: 'rule.id' },
-          aggs: {
-            sample: {
-              top_hits: { size: 1, _source: ['rule.description', 'full_log'] },
-            },
-          },
-        },
-      },
-    },
-    policy,
-  );
-  const aggs = out.aggs as {
-    top: { aggs: { sample: { top_hits: { _source: string[] } } } };
-  };
-  assert.deepEqual(aggs.top.aggs.sample.top_hits._source, ['rule.description']);
-});
-
-test('applyProjectionPolicy: strips "never" fields from docvalue_fields/fields/stored_fields', () => {
-  const policy: FieldPolicyEntry[] = [{ field: 'full_log', action: 'never' }];
-  const out = applyProjectionPolicy(
-    {
-      _source: ['rule.id'],
-      fields: ['rule.id', { field: 'full_log', format: 'strict_date' }],
-      docvalue_fields: ['full_log'],
-      stored_fields: ['rule.id', 'full_log'],
-    },
-    policy,
-  );
-  assert.deepEqual(out.fields, ['rule.id']);
-  assert.deepEqual(out.docvalue_fields, []);
-  assert.deepEqual(out.stored_fields, ['rule.id']);
-});
-
-test('applyProjectionPolicy: _source:false is left as-is', () => {
-  const policy: FieldPolicyEntry[] = [{ field: 'full_log', action: 'never' }];
-  const out = applyProjectionPolicy({ _source: false }, policy);
-  assert.equal(out._source, false);
-});
-
-test('applyProjectionPolicy: an "anonymize" field is still retrieved (model boundary only)', () => {
-  const policy: FieldPolicyEntry[] = [
-    { field: 'wazuh.agent.name', action: 'anonymize' },
-  ];
-  const body = { _source: ['wazuh.agent.name'] };
-  const out = applyProjectionPolicy(body, policy);
-  // No applicable 'never' entry: the very same body reference is returned, unchanged.
-  assert.equal(out, body);
-  assert.deepEqual(out._source, ['wazuh.agent.name']);
-});
-
-test('applyProjectionPolicy: a tool-scoped "never" entry only applies to its own tool', () => {
-  const policy: FieldPolicyEntry[] = [
-    { field: 'get_active_agents/name', action: 'never' },
-  ];
-  const scoped = applyProjectionPolicy(
-    { _source: ['name', 'id'] },
-    policy,
-    'get_active_agents',
-  );
-  assert.deepEqual(scoped._source, ['id']);
-  const other = applyProjectionPolicy(
-    { _source: ['name', 'id'] },
-    policy,
-    'get_agent_packages',
-  );
-  assert.deepEqual(other._source, ['name', 'id']);
-});
-
-// --- applyTablePolicy (display half of the "never" action) -------------------------------------
-
-test('applyTablePolicy: drops a "never" column and its row values', () => {
-  const policy: FieldPolicyEntry[] = [{ field: 'source.ip', action: 'never' }];
-  const out = applyTablePolicy(
-    {
-      columns: [
-        { id: 'rule.id', label: 'Rule ID' },
-        { id: 'source.ip', label: 'Source IP' },
-      ],
-      rows: [{ 'rule.id': '5710', 'source.ip': '10.0.0.5' }],
-    },
-    policy,
-  );
-  assert.deepEqual(out.columns, [{ id: 'rule.id', label: 'Rule ID' }]);
-  assert.deepEqual(out.rows, [{ 'rule.id': '5710' }]);
-});
-
-test('applyTablePolicy: drops a "never" row-only investigation field with no visible column', () => {
-  const policy: FieldPolicyEntry[] = [
-    { field: 'process.command_line', action: 'never' },
-  ];
-  const out = applyTablePolicy(
-    {
-      columns: [{ id: 'rule.id', label: 'Rule ID' }],
-      rows: [
-        { 'rule.id': '5710', 'process.command_line': 'powershell -enc ...' },
-      ],
-    },
-    policy,
-  );
-  assert.deepEqual(out.rows, [{ 'rule.id': '5710' }]);
-});
-
-test('applyTablePolicy: keeps "anonymize" values in clear text (every LOCAL surface shows the real value; only the provider sees pseudonyms — #8821)', () => {
-  const policy: FieldPolicyEntry[] = [
-    { field: 'wazuh.agent.name', action: 'anonymize', kind: 'HOST' },
-    { field: 'wazuh.agent.host.ip', action: 'anonymize', kind: 'IP' },
-  ];
-  const spec = {
-    columns: [
-      { id: 'wazuh.agent.name', label: 'Agent' },
-      { id: 'wazuh.agent.host.ip', label: 'IP' },
-    ],
-    rows: [
-      {
-        'wazuh.agent.name': 'wazuh.agent.deb.local',
-        'wazuh.agent.host.ip': '172.18.0.4',
-      },
-    ],
-  };
-  const out = applyTablePolicy(spec, policy);
-  // Same reference: an anonymize-only policy leaves the streamed table untouched.
-  assert.equal(out, spec);
-  assert.equal(out.rows[0]['wazuh.agent.host.ip'], '172.18.0.4');
-});
-
-test('applyTablePolicy: an "anonymize" aggregation keeps its real bucket keys', () => {
-  const policy: FieldPolicyEntry[] = [
-    { field: 'wazuh.agent.name', action: 'anonymize', kind: 'HOST' },
-  ];
-  const spec = {
-    columns: [
-      { id: 'key', label: 'Agent' },
-      { id: 'doc_count', label: 'Alerts' },
-    ],
-    rows: [{ key: 'web-01.corp', doc_count: 42 }],
-  };
-  const out = applyTablePolicy(spec, policy, undefined, {
-    top_agents: 'wazuh.agent.name',
-  });
-  assert.equal(out, spec);
-});
-
-test('applyTablePolicy: drops severityColumn when that column is "never"', () => {
-  const policy: FieldPolicyEntry[] = [{ field: 'rule.level', action: 'never' }];
-  const out = applyTablePolicy(
-    {
-      columns: [{ id: 'rule.level', label: 'Level' }],
-      rows: [{ 'rule.level': 'critical' }],
-      severityColumn: 'rule.level',
-    },
-    policy,
-  );
-  assert.equal(out.severityColumn, undefined);
-  assert.deepEqual(out.columns, []);
-});
-
-test('applyTablePolicy: empties the rows of an aggregation over a "never" field', () => {
-  const policy: FieldPolicyEntry[] = [
-    { field: 'wazuh.agent.name', action: 'never' },
-  ];
-  const out = applyTablePolicy(
-    {
-      columns: [
-        { id: 'key', label: 'Agent' },
-        { id: 'doc_count', label: 'Alerts' },
-      ],
-      rows: [{ key: 'web-01.corp', doc_count: 42 }],
-    },
-    policy,
-    undefined,
-    { top_agents: 'wazuh.agent.name' },
-  );
-  assert.deepEqual(out.rows, []);
-});
-
-test('applyTablePolicy: an aggregation over an allowed field keeps its buckets', () => {
-  const policy: FieldPolicyEntry[] = [{ field: 'full_log', action: 'never' }];
-  const spec = {
-    columns: [
-      { id: 'key', label: 'Rule' },
-      { id: 'doc_count', label: 'Alerts' },
-    ],
-    rows: [{ key: '5710', doc_count: 42 }],
-  };
-  const out = applyTablePolicy(spec, policy, undefined, {
-    top_rules: 'rule.id',
-  });
-  assert.equal(out, spec);
-});
-
 // --- applyFieldPolicy: the digest's `columns` schema hint --------------------------------------
 
 test('applyFieldPolicy: drops a "never" field from the digest columns hint', () => {
@@ -757,151 +509,65 @@ test('resolveFieldAction: unlisted field is "allow"; prefix and scoped entries r
   );
 });
 
-// --- applyManagerParamPolicy (retrieval half of "never" on the Wazuh API path, #8821) ----------
+// --- applyFieldPolicy: aggregation SAMPLES (the `key` sample field, #8821) ----------------------
 
-const AGENT_FIELDS = ['id', 'name', 'ip', 'status', 'os.name'];
-
-test('applyManagerParamPolicy: builds a "select" without the "never" field', () => {
+/**
+ * A bucket row's sample keys are `key`/`doc_count`, so resolving `key` by its own name found no
+ * policy entry and shipped the real bucket VALUE to the provider — the same value `breakdown` was
+ * already scrubbing one key over. These cover both actions on that path.
+ */
+test('applyFieldPolicy: drops the "key" sample of an aggregation over a "never" field', () => {
   const policy: FieldPolicyEntry[] = [
-    { field: 'get_active_agents/ip', action: 'never' },
-  ];
-  const out = applyManagerParamPolicy(
-    { status: 'active', limit: 20 },
-    policy,
-    'get_active_agents',
-    AGENT_FIELDS,
-  );
-  assert.equal(out.select, 'id,name,status,os.name');
-  // Everything else the tool asked for is preserved untouched.
-  assert.equal(out.status, 'active');
-  assert.equal(out.limit, 20);
-});
-
-test('applyManagerParamPolicy: a scoped entry does not affect another tool', () => {
-  const policy: FieldPolicyEntry[] = [
-    { field: 'get_active_agents/name', action: 'never' },
-  ];
-  const params = { limit: 20 };
-  assert.equal(
-    applyManagerParamPolicy(params, policy, 'get_agent_packages', [
-      'name',
-      'version',
-    ]),
-    params,
-  );
-});
-
-test('applyManagerParamPolicy: no applicable "never" entry returns the same params reference', () => {
-  const policy: FieldPolicyEntry[] = [
-    { field: 'get_active_agents/name', action: 'anonymize' },
     { field: 'wazuh.agent.name', action: 'never' },
   ];
-  const params = { status: 'active' };
-  assert.equal(
-    applyManagerParamPolicy(params, policy, 'get_active_agents', AGENT_FIELDS),
-    params,
-  );
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [{ key: 'web-01.corp', doc_count: 42 }],
+  });
+  const out = applyFieldPolicy(digest, policy, p, {
+    top_agents: 'wazuh.agent.name',
+  });
+  assert.deepEqual(out.samples, [{ doc_count: 42 }]);
+  // Not even a pseudonym was minted for it: "never" means the value has no representation at all.
+  assert.equal(p.newEntries().length, 0);
 });
 
-test('applyManagerParamPolicy: filters an already-declared "select" instead of replacing it', () => {
+test('applyFieldPolicy: pseudonymizes the "key" sample of an "anonymize" aggregation', () => {
   const policy: FieldPolicyEntry[] = [
-    { field: 'get_active_agents/ip', action: 'never' },
+    { field: 'wazuh.agent.name', action: 'anonymize', kind: 'HOST' },
   ];
-  const out = applyManagerParamPolicy(
-    { select: 'name,ip' },
+  const p = new Pseudonymizer();
+  const out = applyFieldPolicy(
+    baseDigest({ samples: [{ key: 'web-01.corp', doc_count: 42 }] }),
     policy,
-    'get_active_agents',
-    AGENT_FIELDS,
+    p,
+    { top_agents: 'wazuh.agent.name' },
   );
-  assert.equal(out.select, 'name');
+  // Still keyed by `key` — the digest SHAPE the model sees must not change, only the value.
+  assert.deepEqual(out.samples, [{ key: 'HOST_1', doc_count: 42 }]);
 });
 
-test('applyManagerParamPolicy: every needed field "never" adds no select (an empty one is a 400)', () => {
+test('applyFieldPolicy: a real field named "key" is unaffected without an aggregation', () => {
+  const policy: FieldPolicyEntry[] = [{ field: 'key', action: 'allow' }];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({ samples: [{ key: 'literal-value' }] });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.deepEqual(out.samples, [{ key: 'literal-value' }]);
+});
+
+test('applyFieldPolicy: an aggregation with no extractable field leaves "key" alone', () => {
   const policy: FieldPolicyEntry[] = [
-    { field: 'get_active_agents/name', action: 'never' },
+    { field: 'wazuh.agent.name', action: 'never' },
   ];
-  const params = { limit: 20 };
-  const out = applyManagerParamPolicy(params, policy, 'get_active_agents', [
-    'name',
+  const p = new Pseudonymizer();
+  const out = applyFieldPolicy(
+    baseDigest({ samples: [{ key: '2026-07-31T00:00:00Z', doc_count: 3 }] }),
+    policy,
+    p,
+    // A date_histogram: extractAggFields reports the aggregation with no field.
+    { over_time: undefined },
+  );
+  assert.deepEqual(out.samples, [
+    { key: '2026-07-31T00:00:00Z', doc_count: 3 },
   ]);
-  assert.equal(out, params);
-  assert.equal(out.select, undefined);
-});
-
-// --- findNeverAggregation (an aggregation is a projection in disguise, #8821) -------------------
-
-test('findNeverAggregation: reports a terms aggregation over a "never" field', () => {
-  const policy: FieldPolicyEntry[] = [
-    { field: 'wazuh.agent.name', action: 'never' },
-  ];
-  assert.equal(
-    findNeverAggregation(
-      { aggs: { top_agents: { terms: { field: 'wazuh.agent.name' } } } },
-      policy,
-    ),
-    'wazuh.agent.name',
-  );
-});
-
-test('findNeverAggregation: reads the "aggregations" spelling and nested sub-aggregations', () => {
-  const policy: FieldPolicyEntry[] = [{ field: 'source.ip', action: 'never' }];
-  assert.equal(
-    findNeverAggregation(
-      {
-        aggregations: {
-          by_rule: {
-            terms: { field: 'wazuh.rule.id' },
-            aggs: { by_ip: { terms: { field: 'source.ip' } } },
-          },
-        },
-      },
-      policy,
-    ),
-    'source.ip',
-  );
-});
-
-test('findNeverAggregation: a "never" field used as a query filter is still allowed', () => {
-  const policy: FieldPolicyEntry[] = [{ field: 'source.ip', action: 'never' }];
-  assert.equal(
-    findNeverAggregation(
-      {
-        query: { bool: { filter: [{ term: { 'source.ip': '10.0.0.5' } }] } },
-        aggs: { by_rule: { terms: { field: 'wazuh.rule.id' } } },
-      },
-      policy,
-    ),
-    undefined,
-  );
-});
-
-test('findNeverAggregation: a "filter" sub-aggregation over a "never" field is not a projection', () => {
-  const policy: FieldPolicyEntry[] = [{ field: 'source.ip', action: 'never' }];
-  assert.equal(
-    findNeverAggregation(
-      { aggs: { internal: { filter: { exists: { field: 'source.ip' } } } } },
-      policy,
-    ),
-    undefined,
-  );
-});
-
-test('findNeverAggregation: a body with no aggregations is fine', () => {
-  const policy: FieldPolicyEntry[] = [{ field: 'source.ip', action: 'never' }];
-  assert.equal(
-    findNeverAggregation({ query: { match_all: {} } }, policy),
-    undefined,
-  );
-});
-
-test('findNeverAggregation: resolves a tool-scoped entry against the executing tool', () => {
-  const policy: FieldPolicyEntry[] = [
-    { field: 'get_top_hostnames/host.hostname', action: 'never' },
-  ];
-  const body = { aggs: { hosts: { terms: { field: 'host.hostname' } } } };
-  assert.equal(
-    findNeverAggregation(body, policy, 'get_top_hostnames'),
-    'host.hostname',
-  );
-  assert.equal(findNeverAggregation(body, policy, 'other_tool'), undefined);
 });
