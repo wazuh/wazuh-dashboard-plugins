@@ -1,9 +1,11 @@
+import './chat-page.scss';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   EuiSpacer,
   EuiEmptyPrompt,
   EuiButton,
-  EuiBadge,
+  EuiButtonEmpty,
+  EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
   EuiToolTip,
@@ -1451,32 +1453,31 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
   const privacyBadgeLabel = privacyEnabled
     ? i18n.translate('wazuhAiAssistant.chat.privacy.on', {
-        defaultMessage: 'Privacy on',
+        defaultMessage: 'On',
       })
     : i18n.translate('wazuhAiAssistant.chat.privacy.off', {
-        defaultMessage: 'Privacy off',
+        defaultMessage: 'Off',
       });
-  // EuiBadge's props are a discriminated union: the clickable arm (WithButtonProps) requires a
-  // DEFINED onClick + onClickAriaLabel, while the plain arm has neither. Rendering two distinct,
-  // statically-typed badges (rather than conditionally spreading the click props into one) lets
-  // each JSX element match exactly one arm of the union — a conditional spread would widen onClick
-  // to `(() => void) | undefined`, which matches no arm. Output is identical to the spread form:
-  // interactive badge only when the user may toggle privacy, plain badge otherwise.
   const privacyBadgeColor = privacyEnabled ? 'success' : 'hollow';
   const privacyBadgeIcon = privacyEnabled ? 'lock' : 'lockOpen';
   const privacyBadge = assistantSettings?.userCanOverride ? (
-    <EuiBadge
-      color={privacyBadgeColor}
+    <EuiButtonEmpty
+      size='s'
+      color={privacyEnabled ? 'success' : 'text'}
       iconType={privacyBadgeIcon}
       onClick={handleTogglePrivacy}
-      onClickAriaLabel={privacyBadgeLabel}
     >
       {privacyBadgeLabel}
-    </EuiBadge>
+    </EuiButtonEmpty>
   ) : (
-    <EuiBadge color={privacyBadgeColor} iconType={privacyBadgeIcon}>
+    <EuiButtonEmpty
+      size='s'
+      color={privacyEnabled ? 'success' : 'text'}
+      iconType={privacyBadgeIcon}
+      isDisabled
+    >
       {privacyBadgeLabel}
-    </EuiBadge>
+    </EuiButtonEmpty>
   );
 
   // The badge alone only ever said
@@ -1641,88 +1642,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               padding: '16px 24px 0',
             }}
           >
-            {hasProviders && (
-              <>
-                {/* Grouped toolbar strip: the provider select + privacy badge read as one
-                      intentional control cluster instead of two floating controls. */}
-                <EuiPanel
-                  color='subdued'
-                  hasShadow={false}
-                  hasBorder={false}
-                  paddingSize='s'
-                  style={{ borderRadius: 10 }}
-                >
-                  <EuiFlexGroup
-                    justifyContent='flexEnd'
-                    alignItems='center'
-                    gutterSize='s'
-                    responsive={false}
-                  >
-                    <EuiFlexItem grow={false}>
-                      <EuiSelect
-                        id='wzAiAssistantProviderSelect'
-                        compressed
-                        prepend={i18n.translate(
-                          'wazuhAiAssistant.chat.providerLabel',
-                          {
-                            defaultMessage: 'Provider',
-                          },
-                        )}
-                        options={providerOptions}
-                        value={selectedProviderId}
-                        onChange={event => onProviderChange(event.target.value)}
-                        aria-label={i18n.translate(
-                          'wazuhAiAssistant.chat.providerSelect',
-                          {
-                            defaultMessage: 'Provider',
-                          },
-                        )}
-                      />
-                    </EuiFlexItem>
-                    {assistantSettings && (
-                      <EuiFlexItem grow={false}>
-                        {assistantSettings.userCanOverride ? (
-                          privacyBadge
-                        ) : (
-                          <EuiToolTip
-                            content={i18n.translate(
-                              'wazuhAiAssistant.chat.privacy.adminSet',
-                              {
-                                defaultMessage: 'Set by administrator',
-                              },
-                            )}
-                          >
-                            {privacyBadge}
-                          </EuiToolTip>
-                        )}
-                      </EuiFlexItem>
-                    )}
-                    {assistantSettings && (
-                      <EuiFlexItem grow={false}>
-                        {/* disclosure-only affordance explaining what
-                              the privacy badge actually does to the user's data — no behavior
-                              change, the badge's own on/off state and click handling are untouched
-                              above. */}
-                        <EuiIconTip
-                          type='iInCircle'
-                          color='subdued'
-                          content={privacyExplainerText}
-                          aria-label={i18n.translate(
-                            'wazuhAiAssistant.chat.privacy.explainAriaLabel',
-                            {
-                              defaultMessage:
-                                'What privacy mode does to your data',
-                            },
-                          )}
-                        />
-                      </EuiFlexItem>
-                    )}
-                  </EuiFlexGroup>
-                </EuiPanel>
-                <EuiSpacer size='m' />
-              </>
-            )}
-
             {(error || providersError) && (
               <StatusCallout
                 title={i18n.translate('wazuhAiAssistant.chat.errorTitle', {
@@ -2104,8 +2023,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             </div>
 
             {!showLoadingState && !showNoProviderState && (
-              <div style={{ position: 'sticky', bottom: 0 }}>
-                <EuiSpacer size='l' />
+              <div className='wzStickyInputPanel'>
+                <EuiSpacer size='xs' />
                 <EuiPanel
                   color='plain'
                   hasBorder
@@ -2120,9 +2039,106 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     disabled={!hasProviders}
                     isGenerating={isGenerating}
                     onSend={handleSend}
-                    onStop={handleStop}
                   />
+                  <EuiSpacer size='xs' />
+                  <EuiFlexGroup
+                    alignItems='center'
+                    gutterSize='s'
+                    responsive={false}
+                    wrap
+                  >
+                    {hasProviders && assistantSettings && (
+                      <EuiFlexItem grow={false}>
+                        {assistantSettings.userCanOverride ? (
+                          privacyBadge
+                        ) : (
+                          <EuiToolTip
+                            content={i18n.translate(
+                              'wazuhAiAssistant.chat.privacy.adminSet',
+                              { defaultMessage: 'Set by administrator' },
+                            )}
+                          >
+                            {privacyBadge}
+                          </EuiToolTip>
+                        )}
+                      </EuiFlexItem>
+                    )}
+                    {hasProviders && assistantSettings && (
+                      <EuiFlexItem grow={false}>
+                        <EuiIconTip
+                          type='iInCircle'
+                          color='subdued'
+                          content={privacyExplainerText}
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.chat.privacy.explainAriaLabel',
+                            {
+                              defaultMessage:
+                                'What privacy mode does to your data',
+                            },
+                          )}
+                        />
+                      </EuiFlexItem>
+                    )}
+                    <EuiFlexItem />
+                    {hasProviders && (
+                      <EuiFlexItem grow={false}>
+                        <EuiSelect
+                          id='wzAiAssistantProviderSelect'
+                          compressed
+                          prepend={i18n.translate(
+                            'wazuhAiAssistant.chat.providerLabel',
+                            { defaultMessage: 'Provider' },
+                          )}
+                          options={providerOptions}
+                          value={selectedProviderId}
+                          onChange={event =>
+                            onProviderChange(event.target.value)
+                          }
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.chat.providerSelect',
+                            { defaultMessage: 'Provider' },
+                          )}
+                        />
+                      </EuiFlexItem>
+                    )}
+                    <EuiFlexItem grow={false}>
+                      {isGenerating ? (
+                        <EuiButtonIcon
+                          iconType='cross'
+                          color='danger'
+                          size='s'
+                          onClick={handleStop}
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.chat.stopButton',
+                            { defaultMessage: 'Stop' },
+                          )}
+                        />
+                      ) : (
+                        <EuiButtonIcon
+                          iconType='arrowUp'
+                          color='primary'
+                          size='s'
+                          display='fill'
+                          onClick={() => chatInputRef.current?.send()}
+                          disabled={!hasProviders || !inputText.trim()}
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.chat.sendButton',
+                            { defaultMessage: 'Send' },
+                          )}
+                        />
+                      )}
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
                 </EuiPanel>
+                <EuiText size='xs' color='subdued' textAlign='center'>
+                  <p>
+                    {i18n.translate('wazuhAiAssistant.chat.disclaimer', {
+                      defaultMessage:
+                        'AI responses may contain errors. Always verify critical information.',
+                    })}
+                  </p>
+                </EuiText>
+                <EuiSpacer size='s' />
               </div>
             )}
           </div>
