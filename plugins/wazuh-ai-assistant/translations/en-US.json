@@ -96,6 +96,7 @@
     "wazuhAiAssistant.settings.form.modelHelp": "Tool calling needs a model with solid function-calling support. Known good: GPT-4o or GPT-4o-mini (OpenAI), Claude Sonnet (Anthropic), llama-3.3-70b-versatile (Groq). Small or base models often fail with tool errors.",
     "wazuhAiAssistant.settings.form.apiKey": "API key",
     "wazuhAiAssistant.settings.form.apiKeyHelp": "Leave empty to keep the current key.",
+    "wazuhAiAssistant.settings.form.encryptionRequiredTooltip": "An encryption key must be configured before an API key can be saved.",
     "wazuhAiAssistant.settings.form.save": "Save",
     "wazuhAiAssistant.settings.form.cancel": "Cancel",
     "wazuhAiAssistant.settings.deleteConfirm.title": "Delete provider",
