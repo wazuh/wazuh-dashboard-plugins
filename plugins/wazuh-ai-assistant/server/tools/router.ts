@@ -84,8 +84,8 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_agent_processes: 'inventory',
 
   // compliance
-  get_pci_dss_findings: 'compliance',
-  get_pci_dss_summary: 'compliance',
+  get_compliance_alerts: 'compliance',
+  get_compliance_summary: 'compliance',
 
   // free_search (escape hatch)
   search_wazuh_data: 'free_search',
@@ -120,7 +120,9 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'MITRE ATT&CK technique/tactic findings and technique-frequency summaries.',
   inventory:
     'Syscollector inventory: agent OS, installed packages, open ports, running processes.',
-  compliance: 'PCI DSS compliance findings and summaries.',
+  compliance:
+    'Compliance findings/summaries for any of 10 frameworks (PCI DSS, HIPAA, GDPR, ISO 27001, ' +
+    'NIS2, NIST 800-171/800-53, FedRAMP, CMMC, TSC).',
   free_search:
     'Anything else about Wazuh finding/vulnerability/state data (last resort).',
   general:

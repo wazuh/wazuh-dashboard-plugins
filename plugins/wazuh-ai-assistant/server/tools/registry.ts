@@ -12,8 +12,8 @@ import { getSecuritySummaryTool } from './catalog/get-security-summary';
 import { getSuspiciousPowershellTool } from './catalog/get-suspicious-powershell';
 import { searchFindingsByRuleTitleTool } from './catalog/search-findings-by-rule-title';
 import { searchFindingsByRuleTagTool } from './catalog/search-findings-by-rule-tag';
-import { getPciDssFindingsTool } from './catalog/get-pci-dss-findings';
-import { getPciDssSummaryTool } from './catalog/get-pci-dss-summary';
+import { getComplianceAlertsTool } from './catalog/get-compliance-alerts';
+import { getComplianceSummaryTool } from './catalog/get-compliance-summary';
 import { searchFindingsByMultipleAgentsTool } from './catalog/search-findings-by-multiple-agents';
 import { searchFindingsByOsTool } from './catalog/search-findings-by-os';
 import { getVulnerabilitiesTool } from './catalog/get-vulnerabilities';
@@ -56,8 +56,8 @@ const CATALOG: ToolDefinition[] = [
   getSuspiciousPowershellTool,
   searchFindingsByRuleTitleTool,
   searchFindingsByRuleTagTool,
-  getPciDssFindingsTool,
-  getPciDssSummaryTool,
+  getComplianceAlertsTool,
+  getComplianceSummaryTool,
   searchFindingsByMultipleAgentsTool,
   searchFindingsByOsTool,
 

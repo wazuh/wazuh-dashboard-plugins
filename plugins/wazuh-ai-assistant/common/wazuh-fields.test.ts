@@ -1,5 +1,10 @@
 import assert from 'node:assert/strict';
-import { WAZUH_FIELD, SEVERITY_LEVELS } from './wazuh-fields';
+import {
+  WAZUH_FIELD,
+  SEVERITY_LEVELS,
+  COMPLIANCE_FRAMEWORKS,
+  COMPLIANCE_FRAMEWORK_FIELDS,
+} from './wazuh-fields';
 
 test('WAZUH_FIELD exposes the live wazuh.* rule/agent/integration paths', () => {
   assert.equal(WAZUH_FIELD.RULE_LEVEL, 'wazuh.rule.level');
@@ -39,6 +44,32 @@ test('WAZUH_FIELD is frozen', () => {
   assert.throws(() => {
     (WAZUH_FIELD as Record<string, string>).RULE_LEVEL = 'mutated';
   });
+});
+
+test('COMPLIANCE_FRAMEWORKS covers all 10 curated frameworks, each with a distinct field', () => {
+  assert.deepEqual(COMPLIANCE_FRAMEWORKS, [
+    'cmmc',
+    'fedramp',
+    'gdpr',
+    'hipaa',
+    'iso_27001',
+    'nis2',
+    'nist_800_171',
+    'nist_800_53',
+    'pci_dss',
+    'tsc',
+  ]);
+  const fields = COMPLIANCE_FRAMEWORKS.map(
+    framework => COMPLIANCE_FRAMEWORK_FIELDS[framework],
+  );
+  assert.equal(new Set(fields).size, COMPLIANCE_FRAMEWORKS.length);
+  for (const field of fields) {
+    assert.match(field, /^wazuh\.rule\.compliance\.\w+$/);
+  }
+  assert.equal(
+    COMPLIANCE_FRAMEWORK_FIELDS.pci_dss,
+    WAZUH_FIELD.RULE_COMPLIANCE_PCI_DSS,
+  );
 });
 
 test('SEVERITY_LEVELS is the canonical 5-value vocabulary with informational as its own bucket', () => {

@@ -263,8 +263,8 @@ export const FINDING_DIGEST_EXTRA_COLUMNS = [
 
 /**
  * Returns `FINDING_INVESTIGATION_ROW_FIELDS` minus whatever the calling tool already declares as a
- * visible `tableSpec.columns` field (e.g. `get_pci_dss_findings`'s `wazuh.rule.compliance.pci_dss`)
- * — so `buildTableSpec` (digest.ts) never assigns the same dot-path into a row twice.
+ * visible `tableSpec.columns` field — so `buildTableSpec` (digest.ts) never assigns the same
+ * dot-path into a row twice.
  */
 export function findingRowFields(existingColumnFields: string[]): string[] {
   return FINDING_INVESTIGATION_ROW_FIELDS.filter(

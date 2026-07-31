@@ -6,7 +6,11 @@
  * depth) or the future free-DSL escape hatch (its only line of defense).
  */
 
-import { WAZUH_FIELD, SEVERITY_LEVELS } from '../../common/wazuh-fields';
+import {
+  WAZUH_FIELD,
+  SEVERITY_LEVELS,
+  COMPLIANCE_FRAMEWORK_FIELDS,
+} from '../../common/wazuh-fields';
 
 export type GuardrailCheck = { ok: true } | { ok: false; reason: string };
 
@@ -200,11 +204,7 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // compliance requirement list / MITRE technique catalog).
   WAZUH_FIELD.RULE_CATEGORY,
   WAZUH_FIELD.RULE_TAGS,
-  // pci_dss only, not the whole compliance.* family privacy.ts allow-lists for visibility:
-  // aggregation cardinality is vetted per framework, and only pci_dss has a dedicated tool.
-  // Widening this to every framework needs its own cardinality check first, not a copy-paste
-  // of privacy's broader reasoning.
-  WAZUH_FIELD.RULE_COMPLIANCE_PCI_DSS,
+  ...Object.values(COMPLIANCE_FRAMEWORK_FIELDS),
   WAZUH_FIELD.RULE_MITRE_TECHNIQUE_ID,
   WAZUH_FIELD.RULE_MITRE_TECHNIQUE_NAME,
   WAZUH_FIELD.RULE_MITRE_TACTIC_NAME,

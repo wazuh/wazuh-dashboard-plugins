@@ -185,7 +185,7 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
   assert.equal(
     isFieldCovered(
       'wazuh.rule.tags',
-      'get_pci_dss_findings',
+      'get_compliance_alerts',
       FIELD_POLICY_DEFAULTS,
     ),
     true,
