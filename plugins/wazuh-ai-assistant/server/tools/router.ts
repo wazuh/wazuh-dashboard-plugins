@@ -44,8 +44,7 @@ export type RouterCategory =
  */
 const TOOL_CATEGORY: Record<string, RouterCategory> = {
   // agents
-  get_active_agents: 'agents',
-  get_disconnected_agents: 'agents',
+  get_agents: 'agents',
 
   // findings
   get_critical_findings: 'findings',
@@ -108,7 +107,8 @@ const CATEGORY_ORDER: RouterCategory[] = [
 /** One-line descriptions for the stage-1 routing prompt's category menu. Keep these short — every
  * character here is paid for on every turn (stage-1 token budget). */
 const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
-  agents: 'Agent connectivity status (active or disconnected agents).',
+  agents:
+    'Agent listing by status (active, pending, never_connected, disconnected) and/or agent ID.',
   findings:
     'Finding search/summaries: critical findings, by agent/rule/rule-tag/OS/time, top rules, ' +
     'brute-force, suspicious PowerShell, general security summary.',

@@ -11,8 +11,8 @@ export type FieldPolicyAction = 'allow' | 'anonymize' | 'never';
 
 export interface FieldPolicyEntry {
   /** Either a plain digest field path ("wazuh.agent.name") or a tool-scoped form
-   * ("get_active_agents/name") for Manager-API tools whose digest fields are bare, generic names
-   * ("name" means an agent hostname in get_active_agents but a package name in
+   * ("get_agents/name") for Manager-API tools whose digest fields are bare, generic names
+   * ("name" means an agent hostname in get_agents but a package name in
    * get_agent_packages — only tool scoping can distinguish them). Scoped entries win over plain
    * ones for their tool. */
   field: string;
@@ -31,10 +31,8 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // Manager-API tools carry bare, generic digest field names ("name", "ip") that must be scoped
   // per tool: "name" is an agent hostname here but a package name in get_agent_packages (which
   // must stay readable for the model to be useful).
-  { field: 'get_active_agents/name', action: 'anonymize', kind: 'HOST' },
-  { field: 'get_active_agents/ip', action: 'anonymize', kind: 'IP' },
-  { field: 'get_disconnected_agents/name', action: 'anonymize', kind: 'HOST' },
-  { field: 'get_disconnected_agents/ip', action: 'anonymize', kind: 'IP' },
+  { field: 'get_agents/name', action: 'anonymize', kind: 'HOST' },
+  { field: 'get_agents/ip', action: 'anonymize', kind: 'IP' },
   // The syscollector/SCA tools use ECS Indexer paths rather than bare tool-scoped names, so the
   // BARE entries below apply — the ECS paths are unambiguous across tools (host.hostname is
   // always a hostname, source.ip always an IP), so tool scoping is not needed. There is no owner

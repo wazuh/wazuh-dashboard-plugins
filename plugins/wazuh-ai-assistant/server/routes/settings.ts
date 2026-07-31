@@ -789,7 +789,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
               field: schema.string({ minLength: 1 }),
               action: fieldPolicyActionSchema,
               // Optional explicit pseudonym kind for fields whose bare name can't be classified
-              // (tool-scoped Manager fields like "get_active_agents/name" declare HOST here).
+              // (tool-scoped Manager fields like "get_agents/name" declare HOST here).
               kind: schema.maybe(
                 schema.oneOf([
                   schema.literal('HOST'),

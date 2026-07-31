@@ -1,7 +1,6 @@
 import { ToolSpec } from '../../common/types';
 import { ToolDefinition } from './types';
-import { getActiveAgentsTool } from './catalog/get-active-agents';
-import { getDisconnectedAgentsTool } from './catalog/get-disconnected-agents';
+import { getAgentsTool } from './catalog/get-agents';
 import { getCriticalFindingsTool } from './catalog/get-critical-findings';
 import { searchFindingsByAgentTool } from './catalog/search-findings-by-agent';
 import { getTopRulesTool } from './catalog/get-top-rules';
@@ -41,9 +40,9 @@ import { searchWazuhDataTool } from './catalog/search-wazuh-data';
  * catalog rather than special-cased.
  */
 const CATALOG: ToolDefinition[] = [
-  // Original 6 (production, unchanged)
-  getActiveAgentsTool,
-  getDisconnectedAgentsTool,
+  // Original 6 (production, unchanged) — get_active_agents/get_disconnected_agents were replaced
+  // by the single get_agents tool (see get-agents.ts).
+  getAgentsTool,
   getCriticalFindingsTool,
   searchFindingsByAgentTool,
   getTopRulesTool,
