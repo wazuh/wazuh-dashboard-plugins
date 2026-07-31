@@ -55,7 +55,8 @@ export const findDocumentByFieldTool: ToolDefinition = {
         },
         values: {
           type: 'array',
-          description: 'One or more exact ID values to match (matches any of them).',
+          description:
+            'One or more exact ID values to match (matches any of them).',
           items: { type: 'string' },
           minItems: 1,
         },
@@ -74,10 +75,10 @@ export const findDocumentByFieldTool: ToolDefinition = {
       rawIndexPattern === 'wazuh-findings-v5-*'
         ? FINDINGS_INDEX
         : rawIndexPattern === 'wazuh-events-v5-*'
-          ? EVENTS_INDEX
-          : rawIndexPattern === 'wazuh-states-*'
-            ? STATES_INDEX
-            : undefined;
+        ? EVENTS_INDEX
+        : rawIndexPattern === 'wazuh-states-*'
+        ? STATES_INDEX
+        : undefined;
     if (!indexPattern) {
       throw new Error(
         'Parameter "index_pattern" must be one of: "wazuh-findings-v5-*", "wazuh-events-v5-*", ' +
@@ -88,7 +89,9 @@ export const findDocumentByFieldTool: ToolDefinition = {
     if (
       !Array.isArray(rawValues) ||
       rawValues.length === 0 ||
-      !rawValues.every(value => typeof value === 'string' && value.trim() !== '')
+      !rawValues.every(
+        value => typeof value === 'string' && value.trim() !== '',
+      )
     ) {
       throw new Error(
         'Parameter "values" is required and must be a non-empty array of strings.',

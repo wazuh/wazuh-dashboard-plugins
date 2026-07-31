@@ -107,7 +107,7 @@ export function checkIndexAllowlist(index: string): GuardrailCheck {
  * plugin-driven only, never LLM-driven — not implemented in this slice, so it's simply refused).
  */
 export function applySafetyValves(
-  body: Record<string, unknown>
+  body: Record<string, unknown>,
 ): { ok: true; body: Record<string, unknown> } | { ok: false; reason: string } {
   // Nesting depth is checked BEFORE any recursive walk touches this body (see MAX_TREE_DEPTH).
   if (exceedsMaxDepth(body, MAX_TREE_DEPTH)) {
@@ -130,7 +130,8 @@ export function applySafetyValves(
   const requestedSize = asNumber(next.size);
   // No truncation here (unlike clampManagerParams below) and a floor of 0, not 1 -- see
   // clampInt's doc comment for why that difference is preserved rather than unified away.
-  next.size = requestedSize === undefined ? 20 : clampInt(requestedSize, 0, MAX_SIZE);
+  next.size =
+    requestedSize === undefined ? 20 : clampInt(requestedSize, 0, MAX_SIZE);
   next.track_total_hits = MAX_TRACK_TOTAL_HITS;
   // allow_partial_search_results is deliberately NOT set here: it is a transport/URL parameter,
   // not a body field (a body key would 400 the whole search), and the cluster default is already
@@ -150,11 +151,11 @@ function exceedsMaxDepth(node: unknown, limit: number, depth = 0): boolean {
     return true;
   }
   if (Array.isArray(node)) {
-    return node.some((item) => exceedsMaxDepth(item, limit, depth + 1));
+    return node.some(item => exceedsMaxDepth(item, limit, depth + 1));
   }
   if (node && typeof node === 'object') {
-    return Object.values(node as Record<string, unknown>).some((value) =>
-      exceedsMaxDepth(value, limit, depth + 1)
+    return Object.values(node as Record<string, unknown>).some(value =>
+      exceedsMaxDepth(value, limit, depth + 1),
     );
   }
   return false;
@@ -177,12 +178,20 @@ function normalizeMustToFilter(node: unknown): unknown {
   }
   const out: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
-    if (key === 'bool' && value && typeof value === 'object' && !Array.isArray(value)) {
+    if (
+      key === 'bool' &&
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    ) {
       const boolClause = { ...(value as Record<string, unknown>) };
       if (boolClause.must !== undefined) {
         const asArray = (clause: unknown): unknown[] =>
           clause === undefined ? [] : Array.isArray(clause) ? clause : [clause];
-        boolClause.filter = [...asArray(boolClause.filter), ...asArray(boolClause.must)];
+        boolClause.filter = [
+          ...asArray(boolClause.filter),
+          ...asArray(boolClause.must),
+        ];
         delete boolClause.must;
       }
       out[key] = normalizeMustToFilter(boolClause);
@@ -264,7 +273,10 @@ function isExactIdLookupQuery(body: Record<string, unknown>): boolean {
   }
   const query = body.query;
   return (
-    !!query && typeof query === 'object' && !Array.isArray(query) && walkExactIdLookupShape(query)
+    !!query &&
+    typeof query === 'object' &&
+    !Array.isArray(query) &&
+    walkExactIdLookupShape(query)
   );
 }
 
@@ -290,7 +302,7 @@ function walkExactIdLookupShape(node: unknown): boolean {
         return false;
       }
       const fields = Object.keys(value as Record<string, unknown>);
-      if (!fields.every((field) => ID_FIELD_ALLOWLIST.has(field))) {
+      if (!fields.every(field => ID_FIELD_ALLOWLIST.has(field))) {
         return false;
       }
       continue;
@@ -307,7 +319,11 @@ const TIME_FIELD_RE = /(^|\.)(timestamp|@timestamp)$/;
 const MAX_LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
 const MAX_AGG_SIZE = 100;
 
-const LEADING_WILDCARD_KEYS = new Set(['wildcard', 'query_string', 'simple_query_string']);
+const LEADING_WILDCARD_KEYS = new Set([
+  'wildcard',
+  'query_string',
+  'simple_query_string',
+]);
 /**
  * Leading `*`/`?` right after whitespace, `(`, `:`, or a Lucene prefix operator — the common
  * Lucene wildcard positions. The single-term operators `+ - ! ^ ~` must stay in the boundary
@@ -316,7 +332,11 @@ const LEADING_WILDCARD_KEYS = new Set(['wildcard', 'query_string', 'simple_query
  * on a small corpus).
  */
 const LEADING_WILDCARD_PATTERN = /(^|[\s(:+\-!^~])[*?]/;
-const TERMS_LIKE_AGG_KEYS = new Set(['terms', 'cardinality', 'significant_terms']);
+const TERMS_LIKE_AGG_KEYS = new Set([
+  'terms',
+  'cardinality',
+  'significant_terms',
+]);
 
 /** Indices whose documents are events on a timeline — queries against them MUST be time-bounded.
  * Wazuh 5.0: the timeline families are wazuh-events-v5-* and
@@ -362,7 +382,10 @@ const VULN_FIELD_CLAUSE_KEYS = new Set([
  * string values is unaffected.
  */
 const KEYWORD_RANGE_REJECT_FIELDS = new Map<string, string>([
-  [WAZUH_FIELD.RULE_LEVEL, `one of the severity levels (${SEVERITY_LEVELS.join('/')})`],
+  [
+    WAZUH_FIELD.RULE_LEVEL,
+    `one of the severity levels (${SEVERITY_LEVELS.join('/')})`,
+  ],
 ]);
 
 /**
@@ -372,21 +395,28 @@ const KEYWORD_RANGE_REJECT_FIELDS = new Map<string, string>([
  * against a keyword field, but it does not silently produce a plausible-looking wrong answer the
  * way a numeric bound does, so it is left alone here.
  */
-function findNumericRangeOnKeywordField(body: Record<string, unknown>): string | undefined {
+function findNumericRangeOnKeywordField(
+  body: Record<string, unknown>,
+): string | undefined {
   let reason: string | undefined;
   walk(body, (key, value) => {
     if (reason || key !== 'range' || !value || typeof value !== 'object') {
       return;
     }
-    for (const [field, rangeValue] of Object.entries(value as Record<string, unknown>)) {
+    for (const [field, rangeValue] of Object.entries(
+      value as Record<string, unknown>,
+    )) {
       const description = KEYWORD_RANGE_REJECT_FIELDS.get(field);
       if (!description || !rangeValue || typeof rangeValue !== 'object') {
         continue;
       }
       const bounds = rangeValue as Record<string, unknown>;
-      const hasNumericBound = [bounds.gte, bounds.gt, bounds.lte, bounds.lt].some(
-        (bound) => typeof bound === 'number'
-      );
+      const hasNumericBound = [
+        bounds.gte,
+        bounds.gt,
+        bounds.lte,
+        bounds.lt,
+      ].some(bound => typeof bound === 'number');
       if (hasNumericBound) {
         reason =
           `Range on "${field}" is not allowed: it is a keyword field holding ${description}, ` +
@@ -418,7 +448,10 @@ const SCRIPT_OR_RUNTIME_MAPPINGS_REASON =
  * the per-index checks — the mandatory time bound on time-based indices, and the
  * vulnerability-field-on-a-timeline-index check below.
  */
-export function lintDsl(body: Record<string, unknown>, index?: string): GuardrailCheck {
+export function lintDsl(
+  body: Record<string, unknown>,
+  index?: string,
+): GuardrailCheck {
   // Same depth guard as applySafetyValves — lintDsl is exported independently and must
   // never rely on being called only after applySafetyValves to be safe from the recursive `walk`
   // calls below.
@@ -511,7 +544,7 @@ export function lintDsl(body: Record<string, unknown>, index?: string): Guardrai
 
 function walk(
   node: unknown,
-  visit: (key: string, value: unknown, parent: Record<string, unknown>) => void
+  visit: (key: string, value: unknown, parent: Record<string, unknown>) => void,
 ): void {
   if (Array.isArray(node)) {
     for (const item of node) {
@@ -530,7 +563,7 @@ function walk(
 
 function findKey(body: Record<string, unknown>, targetKey: string): boolean {
   let found = false;
-  walk(body, (key) => {
+  walk(body, key => {
     if (key === targetKey) {
       found = true;
     }
@@ -540,7 +573,11 @@ function findKey(body: Record<string, unknown>, targetKey: string): boolean {
 
 function containsLeadingWildcard(node: unknown): boolean {
   if (typeof node === 'string') {
-    return node.startsWith('*') || node.startsWith('?') || LEADING_WILDCARD_PATTERN.test(node);
+    return (
+      node.startsWith('*') ||
+      node.startsWith('?') ||
+      LEADING_WILDCARD_PATTERN.test(node)
+    );
   }
   if (Array.isArray(node)) {
     return node.some(containsLeadingWildcard);
@@ -551,7 +588,9 @@ function containsLeadingWildcard(node: unknown): boolean {
   return false;
 }
 
-function findLeadingWildcard(body: Record<string, unknown>): string | undefined {
+function findLeadingWildcard(
+  body: Record<string, unknown>,
+): string | undefined {
   let reason: string | undefined;
   walk(body, (key, value) => {
     if (reason || !LEADING_WILDCARD_KEYS.has(key)) {
@@ -571,7 +610,9 @@ function findLeadingWildcard(body: Record<string, unknown>): string | undefined 
  * MAX_TREE_DEPTH pre-check `lintDsl` already runs before any check below it gets here — no separate
  * recursion guard needed.
  */
-function findVulnerabilityFieldOnFindingsIndex(body: Record<string, unknown>): boolean {
+function findVulnerabilityFieldOnFindingsIndex(
+  body: Record<string, unknown>,
+): boolean {
   let found = false;
   walk(body, (key, value) => {
     if (
@@ -586,12 +627,15 @@ function findVulnerabilityFieldOnFindingsIndex(body: Record<string, unknown>): b
     const clause = value as Record<string, unknown>;
     // `exists` carries its field path under a `field` key, not as the clause's own key.
     if (key === 'exists') {
-      if (typeof clause.field === 'string' && VULN_FIELD_RE.test(clause.field)) {
+      if (
+        typeof clause.field === 'string' &&
+        VULN_FIELD_RE.test(clause.field)
+      ) {
         found = true;
       }
       return;
     }
-    if (Object.keys(clause).some((field) => VULN_FIELD_RE.test(field))) {
+    if (Object.keys(clause).some(field => VULN_FIELD_RE.test(field))) {
       found = true;
     }
   });
@@ -599,7 +643,10 @@ function findVulnerabilityFieldOnFindingsIndex(body: Record<string, unknown>): b
 }
 
 /** Resolves `now`, `now-Nd/h/m`, or an ISO-8601 string to epoch ms; undefined if unparseable. */
-function resolveDateMath(value: unknown, referenceNowMs: number): number | undefined {
+function resolveDateMath(
+  value: unknown,
+  referenceNowMs: number,
+): number | undefined {
   if (typeof value !== 'string') {
     return undefined;
   }
@@ -609,7 +656,8 @@ function resolveDateMath(value: unknown, referenceNowMs: number): number | undef
   const match = /^now-(\d+)([dhm])$/.exec(value);
   if (match) {
     const amount = Number(match[1]);
-    const unitMs = match[2] === 'd' ? 86400000 : match[2] === 'h' ? 3600000 : 60000;
+    const unitMs =
+      match[2] === 'd' ? 86400000 : match[2] === 'h' ? 3600000 : 60000;
     return referenceNowMs - amount * unitMs;
   }
   const parsed = Date.parse(value);
@@ -641,7 +689,7 @@ function hasTimeRange(body: Record<string, unknown>): boolean {
  * `range` found there can never flip `found` to true. */
 function walkRequiredForTimeRange(node: unknown, required: boolean): boolean {
   if (Array.isArray(node)) {
-    return node.some((item) => walkRequiredForTimeRange(item, required));
+    return node.some(item => walkRequiredForTimeRange(item, required));
   }
   if (!node || typeof node !== 'object') {
     return false;
@@ -655,7 +703,12 @@ function walkRequiredForTimeRange(node: unknown, required: boolean): boolean {
         }
       }
     }
-    if (key === 'bool' && value && typeof value === 'object' && !Array.isArray(value)) {
+    if (
+      key === 'bool' &&
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    ) {
       const boolClause = value as Record<string, unknown>;
       if (
         boolClause.filter !== undefined &&
@@ -663,10 +716,16 @@ function walkRequiredForTimeRange(node: unknown, required: boolean): boolean {
       ) {
         return true;
       }
-      if (boolClause.must !== undefined && walkRequiredForTimeRange(boolClause.must, required)) {
+      if (
+        boolClause.must !== undefined &&
+        walkRequiredForTimeRange(boolClause.must, required)
+      ) {
         return true;
       }
-      if (boolClause.should !== undefined && walkRequiredForTimeRange(boolClause.should, false)) {
+      if (
+        boolClause.should !== undefined &&
+        walkRequiredForTimeRange(boolClause.should, false)
+      ) {
         return true;
       }
       if (
@@ -694,8 +753,14 @@ function checkDateRanges(body: Record<string, unknown>): string | undefined {
     if (reason || key !== 'range' || !value || typeof value !== 'object') {
       return;
     }
-    for (const [field, rangeValue] of Object.entries(value as Record<string, unknown>)) {
-      if (!TIME_FIELD_RE.test(field) || !rangeValue || typeof rangeValue !== 'object') {
+    for (const [field, rangeValue] of Object.entries(
+      value as Record<string, unknown>,
+    )) {
+      if (
+        !TIME_FIELD_RE.test(field) ||
+        !rangeValue ||
+        typeof rangeValue !== 'object'
+      ) {
         continue;
       }
       const bounds = rangeValue as Record<string, unknown>;
@@ -815,7 +880,9 @@ function countOwnAggKeys(value: unknown): number {
   return Object.keys(value as Record<string, unknown>).length;
 }
 
-function checkTopLevelAggCount(body: Record<string, unknown>): string | undefined {
+function checkTopLevelAggCount(
+  body: Record<string, unknown>,
+): string | undefined {
   // Count BOTH spellings and SUM them, rather than `body.aggs ?? body.aggregations`. OpenSearch
   // accepts either name at the request root, and a body may legally carry both — in which case the
   // `??` form only ever counted the `aggs` side, so ONE decoy entry under `aggs` hid any number of
@@ -859,10 +926,12 @@ function checkAggs(body: Record<string, unknown>): string | undefined {
           if (!source || typeof source !== 'object') {
             continue;
           }
-          for (const sourceSpec of Object.values(source as Record<string, unknown>)) {
-            const termsSpec = (sourceSpec as Record<string, unknown> | undefined)?.terms as
-              | Record<string, unknown>
-              | undefined;
+          for (const sourceSpec of Object.values(
+            source as Record<string, unknown>,
+          )) {
+            const termsSpec = (
+              sourceSpec as Record<string, unknown> | undefined
+            )?.terms as Record<string, unknown> | undefined;
             const field = termsSpec?.field;
             if (typeof field === 'string' && !AGG_FIELD_ALLOWLIST.has(field)) {
               reason = aggFieldViolation(field);
@@ -873,7 +942,11 @@ function checkAggs(body: Record<string, unknown>): string | undefined {
       // `composite` needs its own size cap: its page size lives on the aggregation itself, not on
       // the `sources[].terms` specs checked above.
       const compositeSize = asNumber(aggValue.size);
-      if (!reason && compositeSize !== undefined && compositeSize > MAX_AGG_SIZE) {
+      if (
+        !reason &&
+        compositeSize !== undefined &&
+        compositeSize > MAX_AGG_SIZE
+      ) {
         reason = aggSizeViolation(compositeSize, MAX_AGG_SIZE);
       }
     }
@@ -884,14 +957,19 @@ function checkAggs(body: Record<string, unknown>): string | undefined {
       const termsSpecs = aggValue.terms;
       if (Array.isArray(termsSpecs)) {
         for (const termSpec of termsSpecs) {
-          const field = (termSpec as Record<string, unknown> | undefined)?.field;
+          const field = (termSpec as Record<string, unknown> | undefined)
+            ?.field;
           if (typeof field === 'string' && !AGG_FIELD_ALLOWLIST.has(field)) {
             reason = aggFieldViolation(field);
           }
         }
       }
       const multiTermsSize = asNumber(aggValue.size);
-      if (!reason && multiTermsSize !== undefined && multiTermsSize > MAX_AGG_SIZE) {
+      if (
+        !reason &&
+        multiTermsSize !== undefined &&
+        multiTermsSize > MAX_AGG_SIZE
+      ) {
         reason = aggSizeViolation(multiTermsSize, MAX_AGG_SIZE);
       }
     }
@@ -917,10 +995,14 @@ function checkAggs(body: Record<string, unknown>): string | undefined {
             `"interval".`;
         } else {
           const intervalMs = parseIntervalMs(rawInterval);
-          if (intervalMs !== undefined && intervalMs < MIN_DATE_HISTOGRAM_INTERVAL_MS) {
+          if (
+            intervalMs !== undefined &&
+            intervalMs < MIN_DATE_HISTOGRAM_INTERVAL_MS
+          ) {
             reason =
-              `"${key}" interval (${JSON.stringify(rawInterval)}) is too fine; use an interval ` +
-              `of at least 1 minute.`;
+              `"${key}" interval (${JSON.stringify(
+                rawInterval,
+              )}) is too fine; use an interval ` + `of at least 1 minute.`;
           }
         }
       }
@@ -935,7 +1017,9 @@ function checkAggs(body: Record<string, unknown>): string | undefined {
  * server/tools/catalog/common.ts, which falls back to its own `defaultValue`): the Manager API
  * validates its own query parameters and rejects a malformed one with a clear 400, which is a
  * better error than a silently substituted value. */
-export function clampManagerParams(params: Record<string, unknown>): Record<string, unknown> {
+export function clampManagerParams(
+  params: Record<string, unknown>,
+): Record<string, unknown> {
   const next = { ...params };
   const limit = asNumber(next.limit);
   if (limit !== undefined) {

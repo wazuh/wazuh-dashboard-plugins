@@ -12,7 +12,13 @@ import {
  * severity scale, but this is a DIFFERENT field on a DIFFERENT (Sigma-shaped) document: no ordering
  * ("at or above") is assumed or exposed here, only exact match. Do not import
  * `common.ts`'s `severityProperty()`/`severityFilterValues()` for this field. */
-const RULE_LEVELS = ['informational', 'low', 'medium', 'high', 'critical'] as const;
+const RULE_LEVELS = [
+  'informational',
+  'low',
+  'medium',
+  'high',
+  'critical',
+] as const;
 
 /** Confirmed live against `wazuh-threatintel-rules-a` (a `terms` agg on `document.status`,
  * 268/268 docs bucketed, no long tail). */
@@ -67,7 +73,8 @@ export const getRulesTool: ToolDefinition = {
       },
       technique_id: {
         type: 'string',
-        description: 'Filter by one exact MITRE ATT&CK technique ID, e.g. "T1110".',
+        description:
+          'Filter by one exact MITRE ATT&CK technique ID, e.g. "T1110".',
       },
       space: {
         type: 'string',
@@ -75,7 +82,9 @@ export const getRulesTool: ToolDefinition = {
           'Filter by Security Analytics space. Omit to search across every space (the default).',
         enum: [...SECURITY_ANALYTICS_SPACES],
       },
-      limit: limitProperty('Max number of rules to return (default 20, max 500).'),
+      limit: limitProperty(
+        'Max number of rules to return (default 20, max 500).',
+      ),
     }),
   },
   target: 'indexer',
@@ -86,11 +95,15 @@ export const getRulesTool: ToolDefinition = {
       (ENABLED_VALUES as readonly string[]).includes(params.enabled)
         ? params.enabled
         : 'enabled';
-    const status = typeof params.status === 'string' ? params.status.trim() : undefined;
-    const level = typeof params.level === 'string' ? params.level.trim() : undefined;
+    const status =
+      typeof params.status === 'string' ? params.status.trim() : undefined;
+    const level =
+      typeof params.level === 'string' ? params.level.trim() : undefined;
     const tag = typeof params.tag === 'string' ? params.tag.trim() : undefined;
     const techniqueId =
-      typeof params.technique_id === 'string' ? params.technique_id.trim() : undefined;
+      typeof params.technique_id === 'string'
+        ? params.technique_id.trim()
+        : undefined;
     const space = parseSecurityAnalyticsSpace(params.space);
     const limit = clampLimit(params.limit, 20, 500);
 

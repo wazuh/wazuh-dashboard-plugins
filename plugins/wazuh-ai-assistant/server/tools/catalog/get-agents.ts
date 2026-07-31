@@ -38,7 +38,9 @@ function parseStatuses(value: unknown): string[] | undefined {
   );
   if (statuses.length === 0) {
     throw new Error(
-      `Parameter "status" must be one or more of: ${AGENT_STATUSES.join(', ')}.`,
+      `Parameter "status" must be one or more of: ${AGENT_STATUSES.join(
+        ', ',
+      )}.`,
     );
   }
   return statuses;
@@ -62,7 +64,8 @@ export const getAgentsTool: ToolDefinition = {
     parameters: objectSchema({
       agent_ids: {
         type: 'array',
-        description: 'Exact numeric Wazuh agent IDs to filter by, e.g. ["001", "002"].',
+        description:
+          'Exact numeric Wazuh agent IDs to filter by, e.g. ["001", "002"].',
         items: { type: 'string' },
       },
       status: {

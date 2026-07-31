@@ -1,5 +1,10 @@
 import { ToolDefinition } from '../types';
-import { clampLimit, limitProperty, objectSchema, validateAgentId } from './common';
+import {
+  clampLimit,
+  limitProperty,
+  objectSchema,
+  validateAgentId,
+} from './common';
 
 /**
  * Wazuh 5.0 rewrite: the 4.14 Manager endpoint `GET /sca/{agent_id}`
@@ -34,9 +39,11 @@ export const getScaResultsTool: ToolDefinition = {
           type: 'string',
           description: 'Numeric Wazuh agent ID, e.g. "003".',
         },
-        limit: limitProperty('Max number of SCA policies to return (default 20, max 500).'),
+        limit: limitProperty(
+          'Max number of SCA policies to return (default 20, max 500).',
+        ),
       },
-      ['agent_id']
+      ['agent_id'],
     ),
   },
   target: 'indexer',
@@ -79,6 +86,13 @@ export const getScaResultsTool: ToolDefinition = {
     ],
   },
   digest: {
-    sampleColumns: ['key', 'policy.name', 'doc_count', 'passed', 'failed', 'not_applicable'],
+    sampleColumns: [
+      'key',
+      'policy.name',
+      'doc_count',
+      'passed',
+      'failed',
+      'not_applicable',
+    ],
   },
 };

@@ -18,19 +18,20 @@ import {
 } from './common';
 
 const COMPLIANCE_ROW_FIELDS = COMPLIANCE_FRAMEWORKS.map(
-  (framework) => COMPLIANCE_FRAMEWORK_FIELDS[framework]
+  framework => COMPLIANCE_FRAMEWORK_FIELDS[framework],
 );
 
 function parseFrameworks(value: unknown): ComplianceFramework[] {
   const raw = Array.isArray(value) ? value : [];
   const frameworks = raw.filter(
     (entry): entry is ComplianceFramework =>
-      typeof entry === 'string' && (COMPLIANCE_FRAMEWORKS as readonly string[]).includes(entry)
+      typeof entry === 'string' &&
+      (COMPLIANCE_FRAMEWORKS as readonly string[]).includes(entry),
   );
   if (frameworks.length === 0) {
     throw new Error(
       'Parameter "framework" is required and must be one or more of: ' +
-        `${COMPLIANCE_FRAMEWORKS.join(', ')}.`
+        `${COMPLIANCE_FRAMEWORKS.join(', ')}.`,
     );
   }
   return frameworks;
@@ -43,7 +44,8 @@ function parseExcludeFrameworks(value: unknown): ComplianceFramework[] {
   const raw = Array.isArray(value) ? value : [];
   return raw.filter(
     (entry): entry is ComplianceFramework =>
-      typeof entry === 'string' && (COMPLIANCE_FRAMEWORKS as readonly string[]).includes(entry)
+      typeof entry === 'string' &&
+      (COMPLIANCE_FRAMEWORKS as readonly string[]).includes(entry),
   );
 }
 
@@ -65,7 +67,8 @@ export const getComplianceAlertsTool: ToolDefinition = {
       {
         framework: {
           type: 'array',
-          description: 'One or more compliance frameworks to filter by (matches any of them).',
+          description:
+            'One or more compliance frameworks to filter by (matches any of them).',
           items: { type: 'string', enum: [...COMPLIANCE_FRAMEWORKS] },
           minItems: 1,
         },
@@ -76,10 +79,12 @@ export const getComplianceAlertsTool: ToolDefinition = {
             'frameworks. Omit for no exclusion.',
           items: { type: 'string', enum: [...COMPLIANCE_FRAMEWORKS] },
         },
-        limit: limitProperty('Max number of findings to return (default 20, max 500).'),
+        limit: limitProperty(
+          'Max number of findings to return (default 20, max 500).',
+        ),
         ...timeRangeProperties(),
       },
-      ['framework']
+      ['framework'],
     ),
   },
   target: 'indexer',
@@ -89,14 +94,14 @@ export const getComplianceAlertsTool: ToolDefinition = {
     const excludeFrameworks = parseExcludeFrameworks(params.exclude_framework);
     const limit = clampLimit(params.limit, 20, 500);
     const { gte, lte } = resolveTimeRange(params);
-    const existsClauses = frameworks.map((framework) => ({
+    const existsClauses = frameworks.map(framework => ({
       exists: { field: COMPLIANCE_FRAMEWORK_FIELDS[framework] },
     }));
     const complianceFilter =
       existsClauses.length === 1
         ? existsClauses[0]
         : { bool: { should: existsClauses, minimum_should_match: 1 } };
-    const excludeClauses = excludeFrameworks.map((framework) => ({
+    const excludeClauses = excludeFrameworks.map(framework => ({
       exists: { field: COMPLIANCE_FRAMEWORK_FIELDS[framework] },
     }));
     return {
@@ -105,7 +110,10 @@ export const getComplianceAlertsTool: ToolDefinition = {
       body: {
         query: {
           bool: {
-            filter: [complianceFilter, { range: { '@timestamp': { gte, lte } } }],
+            filter: [
+              complianceFilter,
+              { range: { '@timestamp': { gte, lte } } },
+            ],
             ...(excludeClauses.length > 0 ? { must_not: excludeClauses } : {}),
           },
         },

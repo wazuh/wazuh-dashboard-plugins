@@ -25,7 +25,9 @@ test('get_sca_results: aggregates by policy.id with a top_hits sample and per-re
         policy_sample: { top_hits: { size: 1, _source: ['policy.name'] } },
         passed: { filter: { term: { 'check.result': 'Passed' } } },
         failed: { filter: { term: { 'check.result': 'Failed' } } },
-        not_applicable: { filter: { term: { 'check.result': 'Not applicable' } } },
+        not_applicable: {
+          filter: { term: { 'check.result': 'Not applicable' } },
+        },
       },
     },
   });
@@ -34,11 +36,16 @@ test('get_sca_results: aggregates by policy.id with a top_hits sample and per-re
 test('get_sca_results: uses the real capitalized check.result values, not the lowercase 4.14 ones', () => {
   const request = build({ agent_id: '001' });
   const aggs = request.body.aggs as {
-    policies: { aggs: Record<string, { filter: { term: Record<string, string> } }> };
+    policies: {
+      aggs: Record<string, { filter: { term: Record<string, string> } }>;
+    };
   };
   assert.equal(aggs.policies.aggs.passed.filter.term['check.result'], 'Passed');
   assert.equal(aggs.policies.aggs.failed.filter.term['check.result'], 'Failed');
-  assert.equal(aggs.policies.aggs.not_applicable.filter.term['check.result'], 'Not applicable');
+  assert.equal(
+    aggs.policies.aggs.not_applicable.filter.term['check.result'],
+    'Not applicable',
+  );
 });
 
 function policiesTermsSize(request: IndexerRequest): unknown {

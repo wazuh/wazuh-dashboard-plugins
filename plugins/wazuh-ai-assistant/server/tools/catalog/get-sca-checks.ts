@@ -63,9 +63,11 @@ export const getScaChecksTool: ToolDefinition = {
             'exact keywords, so a mid-word fragment like "ssh" matches nothing. To find checks by ' +
             'topic, omit this and filter by result instead, then read the returned check names.',
         },
-        limit: limitProperty('Max number of checks to return (default 20, max 500).'),
+        limit: limitProperty(
+          'Max number of checks to return (default 20, max 500).',
+        ),
       },
-      ['agent_id', 'policy_id']
+      ['agent_id', 'policy_id'],
     ),
   },
   target: 'indexer',
@@ -74,7 +76,7 @@ export const getScaChecksTool: ToolDefinition = {
     const agentId = validateAgentId(params.agent_id);
     const policyId = requireNonEmptyString(
       params.policy_id,
-      'Parameter "policy_id" is required and must be a non-empty string.'
+      'Parameter "policy_id" is required and must be a non-empty string.',
     );
     const limit = clampLimit(params.limit, 20, 500);
     const result = optionalStringParam(params.result);
@@ -88,7 +90,15 @@ export const getScaChecksTool: ToolDefinition = {
             filter: [
               { term: { 'wazuh.agent.id': agentId } },
               { term: { 'policy.id': policyId.trim() } },
-              ...(result ? [{ term: { 'check.result': RESULT_VALUE_MAP[result] ?? result } }] : []),
+              ...(result
+                ? [
+                    {
+                      term: {
+                        'check.result': RESULT_VALUE_MAP[result] ?? result,
+                      },
+                    },
+                  ]
+                : []),
               // `search` is EXACT-or-PREFIX, never substring. `check.name`/`check.description`/
               // `check.rationale` are all mapped `keyword` in 5.0, so the previous bare
               // `multi_match` silently returned nothing for the fragment its own description
@@ -111,7 +121,11 @@ export const getScaChecksTool: ToolDefinition = {
                           {
                             multi_match: {
                               query: search,
-                              fields: ['check.name', 'check.description', 'check.rationale'],
+                              fields: [
+                                'check.name',
+                                'check.description',
+                                'check.rationale',
+                              ],
                             },
                           },
                           { prefix: { 'check.name': search.trim() } },

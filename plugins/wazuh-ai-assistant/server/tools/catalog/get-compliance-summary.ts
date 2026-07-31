@@ -21,18 +21,19 @@ function parseFrameworks(value: unknown): ComplianceFramework[] {
   const raw = Array.isArray(value) ? value : [];
   const frameworks = raw.filter(
     (entry): entry is ComplianceFramework =>
-      typeof entry === 'string' && (COMPLIANCE_FRAMEWORKS as readonly string[]).includes(entry)
+      typeof entry === 'string' &&
+      (COMPLIANCE_FRAMEWORKS as readonly string[]).includes(entry),
   );
   if (frameworks.length === 0) {
     throw new Error(
       'Parameter "framework" is required and must be one or more of: ' +
-        `${COMPLIANCE_FRAMEWORKS.join(', ')}.`
+        `${COMPLIANCE_FRAMEWORKS.join(', ')}.`,
     );
   }
   if (frameworks.length > MAX_FRAMEWORKS_PER_CALL) {
     throw new Error(
       `Parameter "framework" accepts at most ${MAX_FRAMEWORKS_PER_CALL} frameworks per call; ` +
-        'split into separate calls instead.'
+        'split into separate calls instead.',
     );
   }
   return frameworks;
@@ -45,7 +46,8 @@ function parseExcludeFrameworks(value: unknown): ComplianceFramework[] {
   const raw = Array.isArray(value) ? value : [];
   return raw.filter(
     (entry): entry is ComplianceFramework =>
-      typeof entry === 'string' && (COMPLIANCE_FRAMEWORKS as readonly string[]).includes(entry)
+      typeof entry === 'string' &&
+      (COMPLIANCE_FRAMEWORKS as readonly string[]).includes(entry),
   );
 }
 
@@ -84,11 +86,11 @@ export const getComplianceSummaryTool: ToolDefinition = {
           items: { type: 'string', enum: [...COMPLIANCE_FRAMEWORKS] },
         },
         limit: limitProperty(
-          'Max number of requirement buckets to return per framework (default 20, max 100).'
+          'Max number of requirement buckets to return per framework (default 20, max 100).',
         ),
         ...timeRangeProperties(),
       },
-      ['framework']
+      ['framework'],
     ),
   },
   target: 'indexer',
@@ -98,14 +100,14 @@ export const getComplianceSummaryTool: ToolDefinition = {
     const excludeFrameworks = parseExcludeFrameworks(params.exclude_framework);
     const limit = clampLimit(params.limit, 20, 100);
     const { gte, lte } = resolveTimeRange(params);
-    const existsClauses = frameworks.map((framework) => ({
+    const existsClauses = frameworks.map(framework => ({
       exists: { field: COMPLIANCE_FRAMEWORK_FIELDS[framework] },
     }));
     const complianceFilter =
       existsClauses.length === 1
         ? existsClauses[0]
         : { bool: { should: existsClauses, minimum_should_match: 1 } };
-    const excludeClauses = excludeFrameworks.map((framework) => ({
+    const excludeClauses = excludeFrameworks.map(framework => ({
       exists: { field: COMPLIANCE_FRAMEWORK_FIELDS[framework] },
     }));
     const aggs: Record<string, unknown> = {};
@@ -120,7 +122,10 @@ export const getComplianceSummaryTool: ToolDefinition = {
       body: {
         query: {
           bool: {
-            filter: [complianceFilter, { range: { '@timestamp': { gte, lte } } }],
+            filter: [
+              complianceFilter,
+              { range: { '@timestamp': { gte, lte } } },
+            ],
             ...(excludeClauses.length > 0 ? { must_not: excludeClauses } : {}),
           },
         },

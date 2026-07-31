@@ -18,7 +18,9 @@ interface NormalizedBoolQuery {
   };
 }
 
-function timeBoundedFilter(range: Record<string, unknown> = { gte: 'now-1d', lte: 'now' }) {
+function timeBoundedFilter(
+  range: Record<string, unknown> = { gte: 'now-1d', lte: 'now' },
+) {
   return { bool: { filter: [{ range: { '@timestamp': range } }] } };
 }
 
@@ -316,7 +318,10 @@ test('lintDsl: rejects multi_terms on a disallowed field', () => {
   const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
   assert.equal(result.ok, false);
   if (!result.ok) {
-    assert.match(result.reason, /not on the allowed low-cardinality field list/);
+    assert.match(
+      result.reason,
+      /not on the allowed low-cardinality field list/,
+    );
   }
 });
 
@@ -443,7 +448,10 @@ test('lintDsl: rejects a terms agg on a non-allowlisted (high-cardinality) field
   const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
   assert.equal(result.ok, false);
   if (!result.ok) {
-    assert.match(result.reason, /not on the allowed low-cardinality field list/);
+    assert.match(
+      result.reason,
+      /not on the allowed low-cardinality field list/,
+    );
   }
 });
 
@@ -538,7 +546,9 @@ test('checkIndexAllowlist: rejects wazuh-alerts-*/wazuh-archives-* (retired in t
 });
 
 test('checkIndexAllowlist: rejects a comma-smuggled second index', () => {
-  const result = checkIndexAllowlist('wazuh-findings-v5-*,wazuh-monitoring-3.x-2026.07.12');
+  const result = checkIndexAllowlist(
+    'wazuh-findings-v5-*,wazuh-monitoring-3.x-2026.07.12',
+  );
   assert.equal(result.ok, false);
   if (!result.ok) {
     assert.match(result.reason, /not in the allowed set/);
@@ -554,11 +564,18 @@ test('checkIndexAllowlist: rejects a non-wazuh index', () => {
 });
 
 test('checkIndexAllowlist: accepts the 6 named wazuh-threatintel-* sub-families this catalog uses', () => {
-  for (const family of ['rules', 'decoders', 'integrations', 'policies', 'filters', 'kvdbs']) {
+  for (const family of [
+    'rules',
+    'decoders',
+    'integrations',
+    'policies',
+    'filters',
+    'kvdbs',
+  ]) {
     assert.equal(
       checkIndexAllowlist(`wazuh-threatintel-${family}*`).ok,
       true,
-      `expected wazuh-threatintel-${family}* to be allowed`
+      `expected wazuh-threatintel-${family}* to be allowed`,
     );
   }
 });
@@ -580,7 +597,9 @@ test('checkIndexAllowlist: rejects a bare wazuh-threatintel-* or an unrecognized
 });
 
 test('checkIndexAllowlist: rejects a comma-smuggled second threatintel index', () => {
-  const result = checkIndexAllowlist('wazuh-threatintel-rules-a,wazuh-threatintel-enrichments-a');
+  const result = checkIndexAllowlist(
+    'wazuh-threatintel-rules-a,wazuh-threatintel-enrichments-a',
+  );
   assert.equal(result.ok, false);
   if (!result.ok) {
     assert.match(result.reason, /not in the allowed set/);
@@ -588,13 +607,25 @@ test('checkIndexAllowlist: rejects a comma-smuggled second threatintel index', (
 });
 
 test('checkIndexAllowlist: accepts .opensearch-sap-detectors-config (get_detectors, exact match only)', () => {
-  assert.equal(checkIndexAllowlist('.opensearch-sap-detectors-config').ok, true);
+  assert.equal(
+    checkIndexAllowlist('.opensearch-sap-detectors-config').ok,
+    true,
+  );
 });
 
 test('checkIndexAllowlist: rejects any other .opensearch-sap-* index or a wildcard on the detectors index', () => {
-  assert.equal(checkIndexAllowlist('.opensearch-sap-detectors-config*').ok, false);
-  assert.equal(checkIndexAllowlist('.opensearch-sap-suricata-alerts').ok, false);
-  assert.equal(checkIndexAllowlist('.opensearch-sap-suricata-findings').ok, false);
+  assert.equal(
+    checkIndexAllowlist('.opensearch-sap-detectors-config*').ok,
+    false,
+  );
+  assert.equal(
+    checkIndexAllowlist('.opensearch-sap-suricata-alerts').ok,
+    false,
+  );
+  assert.equal(
+    checkIndexAllowlist('.opensearch-sap-suricata-findings').ok,
+    false,
+  );
 });
 
 // --- applySafetyValves ------------------------------------------------------------------------
@@ -719,17 +750,26 @@ const timeBody = (bounds: Record<string, unknown>) => ({
 });
 
 test('lintDsl accepts an exclusive upper bound (gte + lt)', () => {
-  const r = lintDsl(timeBody({ gte: 'now-24h', lt: 'now' }), 'wazuh-events-v5-*');
+  const r = lintDsl(
+    timeBody({ gte: 'now-24h', lt: 'now' }),
+    'wazuh-events-v5-*',
+  );
   assert.equal(r.ok, true, r.ok ? '' : r.reason);
 });
 
 test('lintDsl accepts an exclusive lower bound (gt + lte)', () => {
-  const r = lintDsl(timeBody({ gt: 'now-24h', lte: 'now' }), 'wazuh-events-v5-*');
+  const r = lintDsl(
+    timeBody({ gt: 'now-24h', lte: 'now' }),
+    'wazuh-events-v5-*',
+  );
   assert.equal(r.ok, true, r.ok ? '' : r.reason);
 });
 
 test('lintDsl accepts both bounds exclusive (gt + lt)', () => {
-  const r = lintDsl(timeBody({ gt: 'now-24h', lt: 'now' }), 'wazuh-events-v5-*');
+  const r = lintDsl(
+    timeBody({ gt: 'now-24h', lt: 'now' }),
+    'wazuh-events-v5-*',
+  );
   assert.equal(r.ok, true, r.ok ? '' : r.reason);
 });
 
@@ -744,13 +784,19 @@ test('lintDsl still requires a lower bound (lt only is rejected)', () => {
 });
 
 test('lintDsl still enforces the 90-day span using exclusive bounds', () => {
-  const r = lintDsl(timeBody({ gt: 'now-200d', lt: 'now' }), 'wazuh-events-v5-*');
+  const r = lintDsl(
+    timeBody({ gt: 'now-200d', lt: 'now' }),
+    'wazuh-events-v5-*',
+  );
   assert.equal(r.ok, false);
   assert.match(String(r.ok ? '' : r.reason), /90/);
 });
 
 test('lintDsl still rejects an inverted window written with exclusive bounds', () => {
-  const r = lintDsl(timeBody({ gt: 'now', lt: 'now-24h' }), 'wazuh-events-v5-*');
+  const r = lintDsl(
+    timeBody({ gt: 'now', lt: 'now-24h' }),
+    'wazuh-events-v5-*',
+  );
   assert.equal(r.ok, false);
 });
 
@@ -851,7 +897,10 @@ test('lintDsl: a range on a different field (not wazuh.rule.level) is unaffected
 // --- exact-ID lookup exemption (find_document_by_field) -----------------------------------------
 
 test('lintDsl: an "ids" query on a time-based index skips the mandatory time-range check', () => {
-  const body = { query: { ids: { values: ['oPoOs58B4OP1Z0luRhFX'] } }, size: 20 };
+  const body = {
+    query: { ids: { values: ['oPoOs58B4OP1Z0luRhFX'] } },
+    size: 20,
+  };
   const result = lintDsl(body, 'wazuh-findings-v5-*');
   assert.equal(result.ok, true, result.ok ? '' : result.reason);
 });

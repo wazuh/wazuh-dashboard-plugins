@@ -7,7 +7,13 @@ import {
   SECURITY_ANALYTICS_SPACES,
 } from './common';
 
-const COMPONENT_TYPES = ['decoders', 'integrations', 'policies', 'filters', 'kvdbs'] as const;
+const COMPONENT_TYPES = [
+  'decoders',
+  'integrations',
+  'policies',
+  'filters',
+  'kvdbs',
+] as const;
 type ComponentType = (typeof COMPONENT_TYPES)[number];
 
 /** Maps the model-facing enum value to the internal index constant -- mirrors
@@ -29,12 +35,16 @@ const ENABLED_VALUES = ['enabled', 'disabled', 'any'] as const;
  * live against a real 5.0 stack) -- `space` is filled in by executor.ts's
  * `resolveSecurityAnalyticsSpace`. `policies` has no dedicated list view of its own: it is only
  * ever shown on the integrations app's Overview tab, so it reuses that same route. */
-const COMPONENT_SECURITY_ANALYTICS_PATH: Record<ComponentType, (space: string) => string> = {
-  decoders: (space) => `/app/decoders#/decoders?space=${space}`,
-  integrations: (space) => `/app/sa-integrations#/integrations?space=${space}`,
-  policies: (space) => `/app/sa-integrations#/integrations?space=${space}`,
-  filters: (space) => `/app/sa-integrations#/filters?space=${space}&dataSourceId=`,
-  kvdbs: (space) => `/app/kvdbs#/kvdbs?space=${space}`,
+const COMPONENT_SECURITY_ANALYTICS_PATH: Record<
+  ComponentType,
+  (space: string) => string
+> = {
+  decoders: space => `/app/decoders#/decoders?space=${space}`,
+  integrations: space => `/app/sa-integrations#/integrations?space=${space}`,
+  policies: space => `/app/sa-integrations#/integrations?space=${space}`,
+  filters: space =>
+    `/app/sa-integrations#/filters?space=${space}&dataSourceId=`,
+  kvdbs: space => `/app/kvdbs#/kvdbs?space=${space}`,
 };
 
 /**
@@ -76,7 +86,8 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
         },
         enabled: {
           type: 'string',
-          description: 'Filter by whether the component is enabled. Defaults to "any" (no filter).',
+          description:
+            'Filter by whether the component is enabled. Defaults to "any" (no filter).',
           enum: [...ENABLED_VALUES],
         },
         space: {
@@ -85,9 +96,11 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
             'Filter by Security Analytics space. Omit to search across every space (the default).',
           enum: [...SECURITY_ANALYTICS_SPACES],
         },
-        limit: limitProperty('Max number of components to return (default 20, max 500).'),
+        limit: limitProperty(
+          'Max number of components to return (default 20, max 500).',
+        ),
       },
-      ['component_type']
+      ['component_type'],
     ),
   },
   target: 'indexer',
@@ -98,7 +111,11 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
       typeof componentType !== 'string' ||
       !(COMPONENT_TYPES as readonly string[]).includes(componentType)
     ) {
-      throw new Error(`Parameter "component_type" must be one of: ${COMPONENT_TYPES.join(', ')}.`);
+      throw new Error(
+        `Parameter "component_type" must be one of: ${COMPONENT_TYPES.join(
+          ', ',
+        )}.`,
+      );
     }
     const index = COMPONENT_INDEX[componentType as ComponentType];
 

@@ -13,9 +13,14 @@ import {
 } from './common';
 
 function parseRuleTitles(value: unknown): string[] {
-  const raw = Array.isArray(value) ? value : typeof value === 'string' ? [value] : [];
+  const raw = Array.isArray(value)
+    ? value
+    : typeof value === 'string'
+    ? [value]
+    : [];
   const titles = raw.filter(
-    (title): title is string => typeof title === 'string' && title.trim() !== '',
+    (title): title is string =>
+      typeof title === 'string' && title.trim() !== '',
   );
   if (titles.length === 0) {
     throw new Error(

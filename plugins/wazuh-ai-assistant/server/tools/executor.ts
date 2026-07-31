@@ -1,12 +1,25 @@
-import { OpenSearchDashboardsRequest, RequestHandlerContext } from '../../../../src/core/server';
+import {
+  OpenSearchDashboardsRequest,
+  RequestHandlerContext,
+} from '../../../../src/core/server';
 import { StreamEvent, ToolCall } from '../../common/types';
 import { describeError } from '../../common/errors';
 import { validate } from './schema-validator';
 import { getToolDefinition } from './registry';
-import { applySafetyValves, checkIndexAllowlist, clampManagerParams, lintDsl } from './guardrails';
+import {
+  applySafetyValves,
+  checkIndexAllowlist,
+  clampManagerParams,
+  lintDsl,
+} from './guardrails';
 import { buildDigest, buildTableSpec, capDigest, Digest } from './digest';
 import { IndexerRequest, ManagerRequest, ToolDefinition } from './types';
-import { applyFieldPolicy, extractAggFields, FieldPolicyEntry, Pseudonymizer } from './privacy';
+import {
+  applyFieldPolicy,
+  extractAggFields,
+  FieldPolicyEntry,
+  Pseudonymizer,
+} from './privacy';
 import { resolveApiHostId } from './api-host';
 
 export interface ToolExecutionOutcome {
@@ -38,7 +51,7 @@ function finalizeDigest(
   // The escape hatch's deriveColumns can put ARBITRARY finding fields into
   // the digest, so its unlisted-field default must be fail-closed (anonymize) instead of the
   // curated typed tools' allow-by-omission — see privacy.ts's applyFieldPolicy.
-  isEscapeHatch = false
+  isEscapeHatch = false,
 ): Digest {
   if (!privacy) {
     return digest;
@@ -50,8 +63,8 @@ function finalizeDigest(
       privacy.pseudonymizer,
       aggFields,
       toolName,
-      isEscapeHatch
-    )
+      isEscapeHatch,
+    ),
   );
 }
 
@@ -67,7 +80,10 @@ function toolErrorContent(reason: string): string {
 function sanitizeError(error: unknown): string {
   const raw = describeError(error);
   const firstLine = raw.split('\n')[0];
-  const withoutCredentials = firstLine.replace(/(:\/\/)[^/\s@]+:[^/\s@]+@/g, '$1');
+  const withoutCredentials = firstLine.replace(
+    /(:\/\/)[^/\s@]+:[^/\s@]+@/g,
+    '$1',
+  );
   return withoutCredentials.length > 300
     ? `${withoutCredentials.slice(0, 300)}…`
     : withoutCredentials;
@@ -92,7 +108,8 @@ export function resolveSecurityAnalyticsSpace(hits: unknown): string {
   }
   const spaces = new Set<string>();
   for (const hit of hits) {
-    const space = (hit as { _source?: { space?: { name?: unknown } } })?._source?.space?.name;
+    const space = (hit as { _source?: { space?: { name?: unknown } } })?._source
+      ?.space?.name;
     if (typeof space === 'string' && space.length > 0) {
       spaces.add(space);
     }
@@ -106,7 +123,7 @@ async function executeIndexerRequest(
   indexerRequest: IndexerRequest,
   params: Record<string, unknown>,
   context: RequestHandlerContext,
-  privacy?: PrivacyContext
+  privacy?: PrivacyContext,
 ): Promise<ToolExecutionOutcome> {
   const allowlistCheck = checkIndexAllowlist(indexerRequest.index);
   if (!allowlistCheck.ok) {
@@ -134,7 +151,9 @@ async function executeIndexerRequest(
     body = valved.body;
   } catch (error) {
     return {
-      toolResultContent: toolErrorContent(`Query rejected: ${sanitizeError(error)}`),
+      toolResultContent: toolErrorContent(
+        `Query rejected: ${sanitizeError(error)}`,
+      ),
     };
   }
 
@@ -163,7 +182,7 @@ async function executeIndexerRequest(
       privacy,
       toolName,
       extractAggFields(body),
-      def.deriveColumns
+      def.deriveColumns,
     );
     // "Open in Discover" support (common/types.ts's `TableSpec.discover` doc comment): only this
     // Indexer path has an index/DSL to attach — `body.query` is the guardrail-clamped clause that
@@ -175,7 +194,7 @@ async function executeIndexerRequest(
     };
     if (def.buildSecurityAnalyticsLink) {
       const space = resolveSecurityAnalyticsSpace(
-        (result as { hits?: { hits?: unknown } })?.hits?.hits
+        (result as { hits?: { hits?: unknown } })?.hits?.hits,
       );
       const link = def.buildSecurityAnalyticsLink(params, space);
       if (link) {
@@ -190,7 +209,9 @@ async function executeIndexerRequest(
     };
   } catch (error) {
     return {
-      toolResultContent: toolErrorContent(`Indexer query failed: ${sanitizeError(error)}`),
+      toolResultContent: toolErrorContent(
+        `Indexer query failed: ${sanitizeError(error)}`,
+      ),
     };
   }
 }
@@ -201,7 +222,7 @@ async function executeManagerRequest(
   managerRequest: ManagerRequest,
   context: RequestHandlerContext,
   request: OpenSearchDashboardsRequest,
-  privacy?: PrivacyContext
+  privacy?: PrivacyContext,
 ): Promise<ToolExecutionOutcome> {
   const def = getToolDefinition(toolName);
   if (!def) {
@@ -219,12 +240,14 @@ async function executeManagerRequest(
     // the Manager API ignores (verified in server-api-client.ts::_buildRequestOptions against
     // v4.14.6, re-confirmed unchanged in the 5.0.0-beta3 reference (wdp-5)).
     const data =
-      managerRequest.method === 'GET' ? { params: clampedParams } : { body: clampedParams };
+      managerRequest.method === 'GET'
+        ? { params: clampedParams }
+        : { body: clampedParams };
     const response = await context.wazuh_core.api.client.asCurrentUser.request(
       managerRequest.method,
       managerRequest.path,
       data,
-      { apiHostID }
+      { apiHostID },
     );
     const result = response.data;
     // Manager API list responses have no aggregation concept, so there is no `aggField` to pass.
@@ -278,7 +301,9 @@ export type BuildValidatedRequestResult =
  * executing anything. Kept separate from `executeToolCall` below so validation/build failures
  * resolve to a bounded tool-result error the model can self-correct from.
  */
-export function buildValidatedRequest(call: ToolCall): BuildValidatedRequestResult {
+export function buildValidatedRequest(
+  call: ToolCall,
+): BuildValidatedRequestResult {
   const def = getToolDefinition(call.name);
   if (!def) {
     return {
@@ -291,7 +316,9 @@ export function buildValidatedRequest(call: ToolCall): BuildValidatedRequestResu
   if (!validation.ok) {
     return {
       ok: false,
-      toolResultContent: toolErrorContent(`Invalid arguments: ${validation.errors.join('; ')}`),
+      toolResultContent: toolErrorContent(
+        `Invalid arguments: ${validation.errors.join('; ')}`,
+      ),
     };
   }
 
@@ -322,7 +349,7 @@ export function executeToolCall(
   call: ToolCall,
   context: RequestHandlerContext,
   request: OpenSearchDashboardsRequest,
-  privacy?: PrivacyContext
+  privacy?: PrivacyContext,
 ): Promise<ToolExecutionOutcome> {
   const built = buildValidatedRequest(call);
   if (!built.ok) {
@@ -331,7 +358,19 @@ export function executeToolCall(
   const { request: builtRequest, params } = built.built;
 
   if (builtRequest.target === 'indexer') {
-    return executeIndexerRequest(call.name, builtRequest, params, context, privacy);
+    return executeIndexerRequest(
+      call.name,
+      builtRequest,
+      params,
+      context,
+      privacy,
+    );
   }
-  return executeManagerRequest(call.name, builtRequest, context, request, privacy);
+  return executeManagerRequest(
+    call.name,
+    builtRequest,
+    context,
+    request,
+    privacy,
+  );
 }

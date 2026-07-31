@@ -38,14 +38,17 @@ export const getDetectorsTool: ToolDefinition = {
       },
       detector_type: {
         type: 'string',
-        description: 'Filter by one exact detector type/integration name, e.g. "suricata".',
+        description:
+          'Filter by one exact detector type/integration name, e.g. "suricata".',
       },
       source: {
         type: 'string',
         description: 'Filter by detector source. Omit to search across both.',
         enum: [...DETECTOR_SOURCES],
       },
-      limit: limitProperty('Max number of detectors to return (default 20, max 500).'),
+      limit: limitProperty(
+        'Max number of detectors to return (default 20, max 500).',
+      ),
     }),
   },
   target: 'indexer',
@@ -57,7 +60,9 @@ export const getDetectorsTool: ToolDefinition = {
         ? params.enabled
         : 'enabled';
     const detectorType =
-      typeof params.detector_type === 'string' ? params.detector_type.trim() : undefined;
+      typeof params.detector_type === 'string'
+        ? params.detector_type.trim()
+        : undefined;
     const source =
       typeof params.source === 'string' &&
       (DETECTOR_SOURCES as readonly string[]).includes(params.source)
@@ -67,7 +72,9 @@ export const getDetectorsTool: ToolDefinition = {
 
     const nestedFilter: Record<string, unknown>[] = [];
     if (enabled !== 'any') {
-      nestedFilter.push({ term: { 'detector.enabled': enabled === 'enabled' } });
+      nestedFilter.push({
+        term: { 'detector.enabled': enabled === 'enabled' },
+      });
     }
     if (detectorType) {
       nestedFilter.push({ term: { 'detector.detector_type': detectorType } });
@@ -78,7 +85,12 @@ export const getDetectorsTool: ToolDefinition = {
 
     const query =
       nestedFilter.length > 0
-        ? { nested: { path: 'detector', query: { bool: { filter: nestedFilter } } } }
+        ? {
+            nested: {
+              path: 'detector',
+              query: { bool: { filter: nestedFilter } },
+            },
+          }
         : { match_all: {} };
 
     return {

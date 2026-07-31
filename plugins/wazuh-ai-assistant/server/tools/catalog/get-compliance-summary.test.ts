@@ -17,7 +17,7 @@ test('get_compliance_summary: throws when more than 5 frameworks are requested',
   assert.throws(() =>
     build({
       framework: ['cmmc', 'fedramp', 'gdpr', 'hipaa', 'iso_27001', 'nis2'],
-    })
+    }),
   );
 });
 

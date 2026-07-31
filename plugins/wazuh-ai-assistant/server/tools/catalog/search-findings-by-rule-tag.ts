@@ -13,7 +13,11 @@ import {
 } from './common';
 
 function parseRuleTags(value: unknown): string[] {
-  const raw = Array.isArray(value) ? value : typeof value === 'string' ? [value] : [];
+  const raw = Array.isArray(value)
+    ? value
+    : typeof value === 'string'
+    ? [value]
+    : [];
   const tags = raw.filter(
     (tag): tag is string => typeof tag === 'string' && tag.trim() !== '',
   );

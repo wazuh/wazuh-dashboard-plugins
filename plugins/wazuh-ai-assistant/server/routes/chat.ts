@@ -66,8 +66,10 @@ const MAX_TOOL_ROUNDS = 3;
  * written answer. Two variants: the table rendered something (`sawNonEmptyTable`) vs. the query
  * came back empty.
  */
-const NO_ANALYSIS_TEXT_MESSAGE = 'No additional analysis — see the results above.';
-const NO_MATCHING_RESULTS_MESSAGE = 'No matching results were found for that query.';
+const NO_ANALYSIS_TEXT_MESSAGE =
+  'No additional analysis — see the results above.';
+const NO_MATCHING_RESULTS_MESSAGE =
+  'No matching results were found for that query.';
 
 /** Whitespace-only delta content (e.g. a lone "\n\n" some models emit as priming/formatting
  * right before a tool call) must NOT count as "the model produced an answer" — otherwise the

@@ -1,6 +1,10 @@
 import React from 'react';
 import { EuiSpacer } from '@elastic/eui';
-import { InterruptedTurnNotice, MessageBubble, UiChatMessage } from './message-bubble';
+import {
+  InterruptedTurnNotice,
+  MessageBubble,
+  UiChatMessage,
+} from './message-bubble';
 import { ResolveDiscoverUrl } from './discover-link';
 import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
 
@@ -60,9 +64,11 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
             aiAvatarUrl={aiAvatarUrl}
             resolveDiscoverUrl={resolveDiscoverUrl}
             resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
-            onRetry={index === messages.length - 1 ? onRetryLastTurn : undefined}
+            onRetry={
+              index === messages.length - 1 ? onRetryLastTurn : undefined
+            }
           />
-          {index < messages.length - 1 && <EuiSpacer size="m" />}
+          {index < messages.length - 1 && <EuiSpacer size='m' />}
         </React.Fragment>
       ))}
       {/* A conversation that ENDS on a question is an unanswered turn: the page was reloaded or
@@ -72,7 +78,7 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
           user was left staring at their own question with no way to ask it again. */}
       {lastMessage?.role === 'user' && (
         <>
-          <EuiSpacer size="s" />
+          <EuiSpacer size='s' />
           <InterruptedTurnNotice onRetry={onRetryLastTurn} />
         </>
       )}

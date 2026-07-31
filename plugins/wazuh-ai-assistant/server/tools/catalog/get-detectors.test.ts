@@ -26,7 +26,11 @@ test('get_detectors: enabled="any" with no other filters produces match_all, not
 });
 
 test('get_detectors: detector_type and source each add one nested filter clause', () => {
-  const request = build({ enabled: 'any', detector_type: 'suricata', source: 'standard' });
+  const request = build({
+    enabled: 'any',
+    detector_type: 'suricata',
+    source: 'standard',
+  });
   assert.deepEqual(request.body.query, {
     nested: {
       path: 'detector',
