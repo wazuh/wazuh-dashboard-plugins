@@ -992,8 +992,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                             'wazuhAiAssistant.settings.form.encryptionRequiredBody',
                             {
                               defaultMessage:
-                                'Encryption at rest is not configured, so provider API keys ' +
-                                'would be stored in plain text. Providers that do not need ' +
+                                'Encryption at rest is not configured. Providers that do not need ' +
                                 'an API key can still be saved.',
                             },
                           )}
@@ -1152,7 +1151,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                     <EuiFlexGroup gutterSize='s'>
                       <EuiFlexItem grow={false}>
                         <EuiToolTip
-                          content={!canSave ? accessMessage : undefined}
+                          content={
+                            !canSave
+                              ? accessMessage
+                              : apiKeyBlockedByEncryption
+                              ? i18n.translate(
+                                  'wazuhAiAssistant.settings.form.encryptionRequiredTooltip',
+                                  {
+                                    defaultMessage:
+                                      'An encryption key must be configured before an API key can be saved.',
+                                  },
+                                )
+                              : undefined
+                          }
                         >
                           <EuiButton
                             onClick={handleSubmit}
