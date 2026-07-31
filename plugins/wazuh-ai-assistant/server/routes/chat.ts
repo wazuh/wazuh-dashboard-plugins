@@ -59,6 +59,25 @@ interface StoredProviderAttributes {
 const MAX_TOOL_ROUNDS = 3;
 
 /**
+ * Fallback narration for a turn that used at least one tool but whose model never emitted any
+ * `delta` text of its own before ending in `done` — observed with a tool call that returned zero
+ * rows, where the model apparently considered the (empty) table sufficient and said nothing.
+ * Without this, the user sees a bare table (or nothing at all, for a zero-row result) with no
+ * written answer. Two variants: the table rendered something (`sawNonEmptyTable`) vs. the query
+ * came back empty.
+ */
+const NO_ANALYSIS_TEXT_MESSAGE = 'No additional analysis — see the results above.';
+const NO_MATCHING_RESULTS_MESSAGE = 'No matching results were found for that query.';
+
+/** Whitespace-only delta content (e.g. a lone "\n\n" some models emit as priming/formatting
+ * right before a tool call) must NOT count as "the model produced an answer" — otherwise the
+ * `sawAnyDelta` guard above never fires for exactly the turns it exists to catch. Still forwarded
+ * to the client as a normal delta either way; this only affects the tracking flag. */
+function hasMeaningfulText(content: string): boolean {
+  return content.trim().length > 0;
+}
+
+/**
  * Concurrent-stream cap. Without it, one script or user can open unlimited concurrent streams --
  * the only other protections are accidental (the browser's 6-connection cap, the event loop).
  * `perUserActiveStreams`/`globalActiveStreams` are the enforcement: live counters of open chat
@@ -694,6 +713,14 @@ async function* orchestrate(
   let tools: ToolSpec[] | undefined = listToolSpecs();
   let messages = initialMessages;
   let sawNonEmptyTable = false;
+  // Whole-turn guards (not per-round, unlike `sawToolCall` below which resets every round): true
+  // once ANY delta text / tool call has happened THIS TURN, across every round — see
+  // NO_ANALYSIS_TEXT_MESSAGE/NO_MATCHING_RESULTS_MESSAGE above. `toolUsedThisTurn` (not
+  // `sawNonEmptyTable`) gates the fallback so a plain no-tool conversational turn that legitimately
+  // ends with no text is never second-guessed by a "no matching results" message that would be
+  // flatly wrong for it.
+  let sawAnyDelta = false;
+  let toolUsedThisTurn = false;
 
   /** Yields a `privacy_map` event for any pseudonym entries minted so far this turn, but only
    * once total ("once per turn... when newEntries() is non-empty") — guarded
@@ -797,6 +824,9 @@ async function* orchestrate(
           content = tableSuppressor.push(content);
         }
         if (content) {
+          if (hasMeaningfulText(content)) {
+            sawAnyDelta = true;
+          }
           yield { type: 'delta', content };
         }
         continue;
@@ -804,6 +834,7 @@ async function* orchestrate(
 
       if (event.type === 'tool_call') {
         sawToolCall = true;
+        toolUsedThisTurn = true;
         if (signal.aborted) {
           return;
         }
@@ -812,6 +843,9 @@ async function* orchestrate(
           // resolved before the round moves on.
           const trailing = drainRoundBuffers();
           if (trailing) {
+            if (hasMeaningfulText(trailing)) {
+              sawAnyDelta = true;
+            }
             yield { type: 'delta', content: trailing };
           }
         }
@@ -898,6 +932,9 @@ async function* orchestrate(
         {
           const trailing = drainRoundBuffers();
           if (trailing) {
+            if (hasMeaningfulText(trailing)) {
+              sawAnyDelta = true;
+            }
             yield { type: 'delta', content: trailing };
           }
         }
@@ -905,6 +942,17 @@ async function* orchestrate(
           // More rounds needed: suppress this 'done' (the turn isn't over) and start the next
           // round with the grown message history instead of ending the SSE stream here.
           break;
+        }
+        // The turn is genuinely over (this round made no tool call) but at least one tool ran
+        // earlier THIS turn and the model never produced any text at all — see
+        // NO_ANALYSIS_TEXT_MESSAGE's doc comment.
+        if (!sawAnyDelta && toolUsedThisTurn) {
+          yield {
+            type: 'delta',
+            content: sawNonEmptyTable
+              ? NO_ANALYSIS_TEXT_MESSAGE
+              : NO_MATCHING_RESULTS_MESSAGE,
+          };
         }
         yield* emitPrivacyMapOnce();
         yield event;
@@ -939,7 +987,17 @@ async function* orchestrate(
   }
 
   // Exhausted the round budget and the forced-final (no-tools) round still didn't end cleanly
-  // above; close the SSE stream rather than hang the client.
+  // above; close the SSE stream rather than hang the client. Same no-text guard as the main 'done'
+  // branch above — a model that kept calling tools straight through the final no-tools round still
+  // deserves a written answer, not a bare done.
+  if (!sawAnyDelta && toolUsedThisTurn) {
+    yield {
+      type: 'delta',
+      content: sawNonEmptyTable
+        ? NO_ANALYSIS_TEXT_MESSAGE
+        : NO_MATCHING_RESULTS_MESSAGE,
+    };
+  }
   yield* emitPrivacyMapOnce();
   yield { type: 'done' };
 }
