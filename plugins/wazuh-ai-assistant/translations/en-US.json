@@ -150,6 +150,7 @@
     "wazuhAiAssistant.settings.retention.saveSuccess": "Conversation history settings saved.",
     "wazuhAiAssistant.settings.retention.daysLabel": "Keep saved conversations for (days)",
     "wazuhAiAssistant.settings.retention.daysHelp": "0 keeps every saved conversation forever. Enforcement happens only when the conversation list is loaded — there is no scheduled background cleanup.",
-    "wazuhAiAssistant.settings.retention.save": "Save conversation history settings"
+    "wazuhAiAssistant.settings.retention.save": "Save conversation history settings",
+    "wazuhAiAssistant.chat.disclaimer": "AI responses may contain errors. Always verify critical information."
   }
 }

@@ -1,0 +1,21 @@
+.wzStickyInputPanel {
+  position: sticky;
+  bottom: 0;
+  background-color: $euiPageBackgroundColor;
+  margin-top: 16px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: 0;
+    right: 0;
+    height: 16px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      $euiPageBackgroundColor
+    );
+    pointer-events: none;
+  }
+}

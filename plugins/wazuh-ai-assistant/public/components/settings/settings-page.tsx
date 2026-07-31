@@ -26,6 +26,7 @@ import {
   EuiPanel,
   EuiFieldNumber,
   EuiIcon,
+  EuiIconTip,
   EuiHorizontalRule,
   EuiFieldSearch,
   EuiAccordion,
@@ -1043,33 +1044,49 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 </EuiFormRow>
 
                 <EuiSpacer size='l' />
-                <EuiText size='s'>
-                  <p>
-                    <strong>
-                      {i18n.translate(
-                        'wazuhAiAssistant.settings.privacy.fieldPolicyTitle',
+                {/* The full explanation lives in the tooltip rather than inline: it is long enough
+                    to dominate the section, and it only matters the first time an admin configures
+                    a rule (or when one surprises them). */}
+                <EuiFlexGroup
+                  gutterSize='xs'
+                  alignItems='center'
+                  responsive={false}
+                >
+                  <EuiFlexItem grow={false}>
+                    <EuiText size='s'>
+                      <strong>
+                        {i18n.translate(
+                          'wazuhAiAssistant.settings.privacy.fieldPolicyTitle',
+                          {
+                            defaultMessage: 'Field policy',
+                          },
+                        )}
+                      </strong>
+                    </EuiText>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <EuiIconTip
+                      type='questionInCircle'
+                      color='subdued'
+                      content={i18n.translate(
+                        'wazuhAiAssistant.settings.privacy.fieldPolicyHelp',
                         {
-                          defaultMessage: 'Field policy',
+                          defaultMessage:
+                            'What the AI provider gets per field: real value (Allow), pseudonym (Anonymize), or nothing (Never send).',
                         },
                       )}
-                    </strong>
-                  </p>
-                  <p>
-                    {i18n.translate(
-                      'wazuhAiAssistant.settings.privacy.fieldPolicyHelp',
-                      {
-                        defaultMessage:
-                          'Controls which finding fields are anonymized (or dropped entirely) before reaching the AI provider when privacy mode is on.',
-                      },
-                    )}
-                  </p>
-                </EuiText>
+                    />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
                 <EuiSpacer size='s' />
 
                 {fieldPolicyDraft.length > 0 && (
                   <EuiAccordion
                     id='field-policy-accordion'
-                    initialIsOpen
+                    // Collapsed by default: the rule list is long (the curated defaults alone are
+                    // ~25 rows) and it is not what an admin comes to this section for — the two
+                    // privacy switches above it are. The button content carries the rule count, so
+                    // the section still reports its size without being expanded.
                     buttonContent={i18n.translate(
                       'wazuhAiAssistant.settings.privacy.fieldPolicyAccordion',
                       {

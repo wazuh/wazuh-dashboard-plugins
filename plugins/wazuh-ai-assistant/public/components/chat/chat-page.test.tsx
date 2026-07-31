@@ -173,7 +173,7 @@ async function sendMessage(text: string) {
   fireEvent.change(screen.getByLabelText('Chat message'), {
     target: { value: text },
   });
-  fireEvent.click(screen.getByText('Send'));
+  fireEvent.click(screen.getByRole('button', { name: 'Send' }));
   await waitFor(() => expect(mockStreamChat).toHaveBeenCalled());
 }
 
@@ -404,7 +404,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
       expect(screen.getByText('partial answer')).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByText('Stop'));
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
 
     // Stop is NOT abandonment: what streamed in stays on screen and is saved as this
     // conversation's first turn, so the next turn updates that same row instead of creating a
@@ -809,7 +809,7 @@ describe('ChatPage — interrupted turns and failed saves', () => {
       expect(screen.getByText('half an ans')).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByText('Stop'));
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
 
     await waitFor(() =>
       expect(screen.getByText('Response interrupted')).toBeInTheDocument(),
@@ -860,7 +860,7 @@ describe('ChatPage — interrupted turns and failed saves', () => {
     await waitFor(() =>
       expect(screen.getByText('half an ans')).toBeInTheDocument(),
     );
-    fireEvent.click(screen.getByText('Stop'));
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
     await waitFor(() =>
       expect(screen.getByText('Response interrupted')).toBeInTheDocument(),
     );
@@ -1045,6 +1045,87 @@ describe('ChatPage — feedback while a turn runs', () => {
       expect(screen.getByText('the answer')).toBeInTheDocument(),
     );
     expect(container.querySelectorAll('.euiLoadingContent')).toHaveLength(0);
+  });
+
+  it('holds the result table back until the answer text starts arriving', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    // The real wire order for one tool call: tool_call, then table, then digest.
+    stream.push({
+      type: 'tool_call',
+      toolCall: { id: 't1', name: 'get_top_agents', arguments: {} },
+    });
+    stream.push({
+      type: 'table',
+      spec: {
+        columns: [{ id: 'agent', label: 'Agent' }],
+        rows: [{ agent: 'web-01' }],
+      },
+    });
+    // The `digest` event that follows must not release the held table — it is held until TEXT
+    // arrives, not until the next non-delta event comes along.
+    stream.push({ type: 'digest', toolCallId: 't1', content: '{}' });
+    await waitFor(() =>
+      expect(screen.getByText('1 query executed')).toBeInTheDocument(),
+    );
+    expect(screen.queryByText('web-01')).not.toBeInTheDocument();
+
+    stream.push({ type: 'delta', content: 'here they are' });
+
+    await waitFor(() =>
+      expect(screen.getByText('here they are')).toBeInTheDocument(),
+    );
+    expect(screen.getByText('web-01')).toBeInTheDocument();
+  });
+
+  it('still shows a held table when the turn ends without any answer text', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    stream.push({
+      type: 'table',
+      spec: {
+        columns: [{ id: 'agent', label: 'Agent' }],
+        rows: [{ agent: 'web-01' }],
+      },
+    });
+    stream.push({ type: 'done' });
+    stream.end();
+
+    await waitFor(() => expect(screen.getByText('web-01')).toBeInTheDocument());
+  });
+
+  it('keeps a held table when the turn errors before narrating anything', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('top agents?');
+
+    stream.push({
+      type: 'table',
+      spec: {
+        columns: [{ id: 'agent', label: 'Agent' }],
+        rows: [{ agent: 'web-01' }],
+      },
+    });
+    stream.push({ type: 'error', message: 'provider stream failed' });
+    stream.end();
+
+    await waitFor(() => expect(screen.getByText('web-01')).toBeInTheDocument());
   });
 
   it('shows the query that was executed, with its arguments', async () => {

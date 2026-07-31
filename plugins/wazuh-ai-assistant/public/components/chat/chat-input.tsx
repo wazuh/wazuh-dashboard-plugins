@@ -1,11 +1,5 @@
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiTextArea,
-  EuiButton,
-  EuiButtonEmpty,
-} from '@elastic/eui';
+import { EuiTextArea } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 
 interface ChatInputProps {
@@ -14,11 +8,11 @@ interface ChatInputProps {
   disabled: boolean;
   isGenerating: boolean;
   onSend: (text: string) => void;
-  onStop: () => void;
 }
 
 export interface ChatInputHandle {
   focus: () => void;
+  send: () => void;
 }
 
 /**
@@ -26,13 +20,29 @@ export interface ChatInputHandle {
  * welcome state can prefill it without this component needing an imperative handle.
  */
 export const ChatInput = React.forwardRef<ChatInputHandle, ChatInputProps>(
-  ({ value, onChange, disabled, isGenerating, onSend, onStop }, ref) => {
+  ({ value, onChange, disabled, isGenerating, onSend }, ref) => {
     const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+    // Keep a ref so the imperative handle's `send` always sees the latest value/callbacks
+    // without being recreated on every render.
+    const sendRef = useRef<() => void>(() => {});
+
+    sendRef.current = () => {
+      if (isGenerating) {
+        return;
+      }
+      const trimmed = value.trim();
+      if (!trimmed) {
+        return;
+      }
+      onSend(trimmed);
+      onChange('');
+    };
 
     useImperativeHandle(
       ref,
       () => ({
         focus: () => textAreaRef.current?.focus(),
+        send: () => sendRef.current(),
       }),
       [],
     );
@@ -45,73 +55,50 @@ export const ChatInput = React.forwardRef<ChatInputHandle, ChatInputProps>(
       }
     }, [disabled]);
 
-    const handleSend = () => {
-      if (isGenerating) {
+    // Auto-expand: reset to auto so shrinking works, then grow to fit content.
+    useEffect(() => {
+      const el = textAreaRef.current;
+      if (!el) {
         return;
       }
-      const trimmed = value.trim();
-      if (!trimmed) {
-        return;
-      }
-      onSend(trimmed);
-      onChange('');
-    };
+      el.style.height = 'auto';
+      el.style.height = `${el.scrollHeight}px`;
+    }, [value]);
 
     return (
-      <EuiFlexGroup gutterSize='s' alignItems='center'>
-        <EuiFlexItem>
-          <EuiTextArea
-            inputRef={node => {
-              textAreaRef.current = node;
-            }}
-            fullWidth
-            resize='vertical'
-            rows={2}
-            // isGenerating is folded in here (not just at the parent's `disabled` prop) so typing
-            // or pressing Enter mid-stream can't be silently swallowed by handleSend's own
-            // isGenerating early-return below.
-            disabled={disabled || isGenerating}
-            value={value}
-            placeholder={i18n.translate(
-              'wazuhAiAssistant.chat.inputPlaceholder',
-              {
-                defaultMessage:
-                  'Ask the AI Assistant about your security findings...',
-              },
-            )}
-            aria-label={i18n.translate('wazuhAiAssistant.chat.inputAriaLabel', {
-              defaultMessage: 'Chat message',
-            })}
-            onChange={event => onChange(event.target.value)}
-            onKeyDown={event => {
-              if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                handleSend();
-              }
-            }}
-          />
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          {isGenerating ? (
-            <EuiButtonEmpty onClick={onStop} color='danger' iconType='cross'>
-              {i18n.translate('wazuhAiAssistant.chat.stopButton', {
-                defaultMessage: 'Stop',
-              })}
-            </EuiButtonEmpty>
-          ) : (
-            <EuiButton
-              onClick={handleSend}
-              disabled={disabled || !value.trim()}
-              fill
-              iconType='kqlFunction'
-            >
-              {i18n.translate('wazuhAiAssistant.chat.sendButton', {
-                defaultMessage: 'Send',
-              })}
-            </EuiButton>
-          )}
-        </EuiFlexItem>
-      </EuiFlexGroup>
+      <EuiTextArea
+        inputRef={node => {
+          textAreaRef.current = node;
+        }}
+        fullWidth
+        rows={2}
+        // isGenerating is folded in here (not just at the parent's `disabled` prop) so typing
+        // or pressing Enter mid-stream can't be silently swallowed by sendRef's own
+        // isGenerating early-return below.
+        disabled={disabled || isGenerating}
+        value={value}
+        style={{
+          border: 'none',
+          boxShadow: 'none',
+          resize: 'none',
+          overflow: 'hidden',
+          backgroundColor: 'inherit',
+        }}
+        placeholder={i18n.translate('wazuhAiAssistant.chat.inputPlaceholder', {
+          defaultMessage:
+            'Ask the AI Assistant about your security findings...',
+        })}
+        aria-label={i18n.translate('wazuhAiAssistant.chat.inputAriaLabel', {
+          defaultMessage: 'Chat message',
+        })}
+        onChange={event => onChange(event.target.value)}
+        onKeyDown={event => {
+          if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendRef.current();
+          }
+        }}
+      />
     );
   },
 );

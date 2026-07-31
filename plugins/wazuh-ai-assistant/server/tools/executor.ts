@@ -165,7 +165,11 @@ async function executeIndexerRequest(
     };
     return {
       // The `table` event built from `result` below is deliberately NOT run through field policy:
-      // it renders locally in the browser and never reaches the model.
+      // it renders locally in the browser and never reaches the model. That holds for EVERY action,
+      // 'never' included — the policy's only boundary is the digest above, and the table shows the
+      // analyst their own data in full (issue #8821; see privacy.ts's module header). The same is
+      // true of the executed `body`: no action rewrites its projections, so the field is retrieved
+      // and therefore displayable.
       toolResultContent: JSON.stringify(finalDigest),
       tableEvent: { type: 'table', spec: tableSpec },
     };

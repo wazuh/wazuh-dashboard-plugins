@@ -128,10 +128,6 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   const isUser = message.role === 'user';
   const isWaitingForFirstToken =
     !isUser && message.isStreaming === true && message.content === '';
-  // 'accent' rendered pink in this EUI theme, which reads off-brand for Wazuh; 'subdued' is a
-  // neutral grey that still visually separates the user bubble from the assistant's 'plain'.
-  const panelColor = isUser ? 'subdued' : 'plain';
-
   // color="plain" keeps both avatars on a neutral background so the Wazuh mark reads exactly
   // like the brand mark in the dashboard chrome, instead of EUI's auto-assigned name color.
   const avatar = isUser ? (
@@ -158,144 +154,147 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
     />
   );
 
-  const bubble = (
-    // minWidth keeps a streaming bubble from starting pin-tiny on the first token and visibly
-    // growing token by token; harmless for user bubbles, which never stream.
-    <EuiFlexItem grow={false} style={{ maxWidth: '75%', minWidth: 180 }}>
-      {/* hasBorder only on the user bubble: gives its flatter "subdued" fill a defined edge,
-          while the assistant bubble keeps reading as an elevated card via hasShadow instead —
-          a calm, low-color way to tell the two apart. borderRadius is a shared inline override
-          (wins over EuiPanel's own smaller default) so both bubble kinds match the rest of this
-          surface's rounding. */}
-      <EuiPanel
-        color={panelColor}
-        paddingSize='m'
-        hasShadow={!isUser}
-        hasBorder={isUser}
-        style={{ borderRadius: 14 }}
-      >
-        {isUser || message.isStreaming ? (
-          // aria-live only for the assistant's streaming text (never the user bubble, which this
-          // branch also covers): announces incoming delta tokens to screen readers, which
-          // otherwise stay silent for the whole stream since nothing else here changes focus.
-          <div
-            {...(!isUser
-              ? {
-                  'aria-live': 'polite' as const,
-                  'aria-atomic': 'false' as const,
-                }
-              : {})}
-          >
-            <EuiText size='s'>
-              {/* Shown only before real content has arrived; a delta event clears statusMessage. */}
-              {message.statusMessage && !message.content && (
-                <p style={{ margin: 0, fontStyle: 'italic' }}>
-                  <EuiTextColor color='subdued'>
-                    {message.statusMessage}
-                  </EuiTextColor>
-                </p>
-              )}
-              {/* Waiting for the first token: a bubble with nothing in it read as a broken empty
+  const bubbleContent = (
+    <>
+      {isUser || message.isStreaming ? (
+        // aria-live only for the assistant's streaming text (never the user bubble, which this
+        // branch also covers): announces incoming delta tokens to screen readers, which
+        // otherwise stay silent for the whole stream since nothing else here changes focus.
+        <div
+          {...(!isUser
+            ? {
+                'aria-live': 'polite' as const,
+                'aria-atomic': 'false' as const,
+              }
+            : {})}
+        >
+          <EuiText size='s'>
+            {/* Shown only before real content has arrived; a delta event clears statusMessage. */}
+            {message.statusMessage && !message.content && (
+              <p style={{ margin: 0, fontStyle: 'italic' }}>
+                <EuiTextColor color='subdued'>
+                  {message.statusMessage}
+                </EuiTextColor>
+              </p>
+            )}
+            {/* Waiting for the first token: a bubble with nothing in it read as a broken empty
                   box, especially on a turn that runs tool calls first and can sit silent for
                   seconds. Placeholder lines say "something is coming" the way every chat client
                   does. Replaced by real text the moment a delta arrives. */}
-              {isWaitingForFirstToken ? (
-                <EuiLoadingContent lines={2} />
-              ) : (
-                <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>
-                  {message.content}
-                </p>
-              )}
-            </EuiText>
-          </div>
-        ) : (
-          <EuiText size='s'>
-            <EuiMarkdownFormat>{message.content}</EuiMarkdownFormat>
+            {isWaitingForFirstToken ? (
+              <EuiLoadingContent lines={2} />
+            ) : (
+              <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>
+                {message.content}
+              </p>
+            )}
           </EuiText>
-        )}
-        {message.table && (
-          <>
-            <EuiSpacer size='s' />
-            <ResultTable
-              spec={message.table}
-              resolveDiscoverUrl={resolveDiscoverUrl}
-            />
-          </>
-        )}
-        {/* What was actually run, collapsed by default: the answer is only as trustworthy as the
+        </div>
+      ) : (
+        <EuiText size='s'>
+          <EuiMarkdownFormat>{message.content}</EuiMarkdownFormat>
+        </EuiText>
+      )}
+      {message.table && (
+        <>
+          <EuiSpacer size='s' />
+          <ResultTable
+            spec={message.table}
+            resolveDiscoverUrl={resolveDiscoverUrl}
+          />
+        </>
+      )}
+      {/* What was actually run, collapsed by default: the answer is only as trustworthy as the
             query behind it, and an analyst has to be able to check that query without reading
             server logs. Shows each tool call's real-form arguments and, for an indexer search, the
             executed DSL the table carries (the same one "Open in Discover" uses). */}
-        {message.toolCalls && message.toolCalls.length > 0 && (
-          <>
-            <EuiSpacer size='s' />
-            <EuiAccordion
-              id={`wzAiQuery-${message.id}`}
-              paddingSize='s'
-              buttonContent={
+      {message.toolCalls && message.toolCalls.length > 0 && (
+        <>
+          <EuiSpacer size='s' />
+          <EuiAccordion
+            id={`wzAiQuery-${message.id}`}
+            paddingSize='s'
+            buttonContent={
+              <EuiText size='xs'>
+                <EuiTextColor color='subdued'>
+                  {i18n.translate('wazuhAiAssistant.chat.queryDetails', {
+                    defaultMessage:
+                      '{count, plural, one {# query executed} other {# queries executed}}',
+                    values: { count: message.toolCalls.length },
+                  })}
+                </EuiTextColor>
+              </EuiText>
+            }
+          >
+            {message.toolCalls.map(toolCall => (
+              <div key={toolCall.id}>
                 <EuiText size='xs'>
-                  <EuiTextColor color='subdued'>
-                    {i18n.translate('wazuhAiAssistant.chat.queryDetails', {
-                      defaultMessage:
-                        '{count, plural, one {# query executed} other {# queries executed}}',
-                      values: { count: message.toolCalls.length },
-                    })}
-                  </EuiTextColor>
+                  <strong>{toolCall.name}</strong>
                 </EuiText>
-              }
-            >
-              {message.toolCalls.map(toolCall => (
-                <div key={toolCall.id}>
-                  <EuiText size='xs'>
-                    <strong>{toolCall.name}</strong>
-                  </EuiText>
-                  <EuiSpacer size='xs' />
-                  <EuiCodeBlock
-                    language='json'
-                    paddingSize='s'
-                    fontSize='s'
-                    isCopyable
-                    overflowHeight={240}
-                  >
-                    {JSON.stringify(toolCall.arguments, null, 2)}
-                  </EuiCodeBlock>
-                  <EuiSpacer size='s' />
-                </div>
-              ))}
-              {message.table?.discover && (
-                <>
-                  <EuiText size='xs'>
-                    <strong>
-                      {i18n.translate('wazuhAiAssistant.chat.queryIndex', {
-                        defaultMessage: 'Index: {index}',
-                        values: { index: message.table.discover.index },
-                      })}
-                    </strong>
-                  </EuiText>
-                  <EuiSpacer size='xs' />
-                  <EuiCodeBlock
-                    language='json'
-                    paddingSize='s'
-                    fontSize='s'
-                    isCopyable
-                    overflowHeight={240}
-                  >
-                    {JSON.stringify(message.table.discover.dsl, null, 2)}
-                  </EuiCodeBlock>
-                </>
-              )}
-            </EuiAccordion>
-          </>
-        )}
-        {/* An interrupted answer is labelled as one rather than left looking complete — the whole
+                <EuiSpacer size='xs' />
+                <EuiCodeBlock
+                  language='json'
+                  paddingSize='s'
+                  fontSize='s'
+                  isCopyable
+                  overflowHeight={240}
+                >
+                  {JSON.stringify(toolCall.arguments, null, 2)}
+                </EuiCodeBlock>
+                <EuiSpacer size='s' />
+              </div>
+            ))}
+            {message.table?.discover && (
+              <>
+                <EuiText size='xs'>
+                  <strong>
+                    {i18n.translate('wazuhAiAssistant.chat.queryIndex', {
+                      defaultMessage: 'Index: {index}',
+                      values: { index: message.table.discover.index },
+                    })}
+                  </strong>
+                </EuiText>
+                <EuiSpacer size='xs' />
+                <EuiCodeBlock
+                  language='json'
+                  paddingSize='s'
+                  fontSize='s'
+                  isCopyable
+                  overflowHeight={240}
+                >
+                  {JSON.stringify(message.table.discover.dsl, null, 2)}
+                </EuiCodeBlock>
+              </>
+            )}
+          </EuiAccordion>
+        </>
+      )}
+      {/* An interrupted answer is labelled as one rather than left looking complete — the whole
             point is that the reader can tell this text stops mid-thought on purpose. */}
-        {message.interrupted && !message.isStreaming && (
-          <>
-            <EuiSpacer size='xs' />
-            <InterruptedTurnNotice onRetry={onRetry} />
-          </>
-        )}
-      </EuiPanel>
+      {message.interrupted && !message.isStreaming && (
+        <>
+          <EuiSpacer size='xs' />
+          <InterruptedTurnNotice onRetry={onRetry} />
+        </>
+      )}
+    </>
+  );
+
+  const bubble = (
+    <EuiFlexItem grow={false} style={{ maxWidth: '75%', minWidth: 180 }}>
+      {isUser ? (
+        <EuiPanel
+          color='plain'
+          paddingSize='m'
+          hasShadow={false}
+          hasBorder
+          style={{ borderRadius: 14 }}
+        >
+          {bubbleContent}
+        </EuiPanel>
+      ) : (
+        <div style={{ padding: '8px 0' }}>{bubbleContent}</div>
+      )}
       <EuiText
         size='xs'
         color='subdued'

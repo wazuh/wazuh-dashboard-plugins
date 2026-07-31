@@ -1,9 +1,11 @@
+import './chat-page.scss';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   EuiSpacer,
   EuiEmptyPrompt,
   EuiButton,
-  EuiBadge,
+  EuiButtonEmpty,
+  EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
   EuiToolTip,
@@ -1005,6 +1007,16 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // single empty table if it's the only one" (honest-empty stays correct). A plain local
     // variable, not a ref/state: scoped to this one stream's sequential event loop only.
     let pendingEmptyTable: TableSpec | undefined;
+    /**
+     * A non-empty `table` event held back until the answer's first text arrives. The server emits
+     * `table` the moment a tool returns, well before the model has narrated anything, so committing
+     * it immediately made the table pop in first and the prose then grow in above it — the bubble
+     * renders the table UNDER the text (message-bubble.tsx), so the turn read backwards while it
+     * streamed. Released by `flushPendingDelta` together with that first text (one React update, so
+     * text and table appear at once), or on its own by `flushPendingTable` if the turn ends, errors,
+     * or expires before any text arrives — an answer that is only a table must still show it.
+     */
+    let pendingTable: TableSpec | undefined;
     /** The tool calls issued this turn, in order — mirrors what the bubble displays so the abandoned
      * path can rebuild the turn without reading React state. */
     let committedToolCalls: ToolCall[] = [];
@@ -1017,6 +1029,27 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       }
       const spec = pendingEmptyTable;
       pendingEmptyTable = undefined;
+      committedTable = spec;
+      if (!isTurnStillActive()) {
+        return;
+      }
+      updateMessages(current =>
+        current.map(message =>
+          message.id === assistantMessageId
+            ? { ...message, table: spec }
+            : message,
+        ),
+      );
+    };
+    /** Commits a held non-empty table on its own, for the turns where no answer text ever arrives to
+     * pair it with (stream ended, errored, or the session expired). A no-op once `flushPendingDelta`
+     * has already released it. */
+    const flushPendingTable = () => {
+      if (!pendingTable) {
+        return;
+      }
+      const spec = pendingTable;
+      pendingTable = undefined;
       committedTable = spec;
       if (!isTurnStillActive()) {
         return;
@@ -1060,6 +1093,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       }
       const text = pendingDeltaText;
       pendingDeltaText = '';
+      // The first text of the answer is what the held table was waiting for: released in this same
+      // update so the bubble shows text and table together, already in their final order.
+      const table = pendingTable;
+      pendingTable = undefined;
+      if (table) {
+        committedTable = table;
+      }
       // An abandoned turn keeps accumulating into `accumulatedContent` (which is what its own
       // transcript is rebuilt from) but stops writing into the message list, which now belongs to
       // a different conversation.
@@ -1074,6 +1114,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 ...message,
                 content: message.content + text,
                 statusMessage: undefined,
+                ...(table ? { table } : {}),
               }
             : message,
         ),
@@ -1118,16 +1159,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             pendingEmptyTable = event.spec;
           } else {
             pendingEmptyTable = undefined;
-            committedTable = event.spec;
-            if (isTurnStillActive()) {
-              updateMessages(current =>
-                current.map(message =>
-                  message.id === assistantMessageId
-                    ? { ...message, table: event.spec }
-                    : message,
-                ),
-              );
-            }
+            // Held rather than committed — see `pendingTable`. `committedTable` is deliberately NOT
+            // set here: it is set at the moment the table actually reaches the message list, so an
+            // abandoned turn is remembered with exactly what it displayed.
+            pendingTable = event.spec;
           }
         } else if (event.type === 'status' && isTurnStillActive()) {
           // Transient progress line (e.g. "Querying Wazuh...") from the orchestration loop; no
@@ -1180,6 +1215,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         } else if (event.type === 'error') {
           turnCompleted = true;
           flushPendingEmptyTable();
+          // Released before the placeholder cleanup below, which drops an assistant message with
+          // neither content nor table — a turn whose tool succeeded and whose narration then failed
+          // must keep the table it already produced.
+          flushPendingTable();
           if (!isTurnStillActive()) {
             // An error banner for a conversation the user already left is pure noise — the turn's
             // own transcript (rebuilt in `finally`) simply carries whatever streamed in before it.
@@ -1209,6 +1248,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           // is NOT gated on the turn still being active: the session is gone for the whole app, so
           // the callout is just as relevant to whatever conversation is now on screen.
           turnCompleted = true;
+          flushPendingTable();
           flushPendingEmptyTable();
           handleSessionExpired();
           if (!isTurnStillActive()) {
@@ -1232,6 +1272,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       // ended normally, errored, or was aborted (handleStop's `controller.abort()` unwinds the
       // `for await` and lands here the same way).
       flushPendingDelta();
+      // A turn that produced a table but never any prose (the model stopped after the tool call, or
+      // Stop was pressed while it was still thinking) still has to show that table.
+      flushPendingTable();
       flushPendingEmptyTable();
 
       if (!isTurnStillActive()) {
@@ -1451,32 +1494,31 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
   const privacyBadgeLabel = privacyEnabled
     ? i18n.translate('wazuhAiAssistant.chat.privacy.on', {
-        defaultMessage: 'Privacy on',
+        defaultMessage: 'On',
       })
     : i18n.translate('wazuhAiAssistant.chat.privacy.off', {
-        defaultMessage: 'Privacy off',
+        defaultMessage: 'Off',
       });
-  // EuiBadge's props are a discriminated union: the clickable arm (WithButtonProps) requires a
-  // DEFINED onClick + onClickAriaLabel, while the plain arm has neither. Rendering two distinct,
-  // statically-typed badges (rather than conditionally spreading the click props into one) lets
-  // each JSX element match exactly one arm of the union — a conditional spread would widen onClick
-  // to `(() => void) | undefined`, which matches no arm. Output is identical to the spread form:
-  // interactive badge only when the user may toggle privacy, plain badge otherwise.
   const privacyBadgeColor = privacyEnabled ? 'success' : 'hollow';
   const privacyBadgeIcon = privacyEnabled ? 'lock' : 'lockOpen';
   const privacyBadge = assistantSettings?.userCanOverride ? (
-    <EuiBadge
-      color={privacyBadgeColor}
+    <EuiButtonEmpty
+      size='s'
+      color={privacyEnabled ? 'success' : 'text'}
       iconType={privacyBadgeIcon}
       onClick={handleTogglePrivacy}
-      onClickAriaLabel={privacyBadgeLabel}
     >
       {privacyBadgeLabel}
-    </EuiBadge>
+    </EuiButtonEmpty>
   ) : (
-    <EuiBadge color={privacyBadgeColor} iconType={privacyBadgeIcon}>
+    <EuiButtonEmpty
+      size='s'
+      color={privacyEnabled ? 'success' : 'text'}
+      iconType={privacyBadgeIcon}
+      isDisabled
+    >
       {privacyBadgeLabel}
-    </EuiBadge>
+    </EuiButtonEmpty>
   );
 
   // The badge alone only ever said
@@ -1641,88 +1683,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               padding: '16px 24px 0',
             }}
           >
-            {hasProviders && (
-              <>
-                {/* Grouped toolbar strip: the provider select + privacy badge read as one
-                      intentional control cluster instead of two floating controls. */}
-                <EuiPanel
-                  color='subdued'
-                  hasShadow={false}
-                  hasBorder={false}
-                  paddingSize='s'
-                  style={{ borderRadius: 10 }}
-                >
-                  <EuiFlexGroup
-                    justifyContent='flexEnd'
-                    alignItems='center'
-                    gutterSize='s'
-                    responsive={false}
-                  >
-                    <EuiFlexItem grow={false}>
-                      <EuiSelect
-                        id='wzAiAssistantProviderSelect'
-                        compressed
-                        prepend={i18n.translate(
-                          'wazuhAiAssistant.chat.providerLabel',
-                          {
-                            defaultMessage: 'Provider',
-                          },
-                        )}
-                        options={providerOptions}
-                        value={selectedProviderId}
-                        onChange={event => onProviderChange(event.target.value)}
-                        aria-label={i18n.translate(
-                          'wazuhAiAssistant.chat.providerSelect',
-                          {
-                            defaultMessage: 'Provider',
-                          },
-                        )}
-                      />
-                    </EuiFlexItem>
-                    {assistantSettings && (
-                      <EuiFlexItem grow={false}>
-                        {assistantSettings.userCanOverride ? (
-                          privacyBadge
-                        ) : (
-                          <EuiToolTip
-                            content={i18n.translate(
-                              'wazuhAiAssistant.chat.privacy.adminSet',
-                              {
-                                defaultMessage: 'Set by administrator',
-                              },
-                            )}
-                          >
-                            {privacyBadge}
-                          </EuiToolTip>
-                        )}
-                      </EuiFlexItem>
-                    )}
-                    {assistantSettings && (
-                      <EuiFlexItem grow={false}>
-                        {/* disclosure-only affordance explaining what
-                              the privacy badge actually does to the user's data — no behavior
-                              change, the badge's own on/off state and click handling are untouched
-                              above. */}
-                        <EuiIconTip
-                          type='iInCircle'
-                          color='subdued'
-                          content={privacyExplainerText}
-                          aria-label={i18n.translate(
-                            'wazuhAiAssistant.chat.privacy.explainAriaLabel',
-                            {
-                              defaultMessage:
-                                'What privacy mode does to your data',
-                            },
-                          )}
-                        />
-                      </EuiFlexItem>
-                    )}
-                  </EuiFlexGroup>
-                </EuiPanel>
-                <EuiSpacer size='m' />
-              </>
-            )}
-
             {(error || providersError) && (
               <StatusCallout
                 title={i18n.translate('wazuhAiAssistant.chat.errorTitle', {
@@ -2104,8 +2064,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             </div>
 
             {!showLoadingState && !showNoProviderState && (
-              <div style={{ position: 'sticky', bottom: 0 }}>
-                <EuiSpacer size='l' />
+              <div className='wzStickyInputPanel'>
+                <EuiSpacer size='xs' />
                 <EuiPanel
                   color='plain'
                   hasBorder
@@ -2120,9 +2080,106 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     disabled={!hasProviders}
                     isGenerating={isGenerating}
                     onSend={handleSend}
-                    onStop={handleStop}
                   />
+                  <EuiSpacer size='xs' />
+                  <EuiFlexGroup
+                    alignItems='center'
+                    gutterSize='s'
+                    responsive={false}
+                    wrap
+                  >
+                    {hasProviders && assistantSettings && (
+                      <EuiFlexItem grow={false}>
+                        {assistantSettings.userCanOverride ? (
+                          privacyBadge
+                        ) : (
+                          <EuiToolTip
+                            content={i18n.translate(
+                              'wazuhAiAssistant.chat.privacy.adminSet',
+                              { defaultMessage: 'Set by administrator' },
+                            )}
+                          >
+                            {privacyBadge}
+                          </EuiToolTip>
+                        )}
+                      </EuiFlexItem>
+                    )}
+                    {hasProviders && assistantSettings && (
+                      <EuiFlexItem grow={false}>
+                        <EuiIconTip
+                          type='iInCircle'
+                          color='subdued'
+                          content={privacyExplainerText}
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.chat.privacy.explainAriaLabel',
+                            {
+                              defaultMessage:
+                                'What privacy mode does to your data',
+                            },
+                          )}
+                        />
+                      </EuiFlexItem>
+                    )}
+                    <EuiFlexItem />
+                    {hasProviders && (
+                      <EuiFlexItem grow={false}>
+                        <EuiSelect
+                          id='wzAiAssistantProviderSelect'
+                          compressed
+                          prepend={i18n.translate(
+                            'wazuhAiAssistant.chat.providerLabel',
+                            { defaultMessage: 'Provider' },
+                          )}
+                          options={providerOptions}
+                          value={selectedProviderId}
+                          onChange={event =>
+                            onProviderChange(event.target.value)
+                          }
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.chat.providerSelect',
+                            { defaultMessage: 'Provider' },
+                          )}
+                        />
+                      </EuiFlexItem>
+                    )}
+                    <EuiFlexItem grow={false}>
+                      {isGenerating ? (
+                        <EuiButtonIcon
+                          iconType='cross'
+                          color='danger'
+                          size='s'
+                          onClick={handleStop}
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.chat.stopButton',
+                            { defaultMessage: 'Stop' },
+                          )}
+                        />
+                      ) : (
+                        <EuiButtonIcon
+                          iconType='arrowUp'
+                          color='primary'
+                          size='s'
+                          display='fill'
+                          onClick={() => chatInputRef.current?.send()}
+                          disabled={!hasProviders || !inputText.trim()}
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.chat.sendButton',
+                            { defaultMessage: 'Send' },
+                          )}
+                        />
+                      )}
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
                 </EuiPanel>
+                <EuiText size='xs' color='subdued' textAlign='center'>
+                  <p>
+                    {i18n.translate('wazuhAiAssistant.chat.disclaimer', {
+                      defaultMessage:
+                        'AI responses may contain errors. Always verify critical information.',
+                    })}
+                  </p>
+                </EuiText>
+                <EuiSpacer size='s' />
               </div>
             )}
           </div>

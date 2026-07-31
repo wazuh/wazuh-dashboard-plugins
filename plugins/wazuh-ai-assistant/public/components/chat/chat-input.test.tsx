@@ -14,7 +14,6 @@ describe('ChatInput', () => {
         disabled={false}
         isGenerating={false}
         onSend={noop}
-        onStop={noop}
       />,
     );
 
@@ -37,7 +36,6 @@ describe('ChatInput', () => {
         disabled={false}
         isGenerating={false}
         onSend={noop}
-        onStop={noop}
       />,
     );
 
@@ -57,7 +55,6 @@ describe('ChatInput', () => {
         disabled={false}
         isGenerating={false}
         onSend={onSend}
-        onStop={noop}
       />,
     );
 
@@ -78,7 +75,6 @@ describe('ChatInput', () => {
         disabled={false}
         isGenerating={false}
         onSend={onSend}
-        onStop={noop}
       />,
     );
 
@@ -100,7 +96,6 @@ describe('ChatInput', () => {
         disabled={false}
         isGenerating={false}
         onSend={onSend}
-        onStop={noop}
       />,
     );
 
@@ -112,42 +107,26 @@ describe('ChatInput', () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it('clicking Send calls onSend with the trimmed text and clears the input', () => {
+  it('does not send via Enter while isGenerating', () => {
     const onSend = jest.fn();
-    const onChange = jest.fn();
     render(
       <ChatInput
-        value=' hi '
-        onChange={onChange}
-        disabled={false}
-        isGenerating={false}
-        onSend={onSend}
-        onStop={noop}
-      />,
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: 'Send' }));
-
-    expect(onSend).toHaveBeenCalledWith('hi');
-    expect(onChange).toHaveBeenCalledWith('');
-  });
-
-  it('disables the Send button when the value is blank, even if not globally disabled', () => {
-    render(
-      <ChatInput
-        value=''
+        value='hi'
         onChange={noop}
         disabled={false}
-        isGenerating={false}
-        onSend={noop}
-        onStop={noop}
+        isGenerating
+        onSend={onSend}
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'Send' })).toBeDisabled();
+    fireEvent.keyDown(screen.getByRole('textbox', { name: 'Chat message' }), {
+      key: 'Enter',
+    });
+
+    expect(onSend).not.toHaveBeenCalled();
   });
 
-  it('disables the Send button (and the textarea) when disabled is true, regardless of value', () => {
+  it('disables the textarea when disabled is true', () => {
     render(
       <ChatInput
         value='hi'
@@ -155,18 +134,15 @@ describe('ChatInput', () => {
         disabled
         isGenerating={false}
         onSend={noop}
-        onStop={noop}
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'Send' })).toBeDisabled();
     expect(
       screen.getByRole('textbox', { name: 'Chat message' }),
     ).toBeDisabled();
   });
 
-  it('shows a Stop button instead of Send while isGenerating, disables the textarea, and calls onStop on click', () => {
-    const onStop = jest.fn();
+  it('disables the textarea while isGenerating', () => {
     render(
       <ChatInput
         value='hi'
@@ -174,17 +150,33 @@ describe('ChatInput', () => {
         disabled={false}
         isGenerating
         onSend={noop}
-        onStop={onStop}
       />,
     );
 
-    expect(screen.queryByRole('button', { name: 'Send' })).toBeNull();
     expect(
       screen.getByRole('textbox', { name: 'Chat message' }),
     ).toBeDisabled();
+  });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
-    expect(onStop).toHaveBeenCalledTimes(1);
+  it('exposes an imperative send() handle that trims and forwards the value', () => {
+    const onSend = jest.fn();
+    const onChange = jest.fn();
+    const ref = React.createRef<ChatInputHandle>();
+    render(
+      <ChatInput
+        ref={ref}
+        value=' hi '
+        onChange={onChange}
+        disabled={false}
+        isGenerating={false}
+        onSend={onSend}
+      />,
+    );
+
+    ref.current?.send();
+
+    expect(onSend).toHaveBeenCalledWith('hi');
+    expect(onChange).toHaveBeenCalledWith('');
   });
 
   it('autofocuses the textarea once it transitions from disabled to enabled', () => {
@@ -195,7 +187,6 @@ describe('ChatInput', () => {
         disabled
         isGenerating={false}
         onSend={noop}
-        onStop={noop}
       />,
     );
     expect(document.activeElement).not.toBe(
@@ -209,7 +200,6 @@ describe('ChatInput', () => {
         disabled={false}
         isGenerating={false}
         onSend={noop}
-        onStop={noop}
       />,
     );
 
@@ -228,13 +218,10 @@ describe('ChatInput', () => {
         disabled={false}
         isGenerating={false}
         onSend={noop}
-        onStop={noop}
       />,
     );
 
     const textarea = screen.getByRole('textbox', { name: 'Chat message' });
-    // The mount-time autofocus effect (disabled=false from the start) may already have focused it;
-    // blur first so this assertion is actually exercising the imperative handle, not that effect.
     textarea.blur();
     expect(document.activeElement).not.toBe(textarea);
 
