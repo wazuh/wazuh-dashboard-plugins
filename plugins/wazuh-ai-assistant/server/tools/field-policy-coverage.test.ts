@@ -117,9 +117,12 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   'document.enrichments',
   'document.index_discarded_events',
   'document.index_unclassified_events',
-  // Security Analytics namespace tag (draft/test/custom/standard) -- a config grouping label,
-  // not analyst/attacker-supplied data.
   'space.name',
+  // Security Analytics detector config (get_detectors): admin/vendor-configured metadata.
+  'detector.name',
+  'detector.detector_type',
+  'detector.enabled',
+  'detector.source',
 ]);
 
 /** Replica of privacy.ts's private `resolveFieldEntry`: a tool-scoped entry ("tool/field") wins over

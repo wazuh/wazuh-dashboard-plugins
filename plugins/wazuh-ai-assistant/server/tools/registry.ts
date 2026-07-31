@@ -29,6 +29,7 @@ import { getAgentPortsTool } from './catalog/get-agent-ports';
 import { getAgentProcessesTool } from './catalog/get-agent-processes';
 import { getRulesTool } from './catalog/get-rules';
 import { getThreatIntelComponentsTool } from './catalog/get-threat-intel-components';
+import { getDetectorsTool } from './catalog/get-detectors';
 import { findDocumentByFieldTool } from './catalog/find-document-by-field';
 import { searchWazuhDataTool } from './catalog/search-wazuh-data';
 
@@ -85,9 +86,10 @@ const CATALOG: ToolDefinition[] = [
   getAgentPortsTool,
   getAgentProcessesTool,
 
-  // Security Analytics content: ruleset + pipeline components
+  // Security Analytics content: ruleset + pipeline components + detector definitions
   getRulesTool,
   getThreatIntelComponentsTool,
+  getDetectorsTool,
 
   // Generic exact-ID lookup (document _id or a business-level UUID field, tried automatically)
   findDocumentByFieldTool,

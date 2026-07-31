@@ -90,6 +90,7 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   // security_analytics
   get_rules: 'security_analytics',
   get_threat_intel_components: 'security_analytics',
+  get_detectors: 'security_analytics',
 
   // free_search (escape hatch + generic ID lookup)
   find_document_by_field: 'free_search',
@@ -131,7 +132,8 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'NIS2, NIST 800-171/800-53, FedRAMP, CMMC, TSC).',
   security_analytics:
     'The Security Analytics ruleset and pipeline content itself — rules (name/level/status/' +
-    'technique) and components (decoders, integrations, policies, filters, KVDBs). Pipeline ' +
+    'technique), components (decoders, integrations, policies, filters, KVDBs), and detector ' +
+    'definitions (which detectors exist, enabled state, monitored indices). Pipeline ' +
     'configuration, NOT findings that fired and NOT SCA compliance benchmarks.',
   free_search: 'Anything else about Wazuh finding/vulnerability/state data (last resort).',
   general: 'No Wazuh data needed at all: greeting, meta-question, clarification, chit-chat.',

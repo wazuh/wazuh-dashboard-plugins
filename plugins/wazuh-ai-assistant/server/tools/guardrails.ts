@@ -79,8 +79,12 @@ const MAX_TREE_DEPTH = 100;
 // that must hold on its own, independent of what today's tool schemas happen to permit — opening
 // the whole prefix would silently authorize `enrichments` at this layer the day someone adds it to
 // an enum elsewhere, without anyone consciously deciding to widen it.
+// `.opensearch-sap-detectors-config` (get_detectors.ts) is an exact single index, not a wildcard
+// family -- OpenSearch Security Analytics' own config store for detector definitions, confirmed
+// live to be indexer-reachable and to hold no analyst/attacker-supplied data (name/type/schedule/
+// enabled/source, all vendor- or admin-configured).
 const INDEX_ALLOWLIST_RE =
-  /^wazuh-(events-v5|findings-v5|states|threatintel-(rules|decoders|integrations|policies|filters|kvdbs))[^,\s]*$/;
+  /^wazuh-(events-v5|findings-v5|states|threatintel-(rules|decoders|integrations|policies|filters|kvdbs))[^,\s]*$|^\.opensearch-sap-detectors-config$/;
 
 /** The escape hatch's (and every catalog tool's) index-pattern allowlist. */
 export function checkIndexAllowlist(index: string): GuardrailCheck {
@@ -89,7 +93,8 @@ export function checkIndexAllowlist(index: string): GuardrailCheck {
       ok: false,
       reason:
         `Index "${index}" is not in the allowed set (wazuh-events-v5-*, wazuh-findings-v5-*, ` +
-        `wazuh-states-*, wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*).`,
+        'wazuh-states-*, wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*, ' +
+        '.opensearch-sap-detectors-config).',
     };
   }
   return { ok: true };
