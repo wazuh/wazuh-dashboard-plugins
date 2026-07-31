@@ -29,6 +29,7 @@ import {
   EuiPanel,
   EuiFieldNumber,
   EuiIcon,
+  EuiIconTip,
   EuiHorizontalRule,
   EuiFieldSearch,
   EuiAccordion,
@@ -1233,33 +1234,49 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 </EuiFormRow>
 
                 <EuiSpacer size='l' />
-                <EuiText size='s'>
-                  <p>
-                    <strong>
-                      {i18n.translate(
-                        'wazuhAiAssistant.settings.privacy.fieldPolicyTitle',
+                {/* The full explanation lives in the tooltip rather than inline: it is long enough
+                    to dominate the section, and it only matters the first time an admin configures
+                    a rule (or when one surprises them). */}
+                <EuiFlexGroup
+                  gutterSize='xs'
+                  alignItems='center'
+                  responsive={false}
+                >
+                  <EuiFlexItem grow={false}>
+                    <EuiText size='s'>
+                      <strong>
+                        {i18n.translate(
+                          'wazuhAiAssistant.settings.privacy.fieldPolicyTitle',
+                          {
+                            defaultMessage: 'Field policy',
+                          },
+                        )}
+                      </strong>
+                    </EuiText>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <EuiIconTip
+                      type='questionInCircle'
+                      color='subdued'
+                      content={i18n.translate(
+                        'wazuhAiAssistant.settings.privacy.fieldPolicyHelp',
                         {
-                          defaultMessage: 'Field policy',
+                          defaultMessage:
+                            'Controls what the AI provider receives for each field when privacy mode is on. It never changes what you see: the field is always queried and always shown in full in the answer and in the results table, which stay inside the cluster. "Allow" sends the real value. "Anonymize" sends a reversible pseudonym instead (HOST_1, IP_2). "Never send" sends nothing at all for that field — not the value, not a pseudonym, not even the field name. Field names are matched exactly: an index field ("wazuh.agent.name") and a Wazuh API field of a specific tool ("get_active_agents/name") are different entries and must each be configured.',
                         },
                       )}
-                    </strong>
-                  </p>
-                  <p>
-                    {i18n.translate(
-                      'wazuhAiAssistant.settings.privacy.fieldPolicyHelp',
-                      {
-                        defaultMessage:
-                          'Controls what the AI provider receives for each field when privacy mode is on. It never changes what you see: the field is always queried and always shown in full in the answer and in the results table, which stay inside the cluster. "Allow" sends the real value. "Anonymize" sends a reversible pseudonym instead (HOST_1, IP_2). "Never send" sends nothing at all for that field — not the value, not a pseudonym, not even the field name. Field names are matched exactly: an index field ("wazuh.agent.name") and a Wazuh API field of a specific tool ("get_active_agents/name") are different entries and must each be configured.',
-                      },
-                    )}
-                  </p>
-                </EuiText>
+                    />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
                 <EuiSpacer size='s' />
 
                 {fieldPolicyDraft.length > 0 && (
                   <EuiAccordion
                     id='field-policy-accordion'
-                    initialIsOpen
+                    // Collapsed by default: the rule list is long (the curated defaults alone are
+                    // ~25 rows) and it is not what an admin comes to this section for — the two
+                    // privacy switches above it are. The button content carries the rule count, so
+                    // the section still reports its size without being expanded.
                     buttonContent={i18n.translate(
                       'wazuhAiAssistant.settings.privacy.fieldPolicyAccordion',
                       {
