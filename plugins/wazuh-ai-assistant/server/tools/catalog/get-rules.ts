@@ -1,5 +1,11 @@
 import { ToolDefinition } from '../types';
-import { clampLimit, limitProperty, objectSchema } from './common';
+import {
+  clampLimit,
+  limitProperty,
+  objectSchema,
+  parseSecurityAnalyticsSpace,
+  SECURITY_ANALYTICS_SPACES,
+} from './common';
 
 /** Confirmed live against `wazuh-threatintel-rules-a` (a `terms` agg on `document.level`, 268/268
  * docs bucketed, no long tail) -- the vocabulary happens to reuse the same 5 words as findings-v5's
@@ -63,6 +69,12 @@ export const getRulesTool: ToolDefinition = {
         type: 'string',
         description: 'Filter by one exact MITRE ATT&CK technique ID, e.g. "T1110".',
       },
+      space: {
+        type: 'string',
+        description:
+          'Filter by Security Analytics space. Omit to search across every space (the default).',
+        enum: [...SECURITY_ANALYTICS_SPACES],
+      },
       limit: limitProperty(
         'Max number of rules to return (default 20, max 500).',
       ),
@@ -81,6 +93,7 @@ export const getRulesTool: ToolDefinition = {
     const tag = typeof params.tag === 'string' ? params.tag.trim() : undefined;
     const techniqueId =
       typeof params.technique_id === 'string' ? params.technique_id.trim() : undefined;
+    const space = parseSecurityAnalyticsSpace(params.space);
     const limit = clampLimit(params.limit, 20, 500);
 
     const filter: Record<string, unknown>[] = [];
@@ -92,6 +105,9 @@ export const getRulesTool: ToolDefinition = {
     }
     if (level) {
       filter.push({ term: { 'document.level': level } });
+    }
+    if (space) {
+      filter.push({ term: { 'space.name': space } });
     }
     if (tag) {
       filter.push({ term: { 'document.tags': tag } });

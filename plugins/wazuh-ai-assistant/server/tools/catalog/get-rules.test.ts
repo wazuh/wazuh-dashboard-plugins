@@ -50,24 +50,31 @@ test('get_rules: enabled="any" produces no filter at all', () => {
   assert.deepEqual(request.body.query, { bool: { filter: [] } });
 });
 
-test('get_rules: status/level/tag/technique_id each add exactly one filter', () => {
+test('get_rules: status/level/tag/technique_id/space each add exactly one filter', () => {
   const request = build({
     enabled: 'any',
     status: 'stable',
     level: 'critical',
     tag: 'attack.t1110',
     technique_id: 'T1110',
+    space: 'draft',
   });
   assert.deepEqual(request.body.query, {
     bool: {
       filter: [
         { term: { 'document.status': 'stable' } },
         { term: { 'document.level': 'critical' } },
+        { term: { 'space.name': 'draft' } },
         { term: { 'document.tags': 'attack.t1110' } },
         { term: { 'document.mitre.technique.id': 'T1110' } },
       ],
     },
   });
+});
+
+test('get_rules: an invalid space value is ignored (no filter, no throw)', () => {
+  const request = build({ enabled: 'any', space: 'not-a-real-space' });
+  assert.deepEqual(request.body.query, { bool: { filter: [] } });
 });
 
 test('get_rules: clamps limit to the [1, 500] range', () => {

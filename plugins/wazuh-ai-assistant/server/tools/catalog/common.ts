@@ -18,6 +18,24 @@ const DATE_MATH_OR_ISO_RE =
 export const DEFAULT_TIME_RANGE_GTE = 'now-90d';
 export const DEFAULT_TIME_RANGE_LTE = 'now';
 
+/** Security Analytics content (get_rules, get_threat_intel_components) is namespaced across these
+ * four spaces (confirmed live via each index's own `space.name` field) -- shared here so both
+ * tools' `space` parameter and executor.ts's `resolveSecurityAnalyticsSpace` fallback agree on the
+ * same vocabulary. */
+export const SECURITY_ANALYTICS_SPACES = ['draft', 'test', 'custom', 'standard'] as const;
+export type SecurityAnalyticsSpace = (typeof SECURITY_ANALYTICS_SPACES)[number];
+
+/** Optional `space` parameter shared by get_rules/get_threat_intel_components -- `undefined` when
+ * absent or not one of `SECURITY_ANALYTICS_SPACES`, meaning "no space filter" (every space). */
+export function parseSecurityAnalyticsSpace(
+  value: unknown,
+): SecurityAnalyticsSpace | undefined {
+  return typeof value === 'string' &&
+    (SECURITY_ANALYTICS_SPACES as readonly string[]).includes(value)
+    ? (value as SecurityAnalyticsSpace)
+    : undefined;
+}
+
 /**
  * Validates a time-range bound's format (`common/types.ts`'s flat JsonSchemaObject has no way to
  * express a regex/pattern constraint, so this lives outside the generic schema_validator).

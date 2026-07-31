@@ -1,5 +1,11 @@
 import { ToolDefinition } from '../types';
-import { clampLimit, limitProperty, objectSchema } from './common';
+import {
+  clampLimit,
+  limitProperty,
+  objectSchema,
+  parseSecurityAnalyticsSpace,
+  SECURITY_ANALYTICS_SPACES,
+} from './common';
 
 const COMPONENT_TYPES = [
   'decoders',
@@ -83,6 +89,12 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
             'Filter by whether the component is enabled. Defaults to "any" (no filter).',
           enum: [...ENABLED_VALUES],
         },
+        space: {
+          type: 'string',
+          description:
+            'Filter by Security Analytics space. Omit to search across every space (the default).',
+          enum: [...SECURITY_ANALYTICS_SPACES],
+        },
         limit: limitProperty(
           'Max number of components to return (default 20, max 500).',
         ),
@@ -109,10 +121,16 @@ export const getThreatIntelComponentsTool: ToolDefinition = {
       (ENABLED_VALUES as readonly string[]).includes(params.enabled)
         ? params.enabled
         : 'any';
+    const space = parseSecurityAnalyticsSpace(params.space);
     const limit = clampLimit(params.limit, 20, 500);
 
-    const filter: Record<string, unknown>[] =
-      enabled === 'any' ? [] : [{ term: { 'document.enabled': enabled === 'enabled' } }];
+    const filter: Record<string, unknown>[] = [];
+    if (enabled !== 'any') {
+      filter.push({ term: { 'document.enabled': enabled === 'enabled' } });
+    }
+    if (space) {
+      filter.push({ term: { 'space.name': space } });
+    }
 
     return {
       target: 'indexer',

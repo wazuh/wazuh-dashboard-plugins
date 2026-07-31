@@ -43,6 +43,30 @@ test('get_threat_intel_components: enabled="enabled"/"disabled" produce the bool
   );
 });
 
+test('get_threat_intel_components: space adds an exact term filter', () => {
+  assert.deepEqual(
+    build({ component_type: 'integrations', space: 'draft' }).body.query,
+    { bool: { filter: [{ term: { 'space.name': 'draft' } }] } },
+  );
+  assert.deepEqual(
+    build({ component_type: 'integrations', enabled: 'enabled', space: 'custom' })
+      .body.query,
+    {
+      bool: {
+        filter: [
+          { term: { 'document.enabled': true } },
+          { term: { 'space.name': 'custom' } },
+        ],
+      },
+    },
+  );
+});
+
+test('get_threat_intel_components: an invalid space value is ignored (no filter, no throw)', () => {
+  const request = build({ component_type: 'integrations', space: 'not-a-real-space' });
+  assert.deepEqual(request.body.query, { bool: { filter: [] } });
+});
+
 test('get_threat_intel_components: clamps limit to the [1, 500] range', () => {
   assert.equal(
     build({ component_type: 'kvdbs', limit: 9999 }).body.size,
