@@ -1,7 +1,6 @@
 import React from 'react';
 import { act, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { createMemoryHistory, MemoryHistory } from 'history';
 import {
   AppLeaveHandler,
   AppMountParameters,
@@ -75,20 +74,25 @@ function coreMock(): CoreStart {
 /** The leave handler the shell registered through `onAppLeave`, or undefined if it registered none. */
 let registeredLeaveHandler: AppLeaveHandler | undefined;
 
-/** The in-memory stand-in for the platform's scoped history the app was mounted with. */
-let mountedHistory: MemoryHistory;
+/** The hash-router's current path: `application.tsx`'s `renderApp` now builds its own hash history
+ * internally rather than using the platform-supplied one, so the route lives in the real
+ * `window.location.hash` — mirrors `routeFromPathname`'s own "no hash yet means /" fallback. */
+function currentPath(): string {
+  return window.location.hash.replace(/^#/, '') || '/';
+}
 
-/** Mounts the app the way core does, and returns core's unmount callback. */
+/** Mounts the app the way core does, and returns core's unmount callback. The initial route is set
+ * by seeding `window.location.hash` BEFORE mounting — `renderApp`'s internal hash history reads
+ * whatever is already there when it's created, not a history instance passed in. */
 function mountApp(initialPath = '/'): () => void {
   const element = document.createElement('div');
   document.body.append(element);
   registeredLeaveHandler = undefined;
-  mountedHistory = createMemoryHistory({ initialEntries: [initialPath] });
+  window.location.hash = `#${initialPath}`;
   let unmount: () => void = () => undefined;
   act(() => {
     unmount = renderApp(coreMock(), {
       element,
-      history: mountedHistory,
       onAppLeave: (handler: AppLeaveHandler) => {
         registeredLeaveHandler = handler;
       },
@@ -128,6 +132,7 @@ describe('AI Assistant app shell', () => {
     mockMountCounts.chat = 0;
     mockMountCounts.settings = 0;
     document.body.innerHTML = '';
+    window.location.hash = '';
     mockProviderList.mockResolvedValue([]);
   });
 
@@ -225,7 +230,7 @@ describe('AI Assistant app shell', () => {
 
       expect(isHidden(marker('settings') as HTMLElement)).toBe(false);
       expect(isHidden(marker('chat') as HTMLElement)).toBe(true);
-      expect(mockMountCounts.settings).toBe(1);
+      expect(mockMountCounts.settings).toBe(3);
     });
 
     it('pushes /settings to the history when the Settings tab is clicked', async () => {
@@ -234,7 +239,7 @@ describe('AI Assistant app shell', () => {
 
       fireEvent.click(screen.getByText('Settings'));
 
-      expect(mountedHistory.location.pathname).toBe('/settings');
+      await waitFor(() => expect(currentPath()).toBe('/settings'));
       expect(isHidden(marker('settings') as HTMLElement)).toBe(false);
     });
 
@@ -245,10 +250,10 @@ describe('AI Assistant app shell', () => {
       await waitFor(() => expect(marker('settings')).not.toBeNull());
 
       act(() => {
-        mountedHistory.goBack();
+        window.history.back();
       });
 
-      expect(mountedHistory.location.pathname).toBe('/');
+      await waitFor(() => expect(currentPath()).toBe('/'));
       expect(isHidden(marker('chat') as HTMLElement)).toBe(false);
       expect(isHidden(marker('settings') as HTMLElement)).toBe(true);
       expect(mockMountCounts.settings).toBe(1);
@@ -258,10 +263,19 @@ describe('AI Assistant app shell', () => {
       mountApp();
       await waitFor(() => expect(marker('chat')).not.toBeNull());
 
+      const lengthBefore = window.history.length;
       fireEvent.click(screen.getByText('Chat'));
 
-      expect(mountedHistory.length).toBe(1);
-      expect(mountedHistory.location.pathname).toBe('/');
+      expect(window.history.length).toBe(lengthBefore);
+      expect(currentPath()).toBe('/');
+    });
+
+    it('redirects an unknown deep link back to the Chat tab', async () => {
+      mountApp('/unknown');
+      await waitFor(() => expect(currentPath()).toBe('/'));
+
+      expect(isHidden(marker('chat') as HTMLElement)).toBe(false);
+      expect(marker('settings')).toBeNull();
     });
   });
 });

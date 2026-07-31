@@ -15,7 +15,7 @@ import {
   EuiSelect,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
-import { CoreStart } from '../../../../../src/core/public';
+import { AppMountParameters, CoreStart } from '../../../../../src/core/public';
 import { ChatService } from '../../services/chat-service';
 import {
   AssistantSettings,
@@ -75,6 +75,10 @@ interface ChatPageProps {
   onProviderChange: (id: string) => void;
   /** Switches the app shell to the Settings tab; wired from the top-level route state. */
   onNavigateToSettings: () => void;
+  /** The app shell's router history (the same instance `<Router history={history}>` in
+   * application.tsx uses) — used to read/write the open-conversation route below through
+   * `history.replace` rather than the raw `window.history` API. */
+  history: AppMountParameters['history'];
   /**
    * Reports whether a turn is currently generating, so the app shell's `onAppLeave` handler can warn
    * before the user navigates away from (or reloads out of) a running answer. Called on every change,
@@ -237,20 +241,27 @@ const CHAT_SURFACE_STYLES = `
 `;
 
 /**
- * Rewrites the location hash to address `conversationId` without adding a history entry and without
- * touching the path or query, so this never fights the platform's own routing. `replaceState` fires
- * no `hashchange`/`popstate`, so it cannot loop back into this component's own restore path.
- * Swallows failures: some embedding contexts restrict History API access, and losing the shareable
- * URL is a UX regression, not a functional one — the sessionStorage pointer still covers a reload.
+ * Rewrites the route to address `conversationId` (a `/conversation/:id` path, or `/` for none),
+ * without touching the query string. Goes through the app shell's own router `history` (rather than
+ * a raw `window.history.replaceState` call) so this and the shell's tab routing share one writer of
+ * location changes; `replace`, not `push`, so opening a conversation never adds its own back-button
+ * stop. Note this DOES notify the shell's `<Route>` (and any other `history.listen` subscriber) on
+ * every call, unlike the raw DOM API it replaces — harmless here since nothing there reacts
+ * differently to a `/conversation/:id` path (the shell's redirect fallback and tab matching both
+ * treat it as Chat), but worth knowing if something is ever added that does. Swallows failures: some
+ * embedding contexts restrict History API access, and losing the shareable URL is a UX regression,
+ * not a functional one — the sessionStorage pointer still covers a reload.
  */
-function replaceConversationRoute(conversationId: string | null): void {
+function replaceConversationRoute(
+  history: AppMountParameters['history'],
+  conversationId: string | null,
+): void {
   try {
-    const { pathname, search } = window.location;
-    window.history.replaceState(
-      null,
-      '',
-      `${pathname}${search}${buildConversationRoute(conversationId)}`,
-    );
+    const { search } = history.location;
+    history.replace({
+      pathname: buildConversationRoute(conversationId),
+      search,
+    });
   } catch {
     // Intentionally ignored, see above.
   }
@@ -264,6 +275,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   selectedProviderId,
   onProviderChange,
   onNavigateToSettings,
+  history,
   onGeneratingChange,
   isActive = true,
 }) => {
@@ -621,7 +633,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    * chat with no way to tell which conversation the user had been in — and the next turn then
    * created a second saved conversation instead of continuing theirs.
    *
-   * The URL hash wins over this tab's stored pointer, so a pasted/bookmarked link always opens what
+   * The URL route wins over this tab's stored pointer, so a pasted/bookmarked link always opens what
    * it names. A conversation that is simply GONE (deleted in another tab, or pruned by the retention
    * policy, which deletes on access) is not an error worth a banner: the pointer is forgotten and the
    * user gets a clean new conversation, exactly as if they had never had one open. Any OTHER failure
@@ -630,7 +642,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    */
   useEffect(() => {
     const restoreId =
-      parseConversationRoute(window.location.hash) ??
+      parseConversationRoute(history.location.pathname) ??
       readLastConversationId(window.sessionStorage);
     if (!restoreId) {
       initialRestoreSettledRef.current = true;
@@ -649,7 +661,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         if (status === 404 || status === 403) {
           writeLastConversationId(window.sessionStorage, null);
           if (isActive) {
-            replaceConversationRoute(null);
+            replaceConversationRoute(history, null);
           }
           return;
         }
@@ -665,14 +677,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
   /**
    * Keeps the two out-of-band records of "which conversation is open" in step with state, so the
-   * next reload/deep link can restore it. `replaceState` (not `push`) because opening a conversation
-   * is not a navigation the back button should have to walk back through turn by turn.
+   * next reload/deep link can restore it. `history.replace` (not `push`) because opening a
+   * conversation is not a navigation the back button should have to walk back through turn by turn.
    *
-   * The hash is only written while the view is visible (`isActive`), and re-synced when it becomes
+   * The route is only written while the view is visible (`isActive`), and re-synced when it becomes
    * visible again — a restore running behind Settings must not rewrite `/settings` (#8820).
    *
    * Skipped until the mount-time restore above has settled — otherwise this effect's very first run
-   * would overwrite the hash it is supposed to read.
+   * would overwrite the route it is supposed to read.
    */
   useEffect(() => {
     if (!initialRestoreSettledRef.current) {
@@ -680,9 +692,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     }
     writeLastConversationId(window.sessionStorage, activeConversationId);
     if (isActive) {
-      replaceConversationRoute(activeConversationId);
+      replaceConversationRoute(history, activeConversationId);
     }
-  }, [activeConversationId, isActive]);
+  }, [activeConversationId, isActive, history]);
 
   // Unmount cleanup: the app shell (application.tsx) now KEEPS this component mounted across a
   // Chat<->Settings tab switch, so unmount means the user really left the app (another dashboard
