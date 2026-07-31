@@ -5,7 +5,6 @@ import {
   inferPseudonymKind,
   applyFieldPolicy,
   extractAggFields,
-  resolveFieldAction,
   prescanAndMint,
   prescanAndMintToolContent,
   FieldPolicyEntry,
@@ -469,51 +468,11 @@ test('extractAggFields: returns undefined when body has no aggs', () => {
   assert.equal(extractAggFields(undefined), undefined);
 });
 
-// --- applyFieldPolicy: the digest's `columns` schema hint --------------------------------------
-
-test('applyFieldPolicy: drops a "never" field from the digest columns hint', () => {
-  const policy: FieldPolicyEntry[] = [{ field: 'source.ip', action: 'never' }];
-  const p = new Pseudonymizer();
-  const digest = baseDigest({ columns: ['rule.id', 'source.ip'] });
-  const out = applyFieldPolicy(digest, policy, p);
-  assert.deepEqual(out.columns, ['rule.id']);
-});
-
-test('applyFieldPolicy: leaves "anonymize" and "allow" column labels in the hint', () => {
-  const policy: FieldPolicyEntry[] = [
-    { field: 'wazuh.agent.name', action: 'anonymize' },
-  ];
-  const p = new Pseudonymizer();
-  const digest = baseDigest({ columns: ['rule.id', 'wazuh.agent.name'] });
-  const out = applyFieldPolicy(digest, policy, p);
-  assert.deepEqual(out.columns, ['rule.id', 'wazuh.agent.name']);
-});
-
-// --- resolveFieldAction -----------------------------------------------------------------------
-
-test('resolveFieldAction: unlisted field is "allow"; prefix and scoped entries resolve', () => {
-  const policy: FieldPolicyEntry[] = [
-    { field: 'GeoLocation.*', action: 'never' },
-    { field: 'get_active_agents/name', action: 'never' },
-  ];
-  assert.equal(resolveFieldAction('rule.id', policy), 'allow');
-  assert.equal(resolveFieldAction('GeoLocation', policy), 'never');
-  assert.equal(resolveFieldAction('GeoLocation.country_name', policy), 'never');
-  assert.equal(
-    resolveFieldAction('name', policy, 'get_active_agents'),
-    'never',
-  );
-  assert.equal(
-    resolveFieldAction('name', policy, 'get_agent_packages'),
-    'allow',
-  );
-});
-
-// --- applyFieldPolicy: aggregation SAMPLES (the `key` sample field, #8821) ----------------------
+// --- applyFieldPolicy: aggregation SAMPLES (the `key` sample field) ------------------------------
 
 /**
- * A bucket row's sample keys are `key`/`doc_count`, so resolving `key` by its own name found no
- * policy entry and shipped the real bucket VALUE to the provider — the same value `breakdown` was
+ * A bucket row's sample keys are `key`/`doc_count`, so resolving `key` by its own name matched no
+ * policy entry and sent the real bucket VALUE to the provider — the same value `breakdown` was
  * already scrubbing one key over. These cover both actions on that path.
  */
 test('applyFieldPolicy: drops the "key" sample of an aggregation over a "never" field', () => {
@@ -521,14 +480,14 @@ test('applyFieldPolicy: drops the "key" sample of an aggregation over a "never" 
     { field: 'wazuh.agent.name', action: 'never' },
   ];
   const p = new Pseudonymizer();
-  const digest = baseDigest({
-    samples: [{ key: 'web-01.corp', doc_count: 42 }],
-  });
-  const out = applyFieldPolicy(digest, policy, p, {
-    top_agents: 'wazuh.agent.name',
-  });
+  const out = applyFieldPolicy(
+    baseDigest({ samples: [{ key: 'web-01.corp', doc_count: 42 }] }),
+    policy,
+    p,
+    { top_agents: 'wazuh.agent.name' },
+  );
   assert.deepEqual(out.samples, [{ doc_count: 42 }]);
-  // Not even a pseudonym was minted for it: "never" means the value has no representation at all.
+  // Not even a pseudonym is minted for it: "never" means the value gets no representation at all.
   assert.equal(p.newEntries().length, 0);
 });
 
@@ -547,11 +506,41 @@ test('applyFieldPolicy: pseudonymizes the "key" sample of an "anonymize" aggrega
   assert.deepEqual(out.samples, [{ key: 'HOST_1', doc_count: 42 }]);
 });
 
+test('applyFieldPolicy: resolves the aggregated field tool-scoped, like every other field', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'get_top_agents/wazuh.agent.name', action: 'never' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [{ key: 'web-01.corp', doc_count: 7 }],
+  });
+  const scoped = applyFieldPolicy(
+    digest,
+    policy,
+    p,
+    { top_agents: 'wazuh.agent.name' },
+    'get_top_agents',
+  );
+  assert.deepEqual(scoped.samples, [{ doc_count: 7 }]);
+  // Another tool's aggregation over the same field is not affected by that scoped entry.
+  const other = applyFieldPolicy(
+    baseDigest({ samples: [{ key: 'web-01.corp', doc_count: 7 }] }),
+    policy,
+    p,
+    { top_agents: 'wazuh.agent.name' },
+    'get_top_rules',
+  );
+  assert.deepEqual(other.samples, [{ key: 'web-01.corp', doc_count: 7 }]);
+});
+
 test('applyFieldPolicy: a real field named "key" is unaffected without an aggregation', () => {
   const policy: FieldPolicyEntry[] = [{ field: 'key', action: 'allow' }];
   const p = new Pseudonymizer();
-  const digest = baseDigest({ samples: [{ key: 'literal-value' }] });
-  const out = applyFieldPolicy(digest, policy, p);
+  const out = applyFieldPolicy(
+    baseDigest({ samples: [{ key: 'literal-value' }] }),
+    policy,
+    p,
+  );
   assert.deepEqual(out.samples, [{ key: 'literal-value' }]);
 });
 

@@ -753,6 +753,12 @@ async function* orchestrate(
     const outboundMessages = privacyCtx
       ? scrubMessagesForProvider(messages, privacyCtx.pseudonymizer)
       : messages;
+    // Inbound un-scrub: this is why the ANSWER the analyst reads carries real hostnames/IPs even
+    // with privacy mode on — every delta is run back through the pseudonym map here, so `HOST_1`
+    // becomes the real hostname again before it leaves the server. Pseudonyms exist for the provider
+    // request above, not for the reader (issue #8821; the field policy's boundaries are spelled out
+    // in server/tools/privacy.ts's module header).
+    //
     // The streaming holdback is scoped to ONE adapter stream read: recreated every round so a
     // round that ends via tool_call/done/error always starts its successor with an empty buffer.
     const depseudonymizer = privacyCtx

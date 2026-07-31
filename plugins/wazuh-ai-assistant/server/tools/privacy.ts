@@ -1,32 +1,55 @@
 import { Digest } from './digest';
 import { WAZUH_FIELD } from '../../common/wazuh-fields';
-import {
-  FieldPolicyEntry,
-  PseudonymKind,
-  inferPseudonymKind,
-  resolveFieldAction,
-  resolveFieldEntry,
-} from '../../common/field-policy';
 
 /**
- * Privacy mode, server half: the pseudonym map plus the one pass that needs it — `applyFieldPolicy`,
- * which enforces the policy at THE single boundary that matters, the digest handed to the provider.
- * The pure, isomorphic half (the action semantics and field resolution) lives in
- * `common/field-policy.ts`; read that file's header first, it defines what `allow`/`anonymize`/
- * `never` mean.
+ * Privacy mode: reversible pseudonymization at
+ * the digest boundary. Everything in this module is pure/stateless-per-instance — no module-level
+ * caches — so it is safe to construct fresh per HTTP request (see server/routes/chat.ts).
  *
- * Everything in this module is pure/stateless-per-instance — no module-level caches — so it is safe
- * to construct fresh per HTTP request (see server/routes/chat.ts).
+ * WHAT THE FIELD POLICY DOES AND DOES NOT DO (issue #8821 was filed because this was not written
+ * down anywhere, and the behavior reads like a bug until it is):
+ *
+ * The policy has exactly ONE boundary — what the AI provider receives — and the three actions differ
+ * only in how much of a field's value get there:
+ *
+ * - `allow`: the provider receives the real value. Also the default for a field with no entry on a
+ *   typed catalog tool (the search_wazuh_data escape hatch flips that default to `anonymize` — see
+ *   `applyFieldPolicy`'s `isEscapeHatch`).
+ * - `anonymize`: the provider receives a reversible pseudonym (`HOST_1`, `IP_2`) instead.
+ * - `never`: the provider receives NOTHING for that field. `applyFieldPolicy` drops it from the
+ *   digest's `samples`, drops its aggregation buckets from `breakdown`, and drops its name from the
+ *   `columns` schema hint — so neither the value, nor a pseudonym of it, nor even the fact that the
+ *   field exists is sent.
+ *
+ * What the policy deliberately does NOT touch:
+ *
+ * - The EXECUTED QUERY. No action rewrites `_source`, the Manager API's `select`, or rejects an
+ *   aggregation. The field is always retrieved — it has to be, because the analyst is meant to see it.
+ * - Anything LOCAL. The results table (`buildTableSpec`, streamed straight to the browser), the
+ *   answer text (server/routes/chat.ts runs every provider delta back through
+ *   `StreamDepseudonymizer`, so `HOST_1` becomes the real hostname again before it leaves the server)
+ *   and the tool-call panel (emitted with real arguments) all show the analyst their OWN data, in
+ *   full, for every action including `never`.
+ *
+ * So "I set wazuh.agent.name to Never send and the results table still shows it" is the intended
+ * behavior, not a leak: that table never left the cluster. The check that matters is what the
+ * provider request body carries.
  */
 
-// Re-exported so every server-side consumer (executor.ts, routes/settings.ts,
-// saved_objects/assistant-settings.ts and this file's own tests) keeps importing the policy from one
-// place, without each of them reaching into common/ for half of it.
-export {
-  inferPseudonymKind,
-  resolveFieldAction,
-} from '../../common/field-policy';
-export type { FieldPolicyEntry } from '../../common/field-policy';
+export type FieldPolicyAction = 'allow' | 'anonymize' | 'never';
+
+export interface FieldPolicyEntry {
+  /** Either a plain digest field path ("wazuh.agent.name") or a tool-scoped form
+   * ("get_active_agents/name") for Manager-API tools whose digest fields are bare, generic names
+   * ("name" means an agent hostname in get_active_agents but a package name in
+   * get_agent_packages — only tool scoping can distinguish them). Scoped entries win over plain
+   * ones for their tool. */
+  field: string;
+  action: FieldPolicyAction;
+  /** Optional explicit pseudonym kind, for fields whose name alone can't be classified (a bare
+   * "name" infers VAL; a scoped agent-tool entry declares HOST). */
+  kind?: PseudonymKind;
+}
 
 /** Curated defaults. Every entry targets a valid `wazuh.*`/ECS/WCS field — population is
  * decoder-dependent, so an entry may currently be inert (no matching data) without being wrong. */
@@ -78,6 +101,8 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'package.architecture', action: 'allow' },
 ];
 
+export type PseudonymKind = 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
+
 const PSEUDONYM_KINDS: PseudonymKind[] = ['HOST', 'IP', 'USER', 'URL', 'VAL'];
 
 /** One client-held (or server-minted) pseudonym mapping entry; the wire shape of `privacy.map`
@@ -85,6 +110,27 @@ const PSEUDONYM_KINDS: PseudonymKind[] = ['HOST', 'IP', 'USER', 'URL', 'VAL'];
 export interface PseudonymEntry {
   value: string;
   pseudonym: string;
+}
+
+/** Infers which pseudonym kind a field name should mint, from the field name alone ("kind
+ * inferred from field name"). Checked in this order so a field matching more than one heuristic
+ * (there are none in FIELD_POLICY_DEFAULTS today) resolves predictably; falls back to the generic
+ * `VAL` kind for a field that is none of host/ip/user/url. */
+export function inferPseudonymKind(field: string): PseudonymKind {
+  const lower = field.toLowerCase();
+  if (lower.includes('url')) {
+    return 'URL';
+  }
+  if (lower.includes('ip')) {
+    return 'IP';
+  }
+  if (lower.includes('user')) {
+    return 'USER';
+  }
+  if (lower.includes('hostname') || lower.endsWith('.name')) {
+    return 'HOST';
+  }
+  return 'VAL';
 }
 
 /** Matches a complete minted pseudonym token, e.g. "HOST_3". Word-boundary anchored so a real
@@ -455,6 +501,40 @@ export function prescanAndMintToolContent(
   return JSON.stringify(scanValues(parsed));
 }
 
+/** Resolves the policy entry for `field` (optionally scoped to `toolName`). Tool-scoped entries
+ * ("toolName/field") are checked first and win over plain ones; plain entries support a trailing
+ * `.*` prefix match (e.g. "wazuh.rule.compliance.*" matches "wazuh.rule.compliance" itself and
+ * "wazuh.rule.compliance.pci_dss"). First matching entry wins; `undefined` (no matching policy
+ * entry) means "allow" by omission. */
+function resolveFieldEntry(
+  field: string,
+  policy: FieldPolicyEntry[],
+  toolName?: string,
+): FieldPolicyEntry | undefined {
+  if (toolName) {
+    const scopedKey = `${toolName}/${field}`;
+    for (const entry of policy) {
+      if (entry.field === scopedKey) {
+        return entry;
+      }
+    }
+  }
+  for (const entry of policy) {
+    if (entry.field.includes('/')) {
+      continue; // Tool-scoped entry for some other tool (or already checked above).
+    }
+    if (entry.field.endsWith('.*')) {
+      const prefix = entry.field.slice(0, -2);
+      if (field === prefix || field.startsWith(`${prefix}.`)) {
+        return entry;
+      }
+    } else if (entry.field === field) {
+      return entry;
+    }
+  }
+  return undefined;
+}
+
 /**
  * Reads the field name driving each of a digest's `breakdown` aggregations (a terms/
  * significant_terms/cardinality aggregation's bucket keys), from the EXECUTED request body — the
@@ -516,12 +596,12 @@ export function extractAggFields(
  * - `samples`: 'never' fields are dropped from the sample object entirely; 'anonymize' string
  *   values are pseudonymized (kind inferred from the field name); 'allow' fields pass through
  *   unchanged. An UNLISTED field's behavior depends on `isEscapeHatch` (see below).
- *   AGGREGATION samples are the exception to "resolve by the sample's own field name": a bucket
+ *   AGGREGATION samples are the one exception to "resolve by the sample's own field name": a bucket
  *   row's keys are `key`/`doc_count` (digest.ts's `bucketsToRows`), and `key` holds a VALUE of the
- *   AGGREGATED field, not of a field called "key". Resolving it by name found no policy entry and
- *   let a top-agents/top-rules aggregation ship real bucket values to the provider under `key`
- *   while `breakdown` — the same values, one key over — was correctly scrubbed. `key` is therefore
- *   resolved against `aggFields`' first aggregation field whenever one is available.
+ *   AGGREGATED field, not of a field literally called "key". Resolving it by name matched no policy
+ *   entry, so a top-agents/top-rules aggregation sent its real bucket values to the provider under
+ *   `samples[].key` while `breakdown` — the same values, one key over — was correctly scrubbed.
+ *   `key` is therefore resolved against `aggFields`' first aggregation field whenever there is one.
  * - `breakdown`: a bucket key's field can't be read from the digest alone (see `extractAggFields`
  *   above) — each bucket is attributed to its aggregation (the entry's `agg` name, or the first
  *   aggregation when unset — the single-agg case) and that aggregation's field is resolved against
@@ -556,9 +636,9 @@ export function applyFieldPolicy(
   toolName?: string,
   isEscapeHatch = false,
 ): Digest {
-  // The field a bucket row's `key` actually holds the values OF — see the `samples` note above.
-  // `undefined` for a non-aggregation digest, or an aggregation with no extractable field (e.g. a
-  // date_histogram), in which case `key` falls back to resolving by its own name as before.
+  // The field a bucket row's `key` holds the values OF — see the `samples` note above. `undefined`
+  // for a non-aggregation digest, or for an aggregation with no extractable field (e.g. a
+  // date_histogram), in which case `key` resolves by its own name like any other sample field.
   const firstAggField = aggFields
     ? aggFields[Object.keys(aggFields)[0]]
     : undefined;
@@ -566,7 +646,7 @@ export function applyFieldPolicy(
   const samples = digest.samples.map(sample => {
     const out: Record<string, unknown> = {};
     for (const [sampleKey, value] of Object.entries(sample)) {
-      // `sampleKey` is what the digest is KEYED by (never rewritten — the model's view of the
+      // `sampleKey` is what the digest stays KEYED by (never rewritten — the model's view of the
       // digest shape must not change); `field` is only what the policy is resolved against.
       const field =
         sampleKey === 'key' && firstAggField ? firstAggField : sampleKey;
@@ -644,14 +724,6 @@ export function applyFieldPolicy(
   const scrubbedDigest: Digest = {
     ...digest,
     samples,
-    // `columns` is a schema hint naming the columns of the table already rendered to the user, so it
-    // has to agree with what that table shows: `applyTablePolicy` drops 'never' columns from the
-    // table, and advertising them here would describe a column the analyst cannot see. 'anonymize'
-    // and 'allow' column labels stay untouched — they are field PATHS, not data (the same reason
-    // prescanAndMintToolContent leaves them unscanned).
-    columns: digest.columns.filter(
-      column => resolveFieldAction(column, policy, toolName) !== 'never',
-    ),
     // `...digest` already spread the raw `message` through untouched when present; this explicit
     // key runs it through the whole-text scrub and overrides that spread (object spread is
     // left-to-right, so a later key wins). Omitted entirely when absent so there is no

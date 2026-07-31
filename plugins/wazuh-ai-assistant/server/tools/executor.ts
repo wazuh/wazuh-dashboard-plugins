@@ -68,14 +68,6 @@ function finalizeDigest(
   );
 }
 
-/**
- * The rendered `table` StreamEvent is deliberately NOT policy-filtered — there is no display pass at
- * all. The table, the answer text (de-pseudonymized by chat.ts's `StreamDepseudonymizer`) and the
- * tool-call panel are LOCAL surfaces showing the analyst their own data; the policy's only boundary
- * is the digest handed to the provider (`finalizeDigest` above). See common/field-policy.ts's header
- * for the three actions and issue #8821 for why the two filtering attempts before this were wrong.
- */
-
 function toolErrorContent(reason: string): string {
   return JSON.stringify({ error: reason });
 }
@@ -144,10 +136,6 @@ async function executeIndexerRequest(
     };
   }
 
-  // No projection rewrite happens here: every policy action leaves the EXECUTED query untouched, so
-  // the field is retrieved and can be displayed locally (issue #8821 — a field the analyst is meant
-  // to see in the results table has to be fetched). What must not leave is enforced one layer later,
-  // on the digest.
   try {
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: indexerRequest.index,
@@ -159,13 +147,12 @@ async function executeIndexerRequest(
     // Static-column tools ignore the extra argument entirely. It is ALSO the only place the
     // aggregation fields driving `breakdown` (if any) can be read from — see privacy.ts's
     // `extractAggFields` doc comment — so it is reused for that below when privacy is active.
-    const aggFields = extractAggFields(body);
     const digest = buildDigest(toolName, result, def, body);
     const finalDigest = finalizeDigest(
       digest,
       privacy,
       toolName,
-      aggFields,
+      extractAggFields(body),
       def.deriveColumns,
     );
     // "Open in Discover" support (common/types.ts's `TableSpec.discover` doc comment): only this
@@ -177,6 +164,12 @@ async function executeIndexerRequest(
       dsl: (body.query as Record<string, unknown>) ?? { match_all: {} },
     };
     return {
+      // The `table` event built from `result` below is deliberately NOT run through field policy:
+      // it renders locally in the browser and never reaches the model. That holds for EVERY action,
+      // 'never' included — the policy's only boundary is the digest above, and the table shows the
+      // analyst their own data in full (issue #8821; see privacy.ts's module header). The same is
+      // true of the executed `body`: no action rewrites its projections, so the field is retrieved
+      // and therefore displayable.
       toolResultContent: JSON.stringify(finalDigest),
       tableEvent: { type: 'table', spec: tableSpec },
     };
