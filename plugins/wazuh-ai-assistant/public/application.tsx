@@ -39,10 +39,14 @@ const App: React.FC<{
   core: CoreStart;
   onAppLeave: AppMountParameters['onAppLeave'];
 }> = ({ core, onAppLeave }) => {
-  const [route, setRoute] = useState<Route>('chat');
+  const [route, setRoute] = useState<Route>(() =>
+    window.location.hash === '#/settings' ? 'settings' : 'chat',
+  );
   // Settings is mounted lazily (nothing should issue its requests for a user who never opens the
   // tab) but, once opened, stays mounted for the same reason ChatPage does — see the render below.
-  const [settingsEverOpened, setSettingsEverOpened] = useState(false);
+  const [settingsEverOpened, setSettingsEverOpened] = useState(
+    () => window.location.hash === '#/settings',
+  );
   const [providers, setProviders] = useState<ProviderSummary[]>([]);
   const [providersLoaded, setProvidersLoaded] = useState(false);
   const [selectedProviderId, setSelectedProviderId] = useState('');
@@ -136,7 +140,10 @@ const App: React.FC<{
         <EuiTabs size='s'>
           <EuiTab
             isSelected={route === 'chat'}
-            onClick={() => setRoute('chat')}
+            onClick={() => {
+              window.location.hash = '#/';
+              setRoute('chat');
+            }}
           >
             {i18n.translate('wazuhAiAssistant.app.chatTab', {
               defaultMessage: 'Chat',
@@ -145,6 +152,7 @@ const App: React.FC<{
           <EuiTab
             isSelected={route === 'settings'}
             onClick={() => {
+              window.location.hash = '#/settings';
               setSettingsEverOpened(true);
               setRoute('settings');
             }}
@@ -175,6 +183,7 @@ const App: React.FC<{
               selectedProviderId={selectedProviderId}
               onProviderChange={setSelectedProviderId}
               onNavigateToSettings={() => {
+                window.location.hash = '#/settings';
                 setSettingsEverOpened(true);
                 setRoute('settings');
               }}
