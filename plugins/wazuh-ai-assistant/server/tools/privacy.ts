@@ -5,6 +5,35 @@ import { WAZUH_FIELD } from '../../common/wazuh-fields';
  * Privacy mode: reversible pseudonymization at
  * the digest boundary. Everything in this module is pure/stateless-per-instance — no module-level
  * caches — so it is safe to construct fresh per HTTP request (see server/routes/chat.ts).
+ *
+ * WHAT THE FIELD POLICY DOES AND DOES NOT DO (issue #8821 was filed because this was not written
+ * down anywhere, and the behavior reads like a bug until it is):
+ *
+ * The policy has exactly ONE boundary — what the AI provider receives — and the three actions differ
+ * only in how much of a field's value get there:
+ *
+ * - `allow`: the provider receives the real value. Also the default for a field with no entry on a
+ *   typed catalog tool (the search_wazuh_data escape hatch flips that default to `anonymize` — see
+ *   `applyFieldPolicy`'s `isEscapeHatch`).
+ * - `anonymize`: the provider receives a reversible pseudonym (`HOST_1`, `IP_2`) instead.
+ * - `never`: the provider receives NOTHING for that field. `applyFieldPolicy` drops it from the
+ *   digest's `samples`, drops its aggregation buckets from `breakdown`, and drops its name from the
+ *   `columns` schema hint — so neither the value, nor a pseudonym of it, nor even the fact that the
+ *   field exists is sent.
+ *
+ * What the policy deliberately does NOT touch:
+ *
+ * - The EXECUTED QUERY. No action rewrites `_source`, the Manager API's `select`, or rejects an
+ *   aggregation. The field is always retrieved — it has to be, because the analyst is meant to see it.
+ * - Anything LOCAL. The results table (`buildTableSpec`, streamed straight to the browser), the
+ *   answer text (server/routes/chat.ts runs every provider delta back through
+ *   `StreamDepseudonymizer`, so `HOST_1` becomes the real hostname again before it leaves the server)
+ *   and the tool-call panel (emitted with real arguments) all show the analyst their OWN data, in
+ *   full, for every action including `never`.
+ *
+ * So "I set wazuh.agent.name to Never send and the results table still shows it" is the intended
+ * behavior, not a leak: that table never left the cluster. The check that matters is what the
+ * provider request body carries.
  */
 
 export type FieldPolicyAction = 'allow' | 'anonymize' | 'never';
@@ -565,6 +594,12 @@ export function extractAggFields(
  * - `samples`: 'never' fields are dropped from the sample object entirely; 'anonymize' string
  *   values are pseudonymized (kind inferred from the field name); 'allow' fields pass through
  *   unchanged. An UNLISTED field's behavior depends on `isEscapeHatch` (see below).
+ *   AGGREGATION samples are the one exception to "resolve by the sample's own field name": a bucket
+ *   row's keys are `key`/`doc_count` (digest.ts's `bucketsToRows`), and `key` holds a VALUE of the
+ *   AGGREGATED field, not of a field literally called "key". Resolving it by name matched no policy
+ *   entry, so a top-agents/top-rules aggregation sent its real bucket values to the provider under
+ *   `samples[].key` while `breakdown` — the same values, one key over — was correctly scrubbed.
+ *   `key` is therefore resolved against `aggFields`' first aggregation field whenever there is one.
  * - `breakdown`: a bucket key's field can't be read from the digest alone (see `extractAggFields`
  *   above) — each bucket is attributed to its aggregation (the entry's `agg` name, or the first
  *   aggregation when unset — the single-agg case) and that aggregation's field is resolved against
@@ -599,9 +634,20 @@ export function applyFieldPolicy(
   toolName?: string,
   isEscapeHatch = false,
 ): Digest {
+  // The field a bucket row's `key` holds the values OF — see the `samples` note above. `undefined`
+  // for a non-aggregation digest, or for an aggregation with no extractable field (e.g. a
+  // date_histogram), in which case `key` resolves by its own name like any other sample field.
+  const firstAggField = aggFields
+    ? aggFields[Object.keys(aggFields)[0]]
+    : undefined;
+
   const samples = digest.samples.map(sample => {
     const out: Record<string, unknown> = {};
-    for (const [field, value] of Object.entries(sample)) {
+    for (const [sampleKey, value] of Object.entries(sample)) {
+      // `sampleKey` is what the digest stays KEYED by (never rewritten — the model's view of the
+      // digest shape must not change); `field` is only what the policy is resolved against.
+      const field =
+        sampleKey === 'key' && firstAggField ? firstAggField : sampleKey;
       const entry = resolveFieldEntry(field, policy, toolName);
       if (entry?.action === 'never') {
         continue;
@@ -611,7 +657,7 @@ export function applyFieldPolicy(
         typeof value === 'string' &&
         value.length > 0
       ) {
-        out[field] = pseudonymizer.pseudonymize(
+        out[sampleKey] = pseudonymizer.pseudonymize(
           value,
           entry.kind ?? inferPseudonymKind(field),
         );
@@ -623,12 +669,12 @@ export function applyFieldPolicy(
       ) {
         // Fail-closed: no explicit policy entry for this field, but the escape hatch can
         // surface any finding field, so an unlisted one is NOT trusted as safe-by-omission here.
-        out[field] = pseudonymizer.pseudonymize(
+        out[sampleKey] = pseudonymizer.pseudonymize(
           value,
           inferPseudonymKind(field),
         );
       } else {
-        out[field] = value;
+        out[sampleKey] = value;
       }
     }
     return out;

@@ -1012,6 +1012,16 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // single empty table if it's the only one" (honest-empty stays correct). A plain local
     // variable, not a ref/state: scoped to this one stream's sequential event loop only.
     let pendingEmptyTable: TableSpec | undefined;
+    /**
+     * A non-empty `table` event held back until the answer's first text arrives. The server emits
+     * `table` the moment a tool returns, well before the model has narrated anything, so committing
+     * it immediately made the table pop in first and the prose then grow in above it — the bubble
+     * renders the table UNDER the text (message-bubble.tsx), so the turn read backwards while it
+     * streamed. Released by `flushPendingDelta` together with that first text (one React update, so
+     * text and table appear at once), or on its own by `flushPendingTable` if the turn ends, errors,
+     * or expires before any text arrives — an answer that is only a table must still show it.
+     */
+    let pendingTable: TableSpec | undefined;
     /** The tool calls issued this turn, in order — mirrors what the bubble displays so the abandoned
      * path can rebuild the turn without reading React state. */
     let committedToolCalls: ToolCall[] = [];
@@ -1024,6 +1034,27 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       }
       const spec = pendingEmptyTable;
       pendingEmptyTable = undefined;
+      committedTable = spec;
+      if (!isTurnStillActive()) {
+        return;
+      }
+      updateMessages(current =>
+        current.map(message =>
+          message.id === assistantMessageId
+            ? { ...message, table: spec }
+            : message,
+        ),
+      );
+    };
+    /** Commits a held non-empty table on its own, for the turns where no answer text ever arrives to
+     * pair it with (stream ended, errored, or the session expired). A no-op once `flushPendingDelta`
+     * has already released it. */
+    const flushPendingTable = () => {
+      if (!pendingTable) {
+        return;
+      }
+      const spec = pendingTable;
+      pendingTable = undefined;
       committedTable = spec;
       if (!isTurnStillActive()) {
         return;
@@ -1067,6 +1098,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       }
       const text = pendingDeltaText;
       pendingDeltaText = '';
+      // The first text of the answer is what the held table was waiting for: released in this same
+      // update so the bubble shows text and table together, already in their final order.
+      const table = pendingTable;
+      pendingTable = undefined;
+      if (table) {
+        committedTable = table;
+      }
       // An abandoned turn keeps accumulating into `accumulatedContent` (which is what its own
       // transcript is rebuilt from) but stops writing into the message list, which now belongs to
       // a different conversation.
@@ -1081,6 +1119,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 ...message,
                 content: message.content + text,
                 statusMessage: undefined,
+                ...(table ? { table } : {}),
               }
             : message,
         ),
@@ -1125,16 +1164,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             pendingEmptyTable = event.spec;
           } else {
             pendingEmptyTable = undefined;
-            committedTable = event.spec;
-            if (isTurnStillActive()) {
-              updateMessages(current =>
-                current.map(message =>
-                  message.id === assistantMessageId
-                    ? { ...message, table: event.spec }
-                    : message,
-                ),
-              );
-            }
+            // Held rather than committed — see `pendingTable`. `committedTable` is deliberately NOT
+            // set here: it is set at the moment the table actually reaches the message list, so an
+            // abandoned turn is remembered with exactly what it displayed.
+            pendingTable = event.spec;
           }
         } else if (event.type === 'status' && isTurnStillActive()) {
           // Transient progress line (e.g. "Querying Wazuh...") from the orchestration loop; no
@@ -1187,6 +1220,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         } else if (event.type === 'error') {
           turnCompleted = true;
           flushPendingEmptyTable();
+          // Released before the placeholder cleanup below, which drops an assistant message with
+          // neither content nor table — a turn whose tool succeeded and whose narration then failed
+          // must keep the table it already produced.
+          flushPendingTable();
           if (!isTurnStillActive()) {
             // An error banner for a conversation the user already left is pure noise — the turn's
             // own transcript (rebuilt in `finally`) simply carries whatever streamed in before it.
@@ -1216,6 +1253,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           // is NOT gated on the turn still being active: the session is gone for the whole app, so
           // the callout is just as relevant to whatever conversation is now on screen.
           turnCompleted = true;
+          flushPendingTable();
           flushPendingEmptyTable();
           handleSessionExpired();
           if (!isTurnStillActive()) {
@@ -1239,6 +1277,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       // ended normally, errored, or was aborted (handleStop's `controller.abort()` unwinds the
       // `for await` and lands here the same way).
       flushPendingDelta();
+      // A turn that produced a table but never any prose (the model stopped after the tool call, or
+      // Stop was pressed while it was still thinking) still has to show that table.
+      flushPendingTable();
       flushPendingEmptyTable();
 
       if (!isTurnStillActive()) {

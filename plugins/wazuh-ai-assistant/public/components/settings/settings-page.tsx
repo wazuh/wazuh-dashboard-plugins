@@ -7,17 +7,12 @@ import {
   EuiBasicTable,
   EuiBasicTableColumn,
   EuiButton,
-  EuiButtonEmpty,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiForm,
   EuiFormRow,
   EuiFieldText,
-  EuiFieldPassword,
   EuiSelect,
   EuiCallOut,
-  EuiCode,
-  EuiCodeBlock,
   EuiSpacer,
   EuiHealth,
   EuiText,
@@ -31,12 +26,12 @@ import {
   EuiPanel,
   EuiFieldNumber,
   EuiIcon,
+  EuiIconTip,
   EuiHorizontalRule,
   EuiFieldSearch,
   EuiAccordion,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
-import { FormattedMessage } from '@osd/i18n/react';
 import { CoreStart } from '../../../../../src/core/public';
 import {
   AssistantSettings,
@@ -46,8 +41,8 @@ import {
 } from '../../services/settings-service';
 import { healManagerSession } from '../../services/session-heal';
 import { ProviderInput, ProviderSummary } from '../../../common/types';
-import { PROVIDER_TYPES } from '../../../common/constants';
 import { useDirtyFormState } from '../../hooks/use-dirty-form-state';
+import { ProviderFormFlyout } from './provider-form-flyout';
 
 const FIELD_POLICY_ACTIONS: FieldPolicyAction[] = [
   'allow',
@@ -76,21 +71,8 @@ interface SettingsPageProps {
   onProvidersChanged: () => void;
 }
 
-// Long descriptions (with examples) shown only in the add/edit form's provider type dropdown.
-const PROVIDER_TYPE_FORM_LABELS: Record<string, string> = {
-  openai_compatible: i18n.translate(
-    'wazuhAiAssistant.settings.type.openaiCompatible',
-    {
-      defaultMessage:
-        'OpenAI-compatible (OpenAI, Gemini, Ollama, LM Studio, vLLM...)',
-    },
-  ),
-  anthropic: i18n.translate('wazuhAiAssistant.settings.type.anthropic', {
-    defaultMessage: 'Anthropic',
-  }),
-};
-
-// Short labels shown in the providers table, where the long parenthetical is too verbose.
+// Short labels shown in the providers table; the add/edit flyout uses its own long labels
+// (provider-form-flyout.tsx), where the full parenthetical fits.
 const PROVIDER_TYPE_SHORT_LABELS: Record<string, string> = {
   openai_compatible: i18n.translate(
     'wazuhAiAssistant.settings.type.short.openaiCompatible',
@@ -111,18 +93,6 @@ type PrivacyDraft = Pick<
 > & {
   fieldPolicy: Array<FieldPolicyEntry & { _isNew?: true }>;
 };
-
-const emptyForm: ProviderInput = {
-  name: '',
-  type: 'openai_compatible',
-  baseUrl: '',
-  model: '',
-  apiKey: '',
-};
-
-function isValidEndpointUrl(value: string): boolean {
-  return /^https?:\/\//i.test(value.trim());
-}
 
 /**
  * OSD's HttpFetchError puts the server's JSON body on `error.body` (the raw fetch Response is
@@ -214,8 +184,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 }) => {
   const [service] = useState(() => new SettingsService(core.http));
   const [providers, setProviders] = useState<ProviderSummary[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<ProviderInput>(emptyForm);
+  // Provider whose values seed the flyout form (null = creating); `isFormOpen` is separate so a
+  // create form (no provider) can be open too.
+  const [editingProvider, setEditingProvider] =
+    useState<ProviderSummary | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [testResults, setTestResults] = useState<
@@ -228,7 +200,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const [deleteTarget, setDeleteTarget] = useState<ProviderSummary | null>(
     null,
   );
-  const [baseUrlError, setBaseUrlError] = useState<string | null>(null);
 
   // Privacy settings: loaded once on mount; edited locally and only written back on an explicit
   // "Save privacy settings" click, mirroring the provider form's own edit-then-save pattern
@@ -517,23 +488,20 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   }, []);
 
   const openCreateForm = () => {
-    setEditingId(null);
-    setForm(emptyForm);
-    setBaseUrlError(null);
+    setEditingProvider(null);
+    setError(null);
     setIsFormOpen(true);
   };
 
   const openEditForm = (provider: ProviderSummary) => {
-    setEditingId(provider.id);
-    setForm({
-      name: provider.name,
-      type: provider.type,
-      baseUrl: provider.baseUrl,
-      model: provider.model,
-      apiKey: '',
-    });
-    setBaseUrlError(null);
+    setEditingProvider(provider);
+    setError(null);
     setIsFormOpen(true);
+  };
+
+  const closeForm = () => {
+    setIsFormOpen(false);
+    setError(null);
   };
 
   // No per-provider privacy toggle in this form, deliberately.
@@ -550,33 +518,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   // for; the per-provider map stays editable only by ensuring the global
   // Privacy section below never overwrites it (see `handleSavePrivacySettings`'s
   // `privacyDefaultPerProvider: loadedAssistantSettings.privacyDefaultPerProvider` passthrough).
-  const handleSubmit = async () => {
+  const handleSubmit = async (input: ProviderInput) => {
     setError(null);
-
-    const trimmedForm: ProviderInput = {
-      ...form,
-      name: form.name.trim(),
-      baseUrl: form.baseUrl.trim(),
-      model: form.model.trim(),
-      apiKey: form.apiKey?.trim() ?? '',
-    };
-
-    if (!isValidEndpointUrl(trimmedForm.baseUrl)) {
-      setBaseUrlError(
-        i18n.translate('wazuhAiAssistant.settings.form.baseUrlInvalid', {
-          defaultMessage: 'Enter a valid URL starting with http:// or https://',
-        }),
-      );
-      return;
-    }
-    setBaseUrlError(null);
-
     try {
-      if (editingId) {
-        await service.update(editingId, trimmedForm);
-        clearTestResult(editingId);
+      if (editingProvider) {
+        await service.update(editingProvider.id, input);
+        clearTestResult(editingProvider.id);
       } else {
-        await service.create(trimmedForm);
+        await service.create(input);
       }
       setIsFormOpen(false);
       reload();
@@ -868,9 +817,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     },
   ];
 
-  const apiKeyBlockedByEncryption =
-    apiKeyEncryptionEnabled === false && Boolean(form.apiKey?.trim());
-
   return (
     <EuiPage restrictWidth={960}>
       <EuiPageBody>
@@ -954,7 +900,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               }
             />
             <EuiPanel hasShadow={false} hasBorder paddingSize='m'>
-              {error && (
+              {error && !isFormOpen && (
                 <>
                   <EuiCallOut
                     title={i18n.translate(
@@ -969,229 +915,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                     <p>{error}</p>
                   </EuiCallOut>
                   <EuiSpacer size='m' />
-                </>
-              )}
-
-              {isFormOpen && (
-                <>
-                  {apiKeyEncryptionEnabled === false && (
-                    <>
-                      <EuiCallOut
-                        color='warning'
-                        iconType='alert'
-                        title={i18n.translate(
-                          'wazuhAiAssistant.settings.form.encryptionRequiredTitle',
-                          {
-                            defaultMessage:
-                              'An encryption key is required to save API keys',
-                          },
-                        )}
-                      >
-                        <p>
-                          {i18n.translate(
-                            'wazuhAiAssistant.settings.form.encryptionRequiredBody',
-                            {
-                              defaultMessage:
-                                'Encryption at rest is not configured. Providers that do not need ' +
-                                'an API key can still be saved.',
-                            },
-                          )}
-                        </p>
-                        <p>
-                          {/* Setting/file names are interpolated as <EuiCode> values and the
-                              commands live in the code block below, outside the translatable
-                              string, so translators can never alter them. */}
-                          <FormattedMessage
-                            id='wazuhAiAssistant.settings.form.encryptionRequiredHow'
-                            defaultMessage={
-                              'To enable saving keys, generate a base64-encoded ' +
-                              '32-byte key and store it as {settingName} in the ' +
-                              'keystore (recommended — the ' +
-                              'key never sits in a readable config file) or in ' +
-                              '{configFile}, then restart the dashboard service:'
-                            }
-                            values={{
-                              settingName: (
-                                <EuiCode>
-                                  wazuh_ai_assistant.encryptionKey
-                                </EuiCode>
-                              ),
-                              configFile: (
-                                <EuiCode>opensearch_dashboards.yml</EuiCode>
-                              ),
-                            }}
-                          />
-                        </p>
-                        <EuiCodeBlock
-                          language='bash'
-                          paddingSize='s'
-                          fontSize='s'
-                          isCopyable
-                        >
-                          {'openssl rand -base64 32\n' +
-                            'opensearch-dashboards-keystore add wazuh_ai_assistant.encryptionKey'}
-                        </EuiCodeBlock>
-                      </EuiCallOut>
-                      <EuiSpacer size='m' />
-                    </>
-                  )}
-                  <EuiForm component='div'>
-                    <EuiFormRow
-                      label={i18n.translate(
-                        'wazuhAiAssistant.settings.form.name',
-                        {
-                          defaultMessage: 'Name',
-                        },
-                      )}
-                    >
-                      <EuiFieldText
-                        value={form.name}
-                        onChange={event =>
-                          setForm({ ...form, name: event.target.value })
-                        }
-                      />
-                    </EuiFormRow>
-                    <EuiFormRow
-                      label={i18n.translate(
-                        'wazuhAiAssistant.settings.form.type',
-                        {
-                          defaultMessage: 'Provider type',
-                        },
-                      )}
-                    >
-                      <EuiSelect
-                        options={PROVIDER_TYPES.map(type => ({
-                          value: type,
-                          text: PROVIDER_TYPE_FORM_LABELS[type],
-                        }))}
-                        value={form.type}
-                        onChange={event =>
-                          setForm({
-                            ...form,
-                            type: event.target.value as ProviderInput['type'],
-                          })
-                        }
-                      />
-                    </EuiFormRow>
-                    <EuiFormRow
-                      label={i18n.translate(
-                        'wazuhAiAssistant.settings.form.baseUrl',
-                        {
-                          defaultMessage: 'Endpoint URL',
-                        },
-                      )}
-                      isInvalid={Boolean(baseUrlError)}
-                      error={baseUrlError}
-                    >
-                      <EuiFieldText
-                        value={form.baseUrl}
-                        placeholder='https://api.openai.com/v1'
-                        isInvalid={Boolean(baseUrlError)}
-                        onChange={event => {
-                          setForm({ ...form, baseUrl: event.target.value });
-                          if (baseUrlError) {
-                            setBaseUrlError(null);
-                          }
-                        }}
-                      />
-                    </EuiFormRow>
-                    <EuiFormRow
-                      label={i18n.translate(
-                        'wazuhAiAssistant.settings.form.model',
-                        {
-                          defaultMessage: 'Model',
-                        },
-                      )}
-                      helpText={i18n.translate(
-                        'wazuhAiAssistant.settings.form.modelHelp',
-                        {
-                          defaultMessage:
-                            'Tool calling needs a model with solid function-calling support. Known ' +
-                            'good: GPT-4o or GPT-4o-mini (OpenAI), Claude Sonnet (Anthropic), ' +
-                            'llama-3.3-70b-versatile (Groq). Small or base models often fail with ' +
-                            'tool errors.',
-                        },
-                      )}
-                    >
-                      <EuiFieldText
-                        value={form.model}
-                        onChange={event =>
-                          setForm({ ...form, model: event.target.value })
-                        }
-                      />
-                    </EuiFormRow>
-                    <EuiFormRow
-                      label={i18n.translate(
-                        'wazuhAiAssistant.settings.form.apiKey',
-                        {
-                          defaultMessage: 'API key',
-                        },
-                      )}
-                      helpText={
-                        editingId
-                          ? i18n.translate(
-                              'wazuhAiAssistant.settings.form.apiKeyHelp',
-                              {
-                                defaultMessage:
-                                  'Leave empty to keep the current key.',
-                              },
-                            )
-                          : undefined
-                      }
-                    >
-                      <EuiFieldPassword
-                        type='dual'
-                        value={form.apiKey}
-                        onChange={event =>
-                          setForm({ ...form, apiKey: event.target.value })
-                        }
-                      />
-                    </EuiFormRow>
-                    <EuiSpacer size='m' />
-                    <EuiFlexGroup gutterSize='s'>
-                      <EuiFlexItem grow={false}>
-                        <EuiToolTip
-                          content={
-                            !canSave
-                              ? accessMessage
-                              : apiKeyBlockedByEncryption
-                              ? i18n.translate(
-                                  'wazuhAiAssistant.settings.form.encryptionRequiredTooltip',
-                                  {
-                                    defaultMessage:
-                                      'An encryption key must be configured before an API key can be saved.',
-                                  },
-                                )
-                              : undefined
-                          }
-                        >
-                          <EuiButton
-                            onClick={handleSubmit}
-                            isDisabled={!canSave || apiKeyBlockedByEncryption}
-                            fill
-                          >
-                            {i18n.translate(
-                              'wazuhAiAssistant.settings.form.save',
-                              {
-                                defaultMessage: 'Save',
-                              },
-                            )}
-                          </EuiButton>
-                        </EuiToolTip>
-                      </EuiFlexItem>
-                      <EuiFlexItem grow={false}>
-                        <EuiButtonEmpty onClick={() => setIsFormOpen(false)}>
-                          {i18n.translate(
-                            'wazuhAiAssistant.settings.form.cancel',
-                            {
-                              defaultMessage: 'Cancel',
-                            },
-                          )}
-                        </EuiButtonEmpty>
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  </EuiForm>
-                  <EuiSpacer size='l' />
                 </>
               )}
 
@@ -1321,33 +1044,49 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 </EuiFormRow>
 
                 <EuiSpacer size='l' />
-                <EuiText size='s'>
-                  <p>
-                    <strong>
-                      {i18n.translate(
-                        'wazuhAiAssistant.settings.privacy.fieldPolicyTitle',
+                {/* The full explanation lives in the tooltip rather than inline: it is long enough
+                    to dominate the section, and it only matters the first time an admin configures
+                    a rule (or when one surprises them). */}
+                <EuiFlexGroup
+                  gutterSize='xs'
+                  alignItems='center'
+                  responsive={false}
+                >
+                  <EuiFlexItem grow={false}>
+                    <EuiText size='s'>
+                      <strong>
+                        {i18n.translate(
+                          'wazuhAiAssistant.settings.privacy.fieldPolicyTitle',
+                          {
+                            defaultMessage: 'Field policy',
+                          },
+                        )}
+                      </strong>
+                    </EuiText>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <EuiIconTip
+                      type='questionInCircle'
+                      color='subdued'
+                      content={i18n.translate(
+                        'wazuhAiAssistant.settings.privacy.fieldPolicyHelp',
                         {
-                          defaultMessage: 'Field policy',
+                          defaultMessage:
+                            'What the AI provider gets per field: real value (Allow), pseudonym (Anonymize), or nothing (Never send).',
                         },
                       )}
-                    </strong>
-                  </p>
-                  <p>
-                    {i18n.translate(
-                      'wazuhAiAssistant.settings.privacy.fieldPolicyHelp',
-                      {
-                        defaultMessage:
-                          'Controls which finding fields are anonymized (or dropped entirely) before reaching the AI provider when privacy mode is on.',
-                      },
-                    )}
-                  </p>
-                </EuiText>
+                    />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
                 <EuiSpacer size='s' />
 
                 {fieldPolicyDraft.length > 0 && (
                   <EuiAccordion
                     id='field-policy-accordion'
-                    initialIsOpen
+                    // Collapsed by default: the rule list is long (the curated defaults alone are
+                    // ~25 rows) and it is not what an admin comes to this section for — the two
+                    // privacy switches above it are. The button content carries the rule count, so
+                    // the section still reports its size without being expanded.
                     buttonContent={i18n.translate(
                       'wazuhAiAssistant.settings.privacy.fieldPolicyAccordion',
                       {
@@ -1613,6 +1352,17 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             )}
           </EuiPageContentBody>
         </EuiPageContent>
+        {isFormOpen && (
+          <ProviderFormFlyout
+            editingProvider={editingProvider}
+            error={error}
+            canSave={canSave}
+            accessMessage={accessMessage}
+            apiKeyEncryptionEnabled={apiKeyEncryptionEnabled}
+            onSubmit={handleSubmit}
+            onClose={closeForm}
+          />
+        )}
         {deleteTarget && (
           <EuiConfirmModal
             title={i18n.translate(
