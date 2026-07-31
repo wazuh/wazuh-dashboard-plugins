@@ -20,10 +20,10 @@
 import { KeyValueStorage } from './draft-stash';
 
 /** Hash route one conversation is addressed by, e.g. `#/conversation/9f0c...`. */
-export const CONVERSATION_ROUTE_PREFIX = '#/conversation/';
+export const CONVERSATION_ROUTE_PREFIX = '/conversation/';
 
 /** Route for "no conversation open" (a brand-new, never-saved one). */
-export const NEW_CONVERSATION_ROUTE = '#/';
+export const NEW_CONVERSATION_ROUTE = '/';
 
 /** Namespaced the same way `draft-stash.ts` namespaces its keys, for the same reason. */
 export const LAST_CONVERSATION_STORAGE_KEY =
