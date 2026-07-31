@@ -563,6 +563,71 @@ test('checkIndexAllowlist: rejects a non-wazuh index', () => {
   }
 });
 
+test('checkIndexAllowlist: accepts the 6 named wazuh-threatintel-* sub-families this catalog uses', () => {
+  for (const family of [
+    'rules',
+    'decoders',
+    'integrations',
+    'policies',
+    'filters',
+    'kvdbs',
+  ]) {
+    assert.equal(
+      checkIndexAllowlist(`wazuh-threatintel-${family}*`).ok,
+      true,
+      `expected wazuh-threatintel-${family}* to be allowed`,
+    );
+  }
+});
+
+// Deliberate (ADR-1, sdd/add-SA-tools/design): no tool in this catalog touches the IOC feed, and
+// the allowlist enumerates only the 6 sub-families that are — it must NOT accept the bare
+// wazuh-threatintel-* prefix, which would silently authorize enrichments too.
+test('checkIndexAllowlist: rejects wazuh-threatintel-enrichments-* (deliberately out of scope)', () => {
+  const result = checkIndexAllowlist('wazuh-threatintel-enrichments-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(result.reason, /not in the allowed set/);
+  }
+});
+
+test('checkIndexAllowlist: rejects a bare wazuh-threatintel-* or an unrecognized sub-family', () => {
+  assert.equal(checkIndexAllowlist('wazuh-threatintel-*').ok, false);
+  assert.equal(checkIndexAllowlist('wazuh-threatintel-bogus-*').ok, false);
+});
+
+test('checkIndexAllowlist: rejects a comma-smuggled second threatintel index', () => {
+  const result = checkIndexAllowlist(
+    'wazuh-threatintel-rules-a,wazuh-threatintel-enrichments-a',
+  );
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(result.reason, /not in the allowed set/);
+  }
+});
+
+test('checkIndexAllowlist: accepts .opensearch-sap-detectors-config (get_detectors, exact match only)', () => {
+  assert.equal(
+    checkIndexAllowlist('.opensearch-sap-detectors-config').ok,
+    true,
+  );
+});
+
+test('checkIndexAllowlist: rejects any other .opensearch-sap-* index or a wildcard on the detectors index', () => {
+  assert.equal(
+    checkIndexAllowlist('.opensearch-sap-detectors-config*').ok,
+    false,
+  );
+  assert.equal(
+    checkIndexAllowlist('.opensearch-sap-suricata-alerts').ok,
+    false,
+  );
+  assert.equal(
+    checkIndexAllowlist('.opensearch-sap-suricata-findings').ok,
+    false,
+  );
+});
+
 // --- applySafetyValves ------------------------------------------------------------------------
 
 test('applySafetyValves: clamps size to <= 500', () => {
@@ -827,6 +892,79 @@ test('lintDsl: a range on a different field (not wazuh.rule.level) is unaffected
   };
   const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
   assert.equal(result.ok, true, result.ok ? '' : result.reason);
+});
+
+// --- exact-ID lookup exemption (find_document_by_field) -----------------------------------------
+
+test('lintDsl: an "ids" query on a time-based index skips the mandatory time-range check', () => {
+  const body = {
+    query: { ids: { values: ['oPoOs58B4OP1Z0luRhFX'] } },
+    size: 20,
+  };
+  const result = lintDsl(body, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, true, result.ok ? '' : result.reason);
+});
+
+test('lintDsl: a "term" query on an allowlisted ID field skips the mandatory time-range check', () => {
+  const body = {
+    query: { term: { 'wazuh.event.id': 'abc-123' } },
+    size: 20,
+  };
+  const result = lintDsl(body, 'wazuh-events-v5-*');
+  assert.equal(result.ok, true, result.ok ? '' : result.reason);
+});
+
+test('lintDsl: a "terms" query on multiple allowlisted ID fields (wrapped in bool.filter) is exempt', () => {
+  const body = {
+    query: {
+      bool: {
+        filter: [{ terms: { [WAZUH_FIELD.RULE_ID]: ['id-1', 'id-2'] } }],
+      },
+    },
+    size: 20,
+  };
+  const result = lintDsl(body, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, true, result.ok ? '' : result.reason);
+});
+
+test('lintDsl: a "term" query on a NON-allowlisted field still requires a time range', () => {
+  const body = { query: { term: { 'data.srcip': '10.0.0.1' } }, size: 20 };
+  const result = lintDsl(body, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(result.reason, /must include a "range" clause/);
+  }
+});
+
+test('lintDsl: a bool.should ORing "ids" with multiple allowlisted-field "term" clauses is exempt (find_document_by_field\'s shape)', () => {
+  const body = {
+    query: {
+      bool: {
+        should: [
+          { ids: { values: ['oPoOs58B4OP1Z0luRhFX'] } },
+          { term: { [WAZUH_FIELD.RULE_ID]: 'oPoOs58B4OP1Z0luRhFX' } },
+          { term: { 'wazuh.event.id': 'oPoOs58B4OP1Z0luRhFX' } },
+        ],
+        minimum_should_match: 1,
+      },
+    },
+    size: 20,
+  };
+  const result = lintDsl(body, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, true, result.ok ? '' : result.reason);
+});
+
+test('lintDsl: the exact-ID lookup exemption does not apply once an "aggs" is present', () => {
+  const body = {
+    query: { term: { [WAZUH_FIELD.RULE_ID]: 'rule-uuid-1' } },
+    aggs: { by_id: { terms: { field: WAZUH_FIELD.RULE_ID, size: 10 } } },
+    size: 0,
+  };
+  const result = lintDsl(body, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(result.reason, /must include a "range" clause/);
+  }
 });
 
 // --- clampInt ---------------------------------------------------------------------------------

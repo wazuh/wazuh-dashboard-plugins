@@ -249,8 +249,11 @@ const MAX_TABLE_COLUMNS = 50;
  * projected — but the row and column COUNTS are bounded here, and the client row-caps to the same
  * `CONVERSATION_MAX_TABLE_ROWS` before sending (`common/chat-history.ts`'s `toPersistedMessages`),
  * so the two sides cannot disagree about what is acceptable.
+ *
+ * Exported so `conversations-table-schema.test.ts` can validate against it directly -- otherwise
+ * this is the only place a new `TableSpec` field's persistence acceptance could be checked at all.
  */
-const tableSpecSchema = schema.object({
+export const tableSpecSchema = schema.object({
   columns: schema.arrayOf(
     schema.object({
       id: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
@@ -268,6 +271,15 @@ const tableSpecSchema = schema.object({
     schema.object({
       index: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
       dsl: schema.recordOf(schema.string(), schema.any()),
+    }),
+  ),
+  /** "Open in Security Analytics" (common/types.ts's `TableSpec.securityAnalyticsLink`) --
+   * `discover`'s sibling for wazuh-threatintel-* content with no OSD index-pattern. `url` is
+   * already fully built (app path + hash route + resolved space) by the time it reaches here. */
+  securityAnalyticsLink: schema.maybe(
+    schema.object({
+      label: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
+      url: schema.string({ maxLength: MAX_TABLE_LABEL_LENGTH }),
     }),
   ),
 });

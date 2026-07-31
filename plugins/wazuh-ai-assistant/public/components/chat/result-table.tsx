@@ -4,6 +4,8 @@ import {
   EuiBasicTable,
   EuiBasicTableColumn,
   EuiBadge,
+  EuiFlexGroup,
+  EuiFlexItem,
   EuiText,
   EuiButtonIcon,
   EuiCallOut,
@@ -13,6 +15,10 @@ import { i18n } from '@osd/i18n';
 import { TableSpec } from '../../../common/types';
 import { SeverityLevel } from '../../../common/constants';
 import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
+import {
+  ResolveSecurityAnalyticsUrl,
+  SecurityAnalyticsLink,
+} from './security-analytics-link';
 
 /** Tables at or under this row count default to expanded (nothing to gain from collapsing them);
  * bigger ones default collapsed so a 500-row result doesn't force the user to scroll past it to
@@ -91,6 +97,10 @@ interface ResultTableProps {
    * means no link renders — see discover-link.tsx. Optional so any other/future ResultTable call
    * site never has to supply it. */
   resolveDiscoverUrl?: ResolveDiscoverUrl;
+  /** Builds the "Open in Security Analytics" URL for this spec; omitted (or resolving to `null`)
+   * simply means no link renders — see security-analytics-link.tsx. Optional for the same reason
+   * as `resolveDiscoverUrl` above. */
+  resolveSecurityAnalyticsUrl?: ResolveSecurityAnalyticsUrl;
 }
 
 /**
@@ -99,6 +109,7 @@ interface ResultTableProps {
 const ResultTableInner: React.FC<ResultTableProps> = ({
   spec,
   resolveDiscoverUrl,
+  resolveSecurityAnalyticsUrl,
 }) => {
   const [expandedRowIds, setExpandedRowIds] = useState<Set<number>>(new Set());
   // Stable across re-renders of the SAME mounted table (a later spec on the same tool round would
@@ -245,8 +256,26 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         }
       }}
       extraAction={
-        resolveDiscoverUrl && spec.discover ? (
-          <DiscoverLink spec={spec} resolveDiscoverUrl={resolveDiscoverUrl} />
+        (resolveDiscoverUrl && spec.discover) ||
+        (resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink) ? (
+          <EuiFlexGroup gutterSize='s' responsive={false}>
+            {resolveDiscoverUrl && spec.discover ? (
+              <EuiFlexItem grow={false}>
+                <DiscoverLink
+                  spec={spec}
+                  resolveDiscoverUrl={resolveDiscoverUrl}
+                />
+              </EuiFlexItem>
+            ) : null}
+            {resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink ? (
+              <EuiFlexItem grow={false}>
+                <SecurityAnalyticsLink
+                  spec={spec}
+                  resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+                />
+              </EuiFlexItem>
+            ) : null}
+          </EuiFlexGroup>
         ) : undefined
       }
     >
@@ -347,6 +376,7 @@ class ResultTableBoundary extends React.Component<
       <ResultTableInner
         spec={this.props.spec}
         resolveDiscoverUrl={this.props.resolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={this.props.resolveSecurityAnalyticsUrl}
       />
     );
   }
@@ -355,6 +385,11 @@ class ResultTableBoundary extends React.Component<
 export const ResultTable: React.FC<ResultTableProps> = ({
   spec,
   resolveDiscoverUrl,
+  resolveSecurityAnalyticsUrl,
 }) => (
-  <ResultTableBoundary spec={spec} resolveDiscoverUrl={resolveDiscoverUrl} />
+  <ResultTableBoundary
+    spec={spec}
+    resolveDiscoverUrl={resolveDiscoverUrl}
+    resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+  />
 );

@@ -6,7 +6,11 @@
  * depth) or the future free-DSL escape hatch (its only line of defense).
  */
 
-import { WAZUH_FIELD, SEVERITY_LEVELS } from '../../common/wazuh-fields';
+import {
+  WAZUH_FIELD,
+  SEVERITY_LEVELS,
+  COMPLIANCE_FRAMEWORK_FIELDS,
+} from '../../common/wazuh-fields';
 
 export type GuardrailCheck = { ok: true } | { ok: false; reason: string };
 
@@ -67,7 +71,20 @@ const MAX_TREE_DEPTH = 100;
 // separator, so `.*` would let a single match name two index patterns. Not reachable through the
 // catalog today (`index` is enum-locked at the tool-schema level), but this function is the
 // standalone boundary and must hold on its own.
-const INDEX_ALLOWLIST_RE = /^wazuh-(events-v5|findings-v5|states)[^,\s]*$/;
+//
+// `threatintel-(rules|decoders|integrations|policies|filters|kvdbs)` is enumerated explicitly,
+// NOT a bare `threatintel-[^,\s]*`: this plugin has NO tool touching `wazuh-threatintel-enrichments`
+// (228k IOC docs — deliberately out of scope, see get-rules.ts/get-threat-intel-
+// components.ts's doc comments for why). This allowlist is documented as the standalone boundary
+// that must hold on its own, independent of what today's tool schemas happen to permit — opening
+// the whole prefix would silently authorize `enrichments` at this layer the day someone adds it to
+// an enum elsewhere, without anyone consciously deciding to widen it.
+// `.opensearch-sap-detectors-config` (get_detectors.ts) is an exact single index, not a wildcard
+// family -- OpenSearch Security Analytics' own config store for detector definitions, confirmed
+// live to be indexer-reachable and to hold no analyst/attacker-supplied data (name/type/schedule/
+// enabled/source, all vendor- or admin-configured).
+const INDEX_ALLOWLIST_RE =
+  /^wazuh-(events-v5|findings-v5|states|threatintel-(rules|decoders|integrations|policies|filters|kvdbs))[^,\s]*$|^\.opensearch-sap-detectors-config$/;
 
 /** The escape hatch's (and every catalog tool's) index-pattern allowlist. */
 export function checkIndexAllowlist(index: string): GuardrailCheck {
@@ -75,8 +92,9 @@ export function checkIndexAllowlist(index: string): GuardrailCheck {
     return {
       ok: false,
       reason:
-        `Index "${index}" is not in the allowed set ` +
-        `(wazuh-events-v5-*, wazuh-findings-v5-*, wazuh-states-*).`,
+        `Index "${index}" is not in the allowed set (wazuh-events-v5-*, wazuh-findings-v5-*, ` +
+        'wazuh-states-*, wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*, ' +
+        '.opensearch-sap-detectors-config).',
     };
   }
   return { ok: true };
@@ -200,11 +218,7 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // compliance requirement list / MITRE technique catalog).
   WAZUH_FIELD.RULE_CATEGORY,
   WAZUH_FIELD.RULE_TAGS,
-  // pci_dss only, not the whole compliance.* family privacy.ts allow-lists for visibility:
-  // aggregation cardinality is vetted per framework, and only pci_dss has a dedicated tool.
-  // Widening this to every framework needs its own cardinality check first, not a copy-paste
-  // of privacy's broader reasoning.
-  WAZUH_FIELD.RULE_COMPLIANCE_PCI_DSS,
+  ...Object.values(COMPLIANCE_FRAMEWORK_FIELDS),
   WAZUH_FIELD.RULE_MITRE_TECHNIQUE_ID,
   WAZUH_FIELD.RULE_MITRE_TECHNIQUE_NAME,
   WAZUH_FIELD.RULE_MITRE_TACTIC_NAME,
@@ -213,6 +227,93 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // wazuh-states-sca on 5.0.0-beta3).
   'policy.id',
 ]);
+
+/**
+ * Exact-match ID lookup fields shared by `find_document_by_field` (and any `term`/`terms`/`ids`
+ * query shaped the same way, including the search_wazuh_data escape hatch — see
+ * `isExactIdLookupQuery` below): high-selectivity business-level UUID fields, distinct from the
+ * OpenSearch document `_id` (handled separately via an `ids` query). Kept apart from
+ * `AGG_FIELD_ALLOWLIST` above — that allowlist gates AGGREGATION cardinality; this one gates
+ * exact-match LOOKUPS, a different safety property (a lookup on a high-cardinality field is fine,
+ * an aggregation is not).
+ */
+export const ID_FIELD_ALLOWLIST = new Set([
+  'wazuh.event.id',
+  WAZUH_FIELD.RULE_ID,
+  'vulnerability.id',
+  'event.doc_id',
+]);
+
+/** DSL clause keys an exact-match ID lookup query is allowed to be built from — see
+ * `isExactIdLookupQuery` below. `minimum_should_match` is a `bool` sibling key (not a clause of
+ * its own), handled separately in `walkExactIdLookupShape` below rather than listed here. */
+const EXACT_ID_LOOKUP_QUERY_KEYS = new Set([
+  'bool',
+  'filter',
+  'must',
+  'should',
+  'must_not',
+  'term',
+  'terms',
+  'ids',
+]);
+
+/**
+ * True when `body` is a plain exact-match lookup (`term`/`terms` on an `ID_FIELD_ALLOWLIST` field,
+ * and/or an `ids` query on `_id`), with no aggregation — the shape `find_document_by_field` builds
+ * (a `bool.should` of one `ids` clause plus a `term`/`terms` clause per applicable business
+ * field), and the reason an ID lookup has no time window to give the mandatory-time-range check.
+ * Checked on QUERY SHAPE alone (not which tool produced it), so it also exempts a hand-built
+ * search_wazuh_data query of the same shape — intentional: it only allows exact lookups on
+ * high-selectivity ID fields, not an open-ended scan.
+ */
+function isExactIdLookupQuery(body: Record<string, unknown>): boolean {
+  if (body.aggs !== undefined || body.aggregations !== undefined) {
+    return false;
+  }
+  const query = body.query;
+  return (
+    !!query &&
+    typeof query === 'object' &&
+    !Array.isArray(query) &&
+    walkExactIdLookupShape(query)
+  );
+}
+
+function walkExactIdLookupShape(node: unknown): boolean {
+  if (Array.isArray(node)) {
+    return node.every(walkExactIdLookupShape);
+  }
+  if (!node || typeof node !== 'object') {
+    return false;
+  }
+  for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+    if (key === 'minimum_should_match') {
+      continue; // A bare number sibling of `should` — nothing to validate or recurse into.
+    }
+    if (!EXACT_ID_LOOKUP_QUERY_KEYS.has(key)) {
+      return false;
+    }
+    if (key === 'ids') {
+      continue; // {ids: {values: [...]}} always targets _id — no field to check.
+    }
+    if (key === 'term' || key === 'terms') {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        return false;
+      }
+      const fields = Object.keys(value as Record<string, unknown>);
+      if (!fields.every(field => ID_FIELD_ALLOWLIST.has(field))) {
+        return false;
+      }
+      continue;
+    }
+    // bool/filter/must/should/must_not: recurse into the nested clause(s).
+    if (!walkExactIdLookupShape(value)) {
+      return false;
+    }
+  }
+  return true;
+}
 
 const TIME_FIELD_RE = /(^|\.)(timestamp|@timestamp)$/;
 const MAX_LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
@@ -408,7 +509,8 @@ export function lintDsl(
   if (
     index !== undefined &&
     TIME_BASED_INDEX_RE.test(index) &&
-    !hasTimeRange(body)
+    !hasTimeRange(body) &&
+    !isExactIdLookupQuery(body)
   ) {
     return {
       ok: false,

@@ -24,10 +24,10 @@ The plugin has **zero npm runtime dependencies**: everything comes from the host
    cannot send a POST body, and not `core.http.post`, which buffers the whole response).
 2. The chat route runs the **orchestration loop** (`server/routes/chat.ts`):
    1. **Stage 1 — route**: one cheap model call with a single synthetic `route_question` tool
-      picks 1–2 categories (alerts, vulnerabilities, agents, fim, sca, mitre, inventory,
-      compliance, free_search, general) from a compact menu.
+      picks 1–2 categories (agents, findings, vulnerabilities, fim, sca, mitre, inventory,
+      compliance, security_analytics, free_search, general) from a compact menu.
    2. **Stage 2 — act**: the model is re-invoked with only the routed categories' typed tools
-      (3–6 schemas instead of all 29), keeping every provider in its reliable tool-count range
+      (3–6 schemas instead of all 32), keeping every provider in its reliable tool-count range
       and cutting token overhead.
    3. When the model emits a `tool_call`, the server **lints and clamps** the query
       (guardrails), executes it locally — Indexer via

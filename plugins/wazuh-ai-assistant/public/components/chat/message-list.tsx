@@ -6,6 +6,7 @@ import {
   UiChatMessage,
 } from './message-bubble';
 import { ResolveDiscoverUrl } from './discover-link';
+import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
 
 interface MessageListProps {
   messages: UiChatMessage[];
@@ -13,6 +14,8 @@ interface MessageListProps {
   aiAvatarUrl: string;
   /** Threaded down to every MessageBubble's ResultTable; see discover-link.tsx. */
   resolveDiscoverUrl: ResolveDiscoverUrl;
+  /** Threaded down to every MessageBubble's ResultTable; see security-analytics-link.tsx. */
+  resolveSecurityAnalyticsUrl: ResolveSecurityAnalyticsUrl;
   /**
    * Re-asks the last question. Applies to the LAST turn only — retrying an older one would mean
    * rewriting the middle of the conversation, which nothing here supports. `undefined` while a turn
@@ -48,6 +51,7 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
   messages,
   aiAvatarUrl,
   resolveDiscoverUrl,
+  resolveSecurityAnalyticsUrl,
   onRetryLastTurn,
 }) {
   const lastMessage = messages[messages.length - 1];
@@ -59,6 +63,7 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
             message={message}
             aiAvatarUrl={aiAvatarUrl}
             resolveDiscoverUrl={resolveDiscoverUrl}
+            resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
             onRetry={
               index === messages.length - 1 ? onRetryLastTurn : undefined
             }

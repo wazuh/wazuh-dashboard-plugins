@@ -1,7 +1,6 @@
 import { ToolSpec } from '../../common/types';
 import { ToolDefinition } from './types';
-import { getActiveAgentsTool } from './catalog/get-active-agents';
-import { getDisconnectedAgentsTool } from './catalog/get-disconnected-agents';
+import { getAgentsTool } from './catalog/get-agents';
 import { getCriticalFindingsTool } from './catalog/get-critical-findings';
 import { searchFindingsByAgentTool } from './catalog/search-findings-by-agent';
 import { getTopRulesTool } from './catalog/get-top-rules';
@@ -12,8 +11,8 @@ import { getSecuritySummaryTool } from './catalog/get-security-summary';
 import { getSuspiciousPowershellTool } from './catalog/get-suspicious-powershell';
 import { searchFindingsByRuleTitleTool } from './catalog/search-findings-by-rule-title';
 import { searchFindingsByRuleTagTool } from './catalog/search-findings-by-rule-tag';
-import { getPciDssFindingsTool } from './catalog/get-pci-dss-findings';
-import { getPciDssSummaryTool } from './catalog/get-pci-dss-summary';
+import { getComplianceAlertsTool } from './catalog/get-compliance-alerts';
+import { getComplianceSummaryTool } from './catalog/get-compliance-summary';
 import { searchFindingsByMultipleAgentsTool } from './catalog/search-findings-by-multiple-agents';
 import { searchFindingsByOsTool } from './catalog/search-findings-by-os';
 import { getVulnerabilitiesTool } from './catalog/get-vulnerabilities';
@@ -28,6 +27,10 @@ import { getAgentOsTool } from './catalog/get-agent-os';
 import { getAgentPackagesTool } from './catalog/get-agent-packages';
 import { getAgentPortsTool } from './catalog/get-agent-ports';
 import { getAgentProcessesTool } from './catalog/get-agent-processes';
+import { getRulesTool } from './catalog/get-rules';
+import { getThreatIntelComponentsTool } from './catalog/get-threat-intel-components';
+import { getDetectorsTool } from './catalog/get-detectors';
+import { findDocumentByFieldTool } from './catalog/find-document-by-field';
 import { searchWazuhDataTool } from './catalog/search-wazuh-data';
 
 /**
@@ -41,9 +44,9 @@ import { searchWazuhDataTool } from './catalog/search-wazuh-data';
  * catalog rather than special-cased.
  */
 const CATALOG: ToolDefinition[] = [
-  // Original 6 (production, unchanged)
-  getActiveAgentsTool,
-  getDisconnectedAgentsTool,
+  // Original 6 (production, unchanged) — get_active_agents/get_disconnected_agents were replaced
+  // by the single get_agents tool (see get-agents.ts).
+  getAgentsTool,
   getCriticalFindingsTool,
   searchFindingsByAgentTool,
   getTopRulesTool,
@@ -56,8 +59,8 @@ const CATALOG: ToolDefinition[] = [
   getSuspiciousPowershellTool,
   searchFindingsByRuleTitleTool,
   searchFindingsByRuleTagTool,
-  getPciDssFindingsTool,
-  getPciDssSummaryTool,
+  getComplianceAlertsTool,
+  getComplianceSummaryTool,
   searchFindingsByMultipleAgentsTool,
   searchFindingsByOsTool,
 
@@ -83,7 +86,15 @@ const CATALOG: ToolDefinition[] = [
   getAgentPortsTool,
   getAgentProcessesTool,
 
-  // Escape hatch — last resort, kept last so the 28 typed tools are listed first.
+  // Security Analytics content: ruleset + pipeline components + detector definitions
+  getRulesTool,
+  getThreatIntelComponentsTool,
+  getDetectorsTool,
+
+  // Generic exact-ID lookup (document _id or a business-level UUID field, tried automatically)
+  findDocumentByFieldTool,
+
+  // Escape hatch — last resort, kept last so the typed tools are listed first.
   searchWazuhDataTool,
 ];
 

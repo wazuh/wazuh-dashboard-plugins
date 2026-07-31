@@ -25,6 +25,7 @@ export type RouterCategory =
   | 'mitre'
   | 'inventory'
   | 'compliance'
+  | 'security_analytics'
   | 'free_search'
   | 'general';
 
@@ -44,8 +45,7 @@ export type RouterCategory =
  */
 const TOOL_CATEGORY: Record<string, RouterCategory> = {
   // agents
-  get_active_agents: 'agents',
-  get_disconnected_agents: 'agents',
+  get_agents: 'agents',
 
   // findings
   get_critical_findings: 'findings',
@@ -84,10 +84,16 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_agent_processes: 'inventory',
 
   // compliance
-  get_pci_dss_findings: 'compliance',
-  get_pci_dss_summary: 'compliance',
+  get_compliance_alerts: 'compliance',
+  get_compliance_summary: 'compliance',
 
-  // free_search (escape hatch)
+  // security_analytics
+  get_rules: 'security_analytics',
+  get_threat_intel_components: 'security_analytics',
+  get_detectors: 'security_analytics',
+
+  // free_search (escape hatch + generic ID lookup)
+  find_document_by_field: 'free_search',
   search_wazuh_data: 'free_search',
 };
 
@@ -101,6 +107,7 @@ const CATEGORY_ORDER: RouterCategory[] = [
   'mitre',
   'inventory',
   'compliance',
+  'security_analytics',
   'free_search',
   'general',
 ];
@@ -108,19 +115,29 @@ const CATEGORY_ORDER: RouterCategory[] = [
 /** One-line descriptions for the stage-1 routing prompt's category menu. Keep these short — every
  * character here is paid for on every turn (stage-1 token budget). */
 const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
-  agents: 'Agent connectivity status (active or disconnected agents).',
+  agents:
+    'Agent listing by status (active, pending, never_connected, disconnected) and/or agent ID.',
   findings:
     'Finding search/summaries: critical findings, by agent/rule/rule-tag/OS/time, top rules, ' +
     'brute-force, suspicious PowerShell, general security summary.',
   vulnerabilities:
     'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only.',
   fim: 'File Integrity Monitoring: current state of monitored files (path, mtime, owner, hashes).',
-  sca: 'Security Configuration Assessment (SCA) policy results.',
+  sca:
+    'Security Configuration Assessment (SCA): per-agent compliance benchmark results (e.g. CIS ' +
+    'Ubuntu), NOT Security Analytics pipeline policies.',
   mitre:
     'MITRE ATT&CK technique/tactic findings and technique-frequency summaries.',
   inventory:
     'Syscollector inventory: agent OS, installed packages, open ports, running processes.',
-  compliance: 'PCI DSS compliance findings and summaries.',
+  compliance:
+    'Compliance findings/summaries for any of 10 frameworks (PCI DSS, HIPAA, GDPR, ISO 27001, ' +
+    'NIS2, NIST 800-171/800-53, FedRAMP, CMMC, TSC).',
+  security_analytics:
+    'The Security Analytics ruleset and pipeline content itself — rules (name/level/status/' +
+    'technique), components (decoders, integrations, policies, filters, KVDBs), and detector ' +
+    'definitions (which detectors exist, enabled state, monitored indices). Pipeline ' +
+    'configuration, NOT findings that fired and NOT SCA compliance benchmarks.',
   free_search:
     'Anything else about Wazuh finding/vulnerability/state data (last resort).',
   general:
