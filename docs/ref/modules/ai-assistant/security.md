@@ -21,10 +21,10 @@ allowed to perform. Answers are rendered through EUI's markdown component with r
 ## Admin gating
 
 Provider management (`POST/PUT/DELETE /providers`, set-default, connection test) and settings
-writes are gated on `wazuh-core`'s `dashboardSecurity.isAdministratorUser` check. `GET
-/providers` stays readable by any user because the Chat view needs the provider list — it never
-returns a key, only `hasApiKey`. The Settings page probes `GET /settings/access` on mount to
-warn non-admins up front instead of failing on save.
+writes are gated on `wazuh-core`'s `dashboardSecurity.isAdministratorUser` check.
+`GET /providers` stays readable by any user because the Chat view needs the provider list — it
+never returns a key, only `hasApiKey`. The Settings page probes `GET /settings/access` on mount
+to warn non-admins up front instead of failing on save.
 
 ## SSRF guard on outbound provider traffic
 
@@ -38,14 +38,15 @@ Provider API keys can be encrypted with **AES-256-GCM** using a key supplied thr
 dashboard configuration (`wazuh_ai_assistant.encryptionKey`; prefer the OpenSearch Dashboards
 keystore). The implementation is Node's builtin `crypto` only — no new dependency.
 
-- The current format, `enc:v2:`, binds each ciphertext to its own saved object via GCM
+- The format, `enc:v1:`, binds each ciphertext to its own saved object via GCM
   **Additional Authenticated Data** (`wazuh-ai-assistant-provider:<saved object id>:apiKey`).
   Copying an encrypted blob into another provider's field — via saved-objects import, restore,
   or any write path that bypasses the plugin — fails decryption hard instead of silently handing
   the wrong provider a working key.
-- Unset by default: without a key configured, keys are stored as plaintext (a startup warning is
-  logged). Plaintext values stored before encryption was enabled keep decrypting, and are
-  transparently upgraded to `enc:v2:` on the next write that touches the provider.
+- Unset by default, but required to save API keys: without a key configured, provider writes
+  carrying an API key are rejected (a startup warning is also logged). Plaintext keys are never
+  supported or managed: a value stored by an earlier pre-release build fails decryption and must
+  be re-entered — editing a provider that still holds one is refused until then.
 - There is no key-rotation scheme: changing the key makes previously encrypted values
   undecryptable, surfaced as a clear error; recovery is re-entering the affected keys.
 
