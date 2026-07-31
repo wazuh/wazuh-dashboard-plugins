@@ -19,17 +19,20 @@ import {
  * Deliberate change vs 4.14: no `score`/`end_scan` columns — 5.0 stores no score field anywhere
  * (the old Manager computed it), and `state.modified_at` is a write-time, not scan-time. Rather
  * than bake in a possibly-wrong formula, the digest carries the raw passed/failed counts and the
- * model computes/narrates the ratio when asked (`result values assumed 'passed'/'failed'/
- * 'not applicable' as on 4.14 — re-verify against real agent data when available`).
+ * model computes/narrates the ratio when asked. `check.result` values are confirmed live against
+ * a real 5.0 stack to be capitalized -- `"Passed"`/`"Failed"`/`"Not applicable"` -- NOT the
+ * lowercase 4.14 values; a lowercase `term` filter here silently matches nothing.
  */
 export const getScaResultsTool: ToolDefinition = {
   spec: {
     name: 'get_sca_results',
     description:
-      'Lists Security Configuration Assessment (SCA) policy results for one agent — total/' +
-      'passed/failed check counts per policy. Use for "SCA"/"configuration assessment"/' +
-      '"compliance policy score" questions about a specific agent. The compliance ratio is ' +
-      'passed/(passed+failed).',
+      'Lists Security Configuration Assessment (SCA) benchmark results for one agent — total/' +
+      'passed/failed check counts per compliance benchmark (e.g. CIS Ubuntu). Use for "SCA"/' +
+      '"configuration assessment"/"compliance policy score" questions about a specific agent. ' +
+      'The compliance ratio is passed/(passed+failed). NOT for Security Analytics pipeline ' +
+      'policies (use get_threat_intel_components with component_type="policies") -- SCA is a ' +
+      'per-agent scan result, unrelated to that pipeline configuration.',
     parameters: objectSchema(
       {
         agent_id: {
@@ -60,10 +63,10 @@ export const getScaResultsTool: ToolDefinition = {
               policy_sample: {
                 top_hits: { size: 1, _source: ['policy.name'] },
               },
-              passed: { filter: { term: { 'check.result': 'passed' } } },
-              failed: { filter: { term: { 'check.result': 'failed' } } },
+              passed: { filter: { term: { 'check.result': 'Passed' } } },
+              failed: { filter: { term: { 'check.result': 'Failed' } } },
               not_applicable: {
-                filter: { term: { 'check.result': 'not applicable' } },
+                filter: { term: { 'check.result': 'Not applicable' } },
               },
             },
           },

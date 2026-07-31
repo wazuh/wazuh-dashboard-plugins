@@ -88,7 +88,7 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_compliance_summary: 'compliance',
 
   // security_analytics
-  get_detection_rules: 'security_analytics',
+  get_rules: 'security_analytics',
   get_threat_intel_components: 'security_analytics',
 
   // free_search (escape hatch + generic ID lookup)
@@ -122,7 +122,9 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
   vulnerabilities:
     'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only.',
   fim: 'File Integrity Monitoring: current state of monitored files (path, mtime, owner, hashes).',
-  sca: 'Security Configuration Assessment (SCA) policy results.',
+  sca:
+    'Security Configuration Assessment (SCA): per-agent compliance benchmark results (e.g. CIS ' +
+    'Ubuntu), NOT Security Analytics pipeline policies.',
   mitre:
     'MITRE ATT&CK technique/tactic findings and technique-frequency summaries.',
   inventory:
@@ -131,9 +133,9 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'Compliance findings/summaries for any of 10 frameworks (PCI DSS, HIPAA, GDPR, ISO 27001, ' +
     'NIS2, NIST 800-171/800-53, FedRAMP, CMMC, TSC).',
   security_analytics:
-    'The detection ruleset and pipeline content itself — rules (name/level/status/technique) ' +
-    'and components (decoders, integrations, policies, filters, KVDBs). Configuration, NOT ' +
-    'findings that fired.',
+    'The Security Analytics ruleset and pipeline content itself — rules (name/level/status/' +
+    'technique) and components (decoders, integrations, policies, filters, KVDBs). Pipeline ' +
+    'configuration, NOT findings that fired and NOT SCA compliance benchmarks.',
   free_search:
     'Anything else about Wazuh finding/vulnerability/state data (last resort).',
   general:
