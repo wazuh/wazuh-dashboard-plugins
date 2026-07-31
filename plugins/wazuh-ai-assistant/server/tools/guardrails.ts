@@ -71,7 +71,16 @@ const MAX_TREE_DEPTH = 100;
 // separator, so `.*` would let a single match name two index patterns. Not reachable through the
 // catalog today (`index` is enum-locked at the tool-schema level), but this function is the
 // standalone boundary and must hold on its own.
-const INDEX_ALLOWLIST_RE = /^wazuh-(events-v5|findings-v5|states)[^,\s]*$/;
+//
+// `threatintel-(rules|decoders|integrations|policies|filters|kvdbs)` is enumerated explicitly,
+// NOT a bare `threatintel-[^,\s]*`: this plugin has NO tool touching `wazuh-threatintel-enrichments`
+// (228k IOC docs — deliberately out of scope, see get-detection-rules.ts/get-threat-intel-
+// components.ts's doc comments for why). This allowlist is documented as the standalone boundary
+// that must hold on its own, independent of what today's tool schemas happen to permit — opening
+// the whole prefix would silently authorize `enrichments` at this layer the day someone adds it to
+// an enum elsewhere, without anyone consciously deciding to widen it.
+const INDEX_ALLOWLIST_RE =
+  /^wazuh-(events-v5|findings-v5|states|threatintel-(rules|decoders|integrations|policies|filters|kvdbs))[^,\s]*$/;
 
 /** The escape hatch's (and every catalog tool's) index-pattern allowlist. */
 export function checkIndexAllowlist(index: string): GuardrailCheck {
@@ -79,8 +88,8 @@ export function checkIndexAllowlist(index: string): GuardrailCheck {
     return {
       ok: false,
       reason:
-        `Index "${index}" is not in the allowed set ` +
-        `(wazuh-events-v5-*, wazuh-findings-v5-*, wazuh-states-*).`,
+        `Index "${index}" is not in the allowed set (wazuh-events-v5-*, wazuh-findings-v5-*, ` +
+        `wazuh-states-*, wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*).`,
     };
   }
   return { ok: true };

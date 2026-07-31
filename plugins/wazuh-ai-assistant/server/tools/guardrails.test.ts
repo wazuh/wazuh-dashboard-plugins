@@ -563,6 +563,49 @@ test('checkIndexAllowlist: rejects a non-wazuh index', () => {
   }
 });
 
+test('checkIndexAllowlist: accepts the 6 named wazuh-threatintel-* sub-families this catalog uses', () => {
+  for (const family of [
+    'rules',
+    'decoders',
+    'integrations',
+    'policies',
+    'filters',
+    'kvdbs',
+  ]) {
+    assert.equal(
+      checkIndexAllowlist(`wazuh-threatintel-${family}*`).ok,
+      true,
+      `expected wazuh-threatintel-${family}* to be allowed`,
+    );
+  }
+});
+
+// Deliberate (ADR-1, sdd/add-SA-tools/design): no tool in this catalog touches the IOC feed, and
+// the allowlist enumerates only the 6 sub-families that are — it must NOT accept the bare
+// wazuh-threatintel-* prefix, which would silently authorize enrichments too.
+test('checkIndexAllowlist: rejects wazuh-threatintel-enrichments-* (deliberately out of scope)', () => {
+  const result = checkIndexAllowlist('wazuh-threatintel-enrichments-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(result.reason, /not in the allowed set/);
+  }
+});
+
+test('checkIndexAllowlist: rejects a bare wazuh-threatintel-* or an unrecognized sub-family', () => {
+  assert.equal(checkIndexAllowlist('wazuh-threatintel-*').ok, false);
+  assert.equal(checkIndexAllowlist('wazuh-threatintel-bogus-*').ok, false);
+});
+
+test('checkIndexAllowlist: rejects a comma-smuggled second threatintel index', () => {
+  const result = checkIndexAllowlist(
+    'wazuh-threatintel-rules-a,wazuh-threatintel-enrichments-a',
+  );
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(result.reason, /not in the allowed set/);
+  }
+});
+
 // --- applySafetyValves ------------------------------------------------------------------------
 
 test('applySafetyValves: clamps size to <= 500', () => {

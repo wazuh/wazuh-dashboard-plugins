@@ -25,6 +25,7 @@ export type RouterCategory =
   | 'mitre'
   | 'inventory'
   | 'compliance'
+  | 'security_analytics'
   | 'free_search'
   | 'general';
 
@@ -86,6 +87,10 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_compliance_alerts: 'compliance',
   get_compliance_summary: 'compliance',
 
+  // security_analytics
+  get_detection_rules: 'security_analytics',
+  get_threat_intel_components: 'security_analytics',
+
   // free_search (escape hatch + generic ID lookup)
   find_document_by_field: 'free_search',
   search_wazuh_data: 'free_search',
@@ -101,6 +106,7 @@ const CATEGORY_ORDER: RouterCategory[] = [
   'mitre',
   'inventory',
   'compliance',
+  'security_analytics',
   'free_search',
   'general',
 ];
@@ -124,6 +130,10 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
   compliance:
     'Compliance findings/summaries for any of 10 frameworks (PCI DSS, HIPAA, GDPR, ISO 27001, ' +
     'NIS2, NIST 800-171/800-53, FedRAMP, CMMC, TSC).',
+  security_analytics:
+    'The detection ruleset and pipeline content itself — rules (name/level/status/technique) ' +
+    'and components (decoders, integrations, policies, filters, KVDBs). Configuration, NOT ' +
+    'findings that fired.',
   free_search:
     'Anything else about Wazuh finding/vulnerability/state data (last resort).',
   general:

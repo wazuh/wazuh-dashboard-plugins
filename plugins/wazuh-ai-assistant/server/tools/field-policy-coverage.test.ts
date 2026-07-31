@@ -100,6 +100,20 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   'file.path',
   'file.mtime',
   'file.size',
+  // Security Analytics content (get_detection_rules, get_threat_intel_components): vendor-curated
+  // rule/pipeline configuration metadata, not analyst- or attacker-supplied data.
+  'document.name',
+  'document.level',
+  'document.status',
+  'document.enabled',
+  'document.threat.technique.id',
+  'document.tags',
+  'document.logsource.product',
+  'document.logsource.category',
+  'document.metadata.title',
+  'document.metadata.module',
+  'document.category',
+  'document.mode',
 ]);
 
 /** Replica of privacy.ts's private `resolveFieldEntry`: a tool-scoped entry ("tool/field") wins over
