@@ -10,65 +10,53 @@ import { PROVIDER_SAVED_OBJECT_TYPE } from '../../common/constants';
  * (`wazuh_ai_assistant.encryptionKey` in opensearch_dashboards.yml — see server/config.ts and
  * server/plugin.ts's setup()), with zero new npm dependencies (Node's builtin `crypto` only).
  *
- * ## Wire formats
+ * ## Wire format
  *
- * - `enc:v1:` + base64(iv[12] ‖ authTag[16] ‖ ciphertext) — AES-256-GCM, NO additional
- *   authenticated data (AAD). A pre-release format that `encrypt` never produces: it exists only
- *   so a value written by a pre-release build still decrypts (see `decrypt` below). No released
- *   version of this plugin ever wrote it, so the read path can be dropped once pre-release
- *   deployments are out of scope.
- * - `enc:v2:` + base64(iv[12] ‖ authTag[16] ‖ ciphertext) — identical AES-256-GCM construction,
- *   PLUS `cipher.setAAD(aad)`/`decipher.setAAD(aad)` binding the ciphertext to WHERE it lives:
- *   `buildAad` below derives `aad` deterministically from the saved object id the value is
- *   stored on. This closes a ciphertext-substitution / confused-deputy gap the platform
- *   precedent (OSD core's `data_source` plugin, same AES-256-GCM/IV12/TAG16 parameters) already
- *   guards against by binding its own wrapping-key name + namespace: without this binding, an
- *   `enc:v1:` blob is a bare AES-GCM ciphertext with no notion of where it belongs, so anyone able
- *   to write saved-object attributes (e.g. through a saved-objects import, a bug elsewhere, or an
- *   admin mistake) could copy provider A's encrypted `apiKey` blob into provider B's `apiKey`
- *   field and it would still decrypt there — v2's AAD makes that copy fail decryption instead
- *   (GCM auth-tag verification covers the AAD too, so a mismatched id is a hard decrypt failure,
- *   not a silent success).
+ * `enc:v1:` + base64(iv[12] ‖ authTag[16] ‖ ciphertext) — AES-256-GCM, PLUS
+ * `cipher.setAAD(aad)`/`decipher.setAAD(aad)` binding the ciphertext to WHERE it lives: `buildAad`
+ * below derives `aad` deterministically from the saved object id the value is stored on. This
+ * closes a ciphertext-substitution / confused-deputy gap the platform precedent (OSD core's
+ * `data_source` plugin, same AES-256-GCM/IV12/TAG16 parameters) already guards against by binding
+ * its own wrapping-key name + namespace: without this binding, a blob would be a bare AES-GCM
+ * ciphertext with no notion of where it belongs, so anyone able to write saved-object attributes
+ * (e.g. through a saved-objects import, a bug elsewhere, or an admin mistake) could copy provider
+ * A's encrypted `apiKey` blob into provider B's `apiKey` field and it would still decrypt there —
+ * the AAD makes that copy fail decryption instead (GCM auth-tag verification covers the AAD too,
+ * so a mismatched id is a hard decrypt failure, not a silent success).
  *
- * A fresh random 12-byte IV is generated on every encrypt call (v1 or v2, never reused); the
- * 16-byte auth tag is verified on every decrypt (tamper/corruption/wrong-AAD is a hard decrypt
- * failure, not silently accepted).
+ * A fresh random 12-byte IV is generated on every encrypt call (never reused); the 16-byte auth
+ * tag is verified on every decrypt (tamper/corruption/wrong-AAD is a hard decrypt failure, not
+ * silently accepted).
  *
  * ## The saved-object-id parameter
  *
- * Both `encrypt` and `decrypt` take a mandatory `savedObjectId: string` second parameter. For
- * `enc:v1:` values the id is UNUSED (v1 has no AAD to bind), but the
- * parameter is still required — not optional — so a caller can never forget to pass it once a
- * value becomes (or already is) `enc:v2:`. Threading a real id through in the v1 case
- * costs nothing and keeps the two methods' signatures uniform.
+ * Both `encrypt` and `decrypt` take a mandatory `savedObjectId: string` second parameter — the id
+ * the AAD is bound to (see `buildAad`). Required, not optional, so a caller can never forget to
+ * pass the real id.
  *
  * ## No-plaintext contract
  *
  * Plaintext API keys are NOT supported, in either direction: `encrypt` throws when no valid key
  * is configured (`enabled === false`) instead of passing plaintext through, and `decrypt` only
- * ever accepts `enc:v1:`/`enc:v2:` values — anything else (e.g. a plaintext key stored by a
- * pre-release build) is a hard error, never returned as a usable credential. The only sanctioned
- * exit for a stored plaintext value is server/routes/settings.ts's PUT handler, which re-encrypts
- * it as `enc:v2:` on the next write while encryption is enabled. `enc:v1:` values are NEVER
- * silently re-encrypted to v2 on read by anything in this module — the only place a v1 blob turns
- * into a v2 blob is that same explicit upgrade-on-write call site, which must decrypt the v1
- * value (plaintext now in hand) and call `encrypt` again itself; this module does not do that
- * silently inside `decrypt`.
+ * ever accepts `enc:v1:` values — anything else (e.g. a plaintext key stored by a pre-release
+ * build) is a hard error, never returned as a usable credential. A stored plaintext value has no
+ * supported exit: server/routes/settings.ts's PUT handler refuses to keep or manage it (503, same
+ * as any other write without encryption configured) — the admin must re-enter the key so it is
+ * encrypted fresh, or delete and recreate the provider.
  */
 
 const ENC_PREFIX_V1 = 'enc:v1:';
-const ENC_PREFIX_V2 = 'enc:v2:';
 const ALGORITHM = 'aes-256-gcm';
 const KEY_LENGTH_BYTES = 32;
 const IV_LENGTH_BYTES = 12;
 const AUTH_TAG_LENGTH_BYTES = 16;
 
-/** Fixed field/purpose label bound into every v2 AAD alongside the saved object id — see
+/** Fixed field/purpose label bound into every AAD alongside the saved object id — see
  * `buildAad` below. Kept as its own constant only for readability; it is never used standalone. */
 const API_KEY_ATTRIBUTE_NAME = 'apiKey';
 
 /**
- * Builds the exact AAD bytes bound into a v2 ciphertext: `<saved-object-type>:<savedObjectId>:
+ * Builds the exact AAD bytes bound into a ciphertext: `<saved-object-type>:<savedObjectId>:
  * <attribute-name>`, e.g. `wazuh-ai-assistant-provider:3f2504e0-...:apiKey`. This is the ONE place
  * that string is assembled — both `encrypt` and `decrypt` call it, so they can never disagree
  * about the exact bytes (a mismatch, even a single differing byte, is a hard GCM auth-tag failure
@@ -118,9 +106,6 @@ export class ApiKeyCipher {
    * Throws when disabled: this module never writes plaintext, so a call without a configured key
    * is a bug in the caller (routes gate on `enabled`/`requireApiKeyEncryption` first), never a
    * silent plaintext write.
-   *
-   * Always produces `enc:v2:` output — this module never writes `enc:v1:` any more,
-   * only reads it (see `decrypt`).
    */
   encrypt(plaintext: string, savedObjectId: string): string {
     if (!this.key) {
@@ -138,32 +123,28 @@ export class ApiKeyCipher {
     ]);
     const authTag = cipher.getAuthTag();
     const payload = Buffer.concat([iv, authTag, ciphertext]);
-    return `${ENC_PREFIX_V2}${payload.toString('base64')}`;
+    return `${ENC_PREFIX_V1}${payload.toString('base64')}`;
   }
 
   /**
-   * Decrypts `stored`, which must be either `enc:v2:` ciphertext (AAD checked against
-   * `savedObjectId` via `buildAad`) or `enc:v1:` ciphertext (no AAD — decrypted exactly as
-   * before this format existed). Anything else — e.g. a plaintext key stored by a pre-release
-   * build — throws: plaintext API keys are not supported and are never returned as a usable
-   * credential (re-enter the key, or let the PUT route's upgrade-on-write re-encrypt it).
-   * `savedObjectId` is REQUIRED even for the v1 path where it goes unused, so a caller
-   * can never forget to supply the real id for a value that might be (or might one day become)
-   * `enc:v2:`.
+   * Decrypts `stored`, which must be `enc:v1:` ciphertext (AAD checked against `savedObjectId` via
+   * `buildAad`). Anything else — e.g. a plaintext key stored by a pre-release build — throws:
+   * plaintext API keys are not supported and are never returned as a usable credential (re-enter
+   * the key in the Settings UI).
    *
-   * Throws if `stored` is `enc:v1:`/`enc:v2:`-prefixed ciphertext but no key is configured
+   * Throws if `stored` is `enc:v1:`-prefixed ciphertext but no key is configured
    * (`enabled === false`): that combination only happens if encryption was enabled when the value
    * was written and has since been disabled (or the key was rotated/removed) — a misconfiguration
    * worth surfacing loudly rather than silently returning garbage or the ciphertext itself as if
    * it were a usable API key.
    *
-   * Also throws — same GCM auth-tag mechanism, same non-fail-open guarantee — if an `enc:v2:`
-   * value's AAD doesn't match `savedObjectId`: this is the substitution-attack detection this
-   * format exists for. It surfaces identically to every other decrypt failure (tamper, wrong key)
-   * — never as "treated as empty key and proceed".
+   * Also throws — same GCM auth-tag mechanism, same non-fail-open guarantee — if the AAD doesn't
+   * match `savedObjectId`: this is the substitution-attack detection this format exists for. It
+   * surfaces identically to every other decrypt failure (tamper, wrong key) — never as "treated as
+   * empty key and proceed".
    */
   decrypt(stored: string, savedObjectId: string): string {
-    if (stored.startsWith(ENC_PREFIX_V2)) {
+    if (stored.startsWith(ENC_PREFIX_V1)) {
       if (!this.key) {
         throw new Error(
           'wazuhAiAssistant: encountered an encrypted provider API key but no encryptionKey is ' +
@@ -171,7 +152,7 @@ export class ApiKeyCipher {
             'the same key that was used to encrypt it, or re-enter the provider API key.',
         );
       }
-      const payload = Buffer.from(stored.slice(ENC_PREFIX_V2.length), 'base64');
+      const payload = Buffer.from(stored.slice(ENC_PREFIX_V1.length), 'base64');
       const iv = payload.subarray(0, IV_LENGTH_BYTES);
       const authTag = payload.subarray(
         IV_LENGTH_BYTES,
@@ -195,34 +176,6 @@ export class ApiKeyCipher {
       return plaintext.toString('utf8');
     }
 
-    if (stored.startsWith(ENC_PREFIX_V1)) {
-      if (!this.key) {
-        throw new Error(
-          'wazuhAiAssistant: encountered an encrypted provider API key but no encryptionKey is ' +
-            'configured (wazuh_ai_assistant.encryptionKey in opensearch_dashboards.yml). Configure ' +
-            'the same key that was used to encrypt it, or re-enter the provider API key.',
-        );
-      }
-      const payload = Buffer.from(stored.slice(ENC_PREFIX_V1.length), 'base64');
-      const iv = payload.subarray(0, IV_LENGTH_BYTES);
-      const authTag = payload.subarray(
-        IV_LENGTH_BYTES,
-        IV_LENGTH_BYTES + AUTH_TAG_LENGTH_BYTES,
-      );
-      const ciphertext = payload.subarray(
-        IV_LENGTH_BYTES + AUTH_TAG_LENGTH_BYTES,
-      );
-      const decipher = crypto.createDecipheriv(ALGORITHM, this.key, iv);
-      decipher.setAuthTag(authTag);
-      // No setAAD call: v1 never had AAD, and never will — this branch must keep decrypting every
-      // v1 blob ever written, forever, byte-for-byte as it did before v2 existed.
-      const plaintext = Buffer.concat([
-        decipher.update(ciphertext),
-        decipher.final(),
-      ]);
-      return plaintext.toString('utf8');
-    }
-
     throw new Error(
       'wazuhAiAssistant: the stored provider API key is not encrypted. Plaintext API keys are ' +
         'not supported — re-enter the provider API key in the Settings UI (with ' +
@@ -231,24 +184,10 @@ export class ApiKeyCipher {
   }
 }
 
-/** True iff `value` is ANY recognized ciphertext format this module produces (`enc:v1:` or
- * `enc:v2:`) — used by server/routes/settings.ts's PUT handler to decide whether a kept-existing
- * (not re-supplied) apiKey is still legacy plaintext (and eligible for encryption) versus already
- * encrypted in some form (and NOT eligible for a bare re-encrypt — see `isLegacyV1Encrypted` for
- * the v1-specific upgrade-on-write decision). */
+/** True iff `value` is `enc:v1:`-prefixed ciphertext — used by server/routes/settings.ts's PUT
+ * handler to decide whether a kept-existing (not re-supplied) apiKey is legacy plaintext (refused
+ * with a 503 — plaintext keys are never managed, only re-entered) versus already encrypted. */
 export function isEncrypted(value: string | undefined): boolean {
-  return (
-    typeof value === 'string' &&
-    (value.startsWith(ENC_PREFIX_V1) || value.startsWith(ENC_PREFIX_V2))
-  );
-}
-
-/** True iff `value` is specifically `enc:v1:`-prefixed (the OLD, unbound format) — used by
- * server/routes/settings.ts's PUT handler to decide whether a kept-existing apiKey should be
- * transparently upgraded to `enc:v2:` (decrypt the v1 value, re-encrypt as v2 bound to this
- * provider's id) as part of that write. Never true for `enc:v2:` values — those are never
- * "upgraded" again, there is nowhere further to go. */
-export function isLegacyV1Encrypted(value: string | undefined): boolean {
   return typeof value === 'string' && value.startsWith(ENC_PREFIX_V1);
 }
 

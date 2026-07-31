@@ -21,10 +21,9 @@ sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-key
 
 With no `encryptionKey` set, saving a provider API key is rejected — the Settings form warns
 before submit and the HTTP API refuses the write — and a warning is logged at startup. Providers
-that need no API key can still be saved. Plaintext API keys are never stored or read: a key
-stored in plaintext by an earlier pre-release build is unusable until it is re-entered (or, once
-the encryption key is configured, transparently re-encrypted the next time the provider is
-edited). Neither the key nor any derived material is ever exposed to the browser
+that need no API key can still be saved. Plaintext API keys are never stored, read, or managed: a
+key stored in plaintext by an earlier pre-release build is unusable and must be re-entered before
+the provider can be edited at all. Neither the key nor any derived material is ever exposed to the browser
 or logged. See [Security](./security.md#api-key-encryption-at-rest) for format and rotation
 caveats.
 

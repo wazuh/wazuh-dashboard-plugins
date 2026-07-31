@@ -65,80 +65,54 @@ keys, on both sides of the wire:
 Providers with no credential (the `wazuh_brain` hosted endpoint, unauthenticated local gateways
 such as Ollama) are unaffected. Stored keys are NOT readable without the encryption key either:
 plaintext API keys are not supported anywhere — a plaintext value written by a pre-release build
-fails decryption (chat and the provider connectivity test surface a clear error) until it is
-re-entered, or upgraded on write as described below.
+fails decryption (chat and the provider connectivity test surface a clear error) and is never
+managed or upgraded; it must be re-entered.
 
 ## Enabling encryption on an existing deployment
 
-Note on `enc:v1:`: this is the plugin's first release, so no released version ever wrote that
-format. It is read-only support for values written by a pre-release build, and the read path can
-be removed once pre-release deployments are out of scope.
-
 - Plaintext keys stored before encryption was enabled do NOT keep working — `ApiKeyCipher.decrypt`
-  (`server/crypto/api-key-cipher.ts`) rejects any value that is not `enc:v1:`/`enc:v2:` ciphertext,
-  so chat and the provider connectivity test fail with a clear error for such a provider until its
-  key is re-entered or upgraded on write (next bullets). While no encryption key is configured,
-  editing a provider that still holds a plaintext key is refused with the same 503 as re-supplying
-  a key (keeping it would re-store a plaintext credential); deleting it is always possible.
-- New and updated keys are encrypted once a key is configured, always in the current `enc:v2:`
-  format (see "Format" below); `encrypt()` never writes `enc:v1:`.
-- Migration on write: if you update a provider's OTHER fields (name, URL, model, default flag)
-  without resupplying its API key, and a key is now configured, the stored key is transparently
-  upgraded as part of that write:
-
-  - Legacy plaintext → encrypted (`enc:v2:`).
-  - Pre-release `enc:v1:` ciphertext → re-encrypted as `enc:v2:` (decrypt the v1 value, since the plaintext
-    is briefly in hand at that moment, then encrypt it fresh — see "v1 vs v2" below). This never
-    happens implicitly inside `decrypt()` itself; it is an explicit two-step
-    decrypt-then-encrypt done by the PUT route.
-  - Already-`enc:v2:` values are left untouched — there's nowhere further to upgrade to.
-
-  Nothing forces any of this to happen immediately for providers you never touch again — those
-  simply stay in whatever format they're in until you either edit them or re-enter their API key.
+  (`server/crypto/api-key-cipher.ts`) rejects any value that is not `enc:v1:` ciphertext, so chat
+  and the provider connectivity test fail with a clear error for such a provider until its key is
+  re-entered. A plaintext-stored key is never managed: editing ANY field of a provider that still
+  holds one is refused with the same 503 as re-supplying a key, regardless of whether an
+  encryption key is now configured — re-enter the API key (encrypting it fresh) or delete the
+  provider.
+- New and updated keys are encrypted once a key is configured (see "Format" below).
 
 ## Format
 
-### v1 vs v2
+Provider API keys are encrypted as **`enc:v1:<base64>`** using AES-256-GCM with a fresh random
+12-byte IV generated on every encrypt call and a 16-byte auth tag verified on every decrypt. The
+base64 payload is `iv (12 bytes) ‖ auth tag (16 bytes) ‖ ciphertext`.
 
-There have been two wire formats so far, both AES-256-GCM with a fresh random 12-byte IV
-generated on every encrypt call and a 16-byte auth tag verified on every decrypt:
+The GCM call additionally binds an **Additional Authenticated Data (AAD)** value:
+`wazuh-ai-assistant-provider:<saved object id>:apiKey` (built by the one shared `buildAad` helper
+in `server/crypto/api-key-cipher.ts` that both `encrypt` and `decrypt` call, so the two can never
+disagree on the exact bytes). This mirrors OSD core's own `data_source` plugin — the platform
+precedent for this exact AES-256-GCM/IV-12/tag-16 construction — which binds its own wrapping-key
+name and namespace into its ciphertexts for the same reason.
 
-- **`enc:v1:<base64>`** (original format) — the base64 payload is
-  `iv (12 bytes) ‖ auth tag (16 bytes) ‖ ciphertext`. No additional authenticated data (AAD): the
-  ciphertext carries no notion of where it is stored. **`enc:v1:` values are decrypted exactly as
-  before, forever** — this format is never removed and this plugin's `decrypt()` will keep reading
-  it indefinitely. It is simply never _written_ by `encrypt()` any more.
-- **`enc:v2:<base64>`** (current format) — same payload layout and AES-256-GCM parameters, but the
-  GCM call additionally binds an **Additional Authenticated Data (AAD)** value:
-  `wazuh-ai-assistant-provider:<saved object id>:apiKey` (built by the one shared
-  `buildAad` helper in `server/crypto/api-key-cipher.ts` that both `encrypt` and `decrypt` call, so
-  the two can never disagree on the exact bytes). This mirrors OSD core's own `data_source` plugin
-  — the platform precedent for this exact AES-256-GCM/IV-12/tag-16 construction — which binds its
-  own wrapping-key name and namespace into its ciphertexts for the same reason.
+**What this prevents:** without an AAD binding, a ciphertext blob would be bare and portable —
+anyone able to write saved-object attributes (a saved-objects import, a bug elsewhere, an admin
+mistake, or a lower-privilege actor with unexpected write access) could copy provider A's
+encrypted `apiKey` value into provider B's `apiKey` field (or any other field entirely) and it
+would still decrypt there, silently handing provider B the wrong key. Binding the AAD to the exact
+saved-object id (and a fixed `apiKey` purpose label) turns that copy into a **hard decrypt
+failure**: GCM authenticates the AAD together with the ciphertext, so a value decrypted under the
+wrong id fails auth-tag verification exactly the same way a tampered ciphertext byte would — never
+a silent, wrong-provider success. This is a ciphertext-substitution / confused-deputy defense, not
+a confidentiality feature on its own.
 
-  **What this prevents:** without an AAD binding, an `enc:v1:`-style blob is a bare, portable
-  ciphertext — anyone able to write saved-object attributes (a saved-objects import, a bug
-  elsewhere, an admin mistake, or a lower-privilege actor with unexpected write access) could copy
-  provider A's encrypted `apiKey` value into provider B's `apiKey` field (or any other field
-  entirely) and it would still decrypt there, silently handing provider B the wrong key. Binding
-  the AAD to the exact saved-object id (and a fixed `apiKey` purpose label) turns that copy into a
-  **hard decrypt failure**: GCM authenticates the AAD together with the ciphertext, so a value
-  decrypted under the wrong id fails auth-tag verification exactly the same way a tampered
-  ciphertext byte would — never a silent, wrong-provider success. This is a ciphertext-substitution
-  / confused-deputy defense, not a confidentiality change (v1 and v2 are equally confidential); it
-  is specifically about binding a ciphertext to where it belongs.
-
-Anything not starting with `enc:v1:` or `enc:v2:` is rejected by `decrypt()` — plaintext API keys
-are not supported.
+Anything not starting with `enc:v1:` is rejected by `decrypt()` — plaintext API keys are not
+supported.
 
 ### The saved-object-id parameter
 
 `ApiKeyCipher.encrypt(plaintext, savedObjectId)` and `ApiKeyCipher.decrypt(stored, savedObjectId)`
-both take the provider's saved-object id as a **mandatory** second parameter. For
-`enc:v1:` values the id goes unused (there's no AAD to bind or check), but the parameter is still
-required — never optional — so no call site can forget to supply the real id once a value is (or
-becomes) `enc:v2:`. Every call site in `server/routes/settings.ts` and `server/routes/chat.ts`
-threads the real provider id through.
+both take the provider's saved-object id as a **mandatory** second parameter — the id the AAD is
+bound to. Required, never optional, so no call site can forget to supply the real id. Every call
+site in `server/routes/settings.ts` and `server/routes/chat.ts` threads the real provider id
+through.
 
 One subtlety this created: `POST /providers` (create) needs the id to encrypt the key, but the
 saved-objects `create()` call is what normally mints that id — not available until after it
@@ -169,11 +143,9 @@ new key).
 - The key never leaves the server: it is not exposed to the browser (`exposeToBrowser: {}` in
   `server/config.ts`) and is never logged (`server/plugin.ts` logs only an ENABLED/DISABLED
   boolean).
-- `enc:v2:`'s AAD binding (see "Format" above) additionally protects against ciphertext
-  substitution: even someone able to write raw `apiKey` bytes into a saved object (bypassing this
-  plugin's own routes entirely — e.g. via a saved-objects import/restore, or a bug in an unrelated
-  code path) cannot make a copied `enc:v2:` blob from a different provider decrypt successfully.
-  A v2 value only ever decrypts under the exact saved-object id it was encrypted for; anything
-  else is a hard failure, never a silent wrong-key success. `enc:v1:` values predate this
-  protection and remain unbound — the fix here is forward-only (upgrade on write), not retroactive
-  to every v1 blob already on disk.
+- The AAD binding (see "Format" above) additionally protects against ciphertext substitution: even
+  someone able to write raw `apiKey` bytes into a saved object (bypassing this plugin's own routes
+  entirely — e.g. via a saved-objects import/restore, or a bug in an unrelated code path) cannot
+  make a copied `enc:v1:` blob from a different provider decrypt successfully. A value only ever
+  decrypts under the exact saved-object id it was encrypted for; anything else is a hard failure,
+  never a silent wrong-key success.
