@@ -134,6 +134,77 @@ describe('ProviderFormFlyout — submit error and RBAC', () => {
   });
 });
 
+describe('ProviderFormFlyout — unsaved changes confirmation', () => {
+  const dirtyTheForm = () => {
+    fireEvent.change(screen.getByLabelText(/^name$/i), {
+      target: { value: 'Draft name' },
+    });
+  };
+
+  it('asks for confirmation instead of closing when a field was modified', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    dirtyTheForm();
+    fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+
+    expect(screen.getByText(/unsubmitted changes/i)).toBeInTheDocument();
+    expect(baseProps.onClose).not.toHaveBeenCalled();
+  });
+
+  it('discards the changes and closes on an explicit "Yes, do it"', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    dirtyTheForm();
+    fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+    fireEvent.click(screen.getByRole('button', { name: /yes, do it/i }));
+
+    expect(baseProps.onClose).toHaveBeenCalled();
+  });
+
+  it('keeps the flyout and the typed values on "No, don\'t do it"', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    dirtyTheForm();
+    fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+    fireEvent.click(screen.getByRole('button', { name: /no, don't do it/i }));
+
+    expect(screen.queryByText(/unsubmitted changes/i)).not.toBeInTheDocument();
+    expect(baseProps.onClose).not.toHaveBeenCalled();
+    expect(screen.getByLabelText(/^name$/i)).toHaveValue('Draft name');
+  });
+
+  it('closes directly again once edits are reverted to the initial values', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    dirtyTheForm();
+    fireEvent.change(screen.getByLabelText(/^name$/i), {
+      target: { value: '' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+
+    expect(baseProps.onClose).toHaveBeenCalled();
+    expect(screen.queryByText(/unsubmitted changes/i)).not.toBeInTheDocument();
+  });
+
+  it('guards the flyout close button (X) too, in edit mode', () => {
+    render(
+      <ProviderFormFlyout {...baseProps} editingProvider={editingProvider} />,
+    );
+
+    fireEvent.change(screen.getByLabelText(/^model$/i), {
+      target: { value: 'gpt-4.1' },
+    });
+    fireEvent.click(
+      document.querySelector(
+        '[data-test-subj="euiFlyoutCloseButton"]',
+      ) as Element,
+    );
+
+    expect(screen.getByText(/unsubmitted changes/i)).toBeInTheDocument();
+    expect(baseProps.onClose).not.toHaveBeenCalled();
+  });
+});
+
 describe('ProviderFormFlyout — API key encryption gate', () => {
   it('shows the encryption-required callout when encryption is disabled', () => {
     render(
