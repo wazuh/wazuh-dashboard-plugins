@@ -173,7 +173,7 @@ async function sendMessage(text: string) {
   fireEvent.change(screen.getByLabelText('Chat message'), {
     target: { value: text },
   });
-  fireEvent.click(screen.getByText('Send'));
+  fireEvent.click(screen.getByRole('button', { name: 'Send' }));
   await waitFor(() => expect(mockStreamChat).toHaveBeenCalled());
 }
 
@@ -404,7 +404,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
       expect(screen.getByText('partial answer')).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByText('Stop'));
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
 
     // Stop is NOT abandonment: what streamed in stays on screen and is saved as this
     // conversation's first turn, so the next turn updates that same row instead of creating a
@@ -809,7 +809,7 @@ describe('ChatPage — interrupted turns and failed saves', () => {
       expect(screen.getByText('half an ans')).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByText('Stop'));
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
 
     await waitFor(() =>
       expect(screen.getByText('Response interrupted')).toBeInTheDocument(),
@@ -860,7 +860,7 @@ describe('ChatPage — interrupted turns and failed saves', () => {
     await waitFor(() =>
       expect(screen.getByText('half an ans')).toBeInTheDocument(),
     );
-    fireEvent.click(screen.getByText('Stop'));
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
     await waitFor(() =>
       expect(screen.getByText('Response interrupted')).toBeInTheDocument(),
     );
