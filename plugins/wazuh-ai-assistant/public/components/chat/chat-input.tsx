@@ -58,7 +58,7 @@ export const ChatInput = React.forwardRef<ChatInputHandle, ChatInputProps>(
     };
 
     return (
-      <EuiFlexGroup gutterSize='s' alignItems='flexEnd'>
+      <EuiFlexGroup gutterSize='s' alignItems='center'>
         <EuiFlexItem>
           <EuiTextArea
             inputRef={node => {

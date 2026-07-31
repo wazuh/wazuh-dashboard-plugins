@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { createBrowserHistory } from 'history';
 import { ChatPage } from './chat-page';
 import {
   ConversationRecord,
@@ -131,7 +132,9 @@ function conversationRecord(
   } as ConversationRecord;
 }
 
-function renderChatPage() {
+function renderChatPage(
+  overrides: Partial<React.ComponentProps<typeof ChatPage>> = {},
+) {
   const core = {
     http: { basePath: { prepend: (path: string) => path } },
     uiSettings: { get: () => false },
@@ -142,17 +145,28 @@ function renderChatPage() {
     overlays: { openConfirm: mockOpenConfirm },
   };
 
-  return render(
-    <ChatPage
-      core={core as never}
-      providers={[PROVIDER]}
-      providersLoaded
-      providersError={null}
-      selectedProviderId={PROVIDER.id}
-      onProviderChange={jest.fn()}
-      onNavigateToSettings={jest.fn()}
-    />,
-  );
+  const props: React.ComponentProps<typeof ChatPage> = {
+    core: core as never,
+    providers: [PROVIDER],
+    providersLoaded: true,
+    providersError: null,
+    selectedProviderId: PROVIDER.id,
+    onProviderChange: jest.fn(),
+    onNavigateToSettings: jest.fn(),
+    // A real browser history, backed by jsdom's own `window.history`/`window.location` — reads
+    // whatever path a test seeded via `window.history.replaceState` before mounting, and its own
+    // `history.replace` calls are real `replaceState`s a test can assert on via `window.location`.
+    history: createBrowserHistory() as never,
+    ...overrides,
+  };
+
+  const view = render(<ChatPage {...props} />);
+  return {
+    ...view,
+    // Re-renders with the SAME prop identities plus `next`, so only the overridden props change.
+    rerenderWith: (next: Partial<React.ComponentProps<typeof ChatPage>>) =>
+      view.rerender(<ChatPage {...props} {...next} />),
+  };
 }
 
 async function sendMessage(text: string) {
@@ -208,7 +222,11 @@ beforeEach(() => {
   jest.clearAllMocks();
   // Default: the user confirms. Tests that care about declining override this.
   mockOpenConfirm.mockResolvedValue(true);
-  window.location.hash = '';
+  // The conversation route now lives in the pathname (`/conversation/:id`, not a hash fragment —
+  // see `conversation-location.ts`), so it's reset the same way the component itself writes it:
+  // through the History API, not a direct `window.location` assignment (jsdom does not implement
+  // real navigation for that, only for pushState/replaceState-driven changes).
+  window.history.replaceState(null, '', '/');
   window.sessionStorage.clear();
   mockSettingsService.getAssistantSettings.mockResolvedValue({
     privacyDefaultOn: false,
@@ -489,8 +507,8 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 });
 
 describe('ChatPage — restoring the open conversation', () => {
-  it('restores the conversation named by the URL hash on mount', async () => {
-    window.location.hash = '#/conversation/conv-b';
+  it('restores the conversation named by the URL route on mount', async () => {
+    window.history.replaceState(null, '', '/conversation/conv-b');
 
     renderChatPage();
 
@@ -514,8 +532,8 @@ describe('ChatPage — restoring the open conversation', () => {
     expect(mockConversationsService.get).toHaveBeenCalledWith('conv-b');
   });
 
-  it('prefers the URL hash over the stored pointer', async () => {
-    window.location.hash = '#/conversation/conv-from-url';
+  it('prefers the URL route over the stored pointer', async () => {
+    window.history.replaceState(null, '', '/conversation/conv-from-url');
     window.sessionStorage.setItem(
       'wazuhAiAssistant.lastConversation',
       'conv-from-storage',
@@ -546,7 +564,7 @@ describe('ChatPage — restoring the open conversation', () => {
   });
 
   it('starts clean and forgets the pointer when the conversation is gone', async () => {
-    window.location.hash = '#/conversation/conv-gone';
+    window.history.replaceState(null, '', '/conversation/conv-gone');
     window.sessionStorage.setItem(
       'wazuhAiAssistant.lastConversation',
       'conv-gone',
@@ -568,11 +586,11 @@ describe('ChatPage — restoring the open conversation', () => {
     expect(
       window.sessionStorage.getItem('wazuhAiAssistant.lastConversation'),
     ).toBeNull();
-    expect(window.location.hash).toBe('#/');
+    expect(window.location.pathname).toBe('/');
   });
 
   it('keeps the pointer and reports the failure when the load fails for another reason', async () => {
-    window.location.hash = '#/conversation/conv-b';
+    window.history.replaceState(null, '', '/conversation/conv-b');
     window.sessionStorage.setItem(
       'wazuhAiAssistant.lastConversation',
       'conv-b',
@@ -613,7 +631,7 @@ describe('ChatPage — restoring the open conversation', () => {
     // conv-new is the id the mocked POST returns — a later reload now lands back in this
     // conversation instead of an empty chat.
     await waitFor(() =>
-      expect(window.location.hash).toBe('#/conversation/conv-new'),
+      expect(window.location.pathname).toBe('/conversation/conv-new'),
     );
     expect(
       window.sessionStorage.getItem('wazuhAiAssistant.lastConversation'),
@@ -621,7 +639,7 @@ describe('ChatPage — restoring the open conversation', () => {
   });
 
   it('clears the recorded conversation when the user starts a new one', async () => {
-    window.location.hash = '#/conversation/conv-b';
+    window.history.replaceState(null, '', '/conversation/conv-b');
 
     renderChatPage();
     await waitFor(() =>
@@ -630,10 +648,43 @@ describe('ChatPage — restoring the open conversation', () => {
 
     fireEvent.click(screen.getByText('New conversation'));
 
-    await waitFor(() => expect(window.location.hash).toBe('#/'));
+    await waitFor(() => expect(window.location.pathname).toBe('/'));
     expect(
       window.sessionStorage.getItem('wazuhAiAssistant.lastConversation'),
     ).toBeNull();
+  });
+
+  it('does not write the conversation route while the chat view is hidden', async () => {
+    window.sessionStorage.setItem(
+      'wazuhAiAssistant.lastConversation',
+      'conv-b',
+    );
+
+    renderChatPage({ isActive: false });
+
+    await waitFor(() =>
+      expect(screen.getByText('earlier question')).toBeInTheDocument(),
+    );
+    expect(window.location.pathname).toBe('/');
+  });
+
+  it('re-syncs the route when the chat view becomes active again', async () => {
+    window.sessionStorage.setItem(
+      'wazuhAiAssistant.lastConversation',
+      'conv-b',
+    );
+
+    const view = renderChatPage({ isActive: false });
+    await waitFor(() =>
+      expect(screen.getByText('earlier question')).toBeInTheDocument(),
+    );
+    expect(window.location.pathname).toBe('/');
+
+    view.rerenderWith({ isActive: true });
+
+    await waitFor(() =>
+      expect(window.location.pathname).toBe('/conversation/conv-b'),
+    );
   });
 });
 
@@ -648,7 +699,7 @@ describe('ChatPage — a resumed conversation is the same conversation', () => {
         ],
       }),
     );
-    window.location.hash = '#/conversation/conv-b';
+    window.history.replaceState(null, '', '/conversation/conv-b');
 
     renderChatPage();
 
@@ -687,7 +738,7 @@ describe('ChatPage — a resumed conversation is the same conversation', () => {
         ],
       }),
     );
-    window.location.hash = '#/conversation/conv-b';
+    window.history.replaceState(null, '', '/conversation/conv-b');
 
     renderChatPage();
 
@@ -718,7 +769,7 @@ describe('ChatPage — a resumed conversation is the same conversation', () => {
         ],
       }),
     );
-    window.location.hash = '#/conversation/conv-b';
+    window.history.replaceState(null, '', '/conversation/conv-b');
 
     renderChatPage();
     await waitFor(() =>
@@ -893,7 +944,7 @@ describe('ChatPage — interrupted turns and failed saves', () => {
         ],
       }),
     );
-    window.location.hash = '#/conversation/conv-b';
+    window.history.replaceState(null, '', '/conversation/conv-b');
 
     renderChatPage();
 
@@ -914,7 +965,7 @@ describe('ChatPage — an unanswered question is a retryable turn', () => {
         messages: [{ role: 'user', content: 'earlier question', createdAt: 1 }],
       }),
     );
-    window.location.hash = '#/conversation/conv-b';
+    window.history.replaceState(null, '', '/conversation/conv-b');
 
     renderChatPage();
 
@@ -935,7 +986,7 @@ describe('ChatPage — an unanswered question is a retryable turn', () => {
         messages: [{ role: 'user', content: 'earlier question', createdAt: 1 }],
       }),
     );
-    window.location.hash = '#/conversation/conv-b';
+    window.history.replaceState(null, '', '/conversation/conv-b');
 
     renderChatPage();
     await waitFor(() => expect(screen.getByText('Retry')).toBeInTheDocument());
@@ -1041,7 +1092,7 @@ describe('ChatPage — feedback while a turn runs', () => {
         ],
       }),
     );
-    window.location.hash = '#/conversation/conv-b';
+    window.history.replaceState(null, '', '/conversation/conv-b');
 
     renderChatPage();
 
