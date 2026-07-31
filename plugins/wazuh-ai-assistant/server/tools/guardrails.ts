@@ -74,7 +74,7 @@ const MAX_TREE_DEPTH = 100;
 //
 // `threatintel-(rules|decoders|integrations|policies|filters|kvdbs)` is enumerated explicitly,
 // NOT a bare `threatintel-[^,\s]*`: this plugin has NO tool touching `wazuh-threatintel-enrichments`
-// (228k IOC docs — deliberately out of scope, see get-detection-rules.ts/get-threat-intel-
+// (228k IOC docs — deliberately out of scope, see get-rules.ts/get-threat-intel-
 // components.ts's doc comments for why). This allowlist is documented as the standalone boundary
 // that must hold on its own, independent of what today's tool schemas happen to permit — opening
 // the whole prefix would silently authorize `enrichments` at this layer the day someone adds it to

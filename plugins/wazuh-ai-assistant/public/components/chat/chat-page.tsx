@@ -58,6 +58,7 @@ import {
 import { MessageList } from './message-list';
 import { UiChatMessage } from './message-bubble';
 import { createDiscoverUrlResolver } from './discover-link';
+import { createSecurityAnalyticsUrlResolver } from './security-analytics-link';
 import { ChatInput, ChatInputHandle } from './chat-input';
 import { ConversationList } from './conversation-list';
 import { StatusCallout } from './status-callout';
@@ -385,6 +386,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // "Open in Discover" (discover-link.tsx): built once with `core` in closure, rather than
   // threading `core` itself down through MessageList/MessageBubble/ResultTable.
   const [resolveDiscoverUrl] = useState(() => createDiscoverUrlResolver(core));
+  // "Open in Security Analytics" (security-analytics-link.tsx): same rationale as above.
+  const [resolveSecurityAnalyticsUrl] = useState(() =>
+    createSecurityAnalyticsUrlResolver(core),
+  );
 
   // Auto-scroll: `scrollPaneRef` is the right PANE — the conversation's ONE
   // true scroll container (it owns `overflowY: auto`; the chat column inside it is shrink-locked
@@ -2095,6 +2100,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     messages={messages}
                     aiAvatarUrl={aiAvatarUrl}
                     resolveDiscoverUrl={resolveDiscoverUrl}
+                    resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
                     // Withheld while generating: retrying would abandon the turn already running.
                     onRetryLastTurn={
                       isGenerating ? undefined : handleRetryLastTurn

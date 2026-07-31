@@ -123,6 +123,20 @@ export interface TableSpec {
     index: string;
     dsl: Record<string, unknown>;
   };
+  /**
+   * "Open in Security Analytics" support (result-table.tsx / security-analytics-link.tsx): only
+   * ever present for tools whose index is one of the wazuh-threatintel-* Security Analytics
+   * families (server/tools/executor.ts's `executeIndexerRequest`), which have no OSD index-pattern
+   * saved object and so never resolve a `discover` link -- this is their equivalent deep link into
+   * the actual Security Analytics app instead. `url` is already fully built (app path + hash route
+   * + `space` query param resolved from the executed result's own `space.name` values -- see
+   * executor.ts's `resolveSpace` doc comment for the mixed-space fallback rule); the client only
+   * needs to prepend the OSD basePath.
+   */
+  securityAnalyticsLink?: {
+    label: string;
+    url: string;
+  };
 }
 
 export interface StreamUsage {

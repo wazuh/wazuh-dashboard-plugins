@@ -18,6 +18,7 @@ import { i18n } from '@osd/i18n';
 import { ChatRole, TableSpec, ToolCall } from '../../../common/types';
 import { ResultTable } from './result-table';
 import { ResolveDiscoverUrl } from './discover-link';
+import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
 
 /**
  * "This turn was cut short" affordance, rendered in two places: inside an interrupted assistant
@@ -90,6 +91,9 @@ interface MessageBubbleProps {
   aiAvatarUrl: string;
   /** Threaded down to ResultTable's "Open in Discover" link; see discover-link.tsx. */
   resolveDiscoverUrl: ResolveDiscoverUrl;
+  /** Threaded down to ResultTable's "Open in Security Analytics" link; see
+   * security-analytics-link.tsx. */
+  resolveSecurityAnalyticsUrl: ResolveSecurityAnalyticsUrl;
   /**
    * Re-asks the question this interrupted answer belongs to. Absent when retrying is not possible
    * right now (another turn is generating, or this is not the conversation's last turn), in which
@@ -123,6 +127,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   message,
   aiAvatarUrl,
   resolveDiscoverUrl,
+  resolveSecurityAnalyticsUrl,
   onRetry,
 }) => {
   const isUser = message.role === 'user';
@@ -219,6 +224,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             <ResultTable
               spec={message.table}
               resolveDiscoverUrl={resolveDiscoverUrl}
+              resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
             />
           </>
         )}

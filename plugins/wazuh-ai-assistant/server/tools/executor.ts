@@ -89,10 +89,39 @@ function sanitizeError(error: unknown): string {
     : withoutCredentials;
 }
 
+/** Wazuh's own default space (the one namespace present on 4.14-migrated content, and the only one
+ * `AskUserQuestion`-confirmed choice for when a result's rows don't share a single space). */
+const DEFAULT_SECURITY_ANALYTICS_SPACE = 'standard';
+
+/**
+ * Resolves the single `space` value to use for a `buildSecurityAnalyticsLink` deep link, from the
+ * `space.name` field on each returned hit (Security Analytics content is namespaced across
+ * draft/test/custom/standard, confirmed live). A tool call's rows can span more than one space --
+ * there is no per-row link in this UI, only one per table -- so this only trusts a SINGLE distinct
+ * value found across all hits; zero or multiple distinct values (no hits, or a genuinely mixed
+ * result) falls back to `DEFAULT_SECURITY_ANALYTICS_SPACE` rather than guess which row's space the
+ * link should represent (explicit product decision, not a heuristic first-row pick).
+ */
+export function resolveSecurityAnalyticsSpace(hits: unknown): string {
+  if (!Array.isArray(hits)) {
+    return DEFAULT_SECURITY_ANALYTICS_SPACE;
+  }
+  const spaces = new Set<string>();
+  for (const hit of hits) {
+    const space = (hit as { _source?: { space?: { name?: unknown } } })?._source
+      ?.space?.name;
+    if (typeof space === 'string' && space.length > 0) {
+      spaces.add(space);
+    }
+  }
+  return spaces.size === 1 ? [...spaces][0] : DEFAULT_SECURITY_ANALYTICS_SPACE;
+}
+
 /** Executes a validated, guardrail-passed Indexer search and builds its digest + table. */
 async function executeIndexerRequest(
   toolName: string,
   indexerRequest: IndexerRequest,
+  params: Record<string, unknown>,
   context: RequestHandlerContext,
   privacy?: PrivacyContext,
 ): Promise<ToolExecutionOutcome> {
@@ -163,6 +192,15 @@ async function executeIndexerRequest(
       index: indexerRequest.index,
       dsl: (body.query as Record<string, unknown>) ?? { match_all: {} },
     };
+    if (def.buildSecurityAnalyticsLink) {
+      const space = resolveSecurityAnalyticsSpace(
+        (result as { hits?: { hits?: unknown } })?.hits?.hits,
+      );
+      const link = def.buildSecurityAnalyticsLink(params, space);
+      if (link) {
+        tableSpec.securityAnalyticsLink = link;
+      }
+    }
     return {
       // The `table` event built from `result` below is deliberately NOT run through field policy:
       // it renders locally in the browser and never reaches the model.
@@ -317,10 +355,16 @@ export function executeToolCall(
   if (!built.ok) {
     return Promise.resolve({ toolResultContent: built.toolResultContent });
   }
-  const { request: builtRequest } = built.built;
+  const { request: builtRequest, params } = built.built;
 
   if (builtRequest.target === 'indexer') {
-    return executeIndexerRequest(call.name, builtRequest, context, privacy);
+    return executeIndexerRequest(
+      call.name,
+      builtRequest,
+      params,
+      context,
+      privacy,
+    );
   }
   return executeManagerRequest(
     call.name,
