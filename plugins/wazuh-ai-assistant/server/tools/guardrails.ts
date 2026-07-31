@@ -214,6 +214,93 @@ const AGG_FIELD_ALLOWLIST = new Set([
   'policy.id',
 ]);
 
+/**
+ * Exact-match ID lookup fields shared by `find_document_by_field` (and any `term`/`terms`/`ids`
+ * query shaped the same way, including the search_wazuh_data escape hatch — see
+ * `isExactIdLookupQuery` below): high-selectivity business-level UUID fields, distinct from the
+ * OpenSearch document `_id` (handled separately via an `ids` query). Kept apart from
+ * `AGG_FIELD_ALLOWLIST` above — that allowlist gates AGGREGATION cardinality; this one gates
+ * exact-match LOOKUPS, a different safety property (a lookup on a high-cardinality field is fine,
+ * an aggregation is not).
+ */
+export const ID_FIELD_ALLOWLIST = new Set([
+  'wazuh.event.id',
+  WAZUH_FIELD.RULE_ID,
+  'vulnerability.id',
+  'event.doc_id',
+]);
+
+/** DSL clause keys an exact-match ID lookup query is allowed to be built from — see
+ * `isExactIdLookupQuery` below. `minimum_should_match` is a `bool` sibling key (not a clause of
+ * its own), handled separately in `walkExactIdLookupShape` below rather than listed here. */
+const EXACT_ID_LOOKUP_QUERY_KEYS = new Set([
+  'bool',
+  'filter',
+  'must',
+  'should',
+  'must_not',
+  'term',
+  'terms',
+  'ids',
+]);
+
+/**
+ * True when `body` is a plain exact-match lookup (`term`/`terms` on an `ID_FIELD_ALLOWLIST` field,
+ * and/or an `ids` query on `_id`), with no aggregation — the shape `find_document_by_field` builds
+ * (a `bool.should` of one `ids` clause plus a `term`/`terms` clause per applicable business
+ * field), and the reason an ID lookup has no time window to give the mandatory-time-range check.
+ * Checked on QUERY SHAPE alone (not which tool produced it), so it also exempts a hand-built
+ * search_wazuh_data query of the same shape — intentional: it only allows exact lookups on
+ * high-selectivity ID fields, not an open-ended scan.
+ */
+function isExactIdLookupQuery(body: Record<string, unknown>): boolean {
+  if (body.aggs !== undefined || body.aggregations !== undefined) {
+    return false;
+  }
+  const query = body.query;
+  return (
+    !!query &&
+    typeof query === 'object' &&
+    !Array.isArray(query) &&
+    walkExactIdLookupShape(query)
+  );
+}
+
+function walkExactIdLookupShape(node: unknown): boolean {
+  if (Array.isArray(node)) {
+    return node.every(walkExactIdLookupShape);
+  }
+  if (!node || typeof node !== 'object') {
+    return false;
+  }
+  for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+    if (key === 'minimum_should_match') {
+      continue; // A bare number sibling of `should` — nothing to validate or recurse into.
+    }
+    if (!EXACT_ID_LOOKUP_QUERY_KEYS.has(key)) {
+      return false;
+    }
+    if (key === 'ids') {
+      continue; // {ids: {values: [...]}} always targets _id — no field to check.
+    }
+    if (key === 'term' || key === 'terms') {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        return false;
+      }
+      const fields = Object.keys(value as Record<string, unknown>);
+      if (!fields.every(field => ID_FIELD_ALLOWLIST.has(field))) {
+        return false;
+      }
+      continue;
+    }
+    // bool/filter/must/should/must_not: recurse into the nested clause(s).
+    if (!walkExactIdLookupShape(value)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 const TIME_FIELD_RE = /(^|\.)(timestamp|@timestamp)$/;
 const MAX_LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
 const MAX_AGG_SIZE = 100;
@@ -408,7 +495,8 @@ export function lintDsl(
   if (
     index !== undefined &&
     TIME_BASED_INDEX_RE.test(index) &&
-    !hasTimeRange(body)
+    !hasTimeRange(body) &&
+    !isExactIdLookupQuery(body)
   ) {
     return {
       ok: false,

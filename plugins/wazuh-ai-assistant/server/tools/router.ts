@@ -86,7 +86,8 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_compliance_alerts: 'compliance',
   get_compliance_summary: 'compliance',
 
-  // free_search (escape hatch)
+  // free_search (escape hatch + generic ID lookup)
+  find_document_by_field: 'free_search',
   search_wazuh_data: 'free_search',
 };
 
