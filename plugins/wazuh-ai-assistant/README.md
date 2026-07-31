@@ -41,7 +41,7 @@ server/            Server plugin
   tools/               registry, router, executor, guardrails, digest, privacy, schema-validator
     catalog/           the 29 tool definitions
   providers/           adapter interface + 3 adapters, url-guard (SSRF), retry/stall handling
-  crypto/              api-key-cipher.ts (AES-256-GCM, enc:v1 read / enc:v2 write)
+  crypto/              api-key-cipher.ts (AES-256-GCM, enc:v1 read/write)
   saved_objects/       provider-settings, conversation, assistant-settings (all hidden types)
   prompts.ts           the system prompt
 translations/      en-US.json / es-ES.json
@@ -93,9 +93,9 @@ The full security model is documented in `docs/ref/modules/ai-assistant/security
   _resolve_ into them), redirects disabled. Loopback/RFC1918 stay reachable on purpose — that is
   where self-hosted gateways live.
 - **API keys** are never returned by any route (only a `hasApiKey` boolean), never logged, and
-  redacted from upstream error echoes. Encryption at rest is opt-in; `enc:v2` binds the ciphertext
-  to its saved object via AES-GCM AAD so a blob cannot be moved between providers. See
-  `docs/ENCRYPTION.md` — prefer the OSD keystore for the key.
+  redacted from upstream error echoes. `enc:v1` binds the ciphertext to its saved object via
+  AES-GCM AAD so a blob cannot be moved between providers. See `docs/ENCRYPTION.md` — prefer the
+  keystore for the key.
 - **Concurrency cap**: 5 in-flight chat streams per user, 30 server-wide, and per-provider stall
   timeouts (30 s to first byte, 120 s idle).
 

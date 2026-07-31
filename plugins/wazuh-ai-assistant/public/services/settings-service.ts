@@ -123,16 +123,21 @@ export class SettingsService {
    *
    * `defaultApiHostId` (client-side session auto-heal): the Manager host id to pass to
    * `session-heal.ts`'s `healManagerSession` when `administrator` is false for token reasons; `null`
-   * when the server could not resolve any configured Wazuh manager host. */
+   * when the server could not resolve any configured Wazuh manager host.
+   *
+   * `apiKeyEncryptionEnabled`: false when the server cannot encrypt keys at rest; the form then
+   * warns and blocks saving a key (the server's 503 gate is the backstop). */
   getSettingsAccess(): Promise<{
     administrator: boolean;
     message: string | null;
     defaultApiHostId: string | null;
+    apiKeyEncryptionEnabled: boolean;
   }> {
     return this.http.get<{
       administrator: boolean;
       message: string | null;
       defaultApiHostId: string | null;
+      apiKeyEncryptionEnabled: boolean;
     }>(API_PATHS.SETTINGS_ACCESS);
   }
 }
