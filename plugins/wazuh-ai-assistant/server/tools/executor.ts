@@ -48,7 +48,7 @@ function finalizeDigest(
   privacy: PrivacyContext | undefined,
   toolName: string,
   aggFields?: Record<string, string | undefined>,
-  // The escape hatch's deriveColumns can put ARBITRARY alert fields into
+  // The escape hatch's deriveColumns can put ARBITRARY finding fields into
   // the digest, so its unlisted-field default must be fail-closed (anonymize) instead of the
   // curated typed tools' allow-by-omission — see privacy.ts's applyFieldPolicy.
   isEscapeHatch = false,
@@ -113,7 +113,7 @@ async function executeIndexerRequest(
       return { toolResultContent: toolErrorContent(valved.reason) };
     }
 
-    // The vulnerability-field-on-alerts-index check in guardrails.ts's lintDsl has no per-tool
+    // The vulnerability-field-on-findings-index check in guardrails.ts's lintDsl has no per-tool
     // exemptions (the 4.14 get_solved_vulnerabilities carve-out was retired in the 5.0 port).
     const lintResult = lintDsl(valved.body, indexerRequest.index);
     if (!lintResult.ok) {

@@ -29,15 +29,16 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   // Timestamps / rule metadata (curated by the Wazuh ruleset, not analyst/attacker input).
   'timestamp',
   '@timestamp',
-  'rule.id',
-  'rule.level',
-  'rule.description',
-  'rule.mitre.technique',
+  'wazuh.rule.id',
+  'wazuh.rule.level',
+  'wazuh.rule.title',
+  'wazuh.rule.mitre.technique.id',
+  'wazuh.rule.mitre.technique.name',
   // Aggregation-bucket shape (get_top_rules and the *_summary tools).
   'key',
   'doc_count',
-  // agent.os.name / os.* / architecture / vendor / version: OS/package metadata, not identifiers.
-  'agent.os.name',
+  // os.* / architecture / vendor / version: OS/package metadata, not identifiers.
+  'wazuh.agent.host.os.name',
   'os.name',
   'os.version',
   'architecture',
@@ -166,7 +167,7 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
   assert.equal(
     isFieldCovered(
       'data.totally_new_field',
-      'get_critical_alerts',
+      'get_critical_findings',
       FIELD_POLICY_DEFAULTS,
     ),
     false,
@@ -174,11 +175,19 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
   // Sanity check the positive cases too, so a change to KNOWN_SAFE_STRUCTURAL_FIELDS/
   // FIELD_POLICY_DEFAULTS that accidentally drops an entry is itself caught here.
   assert.equal(
-    isFieldCovered('data.srcip', 'get_critical_alerts', FIELD_POLICY_DEFAULTS),
+    isFieldCovered(
+      'wazuh.agent.host.ip',
+      'get_critical_findings',
+      FIELD_POLICY_DEFAULTS,
+    ),
     true,
   );
   assert.equal(
-    isFieldCovered('rule.groups', 'get_pci_dss_alerts', FIELD_POLICY_DEFAULTS),
+    isFieldCovered(
+      'wazuh.rule.tags',
+      'get_pci_dss_findings',
+      FIELD_POLICY_DEFAULTS,
+    ),
     true,
   );
   assert.equal(

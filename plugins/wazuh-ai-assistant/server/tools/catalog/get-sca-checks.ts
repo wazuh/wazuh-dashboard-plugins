@@ -139,7 +139,7 @@ export const getScaChecksTool: ToolDefinition = {
     columns: [
       { field: 'check.id', label: 'Check ID' },
       { field: 'check.name', label: 'Check' },
-      // `check.result` is a pass/fail/not-applicable WORD, not an alert-severity level — plain
+      // `check.result` is a pass/fail/not-applicable WORD, not a finding-severity level — plain
       // column, not `severity: true` (same rationale as the 4.14 version of this tool).
       { field: 'check.result', label: 'Result' },
       { field: 'check.reason', label: 'Reason' },

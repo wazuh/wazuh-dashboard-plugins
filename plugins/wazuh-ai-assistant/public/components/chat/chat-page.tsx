@@ -113,11 +113,11 @@ const EXAMPLE_CARDS = [
     title: i18n.translate(
       'wazuhAiAssistant.chat.example.criticalAlerts.title',
       {
-        defaultMessage: 'Critical alerts',
+        defaultMessage: 'Critical findings',
       },
     ),
     question: i18n.translate('wazuhAiAssistant.chat.example.criticalAlerts', {
-      defaultMessage: 'Show me the critical alerts of the last 24 hours',
+      defaultMessage: 'Show me the critical findings of the last 24 hours',
     }),
   },
   {
@@ -1475,11 +1475,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const privacyExplainerText = privacyEnabled
     ? i18n.translate('wazuhAiAssistant.chat.privacy.explainOn', {
         defaultMessage:
-          'Privacy on: hostnames, IP addresses, usernames, process command lines, and alert/rule text are pseudonymized before being sent to the configured AI provider.',
+          'Privacy on: hostnames, IP addresses, usernames, process command lines, and finding/rule text are pseudonymized before being sent to the configured AI provider.',
       })
     : i18n.translate('wazuhAiAssistant.chat.privacy.explainOff', {
         defaultMessage:
-          'Privacy off: hostnames, IP addresses, usernames, process command lines, and alert/rule text are sent to the configured AI provider as-is.',
+          'Privacy off: hostnames, IP addresses, usernames, process command lines, and finding/rule text are sent to the configured AI provider as-is.',
       });
 
   const providerOptions = providers.map(provider => ({
@@ -1882,7 +1882,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   <p>
                     {i18n.translate('wazuhAiAssistant.chat.noProvider.body', {
                       defaultMessage:
-                        'The AI Assistant needs at least one connected provider (OpenAI-compatible, Anthropic, or the Wazuh AI Assistant brain) before it can answer questions. Add one to get started.',
+                        'The AI Assistant needs at least one connected provider (OpenAI-compatible or Anthropic) before it can answer questions. Add one to get started.',
                     })}
                   </p>
                 }
@@ -2093,13 +2093,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
             {!showLoadingState && !showNoProviderState && (
               <div style={{ position: 'sticky', bottom: 0 }}>
-                <EuiSpacer size='s' />
+                <EuiSpacer size='l' />
                 <EuiPanel
                   color='plain'
                   hasBorder
                   hasShadow={false}
                   paddingSize='s'
-                  style={{ borderRadius: 12 }}
+                  style={{ borderRadius: 12, marginBottom: 12 }}
                 >
                   <ChatInput
                     ref={chatInputRef}

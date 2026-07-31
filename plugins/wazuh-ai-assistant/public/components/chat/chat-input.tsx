@@ -58,7 +58,7 @@ export const ChatInput = React.forwardRef<ChatInputHandle, ChatInputProps>(
     };
 
     return (
-      <EuiFlexGroup gutterSize='s' alignItems='flexEnd'>
+      <EuiFlexGroup gutterSize='s' alignItems='center'>
         <EuiFlexItem>
           <EuiTextArea
             inputRef={node => {
@@ -76,7 +76,7 @@ export const ChatInput = React.forwardRef<ChatInputHandle, ChatInputProps>(
               'wazuhAiAssistant.chat.inputPlaceholder',
               {
                 defaultMessage:
-                  'Ask the AI Assistant about your security alerts...',
+                  'Ask the AI Assistant about your security findings...',
               },
             )}
             aria-label={i18n.translate('wazuhAiAssistant.chat.inputAriaLabel', {
