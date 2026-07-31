@@ -67,11 +67,7 @@ export const CONVERSATION_SAVED_OBJECT_TYPE = 'wazuh-ai-assistant-conversation';
  * never this literal string. */
 export const CONVERSATION_OWNER_FALLBACK = '_shared';
 
-export const PROVIDER_TYPES = [
-  'openai_compatible',
-  'anthropic',
-  'wazuh_brain',
-] as const;
+export const PROVIDER_TYPES = ['openai_compatible', 'anthropic'] as const;
 
 export type ProviderType = (typeof PROVIDER_TYPES)[number];
 
