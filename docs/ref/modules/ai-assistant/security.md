@@ -12,7 +12,7 @@ for it.
 
 ## Read-only by construction
 
-All 29 tools are read-only and there is no code-execution sink. Indirect prompt injection —
+All 32 tools are read-only and there is no code-execution sink. Indirect prompt injection —
 attacker-controlled text arriving through an ingested alert and being interpreted by the model —
 is bounded by the same fact: the worst it can trigger is another read the user was already
 allowed to perform. Answers are rendered through EUI's markdown component with raw HTML disabled
