@@ -109,6 +109,10 @@ interface TurnConversationTarget {
 const CONVERSATION_MAX_WIDTH = 860;
 /** Fixed width of the saved-conversations sidebar (conversation_list.tsx). */
 const CONVERSATION_SIDEBAR_WIDTH = 260;
+/** Window event announcing a conversation create/update/delete; every mounted ChatPage listens
+ * and refreshes, keeping the app shell's and the header flyout's sidebars in sync. */
+export const CONVERSATIONS_CHANGED_EVENT =
+  'wazuhAiAssistant:conversationsChanged';
 
 /**
  * Welcome-state example questions, now rendered as EuiCards (not plain badge chips) so the empty
@@ -485,9 +489,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     }
   };
 
-  // Persistent conversations: load the caller's own saved-conversation list once on mount.
-  // `refreshConversations` is also called after every create/update/delete below so the sidebar
-  // stays in sync without a full remount.
+  // Persistent conversations: load the caller's own saved-conversation list once on mount, then
+  // again on every CONVERSATIONS_CHANGED_EVENT so all mounted ChatPage instances (the app shell
+  // and the header flyout can be open at once) keep their sidebars in sync.
   const refreshConversations = () => {
     setIsLoadingConversations(true);
     conversationsService
@@ -500,8 +504,21 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       .finally(() => setIsLoadingConversations(false));
   };
 
+  // Mutations dispatch this instead of calling refreshConversations() directly: the event reaches
+  // every mounted ChatPage (including this one, synchronously), so the mutating instance refreshes
+  // exactly once and the listener never re-dispatches — no loop, no double fetch.
+  const notifyConversationsChanged = () => {
+    window.dispatchEvent(new Event(CONVERSATIONS_CHANGED_EVENT));
+  };
+
   useEffect(() => {
     refreshConversations();
+    window.addEventListener(CONVERSATIONS_CHANGED_EVENT, refreshConversations);
+    return () =>
+      window.removeEventListener(
+        CONVERSATIONS_CHANGED_EVENT,
+        refreshConversations,
+      );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -670,7 +687,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       if (activeConversationIdRef.current === id) {
         handleNewConversation();
       }
-      refreshConversations();
+      notifyConversationsChanged();
     } catch {
       setError(
         i18n.translate('wazuhAiAssistant.chat.conversations.deleteError', {
@@ -837,7 +854,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             conversationVersionRef.current = created.version;
           }
         }
-        refreshConversations();
+        notifyConversationsChanged();
         if (args.adoptAsActive) {
           setSaveFailed(false);
         }
