@@ -96,9 +96,7 @@ const CATALOG: ToolDefinition[] = [
   searchWazuhDataTool,
 ];
 
-const registry = new Map<string, ToolDefinition>(
-  CATALOG.map(tool => [tool.spec.name, tool]),
-);
+const registry = new Map<string, ToolDefinition>(CATALOG.map((tool) => [tool.spec.name, tool]));
 
 export function getToolDefinition(name: string): ToolDefinition | undefined {
   return registry.get(name);
@@ -116,5 +114,5 @@ export function listToolDefinitions(): ToolDefinition[] {
  * decided at catalog-distribution level, not by a runtime flag.
  */
 export function listToolSpecs(): ToolSpec[] {
-  return CATALOG.map(tool => tool.spec);
+  return CATALOG.map((tool) => tool.spec);
 }

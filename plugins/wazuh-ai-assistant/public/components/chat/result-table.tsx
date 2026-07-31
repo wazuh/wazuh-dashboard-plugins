@@ -15,10 +15,7 @@ import { i18n } from '@osd/i18n';
 import { TableSpec } from '../../../common/types';
 import { SeverityLevel } from '../../../common/constants';
 import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
-import {
-  ResolveSecurityAnalyticsUrl,
-  SecurityAnalyticsLink,
-} from './security-analytics-link';
+import { ResolveSecurityAnalyticsUrl, SecurityAnalyticsLink } from './security-analytics-link';
 
 /** Tables at or under this row count default to expanded (nothing to gain from collapsing them);
  * bigger ones default collapsed so a 500-row result doesn't force the user to scroll past it to
@@ -37,18 +34,12 @@ const DEFAULT_PAGE_SIZE = 25;
 const PAGE_SIZE_OPTIONS = [25, 50, 100];
 
 /** Badge color + localized label for each `SeverityLevel` word. */
-const SEVERITY_BUCKETS: Record<
-  SeverityLevel,
-  { color: string; label: string }
-> = {
+const SEVERITY_BUCKETS: Record<SeverityLevel, { color: string; label: string }> = {
   informational: {
     color: 'accent',
-    label: i18n.translate(
-      'wazuhAiAssistant.resultTable.severity.informational',
-      {
-        defaultMessage: 'Informational',
-      },
-    ),
+    label: i18n.translate('wazuhAiAssistant.resultTable.severity.informational', {
+      defaultMessage: 'Informational',
+    }),
   },
   low: {
     color: 'hollow',
@@ -86,7 +77,7 @@ function renderSeverityBadge(value: unknown): React.ReactNode {
     | { color: string; label: string }
     | undefined;
   if (!bucket) {
-    return <EuiBadge color='default'>{String(value ?? '')}</EuiBadge>;
+    return <EuiBadge color="default">{String(value ?? '')}</EuiBadge>;
   }
   return <EuiBadge color={bucket.color}>{bucket.label}</EuiBadge>;
 }
@@ -114,10 +105,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   const [expandedRowIds, setExpandedRowIds] = useState<Set<number>>(new Set());
   // Stable across re-renders of the SAME mounted table (a later spec on the same tool round would
   // still be the same accordion instance) — htmlIdGenerator is only invoked once per mount.
-  const accordionId = useMemo(
-    () => htmlIdGenerator('wzAiResultTableAccordion')(),
-    [],
-  );
+  const accordionId = useMemo(() => htmlIdGenerator('wzAiResultTableAccordion')(), []);
 
   const initiallyOpen = spec.rows.length <= AUTO_EXPAND_ROW_THRESHOLD;
   // Lazy-mount (perf): a collapsed EuiAccordion still renders its
@@ -136,7 +124,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   const toggleRow = (rowIndex: number) => {
-    setExpandedRowIds(previous => {
+    setExpandedRowIds((previous) => {
       const next = new Set(previous);
       if (next.has(rowIndex)) {
         next.delete(rowIndex);
@@ -162,10 +150,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         // the row arrives first and the old `(_value, row)` signature read `__rowId` off
         // `undefined`, throwing during render and unmounting the whole chat page (blank screen).
         // Accept both shapes so an EUI behavior change can never crash the app from here again.
-        const row = (maybeRow ?? valueOrRow) as
-          | Record<string, unknown>
-          | null
-          | undefined;
+        const row = (maybeRow ?? valueOrRow) as Record<string, unknown> | null | undefined;
         const rowIndex = Number(row?.__rowId);
         if (!Number.isFinite(rowIndex)) {
           return null;
@@ -173,23 +158,20 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         return (
           <EuiButtonIcon
             onClick={() => toggleRow(rowIndex)}
-            aria-label={i18n.translate(
-              'wazuhAiAssistant.resultTable.expandRow',
-              {
-                defaultMessage: 'Expand row',
-              },
-            )}
+            aria-label={i18n.translate('wazuhAiAssistant.resultTable.expandRow', {
+              defaultMessage: 'Expand row',
+            })}
             iconType={expandedRowIds.has(rowIndex) ? 'arrowUp' : 'arrowDown'}
           />
         );
       },
     }),
-    [expandedRowIds],
+    [expandedRowIds]
   );
 
   const fieldColumns: EuiBasicTableColumn<ResultRow>[] = useMemo(
     () =>
-      spec.columns.map(column => ({
+      spec.columns.map((column) => ({
         field: column.id,
         name: column.label,
         render:
@@ -197,12 +179,12 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
             ? (value: unknown) => renderSeverityBadge(value)
             : undefined,
       })),
-    [spec.columns, spec.severityColumn],
+    [spec.columns, spec.severityColumn]
   );
 
   const columns: EuiBasicTableColumn<ResultRow>[] = useMemo(
     () => [...fieldColumns, expanderColumn],
-    [fieldColumns, expanderColumn],
+    [fieldColumns, expanderColumn]
   );
 
   // Rebuilding a 500-entry map/array on every render (e.g. every keystroke re-render this table
@@ -213,7 +195,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     spec.rows.forEach((row, rowIndex) => {
       if (expandedRowIds.has(rowIndex)) {
         map[String(rowIndex)] = (
-          <EuiText size='s'>
+          <EuiText size="s">
             <pre>{JSON.stringify(row, null, 2)}</pre>
           </EuiText>
         );
@@ -223,9 +205,8 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   }, [spec.rows, expandedRowIds]);
 
   const items = useMemo(
-    () =>
-      spec.rows.map((row, rowIndex) => ({ ...row, __rowId: String(rowIndex) })),
-    [spec.rows],
+    () => spec.rows.map((row, rowIndex) => ({ ...row, __rowId: String(rowIndex) })),
+    [spec.rows]
   );
 
   // Pagination slice: `items` carries GLOBAL `__rowId`s assigned above (before slicing), so
@@ -234,23 +215,20 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   const pageStart = pageIndex * pageSize;
   const pagedItems = useMemo(
     () => items.slice(pageStart, pageStart + pageSize),
-    [items, pageStart, pageSize],
+    [items, pageStart, pageSize]
   );
 
   return (
     <EuiAccordion
       id={accordionId}
-      buttonContent={i18n.translate(
-        'wazuhAiAssistant.resultTable.accordionSummary',
-        {
-          defaultMessage: 'Results ({count} rows)',
-          values: { count: spec.rows.length },
-        },
-      )}
+      buttonContent={i18n.translate('wazuhAiAssistant.resultTable.accordionSummary', {
+        defaultMessage: 'Results ({count} rows)',
+        values: { count: spec.rows.length },
+      })}
       initialIsOpen={initiallyOpen}
       // Lazy-mount: flips `hasOpened` permanently true the first time the accordion is opened
       // (never reset on a later re-collapse, so the table stays mounted from then on).
-      onToggle={isOpen => {
+      onToggle={(isOpen) => {
         if (isOpen) {
           setHasOpened(true);
         }
@@ -258,13 +236,10 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
       extraAction={
         (resolveDiscoverUrl && spec.discover) ||
         (resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink) ? (
-          <EuiFlexGroup gutterSize='s' responsive={false}>
+          <EuiFlexGroup gutterSize="s" responsive={false}>
             {resolveDiscoverUrl && spec.discover ? (
               <EuiFlexItem grow={false}>
-                <DiscoverLink
-                  spec={spec}
-                  resolveDiscoverUrl={resolveDiscoverUrl}
-                />
+                <DiscoverLink spec={spec} resolveDiscoverUrl={resolveDiscoverUrl} />
               </EuiFlexItem>
             ) : null}
             {resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink ? (
@@ -292,7 +267,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
           <EuiBasicTable
             items={pagedItems}
             columns={columns}
-            itemId='__rowId'
+            itemId="__rowId"
             itemIdToExpandedRowMap={itemIdToExpandedRowMap}
             isExpandable
             hasActions
@@ -310,11 +285,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
             // valid target for the paginated arm (whose `CriteriaWithPagination` has a REQUIRED
             // `page`), satisfying the prop without depending on the exact exported type name and
             // giving `page` an explicit type (no implicit-any).
-            onChange={({
-              page,
-            }: {
-              page?: { index: number; size: number };
-            }) => {
+            onChange={({ page }: { page?: { index: number; size: number } }) => {
               if (!page) {
                 return;
               }
@@ -339,10 +310,7 @@ interface ResultTableBoundaryState {
  * are model-shaped data, so this component is the one place in the chat UI that renders content we
  * do not fully control.
  */
-class ResultTableBoundary extends React.Component<
-  ResultTableProps,
-  ResultTableBoundaryState
-> {
+class ResultTableBoundary extends React.Component<ResultTableProps, ResultTableBoundaryState> {
   constructor(props: ResultTableProps) {
     super(props);
     this.state = { hasError: false };
@@ -363,9 +331,9 @@ class ResultTableBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         <EuiCallOut
-          size='s'
-          color='warning'
-          iconType='alert'
+          size="s"
+          color="warning"
+          iconType="alert"
           title={i18n.translate('wazuhAiAssistant.resultTable.renderError', {
             defaultMessage: 'This result table could not be displayed.',
           })}

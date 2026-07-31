@@ -61,11 +61,7 @@ export interface ToolCall {
   arguments: Record<string, unknown>;
 }
 
-export type CanonicalToolChoice =
-  | 'auto'
-  | 'none'
-  | 'required'
-  | { name: string };
+export type CanonicalToolChoice = 'auto' | 'none' | 'required' | { name: string };
 
 export interface ChatMessage {
   role: ChatRole;

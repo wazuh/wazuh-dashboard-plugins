@@ -17,10 +17,7 @@ import {
 import { i18n } from '@osd/i18n';
 import { AppMountParameters, CoreStart } from '../../../../../src/core/public';
 import { ChatService } from '../../services/chat-service';
-import {
-  AssistantSettings,
-  SettingsService,
-} from '../../services/settings-service';
+import { AssistantSettings, SettingsService } from '../../services/settings-service';
 import { healManagerSession } from '../../services/session-heal';
 import { confirmInterruption } from '../../services/interrupt-confirm';
 import { ConversationsService } from '../../services/conversations-service';
@@ -115,12 +112,9 @@ const EXAMPLE_CARDS = [
   {
     id: 'criticalAlerts',
     icon: 'alert',
-    title: i18n.translate(
-      'wazuhAiAssistant.chat.example.criticalAlerts.title',
-      {
-        defaultMessage: 'Critical findings',
-      },
-    ),
+    title: i18n.translate('wazuhAiAssistant.chat.example.criticalAlerts.title', {
+      defaultMessage: 'Critical findings',
+    }),
     question: i18n.translate('wazuhAiAssistant.chat.example.criticalAlerts', {
       defaultMessage: 'Show me the critical findings of the last 24 hours',
     }),
@@ -128,18 +122,12 @@ const EXAMPLE_CARDS = [
   {
     id: 'disconnectedAgents',
     icon: 'user',
-    title: i18n.translate(
-      'wazuhAiAssistant.chat.example.disconnectedAgents.title',
-      {
-        defaultMessage: 'Disconnected agents',
-      },
-    ),
-    question: i18n.translate(
-      'wazuhAiAssistant.chat.example.disconnectedAgents',
-      {
-        defaultMessage: 'Which agents are disconnected?',
-      },
-    ),
+    title: i18n.translate('wazuhAiAssistant.chat.example.disconnectedAgents.title', {
+      defaultMessage: 'Disconnected agents',
+    }),
+    question: i18n.translate('wazuhAiAssistant.chat.example.disconnectedAgents', {
+      defaultMessage: 'Which agents are disconnected?',
+    }),
   },
   {
     id: 'bruteForce',
@@ -255,7 +243,7 @@ const CHAT_SURFACE_STYLES = `
  */
 function replaceConversationRoute(
   history: AppMountParameters['history'],
-  conversationId: string | null,
+  conversationId: string | null
 ): void {
   try {
     const { search } = history.location;
@@ -285,9 +273,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // comment for the one consolidated explanation of WHY each needs a ref mirror synced on every
   // set (persistConversationAfterTurn reads `messagesRef.current`, handleSessionExpired reads
   // `inputTextRef.current`, both from inside an async callback rather than a fresh render).
-  const [messages, updateMessages, messagesRef] = useSyncedState<
-    UiChatMessage[]
-  >([]);
+  const [messages, updateMessages, messagesRef] = useSyncedState<UiChatMessage[]>([]);
   const [inputText, setInputText, inputTextRef] = useSyncedState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -298,11 +284,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // an async stream's completion handler without waiting on a re-render).
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [isLoadingConversations, setIsLoadingConversations] = useState(false);
-  const [
-    activeConversationId,
-    setActiveConversationId,
-    activeConversationIdRef,
-  ] = useSyncedState<string | null>(null);
+  const [activeConversationId, setActiveConversationId, activeConversationIdRef] = useSyncedState<
+    string | null
+  >(null);
   // Save serialization: every auto-save is chained onto this promise instead of being dropped when
   // one is already in flight. Dropping an overlap was safe only while every save targeted the
   // conversation on screen (the next turn's save would resend the same, fuller array) — it is NOT
@@ -310,9 +294,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // `persistConversationTurn`): dropping that save would silently lose the answer the user
   // navigated away from, which is exactly what this is meant to preserve.
   const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
-  const [conversationsService] = useState(
-    () => new ConversationsService(core.http),
-  );
+  const [conversationsService] = useState(() => new ConversationsService(core.http));
 
   // Optimistic concurrency: this tab's last-known saved-object `version` for whatever
   // conversation is currently active — `undefined` for a brand-new, never-yet-saved conversation.
@@ -323,16 +305,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // Shown after a 409 version conflict was reconciled (or failed to reconcile) on the last
   // auto-save — see `saveConversationWithMerge` below. Reset whenever the user starts a fresh save
   // attempt (`handleSend`) or switches conversations, same lifecycle as `error`/`managerAuthHint`.
-  const [mergeNotice, setMergeNotice] = useState<'merged' | 'conflict' | null>(
-    null,
-  );
+  const [mergeNotice, setMergeNotice] = useState<'merged' | 'conflict' | null>(null);
 
   // Privacy mode. `assistantSettings` is loaded once on mount; `privacyEnabled` and
   // `pseudonymMap` are per-conversation state that lives only in this component's own useState.
   // Besides an unmount/remount, `handleNewConversation` is now the other trigger that resets
   // them — see its own doc comment for exactly what it clears vs. leaves alone.
-  const [assistantSettings, setAssistantSettings] =
-    useState<AssistantSettings | null>(null);
+  const [assistantSettings, setAssistantSettings] = useState<AssistantSettings | null>(null);
   const [privacyEnabled, setPrivacyEnabled] = useState(false);
   const [pseudonymMap, setPseudonymMap] = useState<PseudonymEntry[]>([]);
   // Set on the user's first manual toggle so the settings-driven default effect below stops
@@ -380,16 +359,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const chatInputRef = useRef<ChatInputHandle>(null);
   // Core ships this mark alongside every OSD build (src/core/server/core_app/assets/logos/), so
   // it is always present; served under the basePath the same way chat_service reaches the API.
-  const aiAvatarUrl = core.http.basePath.prepend(
-    '/ui/logos/wazuh_mark_on_light.svg',
-  );
+  const aiAvatarUrl = core.http.basePath.prepend('/ui/logos/wazuh_mark_on_light.svg');
   // "Open in Discover" (discover-link.tsx): built once with `core` in closure, rather than
   // threading `core` itself down through MessageList/MessageBubble/ResultTable.
   const [resolveDiscoverUrl] = useState(() => createDiscoverUrlResolver(core));
   // "Open in Security Analytics" (security-analytics-link.tsx): same rationale as above.
-  const [resolveSecurityAnalyticsUrl] = useState(() =>
-    createSecurityAnalyticsUrlResolver(core),
-  );
+  const [resolveSecurityAnalyticsUrl] = useState(() => createSecurityAnalyticsUrlResolver(core));
 
   // Auto-scroll: `scrollPaneRef` is the right PANE — the conversation's ONE
   // true scroll container (it owns `overflowY: auto`; the chat column inside it is shrink-locked
@@ -411,8 +386,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const handleScrollPane = () => {
     const pane = scrollPaneRef.current;
     if (pane) {
-      pinnedToBottomRef.current =
-        pane.scrollHeight - pane.scrollTop - pane.clientHeight < 160;
+      pinnedToBottomRef.current = pane.scrollHeight - pane.scrollTop - pane.clientHeight < 160;
     }
   };
   useEffect(() => {
@@ -442,7 +416,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // `detectManagerAuthError` heuristic below still catches whatever, if anything, is left over.
     settingsService
       .getSettingsAccess()
-      .then(access => {
+      .then((access) => {
         if (access.defaultApiHostId) {
           void healManagerSession(core.http, access.defaultApiHostId);
         }
@@ -466,7 +440,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       const restored = restoreAndClearDraft(
         window.sessionStorage,
         activeConversationIdRef.current,
-        detectNavigationType(),
+        detectNavigationType()
       );
       if (restored) {
         setInputText(restored);
@@ -482,15 +456,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // provider are both known, and never recomputed after the user's first manual toggle — switching
   // providers mid-conversation does not retroactively change an already-chosen value.
   useEffect(() => {
-    if (
-      !assistantSettings ||
-      !selectedProviderId ||
-      privacyTouchedRef.current
-    ) {
+    if (!assistantSettings || !selectedProviderId || privacyTouchedRef.current) {
       return;
     }
-    const perProviderDefault =
-      assistantSettings.privacyDefaultPerProvider[selectedProviderId];
+    const perProviderDefault = assistantSettings.privacyDefaultPerProvider[selectedProviderId];
     setPrivacyEnabled(perProviderDefault ?? assistantSettings.privacyDefaultOn);
   }, [assistantSettings, selectedProviderId]);
 
@@ -501,7 +470,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     privacyTouchedRef.current = true;
     // Applies from the NEXT message only: toggling just changes what handleSend reads on its next
     // call — nothing about already-sent turns is rewritten.
-    setPrivacyEnabled(current => !current);
+    setPrivacyEnabled((current) => !current);
   };
 
   /**
@@ -573,11 +542,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const handleSessionExpired = () => {
     setSessionExpired(true);
     try {
-      stashDraft(
-        window.sessionStorage,
-        activeConversationIdRef.current,
-        inputTextRef.current,
-      );
+      stashDraft(window.sessionStorage, activeConversationIdRef.current, inputTextRef.current);
     } catch {
       // As above: sessionStorage failures here are a lost-draft UX regression, never fatal.
     }
@@ -656,11 +621,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     setIsRestoringConversation(true);
     conversationsService
       .get(restoreId)
-      .then(record => {
+      .then((record) => {
         initialRestoreSettledRef.current = true;
         applyLoadedConversation(record);
       })
-      .catch(restoreError => {
+      .catch((restoreError) => {
         initialRestoreSettledRef.current = true;
         const status = getHttpErrorStatus(restoreError);
         if (status === 404 || status === 403) {
@@ -673,7 +638,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         setError(
           i18n.translate('wazuhAiAssistant.chat.conversations.loadError', {
             defaultMessage: 'Could not load that conversation.',
-          }),
+          })
         );
       })
       .finally(() => setIsRestoringConversation(false));
@@ -757,7 +722,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       setError(
         i18n.translate('wazuhAiAssistant.chat.conversations.loadError', {
           defaultMessage: 'Could not load that conversation.',
-        }),
+        })
       );
     }
   };
@@ -773,7 +738,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       setError(
         i18n.translate('wazuhAiAssistant.chat.conversations.deleteError', {
           defaultMessage: 'Could not delete that conversation.',
-        }),
+        })
       );
     }
   };
@@ -811,15 +776,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     title: string,
     localMessages: PersistedChatMessage[],
     expectedVersion: string | undefined,
-    reflectInUi: boolean,
+    reflectInUi: boolean
   ): Promise<ConversationRecord> => {
     try {
-      return await conversationsService.update(
-        id,
-        title,
-        localMessages,
-        expectedVersion,
-      );
+      return await conversationsService.update(id, title, localMessages, expectedVersion);
     } catch (firstError) {
       if (getHttpErrorStatus(firstError) !== 409) {
         throw firstError;
@@ -828,17 +788,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
     // 409: reconcile against whatever the server has right now.
     const serverRecord = await conversationsService.get(id);
-    const merged = mergeConversationMessages(
-      serverRecord.messages,
-      localMessages,
-    );
+    const merged = mergeConversationMessages(serverRecord.messages, localMessages);
     try {
-      const retried = await conversationsService.update(
-        id,
-        title,
-        merged,
-        serverRecord.version,
-      );
+      const retried = await conversationsService.update(id, title, merged, serverRecord.version);
       if (reflectInUi) {
         setMergeNotice('merged');
         updateMessages(reconstructUiMessages(merged));
@@ -905,7 +857,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           args.messages,
           i18n.translate('wazuhAiAssistant.chat.conversations.untitled', {
             defaultMessage: 'Untitled conversation',
-          }),
+          })
         );
         const toPersist = toPersistedMessages(args.messages, turnRecords);
         if (conversationId) {
@@ -914,14 +866,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             title,
             toPersist,
             expectedVersion,
-            args.adoptAsActive,
+            args.adoptAsActive
           );
           // Only when this IS still the active conversation: an adopted save that raced with a
           // conversation switch must not stamp its version onto the newly opened one.
-          if (
-            args.adoptAsActive &&
-            activeConversationIdRef.current === conversationId
-          ) {
+          if (args.adoptAsActive && activeConversationIdRef.current === conversationId) {
             conversationVersionRef.current = record.version;
           }
           target.version = record.version;
@@ -978,13 +927,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     outgoingMessages: ChatMessage[];
     privacyPayload: ChatRequest['privacy'];
   }) => {
-    const {
-      assistantMessageId,
-      baseMessages,
-      target,
-      outgoingMessages,
-      privacyPayload,
-    } = args;
+    const { assistantMessageId, baseMessages, target, outgoingMessages, privacyPayload } = args;
 
     setIsGenerating(true);
     const controller = new AbortController();
@@ -1000,7 +943,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // which finds nothing once the ref has been reset by a conversation switch — so an abandoned
     // turn's tool exchanges were dropped instead of saved with it.
     const turnRecord = turnHistoryRef.current.find(
-      turn => turn.assistantMessageId === assistantMessageId,
+      (turn) => turn.assistantMessageId === assistantMessageId
     );
 
     // Empty-table suppression: an empty `table` event is held back (not
@@ -1026,12 +969,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       if (!isTurnStillActive()) {
         return;
       }
-      updateMessages(current =>
-        current.map(message =>
-          message.id === assistantMessageId
-            ? { ...message, table: spec }
-            : message,
-        ),
+      updateMessages((current) =>
+        current.map((message) =>
+          message.id === assistantMessageId ? { ...message, table: spec } : message
+        )
       );
     };
 
@@ -1071,8 +1012,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       if (!isTurnStillActive()) {
         return;
       }
-      updateMessages(current =>
-        current.map(message =>
+      updateMessages((current) =>
+        current.map((message) =>
           message.id === assistantMessageId
             ? // Real content is arriving: drop any stale "querying..." status line.
               {
@@ -1080,8 +1021,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 content: message.content + text,
                 statusMessage: undefined,
               }
-            : message,
-        ),
+            : message
+        )
       );
     };
     const scheduleFlush = () => {
@@ -1105,7 +1046,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         selectedProviderId,
         outgoingMessages,
         controller.signal,
-        privacyPayload,
+        privacyPayload
       )) {
         // Ordering invariant: every non-delta event must observe `message.content` as it stands
         // AFTER every delta text that arrived strictly before it — flushing here (a no-op if
@@ -1125,24 +1066,22 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             pendingEmptyTable = undefined;
             committedTable = event.spec;
             if (isTurnStillActive()) {
-              updateMessages(current =>
-                current.map(message =>
-                  message.id === assistantMessageId
-                    ? { ...message, table: event.spec }
-                    : message,
-                ),
+              updateMessages((current) =>
+                current.map((message) =>
+                  message.id === assistantMessageId ? { ...message, table: event.spec } : message
+                )
               );
             }
           }
         } else if (event.type === 'status' && isTurnStillActive()) {
           // Transient progress line (e.g. "Querying Wazuh...") from the orchestration loop; no
           // engine emits this yet, but the bubble already knows how to show it once one does.
-          updateMessages(current =>
-            current.map(message =>
+          updateMessages((current) =>
+            current.map((message) =>
               message.id === assistantMessageId
                 ? { ...message, statusMessage: event.message }
-                : message,
-            ),
+                : message
+            )
           );
         } else if (event.type === 'tool_call') {
           // Digest-in-history bookkeeping only — never rendered as a UI message (message_bubble.tsx
@@ -1154,17 +1093,17 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           committedToolCalls = [...committedToolCalls, event.toolCall];
           if (isTurnStillActive()) {
             const toolCallsForDisplay = committedToolCalls;
-            updateMessages(current =>
-              current.map(message =>
+            updateMessages((current) =>
+              current.map((message) =>
                 message.id === assistantMessageId
                   ? { ...message, toolCalls: toolCallsForDisplay }
-                  : message,
-              ),
+                  : message
+              )
             );
           }
         } else if (event.type === 'digest') {
           const exchange = turnRecord?.toolExchanges.find(
-            entry => entry.toolCall.id === event.toolCallId,
+            (entry) => entry.toolCall.id === event.toolCallId
           );
           if (exchange) {
             exchange.digestContent = event.content;
@@ -1173,11 +1112,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           // Gated: the pseudonym map is PER-CONVERSATION state. An abandoned turn's entries used to
           // be merged into whatever conversation the user had just opened, and then sent up with
           // that conversation's next request.
-          setPseudonymMap(current => {
-            const known = new Set(current.map(entry => entry.pseudonym));
-            const additions = event.entries.filter(
-              entry => !known.has(entry.pseudonym),
-            );
+          setPseudonymMap((current) => {
+            const known = new Set(current.map((entry) => entry.pseudonym));
+            const additions = event.entries.filter((entry) => !known.has(entry.pseudonym));
             return additions.length > 0 ? [...current, ...additions] : current;
           });
         } else if (event.type === 'done') {
@@ -1197,15 +1134,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           }
           // Drop the assistant placeholder if no content ever arrived for it; keep it if
           // partial deltas (or a table) already streamed in before the error happened.
-          updateMessages(current =>
+          updateMessages((current) =>
             current.filter(
-              message =>
-                !(
-                  message.id === assistantMessageId &&
-                  message.content === '' &&
-                  !message.table
-                ),
-            ),
+              (message) =>
+                !(message.id === assistantMessageId && message.content === '' && !message.table)
+            )
           );
         } else if (event.type === 'auth_expired') {
           // Session-expiry recovery UX: a genuine 401 on the chat POST itself, distinct
@@ -1219,15 +1152,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           if (!isTurnStillActive()) {
             continue;
           }
-          updateMessages(current =>
+          updateMessages((current) =>
             current.filter(
-              message =>
-                !(
-                  message.id === assistantMessageId &&
-                  message.content === '' &&
-                  !message.table
-                ),
-            ),
+              (message) =>
+                !(message.id === assistantMessageId && message.content === '' && !message.table)
+            )
           );
         }
       }
@@ -1247,29 +1176,23 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         // conversation. Nothing here touches shared state — `abandonActiveStream` already reset
         // `isGenerating` and `abortControllerRef` at the moment of abandonment.
         const abandonedTranscript = baseMessages
-          .map(message =>
+          .map((message) =>
             message.id === assistantMessageId
               ? {
                   ...message,
                   content: accumulatedContent,
                   table: committedTable,
-                  ...(committedToolCalls.length > 0
-                    ? { toolCalls: committedToolCalls }
-                    : {}),
+                  ...(committedToolCalls.length > 0 ? { toolCalls: committedToolCalls } : {}),
                   isStreaming: false,
                   ...(turnCompleted ? {} : { interrupted: true }),
                 }
-              : message,
+              : message
           )
           // Same rule the `error` branch applies to the visible list: an assistant placeholder that
           // never received anything is not worth persisting.
           .filter(
-            message =>
-              !(
-                message.id === assistantMessageId &&
-                message.content === '' &&
-                !message.table
-              ),
+            (message) =>
+              !(message.id === assistantMessageId && message.content === '' && !message.table)
           );
         void persistConversationTurn({
           adoptAsActive: false,
@@ -1283,16 +1206,16 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         if (detectManagerAuthError(accumulatedContent)) {
           setManagerAuthHint(true);
         }
-        updateMessages(current =>
-          current.map(message =>
+        updateMessages((current) =>
+          current.map((message) =>
             message.id === assistantMessageId
               ? {
                   ...message,
                   isStreaming: false,
                   ...(turnCompleted ? {} : { interrupted: true }),
                 }
-              : message,
-          ),
+              : message
+          )
         );
         setIsGenerating(false);
         abortControllerRef.current = null;
@@ -1337,14 +1260,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
     // Built from turnHistoryRef BEFORE this turn's own (still-empty) record is registered below, so
     // it only ever reflects PRIOR completed turns — see buildOutgoingMessages's doc comment.
-    const outgoingMessages = buildOutgoingMessages(
-      history,
-      turnHistoryRef.current,
-    );
-    turnHistoryRef.current = [
-      ...turnHistoryRef.current,
-      { assistantMessageId, toolExchanges: [] },
-    ];
+    const outgoingMessages = buildOutgoingMessages(history, turnHistoryRef.current);
+    turnHistoryRef.current = [...turnHistoryRef.current, { assistantMessageId, toolExchanges: [] }];
 
     // Sending always snaps the pane to the new turn, even if the user had scrolled up — the one
     // case where overriding their scroll position is what they expect (see pinnedToBottomRef).
@@ -1382,9 +1299,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     if (!selectedProviderId) {
       setError(
         i18n.translate('wazuhAiAssistant.chat.noProviderError', {
-          defaultMessage:
-            'Configure a provider in the Settings tab before starting a chat.',
-        }),
+          defaultMessage: 'Configure a provider in the Settings tab before starting a chat.',
+        })
       );
       return;
     }
@@ -1423,8 +1339,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // itself (Stop, or leaving while the page stayed alive). A trailing USER message is the harder
     // case: a reload or a navigation killed the page mid-answer, so nothing was left running to mark
     // anything — the question was saved before generating started and that is all there is.
-    const isInterruptedAnswer =
-      last.role === 'assistant' && last.interrupted === true;
+    const isInterruptedAnswer = last.role === 'assistant' && last.interrupted === true;
     if (!isInterruptedAnswer && last.role !== 'user') {
       return;
     }
@@ -1434,7 +1349,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     }
     // The dropped answer's tool exchanges go with it: they belong to a turn that is being replaced.
     turnHistoryRef.current = turnHistoryRef.current.filter(
-      turn => turn.assistantMessageId !== last.id,
+      (turn) => turn.assistantMessageId !== last.id
     );
     setError(null);
     setManagerAuthHint(false);
@@ -1451,8 +1366,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // spinner, so a reload lands on "loading" and then the transcript, instead of flashing the
   // welcome state at a user who is not starting from scratch.
   const showLoadingState = !providersLoaded || isRestoringConversation;
-  const showWelcomeState =
-    hasProviders && messages.length === 0 && !showLoadingState;
+  const showWelcomeState = hasProviders && messages.length === 0 && !showLoadingState;
 
   const privacyBadgeLabel = privacyEnabled
     ? i18n.translate('wazuhAiAssistant.chat.privacy.on', {
@@ -1499,7 +1413,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           'Privacy off: hostnames, IP addresses, usernames, process command lines, and finding/rule text are sent to the configured AI provider as-is.',
       });
 
-  const providerOptions = providers.map(provider => ({
+  const providerOptions = providers.map((provider) => ({
     value: provider.id,
     text: provider.isDefault
       ? i18n.translate('wazuhAiAssistant.chat.providerOptionDefault', {
@@ -1549,11 +1463,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         {/* Left pane: saved-conversations sidebar. EuiPanel color="subdued" gives the standard OSD
           "sunken" pane background without inventing a new hardcoded color. */}
         <EuiPanel
-          color='subdued'
+          color="subdued"
           hasShadow={false}
           hasBorder={false}
-          borderRadius='none'
-          paddingSize='m'
+          borderRadius="none"
+          paddingSize="m"
           // EuiPanel's `grow` prop DEFAULTS TO TRUE (flex-grow:1), which in this flex-row parent
           // overrode the fixed width below and let the sidebar swallow half the page. A
           // fixed-width pane must explicitly opt out.
@@ -1583,15 +1497,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             // (`handleSelectConversation` returns immediately), so asking to confirm an interruption
             // that was never going to happen only trains the user to dismiss the dialog. The check
             // has to happen here, before the gate, not only inside the handler behind it.
-            onSelect={id => {
+            onSelect={(id) => {
               if (id === activeConversationIdRef.current) {
                 return;
               }
               void confirmIfGenerating(() => void handleSelectConversation(id));
             }}
-            onNewConversation={() =>
-              void confirmIfGenerating(handleNewConversation)
-            }
+            onNewConversation={() => void confirmIfGenerating(handleNewConversation)}
             onDelete={handleDeleteConversation}
           />
         </EuiPanel>
@@ -1651,37 +1563,31 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 {/* Grouped toolbar strip: the provider select + privacy badge read as one
                       intentional control cluster instead of two floating controls. */}
                 <EuiPanel
-                  color='subdued'
+                  color="subdued"
                   hasShadow={false}
                   hasBorder={false}
-                  paddingSize='s'
+                  paddingSize="s"
                   style={{ borderRadius: 10 }}
                 >
                   <EuiFlexGroup
-                    justifyContent='flexEnd'
-                    alignItems='center'
-                    gutterSize='s'
+                    justifyContent="flexEnd"
+                    alignItems="center"
+                    gutterSize="s"
                     responsive={false}
                   >
                     <EuiFlexItem grow={false}>
                       <EuiSelect
-                        id='wzAiAssistantProviderSelect'
+                        id="wzAiAssistantProviderSelect"
                         compressed
-                        prepend={i18n.translate(
-                          'wazuhAiAssistant.chat.providerLabel',
-                          {
-                            defaultMessage: 'Provider',
-                          },
-                        )}
+                        prepend={i18n.translate('wazuhAiAssistant.chat.providerLabel', {
+                          defaultMessage: 'Provider',
+                        })}
                         options={providerOptions}
                         value={selectedProviderId}
-                        onChange={event => onProviderChange(event.target.value)}
-                        aria-label={i18n.translate(
-                          'wazuhAiAssistant.chat.providerSelect',
-                          {
-                            defaultMessage: 'Provider',
-                          },
-                        )}
+                        onChange={(event) => onProviderChange(event.target.value)}
+                        aria-label={i18n.translate('wazuhAiAssistant.chat.providerSelect', {
+                          defaultMessage: 'Provider',
+                        })}
                       />
                     </EuiFlexItem>
                     {assistantSettings && (
@@ -1690,12 +1596,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                           privacyBadge
                         ) : (
                           <EuiToolTip
-                            content={i18n.translate(
-                              'wazuhAiAssistant.chat.privacy.adminSet',
-                              {
-                                defaultMessage: 'Set by administrator',
-                              },
-                            )}
+                            content={i18n.translate('wazuhAiAssistant.chat.privacy.adminSet', {
+                              defaultMessage: 'Set by administrator',
+                            })}
                           >
                             {privacyBadge}
                           </EuiToolTip>
@@ -1709,22 +1612,21 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                               change, the badge's own on/off state and click handling are untouched
                               above. */}
                         <EuiIconTip
-                          type='iInCircle'
-                          color='subdued'
+                          type="iInCircle"
+                          color="subdued"
                           content={privacyExplainerText}
                           aria-label={i18n.translate(
                             'wazuhAiAssistant.chat.privacy.explainAriaLabel',
                             {
-                              defaultMessage:
-                                'What privacy mode does to your data',
-                            },
+                              defaultMessage: 'What privacy mode does to your data',
+                            }
                           )}
                         />
                       </EuiFlexItem>
                     )}
                   </EuiFlexGroup>
                 </EuiPanel>
-                <EuiSpacer size='m' />
+                <EuiSpacer size="m" />
               </>
             )}
 
@@ -1733,29 +1635,23 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 title={i18n.translate('wazuhAiAssistant.chat.errorTitle', {
                   defaultMessage: 'Something went wrong',
                 })}
-                color='danger'
-                iconType='alert'
+                color="danger"
+                iconType="alert"
                 body={error ?? providersError}
               />
             )}
 
             {managerAuthHint && (
               <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.managerAuthHint.title',
-                  {
-                    defaultMessage: 'Your Wazuh session may have expired',
-                  },
-                )}
-                color='warning'
-                iconType='alert'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.managerAuthHint.body',
-                  {
-                    defaultMessage:
-                      'A request to the Wazuh manager failed, which can happen when your dashboard session token has expired. Reload the page and sign in again, then retry your question.',
-                  },
-                )}
+                title={i18n.translate('wazuhAiAssistant.chat.managerAuthHint.title', {
+                  defaultMessage: 'Your Wazuh session may have expired',
+                })}
+                color="warning"
+                iconType="alert"
+                body={i18n.translate('wazuhAiAssistant.chat.managerAuthHint.body', {
+                  defaultMessage:
+                    'A request to the Wazuh manager failed, which can happen when your dashboard session token has expired. Reload the page and sign in again, then retry your question.',
+                })}
               />
             )}
 
@@ -1765,33 +1661,20 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   user reloads, per this fix's brief. */}
             {sessionExpired && (
               <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.sessionExpired.title',
-                  {
-                    defaultMessage: 'Your session expired',
-                  },
-                )}
-                color='danger'
-                iconType='lock'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.sessionExpired.body',
-                  {
-                    defaultMessage:
-                      'Reload the page to sign in again. Your unsent message has been saved and will be restored automatically.',
-                  },
-                )}
+                title={i18n.translate('wazuhAiAssistant.chat.sessionExpired.title', {
+                  defaultMessage: 'Your session expired',
+                })}
+                color="danger"
+                iconType="lock"
+                body={i18n.translate('wazuhAiAssistant.chat.sessionExpired.body', {
+                  defaultMessage:
+                    'Reload the page to sign in again. Your unsent message has been saved and will be restored automatically.',
+                })}
                 action={
-                  <EuiButton
-                    size='s'
-                    color='danger'
-                    onClick={() => window.location.reload()}
-                  >
-                    {i18n.translate(
-                      'wazuhAiAssistant.chat.sessionExpired.reloadButton',
-                      {
-                        defaultMessage: 'Reload page',
-                      },
-                    )}
+                  <EuiButton size="s" color="danger" onClick={() => window.location.reload()}>
+                    {i18n.translate('wazuhAiAssistant.chat.sessionExpired.reloadButton', {
+                      defaultMessage: 'Reload page',
+                    })}
                   </EuiButton>
                 }
               />
@@ -1803,21 +1686,15 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   is fully usable either way, this is purely informational. */}
             {mergeNotice === 'merged' && (
               <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.mergedNotice.title',
-                  {
-                    defaultMessage: 'Conversation merged',
-                  },
-                )}
-                color='warning'
-                iconType='alert'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.mergedNotice.body',
-                  {
-                    defaultMessage:
-                      'This conversation was also updated in another tab — the versions were merged.',
-                  },
-                )}
+                title={i18n.translate('wazuhAiAssistant.chat.conversations.mergedNotice.title', {
+                  defaultMessage: 'Conversation merged',
+                })}
+                color="warning"
+                iconType="alert"
+                body={i18n.translate('wazuhAiAssistant.chat.conversations.mergedNotice.body', {
+                  defaultMessage:
+                    'This conversation was also updated in another tab — the versions were merged.',
+                })}
               />
             )}
 
@@ -1827,16 +1704,16 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   'wazuhAiAssistant.chat.conversations.mergeConflictNotice.title',
                   {
                     defaultMessage: 'Could not merge automatically',
-                  },
+                  }
                 )}
-                color='warning'
-                iconType='alert'
+                color="warning"
+                iconType="alert"
                 body={i18n.translate(
                   'wazuhAiAssistant.chat.conversations.mergeConflictNotice.body',
                   {
                     defaultMessage:
                       'This conversation is being edited in another tab and the changes could not be merged automatically. Your latest messages are still shown here, but they may not be saved.',
-                  },
+                  }
                 )}
               />
             )}
@@ -1847,39 +1724,26 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 this as soon as one succeeds. */}
             {saveFailed && (
               <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.saveFailed.title',
-                  {
-                    defaultMessage: 'This conversation is not being saved',
-                  },
-                )}
-                color='warning'
-                iconType='alert'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.saveFailed.body',
-                  {
-                    defaultMessage:
-                      'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
-                  },
-                )}
+                title={i18n.translate('wazuhAiAssistant.chat.conversations.saveFailed.title', {
+                  defaultMessage: 'This conversation is not being saved',
+                })}
+                color="warning"
+                iconType="alert"
+                body={i18n.translate('wazuhAiAssistant.chat.conversations.saveFailed.body', {
+                  defaultMessage:
+                    'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
+                })}
               />
             )}
 
             {showLoadingState && (
-              <EuiFlexGroup
-                justifyContent='center'
-                alignItems='center'
-                style={{ minHeight: 240 }}
-              >
+              <EuiFlexGroup justifyContent="center" alignItems="center" style={{ minHeight: 240 }}>
                 <EuiFlexItem grow={false}>
                   <EuiLoadingSpinner
-                    size='xl'
-                    aria-label={i18n.translate(
-                      'wazuhAiAssistant.common.loading',
-                      {
-                        defaultMessage: 'Loading...',
-                      },
-                    )}
+                    size="xl"
+                    aria-label={i18n.translate('wazuhAiAssistant.common.loading', {
+                      defaultMessage: 'Loading...',
+                    })}
                   />
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -1887,7 +1751,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
 
             {showNoProviderState && (
               <EuiEmptyPrompt
-                iconType='machineLearningApp'
+                iconType="machineLearningApp"
                 title={
                   <h2>
                     {i18n.translate('wazuhAiAssistant.chat.noProvider.title', {
@@ -1904,11 +1768,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   </p>
                 }
                 actions={
-                  <EuiButton
-                    color='primary'
-                    fill
-                    onClick={onNavigateToSettings}
-                  >
+                  <EuiButton color="primary" fill onClick={onNavigateToSettings}>
                     {i18n.translate('wazuhAiAssistant.chat.noProvider.action', {
                       defaultMessage: 'Add a provider',
                     })}
@@ -1946,12 +1806,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     // resolved Wazuh-blue accent (see CHAT_SURFACE_STYLES); wzHeroIcon just needs
                     // z-index above it, which the class provides via `position: relative`.
                     icon={
-                      <div className='wzHeroIconWrap'>
-                        <div className='wzHeroWash' aria-hidden='true' />
+                      <div className="wzHeroIconWrap">
+                        <div className="wzHeroWash" aria-hidden="true" />
                         <img
                           src={aiAvatarUrl}
-                          alt=''
-                          className='wzHeroIcon'
+                          alt=""
+                          className="wzHeroIcon"
                           style={{ height: 76 }}
                         />
                       </div>
@@ -1976,24 +1836,21 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     }
                     body={
                       <p style={{ fontSize: 16, lineHeight: 1.5, margin: 0 }}>
-                        {i18n.translate(
-                          'wazuhAiAssistant.chat.welcome.subtitle',
-                          {
-                            defaultMessage:
-                              'Ask questions about your security data in plain language.',
-                          },
-                        )}
+                        {i18n.translate('wazuhAiAssistant.chat.welcome.subtitle', {
+                          defaultMessage:
+                            'Ask questions about your security data in plain language.',
+                        })}
                       </p>
                     }
                   />
-                  <EuiSpacer size='l' />
+                  <EuiSpacer size="l" />
                   {/* Same existing "Try one of these..." string, now reads as a small
                         section label introducing the cards rather than a second full
                         paragraph competing with the subtitle above. Moved out of
                         EuiEmptyPrompt's body (along with the card row below) so the row is
                         no longer clamped to the empty prompt's ~576px content width — it now
                         spans the full ~860px chat column instead of wrapping 2+1. */}
-                  <EuiText size='s' color='subdued'>
+                  <EuiText size="s" color="subdued">
                     <p
                       style={{
                         margin: 0,
@@ -2005,12 +1862,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                       }}
                     >
                       {i18n.translate('wazuhAiAssistant.chat.welcome.body', {
-                        defaultMessage:
-                          'Try one of these, or type your own question below.',
+                        defaultMessage: 'Try one of these, or type your own question below.',
                       })}
                     </p>
                   </EuiText>
-                  <EuiSpacer size='s' />
+                  <EuiSpacer size="s" />
                   {/* Elevated example cards (EuiPanel, not EuiCard): a titleSize="xs"-style
                         compact EuiCard is not a reliably typed prop in this EUI version and
                         EuiCard's fixed layout paddings still read oversized at "s"/horizontal
@@ -2020,24 +1876,15 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         fade/slide-in on mount driven by each card's own --wzCardDelay.
                         Clicking still only fills the input (unchanged setInputText call),
                         never auto-sends. */}
-                  <EuiFlexGroup
-                    gutterSize='m'
-                    wrap
-                    justifyContent='center'
-                    responsive={false}
-                  >
+                  <EuiFlexGroup gutterSize="m" wrap justifyContent="center" responsive={false}>
                     {EXAMPLE_CARDS.map((card, index) => (
-                      <EuiFlexItem
-                        grow={1}
-                        key={card.id}
-                        style={{ minWidth: 220, maxWidth: 280 }}
-                      >
+                      <EuiFlexItem grow={1} key={card.id} style={{ minWidth: 220, maxWidth: 280 }}>
                         <EuiPanel
-                          paddingSize='m'
+                          paddingSize="m"
                           hasShadow={false}
                           hasBorder
                           onClick={() => setInputText(card.question)}
-                          className='wzHeroCard'
+                          className="wzHeroCard"
                           style={
                             {
                               textAlign: 'left',
@@ -2063,17 +1910,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                               background: 'rgba(var(--wzAccentRgb), 0.12)',
                             }}
                           >
-                            <EuiIcon
-                              type={card.icon}
-                              size='m'
-                              color='primary'
-                            />
+                            <EuiIcon type={card.icon} size="m" color="primary" />
                           </div>
-                          <EuiSpacer size='s' />
-                          <EuiText size='s'>
+                          <EuiSpacer size="s" />
+                          <EuiText size="s">
                             <strong>{card.title}</strong>
                           </EuiText>
-                          <EuiText size='xs' color='subdued'>
+                          <EuiText size="xs" color="subdued">
                             <p
                               style={{
                                 overflow: 'hidden',
@@ -2089,34 +1932,30 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                       </EuiFlexItem>
                     ))}
                   </EuiFlexGroup>
-                  <EuiSpacer size='l' />
+                  <EuiSpacer size="l" />
                 </>
               )}
 
-              {!showLoadingState &&
-                !showNoProviderState &&
-                !showWelcomeState && (
-                  <MessageList
-                    messages={messages}
-                    aiAvatarUrl={aiAvatarUrl}
-                    resolveDiscoverUrl={resolveDiscoverUrl}
-                    resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
-                    // Withheld while generating: retrying would abandon the turn already running.
-                    onRetryLastTurn={
-                      isGenerating ? undefined : handleRetryLastTurn
-                    }
-                  />
-                )}
+              {!showLoadingState && !showNoProviderState && !showWelcomeState && (
+                <MessageList
+                  messages={messages}
+                  aiAvatarUrl={aiAvatarUrl}
+                  resolveDiscoverUrl={resolveDiscoverUrl}
+                  resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+                  // Withheld while generating: retrying would abandon the turn already running.
+                  onRetryLastTurn={isGenerating ? undefined : handleRetryLastTurn}
+                />
+              )}
             </div>
 
             {!showLoadingState && !showNoProviderState && (
               <div style={{ position: 'sticky', bottom: 0 }}>
-                <EuiSpacer size='l' />
+                <EuiSpacer size="l" />
                 <EuiPanel
-                  color='plain'
+                  color="plain"
                   hasBorder
                   hasShadow={false}
-                  paddingSize='s'
+                  paddingSize="s"
                   style={{ borderRadius: 12, marginBottom: 12 }}
                 >
                   <ChatInput

@@ -4,7 +4,7 @@ import { CoreStart } from '../../../../../src/core/public';
 import { TableSpec } from '../../../common/types';
 
 export type ResolveSecurityAnalyticsUrl = (
-  spec: TableSpec,
+  spec: TableSpec
 ) => { label: string; url: string } | null;
 
 /**
@@ -15,9 +15,7 @@ export type ResolveSecurityAnalyticsUrl = (
  * see its doc comment in common/types.ts) -- no saved-object lookup is needed, so this is a plain
  * synchronous function rather than a Promise-returning one.
  */
-export function createSecurityAnalyticsUrlResolver(
-  core: CoreStart,
-): ResolveSecurityAnalyticsUrl {
+export function createSecurityAnalyticsUrlResolver(core: CoreStart): ResolveSecurityAnalyticsUrl {
   return (spec: TableSpec) => {
     if (!spec.securityAnalyticsLink) {
       return null;
@@ -51,11 +49,11 @@ export const SecurityAnalyticsLink: React.FC<SecurityAnalyticsLinkProps> = ({
 
   return (
     <EuiButtonEmpty
-      size='xs'
-      iconType='popout'
+      size="xs"
+      iconType="popout"
       href={resolved.url}
-      target='_blank'
-      rel='noopener noreferrer'
+      target="_blank"
+      rel="noopener noreferrer"
     >
       {resolved.label}
     </EuiButtonEmpty>

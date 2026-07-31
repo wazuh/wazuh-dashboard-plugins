@@ -74,7 +74,7 @@ export interface ToolDefinition {
    */
   buildSecurityAnalyticsLink?(
     params: Record<string, unknown>,
-    space: string,
+    space: string
   ): { label: string; url: string } | undefined;
   /**
    * Opt-in escape hatch (currently only `search_wazuh_data`): when true, `tableSpec.columns` and

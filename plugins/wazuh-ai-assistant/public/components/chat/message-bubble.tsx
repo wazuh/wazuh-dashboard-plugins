@@ -26,18 +26,11 @@ import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
  * reload or a navigation mid-answer kills the page before anything can mark the assistant message,
  * so the only evidence left is a conversation that ends with an unanswered question.
  */
-export const InterruptedTurnNotice: React.FC<{ onRetry?: () => void }> = ({
-  onRetry,
-}) => (
-  <EuiFlexGroup
-    gutterSize='s'
-    alignItems='center'
-    responsive={false}
-    justifyContent='flexStart'
-  >
+export const InterruptedTurnNotice: React.FC<{ onRetry?: () => void }> = ({ onRetry }) => (
+  <EuiFlexGroup gutterSize="s" alignItems="center" responsive={false} justifyContent="flexStart">
     <EuiFlexItem grow={false}>
-      <EuiText size='xs'>
-        <EuiTextColor color='subdued'>
+      <EuiText size="xs">
+        <EuiTextColor color="subdued">
           {i18n.translate('wazuhAiAssistant.chat.interrupted', {
             defaultMessage: 'Response interrupted',
           })}
@@ -46,12 +39,7 @@ export const InterruptedTurnNotice: React.FC<{ onRetry?: () => void }> = ({
     </EuiFlexItem>
     {onRetry && (
       <EuiFlexItem grow={false}>
-        <EuiButtonEmpty
-          size='xs'
-          flush='both'
-          iconType='refresh'
-          onClick={onRetry}
-        >
+        <EuiButtonEmpty size="xs" flush="both" iconType="refresh" onClick={onRetry}>
           {i18n.translate('wazuhAiAssistant.chat.retry', {
             defaultMessage: 'Retry',
           })}
@@ -131,8 +119,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   onRetry,
 }) => {
   const isUser = message.role === 'user';
-  const isWaitingForFirstToken =
-    !isUser && message.isStreaming === true && message.content === '';
+  const isWaitingForFirstToken = !isUser && message.isStreaming === true && message.content === '';
   // 'accent' rendered pink in this EUI theme, which reads off-brand for Wazuh; 'subdued' is a
   // neutral grey that still visually separates the user bubble from the assistant's 'plain'.
   const panelColor = isUser ? 'subdued' : 'plain';
@@ -141,9 +128,9 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   // like the brand mark in the dashboard chrome, instead of EUI's auto-assigned name color.
   const avatar = isUser ? (
     <EuiAvatar
-      size='m'
-      iconType='user'
-      color='plain'
+      size="m"
+      iconType="user"
+      color="plain"
       name={i18n.translate('wazuhAiAssistant.chat.userAvatarName', {
         defaultMessage: 'You',
       })}
@@ -154,9 +141,9 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
     // name="AI" still backs the aria-label/title and would be the initials shown if this prop
     // were ever removed.
     <EuiAvatar
-      size='m'
+      size="m"
       imageUrl={aiAvatarUrl}
-      color='plain'
+      color="plain"
       name={i18n.translate('wazuhAiAssistant.chat.aiAvatarName', {
         defaultMessage: 'AI',
       })}
@@ -174,7 +161,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           surface's rounding. */}
       <EuiPanel
         color={panelColor}
-        paddingSize='m'
+        paddingSize="m"
         hasShadow={!isUser}
         hasBorder={isUser}
         style={{ borderRadius: 14 }}
@@ -191,13 +178,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
                 }
               : {})}
           >
-            <EuiText size='s'>
+            <EuiText size="s">
               {/* Shown only before real content has arrived; a delta event clears statusMessage. */}
               {message.statusMessage && !message.content && (
                 <p style={{ margin: 0, fontStyle: 'italic' }}>
-                  <EuiTextColor color='subdued'>
-                    {message.statusMessage}
-                  </EuiTextColor>
+                  <EuiTextColor color="subdued">{message.statusMessage}</EuiTextColor>
                 </p>
               )}
               {/* Waiting for the first token: a bubble with nothing in it read as a broken empty
@@ -207,20 +192,18 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
               {isWaitingForFirstToken ? (
                 <EuiLoadingContent lines={2} />
               ) : (
-                <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>
-                  {message.content}
-                </p>
+                <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{message.content}</p>
               )}
             </EuiText>
           </div>
         ) : (
-          <EuiText size='s'>
+          <EuiText size="s">
             <EuiMarkdownFormat>{message.content}</EuiMarkdownFormat>
           </EuiText>
         )}
         {message.table && (
           <>
-            <EuiSpacer size='s' />
+            <EuiSpacer size="s" />
             <ResultTable
               spec={message.table}
               resolveDiscoverUrl={resolveDiscoverUrl}
@@ -234,13 +217,13 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             executed DSL the table carries (the same one "Open in Discover" uses). */}
         {message.toolCalls && message.toolCalls.length > 0 && (
           <>
-            <EuiSpacer size='s' />
+            <EuiSpacer size="s" />
             <EuiAccordion
               id={`wzAiQuery-${message.id}`}
-              paddingSize='s'
+              paddingSize="s"
               buttonContent={
-                <EuiText size='xs'>
-                  <EuiTextColor color='subdued'>
+                <EuiText size="xs">
+                  <EuiTextColor color="subdued">
                     {i18n.translate('wazuhAiAssistant.chat.queryDetails', {
                       defaultMessage:
                         '{count, plural, one {# query executed} other {# queries executed}}',
@@ -250,27 +233,27 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
                 </EuiText>
               }
             >
-              {message.toolCalls.map(toolCall => (
+              {message.toolCalls.map((toolCall) => (
                 <div key={toolCall.id}>
-                  <EuiText size='xs'>
+                  <EuiText size="xs">
                     <strong>{toolCall.name}</strong>
                   </EuiText>
-                  <EuiSpacer size='xs' />
+                  <EuiSpacer size="xs" />
                   <EuiCodeBlock
-                    language='json'
-                    paddingSize='s'
-                    fontSize='s'
+                    language="json"
+                    paddingSize="s"
+                    fontSize="s"
                     isCopyable
                     overflowHeight={240}
                   >
                     {JSON.stringify(toolCall.arguments, null, 2)}
                   </EuiCodeBlock>
-                  <EuiSpacer size='s' />
+                  <EuiSpacer size="s" />
                 </div>
               ))}
               {message.table?.discover && (
                 <>
-                  <EuiText size='xs'>
+                  <EuiText size="xs">
                     <strong>
                       {i18n.translate('wazuhAiAssistant.chat.queryIndex', {
                         defaultMessage: 'Index: {index}',
@@ -278,11 +261,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
                       })}
                     </strong>
                   </EuiText>
-                  <EuiSpacer size='xs' />
+                  <EuiSpacer size="xs" />
                   <EuiCodeBlock
-                    language='json'
-                    paddingSize='s'
-                    fontSize='s'
+                    language="json"
+                    paddingSize="s"
+                    fontSize="s"
                     isCopyable
                     overflowHeight={240}
                   >
@@ -297,32 +280,30 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             point is that the reader can tell this text stops mid-thought on purpose. */}
         {message.interrupted && !message.isStreaming && (
           <>
-            <EuiSpacer size='xs' />
+            <EuiSpacer size="xs" />
             <InterruptedTurnNotice onRetry={onRetry} />
           </>
         )}
       </EuiPanel>
       <EuiText
-        size='xs'
-        color='subdued'
+        size="xs"
+        color="subdued"
         textAlign={isUser ? 'right' : 'left'}
-        className='wzAiAssistantMessageTimestamp'
+        className="wzAiAssistantMessageTimestamp"
       >
-        <p style={{ margin: '2px 4px 0' }}>
-          {formatTimestamp(message.createdAt)}
-        </p>
+        <p style={{ margin: '2px 4px 0' }}>{formatTimestamp(message.createdAt)}</p>
       </EuiText>
     </EuiFlexItem>
   );
 
   const avatarItem = (
     <EuiFlexItem grow={false}>
-      <EuiFlexGroup direction='column' alignItems='center' gutterSize='xs'>
+      <EuiFlexGroup direction="column" alignItems="center" gutterSize="xs">
         <EuiFlexItem grow={false}>{avatar}</EuiFlexItem>
         {message.isStreaming && (
           <EuiFlexItem grow={false}>
             <EuiLoadingSpinner
-              size='s'
+              size="s"
               aria-label={i18n.translate('wazuhAiAssistant.chat.generating', {
                 defaultMessage: 'Generating response',
               })}
@@ -341,9 +322,9 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
     // element, so the CSS animation never restarts; only a genuinely NEW message (new `key` in
     // message-list.tsx, so a new DOM node) plays it again.
     <EuiFlexGroup
-      className='wzMsgRow'
+      className="wzMsgRow"
       justifyContent={isUser ? 'flexEnd' : 'flexStart'}
-      gutterSize='s'
+      gutterSize="s"
       responsive={false}
     >
       {isUser ? (

@@ -12,8 +12,7 @@ import { clampInt } from '../guardrails';
  */
 
 /** `now`, `now-90d`, `now-24h`, `now-15m`, or an ISO-8601 timestamp (date or date-time). */
-const DATE_MATH_OR_ISO_RE =
-  /^now(-\d+[dhm])?$|^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?Z?)?$/;
+const DATE_MATH_OR_ISO_RE = /^now(-\d+[dhm])?$|^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?Z?)?$/;
 
 export const DEFAULT_TIME_RANGE_GTE = 'now-90d';
 export const DEFAULT_TIME_RANGE_LTE = 'now';
@@ -27,9 +26,7 @@ export type SecurityAnalyticsSpace = (typeof SECURITY_ANALYTICS_SPACES)[number];
 
 /** Optional `space` parameter shared by get_rules/get_threat_intel_components -- `undefined` when
  * absent or not one of `SECURITY_ANALYTICS_SPACES`, meaning "no space filter" (every space). */
-export function parseSecurityAnalyticsSpace(
-  value: unknown,
-): SecurityAnalyticsSpace | undefined {
+export function parseSecurityAnalyticsSpace(value: unknown): SecurityAnalyticsSpace | undefined {
   return typeof value === 'string' &&
     (SECURITY_ANALYTICS_SPACES as readonly string[]).includes(value)
     ? (value as SecurityAnalyticsSpace)
@@ -47,7 +44,7 @@ export function validateTimeBound(value: string, paramName: string): string {
   if (!DATE_MATH_OR_ISO_RE.test(value)) {
     throw new Error(
       `Parameter "${paramName}" must be date-math ("now", "now-90d", "now-24h", "now-15m") or an ` +
-        `ISO-8601 timestamp; got "${value}".`,
+        `ISO-8601 timestamp; got "${value}".`
     );
   }
   return value;
@@ -60,13 +57,8 @@ export function validateTimeBound(value: string, paramName: string): string {
  * (NaN, Infinity, or simply not a number) falls back to `defaultValue` rather than propagating.
  * `clampInt` itself only does the floor/cap clamp; the finite check and truncation are this call
  * site's own responsibility, same as before this was factored out. */
-export function clampLimit(
-  value: unknown,
-  defaultValue: number,
-  max: number,
-): number {
-  const numeric =
-    typeof value === 'number' && Number.isFinite(value) ? value : defaultValue;
+export function clampLimit(value: unknown, defaultValue: number, max: number): number {
+  const numeric = typeof value === 'number' && Number.isFinite(value) ? value : defaultValue;
   return clampInt(Math.trunc(numeric), 1, max);
 }
 
@@ -95,9 +87,7 @@ export function optionalStringParam(value: unknown): string | undefined {
  * (no floor), failing OPEN toward showing more rather than silently hiding findings.
  */
 export function severitiesAtOrAbove(min: string): SeverityLevel[] {
-  const idx = SEVERITY_LEVELS.indexOf(
-    min.trim().toLowerCase() as SeverityLevel,
-  );
+  const idx = SEVERITY_LEVELS.indexOf(min.trim().toLowerCase() as SeverityLevel);
   return idx === -1 ? [...SEVERITY_LEVELS] : SEVERITY_LEVELS.slice(idx);
 }
 
@@ -107,19 +97,13 @@ export function severitiesAtOrAbove(min: string): SeverityLevel[] {
  * list (no ceiling), failing OPEN toward showing more rather than silently hiding findings.
  */
 export function severitiesAtOrBelow(max: string): SeverityLevel[] {
-  const idx = SEVERITY_LEVELS.indexOf(
-    max.trim().toLowerCase() as SeverityLevel,
-  );
+  const idx = SEVERITY_LEVELS.indexOf(max.trim().toLowerCase() as SeverityLevel);
   return idx === -1 ? [...SEVERITY_LEVELS] : SEVERITY_LEVELS.slice(0, idx + 1);
 }
 
 export type SeverityComparison = 'exact' | 'at_or_above' | 'at_or_below';
 
-const VALID_SEVERITY_COMPARISONS: readonly string[] = [
-  'exact',
-  'at_or_above',
-  'at_or_below',
-];
+const VALID_SEVERITY_COMPARISONS: readonly string[] = ['exact', 'at_or_above', 'at_or_below'];
 
 /**
  * Resolves a severity value + comparison mode to the `terms` list a query should filter on.
@@ -132,14 +116,8 @@ const VALID_SEVERITY_COMPARISONS: readonly string[] = [
  * full severity list (same direction as an unrecognized `value`), not to a silent exact match —
  * a hallucinated comparison should widen results, never narrow them without saying so.
  */
-export function severityFilterValues(
-  value: string,
-  comparison?: string,
-): SeverityLevel[] {
-  if (
-    comparison !== undefined &&
-    !VALID_SEVERITY_COMPARISONS.includes(comparison)
-  ) {
+export function severityFilterValues(value: string, comparison?: string): SeverityLevel[] {
+  if (comparison !== undefined && !VALID_SEVERITY_COMPARISONS.includes(comparison)) {
     return [...SEVERITY_LEVELS];
   }
   if (comparison === 'at_or_above') {
@@ -149,9 +127,7 @@ export function severityFilterValues(
     return severitiesAtOrBelow(value);
   }
   const normalized = value.trim().toLowerCase() as SeverityLevel;
-  return SEVERITY_LEVELS.includes(normalized)
-    ? [normalized]
-    : [...SEVERITY_LEVELS];
+  return SEVERITY_LEVELS.includes(normalized) ? [normalized] : [...SEVERITY_LEVELS];
 }
 
 /** The `severity` enum property shared by the finding tools that take a severity filter. */
@@ -190,8 +166,7 @@ export function timeRangeProperties(): Record<string, JsonSchemaProperty> {
     },
     time_range_lte: {
       type: 'string',
-      description:
-        'End of the time range: date-math ("now") or ISO-8601. Defaults to "now".',
+      description: 'End of the time range: date-math ("now") or ISO-8601. Defaults to "now".',
     },
   };
 }
@@ -201,16 +176,12 @@ export function resolveTimeRange(params: Record<string, unknown>): {
   lte: string;
 } {
   const gte = validateTimeBound(
-    typeof params.time_range_gte === 'string'
-      ? params.time_range_gte
-      : DEFAULT_TIME_RANGE_GTE,
-    'time_range_gte',
+    typeof params.time_range_gte === 'string' ? params.time_range_gte : DEFAULT_TIME_RANGE_GTE,
+    'time_range_gte'
   );
   const lte = validateTimeBound(
-    typeof params.time_range_lte === 'string'
-      ? params.time_range_lte
-      : DEFAULT_TIME_RANGE_LTE,
-    'time_range_lte',
+    typeof params.time_range_lte === 'string' ? params.time_range_lte : DEFAULT_TIME_RANGE_LTE,
+    'time_range_lte'
   );
   return { gte, lte };
 }
@@ -218,7 +189,7 @@ export function resolveTimeRange(params: Record<string, unknown>): {
 /** Builds a flat JsonSchemaObject from a properties map, matching this repo's minimal subset. */
 export function objectSchema(
   properties: Record<string, JsonSchemaProperty>,
-  required?: string[],
+  required?: string[]
 ): JsonSchemaObject {
   return { type: 'object', properties, ...(required ? { required } : {}) };
 }
@@ -236,8 +207,9 @@ export const STANDARD_FINDING_TABLE_COLUMNS: ToolTableColumnSpec[] = [
   { field: 'wazuh.rule.level', label: 'Level', severity: true },
   { field: 'wazuh.integration.category', label: 'Category' },
 ];
-export const STANDARD_FINDING_TABLE_COLUMN_FIELDS =
-  STANDARD_FINDING_TABLE_COLUMNS.map(column => column.field);
+export const STANDARD_FINDING_TABLE_COLUMN_FIELDS = STANDARD_FINDING_TABLE_COLUMNS.map(
+  (column) => column.field
+);
 export const STANDARD_FINDING_SAMPLE_COLUMNS = [
   '@timestamp',
   'wazuh.agent.name',
@@ -285,20 +257,16 @@ export const FINDING_DIGEST_EXTRA_COLUMNS = [
  * dot-path into a row twice.
  */
 export function findingRowFields(existingColumnFields: string[]): string[] {
-  return FINDING_INVESTIGATION_ROW_FIELDS.filter(
-    field => !existingColumnFields.includes(field),
-  );
+  return FINDING_INVESTIGATION_ROW_FIELDS.filter((field) => !existingColumnFields.includes(field));
 }
 
 /**
  * Appends `FINDING_DIGEST_EXTRA_COLUMNS` to a tool's own `digest.sampleColumns`, deduping any column
  * the tool already whitelists, so a sample row never carries the same field twice.
  */
-export function findingDigestColumns(
-  existingSampleColumns: string[],
-): string[] {
+export function findingDigestColumns(existingSampleColumns: string[]): string[] {
   const extras = FINDING_DIGEST_EXTRA_COLUMNS.filter(
-    field => !existingSampleColumns.includes(field),
+    (field) => !existingSampleColumns.includes(field)
   );
   return [...existingSampleColumns, ...extras];
 }
@@ -323,20 +291,14 @@ export const VULN_DIGEST_SAMPLE_COLUMNS = [
  * Identical (same fields, same order) at every call site.
  * Part of the outbound Indexer request: order and contents must stay exactly as below.
  */
-export const VULN_SOURCE_FIELDS = [
-  ...VULN_DIGEST_SAMPLE_COLUMNS,
-  'vulnerability.description',
-];
+export const VULN_SOURCE_FIELDS = [...VULN_DIGEST_SAMPLE_COLUMNS, 'vulnerability.description'];
 
 /**
  * Shared outbound `_source` list for get_vulnerabilities_by_agent and get_vulnerability_by_cve —
  * Identical (same fields, same order, `wazuh.agent.id` first) at every call site. Part of the outbound Indexer request: order and contents must stay exactly as
  * below.
  */
-export const VULN_SOURCE_FIELDS_WITH_AGENT_ID = [
-  'wazuh.agent.id',
-  ...VULN_SOURCE_FIELDS,
-];
+export const VULN_SOURCE_FIELDS_WITH_AGENT_ID = ['wazuh.agent.id', ...VULN_SOURCE_FIELDS];
 
 /**
  * Guard shared by ~11 catalog buildRequest sites that require a non-empty string param: validates
@@ -364,7 +326,7 @@ const AGENT_ID_RE = /^\d{3,}$/;
 export function validateAgentId(value: unknown): string {
   if (typeof value !== 'string' || !AGENT_ID_RE.test(value)) {
     throw new Error(
-      'Parameter "agent_id" must be a numeric Wazuh agent ID of at least 3 digits (e.g. "001").',
+      'Parameter "agent_id" must be a numeric Wazuh agent ID of at least 3 digits (e.g. "001").'
     );
   }
   return value;

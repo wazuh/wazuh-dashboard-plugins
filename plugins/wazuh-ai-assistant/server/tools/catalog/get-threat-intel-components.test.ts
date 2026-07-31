@@ -33,32 +33,25 @@ test('get_threat_intel_components: enabled defaults to "any" (no filter)', () =>
 });
 
 test('get_threat_intel_components: enabled="enabled"/"disabled" produce the boolean term', () => {
-  assert.deepEqual(
-    build({ component_type: 'decoders', enabled: 'enabled' }).body.query,
-    { bool: { filter: [{ term: { 'document.enabled': true } }] } },
-  );
-  assert.deepEqual(
-    build({ component_type: 'decoders', enabled: 'disabled' }).body.query,
-    { bool: { filter: [{ term: { 'document.enabled': false } }] } },
-  );
+  assert.deepEqual(build({ component_type: 'decoders', enabled: 'enabled' }).body.query, {
+    bool: { filter: [{ term: { 'document.enabled': true } }] },
+  });
+  assert.deepEqual(build({ component_type: 'decoders', enabled: 'disabled' }).body.query, {
+    bool: { filter: [{ term: { 'document.enabled': false } }] },
+  });
 });
 
 test('get_threat_intel_components: space adds an exact term filter', () => {
+  assert.deepEqual(build({ component_type: 'integrations', space: 'draft' }).body.query, {
+    bool: { filter: [{ term: { 'space.name': 'draft' } }] },
+  });
   assert.deepEqual(
-    build({ component_type: 'integrations', space: 'draft' }).body.query,
-    { bool: { filter: [{ term: { 'space.name': 'draft' } }] } },
-  );
-  assert.deepEqual(
-    build({ component_type: 'integrations', enabled: 'enabled', space: 'custom' })
-      .body.query,
+    build({ component_type: 'integrations', enabled: 'enabled', space: 'custom' }).body.query,
     {
       bool: {
-        filter: [
-          { term: { 'document.enabled': true } },
-          { term: { 'space.name': 'custom' } },
-        ],
+        filter: [{ term: { 'document.enabled': true } }, { term: { 'space.name': 'custom' } }],
       },
-    },
+    }
   );
 });
 
@@ -68,10 +61,7 @@ test('get_threat_intel_components: an invalid space value is ignored (no filter,
 });
 
 test('get_threat_intel_components: clamps limit to the [1, 500] range', () => {
-  assert.equal(
-    build({ component_type: 'kvdbs', limit: 9999 }).body.size,
-    500,
-  );
+  assert.equal(build({ component_type: 'kvdbs', limit: 9999 }).body.size, 500);
   assert.equal(build({ component_type: 'kvdbs', limit: 0 }).body.size, 1);
 });
 
@@ -81,7 +71,7 @@ test('get_threat_intel_components: every produced index passes checkIndexAllowli
     assert.equal(
       checkIndexAllowlist(request.index).ok,
       true,
-      `${componentType} index rejected by allowlist`,
+      `${componentType} index rejected by allowlist`
     );
     const result = lintDsl(request.body, request.index);
     assert.equal(result.ok, true, result.ok ? '' : result.reason);
@@ -94,21 +84,19 @@ test('get_threat_intel_components: the "Title" column uses document.metadata.tit
   // populated on kvdbs, so it must never be the primary display column. Labeled "Title" (not
   // "Name") because that is the field actually backing it.
   const titleColumn = getThreatIntelComponentsTool.tableSpec.columns.find(
-    column => column.label === 'Title',
+    (column) => column.label === 'Title'
   );
   assert.equal(titleColumn?.field, 'document.metadata.title');
   assert.equal(
     getThreatIntelComponentsTool.tableSpec.columns.some(
-      column => column.field === 'document.name',
+      (column) => column.field === 'document.name'
     ),
-    false,
+    false
   );
 });
 
 test('get_threat_intel_components: table/digest columns stay within the declared _source', () => {
-  const source = new Set(
-    build({ component_type: 'integrations' }).body._source as string[],
-  );
+  const source = new Set(build({ component_type: 'integrations' }).body._source as string[]);
   for (const column of getThreatIntelComponentsTool.tableSpec.columns) {
     assert.ok(source.has(column.field), `${column.field} missing from _source`);
   }

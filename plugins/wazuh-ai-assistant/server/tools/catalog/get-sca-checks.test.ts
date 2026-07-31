@@ -92,16 +92,13 @@ test('get_sca_checks: policy_id is trimmed', () => {
 });
 
 test('get_sca_checks: missing policy_id throws', () => {
-  assert.throws(
-    () => getScaChecksTool.buildRequest({ agent_id: '000' }),
-    /policy_id/,
-  );
+  assert.throws(() => getScaChecksTool.buildRequest({ agent_id: '000' }), /policy_id/);
 });
 
 test('get_sca_checks: empty-string policy_id throws', () => {
   assert.throws(
     () => getScaChecksTool.buildRequest({ agent_id: '000', policy_id: '   ' }),
-    /policy_id/,
+    /policy_id/
   );
 });
 
@@ -112,7 +109,7 @@ test('get_sca_checks: invalid agent_id throws (delegates to validateAgentId)', (
         agent_id: 'not-numeric',
         policy_id: 'cis_ubuntu22-04',
       }),
-    /agent_id/,
+    /agent_id/
   );
 });
 
@@ -125,23 +122,16 @@ test('get_sca_checks: limit is clamped to [1, 500]', () => {
 
 test('get_sca_checks: tableSpec/digest declare the locked 5.0 columns/rowFields/sampleColumns', () => {
   assert.deepEqual(
-    getScaChecksTool.tableSpec.columns.map(c => c.field),
-    ['check.id', 'check.name', 'check.result', 'check.reason'],
+    getScaChecksTool.tableSpec.columns.map((c) => c.field),
+    ['check.id', 'check.name', 'check.result', 'check.reason']
   );
-  assert.deepEqual(getScaChecksTool.tableSpec.rowFields, [
-    'check.remediation',
-    'check.rules',
-  ]);
+  assert.deepEqual(getScaChecksTool.tableSpec.rowFields, ['check.remediation', 'check.rules']);
   assert.deepEqual(getScaChecksTool.digest.sampleColumns, [
     'check.id',
     'check.name',
     'check.result',
   ]);
   // Long-text fields stay out of the digest (token-budget decision, unchanged from 4.14).
-  assert.ok(
-    !getScaChecksTool.digest.sampleColumns.includes('check.remediation'),
-  );
-  assert.ok(
-    !getScaChecksTool.digest.sampleColumns.includes('check.description'),
-  );
+  assert.ok(!getScaChecksTool.digest.sampleColumns.includes('check.remediation'));
+  assert.ok(!getScaChecksTool.digest.sampleColumns.includes('check.description'));
 });

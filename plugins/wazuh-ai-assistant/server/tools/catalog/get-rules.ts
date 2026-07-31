@@ -75,9 +75,7 @@ export const getRulesTool: ToolDefinition = {
           'Filter by Security Analytics space. Omit to search across every space (the default).',
         enum: [...SECURITY_ANALYTICS_SPACES],
       },
-      limit: limitProperty(
-        'Max number of rules to return (default 20, max 500).',
-      ),
+      limit: limitProperty('Max number of rules to return (default 20, max 500).'),
     }),
   },
   target: 'indexer',

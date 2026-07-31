@@ -119,16 +119,13 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
   findings:
     'Finding search/summaries: critical findings, by agent/rule/rule-tag/OS/time, top rules, ' +
     'brute-force, suspicious PowerShell, general security summary.',
-  vulnerabilities:
-    'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only.',
+  vulnerabilities: 'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only.',
   fim: 'File Integrity Monitoring: current state of monitored files (path, mtime, owner, hashes).',
   sca:
     'Security Configuration Assessment (SCA): per-agent compliance benchmark results (e.g. CIS ' +
     'Ubuntu), NOT Security Analytics pipeline policies.',
-  mitre:
-    'MITRE ATT&CK technique/tactic findings and technique-frequency summaries.',
-  inventory:
-    'Syscollector inventory: agent OS, installed packages, open ports, running processes.',
+  mitre: 'MITRE ATT&CK technique/tactic findings and technique-frequency summaries.',
+  inventory: 'Syscollector inventory: agent OS, installed packages, open ports, running processes.',
   compliance:
     'Compliance findings/summaries for any of 10 frameworks (PCI DSS, HIPAA, GDPR, ISO 27001, ' +
     'NIS2, NIST 800-171/800-53, FedRAMP, CMMC, TSC).',
@@ -136,10 +133,8 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'The Security Analytics ruleset and pipeline content itself — rules (name/level/status/' +
     'technique) and components (decoders, integrations, policies, filters, KVDBs). Pipeline ' +
     'configuration, NOT findings that fired and NOT SCA compliance benchmarks.',
-  free_search:
-    'Anything else about Wazuh finding/vulnerability/state data (last resort).',
-  general:
-    'No Wazuh data needed at all: greeting, meta-question, clarification, chit-chat.',
+  free_search: 'Anything else about Wazuh finding/vulnerability/state data (last resort).',
+  general: 'No Wazuh data needed at all: greeting, meta-question, clarification, chit-chat.',
 };
 
 /**
@@ -147,9 +142,10 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
  * `TOOL_CATEGORY` rather than hand-duplicated, so the two can never drift apart.
  */
 function groupToolsByCategory(): Record<RouterCategory, string[]> {
-  const grouped = Object.fromEntries(
-    CATEGORY_ORDER.map(cat => [cat, [] as string[]]),
-  ) as Record<RouterCategory, string[]>;
+  const grouped = Object.fromEntries(CATEGORY_ORDER.map((cat) => [cat, [] as string[]])) as Record<
+    RouterCategory,
+    string[]
+  >;
   for (const [toolName, category] of Object.entries(TOOL_CATEGORY)) {
     grouped[category].push(toolName);
   }
@@ -167,32 +163,24 @@ const CATEGORY_TOOLS = groupToolsByCategory();
  * unreachable once the router is enabled).
  */
 function assertRegistryConsistency(): void {
-  const registryToolNames = listToolDefinitions().map(def => def.spec.name);
-  const missing = registryToolNames.filter(
-    name => TOOL_CATEGORY[name] === undefined,
-  );
+  const registryToolNames = listToolDefinitions().map((def) => def.spec.name);
+  const missing = registryToolNames.filter((name) => TOOL_CATEGORY[name] === undefined);
   if (missing.length > 0) {
     throw new Error(
       'wazuhAiAssistant router: the following registry tools have no router category assigned in ' +
-        `server/tools/router.ts's TOOL_CATEGORY map: ${missing.join(
-          ', ',
-        )}. Add each to exactly ` +
-        'one category before starting the plugin.',
+        `server/tools/router.ts's TOOL_CATEGORY map: ${missing.join(', ')}. Add each to exactly ` +
+        'one category before starting the plugin.'
     );
   }
   // The reverse check (a TOOL_CATEGORY entry naming a tool the registry no longer has) is a stale
   // mapping, not a routing hole, but still worth failing on loudly rather than routing to a name
   // resolveStage2Tools will silently drop (see its `getToolDefinition(name)` guard below).
   const registryToolNameSet = new Set(registryToolNames);
-  const stale = Object.keys(TOOL_CATEGORY).filter(
-    name => !registryToolNameSet.has(name),
-  );
+  const stale = Object.keys(TOOL_CATEGORY).filter((name) => !registryToolNameSet.has(name));
   if (stale.length > 0) {
     throw new Error(
       'wazuhAiAssistant router: TOOL_CATEGORY names tool(s) not present in the registry: ' +
-        `${stale.join(
-          ', ',
-        )}. Remove them from server/tools/router.ts or fix the registry.`,
+        `${stale.join(', ')}. Remove them from server/tools/router.ts or fix the registry.`
     );
   }
 }
@@ -233,9 +221,7 @@ export const ROUTE_QUESTION_TOOL: ToolSpec = {
  *
  */
 export function buildRoutingPrompt(nowIso: string): string {
-  const menu = CATEGORY_ORDER.map(
-    cat => `- ${cat}: ${CATEGORY_DESCRIPTIONS[cat]}`,
-  ).join('\n');
+  const menu = CATEGORY_ORDER.map((cat) => `- ${cat}: ${CATEGORY_DESCRIPTIONS[cat]}`).join('\n');
   return [
     'You are the routing pre-step for the Wazuh AI Assistant. Do not answer the user yet.',
     `The current UTC time is ${nowIso}.`,
@@ -260,11 +246,9 @@ export function buildRoutingPrompt(nowIso: string): string {
  * `CATEGORY_ORDER`; this function still defensively drops anything unrecognized rather than
  * trusting that invariant blindly.
  */
-export function resolveStage2Tools(
-  categories: string[],
-): ToolSpec[] | undefined {
+export function resolveStage2Tools(categories: string[]): ToolSpec[] | undefined {
   const valid = categories.filter((cat): cat is RouterCategory =>
-    (CATEGORY_ORDER as string[]).includes(cat),
+    (CATEGORY_ORDER as string[]).includes(cat)
   );
 
   if (valid.length === 1 && valid[0] === 'general') {

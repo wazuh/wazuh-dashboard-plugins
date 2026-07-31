@@ -38,10 +38,7 @@ test('get_sca_results: uses the real capitalized check.result values, not the lo
   };
   assert.equal(aggs.policies.aggs.passed.filter.term['check.result'], 'Passed');
   assert.equal(aggs.policies.aggs.failed.filter.term['check.result'], 'Failed');
-  assert.equal(
-    aggs.policies.aggs.not_applicable.filter.term['check.result'],
-    'Not applicable',
-  );
+  assert.equal(aggs.policies.aggs.not_applicable.filter.term['check.result'], 'Not applicable');
 });
 
 function policiesTermsSize(request: IndexerRequest): unknown {
@@ -52,10 +49,7 @@ function policiesTermsSize(request: IndexerRequest): unknown {
 }
 
 test('get_sca_results: clamps limit to the [1, 500] range', () => {
-  assert.equal(
-    policiesTermsSize(build({ agent_id: '001', limit: 9999 })),
-    500,
-  );
+  assert.equal(policiesTermsSize(build({ agent_id: '001', limit: 9999 })), 500);
   assert.equal(policiesTermsSize(build({ agent_id: '001', limit: 0 })), 1);
 });
 

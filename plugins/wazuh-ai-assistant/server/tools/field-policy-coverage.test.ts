@@ -117,6 +117,8 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   'document.enrichments',
   'document.index_discarded_events',
   'document.index_unclassified_events',
+  // Security Analytics namespace tag (draft/test/custom/standard) -- a config grouping label,
+  // not analyst/attacker-supplied data.
   'space.name',
 ]);
 
@@ -124,16 +126,12 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
  * a plain one; a plain entry may prefix-match via a trailing ".*". Kept local to this test (rather
  * than exporting the private helper from privacy.ts) since this is the only other place that needs
  * the same resolution semantics. */
-function hasPolicyEntry(
-  field: string,
-  toolName: string,
-  policy: FieldPolicyEntry[],
-): boolean {
+function hasPolicyEntry(field: string, toolName: string, policy: FieldPolicyEntry[]): boolean {
   const scopedKey = `${toolName}/${field}`;
-  if (policy.some(entry => entry.field === scopedKey)) {
+  if (policy.some((entry) => entry.field === scopedKey)) {
     return true;
   }
-  return policy.some(entry => {
+  return policy.some((entry) => {
     if (entry.field.includes('/')) {
       return false;
     }
@@ -145,15 +143,8 @@ function hasPolicyEntry(
   });
 }
 
-function isFieldCovered(
-  field: string,
-  toolName: string,
-  policy: FieldPolicyEntry[],
-): boolean {
-  return (
-    hasPolicyEntry(field, toolName, policy) ||
-    KNOWN_SAFE_STRUCTURAL_FIELDS.has(field)
-  );
+function isFieldCovered(field: string, toolName: string, policy: FieldPolicyEntry[]): boolean {
+  return hasPolicyEntry(field, toolName, policy) || KNOWN_SAFE_STRUCTURAL_FIELDS.has(field);
 }
 
 test('every T1 non-deriveColumns tool digest column is privacy-classified or explicitly allowlisted', () => {
@@ -172,8 +163,8 @@ test('every T1 non-deriveColumns tool digest column is privacy-classified or exp
     failures,
     [],
     `digest column(s) with no FIELD_POLICY_DEFAULTS entry and no structural allowlist entry: ${failures.join(
-      ', ',
-    )}`,
+      ', '
+    )}`
   );
 });
 
@@ -182,37 +173,19 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
   // FIELD_POLICY_DEFAULTS entry nor a known-safe structural field must fail coverage — this is
   // what makes the test above fail loudly if a future PR adds a digest column and forgets both.
   assert.equal(
-    isFieldCovered(
-      'data.totally_new_field',
-      'get_critical_findings',
-      FIELD_POLICY_DEFAULTS,
-    ),
-    false,
+    isFieldCovered('data.totally_new_field', 'get_critical_findings', FIELD_POLICY_DEFAULTS),
+    false
   );
   // Sanity check the positive cases too, so a change to KNOWN_SAFE_STRUCTURAL_FIELDS/
   // FIELD_POLICY_DEFAULTS that accidentally drops an entry is itself caught here.
   assert.equal(
-    isFieldCovered(
-      'wazuh.agent.host.ip',
-      'get_critical_findings',
-      FIELD_POLICY_DEFAULTS,
-    ),
-    true,
+    isFieldCovered('wazuh.agent.host.ip', 'get_critical_findings', FIELD_POLICY_DEFAULTS),
+    true
   );
   assert.equal(
-    isFieldCovered(
-      'wazuh.rule.tags',
-      'get_compliance_alerts',
-      FIELD_POLICY_DEFAULTS,
-    ),
-    true,
+    isFieldCovered('wazuh.rule.tags', 'get_compliance_alerts', FIELD_POLICY_DEFAULTS),
+    true
   );
-  assert.equal(
-    isFieldCovered('name', 'get_agent_packages', FIELD_POLICY_DEFAULTS),
-    true,
-  );
-  assert.equal(
-    isFieldCovered('name', 'get_agents', FIELD_POLICY_DEFAULTS),
-    true,
-  );
+  assert.equal(isFieldCovered('name', 'get_agent_packages', FIELD_POLICY_DEFAULTS), true);
+  assert.equal(isFieldCovered('name', 'get_agents', FIELD_POLICY_DEFAULTS), true);
 });

@@ -6,18 +6,12 @@ function hit(space: string | undefined): unknown {
 }
 
 test('resolveSecurityAnalyticsSpace: a single distinct space across all hits is used as-is', () => {
-  assert.equal(
-    resolveSecurityAnalyticsSpace([hit('standard'), hit('standard')]),
-    'standard',
-  );
+  assert.equal(resolveSecurityAnalyticsSpace([hit('standard'), hit('standard')]), 'standard');
   assert.equal(resolveSecurityAnalyticsSpace([hit('draft')]), 'draft');
 });
 
 test('resolveSecurityAnalyticsSpace: falls back to "standard" when hits span multiple spaces', () => {
-  assert.equal(
-    resolveSecurityAnalyticsSpace([hit('draft'), hit('custom')]),
-    'standard',
-  );
+  assert.equal(resolveSecurityAnalyticsSpace([hit('draft'), hit('custom')]), 'standard');
 });
 
 test('resolveSecurityAnalyticsSpace: falls back to "standard" with no hits or non-array input', () => {
