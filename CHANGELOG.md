@@ -37,6 +37,7 @@
 - Expanded the case management form with title, description, severity, priority and TLP fields, comments that can be added or edited individually, and a confirmation dialog before discarding unsaved changes [#8718](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8718)
 - Added queue usage in bytes and agent cache visualizations to `Server Management` > `Statistics`, and relabeled the Comms "Queue usage" Y-axis to Bytes [#8768](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8768)
 - Added Wazuh AI Assistant plugin: provider-agnostic AI chat over Wazuh data with a read-only tool catalog, server-side guardrails, optional pseudonymization, and API-key encryption at rest [#8788](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8788) [#8797](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8797) [8802](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8802)
+- Added AI Assistant tool catalog coverage for compliance frameworks beyond PCI DSS, a generic document-by-ID lookup tool, agent listing across all connection statuses, array support in rule-tag/rule-title search, and Security Analytics detection rules/pipeline components [#8814](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8814)
 
 ### Changed
 
