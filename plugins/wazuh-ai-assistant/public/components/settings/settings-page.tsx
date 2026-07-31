@@ -16,6 +16,8 @@ import {
   EuiFieldPassword,
   EuiSelect,
   EuiCallOut,
+  EuiCode,
+  EuiCodeBlock,
   EuiSpacer,
   EuiHealth,
   EuiText,
@@ -35,6 +37,7 @@ import {
   EuiAccordion,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import { CoreStart } from '../../../../../src/core/public';
 import {
   AssistantSettings,
@@ -278,6 +281,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   // gate on every PUT regardless of what this banner shows).
   const [canSave, setCanSave] = useState(true);
   const [accessMessage, setAccessMessage] = useState<string | null>(null);
+  // Tri-state, fail-open like `canSave`: `null` = probe pending/failed → no callout and no Save
+  // block; only a confirmed server `false` gates the form. The server's 503 gate still refuses
+  // plaintext key writes regardless.
+  const [apiKeyEncryptionEnabled, setApiKeyEncryptionEnabled] = useState<
+    boolean | null
+  >(null);
   // Session auto-heal: guards the one-shot POST /api/login retry below so a mount ever
   // attempts it AT MOST once, regardless of how many times the access probe itself is re-run (it
   // currently only runs once on mount, but this ref is what makes that invariant hold even if a
@@ -311,6 +320,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     service
       .getSettingsAccess()
       .then(async access => {
+        // Before the heal branch (its early return must not skip this); `!== false` stays
+        // fail-open when older servers omit the field.
+        setApiKeyEncryptionEnabled(access.apiKeyEncryptionEnabled !== false);
         // Session auto-heal: the failure this targets is a missing/expired
         // wz-token cookie, surfaced through the SAME actionable copy `describeAdministratorRequirement`
         // (server/routes/settings.ts) now maps both the three original token literals AND the raw
@@ -857,6 +869,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     },
   ];
 
+  const apiKeyBlockedByEncryption =
+    apiKeyEncryptionEnabled === false && Boolean(form.apiKey?.trim());
+
   return (
     <EuiPage restrictWidth={960}>
       <EuiPageBody>
@@ -960,6 +975,67 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
               {isFormOpen && (
                 <>
+                  {apiKeyEncryptionEnabled === false && (
+                    <>
+                      <EuiCallOut
+                        color='warning'
+                        iconType='alert'
+                        title={i18n.translate(
+                          'wazuhAiAssistant.settings.form.encryptionRequiredTitle',
+                          {
+                            defaultMessage:
+                              'An encryption key is required to save API keys',
+                          },
+                        )}
+                      >
+                        <p>
+                          {i18n.translate(
+                            'wazuhAiAssistant.settings.form.encryptionRequiredBody',
+                            {
+                              defaultMessage:
+                                'Encryption at rest is not configured. Providers that do not need ' +
+                                'an API key can still be saved.',
+                            },
+                          )}
+                        </p>
+                        <p>
+                          {/* Setting/file names are interpolated as <EuiCode> values and the
+                              commands live in the code block below, outside the translatable
+                              string, so translators can never alter them. */}
+                          <FormattedMessage
+                            id='wazuhAiAssistant.settings.form.encryptionRequiredHow'
+                            defaultMessage={
+                              'To enable saving keys, generate a base64-encoded ' +
+                              '32-byte key and store it as {settingName} in the ' +
+                              'keystore (recommended — the ' +
+                              'key never sits in a readable config file) or in ' +
+                              '{configFile}, then restart the dashboard service:'
+                            }
+                            values={{
+                              settingName: (
+                                <EuiCode>
+                                  wazuh_ai_assistant.encryptionKey
+                                </EuiCode>
+                              ),
+                              configFile: (
+                                <EuiCode>opensearch_dashboards.yml</EuiCode>
+                              ),
+                            }}
+                          />
+                        </p>
+                        <EuiCodeBlock
+                          language='bash'
+                          paddingSize='s'
+                          fontSize='s'
+                          isCopyable
+                        >
+                          {'openssl rand -base64 32\n' +
+                            'opensearch-dashboards-keystore add wazuh_ai_assistant.encryptionKey'}
+                        </EuiCodeBlock>
+                      </EuiCallOut>
+                      <EuiSpacer size='m' />
+                    </>
+                  )}
                   <EuiForm component='div'>
                     <EuiFormRow
                       label={i18n.translate(
@@ -1076,11 +1152,23 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                     <EuiFlexGroup gutterSize='s'>
                       <EuiFlexItem grow={false}>
                         <EuiToolTip
-                          content={!canSave ? accessMessage : undefined}
+                          content={
+                            !canSave
+                              ? accessMessage
+                              : apiKeyBlockedByEncryption
+                              ? i18n.translate(
+                                  'wazuhAiAssistant.settings.form.encryptionRequiredTooltip',
+                                  {
+                                    defaultMessage:
+                                      'An encryption key must be configured before an API key can be saved.',
+                                  },
+                                )
+                              : undefined
+                          }
                         >
                           <EuiButton
                             onClick={handleSubmit}
-                            isDisabled={!canSave}
+                            isDisabled={!canSave || apiKeyBlockedByEncryption}
                             fill
                           >
                             {i18n.translate(
