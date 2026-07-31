@@ -713,6 +713,15 @@ describe('ChatPage — restoring the open conversation', () => {
       expect(window.location.pathname).toBe('/conversation/conv-b'),
     );
   });
+
+  it('hides the saved-conversations sidebar when showConversationSidebar is false', () => {
+    const view = renderChatPage({ showConversationSidebar: false });
+
+    expect(screen.queryByText('New conversation')).toBeNull();
+
+    view.rerenderWith({ showConversationSidebar: true });
+    expect(screen.getByText('New conversation')).toBeInTheDocument();
+  });
 });
 
 describe('ChatPage — a resumed conversation is the same conversation', () => {

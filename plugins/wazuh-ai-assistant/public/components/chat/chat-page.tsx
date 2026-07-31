@@ -94,6 +94,9 @@ interface ChatPageProps {
   /** Whether the chat view is the app shell's visible tab (default true). While hidden, the
    * conversation hash stays out of the URL so a restore can't rewrite `/settings`. */
   isActive?: boolean;
+  /** Whether to render the saved-conversations sidebar (default true). The docked header panel
+   * (assistant-chat-panel.tsx) hides it while the panel is too narrow for both panes. */
+  showConversationSidebar?: boolean;
 }
 
 /**
@@ -200,6 +203,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   history,
   onGeneratingChange,
   isActive = true,
+  showConversationSidebar = true,
 }) => {
   // `useSyncedState` (public/hooks/use-synced-state.ts) is the `[value, setValue, ref]` pattern
   // used for `messages`, `inputText`, and `activeConversationId` below — see that hook's own doc
@@ -1636,56 +1640,60 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       >
         {/* Left pane: saved-conversations sidebar. EuiPanel color="subdued" gives the standard OSD
           "sunken" pane background without inventing a new hardcoded color. */}
-        <EuiPanel
-          color='subdued'
-          hasShadow={false}
-          hasBorder={false}
-          borderRadius='none'
-          paddingSize='m'
-          // EuiPanel's `grow` prop DEFAULTS TO TRUE (flex-grow:1), which in this flex-row parent
-          // overrode the fixed width below and let the sidebar swallow half the page. A
-          // fixed-width pane must explicitly opt out.
-          grow={false}
-          role='region'
-          aria-label={i18n.translate(
-            'wazuhAiAssistant.chat.conversations.sidebarRegionLabel',
-            { defaultMessage: 'Saved conversations' },
-          )}
-          style={{
-            width: CONVERSATION_SIDEBAR_WIDTH,
-            maxWidth: CONVERSATION_SIDEBAR_WIDTH,
-            flexShrink: 0,
-            overflowY: 'auto',
-            // `--wz-hairline` (chat-page.scss, sourced from `$euiBorderColor`) replaces the old
-            // hardcoded `#D3DAE6` — that hex was EUI's light-theme `lightShade` token with no
-            // dark-mode counterpart, so it rendered as the brightest edge on the page in dark mode.
-            borderRight: '1px solid var(--wz-hairline)',
-          }}
-        >
-          <ConversationList
-            conversations={conversations}
-            isLoading={isLoadingConversations}
-            activeConversationId={activeConversationId}
-            // Both go through the confirm gate: each would cancel a running answer. Delete is not
-            // gated — ConversationList already confirms it, and a second modal on top of that one
-            // would be worse than the risk it guards against.
-            //
-            // Clicking the conversation ALREADY open is not one of those actions: it is a no-op
-            // (`handleSelectConversation` returns immediately), so asking to confirm an interruption
-            // that was never going to happen only trains the user to dismiss the dialog. The check
-            // has to happen here, before the gate, not only inside the handler behind it.
-            onSelect={id => {
-              if (id === activeConversationIdRef.current) {
-                return;
-              }
-              void confirmIfGenerating(() => void handleSelectConversation(id));
+        {showConversationSidebar && (
+          <EuiPanel
+            color='subdued'
+            hasShadow={false}
+            hasBorder={false}
+            borderRadius='none'
+            paddingSize='m'
+            // EuiPanel's `grow` prop DEFAULTS TO TRUE (flex-grow:1), which in this flex-row parent
+            // overrode the fixed width below and let the sidebar swallow half the page. A
+            // fixed-width pane must explicitly opt out.
+            grow={false}
+            role='region'
+            aria-label={i18n.translate(
+              'wazuhAiAssistant.chat.conversations.sidebarRegionLabel',
+              { defaultMessage: 'Saved conversations' },
+            )}
+            style={{
+              width: CONVERSATION_SIDEBAR_WIDTH,
+              maxWidth: CONVERSATION_SIDEBAR_WIDTH,
+              flexShrink: 0,
+              overflowY: 'auto',
+              // `--wz-hairline` (chat-page.scss, sourced from `$euiBorderColor`) replaces the old
+              // hardcoded `#D3DAE6` — that hex was EUI's light-theme `lightShade` token with no
+              // dark-mode counterpart, so it rendered as the brightest edge on the page in dark mode.
+              borderRight: '1px solid var(--wz-hairline)',
             }}
-            onNewConversation={() =>
-              void confirmIfGenerating(handleNewConversation)
-            }
-            onDelete={handleDeleteConversation}
-          />
-        </EuiPanel>
+          >
+            <ConversationList
+              conversations={conversations}
+              isLoading={isLoadingConversations}
+              activeConversationId={activeConversationId}
+              // Both go through the confirm gate: each would cancel a running answer. Delete is not
+              // gated — ConversationList already confirms it, and a second modal on top of that one
+              // would be worse than the risk it guards against.
+              //
+              // Clicking the conversation ALREADY open is not one of those actions: it is a no-op
+              // (`handleSelectConversation` returns immediately), so asking to confirm an interruption
+              // that was never going to happen only trains the user to dismiss the dialog. The check
+              // has to happen here, before the gate, not only inside the handler behind it.
+              onSelect={id => {
+                if (id === activeConversationIdRef.current) {
+                  return;
+                }
+                void confirmIfGenerating(
+                  () => void handleSelectConversation(id),
+                );
+              }}
+              onNewConversation={() =>
+                void confirmIfGenerating(handleNewConversation)
+              }
+              onDelete={handleDeleteConversation}
+            />
+          </EuiPanel>
+        )}
 
         {/* Right pane: the chat column, centered, on the plain (default) background. This IS the
           conversation's scroll container (the scrollbar belongs
