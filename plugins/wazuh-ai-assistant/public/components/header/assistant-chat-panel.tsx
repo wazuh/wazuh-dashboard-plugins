@@ -3,8 +3,6 @@ import {
   EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiFlyout,
-  EuiFlyoutHeader,
   EuiTitle,
   EuiToolTip,
 } from '@elastic/eui';
@@ -14,21 +12,26 @@ import { AppMountParameters, CoreStart } from '../../../../../src/core/public';
 import { PLUGIN_ID } from '../../../common/constants';
 import { ChatPage } from '../chat/chat-page';
 import { useProviders } from '../../hooks/use-providers';
-import {
-  confirmInterruption,
-  interruptConfirmationText,
-} from '../../services/interrupt-confirm';
+import { interruptConfirmationText } from '../../services/interrupt-confirm';
 
-interface AssistantChatFlyoutProps {
+interface AssistantChatPanelProps {
   core: CoreStart;
+  /** Closes the sidecar without confirmation — always call it through `runGuarded`. */
   onClose: () => void;
+  /** Interrupt-confirm gate owned by the header button, shared with its toggle-close path. */
+  runGuarded: (action: () => void) => void;
+  /** Shared with the header button so both close paths see the generating state. */
+  isGeneratingRef: React.MutableRefObject<boolean>;
 }
 
-const FLYOUT_MAX_WIDTH = 1150;
+/** Panel width from which the saved-conversations sidebar fits beside the chat column. */
+const SIDEBAR_MIN_PANEL_WIDTH = 700;
 
-export const AssistantChatFlyout: React.FC<AssistantChatFlyoutProps> = ({
+export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
   core,
   onClose,
+  runGuarded,
+  isGeneratingRef,
 }) => {
   const {
     providers,
@@ -41,11 +44,15 @@ export const AssistantChatFlyout: React.FC<AssistantChatFlyoutProps> = ({
     () => createMemoryHistory() as unknown as AppMountParameters['history'],
   );
   const titleId = useId();
+  const rootRef = useRef<HTMLElement>(null);
+  const [showSidebar, setShowSidebar] = useState(false);
 
-  const isGeneratingRef = useRef(false);
-  const handleGeneratingChange = useCallback((generating: boolean) => {
-    isGeneratingRef.current = generating;
-  }, []);
+  const handleGeneratingChange = useCallback(
+    (generating: boolean) => {
+      isGeneratingRef.current = generating;
+    },
+    [isGeneratingRef],
+  );
 
   useEffect(() => {
     const warnBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -56,22 +63,23 @@ export const AssistantChatFlyout: React.FC<AssistantChatFlyoutProps> = ({
     };
     window.addEventListener('beforeunload', warnBeforeUnload);
     return () => window.removeEventListener('beforeunload', warnBeforeUnload);
-  }, []);
+  }, [isGeneratingRef]);
 
-  const runGuarded = useCallback(
-    (action: () => void) => {
-      if (!isGeneratingRef.current) {
-        action();
-        return;
-      }
-      void confirmInterruption(core.overlays).then(confirmed => {
-        if (confirmed) {
-          action();
-        }
-      });
-    },
-    [core.overlays],
-  );
+  useEffect(() => {
+    const element = rootRef.current;
+    if (!element) {
+      return undefined;
+    }
+    const update = () =>
+      setShowSidebar(element.offsetWidth >= SIDEBAR_MIN_PANEL_WIDTH);
+    update();
+    if (typeof ResizeObserver === 'undefined') {
+      return undefined;
+    }
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   const requestClose = useCallback(
     () => runGuarded(onClose),
@@ -88,42 +96,66 @@ export const AssistantChatFlyout: React.FC<AssistantChatFlyoutProps> = ({
   );
 
   const settingsLabel = i18n.translate(
-    'wazuhAiAssistant.headerFlyout.settingsButtonLabel',
-    { defaultMessage: 'AI Assistant settings' },
+    'wazuhAiAssistant.headerPanel.settingsButtonLabel',
+    {
+      defaultMessage: 'AI Assistant settings',
+    },
+  );
+  const closeLabel = i18n.translate(
+    'wazuhAiAssistant.headerPanel.closeButtonLabel',
+    {
+      defaultMessage: 'Close the AI Assistant',
+    },
   );
 
   return (
-    <EuiFlyout
-      onClose={requestClose}
-      size='l'
-      maxWidth={FLYOUT_MAX_WIDTH}
+    <section
+      ref={rootRef}
       aria-labelledby={titleId}
-      data-test-subj='wzAiAssistantFlyout'
+      data-test-subj='wzAiAssistantPanel'
+      style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
     >
-      <EuiFlyoutHeader hasBorder>
+      <div
+        style={{
+          padding: '10px 16px',
+          borderBottom: '1px solid #D3DAE6',
+          flexShrink: 0,
+        }}
+      >
         <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
           <EuiFlexItem>
-            <EuiTitle size='s'>
+            <EuiTitle size='xs'>
               <h2 id={titleId}>
-                {i18n.translate('wazuhAiAssistant.headerFlyout.title', {
+                {i18n.translate('wazuhAiAssistant.headerPanel.title', {
                   defaultMessage: 'AI Assistant',
                 })}
               </h2>
             </EuiTitle>
           </EuiFlexItem>
-          <EuiFlexItem grow={false} style={{ marginRight: 32 }}>
+          <EuiFlexItem grow={false}>
             <EuiToolTip content={settingsLabel}>
               <EuiButtonIcon
                 iconType='gear'
                 color='text'
                 aria-label={settingsLabel}
                 onClick={openSettings}
-                data-test-subj='wzAiAssistantFlyoutSettingsButton'
+                data-test-subj='wzAiAssistantPanelSettingsButton'
+              />
+            </EuiToolTip>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiToolTip content={closeLabel}>
+              <EuiButtonIcon
+                iconType='cross'
+                color='text'
+                aria-label={closeLabel}
+                onClick={requestClose}
+                data-test-subj='wzAiAssistantPanelCloseButton'
               />
             </EuiToolTip>
           </EuiFlexItem>
         </EuiFlexGroup>
-      </EuiFlyoutHeader>
+      </div>
       <div style={{ flex: '1 1 auto', minHeight: 0, overflow: 'auto' }}>
         <div style={{ height: '100%' }}>
           <ChatPage
@@ -136,9 +168,10 @@ export const AssistantChatFlyout: React.FC<AssistantChatFlyoutProps> = ({
             onProviderChange={setSelectedProviderId}
             onNavigateToSettings={openSettings}
             onGeneratingChange={handleGeneratingChange}
+            showConversationSidebar={showSidebar}
           />
         </div>
       </div>
-    </EuiFlyout>
+    </section>
   );
 };
