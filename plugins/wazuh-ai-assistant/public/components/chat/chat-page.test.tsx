@@ -1,8 +1,14 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  act,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { createBrowserHistory } from 'history';
-import { ChatPage } from './chat-page';
+import { ChatPage, CONVERSATIONS_CHANGED_EVENT } from './chat-page';
 import {
   ConversationRecord,
   PersistedChatMessage,
@@ -1335,5 +1341,45 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
       expect(screen.getByText('earlier question')).toBeInTheDocument(),
     );
     expect(mockOpenConfirm).not.toHaveBeenCalled();
+  });
+});
+
+describe('ChatPage — sidebar sync across instances (#8827)', () => {
+  it('refreshes the conversation list when another instance announces a change', async () => {
+    mockConversationsService.list.mockResolvedValue([]);
+    renderChatPage();
+    await waitFor(() =>
+      expect(mockConversationsService.list).toHaveBeenCalledTimes(1),
+    );
+
+    // Another mounted ChatPage (e.g. the header flyout) saved a new conversation.
+    mockConversationsService.list.mockResolvedValue([
+      {
+        id: 'conv-flyout',
+        title: 'Created in the flyout',
+        updatedAt: '2024-01-01',
+      },
+    ]);
+    act(() => {
+      window.dispatchEvent(new Event(CONVERSATIONS_CHANGED_EVENT));
+    });
+
+    await waitFor(() =>
+      expect(screen.getByText('Created in the flyout')).toBeInTheDocument(),
+    );
+    expect(mockConversationsService.list).toHaveBeenCalledTimes(2);
+  });
+
+  it('stops listening once unmounted', async () => {
+    mockConversationsService.list.mockResolvedValue([]);
+    const { unmount } = renderChatPage();
+    await waitFor(() =>
+      expect(mockConversationsService.list).toHaveBeenCalledTimes(1),
+    );
+
+    unmount();
+    window.dispatchEvent(new Event(CONVERSATIONS_CHANGED_EVENT));
+
+    expect(mockConversationsService.list).toHaveBeenCalledTimes(1);
   });
 });
