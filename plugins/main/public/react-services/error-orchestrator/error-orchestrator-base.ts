@@ -37,7 +37,7 @@ export class ErrorOrchestratorBase implements ErrorOrchestrator {
     }
 
     try {
-      const winstonLevel = winstonLevelDict[errorLog.level.toLowerCase()] || 'error';
+      const winstonLevel = winstonLevelDict[errorLog.level] || 'error';
 
       await GenericRequest.request('POST', `/utils/logs/ui`, {
         message: errorLog?.error?.message || 'No message',
