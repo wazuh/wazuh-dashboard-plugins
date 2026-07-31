@@ -6,17 +6,15 @@ import {
   ProviderTestResult,
 } from '../../common/types';
 import { fetchAllPages } from './fetch-all-pages';
+import { FieldPolicyEntry } from '../../common/field-policy';
 
-/** Mirrors server/tools/privacy.ts's `FieldPolicyAction` — that file lives under server/ (out of
- * scope to import from public/), so this is a hand-kept public-side copy of the same wire values
- * (server/routes/settings.ts's `fieldPolicyActionSchema` is the source of truth). */
-export type FieldPolicyAction = 'allow' | 'anonymize' | 'never';
-
-/** Mirrors server/tools/privacy.ts's `FieldPolicyEntry`. */
-export interface FieldPolicyEntry {
-  field: string;
-  action: FieldPolicyAction;
-}
+/** Re-exported from common/field-policy.ts — the single definition both sides now share (it used to
+ * be a hand-kept public-side copy of the server/ type, which public/ may not import). Kept exported
+ * from here so the Settings page's existing imports are unaffected. */
+export type {
+  FieldPolicyAction,
+  FieldPolicyEntry,
+} from '../../common/field-policy';
 
 /**
  * Public-side mirror of server/saved_objects/assistant-settings.ts's `AssistantSettingsAttributes`

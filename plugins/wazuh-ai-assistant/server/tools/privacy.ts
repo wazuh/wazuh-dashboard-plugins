@@ -1,39 +1,34 @@
-import { TableSpec } from '../../common/types';
 import { Digest } from './digest';
 import { WAZUH_FIELD } from '../../common/wazuh-fields';
+import {
+  FieldPolicyEntry,
+  PseudonymKind,
+  inferPseudonymKind,
+  resolveFieldAction,
+  resolveFieldEntry,
+} from '../../common/field-policy';
 
 /**
- * Privacy mode: reversible pseudonymization at
- * the digest boundary. Everything in this module is pure/stateless-per-instance — no module-level
- * caches — so it is safe to construct fresh per HTTP request (see server/routes/chat.ts).
+ * Privacy mode, server half: the pseudonym map plus every policy pass that needs it (the digest
+ * boundary) or needs the outbound REQUEST (the retrieval boundary). The pure, isomorphic half of
+ * the policy — the action semantics, field resolution, and the display pass `applyTablePolicy` —
+ * lives in `common/field-policy.ts`, because `public/` has to re-apply the display half to
+ * persisted tables and cannot import from `server/`. Read that file's header first: it defines what
+ * `allow`/`anonymize`/`never` mean at each boundary.
  *
- * The three actions do NOT all act at the same boundary, and the difference is deliberate:
- *
- * - `anonymize` is a MODEL-boundary control. The pseudonym map is reversible and stays inside the
- *   deployment, so the value must still be retrieved and still renders in clear text in the locally
- *   rendered result table — that is the whole point of pseudonymizing rather than dropping: the
- *   analyst keeps their data, the provider only ever sees `HOST_1`.
- * - `never` is a RETRIEVAL control. Nothing that is never allowed to leave should be fetched in the
- *   first place, so the field is stripped from the outbound query's projections
- *   (`applyProjectionPolicy`) and from the rendered table (`applyTablePolicy`) as well as from the
- *   digest (`applyFieldPolicy`).
- * - `allow` (also the default for an unlisted field on a typed tool) acts nowhere.
+ * Everything in this module is pure/stateless-per-instance — no module-level caches — so it is safe
+ * to construct fresh per HTTP request (see server/routes/chat.ts).
  */
 
-export type FieldPolicyAction = 'allow' | 'anonymize' | 'never';
-
-export interface FieldPolicyEntry {
-  /** Either a plain digest field path ("wazuh.agent.name") or a tool-scoped form
-   * ("get_active_agents/name") for Manager-API tools whose digest fields are bare, generic names
-   * ("name" means an agent hostname in get_active_agents but a package name in
-   * get_agent_packages — only tool scoping can distinguish them). Scoped entries win over plain
-   * ones for their tool. */
-  field: string;
-  action: FieldPolicyAction;
-  /** Optional explicit pseudonym kind, for fields whose name alone can't be classified (a bare
-   * "name" infers VAL; a scoped agent-tool entry declares HOST). */
-  kind?: PseudonymKind;
-}
+// Re-exported so every server-side consumer (executor.ts, routes/settings.ts,
+// saved_objects/assistant-settings.ts and this file's own tests) keeps importing the policy from one
+// place, without each of them reaching into common/ for half of it.
+export {
+  applyTablePolicy,
+  inferPseudonymKind,
+  resolveFieldAction,
+} from '../../common/field-policy';
+export type { FieldPolicyEntry } from '../../common/field-policy';
 
 /** Curated defaults. Every entry targets a valid `wazuh.*`/ECS/WCS field — population is
  * decoder-dependent, so an entry may currently be inert (no matching data) without being wrong. */
@@ -85,8 +80,6 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'package.architecture', action: 'allow' },
 ];
 
-export type PseudonymKind = 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
-
 const PSEUDONYM_KINDS: PseudonymKind[] = ['HOST', 'IP', 'USER', 'URL', 'VAL'];
 
 /** One client-held (or server-minted) pseudonym mapping entry; the wire shape of `privacy.map`
@@ -94,27 +87,6 @@ const PSEUDONYM_KINDS: PseudonymKind[] = ['HOST', 'IP', 'USER', 'URL', 'VAL'];
 export interface PseudonymEntry {
   value: string;
   pseudonym: string;
-}
-
-/** Infers which pseudonym kind a field name should mint, from the field name alone ("kind
- * inferred from field name"). Checked in this order so a field matching more than one heuristic
- * (there are none in FIELD_POLICY_DEFAULTS today) resolves predictably; falls back to the generic
- * `VAL` kind for a field that is none of host/ip/user/url. */
-export function inferPseudonymKind(field: string): PseudonymKind {
-  const lower = field.toLowerCase();
-  if (lower.includes('url')) {
-    return 'URL';
-  }
-  if (lower.includes('ip')) {
-    return 'IP';
-  }
-  if (lower.includes('user')) {
-    return 'USER';
-  }
-  if (lower.includes('hostname') || lower.endsWith('.name')) {
-    return 'HOST';
-  }
-  return 'VAL';
 }
 
 /** Matches a complete minted pseudonym token, e.g. "HOST_3". Word-boundary anchored so a real
@@ -485,52 +457,6 @@ export function prescanAndMintToolContent(
   return JSON.stringify(scanValues(parsed));
 }
 
-/** Resolves the policy entry for `field` (optionally scoped to `toolName`). Tool-scoped entries
- * ("toolName/field") are checked first and win over plain ones; plain entries support a trailing
- * `.*` prefix match (e.g. "wazuh.rule.compliance.*" matches "wazuh.rule.compliance" itself and
- * "wazuh.rule.compliance.pci_dss"). First matching entry wins; `undefined` (no matching policy
- * entry) means "allow" by omission. */
-function resolveFieldEntry(
-  field: string,
-  policy: FieldPolicyEntry[],
-  toolName?: string,
-): FieldPolicyEntry | undefined {
-  if (toolName) {
-    const scopedKey = `${toolName}/${field}`;
-    for (const entry of policy) {
-      if (entry.field === scopedKey) {
-        return entry;
-      }
-    }
-  }
-  for (const entry of policy) {
-    if (entry.field.includes('/')) {
-      continue; // Tool-scoped entry for some other tool (or already checked above).
-    }
-    if (entry.field.endsWith('.*')) {
-      const prefix = entry.field.slice(0, -2);
-      if (field === prefix || field.startsWith(`${prefix}.`)) {
-        return entry;
-      }
-    } else if (entry.field === field) {
-      return entry;
-    }
-  }
-  return undefined;
-}
-
-/** Effective action for `field` under `policy` — `'allow'` when no entry matches, since an
- * unlisted field is allowed by omission (the escape hatch's fail-closed default is a digest-only
- * concern, see `applyFieldPolicy`). Exported for the retrieval/display passes below, which need the
- * action for a bare field path rather than the whole entry. */
-export function resolveFieldAction(
-  field: string,
-  policy: FieldPolicyEntry[],
-  toolName?: string,
-): FieldPolicyAction {
-  return resolveFieldEntry(field, policy, toolName)?.action ?? 'allow';
-}
-
 /**
  * The `_source`-style exclude patterns covering every 'never' entry that applies to `toolName`.
  * A tool-scoped entry ("get_active_agents/name") contributes only for its own tool, and only its
@@ -706,59 +632,122 @@ export function applyProjectionPolicy(
 }
 
 /**
- * Display half of the 'never' action: drops every 'never' field from the `table` StreamEvent — its
- * column list, each row's keys (visible columns AND the row-only investigation fields the row
- * expander reveals), and `severityColumn` if that column itself went away.
+ * Retrieval half of the 'never' action for the MANAGER API path (issue #8821): the Wazuh Server API
+ * has no `_source`, it projects through the `select` query parameter, so `applyProjectionPolicy`
+ * above cannot cover it. Without this, a 'never' Manager field was still fetched from the API in
+ * full and only dropped afterwards when the table/digest were built — the exact "the query brings
+ * everything and then it is filtered" gap this closes.
  *
- * 'anonymize' fields are deliberately left in clear text: the table renders locally in the browser
- * and never reaches the provider, and the pseudonym map is reversible by design — a table of
- * `HOST_1`/`IP_3` would cost the analyst their data for no privacy gain. See this module's header.
+ * `fields` is everything the tool actually needs (its table columns, its row-only investigation
+ * fields and its digest sample columns — assembled at the executor.ts call site from the
+ * `ToolDefinition`): the returned `select` is that list minus the 'never' fields, so the API returns
+ * exactly what will be displayed and nothing more.
  *
- * `aggFields` (when given) covers the aggregation-table case, where a row's keys are `key`/
- * `doc_count` rather than field paths and per-column resolution therefore can't see the underlying
- * field: if the FIRST top-level aggregation's field is 'never', every bucket key IS a value of that
- * field, so the rows are dropped entirely. Only the first aggregation is consulted because that is
- * the only one `buildTableSpec` renders (documented in search_wazuh_data.ts).
+ * Returns `params` itself (same reference) when no 'never' entry applies to this tool, so a policy
+ * without one leaves the Manager request byte-identical to a privacy-off one. Two deliberate
+ * degradations rather than sending a request the API would reject:
+ *
+ * - Every needed field is 'never' -> no `select` is added at all (an empty `select=` is a 400). The
+ *   table and digest passes then drop every field anyway, so the analyst still sees nothing; the
+ *   values do reach the server on that (pathological, self-defeating) configuration.
+ * - A tool that already declares its own `select` (none does today) has that list FILTERED instead
+ *   of replaced, so an explicit narrower projection is never widened by this pass.
  */
-export function applyTablePolicy(
-  spec: TableSpec,
+export function applyManagerParamPolicy(
+  params: Record<string, unknown>,
   policy: FieldPolicyEntry[],
-  toolName?: string,
-  aggFields?: Record<string, string | undefined>,
-): TableSpec {
+  toolName: string,
+  fields: string[],
+): Record<string, unknown> {
   const isNever = (field: string): boolean =>
     resolveFieldAction(field, policy, toolName) === 'never';
-
-  const firstAggField = aggFields
-    ? aggFields[Object.keys(aggFields)[0]]
-    : undefined;
-  if (firstAggField && isNever(firstAggField)) {
-    return { ...spec, columns: spec.columns, rows: [] };
+  if (!fields.some(isNever)) {
+    return params;
   }
 
-  const columns = spec.columns.filter(column => !isNever(column.id));
-  if (
-    columns.length === spec.columns.length &&
-    !spec.rows.some(row => Object.keys(row).some(isNever))
-  ) {
-    return spec;
+  const existing = params.select;
+  const declared =
+    typeof existing === 'string'
+      ? existing.split(',').map(field => field.trim())
+      : Array.isArray(existing)
+      ? existing.filter((field): field is string => typeof field === 'string')
+      : fields;
+  const selected = [
+    ...new Set(declared.filter(field => field && !isNever(field))),
+  ];
+  if (selected.length === 0) {
+    return params;
+  }
+  return { ...params, select: selected.join(',') };
+}
+
+/** Aggregation spec keys whose `field` is NOT a projection of that field's values: a `filter`
+ * sub-aggregation counts documents matching a clause, and using a field as a FILTER is explicitly
+ * allowed by the policy (see `applyProjectionPolicy`'s doc comment). Everything else that carries a
+ * `field` — terms, significant_terms, multi_terms, composite sources, cardinality, date_histogram,
+ * top_metrics, min/max/avg/sum — surfaces values or value-derived buckets and is therefore treated
+ * as a projection. */
+const NON_PROJECTING_AGG_KEYS = new Set(['filter', 'filters']);
+
+/**
+ * Retrieval half of the 'never' action for AGGREGATIONS (issue #8821): an aggregation over a field
+ * is a projection in disguise — its bucket keys ARE values of that field — and `_source` excludes
+ * cannot stop it, so the values used to come back from the indexer and were only dropped afterwards
+ * by `applyFieldPolicy`/`applyTablePolicy`. This detects that case BEFORE the search runs so the
+ * query is rejected instead of executed; executor.ts turns the returned field name into a bounded
+ * tool-result error the model can self-correct from (by aggregating over an allowed field instead).
+ *
+ * Only the `aggs`/`aggregations` subtree is walked — a 'never' field used inside `query` is a
+ * filter, not a projection, and stays allowed. Returns the first offending field name, or
+ * `undefined` when there is none (including when the body has no aggregations at all).
+ */
+export function findNeverAggregation(
+  body: Record<string, unknown>,
+  policy: FieldPolicyEntry[],
+  toolName?: string,
+): string | undefined {
+  const aggs = body.aggs ?? body.aggregations;
+  if (!aggs || typeof aggs !== 'object') {
+    return undefined;
   }
 
-  const rows = spec.rows.map(row => {
-    const out: Record<string, unknown> = {};
-    for (const [field, value] of Object.entries(row)) {
-      if (!isNever(field)) {
-        out[field] = value;
+  /** `insideFilter` is sticky for the whole subtree below a `filter`/`filters` key: that subtree is a
+   * QUERY clause (`{filter:{exists:{field:...}}}`), and using a field as a filter is allowed — so no
+   * `field` anywhere inside it may be treated as a projection, not just the one directly under it. */
+  const walk = (node: unknown, insideFilter: boolean): string | undefined => {
+    if (Array.isArray(node)) {
+      for (const item of node) {
+        const found = walk(item, insideFilter);
+        if (found) {
+          return found;
+        }
+      }
+      return undefined;
+    }
+    if (!node || typeof node !== 'object') {
+      return undefined;
+    }
+    const record = node as Record<string, unknown>;
+    if (
+      !insideFilter &&
+      typeof record.field === 'string' &&
+      resolveFieldAction(record.field, policy, toolName) === 'never'
+    ) {
+      return record.field;
+    }
+    for (const [key, value] of Object.entries(record)) {
+      const found = walk(
+        value,
+        insideFilter || NON_PROJECTING_AGG_KEYS.has(key),
+      );
+      if (found) {
+        return found;
       }
     }
-    return out;
-  });
+    return undefined;
+  };
 
-  const next: TableSpec = { ...spec, columns, rows };
-  if (next.severityColumn && isNever(next.severityColumn)) {
-    delete next.severityColumn;
-  }
-  return next;
+  return walk(aggs, false);
 }
 
 /**
@@ -784,7 +773,8 @@ export function extractAggFields(
   // the escape hatch passes the model's raw body through. Reading only `aggs` would leave the
   // breakdown of an `aggregations`-spelled query unattributed, and therefore unscrubbed.
   const aggs = (body?.aggs ?? body?.aggregations) as
-    Record<string, unknown> | undefined;
+    | Record<string, unknown>
+    | undefined;
   if (!aggs) {
     return undefined;
   }

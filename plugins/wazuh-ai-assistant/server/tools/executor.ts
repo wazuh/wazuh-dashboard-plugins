@@ -16,10 +16,12 @@ import { buildDigest, buildTableSpec, capDigest, Digest } from './digest';
 import { IndexerRequest, ManagerRequest, ToolDefinition } from './types';
 import {
   applyFieldPolicy,
+  applyManagerParamPolicy,
   applyProjectionPolicy,
   applyTablePolicy,
   extractAggFields,
   FieldPolicyEntry,
+  findNeverAggregation,
   Pseudonymizer,
 } from './privacy';
 import { resolveApiHostId } from './api-host';
@@ -73,9 +75,11 @@ function finalizeDigest(
 /**
  * Applies the display half of the field policy to a `table` StreamEvent's spec (when `privacy` is
  * given): 'never' fields are dropped from its columns and rows. 'anonymize' fields keep their real
- * values on purpose — the table renders locally and never reaches the provider, and the pseudonym
- * map is reversible (see privacy.ts's module header). A no-op passthrough when `privacy` is
- * undefined, so privacy-off tables are byte-identical to before this existed.
+ * values on purpose — the table is a LOCAL surface, and so are the answer text (de-pseudonymized by
+ * chat.ts's `StreamDepseudonymizer` before it reaches the browser) and the tool-call panel; only the
+ * provider ever sees pseudonyms. See common/field-policy.ts's module header.
+ *
+ * A no-op passthrough when `privacy` is undefined, so privacy-off tables are byte-identical.
  */
 function finalizeTable(
   spec: TableSpec,
@@ -164,6 +168,24 @@ async function executeIndexerRequest(
   // and the "Open in Discover" DSL all read `body` below. A no-op passthrough (same reference) when
   // privacy is off or the policy has no applicable 'never' entry.
   if (privacy) {
+    // Aggregations first: an aggregation's bucket keys ARE values of the aggregated field, and no
+    // `_source` rewrite can suppress them — so a 'never' aggregation field has to reject the query
+    // rather than be filtered out of the response afterwards (issue #8821). Bounded and
+    // self-correctable: the model is told which field is off limits and can re-aggregate.
+    const neverAggField = findNeverAggregation(
+      body,
+      privacy.fieldPolicy,
+      toolName,
+    );
+    if (neverAggField) {
+      return {
+        toolResultContent: toolErrorContent(
+          `Aggregating over "${neverAggField}" is not allowed: the field's privacy policy is ` +
+            '"never send", and an aggregation would expose its values as bucket keys. Aggregate ' +
+            'over a different field.',
+        ),
+      };
+    }
     body = applyProjectionPolicy(body, privacy.fieldPolicy, toolName);
   }
 
@@ -228,7 +250,33 @@ async function executeManagerRequest(
     };
   }
 
-  const clampedParams = clampManagerParams(managerRequest.params);
+  let clampedParams = clampManagerParams(managerRequest.params);
+
+  // Retrieval half of the 'never' action for the Manager API (issue #8821): the API projects through
+  // `select`, not `_source`, so `applyProjectionPolicy` (Indexer-only) never covered this path and a
+  // 'never' field was fetched in full and only dropped when the table/digest were built. The field
+  // list is assembled from THIS tool's definition — visible columns, the row-only investigation
+  // fields the row expander shows, and the digest's sample columns — so `select` asks for exactly
+  // what is displayable and nothing more. A no-op passthrough when the policy has no applicable
+  // 'never' entry (see applyManagerParamPolicy), keeping privacy-off requests byte-identical.
+  // GET only: `select` is a query-string projection parameter, and only a GET's params reach the
+  // query string (a non-GET's params are sent as the request body — see the `data` build below), so
+  // adding it to a POST/PUT body would be a field the API ignores rather than a projection.
+  if (privacy && managerRequest.method === 'GET') {
+    const neededFields = [
+      ...new Set([
+        ...def.tableSpec.columns.map(column => column.field),
+        ...(def.tableSpec.rowFields ?? []),
+        ...def.digest.sampleColumns,
+      ]),
+    ];
+    clampedParams = applyManagerParamPolicy(
+      clampedParams,
+      privacy.fieldPolicy,
+      toolName,
+      neededFields,
+    );
+  }
 
   try {
     const apiHostID = await resolveApiHostId(context, request);
@@ -296,7 +344,8 @@ export interface BuiltToolCall {
 }
 
 export type BuildValidatedRequestResult =
-  { ok: true; built: BuiltToolCall } | { ok: false; toolResultContent: string };
+  | { ok: true; built: BuiltToolCall }
+  | { ok: false; toolResultContent: string };
 
 /**
  * Validates a model-issued tool call's arguments and builds its outbound request, WITHOUT
