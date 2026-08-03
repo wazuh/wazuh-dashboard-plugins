@@ -15,6 +15,7 @@ import {
   EuiFlyoutHeader,
   EuiForm,
   EuiFormRow,
+  EuiLink,
   EuiSelect,
   EuiSpacer,
   EuiTitle,
@@ -37,6 +38,46 @@ const PROVIDER_TYPE_FORM_LABELS: Record<string, string> = {
   anthropic: i18n.translate('wazuhAiAssistant.settings.type.anthropic', {
     defaultMessage: 'Anthropic',
   }),
+};
+
+/**
+ * Per-type endpoint URL guidance shown under the field: the adapters append their own path to
+ * `baseUrl` (`/chat/completions` for openai_compatible, `/v1/messages` for anthropic — see
+ * server/providers/openai-compatible.ts and anthropic.ts), so the placeholder/examples must be
+ * the API ROOT, not a full request URL, or a user copying the example verbatim would get a
+ * doubled path once the adapter appends its own suffix.
+ */
+const PROVIDER_URL_GUIDANCE: Record<
+  ProviderInput['type'],
+  {
+    placeholder: string;
+    examples: string[];
+    docsLabel: string;
+    docsUrl: string;
+  }
+> = {
+  openai_compatible: {
+    placeholder: 'https://api.openai.com/v1',
+    examples: [
+      'https://api.openai.com/v1',
+      'https://api.groq.com/openai/v1',
+      'http://localhost:11434/v1',
+    ],
+    docsLabel: i18n.translate(
+      'wazuhAiAssistant.settings.form.baseUrlDocsOpenai',
+      { defaultMessage: 'OpenAI API reference' },
+    ),
+    docsUrl: 'https://platform.openai.com/docs/api-reference',
+  },
+  anthropic: {
+    placeholder: 'https://api.anthropic.com',
+    examples: ['https://api.anthropic.com'],
+    docsLabel: i18n.translate(
+      'wazuhAiAssistant.settings.form.baseUrlDocsAnthropic',
+      { defaultMessage: 'Anthropic API reference' },
+    ),
+    docsUrl: 'https://docs.anthropic.com/en/api/overview',
+  },
 };
 
 const emptyForm: ProviderInput = {
@@ -87,6 +128,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   );
   const [baseUrlError, setBaseUrlError] = useState<string | null>(null);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  const urlGuidance = PROVIDER_URL_GUIDANCE[form.type];
 
   const handleSave = async () => {
     const trimmedForm: ProviderInput = {
@@ -140,7 +182,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
     <>
       <EuiFlyout
         onClose={requestClose}
-        size='s'
+        size='m'
         aria-labelledby='wz-ai-provider-flyout-title'
       >
         <EuiFlyoutHeader hasBorder>
@@ -266,10 +308,31 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               })}
               isInvalid={Boolean(baseUrlError)}
               error={baseUrlError}
+              helpText={
+                <>
+                  <FormattedMessage
+                    id='wazuhAiAssistant.settings.form.baseUrlExample'
+                    defaultMessage='Example: {example}'
+                    values={{
+                      example: <EuiCode>{urlGuidance.examples[0]}</EuiCode>,
+                    }}
+                  />
+                  {urlGuidance.examples.slice(1).map(example => (
+                    <React.Fragment key={example}>
+                      {', '}
+                      <EuiCode>{example}</EuiCode>
+                    </React.Fragment>
+                  ))}
+                  {'. '}
+                  <EuiLink href={urlGuidance.docsUrl} target='_blank'>
+                    {urlGuidance.docsLabel}
+                  </EuiLink>
+                </>
+              }
             >
               <EuiFieldText
                 value={form.baseUrl}
-                placeholder='https://api.openai.com/v1'
+                placeholder={urlGuidance.placeholder}
                 isInvalid={Boolean(baseUrlError)}
                 onChange={event => {
                   setForm({ ...form, baseUrl: event.target.value });

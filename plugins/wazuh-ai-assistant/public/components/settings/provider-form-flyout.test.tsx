@@ -246,3 +246,33 @@ describe('ProviderFormFlyout — API key encryption gate', () => {
     expect(screen.getByRole('button', { name: /^save$/i })).toBeEnabled();
   });
 });
+
+describe('ProviderFormFlyout — endpoint URL guidance', () => {
+  it('shows an OpenAI placeholder/example and docs link by default (openai_compatible)', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveAttribute(
+      'placeholder',
+      'https://api.openai.com/v1',
+    );
+    expect(
+      screen.getByRole('link', { name: /openai api reference/i }),
+    ).toHaveAttribute('href', 'https://platform.openai.com/docs/api-reference');
+  });
+
+  it('switches to the Anthropic placeholder/example and docs link when the provider type changes', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveAttribute(
+      'placeholder',
+      'https://api.anthropic.com',
+    );
+    expect(
+      screen.getByRole('link', { name: /anthropic api reference/i }),
+    ).toHaveAttribute('href', 'https://docs.anthropic.com/en/api/overview');
+  });
+});
