@@ -213,11 +213,15 @@ const DocsPopover: React.FC<{
       closePopover={() => setIsOpen(false)}
       panelPaddingSize='s'
       anchorPosition='downLeft'
+      // Without an explicit cap the panel sizes to its widest unwrapped line — the note sentence
+      // in particular — stretching the popover (and its trigger link) far past what the list of
+      // short doc links actually needs. Capping the width forces the note to wrap instead.
+      panelStyle={{ maxWidth: 280 }}
     >
       <EuiPopoverTitle>{title}</EuiPopoverTitle>
       <EuiFlexGroup direction='column' gutterSize='s' responsive={false}>
         {docs.map(doc => (
-          <EuiFlexItem key={doc.url}>
+          <EuiFlexItem key={doc.url} grow={false}>
             <EuiLink href={doc.url} target='_blank'>
               {doc.label}
             </EuiLink>
