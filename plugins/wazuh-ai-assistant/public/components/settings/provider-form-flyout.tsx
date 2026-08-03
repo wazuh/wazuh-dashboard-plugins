@@ -16,6 +16,8 @@ import {
   EuiForm,
   EuiFormRow,
   EuiLink,
+  EuiPopover,
+  EuiPopoverTitle,
   EuiSelect,
   EuiSpacer,
   EuiTitle,
@@ -121,6 +123,44 @@ const emptyForm: ProviderInput = {
 function isValidEndpointUrl(value: string): boolean {
   return /^https?:\/\//i.test(value.trim());
 }
+
+/** Collapses the (potentially multi-service, for openai_compatible) docs links behind a single
+ * trigger rather than inlining them all in the help text — inlining every link for every provider
+ * type change would make the field's help text noisy and reflow the form on each type switch. */
+const DocsPopover: React.FC<{ docs: ProviderUrlDoc[] }> = ({ docs }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <EuiPopover
+      button={
+        <EuiLink onClick={() => setIsOpen(open => !open)}>
+          {i18n.translate('wazuhAiAssistant.settings.form.baseUrlDocsButton', {
+            defaultMessage: 'API documentation',
+          })}
+        </EuiLink>
+      }
+      isOpen={isOpen}
+      closePopover={() => setIsOpen(false)}
+      panelPaddingSize='s'
+      anchorPosition='downLeft'
+    >
+      <EuiPopoverTitle>
+        {i18n.translate('wazuhAiAssistant.settings.form.baseUrlDocsTitle', {
+          defaultMessage: 'API documentation',
+        })}
+      </EuiPopoverTitle>
+      <EuiFlexGroup direction='column' gutterSize='s' responsive={false}>
+        {docs.map(doc => (
+          <EuiFlexItem key={doc.url}>
+            <EuiLink href={doc.url} target='_blank'>
+              {doc.label}
+            </EuiLink>
+          </EuiFlexItem>
+        ))}
+      </EuiFlexGroup>
+    </EuiPopover>
+  );
+};
 
 interface ProviderFormFlyoutProps {
   editingProvider: ProviderSummary | null;
@@ -354,14 +394,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     </React.Fragment>
                   ))}
                   {'. '}
-                  {urlGuidance.docs.map((doc, index) => (
-                    <React.Fragment key={doc.url}>
-                      {index > 0 && ', '}
-                      <EuiLink href={doc.url} target='_blank'>
-                        {doc.label}
-                      </EuiLink>
-                    </React.Fragment>
-                  ))}
+                  <DocsPopover docs={urlGuidance.docs} />
                 </>
               }
             >
