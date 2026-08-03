@@ -8,6 +8,7 @@ import {
 } from '../../../src/core/public';
 import { i18n } from '@osd/i18n';
 import { PLUGIN_ID } from '../common/constants';
+import { registerAssistantHeaderButton } from './components/header/assistant-header-button';
 import {
   WazuhAiAssistantPluginSetup,
   WazuhAiAssistantPluginSetupDependencies,
@@ -44,7 +45,9 @@ export class WazuhAiAssistantPlugin
     return {};
   }
 
-  public start(_core: CoreStart): WazuhAiAssistantPluginStart {
+  public start(core: CoreStart): WazuhAiAssistantPluginStart {
+    registerAssistantHeaderButton(core);
+
     return {};
   }
 

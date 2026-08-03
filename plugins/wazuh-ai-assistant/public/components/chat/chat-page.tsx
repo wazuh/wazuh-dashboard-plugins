@@ -76,7 +76,8 @@ interface ChatPageProps {
   /** Owned by the app shell (application.tsx); rendered here so the provider selector sits in the
    * chat column's own header row next to the privacy chip, instead of a separate top-level row. */
   onProviderChange: (id: string) => void;
-  /** Switches the app shell to the Settings tab; wired from the top-level route state. */
+  /** The no-provider empty state's "Add a provider" CTA — its only caller. Owners wire it to
+   * open Settings with the create-provider flyout (`#/settings?addProvider=true`). */
   onNavigateToSettings: () => void;
   /** The app shell's router history (the same instance `<Router history={history}>` in
    * application.tsx uses) — used to read/write the open-conversation route below through
@@ -91,6 +92,9 @@ interface ChatPageProps {
   /** Whether the chat view is the app shell's visible tab (default true). While hidden, the
    * conversation hash stays out of the URL so a restore can't rewrite `/settings`. */
   isActive?: boolean;
+  /** Whether to render the saved-conversations sidebar (default true). The docked header panel
+   * (assistant-chat-panel.tsx) hides it while the panel is too narrow for both panes. */
+  showConversationSidebar?: boolean;
 }
 
 /**
@@ -106,6 +110,10 @@ interface TurnConversationTarget {
 const CONVERSATION_MAX_WIDTH = 860;
 /** Fixed width of the saved-conversations sidebar (conversation_list.tsx). */
 const CONVERSATION_SIDEBAR_WIDTH = 260;
+/** Window event announcing a conversation create/update/delete; every mounted ChatPage listens
+ * and refreshes, keeping the app shell's and the header flyout's sidebars in sync. */
+export const CONVERSATIONS_CHANGED_EVENT =
+  'wazuhAiAssistant:conversationsChanged';
 
 /**
  * Welcome-state example questions, now rendered as EuiCards (not plain badge chips) so the empty
@@ -281,6 +289,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   history,
   onGeneratingChange,
   isActive = true,
+  showConversationSidebar = true,
 }) => {
   // `useSyncedState` (public/hooks/use-synced-state.ts) is the `[value, setValue, ref]` pattern
   // used for `messages`, `inputText`, and `activeConversationId` below — see that hook's own doc
@@ -585,9 +594,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     }
   };
 
-  // Persistent conversations: load the caller's own saved-conversation list once on mount.
-  // `refreshConversations` is also called after every create/update/delete below so the sidebar
-  // stays in sync without a full remount.
+  // Persistent conversations: load the caller's own saved-conversation list once on mount, then
+  // again on every CONVERSATIONS_CHANGED_EVENT so all mounted ChatPage instances (the app shell
+  // and the header flyout can be open at once) keep their sidebars in sync.
   const refreshConversations = () => {
     setIsLoadingConversations(true);
     conversationsService
@@ -600,8 +609,21 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       .finally(() => setIsLoadingConversations(false));
   };
 
+  // Mutations dispatch this instead of calling refreshConversations() directly: the event reaches
+  // every mounted ChatPage (including this one, synchronously), so the mutating instance refreshes
+  // exactly once and the listener never re-dispatches — no loop, no double fetch.
+  const notifyConversationsChanged = () => {
+    window.dispatchEvent(new Event(CONVERSATIONS_CHANGED_EVENT));
+  };
+
   useEffect(() => {
     refreshConversations();
+    window.addEventListener(CONVERSATIONS_CHANGED_EVENT, refreshConversations);
+    return () =>
+      window.removeEventListener(
+        CONVERSATIONS_CHANGED_EVENT,
+        refreshConversations,
+      );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -770,7 +792,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       if (activeConversationIdRef.current === id) {
         handleNewConversation();
       }
-      refreshConversations();
+      notifyConversationsChanged();
     } catch {
       setError(
         i18n.translate('wazuhAiAssistant.chat.conversations.deleteError', {
@@ -937,7 +959,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             conversationVersionRef.current = created.version;
           }
         }
-        refreshConversations();
+        notifyConversationsChanged();
         if (args.adoptAsActive) {
           setSaveFailed(false);
         }
@@ -1589,53 +1611,57 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       >
         {/* Left pane: saved-conversations sidebar. EuiPanel color="subdued" gives the standard OSD
           "sunken" pane background without inventing a new hardcoded color. */}
-        <EuiPanel
-          color='subdued'
-          hasShadow={false}
-          hasBorder={false}
-          borderRadius='none'
-          paddingSize='m'
-          // EuiPanel's `grow` prop DEFAULTS TO TRUE (flex-grow:1), which in this flex-row parent
-          // overrode the fixed width below and let the sidebar swallow half the page. A
-          // fixed-width pane must explicitly opt out.
-          grow={false}
-          style={{
-            width: CONVERSATION_SIDEBAR_WIDTH,
-            maxWidth: CONVERSATION_SIDEBAR_WIDTH,
-            flexShrink: 0,
-            overflowY: 'auto',
-            // Single hardcoded hex in this file: #D3DAE6 is EUI's `lightShade` token, the same shade
-            // EUI's own components already use for hairline borders in the light theme. No CSS
-            // variable/theme value is exposed to inline styles in this plugin (no stylesheet, no
-            // EuiThemeProvider hook usage elsewhere here), so this is a deliberate one-off rather than
-            // a new arbitrary color.
-            borderRight: '1px solid #D3DAE6',
-          }}
-        >
-          <ConversationList
-            conversations={conversations}
-            isLoading={isLoadingConversations}
-            activeConversationId={activeConversationId}
-            // Both go through the confirm gate: each would cancel a running answer. Delete is not
-            // gated — ConversationList already confirms it, and a second modal on top of that one
-            // would be worse than the risk it guards against.
-            //
-            // Clicking the conversation ALREADY open is not one of those actions: it is a no-op
-            // (`handleSelectConversation` returns immediately), so asking to confirm an interruption
-            // that was never going to happen only trains the user to dismiss the dialog. The check
-            // has to happen here, before the gate, not only inside the handler behind it.
-            onSelect={id => {
-              if (id === activeConversationIdRef.current) {
-                return;
-              }
-              void confirmIfGenerating(() => void handleSelectConversation(id));
+        {showConversationSidebar && (
+          <EuiPanel
+            color='subdued'
+            hasShadow={false}
+            hasBorder={false}
+            borderRadius='none'
+            paddingSize='m'
+            // EuiPanel's `grow` prop DEFAULTS TO TRUE (flex-grow:1), which in this flex-row parent
+            // overrode the fixed width below and let the sidebar swallow half the page. A
+            // fixed-width pane must explicitly opt out.
+            grow={false}
+            style={{
+              width: CONVERSATION_SIDEBAR_WIDTH,
+              maxWidth: CONVERSATION_SIDEBAR_WIDTH,
+              flexShrink: 0,
+              overflowY: 'auto',
+              // Single hardcoded hex in this file: #D3DAE6 is EUI's `lightShade` token, the same shade
+              // EUI's own components already use for hairline borders in the light theme. No CSS
+              // variable/theme value is exposed to inline styles in this plugin (no stylesheet, no
+              // EuiThemeProvider hook usage elsewhere here), so this is a deliberate one-off rather than
+              // a new arbitrary color.
+              borderRight: '1px solid #D3DAE6',
             }}
-            onNewConversation={() =>
-              void confirmIfGenerating(handleNewConversation)
-            }
-            onDelete={handleDeleteConversation}
-          />
-        </EuiPanel>
+          >
+            <ConversationList
+              conversations={conversations}
+              isLoading={isLoadingConversations}
+              activeConversationId={activeConversationId}
+              // Both go through the confirm gate: each would cancel a running answer. Delete is not
+              // gated — ConversationList already confirms it, and a second modal on top of that one
+              // would be worse than the risk it guards against.
+              //
+              // Clicking the conversation ALREADY open is not one of those actions: it is a no-op
+              // (`handleSelectConversation` returns immediately), so asking to confirm an interruption
+              // that was never going to happen only trains the user to dismiss the dialog. The check
+              // has to happen here, before the gate, not only inside the handler behind it.
+              onSelect={id => {
+                if (id === activeConversationIdRef.current) {
+                  return;
+                }
+                void confirmIfGenerating(
+                  () => void handleSelectConversation(id),
+                );
+              }}
+              onNewConversation={() =>
+                void confirmIfGenerating(handleNewConversation)
+              }
+              onDelete={handleDeleteConversation}
+            />
+          </EuiPanel>
+        )}
 
         {/* Right pane: the chat column, centered, on the plain (default) background. This IS the
           conversation's scroll container (the scrollbar belongs

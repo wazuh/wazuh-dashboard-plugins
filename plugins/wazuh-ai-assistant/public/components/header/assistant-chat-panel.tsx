@@ -1,0 +1,188 @@
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
+import {
+  EuiButtonIcon,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiTitle,
+  EuiToolTip,
+} from '@elastic/eui';
+import { i18n } from '@osd/i18n';
+import { createMemoryHistory } from 'history';
+import { AppMountParameters, CoreStart } from '../../../../../src/core/public';
+import { PLUGIN_ID } from '../../../common/constants';
+import { ChatPage } from '../chat/chat-page';
+import { useProviders } from '../../hooks/use-providers';
+import { interruptConfirmationText } from '../../services/interrupt-confirm';
+
+interface AssistantChatPanelProps {
+  core: CoreStart;
+  /** Closes the sidecar without confirmation — always call it through `runGuarded`. */
+  onClose: () => void;
+  /** Interrupt-confirm gate owned by the header button, shared with its toggle-close path. */
+  runGuarded: (action: () => void) => void;
+  /** Shared with the header button so both close paths see the generating state. */
+  isGeneratingRef: React.MutableRefObject<boolean>;
+}
+
+/** Panel width from which the saved-conversations sidebar fits beside the chat column. */
+const SIDEBAR_MIN_PANEL_WIDTH = 600;
+
+export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
+  core,
+  onClose,
+  runGuarded,
+  isGeneratingRef,
+}) => {
+  const {
+    providers,
+    providersLoaded,
+    providersError,
+    selectedProviderId,
+    setSelectedProviderId,
+  } = useProviders(core.http);
+  const [chatHistory] = useState(
+    () => createMemoryHistory() as unknown as AppMountParameters['history'],
+  );
+  const titleId = useId();
+  const rootRef = useRef<HTMLElement>(null);
+  const [showSidebar, setShowSidebar] = useState(false);
+
+  const handleGeneratingChange = useCallback(
+    (generating: boolean) => {
+      isGeneratingRef.current = generating;
+    },
+    [isGeneratingRef],
+  );
+
+  useEffect(() => {
+    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (isGeneratingRef.current) {
+        event.preventDefault();
+        event.returnValue = interruptConfirmationText();
+      }
+    };
+    window.addEventListener('beforeunload', warnBeforeUnload);
+    return () => window.removeEventListener('beforeunload', warnBeforeUnload);
+  }, [isGeneratingRef]);
+
+  useEffect(() => {
+    const element = rootRef.current;
+    if (!element) {
+      return undefined;
+    }
+    const update = () =>
+      setShowSidebar(element.offsetWidth >= SIDEBAR_MIN_PANEL_WIDTH);
+    update();
+    if (typeof ResizeObserver === 'undefined') {
+      return undefined;
+    }
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  const requestClose = useCallback(
+    () => runGuarded(onClose),
+    [runGuarded, onClose],
+  );
+
+  const openSettings = useCallback(
+    () =>
+      runGuarded(() => {
+        onClose();
+        void core.application.navigateToApp(PLUGIN_ID, { path: '#/settings' });
+      }),
+    [runGuarded, onClose, core.application],
+  );
+
+  const openSettingsToAddProvider = useCallback(
+    () =>
+      runGuarded(() => {
+        onClose();
+        void core.application.navigateToApp(PLUGIN_ID, {
+          path: '#/settings?addProvider=true',
+        });
+      }),
+    [runGuarded, onClose, core.application],
+  );
+
+  const settingsLabel = i18n.translate(
+    'wazuhAiAssistant.headerPanel.settingsButtonLabel',
+    {
+      defaultMessage: 'AI Assistant settings',
+    },
+  );
+  const closeLabel = i18n.translate(
+    'wazuhAiAssistant.headerPanel.closeButtonLabel',
+    {
+      defaultMessage: 'Close the AI Assistant',
+    },
+  );
+
+  return (
+    <section
+      ref={rootRef}
+      aria-labelledby={titleId}
+      data-test-subj='wzAiAssistantPanel'
+      style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+    >
+      <div
+        style={{
+          padding: '10px 16px',
+          borderBottom: '1px solid #D3DAE6',
+          flexShrink: 0,
+        }}
+      >
+        <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
+          <EuiFlexItem>
+            <EuiTitle size='xs'>
+              <h2 id={titleId}>
+                {i18n.translate('wazuhAiAssistant.headerPanel.title', {
+                  defaultMessage: 'AI Assistant',
+                })}
+              </h2>
+            </EuiTitle>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiToolTip content={settingsLabel}>
+              <EuiButtonIcon
+                iconType='gear'
+                color='text'
+                aria-label={settingsLabel}
+                onClick={openSettings}
+                data-test-subj='wzAiAssistantPanelSettingsButton'
+              />
+            </EuiToolTip>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiToolTip content={closeLabel}>
+              <EuiButtonIcon
+                iconType='cross'
+                color='text'
+                aria-label={closeLabel}
+                onClick={requestClose}
+                data-test-subj='wzAiAssistantPanelCloseButton'
+              />
+            </EuiToolTip>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </div>
+      <div style={{ flex: '1 1 auto', minHeight: 0, overflow: 'auto' }}>
+        <div style={{ height: '100%' }}>
+          <ChatPage
+            core={core}
+            history={chatHistory}
+            providers={providers}
+            providersLoaded={providersLoaded}
+            providersError={providersError}
+            selectedProviderId={selectedProviderId}
+            onProviderChange={setSelectedProviderId}
+            onNavigateToSettings={openSettingsToAddProvider}
+            onGeneratingChange={handleGeneratingChange}
+            showConversationSidebar={showSidebar}
+          />
+        </div>
+      </div>
+    </section>
+  );
+};

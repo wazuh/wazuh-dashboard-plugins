@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   Router,
@@ -13,34 +13,32 @@ import { EuiTabs, EuiTab, EuiSpacer } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { ChatPage } from './components/chat/chat-page';
 import { SettingsPage } from './components/settings/settings-page';
-import { SettingsService } from './services/settings-service';
 import {
   interruptConfirmationText,
   interruptConfirmationTitle,
 } from './services/interrupt-confirm';
-import { ProviderSummary } from '../common/types';
+import { useProviders } from './hooks/use-providers';
 import { createHashHistory } from 'history';
 
 type Tab = 'chat' | 'settings';
 
 const SETTINGS_PATH = '/settings';
+/** `?addProvider=true` on `#/settings`: set by the chat CTA, opens the create-provider flyout. */
+export const ADD_PROVIDER_PARAM = 'addProvider';
 
 /** Unknown paths fall back to chat so a stale/mistyped deep link still lands somewhere usable. */
 export const routeFromPathname = (pathname: string): Tab =>
   pathname.replace(/\/+$/, '') === SETTINGS_PATH ? 'settings' : 'chat';
 
-/** How long the first provider load may take before the app stops waiting on it — see
- * `refreshProviders`. Generous for a slow cluster, short enough that no one stares at a spinner. */
-const PROVIDERS_LOAD_TIMEOUT_MS = 20_000;
-
 /**
  * Provider list/selection is owned here (not by ChatPage) so a tab switch away from Chat and back
  * never loses the selection, and so SettingsPage can report back through onProvidersChanged
  * whenever it creates/edits/deletes/re-defaults a provider and keep this list (and the Chat tab's
- * selection) in sync without needing a full remount. The actual provider <select> control now
- * renders inside ChatPage's own header row (next to the privacy chip) rather than up here, so it
- * reads as part of the chat surface instead of a separate floating control — see
- * `onProviderChange` passed to ChatPage below.
+ * selection) in sync without needing a full remount. The state itself lives in the `useProviders`
+ * hook (hooks/use-providers.ts), shared with the header-button flyout. The actual provider
+ * <select> control renders inside ChatPage's own header row (next to the privacy chip) rather
+ * than up here, so it reads as part of the chat surface instead of a separate floating control —
+ * see `onProviderChange` passed to ChatPage below.
  */
 /**
  * `onAppLeave` is the platform's one hook for "the user is leaving this app": OSD calls it both for
@@ -62,11 +60,14 @@ const App: React.FC<{
   const settingsEverOpenedRef = useRef(
     routeFromPathname(history.location.pathname) === 'settings',
   );
-  const [providers, setProviders] = useState<ProviderSummary[]>([]);
-  const [providersLoaded, setProvidersLoaded] = useState(false);
-  const [selectedProviderId, setSelectedProviderId] = useState('');
-  const [providersError, setProvidersError] = useState<string | null>(null);
-  const [settingsService] = useState(() => new SettingsService(core.http));
+  const {
+    providers,
+    providersLoaded,
+    providersError,
+    selectedProviderId,
+    setSelectedProviderId,
+    refreshProviders,
+  } = useProviders(core.http);
   // Read by the leave handler below, which is registered ONCE and must always see the current value
   // — hence a ref rather than state (a stale closure here would silently stop warning anyone).
   const isGeneratingRef = useRef(false);
@@ -97,53 +98,6 @@ const App: React.FC<{
     });
   }, [onAppLeave]);
 
-  const refreshProviders = useCallback(() => {
-    // Deadline for the FIRST load. `providersLoaded` gates the Chat tab's whole rendering — until it
-    // flips, the tab shows a spinner and nothing else — so a request that never settles (a hung
-    // proxy, a dropped connection) left the chat spinning forever with no explanation and no way
-    // out. On expiry the app renders its normal "could not load providers" state instead, and a
-    // later successful response still takes effect.
-    const deadline = setTimeout(() => {
-      setProvidersError(
-        i18n.translate('wazuhAiAssistant.chat.providersLoadTimeout', {
-          defaultMessage:
-            'Loading the configured providers timed out. Reload the page, or check the Settings tab.',
-        }),
-      );
-      setProvidersLoaded(true);
-    }, PROVIDERS_LOAD_TIMEOUT_MS);
-
-    settingsService
-      .list()
-      .then(list => {
-        clearTimeout(deadline);
-        setProviders(list);
-        setProvidersError(null);
-        setSelectedProviderId(current => {
-          if (current && list.some(provider => provider.id === current)) {
-            return current;
-          }
-          const defaultProvider =
-            list.find(provider => provider.isDefault) ?? list[0];
-          return defaultProvider ? defaultProvider.id : '';
-        });
-      })
-      .catch(() => {
-        clearTimeout(deadline);
-        setProvidersError(
-          i18n.translate('wazuhAiAssistant.chat.providersLoadError', {
-            defaultMessage:
-              'Could not load configured providers. Check the Settings tab.',
-          }),
-        );
-      })
-      .finally(() => setProvidersLoaded(true));
-  }, [settingsService]);
-
-  useEffect(() => {
-    refreshProviders();
-  }, [refreshProviders]);
-
   return (
     <I18nProvider>
       <Router history={history}>
@@ -170,8 +124,11 @@ const App: React.FC<{
             two — is called on EVERY render regardless of match, which is what lets both tabs below
             stay mounted instead of being unmounted by the router when the path doesn't match. */}
         <Route exact path={SETTINGS_PATH}>
-          {({ match }: RouteChildrenProps) => {
+          {({ match, location }: RouteChildrenProps) => {
             const isSettings = Boolean(match);
+            const autoOpenCreateProvider =
+              isSettings &&
+              new URLSearchParams(location.search).has(ADD_PROVIDER_PARAM);
             // Flipped here rather than in an effect: this render only runs once the location has
             // already changed, so setting the ref during it needs no extra render to take effect.
             if (isSettings) {
@@ -239,7 +196,11 @@ const App: React.FC<{
                       providersError={providersError}
                       selectedProviderId={selectedProviderId}
                       onProviderChange={setSelectedProviderId}
-                      onNavigateToSettings={() => navigateTo('settings')}
+                      onNavigateToSettings={() =>
+                        history.push(
+                          `${SETTINGS_PATH}?${ADD_PROVIDER_PARAM}=true`,
+                        )
+                      }
                       onGeneratingChange={handleGeneratingChange}
                     />
                   </div>
@@ -253,6 +214,10 @@ const App: React.FC<{
                       <SettingsPage
                         core={core}
                         onProvidersChanged={refreshProviders}
+                        autoOpenCreateForm={autoOpenCreateProvider}
+                        onAutoOpenCreateFormDone={() =>
+                          history.replace(SETTINGS_PATH)
+                        }
                       />
                     </div>
                   )}
