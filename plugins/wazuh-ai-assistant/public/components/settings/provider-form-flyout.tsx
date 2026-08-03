@@ -40,6 +40,11 @@ const PROVIDER_TYPE_FORM_LABELS: Record<string, string> = {
   }),
 };
 
+interface ProviderUrlDoc {
+  label: string;
+  url: string;
+}
+
 /**
  * Per-type endpoint URL guidance shown under the field: the adapters append their own path to
  * `baseUrl` (`/chat/completions` for openai_compatible, `/v1/messages` for anthropic — see
@@ -52,8 +57,7 @@ const PROVIDER_URL_GUIDANCE: Record<
   {
     placeholder: string;
     examples: string[];
-    docsLabel: string;
-    docsUrl: string;
+    docs: ProviderUrlDoc[];
   }
 > = {
   openai_compatible: {
@@ -63,20 +67,46 @@ const PROVIDER_URL_GUIDANCE: Record<
       'https://api.groq.com/openai/v1',
       'http://localhost:11434/v1',
     ],
-    docsLabel: i18n.translate(
-      'wazuhAiAssistant.settings.form.baseUrlDocsOpenai',
-      { defaultMessage: 'OpenAI API reference' },
-    ),
-    docsUrl: 'https://platform.openai.com/docs/api-reference',
+    // One link per actual service this type covers (see PROVIDER_TYPE_FORM_LABELS above) — a
+    // single "OpenAI API reference" link would be misleading for a Groq/Ollama/etc endpoint.
+    docs: [
+      {
+        label: i18n.translate(
+          'wazuhAiAssistant.settings.form.baseUrlDocsOpenai',
+          { defaultMessage: 'OpenAI API reference' },
+        ),
+        url: 'https://platform.openai.com/docs/api-reference',
+      },
+      {
+        label: i18n.translate(
+          'wazuhAiAssistant.settings.form.baseUrlDocsGroq',
+          {
+            defaultMessage: 'Groq API reference',
+          },
+        ),
+        url: 'https://console.groq.com/docs/api-reference',
+      },
+      {
+        label: i18n.translate(
+          'wazuhAiAssistant.settings.form.baseUrlDocsOllama',
+          { defaultMessage: 'Ollama API reference' },
+        ),
+        url: 'https://github.com/ollama/ollama/blob/main/docs/api.md',
+      },
+    ],
   },
   anthropic: {
     placeholder: 'https://api.anthropic.com',
     examples: ['https://api.anthropic.com'],
-    docsLabel: i18n.translate(
-      'wazuhAiAssistant.settings.form.baseUrlDocsAnthropic',
-      { defaultMessage: 'Anthropic API reference' },
-    ),
-    docsUrl: 'https://docs.anthropic.com/en/api/overview',
+    docs: [
+      {
+        label: i18n.translate(
+          'wazuhAiAssistant.settings.form.baseUrlDocsAnthropic',
+          { defaultMessage: 'Anthropic API reference' },
+        ),
+        url: 'https://docs.anthropic.com/en/api/overview',
+      },
+    ],
   },
 };
 
@@ -324,9 +354,14 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     </React.Fragment>
                   ))}
                   {'. '}
-                  <EuiLink href={urlGuidance.docsUrl} target='_blank'>
-                    {urlGuidance.docsLabel}
-                  </EuiLink>
+                  {urlGuidance.docs.map((doc, index) => (
+                    <React.Fragment key={doc.url}>
+                      {index > 0 && ', '}
+                      <EuiLink href={doc.url} target='_blank'>
+                        {doc.label}
+                      </EuiLink>
+                    </React.Fragment>
+                  ))}
                 </>
               }
             >

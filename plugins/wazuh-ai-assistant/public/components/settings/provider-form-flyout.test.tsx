@@ -248,7 +248,7 @@ describe('ProviderFormFlyout — API key encryption gate', () => {
 });
 
 describe('ProviderFormFlyout — endpoint URL guidance', () => {
-  it('shows an OpenAI placeholder/example and docs link by default (openai_compatible)', () => {
+  it('shows an OpenAI placeholder/example and one docs link per covered service by default (openai_compatible)', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
     expect(screen.getByLabelText(/endpoint url/i)).toHaveAttribute(
@@ -258,6 +258,15 @@ describe('ProviderFormFlyout — endpoint URL guidance', () => {
     expect(
       screen.getByRole('link', { name: /openai api reference/i }),
     ).toHaveAttribute('href', 'https://platform.openai.com/docs/api-reference');
+    expect(
+      screen.getByRole('link', { name: /groq api reference/i }),
+    ).toHaveAttribute('href', 'https://console.groq.com/docs/api-reference');
+    expect(
+      screen.getByRole('link', { name: /ollama api reference/i }),
+    ).toHaveAttribute(
+      'href',
+      'https://github.com/ollama/ollama/blob/main/docs/api.md',
+    );
   });
 
   it('switches to the Anthropic placeholder/example and docs link when the provider type changes', () => {
@@ -274,5 +283,8 @@ describe('ProviderFormFlyout — endpoint URL guidance', () => {
     expect(
       screen.getByRole('link', { name: /anthropic api reference/i }),
     ).toHaveAttribute('href', 'https://docs.anthropic.com/en/api/overview');
+    expect(
+      screen.queryByRole('link', { name: /groq api reference/i }),
+    ).not.toBeInTheDocument();
   });
 });
