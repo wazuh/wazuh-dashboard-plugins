@@ -11,10 +11,8 @@
           "type": "linux",
           "version": "12 (bookworm)"
         },
-        "group_config_status": "not synced",
         "dateAdd": "2026-05-07T16:00:34+00:00",
         "id": "001",
-        "mergedSum": "ca35f9148a3273413eccb79f149f4757",
         "version": "v5.0.0",
         "group": [
           "default",
@@ -56,7 +54,6 @@
         "node_name": "master",
         "lastKeepAlive": "9999-12-31T23:59:59Z",
         "version": "Wazuh v4.5.0",
-        "group_config_status": "synced",
         "status_code": 0
       },
       {
@@ -69,10 +66,8 @@
           "type": "windows",
           "version": "10.0.19045"
         },
-        "group_config_status": "not synced",
         "dateAdd": "2026-05-07T16:00:50+00:00",
         "id": "003",
-        "mergedSum": "e669d89eba52f6897060fc65a45300ac",
         "version": "v5.0.0",
         "group": ["default", "test"],
         "status": "active",
@@ -93,10 +88,8 @@
           "type": "macos",
           "version": "15.4"
         },
-        "group_config_status": "synced",
         "dateAdd": "2026-05-07T16:01:10+00:00",
         "id": "004",
-        "mergedSum": "ca35f9148a3273413eccb79f149f4758",
         "version": "v5.0.0",
         "group": ["default"],
         "status": "active",
@@ -128,7 +121,6 @@
         "node_name": "master",
         "lastKeepAlive": "9999-12-31T23:59:59Z",
         "version": "Wazuh v4.5.0",
-        "group_config_status": "synced",
         "status_code": 2
       },
       {
@@ -139,7 +131,6 @@
         "registerIP": "any",
         "id": "006",
         "ip": "any",
-        "group_config_status": "not synced",
         "status_code": 5
       },
       {
@@ -150,7 +141,6 @@
         "registerIP": "any",
         "id": "007",
         "ip": "any",
-        "group_config_status": "not synced",
         "status_code": 5
       },
       {
@@ -174,7 +164,6 @@
         "node_name": "master",
         "lastKeepAlive": "9999-12-31T23:59:59Z",
         "version": "Wazuh v4.5.0",
-        "group_config_status": "synced",
         "status_code": 2
       },
       {
@@ -200,9 +189,7 @@
         "id": "010",
         "version": "Wazuh v4.3.10",
         "ip": "111.111.1.111",
-        "mergedSum": "e669d89eba52f6897060fc65a45300ac",
-        "configSum": "97fccbb67e250b7c80aadc8d0dc59abe",
-        "group_config_status": "not synced"
+        "configSum": "97fccbb67e250b7c80aadc8d0dc59abe"
       }
     ],
     "total_affected_items": 5,

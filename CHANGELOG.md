@@ -163,6 +163,7 @@
 - Removed the Statistics app [#8218](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8218)
 - Removed some options of the manager and agent configuration [#8243](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8243)
 - Removed GPG13 option in Compliance panel in agent overview [#8307](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8307)
+- Removed the agents table `Synced` column and the agent configuration synchronization badge, deprecated with the `group_config_status` and `mergedSum` properties of the `/agents` endpoint [#8836](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8836)
 
 ## Prior versions
 

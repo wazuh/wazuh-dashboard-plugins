@@ -23,7 +23,6 @@ const data = [
     name: 'Debian agent',
     ip: '127.0.0.1',
     status: 'active',
-    group_config_status: 'not synced',
     group: [
       'default',
       'test',
@@ -66,7 +65,6 @@ const data = [
       node_name: 'master',
       lastKeepAlive: '9999-12-31T23:59:59Z',
       version: 'Wazuh v4.5.0',
-      group_config_status: 'not synced',
     },
     version: 'v4.5.0',
     node_name: 'master',
@@ -103,7 +101,6 @@ const data = [
       node_name: 'master',
       lastKeepAlive: '9999-12-31T23:59:59Z',
       version: 'Wazuh v4.5.0',
-      group_config_status: 'not synced',
     },
     upgrading: true,
   },
@@ -112,7 +109,6 @@ const data = [
     name: 'wazuh-manager-master-0',
     ip: '127.0.0.1',
     status: 'active',
-    group_config_status: 'synced',
     group: ['default', 'test', 'test2', 'test3', 'test4'],
     os_name: {
       os: {
@@ -135,7 +131,6 @@ const data = [
       node_name: 'master',
       lastKeepAlive: '9999-12-31T23:59:59Z',
       version: 'Wazuh v4.5.0',
-      group_config_status: 'synced',
     },
     version: 'v4.5.0',
     node_name: 'master',
@@ -162,7 +157,6 @@ const data = [
       node_name: 'master',
       lastKeepAlive: '9999-12-31T23:59:59Z',
       version: 'Wazuh v4.5.0',
-      group_config_status: 'synced',
     },
     upgrading: false,
   },
@@ -171,7 +165,6 @@ const data = [
     name: 'disconnected-agent',
     ip: '111.111.1.111',
     status: 'disconnected',
-    group_config_status: 'not synced',
     group: ['default', 'test'],
     os_name: {
       os: {
@@ -195,9 +188,7 @@ const data = [
       id: '003',
       version: 'Wazuh v4.3.10',
       ip: '111.111.1.111',
-      mergedSum: 'e669d89eba52f6897060fc65a45300ac',
       configSum: '97fccbb67e250b7c80aadc8d0dc59abe',
-      group_config_status: 'not synced',
     },
     version: 'v4.3.10',
     node_name: 'node01',
@@ -225,9 +216,7 @@ const data = [
       id: '003',
       version: 'Wazuh v4.3.10',
       ip: '111.111.1.111',
-      mergedSum: 'e669d89eba52f6897060fc65a45300ac',
       configSum: '97fccbb67e250b7c80aadc8d0dc59abe',
-      group_config_status: 'not synced',
     },
     upgrading: false,
   },
@@ -242,18 +231,9 @@ const defaultColumns = [
   'node_name',
   'version',
   'actions',
-  'group_config_status',
 ];
 
-const customColumns = [
-  'id',
-  'name',
-  'ip',
-  'version',
-  'actions',
-  'status',
-  'group_config_status',
-];
+const customColumns = ['id', 'name', 'ip', 'version', 'actions', 'status'];
 
 const localStorageMock = (function () {
   let store = {

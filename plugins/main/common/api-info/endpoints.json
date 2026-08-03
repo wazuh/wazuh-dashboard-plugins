@@ -57,14 +57,6 @@
             }
           },
           {
-            "name": "group_config_status",
-            "description": "Agent groups configuration sync status",
-            "schema": {
-              "type": "string",
-              "enum": ["synced", "not synced"]
-            }
-          },
-          {
             "name": "ip",
             "description": "Filter by the IP used by the agent to communicate with the manager. If it's not available, it will have the same value as registerIP",
             "schema": {
@@ -350,44 +342,6 @@
               }
             }
           },
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ]
-      },
-      {
-        "name": "/agents/:agent_id/group/is_sync",
-        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_sync_agent",
-        "description": "Return whether the agent configuration has been synchronized with the agent or not. This can be useful to check after updating a group configuration",
-        "summary": "Get configuration sync status",
-        "tags": ["Agents"],
-        "args": [
-          {
-            "name": ":agent_id",
-            "description": "Agent ID. All possible values from 000 onwards",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 3,
-              "description": "Agent ID",
-              "format": "numbers"
-            }
-          }
-        ],
-        "query": [
           {
             "name": "pretty",
             "description": "Show results in human-readable format",

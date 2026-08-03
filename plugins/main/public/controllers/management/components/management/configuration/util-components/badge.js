@@ -27,12 +27,6 @@ class WzBadge extends Component {
         } else {
           return { color: 'danger', content: 'DISABLED' };
         }
-      } else if (typeof nextProps.synchronized !== 'undefined') {
-        if (nextProps.synchronized) {
-          return { color: 'secondary', content: 'SYNCHRONIZED' };
-        } else {
-          return { color: 'danger', content: 'NOT SYNCHRONIZED' };
-        }
       } else if (nextProps.color && nextProps.content) {
         return { color: nextProps.color, content: nextProps.content };
       }
