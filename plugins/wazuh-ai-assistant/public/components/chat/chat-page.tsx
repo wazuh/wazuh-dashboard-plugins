@@ -23,7 +23,7 @@ import {
   AssistantSettings,
   SettingsService,
 } from '../../services/settings-service';
-import { healManagerSession } from '../../services/session-heal';
+import { ensureManagerSession } from '../../services/session-heal';
 import { confirmInterruption } from '../../services/interrupt-confirm';
 import { ConversationsService } from '../../services/conversations-service';
 import {
@@ -435,21 +435,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         // it would compete with the chat error state on first paint for something that degrades
         // gracefully on its own.
       });
-
-    // One-shot session auto-heal (mirrors settings-page.tsx's own heal wiring): a direct
-    // deep link into this app never visits the main Wazuh app, so the wz-token cookie backing every
-    // Manager-path tool call may be missing/expired on first paint. Fire-and-forget: the access
-    // probe's `defaultApiHostId` is the only thing needed here, and any outcome (healed, not healed,
-    // probe itself failed) is ignored — this never blocks or errors the chat UI, and the existing
-    // `detectManagerAuthError` heuristic below still catches whatever, if anything, is left over.
-    settingsService
-      .getSettingsAccess()
-      .then(access => {
-        if (access.defaultApiHostId) {
-          void healManagerSession(core.http, access.defaultApiHostId);
-        }
-      })
-      .catch(() => {});
 
     // Session-expiry draft stash restore: the mirror image of `handleSessionExpired`'s
     // stash below. Runs once, on mount — the only time a stashed draft could be waiting, since it
@@ -1369,6 +1354,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    * exactly the same placeholder/history/save/stream sequence.
    */
   const startTurn = async (history: UiChatMessage[]) => {
+    // Pre-turn session guard: after >60s idle, re-probe (and heal if the wz-token
+    // expired) so this turn's Manager-path tool calls see a fresh token. The 60s memo makes it free
+    // during rapid back-and-forth; `detectManagerAuthError` below stays the mid-turn backstop.
+    await ensureManagerSession(core.http, { maxAgeMs: 60_000 });
+
     const assistantMessageId = nextMessageId();
     const assistantMessage: UiChatMessage = {
       id: assistantMessageId,

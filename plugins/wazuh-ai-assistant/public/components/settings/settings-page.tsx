@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   EuiPage,
   EuiPageBody,
@@ -39,7 +39,7 @@ import {
   FieldPolicyEntry,
   SettingsService,
 } from '../../services/settings-service';
-import { healManagerSession } from '../../services/session-heal';
+import { ensureManagerSession } from '../../services/session-heal';
 import { ProviderInput, ProviderSummary } from '../../../common/types';
 import { useDirtyFormState } from '../../hooks/use-dirty-form-state';
 import { ProviderFormFlyout } from './provider-form-flyout';
@@ -257,12 +257,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const [apiKeyEncryptionEnabled, setApiKeyEncryptionEnabled] = useState<
     boolean | null
   >(null);
-  // Session auto-heal: guards the one-shot POST /api/login retry below so a mount ever
-  // attempts it AT MOST once, regardless of how many times the access probe itself is re-run (it
-  // currently only runs once on mount, but this ref is what makes that invariant hold even if a
-  // future change re-triggers the probe) — never a retry loop.
-  const healAttemptedRef = useRef(false);
-
   const reloadPrivacySettings = () => {
     service
       .getAssistantSettings()
@@ -287,45 +281,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
   useEffect(() => {
     reloadPrivacySettings();
-    service
-      .getSettingsAccess()
-      .then(async access => {
-        // Before the heal branch (its early return must not skip this); `!== false` stays
-        // fail-open when older servers omit the field.
-        setApiKeyEncryptionEnabled(access.apiKeyEncryptionEnabled !== false);
-        // Session auto-heal: the failure this targets is a missing/expired
-        // wz-token cookie, surfaced through the SAME actionable copy `describeAdministratorRequirement`
-        // (server/routes/settings.ts) now maps both the three original token literals AND the raw
-        // "...status code 401"/"could not check...401" live-probe failure onto — so matching on
-        // that one substring catches both without this component knowing the raw reference-plugin
-        // strings. Only attempted when there's an actual host id to heal against, and only once per
-        // mount (`healAttemptedRef`) so a still-failing heal can never loop.
-        if (
-          !access.administrator &&
-          !healAttemptedRef.current &&
-          access.defaultApiHostId &&
-          access.message?.includes('session is missing or expired')
-        ) {
-          healAttemptedRef.current = true;
-          const healed = await healManagerSession(
-            core.http,
-            access.defaultApiHostId,
-          );
-          if (healed) {
-            const reprobed = await service.getSettingsAccess();
-            setCanSave(reprobed.administrator);
-            setAccessMessage(reprobed.administrator ? null : reprobed.message);
-            return;
-          }
-        }
-        setCanSave(access.administrator);
-        setAccessMessage(access.administrator ? null : access.message);
-      })
-      .catch(() => {
-        // Fail OPEN on the client: if the probe itself fails, don't block anything here —
-        // `canSave` stays at its optimistic default and the server still enforces the real gate on
-        // every PUT regardless.
-      });
+    // The probe→heal→re-probe choreography lives in ensureManagerSession now (it shares the
+    // execution renderApp already started, so a /settings deep link gets the healed answer on
+    // first paint). A `null` result means the probe itself failed: fail OPEN — `canSave` stays at
+    // its optimistic default and the server still enforces the real gate on every PUT regardless.
+    void ensureManagerSession(core.http).then(access => {
+      if (!access) {
+        return;
+      }
+      // `!== false` stays fail-open when older servers omit the field.
+      setApiKeyEncryptionEnabled(access.apiKeyEncryptionEnabled !== false);
+      setCanSave(access.administrator);
+      setAccessMessage(access.administrator ? null : access.message);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
