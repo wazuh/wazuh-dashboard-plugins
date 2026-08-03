@@ -331,7 +331,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
     <>
       <EuiFlyout
         onClose={requestClose}
-        size='m'
+        size='s'
         aria-labelledby='wz-ai-provider-flyout-title'
       >
         <EuiFlyoutHeader hasBorder>
@@ -556,12 +556,24 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               helpText={
                 editingProvider
                   ? i18n.translate(
-                      'wazuhAiAssistant.settings.form.apiKeyHelp',
+                      'wazuhAiAssistant.settings.form.apiKeyHelpEditing',
                       {
-                        defaultMessage: 'Leave empty to keep the current key.',
+                        defaultMessage:
+                          'Leave empty to keep the current key. Optional for endpoints that ' +
+                          "don't require authentication (e.g. a local Ollama server without " +
+                          'auth) — stored encrypted at rest when an encryption key is ' +
+                          'configured.',
                       },
                     )
-                  : undefined
+                  : i18n.translate(
+                      'wazuhAiAssistant.settings.form.apiKeyHelpCreate',
+                      {
+                        defaultMessage:
+                          "Optional for endpoints that don't require authentication (e.g. a " +
+                          'local Ollama server without auth) — stored encrypted at rest when ' +
+                          'an encryption key is configured.',
+                      },
+                    )
               }
             >
               <EuiFieldPassword

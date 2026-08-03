@@ -39,6 +39,17 @@ describe('ProviderFormFlyout — create mode', () => {
     expect(screen.getByLabelText(/^name$/i)).toHaveValue('');
   });
 
+  it('clarifies the API key is optional for auth-free endpoints and encrypted at rest', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    expect(
+      screen.getByText(
+        /optional for endpoints that don't require authentication/i,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/stored encrypted at rest/i)).toBeInTheDocument();
+  });
+
   it('blocks submit and shows an error when the endpoint URL is invalid', async () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
