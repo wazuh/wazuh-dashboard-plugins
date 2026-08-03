@@ -91,6 +91,10 @@ interface SettingsPageProps {
   core: CoreStart;
   /** Lets the top-level app shell refresh its own provider list/selection after a CRUD action. */
   onProvidersChanged: () => void;
+  /** True while the URL carries `?addProvider=true`: opens the create-provider flyout, then
+   * `onAutoOpenCreateFormDone` lets the owner strip the flag. */
+  autoOpenCreateForm?: boolean;
+  onAutoOpenCreateFormDone?: () => void;
 }
 
 // Short labels shown in the providers table; the add/edit flyout uses its own long labels
@@ -179,6 +183,8 @@ const SectionHeader: React.FC<{
 export const SettingsPage: React.FC<SettingsPageProps> = ({
   core,
   onProvidersChanged,
+  autoOpenCreateForm,
+  onAutoOpenCreateFormDone,
 }) => {
   const [service] = useState(() => new SettingsService(core.http));
   const [providers, setProviders] = useState<ProviderSummary[]>([]);
@@ -499,6 +505,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     setIsFormOpen(false);
     setError(null);
   };
+
+  // The page stays mounted (hidden), so this fires on every flag flip; reporting done at once
+  // strips the flag so a plain revisit doesn't re-open the flyout.
+  useEffect(() => {
+    if (autoOpenCreateForm) {
+      openCreateForm();
+      onAutoOpenCreateFormDone?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoOpenCreateForm]);
 
   // No per-provider privacy toggle in this form, deliberately.
   // `AssistantSettings.privacyDefaultPerProvider` is keyed by provider id and lives in a

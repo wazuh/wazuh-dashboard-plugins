@@ -79,7 +79,8 @@ interface ChatPageProps {
   /** Owned by the app shell (application.tsx); rendered here so the provider selector sits in the
    * chat column's own header row next to the privacy chip, instead of a separate top-level row. */
   onProviderChange: (id: string) => void;
-  /** Switches the app shell to the Settings tab; wired from the top-level route state. */
+  /** The no-provider empty state's "Add a provider" CTA — its only caller. Owners wire it to
+   * open Settings with the create-provider flyout (`#/settings?addProvider=true`). */
   onNavigateToSettings: () => void;
   /** The app shell's router history (the same instance `<Router history={history}>` in
    * application.tsx uses) — used to read/write the open-conversation route below through

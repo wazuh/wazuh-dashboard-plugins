@@ -25,6 +25,8 @@ import { createHashHistory } from 'history';
 type Tab = 'chat' | 'settings';
 
 const SETTINGS_PATH = '/settings';
+/** `?addProvider=true` on `#/settings`: set by the chat CTA, opens the create-provider flyout. */
+export const ADD_PROVIDER_PARAM = 'addProvider';
 
 /** Unknown paths fall back to chat so a stale/mistyped deep link still lands somewhere usable. */
 export const routeFromPathname = (pathname: string): Tab =>
@@ -171,8 +173,11 @@ const App: React.FC<{
             two — is called on EVERY render regardless of match, which is what lets both tabs below
             stay mounted instead of being unmounted by the router when the path doesn't match. */}
         <Route exact path={SETTINGS_PATH}>
-          {({ match }: RouteChildrenProps) => {
+          {({ match, location }: RouteChildrenProps) => {
             const isSettings = Boolean(match);
+            const autoOpenCreateProvider =
+              isSettings &&
+              new URLSearchParams(location.search).has(ADD_PROVIDER_PARAM);
             // Flipped here rather than in an effect: this render only runs once the location has
             // already changed, so setting the ref during it needs no extra render to take effect.
             if (isSettings) {
@@ -240,7 +245,11 @@ const App: React.FC<{
                       providersError={providersError}
                       selectedProviderId={selectedProviderId}
                       onProviderChange={setSelectedProviderId}
-                      onNavigateToSettings={() => navigateTo('settings')}
+                      onNavigateToSettings={() =>
+                        history.push(
+                          `${SETTINGS_PATH}?${ADD_PROVIDER_PARAM}=true`,
+                        )
+                      }
                       onGeneratingChange={handleGeneratingChange}
                     />
                   </div>
@@ -254,6 +263,10 @@ const App: React.FC<{
                       <SettingsPage
                         core={core}
                         onProvidersChanged={refreshProviders}
+                        autoOpenCreateForm={autoOpenCreateProvider}
+                        onAutoOpenCreateFormDone={() =>
+                          history.replace(SETTINGS_PATH)
+                        }
                       />
                     </div>
                   )}
