@@ -25,7 +25,7 @@ interface AssistantChatPanelProps {
 }
 
 /** Panel width from which the saved-conversations sidebar fits beside the chat column. */
-const SIDEBAR_MIN_PANEL_WIDTH = 700;
+const SIDEBAR_MIN_PANEL_WIDTH = 600;
 
 export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
   core,
@@ -91,6 +91,17 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
       runGuarded(() => {
         onClose();
         void core.application.navigateToApp(PLUGIN_ID, { path: '#/settings' });
+      }),
+    [runGuarded, onClose, core.application],
+  );
+
+  const openSettingsToAddProvider = useCallback(
+    () =>
+      runGuarded(() => {
+        onClose();
+        void core.application.navigateToApp(PLUGIN_ID, {
+          path: '#/settings?addProvider=true',
+        });
       }),
     [runGuarded, onClose, core.application],
   );
@@ -166,7 +177,7 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
             providersError={providersError}
             selectedProviderId={selectedProviderId}
             onProviderChange={setSelectedProviderId}
-            onNavigateToSettings={openSettings}
+            onNavigateToSettings={openSettingsToAddProvider}
             onGeneratingChange={handleGeneratingChange}
             showConversationSidebar={showSidebar}
           />

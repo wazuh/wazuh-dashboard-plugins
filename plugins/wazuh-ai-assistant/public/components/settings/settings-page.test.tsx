@@ -150,3 +150,29 @@ describe('SettingsPage — RBAC tooltip on disabled Save buttons', () => {
     });
   });
 });
+
+describe('SettingsPage — auto-open create-provider flyout (?addProvider=true)', () => {
+  it('opens the create form and reports back when autoOpenCreateForm is true', async () => {
+    const onDone = jest.fn();
+
+    render(
+      <SettingsPage
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        autoOpenCreateForm={true}
+        onAutoOpenCreateFormDone={onDone}
+      />,
+    );
+
+    // The create flyout is open (its Name field renders) without clicking "Add provider".
+    expect(await screen.findByLabelText(/^name$/i)).toBeInTheDocument();
+    expect(onDone).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not open the form when the flag is absent', async () => {
+    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    await screen.findByRole('button', { name: /add provider/i });
+    expect(screen.queryByLabelText(/^name$/i)).not.toBeInTheDocument();
+  });
+});

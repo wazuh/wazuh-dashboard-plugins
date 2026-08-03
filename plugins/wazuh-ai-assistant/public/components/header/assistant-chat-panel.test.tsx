@@ -117,14 +117,14 @@ describe('AssistantChatPanel', () => {
     });
   });
 
-  it("routes ChatPage's own settings CTA the same way", () => {
+  it("routes ChatPage's add-provider CTA to settings with the add-provider flag", () => {
     const { props } = renderPanel();
 
     fireEvent.click(screen.getByText('chat settings CTA'));
 
     expect(props.onClose).toHaveBeenCalled();
     expect(mockNavigateToApp).toHaveBeenCalledWith('wazuhAiAssistant', {
-      path: '#/settings',
+      path: '#/settings?addProvider=true',
     });
   });
 

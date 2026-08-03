@@ -23,15 +23,24 @@ const mockMountCounts = { chat: 0, settings: 0 };
 const mockReact = React;
 
 function mockMountCountingStub(page: 'chat' | 'settings') {
-  return (props: { onGeneratingChange?: (generating: boolean) => void }) => {
+  return (props: {
+    onGeneratingChange?: (generating: boolean) => void;
+    onNavigateToSettings?: () => void;
+    autoOpenCreateForm?: boolean;
+    onAutoOpenCreateFormDone?: () => void;
+  }) => {
     mockReact.useEffect(() => {
       mockMountCounts[page] += 1;
     }, []);
-    // The Chat stub exposes a button that flips the shell's "a turn is generating" flag, which is
-    // what the leave handler reads.
+    // The Chat stub exposes a button that flips the shell's "a turn is generating" flag (what the
+    // leave handler reads) and one for its add-provider CTA; the Settings stub mirrors the
+    // add-provider auto-open flag and exposes a button that reports it handled.
     return mockReact.createElement(
       'div',
-      { 'data-test-subj': `${page}-marker` },
+      {
+        'data-test-subj': `${page}-marker`,
+        'data-auto-open': String(Boolean(props.autoOpenCreateForm)),
+      },
       `${page} page`,
       props.onGeneratingChange
         ? mockReact.createElement(
@@ -41,6 +50,26 @@ function mockMountCountingStub(page: 'chat' | 'settings') {
               onClick: () => props.onGeneratingChange?.(true),
             },
             'start generating',
+          )
+        : null,
+      props.onNavigateToSettings
+        ? mockReact.createElement(
+            'button',
+            {
+              type: 'button',
+              onClick: () => props.onNavigateToSettings?.(),
+            },
+            'add provider CTA',
+          )
+        : null,
+      props.onAutoOpenCreateFormDone
+        ? mockReact.createElement(
+            'button',
+            {
+              type: 'button',
+              onClick: () => props.onAutoOpenCreateFormDone?.(),
+            },
+            'auto open handled',
           )
         : null,
     );
@@ -276,6 +305,23 @@ describe('AI Assistant app shell', () => {
 
       expect(isHidden(marker('chat') as HTMLElement)).toBe(false);
       expect(marker('settings')).toBeNull();
+    });
+
+    it('opens Settings with the add-provider flag from the chat CTA, then strips it once handled', async () => {
+      mountApp();
+      await waitFor(() => expect(marker('chat')).not.toBeNull());
+
+      fireEvent.click(screen.getByText('add provider CTA'));
+
+      await waitFor(() => expect(marker('settings')).not.toBeNull());
+      expect(currentPath()).toBe('/settings?addProvider=true');
+      expect(isHidden(marker('settings') as HTMLElement)).toBe(false);
+      expect(marker('settings')).toHaveAttribute('data-auto-open', 'true');
+
+      fireEvent.click(screen.getByText('auto open handled'));
+
+      await waitFor(() => expect(currentPath()).toBe('/settings'));
+      expect(marker('settings')).toHaveAttribute('data-auto-open', 'false');
     });
   });
 });
