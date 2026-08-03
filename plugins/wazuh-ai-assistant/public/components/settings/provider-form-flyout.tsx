@@ -20,6 +20,7 @@ import {
   EuiPopoverTitle,
   EuiSelect,
   EuiSpacer,
+  EuiText,
   EuiTitle,
   EuiToolTip,
 } from '@elastic/eui';
@@ -47,6 +48,19 @@ interface ProviderUrlDoc {
   url: string;
 }
 
+/** Note shown under the docs links for openai_compatible: that type's label (see
+ * PROVIDER_TYPE_FORM_LABELS above) advertises more services (Gemini, LM Studio, vLLM...) than this
+ * file has room to keep a maintained doc link for — pointing the admin at their own provider's
+ * docs is more reliable than us trying to enumerate every compatible gateway. */
+const OTHER_OPENAI_COMPATIBLE_PROVIDERS_NOTE = i18n.translate(
+  'wazuhAiAssistant.settings.form.otherProvidersNote',
+  {
+    defaultMessage:
+      'Using another OpenAI-compatible provider or gateway (e.g. Gemini, LM Studio, vLLM)? ' +
+      'Check its own documentation for the correct values.',
+  },
+);
+
 /**
  * Per-type endpoint URL guidance shown under the field: the adapters append their own path to
  * `baseUrl` (`/chat/completions` for openai_compatible, `/v1/messages` for anthropic — see
@@ -60,6 +74,7 @@ const PROVIDER_URL_GUIDANCE: Record<
     placeholder: string;
     examples: string[];
     docs: ProviderUrlDoc[];
+    note?: string;
   }
 > = {
   openai_compatible: {
@@ -96,6 +111,7 @@ const PROVIDER_URL_GUIDANCE: Record<
         url: 'https://github.com/ollama/ollama/blob/main/docs/api.md',
       },
     ],
+    note: OTHER_OPENAI_COMPATIBLE_PROVIDERS_NOTE,
   },
   anthropic: {
     placeholder: 'https://api.anthropic.com',
@@ -107,6 +123,56 @@ const PROVIDER_URL_GUIDANCE: Record<
           { defaultMessage: 'Anthropic API reference' },
         ),
         url: 'https://docs.anthropic.com/en/api/overview',
+      },
+    ],
+  },
+};
+
+/**
+ * Per-type MODEL guidance: the model field is free text (no enum — providers add models faster
+ * than this form could track), so it gets the same examples-plus-docs treatment as the endpoint
+ * URL field, pointing at each provider's own model list instead of us mirroring it (which would
+ * always be stale).
+ */
+const PROVIDER_MODEL_GUIDANCE: Record<
+  ProviderInput['type'],
+  { examples: string[]; docs: ProviderUrlDoc[]; note?: string }
+> = {
+  openai_compatible: {
+    examples: ['gpt-4o', 'gpt-4o-mini', 'llama-3.3-70b-versatile'],
+    docs: [
+      {
+        label: i18n.translate(
+          'wazuhAiAssistant.settings.form.modelDocsOpenai',
+          { defaultMessage: 'OpenAI model list' },
+        ),
+        url: 'https://platform.openai.com/docs/models',
+      },
+      {
+        label: i18n.translate('wazuhAiAssistant.settings.form.modelDocsGroq', {
+          defaultMessage: 'Groq model list',
+        }),
+        url: 'https://console.groq.com/docs/models',
+      },
+      {
+        label: i18n.translate(
+          'wazuhAiAssistant.settings.form.modelDocsOllama',
+          { defaultMessage: 'Ollama model library' },
+        ),
+        url: 'https://ollama.com/library',
+      },
+    ],
+    note: OTHER_OPENAI_COMPATIBLE_PROVIDERS_NOTE,
+  },
+  anthropic: {
+    examples: ['claude-sonnet-4-5', 'claude-opus-4-1'],
+    docs: [
+      {
+        label: i18n.translate(
+          'wazuhAiAssistant.settings.form.modelDocsAnthropic',
+          { defaultMessage: 'Anthropic model list' },
+        ),
+        url: 'https://docs.anthropic.com/en/docs/about-claude/models/overview',
       },
     ],
   },
@@ -126,17 +192,21 @@ function isValidEndpointUrl(value: string): boolean {
 
 /** Collapses the (potentially multi-service, for openai_compatible) docs links behind a single
  * trigger rather than inlining them all in the help text — inlining every link for every provider
- * type change would make the field's help text noisy and reflow the form on each type switch. */
-const DocsPopover: React.FC<{ docs: ProviderUrlDoc[] }> = ({ docs }) => {
+ * type change would make the field's help text noisy and reflow the form on each type switch.
+ * Reused for both the endpoint URL and the Model field, with their own trigger label/title/note. */
+const DocsPopover: React.FC<{
+  triggerLabel: string;
+  title: string;
+  docs: ProviderUrlDoc[];
+  note?: string;
+}> = ({ triggerLabel, title, docs, note }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <EuiPopover
       button={
         <EuiLink onClick={() => setIsOpen(open => !open)}>
-          {i18n.translate('wazuhAiAssistant.settings.form.baseUrlDocsButton', {
-            defaultMessage: 'API documentation',
-          })}
+          {triggerLabel}
         </EuiLink>
       }
       isOpen={isOpen}
@@ -144,11 +214,7 @@ const DocsPopover: React.FC<{ docs: ProviderUrlDoc[] }> = ({ docs }) => {
       panelPaddingSize='s'
       anchorPosition='downLeft'
     >
-      <EuiPopoverTitle>
-        {i18n.translate('wazuhAiAssistant.settings.form.baseUrlDocsTitle', {
-          defaultMessage: 'API documentation',
-        })}
-      </EuiPopoverTitle>
+      <EuiPopoverTitle>{title}</EuiPopoverTitle>
       <EuiFlexGroup direction='column' gutterSize='s' responsive={false}>
         {docs.map(doc => (
           <EuiFlexItem key={doc.url}>
@@ -158,6 +224,14 @@ const DocsPopover: React.FC<{ docs: ProviderUrlDoc[] }> = ({ docs }) => {
           </EuiFlexItem>
         ))}
       </EuiFlexGroup>
+      {note && (
+        <>
+          <EuiSpacer size='s' />
+          <EuiText size='xs' color='subdued'>
+            {note}
+          </EuiText>
+        </>
+      )}
     </EuiPopover>
   );
 };
@@ -199,6 +273,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   const [baseUrlError, setBaseUrlError] = useState<string | null>(null);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const urlGuidance = PROVIDER_URL_GUIDANCE[form.type];
+  const modelGuidance = PROVIDER_MODEL_GUIDANCE[form.type];
 
   const handleSave = async () => {
     const trimmedForm: ProviderInput = {
@@ -394,7 +469,18 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     </React.Fragment>
                   ))}
                   {'. '}
-                  <DocsPopover docs={urlGuidance.docs} />
+                  <DocsPopover
+                    triggerLabel={i18n.translate(
+                      'wazuhAiAssistant.settings.form.baseUrlDocsButton',
+                      { defaultMessage: 'API documentation' },
+                    )}
+                    title={i18n.translate(
+                      'wazuhAiAssistant.settings.form.baseUrlDocsTitle',
+                      { defaultMessage: 'API documentation' },
+                    )}
+                    docs={urlGuidance.docs}
+                    note={urlGuidance.note}
+                  />
                 </>
               }
             >
@@ -415,16 +501,41 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               label={i18n.translate('wazuhAiAssistant.settings.form.model', {
                 defaultMessage: 'Model',
               })}
-              helpText={i18n.translate(
-                'wazuhAiAssistant.settings.form.modelHelp',
-                {
-                  defaultMessage:
-                    'Tool calling needs a model with solid function-calling support. Known ' +
-                    'good: GPT-4o or GPT-4o-mini (OpenAI), Claude Sonnet (Anthropic), ' +
-                    'llama-3.3-70b-versatile (Groq). Small or base models often fail with ' +
-                    'tool errors.',
-                },
-              )}
+              helpText={
+                <>
+                  {i18n.translate('wazuhAiAssistant.settings.form.modelHelp', {
+                    defaultMessage:
+                      'Tool calling needs a model with solid function-calling support. Small ' +
+                      'or base models often fail with tool errors.',
+                  })}{' '}
+                  <FormattedMessage
+                    id='wazuhAiAssistant.settings.form.modelExample'
+                    defaultMessage='Example: {example}'
+                    values={{
+                      example: <EuiCode>{modelGuidance.examples[0]}</EuiCode>,
+                    }}
+                  />
+                  {modelGuidance.examples.slice(1).map(example => (
+                    <React.Fragment key={example}>
+                      {', '}
+                      <EuiCode>{example}</EuiCode>
+                    </React.Fragment>
+                  ))}
+                  {'. '}
+                  <DocsPopover
+                    triggerLabel={i18n.translate(
+                      'wazuhAiAssistant.settings.form.modelDocsButton',
+                      { defaultMessage: 'See available models' },
+                    )}
+                    title={i18n.translate(
+                      'wazuhAiAssistant.settings.form.modelDocsTitle',
+                      { defaultMessage: 'Model documentation' },
+                    )}
+                    docs={modelGuidance.docs}
+                    note={modelGuidance.note}
+                  />
+                </>
+              }
             >
               <EuiFieldText
                 value={form.model}

@@ -275,6 +275,9 @@ describe('ProviderFormFlyout — endpoint URL guidance', () => {
       'href',
       'https://github.com/ollama/ollama/blob/main/docs/api.md',
     );
+    expect(
+      screen.getByText(/using another openai-compatible provider or gateway/i),
+    ).toBeInTheDocument();
   });
 
   it('switches to the Anthropic placeholder/example and docs link when the provider type changes', async () => {
@@ -298,6 +301,60 @@ describe('ProviderFormFlyout — endpoint URL guidance', () => {
     ).toHaveAttribute('href', 'https://docs.anthropic.com/en/api/overview');
     expect(
       screen.queryByRole('link', { name: /groq api reference/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        /using another openai-compatible provider or gateway/i,
+      ),
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe('ProviderFormFlyout — Model field guidance', () => {
+  it('shows OpenAI-compatible model examples and one docs link per covered service by default', async () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    expect(screen.getByText(/gpt-4o-mini/i)).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole('button', { name: /^see available models$/i }),
+    );
+
+    expect(
+      await screen.findByRole('link', { name: /openai model list/i }),
+    ).toHaveAttribute('href', 'https://platform.openai.com/docs/models');
+    expect(
+      screen.getByRole('link', { name: /groq model list/i }),
+    ).toHaveAttribute('href', 'https://console.groq.com/docs/models');
+    expect(
+      screen.getByRole('link', { name: /ollama model library/i }),
+    ).toHaveAttribute('href', 'https://ollama.com/library');
+    expect(
+      screen.getByText(/using another openai-compatible provider or gateway/i),
+    ).toBeInTheDocument();
+  });
+
+  it('switches to Anthropic model examples and docs link when the provider type changes', async () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+
+    expect(screen.getByText(/claude-sonnet-4-5/i)).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole('button', { name: /^see available models$/i }),
+    );
+
+    expect(
+      await screen.findByRole('link', { name: /anthropic model list/i }),
+    ).toHaveAttribute(
+      'href',
+      'https://docs.anthropic.com/en/docs/about-claude/models/overview',
+    );
+    expect(
+      screen.queryByRole('link', { name: /groq model list/i }),
     ).not.toBeInTheDocument();
   });
 });
