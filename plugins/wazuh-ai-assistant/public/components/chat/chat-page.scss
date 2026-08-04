@@ -51,13 +51,15 @@
   }
 }
 
-/* result-table.tsx's bordered-panel header strip: restyles EUI's own accordion trigger wrapper
-   into a small sunken-background row with a hairline bottom border, rather than inventing new
-   markup to replace EuiAccordion's built-in (and already keyboard-accessible) toggle. */
+/* result-table.tsx's header row (row count on the left, "Open in Discover" on the right): restyles
+   EUI's own accordion trigger wrapper rather than inventing markup to replace its built-in, already
+   keyboard-accessible toggle. A hairline underneath is the whole treatment — no fill and no frame
+   around the table, because a tinted strip inside a bordered box made the table read as a widget
+   bolted into the reply instead of as the reply's own data, and it was the third nested container
+   the reader was looking inside. */
 .wzResultTableAccordion > .euiAccordion__triggerWrapper {
-  background: var(--wz-surface-sunken);
   border-bottom: 1px solid var(--wz-hairline);
-  padding: 4px 12px;
+  padding: 4px 2px;
 }
 
 /**

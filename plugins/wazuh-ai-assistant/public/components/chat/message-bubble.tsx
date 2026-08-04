@@ -233,7 +233,6 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
                   paddingSize='s'
                   fontSize='s'
                   isCopyable
-                  overflowHeight={240}
                 >
                   {JSON.stringify(toolCall.arguments, null, 2)}
                 </EuiCodeBlock>
@@ -256,7 +255,6 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
                   paddingSize='s'
                   fontSize='s'
                   isCopyable
-                  overflowHeight={240}
                 >
                   {JSON.stringify(message.table.discover.dsl, null, 2)}
                 </EuiCodeBlock>

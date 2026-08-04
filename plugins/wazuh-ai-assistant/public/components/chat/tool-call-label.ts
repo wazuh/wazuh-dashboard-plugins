@@ -11,42 +11,48 @@ const DEFAULT_TIME_RANGE_LTE = 'now';
 
 /** Truncates a label for the collapsed chip; the untruncated string is always still available via
  * `title`/`aria-label`, so this is purely a layout concern. */
-const CHIP_LABEL_MAX_LENGTH = 28;
+const CHIP_LABEL_MAX_LENGTH = 32;
 
-/** `now-24h` -> "last 24 hours", `now-90d` -> "last 90 days", `now-15m` -> "last 15 minutes".
- * Anything else (a plain ISO timestamp, or literal "now") is not date-math shorthand, so the raw
- * value is shown as-is rather than guessing at a phrasing for it. */
-function humanizeDateMathBound(value: string): string {
-  const match = /^now-(\d+)([dhm])$/.exec(value);
-  if (!match) {
-    return value;
+/**
+ * Turns a tool identifier into a readable name: `get_critical_findings` -> "Critical findings",
+ * `search_findings_by_agent` -> "Findings by agent". The chip names WHAT WAS ASKED, which is the
+ * only part that differs between one call and the next — labelling by index instead produced two
+ * identical chips whenever a turn ran two tools against the same index, which told the reader
+ * nothing and read as a rendering bug.
+ */
+function humanizeToolName(name: string): string {
+  const words = name
+    .replace(/^(get|search|find|list)_/, '')
+    .split('_')
+    .filter(Boolean);
+  if (words.length === 0) {
+    return name;
   }
-  const amount = Number(match[1]);
-  const unitLabel =
-    match[2] === 'd' ? 'day' : match[2] === 'h' ? 'hour' : 'minute';
-  return `last ${amount} ${unitLabel}${amount === 1 ? '' : 's'}`;
+  const phrase = words.join(' ');
+  return phrase.charAt(0).toUpperCase() + phrase.slice(1);
 }
 
-/** Describes the `time_range_gte`/`time_range_lte` pair a tool call's arguments carry (when
- * present), defaulting exactly the way the server's own query builders do. Returns `undefined`
- * only when neither the call's own arguments nor the defaults produce something worth showing —
- * in practice this always returns a string, since the defaults themselves are always valid.
- */
-function describeTimeRange(args: Record<string, unknown>): string | undefined {
-  const gte =
-    typeof args.time_range_gte === 'string'
-      ? args.time_range_gte
-      : DEFAULT_TIME_RANGE_GTE;
-  const lte =
-    typeof args.time_range_lte === 'string'
-      ? args.time_range_lte
-      : DEFAULT_TIME_RANGE_LTE;
+/** `now-24h` -> "24h", `now-90d` -> "90d". Anything else (a plain ISO timestamp, or literal "now")
+ * is not date-math shorthand, so it is left out of the short chip label and appears only in the
+ * full label. */
+function shortDateMath(value: string): string | undefined {
+  const match = /^now-(\d+[dhm])$/.exec(value);
+  return match ? match[1] : undefined;
+}
 
-  const gteLabel = humanizeDateMathBound(gte);
-  if (lte === DEFAULT_TIME_RANGE_LTE) {
-    return gteLabel;
-  }
-  return `${gteLabel} to ${humanizeDateMathBound(lte)}`;
+/** Reads the `time_range_gte`/`time_range_lte` pair off a call's arguments, defaulting exactly the
+ * way the server's own query builders do. */
+function timeRangeOf(args: Record<string, unknown>): { gte: string; lte: string } {
+  return {
+    gte:
+      typeof args.time_range_gte === 'string'
+        ? args.time_range_gte
+        : DEFAULT_TIME_RANGE_GTE,
+    lte:
+      typeof args.time_range_lte === 'string'
+        ? args.time_range_lte
+        : DEFAULT_TIME_RANGE_LTE,
+  };
 }
 
 function truncate(value: string, maxLength: number): string {
@@ -58,24 +64,34 @@ function truncate(value: string, maxLength: number): string {
 export interface ToolCallLabel {
   /** Truncated text for the chip itself. */
   short: string;
-  /** Untruncated text for `title`/`aria-label`. */
+  /** Untruncated text for `title`/`aria-label` — the raw tool name, the index it read, and the
+   * exact bounds, so the hover answers "what precisely ran" without opening the raw view. */
   full: string;
 }
 
 /**
- * Builds a provenance chip's label for one tool call: `{index} · {time range}` when the turn's
- * table carries "Open in Discover" info (the only case with an index to name), falling back to
- * the raw tool name otherwise — a Manager API tool call has no index/time-range concept at all.
+ * Builds a provenance chip's label for one tool call: a readable name plus the time window it
+ * covered (`Critical findings · 90d`), with the verbatim detail kept for the tooltip.
  */
 export function describeToolCall(
   toolCall: ToolCall,
   table: TableSpec | undefined,
 ): ToolCallLabel {
+  const args = toolCall.arguments ?? {};
+  const { gte, lte } = timeRangeOf(args);
+  const readable = humanizeToolName(toolCall.name);
+  const window = lte === DEFAULT_TIME_RANGE_LTE ? shortDateMath(gte) : undefined;
+  const short = window ? `${readable} · ${window}` : readable;
+
   const index = table?.discover?.index;
-  if (!index) {
-    return { short: truncate(toolCall.name, CHIP_LABEL_MAX_LENGTH), full: toolCall.name };
+  const fullParts = [toolCall.name];
+  if (index) {
+    fullParts.push(index);
   }
-  const timeRange = describeTimeRange(toolCall.arguments ?? {});
-  const full = timeRange ? `${index} · ${timeRange}` : index;
-  return { short: truncate(full, CHIP_LABEL_MAX_LENGTH), full };
+  fullParts.push(`${gte} → ${lte}`);
+
+  return {
+    short: truncate(short, CHIP_LABEL_MAX_LENGTH),
+    full: fullParts.join(' · '),
+  };
 }

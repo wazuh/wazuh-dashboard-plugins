@@ -28,13 +28,14 @@ const AUTO_EXPAND_ROW_THRESHOLD = 10;
 /** One rendered table row: a `TableSpec` row plus the global `__rowId` the expander column and
  * `itemIdToExpandedRowMap` are keyed by (assigned over the FULL row set before pagination). */
 type ResultRow = Record<string, unknown> & { __rowId: string };
-/** Max height of the scrollable table body inside the accordion; the accordion (and the page) never
- * grows taller than this for the table itself, however many rows or columns it has. */
-const TABLE_SCROLL_MAX_HEIGHT = 400;
-/** Default page size and the choices offered in EuiBasicTable's page-size popover (perf: caps a
- * 500-row result to this many DOM rows at a time instead of all of them at once). */
-const DEFAULT_PAGE_SIZE = 25;
-const PAGE_SIZE_OPTIONS = [25, 50, 100];
+/** Default page size and the choices offered in EuiBasicTable's page-size popover.
+ *
+ * Five, not twenty-five: the page size IS the height control now that the table body has no inner
+ * scroller. Five rows answer "what did it find?" inside the conversation without pushing the chat
+ * input off the screen, and the reader can page through or open the full set in Discover. It also
+ * keeps the DOM small for a 500-row result, which is why pagination was here to begin with. */
+const DEFAULT_PAGE_SIZE = 5;
+const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
 
 /**
  * Badge color + localized label for each `SeverityLevel` word. Colors mirror the platform's own
@@ -348,16 +349,13 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     spec.rows.forEach((row, rowIndex) => {
       if (expandedRowIds.has(rowIndex)) {
         // Same raw-JSON treatment as the provenance chips' raw view (message-bubble.tsx): a
-        // proper EuiCodeBlock instead of a bare <pre>, with copy support and a capped scroll
-        // height so one very large row can't push the table's own height out.
+        // proper EuiCodeBlock instead of a bare <pre>, with copy support. No `overflowHeight`:
+        // that would put a scrollbar inside an expanded row inside the transcript, and this
+        // content only exists because the reader deliberately expanded the row — cutting it off
+        // behind a third scrollbar defeats the click they just made. EuiCodeBlock's own
+        // fullscreen control handles a genuinely huge document.
         map[String(rowIndex)] = (
-          <EuiCodeBlock
-            language='json'
-            paddingSize='s'
-            fontSize='s'
-            isCopyable
-            overflowHeight={240}
-          >
+          <EuiCodeBlock language='json' paddingSize='s' fontSize='s' isCopyable>
             {JSON.stringify(row, null, 2)}
           </EuiCodeBlock>
         );
@@ -382,19 +380,11 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   );
 
   return (
-    // Bordered panel look: a hairline border all around, with the accordion's own trigger row
-    // (arrow + "Results (N rows)" + "Open in Discover"/"Open in Security Analytics") restyled via
-    // `wzResultTableAccordion` (chat-page.scss targets EUI's own `.euiAccordion__triggerWrapper`)
-    // into a small sunken-background header strip with a hairline bottom border, matching the
-    // conversation header's own hairline-only separation (no shadow anywhere on this surface).
-    // `overflow: hidden` keeps that header's background from spilling past the rounded corners.
-    <div
-      style={{
-        border: '1px solid var(--wz-hairline)',
-        borderRadius: 4,
-        overflow: 'hidden',
-      }}
-    >
+    // No frame around the table. A bordered box here would be the third nested container the
+    // reader is inside (page, then turn, then table), and the table already carries its own
+    // structure: a hairline under the header row (applied by `wzResultTableAccordion` in
+    // chat-page.scss) plus EUI's own row separators. Data, not a widget.
+    <div>
       <EuiAccordion
         id={accordionId}
         className='wzResultTableAccordion'
@@ -439,12 +429,14 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         }
       >
         {hasOpened ? (
-          // Scrolls internally (both axes) instead of growing the page: a wide/tall table must
-          // never push the chat input further down the page than the accordion header itself does.
+          // No inner scroller. A scrollbar inside a message inside the scrolling transcript means
+          // the reader has to work out which of three surfaces their wheel is aimed at, and the
+          // rows below the fold are invisible until they find out. Height is controlled by how
+          // many rows a page shows (DEFAULT_PAGE_SIZE) instead, so the table is simply as tall as
+          // its content and the page scrolls once. `overflowX` stays as a safety net for a
+          // pathologically wide column set; with content-sized columns it does not normally engage.
           <div
             style={{
-              maxHeight: TABLE_SCROLL_MAX_HEIGHT,
-              overflowY: 'auto',
               overflowX: 'auto',
               // paddingSize='none' above (the header strip owns its own padding via
               // wzResultTableAccordion) leaves the body needing its own inset.

@@ -67,7 +67,7 @@ describe('ResultTable', () => {
     expect(screen.getByText('agent-0')).toBeInTheDocument();
   });
 
-  it('paginates: only the first DEFAULT_PAGE_SIZE (25) rows are in the DOM at once', () => {
+  it('paginates: only the first DEFAULT_PAGE_SIZE (5) rows are in the DOM at once', () => {
     const thirtyRows = Array.from({ length: 30 }, (_unused, i) => ({
       agent: `agent-${i}`,
     }));
@@ -83,9 +83,30 @@ describe('ResultTable', () => {
     fireEvent.click(screen.getByText('Results (30 rows)'));
 
     expect(screen.getByText('agent-0')).toBeInTheDocument();
-    expect(screen.getByText('agent-24')).toBeInTheDocument();
-    expect(screen.queryByText('agent-25')).toBeNull();
+    expect(screen.getByText('agent-4')).toBeInTheDocument();
+    expect(screen.queryByText('agent-5')).toBeNull();
     expect(screen.queryByText('agent-29')).toBeNull();
+  });
+
+  // The page size is what keeps the table a readable height now that the body has no inner
+  // scroller, so "no max-height on the table body" is a behavior worth pinning: a scrollbar
+  // reappearing here would put one scrolling box inside another.
+  it('does not cap the table body height (no scroll-within-scroll)', () => {
+    const { container } = render(
+      <ResultTable
+        spec={spec({
+          columns: [{ id: 'agent', label: 'Agent' }],
+          rows: Array.from({ length: 4 }, (_unused, i) => ({
+            agent: `agent-${i}`,
+          })),
+        })}
+      />,
+    );
+
+    const scrollBoxes = [...container.querySelectorAll('div')].filter(element =>
+      (element.getAttribute('style') ?? '').includes('max-height'),
+    );
+    expect(scrollBoxes).toHaveLength(0);
   });
 
   describe('severity badge rendering', () => {
