@@ -55,8 +55,8 @@ there for debugging (the directory is git-ignored).
 
 - Argument validation (`--help`, missing/extra args, malformed `x.y.z`
   versions) and that failures leave `CHANGELOG.md` untouched.
-- Version bump: changelog reset to the new `## [vX.Y.Z]` entry with empty
-  sections and the `- Support for Wazuh X.Y.Z` line; "Prior versions" rebuilt
+- Version bump: changelog reset to the new `## [vX.Y.Z]` entry with an empty
+  `| Issue | Comment |` table per section; "Prior versions" rebuilt
   with the two most recent minors below the new version, every patch of each,
   newest first; non-version tags filtered out; `v`-prefixed tags normalized.
 - Stage-only bump (same version) and `--tag`: entries preserved, only the
