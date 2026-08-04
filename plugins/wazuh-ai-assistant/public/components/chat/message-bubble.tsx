@@ -162,6 +162,14 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
     />
   );
 
+  // Prose keeps a fixed reading measure even when the turn is wide. A turn carrying a table
+  // widens to the full column so the table fits (see the wrapper below), and without this the
+  // answer's sentences inherited that width and ran to ~117 characters a line — roughly 60% past
+  // the point where the eye reliably finds the next line, which reads as a wall of text. Only
+  // block content (the table, the raw query view) is allowed to use the extra width.
+  const PROSE_MEASURE = 720;
+  const proseStyle: React.CSSProperties = { maxWidth: PROSE_MEASURE };
+
   const bubbleContent = (
     <>
       {isUser || message.isStreaming ? (
@@ -169,6 +177,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         // branch also covers): announces incoming delta tokens to screen readers, which
         // otherwise stay silent for the whole stream since nothing else here changes focus.
         <div
+          style={proseStyle}
           {...(!isUser
             ? {
                 'aria-live': 'polite' as const,
@@ -199,9 +208,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           </EuiText>
         </div>
       ) : (
-        <EuiText size='s'>
-          <EuiMarkdownFormat>{message.content}</EuiMarkdownFormat>
-        </EuiText>
+        <div style={proseStyle}>
+          <EuiText size='s'>
+            <EuiMarkdownFormat>{message.content}</EuiMarkdownFormat>
+          </EuiText>
+        </div>
       )}
       {message.table && (
         <>

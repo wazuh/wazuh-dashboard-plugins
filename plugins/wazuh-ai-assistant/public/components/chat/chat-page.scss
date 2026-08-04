@@ -49,6 +49,14 @@
   &.wzStickyInputPanel-isDisabled .euiPanel {
     opacity: 0.6;
   }
+
+  /* EUI draws a form control's underline with a `background-image` gradient, not a border, so the
+     textarea's own inline `border: none` never removed it: the dock ended up with a focus ring
+     around the panel AND a dark rule under the text, two competing borders on one control. The
+     dock's ring is the single focus affordance. */
+  .euiTextArea {
+    background-image: none;
+  }
 }
 
 /* result-table.tsx's header row (row count on the left, "Open in Discover" on the right): restyles

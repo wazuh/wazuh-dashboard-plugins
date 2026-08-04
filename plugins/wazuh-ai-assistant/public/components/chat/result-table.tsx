@@ -92,9 +92,9 @@ const ISO_TIMESTAMP_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{
 /** Column width for a formatted timestamp column — wide enough for "Jul 26, 2026, 05:58" on one
  * line, which is the entire point: unformatted, a raw ISO instant wrapped onto three lines and
  * made every row three times taller than its content needed. */
-const TIMESTAMP_COLUMN_WIDTH = '150px';
+const TIMESTAMP_COLUMN_WIDTH = '118px';
 /** Column width for the severity column: a badge plus its longest label ("Informational"). */
-const SEVERITY_COLUMN_WIDTH = '120px';
+const SEVERITY_COLUMN_WIDTH = '104px';
 /** Approximate advance width of one character at the table's font size, used only to turn a
  * column's longest value into a pixel width. Deliberately rough — it decides how much room a
  * short column reserves, not whether anything is readable. */
@@ -102,8 +102,12 @@ const APPROX_CHAR_WIDTH = 7.5;
 /** A column whose longest value is no longer than this is treated as a "short" column and gets a
  * width sized to its content, leaving the remaining width to the free-text column(s). */
 const SHORT_COLUMN_MAX_CHARS = 24;
-const SHORT_COLUMN_MIN_WIDTH = 100;
-const SHORT_COLUMN_MAX_WIDTH = 200;
+const SHORT_COLUMN_MIN_WIDTH = 92;
+/** Deliberately tight. Every pixel a one-word column reserves is a pixel the free-text column
+ * does not get, and the free-text column is the only one whose content wraps: allowing short
+ * columns up to 200px left the rule title ~225px and wrapping onto three lines, which made row
+ * heights alternate between one and three lines down the page. */
+const SHORT_COLUMN_MAX_WIDTH = 132;
 
 /** Length of the longest rendered value in a column (header included, so a short column never
  * ends up narrower than its own label). */
