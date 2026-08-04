@@ -461,8 +461,12 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 <>
                   <FormattedMessage
                     id='wazuhAiAssistant.settings.form.baseUrlExample'
-                    defaultMessage='Example: {example}'
+                    defaultMessage='{header}: {example}'
                     values={{
+                      header:
+                        urlGuidance.examples.length > 1
+                          ? 'Examples'
+                          : 'Example',
                       example: <EuiCode>{urlGuidance.examples[0]}</EuiCode>,
                     }}
                   />
@@ -473,6 +477,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     </React.Fragment>
                   ))}
                   {'. '}
+                  <EuiSpacer size='xs' />
                   <DocsPopover
                     triggerLabel={i18n.translate(
                       'wazuhAiAssistant.settings.form.baseUrlDocsButton',
@@ -514,8 +519,12 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                   })}{' '}
                   <FormattedMessage
                     id='wazuhAiAssistant.settings.form.modelExample'
-                    defaultMessage='Example: {example}'
+                    defaultMessage='{header}: {example}'
                     values={{
+                      header:
+                        modelGuidance.examples.length > 1
+                          ? 'Examples'
+                          : 'Example',
                       example: <EuiCode>{modelGuidance.examples[0]}</EuiCode>,
                     }}
                   />
@@ -526,6 +535,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                     </React.Fragment>
                   ))}
                   {'. '}
+                  <EuiSpacer size='xs' />
                   <DocsPopover
                     triggerLabel={i18n.translate(
                       'wazuhAiAssistant.settings.form.modelDocsButton',
