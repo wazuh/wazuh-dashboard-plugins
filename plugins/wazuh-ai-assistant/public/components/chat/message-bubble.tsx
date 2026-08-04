@@ -4,7 +4,6 @@ import {
   EuiText,
   EuiTextColor,
   EuiSpacer,
-  EuiLoadingSpinner,
   EuiFlexGroup,
   EuiFlexItem,
   EuiBadge,
@@ -266,29 +265,30 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           </div>
         </>
       )}
-      {/* An interrupted answer is labelled as one rather than left looking complete — the whole
-            point is that the reader can tell this text stops mid-thought on purpose. */}
-      {message.interrupted && !message.isStreaming && (
-        <>
-          <EuiSpacer size='xs' />
-          <InterruptedTurnNotice onRetry={onRetry} />
-        </>
-      )}
     </>
   );
 
   const bubble = (
     <EuiFlexItem grow={false} style={{ maxWidth: '75%', minWidth: 180 }}>
       {isUser ? (
-        <EuiPanel color='plain' paddingSize='m' hasShadow={false} hasBorder>
+        // Quiet tinted inset, no border/shadow/radius override — the assistant turn stays
+        // undecorated prose on the canvas, so role is distinguished by this container alone.
+        <EuiPanel
+          color='subdued'
+          paddingSize='s'
+          hasShadow={false}
+          hasBorder={false}
+        >
           {bubbleContent}
         </EuiPanel>
       ) : (
         <div style={{ padding: '8px 0' }}>{bubbleContent}</div>
       )}
-      {/* Meta row: timestamp plus, for an assistant turn that ran tool calls, one provenance chip
-            per call — clicking any of them toggles the shared raw view above (default collapsed,
-            wired via aria-expanded/aria-controls). */}
+      {/* Meta row: an interrupted-turn notice (assistant only, left of the timestamp) plus the
+            timestamp plus, for an assistant turn that ran tool calls, one provenance chip per
+            call — clicking any of them toggles the shared raw view above (default collapsed,
+            wired via aria-expanded/aria-controls). Anchoring the interrupted notice here instead
+            of as its own floating line keeps it attached to the turn it belongs to. */}
       <EuiFlexGroup
         gutterSize='xs'
         alignItems='center'
@@ -296,6 +296,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         justifyContent={isUser ? 'flexEnd' : 'flexStart'}
         wrap
       >
+        {!isUser && message.interrupted && !message.isStreaming && (
+          <EuiFlexItem grow={false}>
+            <InterruptedTurnNotice onRetry={onRetry} />
+          </EuiFlexItem>
+        )}
         <EuiFlexItem grow={false}>
           <EuiText
             size='xs'
@@ -342,20 +347,13 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
     </EuiFlexItem>
   );
 
+  // One loading indicator while streaming, not two: the avatar-mounted spinner that used to sit
+  // alongside the in-bubble EuiLoadingContent skeleton/status line is gone — that pair read as two
+  // independent "something is happening" signals for the same event.
   const avatarItem = (
     <EuiFlexItem grow={false}>
       <EuiFlexGroup direction='column' alignItems='center' gutterSize='xs'>
         <EuiFlexItem grow={false}>{avatar}</EuiFlexItem>
-        {message.isStreaming && (
-          <EuiFlexItem grow={false}>
-            <EuiLoadingSpinner
-              size='s'
-              aria-label={i18n.translate('wazuhAiAssistant.chat.generating', {
-                defaultMessage: 'Generating response',
-              })}
-            />
-          </EuiFlexItem>
-        )}
       </EuiFlexGroup>
     </EuiFlexItem>
   );

@@ -12,6 +12,7 @@ import {
   EuiIconTip,
   EuiText,
   EuiTitle,
+  EuiBetaBadge,
   EuiLoadingSpinner,
   EuiPanel,
   EuiIcon,
@@ -1448,6 +1449,15 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           'Privacy off: hostnames, IP addresses, usernames, process command lines, and finding/rule text are sent to the configured AI provider as-is.',
       });
 
+  // Conversation header title: the active conversation's own saved title when one is open
+  // (looked up from the sidebar's own `conversations` list, never re-derived), or the
+  // "New conversation" fallback for a brand-new, never-yet-saved one.
+  const activeConversationTitle = activeConversationId
+    ? conversations.find(
+        conversation => conversation.id === activeConversationId,
+      )?.title
+    : undefined;
+
   const providerOptions = providers.map(provider => ({
     value: provider.id,
     text: provider.isDefault
@@ -1496,6 +1506,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           // overrode the fixed width below and let the sidebar swallow half the page. A
           // fixed-width pane must explicitly opt out.
           grow={false}
+          role='region'
+          aria-label={i18n.translate(
+            'wazuhAiAssistant.chat.conversations.sidebarRegionLabel',
+            { defaultMessage: 'Saved conversations' },
+          )}
           style={{
             width: CONVERSATION_SIDEBAR_WIDTH,
             maxWidth: CONVERSATION_SIDEBAR_WIDTH,
@@ -1542,6 +1557,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         <div
           ref={scrollPaneRef}
           onScroll={handleScrollPane}
+          role='region'
+          aria-label={i18n.translate(
+            'wazuhAiAssistant.chat.chatPaneRegionLabel',
+            { defaultMessage: 'Chat' },
+          )}
           style={
             {
               flex: 1,
@@ -1582,6 +1602,39 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               padding: '16px 24px 0',
             }}
           >
+            {/* Conversation header: the active conversation's title as the view's own `<h1>` —
+                  the chat column previously had no heading at all, visually or for assistive
+                  tech. Sized down to EuiTitle's smallest scale (matching the Home Overview's own
+                  card-title/section-label weight) so the markup is standards-correct without
+                  reading as a page-scale title on a benchmark surface that has none. Sticky
+                  (like .wzStickyInputPanel below it) so it stays in view while the transcript
+                  scrolls; a hairline bottom border is its only visual separation, no shadow. */}
+            {!showLoadingState && !showNoProviderState && (
+              <div
+                style={{
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 1,
+                  height: 40,
+                  display: 'flex',
+                  alignItems: 'center',
+                  flex: '0 0 auto',
+                  borderBottom: '1px solid var(--wz-hairline)',
+                  background: 'var(--wz-surface)',
+                }}
+              >
+                <EuiTitle size='xxs'>
+                  <h1>
+                    {activeConversationTitle ??
+                      i18n.translate(
+                        'wazuhAiAssistant.chat.conversations.newConversationHeading',
+                        { defaultMessage: 'New conversation' },
+                      )}
+                  </h1>
+                </EuiTitle>
+              </div>
+            )}
+
             {(error || providersError) && (
               <StatusCallout
                 title={i18n.translate('wazuhAiAssistant.chat.errorTitle', {
@@ -1831,27 +1884,32 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         paragraph competing with the subtitle above. Moved out of
                         EuiEmptyPrompt's body (along with the card row below) so the row is
                         no longer clamped to the empty prompt's ~576px content width — it now
-                        spans the full ~860px chat column instead of wrapping 2+1. */}
-                  {/* fontSize bumped 11 -> 12 so this label is never smaller than the EUI
-                        type scale it sits on (still below-scale in spirit; commit #8843-3
-                        replaces this whole label with an EuiBetaBadge). */}
-                  <EuiText size='s' color='subdued'>
-                    <p
-                      style={{
-                        margin: 0,
-                        fontWeight: 600,
-                        letterSpacing: '0.02em',
-                        textTransform: 'uppercase',
-                        fontSize: 12,
-                        textAlign: 'center',
-                      }}
-                    >
-                      {i18n.translate('wazuhAiAssistant.chat.welcome.body', {
-                        defaultMessage:
-                          'Try one of these, or type your own question below.',
-                      })}
-                    </p>
-                  </EuiText>
+                        spans the full ~860px chat column instead of wrapping 2+1.
+                        EuiBetaBadge (the same "lighter, navigation-style" device the Home
+                        Overview's SectionHeader uses) replaces the old uppercase/letter-spaced
+                        inline-styled label — it is never smaller than the content it introduces,
+                        unlike the label it replaces. */}
+                  <EuiFlexGroup
+                    gutterSize='none'
+                    justifyContent='center'
+                    responsive={false}
+                  >
+                    <EuiFlexItem grow={false}>
+                      <EuiBetaBadge
+                        color='subdued'
+                        label={i18n.translate(
+                          'wazuhAiAssistant.chat.welcome.body',
+                          {
+                            defaultMessage: 'Try one of these',
+                          },
+                        )}
+                        aria-label={i18n.translate(
+                          'wazuhAiAssistant.chat.welcome.bodyAriaLabel',
+                          { defaultMessage: 'Example questions section' },
+                        )}
+                      />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
                   <EuiSpacer size='s' />
                   {/* Elevated example cards (EuiPanel, not EuiCard): a titleSize="xs"-style
                         compact EuiCard is not a reliably typed prop in this EUI version and

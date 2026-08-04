@@ -128,34 +128,26 @@ describe('MessageBubble', () => {
     expect(screen.getByText('First token')).toBeInTheDocument();
   });
 
-  it('shows a loading spinner next to the avatar only while isStreaming is true', () => {
+  it('never mounts a second, avatar-side loading spinner while streaming (one indicator only)', () => {
+    // The avatar-mounted EuiLoadingSpinner that used to run alongside the in-bubble
+    // EuiLoadingContent skeleton was removed — a streaming turn now shows exactly one loading
+    // affordance (the skeleton/status line inside the bubble, covered by the tests above), never
+    // two independent ones for the same event.
     const { container: streamingContainer } = render(
       <MessageBubble
         message={baseMessage({
           role: 'assistant',
-          content: 'partial',
+          content: '',
           isStreaming: true,
         })}
         resolveDiscoverUrl={noopResolveDiscoverUrl}
         resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
       />,
     );
+    expect(streamingContainer.querySelector('.euiLoadingSpinner')).toBeNull();
     expect(
-      streamingContainer.querySelector('.euiLoadingSpinner'),
+      streamingContainer.querySelector('.euiLoadingContent'),
     ).not.toBeNull();
-
-    const { container: doneContainer } = render(
-      <MessageBubble
-        message={baseMessage({
-          role: 'assistant',
-          content: 'finished',
-          isStreaming: false,
-        })}
-        resolveDiscoverUrl={noopResolveDiscoverUrl}
-        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
-      />,
-    );
-    expect(doneContainer.querySelector('.euiLoadingSpinner')).toBeNull();
   });
 
   it('renders a ResultTable underneath the bubble when message.table is present', () => {

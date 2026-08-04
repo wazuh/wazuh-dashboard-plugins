@@ -47,7 +47,7 @@
  * Motion is entirely opt-in: every animation/transition/transform lives inside the
  * `prefers-reduced-motion: no-preference` block. Outside it (i.e. for a reduced-motion user), the
  * hero cards and message rows simply render at their final `opacity: 1` state with no movement —
- * the ONE exception is the hover/focus border+shadow rule, which is an instant state change (no
+ * the ONE exception is the hover/focus border-color rule, which is an instant state change (no
  * transition, no transform) even for reduced-motion users, since EUI's own hover affordances work
  * the same way.
  */
@@ -58,28 +58,16 @@
   justify-content: center;
 }
 
-.wzHeroWash {
-  position: absolute;
-  width: 230px;
-  height: 230px;
-  border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(
-    circle,
-    var(--wz-accent-soft) 0%,
-    var(--wz-accent-hover) 45%,
-    transparent 72%
-  );
-}
-
 .wzHeroIcon {
   position: relative;
 }
 
+/* No transform, no box-shadow "glow" on hover — a plain border-color change is the only feedback
+   an example card gives, matching the Home Overview's "no hover lift/glow" surface language while
+   still giving SOME affordance for what is, unlike their cards, a real interactive control. */
 .wzHeroCard:hover,
 .wzHeroCard:focus-visible {
   border-color: var(--wz-accent) !important;
-  box-shadow: 0 6px 20px -4px var(--wz-accent-soft);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -87,11 +75,7 @@
     opacity: 0;
     animation: wzFadeUp 420ms ease-out both;
     animation-delay: var(--wzCardDelay, 0ms);
-    transition: transform 150ms ease-out, box-shadow 150ms ease-out, border-color 150ms ease-out;
-  }
-
-  .wzHeroCard:hover {
-    transform: translateY(-3px);
+    transition: border-color 150ms ease-out;
   }
 
   .wzConvoRow {

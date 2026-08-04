@@ -179,6 +179,10 @@ export const ConversationList: React.FC<ConversationListProps> = ({
               <div
                 role='button'
                 tabIndex={0}
+                // Programmatic indication of the single-select list's current item, for assistive
+                // tech — previously the selected row was signaled only visually (border/background
+                // tint + font-weight), with nothing for a screen reader to key off of.
+                aria-current={isSelected ? 'true' : undefined}
                 onClick={() => onSelect(conversation.id)}
                 onKeyDown={event => {
                   if (event.key === 'Enter' || event.key === ' ') {
@@ -192,9 +196,9 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                     current === conversation.id ? null : current,
                   )
                 }
-                // wzConvoRow (chat-page.tsx's CHAT_SURFACE_STYLES) only adds a reduced-motion-safe
-                // transition timing for the background/border-color changes below — the colors
-                // themselves stay driven by this row's own hover/selected state, unchanged.
+                // wzConvoRow (chat-page.scss) only adds a reduced-motion-safe transition timing for
+                // the background/border-color changes below — the colors themselves stay driven by
+                // this row's own hover/selected state, unchanged.
                 className='wzConvoRow'
                 style={{
                   cursor: 'pointer',

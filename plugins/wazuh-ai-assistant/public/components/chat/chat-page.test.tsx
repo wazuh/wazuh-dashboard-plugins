@@ -202,12 +202,30 @@ function lastSavedRoleContent(mock: jest.Mock): Array<[string, string]> {
 }
 
 /**
+ * Finds a conversation's SIDEBAR ROW by its title text. Once a conversation is both open (the
+ * conversation header now shows its title as an `<h1>`, chat-page.tsx) and listed in the sidebar,
+ * the same title string can render twice on screen — `screen.getByText` would then throw on an
+ * ambiguous match, so every lookup goes through here instead, which disambiguates by picking the
+ * match inside the sidebar's own `[role="button"]` row.
+ */
+function conversationRow(title: string): HTMLElement {
+  const row = screen
+    .getAllByText(title)
+    .map(element => element.closest('[role="button"]'))
+    .find((element): element is HTMLElement => element !== null);
+  if (!row) {
+    throw new Error(`No conversation row found for "${title}"`);
+  }
+  return row;
+}
+
+/**
  * Opens another conversation from the sidebar. A mid-stream switch asks for confirmation first
  * (`overlays.openConfirm`, mocked to accept by default), so every such switch in these tests goes
  * through here rather than assuming a bare click is enough.
  */
 async function leaveForConversation(title: string) {
-  fireEvent.click(screen.getByText(title));
+  fireEvent.click(conversationRow(title));
   await waitFor(() => expect(mockConversationsService.get).toHaveBeenCalled());
 }
 
@@ -261,7 +279,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     stream.push({ type: 'delta', content: 'partial ' });
@@ -285,7 +303,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     stream.push({ type: 'delta', content: 'partial answer' });
@@ -343,7 +361,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     stream.push({ type: 'delta', content: 'partial answer' });
@@ -379,7 +397,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     expect(screen.getByLabelText('Chat message')).toBeDisabled();
@@ -433,7 +451,10 @@ describe('ChatPage — turn abandoned mid-stream', () => {
     );
 
     const signal = lastStreamSignal();
-    fireEvent.click(screen.getByText('New conversation'));
+    // getByRole (not getByText): the conversation header's own "New conversation" fallback
+    // title (chat-page.tsx, shown while no conversation is active) can render the exact same
+    // string at the same time as this sidebar button.
+    fireEvent.click(screen.getByRole('button', { name: 'New conversation' }));
 
     await waitFor(() => expect(signal.aborted).toBe(true));
     await waitFor(() =>
@@ -481,7 +502,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     firstStream.push({
@@ -646,7 +667,10 @@ describe('ChatPage — restoring the open conversation', () => {
       expect(screen.getByText('earlier question')).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByText('New conversation'));
+    // getByRole (not getByText): the conversation header's own "New conversation" fallback
+    // title (chat-page.tsx, shown while no conversation is active) can render the exact same
+    // string at the same time as this sidebar button.
+    fireEvent.click(screen.getByRole('button', { name: 'New conversation' }));
 
     await waitFor(() => expect(window.location.pathname).toBe('/'));
     expect(
@@ -1209,7 +1233,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
   }) {
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     stream.push({ type: 'delta', content: 'half an ans' });
@@ -1222,7 +1246,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     const stream = startGeneratingWithSidebar();
     await renderAndStartTurn(stream);
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
 
     await waitFor(() => expect(mockOpenConfirm).toHaveBeenCalledTimes(1));
     // No styling overrides: the platform's own app-leave confirmation passes none either, and
@@ -1241,7 +1265,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     await renderAndStartTurn(stream);
     const signal = lastStreamSignal();
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
 
     await waitFor(() => expect(mockOpenConfirm).toHaveBeenCalled());
     expect(signal.aborted).toBe(false);
@@ -1254,7 +1278,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     await renderAndStartTurn(stream);
     const signal = lastStreamSignal();
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
     await waitFor(() => expect(mockOpenConfirm).toHaveBeenCalled());
 
     expect(signal.aborted).toBe(false);
@@ -1272,7 +1296,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     await renderAndStartTurn(stream);
     const signal = lastStreamSignal();
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
 
     await waitFor(() => expect(signal.aborted).toBe(true));
     await waitFor(() =>
@@ -1285,7 +1309,10 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     mockOpenConfirm.mockResolvedValue(false);
     await renderAndStartTurn(stream);
 
-    fireEvent.click(screen.getByText('New conversation'));
+    // getByRole (not getByText): the conversation header's own "New conversation" fallback
+    // title (chat-page.tsx, shown while no conversation is active) can render the exact same
+    // string at the same time as this sidebar button.
+    fireEvent.click(screen.getByRole('button', { name: 'New conversation' }));
 
     await waitFor(() => expect(mockOpenConfirm).toHaveBeenCalledTimes(1));
     // Declined, so the turn is untouched.
@@ -1300,9 +1327,9 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     // Open conv-b, then start a turn inside it.
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
     await waitFor(() =>
       expect(screen.getByText('earlier question')).toBeInTheDocument(),
     );
@@ -1316,7 +1343,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
 
     // Clicking the conversation that is already open changes nothing, so there is nothing to
     // interrupt and nothing to confirm.
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
 
     await waitFor(() =>
       expect(screen.getByText('half an ans')).toBeInTheDocument(),
@@ -1333,10 +1360,10 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
 
     await waitFor(() =>
       expect(screen.getByText('earlier question')).toBeInTheDocument(),

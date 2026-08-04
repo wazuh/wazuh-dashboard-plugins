@@ -61,7 +61,9 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
               index === messages.length - 1 ? onRetryLastTurn : undefined
             }
           />
-          {index < messages.length - 1 && <EuiSpacer size='m' />}
+          {/* One turn = one 24px breath (EuiSpacer size='l'), matching the rhythm the conversation
+              header and welcome state also use — intra-turn spacing inside a bubble stays 's'. */}
+          {index < messages.length - 1 && <EuiSpacer size='l' />}
         </React.Fragment>
       ))}
       {/* A conversation that ENDS on a question is an unanswered turn: the page was reloaded or
