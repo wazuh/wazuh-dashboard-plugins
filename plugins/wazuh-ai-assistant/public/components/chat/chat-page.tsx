@@ -11,6 +11,7 @@ import {
   EuiToolTip,
   EuiIconTip,
   EuiText,
+  EuiTitle,
   EuiLoadingSpinner,
   EuiPanel,
   EuiIcon,
@@ -154,69 +155,6 @@ const EXAMPLE_CARDS = [
     }),
   },
 ];
-
-/**
- * Single injected `<style>` element for this whole chat surface (rendered once from ChatPage's
- * own JSX below) — the hard constraint here is EUI/inline styles + AT MOST ONE `<style>` tag for
- * exactly what inline styles cannot express: `@keyframes`, the hero wash's `radial-gradient`,
- * `:hover`/`:focus-visible` pseudo-class rules, and the example cards' per-card stagger delay
- * (each card sets `--wzCardDelay` inline; this is the one place that consumes it).
- *
- * Every color reference here is `rgba(var(--wzAccentRgb), alpha)` — `--wzAccentRgb` is set ONCE,
- * inline, on this component's own root element below, resolved from the real OSD theme
- * (`core.uiSettings.get('theme:darkMode')`, not `prefers-color-scheme`, which is NOT how OSD
- * models dark mode). Custom properties inherit through the whole DOM subtree regardless of
- * component boundaries, so every descendant (sidebar rows, hero cards) picks it up without any of
- * them needing an `isDarkMode` prop threaded down.
- *
- * Motion is entirely opt-in: every animation/transition/transform lives inside the
- * `prefers-reduced-motion: no-preference` block. Outside it (i.e. for a reduced-motion user), the
- * hero cards and message rows simply render at their final `opacity: 1` state with no movement —
- * the ONE exception is the hover/focus border+shadow rule, which is an instant state change (no
- * transition, no transform) even for reduced-motion users, since EUI's own hover affordances work
- * the same way.
- */
-const CHAT_SURFACE_STYLES = `
-.wzHeroCard:hover,
-.wzHeroCard:focus-visible {
-  border-color: rgba(var(--wzAccentRgb), 0.55) !important;
-  box-shadow: 0 6px 20px -4px rgba(var(--wzAccentRgb), 0.28);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .wzHeroCard {
-    opacity: 0;
-    animation: wzFadeUp 420ms ease-out both;
-    animation-delay: var(--wzCardDelay, 0ms);
-    transition: transform 150ms ease-out, box-shadow 150ms ease-out, border-color 150ms ease-out;
-  }
-
-  .wzHeroCard:hover {
-    transform: translateY(-3px);
-  }
-
-  .wzConvoRow {
-    transition: background-color 120ms ease-out, border-color 120ms ease-out;
-  }
-
-  .wzMsgRow {
-    opacity: 0;
-    animation: wzFadeUp 260ms ease-out both;
-  }
-
-  @keyframes wzFadeUp {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-}
-
-`;
 
 /**
  * Rewrites the route to address `conversationId` (a `/conversation/:id` path, or `/` for none),
@@ -1520,14 +1458,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       : provider.name,
   }));
 
-  // Theme-correct accent (see CHAT_SURFACE_STYLES's doc comment): OSD dark mode is a uiSettings
-  // toggle the dashboard applies on a full page load, not a live-changing media feature, so
-  // reading it once per render — no listener, no state — is enough. This is the same #0077CC
-  // family conversation-list.tsx's selected and hover rows use, lightened for dark mode so it
-  // stays legible against a dark canvas instead of reading as a second, unrelated hue.
-  const isDarkMode = core.uiSettings.get('theme:darkMode');
-  const accentRgb = isDarkMode ? '86, 180, 233' : '0, 119, 204';
-
   return (
     // Iteration 2 layout: EuiPage/EuiPageSideBar rendered as an unreliable hairline sliver in this
     // OSD/EUI build (iteration 1 screenshots), so the two-pane layout is now an explicit,
@@ -1540,22 +1470,19 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // behaves like the old plain document-flow layout (sidebar and chat column both size to
     // content, page scrolls normally) rather than breaking, so it is safe either way.
     <>
-      {/* Single injected <style> element for the whole chat surface — see CHAT_SURFACE_STYLES's own
-        doc comment above for exactly what it does and does not cover. */}
-      <style>{CHAT_SURFACE_STYLES}</style>
+      {/* wzAiChat: the `--wz-*` token block chat-page.scss defines from EUI's own `$eui*` SASS
+        variables — every color/border reference in this subtree (sidebar rows, hero cards, the
+        sticky input focus ring) reads one of those custom properties instead of a hardcoded hex
+        or a JS-computed `theme:darkMode` branch. Custom properties inherit through the whole DOM
+        subtree regardless of component boundaries, so nothing downstream needs its own dark-mode
+        prop threaded down to it. */}
       <div
-        style={
-          {
-            display: 'flex',
-            height: '100%',
-            minHeight: 0,
-            // Consumed by CHAT_SURFACE_STYLES above and by inline `rgba(var(--wzAccentRgb), ...)`
-            // reads further down this subtree (conversation-list.tsx's selected/hover rows, the
-            // hero cards' icon chips) — set once here so nothing downstream needs its own
-            // isDarkMode prop.
-            '--wzAccentRgb': accentRgb,
-          } as React.CSSProperties
-        }
+        className='wzAiChat'
+        style={{
+          display: 'flex',
+          height: '100%',
+          minHeight: 0,
+        }}
       >
         {/* Left pane: saved-conversations sidebar. EuiPanel color="subdued" gives the standard OSD
           "sunken" pane background without inventing a new hardcoded color. */}
@@ -1574,12 +1501,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             maxWidth: CONVERSATION_SIDEBAR_WIDTH,
             flexShrink: 0,
             overflowY: 'auto',
-            // Single hardcoded hex in this file: #D3DAE6 is EUI's `lightShade` token, the same shade
-            // EUI's own components already use for hairline borders in the light theme. No CSS
-            // variable/theme value is exposed to inline styles in this plugin (no stylesheet, no
-            // EuiThemeProvider hook usage elsewhere here), so this is a deliberate one-off rather than
-            // a new arbitrary color.
-            borderRight: '1px solid #D3DAE6',
+            // `--wz-hairline` (chat-page.scss, sourced from `$euiBorderColor`) replaces the old
+            // hardcoded `#D3DAE6` — that hex was EUI's light-theme `lightShade` token with no
+            // dark-mode counterpart, so it rendered as the brightest edge on the page in dark mode.
+            borderRight: '1px solid var(--wz-hairline)',
           }}
         >
           <ConversationList
@@ -1872,33 +1797,32 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     // No `icon`: this chat already lives inside the Wazuh app chrome, so a Wazuh
                     // mark on the welcome screen only repeated branding the user can already see.
                     title={
-                      // Inline size/weight/letter-spacing override the EuiEmptyPrompt title's
-                      // own (smaller) default — inline style always wins over EUI's class-based
-                      // font-size here, same override pattern already used throughout this file.
-                      <h2
-                        style={{
-                          fontSize: 30,
-                          fontWeight: 600,
-                          letterSpacing: '-0.01em',
-                          lineHeight: 1.25,
-                          margin: 0,
-                        }}
-                      >
-                        {i18n.translate('wazuhAiAssistant.chat.welcome.title', {
-                          defaultMessage: 'Ask the AI Assistant something',
-                        })}
-                      </h2>
+                      // EUI's own type scale (size='m') instead of an inline fontSize/weight/
+                      // letter-spacing override — the whole point of this pass is to stop
+                      // fighting EuiEmptyPrompt's built-in typography with inline styles.
+                      <EuiTitle size='m'>
+                        <h2>
+                          {i18n.translate(
+                            'wazuhAiAssistant.chat.welcome.title',
+                            {
+                              defaultMessage: 'Ask the AI Assistant something',
+                            },
+                          )}
+                        </h2>
+                      </EuiTitle>
                     }
                     body={
-                      <p style={{ fontSize: 16, lineHeight: 1.5, margin: 0 }}>
-                        {i18n.translate(
-                          'wazuhAiAssistant.chat.welcome.subtitle',
-                          {
-                            defaultMessage:
-                              'Ask questions about your security data in plain language.',
-                          },
-                        )}
-                      </p>
+                      <EuiText size='m'>
+                        <p>
+                          {i18n.translate(
+                            'wazuhAiAssistant.chat.welcome.subtitle',
+                            {
+                              defaultMessage:
+                                'Ask questions about your security data in plain language.',
+                            },
+                          )}
+                        </p>
+                      </EuiText>
                     }
                   />
                   <EuiSpacer size='l' />
@@ -1908,6 +1832,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         EuiEmptyPrompt's body (along with the card row below) so the row is
                         no longer clamped to the empty prompt's ~576px content width — it now
                         spans the full ~860px chat column instead of wrapping 2+1. */}
+                  {/* fontSize bumped 11 -> 12 so this label is never smaller than the EUI
+                        type scale it sits on (still below-scale in spirit; commit #8843-3
+                        replaces this whole label with an EuiBetaBadge). */}
                   <EuiText size='s' color='subdued'>
                     <p
                       style={{
@@ -1915,7 +1842,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         fontWeight: 600,
                         letterSpacing: '0.02em',
                         textTransform: 'uppercase',
-                        fontSize: 11,
+                        fontSize: 12,
                         textAlign: 'center',
                       }}
                     >
@@ -1931,7 +1858,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         EuiCard's fixed layout paddings still read oversized at "s"/horizontal
                         for a 3-up row this narrow, so this uses onClick EuiPanels instead —
                         icon chip + title + one truncated line, now with a consistent height,
-                        a hover lift (wzHeroCard, see CHAT_SURFACE_STYLES), and a staggered
+                        a hover lift (wzHeroCard, see chat-page.scss), and a staggered
                         fade/slide-in on mount driven by each card's own --wzCardDelay.
                         Clicking still only fills the input (unchanged setInputText call),
                         never auto-sends. */}
@@ -1960,8 +1887,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                               minHeight: 128,
                               display: 'flex',
                               flexDirection: 'column',
-                              borderRadius: 10,
-                              // Consumed only by CHAT_SURFACE_STYLES's reduced-motion-safe
+                              // No borderRadius override — EuiPanel's own default applies.
+                              // Consumed only by chat-page.scss's reduced-motion-safe
                               // animation-delay rule; see this component's own doc comment.
                               '--wzCardDelay': `${index * 80}ms`,
                             } as React.CSSProperties
@@ -1974,8 +1901,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                               justifyContent: 'center',
                               width: 32,
                               height: 32,
-                              borderRadius: 8,
-                              background: 'rgba(var(--wzAccentRgb), 0.12)',
+                              borderRadius: 4,
+                              background: 'var(--wz-accent-soft)',
                             }}
                           >
                             <EuiIcon
@@ -2031,7 +1958,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   hasBorder
                   hasShadow={false}
                   paddingSize='s'
-                  style={{ borderRadius: 12, marginBottom: 12 }}
+                  style={{ marginBottom: 12 }}
                 >
                   <ChatInput
                     ref={chatInputRef}

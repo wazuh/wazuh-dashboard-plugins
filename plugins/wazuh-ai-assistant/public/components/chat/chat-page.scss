@@ -1,3 +1,21 @@
+/**
+ * Chat surface tokens. Compiled once per theme by OSD (unlike an inline React style, which reads
+ * whatever value JS computed at render time) — a `--wz-*` custom-property block sourced from
+ * EUI's own `$eui*` SASS variables is the single place this plugin's components read color/border
+ * roles from, so no component ever hardcodes a hex literal or branches on `theme:darkMode` itself.
+ * Custom properties inherit through the whole DOM subtree regardless of component boundaries, so
+ * nothing downstream needs its own dark-mode prop threaded down to it.
+ */
+.wzAiChat {
+  --wz-hairline: #{$euiBorderColor};
+  --wz-accent: #{$euiColorPrimary};
+  --wz-accent-soft: #{rgba($euiColorPrimary, 0.1)};
+  --wz-accent-hover: #{rgba($euiColorPrimary, 0.06)};
+  --wz-surface: #{$euiColorEmptyShade};
+  --wz-surface-sunken: #{$euiColorLightestShade};
+  --wz-text-subdued: #{$euiTextSubduedColor};
+}
+
 .wzStickyInputPanel {
   position: sticky;
   bottom: 0;
@@ -17,5 +35,82 @@
       $euiPageBackgroundColor
     );
     pointer-events: none;
+  }
+}
+
+/**
+ * Moved here from chat-page.tsx's runtime-injected `CHAT_SURFACE_STYLES` `<style>` tag — this file
+ * is compiled per theme already, so there is no need for a second, JS-injected stylesheet. Every
+ * color reference below is one of the `--wz-*` custom properties above (no more
+ * `rgba(var(--wzAccentRgb), ...)` computed in JS from a `theme:darkMode` read).
+ *
+ * Motion is entirely opt-in: every animation/transition/transform lives inside the
+ * `prefers-reduced-motion: no-preference` block. Outside it (i.e. for a reduced-motion user), the
+ * hero cards and message rows simply render at their final `opacity: 1` state with no movement —
+ * the ONE exception is the hover/focus border+shadow rule, which is an instant state change (no
+ * transition, no transform) even for reduced-motion users, since EUI's own hover affordances work
+ * the same way.
+ */
+.wzHeroIconWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wzHeroWash {
+  position: absolute;
+  width: 230px;
+  height: 230px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    var(--wz-accent-soft) 0%,
+    var(--wz-accent-hover) 45%,
+    transparent 72%
+  );
+}
+
+.wzHeroIcon {
+  position: relative;
+}
+
+.wzHeroCard:hover,
+.wzHeroCard:focus-visible {
+  border-color: var(--wz-accent) !important;
+  box-shadow: 0 6px 20px -4px var(--wz-accent-soft);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .wzHeroCard {
+    opacity: 0;
+    animation: wzFadeUp 420ms ease-out both;
+    animation-delay: var(--wzCardDelay, 0ms);
+    transition: transform 150ms ease-out, box-shadow 150ms ease-out, border-color 150ms ease-out;
+  }
+
+  .wzHeroCard:hover {
+    transform: translateY(-3px);
+  }
+
+  .wzConvoRow {
+    transition: background-color 120ms ease-out, border-color 120ms ease-out;
+  }
+
+  .wzMsgRow {
+    opacity: 0;
+    animation: wzFadeUp 260ms ease-out both;
+  }
+
+  @keyframes wzFadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }

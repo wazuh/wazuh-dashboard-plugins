@@ -198,23 +198,21 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                 className='wzConvoRow'
                 style={{
                   cursor: 'pointer',
-                  padding: '6px 8px',
-                  borderRadius: 8,
-                  // rgba(var(--wzAccentRgb), ...) resolves the same Wazuh-blue accent chat-page.tsx
-                  // sets once on its own root element (theme-resolved via uiSettings, not a second
-                  // hardcoded hex) — CSS custom properties inherit through this whole subtree
-                  // regardless of the EuiPanel/component boundaries in between, so no extra prop is
-                  // needed here to reach it. The left border on selection reads unambiguously even
-                  // for users who rely on more than a background tint (e.g. reduced contrast
-                  // themes); the hover tint now shares the same accent family instead of a flat
-                  // black overlay, which read too faint on a dark canvas.
+                  padding: '8px',
+                  borderRadius: 4,
+                  // `--wz-accent`/`--wz-accent-soft`/`--wz-accent-hover` (chat-page.scss, sourced
+                  // from EUI's own `$eui*` SASS variables) — CSS custom properties inherit through
+                  // this whole subtree regardless of the EuiPanel/component boundaries in between,
+                  // so no extra prop is needed here to reach them. The left border on selection
+                  // reads unambiguously even for users who rely on more than a background tint
+                  // (e.g. reduced contrast themes).
                   borderLeft: isSelected
-                    ? '3px solid rgba(var(--wzAccentRgb), 0.8)'
+                    ? '3px solid var(--wz-accent)'
                     : '3px solid transparent',
                   background: isSelected
-                    ? 'rgba(var(--wzAccentRgb), 0.1)'
+                    ? 'var(--wz-accent-soft)'
                     : isHovered
-                    ? 'rgba(var(--wzAccentRgb), 0.06)'
+                    ? 'var(--wz-accent-hover)'
                     : 'transparent',
                 }}
               >
@@ -234,7 +232,11 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                     >
                       {conversation.title}
                     </EuiText>
-                    <EuiText size='xs' color='subdued'>
+                    <EuiText
+                      size='xs'
+                      color='subdued'
+                      style={{ fontVariantNumeric: 'tabular-nums' }}
+                    >
                       {formatRelativeTime(conversation.updatedAt)}
                     </EuiText>
                   </EuiFlexItem>

@@ -285,13 +285,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   const bubble = (
     <EuiFlexItem grow={false} style={{ maxWidth: '75%', minWidth: 180 }}>
       {isUser ? (
-        <EuiPanel
-          color='plain'
-          paddingSize='m'
-          hasShadow={false}
-          hasBorder
-          style={{ borderRadius: 14 }}
-        >
+        <EuiPanel color='plain' paddingSize='m' hasShadow={false} hasBorder>
           {bubbleContent}
         </EuiPanel>
       ) : (
@@ -303,7 +297,12 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         textAlign={isUser ? 'right' : 'left'}
         className='wzAiAssistantMessageTimestamp'
       >
-        <p style={{ margin: '2px 4px 0' }}>
+        <p
+          style={{
+            margin: '4px 4px 0',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
           {formatTimestamp(message.createdAt)}
         </p>
       </EuiText>
