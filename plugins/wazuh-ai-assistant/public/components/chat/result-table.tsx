@@ -94,6 +94,36 @@ const ISO_TIMESTAMP_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{
 const TIMESTAMP_COLUMN_WIDTH = '150px';
 /** Column width for the severity column: a badge plus its longest label ("Informational"). */
 const SEVERITY_COLUMN_WIDTH = '120px';
+/** Approximate advance width of one character at the table's font size, used only to turn a
+ * column's longest value into a pixel width. Deliberately rough — it decides how much room a
+ * short column reserves, not whether anything is readable. */
+const APPROX_CHAR_WIDTH = 7.5;
+/** A column whose longest value is no longer than this is treated as a "short" column and gets a
+ * width sized to its content, leaving the remaining width to the free-text column(s). */
+const SHORT_COLUMN_MAX_CHARS = 24;
+const SHORT_COLUMN_MIN_WIDTH = 100;
+const SHORT_COLUMN_MAX_WIDTH = 200;
+
+/** Length of the longest rendered value in a column (header included, so a short column never
+ * ends up narrower than its own label). */
+function longestValueLength(
+  rows: Array<Record<string, unknown>>,
+  field: string,
+  label: string,
+): number {
+  let longest = label.length;
+  for (const row of rows) {
+    const value = row[field];
+    if (value === null || value === undefined) {
+      continue;
+    }
+    const length = String(value).length;
+    if (length > longest) {
+      longest = length;
+    }
+  }
+  return longest;
+}
 
 /**
  * Compact, locale-aware rendering of an ISO instant — display only. The raw value is untouched in
@@ -278,6 +308,26 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
                 // than letting an `unknown` reach React.
                 String(value ?? '')
               ),
+          };
+        }
+        // EuiBasicTable's default fixed layout splits the leftover width EQUALLY between every
+        // column that has no explicit width, so a one-word "Category" column claimed exactly as
+        // much room as a sentence-long rule title and the title wrapped onto four lines. Sizing
+        // the short columns to their content leaves the remainder to the free-text column(s) —
+        // the only ones that can actually use it.
+        const longest = longestValueLength(spec.rows, column.id, column.label);
+        if (longest <= SHORT_COLUMN_MAX_CHARS) {
+          const width = Math.min(
+            SHORT_COLUMN_MAX_WIDTH,
+            Math.max(
+              SHORT_COLUMN_MIN_WIDTH,
+              Math.round(longest * APPROX_CHAR_WIDTH) + 32,
+            ),
+          );
+          return {
+            field: column.id,
+            name: column.label,
+            width: `${width}px`,
           };
         }
         return { field: column.id, name: column.label };
