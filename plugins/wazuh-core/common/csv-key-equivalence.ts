@@ -55,7 +55,7 @@ export const KeyEquivalence: {[key: string]: string} = {
   path: 'Path',
   details: 'Details',
   position: 'Position',
-  configSum: 'Group checksum',
+  configSum: 'Configuration checksum',
   key: 'Key',
   scan_id: 'Scan ID',
   format: 'Format',
