@@ -1071,8 +1071,10 @@ describe('ChatPage — feedback while a turn runs', () => {
     // The `digest` event that follows must not release the held table — it is held until TEXT
     // arrives, not until the next non-delta event comes along.
     stream.push({ type: 'digest', toolCallId: 't1', content: '{}' });
+    // The table is still held (no text has arrived yet), so the chip's label falls back to the
+    // raw tool name rather than "{index} · {time range}".
     await waitFor(() =>
-      expect(screen.getByText('1 query executed')).toBeInTheDocument(),
+      expect(screen.getByText('get_top_agents')).toBeInTheDocument(),
     );
     expect(screen.queryByText('web-01')).not.toBeInTheDocument();
 
@@ -1145,11 +1147,16 @@ describe('ChatPage — feedback while a turn runs', () => {
       },
     });
 
+    // No table event this turn, so the chip falls back to the raw tool name — and it is the chip
+    // itself, visible without any click, since the fallback label IS the tool name.
     await waitFor(() =>
-      expect(screen.getByText('1 query executed')).toBeInTheDocument(),
+      expect(screen.getByText('search_wazuh_data')).toBeInTheDocument(),
     );
-    expect(screen.getByText('search_wazuh_data')).toBeInTheDocument();
-    expect(screen.getByText(/wazuh-alerts-\*/)).toBeInTheDocument();
+    // Raw arguments are one click deeper, not on screen unbidden.
+    expect(screen.queryByText(/wazuh-alerts-\*/)).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('search_wazuh_data'));
+    expect(await screen.findByText(/wazuh-alerts-\*/)).toBeInTheDocument();
   });
 
   it('shows the executed queries again on a resumed conversation', async () => {
@@ -1180,7 +1187,7 @@ describe('ChatPage — feedback while a turn runs', () => {
     await waitFor(() =>
       expect(screen.getByText('42 alerts')).toBeInTheDocument(),
     );
-    expect(screen.getByText('1 query executed')).toBeInTheDocument();
+    // No discover info on this restored table, so the chip's fallback label is the raw tool name.
     expect(screen.getByText('search_wazuh_data')).toBeInTheDocument();
   });
 });

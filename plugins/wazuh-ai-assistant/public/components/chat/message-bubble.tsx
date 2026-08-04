@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   EuiPanel,
   EuiText,
@@ -7,7 +7,7 @@ import {
   EuiLoadingSpinner,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiAccordion,
+  EuiBadge,
   EuiAvatar,
   EuiButtonEmpty,
   EuiCodeBlock,
@@ -19,6 +19,7 @@ import { ChatRole, TableSpec, ToolCall } from '../../../common/types';
 import { ResultTable } from './result-table';
 import { ResolveDiscoverUrl } from './discover-link';
 import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
+import { describeToolCall } from './tool-call-label';
 
 /**
  * "This turn was cut short" affordance, rendered in two places: inside an interrupted assistant
@@ -72,8 +73,9 @@ export interface UiChatMessage {
   statusMessage?: string;
   createdAt: number;
   /**
-   * The tool calls this turn ran, shown as a collapsed "query executed" panel so the reader can see
-   * exactly what was asked of the indexer or the Manager API rather than having to trust the prose.
+   * The tool calls this turn ran, shown as small provenance chips in the message meta row so the
+   * reader can see exactly what was asked of the indexer or the Manager API rather than having to
+   * trust the prose — the raw name/arguments/DSL are one click deeper, never on screen unbidden.
    * Real-form arguments (the server reverses pseudonyms before emitting the `tool_call` event).
    */
   toolCalls?: ToolCall[];
@@ -130,6 +132,12 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   const isUser = message.role === 'user';
   const isWaitingForFirstToken =
     !isUser && message.isStreaming === true && message.content === '';
+  const toolCalls = message.toolCalls ?? [];
+  // One shared raw view for every provenance chip on this bubble (not one per chip): clicking any
+  // chip toggles the same panel, which is exactly the content the old "N queries executed"
+  // accordion showed — default collapsed, so no JSON is ever on screen unbidden.
+  const [isRawViewOpen, setIsRawViewOpen] = useState(false);
+  const rawViewId = `wzAiQueryRaw-${message.id}`;
   // color="plain" keeps both avatars on the same neutral background, so the pair reads as one
   // set instead of picking up EUI's auto-assigned per-name colors.
   const avatar = isUser ? (
@@ -206,29 +214,16 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           />
         </>
       )}
-      {/* What was actually run, collapsed by default: the answer is only as trustworthy as the
-            query behind it, and an analyst has to be able to check that query without reading
-            server logs. Shows each tool call's real-form arguments and, for an indexer search, the
+      {/* What was actually run, collapsed by default (see the provenance chips in the meta row
+            below, which toggle this same panel): the answer is only as trustworthy as the query
+            behind it, and an analyst has to be able to check that query without reading server
+            logs. Shows each tool call's real-form arguments and, for an indexer search, the
             executed DSL the table carries (the same one "Open in Discover" uses). */}
-      {message.toolCalls && message.toolCalls.length > 0 && (
+      {toolCalls.length > 0 && isRawViewOpen && (
         <>
           <EuiSpacer size='s' />
-          <EuiAccordion
-            id={`wzAiQuery-${message.id}`}
-            paddingSize='s'
-            buttonContent={
-              <EuiText size='xs'>
-                <EuiTextColor color='subdued'>
-                  {i18n.translate('wazuhAiAssistant.chat.queryDetails', {
-                    defaultMessage:
-                      '{count, plural, one {# query executed} other {# queries executed}}',
-                    values: { count: message.toolCalls.length },
-                  })}
-                </EuiTextColor>
-              </EuiText>
-            }
-          >
-            {message.toolCalls.map(toolCall => (
+          <div id={rawViewId}>
+            {toolCalls.map(toolCall => (
               <div key={toolCall.id}>
                 <EuiText size='xs'>
                   <strong>{toolCall.name}</strong>
@@ -268,7 +263,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
                 </EuiCodeBlock>
               </>
             )}
-          </EuiAccordion>
+          </div>
         </>
       )}
       {/* An interrupted answer is labelled as one rather than left looking complete — the whole
@@ -291,21 +286,59 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       ) : (
         <div style={{ padding: '8px 0' }}>{bubbleContent}</div>
       )}
-      <EuiText
-        size='xs'
-        color='subdued'
-        textAlign={isUser ? 'right' : 'left'}
-        className='wzAiAssistantMessageTimestamp'
+      {/* Meta row: timestamp plus, for an assistant turn that ran tool calls, one provenance chip
+            per call — clicking any of them toggles the shared raw view above (default collapsed,
+            wired via aria-expanded/aria-controls). */}
+      <EuiFlexGroup
+        gutterSize='xs'
+        alignItems='center'
+        responsive={false}
+        justifyContent={isUser ? 'flexEnd' : 'flexStart'}
+        wrap
       >
-        <p
-          style={{
-            margin: '4px 4px 0',
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {formatTimestamp(message.createdAt)}
-        </p>
-      </EuiText>
+        <EuiFlexItem grow={false}>
+          <EuiText
+            size='xs'
+            color='subdued'
+            textAlign={isUser ? 'right' : 'left'}
+            className='wzAiAssistantMessageTimestamp'
+          >
+            <p
+              style={{
+                margin: '4px 4px 0',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {formatTimestamp(message.createdAt)}
+            </p>
+          </EuiText>
+        </EuiFlexItem>
+        {!isUser &&
+          toolCalls.map(toolCall => {
+            const { short, full } = describeToolCall(toolCall, message.table);
+            return (
+              <EuiFlexItem grow={false} key={toolCall.id}>
+                <EuiBadge
+                  color='hollow'
+                  iconType='search'
+                  title={full}
+                  onClick={() => setIsRawViewOpen(open => !open)}
+                  onClickAriaLabel={i18n.translate(
+                    'wazuhAiAssistant.chat.queryChipAriaLabel',
+                    {
+                      defaultMessage: 'Show the executed query: {label}',
+                      values: { label: full },
+                    },
+                  )}
+                  aria-expanded={isRawViewOpen}
+                  aria-controls={rawViewId}
+                >
+                  {short}
+                </EuiBadge>
+              </EuiFlexItem>
+            );
+          })}
+      </EuiFlexGroup>
     </EuiFlexItem>
   );
 
@@ -328,7 +361,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   );
 
   return (
-    // wzMsgRow (chat-page.tsx's CHAT_SURFACE_STYLES): a reduced-motion-guarded fade/slide-up that
+    // wzMsgRow (chat-page.scss): a reduced-motion-guarded fade/slide-up that
     // plays once when this row is first inserted into the DOM. Applying the class unconditionally
     // (not toggled by any state) is what keeps it a MOUNT-only effect — a later re-render of this
     // same MessageBubble instance (a streamed delta, a table arriving, etc.) never re-inserts the
