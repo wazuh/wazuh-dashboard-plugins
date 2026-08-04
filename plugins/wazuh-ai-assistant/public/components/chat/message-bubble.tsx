@@ -269,7 +269,17 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   );
 
   const bubble = (
-    <EuiFlexItem grow={false} style={{ maxWidth: '75%', minWidth: 180 }}>
+    <EuiFlexItem
+      grow={false}
+      style={{
+        // The user turn keeps its 75% share (a question is always prose); the assistant turn
+        // gets a readable 720px prose measure EXCEPT when it carries a result table, which uses
+        // the full column width instead — a wide table squeezed into 75% of an already-narrow
+        // column forced a horizontal scrollbar inside the table's own 400px scroller.
+        maxWidth: isUser ? '75%' : message.table ? '100%' : 720,
+        minWidth: 180,
+      }}
+    >
       {isUser ? (
         // Quiet tinted inset, no border/shadow/radius override — the assistant turn stays
         // undecorated prose on the canvas, so role is distinguished by this container alone.

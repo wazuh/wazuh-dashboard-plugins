@@ -36,6 +36,28 @@
     );
     pointer-events: none;
   }
+
+  /* Focus-within ring is the ONE box-shadow this surface allows (a focus indicator, not
+     decoration) — the textarea itself is intentionally chromeless (chat-input.tsx), so the dock
+     panel is what shows focus has landed inside it. Disabled state (no providers configured yet)
+     dims the whole dock instead of leaving it visually identical to the enabled state. */
+  .euiPanel:focus-within {
+    border-color: var(--wz-accent);
+    box-shadow: 0 0 0 1px var(--wz-accent);
+  }
+
+  &.wzStickyInputPanel-isDisabled .euiPanel {
+    opacity: 0.6;
+  }
+}
+
+/* result-table.tsx's bordered-panel header strip: restyles EUI's own accordion trigger wrapper
+   into a small sunken-background row with a hairline bottom border, rather than inventing new
+   markup to replace EuiAccordion's built-in (and already keyboard-accessible) toggle. */
+.wzResultTableAccordion > .euiAccordion__triggerWrapper {
+  background: var(--wz-surface-sunken);
+  border-bottom: 1px solid var(--wz-hairline);
+  padding: 4px 12px;
 }
 
 /**

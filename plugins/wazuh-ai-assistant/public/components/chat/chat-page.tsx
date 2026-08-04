@@ -1635,41 +1635,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               </div>
             )}
 
-            {(error || providersError) && (
-              <StatusCallout
-                title={i18n.translate('wazuhAiAssistant.chat.errorTitle', {
-                  defaultMessage: 'Something went wrong',
-                })}
-                color='danger'
-                iconType='alert'
-                body={error ?? providersError}
-              />
-            )}
-
-            {managerAuthHint && (
-              <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.managerAuthHint.title',
-                  {
-                    defaultMessage: 'Your Wazuh session may have expired',
-                  },
-                )}
-                color='warning'
-                iconType='alert'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.managerAuthHint.body',
-                  {
-                    defaultMessage:
-                      'A request to the Wazuh manager failed, which can happen when your dashboard session token has expired. Reload the page and sign in again, then retry your question.',
-                  },
-                )}
-              />
-            )}
-
-            {/* Session-expiry recovery UX: a genuine 401, distinct from managerAuthHint's
-                  best-effort heuristic above. Persistent (no dismiss control, and nothing in this
-                  file ever calls setSessionExpired(false) except starting a fresh send) until the
-                  user reloads, per this fix's brief. */}
+            {/* Callouts render in priority order (never suppressed — resilience-first: every
+                  state is shown, just ordered): session expiry first (it blocks everything else),
+                  then generic errors, then a failed auto-save, then the optimistic-concurrency
+                  merge notices. Session-expiry recovery UX: a genuine 401, distinct from
+                  managerAuthHint's best-effort heuristic below. Persistent (no dismiss control,
+                  and nothing in this file ever calls setSessionExpired(false) except starting a
+                  fresh send) until the user reloads, per this fix's brief. */}
             {sessionExpired && (
               <StatusCallout
                 title={i18n.translate(
@@ -1704,6 +1676,61 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               />
             )}
 
+            {(error || providersError) && (
+              <StatusCallout
+                title={i18n.translate('wazuhAiAssistant.chat.errorTitle', {
+                  defaultMessage: 'Something went wrong',
+                })}
+                color='danger'
+                iconType='alert'
+                body={error ?? providersError}
+              />
+            )}
+
+            {managerAuthHint && (
+              <StatusCallout
+                title={i18n.translate(
+                  'wazuhAiAssistant.chat.managerAuthHint.title',
+                  {
+                    defaultMessage: 'Your Wazuh session may have expired',
+                  },
+                )}
+                color='warning'
+                iconType='alert'
+                body={i18n.translate(
+                  'wazuhAiAssistant.chat.managerAuthHint.body',
+                  {
+                    defaultMessage:
+                      'A request to the Wazuh manager failed, which can happen when your dashboard session token has expired. Reload the page and sign in again, then retry your question.',
+                  },
+                )}
+              />
+            )}
+
+            {/* A failed auto-save is surfaced instead of swallowed: the conversation on screen is
+                ahead of what is stored, which the user cannot infer from anything else. Not
+                dismissible and not an action — the next turn's save retries on its own, and clears
+                this as soon as one succeeds. */}
+            {saveFailed && (
+              <StatusCallout
+                title={i18n.translate(
+                  'wazuhAiAssistant.chat.conversations.saveFailed.title',
+                  {
+                    defaultMessage: 'This conversation is not being saved',
+                  },
+                )}
+                color='warning'
+                iconType='alert'
+                body={i18n.translate(
+                  'wazuhAiAssistant.chat.conversations.saveFailed.body',
+                  {
+                    defaultMessage:
+                      'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
+                  },
+                )}
+              />
+            )}
+
             {/* Optimistic-concurrency notice: shown after persistConversationAfterTurn's
                   auto-save hit a 409 on the last completed turn — see saveConversationWithMerge's
                   own doc comment for exactly when each variant fires. Non-blocking: the chat itself
@@ -1716,8 +1743,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     defaultMessage: 'Conversation merged',
                   },
                 )}
-                color='warning'
-                iconType='alert'
+                // A successful merge is a good outcome, not a warning — the conflict variant
+                // right below keeps 'warning'/'alert', so the two are no longer visually
+                // identical for opposite results.
+                color='success'
+                iconType='check'
                 body={i18n.translate(
                   'wazuhAiAssistant.chat.conversations.mergedNotice.body',
                   {
@@ -1743,30 +1773,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   {
                     defaultMessage:
                       'This conversation is being edited in another tab and the changes could not be merged automatically. Your latest messages are still shown here, but they may not be saved.',
-                  },
-                )}
-              />
-            )}
-
-            {/* A failed auto-save is surfaced instead of swallowed: the conversation on screen is
-                ahead of what is stored, which the user cannot infer from anything else. Not
-                dismissible and not an action — the next turn's save retries on its own, and clears
-                this as soon as one succeeds. */}
-            {saveFailed && (
-              <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.saveFailed.title',
-                  {
-                    defaultMessage: 'This conversation is not being saved',
-                  },
-                )}
-                color='warning'
-                iconType='alert'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.saveFailed.body',
-                  {
-                    defaultMessage:
-                      'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
                   },
                 )}
               />
@@ -2009,7 +2015,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             </div>
 
             {!showLoadingState && !showNoProviderState && (
-              <div className='wzStickyInputPanel'>
+              <div
+                className={
+                  hasProviders
+                    ? 'wzStickyInputPanel'
+                    : 'wzStickyInputPanel wzStickyInputPanel-isDisabled'
+                }
+              >
                 <EuiSpacer size='xs' />
                 <EuiPanel
                   color='plain'
@@ -2065,54 +2077,71 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         />
                       </EuiFlexItem>
                     )}
-                    <EuiFlexItem />
-                    {hasProviders && (
-                      <EuiFlexItem grow={false}>
-                        <EuiSelect
-                          id='wzAiAssistantProviderSelect'
-                          compressed
-                          prepend={i18n.translate(
-                            'wazuhAiAssistant.chat.providerLabel',
-                            { defaultMessage: 'Provider' },
-                          )}
-                          options={providerOptions}
-                          value={selectedProviderId}
-                          onChange={event =>
-                            onProviderChange(event.target.value)
-                          }
-                          aria-label={i18n.translate(
-                            'wazuhAiAssistant.chat.providerSelect',
-                            { defaultMessage: 'Provider' },
-                          )}
-                        />
-                      </EuiFlexItem>
-                    )}
+                    {/* Explicit grow spacer (was a bare `<EuiFlexItem />` relying on `grow`
+                          defaulting to true) pushes the provider/send cluster to the far right;
+                          that cluster now sits behind its own hairline left border, so the two
+                          concerns (privacy controls vs. provider/send) read as visually separate
+                          groups instead of one undivided row. */}
+                    <EuiFlexItem grow />
                     <EuiFlexItem grow={false}>
-                      {isGenerating ? (
-                        <EuiButtonIcon
-                          iconType='cross'
-                          color='danger'
-                          size='s'
-                          onClick={handleStop}
-                          aria-label={i18n.translate(
-                            'wazuhAiAssistant.chat.stopButton',
-                            { defaultMessage: 'Stop' },
+                      <EuiFlexGroup
+                        alignItems='center'
+                        gutterSize='s'
+                        responsive={false}
+                        style={{
+                          borderLeft: '1px solid var(--wz-hairline)',
+                          paddingLeft: 8,
+                        }}
+                      >
+                        {hasProviders && (
+                          <EuiFlexItem grow={false}>
+                            <EuiSelect
+                              id='wzAiAssistantProviderSelect'
+                              compressed
+                              prepend={i18n.translate(
+                                'wazuhAiAssistant.chat.providerLabel',
+                                { defaultMessage: 'Provider' },
+                              )}
+                              options={providerOptions}
+                              value={selectedProviderId}
+                              onChange={event =>
+                                onProviderChange(event.target.value)
+                              }
+                              aria-label={i18n.translate(
+                                'wazuhAiAssistant.chat.providerSelect',
+                                { defaultMessage: 'Provider' },
+                              )}
+                            />
+                          </EuiFlexItem>
+                        )}
+                        <EuiFlexItem grow={false}>
+                          {isGenerating ? (
+                            <EuiButtonIcon
+                              iconType='cross'
+                              color='danger'
+                              size='s'
+                              onClick={handleStop}
+                              aria-label={i18n.translate(
+                                'wazuhAiAssistant.chat.stopButton',
+                                { defaultMessage: 'Stop' },
+                              )}
+                            />
+                          ) : (
+                            <EuiButtonIcon
+                              iconType='arrowUp'
+                              color='primary'
+                              size='s'
+                              display='fill'
+                              onClick={() => chatInputRef.current?.send()}
+                              disabled={!hasProviders || !inputText.trim()}
+                              aria-label={i18n.translate(
+                                'wazuhAiAssistant.chat.sendButton',
+                                { defaultMessage: 'Send' },
+                              )}
+                            />
                           )}
-                        />
-                      ) : (
-                        <EuiButtonIcon
-                          iconType='arrowUp'
-                          color='primary'
-                          size='s'
-                          display='fill'
-                          onClick={() => chatInputRef.current?.send()}
-                          disabled={!hasProviders || !inputText.trim()}
-                          aria-label={i18n.translate(
-                            'wazuhAiAssistant.chat.sendButton',
-                            { defaultMessage: 'Send' },
-                          )}
-                        />
-                      )}
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiPanel>

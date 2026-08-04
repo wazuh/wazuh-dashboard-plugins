@@ -6,9 +6,9 @@ import {
   EuiBadge,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiText,
   EuiButtonIcon,
   EuiCallOut,
+  EuiCodeBlock,
   htmlIdGenerator,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
@@ -36,13 +36,20 @@ const TABLE_SCROLL_MAX_HEIGHT = 400;
 const DEFAULT_PAGE_SIZE = 25;
 const PAGE_SIZE_OPTIONS = [25, 50, 100];
 
-/** Badge color + localized label for each `SeverityLevel` word. */
+/**
+ * Badge color + localized label for each `SeverityLevel` word. Colors mirror the platform's own
+ * mapping — plugins/main/common/constants.ts's `UI_COLOR_STATUS` (critical: '#BD271E', high:
+ * '#FEC514', medium/info: '#6092C0', low/success: '#007871', informational/disabled: '#646A77') —
+ * so a severity reads the same color here as it does everywhere else in the product. Not imported
+ * directly (that would be a cross-plugin import from wazuh-ai-assistant into plugins/main); the
+ * hex values are copied in and this comment is the pointer back to the source of truth.
+ */
 const SEVERITY_BUCKETS: Record<
   SeverityLevel,
   { color: string; label: string }
 > = {
   informational: {
-    color: 'accent',
+    color: '#646A77',
     label: i18n.translate(
       'wazuhAiAssistant.resultTable.severity.informational',
       {
@@ -51,25 +58,25 @@ const SEVERITY_BUCKETS: Record<
     ),
   },
   low: {
-    color: 'hollow',
+    color: '#007871',
     label: i18n.translate('wazuhAiAssistant.resultTable.severity.low', {
       defaultMessage: 'Low',
     }),
   },
   medium: {
-    color: 'default',
+    color: '#6092C0',
     label: i18n.translate('wazuhAiAssistant.resultTable.severity.medium', {
       defaultMessage: 'Medium',
     }),
   },
   high: {
-    color: 'warning',
+    color: '#FEC514',
     label: i18n.translate('wazuhAiAssistant.resultTable.severity.high', {
       defaultMessage: 'High',
     }),
   },
   critical: {
-    color: 'danger',
+    color: '#BD271E',
     label: i18n.translate('wazuhAiAssistant.resultTable.severity.critical', {
       defaultMessage: 'Critical',
     }),
@@ -212,10 +219,19 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     const map: Record<string, React.ReactNode> = {};
     spec.rows.forEach((row, rowIndex) => {
       if (expandedRowIds.has(rowIndex)) {
+        // Same raw-JSON treatment as the provenance chips' raw view (message-bubble.tsx): a
+        // proper EuiCodeBlock instead of a bare <pre>, with copy support and a capped scroll
+        // height so one very large row can't push the table's own height out.
         map[String(rowIndex)] = (
-          <EuiText size='s'>
-            <pre>{JSON.stringify(row, null, 2)}</pre>
-          </EuiText>
+          <EuiCodeBlock
+            language='json'
+            paddingSize='s'
+            fontSize='s'
+            isCopyable
+            overflowHeight={240}
+          >
+            {JSON.stringify(row, null, 2)}
+          </EuiCodeBlock>
         );
       }
     });
@@ -238,93 +254,112 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   );
 
   return (
-    <EuiAccordion
-      id={accordionId}
-      buttonContent={i18n.translate(
-        'wazuhAiAssistant.resultTable.accordionSummary',
-        {
-          defaultMessage: 'Results ({count} rows)',
-          values: { count: spec.rows.length },
-        },
-      )}
-      initialIsOpen={initiallyOpen}
-      // Lazy-mount: flips `hasOpened` permanently true the first time the accordion is opened
-      // (never reset on a later re-collapse, so the table stays mounted from then on).
-      onToggle={isOpen => {
-        if (isOpen) {
-          setHasOpened(true);
-        }
+    // Bordered panel look: a hairline border all around, with the accordion's own trigger row
+    // (arrow + "Results (N rows)" + "Open in Discover"/"Open in Security Analytics") restyled via
+    // `wzResultTableAccordion` (chat-page.scss targets EUI's own `.euiAccordion__triggerWrapper`)
+    // into a small sunken-background header strip with a hairline bottom border, matching the
+    // conversation header's own hairline-only separation (no shadow anywhere on this surface).
+    // `overflow: hidden` keeps that header's background from spilling past the rounded corners.
+    <div
+      style={{
+        border: '1px solid var(--wz-hairline)',
+        borderRadius: 4,
+        overflow: 'hidden',
       }}
-      extraAction={
-        (resolveDiscoverUrl && spec.discover) ||
-        (resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink) ? (
-          <EuiFlexGroup gutterSize='s' responsive={false}>
-            {resolveDiscoverUrl && spec.discover ? (
-              <EuiFlexItem grow={false}>
-                <DiscoverLink
-                  spec={spec}
-                  resolveDiscoverUrl={resolveDiscoverUrl}
-                />
-              </EuiFlexItem>
-            ) : null}
-            {resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink ? (
-              <EuiFlexItem grow={false}>
-                <SecurityAnalyticsLink
-                  spec={spec}
-                  resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
-                />
-              </EuiFlexItem>
-            ) : null}
-          </EuiFlexGroup>
-        ) : undefined
-      }
     >
-      {hasOpened ? (
-        // Scrolls internally (both axes) instead of growing the page: a wide/tall table must
-        // never push the chat input further down the page than the accordion header itself does.
-        <div
-          style={{
-            maxHeight: TABLE_SCROLL_MAX_HEIGHT,
-            overflowY: 'auto',
-            overflowX: 'auto',
-          }}
-        >
-          <EuiBasicTable
-            items={pagedItems}
-            columns={columns}
-            itemId='__rowId'
-            itemIdToExpandedRowMap={itemIdToExpandedRowMap}
-            isExpandable
-            hasActions
-            pagination={{
-              pageIndex,
-              pageSize,
-              totalItemCount: spec.rows.length,
-              pageSizeOptions: PAGE_SIZE_OPTIONS,
+      <EuiAccordion
+        id={accordionId}
+        className='wzResultTableAccordion'
+        paddingSize='none'
+        buttonContent={i18n.translate(
+          'wazuhAiAssistant.resultTable.accordionSummary',
+          {
+            defaultMessage: 'Results ({count} rows)',
+            values: { count: spec.rows.length },
+          },
+        )}
+        initialIsOpen={initiallyOpen}
+        // Lazy-mount: flips `hasOpened` permanently true the first time the accordion is opened
+        // (never reset on a later re-collapse, so the table stays mounted from then on).
+        onToggle={isOpen => {
+          if (isOpen) {
+            setHasOpened(true);
+          }
+        }}
+        extraAction={
+          (resolveDiscoverUrl && spec.discover) ||
+          (resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink) ? (
+            <EuiFlexGroup gutterSize='s' responsive={false}>
+              {resolveDiscoverUrl && spec.discover ? (
+                <EuiFlexItem grow={false}>
+                  <DiscoverLink
+                    spec={spec}
+                    resolveDiscoverUrl={resolveDiscoverUrl}
+                  />
+                </EuiFlexItem>
+              ) : null}
+              {resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink ? (
+                <EuiFlexItem grow={false}>
+                  <SecurityAnalyticsLink
+                    spec={spec}
+                    resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+                  />
+                </EuiFlexItem>
+              ) : null}
+            </EuiFlexGroup>
+          ) : undefined
+        }
+      >
+        {hasOpened ? (
+          // Scrolls internally (both axes) instead of growing the page: a wide/tall table must
+          // never push the chat input further down the page than the accordion header itself does.
+          <div
+            style={{
+              maxHeight: TABLE_SCROLL_MAX_HEIGHT,
+              overflowY: 'auto',
+              overflowX: 'auto',
+              // paddingSize='none' above (the header strip owns its own padding via
+              // wzResultTableAccordion) leaves the body needing its own inset.
+              padding: 12,
             }}
-            // EuiBasicTable's page-change callback is `onChange` (the `onTableChange` name belongs
-            // to EuiInMemoryTable — using it here was silently ignored at runtime, so pagination
-            // never actually turned pages). Typed inline rather than via EUI's
-            // `CriteriaWithPagination<T>`: `columns` is cast to `any` so the item generic `T` isn't
-            // usefully inferred, and this handler only reads `page`. An optional-`page` shape is a
-            // valid target for the paginated arm (whose `CriteriaWithPagination` has a REQUIRED
-            // `page`), satisfying the prop without depending on the exact exported type name and
-            // giving `page` an explicit type (no implicit-any).
-            onChange={({
-              page,
-            }: {
-              page?: { index: number; size: number };
-            }) => {
-              if (!page) {
-                return;
-              }
-              setPageIndex(page.index);
-              setPageSize(page.size);
-            }}
-          />
-        </div>
-      ) : null}
-    </EuiAccordion>
+          >
+            <EuiBasicTable
+              items={pagedItems}
+              columns={columns}
+              itemId='__rowId'
+              itemIdToExpandedRowMap={itemIdToExpandedRowMap}
+              isExpandable
+              hasActions
+              pagination={{
+                pageIndex,
+                pageSize,
+                totalItemCount: spec.rows.length,
+                pageSizeOptions: PAGE_SIZE_OPTIONS,
+              }}
+              // EuiBasicTable's page-change callback is `onChange` (the `onTableChange` name
+              // belongs to EuiInMemoryTable — using it here was silently ignored at runtime, so
+              // pagination never actually turned pages). Typed inline rather than via EUI's
+              // `CriteriaWithPagination<T>`: `columns` is cast to `any` so the item generic `T`
+              // isn't usefully inferred, and this handler only reads `page`. An optional-`page`
+              // shape is a valid target for the paginated arm (whose `CriteriaWithPagination` has
+              // a REQUIRED `page`), satisfying the prop without depending on the exact exported
+              // type name and giving `page` an explicit type (no implicit-any).
+              onChange={({
+                page,
+              }: {
+                page?: { index: number; size: number };
+              }) => {
+                if (!page) {
+                  return;
+                }
+                setPageIndex(page.index);
+                setPageSize(page.size);
+              }}
+            />
+          </div>
+        ) : null}
+      </EuiAccordion>
+    </div>
   );
 };
 

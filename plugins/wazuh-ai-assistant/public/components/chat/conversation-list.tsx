@@ -246,7 +246,10 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                   </EuiFlexItem>
                   <EuiFlexItem
                     grow={false}
-                    style={{ opacity: isHovered || isSelected ? 1 : 0.35 }}
+                    // 0 at rest (never a mid-opacity resting state that fails WCAG 1.4.11's 3:1
+                    // contrast requirement for a control) — 1 on hover, selection, OR keyboard
+                    // focus, so a keyboard/switch user can find and reach this control too.
+                    style={{ opacity: isHovered || isSelected ? 1 : 0 }}
                   >
                     <EuiButtonIcon
                       iconType='trash'
@@ -259,6 +262,12 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                       )}
                       onClick={(event: React.MouseEvent) =>
                         requestDelete(event, conversation)
+                      }
+                      onFocus={() => setHoveredId(conversation.id)}
+                      onBlur={() =>
+                        setHoveredId(current =>
+                          current === conversation.id ? null : current,
+                        )
                       }
                     />
                   </EuiFlexItem>
