@@ -87,8 +87,6 @@ export interface UiChatMessage {
 
 interface MessageBubbleProps {
   message: UiChatMessage;
-  /** Basepath-prepended URL for the Wazuh mark, used as the assistant avatar. */
-  aiAvatarUrl: string;
   /** Threaded down to ResultTable's "Open in Discover" link; see discover-link.tsx. */
   resolveDiscoverUrl: ResolveDiscoverUrl;
   /** Threaded down to ResultTable's "Open in Security Analytics" link; see
@@ -119,13 +117,12 @@ function formatTimestamp(epochMs: number): string {
  * Memoized (perf): without this, every keystroke in the chat input
  * re-renders ChatPage, which re-renders MessageList, which re-renders EVERY MessageBubble
  * (including their ResultTables, up to 500 rows each) even though none of their own props
- * changed. `message`/`aiAvatarUrl`/`resolveDiscoverUrl` are all referentially stable across a
+ * changed. `message`/`resolveDiscoverUrl` are all referentially stable across a
  * keystroke (see message-list.tsx's own memo doc comment for why), so the default shallow
  * prop comparison is enough here — no custom comparator needed.
  */
 const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   message,
-  aiAvatarUrl,
   resolveDiscoverUrl,
   resolveSecurityAnalyticsUrl,
   onRetry,
@@ -133,8 +130,8 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   const isUser = message.role === 'user';
   const isWaitingForFirstToken =
     !isUser && message.isStreaming === true && message.content === '';
-  // color="plain" keeps both avatars on a neutral background so the Wazuh mark reads exactly
-  // like the brand mark in the dashboard chrome, instead of EUI's auto-assigned name color.
+  // color="plain" keeps both avatars on the same neutral background, so the pair reads as one
+  // set instead of picking up EUI's auto-assigned per-name colors.
   const avatar = isUser ? (
     <EuiAvatar
       size='m'
@@ -145,14 +142,13 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       })}
     />
   ) : (
-    // imageUrl renders the Wazuh mark as a CSS background-image; EuiAvatar has no built-in
-    // onError fallback, but this asset ships with every OSD core build so it is always present.
-    // name="AI" still backs the aria-label/title and would be the initials shown if this prop
-    // were ever removed.
+    // Initials, not an image: the Wazuh mark was dropped here because the app chrome already
+    // brands the page. `name` backs both the aria-label/title and the rendered initials, and
+    // initialsLength=2 keeps it as "AI" rather than EUI's default single-letter "A".
     <EuiAvatar
       size='m'
-      imageUrl={aiAvatarUrl}
       color='plain'
+      initialsLength={2}
       name={i18n.translate('wazuhAiAssistant.chat.aiAvatarName', {
         defaultMessage: 'AI',
       })}

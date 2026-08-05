@@ -786,7 +786,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   ];
 
   return (
-    <EuiPage restrictWidth={960}>
+    <EuiPage>
       <EuiPageBody>
         <EuiPageContent
           hasShadow={false}

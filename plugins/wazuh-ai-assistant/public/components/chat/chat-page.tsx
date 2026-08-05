@@ -177,31 +177,6 @@ const EXAMPLE_CARDS = [
  * the same way.
  */
 const CHAT_SURFACE_STYLES = `
-.wzHeroIconWrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.wzHeroWash {
-  position: absolute;
-  width: 230px;
-  height: 230px;
-  border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(
-    circle,
-    rgba(var(--wzAccentRgb), 0.18) 0%,
-    rgba(var(--wzAccentRgb), 0.06) 45%,
-    rgba(var(--wzAccentRgb), 0) 72%
-  );
-}
-
-.wzHeroIcon {
-  position: relative;
-}
-
 .wzHeroCard:hover,
 .wzHeroCard:focus-visible {
   border-color: rgba(var(--wzAccentRgb), 0.55) !important;
@@ -380,11 +355,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // into whichever conversation the user had just opened.
   const streamGenerationRef = useRef(0);
   const chatInputRef = useRef<ChatInputHandle>(null);
-  // Core ships this mark alongside every OSD build (src/core/server/core_app/assets/logos/), so
-  // it is always present; served under the basePath the same way chat_service reaches the API.
-  const aiAvatarUrl = core.http.basePath.prepend(
-    '/ui/logos/wazuh_mark_on_light.svg',
-  );
   // "Open in Discover" (discover-link.tsx): built once with `core` in closure, rather than
   // threading `core` itself down through MessageList/MessageBubble/ResultTable.
   const [resolveDiscoverUrl] = useState(() => createDiscoverUrlResolver(core));
@@ -1889,22 +1859,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               {showWelcomeState && (
                 <>
                   <EuiEmptyPrompt
-                    // Plain, natural-aspect-ratio mark (not EuiAvatar) — EuiAvatar was cropping
-                    // the Wazuh mark into an awkward circle. Message-bubble.tsx's own assistant
-                    // avatars are untouched. wzHeroWash is a soft, low-opacity radial wash in the
-                    // resolved Wazuh-blue accent (see CHAT_SURFACE_STYLES); wzHeroIcon just needs
-                    // z-index above it, which the class provides via `position: relative`.
-                    icon={
-                      <div className='wzHeroIconWrap'>
-                        <div className='wzHeroWash' aria-hidden='true' />
-                        <img
-                          src={aiAvatarUrl}
-                          alt=''
-                          className='wzHeroIcon'
-                          style={{ height: 76 }}
-                        />
-                      </div>
-                    }
+                    // No `icon`: this chat already lives inside the Wazuh app chrome, so a Wazuh
+                    // mark on the welcome screen only repeated branding the user can already see.
                     title={
                       // Inline size/weight/letter-spacing override the EuiEmptyPrompt title's
                       // own (smaller) default — inline style always wins over EUI's class-based
@@ -2047,7 +2003,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 !showWelcomeState && (
                   <MessageList
                     messages={messages}
-                    aiAvatarUrl={aiAvatarUrl}
                     resolveDiscoverUrl={resolveDiscoverUrl}
                     resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
                     // Withheld while generating: retrying would abandon the turn already running.
