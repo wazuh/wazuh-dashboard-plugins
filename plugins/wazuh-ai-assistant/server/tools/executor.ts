@@ -190,11 +190,27 @@ async function executeIndexerRequest(
     // aggregation fields driving `breakdown` (if any) can be read from — see privacy.ts's
     // `extractAggFields` doc comment — so it is reused for that below when privacy is active.
     const digest = buildDigest(toolName, result, def, body);
+    // A `breakdownDimensions`-opted-in tool's synthesized breakdown (digest.ts's
+    // `buildSyntheticBreakdown`) tags each bucket `agg: <dimension field path>` — an IDENTITY map
+    // (dimension -> itself) lets `applyFieldPolicy` below resolve those buckets' field policy the
+    // exact same way it resolves a REAL aggregation's buckets, rather than silently skipping the
+    // scrub because `extractAggFields(body)` (which only ever reads a REAL `aggs` clause) has
+    // nothing to report for a tool — every one of these — that never sends one.
+    const aggFields =
+      extractAggFields(body) ??
+      (def.digest.breakdownDimensions
+        ? Object.fromEntries(
+            def.digest.breakdownDimensions.map(dimension => [
+              dimension,
+              dimension,
+            ]),
+          )
+        : undefined);
     const finalDigest = finalizeDigest(
       digest,
       privacy,
       toolName,
-      extractAggFields(body),
+      aggFields,
       def.deriveColumns,
     );
     // "Open in Discover" support (common/types.ts's `TableSpec.discover` doc comment): only this

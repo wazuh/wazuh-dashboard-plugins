@@ -23,6 +23,10 @@ export interface Digest {
    * instead. A single-filter 0-row result is an ordinary, unambiguous "no data" and gets no hint. */
   hint?: string;
   samples: Array<Record<string, unknown>>;
+  /** Set only when `samples.length < counts.returned` — see `buildSamplesNote`: a one-sentence
+   * caveat that the sample is the newest-N of the result, not a representative cut, so the model
+   * does not read an entity's absence from `samples` as a fact about the whole result set. */
+  samplesNote?: string;
   /** Schema hint: the column ids of the table already rendered to the user. */
   columns: string[];
   /** The Manager response's top-level `message` (e.g. "AR command was not sent to any agent"),
@@ -512,6 +516,64 @@ function buildZeroRowHint(
   );
 }
 
+/** How many buckets `buildSyntheticBreakdown` keeps per dimension — same token-bloat reasoning as
+ * `buildBreakdown`'s real-aggregation buckets (~40 tokens for a handful of {key,count} pairs). */
+const BREAKDOWN_BUCKET_CAP = 5;
+
+/**
+ * Synthesizes a `breakdown` from EVERY row the tool call returned (not just the `MAX_SAMPLES`
+ * slice `samples` draws from) for the "aggregative QUESTION, non-aggregative QUERY" gap: a
+ * finding-hits typed tool ("which agents are affected", "which rules fired most") only ever runs
+ * a plain hits search, so `buildBreakdown` above (which reads `result.aggregations`) never fires
+ * for it — the model was left to hand-count `samples`, which are the newest
+ * `MAX_SAMPLES` rows of a timestamp-descending sort and therefore miss any entity whose only
+ * matching rows are older. Grouping over ALL rows (already in memory, bounded by the tool's own
+ * request `size`) removes that sort bias entirely, at a fixed, small token cost. Tagged
+ * `agg: dimension` — the dimension's own field path, not a real OpenSearch aggregation name — so
+ * executor.ts can pass privacy.ts's `applyFieldPolicy` an identity map for these dimensions and
+ * have the exact same bucket-scrubbing logic apply as for a real aggregation's breakdown.
+ */
+function buildSyntheticBreakdown(
+  rows: Array<Record<string, unknown>>,
+  dimensions: string[],
+): Array<{ key: string; count: number; agg: string }> | undefined {
+  const breakdown: Array<{ key: string; count: number; agg: string }> = [];
+  for (const dimension of dimensions) {
+    const counts = new Map<string, number>();
+    for (const row of rows) {
+      const value = getByPath(row, dimension);
+      if (typeof value !== 'string' || value.length === 0) {
+        continue;
+      }
+      counts.set(value, (counts.get(value) ?? 0) + 1);
+    }
+    const topBuckets = [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, BREAKDOWN_BUCKET_CAP);
+    for (const [key, count] of topBuckets) {
+      breakdown.push({ key, count, agg: dimension });
+    }
+  }
+  return breakdown.length > 0 ? breakdown : undefined;
+}
+
+/** One-sentence caveat attached whenever `samples` is a strict subset of the returned rows: the
+ * sample is always the newest end of whatever sort the underlying query ran (see `MAX_SAMPLES`'s
+ * own doc comment), never a random or representative cut — so an entity absent from the sample is
+ * only "not in this preview", never "not in the data". Independent of the `breakdown` synthesis
+ * above: it fires for ANY tool whose result was sample-truncated, `breakdownDimensions` opt-in or
+ * not, at the fixed, modest cost of one sentence. */
+function buildSamplesNote(
+  returned: number,
+  sampleCount: number,
+): string | undefined {
+  return returned > sampleCount
+    ? `Showing ${sampleCount} of ${returned} matching rows, drawn from the newest end of the ` +
+        'query order — not a representative sample. Use counts/breakdown, not an absence from ' +
+        'these rows, to decide what the full result set contains.'
+    : undefined;
+}
+
 /**
  * PRIVACY SEAM: the field-level pseudonymizer
  * (server/tools/privacy.ts's `applyFieldPolicy`) wraps this function's output, not its inside.
@@ -546,8 +608,20 @@ export function buildDigest(
     return sample;
   });
 
-  const breakdown = buildBreakdown(result);
+  // `buildBreakdown` only ever fires when the response itself carries `aggregations` (the query
+  // WAS an aggregation). When it's not, but this tool opted into `breakdownDimensions` (the finding
+  // -hits tools) and there are more rows than the sample can show, synthesize an equivalent
+  // breakdown from every returned row instead — the "aggregative QUESTION, non-aggregative QUERY"
+  // case (see `buildSyntheticBreakdown`'s doc comment). Real aggregations always take priority when
+  // both are somehow available, though no catalog tool today declares `breakdownDimensions` AND
+  // runs an aggs query.
+  const breakdown =
+    buildBreakdown(result) ??
+    (def.digest.breakdownDimensions && returned > MAX_SAMPLES
+      ? buildSyntheticBreakdown(rows, def.digest.breakdownDimensions)
+      : undefined);
   const hint = buildZeroRowHint(requestBody, returned);
+  const samplesNote = buildSamplesNote(returned, samples.length);
   // Manager responses carry a top-level `message` alongside `data` (e.g. an active-response no-op:
   // error:0, affected_items/failed_items both empty, message:"AR command was not sent to any
   // agent") — surfaced here so a silent no-op is still visible to the model. Indexer responses
@@ -559,6 +633,7 @@ export function buildDigest(
     ...(hint ? { hint } : {}),
     ...(breakdown ? { breakdown } : {}),
     samples,
+    ...(samplesNote ? { samplesNote } : {}),
     columns: def.deriveColumns
       ? sampleColumns
       : def.tableSpec.columns.map(column => column.field),

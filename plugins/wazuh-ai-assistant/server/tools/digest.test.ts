@@ -340,3 +340,143 @@ test('buildDigest: a non-zero-row result carries no hint even with 2+ filters', 
   const digest = buildDigest('search_wazuh_data', result, def, requestBody);
   assert.ok(!('hint' in digest));
 });
+
+// --- samples non-representative-preview note ----------------------------------------------------
+
+function findingRow(agent: string, rule: string, timestamp: string) {
+  return {
+    _source: {
+      '@timestamp': timestamp,
+      wazuh: { agent: { name: agent }, rule: { title: rule } },
+    },
+  };
+}
+
+test('buildDigest: samplesNote appears when returned rows exceed the 5-sample cap, not otherwise', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'wazuh.agent.name', label: 'Agent' }] },
+    digest: { sampleColumns: ['wazuh.agent.name'] },
+  });
+  const manyHits = Array.from({ length: 8 }, (_, i) =>
+    findingRow(`agent-${i}`, 'Rule X', `2026-01-0${(i % 9) + 1}T00:00:00Z`),
+  );
+  const bigResult = { hits: { total: { value: 8 }, hits: manyHits } };
+  const bigDigest = buildDigest('get_critical_findings', bigResult, def);
+  assert.equal(bigDigest.samples.length, 5);
+  assert.ok(bigDigest.samplesNote);
+  assert.match(bigDigest.samplesNote!, /Showing 5 of 8/);
+
+  const smallResult = {
+    hits: { total: { value: 2 }, hits: manyHits.slice(0, 2) },
+  };
+  const smallDigest = buildDigest('get_critical_findings', smallResult, def);
+  assert.equal(smallDigest.samples.length, 2);
+  assert.ok(!('samplesNote' in smallDigest));
+});
+
+// --- synthetic breakdown for aggregative questions on finding-hits tools -------------------------
+
+test('buildDigest: a finding-hits tool with breakdownDimensions synthesizes a breakdown from ALL rows, not just the 5-sample slice', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'wazuh.agent.name', label: 'Agent' }] },
+    digest: {
+      sampleColumns: ['wazuh.agent.name'],
+      breakdownDimensions: ['wazuh.agent.name', 'wazuh.rule.title'],
+    },
+  });
+  // Mirrors the issue's reproduction: 26 total findings, web-prod-01 (16), web-prod-02 (8),
+  // wazuh-aio-5 (2) -- wazuh-aio-5's rows are the OLDEST (sorted ascending here on purpose), so a
+  // newest-5 sample would miss it entirely; the breakdown must not.
+  const rows: Array<{ _source: Record<string, unknown> }> = [];
+  for (let i = 0; i < 2; i++) {
+    rows.push(findingRow('wazuh-aio-5', 'Rule A', `2025-01-0${i + 1}T00:00:00Z`));
+  }
+  for (let i = 0; i < 16; i++) {
+    rows.push(findingRow('web-prod-01', 'Rule B', `2026-06-${10 + i}T00:00:00Z`));
+  }
+  for (let i = 0; i < 8; i++) {
+    rows.push(findingRow('web-prod-02', 'Rule C', `2026-07-0${i + 1}T00:00:00Z`));
+  }
+  const result = { hits: { total: { value: 26 }, hits: rows } };
+  const digest = buildDigest('get_critical_findings', result, def);
+
+  assert.equal(digest.samples.length, 5, 'samples must stay capped at MAX_SAMPLES');
+  assert.ok(digest.breakdown, 'expected a synthesized breakdown');
+
+  const agentBuckets = digest.breakdown!.filter(b => b.agg === 'wazuh.agent.name');
+  const ruleBuckets = digest.breakdown!.filter(b => b.agg === 'wazuh.rule.title');
+  assert.deepEqual(
+    new Map(agentBuckets.map(b => [b.key, b.count])),
+    new Map([
+      ['web-prod-01', 16],
+      ['web-prod-02', 8],
+      ['wazuh-aio-5', 2],
+    ]),
+  );
+  assert.deepEqual(
+    new Map(ruleBuckets.map(b => [b.key, b.count])),
+    new Map([
+      ['Rule B', 16],
+      ['Rule C', 8],
+      ['Rule A', 2],
+    ]),
+  );
+  // Token-bloat guard: only the two declared dimensions appear, nothing else.
+  assert.equal(agentBuckets.length + ruleBuckets.length, digest.breakdown!.length);
+});
+
+test('buildDigest: the synthetic breakdown caps each dimension at 5 buckets', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'wazuh.agent.name', label: 'Agent' }] },
+    digest: {
+      sampleColumns: ['wazuh.agent.name'],
+      breakdownDimensions: ['wazuh.agent.name'],
+    },
+  });
+  // 8 distinct agents, one finding each, plus enough rows to exceed MAX_SAMPLES so the breakdown
+  // path actually fires.
+  const rows = Array.from({ length: 8 }, (_, i) =>
+    findingRow(`agent-${i}`, 'Rule X', '2026-01-01T00:00:00Z'),
+  );
+  const result = { hits: { total: { value: 8 }, hits: rows } };
+  const digest = buildDigest('get_critical_findings', result, def);
+  assert.ok(digest.breakdown);
+  assert.ok(
+    digest.breakdown!.length <= 5,
+    `expected at most 5 buckets, got ${digest.breakdown!.length}`,
+  );
+});
+
+test('buildDigest: no breakdownDimensions opt-in means no synthetic breakdown, even past 5 rows', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'wazuh.agent.name', label: 'Agent' }] },
+    digest: { sampleColumns: ['wazuh.agent.name'] },
+  });
+  const rows = Array.from({ length: 8 }, (_, i) =>
+    findingRow(`agent-${i}`, 'Rule X', '2026-01-01T00:00:00Z'),
+  );
+  const result = { hits: { total: { value: 8 }, hits: rows } };
+  const digest = buildDigest('get_findings_by_time', result, def);
+  assert.ok(!('breakdown' in digest));
+});
+
+test('buildDigest: a REAL aggregation breakdown takes priority over synthesizing one', () => {
+  const def = buildToolDef({
+    digest: { sampleColumns: ['key'], breakdownDimensions: ['wazuh.agent.name'] },
+  });
+  const result = {
+    aggregations: {
+      top_rules: {
+        buckets: [
+          { key: '100', doc_count: 5 },
+          { key: '200', doc_count: 3 },
+        ],
+      },
+    },
+  };
+  const digest = buildDigest('get_top_rules', result, def);
+  assert.deepEqual(digest.breakdown, [
+    { key: '100', count: 5 },
+    { key: '200', count: 3 },
+  ]);
+});

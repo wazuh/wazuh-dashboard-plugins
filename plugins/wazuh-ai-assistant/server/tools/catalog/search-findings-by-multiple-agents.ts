@@ -1,6 +1,7 @@
 import { ToolDefinition } from '../types';
 import {
   findingDigestColumns,
+  FINDING_BREAKDOWN_DIMENSIONS,
   findingRowFields,
   clampLimit,
   limitProperty,
@@ -95,5 +96,6 @@ export const searchFindingsByMultipleAgentsTool: ToolDefinition = {
   },
   digest: {
     sampleColumns: findingDigestColumns(STANDARD_FINDING_SAMPLE_COLUMNS),
+    breakdownDimensions: FINDING_BREAKDOWN_DIMENSIONS,
   },
 };

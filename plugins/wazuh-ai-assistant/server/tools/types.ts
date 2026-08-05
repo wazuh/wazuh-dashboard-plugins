@@ -63,7 +63,19 @@ export interface ToolDefinition {
      */
     rowFields?: string[];
   };
-  digest: { sampleColumns: string[] };
+  digest: {
+    sampleColumns: string[];
+    /**
+     * Opt-in (currently only the 8 finding-hits tools, via `catalog/common.ts`'s
+     * `FINDING_BREAKDOWN_DIMENSIONS`): dot-paths digest.ts's `buildDigest` groups ALL returned
+     * rows by (not just the `MAX_SAMPLES` slice) to synthesize a `breakdown` when the tool's own
+     * result carries no real `aggregations` — i.e. the natural-language QUESTION is aggregative
+     * ("which agents", "which rules") even though this tool only ever executes a plain hits
+     * search. `undefined` (every other tool) reproduces today's breakdown-only-from-real-aggs
+     * behavior exactly.
+     */
+    breakdownDimensions?: string[];
+  };
   /**
    * Opt-in hook for Security Analytics catalog tools (get_rules, get_threat_intel_components):
    * given the validated params and the `space` value executor.ts resolved from the executed

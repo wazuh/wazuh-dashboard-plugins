@@ -270,6 +270,17 @@ export const FINDING_INVESTIGATION_ROW_FIELDS = [
 ];
 
 /**
+ * Group-by dimensions for digest.ts's `buildSyntheticBreakdown` — shared by the same 8
+ * finding-hits tools listed above. These two are the ones the issue this exists for names
+ * verbatim ("which agents"/"which rules"); every finding row carries both regardless of which
+ * columns the calling tool declares visible, so this is safe to share across all 8 unconditionally.
+ */
+export const FINDING_BREAKDOWN_DIMENSIONS = [
+  'wazuh.agent.name',
+  'wazuh.rule.title',
+];
+
+/**
  * Fields added to every finding-hits tool's digest `sampleColumns` — the model-facing subset of
  * the investigation row set (deliberately narrower: `source.port`/`process.command_line` stay
  * row-only, not sent to the model). Every one of these has a `server/tools/privacy.ts`
