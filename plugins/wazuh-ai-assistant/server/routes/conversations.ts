@@ -22,6 +22,7 @@ import {
   PersistedChatMessage,
 } from '../../common/types';
 import { ConversationAttributes } from '../saved_objects/conversation';
+import { retentionCutoffMs } from '../conversation-retention';
 import { getOrCreateAssistantSettings } from './settings';
 import { getSavedObjectsStart } from '../plugin-services';
 import { resolveWazuhUsername } from '../identity';
@@ -218,7 +219,8 @@ export function isVersionConflictError(error: unknown): boolean {
  * Unbounded conversation storage: an
  * authenticated user could previously create unlimited conversation saved objects with unbounded
  * title/message sizes, growing the shared saved-objects index indefinitely (retention defaults to
- * keep-forever and only prunes on access — see the list route above). These constants bound that
+ * keep-forever; expired rows are pruned by the background job in
+ * server/conversation-retention.ts). These constants bound that
  * WITHOUT breaking real usage — each is generous relative to legitimate traffic, just no longer
  * infinite. Every limit lives here, named, so the schemas below and `countOwnerConversations`
  * (used by the CREATE route further down) can't drift out of sync.
@@ -397,28 +399,13 @@ export function registerConversationRoutes(
       });
       const owned = result.saved_objects;
 
+      // Read-only visibility filter: hides rows past the retention window until the background
+      // prune job (server/conversation-retention.ts) deletes them — a GET must never write (#8830).
       let visible = owned;
       if (retentionDays > 0) {
-        const cutoffMs = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
-        const expired = owned.filter(
-          object => new Date(object.attributes.updatedAt).getTime() < cutoffMs,
-        );
+        const cutoffMs = retentionCutoffMs(retentionDays, Date.now());
         visible = owned.filter(
           object => new Date(object.attributes.updatedAt).getTime() >= cutoffMs,
-        );
-        // Best-effort prune, ON-ACCESS ONLY (AssistantSettingsAttributes.conversationRetentionDays's
-        // doc comment: OSD plugins have no scheduled/cron job runner, so there is no other trigger
-        // for this). A delete failing here just means the same row is retried on the next GET —
-        // never blocks the response, and the row is already excluded from `visible` regardless.
-        // Scoped to just THIS page's rows — retention pruning is inherently best-effort/eventual
-        // (same doc comment) and a row on a later page is simply caught on a future GET of that
-        // page, same as before pagination existed.
-        await Promise.all(
-          expired.map(object =>
-            client
-              .delete(CONVERSATION_SAVED_OBJECT_TYPE, object.id)
-              .catch(() => undefined),
-          ),
         );
       }
 

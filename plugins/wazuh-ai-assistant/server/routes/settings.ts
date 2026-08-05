@@ -31,8 +31,9 @@ import {
   withInternalErrorHandling,
 } from './route-helpers';
 
-/** Keep saved conversations forever unless an admin opts into a retention window. */
-const DEFAULT_CONVERSATION_RETENTION_DAYS = 0;
+/** Keep saved conversations forever unless an admin opts into a retention window. Exported for
+ * the background prune job (server/conversation-retention.ts) to share the same default. */
+export const DEFAULT_CONVERSATION_RETENTION_DAYS = 0;
 
 const DEFAULT_ASSISTANT_SETTINGS: AssistantSettingsAttributes = {
   privacyDefaultOn: false,

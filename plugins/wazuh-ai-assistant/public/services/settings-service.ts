@@ -28,8 +28,8 @@ export interface AssistantSettings {
   privacyDefaultPerProvider: Record<string, boolean>;
   userCanOverride: boolean;
   fieldPolicy: FieldPolicyEntry[];
-  /** Days to keep a saved conversation before GET /conversations excludes (and best-effort
-   * deletes) it; `0` means keep forever. Mirrors server/saved_objects/assistant-settings.ts's
+  /** Days to keep a saved conversation before the server's background job deletes it; `0` means
+   * keep forever. Mirrors server/saved_objects/assistant-settings.ts's
    * `AssistantSettingsAttributes.conversationRetentionDays`. */
   conversationRetentionDays: number;
 }

@@ -18,12 +18,10 @@ export interface AssistantSettingsAttributes {
   userCanOverride: boolean;
   fieldPolicy: FieldPolicyEntry[];
   /**
-   * Persistent conversations retention: days to keep a saved conversation before it is
-   * excluded from GET /conversations and best-effort deleted (server/routes/conversations.ts).
-   * `0` (default) means "keep forever" — no enforcement at all. There is no scheduled/cron
-   * pruning: OSD plugins have no background job runner, so this is enforced ON-ACCESS ONLY, i.e.
-   * only when GET /conversations actually runs; a conversation past its retention window that is
-   * never listed again (no user ever opens the Chat tab) simply stays on disk until it is.
+   * Persistent conversations retention: days to keep a saved conversation before it is deleted.
+   * `0` (default) means "keep forever" — no enforcement at all. Enforced by the periodic
+   * background job in server/conversation-retention.ts across ALL owners; GET
+   * /conversations additionally hides — but never deletes — expired rows between passes.
    */
   conversationRetentionDays: number;
 }

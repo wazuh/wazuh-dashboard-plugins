@@ -222,8 +222,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const [loadedAssistantSettings, setLoadedAssistantSettings] =
     useState<AssistantSettings | null>(null);
 
-  // Conversation history retention: days to keep a saved conversation before GET
-  // /conversations excludes (and best-effort deletes) it; `0` means keep forever. Same
+  // Conversation history retention: days to keep a saved conversation before the server's
+  // background job deletes it; `0` means keep forever. Same
   // load-draft-then-explicit-save pattern as Privacy above, PUT via the same
   // `updateAssistantSettings` round-trip. `retention.isDirty` is derived from comparing
   // `retention.value` against the last loaded/saved baseline, rather than a hand-toggled flag.
@@ -936,7 +936,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                             testResults[p.id].message ??
                             i18n.translate(
                               'wazuhAiAssistant.settings.testFailureUnknown',
-                              { defaultMessage: 'Connection failed.' },
+                              {
+                                defaultMessage: 'Connection failed.',
+                              },
                             ),
                         },
                       },
@@ -1117,7 +1119,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                           <strong>
                             {i18n.translate(
                               'wazuhAiAssistant.settings.privacy.fieldColumnHeader',
-                              { defaultMessage: 'Field' },
+                              {
+                                defaultMessage: 'Field',
+                              },
                             )}
                           </strong>
                         </EuiText>
@@ -1217,7 +1221,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                     >
                       {i18n.translate(
                         'wazuhAiAssistant.settings.privacy.addField',
-                        { defaultMessage: 'Add field' },
+                        {
+                          defaultMessage: 'Add field',
+                        },
                       )}
                     </EuiButton>
                   </EuiAccordion>
@@ -1233,7 +1239,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                     >
                       {i18n.translate(
                         'wazuhAiAssistant.settings.privacy.addField',
-                        { defaultMessage: 'Add field' },
+                        {
+                          defaultMessage: 'Add field',
+                        },
                       )}
                     </EuiButton>
                   </>
@@ -1316,7 +1324,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                     'wazuhAiAssistant.settings.retention.daysHelp',
                     {
                       defaultMessage:
-                        '0 keeps every saved conversation forever. Enforcement happens only when the conversation list is loaded — there is no scheduled background cleanup.',
+                        '0 keeps every saved conversation forever. Older conversations are deleted automatically by a periodic background cleanup.',
                     },
                   )}
                 >

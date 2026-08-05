@@ -6,8 +6,13 @@ import {
   PluginInitializerContext,
   Logger,
 } from '../../../src/core/server';
+import {
+  ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE,
+  CONVERSATION_SAVED_OBJECT_TYPE,
+} from '../common/constants';
 import { registerRoutes } from './routes';
 import { setSavedObjectsStart, setApiKeyCipher } from './plugin-services';
+import { startConversationRetentionJob } from './conversation-retention';
 import { providerSettingsSavedObjectType } from './saved_objects/provider-settings';
 import { assistantSettingsSavedObjectType } from './saved_objects/assistant-settings';
 import { conversationSavedObjectType } from './saved_objects/conversation';
@@ -31,6 +36,7 @@ export class WazuhAiAssistantPlugin
 {
   private readonly logger: Logger;
   private readonly initializerContext: PluginInitializerContext;
+  private stopRetentionJob?: () => void;
 
   constructor(initializerContext: PluginInitializerContext) {
     this.initializerContext = initializerContext;
@@ -97,10 +103,22 @@ export class WazuhAiAssistantPlugin
     // Stash the savedObjects start contract so the conversation routes can build a scoped client
     // that includes the hidden `wazuh-ai-assistant-conversation` type (see plugin-services.ts).
     setSavedObjectsStart(core.savedObjects);
+    // Retention runs with no request to scope a client from, so it uses the internal repository
+    // (same as wazuh-check-updates), listing both hidden types it reads/deletes.
+    const retentionRepository = core.savedObjects.createInternalRepository([
+      CONVERSATION_SAVED_OBJECT_TYPE,
+      ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE,
+    ]);
+    this.stopRetentionJob = startConversationRetentionJob(
+      retentionRepository,
+      this.logger,
+    );
     return {};
   }
 
   public stop(): void {
     this.logger.debug('wazuhAiAssistant: stop');
+    this.stopRetentionJob?.();
+    this.stopRetentionJob = undefined;
   }
 }
