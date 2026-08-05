@@ -109,6 +109,17 @@ function validateArray(
  * type-checking, per the design spec — the server-side half of `wire-schema.ts`'s
  * `widenNumericTypes` wire widening (that widens the declared type so the provider accepts a
  * quoted value; this coerces it back once the call arrives).
+ *
+ * A parallel accommodation for the opposite direction: a `string`-declared parameter (e.g.
+ * search-wazuh-data.ts's `query_dsl`, which must arrive as JSON-encoded text because this file's
+ * `JsonSchemaObject` has no nested-object property type to declare it against) sometimes arrives
+ * as a real JSON object instead — models naturally emit nested JSON as a live object rather than
+ * hand-serializing it into a string. Re-stringifying it here is the same wire-widening move as
+ * the numeric/boolean case above, just without a wire-schema.ts counterpart (there is no
+ * "object" primitive type to advertise): the widened INPUT is narrowed straight back to the
+ * declared type before anything downstream ever sees it, so `buildRequest`'s `JSON.parse` and
+ * every guardrails.ts check that runs on the parsed body behave identically to the string-form
+ * case — only the wire shape got wider, not what is allowed through it.
  */
 function coerce(
   raw: unknown,
@@ -131,6 +142,14 @@ function coerce(
     if (raw === 'false') {
       return false;
     }
+  }
+  if (
+    expectedType === 'string' &&
+    typeof raw === 'object' &&
+    raw !== null &&
+    !Array.isArray(raw)
+  ) {
+    return JSON.stringify(raw);
   }
   return raw;
 }

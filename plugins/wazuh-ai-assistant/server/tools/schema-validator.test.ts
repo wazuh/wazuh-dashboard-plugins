@@ -13,6 +13,16 @@ const AGENT_SCHEMA: JsonSchemaObject = {
   required: ['agent_id'],
 };
 
+// Mirrors search-wazuh-data.ts's query_dsl parameter: a string-typed property that carries a
+// JSON-encoded OpenSearch search request body.
+const DSL_SCHEMA: JsonSchemaObject = {
+  type: 'object',
+  properties: {
+    query_dsl: { type: 'string' },
+  },
+  required: ['query_dsl'],
+};
+
 const ARRAY_SCHEMA: JsonSchemaObject = {
   type: 'object',
   properties: {
@@ -152,6 +162,49 @@ test('validateArray (via validate): rejects a wrong-typed item within the array'
   assert.equal(result.ok, false);
   if (!result.ok) {
     assert.ok(result.errors.some(e => /ids\[1\]/.test(e)));
+  }
+});
+
+test('validate: an object-form query_dsl is stringified to match the declared string type', () => {
+  const dsl = { query: { match_all: {} } };
+  const result = validate({ query_dsl: dsl }, DSL_SCHEMA);
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.equal(typeof result.value.query_dsl, 'string');
+    assert.deepEqual(JSON.parse(result.value.query_dsl as string), dsl);
+  }
+});
+
+test('validate: a string-form query_dsl continues to work unchanged (regression)', () => {
+  const dslString = JSON.stringify({ query: { match_all: {} } });
+  const result = validate({ query_dsl: dslString }, DSL_SCHEMA);
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.equal(result.value.query_dsl, dslString);
+  }
+});
+
+test('validate: an object-form query_dsl carrying a "script" key round-trips intact, so the ' +
+  'downstream DSL lint (guardrails.ts lintDsl, which parses this string) still sees and rejects ' +
+  'it exactly as a hand-written string — widening the accepted TYPE must not widen what is ' +
+  'ALLOWED', () => {
+  const maliciousDsl = { query: { match_all: {} }, script: { source: 'evil' } };
+  const result = validate({ query_dsl: maliciousDsl }, DSL_SCHEMA);
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.deepEqual(
+      JSON.parse(result.value.query_dsl as string),
+      maliciousDsl,
+    );
+  }
+});
+
+test('validate: an array-form query_dsl is NOT coerced (only plain objects are) and still fails ' +
+  'the type check, same as before this change', () => {
+  const result = validate({ query_dsl: ['a', 'b'] }, DSL_SCHEMA);
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.ok(result.errors.some(e => /must be of type string/.test(e)));
   }
 });
 
