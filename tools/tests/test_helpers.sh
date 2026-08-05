@@ -213,14 +213,24 @@ EOF
 
 ### Added
 
-- Support for Wazuh 5.0.0
-- Some existing feature entry
+| Issue | Comment |
+| ----- | ------- |
+| [#1](https://github.com/wazuh/test-repo/issues/1) | Some existing feature entry |
 
 ### Changed
 
+| Issue | Comment |
+| ----- | ------- |
+
 ### Removed
 
+| Issue | Comment |
+| ----- | ------- |
+
 ### Fixed
+
+| Issue | Comment |
+| ----- | ------- |
 
 ## Prior versions
 
