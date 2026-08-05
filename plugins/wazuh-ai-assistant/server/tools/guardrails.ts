@@ -542,7 +542,10 @@ export function lintDsl(
   return { ok: true };
 }
 
-function walk(
+// Exported so server/tools/field-validation.ts's field-name extractor can reuse the exact same
+// tree-walk shape this file's own checks (findKey, findLeadingWildcard, checkAggs, ...) already
+// rely on, instead of a second hand-rolled walker drifting out of sync with this one.
+export function walk(
   node: unknown,
   visit: (key: string, value: unknown, parent: Record<string, unknown>) => void,
 ): void {

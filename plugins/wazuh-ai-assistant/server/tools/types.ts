@@ -84,4 +84,14 @@ export interface ToolDefinition {
    * other catalog tool leaves this unset, so their static-column path in digest.ts is untouched.
    */
   deriveColumns?: boolean;
+  /**
+   * Opt-in (currently only `search_wazuh_data`): when true, executor.ts's `executeIndexerRequest`
+   * validates every field name it can extract from the executed body against the target index
+   * pattern's live mapping (server/tools/field-validation.ts) before the request reaches
+   * OpenSearch, throwing a bounded, self-correctable tool error for an invented field name instead
+   * of letting OpenSearch silently return zero matches/buckets. Gated per-tool rather than global:
+   * a typed catalog tool builds its field paths from `common/wazuh-fields.ts` constants, so it
+   * cannot guess one wrong, and would pay a `_field_caps` round trip on every call for no benefit.
+   */
+  validateFieldNames?: boolean;
 }

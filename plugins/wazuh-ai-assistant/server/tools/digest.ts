@@ -15,6 +15,13 @@ export interface Digest {
    * to — single-agg digests (every typed tool) stay byte-identical to before it existed. It also
    * lets privacy.ts's field-policy pass attribute each bucket key to the right aggregation field. */
   breakdown?: Array<{ key: string; count: number; agg?: string }>;
+  /** Set only when `counts.returned` is 0 AND the executed query carried 2+ filter clauses — see
+   * `buildZeroRowHint` below. A 0-row result is exactly as consistent with "a wrong field name" or
+   * "an over-narrow filter" as with "genuinely no matching data"; the system prompt already tells
+   * the model to retry broader in that situation, but relying on it noticing on its own has
+   * measurably failed (see the issue this exists for), so this makes the ambiguity mechanical
+   * instead. A single-filter 0-row result is an ordinary, unambiguous "no data" and gets no hint. */
+  hint?: string;
   samples: Array<Record<string, unknown>>;
   /** Schema hint: the column ids of the table already rendered to the user. */
   columns: string[];
@@ -436,6 +443,75 @@ function buildBreakdown(
   return breakdown.length > 0 ? breakdown : undefined;
 }
 
+/** `term`/`terms`/`match`/`match_phrase`/`range` filter clauses whose value's own keys ARE field
+ * paths — the same shape field-validation.ts's `FIELD_KEYED_CLAUSE_KEYS` walks for the same
+ * reason, kept as a separate (smaller) list here: this one only names WHICH filters produced a
+ * zero-row result for the hint below, it does not validate anything. */
+const NAMED_FILTER_CLAUSE_KEYS = new Set([
+  'term',
+  'terms',
+  'match',
+  'match_phrase',
+  'range',
+]);
+
+/** The field name of one `query.bool.filter[]` entry, when this function can attribute it with
+ * certainty; `undefined` for a shape it doesn't recognize (e.g. a nested `bool`) — that entry
+ * still counts toward the >=2 threshold in `buildZeroRowHint` below, it just isn't named. */
+function describeFilterClause(clause: unknown): string | undefined {
+  if (!clause || typeof clause !== 'object') {
+    return undefined;
+  }
+  const record = clause as Record<string, unknown>;
+  if (record.exists && typeof record.exists === 'object') {
+    const field = (record.exists as { field?: unknown }).field;
+    return typeof field === 'string' ? field : undefined;
+  }
+  const clauseKey = Object.keys(record)[0];
+  if (!clauseKey || !NAMED_FILTER_CLAUSE_KEYS.has(clauseKey)) {
+    return undefined;
+  }
+  const value = record[clauseKey];
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return undefined;
+  }
+  return Object.keys(value)[0];
+}
+
+const MIN_FILTERS_FOR_ZERO_ROW_HINT = 2;
+
+/**
+ * Mechanical zero-row hint (issue: field-name validation's companion — one catches a wrong field
+ * name before the query runs, this catches an over-narrow filter on a field that DOES exist,
+ * after the fact). Fires only at `returned === 0` and 2+ top-level `query.bool.filter` clauses;
+ * a single-filter 0-row result is ordinary and gets no hint (no noise on a legitimately narrow,
+ * correct query). `requestBody` is only ever passed for the Indexer path (see `buildDigest`'s call
+ * sites in executor.ts) — Manager responses have no DSL filters to name, so this is a no-op there.
+ */
+function buildZeroRowHint(
+  requestBody: Record<string, unknown> | undefined,
+  returned: number,
+): string | undefined {
+  if (returned !== 0) {
+    return undefined;
+  }
+  const filters = (
+    requestBody?.query as { bool?: { filter?: unknown } } | undefined
+  )?.bool?.filter;
+  if (!Array.isArray(filters) || filters.length < MIN_FILTERS_FOR_ZERO_ROW_HINT) {
+    return undefined;
+  }
+  const names = filters
+    .map(describeFilterClause)
+    .filter((name): name is string => !!name);
+  const filterDescription =
+    names.length > 0 ? names.join(', ') : `${filters.length} filter clauses`;
+  return (
+    `0 rows. Filters applied: ${filterDescription}. A wrong field name or an over-narrow filter ` +
+    'produces this same result.'
+  );
+}
+
 /**
  * PRIVACY SEAM: the field-level pseudonymizer
  * (server/tools/privacy.ts's `applyFieldPolicy`) wraps this function's output, not its inside.
@@ -471,6 +547,7 @@ export function buildDigest(
   });
 
   const breakdown = buildBreakdown(result);
+  const hint = buildZeroRowHint(requestBody, returned);
   // Manager responses carry a top-level `message` alongside `data` (e.g. an active-response no-op:
   // error:0, affected_items/failed_items both empty, message:"AR command was not sent to any
   // agent") — surfaced here so a silent no-op is still visible to the model. Indexer responses
@@ -479,6 +556,7 @@ export function buildDigest(
   const digest: Digest = {
     tool: toolName,
     counts: { total, returned, truncated },
+    ...(hint ? { hint } : {}),
     ...(breakdown ? { breakdown } : {}),
     samples,
     columns: def.deriveColumns

@@ -282,3 +282,61 @@ test('capDigest: small digests are left untouched', () => {
   const capped = capDigest(digest);
   assert.deepEqual(capped.samples, [{ a: 1 }, { b: 2 }]);
 });
+
+// --- zero-row hint -----------------------------------------------------------------------------
+
+function hitsResult(sourceCount: number): unknown {
+  return { hits: { total: { value: sourceCount }, hits: [] } };
+}
+
+test('buildDigest: a 0-row result with 2+ filters carries a hint naming them', () => {
+  const def = buildToolDef();
+  const requestBody = {
+    query: {
+      bool: {
+        filter: [
+          { match: { 'wazuh.agent.name': 'web-prod-01' } },
+          { range: { '@timestamp': { gte: 'now-90d', lte: 'now' } } },
+          { terms: { 'wazuh.rule.tags': ['pam'] } },
+        ],
+      },
+    },
+  };
+  const digest = buildDigest('search_wazuh_data', hitsResult(0), def, requestBody);
+  assert.equal(digest.counts.returned, 0);
+  assert.ok(digest.hint, 'expected a hint on a 0-row, 3-filter result');
+  assert.match(digest.hint!, /^0 rows\. Filters applied:/);
+  assert.match(digest.hint!, /wazuh\.agent\.name/);
+  assert.match(digest.hint!, /@timestamp/);
+  assert.match(digest.hint!, /wazuh\.rule\.tags/);
+});
+
+test('buildDigest: a 0-row result with a SINGLE filter carries no hint', () => {
+  const def = buildToolDef();
+  const requestBody = {
+    query: { bool: { filter: [{ range: { '@timestamp': { gte: 'now-90d' } } }] } },
+  };
+  const digest = buildDigest('search_wazuh_data', hitsResult(0), def, requestBody);
+  assert.equal(digest.counts.returned, 0);
+  assert.ok(!('hint' in digest));
+});
+
+test('buildDigest: a non-zero-row result carries no hint even with 2+ filters', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'a', label: 'A' }] },
+    digest: { sampleColumns: ['a'] },
+  });
+  const requestBody = {
+    query: {
+      bool: {
+        filter: [
+          { match: { 'wazuh.agent.name': 'web-prod-01' } },
+          { range: { '@timestamp': { gte: 'now-90d' } } },
+        ],
+      },
+    },
+  };
+  const result = { hits: { total: { value: 1 }, hits: [{ _source: { a: 1 } }] } };
+  const digest = buildDigest('search_wazuh_data', result, def, requestBody);
+  assert.ok(!('hint' in digest));
+});

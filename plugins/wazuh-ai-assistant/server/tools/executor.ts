@@ -13,6 +13,7 @@ import {
   lintDsl,
 } from './guardrails';
 import { buildDigest, buildTableSpec, capDigest, Digest } from './digest';
+import { validateQueryFields } from './field-validation';
 import { IndexerRequest, ManagerRequest, ToolDefinition } from './types';
 import {
   applyFieldPolicy,
@@ -163,6 +164,18 @@ async function executeIndexerRequest(
     return {
       toolResultContent: toolErrorContent(`Unknown tool "${toolName}".`),
     };
+  }
+
+  // Escape-hatch-only field-existence check (see field-validation.ts / ToolDefinition's
+  // `validateFieldNames` doc comment): runs AFTER the synchronous guardrails above (so a
+  // structurally-rejected body never pays the `_field_caps` round trip) and BEFORE the request
+  // actually reaches OpenSearch — a made-up field name becomes a bounded, self-correctable tool
+  // error instead of a silent zero-row/zero-bucket result.
+  if (def.validateFieldNames) {
+    const fieldCheck = await validateQueryFields(context, indexerRequest.index, body);
+    if (!fieldCheck.ok) {
+      return { toolResultContent: toolErrorContent(fieldCheck.reason) };
+    }
   }
 
   try {
