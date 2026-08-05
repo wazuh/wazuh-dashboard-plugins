@@ -1095,10 +1095,10 @@ describe('ChatPage — feedback while a turn runs', () => {
     // The `digest` event that follows must not release the held table — it is held until TEXT
     // arrives, not until the next non-delta event comes along.
     stream.push({ type: 'digest', toolCallId: 't1', content: '{}' });
-    // The table is still held (no text has arrived yet), so the chip's label falls back to the
-    // raw tool name rather than "{index} · {time range}".
+    // The chip's label is derived from the tool call itself (name + time range), not from the
+    // table, so it appears with its final text even while the table is still held.
     await waitFor(() =>
-      expect(screen.getByText('get_top_agents')).toBeInTheDocument(),
+      expect(screen.getByText('Top agents · 90d')).toBeInTheDocument(),
     );
     expect(screen.queryByText('web-01')).not.toBeInTheDocument();
 
@@ -1171,15 +1171,15 @@ describe('ChatPage — feedback while a turn runs', () => {
       },
     });
 
-    // No table event this turn, so the chip falls back to the raw tool name — and it is the chip
-    // itself, visible without any click, since the fallback label IS the tool name.
+    // No table event this turn, so the chip's label is derived purely from the tool call itself:
+    // its humanized name plus the default 90-day time window.
     await waitFor(() =>
-      expect(screen.getByText('search_wazuh_data')).toBeInTheDocument(),
+      expect(screen.getByText('Wazuh data · 90d')).toBeInTheDocument(),
     );
     // Raw arguments are one click deeper, not on screen unbidden.
     expect(screen.queryByText(/wazuh-alerts-\*/)).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByText('search_wazuh_data'));
+    fireEvent.click(screen.getByText('Wazuh data · 90d'));
     expect(await screen.findByText(/wazuh-alerts-\*/)).toBeInTheDocument();
   });
 
@@ -1211,8 +1211,9 @@ describe('ChatPage — feedback while a turn runs', () => {
     await waitFor(() =>
       expect(screen.getByText('42 alerts')).toBeInTheDocument(),
     );
-    // No discover info on this restored table, so the chip's fallback label is the raw tool name.
-    expect(screen.getByText('search_wazuh_data')).toBeInTheDocument();
+    // No discover info on this restored table, but the chip's label doesn't need it — it's
+    // derived from the tool call itself, same as on a live turn.
+    expect(screen.getByText('Wazuh data · 90d')).toBeInTheDocument();
   });
 });
 
