@@ -34,11 +34,11 @@
     ],
     "agent_status": {
       "connection": {
-          "active": 1,
-          "disconnected": 2,
-          "never_connected": 0,
-          "pending": 0,
-          "total": 3
+        "active": 1,
+        "disconnected": 2,
+        "never_connected": 0,
+        "pending": 0,
+        "total": 3
       }
     },
     "agent_version": [
