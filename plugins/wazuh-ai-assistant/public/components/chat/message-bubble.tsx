@@ -149,10 +149,12 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       }
       return next;
     });
-  /** The executed indexer query gets its own chip rather than riding along with a tool call: the
-   * turn's data carries no link saying WHICH call produced the table, so attaching it to one of
-   * them would be a guess shown as a fact. */
-  const DSL_RAW_ID = 'dsl';
+  // No chip for the table's executed DSL: `buildDiscoverUrl` (common/discover-url.ts) already
+  // embeds that exact query in the "Open in Discover" link as a filter named "AI Assistant query",
+  // so the table's own link shows the reader the literal query that ran — in a surface built for
+  // reading queries. A second copy in the meta row was the same query at a lower abstraction
+  // level, competing with the chips that answer the question people actually ask of an answer:
+  // what did it look for?
   // color="plain" keeps both avatars on the same neutral background, so the pair reads as one
   // set instead of picking up EUI's auto-assigned per-name colors.
   const avatar = isUser ? (
@@ -336,29 +338,6 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
               </EuiFlexItem>
             );
           })}
-        {!isUser && message.table?.discover && (
-          <EuiFlexItem grow={false}>
-            <EuiBadge
-              color='hollow'
-              iconType='database'
-              title={message.table.discover.index}
-              onClick={() => toggleRawId(DSL_RAW_ID)}
-              onClickAriaLabel={i18n.translate(
-                'wazuhAiAssistant.chat.queryDslChipAriaLabel',
-                {
-                  defaultMessage: 'Show the query run on {index}',
-                  values: { index: message.table.discover.index },
-                },
-              )}
-              aria-expanded={openRawIds.has(DSL_RAW_ID)}
-              aria-controls={`${rawViewId}-${DSL_RAW_ID}`}
-            >
-              {i18n.translate('wazuhAiAssistant.chat.queryDslChip', {
-                defaultMessage: 'Executed query',
-              })}
-            </EuiBadge>
-          </EuiFlexItem>
-        )}
       </EuiFlexGroup>
       {/* Each open chip's content, BELOW the chip row: the chip stays exactly where it was
             clicked, so the same click closes what it opened. The answer is only as trustworthy as
@@ -388,28 +367,6 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
               </EuiCodeBlock>
             </div>
           ))}
-      {!isUser && message.table?.discover && openRawIds.has(DSL_RAW_ID) && (
-        <div id={`${rawViewId}-${DSL_RAW_ID}`} style={proseStyle}>
-          <EuiSpacer size='xs' />
-          <EuiText size='xs'>
-            <strong>
-              {i18n.translate('wazuhAiAssistant.chat.queryIndex', {
-                defaultMessage: 'Index: {index}',
-                values: { index: message.table.discover.index },
-              })}
-            </strong>
-          </EuiText>
-          <EuiSpacer size='xs' />
-          <EuiCodeBlock
-            language='json'
-            paddingSize='s'
-            fontSize='s'
-            isCopyable
-          >
-            {JSON.stringify(message.table.discover.dsl, null, 2)}
-          </EuiCodeBlock>
-        </div>
-      )}
     </EuiFlexItem>
   );
 
