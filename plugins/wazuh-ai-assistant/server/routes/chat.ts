@@ -800,8 +800,16 @@ async function* orchestrate(
     }
 
     const isFinalRound = round === MAX_TOOL_ROUNDS;
+    // Final round: omit `tools` entirely rather than send `{tools, toolChoice: 'none'}`. That hint
+    // depends on the model complying with it — Groq's own docs warn some models call a tool anyway
+    // and the API then 400s ("Tool choice is none, but model called a tool"), observed on
+    // openai/gpt-oss-120b in 1 of 3 runs (issue 03-tool-choice-none-final-round.md). With no tools
+    // offered there is nothing to call and no compliance to depend on: the adapter's own
+    // `if (options?.tools?.length)` guard (openai-compatible.ts/anthropic.ts) already omits
+    // `tools`/`tool_choice` from the wire body whenever `tools` is empty/undefined, so this is a
+    // structural terminator instead of a request-level one.
     const streamOptions = isFinalRound
-      ? { tools, toolChoice: 'none' as const }
+      ? {}
       : { tools, toolChoice: 'auto' as const };
 
     // Outbound scrub: a fresh transformed COPY per round — `messages` itself keeps

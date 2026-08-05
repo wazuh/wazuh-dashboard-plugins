@@ -59,6 +59,30 @@ function withFakeFetch<T>(
   });
 }
 
+/** Same as withFakeFetch, but also captures every outbound request body -- needed to assert on
+ * what the adapter actually sent (issue 03's final-round shape, issue 05's temperature). */
+function withFakeFetchCapturingBody<T>(
+  responseBody: string,
+  run: (capturedBodies: Array<Record<string, unknown>>) => Promise<T>,
+): Promise<T> {
+  const original = globalThis.fetch;
+  const capturedBodies: Array<Record<string, unknown>> = [];
+  globalThis.fetch = ((_url: string, init?: RequestInit) => {
+    if (typeof init?.body === 'string') {
+      capturedBodies.push(JSON.parse(init.body));
+    }
+    return Promise.resolve(
+      new Response(responseBody, {
+        status: 200,
+        headers: { 'Content-Type': 'text/event-stream' },
+      }),
+    );
+  }) as unknown as typeof fetch;
+  return run(capturedBodies).finally(() => {
+    globalThis.fetch = original;
+  });
+}
+
 test('chatStream: a stream carrying only delta.reasoning (no delta.content at all) renders the accumulated reasoning as the answer', async () => {
   const body = sseBody([
     {
@@ -144,4 +168,63 @@ test('chatStream: a stream with neither content nor reasoning still ends cleanly
     );
   });
   assert.deepEqual(events.map(event => event.type), ['done']);
+});
+
+// --- final-round tools/tool_choice omission (issue 03-tool-choice-none-final-round.md) --------
+// chat.ts's orchestrate() now sends `{}` (no `tools` at all) instead of
+// `{tools, toolChoice: 'none'}` on the final round, relying on this adapter's existing
+// `if (options?.tools?.length)` guard to drop `tools`/`tool_choice` from the wire body for free.
+
+test('chatStream: with no `tools` in options, the outbound body carries neither `tools` nor `tool_choice` (final-round shape)', async () => {
+  const body = sseBody([
+    { choices: [{ index: 0, delta: { content: 'Done.' } }] },
+  ]);
+  const capturedBodies = await withFakeFetchCapturingBody(body, async () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('final answer please')],
+        controller.signal,
+        {},
+      ),
+    );
+  });
+  assert.equal(capturedBodies.length, 1);
+  assert.ok(
+    !('tools' in capturedBodies[0]),
+    'tools must be entirely absent, not an empty array',
+  );
+  assert.ok(!('tool_choice' in capturedBodies[0]));
+});
+
+test('chatStream: with `tools` present, the outbound body still carries `tools` and `tool_choice` (regression)', async () => {
+  const body = sseBody([
+    { choices: [{ index: 0, delta: { content: 'Done.' } }] },
+  ]);
+  const capturedBodies = await withFakeFetchCapturingBody(body, async () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('list active agents')],
+        controller.signal,
+        {
+          tools: [
+            {
+              name: 'get_agents',
+              description: 'list agents',
+              parameters: { type: 'object', properties: {} },
+            },
+          ],
+          toolChoice: 'auto',
+        },
+      ),
+    );
+  });
+  assert.equal(capturedBodies.length, 1);
+  assert.ok('tools' in capturedBodies[0]);
+  assert.equal(capturedBodies[0].tool_choice, 'auto');
 });
