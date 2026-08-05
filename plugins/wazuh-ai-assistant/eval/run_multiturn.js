@@ -421,7 +421,7 @@ async function runCase(testCase, cookies) {
   // requires_tool_call_each_turn (digest_freshness_repeat): assert a match on EVERY turn -- the
   // whole point of the case is confirming turn 2 fires its OWN tool_call instead of answering from
   // stale history. Otherwise (markdown_table_suppression): per that case's own rubric ("turn 1 is
-  // just setup -- it should produce a real results table via get_alerts_by_time"), only the FIRST
+  // just setup -- it should produce a real results table via get_findings_by_time"), only the FIRST
   // turn is asserted to have called it; turn 2 is legitimately allowed to reformat from history
   // without re-querying, so only its answer_must_not_match below applies. This is driven off the
   // `requires_tool_call_each_turn` case field, not a hardcoded case id, so it generalizes to future

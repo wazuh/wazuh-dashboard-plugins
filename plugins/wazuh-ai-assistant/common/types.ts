@@ -115,13 +115,27 @@ export interface TableSpec {
    * "Open in Discover" support (result-table.tsx / discover-link.tsx): only ever present for a
    * table built from the Indexer path (server/tools/executor.ts's `executeIndexerRequest`) — the
    * Manager API path has no index/DSL concept, so its tables never carry this field. `index` is the
-   * concrete index the search ran against (e.g. "wazuh-alerts-*"); `dsl` is the executed query
+   * concrete index the search ran against (e.g. "wazuh-findings-v5*"); `dsl` is the executed query
    * clause (the guardrail-clamped `body.query`, not a `{query: ...}` wrapper) that the client
    * rison-encodes verbatim into the Discover link's custom filter.
    */
   discover?: {
     index: string;
     dsl: Record<string, unknown>;
+  };
+  /**
+   * "Open in Security Analytics" support (result-table.tsx / security-analytics-link.tsx): only
+   * ever present for tools whose index is one of the wazuh-threatintel-* Security Analytics
+   * families (server/tools/executor.ts's `executeIndexerRequest`), which have no OSD index-pattern
+   * saved object and so never resolve a `discover` link -- this is their equivalent deep link into
+   * the actual Security Analytics app instead. `url` is already fully built (app path + hash route
+   * + `space` query param resolved from the executed result's own `space.name` values -- see
+   * executor.ts's `resolveSpace` doc comment for the mixed-space fallback rule); the client only
+   * needs to prepend the OSD basePath.
+   */
+  securityAnalyticsLink?: {
+    label: string;
+    url: string;
   };
 }
 
@@ -182,9 +196,37 @@ export interface ConversationSummary {
   updatedAt: string;
 }
 
+/**
+ * One message as a saved conversation stores it: a `ChatMessage` plus the two presentation fields a
+ * resumed conversation needs in order to be the SAME conversation rather than a summary of one.
+ *
+ * Both are optional, and deliberately so: conversations saved before they existed simply lack them
+ * and resume exactly as they did before (no migration — `messages` is an `enabled: false` opaque
+ * object in the saved-object mappings, see server/saved_objects/conversation.ts).
+ *
+ * What was lost without them: `createdAt` meant every message in a resumed conversation was stamped
+ * with the moment of the resume, so a conversation from last week read as seconds old; and dropping
+ * `table` meant the result tables disappeared, leaving the model's prose describing tables that were
+ * no longer on screen (and taking "Open in Discover" with them).
+ *
+ * The MODEL-facing half of a turn is not a new field: the `[assistant{toolCalls}, tool{content}]`
+ * pairs are persisted as ordinary `ChatMessage`s interleaved before the assistant's prose message,
+ * exactly the shape `common/chat-history.ts`'s `buildOutgoingMessages` already sends on the wire, so
+ * a resumed conversation can rebuild the tool history a follow-up question depends on.
+ */
+export interface PersistedChatMessage extends ChatMessage {
+  /** Epoch milliseconds, as `Date.now()` produced it when the message was first shown. */
+  createdAt?: number;
+  /** The result table this message was displayed with, row-capped at save time. */
+  table?: TableSpec;
+  /** The answer was cut short (Stop, navigation, a dropped connection) rather than completed, so a
+   * resumed conversation can label it instead of presenting a partial answer as a finished one. */
+  interrupted?: boolean;
+}
+
 export interface ConversationRecord extends ConversationSummary {
   createdAt: string;
-  messages: ChatMessage[];
+  messages: PersistedChatMessage[];
   /**
    * Optimistic-concurrency token (two tabs on the
    * same conversation previously overwrote each other, last-write-wins). Opaque, OSD-assigned

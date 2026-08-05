@@ -1,7 +1,12 @@
 import React from 'react';
 import { EuiSpacer } from '@elastic/eui';
-import { MessageBubble, UiChatMessage } from './message-bubble';
+import {
+  InterruptedTurnNotice,
+  MessageBubble,
+  UiChatMessage,
+} from './message-bubble';
 import { ResolveDiscoverUrl } from './discover-link';
+import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
 
 interface MessageListProps {
   messages: UiChatMessage[];
@@ -9,6 +14,14 @@ interface MessageListProps {
   aiAvatarUrl: string;
   /** Threaded down to every MessageBubble's ResultTable; see discover-link.tsx. */
   resolveDiscoverUrl: ResolveDiscoverUrl;
+  /** Threaded down to every MessageBubble's ResultTable; see security-analytics-link.tsx. */
+  resolveSecurityAnalyticsUrl: ResolveSecurityAnalyticsUrl;
+  /**
+   * Re-asks the last question. Applies to the LAST turn only — retrying an older one would mean
+   * rewriting the middle of the conversation, which nothing here supports. `undefined` while a turn
+   * is generating.
+   */
+  onRetryLastTurn?: () => void;
 }
 
 /**
@@ -38,7 +51,10 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
   messages,
   aiAvatarUrl,
   resolveDiscoverUrl,
+  resolveSecurityAnalyticsUrl,
+  onRetryLastTurn,
 }) {
+  const lastMessage = messages[messages.length - 1];
   return (
     <div>
       {messages.map((message, index) => (
@@ -47,10 +63,25 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
             message={message}
             aiAvatarUrl={aiAvatarUrl}
             resolveDiscoverUrl={resolveDiscoverUrl}
+            resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+            onRetry={
+              index === messages.length - 1 ? onRetryLastTurn : undefined
+            }
           />
           {index < messages.length - 1 && <EuiSpacer size='m' />}
         </React.Fragment>
       ))}
+      {/* A conversation that ENDS on a question is an unanswered turn: the page was reloaded or
+          navigated away from while the answer was streaming, so nothing survived to be marked
+          interrupted (that happens in the browser, and the browser went away). The question itself
+          was saved before generating started, so this is the only trace left — and without this the
+          user was left staring at their own question with no way to ask it again. */}
+      {lastMessage?.role === 'user' && (
+        <>
+          <EuiSpacer size='s' />
+          <InterruptedTurnNotice onRetry={onRetryLastTurn} />
+        </>
+      )}
     </div>
   );
 });

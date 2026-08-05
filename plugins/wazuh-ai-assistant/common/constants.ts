@@ -67,18 +67,13 @@ export const CONVERSATION_SAVED_OBJECT_TYPE = 'wazuh-ai-assistant-conversation';
  * never this literal string. */
 export const CONVERSATION_OWNER_FALLBACK = '_shared';
 
-export const PROVIDER_TYPES = [
-  'openai_compatible',
-  'anthropic',
-  'wazuh_brain',
-] as const;
+export const PROVIDER_TYPES = ['openai_compatible', 'anthropic'] as const;
 
 export type ProviderType = (typeof PROVIDER_TYPES)[number];
 
-/** Severity levels recognised by the result table's severity column colouring. */
-export const SEVERITY_LEVELS = ['critical', 'high', 'medium', 'low'] as const;
-
-export type SeverityLevel = (typeof SEVERITY_LEVELS)[number];
+/** Re-exported from `wazuh-fields.ts`, the single source of truth for the severity vocabulary. */
+export { SEVERITY_LEVELS } from './wazuh-fields';
+export type { SeverityLevel } from './wazuh-fields';
 
 export const DEFAULT_ANTHROPIC_MAX_TOKENS = 4096;
 export const DEFAULT_ANTHROPIC_VERSION = '2023-06-01';
@@ -98,3 +93,25 @@ export const DEFAULT_ANTHROPIC_VERSION = '2023-06-01';
 export const CONVERSATION_MAX_TITLE_LENGTH = 200;
 export const CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH = 100_000;
 export const CONVERSATION_MAX_MESSAGES = 1000;
+
+/**
+ * Rows kept when a result table is persisted alongside the message it was shown with
+ * (`PersistedChatMessage.table`). The live table is already capped at 500 rows server-side
+ * (server/tools/digest.ts's `TABLE_ROW_CAP`); this second, tighter cap exists because a saved
+ * conversation multiplies that by every table-bearing turn it holds.
+ */
+export const CONVERSATION_MAX_TABLE_ROWS = 100;
+
+/**
+ * Total serialized budget for a conversation's `messages` payload, enforced CLIENT-side before the
+ * request is built (`common/chat-history.ts`'s `toPersistedMessages`).
+ *
+ * The per-message and per-conversation counts above bound the array's SHAPE but not its size: 1000
+ * messages of 100k characters is a ~100 MB payload on paper, while OSD's default
+ * `server.maxPayloadBytes` is 1 MB — so a conversation could satisfy every limit above and still be
+ * rejected with a 413, which auto-save treats as a non-fatal hiccup and therefore fails silently
+ * and permanently. Persisting tables and tool-call history makes that ceiling much easier to reach,
+ * so the trim now also drops content (oldest and least essential first) until the payload fits.
+ * Set well below 1 MB to leave room for the title, the JSON envelope and multi-byte characters.
+ */
+export const CONVERSATION_MAX_SERIALIZED_BYTES = 700_000;

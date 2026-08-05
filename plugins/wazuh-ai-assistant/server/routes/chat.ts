@@ -59,6 +59,27 @@ interface StoredProviderAttributes {
 const MAX_TOOL_ROUNDS = 3;
 
 /**
+ * Fallback narration for a turn that used at least one tool but whose model never emitted any
+ * `delta` text of its own before ending in `done` — observed with a tool call that returned zero
+ * rows, where the model apparently considered the (empty) table sufficient and said nothing.
+ * Without this, the user sees a bare table (or nothing at all, for a zero-row result) with no
+ * written answer. Two variants: the table rendered something (`sawNonEmptyTable`) vs. the query
+ * came back empty.
+ */
+const NO_ANALYSIS_TEXT_MESSAGE =
+  'No additional analysis — see the results above.';
+const NO_MATCHING_RESULTS_MESSAGE =
+  'No matching results were found for that query.';
+
+/** Whitespace-only delta content (e.g. a lone "\n\n" some models emit as priming/formatting
+ * right before a tool call) must NOT count as "the model produced an answer" — otherwise the
+ * `sawAnyDelta` guard above never fires for exactly the turns it exists to catch. Still forwarded
+ * to the client as a normal delta either way; this only affects the tracking flag. */
+function hasMeaningfulText(content: string): boolean {
+  return content.trim().length > 0;
+}
+
+/**
  * Concurrent-stream cap. Without it, one script or user can open unlimited concurrent streams --
  * the only other protections are accidental (the browser's 6-connection cap, the event loop).
  * `perUserActiveStreams`/`globalActiveStreams` are the enforcement: live counters of open chat
@@ -402,18 +423,18 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
         });
       }
 
-      // Decrypt-on-read (server/crypto/api-key-cipher.ts): the saved object may hold `enc:v2:`
+      // Decrypt-on-read (server/crypto/api-key-cipher.ts): the saved object may hold `enc:v1:`
       // ciphertext (AAD-bound to `providerId`, the id this exact saved object was fetched by
-      // above), legacy `enc:v1:` ciphertext (unbound, no AAD), or legacy plaintext — decrypt()
-      // passes plaintext through unchanged either way, so this is a no-op when no encryptionKey is
-      // configured. Passing `providerId` here is what makes the v2 substitution-attack detection
-      // real for chat: if this saved object's `apiKey` were ever a v2 blob copied in from a
-      // DIFFERENT provider's row, this call — using THIS provider's own id — would hard-fail
-      // rather than silently decrypt to the wrong provider's key. Kept in its own try/catch,
-      // separate from the "unknown provider" one above, so a decrypt failure (ciphertext present
-      // but no/rotated encryptionKey, or an AAD/id mismatch — both real server misconfigurations,
-      // the latter now also covering the substitution attack) is never misreported to the client
-      // as "unknown provider".
+      // above) — anything else (a legacy PLAINTEXT key from a pre-release build) makes decrypt()
+      // throw: plaintext keys are never used, the admin must re-enter them. Passing `providerId`
+      // here is what makes the substitution-attack detection real for chat: if this saved
+      // object's `apiKey` were ever a ciphertext blob copied in from a DIFFERENT provider's row,
+      // this call — using THIS provider's own id — would hard-fail rather than silently decrypt
+      // to the wrong provider's key. Kept in its own try/catch, separate from the "unknown
+      // provider" one above, so a decrypt failure (plaintext value, ciphertext present but
+      // no/rotated encryptionKey, or an AAD/id mismatch — all real server misconfigurations, the
+      // latter also covering the substitution attack) is never misreported to the client as
+      // "unknown provider".
       let providerConfig: ProviderConfig;
       try {
         providerConfig = {
@@ -694,6 +715,14 @@ async function* orchestrate(
   let tools: ToolSpec[] | undefined = listToolSpecs();
   let messages = initialMessages;
   let sawNonEmptyTable = false;
+  // Whole-turn guards (not per-round, unlike `sawToolCall` below which resets every round): true
+  // once ANY delta text / tool call has happened THIS TURN, across every round — see
+  // NO_ANALYSIS_TEXT_MESSAGE/NO_MATCHING_RESULTS_MESSAGE above. `toolUsedThisTurn` (not
+  // `sawNonEmptyTable`) gates the fallback so a plain no-tool conversational turn that legitimately
+  // ends with no text is never second-guessed by a "no matching results" message that would be
+  // flatly wrong for it.
+  let sawAnyDelta = false;
+  let toolUsedThisTurn = false;
 
   /** Yields a `privacy_map` event for any pseudonym entries minted so far this turn, but only
    * once total ("once per turn... when newEntries() is non-empty") — guarded
@@ -753,6 +782,12 @@ async function* orchestrate(
     const outboundMessages = privacyCtx
       ? scrubMessagesForProvider(messages, privacyCtx.pseudonymizer)
       : messages;
+    // Inbound un-scrub: this is why the ANSWER the analyst reads carries real hostnames/IPs even
+    // with privacy mode on — every delta is run back through the pseudonym map here, so `HOST_1`
+    // becomes the real hostname again before it leaves the server. Pseudonyms exist for the provider
+    // request above, not for the reader (issue #8821; the field policy's boundaries are spelled out
+    // in server/tools/privacy.ts's module header).
+    //
     // The streaming holdback is scoped to ONE adapter stream read: recreated every round so a
     // round that ends via tool_call/done/error always starts its successor with an empty buffer.
     const depseudonymizer = privacyCtx
@@ -797,6 +832,9 @@ async function* orchestrate(
           content = tableSuppressor.push(content);
         }
         if (content) {
+          if (hasMeaningfulText(content)) {
+            sawAnyDelta = true;
+          }
           yield { type: 'delta', content };
         }
         continue;
@@ -804,6 +842,7 @@ async function* orchestrate(
 
       if (event.type === 'tool_call') {
         sawToolCall = true;
+        toolUsedThisTurn = true;
         if (signal.aborted) {
           return;
         }
@@ -812,6 +851,9 @@ async function* orchestrate(
           // resolved before the round moves on.
           const trailing = drainRoundBuffers();
           if (trailing) {
+            if (hasMeaningfulText(trailing)) {
+              sawAnyDelta = true;
+            }
             yield { type: 'delta', content: trailing };
           }
         }
@@ -898,6 +940,9 @@ async function* orchestrate(
         {
           const trailing = drainRoundBuffers();
           if (trailing) {
+            if (hasMeaningfulText(trailing)) {
+              sawAnyDelta = true;
+            }
             yield { type: 'delta', content: trailing };
           }
         }
@@ -905,6 +950,17 @@ async function* orchestrate(
           // More rounds needed: suppress this 'done' (the turn isn't over) and start the next
           // round with the grown message history instead of ending the SSE stream here.
           break;
+        }
+        // The turn is genuinely over (this round made no tool call) but at least one tool ran
+        // earlier THIS turn and the model never produced any text at all — see
+        // NO_ANALYSIS_TEXT_MESSAGE's doc comment.
+        if (!sawAnyDelta && toolUsedThisTurn) {
+          yield {
+            type: 'delta',
+            content: sawNonEmptyTable
+              ? NO_ANALYSIS_TEXT_MESSAGE
+              : NO_MATCHING_RESULTS_MESSAGE,
+          };
         }
         yield* emitPrivacyMapOnce();
         yield event;
@@ -939,7 +995,17 @@ async function* orchestrate(
   }
 
   // Exhausted the round budget and the forced-final (no-tools) round still didn't end cleanly
-  // above; close the SSE stream rather than hang the client.
+  // above; close the SSE stream rather than hang the client. Same no-text guard as the main 'done'
+  // branch above — a model that kept calling tools straight through the final no-tools round still
+  // deserves a written answer, not a bare done.
+  if (!sawAnyDelta && toolUsedThisTurn) {
+    yield {
+      type: 'delta',
+      content: sawNonEmptyTable
+        ? NO_ANALYSIS_TEXT_MESSAGE
+        : NO_MATCHING_RESULTS_MESSAGE,
+    };
+  }
   yield* emitPrivacyMapOnce();
   yield { type: 'done' };
 }

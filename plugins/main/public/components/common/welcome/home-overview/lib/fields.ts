@@ -1,4 +1,5 @@
 import { SeverityBand } from '../interfaces/types';
+import { WAZUH_MODULES_ID } from '../../../../../../common/constants';
 
 /** Field-name constants shared by the query builders, mappers and navigation. */
 
@@ -24,13 +25,19 @@ export const MITRE_TACTIC_ID_FIELD = 'wazuh.rule.mitre.tactic.id';
 export const MITRE_TECHNIQUE_ID_FIELD = 'wazuh.rule.mitre.technique.id';
 export const MITRE_TECHNIQUE_NAME_FIELD = 'wazuh.rule.mitre.technique.name';
 export const RULE_TITLE_FIELD = 'wazuh.rule.title';
+/** Integration a finding came from, i.e. the module that produced it. */
+export const INTEGRATION_NAME_FIELD = 'wazuh.integration.name';
 export const HOST_OS_NAME_FIELD = 'host.os.name';
 export const PROCESS_NAME_FIELD = 'process.name';
 export const SCA_CHECK_RESULT_FIELD = 'check.result';
 export const SCA_POLICY_NAME_FIELD = 'policy.name';
-export const FIM_PLATFORM_FIELD = 'wazuh.agent.host.os.platform';
+/** Monitored-file path on a FIM state document. */
+export const FIM_FILE_PATH_FIELD = 'file.path';
+/** Last modification time of a monitored file; ranks the FIM list. */
+export const FIM_FILE_MTIME_FIELD = 'file.mtime';
 export const VULNERABILITY_SEVERITY_FIELD = 'vulnerability.severity';
-export const VULNERABILITY_OS_NAME_FIELD = 'host.os.name';
+/** Package name on a vulnerability state document. */
+export const VULNERABILITY_PACKAGE_NAME_FIELD = 'package.name';
 /** CVE identifier field; distinct from doc count since one CVE can match many findings/assets. */
 export const VULNERABILITY_CVE_ID_FIELD = 'vulnerability.id';
 /**
@@ -52,6 +59,7 @@ export const THREAT_ENRICHMENTS_FIELD = 'wazuh.threat.enrichments';
  * type" breakdown — the composition of the feed itself, not what matched.
  */
 export const THREAT_INTEL_TYPE_FIELD = 'document.type';
+export const THREAT_INTEL_THREAT_TYPE_FIELD = 'document.software.type';
 
 /**
  * vulnerability.severity values are capitalized, unlike the lowercase
@@ -64,4 +72,21 @@ export const VULNERABILITY_SEVERITY_VALUES: Partial<
   high: 'High',
   medium: 'Medium',
   low: 'Low',
+};
+
+/**
+ * Compliance field per framework. The chips count *distinct controls* on these,
+ * since one finding can implicate several frameworks at once.
+ */
+export const COMPLIANCE_FRAMEWORK_FIELDS: Record<string, string> = {
+  [WAZUH_MODULES_ID.PCI_DSS]: 'wazuh.rule.compliance.pci_dss',
+  [WAZUH_MODULES_ID.GDPR]: 'wazuh.rule.compliance.gdpr',
+  [WAZUH_MODULES_ID.HIPAA]: 'wazuh.rule.compliance.hipaa',
+  [WAZUH_MODULES_ID.NIST_800_53]: 'wazuh.rule.compliance.nist_800_53',
+  [WAZUH_MODULES_ID.NIST_800_171]: 'wazuh.rule.compliance.nist_800_171',
+  [WAZUH_MODULES_ID.TSC]: 'wazuh.rule.compliance.tsc',
+  [WAZUH_MODULES_ID.CMMC]: 'wazuh.rule.compliance.cmmc',
+  [WAZUH_MODULES_ID.FEDRAMP]: 'wazuh.rule.compliance.fedramp',
+  [WAZUH_MODULES_ID.ISO_27001]: 'wazuh.rule.compliance.iso_27001',
+  [WAZUH_MODULES_ID.NIS2]: 'wazuh.rule.compliance.nis2',
 };

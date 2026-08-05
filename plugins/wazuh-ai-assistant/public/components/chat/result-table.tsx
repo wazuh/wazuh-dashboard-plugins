@@ -4,6 +4,8 @@ import {
   EuiBasicTable,
   EuiBasicTableColumn,
   EuiBadge,
+  EuiFlexGroup,
+  EuiFlexItem,
   EuiText,
   EuiButtonIcon,
   EuiCallOut,
@@ -11,8 +13,12 @@ import {
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { TableSpec } from '../../../common/types';
-import { SEVERITY_LEVELS, SeverityLevel } from '../../../common/constants';
+import { SeverityLevel } from '../../../common/constants';
 import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
+import {
+  ResolveSecurityAnalyticsUrl,
+  SecurityAnalyticsLink,
+} from './security-analytics-link';
 
 /** Tables at or under this row count default to expanded (nothing to gain from collapsing them);
  * bigger ones default collapsed so a 500-row result doesn't force the user to scroll past it to
@@ -30,91 +36,59 @@ const TABLE_SCROLL_MAX_HEIGHT = 400;
 const DEFAULT_PAGE_SIZE = 25;
 const PAGE_SIZE_OPTIONS = [25, 50, 100];
 
-const SEVERITY_COLORS: Record<SeverityLevel, string> = {
-  critical: 'danger',
-  high: 'warning',
-  medium: 'default',
-  low: 'hollow',
+/** Badge color + localized label for each `SeverityLevel` word. */
+const SEVERITY_BUCKETS: Record<
+  SeverityLevel,
+  { color: string; label: string }
+> = {
+  informational: {
+    color: 'accent',
+    label: i18n.translate(
+      'wazuhAiAssistant.resultTable.severity.informational',
+      {
+        defaultMessage: 'Informational',
+      },
+    ),
+  },
+  low: {
+    color: 'hollow',
+    label: i18n.translate('wazuhAiAssistant.resultTable.severity.low', {
+      defaultMessage: 'Low',
+    }),
+  },
+  medium: {
+    color: 'default',
+    label: i18n.translate('wazuhAiAssistant.resultTable.severity.medium', {
+      defaultMessage: 'Medium',
+    }),
+  },
+  high: {
+    color: 'warning',
+    label: i18n.translate('wazuhAiAssistant.resultTable.severity.high', {
+      defaultMessage: 'High',
+    }),
+  },
+  critical: {
+    color: 'danger',
+    label: i18n.translate('wazuhAiAssistant.resultTable.severity.critical', {
+      defaultMessage: 'Critical',
+    }),
+  },
 };
-
-/** Localized badge text for each canonical severity level (color mapping above stays keyed by the
- * English level regardless — only the displayed label is translated). */
-const SEVERITY_LABELS: Record<SeverityLevel, string> = {
-  critical: i18n.translate('wazuhAiAssistant.resultTable.severity.critical', {
-    defaultMessage: 'Critical',
-  }),
-  high: i18n.translate('wazuhAiAssistant.resultTable.severity.high', {
-    defaultMessage: 'High',
-  }),
-  medium: i18n.translate('wazuhAiAssistant.resultTable.severity.medium', {
-    defaultMessage: 'Medium',
-  }),
-  low: i18n.translate('wazuhAiAssistant.resultTable.severity.low', {
-    defaultMessage: 'Low',
-  }),
-};
-
-/**
- * LEGACY numeric rule.level -> severity-word classification (0-6 low, 7-11 medium, 12-14 high,
- * 15+ critical), the Wazuh 4.14 model. In Wazuh 5.0 (findings-v5) rule.level is ALREADY a
- * categorical word (informational/low/medium/high/critical) and never numeric, so this function is
- * now only a fallback for any severity column whose value still arrives numeric; the word path in
- * `renderSeverityBadge` is the normal 5.0 route. Kept so a mixed/older data source still renders.
- */
-function severityWordFromLevel(level: number): SeverityLevel {
-  if (level >= 15) {
-    return 'critical';
-  }
-  if (level >= 12) {
-    return 'high';
-  }
-  if (level >= 7) {
-    return 'medium';
-  }
-  return 'low';
-}
-
-/** `value` is numeric (or a numeric-looking string) when it came from a rule.level column; a
- * severity column sourced from a field that is already a word (e.g. vulnerability.severity)
- * fails this check and falls through to the pre-existing word-matching path below unchanged. */
-function toSeverityLevelNumber(value: unknown): number | undefined {
-  if (typeof value === 'number') {
-    return value;
-  }
-  if (
-    typeof value === 'string' &&
-    value.trim() !== '' &&
-    !Number.isNaN(Number(value))
-  ) {
-    return Number(value);
-  }
-  return undefined;
-}
 
 function renderSeverityBadge(value: unknown): React.ReactNode {
-  const numericLevel = toSeverityLevelNumber(value);
-  const word =
-    numericLevel !== undefined
-      ? severityWordFromLevel(numericLevel)
-      : String(value ?? '').toLowerCase();
-  // Wazuh 5.0 findings add an "informational" severity below "low";
-  // it is not one of the four canonical SeverityLevel badge colors, so render it as a subdued
-  // badge with its own label rather than falling through to the raw-value default.
-  if (word === 'informational') {
-    return (
-      <EuiBadge color='hollow'>
-        {i18n.translate('wazuhAiAssistant.resultTable.severity.informational', {
-          defaultMessage: 'Informational',
-        })}
-      </EuiBadge>
-    );
+  const word = String(value ?? '').toLowerCase();
+  // Look up directly in SEVERITY_BUCKETS (the single source of truth for what's renderable)
+  // instead of checking membership in SEVERITY_LEVELS first and casting — two collections
+  // staying in sync is an assumption this can't verify at runtime, an object property lookup
+  // can't throw, and `bucket` being `undefined` is a normal, handled outcome either way.
+  const bucket = SEVERITY_BUCKETS[word as SeverityLevel] as
+    | { color: string; label: string }
+    | undefined;
+  if (!bucket) {
+    return <EuiBadge color='default'>{String(value ?? '')}</EuiBadge>;
   }
-  const isKnown = (SEVERITY_LEVELS as readonly string[]).includes(word);
-  const color = isKnown ? SEVERITY_COLORS[word as SeverityLevel] : 'default';
-  const label = isKnown
-    ? SEVERITY_LABELS[word as SeverityLevel]
-    : String(value ?? '');
-  return <EuiBadge color={color}>{label}</EuiBadge>;
+  return <EuiBadge color={bucket.color}>{bucket.label}</EuiBadge>;
 }
 
 interface ResultTableProps {
@@ -123,6 +97,10 @@ interface ResultTableProps {
    * means no link renders — see discover-link.tsx. Optional so any other/future ResultTable call
    * site never has to supply it. */
   resolveDiscoverUrl?: ResolveDiscoverUrl;
+  /** Builds the "Open in Security Analytics" URL for this spec; omitted (or resolving to `null`)
+   * simply means no link renders — see security-analytics-link.tsx. Optional for the same reason
+   * as `resolveDiscoverUrl` above. */
+  resolveSecurityAnalyticsUrl?: ResolveSecurityAnalyticsUrl;
 }
 
 /**
@@ -131,6 +109,7 @@ interface ResultTableProps {
 const ResultTableInner: React.FC<ResultTableProps> = ({
   spec,
   resolveDiscoverUrl,
+  resolveSecurityAnalyticsUrl,
 }) => {
   const [expandedRowIds, setExpandedRowIds] = useState<Set<number>>(new Set());
   // Stable across re-renders of the SAME mounted table (a later spec on the same tool round would
@@ -277,8 +256,26 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         }
       }}
       extraAction={
-        resolveDiscoverUrl && spec.discover ? (
-          <DiscoverLink spec={spec} resolveDiscoverUrl={resolveDiscoverUrl} />
+        (resolveDiscoverUrl && spec.discover) ||
+        (resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink) ? (
+          <EuiFlexGroup gutterSize='s' responsive={false}>
+            {resolveDiscoverUrl && spec.discover ? (
+              <EuiFlexItem grow={false}>
+                <DiscoverLink
+                  spec={spec}
+                  resolveDiscoverUrl={resolveDiscoverUrl}
+                />
+              </EuiFlexItem>
+            ) : null}
+            {resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink ? (
+              <EuiFlexItem grow={false}>
+                <SecurityAnalyticsLink
+                  spec={spec}
+                  resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+                />
+              </EuiFlexItem>
+            ) : null}
+          </EuiFlexGroup>
         ) : undefined
       }
     >
@@ -379,6 +376,7 @@ class ResultTableBoundary extends React.Component<
       <ResultTableInner
         spec={this.props.spec}
         resolveDiscoverUrl={this.props.resolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={this.props.resolveSecurityAnalyticsUrl}
       />
     );
   }
@@ -387,6 +385,11 @@ class ResultTableBoundary extends React.Component<
 export const ResultTable: React.FC<ResultTableProps> = ({
   spec,
   resolveDiscoverUrl,
+  resolveSecurityAnalyticsUrl,
 }) => (
-  <ResultTableBoundary spec={spec} resolveDiscoverUrl={resolveDiscoverUrl} />
+  <ResultTableBoundary
+    spec={spec}
+    resolveDiscoverUrl={resolveDiscoverUrl}
+    resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+  />
 );

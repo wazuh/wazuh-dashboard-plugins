@@ -7,13 +7,59 @@ import {
   EuiLoadingSpinner,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiAccordion,
   EuiAvatar,
+  EuiButtonEmpty,
+  EuiCodeBlock,
+  EuiLoadingContent,
   EuiMarkdownFormat,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
-import { ChatRole, TableSpec } from '../../../common/types';
+import { ChatRole, TableSpec, ToolCall } from '../../../common/types';
 import { ResultTable } from './result-table';
 import { ResolveDiscoverUrl } from './discover-link';
+import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
+
+/**
+ * "This turn was cut short" affordance, rendered in two places: inside an interrupted assistant
+ * bubble, and on its own (message-list.tsx) for a question whose answer never arrived at all — a
+ * reload or a navigation mid-answer kills the page before anything can mark the assistant message,
+ * so the only evidence left is a conversation that ends with an unanswered question.
+ */
+export const InterruptedTurnNotice: React.FC<{ onRetry?: () => void }> = ({
+  onRetry,
+}) => (
+  <EuiFlexGroup
+    gutterSize='s'
+    alignItems='center'
+    responsive={false}
+    justifyContent='flexStart'
+  >
+    <EuiFlexItem grow={false}>
+      <EuiText size='xs'>
+        <EuiTextColor color='subdued'>
+          {i18n.translate('wazuhAiAssistant.chat.interrupted', {
+            defaultMessage: 'Response interrupted',
+          })}
+        </EuiTextColor>
+      </EuiText>
+    </EuiFlexItem>
+    {onRetry && (
+      <EuiFlexItem grow={false}>
+        <EuiButtonEmpty
+          size='xs'
+          flush='both'
+          iconType='refresh'
+          onClick={onRetry}
+        >
+          {i18n.translate('wazuhAiAssistant.chat.retry', {
+            defaultMessage: 'Retry',
+          })}
+        </EuiButtonEmpty>
+      </EuiFlexItem>
+    )}
+  </EuiFlexGroup>
+);
 
 export interface UiChatMessage {
   id: string;
@@ -25,6 +71,18 @@ export interface UiChatMessage {
   /** Transient progress line from a `status` stream event (e.g. "Querying Wazuh..."). */
   statusMessage?: string;
   createdAt: number;
+  /**
+   * The tool calls this turn ran, shown as a collapsed "query executed" panel so the reader can see
+   * exactly what was asked of the indexer or the Manager API rather than having to trust the prose.
+   * Real-form arguments (the server reverses pseudonyms before emitting the `tool_call` event).
+   */
+  toolCalls?: ToolCall[];
+  /**
+   * The turn ended before the answer was complete — the user pressed Stop, navigated away, or the
+   * connection dropped. Persisted, so a resumed conversation still shows which answer is a partial
+   * one instead of presenting it as finished.
+   */
+  interrupted?: boolean;
 }
 
 interface MessageBubbleProps {
@@ -33,6 +91,15 @@ interface MessageBubbleProps {
   aiAvatarUrl: string;
   /** Threaded down to ResultTable's "Open in Discover" link; see discover-link.tsx. */
   resolveDiscoverUrl: ResolveDiscoverUrl;
+  /** Threaded down to ResultTable's "Open in Security Analytics" link; see
+   * security-analytics-link.tsx. */
+  resolveSecurityAnalyticsUrl: ResolveSecurityAnalyticsUrl;
+  /**
+   * Re-asks the question this interrupted answer belongs to. Absent when retrying is not possible
+   * right now (another turn is generating, or this is not the conversation's last turn), in which
+   * case the interrupted notice is shown without an action.
+   */
+  onRetry?: () => void;
 }
 
 function formatTimestamp(epochMs: number): string {
@@ -60,12 +127,12 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   message,
   aiAvatarUrl,
   resolveDiscoverUrl,
+  resolveSecurityAnalyticsUrl,
+  onRetry,
 }) => {
   const isUser = message.role === 'user';
-  // 'accent' rendered pink in this EUI theme, which reads off-brand for Wazuh; 'subdued' is a
-  // neutral grey that still visually separates the user bubble from the assistant's 'plain'.
-  const panelColor = isUser ? 'subdued' : 'plain';
-
+  const isWaitingForFirstToken =
+    !isUser && message.isStreaming === true && message.content === '';
   // color="plain" keeps both avatars on a neutral background so the Wazuh mark reads exactly
   // like the brand mark in the dashboard chrome, instead of EUI's auto-assigned name color.
   const avatar = isUser ? (
@@ -92,63 +159,148 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
     />
   );
 
-  const bubble = (
-    // minWidth keeps a streaming bubble from starting pin-tiny on the first token and visibly
-    // growing token by token; harmless for user bubbles, which never stream.
-    <EuiFlexItem grow={false} style={{ maxWidth: '75%', minWidth: 180 }}>
-      {/* hasBorder only on the user bubble: gives its flatter "subdued" fill a defined edge,
-          while the assistant bubble keeps reading as an elevated card via hasShadow instead —
-          a calm, low-color way to tell the two apart. borderRadius is a shared inline override
-          (wins over EuiPanel's own smaller default) so both bubble kinds match the rest of this
-          surface's rounding. */}
-      <EuiPanel
-        color={panelColor}
-        paddingSize='m'
-        hasShadow={!isUser}
-        hasBorder={isUser}
-        style={{ borderRadius: 14 }}
-      >
-        {isUser || message.isStreaming ? (
-          // aria-live only for the assistant's streaming text (never the user bubble, which this
-          // branch also covers): announces incoming delta tokens to screen readers, which
-          // otherwise stay silent for the whole stream since nothing else here changes focus.
-          <div
-            {...(!isUser
-              ? {
-                  'aria-live': 'polite' as const,
-                  'aria-atomic': 'false' as const,
-                }
-              : {})}
-          >
-            <EuiText size='s'>
-              {/* Shown only before real content has arrived; a delta event clears statusMessage. */}
-              {message.statusMessage && !message.content && (
-                <p style={{ margin: 0, fontStyle: 'italic' }}>
-                  <EuiTextColor color='subdued'>
-                    {message.statusMessage}
-                  </EuiTextColor>
-                </p>
-              )}
+  const bubbleContent = (
+    <>
+      {isUser || message.isStreaming ? (
+        // aria-live only for the assistant's streaming text (never the user bubble, which this
+        // branch also covers): announces incoming delta tokens to screen readers, which
+        // otherwise stay silent for the whole stream since nothing else here changes focus.
+        <div
+          {...(!isUser
+            ? {
+                'aria-live': 'polite' as const,
+                'aria-atomic': 'false' as const,
+              }
+            : {})}
+        >
+          <EuiText size='s'>
+            {/* Shown only before real content has arrived; a delta event clears statusMessage. */}
+            {message.statusMessage && !message.content && (
+              <p style={{ margin: 0, fontStyle: 'italic' }}>
+                <EuiTextColor color='subdued'>
+                  {message.statusMessage}
+                </EuiTextColor>
+              </p>
+            )}
+            {/* Waiting for the first token: a bubble with nothing in it read as a broken empty
+                  box, especially on a turn that runs tool calls first and can sit silent for
+                  seconds. Placeholder lines say "something is coming" the way every chat client
+                  does. Replaced by real text the moment a delta arrives. */}
+            {isWaitingForFirstToken ? (
+              <EuiLoadingContent lines={2} />
+            ) : (
               <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>
                 {message.content}
               </p>
-            </EuiText>
-          </div>
-        ) : (
-          <EuiText size='s'>
-            <EuiMarkdownFormat>{message.content}</EuiMarkdownFormat>
+            )}
           </EuiText>
-        )}
-        {message.table && (
-          <>
-            <EuiSpacer size='s' />
-            <ResultTable
-              spec={message.table}
-              resolveDiscoverUrl={resolveDiscoverUrl}
-            />
-          </>
-        )}
-      </EuiPanel>
+        </div>
+      ) : (
+        <EuiText size='s'>
+          <EuiMarkdownFormat>{message.content}</EuiMarkdownFormat>
+        </EuiText>
+      )}
+      {message.table && (
+        <>
+          <EuiSpacer size='s' />
+          <ResultTable
+            spec={message.table}
+            resolveDiscoverUrl={resolveDiscoverUrl}
+            resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+          />
+        </>
+      )}
+      {/* What was actually run, collapsed by default: the answer is only as trustworthy as the
+            query behind it, and an analyst has to be able to check that query without reading
+            server logs. Shows each tool call's real-form arguments and, for an indexer search, the
+            executed DSL the table carries (the same one "Open in Discover" uses). */}
+      {message.toolCalls && message.toolCalls.length > 0 && (
+        <>
+          <EuiSpacer size='s' />
+          <EuiAccordion
+            id={`wzAiQuery-${message.id}`}
+            paddingSize='s'
+            buttonContent={
+              <EuiText size='xs'>
+                <EuiTextColor color='subdued'>
+                  {i18n.translate('wazuhAiAssistant.chat.queryDetails', {
+                    defaultMessage:
+                      '{count, plural, one {# query executed} other {# queries executed}}',
+                    values: { count: message.toolCalls.length },
+                  })}
+                </EuiTextColor>
+              </EuiText>
+            }
+          >
+            {message.toolCalls.map(toolCall => (
+              <div key={toolCall.id}>
+                <EuiText size='xs'>
+                  <strong>{toolCall.name}</strong>
+                </EuiText>
+                <EuiSpacer size='xs' />
+                <EuiCodeBlock
+                  language='json'
+                  paddingSize='s'
+                  fontSize='s'
+                  isCopyable
+                  overflowHeight={240}
+                >
+                  {JSON.stringify(toolCall.arguments, null, 2)}
+                </EuiCodeBlock>
+                <EuiSpacer size='s' />
+              </div>
+            ))}
+            {message.table?.discover && (
+              <>
+                <EuiText size='xs'>
+                  <strong>
+                    {i18n.translate('wazuhAiAssistant.chat.queryIndex', {
+                      defaultMessage: 'Index: {index}',
+                      values: { index: message.table.discover.index },
+                    })}
+                  </strong>
+                </EuiText>
+                <EuiSpacer size='xs' />
+                <EuiCodeBlock
+                  language='json'
+                  paddingSize='s'
+                  fontSize='s'
+                  isCopyable
+                  overflowHeight={240}
+                >
+                  {JSON.stringify(message.table.discover.dsl, null, 2)}
+                </EuiCodeBlock>
+              </>
+            )}
+          </EuiAccordion>
+        </>
+      )}
+      {/* An interrupted answer is labelled as one rather than left looking complete — the whole
+            point is that the reader can tell this text stops mid-thought on purpose. */}
+      {message.interrupted && !message.isStreaming && (
+        <>
+          <EuiSpacer size='xs' />
+          <InterruptedTurnNotice onRetry={onRetry} />
+        </>
+      )}
+    </>
+  );
+
+  const bubble = (
+    <EuiFlexItem grow={false} style={{ maxWidth: '75%', minWidth: 180 }}>
+      {isUser ? (
+        <EuiPanel
+          color='plain'
+          paddingSize='m'
+          hasShadow={false}
+          hasBorder
+          style={{ borderRadius: 14 }}
+        >
+          {bubbleContent}
+        </EuiPanel>
+      ) : (
+        <div style={{ padding: '8px 0' }}>{bubbleContent}</div>
+      )}
       <EuiText
         size='xs'
         color='subdued'

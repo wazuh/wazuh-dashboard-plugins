@@ -29,16 +29,19 @@ import {
 import { WzRequest } from '../../../../../react-services';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import {
+  buildCloudSecurityByModuleAgg,
+  buildComplianceControlsAgg,
   buildCvesMatchedAgg,
   buildFindingsOverviewAggs,
-  buildFIMTopPlatformsAgg,
+  buildFIMTopFilesAgg,
   buildMalwareFilterAgg,
   buildSCATilesAgg,
   buildSCATopBenchmarksAgg,
+  buildThreatIntelByThreatTypeAgg,
   buildThreatIntelFeedByTypeAgg,
   buildTopTermsAgg,
   buildVulnerabilitySeverityFiltersAgg,
-  buildVulnerabilityTopOsAgg,
+  buildVulnerabilityTopPackagesAgg,
 } from '../lib/queries';
 import {
   HOST_OS_NAME_FIELD,
@@ -49,6 +52,8 @@ import { AGG } from '../lib/constants';
 import {
   mapAgentStatus,
   mapCardinality,
+  mapCloudSecurityByModule,
+  mapComplianceControls,
   mapDocCount,
   mapScaBenchmarks,
   mapScaTiles,
@@ -58,12 +63,15 @@ import {
 import {
   fetchDecodersCount,
   fetchDetectorsCount,
+  fetchFiltersCount,
   fetchIntegrationsCount,
+  fetchKvdbsCount,
   fetchRulesCount,
 } from '../services/security-analytics.service';
 import {
   AgentStatus,
   FimOverview,
+  FindingsBreakdowns,
   FindingsOverview,
   ScaOverview,
   ThreatIntelEnrichments,
@@ -239,7 +247,10 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
       label: 'Findings',
       fetch: async fetchData => {
         const response = await fetchData({
-          aggs: { ...buildFindingsOverviewAggs(), ...buildMalwareFilterAgg() },
+          aggs: {
+            ...buildFindingsOverviewAggs(),
+            ...buildMalwareFilterAgg(),
+          },
           dateRange: LAST_24H,
           pagination: NO_HITS,
         });
@@ -268,6 +279,39 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
     () => ({ ...result, indexPatternId, fixedFilters }),
     [result.status, result.data, indexPatternId, fixedFilters],
   );
+}
+
+/**
+ * Findings (last 24h) broken down per Cloud Security module and per compliance
+ * framework, for the two bottom sections. One lazy search for both: every
+ * `useAggregationGroup` costs an index-pattern lookup on mount even while
+ * disabled, and neither agg needs to weigh down the on-mount batch.
+ */
+export function useFindingsBreakdowns(
+  enabled: boolean,
+): DataGroupResult<FindingsBreakdowns> {
+  return useAggregationGroup<FindingsBreakdowns>({
+    DataSource: OverviewDataSource,
+    createRepository: () => new FindingsDataSourceRepository(),
+    enabled,
+    label: 'Findings breakdowns',
+    fetch: async fetchData => {
+      const response = await fetchData({
+        aggs: {
+          ...buildCloudSecurityByModuleAgg(),
+          ...buildComplianceControlsAgg(),
+        },
+        dateRange: LAST_24H,
+        pagination: NO_HITS,
+      });
+      return {
+        cloudSecurityByModule: mapCloudSecurityByModule(response?.aggregations),
+        complianceControlsByFramework: mapComplianceControls(
+          response?.aggregations,
+        ),
+      };
+    },
+  });
 }
 
 export function useTopOperatingSystems(
@@ -356,12 +400,12 @@ export function useFIMOverview(enabled: boolean): DataGroupResult<FimOverview> {
     label: 'File Integrity Monitoring',
     fetch: async fetchData => {
       const response = await fetchData({
-        aggs: buildFIMTopPlatformsAgg(),
+        aggs: buildFIMTopFilesAgg(),
         pagination: NO_HITS,
       });
       return {
         total: mapDocCount(response),
-        platforms: mapTopBuckets(response?.aggregations, AGG.fimPlatforms),
+        files: mapTopBuckets(response?.aggregations, AGG.fimTopFiles),
       };
     },
   });
@@ -407,6 +451,14 @@ export function useDetectorsCount(enabled: boolean): DataGroupResult<number> {
   return useSecurityAnalyticsFetch(enabled, fetchDetectorsCount, 'Detectors');
 }
 
+export function useKvdbsCount(enabled: boolean): DataGroupResult<number> {
+  return useSecurityAnalyticsFetch(enabled, fetchKvdbsCount, 'KVDBs');
+}
+
+export function useFiltersCount(enabled: boolean): DataGroupResult<number> {
+  return useSecurityAnalyticsFetch(enabled, fetchFiltersCount, 'Filters');
+}
+
 export function useVulnerabilityOverview(
   enabled: boolean,
 ): DataGroupResult<VulnerabilityOverview> {
@@ -419,7 +471,7 @@ export function useVulnerabilityOverview(
       const response = await fetchData({
         aggs: {
           ...buildVulnerabilitySeverityFiltersAgg(),
-          ...buildVulnerabilityTopOsAgg(),
+          ...buildVulnerabilityTopPackagesAgg(),
           ...buildCvesMatchedAgg(),
         },
         pagination: NO_HITS,
@@ -430,7 +482,10 @@ export function useVulnerabilityOverview(
           AGG.vulnerabilitySeverity,
           VULNERABILITY_SEVERITY_BANDS,
         ),
-        byOs: mapTopBuckets(response?.aggregations, AGG.vulnerabilitiesByOs),
+        byPackage: mapTopBuckets(
+          response?.aggregations,
+          AGG.vulnerabilitiesByPackage,
+        ),
         cvesMatched: mapCardinality(response?.aggregations, AGG.cvesMatched),
       };
     },
@@ -438,10 +493,9 @@ export function useVulnerabilityOverview(
 }
 
 /**
- * Threat-intel enrichments catalog: the total IOC count (the "IOCs" tile) and
- * the feed composition by type (Malware Detection's "IOC feed by type"), in one
- * search over `wazuh-threatintel-enrichments*`. Current-state, so no time range.
- * Shared by the Endpoint Security and Threat Intelligence Feed sections.
+ * Threat-intel enrichments catalog in one current-state search: total IOCs, the
+ * composition by indicator type and by threat type. Shared by the Endpoint
+ * Security and Threat Intelligence Feed sections.
  */
 export function useThreatIntelEnrichments(
   enabled: boolean,
@@ -454,12 +508,16 @@ export function useThreatIntelEnrichments(
     label: 'Threat intelligence',
     fetch: async fetchData => {
       const response = await fetchData({
-        aggs: buildThreatIntelFeedByTypeAgg(),
+        aggs: {
+          ...buildThreatIntelFeedByTypeAgg(),
+          ...buildThreatIntelByThreatTypeAgg(),
+        },
         pagination: NO_HITS,
       });
       return {
         total: mapDocCount(response),
         feedByType: mapTopBuckets(response?.aggregations, AGG.iocFeedByType),
+        byThreatType: mapTopBuckets(response?.aggregations, AGG.threatTypes),
       };
     },
   });

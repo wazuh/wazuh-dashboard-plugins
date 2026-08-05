@@ -6,6 +6,12 @@
  * depth) or the future free-DSL escape hatch (its only line of defense).
  */
 
+import {
+  WAZUH_FIELD,
+  SEVERITY_LEVELS,
+  COMPLIANCE_FRAMEWORK_FIELDS,
+} from '../../common/wazuh-fields';
+
 export type GuardrailCheck = { ok: true } | { ok: false; reason: string };
 
 /**
@@ -26,9 +32,7 @@ export type GuardrailCheck = { ok: true } | { ok: false; reason: string };
  *
  * Callers stay responsible for any NaN guard and for truncation; this only does the clamp.
  *
- * Exported so `common.ts`'s `clampLimit` can share it. This file has no imports of its own, which
- * is what lets its unit tests run without the rest of the plugin; sharing this one primitive as an
- * export keeps that property intact.
+ * Exported so `common.ts`'s `clampLimit` can share it, keeping this file dependency-light.
  */
 export function clampInt(value: number, floor: number, cap: number): number {
   return Math.min(Math.max(value, floor), cap);
@@ -66,11 +70,21 @@ const MAX_TREE_DEPTH = 100;
 // ("wazuh-findings-v5-*,wazuh-monitoring-*"): the Indexer treats a comma as a multi-index
 // separator, so `.*` would let a single match name two index patterns. Not reachable through the
 // catalog today (`index` is enum-locked at the tool-schema level), but this function is the
-// standalone boundary and must hold on its own. Wazuh 5.0 families: wazuh-events-v5-*,
-// wazuh-findings-v5-* (the alert/finding data), and wazuh-states-* (SCA/FIM/inventory/vuln
-// current-state). wazuh-alerts-*/wazuh-archives-* no longer exist in 5.0 and are intentionally
-// dropped from the allowlist.
-const INDEX_ALLOWLIST_RE = /^wazuh-(events-v5|findings-v5|states)[^,\s]*$/;
+// standalone boundary and must hold on its own.
+//
+// `threatintel-(rules|decoders|integrations|policies|filters|kvdbs)` is enumerated explicitly,
+// NOT a bare `threatintel-[^,\s]*`: this plugin has NO tool touching `wazuh-threatintel-enrichments`
+// (228k IOC docs — deliberately out of scope, see get-rules.ts/get-threat-intel-
+// components.ts's doc comments for why). This allowlist is documented as the standalone boundary
+// that must hold on its own, independent of what today's tool schemas happen to permit — opening
+// the whole prefix would silently authorize `enrichments` at this layer the day someone adds it to
+// an enum elsewhere, without anyone consciously deciding to widen it.
+// `.opensearch-sap-detectors-config` (get_detectors.ts) is an exact single index, not a wildcard
+// family -- OpenSearch Security Analytics' own config store for detector definitions, confirmed
+// live to be indexer-reachable and to hold no analyst/attacker-supplied data (name/type/schedule/
+// enabled/source, all vendor- or admin-configured).
+const INDEX_ALLOWLIST_RE =
+  /^wazuh-(events-v5|findings-v5|states|threatintel-(rules|decoders|integrations|policies|filters|kvdbs))[^,\s]*$|^\.opensearch-sap-detectors-config$/;
 
 /** The escape hatch's (and every catalog tool's) index-pattern allowlist. */
 export function checkIndexAllowlist(index: string): GuardrailCheck {
@@ -78,8 +92,9 @@ export function checkIndexAllowlist(index: string): GuardrailCheck {
     return {
       ok: false,
       reason:
-        `Index "${index}" is not in the allowed set ` +
-        `(wazuh-events-v5-*, wazuh-findings-v5-*, wazuh-states-*).`,
+        `Index "${index}" is not in the allowed set (wazuh-events-v5-*, wazuh-findings-v5-*, ` +
+        'wazuh-states-*, wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*, ' +
+        '.opensearch-sap-detectors-config).',
     };
   }
   return { ok: true };
@@ -187,40 +202,118 @@ function normalizeMustToFilter(node: unknown): unknown {
   return out;
 }
 
-/** Low-cardinality fields vetted safe for terms/composite/cardinality/significant_terms aggs. */
+/**
+ * Low-cardinality fields vetted safe for terms/composite/cardinality/significant_terms aggs.
+ * Only schema-valid `wazuh.*` fields are listed (see `common/wazuh-fields.ts`); population is
+ * decoder-dependent.
+ */
 const AGG_FIELD_ALLOWLIST = new Set([
-  'rule.id',
-  'rule.level',
-  'rule.groups',
-  'rule.description',
-  'agent.id',
-  'agent.name',
+  WAZUH_FIELD.RULE_ID,
+  WAZUH_FIELD.RULE_LEVEL,
+  WAZUH_FIELD.RULE_TITLE,
+  WAZUH_FIELD.AGENT_ID,
+  WAZUH_FIELD.AGENT_NAME,
   'vulnerability.severity',
-  'agent.os.name',
-  // Wazuh 5.0 findings-v5 agg fields: rule.groups has no 5.0 equivalent
-  // (replaced by rule.category (single) + rule.tags (array)); the PCI summary aggregates the
-  // per-requirement compliance tag. All keyword, low-cardinality (finite rule taxonomy /
-  // compliance requirement list). rule.mitre.technique moved to rule.mitre.technique.{id,name}.
-  'rule.category',
-  'rule.tags',
-  'rule.compliance.pci_dss',
-  'rule.mitre.technique.id',
-  'rule.mitre.technique.name',
-  'rule.mitre.tactic.name',
-  // get_mitre_summary: MITRE ATT&CK technique id/name, both mapped `keyword` and low-cardinality
-  // (finite technique catalog) — confirmed in wazuh-dashboard-plugins' known-fields cache
-  // (plugins/main/public/utils/known-fields/alerts.json, rule.mitre.id and rule.mitre.technique
-  // entries both `esTypes: ["keyword"]`).
-  'rule.mitre.id',
-  'rule.mitre.technique',
-  // Wazuh 5.0: SCA policy summary is now DERIVED via a terms agg on
-  // `policy.id` (keyword, low-cardinality — a handful of benchmark policies per agent; mapping
-  // live-verified against wazuh-states-sca on 5.0.0-beta3). `wazuh.agent.id`/`wazuh.agent.name`
-  // are the 5.0 ECS envelope duplicates of the 4.14 agent.id/agent.name entries above.
+  // Wazuh 5.0 findings-v5 agg fields, all keyword/low-cardinality (finite rule taxonomy /
+  // compliance requirement list / MITRE technique catalog).
+  WAZUH_FIELD.RULE_CATEGORY,
+  WAZUH_FIELD.RULE_TAGS,
+  ...Object.values(COMPLIANCE_FRAMEWORK_FIELDS),
+  WAZUH_FIELD.RULE_MITRE_TECHNIQUE_ID,
+  WAZUH_FIELD.RULE_MITRE_TECHNIQUE_NAME,
+  WAZUH_FIELD.RULE_MITRE_TACTIC_NAME,
+  // Wazuh 5.0: SCA policy summary is DERIVED via a terms agg on `policy.id` (keyword,
+  // low-cardinality — a handful of benchmark policies per agent; mapping live-verified against
+  // wazuh-states-sca on 5.0.0-beta3).
   'policy.id',
-  'wazuh.agent.id',
-  'wazuh.agent.name',
 ]);
+
+/**
+ * Exact-match ID lookup fields shared by `find_document_by_field` (and any `term`/`terms`/`ids`
+ * query shaped the same way, including the search_wazuh_data escape hatch — see
+ * `isExactIdLookupQuery` below): high-selectivity business-level UUID fields, distinct from the
+ * OpenSearch document `_id` (handled separately via an `ids` query). Kept apart from
+ * `AGG_FIELD_ALLOWLIST` above — that allowlist gates AGGREGATION cardinality; this one gates
+ * exact-match LOOKUPS, a different safety property (a lookup on a high-cardinality field is fine,
+ * an aggregation is not).
+ */
+export const ID_FIELD_ALLOWLIST = new Set([
+  'wazuh.event.id',
+  WAZUH_FIELD.RULE_ID,
+  'vulnerability.id',
+  'event.doc_id',
+]);
+
+/** DSL clause keys an exact-match ID lookup query is allowed to be built from — see
+ * `isExactIdLookupQuery` below. `minimum_should_match` is a `bool` sibling key (not a clause of
+ * its own), handled separately in `walkExactIdLookupShape` below rather than listed here. */
+const EXACT_ID_LOOKUP_QUERY_KEYS = new Set([
+  'bool',
+  'filter',
+  'must',
+  'should',
+  'must_not',
+  'term',
+  'terms',
+  'ids',
+]);
+
+/**
+ * True when `body` is a plain exact-match lookup (`term`/`terms` on an `ID_FIELD_ALLOWLIST` field,
+ * and/or an `ids` query on `_id`), with no aggregation — the shape `find_document_by_field` builds
+ * (a `bool.should` of one `ids` clause plus a `term`/`terms` clause per applicable business
+ * field), and the reason an ID lookup has no time window to give the mandatory-time-range check.
+ * Checked on QUERY SHAPE alone (not which tool produced it), so it also exempts a hand-built
+ * search_wazuh_data query of the same shape — intentional: it only allows exact lookups on
+ * high-selectivity ID fields, not an open-ended scan.
+ */
+function isExactIdLookupQuery(body: Record<string, unknown>): boolean {
+  if (body.aggs !== undefined || body.aggregations !== undefined) {
+    return false;
+  }
+  const query = body.query;
+  return (
+    !!query &&
+    typeof query === 'object' &&
+    !Array.isArray(query) &&
+    walkExactIdLookupShape(query)
+  );
+}
+
+function walkExactIdLookupShape(node: unknown): boolean {
+  if (Array.isArray(node)) {
+    return node.every(walkExactIdLookupShape);
+  }
+  if (!node || typeof node !== 'object') {
+    return false;
+  }
+  for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+    if (key === 'minimum_should_match') {
+      continue; // A bare number sibling of `should` — nothing to validate or recurse into.
+    }
+    if (!EXACT_ID_LOOKUP_QUERY_KEYS.has(key)) {
+      return false;
+    }
+    if (key === 'ids') {
+      continue; // {ids: {values: [...]}} always targets _id — no field to check.
+    }
+    if (key === 'term' || key === 'terms') {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        return false;
+      }
+      const fields = Object.keys(value as Record<string, unknown>);
+      if (!fields.every(field => ID_FIELD_ALLOWLIST.has(field))) {
+        return false;
+      }
+      continue;
+    }
+    // bool/filter/must/should/must_not: recurse into the nested clause(s).
+    if (!walkExactIdLookupShape(value)) {
+      return false;
+    }
+  }
+  return true;
+}
 
 const TIME_FIELD_RE = /(^|\.)(timestamp|@timestamp)$/;
 const MAX_LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
@@ -256,9 +349,8 @@ const TIME_BASED_INDEX_RE = /^wazuh-(events|findings)-v5/;
  * Vulnerability STATE lives in wazuh-states-vulnerabilities, not the findings/events timeline — so
  * a bare "data.vulnerability." / "vulnerability." filter on a time-based (findings-v5/events-v5)
  * index is structurally wrong: it steers the model back to the typed vulnerability tools instead
- * of letting the escape hatch hand-build a vulnerability query against the wrong index. (The 4.14
- * get_solved_vulnerabilities exemption is gone — that tool was retired in the 5.0 port, so there is
- * no longer any legitimate caller of vulnerability fields on a timeline index.)
+ * of letting the escape hatch hand-build a vulnerability query against the wrong index. There is
+ * no legitimate caller of vulnerability fields on a timeline index.
  */
 const VULN_FIELD_RE = /^(data\.)?vulnerability\./;
 
@@ -279,7 +371,64 @@ const VULN_FIELD_CLAUSE_KEYS = new Set([
   'prefix',
 ]);
 
-const VULN_FIELD_ON_ALERTS_REASON =
+/**
+ * Keyword fields where a numeric `range` bound would silently fall back to lexicographic string
+ * comparison instead of erroring, mapped to a human description of their valid string values used
+ * to build an accurate rejection message per field. `wazuh.rule.level` is currently the only
+ * entry: it holds one of `SEVERITY_LEVELS` (`informational`/`low`/`medium`/`high`/`critical`), not
+ * a numeric scale, and a numeric `range` against it does not error in OpenSearch — it silently
+ * falls back to lexicographic string comparison ("informational" &lt; "low" &lt; "medium" by
+ * dictionary order, NOT by severity), so it must be actively rejected. `term`/`terms` against the
+ * string values is unaffected.
+ */
+const KEYWORD_RANGE_REJECT_FIELDS = new Map<string, string>([
+  [
+    WAZUH_FIELD.RULE_LEVEL,
+    `one of the severity levels (${SEVERITY_LEVELS.join('/')})`,
+  ],
+]);
+
+/**
+ * True when a `range` clause anywhere in the tree targets one of `KEYWORD_RANGE_REJECT_FIELDS`
+ * with at least one numeric bound. A non-numeric bound (e.g. a caller mistakenly trying
+ * `{gte: "low"}`) is not this check's concern — that is still nonsensical on a `range` query
+ * against a keyword field, but it does not silently produce a plausible-looking wrong answer the
+ * way a numeric bound does, so it is left alone here.
+ */
+function findNumericRangeOnKeywordField(
+  body: Record<string, unknown>,
+): string | undefined {
+  let reason: string | undefined;
+  walk(body, (key, value) => {
+    if (reason || key !== 'range' || !value || typeof value !== 'object') {
+      return;
+    }
+    for (const [field, rangeValue] of Object.entries(
+      value as Record<string, unknown>,
+    )) {
+      const description = KEYWORD_RANGE_REJECT_FIELDS.get(field);
+      if (!description || !rangeValue || typeof rangeValue !== 'object') {
+        continue;
+      }
+      const bounds = rangeValue as Record<string, unknown>;
+      const hasNumericBound = [
+        bounds.gte,
+        bounds.gt,
+        bounds.lte,
+        bounds.lt,
+      ].some(bound => typeof bound === 'number');
+      if (hasNumericBound) {
+        reason =
+          `Range on "${field}" is not allowed: it is a keyword field holding ${description}, ` +
+          `not a number. Use "term" or "terms" against one or more of those string values instead.`;
+        return;
+      }
+    }
+  });
+  return reason;
+}
+
+const VULN_FIELD_ON_FINDINGS_REASON =
   'Vulnerability data is not in the findings/events index. Use the vulnerability tools ' +
   '(get_vulnerabilities, get_critical_vulnerabilities, ' +
   'get_vulnerabilities_by_agent, get_vulnerability_by_cve) instead of querying vulnerability ' +
@@ -332,6 +481,15 @@ export function lintDsl(
     return { ok: false, reason: '"regexp" queries are not allowed.' };
   }
 
+  // Same "unfixable by editing the range" class as the structural bans above: a numeric range
+  // against a keyword field does not error, it silently does the WRONG thing (lexicographic
+  // string comparison), so it must be caught before any range-shaped check below that would
+  // otherwise treat this body as a well-formed, in-range query.
+  const keywordRangeReason = findNumericRangeOnKeywordField(body);
+  if (keywordRangeReason) {
+    return { ok: false, reason: keywordRangeReason };
+  }
+
   // Same "unfixable by editing the range" reasoning as the structural bans above, so this too
   // must be reported before the mandatory-time-range check below: telling the model to add/widen
   // a range would burn its bounded retry on a correction that does not fix a wrong index/field
@@ -339,9 +497,9 @@ export function lintDsl(
   if (
     index !== undefined &&
     TIME_BASED_INDEX_RE.test(index) &&
-    findVulnerabilityFieldOnAlertsIndex(body)
+    findVulnerabilityFieldOnFindingsIndex(body)
   ) {
-    return { ok: false, reason: VULN_FIELD_ON_ALERTS_REASON };
+    return { ok: false, reason: VULN_FIELD_ON_FINDINGS_REASON };
   }
 
   // After the structural bans (script/wildcard/regexp) and the vulnerability-field check above:
@@ -351,7 +509,8 @@ export function lintDsl(
   if (
     index !== undefined &&
     TIME_BASED_INDEX_RE.test(index) &&
-    !hasTimeRange(body)
+    !hasTimeRange(body) &&
+    !isExactIdLookupQuery(body)
   ) {
     return {
       ok: false,
@@ -451,7 +610,7 @@ function findLeadingWildcard(
  * MAX_TREE_DEPTH pre-check `lintDsl` already runs before any check below it gets here — no separate
  * recursion guard needed.
  */
-function findVulnerabilityFieldOnAlertsIndex(
+function findVulnerabilityFieldOnFindingsIndex(
   body: Record<string, unknown>,
 ): boolean {
   let found = false;

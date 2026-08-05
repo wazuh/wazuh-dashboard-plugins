@@ -300,20 +300,23 @@ async function discoverLiveFixtures() {
       size: 0,
       aggs: {
         agents: { terms: { field: 'wazuh.agent.name', size: 10 } },
-        tags: { terms: { field: 'rule.tags', size: 10 } },
-        rule_ids: { terms: { field: 'rule.id', size: 10 } },
+        tags: { terms: { field: 'wazuh.rule.tags', size: 10 } },
+        rule_titles: { terms: { field: 'wazuh.rule.title', size: 10 } },
         os: { terms: { field: 'host.os.name', size: 10 } },
       },
     });
     familyCounts.findings = agg.hits.total.value;
     const agentBuckets = agg.aggregations.agents.buckets;
     const tagBuckets = agg.aggregations.tags.buckets;
-    const ruleIdBuckets = agg.aggregations.rule_ids.buckets;
+    const ruleTitleBuckets = agg.aggregations.rule_titles.buckets;
     const osBuckets = agg.aggregations.os.buckets;
     if (agentBuckets[0]) fixtures.agentName = agentBuckets[0].key;
     if (agentBuckets[1]) fixtures.secondAgentName = agentBuckets[1].key;
     if (tagBuckets[0]) fixtures.ruleTag = tagBuckets[0].key;
-    if (ruleIdBuckets[0]) fixtures.ruleId = Number(ruleIdBuckets[0].key);
+    // wazuh.rule.id is a UUID in 5.0 (not the numeric 4.x rule id), so it is no longer a usable
+    // fixture for search_findings_by_rule_title's rule_title param -- discover the real rule
+    // title instead (the field that tool actually filters on).
+    if (ruleTitleBuckets[0]) fixtures.ruleTitle = ruleTitleBuckets[0].key;
     if (osBuckets[0]) fixtures.osName = osBuckets[0].key;
   } catch (error) {
     notes.push(`findings-family discovery failed: ${error.message}`);
@@ -418,8 +421,10 @@ async function discoverLiveFixtures() {
     familyCounts.powershellSignals = await esCount('wazuh-findings-v5*', {
       bool: {
         should: [
-          { term: { 'rule.mitre.technique.id': 'T1059.001' } },
-          { terms: { 'rule.tags': ['powershell', 'windows_powershell'] } },
+          { term: { 'wazuh.rule.mitre.technique.id': 'T1059.001' } },
+          {
+            terms: { 'wazuh.rule.tags': ['powershell', 'windows_powershell'] },
+          },
           {
             terms: {
               'process.name': ['powershell.exe', 'pwsh.exe', 'powershell'],
