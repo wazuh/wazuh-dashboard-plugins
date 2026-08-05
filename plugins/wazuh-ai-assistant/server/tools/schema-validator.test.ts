@@ -13,14 +13,24 @@ const AGENT_SCHEMA: JsonSchemaObject = {
   required: ['agent_id'],
 };
 
-// Mirrors search-wazuh-data.ts's query_dsl parameter: a string-typed property that carries a
-// JSON-encoded OpenSearch search request body.
+// Mirrors search-wazuh-data.ts's query_dsl parameter: a `jsonString`-marked string-typed property
+// that carries a JSON-encoded OpenSearch search request body.
 const DSL_SCHEMA: JsonSchemaObject = {
   type: 'object',
   properties: {
-    query_dsl: { type: 'string' },
+    query_dsl: { type: 'string', jsonString: true },
   },
   required: ['query_dsl'],
+};
+
+// An ordinary, UNMARKED string property (e.g. search-wazuh-data.ts's own index_pattern, or
+// agent_name on other tools) — the regression guard against over-broad coercion.
+const PLAIN_STRING_SCHEMA: JsonSchemaObject = {
+  type: 'object',
+  properties: {
+    agent_name: { type: 'string' },
+  },
+  required: ['agent_name'],
 };
 
 const ARRAY_SCHEMA: JsonSchemaObject = {
@@ -202,6 +212,18 @@ test('validate: an object-form query_dsl carrying a "script" key round-trips int
 test('validate: an array-form query_dsl is NOT coerced (only plain objects are) and still fails ' +
   'the type check, same as before this change', () => {
   const result = validate({ query_dsl: ['a', 'b'] }, DSL_SCHEMA);
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.ok(result.errors.some(e => /must be of type string/.test(e)));
+  }
+});
+
+test('validate: an object for an UNMARKED string property (no jsonString) is rejected, not ' +
+  'silently stringified — the regression guard against over-broad coercion', () => {
+  const result = validate(
+    { agent_name: { not: 'a plain string' } },
+    PLAIN_STRING_SCHEMA,
+  );
   assert.equal(result.ok, false);
   if (!result.ok) {
     assert.ok(result.errors.some(e => /must be of type string/.test(e)));
