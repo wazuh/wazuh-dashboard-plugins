@@ -12,6 +12,7 @@ import {
   EuiIconTip,
   EuiText,
   EuiTitle,
+  EuiScreenReaderOnly,
   EuiBetaBadge,
   EuiLoadingSpinner,
   EuiPanel,
@@ -1602,37 +1603,24 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               padding: '16px 24px 0',
             }}
           >
-            {/* Conversation header: the active conversation's title as the view's own `<h1>` —
-                  the chat column previously had no heading at all, visually or for assistive
-                  tech. Sized down to EuiTitle's smallest scale (matching the Home Overview's own
-                  card-title/section-label weight) so the markup is standards-correct without
-                  reading as a page-scale title on a benchmark surface that has none. Sticky
-                  (like .wzStickyInputPanel below it) so it stays in view while the transcript
-                  scrolls; a hairline bottom border is its only visual separation, no shadow. */}
+            {/* The view's `<h1>`, for assistive tech only. The chat column had no heading at all,
+                  which left screen-reader users without a name for the thing they are reading and
+                  the page without a document outline. A VISIBLE header was tried and dropped: a
+                  conversation's title is generated from its first message, so a visible strip
+                  restated the user's own question directly above that same question in the
+                  transcript, and the sidebar already marks which conversation is open. Screen-
+                  reader-only keeps the semantics without the duplication — and matches the Home
+                  Overview, which likewise shows no page-scale title. */}
             {!showLoadingState && !showNoProviderState && (
-              <div
-                style={{
-                  position: 'sticky',
-                  top: 0,
-                  zIndex: 1,
-                  height: 40,
-                  display: 'flex',
-                  alignItems: 'center',
-                  flex: '0 0 auto',
-                  borderBottom: '1px solid var(--wz-hairline)',
-                  background: 'var(--wz-surface)',
-                }}
-              >
-                <EuiTitle size='xxs'>
-                  <h1>
-                    {activeConversationTitle ??
-                      i18n.translate(
-                        'wazuhAiAssistant.chat.conversations.newConversationHeading',
-                        { defaultMessage: 'New conversation' },
-                      )}
-                  </h1>
-                </EuiTitle>
-              </div>
+              <EuiScreenReaderOnly>
+                <h1>
+                  {activeConversationTitle ??
+                    i18n.translate(
+                      'wazuhAiAssistant.chat.conversations.newConversationHeading',
+                      { defaultMessage: 'New conversation' },
+                    )}
+                </h1>
+              </EuiScreenReaderOnly>
             )}
 
             {/* Callouts render in priority order (never suppressed — resilience-first: every

@@ -83,6 +83,60 @@ const SEVERITY_BUCKETS: Record<
   },
 };
 
+/** ISO-8601 instants as the indexer emits them (`2026-07-26T05:58:38.000Z`). Matched, rather than
+ * fed straight to `new Date()`, so a plain string that merely happens to be Date-parseable (a rule
+ * title starting with a year, an agent name like "2026-prod") is never silently reformatted. */
+const ISO_TIMESTAMP_RE =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:?\d{2})$/;
+
+/** Column width for a formatted timestamp column — wide enough for "Jul 26, 2026, 05:58" on one
+ * line, which is the entire point: unformatted, a raw ISO instant wrapped onto three lines and
+ * made every row three times taller than its content needed. */
+const TIMESTAMP_COLUMN_WIDTH = '150px';
+/** Column width for the severity column: a badge plus its longest label ("Informational"). */
+const SEVERITY_COLUMN_WIDTH = '120px';
+
+/**
+ * Compact, locale-aware rendering of an ISO instant — display only. The raw value is untouched in
+ * the row data (and still visible verbatim in the expanded-row JSON and the `title` attribute), so
+ * nothing is lost: this changes how a timestamp reads, never what it is. Falls back to the raw
+ * string if `Intl` throws on an unexpected value.
+ */
+function formatTimestamp(value: string): string {
+  try {
+    return new Intl.DateTimeFormat(undefined, {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(new Date(value));
+  } catch {
+    return value;
+  }
+}
+
+/** True when every non-empty value in a column is an ISO instant — a column is only reformatted
+ * when the WHOLE column is timestamps, so a mixed column keeps its raw values rather than showing
+ * two different formats side by side. */
+function isTimestampColumn(
+  rows: Array<Record<string, unknown>>,
+  field: string,
+): boolean {
+  let sawValue = false;
+  for (const row of rows) {
+    const value = row[field];
+    if (value === null || value === undefined || value === '') {
+      continue;
+    }
+    if (typeof value !== 'string' || !ISO_TIMESTAMP_RE.test(value)) {
+      return false;
+    }
+    sawValue = true;
+  }
+  return sawValue;
+}
+
 function renderSeverityBadge(value: unknown): React.ReactNode {
   const word = String(value ?? '').toLowerCase();
   // Look up directly in SEVERITY_BUCKETS (the single source of truth for what's renderable)
@@ -194,17 +248,42 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     [expandedRowIds],
   );
 
+  // Column widths and timestamp formatting are DISPLAY concerns only — same columns, same values,
+  // same order as the spec asked for. Without them EuiBasicTable divides the width evenly and
+  // renders every value verbatim, so a raw ISO instant wrapped onto three lines and dragged every
+  // row's height with it, while the free-text title column (the one that actually needs room) got
+  // no more space than the severity word beside it.
   const fieldColumns: EuiBasicTableColumn<ResultRow>[] = useMemo(
     () =>
-      spec.columns.map(column => ({
-        field: column.id,
-        name: column.label,
-        render:
-          column.id === spec.severityColumn
-            ? (value: unknown) => renderSeverityBadge(value)
-            : undefined,
-      })),
-    [spec.columns, spec.severityColumn],
+      spec.columns.map(column => {
+        if (column.id === spec.severityColumn) {
+          return {
+            field: column.id,
+            name: column.label,
+            width: SEVERITY_COLUMN_WIDTH,
+            render: (value: unknown) => renderSeverityBadge(value),
+          };
+        }
+        if (isTimestampColumn(spec.rows, column.id)) {
+          return {
+            field: column.id,
+            name: column.label,
+            width: TIMESTAMP_COLUMN_WIDTH,
+            render: (value: unknown) =>
+              typeof value === 'string' ? (
+                // The unabbreviated instant stays one hover away, so precision is deferred rather
+                // than discarded.
+                <span title={value}>{formatTimestamp(value)}</span>
+              ) : (
+                // `isTimestampColumn` only skips null/undefined/'' — render those as empty rather
+                // than letting an `unknown` reach React.
+                String(value ?? '')
+              ),
+          };
+        }
+        return { field: column.id, name: column.label };
+      }),
+    [spec.columns, spec.severityColumn, spec.rows],
   );
 
   const columns: EuiBasicTableColumn<ResultRow>[] = useMemo(

@@ -281,13 +281,21 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       }}
     >
       {isUser ? (
-        // Quiet tinted inset, no border/shadow/radius override — the assistant turn stays
-        // undecorated prose on the canvas, so role is distinguished by this container alone.
+        // The question is a discrete card; the answer is undecorated prose on the canvas, so the
+        // two roles never read as the same kind of thing. `color='plain'` (empty shade) over the
+        // page's own light-grey background is what actually separates them: a `subdued` fill sits
+        // within ~2% luminance of that background and, with no border, made the question
+        // effectively invisible. The border is the guarantee — it holds the edge in both themes
+        // regardless of how close the two fills are, and matches the Home Overview's own
+        // hairline-bordered, shadowless panel signature.
         <EuiPanel
-          color='subdued'
-          paddingSize='s'
+          color='plain'
+          paddingSize='m'
           hasShadow={false}
-          hasBorder={false}
+          hasBorder
+          // The one deliberate radius override on the surface: a conversation turn reads as a
+          // bubble, not as a data panel. Everything else uses EUI defaults (see chat-page.scss).
+          style={{ borderRadius: 14 }}
         >
           {bubbleContent}
         </EuiPanel>
