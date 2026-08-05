@@ -38,10 +38,10 @@ export type RouterCategory =
  * contains has an entry here at all — so a new catalog tool that forgets to add itself here fails
  * loudly at plugin start instead of silently never being routed to.
  *
- * `general` (no tools) and `free_search` (the escape hatch, `search_wazuh_data`) are not listed as
- * map values for any OTHER tool; `search_wazuh_data` is also always appended to stage 2's resolved
- * tool list regardless of routed category (see `resolveStage2Tools`), so its category membership
- * here is mostly documentary.
+ * `general` (minimal recovery set, not "no tools" — see `resolveStage2Tools`) and `free_search`
+ * (the escape hatch, `search_wazuh_data`) are not listed as map values for any OTHER tool;
+ * `search_wazuh_data` is also always appended to stage 2's resolved tool list regardless of routed
+ * category (see `resolveStage2Tools`), so its category membership here is mostly documentary.
  */
 const TOOL_CATEGORY: Record<string, RouterCategory> = {
   // agents
@@ -141,7 +141,8 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
   free_search:
     'Anything else about Wazuh finding/vulnerability/state data (last resort).',
   general:
-    'No Wazuh data needed at all: greeting, meta-question, clarification, chit-chat.',
+    'Greetings, thanks, or questions about the assistant itself. If the user asks anything about ' +
+    'their own environment - however vaguely - do NOT pick general.',
 };
 
 /**
@@ -242,8 +243,9 @@ export function buildRoutingPrompt(nowIso: string): string {
     'You are the routing pre-step for the Wazuh AI Assistant. Do not answer the user yet.',
     `The current UTC time is ${nowIso}.`,
     "Pick the 1-2 categories of Wazuh data most likely needed to answer the user's last message, " +
-      'then call route_question with them, most relevant first. If no Wazuh data is needed at ' +
-      'all (greeting, meta-question, clarification, chit-chat), pick "general" alone.',
+      'then call route_question with them, most relevant first. Pick "general" alone only for ' +
+      'greetings, thanks, or questions about the assistant itself - never when the user asks ' +
+      'anything, however vaguely, about their own environment.',
     'Categories:',
     menu,
     'Call route_question now.',
@@ -252,31 +254,35 @@ export function buildRoutingPrompt(nowIso: string): string {
 
 /**
  * Stage-2 tool-list resolver: union of the routed categories' tools, plus
- * `search_wazuh_data` always appended (deduped) as the safety-valve escape hatch — UNLESS the
- * model routed to `general` alone, in which case this returns `undefined` so chat.ts's orchestrate
- * loop skips tools entirely for the turn (today's plain-text-only behavior, options with `tools`
- * undefined).
+ * `search_wazuh_data` always appended (deduped) as the safety-valve escape hatch. NEVER returns
+ * `undefined` and NEVER resolves to an empty list: a stage-1 misclassification must be
+ * recoverable, not terminal, so even a lone `general` route (see issue "never route zero
+ * tools") resolves to a minimal recovery set — `get_security_summary` plus `search_wazuh_data`
+ * — instead of leaving the turn with no data path at all. `tool_choice` still stays `'auto'` for
+ * these turns (server/routes/chat.ts's `orchestrate`), so a genuine greeting still gets a
+ * plain-text answer; the minimal set is only an escape hatch the model *may* reach for, never a
+ * forced call.
  *
  * `categories` is expected to already be schema-validated (schema-validator.ts against
  * `ROUTE_QUESTION_TOOL.parameters`, done by the caller in chat.ts) so every entry is one of
  * `CATEGORY_ORDER`; this function still defensively drops anything unrecognized rather than
  * trusting that invariant blindly.
  */
-export function resolveStage2Tools(
-  categories: string[],
-): ToolSpec[] | undefined {
+export function resolveStage2Tools(categories: string[]): ToolSpec[] {
   const valid = categories.filter((cat): cat is RouterCategory =>
     (CATEGORY_ORDER as string[]).includes(cat),
   );
 
-  if (valid.length === 1 && valid[0] === 'general') {
-    return undefined;
-  }
-
   const toolNames = new Set<string>();
-  for (const category of valid) {
-    for (const toolName of CATEGORY_TOOLS[category]) {
-      toolNames.add(toolName);
+  if (valid.length === 1 && valid[0] === 'general') {
+    // Minimal recovery set (see doc comment above): `general` alone maps to no tool category in
+    // `TOOL_CATEGORY`/`CATEGORY_TOOLS`, so without this branch the union below would be empty.
+    toolNames.add('get_security_summary');
+  } else {
+    for (const category of valid) {
+      for (const toolName of CATEGORY_TOOLS[category]) {
+        toolNames.add(toolName);
+      }
     }
   }
   // Always-on escape hatch, deduped via the Set regardless of whether
