@@ -1,6 +1,7 @@
 import { ToolDefinition } from '../types';
 import {
   clampLimit,
+  INVENTORY_CURRENT_STATE_NOTE,
   limitProperty,
   objectSchema,
   validateAgentId,
@@ -17,8 +18,9 @@ export const getAgentPortsTool: ToolDefinition = {
   spec: {
     name: 'get_agent_ports',
     description:
-      'Lists open network ports (local IP/port, protocol, owning process) for one agent. Use ' +
-      'for "what ports are open on agent X" questions.',
+      'Lists open network ports (local IP/port, protocol, owning process) for one agent (host/' +
+      `machine/endpoint). Use for "what ports are open on agent X" questions. ` +
+      INVENTORY_CURRENT_STATE_NOTE,
     parameters: objectSchema(
       {
         agent_id: {

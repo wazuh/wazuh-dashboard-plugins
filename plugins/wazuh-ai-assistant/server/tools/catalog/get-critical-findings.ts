@@ -3,6 +3,7 @@ import {
   findingDigestColumns,
   findingRowFields,
   clampLimit,
+  FINDING_SCOPE_NOTE,
   limitProperty,
   objectSchema,
   resolveTimeRange,
@@ -21,8 +22,8 @@ export const getCriticalFindingsTool: ToolDefinition = {
   spec: {
     name: 'get_critical_findings',
     description:
-      'Searches security findings for critical-severity findings within a time range, most ' +
-      'recent first.',
+      'Searches security findings for critical-severity findings across the fleet (all agents/' +
+      `hosts/machines) within a time range, most recent first. ${FINDING_SCOPE_NOTE}`,
     parameters: objectSchema({
       limit: limitProperty(
         'Max number of findings to return (default 20, max 500).',

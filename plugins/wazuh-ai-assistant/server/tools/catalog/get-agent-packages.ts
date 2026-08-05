@@ -1,6 +1,7 @@
 import { ToolDefinition } from '../types';
 import {
   clampLimit,
+  INVENTORY_CURRENT_STATE_NOTE,
   limitProperty,
   objectSchema,
   validateAgentId,
@@ -16,8 +17,9 @@ export const getAgentPackagesTool: ToolDefinition = {
   spec: {
     name: 'get_agent_packages',
     description:
-      'Lists installed software packages (name, version, architecture, vendor) for one agent. ' +
-      'Use for "what software/packages are installed on agent X" questions.',
+      'Lists installed software packages (name, version, architecture, vendor) for one agent ' +
+      '(host/machine/endpoint). Use for "what software/packages are installed on agent X" ' +
+      `questions. ${INVENTORY_CURRENT_STATE_NOTE}`,
     parameters: objectSchema(
       {
         agent_id: {

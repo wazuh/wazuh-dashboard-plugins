@@ -229,6 +229,34 @@ export function objectSchema(
 }
 
 /**
+ * Negative-scope + vocabulary note appended to every finding-hits tool's `spec.description` --
+ * the fix for a measured failure ("give me everything that happened on X") where two different
+ * model families silently substituted a narrower rule-matched-only search and reported "nothing
+ * happened" instead of saying no rule fired. Kept as one shared string so all 8 (see
+ * `STANDARD_FINDING_TABLE_COLUMNS`'s doc comment below) finding-hits tools carry identical
+ * wording rather than independently-drifting paraphrases -- every finding-hits tool description
+ * appends this verbatim. "alerts/hits/signals" is the synonym vocabulary analysts use for
+ * "findings"; the model matches on this text at tool-choice time, not against a fixed keyword map.
+ */
+export const FINDING_SCOPE_NOTE =
+  'Covers rule-matched detections (alerts/hits/signals) only -- never the raw, unmatched event ' +
+  'stream; if this returns 0 rows, say so plainly rather than reporting nothing happened.';
+
+/** Current-state note appended to the 4 vulnerability tools' descriptions: `wazuh-states-
+ * vulnerabilities*` is a snapshot, not a timeline, so there is no "solved/resolved" history to
+ * report -- see also `server/prompts.ts`'s matching instruction, which this makes visible at
+ * tool-choice time too, not only after a tool is already picked. */
+export const VULN_CURRENT_STATE_NOTE =
+  'Reflects current vulnerability state only -- no patched/unpatched history over time.';
+
+/** Current-state note appended to the syscollector inventory tools' descriptions (and, from issue
+ * 12's consolidation onward, to `get_agent_inventory`'s): `wazuh-states-inventory-*` is a snapshot
+ * written at scan/collection time, not an event-time record, so it answers "what does agent X look
+ * like now", never "what did it look like when finding Y fired". */
+export const INVENTORY_CURRENT_STATE_NOTE =
+  'Reflects current state only, not the state at any past event time.';
+
+/**
  * Shared baseline `tableSpec.columns`/`digest.sampleColumns` for the 8 finding-hits tools
  * (get_critical_findings, get_findings_by_time, get_brute_force, get_suspicious_powershell,
  * search_findings_by_agent, search_findings_by_multiple_agents, search_findings_by_rule_title,

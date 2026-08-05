@@ -3,6 +3,7 @@ import {
   findingDigestColumns,
   findingRowFields,
   clampLimit,
+  FINDING_SCOPE_NOTE,
   limitProperty,
   objectSchema,
   resolveTimeRange,
@@ -52,8 +53,9 @@ export const searchFindingsByRuleTagTool: ToolDefinition = {
     name: 'search_findings_by_rule_tag',
     description:
       'Searches security findings belonging to one or more rule classification tags ' +
-      '(wazuh.rule.tags), within a time range, most recent first. Use this for "which/what kind ' +
-      'of findings" questions about a category of activity (logins, SSH, sudo, file integrity, ' +
+      `(wazuh.rule.tags), within a time range, most recent first. ${FINDING_SCOPE_NOTE} Use ` +
+      'this for "which/what kind of findings" questions about a category of activity (logins, ' +
+      'SSH, sudo, file integrity, ' +
       'authentication) when you do not know the exact numeric rule ID -- never guess a ' +
       'wazuh.rule.id. The exact tag vocabulary is deployment-specific: if you are unsure what tag ' +
       'to use, first aggregate with get_top_rules to see the real rules/tags in the data rather ' +

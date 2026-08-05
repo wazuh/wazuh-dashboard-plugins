@@ -3,6 +3,7 @@ import {
   findingDigestColumns,
   findingRowFields,
   clampLimit,
+  FINDING_SCOPE_NOTE,
   limitProperty,
   objectSchema,
   resolveTimeRange,
@@ -39,7 +40,8 @@ export const getBruteForceTool: ToolDefinition = {
     name: 'get_brute_force',
     description:
       'Searches security findings for brute-force / repeated authentication-failure findings ' +
-      'within a time range (MITRE technique T1110 or its rule tags), most recent first.',
+      `within a time range (MITRE technique T1110 or its rule tags), most recent first. ` +
+      FINDING_SCOPE_NOTE,
     parameters: objectSchema({
       limit: limitProperty(
         'Max number of findings to return (default 20, max 500).',

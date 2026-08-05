@@ -3,6 +3,7 @@ import {
   findingDigestColumns,
   findingRowFields,
   clampLimit,
+  FINDING_SCOPE_NOTE,
   limitProperty,
   objectSchema,
   resolveTimeRange,
@@ -24,7 +25,7 @@ export const getSuspiciousPowershellTool: ToolDefinition = {
     name: 'get_suspicious_powershell',
     description:
       'Searches security findings for PowerShell-related activity within a time range, most ' +
-      'recent first. Use for "suspicious PowerShell activity" questions.',
+      `recent first. Use for "suspicious PowerShell activity" questions. ${FINDING_SCOPE_NOTE}`,
     parameters: objectSchema({
       limit: limitProperty(
         'Max number of findings to return (default 20, max 500).',

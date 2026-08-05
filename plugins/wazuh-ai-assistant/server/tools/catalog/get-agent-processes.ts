@@ -1,6 +1,7 @@
 import { ToolDefinition } from '../types';
 import {
   clampLimit,
+  INVENTORY_CURRENT_STATE_NOTE,
   limitProperty,
   objectSchema,
   validateAgentId,
@@ -23,9 +24,9 @@ export const getAgentProcessesTool: ToolDefinition = {
   spec: {
     name: 'get_agent_processes',
     description:
-      'Lists running processes (PID, name, state, command line) for one agent. Use for "what ' +
-      'processes are running on agent X" questions. Note: process owner/user is not available ' +
-      'in Wazuh 5.0 process inventory.',
+      'Lists running processes (PID, name, state, command line) for one agent (host/machine/' +
+      'endpoint). Use for "what processes are running on agent X" questions. Note: process ' +
+      `owner/user is not available in Wazuh 5.0 process inventory. ${INVENTORY_CURRENT_STATE_NOTE}`,
     parameters: objectSchema(
       {
         agent_id: {

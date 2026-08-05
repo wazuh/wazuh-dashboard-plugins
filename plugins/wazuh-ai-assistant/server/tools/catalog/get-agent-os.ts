@@ -1,5 +1,9 @@
 import { ToolDefinition } from '../types';
-import { objectSchema, validateAgentId } from './common';
+import {
+  INVENTORY_CURRENT_STATE_NOTE,
+  objectSchema,
+  validateAgentId,
+} from './common';
 
 /**
  * Wazuh 5.0 rewrite: the 4.14 Manager endpoint
@@ -13,8 +17,9 @@ export const getAgentOsTool: ToolDefinition = {
   spec: {
     name: 'get_agent_os',
     description:
-      'Retrieves operating system details (name, version, platform, architecture) for one agent. ' +
-      'Use for "what OS is agent X running" questions.',
+      'Retrieves operating system details (name, version, platform, architecture) for one agent ' +
+      '(host/machine/endpoint). Use for "what OS is agent X running" questions. ' +
+      INVENTORY_CURRENT_STATE_NOTE,
     parameters: objectSchema(
       {
         agent_id: {

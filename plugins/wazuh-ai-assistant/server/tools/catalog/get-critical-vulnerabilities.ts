@@ -3,6 +3,7 @@ import {
   clampLimit,
   limitProperty,
   objectSchema,
+  VULN_CURRENT_STATE_NOTE,
   VULN_DIGEST_SAMPLE_COLUMNS,
   VULN_SOURCE_FIELDS,
 } from './common';
@@ -16,7 +17,8 @@ export const getCriticalVulnerabilitiesTool: ToolDefinition = {
   spec: {
     name: 'get_critical_vulnerabilities',
     description:
-      'Lists active critical-severity vulnerabilities and the agents affected by them.',
+      'Lists active critical-severity vulnerabilities and the agents (hosts/machines) affected ' +
+      `by them. ${VULN_CURRENT_STATE_NOTE}`,
     parameters: objectSchema({
       limit: limitProperty(
         'Max number of vulnerabilities to return (default 20, max 500).',

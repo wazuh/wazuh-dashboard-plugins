@@ -3,6 +3,7 @@ import {
   findingDigestColumns,
   findingRowFields,
   clampLimit,
+  FINDING_SCOPE_NOTE,
   limitProperty,
   objectSchema,
   resolveTimeRange,
@@ -45,10 +46,10 @@ export const searchFindingsByRuleTitleTool: ToolDefinition = {
   spec: {
     name: 'search_findings_by_rule_title',
     description:
-      'Searches security findings for findings triggered by one or more exact rule titles, ' +
-      'within a time range, most recent first. Use when the question names a specific rule by ' +
-      'its exact title text. If unsure of the exact title, first aggregate with get_top_rules ' +
-      'rather than guessing one.',
+      'Searches security findings triggered by one or more exact rule titles, within a time ' +
+      `range, most recent first. ${FINDING_SCOPE_NOTE} Use when the question names a specific ` +
+      'rule by its exact title text. If unsure of the exact title, first aggregate with ' +
+      'get_top_rules rather than guessing one.',
     parameters: objectSchema(
       {
         rule_titles: {
