@@ -13,6 +13,7 @@ import {
   ASSISTANT_SETTINGS_ID,
   ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE,
   API_PATHS,
+  MANAGER_SESSION_EXPIRED_COPY,
   PROVIDER_SAVED_OBJECT_TYPE,
   PROVIDER_TYPES,
 } from '../../common/constants';
@@ -217,7 +218,8 @@ function tokenMissingOrExpiredMessage(
   administratorRequirements: string | null,
 ): string {
   return (
-    'Your Wazuh Manager API session is missing or expired. Open any page of the main Wazuh ' +
+    // Built from MANAGER_SESSION_EXPIRED_COPY so the client-side heal/retry trigger
+    `Your Wazuh Manager API ${MANAGER_SESSION_EXPIRED_COPY}. Open any page of the main Wazuh ` +
     'app (or reload and log in again) to establish it, then retry saving. ' +
     `(${administratorRequirements})`
   );

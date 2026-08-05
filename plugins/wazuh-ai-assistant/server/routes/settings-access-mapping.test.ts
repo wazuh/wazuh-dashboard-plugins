@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { MANAGER_SESSION_EXPIRED_COPY } from '../../common/constants';
 import { describeAdministratorRequirement } from './settings';
 
 // The reference plugin's live `isAdministratorUser` Manager
@@ -40,4 +41,24 @@ test('describeAdministratorRequirement: null reason falls back to the generic me
   const message = describeAdministratorRequirement(null);
   assert.match(message, /Administrator privileges are required/);
   assert.ok(!message.includes('('));
+});
+
+// Contract with the client-side heal/retry (public/services/session-heal.ts): every token-shaped
+// reason must surface a copy containing MANAGER_SESSION_EXPIRED_COPY, or a future rewording would
+// silently disable client healing.
+test('every token-shaped reason carries the shared MANAGER_SESSION_EXPIRED_COPY substring', () => {
+  const tokenShapedReasons = [
+    'No token provider',
+    'Token is not valid',
+    'No API id provided',
+    'It could not check if the current user is administrator due to: Request failed with status code 401',
+  ];
+  for (const reason of tokenShapedReasons) {
+    assert.ok(
+      describeAdministratorRequirement(reason).includes(
+        MANAGER_SESSION_EXPIRED_COPY,
+      ),
+      `copy for "${reason}" lost the shared substring`,
+    );
+  }
 });

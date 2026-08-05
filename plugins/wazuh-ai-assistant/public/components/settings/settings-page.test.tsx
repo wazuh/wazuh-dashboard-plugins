@@ -28,8 +28,13 @@ jest.mock('../../services/settings-service', () => ({
   SettingsService: jest.fn(() => mockService),
 }));
 
+// The page derives canSave/accessMessage/apiKeyEncryptionEnabled from ensureManagerSession's
+// resolved value now (the probe→heal→re-probe choreography lives in the service, tested there).
+const mockEnsureManagerSession = jest.fn();
+
 jest.mock('../../services/session-heal', () => ({
-  healManagerSession: jest.fn().mockResolvedValue(false),
+  ensureManagerSession: (...args: unknown[]) =>
+    mockEnsureManagerSession(...args),
 }));
 
 import { SettingsPage } from './settings-page';
@@ -48,6 +53,12 @@ beforeEach(() => {
   mockService.getSettingsAccess.mockResolvedValue({
     administrator: true,
     message: null,
+  });
+  mockEnsureManagerSession.mockResolvedValue({
+    administrator: true,
+    message: null,
+    defaultApiHostId: 'default',
+    apiKeyEncryptionEnabled: true,
   });
   mockService.test.mockResolvedValue({
     success: true,
@@ -135,9 +146,11 @@ describe('SettingsPage — field policy filter', () => {
 
 describe('SettingsPage — RBAC tooltip on disabled Save buttons', () => {
   it('renders the access message when the user is not an administrator', async () => {
-    mockService.getSettingsAccess.mockResolvedValue({
+    mockEnsureManagerSession.mockResolvedValue({
       administrator: false,
       message: 'Administrator role required to change settings.',
+      defaultApiHostId: 'default',
+      apiKeyEncryptionEnabled: true,
     });
 
     render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
@@ -148,5 +161,19 @@ describe('SettingsPage — RBAC tooltip on disabled Save buttons', () => {
           .length,
       ).toBeGreaterThan(0);
     });
+  });
+
+  it('fails open (no callout, saving not blocked) when the access probe itself fails', async () => {
+    mockEnsureManagerSession.mockResolvedValue(null);
+
+    render(<SettingsPage core={coreMock} onProvidersChanged={jest.fn()} />);
+
+    await waitFor(() => expect(mockEnsureManagerSession).toHaveBeenCalled());
+    expect(
+      screen.queryByText(/administrator role required/i),
+    ).not.toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: /add provider/i }),
+    ).toBeEnabled();
   });
 });
