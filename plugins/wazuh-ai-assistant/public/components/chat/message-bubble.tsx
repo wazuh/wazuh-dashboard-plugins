@@ -1,13 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   EuiPanel,
   EuiText,
   EuiTextColor,
   EuiSpacer,
-  EuiLoadingSpinner,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiAccordion,
+  EuiBadge,
   EuiAvatar,
   EuiButtonEmpty,
   EuiCodeBlock,
@@ -19,6 +18,7 @@ import { ChatRole, TableSpec, ToolCall } from '../../../common/types';
 import { ResultTable } from './result-table';
 import { ResolveDiscoverUrl } from './discover-link';
 import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
+import { describeToolCall } from './tool-call-label';
 
 /**
  * "This turn was cut short" affordance, rendered in two places: inside an interrupted assistant
@@ -72,8 +72,9 @@ export interface UiChatMessage {
   statusMessage?: string;
   createdAt: number;
   /**
-   * The tool calls this turn ran, shown as a collapsed "query executed" panel so the reader can see
-   * exactly what was asked of the indexer or the Manager API rather than having to trust the prose.
+   * The tool calls this turn ran, shown as small provenance chips in the message meta row so the
+   * reader can see exactly what was asked of the indexer or the Manager API rather than having to
+   * trust the prose — the raw name/arguments/DSL are one click deeper, never on screen unbidden.
    * Real-form arguments (the server reverses pseudonyms before emitting the `tool_call` event).
    */
   toolCalls?: ToolCall[];
@@ -130,6 +131,30 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   const isUser = message.role === 'user';
   const isWaitingForFirstToken =
     !isUser && message.isStreaming === true && message.content === '';
+  const toolCalls = message.toolCalls ?? [];
+  // One open/closed state PER chip, keyed by what that chip reveals. A single shared panel was
+  // tried first and was wrong twice over: clicking one query opened every query on the turn, and
+  // because the panel rendered above the chips it pushed them down, so the control that closed it
+  // was no longer where the reader had just clicked. A chip now opens exactly the thing it names,
+  // directly beneath itself, and the same click closes it.
+  const [openRawIds, setOpenRawIds] = useState<Set<string>>(new Set());
+  const rawViewId = `wzAiQueryRaw-${message.id}`;
+  const toggleRawId = (id: string) =>
+    setOpenRawIds(previous => {
+      const next = new Set(previous);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  // No chip for the table's executed DSL: `buildDiscoverUrl` (common/discover-url.ts) already
+  // embeds that exact query in the "Open in Discover" link as a filter named "AI Assistant query",
+  // so the table's own link shows the reader the literal query that ran — in a surface built for
+  // reading queries. A second copy in the meta row was the same query at a lower abstraction
+  // level, competing with the chips that answer the question people actually ask of an answer:
+  // what did it look for?
   // color="plain" keeps both avatars on the same neutral background, so the pair reads as one
   // set instead of picking up EUI's auto-assigned per-name colors.
   const avatar = isUser ? (
@@ -155,6 +180,14 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
     />
   );
 
+  // Prose keeps a fixed reading measure even when the turn is wide. A turn carrying a table
+  // widens to the full column so the table fits (see the wrapper below), and without this the
+  // answer's sentences inherited that width and ran to ~117 characters a line — roughly 60% past
+  // the point where the eye reliably finds the next line, which reads as a wall of text. Only
+  // block content (the table, the raw query view) is allowed to use the extra width.
+  const PROSE_MEASURE = 720;
+  const proseStyle: React.CSSProperties = { maxWidth: PROSE_MEASURE };
+
   const bubbleContent = (
     <>
       {isUser || message.isStreaming ? (
@@ -162,6 +195,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         // branch also covers): announces incoming delta tokens to screen readers, which
         // otherwise stay silent for the whole stream since nothing else here changes focus.
         <div
+          style={proseStyle}
           {...(!isUser
             ? {
                 'aria-live': 'polite' as const,
@@ -192,9 +226,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           </EuiText>
         </div>
       ) : (
-        <EuiText size='s'>
-          <EuiMarkdownFormat>{message.content}</EuiMarkdownFormat>
-        </EuiText>
+        <div style={proseStyle}>
+          <EuiText size='s'>
+            <EuiMarkdownFormat>{message.content}</EuiMarkdownFormat>
+          </EuiText>
+        </div>
       )}
       {message.table && (
         <>
@@ -206,90 +242,36 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           />
         </>
       )}
-      {/* What was actually run, collapsed by default: the answer is only as trustworthy as the
-            query behind it, and an analyst has to be able to check that query without reading
-            server logs. Shows each tool call's real-form arguments and, for an indexer search, the
-            executed DSL the table carries (the same one "Open in Discover" uses). */}
-      {message.toolCalls && message.toolCalls.length > 0 && (
-        <>
-          <EuiSpacer size='s' />
-          <EuiAccordion
-            id={`wzAiQuery-${message.id}`}
-            paddingSize='s'
-            buttonContent={
-              <EuiText size='xs'>
-                <EuiTextColor color='subdued'>
-                  {i18n.translate('wazuhAiAssistant.chat.queryDetails', {
-                    defaultMessage:
-                      '{count, plural, one {# query executed} other {# queries executed}}',
-                    values: { count: message.toolCalls.length },
-                  })}
-                </EuiTextColor>
-              </EuiText>
-            }
-          >
-            {message.toolCalls.map(toolCall => (
-              <div key={toolCall.id}>
-                <EuiText size='xs'>
-                  <strong>{toolCall.name}</strong>
-                </EuiText>
-                <EuiSpacer size='xs' />
-                <EuiCodeBlock
-                  language='json'
-                  paddingSize='s'
-                  fontSize='s'
-                  isCopyable
-                  overflowHeight={240}
-                >
-                  {JSON.stringify(toolCall.arguments, null, 2)}
-                </EuiCodeBlock>
-                <EuiSpacer size='s' />
-              </div>
-            ))}
-            {message.table?.discover && (
-              <>
-                <EuiText size='xs'>
-                  <strong>
-                    {i18n.translate('wazuhAiAssistant.chat.queryIndex', {
-                      defaultMessage: 'Index: {index}',
-                      values: { index: message.table.discover.index },
-                    })}
-                  </strong>
-                </EuiText>
-                <EuiSpacer size='xs' />
-                <EuiCodeBlock
-                  language='json'
-                  paddingSize='s'
-                  fontSize='s'
-                  isCopyable
-                  overflowHeight={240}
-                >
-                  {JSON.stringify(message.table.discover.dsl, null, 2)}
-                </EuiCodeBlock>
-              </>
-            )}
-          </EuiAccordion>
-        </>
-      )}
-      {/* An interrupted answer is labelled as one rather than left looking complete — the whole
-            point is that the reader can tell this text stops mid-thought on purpose. */}
-      {message.interrupted && !message.isStreaming && (
-        <>
-          <EuiSpacer size='xs' />
-          <InterruptedTurnNotice onRetry={onRetry} />
-        </>
-      )}
     </>
   );
 
   const bubble = (
-    <EuiFlexItem grow={false} style={{ maxWidth: '75%', minWidth: 180 }}>
+    <EuiFlexItem
+      grow={false}
+      style={{
+        // The user turn keeps its 75% share (a question is always prose); the assistant turn
+        // gets a readable 720px prose measure EXCEPT when it carries a result table, which uses
+        // the full column width instead — a wide table squeezed into 75% of an already-narrow
+        // column forced a horizontal scrollbar inside the table's own 400px scroller.
+        maxWidth: isUser ? '75%' : message.table ? '100%' : 720,
+        minWidth: 180,
+      }}
+    >
       {isUser ? (
+        // The question is a discrete card; the answer is undecorated prose on the canvas, so the
+        // two roles never read as the same kind of thing. `color='plain'` (empty shade) over the
+        // page's own light-grey background is what actually separates them: a `subdued` fill sits
+        // within ~2% luminance of that background and, with no border, made the question
+        // effectively invisible. The border is the guarantee — it holds the edge in both themes
+        // regardless of how close the two fills are, and matches the Home Overview's own
+        // hairline-bordered, shadowless panel signature.
         <EuiPanel
           color='plain'
           paddingSize='m'
           hasShadow={false}
           hasBorder
+          // The one deliberate radius override on the surface: a conversation turn reads as a
+          // bubble, not as a data panel. Everything else uses EUI defaults (see chat-page.scss).
           style={{ borderRadius: 14 }}
         >
           {bubbleContent}
@@ -297,39 +279,111 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       ) : (
         <div style={{ padding: '8px 0' }}>{bubbleContent}</div>
       )}
-      <EuiText
-        size='xs'
-        color='subdued'
-        textAlign={isUser ? 'right' : 'left'}
-        className='wzAiAssistantMessageTimestamp'
+      {/* Meta row: an interrupted-turn notice (assistant only, left of the timestamp) plus the
+            timestamp plus, for an assistant turn that ran tool calls, one provenance chip per
+            call — clicking any of them toggles the shared raw view above (default collapsed,
+            wired via aria-expanded/aria-controls). Anchoring the interrupted notice here instead
+            of as its own floating line keeps it attached to the turn it belongs to. */}
+      <EuiFlexGroup
+        gutterSize='xs'
+        alignItems='center'
+        responsive={false}
+        justifyContent={isUser ? 'flexEnd' : 'flexStart'}
+        wrap
       >
-        <p style={{ margin: '2px 4px 0' }}>
-          {formatTimestamp(message.createdAt)}
-        </p>
-      </EuiText>
+        {!isUser && message.interrupted && !message.isStreaming && (
+          <EuiFlexItem grow={false}>
+            <InterruptedTurnNotice onRetry={onRetry} />
+          </EuiFlexItem>
+        )}
+        <EuiFlexItem grow={false}>
+          <EuiText
+            size='xs'
+            color='subdued'
+            textAlign={isUser ? 'right' : 'left'}
+            className='wzAiAssistantMessageTimestamp'
+          >
+            <p
+              style={{
+                margin: '4px 4px 0',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {formatTimestamp(message.createdAt)}
+            </p>
+          </EuiText>
+        </EuiFlexItem>
+        {!isUser &&
+          toolCalls.map(toolCall => {
+            const { short, full } = describeToolCall(toolCall, message.table);
+            const isRawOpen = openRawIds.has(toolCall.id);
+            return (
+              <EuiFlexItem grow={false} key={toolCall.id}>
+                <EuiBadge
+                  color={isRawOpen ? 'default' : 'hollow'}
+                  iconType='search'
+                  title={full}
+                  onClick={() => toggleRawId(toolCall.id)}
+                  onClickAriaLabel={i18n.translate(
+                    'wazuhAiAssistant.chat.queryChipAriaLabel',
+                    {
+                      defaultMessage: 'Show the executed query: {label}',
+                      values: { label: full },
+                    },
+                  )}
+                  aria-expanded={isRawOpen}
+                  aria-controls={`${rawViewId}-${toolCall.id}`}
+                >
+                  {short}
+                </EuiBadge>
+              </EuiFlexItem>
+            );
+          })}
+      </EuiFlexGroup>
+      {/* Each open chip's content, BELOW the chip row: the chip stays exactly where it was
+            clicked, so the same click closes what it opened. The answer is only as trustworthy as
+            the query behind it, and an analyst has to be able to check that query without reading
+            server logs — but nothing here is on screen unbidden. */}
+      {!isUser &&
+        toolCalls
+          .filter(toolCall => openRawIds.has(toolCall.id))
+          .map(toolCall => (
+            <div
+              key={toolCall.id}
+              id={`${rawViewId}-${toolCall.id}`}
+              style={proseStyle}
+            >
+              <EuiSpacer size='xs' />
+              <EuiText size='xs'>
+                <strong>{toolCall.name}</strong>
+              </EuiText>
+              <EuiSpacer size='xs' />
+              <EuiCodeBlock
+                language='json'
+                paddingSize='s'
+                fontSize='s'
+                isCopyable
+              >
+                {JSON.stringify(toolCall.arguments, null, 2)}
+              </EuiCodeBlock>
+            </div>
+          ))}
     </EuiFlexItem>
   );
 
+  // One loading indicator while streaming, not two: the avatar-mounted spinner that used to sit
+  // alongside the in-bubble EuiLoadingContent skeleton/status line is gone — that pair read as two
+  // independent "something is happening" signals for the same event.
   const avatarItem = (
     <EuiFlexItem grow={false}>
       <EuiFlexGroup direction='column' alignItems='center' gutterSize='xs'>
         <EuiFlexItem grow={false}>{avatar}</EuiFlexItem>
-        {message.isStreaming && (
-          <EuiFlexItem grow={false}>
-            <EuiLoadingSpinner
-              size='s'
-              aria-label={i18n.translate('wazuhAiAssistant.chat.generating', {
-                defaultMessage: 'Generating response',
-              })}
-            />
-          </EuiFlexItem>
-        )}
       </EuiFlexGroup>
     </EuiFlexItem>
   );
 
   return (
-    // wzMsgRow (chat-page.tsx's CHAT_SURFACE_STYLES): a reduced-motion-guarded fade/slide-up that
+    // wzMsgRow (chat-page.scss): a reduced-motion-guarded fade/slide-up that
     // plays once when this row is first inserted into the DOM. Applying the class unconditionally
     // (not toggled by any state) is what keeps it a MOUNT-only effect — a later re-render of this
     // same MessageBubble instance (a streamed delta, a table arriving, etc.) never re-inserts the

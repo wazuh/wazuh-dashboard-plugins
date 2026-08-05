@@ -162,6 +162,54 @@ describe('ConversationList', () => {
     expect(screen.getByText('Other one').style.fontWeight).toBe('');
   });
 
+  describe('delete button visibility (WCAG 1.4.11)', () => {
+    it('is invisible at rest (opacity 0, never a low-contrast in-between value)', () => {
+      render(
+        <ConversationList
+          conversations={[conversation()]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+        />,
+      );
+
+      const deleteButton = screen.getByRole('button', {
+        name: 'Delete conversation',
+      });
+      expect(
+        (deleteButton.closest('[style]') as HTMLElement).style.opacity,
+      ).toBe('0');
+    });
+
+    it('becomes visible on keyboard focus, not just mouse hover', () => {
+      render(
+        <ConversationList
+          conversations={[conversation()]}
+          isLoading={false}
+          activeConversationId={null}
+          onSelect={noop}
+          onNewConversation={noop}
+          onDelete={noop}
+        />,
+      );
+
+      const deleteButton = screen.getByRole('button', {
+        name: 'Delete conversation',
+      });
+      fireEvent.focus(deleteButton);
+      expect(
+        (deleteButton.closest('[style]') as HTMLElement).style.opacity,
+      ).toBe('1');
+
+      fireEvent.blur(deleteButton);
+      expect(
+        (deleteButton.closest('[style]') as HTMLElement).style.opacity,
+      ).toBe('0');
+    });
+  });
+
   describe('delete flow', () => {
     it('clicking the trash icon opens a confirm modal without triggering onSelect', () => {
       const onSelect = jest.fn();
