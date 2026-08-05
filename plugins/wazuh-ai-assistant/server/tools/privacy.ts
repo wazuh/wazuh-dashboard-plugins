@@ -97,6 +97,18 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // by the outbound applyToText scrub in chat.ts.
   { field: 'vulnerability.score.base', action: 'allow' },
   { field: 'package.architecture', action: 'allow' },
+  // get_events_by_agent (issue: "Add a typed events tool over wazuh-events-v5") reads the raw ECS
+  // event stream, whose agent identifier is bare `agent.name`/`agent.id` -- NOT the
+  // `wazuh.agent.name`/`wazuh.agent.id` findings-index spelling above, see that tool's doc comment
+  // for the field-name verification trail. `agent.name` is a hostname, same privacy treatment as
+  // WAZUH_FIELD.AGENT_NAME; `agent.id` is a structural identifier, same treatment as
+  // WAZUH_FIELD.AGENT_ID. `event.category`/`event.action`/`event.outcome` are the engine's own
+  // curated ECS taxonomy words (not analyst/attacker-supplied), same class as wazuh.rule.category.
+  { field: 'agent.name', action: 'anonymize', kind: 'HOST' },
+  { field: 'agent.id', action: 'allow' },
+  { field: 'event.category', action: 'allow' },
+  { field: 'event.action', action: 'allow' },
+  { field: 'event.outcome', action: 'allow' },
 ];
 
 export type PseudonymKind = 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';

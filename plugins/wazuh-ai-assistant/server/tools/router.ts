@@ -52,6 +52,15 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   search_findings_by_agent: 'findings',
   get_top_rules: 'findings',
   get_findings_by_time: 'findings',
+  // get_events_by_agent (issue: "Add a typed events tool over wazuh-events-v5") targets the raw
+  // event stream, not findings -- but it is filed under 'findings' rather than a new 'events'
+  // category. Rationale: a dedicated category costs one more line on the stage-1 routing menu
+  // (CATEGORY_DESCRIPTIONS) on EVERY turn regardless of whether it is ever picked, and users
+  // conflate "what happened"/"events" with "findings" in exactly the way the issue's own
+  // reproduction shows (a findings-only tool call for an "everything that happened" question) --
+  // filing this under 'findings' means it is reachable whenever the model (mis)routes an
+  // events-shaped question there, which is the common case, at zero extra stage-1 cost.
+  get_events_by_agent: 'findings',
   get_brute_force: 'findings',
   get_security_summary: 'findings',
   get_suspicious_powershell: 'findings',
@@ -119,7 +128,8 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'Agent listing by status (active, pending, never_connected, disconnected) and/or agent ID.',
   findings:
     'Finding search/summaries: critical findings, by agent/rule/rule-tag/OS/time, top rules, ' +
-    'brute-force, suspicious PowerShell, general security summary.',
+    'brute-force, suspicious PowerShell, general security summary. Also covers the raw/normalized ' +
+    'event stream ("everything that happened", matched or not).',
   vulnerabilities:
     'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only.',
   fim: 'File Integrity Monitoring: current state of monitored files (path, mtime, owner, hashes).',
