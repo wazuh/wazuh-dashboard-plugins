@@ -160,6 +160,60 @@ test('chatStream: a normal delta.content stream is unchanged (regression) — no
   );
 });
 
+test('chatStream: reasoning deltas followed by a tool call, closed only by [DONE] (no finish_reason, no content) -- must yield the tool call and NO delta text', async () => {
+  // The hazard this guards against: a provider can close a tool round through the `[DONE]` exit
+  // without ever sending `finish_reason: 'tool_calls'` (gpt-oss/Groq happens to send it, but
+  // nothing in the wire format guarantees that). Reasoning routinely precedes a tool call on the
+  // analysis channel, so `reasoningBuffer` is typically non-empty exactly when this happens --
+  // without the `hadToolCalls` gate, that buffered chain-of-thought would be injected as if it
+  // were the answer for what is actually a TOOL round with no answer due yet.
+  const body = sseBody([
+    {
+      choices: [
+        {
+          index: 0,
+          delta: {
+            reasoning: 'I should check the agent list.',
+            channel: 'analysis',
+          },
+        },
+      ],
+    },
+    {
+      choices: [
+        {
+          index: 0,
+          delta: {
+            tool_calls: [
+              {
+                index: 0,
+                id: 'call_1',
+                function: { name: 'get_agents', arguments: '{}' },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ]);
+  const events = await withFakeFetch(body, () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('list active agents')],
+        controller.signal,
+      ),
+    );
+  });
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['tool_call', 'done'],
+    "no delta event must be emitted -- the buffered reasoning must not leak into a tool round's answer text",
+  );
+});
+
 test('chatStream: a stream with neither content nor reasoning still ends cleanly with just done (no phantom fallback text)', async () => {
   const body = sseBody([{ choices: [{ index: 0, delta: {} }] }]);
   const events = await withFakeFetch(body, () => {
