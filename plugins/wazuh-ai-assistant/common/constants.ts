@@ -31,6 +31,10 @@ export const API_PATHS = {
   CONVERSATION_BY_ID: (id: string) => `${API_ROOT}/conversations/${id}`,
 } as const;
 
+/** Substring contract between server/routes/settings.ts's token-failure copy and the client-side
+ * session heal/retry (public/services/session-heal.ts) — reword only in both directions at once. */
+export const MANAGER_SESSION_EXPIRED_COPY = 'session is missing or expired';
+
 /** Saved object type used to persist provider configuration. */
 export const PROVIDER_SAVED_OBJECT_TYPE = 'wazuh-ai-assistant-provider';
 

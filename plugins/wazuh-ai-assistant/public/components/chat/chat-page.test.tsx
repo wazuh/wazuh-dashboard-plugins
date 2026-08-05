@@ -36,7 +36,7 @@ const mockSettingsService = {
   getAssistantSettings: jest.fn(),
   getSettingsAccess: jest.fn(),
 };
-const mockHealManagerSession = jest.fn();
+const mockEnsureManagerSession = jest.fn();
 const mockOpenConfirm = jest.fn();
 
 jest.mock('../../services/chat-service', () => ({
@@ -63,7 +63,8 @@ jest.mock('../../services/settings-service', () => ({
 }));
 
 jest.mock('../../services/session-heal', () => ({
-  healManagerSession: (...args: unknown[]) => mockHealManagerSession(...args),
+  ensureManagerSession: (...args: unknown[]) =>
+    mockEnsureManagerSession(...args),
 }));
 
 jest.mock('./discover-link', () => ({
@@ -246,6 +247,8 @@ beforeEach(() => {
   // real navigation for that, only for pushState/replaceState-driven changes).
   window.history.replaceState(null, '', '/');
   window.sessionStorage.clear();
+  // startTurn awaits this pre-turn guard; `null` (probe failed, fail-open) is the neutral default.
+  mockEnsureManagerSession.mockResolvedValue(null);
   mockSettingsService.getAssistantSettings.mockResolvedValue({
     privacyDefaultOn: false,
     privacyDefaultPerProvider: {},
@@ -1370,5 +1373,34 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
       expect(screen.getByText('earlier question')).toBeInTheDocument(),
     );
     expect(mockOpenConfirm).not.toHaveBeenCalled();
+  });
+});
+
+describe('ChatPage — pre-turn Manager session guard (issue #8826)', () => {
+  it('ensures the Manager session (60s memo) before the chat stream fires', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('hello');
+
+    expect(mockEnsureManagerSession).toHaveBeenCalledWith(expect.anything(), {
+      maxAgeMs: 60_000,
+    });
+    // The guard must settle before the stream request is issued.
+    expect(mockEnsureManagerSession.mock.invocationCallOrder[0]).toBeLessThan(
+      mockStreamChat.mock.invocationCallOrder[0],
+    );
+    stream.end();
+  });
+
+  it('does not run the mount-time access-probe heal any more', async () => {
+    renderChatPage();
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalled(),
+    );
+    expect(mockSettingsService.getSettingsAccess).not.toHaveBeenCalled();
   });
 });

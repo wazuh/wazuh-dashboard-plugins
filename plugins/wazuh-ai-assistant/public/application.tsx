@@ -14,6 +14,7 @@ import { i18n } from '@osd/i18n';
 import { ChatPage } from './components/chat/chat-page';
 import { SettingsPage } from './components/settings/settings-page';
 import { SettingsService } from './services/settings-service';
+import { ensureManagerSession } from './services/session-heal';
 import {
   interruptConfirmationText,
   interruptConfirmationTitle,
@@ -283,6 +284,10 @@ export const renderApp = (
       }),
     },
   ]);
+
+  // Proactive session heal on every app mount: establishes the Manager API cookies
+  // before any tab issues Manager-gated requests; pages' own calls share this in-flight execution.
+  void ensureManagerSession(core.http);
 
   const history = createHashHistory();
   const root = createRoot(element);
