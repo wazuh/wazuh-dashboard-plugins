@@ -21,7 +21,7 @@ import {
 } from '../../common/types';
 import { describeError } from '../../common/errors';
 import { getProviderAdapter } from '../providers/registry';
-import { ProviderAdapter } from '../providers/types';
+import { ChatStreamOptions, ProviderAdapter } from '../providers/types';
 import { buildSystemPrompt } from '../prompts';
 import { listToolSpecs } from '../tools/registry';
 import {
@@ -641,6 +641,10 @@ async function* runStage1Routing(
     {
       tools: [ROUTE_QUESTION_TOOL],
       toolChoice: { name: ROUTE_QUESTION_TOOL.name },
+      // Stage 1's only job is one structured pick out of a fixed enum (route_question's
+      // categories) — the lowest temperature Groq's tool-use guidance names (issue
+      // 05-set-temperature-for-tool-calls.md) is the right setting for that, not a range.
+      temperature: 0,
     },
   )) {
     if (signal.aborted) {
@@ -808,9 +812,19 @@ async function* orchestrate(
     // `if (options?.tools?.length)` guard (openai-compatible.ts/anthropic.ts) already omits
     // `tools`/`tool_choice` from the wire body whenever `tools` is empty/undefined, so this is a
     // structural terminator instead of a request-level one.
-    const streamOptions = isFinalRound
+    const streamOptions: ChatStreamOptions = isFinalRound
       ? {}
-      : { tools, toolChoice: 'auto' as const };
+      : {
+          tools,
+          toolChoice: 'auto',
+          // Tool-bearing round: keep sampling low, per Groq's tool-use guidance (0.0-0.5), since a
+          // high default temperature (Groq's is 1.0) is a documented contributing cause of
+          // malformed tool calls (issue 05-set-temperature-for-tool-calls.md). Only set when this
+          // round actually offers tools (`tools` is `undefined` on a `general`-routed, no-tool
+          // turn) — a plain-prose round has no structured output to protect and no reason to
+          // deviate from the provider's own default.
+          ...(tools?.length ? { temperature: 0.2 } : {}),
+        };
 
     // Outbound scrub: a fresh transformed COPY per round — `messages` itself keeps
     // accumulating unscrubbed below so later rounds re-scrub from the same source of truth.

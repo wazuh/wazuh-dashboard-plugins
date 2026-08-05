@@ -2,11 +2,13 @@ import assert from 'node:assert/strict';
 import { OpenAiCompatibleAdapter } from './openai-compatible';
 import { ChatMessage, ProviderConfig, StreamEvent } from '../../common/types';
 
-// Covers the reasoning-channel fallback (issue 02-read-reasoning-delta.md): some reasoning
-// models (gpt-oss, qwen3.x) stream their entire answer on `delta.reasoning` instead of
-// `delta.content`, which this adapter previously discarded outright, producing a billed-but-blank
-// answer. More coverage (final-round tools/tool_choice omission, temperature plumbing) is added
-// alongside those later fixes in this same file.
+// Covers three fixes that all land on this adapter's request/response handling:
+//  - the reasoning-channel fallback (issue 02-read-reasoning-delta.md): some reasoning models
+//    (gpt-oss, qwen3.x) stream their entire answer on `delta.reasoning` instead of
+//    `delta.content`, which this adapter previously discarded outright, producing a
+//    billed-but-blank answer;
+//  - the final-round tools/tool_choice omission (issue 03-tool-choice-none-final-round.md);
+//  - the outbound `temperature` plumbing (issue 05-set-temperature-for-tool-calls.md).
 
 function userMessage(content: string): ChatMessage {
   return { role: 'user', content };
@@ -227,4 +229,73 @@ test('chatStream: with `tools` present, the outbound body still carries `tools` 
   assert.equal(capturedBodies.length, 1);
   assert.ok('tools' in capturedBodies[0]);
   assert.equal(capturedBodies[0].tool_choice, 'auto');
+});
+
+// --- temperature plumbing (issue 05-set-temperature-for-tool-calls.md) ------------------------
+// chat.ts sets 0 for the stage-1 router call and 0.2 on tool-bearing orchestrate rounds; this
+// adapter's job is just to forward whatever is given, verbatim, including a literal 0.
+
+test('chatStream: options.temperature is forwarded verbatim on the outbound body, including 0', async () => {
+  const body = sseBody([{ choices: [{ index: 0, delta: { content: 'ok' } }] }]);
+  const capturedBodies = await withFakeFetchCapturingBody(body, async () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('route this')],
+        controller.signal,
+        { temperature: 0 },
+      ),
+    );
+  });
+  assert.equal(
+    capturedBodies[0].temperature,
+    0,
+    'temperature: 0 must survive -- a truthiness check would silently drop it',
+  );
+});
+
+test('chatStream: a tool-bearing request with temperature 0.2 carries it alongside tools', async () => {
+  const body = sseBody([{ choices: [{ index: 0, delta: { content: 'ok' } }] }]);
+  const capturedBodies = await withFakeFetchCapturingBody(body, async () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('list active agents')],
+        controller.signal,
+        {
+          tools: [
+            {
+              name: 'get_agents',
+              description: 'list agents',
+              parameters: { type: 'object', properties: {} },
+            },
+          ],
+          toolChoice: 'auto',
+          temperature: 0.2,
+        },
+      ),
+    );
+  });
+  assert.equal(capturedBodies[0].temperature, 0.2);
+  assert.ok('tools' in capturedBodies[0]);
+});
+
+test('chatStream: omitting options.temperature leaves the field out of the body entirely (regression -- no default injected)', async () => {
+  const body = sseBody([{ choices: [{ index: 0, delta: { content: 'ok' } }] }]);
+  const capturedBodies = await withFakeFetchCapturingBody(body, async () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('plain chat, no options')],
+        controller.signal,
+      ),
+    );
+  });
+  assert.ok(!('temperature' in capturedBodies[0]));
 });
