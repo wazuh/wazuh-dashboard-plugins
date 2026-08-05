@@ -14,22 +14,6 @@ import { WzRequest } from '../../../../../../react-services/wz-request';
 
 export default class StatusHandler {
   /**
-   * Get summary of agents
-   */
-  static async agentsSummary() {
-    try {
-      const result = await WzRequest.apiReq(
-        'GET',
-        `/agents/summary/status`,
-        {},
-      );
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
    * Get cluster nodes
    */
   static async clusterNodes() {
