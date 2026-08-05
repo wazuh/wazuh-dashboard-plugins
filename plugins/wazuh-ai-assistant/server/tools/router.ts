@@ -77,11 +77,10 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_mitre_findings: 'mitre',
   get_mitre_summary: 'mitre',
 
-  // inventory (syscollector)
-  get_agent_os: 'inventory',
-  get_agent_packages: 'inventory',
-  get_agent_ports: 'inventory',
-  get_agent_processes: 'inventory',
+  // inventory (syscollector) -- get_agent_os/get_agent_packages/get_agent_ports/
+  // get_agent_processes were consolidated into get_agent_inventory (issue: "Consolidate agent
+  // inventory into one tool"); this single entry replaces all four.
+  get_agent_inventory: 'inventory',
 
   // compliance
   get_compliance_alerts: 'compliance',
@@ -129,7 +128,8 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
   mitre:
     'MITRE ATT&CK technique/tactic findings and technique-frequency summaries.',
   inventory:
-    'Syscollector inventory: agent OS, installed packages, open ports, running processes.',
+    'Syscollector inventory: agent OS, installed packages, open ports, running processes, or ' +
+    'installed hotfixes.',
   compliance:
     'Compliance findings/summaries for any of 10 frameworks (PCI DSS, HIPAA, GDPR, ISO 27001, ' +
     'NIS2, NIST 800-171/800-53, FedRAMP, CMMC, TSC).',

@@ -16,10 +16,7 @@ import { getVulnerabilitiesTool } from './get-vulnerabilities';
 import { getCriticalVulnerabilitiesTool } from './get-critical-vulnerabilities';
 import { getVulnerabilitiesByAgentTool } from './get-vulnerabilities-by-agent';
 import { getVulnerabilityByCveTool } from './get-vulnerability-by-cve';
-import { getAgentOsTool } from './get-agent-os';
-import { getAgentPackagesTool } from './get-agent-packages';
-import { getAgentPortsTool } from './get-agent-ports';
-import { getAgentProcessesTool } from './get-agent-processes';
+import { getAgentInventoryTool } from './get-agent-inventory';
 
 /**
  * Colocated regression test for the "State tool scope and analyst vocabulary" fix (issue 10): the
@@ -50,12 +47,11 @@ const VULN_TOOLS = [
   getVulnerabilityByCveTool,
 ];
 
-const INVENTORY_TOOLS = [
-  getAgentOsTool,
-  getAgentPackagesTool,
-  getAgentPortsTool,
-  getAgentProcessesTool,
-];
+// The 4 pre-consolidation syscollector inventory tools (get_agent_os/get_agent_packages/
+// get_agent_ports/get_agent_processes) were folded into get_agent_inventory by issue 12 --
+// carrying INVENTORY_CURRENT_STATE_NOTE forward into the consolidated tool's description, so
+// this assertion targets that one tool instead of the 4 now-deleted files.
+const INVENTORY_TOOLS = [getAgentInventoryTool];
 
 test('every finding-hits tool description states the rule-matched-only negative scope', () => {
   for (const tool of FINDING_HITS_TOOLS) {
@@ -87,7 +83,7 @@ test('all 4 vulnerability tools state current-state-only scope', () => {
   }
 });
 
-test('all 4 pre-consolidation syscollector inventory tools state current-state-only scope', () => {
+test('get_agent_inventory states current-state-only scope', () => {
   for (const tool of INVENTORY_TOOLS) {
     assert.ok(
       tool.spec.description.includes(INVENTORY_CURRENT_STATE_NOTE),
