@@ -411,7 +411,7 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
         }}
         extraAction={
           (resolveDiscoverUrl && spec.discover) ||
-            (resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink) ? (
+          (resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink) ? (
             <EuiFlexGroup gutterSize='s' responsive={false}>
               {resolveDiscoverUrl && spec.discover ? (
                 <EuiFlexItem grow={false}>
