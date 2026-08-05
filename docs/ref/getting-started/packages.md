@@ -67,7 +67,6 @@ Automatically installed dependencies:
 
 ### Debian/Ubuntu
 
-- `debhelper` (>= 9)
 - `tar`
 - `curl`
 - `libcap2-bin`
