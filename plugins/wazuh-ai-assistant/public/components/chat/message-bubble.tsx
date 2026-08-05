@@ -316,10 +316,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         {!isUser &&
           toolCalls.map(toolCall => {
             const { short, full } = describeToolCall(toolCall, message.table);
+            const isRawOpen = openRawIds.has(toolCall.id);
             return (
               <EuiFlexItem grow={false} key={toolCall.id}>
                 <EuiBadge
-                  color='hollow'
+                  color={isRawOpen ? 'default' : 'hollow'}
                   iconType='search'
                   title={full}
                   onClick={() => toggleRawId(toolCall.id)}
@@ -330,7 +331,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
                       values: { label: full },
                     },
                   )}
-                  aria-expanded={openRawIds.has(toolCall.id)}
+                  aria-expanded={isRawOpen}
                   aria-controls={`${rawViewId}-${toolCall.id}`}
                 >
                   {short}
