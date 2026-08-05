@@ -82,17 +82,11 @@
  * the ONE exception is the hover/focus border-color rule, which is an instant state change (no
  * transition, no transform) even for reduced-motion users, since EUI's own hover affordances work
  * the same way.
+ *
+ * `.wzHeroIconWrap` / `.wzHeroIcon` are deliberately absent: the welcome screen no longer renders
+ * a Wazuh mark at all (the app chrome already brands the page), so those rules would style markup
+ * that does not exist.
  */
-.wzHeroIconWrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.wzHeroIcon {
-  position: relative;
-}
 
 /* No transform, no box-shadow "glow" on hover — a plain border-color change is the only feedback
    an example card gives, matching the Home Overview's "no hover lift/glow" surface language while
