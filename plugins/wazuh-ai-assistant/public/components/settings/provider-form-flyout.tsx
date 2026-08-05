@@ -139,7 +139,7 @@ const PROVIDER_MODEL_GUIDANCE: Record<
   { examples: string[]; docs: ProviderUrlDoc[]; note?: string }
 > = {
   openai_compatible: {
-    examples: ['gpt-4o', 'gpt-4o-mini', 'llama-3.3-70b-versatile'],
+    examples: ['gpt-4o', 'gpt-4o-mini', 'openai/gpt-oss-120b'],
     docs: [
       {
         label: i18n.translate(
@@ -514,8 +514,14 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 <>
                   {i18n.translate('wazuhAiAssistant.settings.form.modelHelp', {
                     defaultMessage:
-                      'Tool calling needs a model with solid function-calling support. Small ' +
-                      'or base models often fail with tool errors.',
+                      'Tool calling needs a model with solid function-calling support. ' +
+                      'Verified working, August 2026: openai/gpt-oss-120b or ' +
+                      'openai/gpt-oss-20b (Groq), GPT-4o or GPT-4o-mini (OpenAI), Claude ' +
+                      "Sonnet (Anthropic). Do not use Groq's llama-3.3-70b-versatile or " +
+                      'llama-3.1-8b-instant — both retire on 16 August 2026. Each question ' +
+                      'sends roughly 13,000 tokens across three provider calls, so a ' +
+                      'free-tier key with a low per-minute token limit will fail with 413 ' +
+                      'or 429 errors no matter how capable the model is.',
                   })}{' '}
                   <FormattedMessage
                     id='wazuhAiAssistant.settings.form.modelExample'
