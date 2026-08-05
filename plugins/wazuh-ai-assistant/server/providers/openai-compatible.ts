@@ -105,10 +105,18 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     let sawContent = false;
     let reasoningBuffer = '';
     /** Emits the buffered reasoning text as one `delta`, but only if `content` never arrived this
-     * call — called right before every terminal `done` below except the tool-calls exit (a round
-     * that ends in a tool call has no answer due yet, so there is nothing to fall back for). */
-    function* reasoningFallback(): Generator<StreamEvent> {
-      if (!sawContent && reasoningBuffer) {
+     * call AND this exit finalized no tool calls. Two exits are excluded, not one:
+     *  - the `finish_reason === 'tool_calls'` exit (a round that ends in a tool call has no answer
+     *    due yet, so there is nothing to fall back for) never calls this at all;
+     *  - the `[DONE]`/usage/loop-end exits below DO call this, but must still suppress it when
+     *    `hadToolCalls` is true — a provider can close a tool round through one of THOSE exits
+     *    without ever sending `finish_reason: 'tool_calls'` (gpt-oss/Groq happens to send it, but
+     *    the wire format doesn't guarantee it), and reasoning routinely precedes a tool call on the
+     *    analysis channel, so the buffer is typically full exactly when a tool round is ending.
+     *    Without this, that reasoning text would be injected as the answer for a TOOL round instead
+     *    of being correctly treated as "no answer due yet". */
+    function* reasoningFallback(hadToolCalls: boolean): Generator<StreamEvent> {
+      if (!sawContent && !hadToolCalls && reasoningBuffer) {
         yield { type: 'delta', content: reasoningBuffer };
       }
     }
@@ -119,7 +127,7 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
           const finalized = finalizeToolCalls(toolCalls);
           yield* finalized;
           if (!hasToolCallError(finalized)) {
-            yield* reasoningFallback();
+            yield* reasoningFallback(finalized.length > 0);
             yield { type: 'done' };
           }
           return;
@@ -184,7 +192,7 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
           const finalized = finalizeToolCalls(toolCalls);
           yield* finalized;
           if (!hasToolCallError(finalized)) {
-            yield* reasoningFallback();
+            yield* reasoningFallback(finalized.length > 0);
             yield {
               type: 'done',
               usage: {
@@ -199,7 +207,7 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       const finalized = finalizeToolCalls(toolCalls);
       yield* finalized;
       if (!hasToolCallError(finalized)) {
-        yield* reasoningFallback();
+        yield* reasoningFallback(finalized.length > 0);
         yield { type: 'done' };
       }
     } catch (error) {
