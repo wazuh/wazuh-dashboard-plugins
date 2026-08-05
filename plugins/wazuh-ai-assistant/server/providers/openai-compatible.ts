@@ -58,6 +58,12 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       stream: true,
       messages: messages.map(toOpenAiMessage),
     };
+    // Checked for `undefined`, not truthiness -- callers deliberately send `temperature: 0` (the
+    // stage-1 router; see ChatStreamOptions's doc comment), which a `if (options?.temperature)`
+    // guard would treat as absent and silently drop.
+    if (options?.temperature !== undefined) {
+      body.temperature = options.temperature;
+    }
     if (options?.tools?.length) {
       body.tools = toOpenAiTools(options.tools);
       body.tool_choice = toOpenAiToolChoice(options.toolChoice ?? 'auto');
