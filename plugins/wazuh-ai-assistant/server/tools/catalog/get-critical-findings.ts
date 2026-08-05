@@ -1,5 +1,7 @@
 import { ToolDefinition } from '../types';
 import {
+  findingArtifactFilterClauses,
+  findingArtifactFilterProperties,
   findingDigestColumns,
   findingRowFields,
   clampLimit,
@@ -29,6 +31,7 @@ export const getCriticalFindingsTool: ToolDefinition = {
         'Max number of findings to return (default 20, max 500).',
       ),
       ...timeRangeProperties(),
+      ...findingArtifactFilterProperties(),
     }),
   },
   target: 'indexer',
@@ -36,18 +39,16 @@ export const getCriticalFindingsTool: ToolDefinition = {
   buildRequest(params) {
     const limit = clampLimit(params.limit, 20, 500);
     const { gte, lte } = resolveTimeRange(params);
+    const filter: Record<string, unknown>[] = [
+      { terms: { 'wazuh.rule.level': ['critical'] } },
+      { range: { '@timestamp': { gte, lte } } },
+      ...findingArtifactFilterClauses(params),
+    ];
     return {
       target: 'indexer',
       index: 'wazuh-findings-v5*',
       body: {
-        query: {
-          bool: {
-            filter: [
-              { terms: { 'wazuh.rule.level': ['critical'] } },
-              { range: { '@timestamp': { gte, lte } } },
-            ],
-          },
-        },
+        query: { bool: { filter } },
         sort: [{ '@timestamp': { order: 'desc' } }],
         size: limit,
       },

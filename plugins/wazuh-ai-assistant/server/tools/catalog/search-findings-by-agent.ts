@@ -1,5 +1,7 @@
 import { ToolDefinition } from '../types';
 import {
+  findingArtifactFilterClauses,
+  findingArtifactFilterProperties,
   findingDigestColumns,
   findingRowFields,
   clampLimit,
@@ -43,6 +45,7 @@ export const searchFindingsByAgentTool: ToolDefinition = {
           'Max number of findings to return (default 20, max 500).',
         ),
         ...timeRangeProperties(),
+        ...findingArtifactFilterProperties(),
       },
       ['agent_name'],
     ),
@@ -72,6 +75,7 @@ export const searchFindingsByAgentTool: ToolDefinition = {
         },
       });
     }
+    filter.push(...findingArtifactFilterClauses(params));
     return {
       target: 'indexer',
       index: 'wazuh-findings-v5*',

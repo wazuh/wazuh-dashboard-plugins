@@ -201,6 +201,92 @@ export function timeRangeProperties(): Record<string, JsonSchemaProperty> {
   };
 }
 
+/**
+ * Optional artifact-filter parameters shared by the finding-hits tools (issue: "Add artifact
+ * filters to finding tools"): `source.ip` is already returned in every finding-hits tool's
+ * digest (`FINDING_DIGEST_EXTRA_COLUMNS` below) and named in `server/prompts.ts`'s guidance to
+ * "prefer the typed finding tools" for IP/user/process questions, yet no typed tool could
+ * actually filter on it -- the model's only option was hand-writing DSL via search_wazuh_data.
+ * `destination.ip` is confirmed `ip`-mapped and `searchable` on `wazuh-findings-v5*` via a live
+ * `_field_caps` check (see the issue) even though it is not itself in the digest yet; a filter on
+ * it is still correct (it narrows to documents that HAVE it), just possibly sparse. `process.name`
+ * is already used internally by `get_suspicious_powershell.ts`'s own `buildRequest`, confirming
+ * it is queryable on this index -- this exposes the same field as a caller-supplied filter
+ * instead of a hardcoded value list. Follows the same shape as `severityProperty()`/
+ * `timeRangeProperties()` above: a properties-map helper paired with a clause-resolver
+ * (`findingArtifactFilterClauses` below) that every finding-hits tool's `buildRequest` calls.
+ */
+export function findingArtifactFilterProperties(): Record<string, JsonSchemaProperty> {
+  return {
+    source_ip: {
+      type: 'string',
+      description:
+        'Filter to findings whose source.ip exactly matches this IP address (the attacker/' +
+        'originating side).',
+    },
+    destination_ip: {
+      type: 'string',
+      description:
+        'Filter to findings whose destination.ip exactly matches this IP address (the target ' +
+        'side). Mapped but not densely populated on every dataset -- 0 rows may mean the field ' +
+        'is absent on matching documents, not that none exist.',
+    },
+    process_name: {
+      type: 'string',
+      description:
+        'Filter to findings whose process.name exactly matches this process/program name (e.g. ' +
+        '"powershell.exe").',
+    },
+    source_user_name: {
+      type: 'string',
+      description:
+        'Filter to findings whose source.user.name exactly matches this username.',
+    },
+    destination_user_name: {
+      type: 'string',
+      description:
+        'Filter to findings whose destination.user.name exactly matches this username.',
+    },
+  };
+}
+
+/**
+ * Resolves `findingArtifactFilterProperties()`'s five optional params to zero or more `term`
+ * filter clauses, in the fixed order below, for each caller's `buildRequest` to append to its own
+ * `bool.filter` array (see e.g. search-findings-by-agent.ts). A call that supplies none of the
+ * five gets `[]` back -- every existing caller's request body is therefore byte-identical to
+ * before this existed, which is what makes "a tool call with no artifact filter supplied is
+ * unchanged" true by construction rather than by a separate code path.
+ */
+export function findingArtifactFilterClauses(
+  params: Record<string, unknown>,
+): Record<string, unknown>[] {
+  const clauses: Record<string, unknown>[] = [];
+  const sourceIp = optionalStringParam(params.source_ip);
+  if (sourceIp) {
+    clauses.push({ term: { 'source.ip': sourceIp } });
+  }
+  const destinationIp = optionalStringParam(params.destination_ip);
+  if (destinationIp) {
+    clauses.push({ term: { 'destination.ip': destinationIp } });
+  }
+  const processName = optionalStringParam(params.process_name);
+  if (processName) {
+    clauses.push({ term: { 'process.name': processName } });
+  }
+  const sourceUserName = optionalStringParam(params.source_user_name);
+  if (sourceUserName) {
+    clauses.push({ term: { 'source.user.name': sourceUserName } });
+  }
+  const destinationUserName = optionalStringParam(
+    params.destination_user_name,
+  );
+  if (destinationUserName) {
+    clauses.push({ term: { 'destination.user.name': destinationUserName } });
+  }
+  return clauses;
+}
+
 export function resolveTimeRange(params: Record<string, unknown>): {
   gte: string;
   lte: string;

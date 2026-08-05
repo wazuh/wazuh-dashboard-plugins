@@ -1,5 +1,7 @@
 import { ToolDefinition } from '../types';
 import {
+  findingArtifactFilterClauses,
+  findingArtifactFilterProperties,
   findingDigestColumns,
   findingRowFields,
   clampLimit,
@@ -42,6 +44,7 @@ export const getFindingsByTimeTool: ToolDefinition = {
       severity: severityProperty(),
       severity_comparison: severityComparisonProperty(),
       ...timeRangeProperties(),
+      ...findingArtifactFilterProperties(),
     }),
   },
   target: 'indexer',
@@ -64,6 +67,7 @@ export const getFindingsByTimeTool: ToolDefinition = {
         },
       });
     }
+    filter.push(...findingArtifactFilterClauses(params));
     return {
       target: 'indexer',
       index: 'wazuh-findings-v5*',

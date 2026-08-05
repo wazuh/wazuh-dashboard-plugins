@@ -1,5 +1,7 @@
 import { ToolDefinition } from '../types';
 import {
+  findingArtifactFilterClauses,
+  findingArtifactFilterProperties,
   findingDigestColumns,
   findingRowFields,
   clampLimit,
@@ -74,6 +76,7 @@ export const searchFindingsByRuleTagTool: ToolDefinition = {
           'Max number of findings to return (default 20, max 500).',
         ),
         ...timeRangeProperties(),
+        ...findingArtifactFilterProperties(),
       },
       ['rule_tags'],
     ),
@@ -88,15 +91,16 @@ export const searchFindingsByRuleTagTool: ToolDefinition = {
       ruleTags.length === 1
         ? { term: { 'wazuh.rule.tags': ruleTags[0] } }
         : { terms: { 'wazuh.rule.tags': ruleTags } };
+    const filter: Record<string, unknown>[] = [
+      tagFilter,
+      { range: { '@timestamp': { gte, lte } } },
+      ...findingArtifactFilterClauses(params),
+    ];
     return {
       target: 'indexer',
       index: 'wazuh-findings-v5*',
       body: {
-        query: {
-          bool: {
-            filter: [tagFilter, { range: { '@timestamp': { gte, lte } } }],
-          },
-        },
+        query: { bool: { filter } },
         sort: [{ '@timestamp': { order: 'desc' } }],
         size: limit,
       },
