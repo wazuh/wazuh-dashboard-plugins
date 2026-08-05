@@ -42,7 +42,10 @@ function shortDateMath(value: string): string | undefined {
 
 /** Reads the `time_range_gte`/`time_range_lte` pair off a call's arguments, defaulting exactly the
  * way the server's own query builders do. */
-function timeRangeOf(args: Record<string, unknown>): { gte: string; lte: string } {
+function timeRangeOf(args: Record<string, unknown>): {
+  gte: string;
+  lte: string;
+} {
   return {
     gte:
       typeof args.time_range_gte === 'string'
@@ -80,7 +83,8 @@ export function describeToolCall(
   const args = toolCall.arguments ?? {};
   const { gte, lte } = timeRangeOf(args);
   const readable = humanizeToolName(toolCall.name);
-  const window = lte === DEFAULT_TIME_RANGE_LTE ? shortDateMath(gte) : undefined;
+  const window =
+    lte === DEFAULT_TIME_RANGE_LTE ? shortDateMath(gte) : undefined;
   const short = window ? `${readable} · ${window}` : readable;
 
   const index = table?.discover?.index;

@@ -87,7 +87,8 @@ const SEVERITY_BUCKETS: Record<
 /** ISO-8601 instants as the indexer emits them (`2026-07-26T05:58:38.000Z`). Matched, rather than
  * fed straight to `new Date()`, so a plain string that merely happens to be Date-parseable (a rule
  * title starting with a year, an agent name like "2026-prod") is never silently reformatted. */
-const ISO_TIMESTAMP_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:?\d{2})$/;
+const ISO_TIMESTAMP_RE =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:?\d{2})$/;
 
 /** Column width for a formatted timestamp column — wide enough for "Jul 26, 2026, 05:58" on one
  * line, which is the entire point: unformatted, a raw ISO instant wrapped onto three lines and

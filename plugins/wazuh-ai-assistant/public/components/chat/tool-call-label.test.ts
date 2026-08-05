@@ -19,11 +19,17 @@ describe('describeToolCall', () => {
   it('names the query, not the index, so two calls on one index stay distinguishable', () => {
     const spec = table('wazuh-findings-v5*');
     const first = describeToolCall(
-      call({ name: 'get_findings_by_time', arguments: { time_range_gte: 'now-24h' } }),
+      call({
+        name: 'get_findings_by_time',
+        arguments: { time_range_gte: 'now-24h' },
+      }),
       spec,
     );
     const second = describeToolCall(
-      call({ name: 'get_critical_findings', arguments: { time_range_gte: 'now-24h' } }),
+      call({
+        name: 'get_critical_findings',
+        arguments: { time_range_gte: 'now-24h' },
+      }),
       spec,
     );
 
@@ -57,8 +63,8 @@ describe('describeToolCall', () => {
   });
 
   it('humanizes an unprefixed tool name rather than dropping it', () => {
-    expect(describeToolCall(call({ name: 'agents_summary' }), undefined).short).toBe(
-      'Agents summary · 90d',
-    );
+    expect(
+      describeToolCall(call({ name: 'agents_summary' }), undefined).short,
+    ).toBe('Agents summary · 90d');
   });
 });
