@@ -93,7 +93,7 @@
     "wazuhAiAssistant.settings.form.baseUrl": "Endpoint URL",
     "wazuhAiAssistant.settings.form.baseUrlInvalid": "Enter a valid URL starting with http:// or https://",
     "wazuhAiAssistant.settings.form.model": "Model",
-    "wazuhAiAssistant.settings.form.modelHelp": "Tool calling needs a model with solid function-calling support. Known good: GPT-4o or GPT-4o-mini (OpenAI), Claude Sonnet (Anthropic), llama-3.3-70b-versatile (Groq). Small or base models often fail with tool errors.",
+    "wazuhAiAssistant.settings.form.modelHelp": "Tool calling needs a model with solid function-calling support. Verified working, August 2026: openai/gpt-oss-120b or openai/gpt-oss-20b (Groq), GPT-4o or GPT-4o-mini (OpenAI), Claude Sonnet (Anthropic). Do not use Groq's llama-3.3-70b-versatile or llama-3.1-8b-instant — both retire on 16 August 2026. Each question sends roughly 13,000 tokens across three provider calls, so a free-tier key with a low per-minute token limit will fail with 413 or 429 errors no matter how capable the model is.",
     "wazuhAiAssistant.settings.form.apiKey": "API key",
     "wazuhAiAssistant.settings.form.apiKeyHelp": "Leave empty to keep the current key.",
     "wazuhAiAssistant.settings.form.encryptionRequiredTooltip": "An encryption key must be configured before an API key can be saved.",
