@@ -132,11 +132,27 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   const isWaitingForFirstToken =
     !isUser && message.isStreaming === true && message.content === '';
   const toolCalls = message.toolCalls ?? [];
-  // One shared raw view for every provenance chip on this bubble (not one per chip): clicking any
-  // chip toggles the same panel, which is exactly the content the old "N queries executed"
-  // accordion showed — default collapsed, so no JSON is ever on screen unbidden.
-  const [isRawViewOpen, setIsRawViewOpen] = useState(false);
+  // One open/closed state PER chip, keyed by what that chip reveals. A single shared panel was
+  // tried first and was wrong twice over: clicking one query opened every query on the turn, and
+  // because the panel rendered above the chips it pushed them down, so the control that closed it
+  // was no longer where the reader had just clicked. A chip now opens exactly the thing it names,
+  // directly beneath itself, and the same click closes it.
+  const [openRawIds, setOpenRawIds] = useState<Set<string>>(new Set());
   const rawViewId = `wzAiQueryRaw-${message.id}`;
+  const toggleRawId = (id: string) =>
+    setOpenRawIds(previous => {
+      const next = new Set(previous);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  /** The executed indexer query gets its own chip rather than riding along with a tool call: the
+   * turn's data carries no link saying WHICH call produced the table, so attaching it to one of
+   * them would be a guess shown as a fact. */
+  const DSL_RAW_ID = 'dsl';
   // color="plain" keeps both avatars on the same neutral background, so the pair reads as one
   // set instead of picking up EUI's auto-assigned per-name colors.
   const avatar = isUser ? (
@@ -224,56 +240,6 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           />
         </>
       )}
-      {/* What was actually run, collapsed by default (see the provenance chips in the meta row
-            below, which toggle this same panel): the answer is only as trustworthy as the query
-            behind it, and an analyst has to be able to check that query without reading server
-            logs. Shows each tool call's real-form arguments and, for an indexer search, the
-            executed DSL the table carries (the same one "Open in Discover" uses). */}
-      {toolCalls.length > 0 && isRawViewOpen && (
-        <>
-          <EuiSpacer size='s' />
-          <div id={rawViewId}>
-            {toolCalls.map(toolCall => (
-              <div key={toolCall.id}>
-                <EuiText size='xs'>
-                  <strong>{toolCall.name}</strong>
-                </EuiText>
-                <EuiSpacer size='xs' />
-                <EuiCodeBlock
-                  language='json'
-                  paddingSize='s'
-                  fontSize='s'
-                  isCopyable
-                >
-                  {JSON.stringify(toolCall.arguments, null, 2)}
-                </EuiCodeBlock>
-                <EuiSpacer size='s' />
-              </div>
-            ))}
-            {message.table?.discover && (
-              <>
-                <EuiText size='xs'>
-                  <strong>
-                    {i18n.translate('wazuhAiAssistant.chat.queryIndex', {
-                      defaultMessage: 'Index: {index}',
-                      values: { index: message.table.discover.index },
-                    })}
-                  </strong>
-                </EuiText>
-                <EuiSpacer size='xs' />
-                <EuiCodeBlock
-                  language='json'
-                  paddingSize='s'
-                  fontSize='s'
-                  isCopyable
-                >
-                  {JSON.stringify(message.table.discover.dsl, null, 2)}
-                </EuiCodeBlock>
-              </>
-            )}
-          </div>
-        </>
-      )}
     </>
   );
 
@@ -354,7 +320,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
                   color='hollow'
                   iconType='search'
                   title={full}
-                  onClick={() => setIsRawViewOpen(open => !open)}
+                  onClick={() => toggleRawId(toolCall.id)}
                   onClickAriaLabel={i18n.translate(
                     'wazuhAiAssistant.chat.queryChipAriaLabel',
                     {
@@ -362,15 +328,88 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
                       values: { label: full },
                     },
                   )}
-                  aria-expanded={isRawViewOpen}
-                  aria-controls={rawViewId}
+                  aria-expanded={openRawIds.has(toolCall.id)}
+                  aria-controls={`${rawViewId}-${toolCall.id}`}
                 >
                   {short}
                 </EuiBadge>
               </EuiFlexItem>
             );
           })}
+        {!isUser && message.table?.discover && (
+          <EuiFlexItem grow={false}>
+            <EuiBadge
+              color='hollow'
+              iconType='database'
+              title={message.table.discover.index}
+              onClick={() => toggleRawId(DSL_RAW_ID)}
+              onClickAriaLabel={i18n.translate(
+                'wazuhAiAssistant.chat.queryDslChipAriaLabel',
+                {
+                  defaultMessage: 'Show the query run on {index}',
+                  values: { index: message.table.discover.index },
+                },
+              )}
+              aria-expanded={openRawIds.has(DSL_RAW_ID)}
+              aria-controls={`${rawViewId}-${DSL_RAW_ID}`}
+            >
+              {i18n.translate('wazuhAiAssistant.chat.queryDslChip', {
+                defaultMessage: 'Executed query',
+              })}
+            </EuiBadge>
+          </EuiFlexItem>
+        )}
       </EuiFlexGroup>
+      {/* Each open chip's content, BELOW the chip row: the chip stays exactly where it was
+            clicked, so the same click closes what it opened. The answer is only as trustworthy as
+            the query behind it, and an analyst has to be able to check that query without reading
+            server logs — but nothing here is on screen unbidden. */}
+      {!isUser &&
+        toolCalls
+          .filter(toolCall => openRawIds.has(toolCall.id))
+          .map(toolCall => (
+            <div
+              key={toolCall.id}
+              id={`${rawViewId}-${toolCall.id}`}
+              style={proseStyle}
+            >
+              <EuiSpacer size='xs' />
+              <EuiText size='xs'>
+                <strong>{toolCall.name}</strong>
+              </EuiText>
+              <EuiSpacer size='xs' />
+              <EuiCodeBlock
+                language='json'
+                paddingSize='s'
+                fontSize='s'
+                isCopyable
+              >
+                {JSON.stringify(toolCall.arguments, null, 2)}
+              </EuiCodeBlock>
+            </div>
+          ))}
+      {!isUser && message.table?.discover && openRawIds.has(DSL_RAW_ID) && (
+        <div id={`${rawViewId}-${DSL_RAW_ID}`} style={proseStyle}>
+          <EuiSpacer size='xs' />
+          <EuiText size='xs'>
+            <strong>
+              {i18n.translate('wazuhAiAssistant.chat.queryIndex', {
+                defaultMessage: 'Index: {index}',
+                values: { index: message.table.discover.index },
+              })}
+            </strong>
+          </EuiText>
+          <EuiSpacer size='xs' />
+          <EuiCodeBlock
+            language='json'
+            paddingSize='s'
+            fontSize='s'
+            isCopyable
+          >
+            {JSON.stringify(message.table.discover.dsl, null, 2)}
+          </EuiCodeBlock>
+        </div>
+      )}
     </EuiFlexItem>
   );
 
