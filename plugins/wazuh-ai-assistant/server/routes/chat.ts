@@ -16,6 +16,7 @@ import {
   ProviderConfig,
   PseudonymEntry,
   StreamEvent,
+  StreamUsage,
   ToolCall,
   ToolSpec,
 } from '../../common/types';
@@ -46,6 +47,7 @@ import {
   ROUTE_QUESTION_TOOL,
   ROUTER_ENABLED,
 } from '../tools/router';
+import { addUsage, toStreamUsage, ZERO_USAGE_TOTALS } from './chat-usage';
 
 interface StoredProviderAttributes {
   name: string;
@@ -596,6 +598,17 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
 interface Stage1Result {
   /** `undefined` means "no tools this turn" (routed to `general` alone). */
   tools: ToolSpec[] | undefined;
+  /**
+   * Usage this stage-1 call itself spent (~760 tokens observed), so `orchestrate` can fold it into
+   * the turn's total instead of discarding it — stage 1 runs its own adapter stream entirely
+   * outside the round loop below and, before this field existed, its `done`/usage was consumed and
+   * dropped right here, undercounting every routed turn by however much stage 1 cost (issue
+   * 8875). `undefined` on every fallback path that returns before a `done` event is ever read
+   * (signal-aborted, a stage-1 `error`, no/invalid route_question call — see the early `return`s
+   * below): there is nothing to report for those, and `addUsage` (chat-usage.ts) treats `undefined`
+   * as contributing zero rather than resetting the total.
+   */
+  usage?: StreamUsage;
 }
 
 /**
@@ -633,6 +646,10 @@ async function* runStage1Routing(
 
   let sawRouteCall = false;
   let routeArgs: Record<string, unknown> | undefined;
+  // Only ever set from the 'done' branch below — every return path ABOVE that point (signal
+  // aborted mid-stream, a stage-1 'error') never saw a 'done' at all, so `undefined` there
+  // correctly reports "nothing to add" rather than a fabricated cost.
+  let stage1Usage: StreamUsage | undefined;
 
   for await (const event of adapter.chatStream(
     providerConfig,
@@ -671,6 +688,7 @@ async function* runStage1Routing(
       return { tools: listToolSpecs() };
     }
     if (event.type === 'done') {
+      stage1Usage = event.usage;
       break;
     }
     // Any stray 'delta'/'table' from a misbehaving stage-1 call: stage 1 must never leak partial
@@ -681,7 +699,10 @@ async function* runStage1Routing(
     logger.debug(
       'wazuhAiAssistant: stage-1 router produced no route_question call; falling back to the full tool catalog for this turn.',
     );
-    return { tools: listToolSpecs() };
+    // The call still happened and still cost tokens even though the model never called
+    // route_question -- report `stage1Usage` (from the 'done' just seen above) rather than
+    // discarding it just because the fallback path is the full catalog.
+    return { tools: listToolSpecs(), usage: stage1Usage };
   }
 
   const validation = validate(routeArgs, ROUTE_QUESTION_TOOL.parameters);
@@ -691,7 +712,7 @@ async function* runStage1Routing(
         '; ',
       )}); falling back to the full tool catalog for this turn.`,
     );
-    return { tools: listToolSpecs() };
+    return { tools: listToolSpecs(), usage: stage1Usage };
   }
 
   const categories = validation.value.categories;
@@ -699,10 +720,10 @@ async function* runStage1Routing(
     logger.debug(
       'wazuhAiAssistant: stage-1 router returned no categories; falling back to the full tool catalog for this turn.',
     );
-    return { tools: listToolSpecs() };
+    return { tools: listToolSpecs(), usage: stage1Usage };
   }
 
-  return { tools: resolveStage2Tools(categories as string[]) };
+  return { tools: resolveStage2Tools(categories as string[]), usage: stage1Usage };
 }
 
 /**
@@ -754,6 +775,13 @@ async function* orchestrate(
   // 02-read-reasoning-delta.md), and it deserves a sentence, not a silently empty bubble.
   let sawAnyDelta = false;
   let toolUsedThisTurn = false;
+  // Sum of every provider call's `usage` THIS TURN — the stage-1 routing call (if the router ran)
+  // plus every round of the loop below, INCLUDING non-final rounds whose `done` is otherwise
+  // suppressed (see the round loop's `if (sawToolCall) { break; }`). Without this, only the last
+  // round's usage ever reached the client (issue 14-accumulate-usage-across-calls.md, measured
+  // 6,409 reported vs. ~12,740 actual on a multi-round turn). See chat-usage.ts for why the helper
+  // itself lives in its own dependency-free module.
+  let usageTotals = ZERO_USAGE_TOTALS;
 
   /** Yields a `privacy_map` event for any pseudonym entries minted so far this turn, but only
    * once total ("once per turn... when newEntries() is non-empty") — guarded
@@ -796,6 +824,7 @@ async function* orchestrate(
       step = await stage1.next();
     }
     tools = step.value.tools;
+    usageTotals = addUsage(usageTotals, step.value.usage);
   }
 
   for (let round = 0; round <= MAX_TOOL_ROUNDS; round += 1) {
@@ -995,6 +1024,11 @@ async function* orchestrate(
             yield { type: 'delta', content: trailing };
           }
         }
+        // Accumulate BEFORE the sawToolCall branch below: a non-final round's 'done' is suppressed
+        // (never forwarded to the client) but its usage was still real spend for this turn and must
+        // not be dropped — this is the exact bug issue 14-accumulate-usage-across-calls.md
+        // describes (only the LAST round's usage reached the client).
+        usageTotals = addUsage(usageTotals, event.usage);
         if (sawToolCall) {
           // More rounds needed: suppress this 'done' (the turn isn't over) and start the next
           // round with the grown message history instead of ending the SSE stream here.
@@ -1011,7 +1045,9 @@ async function* orchestrate(
           };
         }
         yield* emitPrivacyMapOnce();
-        yield event;
+        // The SUM across every round (and stage 1) this turn made, not this round's own
+        // `event.usage` alone — see `usageTotals`'s doc comment above.
+        yield { type: 'done', usage: toStreamUsage(usageTotals) };
         ended = true;
         break;
       }
@@ -1053,7 +1089,7 @@ async function* orchestrate(
     };
   }
   yield* emitPrivacyMapOnce();
-  yield { type: 'done' };
+  yield { type: 'done', usage: toStreamUsage(usageTotals) };
 }
 
 /** Bridges the orchestration loop's AsyncGenerator<StreamEvent> into SSE frame strings. */
