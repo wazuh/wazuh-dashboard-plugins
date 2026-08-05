@@ -167,6 +167,25 @@ export type StreamEvent =
    */
   | { type: 'digest'; toolCallId: string; content: string }
   | { type: 'done'; usage?: StreamUsage }
+  /**
+   * The graceful-failure handoff (server/tools/suggest-discover-query.ts): emitted instead of a
+   * table when the model determines the data the user asked about is out of reach for every tool
+   * available to it — a blocked index, a filter search_wazuh_data cannot express within its rules,
+   * or a time range beyond the 90-day maximum — rather than guessing or silently answering a
+   * narrower question than the one asked. `index`/`dsl` are enough to build a Discover deep link
+   * (see common/discover-url.ts's `buildDiscoverUrl`, the same helper the `table` event's
+   * `TableSpec.discover` already uses) for the query the user should run themselves; `dsl` may
+   * already have its field-level filters stripped down to index + time range only when their field
+   * names could not be verified against the target index (see suggest-discover-query.ts's
+   * `resolveSuggestedDsl` doc comment for why). `reason` is the model's own plain-language
+   * explanation of what it could not check, shown to the user verbatim next to the link.
+   */
+  | {
+      type: 'suggested_query';
+      index: string;
+      dsl: Record<string, unknown>;
+      reason: string;
+    }
   | { type: 'error'; message: string }
   /**
    * Session-expiry recovery UX (the dashboard's

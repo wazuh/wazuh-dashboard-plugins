@@ -48,6 +48,11 @@ import {
   ROUTER_ENABLED,
 } from '../tools/router';
 import { addUsage, toStreamUsage, ZERO_USAGE_TOTALS } from './chat-usage';
+import {
+  resolveSuggestedDsl,
+  SUGGEST_DISCOVER_QUERY_TOOL,
+  validateSuggestDiscoverQueryArgs,
+} from '../tools/suggest-discover-query';
 
 interface StoredProviderAttributes {
   name: string;
@@ -827,6 +832,14 @@ async function* orchestrate(
     usageTotals = addUsage(usageTotals, step.value.usage);
   }
 
+  // Graceful-failure handoff (server/tools/suggest-discover-query.ts): offered ALONGSIDE the real
+  // stage-2 tools, on every round that offers tools at all — same reasoning as `supportsTools ===
+  // false` above skipping it too: an adapter whose `chatStream` ignores `tools` entirely would
+  // never call it, so there is nothing to append to when `tools` is `undefined`.
+  if (tools) {
+    tools = [...tools, SUGGEST_DISCOVER_QUERY_TOOL];
+  }
+
   for (let round = 0; round <= MAX_TOOL_ROUNDS; round += 1) {
     if (signal.aborted) {
       return;
@@ -920,7 +933,6 @@ async function* orchestrate(
 
       if (event.type === 'tool_call') {
         sawToolCall = true;
-        toolUsedThisTurn = true;
         if (signal.aborted) {
           return;
         }
@@ -935,6 +947,67 @@ async function* orchestrate(
             yield { type: 'delta', content: trailing };
           }
         }
+
+        // Graceful-failure handoff (server/tools/suggest-discover-query.ts, issue
+        // 13-suggested-query-discover-handoff.md): intercepted HERE, before any real tool
+        // execution below, because this is not a data tool — it never touches the Indexer/Manager
+        // API and must never be run through `executeToolCall`, same reasoning as
+        // `ROUTE_QUESTION_TOOL` in `runStage1Routing` above. `toolUsedThisTurn` is deliberately NOT
+        // set for this branch (unlike the real-tool path below): it exists only to pick between
+        // the two TABLE-oriented no-text fallbacks, and this tool never renders a table, so a turn
+        // that calls ONLY this and then produces no text should not fall back to table-flavored
+        // copy (see noTextFallbackMessage's doc comment).
+        if (event.toolCall.name === SUGGEST_DISCOVER_QUERY_TOOL.name) {
+          // Inbound args are pseudonym-form on the wire, same as every other tool call — reverse
+          // before validating/using them (the index/reason text may legitimately name a real
+          // hostname the model is discussing).
+          const realSuggestArgs = privacyCtx
+            ? privacyCtx.pseudonymizer.reverseObject(event.toolCall.arguments)
+            : event.toolCall.arguments;
+          const validation = validateSuggestDiscoverQueryArgs(realSuggestArgs);
+
+          let toolResultContent: string;
+          if (!validation.ok) {
+            // Bounded self-correction, same contract as every other tool: the model sees exactly
+            // why its call was rejected and can retry with corrected arguments.
+            toolResultContent = JSON.stringify({ error: validation.reason });
+          } else {
+            // eslint-disable-next-line no-await-in-loop -- stream events must be emitted in order
+            const resolvedDsl = await resolveSuggestedDsl(
+              context,
+              validation.index,
+              validation.dsl,
+              logger,
+            );
+            yield {
+              type: 'suggested_query',
+              index: validation.index,
+              dsl: resolvedDsl,
+              reason: validation.reason,
+            };
+            toolResultContent = JSON.stringify({
+              shown: true,
+              note:
+                'The suggested query was shown to the user as an "Open in Discover" link. Now ' +
+                'tell the user plainly, in your own words, what you could not check and why — do ' +
+                'not repeat the query itself, the link already shows it.',
+            });
+          }
+
+          messages = [
+            ...messages,
+            // ORIGINAL (pseudonym-form) toolCall — wire consistency, same as the real-tool path.
+            { role: 'assistant', content: '', toolCalls: [event.toolCall] },
+            {
+              role: 'tool',
+              toolCallId: event.toolCall.id,
+              content: toolResultContent,
+            },
+          ];
+          continue;
+        }
+
+        toolUsedThisTurn = true;
 
         // Inbound tool args: the model only ever saw pseudonyms, so `event.toolCall.arguments`
         // is pseudonym-form as emitted — reverse it to real values before validation/execution (the

@@ -75,5 +75,9 @@ export function buildSystemPrompt(nowIso: string): string {
       'search_findings_by_rule_tag with a wazuh.rule.tags value, or aggregate by rule first with ' +
       'get_top_rules to discover ids. If a narrowly-filtered query returns 0 rows for activity ' +
       'that plausibly exists, retry once with a broader filter before concluding there were none.',
+    'When the data the user needs is out of reach for every tool available to you — a blocked ' +
+      'index, a filter search_wazuh_data cannot express within its rules, or a time range beyond ' +
+      'the 90-day maximum — call suggest_discover_query with the index, query, and reason, then ' +
+      'say plainly what you could not check.',
   ].join('\n');
 }

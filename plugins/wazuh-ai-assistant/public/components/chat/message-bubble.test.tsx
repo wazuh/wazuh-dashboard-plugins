@@ -182,4 +182,50 @@ describe('MessageBubble', () => {
 
     expect(container.querySelector('.euiAccordion')).toBeNull();
   });
+
+  // Graceful-failure handoff (server/tools/suggest-discover-query.ts / issue
+  // 13-suggested-query-discover-handoff.md): a `suggested_query` stream event sets
+  // message.suggestedQuery instead of message.table, rendered as a callout with the model's own
+  // reason text plus an "Open in Discover" link.
+  it('renders a callout with the reason text and an "Open in Discover" link when suggestedQuery is present', async () => {
+    const resolveDiscoverUrl = () =>
+      Promise.resolve('https://example.test/app/data-explorer/discover#?_a=...');
+
+    render(
+      <MessageBubble
+        message={baseMessage({
+          role: 'assistant',
+          content: 'I could not check that directly.',
+          suggestedQuery: {
+            index: 'wazuh-findings-v5-*',
+            dsl: { bool: { filter: [] } },
+            reason: 'This index is outside what I can query directly.',
+          },
+        })}
+        resolveDiscoverUrl={resolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+
+    expect(
+      screen.getByText('This index is outside what I can query directly.'),
+    ).toBeInTheDocument();
+    const link = await screen.findByRole('link', { name: 'Open in Discover' });
+    expect(link).toHaveAttribute(
+      'href',
+      'https://example.test/app/data-explorer/discover#?_a=...',
+    );
+  });
+
+  it('does not render the suggested-query callout when message.suggestedQuery is absent', () => {
+    render(
+      <MessageBubble
+        message={baseMessage({ role: 'assistant', content: 'a normal answer' })}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+
+    expect(screen.queryByRole('link', { name: 'Open in Discover' })).toBeNull();
+  });
 });
