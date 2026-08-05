@@ -63,10 +63,10 @@ function withFakeFetch<T>(
 
 /** Same as withFakeFetch, but also captures every outbound request body -- needed to assert on
  * what the adapter actually sent (issue 03's final-round shape, issue 05's temperature). */
-function withFakeFetchCapturingBody<T>(
+function withFakeFetchCapturingBody(
   responseBody: string,
-  run: (capturedBodies: Array<Record<string, unknown>>) => Promise<T>,
-): Promise<T> {
+  run: (capturedBodies: Array<Record<string, unknown>>) => Promise<unknown>,
+): Promise<Array<Record<string, unknown>>> {
   const original = globalThis.fetch;
   const capturedBodies: Array<Record<string, unknown>> = [];
   globalThis.fetch = ((_url: string, init?: RequestInit) => {
@@ -80,9 +80,15 @@ function withFakeFetchCapturingBody<T>(
       }),
     );
   }) as unknown as typeof fetch;
-  return run(capturedBodies).finally(() => {
-    globalThis.fetch = original;
-  });
+  // Resolves with the CAPTURED BODIES, not `run`'s own result: every caller writes
+  // `const capturedBodies = await withFakeFetchCapturingBody(...)` and asserts on the outbound
+  // request bodies. (An earlier version resolved with run()'s drained events instead, which made
+  // all four body-shape assertions inspect StreamEvents -- caught by the first real jest run.)
+  return run(capturedBodies)
+    .then(() => capturedBodies)
+    .finally(() => {
+      globalThis.fetch = original;
+    });
 }
 
 test('chatStream: a stream carrying only delta.reasoning (no delta.content at all) renders the accumulated reasoning as the answer', async () => {
