@@ -429,7 +429,8 @@ test('applyFieldPolicy: a processes-kind get_agent_inventory digest keeps proces
     samples: [
       {
         'process.name': 'sshd',
-        'process.command_line': '/usr/sbin/sshd -D -p 22 --config /home/alice/.ssh/config',
+        'process.command_line':
+          '/usr/sbin/sshd -D -p 22 --config /home/alice/.ssh/config',
       },
     ],
   });

@@ -32,11 +32,13 @@ test('get_agent_inventory: kind enum lists exactly the 5 implemented kinds', () 
 
 test('get_agent_inventory: an unrecognized kind is rejected', () => {
   assert.throws(
-    () => getAgentInventoryTool.buildRequest({ agent_id: '003', kind: 'networks' }),
+    () =>
+      getAgentInventoryTool.buildRequest({ agent_id: '003', kind: 'networks' }),
     /kind/,
   );
   assert.throws(
-    () => getAgentInventoryTool.buildRequest({ agent_id: '003', kind: 'bogus' }),
+    () =>
+      getAgentInventoryTool.buildRequest({ agent_id: '003', kind: 'bogus' }),
     /kind/,
   );
   assert.throws(
@@ -48,7 +50,10 @@ test('get_agent_inventory: an unrecognized kind is rejected', () => {
 test('get_agent_inventory: an invalid agent_id is rejected (delegates to validateAgentId)', () => {
   assert.throws(
     () =>
-      getAgentInventoryTool.buildRequest({ agent_id: 'not-numeric', kind: 'os' }),
+      getAgentInventoryTool.buildRequest({
+        agent_id: 'not-numeric',
+        kind: 'os',
+      }),
     /agent_id/,
   );
 });
@@ -187,7 +192,11 @@ test('get_agent_inventory: kind="processes" matches get_agent_processes\'s origi
 });
 
 test('get_agent_inventory: limit is clamped to [1, 500] for the 3 limit-taking folded-in kinds', () => {
-  const over = buildIndexer({ agent_id: '003', kind: 'packages', limit: 10_000 });
+  const over = buildIndexer({
+    agent_id: '003',
+    kind: 'packages',
+    limit: 10_000,
+  });
   assert.equal(over.body.size, 500);
   const under = buildIndexer({ agent_id: '003', kind: 'ports', limit: 0 });
   assert.equal(under.body.size, 1);

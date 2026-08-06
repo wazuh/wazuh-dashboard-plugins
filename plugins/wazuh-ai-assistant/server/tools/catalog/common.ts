@@ -216,7 +216,10 @@ export function timeRangeProperties(): Record<string, JsonSchemaProperty> {
  * `timeRangeProperties()` above: a properties-map helper paired with a clause-resolver
  * (`findingArtifactFilterClauses` below) that every finding-hits tool's `buildRequest` calls.
  */
-export function findingArtifactFilterProperties(): Record<string, JsonSchemaProperty> {
+export function findingArtifactFilterProperties(): Record<
+  string,
+  JsonSchemaProperty
+> {
   return {
     source_ip: {
       type: 'string',
@@ -278,9 +281,7 @@ export function findingArtifactFilterClauses(
   if (sourceUserName) {
     clauses.push({ term: { 'source.user.name': sourceUserName } });
   }
-  const destinationUserName = optionalStringParam(
-    params.destination_user_name,
-  );
+  const destinationUserName = optionalStringParam(params.destination_user_name);
   if (destinationUserName) {
     clauses.push({ term: { 'destination.user.name': destinationUserName } });
   }
