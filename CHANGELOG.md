@@ -133,6 +133,7 @@
 | [#8708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8708)   | Fixed Home KPI's visualization persistent filters                                                                                                                                             |
 | [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766) | Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration                                                              |
 | [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775) | Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters                                                                                                                |
+| [#8890](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8890) | Fixed the AI Assistant treating tool-result content as trusted: the answer renderer no longer renders Markdown images or raw HTML, the system prompt no longer allows status claims found inside result text, and Manager `message`/`breakdown` digest fields are now length-capped and control-character-stripped                            |
 
 ### Removed
 
