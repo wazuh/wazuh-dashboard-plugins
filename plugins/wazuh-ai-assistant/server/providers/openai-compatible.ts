@@ -61,6 +61,12 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       stream: true,
       messages: messages.map(toOpenAiMessage),
     };
+    // Checked for `undefined`, not truthiness -- callers deliberately send `temperature: 0` (the
+    // stage-1 router; see ChatStreamOptions's doc comment), which a `if (options?.temperature)`
+    // guard would treat as absent and silently drop.
+    if (options?.temperature !== undefined) {
+      body.temperature = options.temperature;
+    }
     if (options?.tools?.length) {
       body.tools = toOpenAiTools(options.tools);
       body.tool_choice = toOpenAiToolChoice(options.toolChoice ?? 'auto');
@@ -92,12 +98,39 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
 
     const toolCalls = new Map<number, ToolCallAccumulator>();
 
+    // Reasoning-channel fallback (see the `parsed` type below and issue
+    // 02-read-reasoning-delta.md): some reasoning models (gpt-oss, qwen3.x) stream their entire
+    // answer on `delta.reasoning` instead of `delta.content` — confirmed on a `general`-routed
+    // (no-tool) turn, where 636 output tokens were billed and 0 characters reached the user.
+    // `content` is always the answer when it arrives; `reasoningBuffer` only exists to be shown
+    // as a LAST-RESORT stand-in, and only once the whole call is known to have produced no
+    // `content` at all — never appended alongside a working answer.
+    let sawContent = false;
+    let reasoningBuffer = '';
+    /** Emits the buffered reasoning text as one `delta`, but only if `content` never arrived this
+     * call AND this exit finalized no tool calls. Two exits are excluded, not one:
+     *  - the `finish_reason === 'tool_calls'` exit (a round that ends in a tool call has no answer
+     *    due yet, so there is nothing to fall back for) never calls this at all;
+     *  - the `[DONE]`/usage/loop-end exits below DO call this, but must still suppress it when
+     *    `hadToolCalls` is true — a provider can close a tool round through one of THOSE exits
+     *    without ever sending `finish_reason: 'tool_calls'` (gpt-oss/Groq happens to send it, but
+     *    the wire format doesn't guarantee it), and reasoning routinely precedes a tool call on the
+     *    analysis channel, so the buffer is typically full exactly when a tool round is ending.
+     *    Without this, that reasoning text would be injected as the answer for a TOOL round instead
+     *    of being correctly treated as "no answer due yet". */
+    function* reasoningFallback(hadToolCalls: boolean): Generator<StreamEvent> {
+      if (!sawContent && !hadToolCalls && reasoningBuffer) {
+        yield { type: 'delta', content: reasoningBuffer };
+      }
+    }
+
     try {
       for await (const payload of iterateSseLines(response.body, signal)) {
         if (payload === '[DONE]') {
           const finalized = finalizeToolCalls(toolCalls);
           yield* finalized;
           if (!hasToolCallError(finalized)) {
+            yield* reasoningFallback(finalized.length > 0);
             yield { type: 'done' };
           }
           return;
@@ -106,6 +139,14 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
           choices?: Array<{
             delta?: {
               content?: string;
+              // Reasoning-channel fields (gpt-oss/qwen3.x-style providers): `reasoning` carries the
+              // text, `channel` distinguishes intermediate reasoning ("analysis") from the final
+              // answer ("final") when the provider bothers to send it — not read here, since the
+              // fallback-only treatment below never needs to tell the two apart (see doc comment
+              // above); kept on the type so a future, more elaborate treatment doesn't have to
+              // rediscover the wire shape.
+              reasoning?: string;
+              channel?: string;
               tool_calls?: Array<{
                 index?: number;
                 id?: string;
@@ -136,7 +177,11 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         const choice = parsed.choices?.[0];
         const delta = choice?.delta?.content;
         if (delta) {
+          sawContent = true;
           yield { type: 'delta', content: delta };
+        }
+        if (choice?.delta?.reasoning) {
+          reasoningBuffer += choice.delta.reasoning;
         }
         accumulateToolCallDeltas(toolCalls, choice?.delta?.tool_calls);
 
@@ -152,6 +197,7 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
           const finalized = finalizeToolCalls(toolCalls);
           yield* finalized;
           if (!hasToolCallError(finalized)) {
+            yield* reasoningFallback(finalized.length > 0);
             yield {
               type: 'done',
               usage: {
@@ -166,6 +212,7 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       const finalized = finalizeToolCalls(toolCalls);
       yield* finalized;
       if (!hasToolCallError(finalized)) {
+        yield* reasoningFallback(finalized.length > 0);
         yield { type: 'done' };
       }
     } catch (error) {

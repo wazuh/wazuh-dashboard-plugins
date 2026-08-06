@@ -85,6 +85,11 @@ export class AnthropicAdapter implements ProviderAdapter {
             model: config.model,
             stream: true,
             max_tokens: DEFAULT_ANTHROPIC_MAX_TOKENS,
+            // Checked for `undefined`, not truthiness -- same reasoning as
+            // openai-compatible.ts's identical guard: a caller-sent `temperature: 0` must survive.
+            ...(options?.temperature !== undefined
+              ? { temperature: options.temperature }
+              : {}),
             ...(systemMessages.length
               ? {
                   system: systemMessages
