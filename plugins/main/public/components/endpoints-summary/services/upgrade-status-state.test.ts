@@ -65,4 +65,54 @@ describe('upgradeStatusState', () => {
 
     expect(upgradeStatusState.hasPending()).toBe(false);
   });
+
+  describe('subscribe', () => {
+    it('notifies subscribers when an agent is tracked', () => {
+      const listener = jest.fn();
+      upgradeStatusState.subscribe(listener);
+
+      upgradeStatusState.trackUpgrade([{ id: '001', version: '4.5.0' }]);
+
+      expect(listener).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not notify when trackUpgrade only contains already-tracked agents', () => {
+      upgradeStatusState.trackUpgrade([{ id: '001', version: '4.5.0' }]);
+      const listener = jest.fn();
+      upgradeStatusState.subscribe(listener);
+
+      upgradeStatusState.trackUpgrade([{ id: '001', version: '4.5.0' }]);
+
+      expect(listener).not.toHaveBeenCalled();
+    });
+
+    it('notifies subscribers when agents are removed', () => {
+      upgradeStatusState.trackUpgrade([{ id: '001', version: '4.5.0' }]);
+      const listener = jest.fn();
+      upgradeStatusState.subscribe(listener);
+
+      upgradeStatusState.removeAgents(['001']);
+
+      expect(listener).toHaveBeenCalledTimes(1);
+    });
+
+    it('notifies subscribers on reset', () => {
+      const listener = jest.fn();
+      upgradeStatusState.subscribe(listener);
+
+      upgradeStatusState.reset();
+
+      expect(listener).toHaveBeenCalledTimes(1);
+    });
+
+    it('stops notifying once unsubscribed', () => {
+      const listener = jest.fn();
+      const unsubscribe = upgradeStatusState.subscribe(listener);
+      unsubscribe();
+
+      upgradeStatusState.trackUpgrade([{ id: '001', version: '4.5.0' }]);
+
+      expect(listener).not.toHaveBeenCalled();
+    });
+  });
 });

@@ -5,7 +5,14 @@ interface PendingAgent {
   trackedAtMs: number;
 }
 
+type Listener = () => void;
+
 let pendingAgents: PendingAgent[] = [];
+let listeners: Listener[] = [];
+
+const notify = (): void => {
+  listeners.forEach(listener => listener());
+};
 
 export const upgradeStatusState = {
   /** Kept on this module-level singleton so it survives a component remount. */
@@ -26,15 +33,35 @@ export const upgradeStatusState = {
     const newAgents = agents
       .filter(agent => !existingIds.has(agent.id))
       .map(agent => ({ ...agent, trackedAtMs }));
+    if (!newAgents.length) {
+      return;
+    }
     pendingAgents = [...pendingAgents, ...newAgents];
+    notify();
   },
 
   removeAgents(agentIds: string[]): void {
     const removed = new Set(agentIds);
-    pendingAgents = pendingAgents.filter(agent => !removed.has(agent.id));
+    const nextPendingAgents = pendingAgents.filter(
+      agent => !removed.has(agent.id),
+    );
+    if (nextPendingAgents.length === pendingAgents.length) {
+      return;
+    }
+    pendingAgents = nextPendingAgents;
+    notify();
   },
 
   reset(): void {
     pendingAgents = [];
+    notify();
+  },
+
+  /** Lets components react to tracking changes without waiting for the next poll tick. */
+  subscribe(listener: Listener): () => void {
+    listeners.push(listener);
+    return () => {
+      listeners = listeners.filter(l => l !== listener);
+    };
   },
 };

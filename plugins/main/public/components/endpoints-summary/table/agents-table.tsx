@@ -18,6 +18,7 @@ import {
   EuiPanel,
   EuiCallOut,
   EuiButton,
+  EuiSpacer,
 } from '@elastic/eui';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import { withErrorBoundary } from '../../common/hocs';
@@ -39,7 +40,7 @@ import NavigationService from '../../../react-services/navigation-service';
 import { getWazuhAPIVersion } from '../services';
 import { RemoveAgentModal } from './actions/remove-agent-modal';
 import { getAgentVersion } from '../../../../common/services/wz-agent';
-import { useUpgradeStatus } from '../hooks';
+import { useUpgradeStatus, usePendingUpgradeAgents } from '../hooks';
 
 type AgentList = {
   items: Agent[];
@@ -102,6 +103,10 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   };
 
   useUpgradeStatus(reloadAgents, reloadTable);
+  const pendingUpgradeAgents = usePendingUpgradeAgents();
+  const pendingUpgradeAgentIds = new Set(
+    pendingUpgradeAgents.map(pendingAgent => pendingAgent.id),
+  );
 
   const onSelectionChange = (selectedItems: Agent[]) => {
     setSelectedItems(selectedItems);
@@ -236,7 +241,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
               setIsUpgradeModalVisible,
               setFilters,
               apiVersion,
-              { setIsRemoveModalVisible },
+              { setIsRemoveModalVisible, pendingUpgradeAgentIds },
             )}
             tableInitialSortingField='id'
             tablePageSizeOptions={[10, 25, 50, 100]}
@@ -415,6 +420,23 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
 
   return (
     <div>
+      {pendingUpgradeAgents.length ? (
+        <>
+          <EuiCallOut
+            title={`${pendingUpgradeAgents.length} ${
+              pendingUpgradeAgents.length === 1 ? 'agent is' : 'agents are'
+            } being upgraded`}
+            color='primary'
+            iconType='iInCircle'
+          >
+            <p>
+              The upgrade request was sent. This list will refresh automatically
+              once each agent reports the new version.
+            </p>
+          </EuiCallOut>
+          <EuiSpacer size='m' />
+        </>
+      ) : null}
       <EuiPanel paddingSize='m'>{table}</EuiPanel>
       {isEditGroupsVisible && agent ? (
         <EditAgentGroupsModal

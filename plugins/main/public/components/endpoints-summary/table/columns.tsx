@@ -10,6 +10,7 @@ import {
   EuiIconTip,
   EuiHealth,
   EuiToolTip,
+  EuiBadge,
 } from '@elastic/eui';
 import { Agent } from '../types';
 import WzIconSVG from '../../common/icons/wz-icon-svg';
@@ -29,7 +30,11 @@ export const agentsTableColumns = (
   {
     // TODO: consider moving the positional arguments to this to avoid bug related to position and allow to extend easily.
     setIsRemoveModalVisible,
-  }: { setIsRemoveModalVisible: SetModalIsVisible },
+    pendingUpgradeAgentIds = new Set<string>(),
+  }: {
+    setIsRemoveModalVisible: SetModalIsVisible;
+    pendingUpgradeAgentIds?: Set<string>;
+  },
 ) => [
   {
     field: 'id',
@@ -146,7 +151,29 @@ export const agentsTableColumns = (
     truncateText: true,
     sortable: true,
     show: true,
-    render: (status, agent) => <AgentStatus status={status} agent={agent} />,
+    render: (status, agent: Agent) => (
+      <EuiFlexGroup
+        wrap={false}
+        responsive={false}
+        gutterSize='xs'
+        alignItems='center'
+      >
+        <EuiFlexItem grow={false}>
+          <AgentStatus status={status} agent={agent} />
+        </EuiFlexItem>
+        {pendingUpgradeAgentIds.has(agent.id) ? (
+          <EuiFlexItem grow={false}>
+            <EuiToolTip
+              content={
+                <p>Upgrade request sent. This may take a few minutes.</p>
+              }
+            >
+              <EuiBadge color='primary'>Upgrading</EuiBadge>
+            </EuiToolTip>
+          </EuiFlexItem>
+        ) : null}
+      </EuiFlexGroup>
+    ),
   },
   {
     field: 'group_config_status',
