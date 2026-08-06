@@ -13,7 +13,6 @@
 import { WzRequest } from '../../../../../../react-services/wz-request';
 import { replaceIllegalXML } from './xml';
 import { delayAsPromise } from '../../../../../../../common/utils';
-import { AGENT_SYNCED_STATUS } from '../../../../../../../common/constants';
 
 /**
  * Fetch full node configuration and extract requested keys.
@@ -480,18 +479,6 @@ export const validateAfterSent = async () => {
   } catch (error) {
     throw error;
   }
-};
-
-export const agentIsSynchronized = async agent => {
-  const isSync = await WzRequest.apiReq(
-    'GET',
-    `/agents?q=id=${agent.id}&select=group_config_status`,
-    {},
-  );
-  return (
-    isSync?.data?.data?.affected_items?.[0]?.group_config_status ==
-    AGENT_SYNCED_STATUS.SYNCED
-  );
 };
 
 /**

@@ -46,10 +46,8 @@ implicitQuery: 'id!=001;';
       { label: 'id', description: 'ID' },
       { label: 'ip', description: 'IP address' },
       { label: 'group', description: 'Group' },
-      { label: 'group_config_status', description: 'Synced configuration status' },
       { label: 'lastKeepAline', description: 'Date add' },
       { label: 'manager', description: 'Manager' },
-      { label: 'mergedSum', description: 'Merged sum' },
       { label: 'name', description: 'Agent name' },
       { label: 'node_name', description: 'Node name' },
       { label: 'os.platform', description: 'Operating system platform' },
@@ -95,14 +93,6 @@ implicitQuery: 'id!=001;';
           currentValue,
         );
         break;
-      case 'group_config_status':
-        return [AGENT_SYNCED_STATUS.SYNCED, AGENT_SYNCED_STATUS.NOT_SYNCED].map(
-          status => ({
-            type: 'value',
-            label: status,
-          }),
-        );
-        break;
       case 'lastKeepAline':
         return await getAgentFilterValuesMapToSearchBarSuggestion(
           previousField,
@@ -110,12 +100,6 @@ implicitQuery: 'id!=001;';
         );
         break;
       case 'manager':
-        return await getAgentFilterValuesMapToSearchBarSuggestion(
-          previousField,
-          currentValue,
-        );
-        break;
-      case 'mergedSum':
         return await getAgentFilterValuesMapToSearchBarSuggestion(
           previousField,
           currentValue,

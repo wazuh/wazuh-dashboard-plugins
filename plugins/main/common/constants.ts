@@ -790,11 +790,6 @@ export const UI_ORDER_AGENT_STATUS = [
   API_NAME_AGENT_STATUS.NEVER_CONNECTED,
 ];
 
-export const AGENT_SYNCED_STATUS = {
-  SYNCED: 'synced',
-  NOT_SYNCED: 'not synced',
-};
-
 // The status code can be seen here https://github.com/wazuh/wazuh/blob/686068a1f05d806b2e3b3d633a765320ae7ae114/src/wazuh_db/wdb.h#L55-L61
 
 export const AGENT_STATUS_CODE = [

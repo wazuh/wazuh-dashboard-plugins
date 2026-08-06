@@ -19,10 +19,8 @@ export type Agent = {
   manager: string;
   registerIP: string;
   status: string;
-  mergedSum: string;
   version: string;
   node_name: string;
-  group_config_status: string;
   status_code: number;
 };
 

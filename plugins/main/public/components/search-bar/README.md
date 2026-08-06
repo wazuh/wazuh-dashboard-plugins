@@ -46,13 +46,8 @@ Basic usage:
             { label: 'id', description: 'ID' },
             { label: 'ip', description: 'IP address' },
             { label: 'group', description: 'Group' },
-            {
-              label: 'group_config_status',
-              description: 'Synced configuration status',
-            },
             { label: 'lastKeepAline', description: 'Date add' },
             { label: 'manager', description: 'Manager' },
-            { label: 'mergedSum', description: 'Merged sum' },
             { label: 'name', description: 'Agent name' },
             { label: 'node_name', description: 'Node name' },
             { label: 'os.platform', description: 'Operating system platform' },
