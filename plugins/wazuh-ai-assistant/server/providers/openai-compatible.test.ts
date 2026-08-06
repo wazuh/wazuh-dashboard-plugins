@@ -417,3 +417,155 @@ test('chatStream: a usage-only final frame (empty `choices`) is reported on the 
     'an empty `choices` array must not stop the usage frame from being read',
   );
 });
+
+// --- terminal usage frame after a tool-call finish (issue 8875) --------------------------------
+// The bug the previous two tests did not catch: `stream_options.include_usage` makes the terminal
+// usage frame arrive as one more chunk AFTER the one carrying `finish_reason: 'tool_calls'`. The
+// old code returned the moment it saw that finish_reason, discarding a bare `{type: 'done'}` with
+// no usage and never reading the trailing frame at all -- so every tool-bearing round (and the
+// stage-1 router call, which always ends in a tool call by construction) reported no usage,
+// leaving only the turn's last, tool-free round for chat.ts's accumulator to sum. Fixed by letting
+// the stream keep reading past `finish_reason: 'tool_calls'` instead of returning right there.
+
+test('chatStream: a round that ends via finish_reason:"tool_calls" still reports the usage frame that follows it', async () => {
+  const body = sseBody([
+    {
+      choices: [
+        {
+          index: 0,
+          delta: {
+            tool_calls: [
+              {
+                index: 0,
+                id: 'call_1',
+                function: { name: 'get_agents', arguments: '{}' },
+              },
+            ],
+          },
+          finish_reason: 'tool_calls',
+        },
+      ],
+    },
+    { choices: [], usage: { prompt_tokens: 812, completion_tokens: 41 } },
+  ]);
+  const events = await withFakeFetch(body, () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('list active agents')],
+        controller.signal,
+      ),
+    );
+  });
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['tool_call', 'done'],
+    'exactly one tool_call followed by one done -- the usage frame must not surface as its own event',
+  );
+  const done = events.find(event => event.type === 'done');
+  assert.deepEqual(
+    (done as Extract<StreamEvent, { type: 'done' }>).usage,
+    { inputTokens: 812, outputTokens: 41 },
+    'the usage frame arriving AFTER finish_reason:"tool_calls" must still reach the done event ' +
+      '-- this is the exact defect issue 8875 describes',
+  );
+});
+
+test('chatStream: a tool-call round with no trailing usage frame still terminates cleanly (provider ignores stream_options)', async () => {
+  const body = sseBody([
+    {
+      choices: [
+        {
+          index: 0,
+          delta: {
+            tool_calls: [
+              {
+                index: 0,
+                id: 'call_1',
+                function: { name: 'get_agents', arguments: '{}' },
+              },
+            ],
+          },
+          finish_reason: 'tool_calls',
+        },
+      ],
+    },
+    // No usage-only chunk here -- sseBody appends [DONE] straight after, as some providers do
+    // regardless of stream_options.include_usage. Must not hang and must not duplicate the
+    // tool_call event that finalizeToolCalls() already emitted once.
+  ]);
+  const events = await withFakeFetch(body, () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('list active agents')],
+        controller.signal,
+      ),
+    );
+  });
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['tool_call', 'done'],
+    'no duplicate tool_call and no hang when the provider never sends a trailing usage frame',
+  );
+  const done = events.find(event => event.type === 'done');
+  assert.equal(
+    (done as Extract<StreamEvent, { type: 'done' }>).usage,
+    undefined,
+    'nothing to report when the provider never sent a usage frame at all',
+  );
+});
+
+test('chatStream: buffered reasoning ahead of a finish_reason:"tool_calls" round is still suppressed once the usage frame arrives later', async () => {
+  // Same invariant "Suppress reasoning fallback on tool-call exits" protects at the immediate
+  // finish_reason exit -- now also checked one chunk later, at the usage-frame exit this fix
+  // makes reachable for a tool-call round for the first time.
+  const body = sseBody([
+    {
+      choices: [
+        {
+          index: 0,
+          delta: { reasoning: 'I should check the agent list.', channel: 'analysis' },
+        },
+      ],
+    },
+    {
+      choices: [
+        {
+          index: 0,
+          delta: {
+            tool_calls: [
+              {
+                index: 0,
+                id: 'call_1',
+                function: { name: 'get_agents', arguments: '{}' },
+              },
+            ],
+          },
+          finish_reason: 'tool_calls',
+        },
+      ],
+    },
+    { choices: [], usage: { prompt_tokens: 500, completion_tokens: 12 } },
+  ]);
+  const events = await withFakeFetch(body, () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('list active agents')],
+        controller.signal,
+      ),
+    );
+  });
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['tool_call', 'done'],
+    'the buffered reasoning must not leak into a tool round just because usage now arrives later',
+  );
+});
