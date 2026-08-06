@@ -361,7 +361,14 @@ describe('ProviderFormFlyout — Model field guidance', () => {
   it('shows OpenAI-compatible model examples and one docs link per covered service by default', async () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    expect(screen.getByText(/gpt-4o-mini/i)).toBeInTheDocument();
+    // Anchored to the example CHIP's own <code>: the updated model help text (issue 09) also names
+    // GPT-4o-mini in its prose, so an unanchored getByText now matches two nodes and throws. This
+    // test is about the example chips, not the help paragraph.
+    expect(
+      screen
+        .getAllByText(/^gpt-4o-mini$/i)
+        .filter(node => node.tagName.toLowerCase() === 'code').length,
+    ).toBeGreaterThan(0);
 
     fireEvent.click(
       screen.getByRole('button', { name: /^see available models$/i }),
