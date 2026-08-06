@@ -73,6 +73,14 @@ export interface ToolDefinition {
      * ("which agents", "which rules") even though this tool only ever executes a plain hits
      * search. `undefined` (every other tool) reproduces today's breakdown-only-from-real-aggs
      * behavior exactly.
+     *
+     * Since #8870's fix, every one of these 8 tools ALSO attaches a real `terms` aggregation per
+     * dimension to its own request (`catalog/common.ts`'s `FINDING_BREAKDOWN_AGGS` — OpenSearch
+     * computes it over the full matched set regardless of `size`), so `buildBreakdown` normally
+     * satisfies `breakdown` before this synthetic path is ever reached; this dot-path list remains
+     * the fallback for whenever a real aggregation genuinely is not present, in which case
+     * `buildDigest` labels the result as page-only (`Digest.breakdownNote`) rather than presenting
+     * it as the population whenever `counts.truncated`.
      */
     breakdownDimensions?: string[];
   };

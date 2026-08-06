@@ -1,6 +1,7 @@
 import { ToolDefinition } from '../types';
 import {
   findingDigestColumns,
+  FINDING_BREAKDOWN_AGGS,
   FINDING_BREAKDOWN_DIMENSIONS,
   findingRowFields,
   clampLimit,
@@ -98,6 +99,7 @@ export const searchFindingsByRuleTagTool: ToolDefinition = {
         },
         sort: [{ '@timestamp': { order: 'desc' } }],
         size: limit,
+        aggs: FINDING_BREAKDOWN_AGGS,
       },
     };
   },

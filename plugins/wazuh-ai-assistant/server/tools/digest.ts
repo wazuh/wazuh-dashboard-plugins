@@ -10,11 +10,25 @@ import { ToolDefinition } from './types';
 export interface Digest {
   tool: string;
   counts: { total?: number; returned: number; truncated: boolean };
-  /** `agg` is set only when the executed query had more than one top-level aggregation (only the
-   * search_wazuh_data escape hatch can produce that), naming which aggregation a bucket belongs
-   * to — single-agg digests (every typed tool) stay byte-identical to before it existed. It also
-   * lets privacy.ts's field-policy pass attribute each bucket key to the right aggregation field. */
+  /** `agg` is set only when the executed query had more than one top-level aggregation — the
+   * search_wazuh_data escape hatch (a hand-built multi-agg query) and, since #8870's fix, every
+   * finding-hits typed tool (`catalog/common.ts`'s `FINDING_BREAKDOWN_AGGS` always attaches two:
+   * by agent name and by rule title) — naming which aggregation a bucket belongs to; single-agg
+   * digests stay byte-identical to before it existed. It also lets privacy.ts's field-policy pass
+   * attribute each bucket key to the right aggregation field. */
   breakdown?: Array<{ key: string; count: number; agg?: string }>;
+  /** Set only when `breakdown` was synthesized from the RETURNED page (`buildSyntheticBreakdown`)
+   * rather than a real OpenSearch aggregation over the full matched set (`buildBreakdown`), AND
+   * that page is not the whole matched set (`counts.truncated`) — i.e. an entity whose rows sort
+   * outside the page is invisible to `breakdown`, the exact defect #8870's validation update
+   * reproduced live (limit:20 on 26 matches synthesizing 13/7 and 11/9 while the true distribution
+   * is 16/8/2 and 13/13). Tells the model `breakdown` is NOT authoritative for the full result,
+   * unlike `samplesNote` (which caveats `samples` only) — see `buildSamplesNote`'s own updated
+   * wording for how the two combine. Omitted whenever `breakdown` is a real aggregation (always
+   * population-true: OpenSearch computes `aggregations` over every matched doc regardless of
+   * `size`) or a synthetic one over an untruncated result (`returned === total`, where grouping
+   * every returned row already IS grouping the full population). */
+  breakdownNote?: string;
   /** Set only when `counts.returned` is 0 AND the executed query carried 2+ filter clauses — see
    * `buildZeroRowHint` below. A 0-row result is exactly as consistent with "a wrong field name" or
    * "an over-narrow filter" as with "genuinely no matching data"; the system prompt already tells
@@ -517,8 +531,11 @@ function buildZeroRowHint(
 }
 
 /** How many buckets `buildSyntheticBreakdown` keeps per dimension — same token-bloat reasoning as
- * `buildBreakdown`'s real-aggregation buckets (~40 tokens for a handful of {key,count} pairs). */
-const BREAKDOWN_BUCKET_CAP = 5;
+ * `buildBreakdown`'s real-aggregation buckets (~40 tokens for a handful of {key,count} pairs).
+ * Exported so `catalog/common.ts`'s `FINDING_BREAKDOWN_AGGS` can size the REAL `terms` aggregation
+ * it attaches to every finding-hits tool's request identically — the token cost of a breakdown
+ * must not change depending on which path (real vs. synthetic) happens to serve a given call. */
+export const BREAKDOWN_BUCKET_CAP = 5;
 
 /**
  * Synthesizes a `breakdown` from EVERY row the tool call returned (not just the `MAX_SAMPLES`
@@ -562,16 +579,57 @@ function buildSyntheticBreakdown(
  * own doc comment), never a random or representative cut — so an entity absent from the sample is
  * only "not in this preview", never "not in the data". Independent of the `breakdown` synthesis
  * above: it fires for ANY tool whose result was sample-truncated, `breakdownDimensions` opt-in or
- * not, at the fixed, modest cost of one sentence. */
+ * not, at the fixed, modest cost of one sentence.
+ *
+ * The instruction to fall back on `breakdown` is only truthful when `breakdown` is itself
+ * population-true — telling the model to "trust the breakdown" while `breakdownNote` (see its doc
+ * comment on `Digest`) simultaneously warns that the very same breakdown is page-scoped would hand
+ * it two contradictory instructions. `breakdownIsPopulationTrue` (true whenever a breakdown exists
+ * AND no `breakdownNote` was attached to it) selects between three variants: trust the breakdown,
+ * distrust it (it shares the same page-scoping this note already warns about), or don't mention it
+ * at all (no breakdown was produced, e.g. a tool with no `breakdownDimensions` opt-in).
+ */
 function buildSamplesNote(
   returned: number,
   sampleCount: number,
+  hasBreakdown: boolean,
+  breakdownIsPopulationTrue: boolean,
 ): string | undefined {
-  return returned > sampleCount
-    ? `Showing ${sampleCount} of ${returned} matching rows, drawn from the newest end of the ` +
-        'query order — not a representative sample. Use counts/breakdown, not an absence from ' +
-        'these rows, to decide what the full result set contains.'
-    : undefined;
+  if (returned <= sampleCount) {
+    return undefined;
+  }
+  const preamble =
+    `Showing ${sampleCount} of ${returned} matching rows, drawn from the newest end of the ` +
+    'query order — not a representative sample.';
+  if (!hasBreakdown) {
+    return (
+      `${preamble} Use counts, not an absence from these rows, to decide what the full result ` +
+      'set contains.'
+    );
+  }
+  if (breakdownIsPopulationTrue) {
+    return (
+      `${preamble} Use counts/breakdown, not an absence from these rows, to decide what the ` +
+      'full result set contains.'
+    );
+  }
+  return (
+    `${preamble} The breakdown below is ALSO scoped to only these returned rows (see its own ` +
+    'note) — use counts, not an absence from either, to decide what the full result set contains.'
+  );
+}
+
+/** One-sentence caveat for a `breakdown` synthesized from the returned page rather than a real
+ * aggregation over the full matched set — see `Digest.breakdownNote`'s doc comment for why this is
+ * a hard requirement (#8870's validation-gate update): a page-scoped breakdown presented without
+ * this caveat is worse than no breakdown at all, because the model treats it as authoritative for
+ * entities it never saw. */
+function buildBreakdownNote(total: number | undefined, returned: number): string {
+  const totalDescription = typeof total === 'number' ? `all ${total}` : 'all';
+  return (
+    `This breakdown covers only the ${returned} returned rows, not ${totalDescription} matching ` +
+    'rows — do not present it as the full distribution.'
+  );
 }
 
 /**
@@ -608,20 +666,33 @@ export function buildDigest(
     return sample;
   });
 
-  // `buildBreakdown` only ever fires when the response itself carries `aggregations` (the query
-  // WAS an aggregation). When it's not, but this tool opted into `breakdownDimensions` (the finding
-  // -hits tools) and there are more rows than the sample can show, synthesize an equivalent
-  // breakdown from every returned row instead — the "aggregative QUESTION, non-aggregative QUERY"
-  // case (see `buildSyntheticBreakdown`'s doc comment). Real aggregations always take priority when
-  // both are somehow available, though no catalog tool today declares `breakdownDimensions` AND
-  // runs an aggs query.
-  const breakdown =
-    buildBreakdown(result) ??
-    (def.digest.breakdownDimensions && returned > MAX_SAMPLES
-      ? buildSyntheticBreakdown(rows, def.digest.breakdownDimensions)
-      : undefined);
+  // `buildBreakdown` only ever fires when the response itself carries `aggregations` — real
+  // aggregations are ALWAYS population-true (OpenSearch computes them over every matched doc
+  // regardless of `size`/limit), so they take priority whenever present and need no page-only
+  // caveat. When there is no real aggregation, but this tool opted into `breakdownDimensions` (the
+  // finding-hits tools) and there are more rows than the sample can show, synthesize an equivalent
+  // breakdown from every RETURNED row instead — the "aggregative QUESTION, non-aggregative QUERY"
+  // case (see `buildSyntheticBreakdown`'s doc comment). That synthetic breakdown is exact only when
+  // `returned === total` (grouping every returned row already covers the whole matched set); when
+  // `truncated` (returned < total), it can only ever see the page the tool happened to return —
+  // the exact defect #8870's validation-gate update caught live — so it gets `breakdownNote`
+  // labeling it as page-only instead of being presented as the population.
+  const realBreakdown = buildBreakdown(result);
+  let breakdown = realBreakdown;
+  let breakdownNote: string | undefined;
+  if (!realBreakdown && def.digest.breakdownDimensions && returned > MAX_SAMPLES) {
+    breakdown = buildSyntheticBreakdown(rows, def.digest.breakdownDimensions);
+    if (breakdown && truncated) {
+      breakdownNote = buildBreakdownNote(total, returned);
+    }
+  }
   const hint = buildZeroRowHint(requestBody, returned);
-  const samplesNote = buildSamplesNote(returned, samples.length);
+  const samplesNote = buildSamplesNote(
+    returned,
+    samples.length,
+    !!breakdown,
+    !!breakdown && !breakdownNote,
+  );
   // Manager responses carry a top-level `message` alongside `data` (e.g. an active-response no-op:
   // error:0, affected_items/failed_items both empty, message:"AR command was not sent to any
   // agent") — surfaced here so a silent no-op is still visible to the model. Indexer responses
@@ -632,6 +703,7 @@ export function buildDigest(
     counts: { total, returned, truncated },
     ...(hint ? { hint } : {}),
     ...(breakdown ? { breakdown } : {}),
+    ...(breakdownNote ? { breakdownNote } : {}),
     samples,
     ...(samplesNote ? { samplesNote } : {}),
     columns: def.deriveColumns

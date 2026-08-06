@@ -480,3 +480,98 @@ test('buildDigest: a REAL aggregation breakdown takes priority over synthesizing
     { key: '200', count: 3 },
   ]);
 });
+
+// --- #8870 validation-gate: breakdown must reflect the MATCHED set, not the returned page --------
+
+test('buildDigest: a real aggregation reflects the full matched set even when limit < total truncates the page', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'wazuh.agent.name', label: 'Agent' }] },
+    digest: {
+      sampleColumns: ['wazuh.agent.name'],
+      breakdownDimensions: ['wazuh.agent.name', 'wazuh.rule.title'],
+    },
+  });
+  // Mirrors the issue's validation-gate reproduction verbatim: limit:20 returns a 20-row PAGE of a
+  // 26-row matched set (true distribution 16/8/2 agents, 13/13 rules). A breakdown grouped over
+  // only the 20 returned rows (buildSyntheticBreakdown) would reproduce the observed defect
+  // (13/7, 11/9 -- a third agent invisible). `catalog/common.ts`'s `FINDING_BREAKDOWN_AGGS` attaches
+  // a REAL terms aggregation to the SAME request, which OpenSearch computes over the full 26-row
+  // matched set regardless of `size` -- this result mocks exactly that response shape: `hits`
+  // truncated to the 20-row page, `aggregations` carrying the true 26-row distribution.
+  const rows = Array.from({ length: 20 }, (_, i) =>
+    findingRow(`agent-${i}`, 'Rule Z', '2026-01-01T00:00:00Z'),
+  );
+  const result = {
+    hits: { total: { value: 26 }, hits: rows },
+    aggregations: {
+      wazuh_agent_name: {
+        buckets: [
+          { key: 'web-prod-01', doc_count: 16 },
+          { key: 'web-prod-02', doc_count: 8 },
+          { key: 'wazuh-aio-5', doc_count: 2 },
+        ],
+      },
+      wazuh_rule_title: {
+        buckets: [
+          { key: 'Rule B', doc_count: 13 },
+          { key: 'Rule A', doc_count: 13 },
+        ],
+      },
+    },
+  };
+  const digest = buildDigest('get_critical_findings', result, def);
+
+  assert.equal(digest.counts.total, 26);
+  assert.equal(digest.counts.returned, 20);
+  assert.equal(digest.counts.truncated, true);
+  assert.ok(
+    !('breakdownNote' in digest),
+    'a REAL aggregation is population-true and needs no page-only caveat',
+  );
+
+  const agentBuckets = digest.breakdown!.filter(b => b.agg === 'wazuh_agent_name');
+  assert.deepEqual(
+    new Map(agentBuckets.map(b => [b.key, b.count])),
+    new Map([
+      ['web-prod-01', 16],
+      ['web-prod-02', 8],
+      ['wazuh-aio-5', 2],
+    ]),
+  );
+  const ruleBuckets = digest.breakdown!.filter(b => b.agg === 'wazuh_rule_title');
+  assert.deepEqual(
+    new Map(ruleBuckets.map(b => [b.key, b.count])),
+    new Map([
+      ['Rule B', 13],
+      ['Rule A', 13],
+    ]),
+  );
+});
+
+test('buildDigest: a synthetic breakdown over a truncated page is labeled page-only, never presented as the population', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'wazuh.agent.name', label: 'Agent' }] },
+    digest: {
+      sampleColumns: ['wazuh.agent.name'],
+      breakdownDimensions: ['wazuh.agent.name'],
+    },
+  });
+  // No `aggregations` on this mock result -- the "adding a real aggregation is impossible for this
+  // caller" case buildSyntheticBreakdown remains the fallback for. `hits.total.value` (26) exceeds
+  // the 8 rows actually returned: the synthesized breakdown can only ever see this page, so it must
+  // carry `breakdownNote` instead of being handed to the model as if it were the full distribution.
+  const rows = Array.from({ length: 8 }, () =>
+    findingRow('web-prod-01', 'Rule X', '2026-01-01T00:00:00Z'),
+  );
+  const result = { hits: { total: { value: 26 }, hits: rows } };
+  const digest = buildDigest('get_critical_findings', result, def);
+
+  assert.equal(digest.counts.truncated, true);
+  assert.ok(digest.breakdown, 'expected a synthesized breakdown despite being page-scoped');
+  assert.ok(digest.breakdownNote, 'expected a page-only caveat on a truncated synthetic breakdown');
+  assert.match(digest.breakdownNote!, /covers only the 8 returned rows/);
+  assert.match(digest.breakdownNote!, /not all 26 matching rows/);
+  // samplesNote must not instruct the model to trust this same page-scoped breakdown.
+  assert.ok(digest.samplesNote);
+  assert.equal(/Use counts\/breakdown/.test(digest.samplesNote!), false);
+});
