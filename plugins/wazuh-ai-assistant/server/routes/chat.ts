@@ -599,8 +599,14 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
   );
 }
 
-/** What `runStage1Routing` resolves to once its (internal-only) adapter stream ends. */
-interface Stage1Result {
+/**
+ * What `runStage1Routing` resolves to once its (internal-only) adapter stream ends. Exported
+ * (along with `runStage1Routing` itself, below) for unit testing only -- see
+ * chat-stage1-usage.test.ts, which drives it with a fake `ProviderAdapter` to prove stage 1's
+ * `usage` actually threads through to this result, rather than only proving the pure accumulator
+ * sums correctly (chat-usage.test.ts) or reading the fix by inspection (issue 8875).
+ */
+export interface Stage1Result {
   /** `undefined` means "no tools this turn" (routed to `general` alone). */
   tools: ToolSpec[] | undefined;
   /**
@@ -628,7 +634,7 @@ interface Stage1Result {
  * loop below with the full catalog; if the provider is genuinely down, round 0 surfaces that to
  * the user the ordinary way.
  */
-async function* runStage1Routing(
+export async function* runStage1Routing(
   adapter: ProviderAdapter,
   providerConfig: ProviderConfig,
   initialMessages: ChatMessage[],
@@ -783,9 +789,12 @@ async function* orchestrate(
   // Sum of every provider call's `usage` THIS TURN — the stage-1 routing call (if the router ran)
   // plus every round of the loop below, INCLUDING non-final rounds whose `done` is otherwise
   // suppressed (see the round loop's `if (sawToolCall) { break; }`). Without this, only the last
-  // round's usage ever reached the client (issue 14-accumulate-usage-across-calls.md, measured
-  // 6,409 reported vs. ~12,740 actual on a multi-round turn). See chat-usage.ts for why the helper
-  // itself lives in its own dependency-free module.
+  // round's usage ever reached the client (issue 8875, measured 6,409 reported vs. ~12,740 actual
+  // on a multi-round turn). This accumulator itself was always correct; the actual defect was one
+  // level down, in openai-compatible.ts, never handing it a non-zero usage for any call that ended
+  // in a tool call (every non-final round, and the stage-1 call above, unconditionally) -- see that
+  // file's `toolCallsFinalized` handling. See chat-usage.ts for why the accumulator helper itself
+  // lives in its own dependency-free module.
   let usageTotals = ZERO_USAGE_TOTALS;
 
   /** Yields a `privacy_map` event for any pseudonym entries minted so far this turn, but only
@@ -1099,8 +1108,8 @@ async function* orchestrate(
         }
         // Accumulate BEFORE the sawToolCall branch below: a non-final round's 'done' is suppressed
         // (never forwarded to the client) but its usage was still real spend for this turn and must
-        // not be dropped — this is the exact bug issue 14-accumulate-usage-across-calls.md
-        // describes (only the LAST round's usage reached the client).
+        // not be dropped — this is the exact bug issue 8875 describes (only the LAST round's usage
+        // reached the client).
         usageTotals = addUsage(usageTotals, event.usage);
         if (sawToolCall) {
           // More rounds needed: suppress this 'done' (the turn isn't over) and start the next
