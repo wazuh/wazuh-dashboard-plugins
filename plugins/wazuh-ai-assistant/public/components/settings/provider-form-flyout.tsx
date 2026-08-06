@@ -139,7 +139,7 @@ const PROVIDER_MODEL_GUIDANCE: Record<
   { examples: string[]; docs: ProviderUrlDoc[]; note?: string }
 > = {
   openai_compatible: {
-    examples: ['gpt-4o', 'gpt-4o-mini', 'llama-3.3-70b-versatile'],
+    examples: ['gpt-4o', 'gpt-4o-mini', 'openai/gpt-oss-120b'],
     docs: [
       {
         label: i18n.translate(
@@ -514,8 +514,11 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 <>
                   {i18n.translate('wazuhAiAssistant.settings.form.modelHelp', {
                     defaultMessage:
-                      'Tool calling needs a model with solid function-calling support. Small ' +
-                      'or base models often fail with tool errors.',
+                      'Tool calling needs a model with solid function-calling support ' +
+                      '(e.g. GPT-4o, Claude Sonnet) — small or lightweight models often ' +
+                      "fail. Check your provider's model list for current availability, " +
+                      'as models are periodically retired. A free-tier API key with a ' +
+                      "low rate limit may fail regardless of the model's capability.",
                   })}{' '}
                   <FormattedMessage
                     id='wazuhAiAssistant.settings.form.modelExample'

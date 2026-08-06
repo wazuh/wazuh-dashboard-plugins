@@ -20,6 +20,21 @@ export interface JsonSchemaPrimitive {
   type: JsonSchemaPrimitiveType;
   description?: string;
   enum?: Array<string | number>;
+  /**
+   * Marks a `string`-typed property whose canonical content is itself JSON-encoded text (today:
+   * only search-wazuh-data.ts's `query_dsl`, a stringified OpenSearch request body — this file's
+   * `JsonSchemaObject` has no nested-object property type to declare it against directly, see the
+   * file header comment above). Two consumers key off this flag: wire-schema.ts's
+   * `widenNumericTypes` widens the property's WIRE type to `["string","object"]` (marker stripped
+   * before the schema reaches the provider — it is not a standard JSON Schema keyword) so a model
+   * that naturally emits nested JSON as a live object isn't hard-rejected by provider-side
+   * argument validation (e.g. Groq's), and server/tools/schema-validator.ts's `coerce` stringifies
+   * an object-valued argument back to the declared `string` type once the call arrives. Absent
+   * (the default) on every other string property, so an object emitted for e.g. `agent_name`
+   * still fails validation instead of being silently accepted as a JSON-blob string that matches
+   * nothing downstream.
+   */
+  jsonString?: true;
 }
 
 export interface JsonSchemaArray {
