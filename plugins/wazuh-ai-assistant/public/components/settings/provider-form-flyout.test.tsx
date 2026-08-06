@@ -321,11 +321,48 @@ describe('ProviderFormFlyout — endpoint URL guidance', () => {
   });
 });
 
+describe('ProviderFormFlyout — model help text does not recommend retiring models', () => {
+  it('does not recommend llama-3.3-70b-versatile or llama-3.1-8b-instant', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const helpText = screen.getByText(
+      /tool calling needs a model with solid function-calling support/i,
+    );
+
+    expect(helpText.textContent).not.toMatch(/llama-3\.3-70b-versatile/);
+    expect(helpText.textContent).not.toMatch(/llama-3\.1-8b-instant/);
+    expect(helpText.textContent).toMatch(/GPT-4o/);
+    expect(helpText.textContent).not.toMatch(
+      /small or base models often fail/i,
+    );
+  });
+
+  it('does not offer llama-3.3-70b-versatile as a model example chip', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    expect(
+      screen.queryByText(/^llama-3\.3-70b-versatile$/),
+    ).not.toBeInTheDocument();
+    // Anchored to the CHIP specifically — it renders the bare id in its own <code>.
+    const chips = screen
+      .getAllByText(/^openai\/gpt-oss-120b$/)
+      .filter(node => node.tagName.toLowerCase() === 'code');
+    expect(chips.length).toBeGreaterThan(0);
+  });
+});
+
 describe('ProviderFormFlyout — Model field guidance', () => {
   it('shows OpenAI-compatible model examples and one docs link per covered service by default', async () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
-    expect(screen.getByText(/gpt-4o-mini/i)).toBeInTheDocument();
+    // Anchored to the example CHIP's own <code>: the updated model help text (issue 09) also names
+    // GPT-4o-mini in its prose, so an unanchored getByText now matches two nodes and throws. This
+    // test is about the example chips, not the help paragraph.
+    expect(
+      screen
+        .getAllByText(/^gpt-4o-mini$/i)
+        .filter(node => node.tagName.toLowerCase() === 'code').length,
+    ).toBeGreaterThan(0);
 
     fireEvent.click(
       screen.getByRole('button', { name: /^see available models$/i }),
