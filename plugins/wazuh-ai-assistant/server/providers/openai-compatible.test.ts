@@ -359,3 +359,248 @@ test('chatStream: omitting options.temperature leaves the field out of the body 
   });
   assert.ok(!('temperature' in capturedBodies[0]));
 });
+
+// --- inline reasoning markup stripping (issue 18-strip-inline-reasoning-markup.md) -------------
+// Unit coverage for the character-level tag-matching/holdback logic itself lives beside the
+// filter (inline-reasoning-markup-filter.test.ts, following markdown-table-filter.test.ts's
+// style). These tests cover this ADAPTER's wiring of it: every exit path flushes it, `sawContent`
+// reflects the FILTERED result (not raw `delta.content`), and the reasoning-channel fallback's
+// precedence against fully-stripped inline content.
+
+test('chatStream: a <think> block in delta.content is stripped before reaching the client', async () => {
+  const body = sseBody([
+    {
+      choices: [
+        {
+          index: 0,
+          delta: {
+            content: '<think>\nI should check the host facts.\n</think>\n\nIt has 16GB RAM.',
+          },
+        },
+      ],
+    },
+  ]);
+  const events = await withFakeFetch(body, () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('how much RAM does this host have?')],
+        controller.signal,
+      ),
+    );
+  });
+  assert.deepEqual(events.map(event => event.type), ['delta', 'done']);
+  assert.equal((events[0] as { content: string }).content, '\n\nIt has 16GB RAM.');
+});
+
+test('chatStream: a <think> tag straddling two SSE chunks is still stripped', async () => {
+  const body = sseBody([
+    { choices: [{ index: 0, delta: { content: 'Sure. <thi' } }] },
+    { choices: [{ index: 0, delta: { content: 'nk>hidden</think> here it is.' } }] },
+  ]);
+  const events = await withFakeFetch(body, () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('question')],
+        controller.signal,
+      ),
+    );
+  });
+  const text = events
+    .filter(event => event.type === 'delta')
+    .map(event => (event as { content: string }).content)
+    .join('');
+  assert.equal(text, 'Sure.  here it is.');
+});
+
+test('chatStream: an unclosed <think> running to [DONE] is dropped, not shown', async () => {
+  const body = sseBody([
+    {
+      choices: [
+        {
+          index: 0,
+          delta: { content: 'Answer first. <think>never closes, stream just ends' },
+        },
+      ],
+    },
+  ]);
+  const events = await withFakeFetch(body, () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('question')],
+        controller.signal,
+      ),
+    );
+  });
+  const text = events
+    .filter(event => event.type === 'delta')
+    .map(event => (event as { content: string }).content)
+    .join('');
+  assert.equal(text, 'Answer first. ');
+});
+
+test('chatStream: <tool_call>/<function=>/<parameter=> markup emitted as delta.content text (not a real tool call) is stripped', async () => {
+  // Verbatim shape from the issue: the model attempts a tool call AS TEXT instead of a structured
+  // `tool_calls` delta, and the block is left unclosed when the stream ends.
+  const body = sseBody([
+    {
+      choices: [
+        {
+          index: 0,
+          delta: {
+            content:
+              '<tool_call>\n<function=search_wazuh_data>\n<parameter=index_pattern>\nwazuh-states-*\n',
+          },
+        },
+      ],
+    },
+  ]);
+  const events = await withFakeFetch(body, () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('how much RAM and what CPU does this host have?')],
+        controller.signal,
+      ),
+    );
+  });
+  // Entirely markup, no real answer text at all -- no delta at all, just done (the route-level
+  // no-text fallback in chat.ts, not this adapter, is what turns this into a user-facing sentence;
+  // see the `noTextFallbackMessage`-interaction test below for the adapter's own analogous case).
+  assert.deepEqual(events.map(event => event.type), ['done']);
+});
+
+test('chatStream: a legitimate <script> mention and a "size < 500" comparison are preserved verbatim (regression)', async () => {
+  const answer =
+    'The rule flags any payload containing a <script> tag. Only alerts where size < 500 and severity > 3 were kept.';
+  const body = sseBody([{ choices: [{ index: 0, delta: { content: answer } }] }]);
+  const events = await withFakeFetch(body, () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('explain the rule')],
+        controller.signal,
+      ),
+    );
+  });
+  assert.deepEqual(events.map(event => event.type), ['delta', 'done']);
+  assert.equal(
+    (events[0] as { content: string }).content,
+    answer,
+    'ordinary angle brackets/comparisons must never be touched by the markup filter',
+  );
+});
+
+test('chatStream: a gpt-oss-style clean stream (no inline markup at all) is byte-identical', async () => {
+  const answer = 'The cluster is healthy. 3 agents are active and reporting.';
+  const body = sseBody([{ choices: [{ index: 0, delta: { content: answer } }] }]);
+  const events = await withFakeFetch(body, () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(BASE_CONFIG, [userMessage('status?')], controller.signal),
+    );
+  });
+  assert.deepEqual(events, [{ type: 'delta', content: answer }, { type: 'done' }]);
+});
+
+test('chatStream: content that is ENTIRELY <think> markup is treated as no content -- the reasoning-channel buffer wins instead', async () => {
+  // Precedence case: the provider sends the SAME deliberation on both channels -- the dedicated
+  // `reasoning` field (issue 02's fallback) and, leaked, inline in `content` wrapped in <think>.
+  // Once inline `content` is fully stripped, `sawContent` must reflect that (not the raw
+  // `delta.content` presence) so `reasoningFallback` can still supply an answer instead of the
+  // turn silently ending with no text at all.
+  const body = sseBody([
+    {
+      choices: [
+        {
+          index: 0,
+          delta: {
+            content: '<think>the host has 16GB RAM and 4 vCPUs</think>',
+            reasoning: 'the host has 16GB RAM and 4 vCPUs',
+            channel: 'analysis',
+          },
+        },
+      ],
+    },
+  ]);
+  const events = await withFakeFetch(body, () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('how much RAM does this host have?')],
+        controller.signal,
+      ),
+    );
+  });
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['delta', 'done'],
+    'a fully-stripped content delta must not count as "the model produced an answer"',
+  );
+  assert.equal(
+    (events[0] as { content: string }).content,
+    'the host has 16GB RAM and 4 vCPUs',
+    'reasoningBuffer must step in once inline content evaporates entirely',
+  );
+});
+
+test('chatStream: markup preceding a real tool call is stripped and flushed before the tool_call event (finish_reason exit)', async () => {
+  const body = sseBody([
+    {
+      choices: [
+        {
+          index: 0,
+          delta: { content: '<think>I should check the agent list.</think>' },
+        },
+      ],
+    },
+    {
+      choices: [
+        {
+          index: 0,
+          delta: {
+            tool_calls: [
+              {
+                index: 0,
+                id: 'call_1',
+                function: { name: 'get_agents', arguments: '{}' },
+              },
+            ],
+          },
+          finish_reason: 'tool_calls',
+        },
+      ],
+    },
+  ]);
+  const events = await withFakeFetch(body, () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('list active agents')],
+        controller.signal,
+      ),
+    );
+  });
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['tool_call', 'done'],
+    'the fully-stripped <think> block must not surface as a phantom delta ahead of the tool call',
+  );
+});

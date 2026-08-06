@@ -21,6 +21,7 @@ import {
   assertProviderUrlAllowed,
   PROVIDER_FETCH_REDIRECT_POLICY,
 } from './url-guard';
+import { InlineReasoningMarkupFilter } from './inline-reasoning-markup-filter';
 
 /** Per-index accumulation of a streamed `tool_calls` delta until the provider closes it out. */
 interface ToolCallAccumulator {
@@ -104,6 +105,32 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     // `content` at all — never appended alongside a working answer.
     let sawContent = false;
     let reasoningBuffer = '';
+    // Inline-markup filter (issue 18-strip-inline-reasoning-markup.md): some reasoning models
+    // (qwen3.x, measured 6/8 leaked answers) put their `<think>...</think>` deliberation, and
+    // sometimes `<tool_call>`/`<function=...>`/`<parameter=...>` text standing in for a real tool
+    // call, straight into `delta.content` instead of the separate `reasoning` channel above. One
+    // instance per call, fed every `content` delta below and drained at every exit path (mirrors
+    // `reasoningBuffer`'s own per-call lifecycle) so a tag split across two SSE chunks is still
+    // caught. See inline-reasoning-markup-filter.ts's doc comment for why this is depth-tracked
+    // rather than line-buffered like markdown-table-filter.ts's MarkdownTableSuppressor.
+    const inlineMarkupFilter = new InlineReasoningMarkupFilter();
+    /** Emits whatever the filter can still release once the stream has ended (e.g. a trailing
+     * ambiguous tag prefix that can now never complete). Precedence note: `sawContent` is set from
+     * this call's return value too (see the `content` handling below), NOT from the raw
+     * `delta.content` presence — so a turn whose entire `content` was `<think>` markup and got
+     * fully stripped is correctly treated as having produced no answer, letting `reasoningFallback`
+     * below step in with `reasoningBuffer` if the provider also happened to send one. Debug
+     * logging on strip: `ProviderAdapter.chatStream` is not given a `Logger` (checked call sites —
+     * none of chat.ts/anthropic.ts/openai-compatible.ts thread one down into an adapter), so this
+     * intentionally does not invent one; `inlineMarkupFilter.didStrip` is available for a future
+     * caller that does plumb one through. */
+    function* flushInlineMarkupFilter(): Generator<StreamEvent> {
+      const trailing = inlineMarkupFilter.flush();
+      if (trailing) {
+        sawContent = true;
+        yield { type: 'delta', content: trailing };
+      }
+    }
     /** Emits the buffered reasoning text as one `delta`, but only if `content` never arrived this
      * call AND this exit finalized no tool calls. Two exits are excluded, not one:
      *  - the `finish_reason === 'tool_calls'` exit (a round that ends in a tool call has no answer
@@ -114,7 +141,14 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
      *    the wire format doesn't guarantee it), and reasoning routinely precedes a tool call on the
      *    analysis channel, so the buffer is typically full exactly when a tool round is ending.
      *    Without this, that reasoning text would be injected as the answer for a TOOL round instead
-     *    of being correctly treated as "no answer due yet". */
+     *    of being correctly treated as "no answer due yet".
+     *
+     *    Precedence when BOTH `reasoningBuffer` and inline markup are present (e.g. a provider
+     *    sends the same deliberation on the `reasoning` channel AND repeats/leaks it inline in
+     *    `content`): `content` still wins whenever it survives stripping with real text — this
+     *    fallback only ever runs when `sawContent` is false, i.e. inline `content` fully evaporated
+     *    (or never arrived). At that point `reasoningBuffer` is the better — indeed only — answer
+     *    source available, so it is used exactly as it already was pre-issue-18. */
     function* reasoningFallback(hadToolCalls: boolean): Generator<StreamEvent> {
       if (!sawContent && !hadToolCalls && reasoningBuffer) {
         yield { type: 'delta', content: reasoningBuffer };
@@ -124,6 +158,7 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     try {
       for await (const payload of iterateSseLines(response.body, signal)) {
         if (payload === '[DONE]') {
+          yield* flushInlineMarkupFilter();
           const finalized = finalizeToolCalls(toolCalls);
           yield* finalized;
           if (!hasToolCallError(finalized)) {
@@ -172,8 +207,16 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         const choice = parsed.choices?.[0];
         const delta = choice?.delta?.content;
         if (delta) {
-          sawContent = true;
-          yield { type: 'delta', content: delta };
+          // Run every content delta through the inline-markup filter BEFORE it ever reaches the
+          // client (issue 18) — `sawContent` is set from the FILTERED result, not `delta`'s mere
+          // presence, so a delta that was entirely `<think>`/`<tool_call>` markup and got fully
+          // stripped never lies about having produced an answer (see `reasoningFallback`'s
+          // precedence note above).
+          const filtered = inlineMarkupFilter.push(delta);
+          if (filtered) {
+            sawContent = true;
+            yield { type: 'delta', content: filtered };
+          }
         }
         if (choice?.delta?.reasoning) {
           reasoningBuffer += choice.delta.reasoning;
@@ -181,6 +224,10 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         accumulateToolCallDeltas(toolCalls, choice?.delta?.tool_calls);
 
         if (choice?.finish_reason === 'tool_calls') {
+          // Flush before finalizing the tool call, same ordering rule chat.ts's own
+          // `drainRoundBuffers()` follows: whatever text preceded the call must be fully resolved
+          // (and, if it was markup, dropped) before the round moves on.
+          yield* flushInlineMarkupFilter();
           const finalized = finalizeToolCalls(toolCalls);
           yield* finalized;
           if (!hasToolCallError(finalized)) {
@@ -189,6 +236,7 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
           return;
         }
         if (parsed.usage) {
+          yield* flushInlineMarkupFilter();
           const finalized = finalizeToolCalls(toolCalls);
           yield* finalized;
           if (!hasToolCallError(finalized)) {
@@ -204,6 +252,7 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
           return;
         }
       }
+      yield* flushInlineMarkupFilter();
       const finalized = finalizeToolCalls(toolCalls);
       yield* finalized;
       if (!hasToolCallError(finalized)) {
