@@ -346,7 +346,14 @@ describe('ProviderFormFlyout — model help text does not recommend retiring mod
     expect(
       screen.queryByText(/^llama-3\.3-70b-versatile$/),
     ).not.toBeInTheDocument();
-    expect(screen.getByText(/openai\/gpt-oss-120b/i)).toBeInTheDocument();
+    // Anchored to the CHIP specifically: the replacement model id now also appears inside the
+    // help-text paragraph ("Verified working, August 2026: openai/gpt-oss-120b or ..."), so an
+    // unanchored getByText matches two nodes and throws. The chip renders the bare id in its own
+    // <code>, which is what this test is actually about.
+    const chips = screen
+      .getAllByText(/^openai\/gpt-oss-120b$/)
+      .filter(node => node.tagName.toLowerCase() === 'code');
+    expect(chips.length).toBeGreaterThan(0);
   });
 });
 
