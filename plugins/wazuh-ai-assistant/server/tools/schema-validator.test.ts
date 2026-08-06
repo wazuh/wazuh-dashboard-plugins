@@ -194,41 +194,53 @@ test('validate: a string-form query_dsl continues to work unchanged (regression)
   }
 });
 
-test('validate: an object-form query_dsl carrying a "script" key round-trips intact, so the ' +
-  'downstream DSL lint (guardrails.ts lintDsl, which parses this string) still sees and rejects ' +
-  'it exactly as a hand-written string — widening the accepted TYPE must not widen what is ' +
-  'ALLOWED', () => {
-  const maliciousDsl = { query: { match_all: {} }, script: { source: 'evil' } };
-  const result = validate({ query_dsl: maliciousDsl }, DSL_SCHEMA);
-  assert.equal(result.ok, true);
-  if (result.ok) {
-    assert.deepEqual(
-      JSON.parse(result.value.query_dsl as string),
-      maliciousDsl,
+test(
+  'validate: an object-form query_dsl carrying a "script" key round-trips intact, so the ' +
+    'downstream DSL lint (guardrails.ts lintDsl, which parses this string) still sees and rejects ' +
+    'it exactly as a hand-written string — widening the accepted TYPE must not widen what is ' +
+    'ALLOWED',
+  () => {
+    const maliciousDsl = {
+      query: { match_all: {} },
+      script: { source: 'evil' },
+    };
+    const result = validate({ query_dsl: maliciousDsl }, DSL_SCHEMA);
+    assert.equal(result.ok, true);
+    if (result.ok) {
+      assert.deepEqual(
+        JSON.parse(result.value.query_dsl as string),
+        maliciousDsl,
+      );
+    }
+  },
+);
+
+test(
+  'validate: an array-form query_dsl is NOT coerced (only plain objects are) and still fails ' +
+    'the type check, same as before this change',
+  () => {
+    const result = validate({ query_dsl: ['a', 'b'] }, DSL_SCHEMA);
+    assert.equal(result.ok, false);
+    if (!result.ok) {
+      assert.ok(result.errors.some(e => /must be of type string/.test(e)));
+    }
+  },
+);
+
+test(
+  'validate: an object for an UNMARKED string property (no jsonString) is rejected, not ' +
+    'silently stringified — the regression guard against over-broad coercion',
+  () => {
+    const result = validate(
+      { agent_name: { not: 'a plain string' } },
+      PLAIN_STRING_SCHEMA,
     );
-  }
-});
-
-test('validate: an array-form query_dsl is NOT coerced (only plain objects are) and still fails ' +
-  'the type check, same as before this change', () => {
-  const result = validate({ query_dsl: ['a', 'b'] }, DSL_SCHEMA);
-  assert.equal(result.ok, false);
-  if (!result.ok) {
-    assert.ok(result.errors.some(e => /must be of type string/.test(e)));
-  }
-});
-
-test('validate: an object for an UNMARKED string property (no jsonString) is rejected, not ' +
-  'silently stringified — the regression guard against over-broad coercion', () => {
-  const result = validate(
-    { agent_name: { not: 'a plain string' } },
-    PLAIN_STRING_SCHEMA,
-  );
-  assert.equal(result.ok, false);
-  if (!result.ok) {
-    assert.ok(result.errors.some(e => /must be of type string/.test(e)));
-  }
-});
+    assert.equal(result.ok, false);
+    if (!result.ok) {
+      assert.ok(result.errors.some(e => /must be of type string/.test(e)));
+    }
+  },
+);
 
 test('validate: omitted optional properties are simply absent from the output', () => {
   const result = validate({ agent_id: '001' }, AGENT_SCHEMA);
