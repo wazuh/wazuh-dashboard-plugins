@@ -77,6 +77,21 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // analyst/attacker-supplied — reviewed 'allow'.
   { field: WAZUH_FIELD.RULE_TAGS, action: 'allow' },
   { field: WAZUH_FIELD.RULE_CATEGORY, action: 'allow' },
+  // Explicit entry added for #8889: wazuh.rule.title is in every finding-hits tool's sample
+  // columns (catalog/common.ts's STANDARD_FINDING_SAMPLE_COLUMNS) but previously had no policy
+  // entry at all, so it reached the provider through allow-by-omission rather than an intentional
+  // decision. Reviewed 'allow', not 'anonymize': the overwhelming majority of titles are fixed
+  // strings from Wazuh's own curated ruleset — the model needs the real text to name/describe a
+  // finding, and anonymizing this high-cardinality field would replace nearly every distinct
+  // finding's label with its own opaque VAL_n, gutting the assistant's usefulness (the same
+  // tradeoff already made for rule.category/rule.tags above). The residual risk is real, not
+  // hypothetical, though: a LOCAL/custom rule's <description> can interpolate a decoder capture
+  // group (e.g. "Failed login from $(srcip)"), so a title CAN echo attacker-influenced log
+  // content, unlike the closed-vocabulary rule.category/rule.tags. That is not left unaddressed —
+  // it is covered at a different layer: chat.ts's scrubMessagesForProvider runs
+  // prescanAndMintToolContent over every tool-result string value (this one included) before it
+  // reaches the provider, so an embedded IP/FQDN in a custom title is still pseudonymized there.
+  { field: WAZUH_FIELD.RULE_TITLE, action: 'allow' },
   // Wildcard covers every compliance framework (pci_dss, hipaa, gdpr, iso_27001, nis2,
   // nist_800_171, nist_800_53, fedramp, cmmc, tsc, ...), not just the one this plugin has a
   // dedicated tool for — all are curated requirement-tag lists, equally not
@@ -115,22 +130,65 @@ export interface PseudonymEntry {
   pseudonym: string;
 }
 
+/** Splits a field name into lowercase word tokens on '.', '_', '-', and camelCase boundaries —
+ * e.g. "data.srcuser" -> ["data","srcuser"] (no internal boundary inside "srcuser"), "GeoLocation"
+ * -> ["geo","location"], "country_name" -> ["country","name"]. Used by `inferPseudonymKind` so a
+ * keyword match is checked against a whole TOKEN (or a token's own prefix/suffix), never against
+ * an arbitrary substring floating in the middle of an unrelated word. */
+function fieldNameTokens(field: string): string[] {
+  return field
+    .split(/[.\-_]+/)
+    .flatMap(segment => segment.split(/(?<=[a-z0-9])(?=[A-Z])/))
+    .map(token => token.toLowerCase())
+    .filter(token => token.length > 0);
+}
+
+/** True when `keyword` occupies the WHOLE of `token`, or is glued to it as a prefix/suffix with no
+ * delimiter in between (e.g. "srcip"/"dstip" end with "ip", "clientuser" ends with "user") — but
+ * NOT when it merely appears somewhere in the middle, which is what let 'wazuh.rule.description'
+ * misclassify as an IP field before this fix (`'description'.includes('ip')` is true — "descr-IP-
+ * tion" — because raw substring search has no concept of a word boundary). */
+function tokenMatchesKeyword(token: string, keyword: string): boolean {
+  return (
+    token === keyword || token.startsWith(keyword) || token.endsWith(keyword)
+  );
+}
+
 /** Infers which pseudonym kind a field name should mint, from the field name alone ("kind
  * inferred from field name"). Checked in this order so a field matching more than one heuristic
  * (there are none in FIELD_POLICY_DEFAULTS today) resolves predictably; falls back to the generic
- * `VAL` kind for a field that is none of host/ip/user/url. */
+ * `VAL` kind for a field that is none of host/ip/user/url.
+ *
+ * Matches on whole tokens (see `fieldNameTokens`/`tokenMatchesKeyword`), not a raw substring of
+ * the entire field string — the previous `lower.includes('ip')` style check flagged any field
+ * whose name merely *contained* "ip" as a substring, e.g. 'wazuh.rule.description' ("descr-IP-
+ * tion") or 'recipient', misclassifying them as IP fields and making the model narrate their
+ * (actually opaque, unrelated-kind) pseudonym tokens as literal IP addresses. Compound field names
+ * with no delimiter (e.g. legacy Wazuh alert fields like "data.srcip"/"data.srcuser") still match,
+ * because the keyword only needs to be a prefix/suffix of a token, not the whole token. */
 export function inferPseudonymKind(field: string): PseudonymKind {
-  const lower = field.toLowerCase();
-  if (lower.includes('url')) {
+  const tokens = fieldNameTokens(field);
+  const hasKeyword = (keyword: string) =>
+    tokens.some(token => tokenMatchesKeyword(token, keyword));
+  if (hasKeyword('url')) {
     return 'URL';
   }
-  if (lower.includes('ip')) {
+  if (hasKeyword('ip')) {
     return 'IP';
   }
-  if (lower.includes('user')) {
+  if (hasKeyword('user')) {
     return 'USER';
   }
-  if (lower.includes('hostname') || lower.endsWith('.name')) {
+  if (hasKeyword('hostname')) {
+    return 'HOST';
+  }
+  // A field path's LAST '.'-delimited segment being the bare word "name" is this repo's
+  // hostname-alias convention (e.g. "wazuh.agent.name") — deliberately an exact match on the
+  // final PATH segment (split only on '.', unlike the token check above) so a within-segment
+  // compound like "country_name" (a place name, not a host) is not swept in; only a path
+  // structurally ending in ".name" is.
+  const pathSegments = field.split('.');
+  if (pathSegments[pathSegments.length - 1].toLowerCase() === 'name') {
     return 'HOST';
   }
   return 'VAL';
@@ -407,6 +465,44 @@ const FQDN_TOKEN_RE = new RegExp(
  * two-label FQDN shape. `prescanAndMint` leaves these untouched. */
 const ALL_NUMERIC_DOTTED_RE = /^[0-9.]+Z?$/;
 
+/** A dotted token shaped like a package/software version string: an optional leading "v" (common
+ * in semver, e.g. "v1.2.3"), then one-or-more digit-only labels, optionally followed by a single
+ * "-suffix" (a Debian/Ubuntu-style package revision, e.g. the "-2ubuntu1" in "5.2.5-2ubuntu1").
+ * `prescanAndMint` leaves these untouched — otherwise minting a HOST_n for a version string
+ * undermines a `package.version:{allow}`-style query the user is asking about. Deliberately
+ * requires the token to START with (optional "v" +) a digit: a real hostname's first label is
+ * essentially never digits-only immediately followed by more dotted digit labels, so this can't
+ * exclude a genuine hostname like "backup-vault.internal.corp" (starts with a letter). */
+const VERSION_LIKE_TOKEN_RE = /^v?\d+(?:\.\d+)+(?:-[0-9A-Za-z.]+)?$/i;
+
+/** Every dot-path SEGMENT word appearing in a curated Wazuh/ECS field name — drawn from
+ * `WAZUH_FIELD`'s values and every plain field in `FIELD_POLICY_DEFAULTS` (a tool-scope
+ * "toolName/" prefix and the trailing ".*" wildcard are stripped first, since those aren't part of
+ * the path itself), all lowercased. Self-updating: a field added to either source is automatically
+ * recognized here — no separate list to hand-maintain. Used by `isFieldPathToken` below. */
+const FIELD_PATH_WORDS: ReadonlySet<string> = new Set(
+  [
+    ...Object.values(WAZUH_FIELD),
+    ...FIELD_POLICY_DEFAULTS.map(entry => entry.field),
+  ]
+    .map(field => field.split('/').pop() as string) // drop a "toolName/" scoping prefix, if any
+    .flatMap(field => field.replace(/\.\*$/, '').split('.'))
+    .map(segment => segment.toLowerCase())
+    .filter(segment => segment.length > 0),
+);
+
+/** True when every '.'-separated segment of `token` is a known field-path word (see
+ * `FIELD_PATH_WORDS`) — i.e. `token` reads as the user NAMING A FIELD (e.g. typing
+ * "wazuh.agent.name" or "wazuh.rule.id" into their own question), not an actual hostname.
+ * Deliberately requires ALL segments to match, not just one: a real hostname composed entirely of
+ * words that also happen to be field-path vocabulary is exotic enough to accept the (favorable)
+ * tradeoff of never mangling a user's own field-path mention into a broken HOST_n token. */
+function isFieldPathToken(token: string): boolean {
+  return token
+    .split('.')
+    .every(segment => FIELD_PATH_WORDS.has(segment.toLowerCase()));
+}
+
 /**
  * First-mention pre-scan: mints a pseudonym for every IPv4/IPv6 address
  * and dotted-hostname (FQDN) token found in `text`, using the SAME `pseudonymizer` instance the
@@ -420,6 +516,13 @@ const ALL_NUMERIC_DOTTED_RE = /^[0-9.]+Z?$/;
  * Scan order matters and is fixed: IPv4, then IPv6, then FQDN — an IPv4 octet run must be minted
  * (and thus removed from the text) before the FQDN pass runs, or a bare IP could otherwise be
  * mis-read as a dotted hostname and minted with the wrong `kind`.
+ *
+ * The FQDN pass additionally excludes (in order checked): an all-numeric dotted run or ISO
+ * timestamp fragment (`ALL_NUMERIC_DOTTED_RE`, pre-existing), a version/package-revision string
+ * (`VERSION_LIKE_TOKEN_RE` — e.g. "5.2.5-2ubuntu1" would otherwise undermine a
+ * `package.version:{allow}` query), and a field-path-shaped token (`isFieldPathToken` — e.g. the
+ * user typing "wazuh.agent.name"/"wazuh.rule.id" would otherwise get that mention replaced with a
+ * HOST_n, breaking their own query and making the model claim the field doesn't exist).
  *
  * Deliberately conservative (documented limitation): a bare
  * single-word hostname ("webserver", no dot) is NEVER matched — only `label.label[...]` forms are,
@@ -442,7 +545,11 @@ export function prescanAndMint(
     pseudonymizer.pseudonymize(token, 'IP'),
   );
   out = out.replace(FQDN_TOKEN_RE, token => {
-    if (ALL_NUMERIC_DOTTED_RE.test(token)) {
+    if (
+      ALL_NUMERIC_DOTTED_RE.test(token) ||
+      VERSION_LIKE_TOKEN_RE.test(token) ||
+      isFieldPathToken(token)
+    ) {
       return token;
     }
     return pseudonymizer.pseudonymize(token, 'HOST');
@@ -597,8 +704,12 @@ export function extractAggFields(
  * `breakdown`, and `message`.
  *
  * - `samples`: 'never' fields are dropped from the sample object entirely; 'anonymize' string
- *   values are pseudonymized (kind inferred from the field name); 'allow' fields pass through
- *   unchanged. An UNLISTED field's behavior depends on `isEscapeHatch` (see below).
+ *   values are pseudonymized (kind inferred from the field name); an explicit 'allow' field
+ *   passes through unchanged. An UNLISTED field's behavior depends on `isEscapeHatch` (see
+ *   below) — and, when it stays allowed (the non-escape-hatch default), its string value is
+ *   still run through `prescanAndMint`'s IP/FQDN value-shape scan (#8889) so an identifier
+ *   embedded in otherwise-readable free text is not missed just because the field itself is
+ *   trusted.
  *   AGGREGATION samples are the one exception to "resolve by the sample's own field name": a bucket
  *   row's keys are `key`/`doc_count` (digest.ts's `bucketsToRows`), and `key` holds a VALUE of the
  *   AGGREGATED field, not of a field literally called "key". Resolving it by name matched no policy
@@ -678,6 +789,22 @@ export function applyFieldPolicy(
           value,
           inferPseudonymKind(field),
         );
+      } else if (!entry && typeof value === 'string' && value.length > 0) {
+        // #8889: allow-BY-OMISSION (typed tool, no explicit policy entry — the escape-hatch case
+        // above already handled isEscapeHatch). The value still reaches the provider verbatim,
+        // same as before, but an IP/FQDN embedded in otherwise-free text (e.g. a package/process
+        // name that happens to mention a hostname) previously had no secondary scan at all.
+        // Deliberately narrower than "every allow-resolved value": an EXPLICIT policy entry
+        // (agent id, MITRE technique IDs — which use dotted sub-technique notation like
+        // "T1059.001" —, compliance citations, CIS benchmark content, ...) is a reviewed, curated
+        // decision (see FIELD_POLICY_DEFAULTS' comments above) and several of those values are
+        // legitimately FQDN-token-shaped without being hostnames; scanning them here too would
+        // misfire. Those stay covered end-to-end regardless: chat.ts's scrubMessagesForProvider
+        // runs prescanAndMintToolContent over every tool-result string value, regardless of field
+        // policy, right before the request leaves the server. Bare single-word identifiers are
+        // still not caught here (see prescanAndMint's own doc comment) — only the
+        // embedded-IP/FQDN case closes.
+        out[sampleKey] = prescanAndMint(value, pseudonymizer);
       } else {
         out[sampleKey] = value;
       }
@@ -713,6 +840,14 @@ export function applyFieldPolicy(
             bucket.key,
             inferPseudonymKind(field),
           ),
+        });
+      } else if (!entry) {
+        // #8889: same allow-by-omission value-shape scan as the samples loop above (see that
+        // branch's comment), applied to bucket keys — each bucket key IS a value of the
+        // aggregated field.
+        scrubbed.push({
+          ...bucket,
+          key: prescanAndMint(bucket.key, pseudonymizer),
         });
       } else {
         scrubbed.push(bucket);

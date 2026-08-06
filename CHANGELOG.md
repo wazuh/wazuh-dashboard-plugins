@@ -133,6 +133,7 @@
 | [#8708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8708)   | Fixed Home KPI's visualization persistent filters                                                                                                                                             |
 | [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766) | Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration                                                              |
 | [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775) | Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters                                                                                                                |
+| [#8889](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8889) | Fixed privacy-mode pseudonymization misclassifying some field names, over-scrubbing dotted field-path mentions and version strings in free text, missing identifiers embedded in allow-listed field values, and `wazuh.rule.title` having no explicit field policy                          |
 
 ### Removed
 

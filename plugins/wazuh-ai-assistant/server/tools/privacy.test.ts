@@ -8,8 +8,10 @@ import {
   prescanAndMint,
   prescanAndMintToolContent,
   FieldPolicyEntry,
+  FIELD_POLICY_DEFAULTS,
 } from './privacy';
 import { Digest } from './digest';
+import { WAZUH_FIELD } from '../../common/wazuh-fields';
 
 // --- prescanAndMint (first-mention inbound pre-scan) ------------------------------------------
 
@@ -51,6 +53,40 @@ test('prescanAndMint: leaves an ISO-8601 timestamp fragment untouched (29.000Z)'
   const out = prescanAndMint('at 2026-07-15T21:59:29.000Z something', p);
   assert.doesNotMatch(out, /HOST_\d+/);
   assert.match(out, /29\.000Z/);
+});
+
+// --- prescanAndMint: #8889 dotted-token scanner narrowing --------------------------------------
+
+test('prescanAndMint: leaves a field-path mention (wazuh.agent.name) untouched', () => {
+  const p = new Pseudonymizer();
+  // Before this fix, naming a dotted field in free text ("what is wazuh.agent.name for host X?")
+  // got that mention replaced with a HOST_n, breaking the user's own query.
+  const out = prescanAndMint('what does wazuh.agent.name look like here?', p);
+  assert.doesNotMatch(out, /HOST_\d+/);
+  assert.match(out, /wazuh\.agent\.name/);
+});
+
+test('prescanAndMint: leaves another field-path mention (wazuh.rule.id) untouched', () => {
+  const p = new Pseudonymizer();
+  const out = prescanAndMint('filter on wazuh.rule.id please', p);
+  assert.doesNotMatch(out, /HOST_\d+/);
+  assert.match(out, /wazuh\.rule\.id/);
+});
+
+test('prescanAndMint: leaves a Debian/Ubuntu-style package version string untouched', () => {
+  const p = new Pseudonymizer();
+  // Before this fix, a version string like this minted a bogus HOST_n, undermining a
+  // package.version:{allow} query about the same package.
+  const out = prescanAndMint('openssl 5.2.5-2ubuntu1 is installed', p);
+  assert.doesNotMatch(out, /HOST_\d+/);
+  assert.match(out, /5\.2\.5-2ubuntu1/);
+});
+
+test('prescanAndMint: still mints a real hostname that is not field-path or version shaped', () => {
+  const p = new Pseudonymizer();
+  const out = prescanAndMint('connect to backup-vault.internal.corp now', p);
+  assert.match(out, /HOST_\d+/);
+  assert.doesNotMatch(out, /backup-vault\.internal\.corp/);
 });
 
 // --- prescanAndMintToolContent (JSON-aware digest pre-scan) -----------------------------------
@@ -138,6 +174,23 @@ test('inferPseudonymKind: infers kind prefixes from field names', () => {
   assert.equal(inferPseudonymKind('agent.name'), 'HOST');
   assert.equal(inferPseudonymKind('predecoder.hostname'), 'HOST');
   assert.equal(inferPseudonymKind('GeoLocation.country_name'), 'VAL');
+});
+
+test('inferPseudonymKind: #8889 no longer misclassifies "description" as an IP field', () => {
+  // 'wazuh.rule.description'.includes('ip') is true ("descr-IP-tion") under raw substring
+  // matching -- the bug this fix closes. A description field is generic free text (VAL), not IP.
+  assert.equal(inferPseudonymKind('wazuh.rule.description'), 'VAL');
+  // Same substring trap, different word: "recipient" also contains "ip" mid-word.
+  assert.equal(inferPseudonymKind('email.recipient'), 'VAL');
+});
+
+test('inferPseudonymKind: still infers IP for an actual "...ip"-shaped field', () => {
+  // A real, curated field (WAZUH_FIELD.AGENT_IP) whose final path segment IS the word "ip".
+  assert.equal(inferPseudonymKind(WAZUH_FIELD.AGENT_IP), 'IP');
+  // Legacy Wazuh alert field with no delimiter before "ip" -- must still match as a suffix.
+  assert.equal(inferPseudonymKind('data.srcip'), 'IP');
+  // "ip_address": splitting on '_' isolates "ip" as its own token.
+  assert.equal(inferPseudonymKind('data.ip_address'), 'IP');
 });
 
 // --- Pseudonymizer -----------------------------------------------------------------------------
@@ -290,6 +343,59 @@ test('applyFieldPolicy: "anonymize" field is pseudonymized', () => {
   const digest = baseDigest({ samples: [{ 'agent.name': 'web-01.corp' }] });
   const out = applyFieldPolicy(digest, policy, p);
   assert.match(out.samples[0]['agent.name'] as string, /^HOST_\d+$/);
+});
+
+// --- applyFieldPolicy: #8889 value-shape scan over allow-by-omission field values ---------------
+
+test('applyFieldPolicy: allow-by-omission value with an embedded IP still gets scanned', () => {
+  // "package.name" has no FIELD_POLICY_DEFAULTS entry -- it stays readable (allow-by-omission),
+  // but before this fix an identifier embedded in it had no secondary scan at all.
+  const policy: FieldPolicyEntry[] = [];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [
+      { 'package.name': 'connector reaching out to 203.0.113.7 for updates' },
+    ],
+  });
+  const out = applyFieldPolicy(digest, policy, p, undefined, undefined, false);
+  const value = out.samples[0]['package.name'] as string;
+  assert.doesNotMatch(value, /203\.0\.113\.7/);
+  assert.match(value, /^connector reaching out to IP_\d+ for updates$/);
+});
+
+test('applyFieldPolicy: allow-by-omission value with an embedded FQDN still gets scanned', () => {
+  const policy: FieldPolicyEntry[] = [];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [
+      {
+        'get_agent_processes/cmd':
+          'curl https://backup-vault.internal.corp/agent',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, policy, p, undefined, undefined, false);
+  const value = out.samples[0]['get_agent_processes/cmd'] as string;
+  assert.doesNotMatch(value, /backup-vault\.internal\.corp/);
+  assert.match(value, /^curl https:\/\/HOST_\d+\/agent$/);
+});
+
+test('applyFieldPolicy: an EXPLICIT "allow" entry is not scanned for embedded IPs/FQDNs', () => {
+  // Deliberate scoping (see the samples-loop comment in privacy.ts): an explicit entry is a
+  // reviewed decision (e.g. a curated taxonomy field), left exactly as before -- only the
+  // allow-BY-OMISSION path gets the new scan.
+  const policy: FieldPolicyEntry[] = [
+    { field: 'check.name', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [{ 'check.name': 'Reach out to 203.0.113.7 if this fails' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p, undefined, undefined, false);
+  assert.equal(
+    out.samples[0]['check.name'],
+    'Reach out to 203.0.113.7 if this fails',
+  );
 });
 
 test('applyFieldPolicy: unlisted field passes through when isEscapeHatch is false', () => {
@@ -522,15 +628,20 @@ test('applyFieldPolicy: resolves the aggregated field tool-scoped, like every ot
     'get_top_agents',
   );
   assert.deepEqual(scoped.samples, [{ doc_count: 7 }]);
-  // Another tool's aggregation over the same field is not affected by that scoped entry.
+  // Another tool's aggregation over the same field is not affected by that scoped entry. Uses a
+  // bare, non-dotted value on purpose (unlike the "scoped" case above): this resolves to
+  // allow-BY-OMISSION for "get_top_rules" (the policy only has a "get_top_agents/..." scoped
+  // entry), which since #8889 runs the IP/FQDN value-shape scan (see applyFieldPolicy's samples
+  // loop) — a dotted, FQDN-shaped value like "web-01.corp" would legitimately get minted there,
+  // which would test that scan instead of the tool-scoping isolation this test is actually about.
   const other = applyFieldPolicy(
-    baseDigest({ samples: [{ key: 'web-01.corp', doc_count: 7 }] }),
+    baseDigest({ samples: [{ key: 'web-01', doc_count: 7 }] }),
     policy,
     p,
     { top_agents: 'wazuh.agent.name' },
     'get_top_rules',
   );
-  assert.deepEqual(other.samples, [{ key: 'web-01.corp', doc_count: 7 }]);
+  assert.deepEqual(other.samples, [{ key: 'web-01', doc_count: 7 }]);
 });
 
 test('applyFieldPolicy: a real field named "key" is unaffected without an aggregation', () => {
@@ -559,4 +670,19 @@ test('applyFieldPolicy: an aggregation with no extractable field leaves "key" al
   assert.deepEqual(out.samples, [
     { key: '2026-07-31T00:00:00Z', doc_count: 3 },
   ]);
+});
+
+// --- FIELD_POLICY_DEFAULTS: #8889 explicit entry for a commonly-surfaced field -------------------
+
+test('FIELD_POLICY_DEFAULTS: wazuh.rule.title has an explicit entry, not allow-by-omission', () => {
+  const entry = FIELD_POLICY_DEFAULTS.find(
+    e => e.field === WAZUH_FIELD.RULE_TITLE,
+  );
+  assert.ok(
+    entry,
+    'wazuh.rule.title must have an explicit policy entry, not rely on allow-by-omission',
+  );
+  // Reviewed 'allow' (see the entry's own comment in privacy.ts for the reasoning and the
+  // residual risk) -- an intentional decision, not a default.
+  assert.equal(entry!.action, 'allow');
 });
