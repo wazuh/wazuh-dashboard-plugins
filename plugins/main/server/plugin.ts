@@ -85,6 +85,7 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_AGENT_STATS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_COMMS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
   WAZUH_EVENTS_PATTERN,
@@ -126,6 +127,7 @@ import {
   WAZUH_IT_HYGIENE_USERS_PATTERN,
   WAZUH_METRICS_AGENTS_PATTERN,
   WAZUH_SCA_PATTERN,
+  WAZUH_AGENT_STATS_PATTERN,
   WAZUH_METRICS_COMMS_PATTERN,
   WAZUH_METRICS_NORMALIZATION_PATTERN,
   WAZUH_VULNERABILITIES_PATTERN,
@@ -179,7 +181,7 @@ declare module 'opensearch_dashboards/server' {
   }
 }
 
-// All 44 index-pattern definitions processed in batches during startup to limit
+// All 45 index-pattern definitions processed in batches during startup to limit
 // peak concurrent connections to the indexer (see issue #8641).
 const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
   {
@@ -427,6 +429,15 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
     indexPatternID: WAZUH_SCA_PATTERN,
     options: {
       fieldsNoIndicesFilePath: knownFieldsFilePath('states-sca.json'),
+    },
+  },
+  {
+    // The agent statistics index stores the latest report of each agent,
+    // replacing the previous one, so it has no time field to filter by
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_AGENT_STATS,
+    indexPatternID: WAZUH_AGENT_STATS_PATTERN,
+    options: {
+      fieldsNoIndicesFilePath: knownFieldsFilePath('agent-stats.json'),
     },
   },
   {
