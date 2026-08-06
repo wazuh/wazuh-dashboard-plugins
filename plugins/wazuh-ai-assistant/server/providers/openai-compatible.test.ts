@@ -94,9 +94,7 @@ function withFakeFetchCapturingBody(
 test('chatStream: a stream carrying only delta.reasoning (no delta.content at all) renders the accumulated reasoning as the answer', async () => {
   const body = sseBody([
     {
-      choices: [
-        { index: 0, delta: { reasoning: 'The', channel: 'analysis' } },
-      ],
+      choices: [{ index: 0, delta: { reasoning: 'The', channel: 'analysis' } }],
     },
     {
       choices: [
@@ -229,7 +227,10 @@ test('chatStream: a stream with neither content nor reasoning still ends cleanly
       adapter.chatStream(BASE_CONFIG, [userMessage('hi')], controller.signal),
     );
   });
-  assert.deepEqual(events.map(event => event.type), ['done']);
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['done'],
+  );
 });
 
 // --- final-round tools/tool_choice omission (issue 03-tool-choice-none-final-round.md) --------
@@ -374,7 +375,8 @@ test('chatStream: a <think> block in delta.content is stripped before reaching t
         {
           index: 0,
           delta: {
-            content: '<think>\nI should check the host facts.\n</think>\n\nIt has 16GB RAM.',
+            content:
+              '<think>\nI should check the host facts.\n</think>\n\nIt has 16GB RAM.',
           },
         },
       ],
@@ -391,14 +393,24 @@ test('chatStream: a <think> block in delta.content is stripped before reaching t
       ),
     );
   });
-  assert.deepEqual(events.map(event => event.type), ['delta', 'done']);
-  assert.equal((events[0] as { content: string }).content, '\n\nIt has 16GB RAM.');
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['delta', 'done'],
+  );
+  assert.equal(
+    (events[0] as { content: string }).content,
+    '\n\nIt has 16GB RAM.',
+  );
 });
 
 test('chatStream: a <think> tag straddling two SSE chunks is still stripped', async () => {
   const body = sseBody([
     { choices: [{ index: 0, delta: { content: 'Sure. <thi' } }] },
-    { choices: [{ index: 0, delta: { content: 'nk>hidden</think> here it is.' } }] },
+    {
+      choices: [
+        { index: 0, delta: { content: 'nk>hidden</think> here it is.' } },
+      ],
+    },
   ]);
   const events = await withFakeFetch(body, () => {
     const adapter = new OpenAiCompatibleAdapter();
@@ -424,7 +436,9 @@ test('chatStream: an unclosed <think> running to [DONE] is dropped, not shown', 
       choices: [
         {
           index: 0,
-          delta: { content: 'Answer first. <think>never closes, stream just ends' },
+          delta: {
+            content: 'Answer first. <think>never closes, stream just ends',
+          },
         },
       ],
     },
@@ -477,13 +491,18 @@ test('chatStream: <tool_call>/<function=>/<parameter=> markup emitted as delta.c
   // Entirely markup, no real answer text at all -- no delta at all, just done (the route-level
   // no-text fallback in chat.ts, not this adapter, is what turns this into a user-facing sentence;
   // see the `noTextFallbackMessage`-interaction test below for the adapter's own analogous case).
-  assert.deepEqual(events.map(event => event.type), ['done']);
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['done'],
+  );
 });
 
 test('chatStream: a legitimate <script> mention and a "size < 500" comparison are preserved verbatim (regression)', async () => {
   const answer =
     'The rule flags any payload containing a <script> tag. Only alerts where size < 500 and severity > 3 were kept.';
-  const body = sseBody([{ choices: [{ index: 0, delta: { content: answer } }] }]);
+  const body = sseBody([
+    { choices: [{ index: 0, delta: { content: answer } }] },
+  ]);
   const events = await withFakeFetch(body, () => {
     const adapter = new OpenAiCompatibleAdapter();
     const controller = new AbortController();
@@ -495,7 +514,10 @@ test('chatStream: a legitimate <script> mention and a "size < 500" comparison ar
       ),
     );
   });
-  assert.deepEqual(events.map(event => event.type), ['delta', 'done']);
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['delta', 'done'],
+  );
   assert.equal(
     (events[0] as { content: string }).content,
     answer,
@@ -505,15 +527,24 @@ test('chatStream: a legitimate <script> mention and a "size < 500" comparison ar
 
 test('chatStream: a gpt-oss-style clean stream (no inline markup at all) is byte-identical', async () => {
   const answer = 'The cluster is healthy. 3 agents are active and reporting.';
-  const body = sseBody([{ choices: [{ index: 0, delta: { content: answer } }] }]);
+  const body = sseBody([
+    { choices: [{ index: 0, delta: { content: answer } }] },
+  ]);
   const events = await withFakeFetch(body, () => {
     const adapter = new OpenAiCompatibleAdapter();
     const controller = new AbortController();
     return drain(
-      adapter.chatStream(BASE_CONFIG, [userMessage('status?')], controller.signal),
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('status?')],
+        controller.signal,
+      ),
     );
   });
-  assert.deepEqual(events, [{ type: 'delta', content: answer }, { type: 'done' }]);
+  assert.deepEqual(events, [
+    { type: 'delta', content: answer },
+    { type: 'done' },
+  ]);
 });
 
 test('chatStream: content that is ENTIRELY <think> markup is treated as no content -- the reasoning-channel buffer wins instead', async () => {

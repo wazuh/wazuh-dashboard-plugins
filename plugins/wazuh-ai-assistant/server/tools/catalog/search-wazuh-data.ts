@@ -48,6 +48,11 @@ export const searchWazuhDataTool: ToolDefinition = {
         },
         query_dsl: {
           type: 'string',
+          // JSON-in-a-string (common/types.ts's JsonSchemaPrimitive.jsonString doc comment): lets
+          // wire-schema.ts widen this property's WIRE type to accept an object too, and
+          // schema-validator.ts's coerce() stringify it back — a model that emits nested JSON as
+          // a live object rather than hand-serializing it isn't hard-rejected for that alone.
+          jsonString: true,
           description:
             'A JSON-encoded (stringified) OpenSearch search request body, e.g. ' +
             '"{\\"query\\":{\\"bool\\":{\\"filter\\":[...]}},\\"sort\\":[...],\\"_source\\":[...],' +

@@ -97,6 +97,11 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // by the outbound applyToText scrub in chat.ts.
   { field: 'vulnerability.score.base', action: 'allow' },
   { field: 'package.architecture', action: 'allow' },
+  // get_events_by_agent reads the same wazuh.agent.* fields as the findings tools above (already
+  // covered by WAZUH_FIELD.AGENT_NAME/AGENT_ID), plus its own ECS event taxonomy fields.
+  { field: 'event.category', action: 'allow' },
+  { field: 'event.action', action: 'allow' },
+  { field: 'event.outcome', action: 'allow' },
 ];
 
 export type PseudonymKind = 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';

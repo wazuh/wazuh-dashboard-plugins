@@ -93,7 +93,9 @@ function noTextFallbackMessage(
   if (!toolUsedThisTurn) {
     return NO_ANSWER_MESSAGE;
   }
-  return sawNonEmptyTable ? NO_ANALYSIS_TEXT_MESSAGE : NO_MATCHING_RESULTS_MESSAGE;
+  return sawNonEmptyTable
+    ? NO_ANALYSIS_TEXT_MESSAGE
+    : NO_MATCHING_RESULTS_MESSAGE;
 }
 
 /** Whitespace-only delta content (e.g. a lone "\n\n" some models emit as priming/formatting
