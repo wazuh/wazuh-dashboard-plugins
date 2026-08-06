@@ -94,9 +94,7 @@ function withFakeFetchCapturingBody(
 test('chatStream: a stream carrying only delta.reasoning (no delta.content at all) renders the accumulated reasoning as the answer', async () => {
   const body = sseBody([
     {
-      choices: [
-        { index: 0, delta: { reasoning: 'The', channel: 'analysis' } },
-      ],
+      choices: [{ index: 0, delta: { reasoning: 'The', channel: 'analysis' } }],
     },
     {
       choices: [
@@ -229,7 +227,10 @@ test('chatStream: a stream with neither content nor reasoning still ends cleanly
       adapter.chatStream(BASE_CONFIG, [userMessage('hi')], controller.signal),
     );
   });
-  assert.deepEqual(events.map(event => event.type), ['done']);
+  assert.deepEqual(
+    events.map(event => event.type),
+    ['done'],
+  );
 });
 
 // --- final-round tools/tool_choice omission (issue 03-tool-choice-none-final-round.md) --------
@@ -241,7 +242,7 @@ test('chatStream: with no `tools` in options, the outbound body carries neither 
   const body = sseBody([
     { choices: [{ index: 0, delta: { content: 'Done.' } }] },
   ]);
-  const capturedBodies = await withFakeFetchCapturingBody(body, async () => {
+  const capturedBodies = await withFakeFetchCapturingBody(body, () => {
     const adapter = new OpenAiCompatibleAdapter();
     const controller = new AbortController();
     return drain(
@@ -265,7 +266,7 @@ test('chatStream: with `tools` present, the outbound body still carries `tools` 
   const body = sseBody([
     { choices: [{ index: 0, delta: { content: 'Done.' } }] },
   ]);
-  const capturedBodies = await withFakeFetchCapturingBody(body, async () => {
+  const capturedBodies = await withFakeFetchCapturingBody(body, () => {
     const adapter = new OpenAiCompatibleAdapter();
     const controller = new AbortController();
     return drain(
@@ -297,7 +298,7 @@ test('chatStream: with `tools` present, the outbound body still carries `tools` 
 
 test('chatStream: options.temperature is forwarded verbatim on the outbound body, including 0', async () => {
   const body = sseBody([{ choices: [{ index: 0, delta: { content: 'ok' } }] }]);
-  const capturedBodies = await withFakeFetchCapturingBody(body, async () => {
+  const capturedBodies = await withFakeFetchCapturingBody(body, () => {
     const adapter = new OpenAiCompatibleAdapter();
     const controller = new AbortController();
     return drain(
@@ -318,7 +319,7 @@ test('chatStream: options.temperature is forwarded verbatim on the outbound body
 
 test('chatStream: a tool-bearing request with temperature 0.2 carries it alongside tools', async () => {
   const body = sseBody([{ choices: [{ index: 0, delta: { content: 'ok' } }] }]);
-  const capturedBodies = await withFakeFetchCapturingBody(body, async () => {
+  const capturedBodies = await withFakeFetchCapturingBody(body, () => {
     const adapter = new OpenAiCompatibleAdapter();
     const controller = new AbortController();
     return drain(
@@ -346,7 +347,7 @@ test('chatStream: a tool-bearing request with temperature 0.2 carries it alongsi
 
 test('chatStream: omitting options.temperature leaves the field out of the body entirely (regression -- no default injected)', async () => {
   const body = sseBody([{ choices: [{ index: 0, delta: { content: 'ok' } }] }]);
-  const capturedBodies = await withFakeFetchCapturingBody(body, async () => {
+  const capturedBodies = await withFakeFetchCapturingBody(body, () => {
     const adapter = new OpenAiCompatibleAdapter();
     const controller = new AbortController();
     return drain(
@@ -529,7 +530,10 @@ test('chatStream: buffered reasoning ahead of a finish_reason:"tool_calls" round
       choices: [
         {
           index: 0,
-          delta: { reasoning: 'I should check the agent list.', channel: 'analysis' },
+          delta: {
+            reasoning: 'I should check the agent list.',
+            channel: 'analysis',
+          },
         },
       ],
     },
