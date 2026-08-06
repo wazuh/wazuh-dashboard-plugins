@@ -92,7 +92,9 @@ test('InlineReasoningMarkupFilter: "size < 500" split right after the "<" is sti
 
 test('InlineReasoningMarkupFilter: a fully-stripped answer (only <think> markup) yields empty output', () => {
   const filter = new InlineReasoningMarkupFilter();
-  const out = run(filter, ['<think>only private deliberation, no real answer</think>']);
+  const out = run(filter, [
+    '<think>only private deliberation, no real answer</think>',
+  ]);
   assert.equal(out, '');
   assert.equal(filter.didStrip, true);
 });

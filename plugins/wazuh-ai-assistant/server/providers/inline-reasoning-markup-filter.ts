@@ -93,7 +93,11 @@ function nextTagMatch(
     return null;
   }
   if (openMatch && (!closeMatch || openMatch.index <= closeMatch.index)) {
-    return { index: openMatch.index, length: openMatch[0].length, isOpen: true };
+    return {
+      index: openMatch.index,
+      length: openMatch[0].length,
+      isOpen: true,
+    };
   }
   return {
     index: (closeMatch as RegExpExecArray).index,
@@ -150,13 +154,14 @@ export class InlineReasoningMarkupFilter {
 
   private drain(isFinal: boolean): string {
     let out = '';
-    // eslint-disable-next-line no-constant-condition -- loop exits via explicit `break`s below
     while (true) {
       if (this.depth === 0) {
         const openMatch = OPEN_TAG_RE.exec(this.buffer);
         if (openMatch) {
           out += this.buffer.slice(0, openMatch.index);
-          this.buffer = this.buffer.slice(openMatch.index + openMatch[0].length);
+          this.buffer = this.buffer.slice(
+            openMatch.index + openMatch[0].length,
+          );
           this.depth = 1;
           this.stripped = true;
           continue;
