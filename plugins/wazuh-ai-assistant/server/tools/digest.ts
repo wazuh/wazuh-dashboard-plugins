@@ -516,7 +516,10 @@ function buildZeroRowHint(
   const filters = (
     requestBody?.query as { bool?: { filter?: unknown } } | undefined
   )?.bool?.filter;
-  if (!Array.isArray(filters) || filters.length < MIN_FILTERS_FOR_ZERO_ROW_HINT) {
+  if (
+    !Array.isArray(filters) ||
+    filters.length < MIN_FILTERS_FOR_ZERO_ROW_HINT
+  ) {
     return undefined;
   }
   const names = filters
@@ -624,7 +627,10 @@ function buildSamplesNote(
  * a hard requirement (#8870's validation-gate update): a page-scoped breakdown presented without
  * this caveat is worse than no breakdown at all, because the model treats it as authoritative for
  * entities it never saw. */
-function buildBreakdownNote(total: number | undefined, returned: number): string {
+function buildBreakdownNote(
+  total: number | undefined,
+  returned: number,
+): string {
   const totalDescription = typeof total === 'number' ? `all ${total}` : 'all';
   return (
     `This breakdown covers only the ${returned} returned rows, not ${totalDescription} matching ` +
@@ -680,7 +686,11 @@ export function buildDigest(
   const realBreakdown = buildBreakdown(result);
   let breakdown = realBreakdown;
   let breakdownNote: string | undefined;
-  if (!realBreakdown && def.digest.breakdownDimensions && returned > MAX_SAMPLES) {
+  if (
+    !realBreakdown &&
+    def.digest.breakdownDimensions &&
+    returned > MAX_SAMPLES
+  ) {
     breakdown = buildSyntheticBreakdown(rows, def.digest.breakdownDimensions);
     if (breakdown && truncated) {
       breakdownNote = buildBreakdownNote(total, returned);

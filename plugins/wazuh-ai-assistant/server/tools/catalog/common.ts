@@ -307,12 +307,13 @@ function aggNameForField(field: string): string {
  * `buildSyntheticBreakdown` uses — so the token cost of a breakdown does not change depending on
  * whether the real or the synthetic path ends up serving a given call.
  */
-export const FINDING_BREAKDOWN_AGGS: Record<string, unknown> = Object.fromEntries(
-  FINDING_BREAKDOWN_DIMENSIONS.map(field => [
-    aggNameForField(field),
-    { terms: { field, size: BREAKDOWN_BUCKET_CAP } },
-  ]),
-);
+export const FINDING_BREAKDOWN_AGGS: Record<string, unknown> =
+  Object.fromEntries(
+    FINDING_BREAKDOWN_DIMENSIONS.map(field => [
+      aggNameForField(field),
+      { terms: { field, size: BREAKDOWN_BUCKET_CAP } },
+    ]),
+  );
 
 /**
  * Fields added to every finding-hits tool's digest `sampleColumns` — the model-facing subset of

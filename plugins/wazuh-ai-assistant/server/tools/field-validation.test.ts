@@ -12,17 +12,17 @@ function fakeContext(knownFields: string[] | undefined): Context {
       opensearch: {
         client: {
           asCurrentUser: {
-            fieldCaps: async () => {
+            fieldCaps: () => {
               if (knownFields === undefined) {
                 throw new Error('simulated _field_caps failure');
               }
-              return {
+              return Promise.resolve({
                 body: {
                   fields: Object.fromEntries(
                     knownFields.map(field => [field, { keyword: {} }]),
                   ),
                 },
-              };
+              });
             },
           },
         },
@@ -82,7 +82,7 @@ test('extractFieldNames: _source string entries, skipping wildcard entries', () 
   assert.deepEqual(extractFieldNames(body), ['wazuh.agent.name']);
 });
 
-test('extractFieldNames: a composite aggregation\'s nested sources[].*.terms.field is still found (no special-casing needed)', () => {
+test("extractFieldNames: a composite aggregation's nested sources[].*.terms.field is still found (no special-casing needed)", () => {
   const body = {
     aggs: {
       by_page: {
@@ -93,7 +93,7 @@ test('extractFieldNames: a composite aggregation\'s nested sources[].*.terms.fie
   assert.deepEqual(extractFieldNames(body), ['agent.id']);
 });
 
-test('extractFieldNames: an unrecognized construct (multi_terms\' array-of-{field} shape) is skipped, not misread', () => {
+test("extractFieldNames: an unrecognized construct (multi_terms' array-of-{field} shape) is skipped, not misread", () => {
   const body = {
     aggs: {
       by_pair: {
@@ -117,10 +117,16 @@ test('extractFieldNames: an unrecognized construct (multi_terms\' array-of-{fiel
 test('validateQueryFields: rejects a field not present in the live mapping, naming near-miss alternatives', async () => {
   const context = fakeContext(['agent.name', 'wazuh.agent.name', '@timestamp']);
   const body = {
-    query: { bool: { filter: [{ range: { '@timestamp': { gte: 'now-1h' } } }] } },
+    query: {
+      bool: { filter: [{ range: { '@timestamp': { gte: 'now-1h' } } }] },
+    },
     aggs: { top_agents: { terms: { field: 'agent.name.keyword', size: 5 } } },
   };
-  const result = await validateQueryFields(context, 'wazuh-findings-v5*-rejects', body);
+  const result = await validateQueryFields(
+    context,
+    'wazuh-findings-v5*-rejects',
+    body,
+  );
   assert.equal(result.ok, false);
   if (!result.ok) {
     assert.match(result.reason, /"agent\.name\.keyword" does not exist/);
@@ -134,7 +140,11 @@ test('validateQueryFields: accepts a field that IS present in the live mapping',
   const body = {
     aggs: { top_agents: { terms: { field: 'agent.name', size: 5 } } },
   };
-  const result = await validateQueryFields(context, 'wazuh-findings-v5*-accepts', body);
+  const result = await validateQueryFields(
+    context,
+    'wazuh-findings-v5*-accepts',
+    body,
+  );
   assert.deepEqual(result, { ok: true });
 });
 
@@ -145,18 +155,23 @@ test('validateQueryFields: a body with no extractable field references short-cir
       opensearch: {
         client: {
           asCurrentUser: {
-            fieldCaps: async () => {
+            fieldCaps: () => {
               called = true;
-              return { body: { fields: {} } };
+
+              return Promise.resolve({ body: { fields: {} } });
             },
           },
         },
       },
     },
   } as unknown as Context;
-  const result = await validateQueryFields(context, 'wazuh-findings-v5*-nofields', {
-    size: 10,
-  });
+  const result = await validateQueryFields(
+    context,
+    'wazuh-findings-v5*-nofields',
+    {
+      size: 10,
+    },
+  );
   assert.deepEqual(result, { ok: true });
   assert.equal(called, false);
 });
@@ -166,6 +181,10 @@ test('validateQueryFields: fails OPEN (does not reject) when the _field_caps loo
   const body = {
     query: { bool: { filter: [{ term: { 'agent.name.keyword': 'x' } }] } },
   };
-  const result = await validateQueryFields(context, 'wazuh-findings-v5*-failopen', body);
+  const result = await validateQueryFields(
+    context,
+    'wazuh-findings-v5*-failopen',
+    body,
+  );
   assert.deepEqual(result, { ok: true });
 });

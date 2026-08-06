@@ -302,7 +302,12 @@ test('buildDigest: a 0-row result with 2+ filters carries a hint naming them', (
       },
     },
   };
-  const digest = buildDigest('search_wazuh_data', hitsResult(0), def, requestBody);
+  const digest = buildDigest(
+    'search_wazuh_data',
+    hitsResult(0),
+    def,
+    requestBody,
+  );
   assert.equal(digest.counts.returned, 0);
   assert.ok(digest.hint, 'expected a hint on a 0-row, 3-filter result');
   assert.match(digest.hint!, /^0 rows\. Filters applied:/);
@@ -314,9 +319,16 @@ test('buildDigest: a 0-row result with 2+ filters carries a hint naming them', (
 test('buildDigest: a 0-row result with a SINGLE filter carries no hint', () => {
   const def = buildToolDef();
   const requestBody = {
-    query: { bool: { filter: [{ range: { '@timestamp': { gte: 'now-90d' } } }] } },
+    query: {
+      bool: { filter: [{ range: { '@timestamp': { gte: 'now-90d' } } }] },
+    },
   };
-  const digest = buildDigest('search_wazuh_data', hitsResult(0), def, requestBody);
+  const digest = buildDigest(
+    'search_wazuh_data',
+    hitsResult(0),
+    def,
+    requestBody,
+  );
   assert.equal(digest.counts.returned, 0);
   assert.ok(!('hint' in digest));
 });
@@ -336,7 +348,9 @@ test('buildDigest: a non-zero-row result carries no hint even with 2+ filters', 
       },
     },
   };
-  const result = { hits: { total: { value: 1 }, hits: [{ _source: { a: 1 } }] } };
+  const result = {
+    hits: { total: { value: 1 }, hits: [{ _source: { a: 1 } }] },
+  };
   const digest = buildDigest('search_wazuh_data', result, def, requestBody);
   assert.ok(!('hint' in digest));
 });
@@ -389,22 +403,36 @@ test('buildDigest: a finding-hits tool with breakdownDimensions synthesizes a br
   // newest-5 sample would miss it entirely; the breakdown must not.
   const rows: Array<{ _source: Record<string, unknown> }> = [];
   for (let i = 0; i < 2; i++) {
-    rows.push(findingRow('wazuh-aio-5', 'Rule A', `2025-01-0${i + 1}T00:00:00Z`));
+    rows.push(
+      findingRow('wazuh-aio-5', 'Rule A', `2025-01-0${i + 1}T00:00:00Z`),
+    );
   }
   for (let i = 0; i < 16; i++) {
-    rows.push(findingRow('web-prod-01', 'Rule B', `2026-06-${10 + i}T00:00:00Z`));
+    rows.push(
+      findingRow('web-prod-01', 'Rule B', `2026-06-${10 + i}T00:00:00Z`),
+    );
   }
   for (let i = 0; i < 8; i++) {
-    rows.push(findingRow('web-prod-02', 'Rule C', `2026-07-0${i + 1}T00:00:00Z`));
+    rows.push(
+      findingRow('web-prod-02', 'Rule C', `2026-07-0${i + 1}T00:00:00Z`),
+    );
   }
   const result = { hits: { total: { value: 26 }, hits: rows } };
   const digest = buildDigest('get_critical_findings', result, def);
 
-  assert.equal(digest.samples.length, 5, 'samples must stay capped at MAX_SAMPLES');
+  assert.equal(
+    digest.samples.length,
+    5,
+    'samples must stay capped at MAX_SAMPLES',
+  );
   assert.ok(digest.breakdown, 'expected a synthesized breakdown');
 
-  const agentBuckets = digest.breakdown!.filter(b => b.agg === 'wazuh.agent.name');
-  const ruleBuckets = digest.breakdown!.filter(b => b.agg === 'wazuh.rule.title');
+  const agentBuckets = digest.breakdown!.filter(
+    b => b.agg === 'wazuh.agent.name',
+  );
+  const ruleBuckets = digest.breakdown!.filter(
+    b => b.agg === 'wazuh.rule.title',
+  );
   assert.deepEqual(
     new Map(agentBuckets.map(b => [b.key, b.count])),
     new Map([
@@ -422,7 +450,10 @@ test('buildDigest: a finding-hits tool with breakdownDimensions synthesizes a br
     ]),
   );
   // Token-bloat guard: only the two declared dimensions appear, nothing else.
-  assert.equal(agentBuckets.length + ruleBuckets.length, digest.breakdown!.length);
+  assert.equal(
+    agentBuckets.length + ruleBuckets.length,
+    digest.breakdown!.length,
+  );
 });
 
 test('buildDigest: the synthetic breakdown caps each dimension at 5 buckets', () => {
@@ -462,7 +493,10 @@ test('buildDigest: no breakdownDimensions opt-in means no synthetic breakdown, e
 
 test('buildDigest: a REAL aggregation breakdown takes priority over synthesizing one', () => {
   const def = buildToolDef({
-    digest: { sampleColumns: ['key'], breakdownDimensions: ['wazuh.agent.name'] },
+    digest: {
+      sampleColumns: ['key'],
+      breakdownDimensions: ['wazuh.agent.name'],
+    },
   });
   const result = {
     aggregations: {
@@ -529,7 +563,9 @@ test('buildDigest: a real aggregation reflects the full matched set even when li
     'a REAL aggregation is population-true and needs no page-only caveat',
   );
 
-  const agentBuckets = digest.breakdown!.filter(b => b.agg === 'wazuh_agent_name');
+  const agentBuckets = digest.breakdown!.filter(
+    b => b.agg === 'wazuh_agent_name',
+  );
   assert.deepEqual(
     new Map(agentBuckets.map(b => [b.key, b.count])),
     new Map([
@@ -538,7 +574,9 @@ test('buildDigest: a real aggregation reflects the full matched set even when li
       ['wazuh-aio-5', 2],
     ]),
   );
-  const ruleBuckets = digest.breakdown!.filter(b => b.agg === 'wazuh_rule_title');
+  const ruleBuckets = digest.breakdown!.filter(
+    b => b.agg === 'wazuh_rule_title',
+  );
   assert.deepEqual(
     new Map(ruleBuckets.map(b => [b.key, b.count])),
     new Map([
@@ -567,8 +605,14 @@ test('buildDigest: a synthetic breakdown over a truncated page is labeled page-o
   const digest = buildDigest('get_critical_findings', result, def);
 
   assert.equal(digest.counts.truncated, true);
-  assert.ok(digest.breakdown, 'expected a synthesized breakdown despite being page-scoped');
-  assert.ok(digest.breakdownNote, 'expected a page-only caveat on a truncated synthetic breakdown');
+  assert.ok(
+    digest.breakdown,
+    'expected a synthesized breakdown despite being page-scoped',
+  );
+  assert.ok(
+    digest.breakdownNote,
+    'expected a page-only caveat on a truncated synthetic breakdown',
+  );
   assert.match(digest.breakdownNote!, /covers only the 8 returned rows/);
   assert.match(digest.breakdownNote!, /not all 26 matching rows/);
   // samplesNote must not instruct the model to trust this same page-scoped breakdown.

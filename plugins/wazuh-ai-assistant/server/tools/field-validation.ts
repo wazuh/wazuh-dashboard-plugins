@@ -156,9 +156,11 @@ async function getIndexFields(
     return cached.fields;
   }
   try {
-    const response = await context.core.opensearch.client.asCurrentUser.fieldCaps(
-      { index: indexPattern, fields: '*' },
-    );
+    const response =
+      await context.core.opensearch.client.asCurrentUser.fieldCaps({
+        index: indexPattern,
+        fields: '*',
+      });
     const rawFields = (response.body as { fields?: Record<string, unknown> })
       .fields;
     const fields = new Set(Object.keys(rawFields ?? {}));
@@ -183,7 +185,10 @@ const MAX_SUGGESTIONS = 5;
  * pattern is the one actually observed, and this is a hint for a model's self-correction, not a
  * spell-checker that needs to be exhaustive.
  */
-function findNearMisses(invalidField: string, knownFields: Set<string>): string[] {
+function findNearMisses(
+  invalidField: string,
+  knownFields: Set<string>,
+): string[] {
   const base = invalidField.replace(/\.(keyword|raw)$/, '');
   const lastSegment = base.split('.').pop() ?? base;
   const matches = [...knownFields].filter(

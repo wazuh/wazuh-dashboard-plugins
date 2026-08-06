@@ -132,7 +132,10 @@ test('FINDING_BREAKDOWN_AGGS declares one terms aggregation per FINDING_BREAKDOW
     const agg = FINDING_BREAKDOWN_AGGS[aggName] as {
       terms?: { field?: string; size?: number };
     };
-    assert.ok(agg, `expected an aggregation named "${aggName}" for field "${field}"`);
+    assert.ok(
+      agg,
+      `expected an aggregation named "${aggName}" for field "${field}"`,
+    );
     assert.equal(agg.terms?.field, field);
     // Sized identically to the synthetic fallback's per-dimension cap (digest.ts's
     // buildSyntheticBreakdown) so the token cost of a breakdown does not depend on which of the

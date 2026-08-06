@@ -172,7 +172,11 @@ async function executeIndexerRequest(
   // actually reaches OpenSearch — a made-up field name becomes a bounded, self-correctable tool
   // error instead of a silent zero-row/zero-bucket result.
   if (def.validateFieldNames) {
-    const fieldCheck = await validateQueryFields(context, indexerRequest.index, body);
+    const fieldCheck = await validateQueryFields(
+      context,
+      indexerRequest.index,
+      body,
+    );
     if (!fieldCheck.ok) {
       return { toolResultContent: toolErrorContent(fieldCheck.reason) };
     }
