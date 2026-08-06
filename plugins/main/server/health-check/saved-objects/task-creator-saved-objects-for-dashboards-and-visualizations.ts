@@ -67,8 +67,7 @@ async function isSavedObjectPresent(
     const existing: SavedObject = await client.get(type, id);
     if (existing) {
       logger.debug(
-        `${toSentenceCase(type)} already exists [${existing.id}] title [${
-          existing.attributes?.title
+        `${toSentenceCase(type)} already exists [${existing.id}] title [${existing.attributes?.title
         }] - skipping`,
       );
       return existing;
@@ -184,16 +183,18 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
             `Processing dashboard definition file [${dashboardDefinition.relativeFilePath}]`,
           );
 
-          await Promise.all(
-            dashboardDefinition.visualizations.map(visualization =>
-              ensureVisualizationSavedObject(
-                client,
-                visualization,
-                ctx.logger,
-                shouldOverwrite,
-              ),
-            ),
-          );
+          // await Promise.all(
+          // dashboardDefinition.visualizations.map(visualization =>
+          for (const visualization of dashboardDefinition.visualizations) {
+            await ensureVisualizationSavedObject(
+              client,
+              visualization,
+              ctx.logger,
+              shouldOverwrite,
+            )
+            // ),
+            // );
+          }
 
           await ensureDashboardSavedObject(
             client,
@@ -207,9 +208,8 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
 
         return { status: 'ok' };
       } catch (error) {
-        const message = `Error provisioning saved objects: ${
-          error instanceof Error ? error.message : String(error)
-        }`;
+        const message = `Error provisioning saved objects: ${error instanceof Error ? error.message : String(error)
+          }`;
         ctx.logger.error(message);
         throw new Error(message);
       }
