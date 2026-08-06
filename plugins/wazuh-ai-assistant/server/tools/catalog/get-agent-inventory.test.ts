@@ -53,6 +53,43 @@ test('get_agent_inventory: an invalid agent_id is rejected (delegates to validat
   );
 });
 
+// --- issue #8873: agent_id is no longer the only way to identify the agent. A 40-question live
+// run invoked this tool 0/40 times, including on 3 questions statically targeting it, because
+// `agent_id` was strictly required and numeric while the target personas ask deictically ("this
+// server") with no id the model can infer. ---
+
+test('get_agent_inventory: agent_name alone builds a match filter on wazuh.agent.name', () => {
+  const req = buildIndexer({ agent_name: 'web-prod-01', kind: 'packages' });
+  assert.deepEqual(req.body.query, {
+    bool: { filter: [{ match: { 'wazuh.agent.name': 'web-prod-01' } }] },
+  });
+});
+
+test('get_agent_inventory: agent_id alone is unchanged (regression)', () => {
+  const req = buildIndexer({ agent_id: '003', kind: 'packages' });
+  assert.deepEqual(req.body.query, {
+    bool: { filter: [{ term: { 'wazuh.agent.id': '003' } }] },
+  });
+});
+
+test('get_agent_inventory: neither agent_id nor agent_name throws a descriptive error naming both options', () => {
+  assert.throws(
+    () => getAgentInventoryTool.buildRequest({ kind: 'packages' }),
+    /agent_id.*agent_name|agent_name.*agent_id/,
+  );
+});
+
+test('get_agent_inventory: both agent_id and agent_name supplied -- agent_id wins (exact, unambiguous Manager-API identifier vs. a fuzzier free-text match)', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    agent_name: 'web-prod-01',
+    kind: 'packages',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: { filter: [{ term: { 'wazuh.agent.id': '003' } }] },
+  });
+});
+
 test('get_agent_inventory: kind="os" resolves to the wazuh-states-inventory-system* index (naming exception)', () => {
   const req = buildIndexer({ agent_id: '003', kind: 'os' });
   assert.equal(req.index, 'wazuh-states-inventory-system*');

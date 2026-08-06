@@ -4,6 +4,7 @@ import {
   INVENTORY_CURRENT_STATE_NOTE,
   limitProperty,
   objectSchema,
+  optionalStringParam,
   validateAgentId,
 } from './common';
 
@@ -140,8 +141,43 @@ function parseKind(value: unknown): InventoryKind {
 }
 
 /**
+ * Resolves the agent-identifying filter clause from `agent_id`/`agent_name` (issue #8873: a live
+ * 40-question run invoked this tool 0/40 times, including on 3 questions statically targeting it,
+ * because `agent_id` was strictly required and numeric while the target personas ask deictically
+ * -- "this server", "the host" -- with no id the model can infer. Elsewhere in the SAME run the
+ * model resolved an agent by calling `get_agents` first, unprompted, so the blocker was this
+ * tool's schema, not model reluctance or routing).
+ *
+ * `agent_id` wins when both are supplied: it is an exact, unambiguous Manager-API identifier,
+ * whereas `agent_name` resolves via a `match` clause (free-text, same precedent as
+ * search-findings-by-agent.ts) that could in principle match more than one document -- given a
+ * caller-supplied id, there is no reason to prefer the fuzzier path. Neither supplied throws a
+ * descriptive Error naming both options, same self-correction convention as `validateAgentId`
+ * and `parseKind` below (the orchestration loop turns a thrown Error into a bounded tool_result
+ * the model reads and can retry from).
+ */
+function resolveAgentFilter(
+  params: Record<string, unknown>,
+): Record<string, unknown> {
+  if (params.agent_id !== undefined) {
+    return { term: { 'wazuh.agent.id': validateAgentId(params.agent_id) } };
+  }
+  const agentName = optionalStringParam(params.agent_name);
+  if (agentName && agentName.trim() !== '') {
+    return { match: { 'wazuh.agent.name': agentName } };
+  }
+  throw new Error(
+    'Either "agent_id" (numeric Wazuh agent ID, e.g. "003") or "agent_name" (the agent\'s ' +
+      'name) is required. If neither is known, call get_agents first to look it up.',
+  );
+}
+
+/**
  * Replaces `get_agent_os`/`get_agent_packages`/`get_agent_ports`/`get_agent_processes` (issue:
- * "Consolidate agent inventory into one tool") with one tool taking `agent_id` + `kind` + `limit`.
+ * "Consolidate agent inventory into one tool") with one tool taking `agent_id`/`agent_name` +
+ * `kind` + `limit` (the `agent_id`-only original schema was later found, live, to make deictic
+ * questions -- "what's installed on this server" -- uncallable; see `resolveAgentFilter`'s doc
+ * comment and issue #8873).
  * Drops the inventory category's schema count from 4 to 1 on every routed turn while raising
  * coverage from 4 of the 13 real `wazuh-states-inventory-*` surfaces to 5 (adds `hotfixes`).
  *
@@ -166,12 +202,22 @@ export const getAgentInventoryTool: ToolDefinition = {
       '"os" (operating system details), "packages" (installed software), "ports" (open network ' +
       'ports), "processes" (running processes), or "hotfixes" (installed Windows hotfixes/KBs -- ' +
       'pairs with the vulnerability tools for patch-management questions, e.g. "which of these ' +
-      `critical vulnerabilities already have a hotfix available"). ${INVENTORY_CURRENT_STATE_NOTE}`,
+      'critical vulnerabilities already have a hotfix available"). Identify the agent by ' +
+      '"agent_id" (numeric) OR "agent_name" -- if the question refers to "this server"/"the ' +
+      'host" without naming or numbering it, and no agent id or name is otherwise known from the ' +
+      `conversation, call get_agents first to look one up. ${INVENTORY_CURRENT_STATE_NOTE}`,
     parameters: objectSchema(
       {
         agent_id: {
           type: 'string',
-          description: 'Numeric Wazuh agent ID, e.g. "003".',
+          description:
+            'Numeric Wazuh agent ID, e.g. "003". Either this or agent_name is required.',
+        },
+        agent_name: {
+          type: 'string',
+          description:
+            'Agent name, e.g. "web-prod-01" -- use this when the id is not known. Either this ' +
+            'or agent_id is required; if both are given, agent_id wins.',
         },
         kind: {
           type: 'string',
@@ -184,13 +230,13 @@ export const getAgentInventoryTool: ToolDefinition = {
             'has at most one current OS record, so this always returns at most 5 rows regardless.',
         ),
       },
-      ['agent_id', 'kind'],
+      ['kind'],
     ),
   },
   target: 'indexer',
   tier: 'T1',
   buildRequest(params) {
-    const agentId = validateAgentId(params.agent_id);
+    const agentFilter = resolveAgentFilter(params);
     const kind = parseKind(params.kind);
     const config = INVENTORY_KIND_CONFIG[kind];
     const size =
@@ -205,7 +251,7 @@ export const getAgentInventoryTool: ToolDefinition = {
       index: config.index,
       body: {
         query: {
-          bool: { filter: [{ term: { 'wazuh.agent.id': agentId } }] },
+          bool: { filter: [agentFilter] },
         },
         _source: config.source,
         sort: ['_doc'],
