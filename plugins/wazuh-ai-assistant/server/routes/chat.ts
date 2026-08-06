@@ -100,7 +100,9 @@ function noTextFallbackMessage(
   if (!toolUsedThisTurn) {
     return NO_ANSWER_MESSAGE;
   }
-  return sawNonEmptyTable ? NO_ANALYSIS_TEXT_MESSAGE : NO_MATCHING_RESULTS_MESSAGE;
+  return sawNonEmptyTable
+    ? NO_ANALYSIS_TEXT_MESSAGE
+    : NO_MATCHING_RESULTS_MESSAGE;
 }
 
 /** Whitespace-only delta content (e.g. a lone "\n\n" some models emit as priming/formatting
@@ -734,7 +736,10 @@ export async function* runStage1Routing(
     return { tools: listToolSpecs(), usage: stage1Usage };
   }
 
-  return { tools: resolveStage2Tools(categories as string[]), usage: stage1Usage };
+  return {
+    tools: resolveStage2Tools(categories as string[]),
+    usage: stage1Usage,
+  };
 }
 
 /**
@@ -981,7 +986,6 @@ async function* orchestrate(
             // why its call was rejected and can retry with corrected arguments.
             toolResultContent = JSON.stringify({ error: validation.reason });
           } else {
-            // eslint-disable-next-line no-await-in-loop -- stream events must be emitted in order
             const resolvedDsl = await resolveSuggestedDsl(
               context,
               validation.index,
