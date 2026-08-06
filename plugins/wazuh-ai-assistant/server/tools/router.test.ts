@@ -42,6 +42,6 @@ test('the "general" category description carries the explicit exclusion', () => 
   assert.match(
     generalLine as string,
     /do NOT pick general/,
-    'general\'s description must explicitly exclude environment questions',
+    "general's description must explicitly exclude environment questions",
   );
 });
