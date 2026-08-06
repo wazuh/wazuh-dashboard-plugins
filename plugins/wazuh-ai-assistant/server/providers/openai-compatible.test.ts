@@ -359,3 +359,59 @@ test('chatStream: omitting options.temperature leaves the field out of the body 
   });
   assert.ok(!('temperature' in capturedBodies[0]));
 });
+
+// --- terminal usage frame -----------------------------------------------------------------------
+// The OpenAI streaming contract only sends the closing `usage` frame when `stream_options.
+// include_usage` is requested. Groq sends it unprompted, so this adapter got away without asking
+// for years; Amazon Bedrock's chat-completions endpoint does not, and every turn against it
+// reported `usage: null`. Two separate guarantees are asserted, because the field alone is not
+// enough -- the frame it unlocks arrives in a shape (empty `choices`) the per-choice handling has
+// to survive.
+
+test('chatStream: the outbound body always requests the terminal usage frame', async () => {
+  const body = sseBody([{ choices: [{ index: 0, delta: { content: 'ok' } }] }]);
+  const capturedBodies = await withFakeFetchCapturingBody(body, async () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('plain chat')],
+        controller.signal,
+      ),
+    );
+  });
+  assert.deepEqual(
+    capturedBodies[0].stream_options,
+    { include_usage: true },
+    'without stream_options.include_usage, providers other than Groq never send a usage frame ' +
+      'and token accounting reads blank',
+  );
+});
+
+test('chatStream: a usage-only final frame (empty `choices`) is reported on the done event', async () => {
+  // Exactly the shape `include_usage` produces: content frames, then a frame whose `choices` array
+  // is EMPTY and which carries only `usage`. Values mirror a real observed router turn.
+  const body = sseBody([
+    { choices: [{ index: 0, delta: { content: 'ok' } }] },
+    { choices: [], usage: { prompt_tokens: 1281, completion_tokens: 636 } },
+  ]);
+  const events = await withFakeFetch(body, () => {
+    const adapter = new OpenAiCompatibleAdapter();
+    const controller = new AbortController();
+    return drain(
+      adapter.chatStream(
+        BASE_CONFIG,
+        [userMessage('count something')],
+        controller.signal,
+      ),
+    );
+  });
+  const done = events.find(event => event.type === 'done');
+  assert.ok(done, 'the stream must still terminate with a done event');
+  assert.deepEqual(
+    (done as Extract<StreamEvent, { type: 'done' }>).usage,
+    { inputTokens: 1281, outputTokens: 636 },
+    'an empty `choices` array must not stop the usage frame from being read',
+  );
+});

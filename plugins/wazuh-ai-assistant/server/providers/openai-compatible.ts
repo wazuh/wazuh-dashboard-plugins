@@ -56,6 +56,15 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     const body: Record<string, unknown> = {
       model: config.model,
       stream: true,
+      // The OpenAI streaming contract only emits the terminal `usage` frame when this is set.
+      // Groq sends it unprompted, which is why the omission went unnoticed -- every usage number
+      // this plugin has recorded so far came from Groq. Amazon Bedrock's chat-completions endpoint
+      // does not: without this, every turn reports `usage: null` and token accounting (including
+      // the stage-1 router's own spend) reads blank. Providers that don't recognise the field
+      // ignore it, and the `if (parsed.usage)` exit below is unchanged either way -- note that
+      // frame arrives with an EMPTY `choices` array, which the per-choice handling above already
+      // tolerates (`parsed.choices?.[0]` is simply undefined).
+      stream_options: { include_usage: true },
       messages: messages.map(toOpenAiMessage),
     };
     // Checked for `undefined`, not truthiness -- callers deliberately send `temperature: 0` (the
