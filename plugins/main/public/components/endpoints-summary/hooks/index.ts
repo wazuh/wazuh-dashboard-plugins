@@ -1,2 +1,2 @@
 export { useGetGroups } from './groups';
-export { useGetUpgradeTasks } from './upgrade-tasks';
+export { useUpgradeStatus } from './use-upgrade-status';

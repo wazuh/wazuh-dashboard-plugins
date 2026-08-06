@@ -19,7 +19,7 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { getAgentsService } from '../../../services';
-import { Agent, ResponseUpgradeAgents } from '../../../types';
+import { Agent } from '../../../types';
 import { RemoveAgentsModalResult } from './result';
 import { ErrorAgent } from '../../../services/paginated-agents-request';
 import { removeAgentsService } from '../../../services/remove-agents';
@@ -37,7 +37,6 @@ interface RemoveAgentsModalProps {
   filters: any;
   onClose: () => void;
   reloadAgents: () => void;
-  setIsUpgradePanelClosed: (isUpgradePanelClosed: boolean) => void;
 }
 
 export const RemoveAgentsModal = compose(withErrorBoundary)(
@@ -47,7 +46,6 @@ export const RemoveAgentsModal = compose(withErrorBoundary)(
     filters,
     onClose,
     reloadAgents,
-    setIsUpgradePanelClosed,
   }: RemoveAgentsModalProps) => {
     const getDeleteErrorMessage = (error: any) => {
       const apiMessage = error?.response?.data?.message;

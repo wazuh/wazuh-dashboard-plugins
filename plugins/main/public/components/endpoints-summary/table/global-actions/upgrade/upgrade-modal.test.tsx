@@ -29,7 +29,6 @@ describe('UpgradeAgentsModal component', () => {
         filters={{}}
         onClose={() => {}}
         reloadAgents={() => {}}
-        setIsUpgradePanelClosed={() => {}}
       />,
     );
 
@@ -58,7 +57,6 @@ describe('UpgradeAgentsModal component', () => {
         filters={{}}
         onClose={() => {}}
         reloadAgents={() => {}}
-        setIsUpgradePanelClosed={() => {}}
       />,
     );
 
@@ -72,6 +70,6 @@ describe('UpgradeAgentsModal component', () => {
     await waitFor(() =>
       expect(getByText('Retrieve agents data')).toBeInTheDocument(),
     );
-    expect(getByText('Upgrade agent tasks')).toBeInTheDocument();
+    expect(getByText('Upgrade status')).toBeInTheDocument();
   });
 });

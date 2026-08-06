@@ -192,9 +192,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
           </div>
           <div
             class="euiFlexItem"
-          />
-          <div
-            class="euiFlexItem"
           >
             <div>
               <div
@@ -795,9 +792,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
           </div>
           <div
             class="euiFlexItem"
-          />
-          <div
-            class="euiFlexItem"
           >
             <div>
               <div
@@ -1396,9 +1390,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
               </div>
             </div>
           </div>
-          <div
-            class="euiFlexItem"
-          />
           <div
             class="euiFlexItem"
           >
