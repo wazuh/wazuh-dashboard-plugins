@@ -40,10 +40,7 @@ import WzConfigurationPath from './util-components/configuration-path';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
 import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs';
 
-import {
-  clusterNodes as requestClusterNodes,
-  agentIsSynchronized,
-} from './utils/wz-fetch';
+import { clusterNodes as requestClusterNodes } from './utils/wz-fetch';
 import {
   updateClusterNodes,
   updateClusterNodeSelected,
@@ -80,7 +77,6 @@ class WzConfigurationSwitch extends Component {
     this.state = {
       view: '',
       viewProps: {},
-      agentSynchronized: undefined,
       loadingOverview: false,
     };
   }
@@ -114,20 +110,6 @@ class WzConfigurationSwitch extends Component {
     getErrorOrchestrator().handleError(options);
   };
 
-  updateAgentSynchronization = async (/** @type {string} */ context) => {
-    // If agent, check if is synchronized or not
-    if (!this.props.agent) {
-      // No agent (manager), no need to verify synchronization
-      return;
-    }
-    try {
-      const agentSynchronized = await agentIsSynchronized(this.props.agent);
-      this.setState({ agentSynchronized });
-    } catch (error) {
-      this.catchError(error, context);
-    }
-  };
-
   handleClusterNodes = async () => {
     const nodes = await requestClusterNodes();
     const clusterNodes = nodes.data.data.affected_items;
@@ -154,18 +136,13 @@ class WzConfigurationSwitch extends Component {
     }
   };
 
-  handleAgentOrClusterUpdate = (/** @type {string} */ context) => {
-    this.updateAgentSynchronization(context);
-    this.updateClusterInformation(context);
-  };
-
   async componentDidMount() {
-    this.handleAgentOrClusterUpdate('componentDidMount');
+    this.updateClusterInformation('componentDidMount');
   }
 
   async componentDidUpdate(prevProps) {
     if (this.props.agent?.id !== prevProps.agent?.id) {
-      this.handleAgentOrClusterUpdate('componentDidUpdate');
+      this.updateClusterInformation('componentDidUpdate');
 
       // Reset view if switching between manager/agent contexts
       const wasManager = !prevProps.agent;
@@ -180,7 +157,6 @@ class WzConfigurationSwitch extends Component {
     const {
       view,
       viewProps: { title, description, badge },
-      agentSynchronized,
     } = this.state;
     const { agent } = this.props;
     const isManager = !agent; // If no agent, it's manager configuration
@@ -227,7 +203,6 @@ class WzConfigurationSwitch extends Component {
               ((!this.state.loadingOverview && (
                 <WzConfigurationOverview
                   agent={agent}
-                  agentSynchronized={agentSynchronized}
                   updateConfigurationSection={this.updateConfigurationSection}
                 />
               )) || <WzLoading />)}

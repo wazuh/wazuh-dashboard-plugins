@@ -58,10 +58,6 @@ resources:
   - method: DELETE
     path: /agents/{agent_id}/group
 
-  # Get configuration sync status
-  - method: GET
-    path: /agents/{agent_id}/group/is_sync
-
   # Remove agent from group
   - method: DELETE
     path: /agents/{agent_id}/group/{group_id}
