@@ -6,6 +6,7 @@ import { searchFindingsByAgentTool } from './catalog/search-findings-by-agent';
 import { getTopRulesTool } from './catalog/get-top-rules';
 import { getCriticalVulnerabilitiesTool } from './catalog/get-critical-vulnerabilities';
 import { getFindingsByTimeTool } from './catalog/get-findings-by-time';
+import { getEventsByAgentTool } from './catalog/get-events-by-agent';
 import { getBruteForceTool } from './catalog/get-brute-force';
 import { getSecuritySummaryTool } from './catalog/get-security-summary';
 import { getSuspiciousPowershellTool } from './catalog/get-suspicious-powershell';
@@ -51,6 +52,11 @@ const CATALOG: ToolDefinition[] = [
 
   // General finding search / summary
   getFindingsByTimeTool,
+  // Raw event stream (issue: "Add a typed events tool over wazuh-events-v5") -- the mirror image
+  // of the finding-hits tools above: ALL normalized events, matched or not, not just rule-matched
+  // detections. Kept adjacent to them in this list since the two are the same category
+  // (server/tools/router.ts's TOOL_CATEGORY) and are the tools users most often conflate.
+  getEventsByAgentTool,
   getBruteForceTool,
   getSecuritySummaryTool,
   getSuspiciousPowershellTool,
