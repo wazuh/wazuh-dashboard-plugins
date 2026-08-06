@@ -370,7 +370,9 @@ test('chatStream: omitting options.temperature leaves the field out of the body 
 
 test('chatStream: the outbound body always requests the terminal usage frame', async () => {
   const body = sseBody([{ choices: [{ index: 0, delta: { content: 'ok' } }] }]);
-  const capturedBodies = await withFakeFetchCapturingBody(body, async () => {
+  // Non-async callback: nothing to await here, it just returns drain()'s promise. The older
+  // body-shape tests above spell this `async () =>` and trip `require-await` as a result.
+  const capturedBodies = await withFakeFetchCapturingBody(body, () => {
     const adapter = new OpenAiCompatibleAdapter();
     const controller = new AbortController();
     return drain(
