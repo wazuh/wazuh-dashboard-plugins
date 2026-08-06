@@ -15,7 +15,10 @@ import {
 } from './types';
 import { widenNumericTypes } from './wire-schema';
 import { iterateSseLines } from './sse-utils';
-import { fetchProviderWithRetry } from './retry';
+import {
+  fetchProviderWithRetry,
+  describeToolUseFailedStreamMessage,
+} from './retry';
 import {
   DEFAULT_ANTHROPIC_MAX_TOKENS,
   DEFAULT_ANTHROPIC_VERSION,
@@ -181,9 +184,11 @@ export class AnthropicAdapter implements ProviderAdapter {
             toolUses.delete(blockIndex);
           }
         } else if (parsed.type === 'error') {
+          const rawMessage = parsed.error?.message ?? 'Unknown provider error';
           yield {
             type: 'error',
-            message: parsed.error?.message ?? 'Unknown provider error',
+            message:
+              describeToolUseFailedStreamMessage(rawMessage) ?? rawMessage,
           };
           return;
         } else if (parsed.type === 'message_stop') {
