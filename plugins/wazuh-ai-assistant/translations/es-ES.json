@@ -95,7 +95,7 @@
     "wazuhAiAssistant.settings.form.baseUrl": "URL del endpoint",
     "wazuhAiAssistant.settings.form.baseUrlInvalid": "Introduce una URL válida que empiece por http:// o https://",
     "wazuhAiAssistant.settings.form.model": "Modelo",
-    "wazuhAiAssistant.settings.form.modelHelp": "El uso de herramientas necesita un modelo con buen soporte de function calling. Verificados en agosto de 2026: openai/gpt-oss-120b o openai/gpt-oss-20b (Groq), GPT-4o o GPT-4o-mini (OpenAI), Claude Sonnet (Anthropic). No utilice llama-3.3-70b-versatile ni llama-3.1-8b-instant de Groq: ambos se retiran el 16 de agosto de 2026. Cada pregunta envía unos 13.000 tokens repartidos en tres llamadas al proveedor, por lo que una clave de nivel gratuito con un límite bajo de tokens por minuto fallará con errores 413 o 429 por muy capaz que sea el modelo.",
+    "wazuhAiAssistant.settings.form.modelHelp": "El uso de herramientas necesita un modelo con buen soporte de function calling; los modelos pequeños o básicos suelen fallar. Recomendados: GPT-4o o GPT-4o-mini (OpenAI), Claude Sonnet (Anthropic), o gpt-oss-120b / gpt-oss-20b (Groq). Consulte la lista de modelos de su proveedor para ver la disponibilidad actual, ya que los modelos se retiran periódicamente. Cada pregunta puede consumir una gran cantidad de tokens, por lo que una clave de nivel gratuito con un límite bajo puede fallar sin importar la capacidad del modelo.",
     "wazuhAiAssistant.settings.form.apiKey": "Clave API",
     "wazuhAiAssistant.settings.form.apiKeyHelp": "Déjalo vacío para conservar la clave actual.",
     "wazuhAiAssistant.settings.form.save": "Guardar",

@@ -34,11 +34,13 @@ test('with no agent_name: only the time-range filter is present (all agents)', (
   ]);
 });
 
-test('with agent_name: adds a term clause on the ECS "agent.name" field -- NOT "wazuh.agent.name"', () => {
+test('with agent_name: adds a match clause on "wazuh.agent.name"', () => {
   const req = buildIndexer({ agent_name: 'web-prod-01' });
   const clauses = filters(req);
   assert.equal(clauses.length, 2);
-  assert.deepEqual(clauses[1], { term: { 'agent.name': 'web-prod-01' } });
+  assert.deepEqual(clauses[1], {
+    match: { 'wazuh.agent.name': 'web-prod-01' },
+  });
 });
 
 test('an empty-string agent_name contributes no filter clause (same as omitted)', () => {
@@ -103,7 +105,7 @@ test('table/digest columns stay within the fields verified present on the seeded
   const columnFields = getEventsByAgentTool.tableSpec.columns.map(c => c.field);
   assert.deepEqual(columnFields, [
     '@timestamp',
-    'agent.name',
+    'wazuh.agent.name',
     'event.category',
     'event.action',
     'event.outcome',

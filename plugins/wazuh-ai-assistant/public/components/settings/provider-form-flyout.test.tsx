@@ -322,19 +322,16 @@ describe('ProviderFormFlyout — endpoint URL guidance', () => {
 });
 
 describe('ProviderFormFlyout — model help text does not recommend retiring models', () => {
-  it('does not mention llama-3.3-70b-versatile or llama-3.1-8b-instant as recommendations', () => {
+  it('does not recommend llama-3.3-70b-versatile or llama-3.1-8b-instant', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
     const helpText = screen.getByText(
       /tool calling needs a model with solid function-calling support/i,
     );
 
-    // Both retiring model ids may appear only inside a "do not use" clause, never as an
-    // example chip or a recommended model — assert on the rendered help text as a whole.
-    expect(helpText.textContent).toMatch(/do not use/i);
-    expect(helpText.textContent).toMatch(/llama-3\.3-70b-versatile/);
-    expect(helpText.textContent).toMatch(/llama-3\.1-8b-instant/);
-    expect(helpText.textContent).not.toMatch(/known good/i);
+    expect(helpText.textContent).not.toMatch(/llama-3\.3-70b-versatile/);
+    expect(helpText.textContent).not.toMatch(/llama-3\.1-8b-instant/);
+    expect(helpText.textContent).toMatch(/gpt-oss-120b/);
     expect(helpText.textContent).not.toMatch(
       /small or base models often fail/i,
     );
@@ -347,9 +344,8 @@ describe('ProviderFormFlyout — model help text does not recommend retiring mod
       screen.queryByText(/^llama-3\.3-70b-versatile$/),
     ).not.toBeInTheDocument();
     // Anchored to the CHIP specifically: the replacement model id now also appears inside the
-    // help-text paragraph ("Verified working, August 2026: openai/gpt-oss-120b or ..."), so an
-    // unanchored getByText matches two nodes and throws. The chip renders the bare id in its own
-    // <code>, which is what this test is actually about.
+    // help-text paragraph, so an unanchored getByText matches two nodes and throws. The chip
+    // renders the bare id in its own <code>, which is what this test is actually about.
     const chips = screen
       .getAllByText(/^openai\/gpt-oss-120b$/)
       .filter(node => node.tagName.toLowerCase() === 'code');
