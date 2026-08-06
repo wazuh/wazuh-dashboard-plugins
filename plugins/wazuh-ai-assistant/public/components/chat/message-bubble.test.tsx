@@ -189,7 +189,9 @@ describe('MessageBubble', () => {
   // reason text plus an "Open in Discover" link.
   it('renders a callout with the reason text and an "Open in Discover" link when suggestedQuery is present', async () => {
     const resolveDiscoverUrl = () =>
-      Promise.resolve('https://example.test/app/data-explorer/discover#?_a=...');
+      Promise.resolve(
+        'https://example.test/app/data-explorer/discover#?_a=...',
+      );
 
     render(
       <MessageBubble

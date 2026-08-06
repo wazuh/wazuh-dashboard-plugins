@@ -22,7 +22,10 @@ export interface UsageTotals {
 /** The identity element for `addUsage` below — a turn that never sees any `usage` at all (e.g. an
  * adapter that never reports it) still ends with this, and `toStreamUsage` turns it into
  * `undefined` rather than a misleading `{inputTokens: 0, outputTokens: 0}`. */
-export const ZERO_USAGE_TOTALS: UsageTotals = { inputTokens: 0, outputTokens: 0 };
+export const ZERO_USAGE_TOTALS: UsageTotals = {
+  inputTokens: 0,
+  outputTokens: 0,
+};
 
 /**
  * Folds one more call's `usage` (a round's `done`, or stage 1's `done`) into the running totals.

@@ -38,14 +38,20 @@ test('addUsage: a single-round turn is a no-op sum (unchanged behavior)', () => 
     inputTokens: 512,
     outputTokens: 64,
   });
-  assert.deepEqual(toStreamUsage(totals), { inputTokens: 512, outputTokens: 64 });
+  assert.deepEqual(toStreamUsage(totals), {
+    inputTokens: 512,
+    outputTokens: 64,
+  });
 });
 
 test('addUsage: an undefined usage (adapter reported none for that call) contributes zero, does not reset', () => {
   let totals = ZERO_USAGE_TOTALS;
   totals = addUsage(totals, { inputTokens: 100, outputTokens: 10 });
   totals = addUsage(totals, undefined);
-  assert.deepEqual(toStreamUsage(totals), { inputTokens: 100, outputTokens: 10 });
+  assert.deepEqual(toStreamUsage(totals), {
+    inputTokens: 100,
+    outputTokens: 10,
+  });
 });
 
 test('toStreamUsage: returns undefined (not zeros) when nothing was ever accumulated', () => {
@@ -71,7 +77,8 @@ test('addUsage: two rounds of roughly-equal size sum to ~2x a single round, not 
   const summed = toStreamUsage(totals);
   assert.deepEqual(summed, { inputTokens: 6814 * 2, outputTokens: 140 * 2 });
   assert.ok(
-    (summed as { inputTokens: number }).inputTokens > singleRound.inputTokens + 1000,
+    (summed as { inputTokens: number }).inputTokens >
+      singleRound.inputTokens + 1000,
     'a genuine sum of two rounds must clear the single round by more than a few hundred tokens ' +
       '-- the broken accumulation this issue describes only ever added ~291',
   );

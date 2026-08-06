@@ -51,7 +51,7 @@ export const SUGGEST_DISCOVER_QUERY_TOOL: ToolSpec = {
       reason: {
         type: 'string',
         description:
-          'One or two plain sentences, in the user\'s own language, saying what you could not ' +
+          "One or two plain sentences, in the user's own language, saying what you could not " +
           'check and why (e.g. "this index is outside what I can query directly" or "this needs ' +
           'a date range beyond the 90 days I can search"). Shown to the user verbatim.',
       },
@@ -95,10 +95,9 @@ export function validateSuggestDiscoverQueryArgs(
   } catch (error) {
     return {
       ok: false,
-      reason:
-        `Parameter "query_dsl" is not valid JSON (${
-          error instanceof Error ? error.message : String(error)
-        }). Re-send it as a single JSON-encoded string, e.g. "{\\"bool\\":{...}}".`,
+      reason: `Parameter "query_dsl" is not valid JSON (${
+        error instanceof Error ? error.message : String(error)
+      }). Re-send it as a single JSON-encoded string, e.g. "{\\"bool\\":{...}}".`,
     };
   }
   if (typeof dsl !== 'object' || dsl === null || Array.isArray(dsl)) {
@@ -255,7 +254,7 @@ export async function resolveSuggestedDsl(
       `wazuhAiAssistant: suggest_discover_query targets index "${index}", outside the executor's ` +
         'allowlist, so its field names cannot be verified via _field_caps -- stripping the ' +
         'suggested query to index + time range only rather than widening the allowlist for a ' +
-        'metadata read (see suggest-discover-query.ts\'s resolveSuggestedDsl doc comment).',
+        "metadata read (see suggest-discover-query.ts's resolveSuggestedDsl doc comment).",
     );
     return timeRangeOnlyDsl;
   }
@@ -269,12 +268,11 @@ export async function resolveSuggestedDsl(
   }
 
   try {
-    const response = await context.core.opensearch.client.asCurrentUser.fieldCaps(
-      {
+    const response =
+      await context.core.opensearch.client.asCurrentUser.fieldCaps({
         index,
         fields: [...fieldNames].join(','),
-      },
-    );
+      });
     const knownFields = new Set(
       Object.keys(
         (response.body as { fields?: Record<string, unknown> } | undefined)
@@ -286,7 +284,9 @@ export async function resolveSuggestedDsl(
   } catch (error) {
     logger.debug(
       `wazuhAiAssistant: suggest_discover_query's _field_caps check failed for index "${index}" ` +
-        `(${describeError(error)}) -- stripping the suggested query to index + time range only.`,
+        `(${describeError(
+          error,
+        )}) -- stripping the suggested query to index + time range only.`,
     );
     return timeRangeOnlyDsl;
   }
