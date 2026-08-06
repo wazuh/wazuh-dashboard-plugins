@@ -73,6 +73,36 @@ test('widenNumericTypes: leaves string properties untouched', () => {
   assert.deepEqual(out.properties, schema.properties);
 });
 
+test('widenNumericTypes: widens a jsonString-marked string property to ["string","object"]', () => {
+  const schema: JsonSchemaObject = {
+    type: 'object',
+    properties: {
+      query_dsl: {
+        type: 'string',
+        jsonString: true,
+        description: 'a JSON-encoded search body',
+      },
+    },
+  };
+  const out = widenNumericTypes(schema);
+  const widened = widenedProperties(out).query_dsl;
+  assert.deepEqual(widened.type, ['string', 'object']);
+  assert.equal(widened.description, 'a JSON-encoded search body');
+});
+
+test('widenNumericTypes: strips the jsonString marker from the widened wire property', () => {
+  const schema: JsonSchemaObject = {
+    type: 'object',
+    properties: { query_dsl: { type: 'string', jsonString: true } },
+  };
+  const out = widenNumericTypes(schema);
+  assert.equal(
+    'jsonString' in widenedProperties(out).query_dsl,
+    false,
+    'the non-standard jsonString keyword must never reach the provider wire',
+  );
+});
+
 test('widenNumericTypes: leaves array-of-string items untouched', () => {
   const schema: JsonSchemaObject = {
     type: 'object',
