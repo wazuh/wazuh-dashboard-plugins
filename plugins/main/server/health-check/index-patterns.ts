@@ -289,7 +289,8 @@ async function runIndexPatternTask(
     logger.debug('Starting index pattern saved object');
     const savedObjectsClient = getSavedObjectsClient(ctx, ctx.scope);
     const indexPatternsClient = getIndexPatternsClient(ctx, ctx.scope);
-
+    logger.warn('pre-wait');
+    // await new Promise((resolve) => setTimeout(resolve, 3000));
     let compatibleIndexPatterns = [];
 
     if (indexPatternID) {

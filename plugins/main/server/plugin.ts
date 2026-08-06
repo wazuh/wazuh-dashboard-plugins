@@ -742,7 +742,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     core.healthCheck.register(
       initializationTaskCreatorIndexPatternBatch({
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERNS,
-        batchSize: 5,
+        batchSize: 1,
         indexPatterns: INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS,
       }),
     );
@@ -784,5 +784,5 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     return {};
   }
 
-  public stop() {}
+  public stop() { }
 }
