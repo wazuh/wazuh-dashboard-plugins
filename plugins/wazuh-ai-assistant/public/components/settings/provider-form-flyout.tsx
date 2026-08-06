@@ -514,12 +514,10 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 <>
                   {i18n.translate('wazuhAiAssistant.settings.form.modelHelp', {
                     defaultMessage:
-                      'Tool calling needs a model with solid function-calling support; ' +
-                      'small or lightweight models often fail. Recommended: GPT-4o or ' +
-                      'GPT-4o-mini (OpenAI), Claude Sonnet (Anthropic), or gpt-oss-120b / ' +
-                      "gpt-oss-20b (Groq). Check your provider's model list for current " +
-                      'availability, as models are periodically retired. Each question ' +
-                      'can use a large number of tokens, so a free-tier API key with a ' +
+                      'Tool calling needs a model with solid function-calling support ' +
+                      '(e.g. GPT-4o, Claude Sonnet) — small or lightweight models often ' +
+                      "fail. Check your provider's model list for current availability, " +
+                      'as models are periodically retired. A free-tier API key with a ' +
                       "low rate limit may fail regardless of the model's capability.",
                   })}{' '}
                   <FormattedMessage

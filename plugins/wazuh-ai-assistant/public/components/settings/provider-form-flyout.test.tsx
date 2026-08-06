@@ -331,7 +331,7 @@ describe('ProviderFormFlyout — model help text does not recommend retiring mod
 
     expect(helpText.textContent).not.toMatch(/llama-3\.3-70b-versatile/);
     expect(helpText.textContent).not.toMatch(/llama-3\.1-8b-instant/);
-    expect(helpText.textContent).toMatch(/gpt-oss-120b/);
+    expect(helpText.textContent).toMatch(/GPT-4o/);
     expect(helpText.textContent).not.toMatch(
       /small or base models often fail/i,
     );
@@ -343,9 +343,7 @@ describe('ProviderFormFlyout — model help text does not recommend retiring mod
     expect(
       screen.queryByText(/^llama-3\.3-70b-versatile$/),
     ).not.toBeInTheDocument();
-    // Anchored to the CHIP specifically: the replacement model id now also appears inside the
-    // help-text paragraph, so an unanchored getByText matches two nodes and throws. The chip
-    // renders the bare id in its own <code>, which is what this test is actually about.
+    // Anchored to the CHIP specifically — it renders the bare id in its own <code>.
     const chips = screen
       .getAllByText(/^openai\/gpt-oss-120b$/)
       .filter(node => node.tagName.toLowerCase() === 'code');
