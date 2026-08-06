@@ -109,11 +109,26 @@ function validateArray(
  * type-checking, per the design spec — the server-side half of `wire-schema.ts`'s
  * `widenNumericTypes` wire widening (that widens the declared type so the provider accepts a
  * quoted value; this coerces it back once the call arrives).
+ *
+ * A parallel accommodation for the opposite direction, but deliberately NARROW: a `string`-declared
+ * parameter marked `jsonString: true` (common/types.ts's `JsonSchemaPrimitive.jsonString` doc
+ * comment — today only search-wazuh-data.ts's `query_dsl`, which must arrive as JSON-encoded text
+ * because this file's `JsonSchemaObject` has no nested-object property type to declare it against)
+ * sometimes arrives as a real JSON object instead — models naturally emit nested JSON as a live
+ * object rather than hand-serializing it into a string. Re-stringifying it here is the same
+ * wire-widening move as the numeric/boolean case above (wire-schema.ts's `widenNumericTypes` widens
+ * this same marked property's WIRE type to `["string","object"]`): the widened INPUT is narrowed
+ * straight back to the declared type before anything downstream ever sees it, so `buildRequest`'s
+ * `JSON.parse` and every guardrails.ts check that runs on the parsed body behave identically to the
+ * string-form case — only the wire shape got wider, not what is allowed through it.
+ *
+ * Gated on the `jsonString` marker rather than on `expectedType === 'string'` alone: an UNMARKED
+ * string property (e.g. `agent_name`) receiving an object is a model mistake, not a wire-format
+ * accommodation, and must still fail validation — stringifying it would silently produce a
+ * JSON-blob value that matches nothing downstream, trading a loud failure for a wrong answer.
  */
-function coerce(
-  raw: unknown,
-  expectedType: JsonSchemaPrimitive['type'],
-): unknown {
+function coerce(raw: unknown, propertySchema: JsonSchemaPrimitive): unknown {
+  const expectedType = propertySchema.type;
   if (
     expectedType === 'number' &&
     typeof raw === 'string' &&
@@ -132,6 +147,15 @@ function coerce(
       return false;
     }
   }
+  if (
+    expectedType === 'string' &&
+    propertySchema.jsonString &&
+    typeof raw === 'object' &&
+    raw !== null &&
+    !Array.isArray(raw)
+  ) {
+    return JSON.stringify(raw);
+  }
   return raw;
 }
 
@@ -140,7 +164,7 @@ function validatePrimitive(
   raw: unknown,
   propertySchema: JsonSchemaPrimitive,
 ): { value: unknown; errors: string[] } {
-  const value = coerce(raw, propertySchema.type);
+  const value = coerce(raw, propertySchema);
   const actualType = typeof value;
 
   if (actualType !== propertySchema.type) {
