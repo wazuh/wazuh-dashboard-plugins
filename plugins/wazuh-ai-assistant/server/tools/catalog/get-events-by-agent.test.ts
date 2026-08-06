@@ -93,7 +93,10 @@ test('spec: exposes agent_name as optional (not in the required list)', () => {
   const required = (
     getEventsByAgentTool.spec.parameters as { required?: string[] }
   ).required;
-  assert.equal(required === undefined || !required.includes('agent_name'), true);
+  assert.equal(
+    required === undefined || !required.includes('agent_name'),
+    true,
+  );
 });
 
 test('table/digest columns stay within the fields verified present on the seeded events docs', () => {
