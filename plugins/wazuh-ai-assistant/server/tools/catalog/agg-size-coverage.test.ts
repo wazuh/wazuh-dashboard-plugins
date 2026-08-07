@@ -45,6 +45,12 @@ function sampleValue(name: string, prop: JsonSchemaProperty): unknown {
   if (name === 'limit') {
     return ABSURD_LIMIT;
   }
+  // A `jsonString: true` param (common/types.ts) carries JSON inside a string — search_wazuh_data's
+  // `query_dsl` is the only one today. Detected from the schema MARKER rather than the param name so
+  // a future jsonString param is handled without editing this file.
+  if ((prop as { jsonString?: true }).jsonString) {
+    return '{"query":{"match_all":{}}}';
+  }
   const enumValues = (prop as { enum?: unknown[] }).enum;
   if (Array.isArray(enumValues) && enumValues.length > 0) {
     return enumValues[0];
