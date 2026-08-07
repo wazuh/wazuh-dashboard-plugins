@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiHorizontalRule } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
@@ -12,22 +17,19 @@ import {
   useIntegrationsCount,
   useKvdbsCount,
   useRulesCount,
-  useVulnerabilityOverview,
 } from '../../hooks/use-overview-data';
 import { DataGroupResult } from '../../interfaces/data-group';
 import { ThreatIntelEnrichments, TopItem } from '../../interfaces/types';
 import { getIntegrationsUrl } from '../../utils/navigation';
 
 export interface ThreatIntelligenceFeedSectionProps {
-  /** Shared vulnerabilities search; provides the CVEs-matched tile. */
-  vulnerabilities: ReturnType<typeof useVulnerabilityOverview>;
   /** Shared enrichments catalog: the IOCs tile and the threat-type bar. */
   threatIntel: DataGroupResult<ThreatIntelEnrichments>;
 }
 
 const ThreatIntelligenceFeedSectionComponent: React.FC<
   ThreatIntelligenceFeedSectionProps
-> = ({ vulnerabilities, threatIntel }) => {
+> = ({ threatIntel }) => {
   const [sectionRef, visible] = useInViewport<HTMLDivElement>();
   const rules = useRulesCount(visible);
   const decoders = useDecodersCount(visible);
@@ -39,11 +41,6 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
     status: threatIntel.status,
     data: threatIntel.data?.total,
     error: threatIntel.error,
-  };
-  const cvesMatched: DataGroupResult<number | undefined> = {
-    status: vulnerabilities.status,
-    data: vulnerabilities.data?.cvesMatched,
-    error: vulnerabilities.error,
   };
   const byThreatType: DataGroupResult<TopItem[]> = {
     status: threatIntel.status,
@@ -84,7 +81,7 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
             caption='Current state'
             data-test-subj='home-overview-threat-catalog'
           >
-            <ThreatCatalogTiles iocs={iocs} cvesMatched={cvesMatched} />
+            <ThreatCatalogTiles iocs={iocs} />
             <EuiHorizontalRule margin='m' />
             <ThreatTypeComposition byThreatType={byThreatType} />
           </WidgetGroup>

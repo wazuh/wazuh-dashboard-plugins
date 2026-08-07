@@ -17,8 +17,18 @@ import {
   PatternDataSourceFilterManager,
   tFilter,
 } from '../../../data-source';
-import { FINDING_SEVERITY_FIELD } from '../lib/fields';
+import {
+  FINDING_SEVERITY_FIELD,
+  HOST_OS_NAME_FIELD,
+  SCA_CHECK_RESULT_FIELD,
+  VULNERABILITY_SEVERITY_FIELD,
+  VULNERABILITY_SEVERITY_VALUES,
+} from '../lib/fields';
 import { SeverityBand } from '../interfaces/types';
+
+/** Shared `_g` query state: last 24h, no pinned filters, refresh paused. */
+const DISCOVER_G_STATE =
+  '(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-24h,to:now))';
 
 /** Navigation helpers, kept in one module so sections depend on one boundary. */
 
@@ -75,14 +85,112 @@ export const getDiscoverFindingsBySeverityUrl = (
 };
 export const getMitreUrl = () => getUrlForApp(mitreAttack.id);
 export const getItHygieneUrl = () => getUrlForApp(ITHygiene.id);
+
+/** IT Hygiene > System > OS tab, optionally filtered to one `host.os.name`. */
+export const getItHygieneSystemOsUrl = (
+  osName?: string,
+  indexPatternId?: string,
+): string => {
+  const path = '#overview/?tab=it-hygiene&tabView=system&tabSubView=os';
+  if (!osName || !indexPatternId) {
+    return getUrlForApp(ITHygiene.id, { path });
+  }
+  const queryState = rison.encode({
+    filters: [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        HOST_OS_NAME_FIELD,
+        osName,
+        indexPatternId,
+      ),
+    ],
+    query: { language: 'kuery', query: '' },
+  });
+  return getUrlForApp(ITHygiene.id, {
+    path: `${path}&_a=${queryState}&_g=${DISCOVER_G_STATE}`,
+  });
+};
+export const getItHygieneSoftwareUrl = () =>
+  getUrlForApp(ITHygiene.id, {
+    path: '#overview/?tab=it-hygiene&tabView=software&tabSubView=packages',
+  });
+export const getItHygieneUsersTabUrl = () =>
+  getUrlForApp(ITHygiene.id, {
+    path: '#overview/?tab=it-hygiene&tabView=users&tabSubView=users',
+  });
+export const getItHygieneServicesTabUrl = () =>
+  getUrlForApp(ITHygiene.id, {
+    path: '#overview/?tab=it-hygiene&tabView=services',
+  });
+
 export const getConfigurationAssessmentUrl = () =>
   getUrlForApp(configurationAssessment.id);
+
+/** Configuration Assessment > Inventory, filtered to a `check.result` value. */
+export const getConfigurationAssessmentByStatusUrl = (
+  status: string,
+  indexPatternId?: string,
+): string => {
+  if (!indexPatternId) {
+    return getUrlForApp(configurationAssessment.id);
+  }
+  const queryState = rison.encode({
+    filters: [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        SCA_CHECK_RESULT_FIELD,
+        status,
+        indexPatternId,
+      ),
+    ],
+    query: { language: 'kuery', query: '' },
+  });
+  return getUrlForApp(configurationAssessment.id, {
+    path: `#overview/?tab=sca&tabView=inventory&_a=${queryState}&_g=${DISCOVER_G_STATE}`,
+  });
+};
+
 export const getFileIntegrityMonitoringUrl = () =>
   getUrlForApp(fileIntegrityMonitoring.id);
+export const getFileIntegrityMonitoringInventoryFilesUrl = () =>
+  getUrlForApp(fileIntegrityMonitoring.id, {
+    path: '#overview/?tab=fim&tabView=inventory&tabSubView=files',
+  });
+
 export const getMalwareDetectionUrl = () => getUrlForApp(malwareDetection.id);
 export const getVulnerabilityDetectionUrl = () =>
   getUrlForApp(vulnerabilityDetection.id);
+
+/** Vulnerability Detection > Inventory, filtered by severity band. */
+export const getVulnerabilityDetectionBySeverityUrl = (
+  band: SeverityBand,
+  indexPatternId?: string,
+): string => {
+  if (!indexPatternId) {
+    return getUrlForApp(vulnerabilityDetection.id);
+  }
+  const queryState = rison.encode({
+    filters: [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        VULNERABILITY_SEVERITY_FIELD,
+        VULNERABILITY_SEVERITY_VALUES[band],
+        indexPatternId,
+      ),
+    ],
+    query: { language: 'kuery', query: '' },
+  });
+  return getUrlForApp(vulnerabilityDetection.id, {
+    path: `#overview/?tab=vuls&tabView=inventory&_a=${queryState}&_g=${DISCOVER_G_STATE}`,
+  });
+};
+
 export const getActiveResponseUrl = () => getUrlForApp(activeResponses.id);
+/** Incident Response > Responses tab (triggered actions list). */
+export const getActiveResponseResponsesUrl = () =>
+  getUrlForApp(activeResponses.id, {
+    path: '#overview/?tab=incident-response-dashboard&tabView=responses',
+  });
 
 export const getRegulatoryComplianceUrlHome = () =>
   getUrlForApp(regulatoryCompliance.id);

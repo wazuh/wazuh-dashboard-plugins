@@ -6,9 +6,10 @@ import { ThreatHuntingSection } from './threat-hunting-section';
 import * as navigation from '../../utils/navigation';
 
 jest.mock('../../utils/navigation', () => ({
-  getThreatHuntingUrl: jest.fn(),
+  getThreatHuntingUrl: jest.fn(() => '#threat-hunting'),
   getMitreUrl: jest.fn(),
   getVulnerabilityDetectionUrl: jest.fn(),
+  getVulnerabilityDetectionBySeverityUrl: jest.fn(() => '#vuln-filtered'),
 }));
 const findingsAvailable = {
   status: 'available' as const,
@@ -107,5 +108,38 @@ describe('ThreatHuntingSection', () => {
     );
     fireEvent.click(screen.getByText('Threat Hunting'));
     expect(navigation.getThreatHuntingUrl).toHaveBeenCalled();
+  });
+
+  it('links the Total findings KPI to Threat Hunting', () => {
+    const { container } = render(
+      <ThreatHuntingSection
+        findings={findingsAvailable}
+        vulnerabilities={vulnerabilitiesAvailable}
+      />,
+    );
+    expect(
+      container.querySelector('[data-test-subj="total-findings-hero-link"]'),
+    ).toBeInTheDocument();
+    expect(navigation.getThreatHuntingUrl).toHaveBeenCalled();
+  });
+
+  it('renders the vulnerability severity counts as KPI tiles, each linking to a filtered Inventory', () => {
+    const { container } = render(
+      <ThreatHuntingSection
+        findings={findingsAvailable}
+        vulnerabilities={vulnerabilitiesAvailable}
+      />,
+    );
+    expect(
+      container.querySelector('[data-test-subj="vulnerability-severity"]'),
+    ).toBeNull();
+    expect(
+      container.querySelector('[data-test-subj="vulnerability-severity-high"]'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('5,456')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('5,456'));
+    expect(
+      navigation.getVulnerabilityDetectionBySeverityUrl,
+    ).toHaveBeenCalledWith('high', undefined);
   });
 });

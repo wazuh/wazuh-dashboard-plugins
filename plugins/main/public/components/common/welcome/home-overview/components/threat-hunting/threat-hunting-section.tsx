@@ -14,7 +14,7 @@ import {
   StatTile,
   TabNumber,
   BarList,
-  SeverityDistributionBar,
+  FindingSeverityTiles,
   SectionHeader,
   formatValueSafely,
   WIDGET_LOADING_MIN_HEIGHT,
@@ -28,6 +28,7 @@ import {
 import {
   getMitreUrl,
   getThreatHuntingUrl,
+  getVulnerabilityDetectionBySeverityUrl,
   getVulnerabilityDetectionUrl,
 } from '../../utils/navigation';
 
@@ -108,7 +109,18 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                 <StatTile
                   textAlign='center'
                   reverse
-                  value={<TabNumber value={findings.data.totalFindings} />}
+                  value={
+                    <RedirectAppLinks application={getCore().application}>
+                      <EuiLink
+                        style={{ fontWeight: 'inherit' }}
+                        color='text'
+                        href={getThreatHuntingUrl()}
+                        data-test-subj='total-findings-hero-link'
+                      >
+                        <TabNumber value={findings.data.totalFindings} />
+                      </EuiLink>
+                    </RedirectAppLinks>
+                  }
                   label='Total findings'
                   data-test-subj='total-findings-hero'
                 />
@@ -141,22 +153,28 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
           >
             {vulnerabilities.data && (
               <>
-                <SeverityDistributionBar
+                <EuiText size='s'>
+                  <strong className='tab-num'>
+                    {formatValueSafely(
+                      Object.values(vulnerabilities.data.severity).reduce(
+                        (sum: number, count) => sum + (count ?? 0),
+                        0,
+                      ),
+                    )}
+                  </strong>{' '}
+                  open vulnerabilities
+                </EuiText>
+                <EuiSpacer size='s' />
+                <FindingSeverityTiles
                   counts={vulnerabilities.data.severity}
-                  headline={
-                    <EuiText size='s'>
-                      <strong className='tab-num'>
-                        {formatValueSafely(
-                          Object.values(vulnerabilities.data.severity).reduce(
-                            (sum: number, count) => sum + (count ?? 0),
-                            0,
-                          ),
-                        )}
-                      </strong>{' '}
-                      open vulnerabilities
-                    </EuiText>
-                  }
                   testSubjPrefix='vulnerability-severity'
+                  onSelect={band =>
+                    getVulnerabilityDetectionBySeverityUrl(
+                      band,
+                      vulnerabilities.indexPatternId,
+                    )
+                  }
+                  getTooltip={band => `Click to see vulnerabilities: ${band}`}
                 />
                 <EuiSpacer size='s' />
                 <TopPackagesTable items={vulnerabilities.data.byPackage} />

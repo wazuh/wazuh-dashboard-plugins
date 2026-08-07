@@ -1,3 +1,8 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { useEffect, useMemo, useState } from 'react';
 import { useDataSource } from '../../../data-source/hooks/use-data-source';
 import {
@@ -13,7 +18,7 @@ import {
   SCAStatesDataSource,
   SCAStatesDataSourceRepository,
   FIMFilesStatesDataSource,
-  FIMDataSourceRepository,
+  FIMFilesStatesDataSourceRepository,
   VulnerabilitiesDataSource,
   VulnerabilitiesDataSourceRepository,
   ActiveResponsesDataSource,
@@ -316,8 +321,8 @@ export function useFindingsBreakdowns(
 
 export function useTopOperatingSystems(
   enabled: boolean,
-): DataGroupResult<TopItem[]> {
-  return useAggregationGroup<TopItem[]>({
+): DataGroupResult<TopItem[]> & { indexPatternId?: string } {
+  const { dataSource, ...result } = useAggregationGroup<TopItem[]>({
     DataSource: SystemInventoryStatesDataSource,
     createRepository: () =>
       new SystemInventorySystemStatesDataSourceRepository(),
@@ -331,6 +336,13 @@ export function useTopOperatingSystems(
       return mapTopBuckets(response?.aggregations, AGG.topOs);
     },
   });
+
+  const indexPatternId = dataSource?.indexPattern?.id;
+
+  return useMemo(
+    () => ({ ...result, indexPatternId }),
+    [result.status, result.data, indexPatternId],
+  );
 }
 
 export function useTopNetworkServices(
@@ -373,8 +385,10 @@ export function useAgentStatus(): DataGroupResult<AgentStatus> {
   });
 }
 
-export function useSCAOverview(enabled: boolean): DataGroupResult<ScaOverview> {
-  return useAggregationGroup<ScaOverview>({
+export function useSCAOverview(
+  enabled: boolean,
+): DataGroupResult<ScaOverview> & { indexPatternId?: string } {
+  const { dataSource, ...result } = useAggregationGroup<ScaOverview>({
     DataSource: SCAStatesDataSource,
     createRepository: () => new SCAStatesDataSourceRepository(),
     enabled,
@@ -390,12 +404,19 @@ export function useSCAOverview(enabled: boolean): DataGroupResult<ScaOverview> {
       };
     },
   });
+
+  const indexPatternId = dataSource?.indexPattern?.id;
+
+  return useMemo(
+    () => ({ ...result, indexPatternId }),
+    [result.status, result.data, indexPatternId],
+  );
 }
 
 export function useFIMOverview(enabled: boolean): DataGroupResult<FimOverview> {
   return useAggregationGroup<FimOverview>({
     DataSource: FIMFilesStatesDataSource,
-    createRepository: () => new FIMDataSourceRepository(),
+    createRepository: () => new FIMFilesStatesDataSourceRepository(),
     enabled,
     label: 'File Integrity Monitoring',
     fetch: async fetchData => {
@@ -461,8 +482,8 @@ export function useFiltersCount(enabled: boolean): DataGroupResult<number> {
 
 export function useVulnerabilityOverview(
   enabled: boolean,
-): DataGroupResult<VulnerabilityOverview> {
-  return useAggregationGroup<VulnerabilityOverview>({
+): DataGroupResult<VulnerabilityOverview> & { indexPatternId?: string } {
+  const { dataSource, ...result } = useAggregationGroup<VulnerabilityOverview>({
     DataSource: VulnerabilitiesDataSource,
     createRepository: () => new VulnerabilitiesDataSourceRepository(),
     enabled,
@@ -490,6 +511,13 @@ export function useVulnerabilityOverview(
       };
     },
   });
+
+  const indexPatternId = dataSource?.indexPattern?.id;
+
+  return useMemo(
+    () => ({ ...result, indexPatternId }),
+    [result.status, result.data, indexPatternId],
+  );
 }
 
 /**

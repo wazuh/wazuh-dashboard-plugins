@@ -59,11 +59,6 @@ export function buildVulnerabilitySeverityFiltersAgg() {
       },
     };
   }
-  filters['pending'] = {
-    match_phrase: {
-      'vulnerability.under_evaluation': true,
-    },
-  };
   return { [AGG.vulnerabilitySeverity]: { filters: { filters } } };
 }
 

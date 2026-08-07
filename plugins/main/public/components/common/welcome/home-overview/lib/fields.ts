@@ -16,7 +16,6 @@ export const VULNERABILITY_SEVERITY_BANDS: SeverityBand[] = [
   'high',
   'medium',
   'low',
-  'pending',
 ];
 
 export const FINDING_SEVERITY_FIELD = 'wazuh.rule.level';
