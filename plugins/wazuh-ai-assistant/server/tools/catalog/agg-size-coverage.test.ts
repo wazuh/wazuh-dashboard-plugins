@@ -48,8 +48,21 @@ function sampleValue(name: string, prop: JsonSchemaProperty): unknown {
   // A `jsonString: true` param (common/types.ts) carries JSON inside a string — search_wazuh_data's
   // `query_dsl` is the only one today. Detected from the schema MARKER rather than the param name so
   // a future jsonString param is handled without editing this file.
+  //
+  // The sample carries a bounded `@timestamp` range deliberately. `search_wazuh_data` is the escape
+  // hatch: its body comes from the CALLER, and `lintDsl` requires a both-sides-bounded range within
+  // the 90-day cap for the findings indices. A bare `match_all` is therefore rejected — correctly,
+  // and that rejection is a feature, not the aggregation-size defect this file is guarding. Supplying
+  // a well-formed caller query keeps the escape hatch inside the invariant (its own `limit` still
+  // reaches the request) instead of exempting it and losing the coverage.
   if ((prop as { jsonString?: true }).jsonString) {
-    return '{"query":{"match_all":{}}}';
+    return JSON.stringify({
+      query: {
+        bool: {
+          filter: [{ range: { '@timestamp': { gte: 'now-7d', lte: 'now' } } }],
+        },
+      },
+    });
   }
   const enumValues = (prop as { enum?: unknown[] }).enum;
   if (Array.isArray(enumValues) && enumValues.length > 0) {
