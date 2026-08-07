@@ -5,6 +5,10 @@ import '../../test-utils/setup-home-overview-test';
 import { EndpointSecuritySection } from './endpoint-security-section';
 import { useFIMOverview, useSCAOverview } from '../../hooks/use-overview-data';
 import { useInViewport } from '../../../../hooks';
+import {
+  getConfigurationAssessmentByStatusUrl,
+  getFileIntegrityMonitoringInventoryFilesUrl,
+} from '../../utils/navigation';
 
 jest.mock('../../hooks/use-overview-data', () => ({
   useSCAOverview: jest.fn(),
@@ -12,7 +16,9 @@ jest.mock('../../hooks/use-overview-data', () => ({
 }));
 jest.mock('../../utils/navigation', () => ({
   getConfigurationAssessmentUrl: jest.fn(),
+  getConfigurationAssessmentByStatusUrl: jest.fn(() => '#sca-filtered'),
   getFileIntegrityMonitoringUrl: jest.fn(),
+  getFileIntegrityMonitoringInventoryFilesUrl: jest.fn(() => '#fim-files'),
   getMalwareDetectionUrl: jest.fn(),
 }));
 jest.mock('../../../../hooks', () => ({
@@ -40,10 +46,11 @@ beforeEach(() => {
         },
       ],
     },
+    indexPatternId: 'idx-sca',
   });
   asMock(useFIMOverview).mockReturnValue({
     status: 'available',
-    data: { total: 38822, platforms: [{ key: 'Ubuntu', count: 8435 }] },
+    data: { total: 38822, files: [{ key: '/etc/passwd', count: 8435 }] },
   });
   asMock(useInViewport).mockReturnValue([{ current: null }, true]);
 });
@@ -63,7 +70,11 @@ const findingsAvailable = {
 
 const threatIntelAvailable = {
   status: 'available' as const,
-  data: { total: 2048, feedByType: [{ key: 'Domains', count: 92700 }] },
+  data: {
+    total: 2048,
+    feedByType: [{ key: 'Domains', count: 92700 }],
+    byThreatType: [],
+  },
 };
 
 describe('EndpointSecuritySection', () => {
@@ -77,16 +88,35 @@ describe('EndpointSecuritySection', () => {
     expect(screen.getByText('Configuration Assessment')).toBeInTheDocument();
     expect(screen.getByText('File Integrity Monitoring')).toBeInTheDocument();
     expect(screen.getByText('Malware Detection')).toBeInTheDocument();
-    // "Passed" also appears as a benchmarks-table column header, so scope to the tile.
     expect(
       document.querySelector('[data-test-subj="sca-tile-passed"]'),
     ).toBeInTheDocument();
-    expect(screen.getAllByText('Ubuntu').length).toBeGreaterThan(0);
     expect(
-      screen.getByText('Files & registry objects baselined fleet-wide'),
+      screen.getByText('CIS Ubuntu Linux 24.04 LTS v1.0.0'),
     ).toBeInTheDocument();
-    expect(screen.getByText('IOC matches, last 24 hours')).toBeInTheDocument();
+    expect(screen.getAllByText('/etc/passwd').length).toBeGreaterThan(0);
+    expect(
+      screen.getByText('File integrity baselined fleet-wide'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('IOC matches')).toBeInTheDocument();
     expect(screen.getAllByText('Domains').length).toBeGreaterThan(0);
+  });
+
+  it('links the SCA tiles and the FIM hero to their filtered/inventory views', () => {
+    const { container } = render(
+      <EndpointSecuritySection
+        findings={findingsAvailable}
+        threatIntel={threatIntelAvailable}
+      />,
+    );
+    expect(
+      container.querySelector('[data-test-subj="sca-tile-passed-link"]'),
+    ).toBeInTheDocument();
+    expect(getConfigurationAssessmentByStatusUrl).toHaveBeenCalled();
+    expect(
+      container.querySelector('[data-test-subj="fim-hero-link"]'),
+    ).toBeInTheDocument();
+    expect(getFileIntegrityMonitoringInventoryFilesUrl).toHaveBeenCalled();
   });
 
   it('still renders Configuration Assessment when the SCA index is unavailable', () => {

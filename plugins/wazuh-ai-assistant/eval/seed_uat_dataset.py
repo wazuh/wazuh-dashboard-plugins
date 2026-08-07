@@ -110,17 +110,16 @@ def finding(ts, agent, rule, src_ip, src_user, dst_user, proc, cmd):
     rid, sev, desc, tags, cat, tid, tname, tac, pci = rule
     return {
         "@timestamp": ts.strftime("%Y-%m-%dT%H:%M:%S.000Z"),
-        "agent": {"id": aid, "name": aname},
         "wazuh": {
             "agent": {"id": aid, "name": aname, "groups": ["default", SEED_MARK]},
             "cluster": {"name": "wazuh", "node": "master"},
             "schema": {"version": "1.0"},
-        },
-        "rule": {
-            "id": str(rid), "level": sev, "description": desc, "title": desc,
-            "tags": tags, "category": cat,
-            "mitre": {"technique": {"id": tid, "name": tname}, "tactic": {"name": tac}},
-            "compliance": {"pci_dss": pci},
+            "rule": {
+                "id": str(rid), "level": sev, "description": desc, "title": desc,
+                "tags": tags, "category": cat,
+                "mitre": {"technique": {"id": tid, "name": tname}, "tactic": {"name": tac}},
+                "compliance": {"pci_dss": pci},
+            },
         },
         "source": {"ip": src_ip, "port": random.randint(1024, 65000), "user": {"name": src_user}},
         "destination": {"user": {"name": dst_user}},
@@ -335,9 +334,9 @@ def summarise():
     c = req("GET", f"/{FINDINGS}/_count")["count"]
     print(f"findings total: {c}")
     body = {"size": 0, "aggs": {
-        "sev": {"terms": {"field": "rule.level"}},
+        "sev": {"terms": {"field": "wazuh.rule.level"}},
         "agents": {"terms": {"field": "wazuh.agent.name", "size": 10}},
-        "rules": {"terms": {"field": "rule.id", "size": 5}},
+        "rules": {"terms": {"field": "wazuh.rule.id", "size": 5}},
     }}
     res = req("POST", f"/{FINDINGS}/_search", body)
     for name in ("sev", "agents", "rules"):

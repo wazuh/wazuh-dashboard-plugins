@@ -5,12 +5,13 @@ import {
   WidgetGroup,
   StatTile,
   TabNumber,
+  ScoreGauge,
+  DualBarList,
   SectionHeader,
   WIDGET_LOADING_MIN_HEIGHT,
 } from '../common';
 import { ScaTiles } from './sca-tiles';
-import { ScaBenchmarksTable } from './sca-benchmarks-table';
-import { FimPlatformsTable } from './fim-platforms-table';
+import { FimTopFilesTable } from './fim-top-files-table';
 import { MalwareDetectionPanel } from './malware-detection-panel';
 import { useInViewport } from '../../../../hooks';
 import {
@@ -20,6 +21,7 @@ import {
 } from '../../hooks/use-overview-data';
 import {
   getConfigurationAssessmentUrl,
+  getFileIntegrityMonitoringInventoryFilesUrl,
   getFileIntegrityMonitoringUrl,
 } from '../../utils/navigation';
 import { DataGroupResult } from '../../interfaces/data-group';
@@ -81,9 +83,29 @@ const EndpointSecuritySectionComponent: React.FC<
           >
             {sca.data && (
               <>
-                <ScaTiles tiles={sca.data.tiles} />
-                <EuiSpacer size='s' />
-                <ScaBenchmarksTable items={sca.data.benchmarks} />
+                <ScaTiles
+                  tiles={sca.data.tiles}
+                  indexPatternId={sca.indexPatternId}
+                />
+                <EuiSpacer size='m' />
+                <ScoreGauge
+                  title='Overall score'
+                  score={sca.data.tiles.score}
+                  data-test-subj='sca-score-gauge'
+                />
+                <EuiSpacer size='m' />
+                <DualBarList
+                  title='Top 5 benchmarks'
+                  items={sca.data.benchmarks.map(benchmark => ({
+                    key: benchmark.name,
+                    label: benchmark.name,
+                    passed: benchmark.passed,
+                    failed: benchmark.failed,
+                    score: benchmark.score,
+                  }))}
+                  emptyMessage='No SCA benchmarks found'
+                  data-test-subj='sca-benchmarks'
+                />
               </>
             )}
           </WidgetGroup>
@@ -110,14 +132,25 @@ const EndpointSecuritySectionComponent: React.FC<
             {fim.data && (
               <>
                 <StatTile
-                  value={<TabNumber value={fim.data.total} />}
-                  label='Files & registry objects baselined fleet-wide'
+                  value={
+                    <RedirectAppLinks application={getCore().application}>
+                      <EuiLink
+                        style={{ fontWeight: 'inherit' }}
+                        color='text'
+                        href={getFileIntegrityMonitoringInventoryFilesUrl()}
+                        data-test-subj='fim-hero-link'
+                      >
+                        <TabNumber value={fim.data.total} />
+                      </EuiLink>
+                    </RedirectAppLinks>
+                  }
+                  label='File integrity baselined fleet-wide'
                   reverse
                   textAlign='center'
                   data-test-subj='fim-hero'
                 />
                 <EuiSpacer size='s' />
-                <FimPlatformsTable items={fim.data.platforms} />
+                <FimTopFilesTable items={fim.data.files} />
               </>
             )}
           </WidgetGroup>
@@ -133,6 +166,7 @@ const EndpointSecuritySectionComponent: React.FC<
   );
 };
 
-export const EndpointSecuritySection = React.memo(
-  withErrorBoundary(EndpointSecuritySectionComponent),
-);
+// Annotated: `withErrorBoundary` is untyped, so without this the props
+// would reach every call site as `any`.
+export const EndpointSecuritySection: React.FC<EndpointSecuritySectionProps> =
+  React.memo(withErrorBoundary(EndpointSecuritySectionComponent));

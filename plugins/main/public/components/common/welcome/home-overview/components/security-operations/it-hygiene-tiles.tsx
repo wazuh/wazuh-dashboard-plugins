@@ -1,6 +1,12 @@
 import React from 'react';
 import { StatTileGroup, StatTileSpec } from '../common';
 import { DataGroupResult } from '../../interfaces/data-group';
+import {
+  getItHygieneServicesTabUrl,
+  getItHygieneSoftwareUrl,
+  getItHygieneSystemOsUrl,
+  getItHygieneUsersTabUrl,
+} from '../../utils/navigation';
 
 export interface ItHygieneTilesProps {
   operatingSystems: DataGroupResult<number>;
@@ -14,10 +20,26 @@ const TILES: ReadonlyArray<StatTileSpec<keyof ItHygieneTilesProps>> = [
     key: 'operatingSystems',
     label: 'Operating systems',
     testSubj: 'it-hygiene-tile-operating-systems',
+    onSelect: () => getItHygieneSystemOsUrl(),
   },
-  { key: 'packages', label: 'Packages', testSubj: 'it-hygiene-tile-packages' },
-  { key: 'users', label: 'Users', testSubj: 'it-hygiene-tile-users' },
-  { key: 'services', label: 'Services', testSubj: 'it-hygiene-tile-services' },
+  {
+    key: 'packages',
+    label: 'Packages',
+    testSubj: 'it-hygiene-tile-packages',
+    onSelect: getItHygieneSoftwareUrl,
+  },
+  {
+    key: 'users',
+    label: 'Users',
+    testSubj: 'it-hygiene-tile-users',
+    onSelect: getItHygieneUsersTabUrl,
+  },
+  {
+    key: 'services',
+    label: 'Services',
+    testSubj: 'it-hygiene-tile-services',
+    onSelect: getItHygieneServicesTabUrl,
+  },
 ];
 
 /**

@@ -1,40 +1,54 @@
+import './chat-page.scss';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   EuiSpacer,
   EuiEmptyPrompt,
   EuiButton,
-  EuiBadge,
+  EuiButtonEmpty,
+  EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
   EuiToolTip,
   EuiIconTip,
   EuiText,
+  EuiTitle,
+  EuiScreenReaderOnly,
+  EuiBetaBadge,
   EuiLoadingSpinner,
   EuiPanel,
   EuiIcon,
   EuiSelect,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
-import { CoreStart } from '../../../../../src/core/public';
+import { AppMountParameters, CoreStart } from '../../../../../src/core/public';
 import { ChatService } from '../../services/chat-service';
 import {
   AssistantSettings,
   SettingsService,
 } from '../../services/settings-service';
-import { healManagerSession } from '../../services/session-heal';
+import { ensureManagerSession } from '../../services/session-heal';
+import { confirmInterruption } from '../../services/interrupt-confirm';
 import { ConversationsService } from '../../services/conversations-service';
 import {
   ChatMessage,
   ChatRequest,
+  PersistedChatMessage,
   ConversationRecord,
   ConversationSummary,
   ProviderSummary,
   PseudonymEntry,
   TableSpec,
+  ToolCall,
 } from '../../../common/types';
 import { mergeConversationMessages } from '../../../common/conversation-merge';
 import { getHttpErrorStatus } from '../../../common/http-status';
 import { restoreAndClearDraft, stashDraft } from '../../../common/draft-stash';
+import {
+  buildConversationRoute,
+  parseConversationRoute,
+  readLastConversationId,
+  writeLastConversationId,
+} from '../../../common/conversation-location';
 import {
   AssistantTurnRecord,
   buildConversationTitle,
@@ -42,12 +56,14 @@ import {
   detectManagerAuthError,
   detectNavigationType,
   nextMessageId,
+  reconstructConversation,
   reconstructUiMessages,
   toPersistedMessages,
 } from '../../../common/chat-history';
 import { MessageList } from './message-list';
 import { UiChatMessage } from './message-bubble';
 import { createDiscoverUrlResolver } from './discover-link';
+import { createSecurityAnalyticsUrlResolver } from './security-analytics-link';
 import { ChatInput, ChatInputHandle } from './chat-input';
 import { ConversationList } from './conversation-list';
 import { StatusCallout } from './status-callout';
@@ -65,6 +81,29 @@ interface ChatPageProps {
   onProviderChange: (id: string) => void;
   /** Switches the app shell to the Settings tab; wired from the top-level route state. */
   onNavigateToSettings: () => void;
+  /** The app shell's router history (the same instance `<Router history={history}>` in
+   * application.tsx uses) — used to read/write the open-conversation route below through
+   * `history.replace` rather than the raw `window.history` API. */
+  history: AppMountParameters['history'];
+  /**
+   * Reports whether a turn is currently generating, so the app shell's `onAppLeave` handler can warn
+   * before the user navigates away from (or reloads out of) a running answer. Called on every change,
+   * never on unmount — by then the turn has been abandoned anyway.
+   */
+  onGeneratingChange?: (generating: boolean) => void;
+  /** Whether the chat view is the app shell's visible tab (default true). While hidden, the
+   * conversation hash stays out of the URL so a restore can't rewrite `/settings`. */
+  isActive?: boolean;
+}
+
+/**
+ * The saved-conversation row one turn writes to, shared by that turn's two saves (one when the
+ * question is sent, one when the answer completes) and mutated by whichever of them creates the row.
+ * `null` means "not created yet"; `version` is the optimistic-concurrency token last seen for it.
+ */
+interface TurnConversationTarget {
+  conversationId: string | null;
+  version: string | undefined;
 }
 
 const CONVERSATION_MAX_WIDTH = 860;
@@ -84,11 +123,11 @@ const EXAMPLE_CARDS = [
     title: i18n.translate(
       'wazuhAiAssistant.chat.example.criticalAlerts.title',
       {
-        defaultMessage: 'Critical alerts',
+        defaultMessage: 'Critical findings',
       },
     ),
     question: i18n.translate('wazuhAiAssistant.chat.example.criticalAlerts', {
-      defaultMessage: 'Show me the critical alerts of the last 24 hours',
+      defaultMessage: 'Show me the critical findings of the last 24 hours',
     }),
   },
   {
@@ -120,92 +159,31 @@ const EXAMPLE_CARDS = [
 ];
 
 /**
- * Single injected `<style>` element for this whole chat surface (rendered once from ChatPage's
- * own JSX below) — the hard constraint here is EUI/inline styles + AT MOST ONE `<style>` tag for
- * exactly what inline styles cannot express: `@keyframes`, the hero wash's `radial-gradient`,
- * `:hover`/`:focus-visible` pseudo-class rules, and the example cards' per-card stagger delay
- * (each card sets `--wzCardDelay` inline; this is the one place that consumes it).
- *
- * Every color reference here is `rgba(var(--wzAccentRgb), alpha)` — `--wzAccentRgb` is set ONCE,
- * inline, on this component's own root element below, resolved from the real OSD theme
- * (`core.uiSettings.get('theme:darkMode')`, not `prefers-color-scheme`, which is NOT how OSD
- * models dark mode). Custom properties inherit through the whole DOM subtree regardless of
- * component boundaries, so every descendant (sidebar rows, hero cards) picks it up without any of
- * them needing an `isDarkMode` prop threaded down.
- *
- * Motion is entirely opt-in: every animation/transition/transform lives inside the
- * `prefers-reduced-motion: no-preference` block. Outside it (i.e. for a reduced-motion user), the
- * hero cards and message rows simply render at their final `opacity: 1` state with no movement —
- * the ONE exception is the hover/focus border+shadow rule, which is an instant state change (no
- * transition, no transform) even for reduced-motion users, since EUI's own hover affordances work
- * the same way.
+ * Rewrites the route to address `conversationId` (a `/conversation/:id` path, or `/` for none),
+ * without touching the query string. Goes through the app shell's own router `history` (rather than
+ * a raw `window.history.replaceState` call) so this and the shell's tab routing share one writer of
+ * location changes; `replace`, not `push`, so opening a conversation never adds its own back-button
+ * stop. Note this DOES notify the shell's `<Route>` (and any other `history.listen` subscriber) on
+ * every call, unlike the raw DOM API it replaces — harmless here since nothing there reacts
+ * differently to a `/conversation/:id` path (the shell's redirect fallback and tab matching both
+ * treat it as Chat), but worth knowing if something is ever added that does. Swallows failures: some
+ * embedding contexts restrict History API access, and losing the shareable URL is a UX regression,
+ * not a functional one — the sessionStorage pointer still covers a reload.
  */
-const CHAT_SURFACE_STYLES = `
-.wzHeroIconWrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.wzHeroWash {
-  position: absolute;
-  width: 230px;
-  height: 230px;
-  border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(
-    circle,
-    rgba(var(--wzAccentRgb), 0.18) 0%,
-    rgba(var(--wzAccentRgb), 0.06) 45%,
-    rgba(var(--wzAccentRgb), 0) 72%
-  );
-}
-
-.wzHeroIcon {
-  position: relative;
-}
-
-.wzHeroCard:hover,
-.wzHeroCard:focus-visible {
-  border-color: rgba(var(--wzAccentRgb), 0.55) !important;
-  box-shadow: 0 6px 20px -4px rgba(var(--wzAccentRgb), 0.28);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .wzHeroCard {
-    opacity: 0;
-    animation: wzFadeUp 420ms ease-out both;
-    animation-delay: var(--wzCardDelay, 0ms);
-    transition: transform 150ms ease-out, box-shadow 150ms ease-out, border-color 150ms ease-out;
-  }
-
-  .wzHeroCard:hover {
-    transform: translateY(-3px);
-  }
-
-  .wzConvoRow {
-    transition: background-color 120ms ease-out, border-color 120ms ease-out;
-  }
-
-  .wzMsgRow {
-    opacity: 0;
-    animation: wzFadeUp 260ms ease-out both;
-  }
-
-  @keyframes wzFadeUp {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+function replaceConversationRoute(
+  history: AppMountParameters['history'],
+  conversationId: string | null,
+): void {
+  try {
+    const { search } = history.location;
+    history.replace({
+      pathname: buildConversationRoute(conversationId),
+      search,
+    });
+  } catch {
+    // Intentionally ignored, see above.
   }
 }
-
-`;
 
 export const ChatPage: React.FC<ChatPageProps> = ({
   core,
@@ -215,6 +193,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   selectedProviderId,
   onProviderChange,
   onNavigateToSettings,
+  history,
+  onGeneratingChange,
+  isActive = true,
 }) => {
   // `useSyncedState` (public/hooks/use-synced-state.ts) is the `[value, setValue, ref]` pattern
   // used for `messages`, `inputText`, and `activeConversationId` below — see that hook's own doc
@@ -239,12 +220,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     setActiveConversationId,
     activeConversationIdRef,
   ] = useSyncedState<string | null>(null);
-  // In-flight guard: a save (POST or PUT) is already running. A simple boolean rather than a
-  // queue — the auto-save call sites (runChatStream's `finally`) always send the FULL, up-to-date
-  // `messagesRef.current` snapshot, so skipping an overlapping call never loses data: whichever
-  // save runs next (the following completed turn) re-sends everything, including what the skipped
-  // call would have sent.
-  const conversationSaveInFlightRef = useRef(false);
+  // Save serialization: every auto-save is chained onto this promise instead of being dropped when
+  // one is already in flight. Dropping an overlap was safe only while every save targeted the
+  // conversation on screen (the next turn's save would resend the same, fuller array) — it is NOT
+  // safe now that an abandoned turn saves a DIFFERENT conversation than the active one (see
+  // `persistConversationTurn`): dropping that save would silently lose the answer the user
+  // navigated away from, which is exactly what this is meant to preserve.
+  const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
   const [conversationsService] = useState(
     () => new ConversationsService(core.http),
   );
@@ -290,18 +272,36 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // it gets its own distinct, persistent (not auto-dismissed) callout with a reload action.
   const [sessionExpired, setSessionExpired] = useState(false);
 
+  // A save failed and the conversation on screen is now ahead of what is stored. Auto-save used to
+  // swallow every failure silently, so a user could keep chatting for an hour believing their
+  // history was being kept when it had stopped being saved after the first rejection.
+  const [saveFailed, setSaveFailed] = useState(false);
+
+  // Conversation restore (common/conversation-location.ts): true while the conversation named by the
+  // URL hash / this tab's stored pointer is being fetched on mount, so the chat shows a spinner
+  // instead of flashing the welcome state and then swapping it for a transcript.
+  const [isRestoringConversation, setIsRestoringConversation] = useState(false);
+  // Guards the location-sync effect below from clobbering the hash it is supposed to READ on mount:
+  // set once the initial restore attempt has been decided, one way or the other.
+  const initialRestoreSettledRef = useRef(false);
+
   const [chatService] = useState(() => new ChatService(core.http.basePath));
   const [settingsService] = useState(() => new SettingsService(core.http));
   const abortControllerRef = useRef<AbortController | null>(null);
+  // Turn identity. Incremented when a turn starts AND when a turn is abandoned, so
+  // `runChatStream`'s own `finally` can tell whether the conversation it was streaming into is
+  // still the one on screen. Without it, switching conversations mid-stream let the outgoing
+  // turn's completion handler write its terminal state, its pseudonym entries and its auto-save
+  // into whichever conversation the user had just opened.
+  const streamGenerationRef = useRef(0);
   const chatInputRef = useRef<ChatInputHandle>(null);
-  // Core ships this mark alongside every OSD build (src/core/server/core_app/assets/logos/), so
-  // it is always present; served under the basePath the same way chat_service reaches the API.
-  const aiAvatarUrl = core.http.basePath.prepend(
-    '/ui/logos/wazuh_mark_on_light.svg',
-  );
   // "Open in Discover" (discover-link.tsx): built once with `core` in closure, rather than
   // threading `core` itself down through MessageList/MessageBubble/ResultTable.
   const [resolveDiscoverUrl] = useState(() => createDiscoverUrlResolver(core));
+  // "Open in Security Analytics" (security-analytics-link.tsx): same rationale as above.
+  const [resolveSecurityAnalyticsUrl] = useState(() =>
+    createSecurityAnalyticsUrlResolver(core),
+  );
 
   // Auto-scroll: `scrollPaneRef` is the right PANE — the conversation's ONE
   // true scroll container (it owns `overflowY: auto`; the chat column inside it is shrink-locked
@@ -345,21 +345,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         // it would compete with the chat error state on first paint for something that degrades
         // gracefully on its own.
       });
-
-    // One-shot session auto-heal (mirrors settings-page.tsx's own heal wiring): a direct
-    // deep link into this app never visits the main Wazuh app, so the wz-token cookie backing every
-    // Manager-path tool call may be missing/expired on first paint. Fire-and-forget: the access
-    // probe's `defaultApiHostId` is the only thing needed here, and any outcome (healed, not healed,
-    // probe itself failed) is ignored — this never blocks or errors the chat UI, and the existing
-    // `detectManagerAuthError` heuristic below still catches whatever, if anything, is left over.
-    settingsService
-      .getSettingsAccess()
-      .then(access => {
-        if (access.defaultApiHostId) {
-          void healManagerSession(core.http, access.defaultApiHostId);
-        }
-      })
-      .catch(() => {});
 
     // Session-expiry draft stash restore: the mirror image of `handleSessionExpired`'s
     // stash below. Runs once, on mount — the only time a stashed draft could be waiting, since it
@@ -416,8 +401,61 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     setPrivacyEnabled(current => !current);
   };
 
+  /**
+   * Stop button: cancels the provider stream but keeps the turn ATTACHED to the conversation on
+   * screen — the generation counter is deliberately not bumped, so `runChatStream`'s `finally`
+   * still takes its normal path (terminal state committed to the visible bubble, auto-save adopted
+   * into the active conversation). Whatever streamed in before the stop is kept, exactly as
+   * before.
+   */
   const handleStop = () => {
     abortControllerRef.current?.abort();
+    setIsGenerating(false);
+  };
+
+  useEffect(() => {
+    onGeneratingChange?.(isGenerating);
+  }, [isGenerating, onGeneratingChange]);
+
+  /**
+   * Gate for any action that would throw away a running answer: asks first instead of silently
+   * cancelling. Passing through untouched when nothing is generating is what keeps the common case
+   * a single click.
+   *
+   * Covers the in-app moves (opening another conversation, starting a new one), through the SAME
+   * `overlays.openConfirm` dialog the platform shows when the user leaves the app entirely — see
+   * services/interrupt-confirm.ts for why this is not a locally rendered modal. Switching to the
+   * Settings TAB deliberately asks nothing: that no longer interrupts anything, the answer keeps
+   * streaming into the Chat tab.
+   */
+  const confirmIfGenerating = async (proceed: () => void) => {
+    if (!isGenerating) {
+      proceed();
+      return;
+    }
+    if (await confirmInterruption(core.overlays)) {
+      proceed();
+    }
+  };
+
+  /**
+   * Cancels the in-flight turn AND detaches it from this component's live state: the user is
+   * leaving the conversation that turn belongs to (conversation switch, new conversation, deleting
+   * the active one, or unmount). Bumping the generation counter is what makes `runChatStream`'s
+   * `finally` take its abandoned path — it persists the turn to the conversation it actually
+   * started in, and touches no state belonging to whatever the user opened next.
+   *
+   * Resetting `isGenerating` here (rather than leaving it to that `finally`, which will no longer
+   * do it for an abandoned turn) is what unblocks the newly opened conversation's input: the abort
+   * only settles a microtask later, and the abandoned path must not flip shared UI state at all.
+   */
+  const abandonActiveStream = () => {
+    if (!abortControllerRef.current) {
+      return;
+    }
+    streamGenerationRef.current += 1;
+    abortControllerRef.current.abort();
+    abortControllerRef.current = null;
     setIsGenerating(false);
   };
 
@@ -462,11 +500,113 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Unmount cleanup: the app shell (application.tsx) swaps ChatPage<->SettingsPage on tab switch
-  // rather than keeping ChatPage mounted, so without this a tab switch mid-generation orphans the
-  // in-flight SSE stream instead of cancelling it (mirrors handleStop's abort, just triggered by
-  // unmount instead of the Stop button).
-  useEffect(() => () => abortControllerRef.current?.abort(), []);
+  /**
+   * Loads a saved conversation into the live chat. Shared by the sidebar's resume handler and by the
+   * mount-time restore below — the difference is only what each does around it (aborting an
+   * in-flight turn, showing a spinner, reacting to a conversation that no longer exists).
+   *
+   * The pseudonym map and `turnHistoryRef` both reset: a resumed conversation has no client-held
+   * pseudonym state to resume (server/saved_objects/conversation.ts's PRIVACY INTERACTION doc
+   * comment: the map is wire-only and never persisted) and no stored tool_call/digest pairs to
+   * replay as history either.
+   */
+  const applyLoadedConversation = (record: ConversationRecord) => {
+    // A resumed conversation opens at its latest turn (bottom), like every chat client.
+    pinnedToBottomRef.current = true;
+    const restored = reconstructConversation(record.messages);
+    updateMessages(restored.messages);
+    // Restoring the tool history is what makes a resumed conversation continuable rather than just
+    // readable: the model gets back the tool calls whose results its prose describes, instead of
+    // re-running the same queries on the next question.
+    turnHistoryRef.current = restored.turnRecords;
+    setPseudonymMap([]);
+    setActiveConversationId(record.id);
+    // Optimistic concurrency: this tab's last-known version starts at whatever the GET returned —
+    // the baseline its NEXT save's `expectedVersion` is checked against.
+    conversationVersionRef.current = record.version;
+    setError(null);
+    setManagerAuthHint(false);
+    setMergeNotice(null);
+  };
+
+  /**
+   * Mount-time conversation restore: the open conversation used to live ONLY in this component's
+   * state, so a reload, a deep link, or coming back from another dashboard app landed on an empty
+   * chat with no way to tell which conversation the user had been in — and the next turn then
+   * created a second saved conversation instead of continuing theirs.
+   *
+   * The URL route wins over this tab's stored pointer, so a pasted/bookmarked link always opens what
+   * it names. A conversation that is simply GONE (deleted in another tab, or pruned by the retention
+   * policy, which deletes on access) is not an error worth a banner: the pointer is forgotten and the
+   * user gets a clean new conversation, exactly as if they had never had one open. Any OTHER failure
+   * keeps the pointer (the conversation is probably still there; the request just failed) and
+   * surfaces the same load error the sidebar's own resume path uses.
+   */
+  useEffect(() => {
+    const restoreId =
+      parseConversationRoute(history.location.pathname) ??
+      readLastConversationId(window.sessionStorage);
+    if (!restoreId) {
+      initialRestoreSettledRef.current = true;
+      return;
+    }
+    setIsRestoringConversation(true);
+    conversationsService
+      .get(restoreId)
+      .then(record => {
+        initialRestoreSettledRef.current = true;
+        applyLoadedConversation(record);
+      })
+      .catch(restoreError => {
+        initialRestoreSettledRef.current = true;
+        const status = getHttpErrorStatus(restoreError);
+        if (status === 404 || status === 403) {
+          writeLastConversationId(window.sessionStorage, null);
+          if (isActive) {
+            replaceConversationRoute(history, null);
+          }
+          return;
+        }
+        setError(
+          i18n.translate('wazuhAiAssistant.chat.conversations.loadError', {
+            defaultMessage: 'Could not load that conversation.',
+          }),
+        );
+      })
+      .finally(() => setIsRestoringConversation(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /**
+   * Keeps the two out-of-band records of "which conversation is open" in step with state, so the
+   * next reload/deep link can restore it. `history.replace` (not `push`) because opening a
+   * conversation is not a navigation the back button should have to walk back through turn by turn.
+   *
+   * The route is only written while the view is visible (`isActive`), and re-synced when it becomes
+   * visible again — a restore running behind Settings must not rewrite `/settings` (#8820).
+   *
+   * Skipped until the mount-time restore above has settled — otherwise this effect's very first run
+   * would overwrite the route it is supposed to read.
+   */
+  useEffect(() => {
+    if (!initialRestoreSettledRef.current) {
+      return;
+    }
+    writeLastConversationId(window.sessionStorage, activeConversationId);
+    if (isActive) {
+      replaceConversationRoute(history, activeConversationId);
+    }
+  }, [activeConversationId, isActive, history]);
+
+  // Unmount cleanup: the app shell (application.tsx) now KEEPS this component mounted across a
+  // Chat<->Settings tab switch, so unmount means the user really left the app (another dashboard
+  // app, a reload, a logout) — without this that orphans the in-flight SSE stream instead of
+  // cancelling it. `abandonActiveStream` (not a bare abort) so the
+  // turn's `finally` persists what streamed in to the conversation it belongs to instead of
+  // writing terminal state into a component that no longer exists. Empty deps with no exhaustive-
+  // deps exemption needed: everything `abandonActiveStream` touches is a ref or a stable setter,
+  // so the first render's closure stays correct for the whole component lifetime.
+  useEffect(() => () => abandonActiveStream(), []);
 
   /**
    * New conversation: resets messages AND the pseudonym map — fresh privacy state — plus
@@ -475,8 +615,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    * creates a new saved-conversation row instead of overwriting the one just left). Deliberately
    * leaves `privacyEnabled`/`privacyTouchedRef` and the selected provider untouched — those are
    * session-level choices, not per-conversation ones, per this component's existing convention.
+   *
+   * Abandons any in-flight turn first: it belongs to the conversation being left, and every
+   * `updateMessages` call it still has queued targets a message id that no longer exists in the
+   * list this replaces it with.
    */
   const handleNewConversation = () => {
+    abandonActiveStream();
     pinnedToBottomRef.current = true;
     updateMessages([]);
     turnHistoryRef.current = [];
@@ -491,13 +636,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   };
 
   /**
-   * Resume a saved conversation: loads its full transcript and replaces the live chat with
-   * it. Reconstructed `UiChatMessage`s get FRESH ids/timestamps (the saved shape,
-   * `toPersistedMessages`'s doc comment, only ever kept `role`/`content` — no id/createdAt/table
-   * to restore). The pseudonym map and `turnHistoryRef` both reset the same as a brand new
-   * conversation: a resumed conversation has no client-held pseudonym state to resume (server/
-   * saved_objects/conversation.ts's PRIVACY INTERACTION doc comment: the map is wire-only and
-   * never persisted) and no stored tool_call/digest pairs to replay as history either.
+   * Resume a saved conversation from the sidebar: loads its full transcript and replaces the live
+   * chat with it (`applyLoadedConversation`, shared with the mount-time restore above).
    */
   const handleSelectConversation = async (id: string) => {
     if (id === activeConversationIdRef.current) {
@@ -505,19 +645,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     }
     try {
       const record = await conversationsService.get(id);
-      const resumed = reconstructUiMessages(record.messages);
-      // A resumed conversation opens at its latest turn (bottom), like every chat client.
-      pinnedToBottomRef.current = true;
-      updateMessages(resumed);
-      turnHistoryRef.current = [];
-      setPseudonymMap([]);
-      setActiveConversationId(id);
-      // Optimistic concurrency: this tab's last-known version starts at whatever GET just
-      // returned — the baseline its NEXT save's `expectedVersion` is checked against.
-      conversationVersionRef.current = record.version;
-      setError(null);
-      setManagerAuthHint(false);
-      setMergeNotice(null);
+      // Abandon the in-flight turn only once the switch is certain to happen — after the GET
+      // resolved, immediately before the message list is replaced. Aborting before the await would
+      // throw away a running answer even when the load fails and the user stays put.
+      abandonActiveStream();
+      applyLoadedConversation(record);
     } catch {
       setError(
         i18n.translate('wazuhAiAssistant.chat.conversations.loadError', {
@@ -546,8 +678,15 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   /**
    * PUT with optimistic concurrency and merge-on-conflict (two tabs on the SAME conversation
    * previously last-write-wins, silently erasing the
-   * faster tab's turns). Sends `conversationVersionRef.current` as `expectedVersion`; the server
-   * 409s when another tab's write landed first (server/routes/conversations.ts).
+   * faster tab's turns). Sends `expectedVersion` (the caller's last-known version for THIS
+   * conversation — the active conversation's `conversationVersionRef`, or the version captured when
+   * an abandoned turn started); the server 409s when another tab's write landed first
+   * (server/routes/conversations.ts).
+   *
+   * `reflectInUi` is false when saving a conversation the user has already navigated away from: a
+   * merge outcome for a conversation that is no longer on screen must not replace the visible
+   * message list, reset this tab's tool-history bookkeeping, or raise a notice about a conversation
+   * the user is no longer looking at.
    *
    * On a 409: fetches the server's current copy, merges it with THIS tab's own local messages via
    * the longest-common-prefix merge (common/conversation-merge.ts — "server messages, then this
@@ -567,14 +706,16 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const saveConversationWithMerge = async (
     id: string,
     title: string,
-    localMessages: ChatMessage[],
+    localMessages: PersistedChatMessage[],
+    expectedVersion: string | undefined,
+    reflectInUi: boolean,
   ): Promise<ConversationRecord> => {
     try {
       return await conversationsService.update(
         id,
         title,
         localMessages,
-        conversationVersionRef.current,
+        expectedVersion,
       );
     } catch (firstError) {
       if (getHttpErrorStatus(firstError) !== 409) {
@@ -595,17 +736,19 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         merged,
         serverRecord.version,
       );
-      setMergeNotice('merged');
-      updateMessages(reconstructUiMessages(merged));
-      // The reconstructed messages above have fresh ids that don't match anything in
-      // turnHistoryRef's bookkeeping (built for THIS tab's own assistantMessageIds) — clearing it
-      // is the same reset `handleSelectConversation` already does after any wholesale message-list
-      // replacement, so a later turn's digest-in-history resend doesn't try to look up a
-      // now-nonexistent id.
-      turnHistoryRef.current = [];
+      if (reflectInUi) {
+        setMergeNotice('merged');
+        updateMessages(reconstructUiMessages(merged));
+        // The reconstructed messages above have fresh ids that don't match anything in
+        // turnHistoryRef's bookkeeping (built for THIS tab's own assistantMessageIds) — clearing it
+        // is the same reset `handleSelectConversation` already does after any wholesale message-list
+        // replacement, so a later turn's digest-in-history resend doesn't try to look up a
+        // now-nonexistent id.
+        turnHistoryRef.current = [];
+      }
       return retried;
     } catch (retryError) {
-      if (getHttpErrorStatus(retryError) === 409) {
+      if (reflectInUi && getHttpErrorStatus(retryError) === 409) {
         setMergeNotice('conflict');
       }
       throw retryError;
@@ -613,57 +756,106 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   };
 
   /**
-   * Auto-save: called from `runChatStream`'s `finally` block, i.e. after EVERY completed
-   * turn. Creates the conversation on the first completed turn (`activeConversationIdRef.current`
-   * still `null`), PUTs it (via `saveConversationWithMerge`) on every later turn.
-   * Guarded by `conversationSaveInFlightRef` against an overlapping call (see its own doc comment
-   * for why dropping an overlap is safe); never saves an empty message list.
+   * Auto-save, called from `runChatStream`'s `finally` after EVERY turn — including a turn the user
+   * navigated away from mid-stream, which is why the conversation being written is an explicit
+   * argument rather than read from `activeConversationIdRef` in here.
+   *
+   * `adoptAsActive` distinguishes the two callers. True for the turn the user is still watching:
+   * the created id and the returned version become this component's active conversation state, the
+   * same as before. False for an ABANDONED turn: its transcript is still persisted (that is the
+   * whole point — the answer the user walked away from is not lost), but nothing about this
+   * component's live state is touched, so it cannot overwrite the id/version of whatever
+   * conversation is now on screen. An abandoned turn with no `conversationId` yet gets its own new
+   * row via POST, so a partial first answer still shows up in the sidebar instead of vanishing.
+   *
+   * Serialized through `saveQueueRef` rather than dropped on overlap — see that ref's own comment.
+   *
+   * `target` is the row this TURN writes to, and it is mutable: a turn now saves twice (once when
+   * the question is sent, once when the answer completes), and the first of those may be what
+   * creates the conversation. Both saves share one target, so the second updates the row the first
+   * created instead of creating a second one — which is exactly what happened while the target was
+   * a plain id captured before the stream started.
    */
-  const persistConversationAfterTurn = async () => {
-    const currentMessages = messagesRef.current;
-    if (currentMessages.length === 0 || conversationSaveInFlightRef.current) {
-      return;
-    }
-    conversationSaveInFlightRef.current = true;
-    try {
-      // The untitled-fallback label is resolved here (not inside buildConversationTitle, which is
-      // now a dependency-free common/ helper — see its own doc comment) via the same
-      // i18n.translate call this file always made for it.
-      const title = buildConversationTitle(
-        currentMessages,
-        i18n.translate('wazuhAiAssistant.chat.conversations.untitled', {
-          defaultMessage: 'Untitled conversation',
-        }),
-      );
-      const toPersist = toPersistedMessages(currentMessages);
-      if (activeConversationIdRef.current) {
-        const record = await saveConversationWithMerge(
-          activeConversationIdRef.current,
-          title,
-          toPersist,
+  const persistConversationTurn = (args: {
+    target: TurnConversationTarget;
+    messages: UiChatMessage[];
+    turnRecords: AssistantTurnRecord[];
+    adoptAsActive: boolean;
+  }): Promise<void> => {
+    const task = async () => {
+      if (args.messages.length === 0) {
+        return;
+      }
+      const { target, turnRecords } = args;
+      const conversationId = target.conversationId;
+      // Prefer the component's live version while this still IS the conversation on screen: a merge
+      // or another save may have moved it on since the target was created.
+      const expectedVersion =
+        args.adoptAsActive && activeConversationIdRef.current === conversationId
+          ? conversationVersionRef.current
+          : target.version;
+      try {
+        // The untitled-fallback label is resolved here (not inside buildConversationTitle, which is
+        // now a dependency-free common/ helper — see its own doc comment) via the same
+        // i18n.translate call this file always made for it.
+        const title = buildConversationTitle(
+          args.messages,
+          i18n.translate('wazuhAiAssistant.chat.conversations.untitled', {
+            defaultMessage: 'Untitled conversation',
+          }),
         );
-        conversationVersionRef.current = record.version;
-      } else {
-        const created = await conversationsService.create(title, toPersist);
-        setActiveConversationId(created.id);
-        conversationVersionRef.current = created.version;
+        const toPersist = toPersistedMessages(args.messages, turnRecords);
+        if (conversationId) {
+          const record = await saveConversationWithMerge(
+            conversationId,
+            title,
+            toPersist,
+            expectedVersion,
+            args.adoptAsActive,
+          );
+          // Only when this IS still the active conversation: an adopted save that raced with a
+          // conversation switch must not stamp its version onto the newly opened one.
+          if (
+            args.adoptAsActive &&
+            activeConversationIdRef.current === conversationId
+          ) {
+            conversationVersionRef.current = record.version;
+          }
+          target.version = record.version;
+        } else {
+          const created = await conversationsService.create(title, toPersist);
+          // The turn now owns this row: its later saves update it instead of creating another.
+          target.conversationId = created.id;
+          target.version = created.version;
+          if (args.adoptAsActive && activeConversationIdRef.current === null) {
+            setActiveConversationId(created.id);
+            conversationVersionRef.current = created.version;
+          }
+        }
+        refreshConversations();
+        if (args.adoptAsActive) {
+          setSaveFailed(false);
+        }
+      } catch (persistError) {
+        // Session-expiry recovery UX: a conversation save can 401 the same way the chat POST
+        // can (same dashboard session, same 15-minute TTL) — this is the "and from the conversation
+        // save" half of that fix; the chat POST's own 401 is handled in runChatStream's event loop.
+        if (getHttpErrorStatus(persistError) === 401) {
+          handleSessionExpired();
+          return;
+        }
+        // The chat itself keeps working — the transcript on screen is intact and the next turn's
+        // save retries with the full message list — but the user is TOLD, because "your history
+        // stopped being saved" is not something to discover later. Only for the conversation on
+        // screen: a notice about a conversation the user already left would be unactionable.
+        if (args.adoptAsActive) {
+          setSaveFailed(true);
+        }
       }
-      refreshConversations();
-    } catch (persistError) {
-      // Session-expiry recovery UX: a conversation save can 401 the same way the chat POST
-      // can (same dashboard session, same 15-minute TTL) — this is the "and from the conversation
-      // save" half of that fix; the chat POST's own 401 is handled in runChatStream's event loop.
-      if (getHttpErrorStatus(persistError) === 401) {
-        handleSessionExpired();
-      }
-      // Otherwise non-fatal: no separate error banner for a persistence hiccup (version-conflict
-      // notices are the one exception, surfaced by saveConversationWithMerge itself above) — it
-      // would compete with the chat's own error state for something that doesn't block the
-      // conversation itself from continuing. The next completed turn's auto-save simply retries
-      // with the (still accurate, still-full) message list.
-    } finally {
-      conversationSaveInFlightRef.current = false;
-    }
+    };
+    // `task` handles its own errors, so the queue can never be poisoned by a rejected link.
+    saveQueueRef.current = saveQueueRef.current.then(task, task);
+    return saveQueueRef.current;
   };
 
   /**
@@ -672,14 +864,41 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    */
   const runChatStream = async (args: {
     assistantMessageId: string;
+    /** The full UI message list this turn started from, INCLUDING its own (still empty) assistant
+     * placeholder. Kept as a local copy so the turn can reconstruct its own complete transcript in
+     * `finally` without reading React state — which, for an abandoned turn, has already been
+     * replaced by whatever conversation the user opened next. */
+    baseMessages: UiChatMessage[];
+    /** The row this turn saves to, already carrying the active conversation's id (or `null` for one
+     * that does not exist yet) and shared with the pre-send save `handleSend` fired. */
+    target: TurnConversationTarget;
     outgoingMessages: ChatMessage[];
     privacyPayload: ChatRequest['privacy'];
   }) => {
-    const { assistantMessageId, outgoingMessages, privacyPayload } = args;
+    const {
+      assistantMessageId,
+      baseMessages,
+      target,
+      outgoingMessages,
+      privacyPayload,
+    } = args;
 
     setIsGenerating(true);
     const controller = new AbortController();
     abortControllerRef.current = controller;
+
+    streamGenerationRef.current += 1;
+    const generation = streamGenerationRef.current;
+    /** False once this turn has been abandoned (`abandonActiveStream`) or superseded by a newer
+     * one — every write into shared component state is gated on it. */
+    const isTurnStillActive = () => generation === streamGenerationRef.current;
+    // This turn's own tool-call record, held by reference rather than looked up per event: the
+    // `tool_call`/`digest` handlers below used to search `turnHistoryRef` by assistant message id,
+    // which finds nothing once the ref has been reset by a conversation switch — so an abandoned
+    // turn's tool exchanges were dropped instead of saved with it.
+    const turnRecord = turnHistoryRef.current.find(
+      turn => turn.assistantMessageId === assistantMessageId,
+    );
 
     // Empty-table suppression: an empty `table` event is held back (not
     // committed to `message.table`) instead of rendered immediately, since a failed/empty first
@@ -688,12 +907,53 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // single empty table if it's the only one" (honest-empty stays correct). A plain local
     // variable, not a ref/state: scoped to this one stream's sequential event loop only.
     let pendingEmptyTable: TableSpec | undefined;
+    /**
+     * A non-empty `table` event held back until the answer's first text arrives. The server emits
+     * `table` the moment a tool returns, well before the model has narrated anything, so committing
+     * it immediately made the table pop in first and the prose then grow in above it — the bubble
+     * renders the table UNDER the text (message-bubble.tsx), so the turn read backwards while it
+     * streamed. Released by `flushPendingDelta` together with that first text (one React update, so
+     * text and table appear at once), or on its own by `flushPendingTable` if the turn ends, errors,
+     * or expires before any text arrives — an answer that is only a table must still show it.
+     */
+    let pendingTable: TableSpec | undefined;
+    /** The tool calls issued this turn, in order — mirrors what the bubble displays so the abandoned
+     * path can rebuild the turn without reading React state. */
+    let committedToolCalls: ToolCall[] = [];
+    /** The table this turn will be remembered with — mirrors what the flushes below commit to
+     * React state, so the abandoned path can rebuild the turn without reading that state. */
+    let committedTable: TableSpec | undefined;
     const flushPendingEmptyTable = () => {
       if (!pendingEmptyTable) {
         return;
       }
       const spec = pendingEmptyTable;
       pendingEmptyTable = undefined;
+      committedTable = spec;
+      if (!isTurnStillActive()) {
+        return;
+      }
+      updateMessages(current =>
+        current.map(message =>
+          message.id === assistantMessageId
+            ? { ...message, table: spec }
+            : message,
+        ),
+      );
+    };
+    /** Commits a held non-empty table on its own, for the turns where no answer text ever arrives to
+     * pair it with (stream ended, errored, or the session expired). A no-op once `flushPendingDelta`
+     * has already released it. */
+    const flushPendingTable = () => {
+      if (!pendingTable) {
+        return;
+      }
+      const spec = pendingTable;
+      pendingTable = undefined;
+      committedTable = spec;
+      if (!isTurnStillActive()) {
+        return;
+      }
       updateMessages(current =>
         current.map(message =>
           message.id === assistantMessageId
@@ -707,6 +967,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // so `detectManagerAuthError` can be checked once the stream ends, over exactly the text THIS
     // stream produced.
     let accumulatedContent = '';
+    /**
+     * Whether this turn reached a terminal state of its own — a `done` frame, or an `error`/
+     * `auth_expired` that has already been reported. Anything else means the stream simply STOPPED:
+     * Stop was pressed, the user navigated away, or the connection dropped. That case used to be
+     * indistinguishable from a finished answer, so a truncated response was saved and later resumed
+     * as though it were complete.
+     */
+    let turnCompleted = false;
 
     // Delta batching (typing-lag/streaming-jank fix): a fast-streaming provider can
     // emit a `delta` event per token, and without batching EVERY one committed its own React state
@@ -725,6 +993,19 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       }
       const text = pendingDeltaText;
       pendingDeltaText = '';
+      // The first text of the answer is what the held table was waiting for: released in this same
+      // update so the bubble shows text and table together, already in their final order.
+      const table = pendingTable;
+      pendingTable = undefined;
+      if (table) {
+        committedTable = table;
+      }
+      // An abandoned turn keeps accumulating into `accumulatedContent` (which is what its own
+      // transcript is rebuilt from) but stops writing into the message list, which now belongs to
+      // a different conversation.
+      if (!isTurnStillActive()) {
+        return;
+      }
       updateMessages(current =>
         current.map(message =>
           message.id === assistantMessageId
@@ -733,6 +1014,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 ...message,
                 content: message.content + text,
                 statusMessage: undefined,
+                ...(table ? { table } : {}),
               }
             : message,
         ),
@@ -777,15 +1059,12 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             pendingEmptyTable = event.spec;
           } else {
             pendingEmptyTable = undefined;
-            updateMessages(current =>
-              current.map(message =>
-                message.id === assistantMessageId
-                  ? { ...message, table: event.spec }
-                  : message,
-              ),
-            );
+            // Held rather than committed — see `pendingTable`. `committedTable` is deliberately NOT
+            // set here: it is set at the moment the table actually reaches the message list, so an
+            // abandoned turn is remembered with exactly what it displayed.
+            pendingTable = event.spec;
           }
-        } else if (event.type === 'status') {
+        } else if (event.type === 'status' && isTurnStillActive()) {
           // Transient progress line (e.g. "Querying Wazuh...") from the orchestration loop; no
           // engine emits this yet, but the bubble already knows how to show it once one does.
           updateMessages(current =>
@@ -797,23 +1076,33 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           );
         } else if (event.type === 'tool_call') {
           // Digest-in-history bookkeeping only — never rendered as a UI message (message_bubble.tsx
-          // has no bubble type for it; it lives only in turnHistoryRef until a LATER turn's
-          // buildOutgoingMessages call resends it).
-          const turn = turnHistoryRef.current.find(
-            t => t.assistantMessageId === assistantMessageId,
-          );
-          turn?.toolExchanges.push({ toolCall: event.toolCall });
+          // has no bubble type for it; it lives in this turn's record until a LATER turn's
+          // buildOutgoingMessages call resends it, or until the turn is saved).
+          turnRecord?.toolExchanges.push({ toolCall: event.toolCall });
+          // Also surfaced in the bubble (message-bubble.tsx's collapsed "queries executed" panel),
+          // so the reader can check the query behind the answer as it runs.
+          committedToolCalls = [...committedToolCalls, event.toolCall];
+          if (isTurnStillActive()) {
+            const toolCallsForDisplay = committedToolCalls;
+            updateMessages(current =>
+              current.map(message =>
+                message.id === assistantMessageId
+                  ? { ...message, toolCalls: toolCallsForDisplay }
+                  : message,
+              ),
+            );
+          }
         } else if (event.type === 'digest') {
-          const turn = turnHistoryRef.current.find(
-            t => t.assistantMessageId === assistantMessageId,
-          );
-          const exchange = turn?.toolExchanges.find(
+          const exchange = turnRecord?.toolExchanges.find(
             entry => entry.toolCall.id === event.toolCallId,
           );
           if (exchange) {
             exchange.digestContent = event.content;
           }
-        } else if (event.type === 'privacy_map') {
+        } else if (event.type === 'privacy_map' && isTurnStillActive()) {
+          // Gated: the pseudonym map is PER-CONVERSATION state. An abandoned turn's entries used to
+          // be merged into whatever conversation the user had just opened, and then sent up with
+          // that conversation's next request.
           setPseudonymMap(current => {
             const known = new Set(current.map(entry => entry.pseudonym));
             const additions = event.entries.filter(
@@ -821,8 +1110,20 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             );
             return additions.length > 0 ? [...current, ...additions] : current;
           });
+        } else if (event.type === 'done') {
+          turnCompleted = true;
         } else if (event.type === 'error') {
+          turnCompleted = true;
           flushPendingEmptyTable();
+          // Released before the placeholder cleanup below, which drops an assistant message with
+          // neither content nor table — a turn whose tool succeeded and whose narration then failed
+          // must keep the table it already produced.
+          flushPendingTable();
+          if (!isTurnStillActive()) {
+            // An error banner for a conversation the user already left is pure noise — the turn's
+            // own transcript (rebuilt in `finally`) simply carries whatever streamed in before it.
+            continue;
+          }
           if (detectManagerAuthError(event.message)) {
             setManagerAuthHint(true);
           } else {
@@ -843,9 +1144,16 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         } else if (event.type === 'auth_expired') {
           // Session-expiry recovery UX: a genuine 401 on the chat POST itself, distinct
           // from the generic `error` branch above — same placeholder-cleanup, but a dedicated,
-          // persistent callout instead of the free-form error banner.
+          // persistent callout instead of the free-form error banner. Unlike the branch above this
+          // is NOT gated on the turn still being active: the session is gone for the whole app, so
+          // the callout is just as relevant to whatever conversation is now on screen.
+          turnCompleted = true;
+          flushPendingTable();
           flushPendingEmptyTable();
           handleSessionExpired();
+          if (!isTurnStillActive()) {
+            continue;
+          }
           updateMessages(current =>
             current.filter(
               message =>
@@ -864,24 +1172,79 @@ export const ChatPage: React.FC<ChatPageProps> = ({
       // ended normally, errored, or was aborted (handleStop's `controller.abort()` unwinds the
       // `for await` and lands here the same way).
       flushPendingDelta();
+      // A turn that produced a table but never any prose (the model stopped after the tool call, or
+      // Stop was pressed while it was still thinking) still has to show that table.
+      flushPendingTable();
       flushPendingEmptyTable();
-      if (detectManagerAuthError(accumulatedContent)) {
-        setManagerAuthHint(true);
+
+      if (!isTurnStillActive()) {
+        // Abandoned turn: the user switched conversation, started a new one, or left the app while
+        // this was streaming. Persist what it produced to the conversation it actually belongs to,
+        // rebuilt from this turn's OWN local record (`baseMessages` + `accumulatedContent` +
+        // `committedTable`) rather than from React state, which now describes a different
+        // conversation. Nothing here touches shared state — `abandonActiveStream` already reset
+        // `isGenerating` and `abortControllerRef` at the moment of abandonment.
+        const abandonedTranscript = baseMessages
+          .map(message =>
+            message.id === assistantMessageId
+              ? {
+                  ...message,
+                  content: accumulatedContent,
+                  table: committedTable,
+                  ...(committedToolCalls.length > 0
+                    ? { toolCalls: committedToolCalls }
+                    : {}),
+                  isStreaming: false,
+                  ...(turnCompleted ? {} : { interrupted: true }),
+                }
+              : message,
+          )
+          // Same rule the `error` branch applies to the visible list: an assistant placeholder that
+          // never received anything is not worth persisting.
+          .filter(
+            message =>
+              !(
+                message.id === assistantMessageId &&
+                message.content === '' &&
+                !message.table
+              ),
+          );
+        void persistConversationTurn({
+          adoptAsActive: false,
+          target,
+          messages: abandonedTranscript,
+          // `turnHistoryRef` has already been reset to whatever conversation the user opened
+          // instead, so this turn's own record is passed explicitly.
+          turnRecords: turnRecord ? [turnRecord] : [],
+        });
+      } else {
+        if (detectManagerAuthError(accumulatedContent)) {
+          setManagerAuthHint(true);
+        }
+        updateMessages(current =>
+          current.map(message =>
+            message.id === assistantMessageId
+              ? {
+                  ...message,
+                  isStreaming: false,
+                  ...(turnCompleted ? {} : { interrupted: true }),
+                }
+              : message,
+          ),
+        );
+        setIsGenerating(false);
+        abortControllerRef.current = null;
+        chatInputRef.current?.focus();
+        // Auto-save: fire-and-forget — `persistConversationTurn` handles its own errors (no
+        // separate banner) and is handed `messagesRef.current`, which the `isStreaming: false`
+        // update just above already applied synchronously (see `useSyncedState`'s doc comment).
+        void persistConversationTurn({
+          adoptAsActive: true,
+          target,
+          messages: messagesRef.current,
+          turnRecords: turnHistoryRef.current,
+        });
       }
-      updateMessages(current =>
-        current.map(message =>
-          message.id === assistantMessageId
-            ? { ...message, isStreaming: false }
-            : message,
-        ),
-      );
-      setIsGenerating(false);
-      abortControllerRef.current = null;
-      chatInputRef.current?.focus();
-      // Auto-save: fire-and-forget — `persistConversationAfterTurn` handles its own errors
-      // (no separate banner) and reads `messagesRef.current`, which the `isStreaming: false`
-      // update just above already applied synchronously (see `updateMessages`'s doc comment).
-      void persistConversationAfterTurn();
     }
   };
 
@@ -893,6 +1256,70 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     privacyEnabled || pseudonymMap.length > 0
       ? { enabled: privacyEnabled, map: pseudonymMap }
       : undefined;
+
+  /**
+   * Runs one assistant turn over `history`, whose LAST message must be the user message being
+   * answered. Shared by `handleSend` (which appends a new question) and `handleRetryLastTurn` (which
+   * re-answers the existing last question after dropping the interrupted answer), so both go through
+   * exactly the same placeholder/history/save/stream sequence.
+   */
+  const startTurn = async (history: UiChatMessage[]) => {
+    // Pre-turn session guard: after >60s idle, re-probe (and heal if the wz-token
+    // expired) so this turn's Manager-path tool calls see a fresh token. The 60s memo makes it free
+    // during rapid back-and-forth; `detectManagerAuthError` below stays the mid-turn backstop.
+    await ensureManagerSession(core.http, { maxAgeMs: 60_000 });
+
+    const assistantMessageId = nextMessageId();
+    const assistantMessage: UiChatMessage = {
+      id: assistantMessageId,
+      role: 'assistant',
+      content: '',
+      isStreaming: true,
+      createdAt: Date.now(),
+    };
+
+    // Built from turnHistoryRef BEFORE this turn's own (still-empty) record is registered below, so
+    // it only ever reflects PRIOR completed turns — see buildOutgoingMessages's doc comment.
+    const outgoingMessages = buildOutgoingMessages(
+      history,
+      turnHistoryRef.current,
+    );
+    turnHistoryRef.current = [
+      ...turnHistoryRef.current,
+      { assistantMessageId, toolExchanges: [] },
+    ];
+
+    // Sending always snaps the pane to the new turn, even if the user had scrolled up — the one
+    // case where overriding their scroll position is what they expect (see pinnedToBottomRef).
+    pinnedToBottomRef.current = true;
+    const baseMessages = [...history, assistantMessage];
+    updateMessages(baseMessages);
+
+    // Persist the question BEFORE generating, not only after the turn completes. A reload, a
+    // navigation, or a crash mid-answer used to lose the question too — the conversation was only
+    // created once the turn ended, so the user came back to an empty chat with no trace that they
+    // had asked anything. `history` excludes the still-empty assistant placeholder. Both of this
+    // turn's saves share `target`, so whichever runs first creates the row and the other updates it
+    // — see `TurnConversationTarget`.
+    const target: TurnConversationTarget = {
+      conversationId: activeConversationIdRef.current,
+      version: conversationVersionRef.current,
+    };
+    void persistConversationTurn({
+      adoptAsActive: true,
+      target,
+      messages: history,
+      turnRecords: turnHistoryRef.current,
+    });
+
+    await runChatStream({
+      assistantMessageId,
+      baseMessages,
+      target,
+      outgoingMessages,
+      privacyPayload,
+    });
+  };
 
   const handleSend = async (text: string) => {
     if (!selectedProviderId) {
@@ -909,81 +1336,93 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     setManagerAuthHint(false);
     setMergeNotice(null);
     setSessionExpired(false);
-    const userMessage: UiChatMessage = {
-      id: nextMessageId(),
-      role: 'user',
-      content: text,
-      createdAt: Date.now(),
-    };
-    const assistantMessageId = nextMessageId();
-    const assistantMessage: UiChatMessage = {
-      id: assistantMessageId,
-      role: 'assistant',
-      content: '',
-      isStreaming: true,
-      createdAt: Date.now(),
-    };
+    setSaveFailed(false);
+    await startTurn([
+      ...messages,
+      {
+        id: nextMessageId(),
+        role: 'user',
+        content: text,
+        createdAt: Date.now(),
+      },
+    ]);
+  };
 
-    const history = [...messages, userMessage];
-    // Built from turnHistoryRef BEFORE this turn's own (still-empty) record is registered below, so
-    // it only ever reflects PRIOR completed turns — see buildOutgoingMessages's doc comment.
-    const outgoingMessages = buildOutgoingMessages(
-      history,
-      turnHistoryRef.current,
+  /**
+   * Re-asks the question whose answer was interrupted. The interrupted answer is dropped from the
+   * transcript first, so the retry replaces it rather than appending a second answer to the same
+   * question — and the pre-send save then persists the conversation without it, which is what makes
+   * a retried turn look like one turn after a reload too.
+   *
+   * Only ever offered for the LAST message (message-list.tsx) and only while nothing is generating,
+   * so there is no case where this rewrites the middle of a conversation.
+   */
+  const handleRetryLastTurn = async () => {
+    const last = messages[messages.length - 1];
+    if (isGenerating || !last) {
+      return;
+    }
+    // Two shapes of unfinished turn. An interrupted ASSISTANT message is the one this tab marked
+    // itself (Stop, or leaving while the page stayed alive). A trailing USER message is the harder
+    // case: a reload or a navigation killed the page mid-answer, so nothing was left running to mark
+    // anything — the question was saved before generating started and that is all there is.
+    const isInterruptedAnswer =
+      last.role === 'assistant' && last.interrupted === true;
+    if (!isInterruptedAnswer && last.role !== 'user') {
+      return;
+    }
+    const history = isInterruptedAnswer ? messages.slice(0, -1) : messages;
+    if (history[history.length - 1]?.role !== 'user') {
+      return;
+    }
+    // The dropped answer's tool exchanges go with it: they belong to a turn that is being replaced.
+    turnHistoryRef.current = turnHistoryRef.current.filter(
+      turn => turn.assistantMessageId !== last.id,
     );
-    turnHistoryRef.current = [
-      ...turnHistoryRef.current,
-      { assistantMessageId, toolExchanges: [] },
-    ];
-
-    // Sending always snaps the pane to the new turn, even if the user had scrolled up — the one
-    // case where overriding their scroll position is what they expect (see pinnedToBottomRef).
-    pinnedToBottomRef.current = true;
-    updateMessages([...history, assistantMessage]);
-
-    await runChatStream({
-      assistantMessageId,
-      outgoingMessages,
-      privacyPayload,
-    });
+    setError(null);
+    setManagerAuthHint(false);
+    setSaveFailed(false);
+    updateMessages(history);
+    await startTurn(history);
   };
 
   const hasProviders = providers.length > 0;
   const showNoProviderState = providersLoaded && !hasProviders;
-  const showWelcomeState = hasProviders && messages.length === 0;
   // Initial mount, before the app shell's provider load has resolved either way: neither the
   // no-provider nor the welcome state can render yet (both depend on `providersLoaded`), so without
-  // an explicit state here this window shows a blank pane.
-  const showLoadingProvidersState = !providersLoaded;
+  // an explicit state here this window shows a blank pane. Restoring a conversation shows the same
+  // spinner, so a reload lands on "loading" and then the transcript, instead of flashing the
+  // welcome state at a user who is not starting from scratch.
+  const showLoadingState = !providersLoaded || isRestoringConversation;
+  const showWelcomeState =
+    hasProviders && messages.length === 0 && !showLoadingState;
 
   const privacyBadgeLabel = privacyEnabled
     ? i18n.translate('wazuhAiAssistant.chat.privacy.on', {
-        defaultMessage: 'Privacy on',
+        defaultMessage: 'On',
       })
     : i18n.translate('wazuhAiAssistant.chat.privacy.off', {
-        defaultMessage: 'Privacy off',
+        defaultMessage: 'Off',
       });
-  // EuiBadge's props are a discriminated union: the clickable arm (WithButtonProps) requires a
-  // DEFINED onClick + onClickAriaLabel, while the plain arm has neither. Rendering two distinct,
-  // statically-typed badges (rather than conditionally spreading the click props into one) lets
-  // each JSX element match exactly one arm of the union — a conditional spread would widen onClick
-  // to `(() => void) | undefined`, which matches no arm. Output is identical to the spread form:
-  // interactive badge only when the user may toggle privacy, plain badge otherwise.
-  const privacyBadgeColor = privacyEnabled ? 'success' : 'hollow';
   const privacyBadgeIcon = privacyEnabled ? 'lock' : 'lockOpen';
   const privacyBadge = assistantSettings?.userCanOverride ? (
-    <EuiBadge
-      color={privacyBadgeColor}
+    <EuiButtonEmpty
+      size='s'
+      color={privacyEnabled ? 'success' : 'text'}
       iconType={privacyBadgeIcon}
       onClick={handleTogglePrivacy}
-      onClickAriaLabel={privacyBadgeLabel}
     >
       {privacyBadgeLabel}
-    </EuiBadge>
+    </EuiButtonEmpty>
   ) : (
-    <EuiBadge color={privacyBadgeColor} iconType={privacyBadgeIcon}>
+    <EuiButtonEmpty
+      size='s'
+      color={privacyEnabled ? 'success' : 'text'}
+      iconType={privacyBadgeIcon}
+      isDisabled
+    >
       {privacyBadgeLabel}
-    </EuiBadge>
+    </EuiButtonEmpty>
   );
 
   // The badge alone only ever said
@@ -994,12 +1433,21 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   const privacyExplainerText = privacyEnabled
     ? i18n.translate('wazuhAiAssistant.chat.privacy.explainOn', {
         defaultMessage:
-          'Privacy on: hostnames, IP addresses, usernames, process command lines, and alert/rule text are pseudonymized before being sent to the configured AI provider.',
+          'Privacy on: hostnames, IP addresses, usernames, process command lines, and finding/rule text are pseudonymized before being sent to the configured AI provider.',
       })
     : i18n.translate('wazuhAiAssistant.chat.privacy.explainOff', {
         defaultMessage:
-          'Privacy off: hostnames, IP addresses, usernames, process command lines, and alert/rule text are sent to the configured AI provider as-is.',
+          'Privacy off: hostnames, IP addresses, usernames, process command lines, and finding/rule text are sent to the configured AI provider as-is.',
       });
+
+  // Conversation header title: the active conversation's own saved title when one is open
+  // (looked up from the sidebar's own `conversations` list, never re-derived), or the
+  // "New conversation" fallback for a brand-new, never-yet-saved one.
+  const activeConversationTitle = activeConversationId
+    ? conversations.find(
+        conversation => conversation.id === activeConversationId,
+      )?.title
+    : undefined;
 
   const providerOptions = providers.map(provider => ({
     value: provider.id,
@@ -1010,14 +1458,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         })
       : provider.name,
   }));
-
-  // Theme-correct accent (see CHAT_SURFACE_STYLES's doc comment): OSD dark mode is a uiSettings
-  // toggle the dashboard applies on a full page load, not a live-changing media feature, so
-  // reading it once per render — no listener, no state — is enough. This is the same #0077CC
-  // family conversation-list.tsx's selected and hover rows use, lightened for dark mode so it
-  // stays legible against a dark canvas instead of reading as a second, unrelated hue.
-  const isDarkMode = core.uiSettings.get('theme:darkMode');
-  const accentRgb = isDarkMode ? '86, 180, 233' : '0, 119, 204';
 
   return (
     // Iteration 2 layout: EuiPage/EuiPageSideBar rendered as an unreliable hairline sliver in this
@@ -1031,22 +1471,19 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // behaves like the old plain document-flow layout (sidebar and chat column both size to
     // content, page scrolls normally) rather than breaking, so it is safe either way.
     <>
-      {/* Single injected <style> element for the whole chat surface — see CHAT_SURFACE_STYLES's own
-        doc comment above for exactly what it does and does not cover. */}
-      <style>{CHAT_SURFACE_STYLES}</style>
+      {/* wzAiChat: the `--wz-*` token block chat-page.scss defines from EUI's own `$eui*` SASS
+        variables — every color/border reference in this subtree (sidebar rows, hero cards, the
+        sticky input focus ring) reads one of those custom properties instead of a hardcoded hex
+        or a JS-computed `theme:darkMode` branch. Custom properties inherit through the whole DOM
+        subtree regardless of component boundaries, so nothing downstream needs its own dark-mode
+        prop threaded down to it. */}
       <div
-        style={
-          {
-            display: 'flex',
-            height: '100%',
-            minHeight: 0,
-            // Consumed by CHAT_SURFACE_STYLES above and by inline `rgba(var(--wzAccentRgb), ...)`
-            // reads further down this subtree (conversation-list.tsx's selected/hover rows, the
-            // hero cards' icon chips) — set once here so nothing downstream needs its own
-            // isDarkMode prop.
-            '--wzAccentRgb': accentRgb,
-          } as React.CSSProperties
-        }
+        className='wzAiChat'
+        style={{
+          display: 'flex',
+          height: '100%',
+          minHeight: 0,
+        }}
       >
         {/* Left pane: saved-conversations sidebar. EuiPanel color="subdued" gives the standard OSD
           "sunken" pane background without inventing a new hardcoded color. */}
@@ -1060,25 +1497,43 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           // overrode the fixed width below and let the sidebar swallow half the page. A
           // fixed-width pane must explicitly opt out.
           grow={false}
+          role='region'
+          aria-label={i18n.translate(
+            'wazuhAiAssistant.chat.conversations.sidebarRegionLabel',
+            { defaultMessage: 'Saved conversations' },
+          )}
           style={{
             width: CONVERSATION_SIDEBAR_WIDTH,
             maxWidth: CONVERSATION_SIDEBAR_WIDTH,
             flexShrink: 0,
             overflowY: 'auto',
-            // Single hardcoded hex in this file: #D3DAE6 is EUI's `lightShade` token, the same shade
-            // EUI's own components already use for hairline borders in the light theme. No CSS
-            // variable/theme value is exposed to inline styles in this plugin (no stylesheet, no
-            // EuiThemeProvider hook usage elsewhere here), so this is a deliberate one-off rather than
-            // a new arbitrary color.
-            borderRight: '1px solid #D3DAE6',
+            // `--wz-hairline` (chat-page.scss, sourced from `$euiBorderColor`) replaces the old
+            // hardcoded `#D3DAE6` — that hex was EUI's light-theme `lightShade` token with no
+            // dark-mode counterpart, so it rendered as the brightest edge on the page in dark mode.
+            borderRight: '1px solid var(--wz-hairline)',
           }}
         >
           <ConversationList
             conversations={conversations}
             isLoading={isLoadingConversations}
             activeConversationId={activeConversationId}
-            onSelect={handleSelectConversation}
-            onNewConversation={handleNewConversation}
+            // Both go through the confirm gate: each would cancel a running answer. Delete is not
+            // gated — ConversationList already confirms it, and a second modal on top of that one
+            // would be worse than the risk it guards against.
+            //
+            // Clicking the conversation ALREADY open is not one of those actions: it is a no-op
+            // (`handleSelectConversation` returns immediately), so asking to confirm an interruption
+            // that was never going to happen only trains the user to dismiss the dialog. The check
+            // has to happen here, before the gate, not only inside the handler behind it.
+            onSelect={id => {
+              if (id === activeConversationIdRef.current) {
+                return;
+              }
+              void confirmIfGenerating(() => void handleSelectConversation(id));
+            }}
+            onNewConversation={() =>
+              void confirmIfGenerating(handleNewConversation)
+            }
             onDelete={handleDeleteConversation}
           />
         </EuiPanel>
@@ -1093,6 +1548,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         <div
           ref={scrollPaneRef}
           onScroll={handleScrollPane}
+          role='region'
+          aria-label={i18n.translate(
+            'wazuhAiAssistant.chat.chatPaneRegionLabel',
+            { defaultMessage: 'Chat' },
+          )}
           style={
             {
               flex: 1,
@@ -1133,123 +1593,33 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               padding: '16px 24px 0',
             }}
           >
-            {hasProviders && (
-              <>
-                {/* Grouped toolbar strip: the provider select + privacy badge read as one
-                      intentional control cluster instead of two floating controls. */}
-                <EuiPanel
-                  color='subdued'
-                  hasShadow={false}
-                  hasBorder={false}
-                  paddingSize='s'
-                  style={{ borderRadius: 10 }}
-                >
-                  <EuiFlexGroup
-                    justifyContent='flexEnd'
-                    alignItems='center'
-                    gutterSize='s'
-                    responsive={false}
-                  >
-                    <EuiFlexItem grow={false}>
-                      <EuiSelect
-                        id='wzAiAssistantProviderSelect'
-                        compressed
-                        prepend={i18n.translate(
-                          'wazuhAiAssistant.chat.providerLabel',
-                          {
-                            defaultMessage: 'Provider',
-                          },
-                        )}
-                        options={providerOptions}
-                        value={selectedProviderId}
-                        onChange={event => onProviderChange(event.target.value)}
-                        aria-label={i18n.translate(
-                          'wazuhAiAssistant.chat.providerSelect',
-                          {
-                            defaultMessage: 'Provider',
-                          },
-                        )}
-                      />
-                    </EuiFlexItem>
-                    {assistantSettings && (
-                      <EuiFlexItem grow={false}>
-                        {assistantSettings.userCanOverride ? (
-                          privacyBadge
-                        ) : (
-                          <EuiToolTip
-                            content={i18n.translate(
-                              'wazuhAiAssistant.chat.privacy.adminSet',
-                              {
-                                defaultMessage: 'Set by administrator',
-                              },
-                            )}
-                          >
-                            {privacyBadge}
-                          </EuiToolTip>
-                        )}
-                      </EuiFlexItem>
+            {/* The view's `<h1>`, for assistive tech only. The chat column had no heading at all,
+                  which left screen-reader users without a name for the thing they are reading and
+                  the page without a document outline. A VISIBLE header was tried and dropped: a
+                  conversation's title is generated from its first message, so a visible strip
+                  restated the user's own question directly above that same question in the
+                  transcript, and the sidebar already marks which conversation is open. Screen-
+                  reader-only keeps the semantics without the duplication — and matches the Home
+                  Overview, which likewise shows no page-scale title. */}
+            {!showLoadingState && !showNoProviderState && (
+              <EuiScreenReaderOnly>
+                <h1>
+                  {activeConversationTitle ??
+                    i18n.translate(
+                      'wazuhAiAssistant.chat.conversations.newConversationHeading',
+                      { defaultMessage: 'New conversation' },
                     )}
-                    {assistantSettings && (
-                      <EuiFlexItem grow={false}>
-                        {/* disclosure-only affordance explaining what
-                              the privacy badge actually does to the user's data — no behavior
-                              change, the badge's own on/off state and click handling are untouched
-                              above. */}
-                        <EuiIconTip
-                          type='iInCircle'
-                          color='subdued'
-                          content={privacyExplainerText}
-                          aria-label={i18n.translate(
-                            'wazuhAiAssistant.chat.privacy.explainAriaLabel',
-                            {
-                              defaultMessage:
-                                'What privacy mode does to your data',
-                            },
-                          )}
-                        />
-                      </EuiFlexItem>
-                    )}
-                  </EuiFlexGroup>
-                </EuiPanel>
-                <EuiSpacer size='m' />
-              </>
+                </h1>
+              </EuiScreenReaderOnly>
             )}
 
-            {(error || providersError) && (
-              <StatusCallout
-                title={i18n.translate('wazuhAiAssistant.chat.errorTitle', {
-                  defaultMessage: 'Something went wrong',
-                })}
-                color='danger'
-                iconType='alert'
-                body={error ?? providersError}
-              />
-            )}
-
-            {managerAuthHint && (
-              <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.managerAuthHint.title',
-                  {
-                    defaultMessage: 'Your Wazuh session may have expired',
-                  },
-                )}
-                color='warning'
-                iconType='alert'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.managerAuthHint.body',
-                  {
-                    defaultMessage:
-                      'A request to the Wazuh manager failed, which can happen when your dashboard session token has expired. Reload the page and sign in again, then retry your question.',
-                  },
-                )}
-              />
-            )}
-
-            {/* Session-expiry recovery UX: a genuine 401, distinct from managerAuthHint's
-                  best-effort heuristic above. Persistent (no dismiss control, and nothing in this
-                  file ever calls setSessionExpired(false) except starting a fresh send) until the
-                  user reloads, per this fix's brief. */}
+            {/* Callouts render in priority order (never suppressed — resilience-first: every
+                  state is shown, just ordered): session expiry first (it blocks everything else),
+                  then generic errors, then a failed auto-save, then the optimistic-concurrency
+                  merge notices. Session-expiry recovery UX: a genuine 401, distinct from
+                  managerAuthHint's best-effort heuristic below. Persistent (no dismiss control,
+                  and nothing in this file ever calls setSessionExpired(false) except starting a
+                  fresh send) until the user reloads, per this fix's brief. */}
             {sessionExpired && (
               <StatusCallout
                 title={i18n.translate(
@@ -1284,6 +1654,61 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               />
             )}
 
+            {(error || providersError) && (
+              <StatusCallout
+                title={i18n.translate('wazuhAiAssistant.chat.errorTitle', {
+                  defaultMessage: 'Something went wrong',
+                })}
+                color='danger'
+                iconType='alert'
+                body={error ?? providersError}
+              />
+            )}
+
+            {managerAuthHint && (
+              <StatusCallout
+                title={i18n.translate(
+                  'wazuhAiAssistant.chat.managerAuthHint.title',
+                  {
+                    defaultMessage: 'Your Wazuh session may have expired',
+                  },
+                )}
+                color='warning'
+                iconType='alert'
+                body={i18n.translate(
+                  'wazuhAiAssistant.chat.managerAuthHint.body',
+                  {
+                    defaultMessage:
+                      'A request to the Wazuh manager failed, which can happen when your dashboard session token has expired. Reload the page and sign in again, then retry your question.',
+                  },
+                )}
+              />
+            )}
+
+            {/* A failed auto-save is surfaced instead of swallowed: the conversation on screen is
+                ahead of what is stored, which the user cannot infer from anything else. Not
+                dismissible and not an action — the next turn's save retries on its own, and clears
+                this as soon as one succeeds. */}
+            {saveFailed && (
+              <StatusCallout
+                title={i18n.translate(
+                  'wazuhAiAssistant.chat.conversations.saveFailed.title',
+                  {
+                    defaultMessage: 'This conversation is not being saved',
+                  },
+                )}
+                color='warning'
+                iconType='alert'
+                body={i18n.translate(
+                  'wazuhAiAssistant.chat.conversations.saveFailed.body',
+                  {
+                    defaultMessage:
+                      'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
+                  },
+                )}
+              />
+            )}
+
             {/* Optimistic-concurrency notice: shown after persistConversationAfterTurn's
                   auto-save hit a 409 on the last completed turn — see saveConversationWithMerge's
                   own doc comment for exactly when each variant fires. Non-blocking: the chat itself
@@ -1296,8 +1721,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     defaultMessage: 'Conversation merged',
                   },
                 )}
-                color='warning'
-                iconType='alert'
+                // A successful merge is a good outcome, not a warning — the conflict variant
+                // right below keeps 'warning'/'alert', so the two are no longer visually
+                // identical for opposite results.
+                color='success'
+                iconType='check'
                 body={i18n.translate(
                   'wazuhAiAssistant.chat.conversations.mergedNotice.body',
                   {
@@ -1328,7 +1756,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               />
             )}
 
-            {showLoadingProvidersState && (
+            {showLoadingState && (
               <EuiFlexGroup
                 justifyContent='center'
                 alignItems='center'
@@ -1362,7 +1790,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   <p>
                     {i18n.translate('wazuhAiAssistant.chat.noProvider.body', {
                       defaultMessage:
-                        'The AI Assistant needs at least one connected provider (OpenAI-compatible, Anthropic, or the Wazuh AI Assistant brain) before it can answer questions. Add one to get started.',
+                        'The AI Assistant needs at least one connected provider (OpenAI-compatible or Anthropic) before it can answer questions. Add one to get started.',
                     })}
                   </p>
                 }
@@ -1403,50 +1831,35 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               {showWelcomeState && (
                 <>
                   <EuiEmptyPrompt
-                    // Plain, natural-aspect-ratio mark (not EuiAvatar) — EuiAvatar was cropping
-                    // the Wazuh mark into an awkward circle. Message-bubble.tsx's own assistant
-                    // avatars are untouched. wzHeroWash is a soft, low-opacity radial wash in the
-                    // resolved Wazuh-blue accent (see CHAT_SURFACE_STYLES); wzHeroIcon just needs
-                    // z-index above it, which the class provides via `position: relative`.
-                    icon={
-                      <div className='wzHeroIconWrap'>
-                        <div className='wzHeroWash' aria-hidden='true' />
-                        <img
-                          src={aiAvatarUrl}
-                          alt=''
-                          className='wzHeroIcon'
-                          style={{ height: 76 }}
-                        />
-                      </div>
-                    }
+                    // No `icon`: this chat already lives inside the Wazuh app chrome, so a Wazuh
+                    // mark on the welcome screen only repeated branding the user can already see.
                     title={
-                      // Inline size/weight/letter-spacing override the EuiEmptyPrompt title's
-                      // own (smaller) default — inline style always wins over EUI's class-based
-                      // font-size here, same override pattern already used throughout this file.
-                      <h2
-                        style={{
-                          fontSize: 30,
-                          fontWeight: 600,
-                          letterSpacing: '-0.01em',
-                          lineHeight: 1.25,
-                          margin: 0,
-                        }}
-                      >
-                        {i18n.translate('wazuhAiAssistant.chat.welcome.title', {
-                          defaultMessage: 'Ask the AI Assistant something',
-                        })}
-                      </h2>
+                      // EUI's own type scale (size='m') instead of an inline fontSize/weight/
+                      // letter-spacing override — the whole point of this pass is to stop
+                      // fighting EuiEmptyPrompt's built-in typography with inline styles.
+                      <EuiTitle size='m'>
+                        <h2>
+                          {i18n.translate(
+                            'wazuhAiAssistant.chat.welcome.title',
+                            {
+                              defaultMessage: 'Ask the AI Assistant something',
+                            },
+                          )}
+                        </h2>
+                      </EuiTitle>
                     }
                     body={
-                      <p style={{ fontSize: 16, lineHeight: 1.5, margin: 0 }}>
-                        {i18n.translate(
-                          'wazuhAiAssistant.chat.welcome.subtitle',
-                          {
-                            defaultMessage:
-                              'Ask questions about your security data in plain language.',
-                          },
-                        )}
-                      </p>
+                      <EuiText size='m'>
+                        <p>
+                          {i18n.translate(
+                            'wazuhAiAssistant.chat.welcome.subtitle',
+                            {
+                              defaultMessage:
+                                'Ask questions about your security data in plain language.',
+                            },
+                          )}
+                        </p>
+                      </EuiText>
                     }
                   />
                   <EuiSpacer size='l' />
@@ -1455,31 +1868,39 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         paragraph competing with the subtitle above. Moved out of
                         EuiEmptyPrompt's body (along with the card row below) so the row is
                         no longer clamped to the empty prompt's ~576px content width — it now
-                        spans the full ~860px chat column instead of wrapping 2+1. */}
-                  <EuiText size='s' color='subdued'>
-                    <p
-                      style={{
-                        margin: 0,
-                        fontWeight: 600,
-                        letterSpacing: '0.02em',
-                        textTransform: 'uppercase',
-                        fontSize: 11,
-                        textAlign: 'center',
-                      }}
-                    >
-                      {i18n.translate('wazuhAiAssistant.chat.welcome.body', {
-                        defaultMessage:
-                          'Try one of these, or type your own question below.',
-                      })}
-                    </p>
-                  </EuiText>
+                        spans the full ~860px chat column instead of wrapping 2+1.
+                        EuiBetaBadge (the same "lighter, navigation-style" device the Home
+                        Overview's SectionHeader uses) replaces the old uppercase/letter-spaced
+                        inline-styled label — it is never smaller than the content it introduces,
+                        unlike the label it replaces. */}
+                  <EuiFlexGroup
+                    gutterSize='none'
+                    justifyContent='center'
+                    responsive={false}
+                  >
+                    <EuiFlexItem grow={false}>
+                      <EuiBetaBadge
+                        color='subdued'
+                        label={i18n.translate(
+                          'wazuhAiAssistant.chat.welcome.body',
+                          {
+                            defaultMessage: 'Try one of these',
+                          },
+                        )}
+                        aria-label={i18n.translate(
+                          'wazuhAiAssistant.chat.welcome.bodyAriaLabel',
+                          { defaultMessage: 'Example questions section' },
+                        )}
+                      />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
                   <EuiSpacer size='s' />
                   {/* Elevated example cards (EuiPanel, not EuiCard): a titleSize="xs"-style
                         compact EuiCard is not a reliably typed prop in this EUI version and
                         EuiCard's fixed layout paddings still read oversized at "s"/horizontal
                         for a 3-up row this narrow, so this uses onClick EuiPanels instead —
                         icon chip + title + one truncated line, now with a consistent height,
-                        a hover lift (wzHeroCard, see CHAT_SURFACE_STYLES), and a staggered
+                        a hover lift (wzHeroCard, see chat-page.scss), and a staggered
                         fade/slide-in on mount driven by each card's own --wzCardDelay.
                         Clicking still only fills the input (unchanged setInputText call),
                         never auto-sends. */}
@@ -1508,8 +1929,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                               minHeight: 128,
                               display: 'flex',
                               flexDirection: 'column',
-                              borderRadius: 10,
-                              // Consumed only by CHAT_SURFACE_STYLES's reduced-motion-safe
+                              // No borderRadius override — EuiPanel's own default applies.
+                              // Consumed only by chat-page.scss's reduced-motion-safe
                               // animation-delay rule; see this component's own doc comment.
                               '--wzCardDelay': `${index * 80}ms`,
                             } as React.CSSProperties
@@ -1522,8 +1943,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                               justifyContent: 'center',
                               width: 32,
                               height: 32,
-                              borderRadius: 8,
-                              background: 'rgba(var(--wzAccentRgb), 0.12)',
+                              borderRadius: 4,
+                              background: 'var(--wz-accent-soft)',
                             }}
                           >
                             <EuiIcon
@@ -1556,26 +1977,36 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 </>
               )}
 
-              {!showLoadingProvidersState &&
+              {!showLoadingState &&
                 !showNoProviderState &&
                 !showWelcomeState && (
                   <MessageList
                     messages={messages}
-                    aiAvatarUrl={aiAvatarUrl}
                     resolveDiscoverUrl={resolveDiscoverUrl}
+                    resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+                    // Withheld while generating: retrying would abandon the turn already running.
+                    onRetryLastTurn={
+                      isGenerating ? undefined : handleRetryLastTurn
+                    }
                   />
                 )}
             </div>
 
-            {!showLoadingProvidersState && !showNoProviderState && (
-              <div style={{ position: 'sticky', bottom: 0 }}>
-                <EuiSpacer size='s' />
+            {!showLoadingState && !showNoProviderState && (
+              <div
+                className={
+                  hasProviders
+                    ? 'wzStickyInputPanel'
+                    : 'wzStickyInputPanel wzStickyInputPanel-isDisabled'
+                }
+              >
+                <EuiSpacer size='xs' />
                 <EuiPanel
                   color='plain'
                   hasBorder
                   hasShadow={false}
                   paddingSize='s'
-                  style={{ borderRadius: 12 }}
+                  style={{ marginBottom: 12 }}
                 >
                   <ChatInput
                     ref={chatInputRef}
@@ -1584,9 +2015,123 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     disabled={!hasProviders}
                     isGenerating={isGenerating}
                     onSend={handleSend}
-                    onStop={handleStop}
                   />
+                  <EuiSpacer size='xs' />
+                  <EuiFlexGroup
+                    alignItems='center'
+                    gutterSize='s'
+                    responsive={false}
+                    wrap
+                  >
+                    {hasProviders && assistantSettings && (
+                      <EuiFlexItem grow={false}>
+                        {assistantSettings.userCanOverride ? (
+                          privacyBadge
+                        ) : (
+                          <EuiToolTip
+                            content={i18n.translate(
+                              'wazuhAiAssistant.chat.privacy.adminSet',
+                              { defaultMessage: 'Set by administrator' },
+                            )}
+                          >
+                            {privacyBadge}
+                          </EuiToolTip>
+                        )}
+                      </EuiFlexItem>
+                    )}
+                    {hasProviders && assistantSettings && (
+                      <EuiFlexItem grow={false}>
+                        <EuiIconTip
+                          type='iInCircle'
+                          color='subdued'
+                          content={privacyExplainerText}
+                          aria-label={i18n.translate(
+                            'wazuhAiAssistant.chat.privacy.explainAriaLabel',
+                            {
+                              defaultMessage:
+                                'What privacy mode does to your data',
+                            },
+                          )}
+                        />
+                      </EuiFlexItem>
+                    )}
+                    {/* Explicit grow spacer (was a bare `<EuiFlexItem />` relying on `grow`
+                          defaulting to true) pushes the provider/send cluster to the far right;
+                          that cluster now sits behind its own hairline left border, so the two
+                          concerns (privacy controls vs. provider/send) read as visually separate
+                          groups instead of one undivided row. */}
+                    <EuiFlexItem grow />
+                    <EuiFlexItem grow={false}>
+                      <EuiFlexGroup
+                        alignItems='center'
+                        gutterSize='s'
+                        responsive={false}
+                        style={{
+                          borderLeft: '1px solid var(--wz-hairline)',
+                          paddingLeft: 8,
+                        }}
+                      >
+                        {hasProviders && (
+                          <EuiFlexItem grow={false}>
+                            <EuiSelect
+                              id='wzAiAssistantProviderSelect'
+                              compressed
+                              prepend={i18n.translate(
+                                'wazuhAiAssistant.chat.providerLabel',
+                                { defaultMessage: 'Provider' },
+                              )}
+                              options={providerOptions}
+                              value={selectedProviderId}
+                              onChange={event =>
+                                onProviderChange(event.target.value)
+                              }
+                              aria-label={i18n.translate(
+                                'wazuhAiAssistant.chat.providerSelect',
+                                { defaultMessage: 'Provider' },
+                              )}
+                            />
+                          </EuiFlexItem>
+                        )}
+                        <EuiFlexItem grow={false}>
+                          {isGenerating ? (
+                            <EuiButtonIcon
+                              iconType='cross'
+                              color='danger'
+                              size='s'
+                              onClick={handleStop}
+                              aria-label={i18n.translate(
+                                'wazuhAiAssistant.chat.stopButton',
+                                { defaultMessage: 'Stop' },
+                              )}
+                            />
+                          ) : (
+                            <EuiButtonIcon
+                              iconType='arrowUp'
+                              color='primary'
+                              size='s'
+                              display='fill'
+                              onClick={() => chatInputRef.current?.send()}
+                              disabled={!hasProviders || !inputText.trim()}
+                              aria-label={i18n.translate(
+                                'wazuhAiAssistant.chat.sendButton',
+                                { defaultMessage: 'Send' },
+                              )}
+                            />
+                          )}
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
                 </EuiPanel>
+                <EuiText size='xs' color='subdued' textAlign='center'>
+                  <p>
+                    {i18n.translate('wazuhAiAssistant.chat.disclaimer', {
+                      defaultMessage:
+                        'AI responses may contain errors. Always verify critical information.',
+                    })}
+                  </p>
+                </EuiText>
+                <EuiSpacer size='s' />
               </div>
             )}
           </div>

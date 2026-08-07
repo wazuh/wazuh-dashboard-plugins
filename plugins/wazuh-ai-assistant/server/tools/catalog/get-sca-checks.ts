@@ -17,9 +17,16 @@ import {
  * file/directory/command fields have NO dedicated 5.0 field (per the matrix, likely folded into
  * the `check.rules` strings — carried as a rowField so the row expander still surfaces whatever
  * the rules text contains). `check.description`/`check.rationale` stay out of the digest (long
- * text, same budget decision as 4.14). `result` values assumed unchanged from 4.14
- * ('failed'/'passed'/'not applicable') — re-verify against real agent data when available.
+ * text, same budget decision as 4.14). `check.result` is confirmed live to store CAPITALIZED
+ * values (`"Passed"`/`"Failed"`/`"Not applicable"`), unlike the lowercase 4.14 values this tool's
+ * `result` parameter still exposes to the model -- `RESULT_VALUE_MAP` translates at the
+ * `buildRequest` boundary so the model-facing contract doesn't have to change.
  */
+const RESULT_VALUE_MAP: Record<string, string> = {
+  passed: 'Passed',
+  failed: 'Failed',
+  'not applicable': 'Not applicable',
+};
 export const getScaChecksTool: ToolDefinition = {
   spec: {
     name: 'get_sca_checks',
@@ -83,7 +90,15 @@ export const getScaChecksTool: ToolDefinition = {
             filter: [
               { term: { 'wazuh.agent.id': agentId } },
               { term: { 'policy.id': policyId.trim() } },
-              ...(result ? [{ term: { 'check.result': result } }] : []),
+              ...(result
+                ? [
+                    {
+                      term: {
+                        'check.result': RESULT_VALUE_MAP[result] ?? result,
+                      },
+                    },
+                  ]
+                : []),
               // `search` is EXACT-or-PREFIX, never substring. `check.name`/`check.description`/
               // `check.rationale` are all mapped `keyword` in 5.0, so the previous bare
               // `multi_match` silently returned nothing for the fragment its own description
@@ -139,7 +154,7 @@ export const getScaChecksTool: ToolDefinition = {
     columns: [
       { field: 'check.id', label: 'Check ID' },
       { field: 'check.name', label: 'Check' },
-      // `check.result` is a pass/fail/not-applicable WORD, not an alert-severity level — plain
+      // `check.result` is a pass/fail/not-applicable WORD, not a finding-severity level — plain
       // column, not `severity: true` (same rationale as the 4.14 version of this tool).
       { field: 'check.result', label: 'Result' },
       { field: 'check.reason', label: 'Reason' },

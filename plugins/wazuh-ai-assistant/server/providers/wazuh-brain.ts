@@ -9,6 +9,7 @@ import {
 // Raw HTTP error bodies can echo a credential from a misbehaving gateway; reuse retry.ts's
 // truncate+redact helper rather than forwarding the body verbatim (see its doc comment).
 import {
+  extractProviderErrorMessage,
   fetchWithHeaderTimeout,
   safeReadText,
   sanitizeProviderErrorBody,
@@ -109,7 +110,10 @@ export class WazuhBrainAdapter implements ProviderAdapter {
         // credential shapes.
         message: `Provider responded with HTTP ${
           response.status
-        }: ${sanitizeProviderErrorBody(bodyText, config.apiKey)}`,
+        }: ${sanitizeProviderErrorBody(
+          extractProviderErrorMessage(bodyText),
+          config.apiKey,
+        )}`,
       };
       return;
     }

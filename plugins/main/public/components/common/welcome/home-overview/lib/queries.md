@@ -31,6 +31,8 @@ the filter portion. Field/agg names come from [`fields.ts`](./fields.ts) and
 | Data source (hook)                                     | Index pattern                                              | Window   |
 | ------------------------------------------------------ | ---------------------------------------------------------- | -------- |
 | Findings (`useFindingsOverview`)                       | `wazuh-findings-v5*`                                       | last 24h |
+| Cloud security findings (`useCloudSecurityFindings`)   | `wazuh-findings-v5*`                                       | last 24h |
+| Compliance controls (`useComplianceControls`)          | `wazuh-findings-v5*`                                       | last 24h |
 | Top OS (`useTopOperatingSystems`)                      | `wazuh-states-inventory-system*`                           | current  |
 | Top network services (`useTopNetworkServices`)         | `wazuh-states-inventory-ports*`                            | current  |
 | SCA (`useSCAOverview`)                                 | `wazuh-states-sca*`                                        | current  |
@@ -48,7 +50,8 @@ the filter portion. Field/agg names come from [`fields.ts`](./fields.ts) and
 
 Fired **on mount**; one search feeds three sections (Overview, Threat Hunting,
 Endpoint Security → Malware). Built by `buildFindingsOverviewAggs()` +
-`buildMalwareFilterAgg()`.
+`buildMalwareFilterAgg()`. The two other findings searches (§1.1, §1.2) are kept
+separate so this on-mount one stays as small as the above-the-fold widgets need.
 
 **Represents:** finding severity distribution, top MITRE tactics, total findings,
 top rules, distinct techniques observed, top techniques, and the Malware
@@ -104,6 +107,73 @@ IOC-match hero.
 
 **DQL (filter part):** whole search is `*` over the last 24h; the Malware subset
 is `wazuh.threat.enrichments: *` (field exists).
+
+## 1.1 Cloud security findings — `wazuh-findings-v5*`, last 24h
+
+`buildCloudSecurityByModuleAgg()`, once the Cloud security section scrolls in.
+
+**Represents:** the findings count badge on each Cloud Security card. One
+filters-agg bucket per module, keyed by the app id the card links to and matching
+what that module's own data source filters on.
+
+```jsonc
+{
+  "size": 0,
+  "aggs": {
+    "cloud_security_by_module": {
+      "filters": {
+        "filters": {
+          "docker": { "match_phrase": { "wazuh.integration.name": "docker" } },
+          // AWS spans aws-cloudtrail, aws-guardduty, ...
+          "amazon-web-services": {
+            "wildcard": { "wazuh.integration.name": "aws*" }
+          },
+          "google-cloud": {
+            "match_phrase": { "wazuh.integration.name": "gcp" }
+          },
+          "github": { "match_phrase": { "wazuh.integration.name": "github" } },
+          "office365": { "match_phrase": { "wazuh.integration.name": "o365" } },
+          "microsoft-graph-api": {
+            "match_phrase": { "wazuh.integration.name": "azure" }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+DQL: `*` over the last 24h.
+
+## 1.2 Compliance controls — `wazuh-findings-v5*`, last 24h
+
+`buildComplianceControlsAgg()`, once the Security operations section scrolls in.
+
+**Represents:** the count on each Regulatory Compliance chip. Every framework
+reports the same total findings count (one finding can implicate several
+frameworks at once), so the chips show _distinct controls implicated_ — a
+cardinality agg per `COMPLIANCE_FRAMEWORK_FIELDS` entry, not a doc count.
+
+```jsonc
+{
+  "size": 0,
+  "aggs": {
+    "compliance_controls_pci-dss": {
+      "cardinality": { "field": "wazuh.rule.compliance.pci_dss" }
+    },
+    "compliance_controls_gdpr": {
+      "cardinality": { "field": "wazuh.rule.compliance.gdpr" }
+    },
+    // ... one per framework: hipaa, nist-800-53, nist-800-171, tsc, cmmc,
+    // fedramp, iso-27001, nis2
+    "compliance_controls_nis2": {
+      "cardinality": { "field": "wazuh.rule.compliance.nis2" }
+    }
+  }
+}
+```
+
+DQL: `*` over the last 24h.
 
 ## 2. Top operating systems — `wazuh-states-inventory-system*`, current
 
@@ -173,17 +243,26 @@ SCA scan (`welcome/components/sca_scan/sca_scan.tsx`).
 
 ## 5. File Integrity Monitoring — `wazuh-states-fim*`, current
 
-`buildFIMTopPlatformsAgg()`. The `wazuh-states-fim*` pattern spans files +
+`buildFIMTopFilesAgg()`. The `wazuh-states-fim*` pattern spans files +
 registry keys + registry values.
 
-**Represents:** total baselined objects (`hits.total`) and the top 5 platforms.
+**Represents:** total baselined objects (`hits.total`) and the top 5 **most
+recently modified** files. The terms agg orders by each path's latest
+`file.mtime`; its `doc_count` is how many agents monitor that path (the state
+index holds one document per agent and path), which is what the list's count
+column shows.
 
 ```jsonc
 {
   "size": 0, // total comes from hits.total (mapDocCount)
   "aggs": {
-    "fim_platforms": {
-      "terms": { "field": "wazuh.agent.host.os.platform", "size": 5 }
+    "fim_top_files": {
+      "terms": {
+        "field": "file.path",
+        "size": 5,
+        "order": { "last_modified": "desc" }
+      },
+      "aggs": { "last_modified": { "max": { "field": "file.mtime" } } }
     }
   }
 }
@@ -193,12 +272,11 @@ DQL: `*`.
 
 ## 6. Vulnerabilities — `wazuh-states-vulnerabilities*`, current
 
-`buildVulnerabilitySeverityFiltersAgg()` + `buildVulnerabilityTopOsAgg()` +
-`buildCvesMatchedAgg()`.
+`buildVulnerabilitySeverityFiltersAgg()` + `buildVulnerabilityTopPackagesAgg()`.
 
-**Represents:** vulnerability severity tiles, top affected OS, and the distinct
-"CVEs matched" count. Note `vulnerability.severity` values are **Capitalized**
-(unlike the lowercase finding bands) and there is **no** informational band.
+**Represents:** vulnerability severity distribution and top affected package
+names. Note `vulnerability.severity` values are **Capitalized** (unlike the
+lowercase finding bands) and there is **no** informational band.
 
 ```jsonc
 {
@@ -216,11 +294,9 @@ DQL: `*`.
         }
       }
     },
-    "vulnerabilities_by_os": {
-      "terms": { "field": "host.os.name", "size": 5 }
-    },
-    // distinct CVEs, not the match-document count (one CVE matches many assets)
-    "cves_matched": { "cardinality": { "field": "vulnerability.id" } }
+    "vulnerabilities_by_package": {
+      "terms": { "field": "package.name", "size": 5 }
+    }
   }
 }
 ```
@@ -229,18 +305,23 @@ DQL: `*`.
 
 ## 7. Threat-intel enrichments catalog — `wazuh-threatintel-enrichments*`, current
 
-`buildThreatIntelFeedByTypeAgg()`. This is the feed **catalog** (what indicators
-the platform ships with) — distinct from the Malware IOC-match hero in §1 (what
-actually matched in findings).
+`buildThreatIntelFeedByTypeAgg()` + `buildThreatIntelByThreatTypeAgg()`. This is
+the feed **catalog** (what indicators the platform ships with) — distinct from
+the Malware IOC-match hero in §1 (what actually matched in findings).
 
-**Represents:** total IOCs in the feed (`hits.total`, the "IOCs" tile) and the
-feed composition by indicator type (domain/url/ip/hash).
+**Represents:** total IOCs in the feed (`hits.total`, the "IOCs" tile), the feed
+composition by indicator type (domain/url/ip/hash) and the composition by threat
+type (`botnet_cc`, `payload_delivery`, …) shown on the Threat catalog card.
 
 ```jsonc
 {
   "size": 0, // total IOCs from hits.total
   "aggs": {
-    "ioc_feed_by_type": { "terms": { "field": "document.type", "size": 5 } }
+    "ioc_feed_by_type": { "terms": { "field": "document.type", "size": 5 } },
+    // what kind of threats the catalog covers, not their technical form
+    "threat_types": {
+      "terms": { "field": "document.software.type", "size": 5 }
+    }
   }
 }
 ```

@@ -9,20 +9,23 @@ The plugin's `configPath` is `wazuh_ai_assistant` (note: the config namespace, n
 `wazuhAiAssistant` plugin id). Keys go in `opensearch_dashboards.yml` or the OpenSearch
 Dashboards keystore:
 
-| Key                                | Default | Description                                                                                                                                                        |
-| ---------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `wazuh_ai_assistant.enabled`       | `true`  | Enables/disables the plugin.                                                                                                                                       |
-| `wazuh_ai_assistant.encryptionKey` | unset   | Base64-encoded 32-byte AES-256 key used to encrypt provider API keys at rest. Generate with `openssl rand -base64 32`. **Prefer the keystore** over the YAML file: |
+| Key                                | Default | Description                                                                                                                                                                                                                                         |
+| ---------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `wazuh_ai_assistant.enabled`       | `true`  | Enables/disables the plugin.                                                                                                                                                                                                                        |
+| `wazuh_ai_assistant.encryptionKey` | unset   | **Required to save provider API keys** — writes carrying a key are rejected without it. Base64-encoded 32-byte AES-256 key used to encrypt those keys at rest. Generate with `openssl rand -base64 32`. **Prefer the keystore** over the YAML file: |
 
 ```
 sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
   add wazuh_ai_assistant.encryptionKey
 ```
 
-With no `encryptionKey` set, provider API keys are stored in plaintext inside the saved-objects
-index and a warning is logged at startup. Neither the key nor any derived material is ever
-exposed to the browser or logged. See
-[Security](./security.md#api-key-encryption-at-rest) for format and rotation caveats.
+With no `encryptionKey` set, saving a provider API key is rejected — the Settings form warns
+before submit and the HTTP API refuses the write — and a warning is logged at startup. Providers
+that need no API key can still be saved. Plaintext API keys are never stored, read, or managed: a
+key stored in plaintext by an earlier pre-release build is unusable and must be re-entered before
+the provider can be edited at all. Neither the key nor any derived material is ever exposed to the browser
+or logged. See [Security](./security.md#api-key-encryption-at-rest) for format and rotation
+caveats.
 
 ## Settings view
 
@@ -40,7 +43,7 @@ Create, edit, delete, and test providers, and choose the default one.
 | **Type**     | `OpenAI-compatible`, `Anthropic`, or `Wazuh hosted brain`.                                                                                                              |
 | **Base URL** | Endpoint root. Checked by the SSRF guard on every request; private/loopback addresses are allowed (self-hosted gateways), cloud-metadata and link-local ranges are not. |
 | **Model**    | Model identifier passed through to the provider.                                                                                                                        |
-| **API key**  | Optional; write-only (the UI only ever shows whether a key is set). Encrypted at rest when `encryptionKey` is configured.                                               |
+| **API key**  | Optional; write-only (the UI only ever shows whether a key is set). Saving one requires `encryptionKey` to be configured; always encrypted at rest.                     |
 
 **Test connection** performs a round-trip against the provider without sending any Wazuh data.
 

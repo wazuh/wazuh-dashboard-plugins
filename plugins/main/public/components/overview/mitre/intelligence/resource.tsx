@@ -32,24 +32,9 @@ export const ModuleMitreAttackIntelligenceResource = ({
   const [details, setDetails] = useState(null);
   const navigationService = NavigationService.getInstance();
 
-  useEffect(() => {
-    const urlParams = navigationService.getParams();
-    const hasRedirectTabParam = urlParams.has('tabRedirect');
-    const hasIdToRedirectParam = urlParams.has('idToRedirect');
-    if (hasRedirectTabParam && hasIdToRedirectParam) {
-      const redirectTab = urlParams.get('tabRedirect');
-      const idToRedirect = urlParams.get('idToRedirect');
-      const endpoint = `/mitre/${redirectTab}?q=external_id=${idToRedirect}`;
-      getMitreItemToRedirect(endpoint);
-    }
-  }, [
-    navigationService.getParams().has('tabRedirect'),
-    navigationService.getParams().has('idToRedirect'),
-  ]);
-
-  const getMitreItemToRedirect = async endpoint => {
+  const getMitreItemToRedirect = async (endpoint, body = {}) => {
     try {
-      const res = await WzRequest.apiReq('GET', endpoint, {});
+      const res = await WzRequest.apiReq('GET', endpoint, body);
       const data = res?.data?.data.affected_items;
       setDetails(data[0]);
     } catch (error) {
@@ -69,12 +54,39 @@ export const ModuleMitreAttackIntelligenceResource = ({
     }
   };
 
+  useEffect(() => {
+    const urlParams = navigationService.getParams();
+    const hasRedirectTabParam = urlParams.has('tabRedirect');
+    const hasIdToRedirectParam = urlParams.has('idToRedirect');
+    const hasNameToRedirectParam = urlParams.has('nameToRedirect');
+    if (hasRedirectTabParam && hasIdToRedirectParam) {
+      const redirectTab = urlParams.get('tabRedirect');
+      const idToRedirect = urlParams.get('idToRedirect');
+      const endpoint = `/mitre/${redirectTab}?q=external_id=${idToRedirect}`;
+      getMitreItemToRedirect(endpoint);
+    } else if (hasRedirectTabParam && hasNameToRedirectParam) {
+      const redirectTab = urlParams.get('tabRedirect');
+      // The params parser does not decode values, so names keep their encoding
+      const nameToRedirect = decodeURIComponent(
+        urlParams.get('nameToRedirect'),
+      );
+      getMitreItemToRedirect(`/mitre/${redirectTab}`, {
+        params: { q: `name=${nameToRedirect}` },
+      });
+    }
+  }, [
+    navigationService.getParams().has('tabRedirect'),
+    navigationService.getParams().has('idToRedirect'),
+    navigationService.getParams().has('nameToRedirect'),
+  ]);
+
   const tableColumns = useMemo(() => tableColumnsCreator(), []);
 
   const closeFlyout = useCallback(() => {
     setDetails(null);
     NavigationService.getInstance().updateAndNavigateSearchParams({
       idToRedirect: null,
+      nameToRedirect: null,
     });
   }, []);
 
@@ -97,6 +109,16 @@ export const ModuleMitreAttackIntelligenceResource = ({
         <Switch>
           <Route
             path='?tabRedirect=:tabRedirect&idToRedirect=:idToRedirect'
+            render={() => (
+              <ModuleMitreAttackIntelligenceFlyout
+                details={details}
+                closeFlyout={() => closeFlyout()}
+                onSelectResource={setDetails}
+              />
+            )}
+          />
+          <Route
+            path='?tabRedirect=:tabRedirect&nameToRedirect=:nameToRedirect'
             render={() => (
               <ModuleMitreAttackIntelligenceFlyout
                 details={details}

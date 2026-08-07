@@ -14,6 +14,18 @@ import {
 export interface ChatStreamOptions {
   tools?: ToolSpec[];
   toolChoice?: CanonicalToolChoice;
+  /**
+   * Sampling temperature passed straight through to the provider when defined; omitted from the
+   * wire body entirely when `undefined` (both adapters check this, not truthiness, so an explicit
+   * `0` — the stage-1 router's setting, server/routes/chat.ts's `runStage1Routing` — is never
+   * dropped). Left unset by default: the plain-chat/connectivity-test call sites never pass this,
+   * so a provider's own default temperature is unaffected by this option's mere existence.
+   * server/routes/chat.ts sets 0 for the stage-1 router call (one structured pick out of a fixed
+   * enum) and 0.2 on tool-bearing orchestrate rounds — Groq's tool-use guidance recommends 0.0-0.5
+   * for tool calling and names their own default of 1.0 as a contributing cause of malformed tool
+   * calls (issue 05-set-temperature-for-tool-calls.md).
+   */
+  temperature?: number;
 }
 
 /**

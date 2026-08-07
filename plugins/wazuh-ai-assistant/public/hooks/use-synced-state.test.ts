@@ -59,6 +59,38 @@ describe('useSyncedState', () => {
     expect(result.current[0]).toBe(42);
   });
 
+  it('keeps the ref in sync across several updater calls batched into one render', () => {
+    const { result } = renderHook(() => useSyncedState<string[]>([]));
+    const ref = result.current[2];
+
+    act(() => {
+      // Two updater calls with no render in between — the shape React 18's automatic batching
+      // produces for `runChatStream`'s rAF-batched delta flushes. Writing the ref from inside the
+      // `setValue` updater lost the SECOND value here: React 18 only evaluates an updater eagerly
+      // while the fiber has no pending lanes, so once the first call queued an update the second
+      // updater (and its ref write) was deferred to render time.
+      result.current[1](current => [...current, 'first']);
+      result.current[1](current => [...current, 'second']);
+      expect(ref.current).toEqual(['first', 'second']);
+    });
+
+    expect(result.current[0]).toEqual(['first', 'second']);
+    expect(ref.current).toEqual(['first', 'second']);
+  });
+
+  it('applies a plain-value update batched after an updater update', () => {
+    const { result } = renderHook(() => useSyncedState('start'));
+    const ref = result.current[2];
+
+    act(() => {
+      result.current[1](current => `${current}-a`);
+      result.current[1]('replaced');
+      expect(ref.current).toBe('replaced');
+    });
+
+    expect(result.current[0]).toBe('replaced');
+  });
+
   it('returns the same ref object across re-renders (never recreated)', () => {
     const { result, rerender } = renderHook(() => useSyncedState('a'));
     const firstRef = result.current[2];

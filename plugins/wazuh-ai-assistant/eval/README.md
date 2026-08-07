@@ -55,15 +55,15 @@ node run_live.js
 
 ### Env vars
 
-| Var                | Default                  | Notes                                                          |
-| ------------------ | ------------------------ | -------------------------------------------------------------- |
-| `EVAL_BASE_URL`    | `https://localhost:8443` | dashboard base URL                                             |
-| `EVAL_USER`        | `admin`                  | dashboard username                                             |
-| `EVAL_PASS`        | —                        | **required**                                                   |
-| `EVAL_PROVIDER_ID` | —                        | **required**; a provider saved-object id                       |
-| `EVAL_LANG`        | `both`                   | `en` \| `es` \| `both`                                         |
-| `EVAL_FILTER`      | (all cases)              | comma-separated case ids, e.g. `active_agents,critical_alerts` |
-| `EVAL_SLEEP_S`     | `30`                     | seconds slept between calls -- see quota notes below           |
+| Var                | Default                  | Notes                                                            |
+| ------------------ | ------------------------ | ---------------------------------------------------------------- |
+| `EVAL_BASE_URL`    | `https://localhost:8443` | dashboard base URL                                               |
+| `EVAL_USER`        | `admin`                  | dashboard username                                               |
+| `EVAL_PASS`        | —                        | **required**                                                     |
+| `EVAL_PROVIDER_ID` | —                        | **required**; a provider saved-object id                         |
+| `EVAL_LANG`        | `both`                   | `en` \| `es` \| `both`                                           |
+| `EVAL_FILTER`      | (all cases)              | comma-separated case ids, e.g. `active_agents,critical_findings` |
+| `EVAL_SLEEP_S`     | `30`                     | seconds slept between calls -- see quota notes below             |
 
 Output: a `PASS`/`FAIL`/`SKIPPED-QUOTA` line per (case, language) with failure reasons indented
 underneath, a final case-x-language matrix, and a summary line. Exit code = number of FAILs
@@ -203,36 +203,36 @@ the message -- prepending `[[route:...]]` keeps both markers usable in the same 
 Derived by reading every `server/tools/catalog/*.ts` file's `parameters` schema + `buildRequest`,
 supplying only the properties each tool actually requires:
 
-| Tool                               | Args                                                                                   |
-| ---------------------------------- | -------------------------------------------------------------------------------------- |
-| `get_active_agents`                | `{}`                                                                                   |
-| `get_disconnected_agents`          | `{}`                                                                                   |
-| `get_critical_alerts`              | `{}`                                                                                   |
-| `search_alerts_by_agent`           | `{agent_name:"wazuh-aio"}`                                                             |
-| `get_top_rules`                    | `{}`                                                                                   |
-| `get_critical_vulnerabilities`     | `{}`                                                                                   |
-| `get_alerts_by_time`               | `{}`                                                                                   |
-| `get_brute_force`                  | `{}`                                                                                   |
-| `get_security_summary`             | `{}`                                                                                   |
-| `get_suspicious_powershell`        | `{}`                                                                                   |
-| `search_alerts_by_rule_id`         | `{rule_id:5710}`                                                                       |
-| `get_pci_dss_alerts`               | `{}`                                                                                   |
-| `get_pci_dss_summary`              | `{}`                                                                                   |
-| `search_alerts_by_multiple_agents` | `{agent_names:["wazuh-aio"]}`                                                          |
-| `search_alerts_by_os`              | `{os_name:"Ubuntu"}`                                                                   |
-| `get_vulnerabilities`              | `{}`                                                                                   |
-| `get_vulnerabilities_by_agent`     | `{agent_identifier:"wazuh-aio"}`                                                       |
-| `get_solved_vulnerabilities`       | `{}`                                                                                   |
-| `get_vulnerability_by_cve`         | `{cve_id:"CVE-2021-44228"}`                                                            |
-| `get_fim_events`                   | `{}`                                                                                   |
-| `get_sca_results`                  | `{agent_id:"000"}`                                                                     |
-| `get_mitre_alerts`                 | `{}`                                                                                   |
-| `get_mitre_summary`                | `{}`                                                                                   |
-| `get_agent_os`                     | `{agent_id:"000"}`                                                                     |
-| `get_agent_packages`               | `{agent_id:"000"}`                                                                     |
-| `get_agent_ports`                  | `{agent_id:"000"}`                                                                     |
-| `get_agent_processes`              | `{agent_id:"000"}`                                                                     |
-| `search_wazuh_data`                | `{index_pattern:"wazuh-alerts-*", query_dsl:"<JSON-encoded body, 90d range, size 5>"}` |
+| Tool                                 | Args                                                                                        |
+| ------------------------------------ | ------------------------------------------------------------------------------------------- |
+| `get_active_agents`                  | `{}`                                                                                        |
+| `get_disconnected_agents`            | `{}`                                                                                        |
+| `get_critical_findings`              | `{}`                                                                                        |
+| `search_findings_by_agent`           | `{agent_name:"wazuh-aio"}`                                                                  |
+| `get_top_rules`                      | `{}`                                                                                        |
+| `get_critical_vulnerabilities`       | `{}`                                                                                        |
+| `get_findings_by_time`               | `{}`                                                                                        |
+| `get_brute_force`                    | `{}`                                                                                        |
+| `get_security_summary`               | `{}`                                                                                        |
+| `get_suspicious_powershell`          | `{}`                                                                                        |
+| `search_findings_by_rule_title`      | `{rule_title:"Wazuh Rootcheck - Rootkit or malware detected"}`                              |
+| `get_pci_dss_findings`               | `{}`                                                                                        |
+| `get_pci_dss_summary`                | `{}`                                                                                        |
+| `search_findings_by_multiple_agents` | `{agent_names:["wazuh-aio"]}`                                                               |
+| `search_findings_by_os`              | `{os_name:"Ubuntu"}`                                                                        |
+| `get_vulnerabilities`                | `{}`                                                                                        |
+| `get_vulnerabilities_by_agent`       | `{agent_identifier:"wazuh-aio"}`                                                            |
+| `get_solved_vulnerabilities`         | `{}`                                                                                        |
+| `get_vulnerability_by_cve`           | `{cve_id:"CVE-2021-44228"}`                                                                 |
+| `get_fim_events`                     | `{}`                                                                                        |
+| `get_sca_results`                    | `{agent_id:"000"}`                                                                          |
+| `get_mitre_findings`                 | `{}`                                                                                        |
+| `get_mitre_summary`                  | `{}`                                                                                        |
+| `get_agent_os`                       | `{agent_id:"000"}`                                                                          |
+| `get_agent_packages`                 | `{agent_id:"000"}`                                                                          |
+| `get_agent_ports`                    | `{agent_id:"000"}`                                                                          |
+| `get_agent_processes`                | `{agent_id:"000"}`                                                                          |
+| `search_wazuh_data`                  | `{index_pattern:"wazuh-findings-v5-*", query_dsl:"<JSON-encoded body, 90d range, size 5>"}` |
 
 **Risk flag**: `get_sca_results`/`get_agent_os`/`get_agent_packages`/`get_agent_ports`/
 `get_agent_processes` use agent id `"000"` (the manager's own pseudo-agent).
@@ -483,7 +483,7 @@ frame-buffering SSE parse inline (`postChatTurn`) rather than modifying the shar
   a matching `tool_call` event must appear on EVERY turn — the point of that case is confirming turn
   2 re-queries instead of answering from turn 1's stale digest. Otherwise (`markdown_table_
 suppression`), only turn 1 is checked — its own rubric treats turn 1 as setup that must produce a
-  real `get_alerts_by_time` call, while turn 2 is allowed to reformat from history without
+  real `get_findings_by_time` call, while turn 2 is allowed to reformat from history without
   re-querying. This branch is driven by the `requires_tool_call_each_turn` case field, not a
   hardcoded case id.
 - `answer_must_match`/`answer_must_not_match`: regex (case-insensitive, same as `run_live.js`),
@@ -618,7 +618,7 @@ Selects what each load-generated question looks like:
   holding an SSE connection open for a controllable duration — the mode that actually exercises
   sustained concurrent-stream memory/CPU, independent of any tool-calling path.
 - **`tool`**: every question cycles through a small fixed set of real catalog tools
-  (`get_active_agents`, `get_critical_alerts`, `get_top_rules`, `search_alerts_by_agent`), each
+  (`get_active_agents`, `get_critical_findings`, `get_top_rules`, `search_findings_by_agent`), each
   prefixed with the matching `[[route:CATEGORY]]` marker (same two-stage-router mechanics as
   `run_plumbing.js`) and suffixed with `[[mock:TOOLNAME:{json args}]]` — measures footprint for the
   tool-calling + digest path instead of a long-held stream.

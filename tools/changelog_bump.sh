@@ -8,9 +8,9 @@
 # From 5.x, each changelog only contains its own version changes and
 # references the prior changelogs with links, so on a version bump this
 # script:
-#   - Resets the changelog to a single "## [vX.Y.Z]" entry with empty
-#     Added/Changed/Removed/Fixed sections, where Added starts with the
-#     "- Support for Wazuh X.Y.Z" entry.
+#   - Resets the changelog to a single "## [vX.Y.Z]" entry with an empty
+#     "| Issue | Comment |" table under each of the Added/Changed/
+#     Removed/Fixed sections.
 #   - Rebuilds the "## Prior versions" section with the two most recent
 #     minors below the new version, including every patch of each,
 #     newest first.
@@ -112,7 +112,18 @@ function print_prior_versions_section() {
 }
 
 # ====
-# Rewrite CHANGELOG.md with the new version entry (empty sections) and the
+# Print a changelog section heading followed by an empty entries table.
+# Arguments:
+#   $1 - section name (Added, Changed, Removed, Fixed)
+# ====
+function print_section() {
+    printf '### %s\n\n' "$1"
+    printf '| Issue | Comment |\n'
+    printf '| ----- | ------- |\n\n'
+}
+
+# ====
+# Rewrite CHANGELOG.md with the new version entry (empty tables) and the
 # rebuilt "## Prior versions" section.
 # Arguments:
 #   $1 - new version
@@ -124,11 +135,10 @@ function write_changelog() {
 
     {
         printf '## [v%s]\n\n' "$new_version"
-        printf '### Added\n\n'
-        printf -- '- Support for Wazuh %s\n\n' "$new_version"
-        printf '### Changed\n\n'
-        printf '### Removed\n\n'
-        printf '### Fixed\n\n'
+        print_section 'Added'
+        print_section 'Changed'
+        print_section 'Removed'
+        print_section 'Fixed'
         print_prior_versions_section "$new_version"
     } > "$temp_file"
 

@@ -7,28 +7,29 @@ import {
   WidgetGroup,
   StatTile,
   TabNumber,
+  BarList,
   FindingSeverityTiles,
   SectionHeader,
   WIDGET_LOADING_MIN_HEIGHT,
 } from '../common';
 import { TopRulesTable } from './top-rules-table';
-import { TopTechniquesTable } from './top-techniques-table';
-import { VulnerabilitiesByOsTable } from './vulnerabilities-by-os-table';
+import { TopPackagesTable } from './top-packages-table';
 import {
   useFindingsOverview,
   useVulnerabilityOverview,
 } from '../../hooks/use-overview-data';
 import {
+  getMitreIntelligenceResourceUrl,
   getMitreUrl,
-  getMitreTechniqueUrl,
   getThreatHuntingUrl,
+  getVulnerabilityDetectionBySeverityUrl,
   getVulnerabilityDetectionUrl,
 } from '../../utils/navigation';
 
 export interface ThreatHuntingSectionProps {
   /** Reuses the Overview on-mount findings search. */
   findings: ReturnType<typeof useFindingsOverview>;
-  /** Shared (lazy) vulnerabilities search, also used by the Threat Intel Feed. */
+  /** Lazy vulnerabilities search, fetched once this section scrolls into view. */
   vulnerabilities: ReturnType<typeof useVulnerabilityOverview>;
 }
 
@@ -43,38 +44,6 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
         description='Hunt for threats, map activity to MITRE ATT&CK, and detect known vulnerabilities.'
       />
       <EuiFlexGroup wrap responsive={false}>
-        <EuiFlexItem>
-          <WidgetGroup
-            status={findings.status}
-            errorLabel={findings.error?.message}
-            showManageIndexPatternsLink={
-              findings.error?.kind === 'index-pattern-missing'
-            }
-            isPermissionDenied={findings.error?.kind === 'permission-denied'}
-            title={
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink href={getThreatHuntingUrl()}>Threat Hunting</EuiLink>
-              </RedirectAppLinks>
-            }
-            caption='Last 24 hours'
-            loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
-            data-test-subj='home-overview-threat-hunting-findings'
-          >
-            {findings.data && (
-              <>
-                <StatTile
-                  textAlign='center'
-                  reverse
-                  value={<TabNumber value={findings.data.totalFindings} />}
-                  label='Total findings'
-                  data-test-subj='total-findings-hero'
-                />
-                <EuiSpacer size='s' />
-                <TopRulesTable items={findings.data.topRules} />
-              </>
-            )}
-          </WidgetGroup>
-        </EuiFlexItem>
         <EuiFlexItem>
           <WidgetGroup
             status={findings.status}
@@ -102,14 +71,58 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                   data-test-subj='techniques-hero'
                 />
                 <EuiSpacer size='s' />
-                <RedirectAppLinks application={getCore().application}>
-                  <TopTechniquesTable
-                    items={findings.data.topTechniques}
-                    onSelect={item =>
-                      getMitreTechniqueUrl(item.id, findings.indexPatternId)
-                    }
-                  />
-                </RedirectAppLinks>
+                <BarList
+                  title='Top 5 techniques'
+                  items={findings.data.topTechniques}
+                  emptyMessage='No techniques observed'
+                  getHref={item =>
+                    getMitreIntelligenceResourceUrl('techniques', item)
+                  }
+                  data-test-subj='top-techniques'
+                />
+              </>
+            )}
+          </WidgetGroup>
+        </EuiFlexItem>
+        <EuiFlexItem>
+          <WidgetGroup
+            status={findings.status}
+            errorLabel={findings.error?.message}
+            showManageIndexPatternsLink={
+              findings.error?.kind === 'index-pattern-missing'
+            }
+            isPermissionDenied={findings.error?.kind === 'permission-denied'}
+            title={
+              <RedirectAppLinks application={getCore().application}>
+                <EuiLink href={getThreatHuntingUrl()}>Threat Hunting</EuiLink>
+              </RedirectAppLinks>
+            }
+            caption='Last 24 hours'
+            loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
+            data-test-subj='home-overview-threat-hunting-findings'
+          >
+            {findings.data && (
+              <>
+                <StatTile
+                  textAlign='center'
+                  reverse
+                  value={
+                    <RedirectAppLinks application={getCore().application}>
+                      <EuiLink
+                        style={{ fontWeight: 'inherit' }}
+                        color='text'
+                        href={getThreatHuntingUrl()}
+                        data-test-subj='total-findings-hero-link'
+                      >
+                        <TabNumber value={findings.data.totalFindings} />
+                      </EuiLink>
+                    </RedirectAppLinks>
+                  }
+                  label='Total findings'
+                  data-test-subj='total-findings-hero'
+                />
+                <EuiSpacer size='s' />
+                <TopRulesTable items={findings.data.topRules} />
               </>
             )}
           </WidgetGroup>
@@ -140,9 +153,16 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                 <FindingSeverityTiles
                   counts={vulnerabilities.data.severity}
                   testSubjPrefix='vulnerability-severity'
+                  onSelect={band =>
+                    getVulnerabilityDetectionBySeverityUrl(
+                      band,
+                      vulnerabilities.indexPatternId,
+                    )
+                  }
+                  getTooltip={band => `Click to see vulnerabilities: ${band}`}
                 />
                 <EuiSpacer size='s' />
-                <VulnerabilitiesByOsTable items={vulnerabilities.data.byOs} />
+                <TopPackagesTable items={vulnerabilities.data.byPackage} />
               </>
             )}
           </WidgetGroup>
@@ -152,6 +172,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
   );
 };
 
-export const ThreatHuntingSection = React.memo(
-  withErrorBoundary(ThreatHuntingSectionComponent),
-);
+// Annotated: `withErrorBoundary` is untyped, so without this the props
+// would reach every call site as `any`.
+export const ThreatHuntingSection: React.FC<ThreatHuntingSectionProps> =
+  React.memo(withErrorBoundary(ThreatHuntingSectionComponent));

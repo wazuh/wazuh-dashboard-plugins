@@ -21,7 +21,7 @@ import {
 } from '../../common/types';
 import { describeError } from '../../common/errors';
 import { getProviderAdapter } from '../providers/registry';
-import { ProviderAdapter } from '../providers/types';
+import { ChatStreamOptions, ProviderAdapter } from '../providers/types';
 import { buildSystemPrompt } from '../prompts';
 import { listToolSpecs } from '../tools/registry';
 import {
@@ -57,6 +57,54 @@ interface StoredProviderAttributes {
 
 /** Bounded tool rounds per turn; a final no-tools round follows to close out the answer. */
 const MAX_TOOL_ROUNDS = 3;
+
+/**
+ * Fallback narration for a turn that used at least one tool but whose model never emitted any
+ * `delta` text of its own before ending in `done` — observed with a tool call that returned zero
+ * rows, where the model apparently considered the (empty) table sufficient and said nothing.
+ * Without this, the user sees a bare table (or nothing at all, for a zero-row result) with no
+ * written answer. Two variants: the table rendered something (`sawNonEmptyTable`) vs. the query
+ * came back empty. Both are tables-oriented copy — see NO_ANSWER_MESSAGE below for the sibling
+ * case where no tool ran at all, which this copy would misdescribe.
+ */
+const NO_ANALYSIS_TEXT_MESSAGE =
+  'No additional analysis — see the results above.';
+const NO_MATCHING_RESULTS_MESSAGE =
+  'No matching results were found for that query.';
+/**
+ * Sibling fallback for a `general`-routed (no-tool) turn that still ends with no text at all —
+ * e.g. a reasoning model streaming its entire answer on a channel nothing reads (issue
+ * 02-read-reasoning-delta.md's `openai-compatible.ts` fix is the known cause; this is the
+ * structural backstop for any future one). Deliberately its own copy rather than reusing
+ * NO_ANALYSIS_TEXT_MESSAGE/NO_MATCHING_RESULTS_MESSAGE above: both of those say or imply "see the
+ * results above" / "that query", which is wrong here — no tool ran, so there is no table and no
+ * query to refer to.
+ */
+const NO_ANSWER_MESSAGE =
+  'I was not able to come up with an answer for that. Try rephrasing your question.';
+
+/** Picks which of the three no-text fallbacks above fits a turn that ended without any `delta`
+ * text — shared by both `!sawAnyDelta` exit points below (the normal per-round `done` branch and
+ * the round-budget-exhausted path) so the same three-way decision lives in exactly one place. */
+function noTextFallbackMessage(
+  toolUsedThisTurn: boolean,
+  sawNonEmptyTable: boolean,
+): string {
+  if (!toolUsedThisTurn) {
+    return NO_ANSWER_MESSAGE;
+  }
+  return sawNonEmptyTable
+    ? NO_ANALYSIS_TEXT_MESSAGE
+    : NO_MATCHING_RESULTS_MESSAGE;
+}
+
+/** Whitespace-only delta content (e.g. a lone "\n\n" some models emit as priming/formatting
+ * right before a tool call) must NOT count as "the model produced an answer" — otherwise the
+ * `sawAnyDelta` guard above never fires for exactly the turns it exists to catch. Still forwarded
+ * to the client as a normal delta either way; this only affects the tracking flag. */
+function hasMeaningfulText(content: string): boolean {
+  return content.trim().length > 0;
+}
 
 /**
  * Concurrent-stream cap. Without it, one script or user can open unlimited concurrent streams --
@@ -402,18 +450,18 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
         });
       }
 
-      // Decrypt-on-read (server/crypto/api-key-cipher.ts): the saved object may hold `enc:v2:`
+      // Decrypt-on-read (server/crypto/api-key-cipher.ts): the saved object may hold `enc:v1:`
       // ciphertext (AAD-bound to `providerId`, the id this exact saved object was fetched by
-      // above), legacy `enc:v1:` ciphertext (unbound, no AAD), or legacy plaintext — decrypt()
-      // passes plaintext through unchanged either way, so this is a no-op when no encryptionKey is
-      // configured. Passing `providerId` here is what makes the v2 substitution-attack detection
-      // real for chat: if this saved object's `apiKey` were ever a v2 blob copied in from a
-      // DIFFERENT provider's row, this call — using THIS provider's own id — would hard-fail
-      // rather than silently decrypt to the wrong provider's key. Kept in its own try/catch,
-      // separate from the "unknown provider" one above, so a decrypt failure (ciphertext present
-      // but no/rotated encryptionKey, or an AAD/id mismatch — both real server misconfigurations,
-      // the latter now also covering the substitution attack) is never misreported to the client
-      // as "unknown provider".
+      // above) — anything else (a legacy PLAINTEXT key from a pre-release build) makes decrypt()
+      // throw: plaintext keys are never used, the admin must re-enter them. Passing `providerId`
+      // here is what makes the substitution-attack detection real for chat: if this saved
+      // object's `apiKey` were ever a ciphertext blob copied in from a DIFFERENT provider's row,
+      // this call — using THIS provider's own id — would hard-fail rather than silently decrypt
+      // to the wrong provider's key. Kept in its own try/catch, separate from the "unknown
+      // provider" one above, so a decrypt failure (plaintext value, ciphertext present but
+      // no/rotated encryptionKey, or an AAD/id mismatch — all real server misconfigurations, the
+      // latter also covering the substitution attack) is never misreported to the client as
+      // "unknown provider".
       let providerConfig: ProviderConfig;
       try {
         providerConfig = {
@@ -548,8 +596,13 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
 
 /** What `runStage1Routing` resolves to once its (internal-only) adapter stream ends. */
 interface Stage1Result {
-  /** `undefined` means "no tools this turn" (routed to `general` alone). */
-  tools: ToolSpec[] | undefined;
+  /**
+   * Never empty and never `undefined` — `resolveStage2Tools` (server/tools/router.ts) always
+   * resolves at least a minimal recovery set (`get_security_summary` + `search_wazuh_data`) even
+   * when the model routed to `general` alone, so a stage-1 misclassification is recoverable
+   * mid-turn rather than leaving the round with no tools at all.
+   */
+  tools: ToolSpec[];
 }
 
 /**
@@ -595,6 +648,10 @@ async function* runStage1Routing(
     {
       tools: [ROUTE_QUESTION_TOOL],
       toolChoice: { name: ROUTE_QUESTION_TOOL.name },
+      // Stage 1's only job is one structured pick out of a fixed enum (route_question's
+      // categories) — the lowest temperature Groq's tool-use guidance names (issue
+      // 05-set-temperature-for-tool-calls.md) is the right setting for that, not a range.
+      temperature: 0,
     },
   )) {
     if (signal.aborted) {
@@ -694,6 +751,16 @@ async function* orchestrate(
   let tools: ToolSpec[] | undefined = listToolSpecs();
   let messages = initialMessages;
   let sawNonEmptyTable = false;
+  // Whole-turn guards (not per-round, unlike `sawToolCall` below which resets every round): true
+  // once ANY delta text / tool call has happened THIS TURN, across every round — see
+  // NO_ANALYSIS_TEXT_MESSAGE/NO_MATCHING_RESULTS_MESSAGE/NO_ANSWER_MESSAGE above. `toolUsedThisTurn`
+  // now only picks WHICH fallback copy fits (tables-oriented vs. the generic one) — every no-text
+  // ending gets *some* fallback text; see the `!sawAnyDelta` branches below. It no longer gates
+  // whether a fallback fires at all: a plain no-tool conversational turn that ends with no text is
+  // exactly the case a `general`-routed reasoning-only stream produces (issue
+  // 02-read-reasoning-delta.md), and it deserves a sentence, not a silently empty bubble.
+  let sawAnyDelta = false;
+  let toolUsedThisTurn = false;
 
   /** Yields a `privacy_map` event for any pseudonym entries minted so far this turn, but only
    * once total ("once per turn... when newEntries() is non-empty") — guarded
@@ -744,15 +811,39 @@ async function* orchestrate(
     }
 
     const isFinalRound = round === MAX_TOOL_ROUNDS;
-    const streamOptions = isFinalRound
-      ? { tools, toolChoice: 'none' as const }
-      : { tools, toolChoice: 'auto' as const };
+    // Final round: omit `tools` entirely rather than send `{tools, toolChoice: 'none'}`. That hint
+    // depends on the model complying with it — Groq's own docs warn some models call a tool anyway
+    // and the API then 400s ("Tool choice is none, but model called a tool"), observed on
+    // openai/gpt-oss-120b in 1 of 3 runs (issue 03-tool-choice-none-final-round.md). With no tools
+    // offered there is nothing to call and no compliance to depend on: the adapter's own
+    // `if (options?.tools?.length)` guard (openai-compatible.ts/anthropic.ts) already omits
+    // `tools`/`tool_choice` from the wire body whenever `tools` is empty/undefined, so this is a
+    // structural terminator instead of a request-level one.
+    const streamOptions: ChatStreamOptions = isFinalRound
+      ? {}
+      : {
+          tools,
+          toolChoice: 'auto',
+          // Tool-bearing round: keep sampling low, per Groq's tool-use guidance (0.0-0.5), since a
+          // high default temperature (Groq's is 1.0) is a documented contributing cause of
+          // malformed tool calls (issue 05-set-temperature-for-tool-calls.md). Only set when this
+          // round actually offers tools (`tools` is `undefined` on a `general`-routed, no-tool
+          // turn) — a plain-prose round has no structured output to protect and no reason to
+          // deviate from the provider's own default.
+          ...(tools?.length ? { temperature: 0.2 } : {}),
+        };
 
     // Outbound scrub: a fresh transformed COPY per round — `messages` itself keeps
     // accumulating unscrubbed below so later rounds re-scrub from the same source of truth.
     const outboundMessages = privacyCtx
       ? scrubMessagesForProvider(messages, privacyCtx.pseudonymizer)
       : messages;
+    // Inbound un-scrub: this is why the ANSWER the analyst reads carries real hostnames/IPs even
+    // with privacy mode on — every delta is run back through the pseudonym map here, so `HOST_1`
+    // becomes the real hostname again before it leaves the server. Pseudonyms exist for the provider
+    // request above, not for the reader (issue #8821; the field policy's boundaries are spelled out
+    // in server/tools/privacy.ts's module header).
+    //
     // The streaming holdback is scoped to ONE adapter stream read: recreated every round so a
     // round that ends via tool_call/done/error always starts its successor with an empty buffer.
     const depseudonymizer = privacyCtx
@@ -797,6 +888,9 @@ async function* orchestrate(
           content = tableSuppressor.push(content);
         }
         if (content) {
+          if (hasMeaningfulText(content)) {
+            sawAnyDelta = true;
+          }
           yield { type: 'delta', content };
         }
         continue;
@@ -804,6 +898,7 @@ async function* orchestrate(
 
       if (event.type === 'tool_call') {
         sawToolCall = true;
+        toolUsedThisTurn = true;
         if (signal.aborted) {
           return;
         }
@@ -812,6 +907,9 @@ async function* orchestrate(
           // resolved before the round moves on.
           const trailing = drainRoundBuffers();
           if (trailing) {
+            if (hasMeaningfulText(trailing)) {
+              sawAnyDelta = true;
+            }
             yield { type: 'delta', content: trailing };
           }
         }
@@ -898,6 +996,9 @@ async function* orchestrate(
         {
           const trailing = drainRoundBuffers();
           if (trailing) {
+            if (hasMeaningfulText(trailing)) {
+              sawAnyDelta = true;
+            }
             yield { type: 'delta', content: trailing };
           }
         }
@@ -905,6 +1006,16 @@ async function* orchestrate(
           // More rounds needed: suppress this 'done' (the turn isn't over) and start the next
           // round with the grown message history instead of ending the SSE stream here.
           break;
+        }
+        // The turn is genuinely over (this round made no tool call) and the model never produced
+        // any text at all — see NO_ANALYSIS_TEXT_MESSAGE/NO_ANSWER_MESSAGE's doc comments. Which
+        // copy fits depends on whether a tool ran earlier this turn; if none did, there is no
+        // table and no query to reference, so NO_ANSWER_MESSAGE is used instead.
+        if (!sawAnyDelta) {
+          yield {
+            type: 'delta',
+            content: noTextFallbackMessage(toolUsedThisTurn, sawNonEmptyTable),
+          };
         }
         yield* emitPrivacyMapOnce();
         yield event;
@@ -939,7 +1050,15 @@ async function* orchestrate(
   }
 
   // Exhausted the round budget and the forced-final (no-tools) round still didn't end cleanly
-  // above; close the SSE stream rather than hang the client.
+  // above; close the SSE stream rather than hang the client. Same widened no-text guard as the
+  // main 'done' branch above — a model that never produced text deserves a written answer, not a
+  // bare done, regardless of whether a tool ran.
+  if (!sawAnyDelta) {
+    yield {
+      type: 'delta',
+      content: noTextFallbackMessage(toolUsedThisTurn, sawNonEmptyTable),
+    };
+  }
   yield* emitPrivacyMapOnce();
   yield { type: 'done' };
 }
