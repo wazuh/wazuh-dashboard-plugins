@@ -73,7 +73,7 @@
       "body": {
         "query": {
           "regexp": {
-            "rule.description": {
+            "wazuh.rule.title": {
               "value": ".*brute.*"
             }
           }
@@ -90,7 +90,7 @@
       "body": {
         "query": {
           "wildcard": {
-            "agent.name": {
+            "wazuh.agent.name": {
               "value": "*prod*"
             }
           }
@@ -322,7 +322,7 @@
         "aggs": {
           "by_rule": {
             "terms": {
-              "field": "rule.id",
+              "field": "wazuh.rule.id",
               "size": 500
             }
           }
@@ -331,7 +331,7 @@
       },
       "expect": "reject",
       "reason_match": "exceeds the maximum",
-      "citation": "guardrails.ts:84 MAX_AGG_SIZE=100; guardrails.ts:251-253 checkAggs rejects when an allowlisted field's terms agg 'size' still exceeds 100 (rule.id itself IS allowlisted, guardrails.ts:65, so only the size trips this one)."
+      "citation": "guardrails.ts:84 MAX_AGG_SIZE=100; guardrails.ts:251-253 checkAggs rejects when an allowlisted field's terms agg 'size' still exceeds 100 (wazuh.rule.id itself IS allowlisted, guardrails.ts:65, so only the size trips this one)."
     },
     {
       "name": "index_not_on_allowlist",
@@ -389,7 +389,7 @@
             "filter": [
               {
                 "range": {
-                  "rule.level": {
+                  "wazuh.rule.level": {
                     "gte": 15
                   }
                 }
@@ -416,7 +416,7 @@
       },
       "expect": "pass",
       "reason_match": null,
-      "citation": "Shape of get_critical_alerts.ts:34-46's real, in-production query -- must pass cleanly end to end (checkIndexAllowlist, applySafetyValves, lintDsl all ok:true)."
+      "citation": "Shape of get_critical_findings.ts:34-46's real, in-production query -- must pass cleanly end to end (checkIndexAllowlist, applySafetyValves, lintDsl all ok:true)."
     },
     {
       "name": "clean_aggregation_query",
@@ -439,7 +439,7 @@
         "aggs": {
           "top_rules": {
             "terms": {
-              "field": "rule.id",
+              "field": "wazuh.rule.id",
               "size": 20
             }
           }
@@ -448,7 +448,7 @@
       },
       "expect": "pass",
       "reason_match": null,
-      "citation": "Shape of get_top_rules.ts:32-44's real, in-production aggregation query (minus the top_hits sub-agg, irrelevant to guardrails) -- rule.id is allowlisted and size is well under the 100 cap."
+      "citation": "Shape of get_top_rules.ts:32-44's real, in-production aggregation query (minus the top_hits sub-agg, irrelevant to guardrails) -- wazuh.rule.id is allowlisted and size is well under the 100 cap."
     },
     {
       "name": "time_range_in_should_bypasses_mandatory_check",
@@ -534,7 +534,7 @@
                   "field": "data.srcip"
                 },
                 {
-                  "field": "agent.id"
+                  "field": "wazuh.agent.id"
                 }
               ],
               "size": 10000
@@ -545,7 +545,7 @@
       },
       "expect": "reject",
       "reason_match": "not on the allowed low-cardinality field list",
-      "citation": "(returns data.srcip buckets with size 10000 honored). checkAggs now iterates multi_terms.terms[].field against AGG_FIELD_ALLOWLIST and checks multi_terms.size."
+      "citation": "(returns data.srcip buckets with size 10000 honored). checkAggs now iterates multi_terms.terms[].field against AGG_FIELD_ALLOWLIST and checks multi_terms.size (wazuh.agent.id itself IS allowlisted; data.srcip is the field that trips the rejection)."
     },
     {
       "name": "composite_agg_size_never_checked",
@@ -573,7 +573,7 @@
                 {
                   "agent": {
                     "terms": {
-                      "field": "agent.id"
+                      "field": "wazuh.agent.id"
                     }
                   }
                 }
@@ -585,7 +585,7 @@
       },
       "expect": "reject",
       "reason_match": "exceeds the maximum",
-      "citation": ". agent.id is allowlisted so only composite.size=10000 trips the check, which the composite branch now enforces against MAX_AGG_SIZE."
+      "citation": ". wazuh.agent.id is allowlisted so only composite.size=10000 trips the check, which the composite branch now enforces against MAX_AGG_SIZE."
     },
     {
       "name": "date_histogram_tiny_interval_bucket_explosion",
@@ -662,7 +662,7 @@
       "citation": "/latent (not reachable today: index is enum-locked in schema_validator). INDEX_ALLOWLIST_RE now rejects a comma/whitespace-smuggled disallowed index appended after a valid prefix."
     },
     {
-      "name": "vuln_field_match_on_alerts_index_rejected",
+      "name": "vuln_field_match_on_findings_index_rejected",
       "index": "wazuh-findings-v5-*",
       "body": {
         "query": {
@@ -688,7 +688,7 @@
       },
       "expect": "reject",
       "reason_match": "Vulnerability data is not in the findings/events index",
-      "citation": "Observed against the 4.14 equivalent of this query: this is the shape of escape-hatch query the model hand-builds instead of calling a typed vulnerability tool. guardrails.ts's findVulnerabilityFieldOnAlertsIndex (called from lintDsl, before the mandatory-time-range check) rejects any match/match_phrase/term/terms/range/exists clause on a data.vulnerability.*/vulnerability.* field against a time-based (wazuh-events-v5-*/wazuh-findings-v5-*) index, naming the typed vulnerability tools so the model self-corrects in the same turn. The 5.0 port retired both get_solved_vulnerabilities and its per-tool exemption on this check (lintDsl no longer takes a toolName argument), so this rejection is now unconditional on a time-based index -- there is no legitimate caller of vulnerability fields on the findings/events timeline."
+      "citation": "This is the shape of escape-hatch query the model hand-builds instead of calling a typed vulnerability tool. guardrails.ts's findVulnerabilityFieldOnFindingsIndex (called from lintDsl, before the mandatory-time-range check) rejects any match/match_phrase/term/terms/range/exists clause on a data.vulnerability.*/vulnerability.* field against a time-based (wazuh-events-v5-*/wazuh-findings-v5-*) index, naming the typed vulnerability tools so the model self-corrects in the same turn. There is no legitimate caller of vulnerability fields on the findings/events timeline."
     },
     {
       "name": "vuln_field_match_on_states_index_still_passes",
@@ -703,7 +703,7 @@
       },
       "expect": "pass",
       "reason_match": null,
-      "citation": "Regression guard against overreach for vuln_field_match_on_alerts_index_rejected: the check keys on TIME_BASED_INDEX_RE (wazuh-events-v5-*/wazuh-findings-v5-* only, as of the 5.0 port), so the exact same field filter against wazuh-states-vulnerabilities-* -- the real current-state index every vulnerability tool targets -- must never be rejected by this rule. wazuh-states-* is also exempt from the mandatory-time-range check (see states_index_no_time_range_still_passes), so this case passes end to end."
+      "citation": "Regression guard against overreach for vuln_field_match_on_findings_index_rejected: the check keys on TIME_BASED_INDEX_RE (wazuh-events-v5-*/wazuh-findings-v5-* only, as of the 5.0 port), so the exact same field filter against wazuh-states-vulnerabilities-* -- the real current-state index every vulnerability tool targets -- must never be rejected by this rule. wazuh-states-* is also exempt from the mandatory-time-range check (see states_index_no_time_range_still_passes), so this case passes end to end."
     }
   ]
 }

@@ -1,17 +1,47 @@
 import { Digest } from './digest';
+import { WAZUH_FIELD } from '../../common/wazuh-fields';
 
 /**
  * Privacy mode: reversible pseudonymization at
  * the digest boundary. Everything in this module is pure/stateless-per-instance — no module-level
  * caches — so it is safe to construct fresh per HTTP request (see server/routes/chat.ts).
+ *
+ * WHAT THE FIELD POLICY DOES AND DOES NOT DO (issue #8821 was filed because this was not written
+ * down anywhere, and the behavior reads like a bug until it is):
+ *
+ * The policy has exactly ONE boundary — what the AI provider receives — and the three actions differ
+ * only in how much of a field's value get there:
+ *
+ * - `allow`: the provider receives the real value. Also the default for a field with no entry on a
+ *   typed catalog tool (the search_wazuh_data escape hatch flips that default to `anonymize` — see
+ *   `applyFieldPolicy`'s `isEscapeHatch`).
+ * - `anonymize`: the provider receives a reversible pseudonym (`HOST_1`, `IP_2`) instead.
+ * - `never`: the provider receives NOTHING for that field. `applyFieldPolicy` drops it from the
+ *   digest's `samples`, drops its aggregation buckets from `breakdown`, and drops its name from the
+ *   `columns` schema hint — so neither the value, nor a pseudonym of it, nor even the fact that the
+ *   field exists is sent.
+ *
+ * What the policy deliberately does NOT touch:
+ *
+ * - The EXECUTED QUERY. No action rewrites `_source`, the Manager API's `select`, or rejects an
+ *   aggregation. The field is always retrieved — it has to be, because the analyst is meant to see it.
+ * - Anything LOCAL. The results table (`buildTableSpec`, streamed straight to the browser), the
+ *   answer text (server/routes/chat.ts runs every provider delta back through
+ *   `StreamDepseudonymizer`, so `HOST_1` becomes the real hostname again before it leaves the server)
+ *   and the tool-call panel (emitted with real arguments) all show the analyst their OWN data, in
+ *   full, for every action including `never`.
+ *
+ * So "I set wazuh.agent.name to Never send and the results table still shows it" is the intended
+ * behavior, not a leak: that table never left the cluster. The check that matters is what the
+ * provider request body carries.
  */
 
 export type FieldPolicyAction = 'allow' | 'anonymize' | 'never';
 
 export interface FieldPolicyEntry {
-  /** Either a plain digest field path ("agent.name", "GeoLocation.*") or a tool-scoped form
-   * ("get_active_agents/name") for Manager-API tools whose digest fields are bare, generic names
-   * ("name" means an agent hostname in get_active_agents but a package name in
+  /** Either a plain digest field path ("wazuh.agent.name") or a tool-scoped form
+   * ("get_agents/name") for Manager-API tools whose digest fields are bare, generic names
+   * ("name" means an agent hostname in get_agents but a package name in
    * get_agent_packages — only tool scoping can distinguish them). Scoped entries win over plain
    * ones for their tool. */
   field: string;
@@ -21,61 +51,21 @@ export interface FieldPolicyEntry {
   kind?: PseudonymKind;
 }
 
-/**
- * Curated defaults. `full_log` is 'never' (Never-send: stripped from the digest entirely);
- * everything else here is 'anonymize'. `GeoLocation.*` uses the trailing `.*` prefix-match
- * convention (matches "GeoLocation" itself or any "GeoLocation.<subfield>").
- *
- * `data.username` is deliberately singular. A plural `data.usernames` variant could not be
- * confirmed against the wazuh-dashboard-plugins known-fields cache, and inventing a field name
- * that does not exist would add a policy entry that silently never matches.
- */
+/** Curated defaults. Every entry targets a valid `wazuh.*`/ECS/WCS field — population is
+ * decoder-dependent, so an entry may currently be inert (no matching data) without being wrong. */
 export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
-  { field: 'agent.name', action: 'anonymize' },
-  { field: 'agent.ip', action: 'anonymize' },
-  // Wazuh 5.0 ECS rename: the states/inventory families carry the
-  // agent identity under `wazuh.agent.*`. The retargeted vulnerability tools' digests emit
-  // `wazuh.agent.name`; keep the bare `agent.*` entries above too, since alert tools not yet moved
-  // off wazuh-alerts-* still emit those during the transition.
-  { field: 'wazuh.agent.name', action: 'anonymize', kind: 'HOST' },
-  { field: 'wazuh.agent.id', action: 'allow' },
-  { field: 'data.srcip', action: 'anonymize' },
-  { field: 'data.dstip', action: 'anonymize' },
-  { field: 'data.srcuser', action: 'anonymize' },
-  { field: 'data.dstuser', action: 'anonymize' },
-  { field: 'data.username', action: 'anonymize' },
-  { field: 'predecoder.hostname', action: 'anonymize' },
-  { field: 'GeoLocation.*', action: 'anonymize' },
-  { field: 'data.url', action: 'anonymize' },
-  { field: 'full_log', action: 'never' },
-  // Every field the row/digest widening (server/tools/catalog/common.ts's
-  // ALERT_INVESTIGATION_ROW_FIELDS/ALERT_DIGEST_EXTRA_COLUMNS) exposes to the model must be
-  // classified here.
-  // `data.srcip`/`data.srcuser`/`data.dstuser` are already covered above (anonymize, kind inferred
-  // as IP/USER from the field name). `data.command` can embed hostnames/paths/usernames — VAL (not
-  // USER/HOST) since it is free-text shell input, not a single identifier. `rule.groups`,
-  // `rule.mitre.id`, and `predecoder.program_name` are curated taxonomy/decoder fields, not
-  // analyst-supplied data — explicit 'allow' entries so a future audit sees them as reviewed, not
-  // merely unlisted.
-  { field: 'data.command', action: 'anonymize', kind: 'VAL' },
-  { field: 'rule.groups', action: 'allow' },
-  { field: 'rule.mitre.id', action: 'allow' },
-  { field: 'predecoder.program_name', action: 'allow' },
+  { field: WAZUH_FIELD.AGENT_NAME, action: 'anonymize', kind: 'HOST' },
+  { field: WAZUH_FIELD.AGENT_IP, action: 'anonymize', kind: 'IP' },
+  { field: WAZUH_FIELD.AGENT_ID, action: 'allow' },
   // Manager-API tools carry bare, generic digest field names ("name", "ip") that must be scoped
   // per tool: "name" is an agent hostname here but a package name in get_agent_packages (which
   // must stay readable for the model to be useful).
-  { field: 'get_active_agents/name', action: 'anonymize', kind: 'HOST' },
-  { field: 'get_active_agents/ip', action: 'anonymize', kind: 'IP' },
-  { field: 'get_disconnected_agents/name', action: 'anonymize', kind: 'HOST' },
-  { field: 'get_disconnected_agents/ip', action: 'anonymize', kind: 'IP' },
-  // Wazuh 5.0 rewrites: the syscollector/SCA tools moved from bare
-  // Manager JSON names to ECS Indexer paths, so the old tool-scoped entries
-  // (get_agent_os/hostname, get_agent_ports/local.ip + remote.ip, get_agent_processes/euser +
-  // ruser, get_sca_checks/*) were replaced by the BARE entries below — the ECS paths are
-  // unambiguous across tools (host.hostname is always a hostname, source.ip always an IP), so
-  // tool scoping is no longer needed, and the same entries will cover the alert tools once they
-  // move to the findings index (same ECS namespace). euser/ruser died with 4.14 (no owner field
-  // in 5.0 process inventory — see get-agent-processes.ts).
+  { field: 'get_agents/name', action: 'anonymize', kind: 'HOST' },
+  { field: 'get_agents/ip', action: 'anonymize', kind: 'IP' },
+  // The syscollector/SCA tools use ECS Indexer paths rather than bare tool-scoped names, so the
+  // BARE entries below apply — the ECS paths are unambiguous across tools (host.hostname is
+  // always a hostname, source.ip always an IP), so tool scoping is not needed. There is no owner
+  // field in the process inventory (see get-agent-processes.ts).
   { field: 'host.hostname', action: 'anonymize', kind: 'HOST' },
   { field: 'source.ip', action: 'anonymize', kind: 'IP' },
   { field: 'destination.ip', action: 'anonymize', kind: 'IP' },
@@ -83,17 +73,20 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'destination.user.name', action: 'anonymize', kind: 'USER' },
   { field: 'process.command_line', action: 'anonymize', kind: 'VAL' },
   { field: 'file.owner', action: 'anonymize', kind: 'USER' },
-  // Curated rule taxonomy / MITRE catalog / compliance requirements on findings-v5 (Wave 3):
-  // not analyst/attacker-supplied — reviewed 'allow', replacing the 4.14 rule.groups/rule.mitre.id
-  // entries below (kept inert for the not-yet-migrated escape-hatch paths).
-  { field: 'rule.tags', action: 'allow' },
-  { field: 'rule.category', action: 'allow' },
-  { field: 'rule.compliance.pci_dss', action: 'allow' },
-  { field: 'rule.mitre.technique.id', action: 'allow' },
-  { field: 'rule.mitre.technique.name', action: 'allow' },
-  { field: 'rule.mitre.tactic.name', action: 'allow' },
-  // Curated benchmark/policy content (CIS etc.), not analyst/attacker-supplied — reviewed 'allow'
-  // (same rationale as the 4.14 get_sca_checks/* entries these replace).
+  // Curated rule taxonomy / MITRE catalog / compliance requirements on findings-v5: not
+  // analyst/attacker-supplied — reviewed 'allow'.
+  { field: WAZUH_FIELD.RULE_TAGS, action: 'allow' },
+  { field: WAZUH_FIELD.RULE_CATEGORY, action: 'allow' },
+  // Wildcard covers every compliance framework (pci_dss, hipaa, gdpr, iso_27001, nis2,
+  // nist_800_171, nist_800_53, fedramp, cmmc, tsc, ...), not just the one this plugin has a
+  // dedicated tool for — all are curated requirement-tag lists, equally not
+  // analyst/attacker-supplied.
+  { field: 'wazuh.rule.compliance.*', action: 'allow' },
+  { field: WAZUH_FIELD.RULE_MITRE_TECHNIQUE_ID, action: 'allow' },
+  { field: WAZUH_FIELD.RULE_MITRE_TECHNIQUE_NAME, action: 'allow' },
+  { field: WAZUH_FIELD.RULE_MITRE_TACTIC, action: 'allow' },
+  { field: WAZUH_FIELD.RULE_MITRE_TACTIC_NAME, action: 'allow' },
+  // Curated benchmark/policy content (CIS etc.), not analyst/attacker-supplied — reviewed 'allow'.
   { field: 'check.id', action: 'allow' },
   { field: 'check.name', action: 'allow' },
   { field: 'check.result', action: 'allow' },
@@ -102,16 +95,13 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // NOT anonymized: package/process/policy names are what the analyst asked about, and known
   // mapped identifiers embedded in free text (e.g. a hostname inside a cmd path) are still caught
   // by the outbound applyToText scrub in chat.ts.
-  // MITRE tactic and vulnerability CVSS/architecture fields: `rule.mitre.tactic` and the vulnerability/package fields are
-  // curated taxonomy/public-CVE-database data (like `rule.mitre.id`/`vulnerability.severity`
-  // above), not analyst/attacker-supplied text, so they are 'allow'.
-  { field: 'rule.mitre.tactic', action: 'allow' },
   { field: 'vulnerability.score.base', action: 'allow' },
   { field: 'package.architecture', action: 'allow' },
-  // syscheck.uname_after (4.14 FIM "who changed it") died with get_fim_events — the 5.0 states
-  // surface has no equivalent; get_fim_files' file.owner is classified above. The old tool-scoped
-  // get_agent_ports/remote.ip, get_agent_processes/euser+ruser and get_sca_checks/* entries were
-  // likewise replaced by the bare ECS entries above (see the 5.0-rewrites comment block).
+  // get_events_by_agent reads the same wazuh.agent.* fields as the findings tools above (already
+  // covered by WAZUH_FIELD.AGENT_NAME/AGENT_ID), plus its own ECS event taxonomy fields.
+  { field: 'event.category', action: 'allow' },
+  { field: 'event.action', action: 'allow' },
+  { field: 'event.outcome', action: 'allow' },
 ];
 
 export type PseudonymKind = 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
@@ -128,7 +118,7 @@ export interface PseudonymEntry {
 /** Infers which pseudonym kind a field name should mint, from the field name alone ("kind
  * inferred from field name"). Checked in this order so a field matching more than one heuristic
  * (there are none in FIELD_POLICY_DEFAULTS today) resolves predictably; falls back to the generic
- * `VAL` kind (used by e.g. `GeoLocation.*`, which is neither a host/ip/user/url). */
+ * `VAL` kind for a field that is none of host/ip/user/url. */
 export function inferPseudonymKind(field: string): PseudonymKind {
   const lower = field.toLowerCase();
   if (lower.includes('url')) {
@@ -140,11 +130,7 @@ export function inferPseudonymKind(field: string): PseudonymKind {
   if (lower.includes('user')) {
     return 'USER';
   }
-  if (
-    lower.includes('hostname') ||
-    lower === 'agent.name' ||
-    lower.endsWith('.name')
-  ) {
+  if (lower.includes('hostname') || lower.endsWith('.name')) {
     return 'HOST';
   }
   return 'VAL';
@@ -407,7 +393,7 @@ const HOSTNAME_LABEL_SRC = '[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?';
 /** Matches `label.label[.label]+` — i.e. requires AT LEAST ONE dot, so a bare single-word hostname
  * ("webserver") is deliberately never matched here (documented limitation: see
  * `prescanAndMint`'s doc comment — the digest-boundary field policy still catches those once they
- * appear in a tool result field like `agent.name`). `\b`-anchored on both ends so a trailing
+ * appear in a tool result field like `wazuh.agent.name`). `\b`-anchored on both ends so a trailing
  * sentence period is never swept into the match. */
 const FQDN_TOKEN_RE = new RegExp(
   `\\b${HOSTNAME_LABEL_SRC}(?:\\.${HOSTNAME_LABEL_SRC})+\\b`,
@@ -439,7 +425,7 @@ const ALL_NUMERIC_DOTTED_RE = /^[0-9.]+Z?$/;
  * single-word hostname ("webserver", no dot) is NEVER matched — only `label.label[...]` forms are,
  * to avoid pseudonymizing ordinary prose words. A bare-word hostname is still caught later, once it
  * appears in a typed digest field, by the existing field-policy scrub in `applyFieldPolicy` (e.g.
- * `agent.name`/`predecoder.hostname`) — this pre-scan only closes the gap for the analyst's own
+ * `wazuh.agent.name`) — this pre-scan only closes the gap for the analyst's own
  * free-text wording and for hostnames/IPs surfacing in untyped free text (e.g. a tool's `message`).
  */
 export function prescanAndMint(
@@ -466,8 +452,8 @@ export function prescanAndMint(
 
 /**
  * JSON-aware variant of `prescanAndMint` for `role:'tool'` message content — which is normally a
- * serialized digest whose KEYS are dotted ECS field paths ("wazuh.agent.name",
- * "rule.mitre.technique.id"). Running the flat text scan over that JSON would match those keys as
+ * serialized digest whose KEYS are dotted `wazuh.*` field paths ("wazuh.agent.name",
+ * "wazuh.rule.mitre.technique.id"). Running the flat text scan over that JSON would match those keys as
  * FQDN-shaped tokens and mint garbage HOST_n pseudonyms for FIELD NAMES (corrupting the digest's
  * keys and polluting the client-held map). This variant parses the JSON and scans only STRING
  * VALUES — keys are never touched — then re-serializes (JSON.stringify preserves key order, so a
@@ -520,9 +506,9 @@ export function prescanAndMintToolContent(
 
 /** Resolves the policy entry for `field` (optionally scoped to `toolName`). Tool-scoped entries
  * ("toolName/field") are checked first and win over plain ones; plain entries support a trailing
- * `.*` prefix match (e.g. "GeoLocation.*" matches "GeoLocation" itself and
- * "GeoLocation.country_name"). First matching entry wins; `undefined` (no matching policy entry)
- * means "allow" by omission. */
+ * `.*` prefix match (e.g. "wazuh.rule.compliance.*" matches "wazuh.rule.compliance" itself and
+ * "wazuh.rule.compliance.pci_dss"). First matching entry wins; `undefined` (no matching policy
+ * entry) means "allow" by omission. */
 function resolveFieldEntry(
   field: string,
   policy: FieldPolicyEntry[],
@@ -613,6 +599,12 @@ export function extractAggFields(
  * - `samples`: 'never' fields are dropped from the sample object entirely; 'anonymize' string
  *   values are pseudonymized (kind inferred from the field name); 'allow' fields pass through
  *   unchanged. An UNLISTED field's behavior depends on `isEscapeHatch` (see below).
+ *   AGGREGATION samples are the one exception to "resolve by the sample's own field name": a bucket
+ *   row's keys are `key`/`doc_count` (digest.ts's `bucketsToRows`), and `key` holds a VALUE of the
+ *   AGGREGATED field, not of a field literally called "key". Resolving it by name matched no policy
+ *   entry, so a top-agents/top-rules aggregation sent its real bucket values to the provider under
+ *   `samples[].key` while `breakdown` — the same values, one key over — was correctly scrubbed.
+ *   `key` is therefore resolved against `aggFields`' first aggregation field whenever there is one.
  * - `breakdown`: a bucket key's field can't be read from the digest alone (see `extractAggFields`
  *   above) — each bucket is attributed to its aggregation (the entry's `agg` name, or the first
  *   aggregation when unset — the single-agg case) and that aggregation's field is resolved against
@@ -628,7 +620,7 @@ export function extractAggFields(
  *
  * `isEscapeHatch`: typed catalog tools only ever expose the ~10 fields curated in
  * `FIELD_POLICY_DEFAULTS`, so "unlisted = allow" was a safe default — but the search_wazuh_data
- * escape hatch's `deriveColumns` can pick ANY alert field into `samples`/`breakdown` (data.win.*,
+ * escape hatch's `deriveColumns` can pick ANY finding field into `samples`/`breakdown` (data.win.*,
  * data.office365.*, data.aws.*, syscheck.path, ...), and every one of those was passing through
  * untouched under privacy mode, defeating the guarantee for the one tool built to reach arbitrary
  * fields. When the caller sets `isEscapeHatch: true` (deriveColumns tools only — threaded from
@@ -647,9 +639,20 @@ export function applyFieldPolicy(
   toolName?: string,
   isEscapeHatch = false,
 ): Digest {
+  // The field a bucket row's `key` holds the values OF — see the `samples` note above. `undefined`
+  // for a non-aggregation digest, or for an aggregation with no extractable field (e.g. a
+  // date_histogram), in which case `key` resolves by its own name like any other sample field.
+  const firstAggField = aggFields
+    ? aggFields[Object.keys(aggFields)[0]]
+    : undefined;
+
   const samples = digest.samples.map(sample => {
     const out: Record<string, unknown> = {};
-    for (const [field, value] of Object.entries(sample)) {
+    for (const [sampleKey, value] of Object.entries(sample)) {
+      // `sampleKey` is what the digest stays KEYED by (never rewritten — the model's view of the
+      // digest shape must not change); `field` is only what the policy is resolved against.
+      const field =
+        sampleKey === 'key' && firstAggField ? firstAggField : sampleKey;
       const entry = resolveFieldEntry(field, policy, toolName);
       if (entry?.action === 'never') {
         continue;
@@ -659,7 +662,7 @@ export function applyFieldPolicy(
         typeof value === 'string' &&
         value.length > 0
       ) {
-        out[field] = pseudonymizer.pseudonymize(
+        out[sampleKey] = pseudonymizer.pseudonymize(
           value,
           entry.kind ?? inferPseudonymKind(field),
         );
@@ -670,13 +673,13 @@ export function applyFieldPolicy(
         value.length > 0
       ) {
         // Fail-closed: no explicit policy entry for this field, but the escape hatch can
-        // surface any alert field, so an unlisted one is NOT trusted as safe-by-omission here.
-        out[field] = pseudonymizer.pseudonymize(
+        // surface any finding field, so an unlisted one is NOT trusted as safe-by-omission here.
+        out[sampleKey] = pseudonymizer.pseudonymize(
           value,
           inferPseudonymKind(field),
         );
       } else {
-        out[field] = value;
+        out[sampleKey] = value;
       }
     }
     return out;

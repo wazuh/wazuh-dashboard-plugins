@@ -591,7 +591,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <EuiText grow={false}>
-                <span>Hide techniques with no alerts </span> &nbsp;
+                <span>Hide techniques with no findings </span> &nbsp;
                 <EuiSwitch
                   label=''
                   checked={state.hideAlerts}

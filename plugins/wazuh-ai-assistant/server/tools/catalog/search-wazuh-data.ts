@@ -41,13 +41,18 @@ export const searchWazuhDataTool: ToolDefinition = {
           type: 'string',
           description:
             'The exact index pattern to search. One of: "wazuh-findings-v5-*" (rule-match ' +
-            'findings — the security alerts, with rule.level/rule.mitre/severity), ' +
+            'findings — the security detections, with wazuh.rule.level/wazuh.rule.mitre/severity), ' +
             '"wazuh-events-v5-*" (all normalized events, matched or not), "wazuh-states-*" ' +
             '(current-state data: vulnerabilities, FIM, SCA, inventory).',
           enum: ['wazuh-findings-v5-*', 'wazuh-events-v5-*', 'wazuh-states-*'],
         },
         query_dsl: {
           type: 'string',
+          // JSON-in-a-string (common/types.ts's JsonSchemaPrimitive.jsonString doc comment): lets
+          // wire-schema.ts widen this property's WIRE type to accept an object too, and
+          // schema-validator.ts's coerce() stringify it back — a model that emits nested JSON as
+          // a live object rather than hand-serializing it isn't hard-rejected for that alone.
+          jsonString: true,
           description:
             'A JSON-encoded (stringified) OpenSearch search request body, e.g. ' +
             '"{\\"query\\":{\\"bool\\":{\\"filter\\":[...]}},\\"sort\\":[...],\\"_source\\":[...],' +

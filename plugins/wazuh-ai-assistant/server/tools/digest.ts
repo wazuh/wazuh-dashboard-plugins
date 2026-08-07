@@ -45,8 +45,10 @@ function getByPath(source: Record<string, unknown>, path: string): unknown {
 }
 
 /**
- * Rows from a plain hits-based `_search` response (`hits.hits[]._source`). An EMPTY hits array
- * returns undefined rather than [] so aggregation-only responses (`size:0` always carries an
+ * Rows from a plain hits-based `_search` response (`hits.hits[]._source`), with the hit's own
+ * OpenSearch document `_id` merged in under the `_id` key (a sibling of `_source`'s own fields,
+ * not nested inside them) so it can be surfaced the same way as any other row field. An EMPTY hits
+ * array returns undefined rather than [] so aggregation-only responses (`size:0` always carries an
  * empty hits section) fall through to bucketsToRows instead of short-circuiting to a blank table.
  */
 function hitsToRows(
@@ -64,7 +66,11 @@ function hitsToRows(
     if (!hit || typeof hit !== 'object') {
       continue;
     }
-    rows.push((hit as { _source?: Record<string, unknown> })._source ?? {});
+    const { _source, _id } = hit as {
+      _source?: Record<string, unknown>;
+      _id?: unknown;
+    };
+    rows.push(_id !== undefined ? { ...(_source ?? {}), _id } : _source ?? {});
   }
   return rows;
 }
@@ -72,7 +78,7 @@ function hitsToRows(
 /**
  * Rows from an aggregation-only response (`size:0`, `aggs.<name>.buckets[]`), e.g. get_top_rules.
  * Any `top_hits` sub-aggregation's sampled `_source` is merged into the row (still nested, not
- * flattened) so a tool's tableSpec/digest columns can dot-path into it (e.g. "rule.description").
+ * flattened) so a tool's tableSpec/digest columns can dot-path into it (e.g. "wazuh.rule.title").
  * A metric sub-aggregation (avg/sum/min/max/cardinality — shaped `{value: number|null}`) merges as
  * `row[subAggName] = value`. A `filter` sub-aggregation (shaped `{doc_count: number}` with no
  * `buckets`/`hits` of its own — e.g. get_sca_results' passed/failed/not_applicable counters)
@@ -240,7 +246,7 @@ function extractRows(result: unknown): ExtractedRows {
  *      `bucketsToRows` above): the first row's own keys, taken as-is (already the shape a bucket
  *      table wants).
  *   3. Otherwise: the union of the first `DERIVE_COLUMN_SAMPLE_SIZE` rows' flattened dot-path keys,
- *      preferring the common alert fields when present, capped at `DERIVED_COLUMN_CAP`.
+ *      preferring the common finding fields when present, capped at `DERIVED_COLUMN_CAP`.
  */
 const DERIVED_COLUMN_CAP = 8;
 // Wazuh 5.0 findings-v5 field names: the fields most worth surfacing
@@ -248,9 +254,9 @@ const DERIVED_COLUMN_CAP = 8;
 const PREFERRED_DERIVED_COLUMNS = [
   '@timestamp',
   'wazuh.agent.name',
-  'rule.description',
-  'rule.level',
-  'rule.id',
+  'wazuh.rule.title',
+  'wazuh.rule.level',
+  'wazuh.rule.id',
 ];
 
 /** Dot-path keys of a row's own (nested-object) fields; arrays and scalars are leaves. */
@@ -312,7 +318,7 @@ function deriveResultColumns(
   return columns.slice(0, DERIVED_COLUMN_CAP);
 }
 
-/** Last path segment, capitalized (e.g. "rule.description" -> "Description"); falls back to the
+/** Last path segment, capitalized (e.g. "wazuh.rule.title" -> "Title"); falls back to the
  * full path when two derived columns share a last segment (e.g. two differently-nested "id"s). */
 function deriveColumnLabel(path: string, allPaths: string[]): string {
   const lastSegment = path.split('.').pop() ?? path;
@@ -368,7 +374,7 @@ export function buildTableSpec(
     // The investigation field set (row-only, not a visible column): unlike the loop above, an
     // absent value is skipped rather than written as `undefined` — the row must stay JSON-sparse
     // (a field only costs bytes/appears in the expander when the underlying document actually has
-    // it), not padded with nulls for every alert that never populated e.g. data.srcip.
+    // it), not padded with nulls for every finding that never populated e.g. data.srcip.
     for (const field of rowFields) {
       const value = getByPath(row, field);
       if (value !== undefined) {

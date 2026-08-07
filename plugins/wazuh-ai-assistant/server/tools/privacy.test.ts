@@ -58,7 +58,7 @@ test('prescanAndMint: leaves an ISO-8601 timestamp fragment untouched (29.000Z)'
 test('prescanAndMintToolContent: never pseudonymizes dotted ECS field-name KEYS', () => {
   const p = new Pseudonymizer();
   const digest = JSON.stringify({
-    tool: 'get_alerts_by_time',
+    tool: 'get_findings_by_time',
     samples: [
       {
         'wazuh.agent.name': 'wazuh-server-01',
@@ -326,6 +326,53 @@ test('applyFieldPolicy: explicit "allow" entry is unaffected by isEscapeHatch', 
   assert.equal(out.samples[0]['data.win.system.computerName'], 'DESKTOP-01');
 });
 
+test('applyFieldPolicy: a "*"-suffixed entry matches the prefix field itself and any subfield', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'wazuh.rule.compliance.*', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  // String values on purpose: applyFieldPolicy's fail-closed anonymize branch (isEscapeHatch:
+  // true) only triggers for `typeof value === 'string'`, so an array-valued sample (the real
+  // shape of these compliance fields) would pass through unchanged in the `else` branch
+  // regardless of whether the wildcard actually matched — that would prove nothing about
+  // resolveFieldEntry's prefix-match logic. Strings are what actually exercise it.
+  const digest = baseDigest({
+    samples: [
+      {
+        'wazuh.rule.compliance.pci_dss': '10.6',
+        'wazuh.rule.compliance.hipaa': '164.308.a.1.ii.D',
+        'wazuh.rule.compliance': 'top-level-value',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(digest, policy, p, undefined, undefined, true);
+  // isEscapeHatch: true (fail-closed) would anonymize anything NOT matched by the wildcard —
+  // these three all stay untouched only if the wildcard entry actually matched each of them.
+  assert.equal(out.samples[0]['wazuh.rule.compliance.pci_dss'], '10.6');
+  assert.equal(
+    out.samples[0]['wazuh.rule.compliance.hipaa'],
+    '164.308.a.1.ii.D',
+  );
+  assert.equal(out.samples[0]['wazuh.rule.compliance'], 'top-level-value');
+});
+
+test('applyFieldPolicy: a "*"-suffixed entry does not match an unrelated sibling field', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'wazuh.rule.compliance.*', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [{ 'wazuh.rule.compliance_other': 'should not match' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p, undefined, undefined, true);
+  // Fail-closed anonymizes it, proving the wildcard did NOT swallow this look-alike field —
+  // "wazuh.rule.compliance_other" is not "wazuh.rule.compliance" or a ".compliance." subfield.
+  assert.notEqual(
+    out.samples[0]['wazuh.rule.compliance_other'],
+    'should not match',
+  );
+});
+
 test('applyFieldPolicy: multi-agg breakdown scrubs each bucket under its own agg field', () => {
   const policy: FieldPolicyEntry[] = [
     { field: 'agent.name', action: 'anonymize' },
@@ -419,4 +466,97 @@ test('extractAggFields: date_histogram (no field-bearing key) maps to undefined'
 test('extractAggFields: returns undefined when body has no aggs', () => {
   assert.equal(extractAggFields({}), undefined);
   assert.equal(extractAggFields(undefined), undefined);
+});
+
+// --- applyFieldPolicy: aggregation SAMPLES (the `key` sample field) ------------------------------
+
+/**
+ * A bucket row's sample keys are `key`/`doc_count`, so resolving `key` by its own name matched no
+ * policy entry and sent the real bucket VALUE to the provider — the same value `breakdown` was
+ * already scrubbing one key over. These cover both actions on that path.
+ */
+test('applyFieldPolicy: drops the "key" sample of an aggregation over a "never" field', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'wazuh.agent.name', action: 'never' },
+  ];
+  const p = new Pseudonymizer();
+  const out = applyFieldPolicy(
+    baseDigest({ samples: [{ key: 'web-01.corp', doc_count: 42 }] }),
+    policy,
+    p,
+    { top_agents: 'wazuh.agent.name' },
+  );
+  assert.deepEqual(out.samples, [{ doc_count: 42 }]);
+  // Not even a pseudonym is minted for it: "never" means the value gets no representation at all.
+  assert.equal(p.newEntries().length, 0);
+});
+
+test('applyFieldPolicy: pseudonymizes the "key" sample of an "anonymize" aggregation', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'wazuh.agent.name', action: 'anonymize', kind: 'HOST' },
+  ];
+  const p = new Pseudonymizer();
+  const out = applyFieldPolicy(
+    baseDigest({ samples: [{ key: 'web-01.corp', doc_count: 42 }] }),
+    policy,
+    p,
+    { top_agents: 'wazuh.agent.name' },
+  );
+  // Still keyed by `key` — the digest SHAPE the model sees must not change, only the value.
+  assert.deepEqual(out.samples, [{ key: 'HOST_1', doc_count: 42 }]);
+});
+
+test('applyFieldPolicy: resolves the aggregated field tool-scoped, like every other field', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'get_top_agents/wazuh.agent.name', action: 'never' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [{ key: 'web-01.corp', doc_count: 7 }],
+  });
+  const scoped = applyFieldPolicy(
+    digest,
+    policy,
+    p,
+    { top_agents: 'wazuh.agent.name' },
+    'get_top_agents',
+  );
+  assert.deepEqual(scoped.samples, [{ doc_count: 7 }]);
+  // Another tool's aggregation over the same field is not affected by that scoped entry.
+  const other = applyFieldPolicy(
+    baseDigest({ samples: [{ key: 'web-01.corp', doc_count: 7 }] }),
+    policy,
+    p,
+    { top_agents: 'wazuh.agent.name' },
+    'get_top_rules',
+  );
+  assert.deepEqual(other.samples, [{ key: 'web-01.corp', doc_count: 7 }]);
+});
+
+test('applyFieldPolicy: a real field named "key" is unaffected without an aggregation', () => {
+  const policy: FieldPolicyEntry[] = [{ field: 'key', action: 'allow' }];
+  const p = new Pseudonymizer();
+  const out = applyFieldPolicy(
+    baseDigest({ samples: [{ key: 'literal-value' }] }),
+    policy,
+    p,
+  );
+  assert.deepEqual(out.samples, [{ key: 'literal-value' }]);
+});
+
+test('applyFieldPolicy: an aggregation with no extractable field leaves "key" alone', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'wazuh.agent.name', action: 'never' },
+  ];
+  const p = new Pseudonymizer();
+  const out = applyFieldPolicy(
+    baseDigest({ samples: [{ key: '2026-07-31T00:00:00Z', doc_count: 3 }] }),
+    policy,
+    p,
+    // A date_histogram: extractAggFields reports the aggregation with no field.
+    { over_time: undefined },
+  );
+  assert.deepEqual(out.samples, [
+    { key: '2026-07-31T00:00:00Z', doc_count: 3 },
+  ]);
 });

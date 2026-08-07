@@ -11,7 +11,7 @@ and streams back a short answer plus the real result table.
 ## What it does
 
 - **Chat UI** (EUI/OUI) streaming over SSE end to end: provider → this plugin's server → browser.
-- **29 read-only tools** (`server/tools/catalog/`) covering alerts/findings, vulnerabilities, FIM,
+- **29 read-only tools** (`server/tools/catalog/`) covering findings, vulnerabilities, FIM,
   SCA, MITRE, PCI DSS, syscollector inventory and agent status, plus a general `search_wazuh_data`
   escape hatch. Every tool is `tier: 'T1'` — **there are no mutating tools**.
 - **Two-stage router** (`server/tools/router.ts`) that narrows the tool set per turn to cut tokens.
@@ -41,7 +41,7 @@ server/            Server plugin
   tools/               registry, router, executor, guardrails, digest, privacy, schema-validator
     catalog/           the 29 tool definitions
   providers/           adapter interface + 3 adapters, url-guard (SSRF), retry/stall handling
-  crypto/              api-key-cipher.ts (AES-256-GCM, enc:v1 read / enc:v2 write)
+  crypto/              api-key-cipher.ts (AES-256-GCM, enc:v1 read/write)
   saved_objects/       provider-settings, conversation, assistant-settings (all hidden types)
   prompts.ts           the system prompt
 translations/      en-US.json / es-ES.json
@@ -85,7 +85,7 @@ The full security model is documented in `docs/ref/modules/ai-assistant/security
   or elevated path, so a user can never read data their own RBAC forbids. This is the boundary the
   whole design rests on.
 - **No mutating tools** and no code-execution sink; the worst an injected instruction (e.g. text
-  smuggled in through an ingested alert) can achieve is another read the user could already do.
+  smuggled in through an ingested finding) can achieve is another read the user could already do.
 - **Provider management is admin-gated** (create/update/set-default/delete/test). `GET /providers`
   stays readable because the Chat tab needs the list; it never returns a key.
 - **SSRF guard** (`server/providers/url-guard.ts`) on every outbound provider fetch: http(s) only,
@@ -93,9 +93,9 @@ The full security model is documented in `docs/ref/modules/ai-assistant/security
   _resolve_ into them), redirects disabled. Loopback/RFC1918 stay reachable on purpose — that is
   where self-hosted gateways live.
 - **API keys** are never returned by any route (only a `hasApiKey` boolean), never logged, and
-  redacted from upstream error echoes. Encryption at rest is opt-in; `enc:v2` binds the ciphertext
-  to its saved object via AES-GCM AAD so a blob cannot be moved between providers. See
-  `docs/ENCRYPTION.md` — prefer the OSD keystore for the key.
+  redacted from upstream error echoes. `enc:v1` binds the ciphertext to its saved object via
+  AES-GCM AAD so a blob cannot be moved between providers. See `docs/ENCRYPTION.md` — prefer the
+  keystore for the key.
 - **Concurrency cap**: 5 in-flight chat streams per user, 30 server-wide, and per-provider stall
   timeouts (30 s to first byte, 120 s idle).
 
@@ -103,7 +103,7 @@ The full security model is documented in `docs/ref/modules/ai-assistant/security
 
 Answering a question sends the user's prompt plus a capped tool-result digest to the **configured
 third-party provider**. That digest can include hostnames, source/destination IPs, usernames,
-process command lines and rule/alert text — and, via the escape hatch, any field the model selects.
+process command lines and rule/finding text — and, via the escape hatch, any field the model selects.
 Pseudonymisation mitigates this and is **off by default** (the primary deployment target is a
 self-hosted gateway). The Settings page names the field categories involved and the chat header
 carries a privacy on/off badge.

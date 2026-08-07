@@ -24,7 +24,7 @@ export interface ManagerRequest {
 export type ToolRequest = IndexerRequest | ManagerRequest;
 
 export interface ToolTableColumnSpec {
-  /** Dot-path into a normalized result row (e.g. "agent.name", "rule.level"). */
+  /** Dot-path into a normalized result row (e.g. "wazuh.agent.name", "wazuh.rule.level"). */
   field: string;
   label: string;
   /** Marks this column for severity-badge rendering in the client's ResultTable. */
@@ -64,6 +64,18 @@ export interface ToolDefinition {
     rowFields?: string[];
   };
   digest: { sampleColumns: string[] };
+  /**
+   * Opt-in hook for Security Analytics catalog tools (get_rules, get_threat_intel_components):
+   * given the validated params and the `space` value executor.ts resolved from the executed
+   * result's own `space.name` values, returns the "Open in Security Analytics" deep link for this
+   * specific call (e.g. varying by `component_type` for get_threat_intel_components). `undefined`
+   * (every non-Security-Analytics tool) means no such link is ever attached -- see common/types.ts's
+   * `TableSpec.securityAnalyticsLink` doc comment.
+   */
+  buildSecurityAnalyticsLink?(
+    params: Record<string, unknown>,
+    space: string,
+  ): { label: string; url: string } | undefined;
   /**
    * Opt-in escape hatch (currently only `search_wazuh_data`): when true, `tableSpec.columns` and
    * `digest.sampleColumns` above are ignored (kept as `[]` for type validity — no per-tool schema

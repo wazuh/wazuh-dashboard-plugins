@@ -8,18 +8,16 @@ import {
 } from './common';
 
 /**
- * Ported from GET_TOP_RULES: a `terms` aggregation on `rule.id` (on the guardrail low-cardinality
- * allowlist) with a `top_hits` sub-aggregation sampling one `rule.description` per bucket,
- * `size: 0` (aggregation-only, no hit documents fetched).
- * 5.0: retargeted to wazuh-findings-v5*; time field @timestamp.
- * rule.id/rule.description survive unchanged in the findings schema.
+ * A `terms` aggregation on `wazuh.rule.id` (on the guardrail low-cardinality allowlist) with a
+ * `top_hits` sub-aggregation sampling one `wazuh.rule.title` per bucket, `size: 0`
+ * (aggregation-only, no hit documents fetched).
  */
 export const getTopRulesTool: ToolDefinition = {
   spec: {
     name: 'get_top_rules',
     description:
       'Aggregates the most frequently triggered rules within a time range, with a sample ' +
-      'description per rule.',
+      'title per rule.',
     parameters: objectSchema({
       limit: limitProperty(
         'Max number of distinct rules to return (default 20, max 100).',
@@ -41,10 +39,10 @@ export const getTopRulesTool: ToolDefinition = {
         },
         aggs: {
           top_rules: {
-            terms: { field: 'rule.id', size: limit },
+            terms: { field: 'wazuh.rule.id', size: limit },
             aggs: {
               sample_doc: {
-                top_hits: { size: 1, _source: ['rule.description'] },
+                top_hits: { size: 1, _source: ['wazuh.rule.title'] },
               },
             },
           },
@@ -57,8 +55,8 @@ export const getTopRulesTool: ToolDefinition = {
     columns: [
       { field: 'key', label: 'Rule ID' },
       { field: 'doc_count', label: 'Count' },
-      { field: 'rule.description', label: 'Description' },
+      { field: 'wazuh.rule.title', label: 'Title' },
     ],
   },
-  digest: { sampleColumns: ['key', 'doc_count', 'rule.description'] },
+  digest: { sampleColumns: ['key', 'doc_count', 'wazuh.rule.title'] },
 };

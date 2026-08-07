@@ -40,7 +40,7 @@ test('get_sca_checks: result becomes a term filter; search becomes exact-OR-pref
     search: 'Ensure SSH',
   });
   const clauses = filters(req);
-  assert.deepEqual(clauses[2], { term: { 'check.result': 'failed' } });
+  assert.deepEqual(clauses[2], { term: { 'check.result': 'Failed' } });
   // `search` is no longer a BARE multi_match. `check.name`/`check.description`/`check.rationale`
   // are all `keyword` in 5.0, so an analyzed multi_match on its own silently returned nothing for
   // any fragment — proven live: search "ssh" -> 0 hits, while the full exact check name -> 1. It is
@@ -60,6 +60,24 @@ test('get_sca_checks: result becomes a term filter; search becomes exact-OR-pref
         { prefix: { 'check.name': 'Ensure SSH' } },
       ],
     },
+  });
+});
+
+test('get_sca_checks: result="passed"/"not applicable" map to the real capitalized index values', () => {
+  const passed = buildIndexer({
+    agent_id: '000',
+    policy_id: 'cis_ubuntu22-04',
+    result: 'passed',
+  });
+  assert.deepEqual(filters(passed)[2], { term: { 'check.result': 'Passed' } });
+
+  const notApplicable = buildIndexer({
+    agent_id: '000',
+    policy_id: 'cis_ubuntu22-04',
+    result: 'not applicable',
+  });
+  assert.deepEqual(filters(notApplicable)[2], {
+    term: { 'check.result': 'Not applicable' },
   });
 });
 

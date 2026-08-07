@@ -1,33 +1,37 @@
 import { ToolSpec } from '../../common/types';
 import { ToolDefinition } from './types';
-import { getActiveAgentsTool } from './catalog/get-active-agents';
-import { getDisconnectedAgentsTool } from './catalog/get-disconnected-agents';
-import { getCriticalAlertsTool } from './catalog/get-critical-alerts';
-import { searchAlertsByAgentTool } from './catalog/search-alerts-by-agent';
+import { getAgentsTool } from './catalog/get-agents';
+import { getCriticalFindingsTool } from './catalog/get-critical-findings';
+import { searchFindingsByAgentTool } from './catalog/search-findings-by-agent';
 import { getTopRulesTool } from './catalog/get-top-rules';
 import { getCriticalVulnerabilitiesTool } from './catalog/get-critical-vulnerabilities';
-import { getAlertsByTimeTool } from './catalog/get-alerts-by-time';
+import { getFindingsByTimeTool } from './catalog/get-findings-by-time';
+import { getEventsByAgentTool } from './catalog/get-events-by-agent';
 import { getBruteForceTool } from './catalog/get-brute-force';
 import { getSecuritySummaryTool } from './catalog/get-security-summary';
 import { getSuspiciousPowershellTool } from './catalog/get-suspicious-powershell';
-import { searchAlertsByRuleIdTool } from './catalog/search-alerts-by-rule-id';
-import { searchAlertsByRuleGroupTool } from './catalog/search-alerts-by-rule-group';
-import { getPciDssAlertsTool } from './catalog/get-pci-dss-alerts';
-import { getPciDssSummaryTool } from './catalog/get-pci-dss-summary';
-import { searchAlertsByMultipleAgentsTool } from './catalog/search-alerts-by-multiple-agents';
-import { searchAlertsByOsTool } from './catalog/search-alerts-by-os';
+import { searchFindingsByRuleTitleTool } from './catalog/search-findings-by-rule-title';
+import { searchFindingsByRuleTagTool } from './catalog/search-findings-by-rule-tag';
+import { getComplianceAlertsTool } from './catalog/get-compliance-alerts';
+import { getComplianceSummaryTool } from './catalog/get-compliance-summary';
+import { searchFindingsByMultipleAgentsTool } from './catalog/search-findings-by-multiple-agents';
+import { searchFindingsByOsTool } from './catalog/search-findings-by-os';
 import { getVulnerabilitiesTool } from './catalog/get-vulnerabilities';
 import { getVulnerabilitiesByAgentTool } from './catalog/get-vulnerabilities-by-agent';
 import { getVulnerabilityByCveTool } from './catalog/get-vulnerability-by-cve';
 import { getFimFilesTool } from './catalog/get-fim-files';
 import { getScaResultsTool } from './catalog/get-sca-results';
 import { getScaChecksTool } from './catalog/get-sca-checks';
-import { getMitreAlertsTool } from './catalog/get-mitre-alerts';
+import { getMitreFindingsTool } from './catalog/get-mitre-findings';
 import { getMitreSummaryTool } from './catalog/get-mitre-summary';
 import { getAgentOsTool } from './catalog/get-agent-os';
 import { getAgentPackagesTool } from './catalog/get-agent-packages';
 import { getAgentPortsTool } from './catalog/get-agent-ports';
 import { getAgentProcessesTool } from './catalog/get-agent-processes';
+import { getRulesTool } from './catalog/get-rules';
+import { getThreatIntelComponentsTool } from './catalog/get-threat-intel-components';
+import { getDetectorsTool } from './catalog/get-detectors';
+import { findDocumentByFieldTool } from './catalog/find-document-by-field';
 import { searchWazuhDataTool } from './catalog/search-wazuh-data';
 
 /**
@@ -41,25 +45,30 @@ import { searchWazuhDataTool } from './catalog/search-wazuh-data';
  * catalog rather than special-cased.
  */
 const CATALOG: ToolDefinition[] = [
-  // Original 6 (production, unchanged)
-  getActiveAgentsTool,
-  getDisconnectedAgentsTool,
-  getCriticalAlertsTool,
-  searchAlertsByAgentTool,
+  // Original 6 (production, unchanged) — get_active_agents/get_disconnected_agents were replaced
+  // by the single get_agents tool (see get-agents.ts).
+  getAgentsTool,
+  getCriticalFindingsTool,
+  searchFindingsByAgentTool,
   getTopRulesTool,
   getCriticalVulnerabilitiesTool,
 
-  // General alert search / summary
-  getAlertsByTimeTool,
+  // General finding search / summary
+  getFindingsByTimeTool,
+  // Raw event stream (issue: "Add a typed events tool over wazuh-events-v5") -- the mirror image
+  // of the finding-hits tools above: ALL normalized events, matched or not, not just rule-matched
+  // detections. Kept adjacent to them in this list since the two are the same category
+  // (server/tools/router.ts's TOOL_CATEGORY) and are the tools users most often conflate.
+  getEventsByAgentTool,
   getBruteForceTool,
   getSecuritySummaryTool,
   getSuspiciousPowershellTool,
-  searchAlertsByRuleIdTool,
-  searchAlertsByRuleGroupTool,
-  getPciDssAlertsTool,
-  getPciDssSummaryTool,
-  searchAlertsByMultipleAgentsTool,
-  searchAlertsByOsTool,
+  searchFindingsByRuleTitleTool,
+  searchFindingsByRuleTagTool,
+  getComplianceAlertsTool,
+  getComplianceSummaryTool,
+  searchFindingsByMultipleAgentsTool,
+  searchFindingsByOsTool,
 
   // Vulnerabilities. (get_solved_vulnerabilities was retired in the 5.0 port: its 4.14 data
   // source (data.vulnerability.status on
@@ -74,7 +83,7 @@ const CATALOG: ToolDefinition[] = [
   getFimFilesTool,
   getScaResultsTool,
   getScaChecksTool,
-  getMitreAlertsTool,
+  getMitreFindingsTool,
   getMitreSummaryTool,
 
   // Syscollector inventory
@@ -83,7 +92,15 @@ const CATALOG: ToolDefinition[] = [
   getAgentPortsTool,
   getAgentProcessesTool,
 
-  // Escape hatch — last resort, kept last so the 28 typed tools are listed first.
+  // Security Analytics content: ruleset + pipeline components + detector definitions
+  getRulesTool,
+  getThreatIntelComponentsTool,
+  getDetectorsTool,
+
+  // Generic exact-ID lookup (document _id or a business-level UUID field, tried automatically)
+  findDocumentByFieldTool,
+
+  // Escape hatch — last resort, kept last so the typed tools are listed first.
   searchWazuhDataTool,
 ];
 

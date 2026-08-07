@@ -37,11 +37,12 @@ run_tool changelog_bump.sh 5.1.0 5.0.0
 assert_eq 0 "$STATUS" "exits 0"
 CONTENT=$(cat "$WORK/CHANGELOG.md")
 assert_contains "$CONTENT" "## [v5.1.0]" "new version heading"
-assert_contains "$CONTENT" "- Support for Wazuh 5.1.0" "Support for Wazuh entry"
 assert_contains "$CONTENT" "### Added" "Added section"
 assert_contains "$CONTENT" "### Changed" "Changed section"
 assert_contains "$CONTENT" "### Removed" "Removed section"
 assert_contains "$CONTENT" "### Fixed" "Fixed section"
+assert_eq 4 "$(grep -c '^| Issue | Comment |$' "$WORK/CHANGELOG.md")" \
+  "one empty entries table per section"
 assert_not_contains "$CONTENT" "Some existing feature entry" "old entries removed"
 assert_eq "$(expected_priors 5.0.0 4.10.2 4.10.1 4.10.0)" "$(prior_versions_block)" \
   "Prior versions = last 2 minors (every patch, newest first)"
@@ -78,12 +79,14 @@ cat >"$WORK/CHANGELOG.md" <<'EOF'
 
 ### Added
 
-- Support for Wazuh 5.0.0
+| Issue | Comment |
+| ----- | ------- |
+| [#1](https://github.com/wazuh/test-repo/issues/1) | Some existing feature entry |
 EOF
 run_tool changelog_bump.sh 5.0.0 5.0.0
 assert_eq 0 "$STATUS" "exits 0"
 CONTENT=$(cat "$WORK/CHANGELOG.md")
-assert_contains "$CONTENT" "- Support for Wazuh 5.0.0" "entries preserved"
+assert_contains "$CONTENT" "| Some existing feature entry |" "entries preserved"
 assert_contains "$CONTENT" "## Prior versions" "section appended"
 assert_eq "$(expected_priors 4.10.2 4.10.1 4.10.0 4.9.1 4.9.0)" "$(prior_versions_block)" \
   "list built correctly"

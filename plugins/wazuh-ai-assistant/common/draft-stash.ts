@@ -19,9 +19,10 @@
  *  - Cross-user: sessionStorage is per-tab and per-origin, NOT per-user, and a same-origin
  *    logout/login does not clear it. On a shared workstation, analyst A's stashed draft would be
  *    handed straight to analyst B the moment B's ChatPage mounted.
- *  - Cross-conversation: the app shell unmounts and remounts ChatPage on every tab switch
- *    (Chat<->Settings), which resets the active conversation id to null — the same reset a real
- *    reload produces — so a fallback scan would fire on ANY remount, not only a genuine reload.
+ *  - Cross-conversation: ChatPage mounts with its active conversation id still null (a conversation
+ *    named by the URL/session pointer is only resolved asynchronously, see
+ *    common/conversation-location.ts) — the same starting point a real reload produces — so a
+ *    fallback scan would fire on ANY mount, not only a genuine reload.
  *
  * There is no client-side identity to key the stash on, and adding one would mean a new server
  * route: `GET /settings/access` (server/routes/settings.ts, wrapped by

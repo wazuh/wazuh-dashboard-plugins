@@ -1,0 +1,126 @@
+/**
+ * Chat surface tokens. Compiled once per theme by OSD (unlike an inline React style, which reads
+ * whatever value JS computed at render time) — a `--wz-*` custom-property block sourced from
+ * EUI's own `$eui*` SASS variables is the single place this plugin's components read color/border
+ * roles from, so no component ever hardcodes a hex literal or branches on `theme:darkMode` itself.
+ * Custom properties inherit through the whole DOM subtree regardless of component boundaries, so
+ * nothing downstream needs its own dark-mode prop threaded down to it.
+ */
+.wzAiChat {
+  --wz-hairline: #{$euiBorderColor};
+  --wz-accent: #{$euiColorPrimary};
+  --wz-accent-soft: #{rgba($euiColorPrimary, 0.1)};
+  --wz-accent-hover: #{rgba($euiColorPrimary, 0.06)};
+  --wz-surface: #{$euiColorEmptyShade};
+  --wz-surface-sunken: #{$euiColorLightestShade};
+  --wz-text-subdued: #{$euiTextSubduedColor};
+}
+
+.wzStickyInputPanel {
+  position: sticky;
+  bottom: 0;
+  background-color: $euiPageBackgroundColor;
+  margin-top: 16px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: 0;
+    right: 0;
+    height: 16px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      $euiPageBackgroundColor
+    );
+    pointer-events: none;
+  }
+
+  /* Focus-within ring is the ONE box-shadow this surface allows (a focus indicator, not
+     decoration) — the textarea itself is intentionally chromeless (chat-input.tsx), so the dock
+     panel is what shows focus has landed inside it. Disabled state (no providers configured yet)
+     dims the whole dock instead of leaving it visually identical to the enabled state. */
+  .euiPanel:focus-within {
+    border-color: var(--wz-accent);
+    box-shadow: 0 0 0 1px var(--wz-accent);
+  }
+
+  &.wzStickyInputPanel-isDisabled .euiPanel {
+    opacity: 0.6;
+  }
+
+  /* EUI draws a form control's underline with a `background-image` gradient, not a border, so the
+     textarea's own inline `border: none` never removed it: the dock ended up with a focus ring
+     around the panel AND a dark rule under the text, two competing borders on one control. The
+     dock's ring is the single focus affordance. */
+  .euiTextArea {
+    background-image: none;
+  }
+}
+
+/* result-table.tsx's header row (row count on the left, "Open in Discover" on the right): restyles
+   EUI's own accordion trigger wrapper rather than inventing markup to replace its built-in, already
+   keyboard-accessible toggle. A hairline underneath is the whole treatment — no fill and no frame
+   around the table, because a tinted strip inside a bordered box made the table read as a widget
+   bolted into the reply instead of as the reply's own data, and it was the third nested container
+   the reader was looking inside. */
+.wzResultTableAccordion > .euiAccordion__triggerWrapper {
+  border-bottom: 1px solid var(--wz-hairline);
+  padding: 4px 2px;
+}
+
+/**
+ * Moved here from chat-page.tsx's runtime-injected `CHAT_SURFACE_STYLES` `<style>` tag — this file
+ * is compiled per theme already, so there is no need for a second, JS-injected stylesheet. Every
+ * color reference below is one of the `--wz-*` custom properties above (no more
+ * `rgba(var(--wzAccentRgb), ...)` computed in JS from a `theme:darkMode` read).
+ *
+ * Motion is entirely opt-in: every animation/transition/transform lives inside the
+ * `prefers-reduced-motion: no-preference` block. Outside it (i.e. for a reduced-motion user), the
+ * hero cards and message rows simply render at their final `opacity: 1` state with no movement —
+ * the ONE exception is the hover/focus border-color rule, which is an instant state change (no
+ * transition, no transform) even for reduced-motion users, since EUI's own hover affordances work
+ * the same way.
+ *
+ * `.wzHeroIconWrap` / `.wzHeroIcon` are deliberately absent: the welcome screen no longer renders
+ * a Wazuh mark at all (the app chrome already brands the page), so those rules would style markup
+ * that does not exist.
+ */
+
+/* No transform, no box-shadow "glow" on hover — a plain border-color change is the only feedback
+   an example card gives, matching the Home Overview's "no hover lift/glow" surface language while
+   still giving SOME affordance for what is, unlike their cards, a real interactive control. */
+.wzHeroCard:hover,
+.wzHeroCard:focus-visible {
+  border-color: var(--wz-accent) !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .wzHeroCard {
+    opacity: 0;
+    animation: wzFadeUp 420ms ease-out both;
+    animation-delay: var(--wzCardDelay, 0ms);
+    transition: border-color 150ms ease-out;
+  }
+
+  .wzConvoRow {
+    transition: background-color 120ms ease-out, border-color 120ms ease-out;
+  }
+
+  .wzMsgRow {
+    opacity: 0;
+    animation: wzFadeUp 260ms ease-out both;
+  }
+
+  @keyframes wzFadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
