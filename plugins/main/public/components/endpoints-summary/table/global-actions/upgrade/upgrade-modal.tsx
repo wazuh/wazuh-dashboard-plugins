@@ -144,6 +144,7 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
               id: agentIds,
             },
           ],
+          totalErrorAgents: 1,
         });
         setSaveChangesStatus('danger');
         const options = {
