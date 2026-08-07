@@ -1,7 +1,7 @@
 import { JsonSchemaObject, JsonSchemaProperty } from '../../../common/types';
 import { SEVERITY_LEVELS, SeverityLevel } from '../../../common/wazuh-fields';
 import { ToolTableColumnSpec } from '../types';
-import { clampInt } from '../guardrails';
+import { clampInt, MAX_AGG_SIZE } from '../guardrails';
 import { BREAKDOWN_BUCKET_CAP } from '../digest';
 
 /**
@@ -79,6 +79,45 @@ export function clampLimit(
 /** The `limit` property shared by every catalog tool's params schema. */
 export function limitProperty(description: string): JsonSchemaProperty {
   return { type: 'number', description };
+}
+
+/**
+ * `clampLimit` for a limit that becomes an AGGREGATION `size` rather than a hits `size` — clamps to
+ * `MAX_AGG_SIZE` (server/tools/guardrails.ts) instead of taking a caller-chosen max.
+ *
+ * Use this, never `clampLimit(value, n, <literal>)`, whenever the clamped result is written into a
+ * `terms`/`composite`/`multi_terms` `size`. Reason (issue #8894): `guardrails.ts`'s `checkAggs`
+ * rejects any aggregation size above `MAX_AGG_SIZE`, and `executor.ts` runs `lintDsl` on EVERY
+ * indexer request with no per-tool exemption. So a tool that clamped its own limit to a larger
+ * number did not get a bigger aggregation — it got a hard failure for the whole range above the cap.
+ * `get_sca_results` clamped to 500 and every call in 101-500 was refused. Taking the cap from the
+ * guardrail constant makes that arithmetic mismatch unrepresentable rather than merely fixed once.
+ *
+ * Hits-paging limits are unaffected and must keep using `clampLimit`: `applySafetyValves` clamps a
+ * top-level `size` to `MAX_SIZE` (500) rather than rejecting it, so a large hits limit degrades
+ * gracefully where a large agg size does not. That asymmetry is exactly why the two need different
+ * helpers.
+ */
+export function clampAggLimit(value: unknown, defaultValue: number): number {
+  return clampLimit(value, defaultValue, MAX_AGG_SIZE);
+}
+
+/**
+ * `limitProperty` for an aggregation-backed limit: builds the description so the advertised maximum
+ * is READ FROM the same `MAX_AGG_SIZE` the guardrail enforces.
+ *
+ * The half of issue #8894 that actually misled the model was the description — it promised `max 500`
+ * on a tool that failed above 100, so a model following the schema was steered into the broken
+ * range. Generating the sentence removes the possibility of the two numbers disagreeing; a future
+ * change to the cap updates every tool's advertised maximum automatically.
+ */
+export function aggLimitProperty(
+  subject: string,
+  defaultValue: number,
+): JsonSchemaProperty {
+  return limitProperty(
+    `Max number of ${subject} to return (default ${defaultValue}, max ${MAX_AGG_SIZE}).`,
+  );
 }
 
 /** Reads an optional string params value, returning `undefined` for anything not a string. */

@@ -5,8 +5,8 @@ import {
 } from '../../../common/wazuh-fields';
 import { ToolDefinition } from '../types';
 import {
-  clampLimit,
-  limitProperty,
+  aggLimitProperty,
+  clampAggLimit,
   objectSchema,
   resolveTimeRange,
   timeRangeProperties,
@@ -85,8 +85,9 @@ export const getComplianceSummaryTool: ToolDefinition = {
             'frameworks. Omit for no exclusion.',
           items: { type: 'string', enum: [...COMPLIANCE_FRAMEWORKS] },
         },
-        limit: limitProperty(
-          'Max number of requirement buckets to return per framework (default 20, max 100).',
+        limit: aggLimitProperty(
+          'requirement buckets to return per framework',
+          20,
         ),
         ...timeRangeProperties(),
       },
@@ -98,7 +99,7 @@ export const getComplianceSummaryTool: ToolDefinition = {
   buildRequest(params) {
     const frameworks = parseFrameworks(params.framework);
     const excludeFrameworks = parseExcludeFrameworks(params.exclude_framework);
-    const limit = clampLimit(params.limit, 20, 100);
+    const limit = clampAggLimit(params.limit, 20);
     const { gte, lte } = resolveTimeRange(params);
     const existsClauses = frameworks.map(framework => ({
       exists: { field: COMPLIANCE_FRAMEWORK_FIELDS[framework] },
