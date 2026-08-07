@@ -638,7 +638,7 @@
       {
         "name": "/agents/summary/status",
         "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_agent_summary_status",
-        "description": "Return a summary of the connection and groups configuration synchronization statuses of available agents",
+        "description": "Return a summary of the connection statuses of available agents",
         "summary": "Summarize agents status",
         "tags": ["Agents"],
         "query": [

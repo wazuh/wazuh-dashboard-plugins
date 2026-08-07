@@ -23,7 +23,6 @@ export const AGENT = {
     node_name: 'master',
     lastKeepAlive: new Date('9999-12-31T23:59:59Z'),
     version: 'Wazuh v4.5.0',
-    group_config_status: 'not synced',
     status_code: 0,
   },
   WINDOWS: {
@@ -46,9 +45,7 @@ export const AGENT = {
     id: '003',
     version: 'Wazuh v4.3.10',
     ip: '111.111.1.111',
-    mergedSum: 'e669d89eba52f6897060fc65a45300ac',
     configSum: '97fccbb67e250b7c80aadc8d0dc59abe',
-    group_config_status: 'not synced',
     status_code: 1,
   },
   DARWIN: {
@@ -72,7 +69,6 @@ export const AGENT = {
     node_name: 'master',
     lastKeepAlive: new Date('9999-12-31T23:59:59Z'),
     version: 'Wazuh v4.5.0',
-    group_config_status: 'synced',
     status_code: 3,
   },
 } satisfies Record<string, DeepPartialRecordMock<Agent>>;

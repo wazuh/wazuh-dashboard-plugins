@@ -24,7 +24,6 @@ import { WzButtonPermissions } from '../../common/permissions/button';
 import { withErrorBoundary } from '../../common/hocs';
 import {
   UI_ORDER_AGENT_STATUS,
-  AGENT_SYNCED_STATUS,
   SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
 } from '../../../../common/constants';
 import { TableWzAPI } from '../../common/tables';
@@ -286,10 +285,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                     { label: 'ip', description: 'filter by IP address' },
                     { label: 'group', description: 'filter by group' },
                     {
-                      label: 'group_config_status',
-                      description: 'filter by group configuration status',
-                    },
-                    {
                       label: 'lastKeepAlive',
                       description: 'filter by last keep alive',
                     },
@@ -321,13 +316,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                       case 'status':
                         return UI_ORDER_AGENT_STATUS.map(status => ({
                           label: status,
-                        }));
-                      case 'group_config_status':
-                        return [
-                          AGENT_SYNCED_STATUS.SYNCED,
-                          AGENT_SYNCED_STATUS.NOT_SYNCED,
-                        ].map(label => ({
-                          label,
                         }));
                       default: {
                         const response = await WzRequest.apiReq(

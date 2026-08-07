@@ -1,6 +1,5 @@
 import React from 'react';
 import { agentsTableActions } from './actions/actions';
-import { AgentSynced } from '../../agents/agent-synced';
 import { AgentStatus } from '../../agents/agent-status';
 import { formatUIDate } from '../../../react-services/time-service';
 import { GroupTruncate } from '../../common/util';
@@ -174,14 +173,6 @@ export const agentsTableColumns = (
         ) : null}
       </EuiFlexGroup>
     ),
-  },
-  {
-    field: 'group_config_status',
-    name: 'Synced',
-    sortable: true,
-    show: false,
-    render: synced => <AgentSynced synced={synced} />,
-    searchable: true,
   },
   {
     field: 'actions',

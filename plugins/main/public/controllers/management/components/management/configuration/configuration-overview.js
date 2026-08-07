@@ -16,7 +16,6 @@ import { EuiTitle, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
 import WzConfigurationOverviewTable from './util-components/configuration-overview-table';
 import WzHelpButtonPopover from './util-components/help-button-popover';
-import WzBadge from './util-components/badge';
 import WzClusterSelect from './util-components/configuration-cluster-selector';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
 
@@ -95,10 +94,7 @@ class WzConfigurationOverview extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiTitle>
-              <span>
-                Configuration{' '}
-                <WzBadge synchronized={this.props.agentSynchronized} />
-              </span>
+              <span>Configuration</span>
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
