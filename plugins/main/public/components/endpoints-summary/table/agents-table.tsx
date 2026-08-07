@@ -18,6 +18,7 @@ import {
   EuiPanel,
   EuiCallOut,
   EuiButton,
+  EuiSpacer,
 } from '@elastic/eui';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import { withErrorBoundary } from '../../common/hocs';
@@ -30,17 +31,15 @@ import { WzRequest } from '../../../react-services/wz-request';
 import { get as getLodash } from 'lodash';
 import { endpointSummary } from '../../../utils/applications';
 import { EditAgentGroupsModal } from './actions/edit-groups-modal';
-import { useUserPermissionsRequirements } from '../../common/hooks/useUserPermissions';
 import { agentsTableColumns } from './columns';
 import { AgentsTableGlobalActions } from './global-actions/global-actions';
 import { Agent } from '../types';
 import { UpgradeAgentModal } from './actions/upgrade-agent-modal';
-import { AgentUpgradesInProgress } from './upgrades-in-progress/upgrades-in-progress';
-import { AgentUpgradesTaskDetailsModal } from './upgrade-task-details-modal';
 import NavigationService from '../../../react-services/navigation-service';
 import { getWazuhAPIVersion } from '../services';
 import { RemoveAgentModal } from './actions/remove-agent-modal';
 import { getAgentVersion } from '../../../../common/services/wz-agent';
+import { useUpgradeStatus, usePendingUpgradeAgents } from '../hooks';
 
 type AgentList = {
   items: Agent[];
@@ -71,14 +70,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Agent[]>([]);
   const [allAgentsSelected, setAllAgentsSelected] = useState(false);
-
-  const [isUpgradeTasksModalVisible, setIsUpgradeTasksModalVisible] =
-    useState(false);
-  const [isUpgradePanelClosed, setIsUpgradePanelClosed] = useState(false);
   const [apiVersion, setApiVersion] = useState('');
-  const [denyGetTasks] = useUserPermissionsRequirements([
-    { action: 'task:status', resource: '*:*:*' },
-  ]);
 
   const getApiVersion = async () => {
     const response = await getWazuhAPIVersion('AgentsTable.getApiVersion');
@@ -108,6 +100,12 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
       props.setExternalReload(Date.now());
     }
   };
+
+  useUpgradeStatus(reloadAgents, reloadTable);
+  const pendingUpgradeAgents = usePendingUpgradeAgents();
+  const pendingUpgradeAgentIds = new Set(
+    pendingUpgradeAgents.map(pendingAgent => pendingAgent.id),
+  );
 
   const onSelectionChange = (selectedItems: Agent[]) => {
     setSelectedItems(selectedItems);
@@ -207,15 +205,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
           <TableWzAPI
             title='Agents'
             addOnTitle={selectedtemsRenderer}
-            extra={
-              <AgentUpgradesInProgress
-                reload={props.externalReload}
-                setIsModalVisible={setIsUpgradeTasksModalVisible}
-                isPanelClosed={isUpgradePanelClosed}
-                setIsPanelClosed={setIsUpgradePanelClosed}
-                allowGetTasks={!denyGetTasks}
-              />
-            }
             actionButtons={
               <EuiFlexItem grow={false}>
                 <WzButtonPermissions
@@ -241,8 +230,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                   allAgentsCount={agentList.totalItems}
                   filters={filters?.q}
                   reloadAgents={() => reloadAgents()}
-                  setIsUpgradeTasksModalVisible={setIsUpgradeTasksModalVisible}
-                  setIsUpgradePanelClosed={setIsUpgradePanelClosed}
                 />
               </EuiFlexItem>
             )}
@@ -253,7 +240,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
               setIsUpgradeModalVisible,
               setFilters,
               apiVersion,
-              { setIsRemoveModalVisible },
+              { setIsRemoveModalVisible, pendingUpgradeAgentIds },
             )}
             tableInitialSortingField='id'
             tablePageSizeOptions={[10, 25, 50, 100]}
@@ -421,6 +408,23 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
 
   return (
     <div>
+      {pendingUpgradeAgents.length ? (
+        <>
+          <EuiCallOut
+            title={`${pendingUpgradeAgents.length} ${
+              pendingUpgradeAgents.length === 1 ? 'agent is' : 'agents are'
+            } being upgraded`}
+            color='primary'
+            iconType='iInCircle'
+          >
+            <p>
+              The upgrade request was sent. This list will refresh automatically
+              once each agent reports the new version.
+            </p>
+          </EuiCallOut>
+          <EuiSpacer size='m' />
+        </>
+      ) : null}
       <EuiPanel paddingSize='m'>{table}</EuiPanel>
       {isEditGroupsVisible && agent ? (
         <EditAgentGroupsModal
@@ -440,7 +444,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
             setIsUpgradeModalVisible(false);
             setAgent(undefined);
           }}
-          setIsUpgradePanelClosed={setIsUpgradePanelClosed}
         />
       ) : null}
       {isRemoveModalVisible && agent ? (
@@ -451,11 +454,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
             setIsRemoveModalVisible(false);
             setAgent(undefined);
           }}
-        />
-      ) : null}
-      {isUpgradeTasksModalVisible ? (
-        <AgentUpgradesTaskDetailsModal
-          onClose={() => setIsUpgradeTasksModalVisible(false)}
         />
       ) : null}
     </div>

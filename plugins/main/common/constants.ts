@@ -801,26 +801,10 @@ export const AGENT_STATUS_CODE = [
   },
 ];
 
-export const API_NAME_TASK_STATUS = {
-  DONE: 'Done',
-  IN_PROGRESS: 'In progress',
-  FAILED: 'Failed',
-  TIMEOUT: 'Timeout',
-} as const;
-
-export const UI_TASK_STATUS = [
-  API_NAME_TASK_STATUS.DONE,
-  API_NAME_TASK_STATUS.IN_PROGRESS,
-  API_NAME_TASK_STATUS.FAILED,
-  API_NAME_TASK_STATUS.TIMEOUT,
-];
-
-export const UI_TASK_STATUS_COLORS = {
-  [API_NAME_TASK_STATUS.DONE]: 'success',
-  [API_NAME_TASK_STATUS.IN_PROGRESS]: 'warning',
-  [API_NAME_TASK_STATUS.FAILED]: 'danger',
-  [API_NAME_TASK_STATUS.TIMEOUT]: 'subdued',
-};
+// How often to re-check GET /agents while an upgrade is pending.
+export const AGENT_UPGRADE_STATUS_POLL_INTERVAL_MS = 15000;
+// Stop tracking an agent's upgrade if its version hasn't changed by then.
+export const AGENT_UPGRADE_STATUS_POLL_TIMEOUT_MS = 15 * 60 * 1000;
 
 // Documentation
 export const DOCUMENTATION_WEB_BASE_URL = 'https://documentation.wazuh.com';

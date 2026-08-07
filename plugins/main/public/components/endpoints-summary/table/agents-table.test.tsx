@@ -4,8 +4,6 @@ import { AgentsTable } from './agents-table';
 import { WzRequest } from '../../../react-services/wz-request';
 import configureMockStore from 'redux-mock-store';
 import { Provider } from 'react-redux';
-import { useUserPermissionsRequirements } from '../../common/hooks/useUserPermissions';
-import { useGetUpgradeTasks } from '../hooks';
 
 jest.mock('../../common/hooks/use-app-config', () => ({
   useAppConfig: () => ({
@@ -313,16 +311,6 @@ jest.mock('react', () => ({
   useLayoutEffect: jest.requireActual('react').useEffect,
 }));
 
-jest.mock('../../common/hooks/useUserPermissions', () => ({
-  ...jest.requireActual('../../common/hooks/useUserPermissions'),
-  useUserPermissionsRequirements: jest.fn().mockReturnValue([false, {}]),
-}));
-
-jest.mock('../hooks', () => ({
-  ...jest.requireActual('../hooks'),
-  useGetUpgradeTasks: jest.fn().mockReturnValue({}),
-}));
-
 // TODO: Fix this test
 describe('AgentsTable component', () => {
   WzRequest.apiReq = jest.fn(AgentsTable, 'wzReq').mockResolvedValue({
@@ -396,44 +384,5 @@ describe('AgentsTable component', () => {
     expect(
       window.localStorage.getItem('wz-agents-overview-table-visible-fields'),
     ).toEqual(JSON.stringify(customColumns));
-  });
-
-  it('does not allow AgentUpgradesInProgress to fetch tasks when the task:status permission is missing', () => {
-    (useUserPermissionsRequirements as jest.Mock).mockReturnValue([
-      [{ action: 'task:status', resource: '*:*:*' }],
-      {},
-    ]);
-
-    render(
-      <Provider store={store}>
-        <AgentsTable
-          filters={[]}
-          showOnlyOutdated={false}
-          setShowOnlyOutdated={() => jest.fn()}
-          totalOutdated={0}
-          externalReload={false}
-        />
-      </Provider>,
-    );
-
-    expect(useGetUpgradeTasks).toHaveBeenCalledWith(false, false);
-  });
-
-  it('allows AgentUpgradesInProgress to fetch tasks when the task:status permission is granted', () => {
-    (useUserPermissionsRequirements as jest.Mock).mockReturnValue([false, {}]);
-
-    render(
-      <Provider store={store}>
-        <AgentsTable
-          filters={[]}
-          showOnlyOutdated={false}
-          setShowOnlyOutdated={() => jest.fn()}
-          totalOutdated={0}
-          externalReload={false}
-        />
-      </Provider>,
-    );
-
-    expect(useGetUpgradeTasks).toHaveBeenCalledWith(false, true);
   });
 });

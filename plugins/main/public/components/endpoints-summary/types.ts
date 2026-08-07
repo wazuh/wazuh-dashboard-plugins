@@ -29,10 +29,7 @@ export type Group = {
   count: number;
 };
 
-export type ResponseUpgradeAgents = {
-  agent: string;
-  task_id: number;
-};
+export type ResponseUpgradeAgents = string;
 
 export type ResponseRemoveAgent = string;
 
