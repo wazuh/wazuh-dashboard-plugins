@@ -57,7 +57,8 @@ const TABLE_ROW_CAP = 500;
 /** ~1500 tokens, approximated as 6000 chars (the "compact ~1-2k token hard cap"). */
 const DIGEST_CHAR_CAP = 6000;
 /** Individual string field values longer than this are truncated (capDigest) before whole sample
- * rows are dropped. */
+ * rows are dropped. Also the cap applied to the Manager `message` field and each
+ * `breakdown[].key` — see `capFieldValue` below. */
 const MAX_FIELD_VALUE_LENGTH = 500;
 
 function getByPath(source: Record<string, unknown>, path: string): unknown {
@@ -725,10 +726,41 @@ export function buildDigest(
   return capDigest(digest);
 }
 
+/** Strips ASCII control characters (code points 0-31, and 127/DEL) — a tool-derived string field
+ * (a Manager `message`, an aggregation `breakdown[].key` built from indexed data) can carry these
+ * verbatim from attacker-influenced source data; stripping them defends against escape-sequence
+ * or other control-byte smuggling into the model's context. Filters by code point rather than a
+ * regex control-character class (which `no-control-regex` flags, for good reason elsewhere: those
+ * escapes usually indicate a typo) — this is the one place that legitimately wants exactly that
+ * range. */
+function stripControlChars(value: string): string {
+  let result = '';
+  for (const char of value) {
+    const codePoint = char.codePointAt(0) ?? 0;
+    if (codePoint >= 0x20 && codePoint !== 0x7f) {
+      result += char;
+    }
+  }
+  return result;
+}
+
+/** Control-char strip + length cap for the Manager `message` field and `breakdown[].key` —
+ * unlike `samples`, neither was bounded at all before this; both can originate in free text the
+ * Manager API returns or an aggregation bucket key built from indexed (attacker-influenced)
+ * data. */
+function capFieldValue(value: string): string {
+  const stripped = stripControlChars(value);
+  return stripped.length > MAX_FIELD_VALUE_LENGTH
+    ? `${stripped.slice(0, MAX_FIELD_VALUE_LENGTH)}…`
+    : stripped;
+}
+
 /** Truncates any sample field's string value longer than `MAX_FIELD_VALUE_LENGTH`, mutating each
  * sample row in place. Runs unconditionally (not gated on the overall char cap) as a cheap
  * preprocessing pass before capDigest's row-drop fallback below, since one oversized field (e.g. a
- * raw log line) shouldn't cost an entire row when trimming just that field is enough. */
+ * raw log line) shouldn't cost an entire row when trimming just that field is enough. Also caps
+ * (length + control-char strip, via `capFieldValue`) the two other previously-unbounded string
+ * fields: the Manager `message` and each `breakdown[].key`. */
 function truncateLongFieldValues(digest: Digest): void {
   for (const sample of digest.samples) {
     for (const key of Object.keys(sample)) {
@@ -738,12 +770,27 @@ function truncateLongFieldValues(digest: Digest): void {
       }
     }
   }
+  if (digest.message !== undefined) {
+    digest.message = capFieldValue(digest.message);
+  }
+  if (digest.breakdown) {
+    for (const entry of digest.breakdown) {
+      entry.key = capFieldValue(entry.key);
+    }
+  }
 }
 
 /**
  * Hard cap enforcement: truncate oversized field values first, then drop samples, then trim
- * the breakdown, mutating `digest` in place and returning it. JSON.stringify already omits an
- * undefined `breakdown`, so no cap iterations run when there isn't one.
+ * the breakdown, then — last resort — drop the Manager `message` entirely, mutating `digest` in
+ * place and returning it. JSON.stringify already omits an undefined `breakdown`/`message`, so no
+ * cap iterations run when either is absent.
+ *
+ * `message` is dropped whole rather than trimmed char-by-char: `truncateLongFieldValues` above
+ * already caps it at `MAX_FIELD_VALUE_LENGTH`, so on its own it can only ever push an
+ * already-near-the-cap digest over the edge, never dominate it — by the time samples and
+ * breakdown are both fully exhausted and the digest is STILL oversized, dropping the one
+ * remaining small field is enough (there is nothing left to partially trim).
  *
  * Exported (not just an inline step of `buildDigest` above) so server/tools/executor.ts can re-run
  * it after server/tools/privacy.ts's `applyFieldPolicy` substitutes pseudonyms for real values:
@@ -767,6 +814,12 @@ export function capDigest(digest: Digest): Digest {
     digest.breakdown.length > 0
   ) {
     digest.breakdown.pop();
+  }
+  if (
+    JSON.stringify(digest).length > DIGEST_CHAR_CAP &&
+    digest.message !== undefined
+  ) {
+    delete digest.message;
   }
   return digest;
 }

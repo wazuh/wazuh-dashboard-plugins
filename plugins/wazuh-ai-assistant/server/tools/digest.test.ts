@@ -619,3 +619,81 @@ test('buildDigest: a synthetic breakdown over a truncated page is labeled page-o
   assert.ok(digest.samplesNote);
   assert.equal(/Use counts\/breakdown/.test(digest.samplesNote!), false);
 });
+
+// --- message / breakdown[].key hardening (#8890) ---------------------------------------------
+
+/** Regex control-character classes (e.g. /[\x00-\x1F]/) are themselves flagged by
+ * `no-control-regex` — this checks by code point instead, mirroring digest.ts's own
+ * `stripControlChars`. */
+function hasControlChar(value: string): boolean {
+  for (const char of value) {
+    const codePoint = char.codePointAt(0) ?? 0;
+    if (codePoint < 0x20 || codePoint === 0x7f) {
+      return true;
+    }
+  }
+  return false;
+}
+
+test('buildDigest: the Manager "message" field is stripped of control characters and capped at MAX_FIELD_VALUE_LENGTH', () => {
+  const def = buildToolDef();
+  const dirtyMessage = `AR failed\x07\x1B[31m: ${'x'.repeat(600)}`;
+  const result = {
+    data: { affected_items: [], total_affected_items: 0 },
+    message: dirtyMessage,
+  };
+  const digest = buildDigest('run_active_response', result, def);
+  assert.ok(digest.message, 'message should be present');
+  assert.ok(
+    !hasControlChar(digest.message as string),
+    'control characters must be stripped from message',
+  );
+  assert.equal((digest.message as string).length, 501); // 500 chars + ellipsis marker
+  assert.ok((digest.message as string).endsWith('…'));
+});
+
+test('buildDigest: a short, clean "message" is left byte-identical', () => {
+  const def = buildToolDef();
+  const result = {
+    data: { affected_items: [], total_affected_items: 0 },
+    message: 'AR command was not sent to any agent',
+  };
+  const digest = buildDigest('run_active_response', result, def);
+  assert.equal(digest.message, 'AR command was not sent to any agent');
+});
+
+test('buildDigest: breakdown "key" values are stripped of control characters and capped at MAX_FIELD_VALUE_LENGTH', () => {
+  const def = buildToolDef();
+  const dirtyKey = `rule\x01${'y'.repeat(600)}`;
+  const result = {
+    aggregations: {
+      top_rules: { buckets: [{ key: dirtyKey, doc_count: 3 }] },
+    },
+  };
+  const digest = buildDigest('get_top_rules', result, def);
+  const key = digest.breakdown![0].key;
+  assert.ok(
+    !hasControlChar(key),
+    'control characters must be stripped from the key',
+  );
+  assert.equal(key.length, 501); // 500 chars + ellipsis marker
+  assert.ok(key.endsWith('…'));
+});
+
+test('capDigest: an oversized "columns" list forces the Manager message to be dropped once samples/breakdown are already exhausted', () => {
+  const digest: Digest = {
+    tool: 't',
+    counts: { returned: 0, truncated: false },
+    samples: [],
+    columns: Array.from(
+      { length: 200 },
+      (_, i) => `some.very.long.column.path.name.${i}`,
+    ),
+    message: 'a short, otherwise-harmless message',
+  };
+  const capped = capDigest(digest);
+  assert.ok(
+    !('message' in capped),
+    'message is dropped as the last-resort step once nothing else remains to trim',
+  );
+});

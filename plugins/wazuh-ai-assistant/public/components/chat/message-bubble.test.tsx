@@ -1,7 +1,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { MessageBubble, UiChatMessage } from './message-bubble';
+import {
+  MessageBubble,
+  sanitizeAssistantMarkdown,
+  UiChatMessage,
+} from './message-bubble';
 import { TableSpec } from '../../../common/types';
 
 const noopResolveDiscoverUrl = () => Promise.resolve(null);
@@ -70,6 +74,35 @@ describe('MessageBubble', () => {
     expect(strong?.textContent).toBe('bold');
     // The raw markdown markers themselves are gone from the rendered text.
     expect(container.textContent).not.toContain('**bold**');
+  });
+
+  it('#8890: renders a Markdown image and a raw <img> tag as inert — no <img> element mounts, and legitimate formatting survives', () => {
+    const { container } = render(
+      <MessageBubble
+        message={baseMessage({
+          role: 'assistant',
+          content:
+            'Findings summary with **bold** text. ![x](http://evil.example/x) ' +
+            'Also: <img src=x onerror=alert(1)> End of answer.',
+          isStreaming: false,
+        })}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+
+    // No live <img> element was mounted — neither the Markdown image nor the raw HTML tag ever
+    // reaches the DOM as an element that could trigger an outbound fetch.
+    expect(container.querySelector('img')).toBeNull();
+    // Neither the attacker-controlled URL nor the onerror payload appear anywhere in the
+    // rendered output (stripped, not merely hidden).
+    expect(container.innerHTML).not.toContain('evil.example');
+    expect(container.innerHTML).not.toContain('onerror');
+    // Legitimate formatting elsewhere in the same answer is unaffected.
+    const strong = container.querySelector('strong');
+    expect(strong?.textContent).toBe('bold');
+    expect(container.textContent).toContain('Findings summary with');
+    expect(container.textContent).toContain('End of answer.');
   });
 
   it('renders a streaming assistant message as plain text (no Markdown parsing) with an aria-live region', () => {
@@ -229,5 +262,67 @@ describe('MessageBubble', () => {
     );
 
     expect(screen.queryByRole('link', { name: 'Open in Discover' })).toBeNull();
+  });
+});
+
+describe('sanitizeAssistantMarkdown (#8890)', () => {
+  it('strips inline Markdown image syntax, including the URL', () => {
+    const out = sanitizeAssistantMarkdown(
+      'before ![alt](http://evil.example/x) after',
+    );
+    expect(out).not.toContain('![');
+    expect(out).not.toContain('evil.example');
+  });
+
+  it('strips reference-style Markdown image syntax', () => {
+    const out = sanitizeAssistantMarkdown('before ![alt][ref] after');
+    expect(out).not.toContain('![');
+  });
+
+  it('strips raw HTML tags (open, close, self-closing)', () => {
+    const out = sanitizeAssistantMarkdown(
+      '<img src=x onerror=alert(1)> and <div>text</div> and <br/>',
+    );
+    expect(out).not.toContain('<img');
+    expect(out).not.toContain('<div>');
+    expect(out).not.toContain('</div>');
+    expect(out).not.toContain('<br/>');
+    expect(out).toContain('text');
+  });
+
+  it('leaves ordinary "<"/">" comparisons in prose untouched (not mistaken for a tag)', () => {
+    const input = 'The threshold is value < 5 and > 10 in this case.';
+    expect(sanitizeAssistantMarkdown(input)).toBe(input);
+  });
+
+  it('leaves normal Markdown (bold, lists, headings) untouched', () => {
+    const input =
+      '**bold** and _italic_ and a list:\n- one\n- two\n\n# Heading';
+    expect(sanitizeAssistantMarkdown(input)).toBe(input);
+  });
+
+  it('leaves fenced code blocks completely untouched, even with <img>/![]() inside them', () => {
+    const input =
+      'Before.\n```html\n<img src=x onerror=alert(1)>\n![a](b)\n```\nAfter.';
+    const out = sanitizeAssistantMarkdown(input);
+    expect(out).toContain('<img src=x onerror=alert(1)>');
+    expect(out).toContain('![a](b)');
+  });
+
+  it('leaves inline code spans completely untouched', () => {
+    const input = 'Example: `<img src=x>` and `![a](b)` in code.';
+    expect(sanitizeAssistantMarkdown(input)).toBe(input);
+  });
+
+  it('keeps an explicit http(s) link but drops a non-http(s) link target, keeping only its label', () => {
+    const out = sanitizeAssistantMarkdown(
+      'See [CVE page](https://nvd.nist.gov/x) or [click me](javascript:alert(1)) or [rel](/x).',
+    );
+    expect(out).toContain('[CVE page](https://nvd.nist.gov/x)');
+    expect(out).not.toContain('javascript:');
+    expect(out).not.toContain('[click me]');
+    expect(out).toContain('click me');
+    expect(out).not.toContain('[rel]');
+    expect(out).toContain('rel');
   });
 });

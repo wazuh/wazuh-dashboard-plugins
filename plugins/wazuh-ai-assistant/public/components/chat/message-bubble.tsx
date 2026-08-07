@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   EuiPanel,
   EuiText,
@@ -122,6 +122,60 @@ function formatTimestamp(epochMs: number): string {
 }
 
 /**
+ * SECURITY (#8890): the finished answer below is model output built from tool results, which
+ * can themselves carry attacker-influenced text (a log line, a rule description, a filename).
+ * `EuiMarkdownFormat` is otherwise given no plugin overrides, so its default renderer draws
+ * `![alt](url)` as a live `<img>` (an uncontrolled outbound fetch to whatever URL ended up in
+ * the model's answer) and — depending on the exact EUI/remark-rehype build the host platform
+ * bundles — can interpret raw inline HTML. An assistant answer is analytical prose; it has no
+ * legitimate need to embed a remote image or a raw HTML element.
+ *
+ * EUI does expose `getDefaultEuiMarkdownProcessingPlugins`/`parsingPluginList` overrides for
+ * exactly this kind of restriction, and that is the preferred fix — but this plugin is bundled
+ * against whichever `@elastic/eui` version the host `wazuh-dashboard` platform ships (not a
+ * version pinned in this repo), and that version cannot be resolved or exercised from this
+ * worktree (no installed `node_modules`, no way to run a real render to confirm the plugin-list
+ * shape holds for the bundled version). Rather than hard-code an internal EUI plugin API this
+ * plugin cannot verify against its actual runtime, this sanitizes the STRING before it reaches
+ * `EuiMarkdownFormat`, the same "mechanical, version-independent guarantee" already used for the
+ * markdown-table backstop (see server/tools/markdown-table-filter.ts's doc comment). Fenced code
+ * blocks and inline code spans are left untouched, so a literal `<img>` or `![]()` a user is
+ * reading about in a code sample still displays as written.
+ */
+export function sanitizeAssistantMarkdown(content: string): string {
+  // Split on fenced code blocks (```...```) and inline code spans (`...`); the capturing group
+  // keeps each code segment as its own array element, interleaved with the surrounding prose.
+  // Odd indices are always the captured (code) segments — see the .map below.
+  const segments = content.split(/(```[\s\S]*?```|`[^`\n]*`)/g);
+  return segments
+    .map((segment, index) =>
+      index % 2 === 1 ? segment : sanitizeProseSegment(segment),
+    )
+    .join('');
+}
+
+function sanitizeProseSegment(segment: string): string {
+  return (
+    segment
+      // Markdown images (inline and reference-style) — strip entirely rather than degrading to a
+      // link, since a bare URL the model copied from tool data is exactly the kind of attacker-
+      // influenced text this guards against too.
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+      .replace(/!\[[^\]]*\]\[[^\]]*\]/g, '')
+      // Raw HTML tags (open, close, self-closing) — the leading-letter requirement after `<`/`</`
+      // is what real HTML tags require, so ordinary prose use of `<`/`>` (e.g. "value < 5") never
+      // matches and passes through untouched.
+      .replace(/<\/?[a-zA-Z][a-zA-Z0-9-]*(?:\s[^<>]*)?\/?>/g, '')
+      // Markdown links: keep the label, drop the target unless it's an explicit http(s) URL — a
+      // "plain link... subject to a scheme check" (never javascript:/data:/vbscript:/a bare path).
+      // The trailing `\)+` (not just `\)`) also consumes a stray extra ")" that a malicious target
+      // itself containing an unmatched "(" (e.g. "javascript:alert(1)") would otherwise leave
+      // behind in the rendered text.
+      .replace(/\[([^\]]*)\]\((?!https?:\/\/)[^)]*\)+/gi, '$1')
+  );
+}
+
+/**
  * Renders a single chat turn. User messages are always plain text. Assistant messages are
  * plain text while still streaming (re-parsing Markdown on every delta token is wasteful and
  * can flicker), then switch to EuiMarkdownFormat once the message has finished streaming so
@@ -145,6 +199,14 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   const isWaitingForFirstToken =
     !isUser && message.isStreaming === true && message.content === '';
   const toolCalls = message.toolCalls ?? [];
+  // Only the finished-assistant branch below renders through EuiMarkdownFormat (the user bubble
+  // and the streaming branch both render message.content as plain text/JSX, which React already
+  // escapes), so this is only ever read there — memoized on message.content since re-sanitizing
+  // an unchanged, already-finished answer on every unrelated re-render is pure waste.
+  const sanitizedContent = useMemo(
+    () => sanitizeAssistantMarkdown(message.content),
+    [message.content],
+  );
   // One open/closed state PER chip, keyed by what that chip reveals. A single shared panel was
   // tried first and was wrong twice over: clicking one query opened every query on the turn, and
   // because the panel rendered above the chips it pushed them down, so the control that closed it
@@ -241,7 +303,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       ) : (
         <div style={proseStyle}>
           <EuiText size='s'>
-            <EuiMarkdownFormat>{message.content}</EuiMarkdownFormat>
+            {/* sanitizeAssistantMarkdown (#8890): the finished answer is model output built
+                  from tool results that can carry attacker-influenced text — see that
+                  function's doc comment for why this runs here instead of an EUI
+                  processingPluginList override. */}
+            <EuiMarkdownFormat>{sanitizedContent}</EuiMarkdownFormat>
           </EuiText>
         </div>
       )}
