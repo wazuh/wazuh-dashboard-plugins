@@ -39,15 +39,6 @@ const available = (value: number) => ({
   data: value,
 });
 
-const vulnerabilitiesAvailable = {
-  status: 'available' as const,
-  data: {
-    severity: { critical: 0, high: 0, medium: 0, low: 0 },
-    byPackage: [],
-    cvesMatched: 3521,
-  },
-};
-
 const threatIntelAvailable = {
   status: 'available' as const,
   data: { total: 2048, feedByType: [], byThreatType: [] },
@@ -68,10 +59,7 @@ beforeEach(() => {
 describe('ThreatIntelligenceFeedSection', () => {
   it('renders one section with both the Security analytics and Threat catalog cards', () => {
     render(
-      <ThreatIntelligenceFeedSection
-        vulnerabilities={vulnerabilitiesAvailable}
-        threatIntel={threatIntelAvailable}
-      />,
+      <ThreatIntelligenceFeedSection threatIntel={threatIntelAvailable} />,
     );
     expect(screen.getByText('Threat intelligence feed')).toBeInTheDocument();
     expect(screen.getByText('Security analytics')).toBeInTheDocument();
@@ -80,16 +68,12 @@ describe('ThreatIntelligenceFeedSection', () => {
     expect(screen.getByText('KVDBs')).toBeInTheDocument();
     expect(screen.getByText('Filters')).toBeInTheDocument();
     expect(screen.getByText('IOCs')).toBeInTheDocument();
-    expect(screen.getByText('CVEs matched')).toBeInTheDocument();
     expect(screen.getByText('482')).toBeInTheDocument();
   });
 
   it('navigates to the Security Analytics tiles on click, and to "Manage content" from the card header', () => {
     render(
-      <ThreatIntelligenceFeedSection
-        vulnerabilities={vulnerabilitiesAvailable}
-        threatIntel={threatIntelAvailable}
-      />,
+      <ThreatIntelligenceFeedSection threatIntel={threatIntelAvailable} />,
     );
     fireEvent.click(screen.getByText('Rules'));
     expect(navigation.getRulesUrl).toHaveBeenCalled();
@@ -109,10 +93,7 @@ describe('ThreatIntelligenceFeedSection', () => {
       asMock(mock).mockReturnValue({ status: 'unavailable' });
     }
     render(
-      <ThreatIntelligenceFeedSection
-        vulnerabilities={{ status: 'unavailable' }}
-        threatIntel={{ status: 'unavailable' }}
-      />,
+      <ThreatIntelligenceFeedSection threatIntel={{ status: 'unavailable' }} />,
     );
     expect(screen.getByText('Security analytics')).toBeInTheDocument();
     expect(screen.getByText('Threat catalog')).toBeInTheDocument();
@@ -122,19 +103,15 @@ describe('ThreatIntelligenceFeedSection', () => {
   it('fetches the Security Analytics tiles lazily once the section enters the viewport', () => {
     asMock(useInViewport).mockReturnValue([{ current: null }, false]);
     render(
-      <ThreatIntelligenceFeedSection
-        vulnerabilities={vulnerabilitiesAvailable}
-        threatIntel={threatIntelAvailable}
-      />,
+      <ThreatIntelligenceFeedSection threatIntel={threatIntelAvailable} />,
     );
     expect(asMock(useRulesCount)).toHaveBeenCalledWith(false);
     expect(asMock(useKvdbsCount)).toHaveBeenCalledWith(false);
   });
 
-  it('keeps the IOC and CVE counts and shows the threat-type composition below them', () => {
+  it('keeps the IOC count and shows the threat-type composition below it', () => {
     const { container } = render(
       <ThreatIntelligenceFeedSection
-        vulnerabilities={vulnerabilitiesAvailable}
         threatIntel={{
           status: 'available',
           data: {
@@ -149,7 +126,6 @@ describe('ThreatIntelligenceFeedSection', () => {
       />,
     );
     expect(screen.getAllByText('2,048').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('3,521').length).toBeGreaterThan(0);
     expect(
       container.querySelector('[data-test-subj="threat-catalog-threat-types"]'),
     ).toBeTruthy();

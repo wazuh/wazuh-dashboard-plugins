@@ -16,7 +16,6 @@ export const VULNERABILITY_SEVERITY_BANDS: SeverityBand[] = [
   'high',
   'medium',
   'low',
-  'pending',
 ];
 
 export const FINDING_SEVERITY_FIELD = 'wazuh.rule.level';
@@ -38,8 +37,6 @@ export const FIM_FILE_MTIME_FIELD = 'file.mtime';
 export const VULNERABILITY_SEVERITY_FIELD = 'vulnerability.severity';
 /** Package name on a vulnerability state document. */
 export const VULNERABILITY_PACKAGE_NAME_FIELD = 'package.name';
-/** CVE identifier field; distinct from doc count since one CVE can match many findings/assets. */
-export const VULNERABILITY_CVE_ID_FIELD = 'vulnerability.id';
 /**
  * One event can carry more than one threat-enrichment match, so Malware
  * Detection counts distinct events via this field rather than raw doc count
