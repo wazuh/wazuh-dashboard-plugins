@@ -9,6 +9,7 @@ import {
   EuiBadge,
   EuiAvatar,
   EuiButtonEmpty,
+  EuiCallOut,
   EuiCodeBlock,
   EuiLoadingContent,
   EuiMarkdownFormat,
@@ -16,7 +17,7 @@ import {
 import { i18n } from '@osd/i18n';
 import { ChatRole, TableSpec, ToolCall } from '../../../common/types';
 import { ResultTable } from './result-table';
-import { ResolveDiscoverUrl } from './discover-link';
+import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
 import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
 import { describeToolCall } from './tool-call-label';
 
@@ -66,6 +67,18 @@ export interface UiChatMessage {
   role: ChatRole;
   content: string;
   table?: TableSpec;
+  /**
+   * The graceful-failure handoff (server/tools/suggest-discover-query.ts / issue
+   * 13-suggested-query-discover-handoff.md): set from a `suggested_query` stream event instead of
+   * `table` when the model determined the data asked about is out of its reach for every tool it
+   * has, and offered a query the user can run themselves in Discover instead of guessing.
+   * `reason` is the model's own plain-language explanation, shown verbatim next to the link.
+   */
+  suggestedQuery?: {
+    index: string;
+    dsl: Record<string, unknown>;
+    reason: string;
+  };
   /** True while this assistant message is still receiving delta events. */
   isStreaming?: boolean;
   /** Transient progress line from a `status` stream event (e.g. "Querying Wazuh..."). */
@@ -240,6 +253,34 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
             resolveDiscoverUrl={resolveDiscoverUrl}
             resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
           />
+        </>
+      )}
+      {/* Graceful-failure handoff (server/tools/suggest-discover-query.ts): the model's own reason
+          text plus a link to run the query itself in Discover, in place of the table/answer it
+          could not produce. `discover` is a synthetic, minimal TableSpec — {columns:[], rows:[]}
+          carry nothing ResultTable itself would render; only `discover` is real, reusing the exact
+          same DiscoverLink/resolveDiscoverUrl plumbing every result table's "Open in Discover"
+          link already goes through (discover-link.tsx). */}
+      {message.suggestedQuery && (
+        <>
+          <EuiSpacer size='s' />
+          <EuiCallOut
+            size='s'
+            iconType='iInCircle'
+            title={message.suggestedQuery.reason}
+          >
+            <DiscoverLink
+              spec={{
+                columns: [],
+                rows: [],
+                discover: {
+                  index: message.suggestedQuery.index,
+                  dsl: message.suggestedQuery.dsl,
+                },
+              }}
+              resolveDiscoverUrl={resolveDiscoverUrl}
+            />
+          </EuiCallOut>
         </>
       )}
     </>

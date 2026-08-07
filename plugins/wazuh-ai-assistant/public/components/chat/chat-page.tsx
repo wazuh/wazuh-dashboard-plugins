@@ -1099,6 +1099,26 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           if (exchange) {
             exchange.digestContent = event.content;
           }
+        } else if (event.type === 'suggested_query') {
+          // Graceful-failure handoff (server/tools/suggest-discover-query.ts): a callout rendered
+          // alongside this message's prose (message-bubble.tsx), not another `table` — the model
+          // is telling the user what it could NOT check, so there is no result set to show, only a
+          // query the user can run themselves. Set immediately (unlike `table`'s held/flushed
+          // `pendingTable`) since it has no ordering dependency on delta text arriving first.
+          if (isTurnStillActive()) {
+            const suggestedQuery = {
+              index: event.index,
+              dsl: event.dsl,
+              reason: event.reason,
+            };
+            updateMessages(current =>
+              current.map(message =>
+                message.id === assistantMessageId
+                  ? { ...message, suggestedQuery }
+                  : message,
+              ),
+            );
+          }
         } else if (event.type === 'privacy_map' && isTurnStillActive()) {
           // Gated: the pseudonym map is PER-CONVERSATION state. An abandoned turn's entries used to
           // be merged into whatever conversation the user had just opened, and then sent up with

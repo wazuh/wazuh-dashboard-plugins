@@ -59,6 +59,15 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     const body: Record<string, unknown> = {
       model: config.model,
       stream: true,
+      // The OpenAI streaming contract only emits the terminal `usage` frame when this is set.
+      // Groq sends it unprompted, which is why the omission went unnoticed -- every usage number
+      // this plugin has recorded so far came from Groq. Amazon Bedrock's chat-completions endpoint
+      // does not: without this, every turn reports `usage: null` and token accounting (including
+      // the stage-1 router's own spend) reads blank. Providers that don't recognise the field
+      // ignore it, and the `if (parsed.usage)` exit below is unchanged either way -- note that
+      // frame arrives with an EMPTY `choices` array, which the per-choice handling above already
+      // tolerates (`parsed.choices?.[0]` is simply undefined).
+      stream_options: { include_usage: true },
       messages: messages.map(toOpenAiMessage),
     };
     // Checked for `undefined`, not truthiness -- callers deliberately send `temperature: 0` (the
@@ -107,17 +116,26 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     // `content` at all — never appended alongside a working answer.
     let sawContent = false;
     let reasoningBuffer = '';
+    // Set once the `finish_reason === 'tool_calls'` branch below has finalized and yielded this
+    // call's tool calls. Existing solely so the LATER exits (the terminal `usage` frame requested
+    // by `stream_options.include_usage`, or `[DONE]`) know two things without re-touching
+    // `toolCalls`: (a) don't call `finalizeToolCalls` again -- it was already drained and its
+    // events already yielded, so a second call would either emit nothing (fine) or, if the map
+    // wasn't cleared, re-emit duplicates; and (b) `reasoningFallback` below must still be suppressed
+    // there, even though the map they'd otherwise check is now empty. Previously the
+    // `finish_reason === 'tool_calls'` branch yielded its own bare `done` and returned immediately,
+    // which is the bug (issue 8875): a tool_calls-terminated stream still has one more chunk to read
+    // -- the empty-`choices` usage frame `stream_options.include_usage` unlocks -- and returning
+    // early skipped it, so EVERY tool-bearing round (and the stage-1 router call, which always ends
+    // in a tool call by design) reported `usage: undefined` right up to the round loop's accumulator,
+    // leaving only the last, tool-free round's usage to sum.
+    let toolCallsFinalized = false;
     /** Emits the buffered reasoning text as one `delta`, but only if `content` never arrived this
-     * call AND this exit finalized no tool calls. Two exits are excluded, not one:
-     *  - the `finish_reason === 'tool_calls'` exit (a round that ends in a tool call has no answer
-     *    due yet, so there is nothing to fall back for) never calls this at all;
-     *  - the `[DONE]`/usage/loop-end exits below DO call this, but must still suppress it when
-     *    `hadToolCalls` is true — a provider can close a tool round through one of THOSE exits
-     *    without ever sending `finish_reason: 'tool_calls'` (gpt-oss/Groq happens to send it, but
-     *    the wire format doesn't guarantee it), and reasoning routinely precedes a tool call on the
-     *    analysis channel, so the buffer is typically full exactly when a tool round is ending.
-     *    Without this, that reasoning text would be injected as the answer for a TOOL round instead
-     *    of being correctly treated as "no answer due yet". */
+     * call AND this exit finalized no tool calls -- a round that ends in a tool call has no answer
+     * due yet, so buffered reasoning must never be injected as if it were one. `hadToolCalls` folds
+     * in `toolCallsFinalized` at every call site below so this still holds true even once the
+     * `finish_reason === 'tool_calls'` branch has already drained `toolCalls` down to empty by the
+     * time a later exit calls this. */
     function* reasoningFallback(hadToolCalls: boolean): Generator<StreamEvent> {
       if (!sawContent && !hadToolCalls && reasoningBuffer) {
         yield { type: 'delta', content: reasoningBuffer };
@@ -127,12 +145,16 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     try {
       for await (const payload of iterateSseLines(response.body, signal)) {
         if (payload === '[DONE]') {
-          const finalized = finalizeToolCalls(toolCalls);
-          yield* finalized;
-          if (!hasToolCallError(finalized)) {
-            yield* reasoningFallback(finalized.length > 0);
-            yield { type: 'done' };
+          if (!toolCallsFinalized) {
+            const finalized = finalizeToolCalls(toolCalls);
+            yield* finalized;
+            if (hasToolCallError(finalized)) {
+              return;
+            }
+            toolCallsFinalized = toolCallsFinalized || finalized.length > 0;
           }
+          yield* reasoningFallback(toolCallsFinalized);
+          yield { type: 'done' };
           return;
         }
         let parsed: {
@@ -185,36 +207,47 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         }
         accumulateToolCallDeltas(toolCalls, choice?.delta?.tool_calls);
 
-        if (choice?.finish_reason === 'tool_calls') {
+        if (choice?.finish_reason === 'tool_calls' && !toolCallsFinalized) {
           const finalized = finalizeToolCalls(toolCalls);
           yield* finalized;
-          if (!hasToolCallError(finalized)) {
-            yield { type: 'done' };
+          if (hasToolCallError(finalized)) {
+            return;
           }
-          return;
+          toolCallsFinalized = true;
+          // No 'done' yet, no return: the terminal usage frame `stream_options.include_usage`
+          // requests (or, failing that, `[DONE]`) is still to come on this same stream, and one of
+          // the two blocks below is what actually yields 'done' for this call.
         }
         if (parsed.usage) {
-          const finalized = finalizeToolCalls(toolCalls);
-          yield* finalized;
-          if (!hasToolCallError(finalized)) {
-            yield* reasoningFallback(finalized.length > 0);
-            yield {
-              type: 'done',
-              usage: {
-                inputTokens: parsed.usage.prompt_tokens,
-                outputTokens: parsed.usage.completion_tokens,
-              },
-            };
+          if (!toolCallsFinalized) {
+            const finalized = finalizeToolCalls(toolCalls);
+            yield* finalized;
+            if (hasToolCallError(finalized)) {
+              return;
+            }
+            toolCallsFinalized = toolCallsFinalized || finalized.length > 0;
           }
+          yield* reasoningFallback(toolCallsFinalized);
+          yield {
+            type: 'done',
+            usage: {
+              inputTokens: parsed.usage.prompt_tokens,
+              outputTokens: parsed.usage.completion_tokens,
+            },
+          };
           return;
         }
       }
-      const finalized = finalizeToolCalls(toolCalls);
-      yield* finalized;
-      if (!hasToolCallError(finalized)) {
-        yield* reasoningFallback(finalized.length > 0);
-        yield { type: 'done' };
+      if (!toolCallsFinalized) {
+        const finalized = finalizeToolCalls(toolCalls);
+        yield* finalized;
+        if (hasToolCallError(finalized)) {
+          return;
+        }
+        toolCallsFinalized = toolCallsFinalized || finalized.length > 0;
       }
+      yield* reasoningFallback(toolCallsFinalized);
+      yield { type: 'done' };
     } catch (error) {
       if (signal.aborted) {
         return;
