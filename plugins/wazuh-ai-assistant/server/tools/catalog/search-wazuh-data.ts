@@ -35,8 +35,11 @@ export const searchWazuhDataTool: ToolDefinition = {
       'If "aggs" has more than one top-level aggregation, every aggregation\'s buckets are ' +
       'summarized in the digest text you receive, but the rendered table only shows the first ' +
       "aggregation's buckets. For a \"how many DISTINCT X\" question, use a \"cardinality\" " +
-      'aggregation on the relevant field (e.g. wazuh.agent.name for distinct hosts/agents) ' +
-      'instead of counting hits -- a hit count overcounts when one host has multiple documents.',
+      'aggregation on an ALLOWLISTED keyword field such as wazuh.agent.name (for distinct hosts/' +
+      'agents) instead of counting hits -- a hit count overcounts when one host has multiple ' +
+      'documents. Only a fixed set of low-cardinality fields is allowed for this (the allowlist ' +
+      'may grow over time); an arbitrary field like source.user.name or file.path is rejected -- ' +
+      'if the field you need is not accepted, say so rather than retrying variations.',
     parameters: objectSchema(
       {
         index_pattern: {

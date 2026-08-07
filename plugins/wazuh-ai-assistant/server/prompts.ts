@@ -83,8 +83,9 @@ export function buildSystemPrompt(nowIso: string): string {
       '"which checks fail" questions.',
     'For "how many DISTINCT X" questions (e.g. distinct hosts/agents affected), a plain hit count ' +
       '(hits.total) overcounts when the same host appears in multiple documents -- it is NOT a ' +
-      'distinct count. Use search_wazuh_data with a "cardinality" aggregation on the relevant ' +
-      'keyword field instead (e.g. wazuh.agent.name for distinct hosts/agents).',
+      'distinct count. Use search_wazuh_data with a "cardinality" aggregation on an allowlisted ' +
+      'keyword field such as wazuh.agent.name instead (the allowlist is fixed and may grow over ' +
+      'time; an arbitrary field like source.user.name or file.path will be rejected).',
     'Never guess rule ids: if you do not know the exact wazuh.rule.id for a kind of finding, use ' +
       'search_findings_by_rule_tag with a wazuh.rule.tags value, or aggregate by rule first with ' +
       'get_top_rules to discover ids. If a narrowly-filtered query returns 0 rows for activity ' +
