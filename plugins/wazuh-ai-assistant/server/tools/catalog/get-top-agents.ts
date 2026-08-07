@@ -24,8 +24,8 @@ function resolveIndexFamily(value: unknown): IndexFamily {
  * escape hatch's `AGG_FIELD_ALLOWLIST` check made a hand-built terms agg on the agent fields the
  * only route, which a weak router/model rarely reaches unassisted.
  *
- * Same shape as `get-top-rules.ts`: a `terms` aggregation on `wazuh.agent.id` (on the guardrail
- * low-cardinality allowlist -- see `WAZUH_FIELD.AGENT_ID` in `guardrails.ts`) with a `top_hits`
+ * Same shape as `get-top-rules.ts`: a `terms` aggregation on `wazuh.agent.id` (on the guardrail's
+ * bounded-bucket-safe allowlist -- see `WAZUH_FIELD.AGENT_ID` in `guardrails.ts`) with a `top_hits`
  * sub-aggregation sampling one `wazuh.agent.name` per bucket, `size: 0` (aggregation-only, no hit
  * documents fetched). `index` selects which timeline family to rank agents over: `findings`
  * (rule-matched detections, the default -- "which agents are triggering the most alerts") or

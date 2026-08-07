@@ -13,8 +13,17 @@ export interface Digest {
   /** `agg` is set only when the executed query had more than one top-level aggregation (only the
    * search_wazuh_data escape hatch can produce that), naming which aggregation a bucket belongs
    * to — single-agg digests (every typed tool) stay byte-identical to before it existed. It also
-   * lets privacy.ts's field-policy pass attribute each bucket key to the right aggregation field. */
-  breakdown?: Array<{ key: string; count: number; agg?: string }>;
+   * lets privacy.ts's field-policy pass attribute each bucket key to the right aggregation field.
+   *
+   * `key` is `unknown`, not `string`: a plain terms/significant_terms/cardinality bucket's key is
+   * always a string (unchanged from before), but a `multi_terms` bucket's key is an ARRAY of
+   * component values and a `composite` bucket's key is an OBJECT of `{sourceName: value}` pairs —
+   * see `buildBreakdown` below. Forcing either through `String()` loses the per-component
+   * structure privacy.ts's field-policy pass needs to scrub each component against its own field
+   * (and, for `composite`, produced the literal string "[object Object]", a separate display
+   * bug). digest.ts stays privacy-agnostic either way: it just stops DESTROYING the structure a
+   * privacy-aware consumer needs, it does not interpret it. */
+  breakdown?: Array<{ key: unknown; count: number; agg?: string }>;
   samples: Array<Record<string, unknown>>;
   /** Schema hint: the column ids of the table already rendered to the user. */
   columns: string[];
@@ -427,9 +436,27 @@ export function buildTableSpec(
  * only reflects the first aggregation — documented as a known limitation in search_wazuh_data.ts's
  * tool description — so this is a digest-only improvement.
  */
+/**
+ * Bucket keys arrive in three shapes: a plain string/number for terms/significant_terms/
+ * cardinality (unchanged: `String()`-coerced same as always), an ARRAY for `multi_terms`, or an
+ * OBJECT (`{sourceName: value}`) for `composite`. The latter two are returned AS-IS rather than
+ * `String()`-coerced -- `String()` on an object produces the literal, useless "[object Object]"
+ * (a display bug on its own) and, more importantly, throws away the per-component structure
+ * privacy.ts's field-policy pass needs to scrub each component against its own field (see
+ * `Digest.breakdown`'s doc comment). `String()` on an array already produces a readable
+ * comma-joined string in JS, so that shape was never the display bug -- it is kept structural here
+ * too, for the same privacy reason, not because it was broken before.
+ */
+function normalizeBucketKey(rawKey: unknown): unknown {
+  if (rawKey !== null && typeof rawKey === 'object') {
+    return rawKey;
+  }
+  return String(rawKey);
+}
+
 function buildBreakdown(
   result: unknown,
-): Array<{ key: string; count: number; agg?: string }> | undefined {
+): Array<{ key: unknown; count: number; agg?: string }> | undefined {
   const aggregations = (
     result as { aggregations?: Record<string, unknown> } | undefined
   )?.aggregations;
@@ -438,7 +465,7 @@ function buildBreakdown(
   }
   const aggKeys = Object.keys(aggregations);
   const multipleAggs = aggKeys.length > 1;
-  const breakdown: Array<{ key: string; count: number; agg?: string }> = [];
+  const breakdown: Array<{ key: unknown; count: number; agg?: string }> = [];
   for (const aggKey of aggKeys) {
     const buckets = (aggregations[aggKey] as { buckets?: unknown } | undefined)
       ?.buckets;
@@ -448,7 +475,7 @@ function buildBreakdown(
     for (const bucket of buckets) {
       const bucketRecord = bucket as Record<string, unknown>;
       breakdown.push({
-        key: String(bucketRecord.key),
+        key: normalizeBucketKey(bucketRecord.key),
         count: Number(bucketRecord.doc_count ?? 0),
         ...(multipleAggs ? { agg: aggKey } : {}),
       });

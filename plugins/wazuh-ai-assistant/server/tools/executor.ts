@@ -15,6 +15,7 @@ import {
 import { buildDigest, buildTableSpec, capDigest, Digest } from './digest';
 import { IndexerRequest, ManagerRequest, ToolDefinition } from './types';
 import {
+  AggFieldSpec,
   applyFieldPolicy,
   extractAggFields,
   FieldPolicyEntry,
@@ -47,7 +48,7 @@ function finalizeDigest(
   digest: Digest,
   privacy: PrivacyContext | undefined,
   toolName: string,
-  aggFields?: Record<string, string | undefined>,
+  aggFields?: Record<string, AggFieldSpec | undefined>,
   // The escape hatch's deriveColumns can put ARBITRARY finding fields into
   // the digest, so its unlisted-field default must be fail-closed (anonymize) instead of the
   // curated typed tools' allow-by-omission — see privacy.ts's applyFieldPolicy.

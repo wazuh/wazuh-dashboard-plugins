@@ -143,15 +143,24 @@ export function applySafetyValves(
   // not actually the true count. `true` asks OpenSearch for the EXACT count on every shard
   // (`hits.total = {value: <exact>, relation: 'eq'}` always) with no upper bound of its own.
   // Accepted trade-off, not a regression: exact counting costs strictly more than a capped count
-  // on a very large index, but (a) `counts.total` drives user-facing, often compliance-adjacent
-  // answers ("how many critical vulnerabilities") where an approximate/capped number is the wrong
-  // kind of wrong to ship silently, and (b) every query this valve applies to is already bounded
-  // by this file's OTHER valves -- the mandatory <=90-day time range on timeline indices
-  // (`lintDsl`'s time-bound check), the `wazuh-states-*` current-state indices' inherently
-  // fixed per-agent document counts, and `MAX_SIZE`/`MAX_AGG_SIZE` capping what is ever
-  // RETURNED -- so this is bounded lab/production security telemetry, not an unbounded
-  // web-scale corpus; the exact-count pass over an already time-/scope-bounded shard set is cheap
-  // in that regime.
+  // on a very large index -- COUNTING work, not RETURNED-volume work, so it is NOT actually bounded
+  // by the <=90-day time range or by `MAX_SIZE`/`MAX_AGG_SIZE`: those valves cap how many documents/
+  // buckets are ever RETURNED to the caller, but `track_total_hits: true` makes every shard walk
+  // its ENTIRE matching set to produce an exact count regardless of how few hits are returned or
+  // how narrow the declared time window is -- a 90-day range against a high-volume index can still
+  // match millions of documents that all have to be counted. The actual backstop against that cost
+  // is `SEARCH_TIMEOUT` ('10s', above): every search this valve applies to already carries that
+  // timeout, so a pathologically expensive exact count fails the request (a clean, bounded error)
+  // rather than running unbounded -- that timeout, not the time-range/size valves, is what makes
+  // this acceptable. Trade-off accepted because `counts.total` drives user-facing, often
+  // compliance-adjacent answers ("how many critical vulnerabilities") where an approximate/capped
+  // number is the wrong kind of wrong to ship silently, and this plugin's traffic is bounded
+  // lab/production security telemetry, not an unbounded web-scale corpus.
+  // Recorded follow-up concern, NOT mitigated by anything above: there is no per-TURN cap on how
+  // many tool calls a single conversation turn can issue, so a turn that fans out several expensive
+  // exact-count aggregations back-to-back has no aggregate cost ceiling beyond each individual
+  // call's own 10s timeout -- worth revisiting if this valve's cost profile turns out to matter in
+  // practice.
   next.track_total_hits = true;
   // allow_partial_search_results is deliberately NOT set here: it is a transport/URL parameter,
   // not a body field (a body key would 400 the whole search), and the cluster default is already
@@ -305,14 +314,17 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // `MAX_AGG_SIZE` capping the returned bucket count and the query's other mandatory bounds (time
   // range, index allowlist), per this Set's contract comment above, NOT on `source.ip` itself
   // having few distinct values. PRIVACY: `source.ip` already has a `FIELD_POLICY_DEFAULTS` entry
-  // (`privacy.ts:70`, `{action: 'anonymize', kind: 'IP'}`) from its existing use as a sample
-  // field, and `privacy.ts`'s `applyFieldPolicy` `breakdown` loop (`privacy.ts:688-725`) resolves
-  // EVERY bucket's aggregation field via `extractAggFields` and applies that SAME policy entry to
-  // the bucket `key` -- the exact "a top-agents terms agg leaks hostnames otherwise" mechanism
-  // documented on `applyFieldPolicy` (`privacy.ts:611`), which already covers ANY aggregated
-  // field, not just agent fields. So a `source.ip` terms agg's buckets are pseudonymized under
-  // privacy mode exactly like a `source.ip` sample value is today; no new privacy plumbing was
-  // needed. Privacy-off (the default) surfaces raw IPs in buckets, same as it already does in
+  // (`privacy.ts`, `{action: 'anonymize', kind: 'IP'}`) from its existing use as a sample field,
+  // and `privacy.ts`'s `applyFieldPolicy` `breakdown` loop resolves EVERY bucket's aggregation
+  // field(s) via `extractAggFields`/`scrubAggKey` and applies that SAME policy entry to the bucket
+  // key (or, for a `multi_terms`/`composite` pivot, to each of its components) -- the "a top-agents
+  // terms agg leaks hostnames otherwise" mechanism documented on `applyFieldPolicy`, which already
+  // covers ANY aggregated field, not just agent fields. So a `source.ip` terms agg's buckets are
+  // pseudonymized under privacy mode exactly like a `source.ip` sample value is today; no new
+  // privacy plumbing was needed for a plain `terms` pivot on this field (a `multi_terms`/
+  // `composite` pivot combining `source.ip` with another field required fixing a separate,
+  // pre-existing gap in that same mechanism -- see `scrubAggKey`'s doc comment in privacy.ts).
+  // Privacy-off (the default) surfaces raw IPs in buckets, same as it already does in
   // every finding-hits tool's digest samples via `FINDING_DIGEST_EXTRA_COLUMNS` -- no new exposure.
   'source.ip',
 ]);
