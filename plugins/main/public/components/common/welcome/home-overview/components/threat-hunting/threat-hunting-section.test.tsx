@@ -6,10 +6,11 @@ import { ThreatHuntingSection } from './threat-hunting-section';
 import * as navigation from '../../utils/navigation';
 
 jest.mock('../../utils/navigation', () => ({
-  getThreatHuntingUrl: jest.fn(),
+  getThreatHuntingUrl: jest.fn(() => '#threat-hunting'),
   getMitreUrl: jest.fn(),
-  getMitreTechniqueUrl: jest.fn(),
+  getMitreIntelligenceResourceUrl: jest.fn(() => '#mitre-intelligence'),
   getVulnerabilityDetectionUrl: jest.fn(),
+  getVulnerabilityDetectionBySeverityUrl: jest.fn(() => '#vuln-filtered'),
 }));
 const findingsAvailable = {
   status: 'available' as const,
@@ -31,8 +32,7 @@ const vulnerabilitiesAvailable = {
   status: 'available' as const,
   data: {
     severity: { critical: 179, high: 5456, medium: 31517, low: 1980 },
-    byOs: [{ key: 'Red Hat Enterprise Linux 9.5', count: 29685 }],
-    cvesMatched: 3521,
+    byPackage: [{ key: 'openssl', count: 29685 }],
   },
 };
 
@@ -56,9 +56,23 @@ describe('ThreatHuntingSection', () => {
     expect(
       screen.getAllByText('Exploit Public-Facing Application').length,
     ).toBeGreaterThan(0);
+    expect(screen.getAllByText('openssl').length).toBeGreaterThan(0);
+  });
+
+  it('links each Top 5 technique to its MITRE Intelligence detail', () => {
+    render(
+      <ThreatHuntingSection
+        findings={findingsAvailable}
+        vulnerabilities={vulnerabilitiesAvailable}
+      />,
+    );
     expect(
-      screen.getAllByText('Red Hat Enterprise Linux 9.5').length,
-    ).toBeGreaterThan(0);
+      screen.getByText('Exploit Public-Facing Application').closest('a'),
+    ).toBeInTheDocument();
+    expect(navigation.getMitreIntelligenceResourceUrl).toHaveBeenCalledWith(
+      'techniques',
+      { key: 'Exploit Public-Facing Application', count: 35378, id: 'T1190' },
+    );
   });
 
   it('keeps Vulnerability Detection when the search is unavailable', () => {
@@ -98,5 +112,38 @@ describe('ThreatHuntingSection', () => {
     );
     fireEvent.click(screen.getByText('Threat Hunting'));
     expect(navigation.getThreatHuntingUrl).toHaveBeenCalled();
+  });
+
+  it('links the Total findings KPI to Threat Hunting', () => {
+    const { container } = render(
+      <ThreatHuntingSection
+        findings={findingsAvailable}
+        vulnerabilities={vulnerabilitiesAvailable}
+      />,
+    );
+    expect(
+      container.querySelector('[data-test-subj="total-findings-hero-link"]'),
+    ).toBeInTheDocument();
+    expect(navigation.getThreatHuntingUrl).toHaveBeenCalled();
+  });
+
+  it('renders the vulnerability severity counts as KPI tiles, each linking to a filtered Inventory', () => {
+    const { container } = render(
+      <ThreatHuntingSection
+        findings={findingsAvailable}
+        vulnerabilities={vulnerabilitiesAvailable}
+      />,
+    );
+    expect(
+      container.querySelector('[data-test-subj="vulnerability-severity"]'),
+    ).toBeNull();
+    expect(
+      container.querySelector('[data-test-subj="vulnerability-severity-high"]'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('5,456')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('5,456'));
+    expect(
+      navigation.getVulnerabilityDetectionBySeverityUrl,
+    ).toHaveBeenCalledWith('high', undefined);
   });
 });

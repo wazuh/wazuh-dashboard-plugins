@@ -29,15 +29,16 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   // Timestamps / rule metadata (curated by the Wazuh ruleset, not analyst/attacker input).
   'timestamp',
   '@timestamp',
-  'rule.id',
-  'rule.level',
-  'rule.description',
-  'rule.mitre.technique',
+  'wazuh.rule.id',
+  'wazuh.rule.level',
+  'wazuh.rule.title',
+  'wazuh.rule.mitre.technique.id',
+  'wazuh.rule.mitre.technique.name',
   // Aggregation-bucket shape (get_top_rules and the *_summary tools).
   'key',
   'doc_count',
-  // agent.os.name / os.* / architecture / vendor / version: OS/package metadata, not identifiers.
-  'agent.os.name',
+  // os.* / architecture / vendor / version: OS/package metadata, not identifiers.
+  'wazuh.agent.host.os.name',
   'os.name',
   'os.version',
   'architecture',
@@ -74,9 +75,8 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   // Generic "name" recurs across several Manager-API tools (package/process/policy name) with no
   // tool-scoped policy entry because it is deliberately NOT anonymized there (see privacy.ts's
   // comment on get_agent_packages/name, get_agent_processes/name, get_sca_results/name) — tools
-  // where "name" DOES mean a hostname (get_active_agents, get_disconnected_agents) have their own
-  // scoped FIELD_POLICY_DEFAULTS entry that is checked first and wins, so this blanket allowance
-  // never overrides those.
+  // where "name" DOES mean a hostname (get_agents) have their own scoped FIELD_POLICY_DEFAULTS
+  // entry that is checked first and wins, so this blanket allowance never overrides those.
   'name',
   // Wazuh 5.0 ECS structural fields: OS/package metadata,
   // bare port numbers/enums, process metadata, SCA-summary counters, and FIM file metadata —
@@ -100,6 +100,29 @@ const KNOWN_SAFE_STRUCTURAL_FIELDS = new Set<string>([
   'file.path',
   'file.mtime',
   'file.size',
+  // Security Analytics content (get_rules, get_threat_intel_components): vendor-curated
+  // rule/pipeline configuration metadata, not analyst- or attacker-supplied data.
+  'document.name',
+  'document.level',
+  'document.status',
+  'document.enabled',
+  'document.mitre.technique.id',
+  'document.tags',
+  'document.logsource.product',
+  'document.logsource.category',
+  'document.metadata.title',
+  'document.metadata.module',
+  'document.category',
+  'document.mode',
+  'document.enrichments',
+  'document.index_discarded_events',
+  'document.index_unclassified_events',
+  'space.name',
+  // Security Analytics detector config (get_detectors): admin/vendor-configured metadata.
+  'detector.name',
+  'detector.detector_type',
+  'detector.enabled',
+  'detector.source',
 ]);
 
 /** Replica of privacy.ts's private `resolveFieldEntry`: a tool-scoped entry ("tool/field") wins over
@@ -166,7 +189,7 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
   assert.equal(
     isFieldCovered(
       'data.totally_new_field',
-      'get_critical_alerts',
+      'get_critical_findings',
       FIELD_POLICY_DEFAULTS,
     ),
     false,
@@ -174,11 +197,19 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
   // Sanity check the positive cases too, so a change to KNOWN_SAFE_STRUCTURAL_FIELDS/
   // FIELD_POLICY_DEFAULTS that accidentally drops an entry is itself caught here.
   assert.equal(
-    isFieldCovered('data.srcip', 'get_critical_alerts', FIELD_POLICY_DEFAULTS),
+    isFieldCovered(
+      'wazuh.agent.host.ip',
+      'get_critical_findings',
+      FIELD_POLICY_DEFAULTS,
+    ),
     true,
   );
   assert.equal(
-    isFieldCovered('rule.groups', 'get_pci_dss_alerts', FIELD_POLICY_DEFAULTS),
+    isFieldCovered(
+      'wazuh.rule.tags',
+      'get_compliance_alerts',
+      FIELD_POLICY_DEFAULTS,
+    ),
     true,
   );
   assert.equal(
@@ -186,7 +217,7 @@ test('isFieldCovered mechanism: an unclassified field is correctly flagged as NO
     true,
   );
   assert.equal(
-    isFieldCovered('name', 'get_active_agents', FIELD_POLICY_DEFAULTS),
+    isFieldCovered('name', 'get_agents', FIELD_POLICY_DEFAULTS),
     true,
   );
 });

@@ -10,8 +10,10 @@ export const configSchema = schema.object({
    * opensearch_dashboards.yml (this plugin's `configPath` is `wazuh_ai_assistant` — see
    * opensearch_dashboards.json — NOT the `wazuhAiAssistant` plugin id).
    *
-   * Optional and unset by default: with no key configured, provider API keys are stored and read
-   * as plaintext, byte-identical to this plugin's behavior before encryption-at-rest existed (see
+   * Unset by default, but required to USE API keys at all: with no key configured, provider
+   * writes carrying a non-empty `apiKey` are rejected (`requireApiKeyEncryption` in
+   * server/routes/settings.ts), and API keys are never stored or read as plaintext — a plaintext
+   * value stored by a pre-release build fails decryption and must be re-entered (see
    * docs/ENCRYPTION.md). Never exposed to the browser (see `exposeToBrowser` below) and never
    * logged (server/plugin.ts's setup() logs only whether encryption is enabled, not the key).
    */
