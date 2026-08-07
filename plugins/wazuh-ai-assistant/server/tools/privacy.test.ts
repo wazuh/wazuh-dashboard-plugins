@@ -384,9 +384,7 @@ test('applyFieldPolicy: an EXPLICIT "allow" entry is not scanned for embedded IP
   // Deliberate scoping (see the samples-loop comment in privacy.ts): an explicit entry is a
   // reviewed decision (e.g. a curated taxonomy field), left exactly as before -- only the
   // allow-BY-OMISSION path gets the new scan.
-  const policy: FieldPolicyEntry[] = [
-    { field: 'check.name', action: 'allow' },
-  ];
+  const policy: FieldPolicyEntry[] = [{ field: 'check.name', action: 'allow' }];
   const p = new Pseudonymizer();
   const digest = baseDigest({
     samples: [{ 'check.name': 'Reach out to 203.0.113.7 if this fails' }],
