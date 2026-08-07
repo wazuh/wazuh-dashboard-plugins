@@ -4,7 +4,7 @@ import { PLUGIN_ID } from '../../common/constants';
 import {
   WAZUH_AI_NAV_CATEGORY,
   WAZUH_AI_NAV_GROUP_ORDER,
-} from '../../../wazuh-core/common/nav-categories';
+} from '../../common/nav-categories';
 
 /**
  * New-navigation registration for the AI Assistant (issue #8895).

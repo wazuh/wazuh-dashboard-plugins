@@ -1,23 +1,27 @@
 import { i18n } from '@osd/i18n';
 
 /**
- * Shared Wazuh navigation-category definitions (issue #8895).
+ * Wazuh navigation-category definition for the AI layer (issue #8895).
  *
- * Lives in `wazuh-core/common` because a category has to be identical in every plugin that places an
- * app into it — OpenSearch Dashboards groups apps by the category `id`, so two plugins declaring the
- * same id with a different `label` or `order` produce whichever the framework happens to resolve
- * last. Restating the object per plugin is how that drifts, so the literal is defined once here and
- * imported. `common/` specifically (not `public/`) because it is an isomorphic constant with no
- * browser or Node dependency, per this repo's layering rules.
+ * Lives in THIS plugin's `common/` because the assistant is the only application in the AI category.
+ * The main `wazuh` plugin deliberately does NOT declare this category: no main-plugin application
+ * belongs to it, and registering it there can render an empty group in that plugin's own menus. With
+ * a single owner there is no cross-plugin copy to keep in sync, so the literal lives with its
+ * consumer.
  *
- * Why this is NOT declared in the main `wazuh` plugin alongits own category list: no main-plugin
- * application belongs to the AI category, and adding it there renders an empty group in that
- * plugin's own menus. The main plugin's list stays the set of categories IT populates.
+ * It was first written into `wazuh-core/common` to be "shared", which does NOT work here: a
+ * cross-plugin VALUE import cannot resolve in this plugin's build and test tree, where sibling
+ * plugins are not present. The main plugin gets away with importing from `wazuh-core` only because
+ * its import is type-only and therefore erased at compile time. Should a second plugin ever need
+ * this category, promoting it to `wazuh-core` also means giving that plugin's jest config and build
+ * access to the sibling source it would then depend on.
  *
- * Note also that a category cannot be published through `wazuh-core`'s setup/start contract, because
+ * `common/` rather than `public/`: it is an isomorphic constant with no browser or Node dependency,
+ * per this repo's layering rules.
+ *
+ * Note a category cannot be published through a plugin setup/start contract either, because
  * consumers need it during `application.register()` inside their own `setup()`, before any plugin
- * contract is available to them. A static import is the only mechanism that is in scope at that
- * point.
+ * contract is available to them. A static import is the only mechanism in scope at that point.
  */
 
 /**

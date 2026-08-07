@@ -7,7 +7,7 @@ import {
 } from '../../../src/core/public';
 import { i18n } from '@osd/i18n';
 import { PLUGIN_ID } from '../common/constants';
-import { WAZUH_AI_APP_CATEGORY } from '../../wazuh-core/common/nav-categories';
+import { WAZUH_AI_APP_CATEGORY } from '../common/nav-categories';
 import { registerAiNavLink } from './utils/nav-link';
 import {
   WazuhAiAssistantPluginSetup,
@@ -38,7 +38,7 @@ export class WazuhAiAssistantPlugin
       // is the clearest AI glyph available inside that family in the bundled EUI.
       euiIconType: 'machineLearningApp',
       // Sole app in its own category, so the intra-category order is not contested; what positions
-      // the entry in the sidebar is the CATEGORY order (see wazuh-core/common/nav-categories.ts).
+      // the entry in the sidebar is the CATEGORY order (see common/nav-categories.ts).
       // The previous 9070 only ever meant "late within Explore".
       order: 100,
       // Own top-level category instead of the framework's generic `Explore` (issue #8895). The

@@ -5,7 +5,7 @@ import {
   WAZUH_AI_CATEGORY_ORDER,
   WAZUH_AI_NAV_CATEGORY,
   WAZUH_AI_NAV_GROUP_ORDER,
-} from '../../../wazuh-core/common/nav-categories';
+} from '../../common/nav-categories';
 
 /**
  * Guards the navigation placement decided in issue #8895. The assistant was previously filed under
