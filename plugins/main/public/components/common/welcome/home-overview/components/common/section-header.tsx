@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  EuiBreadcrumbs,
   EuiFlexGroup,
   EuiFlexItem,
   EuiText,
@@ -11,6 +10,8 @@ import {
 export interface SectionHeaderProps {
   title: string;
   description: React.ReactNode;
+  /** Optional right-aligned content, e.g. the page-level Quick access menu. */
+  actions?: React.ReactNode;
 }
 
 /**
@@ -22,21 +23,38 @@ export interface SectionHeaderProps {
 export const SectionHeader: React.FC<SectionHeaderProps> = ({
   title,
   description,
+  actions,
 }) => (
   <>
-    <EuiFlexGroup gutterSize='s' alignItems='baseline' responsive={false} wrap>
+    <EuiFlexGroup
+      gutterSize='s'
+      alignItems='baseline'
+      responsive={false}
+      wrap
+      justifyContent={actions ? 'spaceBetween' : undefined}
+    >
       <EuiFlexItem grow={false}>
-        <EuiBetaBadge
-          color='subdued'
-          label={`${title}`}
-          aria-label={`${title} section`}
-        />
+        <EuiFlexGroup
+          gutterSize='s'
+          alignItems='baseline'
+          responsive={false}
+          wrap
+        >
+          <EuiFlexItem grow={false}>
+            <EuiBetaBadge
+              color='subdued'
+              label={`${title}`}
+              aria-label={`${title} section`}
+            />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiText size='s' color='subdued'>
+              {description}
+            </EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       </EuiFlexItem>
-      <EuiFlexItem grow={false}>
-        <EuiText size='s' color='subdued'>
-          {description}
-        </EuiText>
-      </EuiFlexItem>
+      {actions && <EuiFlexItem grow={false}>{actions}</EuiFlexItem>}
     </EuiFlexGroup>
     <EuiSpacer size='m' />
   </>

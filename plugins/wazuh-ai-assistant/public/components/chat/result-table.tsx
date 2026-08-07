@@ -4,15 +4,21 @@ import {
   EuiBasicTable,
   EuiBasicTableColumn,
   EuiBadge,
-  EuiText,
+  EuiFlexGroup,
+  EuiFlexItem,
   EuiButtonIcon,
   EuiCallOut,
+  EuiCodeBlock,
   htmlIdGenerator,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { TableSpec } from '../../../common/types';
-import { SEVERITY_LEVELS, SeverityLevel } from '../../../common/constants';
+import { SeverityLevel } from '../../../common/constants';
 import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
+import {
+  ResolveSecurityAnalyticsUrl,
+  SecurityAnalyticsLink,
+} from './security-analytics-link';
 
 /** Tables at or under this row count default to expanded (nothing to gain from collapsing them);
  * bigger ones default collapsed so a 500-row result doesn't force the user to scroll past it to
@@ -22,99 +28,163 @@ const AUTO_EXPAND_ROW_THRESHOLD = 10;
 /** One rendered table row: a `TableSpec` row plus the global `__rowId` the expander column and
  * `itemIdToExpandedRowMap` are keyed by (assigned over the FULL row set before pagination). */
 type ResultRow = Record<string, unknown> & { __rowId: string };
-/** Max height of the scrollable table body inside the accordion; the accordion (and the page) never
- * grows taller than this for the table itself, however many rows or columns it has. */
-const TABLE_SCROLL_MAX_HEIGHT = 400;
-/** Default page size and the choices offered in EuiBasicTable's page-size popover (perf: caps a
- * 500-row result to this many DOM rows at a time instead of all of them at once). */
-const DEFAULT_PAGE_SIZE = 25;
-const PAGE_SIZE_OPTIONS = [25, 50, 100];
-
-const SEVERITY_COLORS: Record<SeverityLevel, string> = {
-  critical: 'danger',
-  high: 'warning',
-  medium: 'default',
-  low: 'hollow',
-};
-
-/** Localized badge text for each canonical severity level (color mapping above stays keyed by the
- * English level regardless — only the displayed label is translated). */
-const SEVERITY_LABELS: Record<SeverityLevel, string> = {
-  critical: i18n.translate('wazuhAiAssistant.resultTable.severity.critical', {
-    defaultMessage: 'Critical',
-  }),
-  high: i18n.translate('wazuhAiAssistant.resultTable.severity.high', {
-    defaultMessage: 'High',
-  }),
-  medium: i18n.translate('wazuhAiAssistant.resultTable.severity.medium', {
-    defaultMessage: 'Medium',
-  }),
-  low: i18n.translate('wazuhAiAssistant.resultTable.severity.low', {
-    defaultMessage: 'Low',
-  }),
-};
+/** Default page size and the choices offered in EuiBasicTable's page-size popover.
+ *
+ * Five, not twenty-five: the page size IS the height control now that the table body has no inner
+ * scroller. Five rows answer "what did it find?" inside the conversation without pushing the chat
+ * input off the screen, and the reader can page through or open the full set in Discover. It also
+ * keeps the DOM small for a 500-row result, which is why pagination was here to begin with. */
+const DEFAULT_PAGE_SIZE = 5;
+const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
 
 /**
- * LEGACY numeric rule.level -> severity-word classification (0-6 low, 7-11 medium, 12-14 high,
- * 15+ critical), the Wazuh 4.14 model. In Wazuh 5.0 (findings-v5) rule.level is ALREADY a
- * categorical word (informational/low/medium/high/critical) and never numeric, so this function is
- * now only a fallback for any severity column whose value still arrives numeric; the word path in
- * `renderSeverityBadge` is the normal 5.0 route. Kept so a mixed/older data source still renders.
+ * Badge color + localized label for each `SeverityLevel` word. Colors mirror the platform's own
+ * mapping — plugins/main/common/constants.ts's `UI_COLOR_STATUS` (critical: '#BD271E', high:
+ * '#FEC514', medium/info: '#6092C0', low/success: '#007871', informational/disabled: '#646A77') —
+ * so a severity reads the same color here as it does everywhere else in the product. Not imported
+ * directly (that would be a cross-plugin import from wazuh-ai-assistant into plugins/main); the
+ * hex values are copied in and this comment is the pointer back to the source of truth.
  */
-function severityWordFromLevel(level: number): SeverityLevel {
-  if (level >= 15) {
-    return 'critical';
+const SEVERITY_BUCKETS: Record<
+  SeverityLevel,
+  { color: string; label: string }
+> = {
+  informational: {
+    color: '#646A77',
+    label: i18n.translate(
+      'wazuhAiAssistant.resultTable.severity.informational',
+      {
+        defaultMessage: 'Informational',
+      },
+    ),
+  },
+  low: {
+    color: '#007871',
+    label: i18n.translate('wazuhAiAssistant.resultTable.severity.low', {
+      defaultMessage: 'Low',
+    }),
+  },
+  medium: {
+    color: '#6092C0',
+    label: i18n.translate('wazuhAiAssistant.resultTable.severity.medium', {
+      defaultMessage: 'Medium',
+    }),
+  },
+  high: {
+    color: '#FEC514',
+    label: i18n.translate('wazuhAiAssistant.resultTable.severity.high', {
+      defaultMessage: 'High',
+    }),
+  },
+  critical: {
+    color: '#BD271E',
+    label: i18n.translate('wazuhAiAssistant.resultTable.severity.critical', {
+      defaultMessage: 'Critical',
+    }),
+  },
+};
+
+/** ISO-8601 instants as the indexer emits them (`2026-07-26T05:58:38.000Z`). Matched, rather than
+ * fed straight to `new Date()`, so a plain string that merely happens to be Date-parseable (a rule
+ * title starting with a year, an agent name like "2026-prod") is never silently reformatted. */
+const ISO_TIMESTAMP_RE =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:?\d{2})$/;
+
+/** Column width for a formatted timestamp column — wide enough for "Jul 26, 2026, 05:58" on one
+ * line, which is the entire point: unformatted, a raw ISO instant wrapped onto three lines and
+ * made every row three times taller than its content needed. */
+const TIMESTAMP_COLUMN_WIDTH = '118px';
+/** Column width for the severity column: a badge plus its longest label ("Informational"). */
+const SEVERITY_COLUMN_WIDTH = '104px';
+/** Approximate advance width of one character at the table's font size, used only to turn a
+ * column's longest value into a pixel width. Deliberately rough — it decides how much room a
+ * short column reserves, not whether anything is readable. */
+const APPROX_CHAR_WIDTH = 7.5;
+/** A column whose longest value is no longer than this is treated as a "short" column and gets a
+ * width sized to its content, leaving the remaining width to the free-text column(s). */
+const SHORT_COLUMN_MAX_CHARS = 24;
+const SHORT_COLUMN_MIN_WIDTH = 92;
+/** Deliberately tight. Every pixel a one-word column reserves is a pixel the free-text column
+ * does not get, and the free-text column is the only one whose content wraps: allowing short
+ * columns up to 200px left the rule title ~225px and wrapping onto three lines, which made row
+ * heights alternate between one and three lines down the page. */
+const SHORT_COLUMN_MAX_WIDTH = 132;
+
+/** Length of the longest rendered value in a column (header included, so a short column never
+ * ends up narrower than its own label). */
+function longestValueLength(
+  rows: Array<Record<string, unknown>>,
+  field: string,
+  label: string,
+): number {
+  let longest = label.length;
+  for (const row of rows) {
+    const value = row[field];
+    if (value === null || value === undefined) {
+      continue;
+    }
+    const length = String(value).length;
+    if (length > longest) {
+      longest = length;
+    }
   }
-  if (level >= 12) {
-    return 'high';
-  }
-  if (level >= 7) {
-    return 'medium';
-  }
-  return 'low';
+  return longest;
 }
 
-/** `value` is numeric (or a numeric-looking string) when it came from a rule.level column; a
- * severity column sourced from a field that is already a word (e.g. vulnerability.severity)
- * fails this check and falls through to the pre-existing word-matching path below unchanged. */
-function toSeverityLevelNumber(value: unknown): number | undefined {
-  if (typeof value === 'number') {
+/**
+ * Compact, locale-aware rendering of an ISO instant — display only. The raw value is untouched in
+ * the row data (and still visible verbatim in the expanded-row JSON and the `title` attribute), so
+ * nothing is lost: this changes how a timestamp reads, never what it is. Falls back to the raw
+ * string if `Intl` throws on an unexpected value.
+ */
+function formatTimestamp(value: string): string {
+  try {
+    return new Intl.DateTimeFormat(undefined, {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(new Date(value));
+  } catch {
     return value;
   }
-  if (
-    typeof value === 'string' &&
-    value.trim() !== '' &&
-    !Number.isNaN(Number(value))
-  ) {
-    return Number(value);
+}
+
+/** True when every non-empty value in a column is an ISO instant — a column is only reformatted
+ * when the WHOLE column is timestamps, so a mixed column keeps its raw values rather than showing
+ * two different formats side by side. */
+function isTimestampColumn(
+  rows: Array<Record<string, unknown>>,
+  field: string,
+): boolean {
+  let sawValue = false;
+  for (const row of rows) {
+    const value = row[field];
+    if (value === null || value === undefined || value === '') {
+      continue;
+    }
+    if (typeof value !== 'string' || !ISO_TIMESTAMP_RE.test(value)) {
+      return false;
+    }
+    sawValue = true;
   }
-  return undefined;
+  return sawValue;
 }
 
 function renderSeverityBadge(value: unknown): React.ReactNode {
-  const numericLevel = toSeverityLevelNumber(value);
-  const word =
-    numericLevel !== undefined
-      ? severityWordFromLevel(numericLevel)
-      : String(value ?? '').toLowerCase();
-  // Wazuh 5.0 findings add an "informational" severity below "low";
-  // it is not one of the four canonical SeverityLevel badge colors, so render it as a subdued
-  // badge with its own label rather than falling through to the raw-value default.
-  if (word === 'informational') {
-    return (
-      <EuiBadge color='hollow'>
-        {i18n.translate('wazuhAiAssistant.resultTable.severity.informational', {
-          defaultMessage: 'Informational',
-        })}
-      </EuiBadge>
-    );
+  const word = String(value ?? '').toLowerCase();
+  // Look up directly in SEVERITY_BUCKETS (the single source of truth for what's renderable)
+  // instead of checking membership in SEVERITY_LEVELS first and casting — two collections
+  // staying in sync is an assumption this can't verify at runtime, an object property lookup
+  // can't throw, and `bucket` being `undefined` is a normal, handled outcome either way.
+  const bucket = SEVERITY_BUCKETS[word as SeverityLevel] as
+    | { color: string; label: string }
+    | undefined;
+  if (!bucket) {
+    return <EuiBadge color='default'>{String(value ?? '')}</EuiBadge>;
   }
-  const isKnown = (SEVERITY_LEVELS as readonly string[]).includes(word);
-  const color = isKnown ? SEVERITY_COLORS[word as SeverityLevel] : 'default';
-  const label = isKnown
-    ? SEVERITY_LABELS[word as SeverityLevel]
-    : String(value ?? '');
-  return <EuiBadge color={color}>{label}</EuiBadge>;
+  return <EuiBadge color={bucket.color}>{bucket.label}</EuiBadge>;
 }
 
 interface ResultTableProps {
@@ -123,6 +193,10 @@ interface ResultTableProps {
    * means no link renders — see discover-link.tsx. Optional so any other/future ResultTable call
    * site never has to supply it. */
   resolveDiscoverUrl?: ResolveDiscoverUrl;
+  /** Builds the "Open in Security Analytics" URL for this spec; omitted (or resolving to `null`)
+   * simply means no link renders — see security-analytics-link.tsx. Optional for the same reason
+   * as `resolveDiscoverUrl` above. */
+  resolveSecurityAnalyticsUrl?: ResolveSecurityAnalyticsUrl;
 }
 
 /**
@@ -131,6 +205,7 @@ interface ResultTableProps {
 const ResultTableInner: React.FC<ResultTableProps> = ({
   spec,
   resolveDiscoverUrl,
+  resolveSecurityAnalyticsUrl,
 }) => {
   const [expandedRowIds, setExpandedRowIds] = useState<Set<number>>(new Set());
   // Stable across re-renders of the SAME mounted table (a later spec on the same tool round would
@@ -208,17 +283,62 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     [expandedRowIds],
   );
 
+  // Column widths and timestamp formatting are DISPLAY concerns only — same columns, same values,
+  // same order as the spec asked for. Without them EuiBasicTable divides the width evenly and
+  // renders every value verbatim, so a raw ISO instant wrapped onto three lines and dragged every
+  // row's height with it, while the free-text title column (the one that actually needs room) got
+  // no more space than the severity word beside it.
   const fieldColumns: EuiBasicTableColumn<ResultRow>[] = useMemo(
     () =>
-      spec.columns.map(column => ({
-        field: column.id,
-        name: column.label,
-        render:
-          column.id === spec.severityColumn
-            ? (value: unknown) => renderSeverityBadge(value)
-            : undefined,
-      })),
-    [spec.columns, spec.severityColumn],
+      spec.columns.map(column => {
+        if (column.id === spec.severityColumn) {
+          return {
+            field: column.id,
+            name: column.label,
+            width: SEVERITY_COLUMN_WIDTH,
+            render: (value: unknown) => renderSeverityBadge(value),
+          };
+        }
+        if (isTimestampColumn(spec.rows, column.id)) {
+          return {
+            field: column.id,
+            name: column.label,
+            width: TIMESTAMP_COLUMN_WIDTH,
+            render: (value: unknown) =>
+              typeof value === 'string' ? (
+                // The unabbreviated instant stays one hover away, so precision is deferred rather
+                // than discarded.
+                <span title={value}>{formatTimestamp(value)}</span>
+              ) : (
+                // `isTimestampColumn` only skips null/undefined/'' — render those as empty rather
+                // than letting an `unknown` reach React.
+                String(value ?? '')
+              ),
+          };
+        }
+        // EuiBasicTable's default fixed layout splits the leftover width EQUALLY between every
+        // column that has no explicit width, so a one-word "Category" column claimed exactly as
+        // much room as a sentence-long rule title and the title wrapped onto four lines. Sizing
+        // the short columns to their content leaves the remainder to the free-text column(s) —
+        // the only ones that can actually use it.
+        const longest = longestValueLength(spec.rows, column.id, column.label);
+        if (longest <= SHORT_COLUMN_MAX_CHARS) {
+          const width = Math.min(
+            SHORT_COLUMN_MAX_WIDTH,
+            Math.max(
+              SHORT_COLUMN_MIN_WIDTH,
+              Math.round(longest * APPROX_CHAR_WIDTH) + 32,
+            ),
+          );
+          return {
+            field: column.id,
+            name: column.label,
+            width: `${width}px`,
+          };
+        }
+        return { field: column.id, name: column.label };
+      }),
+    [spec.columns, spec.severityColumn, spec.rows],
   );
 
   const columns: EuiBasicTableColumn<ResultRow>[] = useMemo(
@@ -233,10 +353,16 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
     const map: Record<string, React.ReactNode> = {};
     spec.rows.forEach((row, rowIndex) => {
       if (expandedRowIds.has(rowIndex)) {
+        // Same raw-JSON treatment as the provenance chips' raw view (message-bubble.tsx): a
+        // proper EuiCodeBlock instead of a bare <pre>, with copy support. No `overflowHeight`:
+        // that would put a scrollbar inside an expanded row inside the transcript, and this
+        // content only exists because the reader deliberately expanded the row — cutting it off
+        // behind a third scrollbar defeats the click they just made. EuiCodeBlock's own
+        // fullscreen control handles a genuinely huge document.
         map[String(rowIndex)] = (
-          <EuiText size='s'>
-            <pre>{JSON.stringify(row, null, 2)}</pre>
-          </EuiText>
+          <EuiCodeBlock language='json' paddingSize='s' fontSize='s' isCopyable>
+            {JSON.stringify(row, null, 2)}
+          </EuiCodeBlock>
         );
       }
     });
@@ -259,75 +385,106 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
   );
 
   return (
-    <EuiAccordion
-      id={accordionId}
-      buttonContent={i18n.translate(
-        'wazuhAiAssistant.resultTable.accordionSummary',
-        {
-          defaultMessage: 'Results ({count} rows)',
-          values: { count: spec.rows.length },
-        },
-      )}
-      initialIsOpen={initiallyOpen}
-      // Lazy-mount: flips `hasOpened` permanently true the first time the accordion is opened
-      // (never reset on a later re-collapse, so the table stays mounted from then on).
-      onToggle={isOpen => {
-        if (isOpen) {
-          setHasOpened(true);
+    // No frame around the table. A bordered box here would be the third nested container the
+    // reader is inside (page, then turn, then table), and the table already carries its own
+    // structure: a hairline under the header row (applied by `wzResultTableAccordion` in
+    // chat-page.scss) plus EUI's own row separators. Data, not a widget.
+    <div>
+      <EuiAccordion
+        id={accordionId}
+        className='wzResultTableAccordion'
+        paddingSize='none'
+        buttonContent={i18n.translate(
+          'wazuhAiAssistant.resultTable.accordionSummary',
+          {
+            defaultMessage: 'Results ({count} rows)',
+            values: { count: spec.rows.length },
+          },
+        )}
+        initialIsOpen={initiallyOpen}
+        // Lazy-mount: flips `hasOpened` permanently true the first time the accordion is opened
+        // (never reset on a later re-collapse, so the table stays mounted from then on).
+        onToggle={isOpen => {
+          if (isOpen) {
+            setHasOpened(true);
+          }
+        }}
+        extraAction={
+          (resolveDiscoverUrl && spec.discover) ||
+          (resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink) ? (
+            <EuiFlexGroup gutterSize='s' responsive={false}>
+              {resolveDiscoverUrl && spec.discover ? (
+                <EuiFlexItem grow={false}>
+                  <DiscoverLink
+                    spec={spec}
+                    resolveDiscoverUrl={resolveDiscoverUrl}
+                  />
+                </EuiFlexItem>
+              ) : null}
+              {resolveSecurityAnalyticsUrl && spec.securityAnalyticsLink ? (
+                <EuiFlexItem grow={false}>
+                  <SecurityAnalyticsLink
+                    spec={spec}
+                    resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+                  />
+                </EuiFlexItem>
+              ) : null}
+            </EuiFlexGroup>
+          ) : undefined
         }
-      }}
-      extraAction={
-        resolveDiscoverUrl && spec.discover ? (
-          <DiscoverLink spec={spec} resolveDiscoverUrl={resolveDiscoverUrl} />
-        ) : undefined
-      }
-    >
-      {hasOpened ? (
-        // Scrolls internally (both axes) instead of growing the page: a wide/tall table must
-        // never push the chat input further down the page than the accordion header itself does.
-        <div
-          style={{
-            maxHeight: TABLE_SCROLL_MAX_HEIGHT,
-            overflowY: 'auto',
-            overflowX: 'auto',
-          }}
-        >
-          <EuiBasicTable
-            items={pagedItems}
-            columns={columns}
-            itemId='__rowId'
-            itemIdToExpandedRowMap={itemIdToExpandedRowMap}
-            isExpandable
-            hasActions
-            pagination={{
-              pageIndex,
-              pageSize,
-              totalItemCount: spec.rows.length,
-              pageSizeOptions: PAGE_SIZE_OPTIONS,
+      >
+        {hasOpened ? (
+          // No inner scroller. A scrollbar inside a message inside the scrolling transcript means
+          // the reader has to work out which of three surfaces their wheel is aimed at, and the
+          // rows below the fold are invisible until they find out. Height is controlled by how
+          // many rows a page shows (DEFAULT_PAGE_SIZE) instead, so the table is simply as tall as
+          // its content and the page scrolls once. `overflowX` stays as a safety net for a
+          // pathologically wide column set; with content-sized columns it does not normally engage.
+          <div
+            style={{
+              overflowX: 'auto',
+              // paddingSize='none' above (the header strip owns its own padding via
+              // wzResultTableAccordion) leaves the body needing its own inset.
+              padding: 12,
             }}
-            // EuiBasicTable's page-change callback is `onChange` (the `onTableChange` name belongs
-            // to EuiInMemoryTable — using it here was silently ignored at runtime, so pagination
-            // never actually turned pages). Typed inline rather than via EUI's
-            // `CriteriaWithPagination<T>`: `columns` is cast to `any` so the item generic `T` isn't
-            // usefully inferred, and this handler only reads `page`. An optional-`page` shape is a
-            // valid target for the paginated arm (whose `CriteriaWithPagination` has a REQUIRED
-            // `page`), satisfying the prop without depending on the exact exported type name and
-            // giving `page` an explicit type (no implicit-any).
-            onChange={({
-              page,
-            }: {
-              page?: { index: number; size: number };
-            }) => {
-              if (!page) {
-                return;
-              }
-              setPageIndex(page.index);
-              setPageSize(page.size);
-            }}
-          />
-        </div>
-      ) : null}
-    </EuiAccordion>
+          >
+            <EuiBasicTable
+              items={pagedItems}
+              columns={columns}
+              itemId='__rowId'
+              itemIdToExpandedRowMap={itemIdToExpandedRowMap}
+              isExpandable
+              hasActions
+              pagination={{
+                pageIndex,
+                pageSize,
+                totalItemCount: spec.rows.length,
+                pageSizeOptions: PAGE_SIZE_OPTIONS,
+              }}
+              // EuiBasicTable's page-change callback is `onChange` (the `onTableChange` name
+              // belongs to EuiInMemoryTable — using it here was silently ignored at runtime, so
+              // pagination never actually turned pages). Typed inline rather than via EUI's
+              // `CriteriaWithPagination<T>`: `columns` is cast to `any` so the item generic `T`
+              // isn't usefully inferred, and this handler only reads `page`. An optional-`page`
+              // shape is a valid target for the paginated arm (whose `CriteriaWithPagination` has
+              // a REQUIRED `page`), satisfying the prop without depending on the exact exported
+              // type name and giving `page` an explicit type (no implicit-any).
+              onChange={({
+                page,
+              }: {
+                page?: { index: number; size: number };
+              }) => {
+                if (!page) {
+                  return;
+                }
+                setPageIndex(page.index);
+                setPageSize(page.size);
+              }}
+            />
+          </div>
+        ) : null}
+      </EuiAccordion>
+    </div>
   );
 };
 
@@ -379,6 +536,7 @@ class ResultTableBoundary extends React.Component<
       <ResultTableInner
         spec={this.props.spec}
         resolveDiscoverUrl={this.props.resolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={this.props.resolveSecurityAnalyticsUrl}
       />
     );
   }
@@ -387,6 +545,11 @@ class ResultTableBoundary extends React.Component<
 export const ResultTable: React.FC<ResultTableProps> = ({
   spec,
   resolveDiscoverUrl,
+  resolveSecurityAnalyticsUrl,
 }) => (
-  <ResultTableBoundary spec={spec} resolveDiscoverUrl={resolveDiscoverUrl} />
+  <ResultTableBoundary
+    spec={spec}
+    resolveDiscoverUrl={resolveDiscoverUrl}
+    resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
+  />
 );

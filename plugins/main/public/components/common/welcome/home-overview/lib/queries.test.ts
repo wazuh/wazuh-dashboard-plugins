@@ -6,17 +6,19 @@ import {
   buildVulnerabilitySeverityFiltersAgg,
   buildSCATilesAgg,
   buildSCATopBenchmarksAgg,
-  buildFIMTopPlatformsAgg,
-  buildVulnerabilityTopOsAgg,
-  buildCvesMatchedAgg,
+  buildFIMTopFilesAgg,
+  buildVulnerabilityTopPackagesAgg,
   buildIocMatchesAgg,
   buildMalwareFilterAgg,
+  buildThreatIntelByThreatTypeAgg,
   buildThreatIntelFeedByTypeAgg,
+  buildCloudSecurityByModuleAgg,
 } from './queries';
 import {
   FINDING_SEVERITY_BANDS,
   VULNERABILITY_SEVERITY_BANDS,
   FINDING_SEVERITY_FIELD,
+  INTEGRATION_NAME_FIELD,
   MITRE_TACTIC_NAME_FIELD,
   MITRE_TACTIC_ID_FIELD,
   MITRE_TECHNIQUE_ID_FIELD,
@@ -25,11 +27,12 @@ import {
   VULNERABILITY_SEVERITY_FIELD,
   SCA_CHECK_RESULT_FIELD,
   SCA_POLICY_NAME_FIELD,
-  FIM_PLATFORM_FIELD,
-  VULNERABILITY_OS_NAME_FIELD,
-  VULNERABILITY_CVE_ID_FIELD,
+  FIM_FILE_MTIME_FIELD,
+  FIM_FILE_PATH_FIELD,
+  VULNERABILITY_PACKAGE_NAME_FIELD,
   EVENT_DOC_ID_FIELD,
   THREAT_ENRICHMENTS_FIELD,
+  THREAT_INTEL_THREAT_TYPE_FIELD,
   THREAT_INTEL_TYPE_FIELD,
 } from './fields';
 
@@ -114,23 +117,24 @@ describe('query builders', () => {
     );
   });
 
-  it('builds the FIM top-platforms agg', () => {
-    expect(buildFIMTopPlatformsAgg(5)).toEqual({
-      fim_platforms: { terms: { field: FIM_PLATFORM_FIELD, size: 5 } },
-    });
-  });
-
-  it('builds the vulnerabilities-by-OS agg', () => {
-    expect(buildVulnerabilityTopOsAgg(5)).toEqual({
-      vulnerabilities_by_os: {
-        terms: { field: VULNERABILITY_OS_NAME_FIELD, size: 5 },
+  it('builds the FIM top-modified-files agg ordered by the latest modification time', () => {
+    expect(buildFIMTopFilesAgg(5)).toEqual({
+      fim_top_files: {
+        terms: {
+          field: FIM_FILE_PATH_FIELD,
+          size: 5,
+          order: { last_modified: 'desc' },
+        },
+        aggs: { last_modified: { max: { field: FIM_FILE_MTIME_FIELD } } },
       },
     });
   });
 
-  it('builds the CVEs-matched agg as a cardinality, not a doc count', () => {
-    expect(buildCvesMatchedAgg()).toEqual({
-      cves_matched: { cardinality: { field: VULNERABILITY_CVE_ID_FIELD } },
+  it('builds the vulnerabilities-by-package agg', () => {
+    expect(buildVulnerabilityTopPackagesAgg(5)).toEqual({
+      vulnerabilities_by_package: {
+        terms: { field: VULNERABILITY_PACKAGE_NAME_FIELD, size: 5 },
+      },
     });
   });
 
@@ -143,6 +147,46 @@ describe('query builders', () => {
   it('builds the IOC-feed-by-type agg as a terms agg on the enrichments catalog type', () => {
     expect(buildThreatIntelFeedByTypeAgg(5)).toEqual({
       ioc_feed_by_type: { terms: { field: THREAT_INTEL_TYPE_FIELD, size: 5 } },
+    });
+  });
+
+  it('builds the threat-types agg as a terms agg on the enrichments threat type', () => {
+    expect(buildThreatIntelByThreatTypeAgg(5)).toEqual({
+      threat_types: {
+        terms: { field: THREAT_INTEL_THREAT_TYPE_FIELD, size: 5 },
+      },
+    });
+  });
+
+  it('builds one filters-agg bucket per Cloud Security module, keyed by app id', () => {
+    const agg = buildCloudSecurityByModuleAgg();
+    const filters = agg.cloud_security_by_module.filters.filters;
+    expect(Object.keys(filters).sort()).toEqual(
+      [
+        'amazon-web-services',
+        'docker',
+        'github',
+        'google-cloud',
+        'microsoft-graph-api',
+        'office365',
+      ].sort(),
+    );
+    expect(filters.docker).toEqual({
+      match_phrase: { [INTEGRATION_NAME_FIELD]: 'docker' },
+    });
+    // AWS spans several sub-integrations (aws-cloudtrail, aws-guardduty, ...).
+    expect(filters['amazon-web-services']).toEqual({
+      wildcard: { [INTEGRATION_NAME_FIELD]: 'aws*' },
+    });
+    expect(filters['google-cloud']).toEqual({
+      match_phrase: { [INTEGRATION_NAME_FIELD]: 'gcp' },
+    });
+    expect(filters.office365).toEqual({
+      match_phrase: { [INTEGRATION_NAME_FIELD]: 'o365' },
+    });
+    // Microsoft Graph API reuses the Azure dashboard/data source.
+    expect(filters['microsoft-graph-api']).toEqual({
+      match_phrase: { [INTEGRATION_NAME_FIELD]: 'azure' },
     });
   });
 

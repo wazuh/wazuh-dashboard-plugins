@@ -2,7 +2,9 @@
 
 ### Added
 
-- Support for Wazuh 5.1.0
+| Issue | Comment                 |
+| ----- | ----------------------- |
+|       | Support for Wazuh 5.1.0 |
 
 ## Prior versions
 

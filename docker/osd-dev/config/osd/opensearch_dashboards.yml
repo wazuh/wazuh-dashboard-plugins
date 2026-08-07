@@ -41,3 +41,5 @@ wazuh_core.hosts:
     run_as: true
 wazuh_check_updates.ctiRegistrationUiEnabled: false
 wazuh_check_updates.ctiRegistrationStatusPollIntervalSec: 30
+
+wazuh_ai_assistant.encryptionKey: 'X53wBSic7YMVYLYXrbPt93q4Sgbq0LiPzPr7xACTTn4='

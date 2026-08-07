@@ -11,14 +11,31 @@ import {
   detectManagerAuthError,
   detectNavigationType,
   nextMessageId,
+  reconstructConversation,
   reconstructUiMessages,
   toPersistedMessages,
 } from './chat-history';
 import {
   CONVERSATION_MAX_MESSAGES,
   CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH,
+  CONVERSATION_MAX_SERIALIZED_BYTES,
+  CONVERSATION_MAX_TABLE_ROWS,
 } from './constants';
-import { ChatMessage, ToolCall } from './types';
+import {
+  ChatMessage,
+  PersistedChatMessage,
+  TableSpec,
+  ToolCall,
+} from './types';
+
+function tableSpec(rowCount: number): TableSpec {
+  return {
+    columns: [{ id: 'agent', label: 'Agent' }],
+    rows: Array.from({ length: rowCount }, (_unused, i) => ({
+      agent: `agent-${i}`,
+    })),
+  };
+}
 
 function uiUser(id: string, content: string): ChatHistoryMessage {
   return { id, role: 'user', content, createdAt: Date.now() };
@@ -27,7 +44,7 @@ function uiAssistant(id: string, content: string): ChatHistoryMessage {
   return { id, role: 'assistant', content, createdAt: Date.now() };
 }
 function toolCall(id: string): ToolCall {
-  return { id, name: 'get_alerts', arguments: {} };
+  return { id, name: 'get_findings', arguments: {} };
 }
 function exchange(toolCallId: string, digestContent?: string): ToolExchange {
   return { toolCall: toolCall(toolCallId), digestContent };
@@ -244,19 +261,21 @@ test('reconstructUiMessages: empty input returns empty output', () => {
 // toPersistedMessages
 // ---------------------------------------------------------------------------
 
-test('toPersistedMessages: keeps only role/content, dropping id/createdAt (structural, not just missing-on-input)', () => {
+test('toPersistedMessages: persists role/content and the real createdAt, never the render-only id', () => {
   const uiMessages: ChatHistoryMessage[] = [
-    uiUser('u1', 'hi'),
-    uiAssistant('a1', 'hello'),
+    { id: 'u1', role: 'user', content: 'hi', createdAt: 1 },
+    { id: 'a1', role: 'assistant', content: 'hello', createdAt: 2 },
   ];
   const persisted = toPersistedMessages(uiMessages);
+  // createdAt is persisted so a resumed conversation shows when each turn actually happened,
+  // instead of stamping every message with the moment of the resume.
   assert.deepEqual(persisted, [
-    { role: 'user', content: 'hi' },
-    { role: 'assistant', content: 'hello' },
+    { role: 'user', content: 'hi', createdAt: 1 },
+    { role: 'assistant', content: 'hello', createdAt: 2 },
   ]);
-  // No extra keys leak through (id/createdAt in particular).
+  // The id is a client-side render key and must not leak into storage.
   persisted.forEach(m =>
-    assert.deepEqual(Object.keys(m).sort(), ['content', 'role']),
+    assert.deepEqual(Object.keys(m).sort(), ['content', 'createdAt', 'role']),
   );
 });
 
@@ -271,11 +290,11 @@ test('toPersistedMessages: empty input returns empty output', () => {
 test('buildConversationTitle: uses the first USER message, trimmed, ignoring any assistant messages before it', () => {
   const messages: ChatHistoryMessage[] = [
     uiAssistant('a0', 'a stray assistant message somehow first'),
-    uiUser('u1', '  How many critical alerts today?  '),
+    uiUser('u1', '  How many critical findings today?  '),
     uiAssistant('a1', 'answer'),
   ];
   const title = buildConversationTitle(messages, 'Untitled conversation');
-  assert.equal(title, 'How many critical alerts today?');
+  assert.equal(title, 'How many critical findings today?');
 });
 
 test('buildConversationTitle: falls back to the untitled label when there is no user message', () => {
@@ -355,7 +374,7 @@ test('detectManagerAuthError: an answer about authentication failures does not m
 test('detectManagerAuthError: plain unrelated narration does not match', () => {
   assert.equal(
     detectManagerAuthError(
-      'Here are the top 5 critical alerts from the last 24 hours.',
+      'Here are the top 5 critical findings from the last 24 hours.',
     ),
     false,
   );
@@ -453,8 +472,8 @@ test('toPersistedMessages leaves a normal conversation untouched', () => {
     { id: 'b', role: 'assistant' as const, content: 'hi there', createdAt: 2 },
   ];
   assert.deepEqual(toPersistedMessages(normal), [
-    { role: 'user', content: 'hello' },
-    { role: 'assistant', content: 'hi there' },
+    { role: 'user', content: 'hello', createdAt: 1 },
+    { role: 'assistant', content: 'hi there', createdAt: 2 },
   ]);
 });
 
@@ -472,5 +491,240 @@ test('no output of toPersistedMessages can violate the server bounds', () => {
   assert.ok(out.length <= CONVERSATION_MAX_MESSAGES);
   assert.ok(
     out.every(m => m.content.length <= CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH),
+  );
+});
+
+// ---------------------------------------------------------------------------
+// Faithful persistence: a resumed conversation must BE the conversation, not a summary of it
+// ---------------------------------------------------------------------------
+
+test('toPersistedMessages: persists the result table a message was displayed with', () => {
+  const out = toPersistedMessages([
+    { id: 'u1', role: 'user', content: 'top agents?', createdAt: 1 },
+    {
+      id: 'a1',
+      role: 'assistant',
+      content: 'here they are',
+      createdAt: 2,
+      table: tableSpec(3),
+    },
+  ]);
+  assert.equal(out[1].table?.rows.length, 3);
+  assert.deepEqual(out[1].table?.columns, [{ id: 'agent', label: 'Agent' }]);
+  // A message that had no table gains no empty one.
+  assert.ok(!('table' in out[0]));
+});
+
+test(`toPersistedMessages: row-caps a persisted table at CONVERSATION_MAX_TABLE_ROWS (${CONVERSATION_MAX_TABLE_ROWS})`, () => {
+  const out = toPersistedMessages([
+    {
+      id: 'a1',
+      role: 'assistant',
+      content: 'lots',
+      createdAt: 1,
+      table: tableSpec(CONVERSATION_MAX_TABLE_ROWS + 400),
+    },
+  ]);
+  assert.equal(out[0].table?.rows.length, CONVERSATION_MAX_TABLE_ROWS);
+  // The kept rows are the first ones, matching what the live table showed from the top.
+  assert.deepEqual(out[0].table?.rows[0], { agent: 'agent-0' });
+});
+
+test("toPersistedMessages: interleaves a turn's tool exchanges immediately before its prose message", () => {
+  const out = toPersistedMessages(
+    [
+      { id: 'u1', role: 'user', content: 'how many?', createdAt: 1 },
+      { id: 'a1', role: 'assistant', content: '42', createdAt: 2 },
+    ],
+    [turn('a1', [exchange('t1', '{"count":42}')])],
+  );
+  assert.deepEqual(
+    out.map(m => [m.role, m.content]),
+    [
+      ['user', 'how many?'],
+      ['assistant', ''],
+      ['tool', '{"count":42}'],
+      ['assistant', '42'],
+    ],
+  );
+  assert.deepEqual(out[1].toolCalls, [toolCall('t1')]);
+  assert.equal(out[2].toolCallId, 't1');
+});
+
+test('toPersistedMessages: a tool exchange with no digest is not persisted', () => {
+  const out = toPersistedMessages(
+    [{ id: 'a1', role: 'assistant', content: 'sorry', createdAt: 1 }],
+    [turn('a1', [exchange('t1')])],
+  );
+  assert.deepEqual(
+    out.map(m => m.role),
+    ['assistant'],
+  );
+});
+
+test('toPersistedMessages: sheds tables before prose when the payload is over the byte budget', () => {
+  // One table alone bigger than the whole budget: prose must survive, the table must not.
+  const huge: TableSpec = {
+    columns: [{ id: 'blob', label: 'Blob' }],
+    rows: [{ blob: 'z'.repeat(CONVERSATION_MAX_SERIALIZED_BYTES) }],
+  };
+  const out = toPersistedMessages([
+    { id: 'u1', role: 'user', content: 'question', createdAt: 1 },
+    {
+      id: 'a1',
+      role: 'assistant',
+      content: 'answer',
+      createdAt: 2,
+      table: huge,
+    },
+  ]);
+  assert.deepEqual(
+    out.map(m => m.content),
+    ['question', 'answer'],
+  );
+  assert.ok(out.every(m => m.table === undefined));
+});
+
+test('toPersistedMessages: drops oldest messages when even prose alone exceeds the byte budget', () => {
+  const bulky = Array.from({ length: 20 }, (_unused, i) => ({
+    id: `m${i}`,
+    role: 'user' as const,
+    content: 'x'.repeat(CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH),
+    createdAt: i,
+  }));
+  const out = toPersistedMessages(bulky);
+  assert.ok(
+    JSON.stringify(out).length <= CONVERSATION_MAX_SERIALIZED_BYTES,
+    'payload must fit the budget',
+  );
+  assert.ok(out.length > 0, 'the newest messages must survive');
+  // What survives is the TAIL.
+  assert.equal(out[out.length - 1].createdAt, 19);
+});
+
+test('toPersistedMessages: never emits a payload over the byte budget, however pathological the input', () => {
+  const pathological = Array.from(
+    { length: CONVERSATION_MAX_MESSAGES + 10 },
+    (_unused, i) => ({
+      id: `m${i}`,
+      role: 'assistant' as const,
+      content: 'y'.repeat(CONVERSATION_MAX_MESSAGE_CONTENT_LENGTH),
+      createdAt: i,
+      table: tableSpec(500),
+    }),
+  );
+  const out = toPersistedMessages(pathological);
+  assert.ok(JSON.stringify(out).length <= CONVERSATION_MAX_SERIALIZED_BYTES);
+});
+
+// ---------------------------------------------------------------------------
+// reconstructConversation
+// ---------------------------------------------------------------------------
+
+test('reconstructConversation: restores the displayed messages, their timestamps and their tables', () => {
+  const persisted: PersistedChatMessage[] = [
+    { role: 'user', content: 'top agents?', createdAt: 111 },
+    {
+      role: 'assistant',
+      content: 'here they are',
+      createdAt: 222,
+      table: tableSpec(2),
+    },
+  ];
+  const restored = reconstructConversation(persisted);
+  assert.equal(restored.messages.length, 2);
+  assert.equal(restored.messages[0].createdAt, 111);
+  assert.equal(restored.messages[1].createdAt, 222);
+  assert.equal(restored.messages[1].table?.rows.length, 2);
+});
+
+test('reconstructConversation: rebuilds the tool history and keys it to the restored assistant message', () => {
+  const persisted: PersistedChatMessage[] = [
+    { role: 'user', content: 'how many?', createdAt: 1 },
+    { role: 'assistant', content: '', toolCalls: [toolCall('t1')] },
+    { role: 'tool', content: '{"count":42}', toolCallId: 't1' },
+    { role: 'assistant', content: '42', createdAt: 2 },
+  ];
+  const restored = reconstructConversation(persisted);
+
+  // The tool pair is NOT displayed.
+  assert.deepEqual(
+    restored.messages.map(m => m.content),
+    ['how many?', '42'],
+  );
+  assert.equal(restored.turnRecords.length, 1);
+  assert.equal(
+    restored.turnRecords[0].assistantMessageId,
+    restored.messages[1].id,
+  );
+  assert.deepEqual(restored.turnRecords[0].toolExchanges, [
+    { toolCall: toolCall('t1'), digestContent: '{"count":42}' },
+  ]);
+});
+
+test('reconstructConversation: round-trips what toPersistedMessages produced', () => {
+  const messages: ChatHistoryMessage[] = [
+    { id: 'u1', role: 'user', content: 'how many?', createdAt: 111 },
+    {
+      id: 'a1',
+      role: 'assistant',
+      content: '42',
+      createdAt: 222,
+      table: tableSpec(1),
+    },
+  ];
+  const records = [turn('a1', [exchange('t1', '{"count":42}')])];
+
+  const restored = reconstructConversation(
+    toPersistedMessages(messages, records),
+  );
+
+  assert.deepEqual(
+    restored.messages.map(m => ({
+      role: m.role,
+      content: m.content,
+      createdAt: m.createdAt,
+      rows: m.table?.rows.length,
+    })),
+    [
+      { role: 'user', content: 'how many?', createdAt: 111, rows: undefined },
+      { role: 'assistant', content: '42', createdAt: 222, rows: 1 },
+    ],
+  );
+  // The rebuilt record is usable as history again — same exchange, new message id.
+  assert.deepEqual(
+    restored.turnRecords[0].toolExchanges,
+    records[0].toolExchanges,
+  );
+  assert.equal(
+    restored.turnRecords[0].assistantMessageId,
+    restored.messages[1].id,
+  );
+});
+
+test('reconstructConversation: falls back to now for a conversation saved before timestamps were persisted', () => {
+  const before = Date.now();
+  const restored = reconstructConversation([
+    { role: 'user', content: 'legacy' },
+    { role: 'assistant', content: 'legacy answer' },
+  ]);
+  restored.messages.forEach(message => {
+    assert.ok(message.createdAt >= before);
+  });
+  assert.deepEqual(restored.turnRecords, []);
+});
+
+test('reconstructConversation: a tool pair never carries over into a later turn', () => {
+  const restored = reconstructConversation([
+    { role: 'assistant', content: '', toolCalls: [toolCall('t1')] },
+    { role: 'tool', content: 'digest', toolCallId: 't1' },
+    { role: 'assistant', content: 'first', createdAt: 1 },
+    { role: 'user', content: 'again?', createdAt: 2 },
+    { role: 'assistant', content: 'second', createdAt: 3 },
+  ]);
+  assert.equal(restored.turnRecords.length, 1);
+  assert.equal(
+    restored.turnRecords[0].assistantMessageId,
+    restored.messages[0].id,
   );
 });

@@ -67,7 +67,7 @@ describe('ResultTable', () => {
     expect(screen.getByText('agent-0')).toBeInTheDocument();
   });
 
-  it('paginates: only the first DEFAULT_PAGE_SIZE (25) rows are in the DOM at once', () => {
+  it('paginates: only the first DEFAULT_PAGE_SIZE (5) rows are in the DOM at once', () => {
     const thirtyRows = Array.from({ length: 30 }, (_unused, i) => ({
       agent: `agent-${i}`,
     }));
@@ -83,38 +83,33 @@ describe('ResultTable', () => {
     fireEvent.click(screen.getByText('Results (30 rows)'));
 
     expect(screen.getByText('agent-0')).toBeInTheDocument();
-    expect(screen.getByText('agent-24')).toBeInTheDocument();
-    expect(screen.queryByText('agent-25')).toBeNull();
+    expect(screen.getByText('agent-4')).toBeInTheDocument();
+    expect(screen.queryByText('agent-5')).toBeNull();
     expect(screen.queryByText('agent-29')).toBeNull();
   });
 
+  // The page size is what keeps the table a readable height now that the body has no inner
+  // scroller, so "no max-height on the table body" is a behavior worth pinning: a scrollbar
+  // reappearing here would put one scrolling box inside another.
+  it('does not cap the table body height (no scroll-within-scroll)', () => {
+    const { container } = render(
+      <ResultTable
+        spec={spec({
+          columns: [{ id: 'agent', label: 'Agent' }],
+          rows: Array.from({ length: 4 }, (_unused, i) => ({
+            agent: `agent-${i}`,
+          })),
+        })}
+      />,
+    );
+
+    const scrollBoxes = [...container.querySelectorAll('div')].filter(element =>
+      (element.getAttribute('style') ?? '').includes('max-height'),
+    );
+    expect(scrollBoxes).toHaveLength(0);
+  });
+
   describe('severity badge rendering', () => {
-    it('maps a numeric rule.level to the legacy word thresholds (0-6 low, 7-11 medium, 12-14 high, 15+ critical)', () => {
-      const rows = [
-        { agent: 'a', level: 3 },
-        { agent: 'b', level: 9 },
-        { agent: 'c', level: 13 },
-        { agent: 'd', level: 15 },
-      ];
-      render(
-        <ResultTable
-          spec={spec({
-            columns: [
-              { id: 'agent', label: 'Agent' },
-              { id: 'level', label: 'Severity' },
-            ],
-            rows,
-            severityColumn: 'level',
-          })}
-        />,
-      );
-
-      expect(screen.getByText('Low')).toBeInTheDocument();
-      expect(screen.getByText('Medium')).toBeInTheDocument();
-      expect(screen.getByText('High')).toBeInTheDocument();
-      expect(screen.getByText('Critical')).toBeInTheDocument();
-    });
-
     it('renders an already-word severity value (Wazuh 5.0 findings) directly, case-insensitively', () => {
       render(
         <ResultTable
@@ -147,6 +142,53 @@ describe('ResultTable', () => {
       );
 
       expect(screen.getByText('Informational')).toBeInTheDocument();
+    });
+
+    it('renders "informational" and "low" with distinct, non-hollow background colors matching the platform severity palette', () => {
+      // Colors now mirror plugins/main's UI_COLOR_STATUS (see result-table.tsx's SEVERITY_BUCKETS
+      // comment): low is UI_COLOR_STATUS.success ('#007871'), informational is
+      // UI_COLOR_STATUS.disabled ('#646A77') — both are real background colors (neither renders
+      // as EUI's outline-only 'hollow' badge any more), and they must never collide.
+      const { unmount } = render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'severity', label: 'Severity' },
+            ],
+            rows: [{ agent: 'a', severity: 'informational' }],
+            severityColumn: 'severity',
+          })}
+        />,
+      );
+      const informationalBadge = screen.getByText('Informational');
+      expect(informationalBadge).toBeInTheDocument();
+      const informationalBadgeEl = informationalBadge.closest(
+        '.euiBadge',
+      ) as HTMLElement;
+      expect(informationalBadgeEl.className).not.toMatch(/hollow/i);
+      expect(informationalBadgeEl.style.backgroundColor).not.toBe('');
+      const informationalColor = informationalBadgeEl.style.backgroundColor;
+      unmount();
+
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [
+              { id: 'agent', label: 'Agent' },
+              { id: 'severity', label: 'Severity' },
+            ],
+            rows: [{ agent: 'a', severity: 'low' }],
+            severityColumn: 'severity',
+          })}
+        />,
+      );
+      const lowBadge = screen.getByText('Low');
+      expect(lowBadge).toBeInTheDocument();
+      const lowBadgeEl = lowBadge.closest('.euiBadge') as HTMLElement;
+      expect(lowBadgeEl.className).not.toMatch(/hollow/i);
+      expect(lowBadgeEl.style.backgroundColor).not.toBe('');
+      expect(lowBadgeEl.style.backgroundColor).not.toBe(informationalColor);
     });
 
     it('falls back to the raw value for an unrecognized severity word', () => {

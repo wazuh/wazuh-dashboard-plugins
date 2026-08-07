@@ -48,7 +48,7 @@ function finalizeDigest(
   privacy: PrivacyContext | undefined,
   toolName: string,
   aggFields?: Record<string, string | undefined>,
-  // The escape hatch's deriveColumns can put ARBITRARY alert fields into
+  // The escape hatch's deriveColumns can put ARBITRARY finding fields into
   // the digest, so its unlisted-field default must be fail-closed (anonymize) instead of the
   // curated typed tools' allow-by-omission — see privacy.ts's applyFieldPolicy.
   isEscapeHatch = false,
@@ -89,10 +89,39 @@ function sanitizeError(error: unknown): string {
     : withoutCredentials;
 }
 
+/** Wazuh's own default space (the one namespace present on 4.14-migrated content, and the only one
+ * `AskUserQuestion`-confirmed choice for when a result's rows don't share a single space). */
+const DEFAULT_SECURITY_ANALYTICS_SPACE = 'standard';
+
+/**
+ * Resolves the single `space` value to use for a `buildSecurityAnalyticsLink` deep link, from the
+ * `space.name` field on each returned hit (Security Analytics content is namespaced across
+ * draft/test/custom/standard, confirmed live). A tool call's rows can span more than one space --
+ * there is no per-row link in this UI, only one per table -- so this only trusts a SINGLE distinct
+ * value found across all hits; zero or multiple distinct values (no hits, or a genuinely mixed
+ * result) falls back to `DEFAULT_SECURITY_ANALYTICS_SPACE` rather than guess which row's space the
+ * link should represent (explicit product decision, not a heuristic first-row pick).
+ */
+export function resolveSecurityAnalyticsSpace(hits: unknown): string {
+  if (!Array.isArray(hits)) {
+    return DEFAULT_SECURITY_ANALYTICS_SPACE;
+  }
+  const spaces = new Set<string>();
+  for (const hit of hits) {
+    const space = (hit as { _source?: { space?: { name?: unknown } } })?._source
+      ?.space?.name;
+    if (typeof space === 'string' && space.length > 0) {
+      spaces.add(space);
+    }
+  }
+  return spaces.size === 1 ? [...spaces][0] : DEFAULT_SECURITY_ANALYTICS_SPACE;
+}
+
 /** Executes a validated, guardrail-passed Indexer search and builds its digest + table. */
 async function executeIndexerRequest(
   toolName: string,
   indexerRequest: IndexerRequest,
+  params: Record<string, unknown>,
   context: RequestHandlerContext,
   privacy?: PrivacyContext,
 ): Promise<ToolExecutionOutcome> {
@@ -113,7 +142,7 @@ async function executeIndexerRequest(
       return { toolResultContent: toolErrorContent(valved.reason) };
     }
 
-    // The vulnerability-field-on-alerts-index check in guardrails.ts's lintDsl has no per-tool
+    // The vulnerability-field-on-findings-index check in guardrails.ts's lintDsl has no per-tool
     // exemptions (the 4.14 get_solved_vulnerabilities carve-out was retired in the 5.0 port).
     const lintResult = lintDsl(valved.body, indexerRequest.index);
     if (!lintResult.ok) {
@@ -163,9 +192,22 @@ async function executeIndexerRequest(
       index: indexerRequest.index,
       dsl: (body.query as Record<string, unknown>) ?? { match_all: {} },
     };
+    if (def.buildSecurityAnalyticsLink) {
+      const space = resolveSecurityAnalyticsSpace(
+        (result as { hits?: { hits?: unknown } })?.hits?.hits,
+      );
+      const link = def.buildSecurityAnalyticsLink(params, space);
+      if (link) {
+        tableSpec.securityAnalyticsLink = link;
+      }
+    }
     return {
       // The `table` event built from `result` below is deliberately NOT run through field policy:
-      // it renders locally in the browser and never reaches the model.
+      // it renders locally in the browser and never reaches the model. That holds for EVERY action,
+      // 'never' included — the policy's only boundary is the digest above, and the table shows the
+      // analyst their own data in full (issue #8821; see privacy.ts's module header). The same is
+      // true of the executed `body`: no action rewrites its projections, so the field is retrieved
+      // and therefore displayable.
       toolResultContent: JSON.stringify(finalDigest),
       tableEvent: { type: 'table', spec: tableSpec },
     };
@@ -317,10 +359,16 @@ export function executeToolCall(
   if (!built.ok) {
     return Promise.resolve({ toolResultContent: built.toolResultContent });
   }
-  const { request: builtRequest } = built.built;
+  const { request: builtRequest, params } = built.built;
 
   if (builtRequest.target === 'indexer') {
-    return executeIndexerRequest(call.name, builtRequest, context, privacy);
+    return executeIndexerRequest(
+      call.name,
+      builtRequest,
+      params,
+      context,
+      privacy,
+    );
   }
   return executeManagerRequest(
     call.name,

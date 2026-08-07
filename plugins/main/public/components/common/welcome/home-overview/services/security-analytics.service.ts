@@ -15,6 +15,8 @@ export const SECURITY_ANALYTICS_ROUTES = {
   decodersSearch: `${SECURITY_ANALYTICS_BASE}/decoders/_search`,
   integrationsSearch: `${SECURITY_ANALYTICS_BASE}/integrations/_search`,
   detectorsSearch: `${SECURITY_ANALYTICS_BASE}/detectors/_search`,
+  kvdbsSearch: `${SECURITY_ANALYTICS_BASE}/kvdbs/_search`,
+  filtersSearch: `${SECURITY_ANALYTICS_BASE}/filters/_search`,
 };
 
 /**
@@ -124,5 +126,19 @@ export async function fetchDetectorsCount(): Promise<number> {
   return fetchSecurityAnalyticsSearchCount({
     route: SECURITY_ANALYTICS_ROUTES.detectorsSearch,
     body: { size: 0, query: { match_all: {} } },
+  });
+}
+
+export async function fetchKvdbsCount(): Promise<number> {
+  return fetchSecurityAnalyticsSearchCount({
+    route: SECURITY_ANALYTICS_ROUTES.kvdbsSearch,
+    body: { size: 0, query: SPACES_AND_ENABLED },
+  });
+}
+
+export async function fetchFiltersCount(): Promise<number> {
+  return fetchSecurityAnalyticsSearchCount({
+    route: SECURITY_ANALYTICS_ROUTES.filtersSearch,
+    body: { size: 0, query: SPACES_AND_ENABLED },
   });
 }

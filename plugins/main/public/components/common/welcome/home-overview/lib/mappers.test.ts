@@ -4,6 +4,7 @@ import {
   mapTopBuckets,
   mapAgentStatus,
   mapCardinality,
+  mapCloudSecurityByModule,
   mapDocCount,
   mapScaTiles,
   mapScaBenchmarks,
@@ -80,7 +81,6 @@ describe('mappers', () => {
             high: { doc_count: 5456 },
             medium: { doc_count: 31517 },
             low: { doc_count: 1980 },
-            pending: { doc_count: 0 },
           },
         },
       };
@@ -95,7 +95,6 @@ describe('mappers', () => {
         high: 5456,
         medium: 31517,
         low: 1980,
-        pending: 0,
       });
     });
   });
@@ -202,6 +201,30 @@ describe('mappers', () => {
     it('returns an empty array when the agg is missing', () => {
       expect(mapScaBenchmarks(undefined)).toEqual([]);
       expect(mapScaBenchmarks({})).toEqual([]);
+    });
+  });
+
+  describe('mapCloudSecurityByModule', () => {
+    it('reads doc_count per module bucket, keyed by app id', () => {
+      const aggregations = {
+        cloud_security_by_module: {
+          buckets: {
+            docker: { doc_count: 12 },
+            'amazon-web-services': { doc_count: 0 },
+            github: { doc_count: 3 },
+          },
+        },
+      };
+      expect(mapCloudSecurityByModule(aggregations)).toEqual({
+        docker: 12,
+        'amazon-web-services': 0,
+        github: 3,
+      });
+    });
+
+    it('returns an empty object when the agg is missing', () => {
+      expect(mapCloudSecurityByModule(undefined)).toEqual({});
+      expect(mapCloudSecurityByModule({})).toEqual({});
     });
   });
 

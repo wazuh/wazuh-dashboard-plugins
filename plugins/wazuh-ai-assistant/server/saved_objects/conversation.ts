@@ -1,6 +1,6 @@
 import { SavedObjectsType } from '../../../../src/core/server';
 import { CONVERSATION_SAVED_OBJECT_TYPE } from '../../common/constants';
-import { ChatMessage } from '../../common/types';
+import { PersistedChatMessage } from '../../common/types';
 
 /**
  * Persistent (saved) conversations. One saved object per conversation, owner-scoped by the
@@ -34,7 +34,7 @@ export interface ConversationAttributes {
   title: string;
   createdAt: string;
   updatedAt: string;
-  messages: ChatMessage[];
+  messages: PersistedChatMessage[];
 }
 
 export const conversationSavedObjectType: SavedObjectsType = {
