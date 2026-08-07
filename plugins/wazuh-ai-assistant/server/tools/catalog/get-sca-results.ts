@@ -1,7 +1,7 @@
 import { ToolDefinition } from '../types';
 import {
-  clampLimit,
-  limitProperty,
+  aggLimitProperty,
+  clampAggLimit,
   objectSchema,
   validateAgentId,
 } from './common';
@@ -39,9 +39,7 @@ export const getScaResultsTool: ToolDefinition = {
           type: 'string',
           description: 'Numeric Wazuh agent ID, e.g. "003".',
         },
-        limit: limitProperty(
-          'Max number of SCA policies to return (default 20, max 500).',
-        ),
+        limit: aggLimitProperty('SCA policies', 20),
       },
       ['agent_id'],
     ),
@@ -50,7 +48,7 @@ export const getScaResultsTool: ToolDefinition = {
   tier: 'T1',
   buildRequest(params) {
     const agentId = validateAgentId(params.agent_id);
-    const limit = clampLimit(params.limit, 20, 500);
+    const limit = clampAggLimit(params.limit, 20);
     return {
       target: 'indexer',
       index: 'wazuh-states-sca*',

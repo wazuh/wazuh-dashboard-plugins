@@ -1,7 +1,7 @@
 import { ToolDefinition } from '../types';
 import {
-  clampLimit,
-  limitProperty,
+  aggLimitProperty,
+  clampAggLimit,
   objectSchema,
   resolveTimeRange,
   timeRangeProperties,
@@ -19,16 +19,14 @@ export const getTopRulesTool: ToolDefinition = {
       'Aggregates the most frequently triggered rules within a time range, with a sample ' +
       'title per rule.',
     parameters: objectSchema({
-      limit: limitProperty(
-        'Max number of distinct rules to return (default 20, max 100).',
-      ),
+      limit: aggLimitProperty('distinct rules', 20),
       ...timeRangeProperties(),
     }),
   },
   target: 'indexer',
   tier: 'T1',
   buildRequest(params) {
-    const limit = clampLimit(params.limit, 20, 100);
+    const limit = clampAggLimit(params.limit, 20);
     const { gte, lte } = resolveTimeRange(params);
     return {
       target: 'indexer',

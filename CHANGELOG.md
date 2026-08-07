@@ -133,6 +133,7 @@
 | [#8708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8708)   | Fixed Home KPI's visualization persistent filters                                                                                                                                             |
 | [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766) | Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration                                                              |
 | [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775) | Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters                                                                                                                |
+| [#8894](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8894) | Fixed the AI Assistant's `get_sca_results` tool failing for any result limit between 101 and 500, and made every aggregation-backed tool limit share one cap so the advertised and enforced maximums cannot drift apart |
 
 ### Removed
 
