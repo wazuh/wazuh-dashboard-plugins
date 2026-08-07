@@ -1030,9 +1030,35 @@ function checkAggs(body: Record<string, unknown>): string | undefined {
           for (const sourceSpec of Object.values(
             source as Record<string, unknown>,
           )) {
-            const termsSpec = (
-              sourceSpec as Record<string, unknown> | undefined
-            )?.terms as Record<string, unknown> | undefined;
+            if (
+              !sourceSpec ||
+              typeof sourceSpec !== 'object' ||
+              Array.isArray(sourceSpec)
+            ) {
+              continue;
+            }
+            const sourceSpecRecord = sourceSpec as Record<string, unknown>;
+            // Only a `terms` composite source was ever field/allowlist-checked below --
+            // `histogram`/`date_histogram`/`geotile_grid` sources were silently let through
+            // regardless of what field they aggregated on, and their bucket component then
+            // reached privacy.ts's field-policy scrub as an "unresolved property" (pass-through
+            // for a typed tool, since composite is escape-hatch-only in practice, this closes a
+            // real gap rather than a defense-in-depth one). Rejected here rather than merely
+            // routed to privacy.ts's fail-closed default: the field itself was NEVER checked
+            // against AGG_FIELD_ALLOWLIST for these source types, so a high-cardinality field
+            // (e.g. a raw numeric field bucketed by `histogram`) could reach a bucket regardless
+            // of this file's field-allowlist contract -- an aggregation-safety gap, not just a
+            // privacy one, and this file's job is the former.
+            if (!('terms' in sourceSpecRecord)) {
+              const sourceType = Object.keys(sourceSpecRecord)[0] ?? 'unknown';
+              reason =
+                `Composite source type "${sourceType}" is not allowed; only "terms" composite ` +
+                'sources are supported.';
+              continue;
+            }
+            const termsSpec = sourceSpecRecord.terms as
+              | Record<string, unknown>
+              | undefined;
             const field = termsSpec?.field;
             if (typeof field === 'string' && !AGG_FIELD_ALLOWLIST.has(field)) {
               reason = aggFieldViolation(field);

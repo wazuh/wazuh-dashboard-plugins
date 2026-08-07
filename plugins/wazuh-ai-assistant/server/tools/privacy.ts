@@ -788,7 +788,14 @@ function scrubAggKey(
 
   if (spec.kind === 'multi') {
     if (!Array.isArray(rawKey) || rawKey.length !== spec.fields.length) {
-      return { drop: false, value: rawKey }; // Shape mismatch -- leave alone defensively.
+      // Shape mismatch: not reachable through `extractAggFields` today (it only ever produces a
+      // `multi` spec whose `fields.length` already matches the source `multi_terms.terms.length`,
+      // and a well-formed OpenSearch response's bucket key array length always matches that same
+      // `terms` count) -- but the escape hatch's arbitrary DSL is this file's only caller that
+      // doesn't go through `extractAggFields`'s own validation on the way in, so this branch is
+      // still the last fail-open path on that route. Symmetric with the `!spec` structured-key
+      // branch above: an unrecognized/mismatched shape is dropped rather than trusted as safe.
+      return { drop: true };
     }
     const out: unknown[] = [];
     for (let i = 0; i < rawKey.length; i += 1) {
@@ -818,7 +825,27 @@ function scrubAggKey(
   )) {
     const field = spec.fields[sourceName];
     if (!field) {
-      out[sourceName] = componentValue; // No resolved field for this source -- pass through.
+      // No resolved field for this named source (e.g. a composite source type `extractAggFields`
+      // does not map to a field, like `histogram`/`date_histogram`/`geotile_grid` -- as of this
+      // change `guardrails.ts`'s `checkAggs` REJECTS a non-`terms` composite source outright, so a
+      // typed tool or a guardrail-checked escape-hatch query can no longer reach this branch with
+      // one; kept as defense in depth for anything upstream of that check anyway). Typed catalog
+      // tools keep today's pass-through (same rationale as the top-level `undefined`-spec branch
+      // above: nothing curated is being bypassed). The escape hatch fails CLOSED instead: a string
+      // component is pseudonymized generically, a structured one is omitted outright rather than
+      // risk shipping an unrecognized value verbatim.
+      if (!isEscapeHatch) {
+        out[sourceName] = componentValue;
+      } else if (
+        typeof componentValue === 'string' &&
+        componentValue.length > 0
+      ) {
+        out[sourceName] = pseudonymizer.pseudonymize(
+          componentValue,
+          inferPseudonymKind(sourceName),
+        );
+      }
+      // else (escape hatch + non-string/empty component): omit the property entirely.
       continue;
     }
     const result = scrubFieldValue(
