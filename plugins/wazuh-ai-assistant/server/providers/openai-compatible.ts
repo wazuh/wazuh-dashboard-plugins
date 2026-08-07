@@ -16,7 +16,10 @@ import {
 } from './types';
 import { widenNumericTypes } from './wire-schema';
 import { iterateSseLines } from './sse-utils';
-import { fetchProviderWithRetry } from './retry';
+import {
+  fetchProviderWithRetry,
+  describeToolUseFailedStreamMessage,
+} from './retry';
 import {
   assertProviderUrlAllowed,
   PROVIDER_FETCH_REDIRECT_POLICY,
@@ -57,6 +60,15 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     const body: Record<string, unknown> = {
       model: config.model,
       stream: true,
+      // The OpenAI streaming contract only emits the terminal `usage` frame when this is set.
+      // Groq sends it unprompted, which is why the omission went unnoticed -- every usage number
+      // this plugin has recorded so far came from Groq. Amazon Bedrock's chat-completions endpoint
+      // does not: without this, every turn reports `usage: null` and token accounting (including
+      // the stage-1 router's own spend) reads blank. Providers that don't recognise the field
+      // ignore it, and the `if (parsed.usage)` exit below is unchanged either way -- note that
+      // frame arrives with an EMPTY `choices` array, which the per-choice handling above already
+      // tolerates (`parsed.choices?.[0]` is simply undefined).
+      stream_options: { include_usage: true },
       messages: messages.map(toOpenAiMessage),
     };
     // Checked for `undefined`, not truthiness -- callers deliberately send `temperature: 0` (the
@@ -105,6 +117,20 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     // `content` at all — never appended alongside a working answer.
     let sawContent = false;
     let reasoningBuffer = '';
+    // Set once the `finish_reason === 'tool_calls'` branch below has finalized and yielded this
+    // call's tool calls. Existing solely so the LATER exits (the terminal `usage` frame requested
+    // by `stream_options.include_usage`, or `[DONE]`) know two things without re-touching
+    // `toolCalls`: (a) don't call `finalizeToolCalls` again -- it was already drained and its
+    // events already yielded, so a second call would either emit nothing (fine) or, if the map
+    // wasn't cleared, re-emit duplicates; and (b) `reasoningFallback` below must still be suppressed
+    // there, even though the map they'd otherwise check is now empty. Previously the
+    // `finish_reason === 'tool_calls'` branch yielded its own bare `done` and returned immediately,
+    // which is the bug (issue 8875): a tool_calls-terminated stream still has one more chunk to read
+    // -- the empty-`choices` usage frame `stream_options.include_usage` unlocks -- and returning
+    // early skipped it, so EVERY tool-bearing round (and the stage-1 router call, which always ends
+    // in a tool call by design) reported `usage: undefined` right up to the round loop's accumulator,
+    // leaving only the last, tool-free round's usage to sum.
+    let toolCallsFinalized = false;
     // Inline-markup filter (issue 18-strip-inline-reasoning-markup.md): some reasoning models
     // (qwen3.x, measured 6/8 leaked answers) put their `<think>...</think>` deliberation, and
     // sometimes `<tool_call>`/`<function=...>`/`<parameter=...>` text standing in for a real tool
@@ -158,13 +184,17 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     try {
       for await (const payload of iterateSseLines(response.body, signal)) {
         if (payload === '[DONE]') {
-          yield* flushInlineMarkupFilter();
-          const finalized = finalizeToolCalls(toolCalls);
-          yield* finalized;
-          if (!hasToolCallError(finalized)) {
-            yield* reasoningFallback(finalized.length > 0);
-            yield { type: 'done' };
+          if (!toolCallsFinalized) {
+            yield* flushInlineMarkupFilter();
+            const finalized = finalizeToolCalls(toolCalls);
+            yield* finalized;
+            if (hasToolCallError(finalized)) {
+              return;
+            }
+            toolCallsFinalized = toolCallsFinalized || finalized.length > 0;
           }
+          yield* reasoningFallback(toolCallsFinalized);
+          yield { type: 'done' };
           return;
         }
         let parsed: {
@@ -198,9 +228,11 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         }
         if (parsed.error) {
           // Some providers (e.g. Groq) report failures as an in-stream error frame on HTTP 200.
+          const rawMessage = parsed.error.message ?? 'Unknown provider error';
           yield {
             type: 'error',
-            message: parsed.error.message ?? 'Unknown provider error',
+            message:
+              describeToolUseFailedStreamMessage(rawMessage) ?? rawMessage,
           };
           return;
         }
@@ -223,42 +255,53 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         }
         accumulateToolCallDeltas(toolCalls, choice?.delta?.tool_calls);
 
-        if (choice?.finish_reason === 'tool_calls') {
+        if (choice?.finish_reason === 'tool_calls' && !toolCallsFinalized) {
           // Flush before finalizing the tool call, same ordering rule chat.ts's own
           // `drainRoundBuffers()` follows: whatever text preceded the call must be fully resolved
           // (and, if it was markup, dropped) before the round moves on.
           yield* flushInlineMarkupFilter();
           const finalized = finalizeToolCalls(toolCalls);
           yield* finalized;
-          if (!hasToolCallError(finalized)) {
-            yield { type: 'done' };
+          if (hasToolCallError(finalized)) {
+            return;
           }
-          return;
+          toolCallsFinalized = true;
+          // No 'done' yet, no return: the terminal usage frame `stream_options.include_usage`
+          // requests (or, failing that, `[DONE]`) is still to come on this same stream, and one of
+          // the two blocks below is what actually yields 'done' for this call.
         }
         if (parsed.usage) {
-          yield* flushInlineMarkupFilter();
-          const finalized = finalizeToolCalls(toolCalls);
-          yield* finalized;
-          if (!hasToolCallError(finalized)) {
-            yield* reasoningFallback(finalized.length > 0);
-            yield {
-              type: 'done',
-              usage: {
-                inputTokens: parsed.usage.prompt_tokens,
-                outputTokens: parsed.usage.completion_tokens,
-              },
-            };
+          if (!toolCallsFinalized) {
+            yield* flushInlineMarkupFilter();
+            const finalized = finalizeToolCalls(toolCalls);
+            yield* finalized;
+            if (hasToolCallError(finalized)) {
+              return;
+            }
+            toolCallsFinalized = toolCallsFinalized || finalized.length > 0;
           }
+          yield* reasoningFallback(toolCallsFinalized);
+          yield {
+            type: 'done',
+            usage: {
+              inputTokens: parsed.usage.prompt_tokens,
+              outputTokens: parsed.usage.completion_tokens,
+            },
+          };
           return;
         }
       }
-      yield* flushInlineMarkupFilter();
-      const finalized = finalizeToolCalls(toolCalls);
-      yield* finalized;
-      if (!hasToolCallError(finalized)) {
-        yield* reasoningFallback(finalized.length > 0);
-        yield { type: 'done' };
+      if (!toolCallsFinalized) {
+        yield* flushInlineMarkupFilter();
+        const finalized = finalizeToolCalls(toolCalls);
+        yield* finalized;
+        if (hasToolCallError(finalized)) {
+          return;
+        }
+        toolCallsFinalized = toolCallsFinalized || finalized.length > 0;
       }
+      yield* reasoningFallback(toolCallsFinalized);
+      yield { type: 'done' };
     } catch (error) {
       if (signal.aborted) {
         return;

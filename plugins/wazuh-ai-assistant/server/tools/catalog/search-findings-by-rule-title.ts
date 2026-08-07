@@ -1,8 +1,13 @@
 import { ToolDefinition } from '../types';
 import {
+  findingArtifactFilterClauses,
+  findingArtifactFilterProperties,
   findingDigestColumns,
+  FINDING_BREAKDOWN_AGGS,
+  FINDING_BREAKDOWN_DIMENSIONS,
   findingRowFields,
   clampLimit,
+  FINDING_SCOPE_NOTE,
   limitProperty,
   objectSchema,
   resolveTimeRange,
@@ -45,10 +50,10 @@ export const searchFindingsByRuleTitleTool: ToolDefinition = {
   spec: {
     name: 'search_findings_by_rule_title',
     description:
-      'Searches security findings for findings triggered by one or more exact rule titles, ' +
-      'within a time range, most recent first. Use when the question names a specific rule by ' +
-      'its exact title text. If unsure of the exact title, first aggregate with get_top_rules ' +
-      'rather than guessing one.',
+      'Searches security findings triggered by one or more exact rule titles, within a time ' +
+      `range, most recent first. ${FINDING_SCOPE_NOTE} Use when the question names a specific ` +
+      'rule by its exact title text. If unsure of the exact title, first aggregate with ' +
+      'get_top_rules rather than guessing one.',
     parameters: objectSchema(
       {
         rule_titles: {
@@ -62,6 +67,7 @@ export const searchFindingsByRuleTitleTool: ToolDefinition = {
           'Max number of findings to return (default 20, max 500).',
         ),
         ...timeRangeProperties(),
+        ...findingArtifactFilterProperties(),
       },
       ['rule_titles'],
     ),
@@ -76,17 +82,19 @@ export const searchFindingsByRuleTitleTool: ToolDefinition = {
       ruleTitles.length === 1
         ? { term: { 'wazuh.rule.title': ruleTitles[0] } }
         : { terms: { 'wazuh.rule.title': ruleTitles } };
+    const filter: Record<string, unknown>[] = [
+      titleFilter,
+      { range: { '@timestamp': { gte, lte } } },
+      ...findingArtifactFilterClauses(params),
+    ];
     return {
       target: 'indexer',
       index: 'wazuh-findings-v5*',
       body: {
-        query: {
-          bool: {
-            filter: [titleFilter, { range: { '@timestamp': { gte, lte } } }],
-          },
-        },
+        query: { bool: { filter } },
         sort: [{ '@timestamp': { order: 'desc' } }],
         size: limit,
+        aggs: FINDING_BREAKDOWN_AGGS,
       },
     };
   },
@@ -96,5 +104,6 @@ export const searchFindingsByRuleTitleTool: ToolDefinition = {
   },
   digest: {
     sampleColumns: findingDigestColumns(STANDARD_FINDING_SAMPLE_COLUMNS),
+    breakdownDimensions: FINDING_BREAKDOWN_DIMENSIONS,
   },
 };

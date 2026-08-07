@@ -4,6 +4,7 @@ import {
   limitProperty,
   objectSchema,
   optionalStringParam,
+  VULN_CURRENT_STATE_NOTE,
   VULN_DIGEST_SAMPLE_COLUMNS,
   VULN_SOURCE_FIELDS,
 } from './common';
@@ -21,10 +22,11 @@ export const getVulnerabilitiesTool: ToolDefinition = {
   spec: {
     name: 'get_vulnerabilities',
     description:
-      'Lists active vulnerabilities and the agents affected by them, across the whole fleet. ' +
-      'Optional severity filter (Critical/High/Medium/Low); omit severity to list ALL ' +
-      'vulnerabilities regardless of severity. Use get_critical_vulnerabilities instead if the ' +
-      'question is specifically about critical-only vulnerabilities.',
+      'Lists active vulnerabilities and the agents (hosts/machines) affected by them, across ' +
+      `the whole fleet. ${VULN_CURRENT_STATE_NOTE} Optional severity filter (Critical/High/` +
+      'Medium/Low); omit severity to list ALL vulnerabilities regardless of severity. Use ' +
+      'get_critical_vulnerabilities instead if the question is specifically about ' +
+      'critical-only vulnerabilities.',
     parameters: objectSchema({
       severity: {
         type: 'string',
