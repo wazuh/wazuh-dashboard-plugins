@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiLink,
-  EuiSpacer,
-  EuiText,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiLink, EuiSpacer } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -16,7 +10,6 @@ import {
   BarList,
   FindingSeverityTiles,
   SectionHeader,
-  formatValueSafely,
   WIDGET_LOADING_MIN_HEIGHT,
 } from '../common';
 import { TopRulesTable } from './top-rules-table';
@@ -36,7 +29,7 @@ import {
 export interface ThreatHuntingSectionProps {
   /** Reuses the Overview on-mount findings search. */
   findings: ReturnType<typeof useFindingsOverview>;
-  /** Shared (lazy) vulnerabilities search, also used by the Threat Intel Feed. */
+  /** Lazy vulnerabilities search, fetched once this section scrolls into view. */
   vulnerabilities: ReturnType<typeof useVulnerabilityOverview>;
 }
 
@@ -157,18 +150,6 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
           >
             {vulnerabilities.data && (
               <>
-                <EuiText size='s'>
-                  <strong className='tab-num'>
-                    {formatValueSafely(
-                      Object.values(vulnerabilities.data.severity).reduce(
-                        (sum: number, count) => sum + (count ?? 0),
-                        0,
-                      ),
-                    )}
-                  </strong>{' '}
-                  open vulnerabilities
-                </EuiText>
-                <EuiSpacer size='s' />
                 <FindingSeverityTiles
                   counts={vulnerabilities.data.severity}
                   testSubjPrefix='vulnerability-severity'

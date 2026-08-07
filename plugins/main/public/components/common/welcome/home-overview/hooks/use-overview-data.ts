@@ -31,7 +31,6 @@ import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selec
 import {
   buildCloudSecurityByModuleAgg,
   buildComplianceControlsAgg,
-  buildCvesMatchedAgg,
   buildFindingsOverviewAggs,
   buildFIMTopFilesAgg,
   buildMalwareFilterAgg,
@@ -488,7 +487,6 @@ export function useVulnerabilityOverview(
         aggs: {
           ...buildVulnerabilitySeverityFiltersAgg(),
           ...buildVulnerabilityTopPackagesAgg(),
-          ...buildCvesMatchedAgg(),
         },
         pagination: NO_HITS,
       });
@@ -502,7 +500,6 @@ export function useVulnerabilityOverview(
           response?.aggregations,
           AGG.vulnerabilitiesByPackage,
         ),
-        cvesMatched: mapCardinality(response?.aggregations, AGG.cvesMatched),
       };
     },
   });

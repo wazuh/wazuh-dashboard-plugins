@@ -94,6 +94,4 @@ export interface VulnerabilityOverview {
   severity: SeverityCounts;
   /** Top 5 vulnerable package names (`package.name`). */
   byPackage: TopItem[];
-  /** Distinct CVE count (cardinality). */
-  cvesMatched?: number;
 }
