@@ -22,7 +22,6 @@ export const AGG = {
   /** Latest `file.mtime` per `fim_top_files` bucket; the terms agg orders by it. */
   fimLastModified: 'last_modified',
   vulnerabilitiesByPackage: 'vulnerabilities_by_package',
-  cvesMatched: 'cves_matched',
   /** Distinct-event IOC match count (hero), inside the findings `malware` filter. */
   iocMatches: 'ioc_matches',
   malware: 'malware',

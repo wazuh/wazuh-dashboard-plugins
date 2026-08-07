@@ -439,6 +439,25 @@ test('lintDsl: passes a clean terms aggregation on an allowlisted field within s
   assert.equal(result.ok, true);
 });
 
+test("lintDsl: passes a terms aggregation on wazuh.integration.category (get_security_summary's field)", () => {
+  // Regression: get_security_summary aggregates on WAZUH_FIELD.INTEGRATION_CATEGORY
+  // ("security"/"system-activity") because WAZUH_FIELD.RULE_CATEGORY (allowlisted above) is never
+  // populated by the active integrations (rootcheck/FIM/vulnerability-detection) in a real
+  // deployment — the tool's own aggregation field must be on this allowlist too, or every call
+  // gets silently rejected and the user sees an empty "no matching results" table.
+  const wrapped = {
+    query: timeBoundedFilter({ gte: 'now-90d', lte: 'now' }),
+    aggs: {
+      finding_categories: {
+        terms: { field: WAZUH_FIELD.INTEGRATION_CATEGORY, size: 20 },
+      },
+    },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5*');
+  assert.equal(result.ok, true);
+});
+
 test('lintDsl: rejects a terms agg on a non-allowlisted (high-cardinality) field', () => {
   const wrapped = {
     query: timeBoundedFilter(),

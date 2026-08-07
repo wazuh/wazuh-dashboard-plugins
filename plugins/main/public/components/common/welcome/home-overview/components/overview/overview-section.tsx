@@ -8,21 +8,17 @@ import {
   WIDGET_LOADING_MIN_HEIGHT,
 } from '../common';
 import { AgentsByStatus } from './agents-by-status';
-import { TopNetworkServicesTable } from './top-network-services-table';
-import { useInViewport } from '../../../../hooks';
 import {
   useAgentStatus,
   useFindingsOverview,
-  useTopOperatingSystems,
-  useTopNetworkServices,
 } from '../../hooks/use-overview-data';
 import {
   getDeployAgentUrl,
   getAgentsUrl,
   goToAgentsByStatus,
   getThreatHuntingUrl,
+  getMitreIntelligenceResourceUrl,
   getMitreUrl,
-  getItHygieneUrl,
   getDiscoverFindingsBySeverityUrl,
 } from '../../utils/navigation';
 import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
@@ -33,14 +29,10 @@ export interface OverviewSectionProps {
   findings: ReturnType<typeof useFindingsOverview>;
 }
 
-/** Findings fire on mount; the inventory row is lazy. */
 const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
   findings,
 }) => {
   const agents = useAgentStatus();
-  const [inventoryRef, inventoryVisible] = useInViewport<HTMLDivElement>();
-  const topOs = useTopOperatingSystems(inventoryVisible);
-  const topServices = useTopNetworkServices(inventoryVisible);
 
   return (
     <div>
@@ -115,66 +107,12 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
           <BarList
             items={findings.data.topTactics}
             emptyMessage='No MITRE ATT&CK tactics observed'
+            getHref={item => getMitreIntelligenceResourceUrl('tactics', item)}
             data-test-subj='mitre-top-tactics'
             barColor={UI_COLOR_STATUS.success}
           />
         )}
       </WidgetGroup>
-
-      <EuiSpacer size='m' />
-
-      <div ref={inventoryRef}>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <WidgetGroup
-              status={topOs.status}
-              errorLabel={topOs.error?.message}
-              showManageIndexPatternsLink={
-                topOs.error?.kind === 'index-pattern-missing'
-              }
-              isPermissionDenied={topOs.error?.kind === 'permission-denied'}
-              title='Top 5 operating systems'
-              caption='Current state'
-              headerLink={{ label: 'IT Hygiene', href: getItHygieneUrl() }}
-              loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
-              centerBody
-              data-test-subj='home-overview-top-os'
-            >
-              {topOs.data && (
-                <BarList
-                  items={topOs.data}
-                  emptyMessage='No operating systems found'
-                  title='OS name'
-                  totalSlots={5}
-                  moreItemsMessage='No more operating systems to display'
-                  data-test-subj='top-os'
-                />
-              )}
-            </WidgetGroup>
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <WidgetGroup
-              status={topServices.status}
-              errorLabel={topServices.error?.message}
-              showManageIndexPatternsLink={
-                topServices.error?.kind === 'index-pattern-missing'
-              }
-              isPermissionDenied={
-                topServices.error?.kind === 'permission-denied'
-              }
-              title='Top 5 network services'
-              caption='Current state'
-              headerLink={{ label: 'IT Hygiene', href: getItHygieneUrl() }}
-              loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
-              data-test-subj='home-overview-top-network-services'
-            >
-              {topServices.data && (
-                <TopNetworkServicesTable items={topServices.data} />
-              )}
-            </WidgetGroup>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </div>
     </div>
   );
 };
