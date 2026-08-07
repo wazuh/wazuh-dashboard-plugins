@@ -362,6 +362,83 @@ test('lintDsl: rejects composite.size over 100', () => {
   }
 });
 
+test('lintDsl: passes composite with only "terms" sources on allowlisted fields', () => {
+  const wrapped = {
+    query: timeBoundedFilter(),
+    aggs: {
+      c: {
+        composite: {
+          size: 20,
+          sources: [
+            { agent: { terms: { field: WAZUH_FIELD.AGENT_ID } } },
+            { ip: { terms: { field: 'source.ip' } } },
+          ],
+        },
+      },
+    },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, true);
+});
+
+test('lintDsl: rejects a composite source whose type is not "terms" (e.g. histogram)', () => {
+  // Closes a gap: only a `terms` composite source was ever field/allowlist-checked, so a
+  // `histogram`/`date_histogram`/`geotile_grid` source's field was never checked against
+  // AGG_FIELD_ALLOWLIST at all -- rejected outright now, rather than silently letting an
+  // unchecked-cardinality field's bucket component through.
+  const wrapped = {
+    query: timeBoundedFilter(),
+    aggs: {
+      c: {
+        composite: {
+          size: 20,
+          sources: [
+            { agent: { terms: { field: WAZUH_FIELD.AGENT_ID } } },
+            { bucket: { histogram: { field: 'vulnerability.score.base', interval: 1 } } },
+          ],
+        },
+      },
+    },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.equal(
+      result.reason,
+      'Composite source type "histogram" is not allowed; only "terms" composite ' +
+        'sources are supported.',
+    );
+  }
+});
+
+test('lintDsl: rejects a composite source of type date_histogram, naming it in the reason', () => {
+  const wrapped = {
+    query: timeBoundedFilter(),
+    aggs: {
+      c: {
+        composite: {
+          size: 20,
+          sources: [
+            {
+              bucket: {
+                date_histogram: { field: '@timestamp', calendar_interval: '1d' },
+              },
+            },
+          ],
+        },
+      },
+    },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(result.reason, /Composite source type "date_histogram" is not allowed/);
+  }
+});
+
 // top_hits had no size cap at all -- a nested
 // `{aggs:{sample:{top_hits:{size:10000}}}}` passed every other check and asked the cluster to
 // materialize up to (outer terms size) x 10000 documents.

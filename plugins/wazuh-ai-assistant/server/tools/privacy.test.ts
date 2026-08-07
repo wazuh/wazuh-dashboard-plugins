@@ -581,6 +581,87 @@ test('applyFieldPolicy: multi_terms drops the WHOLE bucket when any positional c
   assert.deepEqual(out.breakdown, undefined);
 });
 
+test('applyFieldPolicy: multi_terms with an array-length mismatch drops the bucket (fail-closed)', () => {
+  // Not reachable through extractAggFields today (its "multi" spec length always matches the
+  // source multi_terms.terms.length, and a well-formed response's bucket key array length always
+  // matches that same count) -- hand-crafted here because it is still the last fail-open path on
+  // the escape hatch's key route (a hand-built aggFields/response pairing that disagrees with each
+  // other). Symmetric with the top-level unresolved-structured-key branch: an unrecognized/
+  // mismatched shape is dropped rather than trusted as safe.
+  const policy: FieldPolicyEntry[] = [{ field: 'source.ip', action: 'allow' }];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    breakdown: [{ key: ['198.51.100.10', '007', 'extra'], count: 4 }],
+  });
+  const aggFields = {
+    by_ip_and_agent: {
+      kind: 'multi' as const,
+      fields: ['source.ip', 'wazuh.agent.id'], // length 2, bucket key length 3 -- mismatch.
+    },
+  };
+  const out = applyFieldPolicy(digest, policy, p, aggFields);
+  assert.deepEqual(out.breakdown, undefined);
+});
+
+test('applyFieldPolicy: composite with an unresolved property fails closed under the escape hatch', () => {
+  // Defense in depth behind guardrails.ts's new composite-source-type rejection: even if a
+  // composite source's field somehow could not be resolved (spec.fields has no entry for a
+  // property actually present on the bucket key), the escape hatch must not pass that component
+  // through raw -- a string is pseudonymized generically, a structured value is omitted.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    breakdown: [
+      { key: { ip: '198.51.100.10', mystery: 'raw-value' }, count: 9 },
+    ],
+  });
+  const aggFields = {
+    by_ip_and_mystery: {
+      kind: 'composite' as const,
+      fields: { ip: 'source.ip' }, // no entry for "mystery" -- unresolved property.
+    },
+  };
+  const out = applyFieldPolicy(
+    digest,
+    [{ field: 'source.ip', action: 'allow' }],
+    p,
+    aggFields,
+    'search_wazuh_data',
+    true,
+  );
+  assert.ok(out.breakdown);
+  const key = out.breakdown![0].key as Record<string, unknown>;
+  assert.equal(key.ip, '198.51.100.10');
+  assert.match(key.mystery as string, /^VAL_\d+$/);
+});
+
+test('applyFieldPolicy: composite with an unresolved property passes through for typed tools', () => {
+  // Non-escape-hatch call sites keep today's pass-through for an unresolved property -- typed
+  // catalog tools never produce a composite this file cannot fully resolve in practice, and this
+  // proves the escape-hatch fail-closed default above did not change that default for them.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    breakdown: [
+      { key: { ip: '198.51.100.10', mystery: 'raw-value' }, count: 9 },
+    ],
+  });
+  const aggFields = {
+    by_ip_and_mystery: {
+      kind: 'composite' as const,
+      fields: { ip: 'source.ip' },
+    },
+  };
+  const out = applyFieldPolicy(
+    digest,
+    [{ field: 'source.ip', action: 'allow' }],
+    p,
+    aggFields,
+  );
+  assert.deepEqual(out.breakdown![0].key, {
+    ip: '198.51.100.10',
+    mystery: 'raw-value',
+  });
+});
+
 test('applyFieldPolicy: composite on source.ip + wazuh.agent.id scrubs each named component', () => {
   const policy: FieldPolicyEntry[] = [
     { field: 'source.ip', action: 'anonymize', kind: 'IP' },
