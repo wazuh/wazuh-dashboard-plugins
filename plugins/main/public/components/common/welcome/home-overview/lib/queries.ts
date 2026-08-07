@@ -28,7 +28,6 @@ import {
   THREAT_ENRICHMENTS_FIELD,
   THREAT_INTEL_THREAT_TYPE_FIELD,
   THREAT_INTEL_TYPE_FIELD,
-  VULNERABILITY_CVE_ID_FIELD,
   VULNERABILITY_PACKAGE_NAME_FIELD,
   VULNERABILITY_SEVERITY_FIELD,
   VULNERABILITY_SEVERITY_VALUES,
@@ -59,11 +58,6 @@ export function buildVulnerabilitySeverityFiltersAgg() {
       },
     };
   }
-  filters['pending'] = {
-    match_phrase: {
-      'vulnerability.under_evaluation': true,
-    },
-  };
   return { [AGG.vulnerabilitySeverity]: { filters: { filters } } };
 }
 
@@ -203,13 +197,6 @@ export function buildVulnerabilityTopPackagesAgg(size = TOP_N) {
     VULNERABILITY_PACKAGE_NAME_FIELD,
     size,
   );
-}
-
-/** CVEs matched: distinct-CVE count, not the total match-document count. */
-export function buildCvesMatchedAgg() {
-  return {
-    [AGG.cvesMatched]: { cardinality: { field: VULNERABILITY_CVE_ID_FIELD } },
-  };
 }
 
 /**
