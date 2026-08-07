@@ -90,6 +90,58 @@ const NO_MATCHING_RESULTS_MESSAGE =
 const NO_ANSWER_MESSAGE =
   'I was not able to come up with an answer for that. Try rephrasing your question.';
 
+/**
+ * Appended to the FINAL round's outbound messages when the turn ran at least one tool (issue
+ * #8893) — see the append site in `orchestrate` below for the measurement and for why it goes on
+ * the outbound copy only. This is the request for a conclusion that dropping `tools` does not by
+ * itself make.
+ *
+ * Every clause is load-bearing, so edit with care:
+ *  - "using only the tool results already gathered" and "Do not state anything the results do not
+ *    show" keep this from becoming a fabrication prompt. Asking a model to produce an answer it
+ *    could not support is exactly how invented numbers and agent names appear, and the fallbacks
+ *    above exist precisely because an honest silence was preferable to that. The instruction has
+ *    to buy analysis WITHOUT buying invention.
+ *  - "If they do not answer the question, say so plainly" gives the model a licensed exit, so the
+ *    honest outcome stays reachable rather than being squeezed out by the request for text.
+ *  - no mention of tools being unavailable: the round already omits `tools` entirely, and naming
+ *    the absent capability invites the model to narrate the mechanism ("I cannot query further…")
+ *    instead of answering.
+ */
+export const FINAL_ROUND_ANSWER_INSTRUCTION =
+  "Now answer the user's question directly, using only the tool results already gathered in " +
+  'this conversation. Do not state anything the results do not show. If they do not answer the ' +
+  'question, say so plainly and state what is missing.';
+
+/**
+ * Appends FINAL_ROUND_ANSWER_INSTRUCTION to the messages bound for the provider, but only on the
+ * final round of a turn that actually ran a tool (issue #8893). Exported for unit testing only —
+ * not part of this route's HTTP contract — and kept as a pure function precisely so the decision
+ * can be tested without standing up a whole fake `orchestrate` run.
+ *
+ * Returns the input array UNCHANGED (same reference) when the instruction does not apply, and a
+ * fresh array when it does — never mutates the input, which matters because the caller may pass
+ * `messages` itself (the turn's accumulating source of truth) when privacy mode is off.
+ *
+ * Gated on `toolUsedThisTurn`: on a `general`-routed (no-tool) turn the final round IS the whole
+ * answer and there are no gathered results to reason over, so the instruction would be a lie.
+ * That path's silence is a different defect with its own fix (the reasoning-channel fallback in
+ * openai-compatible.ts) and its own fallback copy (NO_ANSWER_MESSAGE above).
+ */
+export function withFinalRoundAnswerInstruction(
+  messages: ChatMessage[],
+  isFinalRound: boolean,
+  toolUsedThisTurn: boolean,
+): ChatMessage[] {
+  if (!isFinalRound || !toolUsedThisTurn) {
+    return messages;
+  }
+  return [
+    ...messages,
+    { role: 'system', content: FINAL_ROUND_ANSWER_INSTRUCTION },
+  ];
+}
+
 /** Picks which of the three no-text fallbacks above fits a turn that ended without any `delta`
  * text — shared by both `!sawAnyDelta` exit points below (the normal per-round `done` branch and
  * the round-budget-exhausted path) so the same three-way decision lives in exactly one place. */
@@ -889,9 +941,30 @@ async function* orchestrate(
 
     // Outbound scrub: a fresh transformed COPY per round — `messages` itself keeps
     // accumulating unscrubbed below so later rounds re-scrub from the same source of truth.
-    const outboundMessages = privacyCtx
+    const scrubbedMessages = privacyCtx
       ? scrubMessagesForProvider(messages, privacyCtx.pseudonymizer)
       : messages;
+    // Final round of a tool-using turn: ask for the answer (issue #8893). Dropping `tools` above
+    // terminates the tool loop, but on its own it only stops the model from CALLING anything — it
+    // never asks for a conclusion. The model is handed a transcript of tool results with no
+    // outstanding request, so "I already presented the data, nothing to add" is a rational
+    // completion rather than a malfunction, and the turn ends with no text at all: measured on
+    // openai/gpt-oss-120b over a 40-question analyst-persona bank, 6/40 turns ended on the
+    // `!sawAnyDelta` fallback below, every one with the same 4-tool-call signature (the 3
+    // tool-bearing rounds this budget allows plus stage 1's own forced `route_question`), and 4 of
+    // those 6 had already rendered a NON-EMPTY table — a non-answer sitting directly above real
+    // data the user asked to have interpreted.
+    //
+    // Applied to the outbound COPY only, never to `messages`: this is a per-request nudge, not
+    // conversation history, so it must not persist into the saved conversation or be re-sent by a
+    // later turn. Applied AFTER the scrub deliberately — it is static first-party text with no user
+    // data in it, so there is nothing for the pseudonymizer to find, and running it through would
+    // only risk `prescanAndMint` mangling a word in our own copy.
+    const outboundMessages = withFinalRoundAnswerInstruction(
+      scrubbedMessages,
+      isFinalRound,
+      toolUsedThisTurn,
+    );
     // Inbound un-scrub: this is why the ANSWER the analyst reads carries real hostnames/IPs even
     // with privacy mode on — every delta is run back through the pseudonym map here, so `HOST_1`
     // becomes the real hostname again before it leaves the server. Pseudonyms exist for the provider

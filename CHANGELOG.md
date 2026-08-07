@@ -133,6 +133,7 @@
 | [#8708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8708)   | Fixed Home KPI's visualization persistent filters                                                                                                                                             |
 | [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766) | Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration                                                              |
 | [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775) | Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters                                                                                                                |
+| [#8893](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8893) | Fixed the AI Assistant ending a turn with no written answer after using up its tool rounds, leaving fallback text above a populated results table                                              |
 
 ### Removed
 
