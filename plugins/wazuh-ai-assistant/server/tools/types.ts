@@ -63,7 +63,27 @@ export interface ToolDefinition {
      */
     rowFields?: string[];
   };
-  digest: { sampleColumns: string[] };
+  digest: {
+    sampleColumns: string[];
+    /**
+     * Opt-in (currently only the 8 finding-hits tools, via `catalog/common.ts`'s
+     * `FINDING_BREAKDOWN_DIMENSIONS`): dot-paths digest.ts's `buildDigest` groups ALL returned
+     * rows by (not just the `MAX_SAMPLES` slice) to synthesize a `breakdown` when the tool's own
+     * result carries no real `aggregations` — i.e. the natural-language QUESTION is aggregative
+     * ("which agents", "which rules") even though this tool only ever executes a plain hits
+     * search. `undefined` (every other tool) reproduces today's breakdown-only-from-real-aggs
+     * behavior exactly.
+     *
+     * Since #8870's fix, every one of these 8 tools ALSO attaches a real `terms` aggregation per
+     * dimension to its own request (`catalog/common.ts`'s `FINDING_BREAKDOWN_AGGS` — OpenSearch
+     * computes it over the full matched set regardless of `size`), so `buildBreakdown` normally
+     * satisfies `breakdown` before this synthetic path is ever reached; this dot-path list remains
+     * the fallback for whenever a real aggregation genuinely is not present, in which case
+     * `buildDigest` labels the result as page-only (`Digest.breakdownNote`) rather than presenting
+     * it as the population whenever `counts.truncated`.
+     */
+    breakdownDimensions?: string[];
+  };
   /**
    * Opt-in hook for Security Analytics catalog tools (get_rules, get_threat_intel_components):
    * given the validated params and the `space` value executor.ts resolved from the executed
@@ -84,4 +104,14 @@ export interface ToolDefinition {
    * other catalog tool leaves this unset, so their static-column path in digest.ts is untouched.
    */
   deriveColumns?: boolean;
+  /**
+   * Opt-in (currently only `search_wazuh_data`): when true, executor.ts's `executeIndexerRequest`
+   * validates every field name it can extract from the executed body against the target index
+   * pattern's live mapping (server/tools/field-validation.ts) before the request reaches
+   * OpenSearch, throwing a bounded, self-correctable tool error for an invented field name instead
+   * of letting OpenSearch silently return zero matches/buckets. Gated per-tool rather than global:
+   * a typed catalog tool builds its field paths from `common/wazuh-fields.ts` constants, so it
+   * cannot guess one wrong, and would pay a `_field_caps` round trip on every call for no benefit.
+   */
+  validateFieldNames?: boolean;
 }

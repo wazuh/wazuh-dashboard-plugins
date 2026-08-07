@@ -10,12 +10,37 @@ import { ToolDefinition } from './types';
 export interface Digest {
   tool: string;
   counts: { total?: number; returned: number; truncated: boolean };
-  /** `agg` is set only when the executed query had more than one top-level aggregation (only the
-   * search_wazuh_data escape hatch can produce that), naming which aggregation a bucket belongs
-   * to — single-agg digests (every typed tool) stay byte-identical to before it existed. It also
-   * lets privacy.ts's field-policy pass attribute each bucket key to the right aggregation field. */
+  /** `agg` is set only when the executed query had more than one top-level aggregation — the
+   * search_wazuh_data escape hatch (a hand-built multi-agg query) and, since #8870's fix, every
+   * finding-hits typed tool (`catalog/common.ts`'s `FINDING_BREAKDOWN_AGGS` always attaches two:
+   * by agent name and by rule title) — naming which aggregation a bucket belongs to; single-agg
+   * digests stay byte-identical to before it existed. It also lets privacy.ts's field-policy pass
+   * attribute each bucket key to the right aggregation field. */
   breakdown?: Array<{ key: string; count: number; agg?: string }>;
+  /** Set only when `breakdown` was synthesized from the RETURNED page (`buildSyntheticBreakdown`)
+   * rather than a real OpenSearch aggregation over the full matched set (`buildBreakdown`), AND
+   * that page is not the whole matched set (`counts.truncated`) — i.e. an entity whose rows sort
+   * outside the page is invisible to `breakdown`, the exact defect #8870's validation update
+   * reproduced live (limit:20 on 26 matches synthesizing 13/7 and 11/9 while the true distribution
+   * is 16/8/2 and 13/13). Tells the model `breakdown` is NOT authoritative for the full result,
+   * unlike `samplesNote` (which caveats `samples` only) — see `buildSamplesNote`'s own updated
+   * wording for how the two combine. Omitted whenever `breakdown` is a real aggregation (always
+   * population-true: OpenSearch computes `aggregations` over every matched doc regardless of
+   * `size`) or a synthetic one over an untruncated result (`returned === total`, where grouping
+   * every returned row already IS grouping the full population). */
+  breakdownNote?: string;
+  /** Set only when `counts.returned` is 0 AND the executed query carried 2+ filter clauses — see
+   * `buildZeroRowHint` below. A 0-row result is exactly as consistent with "a wrong field name" or
+   * "an over-narrow filter" as with "genuinely no matching data"; the system prompt already tells
+   * the model to retry broader in that situation, but relying on it noticing on its own has
+   * measurably failed (see the issue this exists for), so this makes the ambiguity mechanical
+   * instead. A single-filter 0-row result is an ordinary, unambiguous "no data" and gets no hint. */
+  hint?: string;
   samples: Array<Record<string, unknown>>;
+  /** Set only when `samples.length < counts.returned` — see `buildSamplesNote`: a one-sentence
+   * caveat that the sample is the newest-N of the result, not a representative cut, so the model
+   * does not read an entity's absence from `samples` as a fact about the whole result set. */
+  samplesNote?: string;
   /** Schema hint: the column ids of the table already rendered to the user. */
   columns: string[];
   /** The Manager response's top-level `message` (e.g. "AR command was not sent to any agent"),
@@ -436,6 +461,183 @@ function buildBreakdown(
   return breakdown.length > 0 ? breakdown : undefined;
 }
 
+/** `term`/`terms`/`match`/`match_phrase`/`range` filter clauses whose value's own keys ARE field
+ * paths — the same shape field-validation.ts's `FIELD_KEYED_CLAUSE_KEYS` walks for the same
+ * reason, kept as a separate (smaller) list here: this one only names WHICH filters produced a
+ * zero-row result for the hint below, it does not validate anything. */
+const NAMED_FILTER_CLAUSE_KEYS = new Set([
+  'term',
+  'terms',
+  'match',
+  'match_phrase',
+  'range',
+]);
+
+/** The field name of one `query.bool.filter[]` entry, when this function can attribute it with
+ * certainty; `undefined` for a shape it doesn't recognize (e.g. a nested `bool`) — that entry
+ * still counts toward the >=2 threshold in `buildZeroRowHint` below, it just isn't named. */
+function describeFilterClause(clause: unknown): string | undefined {
+  if (!clause || typeof clause !== 'object') {
+    return undefined;
+  }
+  const record = clause as Record<string, unknown>;
+  if (record.exists && typeof record.exists === 'object') {
+    const field = (record.exists as { field?: unknown }).field;
+    return typeof field === 'string' ? field : undefined;
+  }
+  const clauseKey = Object.keys(record)[0];
+  if (!clauseKey || !NAMED_FILTER_CLAUSE_KEYS.has(clauseKey)) {
+    return undefined;
+  }
+  const value = record[clauseKey];
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return undefined;
+  }
+  return Object.keys(value)[0];
+}
+
+const MIN_FILTERS_FOR_ZERO_ROW_HINT = 2;
+
+/**
+ * Mechanical zero-row hint (issue: field-name validation's companion — one catches a wrong field
+ * name before the query runs, this catches an over-narrow filter on a field that DOES exist,
+ * after the fact). Fires only at `returned === 0` and 2+ top-level `query.bool.filter` clauses;
+ * a single-filter 0-row result is ordinary and gets no hint (no noise on a legitimately narrow,
+ * correct query). `requestBody` is only ever passed for the Indexer path (see `buildDigest`'s call
+ * sites in executor.ts) — Manager responses have no DSL filters to name, so this is a no-op there.
+ */
+function buildZeroRowHint(
+  requestBody: Record<string, unknown> | undefined,
+  returned: number,
+): string | undefined {
+  if (returned !== 0) {
+    return undefined;
+  }
+  const filters = (
+    requestBody?.query as { bool?: { filter?: unknown } } | undefined
+  )?.bool?.filter;
+  if (
+    !Array.isArray(filters) ||
+    filters.length < MIN_FILTERS_FOR_ZERO_ROW_HINT
+  ) {
+    return undefined;
+  }
+  const names = filters
+    .map(describeFilterClause)
+    .filter((name): name is string => !!name);
+  const filterDescription =
+    names.length > 0 ? names.join(', ') : `${filters.length} filter clauses`;
+  return (
+    `0 rows. Filters applied: ${filterDescription}. A wrong field name or an over-narrow filter ` +
+    'produces this same result.'
+  );
+}
+
+/** How many buckets `buildSyntheticBreakdown` keeps per dimension — same token-bloat reasoning as
+ * `buildBreakdown`'s real-aggregation buckets (~40 tokens for a handful of {key,count} pairs).
+ * Exported so `catalog/common.ts`'s `FINDING_BREAKDOWN_AGGS` can size the REAL `terms` aggregation
+ * it attaches to every finding-hits tool's request identically — the token cost of a breakdown
+ * must not change depending on which path (real vs. synthetic) happens to serve a given call. */
+export const BREAKDOWN_BUCKET_CAP = 5;
+
+/**
+ * Synthesizes a `breakdown` from EVERY row the tool call returned (not just the `MAX_SAMPLES`
+ * slice `samples` draws from) for the "aggregative QUESTION, non-aggregative QUERY" gap: a
+ * finding-hits typed tool ("which agents are affected", "which rules fired most") only ever runs
+ * a plain hits search, so `buildBreakdown` above (which reads `result.aggregations`) never fires
+ * for it — the model was left to hand-count `samples`, which are the newest
+ * `MAX_SAMPLES` rows of a timestamp-descending sort and therefore miss any entity whose only
+ * matching rows are older. Grouping over ALL rows (already in memory, bounded by the tool's own
+ * request `size`) removes that sort bias entirely, at a fixed, small token cost. Tagged
+ * `agg: dimension` — the dimension's own field path, not a real OpenSearch aggregation name — so
+ * executor.ts can pass privacy.ts's `applyFieldPolicy` an identity map for these dimensions and
+ * have the exact same bucket-scrubbing logic apply as for a real aggregation's breakdown.
+ */
+function buildSyntheticBreakdown(
+  rows: Array<Record<string, unknown>>,
+  dimensions: string[],
+): Array<{ key: string; count: number; agg: string }> | undefined {
+  const breakdown: Array<{ key: string; count: number; agg: string }> = [];
+  for (const dimension of dimensions) {
+    const counts = new Map<string, number>();
+    for (const row of rows) {
+      const value = getByPath(row, dimension);
+      if (typeof value !== 'string' || value.length === 0) {
+        continue;
+      }
+      counts.set(value, (counts.get(value) ?? 0) + 1);
+    }
+    const topBuckets = [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, BREAKDOWN_BUCKET_CAP);
+    for (const [key, count] of topBuckets) {
+      breakdown.push({ key, count, agg: dimension });
+    }
+  }
+  return breakdown.length > 0 ? breakdown : undefined;
+}
+
+/** One-sentence caveat attached whenever `samples` is a strict subset of the returned rows: the
+ * sample is always the newest end of whatever sort the underlying query ran (see `MAX_SAMPLES`'s
+ * own doc comment), never a random or representative cut — so an entity absent from the sample is
+ * only "not in this preview", never "not in the data". Independent of the `breakdown` synthesis
+ * above: it fires for ANY tool whose result was sample-truncated, `breakdownDimensions` opt-in or
+ * not, at the fixed, modest cost of one sentence.
+ *
+ * The instruction to fall back on `breakdown` is only truthful when `breakdown` is itself
+ * population-true — telling the model to "trust the breakdown" while `breakdownNote` (see its doc
+ * comment on `Digest`) simultaneously warns that the very same breakdown is page-scoped would hand
+ * it two contradictory instructions. `breakdownIsPopulationTrue` (true whenever a breakdown exists
+ * AND no `breakdownNote` was attached to it) selects between three variants: trust the breakdown,
+ * distrust it (it shares the same page-scoping this note already warns about), or don't mention it
+ * at all (no breakdown was produced, e.g. a tool with no `breakdownDimensions` opt-in).
+ */
+function buildSamplesNote(
+  returned: number,
+  sampleCount: number,
+  hasBreakdown: boolean,
+  breakdownIsPopulationTrue: boolean,
+): string | undefined {
+  if (returned <= sampleCount) {
+    return undefined;
+  }
+  const preamble =
+    `Showing ${sampleCount} of ${returned} matching rows, drawn from the newest end of the ` +
+    'query order — not a representative sample.';
+  if (!hasBreakdown) {
+    return (
+      `${preamble} Use counts, not an absence from these rows, to decide what the full result ` +
+      'set contains.'
+    );
+  }
+  if (breakdownIsPopulationTrue) {
+    return (
+      `${preamble} Use counts/breakdown, not an absence from these rows, to decide what the ` +
+      'full result set contains.'
+    );
+  }
+  return (
+    `${preamble} The breakdown below is ALSO scoped to only these returned rows (see its own ` +
+    'note) — use counts, not an absence from either, to decide what the full result set contains.'
+  );
+}
+
+/** One-sentence caveat for a `breakdown` synthesized from the returned page rather than a real
+ * aggregation over the full matched set — see `Digest.breakdownNote`'s doc comment for why this is
+ * a hard requirement (#8870's validation-gate update): a page-scoped breakdown presented without
+ * this caveat is worse than no breakdown at all, because the model treats it as authoritative for
+ * entities it never saw. */
+function buildBreakdownNote(
+  total: number | undefined,
+  returned: number,
+): string {
+  const totalDescription = typeof total === 'number' ? `all ${total}` : 'all';
+  return (
+    `This breakdown covers only the ${returned} returned rows, not ${totalDescription} matching ` +
+    'rows — do not present it as the full distribution.'
+  );
+}
+
 /**
  * PRIVACY SEAM: the field-level pseudonymizer
  * (server/tools/privacy.ts's `applyFieldPolicy`) wraps this function's output, not its inside.
@@ -470,7 +672,37 @@ export function buildDigest(
     return sample;
   });
 
-  const breakdown = buildBreakdown(result);
+  // `buildBreakdown` only ever fires when the response itself carries `aggregations` — real
+  // aggregations are ALWAYS population-true (OpenSearch computes them over every matched doc
+  // regardless of `size`/limit), so they take priority whenever present and need no page-only
+  // caveat. When there is no real aggregation, but this tool opted into `breakdownDimensions` (the
+  // finding-hits tools) and there are more rows than the sample can show, synthesize an equivalent
+  // breakdown from every RETURNED row instead — the "aggregative QUESTION, non-aggregative QUERY"
+  // case (see `buildSyntheticBreakdown`'s doc comment). That synthetic breakdown is exact only when
+  // `returned === total` (grouping every returned row already covers the whole matched set); when
+  // `truncated` (returned < total), it can only ever see the page the tool happened to return —
+  // the exact defect #8870's validation-gate update caught live — so it gets `breakdownNote`
+  // labeling it as page-only instead of being presented as the population.
+  const realBreakdown = buildBreakdown(result);
+  let breakdown = realBreakdown;
+  let breakdownNote: string | undefined;
+  if (
+    !realBreakdown &&
+    def.digest.breakdownDimensions &&
+    returned > MAX_SAMPLES
+  ) {
+    breakdown = buildSyntheticBreakdown(rows, def.digest.breakdownDimensions);
+    if (breakdown && truncated) {
+      breakdownNote = buildBreakdownNote(total, returned);
+    }
+  }
+  const hint = buildZeroRowHint(requestBody, returned);
+  const samplesNote = buildSamplesNote(
+    returned,
+    samples.length,
+    !!breakdown,
+    !!breakdown && !breakdownNote,
+  );
   // Manager responses carry a top-level `message` alongside `data` (e.g. an active-response no-op:
   // error:0, affected_items/failed_items both empty, message:"AR command was not sent to any
   // agent") — surfaced here so a silent no-op is still visible to the model. Indexer responses
@@ -479,8 +711,11 @@ export function buildDigest(
   const digest: Digest = {
     tool: toolName,
     counts: { total, returned, truncated },
+    ...(hint ? { hint } : {}),
     ...(breakdown ? { breakdown } : {}),
+    ...(breakdownNote ? { breakdownNote } : {}),
     samples,
+    ...(samplesNote ? { samplesNote } : {}),
     columns: def.deriveColumns
       ? sampleColumns
       : def.tableSpec.columns.map(column => column.field),

@@ -2,6 +2,7 @@ import { JsonSchemaObject, JsonSchemaProperty } from '../../../common/types';
 import { SEVERITY_LEVELS, SeverityLevel } from '../../../common/wazuh-fields';
 import { ToolTableColumnSpec } from '../types';
 import { clampInt } from '../guardrails';
+import { BREAKDOWN_BUCKET_CAP } from '../digest';
 
 /**
  * Shared helpers for the catalog tool modules under server/tools/catalog/. Kept separate from
@@ -268,6 +269,51 @@ export const FINDING_INVESTIGATION_ROW_FIELDS = [
   'destination.user.name',
   'process.command_line',
 ];
+
+/**
+ * Group-by dimensions for digest.ts's `buildSyntheticBreakdown` — shared by the same 8
+ * finding-hits tools listed above. These two are the ones the issue this exists for names
+ * verbatim ("which agents"/"which rules"); every finding row carries both regardless of which
+ * columns the calling tool declares visible, so this is safe to share across all 8 unconditionally.
+ */
+export const FINDING_BREAKDOWN_DIMENSIONS = [
+  'wazuh.agent.name',
+  'wazuh.rule.title',
+];
+
+/** Derives a valid, unique OpenSearch top-level aggregation name from a dot-path field — agg names
+ * are plain object keys with no dot restriction, but a stable NAME distinct from the field path
+ * itself (rather than reusing the path verbatim as the key) keeps `digest.ts`'s `breakdown[].agg`
+ * tag readable and avoids relying on dots surviving unescaped through any future request
+ * transform. */
+function aggNameForField(field: string): string {
+  return field.replace(/\./g, '_');
+}
+
+/**
+ * Real `terms` aggregations over `FINDING_BREAKDOWN_DIMENSIONS`, attached to every finding-hits
+ * typed tool's request body (see e.g. get-critical-findings.ts's `buildRequest`) alongside the
+ * existing `query`/`sort`/`size` — OpenSearch computes `aggregations` over the FULL MATCHED set of
+ * a query regardless of `size`, independently of how many hits are actually returned. This closes
+ * the #8870 validation-gate gap: a breakdown computed over only the RETURNED page
+ * (`buildSyntheticBreakdown`, digest.ts) is wrong whenever `size`/`limit` truncates the match set,
+ * because the digest hands it to the model as if it were the population. With this `aggs` clause
+ * present, `buildBreakdown` (digest.ts, unmodified — it already read `result.aggregations`
+ * generically for the search_wazuh_data escape hatch) picks up the real, population-true
+ * distribution instead, and the synthetic path never runs for these 8 tools.
+ *
+ * Both dimension fields are already on `guardrails.ts`'s `AGG_FIELD_ALLOWLIST`, so this passes
+ * `checkAggs` unmodified. Sized at `BREAKDOWN_BUCKET_CAP` — the same per-dimension bucket budget
+ * `buildSyntheticBreakdown` uses — so the token cost of a breakdown does not change depending on
+ * whether the real or the synthetic path ends up serving a given call.
+ */
+export const FINDING_BREAKDOWN_AGGS: Record<string, unknown> =
+  Object.fromEntries(
+    FINDING_BREAKDOWN_DIMENSIONS.map(field => [
+      aggNameForField(field),
+      { terms: { field, size: BREAKDOWN_BUCKET_CAP } },
+    ]),
+  );
 
 /**
  * Fields added to every finding-hits tool's digest `sampleColumns` — the model-facing subset of
