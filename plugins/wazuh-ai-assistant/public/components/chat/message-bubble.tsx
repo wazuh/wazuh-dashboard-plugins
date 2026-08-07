@@ -155,22 +155,24 @@ export function sanitizeAssistantMarkdown(content: string): string {
 }
 
 function sanitizeProseSegment(segment: string): string {
-  return segment
-    // Markdown images (inline and reference-style) — strip entirely rather than degrading to a
-    // link, since a bare URL the model copied from tool data is exactly the kind of attacker-
-    // influenced text this guards against too.
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
-    .replace(/!\[[^\]]*\]\[[^\]]*\]/g, '')
-    // Raw HTML tags (open, close, self-closing) — the leading-letter requirement after `<`/`</`
-    // is what real HTML tags require, so ordinary prose use of `<`/`>` (e.g. "value < 5") never
-    // matches and passes through untouched.
-    .replace(/<\/?[a-zA-Z][a-zA-Z0-9-]*(?:\s[^<>]*)?\/?>/g, '')
-    // Markdown links: keep the label, drop the target unless it's an explicit http(s) URL — a
-    // "plain link... subject to a scheme check" (never javascript:/data:/vbscript:/a bare path).
-    // The trailing `\)+` (not just `\)`) also consumes a stray extra ")" that a malicious target
-    // itself containing an unmatched "(" (e.g. "javascript:alert(1)") would otherwise leave
-    // behind in the rendered text.
-    .replace(/\[([^\]]*)\]\((?!https?:\/\/)[^)]*\)+/gi, '$1');
+  return (
+    segment
+      // Markdown images (inline and reference-style) — strip entirely rather than degrading to a
+      // link, since a bare URL the model copied from tool data is exactly the kind of attacker-
+      // influenced text this guards against too.
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+      .replace(/!\[[^\]]*\]\[[^\]]*\]/g, '')
+      // Raw HTML tags (open, close, self-closing) — the leading-letter requirement after `<`/`</`
+      // is what real HTML tags require, so ordinary prose use of `<`/`>` (e.g. "value < 5") never
+      // matches and passes through untouched.
+      .replace(/<\/?[a-zA-Z][a-zA-Z0-9-]*(?:\s[^<>]*)?\/?>/g, '')
+      // Markdown links: keep the label, drop the target unless it's an explicit http(s) URL — a
+      // "plain link... subject to a scheme check" (never javascript:/data:/vbscript:/a bare path).
+      // The trailing `\)+` (not just `\)`) also consumes a stray extra ")" that a malicious target
+      // itself containing an unmatched "(" (e.g. "javascript:alert(1)") would otherwise leave
+      // behind in the rendered text.
+      .replace(/\[([^\]]*)\]\((?!https?:\/\/)[^)]*\)+/gi, '$1')
+  );
 }
 
 /**

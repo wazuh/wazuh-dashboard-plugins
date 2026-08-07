@@ -672,7 +672,10 @@ test('buildDigest: breakdown "key" values are stripped of control characters and
   };
   const digest = buildDigest('get_top_rules', result, def);
   const key = digest.breakdown![0].key;
-  assert.ok(!hasControlChar(key), 'control characters must be stripped from the key');
+  assert.ok(
+    !hasControlChar(key),
+    'control characters must be stripped from the key',
+  );
   assert.equal(key.length, 501); // 500 chars + ellipsis marker
   assert.ok(key.endsWith('…'));
 });
@@ -682,7 +685,10 @@ test('capDigest: an oversized "columns" list forces the Manager message to be dr
     tool: 't',
     counts: { returned: 0, truncated: false },
     samples: [],
-    columns: Array.from({ length: 200 }, (_, i) => `some.very.long.column.path.name.${i}`),
+    columns: Array.from(
+      { length: 200 },
+      (_, i) => `some.very.long.column.path.name.${i}`,
+    ),
     message: 'a short, otherwise-harmless message',
   };
   const capped = capDigest(digest);

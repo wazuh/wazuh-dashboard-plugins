@@ -267,7 +267,9 @@ describe('MessageBubble', () => {
 
 describe('sanitizeAssistantMarkdown (#8890)', () => {
   it('strips inline Markdown image syntax, including the URL', () => {
-    const out = sanitizeAssistantMarkdown('before ![alt](http://evil.example/x) after');
+    const out = sanitizeAssistantMarkdown(
+      'before ![alt](http://evil.example/x) after',
+    );
     expect(out).not.toContain('![');
     expect(out).not.toContain('evil.example');
   });
@@ -294,12 +296,14 @@ describe('sanitizeAssistantMarkdown (#8890)', () => {
   });
 
   it('leaves normal Markdown (bold, lists, headings) untouched', () => {
-    const input = '**bold** and _italic_ and a list:\n- one\n- two\n\n# Heading';
+    const input =
+      '**bold** and _italic_ and a list:\n- one\n- two\n\n# Heading';
     expect(sanitizeAssistantMarkdown(input)).toBe(input);
   });
 
   it('leaves fenced code blocks completely untouched, even with <img>/![]() inside them', () => {
-    const input = 'Before.\n```html\n<img src=x onerror=alert(1)>\n![a](b)\n```\nAfter.';
+    const input =
+      'Before.\n```html\n<img src=x onerror=alert(1)>\n![a](b)\n```\nAfter.';
     const out = sanitizeAssistantMarkdown(input);
     expect(out).toContain('<img src=x onerror=alert(1)>');
     expect(out).toContain('![a](b)');
