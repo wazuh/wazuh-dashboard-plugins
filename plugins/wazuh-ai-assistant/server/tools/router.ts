@@ -125,11 +125,13 @@ const CATEGORY_ORDER: RouterCategory[] = [
  * character here is paid for on every turn (stage-1 token budget). */
 const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
   agents:
-    'Agent listing by status (active, pending, never_connected, disconnected) and/or agent ID.',
+    'Agent listing by status (active, pending, never_connected, disconnected) and/or agent ID. ' +
+    'Enrollment/connection status only, NOT comms-channel health or message drop-rate.',
   findings:
     'Finding search/summaries: critical findings, by agent/rule/rule-tag/OS/time, top rules, ' +
     'brute-force, suspicious PowerShell, general security summary. Also covers the raw/normalized ' +
-    'event stream ("everything that happened", matched or not).',
+    'event stream ("everything that happened", matched or not). NOT automated actions Wazuh took ' +
+    'in response (active response/blocking/quarantine) -- no category covers that.',
   vulnerabilities:
     'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only.',
   fim: 'File Integrity Monitoring: current state of monitored files (path, mtime, owner, hashes).',
