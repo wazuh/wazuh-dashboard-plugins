@@ -596,8 +596,13 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
 
 /** What `runStage1Routing` resolves to once its (internal-only) adapter stream ends. */
 interface Stage1Result {
-  /** `undefined` means "no tools this turn" (routed to `general` alone). */
-  tools: ToolSpec[] | undefined;
+  /**
+   * Never empty and never `undefined` — `resolveStage2Tools` (server/tools/router.ts) always
+   * resolves at least a minimal recovery set (`get_security_summary` + `search_wazuh_data`) even
+   * when the model routed to `general` alone, so a stage-1 misclassification is recoverable
+   * mid-turn rather than leaving the round with no tools at all.
+   */
+  tools: ToolSpec[];
 }
 
 /**
