@@ -214,13 +214,34 @@ interface ExtractedRows {
   total?: number;
 }
 
+/**
+ * Reads a `_search` response's `hits.total` in whichever shape it actually arrives in.
+ * `guardrails.ts`'s `applySafetyValves` forces `track_total_hits: true` on every outbound
+ * request, which makes the Indexer (OpenSearch, ES-compatible response shape) always return the
+ * modern object form -- `{value: <exact count>, relation: 'eq'}` -- never the pre-7.x bare-number
+ * form. This function accepts a bare number too anyway: it costs nothing, and it means this
+ * extraction keeps working unchanged if a future call site (or a test fixture) ever hands it the
+ * legacy shape directly, rather than silently reading `undefined` off a plain number's `.value`.
+ * `relation` is not inspected here -- with `track_total_hits: true` it is always `'eq'` (an exact
+ * count, never the capped `'gte'` a numeric `track_total_hits` can produce), so `total` below is
+ * always the true match count, not a lower bound.
+ */
+function resolveHitsTotal(result: unknown): number | undefined {
+  const total = (
+    result as
+      | { hits?: { total?: number | { value?: number } } }
+      | undefined
+  )?.hits?.total;
+  if (typeof total === 'number') {
+    return total;
+  }
+  return typeof total?.value === 'number' ? total.value : undefined;
+}
+
 function extractRows(result: unknown): ExtractedRows {
   const hitsRows = hitsToRows(result);
   if (hitsRows) {
-    const total = (
-      result as { hits?: { total?: { value?: number } } } | undefined
-    )?.hits?.total?.value;
-    return { rows: hitsRows, total };
+    return { rows: hitsRows, total: resolveHitsTotal(result) };
   }
   const bucketRows = bucketsToRows(result);
   if (bucketRows) {

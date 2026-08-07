@@ -731,15 +731,30 @@ test('applySafetyValves: clamps size to <= 500', () => {
   }
 });
 
-test('applySafetyValves: forces track_total_hits regardless of input', () => {
+test('applySafetyValves: forces track_total_hits to true (exact count) regardless of input', () => {
   const result = applySafetyValves({
     query: timeBoundedFilter(),
-    track_total_hits: true,
+    track_total_hits: 100,
     size: 20,
   });
   assert.equal(result.ok, true);
   if (result.ok) {
-    assert.equal(result.body.track_total_hits, 10000);
+    assert.equal(result.body.track_total_hits, true);
+  }
+});
+
+test('applySafetyValves: forces track_total_hits to true even when the query_dsl disables it', () => {
+  // A search_wazuh_data query_dsl setting track_total_hits: false must not be honored -- the
+  // enforced exact-count value always wins, same precedence as every other valve in this
+  // function (size/timeout/etc).
+  const result = applySafetyValves({
+    query: timeBoundedFilter(),
+    track_total_hits: false,
+    size: 20,
+  });
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.equal(result.body.track_total_hits, true);
   }
 });
 

@@ -58,7 +58,6 @@ function asNumber(value: unknown): number | undefined {
 
 const MAX_SIZE = 500;
 const MAX_FROM = 1000;
-const MAX_TRACK_TOTAL_HITS = 10000;
 const SEARCH_TIMEOUT = '10s';
 // A pathological ~20KB deeply-nested `bool` body overflows the stack in the recursive tree walkers
 // below (normalizeMustToFilter, walk) and throws an uncaught RangeError, which would break
@@ -132,7 +131,28 @@ export function applySafetyValves(
   // clampInt's doc comment for why that difference is preserved rather than unified away.
   next.size =
     requestedSize === undefined ? 20 : clampInt(requestedSize, 0, MAX_SIZE);
-  next.track_total_hits = MAX_TRACK_TOTAL_HITS;
+  // Forced to `true` (an exact count) regardless of whatever the model/catalog tool set, the same
+  // "enforced value always wins" precedence every other valve in this function applies -- this
+  // assignment runs unconditionally, after `next` already carries through any caller-supplied
+  // `track_total_hits`, so a search_wazuh_data query_dsl setting its own value (true/false/a
+  // number) is silently overwritten here, never honored. Previously this was clamped to a
+  // NUMERIC cap (10000): OpenSearch stops counting past that number and reports
+  // `hits.total = {value: 10000, relation: 'gte'}` for any match count above it, so `digest.ts`'s
+  // "total" (and therefore its "truncated" flag) silently under-reported/mis-flagged once a
+  // fleet's real match count crossed 10k -- observed as "10,000 total, capped" answers that were
+  // not actually the true count. `true` asks OpenSearch for the EXACT count on every shard
+  // (`hits.total = {value: <exact>, relation: 'eq'}` always) with no upper bound of its own.
+  // Accepted trade-off, not a regression: exact counting costs strictly more than a capped count
+  // on a very large index, but (a) `counts.total` drives user-facing, often compliance-adjacent
+  // answers ("how many critical vulnerabilities") where an approximate/capped number is the wrong
+  // kind of wrong to ship silently, and (b) every query this valve applies to is already bounded
+  // by this file's OTHER valves -- the mandatory <=90-day time range on timeline indices
+  // (`lintDsl`'s time-bound check), the `wazuh-states-*` current-state indices' inherently
+  // fixed per-agent document counts, and `MAX_SIZE`/`MAX_AGG_SIZE` capping what is ever
+  // RETURNED -- so this is bounded lab/production security telemetry, not an unbounded
+  // web-scale corpus; the exact-count pass over an already time-/scope-bounded shard set is cheap
+  // in that regime.
+  next.track_total_hits = true;
   // allow_partial_search_results is deliberately NOT set here: it is a transport/URL parameter,
   // not a body field (a body key would 400 the whole search), and the cluster default is already
   // `true`, which is the behavior we want.
