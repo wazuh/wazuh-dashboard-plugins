@@ -24,7 +24,7 @@ import {
   VULNERABILITY_SEVERITY_FIELD,
   VULNERABILITY_SEVERITY_VALUES,
 } from '../lib/fields';
-import { SeverityBand } from '../interfaces/types';
+import { SeverityBand, TopItem } from '../interfaces/types';
 
 /** Shared `_g` query state: last 24h, no pinned filters, refresh paused. */
 const DISCOVER_G_STATE =
@@ -84,6 +84,16 @@ export const getDiscoverFindingsBySeverityUrl = (
   });
 };
 export const getMitreUrl = () => getUrlForApp(mitreAttack.id);
+
+export const getMitreIntelligenceResourceUrl = (
+  resource: 'tactics' | 'techniques',
+  item: TopItem,
+): string =>
+  getUrlForApp(mitreAttack.id, {
+    path: `#/overview?tab=mitre&tabView=intelligence&tabRedirect=${resource}&nameToRedirect=${encodeURIComponent(
+      item.key,
+    )}`,
+  });
 export const getItHygieneUrl = () => getUrlForApp(ITHygiene.id);
 
 /** IT Hygiene > System > OS tab, optionally filtered to one `host.os.name`. */

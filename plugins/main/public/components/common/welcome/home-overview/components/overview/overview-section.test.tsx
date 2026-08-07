@@ -17,6 +17,7 @@ jest.mock('../../utils/navigation', () => ({
   goToAgentsByStatus: jest.fn(),
   getThreatHuntingUrl: jest.fn(() => '#threat-hunting'),
   getMitreUrl: jest.fn(),
+  getMitreIntelligenceResourceUrl: jest.fn(() => '#mitre-intelligence'),
   getDiscoverFindingsBySeverityUrl: jest.fn(() => '#discover'),
 }));
 // WzButtonPermissions pulls in a react-redux `useSelector` for RBAC checks —
@@ -84,6 +85,15 @@ describe('OverviewSection', () => {
         .length,
     ).toBeGreaterThan(0);
     expect(screen.getByText('Findings')).toBeInTheDocument();
+  });
+
+  it('links each top tactic to its MITRE Intelligence detail', () => {
+    render(<OverviewSection findings={findingsAvailable} />);
+    expect(screen.getByText('Initial Access').closest('a')).toBeInTheDocument();
+    expect(navigation.getMitreIntelligenceResourceUrl).toHaveBeenCalledWith(
+      'tactics',
+      { key: 'Initial Access', count: 36231, id: 'TA0001' },
+    );
   });
 
   it('navigates to Threat Hunting from the findings header link', () => {

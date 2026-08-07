@@ -8,6 +8,7 @@ import * as navigation from '../../utils/navigation';
 jest.mock('../../utils/navigation', () => ({
   getThreatHuntingUrl: jest.fn(() => '#threat-hunting'),
   getMitreUrl: jest.fn(),
+  getMitreIntelligenceResourceUrl: jest.fn(() => '#mitre-intelligence'),
   getVulnerabilityDetectionUrl: jest.fn(),
   getVulnerabilityDetectionBySeverityUrl: jest.fn(() => '#vuln-filtered'),
 }));
@@ -59,7 +60,7 @@ describe('ThreatHuntingSection', () => {
     expect(screen.getAllByText('openssl').length).toBeGreaterThan(0);
   });
 
-  it('renders Top 5 techniques as plain text, not links (intentionally non-interactive)', () => {
+  it('links each Top 5 technique to its MITRE Intelligence detail', () => {
     render(
       <ThreatHuntingSection
         findings={findingsAvailable}
@@ -68,7 +69,11 @@ describe('ThreatHuntingSection', () => {
     );
     expect(
       screen.getByText('Exploit Public-Facing Application').closest('a'),
-    ).toBeNull();
+    ).toBeInTheDocument();
+    expect(navigation.getMitreIntelligenceResourceUrl).toHaveBeenCalledWith(
+      'techniques',
+      { key: 'Exploit Public-Facing Application', count: 35378, id: 'T1190' },
+    );
   });
 
   it('keeps Vulnerability Detection when the search is unavailable', () => {
