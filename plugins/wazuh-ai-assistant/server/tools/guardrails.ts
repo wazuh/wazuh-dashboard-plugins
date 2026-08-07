@@ -231,6 +231,35 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // low-cardinality — a handful of benchmark policies per agent; mapping live-verified against
   // wazuh-states-sca on 5.0.0-beta3).
   'policy.id',
+  // Entity-pivot fields for "noisiest/top X" questions (GA benchmark gap: this allowlist only
+  // ever listed wazuh-findings-v5 field names, so a terms/composite/multi_terms agg on the
+  // wazuh-events-v5 and wazuh-states-* families' own entity fields was rejected even though
+  // WAZUH_FIELD.AGENT_ID/AGENT_NAME above already cover the *agent* pivot on those families --
+  // `wazuh.agent.id`/`wazuh.agent.name` are the SAME field names on findings-v5, events-v5, and
+  // every wazuh-states-* index (confirmed identical field literals in get-events-by-agent.ts:54
+  // `wazuh.agent.name`, get-agent-os.ts:36/get-agent-packages.ts:43/get-fim-files.ts:72/
+  // get-vulnerabilities.ts:63/get-vulnerabilities-by-agent.ts:56-57 `wazuh.agent.id`/
+  // `wazuh.agent.name`) and this Set is a flat, non-index-scoped allowlist (checkAggs has no
+  // `index` argument), so no new entry was needed for that pivot -- it was already unblocked.
+  // The two pivots below are genuinely NEW field names, both `wazuh-states-*`-only (not present
+  // on findings-v5/events-v5 at all) and both cardinality-safe regardless of MAX_AGG_SIZE's
+  // (100) bucket cap, which bounds every terms/composite/multi_terms agg on this list anyway:
+  //
+  // - `package.name` (wazuh-states-inventory-packages, syscollector package inventory; field
+  //   verified live in get-agent-packages.ts:45 `_source`, KNOWN_SAFE_STRUCTURAL_FIELDS-listed
+  //   in field-policy-coverage.test.ts) -- a per-OS software catalog (distro package repositories
+  //   / vendor installers), not analyst/attacker-supplied free text, unbounded IDs, file paths,
+  //   or hashes; bounded by the fleet's actual installed-software catalog, not open cardinality.
+  // - `host.os.name` (wazuh-states-inventory-system, syscollector OS inventory; field verified
+  //   live in get-agent-os.ts:39 `_source`, KNOWN_SAFE_STRUCTURAL_FIELDS-listed) -- a finite OS
+  //   name taxonomy (Ubuntu/Windows/CentOS/...), lower cardinality than the rule/technique
+  //   taxonomies already on this list.
+  // - `host.os.platform` (same index/tool, get-agent-os.ts:41 `_source`, also
+  //   KNOWN_SAFE_STRUCTURAL_FIELDS-listed) -- an even coarser platform family bucket
+  //   (linux/windows/darwin/...), lower cardinality than `host.os.name` above.
+  'package.name',
+  'host.os.name',
+  'host.os.platform',
 ]);
 
 /**

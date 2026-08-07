@@ -458,6 +458,80 @@ test("lintDsl: passes a terms aggregation on wazuh.integration.category (get_sec
   assert.equal(result.ok, true);
 });
 
+test('lintDsl: passes a terms aggregation on package.name (states inventory-packages pivot)', () => {
+  // Regression: entity-pivot allowlist extension for get_top_agents-adjacent "top package"
+  // questions -- package.name is wazuh-states-inventory-packages-only (not on findings-v5/
+  // events-v5 at all), see get-agent-packages.ts's `_source` list. wazuh-states-* is exempt from
+  // the mandatory time-range check, so no time filter is needed here.
+  const wrapped = {
+    query: { match_all: {} },
+    aggs: { by_package: { terms: { field: 'package.name', size: 20 } } },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-states-inventory-packages-*');
+  assert.equal(result.ok, true);
+});
+
+test('lintDsl: passes a terms aggregation on host.os.name and host.os.platform (states OS pivot)', () => {
+  // Regression: entity-pivot allowlist extension for "top OS/platform" questions -- both fields
+  // are wazuh-states-inventory-system-only, see get-agent-os.ts's `_source` list.
+  const byName = {
+    query: { match_all: {} },
+    aggs: { by_os: { terms: { field: 'host.os.name', size: 20 } } },
+    size: 0,
+  };
+  const byPlatform = {
+    query: { match_all: {} },
+    aggs: { by_platform: { terms: { field: 'host.os.platform', size: 20 } } },
+    size: 0,
+  };
+  assert.equal(
+    lintDsl(byName, 'wazuh-states-inventory-system-*').ok,
+    true,
+  );
+  assert.equal(
+    lintDsl(byPlatform, 'wazuh-states-inventory-system-*').ok,
+    true,
+  );
+});
+
+test('lintDsl: passes a terms aggregation on wazuh.agent.id against wazuh-events-v5 (agent pivot, already allowlisted)', () => {
+  // Regression: confirms the agent pivot is reachable on events-v5 too -- WAZUH_FIELD.AGENT_ID is
+  // a flat, non-index-scoped allowlist entry (checkAggs has no `index` argument), and
+  // wazuh.agent.id/wazuh.agent.name are the same field names on events-v5 as on findings-v5 (see
+  // get-events-by-agent.ts), so no new allowlist entry was needed for this pivot specifically.
+  const wrapped = {
+    query: timeBoundedFilter({ gte: 'now-1d', lte: 'now' }),
+    aggs: {
+      by_agent: { terms: { field: WAZUH_FIELD.AGENT_ID, size: 10 } },
+    },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-events-v5-*');
+  assert.equal(result.ok, true);
+});
+
+test('lintDsl: still rejects a non-allowlisted events-v5 field (e.g. a hand-built high-cardinality pivot)', () => {
+  // Negative counterpart to the allowlist extension above: a field genuinely absent from
+  // AGG_FIELD_ALLOWLIST must still be rejected on events-v5, proving the extension did not widen
+  // the check into a blanket "any field on this index family" pass.
+  const wrapped = {
+    query: timeBoundedFilter({ gte: 'now-1d', lte: 'now' }),
+    aggs: {
+      by_action: { terms: { field: 'event.action', size: 10 } },
+    },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-events-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(
+      result.reason,
+      /not on the allowed low-cardinality field list/,
+    );
+  }
+});
+
 test('lintDsl: rejects a terms agg on a non-allowlisted (high-cardinality) field', () => {
   const wrapped = {
     query: timeBoundedFilter(),
