@@ -16,7 +16,10 @@ import {
 } from './types';
 import { widenNumericTypes } from './wire-schema';
 import { iterateSseLines } from './sse-utils';
-import { fetchProviderWithRetry } from './retry';
+import {
+  fetchProviderWithRetry,
+  describeToolUseFailedStreamMessage,
+} from './retry';
 import {
   assertProviderUrlAllowed,
   PROVIDER_FETCH_REDIRECT_POLICY,
@@ -163,9 +166,11 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         }
         if (parsed.error) {
           // Some providers (e.g. Groq) report failures as an in-stream error frame on HTTP 200.
+          const rawMessage = parsed.error.message ?? 'Unknown provider error';
           yield {
             type: 'error',
-            message: parsed.error.message ?? 'Unknown provider error',
+            message:
+              describeToolUseFailedStreamMessage(rawMessage) ?? rawMessage,
           };
           return;
         }
