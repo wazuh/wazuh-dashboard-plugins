@@ -1,8 +1,3 @@
-/*
- * Copyright OpenSearch Contributors
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import { useEffect, useMemo, useState } from 'react';
 import { useDataSource } from '../../../data-source/hooks/use-data-source';
 import {
