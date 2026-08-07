@@ -57,10 +57,7 @@ const HomeOverviewBody: React.FC = () => {
         />
       </div>
       <EuiSpacer size='l' />
-      <ThreatIntelligenceFeedSection
-        vulnerabilities={vulnerabilities}
-        threatIntel={threatIntel}
-      />
+      <ThreatIntelligenceFeedSection threatIntel={threatIntel} />
       <EuiSpacer size='l' />
       <div ref={breakdownsRef}>
         <SecurityOperationsSection

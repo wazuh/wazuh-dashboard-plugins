@@ -217,6 +217,11 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // Wazuh 5.0 findings-v5 agg fields, all keyword/low-cardinality (finite rule taxonomy /
   // compliance requirement list / MITRE technique catalog).
   WAZUH_FIELD.RULE_CATEGORY,
+  // `wazuh.rule.category` (above) is never populated by the active integrations in this
+  // environment (rootcheck/FIM/vulnerability-detection) — `wazuh.integration.category`
+  // ("security"/"system-activity") is the field that actually carries a value; get_security_summary
+  // aggregates on it. Same finite, low-cardinality taxonomy as RULE_CATEGORY.
+  WAZUH_FIELD.INTEGRATION_CATEGORY,
   WAZUH_FIELD.RULE_TAGS,
   ...Object.values(COMPLIANCE_FRAMEWORK_FIELDS),
   WAZUH_FIELD.RULE_MITRE_TECHNIQUE_ID,

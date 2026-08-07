@@ -8,7 +8,6 @@ import {
   buildSCATopBenchmarksAgg,
   buildFIMTopFilesAgg,
   buildVulnerabilityTopPackagesAgg,
-  buildCvesMatchedAgg,
   buildIocMatchesAgg,
   buildMalwareFilterAgg,
   buildThreatIntelByThreatTypeAgg,
@@ -31,7 +30,6 @@ import {
   FIM_FILE_MTIME_FIELD,
   FIM_FILE_PATH_FIELD,
   VULNERABILITY_PACKAGE_NAME_FIELD,
-  VULNERABILITY_CVE_ID_FIELD,
   EVENT_DOC_ID_FIELD,
   THREAT_ENRICHMENTS_FIELD,
   THREAT_INTEL_THREAT_TYPE_FIELD,
@@ -137,12 +135,6 @@ describe('query builders', () => {
       vulnerabilities_by_package: {
         terms: { field: VULNERABILITY_PACKAGE_NAME_FIELD, size: 5 },
       },
-    });
-  });
-
-  it('builds the CVEs-matched agg as a cardinality, not a doc count', () => {
-    expect(buildCvesMatchedAgg()).toEqual({
-      cves_matched: { cardinality: { field: VULNERABILITY_CVE_ID_FIELD } },
     });
   });
 
