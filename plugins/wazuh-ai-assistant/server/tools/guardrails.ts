@@ -223,9 +223,24 @@ function normalizeMustToFilter(node: unknown): unknown {
 }
 
 /**
- * Low-cardinality fields vetted safe for terms/composite/cardinality/significant_terms aggs.
- * Only schema-valid `wazuh.*` fields are listed (see `common/wazuh-fields.ts`); population is
- * decoder-dependent.
+ * Fields vetted BOUNDED-BUCKET SAFE for terms/composite/cardinality/significant_terms aggs. Only
+ * schema-valid `wazuh.*` fields are listed where applicable (see `common/wazuh-fields.ts`);
+ * population is decoder-dependent.
+ *
+ * Originally documented as a "low-cardinality" allowlist, which described every entry until
+ * `source.ip` below: safety here does NOT actually come from the underlying field's cardinality
+ * being small -- it comes from `MAX_AGG_SIZE` (100) capping how many buckets any terms/composite/
+ * multi_terms agg on ANY of these fields can ever RETURN, and from every such query already being
+ * bounded by this file's other valves (the mandatory time range on timeline indices, `MAX_SIZE`
+ * on returned hits, the index allowlist). A field with unbounded underlying cardinality (like an
+ * IP address space) still only ever returns at most 100 buckets and costs the Indexer one bounded
+ * terms aggregation over an already time-/scope-bounded shard set -- the same resource shape as a
+ * genuinely low-cardinality field, just with more candidate terms to bucket over on the way there.
+ * Every entry below except `source.ip` also happens to be low-cardinality in the traditional
+ * sense (a finite taxonomy/catalog); that is a property of THOSE fields, not a requirement this
+ * list enforces. Field-level PRIVACY exposure (a bucket's `key` being a raw analyst-identifying
+ * value) is a SEPARATE, already-solved concern handled by `privacy.ts`'s `extractAggFields`/
+ * `applyFieldPolicy` -- see `source.ip`'s own comment below for how that applies here.
  */
 const AGG_FIELD_ALLOWLIST = new Set([
   WAZUH_FIELD.RULE_ID,
@@ -280,6 +295,26 @@ const AGG_FIELD_ALLOWLIST = new Set([
   'package.name',
   'host.os.name',
   'host.os.platform',
+  // Entity pivot for "top attacking/connecting source IPs" questions. Field name verified live:
+  // `source.ip` is the exact literal already used as a findings-v5 investigation field
+  // (`server/tools/catalog/common.ts:265` `FINDING_INVESTIGATION_ROW_FIELDS` and `:283`
+  // `FINDING_DIGEST_EXTRA_COLUMNS` -- sent to the model today in every finding-hits tool's digest,
+  // see `get-brute-force.ts`) and as the syscollector local-IP field
+  // (`get-agent-ports.ts:46,62,74`). HONEST cardinality note, unlike every other entry above:
+  // an IP address is HIGH-cardinality, not a finite taxonomy -- safety here rests entirely on
+  // `MAX_AGG_SIZE` capping the returned bucket count and the query's other mandatory bounds (time
+  // range, index allowlist), per this Set's contract comment above, NOT on `source.ip` itself
+  // having few distinct values. PRIVACY: `source.ip` already has a `FIELD_POLICY_DEFAULTS` entry
+  // (`privacy.ts:70`, `{action: 'anonymize', kind: 'IP'}`) from its existing use as a sample
+  // field, and `privacy.ts`'s `applyFieldPolicy` `breakdown` loop (`privacy.ts:688-725`) resolves
+  // EVERY bucket's aggregation field via `extractAggFields` and applies that SAME policy entry to
+  // the bucket `key` -- the exact "a top-agents terms agg leaks hostnames otherwise" mechanism
+  // documented on `applyFieldPolicy` (`privacy.ts:611`), which already covers ANY aggregated
+  // field, not just agent fields. So a `source.ip` terms agg's buckets are pseudonymized under
+  // privacy mode exactly like a `source.ip` sample value is today; no new privacy plumbing was
+  // needed. Privacy-off (the default) surfaces raw IPs in buckets, same as it already does in
+  // every finding-hits tool's digest samples via `FINDING_DIGEST_EXTRA_COLUMNS` -- no new exposure.
+  'source.ip',
 ]);
 
 /**

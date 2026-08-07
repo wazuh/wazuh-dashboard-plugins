@@ -532,6 +532,35 @@ test('lintDsl: still rejects a non-allowlisted events-v5 field (e.g. a hand-buil
   }
 });
 
+test('lintDsl: passes a terms aggregation on source.ip within the size cap (top attacking-IP pivot)', () => {
+  // Positive case for the source.ip allowlist entry (high-cardinality-but-bounded-bucket-safe --
+  // see guardrails.ts's AGG_FIELD_ALLOWLIST comment): a terms agg on source.ip at or under
+  // MAX_AGG_SIZE (100) passes exactly like any other allowlisted field.
+  const wrapped = {
+    query: timeBoundedFilter({ gte: 'now-7d', lte: 'now' }),
+    aggs: { top_source_ips: { terms: { field: 'source.ip', size: 100 } } },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, true);
+});
+
+test('lintDsl: still rejects a source.ip terms agg size over the 100 cap', () => {
+  // Negative case: source.ip's allowlisting does not exempt it from the same size cap every other
+  // allowlisted field is subject to -- being allowlisted only permits the FIELD, never an
+  // oversized bucket count.
+  const wrapped = {
+    query: timeBoundedFilter({ gte: 'now-7d', lte: 'now' }),
+    aggs: { top_source_ips: { terms: { field: 'source.ip', size: 500 } } },
+    size: 0,
+  };
+  const result = lintDsl(wrapped, 'wazuh-findings-v5-*');
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(result.reason, /exceeds the maximum/);
+  }
+});
+
 test('lintDsl: rejects a terms agg on a non-allowlisted (high-cardinality) field', () => {
   const wrapped = {
     query: timeBoundedFilter(),
