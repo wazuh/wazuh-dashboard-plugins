@@ -739,17 +739,6 @@ resources:
     path: /syscollector/{agent_id}/processes
 
   # ===================================================== #
-  #   TASKS
-  # ===================================================== #
-
-  # List tasks
-  - method: GET
-    path: /tasks/status
-    response:
-      statusCode: 200
-      scriptFile: tasks/status.js
-
-  # ===================================================== #
   #   VULNERABILITY
   # ===================================================== #
 
