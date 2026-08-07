@@ -51,6 +51,10 @@ const TOOL_CATEGORY: Record<string, RouterCategory> = {
   get_critical_findings: 'findings',
   search_findings_by_agent: 'findings',
   get_top_rules: 'findings',
+  // get_top_agents ranks agents over either findings or events (its own `index` param) -- filed
+  // under 'findings' for the same reason as get_events_by_agent below: it is the common case and
+  // costs no extra stage-1 category.
+  get_top_agents: 'findings',
   get_findings_by_time: 'findings',
   // get_events_by_agent (issue: "Add a typed events tool over wazuh-events-v5") targets the raw
   // event stream, not findings -- but it is filed under 'findings' rather than a new 'events'
@@ -127,9 +131,9 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
   agents:
     'Agent listing by status (active, pending, never_connected, disconnected) and/or agent ID.',
   findings:
-    'Finding search/summaries: critical findings, by agent/rule/rule-tag/OS/time, top rules, ' +
-    'brute-force, suspicious PowerShell, general security summary. Also covers the raw/normalized ' +
-    'event stream ("everything that happened", matched or not).',
+    'Finding search/summaries: critical findings, by agent/rule/rule-tag/OS/time, top rules, top/' +
+    'noisiest agents, brute-force, suspicious PowerShell, general security summary. Also covers ' +
+    'the raw/normalized event stream ("everything that happened", matched or not).',
   vulnerabilities:
     'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only.',
   fim: 'File Integrity Monitoring: current state of monitored files (path, mtime, owner, hashes).',
