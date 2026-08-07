@@ -745,6 +745,25 @@ test('applyFieldPolicy: an escape-hatch unresolvable-field bucket fails closed (
   assert.match(out.breakdown![0].key as string, /^VAL_\d+$/);
 });
 
+test('applyFieldPolicy: an escape-hatch unresolvable-field bucket fails closed (structured key, dropped)', () => {
+  // Sibling of the string-key case above: a STRUCTURED key (object/array) under an unresolvable
+  // spec cannot be safely pseudonymized component-by-component (no field mapping exists for it),
+  // so the escape hatch drops the whole bucket outright rather than shipping raw structured data.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    breakdown: [{ key: { mystery: 'raw-value' }, count: 5 }],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    [],
+    p,
+    { unknown_shape: undefined },
+    'search_wazuh_data',
+    true,
+  );
+  assert.deepEqual(out.breakdown, undefined);
+});
+
 // --- applyFieldPolicy: aggregation SAMPLES (the `key` sample field) ------------------------------
 
 /**
