@@ -1,10 +1,13 @@
 import { ToolDefinition } from '../types';
 import {
+  findingArtifactFilterClauses,
+  findingArtifactFilterProperties,
   findingDigestColumns,
   FINDING_BREAKDOWN_AGGS,
   FINDING_BREAKDOWN_DIMENSIONS,
   findingRowFields,
   clampLimit,
+  FINDING_SCOPE_NOTE,
   limitProperty,
   objectSchema,
   resolveTimeRange,
@@ -26,12 +29,13 @@ export const getSuspiciousPowershellTool: ToolDefinition = {
     name: 'get_suspicious_powershell',
     description:
       'Searches security findings for PowerShell-related activity within a time range, most ' +
-      'recent first. Use for "suspicious PowerShell activity" questions.',
+      `recent first. Use for "suspicious PowerShell activity" questions. ${FINDING_SCOPE_NOTE}`,
     parameters: objectSchema({
       limit: limitProperty(
         'Max number of findings to return (default 20, max 500).',
       ),
       ...timeRangeProperties(),
+      ...findingArtifactFilterProperties(),
     }),
   },
   target: 'indexer',
@@ -51,13 +55,14 @@ export const getSuspiciousPowershellTool: ToolDefinition = {
             // robust signals instead of trusting the title: the canonical ATT&CK technique id
             // for PowerShell, the `wazuh.rule.tags` vocabulary, and the Windows PowerShell process
             // names. The mandatory time range stays in `filter` so the guardrail's required-context
-            // time check still counts it.
-            //
-            // Same caveat `get_brute_force` records for its own tag list: the `wazuh.rule.tags`
-            // vocabulary, and whether `process.name` is populated for PowerShell events, are
-            // unconfirmed against real 5.0 Windows agent data. The technique-id clause does not
-            // depend on either, so a wrong tag name narrows this tool rather than breaking it.
-            filter: [{ range: { '@timestamp': { gte, lte } } }],
+            // time check still counts it. Any caller-supplied artifact filter (source_ip,
+            // process_name, etc. -- see common.ts's findingArtifactFilterClauses) is ALSO appended
+            // to this `filter` array, so a supplied process_name narrows the OR'd `should` set
+            // further rather than replacing it.
+            filter: [
+              { range: { '@timestamp': { gte, lte } } },
+              ...findingArtifactFilterClauses(params),
+            ],
             minimum_should_match: 1,
             should: [
               { term: { 'wazuh.rule.mitre.technique.id': 'T1059.001' } },

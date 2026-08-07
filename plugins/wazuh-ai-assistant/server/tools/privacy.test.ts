@@ -8,6 +8,7 @@ import {
   prescanAndMint,
   prescanAndMintToolContent,
   FieldPolicyEntry,
+  FIELD_POLICY_DEFAULTS,
 } from './privacy';
 import { Digest } from './digest';
 
@@ -324,6 +325,142 @@ test('applyFieldPolicy: explicit "allow" entry is unaffected by isEscapeHatch', 
   });
   const out = applyFieldPolicy(digest, policy, p, undefined, undefined, true);
   assert.equal(out.samples[0]['data.win.system.computerName'], 'DESKTOP-01');
+});
+
+// --- get_agent_inventory's deriveColumns/isEscapeHatch fail-closed default, against the REAL
+// FIELD_POLICY_DEFAULTS (not a hand-built test-local policy): confirms the explicit 'allow'
+// entries added for it actually land where they need to, and that the fields which must stay
+// anonymized on this same tool still do. Regression guard for the "which fields are safe to allow
+// on a deriveColumns tool" review, not just the generic mechanism already covered above. ---------
+
+test('applyFieldPolicy: a packages-kind get_agent_inventory digest keeps package.name readable under privacy mode', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_agent_inventory',
+    samples: [
+      {
+        'package.name': 'openssl',
+        'package.version': '3.0.2',
+        'package.architecture': 'amd64',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'get_agent_inventory',
+    true, // isEscapeHatch: true, matching get_agent_inventory's deriveColumns: true
+  );
+  assert.equal(out.samples[0]['package.name'], 'openssl');
+  assert.equal(out.samples[0]['package.version'], '3.0.2');
+  assert.equal(out.samples[0]['package.architecture'], 'amd64');
+});
+
+test('applyFieldPolicy: a ports-kind get_agent_inventory digest still anonymizes source.ip/destination.ip', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_agent_inventory',
+    samples: [
+      {
+        'source.ip': '10.0.0.5',
+        'source.port': 443,
+        'destination.ip': '198.51.100.10',
+        'destination.port': 51422,
+        'network.transport': 'tcp',
+        'process.name': 'nginx',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'get_agent_inventory',
+    true,
+  );
+  // The addresses are still pseudonymized -- the fix allow-lists port-inventory MECHANICS, not the
+  // IPs those mechanics are attached to.
+  assert.match(out.samples[0]['source.ip'] as string, /^IP_\d+$/);
+  assert.match(out.samples[0]['destination.ip'] as string, /^IP_\d+$/);
+  // network.transport/process.name are the string fields that actually exercise the new 'allow'
+  // entries (applyFieldPolicy's fail-closed branch only ever touches string values -- a numeric
+  // port never would have been pseudonymized either way, so source.port/destination.port below
+  // just confirm they round-trip, not that the fix specifically caused it).
+  assert.equal(out.samples[0]['source.port'], 443);
+  assert.equal(out.samples[0]['destination.port'], 51422);
+  assert.equal(out.samples[0]['network.transport'], 'tcp');
+  assert.equal(out.samples[0]['process.name'], 'nginx');
+});
+
+test('applyFieldPolicy: an os-kind get_agent_inventory digest keeps OS identity readable but still anonymizes host.hostname', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_agent_inventory',
+    samples: [
+      {
+        'host.hostname': 'web-prod-01',
+        'host.os.name': 'Ubuntu',
+        'host.os.version': '22.04',
+        'host.os.platform': 'ubuntu',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'get_agent_inventory',
+    true,
+  );
+  assert.match(out.samples[0]['host.hostname'] as string, /^HOST_\d+$/);
+  assert.equal(out.samples[0]['host.os.name'], 'Ubuntu');
+  assert.equal(out.samples[0]['host.os.version'], '22.04');
+  assert.equal(out.samples[0]['host.os.platform'], 'ubuntu');
+});
+
+test('applyFieldPolicy: a processes-kind get_agent_inventory digest keeps process.name readable but still anonymizes process.command_line', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_agent_inventory',
+    samples: [
+      {
+        'process.name': 'sshd',
+        'process.command_line':
+          '/usr/sbin/sshd -D -p 22 --config /home/alice/.ssh/config',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'get_agent_inventory',
+    true,
+  );
+  assert.equal(out.samples[0]['process.name'], 'sshd');
+  assert.match(out.samples[0]['process.command_line'] as string, /^VAL_\d+$/);
+});
+
+test('applyFieldPolicy: a hotfixes-kind get_agent_inventory digest keeps package.hotfix.name readable', () => {
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_agent_inventory',
+    samples: [{ 'package.hotfix.name': 'KB5034441' }],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'get_agent_inventory',
+    true,
+  );
+  assert.equal(out.samples[0]['package.hotfix.name'], 'KB5034441');
 });
 
 test('applyFieldPolicy: a "*"-suffixed entry matches the prefix field itself and any subfield', () => {

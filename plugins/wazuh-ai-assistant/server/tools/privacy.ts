@@ -91,12 +91,46 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'check.name', action: 'allow' },
   { field: 'check.result', action: 'allow' },
   { field: 'policy.name', action: 'allow' },
-  // get_agent_packages/name, get_agent_processes/name+cmd, get_sca_results/name are deliberately
-  // NOT anonymized: package/process/policy names are what the analyst asked about, and known
-  // mapped identifiers embedded in free text (e.g. a hostname inside a cmd path) are still caught
-  // by the outbound applyToText scrub in chat.ts.
+  // get_sca_results/name is deliberately NOT anonymized: a policy name is what the analyst asked
+  // about, and known mapped identifiers embedded in free text (e.g. a hostname inside a cmd path)
+  // are still caught by the outbound applyToText scrub in chat.ts.
   { field: 'vulnerability.score.base', action: 'allow' },
   { field: 'package.architecture', action: 'allow' },
+  // get_agent_inventory (issue: "Consolidate agent inventory into one tool") reads
+  // wazuh-states-inventory-* via `deriveColumns: true`, which flips applyFieldPolicy's
+  // unlisted-field default from allow-by-omission to fail-closed anonymize (the same "any finding
+  // field" protection search_wazuh_data's escape hatch needed -- see this file's header doc
+  // comment on `isEscapeHatch`). The four deleted single-purpose tools it replaced never needed
+  // explicit entries for these because they were NOT deriveColumns tools, so allow-by-omission
+  // covered them silently; folding them into a deriveColumns tool means every field that should
+  // stay readable now needs its own explicit 'allow' entry below, or it silently starts arriving
+  // at the provider as a VAL_n pseudonym -- making "what packages are installed on X" answer in
+  // meaningless pseudonyms under privacy mode. Each entry below is software/config IDENTITY, not a
+  // personal or infrastructure identifier -- the contrast with the fields that correctly stay
+  // anonymized (host.hostname, process.command_line, source.ip/destination.ip,
+  // source.user.name/destination.user.name -- all already listed above) is deliberate and must not
+  // be widened without the same scrutiny.
+  { field: 'package.name', action: 'allow' },
+  { field: 'package.version', action: 'allow' },
+  { field: 'package.type', action: 'allow' },
+  // A hotfix/KB identifier (e.g. "KB5034441"), not a person or a network address.
+  { field: 'package.hotfix.name', action: 'allow' },
+  // OS identity -- NOT host.hostname (above), which is the agent's network identity and stays
+  // anonymized.
+  { field: 'host.os.name', action: 'allow' },
+  { field: 'host.os.version', action: 'allow' },
+  { field: 'host.os.platform', action: 'allow' },
+  // A running program's name -- NOT process.command_line (above), which can carry user-supplied
+  // paths/arguments (a username in a home directory path, a secret passed as a CLI flag) and must
+  // keep being anonymized.
+  { field: 'process.name', action: 'allow' },
+  // Open-port inventory mechanics (protocol, listen state, the two bare port numbers) -- NOT
+  // source.ip/destination.ip (above), which correctly stay anonymized: a port number alone
+  // identifies nothing without the IP it's paired with.
+  { field: 'network.transport', action: 'allow' },
+  { field: 'interface.state', action: 'allow' },
+  { field: 'source.port', action: 'allow' },
+  { field: 'destination.port', action: 'allow' },
   // get_events_by_agent reads the same wazuh.agent.* fields as the findings tools above (already
   // covered by WAZUH_FIELD.AGENT_NAME/AGENT_ID), plus its own ECS event taxonomy fields.
   { field: 'event.category', action: 'allow' },

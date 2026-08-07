@@ -1,10 +1,13 @@
 import { ToolDefinition } from '../types';
 import {
+  findingArtifactFilterClauses,
+  findingArtifactFilterProperties,
   findingDigestColumns,
   FINDING_BREAKDOWN_AGGS,
   FINDING_BREAKDOWN_DIMENSIONS,
   findingRowFields,
   clampLimit,
+  FINDING_SCOPE_NOTE,
   limitProperty,
   objectSchema,
   optionalStringParam,
@@ -30,9 +33,11 @@ export const getFindingsByTimeTool: ToolDefinition = {
   spec: {
     name: 'get_findings_by_time',
     description:
-      'Searches security findings for ALL findings of any severity within a time range, most ' +
-      'recent first. Use for general "show me the findings"/"what happened in the last N hours" ' +
-      'questions — not restricted to critical findings. Optional severity narrows to exactly ' +
+      'Searches security findings for ALL findings (alerts/detections/hits) of any severity ' +
+      `within a time range, most recent first. ${FINDING_SCOPE_NOTE} Use for general "show me ` +
+      'the findings"/"what happened in the last N hours" questions about detections specifically ' +
+      '— not restricted to critical findings, and NOT proof nothing happened if it returns 0 (the ' +
+      'raw event stream is a separate, unchecked source). Optional severity narrows to exactly ' +
       'that severity, or to a floor/ceiling via severity_comparison.',
     parameters: objectSchema({
       limit: limitProperty(
@@ -41,6 +46,7 @@ export const getFindingsByTimeTool: ToolDefinition = {
       severity: severityProperty(),
       severity_comparison: severityComparisonProperty(),
       ...timeRangeProperties(),
+      ...findingArtifactFilterProperties(),
     }),
   },
   target: 'indexer',
@@ -63,6 +69,7 @@ export const getFindingsByTimeTool: ToolDefinition = {
         },
       });
     }
+    filter.push(...findingArtifactFilterClauses(params));
     return {
       target: 'indexer',
       index: 'wazuh-findings-v5*',
