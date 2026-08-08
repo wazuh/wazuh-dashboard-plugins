@@ -117,7 +117,8 @@ export const agentsTableColumns = (
         />
       </span>
     ),
-    render: dateAdd => formatUIDate(dateAdd),
+    render: dateAdd =>
+      dateAdd && new Date(dateAdd).getTime() !== 0 ? formatUIDate(dateAdd) : '-',
     sortable: true,
     show: false,
     searchable: false,
