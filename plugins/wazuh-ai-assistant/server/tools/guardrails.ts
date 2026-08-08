@@ -322,7 +322,20 @@ function walkExactIdLookupShape(node: unknown): boolean {
 
 const TIME_FIELD_RE = /(^|\.)(timestamp|@timestamp)$/;
 const MAX_LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
-const MAX_AGG_SIZE = 100;
+/**
+ * Hard cap on any aggregation's `size`, enforced by `checkAggs` below on EVERY indexer request
+ * (executor.ts runs `lintDsl` unconditionally — a typed catalog tool is not exempt).
+ *
+ * Exported because a catalog tool that derives an aggregation `size` from its own `limit` parameter
+ * must clamp to the SAME number, and hard-coding it a second time is how issue #8894 happened:
+ * `get_sca_results` clamped `limit` to 500, fed it to a `terms` size, and every call in the 101-500
+ * range was rejected here — while its parameter description advertised 500 to the model, so a
+ * compliant model was steered straight into the failure. Catalog code must reach this value through
+ * `catalog/common.ts`'s `clampAggLimit`/`aggLimitProperty` rather than restating it, so the enforced
+ * cap and the advertised cap cannot drift apart again. `catalog/agg-size-coverage.test.ts` asserts
+ * no tool in the registry can build a request this rejects.
+ */
+export const MAX_AGG_SIZE = 100;
 
 const LEADING_WILDCARD_KEYS = new Set([
   'wildcard',
@@ -547,7 +560,10 @@ export function lintDsl(
   return { ok: true };
 }
 
-function walk(
+// Exported so server/tools/field-validation.ts's field-name extractor can reuse the exact same
+// tree-walk shape this file's own checks (findKey, findLeadingWildcard, checkAggs, ...) already
+// rely on, instead of a second hand-rolled walker drifting out of sync with this one.
+export function walk(
   node: unknown,
   visit: (key: string, value: unknown, parent: Record<string, unknown>) => void,
 ): void {
