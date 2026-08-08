@@ -133,7 +133,7 @@
 | [#8708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8708)   | Fixed Home KPI's visualization persistent filters                                                                                                                                             |
 | [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766) | Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration                                                              |
 | [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775) | Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters                                                                                                                |
-| [#8913](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8913) | Fixed AI Assistant deictic host references (e.g. "this box") not resolving to an agent, by instructing the model to call `get_agents` first and either proceed with the single active agent or ask when several exist |
+| [#8913](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8913) | Fixed AI Assistant deictic host references (e.g. "this box") not resolving to an agent, by resolving the agent server-side when none is named -- proceeding with the single active agent (stating the assumption) or asking when zero or several exist -- instead of relying on the model to call `get_agents` first |
 
 ### Removed
 

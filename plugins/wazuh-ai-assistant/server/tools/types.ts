@@ -1,4 +1,29 @@
+import {
+  OpenSearchDashboardsRequest,
+  RequestHandlerContext,
+} from '../../../../src/core/server';
 import { ToolSpec } from '../../common/types';
+
+/**
+ * Outcome of an optional `ToolDefinition.resolveParams` hook (see that field's doc comment below;
+ * added for issue #8913). Not itself a `ToolRequest` -- exactly one outbound request still
+ * executes per tool call (`executor.ts`'s `executeToolCall`); this is the result of a live lookup
+ * that happens BEFORE that request is built, used to patch/validate `params`.
+ */
+export interface ResolvedToolParams {
+  /** Params to hand to `buildRequest`, including every original param unchanged plus whatever this
+   * hook resolved (e.g. an inferred `agent_id`). */
+  params: Record<string, unknown>;
+  /** Surfaced to the model via `Digest.assumptionNote` (digest.ts) when a value was inferred
+   * rather than supplied by the caller -- e.g. "no agent was specified; assumed the only active
+   * agent". Omitted when nothing was inferred (every param the hook cared about was already
+   * supplied), so a call that needed no resolution produces no note. */
+  note?: string;
+}
+
+export type ResolveParamsResult =
+  | { ok: true; resolved: ResolvedToolParams }
+  | { ok: false; reason: string };
 
 /**
  * A search executed against the Wazuh Indexer (`context.core.opensearch.client.asCurrentUser`).
@@ -51,6 +76,24 @@ export interface ToolDefinition {
    * orchestration loop turns that into a bounded tool_result error for the model to self-correct.
    */
   buildRequest(params: Record<string, unknown>): ToolRequest;
+  /**
+   * Opt-in async pre-`buildRequest` hook (currently only get_agent_inventory, issue #8913):
+   * resolves/validates params against a live source (e.g. the Manager API's active-agent list)
+   * BEFORE `buildRequest` runs, for a caller that omitted a param `buildRequest` alone has no way
+   * to infer (it is purely synchronous and has no execution context). `executor.ts`'s
+   * `executeToolCall` awaits this immediately after schema validation and before `buildRequest`;
+   * an `{ok:false}` result short-circuits to a bounded tool-result error exactly like a
+   * `buildRequest` throw, and `resolved.note` (when set) is surfaced to the model via
+   * `Digest.assumptionNote`. `undefined` (every other tool) skips this step entirely — params flow
+   * into `buildRequest` unchanged, byte-identical to before this hook existed. Deliberately
+   * separate from `buildRequest` rather than making that async: every other catalog tool's
+   * `buildRequest` stays a pure, synchronous, context-free function.
+   */
+  resolveParams?(
+    params: Record<string, unknown>,
+    context: RequestHandlerContext,
+    request: OpenSearchDashboardsRequest,
+  ): Promise<ResolveParamsResult>;
   tableSpec: {
     columns: ToolTableColumnSpec[];
     /**
