@@ -3,6 +3,7 @@ import {
   extractProviderErrorMessage,
   fetchProviderWithRetry,
   sanitizeProviderErrorBody,
+  describeToolUseFailedStreamMessage,
 } from './retry';
 import { StreamEvent } from '../../common/types';
 
@@ -239,6 +240,37 @@ test('sanitizeProviderErrorBody: exact-value redaction catches a short/odd-shape
   );
   assert.doesNotMatch(out, /abc123/);
   assert.match(out, /\[redacted\]/);
+});
+
+test('describeToolUseFailedStreamMessage: a message containing failed_generation returns the friendly copy', () => {
+  const out = describeToolUseFailedStreamMessage(
+    "Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details.",
+  );
+  assert.ok(out);
+  assert.match(out as string, /couldn't get a valid tool call/i);
+});
+
+test('describeToolUseFailedStreamMessage: a message containing tool_use_failed returns the friendly copy', () => {
+  const out = describeToolUseFailedStreamMessage('tool_use_failed: bad call');
+  assert.ok(out);
+  assert.match(out as string, /couldn't get a valid tool call/i);
+});
+
+test('describeToolUseFailedStreamMessage: an ordinary message with no marker returns undefined', () => {
+  assert.equal(
+    describeToolUseFailedStreamMessage('rate limit exceeded'),
+    undefined,
+  );
+  assert.equal(
+    describeToolUseFailedStreamMessage('invalid api key'),
+    undefined,
+  );
+});
+
+test('describeToolUseFailedStreamMessage: the friendly message never contains the literal failed_generation substring', () => {
+  const out = describeToolUseFailedStreamMessage('failed_generation happened');
+  assert.ok(out);
+  assert.doesNotMatch(out as string, /failed_generation/);
 });
 
 test('sanitizeProviderErrorBody: an empty/absent secret does not change behavior (no crash, no spurious redaction)', () => {

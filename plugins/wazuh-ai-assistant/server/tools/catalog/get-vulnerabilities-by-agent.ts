@@ -4,6 +4,7 @@ import {
   limitProperty,
   objectSchema,
   requireNonEmptyString,
+  VULN_CURRENT_STATE_NOTE,
   VULN_DIGEST_SAMPLE_COLUMNS,
   VULN_SOURCE_FIELDS_WITH_AGENT_ID,
 } from './common';
@@ -19,8 +20,9 @@ export const getVulnerabilitiesByAgentTool: ToolDefinition = {
   spec: {
     name: 'get_vulnerabilities_by_agent',
     description:
-      'Lists active vulnerabilities affecting one specific agent, identified by its name or its ' +
-      'numeric agent ID. Use when the question names a particular host/agent, not the whole fleet.',
+      'Lists active vulnerabilities affecting one specific agent (host/machine/endpoint), ' +
+      'identified by its name or its numeric agent ID. Use when the question names a particular ' +
+      `host/agent, not the whole fleet. ${VULN_CURRENT_STATE_NOTE}`,
     parameters: objectSchema(
       {
         agent_identifier: {

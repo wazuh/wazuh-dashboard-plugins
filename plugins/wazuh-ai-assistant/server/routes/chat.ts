@@ -16,6 +16,7 @@ import {
   ProviderConfig,
   PseudonymEntry,
   StreamEvent,
+  StreamUsage,
   ToolCall,
   ToolSpec,
 } from '../../common/types';
@@ -46,6 +47,12 @@ import {
   ROUTE_QUESTION_TOOL,
   ROUTER_ENABLED,
 } from '../tools/router';
+import { addUsage, toStreamUsage, ZERO_USAGE_TOTALS } from './chat-usage';
+import {
+  resolveSuggestedDsl,
+  SUGGEST_DISCOVER_QUERY_TOOL,
+  validateSuggestDiscoverQueryArgs,
+} from '../tools/suggest-discover-query';
 
 interface StoredProviderAttributes {
   name: string;
@@ -82,6 +89,58 @@ const NO_MATCHING_RESULTS_MESSAGE =
  */
 const NO_ANSWER_MESSAGE =
   'I was not able to come up with an answer for that. Try rephrasing your question.';
+
+/**
+ * Appended to the FINAL round's outbound messages when the turn ran at least one tool (issue
+ * #8893) — see the append site in `orchestrate` below for the measurement and for why it goes on
+ * the outbound copy only. This is the request for a conclusion that dropping `tools` does not by
+ * itself make.
+ *
+ * Every clause is load-bearing, so edit with care:
+ *  - "using only the tool results already gathered" and "Do not state anything the results do not
+ *    show" keep this from becoming a fabrication prompt. Asking a model to produce an answer it
+ *    could not support is exactly how invented numbers and agent names appear, and the fallbacks
+ *    above exist precisely because an honest silence was preferable to that. The instruction has
+ *    to buy analysis WITHOUT buying invention.
+ *  - "If they do not answer the question, say so plainly" gives the model a licensed exit, so the
+ *    honest outcome stays reachable rather than being squeezed out by the request for text.
+ *  - no mention of tools being unavailable: the round already omits `tools` entirely, and naming
+ *    the absent capability invites the model to narrate the mechanism ("I cannot query further…")
+ *    instead of answering.
+ */
+export const FINAL_ROUND_ANSWER_INSTRUCTION =
+  "Now answer the user's question directly, using only the tool results already gathered in " +
+  'this conversation. Do not state anything the results do not show. If they do not answer the ' +
+  'question, say so plainly and state what is missing.';
+
+/**
+ * Appends FINAL_ROUND_ANSWER_INSTRUCTION to the messages bound for the provider, but only on the
+ * final round of a turn that actually ran a tool (issue #8893). Exported for unit testing only —
+ * not part of this route's HTTP contract — and kept as a pure function precisely so the decision
+ * can be tested without standing up a whole fake `orchestrate` run.
+ *
+ * Returns the input array UNCHANGED (same reference) when the instruction does not apply, and a
+ * fresh array when it does — never mutates the input, which matters because the caller may pass
+ * `messages` itself (the turn's accumulating source of truth) when privacy mode is off.
+ *
+ * Gated on `toolUsedThisTurn`: on a `general`-routed (no-tool) turn the final round IS the whole
+ * answer and there are no gathered results to reason over, so the instruction would be a lie.
+ * That path's silence is a different defect with its own fix (the reasoning-channel fallback in
+ * openai-compatible.ts) and its own fallback copy (NO_ANSWER_MESSAGE above).
+ */
+export function withFinalRoundAnswerInstruction(
+  messages: ChatMessage[],
+  isFinalRound: boolean,
+  toolUsedThisTurn: boolean,
+): ChatMessage[] {
+  if (!isFinalRound || !toolUsedThisTurn) {
+    return messages;
+  }
+  return [
+    ...messages,
+    { role: 'system', content: FINAL_ROUND_ANSWER_INSTRUCTION },
+  ];
+}
 
 /** Picks which of the three no-text fallbacks above fits a turn that ended without any `delta`
  * text — shared by both `!sawAnyDelta` exit points below (the normal per-round `done` branch and
@@ -594,8 +653,14 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
   );
 }
 
-/** What `runStage1Routing` resolves to once its (internal-only) adapter stream ends. */
-interface Stage1Result {
+/**
+ * What `runStage1Routing` resolves to once its (internal-only) adapter stream ends. Exported
+ * (along with `runStage1Routing` itself, below) for unit testing only -- see
+ * chat-stage1-usage.test.ts, which drives it with a fake `ProviderAdapter` to prove stage 1's
+ * `usage` actually threads through to this result, rather than only proving the pure accumulator
+ * sums correctly (chat-usage.test.ts) or reading the fix by inspection (issue 8875).
+ */
+export interface Stage1Result {
   /**
    * Never empty and never `undefined` — `resolveStage2Tools` (server/tools/router.ts) always
    * resolves at least a minimal recovery set (`get_security_summary` + `search_wazuh_data`) even
@@ -603,6 +668,17 @@ interface Stage1Result {
    * mid-turn rather than leaving the round with no tools at all.
    */
   tools: ToolSpec[];
+  /**
+   * Usage this stage-1 call itself spent (~760 tokens observed), so `orchestrate` can fold it into
+   * the turn's total instead of discarding it — stage 1 runs its own adapter stream entirely
+   * outside the round loop below and, before this field existed, its `done`/usage was consumed and
+   * dropped right here, undercounting every routed turn by however much stage 1 cost (issue
+   * 8875). `undefined` on every fallback path that returns before a `done` event is ever read
+   * (signal-aborted, a stage-1 `error`, no/invalid route_question call — see the early `return`s
+   * below): there is nothing to report for those, and `addUsage` (chat-usage.ts) treats `undefined`
+   * as contributing zero rather than resetting the total.
+   */
+  usage?: StreamUsage;
 }
 
 /**
@@ -617,7 +693,7 @@ interface Stage1Result {
  * loop below with the full catalog; if the provider is genuinely down, round 0 surfaces that to
  * the user the ordinary way.
  */
-async function* runStage1Routing(
+export async function* runStage1Routing(
   adapter: ProviderAdapter,
   providerConfig: ProviderConfig,
   initialMessages: ChatMessage[],
@@ -640,6 +716,10 @@ async function* runStage1Routing(
 
   let sawRouteCall = false;
   let routeArgs: Record<string, unknown> | undefined;
+  // Only ever set from the 'done' branch below — every return path ABOVE that point (signal
+  // aborted mid-stream, a stage-1 'error') never saw a 'done' at all, so `undefined` there
+  // correctly reports "nothing to add" rather than a fabricated cost.
+  let stage1Usage: StreamUsage | undefined;
 
   for await (const event of adapter.chatStream(
     providerConfig,
@@ -678,6 +758,7 @@ async function* runStage1Routing(
       return { tools: listToolSpecs() };
     }
     if (event.type === 'done') {
+      stage1Usage = event.usage;
       break;
     }
     // Any stray 'delta'/'table' from a misbehaving stage-1 call: stage 1 must never leak partial
@@ -688,7 +769,10 @@ async function* runStage1Routing(
     logger.debug(
       'wazuhAiAssistant: stage-1 router produced no route_question call; falling back to the full tool catalog for this turn.',
     );
-    return { tools: listToolSpecs() };
+    // The call still happened and still cost tokens even though the model never called
+    // route_question -- report `stage1Usage` (from the 'done' just seen above) rather than
+    // discarding it just because the fallback path is the full catalog.
+    return { tools: listToolSpecs(), usage: stage1Usage };
   }
 
   const validation = validate(routeArgs, ROUTE_QUESTION_TOOL.parameters);
@@ -698,7 +782,7 @@ async function* runStage1Routing(
         '; ',
       )}); falling back to the full tool catalog for this turn.`,
     );
-    return { tools: listToolSpecs() };
+    return { tools: listToolSpecs(), usage: stage1Usage };
   }
 
   const categories = validation.value.categories;
@@ -706,10 +790,13 @@ async function* runStage1Routing(
     logger.debug(
       'wazuhAiAssistant: stage-1 router returned no categories; falling back to the full tool catalog for this turn.',
     );
-    return { tools: listToolSpecs() };
+    return { tools: listToolSpecs(), usage: stage1Usage };
   }
 
-  return { tools: resolveStage2Tools(categories as string[]) };
+  return {
+    tools: resolveStage2Tools(categories as string[]),
+    usage: stage1Usage,
+  };
 }
 
 /**
@@ -761,6 +848,16 @@ async function* orchestrate(
   // 02-read-reasoning-delta.md), and it deserves a sentence, not a silently empty bubble.
   let sawAnyDelta = false;
   let toolUsedThisTurn = false;
+  // Sum of every provider call's `usage` THIS TURN — the stage-1 routing call (if the router ran)
+  // plus every round of the loop below, INCLUDING non-final rounds whose `done` is otherwise
+  // suppressed (see the round loop's `if (sawToolCall) { break; }`). Without this, only the last
+  // round's usage ever reached the client (issue 8875, measured 6,409 reported vs. ~12,740 actual
+  // on a multi-round turn). This accumulator itself was always correct; the actual defect was one
+  // level down, in openai-compatible.ts, never handing it a non-zero usage for any call that ended
+  // in a tool call (every non-final round, and the stage-1 call above, unconditionally) -- see that
+  // file's `toolCallsFinalized` handling. See chat-usage.ts for why the accumulator helper itself
+  // lives in its own dependency-free module.
+  let usageTotals = ZERO_USAGE_TOTALS;
 
   /** Yields a `privacy_map` event for any pseudonym entries minted so far this turn, but only
    * once total ("once per turn... when newEntries() is non-empty") — guarded
@@ -803,6 +900,15 @@ async function* orchestrate(
       step = await stage1.next();
     }
     tools = step.value.tools;
+    usageTotals = addUsage(usageTotals, step.value.usage);
+  }
+
+  // Graceful-failure handoff (server/tools/suggest-discover-query.ts): offered ALONGSIDE the real
+  // stage-2 tools, on every round that offers tools at all — same reasoning as `supportsTools ===
+  // false` above skipping it too: an adapter whose `chatStream` ignores `tools` entirely would
+  // never call it, so there is nothing to append to when `tools` is `undefined`.
+  if (tools) {
+    tools = [...tools, SUGGEST_DISCOVER_QUERY_TOOL];
   }
 
   for (let round = 0; round <= MAX_TOOL_ROUNDS; round += 1) {
@@ -835,9 +941,30 @@ async function* orchestrate(
 
     // Outbound scrub: a fresh transformed COPY per round — `messages` itself keeps
     // accumulating unscrubbed below so later rounds re-scrub from the same source of truth.
-    const outboundMessages = privacyCtx
+    const scrubbedMessages = privacyCtx
       ? scrubMessagesForProvider(messages, privacyCtx.pseudonymizer)
       : messages;
+    // Final round of a tool-using turn: ask for the answer (issue #8893). Dropping `tools` above
+    // terminates the tool loop, but on its own it only stops the model from CALLING anything — it
+    // never asks for a conclusion. The model is handed a transcript of tool results with no
+    // outstanding request, so "I already presented the data, nothing to add" is a rational
+    // completion rather than a malfunction, and the turn ends with no text at all: measured on
+    // openai/gpt-oss-120b over a 40-question analyst-persona bank, 6/40 turns ended on the
+    // `!sawAnyDelta` fallback below, every one with the same 4-tool-call signature (the 3
+    // tool-bearing rounds this budget allows plus stage 1's own forced `route_question`), and 4 of
+    // those 6 had already rendered a NON-EMPTY table — a non-answer sitting directly above real
+    // data the user asked to have interpreted.
+    //
+    // Applied to the outbound COPY only, never to `messages`: this is a per-request nudge, not
+    // conversation history, so it must not persist into the saved conversation or be re-sent by a
+    // later turn. Applied AFTER the scrub deliberately — it is static first-party text with no user
+    // data in it, so there is nothing for the pseudonymizer to find, and running it through would
+    // only risk `prescanAndMint` mangling a word in our own copy.
+    const outboundMessages = withFinalRoundAnswerInstruction(
+      scrubbedMessages,
+      isFinalRound,
+      toolUsedThisTurn,
+    );
     // Inbound un-scrub: this is why the ANSWER the analyst reads carries real hostnames/IPs even
     // with privacy mode on — every delta is run back through the pseudonym map here, so `HOST_1`
     // becomes the real hostname again before it leaves the server. Pseudonyms exist for the provider
@@ -898,7 +1025,6 @@ async function* orchestrate(
 
       if (event.type === 'tool_call') {
         sawToolCall = true;
-        toolUsedThisTurn = true;
         if (signal.aborted) {
           return;
         }
@@ -913,6 +1039,66 @@ async function* orchestrate(
             yield { type: 'delta', content: trailing };
           }
         }
+
+        // Graceful-failure handoff (server/tools/suggest-discover-query.ts, issue
+        // 13-suggested-query-discover-handoff.md): intercepted HERE, before any real tool
+        // execution below, because this is not a data tool — it never touches the Indexer/Manager
+        // API and must never be run through `executeToolCall`, same reasoning as
+        // `ROUTE_QUESTION_TOOL` in `runStage1Routing` above. `toolUsedThisTurn` is deliberately NOT
+        // set for this branch (unlike the real-tool path below): it exists only to pick between
+        // the two TABLE-oriented no-text fallbacks, and this tool never renders a table, so a turn
+        // that calls ONLY this and then produces no text should not fall back to table-flavored
+        // copy (see noTextFallbackMessage's doc comment).
+        if (event.toolCall.name === SUGGEST_DISCOVER_QUERY_TOOL.name) {
+          // Inbound args are pseudonym-form on the wire, same as every other tool call — reverse
+          // before validating/using them (the index/reason text may legitimately name a real
+          // hostname the model is discussing).
+          const realSuggestArgs = privacyCtx
+            ? privacyCtx.pseudonymizer.reverseObject(event.toolCall.arguments)
+            : event.toolCall.arguments;
+          const validation = validateSuggestDiscoverQueryArgs(realSuggestArgs);
+
+          let toolResultContent: string;
+          if (!validation.ok) {
+            // Bounded self-correction, same contract as every other tool: the model sees exactly
+            // why its call was rejected and can retry with corrected arguments.
+            toolResultContent = JSON.stringify({ error: validation.reason });
+          } else {
+            const resolvedDsl = await resolveSuggestedDsl(
+              context,
+              validation.index,
+              validation.dsl,
+              logger,
+            );
+            yield {
+              type: 'suggested_query',
+              index: validation.index,
+              dsl: resolvedDsl,
+              reason: validation.reason,
+            };
+            toolResultContent = JSON.stringify({
+              shown: true,
+              note:
+                'The suggested query was shown to the user as an "Open in Discover" link. Now ' +
+                'tell the user plainly, in your own words, what you could not check and why — do ' +
+                'not repeat the query itself, the link already shows it.',
+            });
+          }
+
+          messages = [
+            ...messages,
+            // ORIGINAL (pseudonym-form) toolCall — wire consistency, same as the real-tool path.
+            { role: 'assistant', content: '', toolCalls: [event.toolCall] },
+            {
+              role: 'tool',
+              toolCallId: event.toolCall.id,
+              content: toolResultContent,
+            },
+          ];
+          continue;
+        }
+
+        toolUsedThisTurn = true;
 
         // Inbound tool args: the model only ever saw pseudonyms, so `event.toolCall.arguments`
         // is pseudonym-form as emitted — reverse it to real values before validation/execution (the
@@ -1002,6 +1188,11 @@ async function* orchestrate(
             yield { type: 'delta', content: trailing };
           }
         }
+        // Accumulate BEFORE the sawToolCall branch below: a non-final round's 'done' is suppressed
+        // (never forwarded to the client) but its usage was still real spend for this turn and must
+        // not be dropped — this is the exact bug issue 8875 describes (only the LAST round's usage
+        // reached the client).
+        usageTotals = addUsage(usageTotals, event.usage);
         if (sawToolCall) {
           // More rounds needed: suppress this 'done' (the turn isn't over) and start the next
           // round with the grown message history instead of ending the SSE stream here.
@@ -1018,7 +1209,9 @@ async function* orchestrate(
           };
         }
         yield* emitPrivacyMapOnce();
-        yield event;
+        // The SUM across every round (and stage 1) this turn made, not this round's own
+        // `event.usage` alone — see `usageTotals`'s doc comment above.
+        yield { type: 'done', usage: toStreamUsage(usageTotals) };
         ended = true;
         break;
       }
@@ -1060,7 +1253,7 @@ async function* orchestrate(
     };
   }
   yield* emitPrivacyMapOnce();
-  yield { type: 'done' };
+  yield { type: 'done', usage: toStreamUsage(usageTotals) };
 }
 
 /** Bridges the orchestration loop's AsyncGenerator<StreamEvent> into SSE frame strings. */
