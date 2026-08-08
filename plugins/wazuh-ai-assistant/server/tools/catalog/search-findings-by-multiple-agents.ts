@@ -1,8 +1,13 @@
 import { ToolDefinition } from '../types';
 import {
+  findingArtifactFilterClauses,
+  findingArtifactFilterProperties,
   findingDigestColumns,
+  FINDING_BREAKDOWN_AGGS,
+  FINDING_BREAKDOWN_DIMENSIONS,
   findingRowFields,
   clampLimit,
+  FINDING_SCOPE_NOTE,
   limitProperty,
   objectSchema,
   optionalStringParam,
@@ -27,10 +32,10 @@ export const searchFindingsByMultipleAgentsTool: ToolDefinition = {
   spec: {
     name: 'search_findings_by_multiple_agents',
     description:
-      'Searches security findings for findings from any of several named agents, within a ' +
-      'time range. Optional severity narrows to exactly that severity, or to a floor/ceiling ' +
-      'via severity_comparison. Use when the question names two or more agents; use ' +
-      'search_findings_by_agent instead for a single agent.',
+      'Searches security findings from any of several named agents (hosts/machines/endpoints), ' +
+      `within a time range. ${FINDING_SCOPE_NOTE} Optional severity narrows to exactly that ` +
+      'severity, or to a floor/ceiling via severity_comparison. Use when the question names two ' +
+      'or more agents; use search_findings_by_agent instead for a single agent.',
     parameters: objectSchema(
       {
         agent_names: {
@@ -44,6 +49,7 @@ export const searchFindingsByMultipleAgentsTool: ToolDefinition = {
           'Max number of findings to return (default 20, max 500).',
         ),
         ...timeRangeProperties(),
+        ...findingArtifactFilterProperties(),
       },
       ['agent_names'],
     ),
@@ -79,6 +85,7 @@ export const searchFindingsByMultipleAgentsTool: ToolDefinition = {
         },
       });
     }
+    filter.push(...findingArtifactFilterClauses(params));
     return {
       target: 'indexer',
       index: 'wazuh-findings-v5*',
@@ -86,6 +93,7 @@ export const searchFindingsByMultipleAgentsTool: ToolDefinition = {
         query: { bool: { filter } },
         sort: [{ '@timestamp': { order: 'desc' } }],
         size: limit,
+        aggs: FINDING_BREAKDOWN_AGGS,
       },
     };
   },
@@ -95,5 +103,6 @@ export const searchFindingsByMultipleAgentsTool: ToolDefinition = {
   },
   digest: {
     sampleColumns: findingDigestColumns(STANDARD_FINDING_SAMPLE_COLUMNS),
+    breakdownDimensions: FINDING_BREAKDOWN_DIMENSIONS,
   },
 };

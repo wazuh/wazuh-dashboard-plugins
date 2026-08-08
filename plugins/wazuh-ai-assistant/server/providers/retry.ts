@@ -48,6 +48,27 @@ const TOOL_USE_FAILED_TERMINAL_MESSAGE =
   'tool-calling support (for example GPT-4o, Claude Sonnet, or llama-3.3-70b; see the Model field ' +
   'hint in Settings).';
 
+/** In-stream counterpart of TOOL_USE_FAILED_TERMINAL_MESSAGE. Worded differently on purpose: this
+ * frame arrives on HTTP 200 mid-stream, no retry budget was spent, and it carries no
+ * `failed_generation` field, so there is no snippet to append and no recovery to report. */
+const TOOL_USE_FAILED_STREAM_MESSAGE =
+  "The assistant couldn't get a valid tool call from the configured model for this request. " +
+  "This usually means the model's function-calling support isn't reliable enough for this kind " +
+  'of question. Try a model with stronger tool-calling support, or ask a simpler question.';
+
+/** Maps a provider in-stream `error.message` (HTTP-200 SSE error frame, which carries only a
+ * plain message string -- unlike the HTTP-400 `tool_use_failed` body, there is no
+ * `failed_generation` field here to append as a snippet) to our own friendly copy when it is a
+ * tool_use_failed report; returns undefined for every other error so callers keep the raw
+ * message. */
+export function describeToolUseFailedStreamMessage(
+  rawMessage: string,
+): string | undefined {
+  return TOOL_USE_FAILED_MARKERS.some(marker => rawMessage.includes(marker))
+    ? TOOL_USE_FAILED_STREAM_MESSAGE
+    : undefined;
+}
+
 /** True when a rejected response is Groq's (or a compatible provider's) tool_use_failed shape. */
 function isToolUseFailedBody(status: number, bodyText: string): boolean {
   return (
