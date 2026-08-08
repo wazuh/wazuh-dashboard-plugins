@@ -8,6 +8,7 @@ import {
   AggFieldSpec,
   prescanAndMint,
   prescanAndMintToolContent,
+  scrubKnownEntities,
   FieldPolicyEntry,
   FIELD_POLICY_DEFAULTS,
 } from './privacy';
@@ -1098,6 +1099,225 @@ test('applyFieldPolicy: an aggregation with no extractable field leaves "key" al
   assert.deepEqual(out.samples, [
     { key: '2026-07-31T00:00:00Z', doc_count: 3 },
   ]);
+});
+
+// --- scrubKnownEntities (#8912 known-entity dictionary scan) -----------------------------------
+
+test('scrubKnownEntities: a dictionary hit is replaced with the SAME pseudonym used elsewhere', () => {
+  // CRITICAL correctness property: pseudonym reuse must be conversation-consistent (same real
+  // value -> same pseudonym everywhere), or the model sees two different names for one host.
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('DBPRIMARY03', 'HOST'); // minted elsewhere, e.g. wazuh.agent.name
+  const out = scrubKnownEntities(
+    'installed package for DBPRIMARY03 host role',
+    p,
+  );
+  assert.equal(out, `installed package for ${pseudonym} host role`);
+  // No SECOND pseudonym was minted for the same real value.
+  assert.equal(p.newEntries().length, 1);
+});
+
+test('scrubKnownEntities: case-insensitive hit still resolves to the existing pseudonym', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('DBPRIMARY03', 'HOST');
+  const out = scrubKnownEntities('connecting to dbprimary03 now', p);
+  assert.equal(out, `connecting to ${pseudonym} now`);
+});
+
+test('scrubKnownEntities: a known identifier embedded via "-"/"_" is still matched (non-alphanumeric boundary)', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('DBPRIMARY03', 'HOST');
+  const out = scrubKnownEntities('mysql-server-DBPRIMARY03-config', p);
+  assert.equal(out, `mysql-server-${pseudonym}-config`);
+});
+
+test('scrubKnownEntities: a substring of a LARGER alphanumeric word does not match', () => {
+  const p = new Pseudonymizer();
+  p.pseudonymize('DBPRIMARY03', 'HOST');
+  // "DBPRIMARY03" is a substring of "DBPRIMARY031", but the trailing "1" is alphanumeric, so
+  // there is no boundary there -- the whole larger token must be left alone.
+  const out = scrubKnownEntities('host DBPRIMARY031 is unrelated', p);
+  assert.equal(out, 'host DBPRIMARY031 is unrelated');
+});
+
+test('scrubKnownEntities: an unknown identifier (never minted anywhere) passes through unscrubbed', () => {
+  // Documented residual limitation (see the function's own doc comment): a value that is BOTH
+  // shapeless (no IP/FQDN pattern) AND never minted anywhere else in the conversation has nothing
+  // for this scan to reuse, and is honestly left untouched rather than silently "handled".
+  const p = new Pseudonymizer();
+  p.pseudonymize('DBPRIMARY03', 'HOST'); // an unrelated known entity
+  const out = scrubKnownEntities('host NEVERSEENHOST99 reporting in', p);
+  assert.equal(out, 'host NEVERSEENHOST99 reporting in');
+});
+
+test('scrubKnownEntities: an empty dictionary is a no-op', () => {
+  const p = new Pseudonymizer();
+  const out = scrubKnownEntities('nothing minted yet for DBPRIMARY03', p);
+  assert.equal(out, 'nothing minted yet for DBPRIMARY03');
+});
+
+test('scrubKnownEntities: longest known value wins so a shorter one does not corrupt it', () => {
+  const p = new Pseudonymizer();
+  const shortPseudonym = p.pseudonymize('DB03', 'HOST');
+  const longPseudonym = p.pseudonymize('DB03-PRIMARY', 'HOST');
+  const out = scrubKnownEntities('cluster member DB03-PRIMARY online', p);
+  assert.equal(out, `cluster member ${longPseudonym} online`);
+  assert.notEqual(shortPseudonym, longPseudonym);
+});
+
+// --- applyFieldPolicy: 'allow-scan' action (#8912) ----------------------------------------------
+
+test('applyFieldPolicy: "allow-scan" field replaces a known dictionary hit with its existing pseudonym', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'package.name', action: 'allow-scan' },
+  ];
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('DBPRIMARY03', 'HOST'); // minted from an earlier agent.name field
+  const digest = baseDigest({
+    samples: [{ 'package.name': 'vendor-agent-DBPRIMARY03-connector' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.equal(
+    out.samples[0]['package.name'],
+    `vendor-agent-${pseudonym}-connector`,
+  );
+});
+
+test('applyFieldPolicy: "allow-scan" field still runs the shape scan for embedded IPs/FQDNs', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'package.name', action: 'allow-scan' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [{ 'package.name': 'connector phoning home to 203.0.113.7' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  const value = out.samples[0]['package.name'] as string;
+  assert.doesNotMatch(value, /203\.0\.113\.7/);
+  assert.match(value, /^connector phoning home to IP_\d+$/);
+});
+
+test('applyFieldPolicy: "allow-scan" field with no dictionary/shape hits passes through verbatim', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'package.name', action: 'allow-scan' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({ samples: [{ 'package.name': 'openssl' }] });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.equal(out.samples[0]['package.name'], 'openssl');
+});
+
+test('applyFieldPolicy: a curated "allow" field is not affected by the allow-scan dictionary scan', () => {
+  // check.name stays plain 'allow' -- a known-entity hit inside it must NOT be scrubbed, unlike
+  // the allow-scan case above. Confirms the two actions stay genuinely distinct.
+  const policy: FieldPolicyEntry[] = [{ field: 'check.name', action: 'allow' }];
+  const p = new Pseudonymizer();
+  p.pseudonymize('DBPRIMARY03', 'HOST');
+  const digest = baseDigest({
+    samples: [{ 'check.name': 'Verify DBPRIMARY03 patch level' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.equal(out.samples[0]['check.name'], 'Verify DBPRIMARY03 patch level');
+});
+
+// --- applyFieldPolicy: 'allow-scan' through EVERY scrubAggKey bucket-key SHAPE (#8912 rework) ----
+//
+// The v1 version of this fix wired allow-scan inline in applyFieldPolicy's breakdown loop, which
+// only ever saw a flat string key. feat/8909 (544d73a93) refactored that loop to delegate to
+// `scrubAggKey`, which dispatches on the aggregation's ACTUAL key shape (scalar/multi/composite).
+// Since `scrubFieldValue` is now the single place the allow-scan branch lives, and all three
+// `scrubAggKey` shapes call back into `scrubFieldValue` for each component, a single allow-scan
+// entry must be honored no matter which shape carries it -- these three tests prove each path
+// independently rather than trusting that "it worked for scalar" generalizes.
+
+test('applyFieldPolicy: "allow-scan" SCALAR breakdown bucket key is scrubbed against the known dictionary', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'package.name', action: 'allow-scan' },
+  ];
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('DBPRIMARY03', 'HOST');
+  const digest = baseDigest({
+    breakdown: [{ key: 'agent-DBPRIMARY03-pkg', count: 2, agg: 'by_package' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p, {
+    by_package: scalarSpec('package.name'),
+  });
+  assert.ok(out.breakdown);
+  assert.equal(out.breakdown![0].key, `agent-${pseudonym}-pkg`);
+});
+
+test('applyFieldPolicy: "allow-scan" MULTI (multi_terms) breakdown component is scrubbed against the known dictionary', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'package.name', action: 'allow-scan' },
+    { field: 'wazuh.agent.id', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('DBPRIMARY03', 'HOST');
+  const digest = baseDigest({
+    breakdown: [{ key: ['agent-DBPRIMARY03-pkg', '007'], count: 4 }],
+  });
+  const aggFields = {
+    by_package_and_agent: {
+      kind: 'multi' as const,
+      fields: ['package.name', 'wazuh.agent.id'],
+    },
+  };
+  const out = applyFieldPolicy(digest, policy, p, aggFields);
+  assert.ok(out.breakdown);
+  const [pkg, agent] = out.breakdown![0].key as unknown[];
+  assert.equal(pkg, `agent-${pseudonym}-pkg`);
+  assert.equal(agent, '007');
+});
+
+test('applyFieldPolicy: "allow-scan" COMPOSITE breakdown component is scrubbed against the known dictionary', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'package.name', action: 'allow-scan' },
+    { field: 'wazuh.agent.id', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('DBPRIMARY03', 'HOST');
+  const digest = baseDigest({
+    breakdown: [
+      { key: { pkg: 'agent-DBPRIMARY03-pkg', agent: '007' }, count: 4 },
+    ],
+  });
+  const aggFields = {
+    by_package_and_agent: {
+      kind: 'composite' as const,
+      fields: { pkg: 'package.name', agent: 'wazuh.agent.id' },
+    },
+  };
+  const out = applyFieldPolicy(digest, policy, p, aggFields);
+  assert.ok(out.breakdown);
+  const key = out.breakdown![0].key as Record<string, unknown>;
+  assert.equal(key.pkg, `agent-${pseudonym}-pkg`);
+  assert.equal(key.agent, '007');
+});
+
+// --- FIELD_POLICY_DEFAULTS: #8912 package.name reclassified to allow-scan -----------------------
+
+test('FIELD_POLICY_DEFAULTS: package.name is "allow-scan", not plain allow-by-omission or "allow"', () => {
+  const entry = FIELD_POLICY_DEFAULTS.find(e => e.field === 'package.name');
+  assert.ok(entry, 'package.name must have an explicit policy entry');
+  assert.equal(entry!.action, 'allow-scan');
+});
+
+test('FIELD_POLICY_DEFAULTS: end-to-end -- a known agent hostname embedded in package.name is caught', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('DBPRIMARY03', 'HOST'); // as would happen via wazuh.agent.name
+  const digest = baseDigest({
+    tool: 'get_agent_inventory',
+    samples: [{ 'package.name': 'custom-build-for-DBPRIMARY03' }],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'get_agent_inventory',
+    true,
+  );
+  assert.equal(out.samples[0]['package.name'], `custom-build-for-${pseudonym}`);
 });
 
 // --- FIELD_POLICY_DEFAULTS: #8889 explicit entry for a commonly-surfaced field -------------------

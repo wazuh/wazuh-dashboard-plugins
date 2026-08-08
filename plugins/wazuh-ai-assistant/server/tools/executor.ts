@@ -203,14 +203,15 @@ async function executeIndexerRequest(
     // field policy the exact same way it resolves a REAL aggregation's buckets, rather than
     // silently skipping the scrub because `extractAggFields(body)` (which only ever reads a REAL
     // `aggs` clause) has nothing to report for a tool — every one of these — that never sends one.
-    // NOTE: every current `breakdownDimensions` tool (the 8 finding-hits tools in
+    // NOTE: as of #8912, every current `breakdownDimensions` tool (the 8 finding-hits tools in
     // catalog/common.ts) ALSO unconditionally attaches a real `aggs` clause
     // (`FINDING_BREAKDOWN_AGGS`), so `extractAggFields(body)` always resolves first in practice and
-    // this fallback is not exercised today — kept as the documented, type-correct contract for any
-    // future tool that opts into `breakdownDimensions` without a matching real `aggs` clause. A
-    // bare `{dimension: dimension}` STRING identity map here does not satisfy
-    // `Record<string, AggFieldSpec | undefined>` and is a type error the moment this fallback is
-    // actually live.
+    // this fallback is not exercised today — kept as the documented, now type-correct, contract for
+    // any future tool that opts into `breakdownDimensions` without a matching real `aggs` clause.
+    // Before this fix the fallback built a `{dimension: dimension}` STRING identity map, which
+    // pre-dates `AggFieldSpec` (privacy.ts, #8909) and does not satisfy it — a type error
+    // (`Record<string, string>` is not assignable to `Record<string, AggFieldSpec | undefined>`)
+    // that only surfaces once this fallback is actually live.
     const aggFields: Record<string, AggFieldSpec | undefined> | undefined =
       extractAggFields(body) ??
       (def.digest.breakdownDimensions
