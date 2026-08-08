@@ -924,6 +924,11 @@ export function extractAggFields(
  * property, or drop a whole bucket for a positional multi_terms component — see
  * `scrubAggKeyComponent`).
  *
+ * The #8889/#8902 allow-by-omission branch below is the digest-boundary half of that hardening's
+ * defense-in-depth (the other half, chat.ts's `scrubMessagesForProvider` running
+ * `prescanAndMintToolContent`/`prescanAndMint` over every outbound message, is independent of this
+ * function and does not substitute for it) and MUST survive any future refactor of this function.
+ *
  * Branch order is deliberate and every branch matters — do not reorder or drop one without
  * re-checking every FIELD_POLICY_DEFAULTS entry that relies on it:
  * 1. `never` — drop.
@@ -931,17 +936,17 @@ export function extractAggFields(
  * 3. `allow-scan` (#8912) — shape scan (`prescanAndMint`) THEN known-entity dictionary scan
  *    (`scrubKnownEntities`); see that function's doc comment for why both passes are needed.
  * 4. escape-hatch fail-closed default for an unlisted field — pseudonymize (kind inferred).
- * 5. `#8889` allow-BY-OMISSION (typed tool, no explicit entry, not the escape hatch) — shape scan
- *    only (`prescanAndMint`), no dictionary scan: an unlisted field is trusted allow-by-default,
- *    but not curated the way an explicit `allow-scan` entry is, so it gets the narrower of the two
- *    scans. See the original #8889 comment this branch preserves: the value still reaches the
- *    provider verbatim, but an IP/FQDN embedded in otherwise-free text (e.g. a package/process
- *    name that happens to mention a hostname) gets a secondary scan. Curated entries (agent id,
- *    MITRE technique IDs, compliance citations, CIS benchmark content, ...) are explicit `allow`
- *    (case 6) and skip this — several of those values are legitimately FQDN-token-shaped without
- *    being hostnames, so scanning them here would misfire; they stay covered end-to-end regardless
- *    by chat.ts's scrubMessagesForProvider, which runs prescanAndMintToolContent over every
- *    tool-result string value unconditionally.
+ * 5. `#8889`/`#8902` allow-BY-OMISSION (typed tool, no explicit entry, not the escape hatch) —
+ *    shape scan only (`prescanAndMint`), no dictionary scan: an unlisted field is trusted
+ *    allow-by-default, but not curated the way an explicit `allow-scan` entry is, so it gets the
+ *    narrower of the two scans. The value still reaches the provider verbatim, but an IP/FQDN
+ *    embedded in otherwise-free text (e.g. a package/process name that happens to mention a
+ *    hostname) gets a secondary scan. Curated entries (agent id, MITRE technique IDs, compliance
+ *    citations, CIS benchmark content, ...) are explicit `allow` (case 6) and skip this — several
+ *    of those values are legitimately FQDN-token-shaped without being hostnames, so scanning them
+ *    here would misfire; they stay covered end-to-end regardless by chat.ts's
+ *    scrubMessagesForProvider, which runs prescanAndMintToolContent over every tool-result string
+ *    value unconditionally.
  * 6. Explicit `allow` (or a non-string/empty value in any branch above that didn't already return)
  *    — passthrough, completely unscanned. This is the ONLY branch that skips both scans; every
  *    other outcome above goes through at least the shape scan.
@@ -997,9 +1002,11 @@ function scrubFieldValue(
     };
   }
   if (!entry && typeof value === 'string' && value.length > 0) {
-    // #8889: allow-BY-OMISSION (typed tool, no explicit policy entry — the escape-hatch case above
-    // already handled isEscapeHatch). See this function's doc comment, branch 5, for why this is
-    // shape-scan-only (no dictionary scan) unlike the explicit `allow-scan` branch above.
+    // #8889/#8902: allow-BY-OMISSION (typed tool, no explicit policy entry — the escape-hatch case
+    // above already handled isEscapeHatch). See this function's doc comment, branch 5, for why
+    // this is shape-scan-only (no dictionary scan) unlike the explicit `allow-scan` branch above,
+    // and for why this branch must never be silently dropped again (it was, once — see the
+    // module-level history in scrubFieldValue's doc comment above).
     return { keep: true, value: prescanAndMint(value, pseudonymizer) };
   }
   return { keep: true, value };
