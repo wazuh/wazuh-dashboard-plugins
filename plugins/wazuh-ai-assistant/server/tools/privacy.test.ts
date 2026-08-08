@@ -5,13 +5,22 @@ import {
   inferPseudonymKind,
   applyFieldPolicy,
   extractAggFields,
+  AggFieldSpec,
   prescanAndMint,
   prescanAndMintToolContent,
+  scrubKnownEntities,
   FieldPolicyEntry,
   FIELD_POLICY_DEFAULTS,
 } from './privacy';
 import { Digest } from './digest';
 import { WAZUH_FIELD } from '../../common/wazuh-fields';
+
+/** Test-only shorthand for the common `terms`/`significant_terms`/`cardinality` case of
+ * `AggFieldSpec` — every pre-existing test here predates `multi_terms`/`composite` support and
+ * only ever needs this one shape. */
+function scalarSpec(field: string): AggFieldSpec {
+  return { kind: 'scalar', field };
+}
 
 // --- prescanAndMint (first-mention inbound pre-scan) ------------------------------------------
 
@@ -625,12 +634,15 @@ test('applyFieldPolicy: multi-agg breakdown scrubs each bucket under its own agg
       { key: '100', count: 3, agg: 'by_rule' },
     ],
   });
-  const aggFields = { by_agent: 'agent.name', by_rule: 'rule.id' };
+  const aggFields = {
+    by_agent: scalarSpec('agent.name'),
+    by_rule: scalarSpec('rule.id'),
+  };
   const out = applyFieldPolicy(digest, policy, p, aggFields);
   assert.ok(out.breakdown);
   const byAgent = out.breakdown!.find(b => b.agg === 'by_agent')!;
   const byRule = out.breakdown!.find(b => b.agg === 'by_rule')!;
-  assert.match(byAgent.key, /^HOST_\d+$/);
+  assert.match(byAgent.key as string, /^HOST_\d+$/);
   assert.equal(byRule.key, '100');
 });
 
@@ -646,7 +658,10 @@ test('applyFieldPolicy: a "never" agg field drops only its own buckets', () => {
       { key: '100', count: 3, agg: 'by_rule' },
     ],
   });
-  const aggFields = { by_ip: 'data.srcip', by_rule: 'rule.id' };
+  const aggFields = {
+    by_ip: scalarSpec('data.srcip'),
+    by_rule: scalarSpec('rule.id'),
+  };
   const out = applyFieldPolicy(digest, policy, p, aggFields);
   assert.ok(out.breakdown);
   assert.equal(out.breakdown!.length, 1);
@@ -684,9 +699,50 @@ test('extractAggFields: maps each top-level agg name to its terms/significant_te
   };
   const fields = extractAggFields(body);
   assert.ok(fields);
-  assert.equal(fields!.by_rule, 'rule.id');
-  assert.equal(fields!.by_ip_count, 'data.srcip');
-  assert.equal(fields!.by_sig, 'rule.description');
+  assert.deepEqual(fields!.by_rule, scalarSpec('rule.id'));
+  assert.deepEqual(fields!.by_ip_count, scalarSpec('data.srcip'));
+  assert.deepEqual(fields!.by_sig, scalarSpec('rule.description'));
+});
+
+test('extractAggFields: resolves multi_terms to a "multi" spec, positionally aligned', () => {
+  const body = {
+    aggs: {
+      by_ip_and_agent: {
+        multi_terms: {
+          terms: [{ field: 'source.ip' }, { field: 'wazuh.agent.id' }],
+          size: 20,
+        },
+      },
+    },
+  };
+  const fields = extractAggFields(body);
+  assert.ok(fields);
+  assert.deepEqual(fields!.by_ip_and_agent, {
+    kind: 'multi',
+    fields: ['source.ip', 'wazuh.agent.id'],
+  });
+});
+
+test('extractAggFields: resolves composite to a "composite" spec keyed by source name', () => {
+  const body = {
+    aggs: {
+      by_ip_and_agent: {
+        composite: {
+          size: 20,
+          sources: [
+            { ip: { terms: { field: 'source.ip' } } },
+            { agent: { terms: { field: 'wazuh.agent.id' } } },
+          ],
+        },
+      },
+    },
+  };
+  const fields = extractAggFields(body);
+  assert.ok(fields);
+  assert.deepEqual(fields!.by_ip_and_agent, {
+    kind: 'composite',
+    fields: { ip: 'source.ip', agent: 'wazuh.agent.id' },
+  });
 });
 
 test('extractAggFields: date_histogram (no field-bearing key) maps to undefined', () => {
@@ -708,6 +764,247 @@ test('extractAggFields: returns undefined when body has no aggs', () => {
   assert.equal(extractAggFields(undefined), undefined);
 });
 
+// --- applyFieldPolicy: breakdown SECURITY REGRESSIONS for multi_terms / composite ----------------
+//
+// HIGH severity finding: extractAggFields previously resolved only terms/significant_terms/
+// cardinality; a multi_terms or composite aggregation's field was always "unresolvable", and the
+// breakdown loop's `if (!field) { scrubbed.push(bucket); continue; }` passed every such bucket's
+// RAW key through untouched, WITH PRIVACY ON — a multi_terms/composite pivot on source.ip leaked
+// real IPs regardless of the field's own 'anonymize' policy entry. Fixed by teaching
+// extractAggFields to resolve both shapes (see the extractAggFields tests above) and by
+// `scrubAggKey` handling each bucket key structurally instead of only ever handling a bare string.
+
+test('applyFieldPolicy: multi_terms on source.ip + wazuh.agent.id pseudonymizes both positions', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'source.ip', action: 'anonymize', kind: 'IP' },
+    { field: 'wazuh.agent.id', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    breakdown: [{ key: ['198.51.100.10', '007'], count: 12 }],
+  });
+  const aggFields = {
+    by_ip_and_agent: {
+      kind: 'multi' as const,
+      fields: ['source.ip', 'wazuh.agent.id'],
+    },
+  };
+  const out = applyFieldPolicy(digest, policy, p, aggFields);
+  assert.ok(out.breakdown);
+  assert.equal(out.breakdown!.length, 1);
+  const [ip, agent] = out.breakdown![0].key as unknown[];
+  assert.match(ip as string, /^IP_\d+$/);
+  assert.equal(agent, '007');
+});
+
+test('applyFieldPolicy: multi_terms drops the WHOLE bucket when any positional component is "never"', () => {
+  // Positional array: partially redacting one slot would silently misalign the remaining values
+  // with their fields, so any 'never' component drops the entire bucket instead (see
+  // scrubAggKey's doc comment).
+  const policy: FieldPolicyEntry[] = [
+    { field: 'source.ip', action: 'never' },
+    { field: 'wazuh.agent.id', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    breakdown: [
+      { key: ['198.51.100.10', '007'], count: 12 },
+      { key: ['198.51.100.11', '008'], count: 3 },
+    ],
+  });
+  const aggFields = {
+    by_ip_and_agent: {
+      kind: 'multi' as const,
+      fields: ['source.ip', 'wazuh.agent.id'],
+    },
+  };
+  const out = applyFieldPolicy(digest, policy, p, aggFields);
+  assert.deepEqual(out.breakdown, undefined);
+});
+
+test('applyFieldPolicy: multi_terms with an array-length mismatch drops the bucket (fail-closed)', () => {
+  // Not reachable through extractAggFields today (its "multi" spec length always matches the
+  // source multi_terms.terms.length, and a well-formed response's bucket key array length always
+  // matches that same count) -- hand-crafted here because it is still the last fail-open path on
+  // the escape hatch's key route (a hand-built aggFields/response pairing that disagrees with each
+  // other). Symmetric with the top-level unresolved-structured-key branch: an unrecognized/
+  // mismatched shape is dropped rather than trusted as safe.
+  const policy: FieldPolicyEntry[] = [{ field: 'source.ip', action: 'allow' }];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    breakdown: [{ key: ['198.51.100.10', '007', 'extra'], count: 4 }],
+  });
+  const aggFields = {
+    by_ip_and_agent: {
+      kind: 'multi' as const,
+      fields: ['source.ip', 'wazuh.agent.id'], // length 2, bucket key length 3 -- mismatch.
+    },
+  };
+  const out = applyFieldPolicy(digest, policy, p, aggFields);
+  assert.deepEqual(out.breakdown, undefined);
+});
+
+test('applyFieldPolicy: composite with an unresolved property fails closed under the escape hatch', () => {
+  // Defense in depth behind guardrails.ts's new composite-source-type rejection: even if a
+  // composite source's field somehow could not be resolved (spec.fields has no entry for a
+  // property actually present on the bucket key), the escape hatch must not pass that component
+  // through raw -- a string is pseudonymized generically, a structured value is omitted.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    breakdown: [
+      { key: { ip: '198.51.100.10', mystery: 'raw-value' }, count: 9 },
+    ],
+  });
+  const aggFields = {
+    by_ip_and_mystery: {
+      kind: 'composite' as const,
+      fields: { ip: 'source.ip' }, // no entry for "mystery" -- unresolved property.
+    },
+  };
+  const out = applyFieldPolicy(
+    digest,
+    [{ field: 'source.ip', action: 'allow' }],
+    p,
+    aggFields,
+    'search_wazuh_data',
+    true,
+  );
+  assert.ok(out.breakdown);
+  const key = out.breakdown![0].key as Record<string, unknown>;
+  assert.equal(key.ip, '198.51.100.10');
+  assert.match(key.mystery as string, /^VAL_\d+$/);
+});
+
+test('applyFieldPolicy: composite with an unresolved property passes through for typed tools', () => {
+  // Non-escape-hatch call sites keep today's pass-through for an unresolved property -- typed
+  // catalog tools never produce a composite this file cannot fully resolve in practice, and this
+  // proves the escape-hatch fail-closed default above did not change that default for them.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    breakdown: [
+      { key: { ip: '198.51.100.10', mystery: 'raw-value' }, count: 9 },
+    ],
+  });
+  const aggFields = {
+    by_ip_and_mystery: {
+      kind: 'composite' as const,
+      fields: { ip: 'source.ip' },
+    },
+  };
+  const out = applyFieldPolicy(
+    digest,
+    [{ field: 'source.ip', action: 'allow' }],
+    p,
+    aggFields,
+  );
+  assert.deepEqual(out.breakdown![0].key, {
+    ip: '198.51.100.10',
+    mystery: 'raw-value',
+  });
+});
+
+test('applyFieldPolicy: composite on source.ip + wazuh.agent.id scrubs each named component', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'source.ip', action: 'anonymize', kind: 'IP' },
+    { field: 'wazuh.agent.id', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    breakdown: [
+      { key: { ip: '198.51.100.10', agent: '007' }, count: 12 },
+    ],
+  });
+  const aggFields = {
+    by_ip_and_agent: {
+      kind: 'composite' as const,
+      fields: { ip: 'source.ip', agent: 'wazuh.agent.id' },
+    },
+  };
+  const out = applyFieldPolicy(digest, policy, p, aggFields);
+  assert.ok(out.breakdown);
+  const key = out.breakdown![0].key as Record<string, unknown>;
+  assert.match(key.ip as string, /^IP_\d+$/);
+  assert.equal(key.agent, '007');
+});
+
+test('applyFieldPolicy: composite omits only the "never" named component, keeping the rest', () => {
+  // Unlike multi_terms above, a composite bucket's properties are individually named, so a
+  // 'never' component can be safely omitted without misaligning the others.
+  const policy: FieldPolicyEntry[] = [
+    { field: 'source.ip', action: 'never' },
+    { field: 'wazuh.agent.id', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    breakdown: [{ key: { ip: '198.51.100.10', agent: '007' }, count: 12 }],
+  });
+  const aggFields = {
+    by_ip_and_agent: {
+      kind: 'composite' as const,
+      fields: { ip: 'source.ip', agent: 'wazuh.agent.id' },
+    },
+  };
+  const out = applyFieldPolicy(digest, policy, p, aggFields);
+  assert.ok(out.breakdown);
+  assert.deepEqual(out.breakdown![0].key, { agent: '007' });
+});
+
+test('applyFieldPolicy: a harmless date_histogram breakdown still passes through unscathed', () => {
+  // Regression guard for the inverted-default fix: a genuinely fieldless agg (extractAggFields
+  // resolves it to undefined) must still pass through for typed catalog tools, exactly as before
+  // multi_terms/composite support and the fail-closed backstop were added.
+  const policy: FieldPolicyEntry[] = [
+    { field: 'wazuh.agent.name', action: 'never' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    breakdown: [{ key: '2026-07-31T00:00:00.000Z', count: 42 }],
+  });
+  const out = applyFieldPolicy(digest, policy, p, { over_time: undefined });
+  assert.deepEqual(out.breakdown, [
+    { key: '2026-07-31T00:00:00.000Z', count: 42 },
+  ]);
+});
+
+test('applyFieldPolicy: an escape-hatch unresolvable-field bucket fails closed (string key)', () => {
+  // The inverted default: unlike the typed-tool case above, the escape hatch's arbitrary DSL can
+  // put an agg shape here this file does not parse but that DOES carry a real (unknown) field, so
+  // a string key is pseudonymized generically rather than trusted as safe.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    breakdown: [{ key: 'mystery-value', count: 5 }],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    [],
+    p,
+    { unknown_shape: undefined },
+    'search_wazuh_data',
+    true,
+  );
+  assert.ok(out.breakdown);
+  assert.match(out.breakdown![0].key as string, /^VAL_\d+$/);
+});
+
+test('applyFieldPolicy: an escape-hatch unresolvable-field bucket fails closed (structured key, dropped)', () => {
+  // Sibling of the string-key case above: a STRUCTURED key (object/array) under an unresolvable
+  // spec cannot be safely pseudonymized component-by-component (no field mapping exists for it),
+  // so the escape hatch drops the whole bucket outright rather than shipping raw structured data.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    breakdown: [{ key: { mystery: 'raw-value' }, count: 5 }],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    [],
+    p,
+    { unknown_shape: undefined },
+    'search_wazuh_data',
+    true,
+  );
+  assert.deepEqual(out.breakdown, undefined);
+});
+
 // --- applyFieldPolicy: aggregation SAMPLES (the `key` sample field) ------------------------------
 
 /**
@@ -724,7 +1021,7 @@ test('applyFieldPolicy: drops the "key" sample of an aggregation over a "never" 
     baseDigest({ samples: [{ key: 'web-01.corp', doc_count: 42 }] }),
     policy,
     p,
-    { top_agents: 'wazuh.agent.name' },
+    { top_agents: scalarSpec('wazuh.agent.name') },
   );
   assert.deepEqual(out.samples, [{ doc_count: 42 }]);
   // Not even a pseudonym is minted for it: "never" means the value gets no representation at all.
@@ -740,7 +1037,7 @@ test('applyFieldPolicy: pseudonymizes the "key" sample of an "anonymize" aggrega
     baseDigest({ samples: [{ key: 'web-01.corp', doc_count: 42 }] }),
     policy,
     p,
-    { top_agents: 'wazuh.agent.name' },
+    { top_agents: scalarSpec('wazuh.agent.name') },
   );
   // Still keyed by `key` — the digest SHAPE the model sees must not change, only the value.
   assert.deepEqual(out.samples, [{ key: 'HOST_1', doc_count: 42 }]);
@@ -758,7 +1055,7 @@ test('applyFieldPolicy: resolves the aggregated field tool-scoped, like every ot
     digest,
     policy,
     p,
-    { top_agents: 'wazuh.agent.name' },
+    { top_agents: scalarSpec('wazuh.agent.name') },
     'get_top_agents',
   );
   assert.deepEqual(scoped.samples, [{ doc_count: 7 }]);
@@ -772,7 +1069,7 @@ test('applyFieldPolicy: resolves the aggregated field tool-scoped, like every ot
     baseDigest({ samples: [{ key: 'web-01', doc_count: 7 }] }),
     policy,
     p,
-    { top_agents: 'wazuh.agent.name' },
+    { top_agents: scalarSpec('wazuh.agent.name') },
     'get_top_rules',
   );
   assert.deepEqual(other.samples, [{ key: 'web-01', doc_count: 7 }]);
@@ -804,6 +1101,230 @@ test('applyFieldPolicy: an aggregation with no extractable field leaves "key" al
   assert.deepEqual(out.samples, [
     { key: '2026-07-31T00:00:00Z', doc_count: 3 },
   ]);
+});
+
+// --- scrubKnownEntities (#8912 known-entity dictionary scan) -----------------------------------
+
+test('scrubKnownEntities: a dictionary hit is replaced with the SAME pseudonym used elsewhere', () => {
+  // CRITICAL correctness property: pseudonym reuse must be conversation-consistent (same real
+  // value -> same pseudonym everywhere), or the model sees two different names for one host.
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('DBPRIMARY03', 'HOST'); // minted elsewhere, e.g. wazuh.agent.name
+  const out = scrubKnownEntities(
+    'installed package for DBPRIMARY03 host role',
+    p,
+  );
+  assert.equal(out, `installed package for ${pseudonym} host role`);
+  // No SECOND pseudonym was minted for the same real value.
+  assert.equal(p.newEntries().length, 1);
+});
+
+test('scrubKnownEntities: case-insensitive hit still resolves to the existing pseudonym', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('DBPRIMARY03', 'HOST');
+  const out = scrubKnownEntities('connecting to dbprimary03 now', p);
+  assert.equal(out, `connecting to ${pseudonym} now`);
+});
+
+test('scrubKnownEntities: a known identifier embedded via "-"/"_" is still matched (non-alphanumeric boundary)', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('DBPRIMARY03', 'HOST');
+  const out = scrubKnownEntities('mysql-server-DBPRIMARY03-config', p);
+  assert.equal(out, `mysql-server-${pseudonym}-config`);
+});
+
+test('scrubKnownEntities: a substring of a LARGER alphanumeric word does not match', () => {
+  const p = new Pseudonymizer();
+  p.pseudonymize('DBPRIMARY03', 'HOST');
+  // "DBPRIMARY03" is a substring of "DBPRIMARY031", but the trailing "1" is alphanumeric, so
+  // there is no boundary there -- the whole larger token must be left alone.
+  const out = scrubKnownEntities('host DBPRIMARY031 is unrelated', p);
+  assert.equal(out, 'host DBPRIMARY031 is unrelated');
+});
+
+test('scrubKnownEntities: an unknown identifier (never minted anywhere) passes through unscrubbed', () => {
+  // Documented residual limitation (see the function's own doc comment): a value that is BOTH
+  // shapeless (no IP/FQDN pattern) AND never minted anywhere else in the conversation has nothing
+  // for this scan to reuse, and is honestly left untouched rather than silently "handled".
+  const p = new Pseudonymizer();
+  p.pseudonymize('DBPRIMARY03', 'HOST'); // an unrelated known entity
+  const out = scrubKnownEntities('host NEVERSEENHOST99 reporting in', p);
+  assert.equal(out, 'host NEVERSEENHOST99 reporting in');
+});
+
+test('scrubKnownEntities: an empty dictionary is a no-op', () => {
+  const p = new Pseudonymizer();
+  const out = scrubKnownEntities('nothing minted yet for DBPRIMARY03', p);
+  assert.equal(out, 'nothing minted yet for DBPRIMARY03');
+});
+
+test('scrubKnownEntities: longest known value wins so a shorter one does not corrupt it', () => {
+  const p = new Pseudonymizer();
+  const shortPseudonym = p.pseudonymize('DB03', 'HOST');
+  const longPseudonym = p.pseudonymize('DB03-PRIMARY', 'HOST');
+  const out = scrubKnownEntities('cluster member DB03-PRIMARY online', p);
+  assert.equal(out, `cluster member ${longPseudonym} online`);
+  assert.notEqual(shortPseudonym, longPseudonym);
+});
+
+// --- applyFieldPolicy: 'allow-scan' action (#8912) ----------------------------------------------
+
+test('applyFieldPolicy: "allow-scan" field replaces a known dictionary hit with its existing pseudonym', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'package.name', action: 'allow-scan' },
+  ];
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('DBPRIMARY03', 'HOST'); // minted from an earlier agent.name field
+  const digest = baseDigest({
+    samples: [{ 'package.name': 'vendor-agent-DBPRIMARY03-connector' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.equal(
+    out.samples[0]['package.name'],
+    `vendor-agent-${pseudonym}-connector`,
+  );
+});
+
+test('applyFieldPolicy: "allow-scan" field still runs the shape scan for embedded IPs/FQDNs', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'package.name', action: 'allow-scan' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    samples: [{ 'package.name': 'connector phoning home to 203.0.113.7' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  const value = out.samples[0]['package.name'] as string;
+  assert.doesNotMatch(value, /203\.0\.113\.7/);
+  assert.match(value, /^connector phoning home to IP_\d+$/);
+});
+
+test('applyFieldPolicy: "allow-scan" field with no dictionary/shape hits passes through verbatim', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'package.name', action: 'allow-scan' },
+  ];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({ samples: [{ 'package.name': 'openssl' }] });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.equal(out.samples[0]['package.name'], 'openssl');
+});
+
+test('applyFieldPolicy: a curated "allow" field is not affected by the allow-scan dictionary scan', () => {
+  // check.name stays plain 'allow' -- a known-entity hit inside it must NOT be scrubbed, unlike
+  // the allow-scan case above. Confirms the two actions stay genuinely distinct.
+  const policy: FieldPolicyEntry[] = [
+    { field: 'check.name', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  p.pseudonymize('DBPRIMARY03', 'HOST');
+  const digest = baseDigest({
+    samples: [{ 'check.name': 'Verify DBPRIMARY03 patch level' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p);
+  assert.equal(out.samples[0]['check.name'], 'Verify DBPRIMARY03 patch level');
+});
+
+// --- applyFieldPolicy: 'allow-scan' through EVERY scrubAggKey bucket-key SHAPE (#8912 rework) ----
+//
+// The v1 version of this fix wired allow-scan inline in applyFieldPolicy's breakdown loop, which
+// only ever saw a flat string key. feat/8909 (544d73a93) refactored that loop to delegate to
+// `scrubAggKey`, which dispatches on the aggregation's ACTUAL key shape (scalar/multi/composite).
+// Since `scrubFieldValue` is now the single place the allow-scan branch lives, and all three
+// `scrubAggKey` shapes call back into `scrubFieldValue` for each component, a single allow-scan
+// entry must be honored no matter which shape carries it -- these three tests prove each path
+// independently rather than trusting that "it worked for scalar" generalizes.
+
+test('applyFieldPolicy: "allow-scan" SCALAR breakdown bucket key is scrubbed against the known dictionary', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'package.name', action: 'allow-scan' },
+  ];
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('DBPRIMARY03', 'HOST');
+  const digest = baseDigest({
+    breakdown: [{ key: 'agent-DBPRIMARY03-pkg', count: 2, agg: 'by_package' }],
+  });
+  const out = applyFieldPolicy(digest, policy, p, {
+    by_package: scalarSpec('package.name'),
+  });
+  assert.ok(out.breakdown);
+  assert.equal(out.breakdown![0].key, `agent-${pseudonym}-pkg`);
+});
+
+test('applyFieldPolicy: "allow-scan" MULTI (multi_terms) breakdown component is scrubbed against the known dictionary', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'package.name', action: 'allow-scan' },
+    { field: 'wazuh.agent.id', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('DBPRIMARY03', 'HOST');
+  const digest = baseDigest({
+    breakdown: [{ key: ['agent-DBPRIMARY03-pkg', '007'], count: 4 }],
+  });
+  const aggFields = {
+    by_package_and_agent: {
+      kind: 'multi' as const,
+      fields: ['package.name', 'wazuh.agent.id'],
+    },
+  };
+  const out = applyFieldPolicy(digest, policy, p, aggFields);
+  assert.ok(out.breakdown);
+  const [pkg, agent] = out.breakdown![0].key as unknown[];
+  assert.equal(pkg, `agent-${pseudonym}-pkg`);
+  assert.equal(agent, '007');
+});
+
+test('applyFieldPolicy: "allow-scan" COMPOSITE breakdown component is scrubbed against the known dictionary', () => {
+  const policy: FieldPolicyEntry[] = [
+    { field: 'package.name', action: 'allow-scan' },
+    { field: 'wazuh.agent.id', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('DBPRIMARY03', 'HOST');
+  const digest = baseDigest({
+    breakdown: [
+      { key: { pkg: 'agent-DBPRIMARY03-pkg', agent: '007' }, count: 4 },
+    ],
+  });
+  const aggFields = {
+    by_package_and_agent: {
+      kind: 'composite' as const,
+      fields: { pkg: 'package.name', agent: 'wazuh.agent.id' },
+    },
+  };
+  const out = applyFieldPolicy(digest, policy, p, aggFields);
+  assert.ok(out.breakdown);
+  const key = out.breakdown![0].key as Record<string, unknown>;
+  assert.equal(key.pkg, `agent-${pseudonym}-pkg`);
+  assert.equal(key.agent, '007');
+});
+
+// --- FIELD_POLICY_DEFAULTS: #8912 package.name reclassified to allow-scan -----------------------
+
+test('FIELD_POLICY_DEFAULTS: package.name is "allow-scan", not plain allow-by-omission or "allow"', () => {
+  const entry = FIELD_POLICY_DEFAULTS.find(e => e.field === 'package.name');
+  assert.ok(entry, 'package.name must have an explicit policy entry');
+  assert.equal(entry!.action, 'allow-scan');
+});
+
+test('FIELD_POLICY_DEFAULTS: end-to-end -- a known agent hostname embedded in package.name is caught', () => {
+  const p = new Pseudonymizer();
+  const pseudonym = p.pseudonymize('DBPRIMARY03', 'HOST'); // as would happen via wazuh.agent.name
+  const digest = baseDigest({
+    tool: 'get_agent_inventory',
+    samples: [{ 'package.name': 'custom-build-for-DBPRIMARY03' }],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'get_agent_inventory',
+    true,
+  );
+  assert.equal(
+    out.samples[0]['package.name'],
+    `custom-build-for-${pseudonym}`,
+  );
 });
 
 // --- FIELD_POLICY_DEFAULTS: #8889 explicit entry for a commonly-surfaced field -------------------
