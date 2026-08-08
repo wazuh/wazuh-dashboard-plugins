@@ -359,7 +359,14 @@ test('get_agent_inventory: kind="os" filter matches either host.hostname or host
   });
 });
 
-test('get_agent_inventory: kind="ports" filter is numeric equality on source.port OR destination.port', () => {
+// #8914: a numeric ports filter matched EITHER side of the socket with no state narrowing, so
+// "what's listening on port 9200" returned every connection touching 9200 instead of just the
+// listener(s). The outer clause narrowed here: still a port match on EITHER side (`bool.filter`
+// unchanged in spirit), AND (via a nested `bool.should`/`minimum_should_match: 1`) either
+// `interface.state` is "LISTEN" or the field is absent from that document -- the graceful fallback
+// so a deployment/document without `interface.state` still gets the plain port match back instead
+// of the query going silently empty.
+test('get_agent_inventory: kind="ports" numeric filter matches the port on either side AND prefers the listening state', () => {
   const req = buildIndexer({
     agent_id: '003',
     kind: 'ports',
@@ -371,9 +378,20 @@ test('get_agent_inventory: kind="ports" filter is numeric equality on source.por
         { term: { 'wazuh.agent.id': '003' } },
         {
           bool: {
+            filter: [
+              {
+                bool: {
+                  should: [
+                    { term: { 'source.port': 9200 } },
+                    { term: { 'destination.port': 9200 } },
+                  ],
+                  minimum_should_match: 1,
+                },
+              },
+            ],
             should: [
-              { term: { 'source.port': 9200 } },
-              { term: { 'destination.port': 9200 } },
+              { term: { 'interface.state': 'LISTEN' } },
+              { bool: { must_not: { exists: { field: 'interface.state' } } } },
             ],
             minimum_should_match: 1,
           },
@@ -381,6 +399,25 @@ test('get_agent_inventory: kind="ports" filter is numeric equality on source.por
       ],
     },
   });
+});
+
+test('get_agent_inventory: kind="ports" numeric filter still returns a document lacking "interface.state" (fallback)', () => {
+  // Same request as above -- this test documents the query SHAPE's fallback behavior (a document
+  // with no "interface.state" field satisfies the "must_not: exists" should-clause, so it is not
+  // excluded by the state narrowing), since this is a static request-building test with no live
+  // Indexer to execute the query against.
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'ports',
+    filter: '9200',
+  });
+  const portFilterClause = (
+    req.body.query as { bool: { filter: unknown[] } }
+  ).bool.filter[1] as { bool: { should: unknown[]; minimum_should_match: number } };
+  assert.deepEqual(portFilterClause.bool.should[1], {
+    bool: { must_not: { exists: { field: 'interface.state' } } },
+  });
+  assert.equal(portFilterClause.bool.minimum_should_match, 1);
 });
 
 test('get_agent_inventory: kind="ports" a non-numeric filter falls back to a process.name match', () => {

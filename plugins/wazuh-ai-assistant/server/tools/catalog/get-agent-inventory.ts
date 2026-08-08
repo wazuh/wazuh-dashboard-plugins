@@ -157,9 +157,10 @@ function parseKind(value: unknown): InventoryKind {
  *   `filter` silently ignored for exactly one of the five kinds would be a worse (surprising)
  *   contract than a uniform, if lower-value, one.
  * - `ports` has no single name field (see `buildInventoryFilterClause`'s own handling): a numeric
- *   filter matches `source.port`/`destination.port`, a non-numeric one matches `process.name` (the
- *   process bound to the port), matching the issue's own worked example ("what process is on port
- *   9200").
+ *   filter matches `source.port`/`destination.port` AND prefers `interface.state: LISTEN` (issue
+ *   #8914 -- see `PORT_LISTENING_STATE`'s doc comment below), a non-numeric one matches
+ *   `process.name` (the process bound to the port), matching the issue's own worked example ("what
+ *   process is on port 9200").
  */
 const INVENTORY_FILTER_FIELDS: Partial<Record<InventoryKind, string[]>> = {
   os: ['host.hostname', 'host.os.name'],
@@ -222,6 +223,23 @@ function anyFieldMatches(
 }
 
 /**
+ * `interface.state` value the syscollector ports schema uses for a bound/listening socket.
+ * Evidence: the outbound `_source` for `ports` already carries `interface.state` (see
+ * `INVENTORY_KIND_CONFIG` above, unchanged by this fix), and `plugins/main`'s own
+ * `states-inventory-ports` sample-data generator (`server/lib/sample-data/dataset/
+ * states-inventory-ports/main.js`) sets it to exactly `random.choice(['LISTEN', 'ESTABLISHED'])`
+ * -- the same two-value vocabulary `plugins/main`'s IT Hygiene dashboards filter on with
+ * `interface.state: LISTEN`/`interface.state: ESTABLISHED` KQL queries (e.g.
+ * `public/components/overview/it-hygiene/networks/inventories/traffic/dashboard.ts`), sourced
+ * from the wazuh-indexer ports template (referenced in that same generator file as
+ * https://github.com/wazuh/wazuh-indexer/pull/744). No index template/mapping JSON for
+ * `wazuh-states-inventory-ports*` is checked into this repo, so this is the same standard of
+ * "confirmed live-checked-in evidence, not a guessed sibling field" this file already applies
+ * elsewhere (see `INVENTORY_KIND_CONFIG`'s `hotfixes` doc comment).
+ */
+const PORT_LISTENING_STATE = 'LISTEN';
+
+/**
  * Resolves the optional `filter` param (issue #8910) to zero or one extra `bool.filter` clause,
  * appended by `buildRequest` after the agent clause. Returns `undefined` for an omitted/blank
  * filter (existing callers with no `filter` supplied get exactly the same request body as before
@@ -234,6 +252,21 @@ function anyFieldMatches(
  * `long`, never `keyword`), since neither `source`/`destination` alone is "the" port a caller means
  * by "port 9200". A non-numeric filter ("which process is on port X" asked the other way, "what's
  * using nginx's port") falls back to the same `process.name` prefix match `processes` uses.
+ *
+ * Issue #8910: a numeric filter matched EITHER side of the socket with no state narrowing, so
+ * "what's listening on port 9200" returned every connection touching 9200 (both the listener AND
+ * every established peer connection through it) instead of just the listener(s). Issue #8914
+ * narrows this: the outer clause is `bool.filter` on the port match (unchanged, still both sides --
+ * a `source.port`/`destination.port` OR, since a caller-supplied port can legitimately be either
+ * side of a real socket) AND (via a nested `bool.should`/`minimum_should_match: 1`) either
+ * `interface.state` is `LISTEN` OR the `interface.state` field is absent from that document. The
+ * "OR absent" arm is the graceful fallback the issue asks for: `interface.state` is NOT made a hard
+ * requirement (a `must`/`filter` on `term: LISTEN` alone would silently return zero rows for any
+ * document that happens to lack the field -- e.g. an older/partial doc from before the field
+ * existed), so a deployment where some or all `ports` documents never carry `interface.state` still
+ * gets its port-only match back exactly as before this fix, one document at a time, rather than the
+ * whole query going empty. A document that DOES carry `interface.state` and holds a non-listening
+ * value (e.g. `ESTABLISHED`) is excluded -- that is the actual narrowing this issue exists for.
  */
 function buildInventoryFilterClause(
   kind: InventoryKind,
@@ -250,11 +283,21 @@ function buildInventoryFilterClause(
   if (kind === 'ports') {
     if (INTEGER_FILTER_RE.test(value)) {
       const port = Number.parseInt(value, 10);
-      return {
+      const portMatch = {
         bool: {
           should: [
             { term: { 'source.port': port } },
             { term: { 'destination.port': port } },
+          ],
+          minimum_should_match: 1,
+        },
+      };
+      return {
+        bool: {
+          filter: [portMatch],
+          should: [
+            { term: { 'interface.state': PORT_LISTENING_STATE } },
+            { bool: { must_not: { exists: { field: 'interface.state' } } } },
           ],
           minimum_should_match: 1,
         },
@@ -367,9 +410,12 @@ export const getAgentInventoryTool: ToolDefinition = {
             "Narrows results to rows matching this value on the kind's primary name field, " +
             'case-insensitive: package name for "packages", hotfix id for "hotfixes", process ' +
             'name/command line for "processes", hostname/OS name for "os". For "ports", a numeric ' +
-            'value matches that port number (source or destination); a non-numeric value matches ' +
-            "the process name bound to the port. Optional -- omit to return the kind's unfiltered " +
-            'rows (existing behavior, subject to "limit").',
+            'value matches that port number (source or destination) and prefers the LISTENING ' +
+            'socket(s) when a row carries the "interface.state" field ("what is listening on port ' +
+            '9200?" -- rows without that field are still returned, unnarrowed, so the port-only ' +
+            'match never goes silently empty); a non-numeric value matches the process name bound ' +
+            "to the port. Optional -- omit to return the kind's unfiltered rows (existing " +
+            'behavior, subject to "limit").',
         },
       },
       ['kind'],
