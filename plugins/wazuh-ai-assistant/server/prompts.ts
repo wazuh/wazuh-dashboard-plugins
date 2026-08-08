@@ -79,6 +79,20 @@ export function buildSystemPrompt(nowIso: string): string {
       'include those fields in the "_source" list or your result will not contain them.',
     'get_sca_checks needs a policy_id from get_sca_results first; use result="failed" for ' +
       '"which checks fail" questions.',
+    // #8913: a bare deictic reference to the host ("this box/host/machine/server/system") with
+    // no agent named earlier in the conversation left the model asking the user for an agent id
+    // instead of resolving it -- get_agent_inventory's own description already says to call
+    // get_agents first, but only once an agent id or name is otherwise known to be missing from
+    // the conversation, which a standalone "this box" does not obviously signal. State the
+    // resolution steps directly so the model always takes them: call get_agents first; if
+    // exactly one ACTIVE agent exists, proceed with it and say so; otherwise list the candidates
+    // and ask -- never guess among several.
+    'If the user refers to the host deictically ("this box", "this host", "this machine", ' +
+      '"this server", "this system") and no agent has been named or numbered earlier in the ' +
+      'conversation, call get_agents first. If exactly one ACTIVE agent exists, proceed with it ' +
+      'and state that assumption in your answer (e.g. "Assuming you mean agent 003 ' +
+      '(web-prod-01), the only active agent"). If more than one active agent exists, do not ' +
+      'guess: briefly list the candidates (id and name) and ask the user which one they mean.',
     'Never guess rule ids: if you do not know the exact wazuh.rule.id for a kind of finding, use ' +
       'search_findings_by_rule_tag with a wazuh.rule.tags value, or aggregate by rule first with ' +
       'get_top_rules to discover ids. If a narrowly-filtered query returns 0 rows for activity ' +
