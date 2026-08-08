@@ -1,7 +1,8 @@
 import { JsonSchemaObject, JsonSchemaProperty } from '../../../common/types';
 import { SEVERITY_LEVELS, SeverityLevel } from '../../../common/wazuh-fields';
 import { ToolTableColumnSpec } from '../types';
-import { clampInt } from '../guardrails';
+import { clampInt, MAX_AGG_SIZE } from '../guardrails';
+import { BREAKDOWN_BUCKET_CAP } from '../digest';
 
 /**
  * Shared helpers for the catalog tool modules under server/tools/catalog/. Kept separate from
@@ -78,6 +79,45 @@ export function clampLimit(
 /** The `limit` property shared by every catalog tool's params schema. */
 export function limitProperty(description: string): JsonSchemaProperty {
   return { type: 'number', description };
+}
+
+/**
+ * `clampLimit` for a limit that becomes an AGGREGATION `size` rather than a hits `size` — clamps to
+ * `MAX_AGG_SIZE` (server/tools/guardrails.ts) instead of taking a caller-chosen max.
+ *
+ * Use this, never `clampLimit(value, n, <literal>)`, whenever the clamped result is written into a
+ * `terms`/`composite`/`multi_terms` `size`. Reason (issue #8894): `guardrails.ts`'s `checkAggs`
+ * rejects any aggregation size above `MAX_AGG_SIZE`, and `executor.ts` runs `lintDsl` on EVERY
+ * indexer request with no per-tool exemption. So a tool that clamped its own limit to a larger
+ * number did not get a bigger aggregation — it got a hard failure for the whole range above the cap.
+ * `get_sca_results` clamped to 500 and every call in 101-500 was refused. Taking the cap from the
+ * guardrail constant makes that arithmetic mismatch unrepresentable rather than merely fixed once.
+ *
+ * Hits-paging limits are unaffected and must keep using `clampLimit`: `applySafetyValves` clamps a
+ * top-level `size` to `MAX_SIZE` (500) rather than rejecting it, so a large hits limit degrades
+ * gracefully where a large agg size does not. That asymmetry is exactly why the two need different
+ * helpers.
+ */
+export function clampAggLimit(value: unknown, defaultValue: number): number {
+  return clampLimit(value, defaultValue, MAX_AGG_SIZE);
+}
+
+/**
+ * `limitProperty` for an aggregation-backed limit: builds the description so the advertised maximum
+ * is READ FROM the same `MAX_AGG_SIZE` the guardrail enforces.
+ *
+ * The half of issue #8894 that actually misled the model was the description — it promised `max 500`
+ * on a tool that failed above 100, so a model following the schema was steered into the broken
+ * range. Generating the sentence removes the possibility of the two numbers disagreeing; a future
+ * change to the cap updates every tool's advertised maximum automatically.
+ */
+export function aggLimitProperty(
+  subject: string,
+  defaultValue: number,
+): JsonSchemaProperty {
+  return limitProperty(
+    `Max number of ${subject} to return (default ${defaultValue}, max ${MAX_AGG_SIZE}).`,
+  );
 }
 
 /** Reads an optional string params value, returning `undefined` for anything not a string. */
@@ -201,6 +241,93 @@ export function timeRangeProperties(): Record<string, JsonSchemaProperty> {
   };
 }
 
+/**
+ * Optional artifact-filter parameters shared by the finding-hits tools (issue: "Add artifact
+ * filters to finding tools"): `source.ip` is already returned in every finding-hits tool's
+ * digest (`FINDING_DIGEST_EXTRA_COLUMNS` below) and named in `server/prompts.ts`'s guidance to
+ * "prefer the typed finding tools" for IP/user/process questions, yet no typed tool could
+ * actually filter on it -- the model's only option was hand-writing DSL via search_wazuh_data.
+ * `destination.ip` is confirmed `ip`-mapped and `searchable` on `wazuh-findings-v5*` via a live
+ * `_field_caps` check (see the issue) even though it is not itself in the digest yet; a filter on
+ * it is still correct (it narrows to documents that HAVE it), just possibly sparse. `process.name`
+ * is already used internally by `get_suspicious_powershell.ts`'s own `buildRequest`, confirming
+ * it is queryable on this index -- this exposes the same field as a caller-supplied filter
+ * instead of a hardcoded value list. Follows the same shape as `severityProperty()`/
+ * `timeRangeProperties()` above: a properties-map helper paired with a clause-resolver
+ * (`findingArtifactFilterClauses` below) that every finding-hits tool's `buildRequest` calls.
+ */
+export function findingArtifactFilterProperties(): Record<
+  string,
+  JsonSchemaProperty
+> {
+  return {
+    source_ip: {
+      type: 'string',
+      description:
+        'Filter to findings whose source.ip exactly matches this IP address (the attacker/' +
+        'originating side).',
+    },
+    destination_ip: {
+      type: 'string',
+      description:
+        'Filter to findings whose destination.ip exactly matches this IP address (the target ' +
+        'side). Mapped but not densely populated on every dataset -- 0 rows may mean the field ' +
+        'is absent on matching documents, not that none exist.',
+    },
+    process_name: {
+      type: 'string',
+      description:
+        'Filter to findings whose process.name exactly matches this process/program name (e.g. ' +
+        '"powershell.exe").',
+    },
+    source_user_name: {
+      type: 'string',
+      description:
+        'Filter to findings whose source.user.name exactly matches this username.',
+    },
+    destination_user_name: {
+      type: 'string',
+      description:
+        'Filter to findings whose destination.user.name exactly matches this username.',
+    },
+  };
+}
+
+/**
+ * Resolves `findingArtifactFilterProperties()`'s five optional params to zero or more `term`
+ * filter clauses, in the fixed order below, for each caller's `buildRequest` to append to its own
+ * `bool.filter` array (see e.g. search-findings-by-agent.ts). A call that supplies none of the
+ * five gets `[]` back -- every existing caller's request body is therefore byte-identical to
+ * before this existed, which is what makes "a tool call with no artifact filter supplied is
+ * unchanged" true by construction rather than by a separate code path.
+ */
+export function findingArtifactFilterClauses(
+  params: Record<string, unknown>,
+): Record<string, unknown>[] {
+  const clauses: Record<string, unknown>[] = [];
+  const sourceIp = optionalStringParam(params.source_ip);
+  if (sourceIp) {
+    clauses.push({ term: { 'source.ip': sourceIp } });
+  }
+  const destinationIp = optionalStringParam(params.destination_ip);
+  if (destinationIp) {
+    clauses.push({ term: { 'destination.ip': destinationIp } });
+  }
+  const processName = optionalStringParam(params.process_name);
+  if (processName) {
+    clauses.push({ term: { 'process.name': processName } });
+  }
+  const sourceUserName = optionalStringParam(params.source_user_name);
+  if (sourceUserName) {
+    clauses.push({ term: { 'source.user.name': sourceUserName } });
+  }
+  const destinationUserName = optionalStringParam(params.destination_user_name);
+  if (destinationUserName) {
+    clauses.push({ term: { 'destination.user.name': destinationUserName } });
+  }
+  return clauses;
+}
+
 export function resolveTimeRange(params: Record<string, unknown>): {
   gte: string;
   lte: string;
@@ -227,6 +354,34 @@ export function objectSchema(
 ): JsonSchemaObject {
   return { type: 'object', properties, ...(required ? { required } : {}) };
 }
+
+/**
+ * Negative-scope + vocabulary note appended to every finding-hits tool's `spec.description` --
+ * the fix for a measured failure ("give me everything that happened on X") where two different
+ * model families silently substituted a narrower rule-matched-only search and reported "nothing
+ * happened" instead of saying no rule fired. Kept as one shared string so all 8 (see
+ * `STANDARD_FINDING_TABLE_COLUMNS`'s doc comment below) finding-hits tools carry identical
+ * wording rather than independently-drifting paraphrases -- every finding-hits tool description
+ * appends this verbatim. "alerts/hits/signals" is the synonym vocabulary analysts use for
+ * "findings"; the model matches on this text at tool-choice time, not against a fixed keyword map.
+ */
+export const FINDING_SCOPE_NOTE =
+  'Covers rule-matched detections (alerts/hits/signals) only -- never the raw, unmatched event ' +
+  'stream; if this returns 0 rows, say so plainly rather than reporting nothing happened.';
+
+/** Current-state note appended to the 4 vulnerability tools' descriptions: `wazuh-states-
+ * vulnerabilities*` is a snapshot, not a timeline, so there is no "solved/resolved" history to
+ * report -- see also `server/prompts.ts`'s matching instruction, which this makes visible at
+ * tool-choice time too, not only after a tool is already picked. */
+export const VULN_CURRENT_STATE_NOTE =
+  'Reflects current vulnerability state only -- no patched/unpatched history over time.';
+
+/** Current-state note appended to the syscollector inventory tools' descriptions (and, from issue
+ * 12's consolidation onward, to `get_agent_inventory`'s): `wazuh-states-inventory-*` is a snapshot
+ * written at scan/collection time, not an event-time record, so it answers "what does agent X look
+ * like now", never "what did it look like when finding Y fired". */
+export const INVENTORY_CURRENT_STATE_NOTE =
+  'Reflects current state only, not the state at any past event time.';
 
 /**
  * Shared baseline `tableSpec.columns`/`digest.sampleColumns` for the 8 finding-hits tools
@@ -268,6 +423,51 @@ export const FINDING_INVESTIGATION_ROW_FIELDS = [
   'destination.user.name',
   'process.command_line',
 ];
+
+/**
+ * Group-by dimensions for digest.ts's `buildSyntheticBreakdown` — shared by the same 8
+ * finding-hits tools listed above. These two are the ones the issue this exists for names
+ * verbatim ("which agents"/"which rules"); every finding row carries both regardless of which
+ * columns the calling tool declares visible, so this is safe to share across all 8 unconditionally.
+ */
+export const FINDING_BREAKDOWN_DIMENSIONS = [
+  'wazuh.agent.name',
+  'wazuh.rule.title',
+];
+
+/** Derives a valid, unique OpenSearch top-level aggregation name from a dot-path field — agg names
+ * are plain object keys with no dot restriction, but a stable NAME distinct from the field path
+ * itself (rather than reusing the path verbatim as the key) keeps `digest.ts`'s `breakdown[].agg`
+ * tag readable and avoids relying on dots surviving unescaped through any future request
+ * transform. */
+function aggNameForField(field: string): string {
+  return field.replace(/\./g, '_');
+}
+
+/**
+ * Real `terms` aggregations over `FINDING_BREAKDOWN_DIMENSIONS`, attached to every finding-hits
+ * typed tool's request body (see e.g. get-critical-findings.ts's `buildRequest`) alongside the
+ * existing `query`/`sort`/`size` — OpenSearch computes `aggregations` over the FULL MATCHED set of
+ * a query regardless of `size`, independently of how many hits are actually returned. This closes
+ * the #8870 validation-gate gap: a breakdown computed over only the RETURNED page
+ * (`buildSyntheticBreakdown`, digest.ts) is wrong whenever `size`/`limit` truncates the match set,
+ * because the digest hands it to the model as if it were the population. With this `aggs` clause
+ * present, `buildBreakdown` (digest.ts, unmodified — it already read `result.aggregations`
+ * generically for the search_wazuh_data escape hatch) picks up the real, population-true
+ * distribution instead, and the synthetic path never runs for these 8 tools.
+ *
+ * Both dimension fields are already on `guardrails.ts`'s `AGG_FIELD_ALLOWLIST`, so this passes
+ * `checkAggs` unmodified. Sized at `BREAKDOWN_BUCKET_CAP` — the same per-dimension bucket budget
+ * `buildSyntheticBreakdown` uses — so the token cost of a breakdown does not change depending on
+ * whether the real or the synthetic path ends up serving a given call.
+ */
+export const FINDING_BREAKDOWN_AGGS: Record<string, unknown> =
+  Object.fromEntries(
+    FINDING_BREAKDOWN_DIMENSIONS.map(field => [
+      aggNameForField(field),
+      { terms: { field, size: BREAKDOWN_BUCKET_CAP } },
+    ]),
+  );
 
 /**
  * Fields added to every finding-hits tool's digest `sampleColumns` — the model-facing subset of

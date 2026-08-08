@@ -25,10 +25,7 @@ import { getScaResultsTool } from './catalog/get-sca-results';
 import { getScaChecksTool } from './catalog/get-sca-checks';
 import { getMitreFindingsTool } from './catalog/get-mitre-findings';
 import { getMitreSummaryTool } from './catalog/get-mitre-summary';
-import { getAgentOsTool } from './catalog/get-agent-os';
-import { getAgentPackagesTool } from './catalog/get-agent-packages';
-import { getAgentPortsTool } from './catalog/get-agent-ports';
-import { getAgentProcessesTool } from './catalog/get-agent-processes';
+import { getAgentInventoryTool } from './catalog/get-agent-inventory';
 import { getRulesTool } from './catalog/get-rules';
 import { getThreatIntelComponentsTool } from './catalog/get-threat-intel-components';
 import { getDetectorsTool } from './catalog/get-detectors';
@@ -90,11 +87,9 @@ const CATALOG: ToolDefinition[] = [
   getMitreFindingsTool,
   getMitreSummaryTool,
 
-  // Syscollector inventory
-  getAgentOsTool,
-  getAgentPackagesTool,
-  getAgentPortsTool,
-  getAgentProcessesTool,
+  // Syscollector inventory (get_agent_os/get_agent_packages/get_agent_ports/get_agent_processes
+  // were consolidated into this one tool -- see get-agent-inventory.ts's doc comment)
+  getAgentInventoryTool,
 
   // Security Analytics content: ruleset + pipeline components + detector definitions
   getRulesTool,

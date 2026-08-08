@@ -13,6 +13,7 @@ import {
   lintDsl,
 } from './guardrails';
 import { buildDigest, buildTableSpec, capDigest, Digest } from './digest';
+import { validateQueryFields } from './field-validation';
 import { IndexerRequest, ManagerRequest, ToolDefinition } from './types';
 import {
   AggFieldSpec,
@@ -166,6 +167,22 @@ async function executeIndexerRequest(
     };
   }
 
+  // Escape-hatch-only field-existence check (see field-validation.ts / ToolDefinition's
+  // `validateFieldNames` doc comment): runs AFTER the synchronous guardrails above (so a
+  // structurally-rejected body never pays the `_field_caps` round trip) and BEFORE the request
+  // actually reaches OpenSearch — a made-up field name becomes a bounded, self-correctable tool
+  // error instead of a silent zero-row/zero-bucket result.
+  if (def.validateFieldNames) {
+    const fieldCheck = await validateQueryFields(
+      context,
+      indexerRequest.index,
+      body,
+    );
+    if (!fieldCheck.ok) {
+      return { toolResultContent: toolErrorContent(fieldCheck.reason) };
+    }
+  }
+
   try {
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: indexerRequest.index,
@@ -178,11 +195,39 @@ async function executeIndexerRequest(
     // aggregation fields driving `breakdown` (if any) can be read from — see privacy.ts's
     // `extractAggFields` doc comment — so it is reused for that below when privacy is active.
     const digest = buildDigest(toolName, result, def, body);
+    // A `breakdownDimensions`-opted-in tool's synthesized breakdown (digest.ts's
+    // `buildSyntheticBreakdown`) tags each bucket `agg: <dimension field path>` — a map from each
+    // dimension to a SCALAR `AggFieldSpec` naming that same field (a synthesized breakdown is
+    // always one bucket key per dimension, never multi/composite — each dimension in
+    // `breakdownDimensions` is independent) lets `applyFieldPolicy` below resolve those buckets'
+    // field policy the exact same way it resolves a REAL aggregation's buckets, rather than
+    // silently skipping the scrub because `extractAggFields(body)` (which only ever reads a REAL
+    // `aggs` clause) has nothing to report for a tool — every one of these — that never sends one.
+    // NOTE: every current `breakdownDimensions` tool (the 8 finding-hits tools in
+    // catalog/common.ts) ALSO unconditionally attaches a real `aggs` clause
+    // (`FINDING_BREAKDOWN_AGGS`), so `extractAggFields(body)` always resolves first in practice and
+    // this fallback is not exercised today — kept as the documented, type-correct contract for any
+    // future tool that opts into `breakdownDimensions` without a matching real `aggs` clause. A
+    // bare `{dimension: dimension}` STRING identity map here does not satisfy
+    // `Record<string, AggFieldSpec | undefined>` and is a type error the moment this fallback is
+    // actually live.
+    const aggFields: Record<string, AggFieldSpec | undefined> | undefined =
+      extractAggFields(body) ??
+      (def.digest.breakdownDimensions
+        ? Object.fromEntries(
+            def.digest.breakdownDimensions.map(
+              (dimension): [string, AggFieldSpec] => [
+                dimension,
+                { kind: 'scalar', field: dimension },
+              ],
+            ),
+          )
+        : undefined);
     const finalDigest = finalizeDigest(
       digest,
       privacy,
       toolName,
-      extractAggFields(body),
+      aggFields,
       def.deriveColumns,
     );
     // "Open in Discover" support (common/types.ts's `TableSpec.discover` doc comment): only this

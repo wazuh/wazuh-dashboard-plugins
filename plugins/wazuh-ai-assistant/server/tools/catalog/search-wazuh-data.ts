@@ -16,7 +16,11 @@ import { objectSchema } from './common';
  *
  * `tableSpec.columns`/`digest.sampleColumns` are left empty and `deriveColumns: true` opts this
  * tool into digest.ts's per-response column derivation (see digest.ts) — there is no fixed schema
- * to declare statically for an arbitrary query.
+ * to declare statically for an arbitrary query. `validateFieldNames: true` opts this tool (and
+ * only this tool) into executor.ts's pre-execution field-existence check (field-validation.ts):
+ * unlike every typed catalog tool, the field paths here come straight from the model's own guess,
+ * so this is the one call site where a made-up field name (e.g. "agent.name.keyword") is actually
+ * reachable.
  */
 export const searchWazuhDataTool: ToolDefinition = {
   spec: {
@@ -100,4 +104,5 @@ export const searchWazuhDataTool: ToolDefinition = {
   tableSpec: { columns: [] },
   digest: { sampleColumns: [] },
   deriveColumns: true,
+  validateFieldNames: true,
 };

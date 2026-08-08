@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { getScaResultsTool } from './get-sca-results';
-import { lintDsl, checkIndexAllowlist } from '../guardrails';
+import { lintDsl, checkIndexAllowlist, MAX_AGG_SIZE } from '../guardrails';
 import { IndexerRequest } from '../types';
 
 function build(params: Record<string, unknown>): IndexerRequest {
@@ -55,14 +55,39 @@ function policiesTermsSize(request: IndexerRequest): unknown {
   return aggs.policies.terms.size;
 }
 
-test('get_sca_results: clamps limit to the [1, 500] range', () => {
-  assert.equal(policiesTermsSize(build({ agent_id: '001', limit: 9999 })), 500);
+test('get_sca_results: clamps limit to the guardrails aggregation cap, not a larger ceiling', () => {
+  // Was [1, 500] and that was the defect (issue #8894): this limit becomes the `policies` terms
+  // aggregation size, and guardrails.ts rejects any aggregation size above MAX_AGG_SIZE, so every
+  // call in the 101-500 range hard-failed instead of returning fewer policies. Asserted against the
+  // imported constant rather than a literal 100, so the two can never disagree again.
+  assert.equal(
+    policiesTermsSize(build({ agent_id: '001', limit: 9999 })),
+    MAX_AGG_SIZE,
+  );
   assert.equal(policiesTermsSize(build({ agent_id: '001', limit: 0 })), 1);
+});
+
+test('get_sca_results: advertises the cap it actually enforces', () => {
+  // The description promised "max 500" while the tool failed above 100, so a model following the
+  // schema was steered into the broken range. aggLimitProperty generates this from MAX_AGG_SIZE.
+  const description =
+    getScaResultsTool.spec.parameters.properties.limit.description ?? '';
+  assert.match(description, new RegExp(`max ${MAX_AGG_SIZE}\\b`));
+  assert.doesNotMatch(description, /max 500\b/);
 });
 
 test('get_sca_results: request passes checkIndexAllowlist and lintDsl', () => {
   const request = build({ agent_id: '001' });
   assert.equal(checkIndexAllowlist(request.index).ok, true);
+  const result = lintDsl(request.body, request.index);
+  assert.equal(result.ok, true, result.ok ? '' : result.reason);
+});
+
+test('get_sca_results: still passes lintDsl at its maximum advertised limit', () => {
+  // The pre-existing lint test above only ever built with the DEFAULT limit, which is why #8894
+  // shipped: the rejection only happened above 100. Exercising the advertised maximum is what makes
+  // this tool's own suite catch a regression, independently of the catalog-wide coverage test.
+  const request = build({ agent_id: '001', limit: 9999 });
   const result = lintDsl(request.body, request.index);
   assert.equal(result.ok, true, result.ok ? '' : result.reason);
 });
