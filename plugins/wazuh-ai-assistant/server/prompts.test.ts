@@ -39,17 +39,33 @@ test('buildSystemPrompt: instructs the model to never assert a remediation/compl
 });
 
 // #8913: deictic host references ("this box") produced no tool call -- the model asked the user
-// for an agent id/name instead of resolving it itself. Pins the three semantic parts of the new
-// guidance so a reword that drops any of them fails loudly: (1) call get_agents first on a bare
-// deictic reference, (2) proceed with the single ACTIVE agent and state that assumption, (3) list
-// candidates and ask when there is more than one.
+// for an agent id/name instead of resolving it itself. A live diagnostic (branch
+// diag/8913-router-logging) proved WHY the original single instruction below still failed 0/5 on
+// its own worked example ("What software does this box have installed?") even after the reword
+// pinned by these tests first shipped: stage-1 routing correctly offered get_agent_inventory every
+// time, but this instruction told the model to call get_agents first -- a tool the router does not
+// offer alongside a lone 'inventory' route, so the model could not obey it and fell back to asking
+// the user or improvising with search_wazuh_data instead. The fix splits this into two
+// instructions: get_agent_inventory (the only tool with server-side resolveParams resolution) gets
+// its own "call it directly, do not call get_agents" rule; every other agent-scoped tool keeps the
+// original "call get_agents first" rule unchanged, since none of them can resolve a deictic
+// reference on their own.
 
-test('buildSystemPrompt: instructs the model to call get_agents first on a bare deictic host reference', () => {
+test('buildSystemPrompt: instructs the model to call get_agent_inventory directly (not get_agents) for a deictic inventory question', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(prompt, /this box.*this host.*this machine.*this server.*this system/);
   assert.match(
     prompt,
-    /no agent has been named or numbered earlier in the\s+conversation, call get_agents first/,
+    /no agent named or numbered earlier in the\s+conversation, call get_agent_inventory directly WITHOUT agent_id or agent_name/,
+  );
+  assert.match(prompt, /do NOT\s+call get_agents first for this case/);
+});
+
+test('buildSystemPrompt: still instructs the model to call get_agents first for every OTHER agent-scoped tool on a bare deictic reference', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /with a tool BESIDES get_agent_inventory that needs an agent_id,\s+and no agent has been named or numbered earlier in the\s+conversation, call get_agents\s+first/,
   );
 });
 
@@ -57,7 +73,7 @@ test('buildSystemPrompt: instructs the model to proceed with a single active age
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
-    /If exactly one ACTIVE agent exists, proceed with it\s+and state that assumption in your answer/,
+    /If exactly one ACTIVE agent exists, proceed with it and state that assumption in\s+your answer/,
   );
 });
 
@@ -65,7 +81,7 @@ test('buildSystemPrompt: instructs the model to ask instead of guessing when sev
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
-    /If more than one active agent exists, do not\s+guess: briefly list the candidates \(id and name\) and ask the user which one they mean/,
+    /If more than one active agent exists, do not guess: briefly list the candidates \(id and\s+name\) and ask the user which one they mean/,
   );
 });
 

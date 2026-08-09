@@ -79,20 +79,38 @@ export function buildSystemPrompt(nowIso: string): string {
       'include those fields in the "_source" list or your result will not contain them.',
     'get_sca_checks needs a policy_id from get_sca_results first; use result="failed" for ' +
       '"which checks fail" questions.',
-    // #8913: a bare deictic reference to the host ("this box/host/machine/server/system") with
-    // no agent named earlier in the conversation left the model asking the user for an agent id
-    // instead of resolving it -- get_agent_inventory's own description already says to call
-    // get_agents first, but only once an agent id or name is otherwise known to be missing from
-    // the conversation, which a standalone "this box" does not obviously signal. State the
-    // resolution steps directly so the model always takes them: call get_agents first; if
-    // exactly one ACTIVE agent exists, proceed with it and say so; otherwise list the candidates
-    // and ask -- never guess among several.
-    'If the user refers to the host deictically ("this box", "this host", "this machine", ' +
-      '"this server", "this system") and no agent has been named or numbered earlier in the ' +
-      'conversation, call get_agents first. If exactly one ACTIVE agent exists, proceed with it ' +
-      'and state that assumption in your answer (e.g. "Assuming you mean agent 003 ' +
-      '(web-prod-01), the only active agent"). If more than one active agent exists, do not ' +
-      'guess: briefly list the candidates (id and name) and ask the user which one they mean.',
+    // #8913: a bare deictic reference to the host ("this box/host/machine/server/system") with no
+    // agent named earlier in the conversation left the model asking the user for an agent id
+    // instead of resolving it. get_agent_inventory now resolves this itself, server-side (its
+    // `resolveParams` hook, tools/catalog/get-agent-inventory.ts) whenever it is called with
+    // neither agent_id nor agent_name -- so for THAT tool the right instruction is "call it
+    // directly", not "look the agent up first". A live diagnostic run (branch
+    // diag/8913-router-logging, never shipped) proved stage-1 routing was never the problem --
+    // get_agent_inventory was offered in 5/5 runs of the issue's own worked example ("What
+    // software does this box have installed?") -- but THIS instruction's prior wording told the
+    // model to "call get_agents first", a DIFFERENT tool that the router only offers under the
+    // separate 'agents' category, which stage-1 has no reason to also pick for an inventory-only
+    // question. The model could not obey an instruction naming a tool it had not been given and
+    // fell back to asking the user or improvising with search_wazuh_data -- 0/5 calls to either
+    // get_agents or get_agent_inventory, on that exact worked example, with this exact
+    // (pre-fix) wording in place. No OTHER agent-scoped tool in the catalog has this server-side
+    // resolution (only get_agent_inventory implements `resolveParams`), so the get-agents-first
+    // instruction further below is still correct and UNCHANGED for every other tool.
+    'If the user asks about installed software/packages, OS details, open ports, running ' +
+      'processes, or hotfixes for the host deictically ("this box", "this host", "this ' +
+      'machine", "this server", "this system") with no agent named or numbered earlier in the ' +
+      'conversation, call get_agent_inventory directly WITHOUT agent_id or agent_name -- do NOT ' +
+      'call get_agents first for this case. It resolves to the only active agent automatically ' +
+      'and tells you which one it assumed; state that assumption in your answer. If it instead ' +
+      'reports more than one active agent, list the candidates it gives you and ask the user ' +
+      'which one they mean -- never guess among several.',
+    'For any OTHER deictic reference to the host ("this box"/"this host"/"this machine"/"this ' +
+      'server"/"this system") with a tool BESIDES get_agent_inventory that needs an agent_id, ' +
+      'and no agent has been named or numbered earlier in the conversation, call get_agents ' +
+      'first. If exactly one ACTIVE agent exists, proceed with it and state that assumption in ' +
+      'your answer (e.g. "Assuming you mean agent 003 (web-prod-01), the only active agent"). ' +
+      'If more than one active agent exists, do not guess: briefly list the candidates (id and ' +
+      'name) and ask the user which one they mean.',
     'Never guess rule ids: if you do not know the exact wazuh.rule.id for a kind of finding, use ' +
       'search_findings_by_rule_tag with a wazuh.rule.tags value, or aggregate by rule first with ' +
       'get_top_rules to discover ids. If a narrowly-filtered query returns 0 rows for activity ' +

@@ -99,6 +99,34 @@ test('get_agent_inventory: an unrecognized kind is rejected', () => {
   );
 });
 
+// --- issue #8913 (diagnostic follow-up): a live diagnostic run (branch diag/8913-router-logging)
+// proved stage-1 routing correctly offered this tool every time for a deictic inventory question,
+// but the tool's OWN description (and the system prompt) told the model to "call get_agents
+// first" -- a tool the router does not also offer for a lone 'inventory' route -- so the model
+// could not comply and never called this tool either. These assertions pin the reworded
+// description/params so a future edit cannot silently reintroduce that dead-end instruction. ---
+
+test('get_agent_inventory: description tells the model to call this tool directly for a deictic reference, not get_agents first', () => {
+  const { description } = getAgentInventoryTool.spec;
+  assert.match(
+    description,
+    /call THIS TOOL DIRECTLY with BOTH\s+omitted -- do not call get_agents first/,
+  );
+  assert.doesNotMatch(description, /call get_agents first to look/);
+});
+
+test('get_agent_inventory: agent_id/agent_name param descriptions document the deictic auto-resolution, not a hard requirement', () => {
+  const { agent_id: agentId, agent_name: agentName } =
+    getAgentInventoryTool.spec.parameters.properties as unknown as {
+      agent_id: { description?: string };
+      agent_name: { description?: string };
+    };
+  assert.match(agentId.description ?? '', /resolves to the only active agent automatically/);
+  assert.match(agentName.description ?? '', /resolves to the only active agent automatically/);
+  assert.doesNotMatch(agentId.description ?? '', /is required\.?$/);
+  assert.doesNotMatch(agentName.description ?? '', /^Either this or agent_id is required/);
+});
+
 test('get_agent_inventory: an invalid agent_id is rejected (delegates to validateAgentId)', () => {
   assert.throws(
     () =>

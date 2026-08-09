@@ -360,21 +360,28 @@ export const getAgentInventoryTool: ToolDefinition = {
       'ports), "processes" (running processes), or "hotfixes" (installed Windows hotfixes/KBs -- ' +
       'pairs with the vulnerability tools for patch-management questions, e.g. "which of these ' +
       'critical vulnerabilities already have a hotfix available"). Identify the agent by ' +
-      '"agent_id" (numeric) OR "agent_name" -- if the question refers to "this server"/"the ' +
-      'host" without naming or numbering it, and no agent id or name is otherwise known from the ' +
-      `conversation, call get_agents first to look one up. ${INVENTORY_CURRENT_STATE_NOTE}`,
+      '"agent_id" (numeric) OR "agent_name" if either is already known. If the question refers ' +
+      'to "this server"/"the host"/"this box" without naming or numbering it, and no agent id ' +
+      'or name is otherwise known from the conversation, call THIS TOOL DIRECTLY with BOTH ' +
+      'omitted -- do not call get_agents first. It resolves to the only active agent ' +
+      'automatically (stating that assumption is your job, from the note this call returns), or ' +
+      `reports the active-agent candidates for you to ask about if there is more than one. ${INVENTORY_CURRENT_STATE_NOTE}`,
     parameters: objectSchema(
       {
         agent_id: {
           type: 'string',
           description:
-            'Numeric Wazuh agent ID, e.g. "003". Either this or agent_name is required.',
+            'Numeric Wazuh agent ID, e.g. "003". Optional: omit this AND agent_name for a ' +
+            'deictic host reference ("this box"/"this server") with no known id or name -- the ' +
+            'call resolves to the only active agent automatically.',
         },
         agent_name: {
           type: 'string',
           description:
-            'Agent name, e.g. "web-prod-01" -- use this when the id is not known. Either this ' +
-            'or agent_id is required; if both are given, agent_id wins.',
+            'Agent name, e.g. "web-prod-01" -- use this when the id is not known but the name ' +
+            'is. Optional: omit this AND agent_id for a deictic host reference with neither ' +
+            'known -- the call resolves to the only active agent automatically. If both are ' +
+            'given, agent_id wins.',
         },
         kind: {
           type: 'string',
