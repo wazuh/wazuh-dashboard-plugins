@@ -193,6 +193,17 @@ const mapToDataGridColumn = (
   } as tDataGridColumn;
 };
 
+// The module column definitions only declare the `id` of the field. The columns
+// built from the index pattern fields always carry a `name`, which is the label
+// the Available fields selector displays and searches on. Derive it from the
+// `id` so the shape is the same whatever the index pattern fields availability.
+const withDerivedName = (column: tDataGridColumn): tDataGridColumn => {
+  return {
+    name: column.id,
+    ...column,
+  } as tDataGridColumn;
+};
+
 export const parseColumns = (
   fields: IFieldType[],
   defaultColumns: tDataGridColumn[] = [],
@@ -204,7 +215,9 @@ export const parseColumns = (
 ): tDataGridColumn[] => {
   // remove _source field becuase is a object field and is not supported
   // merge the properties of the field with the default columns
-  if (!fields?.length) return defaultColumns;
+  if (!fields?.length) {
+    return defaultColumns.map(column => withDerivedName(column));
+  }
 
   return fields
     .filter(field => field.name !== '_source')
