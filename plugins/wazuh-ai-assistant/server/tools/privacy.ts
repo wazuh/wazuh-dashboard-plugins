@@ -112,12 +112,13 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'vulnerability.score.base', action: 'allow' },
   { field: 'package.architecture', action: 'allow' },
   // get_agent_inventory (issue: "Consolidate agent inventory into one tool") reads
-  // wazuh-states-inventory-* via `deriveColumns: true`, which flips applyFieldPolicy's
+  // wazuh-states-inventory-* and sets `failClosedFieldPolicy: true` (issue #8917 -- see
+  // `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts), which flips applyFieldPolicy's
   // unlisted-field default from allow-by-omission to fail-closed anonymize (the same "any finding
   // field" protection search_wazuh_data's escape hatch needed -- see this file's header doc
   // comment on `isEscapeHatch`). The four deleted single-purpose tools it replaced never needed
-  // explicit entries for these because they were NOT deriveColumns tools, so allow-by-omission
-  // covered them silently; folding them into a deriveColumns tool means every field that should
+  // explicit entries for these because they had no such flag, so allow-by-omission
+  // covered them silently; folding them into this tool means every field that should
   // stay readable now needs its own explicit 'allow' entry below, or it silently starts arriving
   // at the provider as a VAL_n pseudonym -- making "what packages are installed on X" answer in
   // meaningless pseudonyms under privacy mode. Each entry below is software/config IDENTITY, not a
@@ -764,17 +765,19 @@ export function extractAggFields(
  *   privacy-on-but-message-absent both stay byte-identical to before this existed.
  *
  * `isEscapeHatch`: typed catalog tools only ever expose the ~10 fields curated in
- * `FIELD_POLICY_DEFAULTS`, so "unlisted = allow" was a safe default — but the search_wazuh_data
- * escape hatch's `deriveColumns` can pick ANY finding field into `samples`/`breakdown` (data.win.*,
+ * `FIELD_POLICY_DEFAULTS`, so "unlisted = allow" was a safe default — but search_wazuh_data's
+ * arbitrary DSL can pick ANY finding field into `samples`/`breakdown` (data.win.*,
  * data.office365.*, data.aws.*, syscheck.path, ...), and every one of those was passing through
  * untouched under privacy mode, defeating the guarantee for the one tool built to reach arbitrary
- * fields. When the caller sets `isEscapeHatch: true` (deriveColumns tools only — threaded from
- * `ToolDefinition.deriveColumns` at the executor.ts call site), an UNLISTED string field's default
- * flips from allow to anonymize (kind inferred from the field name, same as an explicit 'anonymize'
- * entry with no `kind`) — fail-closed: pseudonymize anything not explicitly allow-listed. A field
- * explicitly present in the policy (any action, including 'allow') is unaffected either way — this
- * only changes the *default for an absent entry*. Typed tools (the default, `isEscapeHatch` false
- * or omitted) keep today's allow-by-omission behavior exactly.
+ * fields. When the caller sets `isEscapeHatch: true` (threaded from
+ * `ToolDefinition.failClosedFieldPolicy` at the executor.ts call site — issue #8917; NOT the same
+ * as `deriveColumns`, which only controls how columns are computed and is set on tools of very
+ * different risk profiles, see that flag's own doc comment in types.ts), an UNLISTED string
+ * field's default flips from allow to anonymize (kind inferred from the field name, same as an
+ * explicit 'anonymize' entry with no `kind`) — fail-closed: pseudonymize anything not explicitly
+ * allow-listed. A field explicitly present in the policy (any action, including 'allow') is
+ * unaffected either way — this only changes the *default for an absent entry*. Typed tools (the
+ * default, `isEscapeHatch` false or omitted) keep today's allow-by-omission behavior exactly.
  */
 export function applyFieldPolicy(
   digest: Digest,

@@ -221,3 +221,11 @@ test('get_agent_inventory: deriveColumns is set (no static tableSpec/digest for 
   assert.deepEqual(getAgentInventoryTool.tableSpec.columns, []);
   assert.deepEqual(getAgentInventoryTool.digest.sampleColumns, []);
 });
+
+// Issue #8917: `failClosedFieldPolicy` must be set explicitly and independently of
+// `deriveColumns` -- see that flag's doc comment in types.ts. This tool needs `deriveColumns` for
+// column derivation across its 5 kinds, and separately opts into fail-closed field policy because
+// every field any kind can surface still needs its own explicit FIELD_POLICY_DEFAULTS entry.
+test('get_agent_inventory: failClosedFieldPolicy is explicitly true, independent of deriveColumns', () => {
+  assert.equal(getAgentInventoryTool.failClosedFieldPolicy, true);
+});
