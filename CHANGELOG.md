@@ -133,6 +133,7 @@
 | [#8708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8708)   | Fixed Home KPI's visualization persistent filters                                                                                                                                             |
 | [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766) | Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration                                                              |
 | [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775) | Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters                                                                                                                |
+| [#8916](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8916) | Fixed the AI Assistant's privacy mode corrupting values (e.g. package versions) by substring-replacing a pseudonymized word wherever it appeared, instead of only at whole-token boundaries   |
 
 ### Removed
 

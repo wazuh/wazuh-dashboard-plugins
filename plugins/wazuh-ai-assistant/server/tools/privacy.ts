@@ -265,6 +265,14 @@ function deepMapStrings(
   return value;
 }
 
+/** Escapes every regex metacharacter in `value` so it can be embedded literally inside a
+ * dynamically-built `RegExp` — needed by `Pseudonymizer.applyToText` below, which (unlike a plain
+ * `split`/`join`) must express a word-boundary condition, and a raw attacker/data-controlled value
+ * cannot be interpolated into a regex source without first escaping it. */
+function escapeRegExpLiteral(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 /**
  * Per-request pseudonymizer (a stateless, conversation-scoped map): the map itself is
  * client-held across turns (the chat request body's `privacy.map`, common/types.ts's
@@ -335,11 +343,31 @@ export class Pseudonymizer {
     return this.minted.slice();
   }
 
-  /** Replaces every known REAL value with its pseudonym, longest-value-first so a shorter value
+  /**
+   * Replaces every known REAL value with its pseudonym, longest-value-first so a shorter value
    * that happens to be a substring of a longer one (e.g. "10.0.0.1" inside "10.0.0.10") is never
-   * substituted first and left corrupting the longer value. Uses plain `split`/`join` rather than
-   * a regex built from the (unescaped, attacker/data-controlled) value — sidesteps regex-escaping
-   * entirely instead of trying to get it right. */
+   * substituted first and left corrupting the longer value.
+   *
+   * #8916: a value is only ever replaced as a WHOLE token, never as a substring embedded inside a
+   * larger alphanumeric run — observed live: the word "ubuntu" (pseudonymized to "VAL_2" from an
+   * earlier `host.os.platform` value) turned the unrelated package version "7.81.0-1ubuntu1.14"
+   * into "7.81.0-1VAL_21.14". A "boundary" here is any NON-ALPHANUMERIC character (or start/end of
+   * string) — deliberately NOT the conventional regex `\b` (which treats "_" as a word character):
+   * real identifiers routinely embed "-"/"_" as separators (e.g. "mysql-server-DBPRIMARY03"), and
+   * requiring only an actual alphanumeric neighbor to disqualify a match means a "-"/"_"-glued
+   * compound identifier still matches as a whole token, exactly like a space- or
+   * punctuation-delimited one. Embedded IP/FQDN values minted by `prescanAndMint`'s shape scan are
+   * unaffected by this tightening: they were already matched (and therefore already delimited) as
+   * whole tokens by their own `\b`-anchored regexes before ever reaching this map, so they still
+   * satisfy this boundary check here — this only ever REJECTS matches the previous plain
+   * `split`/`join` wrongly accepted, never one it correctly accepted.
+   *
+   * This now needs a real `RegExp` (to express the boundary condition) instead of the previous
+   * plain `split`/`join` — every value is escaped first via `escapeRegExpLiteral` since values
+   * here are attacker/data-controlled text, never safe to interpolate into a regex source
+   * unescaped. An empty value is skipped outright: an empty pattern's zero-width match would
+   * otherwise insert a pseudonym at every non-alphanumeric-adjacent position in the text.
+   */
   applyToText(text: string): string {
     if (!text || this.valueToPseudonym.size === 0) {
       return text;
@@ -349,10 +377,14 @@ export class Pseudonymizer {
     );
     let out = text;
     for (const value of values) {
-      if (!out.includes(value)) {
+      if (!value || !out.includes(value)) {
         continue;
       }
-      out = out.split(value).join(this.valueToPseudonym.get(value) as string);
+      const pattern = new RegExp(
+        `(?<![A-Za-z0-9])${escapeRegExpLiteral(value)}(?![A-Za-z0-9])`,
+        'g',
+      );
+      out = out.replace(pattern, this.valueToPseudonym.get(value) as string);
     }
     return out;
   }
