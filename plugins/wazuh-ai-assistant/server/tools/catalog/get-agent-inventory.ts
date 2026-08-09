@@ -147,10 +147,19 @@ function parseKind(value: unknown): InventoryKind {
 
 /** Shared by `resolveAgentFilter`'s own throw (a direct `buildRequest` call with neither
  * identifier, e.g. from a unit test) and `resolveDeicticAgentParams`'s failure paths below (issue
- * #8913) so the two can never drift into different wording for the same underlying situation. */
+ * #8913) so the two can never drift into different wording for the same underlying situation.
+ *
+ * Deliberately does NOT name `get_agents` (follow-up audit fix, same class of bug this whole
+ * file exists to fix): `resolveDeicticAgentParams`'s zero-active-agents and lookup-failure
+ * branches return exactly this text as a LIVE tool_result error, at a point where get_agent_inventory
+ * has already been called -- which only happens when stage-1 routing offered the 'inventory'
+ * category. Nothing guarantees 'agents' (the category get_agents lives in) was ALSO routed that
+ * turn, so telling the model to "call get_agents" here can name a tool it does not have, same
+ * failure mode as the tool description/system prompt text this file was reworded to fix. Asking
+ * the user is always a safe next step regardless of which tools this turn happens to have. */
 const NO_AGENT_IDENTIFIER_ERROR =
   'Either "agent_id" (numeric Wazuh agent ID, e.g. "003") or "agent_name" (the agent\'s name) ' +
-  'is required. If neither is known, call get_agents first to look it up.';
+  'is required and could not be resolved automatically. Ask the user which agent/host they mean.';
 
 /**
  * Resolves the agent-identifying filter clause from `agent_id`/`agent_name` (issue #8873: a live
@@ -209,13 +218,17 @@ interface ManagerAgentSummary {
 
 /**
  * `ToolDefinition.resolveParams` hook (issue #8913): resolves a deictic agent reference ("this
- * server", "the host") server-side instead of relying on the model to comply with the system
- * prompt's instruction to call `get_agents` first. That instruction is real and still correct
- * guidance (kept, unchanged) -- but a live-verified N=5 run of the issue's own worked example
- * ("What software does this box have installed?") found the model followed it 0/5 times (4/5
- * asked the user to name an agent instead of looking one up; 1/5 called `search_wazuh_data` and
- * found nothing). Prompt compliance alone cannot be guaranteed, so this makes correctness
- * independent of it.
+ * server", "the host") server-side instead of relying on the model to call `get_agents` first --
+ * the system prompt used to instruct exactly that, but a live-verified N=5 run of the issue's own
+ * worked example ("What software does this box have installed?") found the model followed it 0/5
+ * times (4/5 asked the user to name an agent instead of looking one up; 1/5 called
+ * `search_wazuh_data` and found nothing) -- a live diagnostic later traced this to `get_agents`
+ * (its own 'agents' category) not even being offered alongside a lone 'inventory' route, so the
+ * model could not have obeyed that instruction regardless of compliance. The system prompt's
+ * get_agent_inventory-specific instruction (prompts.ts) was rewritten accordingly to say "call
+ * this tool directly" instead of "call get_agents first". This hook is what makes that reworded
+ * instruction actually correct rather than just differently wrong: prompt compliance alone can
+ * never be guaranteed, so resolution happens here, server-side, independent of it.
  *
  * Only runs when NEITHER `agent_id` NOR `agent_name` was supplied -- a call that supplies either
  * returns `params` unchanged (`ok: true`, no note), so `resolveAgentFilter`'s existing validation
@@ -294,7 +307,7 @@ async function resolveDeicticAgentParams(
       ok: false,
       reason:
         `${NO_AGENT_IDENTIFIER_ERROR} (No active agent was found to assume by default -- the ` +
-        'intended agent may be pending/disconnected/never_connected; call get_agents to find it.)',
+        'intended agent may be pending/disconnected/never_connected.)',
     };
   }
 

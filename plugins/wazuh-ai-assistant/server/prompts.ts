@@ -95,7 +95,15 @@ export function buildSystemPrompt(nowIso: string): string {
     // get_agents or get_agent_inventory, on that exact worked example, with this exact
     // (pre-fix) wording in place. No OTHER agent-scoped tool in the catalog has this server-side
     // resolution (only get_agent_inventory implements `resolveParams`), so the get-agents-first
-    // instruction further below is still correct and UNCHANGED for every other tool.
+    // instruction further below is still needed for every other tool -- BUT (follow-up audit,
+    // never independently reproduced live, caught by inspection before it repeated the same
+    // mistake) it must not repeat the exact bug this whole fix exists for: telling the model to
+    // call a tool the router may not have offered THIS turn. get_agents is its own 'agents'
+    // category; a question that deictically names the host for some OTHER agent-scoped tool
+    // (e.g. "what vulnerabilities does this box have") plausibly routes to that tool's own
+    // category alone (e.g. 'vulnerabilities'), not 'agents' -- so "call get_agents first" can be
+    // just as unreachable here as it was for get_agent_inventory. Made conditional on the tool
+    // actually being available this turn instead of unconditional.
     'If the user asks about installed software/packages, OS details, open ports, running ' +
       'processes, or hotfixes for the host deictically ("this box", "this host", "this ' +
       'machine", "this server", "this system") with no agent named or numbered earlier in the ' +
@@ -106,11 +114,13 @@ export function buildSystemPrompt(nowIso: string): string {
       'which one they mean -- never guess among several.',
     'For any OTHER deictic reference to the host ("this box"/"this host"/"this machine"/"this ' +
       'server"/"this system") with a tool BESIDES get_agent_inventory that needs an agent_id, ' +
-      'and no agent has been named or numbered earlier in the conversation, call get_agents ' +
-      'first. If exactly one ACTIVE agent exists, proceed with it and state that assumption in ' +
-      'your answer (e.g. "Assuming you mean agent 003 (web-prod-01), the only active agent"). ' +
-      'If more than one active agent exists, do not guess: briefly list the candidates (id and ' +
-      'name) and ask the user which one they mean.',
+      'and no agent has been named or numbered earlier in the conversation: if get_agents is ' +
+      'among the tools available to you this turn, call it first. If exactly one ACTIVE agent ' +
+      'exists, proceed with it and state that assumption in your answer (e.g. "Assuming you ' +
+      'mean agent 003 (web-prod-01), the only active agent"). If more than one active agent ' +
+      'exists, do not guess: briefly list the candidates (id and name) and ask the user which ' +
+      'one they mean. If get_agents is NOT among the tools available to you this turn, do not ' +
+      'try to call it -- ask the user which agent they mean instead.',
     'Never guess rule ids: if you do not know the exact wazuh.rule.id for a kind of finding, use ' +
       'search_findings_by_rule_tag with a wazuh.rule.tags value, or aggregate by rule first with ' +
       'get_top_rules to discover ids. If a narrowly-filtered query returns 0 rows for activity ' +

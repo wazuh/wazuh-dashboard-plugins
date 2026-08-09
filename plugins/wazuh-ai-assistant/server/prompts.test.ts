@@ -47,9 +47,13 @@ test('buildSystemPrompt: instructs the model to never assert a remediation/compl
 // offer alongside a lone 'inventory' route, so the model could not obey it and fell back to asking
 // the user or improvising with search_wazuh_data instead. The fix splits this into two
 // instructions: get_agent_inventory (the only tool with server-side resolveParams resolution) gets
-// its own "call it directly, do not call get_agents" rule; every other agent-scoped tool keeps the
-// original "call get_agents first" rule unchanged, since none of them can resolve a deictic
-// reference on their own.
+// its own "call it directly, do not call get_agents" rule; every other agent-scoped tool keeps a
+// get-agents-first rule, since none of them can resolve a deictic reference on their own -- BUT
+// (follow-up audit fix, same bug class, caught before it was independently reproduced live) that
+// rule is now CONDITIONAL on get_agents actually being offered this turn, not unconditional: a
+// question like "what vulnerabilities does this box have" can just as plausibly route to
+// 'vulnerabilities' alone as an inventory question routes to 'inventory' alone, leaving get_agents
+// unavailable there too.
 
 test('buildSystemPrompt: instructs the model to call get_agent_inventory directly (not get_agents) for a deictic inventory question', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
@@ -61,11 +65,19 @@ test('buildSystemPrompt: instructs the model to call get_agent_inventory directl
   assert.match(prompt, /do NOT\s+call get_agents first for this case/);
 });
 
-test('buildSystemPrompt: still instructs the model to call get_agents first for every OTHER agent-scoped tool on a bare deictic reference', () => {
+test('buildSystemPrompt: instructs the model to call get_agents first for every OTHER agent-scoped tool ONLY when it is actually offered this turn', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
   assert.match(
     prompt,
-    /with a tool BESIDES get_agent_inventory that needs an agent_id,\s+and no agent has been named or numbered earlier in the\s+conversation, call get_agents\s+first/,
+    /with a tool BESIDES get_agent_inventory that needs an agent_id,\s+and no agent has been named or numbered earlier in the\s+conversation: if\s+get_agents is\s+among the tools available to you this turn, call it first/,
+  );
+});
+
+test('buildSystemPrompt: instructs the model to ask the user instead of calling get_agents when it is NOT offered this turn', () => {
+  const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+  assert.match(
+    prompt,
+    /If get_agents is NOT among the tools available to you this turn, do not\s+try to call it -- ask the user which agent they mean instead/,
   );
 });
 

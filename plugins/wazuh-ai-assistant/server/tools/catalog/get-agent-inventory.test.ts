@@ -337,6 +337,13 @@ test('get_agent_inventory resolveParams: no identifier + zero active agents retu
   }
   assert.match(result.reason, /agent_id.*agent_name|agent_name.*agent_id/);
   assert.match(result.reason, /no active agent/i);
+  // Follow-up audit fix (same bug class as #8913's main fix): this LIVE tool_result error must
+  // never tell the model to call get_agents -- stage-1 routing offered get_agent_inventory (its
+  // own 'inventory' category) for this call to have happened at all, but nothing guarantees
+  // 'agents' was ALSO routed this turn, so naming that tool here can be just as unreachable as it
+  // was in the description/system-prompt text this whole fix started from.
+  assert.doesNotMatch(result.reason, /get_agents/);
+  assert.match(result.reason, /ask the user/i);
 });
 
 test('get_agent_inventory resolveParams: no identifier + multiple active agents errors and lists candidates', async () => {
@@ -380,6 +387,8 @@ test('get_agent_inventory resolveParams: a lookup failure (Manager API unreachab
     return;
   }
   assert.match(result.reason, /agent_id.*agent_name|agent_name.*agent_id/);
+  // Same follow-up audit fix as the zero-active-agents case above.
+  assert.doesNotMatch(result.reason, /get_agents/);
 });
 
 test('get_agent_inventory resolveParams: agent_id supplied is returned unchanged, no lookup, no note (regression)', async () => {
