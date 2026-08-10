@@ -306,8 +306,15 @@ test('no tool in the WHOLE registry declares a time-like parameter under any oth
   // time_range_gte/lte pair): any schema property whose name looks like a time control must BE
   // that pair. Registry-wide, manager tools included -- a future manager-target tool with a time
   // axis must not dodge the sweep by target.
+  // SEGMENT-anchored, not a bare substring search: a bare alternation matches
+  // `get_agent_inventory`'s `filter` parameter (added by #8910), because "filter" CONTAINS "lte"
+  // (fi-lte-r). A package/port/process filter is not a time control, and a coverage test that cries
+  // wolf on an unrelated parameter gets exempted into uselessness. Anchoring each alternative to a
+  // name-segment boundary keeps every real offender (`since`, `lookback`, `start_time`, `days_back`,
+  // `time_from`) while dropping the accidental substring hits. Found when this branch was merged with
+  // the eleven open AI-Assistant branches, where that parameter exists.
   const TIME_LIKE_PARAM_RE =
-    /(gte|lte|since|before|after|window|lookback|days|hours|minutes|_from|_to|time)/i;
+    /(^|_)(gte|lte|since|before|after|window|lookback|days|hours|minutes|from|to|time)(_|$)/i;
   const offenders: string[] = [];
   for (const def of listToolDefinitions()) {
     for (const name of Object.keys(def.spec.parameters.properties)) {
