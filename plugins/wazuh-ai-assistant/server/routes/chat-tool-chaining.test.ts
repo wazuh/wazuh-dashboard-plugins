@@ -9,6 +9,7 @@ import {
   MAX_TOOL_ROUNDS,
   FINAL_ROUND_ANSWER_INSTRUCTION,
   orchestrate,
+  shouldConsiderDeferredOffer,
 } from './chat';
 import { ROUTE_QUESTION_TOOL } from '../tools/router';
 import { SUGGEST_DISCOVER_QUERY_TOOL } from '../tools/suggest-discover-query';
@@ -34,12 +35,12 @@ import { ChatStreamOptions, ProviderAdapter } from '../providers/types';
  * each call's `options` (that file's harness discards them -- the whole point here is asserting
  * `options.toolChoice` on the FORCED round).
  *
- * NOTE (needs the OSD tree to actually run): imports `./chat`, which imports
- * `@osd/config-schema` -- unresolvable outside the full wazuh-dashboard checkout this repo is
- * normally built against. Same colocated-unit-test convention as every other chat-*.test.ts file
- * in this directory; needs the platform runner (or CI) to execute. This was traced by hand against
- * the implementation (see the PR/handoff notes) but NOT executed, per the environment's
- * constraints -- stated explicitly rather than claimed as passing.
+ * NOTE (running outside the OSD tree): imports `./chat`, which imports `@osd/config-schema` --
+ * unresolvable outside the full wazuh-dashboard checkout this repo is normally built against.
+ * Same colocated-unit-test convention as every other chat-*.test.ts file in this directory; CI
+ * runs it under the platform runner. The #8935 integration pass ALSO executed this whole file
+ * standalone (tsc-compiled, plain Node, `@osd/config-schema` stubbed -- route registration is
+ * never invoked by these tests, so the stub is inert) against the real `orchestrate`: 27/27.
  */
 
 // --- scriptedAdapter, extended to capture `options` -------------------------------------------
@@ -371,14 +372,95 @@ test('findOfferedFollowUpTool: two candidates named -> undefined (capability lis
   );
 });
 
-test('findOfferedFollowUpTool: an already-executed tool is excluded even if named alone', () => {
+test('findOfferedFollowUpTool: an already-executed tool is excluded even from an offer-shaped sentence', () => {
   assert.equal(
     findOfferedFollowUpTool(
-      'That used get_sca_results.',
+      'I can run get_sca_results again — want me to?',
       SCA_TOOLS,
       new Set(['get_sca_results']),
     ),
     undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: a NON-offer sentence never matches, even naming one unexecuted tool', () => {
+  // The sentence-level offer gate (integration review): a dismissive/negative mention must not
+  // read as an offer. No OFFER_MARKER_RE marker anywhere in this text.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'get_sca_checks would not answer a hardening question, so this summary covers only SCA.',
+      SCA_TOOLS,
+      new Set(),
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: marker and name in DIFFERENT sentences do not combine into an offer', () => {
+  assert.equal(
+    findOfferedFollowUpTool(
+      'I can dig further if you want. get_sca_checks was not appropriate here.',
+      SCA_TOOLS,
+      new Set(),
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: search_wazuh_data (the escape hatch) is never returned, even offered alone', () => {
+  // prompts.ts orders the model to offer this exact tool in prose -- see FORCE_EXEMPT_TOOL_NAMES.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'I can query the source IPs with search_wazuh_data — want me to?',
+      SCA_TOOLS,
+      new Set(),
+    ),
+    undefined,
+  );
+});
+
+test('findOfferedFollowUpTool: a listing where one option is exempt is STILL a listing (mention count precedes exclusions)', () => {
+  // If exclusions ran before the exactly-one count, "get_sca_checks or search_wazuh_data" would
+  // collapse to one candidate and be force-called -- integration review of the gate ordering.
+  assert.equal(
+    findOfferedFollowUpTool(
+      'I can also run get_sca_checks or search_wazuh_data if that would help — want me to?',
+      SCA_TOOLS,
+      new Set(),
+    ),
+    undefined,
+  );
+});
+
+test('shouldConsiderDeferredOffer: pins every gate, including the once-per-turn spent flag', () => {
+  const base = {
+    isFinalRound: false,
+    round: 1,
+    maxRounds: 3,
+    toolUsedThisTurn: true,
+    forcedFollowUpSpent: false,
+  };
+  assert.equal(shouldConsiderDeferredOffer(base), true);
+  // The spent flag: unreachable-as-true under MAX_TOOL_ROUNDS=3 (only round 1 can intercept), so
+  // this pure-function pin is the ONLY executable witness of its bound -- see the state doc
+  // comment in chat.ts's orchestrate.
+  assert.equal(
+    shouldConsiderDeferredOffer({ ...base, forcedFollowUpSpent: true }),
+    false,
+  );
+  assert.equal(
+    shouldConsiderDeferredOffer({ ...base, toolUsedThisTurn: false }),
+    false,
+  );
+  assert.equal(shouldConsiderDeferredOffer({ ...base, round: 2 }), false);
+  assert.equal(
+    shouldConsiderDeferredOffer({ ...base, isFinalRound: true }),
+    false,
+  );
+  // A raised round budget re-opens later rounds -- the flag becomes load-bearing exactly then.
+  assert.equal(
+    shouldConsiderDeferredOffer({ ...base, round: 2, maxRounds: 4 }),
+    true,
   );
 });
 
@@ -407,15 +489,16 @@ test('findOfferedFollowUpTool: no name mentioned at all -> undefined', () => {
 // --- registry-wide coverage: nothing exempt by default (same standard as
 // agg-size-coverage.test.ts / field-policy-coverage.test.ts) ------------------------------------
 
-test('registry-wide coverage: EVERY catalog tool is detected when offered, named alone, and unexecuted', () => {
+test('registry-wide coverage: EVERY catalog tool is detected when offered, named alone, and unexecuted — except the recorded exemption', () => {
   // Class-level guard for issue #8935 item I3: the detector must work identically for every
   // registered tool, not just the SCA pair the measured failure happened to name. Driven from the
   // REAL `listToolSpecs()` (not a hand-picked list) so a future catalog tool is covered
-  // automatically -- nothing is exempt by default. A tool whose name breaks the `\bname\b` regex
-  // construction (e.g. a future name containing a regex metacharacter, which would violate the
-  // documented `[a-z_]+` tool-name shape), or a detector that silently degraded to a hardcoded
-  // per-tool allowlist instead of scanning the full offered list, fails this loop instead of
-  // shipping unnoticed.
+  // automatically -- the ONLY exemption is search_wazuh_data (FORCE_EXEMPT_TOOL_NAMES: prompts.ts
+  // orders the model to offer it in prose, and it is the strictest-guardrail surface), asserted
+  // here EXPLICITLY so the exemption list cannot silently grow. A tool whose name breaks the
+  // `\bname\b` regex construction, or a detector that silently degraded to a hardcoded per-tool
+  // allowlist instead of scanning the full offered list, fails this loop instead of shipping
+  // unnoticed.
   const allTools = listToolSpecs();
   const offered = [...allTools, SUGGEST_DISCOVER_QUERY_TOOL];
   const failures: string[] = [];
@@ -425,30 +508,54 @@ test('registry-wide coverage: EVERY catalog tool is detected when offered, named
       offered,
       new Set(),
     );
-    if (result !== spec.name) {
-      failures.push(`${spec.name}: got ${JSON.stringify(result)}`);
+    const expected = spec.name === 'search_wazuh_data' ? undefined : spec.name;
+    if (result !== expected) {
+      failures.push(
+        `${spec.name}: got ${JSON.stringify(result)}, expected ${JSON.stringify(
+          expected,
+        )}`,
+      );
     }
   }
   assert.deepEqual(
     failures,
     [],
-    `tool(s) not detected as the sole offered candidate when named alone: ${failures.join(
-      ', ',
-    )}`,
+    `tool(s) with the wrong offer-detection outcome: ${failures.join(', ')}`,
+  );
+});
+
+test('registry-wide coverage: every tool name is the documented [a-z_]+ shape the detector depends on', () => {
+  // The detector's privacy- and regex-safety argument (see findOfferedFollowUpTool's doc comment)
+  // leans on tool names being a closed [a-z_]+ vocabulary; before this test no invariant enforced
+  // that anywhere (integration review). A future dotted/uppercase/metacharacter name would break
+  // the \b word-boundary construction silently -- it breaks here loudly instead.
+  const names = [...listToolSpecs(), SUGGEST_DISCOVER_QUERY_TOOL].map(
+    spec => spec.name,
+  );
+  for (const name of names) {
+    assert.match(name, /^[a-z_]+$/);
+  }
+  // And the recorded force-exemption still names a REAL registry tool -- a rename would otherwise
+  // void the exemption without failing anything.
+  assert.ok(
+    names.includes('search_wazuh_data'),
+    'FORCE_EXEMPT_TOOL_NAMES names a tool that no longer exists in the registry',
   );
 });
 
 test('registry-wide coverage: no catalog tool is ever returned when it is the ONLY thing already executed this turn', () => {
-  // The mirror image of the sweep above: every tool, when it is the ONLY name in the text but was
-  // ALSO the only tool executed this turn, must be excluded -- "the model is summarizing its own
-  // work", never "deferring a new call to itself". Guards the `executedToolNames` exclusion against
-  // a future tool silently bypassing it (e.g. a name comparison that stopped being exact-match).
+  // The mirror image of the detection sweep above: every tool, when offered alone but ALSO the
+  // only tool successfully executed this turn, must be excluded -- "the model is summarizing its
+  // own work", never "deferring a new call to itself". Guards the `executedToolNames` exclusion
+  // against a future tool silently bypassing it (e.g. a name comparison that stopped being
+  // exact-match). Offer-shaped text on purpose: with a non-offer sentence the marker gate would
+  // short-circuit first and this sweep would prove nothing about the exclusion.
   const allTools = listToolSpecs();
   const offered = [...allTools, SUGGEST_DISCOVER_QUERY_TOOL];
   const failures: string[] = [];
   for (const spec of allTools) {
     const result = findOfferedFollowUpTool(
-      `That already ran ${spec.name} earlier this turn.`,
+      `I can run ${spec.name} again — want me to?`,
       offered,
       new Set([spec.name]),
     );
@@ -562,20 +669,165 @@ test('orchestrate: an unprompted single-tool offer with rounds remaining is forc
     forcedRoundMessages[forcedRoundMessages.length - 1].content,
     FINAL_ROUND_ANSWER_INSTRUCTION,
   );
+
+  // The offer text the user already read is IN the forced round's and the final round's history
+  // (integration review: without it, the forced call and the final answer are authored blind of
+  // the summary-plus-offer on screen, and the turn ships two independently-authored summaries).
+  const offerText =
+    'CIS Ubuntu: 95 passed, 102 failed, 10 N/A. I can run get_sca_checks to list the ' +
+    'failing checks — want me to?';
+  const hasOfferMessage = (history: ChatMessage[]): boolean =>
+    history.some(
+      message => message.role === 'assistant' && message.content === offerText,
+    );
+  assert.ok(
+    hasOfferMessage(callMessages[3]),
+    "the forced round's history must carry the already-streamed offer text",
+  );
+  assert.ok(
+    hasOfferMessage(callMessages[4]),
+    "the final round's history must carry the already-streamed offer text",
+  );
+  assert.ok(
+    !hasOfferMessage(callMessages[2]),
+    'the offer round itself is authored before its own text exists',
+  );
 });
 
-// --- orchestrate: negative / regression fences --------------------------------------------------
-// Each of these passes BOTH on base and after this change -- they exist to prove the mechanism
-// does not over-fire, not to reproduce the measured defect.
+test('orchestrate: an offer to RETRY a rejected tool IS forced (a failed call must not immunize the tool)', async () => {
+  // FAILS ON BASE and against this item's first cut: executedToolNames was populated on the
+  // ATTEMPT, so one rejected call permanently immunized the tool and the reported failure shape
+  // ("that call needs a policy_id -- I can retry, want me to?") terminated on the offer.
+  const { events, callMessages, callOptions } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      // round 0: get_sca_results with NO arguments -- rejected by argument validation before any
+      // cluster access (rejectingContext's sentinel would throw otherwise).
+      REJECTED_SCA_RESULTS_ROUND,
+      // round 1: the retry offer, naming the tool whose call was just rejected.
+      offerScript(
+        'That call needs an agent_id. I can retry get_sca_results with it — want me to?',
+      ),
+      // round 2 (forced): complies -- and is rejected again (still no cluster access needed).
+      REJECTED_SCA_RESULTS_ROUND,
+      // round 3: final (no-tools) round closes out.
+      textOnlyScript('I could not retrieve the SCA summary for that agent.'),
+    ],
+    rejectingContext(),
+  );
 
-test('orchestrate: naming an ALREADY-EXECUTED tool alone does not force a chained call', async () => {
+  assert.equal(
+    callMessages.length,
+    5,
+    'the retry offer must be forced into a real retry round',
+  );
+  assert.deepEqual(callOptions[3]?.toolChoice, { name: 'get_sca_results' });
+  assert.equal(events.filter(e => e.type === 'done').length, 1);
+});
+
+// --- orchestrate: forced-round failure must terminate no worse than base ------------------------
+// Both FAIL against this item's first cut: the interception suppressed the offer round's clean
+// 'done' and stashed nothing, so a forced-round provider error surfaced as an SSE error frame and
+// a forced-round dead stream closed the SSE stream with no terminating frame at all -- on base the
+// same turn ended cleanly right after the offer.
+
+test('orchestrate: a provider ERROR on the forced round is swallowed into a clean done', async () => {
   const { events, callMessages } = await runOrchestrate(
     [
       STAGE1_SCA_SCRIPT,
       REJECTED_SCA_RESULTS_ROUND,
-      // Names get_sca_results (already "executed" this turn, even though its call was rejected --
-      // executedToolNames is populated regardless of outcome, see chat.ts's own doc comment).
-      offerScript('That used get_sca_results earlier in this turn.'),
+      offerScript('I can run get_sca_checks — want me to?'),
+      // round 2 (forced): the provider 400s/429s instead of complying.
+      [{ type: 'error', message: 'upstream provider rejected the request' }],
+    ],
+    rejectingContext(),
+  );
+
+  assert.equal(callMessages.length, 4);
+  assert.equal(
+    events.filter(e => e.type === 'error').length,
+    0,
+    'a forced-round failure must not surface as an error frame the user never caused',
+  );
+  const doneEvents = events.filter(e => e.type === 'done');
+  assert.equal(doneEvents.length, 1, 'the turn must still terminate cleanly');
+});
+
+test('orchestrate: a DEAD adapter stream on the forced round still emits a terminating done', async () => {
+  const { events, callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      REJECTED_SCA_RESULTS_ROUND,
+      offerScript('I can run get_sca_checks — want me to?'),
+      // round 2 (forced): the stream closes with no events at all.
+      [],
+    ],
+    rejectingContext(),
+  );
+
+  assert.equal(callMessages.length, 4);
+  const doneEvents = events.filter(e => e.type === 'done');
+  assert.equal(
+    doneEvents.length,
+    1,
+    'the SSE stream must not close without a terminating frame',
+  );
+});
+
+// --- orchestrate: negative / regression fences --------------------------------------------------
+// Each of these passes BOTH on base and after this change -- they exist to prove the mechanism
+// does not over-fire, not to reproduce the measured defect. (The budget-gate/spent-flag test and
+// the retry-offer test live under their own headers further down: those FAIL on base, because
+// they assert a force that base never performs.)
+
+test('orchestrate: an offer naming a SUCCESSFULLY-executed tool does not force a repeat call', async () => {
+  // get_sca_results executes for real (scaContext's canned aggregation response), then the next
+  // round OFFERS the same tool again. A succeeding tool is excluded by name -- the model is
+  // summarizing its own work (or proposing a rerun this mechanism deliberately does not force,
+  // see the executedToolNames add-site comment in chat.ts).
+  const { context } = scaContext();
+  const { events, callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      [
+        {
+          type: 'tool_call',
+          toolCall: {
+            id: 'call_sca_results',
+            name: 'get_sca_results',
+            arguments: { agent_id: '001' },
+          },
+        },
+        { type: 'done', usage: { inputTokens: 20, outputTokens: 10 } },
+      ],
+      offerScript(
+        'CIS Ubuntu: 95 passed, 102 failed. I can run get_sca_results again — want me to?',
+      ),
+    ],
+    context,
+  );
+
+  assert.equal(
+    callMessages.length,
+    3,
+    'no forced 4th round should be introduced',
+  );
+  assert.equal(events.filter(e => e.type === 'done').length, 1);
+});
+
+test('orchestrate: a DISMISSIVE mention of an unexecuted tool does not force a call', async () => {
+  // FENCE for integration-review hole: prompts.ts's capability-honesty block pushes the model to
+  // NAME what it could not check -- a negative mention ("would not answer this") must not be
+  // hijacked into running the very tool the model ruled out. The sentence-level offer gate in
+  // findOfferedFollowUpTool is what this pins.
+  const { events, callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      REJECTED_SEARCH_ROUND,
+      offerScript(
+        'get_sca_checks would not answer a vulnerability question, so I am reporting only ' +
+          'what the search covered.',
+      ),
     ],
     rejectingContext(),
   );
@@ -583,7 +835,62 @@ test('orchestrate: naming an ALREADY-EXECUTED tool alone does not force a chaine
   assert.equal(
     callMessages.length,
     3,
-    'no forced 4th round should be introduced',
+    'a dismissive mention must terminate the turn normally, not force the dismissed tool',
+  );
+  assert.equal(events.filter(e => e.type === 'done').length, 1);
+});
+
+test('orchestrate: a reasoning-fallback round never triggers the interception', async () => {
+  // FENCE for integration-review hole: openai-compatible.ts's reasoningFallback surfaces raw
+  // deliberation as one delta when a model streams only on the reasoning channel (gpt-oss/qwen3.x
+  // -- the very model family in PROVIDER_CONFIG). Deliberation routinely names one tool the model
+  // decided AGAINST; the flagged delta must disqualify the round from interception.
+  const { events, callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      REJECTED_SCA_RESULTS_ROUND,
+      [
+        {
+          type: 'delta',
+          content:
+            'The user wants the failing checks; I can use get_sca_checks but I am not certain ' +
+            'of the policy_id, so I will just summarize.',
+          reasoningFallback: true,
+        },
+        { type: 'done', usage: { inputTokens: 15, outputTokens: 8 } },
+      ],
+    ],
+    rejectingContext(),
+  );
+
+  assert.equal(
+    callMessages.length,
+    3,
+    'reasoning-channel deliberation must never be read as an offer',
+  );
+  assert.equal(events.filter(e => e.type === 'done').length, 1);
+});
+
+test('orchestrate: an offer naming search_wazuh_data (the escape hatch) is never forced', async () => {
+  // FENCE for integration-review hole: prompts.ts ORDERS the model to offer search_wazuh_data in
+  // prose for fields a typed result lacks -- that designed behaviour must not become a forced
+  // call into the strictest-guardrail surface (FORCE_EXEMPT_TOOL_NAMES in chat.ts).
+  const { events, callMessages } = await runOrchestrate(
+    [
+      STAGE1_SCA_SCRIPT,
+      REJECTED_SCA_RESULTS_ROUND,
+      offerScript(
+        'The result does not include source IPs — I can query them with search_wazuh_data. ' +
+          'Want me to?',
+      ),
+    ],
+    rejectingContext(),
+  );
+
+  assert.equal(
+    callMessages.length,
+    3,
+    'the prompt-mandated search_wazuh_data offer must terminate the turn normally',
   );
   assert.equal(events.filter(e => e.type === 'done').length, 1);
 });
@@ -650,6 +957,11 @@ test('orchestrate: no tool ran this turn -- a mentioned tool name never forces a
   );
   assert.equal(events.filter(e => e.type === 'done').length, 1);
 });
+
+// --- orchestrate: budget/spent-gate pin ----------------------------------------------------------
+// NOTE (integration review fixed the earlier mislabel): unlike the fences above, this test FAILS
+// ON BASE — it asserts the one force that base never performs (callOptions[3].toolChoice) on its
+// way to pinning that the SECOND offer is not forced.
 
 test('orchestrate: a second offer after one force was already spent this turn does not force again', async () => {
   const { events, callMessages, callOptions } = await runOrchestrate(
