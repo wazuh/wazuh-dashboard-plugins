@@ -293,7 +293,13 @@ async function executeManagerRequest(
     );
     const result = response.data;
     // Manager API list responses have no aggregation concept, so there is no `aggField` to pass.
-    const digest = buildDigest(toolName, result, def, undefined, assumptionNote);
+    const digest = buildDigest(
+      toolName,
+      result,
+      def,
+      undefined,
+      assumptionNote,
+    );
     const finalDigest = finalizeDigest(digest, privacy, toolName);
     return {
       toolResultContent: JSON.stringify(finalDigest),

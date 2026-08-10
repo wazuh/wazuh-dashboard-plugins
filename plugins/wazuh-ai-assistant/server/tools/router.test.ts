@@ -61,12 +61,15 @@ test('the "inventory" category description covers "software" and vague host phra
   const inventoryLine = prompt
     .split('\n')
     .find(line => line.trim().startsWith('- inventory:'));
-  assert.ok(inventoryLine, 'routing prompt must list an "inventory" menu entry');
+  assert.ok(
+    inventoryLine,
+    'routing prompt must list an "inventory" menu entry',
+  );
   assert.match(
     inventoryLine as string,
     /\bsoftware\b/i,
     'inventory description must literally say "software", not just "installed packages", to ' +
-      'match #8913\'s exact worked-example phrasing',
+      "match #8913's exact worked-example phrasing",
   );
   assert.match(
     inventoryLine as string,

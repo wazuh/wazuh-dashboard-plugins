@@ -57,7 +57,10 @@ test('buildSystemPrompt: instructs the model to never assert a remediation/compl
 
 test('buildSystemPrompt: instructs the model to call get_agent_inventory directly (not get_agents) for a deictic inventory question', () => {
   const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
-  assert.match(prompt, /this box.*this host.*this machine.*this server.*this system/);
+  assert.match(
+    prompt,
+    /this box.*this host.*this machine.*this server.*this system/,
+  );
   assert.match(
     prompt,
     /no agent named or numbered earlier in the\s+conversation, call get_agent_inventory directly WITHOUT agent_id or agent_name/,

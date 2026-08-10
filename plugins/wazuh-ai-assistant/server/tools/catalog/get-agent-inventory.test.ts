@@ -116,15 +116,24 @@ test('get_agent_inventory: description tells the model to call this tool directl
 });
 
 test('get_agent_inventory: agent_id/agent_name param descriptions document the deictic auto-resolution, not a hard requirement', () => {
-  const { agent_id: agentId, agent_name: agentName } =
-    getAgentInventoryTool.spec.parameters.properties as unknown as {
-      agent_id: { description?: string };
-      agent_name: { description?: string };
-    };
-  assert.match(agentId.description ?? '', /resolves to the only active agent automatically/);
-  assert.match(agentName.description ?? '', /resolves to the only active agent automatically/);
+  const { agent_id: agentId, agent_name: agentName } = getAgentInventoryTool
+    .spec.parameters.properties as unknown as {
+    agent_id: { description?: string };
+    agent_name: { description?: string };
+  };
+  assert.match(
+    agentId.description ?? '',
+    /resolves to the only active agent automatically/,
+  );
+  assert.match(
+    agentName.description ?? '',
+    /resolves to the only active agent automatically/,
+  );
   assert.doesNotMatch(agentId.description ?? '', /is required\.?$/);
-  assert.doesNotMatch(agentName.description ?? '', /^Either this or agent_id is required/);
+  assert.doesNotMatch(
+    agentName.description ?? '',
+    /^Either this or agent_id is required/,
+  );
 });
 
 test('get_agent_inventory: an invalid agent_id is rejected (delegates to validateAgentId)', () => {
@@ -309,7 +318,10 @@ test('get_agent_inventory: deriveColumns is set (no static tableSpec/digest for 
 // correctness independent of that compliance by resolving the agent server-side whenever neither
 // identifier was supplied. ---
 
-function resolveParams(params: Record<string, unknown>, context: ResolveParamsContext) {
+function resolveParams(
+  params: Record<string, unknown>,
+  context: ResolveParamsContext,
+) {
   return getAgentInventoryTool.resolveParams!(params, context, fakeRequest());
 }
 
@@ -395,7 +407,9 @@ test('get_agent_inventory resolveParams: agent_id supplied is returned unchanged
   let lookupCalled = false;
   const context = {
     wazuh_core: {
-      manageHosts: { get: () => Promise.reject(new Error('should not be called')) },
+      manageHosts: {
+        get: () => Promise.reject(new Error('should not be called')),
+      },
       api: {
         client: {
           asCurrentUser: {
@@ -416,7 +430,10 @@ test('get_agent_inventory resolveParams: agent_id supplied is returned unchanged
   if (!result.ok) {
     return;
   }
-  assert.deepEqual(result.resolved.params, { agent_id: '003', kind: 'packages' });
+  assert.deepEqual(result.resolved.params, {
+    agent_id: '003',
+    kind: 'packages',
+  });
   assert.equal(result.resolved.note, undefined);
   assert.equal(lookupCalled, false);
 });
@@ -424,7 +441,9 @@ test('get_agent_inventory resolveParams: agent_id supplied is returned unchanged
 test('get_agent_inventory resolveParams: agent_name supplied is returned unchanged, no lookup, no note (regression)', async () => {
   const context = {
     wazuh_core: {
-      manageHosts: { get: () => Promise.reject(new Error('should not be called')) },
+      manageHosts: {
+        get: () => Promise.reject(new Error('should not be called')),
+      },
       api: {
         client: {
           asCurrentUser: {

@@ -327,11 +327,13 @@ async function resolveDeicticAgentParams(
     };
   }
 
-  const candidates = agents.slice(0, MAX_LISTED_AGENT_CANDIDATES).map(agent =>
-    typeof agent.name === 'string' && typeof agent.id === 'string'
-      ? `"${agent.name}" (id ${agent.id})`
-      : `id ${String(agent.id)}`,
-  );
+  const candidates = agents
+    .slice(0, MAX_LISTED_AGENT_CANDIDATES)
+    .map(agent =>
+      typeof agent.name === 'string' && typeof agent.id === 'string'
+        ? `"${agent.name}" (id ${agent.id})`
+        : `id ${String(agent.id)}`,
+    );
   const remaining = totalActive - candidates.length;
   return {
     ok: false,
