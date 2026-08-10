@@ -328,7 +328,7 @@ test('orchestrate: a real tool call rejected by a GUARDRAIL (missing time range)
   );
 });
 
-test('orchestrate: a SUCCESSFUL real tool call is NOT augmented with the capability-denial note', async () => {
+test('orchestrate: a SUCCESSFUL real tool call is NOT augmented with the capability-denial note', () => {
   // Sanity check for the shape-driven guard: get_agents with no filters is a well-formed
   // Manager call this test lets fail at the network layer (no context.wazuh_core set up here),
   // which executor.ts's own try/catch turns into a `{error: "Manager request failed: ..."}`
