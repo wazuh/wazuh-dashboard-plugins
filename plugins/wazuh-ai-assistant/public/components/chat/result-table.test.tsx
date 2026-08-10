@@ -67,7 +67,7 @@ describe('ResultTable', () => {
     expect(screen.getByText('agent-0')).toBeInTheDocument();
   });
 
-  it('paginates: only the first DEFAULT_PAGE_SIZE (25) rows are in the DOM at once', () => {
+  it('paginates: only the first DEFAULT_PAGE_SIZE (5) rows are in the DOM at once', () => {
     const thirtyRows = Array.from({ length: 30 }, (_unused, i) => ({
       agent: `agent-${i}`,
     }));
@@ -83,9 +83,30 @@ describe('ResultTable', () => {
     fireEvent.click(screen.getByText('Results (30 rows)'));
 
     expect(screen.getByText('agent-0')).toBeInTheDocument();
-    expect(screen.getByText('agent-24')).toBeInTheDocument();
-    expect(screen.queryByText('agent-25')).toBeNull();
+    expect(screen.getByText('agent-4')).toBeInTheDocument();
+    expect(screen.queryByText('agent-5')).toBeNull();
     expect(screen.queryByText('agent-29')).toBeNull();
+  });
+
+  // The page size is what keeps the table a readable height now that the body has no inner
+  // scroller, so "no max-height on the table body" is a behavior worth pinning: a scrollbar
+  // reappearing here would put one scrolling box inside another.
+  it('does not cap the table body height (no scroll-within-scroll)', () => {
+    const { container } = render(
+      <ResultTable
+        spec={spec({
+          columns: [{ id: 'agent', label: 'Agent' }],
+          rows: Array.from({ length: 4 }, (_unused, i) => ({
+            agent: `agent-${i}`,
+          })),
+        })}
+      />,
+    );
+
+    const scrollBoxes = [...container.querySelectorAll('div')].filter(element =>
+      (element.getAttribute('style') ?? '').includes('max-height'),
+    );
+    expect(scrollBoxes).toHaveLength(0);
   });
 
   describe('severity badge rendering', () => {
@@ -123,7 +144,11 @@ describe('ResultTable', () => {
       expect(screen.getByText('Informational')).toBeInTheDocument();
     });
 
-    it('renders "informational" as its own visually distinct bucket, never the same badge color as "low"', () => {
+    it('renders "informational" and "low" with distinct, non-hollow background colors matching the platform severity palette', () => {
+      // Colors now mirror plugins/main's UI_COLOR_STATUS (see result-table.tsx's SEVERITY_BUCKETS
+      // comment): low is UI_COLOR_STATUS.success ('#007871'), informational is
+      // UI_COLOR_STATUS.disabled ('#646A77') — both are real background colors (neither renders
+      // as EUI's outline-only 'hollow' badge any more), and they must never collide.
       const { unmount } = render(
         <ResultTable
           spec={spec({
@@ -138,16 +163,12 @@ describe('ResultTable', () => {
       );
       const informationalBadge = screen.getByText('Informational');
       expect(informationalBadge).toBeInTheDocument();
-      // "low" renders with EUI's 'hollow' color, which is the only color with no background-color
-      // style (an outline-only badge via the ouiBadge--hollow class). Asserting that
-      // "informational" does NOT get that same hollow treatment — and instead gets an actual
-      // background color — is what proves the two severities are visually distinct, not just
-      // textually distinct (the previous version of this test only checked the label).
       const informationalBadgeEl = informationalBadge.closest(
         '.euiBadge',
       ) as HTMLElement;
       expect(informationalBadgeEl.className).not.toMatch(/hollow/i);
       expect(informationalBadgeEl.style.backgroundColor).not.toBe('');
+      const informationalColor = informationalBadgeEl.style.backgroundColor;
       unmount();
 
       render(
@@ -165,8 +186,9 @@ describe('ResultTable', () => {
       const lowBadge = screen.getByText('Low');
       expect(lowBadge).toBeInTheDocument();
       const lowBadgeEl = lowBadge.closest('.euiBadge') as HTMLElement;
-      expect(lowBadgeEl.className).toMatch(/hollow/i);
-      expect(lowBadgeEl.style.backgroundColor).toBe('');
+      expect(lowBadgeEl.className).not.toMatch(/hollow/i);
+      expect(lowBadgeEl.style.backgroundColor).not.toBe('');
+      expect(lowBadgeEl.style.backgroundColor).not.toBe(informationalColor);
     });
 
     it('falls back to the raw value for an unrecognized severity word', () => {

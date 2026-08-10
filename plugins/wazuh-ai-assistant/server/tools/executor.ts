@@ -13,6 +13,7 @@ import {
   lintDsl,
 } from './guardrails';
 import { buildDigest, buildTableSpec, capDigest, Digest } from './digest';
+import { validateQueryFields } from './field-validation';
 import { IndexerRequest, ManagerRequest, ToolDefinition } from './types';
 import {
   applyFieldPolicy,
@@ -48,9 +49,13 @@ function finalizeDigest(
   privacy: PrivacyContext | undefined,
   toolName: string,
   aggFields?: Record<string, string | undefined>,
-  // The escape hatch's deriveColumns can put ARBITRARY finding fields into
-  // the digest, so its unlisted-field default must be fail-closed (anonymize) instead of the
-  // curated typed tools' allow-by-omission — see privacy.ts's applyFieldPolicy.
+  // Issue #8917: this used to be the calling tool's `deriveColumns` flag, which conflated "needs
+  // per-response column derivation" with "field surface is uncurated enough to fail closed by
+  // default" — see `ToolDefinition.failClosedFieldPolicy`'s doc comment (types.ts) for why the two
+  // are now separate. A tool whose fields can be ARBITRARY (search_wazuh_data,
+  // find_document_by_field) or that folds several kinds' worth of fields into one digest
+  // (get_agent_inventory) sets this so its unlisted-field default is fail-closed (anonymize)
+  // instead of the curated typed tools' allow-by-omission — see privacy.ts's applyFieldPolicy.
   isEscapeHatch = false,
 ): Digest {
   if (!privacy) {
@@ -165,6 +170,22 @@ async function executeIndexerRequest(
     };
   }
 
+  // Escape-hatch-only field-existence check (see field-validation.ts / ToolDefinition's
+  // `validateFieldNames` doc comment): runs AFTER the synchronous guardrails above (so a
+  // structurally-rejected body never pays the `_field_caps` round trip) and BEFORE the request
+  // actually reaches OpenSearch — a made-up field name becomes a bounded, self-correctable tool
+  // error instead of a silent zero-row/zero-bucket result.
+  if (def.validateFieldNames) {
+    const fieldCheck = await validateQueryFields(
+      context,
+      indexerRequest.index,
+      body,
+    );
+    if (!fieldCheck.ok) {
+      return { toolResultContent: toolErrorContent(fieldCheck.reason) };
+    }
+  }
+
   try {
     const response = await context.core.opensearch.client.asCurrentUser.search({
       index: indexerRequest.index,
@@ -177,12 +198,30 @@ async function executeIndexerRequest(
     // aggregation fields driving `breakdown` (if any) can be read from — see privacy.ts's
     // `extractAggFields` doc comment — so it is reused for that below when privacy is active.
     const digest = buildDigest(toolName, result, def, body);
+    // A `breakdownDimensions`-opted-in tool's synthesized breakdown (digest.ts's
+    // `buildSyntheticBreakdown`) tags each bucket `agg: <dimension field path>` — an IDENTITY map
+    // (dimension -> itself) lets `applyFieldPolicy` below resolve those buckets' field policy the
+    // exact same way it resolves a REAL aggregation's buckets, rather than silently skipping the
+    // scrub because `extractAggFields(body)` (which only ever reads a REAL `aggs` clause) has
+    // nothing to report for a tool — every one of these — that never sends one.
+    const aggFields =
+      extractAggFields(body) ??
+      (def.digest.breakdownDimensions
+        ? Object.fromEntries(
+            def.digest.breakdownDimensions.map(dimension => [
+              dimension,
+              dimension,
+            ]),
+          )
+        : undefined);
     const finalDigest = finalizeDigest(
       digest,
       privacy,
       toolName,
-      extractAggFields(body),
-      def.deriveColumns,
+      aggFields,
+      // Issue #8917: was `def.deriveColumns` -- see `ToolDefinition.failClosedFieldPolicy`'s doc
+      // comment (types.ts) for why this must be its own, explicitly-set flag instead.
+      def.failClosedFieldPolicy,
     );
     // "Open in Discover" support (common/types.ts's `TableSpec.discover` doc comment): only this
     // Indexer path has an index/DSL to attach — `body.query` is the guardrail-clamped clause that

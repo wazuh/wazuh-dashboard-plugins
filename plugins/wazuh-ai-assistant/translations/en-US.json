@@ -99,7 +99,7 @@
     "wazuhAiAssistant.settings.form.baseUrl": "Endpoint URL",
     "wazuhAiAssistant.settings.form.baseUrlInvalid": "Enter a valid URL starting with http:// or https://",
     "wazuhAiAssistant.settings.form.model": "Model",
-    "wazuhAiAssistant.settings.form.modelHelp": "Tool calling needs a model with solid function-calling support. Known good: GPT-4o or GPT-4o-mini (OpenAI), Claude Sonnet (Anthropic), llama-3.3-70b-versatile (Groq). Small or base models often fail with tool errors.",
+    "wazuhAiAssistant.settings.form.modelHelp": "Tool calling needs a model with solid function-calling support (e.g. GPT-4o, Claude Sonnet) — small or lightweight models often fail. Check your provider's model list for current availability, as models are periodically retired. A free-tier API key with a low rate limit may fail regardless of the model's capability.",
     "wazuhAiAssistant.settings.form.apiKey": "API key",
     "wazuhAiAssistant.settings.form.apiKeyHelp": "Leave empty to keep the current key.",
     "wazuhAiAssistant.settings.form.encryptionRequiredTooltip": "An encryption key must be configured before an API key can be saved.",

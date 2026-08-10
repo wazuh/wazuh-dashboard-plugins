@@ -42,7 +42,7 @@ const mockSettingsService = {
   getAssistantSettings: jest.fn(),
   getSettingsAccess: jest.fn(),
 };
-const mockHealManagerSession = jest.fn();
+const mockEnsureManagerSession = jest.fn();
 const mockOpenConfirm = jest.fn();
 
 jest.mock('../../services/chat-service', () => ({
@@ -69,7 +69,8 @@ jest.mock('../../services/settings-service', () => ({
 }));
 
 jest.mock('../../services/session-heal', () => ({
-  healManagerSession: (...args: unknown[]) => mockHealManagerSession(...args),
+  ensureManagerSession: (...args: unknown[]) =>
+    mockEnsureManagerSession(...args),
 }));
 
 jest.mock('./discover-link', () => ({
@@ -208,12 +209,30 @@ function lastSavedRoleContent(mock: jest.Mock): Array<[string, string]> {
 }
 
 /**
+ * Finds a conversation's SIDEBAR ROW by its title text. Once a conversation is both open (the
+ * conversation header now shows its title as an `<h1>`, chat-page.tsx) and listed in the sidebar,
+ * the same title string can render twice on screen — `screen.getByText` would then throw on an
+ * ambiguous match, so every lookup goes through here instead, which disambiguates by picking the
+ * match inside the sidebar's own `[role="button"]` row.
+ */
+function conversationRow(title: string): HTMLElement {
+  const row = screen
+    .getAllByText(title)
+    .map(element => element.closest('[role="button"]'))
+    .find((element): element is HTMLElement => element !== null);
+  if (!row) {
+    throw new Error(`No conversation row found for "${title}"`);
+  }
+  return row;
+}
+
+/**
  * Opens another conversation from the sidebar. A mid-stream switch asks for confirmation first
  * (`overlays.openConfirm`, mocked to accept by default), so every such switch in these tests goes
  * through here rather than assuming a bare click is enough.
  */
 async function leaveForConversation(title: string) {
-  fireEvent.click(screen.getByText(title));
+  fireEvent.click(conversationRow(title));
   await waitFor(() => expect(mockConversationsService.get).toHaveBeenCalled());
 }
 
@@ -234,6 +253,8 @@ beforeEach(() => {
   // real navigation for that, only for pushState/replaceState-driven changes).
   window.history.replaceState(null, '', '/');
   window.sessionStorage.clear();
+  // startTurn awaits this pre-turn guard; `null` (probe failed, fail-open) is the neutral default.
+  mockEnsureManagerSession.mockResolvedValue(null);
   mockSettingsService.getAssistantSettings.mockResolvedValue({
     privacyDefaultOn: false,
     privacyDefaultPerProvider: {},
@@ -267,7 +288,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     stream.push({ type: 'delta', content: 'partial ' });
@@ -291,7 +312,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     stream.push({ type: 'delta', content: 'partial answer' });
@@ -349,7 +370,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     stream.push({ type: 'delta', content: 'partial answer' });
@@ -385,7 +406,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     expect(screen.getByLabelText('Chat message')).toBeDisabled();
@@ -439,7 +460,10 @@ describe('ChatPage — turn abandoned mid-stream', () => {
     );
 
     const signal = lastStreamSignal();
-    fireEvent.click(screen.getByText('New conversation'));
+    // getByRole (not getByText): the conversation header's own "New conversation" fallback
+    // title (chat-page.tsx, shown while no conversation is active) can render the exact same
+    // string at the same time as this sidebar button.
+    fireEvent.click(screen.getByRole('button', { name: 'New conversation' }));
 
     await waitFor(() => expect(signal.aborted).toBe(true));
     await waitFor(() =>
@@ -487,7 +511,7 @@ describe('ChatPage — turn abandoned mid-stream', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     firstStream.push({
@@ -652,7 +676,10 @@ describe('ChatPage — restoring the open conversation', () => {
       expect(screen.getByText('earlier question')).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByText('New conversation'));
+    // getByRole (not getByText): the conversation header's own "New conversation" fallback
+    // title (chat-page.tsx, shown while no conversation is active) can render the exact same
+    // string at the same time as this sidebar button.
+    fireEvent.click(screen.getByRole('button', { name: 'New conversation' }));
 
     await waitFor(() => expect(window.location.pathname).toBe('/'));
     expect(
@@ -696,10 +723,16 @@ describe('ChatPage — restoring the open conversation', () => {
   it('hides the saved-conversations sidebar when showConversationSidebar is false', () => {
     const view = renderChatPage({ showConversationSidebar: false });
 
-    expect(screen.queryByText('New conversation')).toBeNull();
+    // getByRole (not getByText): the conversation header's own "New conversation" fallback
+    // title (chat-page.tsx) can render the exact same string as this sidebar button.
+    expect(
+      screen.queryByRole('button', { name: 'New conversation' }),
+    ).toBeNull();
 
     view.rerenderWith({ showConversationSidebar: true });
-    expect(screen.getByText('New conversation')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'New conversation' }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -1086,8 +1119,10 @@ describe('ChatPage — feedback while a turn runs', () => {
     // The `digest` event that follows must not release the held table — it is held until TEXT
     // arrives, not until the next non-delta event comes along.
     stream.push({ type: 'digest', toolCallId: 't1', content: '{}' });
+    // The chip's label is derived from the tool call itself (name + time range), not from the
+    // table, so it appears with its final text even while the table is still held.
     await waitFor(() =>
-      expect(screen.getByText('1 query executed')).toBeInTheDocument(),
+      expect(screen.getByText('Top agents · 90d')).toBeInTheDocument(),
     );
     expect(screen.queryByText('web-01')).not.toBeInTheDocument();
 
@@ -1160,11 +1195,16 @@ describe('ChatPage — feedback while a turn runs', () => {
       },
     });
 
+    // No table event this turn, so the chip's label is derived purely from the tool call itself:
+    // its humanized name plus the default 90-day time window.
     await waitFor(() =>
-      expect(screen.getByText('1 query executed')).toBeInTheDocument(),
+      expect(screen.getByText('Wazuh data · 90d')).toBeInTheDocument(),
     );
-    expect(screen.getByText('search_wazuh_data')).toBeInTheDocument();
-    expect(screen.getByText(/wazuh-alerts-\*/)).toBeInTheDocument();
+    // Raw arguments are one click deeper, not on screen unbidden.
+    expect(screen.queryByText(/wazuh-alerts-\*/)).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Wazuh data · 90d'));
+    expect(await screen.findByText(/wazuh-alerts-\*/)).toBeInTheDocument();
   });
 
   it('shows the executed queries again on a resumed conversation', async () => {
@@ -1195,8 +1235,9 @@ describe('ChatPage — feedback while a turn runs', () => {
     await waitFor(() =>
       expect(screen.getByText('42 alerts')).toBeInTheDocument(),
     );
-    expect(screen.getByText('1 query executed')).toBeInTheDocument();
-    expect(screen.getByText('search_wazuh_data')).toBeInTheDocument();
+    // No discover info on this restored table, but the chip's label doesn't need it — it's
+    // derived from the tool call itself, same as on a live turn.
+    expect(screen.getByText('Wazuh data · 90d')).toBeInTheDocument();
   });
 });
 
@@ -1217,7 +1258,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
   }) {
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
     await sendMessage('first question');
     stream.push({ type: 'delta', content: 'half an ans' });
@@ -1230,7 +1271,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     const stream = startGeneratingWithSidebar();
     await renderAndStartTurn(stream);
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
 
     await waitFor(() => expect(mockOpenConfirm).toHaveBeenCalledTimes(1));
     // No styling overrides: the platform's own app-leave confirmation passes none either, and
@@ -1249,7 +1290,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     await renderAndStartTurn(stream);
     const signal = lastStreamSignal();
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
 
     await waitFor(() => expect(mockOpenConfirm).toHaveBeenCalled());
     expect(signal.aborted).toBe(false);
@@ -1262,7 +1303,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     await renderAndStartTurn(stream);
     const signal = lastStreamSignal();
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
     await waitFor(() => expect(mockOpenConfirm).toHaveBeenCalled());
 
     expect(signal.aborted).toBe(false);
@@ -1280,7 +1321,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     await renderAndStartTurn(stream);
     const signal = lastStreamSignal();
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
 
     await waitFor(() => expect(signal.aborted).toBe(true));
     await waitFor(() =>
@@ -1293,7 +1334,10 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     mockOpenConfirm.mockResolvedValue(false);
     await renderAndStartTurn(stream);
 
-    fireEvent.click(screen.getByText('New conversation'));
+    // getByRole (not getByText): the conversation header's own "New conversation" fallback
+    // title (chat-page.tsx, shown while no conversation is active) can render the exact same
+    // string at the same time as this sidebar button.
+    fireEvent.click(screen.getByRole('button', { name: 'New conversation' }));
 
     await waitFor(() => expect(mockOpenConfirm).toHaveBeenCalledTimes(1));
     // Declined, so the turn is untouched.
@@ -1308,9 +1352,9 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
     // Open conv-b, then start a turn inside it.
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
     await waitFor(() =>
       expect(screen.getByText('earlier question')).toBeInTheDocument(),
     );
@@ -1324,7 +1368,7 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
 
     // Clicking the conversation that is already open changes nothing, so there is nothing to
     // interrupt and nothing to confirm.
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
 
     await waitFor(() =>
       expect(screen.getByText('half an ans')).toBeInTheDocument(),
@@ -1341,15 +1385,44 @@ describe('ChatPage — confirming before interrupting a running answer', () => {
 
     renderChatPage();
     await waitFor(() =>
-      expect(screen.getByText('Older conversation')).toBeInTheDocument(),
+      expect(conversationRow('Older conversation')).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByText('Older conversation'));
+    fireEvent.click(conversationRow('Older conversation'));
 
     await waitFor(() =>
       expect(screen.getByText('earlier question')).toBeInTheDocument(),
     );
     expect(mockOpenConfirm).not.toHaveBeenCalled();
+  });
+});
+
+describe('ChatPage — pre-turn Manager session guard (issue #8826)', () => {
+  it('ensures the Manager session (60s memo) before the chat stream fires', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('hello');
+
+    expect(mockEnsureManagerSession).toHaveBeenCalledWith(expect.anything(), {
+      maxAgeMs: 60_000,
+    });
+    // The guard must settle before the stream request is issued.
+    expect(mockEnsureManagerSession.mock.invocationCallOrder[0]).toBeLessThan(
+      mockStreamChat.mock.invocationCallOrder[0],
+    );
+    stream.end();
+  });
+
+  it('does not run the mount-time access-probe heal any more', async () => {
+    renderChatPage();
+    await waitFor(() =>
+      expect(mockSettingsService.getAssistantSettings).toHaveBeenCalled(),
+    );
+    expect(mockSettingsService.getSettingsAccess).not.toHaveBeenCalled();
   });
 });
 

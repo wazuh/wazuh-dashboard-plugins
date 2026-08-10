@@ -122,6 +122,11 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
   return (
     <section
       ref={rootRef}
+      // `wzAiChat`: the same `--wz-*` token block chat-page.scss defines for the app-shell chat
+      // surface — applied here too so this panel's own chrome (the header border below) reads
+      // from it instead of a hardcoded hex. ChatPage's nested `wzAiChat` div just redefines the
+      // same custom properties redundantly.
+      className='wzAiChat'
       aria-labelledby={titleId}
       data-test-subj='wzAiAssistantPanel'
       style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
@@ -129,7 +134,7 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
       <div
         style={{
           padding: '10px 16px',
-          borderBottom: '1px solid #D3DAE6',
+          borderBottom: '1px solid var(--wz-hairline)',
           flexShrink: 0,
         }}
       >

@@ -18,9 +18,4 @@ export const SEVERITY_PRESENTATION: SeverityPresentation[] = [
     label: 'Informational',
     color: UI_COLOR_STATUS.disabled,
   },
-  {
-    band: 'pending',
-    label: 'Pending',
-    color: UI_COLOR_STATUS.disabled,
-  },
 ];

@@ -48,6 +48,27 @@ const TOOL_USE_FAILED_TERMINAL_MESSAGE =
   'tool-calling support (for example GPT-4o, Claude Sonnet, or llama-3.3-70b; see the Model field ' +
   'hint in Settings).';
 
+/** In-stream counterpart of TOOL_USE_FAILED_TERMINAL_MESSAGE. Worded differently on purpose: this
+ * frame arrives on HTTP 200 mid-stream, no retry budget was spent, and it carries no
+ * `failed_generation` field, so there is no snippet to append and no recovery to report. */
+const TOOL_USE_FAILED_STREAM_MESSAGE =
+  "The assistant couldn't get a valid tool call from the configured model for this request. " +
+  "This usually means the model's function-calling support isn't reliable enough for this kind " +
+  'of question. Try a model with stronger tool-calling support, or ask a simpler question.';
+
+/** Maps a provider in-stream `error.message` (HTTP-200 SSE error frame, which carries only a
+ * plain message string -- unlike the HTTP-400 `tool_use_failed` body, there is no
+ * `failed_generation` field here to append as a snippet) to our own friendly copy when it is a
+ * tool_use_failed report; returns undefined for every other error so callers keep the raw
+ * message. */
+export function describeToolUseFailedStreamMessage(
+  rawMessage: string,
+): string | undefined {
+  return TOOL_USE_FAILED_MARKERS.some(marker => rawMessage.includes(marker))
+    ? TOOL_USE_FAILED_STREAM_MESSAGE
+    : undefined;
+}
+
 /** True when a rejected response is Groq's (or a compatible provider's) tool_use_failed shape. */
 function isToolUseFailedBody(status: number, bodyText: string): boolean {
   return (
@@ -144,6 +165,86 @@ export function sanitizeProviderErrorBody(
   return out.length > MAX_ERROR_BODY_CHARS
     ? `${out.slice(0, MAX_ERROR_BODY_CHARS)}…`
     : out;
+}
+
+/** Tries the ONE JSON error-body shape real providers actually use: OpenAI, Groq, Anthropic and
+ * the OpenAI-compatible gateways (vLLM, Ollama, LM Studio...) all nest the human message at
+ * `error.message`. Deliberately narrow — a bare top-level `{error: "..."}` or `{message: "..."}`
+ * is NOT unwrapped, even though some ad-hoc gateways use that shape, because such a body may carry
+ * OTHER top-level fields (e.g. a misbehaving gateway echoing the request body/credentials
+ * alongside a generic error string) that unwrapping to just one field would silently drop from the
+ * message sanitizeProviderErrorBody redacts — better to fall through to the raw, fully-redacted
+ * body than to risk narrowing past something that still needed redaction. Returns undefined —
+ * never throws — on non-JSON input or a shape mismatch, so the caller falls through to the next
+ * candidate. */
+function extractJsonErrorMessage(bodyText: string): string | undefined {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(bodyText);
+  } catch {
+    return undefined;
+  }
+  if (!parsed || typeof parsed !== 'object') {
+    return undefined;
+  }
+  const nestedError = (parsed as Record<string, unknown>).error;
+  if (nestedError && typeof nestedError === 'object') {
+    const message = (nestedError as Record<string, unknown>).message;
+    if (typeof message === 'string' && message.trim()) {
+      return message.trim();
+    }
+  }
+  return undefined;
+}
+
+/** A gateway/proxy sitting in front of the provider (a load balancer, an nginx front door, a
+ * corporate egress proxy) commonly rejects the request before it ever reaches the provider's own
+ * API, returning ITS OWN HTML error page rather than the provider's JSON error contract — e.g. a
+ * 502 from an nginx front door, or an SSO/captive-portal redirect page. `<title>` is normally the
+ * terse human-readable summary of such a page ("502 Bad Gateway", "Access Denied"); the
+ * tag-stripped body text is the fallback for a page that omits one. Returns undefined (never
+ * throws) for anything that doesn't look like HTML, so the caller falls through to the raw body. */
+function extractHtmlErrorMessage(bodyText: string): string | undefined {
+  const trimmed = bodyText.trim();
+  if (
+    !/^<(!doctype html|html)\b/i.test(trimmed) &&
+    !/<html[\s>]/i.test(trimmed)
+  ) {
+    return undefined;
+  }
+  const decodeEntities = (text: string): string =>
+    text
+      .replace(/&lt;/gi, '<')
+      .replace(/&gt;/gi, '>')
+      .replace(/&quot;/gi, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&amp;/gi, '&');
+  const titleMatch = trimmed.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  const title = titleMatch
+    ? decodeEntities(titleMatch[1]).replace(/\s+/g, ' ').trim()
+    : '';
+  if (title) {
+    return title;
+  }
+  const text = decodeEntities(trimmed.replace(/<[^>]*>/g, ' '))
+    .replace(/\s+/g, ' ')
+    .trim();
+  return text || undefined;
+}
+
+/** Turns a raw provider/gateway HTTP error body into a short, human-meaningful message before
+ * `sanitizeProviderErrorBody` truncates/redacts it: a JSON body in one of the shapes providers
+ * actually use, or an HTML error page's `<title>`, is unwrapped to just its message text; anything
+ * else (an unrecognized JSON shape, plain text, a truncated/malformed body) is passed through
+ * unchanged so the existing raw-body behavior is preserved — "capture some cases, else display
+ * all". Exported so wazuh-brain.ts's non-streaming adapter, which hits the same raw-body-in-error
+ * shape, reuses it rather than duplicating the parsing. */
+export function extractProviderErrorMessage(bodyText: string): string {
+  return (
+    extractJsonErrorMessage(bodyText) ??
+    extractHtmlErrorMessage(bodyText) ??
+    bodyText
+  );
 }
 
 /** Wait hint from a rejected response: Retry-After header, else a "try again in Xs/Xms" body. */
@@ -340,7 +441,10 @@ export async function* fetchProviderWithRetry(
         type: 'error',
         message: `Provider responded with HTTP ${
           response.status
-        }: ${sanitizeProviderErrorBody(bodyText, secret)}`,
+        }: ${sanitizeProviderErrorBody(
+          extractProviderErrorMessage(bodyText),
+          secret,
+        )}`,
       };
       return undefined;
     }

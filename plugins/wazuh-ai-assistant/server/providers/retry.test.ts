@@ -1,5 +1,10 @@
 import assert from 'node:assert/strict';
-import { fetchProviderWithRetry, sanitizeProviderErrorBody } from './retry';
+import {
+  extractProviderErrorMessage,
+  fetchProviderWithRetry,
+  sanitizeProviderErrorBody,
+  describeToolUseFailedStreamMessage,
+} from './retry';
 import { StreamEvent } from '../../common/types';
 
 /** Minimal fake fetch Response covering everything retry.ts touches: `.ok`, `.status`, `.body`,
@@ -237,6 +242,37 @@ test('sanitizeProviderErrorBody: exact-value redaction catches a short/odd-shape
   assert.match(out, /\[redacted\]/);
 });
 
+test('describeToolUseFailedStreamMessage: a message containing failed_generation returns the friendly copy', () => {
+  const out = describeToolUseFailedStreamMessage(
+    "Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details.",
+  );
+  assert.ok(out);
+  assert.match(out as string, /couldn't get a valid tool call/i);
+});
+
+test('describeToolUseFailedStreamMessage: a message containing tool_use_failed returns the friendly copy', () => {
+  const out = describeToolUseFailedStreamMessage('tool_use_failed: bad call');
+  assert.ok(out);
+  assert.match(out as string, /couldn't get a valid tool call/i);
+});
+
+test('describeToolUseFailedStreamMessage: an ordinary message with no marker returns undefined', () => {
+  assert.equal(
+    describeToolUseFailedStreamMessage('rate limit exceeded'),
+    undefined,
+  );
+  assert.equal(
+    describeToolUseFailedStreamMessage('invalid api key'),
+    undefined,
+  );
+});
+
+test('describeToolUseFailedStreamMessage: the friendly message never contains the literal failed_generation substring', () => {
+  const out = describeToolUseFailedStreamMessage('failed_generation happened');
+  assert.ok(out);
+  assert.doesNotMatch(out as string, /failed_generation/);
+});
+
 test('sanitizeProviderErrorBody: an empty/absent secret does not change behavior (no crash, no spurious redaction)', () => {
   const withoutSecret = sanitizeProviderErrorBody(
     'plain message with no credentials',
@@ -247,4 +283,79 @@ test('sanitizeProviderErrorBody: an empty/absent secret does not change behavior
   );
   assert.equal(withoutSecret, 'plain message with no credentials');
   assert.equal(withUndefined, 'plain message with no credentials');
+});
+
+// extractProviderErrorMessage
+// "capture some cases, else display all": known JSON/HTML error shapes are unwrapped to just
+// their message text; anything else falls through to the raw body unchanged.
+
+test('extractProviderErrorMessage: unwraps an OpenAI/Groq-style {error: {message}} JSON body', () => {
+  const out = extractProviderErrorMessage(
+    '{"error":{"message":"Incorrect API key provided.","type":"invalid_request_error"}}',
+  );
+  assert.equal(out, 'Incorrect API key provided.');
+});
+
+test('extractProviderErrorMessage: does NOT unwrap a bare {error: "..."} JSON body — a sibling field could still carry something that needs redaction', () => {
+  const body =
+    '{"error":"bad request","echoed_body":{"api_key":"sk-should-stay-visible-here"}}';
+  const out = extractProviderErrorMessage(body);
+  assert.equal(out, body);
+});
+
+test('extractProviderErrorMessage: does NOT unwrap a generic top-level {message: "..."} JSON body (same ambiguous-shape reasoning)', () => {
+  const body =
+    '{"message":"quota exceeded","echoed_body":{"api_key":"sk-should-stay-visible-here"}}';
+  const out = extractProviderErrorMessage(body);
+  assert.equal(out, body);
+});
+
+test("extractProviderErrorMessage: extracts an HTML error page's <title>", () => {
+  const out = extractProviderErrorMessage(
+    '<html><head><title>502 Bad Gateway</title></head><body><center>nginx</center></body></html>',
+  );
+  assert.equal(out, '502 Bad Gateway');
+});
+
+test('extractProviderErrorMessage: falls back to tag-stripped text for HTML without a <title>', () => {
+  const out = extractProviderErrorMessage(
+    '<html><body><h1>Access Denied</h1></body></html>',
+  );
+  assert.equal(out, 'Access Denied');
+});
+
+test('extractProviderErrorMessage: decodes HTML entities in the extracted title', () => {
+  const out = extractProviderErrorMessage(
+    '<html><head><title>Bad Request &amp; Forbidden</title></head></html>',
+  );
+  assert.equal(out, 'Bad Request & Forbidden');
+});
+
+test('extractProviderErrorMessage: passes through plain text unchanged (display all)', () => {
+  const out = extractProviderErrorMessage('upstream timeout');
+  assert.equal(out, 'upstream timeout');
+});
+
+test('extractProviderErrorMessage: passes through an unrecognized JSON shape unchanged (display all)', () => {
+  const out = extractProviderErrorMessage(
+    '{"code":503,"detail":"unavailable"}',
+  );
+  assert.equal(out, '{"code":503,"detail":"unavailable"}');
+});
+
+test('extractProviderErrorMessage: passes through malformed/truncated JSON unchanged rather than throwing', () => {
+  const out = extractProviderErrorMessage('{"error":{"message":"cut off...');
+  assert.equal(out, '{"error":{"message":"cut off...');
+});
+
+test('extractProviderErrorMessage: an extracted JSON message is still redacted downstream by sanitizeProviderErrorBody (secret passthrough)', () => {
+  const extracted = extractProviderErrorMessage(
+    '{"error":{"message":"key sk-abc123def456ghi789 is invalid"}}',
+  );
+  const sanitized = sanitizeProviderErrorBody(
+    extracted,
+    'sk-abc123def456ghi789',
+  );
+  assert.doesNotMatch(sanitized, /sk-abc123def456ghi789/);
+  assert.match(sanitized, /\[redacted\]/);
 });

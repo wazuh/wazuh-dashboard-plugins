@@ -36,7 +36,6 @@ jest.mock('./hooks/use-overview-data', () => ({
     data: {
       severity: { critical: 0, high: 0, medium: 0, low: 0 },
       byPackage: [],
-      cvesMatched: 0,
     },
   })),
   useThreatIntelEnrichments: jest.fn(() => ({

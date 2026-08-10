@@ -6,6 +6,7 @@ import {
   ProviderTestResult,
 } from '../../common/types';
 import { fetchAllPages } from './fetch-all-pages';
+import { SettingsAccess, withManagerSessionRetry } from './session-heal';
 
 /** Mirrors server/tools/privacy.ts's `FieldPolicyAction` — that file lives under server/ (out of
  * scope to import from public/), so this is a hand-kept public-side copy of the same wire values
@@ -32,6 +33,14 @@ export interface AssistantSettings {
    * deletes) it; `0` means keep forever. Mirrors server/saved_objects/assistant-settings.ts's
    * `AssistantSettingsAttributes.conversationRetentionDays`. */
   conversationRetentionDays: number;
+  /** Issue #8917: field keys `getOrCreateAssistantSettings` (server/routes/settings.ts) had to
+   * append to `fieldPolicy` on this read/save because the stored policy predated them -- empty
+   * when the stored policy already matches the shipped defaults. Response-only (GET/PUT always
+   * send it back; optional here only because this same interface also shapes the outgoing PUT
+   * payload, which never needs to set it). Visibility only: this plugin does not currently surface
+   * it in the Settings UI, but any caller of GET/PUT can see whether the effective policy it just
+   * received was patched up from something older than the running build. */
+  fieldPolicyReconciledFields?: string[];
 }
 
 /** Shape of the paginated GET /providers response (server/routes/settings.ts). */
@@ -75,28 +84,40 @@ export class SettingsService {
     );
   }
 
+  // The admin-gated write/test methods below run through withManagerSessionRetry: a wz-token that
+  // expired while the form sat open heals and replays once instead of surfacing the session error.
   create(input: ProviderInput): Promise<ProviderSummary> {
-    return this.http.post<ProviderSummary>(API_PATHS.PROVIDERS, {
-      body: JSON.stringify(input),
-    });
+    return withManagerSessionRetry(this.http, () =>
+      this.http.post<ProviderSummary>(API_PATHS.PROVIDERS, {
+        body: JSON.stringify(input),
+      }),
+    );
   }
 
   update(id: string, input: ProviderInput): Promise<ProviderSummary> {
-    return this.http.put<ProviderSummary>(API_PATHS.PROVIDER_BY_ID(id), {
-      body: JSON.stringify(input),
-    });
+    return withManagerSessionRetry(this.http, () =>
+      this.http.put<ProviderSummary>(API_PATHS.PROVIDER_BY_ID(id), {
+        body: JSON.stringify(input),
+      }),
+    );
   }
 
   async remove(id: string): Promise<void> {
-    await this.http.delete(API_PATHS.PROVIDER_BY_ID(id));
+    await withManagerSessionRetry(this.http, () =>
+      this.http.delete(API_PATHS.PROVIDER_BY_ID(id)),
+    );
   }
 
   test(id: string): Promise<ProviderTestResult> {
-    return this.http.post<ProviderTestResult>(API_PATHS.PROVIDER_TEST(id));
+    return withManagerSessionRetry(this.http, () =>
+      this.http.post<ProviderTestResult>(API_PATHS.PROVIDER_TEST(id)),
+    );
   }
 
   setDefault(id: string): Promise<ProviderSummary> {
-    return this.http.post<ProviderSummary>(API_PATHS.PROVIDER_SET_DEFAULT(id));
+    return withManagerSessionRetry(this.http, () =>
+      this.http.post<ProviderSummary>(API_PATHS.PROVIDER_SET_DEFAULT(id)),
+    );
   }
 
   /** Plugin-wide settings singleton: privacy defaults/override/field policy. The GET route
@@ -109,9 +130,11 @@ export class SettingsService {
   updateAssistantSettings(
     settings: AssistantSettings,
   ): Promise<AssistantSettings> {
-    return this.http.put<AssistantSettings>(API_PATHS.SETTINGS, {
-      body: JSON.stringify(settings),
-    });
+    return withManagerSessionRetry(this.http, () =>
+      this.http.put<AssistantSettings>(API_PATHS.SETTINGS, {
+        body: JSON.stringify(settings),
+      }),
+    );
   }
 
   /** Pre-flight administrator probe: backs the Settings page's warning callout
@@ -127,17 +150,7 @@ export class SettingsService {
    *
    * `apiKeyEncryptionEnabled`: false when the server cannot encrypt keys at rest; the form then
    * warns and blocks saving a key (the server's 503 gate is the backstop). */
-  getSettingsAccess(): Promise<{
-    administrator: boolean;
-    message: string | null;
-    defaultApiHostId: string | null;
-    apiKeyEncryptionEnabled: boolean;
-  }> {
-    return this.http.get<{
-      administrator: boolean;
-      message: string | null;
-      defaultApiHostId: string | null;
-      apiKeyEncryptionEnabled: boolean;
-    }>(API_PATHS.SETTINGS_ACCESS);
+  getSettingsAccess(): Promise<SettingsAccess> {
+    return this.http.get<SettingsAccess>(API_PATHS.SETTINGS_ACCESS);
   }
 }

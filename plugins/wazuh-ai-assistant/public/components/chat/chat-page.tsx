@@ -11,6 +11,9 @@ import {
   EuiToolTip,
   EuiIconTip,
   EuiText,
+  EuiTitle,
+  EuiScreenReaderOnly,
+  EuiBetaBadge,
   EuiLoadingSpinner,
   EuiPanel,
   EuiIcon,
@@ -23,7 +26,7 @@ import {
   AssistantSettings,
   SettingsService,
 } from '../../services/settings-service';
-import { healManagerSession } from '../../services/session-heal';
+import { ensureManagerSession } from '../../services/session-heal';
 import { confirmInterruption } from '../../services/interrupt-confirm';
 import { ConversationsService } from '../../services/conversations-service';
 import {
@@ -164,94 +167,6 @@ const EXAMPLE_CARDS = [
 ];
 
 /**
- * Single injected `<style>` element for this whole chat surface (rendered once from ChatPage's
- * own JSX below) — the hard constraint here is EUI/inline styles + AT MOST ONE `<style>` tag for
- * exactly what inline styles cannot express: `@keyframes`, the hero wash's `radial-gradient`,
- * `:hover`/`:focus-visible` pseudo-class rules, and the example cards' per-card stagger delay
- * (each card sets `--wzCardDelay` inline; this is the one place that consumes it).
- *
- * Every color reference here is `rgba(var(--wzAccentRgb), alpha)` — `--wzAccentRgb` is set ONCE,
- * inline, on this component's own root element below, resolved from the real OSD theme
- * (`core.uiSettings.get('theme:darkMode')`, not `prefers-color-scheme`, which is NOT how OSD
- * models dark mode). Custom properties inherit through the whole DOM subtree regardless of
- * component boundaries, so every descendant (sidebar rows, hero cards) picks it up without any of
- * them needing an `isDarkMode` prop threaded down.
- *
- * Motion is entirely opt-in: every animation/transition/transform lives inside the
- * `prefers-reduced-motion: no-preference` block. Outside it (i.e. for a reduced-motion user), the
- * hero cards and message rows simply render at their final `opacity: 1` state with no movement —
- * the ONE exception is the hover/focus border+shadow rule, which is an instant state change (no
- * transition, no transform) even for reduced-motion users, since EUI's own hover affordances work
- * the same way.
- */
-const CHAT_SURFACE_STYLES = `
-.wzHeroIconWrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.wzHeroWash {
-  position: absolute;
-  width: 230px;
-  height: 230px;
-  border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(
-    circle,
-    rgba(var(--wzAccentRgb), 0.18) 0%,
-    rgba(var(--wzAccentRgb), 0.06) 45%,
-    rgba(var(--wzAccentRgb), 0) 72%
-  );
-}
-
-.wzHeroIcon {
-  position: relative;
-}
-
-.wzHeroCard:hover,
-.wzHeroCard:focus-visible {
-  border-color: rgba(var(--wzAccentRgb), 0.55) !important;
-  box-shadow: 0 6px 20px -4px rgba(var(--wzAccentRgb), 0.28);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .wzHeroCard {
-    opacity: 0;
-    animation: wzFadeUp 420ms ease-out both;
-    animation-delay: var(--wzCardDelay, 0ms);
-    transition: transform 150ms ease-out, box-shadow 150ms ease-out, border-color 150ms ease-out;
-  }
-
-  .wzHeroCard:hover {
-    transform: translateY(-3px);
-  }
-
-  .wzConvoRow {
-    transition: background-color 120ms ease-out, border-color 120ms ease-out;
-  }
-
-  .wzMsgRow {
-    opacity: 0;
-    animation: wzFadeUp 260ms ease-out both;
-  }
-
-  @keyframes wzFadeUp {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-}
-
-`;
-
-/**
  * Rewrites the route to address `conversationId` (a `/conversation/:id` path, or `/` for none),
  * without touching the query string. Goes through the app shell's own router `history` (rather than
  * a raw `window.history.replaceState` call) so this and the shell's tab routing share one writer of
@@ -389,11 +304,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
   // into whichever conversation the user had just opened.
   const streamGenerationRef = useRef(0);
   const chatInputRef = useRef<ChatInputHandle>(null);
-  // Core ships this mark alongside every OSD build (src/core/server/core_app/assets/logos/), so
-  // it is always present; served under the basePath the same way chat_service reaches the API.
-  const aiAvatarUrl = core.http.basePath.prepend(
-    '/ui/logos/wazuh_mark_on_light.svg',
-  );
   // "Open in Discover" (discover-link.tsx): built once with `core` in closure, rather than
   // threading `core` itself down through MessageList/MessageBubble/ResultTable.
   const [resolveDiscoverUrl] = useState(() => createDiscoverUrlResolver(core));
@@ -444,21 +354,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         // it would compete with the chat error state on first paint for something that degrades
         // gracefully on its own.
       });
-
-    // One-shot session auto-heal (mirrors settings-page.tsx's own heal wiring): a direct
-    // deep link into this app never visits the main Wazuh app, so the wz-token cookie backing every
-    // Manager-path tool call may be missing/expired on first paint. Fire-and-forget: the access
-    // probe's `defaultApiHostId` is the only thing needed here, and any outcome (healed, not healed,
-    // probe itself failed) is ignored — this never blocks or errors the chat UI, and the existing
-    // `detectManagerAuthError` heuristic below still catches whatever, if anything, is left over.
-    settingsService
-      .getSettingsAccess()
-      .then(access => {
-        if (access.defaultApiHostId) {
-          void healManagerSession(core.http, access.defaultApiHostId);
-        }
-      })
-      .catch(() => {});
 
     // Session-expiry draft stash restore: the mirror image of `handleSessionExpired`'s
     // stash below. Runs once, on mount — the only time a stashed draft could be waiting, since it
@@ -1226,6 +1121,26 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           if (exchange) {
             exchange.digestContent = event.content;
           }
+        } else if (event.type === 'suggested_query') {
+          // Graceful-failure handoff (server/tools/suggest-discover-query.ts): a callout rendered
+          // alongside this message's prose (message-bubble.tsx), not another `table` — the model
+          // is telling the user what it could NOT check, so there is no result set to show, only a
+          // query the user can run themselves. Set immediately (unlike `table`'s held/flushed
+          // `pendingTable`) since it has no ordering dependency on delta text arriving first.
+          if (isTurnStillActive()) {
+            const suggestedQuery = {
+              index: event.index,
+              dsl: event.dsl,
+              reason: event.reason,
+            };
+            updateMessages(current =>
+              current.map(message =>
+                message.id === assistantMessageId
+                  ? { ...message, suggestedQuery }
+                  : message,
+              ),
+            );
+          }
         } else if (event.type === 'privacy_map' && isTurnStillActive()) {
           // Gated: the pseudonym map is PER-CONVERSATION state. An abandoned turn's entries used to
           // be merged into whatever conversation the user had just opened, and then sent up with
@@ -1391,6 +1306,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
    * exactly the same placeholder/history/save/stream sequence.
    */
   const startTurn = async (history: UiChatMessage[]) => {
+    // Pre-turn session guard: after >60s idle, re-probe (and heal if the wz-token
+    // expired) so this turn's Manager-path tool calls see a fresh token. The 60s memo makes it free
+    // during rapid back-and-forth; `detectManagerAuthError` below stays the mid-turn backstop.
+    await ensureManagerSession(core.http, { maxAgeMs: 60_000 });
+
     const assistantMessageId = nextMessageId();
     const assistantMessage: UiChatMessage = {
       id: assistantMessageId,
@@ -1562,6 +1482,15 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           'Privacy off: hostnames, IP addresses, usernames, process command lines, and finding/rule text are sent to the configured AI provider as-is.',
       });
 
+  // Conversation header title: the active conversation's own saved title when one is open
+  // (looked up from the sidebar's own `conversations` list, never re-derived), or the
+  // "New conversation" fallback for a brand-new, never-yet-saved one.
+  const activeConversationTitle = activeConversationId
+    ? conversations.find(
+        conversation => conversation.id === activeConversationId,
+      )?.title
+    : undefined;
+
   const providerOptions = providers.map(provider => ({
     value: provider.id,
     text: provider.isDefault
@@ -1571,14 +1500,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         })
       : provider.name,
   }));
-
-  // Theme-correct accent (see CHAT_SURFACE_STYLES's doc comment): OSD dark mode is a uiSettings
-  // toggle the dashboard applies on a full page load, not a live-changing media feature, so
-  // reading it once per render — no listener, no state — is enough. This is the same #0077CC
-  // family conversation-list.tsx's selected and hover rows use, lightened for dark mode so it
-  // stays legible against a dark canvas instead of reading as a second, unrelated hue.
-  const isDarkMode = core.uiSettings.get('theme:darkMode');
-  const accentRgb = isDarkMode ? '86, 180, 233' : '0, 119, 204';
 
   return (
     // Iteration 2 layout: EuiPage/EuiPageSideBar rendered as an unreliable hairline sliver in this
@@ -1592,22 +1513,19 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     // behaves like the old plain document-flow layout (sidebar and chat column both size to
     // content, page scrolls normally) rather than breaking, so it is safe either way.
     <>
-      {/* Single injected <style> element for the whole chat surface — see CHAT_SURFACE_STYLES's own
-        doc comment above for exactly what it does and does not cover. */}
-      <style>{CHAT_SURFACE_STYLES}</style>
+      {/* wzAiChat: the `--wz-*` token block chat-page.scss defines from EUI's own `$eui*` SASS
+        variables — every color/border reference in this subtree (sidebar rows, hero cards, the
+        sticky input focus ring) reads one of those custom properties instead of a hardcoded hex
+        or a JS-computed `theme:darkMode` branch. Custom properties inherit through the whole DOM
+        subtree regardless of component boundaries, so nothing downstream needs its own dark-mode
+        prop threaded down to it. */}
       <div
-        style={
-          {
-            display: 'flex',
-            height: '100%',
-            minHeight: 0,
-            // Consumed by CHAT_SURFACE_STYLES above and by inline `rgba(var(--wzAccentRgb), ...)`
-            // reads further down this subtree (conversation-list.tsx's selected/hover rows, the
-            // hero cards' icon chips) — set once here so nothing downstream needs its own
-            // isDarkMode prop.
-            '--wzAccentRgb': accentRgb,
-          } as React.CSSProperties
-        }
+        className='wzAiChat'
+        style={{
+          display: 'flex',
+          height: '100%',
+          minHeight: 0,
+        }}
       >
         {/* Left pane: saved-conversations sidebar. EuiPanel color="subdued" gives the standard OSD
           "sunken" pane background without inventing a new hardcoded color. */}
@@ -1622,17 +1540,22 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             // overrode the fixed width below and let the sidebar swallow half the page. A
             // fixed-width pane must explicitly opt out.
             grow={false}
+            role='region'
+            aria-label={i18n.translate(
+              'wazuhAiAssistant.chat.conversations.sidebarRegionLabel',
+              {
+                defaultMessage: 'Saved conversations',
+              },
+            )}
             style={{
               width: CONVERSATION_SIDEBAR_WIDTH,
               maxWidth: CONVERSATION_SIDEBAR_WIDTH,
               flexShrink: 0,
               overflowY: 'auto',
-              // Single hardcoded hex in this file: #D3DAE6 is EUI's `lightShade` token, the same shade
-              // EUI's own components already use for hairline borders in the light theme. No CSS
-              // variable/theme value is exposed to inline styles in this plugin (no stylesheet, no
-              // EuiThemeProvider hook usage elsewhere here), so this is a deliberate one-off rather than
-              // a new arbitrary color.
-              borderRight: '1px solid #D3DAE6',
+              // `--wz-hairline` (chat-page.scss, sourced from `$euiBorderColor`) replaces the old
+              // hardcoded `#D3DAE6` — that hex was EUI's light-theme `lightShade` token with no
+              // dark-mode counterpart, so it rendered as the brightest edge on the page in dark mode.
+              borderRight: '1px solid var(--wz-hairline)',
             }}
           >
             <ConversationList
@@ -1673,6 +1596,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({
         <div
           ref={scrollPaneRef}
           onScroll={handleScrollPane}
+          role='region'
+          aria-label={i18n.translate(
+            'wazuhAiAssistant.chat.chatPaneRegionLabel',
+            {
+              defaultMessage: 'Chat',
+            },
+          )}
           style={
             {
               flex: 1,
@@ -1713,41 +1643,35 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               padding: '16px 24px 0',
             }}
           >
-            {(error || providersError) && (
-              <StatusCallout
-                title={i18n.translate('wazuhAiAssistant.chat.errorTitle', {
-                  defaultMessage: 'Something went wrong',
-                })}
-                color='danger'
-                iconType='alert'
-                body={error ?? providersError}
-              />
+            {/* The view's `<h1>`, for assistive tech only. The chat column had no heading at all,
+                  which left screen-reader users without a name for the thing they are reading and
+                  the page without a document outline. A VISIBLE header was tried and dropped: a
+                  conversation's title is generated from its first message, so a visible strip
+                  restated the user's own question directly above that same question in the
+                  transcript, and the sidebar already marks which conversation is open. Screen-
+                  reader-only keeps the semantics without the duplication — and matches the Home
+                  Overview, which likewise shows no page-scale title. */}
+            {!showLoadingState && !showNoProviderState && (
+              <EuiScreenReaderOnly>
+                <h1>
+                  {activeConversationTitle ??
+                    i18n.translate(
+                      'wazuhAiAssistant.chat.conversations.newConversationHeading',
+                      {
+                        defaultMessage: 'New conversation',
+                      },
+                    )}
+                </h1>
+              </EuiScreenReaderOnly>
             )}
 
-            {managerAuthHint && (
-              <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.managerAuthHint.title',
-                  {
-                    defaultMessage: 'Your Wazuh session may have expired',
-                  },
-                )}
-                color='warning'
-                iconType='alert'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.managerAuthHint.body',
-                  {
-                    defaultMessage:
-                      'A request to the Wazuh manager failed, which can happen when your dashboard session token has expired. Reload the page and sign in again, then retry your question.',
-                  },
-                )}
-              />
-            )}
-
-            {/* Session-expiry recovery UX: a genuine 401, distinct from managerAuthHint's
-                  best-effort heuristic above. Persistent (no dismiss control, and nothing in this
-                  file ever calls setSessionExpired(false) except starting a fresh send) until the
-                  user reloads, per this fix's brief. */}
+            {/* Callouts render in priority order (never suppressed — resilience-first: every
+                  state is shown, just ordered): session expiry first (it blocks everything else),
+                  then generic errors, then a failed auto-save, then the optimistic-concurrency
+                  merge notices. Session-expiry recovery UX: a genuine 401, distinct from
+                  managerAuthHint's best-effort heuristic below. Persistent (no dismiss control,
+                  and nothing in this file ever calls setSessionExpired(false) except starting a
+                  fresh send) until the user reloads, per this fix's brief. */}
             {sessionExpired && (
               <StatusCallout
                 title={i18n.translate(
@@ -1782,6 +1706,61 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               />
             )}
 
+            {(error || providersError) && (
+              <StatusCallout
+                title={i18n.translate('wazuhAiAssistant.chat.errorTitle', {
+                  defaultMessage: 'Something went wrong',
+                })}
+                color='danger'
+                iconType='alert'
+                body={error ?? providersError}
+              />
+            )}
+
+            {managerAuthHint && (
+              <StatusCallout
+                title={i18n.translate(
+                  'wazuhAiAssistant.chat.managerAuthHint.title',
+                  {
+                    defaultMessage: 'Your Wazuh session may have expired',
+                  },
+                )}
+                color='warning'
+                iconType='alert'
+                body={i18n.translate(
+                  'wazuhAiAssistant.chat.managerAuthHint.body',
+                  {
+                    defaultMessage:
+                      'A request to the Wazuh manager failed, which can happen when your dashboard session token has expired. Reload the page and sign in again, then retry your question.',
+                  },
+                )}
+              />
+            )}
+
+            {/* A failed auto-save is surfaced instead of swallowed: the conversation on screen is
+                ahead of what is stored, which the user cannot infer from anything else. Not
+                dismissible and not an action — the next turn's save retries on its own, and clears
+                this as soon as one succeeds. */}
+            {saveFailed && (
+              <StatusCallout
+                title={i18n.translate(
+                  'wazuhAiAssistant.chat.conversations.saveFailed.title',
+                  {
+                    defaultMessage: 'This conversation is not being saved',
+                  },
+                )}
+                color='warning'
+                iconType='alert'
+                body={i18n.translate(
+                  'wazuhAiAssistant.chat.conversations.saveFailed.body',
+                  {
+                    defaultMessage:
+                      'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
+                  },
+                )}
+              />
+            )}
+
             {/* Optimistic-concurrency notice: shown after persistConversationAfterTurn's
                   auto-save hit a 409 on the last completed turn — see saveConversationWithMerge's
                   own doc comment for exactly when each variant fires. Non-blocking: the chat itself
@@ -1794,8 +1773,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                     defaultMessage: 'Conversation merged',
                   },
                 )}
-                color='warning'
-                iconType='alert'
+                // A successful merge is a good outcome, not a warning — the conflict variant
+                // right below keeps 'warning'/'alert', so the two are no longer visually
+                // identical for opposite results.
+                color='success'
+                iconType='check'
                 body={i18n.translate(
                   'wazuhAiAssistant.chat.conversations.mergedNotice.body',
                   {
@@ -1821,30 +1803,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   {
                     defaultMessage:
                       'This conversation is being edited in another tab and the changes could not be merged automatically. Your latest messages are still shown here, but they may not be saved.',
-                  },
-                )}
-              />
-            )}
-
-            {/* A failed auto-save is surfaced instead of swallowed: the conversation on screen is
-                ahead of what is stored, which the user cannot infer from anything else. Not
-                dismissible and not an action — the next turn's save retries on its own, and clears
-                this as soon as one succeeds. */}
-            {saveFailed && (
-              <StatusCallout
-                title={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.saveFailed.title',
-                  {
-                    defaultMessage: 'This conversation is not being saved',
-                  },
-                )}
-                color='warning'
-                iconType='alert'
-                body={i18n.translate(
-                  'wazuhAiAssistant.chat.conversations.saveFailed.body',
-                  {
-                    defaultMessage:
-                      'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
                   },
                 )}
               />
@@ -1925,50 +1883,35 @@ export const ChatPage: React.FC<ChatPageProps> = ({
               {showWelcomeState && (
                 <>
                   <EuiEmptyPrompt
-                    // Plain, natural-aspect-ratio mark (not EuiAvatar) — EuiAvatar was cropping
-                    // the Wazuh mark into an awkward circle. Message-bubble.tsx's own assistant
-                    // avatars are untouched. wzHeroWash is a soft, low-opacity radial wash in the
-                    // resolved Wazuh-blue accent (see CHAT_SURFACE_STYLES); wzHeroIcon just needs
-                    // z-index above it, which the class provides via `position: relative`.
-                    icon={
-                      <div className='wzHeroIconWrap'>
-                        <div className='wzHeroWash' aria-hidden='true' />
-                        <img
-                          src={aiAvatarUrl}
-                          alt=''
-                          className='wzHeroIcon'
-                          style={{ height: 76 }}
-                        />
-                      </div>
-                    }
+                    // No `icon`: this chat already lives inside the Wazuh app chrome, so a Wazuh
+                    // mark on the welcome screen only repeated branding the user can already see.
                     title={
-                      // Inline size/weight/letter-spacing override the EuiEmptyPrompt title's
-                      // own (smaller) default — inline style always wins over EUI's class-based
-                      // font-size here, same override pattern already used throughout this file.
-                      <h2
-                        style={{
-                          fontSize: 30,
-                          fontWeight: 600,
-                          letterSpacing: '-0.01em',
-                          lineHeight: 1.25,
-                          margin: 0,
-                        }}
-                      >
-                        {i18n.translate('wazuhAiAssistant.chat.welcome.title', {
-                          defaultMessage: 'Ask the AI Assistant something',
-                        })}
-                      </h2>
+                      // EUI's own type scale (size='m') instead of an inline fontSize/weight/
+                      // letter-spacing override — the whole point of this pass is to stop
+                      // fighting EuiEmptyPrompt's built-in typography with inline styles.
+                      <EuiTitle size='m'>
+                        <h2>
+                          {i18n.translate(
+                            'wazuhAiAssistant.chat.welcome.title',
+                            {
+                              defaultMessage: 'Ask the AI Assistant something',
+                            },
+                          )}
+                        </h2>
+                      </EuiTitle>
                     }
                     body={
-                      <p style={{ fontSize: 16, lineHeight: 1.5, margin: 0 }}>
-                        {i18n.translate(
-                          'wazuhAiAssistant.chat.welcome.subtitle',
-                          {
-                            defaultMessage:
-                              'Ask questions about your security data in plain language.',
-                          },
-                        )}
-                      </p>
+                      <EuiText size='m'>
+                        <p>
+                          {i18n.translate(
+                            'wazuhAiAssistant.chat.welcome.subtitle',
+                            {
+                              defaultMessage:
+                                'Ask questions about your security data in plain language.',
+                            },
+                          )}
+                        </p>
+                      </EuiText>
                     }
                   />
                   <EuiSpacer size='l' />
@@ -1977,31 +1920,41 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         paragraph competing with the subtitle above. Moved out of
                         EuiEmptyPrompt's body (along with the card row below) so the row is
                         no longer clamped to the empty prompt's ~576px content width — it now
-                        spans the full ~860px chat column instead of wrapping 2+1. */}
-                  <EuiText size='s' color='subdued'>
-                    <p
-                      style={{
-                        margin: 0,
-                        fontWeight: 600,
-                        letterSpacing: '0.02em',
-                        textTransform: 'uppercase',
-                        fontSize: 11,
-                        textAlign: 'center',
-                      }}
-                    >
-                      {i18n.translate('wazuhAiAssistant.chat.welcome.body', {
-                        defaultMessage:
-                          'Try one of these, or type your own question below.',
-                      })}
-                    </p>
-                  </EuiText>
+                        spans the full ~860px chat column instead of wrapping 2+1.
+                        EuiBetaBadge (the same "lighter, navigation-style" device the Home
+                        Overview's SectionHeader uses) replaces the old uppercase/letter-spaced
+                        inline-styled label — it is never smaller than the content it introduces,
+                        unlike the label it replaces. */}
+                  <EuiFlexGroup
+                    gutterSize='none'
+                    justifyContent='center'
+                    responsive={false}
+                  >
+                    <EuiFlexItem grow={false}>
+                      <EuiBetaBadge
+                        color='subdued'
+                        label={i18n.translate(
+                          'wazuhAiAssistant.chat.welcome.body',
+                          {
+                            defaultMessage: 'Try one of these',
+                          },
+                        )}
+                        aria-label={i18n.translate(
+                          'wazuhAiAssistant.chat.welcome.bodyAriaLabel',
+                          {
+                            defaultMessage: 'Example questions section',
+                          },
+                        )}
+                      />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
                   <EuiSpacer size='s' />
                   {/* Elevated example cards (EuiPanel, not EuiCard): a titleSize="xs"-style
                         compact EuiCard is not a reliably typed prop in this EUI version and
                         EuiCard's fixed layout paddings still read oversized at "s"/horizontal
                         for a 3-up row this narrow, so this uses onClick EuiPanels instead —
                         icon chip + title + one truncated line, now with a consistent height,
-                        a hover lift (wzHeroCard, see CHAT_SURFACE_STYLES), and a staggered
+                        a hover lift (wzHeroCard, see chat-page.scss), and a staggered
                         fade/slide-in on mount driven by each card's own --wzCardDelay.
                         Clicking still only fills the input (unchanged setInputText call),
                         never auto-sends. */}
@@ -2030,8 +1983,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                               minHeight: 128,
                               display: 'flex',
                               flexDirection: 'column',
-                              borderRadius: 10,
-                              // Consumed only by CHAT_SURFACE_STYLES's reduced-motion-safe
+                              // No borderRadius override — EuiPanel's own default applies.
+                              // Consumed only by chat-page.scss's reduced-motion-safe
                               // animation-delay rule; see this component's own doc comment.
                               '--wzCardDelay': `${index * 80}ms`,
                             } as React.CSSProperties
@@ -2044,8 +1997,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                               justifyContent: 'center',
                               width: 32,
                               height: 32,
-                              borderRadius: 8,
-                              background: 'rgba(var(--wzAccentRgb), 0.12)',
+                              borderRadius: 4,
+                              background: 'var(--wz-accent-soft)',
                             }}
                           >
                             <EuiIcon
@@ -2083,7 +2036,6 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 !showWelcomeState && (
                   <MessageList
                     messages={messages}
-                    aiAvatarUrl={aiAvatarUrl}
                     resolveDiscoverUrl={resolveDiscoverUrl}
                     resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
                     // Withheld while generating: retrying would abandon the turn already running.
@@ -2095,14 +2047,20 @@ export const ChatPage: React.FC<ChatPageProps> = ({
             </div>
 
             {!showLoadingState && !showNoProviderState && (
-              <div className='wzStickyInputPanel'>
+              <div
+                className={
+                  hasProviders
+                    ? 'wzStickyInputPanel'
+                    : 'wzStickyInputPanel wzStickyInputPanel-isDisabled'
+                }
+              >
                 <EuiSpacer size='xs' />
                 <EuiPanel
                   color='plain'
                   hasBorder
                   hasShadow={false}
                   paddingSize='s'
-                  style={{ borderRadius: 12, marginBottom: 12 }}
+                  style={{ marginBottom: 12 }}
                 >
                   <ChatInput
                     ref={chatInputRef}
@@ -2127,7 +2085,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                           <EuiToolTip
                             content={i18n.translate(
                               'wazuhAiAssistant.chat.privacy.adminSet',
-                              { defaultMessage: 'Set by administrator' },
+                              {
+                                defaultMessage: 'Set by administrator',
+                              },
                             )}
                           >
                             {privacyBadge}
@@ -2151,54 +2111,79 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                         />
                       </EuiFlexItem>
                     )}
-                    <EuiFlexItem />
-                    {hasProviders && (
-                      <EuiFlexItem grow={false}>
-                        <EuiSelect
-                          id='wzAiAssistantProviderSelect'
-                          compressed
-                          prepend={i18n.translate(
-                            'wazuhAiAssistant.chat.providerLabel',
-                            { defaultMessage: 'Provider' },
-                          )}
-                          options={providerOptions}
-                          value={selectedProviderId}
-                          onChange={event =>
-                            onProviderChange(event.target.value)
-                          }
-                          aria-label={i18n.translate(
-                            'wazuhAiAssistant.chat.providerSelect',
-                            { defaultMessage: 'Provider' },
-                          )}
-                        />
-                      </EuiFlexItem>
-                    )}
+                    {/* Explicit grow spacer (was a bare `<EuiFlexItem />` relying on `grow`
+                          defaulting to true) pushes the provider/send cluster to the far right;
+                          that cluster now sits behind its own hairline left border, so the two
+                          concerns (privacy controls vs. provider/send) read as visually separate
+                          groups instead of one undivided row. */}
+                    <EuiFlexItem grow />
                     <EuiFlexItem grow={false}>
-                      {isGenerating ? (
-                        <EuiButtonIcon
-                          iconType='cross'
-                          color='danger'
-                          size='s'
-                          onClick={handleStop}
-                          aria-label={i18n.translate(
-                            'wazuhAiAssistant.chat.stopButton',
-                            { defaultMessage: 'Stop' },
+                      <EuiFlexGroup
+                        alignItems='center'
+                        gutterSize='s'
+                        responsive={false}
+                        style={{
+                          borderLeft: '1px solid var(--wz-hairline)',
+                          paddingLeft: 8,
+                        }}
+                      >
+                        {hasProviders && (
+                          <EuiFlexItem grow={false}>
+                            <EuiSelect
+                              id='wzAiAssistantProviderSelect'
+                              compressed
+                              prepend={i18n.translate(
+                                'wazuhAiAssistant.chat.providerLabel',
+                                {
+                                  defaultMessage: 'Provider',
+                                },
+                              )}
+                              options={providerOptions}
+                              value={selectedProviderId}
+                              onChange={event =>
+                                onProviderChange(event.target.value)
+                              }
+                              aria-label={i18n.translate(
+                                'wazuhAiAssistant.chat.providerSelect',
+                                {
+                                  defaultMessage: 'Provider',
+                                },
+                              )}
+                            />
+                          </EuiFlexItem>
+                        )}
+                        <EuiFlexItem grow={false}>
+                          {isGenerating ? (
+                            <EuiButtonIcon
+                              iconType='cross'
+                              color='danger'
+                              size='s'
+                              onClick={handleStop}
+                              aria-label={i18n.translate(
+                                'wazuhAiAssistant.chat.stopButton',
+                                {
+                                  defaultMessage: 'Stop',
+                                },
+                              )}
+                            />
+                          ) : (
+                            <EuiButtonIcon
+                              iconType='arrowUp'
+                              color='primary'
+                              size='s'
+                              display='fill'
+                              onClick={() => chatInputRef.current?.send()}
+                              disabled={!hasProviders || !inputText.trim()}
+                              aria-label={i18n.translate(
+                                'wazuhAiAssistant.chat.sendButton',
+                                {
+                                  defaultMessage: 'Send',
+                                },
+                              )}
+                            />
                           )}
-                        />
-                      ) : (
-                        <EuiButtonIcon
-                          iconType='arrowUp'
-                          color='primary'
-                          size='s'
-                          display='fill'
-                          onClick={() => chatInputRef.current?.send()}
-                          disabled={!hasProviders || !inputText.trim()}
-                          aria-label={i18n.translate(
-                            'wazuhAiAssistant.chat.sendButton',
-                            { defaultMessage: 'Send' },
-                          )}
-                        />
-                      )}
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiPanel>

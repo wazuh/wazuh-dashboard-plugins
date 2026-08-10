@@ -101,7 +101,7 @@
     "wazuhAiAssistant.settings.form.baseUrl": "URL del endpoint",
     "wazuhAiAssistant.settings.form.baseUrlInvalid": "Introduce una URL válida que empiece por http:// o https://",
     "wazuhAiAssistant.settings.form.model": "Modelo",
-    "wazuhAiAssistant.settings.form.modelHelp": "El uso de herramientas necesita un modelo con buen soporte de function calling. Modelos recomendados: GPT-4o o GPT-4o-mini (OpenAI), Claude Sonnet (Anthropic), llama-3.3-70b-versatile (Groq). Los modelos pequeños o básicos suelen fallar con errores de herramientas.",
+    "wazuhAiAssistant.settings.form.modelHelp": "El uso de herramientas necesita un modelo con buen soporte de function calling (p. ej. GPT-4o, Claude Sonnet); los modelos pequeños o básicos suelen fallar. Consulte la lista de modelos de su proveedor para ver la disponibilidad actual, ya que los modelos se retiran periódicamente. Una clave de nivel gratuito con un límite bajo puede fallar sin importar la capacidad del modelo.",
     "wazuhAiAssistant.settings.form.apiKey": "Clave API",
     "wazuhAiAssistant.settings.form.apiKeyHelp": "Déjalo vacío para conservar la clave actual.",
     "wazuhAiAssistant.settings.form.save": "Guardar",

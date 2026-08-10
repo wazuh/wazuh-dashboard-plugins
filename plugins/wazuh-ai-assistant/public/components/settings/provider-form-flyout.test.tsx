@@ -39,6 +39,17 @@ describe('ProviderFormFlyout — create mode', () => {
     expect(screen.getByLabelText(/^name$/i)).toHaveValue('');
   });
 
+  it('clarifies the API key is optional for auth-free endpoints and encrypted at rest', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    expect(
+      screen.getByText(
+        /optional for endpoints that don't require authentication/i,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/stored encrypted at rest/i)).toBeInTheDocument();
+  });
+
   it('blocks submit and shows an error when the endpoint URL is invalid', async () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
@@ -244,5 +255,154 @@ describe('ProviderFormFlyout — API key encryption gate', () => {
       target: { value: 'sk-secret' },
     });
     expect(screen.getByRole('button', { name: /^save$/i })).toBeEnabled();
+  });
+});
+
+describe('ProviderFormFlyout — endpoint URL guidance', () => {
+  it('shows an OpenAI placeholder/example, with one docs link per covered service behind the documentation popover, by default (openai_compatible)', async () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveAttribute(
+      'placeholder',
+      'https://api.openai.com/v1',
+    );
+    expect(
+      screen.queryByRole('link', { name: /openai api reference/i }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole('button', { name: /^api documentation$/i }),
+    );
+
+    expect(
+      await screen.findByRole('link', { name: /openai api reference/i }),
+    ).toHaveAttribute('href', 'https://platform.openai.com/docs/api-reference');
+    expect(
+      screen.getByRole('link', { name: /groq api reference/i }),
+    ).toHaveAttribute('href', 'https://console.groq.com/docs/api-reference');
+    expect(
+      screen.getByRole('link', { name: /ollama api reference/i }),
+    ).toHaveAttribute(
+      'href',
+      'https://github.com/ollama/ollama/blob/main/docs/api.md',
+    );
+    expect(
+      screen.getByText(/using another openai-compatible provider or gateway/i),
+    ).toBeInTheDocument();
+  });
+
+  it('switches to the Anthropic placeholder/example and docs link when the provider type changes', async () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+
+    expect(screen.getByLabelText(/endpoint url/i)).toHaveAttribute(
+      'placeholder',
+      'https://api.anthropic.com',
+    );
+
+    fireEvent.click(
+      screen.getByRole('button', { name: /^api documentation$/i }),
+    );
+
+    expect(
+      await screen.findByRole('link', { name: /anthropic api reference/i }),
+    ).toHaveAttribute('href', 'https://docs.anthropic.com/en/api/overview');
+    expect(
+      screen.queryByRole('link', { name: /groq api reference/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        /using another openai-compatible provider or gateway/i,
+      ),
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe('ProviderFormFlyout — model help text does not recommend retiring models', () => {
+  it('does not recommend llama-3.3-70b-versatile or llama-3.1-8b-instant', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    const helpText = screen.getByText(
+      /tool calling needs a model with solid function-calling support/i,
+    );
+
+    expect(helpText.textContent).not.toMatch(/llama-3\.3-70b-versatile/);
+    expect(helpText.textContent).not.toMatch(/llama-3\.1-8b-instant/);
+    expect(helpText.textContent).toMatch(/GPT-4o/);
+    expect(helpText.textContent).not.toMatch(
+      /small or base models often fail/i,
+    );
+  });
+
+  it('does not offer llama-3.3-70b-versatile as a model example chip', () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    expect(
+      screen.queryByText(/^llama-3\.3-70b-versatile$/),
+    ).not.toBeInTheDocument();
+    // Anchored to the CHIP specifically — it renders the bare id in its own <code>.
+    const chips = screen
+      .getAllByText(/^openai\/gpt-oss-120b$/)
+      .filter(node => node.tagName.toLowerCase() === 'code');
+    expect(chips.length).toBeGreaterThan(0);
+  });
+});
+
+describe('ProviderFormFlyout — Model field guidance', () => {
+  it('shows OpenAI-compatible model examples and one docs link per covered service by default', async () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    // Anchored to the example CHIP's own <code>: the updated model help text (issue 09) also names
+    // GPT-4o-mini in its prose, so an unanchored getByText now matches two nodes and throws. This
+    // test is about the example chips, not the help paragraph.
+    expect(
+      screen
+        .getAllByText(/^gpt-4o-mini$/i)
+        .filter(node => node.tagName.toLowerCase() === 'code').length,
+    ).toBeGreaterThan(0);
+
+    fireEvent.click(
+      screen.getByRole('button', { name: /^see available models$/i }),
+    );
+
+    expect(
+      await screen.findByRole('link', { name: /openai model list/i }),
+    ).toHaveAttribute('href', 'https://platform.openai.com/docs/models');
+    expect(
+      screen.getByRole('link', { name: /groq model list/i }),
+    ).toHaveAttribute('href', 'https://console.groq.com/docs/models');
+    expect(
+      screen.getByRole('link', { name: /ollama model library/i }),
+    ).toHaveAttribute('href', 'https://ollama.com/library');
+    expect(
+      screen.getByText(/using another openai-compatible provider or gateway/i),
+    ).toBeInTheDocument();
+  });
+
+  it('switches to Anthropic model examples and docs link when the provider type changes', async () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/provider type/i), {
+      target: { value: 'anthropic' },
+    });
+
+    expect(screen.getByText(/claude-sonnet-4-5/i)).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole('button', { name: /^see available models$/i }),
+    );
+
+    expect(
+      await screen.findByRole('link', { name: /anthropic model list/i }),
+    ).toHaveAttribute(
+      'href',
+      'https://docs.anthropic.com/en/docs/about-claude/models/overview',
+    );
+    expect(
+      screen.queryByRole('link', { name: /groq model list/i }),
+    ).not.toBeInTheDocument();
   });
 });

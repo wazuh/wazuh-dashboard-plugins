@@ -10,8 +10,6 @@ import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
 
 interface MessageListProps {
   messages: UiChatMessage[];
-  /** Basepath-prepended URL for the Wazuh mark, used as the assistant avatar. */
-  aiAvatarUrl: string;
   /** Threaded down to every MessageBubble's ResultTable; see discover-link.tsx. */
   resolveDiscoverUrl: ResolveDiscoverUrl;
   /** Threaded down to every MessageBubble's ResultTable; see security-analytics-link.tsx. */
@@ -35,13 +33,10 @@ interface MessageListProps {
  * Memoized (perf): ChatPage re-renders on every keystroke (the input's
  * text lives in its own useState there), which would otherwise re-render this whole list —
  * every MessageBubble, every ResultTable, up to 500 rows each — on every single character typed.
- * The three props below are all referentially stable across a keystroke-triggered ChatPage
+ * The props below are all referentially stable across a keystroke-triggered ChatPage
  * render:
  *  - `messages`: only replaced by `updateMessages` (new message/delta/table/etc.), never by
  *    anything input-related.
- *  - `aiAvatarUrl`: a `string` — recomputed each ChatPage render from `core.http.basePath`, but
- *    `Object.is`/`===` compares primitive strings BY VALUE, so an unchanged basePath still
- *    compares equal even though it's a "new" string each render.
  *  - `resolveDiscoverUrl`: ChatPage holds it via `useState(() => createDiscoverUrlResolver(core))`
  *    (the lazy-initializer form, run once on mount), so it is the exact same function instance for
  *    the component's whole lifetime, not just "equal" — confirmed by reading chat-page.tsx.
@@ -49,7 +44,6 @@ interface MessageListProps {
  */
 export const MessageList = React.memo<MessageListProps>(function MessageList({
   messages,
-  aiAvatarUrl,
   resolveDiscoverUrl,
   resolveSecurityAnalyticsUrl,
   onRetryLastTurn,
@@ -61,14 +55,15 @@ export const MessageList = React.memo<MessageListProps>(function MessageList({
         <React.Fragment key={message.id}>
           <MessageBubble
             message={message}
-            aiAvatarUrl={aiAvatarUrl}
             resolveDiscoverUrl={resolveDiscoverUrl}
             resolveSecurityAnalyticsUrl={resolveSecurityAnalyticsUrl}
             onRetry={
               index === messages.length - 1 ? onRetryLastTurn : undefined
             }
           />
-          {index < messages.length - 1 && <EuiSpacer size='m' />}
+          {/* One turn = one 24px breath (EuiSpacer size='l'), matching the rhythm the conversation
+              header and welcome state also use — intra-turn spacing inside a bubble stays 's'. */}
+          {index < messages.length - 1 && <EuiSpacer size='l' />}
         </React.Fragment>
       ))}
       {/* A conversation that ENDS on a question is an unanswered turn: the page was reloaded or

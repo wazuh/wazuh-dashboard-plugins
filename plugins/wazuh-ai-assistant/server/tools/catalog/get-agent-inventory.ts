@@ -1,0 +1,418 @@
+import { ToolDefinition } from '../types';
+import {
+  clampLimit,
+  INVENTORY_CURRENT_STATE_NOTE,
+  limitProperty,
+  objectSchema,
+  optionalStringParam,
+  validateAgentId,
+} from './common';
+
+/**
+ * The 5 kinds this tool implements tonight, out of the 13 real `wazuh-states-inventory-*`
+ * surfaces (`plugins/main/common/constants.ts`'s `WAZUH_IT_HYGIENE_*`). Enum kept to exactly
+ * these 5 rather than listing all 13 with the other 8 rejected at call time: a listed-but-
+ * rejected enum value is a worse model experience than simply not offering it (the model wastes a
+ * call/round-trip discovering the rejection instead of never considering it), and the smaller enum
+ * is itself a few fewer schema tokens on every routed turn -- the same token-conscious reasoning
+ * this whole tool exists for. The other 8 (hardware, interfaces, networks, protocols, users,
+ * groups, services, browser-extensions) each need their own live-mapping verification pass before
+ * they can be added the same way `hotfixes` was tonight -- see this file's own doc comment on
+ * `INVENTORY_KIND_CONFIG` for what "verified" means in practice.
+ */
+const INVENTORY_KINDS = [
+  'os',
+  'packages',
+  'ports',
+  'processes',
+  'hotfixes',
+] as const;
+type InventoryKind = (typeof INVENTORY_KINDS)[number];
+
+interface InventoryKindConfig {
+  /** The concrete `wazuh-states-inventory-*` index this kind reads. `os` is the one naming
+   * exception carried over from get-agent-os.ts: it reads the `system` sub-index, not a literal
+   * `os` one. */
+  index: string;
+  /** Outbound `_source` field list -- for `os`/`packages`/`ports`/`processes`, copied
+   * byte-for-byte (contents AND order) from get-agent-os.ts/get-agent-packages.ts/
+   * get-agent-ports.ts/get-agent-processes.ts, now folded into this one tool and deleted as
+   * standalone files. Part of the outbound Indexer request contract for those four; see
+   * get-agent-inventory.test.ts's regression assertions for the exact byte-for-byte match. */
+  source: string[];
+  /** `[defaultLimit, maxLimit]` for `clampLimit`, applied to the caller's `limit` param. Every
+   * kind except `os` uses this (all four originally had their own `limitProperty`/`clampLimit`
+   * call with these exact bounds). */
+  limitRange?: [number, number];
+  /** Fixed query `size`, bypassing the `limit` param entirely -- only `os` uses this, matching
+   * get-agent-os.ts's original hardcoded `size: 5` (one agent has at most one current OS record;
+   * the original tool never exposed a `limit` parameter at all). */
+  fixedSize?: number;
+}
+
+/**
+ * `hotfixes` is the one kind added beyond the 4 folded-in ones (issue 12, step 2's first
+ * addition): it pairs with the vulnerability tools for patch-management questions and was
+ * previously invisible to the assistant entirely (zero prior mentions of "hotfix" in this
+ * plugin). Its `_source` list is deliberately just the one field this repo can actually confirm
+ * live for `wazuh-states-inventory-hotfixes*`: `package.hotfix.name`, per `plugins/main`'s own
+ * IT Hygiene hotfixes table (`public/components/overview/it-hygiene/packages/inventories/
+ * hotfixes/table-columns.ts`) and sample-data generator (`server/lib/sample-data/dataset/
+ * states-inventory-hotfixes/main.js`), both checked into this repo and already queried live by
+ * that dashboard. No index template/mapping JSON for this index is checked in anywhere in this
+ * repo (unlike `wazuh-states-vulnerabilities`'s, which get-vulnerability-by-cve.ts cites
+ * directly) -- so rather than guess at plausible sibling fields (an install date, a KB URL) with
+ * no checked-in evidence either way, this stays to the one field actually confirmed. The other 8
+ * uncovered kinds each need this same standard of evidence before being added.
+ */
+const INVENTORY_KIND_CONFIG: Record<InventoryKind, InventoryKindConfig> = {
+  os: {
+    index: 'wazuh-states-inventory-system*',
+    source: [
+      'host.hostname',
+      'host.os.name',
+      'host.os.version',
+      'host.os.platform',
+      'host.os.full',
+      'host.architecture',
+    ],
+    fixedSize: 5,
+  },
+  packages: {
+    index: 'wazuh-states-inventory-packages*',
+    source: [
+      'package.name',
+      'package.version',
+      'package.architecture',
+      'package.vendor',
+    ],
+    limitRange: [50, 500],
+  },
+  ports: {
+    index: 'wazuh-states-inventory-ports*',
+    source: [
+      'source.ip',
+      'source.port',
+      'destination.ip',
+      'destination.port',
+      'network.transport',
+      'interface.state',
+      'process.name',
+      'process.pid',
+    ],
+    limitRange: [50, 500],
+  },
+  processes: {
+    index: 'wazuh-states-inventory-processes*',
+    source: [
+      'process.pid',
+      'process.name',
+      'process.state',
+      'process.parent.pid',
+      'process.command_line',
+    ],
+    limitRange: [50, 500],
+  },
+  hotfixes: {
+    index: 'wazuh-states-inventory-hotfixes*',
+    source: ['package.hotfix.name'],
+    limitRange: [50, 500],
+  },
+};
+
+/** Validates `kind` against the 5 implemented values; throws a descriptive Error (turned into a
+ * bounded tool_result error for the model to self-correct, same convention as every other
+ * catalog `buildRequest` in this directory) for anything else -- including one of the other 8
+ * real-but-unimplemented `wazuh-states-inventory-*` surfaces, which this tool's enum never offers
+ * in the first place (see this file's header doc comment for why that is the better model
+ * experience than listing-then-rejecting). */
+function parseKind(value: unknown): InventoryKind {
+  if (
+    typeof value === 'string' &&
+    (INVENTORY_KINDS as readonly string[]).includes(value)
+  ) {
+    return value as InventoryKind;
+  }
+  throw new Error(
+    `Parameter "kind" must be one of: ${INVENTORY_KINDS.join(
+      ', ',
+    )}; got ${JSON.stringify(value)}.`,
+  );
+}
+
+/**
+ * Per-kind primary name field the optional `filter` param (issue #8910) narrows on, keyed the same
+ * as `INVENTORY_KIND_CONFIG`. Picked from that config's own `source` lists -- never a field invented
+ * for this feature -- so every entry here is already a confirmed part of this tool's outbound
+ * `_source`/query contract:
+ * - `packages` -> `package.name` (the field the failing live question, "is openssl installed on
+ *   agent X", is actually asking about).
+ * - `hotfixes` -> `package.hotfix.name`, the one confirmed field for that kind (see
+ *   `INVENTORY_KIND_CONFIG`'s own doc comment above).
+ * - `processes` -> `process.name`; `process.command_line` is matched too (see
+ *   `buildInventoryFilterClause` below) since "which process" questions are answered as often by a
+ *   command-line fragment as by the bare process name.
+ * - `os` matches `host.hostname` OR `host.os.name` -- the two fields that actually identify an OS
+ *   record by name -- even though `kind="os"` already returns at most 5 rows (`fixedSize`): leaving
+ *   `filter` silently ignored for exactly one of the five kinds would be a worse (surprising)
+ *   contract than a uniform, if lower-value, one.
+ * - `ports` has no single name field (see `buildInventoryFilterClause`'s own handling): a numeric
+ *   filter matches `source.port`/`destination.port`, a non-numeric one matches `process.name` (the
+ *   process bound to the port), matching the issue's own worked example ("what process is on port
+ *   9200").
+ */
+const INVENTORY_FILTER_FIELDS: Partial<Record<InventoryKind, string[]>> = {
+  os: ['host.hostname', 'host.os.name'],
+  packages: ['package.name'],
+  processes: ['process.name', 'process.command_line'],
+  hotfixes: ['package.hotfix.name'],
+};
+
+/** Digits only, matching a Wazuh/syscollector port number (`source.port`/`destination.port` are
+ * plain non-negative integers, never signed/floating) -- `parseInt` alone would accept "9200abc" as
+ * 9200, which is not what a caller who typed that meant. */
+const INTEGER_FILTER_RE = /^\d+$/;
+
+/**
+ * A caller-supplied `filter` is meant as a plain substring, not Lucene syntax -- stripping `*`/`?`
+ * before this tool ever builds its own trailing wildcard keeps the outbound value guardrail-safe by
+ * construction (guardrails.ts's `lintDsl` runs on every catalog tool's request with no per-tool
+ * exemption, and rejects a "wildcard" clause whose value has a LEADING `*`/`?` -- a caller who typed
+ * `filter: "*ssl"` would otherwise turn this tool's own `${value}*` into `"*ssl*"` and get a
+ * confusing guardrail rejection instead of the match they asked for).
+ */
+function sanitizeFilterValue(value: string): string {
+  return value.replace(/[*?]/g, '').trim();
+}
+
+/** Case-insensitive PREFIX match on a keyword field: `wildcard` with only a TRAILING `*` (never a
+ * leading one -- see `sanitizeFilterValue`'s doc comment) and `case_insensitive: true`, the shape
+ * this repo's `wazuh-states-*` fields are queried with elsewhere once analyzed matching isn't wanted
+ * (see e.g. `common.ts`'s `findingArtifactFilterClauses`, which uses `term`/exact match for the same
+ * reason: case_insensitive here trades exactness for a prefix substring UX, which the presence
+ * questions this feature exists for need -- "is openssl installed" should still match if the actual
+ * package name has different casing).
+ */
+function caseInsensitivePrefixClause(
+  field: string,
+  value: string,
+): Record<string, unknown> {
+  return {
+    wildcard: { [field]: { value: `${value}*`, case_insensitive: true } },
+  };
+}
+
+/** `bool.should`/`minimum_should_match: 1` wrapper for "match any of these name fields" -- used
+ * whenever a kind's `INVENTORY_FILTER_FIELDS` entry lists more than one field (`os`, `processes`). A
+ * single-field kind skips this wrapper entirely (see `buildInventoryFilterClause` below), so its
+ * outbound clause is unchanged from a bare `caseInsensitivePrefixClause` call. */
+function anyFieldMatches(
+  fields: string[],
+  value: string,
+): Record<string, unknown> {
+  if (fields.length === 1) {
+    return caseInsensitivePrefixClause(fields[0], value);
+  }
+  return {
+    bool: {
+      should: fields.map(field => caseInsensitivePrefixClause(field, value)),
+      minimum_should_match: 1,
+    },
+  };
+}
+
+/**
+ * Resolves the optional `filter` param (issue #8910) to zero or one extra `bool.filter` clause,
+ * appended by `buildRequest` after the agent clause. Returns `undefined` for an omitted/blank
+ * filter (existing callers with no `filter` supplied get exactly the same request body as before
+ * this existed) or the sanitized value collapses to '' after `sanitizeFilterValue` strips it.
+ *
+ * `ports` is the one kind with no single name field in `INVENTORY_FILTER_FIELDS` (its `_source` has
+ * `source.port`/`destination.port` instead of one name field) -- handled here directly rather than
+ * added to that map: a filter that parses as a plain non-negative integer (`INTEGER_FILTER_RE`)
+ * matches either port field by NUMERIC equality (`term`, not a string match -- these fields are
+ * `long`, never `keyword`), since neither `source`/`destination` alone is "the" port a caller means
+ * by "port 9200". A non-numeric filter ("which process is on port X" asked the other way, "what's
+ * using nginx's port") falls back to the same `process.name` prefix match `processes` uses.
+ */
+function buildInventoryFilterClause(
+  kind: InventoryKind,
+  params: Record<string, unknown>,
+): Record<string, unknown> | undefined {
+  const raw = optionalStringParam(params.filter);
+  if (!raw) {
+    return undefined;
+  }
+  const value = sanitizeFilterValue(raw);
+  if (value === '') {
+    return undefined;
+  }
+  if (kind === 'ports') {
+    if (INTEGER_FILTER_RE.test(value)) {
+      const port = Number.parseInt(value, 10);
+      return {
+        bool: {
+          should: [
+            { term: { 'source.port': port } },
+            { term: { 'destination.port': port } },
+          ],
+          minimum_should_match: 1,
+        },
+      };
+    }
+    return caseInsensitivePrefixClause('process.name', value);
+  }
+  const fields = INVENTORY_FILTER_FIELDS[kind];
+  return fields ? anyFieldMatches(fields, value) : undefined;
+}
+
+/**
+ * Resolves the agent-identifying filter clause from `agent_id`/`agent_name` (issue #8873: a live
+ * 40-question run invoked this tool 0/40 times, including on 3 questions statically targeting it,
+ * because `agent_id` was strictly required and numeric while the target personas ask deictically
+ * -- "this server", "the host" -- with no id the model can infer. Elsewhere in the SAME run the
+ * model resolved an agent by calling `get_agents` first, unprompted, so the blocker was this
+ * tool's schema, not model reluctance or routing).
+ *
+ * `agent_id` wins when both are supplied: it is an exact, unambiguous Manager-API identifier,
+ * whereas `agent_name` resolves via a `match` clause (free-text, same precedent as
+ * search-findings-by-agent.ts) that could in principle match more than one document -- given a
+ * caller-supplied id, there is no reason to prefer the fuzzier path. Neither supplied throws a
+ * descriptive Error naming both options, same self-correction convention as `validateAgentId`
+ * and `parseKind` below (the orchestration loop turns a thrown Error into a bounded tool_result
+ * the model reads and can retry from).
+ */
+function resolveAgentFilter(
+  params: Record<string, unknown>,
+): Record<string, unknown> {
+  if (params.agent_id !== undefined) {
+    return { term: { 'wazuh.agent.id': validateAgentId(params.agent_id) } };
+  }
+  const agentName = optionalStringParam(params.agent_name);
+  if (agentName && agentName.trim() !== '') {
+    return { match: { 'wazuh.agent.name': agentName } };
+  }
+  throw new Error(
+    'Either "agent_id" (numeric Wazuh agent ID, e.g. "003") or "agent_name" (the agent\'s ' +
+      'name) is required. If neither is known, call get_agents first to look it up.',
+  );
+}
+
+/**
+ * Replaces `get_agent_os`/`get_agent_packages`/`get_agent_ports`/`get_agent_processes` (issue:
+ * "Consolidate agent inventory into one tool") with one tool taking `agent_id`/`agent_name` +
+ * `kind` + `limit` (the `agent_id`-only original schema was later found, live, to make deictic
+ * questions -- "what's installed on this server" -- uncallable; see `resolveAgentFilter`'s doc
+ * comment and issue #8873).
+ * Drops the inventory category's schema count from 4 to 1 on every routed turn while raising
+ * coverage from 4 of the 13 real `wazuh-states-inventory-*` surfaces to 5 (adds `hotfixes`).
+ *
+ * `tableSpec.columns`/`digest.sampleColumns` are intentionally empty with `deriveColumns: true`
+ * (the mechanism `search_wazuh_data` already uses for the same reason -- see
+ * server/tools/types.ts's `deriveColumns` doc comment): a single `ToolDefinition` cannot declare
+ * a STATIC table shape that is also correct for 5 different `kind` values with 5 different field
+ * sets, and `digest.ts`'s `deriveResultColumns` already reads the executed request's own
+ * `_source` list as its first priority -- which this tool always sets per-kind (see
+ * `INVENTORY_KIND_CONFIG` above) -- so the rendered table's columns are still exactly each kind's
+ * field list, in that order, just labeled by the field's last dot-path segment instead of the
+ * four original tools' hand-picked labels ("host.os.name" -> "Name" rather than "OS"). That label
+ * difference is the one visible deviation from a byte-for-byte port; the underlying data (fields,
+ * order, values) is unchanged, which is what get-agent-inventory.test.ts's regression assertions
+ * check.
+ */
+export const getAgentInventoryTool: ToolDefinition = {
+  spec: {
+    name: 'get_agent_inventory',
+    description:
+      'Retrieves one kind of syscollector inventory data for one agent (host/machine/endpoint): ' +
+      '"os" (operating system details), "packages" (installed software), "ports" (open network ' +
+      'ports), "processes" (running processes), or "hotfixes" (installed Windows hotfixes/KBs -- ' +
+      'pairs with the vulnerability tools for patch-management questions, e.g. "which of these ' +
+      'critical vulnerabilities already have a hotfix available"). Identify the agent by ' +
+      '"agent_id" (numeric) OR "agent_name" -- if the question refers to "this server"/"the ' +
+      'host" without naming or numbering it, and no agent id or name is otherwise known from the ' +
+      `conversation, call get_agents first to look one up. ${INVENTORY_CURRENT_STATE_NOTE} To ` +
+      'check whether one specific package/port/process is present (e.g. "is openssl installed on ' +
+      'this host?", "what is listening on port 9200?"), pass "filter" instead of scanning the ' +
+      'returned rows yourself -- results are truncated well before every row is returned (see ' +
+      '"limit" below), so a specific entry can be absent from the sample even when it exists.',
+    parameters: objectSchema(
+      {
+        agent_id: {
+          type: 'string',
+          description:
+            'Numeric Wazuh agent ID, e.g. "003". Either this or agent_name is required.',
+        },
+        agent_name: {
+          type: 'string',
+          description:
+            'Agent name, e.g. "web-prod-01" -- use this when the id is not known. Either this ' +
+            'or agent_id is required; if both are given, agent_id wins.',
+        },
+        kind: {
+          type: 'string',
+          description:
+            'Which inventory surface to read: os, packages, ports, processes, or hotfixes.',
+          enum: [...INVENTORY_KINDS],
+        },
+        limit: limitProperty(
+          'Max number of rows to return (default 50, max 500). Ignored for kind="os": one agent ' +
+            'has at most one current OS record, so this always returns at most 5 rows regardless. ' +
+            'A large inventory (e.g. hundreds of packages) can exceed this before every row is ' +
+            'returned -- prefer "filter" over raising this for a targeted lookup.',
+        ),
+        filter: {
+          type: 'string',
+          description:
+            "Narrows results to rows matching this value on the kind's primary name field, " +
+            'case-insensitive: package name for "packages", hotfix id for "hotfixes", process ' +
+            'name/command line for "processes", hostname/OS name for "os". For "ports", a numeric ' +
+            'value matches that port number (source or destination); a non-numeric value matches ' +
+            "the process name bound to the port. Optional -- omit to return the kind's unfiltered " +
+            'rows (existing behavior, subject to "limit").',
+        },
+      },
+      ['kind'],
+    ),
+  },
+  target: 'indexer',
+  tier: 'T1',
+  buildRequest(params) {
+    const agentFilter = resolveAgentFilter(params);
+    const kind = parseKind(params.kind);
+    const config = INVENTORY_KIND_CONFIG[kind];
+    const size =
+      config.fixedSize ??
+      clampLimit(
+        params.limit,
+        config.limitRange?.[0] ?? 50,
+        config.limitRange?.[1] ?? 500,
+      );
+    const inventoryFilter = buildInventoryFilterClause(kind, params);
+    const filter = inventoryFilter
+      ? [agentFilter, inventoryFilter]
+      : [agentFilter];
+    return {
+      target: 'indexer',
+      index: config.index,
+      body: {
+        query: {
+          bool: { filter },
+        },
+        _source: config.source,
+        sort: ['_doc'],
+        size,
+      },
+    };
+  },
+  tableSpec: { columns: [] },
+  digest: { sampleColumns: [] },
+  deriveColumns: true,
+  // Issue #8917: explicit, not inherited from `deriveColumns` above (see
+  // `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts). This tool's 5 kinds each
+  // read a small, fixed, reviewed `_source` list (`INVENTORY_KIND_CONFIG` above) rather than a
+  // genuinely arbitrary caller-supplied field set -- but every one of those fields still needs
+  // its own explicit `FIELD_POLICY_DEFAULTS` entry (privacy.ts) before it is safe to relax this,
+  // so it stays `true` today, same as before this flag existed.
+  failClosedFieldPolicy: true,
+};

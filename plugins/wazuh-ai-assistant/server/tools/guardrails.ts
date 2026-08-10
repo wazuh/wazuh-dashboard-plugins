@@ -217,6 +217,11 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // Wazuh 5.0 findings-v5 agg fields, all keyword/low-cardinality (finite rule taxonomy /
   // compliance requirement list / MITRE technique catalog).
   WAZUH_FIELD.RULE_CATEGORY,
+  // `wazuh.rule.category` (above) is never populated by the active integrations in this
+  // environment (rootcheck/FIM/vulnerability-detection) — `wazuh.integration.category`
+  // ("security"/"system-activity") is the field that actually carries a value; get_security_summary
+  // aggregates on it. Same finite, low-cardinality taxonomy as RULE_CATEGORY.
+  WAZUH_FIELD.INTEGRATION_CATEGORY,
   WAZUH_FIELD.RULE_TAGS,
   ...Object.values(COMPLIANCE_FRAMEWORK_FIELDS),
   WAZUH_FIELD.RULE_MITRE_TECHNIQUE_ID,
@@ -317,7 +322,20 @@ function walkExactIdLookupShape(node: unknown): boolean {
 
 const TIME_FIELD_RE = /(^|\.)(timestamp|@timestamp)$/;
 const MAX_LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
-const MAX_AGG_SIZE = 100;
+/**
+ * Hard cap on any aggregation's `size`, enforced by `checkAggs` below on EVERY indexer request
+ * (executor.ts runs `lintDsl` unconditionally — a typed catalog tool is not exempt).
+ *
+ * Exported because a catalog tool that derives an aggregation `size` from its own `limit` parameter
+ * must clamp to the SAME number, and hard-coding it a second time is how issue #8894 happened:
+ * `get_sca_results` clamped `limit` to 500, fed it to a `terms` size, and every call in the 101-500
+ * range was rejected here — while its parameter description advertised 500 to the model, so a
+ * compliant model was steered straight into the failure. Catalog code must reach this value through
+ * `catalog/common.ts`'s `clampAggLimit`/`aggLimitProperty` rather than restating it, so the enforced
+ * cap and the advertised cap cannot drift apart again. `catalog/agg-size-coverage.test.ts` asserts
+ * no tool in the registry can build a request this rejects.
+ */
+export const MAX_AGG_SIZE = 100;
 
 const LEADING_WILDCARD_KEYS = new Set([
   'wildcard',
@@ -428,11 +446,24 @@ function findNumericRangeOnKeywordField(
   return reason;
 }
 
+// Cross-category tool audit: this reason reaches the model via lintDsl, which
+// executor.ts's executeIndexerRequest runs against EVERY Indexer-backed tool call with "no
+// per-tool exemptions" (see that file) -- in practice the realistic caller is search_wazuh_data
+// or find_document_by_field, both `free_search` (server/tools/router.ts), which is one of the two
+// categories ALWAYS offered whenever any tools are offered at all (resolveStage2Tools always adds
+// search_wazuh_data). The four named tools below, though, all live in the separate
+// `vulnerabilities` category, which stage-1 routing has no obligation to also offer on the SAME
+// turn -- an unconditional "use the vulnerability tools" here would be the same "instruction names
+// a tool that may not be offered" shape as issue #8913. Worded conditionally, with an explicit
+// fallback, so the model degrades to telling the user about the gap instead of stalling on tools
+// it was not given.
 const VULN_FIELD_ON_FINDINGS_REASON =
-  'Vulnerability data is not in the findings/events index. Use the vulnerability tools ' +
-  '(get_vulnerabilities, get_critical_vulnerabilities, ' +
-  'get_vulnerabilities_by_agent, get_vulnerability_by_cve) instead of querying vulnerability ' +
-  'fields on a findings/events index.';
+  'Vulnerability data is not in the findings/events index. The vulnerability tools ' +
+  '(get_vulnerabilities, get_critical_vulnerabilities, get_vulnerabilities_by_agent, ' +
+  'get_vulnerability_by_cve) cover this instead -- use whichever of those is offered to you this ' +
+  'turn rather than querying vulnerability fields on a findings/events index. If none of them ' +
+  'are available to you this turn, tell the user this assistant cannot check vulnerability data ' +
+  'from here.';
 
 /** Shared by both the `script` and `runtime_mappings` checks in `lintDsl` below, so the two
  * trigger paths can never report drifted wording — a scripted
@@ -542,7 +573,10 @@ export function lintDsl(
   return { ok: true };
 }
 
-function walk(
+// Exported so server/tools/field-validation.ts's field-name extractor can reuse the exact same
+// tree-walk shape this file's own checks (findKey, findLeadingWildcard, checkAggs, ...) already
+// rely on, instead of a second hand-rolled walker drifting out of sync with this one.
+export function walk(
   node: unknown,
   visit: (key: string, value: unknown, parent: Record<string, unknown>) => void,
 ): void {

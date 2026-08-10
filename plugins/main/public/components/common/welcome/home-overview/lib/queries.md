@@ -272,13 +272,11 @@ DQL: `*`.
 
 ## 6. Vulnerabilities — `wazuh-states-vulnerabilities*`, current
 
-`buildVulnerabilitySeverityFiltersAgg()` + `buildVulnerabilityTopPackagesAgg()` +
-`buildCvesMatchedAgg()`.
+`buildVulnerabilitySeverityFiltersAgg()` + `buildVulnerabilityTopPackagesAgg()`.
 
-**Represents:** vulnerability severity distribution, top affected package
-names, and the distinct "CVEs matched" count. Note `vulnerability.severity`
-values are **Capitalized** (unlike the lowercase finding bands) and there is
-**no** informational band.
+**Represents:** vulnerability severity distribution and top affected package
+names. Note `vulnerability.severity` values are **Capitalized** (unlike the
+lowercase finding bands) and there is **no** informational band.
 
 ```jsonc
 {
@@ -298,9 +296,7 @@ values are **Capitalized** (unlike the lowercase finding bands) and there is
     },
     "vulnerabilities_by_package": {
       "terms": { "field": "package.name", "size": 5 }
-    },
-    // distinct CVEs, not the match-document count (one CVE matches many assets)
-    "cves_matched": { "cardinality": { "field": "vulnerability.id" } }
+    }
   }
 }
 ```
