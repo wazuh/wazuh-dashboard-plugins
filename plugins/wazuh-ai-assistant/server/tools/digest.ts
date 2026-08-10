@@ -786,11 +786,39 @@ const MIN_FILTERS_FOR_ZERO_ROW_HINT = 2;
  * a single-filter 0-row result is ordinary and gets no hint (no noise on a legitimately narrow,
  * correct query). `requestBody` is only ever passed for the Indexer path (see `buildDigest`'s call
  * sites in executor.ts) — Manager responses have no DSL filters to name, so this is a no-op there.
+ *
+ * POST_FILTER-AWARE (#8935 item I2): a `post_filter` narrows the HITS — and `hits.total` — AFTER
+ * every aggregation is computed, so a 0 total through a post_filter is NOT evidence the query
+ * matched nothing, and the wrong-field/over-narrow wording below would blame the query's own
+ * filter clauses while the aggregations sit in the same digest holding the real, population-true
+ * answer (get_sca_checks's fragment `search` is the shipping caller: an exact-keyword field
+ * legitimately matches 0 rows for a mid-word fragment while the include-scoped enumeration
+ * answers the question). That case gets its own hint instead, naming the real mechanism — keyed
+ * on the response's OWN post-filtered `hits.total` (passed in as `hitsTotal`), not on
+ * `counts.total`: when the aggregations DO carry buckets, `bucketsToRows` turns them into the
+ * digest's rows and `counts.total` becomes the bucket count, so only the raw hits total still
+ * shows that the post_filter passed nothing.
  */
 function buildZeroRowHint(
   requestBody: Record<string, unknown> | undefined,
   returned: number,
+  hitsTotal: number | undefined,
 ): string | undefined {
+  const postFilter = requestBody?.post_filter;
+  if (
+    postFilter &&
+    typeof postFilter === 'object' &&
+    (returned === 0 || hitsTotal === 0)
+  ) {
+    return (
+      "This request's post_filter passed 0 rows — it narrows the returned hits AFTER every " +
+      'aggregation is computed, and an exact/prefix search that matches nothing does exactly ' +
+      'this. The aggregations (and the breakdown built from them) cover the full query-matched ' +
+      'set and remain population-true: answer enumeration/count questions from the breakdown. ' +
+      'If the breakdown is empty too, the search subject matched no values at all. Do not ' +
+      "blame the query's own filters for the empty page."
+    );
+  }
   if (returned !== 0) {
     return undefined;
   }
@@ -1428,7 +1456,13 @@ export function buildDigest(
       );
     }
   }
-  const hint = buildZeroRowHint(requestBody, returned);
+  // The raw post-filtered hits total, straight off the response — deliberately NOT `total` from
+  // extractRows, which the bucket-rows path rewrites to the bucket count (see buildZeroRowHint's
+  // POST_FILTER-AWARE paragraph).
+  const rawHitsTotal = (
+    result as { hits?: { total?: { value?: number } } } | undefined
+  )?.hits?.total?.value;
+  const hint = buildZeroRowHint(requestBody, returned, rawHitsTotal);
   const samplesNote = buildSamplesNote(
     returned,
     samples.length,

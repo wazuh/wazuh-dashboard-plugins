@@ -394,6 +394,27 @@ async function appendEntityNearMissHint(
   }
 }
 
+/**
+ * The DSL an "Open in Discover" link carries (#8935 item I2): the guardrail-clamped query that
+ * actually ran, WITH any `post_filter` folded in as a sibling filter clause. The rendered table's
+ * rows come from `hits.hits`, which ARE post-filtered — a Discover link built from `body.query`
+ * alone would open a different row set than the table it sits under (get_sca_checks with an
+ * exact-name `search` renders 1 row while the bare query matches the whole policy). Folding the
+ * post_filter into a plain `bool.filter` reproduces the post-filtered row set exactly: Discover
+ * has no aggregations, so post-filter-vs-query placement changes nothing else there. Falls back
+ * to `match_all` for a query-less body (matches that same result set). Exported for its
+ * colocated test only.
+ */
+export function buildDiscoverDsl(
+  body: Record<string, unknown>,
+): Record<string, unknown> {
+  const query = (body.query as Record<string, unknown>) ?? { match_all: {} };
+  const postFilter = body.post_filter as Record<string, unknown> | undefined;
+  return postFilter && typeof postFilter === 'object'
+    ? { bool: { filter: [query, postFilter] } }
+    : query;
+}
+
 /** Executes a validated, guardrail-passed Indexer search and builds its digest + table. */
 async function executeIndexerRequest(
   toolName: string,
@@ -529,12 +550,12 @@ async function executeIndexerRequest(
       def.deriveColumns,
     );
     // "Open in Discover" support (common/types.ts's `TableSpec.discover` doc comment): only this
-    // Indexer path has an index/DSL to attach — `body.query` is the guardrail-clamped clause that
-    // actually ran, falling back to `match_all` for a query-less body (matches this same result set).
+    // Indexer path has an index/DSL to attach — see buildDiscoverDsl for why a `post_filter` is
+    // folded in rather than shipping `body.query` alone.
     const tableSpec = buildTableSpec(result, def, body);
     tableSpec.discover = {
       index: indexerRequest.index,
-      dsl: (body.query as Record<string, unknown>) ?? { match_all: {} },
+      dsl: buildDiscoverDsl(body),
     };
     if (def.buildSecurityAnalyticsLink) {
       const space = resolveSecurityAnalyticsSpace(

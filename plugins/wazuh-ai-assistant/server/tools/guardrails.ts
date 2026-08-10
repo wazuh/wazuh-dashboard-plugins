@@ -292,6 +292,15 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // keyword-mapped (a `term` filter with those exact capitalized values on a text mapping would
   // never match).
   'check.result',
+  // SCA check NAME enumeration (#8935 item I2, scoped-enumeration): keyword-mapped, proven by
+  // this tool's own checked-in `prefix` clause on `check.name` in get-sca-checks.ts's `search`
+  // filter -- a `prefix` clause on a text-mapped field would not behave as a prefix match, and
+  // the 5.0 field-rename comment at the top of that file records the live mapping verification
+  // against a real 5.0 stack. Cardinality is bounded by the finite CIS/benchmark check catalog
+  // per policy (~207 checks for cis_ubuntu22-04) -- same class as the already-listed RULE_TITLE
+  // (772 distinct live). PERFORMANCE guard widening (aggregation cardinality), not a privacy one,
+  // same framing as this block's header comment above.
+  'check.name',
   // Syscollector ports: this repo's IT Hygiene network dashboard runs a real terms agg on it
   // (plugins/main/public/components/overview/it-hygiene/dashboards/dashboard-panels.ts) — live
   // values include "Inactive"/"Unknown".
