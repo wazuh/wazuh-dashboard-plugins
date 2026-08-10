@@ -4,6 +4,62 @@
  * `search.allow_expensive_queries=true`) — the plugin enforces everything itself, on every
  * outbound `_search`, regardless of whether the query came from a typed catalog tool (defense in
  * depth) or the future free-DSL escape hatch (its only line of defense).
+ *
+ * BOUND-DISCLOSURE AUDIT (issue #8935 item I4). Every bound the model can hit against the
+ * Indexer/Manager through this plugin, as of this base commit — kept as one list because the
+ * class issue #8935 targets is "an unmarked bound", and a single list is what makes "did we miss
+ * one" answerable at a glance rather than scattered across call sites. Cross-references are by
+ * SYMBOL name, never line number (line numbers in an audit rot the moment code is inserted above
+ * them — integration review found every number in the first cut already stale).
+ *
+ * - MAX_SIZE=500 (hits `size`) — `applySafetyValves`: silent clamp, but STRUCTURALLY disclosed
+ *   (`Digest.counts` carries {total, returned, truncated} plus a `samplesNote`). Adequate; no
+ *   change.
+ * - MAX_FROM=1000 (`from`) — `applySafetyValves`: rejection with reason — disclosed (the model
+ *   sees why and can self-correct).
+ * - track_total_hits=10000 — `applySafetyValves`: SILENT on this base — digest.ts's count
+ *   extraction reads `hits.total.value` and ignores `relation: 'gte'`, so a >10k result set
+ *   reports exactly 10000 unmarked (only `appendWindowRecountHint`'s own probe words it "at
+ *   least N"). NOT FIXED HERE: issue #8909 removes this clamp and merges ahead of this branch in
+ *   the team's stated order — re-fixing here guarantees a conflict. Recorded as "silent on this
+ *   base, resolved upstream by #8909".
+ * - MAX_LOOKBACK_MS (90d time-range span) — `checkDateRanges`: THE DEFECT this item fixes. The
+ *   rejection reaches the model as an error, but a bare retry inside the cap is indistinguishable
+ *   from a default-window query — nothing marks the eventual ANSWER as capped. Fixed by
+ *   `clampLookbackWindow` below (required-context clauses only): clamp-and-disclose on the
+ *   successful call's own digest, the layer measured at 3/3 (not the prompt layer, measured 0/3).
+ *   The span REJECTION itself is UNCHANGED for every other clause shape — `lintDsl` is the
+ *   documented standalone boundary and still guards any call site that skips the clamp.
+ * - MAX_AGG_SIZE=100 (terms/composite/multi_terms/top_hits `size`) — `checkAggs`: rejection with
+ *   reason — disclosed.
+ * - MAX_TOP_LEVEL_AGGS=5 — `checkTopLevelAggCount`: rejection with reason — disclosed.
+ * - MIN_DATE_HISTOGRAM_INTERVAL_MS=60000 — `checkAggs`: rejection with reason — disclosed.
+ * - script/runtime_mappings/regexp/leading-wildcard bans — `lintDsl`: rejection with reason —
+ *   disclosed.
+ * - Request-side `terms` size truncation (more distinct values than the agg `size`) —
+ *   cluster-side, not this file: disclosed via `sum_other_doc_count` -> digest.ts's
+ *   `breakdownNote` (case 2). The SYNTHETIC-breakdown top-5 trim (`buildSyntheticBreakdown` in
+ *   digest.ts) is a SEPARATE instance owned and fixed by issue #8935 item I1 — cross-referenced,
+ *   not duplicated here.
+ * - MAX_SAMPLES=5 (digest sample rows) — digest.ts: `samplesNote` — disclosed.
+ * - MAX_FIELD_VALUE_LENGTH / MAX_HINT_LENGTH — digest.ts: visible "…" ellipsis — disclosed
+ *   inline. NOTE: this item's own lookback disclosure adds up to ~MAX_LOOKBACK_DISCLOSURES
+ *   sentences (~250 chars each) to `hint` on exactly the wide-window calls that return the most
+ *   data — bounded by design (see MAX_LOOKBACK_DISCLOSURES), but it does consume hint budget the
+ *   recount/near-miss writers share, which is why it is prepended first (executor.ts orders it
+ *   ahead of longer hints).
+ * - `capDigest` drop stages (samples beyond the worded samplesNote count; breakdown buckets
+ *   beyond the disclosed count) — digest.ts: SILENT RESIDUAL — a sample/breakdown bucket popped
+ *   by the hard char cap can fall below what the ALREADY-EMITTED note claims. Rare after item
+ *   I1's char-budgeted carry; recorded, deliberately NOT fixed here — a fix needs note
+ *   recomputation from INSIDE the cap loop, a digest.ts change out of this item's file list.
+ * - `clampManagerParams` limit -> MAX_SIZE (Manager API `limit`) — this file: silent clamp,
+ *   disclosed structurally via Manager digest counts (`total_affected_items` vs `returned`).
+ * - MAX_TOOL_ROUNDS — orchestration layer (not this file): owned by issue #8893's final-round
+ *   instruction and issue #8935 item I3 — out of scope here.
+ * - TABLE_ROW_CAP / DERIVED_COLUMN_CAP — client rendering / row schema: never model-facing
+ *   completeness (the table renders locally and never reaches the model, per executor.ts's own
+ *   comment on that boundary) — noted only, nothing to disclose to the model.
  */
 
 import {
@@ -853,6 +909,290 @@ function walkRequiredForTimeRange(node: unknown, required: boolean): boolean {
     }
   }
   return false;
+}
+
+/** How many clamped-window sentences one disclosure may carry. digest.ts's MAX_HINT_LENGTH
+ * invariant is "every hint writer contributes bounded, sentence-sized text" — six clamped clauses
+ * once produced a 1,499-char disclosure that evicted the zero-row recount hint and truncated
+ * mid-timestamp (issue #8935 integration review). Identical (requested, clamped) pairs are
+ * de-duplicated before this cap applies; anything beyond it is summarized in one counted tail. */
+const MAX_LOOKBACK_DISCLOSURES = 2;
+
+/**
+ * Clamp-and-disclose for a time-range span above `MAX_LOOKBACK_MS` (the fix for the one row
+ * marked THE DEFECT in this file's module-header bound-disclosure audit). Returns a NEW body —
+ * `applySafetyValves`'s and `normalizeMustToFilter`'s no-mutation convention — plus a
+ * `disclosure` whenever at least one clause was actually clamped.
+ *
+ * SCOPE: REQUIRED query context ONLY — `body.query` through `bool.filter`/`bool.must` chains,
+ * exactly the context-tracking `walkRequiredForTimeRange` above applies. `bool.should`,
+ * `bool.must_not`, `aggs`-nested filters and `post_filter` are passed through UNTOUCHED and left
+ * to `checkDateRanges`'s existing span REJECTION. This deliberately REVERSES the first cut of
+ * this fix, which clamped every clause in the tree "for scope parity with checkDateRanges"
+ * (integration review): the disclosure asserts a property of the RESULT SET ("results cover X to
+ * Y"), and that claim is only derivable from a clause that BOUNDS what the query matches — for a
+ * `should` clause it is irrelevant-and-false, and for `must_not` it is exactly INVERTED (the
+ * named window would be the one window the results exclude, and the clamp would silently NARROW
+ * the exclusion the caller asked for). Rejection-with-reason is the honest, base-identical
+ * behaviour for those shapes; clamping is only honest where the sentence is true.
+ *
+ * CLAMPS ONLY the well-formed, over-wide case: both bounds present, both parseable via
+ * `resolveDateMath`, and upper >= lower. Every other shape (a single-sided range, an unparseable
+ * bound, an inverted window) is passed through UNCHANGED and left to `checkDateRanges`'s existing
+ * rejections -- those are "unfixable by clamping", not a narrower instance of this bound.
+ *
+ * THE OFF-BY-EPSILON TRAP (why both bounds are rewritten to concrete ISO strings, not just the
+ * lower one): if only the lower bound were rewritten while the upper bound stayed a live
+ * `'now'`/`'now-Nd'` date-math string, the span this function computed at clamp time and the span
+ * `checkDateRanges` computes moments later (it calls `Date.now()` again, independently) would
+ * differ by however many milliseconds elapsed in between -- reopening the window by that epsilon
+ * and defeating the "exactly `MAX_LOOKBACK_MS`" guarantee `lintDsl`'s strict `>` check depends on.
+ * Resolving BOTH bounds to absolute ISO timestamps up front removes the second `Date.now()` call
+ * from the equation entirely: `Date.parse` on an ISO string never depends on when it runs.
+ *
+ * Bound-key handling on a clamped clause (integration review, all three):
+ *  - the inclusive/exclusive spelling (`gte`/`gt`, `lte`/`lt`) is preserved;
+ *  - when BOTH spellings of one side are present, the non-preferred one is DROPPED — leaving a
+ *    stale `gt: now-400d` beside the clamped `gte` would let the engine pick the wider bound
+ *    while the disclosure claims the capped window;
+ *  - a sibling `format` key is DROPPED — the rewritten bounds are full ISO date-times, which a
+ *    caller's `format: 'yyyy-MM-dd'` would make unparseable cluster-side, converting a clear,
+ *    self-correctable rejection into an opaque one (`time_zone` is kept: the rewritten values
+ *    carry an explicit Z offset, which overrides it harmlessly).
+ *
+ * DISCLOSURE WORDING: derives the day figure from `MAX_LOOKBACK_MS` (never a hardcoded "90", so
+ * raising the cap cannot make the sentence false), and only claims "results cover X to Y" when
+ * the clamped clause is the SOLE required-context time range in the query — with more than one,
+ * the effective window is their INTERSECTION and the sentence says so instead of overstating
+ * coverage.
+ */
+export function clampLookbackWindow(body: Record<string, unknown>): {
+  body: Record<string, unknown>;
+  disclosure?: string;
+} {
+  if (!body.query || typeof body.query !== 'object') {
+    return { body };
+  }
+  const state: LookbackClampState = {
+    clamped: [],
+    requiredTimeRanges: 0,
+  };
+  const nowMs = Date.now();
+  const clampedQuery = clampLookbackNode(body.query, true, nowMs, state);
+  if (state.clamped.length === 0) {
+    return { body };
+  }
+  return {
+    body: { ...body, query: clampedQuery as Record<string, unknown> },
+    disclosure: buildLookbackDisclosure(state),
+  };
+}
+
+interface LookbackClampState {
+  clamped: Array<{
+    requestedLower: string;
+    requestedUpper: string;
+    clampedLowerIso: string;
+    clampedUpperIso: string;
+  }>;
+  /** Every well-formed (both-bounds, parseable) time-range clause seen in REQUIRED context,
+   * clamped or not — what decides whether the disclosure may claim whole-result coverage or must
+   * speak of an intersection. */
+  requiredTimeRanges: number;
+}
+
+/** One bounded disclosure from every clamp this body needed: de-duplicated, capped at
+ * `MAX_LOOKBACK_DISCLOSURES` sentences with a counted tail, day figure derived from
+ * `MAX_LOOKBACK_MS`, and coverage claimed only when it is actually derivable — see
+ * `clampLookbackWindow`'s DISCLOSURE WORDING paragraph. */
+function buildLookbackDisclosure(state: LookbackClampState): string {
+  const maxDays = MAX_LOOKBACK_MS / 86400000;
+  const seen = new Set<string>();
+  const unique = state.clamped.filter(entry => {
+    const key = JSON.stringify(entry);
+    if (seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
+  const soleWindow = state.requiredTimeRanges === 1;
+  const sentences = unique
+    .slice(0, MAX_LOOKBACK_DISCLOSURES)
+    .map(
+      ({ requestedLower, requestedUpper, clampedLowerIso, clampedUpperIso }) =>
+        soleWindow
+          ? `Time window capped: the requested range (${requestedLower} to ${requestedUpper}) ` +
+            `spans more than the ${maxDays}-day maximum; results cover ${clampedLowerIso} to ` +
+            `${clampedUpperIso} only. State to the user that the answer covers this capped ` +
+            'window, not the full requested range.'
+          : `Time window capped: a requested range (${requestedLower} to ${requestedUpper}) ` +
+            `spanning more than the ${maxDays}-day maximum was narrowed to ${clampedLowerIso} ` +
+            `to ${clampedUpperIso}. Other time filters in this query still apply — the ` +
+            'effective window is the intersection of all of them; state the answer window ' +
+            'accordingly.',
+    );
+  const overflow = unique.length - MAX_LOOKBACK_DISCLOSURES;
+  if (overflow > 0) {
+    sentences.push(
+      `${overflow} more over-wide time filter(s) were capped the same way.`,
+    );
+  }
+  return sentences.join(' ');
+}
+
+/** Rebuilds a QUERY node, clamping `range` clauses only while `required` context holds -- same
+ * recursive rebuild-the-tree shape as `normalizeMustToFilter` above (never mutates its input),
+ * same required/optional context rules as `walkRequiredForTimeRange` (bool.filter/bool.must keep
+ * the parent's context; bool.should/bool.must_not are copied VERBATIM — nothing under them may be
+ * clamped, and `walkRequiredForTimeRange` never restores `required` under them either, so a
+ * verbatim copy is exactly equivalent). */
+function clampLookbackNode(
+  node: unknown,
+  required: boolean,
+  nowMs: number,
+  state: LookbackClampState,
+): unknown {
+  if (Array.isArray(node)) {
+    return node.map(item => clampLookbackNode(item, required, nowMs, state));
+  }
+  if (!node || typeof node !== 'object') {
+    return node;
+  }
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+    if (
+      key === 'range' &&
+      required &&
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    ) {
+      out[key] = clampRangeClause(
+        value as Record<string, unknown>,
+        nowMs,
+        state,
+      );
+      continue;
+    }
+    if (
+      key === 'bool' &&
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    ) {
+      const boolClause = value as Record<string, unknown>;
+      const rebuilt: Record<string, unknown> = {};
+      for (const [subKey, subValue] of Object.entries(boolClause)) {
+        if (subKey === 'filter' || subKey === 'must') {
+          rebuilt[subKey] = clampLookbackNode(subValue, required, nowMs, state);
+        } else {
+          // should / must_not / minimum_should_match / boost / ...: verbatim — optional and
+          // negated context is never clamped (see the SCOPE paragraph above).
+          rebuilt[subKey] = subValue;
+        }
+      }
+      out[key] = rebuilt;
+      continue;
+    }
+    out[key] = clampLookbackNode(value, required, nowMs, state);
+  }
+  return out;
+}
+
+/** Clamps every `TIME_FIELD_RE` field inside one REQUIRED-context `range` clause's value
+ * (`{"@timestamp": {...}}`), field-by-field -- a clause could in principle carry more than one
+ * recognized time field. Fields that are not time fields, or that fail any of the "clampable"
+ * preconditions documented on `clampLookbackWindow` above, pass through with their original
+ * bounds object reference. */
+function clampRangeClause(
+  rangeValue: Record<string, unknown>,
+  nowMs: number,
+  state: LookbackClampState,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [field, bounds] of Object.entries(rangeValue)) {
+    if (
+      !TIME_FIELD_RE.test(field) ||
+      !bounds ||
+      typeof bounds !== 'object' ||
+      Array.isArray(bounds)
+    ) {
+      out[field] = bounds;
+      continue;
+    }
+    const boundsRecord = bounds as Record<string, unknown>;
+    // Same "gte wins over gt" preference as checkDateRanges, so the two functions agree on which
+    // key is "the" lower/upper bound whenever a caller (unusually) sends both spellings.
+    const lowerKey: 'gte' | 'gt' | undefined =
+      boundsRecord.gte !== undefined
+        ? 'gte'
+        : boundsRecord.gt !== undefined
+        ? 'gt'
+        : undefined;
+    const upperKey: 'lte' | 'lt' | undefined =
+      boundsRecord.lte !== undefined
+        ? 'lte'
+        : boundsRecord.lt !== undefined
+        ? 'lt'
+        : undefined;
+    if (!lowerKey || !upperKey) {
+      // Single-sided range -- unfixable by clamping; checkDateRanges' "must specify both" rejection
+      // stays the correction path.
+      out[field] = bounds;
+      continue;
+    }
+    const lowerRaw = boundsRecord[lowerKey];
+    const upperRaw = boundsRecord[upperKey];
+    const lowerMs = resolveDateMath(lowerRaw, nowMs);
+    const upperMs = resolveDateMath(upperRaw, nowMs);
+    if (lowerMs === undefined || upperMs === undefined) {
+      // Unparseable bound -- unfixable by clamping; checkDateRanges' own rejection stays the
+      // correction path.
+      out[field] = bounds;
+      continue;
+    }
+    if (upperMs < lowerMs) {
+      // Inverted window -- unfixable by clamping; checkDateRanges' own rejection stays the
+      // correction path.
+      out[field] = bounds;
+      continue;
+    }
+    // A well-formed required-context time window (clamped or not) — counted for the disclosure's
+    // sole-window-vs-intersection wording decision.
+    state.requiredTimeRanges += 1;
+    if (upperMs - lowerMs <= MAX_LOOKBACK_MS) {
+      // Already within the cap -- nothing to clamp or disclose.
+      out[field] = bounds;
+      continue;
+    }
+    const clampedUpperMs = upperMs;
+    const clampedLowerMs = clampedUpperMs - MAX_LOOKBACK_MS;
+    const clampedUpperIso = new Date(clampedUpperMs).toISOString();
+    const clampedLowerIso = new Date(clampedLowerMs).toISOString();
+    const {
+      gte: _gte,
+      gt: _gt,
+      lte: _lte,
+      lt: _lt,
+      format: _format,
+      ...passthrough
+    } = boundsRecord;
+    out[field] = {
+      // Everything except the four bound spellings and `format` (see the bound-key handling
+      // paragraph on clampLookbackWindow for why the duplicate spellings and `format` must go).
+      ...passthrough,
+      [lowerKey]: clampedLowerIso,
+      [upperKey]: clampedUpperIso,
+    };
+    state.clamped.push({
+      requestedLower: String(lowerRaw),
+      requestedUpper: String(upperRaw),
+      clampedLowerIso,
+      clampedUpperIso,
+    });
+  }
+  return out;
 }
 
 function checkDateRanges(body: Record<string, unknown>): string | undefined {
