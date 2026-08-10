@@ -118,6 +118,135 @@ test('prescanAndMint: still mints a real hostname that is not field-path or vers
   assert.doesNotMatch(out, /backup-vault\.internal\.corp/);
 });
 
+// --- prescanAndMint / prescanAndMintToolContent: #8920 item 8 version-grammar coverage --------
+//
+// The reported instances were two Ubuntu `dpkg -l` versions ("3.118ubuntu5",
+// "3.20191218.1ubuntu2.3") that got minted as HOST_n because VERSION_LIKE_TOKEN_RE only recognized
+// digit-only dot-labels, not the full Debian/RPM grammar (letters fused into a label, "~"/"+" in a
+// revision suffix). The class is the whole grammar, not those two strings, so these two corpora are
+// data-driven tables: a newly observed version scheme or hostname shape is a one-line addition, and
+// what's asserted per row never changes (never-minted vs always-minted, both directions pinned via
+// `newEntries()` so a silent partial mint can't pass). Each corpus is run through BOTH the flat-text
+// scanner (`prescanAndMint`, this section) and the JSON-aware one (`prescanAndMintToolContent`,
+// below) since the two boundaries have independent code paths.
+
+/** Real Debian/RPM/semver version strings. Every one of these must reach the model UNCHANGED —
+ * minting a HOST_n for a version string breaks a `package.version:{allow}`-style query. Includes
+ * the two previously-leaking wire-capture tokens (letters fused into a dot-label with no leading
+ * "-") and the two previously-passing ones (plain "-suffix" and a "~"-broken compound token), so a
+ * regression in either direction shows up here. */
+const VERSION_GRAMMAR_CORPUS = [
+  '3.118ubuntu5', // previously leaked: letter-fused label, no "-" prefix
+  '3.20191218.1ubuntu2.3', // previously leaked: same shape, 4 labels
+  '1.1.1k', // NON-Ubuntu letter-fused label (openssl) -- blocks a distro-hardcoded reversion
+  '1.1.1k-9.el8', // openssl on RHEL8: letter-fused label + dist-tag revision
+  '1.9.9p1', // sudo's patchlevel notation
+  '0.21-4ubuntu4', // previously passing: plain digit labels + "-suffix"
+  '11.4.0-1ubuntu1~22.04.3', // "~" splits it; residues are version/all-numeric shaped
+  '5.2.5-2ubuntu1',
+  '1.21.1-1ubuntu2~22.04.2',
+  '2.4.41-4+deb11u1', // Debian NMU/backport revision ("+deb11u1")
+  'v1.2.3',
+  '4.15.0-213.224', // kernel-style dotted revision
+  '5.15.0-91-generic', // previously leaked: SECOND hyphen (kernel/linux-image family --
+  // agent.os.kernel carries exactly this string for every Ubuntu agent)
+  '5.4.0-150-generic',
+  '5.15.0-91-lowlatency',
+  '2.4.37-43.module+el8.5.0+1022+b541f3b1', // previously leaked: RHEL modular build, "+" splits
+  // off the FQDN-shaped "el8.5.0" -- covered by the whole-token compound check
+  '1.0+git20200101.abc1234-1', // previously leaked: git snapshot version
+  '1.0.0+build.5', // previously leaked: semver build metadata
+  '0.9.8+really0.9.7-1', // previously leaked: Debian "+really" convention
+  // NOTE: '1.2.3' never reaches VERSION_LIKE_TOKEN_RE at all -- ALL_NUMERIC_DOTTED_RE catches it
+  // first. Kept as an anchor that the two exclusions do not fight each other.
+  '1.2.3',
+];
+
+/** Real hostnames that must ALWAYS mint a HOST_n; if any of them stopped minting, the fix would
+ * have widened a privacy hole instead of just narrowing a fidelity one. The load-bearing rows are
+ * the all-numeric-first-label FQDNs (0.pool.ntp.org and friends): they are the exact shape a
+ * future "accept letter-initial version labels" loosening would stop minting, which is why that
+ * loosening is forbidden (see VERSION_LIKE_TOKEN_RE's KNOWN, DELIBERATE RESIDUE note).
+ * 3com/01server are NOT boundary cases — each fails the version test twice over (letters within
+ * the first label AND an alphabetic final label) — they are here as ordinary regression rows. */
+const HOSTNAME_BOUNDARY_CORPUS = [
+  'wazuh-aio-05.internal.corp',
+  'web-prod-01.example.com',
+  '0.pool.ntp.org', // all-numeric FIRST label: the guard against loosening subsequent labels
+  '1.gravatar.com',
+  '2.bp.blogspot.com',
+  '10.corp.local',
+  '3com.example.com', // digit-initial first label, but a letter WITHIN that same label
+  '01server.corp.local', // same: digit-initial first label, letters fused in
+  'ns1.google.com',
+  'backup-vault.internal.corp',
+  'web1.corp',
+];
+
+test('prescanAndMint (#8920 item 8): version-grammar corpus passes through verbatim, never minted', () => {
+  const failures: string[] = [];
+  for (const token of VERSION_GRAMMAR_CORPUS) {
+    const p = new Pseudonymizer();
+    const input = `installed version ${token} today`;
+    const out = prescanAndMint(input, p);
+    if (out !== input) {
+      failures.push(`${token}: expected verbatim, got "${out}"`);
+    }
+    if (p.newEntries().length !== 0) {
+      failures.push(
+        `${token}: expected no pseudonym entries, minted ${
+          p.newEntries().length
+        }`,
+      );
+    }
+  }
+  assert.deepEqual(failures, []);
+});
+
+test('prescanAndMint (#8920 item 8): hostname corpus at the boundary still mints HOST_n', () => {
+  const failures: string[] = [];
+  for (const token of HOSTNAME_BOUNDARY_CORPUS) {
+    const p = new Pseudonymizer();
+    const out = prescanAndMint(`connect to ${token} now`, p);
+    if (!/HOST_\d+/.test(out)) {
+      failures.push(`${token}: expected a HOST_n pseudonym, got "${out}"`);
+    }
+    if (out.includes(token)) {
+      failures.push(`${token}: real value leaked into output "${out}"`);
+    }
+  }
+  assert.deepEqual(failures, []);
+});
+
+test('prescanAndMint (#8920 item 8): newly version-excluded shapes are pinned as NON-minting', () => {
+  // The tokens whose minting behaviour this fix actually CHANGED on the hostname side: digit-run
+  // labels with trailing letters. None is a plausible hostname; each is a plausible version
+  // fragment, and this pins the accepted direction of the change so it cannot silently flip.
+  for (const token of ['10.0.2c', '01.2srv', '2.6prod', '123.4abc.5x']) {
+    const p = new Pseudonymizer();
+    const input = `value ${token} seen`;
+    assert.equal(prescanAndMint(input, p), input, `${token} must not mint`);
+    assert.equal(p.newEntries().length, 0);
+  }
+});
+
+test('prescanAndMint (#8920 item 8): letter-initial version labels are the KNOWN residue and still mint', () => {
+  // Deliberate residue (see VERSION_LIKE_TOKEN_RE's doc comment): "4.6.3.el7"/"2.0.rc1"-style
+  // labels are legal versions, but excluding them would require accepting letter-initial
+  // subsequent labels — which would stop minting 0.pool.ntp.org-shaped REAL hostnames. This test
+  // pins the residue as minting so a future "fix" cannot take the privacy-regressing direction
+  // without tripping over it and reading why.
+  for (const token of ['4.6.3.el7', '2.0.rc1', '4.0.dev0']) {
+    const p = new Pseudonymizer();
+    const out = prescanAndMint(`version ${token} installed`, p);
+    assert.match(
+      out,
+      /HOST_\d+/,
+      `${token} is the documented fidelity residue`,
+    );
+  }
+});
+
 // --- prescanAndMintToolContent (JSON-aware digest pre-scan) -----------------------------------
 
 test('prescanAndMintToolContent: never pseudonymizes dotted ECS field-name KEYS', () => {
@@ -182,6 +311,54 @@ test('prescanAndMintToolContent: a digest with no scannable values round-trips u
   const out = prescanAndMintToolContent(digest, p);
   assert.equal(out, digest);
   assert.equal(p.newEntries().length, 0);
+});
+
+// --- prescanAndMintToolContent: #8920 item 8 version-grammar coverage (JSON boundary) ----------
+// Same two corpora as the `prescanAndMint` section above, run through the JSON-aware digest path
+// instead, since a tool result reaches privacy scanning through `prescanAndMintToolContent`, not
+// the flat scanner directly — the class fix (one shared regex) has to hold on both boundaries.
+
+test('prescanAndMintToolContent (#8920 item 8): version-grammar corpus stays verbatim in a JSON value', () => {
+  const failures: string[] = [];
+  for (const token of VERSION_GRAMMAR_CORPUS) {
+    const p = new Pseudonymizer();
+    const digest = JSON.stringify({
+      message: `installed version ${token} today`,
+    });
+    const out = prescanAndMintToolContent(digest, p);
+    if (out !== digest) {
+      failures.push(`${token}: expected byte-identical JSON, got "${out}"`);
+    }
+    if (p.newEntries().length !== 0) {
+      failures.push(
+        `${token}: expected no pseudonym entries, minted ${
+          p.newEntries().length
+        }`,
+      );
+    }
+  }
+  assert.deepEqual(failures, []);
+});
+
+test('prescanAndMintToolContent (#8920 item 8): hostname corpus at the boundary still mints in a JSON value', () => {
+  const failures: string[] = [];
+  for (const token of HOSTNAME_BOUNDARY_CORPUS) {
+    const p = new Pseudonymizer();
+    const digest = JSON.stringify({ message: `connect to ${token} now` });
+    const out = prescanAndMintToolContent(digest, p);
+    const parsed = JSON.parse(out) as { message: string };
+    if (!/HOST_\d+/.test(parsed.message)) {
+      failures.push(
+        `${token}: expected a HOST_n pseudonym, got "${parsed.message}"`,
+      );
+    }
+    if (parsed.message.includes(token)) {
+      failures.push(
+        `${token}: real value leaked into output "${parsed.message}"`,
+      );
+    }
+  }
+  assert.deepEqual(failures, []);
 });
 
 function baseDigest(overrides: Partial<Digest> = {}): Digest {
