@@ -564,6 +564,8 @@ test('bound disclosure: search_wazuh_data with a 180-day range is clamped-and-di
 });
 
 test('bound disclosure: a request already within the 90-day cap gets no disclosure', async () => {
+  // OVER-CLAMPING GUARD, not a fails-on-base witness (it asserts the absence of a string base
+  // never emits) -- labeled per the integration review so it is never counted as fix evidence.
   const findingHit = {
     _source: {
       '@timestamp': '2026-08-10T00:00:00Z',

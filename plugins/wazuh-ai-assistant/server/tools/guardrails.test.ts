@@ -363,6 +363,9 @@ test('clampLookbackWindow: a 180-day range is clamped to exactly 90 days, disclo
   assert.equal(unclampedLint.ok, false);
 });
 
+// The five "left untouched" tests below are OVER-CLAMPING GUARDS, not fails-on-base witnesses:
+// an identity stub satisfies them. The fails-on-base evidence for this item is the 180-day test
+// above, executor.test.ts's end-to-end witness, and the lookback-disclosure-coverage sweep.
 test('clampLookbackWindow: a 90-day range is returned untouched, with no disclosure', () => {
   const body = rangeBody({ gte: 'now-90d', lte: 'now' });
   const { body: clamped, disclosure } = clampLookbackWindow(body);
@@ -391,35 +394,160 @@ test('clampLookbackWindow: gt/lt (exclusive bounds) are clamped the same way, an
   assert.equal(lint.ok, true, lint.ok ? '' : lint.reason);
 });
 
-test('clampLookbackWindow: a bool.should (optional-context) 180-day range is ALSO clamped -- scope parity with checkDateRanges', () => {
-  // checkDateRanges deliberately validates EVERY range clause regardless of required/optional
-  // context (unlike hasTimeRange) -- clampLookbackWindow must match that scope exactly, or a
-  // should-context clause it skipped would still trip checkDateRanges' span rejection afterward,
-  // reproducing the unmarked-retry defect for that one clause shape.
+test('clampLookbackWindow: a bool.should (optional-context) 180-day range is NOT clamped -- the span rejection stays', () => {
+  // The recorded scope decision (see clampLookbackWindow's SCOPE paragraph, which REVERSES this
+  // fix's first cut): a should clause does not bound the result set, so a "results cover X to Y"
+  // disclosure derived from it is false -- the first cut clamped it and told the model the answer
+  // covered the last 90 days while the executed query covered the last 24 HOURS. Optional-context
+  // clauses keep checkDateRanges' base rejection instead. The in-cap filter clause here is what
+  // makes this a real witness: the body passes every OTHER lint check, so the surviving rejection
+  // is specifically the should clause's span.
   const body = {
     query: {
       bool: {
-        filter: [{ match_all: {} }],
+        filter: [{ range: { '@timestamp': { gte: 'now-24h', lte: 'now' } } }],
         should: [{ range: { '@timestamp': { gte: 'now-180d', lte: 'now' } } }],
       },
     },
     size: 20,
   };
   const { body: clamped, disclosure } = clampLookbackWindow(body);
-  assert.ok(disclosure);
-  const range = readTimestampRange(clamped, 'should');
-  const spanMs =
-    Date.parse(range.lte as string) - Date.parse(range.gte as string);
-  assert.equal(spanMs, NINETY_DAYS_MS);
-  // This body was never going to pass lintDsl's SEPARATE mandatory-bound check anyway (a
-  // should-only range is decorative -- see hasTimeRange's required-context rule) -- but the SPAN
-  // rejection specifically must be gone now that the clause itself is clamped.
+  assert.equal(disclosure, undefined, 'no result-set claim may be minted');
+  assert.deepEqual(clamped, body);
   const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
   assert.equal(lint.ok, false);
   if (!lint.ok) {
-    assert.ok(!/90-day maximum lookback/.test(lint.reason));
-    assert.match(lint.reason, /must include a "range" clause/);
+    assert.match(lint.reason, /90-day maximum lookback/);
   }
+});
+
+test('clampLookbackWindow: a bool.must_not 275-day exclusion is NOT clamped (the claim would be inverted)', () => {
+  // For a must_not clause the first cut's disclosure named precisely the window the results
+  // EXCLUDE ("findings in the last 90 days but nothing in the prior year" -> "results cover
+  // <the excluded window> only"), and silently narrowed the exclusion the caller asked for.
+  const body = {
+    query: {
+      bool: {
+        filter: [{ range: { '@timestamp': { gte: 'now-90d', lte: 'now' } } }],
+        must_not: [
+          { range: { '@timestamp': { gte: 'now-365d', lte: 'now-90d' } } },
+        ],
+      },
+    },
+    size: 20,
+  };
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.equal(disclosure, undefined);
+  assert.deepEqual(clamped, body);
+  const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
+  assert.equal(lint.ok, false);
+  if (!lint.ok) {
+    assert.match(lint.reason, /90-day maximum lookback/);
+  }
+});
+
+test('clampLookbackWindow: an aggs-nested filter range is NOT clamped (outside body.query entirely)', () => {
+  // The whole-result "results cover" claim cannot be derived from one sub-aggregation's private
+  // filter; the base rejection stays the correction path there too.
+  const body = {
+    query: {
+      bool: {
+        filter: [{ range: { '@timestamp': { gte: 'now-24h', lte: 'now' } } }],
+      },
+    },
+    aggs: {
+      old: {
+        filter: { range: { '@timestamp': { gte: 'now-180d', lte: 'now' } } },
+      },
+    },
+    size: 0,
+  };
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.equal(disclosure, undefined);
+  assert.deepEqual(clamped, body);
+  const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
+  assert.equal(lint.ok, false);
+  if (!lint.ok) {
+    assert.match(lint.reason, /90-day maximum lookback/);
+  }
+});
+
+test('clampLookbackWindow: with a SECOND required time range, the disclosure speaks of an intersection, not coverage', () => {
+  // Two required ranges (180d + 7d): the 180d clause is clamped to 90d, but the effective window
+  // is the 7-DAY intersection -- claiming "results cover <the 90-day window> only" here was an
+  // integration-review hole (overstated coverage).
+  const body = {
+    query: {
+      bool: {
+        filter: [
+          { range: { '@timestamp': { gte: 'now-180d', lte: 'now' } } },
+          { range: { '@timestamp': { gte: 'now-7d', lte: 'now' } } },
+        ],
+      },
+    },
+    size: 20,
+  };
+  const { disclosure } = clampLookbackWindow(body);
+  assert.ok(disclosure);
+  assert.match(disclosure as string, /intersection/);
+  assert.doesNotMatch(
+    disclosure as string,
+    /results cover/,
+    'whole-result coverage must not be claimed when other time filters also apply',
+  );
+});
+
+test('clampLookbackWindow: the disclosure is bounded -- duplicates collapse and the sentence count is capped', () => {
+  // Six identical over-wide clauses once produced a 1,499-char disclosure that MAX_HINT_LENGTH
+  // truncated mid-timestamp and that evicted the zero-row recount hint (integration review).
+  const wide = { range: { '@timestamp': { gte: 'now-180d', lte: 'now' } } };
+  const body = {
+    query: { bool: { filter: [wide, wide, wide, wide, wide, wide] } },
+    size: 20,
+  };
+  const { disclosure } = clampLookbackWindow(body);
+  assert.ok(disclosure);
+  // All six clauses are identical -> ONE deduplicated sentence, no overflow tail.
+  assert.equal(
+    (disclosure as string).match(/Time window capped/g)?.length,
+    1,
+    `duplicates must collapse: ${disclosure}`,
+  );
+  assert.ok(
+    (disclosure as string).length < 500,
+    `disclosure must stay a bounded, sentence-sized hint contribution: ${
+      (disclosure as string).length
+    }`,
+  );
+});
+
+test('clampLookbackWindow: a sibling `format` key is dropped when bounds are rewritten to ISO', () => {
+  // Keeping format:'yyyy-MM-dd' beside full ISO date-times produced a lint-clean body the Indexer
+  // then rejected with an opaque parse error -- worse than the clear span rejection it replaced.
+  const body = rangeBody({
+    gte: '2025-01-01',
+    lte: '2025-12-31',
+    format: 'yyyy-MM-dd',
+  });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.ok(disclosure);
+  const range = readTimestampRange(clamped) as Record<string, unknown>;
+  assert.ok(!('format' in range), 'format must not survive the ISO rewrite');
+  assert.equal(new Date(range.gte as string).toISOString(), range.gte);
+});
+
+test('clampLookbackWindow: a duplicate bound spelling (gte AND gt) is dropped, not left stale', () => {
+  // A stale gt:'now-400d' beside the clamped gte would let the engine pick the wider bound while
+  // the disclosure claims the capped window -- the pre-existing checkDateRanges bypass, closed
+  // here at the one place that rewrites bounds.
+  const body = rangeBody({ gte: 'now-180d', gt: 'now-400d', lte: 'now' });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.ok(disclosure);
+  const range = readTimestampRange(clamped);
+  assert.ok('gte' in range && !('gt' in range));
+  const spanMs =
+    Date.parse(range.lte as string) - Date.parse(range.gte as string);
+  assert.equal(spanMs, NINETY_DAYS_MS);
 });
 
 test('clampLookbackWindow: an unparseable bound is left untouched and still rejected by lintDsl', () => {

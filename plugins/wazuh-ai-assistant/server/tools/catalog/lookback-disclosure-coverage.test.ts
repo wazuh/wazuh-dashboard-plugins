@@ -23,9 +23,18 @@ import { IndexerRequest } from '../types';
  * parameters inherits the guarantee with no edit to this file. Tools with NO such parameters (the
  * `wazuh-states-*` snapshot tools with no event-time axis, the exact-ID lookup tool, and the
  * `search_wazuh_data` escape hatch, whose time range lives inside its free-form `query_dsl` string
- * rather than a flat schema property) are outside this class BY SHAPE, and the second test below
- * checks that exemption is real rather than assumed: none of them silently build a clampable
- * `@timestamp` range some other way.
+ * rather than a flat schema property) are outside this class BY SHAPE, and the exemption tests
+ * below make that STRUCTURAL rather than assumed (integration review — a behavioural probe with
+ * benign sample values would have silently exempted a future `days_back`-style parameter):
+ *  1. no exempt, non-escape-hatch tool builds ANY `@timestamp` range clause at all;
+ *  2. no tool in the WHOLE registry (manager tools included — a future manager tool with a time
+ *     axis must not dodge this sweep by target) declares a time-like parameter under any OTHER
+ *     name — the standard `time_range_gte`/`time_range_lte` pair (catalog/common.ts's
+ *     `timeRangeProperties`) is the only way to take a caller-controlled window, and it is the
+ *     shape that inherits the guarantee.
+ * The escape hatch's model-authored window is covered separately at the chokepoint itself
+ * (executor.test.ts's fails-on-base witness drives the REAL executeToolCall with a 180-day
+ * query_dsl).
  */
 
 /** Far above the 90-day cap, so a tool that already clamps its own inputs some other way (it
@@ -220,13 +229,52 @@ test('mechanism self-test: WITHOUT the clamp stage, the same 180-day request is 
   );
 });
 
-test('tools with NO time_range_gte/lte parameter build no clampable @timestamp range -- exempt by shape, not by an exemption list', () => {
+/** Collects every `range` clause keyed by `@timestamp` anywhere in a built body — `@timestamp` is
+ * the one time axis every catalog tool queries (guardrails' TIME_FIELD_RE is broader, for the
+ * escape hatch's sake, but the STRUCTURAL exemption below is about what typed tools build). */
+function collectTimestampRangeClauses(node: unknown, found: unknown[]): void {
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      collectTimestampRangeClauses(item, found);
+    }
+    return;
+  }
+  if (!node || typeof node !== 'object') {
+    return;
+  }
+  for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+    if (
+      key === 'range' &&
+      value &&
+      typeof value === 'object' &&
+      '@timestamp' in (value as Record<string, unknown>)
+    ) {
+      found.push(value);
+    }
+    collectTimestampRangeClauses(value, found);
+  }
+}
+
+test('tools with NO time_range_gte/lte parameter build NO @timestamp range at all -- exemption is structural', () => {
+  // Integration review: the first cut probed these tools with BENIGN sample values and asserted
+  // "no disclosure", which a future caller-controlled window under another name (days_back: 10)
+  // passes trivially. Structural form: an exempt typed tool must have no @timestamp range clause
+  // in its built body whatsoever -- if it has a time axis, it must take it through the standard
+  // time_range_gte/lte pair and join the sweep above. The escape hatch (jsonString body) is the
+  // one shape whose window is model-authored, covered at the chokepoint by executor.test.ts's
+  // fails-on-base witness instead.
   assert.ok(
     nonTimeRangedTools.length > 0,
     'expected at least one indexer tool with no time_range parameter (states/ID-lookup/escape-hatch tools)',
   );
   const offenders: string[] = [];
   for (const def of nonTimeRangedTools) {
+    const isEscapeHatch = Object.values(def.spec.parameters.properties).some(
+      prop => (prop as { jsonString?: true }).jsonString,
+    );
+    if (isEscapeHatch) {
+      continue;
+    }
     const params = sampleParams(def.spec.parameters.properties);
     let request: IndexerRequest;
     try {
@@ -234,24 +282,50 @@ test('tools with NO time_range_gte/lte parameter build no clampable @timestamp r
     } catch {
       continue; // A parameter-level throw has nothing to do with this class; not this test's concern.
     }
-    const valved = applySafetyValves(request.body);
-    if (!valved.ok) {
-      continue;
-    }
-    const { disclosure } = clampLookbackWindow(valved.body);
-    if (disclosure) {
+    const clauses: unknown[] = [];
+    collectTimestampRangeClauses(request.body, clauses);
+    if (clauses.length > 0) {
       offenders.push(
-        `${def.spec.name}: has no time_range_gte/lte parameter but still built a clampable ` +
-          '@timestamp range -- it belongs in the time-ranged sweep above, not this exemption ' +
-          "(add time_range_gte/lte via catalog/common.ts's timeRangeProperties, or this tool's " +
-          'own wide-range callers get no disclosure).',
+        `${def.spec.name}: has no time_range_gte/lte parameter but builds ${clauses.length} ` +
+          '@timestamp range clause(s) -- it has a time axis outside the disclosure sweep above ' +
+          "(add time_range_gte/lte via catalog/common.ts's timeRangeProperties).",
       );
     }
   }
   assert.deepEqual(
     offenders,
     [],
-    'A tool is missing time_range_gte/lte in its schema but still builds a wide time-range clause ' +
+    'A tool is missing time_range_gte/lte in its schema but still builds a time-range clause ' +
       '-- it is silently outside the disclosure sweep above.',
+  );
+});
+
+test('no tool in the WHOLE registry declares a time-like parameter under any other name', () => {
+  // The forward fence that makes "a future tool with a time parameter inherits the guarantee
+  // automatically" actually true (integration review: it was only true for the exact
+  // time_range_gte/lte pair): any schema property whose name looks like a time control must BE
+  // that pair. Registry-wide, manager tools included -- a future manager-target tool with a time
+  // axis must not dodge the sweep by target.
+  const TIME_LIKE_PARAM_RE =
+    /(gte|lte|since|before|after|window|lookback|days|hours|minutes|_from|_to|time)/i;
+  const offenders: string[] = [];
+  for (const def of listToolDefinitions()) {
+    for (const name of Object.keys(def.spec.parameters.properties)) {
+      if (name === 'time_range_gte' || name === 'time_range_lte') {
+        continue;
+      }
+      if (TIME_LIKE_PARAM_RE.test(name)) {
+        offenders.push(`${def.spec.name}.${name}`);
+      }
+    }
+  }
+  assert.deepEqual(
+    offenders,
+    [],
+    'A tool declares a time-like parameter outside the standard time_range_gte/lte pair ' +
+      "(catalog/common.ts's timeRangeProperties) -- only that pair flows through the " +
+      'clamp-and-disclose chokepoint, so a differently-named window would be a silently ' +
+      'undisclosed bound. Rename the parameter to the standard pair or widen this sweep WITH ' +
+      'its guarantee.',
   );
 });
