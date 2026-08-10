@@ -112,3 +112,13 @@ test('table/digest columns stay within the fields verified present on the seeded
   ]);
   assert.deepEqual(getEventsByAgentTool.digest.sampleColumns, columnFields);
 });
+
+// Issue #8920 item 1 (population-disclosure): this tool sorts by @timestamp desc with no real
+// aggregation, so its digest.samples are only the newest events -- breakdownDimensions is the
+// synthetic fallback that groups every RETURNED row instead.
+test('digest opts into the synthetic event.category/event.outcome breakdown fallback', () => {
+  assert.deepEqual(getEventsByAgentTool.digest.breakdownDimensions, [
+    'event.category',
+    'event.outcome',
+  ]);
+});

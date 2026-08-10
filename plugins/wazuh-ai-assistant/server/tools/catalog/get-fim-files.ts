@@ -102,5 +102,12 @@ export const getFimFilesTool: ToolDefinition = {
   },
   digest: {
     sampleColumns: ['wazuh.agent.name', 'file.path', 'file.mtime', 'file.size'],
+    // Synthetic fallback, not a real aggregation (issue #8920 item 1): this tool sorts by
+    // file.mtime desc, so its 5-row `samples` slice is only the most-recently-modified files --
+    // "which agents have monitored files" would otherwise be answered from that narrow slice.
+    // `wazuh.agent.name` already has a policy entry (WAZUH_FIELD.AGENT_NAME, anonymize/HOST) in
+    // privacy.ts, so this needs no privacy-policy change; the identity-map path in executor.ts
+    // already scrubs synthetic breakdown keys the same way as a real aggregation's.
+    breakdownDimensions: ['wazuh.agent.name'],
   },
 };
