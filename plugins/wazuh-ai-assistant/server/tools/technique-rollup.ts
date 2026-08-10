@@ -11,8 +11,12 @@
  * hand-written `{term: {"wazuh.rule.mitre.technique.id": "T1059"}}` is executed verbatim. This
  * transform therefore runs in executor.ts on the EXECUTED (post-`applySafetyValves`) body of
  * every indexer request, so typed tools and the escape hatch share one deterministic guarantee
- * with no per-tool opt-in. It is idempotent: an already-rolled shape carries no bare `term` on a
- * parent id, so a second pass changes nothing.
+ * with no per-tool opt-in. It is idempotent, but NOT for the reason an earlier version of this
+ * comment gave: the rolled shape below contains a bare-parent `term` as its own first `should`
+ * member, so a naive second pass re-rolls it and nests one `bool` inside another. Idempotence comes
+ * from `isRolledUpClause` recognizing that exact emitted shape and leaving it alone. It matters
+ * because a typed tool (get-mitre-findings.ts) may already have rolled up before this chokepoint
+ * runs on the executed body.
  *
  * What it rewrites: any single-key `{term: {<field ending in "technique.id">: "T<digits>"}}`
  * clause, anywhere in `body.query`, becomes
@@ -66,6 +70,74 @@ function rolledUpClause(
   };
 }
 
+/** The single field/value pair of a one-key clause of type `clauseType`, or undefined if `node` is
+ * not that shape. Shared by the rolled-shape recognizer below. */
+function singleFieldClause(
+  node: unknown,
+  clauseType: 'term' | 'prefix',
+): { field: string; value: string } | undefined {
+  if (!node || typeof node !== 'object' || Array.isArray(node)) {
+    return undefined;
+  }
+  const record = node as Record<string, unknown>;
+  const keys = Object.keys(record);
+  if (keys.length !== 1 || keys[0] !== clauseType) {
+    return undefined;
+  }
+  const body = record[clauseType];
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return undefined;
+  }
+  const entries = Object.entries(body as Record<string, unknown>);
+  if (entries.length !== 1) {
+    return undefined;
+  }
+  const [field, fieldSpec] = entries[0];
+  const value = termValue(fieldSpec);
+  return typeof value === 'string' ? { field, value } : undefined;
+}
+
+/**
+ * True for the EXACT shape `rolledUpClause` emits. Needed because that shape deliberately contains
+ * a bare-parent `term` as its first `should` member: without this check the walker re-rolls its own
+ * output and nests one `bool` inside another on a second pass. (This module's header previously
+ * claimed idempotence on the grounds that "an already-rolled shape carries no bare `term` on a
+ * parent id" — it carries exactly that, which is why `technique-rollup-coverage.test.ts` pins the
+ * twice-applied case.) A second pass now returns the node untouched, and the walker does not
+ * descend into it — the inner clauses are this function's own output, never a caller's filter.
+ */
+function isRolledUpClause(record: Record<string, unknown>): boolean {
+  const keys = Object.keys(record);
+  if (keys.length !== 1 || keys[0] !== 'bool') {
+    return false;
+  }
+  const bool = record.bool;
+  if (!bool || typeof bool !== 'object' || Array.isArray(bool)) {
+    return false;
+  }
+  const boolRecord = bool as Record<string, unknown>;
+  const boolKeys = Object.keys(boolRecord).sort();
+  if (
+    boolKeys.length !== 2 ||
+    boolKeys[0] !== 'minimum_should_match' ||
+    boolKeys[1] !== 'should' ||
+    boolRecord.minimum_should_match !== 1 ||
+    !Array.isArray(boolRecord.should) ||
+    boolRecord.should.length !== 2
+  ) {
+    return false;
+  }
+  const exact = singleFieldClause(boolRecord.should[0], 'term');
+  const children = singleFieldClause(boolRecord.should[1], 'prefix');
+  return (
+    exact !== undefined &&
+    children !== undefined &&
+    exact.field === children.field &&
+    TECHNIQUE_ID_FIELD_RE.test(exact.field) &&
+    children.value === `${exact.value}.`
+  );
+}
+
 function transformNode(node: unknown): unknown {
   if (Array.isArray(node)) {
     return node.map(transformNode);
@@ -74,6 +146,9 @@ function transformNode(node: unknown): unknown {
     return node;
   }
   const record = node as Record<string, unknown>;
+  if (isRolledUpClause(record)) {
+    return record;
+  }
   const keys = Object.keys(record);
   // A candidate `term` clause object has exactly one key ("term") whose value maps exactly one
   // field — anything else is not the clause shape this rollup targets and recurses instead.
