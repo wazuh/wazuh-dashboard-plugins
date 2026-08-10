@@ -713,7 +713,10 @@ test('isMetricAggValue: accepts {value: number|null}, rejects buckets/hits/non-o
   assert.equal(isMetricAggValue({ value: null }), true);
   assert.equal(isMetricAggValue({ value: 6, buckets: [] }), false);
   assert.equal(isMetricAggValue({ value: 6, hits: { hits: [] } }), false);
-  assert.equal(isMetricAggValue({ buckets: [{ key: 'a', doc_count: 1 }] }), false);
+  assert.equal(
+    isMetricAggValue({ buckets: [{ key: 'a', doc_count: 1 }] }),
+    false,
+  );
   assert.equal(isMetricAggValue({ value: '6' }), false);
   assert.equal(isMetricAggValue(null), false);
   assert.equal(isMetricAggValue(undefined), false);
@@ -721,41 +724,209 @@ test('isMetricAggValue: accepts {value: number|null}, rejects buckets/hits/non-o
   assert.equal(isMetricAggValue('x'), false);
 });
 
+/**
+ * One REAL OpenSearch response shape per supported metric type — not a shared synthetic
+ * `{value: 6}` for all of them, which would let a type whose real response is NOT `{value}`
+ * (percentiles, stats) be added to SUPPORTED_METRIC_AGG_TYPES and pass anyway. min/max include
+ * the `value_as_string` a date-field aggregation returns; the sync test below fails if a type is
+ * added to SUPPORTED_METRIC_AGG_TYPES without a real fixture here.
+ */
+const REAL_METRIC_AGG_RESPONSES: Record<string, Record<string, unknown>> = {
+  cardinality: { value: 6 },
+  value_count: { value: 4812 },
+  avg: { value: 7.32 },
+  sum: { value: 120 },
+  min: {
+    value: 1704067200000,
+    value_as_string: '2026-01-01T00:00:00.000Z',
+  },
+  max: {
+    value: 1786000000000,
+    value_as_string: '2026-08-09T12:26:40.000Z',
+  },
+};
+
+test('every SUPPORTED_METRIC_AGG_TYPES entry has a real response fixture in this file', () => {
+  // The per-type loop below is only as strong as this sync: a type added to the list without a
+  // REAL response shape here would otherwise be tested against nothing.
+  for (const type of SUPPORTED_METRIC_AGG_TYPES) {
+    assert.ok(
+      REAL_METRIC_AGG_RESPONSES[type],
+      `${type}: add its real OpenSearch response shape to REAL_METRIC_AGG_RESPONSES`,
+    );
+  }
+});
+
 test('buildDigest: a metric-only response synthesizes ONE row per SUPPORTED_METRIC_AGG_TYPES entry, not returned:0', () => {
-  const def = buildToolDef({ deriveColumns: true, digest: { sampleColumns: [] } });
+  const def = buildToolDef({
+    deriveColumns: true,
+    digest: { sampleColumns: [] },
+  });
   for (const type of SUPPORTED_METRIC_AGG_TYPES) {
     const aggKey = `${type}_result`;
-    const result = { aggregations: { [aggKey]: { value: 6 } } };
+    const response = REAL_METRIC_AGG_RESPONSES[type];
+    const result = { aggregations: { [aggKey]: response } };
     const digest = buildDigest('search_wazuh_data', result, def);
     assert.equal(
       digest.counts.returned,
       1,
       `${type}: expected returned:1, not the pre-fix returned:0`,
     );
+    // counts.total is pinned as 1 too: the synthesized row IS the result set here — there is no
+    // hits row set to count (size:0, metric-only), and inventing hits.total would flip
+    // `truncated` for a result that is not truncated.
+    assert.equal(digest.counts.total, 1, `${type}: synthesized-row total`);
     assert.deepEqual(
       digest.samples,
-      [{ [aggKey]: 6 }],
+      [{ [aggKey]: response.value }],
       `${type}: expected the computed value to reach samples`,
+    );
+    // The projection-immune carrier is ALSO populated (see Digest.metrics doc comment), with
+    // value_as_string carried through when the response provides it (min/max on a date field).
+    assert.deepEqual(
+      digest.metrics,
+      [
+        {
+          agg: aggKey,
+          value: response.value,
+          ...(typeof response.value_as_string === 'string'
+            ? { value_as_string: response.value_as_string }
+            : {}),
+        },
+      ],
+      `${type}: expected a metrics entry`,
+    );
+    assert.equal(
+      digest.hint,
+      undefined,
+      `${type}: a fully-represented response must not carry the unrepresentable-agg hint`,
     );
   }
 });
 
+/**
+ * The negative half of the class guard: aggregation shapes this digest CANNOT represent must not
+ * silently serialize as a bare `returned: 0` — they get no rows, but the hint must name them so
+ * the model can re-query instead of reporting "no data" for a query OpenSearch answered. Each
+ * fixture is that aggregation's REAL response shape.
+ */
+const UNREPRESENTABLE_AGG_RESPONSES: Record<string, Record<string, unknown>> = {
+  stats: { count: 10, min: 1, max: 12, avg: 6.6, sum: 66 },
+  extended_stats: {
+    count: 10,
+    min: 1,
+    max: 12,
+    avg: 6.6,
+    sum: 66,
+    sum_of_squares: 506,
+    variance: 12.04,
+    std_deviation: 3.47,
+  },
+  percentiles: { values: { '95.0': 11.2, '99.0': 12 } },
+  top_metrics: { top: [{ sort: [3], metrics: { 'wazuh.rule.level': 12 } }] },
+  // `filters` with NAMED filters / range with keyed:true — buckets is an OBJECT, not an array.
+  keyed_filters: {
+    buckets: { high: { doc_count: 37 }, low: { doc_count: 29 } },
+  },
+  keyed_range: {
+    buckets: { '*-100.0': { doc_count: 2 }, '100.0-*': { doc_count: 4 } },
+  },
+};
+
+test('buildDigest: an unrepresentable aggregation shape yields 0 rows PLUS a hint naming it', () => {
+  const def = buildToolDef({
+    deriveColumns: true,
+    digest: { sampleColumns: [] },
+  });
+  for (const [name, response] of Object.entries(
+    UNREPRESENTABLE_AGG_RESPONSES,
+  )) {
+    const result = { aggregations: { [name]: response } };
+    const digest = buildDigest('search_wazuh_data', result, def);
+    assert.equal(digest.counts.returned, 0, `${name}: no row can be built`);
+    assert.ok(digest.hint, `${name}: the terminal guard hint must fire`);
+    assert.ok(
+      digest.hint!.includes(name),
+      `${name}: the hint must name the unrepresentable aggregation`,
+    );
+    assert.equal(
+      digest.metrics,
+      undefined,
+      `${name}: no metrics entry can be fabricated for it`,
+    );
+  }
+});
+
+test('buildDigest: a top-level single-bucket filter agg reports its doc_count, not returned:0', () => {
+  // {doc_count} with no buckets/hits/value — filter/global/missing/nested. bucketsToRows already
+  // merged this exact shape for SUB-aggregations; the top level must not be the one place it is
+  // silently dropped.
+  const def = buildToolDef({
+    deriveColumns: true,
+    digest: { sampleColumns: [] },
+  });
+  const result = { aggregations: { criticals: { doc_count: 37 } } };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.equal(digest.counts.returned, 1);
+  assert.deepEqual(digest.samples, [{ criticals: 37 }]);
+  assert.deepEqual(digest.metrics, [{ agg: 'criticals', value: 37 }]);
+  assert.equal(digest.hint, undefined);
+});
+
+test('buildDigest: a metric-only response with a _source list is NOT projected into empty samples', () => {
+  // deriveResultColumns' priority 1 returns `_source` verbatim; the synthesized metric row's keys
+  // are aggregation NAMES, so that projection produced samples:[{}] with returned:1 — a row that
+  // asserts it exists and carries nothing. The agg-name row must win column derivation instead.
+  const def = buildToolDef({
+    deriveColumns: true,
+    digest: { sampleColumns: [] },
+  });
+  const body = {
+    size: 0,
+    _source: ['wazuh.rule.id'],
+    aggs: { distinct_agents: { cardinality: { field: 'wazuh.agent.id' } } },
+  };
+  const result = { aggregations: { distinct_agents: { value: 6 } } };
+  const digest = buildDigest('search_wazuh_data', result, def, body);
+  assert.deepEqual(digest.samples, [{ distinct_agents: 6 }]);
+  assert.deepEqual(digest.columns, ['distinct_agents']);
+});
+
+test('buildDigest: a NON-deriveColumns tool with a metric-only response still carries the answer in metrics', () => {
+  // A typed tool's static sampleColumns can never name a model-chosen agg, so the synthesized
+  // row projects to an empty sample — `metrics` is the projection-immune carrier that must hold
+  // the computed value regardless.
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'wazuh.rule.id', label: 'Rule' }] },
+    digest: { sampleColumns: ['wazuh.rule.id'] },
+  });
+  const result = { aggregations: { distinct_agents: { value: 6 } } };
+  const digest = buildDigest('get_some_tool', result, def);
+  assert.deepEqual(digest.metrics, [{ agg: 'distinct_agents', value: 6 }]);
+});
+
 test('buildDigest: a metric agg with value:null passes through as null, not dropped', () => {
-  const def = buildToolDef({ deriveColumns: true, digest: { sampleColumns: [] } });
+  const def = buildToolDef({
+    deriveColumns: true,
+    digest: { sampleColumns: [] },
+  });
   const result = { aggregations: { avg_level: { value: null } } };
   const digest = buildDigest('search_wazuh_data', result, def);
   assert.equal(digest.counts.returned, 1);
   assert.deepEqual(digest.samples, [{ avg_level: null }]);
 });
 
-test('buildDigest: a metric agg with no bucket-shaped sibling produces no digest.metrics (already in samples)', () => {
-  const def = buildToolDef({ deriveColumns: true, digest: { sampleColumns: [] } });
+test('buildDigest: a metric-only response carries metrics AND the synthesized row', () => {
+  // Deliberately double-represented: the row feeds the rendered table and is subject to column
+  // projection, `metrics` is the projection-immune carrier — see Digest.metrics' doc comment.
+  const def = buildToolDef({
+    deriveColumns: true,
+    digest: { sampleColumns: [] },
+  });
   const result = { aggregations: { distinct_agents: { value: 6 } } };
   const digest = buildDigest('search_wazuh_data', result, def);
-  assert.ok(
-    !('metrics' in digest),
-    'the metric-only value is already carried by the synthesized row/sample, not a second field',
-  );
+  assert.deepEqual(digest.samples, [{ distinct_agents: 6 }]);
+  assert.deepEqual(digest.metrics, [{ agg: 'distinct_agents', value: 6 }]);
 });
 
 test('buildDigest: a metric agg BEFORE a bucket agg in key order no longer masks the bucket rows', () => {
