@@ -401,12 +401,18 @@ test('get_agent_inventory: kind="ports" numeric filter matches the port on eithe
             should: [
               {
                 term: {
-                  'interface.state': { value: 'listening', case_insensitive: true },
+                  'interface.state': {
+                    value: 'listening',
+                    case_insensitive: true,
+                  },
                 },
               },
               {
                 term: {
-                  'interface.state': { value: 'listen', case_insensitive: true },
+                  'interface.state': {
+                    value: 'listen',
+                    case_insensitive: true,
+                  },
                 },
               },
               { bool: { must_not: { exists: { field: 'interface.state' } } } },
@@ -429,14 +435,18 @@ test('get_agent_inventory: kind="ports" listening-state match is case-insensitiv
     kind: 'ports',
     filter: '9200',
   });
-  const portFilterClause = (
-    req.body.query as { bool: { filter: unknown[] } }
-  ).bool.filter[1] as {
-    bool: { should: Array<Record<string, unknown>>; minimum_should_match: number };
+  const portFilterClause = (req.body.query as { bool: { filter: unknown[] } })
+    .bool.filter[1] as {
+    bool: {
+      should: Array<Record<string, unknown>>;
+      minimum_should_match: number;
+    };
   };
   const stateClauses = portFilterClause.bool.should.filter(
     clause => 'term' in clause,
-  ) as Array<{ term: { 'interface.state': { value: string; case_insensitive: boolean } } }>;
+  ) as Array<{
+    term: { 'interface.state': { value: string; case_insensitive: boolean } };
+  }>;
   assert.ok(
     stateClauses.length > 0,
     'expected at least one "term" clause on interface.state',
@@ -469,9 +479,10 @@ test('get_agent_inventory: kind="ports" numeric filter still returns a document 
     kind: 'ports',
     filter: '9200',
   });
-  const portFilterClause = (
-    req.body.query as { bool: { filter: unknown[] } }
-  ).bool.filter[1] as { bool: { should: unknown[]; minimum_should_match: number } };
+  const portFilterClause = (req.body.query as { bool: { filter: unknown[] } })
+    .bool.filter[1] as {
+    bool: { should: unknown[]; minimum_should_match: number };
+  };
   assert.deepEqual(
     portFilterClause.bool.should[portFilterClause.bool.should.length - 1],
     {
