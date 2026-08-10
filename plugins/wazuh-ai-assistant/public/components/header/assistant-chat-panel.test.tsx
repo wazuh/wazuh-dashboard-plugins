@@ -164,4 +164,50 @@ describe('AssistantChatPanel', () => {
     expect(chatPageStub()).toHaveAttribute('data-sidebar', 'true');
     widthSpy.mockRestore();
   });
+
+  it('makes the conversations list reachable from a narrow panel via the toolbar toggle', () => {
+    // jsdom reports offsetWidth 0, i.e. narrower than the auto-show threshold.
+    renderPanel();
+    expect(chatPageStub()).toHaveAttribute('data-sidebar', 'false');
+
+    fireEvent.click(screen.getByLabelText('Show saved conversations'));
+
+    expect(chatPageStub()).toHaveAttribute('data-sidebar', 'true');
+  });
+
+  it('keeps a manually-closed sidebar closed across a resize that would otherwise auto-show it', () => {
+    // jsdom has no ResizeObserver; stub one whose callback this test can re-trigger on demand
+    // to simulate a later resize (distinct from the mount-time `update()` call, which runs
+    // regardless of ResizeObserver's existence).
+    let triggerResize: (() => void) | undefined;
+    class ResizeObserverStub {
+      constructor(callback: () => void) {
+        triggerResize = callback;
+      }
+      observe() {}
+      disconnect() {}
+    }
+    const originalResizeObserver = (
+      window as unknown as { ResizeObserver?: unknown }
+    ).ResizeObserver;
+    (window as unknown as { ResizeObserver: unknown }).ResizeObserver =
+      ResizeObserverStub;
+    const widthSpy = jest
+      .spyOn(HTMLElement.prototype, 'offsetWidth', 'get')
+      .mockReturnValue(800);
+
+    renderPanel();
+    expect(chatPageStub()).toHaveAttribute('data-sidebar', 'true');
+
+    fireEvent.click(screen.getByLabelText('Hide saved conversations'));
+    expect(chatPageStub()).toHaveAttribute('data-sidebar', 'false');
+
+    // A later resize (still wide) must not silently reopen it once the user has closed it.
+    triggerResize?.();
+    expect(chatPageStub()).toHaveAttribute('data-sidebar', 'false');
+
+    widthSpy.mockRestore();
+    (window as unknown as { ResizeObserver: unknown }).ResizeObserver =
+      originalResizeObserver;
+  });
 });

@@ -216,9 +216,16 @@ const App: React.FC<{
                         core={core}
                         onProvidersChanged={refreshProviders}
                         autoOpenCreateForm={autoOpenCreateProvider}
-                        onAutoOpenCreateFormDone={() =>
-                          history.replace(SETTINGS_PATH)
-                        }
+                        onCreateFormOpenChange={open => {
+                          if (open === autoOpenCreateProvider) {
+                            return;
+                          }
+                          history.replace(
+                            open
+                              ? `${SETTINGS_PATH}?${ADD_PROVIDER_PARAM}=true`
+                              : SETTINGS_PATH,
+                          );
+                        }}
                       />
                     </div>
                   )}
