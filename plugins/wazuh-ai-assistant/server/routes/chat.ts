@@ -1235,6 +1235,18 @@ export async function* orchestrate(
                       ? SUGGESTED_QUERY_WINDOW_DEFAULTED_DISCLOSURE
                       : '');
                   break;
+                default: {
+                  // Unreachable: `resolution.outcome` is a closed union and every member is handled
+                  // above. Present because `default-case` is enforced repo-wide, and typed as
+                  // `never` so ADDING an outcome without handling it here fails the build rather
+                  // than silently falling through with an unassigned `dsl`.
+                  const exhaustive: never = resolution;
+                  throw new Error(
+                    `Unhandled suggested-query resolution outcome: ${JSON.stringify(
+                      exhaustive,
+                    )}`,
+                  );
+                }
               }
               yield {
                 type: 'suggested_query',
