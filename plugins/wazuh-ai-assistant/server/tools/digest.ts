@@ -879,35 +879,61 @@ function buildBreakdownNote(
   );
 }
 
-/** Total `sum_other_doc_count` across every top-level bucket aggregation in the response —
- * OpenSearch reports it on every terms aggregation whose bucket list was truncated by `size`.
- * Non-terms bucket aggs (date_histogram etc.) simply lack the field and contribute 0. */
-function sumOtherDocCounts(result: unknown): number {
+/**
+ * `sum_other_doc_count` PER top-level bucket aggregation, for every aggregation whose bucket list
+ * OpenSearch truncated by `size`. Non-terms bucket aggs (date_histogram etc.) lack the field and
+ * are skipped.
+ *
+ * Deliberately NOT summed across aggregations. `buildBreakdown` emits buckets from EVERY top-level
+ * agg (tagging each with `agg` when there is more than one), so each DIMENSION has its own
+ * truncated key set and the remainders are not addable. Summing produced a number with no
+ * referent: on a finding-hits call over this lab's own data — 918 matched rows, an agent dimension
+ * truncating ~20 and a rule-title dimension truncating ~908 (772 distinct titles) — the summed
+ * note claimed "~928 additional rows" for a 918-row result.
+ */
+function perAggOtherDocCounts(
+  result: unknown,
+): Array<{ agg: string; other: number }> {
   const aggregations = (
     result as { aggregations?: Record<string, unknown> } | undefined
   )?.aggregations;
   if (!aggregations) {
-    return 0;
+    return [];
   }
-  let sum = 0;
-  for (const aggValue of Object.values(aggregations)) {
+  const truncated: Array<{ agg: string; other: number }> = [];
+  for (const [aggKey, aggValue] of Object.entries(aggregations)) {
     const other = (aggValue as { sum_other_doc_count?: unknown } | undefined)
       ?.sum_other_doc_count;
     if (typeof other === 'number' && other > 0) {
-      sum += other;
+      truncated.push({ agg: aggKey, other });
     }
   }
-  return sum;
+  return truncated;
 }
 
-/** Caveat for a REAL breakdown whose bucket LIST is truncated (`sum_other_doc_count` > 0) — see
- * `Digest.breakdownNote`'s doc comment, case 2. Counts stay exact; the key set is what must not
- * be read as complete. */
-function buildBucketTruncationNote(otherCount: number): string {
+/**
+ * Caveat for a REAL breakdown whose bucket LIST is truncated (`sum_other_doc_count` > 0) — see
+ * `Digest.breakdownNote`'s doc comment, case 2. Counts stay exact; the key set is what must not be
+ * read as complete.
+ *
+ * Named per dimension (matching `breakdown[].agg`) so a multi-dimension breakdown attributes each
+ * remainder to the dimension it belongs to. Worded as further MATCHES, never as additional ROWS:
+ * on a multi-valued keyword field — `wazuh.rule.mitre.technique.id` and `wazuh.rule.tags` are
+ * arrays — the remainder can be the SAME documents counted again under other keys, so a row count
+ * would be false even for a single aggregation.
+ */
+function buildBucketTruncationNote(
+  truncatedAggs: Array<{ agg: string; other: number }>,
+  breakdownIsMultiDimension: boolean,
+): string {
+  const remainder = breakdownIsMultiDimension
+    ? truncatedAggs.map(({ agg, other }) => `${agg}: ${other}`).join(', ')
+    : String(truncatedAggs[0].other);
   return (
-    `Per-bucket counts are exact, but the bucket list is top-N only: ${otherCount} additional ` +
-    'matching rows fall under keys not listed. Do not present the listed keys as the complete ' +
-    'set of values.'
+    'Per-bucket counts are exact, but the bucket list is top-N only — further matches fall under ' +
+    `keys not listed (${remainder}). On a multi-valued field those may be the same rows counted ` +
+    'under other keys, so do not add them to the row total; do not present the listed keys as the ' +
+    'complete set of values.'
   );
 }
 
@@ -975,9 +1001,14 @@ export function buildDigest(
       syntheticPageScoped = true;
     }
   } else if (realBreakdown) {
-    const otherCount = sumOtherDocCounts(result);
-    if (otherCount > 0) {
-      breakdownNote = buildBucketTruncationNote(otherCount);
+    const truncatedAggs = perAggOtherDocCounts(result);
+    if (truncatedAggs.length > 0) {
+      // `buildBreakdown` tags rows with `agg` only when the response carried more than one
+      // aggregation, so that same flag decides whether the note has to name its dimensions.
+      breakdownNote = buildBucketTruncationNote(
+        truncatedAggs,
+        realBreakdown.some(row => row.agg !== undefined),
+      );
     }
   }
   const hint = buildZeroRowHint(requestBody, returned);
