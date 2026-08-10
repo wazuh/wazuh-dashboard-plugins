@@ -674,7 +674,7 @@ test('applyFieldPolicy: absent message stays absent (no message key added)', () 
 
 // --- extractAggFields ----------------------------------------------------------------------------
 
-test('extractAggFields: maps each top-level agg name to its terms/significant_terms/cardinality field', () => {
+test('extractAggFields: maps each top-level BUCKET agg name to its terms/significant_terms field', () => {
   const body = {
     aggs: {
       by_rule: { terms: { field: 'rule.id', size: 20 } },
@@ -685,8 +685,72 @@ test('extractAggFields: maps each top-level agg name to its terms/significant_te
   const fields = extractAggFields(body);
   assert.ok(fields);
   assert.equal(fields!.by_rule, 'rule.id');
-  assert.equal(fields!.by_ip_count, 'data.srcip');
+  // A metric agg's field is deliberately NOT mapped (its response is a number — no string value
+  // of that field ever leaves through the digest) so it can never win the `samples[].key`
+  // attribution over the bucket agg that actually produced the rows. See extractAggFields'
+  // doc comment for the leak this prevents.
+  assert.equal(fields!.by_ip_count, undefined);
+  assert.ok('by_ip_count' in fields!);
   assert.equal(fields!.by_sig, 'rule.description');
+});
+
+// --- applyFieldPolicy: samples[].key attribution with a leading metric agg (#8920 item 5) --------
+
+/**
+ * Since digest.ts's `bucketsToRows` sources rows from the first agg WITH BUCKETS (skipping a
+ * leading metric agg), the `key` sample column must be resolved against that same aggregation's
+ * field — not the first DECLARED one. These two pin both directions of the misattribution a
+ * declaration-order lookup would reintroduce.
+ */
+test('applyFieldPolicy: "key" resolves against the BUCKET agg, not a leading cardinality agg', () => {
+  // cardinality on an 'allow' field (wazuh.agent.id) declared FIRST; terms on an 'anonymize'
+  // field (wazuh.agent.name) second. The rows/samples come from the terms agg, so the hostnames
+  // under samples[].key MUST be pseudonymized — resolving against wazuh.agent.id's 'allow' entry
+  // would send them to the provider verbatim.
+  const policy: FieldPolicyEntry[] = [
+    { field: 'wazuh.agent.id', action: 'allow' },
+    { field: 'wazuh.agent.name', action: 'anonymize', kind: 'HOST' },
+  ];
+  const p = new Pseudonymizer();
+  const out = applyFieldPolicy(
+    baseDigest({ samples: [{ key: 'web-prod-01', doc_count: 42 }] }),
+    policy,
+    p,
+    extractAggFields({
+      aggs: {
+        distinct_ids: { cardinality: { field: 'wazuh.agent.id' } },
+        by_agent: { terms: { field: 'wazuh.agent.name', size: 10 } },
+      },
+    }),
+  );
+  assert.deepEqual(out.samples, [{ key: 'HOST_1', doc_count: 42 }]);
+});
+
+test('applyFieldPolicy: a leading fieldless metric agg does not blanket-pseudonymize bucket keys', () => {
+  // Mirror direction: an avg/sum/min/max agg has no extractable field at all. If it won the
+  // attribution, `key` would resolve by its own literal name, find no policy entry, and the
+  // escape hatch's fail-closed default would mint VAL_n for every bucket key — real rule ids
+  // arriving at the model as pseudonyms while breakdown carries them verbatim. The terms agg's
+  // 'allow' field must win instead.
+  const policy: FieldPolicyEntry[] = [
+    { field: 'wazuh.rule.id', action: 'allow' },
+  ];
+  const p = new Pseudonymizer();
+  const out = applyFieldPolicy(
+    baseDigest({ samples: [{ key: '5710', doc_count: 66 }] }),
+    policy,
+    p,
+    extractAggFields({
+      aggs: {
+        avg_level: { avg: { field: 'wazuh.rule.level' } },
+        by_rule: { terms: { field: 'wazuh.rule.id', size: 10 } },
+      },
+    }),
+    'search_wazuh_data',
+    true, // isEscapeHatch — the fail-closed default is exactly what must NOT fire here
+  );
+  assert.deepEqual(out.samples, [{ key: '5710', doc_count: 66 }]);
+  assert.equal(p.newEntries().length, 0);
 });
 
 test('extractAggFields: date_histogram (no field-bearing key) maps to undefined', () => {

@@ -606,8 +606,15 @@ export function prescanAndMint(
  * PATHS (e.g. "wazuh.agent.name"), not data — the same labels `applyFieldPolicy` deliberately
  * leaves untouched — and are FQDN-shaped, so scanning them would mint the same garbage HOST_n
  * this fix exists to prevent.
+ *
+ * `metrics` is likewise unscanned: its `value` is a computed NUMBER, its `agg` is the
+ * aggregation's own (model-chosen) name, and its `value_as_string` is OpenSearch's own date/
+ * number formatting of that numeric value (a min/max on a date field) — never indexed
+ * hostnames/IPs. Scanning `value_as_string` would misfire: the "00.000Z" tail of an ISO
+ * timestamp is FQDN-token-shaped and would be minted as a garbage HOST_n, corrupting the one
+ * human-readable form the field exists to carry. See digest.ts's `Digest.metrics` doc comment.
  */
-const UNSCANNED_DIGEST_KEYS = new Set(['columns']);
+const UNSCANNED_DIGEST_KEYS = new Set(['columns', 'metrics']);
 
 export function prescanAndMintToolContent(
   text: string,
@@ -681,13 +688,24 @@ function resolveFieldEntry(
 
 /**
  * Reads the field name driving each of a digest's `breakdown` aggregations (a terms/
- * significant_terms/cardinality aggregation's bucket keys), from the EXECUTED request body — the
+ * significant_terms aggregation's bucket keys), from the EXECUTED request body — the
  * response's `aggregations` tree only carries bucket keys/counts, never which field produced them,
  * so this must read the query side. Returns a map of top-level aggregation name → field (an entry
  * is `undefined` for an agg with no extractable field, e.g. a date_histogram), in the body's key
  * order — the same order digest.ts's `buildBreakdown` iterates, so the two can't drift apart.
  * Breakdown entries name their aggregation (`agg`) only in the multi-agg case; a single-agg
  * entry attributes to the map's first key.
+ *
+ * Only BUCKET-producing aggregation types carry a field here, deliberately: a metric aggregation
+ * (`cardinality`/`avg`/`sum`/`min`/`max`/`value_count`) returns a NUMBER, so no string value of
+ * its field ever leaves through the digest, and mapping its field would misattribute the `key`
+ * sample column — since #8920 item 5, digest.ts's `bucketsToRows` sources rows from the first agg
+ * WITH BUCKETS, skipping over a leading metric agg, so `applyFieldPolicy` below must resolve
+ * `samples[].key` against the first agg with an extractable BUCKET field (the same skip), not
+ * against whatever agg happens to be declared first. Mapping `cardinality` here (as this function
+ * once did) would break exactly that: `aggs: {distinct_ids: {cardinality: wazuh.agent.id},
+ * by_agent: {terms: wazuh.agent.name}}` resolved `key` — which holds HOSTNAMES from `by_agent` —
+ * against `wazuh.agent.id`'s 'allow' policy and sent them to the provider verbatim.
  *
  * This is intentionally NOT threaded through `Digest` itself beyond the `agg` name: adding the
  * FIELD to every digest object would change buildDigest's output even when privacy is off,
@@ -715,11 +733,9 @@ export function extractAggFields(
   for (const aggKey of aggKeys) {
     const aggDef = aggs[aggKey] as Record<string, unknown> | undefined;
     let field: string | undefined;
-    for (const aggType of [
-      'terms',
-      'significant_terms',
-      'cardinality',
-    ] as const) {
+    // Bucket-producing types only — see the doc comment above for why metric types (cardinality
+    // included) are deliberately NOT mapped.
+    for (const aggType of ['terms', 'significant_terms'] as const) {
       const spec = aggDef?.[aggType] as { field?: unknown } | undefined;
       if (spec && typeof spec.field === 'string') {
         field = spec.field;
@@ -784,11 +800,17 @@ export function applyFieldPolicy(
   toolName?: string,
   isEscapeHatch = false,
 ): Digest {
-  // The field a bucket row's `key` holds the values OF — see the `samples` note above. `undefined`
-  // for a non-aggregation digest, or for an aggregation with no extractable field (e.g. a
-  // date_histogram), in which case `key` resolves by its own name like any other sample field.
+  // The field a bucket row's `key` holds the values OF — see the `samples` note above. The first
+  // agg with an extractable BUCKET field, not the first DECLARED agg: since #8920 item 5,
+  // digest.ts's `bucketsToRows` sources rows from the first agg with buckets, skipping a leading
+  // metric agg, and `extractAggFields` above maps only bucket-producing types — so "first defined
+  // entry" here walks in the exact same declaration order and lands on the same aggregation the
+  // rows came from. `undefined` for a non-aggregation digest, or when no aggregation has an
+  // extractable field (e.g. only a date_histogram — whose bucket keys are NUMBERS and never reach
+  // the string-scrub branches anyway), in which case `key` resolves by its own name like any
+  // other sample field.
   const firstAggField = aggFields
-    ? aggFields[Object.keys(aggFields)[0]]
+    ? Object.values(aggFields).find(field => field !== undefined)
     : undefined;
 
   const samples = digest.samples.map(sample => {
