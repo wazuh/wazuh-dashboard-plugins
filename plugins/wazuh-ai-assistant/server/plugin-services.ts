@@ -6,9 +6,11 @@ import { ApiKeyCipher } from './crypto/api-key-cipher';
  * wazuh-check-updates/server/plugin-services.ts). Needed because a route handler's
  * `context.core.savedObjects.client` is the request-scoped client built with NO hidden types on
  * this OSD version (CoreSavedObjectsRouteHandlerContext exposes only `client`/`typeRegistry`, no
- * `getClient(options)`), so the ONLY way to reach a `hidden: true` type (the conversation type)
- * is the START contract's `getScopedClient(request, { includedHiddenTypes })`. plugin.ts's start()
- * stashes the service here; conversation routes read it per request.
+ * `getClient(options)`), so the ONLY way to reach a `hidden: true` type (the assistant-settings and
+ * provider types — server/routes/settings.ts) is the START contract's `getScopedClient(request,
+ * { includedHiddenTypes })`. plugin.ts's start() stashes the service here; those routes read it
+ * per request. Persisted conversations don't use this at all any more — they are read/written
+ * directly against the `wazuh-ai-assistant-sessions` index alias (server/conversation-store.ts).
  */
 let savedObjectsStart: SavedObjectsServiceStart | undefined;
 

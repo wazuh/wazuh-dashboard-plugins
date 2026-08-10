@@ -18,12 +18,12 @@ export interface AssistantSettingsAttributes {
   userCanOverride: boolean;
   fieldPolicy: FieldPolicyEntry[];
   /**
-   * Persistent conversations retention: days to keep a saved conversation before it is
-   * excluded from GET /conversations and best-effort deleted (server/routes/conversations.ts).
-   * `0` (default) means "keep forever" — no enforcement at all. There is no scheduled/cron
-   * pruning: OSD plugins have no background job runner, so this is enforced ON-ACCESS ONLY, i.e.
-   * only when GET /conversations actually runs; a conversation past its retention window that is
-   * never listed again (no user ever opens the Chat tab) simply stays on disk until it is.
+   * Persistent conversations retention, in days. Persisted conversations now live in the
+   * `wazuh-ai-assistant-sessions` index alias, an ISM-managed data stream on the indexer side
+   * (wazuh-indexer-plugins#1422) that already rotates and deletes its own backing indices on a
+   * fixed schedule — actual deletion is no longer this app's job. This setting is not currently
+   * wired to that ISM policy; doing so (making the policy's retention window configurable from
+   * here) is tracked separately (wazuh-dashboard-plugins#8841).
    */
   conversationRetentionDays: number;
 }
@@ -32,9 +32,8 @@ export const assistantSettingsSavedObjectType: SavedObjectsType = {
   name: ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE,
   // Hidden: this singleton holds the field policy / actions guardrails / privacy
   // defaults, none of which should be reachable or editable via the generic Saved Objects
-  // management UI/API — same rationale as CONVERSATION_SAVED_OBJECT_TYPE (server/saved_objects/
-  // conversation.ts). Reached only through server/routes/settings.ts's/chat.ts's own routes, via the
-  // request-scoped client with `includedHiddenTypes: [ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE]`
+  // management UI/API. Reached only through server/routes/settings.ts's/chat.ts's own routes, via
+  // the request-scoped client with `includedHiddenTypes: [ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE]`
   // (plugin-services.ts's start-service singleton — see server/routes/settings.ts's
   // `getOrCreateAssistantSettings`).
   hidden: true,

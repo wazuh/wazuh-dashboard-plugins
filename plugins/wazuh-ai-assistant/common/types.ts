@@ -235,8 +235,8 @@ export interface ConversationSummary {
  * resumed conversation needs in order to be the SAME conversation rather than a summary of one.
  *
  * Both are optional, and deliberately so: conversations saved before they existed simply lack them
- * and resume exactly as they did before (no migration — `messages` is an `enabled: false` opaque
- * object in the saved-object mappings, see server/saved_objects/conversation.ts).
+ * and resume exactly as they did before (no migration — `messages` is stored as an opaque,
+ * unindexed blob, see server/conversation-store.ts's `ConversationDocument`).
  *
  * What was lost without them: `createdAt` meant every message in a resumed conversation was stamped
  * with the moment of the resume, so a conversation from last week read as seconds old; and dropping

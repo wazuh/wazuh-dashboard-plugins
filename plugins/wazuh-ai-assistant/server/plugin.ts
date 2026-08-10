@@ -10,7 +10,6 @@ import { registerRoutes } from './routes';
 import { setSavedObjectsStart, setApiKeyCipher } from './plugin-services';
 import { providerSettingsSavedObjectType } from './saved_objects/provider-settings';
 import { assistantSettingsSavedObjectType } from './saved_objects/assistant-settings';
-import { conversationSavedObjectType } from './saved_objects/conversation';
 import { ApiKeyCipher, parseEncryptionKey } from './crypto/api-key-cipher';
 import { WazuhAiAssistantConfigType } from './config';
 import {
@@ -81,10 +80,11 @@ export class WazuhAiAssistantPlugin
 
     core.savedObjects.registerType(providerSettingsSavedObjectType);
     core.savedObjects.registerType(assistantSettingsSavedObjectType);
-    // All three types are `hidden: true`, which keeps them out of the Saved Objects management UI
-    // but does not change registration: a hidden type must still be registered here, and is then
-    // reached through a scoped client built with `includedHiddenTypes`.
-    core.savedObjects.registerType(conversationSavedObjectType);
+    // Both are `hidden: true`, which keeps them out of the Saved Objects management UI but does
+    // not change registration: a hidden type must still be registered here, and is then reached
+    // through a scoped client built with `includedHiddenTypes`. Persisted conversations are no
+    // longer a saved object type at all — they live in the `wazuh-ai-assistant-sessions` index
+    // alias instead (server/conversation-store.ts, wazuh-indexer-plugins#1422).
 
     const router = core.http.createRouter();
     registerRoutes(router, this.logger);

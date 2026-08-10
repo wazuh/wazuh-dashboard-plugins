@@ -23,10 +23,11 @@ export const API_PATHS = {
    * warning and disable Save buttons before a non-admin's PUT would be rejected anyway. */
   SETTINGS_ACCESS: `${API_ROOT}/settings/access`,
   /** Persistent conversations: owner-scoped CRUD over the
-   * `wazuh-ai-assistant-conversation` saved object (server/routes/conversations.ts). GET lists the
-   * caller's own conversations (summaries only — id/title/updatedAt, never `messages`); POST
-   * creates one; GET/PUT/DELETE `{id}` operate on a single conversation and 404 (never 403) when
-   * it exists but belongs to a different owner, so existence is never leaked cross-owner. */
+   * `wazuh-ai-assistant-sessions` index alias (server/routes/conversations.ts,
+   * server/conversation-store.ts). GET lists the caller's own conversations (summaries only —
+   * id/title/updatedAt, never `messages`); POST creates one; GET/PUT/DELETE `{id}` operate on a
+   * single conversation and 404 (never 403) when it exists but belongs to a different owner, so
+   * existence is never leaked cross-owner. */
   CONVERSATIONS: `${API_ROOT}/conversations`,
   CONVERSATION_BY_ID: (id: string) => `${API_ROOT}/conversations/${id}`,
 } as const;
@@ -47,21 +48,23 @@ export const ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE =
 /** Fixed singleton id — there is exactly one settings object per deployment. */
 export const ASSISTANT_SETTINGS_ID = 'settings';
 
-/** Saved object type persisting one saved (resumable) conversation per row: owner + title +
- * timestamps + the full `ChatMessage[]` transcript. `hidden: true` (server/saved_objects/
- * conversation.ts) — deliberately kept out of the generic Saved Objects management UI, unlike the
- * two types above; reached only through server/routes/conversations.ts's owner-scoped CRUD. */
-export const CONVERSATION_SAVED_OBJECT_TYPE = 'wazuh-ai-assistant-conversation';
+/** Index alias backing persisted (resumable) conversations — one document per conversation: `user`
+ * + title + timestamps + the full `ChatMessage[]` transcript. It is a data stream managed by an
+ * ISM policy on the indexer side (wazuh-indexer-plugins#1422), rotated daily and pruned after 7
+ * days; OpenSearch Document Level Security on it restricts each document to the `user` it belongs
+ * to. Reached only through server/routes/conversations.ts's owner-scoped CRUD and
+ * server/conversation-store.ts's query/document helpers — never a raw client call elsewhere. */
+export const CONVERSATION_SESSIONS_INDEX_ALIAS = 'wazuh-ai-assistant-sessions';
 
 /** Sentinel owner value used when the authenticated username cannot be resolved (main plugin/
  * security not ready, or `context.wazuh` absent).
  * server/routes/conversations.ts's `resolveOwner` never returns this any more — it fails closed
  * with `undefined` instead, and the four owner-CHECKING routes (list/get/put/delete) 403 on that
  * rather than ever comparing against a shared bucket value. The ONLY remaining writer is that
- * file's CREATE route, which still stamps this sentinel on a row when identity can't be resolved
- * (see that route's comment for why that is still safe) — but since no route can subsequently
- * list, get, update, or delete a row stamped with it, this is now a create-only dead end: the row
- * persists but is otherwise unreachable through this API.
+ * file's CREATE route, which still stamps this sentinel on a document's `user` field when identity
+ * can't be resolved (see that route's comment for why that is still safe) — but since no route can
+ * subsequently list, get, update, or delete a document stamped with it, this is now a create-only
+ * dead end: the document persists but is otherwise unreachable through this API.
  * Separately and unrelatedly, server/routes/chat.ts's `resolveChatStreamUser` reuses this same
  * string as its own fallback bucket KEY for the per-user concurrent-stream rate limit (not a
  * saved-objects `owner` at all) — see that function's doc comment for the availability tradeoff
