@@ -1,4 +1,5 @@
 import { ToolDefinition } from '../types';
+import { BREAKDOWN_BUCKET_CAP } from '../digest';
 import {
   findingDigestColumns,
   findingRowFields,
@@ -10,24 +11,65 @@ import {
   timeRangeProperties,
 } from './common';
 
+/** Bare parent technique id, e.g. "T1059" -- no sub-technique dot. A dotted id ("T1059.001") names
+ * one specific sub-technique and must NOT match this. */
+const PARENT_TECHNIQUE_ID_RE = /^T\d+$/i;
+
+/**
+ * Sub-technique rollup (issue #8920 item 2): a bare parent id must match its own exact bucket
+ * AND every "<id>.NNN" sub-technique -- MITRE ATT&CK itself treats a parent technique as
+ * covering its children, so a `term`-only filter on "T1059" silently excludes every
+ * T1059.001/.002/... finding, undercounting "how many T1059 findings" questions. Expressed as a
+ * `should` of an exact `term` plus a `prefix` on "<id>." (guardrail-legal shape -- see
+ * get-sca-checks.ts:131's `prefix` precedent; `wazuh.rule.mitre.technique.id` is already on
+ * guardrails.ts's `AGG_FIELD_ALLOWLIST`, so this needs no guard change). A dotted id is already
+ * maximally specific and stays an exact `term`, never broadened --
+ * `technique-rollup-coverage.test.ts` pins both halves of this for every present and future tool
+ * with a technique-id parameter, not just this one.
+ */
+function buildMitreTechniqueFilter(techniqueId: string): Record<string, unknown> {
+  if (!PARENT_TECHNIQUE_ID_RE.test(techniqueId)) {
+    return { term: { 'wazuh.rule.mitre.technique.id': techniqueId } };
+  }
+  return {
+    bool: {
+      minimum_should_match: 1,
+      should: [
+        { term: { 'wazuh.rule.mitre.technique.id': techniqueId } },
+        { prefix: { 'wazuh.rule.mitre.technique.id': `${techniqueId}.` } },
+      ],
+    },
+  };
+}
+
 /**
  * MITRE ATT&CK-tagged findings. MITRE-tagged findings are detected via an `exists` filter on
- * `wazuh.rule.mitre.technique.id` (a `keyword`-mapped array), with `wazuh.rule.mitre.technique.name`
- * and `wazuh.rule.mitre.tactic.name` as sibling display columns. `technique_id` narrows to one
- * exact technique via a `term` match on `wazuh.rule.mitre.technique.id`; omitted, the tool falls
- * back to the `exists` filter for "any MITRE-tagged finding".
+ * `wazuh.rule.mitre.technique.id` (a `keyword`-mapped array), with
+ * `wazuh.rule.mitre.technique.name` and `wazuh.rule.mitre.tactic.name` as sibling display
+ * columns. `technique_id` narrows to one technique AND its sub-techniques via
+ * `buildMitreTechniqueFilter` above (a dotted id stays exact); omitted, the tool falls back to
+ * the `exists` filter for "any MITRE-tagged finding". A `terms` agg on the same field is always
+ * attached so the digest `breakdown` discloses the exact-vs-rolled-up split population-true
+ * ("T1059: 3, T1059.001: 9") rather than leaving the model to infer it from `samples` alone --
+ * the disclosure this rollup exists for is a data field, not a sentence of prose.
  */
 export const getMitreFindingsTool: ToolDefinition = {
   spec: {
     name: 'get_mitre_findings',
     description:
       'Searches security findings for findings mapped to MITRE ATT&CK techniques, within a time ' +
-      'range, most recent first. Optional technique_id (e.g. "T1110") narrows to one exact ' +
-      'technique; omit it to list any MITRE-tagged finding.',
+      'range, most recent first. Optional technique_id (e.g. "T1110") covers that technique AND ' +
+      'its sub-techniques (e.g. "T1059" includes every "T1059.*"); pass a dotted id (e.g. ' +
+      '"T1059.001") to narrow to one sub-technique only. Omit technique_id to list any ' +
+      'MITRE-tagged finding. The digest breakdown shows counts per exact technique id, so a ' +
+      'rolled-up parent id call still shows which sub-technique(s) the matches actually belong to.',
     parameters: objectSchema({
       technique_id: {
         type: 'string',
-        description: 'Optional exact MITRE technique ID, e.g. "T1110".',
+        description:
+          'Optional MITRE technique ID, e.g. "T1110". A bare parent id ("T1059") also matches ' +
+          'its sub-techniques ("T1059.001", "T1059.002", ...); pass a dotted id for one ' +
+          'sub-technique only.',
       },
       limit: limitProperty(
         'Max number of findings to return (default 20, max 500).',
@@ -42,7 +84,7 @@ export const getMitreFindingsTool: ToolDefinition = {
     const { gte, lte } = resolveTimeRange(params);
     const techniqueId = optionalStringParam(params.technique_id);
     const mitreFilter = techniqueId
-      ? { term: { 'wazuh.rule.mitre.technique.id': techniqueId } }
+      ? buildMitreTechniqueFilter(techniqueId)
       : { exists: { field: 'wazuh.rule.mitre.technique.id' } };
     return {
       target: 'indexer',
@@ -55,6 +97,14 @@ export const getMitreFindingsTool: ToolDefinition = {
         },
         sort: [{ '@timestamp': { order: 'desc' } }],
         size: limit,
+        aggs: {
+          technique_ids: {
+            terms: {
+              field: 'wazuh.rule.mitre.technique.id',
+              size: BREAKDOWN_BUCKET_CAP,
+            },
+          },
+        },
       },
     };
   },
