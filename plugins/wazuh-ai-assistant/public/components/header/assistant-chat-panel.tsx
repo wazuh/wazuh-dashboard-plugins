@@ -24,7 +24,8 @@ interface AssistantChatPanelProps {
   isGeneratingRef: React.MutableRefObject<boolean>;
 }
 
-/** Panel width from which the saved-conversations sidebar fits beside the chat column. */
+/** Panel width from which the saved-conversations sidebar fits beside the chat column without
+ * the toolbar toggle below — it still opens narrower than this on request. */
 const SIDEBAR_MIN_PANEL_WIDTH = 600;
 
 export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
@@ -45,7 +46,11 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
   );
   const titleId = useId();
   const rootRef = useRef<HTMLElement>(null);
-  const [showSidebar, setShowSidebar] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Flipped the first time the toolbar toggle below is used: once the user has taken explicit
+  // control of the sidebar, further panel resizes must not silently override their choice (the
+  // resize-driven default below is a starting point, not a standing rule).
+  const sidebarManuallySetRef = useRef(false);
 
   const handleGeneratingChange = useCallback(
     (generating: boolean) => {
@@ -70,8 +75,12 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
     if (!element) {
       return undefined;
     }
-    const update = () =>
-      setShowSidebar(element.offsetWidth >= SIDEBAR_MIN_PANEL_WIDTH);
+    const update = () => {
+      if (sidebarManuallySetRef.current) {
+        return;
+      }
+      setSidebarOpen(element.offsetWidth >= SIDEBAR_MIN_PANEL_WIDTH);
+    };
     update();
     if (typeof ResizeObserver === 'undefined') {
       return undefined;
@@ -79,6 +88,15 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
     const observer = new ResizeObserver(update);
     observer.observe(element);
     return () => observer.disconnect();
+  }, []);
+
+  // The resize-driven default above is a convenience, not the only way in: a panel narrower than
+  // SIDEBAR_MIN_PANEL_WIDTH never triggered it, so the conversation list was reachable only by
+  // dragging the sidecar wider — an affordance nothing in the panel hinted at. This toolbar
+  // toggle makes the list reachable at any width.
+  const toggleSidebar = useCallback(() => {
+    sidebarManuallySetRef.current = true;
+    setSidebarOpen(open => !open);
   }, []);
 
   const requestClose = useCallback(
@@ -106,6 +124,18 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
     [runGuarded, onClose, core.application],
   );
 
+  const showConversationsLabel = i18n.translate(
+    'wazuhAiAssistant.headerPanel.showConversationsButtonLabel',
+    {
+      defaultMessage: 'Show saved conversations',
+    },
+  );
+  const hideConversationsLabel = i18n.translate(
+    'wazuhAiAssistant.headerPanel.hideConversationsButtonLabel',
+    {
+      defaultMessage: 'Hide saved conversations',
+    },
+  );
   const settingsLabel = i18n.translate(
     'wazuhAiAssistant.headerPanel.settingsButtonLabel',
     {
@@ -144,6 +174,24 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
+            <EuiToolTip
+              content={
+                sidebarOpen ? hideConversationsLabel : showConversationsLabel
+              }
+            >
+              <EuiButtonIcon
+                iconType={sidebarOpen ? 'menuLeft' : 'menuRight'}
+                color='text'
+                aria-label={
+                  sidebarOpen ? hideConversationsLabel : showConversationsLabel
+                }
+                aria-pressed={sidebarOpen}
+                onClick={toggleSidebar}
+                data-test-subj='wzAiAssistantPanelToggleSidebarButton'
+              />
+            </EuiToolTip>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
             <EuiToolTip content={settingsLabel}>
               <EuiButtonIcon
                 iconType='gear'
@@ -179,7 +227,7 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
             onProviderChange={setSelectedProviderId}
             onNavigateToSettings={openSettingsToAddProvider}
             onGeneratingChange={handleGeneratingChange}
-            showConversationSidebar={showSidebar}
+            showConversationSidebar={sidebarOpen}
           />
         </div>
       </div>

@@ -91,10 +91,9 @@ interface SettingsPageProps {
   core: CoreStart;
   /** Lets the top-level app shell refresh its own provider list/selection after a CRUD action. */
   onProvidersChanged: () => void;
-  /** True while the URL carries `?addProvider=true`: opens the create-provider flyout, then
-   * `onAutoOpenCreateFormDone` lets the owner strip the flag. */
+  /** True while the URL carries `?addProvider=true`: opens the create-provider flyout. */
   autoOpenCreateForm?: boolean;
-  onAutoOpenCreateFormDone?: () => void;
+  onCreateFormOpenChange?: (open: boolean) => void;
 }
 
 // Short labels shown in the providers table; the add/edit flyout uses its own long labels
@@ -184,7 +183,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   core,
   onProvidersChanged,
   autoOpenCreateForm,
-  onAutoOpenCreateFormDone,
+  onCreateFormOpenChange,
 }) => {
   const [service] = useState(() => new SettingsService(core.http));
   const [providers, setProviders] = useState<ProviderSummary[]>([]);
@@ -493,6 +492,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     setEditingProvider(null);
     setError(null);
     setIsFormOpen(true);
+    onCreateFormOpenChange?.(true);
   };
 
   const openEditForm = (provider: ProviderSummary) => {
@@ -502,16 +502,22 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   };
 
   const closeForm = () => {
+    // Only the create flow owns `?addProvider=true` — an edit close must not touch it (and
+    // `editingProvider` here still reflects which flow was open, since this runs before either
+    // state setter below takes effect).
+    if (editingProvider === null) {
+      onCreateFormOpenChange?.(false);
+    }
     setIsFormOpen(false);
     setError(null);
   };
 
-  // The page stays mounted (hidden), so this fires on every flag flip; reporting done at once
-  // strips the flag so a plain revisit doesn't re-open the flyout.
+  // The page stays mounted (hidden), so this fires on every flag flip. Re-running it while the
+  // flag is still true (e.g. a re-render with no actual change) just re-applies the same open
+  // state, which is harmless — nothing here needs a "handled already" guard.
   useEffect(() => {
     if (autoOpenCreateForm) {
       openCreateForm();
-      onAutoOpenCreateFormDone?.();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoOpenCreateForm]);

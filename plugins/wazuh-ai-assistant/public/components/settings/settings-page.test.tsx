@@ -555,21 +555,21 @@ describe('SettingsPage — RBAC tooltip on disabled Save buttons', () => {
 });
 
 describe('SettingsPage — auto-open create-provider flyout (?addProvider=true)', () => {
-  it('opens the create form and reports back when autoOpenCreateForm is true', async () => {
-    const onDone = jest.fn();
+  it('opens the create form and reports it open when autoOpenCreateForm is true', async () => {
+    const onOpenChange = jest.fn();
 
     render(
       <SettingsPage
         core={coreMock}
         onProvidersChanged={jest.fn()}
         autoOpenCreateForm={true}
-        onAutoOpenCreateFormDone={onDone}
+        onCreateFormOpenChange={onOpenChange}
       />,
     );
 
     // The create flyout is open (its Name field renders) without clicking "Add provider".
     expect(await screen.findByLabelText(/^name$/i)).toBeInTheDocument();
-    expect(onDone).toHaveBeenCalledTimes(1);
+    expect(onOpenChange).toHaveBeenCalledWith(true);
   });
 
   it('does not open the form when the flag is absent', async () => {
@@ -577,5 +577,92 @@ describe('SettingsPage — auto-open create-provider flyout (?addProvider=true)'
 
     await screen.findByRole('button', { name: /add provider/i });
     expect(screen.queryByLabelText(/^name$/i)).not.toBeInTheDocument();
+  });
+
+  // RC2 (issue #8827 review): the URL only ever reflected a deep link INTO the create flow —
+  // opening the same flyout from the page's own "Add provider" button left `?addProvider=true`
+  // out of the address bar entirely, so the state wasn't shareable/bookmarkable/refresh-safe.
+  it('reports the create form open when "Add provider" is clicked directly, not only via the URL flag', async () => {
+    const onOpenChange = jest.fn();
+
+    render(
+      <SettingsPage
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        onCreateFormOpenChange={onOpenChange}
+      />,
+    );
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /add provider/i }),
+    );
+
+    expect(await screen.findByLabelText(/^name$/i)).toBeInTheDocument();
+    expect(onOpenChange).toHaveBeenCalledWith(true);
+  });
+
+  it('reports the create form closed once the flyout is dismissed', async () => {
+    const onOpenChange = jest.fn();
+
+    render(
+      <SettingsPage
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        autoOpenCreateForm={true}
+        onCreateFormOpenChange={onOpenChange}
+      />,
+    );
+
+    await screen.findByLabelText(/^name$/i);
+    onOpenChange.mockClear();
+
+    fireEvent.click(
+      document.querySelector(
+        '[data-test-subj="euiFlyoutCloseButton"]',
+      ) as Element,
+    );
+
+    await waitFor(() =>
+      expect(screen.queryByLabelText(/^name$/i)).not.toBeInTheDocument(),
+    );
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('does not report a URL change when the EDIT (not create) flyout opens or closes', async () => {
+    mockService.list.mockResolvedValue([
+      {
+        id: 'p1',
+        name: 'My OpenAI',
+        type: 'openai_compatible',
+        baseUrl: 'https://api.openai.com/v1',
+        model: 'gpt-4o',
+        isDefault: true,
+      },
+    ]);
+    const onOpenChange = jest.fn();
+
+    render(
+      <SettingsPage
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        onCreateFormOpenChange={onOpenChange}
+      />,
+    );
+
+    // The row's actions collapse into a single "All actions" menu in this narrow jsdom viewport.
+    fireEvent.click(await screen.findByRole('button', { name: 'All actions' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
+    expect(await screen.findByLabelText(/^name$/i)).toBeInTheDocument();
+
+    fireEvent.click(
+      document.querySelector(
+        '[data-test-subj="euiFlyoutCloseButton"]',
+      ) as Element,
+    );
+    await waitFor(() =>
+      expect(screen.queryByLabelText(/^name$/i)).not.toBeInTheDocument(),
+    );
+
+    expect(onOpenChange).not.toHaveBeenCalled();
   });
 });

@@ -9,6 +9,8 @@
     "wazuhAiAssistant.header.closeChatButtonLabel": "Close the AI Assistant",
     "wazuhAiAssistant.header.buttonTooltip": "AI Assistant",
     "wazuhAiAssistant.headerPanel.title": "AI Assistant",
+    "wazuhAiAssistant.headerPanel.showConversationsButtonLabel": "Show saved conversations",
+    "wazuhAiAssistant.headerPanel.hideConversationsButtonLabel": "Hide saved conversations",
     "wazuhAiAssistant.headerPanel.settingsButtonLabel": "AI Assistant settings",
     "wazuhAiAssistant.headerPanel.closeButtonLabel": "Close the AI Assistant",
     "wazuhAiAssistant.common.loading": "Loading...",

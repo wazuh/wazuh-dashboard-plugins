@@ -27,14 +27,17 @@ function mockMountCountingStub(page: 'chat' | 'settings') {
     onGeneratingChange?: (generating: boolean) => void;
     onNavigateToSettings?: () => void;
     autoOpenCreateForm?: boolean;
-    onAutoOpenCreateFormDone?: () => void;
+    onCreateFormOpenChange?: (open: boolean) => void;
   }) => {
     mockReact.useEffect(() => {
       mockMountCounts[page] += 1;
     }, []);
     // The Chat stub exposes a button that flips the shell's "a turn is generating" flag (what the
     // leave handler reads) and one for its add-provider CTA; the Settings stub mirrors the
-    // add-provider auto-open flag and exposes a button that reports it handled.
+    // add-provider auto-open flag and exposes buttons standing in for BOTH ways the real
+    // create-provider flyout reports its own open state: the URL-driven auto-open (already
+    // reflected via `autoOpenCreateForm`, "close" here mimics the flyout being dismissed) and the
+    // page's own "Add provider" button, which never touched the URL before this fix.
     return mockReact.createElement(
       'div',
       {
@@ -62,14 +65,24 @@ function mockMountCountingStub(page: 'chat' | 'settings') {
             'add provider CTA',
           )
         : null,
-      props.onAutoOpenCreateFormDone
+      props.onCreateFormOpenChange
         ? mockReact.createElement(
             'button',
             {
               type: 'button',
-              onClick: () => props.onAutoOpenCreateFormDone?.(),
+              onClick: () => props.onCreateFormOpenChange?.(false),
             },
-            'auto open handled',
+            'create form closed',
+          )
+        : null,
+      props.onCreateFormOpenChange
+        ? mockReact.createElement(
+            'button',
+            {
+              type: 'button',
+              onClick: () => props.onCreateFormOpenChange?.(true),
+            },
+            'add provider button clicked',
           )
         : null,
     );
@@ -307,7 +320,7 @@ describe('AI Assistant app shell', () => {
       expect(marker('settings')).toBeNull();
     });
 
-    it('opens Settings with the add-provider flag from the chat CTA, then strips it once handled', async () => {
+    it('opens Settings with the add-provider flag from the chat CTA, then strips it once the flyout closes', async () => {
       mountApp();
       await waitFor(() => expect(marker('chat')).not.toBeNull());
 
@@ -318,10 +331,32 @@ describe('AI Assistant app shell', () => {
       expect(isHidden(marker('settings') as HTMLElement)).toBe(false);
       expect(marker('settings')).toHaveAttribute('data-auto-open', 'true');
 
-      fireEvent.click(screen.getByText('auto open handled'));
+      fireEvent.click(screen.getByText('create form closed'));
 
       await waitFor(() => expect(currentPath()).toBe('/settings'));
       expect(marker('settings')).toHaveAttribute('data-auto-open', 'false');
+    });
+
+    it('adds the add-provider flag to the URL when the create-provider flyout is opened from Settings itself, not just the chat CTA', async () => {
+      mountApp();
+      await waitFor(() => expect(marker('chat')).not.toBeNull());
+
+      fireEvent.click(screen.getByText('Settings'));
+      await waitFor(() => expect(marker('settings')).not.toBeNull());
+      expect(currentPath()).toBe('/settings');
+      expect(marker('settings')).toHaveAttribute('data-auto-open', 'false');
+
+      // Settings' own "Add provider" button, not the chat CTA: RC2 — the URL must reflect this
+      // too, not only a deep link that arrived with the flag already set.
+      fireEvent.click(screen.getByText('add provider button clicked'));
+
+      await waitFor(() =>
+        expect(currentPath()).toBe('/settings?addProvider=true'),
+      );
+
+      fireEvent.click(screen.getByText('create form closed'));
+
+      await waitFor(() => expect(currentPath()).toBe('/settings'));
     });
   });
 });
