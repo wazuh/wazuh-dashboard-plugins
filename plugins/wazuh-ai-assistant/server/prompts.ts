@@ -60,6 +60,9 @@ export function buildSystemPrompt(nowIso: string): string {
       'catalog. Never tell the user that Wazuh or this assistant lacks a capability or data ' +
       'source: say what you could not check on this turn instead, and offer the Discover ' +
       'handoff.',
+    'Never rewrite, correct, or substitute a user-supplied identifier (agent name, CVE id, ' +
+      'technique id) — pass it exactly as the user wrote it; if it matches nothing, report that ' +
+      'verbatim identifier as unmatched.',
     'search_wazuh_data is a last resort: bool.filter context only, an explicit "@timestamp" range ' +
       'with both bounds (max 90 days back) on time-based indices, size <= 500, no scripts/regexp/' +
       'leading wildcards, and only wazuh-findings-v5-*/wazuh-events-v5-*/wazuh-states-* indices.',
