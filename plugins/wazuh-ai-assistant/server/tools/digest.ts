@@ -47,6 +47,66 @@ export interface Digest {
    * when present — some mutation endpoints report an otherwise-silent no-op only through this
    * field, with `affected_items`/`failed_items` both empty. */
   message?: string;
+  /**
+   * Every metric-shaped (`isMetricAggValue`) TOP-LEVEL aggregation, keyed by the model's own agg
+   * name — populated only when the response ALSO carries hits rows or a real bucket aggregation
+   * (see `hasTopLevelBucketAgg`), i.e. exactly the case where `bucketsToRows`' single synthesized
+   * row (see `SUPPORTED_METRIC_AGG_TYPES` below) does NOT fire, because `rows` already came from
+   * somewhere else and would otherwise silently drop the sibling metric value (issue #8920 item 5,
+   * e.g. `aggs: {by_rule: {terms...}, distinct_agents: {cardinality...}}`). Three facts about how
+   * this interacts with the rest of the pipeline, recorded here since none of them needed code
+   * changes elsewhere:
+   *  1. Privacy: `value` is always a NUMBER (a computed statistic), never analyst/attacker-supplied
+   *     data, so it needs no field-policy classification. `applyFieldPolicy`'s `{...digest}` spread
+   *     (privacy.ts) carries `metrics` through to the scrubbed digest untouched — it is never
+   *     enumerated there, same as `columns`.
+   *  2. `prescanAndMintToolContent`'s JSON-aware scan (privacy.ts) walks every object/array
+   *     generically and mints pseudonyms only for STRING values it finds — `metrics[].value` is a
+   *     number and is never visited; `metrics[].agg` is a string and IS walked, but it is the
+   *     aggregation's own name (chosen by the model, not indexed data), so scanning it is harmless.
+   *  3. Size: `capDigest` needs no new drop stage for this field — `guardrails.ts`'s
+   *     `MAX_TOP_LEVEL_AGGS` (5) already bounds how many top-level aggregations any request can
+   *     declare, which bounds `metrics.length` to the same ceiling before this field exists.
+   */
+  metrics?: Array<{ agg: string; value: number | null }>;
+}
+
+/**
+ * Metric aggregation types this digest pipeline can represent — the single source of truth both
+ * `isMetricAggValue` (below) and this file's tests key off. NOT an exhaustive list of every metric
+ * aggregation OpenSearch supports: `percentiles`/`stats`/`extended_stats` return a multi-value
+ * object (`{values: {...}}`, `{avg, min, max, sum, count}`) that does not fit the `{value}` shape
+ * `isMetricAggValue` checks for, so they are deliberately excluded here rather than silently
+ * mis-handled — `search-wazuh-data.ts`'s tool description must never advertise one of those as
+ * available (see this file's registry-wide sync test).
+ */
+export const SUPPORTED_METRIC_AGG_TYPES = [
+  'cardinality',
+  'avg',
+  'sum',
+  'min',
+  'max',
+  'value_count',
+] as const;
+
+/**
+ * Shape predicate for a metric aggregation's response value: `{value: number | null}` with no
+ * `buckets` (a bucket agg) or `hits` (a `top_hits` agg) of its own. Deliberately shape-based, not
+ * keyed off the aggregation's TYPE name (which the response never carries) — every entry of
+ * `SUPPORTED_METRIC_AGG_TYPES` above produces exactly this shape, and this is the one place that
+ * checks it, so `bucketsToRows`' synthesized row, `extractMetricAggs`, and this file's tests all
+ * agree on what "metric-shaped" means.
+ */
+export function isMetricAggValue(v: unknown): v is { value: number | null } {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) {
+    return false;
+  }
+  const record = v as Record<string, unknown>;
+  const value = record.value;
+  if (typeof value !== 'number' && value !== null) {
+    return false;
+  }
+  return record.buckets === undefined && record.hits === undefined;
 }
 
 const MAX_SAMPLES = 5;
@@ -105,12 +165,30 @@ function hitsToRows(
  * Rows from an aggregation-only response (`size:0`, `aggs.<name>.buckets[]`), e.g. get_top_rules.
  * Any `top_hits` sub-aggregation's sampled `_source` is merged into the row (still nested, not
  * flattened) so a tool's tableSpec/digest columns can dot-path into it (e.g. "wazuh.rule.title").
- * A metric sub-aggregation (avg/sum/min/max/cardinality — shaped `{value: number|null}`) merges as
- * `row[subAggName] = value`. A `filter` sub-aggregation (shaped `{doc_count: number}` with no
- * `buckets`/`hits` of its own — e.g. get_sca_results' passed/failed/not_applicable counters)
- * merges as `row[subAggName] = doc_count`. A nested bucket sub-aggregation (its own
- * `{buckets:[...]}`) matches none of these shapes and is left unmerged rather than breaking.
- * Generic across any single terms-style aggregation — no per-tool bucket-shaping code needed.
+ * A metric sub-aggregation (avg/sum/min/max/cardinality — shaped `{value: number|null}`, see
+ * `isMetricAggValue`) merges as `row[subAggName] = value`. A `filter` sub-aggregation (shaped
+ * `{doc_count: number}` with no `buckets`/`hits` of its own — e.g. get_sca_results'
+ * passed/failed/not_applicable counters) merges as `row[subAggName] = doc_count`. A nested bucket
+ * sub-aggregation (its own `{buckets:[...]}`) matches none of these shapes and is left unmerged
+ * rather than breaking. Generic across any single terms-style aggregation — no per-tool
+ * bucket-shaping code needed.
+ *
+ * Which TOP-LEVEL aggregation supplies the buckets is resolved by scanning every top-level key IN
+ * ORDER for the first one whose `.buckets` is an array — not just `Object.keys(aggregations)[0]`
+ * (issue #8920 item 5). The escape hatch lets the model declare more than one top-level
+ * aggregation in any order, so a metric agg (`aggs: {distinct_agents: {cardinality...}, by_rule:
+ * {terms...}}`) that happens to sort first must not mask a bucket agg that comes after it — the
+ * defect this fixes silently reported `returned: 0`/an empty table for that exact shape, even
+ * though `by_rule`'s buckets were right there in the response.
+ *
+ * When NO top-level aggregation has buckets at all (a metric-only query, e.g. a bare "how many
+ * distinct X" `cardinality` aggregation), a single row is synthesized instead — `{ [aggName]:
+ * value }` for EVERY metric-shaped (`isMetricAggValue`) top-level aggregation in the response —
+ * so `extractRows`/`buildTableSpec` carry the computed answer (`returned: 1`) rather than
+ * reporting 0 rows for a query OpenSearch actually answered. This is the only place that shape
+ * fires; when a real bucket agg IS present alongside a metric agg, `buildDigest`'s `metrics` field
+ * carries the metric value instead (see `Digest.metrics`'s doc comment) since this function's
+ * return value is already spoken for by the bucket rows.
  */
 function bucketsToRows(
   result: unknown,
@@ -121,16 +199,30 @@ function bucketsToRows(
   if (!aggregations) {
     return undefined;
   }
-  const firstAggKey = Object.keys(aggregations)[0];
-  if (!firstAggKey) {
-    return undefined;
+  const aggKeys = Object.keys(aggregations);
+
+  let buckets: unknown;
+  for (const aggKey of aggKeys) {
+    const candidate = (
+      aggregations[aggKey] as { buckets?: unknown } | undefined
+    )?.buckets;
+    if (Array.isArray(candidate)) {
+      buckets = candidate;
+      break;
+    }
   }
-  const buckets = (
-    aggregations[firstAggKey] as { buckets?: unknown } | undefined
-  )?.buckets;
+
   if (!Array.isArray(buckets)) {
-    return undefined;
+    const metricRow: Record<string, unknown> = {};
+    for (const aggKey of aggKeys) {
+      const aggValue = aggregations[aggKey];
+      if (isMetricAggValue(aggValue)) {
+        metricRow[aggKey] = aggValue.value;
+      }
+    }
+    return Object.keys(metricRow).length > 0 ? [metricRow] : undefined;
   }
+
   return buckets.map(bucket => {
     const bucketRecord = bucket as Record<string, unknown>;
     const row: Record<string, unknown> = {
@@ -150,19 +242,18 @@ function bucketsToRows(
         Object.assign(row, sampleSource);
         continue;
       }
+      if (isMetricAggValue(subAggValue)) {
+        row[subAggKey] = subAggValue.value;
+        continue;
+      }
       if (
         subAggValue &&
         typeof subAggValue === 'object' &&
         !Array.isArray(subAggValue)
       ) {
-        const metricValue = (subAggValue as { value?: unknown }).value;
-        if (typeof metricValue === 'number' || metricValue === null) {
-          row[subAggKey] = metricValue;
-          continue;
-        }
         // `filter` sub-aggregation: a bare filtered doc count (no own buckets/hits) — see doc
-        // comment above. Checked AFTER top_hits (has `hits`) and metrics (has `value`) so neither
-        // of those shapes can fall through to here.
+        // comment above. Checked AFTER top_hits (has `hits`) and metrics (`isMetricAggValue`) so
+        // neither of those shapes can fall through to here.
         const subAgg = subAggValue as {
           doc_count?: unknown;
           buckets?: unknown;
@@ -179,6 +270,47 @@ function bucketsToRows(
     }
     return row;
   });
+}
+
+/** Whether `result.aggregations` has at least one top-level agg with a real `.buckets` array —
+ * the same scan `bucketsToRows` performs, exposed separately so `buildDigest` can tell "a real
+ * bucket agg is present" (a sibling metric agg becomes `Digest.metrics`, see its doc comment)
+ * apart from "no bucket agg at all" (a metric-only response, already fully represented by
+ * `bucketsToRows`' synthesized row — a duplicate `Digest.metrics` would just repeat the same
+ * number under a different key). */
+function hasTopLevelBucketAgg(result: unknown): boolean {
+  const aggregations = (
+    result as { aggregations?: Record<string, unknown> } | undefined
+  )?.aggregations;
+  if (!aggregations) {
+    return false;
+  }
+  return Object.values(aggregations).some(aggValue =>
+    Array.isArray((aggValue as { buckets?: unknown } | undefined)?.buckets),
+  );
+}
+
+/** Every top-level agg in `result.aggregations` that is metric-shaped (`isMetricAggValue`),
+ * regardless of whether the response also carries hits or a bucket agg — `buildDigest` decides
+ * (via `hasTopLevelBucketAgg`) whether to actually attach these as `Digest.metrics` or leave them
+ * to `bucketsToRows`' synthesized row instead, so this function itself stays a plain extraction
+ * with no double-counting logic of its own. */
+function extractMetricAggs(
+  result: unknown,
+): Array<{ agg: string; value: number | null }> | undefined {
+  const aggregations = (
+    result as { aggregations?: Record<string, unknown> } | undefined
+  )?.aggregations;
+  if (!aggregations) {
+    return undefined;
+  }
+  const metrics: Array<{ agg: string; value: number | null }> = [];
+  for (const [aggKey, aggValue] of Object.entries(aggregations)) {
+    if (isMetricAggValue(aggValue)) {
+      metrics.push({ agg: aggKey, value: aggValue.value });
+    }
+  }
+  return metrics.length > 0 ? metrics : undefined;
 }
 
 /** Rows from a Wazuh Manager API response. The common shape is a list under
@@ -429,8 +561,10 @@ export function buildTableSpec(
  * aggregation's name) so the model can tell which aggregation a count belongs to — and so
  * privacy.ts's `applyFieldPolicy` can resolve each bucket key against the RIGHT aggregation's
  * field policy rather than only the first's. The rendered `table` event (buildTableSpec) still
- * only reflects the first aggregation — documented as a known limitation in search_wazuh_data.ts's
- * tool description — so this is a digest-only improvement.
+ * only reflects the first BUCKET aggregation (`bucketsToRows`'s scan, since #8920 item 5 — a
+ * metric agg ahead of it in key order is skipped over rather than masking it) — documented as a
+ * known limitation in search_wazuh_data.ts's tool description — so this is a digest-only
+ * improvement.
  */
 function buildBreakdown(
   result: unknown,
@@ -709,6 +843,14 @@ export function buildDigest(
   // agent") — surfaced here so a silent no-op is still visible to the model. Indexer responses
   // never carry this field, so the check is a no-op for every T1 search tool.
   const message = (result as { message?: unknown } | undefined)?.message;
+  // See `Digest.metrics`'s doc comment: only attach a SIBLING `metrics` field when the response
+  // also carried hits rows or a real bucket agg (`hasTopLevelBucketAgg`) — a metric-only
+  // response was already fully represented by `bucketsToRows`' synthesized row (`rows`/`samples`
+  // above), so attaching `metrics` there too would just repeat the same value under a second key.
+  const metricAggs = extractMetricAggs(result);
+  const hasRowsElsewhere =
+    hitsToRows(result) !== undefined || hasTopLevelBucketAgg(result);
+  const metrics = metricAggs && hasRowsElsewhere ? metricAggs : undefined;
   const digest: Digest = {
     tool: toolName,
     counts: { total, returned, truncated },
@@ -721,6 +863,7 @@ export function buildDigest(
       ? sampleColumns
       : def.tableSpec.columns.map(column => column.field),
     ...(typeof message === 'string' && message.length > 0 ? { message } : {}),
+    ...(metrics ? { metrics } : {}),
   };
 
   return capDigest(digest);

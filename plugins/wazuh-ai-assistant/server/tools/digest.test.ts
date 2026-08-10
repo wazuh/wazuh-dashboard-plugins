@@ -1,6 +1,14 @@
 import assert from 'node:assert/strict';
-import { buildDigest, buildTableSpec, capDigest, Digest } from './digest';
+import {
+  buildDigest,
+  buildTableSpec,
+  capDigest,
+  Digest,
+  isMetricAggValue,
+  SUPPORTED_METRIC_AGG_TYPES,
+} from './digest';
 import { ToolDefinition } from './types';
+import { listToolDefinitions } from './registry';
 
 function buildToolDef(overrides: Partial<ToolDefinition> = {}): ToolDefinition {
   return {
@@ -696,4 +704,234 @@ test('capDigest: an oversized "columns" list forces the Manager message to be dr
     !('message' in capped),
     'message is dropped as the last-resort step once nothing else remains to trim',
   );
+});
+
+// --- #8920 item 5: top-level metric aggregations are no longer dropped -------------------------
+
+test('isMetricAggValue: accepts {value: number|null}, rejects buckets/hits/non-object shapes', () => {
+  assert.equal(isMetricAggValue({ value: 6 }), true);
+  assert.equal(isMetricAggValue({ value: null }), true);
+  assert.equal(isMetricAggValue({ value: 6, buckets: [] }), false);
+  assert.equal(isMetricAggValue({ value: 6, hits: { hits: [] } }), false);
+  assert.equal(isMetricAggValue({ buckets: [{ key: 'a', doc_count: 1 }] }), false);
+  assert.equal(isMetricAggValue({ value: '6' }), false);
+  assert.equal(isMetricAggValue(null), false);
+  assert.equal(isMetricAggValue(undefined), false);
+  assert.equal(isMetricAggValue([1, 2]), false);
+  assert.equal(isMetricAggValue('x'), false);
+});
+
+test('buildDigest: a metric-only response synthesizes ONE row per SUPPORTED_METRIC_AGG_TYPES entry, not returned:0', () => {
+  const def = buildToolDef({ deriveColumns: true, digest: { sampleColumns: [] } });
+  for (const type of SUPPORTED_METRIC_AGG_TYPES) {
+    const aggKey = `${type}_result`;
+    const result = { aggregations: { [aggKey]: { value: 6 } } };
+    const digest = buildDigest('search_wazuh_data', result, def);
+    assert.equal(
+      digest.counts.returned,
+      1,
+      `${type}: expected returned:1, not the pre-fix returned:0`,
+    );
+    assert.deepEqual(
+      digest.samples,
+      [{ [aggKey]: 6 }],
+      `${type}: expected the computed value to reach samples`,
+    );
+  }
+});
+
+test('buildDigest: a metric agg with value:null passes through as null, not dropped', () => {
+  const def = buildToolDef({ deriveColumns: true, digest: { sampleColumns: [] } });
+  const result = { aggregations: { avg_level: { value: null } } };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.equal(digest.counts.returned, 1);
+  assert.deepEqual(digest.samples, [{ avg_level: null }]);
+});
+
+test('buildDigest: a metric agg with no bucket-shaped sibling produces no digest.metrics (already in samples)', () => {
+  const def = buildToolDef({ deriveColumns: true, digest: { sampleColumns: [] } });
+  const result = { aggregations: { distinct_agents: { value: 6 } } };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.ok(
+    !('metrics' in digest),
+    'the metric-only value is already carried by the synthesized row/sample, not a second field',
+  );
+});
+
+test('buildDigest: a metric agg BEFORE a bucket agg in key order no longer masks the bucket rows', () => {
+  // Reproduces the exact pre-fix defect: Object.keys(aggregations)[0] was "distinct_agents" (no
+  // .buckets), so bucketsToRows used to bail out to `undefined` before ever looking at "by_rule".
+  const def = buildToolDef({
+    tableSpec: {
+      columns: [
+        { field: 'key', label: 'Key' },
+        { field: 'doc_count', label: 'Count' },
+      ],
+    },
+    digest: { sampleColumns: ['key', 'doc_count'] },
+  });
+  const result = {
+    aggregations: {
+      distinct_agents: { value: 6 },
+      by_rule: { buckets: [{ key: '100', doc_count: 5 }] },
+    },
+  };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.equal(digest.counts.returned, 1, 'the bucket agg must still be found');
+  assert.deepEqual(digest.samples, [{ key: '100', doc_count: 5 }]);
+  assert.deepEqual(digest.metrics, [{ agg: 'distinct_agents', value: 6 }]);
+});
+
+test('buildTableSpec: a metric agg BEFORE a bucket agg in key order does not blank out the table', () => {
+  const def = buildToolDef({ deriveColumns: true });
+  const result = {
+    aggregations: {
+      distinct_agents: { value: 6 },
+      by_rule: { buckets: [{ key: '100', doc_count: 5 }] },
+    },
+  };
+  const table = buildTableSpec(result, def);
+  assert.deepEqual(table.rows, [{ key: '100', doc_count: 5 }]);
+});
+
+test('buildDigest: a metric agg AFTER a bucket agg carries digest.metrics alongside the bucket rows', () => {
+  const def = buildToolDef({
+    tableSpec: {
+      columns: [
+        { field: 'key', label: 'Key' },
+        { field: 'doc_count', label: 'Count' },
+      ],
+    },
+    digest: { sampleColumns: ['key', 'doc_count'] },
+  });
+  const result = {
+    aggregations: {
+      by_rule: { buckets: [{ key: '100', doc_count: 5 }] },
+      distinct_agents: { value: 6 },
+    },
+  };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.deepEqual(digest.samples, [{ key: '100', doc_count: 5 }]);
+  assert.deepEqual(digest.metrics, [{ agg: 'distinct_agents', value: 6 }]);
+});
+
+test('buildDigest: digest.metrics carries a null metric value through unchanged when mixed with a bucket agg', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'key', label: 'Key' }] },
+    digest: { sampleColumns: ['key'] },
+  });
+  const result = {
+    aggregations: {
+      by_rule: { buckets: [{ key: '100', doc_count: 5 }] },
+      avg_level: { value: null },
+    },
+  };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.deepEqual(digest.metrics, [{ agg: 'avg_level', value: null }]);
+});
+
+test('buildDigest: a metric agg alongside HITS rows (not a bucket agg) also carries digest.metrics', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'a', label: 'A' }] },
+    digest: { sampleColumns: ['a'] },
+  });
+  const result = {
+    hits: { total: { value: 1 }, hits: [{ _source: { a: 1 } }] },
+    aggregations: { distinct_agents: { value: 6 } },
+  };
+  const digest = buildDigest('search_wazuh_data', result, def);
+  assert.deepEqual(digest.samples, [{ a: 1 }]);
+  assert.deepEqual(digest.metrics, [{ agg: 'distinct_agents', value: 6 }]);
+});
+
+test('buildDigest: a single terms-agg digest carries no "metrics" field (regression, unchanged fixture)', () => {
+  // Exact fixture from "buildDigest: single aggregation buckets become a breakdown without an
+  // 'agg' tag" above -- a bucket-only response must stay byte-identical, no new field appears.
+  const def = buildToolDef({ digest: { sampleColumns: ['key'] } });
+  const result = {
+    aggregations: {
+      top_rules: {
+        buckets: [
+          { key: '100', doc_count: 5 },
+          { key: '200', doc_count: 3 },
+        ],
+      },
+    },
+  };
+  const digest = buildDigest('get_top_rules', result, def);
+  assert.ok(
+    !('metrics' in digest),
+    'a bucket-only response must not gain a metrics field',
+  );
+});
+
+test('buildDigest: a manager-response digest (no aggregations at all) carries no "metrics" field', () => {
+  const def = buildToolDef();
+  const result = { data: { affected_items: ['001'], total_affected_items: 1 } };
+  const digest = buildDigest('get_active_agents', result, def);
+  assert.ok(!('metrics' in digest));
+});
+
+// --- registry-wide sync: no tool description advertises a metric shape the digest can't hold ----
+
+/**
+ * Coverage test for #8920 item 5's class fix: iterates EVERY tool spec description (not just
+ * search_wazuh_data's) and extracts aggregation-type words. `top_hits`/`terms` are BUCKET-family
+ * words (already handled by `bucketsToRows`' per-bucket sub-agg merge / real-bucket scan) and are
+ * deliberately not checked against `SUPPORTED_METRIC_AGG_TYPES` here — only the METRIC-family
+ * words are, since those are the ones whose response shape `isMetricAggValue` must recognize.
+ * `percentiles`/`stats`/`extended_stats` are real OpenSearch metric aggregations this digest
+ * pipeline does NOT support (see `SUPPORTED_METRIC_AGG_TYPES`'s doc comment: their response is a
+ * multi-value object, not `{value}`) — a tool description that ever advertises one of those would
+ * repeat the exact silent-drop defect this cluster fixes, just for a shape `isMetricAggValue`
+ * cannot represent, so this test fails on that too. Nothing is exempt by default: a new tool
+ * registered later, or a wording change to an existing one, is checked automatically.
+ */
+const AGG_TYPE_WORD_RE =
+  /\b(cardinality|avg|sum|min|max|value_count|percentiles|stats|extended_stats|top_hits|terms)\b/g;
+const METRIC_FAMILY_WORDS = new Set([
+  'cardinality',
+  'avg',
+  'sum',
+  'min',
+  'max',
+  'value_count',
+  'percentiles',
+  'stats',
+  'extended_stats',
+]);
+
+test('description/digest sync: no tool description advertises a metric shape the digest drops', () => {
+  const offenders: string[] = [];
+  for (const def of listToolDefinitions()) {
+    const words = def.spec.description.match(AGG_TYPE_WORD_RE) ?? [];
+    for (const word of new Set(words)) {
+      if (
+        METRIC_FAMILY_WORDS.has(word) &&
+        !(SUPPORTED_METRIC_AGG_TYPES as readonly string[]).includes(word)
+      ) {
+        offenders.push(`${def.spec.name}: advertises "${word}"`);
+      }
+    }
+  }
+  assert.deepEqual(
+    offenders,
+    [],
+    'A tool description names a metric aggregation type digest.ts cannot represent as {value} -- ' +
+      'either add it to SUPPORTED_METRIC_AGG_TYPES (only if its response really is {value: ' +
+      'number|null}) or remove the claim from the description.',
+  );
+});
+
+test('description/digest sync mechanism: SUPPORTED_METRIC_AGG_TYPES is exactly the METRIC_FAMILY_WORDS the digest supports', () => {
+  // Sanity check for the test above's own logic: every SUPPORTED_METRIC_AGG_TYPES entry must
+  // itself be one of the words this file's regex/word-family split can even recognize as
+  // "metric-family" -- otherwise a typo in SUPPORTED_METRIC_AGG_TYPES would silently make the sync
+  // test above pass for the wrong reason (the word never being extracted at all).
+  for (const type of SUPPORTED_METRIC_AGG_TYPES) {
+    assert.ok(
+      METRIC_FAMILY_WORDS.has(type),
+      `${type}: must be present in this test file's METRIC_FAMILY_WORDS too`,
+    );
+  }
 });
