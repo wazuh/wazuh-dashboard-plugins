@@ -158,8 +158,8 @@ function parseKind(value: unknown): InventoryKind {
  *   contract than a uniform, if lower-value, one.
  * - `ports` has no single name field (see `buildInventoryFilterClause`'s own handling): a numeric
  *   filter matches `source.port`/`destination.port`AND prefers a listening `interface.state`
- *   (issue #8914 -- see `PORT_LISTENING_STATE_VALUES`'s doc comment below), a non-numeric one 
- *   matches `process.name` (the process bound to the port), matching the issue's own worked 
+ *   (issue #8914 -- see `PORT_LISTENING_STATE_VALUES`'s doc comment below), a non-numeric one
+ *   matches `process.name` (the process bound to the port), matching the issue's own worked
  *   example ("what process is on port 9200").
  */
 const INVENTORY_FILTER_FIELDS: Partial<Record<InventoryKind, string[]>> = {

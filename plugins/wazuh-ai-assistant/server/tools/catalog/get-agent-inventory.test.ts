@@ -376,7 +376,7 @@ test('get_agent_inventory: kind="os" filter matches either host.hostname or host
 // test's assertion on the case-insensitive shape is what would catch a future regression back to
 // an exact-cased term.
 test('get_agent_inventory: kind="ports" numeric filter matches the port on either side AND prefers the listening state', () => {
-    const req = buildIndexer({
+  const req = buildIndexer({
     agent_id: '003',
     kind: 'ports',
     filter: '9200',
@@ -416,7 +416,7 @@ test('get_agent_inventory: kind="ports" numeric filter matches the port on eithe
                 },
               },
               { bool: { must_not: { exists: { field: 'interface.state' } } } },
-              ],
+            ],
             minimum_should_match: 1,
           },
         },
@@ -426,7 +426,7 @@ test('get_agent_inventory: kind="ports" numeric filter matches the port on eithe
 });
 
 test('get_agent_inventory: kind="ports" filter is numeric equality on source.port OR destination.port', () => {
-    const req = buildIndexer({
+  const req = buildIndexer({
     agent_id: '003',
     kind: 'ports',
     filter: '9200',
