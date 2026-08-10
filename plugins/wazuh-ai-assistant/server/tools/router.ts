@@ -132,8 +132,8 @@ const CATEGORY_DESCRIPTIONS: Record<RouterCategory, string> = {
     'Enrollment/connection status only, NOT comms-channel health or message drop-rate.',
   findings:
     'Finding search/summaries: critical findings, by agent/rule/rule-tag/OS/time, top rules, top/' +
-    'noisiest agents, brute-force, suspicious PowerShell, general security summary. Also covers ' + 
-    'the raw/normalized event stream ("everything that happened", matched or not). NOT automated ' + 
+    'noisiest agents, brute-force, suspicious PowerShell, general security summary. Also covers ' +
+    'the raw/normalized event stream ("everything that happened", matched or not). NOT automated ' +
     'actions Wazuh took in response (active response/blocking/quarantine) -- no category covers that.',
   vulnerabilities:
     'CVE/vulnerability data: by agent, by CVE ID, solved, or critical only.',

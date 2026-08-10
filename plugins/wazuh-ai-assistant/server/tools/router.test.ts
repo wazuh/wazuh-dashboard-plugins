@@ -56,7 +56,7 @@ test('the "findings" category description mentions top/noisiest agents (get_top_
   assert.ok(findingsLine, 'routing prompt must list a "findings" menu entry');
   assert.match(
     findingsLine as string,
-        /top\/noisiest agents/,
+    /top\/noisiest agents/,
     "findings' description must mention top/noisiest agents so get_top_agents-shaped questions route here",
   );
 });
