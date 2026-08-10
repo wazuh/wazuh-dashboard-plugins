@@ -106,6 +106,45 @@ export function checkIndexAllowlist(index: string): GuardrailCheck {
  * for pagination deeper than the plugin allows (deep pagination must go through search_after/PIT,
  * plugin-driven only, never LLM-driven — not implemented in this slice, so it's simply refused).
  */
+/** The largest `precision_threshold` OpenSearch honours for a `cardinality` aggregation. Below the
+ * threshold a distinct count is EXACT; above it, HyperLogLog++ returns an estimate. */
+export const MAX_CARDINALITY_PRECISION_THRESHOLD = 40000;
+
+/**
+ * Raises every `cardinality` aggregation's `precision_threshold` to the engine maximum, recursively
+ * (a cardinality can sit under a bucket agg as a sub-aggregation).
+ *
+ * Distinct counts are the one supported metric that is an ESTIMATE rather than a count, and the
+ * default threshold is only 3000 — so "how many distinct hosts/rules/CVEs" silently became
+ * approximate on any real fleet while looking exactly as authoritative as an exact count. Raising it
+ * costs a bounded amount of memory per aggregation and buys exactness across the whole range any
+ * Wazuh deployment plausibly reaches. Above it, `Digest.metrics[].approximate` marks the number so
+ * the caveat travels with the value instead of being lost.
+ *
+ * Deliberately raises rather than REJECTS a high-cardinality request: refusing to answer, or
+ * answering with an unmarked estimate, are both worse than answering exactly wherever the engine
+ * can.
+ */
+function raiseCardinalityPrecision(aggs: unknown): void {
+  if (!aggs || typeof aggs !== 'object') {
+    return;
+  }
+  for (const aggBody of Object.values(aggs as Record<string, unknown>)) {
+    if (!aggBody || typeof aggBody !== 'object') {
+      continue;
+    }
+    const agg = aggBody as Record<string, unknown>;
+    const cardinality = agg.cardinality;
+    if (cardinality && typeof cardinality === 'object') {
+      (cardinality as Record<string, unknown>).precision_threshold =
+        MAX_CARDINALITY_PRECISION_THRESHOLD;
+    }
+    // Sub-aggregations: a cardinality under a terms/date_histogram bucket is the common "distinct X
+    // per Y" shape and needs the same treatment.
+    raiseCardinalityPrecision(agg.aggs ?? agg.aggregations);
+  }
+}
+
 export function applySafetyValves(
   body: Record<string, unknown>,
 ): { ok: true; body: Record<string, unknown> } | { ok: false; reason: string } {
@@ -133,6 +172,7 @@ export function applySafetyValves(
   next.size =
     requestedSize === undefined ? 20 : clampInt(requestedSize, 0, MAX_SIZE);
   next.track_total_hits = MAX_TRACK_TOTAL_HITS;
+  raiseCardinalityPrecision(next.aggs ?? next.aggregations);
   // allow_partial_search_results is deliberately NOT set here: it is a transport/URL parameter,
   // not a body field (a body key would 400 the whole search), and the cluster default is already
   // `true`, which is the behavior we want.

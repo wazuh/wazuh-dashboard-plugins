@@ -95,6 +95,19 @@ export interface Digest {
     agg: string;
     value: number | null;
     value_as_string?: string;
+    /**
+     * Set when the aggregation that produced `value` is a `cardinality` — the ONLY supported metric
+     * type whose result is an estimate rather than a count. OpenSearch computes distinct counts with
+     * HyperLogLog++: exact up to `precision_threshold` (guardrails.ts raises every cardinality agg to
+     * the maximum the engine accepts), an approximation above it.
+     *
+     * Carried as a field on the metric itself rather than as prose, so the caveat cannot be
+     * separated from the number it qualifies (the same reason `metrics` exists at all — see this
+     * interface's doc comment). Item 5 made metric aggregations answerable for the first time, so
+     * without this flag "how many distinct hosts" would be the one NEW confidently-exact-looking
+     * answer shipped by an issue whose whole purpose is removing confidently-wrong ones.
+     */
+    approximate?: true;
   }>;
 }
 
@@ -374,13 +387,24 @@ function bucketsToRows(
  * bucket agg — see `Digest.metrics`'s doc comment for why this is attached unconditionally.
  * `value_as_string` is carried when present so a min/max on a date field ships its ISO form, not
  * only epoch millis. */
-function extractMetricAggs(result: unknown): Digest['metrics'] {
+function extractMetricAggs(
+  result: unknown,
+  requestBody?: Record<string, unknown>,
+): Digest['metrics'] {
   const aggregations = (
     result as { aggregations?: Record<string, unknown> } | undefined
   )?.aggregations;
   if (!aggregations) {
     return undefined;
   }
+  // A metric response is `{value: N}` for EVERY metric type, so the response alone cannot say
+  // whether a number is a count or an estimate — only the REQUEST names the aggregation type. That
+  // is why the request body is read here rather than inferring from the value.
+  const requestAggs = requestBody?.aggs as
+    | Record<string, Record<string, unknown>>
+    | undefined;
+  const isCardinality = (aggKey: string): boolean =>
+    requestAggs?.[aggKey] !== undefined && 'cardinality' in requestAggs[aggKey];
   const metrics: NonNullable<Digest['metrics']> = [];
   for (const [aggKey, aggValue] of Object.entries(aggregations)) {
     if (isMetricAggValue(aggValue)) {
@@ -392,6 +416,7 @@ function extractMetricAggs(result: unknown): Digest['metrics'] {
         ...(typeof valueAsString === 'string'
           ? { value_as_string: valueAsString }
           : {}),
+        ...(isCardinality(aggKey) ? { approximate: true as const } : {}),
       });
     } else if (isSingleBucketDocCount(aggValue)) {
       metrics.push({ agg: aggKey, value: aggValue.doc_count });
@@ -1027,7 +1052,7 @@ export function buildDigest(
   // single-bucket-count top-level agg is in the response — even when `bucketsToRows`' synthesized
   // row carries the same numbers, because that row is subject to column projection and `metrics`
   // is the projection-immune carrier.
-  const metrics = extractMetricAggs(result);
+  const metrics = extractMetricAggs(result, requestBody);
   // Terminal class guard (#8920 item 5): an aggregation OpenSearch computed but no extractor in
   // this file can represent must never be silently absent — a bare `returned: 0` (or a digest
   // missing a sibling agg's answer) reads as "no data" for a query that WAS answered. Named

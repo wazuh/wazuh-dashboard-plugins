@@ -1207,3 +1207,36 @@ test('description/digest sync mechanism: SUPPORTED_METRIC_AGG_TYPES is exactly t
     );
   }
 });
+
+test('buildDigest: a cardinality metric is marked approximate; a count metric is not', () => {
+  // The response shape is `{value: N}` for EVERY metric type, so only the REQUEST can say whether a
+  // number is a count or an HLL++ estimate. Item 5 made metric aggregations answerable at all, so an
+  // unmarked distinct count would be a NEW confidently-exact-looking answer in the very issue that
+  // exists to remove confidently-wrong ones.
+  const def = buildToolDef();
+  const requestBody = {
+    size: 0,
+    aggs: {
+      distinct_hosts: { cardinality: { field: 'wazuh.agent.name' } },
+      total_rows: { value_count: { field: 'wazuh.agent.name' } },
+    },
+  };
+  const result = {
+    hits: { hits: [], total: { value: 0 } },
+    aggregations: {
+      distinct_hosts: { value: 6 },
+      total_rows: { value: 918 },
+    },
+  };
+  const digest = buildDigest('search_wazuh_data', result, def, requestBody);
+  const distinct = digest.metrics?.find(m => m.agg === 'distinct_hosts');
+  const counted = digest.metrics?.find(m => m.agg === 'total_rows');
+  assert.equal(distinct?.value, 6);
+  assert.equal(distinct?.approximate, true, 'cardinality must be flagged');
+  assert.equal(counted?.value, 918);
+  assert.equal(
+    counted?.approximate,
+    undefined,
+    'value_count is exact and must NOT be flagged',
+  );
+});
