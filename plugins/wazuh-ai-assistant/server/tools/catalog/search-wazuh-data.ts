@@ -36,9 +36,11 @@ export const searchWazuhDataTool: ToolDefinition = {
       'field with both "gte" and "lte" bounds, spanning no more than 90 days (a query without one ' +
       'is rejected); "size" must be <= 500; no "script"/"script_fields"/"runtime_mappings", no ' +
       '"regexp", and no leading-wildcard "wildcard"/"query_string"/"simple_query_string" values. ' +
+      'For "how many distinct X" questions use a "cardinality" aggregation; metric aggregations ' +
+      '("cardinality"/"avg"/"sum"/"min"/"max"/"value_count") are returned to you in the digest. ' +
       'If "aggs" has more than one top-level aggregation, every aggregation\'s buckets are ' +
       'summarized in the digest text you receive, but the rendered table only shows the first ' +
-      "aggregation's buckets.",
+      "BUCKET aggregation's buckets.",
     parameters: objectSchema(
       {
         index_pattern: {
