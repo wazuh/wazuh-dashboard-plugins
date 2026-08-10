@@ -474,7 +474,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
   // No per-provider privacy toggle in this form, deliberately.
   // `AssistantSettings.privacyDefaultPerProvider` is keyed by provider id and lives in a
-  // SEPARATE saved object from `ProviderInput`/`ProviderSummary` (common/types.ts has no field for
+  // SEPARATE document from `ProviderInput`/`ProviderSummary` (common/types.ts has no field for
   // it, by design — it is not part of a provider's own config). Adding a per-provider toggle to
   // this form would mean: (a) a brand-new provider's id isn't known until AFTER `service.create()`
   // resolves, so the toggle's write has to happen as a second, separate `updateAssistantSettings`

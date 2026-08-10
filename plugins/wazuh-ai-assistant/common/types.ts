@@ -263,15 +263,16 @@ export interface ConversationRecord extends ConversationSummary {
   messages: PersistedChatMessage[];
   /**
    * Optimistic-concurrency token (two tabs on the
-   * same conversation previously overwrote each other, last-write-wins). Opaque, OSD-assigned
-   * (the underlying saved object's own `version`) — never parsed or compared client-side, only
-   * round-tripped: the client remembers the value from the last GET/POST/PUT response it saw for
-   * this conversation and sends it back as `expectedVersion` on its next PUT (server/routes/
-   * conversations.ts) so a write against a since-changed row 409s instead of silently overwriting
-   * it. `undefined` only in the defensive case where the saved-objects client itself omits a
-   * version (does not happen in practice on this OSD version, but the type stays honest about it).
-   * Deliberately absent from `ConversationSummary` — the list route never needed a version before
-   * this fix and still doesn't (only single-conversation GET/POST/PUT round-trip it).
+   * same conversation previously overwrote each other, last-write-wins). Opaque — encodes
+   * OpenSearch's `seq_no`/`primary_term` pair (server/conversation-store.ts's `encodeVersion`) —
+   * never parsed or compared client-side, only round-tripped: the client remembers the value from
+   * the last GET/POST/PUT response it saw for this conversation and sends it back as
+   * `expectedVersion` on its next PUT (server/routes/conversations.ts) so a write against a
+   * since-changed document 409s instead of silently overwriting it. `undefined` only in the
+   * defensive case where a version token could not be decoded (does not happen in practice, but
+   * the type stays honest about it). Deliberately absent from `ConversationSummary` — the list
+   * route never needed a version before this fix and still doesn't (only single-conversation
+   * GET/POST/PUT round-trip it).
    */
   version?: string;
 }

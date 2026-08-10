@@ -36,17 +36,25 @@ export const API_PATHS = {
  * session heal/retry (public/services/session-heal.ts) — reword only in both directions at once. */
 export const MANAGER_SESSION_EXPIRED_COPY = 'session is missing or expired';
 
-/** Saved object type used to persist provider configuration. */
-export const PROVIDER_SAVED_OBJECT_TYPE = 'wazuh-ai-assistant-provider';
+/** Hidden system index holding both provider configuration documents and the plugin-wide settings
+ * singleton (privacy defaults/override/field policy/conversation retention) — provisioned
+ * indexer-side (wazuh-indexer-plugins#1422), readable only by admin/wazuh-admin backend roles.
+ * Reached only through server/settings-store.ts's document helpers; see that file's doc comment
+ * for the internal-user-for-reads/current-user-for-writes split (wazuh-dashboard-plugins#8841). */
+export const ASSISTANT_SETTINGS_INDEX = '.wazuh-ai-assistant-settings';
 
-/** Singleton saved object type persisting plugin-wide settings, currently privacy-focused:
- * default on/off (globally and per provider), whether the user may override it, and the field
- * policy (server/tools/privacy.ts's `FIELD_POLICY_DEFAULTS`). */
-export const ASSISTANT_SETTINGS_SAVED_OBJECT_TYPE =
-  'wazuh-ai-assistant-settings';
-
-/** Fixed singleton id — there is exactly one settings object per deployment. */
+/** Fixed id of the settings singleton document within `ASSISTANT_SETTINGS_INDEX` — there is
+ * exactly one per deployment; every other document in that index is a provider (random UUID id). */
 export const ASSISTANT_SETTINGS_ID = 'settings';
+
+/** Namespacing label bound into the AAD of every provider API key's ciphertext
+ * (server/crypto/api-key-cipher.ts's `buildAad`) — kept as its own named constant purely so that
+ * derivation can't silently drift if this string is ever referenced from a second place. This is
+ * NOT a saved-object type any more (providers now live in `ASSISTANT_SETTINGS_INDEX`); its
+ * decrypt-time role only needs its VALUE to stay byte-for-byte identical to what a given ciphertext
+ * was encrypted with, so this string itself must never change once anything has been encrypted
+ * against it. */
+export const PROVIDER_API_KEY_AAD_NAMESPACE = 'wazuh-ai-assistant-provider';
 
 /** Index alias backing persisted (resumable) conversations — one document per conversation: `user`
  * + title + timestamps + the full `ChatMessage[]` transcript. It is a data stream managed by an
@@ -66,9 +74,9 @@ export const CONVERSATION_SESSIONS_INDEX_ALIAS = 'wazuh-ai-assistant-sessions';
  * subsequently list, get, update, or delete a document stamped with it, this is now a create-only
  * dead end: the document persists but is otherwise unreachable through this API.
  * Separately and unrelatedly, server/routes/chat.ts's `resolveChatStreamUser` reuses this same
- * string as its own fallback bucket KEY for the per-user concurrent-stream rate limit (not a
- * saved-objects `owner` at all) — see that function's doc comment for the availability tradeoff
- * this implies when identity resolution is unavailable deployment-wide.
+ * string as its own fallback bucket KEY for the per-user concurrent-stream rate limit (not an
+ * authorization-relevant `user` value at all) — see that function's doc comment for the
+ * availability tradeoff this implies when identity resolution is unavailable deployment-wide.
  * NOTE: eval/run_persistence.js cannot import this (plain CommonJS, no TypeScript/ts-node in that
  * harness) — it only ever verifies owner-scoping BEHAVIOR (a session sees only its own rows),
  * never this literal string. */
