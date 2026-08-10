@@ -655,7 +655,11 @@ test('buildDigest: a REAL breakdown with a truncated bucket list discloses sum_o
   };
   const digest = buildDigest('get_vulnerabilities', result, def);
   assert.ok(digest.breakdownNote, 'expected the bucket-truncation note');
-  assert.match(digest.breakdownNote!, /37 additional/);
+  // The count must appear, but NOT as "37 additional rows": the note is worded per dimension and in
+  // terms of further MATCHES, because on a multi-valued keyword field the remainder can be the same
+  // documents counted again under other keys (see buildBucketTruncationNote).
+  assert.match(digest.breakdownNote!, /\b37\b/);
+  assert.doesNotMatch(digest.breakdownNote!, /37 additional rows/);
   // `/not.*complete set|complete set/i` (the previous form) collapses to `/complete set/i`: `|`
   // binds looser than concatenation, so the second alternative alone matches any occurrence of
   // "complete set" regardless of whether "not" precedes it -- the `not.*` branch was dead and
