@@ -22,6 +22,11 @@ import {
   Pseudonymizer,
 } from './privacy';
 import { resolveApiHostId } from './api-host';
+import { findTimestampRange, widenToDefaultWindow } from './window-recount';
+import {
+  DEFAULT_TIME_RANGE_GTE,
+  DEFAULT_TIME_RANGE_LTE,
+} from './catalog/common';
 
 export interface ToolExecutionOutcome {
   /** JSON-serialized digest (or `{error}`) — becomes the `role:'tool'` message content. */
@@ -118,6 +123,60 @@ export function resolveSecurityAnalyticsSpace(hits: unknown): string {
   return spaces.size === 1 ? [...spaces][0] : DEFAULT_SECURITY_ANALYTICS_SPACE;
 }
 
+/**
+ * Narrowed-window zero-row disclosure (issue #8920 item 3 -- see window-recount.ts's header comment
+ * for the class-level reasoning). Fires only when the tool call itself returned 0 rows: mutates
+ * `digest.hint` in place, appending to whatever `buildZeroRowHint` (digest.ts) already set rather
+ * than replacing it, so a 0-row/2+-filter result gets BOTH disclosures rather than one clobbering
+ * the other. `body` is the EXECUTED (guardrail-clamped) body, not the tool's own params -- this is
+ * what makes the guarantee a chokepoint one: every time-based typed tool AND the search_wazuh_data
+ * escape hatch share this call site with no per-tool opt-in. Any failure (no widenable range, the
+ * widened query itself failing a guardrail it shouldn't be able to, the second search erroring)
+ * degrades silently -- a failed disclosure attempt must never turn an otherwise-successful tool
+ * call into an error.
+ */
+async function appendWindowRecountHint(
+  digest: Digest,
+  body: Record<string, unknown>,
+  index: string,
+  context: RequestHandlerContext,
+): Promise<void> {
+  try {
+    const widened = widenToDefaultWindow(body);
+    if (!widened) {
+      return;
+    }
+    const valved = applySafetyValves(widened);
+    if (!valved.ok) {
+      return;
+    }
+    const lint = lintDsl(valved.body, index);
+    if (!lint.ok) {
+      return;
+    }
+    const response = await context.core.opensearch.client.asCurrentUser.search({
+      index,
+      body: valved.body,
+    });
+    const total = (
+      response.body as { hits?: { total?: { value?: number } } } | undefined
+    )?.hits?.total?.value;
+    if (typeof total !== 'number' || total <= 0) {
+      return;
+    }
+    const range = findTimestampRange(body);
+    const gte = range?.gte !== undefined ? String(range.gte) : DEFAULT_TIME_RANGE_GTE;
+    const lte = range?.lte !== undefined ? String(range.lte) : DEFAULT_TIME_RANGE_LTE;
+    const hint =
+      `0 rows in the queried window (${gte} to ${lte}); ${total} rows match in the default ` +
+      `window (${DEFAULT_TIME_RANGE_GTE} to ${DEFAULT_TIME_RANGE_LTE}). State that the empty ` +
+      'result is for the narrower window only -- never claim overall absence from it.';
+    digest.hint = digest.hint ? `${digest.hint} ${hint}` : hint;
+  } catch {
+    // Recount failure degrades silently -- see this function's own header comment.
+  }
+}
+
 /** Executes a validated, guardrail-passed Indexer search and builds its digest + table. */
 async function executeIndexerRequest(
   toolName: string,
@@ -194,6 +253,20 @@ async function executeIndexerRequest(
     // aggregation fields driving `breakdown` (if any) can be read from — see privacy.ts's
     // `extractAggFields` doc comment — so it is reused for that below when privacy is active.
     const digest = buildDigest(toolName, result, def, body);
+    // Issue #8920 item 3: slots in HERE, between `buildDigest` and `finalizeDigest`, and extends
+    // `Digest.hint` by concatenation rather than a new field -- deliberately no change to
+    // digest.ts's `Digest` interface. Mutating `digest` before it is handed to `finalizeDigest`
+    // means whatever this appends is still subject to the same downstream pipeline (capDigest's
+    // length cap, the outbound prescan/text-scrub in chat.ts) as any other digest content.
+    if (digest.counts.returned === 0) {
+      await appendWindowRecountHint(digest, body, indexerRequest.index, context);
+    }
+    // `buildDigest` already ran `capDigest` once, BEFORE the hint above could have grown
+    // `digest.hint` further -- re-running it here (privacy-off included, not only the
+    // `finalizeDigest` privacy-on path below) is what keeps the "bounded ~1-2k token digest"
+    // guarantee (digest.ts's `DIGEST_CHAR_CAP`) true even after that append, instead of silently
+    // letting a hint-inflated digest slip past the cap whenever privacy mode is off.
+    capDigest(digest);
     // A `breakdownDimensions`-opted-in tool's synthesized breakdown (digest.ts's
     // `buildSyntheticBreakdown`) tags each bucket `agg: <dimension field path>` — an IDENTITY map
     // (dimension -> itself) lets `applyFieldPolicy` below resolve those buckets' field policy the
