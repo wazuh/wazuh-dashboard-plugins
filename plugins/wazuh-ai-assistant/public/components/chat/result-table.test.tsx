@@ -304,11 +304,21 @@ describe('ResultTable', () => {
 
     it('renders exactly the first 6 spec columns as visible table columns', () => {
       render(<ResultTable spec={eightColumnSpec()} />);
+      // Assert on the HEADER cells, not on text anywhere in the table: EUI renders every column
+      // label twice -- once in the desktop `<th>` and once per row as a mobile header
+      // (`euiTableRowCell__mobileHeader`) -- so `getByText(label)` throws "found multiple
+      // elements". Header cells are also the honest expression of this invariant, which is about
+      // how many columns the table SHOWS.
+      const headerTexts = screen
+        .getAllByRole('columnheader')
+        .map(header => header.textContent ?? '');
       for (const label of ['One', 'Two', 'Three', 'Four', 'Five', 'Six']) {
-        expect(screen.getByText(label)).toBeInTheDocument();
+        expect(headerTexts).toContain(label);
       }
       // Columns 7+ are demoted from visibility, not deleted -- see the next test for where they
       // actually went.
+      expect(headerTexts).not.toContain('Seven');
+      expect(headerTexts).not.toContain('Eight');
       expect(screen.queryByText('Seven')).toBeNull();
       expect(screen.queryByText('Eight')).toBeNull();
     });
