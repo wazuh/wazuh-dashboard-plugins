@@ -48,27 +48,38 @@ export interface Digest {
    * field, with `affected_items`/`failed_items` both empty. */
   message?: string;
   /**
-   * Every metric-shaped (`isMetricAggValue`) TOP-LEVEL aggregation, keyed by the model's own agg
-   * name — populated only when the response ALSO carries hits rows or a real bucket aggregation
-   * (see `hasTopLevelBucketAgg`), i.e. exactly the case where `bucketsToRows`' single synthesized
-   * row (see `SUPPORTED_METRIC_AGG_TYPES` below) does NOT fire, because `rows` already came from
-   * somewhere else and would otherwise silently drop the sibling metric value (issue #8920 item 5,
-   * e.g. `aggs: {by_rule: {terms...}, distinct_agents: {cardinality...}}`). Three facts about how
-   * this interacts with the rest of the pipeline, recorded here since none of them needed code
-   * changes elsewhere:
+   * Every metric-shaped (`isMetricAggValue`) or single-bucket-count (`isSingleBucketDocCount`)
+   * TOP-LEVEL aggregation, keyed by the model's own agg name — populated UNCONDITIONALLY whenever
+   * at least one such aggregation is in the response (issue #8920 item 5, e.g. `aggs: {by_rule:
+   * {terms...}, distinct_agents: {cardinality...}}`). It is deliberately populated even for a
+   * metric-ONLY response, where `bucketsToRows`' synthesized row (see its doc comment) already
+   * carries the same numbers: the synthesized row exists for the rendered table and is subject to
+   * column projection (`deriveResultColumns`' `_source` priority, or a typed tool's static
+   * `sampleColumns` that cannot name a model-chosen agg), either of which can silently drop the
+   * value from `samples` — `metrics` is the projection-immune carrier, so the computed answer can
+   * never be lost to a column mismatch. `value_as_string` is carried when OpenSearch provides it
+   * (min/max on a date field return `{value: <epoch millis>, value_as_string: <ISO date>}`), so
+   * the model is never left to interpret a bare epoch integer.
+   * Three facts about how this interacts with the rest of the pipeline, recorded here since none
+   * of them needed structural changes elsewhere:
    *  1. Privacy: `value` is always a NUMBER (a computed statistic), never analyst/attacker-supplied
    *     data, so it needs no field-policy classification. `applyFieldPolicy`'s `{...digest}` spread
    *     (privacy.ts) carries `metrics` through to the scrubbed digest untouched — it is never
    *     enumerated there, same as `columns`.
-   *  2. `prescanAndMintToolContent`'s JSON-aware scan (privacy.ts) walks every object/array
-   *     generically and mints pseudonyms only for STRING values it finds — `metrics[].value` is a
-   *     number and is never visited; `metrics[].agg` is a string and IS walked, but it is the
-   *     aggregation's own name (chosen by the model, not indexed data), so scanning it is harmless.
+   *  2. `prescanAndMintToolContent`'s JSON-aware scan (privacy.ts) skips this key via
+   *     `UNSCANNED_DIGEST_KEYS`: `value_as_string` is OpenSearch's own date/number formatting of a
+   *     numeric statistic (never a hostname/IP), and scanning it would misfire on timestamp
+   *     fragments ("00.000Z" is FQDN-token-shaped); `agg` is the aggregation's own name (chosen by
+   *     the model, not indexed data).
    *  3. Size: `capDigest` needs no new drop stage for this field — `guardrails.ts`'s
    *     `MAX_TOP_LEVEL_AGGS` (5) already bounds how many top-level aggregations any request can
    *     declare, which bounds `metrics.length` to the same ceiling before this field exists.
    */
-  metrics?: Array<{ agg: string; value: number | null }>;
+  metrics?: Array<{
+    agg: string;
+    value: number | null;
+    value_as_string?: string;
+  }>;
 }
 
 /**
@@ -97,7 +108,9 @@ export const SUPPORTED_METRIC_AGG_TYPES = [
  * checks it, so `bucketsToRows`' synthesized row, `extractMetricAggs`, and this file's tests all
  * agree on what "metric-shaped" means.
  */
-export function isMetricAggValue(v: unknown): v is { value: number | null } {
+export function isMetricAggValue(
+  v: unknown,
+): v is { value: number | null; value_as_string?: string } {
   if (!v || typeof v !== 'object' || Array.isArray(v)) {
     return false;
   }
@@ -107,6 +120,63 @@ export function isMetricAggValue(v: unknown): v is { value: number | null } {
     return false;
   }
   return record.buckets === undefined && record.hits === undefined;
+}
+
+/**
+ * Shape predicate for a SINGLE-BUCKET aggregation's response value — `filter`, `global`,
+ * `missing`, `nested`, `sampler` all return `{doc_count: number}` with no `buckets`/`hits`/`value`
+ * of their own. `bucketsToRows` already merges exactly this shape for SUB-aggregations (a
+ * `filter` sub-agg's count column, e.g. get_sca_results' pass/fail counters); recognizing it at
+ * the TOP level too means `aggs: {criticals: {filter: {...}}}` reports the computed count instead
+ * of the pre-fix `returned: 0` — the same silent-drop class as the metric shape above, one key
+ * over.
+ */
+export function isSingleBucketDocCount(v: unknown): v is { doc_count: number } {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) {
+    return false;
+  }
+  const record = v as Record<string, unknown>;
+  return (
+    typeof record.doc_count === 'number' &&
+    record.buckets === undefined &&
+    record.hits === undefined &&
+    record.value === undefined
+  );
+}
+
+/**
+ * Names every top-level aggregation in the response whose shape NONE of this file's extractors
+ * can represent: not a bucket agg with an ARRAY of buckets (`bucketsToRows`), not a `{value}`
+ * metric (`isMetricAggValue`), not a `{doc_count}` single-bucket count (`isSingleBucketDocCount`).
+ * The remaining shapes — multi-value metrics (`stats`/`extended_stats`/`percentiles`/
+ * `top_metrics`), OBJECT-keyed buckets (`filters` with named filters, `range`/`date_range` with
+ * `keyed: true`), and a top-level `top_hits` — are reachable through the search_wazuh_data escape
+ * hatch today (guardrails.ts's `checkAggs` restricts aggregation FIELDS and SIZES, never TYPES),
+ * and used to serialize as a bare `returned: 0`: a silent lie about a query OpenSearch fully
+ * answered. `buildDigest` turns this list into an explicit hint instead, so an unrepresentable
+ * shape degrades to a disclosed gap the model can react to (rerun with a supported shape), never
+ * to a fabricated "no data".
+ */
+function findUnrepresentableAggs(result: unknown): string[] {
+  const aggregations = (
+    result as { aggregations?: Record<string, unknown> } | undefined
+  )?.aggregations;
+  if (!aggregations) {
+    return [];
+  }
+  const unrepresentable: string[] = [];
+  for (const [aggKey, aggValue] of Object.entries(aggregations)) {
+    if (
+      Array.isArray((aggValue as { buckets?: unknown } | undefined)?.buckets)
+    ) {
+      continue;
+    }
+    if (isMetricAggValue(aggValue) || isSingleBucketDocCount(aggValue)) {
+      continue;
+    }
+    unrepresentable.push(aggKey);
+  }
+  return unrepresentable;
 }
 
 const MAX_SAMPLES = 5;
@@ -120,6 +190,13 @@ const DIGEST_CHAR_CAP = 6000;
  * rows are dropped. Also the cap applied to the Manager `message` field and each
  * `breakdown[].key` — see `capFieldValue` below. */
 const MAX_FIELD_VALUE_LENGTH = 500;
+/** Hard length cap on `Digest.hint`. The hint accumulates by concatenation (this file's zero-row
+ * hint + unrepresentable-aggregation note, plus executor.ts's window-recount and near-miss
+ * disclosures), and `capDigest`'s drop stages deliberately never remove it — an unbounded hint
+ * could therefore evict every sample row and still bust `DIGEST_CHAR_CAP`. Wide enough for all
+ * current writers combined (each is one bounded sentence); anything longer is trimmed rather
+ * than allowed to crowd out the data it annotates. */
+const MAX_HINT_LENGTH = 1000;
 
 function getByPath(source: Record<string, unknown>, path: string): unknown {
   return path.split('.').reduce<unknown>((acc, segment) => {
@@ -181,14 +258,15 @@ function hitsToRows(
  * defect this fixes silently reported `returned: 0`/an empty table for that exact shape, even
  * though `by_rule`'s buckets were right there in the response.
  *
- * When NO top-level aggregation has buckets at all (a metric-only query, e.g. a bare "how many
- * distinct X" `cardinality` aggregation), a single row is synthesized instead — `{ [aggName]:
- * value }` for EVERY metric-shaped (`isMetricAggValue`) top-level aggregation in the response —
- * so `extractRows`/`buildTableSpec` carry the computed answer (`returned: 1`) rather than
- * reporting 0 rows for a query OpenSearch actually answered. This is the only place that shape
- * fires; when a real bucket agg IS present alongside a metric agg, `buildDigest`'s `metrics` field
- * carries the metric value instead (see `Digest.metrics`'s doc comment) since this function's
- * return value is already spoken for by the bucket rows.
+ * When NO top-level aggregation has an ARRAY of buckets at all (a metric-only query, e.g. a bare
+ * "how many distinct X" `cardinality` aggregation, or a bare `filter` count), a single row is
+ * synthesized instead — `{ [aggName]: value }` for every metric-shaped (`isMetricAggValue`)
+ * top-level aggregation and `{ [aggName]: doc_count }` for every single-bucket
+ * (`isSingleBucketDocCount`) one — so `extractRows`/`buildTableSpec` carry the computed answer
+ * (`returned: 1`) rather than reporting 0 rows for a query OpenSearch actually answered. The row
+ * keeps the NUMERIC value even when the response carries a `value_as_string`; the human-readable
+ * form travels via `Digest.metrics` (see its doc comment), which is also populated alongside the
+ * bucket rows when a bucket agg IS present, so a sibling metric is never dropped either way.
  */
 function bucketsToRows(
   result: unknown,
@@ -218,6 +296,8 @@ function bucketsToRows(
       const aggValue = aggregations[aggKey];
       if (isMetricAggValue(aggValue)) {
         metricRow[aggKey] = aggValue.value;
+      } else if (isSingleBucketDocCount(aggValue)) {
+        metricRow[aggKey] = aggValue.doc_count;
       }
     }
     return Object.keys(metricRow).length > 0 ? [metricRow] : undefined;
@@ -272,42 +352,33 @@ function bucketsToRows(
   });
 }
 
-/** Whether `result.aggregations` has at least one top-level agg with a real `.buckets` array —
- * the same scan `bucketsToRows` performs, exposed separately so `buildDigest` can tell "a real
- * bucket agg is present" (a sibling metric agg becomes `Digest.metrics`, see its doc comment)
- * apart from "no bucket agg at all" (a metric-only response, already fully represented by
- * `bucketsToRows`' synthesized row — a duplicate `Digest.metrics` would just repeat the same
- * number under a different key). */
-function hasTopLevelBucketAgg(result: unknown): boolean {
-  const aggregations = (
-    result as { aggregations?: Record<string, unknown> } | undefined
-  )?.aggregations;
-  if (!aggregations) {
-    return false;
-  }
-  return Object.values(aggregations).some(aggValue =>
-    Array.isArray((aggValue as { buckets?: unknown } | undefined)?.buckets),
-  );
-}
-
-/** Every top-level agg in `result.aggregations` that is metric-shaped (`isMetricAggValue`),
- * regardless of whether the response also carries hits or a bucket agg — `buildDigest` decides
- * (via `hasTopLevelBucketAgg`) whether to actually attach these as `Digest.metrics` or leave them
- * to `bucketsToRows`' synthesized row instead, so this function itself stays a plain extraction
- * with no double-counting logic of its own. */
-function extractMetricAggs(
-  result: unknown,
-): Array<{ agg: string; value: number | null }> | undefined {
+/** Every top-level agg in `result.aggregations` that is metric-shaped (`isMetricAggValue`) or a
+ * single-bucket count (`isSingleBucketDocCount` — surfaced as `{agg, value: doc_count}`, the same
+ * "one computed number" reading), regardless of whether the response also carries hits or a
+ * bucket agg — see `Digest.metrics`'s doc comment for why this is attached unconditionally.
+ * `value_as_string` is carried when present so a min/max on a date field ships its ISO form, not
+ * only epoch millis. */
+function extractMetricAggs(result: unknown): Digest['metrics'] {
   const aggregations = (
     result as { aggregations?: Record<string, unknown> } | undefined
   )?.aggregations;
   if (!aggregations) {
     return undefined;
   }
-  const metrics: Array<{ agg: string; value: number | null }> = [];
+  const metrics: NonNullable<Digest['metrics']> = [];
   for (const [aggKey, aggValue] of Object.entries(aggregations)) {
     if (isMetricAggValue(aggValue)) {
-      metrics.push({ agg: aggKey, value: aggValue.value });
+      const valueAsString = (aggValue as { value_as_string?: unknown })
+        .value_as_string;
+      metrics.push({
+        agg: aggKey,
+        value: aggValue.value,
+        ...(typeof valueAsString === 'string'
+          ? { value_as_string: valueAsString }
+          : {}),
+      });
+    } else if (isSingleBucketDocCount(aggValue)) {
+      metrics.push({ agg: aggKey, value: aggValue.doc_count });
     }
   }
   return metrics.length > 0 ? metrics : undefined;
@@ -440,6 +511,25 @@ function deriveResultColumns(
   rows: Array<Record<string, unknown>>,
   requestBody: Record<string, unknown> | undefined,
 ): string[] {
+  // Synthesized metric row (`bucketsToRows`' metric-only fallback): its keys are the request's
+  // own top-level aggregation NAMES, not document fields, so neither `_source` (priority 1 below,
+  // which would project the row to `{}` — a "returned: 1" sample carrying nothing) nor a flattened
+  // field scan applies. Detected exactly: one row whose every key is a declared top-level agg
+  // name — a hits/manager row can never satisfy that, since its keys are document fields/_id.
+  if (rows.length === 1 && requestBody) {
+    const declaredAggs = (requestBody.aggs ?? requestBody.aggregations) as
+      | Record<string, unknown>
+      | undefined;
+    const rowKeys = Object.keys(rows[0]);
+    if (
+      declaredAggs &&
+      rowKeys.length > 0 &&
+      rowKeys.every(key => key in declaredAggs)
+    ) {
+      return rowKeys.slice(0, DERIVED_COLUMN_CAP);
+    }
+  }
+
   const source = requestBody?._source;
   if (
     Array.isArray(source) &&
@@ -843,18 +933,34 @@ export function buildDigest(
   // agent") — surfaced here so a silent no-op is still visible to the model. Indexer responses
   // never carry this field, so the check is a no-op for every T1 search tool.
   const message = (result as { message?: unknown } | undefined)?.message;
-  // See `Digest.metrics`'s doc comment: only attach a SIBLING `metrics` field when the response
-  // also carried hits rows or a real bucket agg (`hasTopLevelBucketAgg`) — a metric-only
-  // response was already fully represented by `bucketsToRows`' synthesized row (`rows`/`samples`
-  // above), so attaching `metrics` there too would just repeat the same value under a second key.
-  const metricAggs = extractMetricAggs(result);
-  const hasRowsElsewhere =
-    hitsToRows(result) !== undefined || hasTopLevelBucketAgg(result);
-  const metrics = metricAggs && hasRowsElsewhere ? metricAggs : undefined;
+  // See `Digest.metrics`'s doc comment: attached UNCONDITIONALLY whenever a metric-shaped or
+  // single-bucket-count top-level agg is in the response — even when `bucketsToRows`' synthesized
+  // row carries the same numbers, because that row is subject to column projection and `metrics`
+  // is the projection-immune carrier.
+  const metrics = extractMetricAggs(result);
+  // Terminal class guard (#8920 item 5): an aggregation OpenSearch computed but no extractor in
+  // this file can represent must never be silently absent — a bare `returned: 0` (or a digest
+  // missing a sibling agg's answer) reads as "no data" for a query that WAS answered. Named
+  // explicitly in the hint so the model can rerun with a supported shape instead of fabricating
+  // an empty result. See `findUnrepresentableAggs` for which shapes land here and why they are
+  // reachable (checkAggs never restricts aggregation types).
+  const unrepresentableAggs = findUnrepresentableAggs(result);
+  const unrepresentableNote =
+    unrepresentableAggs.length > 0
+      ? `Aggregation(s) ${unrepresentableAggs.join(
+          ', ',
+        )} returned a shape this digest cannot ` +
+        'represent (multi-value metrics such as stats/percentiles, keyed buckets, or top_hits ' +
+        'at the top level); their results are NOT included above — do not read their absence ' +
+        'as 0. Re-query with terms buckets, a single-value metric, or a filter count instead.'
+      : undefined;
+  const combinedHint = [hint, unrepresentableNote]
+    .filter((part): part is string => !!part)
+    .join(' ');
   const digest: Digest = {
     tool: toolName,
     counts: { total, returned, truncated },
-    ...(hint ? { hint } : {}),
+    ...(combinedHint ? { hint: combinedHint } : {}),
     ...(breakdown ? { breakdown } : {}),
     ...(breakdownNote ? { breakdownNote } : {}),
     samples,
@@ -915,6 +1021,9 @@ function truncateLongFieldValues(digest: Digest): void {
   }
   if (digest.message !== undefined) {
     digest.message = capFieldValue(digest.message);
+  }
+  if (digest.hint !== undefined && digest.hint.length > MAX_HINT_LENGTH) {
+    digest.hint = `${digest.hint.slice(0, MAX_HINT_LENGTH)}…`;
   }
   if (digest.breakdown) {
     for (const entry of digest.breakdown) {
