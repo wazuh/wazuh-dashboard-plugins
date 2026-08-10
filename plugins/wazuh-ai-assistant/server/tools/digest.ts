@@ -53,7 +53,11 @@ export interface Digest {
    * caveat that the sample is the newest-N of the result, not a representative cut, so the model
    * does not read an entity's absence from `samples` as a fact about the whole result set. */
   samplesNote?: string;
-  /** Schema hint: the column ids of the table already rendered to the user. */
+  /** Schema hint: the column ids of the table SPEC sent to the client — i.e. the field set each
+   * row object carries. Deliberately NOT "the columns the user sees": the client may cap how
+   * many spec columns render as visible table columns (its own budget), with the rest reachable
+   * through the row expander — so the model must treat this as the row schema, never as proof a
+   * particular column is on screen. */
   columns: string[];
   /** The Manager response's top-level `message` (e.g. "AR command was not sent to any agent"),
    * when present — some mutation endpoints report an otherwise-silent no-op only through this
