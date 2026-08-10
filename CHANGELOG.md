@@ -133,7 +133,6 @@
 | [#8708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8708)   | Fixed Home KPI's visualization persistent filters                                                                                                                                             |
 | [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766) | Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration                                                              |
 | [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775) | Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters                                                                                                                |
-| [#8912](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8912) | Hardened AI Assistant privacy mode by adding an `allow-scan` field-policy action that scans allow-listed free-text fields (e.g. `package.name`) for known identifiers already pseudonymized elsewhere in the conversation, and restored the #8889 allow-by-omission value-shape scan that a prior refactor had dropped |
 
 ### Removed
 
