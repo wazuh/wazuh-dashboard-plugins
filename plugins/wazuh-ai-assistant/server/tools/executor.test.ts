@@ -108,7 +108,9 @@ test('executeToolCall: unlisted-field fail-closed tracks failClosedFieldPolicy, 
   // `deriveColumns` stays `true` throughout. If the executor still keyed off `deriveColumns` (the
   // pre-#8917 bug this test guards against), this would have no effect and package.vendor would
   // still come back fail-closed.
-  const { getAgentInventoryTool } = await import('./catalog/get-agent-inventory');
+  const { getAgentInventoryTool } = await import(
+    './catalog/get-agent-inventory'
+  );
   const original = getAgentInventoryTool.failClosedFieldPolicy;
   assert.equal(getAgentInventoryTool.deriveColumns, true);
   try {
