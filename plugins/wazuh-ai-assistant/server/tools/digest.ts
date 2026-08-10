@@ -53,6 +53,23 @@ export interface Digest {
    * caveat that the sample is the newest-N of the result, not a representative cut, so the model
    * does not read an entity's absence from `samples` as a fact about the whole result set. */
   samplesNote?: string;
+  /**
+   * POSITIVE coverage statement (issue #8935's Guarantee 2): what the numbers in this digest are
+   * computed over, said explicitly, in both directions.
+   *
+   * Every other note here warns the model when something is NOT trustworthy. None of them ever said
+   * the opposite — so even when a count was population-true (OpenSearch computes an aggregation over
+   * every matched document regardless of `size`), nothing told the model that IN WORDS, and it hedged.
+   * A hedged answer over an exact number reads as incomplete, which is half of why answers "feel bad"
+   * on a large result set. The goal this serves: with 300k matching documents the assistant should
+   * answer as well as if all 300k were in context, and it can only do that if it knows which parts of
+   * the digest ARE the whole set.
+   *
+   * Costs no extra query. Whether a bucket list is the COMPLETE distinct set is already decidable from
+   * the response: `sum_other_doc_count === 0` on a terms aggregation means nothing was left out, so
+   * "all N distinct values" is a fact rather than a guess.
+   */
+  coverage?: string;
   /** Schema hint: the column ids of the table SPEC sent to the client — i.e. the field set each
    * row object carries. Deliberately NOT "the columns the user sees": the client may cap how
    * many spec columns render as visible table columns (its own budget), with the rest reachable
@@ -937,6 +954,59 @@ function perAggOtherDocCounts(
 }
 
 /**
+ * Builds `Digest.coverage` (see its doc comment). Deliberately assembled from what the response
+ * ALREADY carries -- no extra aggregation, no second query:
+ *  - a REAL aggregation is population-true by construction, so its counts cover `total` documents;
+ *  - `sum_other_doc_count === 0` proves the bucket list is the complete distinct set;
+ *  - `samples.length` vs `total` is the row-sample ratio.
+ * A SYNTHETIC breakdown (grouped from the returned page, see `buildSyntheticBreakdown`) is NOT
+ * population-true when the page is truncated, so it never claims to be.
+ */
+function buildCoverageNote(args: {
+  total: number | undefined;
+  returned: number;
+  sampleCount: number;
+  hasRealBreakdown: boolean;
+  bucketListComplete: boolean;
+  listedBuckets: number;
+  syntheticPageScoped: boolean;
+}): string | undefined {
+  const parts: string[] = [];
+  const scope =
+    typeof args.total === 'number'
+      ? `all ${args.total} matching rows`
+      : undefined;
+  if (args.hasRealBreakdown && scope) {
+    parts.push(
+      `counts and the breakdown are computed over ${scope}, not over the sample`,
+    );
+    parts.push(
+      args.bucketListComplete
+        ? `the breakdown lists all ${args.listedBuckets} distinct value(s)`
+        : `the breakdown lists the top ${args.listedBuckets} value(s) only`,
+    );
+  } else if (args.syntheticPageScoped) {
+    // Grouped from the returned page, which is smaller than the matched set: say so plainly rather
+    // than let a page-scoped distribution read as the population.
+    parts.push(
+      `the breakdown is grouped from the ${
+        args.returned
+      } returned row(s) only, not from ${scope ?? 'the full matched set'}`,
+    );
+  } else if (scope) {
+    parts.push(`counts are computed over ${scope}`);
+  }
+  if (args.sampleCount > 0 && typeof args.total === 'number') {
+    parts.push(
+      args.sampleCount >= args.total
+        ? `the ${args.sampleCount} row(s) in "samples" are the complete set`
+        : `the ${args.sampleCount} row(s) in "samples" are a sample of those ${args.total}`,
+    );
+  }
+  return parts.length > 0 ? `Coverage: ${parts.join('; ')}.` : undefined;
+}
+
+/**
  * Caveat for a REAL breakdown whose bucket LIST is truncated (`sum_other_doc_count` > 0) — see
  * `Digest.breakdownNote`'s doc comment, case 2. Counts stay exact; the key set is what must not be
  * read as complete.
@@ -1015,6 +1085,9 @@ export function buildDigest(
   // truncated key set still has exact, population-true counts, so `buildSamplesNote` must not
   // tell the model to distrust it.
   let syntheticPageScoped = false;
+  // `sum_other_doc_count === 0` on every terms agg means no key was left out -- that is what makes
+  // "all N distinct values" a fact rather than a guess (see buildCoverageNote).
+  let bucketListComplete = false;
   if (
     !realBreakdown &&
     def.digest.breakdownDimensions &&
@@ -1027,6 +1100,8 @@ export function buildDigest(
     }
   } else if (realBreakdown) {
     const truncatedAggs = perAggOtherDocCounts(result);
+    // No aggregation reported a remainder, so every key is listed -- see buildCoverageNote.
+    bucketListComplete = truncatedAggs.length === 0;
     if (truncatedAggs.length > 0) {
       // `buildBreakdown` tags rows with `agg` only when the response carried more than one
       // aggregation, so that same flag decides whether the note has to name its dimensions.
@@ -1053,6 +1128,15 @@ export function buildDigest(
   // row carries the same numbers, because that row is subject to column projection and `metrics`
   // is the projection-immune carrier.
   const metrics = extractMetricAggs(result, requestBody);
+  const coverage = buildCoverageNote({
+    total,
+    returned,
+    sampleCount: samples.length,
+    hasRealBreakdown: !!realBreakdown,
+    bucketListComplete,
+    listedBuckets: realBreakdown ? realBreakdown.length : 0,
+    syntheticPageScoped,
+  });
   // Terminal class guard (#8920 item 5): an aggregation OpenSearch computed but no extractor in
   // this file can represent must never be silently absent — a bare `returned: 0` (or a digest
   // missing a sibling agg's answer) reads as "no data" for a query that WAS answered. Named
@@ -1085,6 +1169,7 @@ export function buildDigest(
       : def.tableSpec.columns.map(column => column.field),
     ...(typeof message === 'string' && message.length > 0 ? { message } : {}),
     ...(metrics ? { metrics } : {}),
+    ...(coverage ? { coverage } : {}),
   };
 
   return capDigest(digest);

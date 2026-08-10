@@ -1240,3 +1240,61 @@ test('buildDigest: a cardinality metric is marked approximate; a count metric is
     'value_count is exact and must NOT be flagged',
   );
 });
+
+// --- issue #8935 Guarantee 2: the digest states what its numbers cover, in BOTH directions --------
+
+test('buildDigest: a complete real breakdown claims the whole matched set and all distinct values', () => {
+  // The point of the claim: OpenSearch computes an aggregation over every matched document, so these
+  // counts ARE the population — but nothing ever told the model so in words, and a hedged answer over
+  // an exact number reads as incomplete. `sum_other_doc_count: 0` is what makes "all N distinct
+  // values" a fact rather than a guess, at no extra query cost.
+  const def = buildToolDef({ digest: { sampleColumns: ['key'] } });
+  const result = {
+    hits: { hits: [{ _source: { key: 'a' } }], total: { value: 312480 } },
+    aggregations: {
+      by_agent: {
+        sum_other_doc_count: 0,
+        buckets: [
+          { key: 'web-prod-01', doc_count: 200000 },
+          { key: 'db-prod-01', doc_count: 112480 },
+        ],
+      },
+    },
+  };
+  const digest = buildDigest('search_wazuh_data', result, def, { size: 20 });
+  assert.ok(digest.coverage, 'expected a coverage statement');
+  assert.match(digest.coverage!, /all 312480 matching rows/);
+  assert.match(digest.coverage!, /lists all 2 distinct value/);
+  assert.match(digest.coverage!, /sample of those 312480/);
+  assert.doesNotMatch(digest.coverage!, /top 2/);
+});
+
+test('buildDigest: a truncated bucket list says "top N only" instead of claiming completeness', () => {
+  const def = buildToolDef({ digest: { sampleColumns: ['key'] } });
+  const result = {
+    hits: { hits: [], total: { value: 5000 } },
+    aggregations: {
+      by_title: {
+        sum_other_doc_count: 4200,
+        buckets: [{ key: 'rule one', doc_count: 800 }],
+      },
+    },
+  };
+  const digest = buildDigest('get_top_rules', result, def, { size: 0 });
+  assert.match(digest.coverage!, /all 5000 matching rows/);
+  assert.match(digest.coverage!, /top 1 value\(s\) only/);
+  assert.doesNotMatch(digest.coverage!, /lists all/);
+});
+
+test('buildDigest: a sample that IS the whole set is not described as a sample', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'a', label: 'A' }] },
+    digest: { sampleColumns: ['a'] },
+  });
+  const result = {
+    hits: { hits: [{ _source: { a: 1 } }], total: { value: 1 } },
+  };
+  const digest = buildDigest('search_wazuh_data', result, def, { size: 20 });
+  assert.match(digest.coverage!, /are the complete set/);
+  assert.doesNotMatch(digest.coverage!, /a sample of/);
+});
