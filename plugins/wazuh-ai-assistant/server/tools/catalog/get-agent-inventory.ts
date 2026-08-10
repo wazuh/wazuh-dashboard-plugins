@@ -408,4 +408,11 @@ export const getAgentInventoryTool: ToolDefinition = {
   tableSpec: { columns: [] },
   digest: { sampleColumns: [] },
   deriveColumns: true,
+  // Issue #8917: explicit, not inherited from `deriveColumns` above (see
+  // `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts). This tool's 5 kinds each
+  // read a small, fixed, reviewed `_source` list (`INVENTORY_KIND_CONFIG` above) rather than a
+  // genuinely arbitrary caller-supplied field set -- but every one of those fields still needs
+  // its own explicit `FIELD_POLICY_DEFAULTS` entry (privacy.ts) before it is safe to relax this,
+  // so it stays `true` today, same as before this flag existed.
+  failClosedFieldPolicy: true,
 };

@@ -112,12 +112,13 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'vulnerability.score.base', action: 'allow' },
   { field: 'package.architecture', action: 'allow' },
   // get_agent_inventory (issue: "Consolidate agent inventory into one tool") reads
-  // wazuh-states-inventory-* via `deriveColumns: true`, which flips applyFieldPolicy's
+  // wazuh-states-inventory-* and sets `failClosedFieldPolicy: true` (issue #8917 -- see
+  // `ToolDefinition.failClosedFieldPolicy`'s doc comment, types.ts), which flips applyFieldPolicy's
   // unlisted-field default from allow-by-omission to fail-closed anonymize (the same "any finding
   // field" protection search_wazuh_data's escape hatch needed -- see this file's header doc
   // comment on `isEscapeHatch`). The four deleted single-purpose tools it replaced never needed
-  // explicit entries for these because they were NOT deriveColumns tools, so allow-by-omission
-  // covered them silently; folding them into a deriveColumns tool means every field that should
+  // explicit entries for these because they had no such flag, so allow-by-omission
+  // covered them silently; folding them into this tool means every field that should
   // stay readable now needs its own explicit 'allow' entry below, or it silently starts arriving
   // at the provider as a VAL_n pseudonym -- making "what packages are installed on X" answer in
   // meaningless pseudonyms under privacy mode. Each entry below is software/config IDENTITY, not a
@@ -152,6 +153,74 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'event.action', action: 'allow' },
   { field: 'event.outcome', action: 'allow' },
 ];
+
+/**
+ * Reconciles a STORED field policy array (the `wazuh-ai-assistant-settings` saved object's
+ * `fieldPolicy` attribute) with the shipped `FIELD_POLICY_DEFAULTS`, so a policy entry added in a
+ * later release reaches an installation whose saved object predates it (issue #8917: a deployed
+ * lab's stored policy had 25 entries -- no `package.name`/`package.version` -- while the installed
+ * code shipped 31, and `server/routes/settings.ts` was taking `found.attributes.fieldPolicy`
+ * wholesale, so those two fields had NO policy entry at all and were pseudonymized wholesale by a
+ * fail-closed tool: the reported over-redaction). Pure and side-effect free -- the caller
+ * (`server/routes/settings.ts`'s `getOrCreateAssistantSettings`) decides what to do with `added`
+ * (log it, surface it in the settings response).
+ *
+ * The rule is ADD-ONLY and per-field, in this order:
+ *
+ * 1. A field already present in `stored` (any action, including one that overrides the shipped
+ *    default) is left completely untouched. The admin's own entry always wins -- this function
+ *    never edits or removes a stored entry, only ever appends ones that were missing.
+ * 2. A shipped default field ABSENT from `stored` is appended UNLESS it is also present in
+ *    `knownFields`. `knownFields` is the set of field keys the stored policy was already reconciled
+ *    against as of the settings object's last write (see `AssistantSettingsAttributes`'s
+ *    `fieldPolicyKnownFields`, stamped at every PUT with the merged view the admin was editing).
+ *    A field present in `knownFields` but absent from `stored` means the admin used the Settings
+ *    page's "remove" control (`handleRemoveFieldPolicyRow`) to deliberately delete that row -- that
+ *    deletion must stick, not be silently reverted on the next read.
+ * 3. A saved object that predates this fix entirely carries no `fieldPolicyKnownFields` at all
+ *    (`knownFields` is then `[]`) -- every currently-shipped default absent from its stored policy
+ *    is therefore treated as "genuinely never reached this install" and is appended. That is
+ *    exactly the one-time catch-up this fix performs for an existing installation: nothing was ever
+ *    deliberately removed from an object that has never been through this reconciliation before, so
+ *    there is nothing to protect from being "wrongly" re-added.
+ *
+ * SECURITY DIRECTION IS NOT UNIFORM -- read this before changing the rule above. Appending a missing
+ * entry does not uniformly increase protection:
+ *
+ * - On a `failClosedFieldPolicy` tool (`applyFieldPolicy`'s `isEscapeHatch` branch below), a field
+ *   with NO policy entry is fail-closed pseudonymized by default. Appending a shipped default whose
+ *   action is `'allow'` (most of the inventory fields are: `package.name`, `package.version`,
+ *   `host.os.name`, ...) therefore REDUCES redaction for that field on that tool -- from
+ *   "pseudonymized because absent" to "sent verbatim because explicitly allowed". That is the
+ *   correct outcome, not a regression: the shipped default reflects reviewed intent (see the
+ *   comments above each entry in `FIELD_POLICY_DEFAULTS`, e.g. "software/config IDENTITY, not a
+ *   personal or infrastructure identifier"), and the whole point of #8917 is that this reviewed
+ *   intent never reached an upgraded install. The over-redaction the issue reports IS this gap.
+ * - Appending a shipped default whose action is `'anonymize'` or `'never'` only ever INCREASES
+ *   protection: an unlisted field on a non-escape-hatch tool is allow-by-omission today, and
+ *   `'anonymize'`/`'never'` newly restricts it; on an escape-hatch tool the fail-closed default is
+ *   already `'anonymize'`, so a shipped `'anonymize'` default is a no-op and a shipped `'never'`
+ *   default (drops the field/bucket entirely) is strictly stronger. Never a regression either way.
+ * - What this function will NEVER do, in either direction, is touch a field the admin already has
+ *   an explicit opinion about (rule 1: present in `stored`). That is the one case that could
+ *   plausibly move protection in a direction the admin did not ask for, and it is excluded by
+ *   construction from both the append and the knownFields-suppression logic above.
+ */
+export function mergeFieldPolicyWithDefaults(
+  stored: FieldPolicyEntry[],
+  defaults: FieldPolicyEntry[],
+  knownFields: string[],
+): { merged: FieldPolicyEntry[]; added: FieldPolicyEntry[] } {
+  const storedFields = new Set(stored.map(entry => entry.field));
+  const known = new Set(knownFields);
+  const added = defaults.filter(
+    entry => !storedFields.has(entry.field) && !known.has(entry.field),
+  );
+  return {
+    merged: added.length > 0 ? [...stored, ...added] : stored,
+    added,
+  };
+}
 
 export type PseudonymKind = 'HOST' | 'IP' | 'USER' | 'URL' | 'VAL';
 
@@ -764,17 +833,19 @@ export function extractAggFields(
  *   privacy-on-but-message-absent both stay byte-identical to before this existed.
  *
  * `isEscapeHatch`: typed catalog tools only ever expose the ~10 fields curated in
- * `FIELD_POLICY_DEFAULTS`, so "unlisted = allow" was a safe default — but the search_wazuh_data
- * escape hatch's `deriveColumns` can pick ANY finding field into `samples`/`breakdown` (data.win.*,
+ * `FIELD_POLICY_DEFAULTS`, so "unlisted = allow" was a safe default — but search_wazuh_data's
+ * arbitrary DSL can pick ANY finding field into `samples`/`breakdown` (data.win.*,
  * data.office365.*, data.aws.*, syscheck.path, ...), and every one of those was passing through
  * untouched under privacy mode, defeating the guarantee for the one tool built to reach arbitrary
- * fields. When the caller sets `isEscapeHatch: true` (deriveColumns tools only — threaded from
- * `ToolDefinition.deriveColumns` at the executor.ts call site), an UNLISTED string field's default
- * flips from allow to anonymize (kind inferred from the field name, same as an explicit 'anonymize'
- * entry with no `kind`) — fail-closed: pseudonymize anything not explicitly allow-listed. A field
- * explicitly present in the policy (any action, including 'allow') is unaffected either way — this
- * only changes the *default for an absent entry*. Typed tools (the default, `isEscapeHatch` false
- * or omitted) keep today's allow-by-omission behavior exactly.
+ * fields. When the caller sets `isEscapeHatch: true` (threaded from
+ * `ToolDefinition.failClosedFieldPolicy` at the executor.ts call site — issue #8917; NOT the same
+ * as `deriveColumns`, which only controls how columns are computed and is set on tools of very
+ * different risk profiles, see that flag's own doc comment in types.ts), an UNLISTED string
+ * field's default flips from allow to anonymize (kind inferred from the field name, same as an
+ * explicit 'anonymize' entry with no `kind`) — fail-closed: pseudonymize anything not explicitly
+ * allow-listed. A field explicitly present in the policy (any action, including 'allow') is
+ * unaffected either way — this only changes the *default for an absent entry*. Typed tools (the
+ * default, `isEscapeHatch` false or omitted) keep today's allow-by-omission behavior exactly.
  */
 export function applyFieldPolicy(
   digest: Digest,

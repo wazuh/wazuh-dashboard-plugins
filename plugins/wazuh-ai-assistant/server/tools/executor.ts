@@ -49,9 +49,13 @@ function finalizeDigest(
   privacy: PrivacyContext | undefined,
   toolName: string,
   aggFields?: Record<string, string | undefined>,
-  // The escape hatch's deriveColumns can put ARBITRARY finding fields into
-  // the digest, so its unlisted-field default must be fail-closed (anonymize) instead of the
-  // curated typed tools' allow-by-omission — see privacy.ts's applyFieldPolicy.
+  // Issue #8917: this used to be the calling tool's `deriveColumns` flag, which conflated "needs
+  // per-response column derivation" with "field surface is uncurated enough to fail closed by
+  // default" — see `ToolDefinition.failClosedFieldPolicy`'s doc comment (types.ts) for why the two
+  // are now separate. A tool whose fields can be ARBITRARY (search_wazuh_data,
+  // find_document_by_field) or that folds several kinds' worth of fields into one digest
+  // (get_agent_inventory) sets this so its unlisted-field default is fail-closed (anonymize)
+  // instead of the curated typed tools' allow-by-omission — see privacy.ts's applyFieldPolicy.
   isEscapeHatch = false,
 ): Digest {
   if (!privacy) {
@@ -215,7 +219,9 @@ async function executeIndexerRequest(
       privacy,
       toolName,
       aggFields,
-      def.deriveColumns,
+      // Issue #8917: was `def.deriveColumns` -- see `ToolDefinition.failClosedFieldPolicy`'s doc
+      // comment (types.ts) for why this must be its own, explicitly-set flag instead.
+      def.failClosedFieldPolicy,
     );
     // "Open in Discover" support (common/types.ts's `TableSpec.discover` doc comment): only this
     // Indexer path has an index/DSL to attach — `body.query` is the guardrail-clamped clause that
