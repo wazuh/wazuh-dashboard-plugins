@@ -425,30 +425,6 @@ test('get_agent_inventory: kind="ports" numeric filter matches the port on eithe
   });
 });
 
-test('get_agent_inventory: kind="ports" filter is numeric equality on source.port OR destination.port', () => {
-  const req = buildIndexer({
-    agent_id: '003',
-    kind: 'ports',
-    filter: '9200',
-  });
-  assert.deepEqual(req.body.query, {
-    bool: {
-      filter: [
-        { term: { 'wazuh.agent.id': '003' } },
-        {
-          bool: {
-            should: [
-              { term: { 'source.port': 9200 } },
-              { term: { 'destination.port': 9200 } },
-            ],
-            minimum_should_match: 1,
-          },
-        },
-      ],
-    },
-  });
-});
-
 // Pins the case-insensitivity specifically (issue #8914's live-verified defect): the live
 // `wazuh-states-inventory-ports*` vocabulary is lowercase ("listening"), so a `term` clause
 // without `case_insensitive: true` -- or one restored to an exact-cased literal like "LISTEN" or
