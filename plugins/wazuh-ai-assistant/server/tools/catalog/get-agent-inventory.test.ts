@@ -221,3 +221,222 @@ test('get_agent_inventory: deriveColumns is set (no static tableSpec/digest for 
   assert.deepEqual(getAgentInventoryTool.tableSpec.columns, []);
   assert.deepEqual(getAgentInventoryTool.digest.sampleColumns, []);
 });
+
+// --- issue #8910: an optional "filter" narrows results on the kind's primary name field, so
+// presence questions ("is openssl installed?", "what's on port 9200?") no longer depend on the
+// answer sorting into the first `limit` rows of a possibly much larger inventory. ---
+
+test('get_agent_inventory: "filter" is an optional string param in the schema', () => {
+  const filterProperty = getAgentInventoryTool.spec.parameters.properties
+    .filter as unknown as { type?: string };
+  assert.equal(filterProperty.type, 'string');
+  assert.ok(
+    !(getAgentInventoryTool.spec.parameters.required ?? []).includes('filter'),
+    'filter must not be required',
+  );
+});
+
+test('get_agent_inventory: omitting "filter" leaves the request body unchanged (regression)', () => {
+  const req = buildIndexer({ agent_id: '003', kind: 'packages' });
+  assert.deepEqual(req.body.query, {
+    bool: { filter: [{ term: { 'wazuh.agent.id': '003' } }] },
+  });
+});
+
+test('get_agent_inventory: kind="packages" filter narrows on package.name, case-insensitive prefix', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'packages',
+    filter: 'openssl',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: {
+      filter: [
+        { term: { 'wazuh.agent.id': '003' } },
+        {
+          wildcard: {
+            'package.name': { value: 'openssl*', case_insensitive: true },
+          },
+        },
+      ],
+    },
+  });
+});
+
+test('get_agent_inventory: kind="hotfixes" filter narrows on package.hotfix.name', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'hotfixes',
+    filter: 'KB5001',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: {
+      filter: [
+        { term: { 'wazuh.agent.id': '003' } },
+        {
+          wildcard: {
+            'package.hotfix.name': {
+              value: 'KB5001*',
+              case_insensitive: true,
+            },
+          },
+        },
+      ],
+    },
+  });
+});
+
+test('get_agent_inventory: kind="processes" filter matches either process.name or process.command_line', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'processes',
+    filter: 'nginx',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: {
+      filter: [
+        { term: { 'wazuh.agent.id': '003' } },
+        {
+          bool: {
+            should: [
+              {
+                wildcard: {
+                  'process.name': { value: 'nginx*', case_insensitive: true },
+                },
+              },
+              {
+                wildcard: {
+                  'process.command_line': {
+                    value: 'nginx*',
+                    case_insensitive: true,
+                  },
+                },
+              },
+            ],
+            minimum_should_match: 1,
+          },
+        },
+      ],
+    },
+  });
+});
+
+test('get_agent_inventory: kind="os" filter matches either host.hostname or host.os.name', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'os',
+    filter: 'web-prod-01',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: {
+      filter: [
+        { term: { 'wazuh.agent.id': '003' } },
+        {
+          bool: {
+            should: [
+              {
+                wildcard: {
+                  'host.hostname': {
+                    value: 'web-prod-01*',
+                    case_insensitive: true,
+                  },
+                },
+              },
+              {
+                wildcard: {
+                  'host.os.name': {
+                    value: 'web-prod-01*',
+                    case_insensitive: true,
+                  },
+                },
+              },
+            ],
+            minimum_should_match: 1,
+          },
+        },
+      ],
+    },
+  });
+});
+
+test('get_agent_inventory: kind="ports" filter is numeric equality on source.port OR destination.port', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'ports',
+    filter: '9200',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: {
+      filter: [
+        { term: { 'wazuh.agent.id': '003' } },
+        {
+          bool: {
+            should: [
+              { term: { 'source.port': 9200 } },
+              { term: { 'destination.port': 9200 } },
+            ],
+            minimum_should_match: 1,
+          },
+        },
+      ],
+    },
+  });
+});
+
+test('get_agent_inventory: kind="ports" a non-numeric filter falls back to a process.name match', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'ports',
+    filter: 'nginx',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: {
+      filter: [
+        { term: { 'wazuh.agent.id': '003' } },
+        {
+          wildcard: {
+            'process.name': { value: 'nginx*', case_insensitive: true },
+          },
+        },
+      ],
+    },
+  });
+});
+
+test('get_agent_inventory: filter value is sanitized so a caller-supplied "*"/"?" cannot produce a leading wildcard', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'packages',
+    filter: '*ssl?',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: {
+      filter: [
+        { term: { 'wazuh.agent.id': '003' } },
+        {
+          wildcard: {
+            'package.name': { value: 'ssl*', case_insensitive: true },
+          },
+        },
+      ],
+    },
+  });
+});
+
+test('get_agent_inventory: a blank/whitespace-only filter is treated as omitted', () => {
+  const req = buildIndexer({
+    agent_id: '003',
+    kind: 'packages',
+    filter: '   ',
+  });
+  assert.deepEqual(req.body.query, {
+    bool: { filter: [{ term: { 'wazuh.agent.id': '003' } }] },
+  });
+});
+
+test('get_agent_inventory: description advertises "filter" for presence questions (routing guidance)', () => {
+  assert.match(
+    getAgentInventoryTool.spec.description,
+    /check whether one specific package\/port\/process is present.*pass "filter"/,
+  );
+});
