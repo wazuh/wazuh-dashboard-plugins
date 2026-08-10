@@ -5,6 +5,7 @@ import {
   checkIndexAllowlist,
   clampManagerParams,
   clampInt,
+  MAX_CARDINALITY_PRECISION_THRESHOLD,
 } from './guardrails';
 import { WAZUH_FIELD } from '../../common/wazuh-fields';
 
@@ -1021,4 +1022,33 @@ test("clampInt: a non-numeric value coerces via Math.max/Math.min's own ToNumber
   // boundary (e.g. an untyped object property), so the coercion behavior is pinned here.
   const nonNumeric = 'not-a-number' as unknown as number;
   assert.ok(Number.isNaN(clampInt(nonNumeric, 1, 500)));
+});
+
+test('applySafetyValves: raises every cardinality precision_threshold, including sub-aggs', () => {
+  const valved = applySafetyValves({
+    size: 0,
+    aggs: {
+      distinct_hosts: { cardinality: { field: 'wazuh.agent.name' } },
+      by_rule: {
+        terms: { field: 'wazuh.rule.id', size: 10 },
+        aggs: {
+          distinct_titles: { cardinality: { field: 'wazuh.rule.title' } },
+        },
+      },
+    },
+  });
+  assert.ok(valved.ok);
+  const aggs = valved.body.aggs as Record<string, Record<string, never>>;
+  assert.equal(
+    (aggs.distinct_hosts.cardinality as Record<string, unknown>)
+      .precision_threshold,
+    MAX_CARDINALITY_PRECISION_THRESHOLD,
+  );
+  assert.equal(
+    (
+      (aggs.by_rule.aggs as Record<string, Record<string, unknown>>)
+        .distinct_titles.cardinality as Record<string, unknown>
+    ).precision_threshold,
+    MAX_CARDINALITY_PRECISION_THRESHOLD,
+  );
 });
