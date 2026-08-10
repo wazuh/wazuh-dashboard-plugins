@@ -215,7 +215,10 @@ test('lintDsl: the vulnerability-field steering reason is conditional on those t
   const result = lintDsl(body, 'wazuh-events-v5-*');
   assert.equal(result.ok, false);
   if (!result.ok) {
-    assert.match(result.reason, /whichever of those is offered to you this\s+turn/);
+    assert.match(
+      result.reason,
+      /whichever of those is offered to you this\s+turn/,
+    );
     assert.match(
       result.reason,
       /If none of them\s+are available to you this turn, tell the user this assistant cannot check\s+vulnerability data\s+from here/,
