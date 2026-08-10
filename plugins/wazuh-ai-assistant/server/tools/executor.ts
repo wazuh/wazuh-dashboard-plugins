@@ -11,6 +11,7 @@ import {
   checkIndexAllowlist,
   clampManagerParams,
   lintDsl,
+  MAX_AGG_SIZE,
 } from './guardrails';
 import { buildDigest, buildTableSpec, capDigest, Digest } from './digest';
 import { validateQueryFields } from './field-validation';
@@ -23,6 +24,10 @@ import {
 } from './privacy';
 import { resolveApiHostId } from './api-host';
 import { findTimestampRange, widenToDefaultWindow } from './window-recount';
+import {
+  extractRequestedAgentNames,
+  findNearMissSiblings,
+} from './entity-resolution';
 import {
   DEFAULT_TIME_RANGE_GTE,
   DEFAULT_TIME_RANGE_LTE,
@@ -177,6 +182,100 @@ async function appendWindowRecountHint(
   }
 }
 
+/**
+ * No-silent-entity-substitution disclosure (issue #8920 item 6 -- see entity-resolution.ts's header
+ * comment for the class-level reasoning). Fires whenever the validated params named at least one
+ * agent (`agent_name`/`agent_names`), REGARDLESS of whether the tool call itself returned rows --
+ * unlike `appendWindowRecountHint` above, a near-miss with data is exactly as worth disclosing as a
+ * near-miss with none (see entity-resolution.ts's `findNearMissSiblings` doc comment). Issues ONE
+ * extra bounded search against the SAME index: a `size:0` terms aggregation over `wazuh.agent.name`
+ * (capped at `MAX_AGG_SIZE`, the same guardrail cap every other aggregation in this catalog is held
+ * to), scoped to the executed body's own `@timestamp` range when it has one, else the plugin
+ * default window (so a states-index tool's agent-name check still runs a lintDsl-satisfying,
+ * time-bounded query). Any failure degrades silently, same as the recount above.
+ *
+ * PRIVACY: each agent name embedded in the hint text (both the requested name and its siblings) is
+ * run through `privacy.pseudonymizer.pseudonymize(name, 'HOST')` before interpolation when privacy
+ * mode is active. This is NOT redundant with `applyFieldPolicy` or the outbound `prescanAndMint`
+ * text scrub: `applyFieldPolicy` only ever touches `samples`/`breakdown`/`message`, never `hint`
+ * (digest.ts's `Digest.hint` is intentionally left untouched by that pass -- see privacy.ts's
+ * `applyFieldPolicy` doc comment), and `prescanAndMint`'s later whole-text scrub in chat.ts
+ * deliberately never matches a BARE single-word hostname (privacy.ts:562-566's documented
+ * limitation) -- which is exactly the shape an agent name usually has. Without this explicit
+ * pseudonymization step, a hostname minted here would reach the provider in the clear under privacy
+ * mode.
+ */
+async function appendEntityNearMissHint(
+  digest: Digest,
+  params: Record<string, unknown>,
+  body: Record<string, unknown>,
+  index: string,
+  context: RequestHandlerContext,
+  privacy: PrivacyContext | undefined,
+): Promise<void> {
+  const requestedNames = extractRequestedAgentNames(params);
+  if (requestedNames.length === 0) {
+    return;
+  }
+  try {
+    const range = findTimestampRange(body);
+    const timestampRange = range ?? {
+      gte: DEFAULT_TIME_RANGE_GTE,
+      lte: DEFAULT_TIME_RANGE_LTE,
+    };
+    const probeBody: Record<string, unknown> = {
+      query: { bool: { filter: [{ range: { '@timestamp': timestampRange } }] } },
+      size: 0,
+      aggs: {
+        agent_names: {
+          terms: { field: 'wazuh.agent.name', size: MAX_AGG_SIZE },
+        },
+      },
+      track_total_hits: false,
+    };
+    const valved = applySafetyValves(probeBody);
+    if (!valved.ok) {
+      return;
+    }
+    const lint = lintDsl(valved.body, index);
+    if (!lint.ok) {
+      return;
+    }
+    const response = await context.core.opensearch.client.asCurrentUser.search({
+      index,
+      body: valved.body,
+    });
+    const buckets = (
+      response.body as {
+        aggregations?: { agent_names?: { buckets?: unknown } };
+      } | undefined
+    )?.aggregations?.agent_names?.buckets;
+    if (!Array.isArray(buckets)) {
+      return;
+    }
+    const indexedNames = buckets
+      .map(bucket => (bucket as { key?: unknown })?.key)
+      .filter((key): key is string => typeof key === 'string');
+    const nearMisses = findNearMissSiblings(requestedNames, indexedNames);
+    if (nearMisses.length === 0) {
+      return;
+    }
+    const display = (name: string): string =>
+      privacy ? privacy.pseudonymizer.pseudonymize(name, 'HOST') : name;
+    const sentences = nearMisses.map(
+      ({ requested, siblings }) =>
+        `The agent_name filter "${display(requested)}" also nearly matches distinct agent(s) ` +
+        `with data: ${siblings.map(display).join(', ')}. If the user named one of those, ` +
+        're-run with that exact name -- never silently substitute one host for another.',
+    );
+    digest.hint = digest.hint
+      ? `${digest.hint} ${sentences.join(' ')}`
+      : sentences.join(' ');
+  } catch {
+    // Extra-query failure degrades silently -- see this function's own header comment.
+  }
+}
+
 /** Executes a validated, guardrail-passed Indexer search and builds its digest + table. */
 async function executeIndexerRequest(
   toolName: string,
@@ -253,19 +352,28 @@ async function executeIndexerRequest(
     // aggregation fields driving `breakdown` (if any) can be read from — see privacy.ts's
     // `extractAggFields` doc comment — so it is reused for that below when privacy is active.
     const digest = buildDigest(toolName, result, def, body);
-    // Issue #8920 item 3: slots in HERE, between `buildDigest` and `finalizeDigest`, and extends
-    // `Digest.hint` by concatenation rather than a new field -- deliberately no change to
-    // digest.ts's `Digest` interface. Mutating `digest` before it is handed to `finalizeDigest`
-    // means whatever this appends is still subject to the same downstream pipeline (capDigest's
-    // length cap, the outbound prescan/text-scrub in chat.ts) as any other digest content.
+    // Issue #8920 items 3 and 6: both slot in HERE, between `buildDigest` and `finalizeDigest`,
+    // and both extend `Digest.hint` by concatenation rather than a new field -- deliberately no
+    // change to digest.ts's `Digest` interface (avoids colliding with sibling in-flight edits to
+    // that file). Mutating `digest` before it is handed to `finalizeDigest` means whatever they
+    // append is still subject to the same downstream pipeline (capDigest's length cap, the
+    // outbound prescan/text-scrub in chat.ts) as any other digest content.
     if (digest.counts.returned === 0) {
       await appendWindowRecountHint(digest, body, indexerRequest.index, context);
     }
-    // `buildDigest` already ran `capDigest` once, BEFORE the hint above could have grown
+    await appendEntityNearMissHint(
+      digest,
+      params,
+      body,
+      indexerRequest.index,
+      context,
+      privacy,
+    );
+    // `buildDigest` already ran `capDigest` once, BEFORE either hint above could have grown
     // `digest.hint` further -- re-running it here (privacy-off included, not only the
     // `finalizeDigest` privacy-on path below) is what keeps the "bounded ~1-2k token digest"
-    // guarantee (digest.ts's `DIGEST_CHAR_CAP`) true even after that append, instead of silently
-    // letting a hint-inflated digest slip past the cap whenever privacy mode is off.
+    // guarantee (digest.ts's `DIGEST_CHAR_CAP`) true even after these two appends, instead of
+    // silently letting a hint-inflated digest slip past the cap whenever privacy mode is off.
     capDigest(digest);
     // A `breakdownDimensions`-opted-in tool's synthesized breakdown (digest.ts's
     // `buildSyntheticBreakdown`) tags each bucket `agg: <dimension field path>` — an IDENTITY map
