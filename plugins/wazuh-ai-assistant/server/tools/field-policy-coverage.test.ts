@@ -182,6 +182,29 @@ test('every T1 non-deriveColumns tool digest column is privacy-classified or exp
   );
 });
 
+test('every breakdownDimensions field is privacy-classified or explicitly allowlisted', () => {
+  // `digest.breakdownDimensions` is a second model-facing data path: synthetic breakdown BUCKET
+  // KEYS are values of these fields and leave through the digest exactly like sampleColumns
+  // values do (executor.ts's identity-map path routes them through the same applyFieldPolicy
+  // pass). Unlike the sampleColumns loop above this includes deriveColumns tools too — the
+  // dimensions list is static and declared, so there is no reason to leave it to the
+  // fail-closed runtime default when it can be reviewed here.
+  const failures: string[] = [];
+  for (const def of listToolDefinitions()) {
+    for (const field of def.digest.breakdownDimensions ?? []) {
+      if (!isFieldCovered(field, def.spec.name, FIELD_POLICY_DEFAULTS)) {
+        failures.push(`${def.spec.name}/${field}`);
+      }
+    }
+  }
+  assert.deepEqual(
+    failures,
+    [],
+    `breakdownDimensions field(s) with no FIELD_POLICY_DEFAULTS entry and no structural ` +
+      `allowlist entry: ${failures.join(', ')}`,
+  );
+});
+
 test('isFieldCovered mechanism: an unclassified field is correctly flagged as NOT covered', () => {
   // Regression-guard sanity check for the helper itself: a field that is neither a
   // FIELD_POLICY_DEFAULTS entry nor a known-safe structural field must fail coverage — this is

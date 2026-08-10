@@ -2,6 +2,8 @@ import { ToolDefinition } from '../types';
 import {
   findingDigestColumns,
   findingRowFields,
+  FINDING_BREAKDOWN_AGGS,
+  FINDING_BREAKDOWN_DIMENSIONS,
   clampLimit,
   limitProperty,
   objectSchema,
@@ -55,6 +57,11 @@ export const getMitreFindingsTool: ToolDefinition = {
         },
         sort: [{ '@timestamp': { order: 'desc' } }],
         size: limit,
+        // Population-true agent/rule-title breakdown over the FULL matched set (issue #8920 item
+        // 1 -- named verbatim in the issue: "if it was found on T1059, it must hold for every
+        // technique id"). Same mechanism as the other finding-hits tools (common.ts's
+        // FINDING_BREAKDOWN_AGGS doc comment); this tool was missed when that fix first landed.
+        aggs: FINDING_BREAKDOWN_AGGS,
       },
     };
   },
@@ -91,5 +98,6 @@ export const getMitreFindingsTool: ToolDefinition = {
       'wazuh.rule.mitre.technique.name',
       'wazuh.rule.mitre.tactic.name',
     ]),
+    breakdownDimensions: FINDING_BREAKDOWN_DIMENSIONS,
   },
 };

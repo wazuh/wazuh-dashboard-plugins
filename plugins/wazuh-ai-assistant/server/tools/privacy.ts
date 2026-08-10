@@ -139,6 +139,16 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // paths/arguments (a username in a home directory path, a secret passed as a CLI flag) and must
   // keep being anonymized.
   { field: 'process.name', action: 'allow' },
+  // Kernel process-state code (a closed enum, not an identifier) -- added for issue #8920 item
+  // 1's get_agent_inventory "processes" SYNTHETIC breakdown (digest.breakdownDimensions, which
+  // groups returned rows and so needs no aggregation-mapping evidence -- see
+  // get-agent-inventory.ts's InventoryKindConfig doc comment). Without this entry,
+  // deriveColumns:true's fail-closed default (see this file's header doc comment on
+  // `isEscapeHatch`) would pseudonymize the breakdown's bucket keys into meaningless VAL_n,
+  // making "how many processes are running vs zombie" unanswerable under privacy mode.
+  // interface.state/network.transport/check.result (the fields newly added to guardrails.ts's
+  // AGG_FIELD_ALLOWLIST for the same issue) already have 'allow' entries in this list.
+  { field: 'process.state', action: 'allow' },
   // Open-port inventory mechanics (protocol, listen state, the two bare port numbers) -- NOT
   // source.ip/destination.ip (above), which correctly stay anonymized: a port number alone
   // identifies nothing without the IP it's paired with.
