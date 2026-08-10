@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict';
 import {
-  ANSWER_BUCKET_CAP,
   BREAKDOWN_BUCKET_CAP,
+  BREAKDOWN_CHAR_BUDGET,
   buildDigest,
   buildTableSpec,
   capDigest,
   Digest,
+  DIGEST_CHAR_CAP,
   isMetricAggValue,
   SUPPORTED_METRIC_AGG_TYPES,
 } from './digest';
@@ -1243,16 +1244,25 @@ test('buildDigest: a cardinality metric is marked approximate; a count metric is
   );
 });
 
-// --- #8935 item 1: real-breakdown carry cap (ANSWER_BUCKET_CAP) --------------------------------
+// --- #8935 item 1: char-budgeted real-breakdown carry --------------------------------------------
 
-/** A single-terms-agg response with `count` short, realistic-length ("check-0000".."check-00NN")
- * bucket keys — mirrors an enumeration-sized aggregation (e.g. get_sca_results' policies agg). */
-function manyBucketsResult(count: number): unknown {
+/** ~45 chars — a realistic SCA/CIS-benchmark check-name length ("Ensure sshd PermitRootLogin is
+ * disabled" = 40). Realistic length is the point: it is what makes the char-budget assertions
+ * below meaningful rather than trivially true. Deterministic per index and always exactly 45. */
+function realisticKey(i: number): string {
+  return `Ensure representative benchmark check ${String(i).padStart(4, '0')}`
+    .slice(0, 45)
+    .padEnd(45, '.');
+}
+
+/** A single-terms-agg response with `count` buckets at realistic key length, doc_count strictly
+ * descending (count - i) so hidden-remainder figures are computable in closed form. */
+function realisticBucketsResult(count: number): unknown {
   return {
     aggregations: {
       policies: {
         buckets: Array.from({ length: count }, (_, i) => ({
-          key: `check-${String(i).padStart(4, '0')}`,
+          key: realisticKey(i),
           doc_count: count - i,
         })),
       },
@@ -1260,62 +1270,112 @@ function manyBucketsResult(count: number): unknown {
   };
 }
 
-test('buildDigest: a 100-bucket real aggregation is carried up to ANSWER_BUCKET_CAP, with the rest disclosed', () => {
-  // FAILS ON BASE: buildBreakdown is unbounded, so the base carries all 100 entries with no
-  // trim/note at all -- 100 short keys serialize well under DIGEST_CHAR_CAP, so capDigest's own
-  // char-cap pop never even fires to mask the gap.
-  const def = buildToolDef({ digest: { sampleColumns: ['key'] } });
-  const digest = buildDigest('get_sca_results', manyBucketsResult(100), def);
-
-  assert.equal(digest.breakdown!.length, ANSWER_BUCKET_CAP);
-  // The 50 carried buckets are the top 50 by count (doc_count descends as i ascends above).
-  assert.deepEqual(
-    digest.breakdown!.map(b => b.key),
-    Array.from(
-      { length: ANSWER_BUCKET_CAP },
-      (_, i) => `check-${String(i).padStart(4, '0')}`,
-    ),
+/** The exact per-entry cost model capBreakdownCarry uses (serialized entry + 1 array comma). */
+function carryCost(entries: Array<Record<string, unknown>>): number {
+  return entries.reduce(
+    (sum, entry) => sum + JSON.stringify(entry).length + 1,
+    0,
   );
-  assert.ok(digest.breakdownNote, 'expected a carry-cap disclosure note');
-  // Hidden buckets are check-0050..check-0099, doc_count 50 down to 1 -> sum = 1+2+...+50 = 1275.
-  assert.match(digest.breakdownNote!, /\b1275\b/);
-  assert.match(digest.breakdownNote!, new RegExp(`top ${ANSWER_BUCKET_CAP}`));
-  assert.ok(
-    JSON.stringify(digest).length <= 6000,
-    'the digest carrying 50 buckets must still respect DIGEST_CHAR_CAP',
-  );
-  // Samples must survive the carry cap untouched -- this is a breakdown-only budget.
-  assert.equal(digest.samples.length, 0); // no hits/aggregation-only response here
-});
+}
 
-test('buildDigest: a real aggregation at or under ANSWER_BUCKET_CAP is carried whole, no trim note (regression pin)', () => {
-  // Passes on base too -- this pins the "small breakdowns are untouched" half of the contract so a
-  // future change to the carry cap cannot silently start trimming ordinary-sized breakdowns.
+test('buildDigest: a 100-bucket long-key aggregation is carried up to the char budget, remainder fully disclosed', () => {
+  // FAILS ON BASE: buildBreakdown is unbounded and emits no note, so the base carries all 100
+  // entries (assert below requires < 100) and `breakdownNote` is absent.
   const def = buildToolDef({ digest: { sampleColumns: ['key'] } });
   const digest = buildDigest(
     'get_sca_results',
-    manyBucketsResult(ANSWER_BUCKET_CAP),
+    realisticBucketsResult(100),
     def,
   );
-  assert.equal(digest.breakdown!.length, ANSWER_BUCKET_CAP);
+
+  const carried = digest.breakdown!;
+  assert.ok(
+    carried.length < 100 && carried.length >= BREAKDOWN_BUCKET_CAP,
+    `expected a partial carry, got ${carried.length}`,
+  );
+  // The carry keeps the FIRST buckets in response order (here: count-descending by construction).
+  assert.deepEqual(
+    carried.map(bucket => bucket.key),
+    Array.from({ length: carried.length }, (_, i) => realisticKey(i)),
+  );
+  // Budget respected, and MAXIMALLY used: one more entry would not have fit. This is what pins
+  // the carry against a regression back to a small flat cap (a 5- or 50-bucket trim with a note
+  // would fail here).
+  const used = carryCost(carried);
+  assert.ok(used <= BREAKDOWN_CHAR_BUDGET, `carry overran budget: ${used}`);
+  const nextEntry = {
+    key: realisticKey(carried.length),
+    count: 100 - carried.length,
+  };
+  assert.ok(
+    used + JSON.stringify(nextEntry).length + 1 > BREAKDOWN_CHAR_BUDGET,
+    'carry stopped before the budget was actually exhausted',
+  );
+  // Remainder disclosed with BOTH figures an enumeration answer needs: hidden match sum AND
+  // hidden key count.
+  const hiddenCount = 100 - carried.length;
+  const hiddenSum = (hiddenCount * (hiddenCount + 1)) / 2; // doc_counts hiddenCount..1
+  assert.ok(digest.breakdownNote, 'expected a carry-trim disclosure note');
+  assert.ok(
+    digest.breakdownNote!.includes(
+      `${hiddenSum} matches across ${hiddenCount} keys`,
+    ),
+    `note lacks the exact remainder figures: ${digest.breakdownNote}`,
+  );
+  // The note must describe the cut as first-in-response-order, never as "top N by count" — the
+  // ordering claim was the first cut of this fix and is false for non-count-ordered aggregations
+  // (see CARRY_TRIM_SENTENCE in digest.ts).
+  assert.match(digest.breakdownNote!, /FIRST ones/);
+  assert.doesNotMatch(digest.breakdownNote!, /top \d+ buckets by count/);
+  assert.ok(JSON.stringify(digest).length <= DIGEST_CHAR_CAP);
+});
+
+test('buildDigest: a 100-bucket SHORT-key enumeration that fits the budget is carried WHOLE, no note', () => {
+  // Regression pin for the char-budget design itself (issue #8935 integration review): a flat
+  // 50-bucket count cap trimmed a ~2.8k-char rule-id enumeration that demonstrably fit — cutting
+  // by a number when the information fits is the exact class this issue exists to remove. Passes
+  // on base too (base is unbounded); it exists to fail against any future flat count cap.
+  const def = buildToolDef({ digest: { sampleColumns: ['key'] } });
+  const result = {
+    aggregations: {
+      by_rule: {
+        buckets: Array.from({ length: 100 }, (_, i) => ({
+          key: String(5000 + i),
+          doc_count: 100 - i,
+        })),
+      },
+    },
+  };
+  const digest = buildDigest('get_top_rules', result, def);
+  assert.equal(digest.breakdown!.length, 100);
   assert.ok(!('breakdownNote' in digest));
 });
 
-test('buildDigest: a carry-cap trim MERGES with an existing sum_other_doc_count into one note', () => {
-  // 60 real buckets (a request-side terms size of 60), of which OpenSearch itself only returned 55
-  // (sum_other_doc_count: 12 for whatever fell outside size:55) -- both the request-side remainder
-  // AND the digest-side carry-cap remainder (buckets 51-55) must land in the SAME merged figure.
-  // FAILS ON BASE: the base carries all 55 buckets whole and never looks at ANSWER_BUCKET_CAP, so
-  // there is no digest-side component to merge -- only sum_other_doc_count would ever show, and
-  // that is a case the base already handles (see the pre-existing `discloses sum_other_doc_count`
-  // test above), so this test specifically exercises the union the base cannot produce.
+test('buildDigest: a side-disclosure-sized (5-bucket) breakdown is untouched, no note (regression pin)', () => {
+  // Passes on base too — pins the "small breakdowns are untouched" half of the contract.
+  const def = buildToolDef({ digest: { sampleColumns: ['key'] } });
+  const digest = buildDigest(
+    'get_sca_results',
+    realisticBucketsResult(BREAKDOWN_BUCKET_CAP),
+    def,
+  );
+  assert.equal(digest.breakdown!.length, BREAKDOWN_BUCKET_CAP);
+  assert.ok(!('breakdownNote' in digest));
+});
+
+test('buildDigest: a carry trim MERGES with an existing sum_other_doc_count into one figure', () => {
+  // 55 long-key buckets of which OpenSearch itself already cut more (sum_other_doc_count: 12).
+  // Both remainders must land in ONE merged figure, and the hidden KEY count must be stated as a
+  // lower bound (the request side never says how many keys its 12 matches span).
+  // FAILS ON BASE: the base carries all 55 buckets whole (no digest-side component to merge) and
+  // its note would carry the raw 12.
   const bucketCount = 55;
   const result = {
     aggregations: {
       policies: {
         sum_other_doc_count: 12,
         buckets: Array.from({ length: bucketCount }, (_, i) => ({
-          key: `check-${String(i).padStart(4, '0')}`,
+          key: realisticKey(i),
           doc_count: bucketCount - i,
         })),
       },
@@ -1323,22 +1383,23 @@ test('buildDigest: a carry-cap trim MERGES with an existing sum_other_doc_count 
   };
   const def = buildToolDef({ digest: { sampleColumns: ['key'] } });
   const digest = buildDigest('get_sca_results', result, def);
-  assert.equal(digest.breakdown!.length, ANSWER_BUCKET_CAP);
+  const carried = digest.breakdown!;
+  assert.ok(carried.length < bucketCount, 'expected a digest-side trim');
+  const hiddenCount = bucketCount - carried.length;
+  const hiddenSum = (hiddenCount * (hiddenCount + 1)) / 2;
+  const merged = hiddenSum + 12;
   assert.ok(digest.breakdownNote);
-  // Hidden buckets 50-54 (5 buckets) have doc_count 5,4,3,2,1 -> sum 15; merged with the request
-  // side's 12 -> 27.
-  assert.match(digest.breakdownNote!, /\b27\b/);
-  assert.doesNotMatch(
-    digest.breakdownNote!,
-    /\b12\b/,
-    'the raw un-merged request-side figure must not appear on its own',
+  assert.ok(
+    digest.breakdownNote!.includes(
+      `${merged} matches across at least ${hiddenCount} keys`,
+    ),
+    `note lacks the merged lower-bound figure: ${digest.breakdownNote}`,
   );
 });
 
-test('buildDigest: a multi-agg carry-cap trim attributes hidden buckets to the RIGHT aggregation', () => {
-  // FAILS ON BASE: same "no carry cap at all" reason as the single-agg case, but this also pins
-  // that per-agg attribution survives the trim -- a naive single merged figure would blur which
-  // aggregation the hidden buckets belong to.
+test('buildDigest: a multi-agg carry trim attributes hidden buckets to the RIGHT aggregation', () => {
+  // FAILS ON BASE: no carry at all (61 entries ride through, no note). Also pins that the
+  // fair-share split trims the oversized group while leaving the small sibling whole.
   const def = buildToolDef();
   const result = {
     aggregations: {
@@ -1356,15 +1417,56 @@ test('buildDigest: a multi-agg carry-cap trim attributes hidden buckets to the R
   const digest = buildDigest('search_wazuh_data', result, def);
   const agentBuckets = digest.breakdown!.filter(b => b.agg === 'by_agent');
   const ruleBuckets = digest.breakdown!.filter(b => b.agg === 'by_rule');
-  assert.equal(agentBuckets.length, ANSWER_BUCKET_CAP);
+  assert.ok(
+    agentBuckets.length >= BREAKDOWN_BUCKET_CAP && agentBuckets.length < 60,
+    `expected a partial by_agent carry, got ${agentBuckets.length}`,
+  );
   assert.equal(ruleBuckets.length, 1);
   assert.ok(digest.breakdownNote);
-  assert.match(digest.breakdownNote!, /by_agent: 10\b/); // 10 hidden agent buckets, doc_count 1 each
+  const hidden = 60 - agentBuckets.length;
+  assert.ok(
+    digest.breakdownNote!.includes(
+      `by_agent: ${hidden} matches across ${hidden} keys`,
+    ),
+    `note misattributes the trim: ${digest.breakdownNote}`,
+  );
   assert.doesNotMatch(
     digest.breakdownNote!,
     /by_rule: [1-9]/,
     'by_rule was never trimmed and must not be named as a truncated dimension',
   );
+});
+
+test('buildDigest: five 100-bucket aggregations stay inside DIGEST_CHAR_CAP with every agg represented', () => {
+  // The GLOBAL-budget pin (issue #8935 integration review): guardrails allows MAX_TOP_LEVEL_AGGS
+  // (5) top-level aggregations, and a PER-AGG cap of 50 long-key entries produced ~21.5k chars —
+  // capDigest then silently deleted whole trailing aggregations behind a note claiming a top-50
+  // list. FAILS ON BASE (500 entries ride through into capDigest's silent pop) and against the
+  // per-agg-flat-cap variant of this fix.
+  const def = buildToolDef();
+  const aggregations: Record<string, unknown> = {};
+  const aggNames = ['by_rule', 'by_agent', 'by_level', 'by_cat', 'by_tech'];
+  for (const name of aggNames) {
+    aggregations[name] = {
+      buckets: Array.from({ length: 100 }, (_, i) => ({
+        key: realisticKey(i),
+        doc_count: 100 - i,
+      })),
+    };
+  }
+  const digest = buildDigest('search_wazuh_data', { aggregations }, def);
+  assert.ok(JSON.stringify(digest).length <= DIGEST_CHAR_CAP);
+  for (const name of aggNames) {
+    const group = digest.breakdown!.filter(b => b.agg === name);
+    assert.ok(
+      group.length >= BREAKDOWN_BUCKET_CAP,
+      `aggregation ${name} was silently deleted or shrunk below the floor (${group.length})`,
+    );
+    assert.ok(
+      digest.breakdownNote!.includes(`${name}:`),
+      `trimmed aggregation ${name} is not named in the note`,
+    );
+  }
 });
 
 // --- #8935 item 1: synthetic-breakdown silent-trim fix ------------------------------------------
@@ -1411,16 +1513,94 @@ test('buildDigest: a synthetic breakdown over an untruncated page discloses hidd
     digest.breakdownNote,
     'expected a hidden-values disclosure for the 7 agents outside the top 5',
   );
+  // Hidden agents are agent-05..agent-11 (7 agents), with finding counts 7,6,5,4,3,2,1 -> sum 28.
+  // Both figures must be stated (an enumeration answer needs the KEY count, not just a match sum),
+  // and the top-by-count claim is provably true here: buildSyntheticBreakdown sorts by count.
+  assert.ok(
+    digest.breakdownNote!.includes('28 matches across 7 keys'),
+    `note lacks the exact hidden figures: ${digest.breakdownNote}`,
+  );
   assert.match(
     digest.breakdownNote!,
-    new RegExp(`top ${BREAKDOWN_BUCKET_CAP}`),
+    new RegExp(`top ${BREAKDOWN_BUCKET_CAP} by count`),
   );
-  // Hidden agents are agent-05..agent-11 (7 agents), with finding counts 7,6,5,4,3,2,1 -> sum 28.
-  assert.match(digest.breakdownNote!, /\b28\b/);
   // Case-2 semantics, not the synthetic page-scope case: counts stay exact and population-true, so
   // samplesNote must still say "trust the breakdown", never the distrust wording.
   assert.ok(digest.samplesNote);
   assert.match(digest.samplesNote!, /Use counts\/breakdown/);
+});
+
+test('buildDigest: a synthetic breakdown over a TRUNCATED page discloses hidden values too, without an exactness claim', () => {
+  // FAILS ON BASE (and against this fix's own first cut, which closed only the untruncated
+  // branch): the truncated branch is the COMMON one — a synthetic breakdown mostly exists because
+  // the page IS truncated — and the base's page-scope note said nothing about distinct values cut
+  // WITHIN the returned page ("which vendors ship packages here" lost every vendor beyond the top
+  // 5 of the rows the model was given, silently).
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'wazuh.agent.name', label: 'Agent' }] },
+    digest: {
+      sampleColumns: ['wazuh.agent.name'],
+      breakdownDimensions: ['wazuh.agent.name'],
+    },
+  });
+  const rows: Array<{ _source: Record<string, unknown> }> = [];
+  for (let i = 0; i < 12; i++) {
+    const findingsForAgent = 12 - i;
+    for (let j = 0; j < findingsForAgent; j++) {
+      rows.push(
+        findingRow(
+          `agent-${String(i).padStart(2, '0')}`,
+          'Rule X',
+          `2026-01-${String(j + 1).padStart(2, '0')}T00:00:00Z`,
+        ),
+      );
+    }
+  }
+  // 78 rows returned of 200 matched: page-scoped.
+  const result = { hits: { total: { value: 200 }, hits: rows } };
+  const digest = buildDigest('get_critical_findings', result, def);
+  assert.equal(digest.counts.truncated, true);
+  assert.ok(digest.breakdownNote);
+  // BOTH binds disclosed: the page scope AND the within-page value cut.
+  assert.match(digest.breakdownNote!, /covers only the 78 returned rows/);
+  assert.ok(
+    digest.breakdownNote!.includes('7 more distinct values on 28 rows'),
+    `note lacks the within-page hidden-values figures: ${digest.breakdownNote}`,
+  );
+  // Counts here are page-scoped: the exactness opener of the untruncated variant must not appear.
+  assert.doesNotMatch(digest.breakdownNote!, /Per-bucket counts are exact/);
+});
+
+test('buildDigest: a synthetic breakdown with UNKNOWN total is page-scoped, never claimed exact', () => {
+  // FAILS against this fix's own first cut: `truncated` is false when total is undefined, and the
+  // first cut keyed exactness off `!truncated` — asserting exact counts over a population of
+  // unknown size, the worst substitution this issue names. On base this response got no note at
+  // all (silent), which was merely incomplete rather than false.
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'wazuh.agent.name', label: 'Agent' }] },
+    digest: {
+      sampleColumns: ['wazuh.agent.name'],
+      breakdownDimensions: ['wazuh.agent.name'],
+    },
+  });
+  const rows: Array<{ _source: Record<string, unknown> }> = [];
+  for (let i = 0; i < 12; i++) {
+    for (let j = 0; j < 12 - i; j++) {
+      rows.push(
+        findingRow(
+          `agent-${String(i).padStart(2, '0')}`,
+          'Rule X',
+          `2026-01-${String(j + 1).padStart(2, '0')}T00:00:00Z`,
+        ),
+      );
+    }
+  }
+  const result = { hits: { hits: rows } }; // no hits.total at all
+  const digest = buildDigest('get_critical_findings', result, def);
+  assert.equal(digest.counts.total, undefined);
+  assert.ok(digest.breakdownNote);
+  assert.match(digest.breakdownNote!, /not all matching rows/);
+  assert.doesNotMatch(digest.breakdownNote!, /Per-bucket counts are exact/);
 });
 
 test('buildDigest: a synthetic breakdown with every dimension at or under BREAKDOWN_BUCKET_CAP distinct values stays note-free (regression pin)', () => {

@@ -894,6 +894,31 @@ test('applyFieldPolicy: a "never" agg field drops only its own buckets', () => {
   assert.equal(out.breakdown![0].agg, 'by_rule');
 });
 
+test('applyFieldPolicy: when a "never" policy drops EVERY bucket, breakdownNote goes with the breakdown', () => {
+  // FAILS ON BASE (and against #8935 item 1's first cut): the spread carried `breakdownNote`
+  // through untouched while the empty scrub result deleted `breakdown`, leaving a note that
+  // asserts concrete truncation figures about a bucket list that is not in the payload. 'never'
+  // is user-settable (server/routes/settings.ts), so this is reachable from settings alone.
+  const policy: FieldPolicyEntry[] = [{ field: 'data.srcip', action: 'never' }];
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    breakdown: [
+      { key: '10.0.0.5', count: 5 },
+      { key: '10.0.0.6', count: 3 },
+    ],
+    breakdownNote:
+      'Per-bucket counts are exact, but the bucket list is incomplete — further matches fall ' +
+      'under keys not listed (12).',
+  });
+  const aggFields = { by_ip: 'data.srcip' };
+  const out = applyFieldPolicy(digest, policy, p, aggFields);
+  assert.ok(!('breakdown' in out), 'every bucket was policy-dropped');
+  assert.ok(
+    !('breakdownNote' in out),
+    'a note describing a deleted breakdown must not reach the provider',
+  );
+});
+
 test('applyFieldPolicy: get_agent_inventory packages breakdown anonymizes package.vendor buckets, not package.architecture', () => {
   // Reproduces the exact reported defect against the REAL FIELD_POLICY_DEFAULTS + the identity
   // map executor.ts builds for a breakdownDimensions tool (dimension -> itself, see executor.ts's
