@@ -1,3 +1,20 @@
+import { listToolDefinitions } from './tools/registry';
+
+/**
+ * The full catalog's tool names, one compact registry-DERIVED line (issue #8920 item 4's
+ * unrouted-tool half): the per-turn tool list is a routed SUBSET, and the model has repeatedly
+ * concluded "the product cannot check X" for capabilities that simply were not offered that turn
+ * (the issue's headline witness: "CIS compliance checks are not covered by the current tools",
+ * while get_sca_results existed and answered the very next question). A generated list is the
+ * only mechanism that can be held registry-wide by a test (prompts.test.ts asserts every
+ * registered tool name appears here), unlike a hand-written sentence that silently rots as
+ * tools are added. Computed once at module load — the registry is static for the process
+ * lifetime. NOTE: like every prompt line, delivery is guaranteed but obedience is not (#8913).
+ */
+const CAPABILITY_INVENTORY = listToolDefinitions()
+  .map(def => def.spec.name)
+  .join(', ');
+
 /**
  * System prompt for the orchestration loop. Deliberately short:
  * tool schemas already carry the per-tool detail, and every provider pays for this prompt's
@@ -56,10 +73,13 @@ export function buildSystemPrompt(nowIso: string): string {
     'If no tool matches the question exactly, try search_wazuh_data with a minimal, correct ' +
       'query; if you cannot express it within its rules, say plainly what you can and cannot ' +
       'check with the available tools — never silently answer a narrower question than the one ' +
-      'asked. The tools offered to you on any given turn are a routed subset of a larger ' +
-      'catalog. Never tell the user that Wazuh or this assistant lacks a capability or data ' +
-      'source: say what you could not check on this turn instead, and offer the Discover ' +
-      'handoff.',
+      'asked. The tools offered to you on any given turn are a routed subset of this full ' +
+      `catalog: ${CAPABILITY_INVENTORY}. ` +
+      'Never present a failed tool call, or a tool that was not offered this turn, as a ' +
+      'missing product capability — say what you could not check on this turn instead, and ' +
+      'offer the Discover handoff. Real, documented product limitations stated in these ' +
+      'instructions (e.g. the absence of a solved-vulnerabilities history) are the exception: ' +
+      'state those plainly.',
     'Never rewrite, correct, or substitute a user-supplied identifier (agent name, CVE id, ' +
       'technique id) — pass it exactly as the user wrote it; if it matches nothing, report that ' +
       'verbatim identifier as unmatched.',

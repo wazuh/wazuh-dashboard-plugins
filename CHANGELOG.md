@@ -134,7 +134,7 @@
 | [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766) | Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration                                                              |
 | [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775) | Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters                                                                                                                |
 | [#8920](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8920) | Fixed the AI Assistant's Discover handoff links silently dropping field filters without disclosing it, invented fields now get a bounded self-correction retry instead                        |
-| [#8920](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8920) | Fixed the AI Assistant claiming a missing product capability after a failed tool call instead of correcting the call or trying another tool                                                  |
+| [#8920](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8920) | Fixed the AI Assistant claiming a missing product capability after a failed tool call instead of correcting the call or trying another tool                                                   |
 
 ### Removed
 
