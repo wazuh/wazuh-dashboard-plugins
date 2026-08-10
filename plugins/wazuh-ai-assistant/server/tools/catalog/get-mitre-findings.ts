@@ -17,6 +17,10 @@ import {
  * one specific sub-technique and must NOT match this. */
 const PARENT_TECHNIQUE_ID_RE = /^T\d+$/i;
 
+/** Dotted sub-technique id, e.g. "T1059.001". Only used to decide whether an input LOOKS like an
+ * ATT&CK id at all, so case-normalization can be skipped for anything that does not. */
+const SUB_TECHNIQUE_ID_RE = /^T\d+\.\d+$/i;
+
 /**
  * Sub-technique rollup (issue #8920 item 2): a bare parent id must match its own exact bucket
  * AND every "<id>.NNN" sub-technique -- MITRE ATT&CK itself treats a parent technique as
@@ -34,8 +38,15 @@ function buildMitreTechniqueFilter(
 ): Record<string, unknown> {
   // MITRE ids are indexed UPPERCASE and `term`/`prefix` on a keyword field are case-sensitive:
   // a caller's "t1110" would otherwise build a query that matches nothing at all — a silent
-  // 0-row lie, strictly worse than the undercount this rollup fixes.
-  const normalized = techniqueId.toUpperCase();
+  // 0-row lie, strictly worse than the undercount this rollup fixes. Case-normalization is
+  // GATED ON THE ID SHAPE, though: an input that is not an ATT&CK id is passed through verbatim
+  // rather than upper-cased, so a caller's own string is never rewritten on its way into an error
+  // message or a 0-row explanation (same principle as this issue's "preserve user-supplied
+  // identifiers verbatim" rule for agent names).
+  const isAttackId =
+    PARENT_TECHNIQUE_ID_RE.test(techniqueId) ||
+    SUB_TECHNIQUE_ID_RE.test(techniqueId);
+  const normalized = isAttackId ? techniqueId.toUpperCase() : techniqueId;
   if (!PARENT_TECHNIQUE_ID_RE.test(normalized)) {
     return { term: { 'wazuh.rule.mitre.technique.id': normalized } };
   }

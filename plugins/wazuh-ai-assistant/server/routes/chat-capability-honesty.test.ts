@@ -381,7 +381,10 @@ test('orchestrate: suggest_discover_query unknown field -> bounded tool error, n
   const parsed = JSON.parse(toolMessages[0].content);
   assert.match(
     parsed.error,
-    /does not exist on wazuh-findings-v5-\*: made\.up\.field/,
+    // Plural-agnostic on purpose: the validator reports "field(s) that do not exist on <index>:
+    // <list>" for one field or many, so pinning the singular "does not exist" made this fail on a
+    // message that was strictly more correct.
+    /not exist on wazuh-findings-v5-\*: made\.up\.field/,
   );
   assert.match(
     parsed.error,
@@ -474,7 +477,8 @@ test('orchestrate: a SECOND unknown_fields resolution emits stripped DSL + discl
   assert.equal(firstFailureToolMessages.length, 1);
   assert.match(
     JSON.parse(firstFailureToolMessages[0].content).error,
-    /does not exist on/,
+    // Plural-agnostic, same reason as the assertion above.
+    /not exist on/,
   );
 
   // `messages` accumulates across rounds (chat.ts appends [assistant, tool] each round), so
