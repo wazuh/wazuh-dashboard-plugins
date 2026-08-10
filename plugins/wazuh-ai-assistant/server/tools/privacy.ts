@@ -120,14 +120,35 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // covered them silently; folding them into a deriveColumns tool means every field that should
   // stay readable now needs its own explicit 'allow' entry below, or it silently starts arriving
   // at the provider as a VAL_n pseudonym -- making "what packages are installed on X" answer in
-  // meaningless pseudonyms under privacy mode. Each entry below is software/config IDENTITY, not a
-  // personal or infrastructure identifier -- the contrast with the fields that correctly stay
-  // anonymized (host.hostname, process.command_line, source.ip/destination.ip,
-  // source.user.name/destination.user.name -- all already listed above) is deliberate and must not
-  // be widened without the same scrutiny.
+  // meaningless pseudonyms under privacy mode. MOST entries below are software/config IDENTITY,
+  // not a personal or infrastructure identifier -- the contrast with the fields that correctly
+  // stay anonymized (host.hostname, process.command_line, source.ip/destination.ip,
+  // source.user.name/destination.user.name -- all already listed above) is deliberate and must
+  // not be widened without the same scrutiny. `package.vendor` below is the deliberate exception
+  // to "identity, therefore allow" -- see its own comment.
   { field: 'package.name', action: 'allow' },
   { field: 'package.version', action: 'allow' },
   { field: 'package.type', action: 'allow' },
+  // NOT 'allow', unlike package.name/architecture/type/version above: a vendor/distributor string
+  // ("Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>", "Debian Sysadmin Team
+  // <debian-admin@lists.debian.org>") routinely embeds a maintainer/team EMAIL ADDRESS -- personal
+  // contact information, not software identity, and the one field in this deriveColumns group that
+  // actually needs review rather than a rubber-stamp 'allow'. This repo has no `allow-scan` action
+  // yet (issue #8912, branch fix/8912-privacy-allow-scan(-v2), not merged as of this fix) that
+  // could keep the distributor NAME readable while still catching the embedded address the way
+  // package.name does there for a bundled hostname -- with only allow/anonymize/never available
+  // today, 'anonymize' is the only choice that does not ship a real email address to the provider.
+  // This ALSO makes explicit (rather than accidental) the protection get_agent_inventory's
+  // deriveColumns fail-closed default already applied here silently: before this entry existed,
+  // field-policy-coverage.test.ts treated `package.vendor` as "covered" purely because it sat in
+  // that test's KNOWN_SAFE_STRUCTURAL_FIELDS allowlist (a structural-shape guess, never a reviewed
+  // privacy decision) -- which said nothing about what the runtime actually does with an unlisted
+  // field on a deriveColumns tool, and would have silently stopped protecting this field the
+  // moment it was ever read by a non-deriveColumns tool (allow-by-omission there means real value,
+  // untouched). See field-policy-coverage.test.ts's `requireExplicitEntry` for the coverage-test
+  // fix that closes that gap. Revisit this to 'allow-scan' once #8912 lands, to preserve the
+  // distributor name while still catching the embedded address.
+  { field: 'package.vendor', action: 'anonymize', kind: 'VAL' },
   // A hotfix/KB identifier (e.g. "KB5034441"), not a person or a network address.
   { field: 'package.hotfix.name', action: 'allow' },
   // OS identity -- NOT host.hostname (above), which is the agent's network identity and stays
