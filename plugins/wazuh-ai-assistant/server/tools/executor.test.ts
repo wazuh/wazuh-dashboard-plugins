@@ -327,8 +327,15 @@ test("entity near-miss: fires even when the inherited window excludes the siblin
   // substituted host) has ~1800 documents INSIDE it. The executed body therefore returns rows, so
   // no recount fires -- the near-miss probe is the only mechanism left that can catch the
   // substitution. This fake OpenSearch mimics real range filtering: if the probe inherits the
-  // executed body's narrow range (the bug), the sibling's out-of-window document is filtered out
-  // and the aggregation returns no bucket; only a rangeless probe (the fix) finds it.
+  // executed body's NARROW range (the bug), the sibling's out-of-window document is filtered out
+  // and the aggregation returns no bucket.
+  //
+  // The probe cannot simply drop the range on a findings index: `lintDsl` REQUIRES a both-sides
+  // bounded @timestamp range on the events/findings families, and the probe helper early-returns on
+  // a lint failure, so a rangeless body made the disclosure vanish silently instead of erroring.
+  // The fix therefore uses the WIDEST window the guardrails allow, and this fake keys on the
+  // range's own lower bound: the inherited `now-24h` excludes the sibling, the default window
+  // includes it.
   const wrongHostHit = {
     _source: {
       '@timestamp': '2026-08-10T00:00:00Z',
@@ -346,15 +353,20 @@ test("entity near-miss: fires even when the inherited window excludes the siblin
     const filter = (
       call.body.query as { bool: { filter: Array<Record<string, unknown>> } }
     ).bool.filter;
-    const hasInheritedRange = filter.some(clause => 'range' in clause);
+    // A real range filter would exclude the sibling's single out-of-window document, so simulate
+    // exactly that: the bucket comes back only when the probe's lower bound is wide enough to
+    // contain it. `now-24h` (the executed body's inherited window, i.e. the bug) does not;
+    // `DEFAULT_TIME_RANGE_GTE` (the guardrail-legal widest window, i.e. the fix) does.
+    const rangeClause = filter.find(clause => 'range' in clause) as
+      | { range: { '@timestamp': { gte?: unknown } } }
+      | undefined;
+    const inheritedNarrowWindow =
+      rangeClause?.range['@timestamp'].gte === 'now-24h';
     return {
       hits: { hits: [], total: { value: 0 } },
       aggregations: {
         agent_names: {
-          // The sibling's single document lives outside the narrowed window: a real OpenSearch
-          // range filter would exclude it, so simulate that by returning no bucket whenever the
-          // probe (wrongly) carries a range clause at all.
-          buckets: hasInheritedRange
+          buckets: inheritedNarrowWindow
             ? []
             : [{ key: 'wazuh-aio-5', doc_count: 1 }],
         },
