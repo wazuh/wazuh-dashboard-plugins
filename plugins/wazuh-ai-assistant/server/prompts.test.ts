@@ -43,3 +43,36 @@ test('buildSystemPrompt: embeds the current UTC time and stays a single joined s
   assert.match(prompt, /The current UTC time is 2026-08-06T12:34:56Z\./);
   assert.equal(typeof prompt, 'string');
 });
+
+// Issue #8920 item 4: the UNGUARANTEED, prompt-level half of the capability-denial guard (see
+// chat.ts's CAPABILITY_DENIAL_NOTE/augmentToolError for the deterministic half of the same guard
+// -- this is only the prose half, which nothing in code can force the model to obey).
+
+test(
+  'buildSystemPrompt: instructs the model never to claim a missing capability, not a routing limit',
+  () => {
+    const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+    assert.match(
+      prompt,
+      /The tools offered to you on any given turn are a routed subset of a larger catalog/,
+    );
+    assert.match(
+      prompt,
+      /Never tell the user that Wazuh or this assistant lacks a capability or data source/,
+    );
+    assert.match(prompt, /say\s+what you could not check on this turn instead/);
+  },
+);
+
+test(
+  'buildSystemPrompt: still says plainly what it can/cannot check (amended, not contradicted)',
+  () => {
+    // The new "never claim a missing capability" line must not silently replace or contradict
+    // the pre-existing honesty instruction it was added next to.
+    const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+    assert.match(
+      prompt,
+      /say plainly what you can and cannot\s+check with the available tools/,
+    );
+  },
+);
