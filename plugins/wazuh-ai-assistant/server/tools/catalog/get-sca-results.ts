@@ -22,6 +22,17 @@ import {
  * model computes/narrates the ratio when asked. `check.result` values are confirmed live against
  * a real 5.0 stack to be capitalized -- `"Passed"`/`"Failed"`/`"Not applicable"` -- NOT the
  * lowercase 4.14 values; a lowercase `term` filter here silently matches nothing.
+ *
+ * Cross-category tool audit: this tool's own category is `sca` (server/tools/router.ts), while
+ * `get_threat_intel_components` -- named in the disambiguation sentence below for the "not SCA,
+ * you want pipeline policies" case -- is a DIFFERENT category (`security_analytics`). The two-stage
+ * router only offers one turn's categories at a time, so a stage-1 route of `sca` alone (plausible:
+ * "policy"/"policies" is genuinely overloaded between an SCA benchmark and a Security Analytics
+ * pipeline policy) would leave that named tool unavailable -- the same "instruction names a tool
+ * that may not be offered" shape as issue #8913, just between two data tools' descriptions instead
+ * of the system prompt. Worded conditionally ("if ... is available to you this turn") instead of
+ * an unconditional "use X instead" so the model degrades to admitting the gap rather than stalling
+ * on a tool it was not given.
  */
 export const getScaResultsTool: ToolDefinition = {
   spec: {
@@ -31,8 +42,9 @@ export const getScaResultsTool: ToolDefinition = {
       'passed/failed check counts per compliance benchmark (e.g. CIS Ubuntu). Use for "SCA"/' +
       '"configuration assessment"/"compliance policy score" questions about a specific agent. ' +
       'The compliance ratio is passed/(passed+failed). NOT for Security Analytics pipeline ' +
-      'policies (use get_threat_intel_components with component_type="policies") -- SCA is a ' +
-      'per-agent scan result, unrelated to that pipeline configuration.',
+      'policies -- SCA is a per-agent scan result, unrelated to that pipeline configuration; if ' +
+      'the question is actually about pipeline policies and get_threat_intel_components (with ' +
+      'component_type="policies") is available to you this turn, use that one instead.',
     parameters: objectSchema(
       {
         agent_id: {
