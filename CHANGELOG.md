@@ -133,7 +133,6 @@
 | [#8708](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8708)   | Fixed Home KPI's visualization persistent filters                                                                                                                                             |
 | [#8766](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8766) | Fixed Server Management Settings crashing or showing a blank page for users without permission to read the manager configuration                                                              |
 | [#8775](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8775) | Fixed MITRE ATT&CK Framework tab not applying the date range and fetch filters                                                                                                                |
-| [#8919](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8919) | Fixed AI Assistant tool descriptions and guardrail messages that named a tool from a different two-stage-router category than the one guaranteed offered that turn, leaving the model unable to call it |
 
 ### Removed
 
