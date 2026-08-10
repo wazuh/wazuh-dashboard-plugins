@@ -91,3 +91,21 @@ test('get_sca_results: still passes lintDsl at its maximum advertised limit', ()
   const result = lintDsl(request.body, request.index);
   assert.equal(result.ok, true, result.ok ? '' : result.reason);
 });
+
+// Cross-category tool audit (same bug shape as issue #8913): this tool's own category is `sca`
+// (server/tools/router.ts), while get_threat_intel_components -- named here for the "you actually
+// want a Security Analytics pipeline policy" case -- is the separate `security_analytics`
+// category, not guaranteed offered on the same turn. Pins the conditional wording so a future edit
+// cannot silently reintroduce an unconditional "use get_threat_intel_components instead" naming a
+// tool that may not be offered.
+test('get_sca_results: names get_threat_intel_components only conditionally on it being offered, not unconditionally', () => {
+  const description = getScaResultsTool.spec.description;
+  assert.match(
+    description,
+    /if\s+the question is actually about pipeline policies and get_threat_intel_components \(with\s+component_type="policies"\) is available to you this turn, use that one instead/,
+  );
+  assert.doesNotMatch(
+    description,
+    /\(use get_threat_intel_components with component_type="policies"\)/,
+  );
+});
