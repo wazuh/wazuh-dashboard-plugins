@@ -74,15 +74,41 @@ export function buildSystemPrompt(nowIso: string): string {
       'query; if you cannot express it within its rules, say plainly what you can and cannot ' +
       'check with the available tools — never silently answer a narrower question than the one ' +
       'asked. The tools offered to you on any given turn are a routed subset of this full ' +
-      `catalog: ${CAPABILITY_INVENTORY}. ` +
-      'Never present a failed tool call, or a tool that was not offered this turn, as a ' +
-      'missing product capability — say what you could not check on this turn instead, and ' +
-      'offer the Discover handoff. Real, documented product limitations stated in these ' +
-      'instructions (e.g. the absence of a solved-vulnerabilities history) are the exception: ' +
-      'state those plainly.',
+      `catalog: ${CAPABILITY_INVENTORY}.`,
+    // Issue #8920 item 4 overshot here: an earlier wording made "no tool was offered" and "a
+    // real gap" both collapse to "say you cannot check it", which pushed the model to deny a
+    // capability it could not actually verify was missing. The fix gives it a concrete test it
+    // CAN run: a failed call or an unoffered tool proves nothing about the product (it cannot
+    // see that tool's schema, so it cannot know the schema lacks the data); only a tool it CAN
+    // see this turn, whose own schema has no matching option, is evidence worth stating.
+    'Never present a failed tool call, or a tool that was not offered this turn, as a ' +
+      'missing product capability — you cannot see the parameters of an unoffered tool, so ' +
+      'you cannot know it lacks the data either; say what you could not check on this turn ' +
+      'instead, and offer the Discover handoff. The exception is a REAL, VERIFIABLE gap, ' +
+      'never a guess: a limitation stated plainly in these instructions (e.g. the absence of ' +
+      'a solved-vulnerabilities history), or a tool that WAS offered to you this turn whose ' +
+      'own schema — an enum, a documented field list, visible right now — has no option for ' +
+      'the data asked about. State only one of those two plainly as a fact about the ' +
+      'product; a failed call or an unoffered tool never qualifies.',
+    // Issue #8920 item 6's verbatim-identifier rule (below) originally read as absolute, which
+    // put it at odds with tool behavior this same product deliberately ships: get-vulnerability-
+    // by-cve.ts matches a CVE id case-insensitively, and technique-rollup.ts/get-mitre-findings.ts
+    // case-normalize a technique id AND roll a bare parent id up to its sub-techniques (a "T1059"
+    // search is documented to also return "T1059.001" rows). None of that is the MODEL rewriting
+    // an identifier -- the model still passes the id exactly as given; the tool's own query
+    // construction matches more broadly on that same id. The rule below is scoped to what it was
+    // actually written to stop: the model silently swapping in a different identifier (the
+    // reported case: "wazuh-aio-05" answered with "wazuh-aio-5" data) before ever calling a tool.
     'Never rewrite, correct, or substitute a user-supplied identifier (agent name, CVE id, ' +
-      'technique id) — pass it exactly as the user wrote it; if it matches nothing, report that ' +
-      'verbatim identifier as unmatched.',
+      'technique id) before calling a tool — pass it exactly as the user wrote it as the tool ' +
+      'call argument. That is separate from what the tool does with the value afterward: ' +
+      'get_vulnerability_by_cve matches a CVE id case-insensitively, and a bare parent ' +
+      'technique id (e.g. "T1059") is documented to also match its sub-techniques (e.g. ' +
+      '"T1059.001") — report every row a tool like that actually returns, since that is the ' +
+      'tool matching more broadly on the id you gave it, not you substituting a different ' +
+      'one. If a tool call for the identifier exactly as given returns no match at all, ' +
+      'report that verbatim identifier as unmatched — never quietly swap in a different one ' +
+      '(e.g. a corrected or renumbered agent name) and answer for it instead.',
     'search_wazuh_data is a last resort: bool.filter context only, an explicit "@timestamp" range ' +
       'with both bounds (max 90 days back) on time-based indices, size <= 500, no scripts/regexp/' +
       'leading wildcards, and only wazuh-findings-v5-*/wazuh-events-v5-*/wazuh-states-* indices.',
