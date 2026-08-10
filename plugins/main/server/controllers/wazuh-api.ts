@@ -687,8 +687,19 @@ export class WazuhApiCtrl {
           response,
         );
       }
+
       // when the error is an axios error the object will be always error.response.data
       const errorMessage = extractErrorMessage(error);
+
+      if (error?.response?.status === HTTP_STATUS_CODES.FORBIDDEN) {
+        return ErrorResponse(
+          errorMessage || error,
+          error.code ? `API error: ${error.code}` : 3013,
+          HTTP_STATUS_CODES.FORBIDDEN,
+          response,
+        );
+      }
+
       context.wazuh.logger.error(errorMessage);
       if ((error || {}).code && ApiErrorEquivalence[error.code]) {
         error.message = ApiErrorEquivalence[error.code];
