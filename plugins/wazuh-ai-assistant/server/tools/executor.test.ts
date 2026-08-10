@@ -390,10 +390,13 @@ test("entity near-miss: fires even when the inherited window excludes the siblin
   );
   const probeFilter = (calls[1].body.query as { bool: { filter: unknown[] } })
     .bool.filter;
+  // The invariant is "never the INHERITED window", not "never a range": a findings-index probe must
+  // carry a bounded range or lintDsl rejects it (and the helper's early return would swallow that
+  // silently). So it must be the guardrail-legal widest window, never the executed body's now-1h.
   assert.deepEqual(
     probeFilter,
-    [{ match_all: {} }],
-    "the probe must never inherit the executed body's @timestamp range",
+    [{ range: { '@timestamp': { gte: 'now-90d', lte: 'now' } } }],
+    "the probe must carry the default window, never the executed body's own narrower one",
   );
   assert.match(
     digest.hint as string,
