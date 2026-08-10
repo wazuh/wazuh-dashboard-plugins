@@ -18,15 +18,51 @@ import { checkIndexAllowlist } from './guardrails';
  * Registered ALONGSIDE the real stage-2 tool list in chat.ts's `orchestrate`, not through
  * server/tools/registry.ts: the registry is the catalog of DATA tools `resolveStage2Tools`
  * (router.ts) routes by category, and this tool has no data-fetching behavior to route to.
+ *
+ * #8915 — why there is no DETERMINISTIC (non-model) emission path, only the sharpened prompt/
+ * description guidance above: a deterministic "the turn is ending with nothing useful, auto-emit
+ * a suggested_query" backstop was evaluated and declined, for two independent reasons:
+ *  1. It already exists, structurally, for the one case where it would be safe to build: every
+ *     Indexer-backed tool call (executor.ts's `executeIndexerRequest`) already attaches a
+ *     `TableSpec.discover` link to its `table` event UNCONDITIONALLY — rows or not, truncated or
+ *     not (common/types.ts's `TableSpec.discover` doc comment). A zero-row or truncated result
+ *     from a real tool call this turn is therefore never actually link-less; the gap this issue
+ *     reports is that the model's own NARRATION doesn't call it out, which is a prompting problem
+ *     (fixed above), not a missing link.
+ *  2. For the two cases that genuinely have no such link, a safe deterministic query cannot be
+ *     built without fabricating one: (a) "no tool covers the data at all" means no tool call ever
+ *     ran this turn, so there is no executed index/DSL to derive anything from — synthesizing one
+ *     would mean guessing which index the user's free-text question maps to outside any tool
+ *     call, i.e. reimplementing the model's own topic-to-index judgment in code; (b) a Manager-API
+ *     tool's zero-item result (executeManagerRequest) has no index/DSL concept at all — Discover
+ *     searches OpenSearch indices, not Manager REST endpoints, so there is nothing sound to link
+ *     to. Both would violate the anti-fabrication constraint this fix is built under (the handoff
+ *     must be an admission the assistant cannot answer, never an invented query standing in for
+ *     one) — the model already carries the language-understanding needed to pick the right index
+ *     and reason for these cases; a deterministic backstop cannot.
+ * What it would take: a static, versioned map from tool-catalog category (router.ts's
+ * `resolveStage2Tools` categories, or `get_agents`/`get_vulnerabilities`-style tool names) to a
+ * default index/time-range DSL, so an "empty domain" turn with NO tool call could still resolve
+ * an index deterministically instead of relying on the model's own guess. That is a real feature
+ * (and a maintenance burden — it drifts every time a tool's backing index changes), not a small
+ * addition, so it is left to a follow-up rather than folded into this fix.
  */
 export const SUGGEST_DISCOVER_QUERY_TOOL: ToolSpec = {
   name: 'suggest_discover_query',
+  // #8915: this description previously read as one optional capability among several, and
+  // measured live traffic showed the model never called it — including on the turns it exists
+  // for. It now states plainly that the call is the REQUIRED close-out of an unanswerable turn,
+  // not an extra, and names all three trigger conditions — kept in sync with prompts.ts's
+  // buildSystemPrompt, which states the same three conditions in the system prompt.
   description:
-    'Use when the data the user asked about is out of reach for every other tool available to ' +
-    'you: a blocked/unsupported index, a filter search_wazuh_data cannot express within its ' +
-    'rules, or a time range beyond the 90-day maximum. Shows the user a query they can run ' +
-    'themselves in Discover, and your reason is shown alongside it — say plainly what you could ' +
-    'not check. This is NOT a way to fetch data yourself; nothing here is executed on your behalf.',
+    'The required final step of a turn you cannot fully answer — not an optional extra. Call it ' +
+    'before you finish whenever: no other tool available to you covers what the user asked about ' +
+    'at all; a tool call came back with zero rows and that zero is your whole answer; or the ' +
+    'rows you would need were truncated away and the question depends on seeing every row. Shows ' +
+    'the user a query they can run themselves in Discover, with your reason shown alongside it — ' +
+    'say plainly what you could not check or confirm. This is NOT a way to fetch data yourself: ' +
+    'nothing here is executed on your behalf, and it never replaces answering with data you ' +
+    'already have — use it to close out only the parts you could not verify.',
   parameters: {
     type: 'object',
     properties: {
