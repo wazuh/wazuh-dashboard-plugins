@@ -79,6 +79,16 @@ const NO_ANALYSIS_TEXT_MESSAGE =
 const NO_MATCHING_RESULTS_MESSAGE =
   'No matching results were found for that query.';
 /**
+ * Variant of NO_ANALYSIS_TEXT_MESSAGE for a turn that exhausted its tool-round budget (a serial
+ * chain deeper than MAX_TOOL_ROUNDS) and still produced no text even after
+ * FINAL_ROUND_ANSWER_INSTRUCTION asked for one. Named explicitly rather than folded into the
+ * generic copy above: the results table IS non-empty here, but it reflects only as far as the
+ * chain got, not the full answer, so the user should know a step was left unreached.
+ */
+const NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE =
+  'The tool-round budget for this turn ran out before a full answer could be written. See the ' +
+  'results above for what was found so far — a follow-up question can continue from there.';
+/**
  * Sibling fallback for a `general`-routed (no-tool) turn that still ends with no text at all —
  * e.g. a reasoning model streaming its entire answer on a channel nothing reads (issue
  * 02-read-reasoning-delta.md's `openai-compatible.ts` fix is the known cause; this is the
@@ -145,16 +155,20 @@ export function withFinalRoundAnswerInstruction(
 /** Picks which of the three no-text fallbacks above fits a turn that ended without any `delta`
  * text — shared by both `!sawAnyDelta` exit points below (the normal per-round `done` branch and
  * the round-budget-exhausted path) so the same three-way decision lives in exactly one place. */
-function noTextFallbackMessage(
+export function noTextFallbackMessage(
   toolUsedThisTurn: boolean,
   sawNonEmptyTable: boolean,
+  roundsExhausted: boolean,
 ): string {
   if (!toolUsedThisTurn) {
     return NO_ANSWER_MESSAGE;
   }
-  return sawNonEmptyTable
-    ? NO_ANALYSIS_TEXT_MESSAGE
-    : NO_MATCHING_RESULTS_MESSAGE;
+  if (!sawNonEmptyTable) {
+    return NO_MATCHING_RESULTS_MESSAGE;
+  }
+  return roundsExhausted
+    ? NO_ANALYSIS_ROUNDS_EXHAUSTED_MESSAGE
+    : NO_ANALYSIS_TEXT_MESSAGE;
 }
 
 /** Whitespace-only delta content (e.g. a lone "\n\n" some models emit as priming/formatting
@@ -1208,7 +1222,11 @@ async function* orchestrate(
         if (!sawAnyDelta) {
           yield {
             type: 'delta',
-            content: noTextFallbackMessage(toolUsedThisTurn, sawNonEmptyTable),
+            content: noTextFallbackMessage(
+              toolUsedThisTurn,
+              sawNonEmptyTable,
+              isFinalRound,
+            ),
           };
         }
         yield* emitPrivacyMapOnce();
@@ -1252,7 +1270,7 @@ async function* orchestrate(
   if (!sawAnyDelta) {
     yield {
       type: 'delta',
-      content: noTextFallbackMessage(toolUsedThisTurn, sawNonEmptyTable),
+      content: noTextFallbackMessage(toolUsedThisTurn, sawNonEmptyTable, true),
     };
   }
   yield* emitPrivacyMapOnce();
