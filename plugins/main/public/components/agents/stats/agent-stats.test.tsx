@@ -321,6 +321,29 @@ describe('AgentStats', () => {
     });
   });
 
+  it('should feed the logcollector tables when a window carries a single file as an object', async () => {
+    const globalFile = { location: 'df -P', events: 32, bytes: 3436 };
+
+    fetchDataMock.mockResolvedValue(
+      statisticsResponse({
+        logcollector: {
+          global: { start: 'start', end: 'end', files: globalFile },
+        },
+      }),
+    );
+
+    await act(async () => {
+      render(<AgentStats agent={{ id: agent002 }} />);
+    });
+
+    const globalProps = AgentStatTableMock.mock.calls
+      .map(([props]) => props)
+      .filter(props => props.title === 'Global')
+      .pop();
+
+    expect(globalProps.items).toEqual([globalFile]);
+  });
+
   it('should update export csv filename correctly when changing agent', async () => {
     const mockExportCSVFilename = (
       agentID: string,

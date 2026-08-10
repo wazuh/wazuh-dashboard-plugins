@@ -77,15 +77,32 @@ const tableColumns = [
   },
 ];
 
+interface AgentStatsLogcollectorFile {
+  location?: string;
+  events?: number;
+  bytes?: number;
+  targets?:
+    | { name?: string; drops?: number }
+    | { name?: string; drops?: number }[];
+}
+
 interface AgentStatsLogcollectorWindow {
   start?: string;
   end?: string;
-  files?: {
-    location?: string;
-    events?: number;
-    bytes?: number;
-    targets?: { name?: string; drops?: number }[];
-  }[];
+  // The index maps the files as a plain object, not as nested, so a report with
+  // a single file can travel as an object instead of a one-element array
+  files?: AgentStatsLogcollectorFile | AgentStatsLogcollectorFile[];
+}
+
+/**
+ * Read a value the index maps as a plain object as a list, so a single item and
+ * a list of items are handled the same way.
+ */
+function toList<T>(value?: T | T[]): T[] {
+  if (value === undefined || value === null) {
+    return [];
+  }
+  return Array.isArray(value) ? value : [value];
 }
 
 /**
@@ -201,7 +218,7 @@ const AgentStatsBody = withDataSourceInitiated({})(
             title='Global'
             start={statistics?.logcollector?.global?.start}
             end={statistics?.logcollector?.global?.end}
-            items={statistics?.logcollector?.global?.files}
+            items={toList(statistics?.logcollector?.global?.files)}
             exportCSVFilename={`agent-stats-${agentID}-logcollector-global`}
           />
         </EuiFlexItem>
@@ -212,7 +229,7 @@ const AgentStatsBody = withDataSourceInitiated({})(
             title='Interval'
             start={statistics?.logcollector?.interval?.start}
             end={statistics?.logcollector?.interval?.end}
-            items={statistics?.logcollector?.interval?.files}
+            items={toList(statistics?.logcollector?.interval?.files)}
             exportCSVFilename={`agent-stats-${agentID}-logcollector-interval`}
           />
         </EuiFlexItem>
