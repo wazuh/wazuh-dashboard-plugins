@@ -313,11 +313,20 @@ export const getAgentInventoryTool: ToolDefinition = {
     // don't carry it — one tool-level list covers `packages` (architecture/vendor: textbook
     // closed-set dimensions on a kind whose real hosts carry 500-2000 docs against a default
     // limit of 50, the most truncation-prone kind in this tool) and `processes` (process.state)
-    // at zero cost to the other kinds. All three fields have privacy classifications
-    // (package.architecture and process.state are explicit 'allow' entries in
-    // FIELD_POLICY_DEFAULTS; package.vendor is a known-safe structural field), and executor.ts's
-    // identity-map path scrubs synthetic breakdown keys through the same applyFieldPolicy pass as
-    // a real aggregation's.
+    // at zero cost to the other kinds. All three fields have their own EXPLICIT
+    // FIELD_POLICY_DEFAULTS entry (package.architecture and process.state 'allow'; package.vendor
+    // 'anonymize' -- a vendor/distributor string routinely embeds a maintainer email address, see
+    // privacy.ts's comment on that entry for why 'allow' is wrong for it specifically). That is a
+    // deliberate correction from an earlier version of this comment, which called `package.vendor`
+    // a "known-safe structural field" -- that phrase describes ONLY
+    // field-policy-coverage.test.ts's `KNOWN_SAFE_STRUCTURAL_FIELDS`, a test-only allowlist for
+    // "this field needs no entry under the ALLOW-by-omission default". This tool sets
+    // `deriveColumns: true`, which flips that default to FAIL-CLOSED anonymize (see this file's
+    // `deriveColumns` doc comment and privacy.ts's `isEscapeHatch`) -- so "needs no policy entry"
+    // and "is safe to send to the provider" are OPPOSITES here, not synonyms, and a field's mere
+    // presence in that structural-shape allowlist proves neither. executor.ts's identity-map path
+    // scrubs synthetic breakdown keys through the same applyFieldPolicy pass as a real
+    // aggregation's, so each dimension above needs, and now has, its own reviewed entry.
     breakdownDimensions: [
       'package.architecture',
       'package.vendor',
