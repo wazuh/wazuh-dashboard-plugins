@@ -5,14 +5,6 @@ import {
   outcomeFromTestResult,
 } from './provider-status';
 
-/**
- * Issue #8854, point 3: "One Failed badge covers four different situations, including one that
- * is not the provider's fault." These tests pin the split this fix introduces: a completed test
- * (`outcomeFromTestResult`) is `ok`/`failed`, while a test that never ran at all
- * (`outcomeFromTestError`, e.g. the admin-gate check itself failing) is the distinct
- * `could-not-verify` status — never rendered as the same red "Failed" badge.
- */
-
 test('outcomeFromTestResult: a successful test maps to ok with the measured latency', () => {
   const outcome = outcomeFromTestResult({ success: true, latencyMs: 237 });
   assert.deepEqual(outcome, { status: 'ok', latencyMs: 237 });

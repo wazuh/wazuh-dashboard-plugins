@@ -180,9 +180,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const [deleteTarget, setDeleteTarget] = useState<ProviderSummary | null>(
     null,
   );
-  // Distinguishes "still loading the initial list" from "loaded and genuinely empty" — without
-  // this, the first-run empty state below would flash open for a frame on every page load, before
-  // `providers` gets its first real value.
   const [providersLoaded, setProvidersLoaded] = useState(false);
 
   // Privacy settings: loaded once on mount; edited locally and only written back on an explicit
@@ -465,14 +462,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   // for; the per-provider map stays editable only by ensuring the global
   // Privacy section below never overwrites it (see `handleSavePrivacySettings`'s
   // `privacyDefaultPerProvider: loadedAssistantSettings.privacyDefaultPerProvider` passthrough).
-  // "Save & test" (issue #8854, points 1-3): saving a provider — whether creating it or editing
-  // an already-verified one — used to leave its Status column at "Not tested" until someone
-  // manually pressed the row's Test action. Save itself must still succeed even when the
-  // immediately-following test fails (a local Ollama that isn't running yet, a rate-limited key,
-  // etc. are still valid saved configurations) — `handleTest` below already reports its own
-  // failure into `testResults` rather than throwing, so firing it here (without awaiting or
-  // wrapping it in this function's own try/catch) can never turn a successful save into a
-  // reported error.
   const handleSubmit = async (input: ProviderInput) => {
     setError(null);
     try {
@@ -567,12 +556,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     }
   };
 
-  // A THROWN error (service.test() rejecting) and a RESOLVED `{success:false}` are different in
-  // kind, not just in outcome — see provider-status.ts's doc comment. Resolving means the test
-  // route ran the real provider round-trip and it failed (`outcomeFromTestResult` -> `failed`);
-  // throwing means the route never got that far at all (most commonly the admin-gate check
-  // itself rejecting the request), so the provider's own configuration was never actually
-  // exercised (`outcomeFromTestError` -> `could-not-verify`).
   const handleTest = async (provider: ProviderSummary) => {
     setTestingIds(current => new Set(current).add(provider.id));
     try {
@@ -724,10 +707,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             </EuiBadge>
           );
         }
-        // `failed` and `could-not-verify` share this layout (a badge plus the message it
-        // couldn't fit) but never the same badge color/text — attaching the message here, on the
-        // row itself, is what replaces the old page-level callout stack: the reason is right next
-        // to the row it is about instead of in a list the admin has to match back up by name.
         const isCouldNotVerify = result.status === 'could-not-verify';
         return (
           <EuiFlexGroup gutterSize='xs' alignItems='center' responsive={false}>
@@ -916,10 +895,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               )}
 
               {providersLoaded && providers.length === 0 ? (
-                // First-run state (issue #8854, point 6): mirrors chat-page.tsx's own
-                // "No AI provider configured" EuiEmptyPrompt exactly (same icon, same title, same
-                // CTA copy) so the two surfaces agree instead of this table falling back to
-                // EuiBasicTable's generic "No items found".
                 <EuiEmptyPrompt
                   iconType='machineLearningApp'
                   title={

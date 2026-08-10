@@ -193,13 +193,6 @@ const PROVIDER_MODEL_GUIDANCE: Record<
   },
 };
 
-/**
- * Server-required fields (Name, Provider type, Endpoint URL, Model — see the create/update
- * validators in server/routes/settings.ts) carried no visual or accessible "required" marker
- * (issue #8854, "Also noticed"), so only the one OPTIONAL field (API key) explained itself. A
- * plain trailing asterisk mirrors how the rest of this repo's forms already flag required
- * fields — no new visual language introduced.
- */
 const RequiredLabel: React.FC<{ label: string }> = ({ label }) => (
   <>
     {label}{' '}
@@ -217,8 +210,6 @@ const emptyForm: ProviderInput = {
   apiKey: '',
 };
 
-// Requires at least one character after the scheme so a bare `https://` (which the server
-// round-trip would reject anyway) is caught here instead of only after a save attempt.
 function isValidEndpointUrl(value: string): boolean {
   return /^https?:\/\/.+/i.test(value.trim());
 }
@@ -436,13 +427,6 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
             </>
           )}
           {!canSave && (
-            // Issue #8854, point 5: the disabled Save button's own EuiToolTip below carries the
-            // same message, but a tooltip only reaches a mouse user who happens to hover the
-            // greyed-out button — an admin who fills in the whole form and then wonders why Save
-            // won't respond should not have to go looking for it. This callout is the
-            // always-visible copy of that same explanation, inside the form the admin is actually
-            // looking at (the page-level warning in settings-page.tsx sits behind this flyout
-            // once it's open).
             <>
               <EuiCallOut
                 color='warning'
@@ -664,13 +648,6 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
               label={i18n.translate('wazuhAiAssistant.settings.form.apiKey', {
                 defaultMessage: 'API key',
               })}
-              // Issue #8854, point 4: the field itself is always blank on edit (the key is never
-              // sent back to the browser — ProviderSummary redacts it to `hasApiKey`), which used
-              // to read as "the key got deleted." The providers TABLE already shows "Configured"
-              // for this same provider; this badge is that same fact, moved to where an admin who
-              // opened the edit form would actually see it. Neutral (not success/warning) per the
-              // linked Kibana precedent (elastic/kibana#80657) choosing plain text over an alarm
-              // color after design review — this is informational, not a state to react to.
               labelAppend={
                 editingProvider?.hasApiKey ? (
                   <EuiBadge color='hollow'>
@@ -721,11 +698,6 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
           </EuiForm>
         </EuiFlyoutBody>
         <EuiFlyoutFooter>
-          {/* Cancel-left/Save-right (issue #8854, "Also noticed": the two were reversed before)
-              plus a dedicated EuiFlyoutFooter — previously Save/Cancel sat inline at the end of
-              the form's own scrolling area, so on a tall form (the encryption callout, five
-              fields, three doc popovers) both could scroll out of view entirely; the footer is
-              pinned outside that scroll region. */}
           <EuiFlexGroup justifyContent='spaceBetween'>
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty onClick={requestClose} flush='left'>
