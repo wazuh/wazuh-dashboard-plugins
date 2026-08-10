@@ -193,7 +193,10 @@ export type StreamEvent =
    * already have its field-level filters stripped down to index + time range only when their field
    * names could not be verified against the target index (see suggest-discover-query.ts's
    * `resolveSuggestedDsl` doc comment for why). `reason` is the model's own plain-language
-   * explanation of what it could not check, shown to the user verbatim next to the link.
+   * explanation of what it could not check, shown to the user next to the link — but NOT always
+   * verbatim: whenever `dsl` above lost field-level filters relative to what the model asked to
+   * show, chat.ts appends a fixed disclosure sentence to `reason` so the two can never silently
+   * diverge (the link would otherwise promise a filter it does not carry — issue #8920 item 9).
    */
   | {
       type: 'suggested_query';
