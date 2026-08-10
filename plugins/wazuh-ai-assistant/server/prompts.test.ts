@@ -76,3 +76,20 @@ test(
     );
   },
 );
+
+// Cross-cluster note: this instruction addresses a deictic/identifier-substitution finding
+// (agent name/CVE id/technique id) that is otherwise A4's concern -- it lives here only because
+// this file (prompts.ts) is A5's to own.
+
+test(
+  'buildSystemPrompt: instructs the model never to rewrite/correct a user-supplied identifier',
+  () => {
+    const prompt = buildSystemPrompt('2026-01-01T00:00:00Z');
+    assert.match(
+      prompt,
+      /Never rewrite, correct, or substitute a user-supplied identifier/,
+    );
+    assert.match(prompt, /pass it exactly as the user wrote it/);
+    assert.match(prompt, /report that\s+verbatim identifier as unmatched/);
+  },
+);
