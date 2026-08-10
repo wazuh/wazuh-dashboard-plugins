@@ -54,6 +54,17 @@ import {
   validateSuggestDiscoverQueryArgs,
 } from '../tools/suggest-discover-query';
 
+/** Server-appended when a `suggested_query` event's DSL lost field-level filters relative to what
+ * the model asked to show (an unverifiable index, a failed `_field_caps` check, or a second
+ * unknown-fields failure this turn -- see `resolveSuggestedDsl`'s `SuggestedDslResolution`).
+ * Closes the "prose promises a field filter, DSL carries only @timestamp" dishonesty (issue #8920
+ * item 9): the emitted `reason` must NEVER silently diverge from what the emitted `dsl` actually
+ * contains, so whenever the strip happens, the reason ALWAYS says so, deterministically -- this is
+ * not a prompt instruction the model could omit. */
+const SUGGESTED_QUERY_FIELDS_STRIPPED_DISCLOSURE =
+  ' (Note: the suggested field filters could not be verified against this index, so the link ' +
+  'opens with a time-range-only query.)';
+
 interface StoredProviderAttributes {
   name: string;
   type: ProviderConfig['type'];
@@ -824,7 +835,10 @@ export async function* runStage1Routing(
  * run through a `MarkdownTableSuppressor` — before that, there is nothing on-screen yet for a
  * hand-built table to duplicate.
  */
-async function* orchestrate(
+// Exported for unit testing only (chat-capability-honesty.test.ts drives it directly with a fake
+// adapter, same pattern as `runStage1Routing`'s own test) -- not part of this route's HTTP
+// contract.
+export async function* orchestrate(
   adapter: ProviderAdapter,
   providerConfig: ProviderConfig,
   initialMessages: ChatMessage[],
@@ -848,6 +862,14 @@ async function* orchestrate(
   // 02-read-reasoning-delta.md), and it deserves a sentence, not a silently empty bubble.
   let sawAnyDelta = false;
   let toolUsedThisTurn = false;
+  // Bounds the suggest_discover_query self-correction loop to ONE retry per turn (issue #8920 item
+  // 9): the first `unknown_fields` resolution this turn is returned as a tool error instead of a
+  // `suggested_query` event, so the model gets one chance to rewrite the call with real field names
+  // -- see the `SUGGEST_DISCOVER_QUERY_TOOL.name` branch below. A SECOND `unknown_fields` this turn
+  // falls through to the stripped-DSL-plus-disclosure path instead of erroring again: the round
+  // budget (MAX_TOOL_ROUNDS) is what actually bounds the loop from spinning forever, but this flag
+  // stops it from burning more than one of those rounds on the same self-correction.
+  let suggestDiscoverUnknownFieldsRetried = false;
   // Sum of every provider call's `usage` THIS TURN — the stage-1 routing call (if the router ran)
   // plus every round of the loop below, INCLUDING non-final rounds whose `done` is otherwise
   // suppressed (see the round loop's `if (sawToolCall) { break; }`). Without this, only the last
@@ -1064,25 +1086,72 @@ async function* orchestrate(
             // why its call was rejected and can retry with corrected arguments.
             toolResultContent = JSON.stringify({ error: validation.reason });
           } else {
-            const resolvedDsl = await resolveSuggestedDsl(
+            const resolution = await resolveSuggestedDsl(
               context,
               validation.index,
               validation.dsl,
               logger,
             );
-            yield {
-              type: 'suggested_query',
-              index: validation.index,
-              dsl: resolvedDsl,
-              reason: validation.reason,
-            };
-            toolResultContent = JSON.stringify({
-              shown: true,
-              note:
-                'The suggested query was shown to the user as an "Open in Discover" link. Now ' +
-                'tell the user plainly, in your own words, what you could not check and why — do ' +
-                'not repeat the query itself, the link already shows it.',
-            });
+
+            if (
+              resolution.outcome === 'unknown_fields' &&
+              !suggestDiscoverUnknownFieldsRetried
+            ) {
+              // First unknown-fields failure this turn (issue #8920 item 9): do NOT show the
+              // suggestion at all -- an invented field name is the MODEL's mistake, and unlike
+              // `unverifiable_index` it is plausibly correctable, so this is a bounded
+              // self-correction tool error instead, same contract as every other tool. Bounded to
+              // ONE retry via `suggestDiscoverUnknownFieldsRetried`: a SECOND unknown-fields
+              // resolution this turn falls through to the `else` below instead of erroring again.
+              suggestDiscoverUnknownFieldsRetried = true;
+              toolResultContent = JSON.stringify({
+                error:
+                  'The suggested query references field(s) that do not exist on ' +
+                  `${validation.index}: ${resolution.unknownFields.join(', ')}. Rewrite the ` +
+                  'suggestion with fields that exist there, or describe the limitation without ' +
+                  'naming a field filter.',
+              });
+            } else {
+              // 'verified' | 'no_field_filters' | 'unverifiable_index' | a SECOND 'unknown_fields'
+              // this turn (the retry above was already spent). Whenever the DSL actually shown lost
+              // field-level filters relative to what the model asked to show, the disclosure is
+              // appended to `reason` DETERMINISTICALLY -- the emitted reason must never promise a
+              // filter the emitted DSL does not carry (see
+              // SUGGESTED_QUERY_FIELDS_STRIPPED_DISCLOSURE's doc comment above). Written as an
+              // exhaustive switch (not a ternary on a derived boolean) so TypeScript's
+              // discriminated-union narrowing picks the right DSL field per outcome --
+              // 'unverifiable_index'/'unknown_fields' have no `.dsl`, and
+              // 'verified'/'no_field_filters' have no `.strippedDsl`.
+              let dsl: Record<string, unknown>;
+              let fieldsWereStripped: boolean;
+              switch (resolution.outcome) {
+                case 'verified':
+                case 'no_field_filters':
+                  dsl = resolution.dsl;
+                  fieldsWereStripped = false;
+                  break;
+                case 'unverifiable_index':
+                case 'unknown_fields':
+                  dsl = resolution.strippedDsl;
+                  fieldsWereStripped = true;
+                  break;
+              }
+              yield {
+                type: 'suggested_query',
+                index: validation.index,
+                dsl,
+                reason: fieldsWereStripped
+                  ? validation.reason + SUGGESTED_QUERY_FIELDS_STRIPPED_DISCLOSURE
+                  : validation.reason,
+              };
+              toolResultContent = JSON.stringify({
+                shown: true,
+                note:
+                  'The suggested query was shown to the user as an "Open in Discover" link. Now ' +
+                  'tell the user plainly, in your own words, what you could not check and why — ' +
+                  'do not repeat the query itself, the link already shows it.',
+              });
+            }
           }
 
           messages = [
