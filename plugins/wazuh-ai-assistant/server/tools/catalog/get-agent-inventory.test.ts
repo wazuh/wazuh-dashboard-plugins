@@ -148,7 +148,13 @@ test('get_agent_inventory: kind="packages" matches get_agent_packages\'s origina
   });
 });
 
-test('get_agent_inventory: kind="ports" matches get_agent_ports\'s original body exactly', () => {
+test('get_agent_inventory: kind="ports" matches get_agent_ports\'s original body, field CONTENTS unchanged, order intentionally reordered', () => {
+  // The original assertion pinned get_agent_ports's order; issue #8921's column-budget item
+  // deliberately re-ordered `_source` (its order drives digest.ts's deriveResultColumns, which
+  // decides which 6 of these 8 fields the client's visible-column budget shows without a
+  // row-expander click). NOTE: assert.deepEqual on an array is still ORDER-SENSITIVE — this
+  // test pins the NEW exact order (contents unchanged from the original set), it has not been
+  // relaxed to an order-insensitive check.
   const req = buildIndexer({ agent_id: '003', kind: 'ports' });
   assert.deepEqual(req, {
     target: 'indexer',
@@ -156,13 +162,13 @@ test('get_agent_inventory: kind="ports" matches get_agent_ports\'s original body
     body: {
       query: { bool: { filter: [{ term: { 'wazuh.agent.id': '003' } }] } },
       _source: [
-        'source.ip',
         'source.port',
-        'destination.ip',
-        'destination.port',
-        'network.transport',
         'interface.state',
         'process.name',
+        'network.transport',
+        'destination.ip',
+        'source.ip',
+        'destination.port',
         'process.pid',
       ],
       sort: ['_doc'],
