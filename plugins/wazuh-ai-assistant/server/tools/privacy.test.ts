@@ -667,6 +667,41 @@ test('applyFieldPolicy: a packages-kind get_agent_inventory digest keeps package
   assert.equal(out.samples[0]['package.architecture'], 'amd64');
 });
 
+test('applyFieldPolicy: a packages-kind get_agent_inventory digest anonymizes package.vendor while keeping name/version/architecture readable', () => {
+  // package.vendor is the deliberate exception in this group (see privacy.ts's comment on its
+  // entry): a distributor string ("Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>")
+  // routinely embeds a maintainer email address, unlike the pure software-identity fields above,
+  // so it stays 'anonymize' even though it sits right next to three 'allow' entries reading the
+  // exact same index. This also pins the OUTCOME the field-policy-coverage.test.ts fix protects:
+  // before `package.vendor` had this explicit entry, it reached this exact result only by
+  // accident (the deriveColumns fail-closed default), with no reviewed decision behind it.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_agent_inventory',
+    samples: [
+      {
+        'package.name': 'openssl',
+        'package.version': '3.0.2',
+        'package.architecture': 'amd64',
+        'package.vendor':
+          'Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>',
+      },
+    ],
+  });
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    undefined,
+    'get_agent_inventory',
+    true, // isEscapeHatch: true, matching get_agent_inventory's deriveColumns: true
+  );
+  assert.equal(out.samples[0]['package.name'], 'openssl');
+  assert.equal(out.samples[0]['package.version'], '3.0.2');
+  assert.equal(out.samples[0]['package.architecture'], 'amd64');
+  assert.match(out.samples[0]['package.vendor'] as string, /^VAL_\d+$/);
+});
+
 test('applyFieldPolicy: a ports-kind get_agent_inventory digest still anonymizes source.ip/destination.ip', () => {
   const p = new Pseudonymizer();
   const digest = baseDigest({
@@ -857,6 +892,46 @@ test('applyFieldPolicy: a "never" agg field drops only its own buckets', () => {
   assert.ok(out.breakdown);
   assert.equal(out.breakdown!.length, 1);
   assert.equal(out.breakdown![0].agg, 'by_rule');
+});
+
+test('applyFieldPolicy: get_agent_inventory packages breakdown anonymizes package.vendor buckets, not package.architecture', () => {
+  // Reproduces the exact reported defect against the REAL FIELD_POLICY_DEFAULTS + the identity
+  // map executor.ts builds for a breakdownDimensions tool (dimension -> itself, see executor.ts's
+  // `aggFields` fallback) -- before package.vendor had its own entry, this bucket already came out
+  // as an opaque VAL_n (the deriveColumns fail-closed default), but with no reviewed policy behind
+  // it; this pins that the SAME outcome now happens deliberately, and that the sibling
+  // package.architecture dimension (a real 'allow' entry) still reports its real bucket keys.
+  const p = new Pseudonymizer();
+  const digest = baseDigest({
+    tool: 'get_agent_inventory',
+    breakdown: [
+      { key: 'amd64', count: 40, agg: 'package.architecture' },
+      {
+        key: 'Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>',
+        count: 12,
+        agg: 'package.vendor',
+      },
+    ],
+  });
+  const aggFields = {
+    'package.architecture': 'package.architecture',
+    'package.vendor': 'package.vendor',
+  };
+  const out = applyFieldPolicy(
+    digest,
+    FIELD_POLICY_DEFAULTS,
+    p,
+    aggFields,
+    'get_agent_inventory',
+    true, // isEscapeHatch: true, matching get_agent_inventory's deriveColumns: true
+  );
+  assert.ok(out.breakdown);
+  const arch = out.breakdown!.find(b => b.agg === 'package.architecture')!;
+  const vendor = out.breakdown!.find(b => b.agg === 'package.vendor')!;
+  assert.equal(arch.key, 'amd64');
+  assert.match(vendor.key, /^VAL_\d+$/);
+  // The real vendor STRING (email address included) never appears in the scrubbed digest.
+  assert.doesNotMatch(JSON.stringify(out), /lists\.ubuntu\.com/);
 });
 
 test('applyFieldPolicy: message field is run through the whole-text scrub', () => {

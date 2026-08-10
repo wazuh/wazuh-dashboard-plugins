@@ -246,9 +246,16 @@ test('entity near-miss: agent names in the hint are pseudonymized when privacy m
   );
   const digest = parseDigest(outcome);
   const hint = digest.hint as string;
-  // Neither raw hostname reaches the digest's hint text under privacy mode.
-  assert.ok(!hint.includes('wazuh-aio-05'));
-  assert.ok(!hint.includes('wazuh-aio-5"'));
+  // Neither raw hostname reaches the digest's hint text under privacy mode. Word-boundary regexes,
+  // not substring checks: the hint quotes the REQUESTED name (`"wazuh-aio-05"`) but renders each
+  // SIBLING bare, with no trailing quote (see appendEntityNearMissHint's sentence template in
+  // executor.ts) — a plain `hint.includes('wazuh-aio-5"')` check (the sibling name plus a literal
+  // closing quote) can never match that bare form, so it stayed true whether or not the sibling
+  // actually leaked in cleartext, silently certifying nothing. `\b` anchors on both sides so
+  // "wazuh-aio-05" (the requested name) can never satisfy the "wazuh-aio-5" (its sibling) pattern
+  // or vice versa — the two differ by the zero-padded digit these near-miss tests are about.
+  assert.ok(!/\bwazuh-aio-05\b/.test(hint));
+  assert.ok(!/\bwazuh-aio-5\b/.test(hint));
   assert.match(hint, /HOST_\d+/);
   // The same two real values are recoverable from the pseudonymizer's own map (round-trip sanity).
   const entries = privacy.pseudonymizer.newEntries();
