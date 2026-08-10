@@ -374,10 +374,7 @@ describe('ResultTable', () => {
         <ResultTable
           spec={spec({
             columns: [{ id: 'ts', label: 'Time' }],
-            rows: [
-              { ts: '2026-07-26T05:58:38.000Z' },
-              { ts: undefined },
-            ],
+            rows: [{ ts: '2026-07-26T05:58:38.000Z' }, { ts: undefined }],
           })}
         />,
       );
@@ -397,7 +394,38 @@ describe('ResultTable', () => {
         />,
       );
       expect(screen.getByText('0')).toBeInTheDocument();
+      // `false` must render a VISIBLE "No" — asserting only the absence of the placeholder would
+      // pass on a blank cell too (React renders a boolean child as nothing), which is exactly the
+      // regression replacing EUI's default formatter could introduce.
+      expect(screen.getByText('No')).toBeInTheDocument();
       expect(screen.queryByText('—')).toBeNull();
+    });
+
+    it('renders booleans as Yes/No, never as blank cells', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'document.enabled', label: 'Enabled' }],
+            rows: [{ 'document.enabled': true }, { 'document.enabled': false }],
+          })}
+        />,
+      );
+      expect(screen.getByText('Yes')).toBeInTheDocument();
+      expect(screen.getByText('No')).toBeInTheDocument();
+    });
+
+    it('renders array values comma-joined, never concatenated', () => {
+      render(
+        <ResultTable
+          spec={spec({
+            columns: [{ id: 'document.tags', label: 'Tags' }],
+            rows: [{ 'document.tags': ['informational', 'wazuh-generic'] }],
+          })}
+        />,
+      );
+      expect(
+        screen.getByText('informational, wazuh-generic'),
+      ).toBeInTheDocument();
     });
   });
 

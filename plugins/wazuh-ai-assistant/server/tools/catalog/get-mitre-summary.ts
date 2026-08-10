@@ -14,35 +14,33 @@ import {
  * to `guardrails.ts`'s `AGG_FIELD_ALLOWLIST` for this tool (`keyword`-mapped and low-cardinality —
  * a finite technique catalog).
  *
- * Column design (issue #8921), the WORSE case of the sampled-label-falsehood class than
- * get-top-rules.ts: `wazuh.rule.mitre.technique.name`/`tactic.name` are MULTI-VALUE arrays on the
- * underlying document (one finding can carry several MITRE techniques), so the bucket key (one
- * technique id) does not even structurally determine which element of the sampled document's name
- * array corresponds to it — a doc tagged `technique.id: [T1059, T1071]` /
- * `technique.name: ["Command and Scripting Interpreter", "Application Layer Protocol"]`, sampled
- * into the T1059 bucket, has no positional guarantee that "Command and Scripting Interpreter" (the
- * first name) is actually T1059's name rather than T1071's. Adding `technique.id` itself to the
- * `top_hits` `_source` fixes that structurally: the id array and name array on any one document are
- * parallel by construction, so a consumer can zip them and pick the name at whichever index its own
- * id equals the bucket key — a positional match that was previously impossible because the id array
- * was never even sent. `distinct_names` (a `cardinality` sub-agg, same merge path as
- * get-top-rules.ts's `distinct_titles`) discloses the spread the same way; the visible columns are
- * relabeled "(sample)" so the falsehood is legible even without reading the id array.
+ * Column design (issue #8921): `wazuh.rule.mitre.technique.id`/`technique.name`/`tactic.name`
+ * are MULTI-VALUE arrays on the underlying document (get-mitre-findings.ts documents the id field
+ * as "a keyword-mapped array" — one finding can carry several techniques), so the bucket key (one
+ * technique id) does not structurally determine which element of a sampled document's name array
+ * corresponds to it: a doc tagged `technique.id: [T1059, T1071]`, sampled into the T1059 bucket,
+ * gives no positional guarantee that the FIRST name is T1059's. Adding `technique.id` itself to
+ * the `top_hits` `_source` fixes that structurally — the id and name arrays on any one document
+ * are parallel by construction, so a consumer can zip them and pick the name whose index matches
+ * the bucket key; the visible columns are relabeled "(sample)" so the sampling is legible.
+ *
+ * DELIBERATELY NOT SHIPPED: a `distinct_names`/`distinct_tactics` cardinality guard (the
+ * instrument get-top-rules.ts uses for its sampled title). It is the WRONG instrument here, and
+ * would itself be a new falsehood: within a bucket, `cardinality(technique.name)` counts the
+ * names of EVERY technique co-tagged on the bucket's documents — so a technique that by ATT&CK
+ * definition has exactly ONE name would read "Distinct names: 2" whenever its findings are
+ * co-tagged with a second technique. get_top_rules' spread guard is valid precisely because
+ * every doc in a rule-id bucket shares that rule id, and titles belong to the rule — no such
+ * per-bucket ownership exists for a multi-value MITRE array. The design doc
+ * (18-result-table-design.md, "Defect 1" table) records technique id -> technique name as 1:1
+ * per the ATT&CK catalog; the residue is POSITIONAL (which array slot belongs to the key), which
+ * the sampled id array above makes verifiable. The tactic column's residue is slightly wider (a
+ * technique can belong to two tactics) and is carried as a labeled sample for the same reason —
+ * see sampled-label-coverage.test.ts's field-scoped justifications, which record both.
  *
  * The adopted rule, verbatim: a sampled label may only be displayed where the key determines the
  * label; otherwise carry the spread and mark the label as a sample. Enforced registry-wide by
  * `catalog/sampled-label-coverage.test.ts`.
- *
- * `distinct_tactics` deliberately goes beyond this issue's literal column-design brief (which named
- * only a `technique.name` spread guard): `wazuh.rule.mitre.tactic.name` is sampled and relabeled
- * "(sample)" by that same brief, and it is EXACTLY the same multi-value-array failure mode as
- * `technique.name` (one technique routinely maps to more than one MITRE tactic) — shipping the rule
- * for one sampled column of this tool and not its sibling would make
- * `sampled-label-coverage.test.ts` fail against this very file, or force a false "1:1" justification
- * into that test's exemption map, which would be dishonest (a technique is not 1:1 with a tactic).
- * Digest-only (no new visible `tableSpec` column, keeping the 5-column design this issue asked
- * for) — same precedent as `catalog/common.ts`'s `FINDING_DIGEST_EXTRA_COLUMNS` (digest-visible
- * fields that are not table columns).
  */
 export const getMitreSummaryTool: ToolDefinition = {
   spec: {
@@ -87,12 +85,6 @@ export const getMitreSummaryTool: ToolDefinition = {
                   ],
                 },
               },
-              distinct_names: {
-                cardinality: { field: 'wazuh.rule.mitre.technique.name' },
-              },
-              distinct_tactics: {
-                cardinality: { field: 'wazuh.rule.mitre.tactic.name' },
-              },
             },
           },
         },
@@ -104,7 +96,6 @@ export const getMitreSummaryTool: ToolDefinition = {
     columns: [
       { field: 'wazuh.rule.mitre.technique.name', label: 'Technique (sample)' },
       { field: 'doc_count', label: 'Count' },
-      { field: 'distinct_names', label: 'Distinct names' },
       { field: 'wazuh.rule.mitre.tactic.name', label: 'Tactic (sample)' },
       { field: 'key', label: 'Technique ID' },
     ],
@@ -114,9 +105,7 @@ export const getMitreSummaryTool: ToolDefinition = {
       'key',
       'doc_count',
       'wazuh.rule.mitre.technique.name',
-      'distinct_names',
       'wazuh.rule.mitre.tactic.name',
-      'distinct_tactics',
       'wazuh.rule.mitre.technique.id',
     ],
   },

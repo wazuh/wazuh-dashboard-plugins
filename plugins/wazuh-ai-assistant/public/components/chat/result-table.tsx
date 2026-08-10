@@ -13,6 +13,7 @@ import {
   htmlIdGenerator,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
+import { MAX_VISIBLE_RESULT_COLUMNS } from '../../../common/types';
 import { TableSpec } from '../../../common/types';
 import { SeverityLevel } from '../../../common/constants';
 import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
@@ -114,7 +115,9 @@ const SHORT_COLUMN_MAX_WIDTH = 132;
 /**
  * Column-count budget (issue #8921's "no table may need a horizontal scrollbar" item): a
  * rendering INVARIANT applied here, in the one generic table renderer, rather than per-tool —
- * every current and future tool's `tableSpec` inherits it automatically. Only the first
+ * every current and future tool's `tableSpec` inherits it automatically. The value lives in
+ * common/types.ts (MAX_VISIBLE_RESULT_COLUMNS) so the server-side registry test can hold every
+ * tool's severity column inside the same budget this renderer applies. Only the first
  * `MAX_VISIBLE_COLUMNS` of `spec.columns` become visible table columns; the rest are NOT dropped —
  * `buildTableSpec` (server/tools/digest.ts) already puts every spec-column field into each row
  * object regardless of visibility, so a hidden column stays reachable through the row expander
@@ -124,7 +127,7 @@ const SHORT_COLUMN_MAX_WIDTH = 132;
  * independent caps that are allowed to disagree, same as before this existed for the static-column
  * tools.
  */
-const MAX_VISIBLE_COLUMNS = 6;
+const MAX_VISIBLE_COLUMNS = MAX_VISIBLE_RESULT_COLUMNS;
 
 /** Rendered in place of an absent value (`undefined`/`null`/`''`) in every column render path
  * (default, severity, timestamp) — issue #8921's "absent is rendered as absent" item. An em dash,
@@ -143,17 +146,51 @@ function isAbsentValue(value: unknown): boolean {
 /** Subdued em-dash placeholder for an absent cell — shared by every column render path so the
  * three (default/severity/timestamp) can never render three different "nothing here" spellings. */
 function renderAbsentPlaceholder(): React.ReactNode {
-  return <EuiTextColor color='subdued'>{ABSENT_VALUE_PLACEHOLDER}</EuiTextColor>;
+  return (
+    <EuiTextColor color='subdued'>{ABSENT_VALUE_PLACEHOLDER}</EuiTextColor>
+  );
 }
 
-/** Default-path cell renderer: the absent-value placeholder for `undefined`/`null`/`''`, otherwise
- * the value UNCHANGED (not stringified) — a non-empty value must render exactly as it did before
- * this existed, since EuiBasicTable's own no-`render` default cell behavior is "render the field
- * value as a child node" and this reproduces that behavior for every non-absent value. */
+/**
+ * Default-path cell renderer. Setting ANY `render` replaces EuiBasicTable's own default cell
+ * formatter, so this must reproduce sane formatting for every value shape, not just pass values
+ * through as React children — a raw `false`/`true` child renders as NOTHING in React (a blank
+ * cell indistinguishable from absent, on real columns: get_rules'/get_detectors' Enabled), and a
+ * raw array child renders concatenated with no separator ("informationalwazuh-generic..."). The
+ * explicit shapes below are deterministic and locally owned rather than delegating to EUI's
+ * internal formatAuto (whose exact behavior varies by EUI version):
+ *  - absent (`undefined`/`null`/`''`) -> the shared em-dash placeholder,
+ *  - boolean -> "Yes"/"No",
+ *  - array   -> elements joined with ", " (each formatted by these same rules),
+ *  - other objects -> JSON (never "[object Object]"),
+ *  - strings/numbers -> unchanged.
+ */
+function formatCellValue(value: unknown): string {
+  if (typeof value === 'boolean') {
+    return value ? 'Yes' : 'No';
+  }
+  if (Array.isArray(value)) {
+    return value
+      .filter(entry => !isAbsentValue(entry))
+      .map(entry => formatCellValue(entry))
+      .join(', ');
+  }
+  if (typeof value === 'object' && value !== null) {
+    return JSON.stringify(value);
+  }
+  return String(value);
+}
+
 function renderDefaultCell(value: unknown): React.ReactNode {
-  return isAbsentValue(value)
-    ? renderAbsentPlaceholder()
-    : (value as React.ReactNode);
+  if (isAbsentValue(value)) {
+    return renderAbsentPlaceholder();
+  }
+  if (typeof value === 'string' || typeof value === 'number') {
+    // Unchanged fast path: strings/numbers render exactly as EuiBasicTable rendered them with no
+    // `render` set.
+    return value as React.ReactNode;
+  }
+  return formatCellValue(value);
 }
 
 /** Length of the longest rendered value in a column (header included, so a short column never
@@ -473,7 +510,8 @@ const ResultTableInner: React.FC<ResultTableProps> = ({
           (hiddenColumnCount > 0
             ? i18n.translate('wazuhAiAssistant.resultTable.hiddenColumnsNote', {
                 defaultMessage:
-                  ' (+{count} more fields per row — expand a row to see them)',
+                  ' (+{count, plural, one {# more field} other {# more fields}}' +
+                  ' per row — expand a row to see them)',
                 values: { count: hiddenColumnCount },
               })
             : '')

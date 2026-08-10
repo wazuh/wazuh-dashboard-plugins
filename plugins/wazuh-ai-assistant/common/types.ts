@@ -121,6 +121,18 @@ export interface TableColumn {
   label: string;
 }
 
+/**
+ * Client-side column-count budget for rendered result tables (issue #8921: no table may need a
+ * horizontal scrollbar): only the first MAX_VISIBLE_RESULT_COLUMNS of a `TableSpec.columns` list
+ * render as visible table columns; the rest stay reachable through the row expander, since
+ * buildTableSpec (server/tools/digest.ts) puts every spec-column field into each row object
+ * regardless of visibility. Lives in common/ because BOTH sides consult it: result-table.tsx
+ * applies it, and server/tools/catalog/visible-column-budget-coverage.test.ts asserts every
+ * tool's severity column sits INSIDE it — a severity badge demoted past the budget is invisible,
+ * which is the exact "missing severity" defect the issue lists.
+ */
+export const MAX_VISIBLE_RESULT_COLUMNS = 6;
+
 export interface TableSpec {
   columns: TableColumn[];
   rows: Array<Record<string, unknown>>;

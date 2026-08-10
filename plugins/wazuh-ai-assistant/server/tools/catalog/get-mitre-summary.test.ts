@@ -26,12 +26,13 @@ test('get_mitre_summary: buildRequest targets wazuh-findings-v5* with an exists 
   assert.equal(request.body.size, 0);
 });
 
-// Issue #8921's WORSE case than get_top_rules: technique/tactic names are MULTI-VALUE arrays, so
-// the bucket key (one technique id) does not by itself say which array element is "its" name.
-// Sampling `technique.id` alongside the names restores a positional match (the two arrays are
-// parallel on any one document); `distinct_names` is the same spread-disclosure sub-agg
-// get_top_rules uses for its own sampled title.
-test('get_mitre_summary: aggregates by technique.id with a sample doc (incl. the parallel id array) and distinct_names', () => {
+// Issue #8921: technique/tactic names are MULTI-VALUE arrays, so the bucket key (one technique
+// id) does not by itself say which array element is "its" name. Sampling `technique.id`
+// alongside the names restores a positional match (the arrays are parallel on any one document).
+// A distinct_names cardinality guard is deliberately ABSENT — see get-mitre-summary.ts's doc
+// comment: within a bucket it would count co-tagged techniques' names, reporting a spread > 1
+// for a technique that has exactly one ATT&CK name (a new falsehood, not a disclosure).
+test('get_mitre_summary: aggregates by technique.id with a sample doc including the parallel id array', () => {
   const request = build({ limit: 10 });
   assert.deepEqual(request.body.aggs, {
     top_techniques: {
@@ -46,12 +47,6 @@ test('get_mitre_summary: aggregates by technique.id with a sample doc (incl. the
               'wazuh.rule.mitre.tactic.name',
             ],
           },
-        },
-        distinct_names: {
-          cardinality: { field: 'wazuh.rule.mitre.technique.name' },
-        },
-        distinct_tactics: {
-          cardinality: { field: 'wazuh.rule.mitre.tactic.name' },
         },
       },
     },
@@ -75,25 +70,22 @@ test('get_mitre_summary: tableSpec relabels the sampled columns "(sample)" and d
     [
       'wazuh.rule.mitre.technique.name',
       'doc_count',
-      'distinct_names',
       'wazuh.rule.mitre.tactic.name',
       'key',
     ],
   );
   assert.deepEqual(
     getMitreSummaryTool.tableSpec.columns.map(column => column.label),
-    ['Technique (sample)', 'Count', 'Distinct names', 'Tactic (sample)', 'Technique ID'],
+    ['Technique (sample)', 'Count', 'Tactic (sample)', 'Technique ID'],
   );
 });
 
-test('get_mitre_summary: digest.sampleColumns keeps "key" and adds distinct_names, distinct_tactics, and the technique id array', () => {
+test('get_mitre_summary: digest.sampleColumns keeps "key" and adds the technique id array', () => {
   assert.deepEqual(getMitreSummaryTool.digest.sampleColumns, [
     'key',
     'doc_count',
     'wazuh.rule.mitre.technique.name',
-    'distinct_names',
     'wazuh.rule.mitre.tactic.name',
-    'distinct_tactics',
     'wazuh.rule.mitre.technique.id',
   ]);
 });

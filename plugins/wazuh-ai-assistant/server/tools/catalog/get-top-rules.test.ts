@@ -16,7 +16,9 @@ test('get_top_rules: buildRequest targets wazuh-findings-v5* with a bounded @tim
   const request = build({ time_range_gte: 'now-7d', time_range_lte: 'now' });
   assert.equal(request.index, 'wazuh-findings-v5*');
   assert.deepEqual(request.body.query, {
-    bool: { filter: [{ range: { '@timestamp': { gte: 'now-7d', lte: 'now' } } }] },
+    bool: {
+      filter: [{ range: { '@timestamp': { gte: 'now-7d', lte: 'now' } } }],
+    },
   });
   assert.equal(request.body.size, 0);
 });
@@ -47,9 +49,8 @@ test('get_top_rules: aggregates by wazuh.rule.id with a sample title, distinct_t
 
 test('get_top_rules: clamps limit to the guardrails aggregation cap, not a larger ceiling', () => {
   const topRulesSize = (request: IndexerRequest): unknown =>
-    (
-      request.body.aggs as { top_rules: { terms: { size: unknown } } }
-    ).top_rules.terms.size;
+    (request.body.aggs as { top_rules: { terms: { size: unknown } } }).top_rules
+      .terms.size;
   assert.equal(topRulesSize(build({ limit: 9999 })), MAX_AGG_SIZE);
   assert.equal(topRulesSize(build({ limit: 0 })), 1);
 });
@@ -87,10 +88,7 @@ test('get_top_rules: digest.sampleColumns keeps "key" (demoted-not-deleted) and 
 });
 
 test('get_top_rules: description discloses that the title is a sample', () => {
-  assert.match(
-    getTopRulesTool.spec.description,
-    /title shown is a sample/i,
-  );
+  assert.match(getTopRulesTool.spec.description, /title shown is a sample/i);
 });
 
 test('get_top_rules: request passes checkIndexAllowlist, applySafetyValves, and lintDsl', () => {
