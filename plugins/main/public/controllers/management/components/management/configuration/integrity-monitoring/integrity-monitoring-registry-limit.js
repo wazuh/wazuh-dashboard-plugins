@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
@@ -41,18 +42,16 @@ class WzConfigurationIntegrityMonitoringRegistryLimit extends Component {
     return (
       <Fragment>
         {currentConfig &&
-        currentConfig['syscheck-syscheck'] &&
-        currentConfig['syscheck-syscheck'].syscheck &&
-        currentConfig['syscheck-syscheck'].syscheck[REGISTRY_LIMIT_PROP] ? (
+        currentConfig.fim &&
+        currentConfig.fim.syscheck &&
+        currentConfig.fim.syscheck[REGISTRY_LIMIT_PROP] ? (
           <WzConfigurationSettingsHeader
             title='Registries limit'
             description='Limit the maximum registries in the FIM database'
             help={helpLinks}
           >
             <WzConfigurationSettingsGroup
-              config={
-                currentConfig['syscheck-syscheck'].syscheck[REGISTRY_LIMIT_PROP]
-              }
+              config={currentConfig.fim.syscheck[REGISTRY_LIMIT_PROP]}
               items={mainSettings}
             />
           </WzConfigurationSettingsHeader>
@@ -63,5 +62,9 @@ class WzConfigurationIntegrityMonitoringRegistryLimit extends Component {
     );
   }
 }
+
+WzConfigurationIntegrityMonitoringRegistryLimit.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
 export default WzConfigurationIntegrityMonitoringRegistryLimit;

@@ -22,7 +22,6 @@ import WzConfigurationRegistrationService from './registration-service/registrat
 import WzConfigurationCluster from './cluster/cluster';
 import WzConfigurationIndexer from './indexer/indexer-configuration';
 import WzConfigurationClient from './client/client';
-import WzConfigurationClientBuffer from './client-buffer/client-buffer';
 import { WzConfigurationAlertsLabelsAgent } from './alerts/alerts-labels';
 import WzConfigurationPolicyMonitoring from './policy-monitoring/policy-monitoring';
 import WzConfigurationVulnerabilities from './vulnerabilities/vulnerabilities';
@@ -271,15 +270,6 @@ class WzConfigurationSwitch extends Component {
                     </WzViewSelectorSwitch>
                     <WzViewSelectorSwitch view='client'>
                       <WzConfigurationClient
-                        clusterNodeSelected={this.props.clusterNodeSelected}
-                        agent={agent}
-                        updateConfigurationSection={
-                          this.updateConfigurationSection
-                        }
-                      />
-                    </WzViewSelectorSwitch>
-                    <WzViewSelectorSwitch view='client-buffer'>
-                      <WzConfigurationClientBuffer
                         clusterNodeSelected={this.props.clusterNodeSelected}
                         agent={agent}
                         updateConfigurationSection={

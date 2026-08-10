@@ -39,7 +39,7 @@ jest.mock('../util-hocs/wz-config', () => () => Component => props => (
 
 // Linux Agent mocked data
 const linuxCurrentConfigMocked = {
-  'logcollector-localfile': {
+  logcollector: {
     localfile: [
       {
         file: '/var/wazuh-manager/logs/active-responses.log',
@@ -81,8 +81,8 @@ const linuxCurrentConfigMocked = {
         frequency: 360,
       },
     ],
+    socket: [],
   },
-  'logcollector-socket': {},
 };
 
 const linuxAgentMocked = {
@@ -139,7 +139,7 @@ const windowAgentMocked = {
 };
 
 const windowsCurrentConfigMocked = {
-  'logcollector-localfile': {
+  logcollector: {
     localfile: [
       {
         channel: 'Application',
@@ -177,8 +177,8 @@ const windowsCurrentConfigMocked = {
         target: ['agent'],
       },
     ],
+    socket: [],
   },
-  'logcollector-socket': {},
 };
 
 describe('Log Collection Section', () => {
@@ -212,9 +212,10 @@ describe('Log Collection Section', () => {
       fireEvent.click(getByText('Commands'));
       getByRole('heading', { name: /command monitoring/i });
       // buttons on left sidebar, showing alias
-      const localFilesWithAlias = linuxCurrentConfigMocked[
-        'logcollector-localfile'
-      ].localfile.filter(item => item.alias);
+      const localFilesWithAlias =
+        linuxCurrentConfigMocked.logcollector.localfile.filter(
+          item => item.alias,
+        );
       localFilesWithAlias.forEach(item => {
         getByRole('button', { name: new RegExp(item.alias || '', 'i') });
       });
@@ -233,9 +234,10 @@ describe('Log Collection Section', () => {
       fireEvent.click(getByText('Commands'));
       getByRole('heading', { name: /command monitoring/i });
       // check all sidebar buttons functionality and inputs showed
-      const localFilesWithAlias = linuxCurrentConfigMocked[
-        'logcollector-localfile'
-      ].localfile.filter(item => item.alias);
+      const localFilesWithAlias =
+        linuxCurrentConfigMocked.logcollector.localfile.filter(
+          item => item.alias,
+        );
       localFilesWithAlias.forEach(item => {
         const commandItem = getByRole('button', {
           name: new RegExp(item.alias || '', 'i'),
@@ -289,9 +291,10 @@ describe('Log Collection Section', () => {
       fireEvent.click(getByText('Windows Events'));
       getByRole('heading', { name: /windows events logs/i });
       // buttons on left sidebar, showing alias
-      const localFilesWithChannel = windowsCurrentConfigMocked[
-        'logcollector-localfile'
-      ].localfile.filter(item => item.logformat === 'eventchannel');
+      const localFilesWithChannel =
+        windowsCurrentConfigMocked.logcollector.localfile.filter(
+          item => item.logformat === 'eventchannel',
+        );
       localFilesWithChannel.forEach(item => {
         const eventBtn = getByRole('button', {
           name: new RegExp(`${item.channel}`, 'i'),
@@ -313,9 +316,10 @@ describe('Log Collection Section', () => {
       fireEvent.click(getByText('Windows Events'));
       getByRole('heading', { name: /windows events logs/i });
       // check all sidebar buttons functionality and inputs showed
-      const localFilesWithChannel = windowsCurrentConfigMocked[
-        'logcollector-localfile'
-      ].localfile.filter(item => item.logformat === 'eventchannel');
+      const localFilesWithChannel =
+        windowsCurrentConfigMocked.logcollector.localfile.filter(
+          item => item.logformat === 'eventchannel',
+        );
       localFilesWithChannel.forEach(item => {
         const eventBtn = getByRole('button', {
           name: new RegExp(`${item.channel}`, 'i'),

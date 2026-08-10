@@ -67,32 +67,27 @@ class WzConfigurationActiveResponseAgent extends Component {
     const { currentConfig, wazuhNotReadyYet } = this.props;
     return (
       <Fragment>
-        {currentConfig['com-active-response'] &&
-          isString(currentConfig['com-active-response']) && (
-            <WzNoConfig
-              error={currentConfig['com-active-response']}
-              help={helpLinks}
-            />
-          )}
-        {currentConfig['com-active-response'] &&
-          !isString(currentConfig['com-active-response']) &&
-          !currentConfig['com-active-response']['active-response'] && (
+        {currentConfig.execd && isString(currentConfig.execd) && (
+          <WzNoConfig error={currentConfig.execd} help={helpLinks} />
+        )}
+        {currentConfig.execd &&
+          !isString(currentConfig.execd) &&
+          !currentConfig.execd['active-response'] && (
             <WzNoConfig error='not-present' help={helpLinks} />
           )}
-        {wazuhNotReadyYet &&
-          (!currentConfig || !currentConfig['com-active-response']) && (
-            <WzNoConfig error='Server not ready yet' help={helpLinks} />
-          )}
-        {currentConfig['com-active-response'] &&
-          !isString(currentConfig['com-active-response']) &&
-          currentConfig['com-active-response']['active-response'] && (
+        {wazuhNotReadyYet && (!currentConfig || !currentConfig.execd) && (
+          <WzNoConfig error='Server not ready yet' help={helpLinks} />
+        )}
+        {currentConfig.execd &&
+          !isString(currentConfig.execd) &&
+          currentConfig.execd['active-response'] && (
             <WzConfigurationSettingsHeader
               title='Active response settings'
               description='Find here all the Active response settings for this agent'
               help={helpLinks}
             >
               <WzConfigurationSettingsGroup
-                config={currentConfig['com-active-response']['active-response']}
+                config={currentConfig.execd['active-response']}
                 items={mainSettings}
               />
             </WzConfigurationSettingsHeader>
@@ -106,13 +101,12 @@ const mapStateToProps = state => ({
   wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
 });
 
-const sectionsAgent = [{ component: 'com', configuration: 'active-response' }];
-
 WzConfigurationActiveResponseAgent.propTypes = {
   wazuhNotReadyYet: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+  currentConfig: PropTypes.object,
 };
 
 export default compose(
   connect(mapStateToProps),
-  withWzConfig(sectionsAgent),
+  withWzConfig(),
 )(WzConfigurationActiveResponseAgent);

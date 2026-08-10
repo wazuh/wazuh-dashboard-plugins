@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import withWzConfig from '../util-hocs/wz-config';
 import WzNoConfig from '../util-components/no-config';
@@ -37,10 +38,7 @@ class WzConfigurationIntegrityMonitoring extends Component {
     this.props.updateBadge(this.badgeEnabled());
   }
   badgeEnabled() {
-    return (
-      this.props.currentConfig?.['syscheck-syscheck']?.syscheck?.disabled ===
-      'no'
-    );
+    return this.props.currentConfig?.fim?.syscheck?.disabled === 'no';
   }
 
   render() {
@@ -48,21 +46,17 @@ class WzConfigurationIntegrityMonitoring extends Component {
     const agentPlatform = ((agent || {}).os || {}).platform;
     return (
       <Fragment>
-        {currentConfig['syscheck-syscheck'] &&
-          isString(currentConfig['syscheck-syscheck']) && (
-            <WzNoConfig
-              error={currentConfig['syscheck-syscheck']}
-              help={helpLinks}
-            />
-          )}
-        {currentConfig['syscheck-syscheck'] &&
-          !isString(currentConfig['syscheck-syscheck']) &&
-          !currentConfig['syscheck-syscheck'].syscheck && (
+        {currentConfig.fim && isString(currentConfig.fim) && (
+          <WzNoConfig error={currentConfig.fim} help={helpLinks} />
+        )}
+        {currentConfig.fim &&
+          !isString(currentConfig.fim) &&
+          !currentConfig.fim.syscheck && (
             <WzNoConfig error='not-present' help={helpLinks} />
           )}
-        {currentConfig['syscheck-syscheck'] &&
-          !isString(currentConfig['syscheck-syscheck']) &&
-          currentConfig['syscheck-syscheck'].syscheck && (
+        {currentConfig.fim &&
+          !isString(currentConfig.fim) &&
+          currentConfig.fim.syscheck && (
             <WzTabSelector>
               <WzTabSelectorTab label='General'>
                 <WzConfigurationIntegrityMonitoringGeneral {...this.props} />
@@ -103,6 +97,8 @@ class WzConfigurationIntegrityMonitoring extends Component {
   }
 }
 
-const sections = [{ component: 'syscheck', configuration: 'syscheck' }];
+WzConfigurationIntegrityMonitoring.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
-export default withWzConfig(sections)(WzConfigurationIntegrityMonitoring);
+export default withWzConfig()(WzConfigurationIntegrityMonitoring);

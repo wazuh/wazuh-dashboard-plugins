@@ -55,12 +55,6 @@ export default [
         goto: 'client',
         when: 'agent',
       },
-      {
-        name: 'Anti-flooding settings',
-        description: 'Agent bucket parameters to avoid event flooding',
-        goto: 'client-buffer',
-        when: 'agent',
-      },
       // Wazuh: Removed this section for the agent.
       // {
       //   name: 'Labels',

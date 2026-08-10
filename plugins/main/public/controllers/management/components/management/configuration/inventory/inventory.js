@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
@@ -79,16 +80,12 @@ class WzConfigurationInventory extends Component {
     const { currentConfig } = this.props;
     return (
       <Fragment>
-        {currentConfig['wmodules-wmodules'] &&
-          isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig
-              error={currentConfig['wmodules-wmodules']}
-              help={helpLinks}
-            />
-          )}
+        {isString(currentConfig?.syscollector) && (
+          <WzNoConfig error={currentConfig.syscollector} help={helpLinks} />
+        )}
         {currentConfig &&
           !this.wodleConfig.syscollector &&
-          !isString(currentConfig['wmodules-wmodules']) && (
+          !isString(currentConfig.syscollector) && (
             <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig && this.wodleConfig && this.wodleConfig.syscollector && (
@@ -114,6 +111,8 @@ class WzConfigurationInventory extends Component {
   }
 }
 
-const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
+WzConfigurationInventory.propTypes = {
+  currentConfig: PropTypes.object,
+};
 
-export default withWzConfig(sections)(WzConfigurationInventory);
+export default withWzConfig()(WzConfigurationInventory);
