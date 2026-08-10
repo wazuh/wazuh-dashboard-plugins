@@ -229,7 +229,7 @@ test('registry-wide coverage: EVERY catalog tool carries CAPABILITY_DENIAL_NOTE 
       fakeContext(),
     );
     const toolMessages = toolMessagesInCall(callMessages, 2);
-    const last = toolMessages.at(-1);
+    const last = toolMessages[toolMessages.length - 1];
     let parsed: { error?: unknown; note?: unknown } = {};
     try {
       parsed = last ? JSON.parse(last.content) : {};
@@ -484,7 +484,9 @@ test('orchestrate: a SECOND unknown_fields resolution emits stripped DSL + discl
   // (augmentToolError is a no-op for non-error content).
   const secondFailureToolMessages = toolMessagesInCall(callMessages, 3);
   assert.equal(secondFailureToolMessages.length, 2);
-  const secondParsed = JSON.parse(secondFailureToolMessages.at(-1)!.content);
+  const secondParsed = JSON.parse(
+    secondFailureToolMessages[secondFailureToolMessages.length - 1].content,
+  );
   assert.equal(secondParsed.shown, true);
   assert.notEqual(
     secondParsed.note,
@@ -546,7 +548,7 @@ test('orchestrate: a query_string clause -> bounded rewrite error, never shipped
 
   assert.equal(events.filter(e => e.type === 'suggested_query').length, 0);
   const toolMessages = toolMessagesInCall(callMessages, 2);
-  const parsed = JSON.parse(toolMessages.at(-1)!.content);
+  const parsed = JSON.parse(toolMessages[toolMessages.length - 1].content);
   assert.match(
     parsed.error,
     /clause type\(s\) whose field names cannot be verified/,
