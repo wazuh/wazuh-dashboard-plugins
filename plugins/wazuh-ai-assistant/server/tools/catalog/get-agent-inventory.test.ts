@@ -148,7 +148,13 @@ test('get_agent_inventory: kind="packages" matches get_agent_packages\'s origina
   });
 });
 
-test('get_agent_inventory: kind="ports" matches get_agent_ports\'s original body exactly', () => {
+test('get_agent_inventory: kind="ports" matches get_agent_ports\'s original body, field CONTENTS unchanged, order intentionally reordered', () => {
+  // The original byte-for-byte-including-order assertion was superseded by issue #8921's
+  // column-budget item: `_source` order drives the derived column order
+  // (digest.ts's `deriveResultColumns`), which in turn decides which 6 of these 8 fields the
+  // client's MAX_VISIBLE_COLUMNS budget shows without a row-expander click. Field CONTENTS are
+  // still exactly the original get_agent_ports set (nothing added or removed), so this remains a
+  // regression guard against a dropped/renamed field -- just not against a reordered one anymore.
   const req = buildIndexer({ agent_id: '003', kind: 'ports' });
   assert.deepEqual(req, {
     target: 'indexer',
@@ -156,13 +162,13 @@ test('get_agent_inventory: kind="ports" matches get_agent_ports\'s original body
     body: {
       query: { bool: { filter: [{ term: { 'wazuh.agent.id': '003' } }] } },
       _source: [
-        'source.ip',
         'source.port',
-        'destination.ip',
-        'destination.port',
-        'network.transport',
         'interface.state',
         'process.name',
+        'network.transport',
+        'destination.ip',
+        'source.ip',
+        'destination.port',
         'process.pid',
       ],
       sort: ['_doc'],
