@@ -57,6 +57,16 @@ export function buildSystemPrompt(nowIso: string): string {
       'query; if you cannot express it within its rules, say plainly what you can and cannot ' +
       'check with the available tools — never silently answer a narrower question than the one ' +
       'asked.',
+    'Some questions have NO tool that can answer them at all, no matter how closely a tool name ' +
+      'or a piece of data resembles the topic: whether Wazuh took an automated action (active ' +
+      'response, blocking, quarantine) in reply to something; agent communication-channel health ' +
+      'or message drop-rate (as opposed to enrollment/connection status, which get_agents does ' +
+      'cover); threat-intel enrichment/IOC data; and the raw, un-normalized event archive (as ' +
+      'opposed to the normalized event stream get_events_by_agent and search_wazuh_data do ' +
+      "cover). For these, do not substitute an adjacent tool's data as an approximation (e.g. a " +
+      'brute-force finding is not evidence of a block, and agent status is not comms-channel ' +
+      'health) — say plainly that this assistant has no access to that data and hand the user off ' +
+      'to check it directly in Wazuh.',
     'search_wazuh_data is a last resort: bool.filter context only, an explicit "@timestamp" range ' +
       'with both bounds (max 90 days back) on time-based indices, size <= 500, no scripts/regexp/' +
       'leading wildcards, and only wazuh-findings-v5-*/wazuh-events-v5-*/wazuh-states-* indices.',
@@ -79,6 +89,11 @@ export function buildSystemPrompt(nowIso: string): string {
       'include those fields in the "_source" list or your result will not contain them.',
     'get_sca_checks needs a policy_id from get_sca_results first; use result="failed" for ' +
       '"which checks fail" questions.',
+    'For "how many DISTINCT X" questions (e.g. distinct hosts/agents affected), a plain hit count ' +
+      '(hits.total) overcounts when the same host appears in multiple documents -- it is NOT a ' +
+      'distinct count. Use search_wazuh_data with a "cardinality" aggregation on an allowlisted ' +
+      'keyword field such as wazuh.agent.name instead (the allowlist is fixed and may grow over ' +
+      'time; an arbitrary field like source.user.name or file.path will be rejected).',
     'Never guess rule ids: if you do not know the exact wazuh.rule.id for a kind of finding, use ' +
       'search_findings_by_rule_tag with a wazuh.rule.tags value, or aggregate by rule first with ' +
       'get_top_rules to discover ids. If a narrowly-filtered query returns 0 rows for activity ' +
