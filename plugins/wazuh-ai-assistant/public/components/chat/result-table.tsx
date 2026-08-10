@@ -13,8 +13,7 @@ import {
   htmlIdGenerator,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
-import { MAX_VISIBLE_RESULT_COLUMNS } from '../../../common/types';
-import { TableSpec } from '../../../common/types';
+import { MAX_VISIBLE_RESULT_COLUMNS, TableSpec } from '../../../common/types';
 import { SeverityLevel } from '../../../common/constants';
 import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
 import {
