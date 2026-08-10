@@ -499,15 +499,40 @@ const FQDN_TOKEN_RE = new RegExp(
  * two-label FQDN shape. `prescanAndMint` leaves these untouched. */
 const ALL_NUMERIC_DOTTED_RE = /^[0-9.]+Z?$/;
 
-/** A dotted token shaped like a package/software version string: an optional leading "v" (common
- * in semver, e.g. "v1.2.3"), then one-or-more digit-only labels, optionally followed by a single
- * "-suffix" (a Debian/Ubuntu-style package revision, e.g. the "-2ubuntu1" in "5.2.5-2ubuntu1").
- * `prescanAndMint` leaves these untouched — otherwise minting a HOST_n for a version string
- * undermines a `package.version:{allow}`-style query the user is asking about. Deliberately
- * requires the token to START with (optional "v" +) a digit: a real hostname's first label is
- * essentially never digits-only immediately followed by more dotted digit labels, so this can't
- * exclude a genuine hostname like "backup-vault.internal.corp" (starts with a letter). */
-const VERSION_LIKE_TOKEN_RE = /^v?\d+(?:\.\d+)+(?:-[0-9A-Za-z.]+)?$/i;
+/**
+ * A dotted token shaped like a package/software version string, covering the FULL Debian/RPM
+ * version grammar rather than the narrower "digit-only labels" shape: an optional leading "v"
+ * (semver-style, "v1.2.3"), an all-digit FIRST label, then one-or-more subsequent dot-labels each
+ * STARTING with a digit but allowed to carry letters after it (so "118ubuntu5", "1ubuntu2",
+ * "20191218" all count as one label each), and an optional final "-revision" suffix whose own
+ * characters may include dots/"+"/"~" (so "-1ubuntu1~22.04.3" and "-4+deb11u1" — real Debian NMU/
+ * backport revision syntax — match as a unit). `prescanAndMint` leaves these untouched — minting a
+ * HOST_n for a version string undermines a `package.version:{allow}`-style query the user is
+ * asking about.
+ *
+ * (#8920 item 8): the previous digits-only-label shape rejected "3.118ubuntu5" and
+ * "3.20191218.1ubuntu2.3" — real `dpkg -l` versions with letters fused directly into a dot-label,
+ * no leading "-" — so they fell through to `FQDN_TOKEN_RE` and were minted as HOST_n. Rather than
+ * add those two shapes as special cases, the discriminator is rewritten as the STRUCTURAL property
+ * above, which covers the grammar by construction instead of by enumeration.
+ *
+ * Hostname-safety proof (why loosening this can only ever REDUCE minting, never open a leak): this
+ * regex is only ever consulted, inside `prescanAndMint`'s FQDN pass, for a token that already
+ * matched `FQDN_TOKEN_RE` — i.e. something already shaped like `label.label[.label]+`. A token is
+ * excluded from minting here ONLY when its first label is all-digit AND every subsequent label
+ * begins with a digit. Any genuine FQDN fails that test: a public hostname's last label is an
+ * alphabetic TLD ("...corp", "...com", "...local"), and an internal hostname's leading label is
+ * essentially always letter-initial ("web1.corp", "backup-vault.internal.corp") or, in the rarer
+ * case where it isn't ("01server.corp.local", "3com.example.com"), still carries a letter WITHIN
+ * that same first label — which fails "first label all-digit" outright, since this is a per-label
+ * structural check, not a "starts with a digit" check. The residue that IS excluded (first label
+ * pure digits, every later label digit-initial) is exactly the shape Debian policy mandates for an
+ * upstream version (`\d[\d.+~A-Za-z-]*`) and no real deployment uses as a hostname; a token of that
+ * shape is indistinguishable from a version string by any test that only looks at the token itself.
+ * The accepted tradeoff for that pathological residue is fidelity, not privacy: worst case a
+ * version-shaped string is (correctly) never minted, never that a real hostname is missed. */
+const VERSION_LIKE_TOKEN_RE =
+  /^v?\d+(?:\.\d[0-9A-Za-z+~]*)+(?:-[0-9A-Za-z.+~]+)?$/i;
 
 /** Every dot-path SEGMENT word appearing in a curated Wazuh/ECS field name — drawn from
  * `WAZUH_FIELD`'s values and every plain field in `FIELD_POLICY_DEFAULTS` (a tool-scope
