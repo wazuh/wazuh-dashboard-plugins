@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { listToolDefinitions } from './registry';
 import {
+  AGENT_NAME_PARAM_KEYS,
+  buildNearMissIncludePattern,
   extractRequestedAgentNames,
   findNearMissSiblings,
   normalizeAgentName,
@@ -22,7 +24,10 @@ test('normalizeAgentName: separator differences (hyphen/underscore/dot) normaliz
 });
 
 test('normalizeAgentName: case differences normalize equal', () => {
-  assert.equal(normalizeAgentName('WEB-PROD-01'), normalizeAgentName('web-prod-01'));
+  assert.equal(
+    normalizeAgentName('WEB-PROD-01'),
+    normalizeAgentName('web-prod-01'),
+  );
 });
 
 test('normalizeAgentName: genuinely distinct hosts (differing digit, not just padding) stay distinct', () => {
@@ -92,10 +97,9 @@ test('findNearMissSiblings: handles multiple requested names independently', () 
 // --- extractRequestedAgentNames -----------------------------------------------------------------
 
 test('extractRequestedAgentNames: reads a single agent_name string', () => {
-  assert.deepEqual(
-    extractRequestedAgentNames({ agent_name: 'web-prod-01' }),
-    ['web-prod-01'],
-  );
+  assert.deepEqual(extractRequestedAgentNames({ agent_name: 'web-prod-01' }), [
+    'web-prod-01',
+  ]);
 });
 
 test('extractRequestedAgentNames: reads an agent_names array, deduped', () => {
@@ -124,34 +128,129 @@ test('extractRequestedAgentNames: empty for a call naming no agent at all', () =
 });
 
 /**
- * Registry-driven assertion (issue #8920 item 6's coverage requirement): the predicate must fire
- * for EVERY tool in the registry that declares an `agent_name`/`agent_names` parameter, not just the
- * ones this test happens to name -- `verifiedBaseNotes` confirmed these four on the base registry
- * (search_findings_by_agent, search_findings_by_multiple_agents, get_events_by_agent,
- * get_agent_inventory); this loop also protects a FUTURE tool that adds the same param from being
- * silently unreachable by this disclosure.
+ * Registry-driven coverage (issue #8920 item 6): every DECLARED tool parameter whose name looks
+ * agent-name-shaped must be one extractRequestedAgentNames actually reads. The previous version
+ * of this test filtered the registry on the exact keys the extractor already knew about and then
+ * asserted a hand-built literal -- which is structurally incapable of failing for a param under
+ * any OTHER name, and is exactly how get_vulnerabilities_by_agent's `agent_identifier` (the
+ * reported instance's own vulnerability leg) slipped through. This version derives the
+ * candidates from a LOOSE name-shape regex over each tool's real declared params, so a future
+ * `agent_hostname`/`agent_display_name` param fails here until AGENT_NAME_PARAM_KEYS (and
+ * therefore the extractor) covers it.
  */
-test('extractRequestedAgentNames fires for every registry tool declaring agent_name/agent_names', () => {
-  const agentNameTools = listToolDefinitions().filter(
-    def =>
-      'agent_name' in def.spec.parameters.properties ||
-      'agent_names' in def.spec.parameters.properties,
-  );
+const AGENT_NAMEISH_PARAM_RE = /agent.*(name|identifier|host)/i;
+
+test('every agent-name-shaped registry param is read by extractRequestedAgentNames', () => {
+  const failures: string[] = [];
+  const matchedTools: string[] = [];
+  for (const def of listToolDefinitions()) {
+    const agentParams = Object.keys(def.spec.parameters.properties).filter(
+      name => AGENT_NAMEISH_PARAM_RE.test(name),
+    );
+    if (agentParams.length === 0) {
+      continue;
+    }
+    matchedTools.push(def.spec.name);
+    for (const paramName of agentParams) {
+      if (!(AGENT_NAME_PARAM_KEYS as readonly string[]).includes(paramName)) {
+        failures.push(
+          `${def.spec.name}/${paramName}: agent-name-shaped param is not in ` +
+            'AGENT_NAME_PARAM_KEYS, so the near-miss disclosure never reads it',
+        );
+        continue;
+      }
+      const prop = def.spec.parameters.properties[paramName] as {
+        type?: string;
+      };
+      const value = prop.type === 'array' ? ['web-prod-01'] : 'web-prod-01';
+      const extracted = extractRequestedAgentNames({ [paramName]: value });
+      if (!extracted.includes('web-prod-01')) {
+        failures.push(
+          `${def.spec.name}/${paramName}: extractRequestedAgentNames did not read a value ` +
+            'passed under this declared param',
+        );
+      }
+    }
+  }
+  // The 5 known agent-name tools on this base: search_findings_by_agent,
+  // search_findings_by_multiple_agents, get_events_by_agent, get_agent_inventory, and
+  // get_vulnerabilities_by_agent (agent_identifier).
   assert.ok(
-    agentNameTools.length >= 4,
-    `expected at least the 4 known agent_name/agent_names tools, found ${agentNameTools.length}: ` +
-      agentNameTools.map(def => def.spec.name).join(', '),
+    matchedTools.length >= 5,
+    `expected at least 5 agent-name tools, found ${matchedTools.length}: ` +
+      matchedTools.join(', '),
   );
-  for (const def of agentNameTools) {
-    const usesArray = 'agent_names' in def.spec.parameters.properties;
-    const params = usesArray
-      ? { agent_names: ['web-prod-01'] }
-      : { agent_name: 'web-prod-01' };
-    const extracted = extractRequestedAgentNames(params);
-    assert.deepEqual(
-      extracted,
-      ['web-prod-01'],
-      `${def.spec.name}: extractRequestedAgentNames did not fire for its own declared param`,
+  assert.deepEqual(failures, []);
+});
+
+test('AGENT_NAMEISH_PARAM_RE mechanism: a differently-named agent param would be caught', () => {
+  // Self-test in the field-policy-coverage.test.ts "mechanism" style: the loop above can only
+  // fail for a param its regex actually matches, so pin the regex against the shapes that have
+  // already slipped through once (agent_identifier) or plausibly could next.
+  for (const name of [
+    'agent_name',
+    'agent_names',
+    'agent_identifier',
+    'agent_hostname',
+    'agent_display_name',
+  ]) {
+    assert.ok(AGENT_NAMEISH_PARAM_RE.test(name), `${name} must match`);
+  }
+  // And params that are NOT agent names must not be dragged in.
+  for (const name of ['agent_id', 'os_name', 'limit', 'technique_id']) {
+    assert.ok(!AGENT_NAMEISH_PARAM_RE.test(name), `${name} must not match`);
+  }
+});
+
+test('extractRequestedAgentNames: reads agent_identifier (get_vulnerabilities_by_agent)', () => {
+  assert.deepEqual(
+    extractRequestedAgentNames({ agent_identifier: 'wazuh-aio-5' }),
+    ['wazuh-aio-5'],
+  );
+});
+
+// --- buildNearMissIncludePattern -----------------------------------------------------------------
+
+/** JS approximation of Lucene regexp matching: Lucene anchors the whole pattern by default, and
+ * the subset this builder emits (character classes, `*`, `|`, escaped literals) is syntactically
+ * identical in JS -- so `^(?:pattern)$` reproduces the terms-agg `include` semantics closely
+ * enough to pin the builder's behaviour. */
+function matchesInclude(pattern: string, candidate: string): boolean {
+  return new RegExp(`^(?:${pattern})$`).test(candidate);
+}
+
+test('buildNearMissIncludePattern: matches every padding/separator/case variant of the requested name', () => {
+  const pattern = buildNearMissIncludePattern(['wazuh-aio-5']);
+  assert.ok(pattern);
+  for (const candidate of [
+    'wazuh-aio-5',
+    'wazuh-aio-05',
+    'WAZUH_AIO_005',
+    'wazuh.aio.5',
+    'wazuhaio5',
+  ]) {
+    assert.ok(
+      matchesInclude(pattern!, candidate),
+      `${candidate} must match the include pattern`,
     );
   }
+});
+
+test('buildNearMissIncludePattern: does not match genuinely different names', () => {
+  const pattern = buildNearMissIncludePattern(['wazuh-aio-5']);
+  assert.ok(pattern);
+  for (const candidate of ['web-prod-01', 'wazuh-aio-50', 'wazuh-aio']) {
+    assert.ok(
+      !matchesInclude(pattern!, candidate),
+      `${candidate} must NOT match the include pattern`,
+    );
+  }
+});
+
+test('buildNearMissIncludePattern: multiple requested names OR together; empty input yields none', () => {
+  const pattern = buildNearMissIncludePattern(['web-01', 'db-02']);
+  assert.ok(pattern);
+  assert.ok(matchesInclude(pattern!, 'web-001'));
+  assert.ok(matchesInclude(pattern!, 'DB-2'));
+  assert.equal(buildNearMissIncludePattern([]), undefined);
 });

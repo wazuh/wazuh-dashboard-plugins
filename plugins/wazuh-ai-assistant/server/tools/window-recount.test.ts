@@ -31,12 +31,33 @@ test('findTimestampRange: returns undefined for a states-index body with no @tim
   assert.equal(findTimestampRange(body), undefined);
 });
 
+test('findTimestampRange: returns a gt/lt-bounded clause verbatim (lintDsl accepts those too)', () => {
+  const body = {
+    query: {
+      bool: {
+        filter: [{ range: { '@timestamp': { gt: 'now-24h', lt: 'now' } } }],
+      },
+    },
+  };
+  assert.deepEqual(findTimestampRange(body), { gt: 'now-24h', lt: 'now' });
+  // And widening replaces the WHOLE bounds object, so the widened copy uses gte/lte defaults.
+  const widened = widenToDefaultWindow(body);
+  assert.ok(widened);
+  assert.deepEqual(findTimestampRange(widened as Record<string, unknown>), {
+    gte: DEFAULT_TIME_RANGE_GTE,
+    lte: DEFAULT_TIME_RANGE_LTE,
+  });
+});
+
 test('findTimestampRange: returns undefined for a body with no query at all', () => {
   assert.equal(findTimestampRange({}), undefined);
 });
 
 test('findTimestampRange: returns undefined when filter is not an array', () => {
-  assert.equal(findTimestampRange({ query: { bool: { filter: {} } } }), undefined);
+  assert.equal(
+    findTimestampRange({ query: { bool: { filter: {} } } }),
+    undefined,
+  );
 });
 
 // --- widenToDefaultWindow ---------------------------------------------------------------------
@@ -65,6 +86,9 @@ test('widenToDefaultWindow: a narrow ISO window widens to the plugin default win
     lte: DEFAULT_TIME_RANGE_LTE,
   });
   assert.equal(widened?.size, 0);
+  // Intent only: applySafetyValves clamps track_total_hits to MAX_TRACK_TOTAL_HITS (10000)
+  // before execution, so the EXECUTED recount reports value<=10000 with relation:'gte' beyond.
+  // The executed behaviour (the "at least N" hint wording) is pinned in executor.test.ts.
   assert.equal(widened?.track_total_hits, true);
   assert.equal('aggs' in (widened as object), false);
   assert.equal('aggregations' in (widened as object), false);
@@ -209,7 +233,9 @@ test('every time-ranged indexer tool builds a request widenable to exactly the d
       range.lte !== DEFAULT_TIME_RANGE_LTE
     ) {
       failures.push(
-        `${def.spec.name}: widened range is not exactly the default window -- got ${JSON.stringify(
+        `${
+          def.spec.name
+        }: widened range is not exactly the default window -- got ${JSON.stringify(
           range,
         )}`,
       );

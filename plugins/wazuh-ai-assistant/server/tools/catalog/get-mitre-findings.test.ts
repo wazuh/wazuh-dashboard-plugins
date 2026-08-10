@@ -42,14 +42,14 @@ test('get_mitre_findings: a bare parent id ("T1059") rolls up to term + sibling 
   });
 });
 
-test('get_mitre_findings: rollup is case-insensitive on the leading "T"', () => {
+test('get_mitre_findings: a lowercase id is uppercased before querying (keyword term/prefix are case-sensitive)', () => {
   const req = buildIndexer({ technique_id: 't1110' });
   assert.deepEqual(filters(req)[0], {
     bool: {
       minimum_should_match: 1,
       should: [
-        { term: { 'wazuh.rule.mitre.technique.id': 't1110' } },
-        { prefix: { 'wazuh.rule.mitre.technique.id': 't1110.' } },
+        { term: { 'wazuh.rule.mitre.technique.id': 'T1110' } },
+        { prefix: { 'wazuh.rule.mitre.technique.id': 'T1110.' } },
       ],
     },
   });

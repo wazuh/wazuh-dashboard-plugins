@@ -27,16 +27,22 @@ const PARENT_TECHNIQUE_ID_RE = /^T\d+$/i;
  * `technique-rollup-coverage.test.ts` pins both halves of this for every present and future tool
  * with a technique-id parameter, not just this one.
  */
-function buildMitreTechniqueFilter(techniqueId: string): Record<string, unknown> {
-  if (!PARENT_TECHNIQUE_ID_RE.test(techniqueId)) {
-    return { term: { 'wazuh.rule.mitre.technique.id': techniqueId } };
+function buildMitreTechniqueFilter(
+  techniqueId: string,
+): Record<string, unknown> {
+  // MITRE ids are indexed UPPERCASE and `term`/`prefix` on a keyword field are case-sensitive:
+  // a caller's "t1110" would otherwise build a query that matches nothing at all — a silent
+  // 0-row lie, strictly worse than the undercount this rollup fixes.
+  const normalized = techniqueId.toUpperCase();
+  if (!PARENT_TECHNIQUE_ID_RE.test(normalized)) {
+    return { term: { 'wazuh.rule.mitre.technique.id': normalized } };
   }
   return {
     bool: {
       minimum_should_match: 1,
       should: [
-        { term: { 'wazuh.rule.mitre.technique.id': techniqueId } },
-        { prefix: { 'wazuh.rule.mitre.technique.id': `${techniqueId}.` } },
+        { term: { 'wazuh.rule.mitre.technique.id': normalized } },
+        { prefix: { 'wazuh.rule.mitre.technique.id': `${normalized}.` } },
       ],
     },
   };
