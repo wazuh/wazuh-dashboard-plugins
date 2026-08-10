@@ -54,7 +54,7 @@ const fakeRequest = {} as ExecRequest;
 // not `deriveColumns` itself -- and that an explicit FIELD_POLICY_DEFAULTS entry wins over the
 // fail-closed default for a real get_agent_inventory call. ---------------------------------------
 
-test('executeToolCall: get_agent_inventory keeps package.name/package.version readable under privacy mode, still anonymizing package.vendor (no entry)', async () => {
+test('executeToolCall: get_agent_inventory keeps package.name/package.version readable under privacy mode, still anonymizing package.vendor', async () => {
   const context = fakeSearchContext([
     {
       package: {
@@ -85,8 +85,11 @@ test('executeToolCall: get_agent_inventory keeps package.name/package.version re
   assert.equal(digest.samples[0]['package.name'], 'adduser');
   assert.equal(digest.samples[0]['package.version'], '3.118ubuntu5');
   assert.equal(digest.samples[0]['package.architecture'], 'all');
-  // package.vendor has no FIELD_POLICY_DEFAULTS entry -- get_agent_inventory's
-  // `failClosedFieldPolicy: true` must still fail it closed.
+  // package.vendor has an explicit 'anonymize' FIELD_POLICY_DEFAULTS entry (a vendor/distributor
+  // string routinely embeds a maintainer email address -- see privacy.ts's comment on that entry)
+  // -- it comes back pseudonymized on that explicit basis, not via
+  // get_agent_inventory's `failClosedFieldPolicy: true` unlisted-field default (see the dedicated
+  // decoupling-proof test below for that case, which uses a genuinely unlisted field instead).
   assert.match(
     digest.samples[0]['package.vendor'] as string,
     /^(HOST|IP|USER|URL|VAL)_\d+$/,
@@ -117,8 +120,16 @@ test('executeToolCall: privacy off leaves get_agent_inventory digest completely 
 test('executeToolCall: unlisted-field fail-closed tracks failClosedFieldPolicy, not deriveColumns (decoupling proof)', async () => {
   // Flips ONLY `failClosedFieldPolicy` on the real, registered get_agent_inventory tool --
   // `deriveColumns` stays `true` throughout. If the executor still keyed off `deriveColumns` (the
-  // pre-#8917 bug this test guards against), this would have no effect and package.vendor would
-  // still come back fail-closed.
+  // pre-#8917 bug this test guards against), this would have no effect and the unlisted field
+  // would still come back fail-closed.
+  //
+  // Uses `kind: 'os'` / `host.os.full` rather than `kind: 'packages'` / `package.vendor` (this
+  // test's original target): `package.vendor` gained its own explicit FIELD_POLICY_DEFAULTS
+  // 'anonymize' entry (see privacy.ts's comment on that entry), so it is no longer unlisted and
+  // would stay anonymized regardless of this flag -- that entry, not the flag, was masking this
+  // test's own regression signal. `host.os.full` has no FIELD_POLICY_DEFAULTS entry of its own
+  // (unlike its siblings host.os.name/version/platform above it in INVENTORY_KIND_CONFIG's `os`
+  // source list), so it stays a genuine unlisted field for this proof.
   const { getAgentInventoryTool } = await import(
     './catalog/get-agent-inventory'
   );
@@ -128,10 +139,8 @@ test('executeToolCall: unlisted-field fail-closed tracks failClosedFieldPolicy, 
     getAgentInventoryTool.failClosedFieldPolicy = false;
     const context = fakeSearchContext([
       {
-        package: {
-          name: 'adduser',
-          version: '3.118ubuntu5',
-          vendor: 'Ubuntu Developers',
+        host: {
+          os: { full: 'Ubuntu 22.04.1 LTS' },
         },
       },
     ]);
@@ -143,7 +152,7 @@ test('executeToolCall: unlisted-field fail-closed tracks failClosedFieldPolicy, 
       {
         id: 'call-1',
         name: 'get_agent_inventory',
-        arguments: { agent_id: '001', kind: 'packages' },
+        arguments: { agent_id: '001', kind: 'os' },
       },
       context,
       fakeRequest,
@@ -152,10 +161,10 @@ test('executeToolCall: unlisted-field fail-closed tracks failClosedFieldPolicy, 
     const digest = JSON.parse(outcome.toolResultContent) as {
       samples: Array<Record<string, unknown>>;
     };
-    // With failClosedFieldPolicy: false, package.vendor (no FIELD_POLICY_DEFAULTS entry) now
-    // falls under plain allow-by-omission instead of failing closed -- proving the executor reads
-    // this flag, and only this flag, to decide.
-    assert.equal(digest.samples[0]['package.vendor'], 'Ubuntu Developers');
+    // With failClosedFieldPolicy: false, host.os.full (no FIELD_POLICY_DEFAULTS entry) now falls
+    // under plain allow-by-omission instead of failing closed -- proving the executor reads this
+    // flag, and only this flag, to decide.
+    assert.equal(digest.samples[0]['host.os.full'], 'Ubuntu 22.04.1 LTS');
   } finally {
     getAgentInventoryTool.failClosedFieldPolicy = original;
   }
