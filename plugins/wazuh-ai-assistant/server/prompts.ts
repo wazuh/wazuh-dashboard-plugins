@@ -118,7 +118,7 @@ export function buildSystemPrompt(nowIso: string): string {
       "cover). For these, do not substitute an adjacent tool's data as an approximation (e.g. a " +
       'brute-force finding is not evidence of a block, and agent status is not comms-channel ' +
       'health) — say plainly that this assistant has no access to that data and hand the user off ' +
-      'to check it directly in Wazuh.'
+      'to check it directly in Wazuh.',
     'search_wazuh_data is a last resort: bool.filter context only, an explicit "@timestamp" range ' +
       'with both bounds (max 90 days back) on time-based indices, size <= 500, no scripts/regexp/' +
       'leading wildcards, and only wazuh-findings-v5-*/wazuh-events-v5-*/wazuh-states-* indices.',
