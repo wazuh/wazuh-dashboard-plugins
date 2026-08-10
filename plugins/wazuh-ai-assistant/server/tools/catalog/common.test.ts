@@ -168,4 +168,3 @@ test('VULN_BREAKDOWN_AGGS declares one terms aggregation per VULN_BREAKDOWN_DIME
     assert.equal(agg.terms?.size, BREAKDOWN_BUCKET_CAP);
   }
 });
-

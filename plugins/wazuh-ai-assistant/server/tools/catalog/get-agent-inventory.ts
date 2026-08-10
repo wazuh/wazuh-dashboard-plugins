@@ -21,7 +21,7 @@ import { BREAKDOWN_BUCKET_CAP } from '../digest';
  * they can be added the same way `hotfixes` was tonight -- see this file's own doc comment on
  * `INVENTORY_KIND_CONFIG` for what "verified" means in practice.
  */
-const INVENTORY_KINDS = [
+export const INVENTORY_KINDS = [
   'os',
   'packages',
   'ports',
@@ -30,7 +30,7 @@ const INVENTORY_KINDS = [
 ] as const;
 type InventoryKind = (typeof INVENTORY_KINDS)[number];
 
-interface InventoryKindConfig {
+export interface InventoryKindConfig {
   /** The concrete `wazuh-states-inventory-*` index this kind reads. `os` is the one naming
    * exception carried over from get-agent-os.ts: it reads the `system` sub-index, not a literal
    * `os` one. */
@@ -51,17 +51,30 @@ interface InventoryKindConfig {
   fixedSize?: number;
   /**
    * Real `terms` aggregation(s) attached to `body.aggs` for a kind whose completeness question
-   * ("how many ports are listening vs closed", "how many processes are running vs zombie") needs a
-   * population-true categorical breakdown (issue #8920 item 1: a plain hits search left a
-   * `limit`-truncated page silently narrated as if it were the whole inventory). OpenSearch
-   * computes `aggregations` over the FULL matched set regardless of `size`, so this stays correct
-   * even when `limit` truncates the returned rows; digest.ts's `buildBreakdown` already reads any
-   * response's `aggregations` generically, so this needs no digest change. `os`/`packages`/
-   * `hotfixes` deliberately have NONE: `os` is capped at `fixedSize: 5` (already effectively the
-   * whole population, no truncation to disclose against); `packages`/`hotfixes` have no
-   * low-cardinality categorical field whose completeness a breakdown would add beyond what
-   * `counts.total` (the digest's own population-true row count) already answers -- see
-   * `population-disclosure-coverage.test.ts`'s per-kind exemption reasoning for this tool.
+   * ("how many ports are listening vs closed") needs a population-true categorical breakdown
+   * (issue #8920 item 1: a plain hits search left a `limit`-truncated page silently narrated as
+   * if it were the whole inventory). OpenSearch computes `aggregations` over the FULL matched set
+   * regardless of `size`, so this stays correct even when `limit` truncates the returned rows;
+   * digest.ts's `buildBreakdown` already reads any response's `aggregations` generically, so this
+   * needs no digest change.
+   *
+   * A real aggregation requires an AGG_FIELD_ALLOWLIST entry AND live keyword-mapping evidence
+   * for its field (a `terms` agg on a text-mapped field is a hard 400, turning a fidelity gap
+   * into a broken tool for that kind — worse than the disclosure gap it fixes). Only `ports`
+   * meets that bar today: this repo's own IT Hygiene dashboards already run terms aggregations
+   * on `interface.state` (plugins/main/.../it-hygiene/dashboards/dashboard-panels.ts) and
+   * aggregate `network.transport` in the services/traffic panels, which is live proof both are
+   * aggregatable keywords. Kinds WITHOUT that evidence take the digest-level
+   * `breakdownDimensions` fallback instead (see `digest` below): it groups the RETURNED rows via
+   * getByPath, so it needs no mapping guarantee and can never hard-fail — page-scoped (with
+   * `breakdownNote`) when the result is limit-truncated, exact otherwise. `processes` uses that
+   * fallback for `process.state` (only a KQL filter exists in-repo, not an aggregation — no
+   * keyword-mapping proof; promote to a real agg here once a live `terms` agg on
+   * wazuh-states-inventory-processes is verified) and `packages` for
+   * `package.architecture`/`package.vendor`. `os` (fixedSize: 5 — effectively the whole
+   * population) and `hotfixes` (single free-text name field, no categorical dimension) carry
+   * neither; the per-kind coverage test in get-agent-inventory.test.ts enumerates every kind
+   * against exactly this map, so a 6th kind cannot ship without a breakdown or a written reason.
    */
   breakdownAggs?: Record<string, unknown>;
 }
@@ -81,73 +94,75 @@ interface InventoryKindConfig {
  * no checked-in evidence either way, this stays to the one field actually confirmed. The other 8
  * uncovered kinds each need this same standard of evidence before being added.
  */
-const INVENTORY_KIND_CONFIG: Record<InventoryKind, InventoryKindConfig> = {
-  os: {
-    index: 'wazuh-states-inventory-system*',
-    source: [
-      'host.hostname',
-      'host.os.name',
-      'host.os.version',
-      'host.os.platform',
-      'host.os.full',
-      'host.architecture',
-    ],
-    fixedSize: 5,
-  },
-  packages: {
-    index: 'wazuh-states-inventory-packages*',
-    source: [
-      'package.name',
-      'package.version',
-      'package.architecture',
-      'package.vendor',
-    ],
-    limitRange: [50, 500],
-  },
-  ports: {
-    index: 'wazuh-states-inventory-ports*',
-    source: [
-      'source.ip',
-      'source.port',
-      'destination.ip',
-      'destination.port',
-      'network.transport',
-      'interface.state',
-      'process.name',
-      'process.pid',
-    ],
-    limitRange: [50, 500],
-    breakdownAggs: {
-      interface_state: {
-        terms: { field: 'interface.state', size: BREAKDOWN_BUCKET_CAP },
-      },
-      network_transport: {
-        terms: { field: 'network.transport', size: BREAKDOWN_BUCKET_CAP },
+// Exported for get-agent-inventory.test.ts's per-kind coverage loop only — a 6th kind added to
+// this map is automatically held to "breakdownAggs, breakdownDimensions coverage, or a written
+// reason" by that test, without the test hardcoding kind names.
+export const INVENTORY_KIND_CONFIG: Record<InventoryKind, InventoryKindConfig> =
+  {
+    os: {
+      index: 'wazuh-states-inventory-system*',
+      source: [
+        'host.hostname',
+        'host.os.name',
+        'host.os.version',
+        'host.os.platform',
+        'host.os.full',
+        'host.architecture',
+      ],
+      fixedSize: 5,
+    },
+    packages: {
+      index: 'wazuh-states-inventory-packages*',
+      source: [
+        'package.name',
+        'package.version',
+        'package.architecture',
+        'package.vendor',
+      ],
+      limitRange: [50, 500],
+    },
+    ports: {
+      index: 'wazuh-states-inventory-ports*',
+      source: [
+        'source.ip',
+        'source.port',
+        'destination.ip',
+        'destination.port',
+        'network.transport',
+        'interface.state',
+        'process.name',
+        'process.pid',
+      ],
+      limitRange: [50, 500],
+      breakdownAggs: {
+        interface_state: {
+          terms: { field: 'interface.state', size: BREAKDOWN_BUCKET_CAP },
+        },
+        network_transport: {
+          terms: { field: 'network.transport', size: BREAKDOWN_BUCKET_CAP },
+        },
       },
     },
-  },
-  processes: {
-    index: 'wazuh-states-inventory-processes*',
-    source: [
-      'process.pid',
-      'process.name',
-      'process.state',
-      'process.parent.pid',
-      'process.command_line',
-    ],
-    limitRange: [50, 500],
-    breakdownAggs: {
-      process_state: {
-        terms: { field: 'process.state', size: BREAKDOWN_BUCKET_CAP },
-      },
+    processes: {
+      index: 'wazuh-states-inventory-processes*',
+      source: [
+        'process.pid',
+        'process.name',
+        'process.state',
+        'process.parent.pid',
+        'process.command_line',
+      ],
+      limitRange: [50, 500],
+      // No breakdownAggs: process.state has no in-repo keyword-mapping evidence (see the
+      // InventoryKindConfig doc comment) — covered by the digest-level breakdownDimensions
+      // fallback instead.
     },
-  },
-  hotfixes: {
-    index: 'wazuh-states-inventory-hotfixes*',
-    source: ['package.hotfix.name'],
-    limitRange: [50, 500],
-  },
-};
+    hotfixes: {
+      index: 'wazuh-states-inventory-hotfixes*',
+      source: ['package.hotfix.name'],
+      limitRange: [50, 500],
+    },
+  };
 
 /** Validates `kind` against the 5 implemented values; throws a descriptive Error (turned into a
  * bounded tool_result error for the model to self-correct, same convention as every other
@@ -290,6 +305,24 @@ export const getAgentInventoryTool: ToolDefinition = {
     };
   },
   tableSpec: { columns: [] },
-  digest: { sampleColumns: [] },
+  digest: {
+    sampleColumns: [],
+    // Digest-level fallback for the kinds with no real breakdown aggregation (see
+    // InventoryKindConfig.breakdownAggs' doc comment for the per-kind split and why): groups the
+    // RETURNED rows via getByPath, so a dimension simply produces no buckets for kinds whose rows
+    // don't carry it — one tool-level list covers `packages` (architecture/vendor: textbook
+    // closed-set dimensions on a kind whose real hosts carry 500-2000 docs against a default
+    // limit of 50, the most truncation-prone kind in this tool) and `processes` (process.state)
+    // at zero cost to the other kinds. All three fields have privacy classifications
+    // (package.architecture and process.state are explicit 'allow' entries in
+    // FIELD_POLICY_DEFAULTS; package.vendor is a known-safe structural field), and executor.ts's
+    // identity-map path scrubs synthetic breakdown keys through the same applyFieldPolicy pass as
+    // a real aggregation's.
+    breakdownDimensions: [
+      'package.architecture',
+      'package.vendor',
+      'process.state',
+    ],
+  },
   deriveColumns: true,
 };

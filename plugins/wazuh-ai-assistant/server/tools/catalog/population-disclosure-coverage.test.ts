@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { JsonSchemaProperty } from '../../../common/types';
 import { listToolDefinitions } from '../registry';
 import { ToolDefinition, IndexerRequest } from '../types';
+import { BREAKDOWN_BUCKET_CAP } from '../digest';
 
 /**
  * Class-level guard for issue #8920 item 1 ("sample narrated as population"): a tool whose digest
@@ -23,20 +24,33 @@ import { ToolDefinition, IndexerRequest } from '../types';
  * exemption fails this suite, the same "nothing exempt by default" standard as
  * `agg-size-coverage.test.ts` and `field-policy-coverage.test.ts`.
  *
+ * The helper predicates are deliberately STRICT, each in response to a way this test could
+ * otherwise be satisfied without the property it claims to prove:
+ *   - (b) requires `terms` to be an aggregation NODE's own type key (a `terms` QUERY clause
+ *     nested inside a `filter` sub-aggregation returns a doc_count, not buckets — it must not
+ *     count), with a real `field` and `size >= BREAKDOWN_BUCKET_CAP` (a size:1 "breakdown" is not
+ *     a distribution).
+ *   - (a) requires a BUCKET aggregation type under size:0 — a metric-only cardinality/avg body
+ *     returns no buckets at all and must not count as "population by construction".
+ *   - (c) requires every declared dimension to be REACHABLE in the tool's own rows: present in
+ *     the built body's `_source` (union across `kind` enum values for multi-kind tools), or the
+ *     tool sends no `_source` at all (full documents). A dimension `getByPath` can never resolve
+ *     produces no buckets at runtime — a declared-but-dead fallback must fail here, not pass.
+ *
  * Deliberately "at least one of (a)-(d)", not "exactly one": several tools legitimately satisfy
  * more than one branch at once, and that overlap is CORRECT, not a defect to flag --
- * `get_sca_results` is size:0 with a terms agg (both (a) and (b)); every finding-hits tool (and,
- * after this issue's fix, get_compliance_alerts/get_mitre_findings/search_findings_by_os) attaches
- * a real `terms` agg AND opts into `breakdownDimensions` (both (b) and (c), the digest-side
- * fallback for whenever a real aggregation is genuinely absent — see common.ts's
- * `FINDING_BREAKDOWN_AGGS`/`ToolDefinition.digest.breakdownDimensions` doc comments). An "exactly
- * one" assertion would therefore fail on tools that are demonstrably fine.
+ * `get_sca_results` is size:0 with a terms agg (both (a) and (b)); every finding-hits tool
+ * attaches a real `terms` agg AND opts into `breakdownDimensions` (both (b) and (c), the
+ * digest-side fallback for whenever a real aggregation is genuinely absent). An "exactly one"
+ * assertion would therefore fail on tools that are demonstrably fine.
  */
 
 /**
  * Tools that deliberately do NOT carry a breakdown mechanism, with the reason spelled out. Every
  * value must be a non-empty, SPECIFIC reason — "not applicable" or similar would defeat the point
- * of this map (a future tool could copy-paste its way past the check).
+ * of this map (a future tool could copy-paste its way past the check). A separate test below also
+ * asserts each exempt tool really has NO breakdown mechanism, so an exemption cannot silently
+ * outlive its own fix.
  */
 const POPULATION_DISCLOSURE_EXEMPT: Record<string, string> = {
   // Manager-API target: the Manager returns `total_affected_items` (a population-true COUNT) but
@@ -60,26 +74,6 @@ const POPULATION_DISCLOSURE_EXEMPT: Record<string, string> = {
     'Escape hatch: the query body (including any "aggs") is model-authored, not built by this ' +
     'catalog -- the population-disclosure guarantee for a hand-authored aggregation is the ' +
     "model's own responsibility, same boundary as every other guardrail on this tool's output.",
-  // --- Known, named, NOT-YET-FIXED gaps (out of scope for issue #8920's cluster A3) -----------
-  // Security Analytics catalog/config content on wazuh-threatintel-rules*: none of its
-  // `document.*` fields are yet on guardrails.ts's AGG_FIELD_ALLOWLIST, and giving it one needs
-  // the same live-mapping verification standard this repo already holds itself to elsewhere (see
-  // get-agent-inventory.ts's own doc comment on its 8 still-unimplemented inventory kinds).
-  // Deliberately left as an admitted gap, not a silent "fine" -- tracked as a follow-up cluster.
-  get_rules:
-    'NOT YET FIXED (known gap, out of scope for issue #8920 cluster A3): Security Analytics ' +
-    'catalog content (document.* fields on wazuh-threatintel-rules*) -- none of its fields are ' +
-    'yet on guardrails.ts AGG_FIELD_ALLOWLIST; needs its own live-mapping-verified aggregation ' +
-    'design before a real or synthetic breakdown can be added. Tracked as a follow-up.',
-  get_threat_intel_components:
-    'NOT YET FIXED (known gap, out of scope for issue #8920 cluster A3): Security Analytics ' +
-    'pipeline/config content (document.* fields across 5 wazuh-threatintel-* families) -- same ' +
-    'gap as get_rules. Tracked as a follow-up.',
-  get_detectors:
-    'NOT YET FIXED (known gap, out of scope for issue #8920 cluster A3): detector.* fields live ' +
-    'inside a `nested` document on .opensearch-sap-detectors-config, which needs a nested ' +
-    'aggregation wrapper, not a plain top-level terms agg -- needs its own design. Tracked as a ' +
-    'follow-up.',
 };
 
 /**
@@ -124,68 +118,142 @@ function sampleValue(name: string, prop: JsonSchemaProperty): unknown {
   return 'test';
 }
 
-/**
- * Builds every declared param for one tool. `get_agent_inventory` is special-cased to `kind:
- * 'ports'` rather than the generic enum-default ('os', the first listed kind): the exemption for
- * this tool is PER-KIND (see `get-agent-inventory.test.ts`'s own assertions that `os`/`packages`/
- * `hotfixes` deliberately carry no breakdown agg, with the reasons written on
- * `InventoryKindConfig.breakdownAggs`'s doc comment) -- this registry-wide check only needs ONE
- * kind that demonstrates the tool as a whole satisfies the invariant, and `ports` is the one that
- * actually carries a real breakdown aggregation.
- */
-function sampleParams(def: ToolDefinition): Record<string, unknown> {
+function sampleParams(
+  def: ToolDefinition,
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
   const params: Record<string, unknown> = {};
   for (const [name, prop] of Object.entries(def.spec.parameters.properties)) {
     params[name] = sampleValue(name, prop);
   }
-  if (def.spec.name === 'get_agent_inventory') {
-    params.kind = 'ports';
-  }
-  return params;
+  return { ...params, ...overrides };
 }
 
-/** True when `body.size === 0` and at least one top-level bucket aggregation is declared --
- * "aggregation tool: population by construction" (branch (a), e.g. get_top_rules/get_sca_results).
- */
-function hasSizeZeroWithAgg(body: Record<string, unknown>): boolean {
-  const aggs = (body.aggs ?? body.aggregations) as
-    | Record<string, unknown>
+/** Every enum value of a tool's `kind` param, or `[undefined]` for tools without one — used to
+ * drive multi-kind tools (get_agent_inventory) once per kind instead of only the enum default. */
+function kindVariants(def: ToolDefinition): Array<string | undefined> {
+  const kindProp = def.spec.parameters.properties.kind as
+    | { enum?: unknown[] }
     | undefined;
-  return (
-    body.size === 0 && aggs !== undefined && Object.keys(aggs).length > 0
+  if (kindProp && Array.isArray(kindProp.enum) && kindProp.enum.length > 0) {
+    return kindProp.enum.filter(
+      (value): value is string => typeof value === 'string',
+    );
+  }
+  return [undefined];
+}
+
+/** Aggregation types whose response is an ARRAY of buckets — what "population by construction"
+ * actually requires under size:0 (a metric-only agg returns no buckets at all). */
+const BUCKET_AGG_TYPE_KEYS = new Set([
+  'terms',
+  'significant_terms',
+  'date_histogram',
+  'histogram',
+  'range',
+  'date_range',
+]);
+/** Reserved keys inside an aggregation definition that are not the aggregation's type. */
+const NON_TYPE_AGG_KEYS = new Set(['aggs', 'aggregations', 'meta']);
+
+/**
+ * Structurally walks the body's aggregation MAPS (agg name → definition), collecting each
+ * aggregation node's (type, spec) pairs at every nesting level. Because only aggregation maps are
+ * walked — never query clauses — a `terms` QUERY clause inside a `filter` sub-aggregation
+ * (`aggs: {failed: {filter: {terms: {...}}}}`) can never be mistaken for a terms AGGREGATION.
+ */
+function collectAggTypeEntries(
+  body: Record<string, unknown>,
+): Array<{ type: string; spec: unknown }> {
+  const entries: Array<{ type: string; spec: unknown }> = [];
+  const walkAggsMap = (aggs: unknown): void => {
+    if (!aggs || typeof aggs !== 'object' || Array.isArray(aggs)) {
+      return;
+    }
+    for (const aggDef of Object.values(aggs as Record<string, unknown>)) {
+      if (!aggDef || typeof aggDef !== 'object' || Array.isArray(aggDef)) {
+        continue;
+      }
+      const record = aggDef as Record<string, unknown>;
+      for (const [key, value] of Object.entries(record)) {
+        if (!NON_TYPE_AGG_KEYS.has(key)) {
+          entries.push({ type: key, spec: value });
+        }
+      }
+      walkAggsMap(record.aggs ?? record.aggregations);
+    }
+  };
+  walkAggsMap(body.aggs ?? body.aggregations);
+  return entries;
+}
+
+/** Branch (a): `size: 0` with at least one BUCKET aggregation — "population by construction".
+ * A metric-only agg body (cardinality/avg under size:0) deliberately does NOT qualify: it
+ * returns a number, not a categorical distribution. */
+function hasSizeZeroWithAgg(body: Record<string, unknown>): boolean {
+  if (body.size !== 0) {
+    return false;
+  }
+  return collectAggTypeEntries(body).some(entry =>
+    BUCKET_AGG_TYPE_KEYS.has(entry.type),
   );
 }
 
-/** True when `body.aggs`/`body.aggregations` contains a `terms` aggregation anywhere in its
- * (possibly nested, e.g. get_sca_results' per-policy sub-aggs) subtree -- "real breakdown
- * attached" (branch (b)), regardless of whether the top-level query is also a hits search (`size`
- * > 0, e.g. get_sca_checks/get_agent_inventory/the vulnerability tools/every finding-hits tool). */
+/** Branch (b): a real `terms` AGGREGATION node (see `collectAggTypeEntries`) with an actual
+ * `field` and `size >= BREAKDOWN_BUCKET_CAP` — a fieldless or size:1 terms agg is not a
+ * population disclosure. */
 function hasRealTermsAggregation(body: Record<string, unknown>): boolean {
-  let found = false;
-  const walk = (node: unknown, insideAggs: boolean): void => {
-    if (found || !node || typeof node !== 'object') {
-      return;
+  return collectAggTypeEntries(body).some(entry => {
+    if (entry.type !== 'terms') {
+      return false;
     }
-    if (Array.isArray(node)) {
-      node.forEach(item => walk(item, insideAggs));
-      return;
+    const spec = entry.spec as { field?: unknown; size?: unknown } | undefined;
+    return (
+      typeof spec?.field === 'string' &&
+      typeof spec?.size === 'number' &&
+      spec.size >= BREAKDOWN_BUCKET_CAP
+    );
+  });
+}
+
+/**
+ * Branch (c) validity: every declared `breakdownDimensions` entry must be REACHABLE in the tool's
+ * rows — either the tool never restricts `_source` (full documents), or the dimension appears in
+ * the union of `_source` lists across the tool's `kind` variants. Returns the unreachable
+ * dimensions (empty array = all reachable). Manager-target tools return full items, so their
+ * dimensions are always considered reachable.
+ */
+function unreachableDimensions(def: ToolDefinition): string[] {
+  const dims = def.digest.breakdownDimensions ?? [];
+  if (dims.length === 0 || def.target !== 'indexer') {
+    return [];
+  }
+  const sourceUnion = new Set<string>();
+  let anyUnrestricted = false;
+  for (const kind of kindVariants(def)) {
+    let request: IndexerRequest;
+    try {
+      request = def.buildRequest(
+        sampleParams(def, kind !== undefined ? { kind } : {}),
+      ) as IndexerRequest;
+    } catch {
+      continue; // a kind whose sample params don't validate is checked by other suites
     }
-    for (const [key, value] of Object.entries(
-      node as Record<string, unknown>,
-    )) {
-      if (key === 'aggs' || key === 'aggregations') {
-        walk(value, true);
-        continue;
+    const source = request.body._source;
+    if (!Array.isArray(source)) {
+      anyUnrestricted = true;
+      break;
+    }
+    for (const field of source) {
+      if (typeof field === 'string') {
+        sourceUnion.add(field);
       }
-      if (insideAggs && key === 'terms') {
-        found = true;
-        return;
-      }
-      walk(value, insideAggs);
     }
-  };
-  walk(body, false);
-  return found;
+  }
+  if (anyUnrestricted) {
+    return [];
+  }
+  return dims.filter(dimension => !sourceUnion.has(dimension));
 }
 
 test('every registry tool discloses a population-true breakdown, or is a reasoned exemption', () => {
@@ -196,14 +264,28 @@ test('every registry tool discloses a population-true breakdown, or is a reasone
   for (const def of defs) {
     const exemptReason = POPULATION_DISCLOSURE_EXEMPT[def.spec.name];
     if (exemptReason !== undefined) {
-      continue; // (d) -- reasoned exemption, checked for non-emptiness in a separate test below.
+      continue; // (d) -- reasoned exemption, itself audited by the tests below.
+    }
+
+    // A declared-but-unreachable dimension is a latent lie regardless of which branch the tool
+    // ends up qualifying under — flag it even when a real aggregation also exists.
+    const deadDims = unreachableDimensions(def);
+    if (deadDims.length > 0) {
+      failures.push(
+        `${def.spec.name}: breakdownDimensions [${deadDims.join(
+          ', ',
+        )}] are not reachable in ` +
+          "the tool's own _source — getByPath can never resolve them, so the declared fallback " +
+          'is dead code',
+      );
+      continue;
     }
 
     if (
       def.digest.breakdownDimensions &&
       def.digest.breakdownDimensions.length > 0
     ) {
-      continue; // (c) -- synthetic fallback opted in.
+      continue; // (c) -- synthetic fallback opted in (and validated reachable above).
     }
 
     if (def.target !== 'indexer') {
@@ -214,23 +296,25 @@ test('every registry tool discloses a population-true breakdown, or is a reasone
       continue;
     }
 
-    const params = sampleParams(def);
-    let request: IndexerRequest;
-    try {
-      request = def.buildRequest(params) as IndexerRequest;
-    } catch (error) {
-      failures.push(
-        `${def.spec.name}: buildRequest threw for its own sample params -- ${
-          error instanceof Error ? error.message : String(error)
-        }`,
+    // Multi-kind tools must satisfy the invariant per-kind through their own colocated test
+    // (get-agent-inventory.test.ts drives every INVENTORY_KIND_CONFIG entry); here it is enough
+    // that at least one kind demonstrates a mechanism, since the per-kind split is asserted
+    // there, driven from the kind map itself.
+    const qualifies = kindVariants(def).some(kind => {
+      let request: IndexerRequest;
+      try {
+        request = def.buildRequest(
+          sampleParams(def, kind !== undefined ? { kind } : {}),
+        ) as IndexerRequest;
+      } catch {
+        return false;
+      }
+      return (
+        hasSizeZeroWithAgg(request.body) ||
+        hasRealTermsAggregation(request.body)
       );
-      continue;
-    }
-
-    if (
-      hasSizeZeroWithAgg(request.body) ||
-      hasRealTermsAggregation(request.body)
-    ) {
+    });
+    if (qualifies) {
       continue; // (a) or (b).
     }
 
@@ -270,10 +354,49 @@ test('every POPULATION_DISCLOSURE_EXEMPT reason is non-empty (a real, written ju
   }
 });
 
-// --- Direct, focused regression checks for the specific mechanisms this test's generic loop
-// above already exercises -- kept as a second, independent sanity check on the helper functions
-// themselves (same "sanity-check the helper" precedent as field-policy-coverage.test.ts's
-// "isFieldCovered mechanism" test). ---
+test('no POPULATION_DISCLOSURE_EXEMPT tool secretly has a breakdown (stale-exemption guard)', () => {
+  // The reverse direction: a tool that later GAINS a breakdown mechanism must drop its
+  // exemption, otherwise the map accumulates entries that misdescribe the catalog.
+  const byName = new Map(
+    listToolDefinitions().map(def => [def.spec.name, def]),
+  );
+  for (const name of Object.keys(POPULATION_DISCLOSURE_EXEMPT)) {
+    const def = byName.get(name);
+    if (!def) {
+      continue; // covered by the registered-names test above
+    }
+    assert.ok(
+      !def.digest.breakdownDimensions ||
+        def.digest.breakdownDimensions.length === 0,
+      `${name}: has breakdownDimensions now — remove its stale exemption`,
+    );
+    if (def.target !== 'indexer') {
+      continue;
+    }
+    const jsonStringDriven = Object.values(def.spec.parameters.properties).some(
+      prop => (prop as { jsonString?: true }).jsonString,
+    );
+    if (jsonStringDriven) {
+      continue; // escape hatch: its aggs are caller-authored, nothing static to inspect
+    }
+    let request: IndexerRequest;
+    try {
+      request = def.buildRequest(sampleParams(def)) as IndexerRequest;
+    } catch {
+      continue;
+    }
+    assert.ok(
+      !hasSizeZeroWithAgg(request.body) &&
+        !hasRealTermsAggregation(request.body),
+      `${name}: builds a real breakdown aggregation now — remove its stale exemption`,
+    );
+  }
+});
+
+// --- Direct, focused regression checks for the helper predicates themselves -- the same
+// "sanity-check the helper" precedent as field-policy-coverage.test.ts's "isFieldCovered
+// mechanism" test: if a helper silently becomes a no-op or over-matches, the registry loop above
+// would pass vacuously. ---
 
 test('hasSizeZeroWithAgg / hasRealTermsAggregation mechanism sanity check', () => {
   // A plain hits search (no aggs at all) satisfies neither.
@@ -300,7 +423,8 @@ test('hasSizeZeroWithAgg / hasRealTermsAggregation mechanism sanity check', () =
   assert.equal(hasSizeZeroWithAgg(hitsWithAgg), false);
   assert.equal(hasRealTermsAggregation(hitsWithAgg), true);
 
-  // A nested sub-aggregation's terms clause (get_sca_results-shaped) is still found.
+  // A nested sub-aggregation's terms AGG (get_sca_results-shaped: top-level terms with filter
+  // sub-aggs) is still found.
   const nested = {
     query: { match_all: {} },
     aggs: {
@@ -312,4 +436,67 @@ test('hasSizeZeroWithAgg / hasRealTermsAggregation mechanism sanity check', () =
     size: 0,
   };
   assert.equal(hasRealTermsAggregation(nested), true);
+
+  // OVER-MATCH guards — each of these satisfied the pre-hardening helpers and must NOT count:
+  // 1. A `terms` QUERY clause inside a `filter` SUB-AGGREGATION is a filtered doc count, not a
+  //    bucket distribution.
+  const termsQueryInFilterAgg = {
+    query: { match_all: {} },
+    aggs: {
+      failed: { filter: { terms: { 'check.result': ['Failed'] } } },
+    },
+    size: 20,
+  };
+  assert.equal(hasRealTermsAggregation(termsQueryInFilterAgg), false);
+  // 2. size:0 with a METRIC-only agg returns a number, not a population distribution.
+  const metricOnly = {
+    query: { match_all: {} },
+    aggs: { distinct: { cardinality: { field: 'wazuh.agent.name' } } },
+    size: 0,
+  };
+  assert.equal(hasSizeZeroWithAgg(metricOnly), false);
+  assert.equal(hasRealTermsAggregation(metricOnly), false);
+  // 3. A terms agg sized below BREAKDOWN_BUCKET_CAP (e.g. size:1) is not a distribution.
+  const tinyTerms = {
+    query: { match_all: {} },
+    aggs: { top1: { terms: { field: 'wazuh.rule.id', size: 1 } } },
+    size: 0,
+  };
+  assert.equal(hasRealTermsAggregation(tinyTerms), false);
+});
+
+test('unreachableDimensions mechanism: a dimension missing from _source is flagged', () => {
+  const syntheticDef: ToolDefinition = {
+    spec: {
+      name: 'synthetic_offender',
+      description: 'test',
+      parameters: { type: 'object', properties: {} },
+    },
+    target: 'indexer',
+    tier: 'T1',
+    buildRequest: () => ({
+      target: 'indexer',
+      index: 'wazuh-states-inventory-packages*',
+      body: {
+        query: { match_all: {} },
+        _source: ['package.name'],
+        size: 20,
+      },
+    }),
+    tableSpec: { columns: [] },
+    digest: {
+      sampleColumns: ['package.name'],
+      breakdownDimensions: ['package.vendor'],
+    },
+  };
+  assert.deepEqual(unreachableDimensions(syntheticDef), ['package.vendor']);
+  // And the reachable variant passes.
+  const reachable: ToolDefinition = {
+    ...syntheticDef,
+    digest: {
+      sampleColumns: ['package.name'],
+      breakdownDimensions: ['package.name'],
+    },
+  };
+  assert.deepEqual(unreachableDimensions(reachable), []);
 });

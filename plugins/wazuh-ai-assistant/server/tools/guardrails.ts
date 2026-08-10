@@ -231,18 +231,34 @@ const AGG_FIELD_ALLOWLIST = new Set([
   // low-cardinality — a handful of benchmark policies per agent; mapping live-verified against
   // wazuh-states-sca on 5.0.0-beta3).
   'policy.id',
-  // Issue #8920 item 1 (population-disclosure): the four fields below back the per-kind/per-tool
+  // Issue #8920 item 1 (population-disclosure): the three fields below back the per-kind/per-tool
   // breakdown aggregations added to close the "sample narrated as population" class ("named 2 of
-  // 10 failed checks" on get_sca_checks; a truncated ports/processes inventory page with no view
-  // of the closed-set field's true distribution). This is a PERFORMANCE guard widening
-  // (aggregation cardinality), not a privacy guard: every field below is a small closed enum, not
-  // analyst/attacker-supplied free text, terms `size` still caps at MAX_AGG_SIZE via checkAggs for
-  // any caller including the escape hatch, and privacy.ts's field policy (a separate boundary) is
-  // unaffected by this list either way.
-  'check.result', // SCA per-check result: "Passed"/"Failed"/"Not applicable" (3-value enum).
-  'interface.state', // syscollector ports: socket state (e.g. "listen"/"established").
-  'network.transport', // syscollector ports: "tcp"/"udp".
-  'process.state', // syscollector processes: single-letter kernel state (e.g. "R"/"S"/"Z").
+  // 10 failed checks" on get_sca_checks; a truncated ports inventory page with no view of the
+  // closed-set field's true distribution). This is a PERFORMANCE guard widening (aggregation
+  // cardinality), not a privacy guard: every field below is a small closed enum, not
+  // analyst/attacker-supplied free text, terms `size` still caps at MAX_AGG_SIZE via checkAggs
+  // for any caller including the escape hatch, and privacy.ts's field policy (a separate
+  // boundary) is unaffected by this list either way. Each entry cites in-repo aggregation
+  // evidence, per the standard `policy.id` (above) set — a terms agg on a text-mapped field is a
+  // hard 400 ("Fielddata is disabled"), so "probably keyword" is not enough. `process.state` is
+  // deliberately NOT here: its only in-repo use is a KQL filter
+  // (plugins/main/public/components/overview/it-hygiene/processes/dashboard.ts), which a text
+  // mapping would also satisfy — get_agent_inventory covers it with the digest-level
+  // breakdownDimensions fallback (no mapping requirement) until a live terms agg on
+  // wazuh-states-inventory-processes is verified.
+  //
+  // SCA per-check result — a closed enum ("Passed"/"Failed"/"Not applicable");
+  // get-sca-results.ts's own capitalized `term` filters on this field are checked-in proof it is
+  // keyword-mapped (a `term` filter with those exact capitalized values on a text mapping would
+  // never match).
+  'check.result',
+  // Syscollector ports: this repo's IT Hygiene network dashboard runs a real terms agg on it
+  // (plugins/main/public/components/overview/it-hygiene/dashboards/dashboard-panels.ts) — live
+  // values include "Inactive"/"Unknown".
+  'interface.state',
+  // Syscollector ports: aggregated by the IT Hygiene services/traffic dashboards; live values
+  // are uppercase ("TCP"/"UDP").
+  'network.transport',
 ]);
 
 /**
