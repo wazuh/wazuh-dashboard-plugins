@@ -211,10 +211,13 @@ async function appendWindowRecountHint(
  * extra bounded search against the SAME index: a `size:0` terms aggregation over
  * `wazuh.agent.name`, restricted by an `include` pattern derived from the requested names (see
  * buildNearMissIncludePattern -- this is what keeps the probe correct on fleets larger than the
- * agg size), scoped to the executed body's own `@timestamp` range when it has one and rangeless
- * otherwise (states indices have no event-time axis and lintDsl requires no bound there -- an
- * injected range on an unmapped field would match nothing and silently disable the disclosure
- * for exactly those tools). Any failure degrades silently, same as the recount above.
+ * agg size), issued ALWAYS rangeless -- never scoped to the executed body's `@timestamp` range,
+ * even when the body has one. Agent-name EXISTENCE is not time-scoped: a conversation narrowed to
+ * "the last 24 hours" (see window-recount.ts) can leave a sibling's only document outside that
+ * window, and a range-scoped probe would then find zero buckets and silently drop the disclosure
+ * while the answer still reports the wrong host's data. A rangeless probe on a states index (no
+ * event-time axis; lintDsl requires no bound there) is the same shape, one case earlier -- this
+ * extends that precedent to every index. Any failure degrades silently, same as the recount above.
  *
  * PRIVACY: each agent name embedded in the hint text (both the requested name and its siblings) is
  * run through `privacy.pseudonymizer.pseudonymize(name, 'HOST')` before interpolation when privacy
@@ -264,7 +267,6 @@ function appendSubTechniqueSplitHint(digest: Digest): void {
 async function appendEntityNearMissHint(
   digest: Digest,
   params: Record<string, unknown>,
-  body: Record<string, unknown>,
   index: string,
   context: RequestHandlerContext,
   privacy: PrivacyContext | undefined,
@@ -281,19 +283,17 @@ async function appendEntityNearMissHint(
     if (!includePattern) {
       return;
     }
-    // The @timestamp range is copied from the EXECUTED body only when it had one: a states-index
-    // body carries no event-time axis (lintDsl requires none there), and injecting a range on an
-    // unmapped @timestamp field would match NOTHING -- zero buckets, silent no-op, exactly the
-    // hole that would exempt get_agent_inventory from this disclosure. A rangeless probe on a
-    // states index mirrors the states tools' own query shape (see get-fim-files.ts's
-    // match_all-in-filter precedent).
-    const range = findTimestampRange(body);
+    // Deliberately NEVER copies the executed body's own @timestamp range (contrast
+    // appendWindowRecountHint above, which intentionally widens within the same time axis).
+    // Agent-name existence has no time axis: a sibling can have exactly one document, ingested
+    // outside whatever window the current turn inherited, and this probe must still find it. A
+    // states-index body carries no event-time axis at all (lintDsl requires none there), so
+    // match_all is also simply correct there -- this is that same rangeless shape, applied
+    // unconditionally rather than only when the executed body happens to lack a range.
     const probeBody: Record<string, unknown> = {
       query: {
         bool: {
-          filter: [
-            range ? { range: { '@timestamp': range } } : { match_all: {} },
-          ],
+          filter: [{ match_all: {} }],
         },
       },
       size: 0,
@@ -471,7 +471,6 @@ async function executeIndexerRequest(
     await appendEntityNearMissHint(
       digest,
       params,
-      body,
       indexerRequest.index,
       context,
       privacy,
