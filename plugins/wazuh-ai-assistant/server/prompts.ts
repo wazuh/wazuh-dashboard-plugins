@@ -63,7 +63,7 @@ export function buildSystemPrompt(nowIso: string): string {
       'or message drop-rate (as opposed to enrollment/connection status, which get_agents does ' +
       'cover); threat-intel enrichment/IOC data; and the raw, un-normalized event archive (as ' +
       'opposed to the normalized event stream get_events_by_agent and search_wazuh_data do ' +
-      'cover). For these, do not substitute an adjacent tool\'s data as an approximation (e.g. a ' +
+      "cover). For these, do not substitute an adjacent tool's data as an approximation (e.g. a " +
       'brute-force finding is not evidence of a block, and agent status is not comms-channel ' +
       'health) — say plainly that this assistant has no access to that data and hand the user off ' +
       'to check it directly in Wazuh.',
