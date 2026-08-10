@@ -4,6 +4,60 @@
  * `search.allow_expensive_queries=true`) — the plugin enforces everything itself, on every
  * outbound `_search`, regardless of whether the query came from a typed catalog tool (defense in
  * depth) or the future free-DSL escape hatch (its only line of defense).
+ *
+ * BOUND-DISCLOSURE AUDIT (issue #8935 item I4). Every bound the model can hit against the
+ * Indexer/Manager through this plugin, as of this base commit — kept as one table because the
+ * class issue #8935 targets is "an unmarked bound", and a single table is what makes "did we miss
+ * one" answerable at a glance rather than scattered across call sites.
+ *
+ * | Bound                                       | Where                        | Disclosure                                                              |
+ * |----------------------------------------------|------------------------------|---------------------------------------------------------------------------|
+ * | MAX_SIZE=500 (hits `size`)                    | applySafetyValves (59, 173)  | Silent clamp, but STRUCTURALLY disclosed: `Digest.counts` carries         |
+ * |                                                |                              | `{total, returned, truncated}` plus a `samplesNote` — adequate, no change |
+ * |                                                |                              | here.                                                                      |
+ * | MAX_FROM=1000 (`from`)                        | applySafetyValves            | Rejection with reason — disclosed (the model sees why and can            |
+ * |                                                | (60, 158-166)                | self-correct).                                                             |
+ * | track_total_hits=10000                        | applySafetyValves (61, 174)  | SILENT on this base: `digest.ts`'s count extraction reads                 |
+ * |                                                |                              | `hits.total.value` and ignores `relation: 'gte'`, so a >10k result set    |
+ * |                                                |                              | reports exactly `10000` unmarked (only `appendWindowRecountHint`'s own    |
+ * |                                                |                              | probe words it "at least N" — executor.ts:178-183). NOT FIXED HERE: issue |
+ * |                                                |                              | #8909 removes this clamp and merges ahead of this branch in the team's    |
+ * |                                                |                              | stated order — re-fixing here guarantees a conflict. Recorded as "silent  |
+ * |                                                |                              | on this base, resolved upstream by #8909".                                |
+ * | MAX_LOOKBACK_MS=90d (time-range span)         | checkDateRanges              | THE DEFECT this item fixes: the rejection reaches the model as an error,  |
+ * |                                                | (392, 893-897)               | but a bare retry inside the cap is indistinguishable from a               |
+ * |                                                |                              | default-window query — nothing marks the eventual ANSWER as capped.       |
+ * |                                                |                              | Fixed by `clampLookbackWindow` below: clamp-and-disclose on the           |
+ * |                                                |                              | successful call's own digest, the layer measured at 3/3 (not the prompt   |
+ * |                                                |                              | layer, measured 0/3). The span REJECTION itself is UNCHANGED —           |
+ * |                                                |                              | `lintDsl` is the documented standalone boundary (441-443) and still       |
+ * |                                                |                              | guards any call site that skips the clamp.                                |
+ * | MAX_AGG_SIZE=100 (terms/composite/            | checkAggs (406, 1003-1112)   | Rejection with reason — disclosed.                                        |
+ * | multi_terms/top_hits `size`)                  |                              |                                                                             |
+ * | MAX_TOP_LEVEL_AGGS=5                          | checkTopLevelAggCount        | Rejection with reason — disclosed.                                        |
+ * |                                                | (967, 983-1001)              |                                                                             |
+ * | MIN_DATE_HISTOGRAM_INTERVAL_MS=60000          | checkAggs (909)              | Rejection with reason — disclosed.                                        |
+ * | script/runtime_mappings/regexp/leading-       | lintDsl                      | Rejection with reason — disclosed.                                        |
+ * | wildcard bans                                 |                              |                                                                             |
+ * | Request-side `terms` size truncation (more    | cluster-side, not this file  | Disclosed via `sum_other_doc_count` -> digest.ts's `breakdownNote` (case  |
+ * | distinct values than the agg `size`)          |                              | 2). The SYNTHETIC-breakdown top-5 trim (`buildSyntheticBreakdown` in      |
+ * |                                                |                              | digest.ts) is a SEPARATE, currently-silent instance owned and fixed by    |
+ * |                                                |                              | issue #8935 item I1 (population-disclosure) — cross-referenced, not       |
+ * |                                                |                              | duplicated here.                                                           |
+ * | MAX_SAMPLES=5 (digest sample rows)            | digest.ts                    | `samplesNote` — disclosed.                                                |
+ * | MAX_FIELD_VALUE_LENGTH / MAX_HINT_LENGTH      | digest.ts                    | Visible "…" ellipsis — disclosed inline.                                  |
+ * | `capDigest` drop stages (samples beyond the   | digest.ts                    | SILENT RESIDUAL: a sample/breakdown bucket popped by the hard char cap    |
+ * | worded samplesNote count; breakdown buckets   |                              | can fall below what the ALREADY-EMITTED note claims. Rare after I1's      |
+ * | beyond the disclosed count)                   |                              | carry cap; recorded, deliberately NOT fixed here — a fix needs note       |
+ * |                                                |                              | recomputation from INSIDE the cap loop, a digest.ts change out of this    |
+ * |                                                |                              | item's file list.                                                         |
+ * | `clampManagerParams` limit -> MAX_SIZE        | guardrails.ts (1120-1129)    | Silent clamp, disclosed structurally via Manager digest counts            |
+ * | (Manager API `limit`)                         |                              | (`total_affected_items` vs. `returned`).                                  |
+ * | MAX_TOOL_ROUNDS                               | orchestration layer (not     | Owned by issue #8893's final-round instruction and issue #8935 item I3 —  |
+ * |                                                | this file)                   | out of scope here.                                                         |
+ * | TABLE_ROW_CAP / DERIVED_COLUMN_CAP            | client rendering / row       | Never model-facing completeness (the table renders locally and never      |
+ * |                                                | schema                       | reaches the model, per executor.ts's own comment on that boundary) —      |
+ * |                                                |                              | noted only, nothing to disclose to the model.                             |
  */
 
 import {
@@ -844,6 +898,167 @@ function walkRequiredForTimeRange(node: unknown, required: boolean): boolean {
     }
   }
   return false;
+}
+
+/**
+ * Clamp-and-disclose for a time-range span above `MAX_LOOKBACK_MS` (the fix for the one row
+ * marked THE DEFECT in this file's module-header bound-disclosure audit table). Returns a NEW
+ * body — `applySafetyValves`'s and
+ * `normalizeMustToFilter`'s no-mutation convention — plus a `disclosure` sentence whenever at
+ * least one clause was actually clamped.
+ *
+ * SCOPE MUST MATCH `checkDateRanges` EXACTLY: every `range` clause anywhere in the tree on a
+ * `TIME_FIELD_RE` field, in BOTH required and optional/negated query context alike (see
+ * `checkDateRanges`'s own header comment on why it -- unlike `hasTimeRange` -- deliberately does
+ * not distinguish required from optional context). Any clause this function skips still reaches
+ * `checkDateRanges` afterward and trips its span rejection unchanged, so under-scoping here would
+ * silently reintroduce the unmarked-retry defect for that clause shape.
+ *
+ * CLAMPS ONLY the well-formed, over-wide case: both bounds present, both parseable via
+ * `resolveDateMath`, and upper >= lower. Every other shape (a single-sided range, an unparseable
+ * bound, an inverted window) is passed through UNCHANGED and left to `checkDateRanges`'s existing
+ * rejections -- those are "unfixable by clamping", not a narrower instance of this bound.
+ *
+ * THE OFF-BY-EPSILON TRAP (why both bounds are rewritten to concrete ISO strings, not just the
+ * lower one): if only the lower bound were rewritten while the upper bound stayed a live
+ * `'now'`/`'now-Nd'` date-math string, the span this function computed at clamp time and the span
+ * `checkDateRanges` computes moments later (it calls `Date.now()` again, independently) would
+ * differ by however many milliseconds elapsed in between -- reopening the window by that epsilon
+ * and defeating the "exactly `MAX_LOOKBACK_MS`" guarantee `lintDsl`'s strict `>` check depends on.
+ * Resolving BOTH bounds to absolute ISO timestamps up front removes the second `Date.now()` call
+ * from the equation entirely: `Date.parse` on an ISO string never depends on when it runs.
+ *
+ * Each bound's inclusive/exclusive spelling (`gte`/`gt`, `lte`/`lt`) is preserved -- only the
+ * VALUE is rewritten, never the key -- so a caller's exclusive-bound query stays exclusive.
+ */
+export function clampLookbackWindow(body: Record<string, unknown>): {
+  body: Record<string, unknown>;
+  disclosure?: string;
+} {
+  const disclosures: string[] = [];
+  const nowMs = Date.now();
+  const clamped = clampLookbackNode(body, nowMs, disclosures) as Record<
+    string,
+    unknown
+  >;
+  return disclosures.length > 0
+    ? { body: clamped, disclosure: disclosures.join(' ') }
+    : { body: clamped };
+}
+
+/** Rebuilds `node`, clamping every `range` clause's bounds along the way -- same recursive
+ * rebuild-the-tree shape as `normalizeMustToFilter` above, so this never mutates its input. */
+function clampLookbackNode(
+  node: unknown,
+  nowMs: number,
+  disclosures: string[],
+): unknown {
+  if (Array.isArray(node)) {
+    return node.map(item => clampLookbackNode(item, nowMs, disclosures));
+  }
+  if (!node || typeof node !== 'object') {
+    return node;
+  }
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+    if (
+      key === 'range' &&
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value)
+    ) {
+      out[key] = clampRangeClause(
+        value as Record<string, unknown>,
+        nowMs,
+        disclosures,
+      );
+      continue;
+    }
+    out[key] = clampLookbackNode(value, nowMs, disclosures);
+  }
+  return out;
+}
+
+/** Clamps every `TIME_FIELD_RE` field inside one `range` clause's value (`{"@timestamp": {...}}`),
+ * field-by-field -- a clause could in principle carry more than one recognized time field. Fields
+ * that are not time fields, or that fail any of the "clampable" preconditions documented on
+ * `clampLookbackWindow` above, pass through with their original bounds object reference. */
+function clampRangeClause(
+  rangeValue: Record<string, unknown>,
+  nowMs: number,
+  disclosures: string[],
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [field, bounds] of Object.entries(rangeValue)) {
+    if (
+      !TIME_FIELD_RE.test(field) ||
+      !bounds ||
+      typeof bounds !== 'object' ||
+      Array.isArray(bounds)
+    ) {
+      out[field] = bounds;
+      continue;
+    }
+    const boundsRecord = bounds as Record<string, unknown>;
+    // Same "gte wins over gt" preference as checkDateRanges, so the two functions agree on which
+    // key is "the" lower/upper bound whenever a caller (unusually) sends both spellings.
+    const lowerKey: 'gte' | 'gt' | undefined =
+      boundsRecord.gte !== undefined
+        ? 'gte'
+        : boundsRecord.gt !== undefined
+        ? 'gt'
+        : undefined;
+    const upperKey: 'lte' | 'lt' | undefined =
+      boundsRecord.lte !== undefined
+        ? 'lte'
+        : boundsRecord.lt !== undefined
+        ? 'lt'
+        : undefined;
+    if (!lowerKey || !upperKey) {
+      // Single-sided range -- unfixable by clamping; checkDateRanges' "must specify both" rejection
+      // stays the correction path.
+      out[field] = bounds;
+      continue;
+    }
+    const lowerRaw = boundsRecord[lowerKey];
+    const upperRaw = boundsRecord[upperKey];
+    const lowerMs = resolveDateMath(lowerRaw, nowMs);
+    const upperMs = resolveDateMath(upperRaw, nowMs);
+    if (lowerMs === undefined || upperMs === undefined) {
+      // Unparseable bound -- unfixable by clamping; checkDateRanges' own rejection stays the
+      // correction path.
+      out[field] = bounds;
+      continue;
+    }
+    if (upperMs < lowerMs) {
+      // Inverted window -- unfixable by clamping; checkDateRanges' own rejection stays the
+      // correction path.
+      out[field] = bounds;
+      continue;
+    }
+    if (upperMs - lowerMs <= MAX_LOOKBACK_MS) {
+      // Already within the cap -- nothing to clamp or disclose.
+      out[field] = bounds;
+      continue;
+    }
+    const clampedUpperMs = upperMs;
+    const clampedLowerMs = clampedUpperMs - MAX_LOOKBACK_MS;
+    const clampedUpperIso = new Date(clampedUpperMs).toISOString();
+    const clampedLowerIso = new Date(clampedLowerMs).toISOString();
+    out[field] = {
+      ...boundsRecord,
+      [lowerKey]: clampedLowerIso,
+      [upperKey]: clampedUpperIso,
+    };
+    disclosures.push(
+      `Time window capped: the requested range (${String(lowerRaw)} to ${String(
+        upperRaw,
+      )}) exceeds the 90-day maximum; results cover ${clampedLowerIso} to ` +
+        `${clampedUpperIso} only. State to the user that the answer covers this capped window, ` +
+        'not the full requested range.',
+    );
+  }
+  return out;
 }
 
 function checkDateRanges(body: Record<string, unknown>): string | undefined {

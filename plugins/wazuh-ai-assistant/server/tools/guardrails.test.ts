@@ -5,6 +5,7 @@ import {
   checkIndexAllowlist,
   clampManagerParams,
   clampInt,
+  clampLookbackWindow,
   MAX_CARDINALITY_PRECISION_THRESHOLD,
 } from './guardrails';
 import { WAZUH_FIELD } from '../../common/wazuh-fields';
@@ -299,6 +300,163 @@ test('lintDsl: wazuh-states-* is exempt from the mandatory time-range check', ()
   };
   const result = lintDsl(body, 'wazuh-states-vulnerabilities-*');
   assert.equal(result.ok, true);
+});
+
+// --- clampLookbackWindow (issue #8935 item I4: bound disclosure) -------------------------------
+// GOAL: MAX_LOOKBACK_MS stays 90 days, but a wider request produces a SUCCESSFUL, capped answer
+// instead of a rejection the model must remember to relay. Not exported from guardrails.ts, so
+// this file hardcodes the documented 90-day contract rather than importing the constant -- same
+// convention the "rejects a range spanning more than 90 days" test above already uses.
+const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
+
+function rangeBody(bounds: Record<string, unknown>): Record<string, unknown> {
+  return {
+    query: { bool: { filter: [{ range: { '@timestamp': bounds } }] } },
+    size: 20,
+  };
+}
+
+interface ClampedTimestampRange {
+  gte?: string;
+  gt?: string;
+  lte?: string;
+  lt?: string;
+}
+
+function readTimestampRange(
+  body: Record<string, unknown>,
+  clause: 'filter' | 'should' = 'filter',
+): ClampedTimestampRange {
+  const bool = (body.query as { bool: Record<string, unknown> }).bool;
+  const clauses = bool[clause] as Array<Record<string, unknown>>;
+  const range = clauses[0].range as Record<string, ClampedTimestampRange>;
+  return range['@timestamp'];
+}
+
+test('clampLookbackWindow: a 180-day range is clamped to exactly 90 days, discloses both windows, and the clamped body passes the real lintDsl', () => {
+  const body = rangeBody({ gte: 'now-180d', lte: 'now' });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  const range = readTimestampRange(clamped);
+  assert.equal(typeof range.gte, 'string');
+  assert.equal(typeof range.lte, 'string');
+  // Rewritten to concrete ISO timestamps, not left as date-math.
+  assert.notEqual(range.gte, 'now-180d');
+  assert.notEqual(range.lte, 'now');
+  assert.equal(new Date(range.gte as string).toISOString(), range.gte);
+  assert.equal(new Date(range.lte as string).toISOString(), range.lte);
+  // Exactly MAX_LOOKBACK_MS apart, regardless of when this test happens to run (see the
+  // off-by-epsilon trap documented on clampLookbackWindow).
+  const spanMs =
+    Date.parse(range.lte as string) - Date.parse(range.gte as string);
+  assert.equal(spanMs, NINETY_DAYS_MS);
+  assert.ok(disclosure);
+  assert.match(disclosure as string, /Time window capped/);
+  // Names both the ORIGINAL requested window and the CLAMPED window that actually ran.
+  assert.match(disclosure as string, /now-180d to now/);
+  assert.ok((disclosure as string).includes(range.gte as string));
+  assert.ok((disclosure as string).includes(range.lte as string));
+  const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
+  assert.equal(lint.ok, true, lint.ok ? '' : lint.reason);
+  // The SAME (unclamped) 180-day body is rejected by the real lintDsl -- proves this is a genuine
+  // fix, not a body that always would have passed.
+  const unclampedLint = lintDsl(body, 'wazuh-findings-v5-*');
+  assert.equal(unclampedLint.ok, false);
+});
+
+test('clampLookbackWindow: a 90-day range is returned untouched, with no disclosure', () => {
+  const body = rangeBody({ gte: 'now-90d', lte: 'now' });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.deepEqual(clamped, body);
+  assert.equal(disclosure, undefined);
+});
+
+test('clampLookbackWindow: an 89-day range is returned untouched, with no disclosure', () => {
+  const body = rangeBody({ gte: 'now-89d', lte: 'now' });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.deepEqual(clamped, body);
+  assert.equal(disclosure, undefined);
+});
+
+test('clampLookbackWindow: gt/lt (exclusive bounds) are clamped the same way, and the spelling is preserved', () => {
+  const body = rangeBody({ gt: 'now-180d', lt: 'now' });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  const range = readTimestampRange(clamped);
+  assert.ok('gt' in range && !('gte' in range));
+  assert.ok('lt' in range && !('lte' in range));
+  const spanMs =
+    Date.parse(range.lt as string) - Date.parse(range.gt as string);
+  assert.equal(spanMs, NINETY_DAYS_MS);
+  assert.ok(disclosure);
+  const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
+  assert.equal(lint.ok, true, lint.ok ? '' : lint.reason);
+});
+
+test('clampLookbackWindow: a bool.should (optional-context) 180-day range is ALSO clamped -- scope parity with checkDateRanges', () => {
+  // checkDateRanges deliberately validates EVERY range clause regardless of required/optional
+  // context (unlike hasTimeRange) -- clampLookbackWindow must match that scope exactly, or a
+  // should-context clause it skipped would still trip checkDateRanges' span rejection afterward,
+  // reproducing the unmarked-retry defect for that one clause shape.
+  const body = {
+    query: {
+      bool: {
+        filter: [{ match_all: {} }],
+        should: [{ range: { '@timestamp': { gte: 'now-180d', lte: 'now' } } }],
+      },
+    },
+    size: 20,
+  };
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.ok(disclosure);
+  const range = readTimestampRange(clamped, 'should');
+  const spanMs =
+    Date.parse(range.lte as string) - Date.parse(range.gte as string);
+  assert.equal(spanMs, NINETY_DAYS_MS);
+  // This body was never going to pass lintDsl's SEPARATE mandatory-bound check anyway (a
+  // should-only range is decorative -- see hasTimeRange's required-context rule) -- but the SPAN
+  // rejection specifically must be gone now that the clause itself is clamped.
+  const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
+  assert.equal(lint.ok, false);
+  if (!lint.ok) {
+    assert.ok(!/90-day maximum lookback/.test(lint.reason));
+    assert.match(lint.reason, /must include a "range" clause/);
+  }
+});
+
+test('clampLookbackWindow: an unparseable bound is left untouched and still rejected by lintDsl', () => {
+  const body = rangeBody({ gte: 'not-a-date', lte: 'now' });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.deepEqual(clamped, body);
+  assert.equal(disclosure, undefined);
+  const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
+  assert.equal(lint.ok, false);
+  if (!lint.ok) {
+    assert.match(lint.reason, /unparseable bound/);
+  }
+});
+
+test('clampLookbackWindow: a single-sided range is left untouched (unfixable by clamping)', () => {
+  const body = rangeBody({ gte: 'now-180d' });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.deepEqual(clamped, body);
+  assert.equal(disclosure, undefined);
+  const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
+  assert.equal(lint.ok, false);
+});
+
+test('clampLookbackWindow: an inverted window (upper before lower) is left untouched (unfixable by clamping)', () => {
+  const body = rangeBody({ gte: 'now', lte: 'now-180d' });
+  const { body: clamped, disclosure } = clampLookbackWindow(body);
+  assert.deepEqual(clamped, body);
+  assert.equal(disclosure, undefined);
+  const lint = lintDsl(clamped, 'wazuh-findings-v5-*');
+  assert.equal(lint.ok, false);
+});
+
+test('clampLookbackWindow: never mutates the input body', () => {
+  const body = rangeBody({ gte: 'now-180d', lte: 'now' });
+  const snapshot = JSON.parse(JSON.stringify(body));
+  clampLookbackWindow(body);
+  assert.deepEqual(body, snapshot);
 });
 
 // --- aggregations ----------------------------------------------------------------------------
