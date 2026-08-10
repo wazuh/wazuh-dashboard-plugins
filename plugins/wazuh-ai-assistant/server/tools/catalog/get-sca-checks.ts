@@ -91,6 +91,32 @@ function buildContainsIncludePattern(subject: string): string {
   }
   return `.*${parts.join('')}.*`;
 }
+
+/**
+ * Upper bound on the normalized `search` subject. `optionalStringParam` does not bound length,
+ * and every character of the subject becomes 1-4 characters of the `terms.include` regexp above —
+ * a model-supplied 5k-char fragment would otherwise become an unbounded cluster-side regexp
+ * (integration review of #8935 item I2). 200 chars comfortably covers the longest real 5.0 check
+ * name observed (~110 chars) plus headroom; anything longer cannot be a check-name fragment.
+ */
+const MAX_SEARCH_SUBJECT_LENGTH = 200;
+
+/**
+ * IN-BAND scope attribution for the enumeration aggregation (#8935 item I2, integration review):
+ * every entry of a multi-aggregation digest breakdown is tagged with its aggregation NAME
+ * (digest.ts's `buildBreakdown`), so the name itself is the one deterministic, code-level channel
+ * that tells the model what the enumerated check names ARE. A `result`-filtered call scopes the
+ * whole query — and therefore this aggregation — to that result, so the name says so
+ * (`matching_failed_checks`); a fragment-only call enumerates across ALL results, and the name
+ * says that too (`matching_checks_all_results`), so a "which SSH checks FAILED" answer cannot
+ * silently present passed checks as failures. Relying on the model to also pass `result` was the
+ * prompt layer — measured 0/3 — which is why the attribution rides in the data instead.
+ */
+function matchingChecksAggName(result: string | undefined): string {
+  return result
+    ? `matching_${result.replace(/\s+/g, '_')}_checks`
+    : 'matching_checks_all_results';
+}
 export const getScaChecksTool: ToolDefinition = {
   spec: {
     name: 'get_sca_checks',
@@ -102,8 +128,9 @@ export const getScaChecksTool: ToolDefinition = {
       'agent — this tool needs that policy_id, it cannot discover one itself. Use ' +
       'result="failed" for "which checks fail" questions. For a TOPIC question ("which SSH ' +
       'checks failed"), pass a topic fragment via search (e.g. "ssh") together with ' +
-      'result="failed": the digest breakdown\'s "matching_checks" entries name every matching ' +
-      'check over the full result set, not just the returned rows.',
+      'result="failed": the digest breakdown\'s "matching_failed_checks" entries name the ' +
+      'matching checks over the full result set (alphabetical; if more match than the list ' +
+      'carries, the digest says how many were cut — narrow the fragment to see them all).',
     parameters: objectSchema(
       {
         agent_id: {
@@ -126,11 +153,13 @@ export const getScaChecksTool: ToolDefinition = {
           type: 'string',
           description:
             'Exact check name, a LEADING prefix of one (e.g. "Ensure SSH"), or a topic fragment ' +
-            '(e.g. "ssh"). check.name is an exact keyword field, so a fragment does NOT narrow ' +
-            'which ROWS come back — but it DOES scope the digest breakdown\'s "matching_checks" ' +
-            'enumeration to check names containing it (case-insensitive). For a topic question, ' +
-            'pass the fragment here together with result="failed" and read "matching_checks" for ' +
-            'the full list of matching check names.',
+            '(e.g. "ssh"). The returned ROWS and their total include only exact/leading-prefix ' +
+            'matches (check.name is an exact keyword field, so a mid-word fragment usually ' +
+            "matches 0 rows — that is expected, not an error). The fragment's real effect is on " +
+            'the digest breakdown: it scopes the "matching_*" enumeration to check names ' +
+            'CONTAINING it (case-insensitive), computed over the full result set. For a topic ' +
+            'question, pass the fragment here together with result="failed" and answer from ' +
+            'that enumeration.',
         },
         limit: limitProperty(
           'Max number of checks to return (default 20, max 500).',
@@ -150,6 +179,13 @@ export const getScaChecksTool: ToolDefinition = {
     const limit = clampLimit(params.limit, 20, 500);
     const result = optionalStringParam(params.result);
     const search = optionalStringParam(params.search);
+    // Normalized subject (#8935 item I2, integration review): trimmed, treated as ABSENT when
+    // whitespace-only (a '   ' subject otherwise became include '.*\ \ \ .*' — matches nothing —
+    // plus a prefix on the empty string), and length-capped so the per-character include
+    // expansion below stays bounded cluster-side.
+    const trimmedSearch = search?.trim().slice(0, MAX_SEARCH_SUBJECT_LENGTH);
+    const subject =
+      trimmedSearch && trimmedSearch.length > 0 ? trimmedSearch : undefined;
     // `search` is EXACT-or-PREFIX, never substring, for the HITS query. `check.name`/
     // `check.description`/`check.rationale` are all mapped `keyword` in 5.0, so a bare
     // `multi_match` silently returned nothing for the fragment its own description once invited:
@@ -162,14 +198,14 @@ export const getScaChecksTool: ToolDefinition = {
     // wildcard, which this plugin's guardrails reject on purpose (unbounded term-dictionary
     // scan). The real long-term fix for the HITS side is an analyzed sub-field on these three
     // fields in the SCA index template, which is a platform-side change, not a plugin one.
-    const searchShould = search
+    const searchShould = subject
       ? {
           bool: {
             minimum_should_match: 1,
             should: [
               {
                 multi_match: {
-                  query: search,
+                  query: subject,
                   fields: [
                     'check.name',
                     'check.description',
@@ -177,26 +213,35 @@ export const getScaChecksTool: ToolDefinition = {
                   ],
                 },
               },
-              { prefix: { 'check.name': search.trim() } },
+              { prefix: { 'check.name': subject } },
             ],
           },
         }
       : undefined;
     // #8935 item I2: attached whenever `result` OR `search` is supplied -- the two drill-down
     // shapes behind "which checks failed"/"which SSH checks failed". A bare listing call (neither
-    // supplied) attaches no `matching_checks` agg at all, so its request body stays byte-identical
-    // to before this item. Scoped to `search`'s fragment via `buildContainsIncludePattern` when a
+    // supplied) attaches no enumeration agg at all, so its request body stays byte-identical to
+    // before this item. Scoped to `search`'s fragment via `buildContainsIncludePattern` when a
     // fragment was supplied; unscoped (still capped at ANSWER_BUCKET_CAP) when only `result` was
-    // supplied, which is what closes the enumeration half of the HONEST SCOPE NOTE below.
+    // supplied, which is what closes the enumeration half of the HONEST SCOPE NOTE below. The agg
+    // NAME carries the result scope in-band — see matchingChecksAggName.
     const matchingChecksAgg =
-      result || search
+      result || subject
         ? {
-            matching_checks: {
+            [matchingChecksAggName(result)]: {
               terms: {
                 field: 'check.name',
                 size: ANSWER_BUCKET_CAP,
-                ...(search
-                  ? { include: buildContainsIncludePattern(search.trim()) }
+                // Alphabetical, EXPLICITLY (#8935 item I2, integration review): wazuh-states-sca
+                // holds one document per check per agent+policy, so every bucket's doc_count is 1
+                // and the default count ordering degenerates to its _key tie-break anyway —
+                // making the order explicit makes the cut DETERMINISTIC and honestly describable
+                // when more checks match than `size` can carry (the digest's trim/remainder note
+                // describes a first-N-in-response-order cut; "the alphabetically first N" is that,
+                // stated plainly, instead of an arbitrary cut a model could read as a top-N).
+                order: { _key: 'asc' },
+                ...(subject
+                  ? { include: buildContainsIncludePattern(subject) }
                   : {}),
               },
             },
@@ -226,13 +271,18 @@ export const getScaChecksTool: ToolDefinition = {
         // `search`'s should-clause moved from `query.bool.filter` to `post_filter` (#8935 item
         // I2). `post_filter` runs AFTER aggregations, filtering HITS (and hits.total) only -- so
         // exact-name/prefix HITS behavior for a `search` caller is completely unchanged, while
-        // `results` and `matching_checks` below are computed over the full agent+policy+result
-        // matched set, unaffected by a fragment. Before this move, `search: "ssh"` (0 hits on a
-        // keyword field) put the search clause in `query.bool.filter`, so EVERY aggregation was
-        // also computed over that same empty set -- a topic fragment degenerated every
-        // aggregation to zero, not just the hits list. `hits.total` honoring `post_filter` (so a
-        // fragment still narrows the reported `counts.total`, just not the aggregations) is
-        // documented OpenSearch behavior, not a guess -- flagged here for the live-proof pass.
+        // the enumeration agg below is computed over the full agent+policy+result matched set,
+        // unaffected by a fragment. Before this move, `search: "ssh"` (0 hits on a keyword field)
+        // put the search clause in `query.bool.filter`, so EVERY aggregation was also computed
+        // over that same empty set -- a topic fragment degenerated every aggregation to zero, not
+        // just the hits list. `hits.total` honoring `post_filter` (so a fragment still narrows
+        // the reported `counts.total`, just not the aggregations) is documented OpenSearch
+        // behavior, not a guess -- flagged here for the live-proof pass. The digest side is
+        // post_filter-AWARE: buildZeroRowHint (digest.ts) sees `post_filter` on the request body
+        // and tells the model the 0 rows are a post-filter artifact with the aggregations still
+        // population-true, instead of blaming the query filters (integration review: a fragment
+        // call otherwise reported "0 rows. Filters applied: wazuh.agent.id, policy.id,
+        // check.result" right beside a breakdown proving all three matched).
         ...(searchShould ? { post_filter: searchShould } : {}),
         _source: [
           'check.id',
@@ -253,18 +303,31 @@ export const getScaChecksTool: ToolDefinition = {
         // already reads any response's `aggregations` generically, so this needs no digest change.
         //
         // HONEST SCOPE NOTE: when the caller ALREADY filters by `result` (the natural call behind
-        // "which SSH checks failed"), `results` above is a single bucket equal to counts.total —
-        // it adds category-count truth for UNFILTERED calls, but on its own it does NOT close the
+        // "which SSH checks failed"), `results` is a single bucket equal to counts.total — it
+        // adds category-count truth for UNFILTERED calls, but on its own it does NOT close the
         // enumeration half of the reported instance ("named 2 of 10 failed checks" with the count
-        // already present). #8935 item I2 closes that half: `matching_checks` below enumerates the
-        // actual check NAMES over the same full matched set, so a `result="failed"` (optionally
-        // `search`-scoped) call now gets both the count (from `results`) and the names (from
-        // `matching_checks`) population-true, inside ANSWER_BUCKET_CAP/MAX_AGG_SIZE. Two top-level
-        // aggs total when both apply, inside guardrails' MAX_TOP_LEVEL_AGGS (5).
+        // already present). #8935 item I2 closes that half: the matching_* agg below enumerates
+        // the actual check NAMES over the same full matched set, so a `result="failed"`
+        // (optionally `search`-scoped) call now gets both the count (from `results`) and the
+        // names population-true, inside ANSWER_BUCKET_CAP/MAX_AGG_SIZE and guardrails'
+        // MAX_TOP_LEVEL_AGGS (5).
+        //
+        // `results` is DROPPED whenever a `search` subject is supplied (#8935 item I2,
+        // integration review): with the search clause in `post_filter`, `results` would count the
+        // WHOLE agent+policy(+result) scope while the question is about the subject — an
+        // exact-name call would show "Failed: 102" beside its one matching check, and a fragment
+        // call would place a policy-wide distribution beside a subject-scoped name list with
+        // nothing in the payload distinguishing the two scopes. For a subject question the
+        // matching_* enumeration IS the answer; the policy-wide distribution belongs to the
+        // subject-less call shapes, where the query scope and the agg scope coincide.
         aggs: {
-          results: {
-            terms: { field: 'check.result', size: BREAKDOWN_BUCKET_CAP },
-          },
+          ...(subject
+            ? {}
+            : {
+                results: {
+                  terms: { field: 'check.result', size: BREAKDOWN_BUCKET_CAP },
+                },
+              }),
           ...(matchingChecksAgg ? matchingChecksAgg : {}),
         },
       },

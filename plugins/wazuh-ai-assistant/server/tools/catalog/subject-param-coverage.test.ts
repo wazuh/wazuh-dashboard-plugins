@@ -15,34 +15,41 @@ import { ToolDefinition } from '../types';
  * correctly but the narrower field/subject already happens to be empty. This sweep makes that
  * mechanical and catalog-wide instead of relying on a human noticing during review.
  *
- * WHAT COUNTS AS A "SUBJECT" PARAM: name matches `/^(search|.*_contains)$/` (today: only
- * `get_sca_checks`'s `search`; the `_contains` half exists for a future tool that names its
- * parameter e.g. `title_contains`), `type: 'string'`, no `enum` (a closed-vocabulary picker is not
- * free text), not `jsonString` (the escape hatch's raw-DSL parameter is a different contract
- * entirely, already covered by `agg-size-coverage.test.ts`'s escape-hatch handling).
+ * WHAT COUNTS AS A "SUBJECT" PARAM: name matches `SUBJECT_PARAM_NAME_RE` below (today:
+ * `get_sca_checks`'s `search` and `get_fim_files`'s `path_prefix`; the `_contains`/`_prefix`
+ * halves exist so a future tool naming its parameter e.g. `title_contains` or `name_prefix` is
+ * swept automatically), `type: 'string'`, no `enum` (a closed-vocabulary picker is not free
+ * text), not `jsonString` (the escape hatch's raw-DSL parameter is a different contract entirely,
+ * already covered by `agg-size-coverage.test.ts`'s escape-hatch handling). Deliberately NOT
+ * matched (integration review asked for the boundary to be stated): exact-VALUE subject params —
+ * `rule_titles`/`rule_tags` (exact arrays), `agent_identifier` (an id/name resolved by
+ * entity-resolution) — promise an exact lookup, not free-text narrowing, so "the value must leave
+ * a trace" is the wrong contract for them (they have their own colocated tests).
  *
  * METHOD: build each qualifying tool's request with every OTHER parameter filled by a minimal
  * schema-legal value and the subject parameter itself set to a distinctive SENTINEL string. The
- * sentinel must leave a LOAD-BEARING trace somewhere in the built request body -- either verbatim
- * (a `multi_match`/`prefix`/`term` clause that embeds the raw value) or as the per-character
+ * sentinel must leave a LOAD-BEARING trace in the built request body -- either verbatim (a
+ * `multi_match`/`prefix`/`term` clause that embeds the raw value) or as the per-character
  * case-class pattern `get-sca-checks.ts`'s own `buildContainsIncludePattern` produces (an
- * `include`-scoped aggregation). Detected by stringifying the whole request body and searching for
- * either form, so it does not matter whether the value ends up in `query`, `post_filter`, or an
- * aggregation `include` -- the exact set of places #8935 item I2's own fix touches.
+ * `include`-scoped aggregation) -- and that trace must exist somewhere OUTSIDE `post_filter`
+ * (integration review: a `post_filter` narrows only the returned rows, so a subject wired ONLY
+ * into a post_filter that matches nothing is exactly the shipped-defect shape this sweep must
+ * refuse; get_sca_checks passes because its subject also scopes the enumeration agg's
+ * `include`).
  *
- * WHAT THIS SWEEP FAILS ON: right NOW, on both the unfixed `fix/8920-*` base and this branch's fix,
- * `get_sca_checks` is the only tool with a qualifying parameter, and in BOTH cases its `search`
- * value reaches the request (base: a `query.bool.filter` multi_match/prefix should-clause; this
- * branch: the same should-clause relocated to `post_filter`, plus the new `matching_checks` agg
- * `include` when a fragment is supplied). So this sweep PASSES on the unfixed base -- it is
+ * WHAT THIS SWEEP FAILS ON: right NOW, on both the unfixed `fix/8920-*` base and this branch's
+ * fix, every qualifying parameter leaves a trace outside `post_filter` (base get_sca_checks: a
+ * `query.bool.filter` multi_match/prefix should-clause; this branch: the `matching_*` agg
+ * `include`; get_fim_files: a `prefix` clause). So this sweep PASSES on the unfixed base -- it is
  * deliberately NOT the fix witness for get_sca_checks's own defect (the colocated tests in
- * `get-sca-checks.test.ts` are; several of them fail on base). This file is the FORWARD fence: the
- * next tool that declares `search`/`*_contains` and forgets to wire it in fails HERE, on the day it
- * is added, rather than shipping silently. The "mechanism self-test" below proves the fence
- * actually trips, using a fabricated tool that reproduces exactly that omission.
+ * `get-sca-checks.test.ts` are; several of them fail on base). This file is the FORWARD fence:
+ * the next tool that declares `search`/`*_contains`/`*_prefix` and forgets to wire it in — or
+ * wires it ONLY into a `post_filter`, where it cannot shape the answer — fails HERE, on the day
+ * it is added, rather than shipping silently. The mechanism self-tests below prove the fence
+ * actually trips on both shapes, using fabricated tools that reproduce each omission.
  */
 
-const SUBJECT_PARAM_NAME_RE = /^(search|.*_contains)$/;
+const SUBJECT_PARAM_NAME_RE = /^(search|.*_contains|.*_prefix)$/;
 
 /** Letters-only (so the per-character case-class expansion below is defined for every character)
  * and distinctive enough that it will not coincidentally already appear in a tool's fixed query
@@ -154,13 +161,20 @@ function checkSubjectParam(
       `${error instanceof Error ? error.message : String(error)}`
     );
   }
-  const serialized = JSON.stringify(requestBodyRecord(request));
+  // The trace must survive with `post_filter` REMOVED: a post_filter narrows only the returned
+  // rows (aggregations are computed before it), so a subject wired solely into a post_filter
+  // that matches nothing on an exact-keyword field is functionally ignored for the answer — the
+  // exact defect shape #8935 item I2's integration review found in the first cut of that fix.
+  const body = requestBodyRecord(request);
+  const { post_filter: _postFilter, ...bodyOutsidePostFilter } = body;
+  const serialized = JSON.stringify(bodyOutsidePostFilter);
   const includeFragment = sentinelIncludeFragment(SENTINEL);
   if (!serialized.includes(SENTINEL) && !serialized.includes(includeFragment)) {
     return (
       `${def.spec.name}.${paramName}: declared as a free-text subject parameter, but a sentinel ` +
       'value placed in it left no trace (verbatim or include-pattern) anywhere in the built ' +
-      'request body -- the parameter looks load-bearing to a caller but is silently ignored.'
+      'request body outside post_filter -- the parameter looks load-bearing to a caller but ' +
+      'cannot shape the answer.'
     );
   }
   return undefined;
@@ -185,10 +199,10 @@ test('every declared free-text subject parameter is load-bearing', () => {
   // If the naming/shape heuristic above ever stops matching ANY parameter in the registry (e.g.
   // `get_sca_checks`'s `search` is renamed or re-typed without a replacement), this sweep would
   // silently check zero tools and always pass -- worse than not existing, because it would read as
-  // coverage. Guard the guard: today's catalog has exactly one qualifying parameter
-  // (`get_sca_checks.search`).
+  // coverage. Guard the guard: today's catalog has two qualifying parameters
+  // (`get_sca_checks.search`, `get_fim_files.path_prefix`).
   assert.ok(
-    qualifyingParamCount > 0,
+    qualifyingParamCount >= 2,
     'no registry tool declared a parameter this sweep recognizes as free-text subject -- the ' +
       'detection heuristic (SUBJECT_PARAM_NAME_RE / isFreeTextSubjectParam) no longer matches ' +
       'anything real, so this test is not actually checking the class it exists for',
@@ -241,5 +255,47 @@ test('mechanism self-test: a tool that declares "search" but ignores it fails th
     failure,
     'the sweep failed to catch a fabricated tool that declares "search" and ignores it entirely ' +
       '-- the check itself is broken and would not catch a real regression either',
+  );
+});
+
+test('mechanism self-test: a tool that wires "search" ONLY into post_filter fails the sweep', () => {
+  // The subtler defect shape (integration review of #8935 item I2's first cut): the subject DOES
+  // appear in the built body — but only inside `post_filter`, which narrows the returned rows
+  // after every aggregation is computed. On an exact-keyword field a fragment post_filter matches
+  // nothing, so the parameter cannot shape the answer at all; the sweep must refuse the trace.
+  const postFilterOnly: ToolDefinition = {
+    spec: {
+      name: 'fabricated_post_filter_only',
+      description: 'Test fixture only -- never registered in the real catalog.',
+      parameters: {
+        type: 'object',
+        properties: {
+          search: {
+            type: 'string',
+            description: 'Wired, but only where it cannot shape the answer.',
+          },
+        },
+      },
+    },
+    target: 'indexer',
+    tier: 'T1',
+    buildRequest(params) {
+      return {
+        target: 'indexer',
+        index: 'wazuh-does-not-matter*',
+        body: {
+          query: { bool: { filter: [] } },
+          post_filter: { term: { 'some.field': params.search } },
+        },
+      };
+    },
+    tableSpec: { columns: [] },
+    digest: { sampleColumns: [] },
+  };
+  const failure = checkSubjectParam(postFilterOnly, 'search');
+  assert.ok(
+    failure,
+    'the sweep accepted a subject parameter that only a post_filter ever reads -- the ' +
+      'outside-post_filter requirement is not being enforced',
   );
 });

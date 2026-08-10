@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {
+  buildDiscoverDsl,
   executeToolCall,
   PrivacyContext,
   resolveSecurityAnalyticsSpace,
@@ -497,4 +498,30 @@ test('sub-technique split: a breakdown carrying a dotted technique id gains the 
     digest.hint as string,
     /parent technique bucket .* does NOT include its sub-techniques/,
   );
+});
+
+// --- #8935 item I2: the "Open in Discover" DSL matches the post-filtered table -----------------
+
+test('buildDiscoverDsl: a post_filter is folded into the DSL so Discover opens the same rows as the table', () => {
+  // FAILS ON BASE: base ships body.query alone, so a get_sca_checks call with an exact-name
+  // `search` rendered a 1-row table whose Discover link opened the whole policy (the post_filter
+  // narrows hits.hits, and the table is built from hits.hits).
+  const query = {
+    bool: { filter: [{ term: { 'wazuh.agent.id': '000' } }] },
+  };
+  const postFilter = {
+    bool: {
+      minimum_should_match: 1,
+      should: [{ prefix: { 'check.name': 'Ensure SSH' } }],
+    },
+  };
+  assert.deepEqual(buildDiscoverDsl({ query, post_filter: postFilter }), {
+    bool: { filter: [query, postFilter] },
+  });
+});
+
+test('buildDiscoverDsl: without a post_filter the DSL is body.query unchanged (match_all fallback)', () => {
+  const query = { bool: { filter: [{ term: { a: 1 } }] } };
+  assert.deepEqual(buildDiscoverDsl({ query }), query);
+  assert.deepEqual(buildDiscoverDsl({}), { match_all: {} });
 });
