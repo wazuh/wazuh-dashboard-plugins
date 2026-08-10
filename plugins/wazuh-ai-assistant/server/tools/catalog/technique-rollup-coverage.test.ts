@@ -291,7 +291,17 @@ test('chokepoint rollup: non-technique terms and aggregations pass through untou
       },
     },
   };
-  const rolled = rollUpTechniqueIdFilters(body);
+  // rollUpTechniqueIdFilters returns `{...body, query: transformNode(body.query)}` -- `aggs` is
+  // never touched, so passing `body` itself would make `rolled.aggs` literally BE `body.aggs`
+  // (same reference), and `assert.deepEqual` on an object and itself always passes regardless of
+  // what the function does to aggs. Deep-cloning the input before the call is what turns the
+  // assertion below into a real structural check instead of a tautology.
+  const rolled = rollUpTechniqueIdFilters(JSON.parse(JSON.stringify(body)));
+  assert.notEqual(
+    rolled.aggs,
+    body.aggs,
+    'sanity check on the fix itself: the clone must make this a different reference',
+  );
   assert.deepEqual(rolled.aggs, body.aggs);
   const filter = (rolled.query as { bool: { filter: unknown[] } }).bool.filter;
   assert.deepEqual(filter, [{ term: { 'wazuh.agent.name': 'T1059' } }]);
