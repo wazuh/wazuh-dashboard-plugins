@@ -628,6 +628,80 @@ test('buildDigest: a synthetic breakdown over a truncated page is labeled page-o
   assert.equal(/Use counts\/breakdown/.test(digest.samplesNote!), false);
 });
 
+test('buildDigest: a REAL breakdown with a truncated bucket list discloses sum_other_doc_count', () => {
+  // A terms agg sized 5 on a 12-agent deployment: OpenSearch returns the top 5 buckets plus
+  // sum_other_doc_count for the rest. Without the note, the digest certified a top-5 agent list
+  // as the population — the sample-narrated-as-population class one layer up, with the digest's
+  // own "use counts/breakdown" wording as warrant.
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'wazuh.agent.name', label: 'Agent' }] },
+    digest: { sampleColumns: ['wazuh.agent.name'] },
+  });
+  const result = {
+    hits: { total: { value: 120 }, hits: [] },
+    aggregations: {
+      wazuh_agent_name: {
+        doc_count_error_upper_bound: 0,
+        sum_other_doc_count: 37,
+        buckets: [
+          { key: 'web-prod-01', doc_count: 40 },
+          { key: 'web-prod-02', doc_count: 25 },
+          { key: 'db-01', doc_count: 10 },
+          { key: 'db-02', doc_count: 5 },
+          { key: 'mail-01', doc_count: 3 },
+        ],
+      },
+    },
+  };
+  const digest = buildDigest('get_vulnerabilities', result, def);
+  assert.ok(digest.breakdownNote, 'expected the bucket-truncation note');
+  assert.match(digest.breakdownNote!, /37 additional/);
+  assert.match(digest.breakdownNote!, /not.*complete set|complete set/i);
+});
+
+test('buildDigest: a REAL breakdown with a complete bucket list stays note-free (byte-identical)', () => {
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'wazuh.agent.name', label: 'Agent' }] },
+    digest: { sampleColumns: ['wazuh.agent.name'] },
+  });
+  const result = {
+    aggregations: {
+      wazuh_agent_name: {
+        sum_other_doc_count: 0,
+        buckets: [{ key: 'web-prod-01', doc_count: 40 }],
+      },
+    },
+  };
+  const digest = buildDigest('get_vulnerabilities', result, def);
+  assert.ok(!('breakdownNote' in digest));
+});
+
+test('buildDigest: samplesNote still points at a REAL breakdown whose counts are exact, even with a truncated key set', () => {
+  // The key-set truncation note (case 2) must NOT flip samplesNote into its distrust variant —
+  // that wording ("ALSO scoped to only these returned rows") is specific to the synthetic
+  // page-scope case and would be false for a real aggregation.
+  const def = buildToolDef({
+    tableSpec: { columns: [{ field: 'wazuh.agent.name', label: 'Agent' }] },
+    digest: { sampleColumns: ['wazuh.agent.name'] },
+  });
+  const rows = Array.from({ length: 8 }, () =>
+    findingRow('web-prod-01', 'Rule X', '2026-01-01T00:00:00Z'),
+  );
+  const result = {
+    hits: { total: { value: 120 }, hits: rows },
+    aggregations: {
+      wazuh_agent_name: {
+        sum_other_doc_count: 37,
+        buckets: [{ key: 'web-prod-01', doc_count: 83 }],
+      },
+    },
+  };
+  const digest = buildDigest('get_vulnerabilities', result, def);
+  assert.ok(digest.breakdownNote);
+  assert.ok(digest.samplesNote);
+  assert.match(digest.samplesNote!, /Use counts\/breakdown/);
+});
+
 // --- message / breakdown[].key hardening (#8890) ---------------------------------------------
 
 /** Regex control-character classes (e.g. /[\x00-\x1F]/) are themselves flagged by

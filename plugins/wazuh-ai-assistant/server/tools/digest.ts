@@ -17,17 +17,29 @@ export interface Digest {
    * digests stay byte-identical to before it existed. It also lets privacy.ts's field-policy pass
    * attribute each bucket key to the right aggregation field. */
   breakdown?: Array<{ key: string; count: number; agg?: string }>;
-  /** Set only when `breakdown` was synthesized from the RETURNED page (`buildSyntheticBreakdown`)
-   * rather than a real OpenSearch aggregation over the full matched set (`buildBreakdown`), AND
-   * that page is not the whole matched set (`counts.truncated`) — i.e. an entity whose rows sort
-   * outside the page is invisible to `breakdown`, the exact defect #8870's validation update
-   * reproduced live (limit:20 on 26 matches synthesizing 13/7 and 11/9 while the true distribution
-   * is 16/8/2 and 13/13). Tells the model `breakdown` is NOT authoritative for the full result,
-   * unlike `samplesNote` (which caveats `samples` only) — see `buildSamplesNote`'s own updated
-   * wording for how the two combine. Omitted whenever `breakdown` is a real aggregation (always
-   * population-true: OpenSearch computes `aggregations` over every matched doc regardless of
-   * `size`) or a synthetic one over an untruncated result (`returned === total`, where grouping
-   * every returned row already IS grouping the full population). */
+  /** Set in exactly two situations, each a distinct honesty gap the model cannot see on its own:
+   *
+   * 1. `breakdown` was synthesized from the RETURNED page (`buildSyntheticBreakdown`) rather than
+   *    a real OpenSearch aggregation over the full matched set (`buildBreakdown`), AND that page
+   *    is not the whole matched set (`counts.truncated`) — i.e. an entity whose rows sort outside
+   *    the page is invisible to `breakdown`, the exact defect #8870's validation update
+   *    reproduced live (limit:20 on 26 matches synthesizing 13/7 and 11/9 while the true
+   *    distribution is 16/8/2 and 13/13). Tells the model `breakdown` is NOT authoritative for
+   *    the full result, unlike `samplesNote` (which caveats `samples` only).
+   * 2. `breakdown` came from a REAL terms aggregation whose BUCKET LIST is truncated — the terms
+   *    response's `sum_other_doc_count` > 0 (`sumOtherDocCounts` below). Per-bucket COUNTS are
+   *    still exact and population-true, but the KEY SET is top-N only: presenting 5 agent-name
+   *    buckets as "the agents affected" on a 12-agent deployment reproduces the exact
+   *    sample-narrated-as-population class one layer up, with the digest's own trust-the-
+   *    breakdown wording as warrant. The note states the uncounted remainder explicitly.
+   *
+   * Omitted for a real aggregation whose buckets are complete, and for a synthetic one over an
+   * untruncated result (`returned === total`, where grouping every returned row already IS
+   * grouping the full population). `buildSamplesNote`'s "trust the breakdown" variant keys off
+   * the SYNTHETIC-page-scope case only (see `syntheticPageScoped` in `buildDigest`): a real
+   * breakdown with a truncated key set still has exact counts, so pointing the model at
+   * counts/breakdown stays truthful — this note is what tells it the key list is not the
+   * universe. */
   breakdownNote?: string;
   /** Set only when `counts.returned` is 0 AND the executed query carried 2+ filter clauses — see
    * `buildZeroRowHint` below. A 0-row result is exactly as consistent with "a wrong field name" or
@@ -863,6 +875,38 @@ function buildBreakdownNote(
   );
 }
 
+/** Total `sum_other_doc_count` across every top-level bucket aggregation in the response —
+ * OpenSearch reports it on every terms aggregation whose bucket list was truncated by `size`.
+ * Non-terms bucket aggs (date_histogram etc.) simply lack the field and contribute 0. */
+function sumOtherDocCounts(result: unknown): number {
+  const aggregations = (
+    result as { aggregations?: Record<string, unknown> } | undefined
+  )?.aggregations;
+  if (!aggregations) {
+    return 0;
+  }
+  let sum = 0;
+  for (const aggValue of Object.values(aggregations)) {
+    const other = (aggValue as { sum_other_doc_count?: unknown } | undefined)
+      ?.sum_other_doc_count;
+    if (typeof other === 'number' && other > 0) {
+      sum += other;
+    }
+  }
+  return sum;
+}
+
+/** Caveat for a REAL breakdown whose bucket LIST is truncated (`sum_other_doc_count` > 0) — see
+ * `Digest.breakdownNote`'s doc comment, case 2. Counts stay exact; the key set is what must not
+ * be read as complete. */
+function buildBucketTruncationNote(otherCount: number): string {
+  return (
+    `Per-bucket counts are exact, but the bucket list is top-N only: ${otherCount} additional ` +
+    'matching rows fall under keys not listed. Do not present the listed keys as the complete ' +
+    'set of values.'
+  );
+}
+
 /**
  * PRIVACY SEAM: the field-level pseudonymizer
  * (server/tools/privacy.ts's `applyFieldPolicy`) wraps this function's output, not its inside.
@@ -911,6 +955,11 @@ export function buildDigest(
   const realBreakdown = buildBreakdown(result);
   let breakdown = realBreakdown;
   let breakdownNote: string | undefined;
+  // Distinguishes the two breakdownNote cases (see its doc comment): only the SYNTHETIC
+  // page-scope case makes the breakdown untrustworthy as a whole — a real breakdown with a
+  // truncated key set still has exact, population-true counts, so `buildSamplesNote` must not
+  // tell the model to distrust it.
+  let syntheticPageScoped = false;
   if (
     !realBreakdown &&
     def.digest.breakdownDimensions &&
@@ -919,6 +968,12 @@ export function buildDigest(
     breakdown = buildSyntheticBreakdown(rows, def.digest.breakdownDimensions);
     if (breakdown && truncated) {
       breakdownNote = buildBreakdownNote(total, returned);
+      syntheticPageScoped = true;
+    }
+  } else if (realBreakdown) {
+    const otherCount = sumOtherDocCounts(result);
+    if (otherCount > 0) {
+      breakdownNote = buildBucketTruncationNote(otherCount);
     }
   }
   const hint = buildZeroRowHint(requestBody, returned);
@@ -926,7 +981,7 @@ export function buildDigest(
     returned,
     samples.length,
     !!breakdown,
-    !!breakdown && !breakdownNote,
+    !!breakdown && !syntheticPageScoped,
   );
   // Manager responses carry a top-level `message` alongside `data` (e.g. an active-response no-op:
   // error:0, affected_items/failed_items both empty, message:"AR command was not sent to any
